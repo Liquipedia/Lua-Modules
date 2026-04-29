@@ -13,6 +13,7 @@ local Json = Lua.import('Module:Json')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TypeUtil = Lua.import('Module:TypeUtil')
@@ -69,7 +70,7 @@ function TournamentStructure.readMatchGroupsSpec(args)
 	end
 
 	local function resolve(rawPageName)
-		local namespaceName, basePageName, stageName = TournamentStructure._splitPageName(rawPageName)
+		local namespaceName, basePageName, stageName = Page.splitPageName(rawPageName)
 
 		-- args.ns is deprecated
 		if not namespaceName and args.ns then
@@ -77,7 +78,7 @@ function TournamentStructure.readMatchGroupsSpec(args)
 		end
 
 		local pageName = String.isNotEmpty(basePageName)
-			and TournamentStructure._createPageName(namespaceName, basePageName)
+			and Page.createPageName(namespaceName, basePageName)
 			or FULL_PAGENAME
 		local redirectedPage = mw.title.new(TournamentStructure._resolveRedirect(pageName))
 		redirectedPage.fragment = stageName or ''
@@ -147,8 +148,8 @@ function TournamentStructure.groupByStage(groupTables, brackets, spec)
 		local basePageName = recordGroup[1].pagename:gsub('_', ' ')
 		local stageName = TournamentStructure.getStageName(recordGroup)
 		local namespaceName = String.nilIfEmpty(Namespace.nameFromId(recordGroup[1].namespace))
-		local pageName = TournamentStructure._createPageName(namespaceName, basePageName, stageName)
-		local wholePageName = TournamentStructure._createPageName(namespaceName, basePageName)
+		local pageName = Page.createPageName(namespaceName, basePageName, stageName)
+		local wholePageName = Page.createPageName(namespaceName, basePageName)
 
 		local stageIndex = recordGroup[1].stageIndex or stageIndexes[pageName] or stageIndexes[wholePageName]
 		-- need it available for later
@@ -234,7 +235,7 @@ end)
 ---@param pageName string
 ---@return ConditionTree
 function TournamentStructure.getPageNameFilter(matchGroupType, pageName)
-	local namespaceName, basePageName, stageName = TournamentStructure._splitPageName(pageName)
+	local namespaceName, basePageName, stageName = Page.splitPageName(pageName)
 	local condition = ConditionTree(BooleanOperator.all)
 	if namespaceName then
 		condition:add(ConditionNode(
@@ -457,27 +458,6 @@ function TournamentStructure.fetchMatches(spec)
 		}),
 		MatchGroupUtil.matchFromRecord
 	)
-end
-
---- Splits a page name into a namespace, base, and stage.
----@param pageName string
----@return string?, string, string?
-function TournamentStructure._splitPageName(pageName)
-	local title = mw.title.new(pageName)
-	assert(title, 'Invalid pagename "' .. pageName .. '"')
-	return String.nilIfEmpty(title.nsText), title.text, String.nilIfEmpty(title.fragment)
-end
-
---- Joins given namespace, base page name, and stage into a page name.
----@param namespaceName string?
----@param basePageName string
----@param stageName string?
----@return string
-function TournamentStructure._createPageName(namespaceName, basePageName, stageName)
-	if String.isEmpty(basePageName) then
-		return ''
-	end
-	return mw.title.makeTitle(namespaceName or '', basePageName, stageName).fullText
 end
 
 return TournamentStructure

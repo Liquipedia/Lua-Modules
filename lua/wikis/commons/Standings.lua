@@ -12,7 +12,9 @@ local Condition = Lua.import('Module:Condition')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Lpdb = Lua.import('Module:Lpdb')
+local Namespace = Lua.import('Module:Namespace')
 local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
@@ -24,6 +26,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local Standings = {}
 
 ---@class StandingsModel
+---@field namespace integer
 ---@field pageName string
 ---@field standingsIndex integer
 ---@field tournament StandardTournament?
@@ -31,11 +34,11 @@ local Standings = {}
 ---@field section string?
 ---@field type 'ffa'|'swiss'|'league'
 ---@field matches MatchGroupUtilMatch[]
----@field config table
+---@field config {hasdraw: string, hasovertime: string, haspoints: string}
 ---@field rounds StandingsRound[]
 ---@field tiebreakers {id: string, title: string?}[]
----@field private record standingstable
----@field private entryRecords standingsentry[]
+---@field package record standingstable
+---@field package entryRecords standingsentry[]
 
 ---@class StandingsRound
 ---@field round integer
@@ -58,14 +61,14 @@ local Standings = {}
 ---@field pointsChangeFromPreviousRound number
 ---@field specialStatus 'dq'|'nc'|'' # nc = non-competing (not in the round)
 ---@field tiebreakerValues table<string, {value: integer?, display: string?}>
----@field private record standingstable
+---@field package record standingsentry
 
 ---Fetches a standings table from a page. Tries to read from page variables before fetching from LPDB.
 ---@param pagename string
 ---@param standingsIndex integer #0-index'd on per page
 ---@return StandingsModel?
 function Standings.getStandingsTable(pagename, standingsIndex)
-	local pageNameInCorrectFormat = string.gsub(pagename, ' ', '_')
+	local pageNameInCorrectFormat = Page.pageifyLink(pagename)
 	local myPageName = string.gsub(mw.title.getCurrentTitle().text, ' ', '_')
 
 	if pageNameInCorrectFormat == myPageName then
@@ -76,8 +79,14 @@ function Standings.getStandingsTable(pagename, standingsIndex)
 		end
 	end
 
+	local namespaceName, basePageName = Page.splitPageName(pageNameInCorrectFormat)
+
 	local record = mw.ext.LiquipediaDB.lpdb('standingstable', {
-		conditions = '[[pagename::' .. pageNameInCorrectFormat .. ']] AND [[standingsindex::' .. standingsIndex .. ']]',
+		conditions = tostring(Condition.Tree(Condition.BooleanOperator.all):add{
+			Condition.Node(Condition.ColumnName('pagename'), Condition.Comparator.eq, basePageName:gsub(' ', '_')),
+			Condition.Node(Condition.ColumnName('standingsindex'), Condition.Comparator.eq, standingsIndex),
+			Condition.Node(Condition.ColumnName('namespace'), Condition.Comparator.eq, Namespace.idFromName(namespaceName)),
+		}),
 		limit = 1,
 	})[1]
 	if not record then
@@ -115,6 +124,7 @@ local StandingsEntryMT = {
 ---@return StandingsModel
 function Standings.standingsFromRecord(record, entries)
 	local standings = {
+		namespace = record.namespace,
 		pageName = record.pagename,
 		standingsIndex = record.standingsindex,
 		title = record.title,
@@ -126,7 +136,7 @@ function Standings.standingsFromRecord(record, entries)
 		entryRecords = entries,
 	}
 
-	-- Some properties are derived from other properies and we can calculate them when accessed.
+	-- Some properties are derived from other properties and we can calculate them when accessed.
 	setmetatable(standings, StandingsMT)
 
 	return standings
@@ -151,7 +161,7 @@ function Standings.entryFromRecord(record)
 		record = record,
 	}
 
-	-- Some properties are derived from other properies and we can calculate them when accessed.
+	-- Some properties are derived from other properties and we can calculate them when accessed.
 	setmetatable(entry, StandingsEntryMT)
 
 	return entry
@@ -160,7 +170,6 @@ end
 ---@param standings StandingsModel
 ---@return MatchGroupUtilMatch[]
 function Standings.fetchMatches(standings)
-	---@diagnostic disable-next-line: invisible
 	local matchids = standings.record.matches or {}
 	local bracketIds = Array.unique(Array.map(matchids, function(matchid)
 		return MatchGroupUtil.splitMatchId(matchid)
@@ -175,7 +184,6 @@ end
 ---@param entry StandingsEntryModel
 ---@return MatchGroupUtilMatch?
 function Standings.fetchMatch(entry)
-	---@diagnostic disable-next-line: invisible
 	local matchid = entry.record.extradata.matchid
 	if not matchid then
 		return
@@ -195,9 +203,11 @@ end
 ---@return standingsentry[]
 function Standings.fetchEntries(standings)
 	local standingsEntries = {}
-	local conditions = Condition.Tree(Condition.BooleanOperator.all)
-		:add(Condition.Node(Condition.ColumnName('pagename'), Condition.Comparator.eq, standings.pageName))
-		:add(Condition.Node(Condition.ColumnName('standingsindex'), Condition.Comparator.eq, standings.standingsIndex))
+	local conditions = Condition.Tree(Condition.BooleanOperator.all):add{
+		Condition.Node(Condition.ColumnName('namespace'), Condition.Comparator.eq, standings.namespace),
+		Condition.Node(Condition.ColumnName('pagename'), Condition.Comparator.eq, standings.pageName),
+		Condition.Node(Condition.ColumnName('standingsindex'), Condition.Comparator.eq, standings.standingsIndex),
+	}
 
 	Lpdb.executeMassQuery(
 		'standingsentry',
@@ -215,9 +225,7 @@ end
 ---@param standings StandingsModel
 ---@return StandingsRound[]
 function Standings.makeRounds(standings)
-	---@diagnostic disable-next-line: invisible
 	local record = standings.record
-	---@diagnostic disable-next-line: invisible
 	local standingsEntries = standings.entryRecords
 
 	local roundCount = Array.maxBy(Array.map(standingsEntries, function(entry)
