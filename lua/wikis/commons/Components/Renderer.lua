@@ -61,9 +61,11 @@ function Renderer.render(vNode, context)
 		---@cast vNode ContextNode<any>
 		-- Push a new link onto the Context chain
 		local newContext = {
-			parent = context,
-			def = vNode.props.def,
-			value = vNode.props.value
+			props = {
+				parent = context,
+				def = vNode.props.def,
+				value = vNode.props.value
+			}
 		}
 		return Renderer.render(vNode.props.children, newContext)
 	end
