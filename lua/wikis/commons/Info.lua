@@ -35,4 +35,8 @@ return {
 			status = 2,
 		},
 	},
+	controlsSettingsTable = {
+		{keys = {'ability'}, title = 'Ability Name'},
+		{keys = {'ability_a', 'ability_b'}, title = 'Ability Name (a/b)'},
+	}
 }
