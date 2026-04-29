@@ -132,7 +132,7 @@ end
 ---@param matchOpponents StarcraftStandardOpponent[]
 ---@return StarcraftMatchGroupUtilGameOpponent[]
 function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
-	local modeParts = mw.text.split(game.mode or '', 'v')
+	local modeParts = Array.parseCommaSeparatedString(game.mode, 'v')
 
 	return Array.map(game.opponents, function(mapOpponent, opponentIndex)
 		local mode = modeParts[opponentIndex]

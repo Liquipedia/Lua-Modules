@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local LeagueIcon = {}
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Template = Lua.import('Module:Template')
 local Logic = Lua.import('Module:Logic')
@@ -120,14 +121,14 @@ function LeagueIcon.getIconFromTemplate(args)
 
 	--if LeagueIconSmall template exists retrieve the icons from it
 	if String.isEmpty(icon) and String.isEmpty(iconDark) and stringOfExpandedTemplate then
-		local stringOfExpandedTemplateArray = mw.text.split(stringOfExpandedTemplate, 'File:')
+		local stringOfExpandedTemplateArray = Array.parseCommaSeparatedString(stringOfExpandedTemplate, 'File:')
 
 		--extract series icon from template:LeagueIconSmall
-		local iconArray = mw.text.split(stringOfExpandedTemplateArray[2] or '', '|')
+		local iconArray = Array.parseCommaSeparatedString(stringOfExpandedTemplateArray[2] or '', '|')
 		icon = iconArray[1]
 		--when Template:LeagueIconSmall has a darkmode icon retrieve that from the template too
 		if String.isEmpty(iconDark) then
-			local iconDarkArray = mw.text.split(stringOfExpandedTemplateArray[3] or '', '|')
+			local iconDarkArray = Array.parseCommaSeparatedString(stringOfExpandedTemplateArray[3] or '', '|')
 			iconDark = iconDarkArray[1]
 		end
 	elseif String.isEmpty(icon) then

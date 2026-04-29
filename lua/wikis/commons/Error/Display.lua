@@ -121,7 +121,7 @@ function ErrorDisplay.ClassicError(error)
 		end
 
 		local stackEntry = {content = frame}
-		local frameSplit = mw.text.split(frame, ':', true)
+		local frameSplit = Array.parseCommaSeparatedString(frame, ':')
 		if (frameSplit[1] == '[C]' or frameSplit[1] == '(tail call)') then
 			stackEntry.prefix = frameSplit[1]
 			stackEntry.content = mw.text.trim(table.concat(frameSplit, ':', 2))
