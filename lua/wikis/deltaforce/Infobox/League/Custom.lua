@@ -7,9 +7,10 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local PageLink = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
+local Page = Lua.import('Module:Page')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
@@ -17,28 +18,23 @@ local League = Lua.import('Module:Infobox/League')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
+local Center = Widgets.Center
 
----@class DeltaforceLeagueInfobox: InfoboxLeague
+---@class DeltaForceLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
-local NONE_BREAKING_SPACE = '&nbsp;'
-local DASH = '&ndash;'
+local PLATFORMS = {
+	pc = 'PC',
+	mobile = 'Mobile',
+	cross = 'Cross-Platform',
+	default = 'Unknown',
+}
 
 local MODES = {
-	warfare = 'Warfare[[Category:Warfare Mode Tournaments]]',
-	operations = 'Operations[[Category:Operations Mode Tournaments]]',
-	default = '[[Category:Unknown Mode Tournaments]]',
-}
-MODES.wf = MODES.warfare
-MODES.op= MODES.operations
-
-local PLATFORMS = {
-	pc = 'PC[[Category:PC Competitions]]',
-	mobile = 'Mobile[[Category:Mobile Competitions]]',
-	console = 'Console[[Category:Console Competitions]]',
-	crossplay = 'Cross-platform[[Category:Cross-platform Competitions]]',
-	default = '[[Category:Unknown Platform Competitions]]',
+	wf = 'Warfare',
+	op = 'Operations',
+	default = 'Unknown',
 }
 
 ---@param frame Frame
@@ -46,6 +42,9 @@ local PLATFORMS = {
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
+
+	league.args.mode = MODES[(league.args.mode or 'default'):lower():gsub(' ', '')]
+	league.args.platform = PLATFORMS[(league.args.platform or 'default'):lower():gsub(' ', '')]
 
 	return league:createInfobox()
 end
@@ -56,69 +55,68 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
-	if id == 'gamesettings' then
-		return {
-			Cell{name = 'Game mode', children = {self.caller:_getGameMode(args)}},
-			Cell{name = 'Patch', children = {CustomLeague._getPatchVersion(args)}},
-			Cell{name = 'Platform', children = {self.caller:_getPlatform(args)}},
-		}
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Mode', children = {args.mode}},
+			Cell{name = 'Platform', children = {args.platform}}
+		)
 	elseif id == 'customcontent' then
-		if args.player_number then
-			table.insert(widgets, Title{children = 'Players'})
-			table.insert(widgets, Cell{name = 'Number of players', children = {args.player_number}})
-		end
+		if String.isNotEmpty(args.map1) then
+			local game = String.isNotEmpty(args.game) and ('/' .. args.game) or ''
+			local maps = {}
 
-		--teams section
-		if args.team_number then
-			table.insert(widgets, Title{children = 'Teams'})
-			table.insert(widgets, Cell{name = 'Number of teams', children = {args.team_number}})
+			for _, map in ipairs(self.caller:getAllArgsForBase(args, 'map')) do
+				table.insert(maps, tostring(self.caller:_createNoWrappingSpan(
+					Page.makeInternalLink({}, map, map .. game)
+				)))
+			end
+			table.sort(maps)
+			table.insert(widgets, Title{children = 'Maps'})
+			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
+	elseif id == 'gamesettings' then
+		table.insert(widgets, Cell{
+			name = 'Patch',
+			children = {self.caller:_createPatchCell(args)}
+		})
 	end
+
 	return widgets
 end
 
----@param lpdbData table
----@param args table
----@return table
-function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
-
-	return lpdbData
-end
-
 ---@param args table
 ---@return string?
-function CustomLeague:_getGameMode(args)
-	if String.isEmpty(args.mode) then
+function CustomLeague:_createPatchCell(args)
+	if String.isEmpty(args.patch) then
 		return nil
 	end
+	local content
 
-	local mode = MODES[string.lower(args.mode or '')] or MODES['default']
-
-	return mode
-end
-
----@param args table
----@return string?
-function CustomLeague:_getPlatform(args)
-	if String.isEmpty(args.platform) then
-		return nil
-	end
-
-	return PLATFORMS[string.lower(args.platform)] or PLATFORMS.default
-end
-
----@param args table
----@return string?
-function CustomLeague._getPatchVersion(args)
-	if String.isEmpty(args.patch) then return nil end
-	local content = PageLink.makeInternalLink(args.patch, 'Patch ' .. args.patch)
-	if String.isNotEmpty(args.epatch) then
-		return content .. NONE_BREAKING_SPACE .. DASH .. NONE_BREAKING_SPACE
-			.. PageLink.makeInternalLink(args.epatch, 'Patch ' .. args.epatch)
+	if String.isEmpty(args.epatch) then
+		content = '[[' .. args.patch .. '|'.. args.patch .. ']]'
+	else
+		content = '[[' .. args.patch .. '|'.. args.patch .. ']]' .. ' &ndash; ' ..
+		'[[' .. args.epatch .. '|'.. args.epatch .. ']]'
 	end
 
 	return content
+end
+
+---@param content Html|string|number|nil
+---@return Html
+function CustomLeague:_createNoWrappingSpan(content)
+	return mw.html.create('span')
+		:css('white-space', 'nowrap')
+		:node(content)
+end
+
+---@param args table
+---@return string[]
+function CustomLeague:getWikiCategories(args)
+	return {
+		args.mode and (args.mode .. ' Competitions') or 'Tournaments without specified mode',
+		args.platform and (args.platform .. ' Tournaments') or 'Tournaments on unknown platforms',
+	}
 end
 
 return CustomLeague
