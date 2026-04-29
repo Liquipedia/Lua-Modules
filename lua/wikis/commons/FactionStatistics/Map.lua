@@ -231,16 +231,21 @@ function MapStatistics._buildConditions(args)
 		conditions:add(ConditionNode(ColumnName('date'), Comparator.le, endDate))
 	end
 
-	local mapsInput = args.maps or args.map
-		or args.mode == 'mapStats' and mw.title.getCurrentTitle().text
-		or nil
-	local maps = Array.parseCommaSeparatedString(mapsInput)
+	---@type string[]
+	local maps = Logic.nilIfEmpty(Array.mapIndexes(function(index)
+			return Logic.nilIfEmpty(args['map' .. index])
+		end))
+		or args.mode == 'mapStats' and {mw.title.getCurrentTitle().text}
+		or {}
+
 	maps = Array.filter(maps, function(map) return map ~= 'TBD' end)
 	if Logic.isNotEmpty(maps) then
 		conditions:add(ConditionUtil.anyOf(ColumnName('map'), maps))
 	end
 
-	local parents = Array.parseCommaSeparatedString(args.parents or args.parent)
+	local parents = Array.mapIndexes(function(index)
+		return Logic.nilIfEmpty(args['parent' .. index])
+	end)
 	if Logic.isNotEmpty(parents) then
 		conditions:add(ConditionUtil.anyOf(ColumnName('parent'), Array.map(parents, Page.pageifyLink)))
 	end
@@ -297,7 +302,11 @@ function MapStatistics._getTournaments(args)
 		return Array.map(tournaments, Operator.property('pagename'))
 	end
 
-	return Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.tournaments or args.tournament))
+	local tournaments = Logic.nilIfEmpty(Array.mapIndexes(function(index)
+		return Logic.nilIfEmpty(args['tournament' .. index])
+	end))
+
+	return tournaments
 		or Logic.nilIfEmpty(fromSeries(args.series))
 		or args.mode == 'tournamentStats' and {mw.title.getCurrentTitle().text}
 		or nil
