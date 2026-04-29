@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Faction = Lua.import('Module:Faction')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
@@ -23,6 +24,7 @@ local TEAM_DISPLAY_MODE = 'team'
 local UNIFORM_DISPLAY_MODE = 'uniform'
 local SCORE_STATUS = MatchGroupInputUtil.STATUS.SCORE
 
+---@class WarcraftMatchGroupUtil: MatchGroupUtil
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
 ---@class WarcraftMatchGroupUtilGamePlayer: standardPlayer
@@ -44,12 +46,11 @@ local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 ---@field by number?
 ---@field map string
 
----@class WarcraftMatchGroupUtilSubmatch
+---@class WarcraftMatchGroupUtilSubmatch: MatchGroupUtilSubgroup
 ---@field games WarcraftMatchGroupUtilGame[]
 ---@field mode string
 ---@field opponents WarcraftMatchGroupUtilGameOpponent[]
 ---@field status string?
----@field subgroup number
 ---@field winner number?
 ---@field header string?
 
@@ -83,8 +84,8 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 	if match.opponentMode == TEAM_DISPLAY_MODE then
 		-- Compute submatches
 		match.submatches = Array.map(
-			CustomMatchGroupUtil.groupBySubmatch(match.games),
-			function(games) return CustomMatchGroupUtil.constructSubmatch(games, match) end
+			MatchGroupUtil.groupBySubgroup(match.games),
+			FnUtil.curry(CustomMatchGroupUtil.constructSubmatch, match)
 		)
 	end
 
@@ -145,31 +146,12 @@ function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	end)
 end
 
----Group games on the subgroup field to form submatches
----@param matchGames WarcraftMatchGroupUtilGame[]
----@return WarcraftMatchGroupUtilGame[][]
-function CustomMatchGroupUtil.groupBySubmatch(matchGames)
-	-- Group games on adjacent subgroups
-	local previousSubgroup = nil
-	local currentGames = nil
-	local submatchGames = {}
-	for _, game in ipairs(matchGames) do
-		if previousSubgroup == nil or previousSubgroup ~= game.subgroup then
-			currentGames = {}
-			table.insert(submatchGames, currentGames)
-			previousSubgroup = game.subgroup
-		end
-		---@cast currentGames -nil
-		table.insert(currentGames, game)
-	end
-	return submatchGames
-end
-
 ---Constructs a submatch object whose properties are aggregated from that of its games.
----@param games WarcraftMatchGroupUtilGame[]
 ---@param match WarcraftMatchGroupUtilMatch
+---@param subgroup MatchGroupUtilSubgroup
 ---@return WarcraftMatchGroupUtilSubmatch
-function CustomMatchGroupUtil.constructSubmatch(games, match)
+function CustomMatchGroupUtil.constructSubmatch(match, subgroup)
+	local games = subgroup.games
 	local firstGame = games[1]
 	local opponents = Table.deepCopy(firstGame.opponents)
 	local isSubmatch = String.startsWith(firstGame.map or '', 'Submatch')
@@ -204,14 +186,12 @@ function CustomMatchGroupUtil.constructSubmatch(games, match)
 		CustomMatchGroupUtil._determineSubmatchPlayerFactions(match, games, opponents, opponentIndex)
 	end)
 
-	return {
-		games = games,
+	return Table.mergeInto({
 		mode = firstGame.mode,
 		opponents = opponents,
-		subgroup = firstGame.subgroup,
 		winner = winner,
-		header = Table.extract(match.extradata or {}, 'subgroup' .. firstGame.subgroup .. 'header'),
-	}
+		header = Table.extract(match.extradata or {}, 'subgroup' .. subgroup.subgroup .. 'header'),
+	}, subgroup)
 end
 
 ---@param match WarcraftMatchGroupUtilMatch

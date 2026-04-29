@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
@@ -19,15 +20,14 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 local SCORE_STATUS = 'S'
 
+---@class HearthstoneMatchGroupUtil: MatchGroupUtil
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
 ---@class HearthstoneMatchGroupUtilGameOpponent: GameOpponent
 ---@field placement number?
 
----@class HearthstoneMatchGroupUtilSubmatch
----@field games MatchGroupUtilGame[]
+---@class HearthstoneMatchGroupUtilSubmatch: MatchGroupUtilSubgroup
 ---@field opponents HearthstoneMatchGroupUtilGameOpponent[]
----@field subgroup number
 ---@field winner number?
 ---@field header string?
 
@@ -35,7 +35,7 @@ local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 ---@field submatches HearthstoneMatchGroupUtilSubmatch[]?
 ---@field isTeamMatch boolean
 
----@param record table
+---@param record match2
 ---@return HearthstoneMatchGroupUtilMatch
 function CustomMatchGroupUtil.matchFromRecord(record)
 	local match = MatchGroupUtil.matchFromRecord(record) --[[@as HearthstoneMatchGroupUtilMatch]]
@@ -55,15 +55,9 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 
 	-- Compute submatches
 	match.submatches = Array.map(
-		CustomMatchGroupUtil.groupBySubmatch(match.games),
-		function(games) return CustomMatchGroupUtil.constructSubmatch(games) end
+		MatchGroupUtil.groupBySubgroup(match.games),
+		FnUtil.curry(CustomMatchGroupUtil.constructSubmatch, match)
 	)
-
-	local extradata = match.extradata
-	---@cast extradata table
-	Array.forEach(match.submatches, function (submatch)
-		submatch.header = Table.extract(extradata, 'subgroup' .. submatch.subgroup .. 'header')
-	end)
 
 	return match
 end
@@ -82,30 +76,12 @@ function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	end)
 end
 
----Group games on the subgroup field to form submatches
----@param matchGames MatchGroupUtilGame[]
----@return MatchGroupUtilGame[][]
-function CustomMatchGroupUtil.groupBySubmatch(matchGames)
-	-- Group games on adjacent subgroups
-	local previousSubgroup = nil
-	local currentGames = nil
-	local submatchGames = {}
-	Array.forEach(matchGames, function (game)
-		if previousSubgroup == nil or previousSubgroup ~= game.subgroup then
-			currentGames = {}
-			table.insert(submatchGames, currentGames)
-			previousSubgroup = game.subgroup
-		end
-		---@cast currentGames -nil
-		table.insert(currentGames, game)
-	end)
-	return submatchGames
-end
-
 ---Constructs a submatch object whose properties are aggregated from that of its games.
----@param games MatchGroupUtilGame[]
+---@param match HearthstoneMatchGroupUtilMatch
+---@param subgroup MatchGroupUtilSubgroup
 ---@return HearthstoneMatchGroupUtilSubmatch
-function CustomMatchGroupUtil.constructSubmatch(games)
+function CustomMatchGroupUtil.constructSubmatch(match, subgroup)
+	local games = subgroup.games
 	local firstGame = games[1]
 	local opponents = Table.deepCopy(firstGame.opponents)
 	local isSubmatch = string.find(firstGame.map or '', '^[sS]ubmatch %d+$')
@@ -133,12 +109,13 @@ function CustomMatchGroupUtil.constructSubmatch(games)
 		opponent.placement = MatchGroupInputUtil.placementFromWinner('', winner, opponentIndex)
 	end)
 
-	return {
-		games = games,
+	local matchExtradata = match.extradata or {}
+
+	return Table.mergeInto({
+		header = Table.extract(matchExtradata, 'subgroup' .. subgroup.subgroup .. 'header'),
 		opponents = opponents,
-		subgroup = firstGame.subgroup,
 		winner = winner,
-	}
+	}, subgroup)
 end
 
 return CustomMatchGroupUtil
