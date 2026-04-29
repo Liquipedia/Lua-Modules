@@ -24,7 +24,7 @@ function MatchupDisplay.display(matchupData)
 			return '-'
 		end
 		local percentage = 100 * matchupData.w / (total)
-		return MathUtil.formatRounded{precision = 1, value = percentage}
+		return MathUtil.formatPercentage(percentage, 1)
 	end
 
 	return {

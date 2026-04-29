@@ -84,6 +84,7 @@ function PlayerStatistics:query()
 	return self
 end
 
+---@private
 function PlayerStatistics:_getMatchData()
 	self.matchIds = {}
 
@@ -148,6 +149,7 @@ function PlayerStatistics:_getMatchData()
 	end)
 end
 
+---@private
 ---@return string
 function PlayerStatistics:_getMatchConditions()
 	local args = self.args
@@ -195,6 +197,7 @@ function PlayerStatistics:_getMatchConditions()
 	return tostring(conditions)
 end
 
+---@private
 ---@return table<string, {w: integer, l: integer}>
 function PlayerStatistics._newEmptyFactionData()
 	return Table.map(Array.append(Faction.knownFactions, 'total'), function(index, key)
@@ -202,6 +205,7 @@ function PlayerStatistics._newEmptyFactionData()
 	end)
 end
 
+---@private
 function PlayerStatistics:_getMapData()
 	local player = self.player
 
@@ -271,6 +275,7 @@ function PlayerStatistics:_getMapData()
 	self.byMap = byMap
 end
 
+---@private
 ---@return string
 function PlayerStatistics:_getMapConditions()
 	---@param opponent string
@@ -312,6 +317,7 @@ function PlayerStatistics:create()
 	}
 end
 
+---@private
 ---@return Widget
 function PlayerStatistics:_matchesPerFaction()
 	local display = function(key)
@@ -328,6 +334,7 @@ end
 
 -- can not use Array.extend due to the metatable ... see #7433
 -- once #7433 is fixed this function becomes obsolete via `Array.extend({'total'}, Faction.knownFactions)`
+---@private
 ---@return string[]
 function PlayerStatistics._getFactionOrder()
 	local order = {'total'}
@@ -335,12 +342,14 @@ function PlayerStatistics._getFactionOrder()
 	return order
 end
 
+---@private
 ---@return Widget
 function PlayerStatistics:_matchesPerType()
 	local order = {'offline', 'online'}
 	return PlayerStatistics._simpleTable(self.byType, String.upperCaseFirst, order, 'Matches per Environment')
 end
 
+---@private
 ---@return Widget
 function PlayerStatistics:_matchesPerOpponentType()
 	local order = {
@@ -353,6 +362,7 @@ function PlayerStatistics:_matchesPerOpponentType()
 	return PlayerStatistics._simpleTable(self.byOpponentType, String.upperCaseFirst, order, 'Matches per Opponent-Type')
 end
 
+---@private
 ---@return Widget
 function PlayerStatistics:_matchesPerBestof()
 	local display = function(key)
@@ -368,6 +378,7 @@ function PlayerStatistics:_matchesPerBestof()
 	return PlayerStatistics._simpleTable(self.byBestof, display, order, 'Matches per Environment')
 end
 
+---@private
 ---@param data table<string, {w: integer, l: integer}>
 ---@param display fun(string): Renderable
 ---@param order string[]
@@ -399,6 +410,7 @@ function PlayerStatistics._simpleTable(data, display, order, title)
 	}
 end
 
+---@private
 ---@param emptyCell boolean
 ---@return Widget[]
 function PlayerStatistics._headerCells(emptyCell)
@@ -411,6 +423,7 @@ function PlayerStatistics._headerCells(emptyCell)
 	)
 end
 
+---@private
 ---@return Widget
 function PlayerStatistics:_gamesPerMapAndFaction()
 	local factionOrder = Array.filter(PlayerStatistics._getFactionOrder(), function (key)

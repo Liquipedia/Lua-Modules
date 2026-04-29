@@ -13,7 +13,6 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local MatchupDisplay = Lua.import('Module:FactionStatistics/MatchupDisplay')
 local FnUtil = Lua.import('Module:FnUtil')
-local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
@@ -70,6 +69,7 @@ function MapStatistics.run(frame)
 	}
 end
 
+---@private
 ---@return {vs: string[], mirrors: string[]}
 function MapStatistics._getMatchups()
 	local vs = {}
@@ -113,6 +113,7 @@ function MapStatistics._getMatchups()
 	}
 end
 
+---@private
 ---@param args table
 ---@param matchUps {vs: string[], mirrors: string[]}
 ---@return {map: string, mapDisplayName: string?, total: integer,
@@ -214,6 +215,7 @@ function MapStatistics._fetchData(args, matchUps)
 	)
 end
 
+---@private
 ---@param args table
 ---@return string
 function MapStatistics._buildConditions(args)
@@ -239,26 +241,20 @@ function MapStatistics._buildConditions(args)
 		or {}
 
 	maps = Array.filter(maps, function(map) return map ~= 'TBD' end)
-	if Logic.isNotEmpty(maps) then
-		conditions:add(ConditionUtil.anyOf(ColumnName('map'), maps))
-	end
+	conditions:add(ConditionUtil.anyOf(ColumnName('map'), maps))
 
 	local parents = Array.mapIndexes(function(index)
 		return Logic.nilIfEmpty(args['parent' .. index])
 	end)
-	if Logic.isNotEmpty(parents) then
-		conditions:add(ConditionUtil.anyOf(ColumnName('parent'), Array.map(parents, Page.pageifyLink)))
-	end
+	conditions:add(ConditionUtil.anyOf(ColumnName('parent'), Array.map(parents, Page.pageifyLink)))
 
-	local tournaments = MapStatistics._getTournaments(args)
-	if Logic.isNotEmpty(tournaments) then
-		---@cast tournaments -nil
-		conditions:add(ConditionUtil.anyOf(ColumnName('pagename'), Array.map(tournaments, Page.pageifyLink)))
-	end
+	local tournaments = Array.map(MapStatistics._getTournaments(args), Page.pageifyLink)
+	conditions:add(ConditionUtil.anyOf(ColumnName('pagename'), tournaments))
 
 	return tostring(conditions)
 end
 
+---@private
 ---@param mapData {map: string, mapDisplayName: string?, total: integer,
 ---vs: table<string, {w: integer, l: integer}>, mirrors: table<string, integer>}
 function MapStatistics._store(mapData)
@@ -275,18 +271,18 @@ function MapStatistics._store(mapData)
 		ratios[factions[2] .. factions[1]] = ratio and (1 - ratio) or nil
 	end
 
-	mw.ext.LiquipediaDB.lpdb_datapoint(
-		'map_winrates_' .. mapData.map,
-		{
-			name = mapData.map,
-			type = 'map_winrates',
-			extradata = Json.stringify(ratios),
-		}
-	)
+	local dataPoint = Lpdb.DataPoint:new{
+		objectname = 'map_winrates_' .. mapData.map,
+		type = 'map_winrates',
+		name = mapData.map,
+		extradata = ratios,
+	}
+	dataPoint:save()
 end
 
+---@private
 ---@param args table
----@return string[]?
+---@return string[]
 function MapStatistics._getTournaments(args)
 	---@param series string?
 	---@return string[]?
@@ -302,16 +298,18 @@ function MapStatistics._getTournaments(args)
 		return Array.map(tournaments, Operator.property('pagename'))
 	end
 
-	local tournaments = Logic.nilIfEmpty(Array.mapIndexes(function(index)
+	local tournaments = Array.mapIndexes(function(index)
 		return Logic.nilIfEmpty(args['tournament' .. index])
-	end))
+	end)
 
-	return tournaments
-		or Logic.nilIfEmpty(fromSeries(args.series))
-		or args.mode == 'tournamentStats' and {mw.title.getCurrentTitle().text}
-		or nil
+	return Logic.emptyOr(
+		tournaments,
+		fromSeries(args.series),
+		args.mode == 'tournamentStats' and {mw.title.getCurrentTitle().text} or {}
+	) --[[@as string[] ]]
 end
 
+---@private
 ---@param matchUps {vs: string[], mirrors: string[]}
 ---@return Widget
 function MapStatistics._header(matchUps)
@@ -371,6 +369,7 @@ function MapStatistics._header(matchUps)
 	}
 end
 
+---@private
 ---@param matchUps {vs: string[], mirrors: string[]}
 ---@param mapData {map: string, mapDisplayName: string?, total: integer,
 ---vs: table<string, {w: integer, l: integer}>, mirrors: table<string, integer>}
