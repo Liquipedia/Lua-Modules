@@ -5,12 +5,14 @@
 
 local importFunctions = {}
 
----@param  uri  string
----@param  name string # Argument of require()
----@param  source string # The source file uri
+local IS_WINDOWS = package.config:sub(1,1) ~= '/'
+
+---@param repoRoot string # Documentation of this parameter is unclear. Seems to be repo root
+---@param name string # Argument of require()
+---@param source string # The source file uri
 ---@return string[]?
 -- luacheck: push ignore
-function ResolveRequire(uri, name, source)
+function ResolveRequire(repoRoot, name, source)
 -- luacheck: pop
 	local fileName = importFunctions.luaifyModuleName(name)
 
@@ -21,6 +23,13 @@ function ResolveRequire(uri, name, source)
 	if not basePath then
 		return nil
 	end
+
+	if IS_WINDOWS then
+		-- On Windows, the file URI starts with file:///C:/path/to/repo, so we need to remove the extra slash
+		-- Also need to unescape the :, otherwise %3 would be treated as a capture group result in later patterns
+		basePath = basePath:gsub('^file:///', 'file://'):gsub('%%3A', ':')
+	end
+
 	local wiki = source:match('^file://.-/lua/wikis/([^/]+)/') or 'commons'
 
 	-- Check if the file exists in the same wiki
