@@ -25,12 +25,6 @@ liquipedia.rankingTable = {
 		} );
 	},
 
-	scheduleChartResize: function ( graphRow ) {
-		window.requestAnimationFrame( () => this.resizeCharts( graphRow ) );
-		window.setTimeout( () => this.resizeCharts( graphRow ), 0 );
-		window.setTimeout( () => this.resizeCharts( graphRow ), 150 );
-	},
-
 	listenToGraphSwitches: function () {
 		document.addEventListener( 'switchButtonChanged', ( event ) => {
 			const target = event.target;
@@ -43,7 +37,7 @@ liquipedia.rankingTable = {
 				return;
 			}
 
-			this.scheduleChartResize( graphRow );
+			this.resizeCharts( graphRow );
 		} );
 	},
 
@@ -75,7 +69,8 @@ liquipedia.rankingTable = {
 			button.setAttribute( 'aria-expanded', String( !isExpanded ) );
 
 			if ( !graphRow.classList.contains( 'd-none' ) ) {
-				this.scheduleChartResize( graphRow );
+				// Initialize or resize charts when the div is visible
+				this.resizeCharts( graphRow );
 			}
 		}
 	},
