@@ -11,53 +11,52 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
-local Table = Lua.import('Module:Table')
-
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local MedalStatsBase = Lua.import('Module:SeriesMedalStats')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
-local MedalStatsBase = Lua.import('Module:SeriesMedalStats')
+local MedalsTable = Lua.import('Module:Widget/MedalsTable')
 
 ---@class SeriesMedalStatsFlag: SeriesMedalStats
 local MedalStats = Class.new(MedalStatsBase)
 
+---@param frame Frame
+---@return Widget?
 function MedalStats.run(frame)
 	local args = Arguments.getArgs(frame)
 
 	--only query for solo opponents (only for them flag stats make sense)
 	args.opponentTypes = Opponent.solo
 
-	return MedalStats(args):query():create()
+	return MedalStats(args):create()
 end
 
----@return Html?
+---@return Widget?
 function MedalStats:create()
-	if Table.isEmpty(self.rawData) then return end
+	if Logic.isEmpty(self.rawData) then return end
 
-	self:_processData()
-
-	local nameDisplay = function(identifier)
-		return Flags.Icon{flag = identifier, shouldLink = false} .. ' ' .. Flags.CountryName{flag = identifier}
-	end
-
-	return self:defaultBuild(nameDisplay, 'Country', 'Countries')
-end
-
-function MedalStats:_processData()
-	---@param placement SeriesMedalStatsPlacementObject
+	---@param placement placement
 	---@return string?
 	local getIdentifier = function(placement)
 		return (placement.opponentplayers or {}).p1flag
 	end
 
 	self.data = {}
-
-	Array.forEach(self.rawData, function(placement)
-		return self:processByIdentifier(getIdentifier, placement)
-	end)
-
+	Array.forEach(self.rawData, FnUtil.curry(FnUtil.curry(self.processByIdentifier, self), getIdentifier))
 	self.rawData = nil
 
-	self:sort()
+	return MedalsTable{
+		medalsTableType = 'Country',
+		dataColumns = self.config.columns,
+		data = self.data,
+		renderRowFirstCell = function(identifier)
+			return Flags.Icon{flag = identifier, shouldLink = false} .. ' ' .. Flags.CountryName{flag = identifier}
+		end,
+		rowSort = MedalStatsBase.rowSort,
+		hideTotalRow = true,
+		cutAfter = self.config.cutAfter,
+	}
 end
 
 return MedalStats
