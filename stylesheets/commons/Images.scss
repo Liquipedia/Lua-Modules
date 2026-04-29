@@ -60,3 +60,41 @@ div.thumbinner {
 .tright .thumbinner {
 	min-width: 6.25rem;
 }
+
+/*******************************************************************************
+Template(s): Images without license information
+Author(s): FO-nTTaX
+*******************************************************************************/
+.logged-in img.image-license-issue {
+	border: 5px solid #ff0000 !important;
+	box-sizing: border-box !important;
+}
+
+/*******************************************************************************
+Template(s): Darkmode images on file pages
+Author(s): FO-nTTaX, iMarbot
+*******************************************************************************/
+html:not( [ data-darkreader-scheme="dark" ] ):not( .theme--dark ) {
+	#file img[ src*="darkmode" ]:not( :hover ),
+	.searchResultImage img[ src*="darkmode" ],
+	.gallerybox img[ src*="darkmode" ] {
+		background-color: #272727;
+	}
+}
+
+#file img[ src*="lightmode" ]:not( :hover ),
+.searchResultImage img[ src*="lightmode" ],
+.gallerybox img[ src*="lightmode" ] {
+	@at-root [ data-darkreader-scheme="dark" ] & {
+		background-color: #808080;
+	}
+
+	@at-root .theme--dark & {
+		background-color: #d8d8d8;
+	}
+}
+
+.filehistory a img[ src*="darkmode" ],
+#file img[ src*="darkmode" ]:hover {
+	background: url( data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAAAAAA6mKC9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAHElEQVQY02MUZoAADijNxIAG6CPAArP/x8C6AwCutQE9GsmfRAAAAABJRU5ErkJggg== ) repeat;
+}
