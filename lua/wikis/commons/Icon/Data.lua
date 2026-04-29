@@ -282,4 +282,7 @@ return {
 
 	-- Usage: Info button
 	['general-info'] = 'fas fa-info-circle',
+
+	-- Usage: Winner
+	tournament_winner = 'fas fa-trophy',
 }
