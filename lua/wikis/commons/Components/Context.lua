@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 local ComponentCore = Lua.import('Module:Components/Component')
+local Types = Lua.import('Module:Components/Types')
 
 local Context = {}
 
@@ -36,7 +37,7 @@ end
 
 -- Set values for contexts
 Context.Provider = setmetatable(
-	{ renderFn = 'CONTEXT_PROVIDER'},
+	{ renderFn = Types.CONTEXT_PROVIDER},
 	ComponentCore.ComponentMT
 ) --[[@as ContextComponent<any>]]
 

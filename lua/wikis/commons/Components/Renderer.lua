@@ -5,6 +5,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Types = require('Module:Components/Types')
+
 local Renderer = {}
 
 --- Renders a Virtual Node (VNode) into a string
@@ -12,11 +14,14 @@ local Renderer = {}
 ---@param context Context?
 ---@return string
 function Renderer.render(vNode, context)
-	if not vNode then return '' end
+	if not vNode then
+		return ''
+	end
 
 	local vNodeType = type(vNode)
 
 	-- Handle Arrays
+	-- For performance reasons we do a heuristic check for array-like tables
 	if vNodeType == 'table' and vNode[1] then
 		local output = {}
 		for _, child in ipairs(vNode) do
@@ -57,7 +62,7 @@ function Renderer.render(vNode, context)
 	---@cast vNode -Html
 
 	-- Handle Context Providers
-	if renderFn == 'CONTEXT_PROVIDER' then
+	if renderFn == Types.CONTEXT_PROVIDER then
 		---@cast vNode ContextNode<any>
 		-- Push a new link onto the Context chain
 		local newContext = {

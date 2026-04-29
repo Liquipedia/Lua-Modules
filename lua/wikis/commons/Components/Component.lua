@@ -18,7 +18,7 @@
 
 ---@alias ContextDef<T> {defaultValue: T}
 
----@alias Component<P> fun(props: P, context: Context?): VNode<P>
+---@alias Component<P> fun(props?: P, context: Context?): VNode<P>
 ---@alias ContextComponent<T> Component<{def: ContextDef<T>, value: T, children: Renderable[]}>
 ---@alias HtmlComponent Component<{classes?: string[], css?: table, attributes?: table, children?: Renderable[]}>
 
@@ -30,9 +30,7 @@ local ComponentCore = {}
 -- Virtual Nodes (The table returned after calling a component)
 ComponentCore.VNodeMT = {
 	-- Automatically trigger rendering
-	__tostring = function(self)
-		return Renderer.render(self)
-	end,
+	__tostring = Renderer.render,
 
 	__index = {
 		-- Allows to be used as a node in the third part html library (mw.html).
