@@ -56,15 +56,31 @@ function TeamTemplate.getIcon(template)
 end
 
 --[[
-Returns the resolved page name of a team template that has been resolved to a
+Returns the redirected page name of a team template that has been resolved to a
 date. Returns nil if the team does not exist, or if the page is not specified.
 ]]
 ---@param resolvedTemplate string
 ---@return string|nil
 TeamTemplate.getPageName = FnUtil.memoize(function(resolvedTemplate)
+	local page = TeamTemplate.getPageNameNoRedirect(resolvedTemplate)
+	if not page then
+		return
+	end
+	return Page.applyUnderScoresIfEnforced(mw.ext.TeamLiquidIntegration.resolve_redirect(page))
+end)
+
+--[[
+Returns the resolved page name of a team template that has been resolved to a
+date. Returns nil if the team does not exist, or if the page is not specified.
+]]
+---@param resolvedTemplate string
+---@return string|nil
+TeamTemplate.getPageNameNoRedirect = FnUtil.memoize(function(resolvedTemplate)
 	local raw = TeamTemplate.getRawOrNil(resolvedTemplate)
-	local pageName = raw and mw.ext.TeamLiquidIntegration.resolve_redirect(raw.page) or nil
-	return Page.applyUnderScoresIfEnforced(pageName)
+	if not raw then
+		return
+	end
+	return Page.applyUnderScoresIfEnforced(raw.page)
 end)
 
 --[[
