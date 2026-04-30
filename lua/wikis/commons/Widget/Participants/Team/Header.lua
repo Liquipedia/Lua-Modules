@@ -61,8 +61,6 @@ function ParticipantsTeamHeader:render()
 							opponent = participant.opponent,
 							teamStyle = 'bracket',
 							additionalClasses = opponentClasses,
-							image = participant.image,
-							imagedark = participant.imagedark,
 						}
 					}
 				},
@@ -73,8 +71,6 @@ function ParticipantsTeamHeader:render()
 							opponent = participant.opponent,
 							teamStyle = 'standard',
 							additionalClasses = opponentClasses,
-							image = participant.image,
-							imagedark = participant.imagedark,
 						}
 					}
 				}
