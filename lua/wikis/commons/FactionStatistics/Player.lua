@@ -142,7 +142,7 @@ function PlayerStatistics:_getMatchData()
 		self.byFaction.total[result] = self.byFaction.total[result] + 1
 
 		local vsFaction = Logic.emptyOr(
-			(((opponents[vsSide].players or {})[1] or {}).extradata or {}).faction,
+			((opponents[vsSide].players or {})[1] or {}).faction,
 			Faction.defaultFaction
 		)
 		if vsFaction == Faction.defaultFaction then return end
@@ -159,7 +159,7 @@ function PlayerStatistics:_getMatchConditions()
 	local tiers = Array.map(Array.parseCommaSeparatedString(args.tiers), function(num)
 		return tonumber(num)
 	end)
-	tiers = Logic.nilIfEmpty(tiers) or DEFAULT_TIERS
+	tiers = Logic.emptyOr(tiers, DEFAULT_TIERS) --[[@as integer[] ]]
 
 	local tierTypes = Array.parseCommaSeparatedString(args.tiers or '!Qualifier')
 	tierTypes = Array.map(tierTypes, function(tierType)
@@ -209,6 +209,10 @@ end
 
 ---@private
 function PlayerStatistics:_getMapData()
+	if Logic.isEmpty(self.matchIds) then
+		return
+	end
+
 	local player = self.player
 
 	local byMap = {total = PlayerStatistics._newEmptyFactionData()}
