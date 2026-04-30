@@ -21,6 +21,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Utils')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -156,9 +157,7 @@ end
 function PlayerStatistics:_getMatchConditions()
 	local args = self.args
 
-	local tiers = Array.map(Array.parseCommaSeparatedString(args.tiers), function(num)
-		return tonumber(num)
-	end)
+	local tiers = Array.map(Array.parseCommaSeparatedString(args.tiers), Tier.toIdentifier)
 	tiers = Logic.emptyOr(tiers, DEFAULT_TIERS) --[[@as integer[] ]]
 
 	local tierTypes = Array.parseCommaSeparatedString(args.tiers or '!Qualifier')
