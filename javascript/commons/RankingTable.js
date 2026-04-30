@@ -21,6 +21,23 @@ liquipedia.rankingTable = {
 			}
 
 			this.toggleGraphVisibility();
+			this.listenToGraphSwitches();
+		} );
+	},
+
+	listenToGraphSwitches: function () {
+		document.addEventListener( 'switchButtonChanged', ( event ) => {
+			const target = event.target;
+			if ( !target.closest( '.ranking-table__graph-switch' ) ) {
+				return;
+			}
+
+			const graphRow = target.closest( this.graphRowSelector );
+			if ( !graphRow || graphRow.classList.contains( 'd-none' ) ) {
+				return;
+			}
+
+			this.resizeCharts( graphRow );
 		} );
 	},
 
