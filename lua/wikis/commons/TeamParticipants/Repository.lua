@@ -72,22 +72,6 @@ function TeamParticipantsRepository.save(participant)
 	end
 
 	Array.forEach(lpdbDatas, function(lpdbData)
-		if participant.qualification then
-			lpdbData.qualifier = participant.qualification.text
-			if participant.qualification.type == 'tournament' then
-				lpdbData.qualifierpage = participant.qualification.tournament.pageName
-			elseif participant.qualification.type == 'external' then
-				lpdbData.qualifierurl = participant.qualification.url
-			end
-		end
-
-		lpdbData.extradata = lpdbData.extradata or {}
-		lpdbData.extradata.opponentaliases = participant.aliases
-		if participant.potentialQualifiers and #participant.potentialQualifiers > 0 then
-			local serializedQualifiers = Array.map(participant.potentialQualifiers, Opponent.toName)
-			lpdbData.extradata.potentialQualifiers = serializedQualifiers
-		end
-
 		-- Remove players that should not be counted for results
 		local activeOpponent = Table.deepCopy(participant.opponent)
 		activeOpponent.players = Array.filter(activeOpponent.players or {}, function(player)
@@ -106,6 +90,24 @@ function TeamParticipantsRepository.save(participant)
 			end)
 			local numberOfPlayersOnTeam = math.max(#(filteredPlayers), 1)
 			lpdbData.individualprizemoney = lpdbData.prizemoney / numberOfPlayersOnTeam
+		end
+
+		if lpdbData.mode ~= 'award_individual' then
+			if participant.qualification then
+				lpdbData.qualifier = participant.qualification.text
+				if participant.qualification.type == 'tournament' then
+					lpdbData.qualifierpage = participant.qualification.tournament.pageName
+				elseif participant.qualification.type == 'external' then
+					lpdbData.qualifierurl = participant.qualification.url
+				end
+			end
+
+			lpdbData.extradata = lpdbData.extradata or {}
+			lpdbData.extradata.opponentaliases = participant.aliases
+			if participant.potentialQualifiers and #participant.potentialQualifiers > 0 then
+				local serializedQualifiers = Array.map(participant.potentialQualifiers, Opponent.toName)
+				lpdbData.extradata.potentialQualifiers = serializedQualifiers
+			end
 		end
 
 		mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, Json.stringifySubTables(lpdbData))
