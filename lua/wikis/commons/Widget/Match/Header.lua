@@ -19,11 +19,14 @@ local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Span = HtmlWidgets.Span
 local Div = HtmlWidgets.Div
 
+local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local CURRENT_PAGE_NAME = mw.ustring.lower(mw.title.getCurrentTitle().text:gsub('_', ' '))
 
 ---@class MatchHeaderProps
 ---@field match MatchGroupUtilMatch
 ---@field teamStyle? teamStyle
+---@field disableCurrentPageLinks boolean?
 ---@field variant 'horizontal'|'vertical'
 
 ---@class MatchHeader: Widget
@@ -32,6 +35,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local MatchHeader = Class.new(Widget)
 MatchHeader.defaultProps = {
 	teamStyle = 'short',
+	disableCurrentPageLinks = false,
 	variant = 'horizontal',
 }
 
@@ -91,6 +95,8 @@ function MatchHeader:_renderHorizontal(match)
 						teamStyle = self.props.teamStyle,
 						overflow = 'ellipsis',
 						flip = true,
+						showLink = not (self.props.disableCurrentPageLinks
+							and self:_isCurrentPageOpponent(match.opponents[1])),
 					}
 				}
 			},
@@ -150,6 +156,8 @@ function MatchHeader:_renderHorizontal(match)
 						opponent = match.opponents[2],
 						teamStyle = self.props.teamStyle,
 						overflow = 'ellipsis',
+						showLink = not (self.props.disableCurrentPageLinks
+							and self:_isCurrentPageOpponent(match.opponents[2])),
 					}
 				}
 			},
@@ -183,6 +191,8 @@ function MatchHeader:_renderVertical(match)
 									opponent = opponent,
 									teamStyle = self.props.teamStyle,
 									overflow = 'ellipsis',
+									showLink = not (self.props.disableCurrentPageLinks
+										and self:_isCurrentPageOpponent(opponent)),
 								}
 							}
 						},
@@ -198,6 +208,17 @@ function MatchHeader:_renderVertical(match)
 			end)
 		)
 	}
+end
+
+---@param opponent standardOpponent
+---@return boolean
+function MatchHeader:_isCurrentPageOpponent(opponent)
+	local success, opponentName = pcall(Opponent.toName, opponent)
+	if not success or not opponentName then
+		return false
+	end
+
+	return mw.ustring.lower(opponentName:gsub('_', ' ')) == CURRENT_PAGE_NAME
 end
 
 return MatchHeader

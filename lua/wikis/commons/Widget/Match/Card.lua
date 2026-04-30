@@ -37,6 +37,7 @@ local MAX_VERTICAL_CARD_STREAMS = 2
 ---@field onlyHighlightOnValue string?
 ---@field hideTournament boolean?
 ---@field displayGameIcons boolean?
+---@field disableCurrentPageLinks boolean?
 ---@field variant 'horizontal' | 'vertical'
 
 ---@class MatchCard: Widget
@@ -47,6 +48,7 @@ MatchCard.defaultProps = {
 	hideTournament = false, -- Hide the tournament and stage
 	displayGameIcons = false, -- Display the game icon in the tournament title
 	onlyHighlightOnValue = nil, -- Only highlight if the publishertier has this value
+	disableCurrentPageLinks = false,
 	variant = 'horizontal',
 }
 
@@ -83,7 +85,10 @@ function MatchCard:_renderHorizontal(match, gameData, highlight)
 		classes = {'match-info'},
 		children = WidgetUtil.collect(
 			MatchCountdown{match = match},
-			MatchHeader{match = match},
+			MatchHeader{
+				match = match,
+				disableCurrentPageLinks = self.props.disableCurrentPageLinks,
+			},
 			not self.props.hideTournament and HtmlWidgets.Div{
 				classes = {'match-info-tournament', highlight and HIGHLIGHT_CLASS or nil},
 				children = {tournamentLink},
@@ -124,7 +129,8 @@ function MatchCard:_renderVertical(match, gameData)
 				},
 			not isFfa and MatchHeader{
 				match = match,
-				variant = 'vertical'
+				variant = 'vertical',
+				disableCurrentPageLinks = self.props.disableCurrentPageLinks,
 			} or nil,
 			isFfa and self:_renderFfaInfo(match, gameData) or nil
 		)
