@@ -30,8 +30,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field style teamStyle
 ---@field dq boolean?
 ---@field note string|number?
----@field image string?
----@field imagedark string?
 
 ---@class BlockTeamWidget: Widget
 ---@operator call(BlockTeamParameters): BlockTeamWidget
@@ -63,8 +61,8 @@ function BlockTeamWidget:render()
 	end
 	local flip = self.flip
 
-	local imageLight = Logic.emptyOr(self.props.image, teamTemplate.image, teamTemplate.legacyimage)
-	local imageDark = Logic.emptyOr(self.props.imagedark, teamTemplate.imagedark, teamTemplate.legacyimagedark)
+	local imageLight = Logic.emptyOr(teamTemplate.image, teamTemplate.legacyimage)
+	local imageDark = Logic.emptyOr(teamTemplate.imagedark, teamTemplate.legacyimagedark)
 
 	return Div{
 		classes = Array.extend('block-team', self.props.additionalClasses, flip and 'flipped' or nil),
