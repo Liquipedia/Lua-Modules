@@ -21,5 +21,10 @@
 		"**/wikis/*/*/*/*/*.lua": "${dirname(-4)}: ${dirname(-5)}/${dirname(-6)}/${dirname}/${filename}",
 		"**/wikis/*/*/*/*/*/*.lua": "${dirname(-4)}: ${dirname(-5)}/${dirname(-6)}/${dirname(-7)}/${dirname}/${filename}",
 		"**/*.lua": "${dirname}: ${filename}"
-	}
+	},
+	"Lua.runtime.special": {
+		"Lua.import": "require",
+		"Lua.requireIfExists": "require",
+		"mw.loadData": "require"
+	},
 }
