@@ -20,6 +20,14 @@ local TierData = Lua.import('Module:Tier/Data', {loadData = true})
 local NON_BREAKING_SPACE = '&nbsp;'
 local DEFAULT_TIER_TYPE = 'General'
 
+---@class TierData
+---@field value string?
+---@field sort string
+---@field name string
+---@field short string
+---@field link string?
+---@field category string?
+
 ---@class TierUtils
 local Tier = {}
 
@@ -39,7 +47,7 @@ end
 --- Retrieves the raw data for a given (tier, tierType) tuple
 ---@param tier string|integer?
 ---@param tierType string?
----@return table?, table?
+---@return TierData?, TierData?
 function Tier.raw(tier, tierType)
 	return (TierData.tiers or {})[Tier.toIdentifier(tier)],
 		(TierData.tierTypes or {})[Tier.toIdentifier(tierType)]
@@ -64,7 +72,7 @@ end
 --- Converts input to (storage) values for a given (tier, tierType) tuple
 ---@param tier string|integer?
 ---@param tierType string?
----@return integer?, string?
+---@return string?, string?
 function Tier.toValue(tier, tierType)
 	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
@@ -184,7 +192,7 @@ end
 
 --- Iterate over tiers/tierTypes in a sorted order
 ---@param subTable 'tiers'|'tierTypes'
----@return function
+---@return fun(): string|integer, TierData
 function Tier.iterate(subTable)
 	return Table.iter.spairs(TierData[subTable], function(tierData, key1, key2)
 		return tierData[key1].sort < tierData[key2].sort
