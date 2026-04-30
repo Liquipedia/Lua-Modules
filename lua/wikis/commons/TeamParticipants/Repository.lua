@@ -28,7 +28,7 @@ local TeamParticipantsRepository = {}
 function TeamParticipantsRepository.save(participant)
 	-- Since we merge data from prizepool and teamparticipants, we need to first fetch the existing record from prizepool
 	-- Records can come from multiple prizepools, such as from both normal prizepool and an award
-	local lpdbDatas = TeamParticipantsRepository.getPrizepoolRecordForTeam(participant.opponent) or {}
+	local lpdbData = TeamParticipantsRepository.getPrizepoolRecordForTeam(participant.opponent) or {}
 
 	local function generateObjectName()
 		local team = Opponent.toName(participant.opponent)
