@@ -5,7 +5,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Types = require('Module:Components/Types')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Types = Lua.import('Module:Components/Types')
 
 local Renderer = {}
 
@@ -23,10 +26,9 @@ function Renderer.render(vNode, context)
 	-- Handle Arrays
 	-- For performance reasons we do a heuristic check for array-like tables
 	if vNodeType == 'table' and vNode[1] then
-		local output = {}
-		for _, child in ipairs(vNode) do
-			table.insert(output, Renderer.render(child, context))
-		end
+		local output = Array.map(vNode, function(child)
+			return Renderer.render(child, context)
+		end)
 		return table.concat(output)
 	end
 
