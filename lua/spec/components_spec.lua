@@ -67,6 +67,11 @@ describe('Components/Renderer', function()
 			assert.are.equal('ab', tostring(vNode))
 		end)
 
+		it('renders fragment without without attributes', function()
+			local vNode = Html.Fragment{children = {'a', 'b'}, attributes = {id = 'should-not-appear'}}
+			assert.are.equal('ab', tostring(vNode))
+		end)
+
 		it('renders a functional component', function()
 			local MyComp = ComponentCore.component(function(props)
 				return Html.Span{children = {props.text}}
