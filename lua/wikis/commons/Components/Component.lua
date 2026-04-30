@@ -33,7 +33,7 @@ ComponentCore.VNodeMT = {
 	__tostring = Renderer.render,
 
 	__index = {
-		-- Allows to be used as a node in the third part html library (mw.html).
+		-- Allows to be used as a node in the third party html library (mw.html).
 		_build = function(self, ret)
 			table.insert(ret, tostring(self))
 		end
