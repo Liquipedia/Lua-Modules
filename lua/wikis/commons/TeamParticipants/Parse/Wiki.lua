@@ -23,7 +23,7 @@ local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, image: string?, imagedark: string?,
 ---notes: {text: string, highlighted: boolean}[], aliases: string[],
----qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer,
+---qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer, autoPlayed: boolean,
 ---potentialQualifiers: standardOpponent[]?, warnings: string[]?}
 
 ---@alias QualificationMethod 'invite'|'qual'
@@ -196,6 +196,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		potentialQualifiers = potentialQualifiers,
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
+		autoPlayed = Logic.readBool(input.autoplayed),
 		date = date,
 	}
 end
@@ -237,9 +238,9 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 		roles = roles,
 		trophies = tonumber(playerInput.trophies),
 		type = playerType,
+		played = playedInput,
+		results = resultsInput,
 		status = status,
-		played = Logic.nilOr(playedInput, true),
-		results = Logic.nilOr(resultsInput, playedInput, true),
 	}
 	return player
 end
