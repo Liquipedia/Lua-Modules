@@ -27,6 +27,7 @@ local TeamParticipantsRepository = {}
 ---@param participant TeamParticipant
 function TeamParticipantsRepository.save(participant)
 	-- Since we merge data from prizepool and teamparticipants, we need to first fetch the existing record from prizepool
+	-- Records can come from multiple prizepools, such as from both normal prizepool and an award
 	local lpdbData = TeamParticipantsRepository.getPrizepoolRecordForTeam(participant.opponent) or {}
 
 	local function generateObjectName()
@@ -110,13 +111,16 @@ end
 ---@param participant TeamParticipant
 function TeamParticipantsRepository.setPageVars(participant)
 	Array.forEach(participant.aliases or {}, function(teamTemplate)
-		local teamName = TeamTemplate.getPageName(teamTemplate)
+		local teamName = TeamTemplate.getPageNameNoRedirect(teamTemplate)
 		if not teamName then
 			return
 		end
+		local teamNameRedirected = mw.ext.TeamLiquidIntegration.resolve_redirect(teamName)
 		local teamPrefixes = {
 			teamName:gsub('_', ' '),
 			teamName:gsub(' ', '_'),
+			teamNameRedirected:gsub('_', ' '),
+			teamNameRedirected:gsub(' ', '_'),
 		}
 		local playerCount, staffCount = 0, 0
 		Array.forEach(participant.opponent.players or {}, function(player)

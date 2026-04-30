@@ -173,6 +173,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 
 	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
 	table.insert(aliases, Opponent.toName(opponent))
+	table.insert(aliases, opponent.template)
 
 	return {
 		opponent = opponent,
