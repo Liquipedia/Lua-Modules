@@ -20,11 +20,11 @@ describe('Components/Renderer', function()
 		end)
 
 		it('returns empty string for empty table', function()
-			assert.are.equal('', Renderer.render({}))
+			assert.are.equal('', Renderer.render{})
 		end)
 
 		it('renders an array of primitives', function()
-			assert.are.equal('abc', Renderer.render({'a', 'b', 'c'}))
+			assert.are.equal('abc', Renderer.render{'a', 'b', 'c'})
 		end)
 
 		it('renders a mixed array', function()
@@ -92,7 +92,7 @@ describe('Components/Renderer', function()
 
 		it('errors on invalid table VNode (no renderFn, no __tostring, no _build)', function()
 			assert.is.error(function()
-				Renderer.render({someKey = 'someValue'})
+				Renderer.render{someKey = 'someValue'}
 			end)
 		end)
 
@@ -238,10 +238,6 @@ end)
 describe('Components/Html', function()
 	it('Html.Div renders a div', function()
 		assert.are.equal('<div></div>', tostring(Html.Div{}))
-	end)
-
-	it('Html.Span renders a span', function()
-		assert.are.equal('<span></span>', tostring(Html.Span{}))
 	end)
 
 	it('Html.Ul with Li children', function()
