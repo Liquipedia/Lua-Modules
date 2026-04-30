@@ -323,6 +323,18 @@ local data = {
 		shortname = "RGE",
 		templatename = "rogue 2021",
 	},
+	-- tbd template
+	['tbd'] = {
+		bracketname = "TBD",
+		image = "",
+		imagedark = "",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "TBD",
+		page = "TBD",
+		shortname = "TBD",
+		templatename = "tbd",
+	},
 	-- tt9 subtemplate
 	['tt9 esports orig'] = {
 		bracketname = "TT9 Esports",
