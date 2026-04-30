@@ -27,7 +27,8 @@ local TeamParticipantsRepository = {}
 ---@param participant TeamParticipant
 function TeamParticipantsRepository.save(participant)
 	-- Since we merge data from prizepool and teamparticipants, we need to first fetch the existing record from prizepool
-	local lpdbData = TeamParticipantsRepository.getPrizepoolRecordForTeam(participant.opponent) or {}
+	-- Records can come from multiple prizepools, such as from both normal prizepool and an award
+	local lpdbDatas = TeamParticipantsRepository.getPrizepoolRecordForTeam(participant.opponent) or {}
 
 	local function generateObjectName()
 		local team = Opponent.toName(participant.opponent)
@@ -49,59 +50,66 @@ function TeamParticipantsRepository.save(participant)
 
 	-- Use the tournament defaults if no data is provided from prizepool
 	-- TODO: Refactor in the future to have a util function deal with this, including prizepool, broadcasters, etc.
-	lpdbData.objectName = lpdbData.objectName or generateObjectName()
-	lpdbData.tournament = lpdbData.tournament or Variables.varDefault('tournament_name')
-	lpdbData.parent = lpdbData.parent or Variables.varDefault('tournament_parent')
-	lpdbData.series = lpdbData.series or Variables.varDefault('tournament_series')
-	lpdbData.shortname = lpdbData.shortname or Variables.varDefault('tournament_tickername')
-	lpdbData.mode = lpdbData.mode or Variables.varDefault('tournament_mode')
-	lpdbData.type = lpdbData.type or Variables.varDefault('tournament_type')
-	lpdbData.liquipediatier = lpdbData.liquipediatier or Variables.varDefault('tournament_liquipediatier')
-	lpdbData.liquipediatiertype = lpdbData.liquipediatiertype or Variables.varDefault('tournament_liquipediatiertype')
-	lpdbData.publishertier = lpdbData.publishertier or Variables.varDefault('tournament_publishertier')
-	lpdbData.icon = lpdbData.icon or Variables.varDefault('tournament_icon')
-	lpdbData.icondark = lpdbData.icondark or Variables.varDefault('tournament_icondark')
-	lpdbData.game = lpdbData.game or Variables.varDefault('tournament_game')
-	lpdbData.startdate = lpdbData.startdate or Variables.varDefault('tournament_startdate')
-	lpdbData.date = lpdbData.date or Variables.varDefault('tournament_enddate')
+	if not lpdbDatas[1] then
+		---@diagnostic disable-next-line: missing-fields
+		lpdbDatas[1] = {
+			objectName = generateObjectName(),
+			tournament = Variables.varDefault('tournament_name') or '',
+			parent = Variables.varDefault('tournament_parent') or '',
+			series = Variables.varDefault('tournament_series') or '',
+			shortname = Variables.varDefault('tournament_tickername') or '',
+			mode = Variables.varDefault('tournament_mode') or '',
+			type = Variables.varDefault('tournament_type') or '',
+			liquipediatier = Variables.varDefault('tournament_liquipediatier') or '',
+			liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype') or '',
+			publishertier = Variables.varDefault('tournament_publishertier') or '',
+			icon = Variables.varDefault('tournament_icon') or '',
+			icondark = Variables.varDefault('tournament_icondark') or '',
+			game = Variables.varDefault('tournament_game') or '',
+			startdate = Variables.varDefault('tournament_startdate') or '',
+			date = Variables.varDefault('tournament_enddate') or '',
+		}
+	end
 
-	if participant.qualification then
-		lpdbData.qualifier = participant.qualification.text
-		if participant.qualification.type == 'tournament' then
-			lpdbData.qualifierpage = participant.qualification.tournament.pageName
-		elseif participant.qualification.type == 'external' then
-			lpdbData.qualifierurl = participant.qualification.url
+	Array.forEach(lpdbDatas, function(lpdbData)
+		if participant.qualification then
+			lpdbData.qualifier = participant.qualification.text
+			if participant.qualification.type == 'tournament' then
+				lpdbData.qualifierpage = participant.qualification.tournament.pageName
+			elseif participant.qualification.type == 'external' then
+				lpdbData.qualifierurl = participant.qualification.url
+			end
 		end
-	end
 
-	lpdbData.extradata = lpdbData.extradata or {}
-	lpdbData.extradata.opponentaliases = participant.aliases
-	if participant.potentialQualifiers and #participant.potentialQualifiers > 0 then
-		local serializedQualifiers = Array.map(participant.potentialQualifiers, Opponent.toName)
-		lpdbData.extradata.potentialQualifiers = serializedQualifiers
-	end
+		lpdbData.extradata = lpdbData.extradata or {}
+		lpdbData.extradata.opponentaliases = participant.aliases
+		if participant.potentialQualifiers and #participant.potentialQualifiers > 0 then
+			local serializedQualifiers = Array.map(participant.potentialQualifiers, Opponent.toName)
+			lpdbData.extradata.potentialQualifiers = serializedQualifiers
+		end
 
-	-- Remove players that should not be counted for results
-	local activeOpponent = Table.deepCopy(participant.opponent)
-	activeOpponent.players = Array.filter(activeOpponent.players or {}, function(player)
-		return player.extradata.results
-	end)
-	-- Add full opponent data for players with results with this team
-	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(activeOpponent, { setPlayersInTeam = true }))
-	-- Legacy participant fields
-	lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(activeOpponent))
-	lpdbData.players = lpdbData.opponentplayers
-
-	-- Calculate individual prize money (prize money per player on team)
-	if lpdbData.prizemoney then
-		local filteredPlayers = Array.filter(activeOpponent.players, function(player)
-			return player.extradata.type ~= 'staff'
+		-- Remove players that should not be counted for results
+		local activeOpponent = Table.deepCopy(participant.opponent)
+		activeOpponent.players = Array.filter(activeOpponent.players or {}, function(player)
+			return player.extradata.results
 		end)
-		local numberOfPlayersOnTeam = math.max(#(filteredPlayers), 1)
-		lpdbData.individualprizemoney = lpdbData.prizemoney / numberOfPlayersOnTeam
-	end
+		-- Add full opponent data for players with results with this team
+		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(activeOpponent, { setPlayersInTeam = true }))
+		-- Legacy participant fields
+		lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(activeOpponent))
+		lpdbData.players = lpdbData.opponentplayers
 
-	mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, Json.stringifySubTables(lpdbData))
+		-- Calculate individual prize money (prize money per player on team)
+		if lpdbData.prizemoney then
+			local filteredPlayers = Array.filter(activeOpponent.players, function(player)
+				return player.extradata.type ~= 'staff'
+			end)
+			local numberOfPlayersOnTeam = math.max(#(filteredPlayers), 1)
+			lpdbData.individualprizemoney = lpdbData.prizemoney / numberOfPlayersOnTeam
+		end
+
+		mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, Json.stringifySubTables(lpdbData))
+	end)
 end
 
 --- Set wiki variables for team participants to be used in other modules/templates, primarily matches
@@ -143,13 +151,13 @@ function TeamParticipantsRepository.setPageVars(participant)
 end
 
 ---@param opponent standardOpponent
----@return placement?
+---@return placement[]
 function TeamParticipantsRepository.getPrizepoolRecordForTeam(opponent)
 	if Opponent.isTbd(opponent) then
-		return
+		return {}
 	end
 	local prizepoolRecords = TeamParticipantsRepository.getPrizepoolRecords()
-	return Array.find(prizepoolRecords, function(record)
+	return Array.filter(prizepoolRecords, function(record)
 		return Opponent.same(opponent, Opponent.fromLpdbStruct(record))
 	end)
 end
