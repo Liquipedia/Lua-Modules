@@ -39,10 +39,13 @@ local GRAPH_VIEW_POINTS = 'points'
 local GRAPH_COLOR_RANK = '#EE6666'
 local GRAPH_COLOR_POINTS = '#2F80ED'
 
----@param progression {date: string, rating: number?, rank: integer?}[]
+---@alias RatingsProgression {date: string, rating: number?, rank: integer?}[]
+---@alias AxisBoundsFn fun(progression: RatingsProgression, defaultMaxY: integer): number, number
+
+---@param progression RatingsProgression
 ---@return number
 ---@return number
-local function makePointsAxisBounds(progression)
+local function pointsAxisBounds(progression)
 	local points = Array.filter(Array.map(progression, Operator.property('rating')), Logic.isNotEmpty)
 	local minPoints = Array.min(points) or 0
 	local maxPoints = Array.max(points) or minPoints
@@ -54,6 +57,15 @@ local function makePointsAxisBounds(progression)
 	end
 
 	return roundedMinPoints, roundedMaxPoints
+end
+
+---@param progression RatingsProgression
+---@param defaultMaxY integer
+---@return number
+---@return number
+local function rankAxisBounds(progression, defaultMaxY)
+	local worstRank = Array.max(Array.map(progression, Operator.property('rank'))) or defaultMaxY
+	return 1, math.max(worstRank, defaultMaxY)
 end
 
 ---@param progression {date: string, rating: number?, rank: integer?}[]
@@ -69,13 +81,11 @@ end
 ---@param teamData RatingsEntry
 ---@param defaultMaxY integer
 ---@param graphView string
+---@param getAxisBounds AxisBoundsFn
 ---@return string
-local function makeTeamChart(teamData, defaultMaxY, graphView)
+local function makeTeamChart(teamData, defaultMaxY, graphView, getAxisBounds)
 	local progression = Array.sortBy(teamData.progression, Operator.property('date'))
-	local pointsAxisMin, pointsAxisMax = makePointsAxisBounds(progression)
-	local worstRankOfTeam = graphView == GRAPH_VIEW_RANK
-		and (Array.max(Array.map(progression, Operator.property('rank'))) or defaultMaxY)
-		or defaultMaxY
+	local axisMin, axisMax = getAxisBounds(progression, defaultMaxY)
 	local axisName = graphView == GRAPH_VIEW_POINTS and 'Points' or 'Rank'
 	local graphColor = graphView == GRAPH_VIEW_POINTS and GRAPH_COLOR_POINTS or GRAPH_COLOR_RANK
 
@@ -96,8 +106,8 @@ local function makeTeamChart(teamData, defaultMaxY, graphView)
 			nameRotate = 90,
 			type = 'value',
 			inverse = graphView == GRAPH_VIEW_RANK,
-			min = graphView == GRAPH_VIEW_POINTS and pointsAxisMin or 1,
-			max = graphView == GRAPH_VIEW_POINTS and pointsAxisMax or math.max(worstRankOfTeam, defaultMaxY),
+			min = axisMin,
+			max = axisMax,
 		},
 		tooltip = {
 			trigger = 'axis',
@@ -258,7 +268,9 @@ function RatingsList:render()
 											label = 'Rank',
 											value = GRAPH_VIEW_RANK,
 											content = Logic.tryOrElseLog(
-												function() return makeTeamChart(team, teamLimit, GRAPH_VIEW_RANK) end,
+												function()
+													return makeTeamChart(team, teamLimit, GRAPH_VIEW_RANK, rankAxisBounds)
+												end,
 												function() return 'Failed to make rank graph for team' end
 											)
 										},
@@ -266,7 +278,9 @@ function RatingsList:render()
 											label = 'Points',
 											value = GRAPH_VIEW_POINTS,
 											content = Logic.tryOrElseLog(
-												function() return makeTeamChart(team, teamLimit, GRAPH_VIEW_POINTS) end,
+												function()
+													return makeTeamChart(team, teamLimit, GRAPH_VIEW_POINTS, pointsAxisBounds)
+												end,
 												function() return 'Failed to make points graph for team' end
 											)
 										},
