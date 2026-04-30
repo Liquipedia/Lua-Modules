@@ -18,6 +18,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tournament = Lua.import('Module:Tournament')
+local Variables = Lua.import('Module:Variables')
 
 local TeamParticipantsWikiParser = {}
 
@@ -134,7 +135,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 	local opponent
 	local warnings = {}
 
-	local date = DateExt.parseIsoDate(input.date) or defaultDate -- TODO: fetch from wiki var too
+	local date = DateExt.parseIsoDate(input.date)
 
 	if input.contenders then
 		opponent = Opponent.tbd(Opponent.team)
@@ -156,6 +157,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		opponent = Opponent.readOpponentArgs(Table.merge(input, {
 			type = Opponent.team,
 		}))
+
 		opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
 		local resolvedOptions = {
 			syncPlayer = true,
@@ -166,6 +168,10 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 				false
 			)
 		}
+
+		local prizePoolDate = Variables.varDefault('enddate_' .. (Opponent.toName(opponent)))
+		date = date or DateExt.parseIsoDate(prizePoolDate) or defaultDate
+
 		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), resolvedOptions)
 	end
 
@@ -196,7 +202,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		potentialQualifiers = potentialQualifiers,
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
-		date = date,
+		date = date or defaultDate,
 	}
 end
 
