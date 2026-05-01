@@ -74,10 +74,14 @@ function IdentityVMatchSummaryGameRow:createGameOpponentView(opponentIndex)
 	local firstSide = getFirstSide()
 	local secondSide = CustomMatchSummary._getOppositeSide(firstSide)
 	local halfs = extradata['t' .. opponentIndex .. 'halfs'] or {}
-	local scoreDetails = {
-		{score = halfs[firstSide], style = 'brkts-identityv-score-color-' .. firstSide},
-		{score = halfs[secondSide], style = 'brkts-identityv-score-color-' .. secondSide},
-	}
+	local scoreDetails
+
+	if firstSide and firstSide ~= '' then
+		scoreDetails = {
+			{score = halfs[firstSide], style = 'brkts-identityv-score-color-' .. firstSide},
+			{score = halfs[secondSide], style = 'brkts-identityv-score-color-' .. secondSide},
+		}
+	end
 
 	local characters = extradata['t' .. opponentIndex .. 'picks'] or {}
 	return {
