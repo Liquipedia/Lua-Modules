@@ -169,7 +169,9 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 			)
 		}
 
-		local prizePoolDate = Variables.varDefault('enddate_' .. (Opponent.toName(opponent)))
+		local opponentName = Opponent.toName(opponent)
+		local prizePoolDate = Variables.varDefault('enddate_' .. opponentName)
+			or Variables.varDefault('enddate_' .. opponentName .. '_date')
 		date = date or DateExt.parseIsoDate(prizePoolDate) or defaultDate
 
 		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), resolvedOptions)
