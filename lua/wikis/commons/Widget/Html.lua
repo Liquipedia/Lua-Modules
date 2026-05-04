@@ -1,12 +1,12 @@
 ---
 -- @Liquipedia
--- page=Module:Components/Html
+-- page=Module:Widget/Html
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
-local ComponentCore = Lua.import('Module:Components/Component')
+local ComponentCore = Lua.import('Module:Widget/Component')
 
 local Html = {}
 

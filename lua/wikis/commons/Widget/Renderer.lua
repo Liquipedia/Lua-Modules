@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Components/Renderer
+-- page=Module:Widget/Renderer
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -8,7 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Types = Lua.import('Module:Components/Types')
+local Types = Lua.import('Module:Widget/Types')
 
 local Renderer = {}
 

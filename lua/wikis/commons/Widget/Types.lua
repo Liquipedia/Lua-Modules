@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Components/Types
+-- page=Module:Widget/Types
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

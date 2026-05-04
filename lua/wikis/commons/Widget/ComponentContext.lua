@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- page=Module:Components/Context
+-- page=Module:Widget/ComponentContext
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
-local ComponentCore = Lua.import('Module:Components/Component')
-local Types = Lua.import('Module:Components/Types')
+local ComponentCore = Lua.import('Module:Widget/Component')
+local Types = Lua.import('Module:Widget/Types')
 
 local Context = {}
 

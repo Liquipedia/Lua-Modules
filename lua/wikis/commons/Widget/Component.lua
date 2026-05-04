@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Components/Component
+-- page=Module:Widget/Component
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -23,7 +23,7 @@
 ---@alias HtmlComponent Component<{classes?: string[], css?: table, attributes?: table, children?: Renderable[]}>
 
 local Lua = require('Module:Lua')
-local Renderer = Lua.import('Module:Components/Renderer')
+local Renderer = Lua.import('Module:Widget/Renderer')
 
 local ComponentCore = {}
 

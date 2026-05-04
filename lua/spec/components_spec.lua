@@ -1,9 +1,9 @@
 --- Triple Comment to Enable our LLS Plugin
-local ComponentCore = require('Module:Components/Component')
-local Context = require('Module:Components/Context')
-local Html = require('Module:Components/Html')
+local ComponentCore = require('Module:Widget/Component')
+local Context = require('Module:Widget/ComponentContext')
+local Html = require('Module:Widget/Html')
 local WidgetHtml = require('Module:Widget/Html/All')
-local Renderer = require('Module:Components/Renderer')
+local Renderer = require('Module:Widget/Renderer')
 
 describe('Components/Renderer', function()
 	describe('Renderer.render', function()
