@@ -1,18 +1,18 @@
 ---
 -- @Liquipedia
--- page=Module:Components/Squad/Header
+-- page=Module:Widget/Squad/Header
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
-local Component = Lua.import('Module:Components/Component')
-local Context = Lua.import('Module:Components/Context')
+local Component = Lua.import('Module:Widget/Component')
+local Context = Lua.import('Module:Widget/ComponentContext')
 
 local SquadUtils = Lua.import('Module:Squad/Utils')
-local TableWidgets = Lua.import('Module:Components/Table2/All')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local SquadContexts = Lua.import('Module:Components/Contexts/Squad')
+local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
 
 ---@param props {status: SquadStatus}
 ---@param context Context

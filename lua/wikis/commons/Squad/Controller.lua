@@ -9,16 +9,16 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Arguments = Lua.import('Module:Arguments')
-local Context = Lua.import('Module:Components/Context')
+local Context = Lua.import('Module:Widget/ComponentContext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Info = Lua.import('Module:Info', {loadData = true})
 local SquadUtils = Lua.import('Module:Squad/Utils')
 local Table = Lua.import('Module:Table')
 
-local SquadContexts = Lua.import('Module:Components/Contexts/Squad')
-local SquadDisplay = Lua.import('Module:Components/Squad/Container')
-local SquadHeader = Lua.import('Module:Components/Squad/Header')
-local SquadPlayerDisplay = Lua.import('Module:Components/Squad/Player')
+local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
+local SquadDisplay = Lua.import('Module:Widget/Squad/Container')
+local SquadHeader = Lua.import('Module:Widget/Squad/Header')
+local SquadPlayerDisplay = Lua.import('Module:Widget/Squad/Player')
 
 local SquadController = {}
 

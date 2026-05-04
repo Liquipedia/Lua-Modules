@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- page=Module:Components/Squad/Player
+-- page=Module:Widget/Squad/Player
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
 
-local Component = Lua.import('Module:Components/Component')
-local Context = Lua.import('Module:Components/Context')
+local Component = Lua.import('Module:Widget/Component')
+local Context = Lua.import('Module:Widget/ComponentContext')
 local Icon = Lua.import('Module:Icon')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
@@ -17,10 +17,10 @@ local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Template = Lua.import('Module:Template')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local Table2Widgets = Lua.import('Module:Components/Table2/All')
-local Html = Lua.import('Module:Components/Html')
+local Table2Widgets = Lua.import('Module:Widget/Table2/All')
+local Html = Lua.import('Module:Widget/Html')
 local Row, Cell = Table2Widgets.Row, Table2Widgets.Cell
-local SquadContexts = Lua.import('Module:Components/Contexts/Squad')
+local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
 
 local RoleIcons = {
 	captain = Icon.makeIcon{iconName = 'captain', hover = 'Captain'},
