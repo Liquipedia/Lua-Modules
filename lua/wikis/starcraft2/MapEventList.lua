@@ -20,10 +20,14 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
+
+local DEFAULT_TIERS = {1}
+local DEFAULT_TIER_TYPES = {'none'}
 
 local MapEventList = {}
 
@@ -33,10 +37,19 @@ function MapEventList.run(frame)
 	local args = Arguments.getArgs(frame)
 	local mapName = (args.map or mw.title.getCurrentTitle().text):gsub(' ', '_')
 
+	local tiers = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.tiers)) or DEFAULT_TIERS
+	local tierTypes = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.tierTypes)) or DEFAULT_TIER_TYPES
+	tierTypes = Array.map(tierTypes, function(tierType)
+		if tierType == 'none' then
+			return ''
+		end
+		return tierType
+	end)
+
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('maps'), Comparator.neq, ''),
-		ConditionNode(ColumnName('liquipediatier'), Comparator.eq, 1),
-		ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, ''),
+		ConditionUtil.anyOf(ColumnName('liquipediatier'), tiers),
+		ConditionUtil.anyOf(ColumnName('liquipediatiertype'), tierTypes),
 	}
 
 	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
