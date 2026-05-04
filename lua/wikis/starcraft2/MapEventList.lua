@@ -58,7 +58,7 @@ function MapEventList.run(frame)
 		conditions = tostring(conditions),
 		query = 'pagename, maps, startdate, enddate, icon, icondark, name, extradata',
 		order = 'enddate desc',
-		limit = 5000,
+		limit = tonumber(args.limit) or 5000,
 	})
 
 	if not data or not data[1] then
