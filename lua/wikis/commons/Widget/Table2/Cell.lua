@@ -7,31 +7,36 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local Component = Lua.import('Module:Widget/Component')
+local Context = Lua.import('Module:Widget/ComponentContext')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
----@class Table2Cell: Widget
----@operator call(Table2CellProps): Table2Cell
----@field props Table2CellProps
-local Table2Cell = Class.new(Widget)
+---@class Table2CellProps
+---@field children Renderable[]?
+---@field align ('left'|'right'|'center')?
+---@field shrink (string|number|boolean)?
+---@field nowrap (string|number|boolean)?
+---@field width string?
+---@field minWidth string?
+---@field maxWidth string?
+---@field colspan integer|string?
+---@field rowspan integer|string?
+---@field columnIndex integer|string?
+---@field classes string[]?
+---@field css {[string]: string|number|nil}?
+---@field attributes {[string]: any}?
 
-Table2Cell.defaultProps = {
-	nowrap = true,
-}
-
----@return Widget
-function Table2Cell:render()
-	local props = self.props
-
-	local columns = self:useContext(Table2Contexts.ColumnContext)
+---@param props Table2CellProps
+---@return Renderable
+local function Table2Cell(props, context)
+	local columns = Context.read(context, Table2Contexts.ColumnContext)
 
 	-- Skip context lookups and property merging if there are no column definitions
 	if not columns then
-		return HtmlWidgets.Td{
+		return Html.Td{
 			attributes = ColumnUtil.buildCellAttributes(
 				props.align,
 				props.nowrap,
@@ -61,7 +66,7 @@ function Table2Cell:render()
 		ColumnUtil.buildAttributes(mergedProps)
 	)
 
-	return HtmlWidgets.Td{
+	return Html.Td{
 		classes = mergedProps.classes,
 		css = css,
 		attributes = attributes,
@@ -69,4 +74,9 @@ function Table2Cell:render()
 	}
 end
 
-return Table2Cell
+return Component.component(
+	Table2Cell,
+	{
+		nowrap = true,
+	}
+)

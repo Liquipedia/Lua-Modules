@@ -1,114 +1,129 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Table2/Row
+-- page=Module:Widget/Table2/Table
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
+local Component = Lua.import('Module:Widget/Component')
+local Context = Lua.import('Module:Widget/ComponentContext')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
-local MathUtil = Lua.import('Module:MathUtil')
 
-local Widget = Lua.import('Module:Widget')
-local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
-local Table2Cell = Lua.import('Module:Widget/Table2/Cell')
-local Table2CellHeader = Lua.import('Module:Widget/Table2/CellHeader')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
+local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 
----@class Table2Row: Widget
----@operator call(Table2RowProps): Table2Row
----@field props Table2RowProps
-local Table2Row = Class.new(Widget)
+---@class Table2ColumnDef
+---@field align 'left'|'right'|'center'?
+---@field shrink (string|number|boolean)?
+---@field nowrap (string|number|boolean)?
+---@field width string?
+---@field minWidth string?
+---@field maxWidth string?
+---@field sortType string?
+---@field unsortable (string|number|boolean)?
+---@field css {[string]: string|number|nil}?
+---@field classes string[]?
+---@field attributes {[string]: any}?
 
----@return Widget
-function Table2Row:render()
-	local props = self.props
-	local section = props.section or self:useContext(Table2Contexts.Section)
-	local headerRowKind = self:useContext(Table2Contexts.HeaderRowKind)
-	local bodyStripe = self:useContext(Table2Contexts.BodyStripe)
+---@class Table2Props
+---@field children Renderable[]?
+---@field variant 'generic'|'themed'?
+---@field sortable (string|number|boolean)?
+---@field striped (string|number|boolean)?
+---@field caption Renderable|Renderable[]?
+---@field title Renderable|Renderable[]?
+---@field footer Renderable|Renderable[]?
+---@field classes string[]?
+---@field tableClasses string[]?
+---@field columns Table2ColumnDef[]?
+---@field css {[string]: string|number|nil}?
+---@field attributes {[string]: any}?
+---@field tableAttributes {[string]: any}?
 
-	local sectionClass = 'table2__row--body'
-	if section == 'head' or section == 'subhead' then
-		sectionClass = 'table2__row--head'
-	end
-
-	local kindClass
-	if section == 'head' then
-		if headerRowKind == 'title' then
-			kindClass = 'table2__row--head-title'
-		elseif headerRowKind == 'columns' then
-			kindClass = 'table2__row--head-columns'
-		end
-	end
-
-	local stripeClass
-	if section == 'body' then
-		if bodyStripe == 'odd' then
-			stripeClass = 'table2__row--odd'
-		elseif bodyStripe == 'even' then
-			stripeClass = 'table2__row--even'
-		end
-	end
-
-	local highlightClass
-	if section == 'body' and Logic.readBool(props.highlighted) then
-		highlightClass = 'table2__row--highlighted'
-	end
-
-	local children = props.children or {}
-
-	local columns = self:useContext(Table2Contexts.ColumnContext)
-	if section == 'subhead' and columns and #children == 1 and Class.instanceOf(children[1], Table2CellHeader) then
-		local singleCell = children[1] --[[@as Table2CellHeader]]
-		if singleCell.props.colspan == nil then
-			singleCell.props.colspan = #columns
-		end
-	end
-
-	local columnIndex = 1
-	local indexedChildren = Array.map(children, function(child)
-		if Class.instanceOf(child, Table2Cell) or Class.instanceOf(child, Table2CellHeader) then
-			local cellChild = child --[[@as Table2Cell|Table2CellHeader]]
-			local explicitIndex = MathUtil.toInteger(cellChild.props.columnIndex)
-			if explicitIndex and explicitIndex >= 1 then
-				columnIndex = math.max(columnIndex, explicitIndex)
-			elseif cellChild.props.columnIndex == nil then
-				cellChild.props.columnIndex = columnIndex
-			end
-
-			local span = MathUtil.toInteger(cellChild.props.colspan) or 1
-			if span < 1 then
-				span = 1
-			end
-			columnIndex = columnIndex + span
-			return cellChild
-		end
-		return child
-	end)
-
-	local trChildren = indexedChildren
-	if section == 'subhead' then
-		trChildren = Array.map(trChildren, function(child)
-			if Class.instanceOf(child, Table2CellHeader) then
-				return Table2Contexts.Section{
-					value = 'subhead',
-					children = {child},
-				}
-			end
-			return child
+---@param props Table2Props
+---@param context Context
+---@return Renderable[]
+local function Table2(props, context)
+	if props.columns and #props.columns > 0 then
+		Array.forEach(props.columns, function(columnDef, columnIndex)
+			assert(not (Logic.readBool(columnDef.shrink) and columnDef.width),
+				'Table2: Column ' .. columnIndex .. ' - Column definition cannot have both shrink and width properties')
 		end)
 	end
 
-	return HtmlWidgets.Tr{
-		classes = WidgetUtil.collect(sectionClass, kindClass, stripeClass, highlightClass, props.classes),
+	local variant = props.variant
+	local wrapperClasses = WidgetUtil.collect('table2', 'table2--' .. variant, props.classes)
+
+	local tableClasses = WidgetUtil.collect(
+		'table2__table',
+		Logic.readBool(props.sortable) and 'sortable' or nil,
+		props.tableClasses
+	)
+
+	local captionNode = props.caption and Html.Div{
+		classes = {'table2__caption'},
+		children = props.caption,
+	} or nil
+
+	local titleNode = props.title and Html.Div{
+		classes = {'table2__title'},
+		children = props.title,
+	} or nil
+
+	local tableChildren = props.children
+	if props.columns and #props.columns > 0 then
+		tableChildren = {Context.Provider{
+			def = Table2Contexts.ColumnContext,
+			value = props.columns,
+			children = tableChildren,
+		}}
+	end
+
+	if Logic.readBool(props.striped) then
+		tableChildren = {Context.Provider{
+			def = Table2Contexts.BodyStripe,
+			value = true,
+			children = tableChildren,
+		}}
+	end
+
+	local tableNode = Html.Table{
+		attributes = props.tableAttributes,
+		classes = tableClasses,
+		children = tableChildren,
+	}
+
+	local containerNode = Html.Div{
+		classes = {'table2__container'},
+		children = {tableNode},
+	}
+
+	local footerNode = props.footer and Html.Div{
+		classes = {'table2__footer'},
+		children = props.footer,
+	} or nil
+
+	local tableWrapperNode = Html.Div{
+		classes = wrapperClasses,
 		css = props.css,
 		attributes = props.attributes,
-		children = trChildren,
+		children = WidgetUtil.collect(titleNode, containerNode, footerNode),
 	}
+
+	return WidgetUtil.collect(captionNode, tableWrapperNode)
 end
 
-return Table2Row
+return Component.component(
+	Table2,
+	{
+		variant = 'generic',
+		sortable = false,
+		striped = true,
+		classes = {},
+		columns = {},
+	}
+)

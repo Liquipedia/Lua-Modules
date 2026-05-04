@@ -8,28 +8,29 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
+local Component = Lua.import('Module:Widget/Component')
+local Context = Lua.import('Module:Widget/ComponentContext')
+local FnUtil = Lua.import('Module:FnUtil')
 local MathUtil = Lua.import('Module:MathUtil')
 
-local Widget = Lua.import('Module:Widget')
 local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 local Table2Cell = Lua.import('Module:Widget/Table2/Cell')
 local Table2CellHeader = Lua.import('Module:Widget/Table2/CellHeader')
 local Table2Row = Lua.import('Module:Widget/Table2/Row')
 
----@class Table2Body: Widget
----@operator call(Table2BodyProps): Table2Body
----@field props Table2BodyProps
-local Table2Body = Class.new(Widget)
+---@class Table2BodyProps
+---@field children Renderable[]?
 
----@return Widget
-function Table2Body:render()
-	local props = self.props
+---@param props Table2BodyProps
+---@param context Context
+---@return Renderable
+local function Table2Body(props, context)
 	local children = props.children or {}
 
-	local stripeEnabled = self:useContext(Table2Contexts.BodyStripe)
+	local stripeEnabled = Context.read(context, Table2Contexts.BodyStripe)
 	if stripeEnabled == nil then
-		return Table2Contexts.Section{
+		return Context.Provider{
+			def = Table2Contexts.Section,
 			value = 'body',
 			children = children,
 		}
@@ -43,30 +44,26 @@ function Table2Body:render()
 		stripe = stripe == 'even' and 'odd' or 'even'
 	end
 
-	local function getRowMaxRowspan(row)
-		if row and row._cachedMaxRowspan then
-			return row._cachedMaxRowspan
-		end
-
+	---@param row VNode
+	local getRowMaxRowspan = FnUtil.memoize(function(row)
 		local rowChildren = (row and row.props and row.props.children) or {}
 		local maxRowspan = 1
+
 		Array.forEach(rowChildren, function(child)
-			if Class.instanceOf(child, Table2Cell) or Class.instanceOf(child, Table2CellHeader) then
+			local childMt = getmetatable(child)
+			if childMt == getmetatable(Table2Cell) or childMt == getmetatable(Table2CellHeader) then
 				local rowspan = MathUtil.toInteger(child.props.rowspan) or 1
 				rowspan = math.max(rowspan, 1)
 				maxRowspan = math.max(maxRowspan, rowspan)
 			end
 		end)
 
-		if row then
-			row._cachedMaxRowspan = maxRowspan
-		end
-
 		return maxRowspan
-	end
+	end)
 
 	Array.forEach(children, function(child)
-		if Class.instanceOf(child, Table2Row) then
+		if getmetatable(child) == getmetatable(Table2Row) then
+			---@cast child VNode
 			if groupRemaining == 0 then
 				toggleStripe()
 			end
@@ -74,7 +71,8 @@ function Table2Body:render()
 			local maxRowspan = getRowMaxRowspan(child)
 			groupRemaining = math.max(groupRemaining, maxRowspan)
 
-			table.insert(stripedChildren, Table2Contexts.BodyStripe{
+			table.insert(stripedChildren, Context.Provider{
+				def = Table2Contexts.BodyStripe,
 				value = stripe,
 				children = {child},
 			})
@@ -85,10 +83,13 @@ function Table2Body:render()
 		end
 	end)
 
-	return Table2Contexts.Section{
+	return Context.Provider{
+		def = Table2Contexts.Section,
 		value = 'body',
 		children = stripedChildren,
 	}
 end
 
-return Table2Body
+return Component.component(
+	Table2Body
+)
