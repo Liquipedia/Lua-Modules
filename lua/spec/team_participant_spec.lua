@@ -58,16 +58,7 @@ insulate('Team Participant', function()
 					players = {},
 				},
 			}),
-			[[<script>
-			$(document).ready(function() {
-				var timer = setInterval(function(){
-					if (window.liquipedia?.switchButtons?.switchGroups) {
-						liquipedia.switchButtons.switchGroups["team-cards-show-rosters"].nodes[0].click();
-						clearInterval(timer);
-					}
-				}, 50)
-			});
-			</script>]]
+			[[<style>.collapsed > .should-collapse { display: block !important; }</style>]]
 		)
 
 		LpdbQuery:revert()
