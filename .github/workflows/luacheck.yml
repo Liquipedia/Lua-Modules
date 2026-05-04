@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup lua
-        uses: leafo/gh-actions-lua@v13
+        uses: Liquipedia/gh-actions-lua@7615c1c345af98bd9898fa5b53c488c5f58246cf
         with:
           luaVersion: '5.1'
 
@@ -43,7 +43,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup lua
-        uses: leafo/gh-actions-lua@v13
+        uses: Liquipedia/gh-actions-lua@7615c1c345af98bd9898fa5b53c488c5f58246cf
         with:
           luaVersion: '5.1'
 

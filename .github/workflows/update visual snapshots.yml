@@ -28,7 +28,7 @@ jobs:
         run: apt-get update && apt-get install -y -q gcc make unzip
 
       - name: Setup lua
-        uses: leafo/gh-actions-lua@v13
+        uses: Liquipedia/gh-actions-lua@7615c1c345af98bd9898fa5b53c488c5f58246cf
         env:
           DEBIAN_FRONTEND: noninteractive
         with:
