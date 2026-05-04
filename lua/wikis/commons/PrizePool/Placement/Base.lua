@@ -93,9 +93,9 @@ function BasePlacement:_readPrizeRewards(args)
 	local playerShare
 	Array.forEach(self.parent.prizes, function(prize)
 		if prize.type == PRIZE_TYPE_BASE_CURRENCY then
-			basePrize = rewards[prize.id] or self.prizeRewards[prize.id]
+			basePrize = rewards[prize.id] or (self.prizeRewards or {})[prize.id]
 		elseif prize.type == PRIZE_TYPE_PLAYER_SHARE then
-			playerShare = rewards[prize.id] or self.prizeRewards[prize.id]
+			playerShare = rewards[prize.id] or (self.prizeRewards or {})[prize.id]
 		end
 	end)
 	if basePrize and playerShare then
