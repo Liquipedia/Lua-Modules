@@ -13,6 +13,7 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
+local Tier = Lua.import('Module:Tier/Utils')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -25,6 +26,7 @@ local ConditionUtil = Condition.Util
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local DEFAULT_TIERS = {1}
 local DEFAULT_TIER_TYPES = {'none'}
@@ -63,8 +65,14 @@ function MapEventList.run(frame)
 		return
 	end
 
+	local title = args.title or WidgetUtil.collect(
+		'Played in ',
+		Array.interleave(Array.map(tiers, Tier.display), ', ')
+		' Tournaments'
+	)
+
 	return HtmlWidgets.Fragment{children = {
-		HtmlWidgets.H3{children = 'Played in Premier Tournaments'},
+		HtmlWidgets.H3{children = title},
 		TableWidgets.Table{
 			sortable = true,
 			columns = Array.rep({}, 4),
