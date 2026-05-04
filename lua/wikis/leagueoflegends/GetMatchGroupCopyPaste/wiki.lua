@@ -45,12 +45,12 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
-		Logic.readBool(args.hasDate) and {
+		Logic.readBool(args.hasDate) and Array.extend(
 			INDENT .. '|date=',
 			INDENT .. '|twitch= |youtube=',
 			(Logic.readBool(args.reddit) and INDENT .. '|reddit= |gol=' or nil),
 			INDENT .. '|mvp='
-		} or nil,
+		) or nil,
 		casters > 0 and {
 			INDENT .. table.concat(Array.map(Array.range(1, casters), function(casterIndex)
 				return '|caster' .. casterIndex .. '='

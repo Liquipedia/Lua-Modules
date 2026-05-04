@@ -44,17 +44,12 @@ end
 function CustomMatchSummary.createBody(match)
 	CustomMatchSummary.computeOfffactions(match)
 	local hasHeroes = CustomMatchSummary.hasHeroes(match)
-	local isResetMatch = String.endsWith(match.matchId, '_RxMBR')
 	local subMatches
 	if match.opponentMode ~= UNIFORM_MATCH then
 		subMatches = match.submatches or {}
 	end
 
 	return WidgetUtil.collect(
-		isResetMatch and MatchSummaryWidgets.Row{
-			css = {['line-height'] = '80%', ['font-weight'] = 'bold', ['text-align'] = 'center'},
-			children = {'Reset match'},
-		} or nil,
 		Array.map(match.opponents, CustomMatchSummary.advantageOrPenalty),
 		subMatches and Array.map(subMatches, CustomMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {hasHeroes = hasHeroes})),

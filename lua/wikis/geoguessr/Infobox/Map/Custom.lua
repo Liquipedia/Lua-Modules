@@ -12,8 +12,8 @@ local Class = Lua.import('Module:Class')
 local Map = Lua.import('Module:Infobox/Map')
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 
-local Link = require('Module:Widget/Basic/Link')
-local Widgets = require('Module:Widget/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class GeoguessrMapInfobox: MapInfobox
@@ -45,7 +45,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Map Link', children = {tostring(Link{
 				linktype = 'external',
 				link = args.maplink,
-				children = {args.map},
+				children = {args.name},
 			})}}
 		)
 	end

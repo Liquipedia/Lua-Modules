@@ -38,11 +38,11 @@ h1#firstHeading,
 	font-weight: 500;
 
 	.theme--light & {
-		color: var( --clr-wiki-theme-40 );
+		color: var( --clr-wiki-theme-20 );
 	}
 
 	.theme--dark & {
-		color: var( --clr-wiki-theme-90 );
+		color: var( --clr-secondary-90 );
 	}
 }
 

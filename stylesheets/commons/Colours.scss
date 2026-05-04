@@ -753,3 +753,25 @@ ul.nav-tabs li.game-wiiu,
 .icon--copper {
 	color: #cc7800;
 }
+
+/* Standings position / placement colors */
+
+.theme--light {
+	--position-byeup-color: #8046a3;
+	--position-seedup-color: #006bd4;
+	--position-up-color: var( --clr-semantic-positive-30 );
+	--position-stayup-color: #094e09;
+	--position-stay-color: #966f00;
+	--position-staydown-color: #d4400f;
+	--position-down-color: var( --clr-semantic-negative-40 );
+}
+
+.theme--dark {
+	--position-byeup-color: #cc9fe7;
+	--position-seedup-color: #a9caeb;
+	--position-up-color: #65a765;
+	--position-stayup-color: #b6f8b6;
+	--position-stay-color: #e5c976;
+	--position-staydown-color: #f2a288;
+	--position-down-color: #fc6868;
+}

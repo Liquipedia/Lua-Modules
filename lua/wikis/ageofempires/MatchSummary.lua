@@ -8,22 +8,35 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 local Faction = Lua.import('Module:Faction')
 local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local MapMode = Lua.import('Module:MapMode')
 local Operator = Lua.import('Module:Operator')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local Opponent = Lua.import('Module:Opponent/Custom')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 
+---@class AoECustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
+
+---@class AoEMatchSummaryGameRowProps: MatchSummaryGameRowProps
+---@field gameData string?
+---@field soloMode boolean
+
+---@class AoEMatchSummaryGameRow: MatchSummaryGameRow
+---@operator call(AoEMatchSummaryGameRowProps): AoEMatchSummaryGameRow
+---@field props AoEMatchSummaryGameRowProps
+local AoEMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+AoEMatchSummaryGameRow.defaultProps = {
+	allowWrappingInOverview = true
+}
 
 ---@param args table
 ---@return Widget
@@ -41,20 +54,24 @@ function CustomMatchSummary._determineWidth(match)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return Widget
 function CustomMatchSummary.createBody(match)
-	local games = Array.map(match.games, function(game)
-		return CustomMatchSummary._createGame(game, {
-			game = match.game,
-			soloMode = CustomMatchSummary._isSolo(match)
-		})
-	end)
-
-	return WidgetUtil.collect(
-		games
-	)
+	return MatchSummaryWidgets.GamesContainer{
+		children = Array.map(match.games, function (game, gameIndex)
+			if (not game.map) and (not game.winner) and Logic.isEmpty(game.status) and Logic.isDeepEmpty(game.opponents) then
+				return
+			end
+			return AoEMatchSummaryGameRow{
+				game = game,
+				gameIndex = gameIndex,
+				gameData = match.game,
+				soloMode = CustomMatchSummary._isSolo(match)
+			}
+		end)
+	}
 end
 
+---@private
 ---@param match MatchGroupUtilMatch
 ---@return boolean
 function CustomMatchSummary._isSolo(match)
@@ -64,100 +81,114 @@ function CustomMatchSummary._isSolo(match)
 	return match.opponents[1].type == Opponent.solo and match.opponents[2].type == Opponent.solo
 end
 
----@param game MatchGroupUtilGame
+---@private
 ---@param opponentIndex integer
 ---@param playerIndex integer
 ---@return {displayName: string?, pageName: string?, flag: string?, civ: string?}
-function CustomMatchSummary._getPlayerData(game, opponentIndex, playerIndex)
+function AoEMatchSummaryGameRow:_getPlayerData(opponentIndex, playerIndex)
+	local game = self.props.game
 	return ((game.opponents[opponentIndex] or {}).players or {})[playerIndex] or {}
 end
 
----@param game MatchGroupUtilGame
----@param props {game: string?, soloMode: boolean}
----@return Widget?
-function CustomMatchSummary._createGame(game, props)
-	if (not game.map) and (not game.winner) and Logic.isEmpty(game.status) and Logic.isDeepEmpty(game.opponents) then
+---@private
+---@param player table
+---@param flipped boolean
+---@return Widget
+function AoEMatchSummaryGameRow:_createParticipant(player, flipped)
+	local children = {
+		self:_createFactionIcon(player.civ),
+		PlayerDisplay.BlockPlayer{player = player, flip = flipped},
+	}
+	return HtmlWidgets.Div{
+		css = {
+			display = 'grid',
+			['grid-template-columns'] = 'subgrid',
+			['grid-column'] = '1 / -1',
+			['align-items'] = 'center',
+			['justify-items'] = flipped and 'end' or 'start',
+		},
+		children = flipped and Array.reverse(children) or children,
+	}
+end
+
+---@private
+---@param opponentId integer
+---@return Widget[]
+function AoEMatchSummaryGameRow:_createOpponentDisplay(opponentId)
+	local flipped = opponentId == 1
+	return Array.map(
+		Array.sortBy(
+			Array.filter(self.props.game.opponents[opponentId].players, Table.isNotEmpty),
+			Operator.property('index')
+		),
+		function (player)
+			return self:_createParticipant(player, flipped)
+		end
+	)
+end
+
+---@protected
+---@param opponentIndex integer
+---@return table<string, string|number>?
+function AoEMatchSummaryGameRow:getGameOpponentViewCss(opponentIndex)
+	local props = self.props
+
+	if props.soloMode then
 		return
 	end
 
-	local normGame = Game.abbreviation{game = props.game}:lower()
+	local flipped = opponentIndex == 1
+	local gridTemplate = {'1fr', 'min-content'}
+
+	return {
+		display = 'grid',
+		['grid-template-columns'] = table.concat(
+			flipped and gridTemplate or Array.reverse(gridTemplate),
+			' '
+		),
+	}
+end
+
+---@protected
+---@param opponentIndex integer
+---@return Widget|Widget[]
+function AoEMatchSummaryGameRow:createGameOpponentView(opponentIndex)
+	local props = self.props
+
+	if props.soloMode then
+		return self:_createFactionIcon(self:_getPlayerData(opponentIndex, 1).civ)
+	end
+
+	return self:_createOpponentDisplay(opponentIndex)
+end
+
+---@protected
+---@return Renderable?
+function AoEMatchSummaryGameRow:createGameOverview()
+	local game = self.props.game
 	game.mapDisplayName = game.mapDisplayName or game.map
 
 	if game.mapDisplayName and game.extradata and game.extradata.mapmode then
 		game.mapDisplayName = game.mapDisplayName .. MapMode._get{game.extradata.mapmode}
 	end
-
-	local faction1, faction2
-
-	if props.soloMode then
-		faction1 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, 1, 1).civ, normGame)
-		faction2 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, 2, 1).civ, normGame)
-	else
-		local function createParticipant(player, flipped)
-			local playerNode = PlayerDisplay.BlockPlayer{player = player, flip = flipped}
-			local factionNode = CustomMatchSummary._createFactionIcon(player.civ, normGame)
-			return mw.html.create('div'):css('display', 'flex'):css('align-self', flipped and 'end' or 'start')
-				:node(flipped and playerNode or factionNode)
-				:wikitext('&nbsp;')
-				:node(flipped and factionNode or playerNode)
-		end
-		local function createOpponentDisplay(opponentId)
-			local display = mw.html.create('div')
-				:css('display', 'flex')
-				:css('width', '90%')
-				:css('flex-direction', 'column')
-				:css('overflow', 'hidden')
-			Array.forEach(
-				Array.sortBy(
-					Array.filter(game.opponents[opponentId].players, Table.isNotEmpty),
-					Operator.property('index')
-				),
-				function(player)
-					display:node(createParticipant(player, opponentId == 1))
-				end
-			)
-			return display
-		end
-
-		faction1 = createOpponentDisplay(1)
-		faction2 = createOpponentDisplay(2)
-	end
-
-	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-body-game'},
-		children = WidgetUtil.collect(
-			MatchSummaryWidgets.GameTeamWrapper{children = {
-					faction1,
-					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1}
-				},
-			},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndStatus(game), css = {
-					['flex'] = '0 0 30%',
-			}},
-			MatchSummaryWidgets.GameTeamWrapper{children = {
-					faction2,
-					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-				},
-				flipped = true
-			},
-			MatchSummaryWidgets.GameComment{children = game.comment}
-		)
-	}
+	return DisplayHelper.MapAndStatus(game)
 end
 
+---@private
 ---@param civ string?
----@param game string
----@return Html
-function CustomMatchSummary._createFactionIcon(civ, game)
-	return mw.html.create('span')
-		:addClass('draft faction')
-		:wikitext(Faction.Icon{
+---@return Widget
+function AoEMatchSummaryGameRow:_createFactionIcon(civ)
+	local normGame = Game.abbreviation{game = self.props.gameData}:lower()
+	return HtmlWidgets.Span{
+		classes = {'brkts-champion-icon'},
+		children = Faction.Icon{
 			faction = civ or '',
-			game = game,
+			game = normGame,
 			size = 64,
 			showTitle = true,
 			showLink = true,
-		})
+		}
+	}
 end
 
 return CustomMatchSummary

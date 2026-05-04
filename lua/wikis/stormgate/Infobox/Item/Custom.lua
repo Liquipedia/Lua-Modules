@@ -14,11 +14,12 @@ local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local MessageBox = Lua.import('Module:Message box')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Item = Lua.import('Module:Infobox/Item')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WarningBox = Lua.import('Module:Widget/WarningBox')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -29,7 +30,6 @@ local Title = Widgets.Title
 local CustomItem = Class.new(Item)
 local CustomInjector = Class.new(Injector)
 
-local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 local VALID_ITEMS = {
 	'Gear',
 }
@@ -50,9 +50,12 @@ function CustomItem.run(frame)
 
 	local builtInfobox = item:createInfobox()
 
-	return mw.html.create()
-		:node(builtInfobox)
-		:node(CustomItem._deprecatedWarning(item.data.deprecated.display))
+	return HtmlWidgets.Fragment{
+		children = {
+			builtInfobox,
+			CustomItem._deprecatedWarning(item.data.deprecated.display)
+		}
+	}
 end
 
 ---@param id string
@@ -179,15 +182,11 @@ function CustomItem:_processPatchFromId(input)
 end
 
 ---@param patch string?
----@return Html?
+---@return Widget?
 function CustomItem._deprecatedWarning(patch)
 	if not patch then return end
 
-	return MessageBox.main('ambox', {
-		image = ICON_DEPRECATED,
-		class ='ambox-red',
-		text = 'This has been removed with Patch ' .. patch,
-	})
+	return WarningBox{text = 'This has been removed with Patch ' .. patch}
 end
 
 return CustomItem
