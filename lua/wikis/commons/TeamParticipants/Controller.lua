@@ -217,12 +217,15 @@ function TeamParticipantsController.applyPlayedData(opponent, playedData)
 	end
 	---@cast players -nil
 
-	local placement = (TeamParticipantsRepository.getPrizepoolRecordForTeam(opponent) or {}).placement
+	local placements = Array.map(
+		TeamParticipantsRepository.getPrizepoolRecordsForTeam(opponent),
+		Operator.property('placement')
+	)
 
 	---@param pageName string
 	---@return boolean?
 	local autoHasPlayed = function(pageName)
-		if Logic.isEmpty(playedData) or Logic.isEmpty(placement) then
+		if Logic.isEmpty(playedData) or Logic.isEmpty(placements) then
 			return
 		end
 		---@cast playedData -nil
