@@ -109,7 +109,9 @@ function Renderer.render(vNode, context)
 		return Renderer.render(result, context)
 	end
 
-	return ''
+	mw.logObject(renderFn, 'Invalid renderFn')
+ 	mw.logObject(vNode, 'VNode with invalid renderFn')
+ 	error('Unsupported renderFn type: ' .. type(renderFn))
 end
 
 return Renderer

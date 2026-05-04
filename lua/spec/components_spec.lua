@@ -67,7 +67,7 @@ describe('Components/Renderer', function()
 			assert.are.equal('ab', tostring(vNode))
 		end)
 
-		it('renders fragment without without attributes', function()
+		it('renders fragment without attributes', function()
 			local vNode = Html.Fragment{children = {'a', 'b'}, attributes = {id = 'should-not-appear'}}
 			assert.are.equal('ab', tostring(vNode))
 		end)
@@ -102,11 +102,11 @@ describe('Components/Renderer', function()
 		end)
 
 		it('renders mw.html', function()
-			assert.are.equal('<p>built</p>', tostring(mw.html.create('p'):wikitext('built')))
+			assert.are.equal('<p>built</p>', Renderer.render(mw.html.create('p'):wikitext('built')))
 		end)
 
 		it('renders widget2', function()
-			assert.are.equal('<p>built</p>', tostring(WidgetHtml.P{children = {'built'}}))
+			assert.are.equal('<p>built</p>', Renderer.render(WidgetHtml.P{children = {'built'}}))
 		end)
 	end)
 end)
