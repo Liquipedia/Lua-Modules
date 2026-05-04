@@ -23,40 +23,31 @@ function MatchSummaryDetailedScore:render()
 	local partialScores = Array.map(self.props.partialScores or {}, function(partialScore)
 		local children = {partialScore.score or '', partialScore.icon}
 
-		local styles = Array.append({},
-			'brkts-popup-body-match-sidewins',
+		local styles = Array.extend(
+			'brkts-popup-body-detailed-score',
 			partialScore.style,
-			partialScore.icon and 'brkts-popup-body-match-sidewins-icon' or nil
+			partialScore.icon and 'brkts-popup-body-detailed-score-icon' or nil
 		)
 
-		return HtmlWidgets.Td{
+		return HtmlWidgets.Span{
 			classes = styles,
-			children = flipped and Array.reverse(children) or children,
+			children = children,
 		}
 	end)
 
 	return HtmlWidgets.Div{
-		css = {['text-align'] = 'center', direction = flipped and 'rtl' or 'ltr'},
-		children = HtmlWidgets.Table{
-			css = {['line-height'] = '28px', float = flipped and 'right' or 'left'},
-			children = {
-				HtmlWidgets.Tr{
-					children = {
-						HtmlWidgets.Td{
-							attributes = {rowspan = 2},
-							css = {['font-size'] = '16px', width = '24px'},
-							children = self.props.score
-						},
-						unpack(Array.filter(partialScores, function(_, i)
-							return i % 2 == 1
-						end))
-					}
-				},
-				HtmlWidgets.Tr{
-					children = Array.filter(partialScores, function(_, i)
-						return i % 2 == 0
-					end)
-				}
+		classes = {
+			'brkts-popup-body-detailed-scores-container',
+			flipped and 'flipped' or nil,
+		},
+		children = {
+			HtmlWidgets.Div{
+				classes = {'brkts-popup-body-detailed-scores-main-score'},
+				children = self.props.score
+			},
+			HtmlWidgets.Div{
+				classes = {'brkts-popup-body-detailed-scores'},
+				children = partialScores
 			}
 		}
 	}

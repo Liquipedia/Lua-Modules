@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Participants/Team/ChevronToggle
+-- page=Module:Widget/GeneralCollapsible/ChevronToggle
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

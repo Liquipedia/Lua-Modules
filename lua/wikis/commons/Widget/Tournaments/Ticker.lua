@@ -7,19 +7,14 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
-local Condition = Lua.import('Module:Condition')
 local Class = Lua.import('Module:Class')
-local DateExt = Lua.import('Module:Date/Ext')
 local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
-local Operator = Lua.import('Module:Operator')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Sublist = Lua.import('Module:Widget/Tournaments/Ticker/Sublist')
-
-local Tournament = Lua.import('Module:Tournament')
+local TickerData = Lua.import('Module:TournamentsTicker/Data')
 
 ---@class TournamentsTickerWidget: Widget
 ---@operator call(table): TournamentsTickerWidget
@@ -31,123 +26,8 @@ TournamentsTickerWidget.defaultProps = {
 
 ---@return Widget
 function TournamentsTickerWidget:render()
-	local upcomingDays = self.props.upcomingDays
-	local completedDays = self.props.completedDays
-
-	local tierThresholdModifiers = {
-		[1] = self.props.modifierTier1,
-		[2] = self.props.modifierTier2,
-		[3] = self.props.modifierTier3,
-		[4] = self.props.modifierTier4,
-		[5] = self.props.modifierTier5,
-		[-1] = self.props.modifierTierMisc,
-	}
-
-	--- The Tier Type thresholds only affect completed tournaments.
-	local tierTypeThresholdModifiers = {
-		['qualifier'] = self.props.modifierTypeQualifier,
-	}
-
-	local currentTimestamp = DateExt.getCurrentTimestamp()
-
-	---@param tournament StandardTournament
-	---@return boolean
-	local function isWithinDateRange(tournament)
-		local modifiedThreshold = tierThresholdModifiers[tournament.liquipediaTier] or 0
-		local modifiedCompletedThreshold = tierTypeThresholdModifiers[tournament.liquipediaTierType] or modifiedThreshold
-
-		if not tournament.startDate then
-			return false
-		end
-
-		local startDateThreshold = currentTimestamp + (upcomingDays + modifiedThreshold) * 24 * 60 * 60
-		local endDateThreshold = currentTimestamp - (completedDays + modifiedCompletedThreshold) * 24 * 60 * 60
-
-		if tournament.phase == 'ONGOING' then
-			return true
-		elseif tournament.phase == 'UPCOMING' then
-			return tournament.startDate.timestamp < startDateThreshold
-		elseif tournament.phase == 'FINISHED' then
-			assert(tournament.endDate, 'Tournament without end date: ' .. tournament.pageName)
-			return tournament.endDate.timestamp > endDateThreshold
-		end
-		return false
-	end
-
-	local lpdbFilter = Condition.Tree(Condition.BooleanOperator.all):add{
-		Condition.Util.anyOf(Condition.ColumnName('status'), {'', 'finished'}),
-		Condition.Node(Condition.ColumnName('liquipediatiertype'), Condition.Comparator.neq, 'Points')
-	}
-
-	local allTournaments = Tournament.getAllTournaments(lpdbFilter, function(tournament)
-		return isWithinDateRange(tournament)
-	end)
-
-	---@param phase TournamentPhase
-	---@return fun(tournament: StandardTournament): boolean
-	local function filterByPhase(phase)
-		return function(tournament)
-			return tournament.phase == phase
-		end
-	end
-
-	---@param a StandardTournament
-	---@param b StandardTournament
-	---@param dateProperty 'endDate' | 'startDate'
-	---@param operator fun(a: integer, b: integer): boolean
-	---@return boolean?
-	local function sortByDateProperty(a, b, dateProperty, operator)
-		if not a[dateProperty] and not b[dateProperty] then
-			return nil
-		end
-		if not a[dateProperty] then
-			return true
-		end
-		if not b[dateProperty] then
-			return false
-		end
-		if a[dateProperty].timestamp ~= b[dateProperty].timestamp then
-			return operator(a[dateProperty].timestamp, b[dateProperty].timestamp)
-		end
-		return nil
-	end
-
-	---@param a StandardTournament
-	---@param b StandardTournament
-	---@return boolean
-	local function sortByDate(a, b)
-		local endDateSort = sortByDateProperty(a, b, 'endDate', Operator.gt)
-		if endDateSort ~= nil then
-			return endDateSort
-		end
-		local startDateSort = sortByDateProperty(a, b, 'startDate', Operator.gt)
-		if startDateSort ~= nil then
-			return startDateSort
-		end
-		return a.pageName < b.pageName
-	end
-
-	---@param a StandardTournament
-	---@param b StandardTournament
-	---@return boolean
-	local function sortByDateUpcoming(a, b)
-		local endDateSort = sortByDateProperty(a, b, 'startDate', Operator.gt)
-		if endDateSort ~= nil then
-			return endDateSort
-		end
-		local startDateSort = sortByDateProperty(a, b, 'endDate', Operator.gt)
-		if startDateSort ~= nil then
-			return startDateSort
-		end
-		return a.pageName < b.pageName
-	end
-
-	local upcomingTournaments = Array.filter(allTournaments, filterByPhase('UPCOMING'))
-	local ongoingTournaments = Array.filter(allTournaments, filterByPhase('ONGOING'))
-	local completedTournaments = Array.filter(allTournaments, filterByPhase('FINISHED'))
-	table.sort(upcomingTournaments, sortByDateUpcoming)
-	table.sort(ongoingTournaments, sortByDate)
-	table.sort(completedTournaments, sortByDate)
+	local data = TickerData.get(self.props)
+	local displayGameIcons = Logic.readBool(self.props.displayGameIcons)
 
 	local fallbackElement = HtmlWidgets.Div{
 		attributes = {
@@ -164,21 +44,18 @@ function TournamentsTickerWidget:render()
 		}
 	}
 
-
-	local displayGameIcons = Logic.readBool(self.props.displayGameIcons)
-
 	return HtmlWidgets.Div{
 		children = {
-			HtmlWidgets.Ul{
+			HtmlWidgets.Div{
 				classes = {'tournaments-list'},
 				attributes = {
 					['data-filter-hideable-group'] = '',
 					['data-filter-effect'] = 'fade',
 				},
 				children = {
-					Sublist{title = 'Upcoming', tournaments = upcomingTournaments, displayGameIcons = displayGameIcons} ,
-					Sublist{title = 'Ongoing', tournaments = ongoingTournaments, displayGameIcons = displayGameIcons},
-					Sublist{title = 'Completed', tournaments = completedTournaments, displayGameIcons = displayGameIcons},
+					Sublist{title = 'Upcoming', tournaments = data.upcoming, displayGameIcons = displayGameIcons},
+					Sublist{title = 'Ongoing', tournaments = data.ongoing, displayGameIcons = displayGameIcons},
+					Sublist{title = 'Completed', tournaments = data.completed, displayGameIcons = displayGameIcons},
 					fallbackElement
 				}
 			}

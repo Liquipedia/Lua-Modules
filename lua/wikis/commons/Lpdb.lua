@@ -31,6 +31,14 @@ function Lpdb.isStorageDisabled()
 	return Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
+---@class LpdbQueryParameters
+---@field conditions string?
+---@field offset integer?
+---@field limit integer?
+---@field query string?
+---@field groupby string?
+---@field order string?
+
 -- Executes a mass query.
 --[==[
 Loops LPDB queries to e.g.
@@ -67,7 +75,7 @@ example:
 ]==]
 ---@generic T
 ---@param tableName `T`
----@param queryParameters table
+---@param queryParameters LpdbQueryParameters
 ---@param itemChecker fun(item: T): boolean?
 ---@param limit number?
 function Lpdb.executeMassQuery(tableName, queryParameters, itemChecker, limit)

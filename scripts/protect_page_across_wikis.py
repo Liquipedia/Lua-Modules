@@ -1,9 +1,10 @@
 import os
 
 from deploy_util import get_wikis
+from mediawiki_session import MediaWikiSession
 from protect_page import (
-    protect_non_existing_page,
-    protect_existing_page,
+    protect_non_existing_pages,
+    protect_existing_pages,
     handle_protect_errors,
 )
 
@@ -11,13 +12,12 @@ PAGE_TO_PROTECT = os.getenv("PAGE_TO_PROTECT")
 
 
 def main():
-    for wiki in get_wikis():
-        print(f"::group::Checking {wiki}:{PAGE_TO_PROTECT}")
-        if wiki == "commons":
-            protect_existing_page(PAGE_TO_PROTECT, wiki)
-        else:
-            protect_non_existing_page(PAGE_TO_PROTECT, wiki)
-        print("::endgroup::")
+    for wiki in sorted(get_wikis()):
+        with MediaWikiSession(wiki) as session:
+            if wiki == "commons":
+                protect_existing_pages(session, [PAGE_TO_PROTECT])
+            else:
+                protect_non_existing_pages(session, [PAGE_TO_PROTECT])
     handle_protect_errors()
 
 

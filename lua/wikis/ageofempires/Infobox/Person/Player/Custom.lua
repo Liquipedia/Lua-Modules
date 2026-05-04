@@ -145,7 +145,7 @@ function CustomInjector:parse(id, widgets)
 		--Elo ratings
 		local ratingCells = {}
 		for game, ratings in Table.iter.spairs(RATINGCONFIG) do
-			game = Game.raw{game = game}
+			local gameData = Game.raw{game = game}
 			Array.forEach(ratings, function(rating)
 				local children = {}
 				local currentRating, bestRating
@@ -163,7 +163,7 @@ function CustomInjector:parse(id, widgets)
 					table.insert(children, bestRating)
 				end
 				if Logic.isNotEmpty(children) then
-					table.insert(ratingCells, Cell{name = rating.text .. ' (' .. game.abbreviation .. ')', children = children})
+					table.insert(ratingCells, Cell{name = rating.text .. ' (' .. gameData.abbreviation .. ')', children = children})
 				end
 			end)
 		end
