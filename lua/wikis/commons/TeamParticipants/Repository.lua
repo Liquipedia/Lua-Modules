@@ -83,9 +83,9 @@ function TeamParticipantsRepository.save(participant)
 		lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(activeOpponent))
 		lpdbData.players = lpdbData.opponentplayers
 
+		-- Calculate individual prize money (prize money per player on team)
 		-- Opt to use playerShare over prizepool if available
 		local prizevalue = lpdbData.extradata and lpdbData.extradata.playershare or lpdbData.prizemoney
-		-- Calculate individual prize money (prize money per player on team)
 		if prizevalue then
 			local filteredPlayers = Array.filter(activeOpponent.players, function(player)
 				return player.extradata.type ~= 'staff'
