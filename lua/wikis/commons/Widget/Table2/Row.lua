@@ -68,7 +68,7 @@ local function Table2Row(props, context)
 
 	local columns = Context.read(context, Table2Contexts.ColumnContext)
 	if section == 'subhead' and columns and #children == 1 and getmetatable(children[1]) == Table2CellHeaderMT then
-		local singleCell = children[1] --[[@as Table2CellHeader]]
+		local singleCell = children[1]
 		if singleCell.props.colspan == nil then
 			singleCell.props.colspan = #columns
 		end
@@ -77,7 +77,7 @@ local function Table2Row(props, context)
 	local columnIndex = 1
 	local indexedChildren = Array.map(children, function(child)
 		if getmetatable(child) == getmetatable(Table2Cell) or getmetatable(child) == Table2CellHeaderMT then
-			local cellChild = child --[[@as Table2Cell|Table2CellHeader]]
+			local cellChild = child
 			local explicitIndex = MathUtil.toInteger(cellChild.props.columnIndex)
 			if explicitIndex and explicitIndex >= 1 then
 				columnIndex = math.max(columnIndex, explicitIndex)
