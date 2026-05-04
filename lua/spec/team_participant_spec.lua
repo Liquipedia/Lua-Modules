@@ -13,7 +13,7 @@ insulate('Team Participant', function()
 				{
 					'Team Liquid',
 					players = {
-						{'alexis'},
+						{'alexis', number = 7},
 						{'dodonut'},
 						{'meL'},
 						{'Noia'},
