@@ -21,6 +21,8 @@ local LOCAL_CURRENCY_VARIABLE_POST_FIX = 'local'
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
 local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
+local PRIZE_TYPE_PLAYER_SHARE = 'PLAYER_SHARE'
+local PRIZE_TYPE_CLUB_SHARE = 'CLUB_SHARE'
 
 --- A BasePlacement is a set of opponents who all share the same final place/award in the tournament.
 --- Its input is generally a table created by `Template:Slot`.
@@ -85,6 +87,19 @@ function BasePlacement:_readPrizeRewards(args)
 	if baseType.row and args[baseType.row] then
 		self.hasBaseCurrency = true
 		rewards[PRIZE_TYPE_BASE_CURRENCY .. 1] = baseType.rowParse(self, args[baseType.row], args, 1)
+	end
+
+	local basePrize
+	local playerShare
+	Array.forEach(self.parent.prizes, function(prize)
+		if prize.type == PRIZE_TYPE_BASE_CURRENCY then
+			basePrize = rewards[prize.id] or self.prizeRewards[prize.id]
+		elseif prize.type == PRIZE_TYPE_PLAYER_SHARE then
+			playerShare = rewards[prize.id] or self.prizeRewards[prize.id]
+		end
+	end)
+	if basePrize and playerShare then
+		rewards[PRIZE_TYPE_CLUB_SHARE .. '1'] = tonumber(basePrize) - tonumber(playerShare)
 	end
 
 	return rewards
