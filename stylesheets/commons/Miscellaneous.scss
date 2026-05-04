@@ -278,6 +278,10 @@ Author(s): FO-nTTaX
 		box-sizing: content-box;
 		max-width: 100%;
 
+		&:not( :last-child ) {
+			padding-right: 2em;
+		}
+
 		> * {
 			box-sizing: border-box;
 		}

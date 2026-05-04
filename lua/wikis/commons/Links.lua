@@ -293,6 +293,9 @@ local PREFIXES = {
 	pubsteam = {'https://steamcommunity.com/groups/'},
 	smiteesports = {match = 'https://www.smiteesports.com/matches/'},
 	spotify = {'https://open.spotify.com/'},
+	statlocker = {
+		match = 'https://statlocker.gg/match/',
+	},
 	stats = {'', match = ''},
 	statshark = {
 		'https://statshark.net/',
@@ -622,6 +625,10 @@ local MATCH_ICONS = {
 		icon = 'SMITE default lightmode.png',
 		iconDark = 'SMITE default darkmode.png',
 		text = 'Smite Esports Match Page'
+	},
+	statlocker = {
+		icon = 'Statlocker_logo_allmode.png',
+		text = 'STATLOCKER',
 	},
 	stats = {
 		icon = 'Match_Info_Stats.png',

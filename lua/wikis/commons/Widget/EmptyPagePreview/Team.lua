@@ -246,7 +246,7 @@ function EmptyTeamPagePreview:_rosterFromTransfers()
 end
 
 ---@private
----@return (Widget|Html)[]
+---@return Widget[]
 function EmptyTeamPagePreview:_matches()
 	return {
 		HtmlWidgets.H3{children = 'Most Recent Matches'},
@@ -260,7 +260,7 @@ function EmptyTeamPagePreview:_matches()
 end
 
 ---@private
----@return (Widget|Html)[]
+---@return Widget[]
 function EmptyTeamPagePreview:_results()
 	return {
 		HtmlWidgets.H3{children = 'Achievements'},
@@ -296,7 +296,7 @@ end
 ---players: {flag: string?, displayName: string, pageName: string, name: string?}[], startDate: string?}
 function EmptyTeamPagePreview:_getPlayersAndCoachesFromLastPlacement()
 	local latestResult = self:_fetchPlacements{limit = 1}[1]
-	if not latestResult then return {coaches = {}, nationalities = {}} end
+	if not latestResult then return {coaches = {}, players = {}} end
 
 	local parsePerson = function (prefix)
 		local person = Page.pageifyLink(latestResult.opponentplayers[prefix])
