@@ -56,7 +56,7 @@ function TeamTemplate.getIcon(template)
 end
 
 --[[
-Returns the redirected page name of a team template that has been resolved to a
+Returns the page name with resolved redirects of a team template that has been resolved to a
 date. Returns nil if the team does not exist, or if the page is not specified.
 ]]
 ---@param resolvedTemplate string
@@ -70,7 +70,7 @@ TeamTemplate.getPageName = FnUtil.memoize(function(resolvedTemplate)
 end)
 
 --[[
-Returns the resolved page name of a team template that has been resolved to a
+Returns the raw page name of a team template that has been resolved to a
 date. Returns nil if the team does not exist, or if the page is not specified.
 ]]
 ---@param resolvedTemplate string
