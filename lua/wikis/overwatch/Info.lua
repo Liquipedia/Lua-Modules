@@ -52,7 +52,7 @@ return {
 		infoboxPlayer = {
 			automatedHistory = {
 				mode = 'manualPrio',
-				storeFromWikiCode =true,
+				storeFromWikiCode = true,
 			},
 		},
 		participants = {
