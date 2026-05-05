@@ -103,9 +103,6 @@ end
 ---@param parsedData {participants: TeamParticipant[], expectedPlayerCount: integer?}
 function TeamParticipantsController.applyPlayedAndResults(parsedData)
 	local playedData = TeamParticipantsController.playedDataFromMatchData(parsedData.participants)
-	if not playedData then
-		return
-	end
 
 	Array.forEach(parsedData.participants, function (participant)
 		TeamParticipantsController.applyPlayedData(
