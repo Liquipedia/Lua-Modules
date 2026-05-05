@@ -87,10 +87,6 @@ function ParticipantsTeamMember:render()
 						trophyIcon
 					)
 			} or nil,
-			number and Div{
-				classes = {'team-participant-card__member-role-right'},
-				children = tostring(number),
-			} or nil,
 			renderRoleRight(),
 			team and Div{
 				classes = {'team-participant-card__member-team'},
@@ -99,6 +95,10 @@ function ParticipantsTeamMember:render()
 					teamStyle = 'icon',
 					additionalClasses = {'team-participant-icon'}
 				}),
+			} or nil,
+			number and Div{
+				classes = {'team-participant-card__member-role-right'},
+				children = tostring(number),
 			} or nil
 		)
 	}
