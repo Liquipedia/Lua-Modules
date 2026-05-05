@@ -8,12 +8,21 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Variables = Lua.import('Module:Variables')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
@@ -146,10 +155,127 @@ function TeamParticipantsRepository.setPageVars(participant)
 				globalVars:set(combinedPrefix .. 'dn', player.displayName)
 				globalVars:set(combinedPrefix .. 'id', player.apiId)
 				globalVars:set(combinedPrefix .. 'faction', player.faction)
-				-- TODO: joindate, leavedate
+				globalVars:set(combinedPrefix .. 'joindate', player.extradata.joinDate)
+				globalVars:set(combinedPrefix .. 'leavedate', player.extradata.leaveDate)
 			end)
 		end)
 	end)
+end
+
+---@param playerPageName string
+---@param teamAliases string[]
+---@param status 'active'|'activeAlt'|'inactive'|'former'
+---@return {joinDate: string?, leaveDate: string?}
+function TeamParticipantsRepository.getPlayerTransferDate(playerPageName, teamAliases, status)
+	local startDate = Variables.varDefault('tournament_startdate', DateExt.getContextualDateOrNow())
+	local endDate = Variables.varDefault('tournament_enddate', os.date('%F'))
+
+	local toTeamComparator, toTeamOperator, fromTeamComparator, fromTeamOperator
+	if status == 'active' then
+		toTeamComparator, toTeamOperator = Comparator.eq, BooleanOperator.any
+		fromTeamComparator, fromTeamOperator = Comparator.neq, BooleanOperator.all
+	elseif status == 'activeAlt' or status == 'inactive' then
+		toTeamComparator, toTeamOperator = Comparator.eq, BooleanOperator.any
+		fromTeamComparator, fromTeamOperator = Comparator.eq, BooleanOperator.any
+	else -- former
+		toTeamComparator, toTeamOperator = Comparator.neq, BooleanOperator.all
+		fromTeamComparator, fromTeamOperator = Comparator.eq, BooleanOperator.any
+	end
+
+	local toTeamTree = ConditionTree(toTeamOperator)
+	Array.forEach(teamAliases, function(alias)
+		toTeamTree:add(ConditionNode(ColumnName('toteam'), toTeamComparator, alias))
+	end)
+
+	local fromTeamTree = ConditionTree(fromTeamOperator)
+	Array.forEach(teamAliases, function(alias)
+		fromTeamTree:add(ConditionNode(ColumnName('fromteam'), fromTeamComparator, alias))
+	end)
+
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName('player'), Comparator.eq, playerPageName),
+			ConditionNode(ColumnName('player'), Comparator.eq, playerPageName:gsub('_', ' ')),
+		},
+		ConditionNode(ColumnName('date'), Comparator.gt, startDate),
+		ConditionNode(ColumnName('date'), Comparator.lt, endDate),
+		toTeamTree,
+		fromTeamTree,
+	}
+
+	if status == 'active' then
+		conditions:add(ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName('role2'), Comparator.eq, ''),
+			ConditionNode(ColumnName('role2'), Comparator.eq, 'Loan'),
+		})
+	elseif status == 'activeAlt' then
+		conditions:add(ConditionNode(ColumnName('role1'), Comparator.eq, 'Inactive'))
+		conditions:add(ConditionNode(ColumnName('role2'), Comparator.eq, ''))
+	elseif status == 'inactive' then
+		conditions:add(ConditionNode(ColumnName('role2'), Comparator.eq, 'Inactive'))
+	end
+
+	local transferData = mw.ext.LiquipediaDB.lpdb('transfer', {
+		conditions = tostring(conditions),
+		order = 'date desc',
+		limit = 1,
+	})
+
+	if not transferData[1] then
+		return {}
+	end
+
+	if status == 'active' or status == 'activeAlt' then
+		return {joinDate = DateExt.toYmdInUtc(transferData[1].date)}
+	end
+	return {leaveDate = DateExt.toYmdInUtc(transferData[1].date)}
+end
+
+---@param player standardPlayer
+---@param teamAliases string[]
+---@return {joinDate: string?, leaveDate: string?}
+function TeamParticipantsRepository.getPlayerDates(player, teamAliases)
+	local pageName = Logic.nilIfEmpty(player.pageName)
+	if not pageName or pageName:lower() == 'tbd' then
+		return {}
+	end
+
+	local extradata = player.extradata or {}
+	local playerDates = {
+		joinDate = extradata.joinDate,
+		leaveDate = extradata.leaveDate,
+	}
+
+	if Logic.isNotEmpty(playerDates.joinDate) and Logic.isNotEmpty(playerDates.leaveDate) then
+		return playerDates
+	end
+
+	local isFormer = extradata.status == 'former'
+
+	playerDates = Table.merge(
+		TeamParticipantsRepository.getPlayerTransferDate(pageName, teamAliases, 'active'),
+		playerDates
+	)
+	if Logic.isEmpty(playerDates.joinDate) then
+		playerDates = Table.merge(
+			TeamParticipantsRepository.getPlayerTransferDate(pageName, teamAliases, 'activeAlt'),
+			playerDates
+		)
+	end
+	if isFormer then
+		playerDates = Table.merge(
+			TeamParticipantsRepository.getPlayerTransferDate(pageName, teamAliases, 'inactive'),
+			playerDates
+		)
+		if Logic.isEmpty(playerDates.leaveDate) then
+			playerDates = Table.merge(
+				TeamParticipantsRepository.getPlayerTransferDate(pageName, teamAliases, 'former'),
+				playerDates
+			)
+		end
+	end
+
+	return playerDates
 end
 
 ---@param opponent standardOpponent
