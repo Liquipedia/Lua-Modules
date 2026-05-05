@@ -197,8 +197,8 @@ function TeamParticipantsRepository.getPlayerTransferDate(playerPageName, teamAl
 			ConditionNode(ColumnName('player'), Comparator.eq, playerPageName),
 			ConditionNode(ColumnName('player'), Comparator.eq, playerPageName:gsub('_', ' ')),
 		},
-		ConditionNode(ColumnName('date'), Comparator.gt, startDate),
-		ConditionNode(ColumnName('date'), Comparator.lt, endDate),
+		ConditionNode(ColumnName('date'), Comparator.ge, startDate),
+		ConditionNode(ColumnName('date'), Comparator.le, endDate),
 		toTeamTree,
 		fromTeamTree,
 	}
