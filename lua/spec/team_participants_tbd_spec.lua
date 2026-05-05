@@ -95,6 +95,24 @@ describe('Team Participants TBD Functionality', function()
 			assert.are_equal(5, #activePlayers)
 		end)
 
+		it('does not count players with a status as active', function()
+			local opponent = {
+				players = {
+					TeamParticipantsWikiParser.parsePlayer({'Player1'}),
+					TeamParticipantsWikiParser.parsePlayer({'Player2'}),
+					TeamParticipantsWikiParser.parsePlayer({'Former1', status = 'former'}),
+					TeamParticipantsWikiParser.parsePlayer({'Sub1', status = 'sub'}),
+				}
+			}
+
+			TeamParticipantsWikiParser.fillIncompleteRoster(opponent, 5)
+
+			local activePlayers = Array.filter(opponent.players, function(p)
+				return p.extradata.type == 'player' and not p.extradata.status
+			end)
+			assert.are_equal(5, #activePlayers)
+		end)
+
 		it('handles missing data gracefully', function()
 			local opponent1 = {
 				players = {

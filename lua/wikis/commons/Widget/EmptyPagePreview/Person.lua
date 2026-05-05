@@ -84,13 +84,13 @@ function EmptyPersonPagePreview:_infobox()
 		self:_backfillInformationFromPlacements()
 	)
 	table.insert(infoboxArgs.idsArray, infoboxArgsFromSquadInfo.id)
+	if Logic.isEmpty(infoboxArgs.idsArray) then
+		return
+	end
 	infoboxArgs.idsArray = Array.unique(infoboxArgs.idsArray)
 	infoboxArgs.idsArray = Array.filter(infoboxArgs.idsArray, function(id)
 		return id ~= infoboxArgs.id
 	end)
-	if Logic.isEmpty(infoboxArgs.idsArray) then
-		return
-	end
 	infoboxArgs.ids = table.concat(infoboxArgs.idsArray, ', ')
 	infoboxArgs.id = infoboxArgs.id or self.props.pageName
 
