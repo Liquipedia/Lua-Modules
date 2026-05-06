@@ -394,7 +394,6 @@ describe('Team Participant', function()
 		end)
 
 		describe('TBD Functionality', function()
-			local TeamParticipantsWikiParser = require('Module:TeamParticipants/Parse/Wiki')
 			local TeamParticipantsController = require('Module:TeamParticipants/Controller')
 			local Array = require('Module:Array')
 
