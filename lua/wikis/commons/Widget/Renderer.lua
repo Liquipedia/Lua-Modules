@@ -53,8 +53,8 @@ local function escapeAttr(str)
 end
 
 --- Builds an HTML string from the given tag, props, and children
----@param tag string|nil
----@param props table
+---@param tag string
+---@param props {classes?: string[], css: table<string, string>, attributes: table<string, string|boolean>}
 ---@param renderedChildren string?
 ---@return string
 local function buildHtmlString(tag, props, renderedChildren)
@@ -74,8 +74,8 @@ local function buildHtmlString(tag, props, renderedChildren)
 		table.insert(buffer, '"')
 	end
 
-	if props.attr then
-		for k, v in pairs(props.attr) do
+	if props.attributes then
+		for k, v in pairs(props.attributes) do
 			if type(v) == 'boolean' then
 				-- Boolean attributes like `disabled` or `checked`
 				if v then table.insert(buffer, ' ' .. k) end
