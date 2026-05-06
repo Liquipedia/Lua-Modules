@@ -24,33 +24,36 @@ function ResolveRequire(repoRoot, name, source)
 		return nil
 	end
 
+	-- See the unescaping of : below
+	basePath = basePath:gsub('%%20', ' ')
+	local ioPath
 	if IS_WINDOWS then
 		-- On Windows, the file URI starts with file:///C:/path/to/repo, so we need to remove the extra slash
 		-- Also need to unescape the :, otherwise %3 would be treated as a capture group result in later patterns
-		basePath = basePath:gsub('^file:///', 'file://'):gsub('%%3A', ':')
+		basePath = basePath:gsub('%%3A', ':')
+		ioPath = basePath:gsub('^file:///', '')
+	else
+		ioPath = basePath:gsub('^file://', '')
 	end
-	-- See the unescaping of : above
-	basePath = basePath:gsub('%%20', ' ')
 
-	local wiki = source:match('^file://.-/lua/wikis/([^/]+)/') or 'commons'
+	local targetWiki = source:match('^file://.-/lua/wikis/([^/]+)/')
 
-	-- Check if the file exists in the same wiki
-	local wikiPath = basePath .. '/wikis/' .. wiki .. '/' .. fileName .. '.lua'
-	local wikiFile = io.open(wikiPath:gsub('^file://', ''), 'r')
-	if wikiFile then
+	local function getFileForWiki(wiki)
+		if not wiki then
+			return
+		end
+		local pathSuffix = '/wikis/' .. wiki .. '/' .. fileName .. '.lua'
+		local wikiFile = io.open(ioPath .. pathSuffix, 'r')
+		print(wikiFile, ioPath .. pathSuffix)
+		if not wikiFile then
+			return
+		end
 		wikiFile:close()
-		return {wikiPath}
+		print(basePath .. pathSuffix)
+		return {basePath .. pathSuffix}
 	end
 
-	-- Fall back to commons wiki
-	local commonsPath = basePath .. '/wikis/commons/' .. fileName .. '.lua'
-	local commonsFile = io.open(commonsPath:gsub('^file://', ''), 'r')
-	if commonsFile then
-		commonsFile:close()
-		return {commonsPath}
-	end
-
-	return nil
+	return getFileForWiki(targetWiki) or getFileForWiki('commons') or nil
 end
 
 ---Transforms a MediaWiki module name, e.g. `Module:Array`, into a lua repository name, e.g. `Array`
