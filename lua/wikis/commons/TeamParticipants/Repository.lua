@@ -20,6 +20,7 @@ local Variables = Lua.import('Module:Variables')
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
+local ConditionUtil = Condition.Util
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
@@ -170,44 +171,25 @@ function TeamParticipantsRepository.getPlayerTransferDate(playerPageName, teamAl
 	local startDate = Variables.varDefault('tournament_startdate', DateExt.getContextualDateOrNow())
 	local endDate = Variables.varDefault('tournament_enddate', os.date('%F'))
 
-	local toTeamComparator, toTeamOperator, fromTeamComparator, fromTeamOperator
+	local toTeamFn, fromTeamFn
 	if status == 'active' then
-		toTeamComparator, toTeamOperator = Comparator.eq, BooleanOperator.any
-		fromTeamComparator, fromTeamOperator = Comparator.neq, BooleanOperator.all
+		toTeamFn, fromTeamFn = ConditionUtil.anyOf, ConditionUtil.noneOf
 	elseif status == 'activeAlt' or status == 'inactive' then
-		toTeamComparator, toTeamOperator = Comparator.eq, BooleanOperator.any
-		fromTeamComparator, fromTeamOperator = Comparator.eq, BooleanOperator.any
+		toTeamFn, fromTeamFn = ConditionUtil.anyOf, ConditionUtil.anyOf
 	else -- former
-		toTeamComparator, toTeamOperator = Comparator.neq, BooleanOperator.all
-		fromTeamComparator, fromTeamOperator = Comparator.eq, BooleanOperator.any
+		toTeamFn, fromTeamFn = ConditionUtil.noneOf, ConditionUtil.anyOf
 	end
 
-	local toTeamTree = ConditionTree(toTeamOperator)
-	Array.forEach(teamAliases, function(alias)
-		toTeamTree:add(ConditionNode(ColumnName('toteam'), toTeamComparator, alias))
-	end)
-
-	local fromTeamTree = ConditionTree(fromTeamOperator)
-	Array.forEach(teamAliases, function(alias)
-		fromTeamTree:add(ConditionNode(ColumnName('fromteam'), fromTeamComparator, alias))
-	end)
-
 	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('player'), Comparator.eq, playerPageName),
-			ConditionNode(ColumnName('player'), Comparator.eq, playerPageName:gsub('_', ' ')),
-		},
+		ConditionUtil.anyOf(ColumnName('player'), {playerPageName, playerPageName:gsub('_', ' ')}),
 		ConditionNode(ColumnName('date'), Comparator.ge, startDate),
 		ConditionNode(ColumnName('date'), Comparator.le, endDate),
-		toTeamTree,
-		fromTeamTree,
+		toTeamFn(ColumnName('toteam'), teamAliases),
+		fromTeamFn(ColumnName('fromteam'), teamAliases),
 	}
 
 	if status == 'active' then
-		conditions:add(ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('role2'), Comparator.eq, ''),
-			ConditionNode(ColumnName('role2'), Comparator.eq, 'Loan'),
-		})
+		conditions:add(ConditionUtil.anyOf(ColumnName('role2'), {'', 'Loan'}))
 	elseif status == 'activeAlt' then
 		conditions:add(ConditionNode(ColumnName('role1'), Comparator.eq, 'Inactive'))
 		conditions:add(ConditionNode(ColumnName('role2'), Comparator.eq, ''))
@@ -246,33 +228,17 @@ function TeamParticipantsRepository.getPlayerDates(player, teamAliases)
 		leaveDate = extradata.leaveDate,
 	}
 
-	if Logic.isNotEmpty(playerDates.joinDate) and Logic.isNotEmpty(playerDates.leaveDate) then
-		return playerDates
+	local function tryQuery(status, field)
+		if Logic.isNotEmpty(playerDates[field]) then return end
+		local result = TeamParticipantsRepository.getPlayerTransferDate(pageName, teamAliases, status)
+		playerDates[field] = result[field]
 	end
 
-	local isFormer = extradata.status == 'former'
-
-	playerDates = Table.merge(
-		TeamParticipantsRepository.getPlayerTransferDate(pageName, teamAliases, 'active'),
-		playerDates
-	)
-	if Logic.isEmpty(playerDates.joinDate) then
-		playerDates = Table.merge(
-			TeamParticipantsRepository.getPlayerTransferDate(pageName, teamAliases, 'activeAlt'),
-			playerDates
-		)
-	end
-	if isFormer then
-		playerDates = Table.merge(
-			TeamParticipantsRepository.getPlayerTransferDate(pageName, teamAliases, 'former'),
-			playerDates
-		)
-		if Logic.isEmpty(playerDates.leaveDate) then
-			playerDates = Table.merge(
-				TeamParticipantsRepository.getPlayerTransferDate(pageName, teamAliases, 'inactive'),
-				playerDates
-			)
-		end
+	tryQuery('active', 'joinDate')
+	tryQuery('activeAlt', 'joinDate')
+	if extradata.status == 'former' then
+		tryQuery('former', 'leaveDate')
+		tryQuery('inactive', 'leaveDate')
 	end
 
 	return playerDates
