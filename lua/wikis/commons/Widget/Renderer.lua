@@ -8,6 +8,8 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local ErrorDisplay = Lua.import('Module:Error/Display')
+local Logic = Lua.import('Module:Logic')
 local Types = Lua.import('Module:Widget/Types')
 
 local Renderer = {}
@@ -71,10 +73,34 @@ function Renderer.render(vNode, context)
 			props = {
 				parent = context,
 				def = vNode.props.def,
-				value = vNode.props.value
+				value = vNode.props.value,
 			}
 		}
 		return Renderer.render(vNode.props.children, newContext)
+	end
+
+	-- Handle Error Boundaries
+	if renderFn == Types.ERROR_BOUNDARY then
+		---@cast vNode ErrorBoundaryNode
+		local props = vNode.props
+		return Logic.tryOrElseLog(
+			function ()
+				return Renderer.render(props.children, context)
+			end,
+			function (error)
+				local fallback = props.fallback
+				if type(fallback) == 'function' then
+					return Renderer.render(fallback(error, context), context)
+				elseif fallback ~= nil then
+					return Renderer.render(fallback, context)
+				end
+				return tostring(ErrorDisplay.InlineError(error))
+			end,
+			function (error)
+				error.header = 'Error occured in widget building:'
+				return error
+			end
+		)
 	end
 
 	-- Handle HTML Tags
