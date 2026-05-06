@@ -44,12 +44,10 @@ function ResolveRequire(repoRoot, name, source)
 		end
 		local pathSuffix = '/wikis/' .. wiki .. '/' .. fileName .. '.lua'
 		local wikiFile = io.open(ioPath .. pathSuffix, 'r')
-		print(wikiFile, ioPath .. pathSuffix)
 		if not wikiFile then
 			return
 		end
 		wikiFile:close()
-		print(basePath .. pathSuffix)
 		return {basePath .. pathSuffix}
 	end
 
