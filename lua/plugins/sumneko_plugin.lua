@@ -25,15 +25,14 @@ function ResolveRequire(repoRoot, name, source)
 	end
 
 	-- See the unescaping of : below
-	basePath = basePath:gsub('%%20', ' ')
-	local ioPath
+	local ioPath = basePath:gsub('%%20', ' ')
 	if IS_WINDOWS then
 		-- On Windows, the file URI starts with file:///C:/path/to/repo, so we need to remove the extra slash
 		-- Also need to unescape the :, otherwise %3 would be treated as a capture group result in later patterns
-		basePath = basePath:gsub('%%3A', ':')
-		ioPath = basePath:gsub('^file:///', '')
+		ioPath = ioPath:gsub('%%3A', ':')
+		ioPath = ioPath:gsub('^file:///', '')
 	else
-		ioPath = basePath:gsub('^file://', '')
+		ioPath = ioPath:gsub('^file://', '')
 	end
 
 	local targetWiki = source:match('^file://.-/lua/wikis/([^/]+)/')
