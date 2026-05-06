@@ -451,7 +451,9 @@ function mw.language:formatDate(format, timestamp, localTime)
 			return os.date('!%Y-%m-%d') --[[@as string]]
 		end
 		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
-			return os.date('!%Y-%m-%d', tonumber(string.sub(timestamp, 2))) --[[@as string]]
+			local seconds = tonumber(string.sub(timestamp, 2))
+			if not seconds then return '' end
+			return os.date('!%Y-%m-%d', seconds) --[[@as string]]
 		end
 		if type(timestamp) == 'string' then
 			local year, month, day = parseDateString(timestamp)
