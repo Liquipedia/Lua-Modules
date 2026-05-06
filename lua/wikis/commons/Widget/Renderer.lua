@@ -12,6 +12,92 @@ local Types = Lua.import('Module:Widget/Types')
 
 local Renderer = {}
 
+-- List of HTML tags that cannot have children and do not need closing tags
+local selfClosingTags = {
+	area = true,
+	base = true,
+	br = true,
+	col = true,
+	command = true,
+	embed = true,
+	hr = true,
+	img = true,
+	input = true,
+	keygen = true,
+	link = true,
+	meta = true,
+	param = true,
+	source = true,
+	track = true,
+	wbr = true,
+}
+
+-- Basic attribute escaper (prevents quotes from breaking HTML)
+local htmlencodeMap = {
+	['>'] = '&gt;',
+	['<'] = '&lt;',
+	['&'] = '&amp;',
+	['"'] = '&quot;',
+}
+
+---@param str any
+---@return string
+local function escapeAttr(str)
+	if type(str) ~= 'string' then
+		str = tostring(str)
+	end
+	for char, escape in pairs(htmlencodeMap) do
+		str = str:gsub(char, escape)
+	end
+	return str
+end
+
+--- Builds an HTML string from the given tag, props, and children
+---@param tag string|nil
+---@param props table
+---@param renderedChildren string?
+---@return string
+local function buildHtmlString(tag, props, renderedChildren)
+	local buffer = { '<', tag }
+
+	if props.classes and #props.classes > 0 then
+		table.insert(buffer, ' class="')
+		table.insert(buffer, escapeAttr(table.concat(props.classes, ' ')))
+		table.insert(buffer, '"')
+	end
+
+	if props.css then
+		table.insert(buffer, ' style="')
+		for k, v in pairs(props.css) do
+			table.insert(buffer, k .. ':' .. tostring(v) .. ';')
+		end
+		table.insert(buffer, '"')
+	end
+
+	if props.attr then
+		for k, v in pairs(props.attr) do
+			if type(v) == 'boolean' then
+				-- Boolean attributes like `disabled` or `checked`
+				if v then table.insert(buffer, ' ' .. k) end
+			else
+				table.insert(buffer, ' ' .. k .. '="' .. escapeAttr(v) .. '"')
+			end
+		end
+	end
+
+	if selfClosingTags[tag] then
+		table.insert(buffer, ' />')
+	else
+		table.insert(buffer, '>')
+		if renderedChildren and renderedChildren ~= '' then
+			table.insert(buffer, renderedChildren)
+		end
+		table.insert(buffer, '</' .. tag .. '>')
+	end
+
+	return table.concat(buffer)
+end
+
 --- Renders a Virtual Node (VNode) into a string
 ---@param vNode Renderable|Renderable[]|nil
 ---@param context Context?
@@ -80,26 +166,16 @@ function Renderer.render(vNode, context)
 	-- Handle HTML Tags
 	if type(renderFn) == 'string' then
 		---@cast vNode HtmlNode
-		local props = vNode.props
-		local tagName = renderFn
-		local tag
-		if tagName == 'fragment' then
-			tag = mw.html.create()
-		else
-			tag = mw.html.create(tagName)
+		local renderedChildren = ''
+		if vNode.props.children then
+			renderedChildren = Renderer.render(vNode.props.children, context)
 		end
 
-		if props.classes then
-			tag:addClass(table.concat(props.classes, ' '))
-		end
-		if props.css then tag:css(props.css) end
-		if props.attributes then tag:attr(props.attributes) end
-
-		if props.children then
-			tag:node(Renderer.render(props.children, context))
+		if renderFn == 'fragment' then
+			return renderedChildren
 		end
 
-		return tostring(tag)
+		return buildHtmlString(renderFn, vNode.props, renderedChildren)
 	end
 
 	-- Handle Functional Components
