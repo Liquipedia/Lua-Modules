@@ -131,6 +131,25 @@ describe('TeamParticipants player dates', function()
 			)
 			assert.are_equal('2023-01-01', dates.joinDate)
 		end)
+
+		it('queries against the team-template columns, not display-name columns', function()
+			local capturedConditions
+			LpdbQuery:revert()
+			LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function(_, options)
+				capturedConditions = options.conditions
+				return {}
+			end)
+
+			TeamParticipantsRepository.getPlayerDates(
+				{pageName = 'Alexis', extradata = {}},
+				{'team liquid'}
+			)
+
+			assert.is_truthy(capturedConditions:find('toteamtemplate', 1, true))
+			assert.is_truthy(capturedConditions:find('fromteamtemplate', 1, true))
+			assert.is_nil(capturedConditions:find('[[toteam::', 1, true))
+			assert.is_nil(capturedConditions:find('[[fromteam::', 1, true))
+		end)
 	end)
 
 	describe('setPageVars', function()

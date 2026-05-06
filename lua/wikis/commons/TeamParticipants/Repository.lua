@@ -184,8 +184,8 @@ function TeamParticipantsRepository.getPlayerTransferDate(playerPageName, teamAl
 		ConditionUtil.anyOf(ColumnName('player'), {playerPageName, playerPageName:gsub('_', ' ')}),
 		ConditionNode(ColumnName('date'), Comparator.ge, startDate),
 		ConditionNode(ColumnName('date'), Comparator.le, endDate),
-		toTeamFn(ColumnName('toteam'), teamAliases),
-		fromTeamFn(ColumnName('fromteam'), teamAliases),
+		toTeamFn(ColumnName('toteamtemplate'), teamAliases),
+		fromTeamFn(ColumnName('fromteamtemplate'), teamAliases),
 	}
 
 	if status == 'active' then
