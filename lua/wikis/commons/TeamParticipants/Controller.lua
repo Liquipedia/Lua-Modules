@@ -148,8 +148,10 @@ end
 ---@param parsedData {participants: TeamParticipant[], expectedPlayerCount: integer?}
 function TeamParticipantsController.enrichPlayerDates(parsedData)
 	Array.forEach(parsedData.participants, function(participant)
-		Array.forEach(participant.opponent.players or {}, function(player)
-			local dates = TeamParticipantsRepository.getPlayerDates(player, participant.aliases)
+		local players = participant.opponent.players or {}
+		local datesByPlayer = TeamParticipantsRepository.getPlayersDates(players, participant.aliases)
+		Array.forEach(players, function(player)
+			local dates = datesByPlayer[player.pageName] or {}
 			player.extradata = player.extradata or {}
 			player.extradata.joinDate = dates.joinDate
 			player.extradata.leaveDate = dates.leaveDate

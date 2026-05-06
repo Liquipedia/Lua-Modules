@@ -163,11 +163,15 @@ function TeamParticipantsRepository.setPageVars(participant)
 	end)
 end
 
----@param playerPageName string
+---@param playerPageNames string[]
 ---@param teamAliases string[]
 ---@param status 'active'|'activeAlt'|'inactive'|'former'
----@return {joinDate: string?, leaveDate: string?}
-function TeamParticipantsRepository.getPlayerTransferDate(playerPageName, teamAliases, status)
+---@return table<string, string> -- pageName -> date (YYYY-MM-DD)
+function TeamParticipantsRepository.getPlayerTransferDates(playerPageNames, teamAliases, status)
+	if #playerPageNames == 0 then
+		return {}
+	end
+
 	local startDate = Variables.varDefault('tournament_startdate', DateExt.getContextualDateOrNow())
 	local endDate = Variables.varDefault('tournament_enddate', os.date('%F'))
 
@@ -180,8 +184,20 @@ function TeamParticipantsRepository.getPlayerTransferDate(playerPageName, teamAl
 		toTeamFn, fromTeamFn = ConditionUtil.noneOf, ConditionUtil.anyOf
 	end
 
+	local variantToCanonical = {}
+	local nameVariants = {}
+	Array.forEach(playerPageNames, function(name)
+		variantToCanonical[name] = name
+		table.insert(nameVariants, name)
+		local alt = name:gsub('_', ' ')
+		if alt ~= name then
+			variantToCanonical[alt] = name
+			table.insert(nameVariants, alt)
+		end
+	end)
+
 	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionUtil.anyOf(ColumnName('player'), {playerPageName, playerPageName:gsub('_', ' ')}),
+		ConditionUtil.anyOf(ColumnName('player'), nameVariants),
 		ConditionNode(ColumnName('date'), Comparator.ge, startDate),
 		ConditionNode(ColumnName('date'), Comparator.le, endDate),
 		toTeamFn(ColumnName('toteamtemplate'), teamAliases),
@@ -200,48 +216,63 @@ function TeamParticipantsRepository.getPlayerTransferDate(playerPageName, teamAl
 	local transferData = mw.ext.LiquipediaDB.lpdb('transfer', {
 		conditions = tostring(conditions),
 		order = 'date desc',
-		limit = 1,
+		limit = 5000,
 	})
 
-	if not transferData[1] then
-		return {}
-	end
-
-	if status == 'active' or status == 'activeAlt' then
-		return {joinDate = DateExt.toYmdInUtc(transferData[1].date)}
-	end
-	return {leaveDate = DateExt.toYmdInUtc(transferData[1].date)}
+	local datesByPlayer = {}
+	Array.forEach(transferData, function(row)
+		local canonical = variantToCanonical[row.player]
+		if canonical and not datesByPlayer[canonical] then
+			datesByPlayer[canonical] = DateExt.toYmdInUtc(row.date)
+		end
+	end)
+	return datesByPlayer
 end
 
----@param player standardPlayer
+---@param players standardPlayer[]
 ---@param teamAliases string[]
----@return {joinDate: string?, leaveDate: string?}
-function TeamParticipantsRepository.getPlayerDates(player, teamAliases)
-	local pageName = Logic.nilIfEmpty(player.pageName)
-	if not pageName or pageName:lower() == 'tbd' then
-		return {}
+---@return table<string, {joinDate: string?, leaveDate: string?}>
+function TeamParticipantsRepository.getPlayersDates(players, teamAliases)
+	local validPlayers = Array.filter(players, function(player)
+		local pageName = Logic.nilIfEmpty(player.pageName)
+		return pageName ~= nil and pageName:lower() ~= 'tbd'
+	end)
+
+	local datesByPlayer = {}
+	Array.forEach(validPlayers, function(player)
+		local extradata = player.extradata or {}
+		datesByPlayer[player.pageName] = {
+			joinDate = extradata.joinDate,
+			leaveDate = extradata.leaveDate,
+		}
+	end)
+
+	local function tryBatchQuery(playerSubset, status, field)
+		local needsQuery = Array.filter(playerSubset, function(player)
+			return Logic.isEmpty(datesByPlayer[player.pageName][field])
+		end)
+		if #needsQuery == 0 then
+			return
+		end
+		local pageNames = Array.map(needsQuery, function(player) return player.pageName end)
+		local fetched = TeamParticipantsRepository.getPlayerTransferDates(pageNames, teamAliases, status)
+		Array.forEach(needsQuery, function(player)
+			if fetched[player.pageName] then
+				datesByPlayer[player.pageName][field] = fetched[player.pageName]
+			end
+		end)
 	end
 
-	local extradata = player.extradata or {}
-	local playerDates = {
-		joinDate = extradata.joinDate,
-		leaveDate = extradata.leaveDate,
-	}
+	tryBatchQuery(validPlayers, 'active', 'joinDate')
+	tryBatchQuery(validPlayers, 'activeAlt', 'joinDate')
 
-	local function tryQuery(status, field)
-		if Logic.isNotEmpty(playerDates[field]) then return end
-		local result = TeamParticipantsRepository.getPlayerTransferDate(pageName, teamAliases, status)
-		playerDates[field] = result[field]
-	end
+	local formerPlayers = Array.filter(validPlayers, function(player)
+		return (player.extradata or {}).status == 'former'
+	end)
+	tryBatchQuery(formerPlayers, 'former', 'leaveDate')
+	tryBatchQuery(formerPlayers, 'inactive', 'leaveDate')
 
-	tryQuery('active', 'joinDate')
-	tryQuery('activeAlt', 'joinDate')
-	if extradata.status == 'former' then
-		tryQuery('former', 'leaveDate')
-		tryQuery('inactive', 'leaveDate')
-	end
-
-	return playerDates
+	return datesByPlayer
 end
 
 ---@param opponent standardOpponent
