@@ -88,7 +88,7 @@ describe('TeamParticipants player dates', function()
 				if callCount == 1 then
 					return {{date = '2024-02-01'}} -- active → joinDate
 				elseif callCount == 2 then
-					return {{date = '2024-08-15'}} -- inactive → leaveDate
+					return {{date = '2024-08-15'}} -- former → leaveDate
 				end
 				return {}
 			end)
@@ -101,13 +101,13 @@ describe('TeamParticipants player dates', function()
 			assert.are_equal('2024-08-15', dates.leaveDate)
 		end)
 
-		it('falls back to former query when inactive returns nothing for former player', function()
+		it('falls back to inactive query when former returns nothing for former player', function()
 			local callCount = 0
 			LpdbQuery:revert()
 			LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function()
 				callCount = callCount + 1
 				if callCount == 4 then
-					return {{date = '2024-09-30'}} -- former → leaveDate
+					return {{date = '2024-09-30'}} -- inactive → leaveDate
 				end
 				return {}
 			end)
@@ -118,7 +118,7 @@ describe('TeamParticipants player dates', function()
 			)
 			assert.is_nil(dates.joinDate)
 			assert.are_equal('2024-09-30', dates.leaveDate)
-			assert.are_equal(4, callCount) -- active, activeAlt, inactive, former
+			assert.are_equal(4, callCount) -- active, activeAlt, former, inactive
 		end)
 
 		it('explicit joinDate takes precedence over LPDB result', function()

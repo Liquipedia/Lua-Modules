@@ -264,12 +264,12 @@ function TeamParticipantsRepository.getPlayerDates(player, teamAliases)
 	end
 	if isFormer then
 		playerDates = Table.merge(
-			TeamParticipantsRepository.getPlayerTransferDate(pageName, teamAliases, 'inactive'),
+			TeamParticipantsRepository.getPlayerTransferDate(pageName, teamAliases, 'former'),
 			playerDates
 		)
 		if Logic.isEmpty(playerDates.leaveDate) then
 			playerDates = Table.merge(
-				TeamParticipantsRepository.getPlayerTransferDate(pageName, teamAliases, 'former'),
+				TeamParticipantsRepository.getPlayerTransferDate(pageName, teamAliases, 'inactive'),
 				playerDates
 			)
 		end
