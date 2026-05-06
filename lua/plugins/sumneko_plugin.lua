@@ -30,7 +30,7 @@ function ResolveRequire(repoRoot, name, source)
 		basePath = basePath:gsub('^file:///', 'file://'):gsub('%%3A', ':')
 	end
 	-- See the unescaping of : above
-	basePath = basePath:gsub('%20', ' ')
+	basePath = basePath:gsub('%%20', ' ')
 
 	local wiki = source:match('^file://.-/lua/wikis/([^/]+)/') or 'commons'
 
