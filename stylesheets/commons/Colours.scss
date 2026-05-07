@@ -765,3 +765,23 @@ html {
 	--position-staydown-color: #c85000;
 	--position-down-color: #d02626;
 }
+
+.theme--light {
+	--position-byeup-background-color: #f7e9ff;
+	--position-seedup-background-color: #d9ecff;
+	--position-up-background-color: #d5f7d5;
+	--position-stayup-background-color: #ebffeb;
+	--position-stay-background-color: #fff7df;
+	--position-staydown-background-color: #ffe7d9;
+	--position-down-background-color: #ffe9e9;
+}
+
+.theme--dark {
+	--position-byeup-background-color: #3a1f4b;
+	--position-seedup-background-color: #15385b;
+	--position-up-background-color: #053b05;
+	--position-stayup-background-color: #052f05;
+	--position-stay-background-color: #413106;
+	--position-staydown-background-color: #441e05;
+	--position-down-background-color: #3f1212;
+}
