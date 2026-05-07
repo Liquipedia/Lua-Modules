@@ -377,11 +377,15 @@ end
 ---@private
 ---@param startDate string?
 ---@param personData {flag: string?, displayName: string, pageName: string, name: string?}
----@return table
+---@return table?
 function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
 	local teams = self.teams
 
 	local pageName = personData.pageName
+	if not pageName then
+		return
+	end
+
 	local pageNameWithSpaces = pageName:gsub('_', ' ')
 	local personCondition = ConditionUtil.anyOf(ColumnName('player'), {pageName, pageNameWithSpaces})
 
