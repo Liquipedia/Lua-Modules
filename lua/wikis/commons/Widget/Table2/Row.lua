@@ -16,7 +16,6 @@ local MathUtil = Lua.import('Module:MathUtil')
 local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 local Table2Cell = Lua.import('Module:Widget/Table2/Cell')
 local Table2CellHeader = Lua.import('Module:Widget/Table2/CellHeader')
-local Table2CellHeaderMT = getmetatable(Table2CellHeader)
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Html = Lua.import('Module:Widget/Html')
 
@@ -67,7 +66,10 @@ local function Table2Row(props, context)
 	local children = props.children or {}
 
 	local columns = Context.read(context, Table2Contexts.ColumnContext)
-	if section == 'subhead' and columns and #children == 1 and getmetatable(children[1]) == Table2CellHeaderMT then
+	if section == 'subhead' and #columns > 0 and #children == 1 and
+			---@diagnostic disable-next-line: undefined-field
+			type(children[1]) == 'table' and children[1].renderFn == Table2CellHeader.renderFn then
+
 		local singleCell = children[1]
 		if singleCell.props.colspan == nil then
 			singleCell.props.colspan = #columns
@@ -76,7 +78,10 @@ local function Table2Row(props, context)
 
 	local columnIndex = 1
 	local indexedChildren = Array.map(children, function(child)
-		if getmetatable(child) == getmetatable(Table2Cell) or getmetatable(child) == Table2CellHeaderMT then
+		if type(child) == 'table' and
+				---@diagnostic disable-next-line: undefined-field
+				(child.renderFn == Table2Cell.renderFn or child.renderFn == Table2CellHeader.renderFn) then
+
 			local cellChild = child
 			local explicitIndex = MathUtil.toInteger(cellChild.props.columnIndex)
 			if explicitIndex and explicitIndex >= 1 then
@@ -98,7 +103,8 @@ local function Table2Row(props, context)
 	local trChildren = indexedChildren
 	if section == 'subhead' then
 		trChildren = Array.map(trChildren, function(child)
-			if getmetatable(child) == Table2CellHeaderMT then
+			---@diagnostic disable-next-line: undefined-field
+			if type(child) == 'table' and child.renderFn == Table2Cell.renderFn then
 				return Context.Provider{
 					def = Table2Contexts.Section,
 					value = 'subhead',

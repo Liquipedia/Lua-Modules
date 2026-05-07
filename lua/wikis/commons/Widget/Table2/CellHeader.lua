@@ -17,7 +17,7 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
 ---@class Table2CellHeaderProps
----@field children Renderable[]?
+---@field children? Renderable|Renderable[]
 ---@field section 'head'|'body'|'subhead'?
 ---@field align ('left'|'right'|'center')?
 ---@field shrink (string|number|boolean)?
@@ -49,7 +49,7 @@ local function Table2CellHeader(props, context)
 	end
 
 	-- Skip context lookups and property merging if there are no column definitions
-	if not columns then
+	if #columns == 0 then
 		local align = props.align
 		local attributes = props.attributes or {}
 		if align == 'right' or align == 'center' then

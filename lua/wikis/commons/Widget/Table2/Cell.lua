@@ -15,7 +15,7 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
 ---@class Table2CellProps
----@field children Renderable[]?
+---@field children? Renderable|Renderable[]
 ---@field align ('left'|'right'|'center')?
 ---@field shrink (string|number|boolean)?
 ---@field nowrap (string|number|boolean)?
@@ -35,7 +35,7 @@ local function Table2Cell(props, context)
 	local columns = Context.read(context, Table2Contexts.ColumnContext)
 
 	-- Skip context lookups and property merging if there are no column definitions
-	if not columns then
+	if #columns == 0 then
 		return Html.Td{
 			attributes = ColumnUtil.buildCellAttributes(
 				props.align,

@@ -28,7 +28,7 @@ local function Table2Body(props, context)
 	local children = props.children or {}
 
 	local stripeEnabled = Context.read(context, Table2Contexts.BodyStripe)
-	if stripeEnabled == nil then
+	if stripeEnabled == 'disabled' then
 		return Context.Provider{
 			def = Table2Contexts.Section,
 			value = 'body',
@@ -44,14 +44,20 @@ local function Table2Body(props, context)
 		stripe = stripe == 'even' and 'odd' or 'even'
 	end
 
-	---@param row VNode
+	---@param row VNode<{children: Renderable|Renderable[]}>
+	---@return integer
 	local getRowMaxRowspan = FnUtil.memoize(function(row)
 		local rowChildren = (row and row.props and row.props.children) or {}
+		if type(rowChildren) ~= 'table' then
+			rowChildren = {rowChildren}
+		end
 		local maxRowspan = 1
 
 		Array.forEach(rowChildren, function(child)
-			local childMt = getmetatable(child)
-			if childMt == getmetatable(Table2Cell) or childMt == getmetatable(Table2CellHeader) then
+			if type(child) == 'table'
+					---@diagnostic disable-next-line: undefined-field
+					and (child.renderFn == Table2Cell.renderFn or child.renderFn == Table2CellHeader.renderFn) then
+
 				local rowspan = MathUtil.toInteger(child.props.rowspan) or 1
 				rowspan = math.max(rowspan, 1)
 				maxRowspan = math.max(maxRowspan, rowspan)
@@ -62,7 +68,8 @@ local function Table2Body(props, context)
 	end)
 
 	Array.forEach(children, function(child)
-		if getmetatable(child) == getmetatable(Table2Row) then
+		---@diagnostic disable-next-line: undefined-field
+		if type(child) == 'table' and child.renderFn == Table2Row.renderFn then
 			---@cast child VNode
 			if groupRemaining == 0 then
 				toggleStripe()

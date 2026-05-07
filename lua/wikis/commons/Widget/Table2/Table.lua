@@ -30,7 +30,7 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 ---@field attributes {[string]: any}?
 
 ---@class Table2Props
----@field children Renderable[]?
+---@field children? Renderable|Renderable[]
 ---@field variant 'generic'|'themed'?
 ---@field sortable (string|number|boolean)?
 ---@field striped (string|number|boolean)?
