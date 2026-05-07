@@ -11,8 +11,8 @@
 
 ---@alias Context<T> { props: { parent: Context?, def: ContextDef<T>, value: T } }
 
----@alias ContextNode<T> VNode<{def: ContextDef<T>, value: T, children: Renderable|Renderable[]}>
----@alias HtmlNode VNode<{classes?: string[], css?: table, attributes?: table, children?: Renderable|Renderable[]}>
+---@alias ContextNode<T> VNode<{def: ContextDef<T>, value: T, children: Renderable[]}>
+---@alias HtmlNode VNode<{classes?: string[], css?: table, attributes?: table, children?: Renderable[]}>
 
 ---@alias Renderable string|Html|Widget|number|VNode
 
@@ -40,6 +40,33 @@ ComponentCore.VNodeMT = {
 	}
 }
 
+--- Highly efficient check for if a node is actually an array of nodes, or just a single node
+---@param node Renderable|Renderable[]|nil
+---@return boolean
+local function isSingleNode(node)
+    if type(node) ~= 'table' then
+		return true
+	end
+
+    -- VNodes always have this key
+    if node.renderFn ~= nil then
+		return true
+	end
+
+	---@cast node -VNode
+
+    -- Widget (render) and mw.html (_build)
+    if node.render ~= nil or node._build ~= nil then
+		return true
+	end
+
+	---@cast node -Html
+	---@cast node -Widget
+
+    -- Array is the only allowed type of Renderable left
+    return false
+end
+
 -- Component Definitions
 ComponentCore.ComponentMT = {
 	__call = function(self, props)
@@ -50,6 +77,10 @@ ComponentCore.ComponentMT = {
 		if self.defaultProps then
 			setmetatable(props, { __index = self.defaultProps })
 		end
+
+		if isSingleNode(props.children) then
+            props.children = { props.children }
+        end
 
 		return setmetatable({
 			renderFn = self.renderFn,

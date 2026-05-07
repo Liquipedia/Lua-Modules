@@ -20,7 +20,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local Html = Lua.import('Module:Widget/Html')
 
 ---@class Table2RowProps
----@field children Renderable[]?
+---@field children Renderable[]
 ---@field section 'head'|'body'|'subhead'?
 ---@field classes string[]?
 ---@field css {[string]: string|number|nil}?
