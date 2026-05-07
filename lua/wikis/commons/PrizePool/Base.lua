@@ -498,11 +498,15 @@ function BasePrizePool:create()
 				return prize.type == PRIZE_TYPE_PERCENTAGE and prize.index == 1
 			end)
 
-			for _, placement in ipairs(self.placements) do
+			Array.forEach(self.placements, function(placement)
 				if hasPercentage1 then placement:_calculateFromPercentage(BasePrizePool.prizeTypes, hasLocalCurrency1) end
 				placement:_setBaseFromRewards(Array.filter(self.prizes, canConvertCurrency), BasePrizePool.prizeTypes)
-			end
+			end)
 		end
+
+		Array.forEach(self.placements, function(placement)
+			placement:_setClubShareFromPlayerShare(self.prizes)
+		end)
 	end
 
 	table.sort(self.prizes, BasePrizePool._comparePrizes)

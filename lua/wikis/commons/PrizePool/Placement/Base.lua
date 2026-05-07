@@ -89,19 +89,6 @@ function BasePlacement:_readPrizeRewards(args)
 		rewards[PRIZE_TYPE_BASE_CURRENCY .. 1] = baseType.rowParse(self, args[baseType.row], args, 1)
 	end
 
-	local basePrize
-	local playerShare
-	Array.forEach(self.parent.prizes, function(prize)
-		if prize.type == PRIZE_TYPE_BASE_CURRENCY then
-			basePrize = rewards[prize.id] or (self.prizeRewards or {})[prize.id]
-		elseif prize.type == PRIZE_TYPE_PLAYER_SHARE then
-			playerShare = rewards[prize.id] or (self.prizeRewards or {})[prize.id]
-		end
-	end)
-	if basePrize and playerShare then
-		rewards[PRIZE_TYPE_CLUB_SHARE .. '1'] = tonumber(basePrize) - tonumber(playerShare)
-	end
-
 	return rewards
 end
 
@@ -225,9 +212,33 @@ function BasePlacement:_setBaseFromRewards(prizesToUse, prizeTypes)
 	end)
 end
 
+-- Calculate club share for the placement
+---@param prizes BasePrizePoolPrize[]
+function BasePlacement:_setClubShareFromPlayerShare(prizes)
+	Array.forEach(self.opponents, function(opponent)
+		local basePrize
+		local playerShare
+		Array.forEach(prizes, function(prize)
+			if prize.type == PRIZE_TYPE_BASE_CURRENCY then
+				basePrize = opponent.prizeRewards[prize.id] or self.prizeRewards[prize.id]
+			elseif prize.type == PRIZE_TYPE_PLAYER_SHARE then
+				playerShare = opponent.prizeRewards[prize.id] or self.prizeRewards[prize.id]
+			end
+		end)
+		basePrize = tonumber(basePrize)
+		playerShare = tonumber(playerShare)
+
+		if not basePrize or not playerShare then
+			return
+		end
+		opponent.prizeRewards = opponent.prizeRewards or {}
+		opponent.prizeRewards[PRIZE_TYPE_CLUB_SHARE .. '1'] = basePrize - playerShare
+	end)
+end
+
 ---@param prizeTypes table
 ---@param hasLocalCurrency boolean
-function BasePlacement:_calculateFromPercentage(prizeTypes, hasLocalCurrency)
+function BasePlacement:_calculeFromPercentage(prizeTypes, hasLocalCurrency)
 	local baseMoney = tonumber(Variables.varDefault(hasLocalCurrency and
 			('tournament_prizepool' .. LOCAL_CURRENCY_VARIABLE_POST_FIX) or
 			('tournament_prizepool' .. BASE_CURRENCY:lower())
