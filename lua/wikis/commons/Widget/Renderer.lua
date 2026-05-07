@@ -68,19 +68,21 @@ local function buildHtmlString(tag, props, renderedChildren)
 
 	if props.css then
 		table.insert(buffer, ' style="')
-		for k, v in pairs(props.css) do
-			table.insert(buffer, k .. ':' .. tostring(v) .. ';')
+		for key, value in pairs(props.css) do
+			table.insert(buffer, key .. ':' .. escapeAttr(tostring(value)) .. ';')
 		end
 		table.insert(buffer, '"')
 	end
 
 	if props.attributes then
-		for k, v in pairs(props.attributes) do
-			if type(v) == 'boolean' then
+		for key, value in pairs(props.attributes) do
+			if type(value) == 'boolean' then
 				-- Boolean attributes like `disabled` or `checked`
-				if v then table.insert(buffer, ' ' .. k) end
+				if value == true then
+					table.insert(buffer, ' ' .. key)
+				end
 			else
-				table.insert(buffer, ' ' .. k .. '="' .. escapeAttr(v) .. '"')
+				table.insert(buffer, ' ' .. key .. '="' .. escapeAttr(value) .. '"')
 			end
 		end
 	end
