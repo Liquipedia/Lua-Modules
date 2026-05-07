@@ -5,6 +5,14 @@
 	tr[ data-position-status ] {
 		position: relative;
 
+		&:not( :last-child ) {
+			border-bottom: 1px solid var( --clr-on-surface-light-primary-8 );
+
+			.theme--dark & {
+				border-bottom: 1px solid var( --clr-on-surface-dark-primary-8 );
+			}
+		}
+
 		&::after {
 			content: "";
 			position: absolute;
