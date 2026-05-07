@@ -49,7 +49,7 @@ function CustomInjector:parse(id, widgets)
 				}
 			},
 			--- option to suppress this in EmptyPagePreview
-			--- intentional
+			--- intentional to only check on true to avoid the option for disabling from wiki code
 			args.suppressRanking ~= true and Cell{
 				name = '[[RankingTableRLCS|RLCS Points]]',
 				children = {TeamRanking.run{
