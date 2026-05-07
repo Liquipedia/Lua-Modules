@@ -238,7 +238,7 @@ end
 
 ---@param prizeTypes table
 ---@param hasLocalCurrency boolean
-function BasePlacement:_calculeFromPercentage(prizeTypes, hasLocalCurrency)
+function BasePlacement:_calculateFromPercentage(prizeTypes, hasLocalCurrency)
 	local baseMoney = tonumber(Variables.varDefault(hasLocalCurrency and
 			('tournament_prizepool' .. LOCAL_CURRENCY_VARIABLE_POST_FIX) or
 			('tournament_prizepool' .. BASE_CURRENCY:lower())
