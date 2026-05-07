@@ -133,6 +133,9 @@ function EmptyTeamPagePreview:_infobox()
 		args[game] = true
 	end)
 
+	--- suppress the ranking display on RL to not error there
+	args.suppressRanking = true
+
 	return Infobox.run(args)
 end
 
