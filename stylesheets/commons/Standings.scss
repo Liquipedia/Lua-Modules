@@ -48,6 +48,17 @@
 			&:has( > :nth-child( 2 ) > .standings-position-indicator ) > :nth-child( 3 ) {
 				background-color: var( --placement-confirmed-color );
 			}
+
+			&:hover {
+				> :nth-child( -n + 2 ),
+				&:has( > :nth-child( 2 ) > .standings-position-indicator ) > :nth-child( 3 ) {
+					background-color: hsl( from var( --placement-confirmed-color ) h s calc( l * 0.9 ) );
+
+					.theme--dark & {
+						background-color: hsl( from var( --placement-confirmed-color ) h s calc( l * 1.25 ) );
+					}
+				}
+			}
 		}
 
 		&:has( > :first-child > .label--placement[ data-placement-type="byeup" ] ) {
