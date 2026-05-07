@@ -498,11 +498,15 @@ function BasePrizePool:create()
 				return prize.type == PRIZE_TYPE_PERCENTAGE and prize.index == 1
 			end)
 
-			for _, placement in ipairs(self.placements) do
+			Array.forEach(self.placements, function(placement)
 				if hasPercentage1 then placement:_calculateFromPercentage(BasePrizePool.prizeTypes, hasLocalCurrency1) end
 				placement:_setBaseFromRewards(Array.filter(self.prizes, canConvertCurrency), BasePrizePool.prizeTypes)
-			end
+			end)
 		end
+
+		Array.forEach(self.placements, function(placement)
+			placement:_setClubShareFromPlayerShare(self.prizes)
+		end)
 	end
 
 	table.sort(self.prizes, BasePrizePool._comparePrizes)
@@ -705,26 +709,6 @@ function BasePrizePool:_buildRows()
 		end
 
 		self:applyToggleExpand(previousPlacement, placement, rows)
-
-		-- Calculate club share for the placement
-		Array.forEach(placement.opponents, function(opponent)
-			local basePrize
-			local playerShare
-			Array.forEach(self.prizes, function(prize)
-				if prize.type == PRIZE_TYPE_BASE_CURRENCY then
-					basePrize = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
-					return
-				end
-				if prize.type == PRIZE_TYPE_PLAYER_SHARE then
-					playerShare = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
-				end
-			end)
-			if basePrize and playerShare then
-				local clubShare = tonumber(basePrize) - tonumber(playerShare)
-				if not opponent.prizeRewards then opponent.prizeRewards = {} end
-				opponent.prizeRewards[PRIZE_TYPE_CLUB_SHARE .. '1'] = clubShare
-			end
-		end)
 
 		local cells = {}
 		table.insert(cells, self:placeOrAwardCell(placement))
