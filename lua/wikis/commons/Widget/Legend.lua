@@ -12,7 +12,7 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 
 local Component = Lua.import('Module:Widget/Component')
-local ChevronToggle = Lua.import('Module:Widget/Participants/Team/ChevronToggle')
+local ChevronToggle = Lua.import('Module:Widget/GeneralCollapsible/ChevronToggle')
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local Html = Lua.import('Module:Widget/Html')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
