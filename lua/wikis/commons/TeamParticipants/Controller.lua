@@ -134,7 +134,7 @@ function TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers,
 		end)
 
 		if indexOfManualPlayer == 0 then
-			table.insert(manualPlayers, player)
+			table.insert(manualPlayers, 1, player)
 		else
 			local newPlayer = Table.deepMerge(player, manualPlayers[indexOfManualPlayer])
 			manualPlayers[indexOfManualPlayer] = newPlayer

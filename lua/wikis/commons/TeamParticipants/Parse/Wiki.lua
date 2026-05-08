@@ -18,6 +18,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tournament = Lua.import('Module:Tournament')
+local Variables = Lua.import('Module:Variables')
 
 local TeamParticipantsWikiParser = {}
 
@@ -133,7 +134,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 	local opponent
 	local warnings = {}
 
-	local date = DateExt.parseIsoDate(input.date) or defaultDate -- TODO: fetch from wiki var too
+	local date = DateExt.parseIsoDate(input.date)
 
 	if input.contenders then
 		opponent = Opponent.tbd(Opponent.team)
@@ -155,6 +156,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		opponent = Opponent.readOpponentArgs(Table.merge(input, {
 			type = Opponent.team,
 		}))
+
 		opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
 		local resolvedOptions = {
 			syncPlayer = true,
@@ -165,6 +167,12 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 				false
 			)
 		}
+
+		local opponentName = Opponent.toName(opponent)
+		local prizePoolDate = Variables.varDefault('enddate_' .. opponentName)
+			or Variables.varDefault('enddate_' .. opponentName .. '_date')
+		date = date or DateExt.parseIsoDate(prizePoolDate) or defaultDate
+
 		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), resolvedOptions)
 	end
 
@@ -193,7 +201,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		potentialQualifiers = potentialQualifiers,
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
-		date = date,
+		date = date or defaultDate,
 	}
 end
 
@@ -214,15 +222,6 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 	local inputType = playerInput.type or 'player'
 	local hasStaffRoles = Array.any(roles, function(role) return role.type == RoleUtil.ROLE_TYPE.STAFF end)
 
-	local status = playerInput.status
-	if not status then
-		if inputType == 'former' then
-			status = 'former'
-		elseif inputType == 'sub' then
-			status = 'sub'
-		end
-	end
-
 	local playerType
 	if inputType == 'staff' or hasStaffRoles then
 		playerType = 'staff'
@@ -234,9 +233,10 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 		roles = roles,
 		trophies = tonumber(playerInput.trophies),
 		type = playerType,
-		status = status,
+		status = playerInput.status,
 		played = Logic.nilOr(playedInput, true),
 		results = Logic.nilOr(resultsInput, playedInput, true),
+		number = tonumber(playerInput.number),
 	}
 	return player
 end
