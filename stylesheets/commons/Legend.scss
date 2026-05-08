@@ -22,7 +22,7 @@
 
 	&-header {
 		display: grid;
-		grid-template-columns: repeat( 2, auto );
+		grid-template-columns: min-content auto min-content;
 		align-items: center;
 		align-content: center;
 		gap: 0.25rem;
@@ -33,17 +33,27 @@
 			color: var( --clr-secondary-90 );
 		}
 
-		.general-collapsible-default-toggle {
-			min-width: unset;
+		> :first-child {
+			grid-column: 1 / -2;
+			display: grid;
+			grid-template-columns: subgrid;
+			margin-left: 0.5rem;
+			align-items: center;
 		}
 
-		.general-collapsible-expand-button,
-		.general-collapsible-collapse-button {
-			outline: unset;
-			color: var( --clr-secondary-7 );
+		.general-collapsible-default-toggle {
+			min-width: unset;
 
-			.theme--dark & {
-				color: var( --clr-secondary-90 );
+			.general-collapsible-expand-button,
+			.general-collapsible-expand-button:visited,
+			.general-collapsible-collapse-button,
+			.general-collapsible-collapse-button:visited {
+				outline: unset;
+				color: var( --clr-secondary-7 );
+
+				.theme--dark & {
+					color: var( --clr-secondary-90 );
+				}
 			}
 		}
 	}

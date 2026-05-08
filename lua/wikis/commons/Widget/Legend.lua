@@ -24,6 +24,9 @@ local LABEL_COLORS = {'byeup', 'seedup', 'up', 'stayup', 'stay', 'staydown', 'do
 ---@class LegendWidget: Widget
 ---@operator call(table): LegendWidget
 local LegendWidget = Class.new(Widget)
+LegendWidget.defaultProps = {
+	title = 'Legend',
+}
 
 ---@return Renderable|Renderable[]?
 function LegendWidget:render()
@@ -45,13 +48,10 @@ function LegendWidget:_createHeader()
 		classes = {'legend-header'},
 		attributes = {['data-collapsible-click-region'] = 'true'},
 		children = {
-			HtmlWidgets.Div{
-				classes = {},
-				children = {
-					Icon{iconName = 'general-info'},
-					' Legend'
-				}
-			},
+			HtmlWidgets.Div{children = {
+				Icon{iconName = 'general-info'},
+				HtmlWidgets.Span{children = self.props.title}
+			}},
 			ChevronToggle{}
 		}
 	}
