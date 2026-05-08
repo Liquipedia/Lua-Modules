@@ -15,6 +15,7 @@ insulate('Widget/Legend', function()
 		},
 		points = {'Lorem ipsum'},
 		showMinimum = true,
+		showNumberSection = true,
 	}))
 	end)
 end)
