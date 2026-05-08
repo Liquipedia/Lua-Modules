@@ -12,7 +12,7 @@ Rollout is wiki-by-wiki, starting with ArenaFPS. LPDB storage is delegated to Te
 
 **Subst is not used initially.** A subst-based Lua wrapper was discussed (hjpalpha); the team's call (Rathoz) is to land the live wrapper first so we can iterate on bugs in the mappings, then look at subst afterwards.
 
-**Out of reach for this wrapper:** StarCraft, StarCraft 2, and Stormgate use TeamCard-like layouts that aren't compatible with this wrapper (different param model). Those wikis stay on their existing modules.
+**Out of reach for this wrapper:** StarCraft, StarCraft 2, and Stormgate use TeamCard-like layouts that aren't compatible with this wrapper (different param model). Those wikis are out of scope for the initial conversion. A separate wrapper will be provided (likely by hjpalpha) and applied in the upcoming months, but earliest when all necessary features are supported.
 
 ## Out of scope
 
@@ -157,7 +157,7 @@ Storage gate:
 
 `team` / `teamRR` global page vars are **not** backfilled. Old TC defined them, but a repo-wide grep found no Lua/JS/SCSS reader. If wiki-side modules turn out to depend on them during rollout, add a targeted backfill later.
 
-If the first stash entry doesn't look like a header (no recognizable header keys, presence of `team` key, etc. — which means `columns start` is missing or malformed), the wrapper treats all entries as cards, **adds a tracking category** (e.g. `[[Category:Pages with malformed TeamCard structure]]`), and **emits a warning** in the rendered output. This makes the broken pages findable so they can be fixed; we don't silently fall back, since the missing `columns end` template might also indicate a structural break.
+If the first stash entry doesn't look like a header (no recognizable header keys, presence of `team` key, etc. — which means `columns start` is missing or malformed), the wrapper treats all entries as cards, **adds a tracking category** (e.g. `[[Category:Pages_with_malformed_Legacy_TeamCard_structure]]`), and **emits a warning** in the rendered output. This makes the broken pages findable so they can be fixed; we don't silently fall back, since the missing `columns end` template might also indicate a structural break.
 
 ## Section 3 — Per-card → Opponent mapping
 
@@ -339,7 +339,7 @@ ArenaFPS does not have a Custom file under the new design; `Template:TeamCard co
 **Edge cases summarized:**
 
 - Empty stash — render nothing.
-- Malformed structure (header missing or looks like a card) — wrapper emits warning + tracking category; renders best-effort. (Per Rathoz: "the `columns end` template might be missing too" — making affected pages findable matters more than silent recovery.)
+- Malformed structure (header missing or looks like a card) — wrapper emits warning + `[[Category:Pages_with_malformed_Legacy_TeamCard_structure]]`; renders best-effort. (Per Rathoz: "the `columns end` template might be missing too" — making affected pages findable matters more than silent recovery.)
 - `team='TBD'` cards — produce TBD opponent without errors.
 - Per-card `disable_storage=true` — ignored. (Bot pre-pass can lift such cards out of the columns block if needed.)
 - Two separate column blocks on one page — `Template.retrieveReturnValues` deletes-and-returns, so each block consumes only its own stash.
