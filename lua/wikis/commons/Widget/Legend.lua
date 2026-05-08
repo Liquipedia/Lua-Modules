@@ -36,7 +36,8 @@ function LegendWidget:render()
 		classes = {'legend'},
 		titleWidget = self:_createHeader(),
 		children = WidgetUtil.collect(
-			self:_createColorSection()
+			self:_createColorSection(),
+			self:_createPointsSection()
 		)
 	}
 end
@@ -82,6 +83,32 @@ function LegendWidget:_createColorSection()
 				}
 			}
 		end)
+	}
+end
+
+---@private
+---@return Widget?
+function LegendWidget:_createPointsSection()
+	local sectionData = Json.parseIfString(self.props.points)
+	if not sectionData then
+		return
+	end
+	local pointsText = sectionData[1] or sectionData.points
+	if Logic.isEmpty(pointsText) then
+		return
+	end
+	return HtmlWidgets.Div{
+		classes = {'legend-section'},
+		children = HtmlWidgets.Div{
+			classes = {'legend-item'},
+			children = {
+				HtmlWidgets.Span{
+					css = {['font-weight'] = 'bold'},
+					children = 'Pts'
+				},
+				HtmlWidgets.Span{children = pointsText}
+			}
+		}
 	}
 end
 
