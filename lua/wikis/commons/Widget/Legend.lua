@@ -35,7 +35,7 @@ LegendComponent.defaultProps = {
 ---@return Widget
 function LegendComponent.render(props)
 	return GeneralCollapsible{
-		shouldCollapse = true,
+		shouldCollapse = Logic.readBool(props.shouldCollapse),
 		collapseAreaClasses = {},
 		classes = {'legend'},
 		titleWidget = LegendComponent._createHeader(props),
