@@ -23,6 +23,11 @@ local LABEL_COLORS = {'byeup', 'seedup', 'up', 'stayup', 'stay', 'staydown', 'do
 
 ---@class LegendComponent
 local LegendComponent = {}
+LegendComponent.defaultProps = {
+	title = 'Legend',
+	showConfirmed = true,
+	showUndecided = true,
+}
 
 ---@param props table
 ---@return Widget
@@ -171,12 +176,4 @@ function LegendComponent._createNumberSection(props)
 	}
 end
 
-return Component.component(
-	LegendComponent.render,
-	{
-		title = 'Legend',
-		showConfirmed = true,
-		showUndecided = true,
-	}
-)
-
+return Component.component(LegendComponent.render, LegendComponent.defaultProps)
