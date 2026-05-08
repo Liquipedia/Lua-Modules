@@ -23,6 +23,8 @@ local LABEL_COLORS = {'byeup', 'seedup', 'up', 'stayup', 'stay', 'staydown', 'do
 
 ---@class LegendComponent
 local LegendComponent = {}
+
+--TODO: pass defaultProps directly to Component.component
 LegendComponent.defaultProps = {
 	title = 'Legend',
 	showConfirmed = true,
@@ -32,7 +34,6 @@ LegendComponent.defaultProps = {
 ---@param props table
 ---@return Widget
 function LegendComponent.render(props)
-	mw.logObject(props, props)
 	return GeneralCollapsible{
 		shouldCollapse = true,
 		collapseAreaClasses = {},
@@ -55,7 +56,7 @@ function LegendComponent._createHeader(props)
 		children = {
 			Html.Div{children = {
 				Icon{iconName = 'general-info'},
-				Html.Span{children = props.title}
+				Html.Span{children = {Logic.emptyOr(props.title, LegendComponent.defaultProps.title)}}
 			}},
 			ChevronToggle{}
 		}
@@ -65,7 +66,6 @@ end
 ---@private
 ---@return VNode?
 function LegendComponent._createColorSection(props)
-	mw.log('LegendComponent._createColorSection')
 	local sectionData = Json.parseIfString(props.color)
 	if Logic.isEmpty(sectionData) then
 		return
@@ -131,7 +131,10 @@ function LegendComponent._createNumberSection(props)
 	end
 
 	local labels = WidgetUtil.collect(
-		Logic.readBool(props.showConfirmed) and Html.Div{
+		Logic.nilOr(
+			Logic.readBoolOrNil(props.showConfirmed),
+			LegendComponent.defaultProps.showConfirmed
+		) and Html.Div{
 			classes = {'legend-item'},
 			children = {
 				LabelWidget{
@@ -153,7 +156,10 @@ function LegendComponent._createNumberSection(props)
 				Html.Span{children = {'Minimum placement reached'}}
 			}
 		} or nil,
-		Logic.readBool(props.showUndecided) and Html.Div{
+		Logic.nilOr(
+			Logic.readBoolOrNil(props.showUndecided),
+			LegendComponent.defaultProps.showUndecided
+		) and Html.Div{
 			classes = {'legend-item'},
 			children = {
 				LabelWidget{
@@ -176,4 +182,4 @@ function LegendComponent._createNumberSection(props)
 	}
 end
 
-return Component.component(LegendComponent.render, LegendComponent.defaultProps)
+return Component.component(LegendComponent.render)
