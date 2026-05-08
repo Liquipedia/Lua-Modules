@@ -28,7 +28,7 @@ function Chronology:render()
 	local processLinkInput = function(input)
 		if Logic.isEmpty(input) then return end
 		---@cast input -nil
-		local link, text = unpack(mw.text.split(input, '|'))
+		local link, text = unpack(Array.parseCommaSeparatedString(input, '|'))
 		return {
 			link = link,
 			text = text or link,

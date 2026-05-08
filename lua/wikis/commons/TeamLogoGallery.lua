@@ -104,7 +104,7 @@ function TeamLogoGallery._makeCaptionAndBelow(imageData, index, finalName)
 	end
 
 	local month = DateExt.formatTimestamp('F', DateExt.readTimestamp(imageData.endDate)--[[@as integer]])
-	local dateArray = mw.text.split(imageData.endDate, '-', true)
+	local dateArray = Array.parseCommaSeparatedString(imageData.endDate, '-')
 	local year = dateArray[1]
 	local day = tonumber(dateArray[3])
 	local daySuffix = Ordinal.suffix(day)

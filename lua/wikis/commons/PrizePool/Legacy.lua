@@ -329,7 +329,7 @@ function LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
 		end
 
 		if not opponentData.link and IS_SOLO then
-			local splitPlayer = mw.text.split(opponentData[1], '|')
+			local splitPlayer = Array.parseCommaSeparatedString(opponentData[1], '|')
 			opponentData.link = splitPlayer[1]
 			opponentData[1] = splitPlayer[#splitPlayer]
 		end
@@ -393,7 +393,7 @@ function LegacyPrizePool.parseWikiLink(input)
 			local link, displayName
 			if cleanedInput:find('|') then
 				-- Link and Display
-				local linkParts = mw.text.split(cleanedInput, '|', true)
+				local linkParts = Array.parseCommaSeparatedString(cleanedInput, '|')
 				link, displayName = mw.text.trim(linkParts[1]), linkParts[2]
 
 			else

@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Logic = Lua.import('Module:Logic')
@@ -119,7 +120,7 @@ function Placement.raw(placement)
 	local raw = {}
 
 	-- Nil check on input and split placement if joint
-	raw.placement = mw.text.split(string.lower(placement or ''), '-', true)
+	raw.placement = Array.parseCommaSeparatedString(string.lower(placement or ''), '-')
 
 	-- Identify appropriate background class
 	if PLACEMENT_CLASSES[raw.placement[1]] then
@@ -140,7 +141,7 @@ function Placement.raw(placement)
 	-- Intercept non-numeric placements for sorting and ordinal creation
 	if not MathUtil.isInteger(raw.placement[1]) then
 		raw.sort = CUSTOM_SORTS[raw.placement[1]] or CUSTOM_SORTS['']
-		raw.ordinal = mw.text.split(string.upper(placement or ''), '-', true)
+		raw.ordinal = Array.parseCommaSeparatedString(string.upper(placement or ''), '-')
 	else
 		raw.sort = raw.placement[1] .. (raw.placement[2] and ('-' .. raw.placement[2]) or '')
 		raw.ordinal = Placement._makeOrdinal(raw.placement)

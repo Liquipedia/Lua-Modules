@@ -137,7 +137,7 @@ function MatchGroupInputUtil.readDate(dateString, dateFallbacks)
 		-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
 		local timezoneOffset = dateString:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
 		local timezoneId = dateString:match('>(%a-)<')
-		local matchDate = mw.text.split(dateString, '<', true)[1]:gsub('-', '')
+		local matchDate = Array.parseCommaSeparatedString(dateString, '<')[1]:gsub('-', '')
 		local isDateExact = String.contains(matchDate .. (timezoneOffset or ''), '[%+%-]')
 		local date = contentLanguage:formatDate('c', matchDate .. (timezoneOffset or ''))
 		return {
@@ -344,12 +344,13 @@ function MatchGroupInputUtil.readMvp(match, opponents)
 	local mvppoints = match.mvppoints or 1
 
 	-- Split the input
-	local players = mw.text.split(match.mvp, ',')
+	local players = Array.parseCommaSeparatedString(match.mvp)
 
 	-- parse the players to get their information
 	opponents = Logic.isNotDeepEmpty(opponents) and opponents or MatchGroupUtil.normalizeSubtype(match, 'opponent')
 	local parsedPlayers = Array.map(players, function(player, playerIndex)
-		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(player, '|')[1]):gsub(' ', '_')
+		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(Array.parseCommaSeparatedString(player, '|')[1])
+			:gsub(' ', '_')
 		for _, opponent in ipairs(opponents) do
 			for _, lookUpPlayer in pairs(opponent.match2players or {}) do
 				if link == lookUpPlayer.name then
@@ -359,7 +360,7 @@ function MatchGroupInputUtil.readMvp(match, opponents)
 			end
 		end
 
-		local nameComponents = mw.text.split(player, '|')
+		local nameComponents = Array.parseCommaSeparatedString(player, '|')
 		return {
 			displayname = nameComponents[#nameComponents],
 			name = link,

@@ -351,7 +351,7 @@ function MapFunctions.readHeroes(heroesInput, faction, playerName, ignoreFaction
 	end
 	---@cast heroesInput -nil
 
-	local heroes = Array.map(mw.text.split(heroesInput, ','), String.trim)
+	local heroes = Array.parseCommaSeparatedString(heroesInput)
 	return Array.map(heroes, function(hero)
 		local heroData = CharacterAliases[hero:lower()]
 		assert(heroData, 'Invalid hero input "' .. hero .. '"')

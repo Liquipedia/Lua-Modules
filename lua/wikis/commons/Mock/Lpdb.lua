@@ -191,7 +191,7 @@ end
 function mockLpdb._applyQuery(data, query)
 	if String.isNotEmpty(query) then
 		---@cast query -nil
-		local fields = Array.map(mw.text.split(query, ','), String.trim)
+		local fields = Array.parseCommaSeparatedString(query)
 
 		return Array.map(data, function(entry)
 			return Table.map(entry, function(field, value)

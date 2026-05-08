@@ -97,16 +97,7 @@ function MedalStats:_getConfig()
 		table.insert(placements, FOURTH)
 	end
 
-	---@param input string?
-	---@param sep string?
-	---@return string[]
-	local splitAndTrimIfExist = function(input, sep)
-		if String.isEmpty(input) then return {} end
-		---@cast input -nil
-		return Array.map(mw.text.split(input, sep or '||'), String.trim)
-	end
-
-	local series = splitAndTrimIfExist(args.series or mw.title.getCurrentTitle().prefixedText)
+	local series = Array.parseCommaSeparatedString(args.series or mw.title.getCurrentTitle().prefixedText, '||')
 
 	if not Logic.readBool(args.noredirect) then
 		series = Array.map(series, mw.ext.TeamLiquidIntegration.resolve_redirect)
@@ -117,8 +108,8 @@ function MedalStats:_getConfig()
 	return {
 		series = series,
 		external = Logic.readBool(args.external),
-		tier = splitAndTrimIfExist(args.tier or args.liquipediatier),
-		tierType = splitAndTrimIfExist(args.tiertype or args.liquipediatiertype),
+		tier = Array.parseCommaSeparatedString(args.tier or args.liquipediatier, '||'),
+		tierType = Array.parseCommaSeparatedString(args.tiertype or args.liquipediatiertype, '||'),
 		offset = tonumber(args.offset),
 		limit = tonumber(args.limit),
 		cutAfter = tonumber(args.cutafter) or 7,
@@ -127,7 +118,7 @@ function MedalStats:_getConfig()
 		startDate = args.sdate,
 		placements = placements,
 		additionalConditions = args.additionalConditions or '',
-		opponentTypes = splitAndTrimIfExist(args.opponentType),
+		opponentTypes = Array.parseCommaSeparatedString(args.opponentType, '||'),
 		mergeIntoSemifinalists = Logic.readBool(args.mergeIntoSemifinalists),
 	}
 end
