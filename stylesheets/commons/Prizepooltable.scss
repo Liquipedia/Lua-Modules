@@ -2,6 +2,11 @@
 Template(s): Prize pool tables
 Author(s): FO-nTTaX
 *******************************************************************************/
+@media ( max-width: 767px ) {
+	.prizepooltable {
+		min-width: 100%;
+	}
+}
 
 table.prizepooltable:not( .collapsed ) .prizepooltableshow,
 table.prizepooltable.collapsed .prizepooltablehide {

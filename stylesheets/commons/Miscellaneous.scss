@@ -9,15 +9,6 @@ Author(s): FO-nTTaX
 }
 
 /*******************************************************************************
-Template(s): Images without license information
-Author(s): FO-nTTaX
-*******************************************************************************/
-.logged-in img.image-license-issue {
-	border: 5px solid #ff0000 !important;
-	box-sizing: border-box !important;
-}
-
-/*******************************************************************************
 Template(s): Documentation
 Author(s): FO-nTTaX
 *******************************************************************************/
@@ -62,22 +53,6 @@ Author(s): FO-nTTaX
 .timer-object-datetime-only .timer-object-countdown,
 .timer-object-datetime-only .timer-object-separator {
 	display: none;
-}
-
-/*******************************************************************************
-Template(s): info-icon
-Author(s): FO-nTTaX
-*******************************************************************************/
-.info-icon {
-	cursor: pointer;
-	height: 12px;
-	width: 12px;
-	background-image: url( data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cdefs%3E%3Cstyle%3E.c%7Bfill%3A%23616161%7D.i%7Bfill%3A%23fff%7D%3C%2Fstyle%3E%3C%2Fdefs%3E%3Ccircle%20class%3D%22c%22%20cx%3D%226%22%20cy%3D%226%22%20r%3D%226%22%2F%3E%3Crect%20class%3D%22i%22%20x%3D%225%22%20y%3D%222%22%20width%3D%222%22%20height%3D%222%22%2F%3E%3Cpolygon%20class%3D%22i%22%20points%3D%224%205%204%206%205%206%205%209%204%209%204%2010%208%2010%208%209%207%209%207%205%204%205%22%2F%3E%3C%2Fsvg%3E );
-	background-size: contain;
-	background-repeat: no-repeat;
-	background-color: transparent;
-	image-rendering: -webkit-optimize-contrast;
-	display: inline-block;
 }
 
 /*******************************************************************************
@@ -157,116 +132,6 @@ Author(s): FO-nTTaX
 }
 
 /*******************************************************************************
-Template(s): Liquipedia links
-Author(s): FO-nTTaX, Elysienna
-*******************************************************************************/
-@keyframes badgePopAnimation {
-	0% {
-		transform: scale( 0 );
-	}
-
-	50% {
-		transform: scale( 1.2 );
-	}
-
-	100% {
-		transform: scale( 1 );
-	}
-}
-
-@keyframes badgeTooltipAnimation {
-	0% {
-		transform: translateX( 97% );
-		opacity: 0;
-	}
-
-	20% {
-		transform: translateX( 100% );
-		opacity: 1;
-	}
-
-	90% {
-		transform: translateX( 100% );
-		opacity: 1;
-	}
-
-	99% {
-		transform: translateX( 97% );
-		opacity: 0;
-	}
-
-	100% {
-		visibility: hidden;
-		pointer-events: none;
-	}
-}
-
-.liquipedia-links-badge {
-	position: absolute;
-	top: 0.0625rem;
-	padding: 0.125rem 0.25rem;
-	right: 0;
-	font-size: 0.75rem;
-	display: flex;
-	animation-name: badgePopAnimation;
-	animation-delay: 1s;
-	animation-duration: 0.4s;
-	animation-fill-mode: forwards;
-	transform: scale( 0 );
-	border-radius: 0.5rem;
-
-	&--tooltip {
-		background-color: #ffffff;
-		position: absolute;
-		color: var( --clr-secondary-39 );
-		border-radius: 0.25rem;
-		font-size: 0.75rem;
-		font-family: "Open Sans", sans-serif;
-		font-weight: bold;
-		padding: 0.125rem 0.25rem;
-		top: 0.0625rem;
-		right: -0.5rem;
-		z-index: 1;
-		opacity: 0;
-		box-shadow: 0 0 0.625rem 0 rgba( 0, 0, 0, 0.5 );
-		animation-name: badgePopAnimation;
-		animation-delay: 2s;
-		animation-duration: 4s;
-		animation-fill-mode: forwards;
-		line-height: 1.2;
-
-		@media screen and ( max-width: 767px ) {
-			width: 30vw;
-			white-space: normal;
-		}
-
-		&::before {
-			content: "";
-			position: absolute;
-			top: 0.25rem;
-			left: -0.3125rem;
-			width: 0;
-			height: 0;
-			border-top: 4px solid transparent;
-			border-bottom: 4px solid transparent;
-			border-right: 5px solid var( --clr-primary-100 );
-		}
-	}
-
-	&-mobile {
-		position: relative;
-		top: -5px;
-		padding: 2px 4px;
-		left: 0;
-		margin-right: 3px;
-	}
-}
-
-.menu-italic {
-	font-style: italic;
-}
-
-/*******************************************************************************
 Template(s): Box
 Author(s): FO-nTTaX
 *******************************************************************************/
@@ -325,38 +190,6 @@ Author(s): FO-nTTaX
 }
 
 /*******************************************************************************
-Template(s): Prizepool Tables
-Author(s): FO-nTTaX
-*******************************************************************************/
-@media ( max-width: 767px ) {
-	.prizepooltable {
-		min-width: 100%;
-	}
-}
-
-/*******************************************************************************
-Template(s): Upcoming and ongoing games of
-Author(s): FO-nTTaX
-*******************************************************************************/
-.infobox-upcoming-ongoing-matches {
-	width: 100%;
-
-	@media ( min-width: 601px ) {
-		float: right;
-		clear: right;
-		max-width: 300px;
-		margin: 0 0 10px 10px;
-	}
-
-	#{&}-header {
-		font-size: 130%;
-		font-weight: bold;
-		text-align: center;
-		padding: 2px;
-	}
-}
-
-/*******************************************************************************
 Template(s): LeagueIconSmall
 Author(s): FO-nTTaX
 *******************************************************************************/
@@ -401,124 +234,6 @@ span.icon-small.darkmode {
 }
 
 /*******************************************************************************
-Template(s): Race icons on the Warcraft wiki
-Author(s): FO-nTTaX
-*******************************************************************************/
-.wiki-warcraft .race-icon-small img {
-	width: 19px;
-	height: 19px;
-}
-
-/*******************************************************************************
-Template(s): Timelines
-Author(s): FO-nTTaX
-*******************************************************************************/
-.timeline {
-	border: 1px solid var( --table-border-color, #dddddd );
-	vertical-align: middle;
-}
-
-.timeline-inner {
-	overflow: hidden;
-}
-
-.timeline-heading {
-	font-size: 200%;
-	text-align: center;
-	vertical-align: middle;
-	border-bottom: 1px solid var( --table-border-color, #dddddd );
-}
-
-.timeline-row {
-	vertical-align: middle;
-
-	&:nth-of-type( 2n ) {
-		background-color: #eeeeee;
-	}
-
-	> div {
-		vertical-align: middle;
-		display: inline-block;
-		position: relative;
-		height: 35px;
-		padding: 4px;
-
-		&:nth-of-type( 1 ) {
-			width: 150px;
-			line-height: 27px;
-			font-weight: bold;
-		}
-
-		&:nth-of-type( 2 ) {
-			width: calc( 100% - 150px );
-		}
-	}
-}
-
-.timeline-period {
-	position: absolute;
-	top: 5px;
-	height: 25px;
-	background-color: #bbbbbb;
-}
-
-.timeline-lines {
-	display: flex;
-	justify-content: space-between;
-	padding-left: 150px;
-}
-
-.timeline-line {
-	width: 0;
-	border-left: 1px solid var( --table-border-color, #333333 );
-	opacity: 0.5;
-	height: 5000px;
-	margin-top: -5000px;
-	pointer-events: none;
-}
-
-.timeline-footer {
-	display: flex;
-	justify-content: space-between;
-	height: 92px;
-	padding-left: 150px;
-	border-top: 1px solid var( --table-border-color, #dddddd );
-
-	&-date {
-		width: 24px;
-
-		&-inner {
-			padding: 4px;
-			transform: rotate( 90deg );
-			margin-top: 0;
-		}
-	}
-}
-
-.timeline-header-sc {
-	padding: 0;
-	text-align: center;
-	margin: 0 0 0 0 !important;
-	float: right;
-	table-layout: fixed;
-}
-
-.timeline-now-sc {
-	position: absolute;
-	height: 100%;
-	border-right: 1px dotted var( --table-border-color, #9a9a9a );
-	width: 1px;
-}
-
-.timeline-team-element-sc {
-	border: 1px solid #9a9a9a;
-	padding-top: 5px;
-	height: 40px;
-	background-color: var( --table-variant-background-color, #eeeeee );
-	text-align: center;
-}
-
-/*******************************************************************************
 Template(s): Progress bars
 Author(s): FO-nTTaX
 *******************************************************************************/
@@ -559,104 +274,6 @@ Author(s): FO-nTTaX
 				padding-right: 5px;
 			}
 		}
-	}
-}
-
-/*******************************************************************************
-Template(s): SpellCard
-Author(s): FO-nTTaX, Rapture
-*******************************************************************************/
-.spellcard-wrapper {
-	display: flex;
-	flex-wrap: wrap;
-	margin: 10px 0;
-
-	.hr {
-		height: 0.125rem;
-	}
-
-	@media ( max-width: 600px ) {
-		display: block;
-	}
-}
-
-.spellcard {
-	display: inline-block;
-	max-width: 550px;
-	clear: both;
-	border-width: 1px;
-	border-style: solid;
-	background-color: var( --clr-surface-2, #eeeeee );
-	margin-right: 1em;
-
-	@media ( max-width: 600px ) {
-		margin-right: 0;
-		max-width: none;
-	}
-
-	@media ( min-width: 2560px ) {
-		/* spazer's test changes */
-		/* Make spellcards wider for wide screens */
-		max-width: 700px;
-	}
-}
-
-.spellcard-description {
-	display: inline-block;
-	width: calc( 100% - 124px );
-	border-width: 1px 0;
-	border-style: solid;
-	padding: 5px 0;
-	margin: 0 5px;
-
-	@media ( max-width: 600px ) {
-		width: auto;
-	}
-}
-
-.spellcard-infotable {
-	display: block;
-	clear: left;
-	vertical-align: top;
-	padding-bottom: 5px;
-	margin: 5px 5px 0 5px;
-
-	th {
-		display: inline;
-		padding-right: 5px;
-		vertical-align: top;
-		white-space: nowrap;
-	}
-
-	td {
-		display: inline-block;
-		vertical-align: top;
-	}
-}
-
-.spellcard-interactions {
-	display: block;
-	vertical-align: top;
-
-	th {
-		padding: 3px 5px 0 0;
-		vertical-align: top;
-	}
-
-	td {
-		padding-top: 3px;
-		vertical-align: top;
-	}
-}
-
-.spellcard-notes {
-	display: inline-block;
-	vertical-align: top;
-	flex: 1 0 400px;
-	padding-top: 5px;
-
-	@media ( max-width: 600px ) {
-		flex: none;
 	}
 }
 
@@ -864,11 +481,6 @@ span.vodlink.darkmode {
 	}
 }
 
-/* random bits */
-.statstable {
-	white-space: nowrap;
-}
-
 /*******************************************************************************
 Template(s): Rumour row
 Author(s): Vogan
@@ -953,130 +565,6 @@ td.mbox-text {
 }
 
 /*******************************************************************************
-Template(s): Stand-in table
-Author(s): Rapture
-*******************************************************************************/
-.stand-in-card {
-	margin: 0 0 10px 0;
-	white-space: nowrap;
-
-	> tbody {
-		> tr > th {
-			background-color: var( --clr-surface-4, #f5f5f5 );
-			font-weight: bold;
-			padding: 5px;
-
-			&.large-only[ colspan="1" ] {
-				display: none;
-
-				@media screen and ( max-width: 750px ) {
-					display: table-cell;
-				}
-			}
-
-			@media screen and ( max-width: 750px ) {
-				&.large-only[ colspan="10" ] {
-					display: none;
-				}
-			}
-		}
-
-		> tr.Players {
-			display: table-row;
-			border-top: 1px solid #bbbbbb;
-
-			@media screen and ( max-width: 750px ) {
-				display: block;
-				padding: 5px;
-			}
-
-			> td {
-				display: table-cell;
-				line-height: 1.42857143;
-				padding: 5px;
-
-				@media screen and ( max-width: 750px ) {
-					display: inline-block;
-					line-height: 1.42857143;
-					border: 0;
-					padding: 0;
-
-					&.Player {
-						clear: left;
-						float: left;
-						padding: 0 5px 5px 0;
-					}
-
-					&.PlayerName {
-						font-style: italic;
-						font-size: small;
-						float: left;
-						margin-top: 1px;
-						padding-bottom: 5px;
-					}
-
-					&.PlayerTeam {
-						float: right;
-					}
-
-					&.Tournaments {
-						display: block;
-						width: auto;
-						text-align: left;
-						padding: 5px 0 0 10px;
-						margin: 0 5px;
-						border-top: 1px solid var( --clr-border, #bbbbbb );
-						clear: both;
-					}
-				}
-
-				&.TeamPlayerIn {
-					padding: 2px 0 0 0;
-				}
-
-				> .MobileStuff {
-					display: none;
-
-					@media screen and ( max-width: 750px ) {
-						display: inline-block;
-					}
-				}
-			}
-		}
-	}
-
-	@media screen and ( max-width: 750px ) {
-		width: 100% !important;
-		max-width: 425px;
-		border: 1px solid var( --clr-border, #bbbbbb );
-
-		> tbody > tr.HeaderRow {
-			display: none;
-		}
-	}
-}
-
-/*******************************************************************************
-Template(s): SMW EventCalendar
-Author(s): Inflicted
-*******************************************************************************/
-.srf-eventcalendar img {
-	width: 18px;
-	vertical-align: top;
-	image-rendering: -webkit-optimize-contrast;
-	float: left;
-}
-
-.srf-eventcalendar .fc-view-agendaDay .fc-event-title {
-	float: left;
-	margin-right: 2px;
-}
-
-.srf-eventcalendar .fc-view-agendaDay span.srf-fc-description {
-	font-size: 80%;
-}
-
-/*******************************************************************************
 Template(s): Match history tables
 Author(s): Inflicted
 *******************************************************************************/
@@ -1138,20 +626,6 @@ Author(s): Ricci
 Template(s): Mobile Group Tables, Match Lists & Showmatches
 Author(s): iMarbot
 *******************************************************************************/
-@media ( min-width: 321px ) {
-	.grouptable-team-mobile,
-	.matchlist-team-mobile {
-		display: none;
-	}
-}
-
-@media ( max-width: 320px ) {
-	.grouptable-team-full,
-	.matchlist-team-full {
-		display: none;
-	}
-}
-
 @media ( max-width: 435px ) {
 	.table.table-bordered.grouptable,
 	.wikitable.matchlist,
@@ -1164,24 +638,6 @@ Author(s): iMarbot
 @media ( max-width: 767px ) {
 	.toggle-group .table-responsive {
 		padding-bottom: 0;
-	}
-}
-
-@media ( min-width: 431px ) {
-	.showmatch-team-mobile {
-		display: none;
-	}
-}
-
-@media ( max-width: 435px ) {
-	.showmatch-team-full {
-		display: none;
-	}
-}
-
-@media ( min-width: 300px ) {
-	.popover {
-		min-width: 275px;
 	}
 }
 
@@ -1280,12 +736,6 @@ img.player-role-icon[ alt="In-Game Leader" ] {
 	image-rendering: -webkit-optimize-contrast;
 }
 
-.faction img {
-	width: 18px;
-	height: 18px;
-	vertical-align: middle;
-	image-rendering: -webkit-optimize-contrast;
-}
 /*******************************************************************************
 Template(s): Building settings table, Button translation
 Author(s): salle
@@ -1301,103 +751,6 @@ kbd {
 	border-radius: 3px;
 	font-weight: 500;
 	font-family: "Open Sans", sans-serif;
-}
-
-/*******************************************************************************
-Template(s): Achievement Table Placement Numbers
-Author(s): spazer, Lafungo
-*******************************************************************************/
-.placement-text {
-	text-shadow: 1px 1px rgba( 64, 64, 64, 0.4 ), 1px -1px rgba( 64, 64, 64, 0.4 ), -1px -1px rgba( 64, 64, 64, 0.4 ), -1px 1px rgba( 64, 64, 64, 0.4 );
-	font-weight: bold;
-	color: #ffffff;
-}
-
-.placement-box {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	align-self: center;
-	border-radius: 0.25rem;
-	padding: 0 0.5rem;
-	min-width: 2.75rem;
-	height: 1.5rem;
-	font-size: 0.8125rem;
-	line-height: 1.25;
-}
-
-.placement-1 {
-	background-color: var( --achievement-placement-1, #ffd739 ); //rgb( 255, 221, 60 );
-}
-
-.placement-2 {
-	background-color: var( --achievement-placement-2, #bebebe ); //rgb( 154, 154, 154 );
-}
-
-.placement-3 {
-	background-color: var( --achievement-placement-3, #bb8644 ); //rgb( 177, 132, 42 );
-}
-
-.placement-4 {
-	background-color: var( --achievement-placement-4, #f8996b );
-}
-
-.placement-5 {
-	background-color: var( --achievement-placement-5, #27a4a4 );
-}
-
-.placement-6 {
-	background-color: var( --achievement-placement-6, #1e7d7d );
-}
-
-.placement-lightblue {
-	background-color: var( --achievement-placement-lightblue, #007f99 );
-}
-
-.placement-blue {
-	background-color: var( --achievement-placement-blue, #166f82 );
-}
-
-.placement-darkblue {
-	background-color: var( --achievement-placement-darkblue, #2d606b );
-}
-
-.placement-darkgrey {
-	background-color: var( --achievement-placement-darkgrey, #445154 );
-}
-
-.placement-win {
-	background-color: var( --achievement-placement-win, #009e60 );
-}
-
-.placement-draw {
-	background-color: var( --achievement-placement-draw, #d2b48c );
-}
-
-.placement-lose {
-	background-color: var( --achievement-placement-lose, #dddddd );
-}
-
-.placement-up {
-	background-color: var( --achievement-placement-up, #89e069 );
-}
-
-.placement-stay {
-	background-color: var( --achievement-placement-stay, #fede68 );
-}
-
-.placement-down {
-	background-color: var( --achievement-placement-down, #ff6f6f );
-}
-
-.placement-dnp {
-	background-color: var( --achievement-placement-dnp, #d0d0d0 );
-}
-
-.green-check {
-	color: #00a901;
-	font-size: 14px;
-	vertical-align: middle;
 }
 
 /*******************************************************************************
@@ -1588,26 +941,6 @@ tr.stats-row:nth-child( 2n+1 ) {
 }
 
 /*******************************************************************************
-Template(s): InfoboxIconSmall
-Author(s): iMarbot
-*******************************************************************************/
-.infobox-icon-small img {
-	max-width: 20px;
-	max-height: 20px;
-	vertical-align: top;
-}
-
-.infobox-icon-small .team-template-image img {
-	max-width: unset;
-	max-height: unset;
-}
-
-.infobox-icon-small span.league-icon-small-image {
-	width: 20px;
-	height: 20px;
-}
-
-/*******************************************************************************
 Template(s): Legends of Runeterra region colors
 Author(s): Darkrai
 *******************************************************************************/
@@ -1687,11 +1020,6 @@ Author(s): iMarbot
 	}
 }
 
-.img-responsive img {
-	max-width: 100%;
-	height: auto;
-}
-
 .grouptable td.prizepooltabletoggle {
 	text-align: center;
 }
@@ -1759,46 +1087,6 @@ Author(s): Rapture
 
 #main-content-column .select2-search--inline {
 	height: 29px;
-}
-
-/*******************************************************************************
-Template(s): 16px Icons
-Author(s): iMarbot
-*******************************************************************************/
-.icon-16px {
-	vertical-align: middle;
-	display: inline-flex;
-	justify-content: center;
-	align-items: center;
-	min-height: 16px;
-	min-width: 16px;
-}
-
-.icon-16px img {
-	max-width: 16px;
-	max-height: 16px;
-	height: auto;
-	width: auto;
-}
-
-.icon-16px a {
-	display: contents;
-}
-
-/* dark mode support */
-.icon-16px.darkmode {
-	display: none;
-}
-
-[ data-darkreader-scheme="dark" ],
-.theme--dark {
-	.icon-16px.lightmode {
-		display: none;
-	}
-
-	.icon-16px.darkmode {
-		display: inline-flex;
-	}
 }
 
 /*******************************************************************************
@@ -2024,35 +1312,6 @@ Author(s): Vogan, salle
 }
 
 /*******************************************************************************
-Template(s): Darkmode images on file pages
-Author(s): FO-nTTaX, iMarbot
-*******************************************************************************/
-html:not( [ data-darkreader-scheme="dark" ] ):not( .theme--dark ) {
-	#file img[ src*="darkmode" ]:not( :hover ),
-	.searchResultImage img[ src*="darkmode" ],
-	.gallerybox img[ src*="darkmode" ] {
-		background-color: #272727;
-	}
-}
-
-#file img[ src*="lightmode" ]:not( :hover ),
-.searchResultImage img[ src*="lightmode" ],
-.gallerybox img[ src*="lightmode" ] {
-	@at-root [ data-darkreader-scheme="dark" ] & {
-		background-color: #808080;
-	}
-
-	@at-root .theme--dark & {
-		background-color: #d8d8d8;
-	}
-}
-
-.filehistory a img[ src*="darkmode" ],
-#file img[ src*="darkmode" ]:hover {
-	background: url( data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAAAAAA6mKC9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAHElEQVQY02MUZoAADijNxIAG6CPAArP/x8C6AwCutQE9GsmfRAAAAABJRU5ErkJggg== ) repeat;
-}
-
-/*******************************************************************************
 Template/Module: Recent games // Recent matches ( for new Bracket/Match System )
 Author(s): hjpalpha
 *******************************************************************************/
@@ -2104,30 +1363,6 @@ Author(s): hjpalpha
 	justify-content: center;
 	align-items: center;
 	font-weight: bold;
-}
-
-/*******************************************************************************
-Template: Sad box for main page
-Author(s): FO-nTTaX
-*******************************************************************************/
-.sadbox {
-	border: 1px solid #000000;
-	color: #ffffff;
-	font-size: 18px;
-	text-align: center;
-	border-radius: 0.5rem;
-	overflow: hidden;
-
-	a {
-		background-color: #464646;
-		color: #ffffff !important;
-		display: block;
-		padding: 10px;
-
-		&:hover {
-			background-color: #232323;
-		}
-	}
 }
 
 /*******************************************************************************
@@ -2195,45 +1430,6 @@ Author(s): iMarbot
 	.matchpage span.banner.darkmode,
 	.matchpage div.logo.darkmode {
 		display: unset !important;
-	}
-}
-
-/*******************************************************************************
-Template: Darkmode 32px icons
-Author(s): iMarbot
-*******************************************************************************/
-[ data-darkreader-scheme="dark" ],
-.theme--dark {
-	& .vodlink img,
-	.group-table-header-right img {
-		&[ src*="VOD_Icon" ],
-		&[ src*="Match_Info_Stats" ],
-		&[ src*="/Trial.png" ],
-		&[ src*="/Substitution.png" ],
-		&[ src*="Reviews32" ],
-		&[ src*="Preview_Icon32" ],
-		&[ src*="LiveReport32" ],
-		&[ src*="Interview32" ],
-		&[ src*="Highlights_Icon32" ],
-		&[ src*="Captain_Icon" ],
-		&[ src*="Recap_Icon" ] {
-			filter: invert( 1 );
-		}
-	}
-
-	& img[ src*="Vod.svg" ],
-	& img[ src*="Vod-" ] {
-		/* Changes the color of the VOD icon to Secondary 80 ( B3B3B3 ) */
-		filter: invert( 79% ) sepia( 1% ) saturate( 0% ) hue-rotate( 121deg ) brightness( 93% ) contrast( 85% );
-	}
-
-	& img.player-role-icon,
-	.rts-team-list-icon-tag img {
-		&[ src*="/Trial.png" ],
-		&[ src*="/Substitution.png" ],
-		&[ src*="Captain_Icon" ] {
-			filter: invert( 1 );
-		}
 	}
 }
 
