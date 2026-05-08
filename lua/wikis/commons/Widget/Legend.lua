@@ -17,6 +17,7 @@ local ChevronToggle = Lua.import('Module:Widget/Participants/Team/ChevronToggle'
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local LabelWidget = Lua.import('Module:Widget/Basic/Label')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local LABEL_COLORS = {'byeup', 'seedup', 'up', 'stayup', 'stay', 'staydown', 'down'}
@@ -26,6 +27,8 @@ local LABEL_COLORS = {'byeup', 'seedup', 'up', 'stayup', 'stay', 'staydown', 'do
 local LegendWidget = Class.new(Widget)
 LegendWidget.defaultProps = {
 	title = 'Legend',
+	showConfirmed = true,
+	showUndecided = true,
 }
 
 ---@return Renderable|Renderable[]?
@@ -37,7 +40,8 @@ function LegendWidget:render()
 		titleWidget = self:_createHeader(),
 		children = WidgetUtil.collect(
 			self:_createColorSection(),
-			self:_createPointsSection()
+			self:_createPointsSection(),
+			self:_createNumberSection()
 		)
 	}
 end
@@ -115,6 +119,60 @@ function LegendWidget:_createPointsSection()
 				HtmlWidgets.Span{children = pointsText}
 			}
 		}
+	}
+end
+
+---@private
+---@return Widget?
+function LegendWidget:_createNumberSection()
+	local props = self.props
+	if not Logic.readBool(props.showNumberSection) then
+		return
+	end
+
+	local labels = WidgetUtil.collect(
+		Logic.readBool(props.showConfirmed) and HtmlWidgets.Div{
+			classes = {'legend-item'},
+			children = {
+				LabelWidget{
+					labelScheme = 'placement',
+					labelType = 'legend-confirmed',
+					children = 1
+				},
+				HtmlWidgets.Span{children = 'Placement confirmed'}
+			}
+		} or nil,
+		Logic.readBool(props.showMinimum) and HtmlWidgets.Div{
+			classes = {'legend-item'},
+			children = {
+				LabelWidget{
+					labelScheme = 'placement',
+					labelType = 'legend-minimum',
+					children = 1
+				},
+				HtmlWidgets.Span{children = 'Minimum placement reached'}
+			}
+		} or nil,
+		Logic.readBool(props.showUndecided) and HtmlWidgets.Div{
+			classes = {'legend-item'},
+			children = {
+				LabelWidget{
+					labelScheme = 'placement',
+					labelType = 'legend-undecided',
+					children = 1
+				},
+				HtmlWidgets.Span{children = 'Placement undecided'}
+			}
+		} or nil
+	)
+
+	if Logic.isEmpty(labels) then
+		return
+	end
+
+	return HtmlWidgets.Div{
+		classes = {'legend-section'},
+		children = labels
 	}
 end
 

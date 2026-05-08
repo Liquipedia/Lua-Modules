@@ -135,6 +135,42 @@
 			}
 		}
 
+		&[ data-label-type|="legend" ] {
+			--label-scale: 0.75;
+		}
+
+		&[ data-label-type="legend-confirmed" ] {
+			--placement-solid-color: var( --clr-secondary-25 );
+			--placement-text-color: var( --clr-secondary-100 );
+
+			.theme--dark & {
+				--placement-solid-color: var( --clr-secondary-90 );
+				--placement-text-color: var( --clr-secondary-25 );
+			}
+		}
+
+		&[ data-label-type="legend-minimum" ] {
+			color: var( --clr-secondary-25 );
+			background-color: var( --clr-on-surface-light-primary-12 );
+			box-shadow: 0 0 0 0.0625rem var( --clr-secondary-25 ) inset;
+
+			.theme--dark & {
+				color: var( --clr-secondary-100 );
+				background-color: var( --clr-on-surface-dark-primary-12 );
+				box-shadow: 0 0 0 0.0625rem var( --clr-secondary-80 ) inset;
+			}
+		}
+
+		&[ data-label-type="legend-undecided" ] {
+			--placement-solid-color: var( --clr-on-surface-light-primary-12 );
+			--placement-text-color: var( --clr-secondary-25 );
+
+			.theme--dark & {
+				--placement-solid-color: var( --clr-on-surface-dark-primary-12 );
+				--placement-text-color: var( --clr-secondary-100 );
+			}
+		}
+
 		&[ data-placement-type="byeup" ] {
 			--placement-solid-color: var( --position-byeup-color );
 		}
