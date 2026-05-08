@@ -504,9 +504,11 @@ function BasePrizePool:create()
 			end)
 		end
 
-		Array.forEach(self.placements, function(placement)
-			placement:_setClubShareFromPlayerShare(self.prizes)
-		end)
+		if hasPlayerShare then
+			Array.forEach(self.placements, function(placement)
+				placement:_setClubShareFromPlayerShare(self.prizes)
+			end)
+		end
 	end
 
 	table.sort(self.prizes, BasePrizePool._comparePrizes)
