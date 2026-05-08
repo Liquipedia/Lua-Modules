@@ -65,6 +65,7 @@
 
 		& + &::before {
 			display: block;
+			grid-column: 1 / -1;
 			content: "";
 			width: 100%;
 			border: 0;
