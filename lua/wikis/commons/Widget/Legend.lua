@@ -15,7 +15,7 @@ local Logic = Lua.import('Module:Logic')
 local Widget = Lua.import('Module:Widget')
 local ChevronToggle = Lua.import('Module:Widget/Participants/Team/ChevronToggle')
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local LabelWidget = Lua.import('Module:Widget/Basic/Label')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -47,15 +47,15 @@ function LegendWidget:render()
 end
 
 ---@private
----@return Widget
+---@return VNode
 function LegendWidget:_createHeader()
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'legend-header'},
 		attributes = {['data-collapsible-click-region'] = 'true'},
 		children = {
-			HtmlWidgets.Div{children = {
+			Html.Div{children = {
 				Icon{iconName = 'general-info'},
-				HtmlWidgets.Span{children = self.props.title}
+				Html.Span{children = self.props.title}
 			}},
 			ChevronToggle{}
 		}
@@ -63,7 +63,7 @@ function LegendWidget:_createHeader()
 end
 
 ---@private
----@return Widget?
+---@return VNode?
 function LegendWidget:_createColorSection()
 	local sectionData = Json.parseIfString(self.props.color)
 	if Logic.isEmpty(sectionData) then
@@ -74,14 +74,14 @@ function LegendWidget:_createColorSection()
 		if Logic.isEmpty(labelText) then
 			return
 		end
-		return HtmlWidgets.Div{
+		return Html.Div{
 			classes = {'legend-item'},
 			children = {
-				HtmlWidgets.Span{
+				Html.Span{
 					classes = {labelColor .. '-text'},
-					children = '&#9679;'
+					children = {'&#9679;'}
 				},
-				HtmlWidgets.Span{children = labelText}
+				Html.Span{children = labelText}
 			}
 		}
 	end)
@@ -90,14 +90,14 @@ function LegendWidget:_createColorSection()
 		return
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'legend-section'},
 		children = labels
 	}
 end
 
 ---@private
----@return Widget?
+---@return VNode?
 function LegendWidget:_createPointsSection()
 	local sectionData = Json.parseIfString(self.props.points)
 	if not sectionData then
@@ -107,23 +107,23 @@ function LegendWidget:_createPointsSection()
 	if Logic.isEmpty(pointsText) then
 		return
 	end
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'legend-section'},
-		children = HtmlWidgets.Div{
+		children = Html.Div{
 			classes = {'legend-item'},
 			children = {
-				HtmlWidgets.Span{
+				Html.Span{
 					css = {['font-weight'] = 'bold'},
-					children = 'Pts'
+					children = {'Pts'}
 				},
-				HtmlWidgets.Span{children = pointsText}
+				Html.Span{children = pointsText}
 			}
 		}
 	}
 end
 
 ---@private
----@return Widget?
+---@return VNode?
 function LegendWidget:_createNumberSection()
 	local props = self.props
 	if not Logic.readBool(props.showNumberSection) then
@@ -131,7 +131,7 @@ function LegendWidget:_createNumberSection()
 	end
 
 	local labels = WidgetUtil.collect(
-		Logic.readBool(props.showConfirmed) and HtmlWidgets.Div{
+		Logic.readBool(props.showConfirmed) and Html.Div{
 			classes = {'legend-item'},
 			children = {
 				LabelWidget{
@@ -139,10 +139,10 @@ function LegendWidget:_createNumberSection()
 					labelType = 'legend-confirmed',
 					children = 1
 				},
-				HtmlWidgets.Span{children = 'Placement confirmed'}
+				Html.Span{children = {'Placement confirmed'}}
 			}
 		} or nil,
-		Logic.readBool(props.showMinimum) and HtmlWidgets.Div{
+		Logic.readBool(props.showMinimum) and Html.Div{
 			classes = {'legend-item'},
 			children = {
 				LabelWidget{
@@ -150,10 +150,10 @@ function LegendWidget:_createNumberSection()
 					labelType = 'legend-minimum',
 					children = 1
 				},
-				HtmlWidgets.Span{children = 'Minimum placement reached'}
+				Html.Span{children = {'Minimum placement reached'}}
 			}
 		} or nil,
-		Logic.readBool(props.showUndecided) and HtmlWidgets.Div{
+		Logic.readBool(props.showUndecided) and Html.Div{
 			classes = {'legend-item'},
 			children = {
 				LabelWidget{
@@ -161,7 +161,7 @@ function LegendWidget:_createNumberSection()
 					labelType = 'legend-undecided',
 					children = 1
 				},
-				HtmlWidgets.Span{children = 'Placement undecided'}
+				Html.Span{children = {'Placement undecided'}}
 			}
 		} or nil
 	)
@@ -170,7 +170,7 @@ function LegendWidget:_createNumberSection()
 		return
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'legend-section'},
 		children = labels
 	}
