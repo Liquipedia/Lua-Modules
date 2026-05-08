@@ -8,11 +8,10 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local ChevronToggle = Lua.import('Module:Widget/Participants/Team/ChevronToggle')
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local Html = Lua.import('Module:Widget/Html')
@@ -22,40 +21,36 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local LABEL_COLORS = {'byeup', 'seedup', 'up', 'stayup', 'stay', 'staydown', 'down'}
 
----@class LegendWidget: Widget
----@operator call(table): LegendWidget
-local LegendWidget = Class.new(Widget)
-LegendWidget.defaultProps = {
-	title = 'Legend',
-	showConfirmed = true,
-	showUndecided = true,
-}
+---@class LegendComponent
+local LegendComponent = {}
 
----@return Renderable|Renderable[]?
-function LegendWidget:render()
+---@param props table
+---@return Widget
+function LegendComponent.render(props)
+	mw.logObject(props, props)
 	return GeneralCollapsible{
 		shouldCollapse = true,
 		collapseAreaClasses = {},
 		classes = {'legend'},
-		titleWidget = self:_createHeader(),
+		titleWidget = LegendComponent._createHeader(props),
 		children = WidgetUtil.collect(
-			self:_createColorSection(),
-			self:_createPointsSection(),
-			self:_createNumberSection()
+			LegendComponent._createColorSection(props),
+			LegendComponent._createPointsSection(props),
+			LegendComponent._createNumberSection(props)
 		)
 	}
 end
 
 ---@private
 ---@return VNode
-function LegendWidget:_createHeader()
+function LegendComponent._createHeader(props)
 	return Html.Div{
 		classes = {'legend-header'},
 		attributes = {['data-collapsible-click-region'] = 'true'},
 		children = {
 			Html.Div{children = {
 				Icon{iconName = 'general-info'},
-				Html.Span{children = self.props.title}
+				Html.Span{children = props.title}
 			}},
 			ChevronToggle{}
 		}
@@ -64,8 +59,9 @@ end
 
 ---@private
 ---@return VNode?
-function LegendWidget:_createColorSection()
-	local sectionData = Json.parseIfString(self.props.color)
+function LegendComponent._createColorSection(props)
+	mw.log('LegendComponent._createColorSection')
+	local sectionData = Json.parseIfString(props.color)
 	if Logic.isEmpty(sectionData) then
 		return
 	end
@@ -98,8 +94,8 @@ end
 
 ---@private
 ---@return VNode?
-function LegendWidget:_createPointsSection()
-	local sectionData = Json.parseIfString(self.props.points)
+function LegendComponent._createPointsSection(props)
+	local sectionData = Json.parseIfString(props.points)
 	if not sectionData then
 		return
 	end
@@ -124,8 +120,7 @@ end
 
 ---@private
 ---@return VNode?
-function LegendWidget:_createNumberSection()
-	local props = self.props
+function LegendComponent._createNumberSection(props)
 	if not Logic.readBool(props.showNumberSection) then
 		return
 	end
@@ -176,5 +171,12 @@ function LegendWidget:_createNumberSection()
 	}
 end
 
-return LegendWidget
+return Component.component(
+	LegendComponent.render,
+	{
+		title = 'Legend',
+		showConfirmed = true,
+		showUndecided = true,
+	}
+)
 
