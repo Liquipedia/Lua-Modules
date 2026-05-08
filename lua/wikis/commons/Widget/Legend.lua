@@ -65,24 +65,30 @@ function LegendWidget:_createColorSection()
 	if Logic.isEmpty(sectionData) then
 		return
 	end
+	local labels = Array.map(LABEL_COLORS, function (labelColor)
+		local labelText = sectionData[labelColor]
+		if Logic.isEmpty(labelText) then
+			return
+		end
+		return HtmlWidgets.Div{
+			classes = {'legend-item'},
+			children = {
+				HtmlWidgets.Span{
+					classes = {labelColor .. '-text'},
+					children = '&#9679;'
+				},
+				HtmlWidgets.Span{children = labelText}
+			}
+		}
+	end)
+
+	if Logic.isEmpty(labels) then
+		return
+	end
+
 	return HtmlWidgets.Div{
 		classes = {'legend-section'},
-		children = Array.map(LABEL_COLORS, function (labelColor)
-			local labelText = sectionData[labelColor]
-			if Logic.isEmpty(labelText) then
-				return
-			end
-			return HtmlWidgets.Div{
-				classes = {'legend-item'},
-				children = {
-					HtmlWidgets.Span{
-						classes = {labelColor .. '-text'},
-						children = '&#9679;'
-					},
-					HtmlWidgets.Span{children = labelText}
-				}
-			}
-		end)
+		children = labels
 	}
 end
 
