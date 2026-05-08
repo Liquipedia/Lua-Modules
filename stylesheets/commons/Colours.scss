@@ -802,3 +802,31 @@ ul.nav-tabs li.game-wiiu,
 .bg-byeup {
 	background-color: var( --position-byeup-background-color ) !important;
 }
+
+.byeup-text {
+	color: var( --position-byeup-color );
+}
+
+.seedup-text {
+	color: var( --position-seedup-color );
+}
+
+.up-text {
+	color: var( --position-up-color );
+}
+
+.stayup-text {
+	color: var( --position-stayup-color );
+}
+
+.stay-text {
+	color: var( --position-stay-color );
+}
+
+.staydown-text {
+	color: var( --position-staydown-color );
+}
+
+.down-text {
+	color: var( --position-down-color );
+}
