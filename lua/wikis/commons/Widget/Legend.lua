@@ -24,7 +24,7 @@ local LABEL_COLORS = {'byeup', 'seedup', 'up', 'stayup', 'stay', 'staydown', 'do
 ---@class LegendComponent
 local LegendComponent = {}
 
---TODO: pass defaultProps directly to Component.component (see #7476) 
+--TODO: pass defaultProps directly to Component.component (see #7476)
 LegendComponent.defaultProps = {
 	title = 'Legend',
 	showConfirmed = true,
