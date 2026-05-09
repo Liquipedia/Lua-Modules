@@ -397,7 +397,7 @@ function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
 	local makeTeamConditions = function(direction)
 		return ConditionTree(BooleanOperator.any):add{
 			ConditionUtil.anyOf(ColumnName(direction .. 'teamtemplate'), teams),
-			ConditionUtil.anyOf(ColumnName(direction .. 'teamsectemplate'), teams),
+			ConditionUtil.anyOf(ColumnName(direction .. 'teamsectemplate', 'extradata'), teams),
 		}
 	end
 
@@ -405,7 +405,7 @@ function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
 		personCondition,
 		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('role2'), Comparator.neq, '-'),
-			ConditionNode(ColumnName('role2_2'), Comparator.neq, '-'),
+			ConditionNode(ColumnName('role2sec', 'extradata'), Comparator.neq, '-'),
 		},
 		makeTeamConditions('to'),
 	}
@@ -424,7 +424,7 @@ function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
 			ConditionNode(ColumnName('date'), Comparator.gt, startDate),
 			ConditionTree(BooleanOperator.any):add{
 				ConditionNode(ColumnName('role1'), Comparator.neq, '-'),
-				ConditionNode(ColumnName('role1_2'), Comparator.neq, '-'),
+				ConditionNode(ColumnName('role1sec', 'extradata'), Comparator.neq, '-'),
 			},
 			makeTeamConditions('from'),
 		}
