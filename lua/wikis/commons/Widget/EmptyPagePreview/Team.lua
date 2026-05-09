@@ -123,7 +123,7 @@ function EmptyTeamPagePreview:_infobox()
 
 	local args = {
 		location = location or 'World',
-		doNotIncludePlayerEarnings = Logic.nilOr(Logic.readBoolOrNil(self.props.doNotIncludePlayerEarnings), true),
+		doNotIncludePlayerEarnings = Logic.readBool(self.props.doNotIncludePlayerEarnings),
 		name = TeamTemplate.getRaw(self.team).name,
 		coaches = coaches,
 		region = self:_determineRegionFromPlacements() or rosterRegion,
