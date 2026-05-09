@@ -24,7 +24,7 @@ local Tournament = Lua.import('Module:Tournament')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
-local Infobox = Lua.import('Module:Infobox/Team/Custom')
+local Infobox = Lua.requireIfExists('Module:Infobox/Team/Custom')
 local MatchTable = Lua.import('Module:MatchTable/Custom')
 local ResultsTable = Lua.import('Module:ResultsTable/Custom')
 local SquadAuto = Lua.import('Module:SquadAuto') -- to be replaced by #5523
@@ -50,7 +50,7 @@ local EmptyTeamPagePreview = Class.new(Widget)
 
 ---@return Widget?
 function EmptyTeamPagePreview:render()
-	if not Namespace.isMain() then
+	if not Namespace.isMain() or not Infobox then
 		return
 	end
 
