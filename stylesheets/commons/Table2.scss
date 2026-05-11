@@ -177,6 +177,26 @@ $table2-cell-padding-x: 0.75rem;
 				background-color: var( --clr-semantic-gold-18 );
 			}
 		}
+
+		&.table2__row--group-hover {
+			.theme--light & {
+				background-color: var( --clr-on-surface-light-primary-8 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-8 );
+			}
+		}
+
+		&.table2__row--highlighted.table2__row--group-hover {
+			.theme--light & {
+				background-color: var( --clr-semantic-gold-85 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-semantic-gold-18 );
+			}
+		}
 	}
 
 	&__title {
