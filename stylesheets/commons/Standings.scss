@@ -4,10 +4,12 @@
 		position: relative;
 
 		&:not( :last-child ) {
-			border-bottom: 1px solid var( --clr-on-surface-light-primary-8 );
+			box-shadow: inset 0 -1px var( --border-color );
+
+			--border-color: var( --clr-on-surface-light-primary-8 );
 
 			.theme--dark & {
-				border-bottom: 1px solid var( --clr-on-surface-dark-primary-8 );
+				--border-color: var( --clr-on-surface-dark-primary-8 );
 			}
 		}
 
@@ -53,6 +55,7 @@
 			> :nth-child( -n + 2 ),
 			&:has( > :nth-child( 2 ) > .standings-position-indicator ) > :nth-child( 3 ) {
 				background-color: var( --placement-confirmed-color );
+				box-shadow: inset 0 -1px var( --border-color );
 			}
 
 			&:hover {
