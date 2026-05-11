@@ -32,7 +32,7 @@ DropdownItem.defaultProps = {
 ---@return HtmlNode
 function DropdownItem.render(props)
 	local icon = not Logic.isEmpty(props.icon) and
-		(type(props.icon) == 'string' and Icon{iconName = props.icon, size = 'sm'} or props.icon)
+		(type(props.icon) == 'string' and Icon{iconName = props.icon --[[@as string]], size = 'sm'} or props.icon)
 
 	local children = WidgetUtil.collect(icon, props.children)
 
