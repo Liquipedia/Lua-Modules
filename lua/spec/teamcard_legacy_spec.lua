@@ -158,6 +158,18 @@ describe('TeamCard Legacy', function()
             local p = LegacyTeamCard.mapPlayer({p1 = 'X', p1sub = 'true', p1leave = 'true'}, 'p1', nil)
             assert.are_equal('former', p.status)
         end)
+
+        it('pNsub=true + pNdnp=true: status=sub and played=false', function()
+            local p = LegacyTeamCard.mapPlayer({p1 = 'X', p1sub = 'true', p1dnp = 'true'}, 'p1', nil)
+            assert.are_equal('sub', p.status)
+            assert.is_false(p.played)
+        end)
+
+        it('pNleave=true + pNdnp=true: status=former and played=false', function()
+            local p = LegacyTeamCard.mapPlayer({p1 = 'X', p1leave = 'true', p1dnp = 'true'}, 'p1', nil)
+            assert.are_equal('former', p.status)
+            assert.is_false(p.played)
+        end)
     end)
 
     describe('mapPlayer source groups', function()
@@ -201,6 +213,11 @@ describe('TeamCard Legacy', function()
         it('source group s with noVarDefault and no result sets played=false', function()
             local p = LegacyTeamCard.mapPlayer({s1 = 'X', noVarDefault = 'true'}, 's1', 's')
             assert.is_false(p.played)
+        end)
+
+        it('source group s + pNsub=true: status=sub (redundant, no conflict)', function()
+            local p = LegacyTeamCard.mapPlayer({s1 = 'X', s1sub = 'true'}, 's1', 's')
+            assert.are_equal('sub', p.status)
         end)
     end)
 
@@ -472,6 +489,30 @@ describe('TeamCard Legacy', function()
             assert.are_equal('true', teamParticipantsVars:get('externalControlsRendered'))
 
             stubParse2:revert()
+        end)
+
+        it('second block does not render controls strip', function()
+            local TPParser = require('Module:TeamParticipants/Parse/Wiki')
+            local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
+
+            local stubParse = stub(TPParser, 'parseWikiInput', function()
+                return {participants = {}}
+            end)
+
+            -- First block
+            teamParticipantsVars:set('externalControlsRendered', '')
+            Template.stashReturnValue({__source = 'header'}, 'LegacyTeamCard')
+            Template.stashReturnValue({__source = 'card', team = 'A'}, 'LegacyTeamCard')
+            LegacyTeamCard.run()
+            assert.are_equal('true', teamParticipantsVars:get('externalControlsRendered'))
+
+            -- Second block: flag is already set, run() must still succeed
+            Template.stashReturnValue({__source = 'header'}, 'LegacyTeamCard')
+            Template.stashReturnValue({__source = 'card', team = 'B'}, 'LegacyTeamCard')
+            local secondOutput = LegacyTeamCard.run()
+            assert.is_truthy(secondOutput)
+
+            stubParse:revert()
         end)
 
         it('forces store=false outside mainspace', function()
