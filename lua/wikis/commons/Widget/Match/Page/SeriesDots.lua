@@ -35,7 +35,7 @@ local MatchPageSeriesDots = Class.new(Widget)
 
 ---@private
 ---@param result string
----@return Widget
+---@return VNode
 MatchPageSeriesDots._makeGameResultIcon = FnUtil.memoize(function (result)
 	return Label{labelType = 'result-' .. RESULT_DISPLAY_TYPES[result:lower()]}
 end)

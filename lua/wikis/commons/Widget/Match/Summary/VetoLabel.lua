@@ -28,7 +28,7 @@ local VetoTypes = {
 ---@field props {vetoType: VetoTypes?}
 local MatchSummaryVetoLabel = Class.new(Widget)
 
----@return Widget?
+---@return VNode?
 function MatchSummaryVetoLabel:render()
 	local vetoType = self.props.vetoType
 	if not VetoTypes[vetoType] then

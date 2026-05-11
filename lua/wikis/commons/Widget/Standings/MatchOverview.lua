@@ -98,7 +98,7 @@ function MatchOverviewWidget:_createScoreContainer(leftScore, rightScore)
 end
 
 ---@private
----@return Widget?
+---@return VNode?
 function MatchOverviewWidget:_createResultDisplay(leftScore, rightScore)
 	if self.props.match.phase == 'upcoming' then
 		return
