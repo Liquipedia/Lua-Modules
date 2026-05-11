@@ -46,27 +46,27 @@ ComponentCore.VNodeMT = {
 ---@param node Renderable|Renderable[]|nil
 ---@return boolean
 local function isSingleNode(node)
-    if type(node) ~= 'table' then
+	if type(node) ~= 'table' then
 		return true
 	end
 
-    -- VNodes always have this key
-    if node.renderFn ~= nil then
+	-- VNodes always have this key
+	if node.renderFn ~= nil then
 		return true
 	end
 
 	---@cast node -VNode
 
-    -- Widget (render) and mw.html (_build)
-    if node.render ~= nil or node._build ~= nil then
+	-- Widget (render) and mw.html (_build)
+	if node.render ~= nil or node._build ~= nil then
 		return true
 	end
 
 	---@cast node -Html
 	---@cast node -Widget
 
-    -- Array is the only allowed type of Renderable left
-    return false
+	-- Array is the only allowed type of Renderable left
+	return false
 end
 
 -- Component Definitions
@@ -81,8 +81,8 @@ ComponentCore.ComponentMT = {
 		end
 
 		if isSingleNode(props.children) then
-            props.children = { props.children }
-        end
+			props.children = { props.children }
+		end
 
 		return setmetatable({
 			renderFn = self.renderFn,
