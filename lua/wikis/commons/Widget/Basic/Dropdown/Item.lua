@@ -8,58 +8,53 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class DropdownItemWidgetParameters
+---@class DropdownItemWidgetParameters: LinkWidgetParameters
 ---@field icon string|Widget?
----@field children Renderable|Renderable[]
----@field link string?
----@field linktype 'internal'|'external'|nil
 ---@field classes string[]?
 ---@field attributes table?
 
----@class DropdownItemWidget: Widget
----@operator call(DropdownItemWidgetParameters): DropdownItemWidget
----@field props DropdownItemWidgetParameters
-local DropdownItem = Class.new(Widget)
+---@class DropdownItemWidget
+local DropdownItem = {}
 DropdownItem.defaultProps = {
 	linktype = 'internal',
 }
 
----@return Widget
-function DropdownItem:render()
-	local icon = not Logic.isEmpty(self.props.icon) and
-		(type(self.props.icon) == 'string' and Icon{iconName = self.props.icon, size = 'sm'} or self.props.icon)
+---@param props DropdownItemWidgetParameters
+---@return HtmlNode
+function DropdownItem.render(props)
+	local icon = not Logic.isEmpty(props.icon) and
+		(type(props.icon) == 'string' and Icon{iconName = props.icon, size = 'sm'} or props.icon)
 
-	local children = WidgetUtil.collect(icon, self.props.children)
+	local children = WidgetUtil.collect(icon, props.children)
 
 	local item = Div{
-		classes = Array.extend('dropdown-widget__item', self.props.classes),
-		attributes = self.props.attributes,
+		classes = Array.extend('dropdown-widget__item', props.classes),
+		attributes = props.attributes,
 		children = children
 	}
 
-	if not self.props.link then
+	if not props.link then
 		return item
 	end
 
 	return Div{
 		children = {
 			Link{
-				link = self.props.link,
-				linktype = self.props.linktype,
+				link = props.link,
+				linktype = props.linktype,
 				children = {item}
 			}
 		}
 	}
 end
 
-return DropdownItem
+return Component.component(DropdownItem.render, DropdownItem.defaultProps)
