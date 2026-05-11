@@ -5,22 +5,24 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+---@alias Renderable string|Html|Widget|number|VNode
+
+---@alias ContextDef<T> {defaultValue: T}
+---@alias ContextParam<T> {def: ContextDef<T>, value: T, children?: Renderable|Renderable[]}
+---@alias HtmlParam {classes?: string[], css?: table, attributes?: table, children?: Renderable|Renderable[]}
+
 ---@class VNode<P>
 ---@field renderFn string|fun(props: P, context?: Context?): Renderable
 ---@field props P
 
----@alias Context<T> { props: { parent: Context?, def: ContextDef<T>, value: T } }
+---@alias Context<T> {props:{parent: Context?, def: ContextDef<T>, value: T}}
 
----@alias ContextNode<T> VNode<{def: ContextDef<T>, value: T, children: Renderable[]}>
----@alias HtmlNode VNode<{classes?: string[], css?: table, attributes?: table, children?: Renderable[]}>
-
----@alias Renderable string|Html|Widget|number|VNode
-
----@alias ContextDef<T> {defaultValue: T}
+---@alias ContextNode<T> VNode<ContextParam<T>>
+---@alias HtmlNode VNode<HtmlParam>
 
 ---@alias Component<P> fun(props?: P, context: Context?): VNode<P>
----@alias ContextComponent<T> Component<{def: ContextDef<T>, value: T, children?: Renderable|Renderable[]?}>
----@alias HtmlComponent Component<{classes?: string[], css?: table, attributes?: table, children?: Renderable|Renderable[]}>
+---@alias ContextComponent<T> Component<ContextParam<T>>
+---@alias HtmlComponent Component<HtmlParam>
 
 local Lua = require('Module:Lua')
 local Renderer = Lua.import('Module:Widget/Renderer')

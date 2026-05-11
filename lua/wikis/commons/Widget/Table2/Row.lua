@@ -20,7 +20,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local Html = Lua.import('Module:Widget/Html')
 
 ---@class Table2RowProps
----@field children Renderable[]
+---@field children? Renderable|Renderable[]
 ---@field section 'head'|'body'|'subhead'?
 ---@field classes string[]?
 ---@field css {[string]: string|number|nil}?
@@ -31,6 +31,9 @@ local Html = Lua.import('Module:Widget/Html')
 ---@param context Context
 ---@return Renderable
 local function Table2Row(props, context)
+	local children = props.children
+	---@cast children Renderable[]
+
 	local section = props.section or Context.read(context, Table2Contexts.Section)
 	local headerRowKind = Context.read(context, Table2Contexts.HeaderRowKind)
 	local bodyStripe = Context.read(context, Table2Contexts.BodyStripe)
@@ -62,8 +65,6 @@ local function Table2Row(props, context)
 	if section == 'body' and Logic.readBool(props.highlighted) then
 		highlightClass = 'table2__row--highlighted'
 	end
-
-	local children = props.children or {}
 
 	local columns = Context.read(context, Table2Contexts.ColumnContext)
 	if section == 'subhead' and #columns > 0 and #children == 1 and

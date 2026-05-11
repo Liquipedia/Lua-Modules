@@ -30,7 +30,7 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 ---@field attributes {[string]: any}?
 
 ---@class Table2Props
----@field children Renderable[]
+---@field children? Renderable|Renderable[]
 ---@field variant 'generic'|'themed'?
 ---@field sortable (string|number|boolean)?
 ---@field striped (string|number|boolean)?
@@ -48,6 +48,9 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 ---@param context Context
 ---@return Renderable[]
 local function Table2(props, context)
+	local tableChildren = props.children
+	---@cast tableChildren Renderable[]
+
 	if props.columns and #props.columns > 0 then
 		Array.forEach(props.columns, function(columnDef, columnIndex)
 			assert(not (Logic.readBool(columnDef.shrink) and columnDef.width),
@@ -74,7 +77,6 @@ local function Table2(props, context)
 		children = props.title,
 	} or nil
 
-	local tableChildren = props.children
 	if props.columns and #props.columns > 0 then
 		tableChildren = {Context.Provider{
 			def = Table2Contexts.ColumnContext,

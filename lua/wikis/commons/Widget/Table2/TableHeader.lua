@@ -15,27 +15,29 @@ local Table2Row = Lua.import('Module:Widget/Table2/Row')
 local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 
 ---@class Table2HeaderProps
----@field children Renderable[]
+---@field children? Renderable|Renderable[]
 
 ---@param props Table2HeaderProps
 ---@param context Context
 ---@return Renderable
 local function Table2Header(props, context)
-	local rowCount = 0
-	local children = Array.map(props.children or {}, function(child)
-		---@diagnostic disable-next-line: undefined-field
-		if type(child) == 'table' and child.renderFn == Table2Row.renderFn then
-			rowCount = rowCount + 1
-			local kind = rowCount == 1 and 'title' or 'columns'
-			child = Context.Provider{def = Table2Contexts.HeaderRowKind, value = kind, children = {child}}
-		end
-		return child
-	end)
+	local children = props.children
+	---@cast children Renderable[]
+
+	local firstRow = true
 
 	return Context.Provider{
 		def = Table2Contexts.Section,
 		value = 'head',
-		children = children,
+		children = Array.map(children, function(child)
+			---@diagnostic disable-next-line: undefined-field
+			if type(child) == 'table' and child.renderFn == Table2Row.renderFn then
+				firstRow = false
+				local kind = firstRow and 'title' or 'columns'
+				child = Context.Provider{def = Table2Contexts.HeaderRowKind, value = kind, children = {child}}
+			end
+			return child
+		end),
 	}
 end
 

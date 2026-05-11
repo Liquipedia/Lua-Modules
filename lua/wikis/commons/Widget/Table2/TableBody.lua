@@ -19,13 +19,14 @@ local Table2CellHeader = Lua.import('Module:Widget/Table2/CellHeader')
 local Table2Row = Lua.import('Module:Widget/Table2/Row')
 
 ---@class Table2BodyProps
----@field children Renderable[]
+---@field children? Renderable|Renderable[]
 
 ---@param props Table2BodyProps
 ---@param context Context
 ---@return Renderable
 local function Table2Body(props, context)
-	local children = props.children or {}
+	local children = props.children
+	---@cast children Renderable[]
 
 	local stripeEnabled = Context.read(context, Table2Contexts.BodyStripe)
 	if stripeEnabled == 'disabled' then

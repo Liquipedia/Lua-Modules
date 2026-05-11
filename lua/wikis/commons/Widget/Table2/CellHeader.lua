@@ -17,7 +17,7 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
 ---@class Table2CellHeaderProps
----@field children Renderable[]
+---@field children? Renderable|Renderable[]
 ---@field section 'head'|'body'|'subhead'?
 ---@field align ('left'|'right'|'center')?
 ---@field shrink (string|number|boolean)?
@@ -37,14 +37,15 @@ local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 ---@param props Table2CellHeaderProps
 ---@return Renderable
 local function Table2CellHeader(props, context)
+	local children = props.children
+	---@cast children Renderable[]
 	local columns = Context.read(context, Table2Contexts.ColumnContext)
 	local section = props.section or Context.read(context, Table2Contexts.Section)
 
-	local children = props.children
 	if section == 'subhead' then
 		children = {Html.Div{
 			classes = {'table2__subheader-cell'},
-			children = props.children,
+			children = children,
 		}}
 	end
 
