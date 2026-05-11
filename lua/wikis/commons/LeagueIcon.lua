@@ -193,15 +193,11 @@ end
 ---@return string
 function LeagueIcon.generate(args)
 	local link = args.link or args.series
-	if String.isEmpty(link) then
-		error('No series/link specified')
-	end
+	assert(String.isNotEmpty(link), 'No series/link specified')
 	local name = args.name or link
 
 	local icon = args.icon
-	if String.isEmpty(icon) then
-		error('No icon file specified')
-	end
+	assert(String.isNotEmpty(icon), 'No icon file specified')
 	local iconDark = args.iconDark or icon
 
 	local imageOptions = '|link={{{1|{{{link|' .. link .. '}}}}}}|{{{name|{{{1|{{{link|' .. name .. '}}}}}}}}}|50x50px]]'
