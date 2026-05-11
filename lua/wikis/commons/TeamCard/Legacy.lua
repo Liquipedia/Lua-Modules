@@ -322,4 +322,21 @@ function LegacyTeamCard.mapCard(tcArgs)
     return card
 end
 
+---@param toggleEntries table[]
+---@return {showPlayerInfo: boolean, extraPlayers: integer, notes: string[]}
+function LegacyTeamCard._foldToggles(toggleEntries)
+    local result = {showPlayerInfo = false, extraPlayers = 0, notes = {}}
+    Array.forEach(toggleEntries, function(entry)
+        if Logic.readBool(entry.playerinfo) then
+            result.showPlayerInfo = true
+        end
+        local extra = tonumber(entry.p_extra)
+        if extra then result.extraPlayers = result.extraPlayers + extra end
+        if Logic.isNotEmpty(entry.note) then
+            table.insert(result.notes, entry.note)
+        end
+    end)
+    return result
+end
+
 return LegacyTeamCard
