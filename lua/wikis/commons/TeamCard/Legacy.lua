@@ -283,7 +283,7 @@ end
 ---@param value string?
 ---@return string
 local function normalizeKey(value)
-    if not value or value == '' then return '' end
+    if Logic.isEmpty(value) then return '' end
     return value:gsub(' ', '_'):lower()
 end
 
