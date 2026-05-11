@@ -39,7 +39,7 @@ function Icon.render(props)
 	local imageLight = props.imageLight
 	local imageDark = props.imageDark
 	if Logic.isEmpty(imageLight) or Logic.isEmpty(imageDark) or imageLight == imageDark then
-		return Icon._make(Logic.emptyOr(imageLight, imageDark))
+		return Icon._make(props, Logic.emptyOr(imageLight, imageDark))
 	end
 
 	return {
