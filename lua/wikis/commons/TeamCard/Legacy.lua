@@ -182,8 +182,9 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
         trophies = (wins or 0) + (winsc or 0)
     end
 
-    local played = Logic.readBoolOrNil(tcArgs[prefix .. 'played']
+    local explicitPlayResult = Logic.readBoolOrNil(tcArgs[prefix .. 'played']
         or tcArgs[prefix .. 'result'])
+    local played = explicitPlayResult
     if Logic.readBool(tcArgs[prefix .. 'dnp']) then
         played = false
     end
@@ -200,8 +201,6 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
     end
 
     -- Default-DNP rules (only when no explicit played/result and no explicit dnp).
-    local explicitPlayResult = Logic.readBoolOrNil(tcArgs[prefix .. 'played']
-        or tcArgs[prefix .. 'result'])
     if explicitPlayResult == nil and not Logic.readBool(tcArgs[prefix .. 'dnp']) then
         if sourceGroup == 's' and Logic.readBool(tcArgs.subdnpdefault) then
             played = false
