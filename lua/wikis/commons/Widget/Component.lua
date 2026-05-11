@@ -79,7 +79,6 @@ local function isSingleNode(node)
 end
 
 -- Component Definitions
----@package
 ComponentCore.ComponentMT = {
 	__call = function(self, props)
 		props = props or {}
