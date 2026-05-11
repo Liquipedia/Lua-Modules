@@ -141,4 +141,41 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
     }
 end
 
+---@param tcArgs table
+---@param prefix string
+---@param sourceGroup nil|'sc'|'fc'  -- nil for main c*, 'sc' for sub-coach source, 'fc' for former-coach source
+---@return table
+function LegacyTeamCard.mapCoach(tcArgs, prefix, sourceGroup)
+    local wins = tonumber(tcArgs[prefix .. 'wins'])
+    local winsc = tonumber(tcArgs[prefix .. 'winsc'])
+    local trophies
+    if wins or winsc then
+        trophies = (wins or 0) + (winsc or 0)
+    end
+
+    local role = tcArgs[prefix .. 'pos'] or 'coach'
+
+    local status
+    if Logic.readBool(tcArgs[prefix .. 'leave']) then
+        status = 'former'
+    elseif Logic.readBool(tcArgs[prefix .. 'sub']) then
+        status = 'sub'
+    elseif sourceGroup == 'sc' then
+        status = 'sub'
+    elseif sourceGroup == 'fc' then
+        status = 'former'
+    end
+
+    return {
+        [1] = tcArgs[prefix],
+        link = tcArgs[prefix .. 'link'],
+        flag = tcArgs[prefix .. 'flag_o'] or tcArgs[prefix .. 'flag'],
+        team = tcArgs[prefix .. 'team'],
+        role = role,
+        type = 'staff',
+        trophies = trophies,
+        status = status,
+    }
+end
+
 return LegacyTeamCard
