@@ -312,4 +312,65 @@ describe('TeamCard Legacy', function()
             assert.are_equal('former', coaches[2].status)
         end)
     end)
+
+    describe('mapCard', function()
+        local LegacyTeamCard = require('Module:TeamCard/Legacy')
+
+        it('uses link over team for template', function()
+            local card = LegacyTeamCard.mapCard({team = 'Display', link = 'Real Team'})
+            assert.are_equal('Real Team', card[1])
+        end)
+
+        it('falls back to team if no link', function()
+            local card = LegacyTeamCard.mapCard({team = 'Solo Team'})
+            assert.are_equal('Solo Team', card[1])
+        end)
+
+        it('team2/team3 populate contenders with all three teams', function()
+            local card = LegacyTeamCard.mapCard({
+                team = 'A', team2 = 'B', team3 = 'C',
+            })
+            assert.is_nil(card[1])
+            assert.are_same({'A', 'B', 'C'}, card.contenders)
+        end)
+
+        it('contender uses link if present', function()
+            local card = LegacyTeamCard.mapCard({
+                team = 'A', link = 'AReal',
+                team2 = 'B', link2 = 'BReal',
+            })
+            assert.are_same({'AReal', 'BReal'}, card.contenders)
+        end)
+
+        it('qualification built from qualifier', function()
+            local card = LegacyTeamCard.mapCard({team = 'A', qualifier = 'Invited'})
+            assert.are_equal('invite', card.qualification.method)
+        end)
+
+        it('notes and inotes both populate notes list', function()
+            local card = LegacyTeamCard.mapCard({team = 'A', notes = 'note A', inotes = 'note B'})
+            assert.are_equal(2, #card.notes)
+            assert.are_equal('note A', card.notes[1][1])
+            assert.are_equal('note B', card.notes[2][1])
+        end)
+
+        it('aliases reads alsoknownas first then aliases', function()
+            assert.are_equal('foo;bar',
+                LegacyTeamCard.mapCard({team = 'A', alsoknownas = 'foo;bar', aliases = 'wrong'}).aliases)
+            assert.are_equal('only-aliases',
+                LegacyTeamCard.mapCard({team = 'A', aliases = 'only-aliases'}).aliases)
+        end)
+
+        it('combines players and coaches into one list', function()
+            local card = LegacyTeamCard.mapCard({team = 'A', p1 = 'P', c1 = 'C'})
+            assert.are_equal('P', card.players[1][1])
+            assert.are_equal('C', card.players[2][1])
+            assert.are_equal('staff', card.players[2].type)
+        end)
+
+        it('sets import=false unconditionally', function()
+            local card = LegacyTeamCard.mapCard({team = 'A', import = 'true'})
+            assert.is_false(card.import)
+        end)
+    end)
 end)

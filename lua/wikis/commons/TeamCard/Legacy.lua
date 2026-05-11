@@ -279,4 +279,47 @@ function LegacyTeamCard.mapCoaches(tcArgs)
     return coaches
 end
 
+---@param tcArgs table
+---@return table  -- TP opponent arg
+function LegacyTeamCard.mapCard(tcArgs)
+    local card = {}
+
+    local hasContenders = Logic.isNotEmpty(tcArgs.team2) or Logic.isNotEmpty(tcArgs.team3)
+    if hasContenders then
+        card.contenders = {}
+        Array.forEach({{'team', 'link'}, {'team2', 'link2'}, {'team3', 'link3'}}, function(pair)
+            local teamArg, linkArg = pair[1], pair[2]
+            local value = tcArgs[linkArg] or tcArgs[teamArg]
+            if Logic.isNotEmpty(value) then
+                table.insert(card.contenders, value)
+            end
+        end)
+    else
+        card[1] = tcArgs.link or tcArgs.team
+    end
+
+    if Logic.isNotEmpty(tcArgs.qualifier) then
+        card.qualification = LegacyTeamCard.parseQualifier(tcArgs.qualifier)
+    end
+
+    local notes = {}
+    if Logic.isNotEmpty(tcArgs.notes) then
+        table.insert(notes, {[1] = tcArgs.notes, highlighted = false})
+    end
+    if Logic.isNotEmpty(tcArgs.inotes) then
+        table.insert(notes, {[1] = tcArgs.inotes, highlighted = false})
+    end
+    if #notes > 0 then card.notes = notes end
+
+    card.date = tcArgs.date
+    card.aliases = tcArgs.alsoknownas or tcArgs.aliases
+    card.import = false
+
+    local players = LegacyTeamCard.mapPlayers(tcArgs)
+    Array.extendWith(players, LegacyTeamCard.mapCoaches(tcArgs))
+    card.players = players
+
+    return card
+end
+
 return LegacyTeamCard
