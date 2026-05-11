@@ -399,4 +399,32 @@ describe('TeamCard Legacy', function()
             assert.are_same({'first', 'second'}, f.notes)
         end)
     end)
+
+    describe('run — partition and malformed', function()
+        local Template = require('Module:Template')
+        local LegacyTeamCard = require('Module:TeamCard/Legacy')
+
+        local function stashAll(entries)
+            for _, e in ipairs(entries) do
+                Template.stashReturnValue(e, 'LegacyTeamCard')
+            end
+        end
+
+        it('with no stash, returns empty render without error', function()
+            local out = LegacyTeamCard.run()
+            assert.is_truthy(out)
+        end)
+
+        it('with malformed structure (no header, just cards), adds tracking category and renders', function()
+            local addCategory = stub(mw.ext.TeamLiquidIntegration, 'add_category', function() end)
+            stashAll({
+                {team = 'A', __source = 'card'},
+                {team = 'B', __source = 'card'},
+            })
+            local out = LegacyTeamCard.run()
+            assert.is_truthy(out)
+            assert.stub(addCategory).was.called_with('Pages with malformed Legacy TeamCard structure')
+            addCategory:revert()
+        end)
+    end)
 end)

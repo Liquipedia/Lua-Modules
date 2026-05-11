@@ -18,11 +18,43 @@ local Variables = Lua.import('Module:Variables')
 
 local LegacyTeamCard = {}
 
+---@param entries table[]
+---@return table[], table?, table[]
+local function partitionStash(entries)
+    local toggles, header, cards = {}, nil, {}
+    local sawHeader = false
+    Array.forEach(entries, function(entry)
+        local source = entry.__source or 'card'
+        if source == 'toggle' then
+            table.insert(toggles, entry)
+        elseif source == 'header' then
+            if sawHeader then
+                table.insert(cards, entry)
+            else
+                header = entry
+                sawHeader = true
+            end
+        else
+            table.insert(cards, entry)
+        end
+    end)
+    return toggles, header, cards
+end
+
 ---@param opts table? Optional table; supports `preprocessCard` hook.
 ---@return string|Widget
 function LegacyTeamCard.run(opts)
     opts = opts or {}
-    return ''
+    local entries = Template.retrieveReturnValues('LegacyTeamCard')
+
+    local toggles, header, cards = partitionStash(entries)
+
+    if not header and #cards > 0 then
+        mw.ext.TeamLiquidIntegration.add_category('Pages with malformed Legacy TeamCard structure')
+    end
+
+    -- Stub render — will be replaced in Task 11.
+    return tostring(#cards) .. ' card(s) staged'
 end
 
 ---@param rawQualifier string|table|nil
