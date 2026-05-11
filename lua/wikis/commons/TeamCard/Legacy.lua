@@ -9,12 +9,21 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 local Tournament = Lua.import('Module:Tournament')
 local Variables = Lua.import('Module:Variables')
+
+local TeamParticipantsController = Lua.import('Module:TeamParticipants/Controller')
+local TeamParticipantsDisplay = Lua.import('Module:Widget/Participants/Team/CardsGroup')
+local TeamParticipantsRepository = Lua.import('Module:TeamParticipants/Repository')
+local TeamParticipantsWikiParser = Lua.import('Module:TeamParticipants/Parse/Wiki')
+
+local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
 
 local LegacyTeamCard = {}
 
@@ -45,16 +54,64 @@ end
 ---@return string|Widget
 function LegacyTeamCard.run(opts)
     opts = opts or {}
+    local preprocessCard = opts.preprocessCard or function(args) return args end
+
     local entries = Template.retrieveReturnValues('LegacyTeamCard')
+    local toggles, header, cardEntries = partitionStash(entries)
 
-    local toggles, header, cards = partitionStash(entries)
-
-    if not header and #cards > 0 then
+    if not header and #cardEntries > 0 then
         mw.ext.TeamLiquidIntegration.add_category('Pages with malformed Legacy TeamCard structure')
     end
 
-    -- Stub render — will be replaced in Task 11.
-    return tostring(#cards) .. ' card(s) staged'
+    local toggleFolded = LegacyTeamCard._foldToggles(toggles)
+
+    local defaultRows, extraRows = 0, 0
+    Array.forEach(cardEntries, function(card)
+        defaultRows = tonumber(card.defaultRowNumber) or defaultRows
+        extraRows = tonumber(card.extraRows) or extraRows
+    end)
+
+    local tpArgs = {
+        minimumplayers = defaultRows + extraRows + toggleFolded.extraPlayers,
+        showplayerinfo = toggleFolded.showPlayerInfo and 'true' or nil,
+    }
+    Array.forEach(cardEntries, function(card)
+        table.insert(tpArgs, LegacyTeamCard.mapCard(preprocessCard(card)))
+    end)
+
+    if not Namespace.isMain() then
+        tpArgs.store = 'false'
+    end
+
+    local parsedData = TeamParticipantsWikiParser.parseWikiInput(tpArgs)
+    TeamParticipantsController.importParticipants(parsedData)
+    TeamParticipantsController.fillIncompleteRosters(parsedData)
+    TeamParticipantsController.enrichPlayerDates(parsedData)
+
+    local shouldStore = Logic.readBoolOrNil(tpArgs.store) ~= false
+        and Lpdb.isStorageEnabled()
+    if shouldStore then
+        Array.forEach(parsedData.participants, TeamParticipantsRepository.save)
+    end
+    Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
+
+    local showControls = not teamParticipantsVars:get('externalControlsRendered')
+
+    local display = TeamParticipantsDisplay{
+        participants = parsedData.participants,
+        showPlayerInfo = toggleFolded.showPlayerInfo,
+        showControls = showControls,
+    }
+
+    teamParticipantsVars:set('externalControlsRendered', 'true')
+
+    local noteHtml = ''
+    if #toggleFolded.notes > 0 then
+        noteHtml = '<div class="team-participant__notes">'
+            .. table.concat(toggleFolded.notes, '<br>') .. '</div>'
+    end
+
+    return noteHtml .. tostring(display)
 end
 
 ---@param rawQualifier string|table|nil

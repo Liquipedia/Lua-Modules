@@ -416,6 +416,10 @@ describe('TeamCard Legacy', function()
         end)
 
         it('with malformed structure (no header, just cards), adds tracking category and renders', function()
+            local TPParser = require('Module:TeamParticipants/Parse/Wiki')
+            local stubParseMalformed = stub(TPParser, 'parseWikiInput', function()
+                return {participants = {}}
+            end)
             local addCategory = stub(mw.ext.TeamLiquidIntegration, 'add_category', function() end)
             stashAll({
                 {team = 'A', __source = 'card'},
@@ -425,6 +429,78 @@ describe('TeamCard Legacy', function()
             assert.is_truthy(out)
             assert.stub(addCategory).was.called_with('Pages with malformed Legacy TeamCard structure')
             addCategory:revert()
+            stubParseMalformed:revert()
+        end)
+    end)
+
+    describe('run — render and post-render side effects', function()
+        local Template = require('Module:Template')
+        local PageVariableNamespace = require('Module:PageVariableNamespace')
+        local LegacyTeamCard = require('Module:TeamCard/Legacy')
+
+        it('passes minimumplayers = defaultRowNumber + extraRows + sum(p_extra)', function()
+            local TPParser = require('Module:TeamParticipants/Parse/Wiki')
+            local captured
+            local stubParse = stub(TPParser, 'parseWikiInput', function(args)
+                captured = args
+                return {participants = {}, expectedPlayerCount = tonumber(args.minimumplayers)}
+            end)
+
+            Template.stashReturnValue({__source = 'header'}, 'LegacyTeamCard')
+            Template.stashReturnValue({__source = 'toggle', p_extra = '2'}, 'LegacyTeamCard')
+            Template.stashReturnValue({__source = 'card', team = 'A', defaultRowNumber = '5', extraRows = '1'}, 'LegacyTeamCard')
+
+            LegacyTeamCard.run()
+            assert.are_equal('8', tostring(captured.minimumplayers))
+
+            stubParse:revert()
+        end)
+
+        it('sets externalControlsRendered after render', function()
+            local TPParser = require('Module:TeamParticipants/Parse/Wiki')
+            local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
+            teamParticipantsVars:set('externalControlsRendered', '')
+
+            local stubParse2 = stub(TPParser, 'parseWikiInput', function()
+                return {participants = {}}
+            end)
+
+            Template.stashReturnValue({__source = 'header'}, 'LegacyTeamCard')
+            Template.stashReturnValue({__source = 'card', team = 'A'}, 'LegacyTeamCard')
+
+            LegacyTeamCard.run()
+            assert.are_equal('true', teamParticipantsVars:get('externalControlsRendered'))
+
+            stubParse2:revert()
+        end)
+
+        it('forces store=false outside mainspace', function()
+            local TPParser = require('Module:TeamParticipants/Parse/Wiki')
+            local Controller = require('Module:TeamParticipants/Controller')
+            local Repository = require('Module:TeamParticipants/Repository')
+
+            local stubParse3 = stub(TPParser, 'parseWikiInput', function()
+                return {participants = {{}}}
+            end)
+            local stubImport = stub(Controller, 'importParticipants', function() end)
+            local stubFill = stub(Controller, 'fillIncompleteRosters', function() end)
+            local stubEnrich = stub(Controller, 'enrichPlayerDates', function() end)
+            local stubSetVars = stub(Repository, 'setPageVars', function() end)
+            local saveSpy = stub(Repository, 'save', function() end)
+            local namespaceStub = stub(require('Module:Namespace'), 'isMain', function() return false end)
+
+            Template.stashReturnValue({__source = 'header'}, 'LegacyTeamCard')
+            Template.stashReturnValue({__source = 'card', team = 'A'}, 'LegacyTeamCard')
+            LegacyTeamCard.run()
+            assert.stub(saveSpy).was_not_called()
+
+            namespaceStub:revert()
+            saveSpy:revert()
+            stubSetVars:revert()
+            stubEnrich:revert()
+            stubFill:revert()
+            stubImport:revert()
+            stubParse3:revert()
         end)
     end)
 end)
