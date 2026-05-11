@@ -20,6 +20,9 @@ local TeamParticipantsDisplay = Lua.import('Module:Widget/Participants/Team/Card
 local TeamParticipantsRepository = Lua.import('Module:TeamParticipants/Repository')
 local TeamParticipantsWikiParser = Lua.import('Module:TeamParticipants/Parse/Wiki')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
 
 local LegacyTeamCard = {}
@@ -48,7 +51,7 @@ local function partitionStash(entries)
 end
 
 ---@param opts table? Optional table; supports `preprocessCard` hook.
----@return string|Widget
+---@return Widget
 function LegacyTeamCard.run(opts)
     opts = opts or {}
     local preprocessCard = opts.preprocessCard or function(args) return args end
@@ -102,13 +105,15 @@ function LegacyTeamCard.run(opts)
 
     teamParticipantsVars:set('externalControlsRendered', 'true')
 
-    local noteHtml = ''
+    local notesWidget
     if #toggleFolded.notes > 0 then
-        noteHtml = '<div class="team-participant__notes">'
-            .. table.concat(toggleFolded.notes, '<br>') .. '</div>'
+        notesWidget = HtmlWidgets.Div{
+            classes = {'team-participant__notes'},
+            children = Array.interleave(toggleFolded.notes, HtmlWidgets.Br{}),
+        }
     end
 
-    return noteHtml .. tostring(display)
+    return HtmlWidgets.Fragment{children = WidgetUtil.collect(notesWidget, display)}
 end
 
 ---@param rawQualifier string|table|nil
