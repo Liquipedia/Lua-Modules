@@ -24,15 +24,14 @@ local Span = Html.Span
 ---@field classes string[]?
 ---@field css table?
 
-local Carousel = {}
-Carousel.defaultProps = {
+local defaultProps = {
 	itemWidth = '200px',
 	gap = '0.5rem',
 }
 
 ---@param props CarouselWidgetParameters
 ---@return HtmlNode
-function Carousel.render(props)
+local function Carousel(props)
 	assert(props.children, 'Carousel: children is required')
 	assert(Array.isArray(props.children), 'Carousel: children must be an array')
 
@@ -93,4 +92,4 @@ function Carousel.render(props)
 	}
 end
 
-return Component.component(Carousel.render, Carousel.defaultProps)
+return Component.component(Carousel, defaultProps)

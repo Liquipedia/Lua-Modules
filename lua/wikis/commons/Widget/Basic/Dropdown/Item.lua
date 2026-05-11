@@ -17,19 +17,18 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class DropdownItemWidgetParameters: LinkWidgetParameters
+---@class DropdownItemProps: LinkComponentProps
 ---@field icon string|Widget?
 ---@field classes string[]?
 ---@field attributes table?
 
-local DropdownItem = {}
-DropdownItem.defaultProps = {
+local defaultProps = {
 	linktype = 'internal',
 }
 
----@param props DropdownItemWidgetParameters
+---@param props DropdownItemProps
 ---@return HtmlNode
-function DropdownItem.render(props)
+local function DropdownItem(props)
 	local icon = Logic.isNotEmpty(props.icon) and
 		(type(props.icon) == 'string' and Icon{iconName = props.icon --[[@as string]], size = 'sm'} or props.icon)
 		or nil
@@ -57,4 +56,4 @@ function DropdownItem.render(props)
 	}
 end
 
-return Component.component(DropdownItem.render, DropdownItem.defaultProps)
+return Component.component(DropdownItem, defaultProps)

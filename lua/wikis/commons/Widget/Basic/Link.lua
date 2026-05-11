@@ -10,20 +10,18 @@ local Lua = require('Module:Lua')
 local Component = Lua.import('Module:Widget/Component')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class LinkWidgetParameters
+---@class LinkComponentProps
 ---@field children? Renderable|Renderable[]
 ---@field link? string
 ---@field linktype? 'internal'|'external'
 
----@class LinkWidget
-local Link = {}
-Link.defaultProps = {
+local defaultProps = {
 	linktype = 'internal',
 }
 
----@param props LinkWidgetParameters
+---@param props LinkComponentProps
 ---@return Renderable[]?
-function Link.render(props)
+local function Link(props)
 	if not props.link then
 		return
 	end
@@ -46,4 +44,4 @@ function Link.render(props)
 	)
 end
 
-return Component.component(Link.render, Link.defaultProps)
+return Component.component(Link, defaultProps)

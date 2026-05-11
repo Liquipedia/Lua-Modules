@@ -36,14 +36,13 @@ local VARIANT_CONFIG = {
 ---@field prefix Renderable|Renderable[]?
 ---@field label Renderable|Renderable[]?
 
-local DropdownContainer = {}
-DropdownContainer.defaultProps = {
+local defaultProps = {
 	variant = 'form',
 }
 
 ---@param props DropdownContainerWidgetParameters
 ---@return HtmlNode?
-function DropdownContainer.render(props)
+local function DropdownContainer(props)
 	if Logic.isEmpty(props.children) then
 		return nil
 	end
@@ -91,4 +90,4 @@ function DropdownContainer.render(props)
 	}
 end
 
-return Component.component(DropdownContainer.render, DropdownContainer.defaultProps)
+return Component.component(DropdownContainer, defaultProps)

@@ -25,8 +25,7 @@ local Div = Html.Div
 ---@field grow boolean?
 ---@field aligncontent 'left'|'right'|nil
 
-local Button = {}
-Button.defaultProps = {
+local defaultProps = {
 	linktype = 'internal',
 	variant = 'primary',
 	size = 'md',
@@ -36,7 +35,7 @@ Button.defaultProps = {
 
 ---@param props ButtonWidgetParameters
 ---@return HtmlNode
-function Button.render(props)
+local function Button(props)
 	--- MW Parser does not allowed the <button> tag, so we use a <div>
 	local cssClasses = {'btn'}
 	if props.variant == 'primary' then
@@ -99,4 +98,4 @@ function Button.render(props)
 	}
 end
 
-return Component.component(Button.render, Button.defaultProps)
+return Component.component(Button, defaultProps)
