@@ -2,7 +2,7 @@ local ShopMerch = require('Module:Widget/Infobox/ShopMerch')
 
 local function render(args)
 	local widget = ShopMerch{args = args}
-	local rendered = widget:render()
+	local rendered = tostring(widget)
 	return rendered and mw.text.jsonEncode(rendered) or nil
 end
 
