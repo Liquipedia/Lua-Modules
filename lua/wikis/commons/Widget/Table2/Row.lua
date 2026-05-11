@@ -105,7 +105,7 @@ local function Table2Row(props, context)
 	if section == 'subhead' then
 		trChildren = Array.map(trChildren, function(child)
 			---@diagnostic disable-next-line: undefined-field
-			if type(child) == 'table' and child.renderFn == Table2Cell.renderFn then
+			if type(child) == 'table' and child.renderFn == Table2CellHeader.renderFn then
 				return Context.Provider{
 					def = Table2Contexts.Section,
 					value = 'subhead',
