@@ -25,7 +25,6 @@ local Div = Html.Div
 ---@field grow boolean?
 ---@field aligncontent 'left'|'right'|nil
 
----@class ButtonWidget
 local Button = {}
 Button.defaultProps = {
 	linktype = 'internal',

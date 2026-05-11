@@ -24,7 +24,6 @@ local Span = Html.Span
 ---@field classes string[]?
 ---@field css table?
 
----@class CarouselWidget
 local Carousel = {}
 Carousel.defaultProps = {
 	itemWidth = '200px',

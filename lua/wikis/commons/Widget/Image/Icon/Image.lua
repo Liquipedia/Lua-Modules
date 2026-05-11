@@ -25,7 +25,6 @@ local Component = Lua.import('Module:Widget/Component')
 ---@field verticalAlignment 'baseline'|'sub'|'super'|'top'|'text-top'|'middle'|'bottom'|'text-bottom'?
 ---@field caption string?
 
----@class IconImageWidget
 local Icon = {}
 Icon.defaultProps = {
 	link = '',

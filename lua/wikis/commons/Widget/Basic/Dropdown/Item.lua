@@ -22,7 +22,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field classes string[]?
 ---@field attributes table?
 
----@class DropdownItemWidget
 local DropdownItem = {}
 DropdownItem.defaultProps = {
 	linktype = 'internal',

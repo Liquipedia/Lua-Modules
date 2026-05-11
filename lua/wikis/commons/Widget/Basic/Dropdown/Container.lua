@@ -36,7 +36,6 @@ local VARIANT_CONFIG = {
 ---@field prefix Renderable|Renderable[]?
 ---@field label Renderable|Renderable[]?
 
----@class DropdownContainerWidget
 local DropdownContainer = {}
 DropdownContainer.defaultProps = {
 	variant = 'form',
