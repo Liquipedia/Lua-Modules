@@ -257,7 +257,7 @@ end
 --generate copy paste code for new historical LeagueIconSmall templates
 --to be used with a form
 ---@param args table
----@return string
+---@return HtmlNode
 function LeagueIcon.generateHistorical(args)
 	local title = args.title or args.series
 	if String.isEmpty(title) then
@@ -303,11 +303,19 @@ function LeagueIcon.generateHistorical(args)
 	end
 	comparisons = '-->{{#ifexpr:' .. comparisons
 
-	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(
-			defineTime .. comparisons .. '--><noinclude>[[Category:Historical Small League Icon template]]</noinclude>'
-		) .. '</pre>' .. LeagueIcon._buildLinkToTemplate(args)
+	return Html.Fragment{children = WidgetUtil.collect(
+		Html.Pre{
+			classes = {'selectall'},
+			css = {width = '50%'},
+			children = {mw.text.nowiki(
+				defineTime .. comparisons .. '--><noinclude>[[Category:Historical Small League Icon template]]</noinclude>'
+			)}
+		},
+		LeagueIcon._buildLinkToTemplate(args)
+	)}
 end
 
+---@private
 ---@param args {templateName: string?, wiki: string?}
 ---@return Renderable[]?
 function LeagueIcon._buildLinkToTemplate(args)
