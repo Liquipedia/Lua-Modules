@@ -48,6 +48,7 @@ function Icon.render(props)
 	}
 end
 
+---@private
 ---@param props IconImageWidgetParameters
 ---@param image string?
 ---@param themeClass string?

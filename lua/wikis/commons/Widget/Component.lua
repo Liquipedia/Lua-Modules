@@ -38,6 +38,7 @@ local Renderer = Lua.import('Module:Widget/Renderer')
 local ComponentCore = {}
 
 -- Virtual Nodes (The table returned after calling a component)
+---@package
 ComponentCore.VNodeMT = {
 	-- Automatically trigger rendering
 	__tostring = Renderer.render,
@@ -78,6 +79,7 @@ local function isSingleNode(node)
 end
 
 -- Component Definitions
+---@package
 ComponentCore.ComponentMT = {
 	__call = function(self, props)
 		props = props or {}
