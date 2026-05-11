@@ -140,10 +140,7 @@ div.NavPic,
 .cinnabar-bg,
 .cinnabar-theme-light-bg,
 .background-color-lose,
-.bg-d,
-.bg-down,
 .bg-lose,
-.bg-drop,
 .swisstable .swisstable-bgc-lose,
 .fo-nttax-infobox-wrapper .infobox-color-never,
 .fo-nttax-infobox-wrapper.infobox-hots .infobox-header,
@@ -226,7 +223,6 @@ ul.nav-tabs li.game-ultimate,
 	color: var( --clr-vividviolet-40, #732b9c );
 }
 
-.bg-byeup,
 .vivid-violet-bg,
 .vivid-violet-theme-light-bg,
 .fo-nttax-infobox-wrapper.infobox-pm .infobox-header,
@@ -304,6 +300,8 @@ div.NavFrame div.NavHead,
 .sapphire-theme-light-bg,
 .background-color-disqualified,
 .swisstable .swisstable-bgc-overturned,
+.bg-dq,
+.bg-disqualified,
 .bg-lightblue,
 .fo-nttax-infobox-wrapper.infobox-wol .infobox-header,
 .fo-nttax-infobox-wrapper.infobox-cscz .infobox-header {
@@ -390,17 +388,9 @@ ul.nav-tabs li.game-brawl,
 	color: var( --clr-forest-30, #3ea34c );
 }
 
-.bg-seedup {
-	background-color: var( --clr-forest-90, #dbeded );
-}
-
 .forest-green-bg,
 .forest-theme-light-bg,
 .background-color-win,
-.bg-u,
-.bg-up,
-.bg-proceed,
-.bg-win,
 .swisstable .swisstable-bgc-win,
 .fo-nttax-infobox-wrapper .infobox-color-always,
 .fo-nttax-infobox-wrapper.infobox-lotv .infobox-header,
@@ -409,10 +399,6 @@ ul.nav-tabs li.game-melee,
 .overview.game-melee,
 .ambox-green {
 	background-color: var( --clr-forest-background-color, #ddf4dd );
-}
-
-.bg-win-important {
-	background-color: var( --clr-forest-background-color, #ddf4dd ) !important;
 }
 
 .forest-theme-dark-bg {
@@ -451,8 +437,6 @@ ul.nav-tabs li.game-melee,
 
 .atlantis-bg,
 .atlantis-theme-light-alt-bg,
-.bg-su,
-.bg-stayup,
 .fo-nttax-infobox-wrapper .infobox-color-very.often,
 .fo-nttax-infobox-wrapper.infobox-csgo .infobox-header,
 .fo-nttax-infobox-wrapper.infobox-64 .infobox-header,
@@ -533,8 +517,6 @@ ul.nav-tabs li.game-64,
 
 .bright-sun-bg,
 .bright-theme-light-alt-bg,
-.bg-s,
-.bg-stay,
 .fo-nttax-infobox-wrapper.infobox-cs1 .infobox-header,
 .fo-nttax-infobox-wrapper.infobox-cs16 .infobox-header {
 	background-color: var( --clr-sun-background-color, #f9f0c7 );
@@ -648,8 +630,6 @@ ul.nav-tabs li.game-64,
 .background-color-fourth-place,
 .bg-fourth,
 .bg-p4,
-.bg-sd,
-.bg-staydown,
 .fo-nttax-infobox-wrapper.infobox-wiiu .infobox-header,
 ul.nav-tabs li.game-wiiu,
 .overview.game-wiiu {
@@ -784,4 +764,41 @@ ul.nav-tabs li.game-wiiu,
 	--position-stay-background-color: #413106;
 	--position-staydown-background-color: #441e05;
 	--position-down-background-color: #3f1212;
+}
+
+.bg-u,
+.bg-up,
+.bg-proceed,
+.bg-win,
+.bg-win-important {
+	background-color: var( --position-up-background-color ) !important;
+}
+
+.bg-su,
+.bg-stayup {
+	background-color: var( --position-stayup-background-color ) !important;
+}
+
+.bg-s,
+.bg-stay {
+	background-color: var( --position-stay-background-color ) !important;
+}
+
+.bg-sd,
+.bg-staydown {
+	background-color: var( --position-staydown-background-color ) !important;
+}
+
+.bg-d,
+.bg-down,
+.bg-drop {
+	background-color: var( --position-down-background-color ) !important;
+}
+
+.bg-seedup {
+	background-color: var( --position-seedup-background-color ) !important;
+}
+
+.bg-byeup {
+	background-color: var( --position-byeup-background-color ) !important;
 }
