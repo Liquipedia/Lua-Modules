@@ -3,7 +3,15 @@ local ShopMerch = require('Module:Widget/Infobox/ShopMerch')
 local function render(args)
 	local widget = ShopMerch{args = args}
 	local rendered = widget:render()
-	return rendered and mw.text.jsonEncode(rendered) or nil
+	if not rendered then
+		return
+	end
+	for i in ipairs(rendered) do
+		if type(rendered[i]) == 'function' then
+			rendered[i] = tostring(rendered[i])
+		end
+	end
+	return mw.text.jsonEncode(rendered)
 end
 
 describe('Infobox/ShopMerch', function()
