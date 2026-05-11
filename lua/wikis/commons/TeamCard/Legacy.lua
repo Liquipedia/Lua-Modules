@@ -88,7 +88,27 @@ end
 ---@param sourceGroup nil|'s'|'f'  -- nil for main p*, 's' for substitute source, 'f' for former
 ---@return table
 function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
-    local person = {
+    local wins = tonumber(tcArgs[prefix .. 'wins'])
+    local winsc = tonumber(tcArgs[prefix .. 'winsc'])
+    local trophies
+    if wins or winsc then
+        trophies = (wins or 0) + (winsc or 0)
+    end
+
+    local played = Logic.readBoolOrNil(tcArgs[prefix .. 'played']
+        or tcArgs[prefix .. 'result'])
+    if Logic.readBool(tcArgs[prefix .. 'dnp']) then
+        played = false
+    end
+
+    local status
+    if Logic.readBool(tcArgs[prefix .. 'leave']) then
+        status = 'former'
+    elseif Logic.readBool(tcArgs[prefix .. 'sub']) then
+        status = 'sub'
+    end
+
+    return {
         [1] = tcArgs[prefix],
         link = tcArgs[prefix .. 'link'],
         flag = tcArgs[prefix .. 'flag_o'] or tcArgs[prefix .. 'flag'],
@@ -96,8 +116,12 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
         id = tcArgs[prefix .. 'id'],
         faction = tcArgs[prefix .. 'faction'] or tcArgs[prefix .. 'race'],
         role = tcArgs[prefix .. 'pos'],
+        trophies = trophies,
+        joindate = tcArgs[prefix .. 'joindate'],
+        leavedate = tcArgs[prefix .. 'leavedate'],
+        played = played,
+        status = status,
     }
-    return person
 end
 
 return LegacyTeamCard
