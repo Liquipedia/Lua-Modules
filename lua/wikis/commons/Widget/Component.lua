@@ -9,22 +9,27 @@
 
 ---@alias ContextDef<T> {defaultValue: T}
 ---@alias ContextParam<T> {def: ContextDef<T>, value: T, children?: Renderable|Renderable[]}
----@alias HtmlParam {classes?: string[], css?: table, attributes?: table, children?: Renderable|Renderable[]}
 ---@alias ErrorParam {children?: Renderable|Renderable[], fallback?: fun(error: Error, context: Context?): Renderable}
 
 ---@class VNode<P>
 ---@field renderFn string|fun(props: P, context?: Context?): Renderable
 ---@field props P
 
+---@class HtmlProps
+---@field classes? string[]
+---@field css? table<string, string|number>
+---@field attributes? table
+---@field children? Renderable|Renderable[]
+
 ---@alias Context<T> {props:{parent: Context?, def: ContextDef<T>, value: T}}
 
 ---@alias ContextNode<T> VNode<ContextParam<T>>
----@alias HtmlNode VNode<HtmlParam>
+---@alias HtmlNode VNode<HtmlProps>
 ---@alias ErrorBoundaryNode VNode<ErrorParam>
 
 ---@alias Component<P> fun(props?: P, context: Context?): VNode<P>
 ---@alias ContextComponent<T> Component<ContextParam<T>>
----@alias HtmlComponent Component<HtmlParam>
+---@alias HtmlComponent Component<HtmlProps>
 ---@alias ErrorBoundaryComponent Component<ErrorParam>
 
 local Lua = require('Module:Lua')
