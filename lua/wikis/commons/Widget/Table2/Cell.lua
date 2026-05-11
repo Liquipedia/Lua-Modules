@@ -57,22 +57,22 @@ local function Table2Cell(props, context)
 		columnDef = columns[columnIndex]
 	end
 
-	local mergedProps = ColumnUtil.mergeProps(props, columnDef)
+	ColumnUtil.mergeProps(props, columnDef)
 
-	local css = ColumnUtil.buildCss(mergedProps.width, mergedProps.minWidth, mergedProps.maxWidth, mergedProps.css)
+	local css = ColumnUtil.buildCss(props.width, props.minWidth, props.maxWidth, props.css)
 
 	local attributes = ColumnUtil.buildCellAttributes(
-		mergedProps.align,
-		mergedProps.nowrap,
-		mergedProps.shrink,
-		ColumnUtil.buildAttributes(mergedProps)
+		props.align,
+		props.nowrap,
+		props.shrink,
+		ColumnUtil.buildAttributes(props)
 	)
 
 	return Html.Td{
-		classes = mergedProps.classes,
+		classes = props.classes,
 		css = css,
 		attributes = attributes,
-		children = mergedProps.children,
+		children = props.children,
 	}
 end
 

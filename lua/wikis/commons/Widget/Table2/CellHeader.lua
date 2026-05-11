@@ -80,9 +80,9 @@ local function Table2CellHeader(props, context)
 		columnDef = columns[columnIndex]
 	end
 
-	local mergedProps = ColumnUtil.mergeProps(props, columnDef)
+	ColumnUtil.mergeProps(props, columnDef)
 
-	local attributes = ColumnUtil.buildAttributes(mergedProps, {
+	local attributes = ColumnUtil.buildAttributes(props, {
 		sortType = function(attrs, cellProps)
 			if cellProps.sortType then
 				attrs['data-sort-type'] = cellProps.sortType
@@ -90,21 +90,21 @@ local function Table2CellHeader(props, context)
 		end,
 	})
 
-	if Logic.readBool(mergedProps.unsortable) then
+	if Logic.readBool(props.unsortable) then
 		attributes.class = 'unsortable'
 	end
 
-	local css = ColumnUtil.buildCss(mergedProps.width, mergedProps.minWidth, mergedProps.maxWidth, mergedProps.css)
+	local css = ColumnUtil.buildCss(props.width, props.minWidth, props.maxWidth, props.css)
 
 	attributes = ColumnUtil.buildCellAttributes(
-		mergedProps.align,
-		mergedProps.nowrap,
-		mergedProps.shrink,
+		props.align,
+		props.nowrap,
+		props.shrink,
 		attributes
 	)
 
 	return Html.Th{
-		classes = mergedProps.classes,
+		classes = props.classes,
 		css = css,
 		attributes = attributes,
 		children = children,
