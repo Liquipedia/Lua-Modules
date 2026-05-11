@@ -36,7 +36,7 @@ end
 ---@param columnDef table?
 function ColumnUtil.mergeProps(cellProps, columnDef)
 	if not columnDef then
-		return cellProps
+		return
 	end
 
 	Array.forEach(INHERITABLE_PROPS, function(prop)
@@ -45,9 +45,15 @@ function ColumnUtil.mergeProps(cellProps, columnDef)
 		end
 	end)
 
-	cellProps.css = Table.merge(columnDef.css, cellProps.css or {})
-	cellProps.classes = WidgetUtil.collect(columnDef.classes, cellProps.classes)
-	cellProps.attributes = Table.merge(columnDef.attributes, cellProps.attributes or {})
+	if columnDef.css then
+		cellProps.css = Table.merge(columnDef.css, cellProps.css or {})
+	end
+	if columnDef.classes then
+		cellProps.classes = WidgetUtil.collect(columnDef.classes, cellProps.classes)
+	end
+	if columnDef.attributes then
+		cellProps.attributes = Table.merge(columnDef.attributes, cellProps.attributes or {})
+	end
 end
 
 ---Builds CSS rules for sizing
