@@ -14,7 +14,7 @@ local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageFooterParameters
----@field comments MatchPageComment[]?
+---@field comments Component<MatchPageCommentParameters>[]?
 ---@field children Renderable|Renderable[]
 
 ---@param props MatchPageFooterParameters
