@@ -150,14 +150,17 @@
 		}
 
 		&[ data-label-type="legend-minimum" ] {
-			color: var( --clr-secondary-25 );
-			background-color: var( --clr-on-surface-light-primary-12 );
-			box-shadow: 0 0 0 0.0625rem var( --clr-secondary-25 ) inset;
+			color: var( --placement-solid-color );
+			background-color: var( --placement-background-color );
+			box-shadow: 0 0 0 0.0625rem var( --placement-border-color, var( --placement-solid-color ) ) inset;
+
+			--placement-solid-color: var( --clr-secondary-25 );
+			--placement-background-color: var( --clr-on-surface-light-primary-12 );
 
 			.theme--dark & {
-				color: var( --clr-secondary-100 );
-				background-color: var( --clr-on-surface-dark-primary-12 );
-				box-shadow: 0 0 0 0.0625rem var( --clr-secondary-80 ) inset;
+				--placement-solid-color: var( --clr-secondary-100 );
+				--placement-background-color: var( --clr-on-surface-dark-primary-12 );
+				--placement-border-color: var( --clr-secondary-80 );
 			}
 		}
 
