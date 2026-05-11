@@ -178,4 +178,105 @@ function LegacyTeamCard.mapCoach(tcArgs, prefix, sourceGroup)
     }
 end
 
+local MAX_PLAYER_INDEX = 25
+local MAX_COACH_INDEX = 25
+
+local TN_TYPE_DEFAULTS = {t2 = 'sub', t3 = 'former'}
+
+---@param tcArgs table
+---@param prefix string
+---@param maxIndex integer
+---@return integer[]
+local function indicesPresent(tcArgs, prefix, maxIndex)
+    return Array.filter(Array.range(1, maxIndex), function(i)
+        return Logic.isNotEmpty(tcArgs[prefix .. i])
+    end)
+end
+
+---@param value string?
+---@return string
+local function normalizeKey(value)
+    if not value or value == '' then return '' end
+    return value:gsub(' ', '_'):lower()
+end
+
+---@param tcArgs table
+---@return table[]
+function LegacyTeamCard.mapPlayers(tcArgs)
+    local players = {}
+    local indexByKey = {}
+
+    local function add(person, allowOverwrite)
+        local key = normalizeKey(person.link or person[1])
+        if key ~= '' and indexByKey[key] then
+            if allowOverwrite then
+                players[indexByKey[key]] = person
+            end
+            return
+        end
+        table.insert(players, person)
+        if key ~= '' then
+            indexByKey[key] = #players
+        end
+    end
+
+    Array.forEach(indicesPresent(tcArgs, 'p', MAX_PLAYER_INDEX), function(i)
+        add(LegacyTeamCard.mapPlayer(tcArgs, 'p' .. i, nil), false)
+    end)
+    Array.forEach(indicesPresent(tcArgs, 's', MAX_PLAYER_INDEX), function(i)
+        add(LegacyTeamCard.mapPlayer(tcArgs, 's' .. i, 's'), false)
+    end)
+    Array.forEach(indicesPresent(tcArgs, 'f', MAX_PLAYER_INDEX), function(i)
+        add(LegacyTeamCard.mapPlayer(tcArgs, 'f' .. i, 'f'), false)
+    end)
+
+    Array.forEach({'t2', 't3'}, function(tab)
+        local tabType = (tcArgs[tab .. 'type'] or TN_TYPE_DEFAULTS[tab]):lower()
+        local sourceGroup
+        if tabType == 'sub' then sourceGroup = 's'
+        elseif tabType == 'former' then sourceGroup = 'f'
+        else sourceGroup = nil end
+
+        Array.forEach(indicesPresent(tcArgs, tab .. 'p', MAX_PLAYER_INDEX), function(i)
+            local person = LegacyTeamCard.mapPlayer(tcArgs, tab .. 'p' .. i, sourceGroup)
+            if tabType == 'staff' then
+                person.type = 'staff'
+            end
+            add(person, true)
+        end)
+    end)
+
+    return players
+end
+
+---@param tcArgs table
+---@return table[]
+function LegacyTeamCard.mapCoaches(tcArgs)
+    local coaches = {}
+
+    Array.forEach(indicesPresent(tcArgs, 'c', MAX_COACH_INDEX), function(i)
+        table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'c' .. i, nil))
+    end)
+    Array.forEach(indicesPresent(tcArgs, 'sc', MAX_COACH_INDEX), function(i)
+        table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'sc' .. i, 'sc'))
+    end)
+    Array.forEach(indicesPresent(tcArgs, 'fc', MAX_COACH_INDEX), function(i)
+        table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'fc' .. i, 'fc'))
+    end)
+
+    Array.forEach({'t2', 't3'}, function(tab)
+        local tabType = (tcArgs[tab .. 'type'] or TN_TYPE_DEFAULTS[tab]):lower()
+        local sourceGroup
+        if tabType == 'sub' then sourceGroup = 'sc'
+        elseif tabType == 'former' then sourceGroup = 'fc'
+        else sourceGroup = nil end
+
+        Array.forEach(indicesPresent(tcArgs, tab .. 'c', MAX_COACH_INDEX), function(i)
+            table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, tab .. 'c' .. i, sourceGroup))
+        end)
+    end)
+
+    return coaches
+end
+
 return LegacyTeamCard

@@ -245,4 +245,71 @@ describe('TeamCard Legacy', function()
             assert.are_equal('us', c.flag)
         end)
     end)
+
+    describe('mapPlayers enumeration', function()
+        local LegacyTeamCard = require('Module:TeamCard/Legacy')
+
+        it('enumerates main players', function()
+            local players = LegacyTeamCard.mapPlayers({p1 = 'A', p2 = 'B', p3 = 'C'})
+            assert.are_equal(3, #players)
+            assert.are_equal('A', players[1][1])
+            assert.are_equal('B', players[2][1])
+        end)
+
+        it('appends sN players with status=sub', function()
+            local players = LegacyTeamCard.mapPlayers({p1 = 'A', s1 = 'B'})
+            assert.are_equal(2, #players)
+            assert.is_nil(players[1].status)
+            assert.are_equal('sub', players[2].status)
+        end)
+
+        it('appends fN players with status=former', function()
+            local players = LegacyTeamCard.mapPlayers({p1 = 'A', f1 = 'B'})
+            assert.are_equal('former', players[2].status)
+        end)
+
+        it('reads t2p* bucketed by t2type', function()
+            local players = LegacyTeamCard.mapPlayers({p1 = 'A', t2p1 = 'B', t2type = 'sub'})
+            assert.are_equal('sub', players[2].status)
+        end)
+
+        it('t2type=staff promotes t2p* to type=staff', function()
+            local players = LegacyTeamCard.mapPlayers({p1 = 'A', t2p1 = 'B', t2type = 'staff'})
+            assert.are_equal('staff', players[2].type)
+        end)
+
+        it('dedups t2p* against s* by pageName, t2p* wins', function()
+            local players = LegacyTeamCard.mapPlayers({
+                p1 = 'Faker',
+                s1 = 'Pawn', s1link = 'Pawn (Korean)',
+                t2p1 = 'Pawn (player)', t2p1link = 'Pawn (Korean)', t2type = 'sub',
+            })
+            local pawnCount = 0
+            for _, p in ipairs(players) do
+                if p.link == 'Pawn (Korean)' then pawnCount = pawnCount + 1 end
+            end
+            assert.are_equal(1, pawnCount)
+        end)
+    end)
+
+    describe('mapCoaches enumeration', function()
+        local LegacyTeamCard = require('Module:TeamCard/Legacy')
+
+        it('enumerates main coaches', function()
+            local coaches = LegacyTeamCard.mapCoaches({c1 = 'A', c2 = 'B'})
+            assert.are_equal(2, #coaches)
+            assert.are_equal('coach', coaches[1].role)
+            assert.are_equal('coach', coaches[2].role)
+        end)
+
+        it('appends scN as sub coaches', function()
+            local coaches = LegacyTeamCard.mapCoaches({c1 = 'A', sc1 = 'B'})
+            assert.are_equal('sub', coaches[2].status)
+        end)
+
+        it('reads t2c* with t2type', function()
+            local coaches = LegacyTeamCard.mapCoaches({c1 = 'A', t2c1 = 'B', t2type = 'former'})
+            assert.are_equal('former', coaches[2].status)
+        end)
+    end)
 end)
