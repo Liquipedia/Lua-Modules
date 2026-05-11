@@ -17,8 +17,8 @@
 
 ---@class HtmlProps
 ---@field classes? string[]
----@field css? table<string, string|number>
----@field attributes? table
+---@field css? table<string, string|number?>
+---@field attributes? table<string, string|number?>
 ---@field children? Renderable|Renderable[]
 
 ---@alias Context<T> {props:{parent: Context?, def: ContextDef<T>, value: T}}
