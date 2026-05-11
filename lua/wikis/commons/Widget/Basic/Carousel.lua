@@ -83,7 +83,7 @@ function Carousel.render(props)
 	local rightFade = Div{classes = {'carousel-fade', 'carousel-fade--right'}}
 
 	return Div{
-		classes = Array.extend({'carousel'}, props.classes),
+		classes = Array.extendWith({'carousel'}, props.classes),
 		children = {
 			leftButton,
 			rightButton,
