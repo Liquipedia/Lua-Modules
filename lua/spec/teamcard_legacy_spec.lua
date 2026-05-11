@@ -503,4 +503,34 @@ describe('TeamCard Legacy', function()
             stubParse3:revert()
         end)
     end)
+
+    describe('run — preprocessCard hook', function()
+        local Template = require('Module:Template')
+        local LegacyTeamCard = require('Module:TeamCard/Legacy')
+
+        it('applies preprocessCard to each card before mapping', function()
+            local TPParser = require('Module:TeamParticipants/Parse/Wiki')
+            local captured
+            local stubParse = stub(TPParser, 'parseWikiInput', function(args)
+                captured = args
+                return {participants = {}, expectedPlayerCount = 0}
+            end)
+
+            Template.stashReturnValue({__source = 'header'}, 'LegacyTeamCard')
+            Template.stashReturnValue({__source = 'card', sub1 = 'X'}, 'LegacyTeamCard')
+
+            LegacyTeamCard.run({
+                preprocessCard = function(card)
+                    if card.sub1 then card.p1 = card.sub1; card.p1sub = 'true'; card.sub1 = nil end
+                    return card
+                end,
+            })
+
+            -- The first opponent in captured should now have p1='X' as a sub-status player.
+            assert.are_equal('X', captured[1].players[1][1])
+            assert.are_equal('sub', captured[1].players[1].status)
+
+            stubParse:revert()
+        end)
+    end)
 end)
