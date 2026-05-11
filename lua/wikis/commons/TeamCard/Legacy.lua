@@ -106,6 +106,23 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
         status = 'former'
     elseif Logic.readBool(tcArgs[prefix .. 'sub']) then
         status = 'sub'
+    elseif sourceGroup == 's' then
+        status = 'sub'
+    elseif sourceGroup == 'f' then
+        status = 'former'
+    end
+
+    -- Default-DNP rules (only when no explicit played/result and no explicit dnp).
+    local explicitPlayResult = Logic.readBoolOrNil(tcArgs[prefix .. 'played']
+        or tcArgs[prefix .. 'result'])
+    if explicitPlayResult == nil and not Logic.readBool(tcArgs[prefix .. 'dnp']) then
+        if sourceGroup == 's' and Logic.readBool(tcArgs.subdnpdefault) then
+            played = false
+        elseif sourceGroup == 'f' and Logic.readBool(tcArgs.formerdnpdefault) then
+            played = false
+        elseif sourceGroup ~= nil and Logic.readBool(tcArgs.noVarDefault) then
+            played = false
+        end
     end
 
     return {
