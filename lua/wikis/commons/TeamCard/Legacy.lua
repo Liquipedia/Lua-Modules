@@ -147,6 +147,7 @@ function LegacyTeamCard.parseQualifier(rawQualifier)
 end
 
 -- Port of Module:TeamCard/Qualifier (and Module:TeamCard/Storage._parseQualifier).
+---@private
 ---@param rawQualifier string
 ---@return string?, string?, string? # (linkText, internalLink, externalLink)
 function LegacyTeamCard._parseQualifierLink(rawQualifier)
@@ -408,6 +409,7 @@ function LegacyTeamCard.mapCard(tcArgs)
     return card
 end
 
+---@private
 ---@param toggleEntries table[]
 ---@return {showPlayerInfo: boolean, extraPlayers: integer, notes: string[]}
 function LegacyTeamCard._foldToggles(toggleEntries)
