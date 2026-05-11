@@ -5,15 +5,15 @@ insulate('Widget/Legend', function()
 
 		GoldenTest('standings_legend', tostring(LegendComponent{
 		color = {
-			byeup = 'Lorem ipsum',
-			seedup = 'Lorem ipsum',
-			up = 'Lorem ipsum',
-			stayup = 'Lorem ipsum',
-			stay = 'Lorem ipsum',
-			staydown = 'Lorem ipsum',
-			down = 'Lorem ipsum',
+			byeup = 'Lorem ipsum byeup',
+			seedup = 'Lorem ipsum seedup',
+			up = 'Lorem ipsum up',
+			stayup = 'Lorem ipsum stayup',
+			stay = 'Lorem ipsum stay',
+			staydown = 'Lorem ipsum staydown',
+			down = 'Lorem ipsum down',
 		},
-		points = {'Lorem ipsum'},
+		points = {'Lorem ipsum points'},
 		showMinimum = true,
 		showNumberSection = true,
 	}))
