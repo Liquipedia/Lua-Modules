@@ -36,6 +36,9 @@ local data = {
 		['0000-01-01'] = 'sk telecom t1 orig',
 		['2019-11-11'] = 't1 2019',
 	},
+	['tbd'] = {
+		['0000-01-01'] = 'tbd',
+	},
 	['team liquid'] = {
 		['0000-01-01'] = 'team liquid orig',
 		['2017-01-17'] = 'team liquid 2017',
@@ -48,6 +51,18 @@ local data = {
 		['0000-01-01'] = 'heroic orig',
 		['2023-01-26'] = 'heroic 2023',
 		['2024-02-20'] = 'heroic 2024',
+	},
+	-- tbd subtemplate
+	['tbd'] = {
+		bracketname = "TBD",
+		image = "",
+		imagedark = "",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "TBD",
+		page = "TBD",
+		shortname = "TBD",
+		templatename = "tbd",
 	},
 	-- bds subtemplates
 	['bds esport old'] = {
