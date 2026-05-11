@@ -7,9 +7,7 @@ local function render(args)
 		return
 	end
 	for i in ipairs(rendered) do
-		if type(rendered[i]) == 'function' then
-			rendered[i] = tostring(rendered[i])
-		end
+		rendered[i] = tostring(rendered[i])
 	end
 	return mw.text.jsonEncode(rendered)
 end
