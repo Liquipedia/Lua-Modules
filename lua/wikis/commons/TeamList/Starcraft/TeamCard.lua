@@ -25,6 +25,8 @@ local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
+-- can't use the DateExt function
+-- due to the wiki vars not existing if using subst bot run
 local getContextualDateOrNow = function()
 	local date = Variables.varDefault('tournament_enddate')
 		or Variables.varDefault('tournament_startdate')
@@ -40,7 +42,7 @@ local getContextualDateOrNow = function()
 	})[1] or {}
 
 	return Logic.nilIfEmpty(data.enddate)
-		or Logic.nilIfEmpty(data.enddate)
+		or Logic.nilIfEmpty(data.startdate)
 		or os.date('%F')
 end
 

@@ -8,7 +8,6 @@
 todo:
 - sections marked with todo (especially mapping ...)
 - debug
-- double check if i missed some new args (i.e. compare to the md)
 
 ]]
 
@@ -56,7 +55,15 @@ function TeamListWrapper.TemplateTeamList(frame)
 	mw.logObject(newArgs) -- todo: remove once mapping works
 
 	if Logic.readBool(args.generate) then
-		TeamListWrapper.generate(newArgs) -- todo
+		TeamListWrapper.generate(newArgs)
+	end
+
+	if Array.any(newArgs, function(section)
+		return Array.any(section, function(opp)
+			return Logic.isNotEmpty(opp.notes)
+		end)
+	end) then
+		mw.ext.TeamLiquidIntegration.add_category('TeamList with notes')
 	end
 
 	if not newArgs[2] then
@@ -66,7 +73,7 @@ function TeamListWrapper.TemplateTeamList(frame)
 	local tabArgs = {}
 	Array.forEach(newArgs, function(tpArgs, index)
 		if not tpArgs.title then
-			-- todo: add tracking category
+			mw.ext.TeamLiquidIntegration.add_category('TeamList with missing section title')
 		end
 		tabArgs['name' .. index] = tpArgs.title
 		tabArgs['content' .. index] = TeamParticipantsController.fromTemplate(tpArgs)
@@ -104,7 +111,7 @@ end
 function TeamListWrapper.generateSingle(args)
 	local parts = {
 		'{{TeamParticipants',
-		TeamListWrapper.generateOuterConfig(args), --todo
+		TeamListWrapper.generateOuterConfig(args),
 	}
 
 	Array.forEach(args, function(oppArgs)
@@ -118,7 +125,21 @@ end
 ---@param table
 ---@return string?
 function TeamListWrapper.generateOuterConfig(args)
---todo
+	local params = {
+		'showplayerinfo',
+		'date',
+	}
+
+	local parts = Array.map(params, function(param)
+		local value = args[param]
+		if Logic.isEmpty(value) then return end
+		return '|' .. param .. '=' .. value
+	end)
+
+	local store = args.store == false and 'false' or '<includeonly>false</includeonly>' -- todo: double check if includeonly or onlyinclude ...
+	table.insert(parts, '|store=' .. store)
+
+	return table.concat(parts)
 end
 
 
@@ -126,15 +147,25 @@ end
 ---@return string
 function TeamListWrapper.generateOpponent(args)
 	local parts = {
-		'\n|{{Opponent|' .. args[1],
-		'\n\n|players={{Persons',
+		'\t|{{Opponent|' .. args.template,
+		'\t\t|import=false',
+		Logic.isNotEmpty(args.date) and ('\t\t|date=' .. args.date) or nil,
 	}
 
+	table.insert(parts, '\t\t|players={{Persons')
 	Array.forEach(args.players, function(playerArgs)
 		table.insert(parts, TeamListWrapper.generatePlayer(playerArgs))
 	end)
-
 	table.insert(parts, '\t\t}}')
+
+	if Logic.isNotEmpty(args.notes) then
+		table.insert(parts, '\t\t|notes={{Json')
+		Array.forEach(notes, function(note)
+			table.insert(parts, '\t\t\t|' .. note)
+		end)
+		table.insert(parts, '\t\t}}')
+	end
+
 	table.insert(parts, '\t}}')
 
 	return table.concat(parts, '\n')
@@ -144,10 +175,26 @@ end
 ---@return string
 function TeamListWrapper.generatePlayer(args)
 	local parts = {
-		'\t\t\t|{{Person|',
+		'\t\t\t|{{Person|' .. args.name,
 	}
 
-	-- todo (flag, role?, link?, faction, team?)
+	local add = function(param)
+		local value = args[param]
+		if Logic.isEmpty(value) then return end
+		table.insert(parts, '|' .. param .. '=' .. value)
+	end
+
+	local params = {
+		'link',
+		'flag',
+		'faction',
+		'team',
+		'role',
+		'played',
+		'results',
+		'status',
+	}
+	Array.forEach(params, add)
 
 	table.insert(parts, '}}')
 
