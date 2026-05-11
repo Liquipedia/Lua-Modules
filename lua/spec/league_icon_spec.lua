@@ -109,7 +109,7 @@ end)
 insulate('LeagueIcon.generate', function()
 	it('should generate code with valid arguments', function()
 		local args = {icon = 'Icon.png', link = 'link', name = 'name', series = 'series'}
-		GoldenTest('LeagueIcon.generate_copy_paste_gen', LeagueIcon.generate(args))
+		GoldenTest('LeagueIcon.generate_copy_paste_gen', tostring(LeagueIcon.generate(args)))
 	end)
 
 	it('should throw error when no link or series is provided', function()
