@@ -16,7 +16,7 @@ local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Div = Html.Div
 
----@class ButtonWidgetParameters: HtmlProps
+---@class ButtonWidgetParameters: HtmlNodeProps
 ---@field title string?
 ---@field link string?
 ---@field linktype 'internal'|'external'|nil

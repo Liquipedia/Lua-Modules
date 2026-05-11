@@ -16,7 +16,7 @@ local Button = Lua.import('Module:Widget/Basic/Button')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Span = Html.Span
 
----@class CollapsibleToggleProps: HtmlProps
+---@class CollapsibleToggleProps: HtmlNodeProps
 ---@field showButtonChildren? Renderable|Renderable[]
 ---@field hideButtonChildren? Renderable|Renderable[]
 

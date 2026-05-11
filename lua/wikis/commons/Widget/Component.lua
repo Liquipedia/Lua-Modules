@@ -15,7 +15,7 @@
 ---@field renderFn string|fun(props: P, context?: Context?): Renderable
 ---@field props P
 
----@class HtmlProps
+---@class HtmlNodeProps
 ---@field classes? string[]
 ---@field css? table<string, string|number?>
 ---@field attributes? table<string, string|number?>
@@ -24,12 +24,12 @@
 ---@alias Context<T> {props:{parent: Context?, def: ContextDef<T>, value: T}}
 
 ---@alias ContextNode<T> VNode<ContextParam<T>>
----@alias HtmlNode VNode<HtmlProps>
+---@alias HtmlNode VNode<HtmlNodeProps>
 ---@alias ErrorBoundaryNode VNode<ErrorParam>
 
 ---@alias Component<P> fun(props?: P, context: Context?): VNode<P>
 ---@alias ContextComponent<T> Component<ContextParam<T>>
----@alias HtmlComponent Component<HtmlProps>
+---@alias HtmlComponent Component<HtmlNodeProps>
 ---@alias ErrorBoundaryComponent Component<ErrorParam>
 
 local Lua = require('Module:Lua')

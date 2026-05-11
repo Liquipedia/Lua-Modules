@@ -15,7 +15,7 @@ local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
 local Table = Html.Table
 
----@class DataTableProps: HtmlProps
+---@class DataTableProps: HtmlNodeProps
 ---@field sortable boolean?
 ---@field tableCss? table<string, string|number?>
 ---@field tableAttributes? table<string, string|number?>

@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 
----@class GenericLabelProps: HtmlProps
+---@class GenericLabelProps: HtmlNodeProps
 ---@field labelScheme string?
 ---@field labelScale number?
 ---@field labelType string?

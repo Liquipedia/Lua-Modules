@@ -15,7 +15,7 @@ local Html = Lua.import('Module:Widget/Html')
 local B = Html.B
 local Div = Html.Div
 
----@class DefaultCollapsibleProps: HtmlProps
+---@class DefaultCollapsibleProps: HtmlNodeProps
 ---@field shouldCollapse boolean?
 ---@field title Renderable|Renderable[]?
 ---@field titleClasses string[]?
