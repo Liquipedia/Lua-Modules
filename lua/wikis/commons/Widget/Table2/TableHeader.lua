@@ -32,8 +32,8 @@ local function Table2Header(props, context)
 		children = Array.map(children, function(child)
 			---@diagnostic disable-next-line: undefined-field
 			if type(child) == 'table' and child.renderFn == Table2Row.renderFn then
-				firstRow = false
 				local kind = firstRow and 'title' or 'columns'
+				firstRow = false
 				child = Context.Provider{def = Table2Contexts.HeaderRowKind, value = kind, children = {child}}
 			end
 			return child
