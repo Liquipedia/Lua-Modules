@@ -19,7 +19,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local FILLER = '<span class="league-icon-small-image">[[File:Logo filler event.png|link=]]</span>'
-local NO_ICON_BUT_ICONDARK_TRACKING_CATEGORY = '[[Category:Pages with only icondark]]'
+local NO_ICON_BUT_ICONDARK_TRACKING_CATEGORY = 'Pages with only icondark'
 
 ---@class LeagueIconDisplayArgs
 ---@field icon string?
@@ -81,7 +81,10 @@ function LeagueIcon.display(args)
 	else
 		link = args.link or args.series or args.abbreviation or args.name or ''
 	end
-	return LeagueIcon._make(icon, iconDark, link, args.name, size) .. trackingCategory
+	if String.isNotEmpty(trackingCategory) then
+		mw.ext.TeamLiquidIntegration.add_category(trackingCategory)
+	end
+	return LeagueIcon._make(icon, iconDark, link, args.name, size)
 end
 
 ---@private
