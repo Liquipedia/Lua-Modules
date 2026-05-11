@@ -45,12 +45,14 @@ describe('Infobox/ShopMerch', function()
 	it('uses default shop url when shoplink=true', function()
 		local output = render{shoplink = 'true'}
 		assert.is_not_nil(output)
+		---@cast output -nil
 		assert.is_truthy(output:find('https://links.liquipedia.net/tlstore', 1, true))
 	end)
 
 	it('strips leading slashes from slugs', function()
 		local output = render{shoplink = '/test'}
 		assert.is_not_nil(output)
+		---@cast output -nil
 		assert.is_truthy(output:find('https://links.liquipedia.net/test', 1, true))
 
 		local output2 = render{shoplink = '///test'}
@@ -69,6 +71,7 @@ describe('Infobox/ShopMerch', function()
 		-- 'ö' is 2 bytes in Lua, but %C3%B6 is 6 chars in URL
 		local output = render{shoplink = 'töst'}
 		assert.is_not_nil(output)
+		---@cast output -nil
 		assert.is_truthy(output:find('https://links.liquipedia.net/t%C3%B6st', 1, true))
 	end)
 
