@@ -744,6 +744,7 @@ ul.nav-tabs li.game-wiiu,
 	--position-stay-color: #966f00;
 	--position-staydown-color: #c85000;
 	--position-down-color: #d02626;
+	--position-disqualified-color: var( --clr-secondary-44 );
 }
 
 .theme--light {
@@ -754,6 +755,7 @@ ul.nav-tabs li.game-wiiu,
 	--position-stay-background-color: #fff7df;
 	--position-staydown-background-color: #ffe7d9;
 	--position-down-background-color: #ffe9e9;
+	--position-disqualified-background-color: var( --clr-on-surface-light-primary-8 );
 }
 
 .theme--dark {
@@ -764,6 +766,7 @@ ul.nav-tabs li.game-wiiu,
 	--position-stay-background-color: #413106;
 	--position-staydown-background-color: #441e05;
 	--position-down-background-color: #3f1212;
+	--position-disqualified-background-color: var( --clr-on-surface-dark-primary-8 );
 }
 
 .bg-u,
