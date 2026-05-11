@@ -533,4 +533,46 @@ describe('TeamCard Legacy', function()
             stubParse:revert()
         end)
     end)
+
+    describe('integration', function()
+        it('renders a representative legacy block via Module:Template stash', function()
+            local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
+            TeamTemplateMock.setUp()
+            local LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function() return {} end)
+            local LpdbPlacementStore = stub(mw.ext.LiquipediaDB, 'lpdb_placement', function() end)
+
+            local Template = require('Module:Template')
+            local LegacyTeamCard = require('Module:TeamCard/Legacy')
+
+            Template.stashReturnValue({__source = 'toggle', playerinfo = 'true', p_extra = '1'}, 'LegacyTeamCard')
+            Template.stashReturnValue({__source = 'header', cols = '4'}, 'LegacyTeamCard')
+            Template.stashReturnValue({
+                __source = 'card',
+                team = 'Team Liquid',
+                defaultRowNumber = '5',
+                subdnpdefault = 'true',
+                p1 = 'alexis',
+                p2 = 'dodonut',
+                p3 = 'meL',
+                p4 = 'Noia',
+                p5 = 'sarah',
+                s1 = 'sub-player', s1result = 'true',
+                c1 = 'Coach Name',
+                qualifier = 'Invited',
+            }, 'LegacyTeamCard')
+            Template.stashReturnValue({
+                __source = 'card',
+                team = 'mouz',
+                defaultRowNumber = '5',
+                qualifier = '[[Qualifier/2025|Qualifier]]',
+            }, 'LegacyTeamCard')
+
+            GoldenTest('teamcard_legacy', tostring(LegacyTeamCard.run()),
+                [[<style>.collapsed > .should-collapse { display: block !important; }</style>]])
+
+            LpdbQuery:revert()
+            LpdbPlacementStore:revert()
+            TeamTemplateMock.tearDown()
+        end)
+    end)
 end)
