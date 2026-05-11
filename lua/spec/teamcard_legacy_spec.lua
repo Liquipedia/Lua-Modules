@@ -60,4 +60,53 @@ describe('TeamCard Legacy', function()
             stubTournament:revert()
         end)
     end)
+
+    describe('mapPlayer basic mapping', function()
+        local LegacyTeamCard = require('Module:TeamCard/Legacy')
+
+        it('reads display from positional', function()
+            local p = LegacyTeamCard.mapPlayer({p1 = 'Faker'}, 'p1', nil)
+            assert.are_equal('Faker', p[1])
+        end)
+
+        it('reads link', function()
+            local p = LegacyTeamCard.mapPlayer({p1 = 'Faker', p1link = 'Lee Sang-hyeok'}, 'p1', nil)
+            assert.are_equal('Lee Sang-hyeok', p.link)
+        end)
+
+        it('reads flag', function()
+            local p = LegacyTeamCard.mapPlayer({p1 = 'Faker', p1flag = 'kr'}, 'p1', nil)
+            assert.are_equal('kr', p.flag)
+        end)
+
+        it('prefers flag_o over flag', function()
+            local p = LegacyTeamCard.mapPlayer({p1 = 'Faker', p1flag = 'kr', p1flag_o = 'us'}, 'p1', nil)
+            assert.are_equal('us', p.flag)
+        end)
+
+        it('reads team override', function()
+            local p = LegacyTeamCard.mapPlayer({p1 = 'X', p1team = 'oldTeam'}, 'p1', nil)
+            assert.are_equal('oldTeam', p.team)
+        end)
+
+        it('reads id', function()
+            local p = LegacyTeamCard.mapPlayer({p1 = 'X', p1id = 'faker-id'}, 'p1', nil)
+            assert.are_equal('faker-id', p.id)
+        end)
+
+        it('reads faction', function()
+            local p = LegacyTeamCard.mapPlayer({p1 = 'X', p1faction = 'p'}, 'p1', nil)
+            assert.are_equal('p', p.faction)
+        end)
+
+        it('reads race as faction fallback', function()
+            local p = LegacyTeamCard.mapPlayer({p1 = 'X', p1race = 'z'}, 'p1', nil)
+            assert.are_equal('z', p.faction)
+        end)
+
+        it('reads pos as role', function()
+            local p = LegacyTeamCard.mapPlayer({p1 = 'X', p1pos = 'top'}, 'p1', nil)
+            assert.are_equal('top', p.role)
+        end)
+    end)
 end)

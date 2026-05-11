@@ -83,4 +83,21 @@ function LegacyTeamCard._parseQualifierLink(rawQualifier)
     end
 end
 
+---@param tcArgs table
+---@param prefix string
+---@param sourceGroup nil|'s'|'f'  -- nil for main p*, 's' for substitute source, 'f' for former
+---@return table
+function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
+    local person = {
+        [1] = tcArgs[prefix],
+        link = tcArgs[prefix .. 'link'],
+        flag = tcArgs[prefix .. 'flag_o'] or tcArgs[prefix .. 'flag'],
+        team = tcArgs[prefix .. 'team'],
+        id = tcArgs[prefix .. 'id'],
+        faction = tcArgs[prefix .. 'faction'] or tcArgs[prefix .. 'race'],
+        role = tcArgs[prefix .. 'pos'],
+    }
+    return person
+end
+
 return LegacyTeamCard
