@@ -20,7 +20,7 @@ local Div = Html.Div
 ---@field title string?
 ---@field link string?
 ---@field linktype 'internal'|'external'|nil
----@field variant 'primary'|'secondary'|'themed'|'ghost'|'destructive'|nil
+---@field variant 'primary'|'secondary'|'themed'|'ghost'|'destructive'|'icon'|nil
 ---@field size 'xs'|'sm'|'md'|'lg'|nil
 ---@field grow boolean?
 ---@field aligncontent 'left'|'right'|nil
