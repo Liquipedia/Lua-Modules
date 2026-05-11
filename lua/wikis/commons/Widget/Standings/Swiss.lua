@@ -48,7 +48,8 @@ function StandingsSwissWidget:render()
 			TableWidgets.TableBody{children = Array.map(lastRound.opponents, function(slot)
 				return self:_createRow(slot)
 			end)}
-		)
+		),
+		striped = false
 	}
 end
 
