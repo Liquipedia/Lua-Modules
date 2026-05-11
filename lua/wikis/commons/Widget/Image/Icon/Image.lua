@@ -15,9 +15,9 @@ local Component = Lua.import('Module:Widget/Component')
 ---@class IconImageWidgetParameters
 ---@field imageLight string?
 ---@field imageDark string?
----@field link string
+---@field link string?
 ---@field alt string?
----@field classes string[]
+---@field classes string[]?
 ---@field border 'border'? # only available if `format: 'frameless'?`
 ---@field format 'frameless'|'frame'|'thumb'?
 ---@field size string? # '{width}px'|'x{height}px'|'{width}x{height}px'
