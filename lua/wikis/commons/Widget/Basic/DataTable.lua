@@ -7,39 +7,37 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
-local Table = HtmlWidgets.Table
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
+local Table = Html.Table
 
----@class WidgetDataTable: Widget
-local DataTable = Class.new(Widget)
-DataTable.defaultProps = {
-	classes = {},
-	wrapperClasses = {},
-	sortable = false,
-}
+---@class DataTableProps: HtmlProps
+---@field sortable boolean?
+---@field tableCss? table<string, string|number?>
+---@field tableAttributes? table<string, string|number?>
+---@field wrapperClasses? string[]
 
----@return Widget
-function DataTable:render()
-	local isSortable = Logic.readBool(self.props.sortable)
+---@param props DataTableProps
+---@return HtmlNode
+local function DataTable(props)
+	local isSortable = Logic.readBool(props.sortable)
 	return Div{
 		children = {
 			Table{
-				children = self.props.children,
-				classes = WidgetUtil.collect('wikitable', isSortable and 'sortable' or nil, self.props.classes),
-				css = self.props.tableCss,
-				attributes = self.props.tableAttributes,
+				children = props.children,
+				classes = WidgetUtil.collect('wikitable', isSortable and 'sortable' or nil, props.classes),
+				css = props.tableCss,
+				attributes = props.tableAttributes,
 			},
 		},
-		classes = WidgetUtil.collect('table-responsive', self.props.wrapperClasses),
-		attributes = self.props.attributes,
-		css = self.props.css,
+		classes = WidgetUtil.collect('table-responsive', props.wrapperClasses),
+		attributes = props.attributes,
+		css = props.css,
 	}
 end
 
-return DataTable
+return Component.component(DataTable)
