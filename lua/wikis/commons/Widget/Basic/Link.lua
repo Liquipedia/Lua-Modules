@@ -7,6 +7,8 @@
 
 local Lua = require('Module:Lua')
 
+local Logic = Lua.import('Module:Logic')
+
 local Component = Lua.import('Module:Widget/Component')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -22,7 +24,7 @@ local defaultProps = {
 ---@param props LinkComponentProps
 ---@return Renderable[]?
 local function Link(props)
-	if not props.link then
+	if Logic.isEmpty(props.link) then
 		return
 	end
 	if props.linktype == 'external' then
@@ -39,7 +41,7 @@ local function Link(props)
 		'[[',
 		props.link,
 		'|',
-		props.children or props.link,
+		Logic.emptyOr(props.children, props.link),
 		']]'
 	)
 end
