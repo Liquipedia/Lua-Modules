@@ -51,6 +51,10 @@
 			--placement-row-color: var( --position-down-color );
 		}
 
+		&[ data-position-status="dq" ] {
+			--placement-row-color: var( --position-disqualified-color );
+		}
+
 		&:has( > :first-child > .label--placement[ data-placement-type ] ) {
 			> :nth-child( -n + 2 ),
 			&:has( > :nth-child( 2 ) > .standings-position-indicator ) > :nth-child( 3 ) {
@@ -96,6 +100,10 @@
 
 		&:has( > :first-child > .label--placement[ data-placement-type="down" ] ) {
 			--placement-confirmed-color: var( --position-down-background-color );
+		}
+
+		&:has( > :first-child > .label--placement[ data-placement-type="dq" ] ) {
+			--placement-confirmed-color: var( --position-disqualified-background-color );
 		}
 	}
 }

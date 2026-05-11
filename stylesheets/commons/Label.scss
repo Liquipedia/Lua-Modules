@@ -162,6 +162,10 @@
 		&[ data-placement-type="down" ] {
 			--placement-solid-color: var( --position-down-color );
 		}
+
+		&[ data-placement-type="dq" ] {
+			--placement-solid-color: var( --position-disqualified-color );
+		}
 	}
 
 	&.label--standings-result {
