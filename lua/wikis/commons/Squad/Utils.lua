@@ -126,7 +126,7 @@ function SquadUtils.readWrapperArgs(args)
 		squadStatus = SquadUtils.SquadStatus.FORMER_INACTIVE
 	end
 
-	return SquadUtils.createWrapperData(players, squadType, squadStatus, args.title)
+	return SquadUtils.createWrapperData(players, squadType, squadStatus, args.title, args)
 end
 
 ---@param player table
@@ -195,6 +195,8 @@ function SquadUtils.readSquadPersonArgs(args)
 			loanedtorole = args.teamrole,
 			newteamdate = String.nilIfEmpty(ReferenceCleaner.clean{input = args.newteamdate}),
 			faction = Faction.read(args.faction or args.race),
+			activeteam = args.activeteam,
+			activeteamrole = args.activeteamrole,
 		},
 	}
 
@@ -240,7 +242,7 @@ function SquadUtils.analyzeColumnVisibility(players, squadStatus)
 		end),
 		role = Array.any(players, function(p)
 			local role = p.role or p.position
-			return String.isNotEmpty(role) and role ~= 'Captain'
+			return String.isNotEmpty(role) and role ~= 'Captain' and role ~= 'Sub'
 		end),
 		joindate = Array.any(players, function(p)
 			return String.isNotEmpty(p.joindate)
