@@ -48,8 +48,10 @@ function TeamListWrapper.TemplateTeamList(frame)
 
 	local newArgs = teamList:map()
 	-- throw the class away to not clog up memory
+	-- luacheck: ignore
 	---@diagnostic disable-next-line: cast-local-type
 	teamList = nil
+	-- luacheck: pop
 
 	if Logic.readBool(args.generate) then
 		TeamListWrapper.generate(newArgs)
