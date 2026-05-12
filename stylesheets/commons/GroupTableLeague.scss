@@ -243,10 +243,13 @@ Template(s): Group tables and colors
 Author(s): spazer
 *******************************************************************************/
 
+.background-color-win,
 .bg-u,
 .bg-up,
 .bg-proceed,
-.bg-win {
+.bg-win,
+.bg-win-important,
+.swisstable .swisstable-bgc-win {
 	background-color: var( --clr-forest-background-color, #ddf4dd ) !important;
 }
 
@@ -269,10 +272,22 @@ Author(s): spazer
 	background-color: var( --clr-california-background-color, #f9dec7 ) !important;
 }
 
+.background-color-lose,
 .bg-d,
 .bg-down,
-.bg-drop {
+.bg-lose,
+.bg-drop,
+.swisstable .swisstable-bgc-lose {
 	background-color: var( --clr-cinnabar-background-color, #fbdfdf ) !important;
+}
+
+.bg-draw,
+.swisstable .swisstable-bgc-draw {
+	background-color: var( --clr-pear-background-color, #f9f9c7 );
+}
+
+.bg-draw-important {
+	background-color: var( --clr-pear-background-color, #f9f9c7 ) !important;
 }
 
 .bg-neutral {
@@ -289,6 +304,8 @@ Author(s): spazer
 
 .bg-dq,
 .bg-disqualified,
+.background-color-disqualified,
+.swisstable .swisstable-bgc-overturned,
 .bg-lightblue {
 	background-color: var( --clr-sapphire-background-color, #dee3ef ) !important;
 }
