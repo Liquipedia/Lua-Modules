@@ -7,7 +7,6 @@
 
 todo:
 - sections marked with todo (especially mapping ...)
-- Add a check that adds a cleanup category if it finds `'<%s*br%s*/?>'` in any of the inputs
 - debug
 
 ]]
@@ -46,6 +45,13 @@ local TeamList = Class.new(
 ---@return Renderable?
 function TeamListWrapper.TemplateTeamList(frame)
 	local args = Arguments.getArgs(frame)
+
+	for _, item in pairs(args) do
+		if item:find('<%s*br%s*/?>') then
+			mw.ext.TeamLiquidIntegration.add_category('TeamList with br')
+		end
+	end
+
 	local teamList = TeamList(args):read()
 
 	mw.logObject(teamList) -- todo: remove once mapping works

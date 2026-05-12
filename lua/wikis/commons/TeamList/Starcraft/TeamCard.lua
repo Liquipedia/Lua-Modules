@@ -43,7 +43,7 @@ local getContextualDateOrNow = function()
 
 	return Logic.nilIfEmpty(data.enddate)
 		or Logic.nilIfEmpty(data.startdate)
-		or os.date('%F')
+		or os.date('%F') --[[@as string]]
 end
 
 ---@class StarcraftTeamCard
@@ -75,7 +75,7 @@ function TeamCard:readOpponent()
 	local args = self.args
 	local date = args.date or getContextualDateOrNow()
 	local team = (args.team or 'tbd'):lower():gsub('_', ' ')
-	local opponent = Opponent.resolve(Opponent.readOpponentArgs{team, type = Opponent.team}, date)
+	local opponent = Opponent.resolve(Opponent.readOpponentArgs{team, type = Opponent.team}, date) --[[@as StarcraftTeamCardOpponent]]
 
 	opponent.dq = Logic.readBool(args.dq)
 	opponent.date = date
@@ -221,9 +221,9 @@ function TeamCard:sync(parentMatchGroupSpec)
 		players = Array.map(players, function(player)
 			player = Table.merge(player, PlayerExtCustom.syncPlayer(player, {date = date}))
 			player.pageName = player.pageName:gsub(' ', '_')
-			player.mainTeam = config.isAdhoc and PlayerExt.syncTeam(player.pageName, player.mainTeam) or player.mainTeam
+			player.mainTeam = config.isAdhoc and PlayerExt.syncTeam(player.pageName, player.mainTeam, {}) or player.mainTeam
 			player.mainTeamPage = player.mainTeamPage or
-				player.mainTeam and TeamTemplate.getPageName(TeamTemplate.resolve(player.mainTeam, date)) or
+				player.mainTeam and TeamTemplate.getPageName(TeamTemplate.resolve(player.mainTeam, date) --[[@as string]]) or
 				nil
 
 			return player
@@ -250,10 +250,8 @@ end
 function TeamCard:dnp(players, matchGroupSpec)
 	local dnpData = TeamCard.fetchDnp(matchGroupSpec)
 
-	Array.map(players, function(player)
+	Array.forEach(players, function(player)
 		player.dnp = player.dnp or (dnpData[self.name] and not dnpData[self.name][player.pageName])
-
-		return player
 	end)
 
 	return players
