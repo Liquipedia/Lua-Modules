@@ -1,7 +1,5 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('TeamCard Legacy', function()
-    local LegacyTeamCard = require('Module:TeamCard/Legacy')
-
     describe('parseQualifier', function()
         local LegacyTeamCard = require('Module:TeamCard/Legacy')
 
