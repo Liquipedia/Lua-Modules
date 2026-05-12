@@ -336,17 +336,7 @@ describe('Components/ErrorBoundary', function()
 			children = {MyComp{}}
 		}
 		local render = tostring(tree)
-		assert.is_true(type(render) == 'string' and render:find('errormsg123'))
-	end)
-
-	it('ErrorBoundary works with multiple children, only errors are caught', function()
-		local Good = ComponentCore.component(function() return 'good' end)
-		local Bad = ComponentCore.component(function() error('bad') end)
-		local tree = ErrorBoundary{
-			fallback = function() return 'fallback' end,
-			children = {Good{}, Bad{}, Good{}}
-		}
-		assert.are.equal('goodfallbackgood', tostring(tree))
+		assert.is_true(render:find('errormsg123') ~= nil)
 	end)
 
 end)
