@@ -117,7 +117,8 @@ describe('TeamCard Legacy', function()
         end)
 
         it('passes joindate/leavedate through', function()
-            local p = LegacyTeamCard.mapPlayer({p1 = 'X', p1joindate = '2025-01-01', p1leavedate = '2025-12-01'}, 'p1', nil)
+            local p = LegacyTeamCard.mapPlayer(
+                {p1 = 'X', p1joindate = '2025-01-01', p1leavedate = '2025-12-01'}, 'p1', nil)
             assert.are_equal('2025-01-01', p.joindate)
             assert.are_equal('2025-12-01', p.leavedate)
         end)
@@ -456,7 +457,8 @@ describe('TeamCard Legacy', function()
 
             Template.stashReturnValue({__source = 'header'}, 'LegacyTeamCard')
             Template.stashReturnValue({__source = 'toggle', p_extra = '2'}, 'LegacyTeamCard')
-            Template.stashReturnValue({__source = 'card', team = 'A', defaultRowNumber = '5', extraRows = '1'}, 'LegacyTeamCard')
+            Template.stashReturnValue(
+                {__source = 'card', team = 'A', defaultRowNumber = '5', extraRows = '1'}, 'LegacyTeamCard')
 
             LegacyTeamCard.run()
             assert.are_equal('8', tostring(captured.minimumplayers))
