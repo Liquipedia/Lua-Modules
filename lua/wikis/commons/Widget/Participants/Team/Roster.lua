@@ -53,7 +53,7 @@ end
 -- * Right-role:
 --   * If the person has a specific status (did not play/former), display it first
 --   * If there's a non-ingame role assigned, display it after the status
---   * Displays the remianing ingame roles (which are not displayed on the left) also.
+--   * Displays the remaining ingame roles (which are not displayed on the left) also.
 --   * Returns an array of labels to display (can be multiple)
 -- * Left-role:
 --   * If the first role has an icon, we use that to render the left-role
