@@ -241,8 +241,8 @@ function SquadUtils.analyzeColumnVisibility(players, squadStatus)
 			return String.isNotEmpty(p.name)
 		end),
 		role = Array.any(players, function(p)
-			local role = p.role or p.position
-			return String.isNotEmpty(role) and role ~= 'Captain' and role ~= 'Sub'
+			local role = String.nilIfEmpty(p.role) or String.nilIfEmpty(p.position)
+			return role ~= nil and role ~= 'Captain' and role ~= 'Sub'
 		end),
 		joindate = Array.any(players, function(p)
 			return String.isNotEmpty(p.joindate)
