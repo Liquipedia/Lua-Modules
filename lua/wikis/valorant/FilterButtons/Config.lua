@@ -29,6 +29,7 @@ local REGION_TO_SUPERREGION = {
 	['Latin America North'] = 'Americas',
 	['Latin America South'] = 'Americas',
 	['Brazil'] = 'Americas',
+	['Asia-Pacific'] = 'Pacific',
 	['Taiwan'] = 'Pacific',
 	['Hong Kong'] = 'Pacific',
 	['Thailand'] = 'Pacific',
