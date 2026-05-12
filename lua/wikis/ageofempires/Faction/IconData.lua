@@ -405,11 +405,11 @@ local byFactionAoM = {
 	demeter = {
 		icon = 'File:Demeter AoM R icon.png',
 	},
-	fuxi = {
-		icon = 'File:Fuxi AoM R icon.png',
-	},
 	freyr = {
 		icon = 'File:Freyr AoM R icon.png',
+	},
+	fuxi = {
+		icon = 'File:Fuxi AoM R icon.png',
 	},
 	gaia = {
 		icon = 'File:Gaia AoM R icon.png',
