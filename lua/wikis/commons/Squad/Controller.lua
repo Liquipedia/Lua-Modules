@@ -16,9 +16,11 @@ local SquadUtils = Lua.import('Module:Squad/Utils')
 local Table = Lua.import('Module:Table')
 
 local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
+local ErrorBoundary = Lua.import('Module:Widget/ErrorBoundary')
 local SquadDisplay = Lua.import('Module:Widget/Squad/Container')
 local SquadHeader = Lua.import('Module:Widget/Squad/Header')
 local SquadPlayerDisplay = Lua.import('Module:Widget/Squad/Player')
+local Table2 = Lua.import('Module:Widget/Table2/All')
 
 local SquadController = {}
 
@@ -51,7 +53,14 @@ function SquadController.execute(squadData, adjustLpdb)
 				type = squadData.squadType,
 				header = SquadHeader{status = squadData.squadStatus},
 				children = Array.map(squadPlayers, function(squadPlayer)
-					return SquadPlayerDisplay{squadPlayer = squadPlayer}
+					return ErrorBoundary{
+						children = SquadPlayerDisplay{squadPlayer = squadPlayer},
+						fallback = function()
+							return Table2.Row{
+								Table2.Cell{colspan = 100, children = 'Error loading player ' .. (squadPlayer.id or '')},
+							}
+						end,
+					}
 				end)
 			}
 		}
