@@ -10,7 +10,7 @@
 ---@alias ContextDef<T> {defaultValue: T}
 ---@alias ContextParam<T> {def: ContextDef<T>, value: T, children?: Renderable|Renderable[]}
 ---@alias HtmlParam {classes?: string[], css?: table, attributes?: table, children?: Renderable|Renderable[]}
----@alias ErrorParam {fallback: fun(error: Error, context: Context?): Renderable, children: Renderable|Renderable[]}
+---@alias ErrorParam {children?: Renderable|Renderable[], fallback: fun(error: Error, context: Context?): Renderable}
 
 ---@class VNode<P>
 ---@field renderFn string|fun(props: P, context?: Context?): Renderable
