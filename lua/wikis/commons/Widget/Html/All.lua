@@ -14,6 +14,7 @@ local Class = Lua.import('Module:Class')
 local String = Lua.import('Module:StringUtils')
 
 local Widget = Lua.import('Module:Widget')
+local WidgetContext = Lua.import('Module:Widget/Context')
 
 ---@param tag? string
 ---@param specialMapping? fun(self: WidgetHtml)
@@ -41,9 +42,15 @@ local function createHtmlTag(tag, specialMapping)
 		htmlNode:attr(self.props.attributes)
 
 		Array.forEach(self.props.children, function(child)
-			if Class.instanceOf(child, Widget) then
+			-- This is largely duplicated code from Widget.lua
+			-- In the future we should investigate how to refactor this
+			if Class.instanceOf(child, WidgetContext) then
+				---@cast child WidgetContext
+				child.contextStack = self:_pushToContextList(self.contextStack, child)
+				htmlNode:node(child:tryMake())
+			elseif Class.instanceOf(child, Widget) then
 				---@cast child Widget
-				child.context = self:_nextContext()
+				child.contextStack = self.contextStack
 				htmlNode:node(child:tryMake())
 			else
 				---@cast child -Widget
