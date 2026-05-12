@@ -233,6 +233,7 @@ function TeamList.mapEntry(entry)
 	local opp = entry.opponent
 	local notes = {opp.note}
 	local args = {
+		import = 'false', --- disallow this shit as it just fucks up things ...
 		players = Array.map(opp.players, function(player)
 			table.insert(notes, player.note)
 			return TeamList.mapPlayer(player)
