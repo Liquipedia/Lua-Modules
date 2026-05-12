@@ -330,9 +330,6 @@ describe('Components/ErrorBoundary', function()
 			error('errormsg123')
 		end)
 		local tree = ErrorBoundary{
-			fallback = function()
-				return Html.Span{children = {'fallback'}}
-			end,
 			children = {MyComp{}}
 		}
 		local render = tostring(tree)
