@@ -316,9 +316,6 @@ local byFactionAoE3 = {
 	unitedstates = {
 		icon = 'File:United States AoE3 icon.png',
 	},
-	random = {
-		icon = 'File:Random AoE3 icon.png',
-	},
 
 	unknown = {
 		icon = 'File:Char head filler.png',
