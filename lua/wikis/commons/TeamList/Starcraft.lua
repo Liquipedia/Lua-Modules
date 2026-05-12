@@ -278,9 +278,7 @@ function TeamList.mapPlayer(player)
 	if player.dnp then
 		args.played = 'false'
 	end
-	local role = player.captain and 'Captain'
-		or player['2v2'] and '2v2'
-		or nil
+	local role = player.captain and 'Captain' or nil
 
 	if player.dq then
 		args.status = 'former'
