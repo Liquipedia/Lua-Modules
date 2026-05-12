@@ -46,15 +46,12 @@ local function escapeAttr(str)
 	if type(str) ~= 'string' then
 		str = tostring(str)
 	end
-	for char, escape in pairs(htmlencodeMap) do
-		str = str:gsub(char, escape)
-	end
-	return str
+	return (str:gsub('[><&"]', htmlencodeMap))
 end
 
 --- Builds an HTML string from the given tag, props, and children
 ---@param tag string
----@param props {classes?: string[], css: table<string, string>, attributes: table<string, string|boolean>}
+---@param props {classes?: string[], css?: table<string, string>, attributes?: table<string, string|boolean>}
 ---@param renderedChildren string?
 ---@return string
 local function buildHtmlString(tag, props, renderedChildren)
