@@ -235,7 +235,7 @@ function SquadUtils.analyzeColumnVisibility(players, squadStatus)
 
 	return {
 		teamIcon = Array.any(players, function(p)
-			return p.team and TeamTemplate.exists(p.team)
+			return p.extradata.loanedto
 		end),
 		name = Array.any(players, function(p)
 			return String.isNotEmpty(p.name)
@@ -259,7 +259,7 @@ function SquadUtils.analyzeColumnVisibility(players, squadStatus)
 		newteam = isFormer and Array.any(players, function(p)
 			return String.isNotEmpty(p.newteam)
 				or String.isNotEmpty(p.newteamrole)
-				or String.isNotEmpty(p.newteamspecial)
+				or String.isNotEmpty(p.extradata.newteamspecial)
 		end),
 	}
 end
