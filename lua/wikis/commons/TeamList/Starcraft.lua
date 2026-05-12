@@ -219,8 +219,77 @@ function TeamList:read()
 end
 
 ---@return table[]
-function TeamList.map()
--- todo
+function TeamList:map()
+	return Array.map(self.sections, function(section)
+		local config = section.config
+
+		local args = {
+			title = section.title or config.title,
+			showplayerinfo =  config.playerInfoButton,
+			date = config.resolveDate,
+			store = not config.noStorage,
+		}
+
+		if args.title and config.showCountBySection then
+			args.title = args.title .. ' (' .. (config.count or #section.entries) .. ')'
+		end
+
+		if config.sortTeams then
+			Array.sortInPlaceBy(section.entries, function(entry) return entry.name:lower() end)
+		end
+
+		Table.mergeInto(args, Array.map(section.entries, TeamList.mapEntry))
+	end)
+end
+
+---@param entry StarcraftTeamCard
+---@return table
+function TeamList.mapEntry(entry)
+	local opp = entry.opponent
+	local notes = {opp.note}
+	local args = {
+		players = Array.map(opp.players, function(player)
+			table.insert(notes, player.note)
+			return TeamList.mapPlayer(player)
+		end),
+		template = opp.template,
+		date = opp.date,
+	}
+	args.notes = notes
+
+	if opp.dq then
+		mw.ext.TeamLiquidIntegration.add_category('TeamList with dq opponent')
+	end
+
+	return args
+end
+
+---@param player StarcraftTeamCardPlayer
+---@return table
+function TeamList.mapPlayer(player)
+	local args = {
+		name = player.displayName or player.pageName,
+		link = player.pageName,
+		flag = player.flag,
+		faction = player.faction,
+		team = player.mainTeamPage,
+	}
+
+	if player.dnp then
+		args.played = 'false'
+	end
+	local role = player.captain and 'Captain'
+		or player['2v2'] and '2v2'
+		or nil
+
+	if player.dq then
+		args.status = 'former'
+		args.result = 'false'
+	elseif player.withdraw then
+		args.status = 'former'
+	end
+
+	return args
 end
 
 ---@class StarcraftTeamListConfig: StarcraftTeamCardConfig
