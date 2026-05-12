@@ -175,7 +175,7 @@ function TeamListWrapper.generatePlayer(args)
 	local add = function(param)
 		local value = args[param]
 		if Logic.isEmpty(value) then return end
-		table.insert(parts, '|' .. param .. '=' .. value)
+		table.insert(parts, '|' .. param .. '=' .. tostring(value))
 	end
 
 	local params = {
@@ -210,7 +210,7 @@ function TeamList:map()
 
 		local args = {
 			title = section.title or config.title,
-			showplayerinfo =  config.playerInfoButton,
+			showplayerinfo =  config.playerInfoButton and 'true' or nil,
 			date = config.resolveDate,
 			store = not config.noStorage,
 		}
