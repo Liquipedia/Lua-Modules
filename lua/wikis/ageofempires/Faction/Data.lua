@@ -432,6 +432,7 @@ local factionPropsAoE2 = {
 		name = 'Wu',
 		faction = 'wu',
 	},
+
 	unknown = {
 		index = 61,
 		name = 'Unknown',
@@ -562,14 +563,9 @@ local factionPropsAoE3 = {
 		name = 'United States',
 		faction = 'unitedstates',
 	},
-	random = {
-		index = 23,
-		name = 'Random',
-		faction = 'random',
-	},
 
 	unknown = {
-		index = 24,
+		index = 23,
 		name = 'Unknown',
 		faction = 'unknown',
 	},
@@ -1014,7 +1010,6 @@ return {
 			ott = 'ottomans',
 			por = 'portuguese',
 			rus = 'russians',
-			ran = 'random',
 			spa = 'spanish',
 			swe = 'swedes',
 			usa = 'unitedstates',
