@@ -7,6 +7,7 @@
 
 todo:
 - sections marked with todo (especially mapping ...)
+- Add a check that adds a cleanup category if it finds `'<%s*br%s*/?>'` in any of the inputs
 - debug
 
 ]]
@@ -42,7 +43,7 @@ local TeamList = Class.new(
 )
 
 ---@param frame Frame
----@return Html?
+---@return Renderable?
 function TeamListWrapper.TemplateTeamList(frame)
 	local args = Arguments.getArgs(frame)
 	local teamList = TeamList(args):read()
@@ -50,6 +51,8 @@ function TeamListWrapper.TemplateTeamList(frame)
 	mw.logObject(teamList) -- todo: remove once mapping works
 
 	local newArgs = teamList:map() -- todo
+	-- throw the class away to not clog up memory
+	---@diagnostic disable-next-line: cast-local-type
 	teamList = nil
 
 	mw.logObject(newArgs) -- todo: remove once mapping works
@@ -82,7 +85,7 @@ function TeamListWrapper.TemplateTeamList(frame)
 	return Tabs.dynamic(tabArgs)
 end
 
----@param table[]
+---@param args table[]
 ---@return string
 function TeamListWrapper.generate(args)
 	if not args[2] then
@@ -106,7 +109,7 @@ function TeamListWrapper.generate(args)
 	return table.concat(parts, '\n')
 end
 
----@param table
+---@param args table
 ---@return string
 function TeamListWrapper.generateSingle(args)
 	local parts = {
@@ -122,7 +125,7 @@ function TeamListWrapper.generateSingle(args)
 	return table.concat(parts, '\n')
 end
 
----@param table
+---@param args table
 ---@return string?
 function TeamListWrapper.generateOuterConfig(args)
 	local params = {
@@ -143,7 +146,7 @@ function TeamListWrapper.generateOuterConfig(args)
 end
 
 
----@param table
+---@param args table
 ---@return string
 function TeamListWrapper.generateOpponent(args)
 	local parts = {
@@ -160,7 +163,7 @@ function TeamListWrapper.generateOpponent(args)
 
 	if Logic.isNotEmpty(args.notes) then
 		table.insert(parts, '\t\t|notes={{Json')
-		Array.forEach(notes, function(note)
+		Array.forEach(args.notes, function(note)
 			table.insert(parts, '\t\t\t|' .. note)
 		end)
 		table.insert(parts, '\t\t}}')
@@ -171,7 +174,7 @@ function TeamListWrapper.generateOpponent(args)
 	return table.concat(parts, '\n')
 end
 
----@param table
+---@param args table
 ---@return string
 function TeamListWrapper.generatePlayer(args)
 	local parts = {
@@ -282,7 +285,7 @@ function TeamList:readSection(sectionArgs)
 	local entriesByName = {}
 
 	sectionArgs = Array.extractValues(Table.filterByKey(sectionArgs, function(key) return type(key) == 'number' end))
-	
+
 	Array.forEach(sectionArgs, function(teamCardArgs)
 		local entry = TeamCard(Table.merge({date = section.config.resolveDate}, Json.parseIfTable(teamCardArgs)))
 		entriesByName[entry.name] = entry
