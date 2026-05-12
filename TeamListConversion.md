@@ -45,9 +45,9 @@
 #### new params
 ##### top level
 - minimumplayers --> useless
-- showplayerinfo --> useless
 - mergeStaffTabIfOnlyOneStaff --> useless
 - sortAlphabetically (#7319) --> legacy wrapper will do the sorting beforehand
+- showplayerinfo
 - date
 - store
 - |X= --> Json of team data
@@ -82,4 +82,147 @@
 - team --> if different from main team ...
 
 ### data available when mapping
-todo - will be added at a later date (when i have the time to sift through the current module + check stuff with logging data)
+#### top level
+- secitions: section[]
+- config:
+  - drop in mapping (read from section level instead)
+
+#### section level
+- title: string?
+	-> section.title
+- entries TC[]
+	-> section.X
+- config:
+  - showCountBySection: bool
+	-> adjust title in mapping
+  - count: number?
+	-> adjust title in mapping
+  - title: string?
+	-> section.title
+  - sortTeams: bool
+	-> if sorting already done before drop, else sort and drop
+  - playerInfoButton: bool
+	-> section.showplayerinfo
+  - matchGroupSpec: {matchGroupIds: string[], pageNames: string[]}?
+	-> drop
+  - import: bool
+	-> drop
+  - importOnlyQualified: bool
+	-> drop
+  - cardWidth: string
+	-> drop
+  - teamStyle: string?
+	-> drop
+  - showFlags: bool
+	-> drop
+  - display: bool
+	-> drop
+  - collapsed: bool
+	-> drop
+  - collapsible: bool
+	-> drop
+  - autoDnp: bool
+	-> drop
+  - syncPlayers: bool
+	-> drop
+  - resolveDate: string
+	-> section.date
+  - sortPlayers: bool
+	-> drop
+  - noStorage: bool
+	-> section.store (invert if not empty ...)
+	-> check if we have to adjust the base processing to get nil if unset here
+  - isAdhoc: bool
+	-> drop
+
+#### TC level
+- name: string
+	-> drop
+- opponent: StarcraftTeamCardOpponent
+  - players: player[]
+	-> map into .players
+  - note: string?
+	-> into .notes
+  - dq: bool
+	-> ??? (tracking category!)
+  - subtitle: string?
+	-> drop
+  - date: string
+	-> .date
+  - template: string
+	-> .template
+  -rest
+	-> drop
+- config
+  - showCountBySection: bool
+	-> drop
+  - count: number?
+	-> drop
+  - title: string?
+	-> drop
+  - sortTeams: bool
+	-> drop
+  - playerInfoButton: bool
+	-> drop
+  - matchGroupSpec: {matchGroupIds: string[], pageNames: string[]}?
+	-> drop
+  - import: bool
+	-> drop
+  - importOnlyQualified: bool
+	-> drop
+  - cardWidth: string
+	-> drop
+  - teamStyle: string?
+	-> drop
+  - showFlags: bool
+	-> drop
+  - display: bool
+	-> drop
+  - collapsed: bool
+	-> drop
+  - collapsible: bool
+	-> drop
+  - autoDnp: bool
+	-> drop
+  - syncPlayers: bool
+	-> drop
+  - resolveDate: string
+	-> .date
+  - sortPlayers: bool
+	-> if sorting already done before drop, else sort and drop
+  - noStorage: bool
+	-> drop
+  - isAdhoc: bool
+	-> check if teams are already determind, if not do it
+	-> drop
+
+#### player level
+- ace: boolean?
+	-> drop
+- captain: boolean?
+- dnp: boolean?
+- dq: boolean?
+- joker: boolean?
+	-> drop
+- mainTeam: string?
+	-> drop
+- mainTeamPage: string?
+	-> .team == mainTeamPage ~= TC.name and mainTeamPage or nil
+- note: boolean?
+	-> into TC notes
+- tag: string?
+	-> drop
+- tagTitle: string?
+	-> drop
+- two: boolean?
+	-> ??? (role?)
+- withdraw: boolean?
+	-> ??? (|played=true|result=false???)
+- displayName: string?
+	-> .name
+- flag: string?
+	-> .flag
+- pageName: string?
+	-> .link
+- faction: string?
+	-> .faction
