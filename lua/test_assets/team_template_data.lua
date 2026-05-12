@@ -36,9 +36,6 @@ local data = {
 		['0000-01-01'] = 'sk telecom t1 orig',
 		['2019-11-11'] = 't1 2019',
 	},
-	['tbd'] = {
-		['0000-01-01'] = 'tbd',
-	},
 	['team liquid'] = {
 		['0000-01-01'] = 'team liquid orig',
 		['2017-01-17'] = 'team liquid 2017',
