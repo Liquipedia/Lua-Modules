@@ -75,7 +75,9 @@ function TeamCard:readOpponent()
 	local args = self.args
 	local date = args.date or getContextualDateOrNow()
 	local team = (args.team or 'tbd'):lower():gsub('_', ' ')
-	local opponent = Opponent.resolve(Opponent.readOpponentArgs{team, type = Opponent.team}, date) --[[@as StarcraftTeamCardOpponent]]
+	local opponent = Opponent.resolve(
+		Opponent.readOpponentArgs{team, type = Opponent.team}, date
+	) --[[@as StarcraftTeamCardOpponent]]
 
 	opponent.dq = Logic.readBool(args.dq)
 	opponent.date = date
@@ -86,7 +88,7 @@ function TeamCard:readOpponent()
 	end))
 
 	if #opponent.players >= 35 then
-		mw.ext.TeamLiquidIntegration.add_category('TeamCards with 35 players')
+		mw.ext.TeamLiquidItegration.add_category('TeamCards with 35 players')
 	elseif #opponent.players >= 25 then
 		mw.ext.TeamLiquidIntegration.add_category('TeamCards with 25 players')
 	elseif #opponent.players >= 20 then

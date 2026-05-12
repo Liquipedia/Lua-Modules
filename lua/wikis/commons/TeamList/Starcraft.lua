@@ -3,14 +3,6 @@
 -- page=Module:TeamList/Starcraft
 --
 
---[[
-
-todo:
-- sections marked with todo (especially mapping ...)
-- debug
-
-]]
-
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
@@ -54,14 +46,10 @@ function TeamListWrapper.TemplateTeamList(frame)
 
 	local teamList = TeamList(args):read()
 
-	mw.logObject(teamList) -- todo: remove once mapping works
-
-	local newArgs = teamList:map() -- todo
+	local newArgs = teamList:map()
 	-- throw the class away to not clog up memory
 	---@diagnostic disable-next-line: cast-local-type
 	teamList = nil
-
-	mw.logObject(newArgs) -- todo: remove once mapping works
 
 	if Logic.readBool(args.generate) then
 		TeamListWrapper.generate(newArgs)
@@ -145,7 +133,7 @@ function TeamListWrapper.generateOuterConfig(args)
 		return '|' .. param .. '=' .. value
 	end)
 
-	local store = args.store == false and 'false' or '<includeonly>false</includeonly>' -- todo: double check if includeonly or onlyinclude ...
+	local store = args.store == false and 'false' or '<includeonly>false</includeonly>'
 	table.insert(parts, '|store=' .. store)
 
 	return table.concat(parts)
@@ -278,7 +266,7 @@ function TeamList.mapPlayer(player)
 	if player.dnp then
 		args.played = 'false'
 	end
-	local role = player.captain and 'Captain' or nil
+	args.role = player.captain and 'Captain' or nil
 
 	if player.dq then
 		args.status = 'former'
