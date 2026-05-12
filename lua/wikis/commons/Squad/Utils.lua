@@ -201,7 +201,7 @@ function SquadUtils.readSquadPersonArgs(args)
 	}
 
 	if Info.config.squads.hasSpecialTeam and not person.newteam and args.newteam then
-		person.newteamspecial = SquadUtils.specialTeamsTemplateMapping[args.newteam]
+		person.extradata.newteamspecial = SquadUtils.specialTeamsTemplateMapping[args.newteam]
 	end
 
 	if person.joindate ~= args.joindate then
@@ -224,7 +224,7 @@ function SquadUtils.storeSquadPerson(squadPerson)
 	squadPerson:save()
 end
 
----@param players table[]
+---@param players ModelRow[]
 ---@param squadStatus SquadStatus
 ---@return table<string, boolean>
 function SquadUtils.analyzeColumnVisibility(players, squadStatus)

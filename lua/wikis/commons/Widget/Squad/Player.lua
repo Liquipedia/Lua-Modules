@@ -127,8 +127,8 @@ end
 ---@param squadPlayer ModelRow
 ---@return Renderable?
 local function newTeamDisplay(squadPlayer)
-	local newTeam = squadPlayer.extradata.newteam
-	local newTeamRole = squadPlayer.extradata.newteamrole
+	local newTeam = squadPlayer.newteam
+	local newTeamRole = squadPlayer.newteamrole
 	local newTeamSpecial = squadPlayer.extradata.newteamspecial
 	local hasNewTeam, hasNewTeamRole = String.isNotEmpty(newTeam), String.isNotEmpty(newTeamRole)
 	local hasNewTeamSpecial = String.isNotEmpty(newTeamSpecial)
@@ -152,7 +152,7 @@ local function newTeamDisplay(squadPlayer)
 		return teamDisplay
 	end
 
-	return teamDisplay .. ' (' .. newTeamRole .. ')'
+	return Html.Fragment{children = {teamDisplay, ' (' .. newTeamRole .. ')'}}
 end
 
 ---@param props {squadPlayer: ModelRow}
