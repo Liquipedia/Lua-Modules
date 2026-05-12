@@ -69,8 +69,8 @@ local function getRoleDisplays(player)
 			return firstRole.icon
 		end
 		for _, role in ipairs(roles) do
-			if role.type == RoleUtil.ROLE_TYPE.INGAME then
-				return role.icon or role.display
+			if role.type == RoleUtil.ROLE_TYPE.INGAME and role.icon then
+				return role.icon
 			end
 		end
 	end
@@ -84,7 +84,7 @@ local function getRoleDisplays(player)
 		end
 		-- Add non-ingame role if present
 		for _, role in ipairs(roles) do
-			if role.type ~= RoleUtil.ROLE_TYPE.INGAME then
+			if role.type ~= RoleUtil.ROLE_TYPE.INGAME or not role.icon then
 				table.insert(rightRoles, role.display)
 				break
 			end
@@ -138,6 +138,7 @@ function ParticipantsTeamRoster:render()
 	end
 
 	---@param groups {label: string?, players: table[]}[]
+	---@return Widget
 	local makeRostersDisplay = function(groups)
 		local children = {}
 		for _, group in ipairs(groups) do
