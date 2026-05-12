@@ -223,7 +223,7 @@ function TeamList:map()
 			Array.sortInPlaceBy(section.entries, function(entry) return entry.name:lower() end)
 		end
 
-		Table.mergeInto(args, Array.map(section.entries, TeamList.mapEntry))
+		return Table.mergeInto(args, Array.map(section.entries, TeamList.mapEntry))
 	end)
 end
 
