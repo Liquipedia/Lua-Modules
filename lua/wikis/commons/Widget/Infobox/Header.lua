@@ -47,10 +47,10 @@ end
 function Header:_name()
 	return Div{children = {Div{
 		classes = {'infobox-header', 'wiki-backgroundcolor-light'},
-		children = {
+		children = WidgetUtil.collect(
 			self:_createInfoboxButtons(),
-			self.props.name,
-		}
+			self.props.name
+		)
 	}}}
 end
 

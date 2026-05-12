@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Table = Lua.import('Module:Table')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Widget = Lua.import('Module:Widget/All')
 local Squad = Lua.import('Module:Widget/Squad/Core')
@@ -33,7 +34,7 @@ function ExtendedSquadRow:activeteam()
 
 	local content = {}
 
-	table.insert(content, mw.ext.TeamTemplate.team(activeTeam, date))
+	table.insert(content, OpponentDisplay.InlineTeamContainer{template = activeTeam, date = date})
 
 	if activeTeamRole then
 		table.insert(content, '&nbsp;')
