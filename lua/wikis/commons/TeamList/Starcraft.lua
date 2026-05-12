@@ -1,6 +1,8 @@
 ---
--- for @Liquipedia by @hjpalpha
+-- @Liquipedia
 -- page=Module:TeamList/Starcraft
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Arguments = require('Module:Arguments')
