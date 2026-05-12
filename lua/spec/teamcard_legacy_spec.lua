@@ -193,13 +193,6 @@ describe('TeamCard Legacy', function()
             assert.is_true(p.played)
         end)
 
-        it('source group f + formerdnpdefault sets played=false when no result', function()
-            local p = LegacyTeamCard.mapPlayer(
-                {f1 = 'X', formerdnpdefault = 'true'}, 'f1', 'f')
-            assert.is_false(p.played)
-            assert.are_equal('former', p.status)
-        end)
-
         it('main group with noVarDefault leaves played untouched', function()
             local p = LegacyTeamCard.mapPlayer({p1 = 'X', noVarDefault = 'true'}, 'p1', nil)
             assert.is_nil(p.played)
@@ -208,6 +201,11 @@ describe('TeamCard Legacy', function()
         it('source group s with noVarDefault and no result sets played=false', function()
             local p = LegacyTeamCard.mapPlayer({s1 = 'X', noVarDefault = 'true'}, 's1', 's')
             assert.is_false(p.played)
+        end)
+
+        it('source group f with noVarDefault leaves played untouched', function()
+            local p = LegacyTeamCard.mapPlayer({f1 = 'X', noVarDefault = 'true'}, 'f1', 'f')
+            assert.is_nil(p.played)
         end)
 
         it('source group s + pNsub=true: status=sub (redundant, no conflict)', function()
