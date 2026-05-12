@@ -42,7 +42,9 @@ function TeamParticipantsController.fromTemplate(frame)
 	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
 	TeamParticipantsController.importParticipants(parsedData)
 	TeamParticipantsController.fillIncompleteRosters(parsedData)
-	TeamParticipantsController.enrichPlayerDates(parsedData)
+	if Logic.nilOr(Logic.readBoolOrNil(parsedArgs.enrichPlayerDates), true) then
+		TeamParticipantsController.enrichPlayerDates(parsedData)
+	end
 
 	local shouldStore = Logic.readBoolOrNil(args.store) ~= false and Lpdb.isStorageEnabled()
 
