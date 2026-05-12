@@ -115,10 +115,6 @@
 
 		--placement-text-color: var( --clr-secondary-100 );
 
-		.theme--dark & {
-			--placement-text-color: var( --clr-secondary-9 );
-		}
-
 		&:not( [ data-placement-type ] ) {
 			--placement-solid-color: var( --clr-on-surface-light-primary-4 );
 			--placement-text-color: var( --clr-secondary-25 );
@@ -132,7 +128,11 @@
 		&[ data-label-type="placement-minimum" ] {
 			color: var( --placement-solid-color );
 			background-color: hsl( from var( --placement-solid-color ) h s l / 0.08 );
-			box-shadow: 0 0 0 calc( var( --label-scale ) * 0.0125rem ) var( --placement-solid-color ) inset;
+			box-shadow: 0 0 0 calc( var( --label-scale ) * 0.0625rem ) var( --placement-solid-color ) inset;
+
+			.theme--dark & {
+				color: var( --placement-text-color );
+			}
 		}
 
 		&[ data-placement-type="byeup" ] {

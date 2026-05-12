@@ -23,6 +23,10 @@ local globalVars = PageVariableNamespace()
 
 local TeamParticipantsRepository = {}
 
+local function shouldStorePlayer(player)
+	return player.extradata.results
+end
+
 --- Save a team participant to lpdb placement table, after merging data from prizepool if exists
 ---@param participant TeamParticipant
 function TeamParticipantsRepository.save(participant)
@@ -74,9 +78,7 @@ function TeamParticipantsRepository.save(participant)
 	Array.forEach(lpdbDatas, function(lpdbData)
 		-- Remove players that should not be counted for results
 		local activeOpponent = Table.deepCopy(participant.opponent)
-		activeOpponent.players = Array.filter(activeOpponent.players or {}, function(player)
-			return player.extradata.results
-		end)
+		activeOpponent.players = Array.filter(activeOpponent.players or {}, shouldStorePlayer)
 		-- Add full opponent data for players with results with this team
 		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(activeOpponent, { setPlayersInTeam = true }))
 		-- Legacy participant fields
@@ -130,6 +132,9 @@ function TeamParticipantsRepository.setPageVars(participant)
 		}
 		local playerCount, staffCount = 0, 0
 		Array.forEach(participant.opponent.players or {}, function(player)
+			if not shouldStorePlayer(player) then
+				return
+			end
 			local playerPrefix
 			if player.extradata.type == 'staff' then
 				staffCount = staffCount + 1

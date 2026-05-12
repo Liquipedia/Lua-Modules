@@ -71,7 +71,8 @@ function StandingsFfaWidget:render()
 				end
 				return self:_createRoundBody(round)
 			end)
-		)
+		),
+		striped = false
 	}
 
 	if activeRounds == 0 then

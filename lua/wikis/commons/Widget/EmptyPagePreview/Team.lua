@@ -24,7 +24,7 @@ local Tournament = Lua.import('Module:Tournament')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
-local Infobox = Lua.import('Module:Infobox/Team/Custom')
+local Infobox = Lua.requireIfExists('Module:Infobox/Team/Custom')
 local MatchTable = Lua.import('Module:MatchTable/Custom')
 local ResultsTable = Lua.import('Module:ResultsTable/Custom')
 local SquadAuto = Lua.import('Module:SquadAuto') -- to be replaced by #5523
@@ -50,7 +50,7 @@ local EmptyTeamPagePreview = Class.new(Widget)
 
 ---@return Widget?
 function EmptyTeamPagePreview:render()
-	if not Namespace.isMain() then
+	if not Namespace.isMain() or not Infobox then
 		return
 	end
 
@@ -123,7 +123,7 @@ function EmptyTeamPagePreview:_infobox()
 
 	local args = {
 		location = location or 'World',
-		doNotIncludePlayerEarnings = Logic.nilOr(Logic.readBoolOrNil(self.props.doNotIncludePlayerEarnings), true),
+		doNotIncludePlayerEarnings = Logic.readBool(self.props.doNotIncludePlayerEarnings),
 		name = TeamTemplate.getRaw(self.team).name,
 		coaches = coaches,
 		region = self:_determineRegionFromPlacements() or rosterRegion,
@@ -132,6 +132,9 @@ function EmptyTeamPagePreview:_infobox()
 	Array.forEach(games, function(game)
 		args[game] = true
 	end)
+
+	--- suppress the ranking display on RL to not error there
+	args.suppressRanking = true
 
 	return Infobox.run(args)
 end
@@ -377,11 +380,15 @@ end
 ---@private
 ---@param startDate string?
 ---@param personData {flag: string?, displayName: string, pageName: string, name: string?}
----@return table
+---@return table?
 function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
 	local teams = self.teams
 
 	local pageName = personData.pageName
+	if not pageName then
+		return
+	end
+
 	local pageNameWithSpaces = pageName:gsub('_', ' ')
 	local personCondition = ConditionUtil.anyOf(ColumnName('player'), {pageName, pageNameWithSpaces})
 
@@ -390,7 +397,7 @@ function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
 	local makeTeamConditions = function(direction)
 		return ConditionTree(BooleanOperator.any):add{
 			ConditionUtil.anyOf(ColumnName(direction .. 'teamtemplate'), teams),
-			ConditionUtil.anyOf(ColumnName(direction .. 'teamsectemplate'), teams),
+			ConditionUtil.anyOf(ColumnName(direction .. 'teamsectemplate', 'extradata'), teams),
 		}
 	end
 
@@ -398,7 +405,7 @@ function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
 		personCondition,
 		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('role2'), Comparator.neq, '-'),
-			ConditionNode(ColumnName('role2_2'), Comparator.neq, '-'),
+			ConditionNode(ColumnName('role2sec', 'extradata'), Comparator.neq, '-'),
 		},
 		makeTeamConditions('to'),
 	}
@@ -417,7 +424,7 @@ function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
 			ConditionNode(ColumnName('date'), Comparator.gt, startDate),
 			ConditionTree(BooleanOperator.any):add{
 				ConditionNode(ColumnName('role1'), Comparator.neq, '-'),
-				ConditionNode(ColumnName('role1_2'), Comparator.neq, '-'),
+				ConditionNode(ColumnName('role1sec', 'extradata'), Comparator.neq, '-'),
 			},
 			makeTeamConditions('from'),
 		}
