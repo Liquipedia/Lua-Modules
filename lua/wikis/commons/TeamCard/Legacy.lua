@@ -15,7 +15,6 @@ local Template = Lua.import('Module:Template')
 local Tournament = Lua.import('Module:Tournament')
 
 local TeamParticipantsController = Lua.import('Module:TeamParticipants/Controller')
-local TeamParticipantsDisplay = Lua.import('Module:Widget/Participants/Team/CardsGroup')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -80,16 +79,7 @@ function LegacyTeamCard.run(opts)
 		tpArgs.store = 'false'
 	end
 
-	local parsedData = TeamParticipantsController.fromArgs(tpArgs)
-
-	local showControls = not teamParticipantsVars:get('externalControlsRendered')
-
-	local display = TeamParticipantsDisplay{
-		participants = parsedData.participants,
-		showPlayerInfo = toggleFolded.showPlayerInfo,
-		showControls = showControls,
-	}
-
+	local display = TeamParticipantsController.fromTemplate(tpArgs)
 	teamParticipantsVars:set('externalControlsRendered', 'true')
 
 	local notesWidget

@@ -34,12 +34,22 @@ local AUTO_IMPORTED_STAFF_ROLES = {
 
 local Config = Info.config.participants or {}
 
----@param frame Frame
+---@param frame Frame|table
 ---@return Widget
 function TeamParticipantsController.fromTemplate(frame)
 	local args = Arguments.getArgs(frame)
 	local parsedArgs = Json.parseStringifiedArgs(args)
-	local parsedData = TeamParticipantsController.fromArgs(parsedArgs)
+	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
+	TeamParticipantsController.importParticipants(parsedData)
+	TeamParticipantsController.fillIncompleteRosters(parsedData)
+	TeamParticipantsController.enrichPlayerDates(parsedData)
+
+	local shouldStore = Logic.readBoolOrNil(args.store) ~= false and Lpdb.isStorageEnabled()
+
+	if shouldStore then
+		Array.forEach(parsedData.participants, TeamParticipantsRepository.save)
+	end
+	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
 
 	local showControls = not teamParticipantsVars:get('externalControlsRendered')
 
@@ -51,23 +61,6 @@ function TeamParticipantsController.fromTemplate(frame)
 			Logic.readBoolOrNil(args.mergeStaffTabIfOnlyOneStaff), Logic.readBool(Config.mergeStaffTabIfOnlyOneStaff)
 		)
 	}
-end
-
----@param args table
----@return {participants: TeamParticipant[], expectedPlayerCount: integer?}
-function TeamParticipantsController.fromArgs(args)
-	local parsedData = TeamParticipantsWikiParser.parseWikiInput(args)
-	TeamParticipantsController.importParticipants(parsedData)
-	TeamParticipantsController.fillIncompleteRosters(parsedData)
-	TeamParticipantsController.enrichPlayerDates(parsedData)
-
-	local shouldStore = Logic.readBoolOrNil(args.store) ~= false and Lpdb.isStorageEnabled()
-	if shouldStore then
-		Array.forEach(parsedData.participants, TeamParticipantsRepository.save)
-	end
-	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
-
-	return parsedData
 end
 
 --- Imports participants' squad members from the database if requested.
