@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
-local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Template = Lua.import('Module:Template')
@@ -17,8 +16,6 @@ local Tournament = Lua.import('Module:Tournament')
 
 local TeamParticipantsController = Lua.import('Module:TeamParticipants/Controller')
 local TeamParticipantsDisplay = Lua.import('Module:Widget/Participants/Team/CardsGroup')
-local TeamParticipantsRepository = Lua.import('Module:TeamParticipants/Repository')
-local TeamParticipantsWikiParser = Lua.import('Module:TeamParticipants/Parse/Wiki')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -83,17 +80,7 @@ function LegacyTeamCard.run(opts)
 		tpArgs.store = 'false'
 	end
 
-	local parsedData = TeamParticipantsWikiParser.parseWikiInput(tpArgs)
-	TeamParticipantsController.importParticipants(parsedData)
-	TeamParticipantsController.fillIncompleteRosters(parsedData)
-	TeamParticipantsController.enrichPlayerDates(parsedData)
-
-	local shouldStore = Logic.readBoolOrNil(tpArgs.store) ~= false
-		and Lpdb.isStorageEnabled()
-	if shouldStore then
-		Array.forEach(parsedData.participants, TeamParticipantsRepository.save)
-	end
-	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
+	local parsedData = TeamParticipantsController.fromArgs(tpArgs)
 
 	local showControls = not teamParticipantsVars:get('externalControlsRendered')
 
