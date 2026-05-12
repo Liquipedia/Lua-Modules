@@ -399,27 +399,6 @@ local byFactionAoE4 = {
 }
 
 local byFactionAoM = {
-	atlanteans = {
-		icon = 'File:Atlantean AoM R icon.png',
-	},
-	aztecs = {
-		icon = 'File:Aztecs AoM R icon.png',
-	},
-	chinese = {
-		icon = 'File:Chinese AoM R icon.png',
-	},
-	egyptians = {
-		icon = 'File:Egyptian AoM R icon.png',
-	},
-	greeks = {
-		icon = 'File:Greek AoM R icon.png',
-	},
-	japanese = {
-		icon = 'File:Japanese AoM R icon.png',
-	},
-	norse = {
-		icon = 'File:Norse AoM R icon.png',
-	},
 	amaterasu = {
 		icon = 'File:Amaterasu AoM R icon.png',
 	},
