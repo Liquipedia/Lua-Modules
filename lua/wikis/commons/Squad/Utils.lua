@@ -197,6 +197,7 @@ function SquadUtils.readSquadPersonArgs(args)
 			faction = Faction.read(args.faction or args.race),
 			activeteam = args.activeteam,
 			activeteamrole = args.activeteamrole,
+			game = args.game,
 		},
 	}
 

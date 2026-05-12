@@ -164,7 +164,7 @@ local function SquadPlayer(props, context)
 		return
 	end
 	local visibility = Context.read(context, SquadContexts.ColumnVisibility)
-	local game = Context.read(context, SquadContexts.GameTitle)
+	local game = squadPlayer.extradata.game or Context.read(context, SquadContexts.GameTitle)
 	---@param columnId string
 	---@param content? Renderable[]
 	---@return Renderable?
