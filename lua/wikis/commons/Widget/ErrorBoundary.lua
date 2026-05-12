@@ -10,6 +10,6 @@ local ComponentCore = Lua.import('Module:Widget/Component')
 local Types = Lua.import('Module:Widget/Types')
 
 return setmetatable(
-	{ renderFn = Types.ERROR_BOUNDARY},
+	{ renderFn = Types.ERROR_BOUNDARY },
 	ComponentCore.ComponentMT
 ) --[[@as ErrorBoundaryComponent]]

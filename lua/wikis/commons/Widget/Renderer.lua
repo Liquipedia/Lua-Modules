@@ -97,7 +97,7 @@ function Renderer.render(vNode, context)
 				return tostring(ErrorDisplay.InlineError(error))
 			end,
 			function (error)
-				error.header = 'Error occured in building:'
+				error.header = 'Error occurred in building:'
 				return error
 			end
 		)
