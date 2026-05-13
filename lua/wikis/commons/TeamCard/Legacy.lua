@@ -242,8 +242,8 @@ function LegacyTeamCard.mapCoach(tcArgs, prefix, sourceGroup)
 	}
 end
 
-local MAX_PLAYER_INDEX = 25
-local MAX_COACH_INDEX = 25
+local DEFAULT_MAX_PLAYER_INDEX = 10
+local MAX_COACH_INDEX = 10
 
 local TN_TYPE_DEFAULTS = {t2 = 'sub', t3 = 'former'}
 
@@ -269,6 +269,7 @@ end
 function LegacyTeamCard.mapPlayers(tcArgs)
 	local players = {}
 	local indexByKey = {}
+	local maxPlayerIndex = tonumber(tcArgs.maxPlayers) or DEFAULT_MAX_PLAYER_INDEX
 
 	local function add(person, allowOverwrite)
 		local key = normalizeKey(person.link or person[1])
@@ -284,13 +285,13 @@ function LegacyTeamCard.mapPlayers(tcArgs)
 		end
 	end
 
-	Array.forEach(indicesPresent(tcArgs, 'p', MAX_PLAYER_INDEX), function(i)
+	Array.forEach(indicesPresent(tcArgs, 'p', maxPlayerIndex), function(i)
 		add(LegacyTeamCard.mapPlayer(tcArgs, 'p' .. i, nil), false)
 	end)
-	Array.forEach(indicesPresent(tcArgs, 's', MAX_PLAYER_INDEX), function(i)
+	Array.forEach(indicesPresent(tcArgs, 's', maxPlayerIndex), function(i)
 		add(LegacyTeamCard.mapPlayer(tcArgs, 's' .. i, 's'), false)
 	end)
-	Array.forEach(indicesPresent(tcArgs, 'f', MAX_PLAYER_INDEX), function(i)
+	Array.forEach(indicesPresent(tcArgs, 'f', maxPlayerIndex), function(i)
 		add(LegacyTeamCard.mapPlayer(tcArgs, 'f' .. i, 'f'), false)
 	end)
 
@@ -301,7 +302,7 @@ function LegacyTeamCard.mapPlayers(tcArgs)
 		elseif tabType == 'former' then sourceGroup = 'f'
 		else sourceGroup = nil end
 
-		Array.forEach(indicesPresent(tcArgs, tab .. 'p', MAX_PLAYER_INDEX), function(i)
+		Array.forEach(indicesPresent(tcArgs, tab .. 'p', maxPlayerIndex), function(i)
 			local person = LegacyTeamCard.mapPlayer(tcArgs, tab .. 'p' .. i, sourceGroup)
 			if tabType == 'staff' then
 				person.type = 'staff'

@@ -34,7 +34,7 @@ local AUTO_IMPORTED_STAFF_ROLES = {
 
 local Config = Info.config.participants or {}
 
----@param frame Frame|table
+---@param frame Frame
 ---@return Widget
 function TeamParticipantsController.fromTemplate(frame)
 	local args = Arguments.getArgs(frame)
