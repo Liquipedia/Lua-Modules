@@ -66,7 +66,10 @@ local function buildHtmlString(tag, props, renderedChildren)
 	if props.css then
 		table.insert(buffer, ' style="')
 		for key, value in pairs(props.css) do
-			table.insert(buffer, key .. ':' .. escapeAttr(value) .. ';')
+			table.insert(buffer, key)
+			table.insert(buffer, ':')
+			table.insert(buffer, escapeAttr(value))
+			table.insert(buffer, ';')
 		end
 		table.insert(buffer, '"')
 	end
@@ -76,10 +79,15 @@ local function buildHtmlString(tag, props, renderedChildren)
 			if type(value) == 'boolean' then
 				-- Boolean attributes like `disabled` or `checked`
 				if value == true then
-					table.insert(buffer, ' ' .. key)
+					table.insert(buffer, ' ')
+					table.insert(buffer, key)
 				end
 			else
-				table.insert(buffer, ' ' .. key .. '="' .. escapeAttr(value) .. '"')
+				table.insert(buffer, ' ')
+				table.insert(buffer, key)
+				table.insert(buffer, '="')
+				table.insert(buffer, escapeAttr(value))
+				table.insert(buffer, '"')
 			end
 		end
 	end
@@ -91,7 +99,9 @@ local function buildHtmlString(tag, props, renderedChildren)
 		if renderedChildren and renderedChildren ~= '' then
 			table.insert(buffer, renderedChildren)
 		end
-		table.insert(buffer, '</' .. tag .. '>')
+		table.insert(buffer, '</')
+		table.insert(buffer, tag)
+		table.insert(buffer, '>')
 	end
 
 	return table.concat(buffer)
