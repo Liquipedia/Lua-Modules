@@ -15,6 +15,10 @@ local CustomData = Lua.requireIfExists('Module:Links/CustomData', {loadData = tr
 
 local Links = {}
 
+local VALID_PLATFORMS_ENDING_IN_NUMBER = {
+    ['fastcup-cs2'] = true,
+}
+
 local PREFIXES = {
 	['365chess'] = {
 		'https://www.365chess.com/tournaments/',
@@ -760,6 +764,9 @@ end
 ---@param key string
 ---@return string
 function Links.removeAppendedNumber(key)
+    if VALID_PLATFORMS_ENDING_IN_NUMBER[key] then
+        return key
+    end
 	return (string.gsub(key, '%d$', ''))
 end
 
