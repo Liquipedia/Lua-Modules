@@ -86,6 +86,7 @@ function LegacyTeamCard.run(dependency)
 
 	local notesWidget
 	if #toggleFolded.notes > 0 then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with Legacy TeamCard toggle note')
 		notesWidget = HtmlWidgets.Div{
 			classes = {'team-participant__notes'},
 			children = Array.interleave(toggleFolded.notes, HtmlWidgets.Br{}),
