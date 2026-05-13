@@ -12,19 +12,22 @@ local Variables = Lua.import('Module:Variables')
 
 local LegacyTeamCard = Lua.import('Module:TeamCard/Legacy')
 
-local Custom = {}
+local CustomLegacyTeamCard = {}
+
+-- Template entry point
+---@return Widget
+function CustomLegacyTeamCard.run()
+	return LegacyTeamCard.run(CustomLegacyTeamCard)
+end
 
 ---@param tcArgs table
-function Custom.preprocessCard(tcArgs)
+---@return table
+function CustomLegacyTeamCard.preprocessCard(tcArgs)
 	local teamPlayers = Variables.varDefault('tournament_teamplayers')
 	if Logic.isNotEmpty(teamPlayers) then
 		tcArgs.defaultRowNumber = teamPlayers
 	end
+	return tcArgs
 end
 
----@return Widget
-function Custom.run()
-	return LegacyTeamCard.run({preprocessCard = Custom.preprocessCard})
-end
-
-return Custom
+return CustomLegacyTeamCard

@@ -46,11 +46,10 @@ local function partitionStash(entries)
 	return toggles, header, cards
 end
 
----@param opts table? Optional table; supports `preprocessCard` hook.
+---@param dependency table<string, function>?
 ---@return Widget
-function LegacyTeamCard.run(opts)
-	opts = opts or {}
-	local preprocessCard = opts.preprocessCard or function(args) return args end
+function LegacyTeamCard.run(dependency)
+	dependency = dependency or {}
 
 	local entries = Template.retrieveReturnValues('LegacyTeamCard')
 	local toggles, header, cardEntries = partitionStash(entries)
@@ -72,7 +71,10 @@ function LegacyTeamCard.run(opts)
 		showplayerinfo = toggleFolded.showPlayerInfo and 'true' or nil,
 	}
 	Array.forEach(cardEntries, function(card)
-		table.insert(tpArgs, LegacyTeamCard.mapCard(preprocessCard(card)))
+		if dependency.preprocessCard then
+			card = dependency.preprocessCard(card)
+		end
+		table.insert(tpArgs, LegacyTeamCard.mapCard(card))
 	end)
 
 	if not Namespace.isMain() then
