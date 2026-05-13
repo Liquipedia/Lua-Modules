@@ -247,6 +247,29 @@ local MAX_COACH_INDEX = 10
 
 local TN_TYPE_DEFAULTS = {t2 = 'sub', t3 = 'former'}
 
+local TN_TITLE_TO_TYPE = {
+	['substitutes'] = 'sub',
+	['substitute'] = 'sub',
+	['subs'] = 'sub',
+	['former'] = 'former',
+	['former players'] = 'former',
+	['former roster'] = 'former',
+	['staff'] = 'staff',
+	['inactive'] = 'inactive',
+}
+
+---@param tcArgs table
+---@param tab string
+---@return string
+local function resolveTabType(tcArgs, tab)
+	local title = tcArgs[tab .. 'title']
+	if Logic.isNotEmpty(title) then
+		local mapped = TN_TITLE_TO_TYPE[title:lower()]
+		if mapped then return mapped end
+	end
+	return (tcArgs[tab .. 'type'] or TN_TYPE_DEFAULTS[tab]):lower()
+end
+
 ---@param tcArgs table
 ---@param prefix string
 ---@param maxIndex integer
@@ -296,7 +319,7 @@ function LegacyTeamCard.mapPlayers(tcArgs)
 	end)
 
 	Array.forEach({'t2', 't3'}, function(tab)
-		local tabType = (tcArgs[tab .. 'type'] or TN_TYPE_DEFAULTS[tab]):lower()
+		local tabType = resolveTabType(tcArgs, tab)
 		local sourceGroup
 		if tabType == 'sub' then sourceGroup = 's'
 		elseif tabType == 'former' then sourceGroup = 'f'
@@ -330,7 +353,7 @@ function LegacyTeamCard.mapCoaches(tcArgs)
 	end)
 
 	Array.forEach({'t2', 't3'}, function(tab)
-		local tabType = (tcArgs[tab .. 'type'] or TN_TYPE_DEFAULTS[tab]):lower()
+		local tabType = resolveTabType(tcArgs, tab)
 		local sourceGroup
 		if tabType == 'sub' then sourceGroup = 'sc'
 		elseif tabType == 'former' then sourceGroup = 'fc'
