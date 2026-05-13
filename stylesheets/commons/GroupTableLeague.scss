@@ -273,11 +273,14 @@ Author(s): spazer
 }
 
 .background-color-lose,
+.bg-lose,
+.swisstable .swisstable-bgc-lose {
+	background-color: var( --clr-cinnabar-background-color, #fbdfdf ) !important;
+}
+
 .bg-d,
 .bg-down,
-.bg-lose,
-.bg-drop,
-.swisstable .swisstable-bgc-lose {
+.bg-drop {
 	background-color: var( --clr-cinnabar-background-color, #fbdfdf ) !important;
 }
 
