@@ -5,22 +5,24 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+---@alias Renderable string|Html|Widget|number|VNode
+
+---@alias ContextDef<T> {defaultValue: T}
+---@alias ContextParam<T> {def: ContextDef<T>, value: T, children?: Renderable|Renderable[]}
+---@alias HtmlParam {classes?: string[], css?: table, attributes?: table, children?: Renderable|Renderable[]}
+
 ---@class VNode<P>
 ---@field renderFn string|fun(props: P, context?: Context?): Renderable
 ---@field props P
 
----@alias Context<T> { props: { parent: Context?, def: ContextDef<T>, value: T } }
+---@alias Context<T> {props:{parent: Context?, def: ContextDef<T>, value: T}}
 
----@alias ContextNode<T> VNode<{def: ContextDef<T>, value: T, children: Renderable[]}>
----@alias HtmlNode VNode<{classes?: string[], css?: table, attributes?: table, children?: Renderable[]}>
-
----@alias Renderable string|Html|Widget|number|VNode
-
----@alias ContextDef<T> {defaultValue: T}
+---@alias ContextNode<T> VNode<ContextParam<T>>
+---@alias HtmlNode VNode<HtmlParam>
 
 ---@alias Component<P> fun(props?: P, context: Context?): VNode<P>
----@alias ContextComponent<T> Component<{def: ContextDef<T>, value: T, children: Renderable[]}>
----@alias HtmlComponent Component<{classes?: string[], css?: table, attributes?: table, children?: Renderable[]}>
+---@alias ContextComponent<T> Component<ContextParam<T>>
+---@alias HtmlComponent Component<HtmlParam>
 
 local Lua = require('Module:Lua')
 local Renderer = Lua.import('Module:Widget/Renderer')
@@ -40,15 +42,46 @@ ComponentCore.VNodeMT = {
 	}
 }
 
+--- Highly efficient check for if a node is actually an array of nodes, or just a single node
+---@param node Renderable|Renderable[]|nil
+---@return boolean
+local function isSingleNode(node)
+	if type(node) ~= 'table' then
+		return true
+	end
+
+	-- VNodes always have this key
+	if node.renderFn ~= nil then
+		return true
+	end
+
+	---@cast node -VNode
+
+	-- Widget (render) and mw.html (_build)
+	if node.render ~= nil or node._build ~= nil then
+		return true
+	end
+
+	---@cast node -Html
+	---@cast node -Widget
+
+	-- Array is the only allowed type of Renderable left
+	return false
+end
+
 -- Component Definitions
 ComponentCore.ComponentMT = {
 	__call = function(self, props)
 		props = props or {}
 
 		-- Apply DefaultProps via lightweight metatable
-		-- Only shallow default props allowed
+		-- Only shallow default props allowed, or empty tables
 		if self.defaultProps then
 			setmetatable(props, { __index = self.defaultProps })
+		end
+
+		if isSingleNode(props.children) then
+			props.children = { props.children }
 		end
 
 		return setmetatable({

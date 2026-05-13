@@ -96,7 +96,10 @@ function Renderer.render(vNode, context)
 		if props.attributes then tag:attr(props.attributes) end
 
 		if props.children then
-			tag:node(Renderer.render(props.children, context))
+			local childContent = Renderer.render(props.children, context)
+			if childContent ~= '' then
+				tag:node(childContent)
+			end
 		end
 
 		return tostring(tag)

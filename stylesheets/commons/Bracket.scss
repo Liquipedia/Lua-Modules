@@ -1355,59 +1355,9 @@ Author(s): spazer
 }
 
 /*******************************************************************************
-Template(s): Group tables and colors
+Template(s): Group tables
 Author(s): spazer
 *******************************************************************************/
-
-.bg-u,
-.bg-up,
-.bg-proceed,
-.bg-win {
-	background-color: var( --clr-forest-background-color, #ddf4dd ) !important;
-}
-
-.bg-su,
-.bg-stayup {
-	background-color: var( --clr-atlantis-background-color, #e5f4c6 ) !important;
-}
-
-.bg-s,
-.bg-stay {
-	background-color: var( --clr-sun-background-color, #f9f0c7 ) !important;
-}
-
-.bg-draw {
-	background-color: var( --clr-pear-background-color, #f9f9c7 ) !important;
-}
-
-.bg-sd,
-.bg-staydown {
-	background-color: var( --clr-california-background-color, #f9dec7 ) !important;
-}
-
-.bg-d,
-.bg-down,
-.bg-drop {
-	background-color: var( --clr-cinnabar-background-color, #fbdfdf ) !important;
-}
-
-.bg-neutral {
-	background-color: var( --clr-moon-background-color, #f0f0f0 ) !important;
-}
-
-.bg-seedup {
-	background-color: var( --clr-elm-background-color, #dbeded ) !important;
-}
-
-.bg-byeup {
-	background-color: var( --clr-vividviolet-background-color, #e8ddef ) !important;
-}
-
-.bg-dq,
-.bg-disqualified,
-.bg-lightblue {
-	background-color: var( --clr-sapphire-background-color, #dee3ef ) !important;
-}
 
 .matchlistslot.bg-draw,
 .matchlistslot.bg-win {
