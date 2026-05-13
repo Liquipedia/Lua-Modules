@@ -525,8 +525,8 @@ describe('TeamCard Legacy', function()
             }, 'LegacyTeamCard')
             Template.stashReturnValue({
                 __source = 'card',
-                team = 'TBD',
-                team2 = 'mouz',
+                team = 'mouz',
+                team2 = 'TBD',
                 team3 = 'bds',
                 defaultRowNumber = '5',
                 qualifier = '[[Qualifier/2025|Qualifier]]',
