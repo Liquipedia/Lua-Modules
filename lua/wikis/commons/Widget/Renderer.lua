@@ -91,8 +91,6 @@ function Renderer.render(vNode, context)
 				local fallback = props.fallback
 				if type(fallback) == 'function' then
 					return Renderer.render(fallback(error, context), context)
-				elseif fallback ~= nil then
-					return Renderer.render(fallback, context)
 				end
 				return tostring(ErrorDisplay.InlineError(error))
 			end,
