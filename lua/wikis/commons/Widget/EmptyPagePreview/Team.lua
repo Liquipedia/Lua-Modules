@@ -446,6 +446,7 @@ function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
 			role = joinData.role2,
 		},
 		newTeam = {team = leaveData.toteam},
+		oldTeam = {team = joinData.fromteam},
 		joindate = joinData.date or '',
 		joindatedisplay = joinData.extradata.displaydate,
 		joindateRef = joinData.reference,
