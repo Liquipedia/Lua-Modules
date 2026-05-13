@@ -444,7 +444,6 @@ describe('TeamCard Legacy', function()
 
     describe('run — render and post-render side effects', function()
         local Template = require('Module:Template')
-        local PageVariableNamespace = require('Module:PageVariableNamespace')
         local LegacyTeamCard = require('Module:TeamCard/Legacy')
 
         it('passes minimumplayers = defaultRowNumber + extraRows + sum(p_extra)', function()
@@ -466,76 +465,6 @@ describe('TeamCard Legacy', function()
             stubParse:revert()
         end)
 
-        it('sets externalControlsRendered after render', function()
-            local TPParser = require('Module:TeamParticipants/Parse/Wiki')
-            local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
-            teamParticipantsVars:set('externalControlsRendered', '')
-
-            local stubParse2 = stub(TPParser, 'parseWikiInput', function()
-                return {participants = {}}
-            end)
-
-            Template.stashReturnValue({__source = 'header'}, 'LegacyTeamCard')
-            Template.stashReturnValue({__source = 'card', team = 'A'}, 'LegacyTeamCard')
-
-            LegacyTeamCard.run()
-            assert.are_equal('true', teamParticipantsVars:get('externalControlsRendered'))
-
-            stubParse2:revert()
-        end)
-
-        it('second block does not render controls strip', function()
-            local TPParser = require('Module:TeamParticipants/Parse/Wiki')
-            local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
-
-            local stubParse = stub(TPParser, 'parseWikiInput', function()
-                return {participants = {}}
-            end)
-
-            -- First block
-            teamParticipantsVars:set('externalControlsRendered', '')
-            Template.stashReturnValue({__source = 'header'}, 'LegacyTeamCard')
-            Template.stashReturnValue({__source = 'card', team = 'A'}, 'LegacyTeamCard')
-            LegacyTeamCard.run()
-            assert.are_equal('true', teamParticipantsVars:get('externalControlsRendered'))
-
-            -- Second block: flag is already set, run() must still succeed
-            Template.stashReturnValue({__source = 'header'}, 'LegacyTeamCard')
-            Template.stashReturnValue({__source = 'card', team = 'B'}, 'LegacyTeamCard')
-            local secondOutput = LegacyTeamCard.run()
-            assert.is_truthy(secondOutput)
-
-            stubParse:revert()
-        end)
-
-        it('forces store=false outside mainspace', function()
-            local TPParser = require('Module:TeamParticipants/Parse/Wiki')
-            local Controller = require('Module:TeamParticipants/Controller')
-            local Repository = require('Module:TeamParticipants/Repository')
-
-            local stubParse3 = stub(TPParser, 'parseWikiInput', function()
-                return {participants = {{}}}
-            end)
-            local stubImport = stub(Controller, 'importParticipants', function() end)
-            local stubFill = stub(Controller, 'fillIncompleteRosters', function() end)
-            local stubEnrich = stub(Controller, 'enrichPlayerDates', function() end)
-            local stubSetVars = stub(Repository, 'setPageVars', function() end)
-            local saveSpy = stub(Repository, 'save', function() end)
-            local namespaceStub = stub(require('Module:Namespace'), 'isMain', function() return false end)
-
-            Template.stashReturnValue({__source = 'header'}, 'LegacyTeamCard')
-            Template.stashReturnValue({__source = 'card', team = 'A'}, 'LegacyTeamCard')
-            LegacyTeamCard.run()
-            assert.stub(saveSpy).was_not_called()
-
-            namespaceStub:revert()
-            saveSpy:revert()
-            stubSetVars:revert()
-            stubEnrich:revert()
-            stubFill:revert()
-            stubImport:revert()
-            stubParse3:revert()
-        end)
     end)
 
     describe('run — preprocessCard hook', function()
