@@ -255,7 +255,6 @@ local TN_TITLE_TO_TYPE = {
 	['former players'] = 'former',
 	['former roster'] = 'former',
 	['staff'] = 'staff',
-	['inactive'] = 'inactive',
 }
 
 ---@param tcArgs table
