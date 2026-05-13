@@ -66,7 +66,7 @@ local function buildHtmlString(tag, props, renderedChildren)
 	if props.css then
 		table.insert(buffer, ' style="')
 		for key, value in pairs(props.css) do
-			table.insert(buffer, key .. ':' .. escapeAttr(tostring(value)) .. ';')
+			table.insert(buffer, key .. ':' .. escapeAttr(value) .. ';')
 		end
 		table.insert(buffer, '"')
 	end
