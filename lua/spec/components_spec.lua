@@ -284,3 +284,53 @@ describe('Components/Html', function()
 		assert.are.equal('<span>a</span><span>b</span>', result)
 	end)
 end)
+
+describe('Components/Html attribute escaping', function()
+	it('escapes ampersand in attribute value', function()
+		local vNode = Html.Span{attributes = {title = 'a&b'}}
+		assert.is_true(tostring(vNode):find('title="a&amp;b"', nil, true) ~= nil)
+	end)
+
+	it('escapes double-quote in attribute value', function()
+		local vNode = Html.Span{attributes = {title = 'say "hello"'}}
+		assert.is_true(tostring(vNode):find('&quot;', nil, true) ~= nil)
+	end)
+
+	it('escapes less-than in attribute value', function()
+		local vNode = Html.Span{attributes = {title = '1<2'}}
+		assert.is_true(tostring(vNode):find('&lt;', nil, true) ~= nil)
+	end)
+
+	it('escapes greater-than in attribute value', function()
+		local vNode = Html.Span{attributes = {title = '2>1'}}
+		assert.is_true(tostring(vNode):find('&gt;', nil, true) ~= nil)
+	end)
+
+	it('escapes ampersand in class name', function()
+		local vNode = Html.Span{classes = {'a&b'}}
+		assert.is_true(tostring(vNode):find('class="a&amp;b"', nil, true) ~= nil)
+	end)
+
+	it('renders boolean true attribute without a value', function()
+		local vNode = Html.Span{attributes = {disabled = true}}
+		local result = tostring(vNode)
+		assert.is_true(result:find(' disabled', nil, true) ~= nil)
+		assert.is_false(result:find('disabled=', nil, true) ~= nil)
+	end)
+
+	it('omits boolean false attribute entirely', function()
+		local vNode = Html.Span{attributes = {disabled = false}}
+		local result = tostring(vNode)
+		assert.is_false(result:find('disabled', nil, true) ~= nil)
+	end)
+
+	it('escapes css value containing special characters', function()
+		-- CSS values with < or > should be escaped in the style attribute
+		local vNode = Html.Span{css = {content = '"<>"'}}
+		local result = tostring(vNode)
+		assert.is_true(result:find('style=', nil, true) ~= nil)
+		assert.is_false(result:find('"<>"', nil, true) ~= nil)
+		assert.is_true(result:find('&lt;&gt;', nil, true) ~= nil)
+		assert.is_true(result:find('&quot;', nil, true) ~= nil)
+	end)
+end)
