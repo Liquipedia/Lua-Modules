@@ -363,7 +363,7 @@ return {
 			},
 		},
 		['fc 26'] = {
-			abbreviation = '2026',
+			abbreviation = 'FC 26',
 			name = 'EA SPORTS FC 26',
 			link = 'EA SPORTS FC 26',
 			logo = {
@@ -373,6 +373,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'EA FC26 default allmode.png',
 				lightMode = 'EA FC26 default allmode.png',
+			},
+		},
+		['fc 27'] = {
+			abbreviation = 'FC 27',
+			name = 'EA SPORTS FC 27',
+			link = 'EA SPORTS FC 27',
+			logo = {
+				darkMode = 'EA FC27 default allmode.png',
+				lightMode = 'EA FC27 default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'EA FC27 default allmode.png',
+				lightMode = 'EA FC27 default allmode.png',
 			},
 		},
 		o2 = {
@@ -415,7 +428,7 @@ return {
 			},
 		},
 		['fc mobile'] = {
-			abbreviation = 'FCM',
+			abbreviation = 'Mobile',
 			name = 'EA SPORTS FC Mobile',
 			link = 'EA SPORTS FC Mobile',
 			logo = {
@@ -428,7 +441,7 @@ return {
 			},
 		},
 		['fc online'] = {
-			abbreviation = 'FCO',
+			abbreviation = 'Online',
 			name = 'EA SPORTS FC Online',
 			link = 'EA SPORTS FC Online',
 			logo = {
