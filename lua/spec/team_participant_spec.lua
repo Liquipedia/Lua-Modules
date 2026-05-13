@@ -896,6 +896,7 @@ describe('Team Participant', function()
 							apiId = nil,
 							extradata = {
 								type = 'player',
+								results = true,
 								joinDate = '2024-03-15',
 								leaveDate = nil,
 							},
@@ -924,6 +925,7 @@ describe('Team Participant', function()
 							apiId = nil,
 							extradata = {
 								type = 'player',
+								results = true,
 								status = 'former',
 								joinDate = '2024-02-01',
 								leaveDate = '2024-08-15',
