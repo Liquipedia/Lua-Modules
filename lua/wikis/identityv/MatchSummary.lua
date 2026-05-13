@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
@@ -74,10 +75,14 @@ function IdentityVMatchSummaryGameRow:createGameOpponentView(opponentIndex)
 	local firstSide = getFirstSide()
 	local secondSide = CustomMatchSummary._getOppositeSide(firstSide)
 	local halfs = extradata['t' .. opponentIndex .. 'halfs'] or {}
-	local scoreDetails = {
-		{score = halfs[firstSide], style = 'brkts-identityv-score-color-' .. firstSide},
-		{score = halfs[secondSide], style = 'brkts-identityv-score-color-' .. secondSide},
-	}
+	local scoreDetails = {}
+
+	if Logic.isNotEmpty(firstSide) then
+		scoreDetails = {
+			{score = halfs[firstSide], style = 'brkts-identityv-score-color-' .. firstSide},
+			{score = halfs[secondSide], style = 'brkts-identityv-score-color-' .. secondSide},
+		}
+	end
 
 	local characters = extradata['t' .. opponentIndex .. 'picks'] or {}
 	return {

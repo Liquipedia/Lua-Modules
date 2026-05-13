@@ -45,7 +45,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Map Link', children = {tostring(Link{
 				linktype = 'external',
 				link = args.maplink,
-				children = {args.map},
+				children = {args.name},
 			})}}
 		)
 	end

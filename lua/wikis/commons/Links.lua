@@ -143,6 +143,8 @@ local PREFIXES = {
 		player = 'https://faceitdb.com/profile/faceit/',
 	},
 	fanclub = {''},
+	['fastcup-csgo'] = {'https://csgo.fastcup.net/tournaments/'},
+	['fastcup-cs2'] = {'https://cs2.fastcup.net/tournaments/'},
 	fide = {
 		'https://ratings.fide.com/tournament_information.phtml?event=',
 		player = 'https://ratings.fide.com/profile/',
