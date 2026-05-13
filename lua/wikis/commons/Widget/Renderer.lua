@@ -46,6 +46,7 @@ local function escapeAttr(str)
 	if type(str) ~= 'string' then
 		str = tostring(str)
 	end
+	if not str:find('[><&"]') then return str end
 	return (str:gsub('[><&"]', htmlencodeMap))
 end
 
@@ -57,7 +58,7 @@ end
 local function buildHtmlString(tag, props, renderedChildren)
 	local buffer = { '<', tag }
 
-	if props.classes and #props.classes > 0 then
+	if props.classes then
 		table.insert(buffer, ' class="')
 		table.insert(buffer, escapeAttr(table.concat(props.classes, ' ')))
 		table.insert(buffer, '"')
