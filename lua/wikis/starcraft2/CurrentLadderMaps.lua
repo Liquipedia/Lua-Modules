@@ -19,7 +19,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
@@ -29,7 +29,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local CurrentLadderMaps = {}
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CurrentLadderMaps.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -58,10 +58,10 @@ function CurrentLadderMaps.run(frame)
 		{mode = '4v4', maps = Array.mapIndexes(FnUtil.curry(readInput, '4v4'))},
 	}
 
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = {
 			CurrentLadderMaps._mapsOverview(data),
-			HtmlWidgets.Br{},
+			Html.Br{},
 			CurrentLadderMaps._mapsDetails(data),
 		}
 	}
@@ -86,7 +86,7 @@ end
 ---@private
 ---@param data {mode:string, maps: {pageName: string, displayName: string, text: string?,
 --- spawns: string?, image: string?, creator: string}[]}[]
----@return Widget
+---@return VNode
 function CurrentLadderMaps._mapsOverview(data)
 	return TableWidgets.Table{
 		children = {
@@ -121,12 +121,12 @@ end
 ---@private
 ---@param data {mode:string, maps: {pageName: string, displayName: string, text: string?,
 --- spawns: string?, image: string?, creator: string}[]}[]
----@return Widget
+---@return VNode
 function CurrentLadderMaps._mapsDetails(data)
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'row'},
 		children = Array.map(data, function(info)
-			return HtmlWidgets.Div{
+			return Html.Div{
 				classes = {'col-lg-3', 'col-md-6', 'col-sm-6', 'col-xs-12'},
 				children = TableWidgets.Table{
 					tableClasses = {'collapsible', 'collapsed'},
@@ -154,12 +154,12 @@ end
 
 ---@private
 ---@param map {pageName: string, displayName: string, text: string?, spawns: string?, image: string?, creator: string}
----@return Widget
+---@return VNode
 function CurrentLadderMaps._mapDetails(map)
 	return TableWidgets.Row{
 		children = TableWidgets.Cell{
 			children = WidgetUtil.collect(
-				HtmlWidgets.B{children = Link{link = map.pageName, children = map.displayName}},
+				Html.B{children = Link{link = map.pageName, children = map.displayName}},
 				map.spawns and (' (' .. map.spawns .. ')') or nil,
 				map.image and Image{
 					imageLight = map.image,
@@ -169,8 +169,8 @@ function CurrentLadderMaps._mapDetails(map)
 					horizontalAlignment = 'right',
 					alt = map.displayName,
 				} or nil,
-				HtmlWidgets.Br{},
-				HtmlWidgets.I{
+				Html.Br{},
+				Html.I{
 					css = {['white-space'] = 'normal'},
 					children = map.text,
 				}
