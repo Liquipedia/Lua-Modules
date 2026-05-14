@@ -50,6 +50,7 @@ local function ParticipantsTeamCardsGroup(props)
 				children = Array.map(participants, function(participant)
 					return ParticipantsTeamCard{
 						participant = participant,
+						mergeStaffTabIfOnlyOneStaff = props.mergeStaffTabIfOnlyOneStaff,
 					}
 				end),
 			}
