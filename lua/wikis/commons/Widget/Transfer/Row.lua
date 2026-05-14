@@ -280,6 +280,8 @@ function TransferRowWidget._displayTeam(args)
 	local data = args.data
 	local align = isOldTeam and 'right' or 'left'
 
+	---@param props {children?: Renderable|Renderable[]}
+	---@return HtmlNode
 	local function createTeamCell(props)
 		return createDivCell{
 			classes = {'Team', isOldTeam and 'OldTeam' or 'NewTeam'},
