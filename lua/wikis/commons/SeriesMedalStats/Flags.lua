@@ -22,7 +22,7 @@ local MedalsTable = Lua.import('Module:Widget/MedalsTable')
 local MedalStats = Class.new(MedalStatsBase)
 
 ---@param frame Frame
----@return Widget?
+---@return VNode?
 function MedalStats.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -32,7 +32,7 @@ function MedalStats.run(frame)
 	return MedalStats(args):create()
 end
 
----@return Widget?
+---@return VNode?
 function MedalStats:create()
 	if Logic.isEmpty(self.rawData) then return end
 

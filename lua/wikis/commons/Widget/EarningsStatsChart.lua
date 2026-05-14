@@ -14,7 +14,7 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Widget = Lua.import('Module:Widget')
 
 ---@class EarningsStatsChart: Widget
@@ -22,17 +22,17 @@ local Widget = Lua.import('Module:Widget')
 ---@field props {dataPoints: {legend: string, key: string}[], data: table}
 local EarningsStatsChart = Class.new(Widget)
 
----@return Widget?
+---@return VNode?
 function EarningsStatsChart:render()
 	local data, years = self:_parse()
 	if Logic.isEmpty(data) then
 		return
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'table-responsive'},
 		children = {
-			HtmlWidgets.H3{children = 'Earnings Statistics'},
+			Html.H3{children = 'Earnings Statistics'},
 			mw.ext.Charts.chart{
 				grid = {
 					left = '15%',

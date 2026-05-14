@@ -24,7 +24,7 @@ local MedalsTable = Lua.import('Module:Widget/MedalsTable')
 local MedalStats = Class.new(MedalStatsBase)
 
 ---@param frame Frame
----@return Widget?
+---@return VNode?
 function MedalStats.run(frame)
 	local args = Arguments.getArgs(frame)
 

@@ -16,7 +16,7 @@ local MedalStatsBase = Lua.import('Module:SeriesMedalStats')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local MedalsTable = Lua.import('Module:Widget/MedalsTable')
 
 ---@class SeriesMedalStatsParticipantTeam: SeriesMedalStats
@@ -24,7 +24,7 @@ local MedalsTable = Lua.import('Module:Widget/MedalsTable')
 local MedalStats = Class.new(MedalStatsBase)
 
 ---@param frame Frame
----@return Widget?
+---@return VNode?
 function MedalStats.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -57,12 +57,12 @@ function MedalStats:create()
 		rowSort = MedalStatsBase.rowSort,
 		hideTotalRow = true,
 		cutAfter = self.config.cutAfter,
-		footer = HtmlWidgets.Small{
+		footer = Html.Small{
 			children = {
 				'Medals won per Team shows the team that a player was',
-				HtmlWidgets.Br{},
+				Html.Br{},
 				'on when the medal was won, ',
-				HtmlWidgets.B{children = 'not'},
+				Html.B{children = 'not'},
 				' their current team.',
 			}
 		},

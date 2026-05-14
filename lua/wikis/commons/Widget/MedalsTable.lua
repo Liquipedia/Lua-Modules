@@ -15,7 +15,7 @@ local Medals = Lua.import('Module:Medals')
 local Table = Lua.import('Module:Table')
 local Tier = Lua.import('Module:Tier/Utils')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -47,7 +47,7 @@ MedalsTable.defaultProps = {
 	end,
 }
 
----@return Widget
+---@return VNode
 function MedalsTable:render()
 	-- can not use defaultProps as the deepmerge might add unwanted columns from default into the inputted data ...
 	self.dataColumns = self.props.dataColumns or DEFAULT_DATA_COLUMNS
@@ -87,14 +87,14 @@ end
 
 ---@private
 ---@param dataColumn string
----@return Widget
+---@return VNode
 function MedalsTable:_headerCell(dataColumn)
 	---@type Renderable?
 	local header
 	if dataColumn == 'total' then
 		header = 'Total'
 	elseif dataColumn == 'top3' then
-		header = HtmlWidgets.Abbr{title = 'Total of top 3', children = 'Top3'}
+		header = Html.Abbr{title = 'Total of top 3', children = 'Top3'}
 	else
 		header = Medals.display{medal = dataColumn}
 	end
@@ -106,7 +106,7 @@ function MedalsTable:_headerCell(dataColumn)
 end
 
 ---@private
----@return Widget[]
+---@return VNode[]
 function MedalsTable:_rows()
 	local totalRowDataSet = Table.extract(self.props.data, 'total')
 	local rows = {}
@@ -126,7 +126,7 @@ end
 ---@private
 ---@param firstCellContent Renderable[]|Renderable?
 ---@param data table<string|integer, integer>
----@return Widget[]
+---@return VNode[]
 function MedalsTable:_row(firstCellContent, data)
 	local dashIfZero = function(input)
 		if not input or input == 0 then

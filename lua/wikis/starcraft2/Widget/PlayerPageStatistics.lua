@@ -27,7 +27,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@operator call(table): PlayerPageStatistics
 local PlayerPageStatistics = Class.new(Widget)
 
----@return Widget[]
+---@return VNode[]
 function PlayerPageStatistics:render()
 	return WidgetUtil.collect(
 		self:_matchupStats(),
@@ -40,7 +40,7 @@ function PlayerPageStatistics:render()
 end
 
 ---@private
----@return Widget?
+---@return VNode?
 function PlayerPageStatistics:_matchupStats()
 	---@type table<string, table<string, {w: integer?, l: integer?}>>
 	local data = Json.parseIfString(Variables.varDefault('matchUpStats'))
@@ -117,7 +117,7 @@ end
 
 ---@private
 ---@param columns string[]
----@return Widget
+---@return VNode
 function PlayerPageStatistics:_matchupStatsHeader(columns)
 	return TableWidgets.TableHeader{
 		children = {
@@ -143,7 +143,7 @@ function PlayerPageStatistics:_matchupStatsHeader(columns)
 end
 
 ---@private
----@return Widget
+---@return VNode
 function PlayerPageStatistics:_earningsChart()
 	local rawData = Json.parseIfString(Variables.varDefault('earningsStats')) or {}
 

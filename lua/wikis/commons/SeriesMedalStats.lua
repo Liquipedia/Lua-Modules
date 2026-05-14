@@ -146,7 +146,7 @@ function MedalStats:_getConditions(args)
 	return tostring(conditions) .. config.additionalConditions
 end
 
----@return Widget?
+---@return VNode?
 function MedalStats:create()
 	error('The `:create()` function has to be part of part of the specific module')
 end

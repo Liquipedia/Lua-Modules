@@ -22,7 +22,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local MedalsTable = Lua.import('Module:Widget/MedalsTable')
 
 local DEFAULT_TIERS = {'1', '2', '3'}
@@ -35,7 +35,7 @@ local PlacementStats = {}
 ---@alias InfoboxPlacementStatsData table<string, InfoboxPlacementStatsDataRow>
 
 ---@param args table
----@return Widget?
+---@return VNode?
 function PlacementStats.run(args)
 	args = args or {}
 
@@ -51,11 +51,11 @@ function PlacementStats.run(args)
 		return
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'fo-nttax-infobox', 'wiki-bordercolor-light'},
 		children = {
-			HtmlWidgets.Div{
-				children = HtmlWidgets.Div{
+			Html.Div{
+				children = Html.Div{
 					classes = {'infobox-header', 'wiki-backgroundcolor-light'},
 					children = 'Placement Summary',
 				},

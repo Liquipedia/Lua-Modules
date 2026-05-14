@@ -13,7 +13,7 @@ local Variables = Lua.import('Module:Variables')
 
 local Box = Lua.import('Module:Widget/Basic/Box')
 local EarningsStatsChart = Lua.import('Module:Widget/EarningsStatsChart')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local MedalsTable = Lua.import('Module:Widget/MedalsTable')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -22,7 +22,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@operator call(table): TeamPageStatistics
 local TeamPageStatistics = Class.new(Widget)
 
----@return Widget
+---@return VNode
 function TeamPageStatistics:render()
 	return WidgetUtil.collect(
 		self:_earningsChart(),
@@ -30,7 +30,7 @@ function TeamPageStatistics:render()
 	)
 end
 
----@return Widget
+---@return VNode
 function TeamPageStatistics:_earningsChart()
 	return EarningsStatsChart{
 		data = {
@@ -44,7 +44,7 @@ function TeamPageStatistics:_earningsChart()
 	}
 end
 
----@return Widget
+---@return VNode
 function TeamPageStatistics:_medalTables()
 	local data = Json.parseIfString(Variables.varDefault('medals'))
 	return Box{
@@ -56,9 +56,9 @@ function TeamPageStatistics:_medalTables()
 			MedalsTable{
 				caption = '1v1 Medal Statistics',
 				data = data.solo,
-				footer = HtmlWidgets.Small{
+				footer = Html.Small{
 					children = {
-						HtmlWidgets.B{children = 'Note:'},
+						Html.B{children = 'Note:'},
 						' This table shows the medals won by players in 1v1 events while on the team.'
 					}
 				},
