@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local Condition = Lua.import('Module:Condition')
@@ -16,15 +15,12 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local ColumnName = Condition.ColumnName
 
+local Component = Lua.import('Module:Widget/Component')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local Widget = Lua.import('Module:Widget')
 
----@class MostAllKills: Widget
----@operator call(table): MostAllKills
-local MostAllKills = Class.new(Widget)
+local MostAllKills = {}
 
----@return Widget
-function MostAllKills:render()
+function MostAllKills.render()
 	return TableWidgets.Table{
 		sortable = false,
 		tableClasses = {'prizepooltable', 'collapsed'},
@@ -46,14 +42,14 @@ function MostAllKills:render()
 					}
 				}
 			},
-			TableWidgets.TableBody{children = self:_rows()}
+			TableWidgets.TableBody{children = MostAllKills._rows()}
 		},
 	}
 end
 
 ---@private
 ---@return Widget[]
-function MostAllKills:_rows()
+function MostAllKills._rows()
 	local allKillList = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = tostring(ConditionNode(ColumnName('type'), Comparator.eq, 'allkills')),
 		order = 'information desc, date desc, pagename asc',
@@ -64,7 +60,7 @@ function MostAllKills:_rows()
 	return Array.map(allKillList, function(allKillInfo)
 		return TableWidgets.Row{
 			children = {
-				TableWidgets.Cell{children = self:_player(allKillInfo.pagename)},
+				TableWidgets.Cell{children = MostAllKills._player(allKillInfo.pagename)},
 				TableWidgets.Cell{children = allKillInfo.information},
 			}
 		}
@@ -74,11 +70,11 @@ end
 ---@private
 ---@param pageName string
 ---@return Renderable
-function MostAllKills:_player(pageName)
+function MostAllKills._player(pageName)
 	local playerInfo = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = tostring(ConditionNode(ColumnName('pagename'), Comparator.eq, pageName)),
 		query = 'extradata, nationality, id',
-		limit = '1',
+		limit = 1,
 	})[1] or {}
 
 	return PlayerDisplay.BlockPlayer{player = {
@@ -89,4 +85,4 @@ function MostAllKills:_player(pageName)
 	}}
 end
 
-return MostAllKills
+return Component.component(MostAllKills.render)
