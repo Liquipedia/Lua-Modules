@@ -289,9 +289,9 @@ function TransferRowWidget._displayTeam(args)
 	end
 
 	if not data.teams[1] and not data.roles[1] then
-		return createTeamCell{
-			children = TransferRowWidget._createRole{roles = {'&nbsp;None&nbsp;'}, marginDirection = align, showTeamName = showTeamName}
-		}
+		return createTeamCell{children = TransferRowWidget._createRole{
+			roles = {'&nbsp;None&nbsp;'}, marginDirection = align, showTeamName = showTeamName
+		}}
 	end
 
 	---@param team string
@@ -307,7 +307,9 @@ function TransferRowWidget._displayTeam(args)
 
 	local teams = Array.map(data.teams, teamDisplay)
 
-	local roleCell = TransferRowWidget._createRole{roles = data.roles, team = data.teams[1], marginDirection = align, showTeamName = showTeamName}
+	local roleCell = TransferRowWidget._createRole{
+		roles = data.roles, team = data.teams[1], marginDirection = align, showTeamName = showTeamName
+	}
 
 	return createTeamCell{
 		children = WidgetUtil.collect(
