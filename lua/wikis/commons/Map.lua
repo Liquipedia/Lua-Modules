@@ -26,7 +26,9 @@ local Map = {}
 ---@field pageName string
 ---@field releaseDate {year: integer, month: integer, day: integer, timestamp: integer, string: string}
 ---@field image string?
+---@field imageDark string?
 ---@field creators string[]
+---@field creatorDisplayNames (string|nil)[]
 ---@field game string?
 ---@field gameModes string[]?
 ---@field extradata table
@@ -98,9 +100,15 @@ function Map.fromRecord(record)
 
 	---@type string[]
 	local creators = {}
+	---@type (string|nil)[]
+	local creatorDisplayNames = {}
 
-	for _, creator in Table.iter.pairsByPrefix(record.extradata, 'creator', {requireIndex = false}) do
+	for prefix, creator, index in Table.iter.pairsByPrefix(record.extradata, 'creator', {requireIndex = false}) do
 		table.insert(creators, creator)
+		if Logic.isEmpty(index) then
+			index = 1
+		end
+		creatorDisplayNames[index] = record.extradata[prefix .. 'dn']
 	end
 
 	---@type StandardMap
@@ -108,8 +116,10 @@ function Map.fromRecord(record)
 		displayName = record.name,
 		pageName = record.pagename,
 		releaseDate = releaseDate,
-		image = record.image,
+		image = Logic.nilIfEmpty(record.image),
+		imageDark = Logic.nilIfEmpty(record.imagedark),
 		creators = creators,
+		creatorDisplayNames = creatorDisplayNames,
 		game = Table.extract(record.extradata, 'game'),
 		gameModes = Table.extract(record.extradata, 'modes'),
 		extradata = record.extradata

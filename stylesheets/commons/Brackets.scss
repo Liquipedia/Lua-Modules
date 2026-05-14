@@ -308,12 +308,22 @@
 	color: var( --clr-primary, #0000ff );
 }
 
-.brkts-valorant-score-color-def {
-	color: #46b09c;
-}
+.wiki-valorant {
+	--valorant-def-score-color: #01654c;
+	--valorant-atk-score-color: #b20110;
 
-.brkts-valorant-score-color-atk {
-	color: #c04845;
+	.theme--dark & {
+		--valorant-def-score-color: #46b09c;
+		--valorant-atk-score-color: #c04845;
+	}
+
+	.brkts-valorant-score-color-def {
+		color: var( --valorant-def-score-color );
+	}
+
+	.brkts-valorant-score-color-atk {
+		color: var( --valorant-atk-score-color );
+	}
 }
 
 .brkts-identityv-score-color-survivor {
@@ -679,6 +689,23 @@ div.brkts-popup-body-element-thumbs {
 			> .brkts-popup-spaced:nth-last-of-type( 1 ) {
 				flex-direction: row-reverse;
 				justify-content: flex-start;
+			}
+		}
+	}
+
+	&-header {
+		padding: unset;
+		grid-template-columns: 1fr 2fr 1fr;
+
+		> div {
+			display: flex;
+
+			&:first-child {
+				justify-content: flex-start;
+			}
+
+			&:nth-child( 2 ) {
+				justify-content: center;
 			}
 		}
 	}

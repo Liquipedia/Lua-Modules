@@ -37,5 +37,11 @@ return {
 		participants = {
 			defaultPlayerNumber = 5,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'manualPrio',
+			},
+		},
 	},
 }

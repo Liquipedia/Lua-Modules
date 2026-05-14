@@ -13,6 +13,7 @@ $participant-icon-size-mobile: 33px;
 $participant-icon-size-small: 18px;
 
 $compact-selector: '[data-switch-group="team-cards-compact"]';
+$hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 
 @mixin set-participant-icon-size($wrapper-size, $icon-size) {
 	width: $wrapper-size;
@@ -35,6 +36,18 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 	@media ( min-width: 768px ) {
 		display: flex;
 	}
+}
+
+.switch-toggle-container:has( #{ $hover-selector } ) {
+	display: none;
+
+	@media ( min-width: 768px ) and ( hover: hover ) and ( pointer: fine ) {
+		display: flex;
+	}
+}
+
+.team-participant-card__hover-header {
+	display: none;
 }
 
 .team-participant {
@@ -541,5 +554,108 @@ body:has( .switch-toggle-active#{ $compact-selector } ) {
 			$participant-icon-wrapper-size-compact,
 			$participant-icon-size-compact
 		);
+	}
+}
+
+@media ( hover: hover ) and ( pointer: fine ) {
+	@supports ( anchor-name: --foo ) {
+		.team-participant-card__opponent .name a {
+			anchor-name: --team-participant-card-name;
+		}
+	}
+
+	body:has( .switch-toggle-active#{ $hover-selector } ) {
+		.team-participant-card.general-collapsible.collapsed {
+			overflow: visible;
+
+			@supports ( anchor-name: --foo ) {
+				anchor-scope: --team-participant-card-name;
+			}
+
+			@supports not ( anchor-name: --foo ) {
+				position: relative;
+			}
+		}
+
+		.team-participant-card.general-collapsible.collapsed:has( .team-participant-card__opponent .name a:hover ) {
+			.should-collapse {
+				display: block;
+				position: absolute;
+				z-index: 10;
+				min-width: 200px;
+				border-radius: 0.5rem;
+				border: 1px solid;
+				overflow: hidden;
+				pointer-events: none;
+				background-color: var( --clr-secondary-100 );
+				border-color: var( --clr-on-surface-light-primary-8 );
+				box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.1 );
+
+				@supports ( anchor-name: --foo ) {
+					position-anchor: --team-participant-card-name;
+					top: calc( anchor( bottom ) + 0.75rem );
+					left: anchor( center );
+					translate: -50% 0;
+				}
+
+				@supports not ( anchor-name: --foo ) {
+					top: calc( 100% + 4px );
+					left: 4px;
+				}
+
+				.theme--dark & {
+					background-color: var( --clr-secondary-16 );
+					border-color: var( --clr-on-surface-dark-primary-8 );
+					box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.3 );
+				}
+			}
+
+			.team-participant-card__hover-header {
+				display: block;
+				padding: 0.5rem 0.75rem 0.25rem;
+				font-weight: bold;
+				font-size: 0.875rem;
+				color: var( --clr-secondary-25 );
+
+				.theme--dark & {
+					color: var( --clr-secondary-90 );
+				}
+			}
+
+			.should-collapse a {
+				color: var( --clr-secondary-7 );
+				text-decoration: none;
+
+				.theme--dark & {
+					color: var( --clr-secondary-90 );
+				}
+			}
+
+			.switch-pill-container {
+				display: none;
+			}
+
+			.toggle-area [ data-toggle-area-content ] {
+				display: none;
+			}
+
+			.toggle-area [ data-toggle-area-content="1" ] {
+				display: block;
+			}
+
+			.team-participant-card__qualifier--content,
+			.team-participant-card__notifications {
+				display: none;
+			}
+		}
+
+		&:has( .switch-toggle-active#{ $compact-selector } ) {
+			.team-participant-card.general-collapsible.collapsed:has( .team-participant-card__opponent .name a:hover ) .should-collapse {
+				@supports ( anchor-name: --foo ) {
+					left: anchor( left );
+					translate: none;
+				}
+			}
+		}
 	}
 }

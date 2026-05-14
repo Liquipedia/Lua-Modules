@@ -82,7 +82,12 @@ const EXPORT_IMAGE_CONFIG = {
 			targetSelector: null,
 			typeName: 'Participants'
 		},
-		{ selector: '.standings-ffa', targetSelector: 'tbody', typeName: 'BR/FFA Standings Table' },
+		{
+			selector: '.table2.standings-ffa',
+			targetSelector: 'table.table2__table',
+			titleSelector: '.table2__title',
+			typeName: 'BR/FFA Standings Table'
+		},
 		{
 			selector: '.table2.standings-swiss',
 			targetSelector: 'table.table2__table',
