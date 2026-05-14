@@ -24,7 +24,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -37,7 +37,7 @@ local YESTERDAY = DateExt.getCurrentTimestamp() - DateExt.daysToSeconds(1)
 local MainPageSeasonEvents = {}
 
 ---@param frame Frame
----@return Widget
+---@return HtmlNode
 function MainPageSeasonEvents.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -46,7 +46,7 @@ function MainPageSeasonEvents.run(frame)
 
 	local tournamentData = MainPageSeasonEvents._fetchTournamentData(args, pageName)
 
-	local iconDisplay = HtmlWidgets.Div{
+	local iconDisplay = Html.Div{
 		css = {
 			height = '70px',
 			display = 'flex',
@@ -64,11 +64,11 @@ function MainPageSeasonEvents.run(frame)
 		},
 	}
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		css = {['text-align'] = 'center'},
 		children = WidgetUtil.collect(
 			iconDisplay,
-			HtmlWidgets.Br{},
+			Html.Br{},
 			Link{link = pageName, children = tournamentData.displayName},
 			tournamentData.status == 'finished'
 				and MainPageSeasonEvents._winnerDisplay(tournamentData)
@@ -93,7 +93,7 @@ end
 
 ---@private
 ---@param tournamentData StandardTournament
----@return Widget[]
+---@return HtmlNode[]
 function MainPageSeasonEvents._winnerDisplay(tournamentData)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('parent'), Comparator.eq, tournamentData.pageName),
@@ -110,7 +110,7 @@ function MainPageSeasonEvents._winnerDisplay(tournamentData)
 	local showWinner = winner and dateDiff > SPOILER_DELAY
 
 	return WidgetUtil.collect(
-		HtmlWidgets.Br{},
+		Html.Br{},
 		showWinner and {
 			IconFa{
 				iconName = 'tournament_winner',
@@ -119,9 +119,9 @@ function MainPageSeasonEvents._winnerDisplay(tournamentData)
 			},
 			'&nbsp;',
 			OpponentDisplay.InlineOpponent{opponent = winner}
-		} or HtmlWidgets.Span{
+		} or Html.Span{
 			classes = {'forest-green-text'},
-			children = HtmlWidgets.B{children = 'Completed'},
+			children = Html.B{children = 'Completed'},
 		}
 	)
 end
@@ -129,7 +129,7 @@ end
 ---@private
 ---@param tournamentData StandardTournament
 ---@param args table
----@return Widget[]?
+---@return HtmlNode[]?
 function MainPageSeasonEvents._countdown(tournamentData, args)
 	local pages = Array.mapIndexes(function(index)
 		return Page.pageifyLink(args['additional_page' .. index])
@@ -157,7 +157,7 @@ function MainPageSeasonEvents._countdown(tournamentData, args)
 	local extradata = matches[1].extradata
 
 	return {
-		HtmlWidgets.Br{},
+		Html.Br{},
 		Countdown.create({date = DateExt.toCountdownArg(extradata.timestamp, extradata.timezoneid), rawcountdown = true}),
 	}
 end
