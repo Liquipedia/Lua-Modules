@@ -13,6 +13,7 @@ local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local FnUtil = Lua.import('Module:FnUtil')
+local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local MatchupDisplay = Lua.import('Module:FactionStatistics/MatchupDisplay')
@@ -193,6 +194,11 @@ function PlayerStatistics:_getMatchConditions()
 		conditions:add(ConditionNode(ColumnName('opponent'), Comparator.eq, self.player))
 	else
 		conditions:add(ConditionNode(ColumnName('player'), Comparator.eq, self.player))
+	end
+
+	local game = Game.toIdentifier{game = args.game, useDefault = false}
+	if game then
+		conditions:add(ConditionNode(ColumnName('game'), Comparator.eq, game))
 	end
 
 	return tostring(conditions)
