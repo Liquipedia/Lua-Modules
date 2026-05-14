@@ -65,12 +65,8 @@ end
 ---@return T[]
 ---@nodiscard
 function Array.rep(element, count, copyFunction)
-	assert(element ~= nil, 'element must not be nil')
-	if count < 0 then
-		error('count must be non-negative')
-	elseif count == 0 then
-		return {}
-	end
+	assert(element ~= nil, 'Array.rep: element must not be nil')
+	assert(count >= 0, 'Array.rep: count must be non-negative')
 	local arr = {}
 	for _ = 1, count do
 		if copyFunction then

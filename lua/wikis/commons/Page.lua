@@ -124,4 +124,25 @@ function Page.makeFormQueryLink(args)
 	return queryLink .. (args.execute and '&_run' or '')
 end
 
+--- Splits a page name into a namespace, base, and section.
+---@param pageName string
+---@return string?, string, string?
+function Page.splitPageName(pageName)
+	local title = mw.title.new(pageName)
+	assert(title, 'Invalid pagename "' .. pageName .. '"')
+	return String.nilIfEmpty(title.nsText), title.text, String.nilIfEmpty(title.fragment)
+end
+
+--- Joins given namespace, base page name, and section into a page name.
+---@param namespaceName string?
+---@param basePageName string
+---@param section string?
+---@return string
+function Page.createPageName(namespaceName, basePageName, section)
+	if String.isEmpty(basePageName) then
+		return ''
+	end
+	return mw.title.makeTitle(namespaceName or '', basePageName, section).fullText
+end
+
 return Page
