@@ -11,7 +11,6 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
-local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -104,6 +103,7 @@ function TransferList:parseArgs(args)
 		shown = Logic.nilOr(Logic.readBoolOrNil(args.shown), true),
 		class = Logic.nilIfEmpty(args.class),
 		showMissingResultsMessage = Logic.readBool(args.form),
+		showTeamName = Logic.readBoolOrNil(args.showTeamName),
 		conditions = {
 			nationalities = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.nationality)),
 			players = Logic.nilIfEmpty(Array.map(players, mw.ext.TeamLiquidIntegration.resolve_redirect)),
@@ -401,7 +401,7 @@ function TransferList:_buildRow(transfers)
 
 	return TransferRowWidget{
 		transfers = transfers,
-		showTeamName = (Info.config.transfers or {}).showTeamName
+		showTeamName = self.config.showTeamName
 	}
 end
 

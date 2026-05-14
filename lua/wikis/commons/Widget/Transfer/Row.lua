@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -421,4 +422,6 @@ function TransferRowWidget.references(transfer)
 	}
 end
 
-return Component.component(TransferRowWidget.render)
+return Component.component(TransferRowWidget.render, {
+	showTeamName = Logic.readBool((Info.config.transfers or {}).showTeamName)
+})
