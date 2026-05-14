@@ -906,16 +906,16 @@ Template(s): OffSeasonOverview
 Author(s): Vogan
 *******************************************************************************/
 .OffSeasonOverview {
-	padding: 0;
-	margin: 0;
 	width: 70%;
-	margin-bottom: -1px;
+	border: 1px solid var( --table-border-color );
 
 	@media ( max-width: 560px ) {
-		padding: 0;
-		margin: 0;
 		width: 100%;
-		margin-bottom: -1px;
+	}
+
+	> .general-collapsible-default-header {
+		background-color: var( --table-header-variant-background-color );
+		padding: 0.3125rem;
 	}
 }
 
@@ -1326,72 +1326,42 @@ Author(s): spazer, Lafungo
 	line-height: 1.25;
 }
 
-.placement-1 {
-	background-color: var( --achievement-placement-1, #ffd739 ); //rgb( 255, 221, 60 );
-}
+$placement-colors: (
+	"1": ( var( --clr-semantic-gold-40 ), var( --clr-semantic-gold-30 ) ),
+	"2": ( var( --clr-semantic-silver-40 ) ),
+	"3": ( var( --clr-semantic-bronze-40 ), var( --clr-semantic-bronze-30 ) ),
+	"4": ( var( --clr-semantic-copper-40 ), var( --clr-semantic-copper-30 ) ),
+	"5": ( var( --clr-elm-40 ), var( --clr-elm-30 ) ),
+	"6": ( var( --clr-elm-30 ), var( --clr-elm-20 ) ),
+	"lightblue": ( var( --clr-elm-40 ), color-mix( in srgb, #000000 20%, var( --clr-elm-40 ) ) ),
+	"blue": ( var( --clr-elm-30 ), color-mix( in srgb, #000000 20%, var( --clr-elm-30 ) ) ),
+	"darkblue": ( var( --clr-elm-20 ), color-mix( in srgb, #000000 20%, var( --clr-elm-20 ) ) ),
+	"darkgrey": ( var( --clr-elm-10 ) ),
+	"win": ( var( --clr-semantic-positive-40 ), var( --clr-semantic-positive-20 ) ),
+	"draw": ( var( --clr-tuliptree-80 ), var( --clr-tuliptree-40 ) ),
+	"lose": ( var( --clr-secondary-70 ), var( --clr-secondary-25 ) ),
+	"up": ( var( --clr-atlantis-40 ), var( --clr-atlantis-30 ) ),
+	"stay": ( var( --clr-sun-40 ), var( --clr-sun-30 ) ),
+	"down": ( color-mix( in srgb, #ffffff 30%, var( --clr-semantic-negative-40 ) ), var( --clr-semantic-negative-30 ) ),
+	"dnp": ( var( --clr-moon-80 ), color-mix( in srgb, #000000 20%, var( --clr-moon-80 ) ) ),
+);
 
-.placement-2 {
-	background-color: var( --achievement-placement-2, #bebebe ); //rgb( 154, 154, 154 );
-}
+@each $name, $colors in $placement-colors {
+	.placement-#{$name} {
+		@if length( $colors ) == 2 {
+			.theme--light & {
+				background-color: nth( $colors, 1 );
+			}
 
-.placement-3 {
-	background-color: var( --achievement-placement-3, #bb8644 ); //rgb( 177, 132, 42 );
-}
+			.theme--dark & {
+				background-color: nth( $colors, 2 );
+			}
+		}
 
-.placement-4 {
-	background-color: var( --achievement-placement-4, #f8996b );
-}
-
-.placement-5 {
-	background-color: var( --achievement-placement-5, #27a4a4 );
-}
-
-.placement-6 {
-	background-color: var( --achievement-placement-6, #1e7d7d );
-}
-
-.placement-lightblue {
-	background-color: var( --achievement-placement-lightblue, #007f99 );
-}
-
-.placement-blue {
-	background-color: var( --achievement-placement-blue, #166f82 );
-}
-
-.placement-darkblue {
-	background-color: var( --achievement-placement-darkblue, #2d606b );
-}
-
-.placement-darkgrey {
-	background-color: var( --achievement-placement-darkgrey, #445154 );
-}
-
-.placement-win {
-	background-color: var( --achievement-placement-win, #009e60 );
-}
-
-.placement-draw {
-	background-color: var( --achievement-placement-draw, #d2b48c );
-}
-
-.placement-lose {
-	background-color: var( --achievement-placement-lose, #dddddd );
-}
-
-.placement-up {
-	background-color: var( --achievement-placement-up, #89e069 );
-}
-
-.placement-stay {
-	background-color: var( --achievement-placement-stay, #fede68 );
-}
-
-.placement-down {
-	background-color: var( --achievement-placement-down, #ff6f6f );
-}
-
-.placement-dnp {
-	background-color: var( --achievement-placement-dnp, #d0d0d0 );
+		@else {
+			background-color: nth( $colors, 1 );
+		}
+	}
 }
 
 .green-check {

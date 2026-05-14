@@ -197,6 +197,7 @@ function MapPoolTable:_backFillMap(map)
 	end
 
 	-- can not use Table.merge nor Table.deepMerge due to creators/creatorDisplayNames
+	map.pageName = mapData.pageName or map.pageName
 	map.displayName = map.displayName or mapData.displayName
 	map.image = map.image or mapData.image
 	map.imageDark = map.imageDark or mapData.imageDark
@@ -215,6 +216,10 @@ function MapPoolTable:display()
 
 	local numberOfColumns = #self.mapCategories == 1 and #self.mapCategories[1].maps or #self.mapCategories
 
+	if self.config.sort and #self.mapCategories == 1 then
+		Array.sortInPlaceBy(self.mapCategories[1].maps, Operator.property('pageName'))
+	end
+
 	return TableWidgets.Table{
 		title = self.config.title,
 		sortable = false,
@@ -223,16 +228,14 @@ function MapPoolTable:display()
 			-- Fit besides the infobox
 			width = 'unset',
 		},
-		columns = Array.map(Array.range(1, numberOfColumns), function ()
-			return {
-				align = 'center',
-				css = {
-					['min-width'] = '6.25rem',
-					['padding-left'] = '0.125rem',
-					['padding-right'] = '0.125rem',
-				}
+		columns = Array.rep({
+			align = 'center',
+			css = {
+				['min-width'] = '6.25rem',
+				['padding-left'] = '0.125rem',
+				['padding-right'] = '0.125rem',
 			}
-		end),
+		}, numberOfColumns),
 		children = WidgetUtil.collect(
 			self:_headerRow(),
 			TableWidgets.TableBody{
@@ -317,10 +320,6 @@ end
 ---@return Widget[]
 function MapPoolTable:_normalDisplay()
 	local mapList = self.mapCategories[1].maps
-
-	if self.config.sort then
-		Array.sortInPlaceBy(mapList, Operator.property('pageName'))
-	end
 
 	return {
 		-- image row
