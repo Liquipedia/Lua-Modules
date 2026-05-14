@@ -352,8 +352,7 @@ local PREFIXES = {
 	twitter = {'https://twitter.com/'},
 	vidio = {'https://www.vidio.com/@'},
 	vk = {'https://www.vk.com/'},
-	['vk-play'] = {'https://live.vkvideo.ru/'},
-	['vk-vid'] = {'https:// live.vkvideo.ru/'},
+	['vk-video'] = {'https:// live.vkvideo.ru/'},
 	vlr = {
 		'https://www.vlr.gg/event/',
 		team = 'https://www.vlr.gg/team/',
