@@ -22,7 +22,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -32,7 +32,7 @@ local DEFAULT_DATE = '2999-01-01'
 local LadderMapsTimeLine = {}
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function LadderMapsTimeLine.run(frame)
 	local args = Arguments.getArgs(frame)
 	local mode = (args.mode or '1v1'):lower()
@@ -112,7 +112,7 @@ end
 
 ---@private
 ---@param seasons {name: string, date_value: string}[]
----@return Widget
+---@return VNode
 function LadderMapsTimeLine._header(seasons)
 	return TableWidgets.Row{
 		children = WidgetUtil.collect(
@@ -129,13 +129,13 @@ end
 ---@private
 ---@param numberOfSeasons integer
 ---@param mapData {display: Widget, seasons: table<integer, true>, introduction: string[], removal: string[]}
----@return Widget
+---@return VNode
 function LadderMapsTimeLine._row(numberOfSeasons, mapData)
 	---@param dates string[]
 	---@return Renderable[]
 	local displayDates = function(dates)
 		dates = Array.map(dates, function(date) return date == DEFAULT_DATE and 'TBD' or date end)
-		return Array.interleave(dates, HtmlWidgets.Br{})
+		return Array.interleave(dates, Html.Br{})
 	end
 
 	return TableWidgets.Row{

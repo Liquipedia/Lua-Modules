@@ -23,7 +23,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -34,7 +34,7 @@ local DEFAULT_TIER_TYPES = {'none'}
 local MapEventList = {}
 
 ---@param frame Frame
----@return Widget?
+---@return VNode?
 function MapEventList.run(frame)
 	local args = Arguments.getArgs(frame)
 	local mapName = (args.map or mw.title.getCurrentTitle().text):gsub(' ', '_')
@@ -71,8 +71,8 @@ function MapEventList.run(frame)
 		' Tournaments'
 	)
 
-	return HtmlWidgets.Fragment{children = {
-		HtmlWidgets.H3{children = title},
+	return Html.Fragment{children = {
+		Html.H3{children = title},
 		TableWidgets.Table{
 			sortable = true,
 			columns = Array.rep({}, 4),
@@ -85,7 +85,7 @@ function MapEventList.run(frame)
 end
 
 ---@private
----@return Widget
+---@return VNode
 function MapEventList._header()
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = {
@@ -100,7 +100,7 @@ end
 ---@param mapName string
 ---@param item {maps: string, pagename: string, startdate: string, enddate: string,
 ---icon: string, icondark: string, name: string}
----@return Widget?
+---@return VNode?
 function MapEventList._row(mapName, item)
 	local maps = Json.parseIfTable(item.maps) or {}
 	if Logic.isEmpty(maps) then

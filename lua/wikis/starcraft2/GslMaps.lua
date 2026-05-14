@@ -25,7 +25,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local GslMaps = {}
 
----@return Widget
+---@return VNode
 function GslMaps.run()
 	local seasons, maps = GslMaps._fetch()
 
@@ -39,7 +39,7 @@ function GslMaps.run()
 end
 
 ---@private
----@return Widget[]
+---@return VNode[]
 ---@return {display: Widget, seasons: table<integer, true>, sortKey: string}[]
 function GslMaps._fetch()
 	local conditions = ConditionTree(BooleanOperator.all):add{
@@ -82,7 +82,7 @@ end
 
 ---@private
 ---@param seasons Widget[]
----@return Widget
+---@return VNode
 function GslMaps._header(seasons)
 	return TableWidgets.Row{
 		children = WidgetUtil.collect(
@@ -97,7 +97,7 @@ end
 ---@private
 ---@param numberOfSeasons integer
 ---@param mapData {display: Widget, seasons: table<integer, true>}
----@return Widget
+---@return VNode
 function GslMaps._row(numberOfSeasons, mapData)
 	return TableWidgets.Row{
 		children = WidgetUtil.collect(
