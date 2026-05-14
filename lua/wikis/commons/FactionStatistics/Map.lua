@@ -13,6 +13,7 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local MatchupDisplay = Lua.import('Module:FactionStatistics/MatchupDisplay')
 local FnUtil = Lua.import('Module:FnUtil')
+local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
@@ -251,6 +252,11 @@ function MapStatistics._buildConditions(args)
 
 	local tournaments = Array.map(MapStatistics._getTournaments(args), Page.pageifyLink)
 	conditions:add(ConditionUtil.anyOf(ColumnName('pagename'), tournaments))
+
+	local game = Game.toIdentifier{game = args.game, useDefault = false}
+	if game then
+		conditions:add(ConditionNode(ColumnName('game'), Comparator.eq, game))
+	end
 
 	return tostring(conditions)
 end
