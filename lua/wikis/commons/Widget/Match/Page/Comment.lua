@@ -14,7 +14,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@class MatchPageCommentParameters
 ---@field children Renderable|Renderable[]
 
----@return HtmlComponent
+---@return HtmlNode
 local function MatchPageComment(props)
 	return Html.Div{
 		classes = { 'match-bm-match-additional-comment' },
