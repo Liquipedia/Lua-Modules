@@ -216,6 +216,10 @@ function MapPoolTable:display()
 
 	local numberOfColumns = #self.mapCategories == 1 and #self.mapCategories[1].maps or #self.mapCategories
 
+	if self.config.sort and #self.mapCategories == 1 then
+		Array.sortInPlaceBy(self.mapCategories[1].maps, Operator.property('pageName'))
+	end
+
 	return TableWidgets.Table{
 		title = self.config.title,
 		sortable = false,
@@ -316,10 +320,6 @@ end
 ---@return Widget[]
 function MapPoolTable:_normalDisplay()
 	local mapList = self.mapCategories[1].maps
-
-	if self.config.sort then
-		Array.sortInPlaceBy(mapList, Operator.property('pageName'))
-	end
 
 	return {
 		-- image row

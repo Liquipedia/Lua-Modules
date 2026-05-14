@@ -48,13 +48,15 @@ function CustomInjector:parse(id, widgets)
 						or 'Not enough data'
 				}
 			},
-			Cell{
+			--- option to suppress this in EmptyPagePreview
+			--- intentional to only check on true to avoid the option for disabling from wiki code
+			args.suppressRanking ~= true and Cell{
 				name = '[[RankingTableRLCS|RLCS Points]]',
 				children = {TeamRanking.run{
 					ranking = args.ranking_name,
 					team = self.caller.pagename
 				}}
-			}
+			} or nil
 		)
 	end
 

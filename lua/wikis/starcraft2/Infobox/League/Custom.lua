@@ -9,7 +9,7 @@ local Lua = require('Module:Lua')
 
 local AllowedServers = Lua.import('Module:Server')
 local Array = Lua.import('Module:Array')
-local Autopatch = Lua.import('Module:Automated Patch')
+local PatchAuto = Lua.import('Module:Infobox/Extension/PatchAuto')
 local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
@@ -29,6 +29,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
+local Link = Lua.import('Module:Widget/Basic/Link')
 local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
@@ -44,7 +45,6 @@ local FINISHED = 'finished'
 local DEFAULT_MODE = '1v1'
 local GREATER_EQUAL = '&#8805;'
 local PRIZE_POOL_ROUND_PRECISION = 2
-local TODAY = os.date('%Y-%m-%d', os.time())
 
 local GAME_MOD = 'mod'
 local GAME_LOTV = Game.toIdentifier{game = 'lotv'}
@@ -102,20 +102,19 @@ end
 function CustomLeague:_computePatch(args)
 	local prefixPatch = function(patch)
 		if not patch then return end
-		return 'Patch ' .. patch
+		return 'Patch ' .. patch:gsub(' ', '_')
+	end
+	self.data.patch = prefixPatch(args.patch)
+	self.data.endPatch = prefixPatch(args.epatch)
+
+	if self.data.game ~= GAME_LOTV or not Logic.nilOr(Logic.readBoolOrNil(args.autopatch), true) then
+		return
 	end
 
-	local shouldFetchPatch = Logic.nilOr(Logic.readBoolOrNil(args.autopatch), true)
-	local fetchPatch = function(date)
-		if not shouldFetchPatch or self.data.game ~= GAME_LOTV then return end
-		return Autopatch._main{date}
-	end
-
-	local patch = args.patch or fetchPatch(self.data.startDate or TODAY)
-	local endPatch = args.epatch or fetchPatch(self.data.endDate or TODAY) or patch
-
-	self.data.patch = prefixPatch(patch)
-	self.data.endPatch = prefixPatch(endPatch)
+	self.data = PatchAuto.run(self.data, {
+		patch_display = prefixPatch(args.patch),
+		epatch_display = prefixPatch(args.epatch),
+	})
 end
 
 ---@param args table
@@ -201,7 +200,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game Version', children = {caller:_getGameVersion(args)}},
+			Cell{name = 'Game Version', children = caller:_getGameVersion(args)},
 			Cell{name = 'Server', children = {caller:_getServer(args)}}
 		}
 	elseif id == 'dates' and data.startTime.display then
@@ -311,22 +310,24 @@ function CustomLeague._removePlus(inputValue, alreadyHasPlus)
 end
 
 ---@param args table
----@return string
+---@return Renderable[]
 function CustomLeague:_getGameVersion(args)
 	local betaPrefix = String.isNotEmpty(args.beta) and 'Beta ' or ''
 
 	local gameDisplay = self.data.game == GAME_MOD and (args.modname or 'Mod')
-		or Page.makeInternalLink(Game.name{game = self.data.game})
+		or Link{link = Game.name{game = self.data.game}}
 
 	local patch = self.data.patch
 	local endPatch = self.data.endPatch
 
-	local patchDisplay = betaPrefix .. table.concat({
-		Page.makeInternalLink(patch),
-		Page.makeInternalLink(endPatch ~= patch and patch and endPatch or nil)
-	}, ' &ndash; ')
+	local patches = Array.map(Array.map({
+		Link{link = patch, children = self.data.patchDisplay},
+		Link{link = endPatch ~= patch and patch and endPatch or nil, children = self.data.endPatchDisplay}
+	}, tostring), Logic.nilIfEmpty)
 
-	return table.concat({gameDisplay, patchDisplay}, '<br>')
+	local patchDisplay = betaPrefix .. table.concat(patches, ' &ndash; ')
+
+	return {gameDisplay, patchDisplay}
 end
 
 ---@param args table
