@@ -6,14 +6,14 @@
 --
 
 local Lua = require('Module:Lua')
+local Component = Lua.import('Module:Widget/Component')
+local Context = Lua.import('Module:Widget/ComponentContext')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 
 ---@class Table2ColumnDef
@@ -30,7 +30,7 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 ---@field attributes {[string]: any}?
 
 ---@class Table2Props
----@field children Renderable[]?
+---@field children? Renderable|Renderable[]
 ---@field variant 'generic'|'themed'?
 ---@field sortable (string|number|boolean)?
 ---@field striped (string|number|boolean)?
@@ -44,22 +44,12 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 ---@field attributes {[string]: any}?
 ---@field tableAttributes {[string]: any}?
 
----@class Table2: Widget
----@operator call(Table2Props): Table2
----@field props Table2Props
-local Table2 = Class.new(Widget)
-
-Table2.defaultProps = {
-	variant = 'generic',
-	sortable = false,
-	striped = true,
-	classes = {},
-	columns = {},
-}
-
----@return Widget[]
-function Table2:render()
-	local props = self.props
+---@param props Table2Props
+---@param context Context
+---@return Renderable[]
+local function Table2(props, context)
+	local tableChildren = props.children
+	---@cast tableChildren Renderable[]
 
 	if props.columns and #props.columns > 0 then
 		Array.forEach(props.columns, function(columnDef, columnIndex)
@@ -77,48 +67,49 @@ function Table2:render()
 		props.tableClasses
 	)
 
-	local captionNode = props.caption and HtmlWidgets.Div{
+	local captionNode = props.caption and Html.Div{
 		classes = {'table2__caption'},
 		children = props.caption,
 	} or nil
 
-	local titleNode = props.title and HtmlWidgets.Div{
+	local titleNode = props.title and Html.Div{
 		classes = {'table2__title'},
 		children = props.title,
 	} or nil
 
-	local tableChildren = props.children
 	if props.columns and #props.columns > 0 then
-		tableChildren = {Table2Contexts.ColumnContext{
+		tableChildren = {Context.Provider{
+			def = Table2Contexts.ColumnContext,
 			value = props.columns,
 			children = tableChildren,
 		}}
 	end
 
 	if Logic.readBool(props.striped) then
-		tableChildren = {Table2Contexts.BodyStripe{
+		tableChildren = {Context.Provider{
+			def = Table2Contexts.BodyStripe,
 			value = true,
 			children = tableChildren,
 		}}
 	end
 
-	local tableNode = HtmlWidgets.Table{
+	local tableNode = Html.Table{
 		attributes = props.tableAttributes,
 		classes = tableClasses,
 		children = tableChildren,
 	}
 
-	local containerNode = HtmlWidgets.Div{
+	local containerNode = Html.Div{
 		classes = {'table2__container'},
 		children = {tableNode},
 	}
 
-	local footerNode = props.footer and HtmlWidgets.Div{
+	local footerNode = props.footer and Html.Div{
 		classes = {'table2__footer'},
 		children = props.footer,
 	} or nil
 
-	local tableWrapperNode = HtmlWidgets.Div{
+	local tableWrapperNode = Html.Div{
 		classes = wrapperClasses,
 		css = props.css,
 		attributes = props.attributes,
@@ -128,4 +119,13 @@ function Table2:render()
 	return WidgetUtil.collect(captionNode, tableWrapperNode)
 end
 
-return Table2
+return Component.component(
+	Table2,
+	{
+		variant = 'generic',
+		sortable = false,
+		striped = true,
+		classes = {},
+		columns = {},
+	}
+)
