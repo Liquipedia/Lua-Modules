@@ -28,18 +28,18 @@ local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
 local Link = Lua.import('Module:Widget/Basic/Link')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local DEFAULT_MAP_NAME = 'Unknown'
-local SUM_ABBR = HtmlWidgets.Abbr{title = 'Sum of', children = 'Σ'}
-local NUMBER_OF_ABBR = HtmlWidgets.Abbr{title = 'Number of', children = '#'}
+local SUM_ABBR = Html.Abbr{title = 'Sum of', children = 'Σ'}
+local NUMBER_OF_ABBR = Html.Abbr{title = 'Number of', children = '#'}
 
 local MapStatistics = {}
 
 ---@param frame Frame
----@return Widget?
+---@return VNode?
 function MapStatistics.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -311,10 +311,10 @@ end
 
 ---@private
 ---@param matchUps {vs: string[], mirrors: string[]}
----@return Widget
+---@return VNode
 function MapStatistics._header(matchUps)
 	---@param key string
-	---@return Widget
+	---@return VNode
 	local makeFactionHeader = function(key)
 		local factions = Array.parseCommaSeparatedString(key)
 
@@ -330,7 +330,7 @@ function MapStatistics._header(matchUps)
 	end
 
 	---@param key string
-	---@return Widget[]
+	---@return VNode[]
 	local makeMatchUpHeader = function(key)
 		local factions = Array.parseCommaSeparatedString(key)
 		return {
@@ -373,7 +373,7 @@ end
 ---@param matchUps {vs: string[], mirrors: string[]}
 ---@param mapData {map: string, mapDisplayName: string?, total: integer,
 ---vs: table<string, {w: integer, l: integer}>, mirrors: table<string, integer>}
----@return Widget?
+---@return VNode?
 function MapStatistics._row(matchUps, mapData)
 	if Logic.isEmpty(mapData) then
 		return
