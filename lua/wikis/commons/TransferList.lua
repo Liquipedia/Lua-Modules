@@ -332,7 +332,7 @@ function TransferList:create()
 	return GeneralCollapsible{
 		title = config.title,
 		classes = {'OffSeasonOverview'},
-		shouldCollapse = not config.shown,
+		shouldCollapse = config.shown,
 		children = display,
 	}
 end
