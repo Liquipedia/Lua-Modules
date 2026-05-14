@@ -143,6 +143,8 @@ local PREFIXES = {
 		player = 'https://faceitdb.com/profile/faceit/',
 	},
 	fanclub = {''},
+	['fastcup-csgo'] = {'https://csgo.fastcup.net/tournaments/'},
+	['fastcup-cs2'] = {'https://cs2.fastcup.net/tournaments/'},
 	fide = {
 		'https://ratings.fide.com/tournament_information.phtml?event=',
 		player = 'https://ratings.fide.com/profile/',
@@ -293,6 +295,9 @@ local PREFIXES = {
 	pubsteam = {'https://steamcommunity.com/groups/'},
 	smiteesports = {match = 'https://www.smiteesports.com/matches/'},
 	spotify = {'https://open.spotify.com/'},
+	statlocker = {
+		match = 'https://statlocker.gg/match/',
+	},
 	stats = {'', match = ''},
 	statshark = {
 		'https://statshark.net/',
@@ -413,6 +418,8 @@ local ICON_KEYS_TO_RENAME = {
 	['faceit-hub'] = 'faceit',
 	['faceit-org'] = 'faceit',
 	['faceitdb'] = 'faceit',
+	['fastcup-csgo'] = 'fastcup',
+	['fastcup-cs2'] = 'fastcup',
 	matcherinolink = 'matcherino',
 	playlist = 'music',
 	privsteam = 'steam',
@@ -622,6 +629,10 @@ local MATCH_ICONS = {
 		icon = 'SMITE default lightmode.png',
 		iconDark = 'SMITE default darkmode.png',
 		text = 'Smite Esports Match Page'
+	},
+	statlocker = {
+		icon = 'Statlocker_logo_allmode.png',
+		text = 'STATLOCKER',
 	},
 	stats = {
 		icon = 'Match_Info_Stats.png',

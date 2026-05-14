@@ -1331,9 +1331,6 @@ span.slash {
 	}
 }
 
-$valorant-atk: #b20110;
-$valorant-def: #01654c;
-
 .match-bm-rounds-overview {
 	$cell-height: 1.75rem;
 	$cell-radius: 0.25rem;
@@ -1388,13 +1385,13 @@ $valorant-def: #01654c;
 
 			&--atk {
 				.wiki-valorant & {
-					color: $valorant-atk;
+					color: var( --valorant-atk-score-color );
 				}
 			}
 
 			&--def {
 				.wiki-valorant & {
-					color: $valorant-def;
+					color: var( --valorant-def-score-color );
 				}
 			}
 		}
@@ -1457,14 +1454,14 @@ $valorant-def: #01654c;
 			&--atk {
 				.wiki-valorant & {
 					color: #ffffff;
-					background-color: $valorant-atk;
+					background-color: var( --valorant-atk-score-color );
 				}
 			}
 
 			&--def {
 				.wiki-valorant & {
 					color: #ffffff;
-					background-color: $valorant-def;
+					background-color: var( --valorant-def-score-color );
 				}
 			}
 		}
@@ -1483,13 +1480,13 @@ $valorant-def: #01654c;
 
 		&--atk {
 			.wiki-valorant & {
-				color: $valorant-atk;
+				color: var( --valorant-atk-score-color );
 			}
 		}
 
 		&--def {
 			.wiki-valorant & {
-				color: $valorant-def;
+				color: var( --valorant-def-score-color );
 			}
 		}
 	}
@@ -1515,14 +1512,14 @@ $valorant-def: #01654c;
 		&--atk {
 			.wiki-valorant & {
 				color: #ffffff;
-				background-color: $valorant-atk;
+				background-color: var( --valorant-atk-score-color );
 			}
 		}
 
 		&--def {
 			.wiki-valorant & {
 				color: #ffffff;
-				background-color: $valorant-def;
+				background-color: var( --valorant-def-score-color );
 			}
 		}
 	}

@@ -5,15 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Widgets = {}
+local Components = {}
 
 local Lua = require('Module:Lua')
 
-Widgets.Table = Lua.import('Module:Widget/Table2/Table')
-Widgets.TableHeader = Lua.import('Module:Widget/Table2/TableHeader')
-Widgets.TableBody = Lua.import('Module:Widget/Table2/TableBody')
-Widgets.Row = Lua.import('Module:Widget/Table2/Row')
-Widgets.CellHeader = Lua.import('Module:Widget/Table2/CellHeader')
-Widgets.Cell = Lua.import('Module:Widget/Table2/Cell')
+Components.Table = Lua.import('Module:Widget/Table2/Table')
+Components.TableHeader = Lua.import('Module:Widget/Table2/TableHeader')
+Components.TableBody = Lua.import('Module:Widget/Table2/TableBody')
+Components.Row = Lua.import('Module:Widget/Table2/Row')
+Components.CellHeader = Lua.import('Module:Widget/Table2/CellHeader')
+Components.Cell = Lua.import('Module:Widget/Table2/Cell')
 
-return Widgets
+return Components

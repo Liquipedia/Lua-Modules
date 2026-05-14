@@ -86,7 +86,7 @@ function CustomMap:_image2()
 		children = {Image{
 			imageLight = self.args.image2,
 			size = '294px',
-			alignment = 'center',
+			horizontalAlignment = 'center',
 		}}
 	}
 end

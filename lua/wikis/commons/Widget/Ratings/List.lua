@@ -20,6 +20,7 @@ local Operator = Lua.import('Module:Operator')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Widget = Lua.import('Module:Widget')
+local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -33,12 +34,60 @@ local TableWidgets = Lua.import('Module:Widget/Table2/All')
 ---@operator call(table): RatingsList
 local RatingsList = Class.new(Widget)
 
+local GRAPH_VIEW_RANK = 'rank'
+local GRAPH_VIEW_POINTS = 'points'
+local GRAPH_COLOR_RANK = '#EE6666'
+local GRAPH_COLOR_POINTS = '#2F80ED'
+
+---@alias RatingsProgression {date: string, rating: number?, rank: integer?}[]
+---@alias AxisBoundsFn fun(progression: RatingsProgression, defaultMaxY: integer): number, number
+
+---@param progression RatingsProgression
+---@return number
+---@return number
+local function pointsAxisBounds(progression)
+	local points = Array.filter(Array.map(progression, Operator.property('rating')), Logic.isNotEmpty)
+	local minPoints = Array.min(points) or 0
+	local maxPoints = Array.max(points) or minPoints
+	local roundedMinPoints = math.max(0, math.floor(minPoints))
+	local roundedMaxPoints = math.ceil(maxPoints)
+
+	if roundedMinPoints == roundedMaxPoints then
+		return math.max(0, roundedMinPoints - 1), roundedMaxPoints + 1
+	end
+
+	return roundedMinPoints, roundedMaxPoints
+end
+
+---@param progression RatingsProgression
+---@param defaultMaxY integer
+---@return number
+---@return number
+local function rankAxisBounds(progression, defaultMaxY)
+	local worstRank = Array.max(Array.map(progression, Operator.property('rank'))) or defaultMaxY
+	return 1, math.max(worstRank, defaultMaxY)
+end
+
+---@param progression {date: string, rating: number?, rank: integer?}[]
+---@param graphView string
+---@return (number|string)[]
+local function makeGraphSeriesData(progression, graphView)
+	return Array.map(progression, function(progress)
+		local value = graphView == GRAPH_VIEW_POINTS and progress.rating or progress.rank
+		return value or ''
+	end)
+end
+
 ---@param teamData RatingsEntry
 ---@param defaultMaxY integer
+---@param graphView string
+---@param getAxisBounds AxisBoundsFn
 ---@return string
-local function makeTeamChart(teamData, defaultMaxY)
+local function makeTeamChart(teamData, defaultMaxY, graphView, getAxisBounds)
 	local progression = Array.sortBy(teamData.progression, Operator.property('date'))
-	local worstRankOfTeam = Array.max(Array.map(progression, Operator.property('rank')))
+	local axisMin, axisMax = getAxisBounds(progression, defaultMaxY)
+	local axisName = graphView == GRAPH_VIEW_POINTS and 'Points' or 'Rank'
+	local graphColor = graphView == GRAPH_VIEW_POINTS and GRAPH_COLOR_POINTS or GRAPH_COLOR_RANK
 
 	local dates = Array.map(Array.map(progression, Operator.property('date')), function(isoDate)
 		return os.date('%b %d', os.time(Date.parseIsoDate(isoDate)))
@@ -52,13 +101,13 @@ local function makeTeamChart(teamData, defaultMaxY)
 			data = dates,
 		},
 		yAxis = {
-			name = 'Rank',
+			name = axisName,
 			nameLocation = 'middle',
 			nameRotate = 90,
 			type = 'value',
-			inverse = true,
-			min = 1,
-			max = math.max(worstRankOfTeam, defaultMaxY),
+			inverse = graphView == GRAPH_VIEW_RANK,
+			min = axisMin,
+			max = axisMax,
 		},
 		tooltip = {
 			trigger = 'axis',
@@ -72,14 +121,15 @@ local function makeTeamChart(teamData, defaultMaxY)
 		},
 		series = {
 			{
-				data = Array.map(progression, function(progress)
-					return progress.rank and tostring(progress.rank) or ''
-				end),
+				data = makeGraphSeriesData(progression, graphView),
 				type = 'line',
-				name = 'Rank',
+				name = axisName,
 				symbolSize = 8,
+				color = graphColor,
 				itemStyle = {
-					color = '#EE6666',
+					color = graphColor,
+					borderColor = '#FFFFFF',
+					borderWidth = 2,
 				},
 			}
 		}
@@ -147,6 +197,7 @@ function RatingsList:render()
 
 	local teamRows = Array.map(teams, function(team, index)
 		local uniqueId = index
+		local graphSwitchGroup = 'ratings-graph-view-' .. tostring(self.props.id or 'default') .. '-' .. uniqueId
 		local changeText = (not team.change and 'NEW') or PlacementChange { change = team.change }
 
 		local rowClasses = {}
@@ -205,11 +256,37 @@ function RatingsList:render()
 					},
 					children = HtmlWidgets.Div {
 						children = {
-							OpponentDisplay.InlineOpponent { opponent = team.opponent },
-							Logic.tryOrElseLog(
-								function() return makeTeamChart(team, teamLimit) end,
-								function() return 'Failed to make graph for team' end
-							)
+							HtmlWidgets.Div {
+								classes = { 'ranking-table__graph-switch' },
+								children = ContentSwitch {
+									switchGroup = graphSwitchGroup,
+									storeValue = false,
+									defaultActive = 1,
+									css = { display = 'flex', ['justify-self'] = 'center' },
+									tabs = {
+										{
+											label = 'Rank',
+											value = GRAPH_VIEW_RANK,
+											content = Logic.tryOrElseLog(
+												function()
+													return makeTeamChart(team, teamLimit, GRAPH_VIEW_RANK, rankAxisBounds)
+												end,
+												function() return 'Failed to make rank graph for team' end
+											)
+										},
+										{
+											label = 'Points',
+											value = GRAPH_VIEW_POINTS,
+											content = Logic.tryOrElseLog(
+												function()
+													return makeTeamChart(team, teamLimit, GRAPH_VIEW_POINTS, pointsAxisBounds)
+												end,
+												function() return 'Failed to make points graph for team' end
+											)
+										},
+									},
+								},
+							}
 						}
 					},
 					classes = { 'ranking-table__graph-row-container' }
