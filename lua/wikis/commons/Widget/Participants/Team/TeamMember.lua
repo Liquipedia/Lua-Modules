@@ -20,7 +20,7 @@ local Div = HtmlWidgets.Div
 
 ---@class ParticipantsTeamMember: Widget
 ---@field props {even: boolean?, roleLeft: string?, roleRight: string[]?, trophies: integer?,
----strikethrough: boolean?, player: standardPlayer, team: standardOpponent?}
+---strikethrough: boolean?, player: standardPlayer, team: standardOpponent?, number: integer?}
 ---@operator call(table): ParticipantsTeamMember
 local ParticipantsTeamMember = Class.new(Widget)
 
@@ -32,6 +32,7 @@ function ParticipantsTeamMember:render()
 	local trophies = self.props.trophies
 	local player = self.props.player
 	local team = self.props.team
+	local number = self.props.number
 
 	local trophyIcon = Icon{iconName = 'firstplace'}
 
@@ -94,6 +95,10 @@ function ParticipantsTeamMember:render()
 					teamStyle = 'icon',
 					additionalClasses = {'team-participant-icon'}
 				}),
+			} or nil,
+			number and Div{
+				classes = {'team-participant-card__member-role-right'},
+				children = tostring(number),
 			} or nil
 		)
 	}

@@ -6,13 +6,11 @@
 --
 
 local Lua = require('Module:Lua')
-
-local Class = Lua.import('Module:Class')
-local Context = Lua.import('Module:Widget/Context')
+local Context = Lua.import('Module:Widget/ComponentContext')
 
 return {
-	BodyStripe = Class.new(Context),
-	ColumnContext = Class.new(Context),
-	HeaderRowKind = Class.new(Context),
-	Section = Class.new(Context),
+	BodyStripe = Context.create('disabled'),
+	ColumnContext = Context.create({}),
+	HeaderRowKind = Context.create('title'),
+	Section = Context.create('head'),
 }

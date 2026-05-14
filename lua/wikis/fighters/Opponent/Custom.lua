@@ -15,6 +15,7 @@ local Variables = Lua.import('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent')
 
+---@class FightersCustomOpponent
 local CustomOpponent = Table.deepCopy(Opponent)
 
 ---@class FightersStandardPlayer:standardPlayer
@@ -50,9 +51,10 @@ function CustomOpponent.readOpponentArgs(args)
 end
 
 ---@param opponent FightersStandardOpponent
+---@param options {setPlayersInTeam: boolean?}?
 ---@return {opponentname: string, opponenttemplate: string?, opponenttype: OpponentType, opponentplayers: table?}
-function CustomOpponent.toLpdbStruct(opponent)
-	local storageStruct = Opponent.toLpdbStruct(opponent)
+function CustomOpponent.toLpdbStruct(opponent, options)
+	local storageStruct = Opponent.toLpdbStruct(opponent, options)
 
 	if not Opponent.typeIsParty(opponent.type) then
 		return storageStruct

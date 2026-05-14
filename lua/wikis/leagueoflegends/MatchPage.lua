@@ -59,7 +59,9 @@ local KEYSTONES = Table.map({
 	-- Sorcery
 	'Summon Aery',
 	'Arcane Comet',
+	'Deathfire Touch',
 	'Phase Rush',
+	'Stormraider\'s Surge',
 
 	-- Resolve
 	'Grasp of the Undying',

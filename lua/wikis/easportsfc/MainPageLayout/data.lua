@@ -183,7 +183,7 @@ return {
 								},
 							},
 							{
-								size = 7,
+								size = 6,
 								children = {
 									{
 										noPanel = true,
@@ -192,7 +192,7 @@ return {
 								},
 							},
 							{
-								size = 5,
+								size = 6,
 								children = {
 									{
 										noPanel = true,
