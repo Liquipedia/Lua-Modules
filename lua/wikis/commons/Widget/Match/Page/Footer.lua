@@ -18,7 +18,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field children Renderable|Renderable[]
 
 ---@param props MatchPageFooterParameters
----@return Widget[]?
+---@return HtmlNode[]?
 local function MatchPageFooter(props)
 	local comments = props.comments
 	local children = props.children
