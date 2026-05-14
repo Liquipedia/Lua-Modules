@@ -59,7 +59,9 @@ local KEYSTONES = Table.map({
 	-- Sorcery
 	'Summon Aery',
 	'Arcane Comet',
+	'Deathfire Touch',
 	'Phase Rush',
+	'Stormraider\'s Surge',
 
 	-- Resolve
 	'Grasp of the Undying',
@@ -209,7 +211,9 @@ function MatchPage:renderOverallStats()
 						},
 						PlayerStat{
 							title = {KP_ICON, 'KP%'},
-							data = MathUtil.formatPercentage(player.extradata.killparticipation, 1)
+							data = player.extradata.killparticipation and MathUtil.formatPercentage(
+								player.extradata.killparticipation, 1
+							) or '-'
 						},
 						PlayerStat{
 							title = {

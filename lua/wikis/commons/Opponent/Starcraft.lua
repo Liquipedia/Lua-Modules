@@ -13,6 +13,7 @@ local Table = Lua.import('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent')
 
+---@class StrcraftCustomOpponent
 local StarcraftOpponent = Table.deepCopy(Opponent)
 
 ---@class StarcraftStandardPlayer:standardPlayer
@@ -80,9 +81,10 @@ function StarcraftOpponent.fromMatch2Record(record)
 end
 
 ---@param opponent StarcraftStandardOpponent
----@return table?
-function StarcraftOpponent.toLpdbStruct(opponent)
-	local storageStruct = Opponent.toLpdbStruct(opponent)
+---@param options {setPlayersInTeam: boolean?}?
+---@return {opponentname: string, opponenttemplate: string?, opponenttype: OpponentType, opponentplayers: table?}
+function StarcraftOpponent.toLpdbStruct(opponent, options)
+	local storageStruct = Opponent.toLpdbStruct(opponent, options)
 
 	if Opponent.typeIsParty(opponent.type) and opponent.isArchon then
 		storageStruct.opponentplayers.isArchon = true

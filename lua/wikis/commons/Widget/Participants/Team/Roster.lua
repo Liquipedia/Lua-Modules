@@ -133,6 +133,7 @@ function ParticipantsTeamRoster:render()
 			roleLeft = roleLeft,
 			roleRight = roleRight,
 			trophies = player.extradata.trophies or 0,
+			number = player.extradata.number,
 		}
 	end
 

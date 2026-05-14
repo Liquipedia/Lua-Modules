@@ -16,6 +16,7 @@ local Variables = Lua.import('Module:Variables')
 local CharacterStandardizationData = Lua.import('module:CharacterStandardization', {loadData = true})
 local Opponent = Lua.import('Module:Opponent')
 
+---@class SmashCustomOpponent
 local CustomOpponent = Table.deepCopy(Opponent)
 
 ---@class SmashStandardPlayer:standardPlayer
@@ -50,9 +51,10 @@ function CustomOpponent.readOpponentArgs(args)
 end
 
 ---@param opponent SmashStandardOpponent
+---@param options {setPlayersInTeam: boolean?}?
 ---@return {opponentname: string, opponenttemplate: string?, opponenttype: OpponentType, opponentplayers: table?}
-function CustomOpponent.toLpdbStruct(opponent)
-	local storageStruct = Opponent.toLpdbStruct(opponent)
+function CustomOpponent.toLpdbStruct(opponent, options)
+	local storageStruct = Opponent.toLpdbStruct(opponent, options)
 
 	if not Opponent.typeIsParty(opponent.type) then
 		return storageStruct
@@ -87,6 +89,37 @@ function CustomOpponent.fromLpdbStruct(storageStruct)
 			storageStruct.opponentplayers['p' .. playerIndex .. 'chars']
 		))
 	end
+
+	return opponent
+end
+
+---@param opponent SmashStandardOpponent
+---@param date string|number|nil
+---@param options {syncPlayer: boolean?, overwritePageVars: boolean?, syncPlayerTeam: boolean?}?
+---@return SmashStandardOpponent
+function CustomOpponent.resolve(opponent, date, options)
+	opponent = Opponent.resolve(opponent, date, options) --[[@as SmashStandardOpponent]]
+
+	if not options or not options.syncPlayer then
+		return opponent
+	end
+
+	Array.forEach(opponent.players, function(player)
+		local lpdbPlayer = mw.ext.LiquipediaDB.lpdb('player', {
+			limit = 1,
+			conditions = '[[pagename::' .. player.pageName:gsub(' ', '_') .. ']]',
+			query = 'extradata',
+		})[1]
+		if not lpdbPlayer or not lpdbPlayer.extradata then
+			return
+		end
+		local game = player.game or
+			Variables.varDefault('tournament_game') or
+			lpdbPlayer.extradata.maingame or Info.defaultGame
+
+		player.chars = Logic.nilIfEmpty(Array.parseCommaSeparatedString(lpdbPlayer.extradata['main' .. game]))
+		player.game = game
+	end)
 
 	return opponent
 end

@@ -54,7 +54,7 @@ function CustomInjector:parse(widgetId, widgets)
 				children = {WidgetImage{
 					imageLight = args.minimap,
 					size = '350px',
-					alignment = 'center',
+					horizontalAlignment = 'center',
 				}}
 			} or nil
 		)

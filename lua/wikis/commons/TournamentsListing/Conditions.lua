@@ -155,8 +155,10 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 	local tier, tierType = Tier.toValue(tournamentData.liquipediaTier, tournamentData.liquipediaTierType)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{
+			-- Condition on tier/tiertype is here to exclude on-page showmatch prizepools used on some wikis
 			ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tier),
-			ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tierType or ''),
+			-- Tiertype 'General' is the default (instead of empty) on R6. Unused on other wikis, so can just add it here.
+			Condition.Util.anyOf(ColumnName('liquipediatiertype'), {tierType or '', 'General'}),
 			ConditionNode(ColumnName(config.useParent and 'parent' or 'pagename'), Comparator.eq, tournamentData.pageName),
 			ConditionNode(ColumnName('placement'), Comparator.neq, '')
 		}

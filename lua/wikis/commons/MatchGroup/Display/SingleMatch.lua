@@ -22,7 +22,7 @@ local SingleMatchDisplay = {}
 ---@return table
 function SingleMatchDisplay.configFromArgs(args)
 	return {
-		width = tonumber((string.gsub(args.width or '', 'px', ''))),
+		width = args.width,
 	}
 end
 
