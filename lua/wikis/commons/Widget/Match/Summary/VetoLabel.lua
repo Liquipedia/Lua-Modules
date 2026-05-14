@@ -7,9 +7,7 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
-
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Label = Lua.import('Module:Widget/Basic/Label')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -23,14 +21,10 @@ local VetoTypes = {
 	protect = 'PROTECT',
 }
 
----@class MatchSummaryVetoLabel: Widget
----@operator call(table): MatchSummaryVetoLabel
----@field props {vetoType: VetoTypes?}
-local MatchSummaryVetoLabel = Class.new(Widget)
-
----@return VNode?
-function MatchSummaryVetoLabel:render()
-	local vetoType = self.props.vetoType
+---@param props {vetoType: VetoTypes?}
+---@return Renderable?
+local function MatchSummaryVetoLabel(props)
+	local vetoType = props.vetoType
 	if not VetoTypes[vetoType] then
 		return
 	end
@@ -44,4 +38,4 @@ function MatchSummaryVetoLabel:render()
 	}
 end
 
-return MatchSummaryVetoLabel
+return Component.component(MatchSummaryVetoLabel)
