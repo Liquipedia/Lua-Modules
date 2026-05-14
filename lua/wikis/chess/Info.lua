@@ -37,6 +37,19 @@ return {
 				lightMode = 'Chess default lightmode.png',
 			},
 		},
+		bughouse = {
+			abbreviation = 'Bughouse',
+			name = 'Bughouse',
+			link = 'Bughouse',
+			logo = {
+				darkMode = 'Chess default darkmode.png',
+				lightMode = 'Chess default lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Chess default darkmode.png',
+				lightMode = 'Chess default lightmode.png',
+			},
+		},
 	},
 	config = {
 		squads = {

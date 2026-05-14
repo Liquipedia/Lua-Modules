@@ -139,12 +139,6 @@ div.NavPic,
 
 .cinnabar-bg,
 .cinnabar-theme-light-bg,
-.background-color-lose,
-.bg-d,
-.bg-down,
-.bg-lose,
-.bg-drop,
-.swisstable .swisstable-bgc-lose,
 .fo-nttax-infobox-wrapper .infobox-color-never,
 .fo-nttax-infobox-wrapper.infobox-hots .infobox-header,
 .fo-nttax-infobox-wrapper.infobox-css .infobox-header,
@@ -226,7 +220,6 @@ ul.nav-tabs li.game-ultimate,
 	color: var( --clr-vividviolet-40, #732b9c );
 }
 
-.bg-byeup,
 .vivid-violet-bg,
 .vivid-violet-theme-light-bg,
 .fo-nttax-infobox-wrapper.infobox-pm .infobox-header,
@@ -302,9 +295,6 @@ div.NavFrame div.NavHead,
 
 .sapphire-bg,
 .sapphire-theme-light-bg,
-.background-color-disqualified,
-.swisstable .swisstable-bgc-overturned,
-.bg-lightblue,
 .fo-nttax-infobox-wrapper.infobox-wol .infobox-header,
 .fo-nttax-infobox-wrapper.infobox-cscz .infobox-header {
 	background-color: var( --clr-sapphire-background-color, #dee3ef );
@@ -390,18 +380,8 @@ ul.nav-tabs li.game-brawl,
 	color: var( --clr-forest-30, #3ea34c );
 }
 
-.bg-seedup {
-	background-color: var( --clr-forest-90, #dbeded );
-}
-
 .forest-green-bg,
 .forest-theme-light-bg,
-.background-color-win,
-.bg-u,
-.bg-up,
-.bg-proceed,
-.bg-win,
-.swisstable .swisstable-bgc-win,
 .fo-nttax-infobox-wrapper .infobox-color-always,
 .fo-nttax-infobox-wrapper.infobox-lotv .infobox-header,
 .fo-nttax-infobox-wrapper.infobox-melee .infobox-header,
@@ -409,10 +389,6 @@ ul.nav-tabs li.game-melee,
 .overview.game-melee,
 .ambox-green {
 	background-color: var( --clr-forest-background-color, #ddf4dd );
-}
-
-.bg-win-important {
-	background-color: var( --clr-forest-background-color, #ddf4dd ) !important;
 }
 
 .forest-theme-dark-bg {
@@ -451,8 +427,6 @@ ul.nav-tabs li.game-melee,
 
 .atlantis-bg,
 .atlantis-theme-light-alt-bg,
-.bg-su,
-.bg-stayup,
 .fo-nttax-infobox-wrapper .infobox-color-very.often,
 .fo-nttax-infobox-wrapper.infobox-csgo .infobox-header,
 .fo-nttax-infobox-wrapper.infobox-64 .infobox-header,
@@ -492,14 +466,8 @@ ul.nav-tabs li.game-64,
 
 .pear-bg,
 .pear-theme-light-alt-bg,
-.bg-draw,
-.fo-nttax-infobox-wrapper .infobox-color-often,
-.swisstable .swisstable-bgc-draw {
+.fo-nttax-infobox-wrapper .infobox-color-often {
 	background-color: var( --clr-pear-background-color, #f9f9c7 );
-}
-
-.bg-draw-important {
-	background-color: var( --clr-pear-background-color, #f9f9c7 ) !important;
 }
 
 .pear-theme-dark-text {
@@ -533,8 +501,6 @@ ul.nav-tabs li.game-64,
 
 .bright-sun-bg,
 .bright-theme-light-alt-bg,
-.bg-s,
-.bg-stay,
 .fo-nttax-infobox-wrapper.infobox-cs1 .infobox-header,
 .fo-nttax-infobox-wrapper.infobox-cs16 .infobox-header {
 	background-color: var( --clr-sun-background-color, #f9f0c7 );
@@ -648,8 +614,6 @@ ul.nav-tabs li.game-64,
 .background-color-fourth-place,
 .bg-fourth,
 .bg-p4,
-.bg-sd,
-.bg-staydown,
 .fo-nttax-infobox-wrapper.infobox-wiiu .infobox-header,
 ul.nav-tabs li.game-wiiu,
 .overview.game-wiiu {
@@ -756,22 +720,35 @@ ul.nav-tabs li.game-wiiu,
 
 /* Standings position / placement colors */
 
-.theme--light {
-	--position-byeup-color: #8046a3;
-	--position-seedup-color: #006bd4;
-	--position-up-color: var( --clr-semantic-positive-30 );
-	--position-stayup-color: #094e09;
+:root {
+	--position-byeup-color: #9641c9;
+	--position-seedup-color: #0572dd;
+	--position-up-color: #008a00;
+	--position-stayup-color: #005a00;
 	--position-stay-color: #966f00;
-	--position-staydown-color: #d4400f;
-	--position-down-color: var( --clr-semantic-negative-40 );
+	--position-staydown-color: #c85000;
+	--position-down-color: #d02626;
+	--position-disqualified-color: var( --clr-secondary-44 );
+}
+
+.theme--light {
+	--position-byeup-background-color: #f7e9ff;
+	--position-seedup-background-color: #d9ecff;
+	--position-up-background-color: #d5f7d5;
+	--position-stayup-background-color: #ebffeb;
+	--position-stay-background-color: #fff7df;
+	--position-staydown-background-color: #ffe7d9;
+	--position-down-background-color: #ffe9e9;
+	--position-disqualified-background-color: var( --clr-on-surface-light-primary-8 );
 }
 
 .theme--dark {
-	--position-byeup-color: #cc9fe7;
-	--position-seedup-color: #a9caeb;
-	--position-up-color: #65a765;
-	--position-stayup-color: #b6f8b6;
-	--position-stay-color: #e5c976;
-	--position-staydown-color: #f2a288;
-	--position-down-color: #fc6868;
+	--position-byeup-background-color: #3a1f4b;
+	--position-seedup-background-color: #15385b;
+	--position-up-background-color: #053b05;
+	--position-stayup-background-color: #052f05;
+	--position-stay-background-color: #413106;
+	--position-staydown-background-color: #441e05;
+	--position-down-background-color: #3f1212;
+	--position-disqualified-background-color: var( --clr-on-surface-dark-primary-8 );
 }
