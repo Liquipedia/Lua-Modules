@@ -446,6 +446,21 @@ function mw.language:formatDate(format, timestamp, localTime)
 			return day or ''
 		end
 		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
+	elseif format == 'Y-m-d' then
+		if not timestamp then
+			return os.date('!%Y-%m-%d') --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			local seconds = tonumber(string.sub(timestamp, 2))
+			if not seconds then return '' end
+			return os.date('!%Y-%m-%d', seconds) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local year, month, day = parseDateString(timestamp)
+			if not year then return '' end
+			return year .. '-' .. month .. '-' .. day
+		end
+		return os.date('!%Y-%m-%d', ostimeWrapper(timestamp)) --[[@as string]]
 	end
 	return ''
 end
