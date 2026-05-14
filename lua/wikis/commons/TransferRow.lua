@@ -66,8 +66,6 @@ local TransferRow = Class.new(
 	---@return self
 	function(self, args)
 		self.args = args
-
-		return self
 	end
 )
 
