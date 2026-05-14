@@ -35,6 +35,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local DEFAULT_MAP_NAME = 'Unknown'
 local SUM_ABBR = Html.Abbr{title = 'Sum of', children = 'Σ'}
 local NUMBER_OF_ABBR = Html.Abbr{title = 'Number of', children = '#'}
+local FACTIONS = Logic.nilIfEmpty(Faction.coreFactions) or Faction.factions
 
 local MapStatistics = {}
 
@@ -91,16 +92,16 @@ function MapStatistics._getMatchups()
 	end
 
 	--- this loop is only wanted/needed so that each faction is on the left at least once...
-	Array.forEach(Faction.coreFactions, function(faction, factionIndex)
-		local nextFaction = Faction.coreFactions[factionIndex + 1] or Faction.coreFactions[1]
+	Array.forEach(FACTIONS, function(faction, factionIndex)
+		local nextFaction = FACTIONS[factionIndex + 1] or FACTIONS[1]
 		if faction == nextFaction or alreadyDone(faction, nextFaction) then
 			return
 		end
 		table.insert(vs, faction .. ',' .. nextFaction)
 	end)
 
-	Array.forEach(Faction.coreFactions, function(faction1)
-		Array.forEach(Faction.coreFactions, function(faction2)
+	Array.forEach(FACTIONS, function(faction1)
+		Array.forEach(FACTIONS, function(faction2)
 			if not alreadyDone(faction1, faction2) then
 				table.insert(vs, faction1 .. ',' .. faction2)
 			end
@@ -109,7 +110,7 @@ function MapStatistics._getMatchups()
 
 	return {
 		vs = vs,
-		mirrors = Table.copy(Faction.coreFactions), -- copy to remove the metatable which breaks some stuff
+		mirrors = Table.copy(FACTIONS), -- copy to remove the metatable which breaks some stuff
 	}
 end
 
@@ -185,12 +186,12 @@ function MapStatistics._fetchData(args, matchUps)
 		data[map] = data[map] or makeInitialMapData(gameData)
 
 		local winnerFaction = gameData.extradata.winnerfaction
-		if not Table.includes(Faction.coreFactions, winnerFaction) then
+		if not Table.includes(FACTIONS, winnerFaction) then
 			return
 		end
 
 		local loserFaction = gameData.extradata.loserfaction
-		if not Table.includes(Faction.coreFactions, loserFaction) then
+		if not Table.includes(FACTIONS, loserFaction) then
 			return
 		end
 
