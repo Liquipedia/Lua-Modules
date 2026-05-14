@@ -8,24 +8,28 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
-local Component = Lua.import('Module:Widget/Component')
-local Html = Lua.import('Module:Widget/Html')
+local Widget = Lua.import('Module:Widget')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local Div = Html.Div
+local Div = HtmlWidgets.Div
 
----@class ButtonWidgetParameters: HtmlNodeProps
+---@class ButtonWidgetParameters
 ---@field title string?
 ---@field link string?
 ---@field linktype 'internal'|'external'|nil
----@field variant 'primary'|'secondary'|'themed'|'ghost'|'destructive'|'icon'|nil
+---@field variant 'primary'|'secondary'|'themed'|'ghost'|'destructive'|nil
 ---@field size 'xs'|'sm'|'md'|'lg'|nil
 ---@field grow boolean?
 ---@field aligncontent 'left'|'right'|nil
 
-local defaultProps = {
+---@class ButtonWidget: Widget
+---@operator call(ButtonWidgetParameters): ButtonWidget
+local Button = Class.new(Widget)
+Button.defaultProps = {
 	linktype = 'internal',
 	variant = 'primary',
 	size = 'md',
@@ -33,69 +37,68 @@ local defaultProps = {
 	aligncontent = nil,
 }
 
----@param props ButtonWidgetParameters
----@return HtmlNode
-local function Button(props)
+---@return Widget
+function Button:render()
 	--- MW Parser does not allowed the <button> tag, so we use a <div>
 	local cssClasses = {'btn'}
-	if props.variant == 'primary' then
+	if self.props.variant == 'primary' then
 		table.insert(cssClasses, 'btn-primary')
-	elseif props.variant == 'secondary' then
+	elseif self.props.variant == 'secondary' then
 		table.insert(cssClasses, 'btn-secondary')
-	elseif props.variant == 'themed' then
+	elseif self.props.variant == 'themed' then
 		table.insert(cssClasses, 'btn-themed')
-	elseif props.variant == 'ghost' then
+	elseif self.props.variant == 'ghost' then
 		table.insert(cssClasses, 'btn-ghost')
-	elseif props.variant == 'destructive' then
+	elseif self.props.variant == 'destructive' then
 		table.insert(cssClasses, 'btn-destructive')
 	end
 
-	if props.size == 'xs' then
+	if self.props.size == 'xs' then
 		table.insert(cssClasses, 'btn-extrasmall')
-	elseif props.size == 'sm' then
+	elseif self.props.size == 'sm' then
 		table.insert(cssClasses, 'btn-small')
-	elseif props.size == 'lg' then
+	elseif self.props.size == 'lg' then
 		table.insert(cssClasses, 'btn-large')
 	end
 
 	local cssTable = {}
-	if props.grow then
+	if self.props.grow then
 		cssTable.width = '100%'
 	end
-	if props.aligncontent == 'left' then
+	if self.props.aligncontent == 'left' then
 		cssTable['justify-content'] = 'left'
-	elseif props.aligncontent == 'right' then
+	elseif self.props.aligncontent == 'right' then
 		cssTable['justify-content'] = 'right'
 	end
 
 	local button = Div{
 		css = Logic.nilIfEmpty(cssTable),
-		classes = Array.extend(cssClasses, props.classes or {}),
+		classes = Array.extend(cssClasses, self.props.classes or {}),
 		attributes = Table.merge({
-			title = props.title,
-			['aria-label'] = props.title,
+			title = self.props.title,
+			['aria-label'] = self.props.title,
 			role = 'button',
 			tabindex = '0',
-		}, props.attributes or {}),
-		children = props.children,
+		}, self.props.attributes or {}),
+		children = self.props.children,
 	}
 
-	if not props.link then
+	if not self.props.link then
 		return button
 	end
 
 	-- Have to wrap it in an extra div to prevent the mediawiki parser from messing it up
 	return Div{
-		css = props.grow and {flex = '1'} or nil,
-		classes = props.classes or {},
+		css = self.props.grow and {flex = '1'} or nil,
+		classes = self.props.classes or {},
 		children = {
 			Link{
-				link = props.link,
-				linktype = props.linktype,
+				link = self.props.link,
+				linktype = self.props.linktype,
 				children = {button},
 			}
 		}
 	}
 end
 
-return Component.component(Button, defaultProps)
+return Button
