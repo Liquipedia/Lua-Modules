@@ -383,7 +383,7 @@ end
 
 ---@private
 ---@param transfers transfer[]
----@return Widget?
+---@return VNode?
 function TransferList:_buildRow(transfers)
 	local firstTransfer = transfers[1]
 	if not firstTransfer then
