@@ -14,20 +14,20 @@ local MatchTable = Lua.import('Module:MatchTable/Custom')
 local MatchTicker = Lua.import('Module:MatchTicker')
 local MatchTickerDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local TeamPlayerMatches = {}
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function TeamPlayerMatches.run(frame)
 	local args = Arguments.getArgs(frame)
 
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = WidgetUtil.collect(
 			TeamPlayerMatches._matchTicker(args.team),
-			HtmlWidgets.H3{children = 'Recent Matches'},
+			Html.H3{children = 'Recent Matches'},
 			'The following table shows the recent 100 Matches of Players that are currently part of this Team.',
 			MatchTable.results{
 				tableMode = 'playersOfTeam',
