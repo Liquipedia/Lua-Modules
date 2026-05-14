@@ -35,7 +35,7 @@ function CustomLegacyTeamCard.preprocessCard(card)
 	card.t3title = Logic.emptyOr(card.t3title, 'Staff')
 
 	-- Adjust position arguments and add default
-	Array.forEach(Array.range(1, 10), function(index)
+	Array.forEach(Array.range(1, LegacyTeamCard.DEFAULT_MAX_PLAYER_INDEX), function(index)
 		local key = 'p' .. index
 		card[key .. 'pos'] = Logic.emptyOr(
 			card[key .. 'pos'],
@@ -45,7 +45,7 @@ function CustomLegacyTeamCard.preprocessCard(card)
 	end)
 
 	for tabIndex = 2, 3 do
-		Array.forEach(Array.range(1, 10), function(index)
+		Array.forEach(Array.range(1, LegacyTeamCard.DEFAULT_MAX_PLAYER_INDEX), function(index)
 			local key = 't' .. tabIndex .. 'p' .. index
 			card[key .. 'pos'] = Logic.emptyOr(
 				card[key .. 'pos'],
