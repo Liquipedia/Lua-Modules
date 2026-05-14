@@ -19,7 +19,7 @@ local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local TransferRowWidget = Lua.import('Module:Widget/Transfer/Row')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -306,12 +306,12 @@ function TransferList:create()
 	local config = self.config
 	if Logic.isDeepEmpty(self.groupedTransfers) then
 		if config.showMissingResultsMessage then
-			return HtmlWidgets.Pre{children = 'No results for: ' .. mw.text.nowiki(self.conditions)}
+			return Html.Pre{children = 'No results for: ' .. mw.text.nowiki(self.conditions)}
 		end
 		return
 	end
 
-	local display = HtmlWidgets.Div{
+	local display = Html.Div{
 		classes = {'divTable', 'mainpage-transfer', 'Ref', config.class},
 		css = {
 			['text-align'] = 'center',
@@ -338,18 +338,18 @@ function TransferList:create()
 end
 
 ---@private
----@return Widget
+---@return HtmlNode
 function TransferList:_buildHeader()
 	---@param props {classes: string[]?, children: Renderable|Renderable[]?}
-	---@return Widget
+	---@return HtmlNode
 	local function createDivCell(props)
-		return HtmlWidgets.Div{
+		return Html.Div{
 			classes = Array.extend('divCell', props.classes),
 			children = props.children,
 		}
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'divHeaderRow'},
 		children = WidgetUtil.collect(
 			createDivCell{
@@ -372,9 +372,9 @@ function TransferList:_buildHeader()
 			},
 			createDivCell{
 				classes = {'Empty'},
-				children = HtmlWidgets.Span{
+				children = Html.Span{
 					classes = {'mobile-hide'},
-					children = HtmlWidgets.Abbr{children = 'Ref', title = 'Reference'}
+					children = Html.Abbr{children = 'Ref', title = 'Reference'}
 				}
 			}
 		)
