@@ -49,6 +49,18 @@ local data = {
 		['2023-01-26'] = 'heroic 2023',
 		['2024-02-20'] = 'heroic 2024',
 	},
+	-- tbd subtemplate
+	['tbd'] = {
+		bracketname = "TBD",
+		image = "",
+		imagedark = "",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "TBD",
+		page = "TBD",
+		shortname = "TBD",
+		templatename = "tbd",
+	},
 	-- bds subtemplates
 	['bds esport old'] = {
 		bracketname = "BDS Esport",

@@ -48,7 +48,8 @@ function StandingsSwissWidget:render()
 			TableWidgets.TableBody{children = Array.map(lastRound.opponents, function(slot)
 				return self:_createRow(slot)
 			end)}
-		)
+		),
+		striped = false
 	}
 end
 
@@ -65,9 +66,7 @@ function StandingsSwissWidget:_buildColumnDefinitions()
 			end
 			return {align = 'center'}
 		end),
-		Array.map(standings.rounds, function(round)
-			return {align = 'center'}
-		end)
+		Array.rep({align = 'center'}, #standings.rounds)
 	)
 end
 
