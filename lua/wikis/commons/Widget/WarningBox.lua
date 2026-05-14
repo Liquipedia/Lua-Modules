@@ -7,34 +7,29 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 
----@class WarningBoxWidget: Widget
----@operator call(table): WarningBoxWidget
----@field props {text: string|number?}
-local WarningBoxWidget = Class.new(Widget)
-
----@return Widget?
-function WarningBoxWidget:render()
-	local text = self.props.text
+---@param props {text: string|number?}
+---@return HtmlNode?
+local function WarningBox(props)
+	local text = props.text
 	if Logic.isEmpty(text) then
 		return
 	end
 	---@cast text -nil
 
-	local tbl = HtmlWidgets.Table{
-		children = HtmlWidgets.Tr{
+	local tbl = Html.Table{
+		children = Html.Tr{
 			children = {
-				HtmlWidgets.Td{
+				Html.Td{
 					classes = {'ambox-image'},
 					children = IconImage{imageLight = 'Emblem-important.svg', size = '40px', link = ''}
 				},
-				HtmlWidgets.Td{
+				Html.Td{
 					classes = {'ambox-text'},
 					children = text
 				},
@@ -42,7 +37,7 @@ function WarningBoxWidget:render()
 		}
 	}
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {
 			'show-when-logged-in',
 			'navigation-not-searchable',
@@ -56,4 +51,4 @@ function WarningBoxWidget:render()
 	}
 end
 
-return WarningBoxWidget
+return Component.component(WarningBox)
