@@ -7,31 +7,28 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Variables = Lua.import('Module:Variables')
 
 local Box = Lua.import('Module:Widget/Basic/Box')
+local Component = Lua.import('Module:Widget/Component')
 local EarningsStatsChart = Lua.import('Module:Widget/EarningsStatsChart')
 local Html = Lua.import('Module:Widget/Html')
 local MedalsTable = Lua.import('Module:Widget/MedalsTable')
-local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class TeamPageStatistics: Widget
----@operator call(table): TeamPageStatistics
-local TeamPageStatistics = Class.new(Widget)
+local TeamPageStatistics = {}
 
 ---@return VNode
-function TeamPageStatistics:render()
+function TeamPageStatistics.render()
 	return WidgetUtil.collect(
-		self:_earningsChart(),
-		self:_medalTables()
+		TeamPageStatistics._earningsChart(),
+		TeamPageStatistics._medalTables()
 	)
 end
 
 ---@return VNode
-function TeamPageStatistics:_earningsChart()
+function TeamPageStatistics._earningsChart()
 	return EarningsStatsChart{
 		data = {
 			solo = Json.parseIfString(Variables.varDefault('playerEarnings')) or {},
@@ -45,7 +42,7 @@ function TeamPageStatistics:_earningsChart()
 end
 
 ---@return VNode
-function TeamPageStatistics:_medalTables()
+function TeamPageStatistics._medalTables()
 	local data = Json.parseIfString(Variables.varDefault('medals'))
 	return Box{
 		children = {
@@ -67,4 +64,4 @@ function TeamPageStatistics:_medalTables()
 	}
 end
 
-return TeamPageStatistics
+return Component.component(TeamPageStatistics.render)

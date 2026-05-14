@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Faction = Lua.import('Module:Faction')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
@@ -17,21 +16,20 @@ local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
+local Component = Lua.import('Module:Widget/Component')
 local EarningsStatsChart = Lua.import('Module:Widget/EarningsStatsChart')
 local MedalsTable = Lua.import('Module:Widget/MedalsTable')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class PlayerPageStatistics: Widget
----@operator call(table): PlayerPageStatistics
-local PlayerPageStatistics = Class.new(Widget)
+local PlayerPageStatistics = {}
 
+---@param props {footer: Renderable?}
 ---@return VNode[]
-function PlayerPageStatistics:render()
+function PlayerPageStatistics.render(props)
 	return WidgetUtil.collect(
-		self:_matchupStats(),
-		self:_earningsChart(),
+		PlayerPageStatistics._matchupStats(props),
+		PlayerPageStatistics._earningsChart(),
 		MedalsTable{
 			caption = '1v1 Medal Statistics',
 			data = Json.parseIfString(Variables.varDefault('medals')),
@@ -40,8 +38,9 @@ function PlayerPageStatistics:render()
 end
 
 ---@private
+---@param props {footer: Renderable?}
 ---@return VNode?
-function PlayerPageStatistics:_matchupStats()
+function PlayerPageStatistics._matchupStats(props)
 	---@type table<string, table<string, {w: integer?, l: integer?}>>
 	local data = Json.parseIfString(Variables.varDefault('matchUpStats'))
 	if Logic.isEmpty(data) then
@@ -59,7 +58,7 @@ function PlayerPageStatistics:_matchupStats()
 		local total2 = (tbl[key2].total.w or 0) + (tbl[key2].total.l or 0)
 		return total1 > total2
 	end) do
-		table.insert(rows, self:_matchupStatsRow(row, rowData, columns))
+		table.insert(rows, PlayerPageStatistics._matchupStatsRow(row, rowData, columns))
 	end
 
 	return TableWidgets.Table{
@@ -74,10 +73,10 @@ function PlayerPageStatistics:_matchupStats()
 			end)
 		),
 		children = {
-			self:_matchupStatsHeader(columns),
+			PlayerPageStatistics._matchupStatsHeader(columns),
 			TableWidgets.TableBody{children = rows}
 		},
-		footer = self.props.footer
+		footer = props.footer
 	}
 end
 
@@ -86,7 +85,7 @@ end
 ---@param rowData table<string, {w: integer?, l: integer?}>
 ---@param columns string[]
 ---@return unknown
-function PlayerPageStatistics:_matchupStatsRow(row, rowData, columns)
+function PlayerPageStatistics._matchupStatsRow(row, rowData, columns)
 	return TableWidgets.Row{
 		classes = {row ~= 'total' and Faction.bgClass(row) or nil},
 		children = WidgetUtil.collect(
@@ -118,7 +117,7 @@ end
 ---@private
 ---@param columns string[]
 ---@return VNode
-function PlayerPageStatistics:_matchupStatsHeader(columns)
+function PlayerPageStatistics._matchupStatsHeader(columns)
 	return TableWidgets.TableHeader{
 		children = {
 			TableWidgets.Row{
@@ -144,7 +143,7 @@ end
 
 ---@private
 ---@return VNode
-function PlayerPageStatistics:_earningsChart()
+function PlayerPageStatistics._earningsChart()
 	local rawData = Json.parseIfString(Variables.varDefault('earningsStats')) or {}
 
 	return EarningsStatsChart{
@@ -161,4 +160,4 @@ function PlayerPageStatistics:_earningsChart()
 	}
 end
 
-return PlayerPageStatistics
+return Component.component(PlayerPageStatistics.render)

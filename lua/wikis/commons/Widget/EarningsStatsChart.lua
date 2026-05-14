@@ -8,23 +8,21 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
+local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
-local Widget = Lua.import('Module:Widget')
 
----@class EarningsStatsChart: Widget
----@operator call(table): EarningsStatsChart
----@field props {dataPoints: {legend: string, key: string}[], data: table}
-local EarningsStatsChart = Class.new(Widget)
+local EarningsStatsChart = {}
 
+---@param props {dataPoints: {legend: string, key: string}[], data: table}
 ---@return VNode?
-function EarningsStatsChart:render()
-	local data, years = self:_parse()
+function EarningsStatsChart.render(props)
+	local data, years = EarningsStatsChart._parse(props)
+
 	if Logic.isEmpty(data) then
 		return
 	end
@@ -47,7 +45,7 @@ function EarningsStatsChart:render()
 				tooltip = {
 					trigger = 'axis',
 				},
-				legend = Array.map(self.props.dataPoints, Operator.property('legend')),
+				legend = Array.map(props.dataPoints, Operator.property('legend')),
 				xAxis = {
 					axisLabel = {rotate = 0},
 					axisTick = {alignWithLabel = true},
@@ -62,11 +60,12 @@ function EarningsStatsChart:render()
 	}
 end
 
+---@param props {dataPoints: {legend: string, key: string}[], data: table}
 ---@return {data: number[], emphasis: {focus: string}, name: string, stack: string, type: string}[]?
 ---@return integer[]?
-function EarningsStatsChart:_parse()
-	local dataSets = Array.map(self.props.dataPoints, function(dataPoint)
-		return self.props.data[dataPoint.key] or {}
+function EarningsStatsChart._parse(props)
+	local dataSets = Array.map(props.dataPoints, function(dataPoint)
+		return props.data[dataPoint.key] or {}
 	end)
 
 	---@param year integer
@@ -93,7 +92,7 @@ function EarningsStatsChart:_parse()
 		table.remove(years)
 	end
 
-	local chartData = Array.map(self.props.dataPoints, function(dataPoint, index)
+	local chartData = Array.map(props.dataPoints, function(dataPoint, index)
 		return {
 			data = Array.map(years, function(year) return dataSets[index][year] or 0 end),
 			emphasis = {
@@ -108,4 +107,4 @@ function EarningsStatsChart:_parse()
 	return chartData, years
 end
 
-return EarningsStatsChart
+return Component.component(EarningsStatsChart.render)
