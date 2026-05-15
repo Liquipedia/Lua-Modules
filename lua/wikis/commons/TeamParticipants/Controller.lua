@@ -42,6 +42,9 @@ function TeamParticipantsController.fromTemplate(frame)
 	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
 	TeamParticipantsController.importParticipants(parsedData)
 	TeamParticipantsController.fillIncompleteRosters(parsedData)
+	if Logic.nilOr(Logic.readBoolOrNil(parsedArgs.enrichPlayerDates), true) then
+		TeamParticipantsController.enrichPlayerDates(parsedData)
+	end
 
 	local shouldStore = Logic.readBoolOrNil(args.store) ~= false and Lpdb.isStorageEnabled()
 
@@ -139,6 +142,22 @@ function TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers,
 			local newPlayer = Table.deepMerge(player, manualPlayers[indexOfManualPlayer])
 			manualPlayers[indexOfManualPlayer] = newPlayer
 		end
+	end)
+end
+
+--- Enriches each player with join/leave dates from the transfer LPDB table.
+--- Explicit dates from wiki input take precedence over auto-fetched ones.
+---@param parsedData {participants: TeamParticipant[], expectedPlayerCount: integer?}
+function TeamParticipantsController.enrichPlayerDates(parsedData)
+	Array.forEach(parsedData.participants, function(participant)
+		local players = participant.opponent.players or {}
+		local datesByPlayer = TeamParticipantsRepository.getPlayersDates(players, participant.aliases)
+		Array.forEach(players, function(player)
+			local dates = datesByPlayer[player.pageName] or {}
+			player.extradata = player.extradata or {}
+			player.extradata.joinDate = dates.joinDate
+			player.extradata.leaveDate = dates.leaveDate
+		end)
 	end)
 end
 

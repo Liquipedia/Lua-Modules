@@ -1,6 +1,7 @@
 --- Triple Comment to Enable our LLS Plugin
 local ComponentCore = require('Module:Widget/Component')
 local Context = require('Module:Widget/ComponentContext')
+local ErrorBoundary = require('Module:Widget/ErrorBoundary')
 local Html = require('Module:Widget/Html')
 local WidgetHtml = require('Module:Widget/Html/All')
 local Renderer = require('Module:Widget/Renderer')
@@ -283,4 +284,56 @@ describe('Components/Html', function()
 		}})
 		assert.are.equal('<span>a</span><span>b</span>', result)
 	end)
+end)
+
+describe('Components/ErrorBoundary', function()
+	it('ErrorBoundary stops error propagation', function()
+		local errorMessage = 'Test error'
+		local MyComp = ComponentCore.component(function(props, context)
+			error(errorMessage)
+		end)
+
+		local tree = ErrorBoundary{
+			children = {MyComp{}}
+		}
+		assert.does_not.error(function() return tostring(tree) end)
+	end)
+
+	it('ErrorBoundary renders fallback on error', function()
+		local MyComp = ComponentCore.component(function()
+			error('fail')
+		end)
+		local tree = ErrorBoundary{
+			fallback = function()
+				return Html.Span{children = {'fallback'}}
+			end,
+			children = {MyComp{}}
+		}
+		assert.are.equal('<span>fallback</span>', tostring(tree))
+	end)
+
+	it('ErrorBoundary renders children if no error', function()
+		local MyComp = ComponentCore.component(function()
+			return Html.Span{children = {'ok'}}
+		end)
+		local tree = ErrorBoundary{
+			fallback = function()
+				return Html.Span{children = {'fallback'}}
+			end,
+			children = {MyComp{}}
+		}
+		assert.are.equal('<span>ok</span>', tostring(tree))
+	end)
+
+	it('ErrorBoundary fallback receives error message', function()
+		local MyComp = ComponentCore.component(function()
+			error('errormsg123')
+		end)
+		local tree = ErrorBoundary{
+			children = {MyComp{}}
+		}
+		local render = tostring(tree)
+		assert.is_true(render:find('errormsg123') ~= nil)
+	end)
+
 end)

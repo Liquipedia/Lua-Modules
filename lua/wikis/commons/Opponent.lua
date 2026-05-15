@@ -38,6 +38,7 @@ StarcraftMatchSummary
 - Wikis may add additional wiki-specific fields to the opponent representation.
 
 ]]
+---@class Opponent
 local Opponent = {types = {}}
 
 ---@enum OpponentType

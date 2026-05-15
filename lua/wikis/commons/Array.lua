@@ -489,7 +489,7 @@ function Array.mapIndexes(funct)
 	local arr = {}
 	for index = 1, math.huge do
 		local y = funct(index)
-		if y then
+		if y ~= nil then
 			table.insert(arr, y)
 		else
 			break

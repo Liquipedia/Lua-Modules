@@ -237,6 +237,8 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 		played = Logic.nilOr(playedInput, true),
 		results = Logic.nilOr(resultsInput, playedInput, true),
 		number = tonumber(playerInput.number),
+		joinDate = Logic.nilIfEmpty(playerInput.joindate),
+		leaveDate = Logic.nilIfEmpty(playerInput.leavedate),
 	}
 	return player
 end
