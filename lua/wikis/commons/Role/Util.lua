@@ -90,7 +90,7 @@ function RoleUtil._createRoleData(roleKey)
 		key = key,
 		type = roleType(),
 		sortOrder = roleData.sortOrder,
-		icon = roleData.iconFa and IconFa{}
+		icon = roleData.iconFa and IconFa{iconName = roleData.iconFa, hover = roleData.display}
 			or roleData.icon
 			or POSITION_ICON_DATA and POSITION_ICON_DATA[key]
 			or nil,
