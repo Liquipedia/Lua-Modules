@@ -260,9 +260,7 @@ end
 ---@return HtmlNode
 function LeagueIcon.generateHistorical(args)
 	local title = args.title or args.series
-	if String.isEmpty(title) then
-		error('No template title specified')
-	end
+	assert(String.isNotEmpty(title), 'No template title specified')
 	local link = args.link or title
 	local name = args.name or link
 	local timeName = title:lower() .. 'time'
