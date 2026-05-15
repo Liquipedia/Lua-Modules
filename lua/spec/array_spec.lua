@@ -228,6 +228,16 @@ describe('array', function()
 				return a[prefix] ~= 'cake' and (prefix .. a[prefix]) or nil
 			end))
 		end)
+
+		it('accept \'false\' literal', function()
+			local a = Array.mapIndexes(function (index)
+				if index > 10 then
+					return
+				end
+				return index % 2 == 0
+			end)
+			assert.are_same(Array.flatten(Array.rep({false, true}, 5)), a)
+		end)
 	end)
 
 	describe('Range', function()
