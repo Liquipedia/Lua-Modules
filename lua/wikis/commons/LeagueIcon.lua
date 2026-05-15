@@ -47,16 +47,16 @@ function LeagueIcon.display(args)
 	local icon = args.icon
 	local trackingCategory = ''
 	if not Logic.readBool(options.noTemplate) and String.isEmpty(icon) and String.isEmpty(iconDark) then
-		local stringOfExpandedTemplate = LeagueIcon.getTemplate({
+		local stringOfExpandedTemplate = LeagueIcon.getTemplate{
 			series = args.series,
 			abbreviation = args.abbreviation,
 			date = args.date
-		})
-		icon, iconDark, trackingCategory = LeagueIcon.getIconFromTemplate({
+		}
+		icon, iconDark, trackingCategory = LeagueIcon.getIconFromTemplate{
 			icon = icon,
 			iconDark = iconDark,
 			stringOfExpandedTemplate = stringOfExpandedTemplate
-		})
+		}
 	end
 
 	--if icon and iconDark are not given and can not be retrieved return filler icon
