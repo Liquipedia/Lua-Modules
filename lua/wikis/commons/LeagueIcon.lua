@@ -18,7 +18,7 @@ local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local FILLER = '<span class="league-icon-small-image">[[File:Logo filler event.png|link=]]</span>'
+local FILLER_IMAGE = 'Logo filler event.png'
 local NO_ICON_BUT_ICONDARK_TRACKING_CATEGORY = 'Pages with only icondark'
 
 ---@class LeagueIconDisplayArgs
@@ -61,7 +61,7 @@ function LeagueIcon.display(args)
 
 	--if icon and iconDark are not given and can not be retrieved return filler icon
 	if String.isEmpty(icon) and String.isEmpty(iconDark) then
-		return FILLER
+		return LeagueIcon._generateWikiCode(FILLER_IMAGE, '')
 	end
 
 	if String.isEmpty(icon) then
@@ -112,8 +112,8 @@ end
 ---@private
 ---@param icon string
 ---@param link string
----@param name string
----@param size number
+---@param name string?
+---@param size number?
 ---@param additionalClasses string|string[]?
 ---@return HtmlNode
 function LeagueIcon._generateWikiCode(icon, link, name, size, additionalClasses)
@@ -121,12 +121,12 @@ function LeagueIcon._generateWikiCode(icon, link, name, size, additionalClasses)
 		classes = Array.extend('league-icon-small-image', additionalClasses),
 		children = {
 			'[[',
-			table.concat({
+			table.concat(Array.extend(
 				'File:' .. icon,
 				'link=' .. link,
-				name or link,
-				size .. 'x' .. size .. 'px'
-			}, '|')
+				Logic.emptyOr(name, link),
+				size and (size .. 'x' .. size .. 'px') or nil
+			), '|')
 			']]'
 		}
 	}
