@@ -122,6 +122,7 @@ function TeamListWrapper.generateOuterConfig(args)
 	local params = {
 		'showplayerinfo',
 		'date',
+		'enrichPlayerDates',
 	}
 
 	local parts = Array.map(params, function(param)
@@ -213,6 +214,7 @@ function TeamList:map()
 			showplayerinfo =  config.playerInfoButton and 'true' or nil,
 			date = config.resolveDate,
 			store = not config.noStorage,
+			enrichPlayerDates = 'false',
 		}
 
 		if args.title and config.showCountBySection then
