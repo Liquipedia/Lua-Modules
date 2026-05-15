@@ -282,7 +282,4 @@ return {
 
 	-- Usage: Info button
 	['general-info'] = 'fas fa-info-circle',
-
-	-- Usage: Role icon for captain / ingame leader
-	captain = 'far fa-crown'
 }
