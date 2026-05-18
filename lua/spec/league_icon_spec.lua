@@ -2,7 +2,7 @@
 local LeagueIcon = require('Module:LeagueIcon')
 
 local FILLER_EXPECT = '<span class="league-icon-small-image">[[File:Logo filler event.png|link=]]</span>'
-local ICON_DARK_EXPECT = '<span class="league-icon-small-image">[[File:DarkIcon.png|link=||50x50px]]</span>'
+local ICON_DARK_EXPECT = '<span class="league-icon-small-image">[[File:DarkIcon.png|link=|50x50px]]</span>'
 
 local ICON_BOTH_EXPECT =
 	'<span class="league-icon-small-image lightmode">[[File:LightIcon.png|link=||50x50px]]</span>' ..
