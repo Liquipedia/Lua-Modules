@@ -126,7 +126,7 @@ function LeagueIcon._generateWikiCode(icon, link, name, size, additionalClasses)
 				'link=' .. link,
 				Logic.emptyOr(name, link),
 				size and (size .. 'x' .. size .. 'px') or nil
-			), '|')
+			), '|'),
 			']]'
 		}
 	}
