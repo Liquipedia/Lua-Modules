@@ -32,7 +32,7 @@ RoleUtil.ROLE_TYPE = {
 	CONTRACT = 'contract',
 	STAFF = 'staff',
 	INGAME = 'ingame',
-	TEAMROLE = 'teamrole  ',
+	TEAMROLE = 'teamrole',
 	UNKNOWN = 'unknown',
 }
 
