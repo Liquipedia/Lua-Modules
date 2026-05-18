@@ -398,4 +398,26 @@ function PlayerExt.TemplateStorePlayerLink(frame)
 	}, {overwritePageVars = true})
 end
 
+---@param record player
+---@return standardPlayer
+---@overload fun(record: {}?): nil
+function PlayerExt.fromLpdbPlayerRecord(record)
+	if Logic.isEmpty(record) then
+		return
+	end
+
+	local extradata = record.extradata or {}
+
+	return {
+		pageName = record.pagename,
+		displayName = record.id,
+		flag = record.nationality,
+		faction = extradata.faction,
+		team = record.teamtemplate,
+		extradata = extradata,
+		pageIsResolved = true,
+		apiId = extradata.playerid, -- dota appid is stored that way
+	}
+end
+
 return PlayerExt
