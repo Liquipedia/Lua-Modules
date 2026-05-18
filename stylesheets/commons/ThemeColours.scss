@@ -115,11 +115,6 @@ $clr-on-copper--dark: #ffcd99;
 html.theme--light,
 html.theme--light::before,
 html.theme--light::after {
-	--clr-wiki-theme-primary: #{$clr-wiki-theme-primary--light};
-	--clr-wiki-primary: #{$clr-wiki-primary--light};
-	--clr-wiki-on-primary: #{$clr-wiki-on-primary--light};
-	--clr-wiki-primary-container: #{$clr-wiki-primary-container--light};
-	--clr-wiki-on-primary-container: #{$clr-wiki-on-primary-container--light};
 	--clr-primary: #{$clr-primary--light};
 	--clr-on-primary: #{$clr-on-primary--light};
 	--clr-primary-container: #{$clr-primary-container--light};
@@ -166,11 +161,6 @@ html.theme--light::after {
 html.theme--dark,
 html.theme--dark::before,
 html.theme--dark::after {
-	--clr-wiki-theme-primary: #{$clr-wiki-theme-primary--dark};
-	--clr-wiki-primary: #{$clr-wiki-primary--dark};
-	--clr-wiki-on-primary: #{$clr-wiki-on-primary--dark};
-	--clr-wiki-primary-container: #{$clr-wiki-primary-container--dark};
-	--clr-wiki-on-primary-container: #{$clr-wiki-on-primary-container--dark};
 	--clr-primary: #{$clr-primary--dark};
 	--clr-on-primary: #{$clr-on-primary--dark};
 	--clr-primary-container: #{$clr-primary-container--dark};
