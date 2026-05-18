@@ -12,8 +12,6 @@ local String = Lua.import('Module:StringUtils')
 
 local Roles = Lua.import('Module:Roles')
 
-local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-
 --- TODO: In the future this should be moved to role data entry
 local POSITION_ICON_DATA = Lua.requireIfExists('Module:PositionIcon/data', {loadData = true})
 
@@ -23,13 +21,11 @@ local RoleUtil = {}
 ---@field display string
 ---@field category string
 ---@field sortOrder integer?
----@field iconFa string?
----@field icon string?
 
 ---@class RoleData: RoleBaseData
 ---@field key string?
 ---@field type RoleTypes
----@field icon VNode|string?
+---@field icon string?
 
 ---@enum RoleTypes
 RoleUtil.ROLE_TYPE = {
@@ -90,10 +86,7 @@ function RoleUtil._createRoleData(roleKey)
 		key = key,
 		type = roleType(),
 		sortOrder = roleData.sortOrder,
-		icon = roleData.iconFa and IconFa{iconName = roleData.iconFa, hover = roleData.display}
-			or roleData.icon
-			or POSITION_ICON_DATA and POSITION_ICON_DATA[key]
-			or nil,
+		icon = POSITION_ICON_DATA and POSITION_ICON_DATA[key] or nil,
 	}
 end
 
