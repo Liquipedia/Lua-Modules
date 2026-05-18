@@ -29,7 +29,7 @@ local RoleUtil = {}
 ---@class RoleData: RoleBaseData
 ---@field key string?
 ---@field type RoleTypes
----@field icon VNode|string?
+---@field icon Renderable?
 
 ---@enum RoleTypes
 RoleUtil.ROLE_TYPE = {
