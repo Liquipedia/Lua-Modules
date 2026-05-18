@@ -61,7 +61,7 @@ function LeagueIcon.display(args)
 
 	--if icon and iconDark are not given and can not be retrieved return filler icon
 	if String.isEmpty(icon) and String.isEmpty(iconDark) then
-		return LeagueIcon._generateWikiCode(FILLER_IMAGE, '')
+		return tostring(LeagueIcon._generateWikiCode(FILLER_IMAGE, ''))
 	end
 
 	if String.isEmpty(icon) then
