@@ -21,7 +21,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local ColumnName = Condition.ColumnName
 
-local Html = require('Module:Widget/Html')
+local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
