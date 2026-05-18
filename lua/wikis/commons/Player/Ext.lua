@@ -352,7 +352,8 @@ function PlayerExt.syncTeam(pageName, template, options)
 
 	if entry and not entry.isResolved then
 		entry.raw = entry.template
-		entry.template = entry.template and TeamTemplate.resolve(entry.template, options.date --[[@as string|number?]])
+		entry.template = entry.template
+			and TeamTemplate.resolve(entry.template, options.date --[[@as string|number?]]) --[[@as string]]
 		entry.isResolved = true
 	end
 
