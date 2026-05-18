@@ -227,7 +227,6 @@ function LeagueIcon.generate(args)
 	return Html.Fragment{children = WidgetUtil.collect(
 		Html.Pre{
 			classes = {'selectall'},
-			css = {width = '50%'},
 			children = {mw.text.nowiki(LeagueIcon._generateTemplateCode(icon, args.iconDark, link, name))}
 		},
 		LeagueIcon._buildLinkToTemplate(args)
@@ -304,7 +303,6 @@ function LeagueIcon.generateHistorical(args)
 	return Html.Fragment{children = WidgetUtil.collect(
 		Html.Pre{
 			classes = {'selectall'},
-			css = {width = '50%'},
 			children = {mw.text.nowiki(
 				defineTime .. comparisons .. '--><noinclude>[[Category:Historical Small League Icon template]]</noinclude>'
 			)}
