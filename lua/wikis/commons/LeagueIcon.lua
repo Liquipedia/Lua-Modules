@@ -105,7 +105,7 @@ function LeagueIcon._make(icon, iconDark, link, name, size)
 	end
 
 	local lightSpan = LeagueIcon._generateWikiCode(icon, link, name, size, 'lightmode')
-	local darkSpan = LeagueIcon._generateWikiCode(icon, link, name, size, 'darkmode')
+	local darkSpan = LeagueIcon._generateWikiCode(iconDark, link, name, size, 'darkmode')
 	return tostring(lightSpan) .. tostring(darkSpan)
 end
 
