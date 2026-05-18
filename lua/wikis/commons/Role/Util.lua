@@ -32,6 +32,7 @@ RoleUtil.ROLE_TYPE = {
 	CONTRACT = 'contract',
 	STAFF = 'staff',
 	INGAME = 'ingame',
+	TEAMROLE = 'teamrole  ',
 	UNKNOWN = 'unknown',
 }
 
@@ -73,6 +74,8 @@ function RoleUtil._createRoleData(roleKey)
 			return RoleUtil.ROLE_TYPE.CONTRACT
 		elseif Roles.StaffRoles[key] then
 			return RoleUtil.ROLE_TYPE.STAFF
+		elseif Roles.PlayerTeamRoles[key] then
+			return RoleUtil.ROLE_TYPE.TEAMROLE
 		elseif Roles.InGameRoles and Roles.InGameRoles[key] then
 			return RoleUtil.ROLE_TYPE.INGAME
 		else
