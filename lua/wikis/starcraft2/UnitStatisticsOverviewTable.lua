@@ -82,7 +82,7 @@ local UnitStats = {}
 function UnitStats.wrapper(frame)
 	local args = Arguments.getArgs(frame)
 	local game = Game.name{game = args.game or 'lotv'}
-	assert(game, 'Invalid game: ' .. args.game)
+	assert(game, 'Invalid game: ' .. (args.game or 'lotv'))
 
 	local tabArgs = {}
 	for index, faction in ipairs(Faction.coreFactions) do
