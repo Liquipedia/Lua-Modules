@@ -85,7 +85,7 @@ local function getRoleDisplays(player)
 		-- Add non-ingame role if present
 		for _, role in ipairs(roles) do
 			if role.type ~= RoleUtil.ROLE_TYPE.INGAME then
-				table.insert(rightRoles, role.icon or role.display)
+				table.insert(rightRoles, role.abbreviation or role.display)
 				break
 			end
 		end
