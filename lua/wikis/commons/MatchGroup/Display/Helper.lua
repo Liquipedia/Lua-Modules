@@ -17,6 +17,7 @@ local Page = Lua.import('Module:Page')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Info = Lua.import('Module:Info', {loadData = true})
@@ -98,6 +99,7 @@ function DisplayHelper.createSubstitutesComment(match)
 		if Logic.isEmpty(substitutions) then
 			return
 		end
+		---@cast substitutions MatchGroupInputSubstituteInformation[]
 
 		Array.forEach(substitutions, function(substitution)
 			if Logic.isEmpty(substitution.substitute) then
@@ -131,11 +133,27 @@ function DisplayHelper.createSubstitutesComment(match)
 				table.insert(subString, string.format('due to %s', substitution.reason))
 			end
 
-			table.insert(comment, table.concat(subString, ' ') .. '.')
+			table.insert(comment, table.concat(subString, ' ') .. '.' .. DisplayHelper._createSubstituteReferences(substitution.references))
 		end)
 	end)
 
 	return comment
+end
+
+---@private
+---@param references table[]?
+---@return string
+function DisplayHelper._createSubstituteReferences(references)
+	if Logic.isEmpty(references) then
+		return ''
+	end
+	---@cast references -nil
+	local frame = mw.getCurrentFrame()
+	return table.concat(Array.map(references, function (reference)
+		return frame:extensionTag('ref', Template.safeExpand(
+			frame, 'Cite web', reference
+		))
+	end))
 end
 
 ---Creates display components for caster(s).
