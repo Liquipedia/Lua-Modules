@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
-local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
@@ -92,12 +91,12 @@ function TeamParticipantsRepository.save(participant)
 		local activeOpponent = Table.deepCopy(participant.opponent)
 		activeOpponent.players = Array.filter(activeOpponent.players or {}, shouldStorePlayer)
 		-- Add full opponent data for players with results with this team
-		-- TODO: per-wiki `opponentLpdbForceUnderscores` is a stopgap so TP storage matches
-		-- the legacy TeamCard pagename form on each wiki. Drop the option (and the flag)
-		-- once underscore-normalization is unconditional at every LPDB write site.
+		-- TODO: `forceUnderscores` is a stopgap so TP storage normalizes player pagenames
+		-- regardless of `Info.config.forceUnderscores`. Drop the option once underscore
+		-- normalization is unconditional at every LPDB write site.
 		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(activeOpponent, {
 			setPlayersInTeam = true,
-			forceUnderscores = Info.config.opponentLpdbForceUnderscores,
+			forceUnderscores = true,
 		}))
 		-- Legacy participant fields
 		lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(activeOpponent))
@@ -162,12 +161,10 @@ function TeamParticipantsRepository.setPageVars(participant)
 				playerPrefix = 'p' .. playerCount
 			end
 
-			-- TODO: keep wiki-variable pagenames (consumed by matches/HiddenDataBox) in the
-			-- same form as the LPDB write above, gated on the same per-wiki flag. Drop
-			-- once pagename normalization is unconditional everywhere.
-			local normalizedPageName = Info.config.opponentLpdbForceUnderscores
-				and Page.pageifyLink(player.pageName)
-				or player.pageName
+			-- TODO: stopgap so wiki-variable pagenames (consumed by matches/HiddenDataBox)
+			-- match the underscore-normalized form of the LPDB write above. Drop once
+			-- pagename normalization is unconditional everywhere.
+			local normalizedPageName = Page.pageifyLink(player.pageName)
 			Array.forEach(teamPrefixes, function(teamPrefix)
 				local combinedPrefix = teamPrefix .. '_' .. playerPrefix
 				globalVars:set(combinedPrefix, normalizedPageName)
