@@ -49,7 +49,7 @@ function TeamListWrapper.TemplateTeamList(frame)
 	local newArgs = TeamList(args):read():map()
 
 	if Logic.readBool(args.generate) then
-		TeamListWrapper.generate(newArgs)
+		return TeamListWrapper.generate(newArgs)
 	end
 
 	if Array.any(newArgs, function(section)
