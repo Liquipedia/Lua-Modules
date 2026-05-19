@@ -133,7 +133,10 @@ function DisplayHelper.createSubstitutesComment(match)
 				table.insert(subString, string.format('due to %s', substitution.reason))
 			end
 
-			table.insert(comment, table.concat(subString, ' ') .. '.' .. DisplayHelper._createSubstituteReferences(substitution.references))
+			table.insert(
+				comment,
+				table.concat(subString, ' ') .. '.' .. DisplayHelper._createSubstituteReferences(substitution.references)
+			)
 		end)
 	end)
 
