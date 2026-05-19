@@ -288,6 +288,23 @@ describe('opponent', function()
 			}, Opponent.toLpdbStruct(Opponent.fromMatch2Record(Config.exampleMatch2RecordDuo) --[[@as standardOpponent]]))
 			--can not test for team opponent due to missing team templates
 		end)
+
+		it('forceUnderscores option normalizes player pagenames', function()
+			local opponent = {
+				type = Opponent.solo,
+				players = {
+					{displayName = 'Some Player', flag = 'Sweden', pageName = 'Some Player'},
+				},
+				extradata = {},
+			} --[[@as standardOpponent]]
+			-- Without the option, no wiki-level forceUnderscores in the test env -> raw.
+			assert.are_equal('Some Player', Opponent.toLpdbStruct(opponent).opponentplayers.p1)
+			-- With the option, pagename is underscore-normalized regardless of wiki config.
+			assert.are_equal(
+				'Some_Player',
+				Opponent.toLpdbStruct(opponent, {forceUnderscores = true}).opponentplayers.p1
+			)
+		end)
 	end)
 
 	describe('from lpdb struct', function()
