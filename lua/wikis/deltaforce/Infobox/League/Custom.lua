@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Page = Lua.import('Module:Page')
 
@@ -19,6 +20,8 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class DeltaForceLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -61,23 +64,22 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Platform', children = {args.platform}}
 		)
 	elseif id == 'customcontent' then
-		if String.isNotEmpty(args.map1) then
-			local game = String.isNotEmpty(args.game) and ('/' .. args.game) or ''
-			local maps = {}
-
-			for _, map in ipairs(self.caller:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(self.caller:_createNoWrappingSpan(
-					Page.makeInternalLink({}, map, map .. game)
-				)))
-			end
-			table.sort(maps)
-			table.insert(widgets, Title{children = 'Maps'})
-			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
-		end
+		if Logic.isEmpty(args.map1) then return end
+		local gameSuffix = Logic.isNotEmpty(args.game) and ('/' .. args.game) or ''
+		local maps = self.caller:getAllArgsForBase(args, 'map')
+		table.sort(maps)
+		local mapDisplays = Array.map(maps, function(map)
+			return Link{link = map .. gameSuffix, children = map}
+		end)
+		Array.appendWith(cells,
+			Title{children = 'Maps'},
+			Center{children = Array.interleave(mapDisplays, '&nbsp;• ')}
+		)
 	elseif id == 'gamesettings' then
 		table.insert(widgets, Cell{
 			name = 'Patch',
-			children = {self.caller:_createPatchCell(args)}
+			children = self.caller:_createPatchCell(args),
+			options = {separator = ' &ndash; '},
 		})
 	end
 
@@ -91,19 +93,10 @@ function CustomLeague:_createPatchCell(args)
 		return nil
 	end
 
-	local displayText = '[['.. args.patch .. ']]'
-	if args.epatch then
-		displayText = displayText .. ' &ndash; [['.. args.epatch .. ']]'
-	end
-	return displayText
-end
-
----@param content Html|string|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	return mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
+	return {
+		Link{link = args.patch},
+		Logic.isNotEmpty(args.epatch) and Link{link = args.epatch} or nil,
+	}
 end
 
 ---@param args table
