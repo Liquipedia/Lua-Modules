@@ -34,5 +34,10 @@ return {
 			matchPage = false,
 			status = 2,
 		},
+		-- TODO: stopgap so new TeamParticipants storage matches each wiki's legacy TeamCard
+		-- pagename form. Should go away once underscore-normalization is unconditional at
+		-- every LPDB write site. Override to `false` on wikis whose legacy TeamCard stored
+		-- player pagenames with spaces (audit on-wiki LPDB before flipping).
+		opponentLpdbForceUnderscores = true,
 	},
 }
