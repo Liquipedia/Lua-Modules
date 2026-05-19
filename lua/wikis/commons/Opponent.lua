@@ -549,7 +549,7 @@ end
 
 ---Reads an opponent struct and builds a standings/placement lpdb struct from it
 ---@param opponent standardOpponent
----@param options {setPlayersInTeam: boolean?}?
+---@param options {setPlayersInTeam: boolean?, forceUnderscores: boolean?}?
 ---@return {opponentname: string, opponenttemplate: string?, opponenttype: OpponentType, opponentplayers: table?}
 function Opponent.toLpdbStruct(opponent, options)
 	options = options or {}
@@ -558,6 +558,13 @@ function Opponent.toLpdbStruct(opponent, options)
 		opponenttemplate = opponent.template,
 		opponenttype = opponent.type,
 	}
+
+	-- TODO: this per-call `forceUnderscores` override is a stopgap. Storage of player
+	-- pagenames should be unconditionally underscore-normalized at every write site,
+	-- not gated by a wiki-level config flag. Remove this option once that lands.
+	local normalizePageName = options.forceUnderscores
+		and function(pageName) return pageName and (pageName:gsub(' ', '_')) or pageName end
+		or Page.applyUnderScoresIfEnforced
 
 	-- Add players for Party Type opponents, or if config is set to force it.
 	if Opponent.typeIsParty(opponent.type) or options.setPlayersInTeam then
@@ -575,7 +582,7 @@ function Opponent.toLpdbStruct(opponent, options)
 				prefix = 'p' .. playerCount
 			end
 
-			players[prefix] = Page.applyUnderScoresIfEnforced(player.pageName)
+			players[prefix] = normalizePageName(player.pageName)
 			players[prefix .. 'dn'] = player.displayName
 			players[prefix .. 'flag'] = player.flag
 			players[prefix .. 'team'] = player.team and

@@ -56,7 +56,7 @@ end
 --   * Returns an array of labels to display (can be multiple)
 -- * Left-role:
 --   * If the first role has an icon, we use that to render the left-role
---   * If not then we instead display the icon or text of the first ingame role
+--   * If not then we instead display the icon of the first ingame role with icon
 ---@param player table
 ---@return string?, string[]?
 local function getRoleDisplays(player)
@@ -69,8 +69,8 @@ local function getRoleDisplays(player)
 			return firstRole.icon
 		end
 		for _, role in ipairs(roles) do
-			if role.type == RoleUtil.ROLE_TYPE.INGAME then
-				return role.icon or role.display
+			if role.type == RoleUtil.ROLE_TYPE.INGAME and role.icon then
+				return role.icon
 			end
 		end
 	end
@@ -85,7 +85,7 @@ local function getRoleDisplays(player)
 		-- Add non-ingame role if present
 		for _, role in ipairs(roles) do
 			if role.type ~= RoleUtil.ROLE_TYPE.INGAME then
-				table.insert(rightRoles, role.display)
+				table.insert(rightRoles, role.abbreviation or role.display)
 				break
 			end
 		end
@@ -138,6 +138,7 @@ function ParticipantsTeamRoster:render()
 	end
 
 	---@param groups {label: string?, players: table[]}[]
+	---@return Widget
 	local makeRostersDisplay = function(groups)
 		local children = {}
 		for _, group in ipairs(groups) do

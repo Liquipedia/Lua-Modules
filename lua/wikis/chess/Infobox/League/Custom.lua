@@ -115,7 +115,7 @@ function CustomLeague:customParseArguments(args)
 	-- Modes.
 	local modes = Array.mapIndexes(function(index)
 		local modeInput = self.args['mode' .. index] or (index == 1 and self.args.mode)
-		return modeInput and MODES[string.lower(modeInput)]
+		return modeInput and MODES[string.lower(modeInput)] or nil
 	end)
 	self.data.modes = Logic.emptyOr(modes, {MODES.classical})
 	self.data.mode = self.data.modes[1]
