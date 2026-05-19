@@ -70,7 +70,7 @@ function CustomInjector:parse(id, widgets)
 		local mapDisplays = Array.map(maps, function(map)
 			return Link{link = map .. gameSuffix, children = map}
 		end)
-		Array.appendWith(cells,
+		Array.appendWith(widgets,
 			Title{children = 'Maps'},
 			Center{children = Array.interleave(mapDisplays, '&nbsp;• ')}
 		)
