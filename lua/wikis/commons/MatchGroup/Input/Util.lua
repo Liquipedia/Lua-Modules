@@ -128,6 +128,7 @@ local contentLanguage = mw.getContentLanguage()
 ---@field player standardPlayer?
 ---@field games string[]
 ---@field reason string?
+---@field references table[]?
 
 ---@param dateString string?
 ---@param dateFallbacks string[]?
@@ -406,6 +407,7 @@ function MatchGroupInputUtil.extractManualPlayersInput(match, opponentIndex, opp
 			player = makeStandardPlayer(substitution.out),
 			games = Logic.nilIfEmpty(Array.parseCommaSeparatedString(substitution.games, ';')),
 			reason = substitution.reason,
+			references = substitution.references,
 		}
 	end)
 
