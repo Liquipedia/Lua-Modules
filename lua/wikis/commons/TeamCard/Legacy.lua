@@ -94,8 +94,15 @@ function LegacyTeamCard.run(dependency)
 
 	local toggleFolded = LegacyTeamCard._foldToggles(toggles)
 
+	local processedCards = Array.map(cardEntries, function(card)
+		if dependency.preprocessCard then
+			return dependency.preprocessCard(card)
+		end
+		return card
+	end)
+
 	local validCards, brokenCards = {}, {}
-	Array.forEach(cardEntries, function(card)
+	Array.forEach(processedCards, function(card)
 		local errorMessage = cardTemplateError(card)
 		if errorMessage then
 			table.insert(brokenCards, {card = card, message = errorMessage})
@@ -123,9 +130,6 @@ function LegacyTeamCard.run(dependency)
 		showplayerinfo = toggleFolded.showPlayerInfo and 'true' or nil,
 	}
 	Array.forEach(validCards, function(card)
-		if dependency.preprocessCard then
-			card = dependency.preprocessCard(card)
-		end
 		table.insert(tpArgs, LegacyTeamCard.mapCard(card))
 	end)
 
