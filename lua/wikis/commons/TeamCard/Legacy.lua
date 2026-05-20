@@ -8,12 +8,10 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local ErrorDisplay = Lua.import('Module:Error/Display')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Template = Lua.import('Module:Template')
-local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tournament = Lua.import('Module:Tournament')
 
 local TeamParticipantsController = Lua.import('Module:TeamParticipants/Controller')
@@ -24,38 +22,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
 
 local LegacyTeamCard = {}
-
----Returns an error message if the card's team template(s) can't be resolved.
----For contender (multi-team) cards, only flags when ALL listed teams are missing.
----Skips empty/TBD templates — TP handles those.
----@param card table
----@return string?
-local function cardTemplateError(card)
-	---@param value string?
-	---@return boolean
-	local function isCheckable(value)
-		return Logic.isNotEmpty(value) and value:lower() ~= 'tbd'
-	end
-
-	if Logic.isNotEmpty(card.team2) or Logic.isNotEmpty(card.team3) then
-		local candidates = {}
-		Array.forEach({{'team', 'link'}, {'team2', 'link2'}, {'team3', 'link3'}}, function(pair)
-			local value = card[pair[2]] or card[pair[1]]
-			if isCheckable(value) then
-				table.insert(candidates, value)
-			end
-		end)
-		if #candidates == 0 then return nil end
-		local anyExists = Array.any(candidates, function(name) return TeamTemplate.exists(name) end)
-		if anyExists then return nil end
-		return 'Missing team templates: ' .. table.concat(candidates, ', ')
-	end
-
-	local template = card.link or card.team
-	if not isCheckable(template) then return nil end
-	if TeamTemplate.exists(template) then return nil end
-	return TeamTemplate.noTeamMessage(template)
-end
 
 ---@param entries table[]
 ---@return table[], table?, table[]
@@ -101,26 +67,8 @@ function LegacyTeamCard.run(dependency)
 		return card
 	end)
 
-	local validCards, brokenCards = {}, {}
-	Array.forEach(processedCards, function(card)
-		local errorMessage = cardTemplateError(card)
-		if errorMessage then
-			table.insert(brokenCards, {card = card, message = errorMessage})
-		else
-			table.insert(validCards, card)
-		end
-	end)
-
-	local errorWidgets
-	if #brokenCards > 0 then
-		mw.ext.TeamLiquidIntegration.add_category('Pages with missing TeamCard team template')
-		errorWidgets = Array.map(brokenCards, function(broken)
-			return ErrorDisplay.Box{text = broken.message}
-		end)
-	end
-
 	local defaultRows, extraRows = 0, 0
-	Array.forEach(validCards, function(card)
+	Array.forEach(processedCards, function(card)
 		defaultRows = tonumber(card.defaultRowNumber) or defaultRows
 		extraRows = tonumber(card.extraRows) or extraRows
 	end)
@@ -129,7 +77,7 @@ function LegacyTeamCard.run(dependency)
 		minimumplayers = defaultRows + extraRows + toggleFolded.extraPlayers,
 		showplayerinfo = toggleFolded.showPlayerInfo and 'true' or nil,
 	}
-	Array.forEach(validCards, function(card)
+	Array.forEach(processedCards, function(card)
 		table.insert(tpArgs, LegacyTeamCard.mapCard(card))
 	end)
 
@@ -137,11 +85,8 @@ function LegacyTeamCard.run(dependency)
 		tpArgs.store = 'false'
 	end
 
-	local display
-	if #validCards > 0 then
-		display = TeamParticipantsController.fromTemplate(tpArgs)
-		teamParticipantsVars:set('externalControlsRendered', 'true')
-	end
+	local display = TeamParticipantsController.fromTemplate(tpArgs)
+	teamParticipantsVars:set('externalControlsRendered', 'true')
 
 	local notesWidget
 	if #toggleFolded.notes > 0 then
@@ -152,7 +97,7 @@ function LegacyTeamCard.run(dependency)
 		}
 	end
 
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(errorWidgets, notesWidget, display)}
+	return HtmlWidgets.Fragment{children = WidgetUtil.collect(notesWidget, display)}
 end
 
 ---@param rawQualifier string|table|nil
