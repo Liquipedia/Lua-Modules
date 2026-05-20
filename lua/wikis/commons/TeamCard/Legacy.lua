@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local ErrorDisplay = Lua.import('Module:Error/Display')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
@@ -107,10 +108,7 @@ function LegacyTeamCard.run(dependency)
 	if #brokenCards > 0 then
 		mw.ext.TeamLiquidIntegration.add_category('Pages with missing TeamCard team template')
 		errorWidgets = Array.map(brokenCards, function(broken)
-			return HtmlWidgets.Div{
-				classes = {'team-participant__error', 'ambox', 'ambox-red'},
-				children = {broken.message},
-			}
+			return ErrorDisplay.Box{text = broken.message}
 		end)
 	end
 
