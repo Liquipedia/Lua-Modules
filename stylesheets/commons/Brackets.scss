@@ -3,11 +3,11 @@
 */
 
 $brackets-colors: (
-	header-background-color: ( light: #cfcfcf,                  dark: var( --clr-secondary-16 ) ),
-	header-border-color:     ( light: #aaaaaa,                  dark: var( --clr-secondary-16 ) ),
-	background-color:        ( light: #f2f2f2,                  dark: var( --clr-secondary-9 ) ),
-	score-background-color:  ( light: #ebebeb,                  dark: var( --clr-secondary-16 ) ),
-	border-color:            ( light: #aaaaaa,                  dark: var( --clr-secondary-16 ) ),
+	header-background-color: ( light: #cfcfcf, dark: var( --clr-secondary-16 ) ),
+	header-border-color: ( light: #aaaaaa, dark: var( --clr-secondary-16 ) ),
+	background-color: ( light: #f2f2f2, dark: var( --clr-secondary-9 ) ),
+	score-background-color: ( light: #ebebeb, dark: var( --clr-secondary-16 ) ),
+	border-color: ( light: #aaaaaa, dark: var( --clr-secondary-16 ) ),
 );
 
 html.theme--light {
