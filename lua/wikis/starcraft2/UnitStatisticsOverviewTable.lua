@@ -115,6 +115,7 @@ function UnitStats._forFaction(args)
 	end)
 
 	return TableWidgets.Table{
+		columns = Array.rep({}, args.faction == PROTOSS and 22 or 21),
 		children = {
 			UnitStats._header(args.faction),
 			TableWidgets.TableBody{children = Array.flatMap(units, FnUtil.curry(UnitStats._row, args.game))},
