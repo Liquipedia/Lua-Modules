@@ -1,3 +1,20 @@
+$navigation-card-colors: (
+	icon-background-color: ( light: var( --clr-wiki-theme-90 ), dark: var( --clr-wiki-theme-20 ) ),
+	icon-color: ( light: var( --clr-wiki-theme-30 ), dark: var( --clr-wiki-theme-80 ) ),
+);
+
+html.theme--light {
+	@each $name, $values in $navigation-card-colors {
+		--navigation-card-#{$name}: #{map-get( $values, light )};
+	}
+}
+
+html.theme--dark {
+	@each $name, $values in $navigation-card-colors {
+		--navigation-card-#{$name}: #{map-get( $values, dark )};
+	}
+}
+
 .navigation-cards {
 	display: grid;
 	grid-template-columns: repeat( 3, 1fr );
