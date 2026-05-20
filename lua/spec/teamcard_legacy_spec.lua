@@ -448,11 +448,13 @@ describe('TeamCard Legacy', function()
 
         it('passes minimumplayers = defaultRowNumber + extraRows + sum(p_extra)', function()
             local TPParser = require('Module:TeamParticipants/Parse/Wiki')
+            local TeamTemplate = require('Module:TeamTemplate')
             local captured
             local stubParse = stub(TPParser, 'parseWikiInput', function(args)
                 captured = args
                 return {participants = {}, expectedPlayerCount = tonumber(args.minimumplayers)}
             end)
+            local stubExists = stub(TeamTemplate, 'exists', function() return true end)
 
             Template.stashReturnValue({__source = 'header'}, 'LegacyTeamCard')
             Template.stashReturnValue({__source = 'toggle', p_extra = '2'}, 'LegacyTeamCard')
@@ -463,8 +465,101 @@ describe('TeamCard Legacy', function()
             assert.are_equal('8', tostring(captured.minimumplayers))
 
             stubParse:revert()
+            stubExists:revert()
         end)
 
+    end)
+
+    describe('run — missing team template', function()
+        local Template = require('Module:Template')
+        local LegacyTeamCard = require('Module:TeamCard/Legacy')
+        local TPParser = require('Module:TeamParticipants/Parse/Wiki')
+        local TeamTemplate = require('Module:TeamTemplate')
+
+        it('drops the card from TP args and adds a tracking category', function()
+            local captured
+            local stubParse = stub(TPParser, 'parseWikiInput', function(args)
+                captured = args
+                return {participants = {}, expectedPlayerCount = 0}
+            end)
+            local stubExists = stub(TeamTemplate, 'exists', function(template)
+                return template == 'good'
+            end)
+            local addCategory = stub(mw.ext.TeamLiquidIntegration, 'add_category', function() end)
+
+            Template.stashReturnValue({__source = 'header'}, 'LegacyTeamCard')
+            Template.stashReturnValue({__source = 'card', team = 'good'}, 'LegacyTeamCard')
+            Template.stashReturnValue({__source = 'card', team = 'missing'}, 'LegacyTeamCard')
+
+            LegacyTeamCard.run()
+
+            assert.are_equal(1, #captured)
+            assert.are_equal('good', captured[1][1])
+            assert.stub(addCategory).was.called_with('Pages with missing TeamCard team template')
+
+            addCategory:revert()
+            stubExists:revert()
+            stubParse:revert()
+        end)
+
+        it('skips the check for empty and TBD templates', function()
+            local captured
+            local stubParse = stub(TPParser, 'parseWikiInput', function(args)
+                captured = args
+                return {participants = {}, expectedPlayerCount = 0}
+            end)
+            local stubExists = stub(TeamTemplate, 'exists', function() return false end)
+
+            Template.stashReturnValue({__source = 'header'}, 'LegacyTeamCard')
+            Template.stashReturnValue({__source = 'card', team = 'TBD'}, 'LegacyTeamCard')
+            Template.stashReturnValue({__source = 'card', team = ''}, 'LegacyTeamCard')
+
+            LegacyTeamCard.run()
+
+            assert.are_equal(2, #captured)
+            stubExists:revert()
+            stubParse:revert()
+        end)
+
+        it('keeps a contender card when at least one team template exists', function()
+            local captured
+            local stubParse = stub(TPParser, 'parseWikiInput', function(args)
+                captured = args
+                return {participants = {}, expectedPlayerCount = 0}
+            end)
+            local stubExists = stub(TeamTemplate, 'exists', function(template)
+                return template == 'good'
+            end)
+
+            Template.stashReturnValue({__source = 'header'}, 'LegacyTeamCard')
+            Template.stashReturnValue(
+                {__source = 'card', team = 'missing1', team2 = 'good', team3 = 'missing2'}, 'LegacyTeamCard')
+
+            LegacyTeamCard.run()
+            assert.are_equal(1, #captured)
+            stubExists:revert()
+            stubParse:revert()
+        end)
+
+        it('drops a contender card when ALL team templates are missing', function()
+            local stubParse = stub(TPParser, 'parseWikiInput', function()
+                return {participants = {}, expectedPlayerCount = 0}
+            end)
+            local stubExists = stub(TeamTemplate, 'exists', function() return false end)
+            local addCategory = stub(mw.ext.TeamLiquidIntegration, 'add_category', function() end)
+
+            Template.stashReturnValue({__source = 'header'}, 'LegacyTeamCard')
+            Template.stashReturnValue(
+                {__source = 'card', team = 'm1', team2 = 'm2', team3 = 'm3'}, 'LegacyTeamCard')
+
+            LegacyTeamCard.run()
+            assert.stub(stubParse).was_not_called()
+            assert.stub(addCategory).was.called_with('Pages with missing TeamCard team template')
+
+            addCategory:revert()
+            stubExists:revert()
+            stubParse:revert()
+        end)
     end)
 
     describe('run — preprocessCard hook', function()
