@@ -30,6 +30,131 @@ $weekly-border-color: var( --tournament-tag-weekly-badge-border-color, #200033 )
 $showmatch-background-color: var( --tournament-tag-showmatch-badge-background-color, rgba( 13, 113, 191, 0.24 ) );
 $showmatch-border-color: var( --tournament-tag-showmatch-badge-border-color, #001933 );
 
+/* Tournaments - Tags */
+$tournament-tag-tier1-badge-background-color--light: var( --clr-semantic-gold-30 );
+$tournament-tag-tier1-badge-background-color--dark: hsl( from var( --clr-semantic-gold-40 ) h s l / 0.24 );
+$tournament-tag-tier1-badge-border-color--light: var( --clr-semantic-gold-10 );
+$tournament-tag-tier1-badge-border-color--dark: var( --clr-semantic-gold-40 );
+$tournament-tag-tier1-chip-background-color--light: var( --clr-semantic-gold-30 );
+$tournament-tag-tier1-chip-background-color--dark: var( --clr-semantic-gold-30 );
+
+$tournament-tag-tier2-badge-background-color--light: var( --clr-semantic-silver-40 );
+$tournament-tag-tier2-badge-background-color--dark: hsl( from var( --clr-semantic-silver-40 ) h s l / 0.24 );
+$tournament-tag-tier2-badge-border-color--light: var( --clr-semantic-silver-10 );
+$tournament-tag-tier2-badge-border-color--dark: var( --clr-semantic-silver-40 );
+$tournament-tag-tier2-chip-background-color--light: var( --clr-semantic-silver-40 );
+$tournament-tag-tier2-chip-background-color--dark: var( --clr-semantic-silver-40 );
+
+$tournament-tag-tier3-badge-background-color--light: var( --clr-semantic-bronze-30 );
+$tournament-tag-tier3-badge-background-color--dark: hsl( from var( --clr-semantic-bronze-40 ) h s l / 0.24 );
+$tournament-tag-tier3-badge-border-color--light: var( --clr-semantic-bronze-10 );
+$tournament-tag-tier3-badge-border-color--dark: var( --clr-semantic-bronze-40 );
+$tournament-tag-tier3-chip-background-color--light: var( --clr-semantic-bronze-40 );
+$tournament-tag-tier3-chip-background-color--dark: var( --clr-semantic-bronze-40 );
+
+$tournament-tag-tier4-badge-background-color--light: var( --clr-semantic-copper-40 );
+$tournament-tag-tier4-badge-background-color--dark: hsl( from var( --clr-semantic-copper-40 ) h s l / 0.24 );
+$tournament-tag-tier4-badge-border-color--light: var( --clr-semantic-copper-10 );
+$tournament-tag-tier4-badge-border-color--dark: var( --clr-semantic-copper-40 );
+$tournament-tag-tier4-chip-background-color--light: var( --clr-semantic-copper-40 );
+$tournament-tag-tier4-chip-background-color--dark: var( --clr-semantic-copper-40 );
+
+$tournament-tag-tier5-badge-background-color--light: var( --clr-secondary-39 );
+$tournament-tag-tier5-badge-background-color--dark: hsl( from var( --clr-secondary-39 ) h s l / 0.24 );
+$tournament-tag-tier5-badge-border-color--light: var( --clr-secondary-16 );
+$tournament-tag-tier5-badge-border-color--dark: var( --clr-secondary-39 );
+$tournament-tag-tier5-chip-background-color--light: var( --clr-secondary-39 );
+$tournament-tag-tier5-chip-background-color--dark: var( --clr-secondary-39 );
+
+$tournament-tag-misc-badge-background-color--light: var( --clr-secondary-39 );
+$tournament-tag-misc-badge-background-color--dark: hsl( from var( --clr-secondary-39 ) h s l / 0.24 );
+$tournament-tag-misc-badge-border-color--light: var( --clr-secondary-16 );
+$tournament-tag-misc-badge-border-color--dark: var( --clr-secondary-39 );
+$tournament-tag-misc-chip-background-color--light: var( --clr-secondary-39 );
+$tournament-tag-misc-chip-background-color--dark: var( --clr-secondary-39 );
+
+$tournament-tag-qualifier-badge-background-color--light: hsl( from var( --clr-redviolet-40 ) h s l / 0.24 );
+$tournament-tag-qualifier-badge-background-color--dark: hsl( from var( --clr-redviolet-20 ) h s l / 0.24 );
+$tournament-tag-qualifier-badge-border-color--light: var( --clr-redviolet-10 );
+$tournament-tag-qualifier-badge-border-color--dark: var( --clr-redviolet-20 );
+
+$tournament-tag-monthly-badge-background-color--light: hsl( from var( --clr-vividviolet-40 ) h s l / 0.24 );
+$tournament-tag-monthly-badge-background-color--dark: hsl( from var( --clr-vividviolet-20 ) h s l / 0.24 );
+$tournament-tag-monthly-badge-border-color--light: var( --clr-vividviolet-10 );
+$tournament-tag-monthly-badge-border-color--dark: var( --clr-vividviolet-20 );
+
+$tournament-tag-weekly-badge-background-color--light: hsl( from var( --clr-gigas-40 ) h s l / 0.24 );
+$tournament-tag-weekly-badge-background-color--dark: hsl( from var( --clr-gigas-30 ) h s l / 0.24 );
+$tournament-tag-weekly-badge-border-color--light: var( --clr-gigas-10 );
+$tournament-tag-weekly-badge-border-color--dark: var( --clr-gigas-30 );
+
+$tournament-tag-showmatch-badge-background-color--light: hsl( from var( --clr-sapphire-40 ) h s l / 0.24 );
+$tournament-tag-showmatch-badge-background-color--dark: hsl( from var( --clr-sapphire-20 ) h s l / 0.24 );
+$tournament-tag-showmatch-badge-border-color--light: var( --clr-sapphire-10 );
+$tournament-tag-showmatch-badge-border-color--dark: var( --clr-sapphire-20 );
+
+html.theme--light,
+html.theme--light::before,
+html.theme--light::after {
+	--tournament-tag-tier1-badge-background-color: #{$tournament-tag-tier1-badge-background-color--light};
+	--tournament-tag-tier1-badge-border-color: #{$tournament-tag-tier1-badge-border-color--light};
+	--tournament-tag-tier1-chip-background-color: #{$tournament-tag-tier1-chip-background-color--light};
+	--tournament-tag-tier2-badge-background-color: #{$tournament-tag-tier2-badge-background-color--light};
+	--tournament-tag-tier2-badge-border-color: #{$tournament-tag-tier2-badge-border-color--light};
+	--tournament-tag-tier2-chip-background-color: #{$tournament-tag-tier2-chip-background-color--light};
+	--tournament-tag-tier3-badge-background-color: #{$tournament-tag-tier3-badge-background-color--light};
+	--tournament-tag-tier3-badge-border-color: #{$tournament-tag-tier3-badge-border-color--light};
+	--tournament-tag-tier3-chip-background-color: #{$tournament-tag-tier3-chip-background-color--light};
+	--tournament-tag-tier4-badge-background-color: #{$tournament-tag-tier4-badge-background-color--light};
+	--tournament-tag-tier4-badge-border-color: #{$tournament-tag-tier4-badge-border-color--light};
+	--tournament-tag-tier4-chip-background-color: #{$tournament-tag-tier4-chip-background-color--light};
+	--tournament-tag-tier5-badge-background-color: #{$tournament-tag-tier5-badge-background-color--light};
+	--tournament-tag-tier5-badge-border-color: #{$tournament-tag-tier5-badge-border-color--light};
+	--tournament-tag-tier5-chip-background-color: #{$tournament-tag-tier5-chip-background-color--light};
+	--tournament-tag-misc-badge-background-color: #{$tournament-tag-misc-badge-background-color--light};
+	--tournament-tag-misc-badge-border-color: #{$tournament-tag-misc-badge-border-color--light};
+	--tournament-tag-misc-chip-background-color: #{$tournament-tag-misc-chip-background-color--light};
+	--tournament-tag-qualifier-badge-background-color: #{$tournament-tag-qualifier-badge-background-color--light};
+	--tournament-tag-qualifier-badge-border-color: #{$tournament-tag-qualifier-badge-border-color--light};
+	--tournament-tag-monthly-badge-background-color: #{$tournament-tag-monthly-badge-background-color--light};
+	--tournament-tag-monthly-badge-border-color: #{$tournament-tag-monthly-badge-border-color--light};
+	--tournament-tag-weekly-badge-background-color: #{$tournament-tag-weekly-badge-background-color--light};
+	--tournament-tag-weekly-badge-border-color: #{$tournament-tag-weekly-badge-border-color--light};
+	--tournament-tag-showmatch-badge-background-color: #{$tournament-tag-showmatch-badge-background-color--light};
+	--tournament-tag-showmatch-badge-border-color: #{$tournament-tag-showmatch-badge-border-color--light};
+}
+
+html.theme--dark,
+html.theme--dark::before,
+html.theme--dark::after {
+	--tournament-tag-tier1-badge-background-color: #{$tournament-tag-tier1-badge-background-color--dark};
+	--tournament-tag-tier1-badge-border-color: #{$tournament-tag-tier1-badge-border-color--dark};
+	--tournament-tag-tier1-chip-background-color: #{$tournament-tag-tier1-chip-background-color--dark};
+	--tournament-tag-tier2-badge-background-color: #{$tournament-tag-tier2-badge-background-color--dark};
+	--tournament-tag-tier2-badge-border-color: #{$tournament-tag-tier2-badge-border-color--dark};
+	--tournament-tag-tier2-chip-background-color: #{$tournament-tag-tier2-chip-background-color--dark};
+	--tournament-tag-tier3-badge-background-color: #{$tournament-tag-tier3-badge-background-color--dark};
+	--tournament-tag-tier3-badge-border-color: #{$tournament-tag-tier3-badge-border-color--dark};
+	--tournament-tag-tier3-chip-background-color: #{$tournament-tag-tier3-chip-background-color--dark};
+	--tournament-tag-tier4-badge-background-color: #{$tournament-tag-tier4-badge-background-color--dark};
+	--tournament-tag-tier4-badge-border-color: #{$tournament-tag-tier4-badge-border-color--dark};
+	--tournament-tag-tier4-chip-background-color: #{$tournament-tag-tier4-chip-background-color--dark};
+	--tournament-tag-tier5-badge-background-color: #{$tournament-tag-tier5-badge-background-color--dark};
+	--tournament-tag-tier5-badge-border-color: #{$tournament-tag-tier5-badge-border-color--dark};
+	--tournament-tag-tier5-chip-background-color: #{$tournament-tag-tier5-chip-background-color--dark};
+	--tournament-tag-misc-badge-background-color: #{$tournament-tag-misc-badge-background-color--dark};
+	--tournament-tag-misc-badge-border-color: #{$tournament-tag-misc-badge-border-color--dark};
+	--tournament-tag-misc-chip-background-color: #{$tournament-tag-misc-chip-background-color--dark};
+	--tournament-tag-qualifier-badge-background-color: #{$tournament-tag-qualifier-badge-background-color--dark};
+	--tournament-tag-qualifier-badge-border-color: #{$tournament-tag-qualifier-badge-border-color--dark};
+	--tournament-tag-monthly-badge-background-color: #{$tournament-tag-monthly-badge-background-color--dark};
+	--tournament-tag-monthly-badge-border-color: #{$tournament-tag-monthly-badge-border-color--dark};
+	--tournament-tag-weekly-badge-background-color: #{$tournament-tag-weekly-badge-background-color--dark};
+	--tournament-tag-weekly-badge-border-color: #{$tournament-tag-weekly-badge-border-color--dark};
+	--tournament-tag-showmatch-badge-background-color: #{$tournament-tag-showmatch-badge-background-color--dark};
+	--tournament-tag-showmatch-badge-border-color: #{$tournament-tag-showmatch-badge-border-color--dark};
+}
+
 .tournament-badge {
 	height: 1.375rem;
 	width: 3.75rem;
