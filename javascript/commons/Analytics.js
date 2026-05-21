@@ -117,6 +117,9 @@ liquipedia.analytics = {
 		liquipedia.analytics.setupToggleClickAnalytics();
 
 		document.body.addEventListener( 'click', ( event ) => {
+			if ( event.target.closest( '#ncmp__tool, #ncmp__modal' ) ) {
+				return;
+			}
 			for ( const tracker of liquipedia.analytics.clickTrackers ) {
 				const element = event.target.closest( tracker.selector );
 
