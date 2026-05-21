@@ -727,13 +727,12 @@ end
 ---@param x T
 ---@return (V|T)[]
 function Array.interleave(elements, x)
-	local size = #elements
-	return Array.flatMap(elements, function(element, index)
-		if index == size then
-			return {element}
-		end
-		return {element, x}
-	end)
+	local ret = {elements[1]}
+	for i = 2, #elements do
+		table.insert(ret, x)
+		table.insert(ret, elements[i])
+	end
+	return ret
 end
 
 return Array
