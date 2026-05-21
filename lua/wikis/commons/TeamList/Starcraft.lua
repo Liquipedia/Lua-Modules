@@ -58,6 +58,12 @@ function TeamListWrapper.TemplateTeamList(frame)
 		end)
 	end) then
 		mw.ext.TeamLiquidIntegration.add_category('TeamList with notes')
+		Array.forEach(newArgs, function(section)
+			Array.forEach(section, function(opp)
+				if Logic.isEmpty(opp.notes) then return end
+				opp.notes = Array.map(opp.notes, function(note) return {note} end)
+			end)
+		end)
 	end
 
 	if not newArgs[2] then
@@ -154,9 +160,9 @@ function TeamListWrapper.generateOpponent(args)
 	table.insert(parts, '\t\t}}')
 
 	if Logic.isNotEmpty(args.notes) then
-		table.insert(parts, '\t\t|notes={{Json')
+		table.insert(parts, '\t\t|notes={{Notes')
 		Array.forEach(args.notes, function(note)
-			table.insert(parts, '\t\t\t|' .. note)
+			table.insert(parts, '\t\t\t|{{Note|' .. note .. '}}')
 		end)
 		table.insert(parts, '\t\t}}')
 	end
