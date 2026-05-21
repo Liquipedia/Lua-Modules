@@ -2,6 +2,14 @@
 Template(s): All Crosstables
 Author(s): FO-nTTaX
 *******************************************************************************/
+.theme--light {
+	--crosstable-box-shadow-color: rgba( 0, 0, 0, 1 );
+}
+
+.theme--dark {
+	--crosstable-box-shadow-color: rgba( 255, 255, 255, 1 );
+}
+
 $crosstable-max: 40;
 $crosstable-size: 40;
 $crosstable-yellow: var( --clr-pear-background-color, #f9f9c7 );
