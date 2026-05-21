@@ -3,30 +3,28 @@ Template(s): Prize pool tables
 Author(s): FO-nTTaX
 *******************************************************************************/
 
-$prize-pool-colors: (
-	variant-background-color: ( light: #f2f2f2, dark: var( --clr-moon-20 ) ),
-	header-background-color: ( light: #eaecf0, dark: var( --table-header-variant-background-color ) ),
-	alt-background-color: ( light: #f5f5f5, dark: var( --clr-secondary-9 ) ),
-	gold: ( light: var( --clr-semantic-gold-40 ), dark: var( --clr-semantic-gold-30 ) ),
-	silver: ( light: var( --clr-semantic-silver-40 ), dark: var( --clr-secondary-39 ) ),
-	bronze: ( light: var( --clr-semantic-bronze-40 ), dark: var( --clr-semantic-bronze-20 ) ),
-	copper: ( light: var( --clr-semantic-copper-40 ), dark: var( --clr-semantic-copper-20 ) ),
-);
-
-html {
+:root {
 	--prize-pool-background-color: transparent;
 }
 
-html.theme--light {
-	@each $name, $values in $prize-pool-colors {
-		--prize-pool-#{$name}: #{map-get( $values, light )};
-	}
+.theme--light {
+	--prize-pool-variant-background-color: #f2f2f2;
+	--prize-pool-header-background-color: #eaecf0;
+	--prize-pool-alt-background-color: #f5f5f5;
+	--prize-pool-gold: var( --clr-semantic-gold-40 );
+	--prize-pool-silver: var( --clr-semantic-silver-40 );
+	--prize-pool-bronze: var( --clr-semantic-bronze-40 );
+	--prize-pool-copper: var( --clr-semantic-copper-40 );
 }
 
-html.theme--dark {
-	@each $name, $values in $prize-pool-colors {
-		--prize-pool-#{$name}: #{map-get( $values, dark )};
-	}
+.theme--dark {
+	--prize-pool-variant-background-color: var( --clr-moon-20 );
+	--prize-pool-header-background-color: var( --table-header-variant-background-color );
+	--prize-pool-alt-background-color: var( --clr-secondary-9 );
+	--prize-pool-gold: var( --clr-semantic-gold-30 );
+	--prize-pool-silver: var( --clr-secondary-39 );
+	--prize-pool-bronze: var( --clr-semantic-bronze-20 );
+	--prize-pool-copper: var( --clr-semantic-copper-20 );
 }
 
 table.prizepooltable:not( .collapsed ) .prizepooltableshow,
