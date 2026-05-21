@@ -6,7 +6,6 @@
 // Event names
 const PAGE_VIEW = 'Page view';
 const LINK_CLICKED = 'Link clicked';
-const WIKI_SWITCHED = 'Wiki switched';
 const SEARCH_PERFORMED = 'Page searched';
 const BUTTON_CLICKED = 'Button clicked';
 const MATCH_POPUP_OPENED = 'Match popup opened';
@@ -105,8 +104,6 @@ liquipedia.analytics = {
 
 	init: function() {
 		liquipedia.analytics.sendPageViewEvent();
-
-		liquipedia.analytics.setupWikiMenuLinkClickAnalytics();
 		liquipedia.analytics.setupLinkClickAnalytics();
 		liquipedia.analytics.setupButtonClickAnalytics();
 		liquipedia.analytics.setupSearchAnalytics();
@@ -117,6 +114,9 @@ liquipedia.analytics = {
 		liquipedia.analytics.setupToggleClickAnalytics();
 
 		document.body.addEventListener( 'click', ( event ) => {
+			if ( event.target.closest( '#ncmp__tool, #ncmp__modal' ) ) {
+				return;
+			}
 			for ( const tracker of liquipedia.analytics.clickTrackers ) {
 				const element = event.target.closest( tracker.selector );
 
@@ -295,20 +295,6 @@ liquipedia.analytics = {
 			propertiesBuilder: ( link ) => ( {
 				title: link.innerText,
 				position: liquipedia.analytics.findLinkPosition( link )
-			} )
-		} );
-	},
-
-	setupWikiMenuLinkClickAnalytics: function() {
-		liquipedia.analytics.clickTrackers.push( {
-			selector: '[data-wiki-menu="link"]',
-			trackerName: WIKI_SWITCHED,
-			propertiesBuilder: ( wikiMenuLink ) => ( {
-				wiki: wikiMenuLink.closest( '[data-wiki-id]' ).dataset.wikiId,
-				position: 'wiki menu',
-				destination: wikiMenuLink.href,
-				'trending page': false,
-				'trending position': null
 			} )
 		} );
 	},
