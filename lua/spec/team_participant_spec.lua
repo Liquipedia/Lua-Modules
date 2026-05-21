@@ -632,6 +632,30 @@ describe('Team Participant', function()
 			end)
 		end)
 
+		describe('missing team template', function()
+			local date = os.date("!*t", os.time()) --[[@as osdateparam]]
+			insulate('parseParticipant', function()
+				local TeamTemplateMock
+				before_each(function()
+					TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
+					TeamTemplateMock.setUp()
+				end)
+				after_each(function()
+					TeamTemplateMock.tearDown()
+				end)
+
+				it('marks the participant broken without calling Opponent.resolve', function()
+					local result = TeamParticipantsWikiParser.parseParticipant({'definitely missing'}, date)
+					assert.is_true(result.broken)
+					assert.is_truthy(result.errorMessage)
+				end)
+
+				it('leaves valid templates untouched', function()
+					local result = TeamParticipantsWikiParser.parseParticipant({'team liquid'}, date)
+					assert.is_nil(result.broken)
+				end)
+			end)
+		end)
 
 	end)
 

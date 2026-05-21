@@ -60,8 +60,15 @@ function LegacyTeamCard.run(dependency)
 
 	local toggleFolded = LegacyTeamCard._foldToggles(toggles)
 
+	local processedCards = Array.map(cardEntries, function(card)
+		if dependency.preprocessCard then
+			return dependency.preprocessCard(card)
+		end
+		return card
+	end)
+
 	local defaultRows, extraRows = 0, 0
-	Array.forEach(cardEntries, function(card)
+	Array.forEach(processedCards, function(card)
 		defaultRows = tonumber(card.defaultRowNumber) or defaultRows
 		extraRows = tonumber(card.extraRows) or extraRows
 	end)
@@ -70,10 +77,7 @@ function LegacyTeamCard.run(dependency)
 		minimumplayers = defaultRows + extraRows + toggleFolded.extraPlayers,
 		showplayerinfo = toggleFolded.showPlayerInfo and 'true' or nil,
 	}
-	Array.forEach(cardEntries, function(card)
-		if dependency.preprocessCard then
-			card = dependency.preprocessCard(card)
-		end
+	Array.forEach(processedCards, function(card)
 		table.insert(tpArgs, LegacyTeamCard.mapCard(card))
 	end)
 
