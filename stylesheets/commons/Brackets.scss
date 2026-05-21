@@ -2,24 +2,20 @@
 * Styles shared between BracketDisplay, MatchlistDisplay, and MatchSummary
 */
 
-$brackets-colors: (
-	header-background-color: ( light: #cfcfcf, dark: var( --clr-secondary-16 ) ),
-	header-border-color: ( light: #aaaaaa, dark: var( --clr-secondary-16 ) ),
-	background-color: ( light: #f2f2f2, dark: var( --clr-secondary-9 ) ),
-	score-background-color: ( light: #ebebeb, dark: var( --clr-secondary-16 ) ),
-	border-color: ( light: #aaaaaa, dark: var( --clr-secondary-16 ) ),
-);
-
-html.theme--light {
-	@each $name, $values in $brackets-colors {
-		--brackets-#{$name}: #{map-get( $values, light )};
-	}
+.theme--light {
+	--brackets-header-background-color: #cfcfcf;
+	--brackets-header-border-color: #aaaaaa;
+	--brackets-background-color: #f2f2f2;
+	--brackets-score-background-color: #ebebeb;
+	--brackets-border-color: #aaaaaa;
 }
 
-html.theme--dark {
-	@each $name, $values in $brackets-colors {
-		--brackets-#{$name}: #{map-get( $values, dark )};
-	}
+.theme--dark {
+	--brackets-header-background-color: var( --clr-secondary-16 );
+	--brackets-header-border-color: var( --clr-secondary-16 );
+	--brackets-background-color: var( --clr-secondary-9 );
+	--brackets-score-background-color: var( --clr-secondary-16 );
+	--brackets-border-color: var( --clr-secondary-16 );
 }
 
 .brkts-match-has-details {
