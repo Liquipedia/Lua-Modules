@@ -10,34 +10,30 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local CountdownIcon = Lua.import('Module:Widget/Match/Summary/Ffa/CountdownIcon')
 
----@class MatchSummaryFfaHeader: Widget
----@operator call(table): MatchSummaryFfaHeader
----@field props {matchId: string, games: FFAMatchGroupUtilGame[]}
-local MatchSummaryFfaHeader = Class.new(Widget)
-
----@return Widget
-function MatchSummaryFfaHeader:render()
-	assert(self.props.matchId, 'No matchId provided')
-	assert(type(self.props.games) == 'table', 'No games provided')
+---@param props {matchId: string, games: FFAMatchGroupUtilGame[]}
+---@return HtmlNode
+local function MatchSummaryFfaHeader(props)
+	assert(props.matchId, 'No matchId provided')
+	assert(type(props.games) == 'table', 'No games provided')
 
 	local function headerItem(title, icon, idx)
-		return HtmlWidgets.Li{
+		return Html.Li{
 			classes = {'panel-tabs__list-item'},
 			attributes = {
 				['data-js-battle-royale'] = 'panel-tab',
-				['data-js-battle-royale-content-target-id'] = self.props.matchId .. 'panel' .. idx,
+				['data-js-battle-royale-content-target-id'] = props.matchId .. 'panel' .. idx,
 				role = 'tab',
 				tabindex = 0,
 			},
 			children = {
 				icon,
-				HtmlWidgets.H4{
+				Html.H4{
 					classes = {'panel-tabs__title'},
 					children = title,
 				},
@@ -47,19 +43,19 @@ function MatchSummaryFfaHeader:render()
 
 	local standingsIcon = IconWidget{iconName = 'standings', additionalClasses = {'panel-tabs__list-icon'}}
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'panel-tabs'},
 		attributes = {
 			role = 'tabpanel',
 		},
-		children = HtmlWidgets.Ul{
+		children = Html.Ul{
 			classes = {'panel-tabs__list'},
 			attributes = {
 				role = 'tablist',
 			},
 			children = WidgetUtil.collect(
 				headerItem('Overall standings', standingsIcon, 0),
-				Array.map(self.props.games, function (game, idx)
+				Array.map(props.games, function (game, idx)
 					return headerItem('Game '.. idx, CountdownIcon{game = game, additionalClasses = {'panel-tabs__list-icon'}}, idx)
 				end)
 			)
@@ -67,4 +63,4 @@ function MatchSummaryFfaHeader:render()
 	}
 end
 
-return MatchSummaryFfaHeader
+return Component.component(MatchSummaryFfaHeader)

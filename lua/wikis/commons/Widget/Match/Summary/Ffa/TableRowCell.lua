@@ -7,32 +7,32 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+---@class MatchSummaryFfaTableRowCellProps
+---@field class? string
+---@field sortable? boolean
+---@field sortType? string
+---@field sortValue? string|number
+---@field value? Renderable|Renderable[]
 
----@class MatchSummaryFfaTableRowCell: Widget
----@operator call(table): MatchSummaryFfaTableRowCell
-local MatchSummaryFfaTableRowCell = Class.new(Widget)
+---@param props MatchSummaryFfaTableRowCellProps
+---@return HtmlNode
+local function MatchSummaryFfaTableRowCell(props)
+	local isSortable = props.sortable
 
----@return Widget?
-function MatchSummaryFfaTableRowCell:render()
-	local isSortable = self.props.sortable
-
-	return HtmlWidgets.Div{
-		classes = {'panel-table__cell', self.props.class},
+	return Html.Div{
+		classes = {'panel-table__cell', props.class},
 		attributes = {
-			['data-sort-type'] = isSortable and self.props.sortType or nil,
-			['data-sort-val'] = isSortable and self.props.sortValue or nil,
+			['data-sort-type'] = isSortable and props.sortType or nil,
+			['data-sort-val'] = isSortable and props.sortValue or nil,
 		},
-		children = {
-			HtmlWidgets.Div{
-				classes = {'panel-table__cell-grouped'},
-				children = self.props.value
-			}
+		children = Html.Div{
+			classes = {'panel-table__cell-grouped'},
+			children = props.value
 		}
 	}
 end
 
-return MatchSummaryFfaTableRowCell
+return Component.component(MatchSummaryFfaTableRowCell)

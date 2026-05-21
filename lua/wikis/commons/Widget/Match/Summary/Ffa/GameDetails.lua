@@ -8,28 +8,23 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local HtmlWidgets = Lua.import('Module:Widget/Html')
 local ContentItemContainer = Lua.import('Module:Widget/Match/Summary/Ffa/ContentItemContainer')
 local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local CountdownIcon = Lua.import('Module:Widget/Match/Summary/Ffa/CountdownIcon')
 local GameCountdown = Lua.import('Module:Widget/Match/Summary/Ffa/GameCountdown')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class MatchSummaryFfaGameDetails: Widget
----@operator call(table): MatchSummaryFfaGameDetails
----@field props {game: FFAMatchGroupUtilGame}
-local MatchSummaryFfaGameDetails = Class.new(Widget)
-
----@return Widget
-function MatchSummaryFfaGameDetails:render()
-	local game = self.props.game
+---@param props {game: FFAMatchGroupUtilGame}
+---@return VNode
+local function MatchSummaryFfaGameDetails(props)
+	local game = props.game
 	assert(game, 'No game provided')
 
 	local casters = game.extradata.casters and DisplayHelper.createCastersDisplay(game.extradata.casters) or nil
@@ -58,4 +53,4 @@ function MatchSummaryFfaGameDetails:render()
 	)}
 end
 
-return MatchSummaryFfaGameDetails
+return Component.component(MatchSummaryFfaGameDetails)
