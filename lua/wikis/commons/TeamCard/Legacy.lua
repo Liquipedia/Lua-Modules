@@ -348,6 +348,9 @@ end
 function LegacyTeamCard.mapCoaches(tcArgs)
 	local coaches = {}
 
+	if Logic.isNotEmpty(tcArgs.c) then
+		table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'c', nil))
+	end
 	Array.forEach(indicesPresent(tcArgs, 'c', MAX_COACH_INDEX), function(i)
 		table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'c' .. i, nil))
 	end)
