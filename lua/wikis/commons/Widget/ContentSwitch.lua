@@ -15,19 +15,19 @@ local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
 
 ---@class ContentSwitchTab
----@field label Renderable|Renderable[]
----@field value string
----@field content Renderable|Renderable[]
+---@field label? Renderable|Renderable[]
+---@field value? string
+---@field content? Renderable|Renderable[]
 
 ---@class ContentSwitchParameters
 ---@field tabs ContentSwitchTab[]
----@field variant 'themed'|'generic'
----@field defaultActive integer
+---@field variant? 'themed'|'generic'
+---@field defaultActive? integer
 ---@field switchGroup string
----@field classes string[]?
----@field size 'extrasmall'|'small'|'medium'
----@field storeValue boolean
----@field css table<string, string|number?>?
+---@field classes? string[]
+---@field size? 'extrasmall'|'small'|'medium'
+---@field storeValue? boolean
+---@field css? table<string, string|number?>
 
 local defaultProps = {
 	variant = 'generic',

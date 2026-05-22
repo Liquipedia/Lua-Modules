@@ -62,7 +62,7 @@ function MatchSummaryContainer:_hasResetMatch()
 end
 
 ---@private
----@return Widget|Html
+---@return Renderable
 function MatchSummaryContainer:_buildChildren()
 	if not self:_hasResetMatch() then
 		return self.props.createMatch(self.props.match):create()
