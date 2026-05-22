@@ -42,7 +42,7 @@ local function ContentSwitch(props)
 	local tabs = assert(props.tabs, 'ContentSwitch requires at least the tabs property to be set')
 	local variant = props.variant
 	local defaultActive = props.defaultActive
-	local switchGroup = assert(Logic.isNotEmpty(props.switchGroup), 'ContentSwitch: missing \'switchGroup\' property')
+	local switchGroup = assert(Logic.nilIfEmpty(props.switchGroup), 'ContentSwitch: missing \'switchGroup\' property')
 
 	if #tabs < 2 then
 		return (tabs[1] or {}).content
