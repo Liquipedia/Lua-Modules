@@ -122,9 +122,7 @@ $tournament-tag-showmatch-badge-border-color--dark: var( --clr-sapphire-20 );
 	--tournament-tag-showmatch-badge-border-color: #{$tournament-tag-showmatch-badge-border-color--light};
 }
 
-html.theme--dark,
-html.theme--dark::before,
-html.theme--dark::after {
+.theme--dark {
 	--tournament-tag-tier1-badge-background-color: #{$tournament-tag-tier1-badge-background-color--dark};
 	--tournament-tag-tier1-badge-border-color: #{$tournament-tag-tier1-badge-border-color--dark};
 	--tournament-tag-tier1-chip-background-color: #{$tournament-tag-tier1-chip-background-color--dark};
