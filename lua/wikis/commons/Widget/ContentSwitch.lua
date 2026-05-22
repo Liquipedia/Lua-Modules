@@ -8,12 +8,11 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
 ---@class ContentSwitchTab
 ---@field label Renderable|Renderable[]
@@ -28,29 +27,25 @@ local Div = HtmlWidgets.Div
 ---@field classes string[]?
 ---@field size 'extrasmall'|'small'|'medium'
 ---@field storeValue boolean
----@field css table?
+---@field css table<string, string|number?>?
 
----@class ContentSwitch: Widget
----@operator call(ContentSwitchParameters): ContentSwitch
----@field props ContentSwitchParameters
-local ContentSwitch = Class.new(Widget)
-ContentSwitch.defaultProps = {
-	tabs = {},
+local defaultProps = {
 	variant = 'generic',
 	defaultActive = 1,
 	size = 'extrasmall',
 	storeValue = true,
 }
 
----@return Widget
-function ContentSwitch:render()
-	local tabs = assert(self.props.tabs, 'ContentSwitch requires at least the tabs property to be set')
-	local variant = self.props.variant
-	local defaultActive = self.props.defaultActive
-	local switchGroup = self:assertExistsAndCopy(self.props.switchGroup)
+---@param props ContentSwitchParameters
+---@return Renderable|Renderable[]
+local function ContentSwitch(props)
+	local tabs = assert(props.tabs, 'ContentSwitch requires at least the tabs property to be set')
+	local variant = props.variant
+	local defaultActive = props.defaultActive
+	local switchGroup = assert(Logic.isNotEmpty(props.switchGroup), 'ContentSwitch: missing \'switchGroup\' property')
 
 	if #tabs < 2 then
-		return HtmlWidgets.Fragment{children = (tabs[1] or {}).content}
+		return (tabs[1] or {}).content
 	end
 
 	local tabOptions = Array.map(tabs, function(tab, index)
@@ -85,9 +80,9 @@ function ContentSwitch:render()
 	if variant == 'generic' then
 		table.insert(switchPillClasses, 'switch-pill-generic')
 	end
-	if self.props.size == 'small' then
+	if props.size == 'small' then
 		table.insert(switchPillClasses, 'switch-pill-small')
-	elseif self.props.size == 'extrasmall' then
+	elseif props.size == 'extrasmall' then
 		table.insert(switchPillClasses, 'switch-pill-extrasmall')
 	end
 
@@ -98,13 +93,13 @@ function ContentSwitch:render()
 		children = {
 			Div{
 				classes = {'switch-pill-container'},
-				css = self.props.css,
+				css = props.css,
 				children = {
 					Div{
 						classes = switchPillClasses,
 						attributes = {
 							['data-switch-group'] = switchGroup,
-							['data-store-value'] = Logic.readBool(self.props.storeValue) and 'true' or nil,
+							['data-store-value'] = Logic.readBool(props.storeValue) and 'true' or nil,
 						},
 						children = tabOptions,
 					},
@@ -118,4 +113,4 @@ function ContentSwitch:render()
 	}
 end
 
-return ContentSwitch
+return Component.component(ContentSwitch, defaultProps)
