@@ -49,11 +49,8 @@
 		align-items: center;
 		justify-content: center;
 		font-size: 2.5rem;
-
-		.theme--light & {
-			background-color: var( --clr-wiki-theme-90 );
-			color: var( --clr-wiki-theme-30 );
-		}
+		background-color: var( --clr-wiki-theme-90 );
+		color: var( --clr-wiki-theme-30 );
 
 		.theme--dark & {
 			background-color: var( --clr-wiki-theme-20 );
