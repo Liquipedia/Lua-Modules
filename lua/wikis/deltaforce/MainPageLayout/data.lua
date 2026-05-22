@@ -12,8 +12,8 @@ local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
@@ -35,7 +35,7 @@ local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = MainPageLayoutUtil.getYearlyTransferPage(),
+			transferPage = MainPageLayoutUtil.getYearlyTransferPage()
 		},
 		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
