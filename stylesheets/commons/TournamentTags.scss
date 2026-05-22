@@ -93,9 +93,7 @@ $tournament-tag-showmatch-badge-background-color--dark: hsl( from var( --clr-sap
 $tournament-tag-showmatch-badge-border-color--light: var( --clr-sapphire-10 );
 $tournament-tag-showmatch-badge-border-color--dark: var( --clr-sapphire-20 );
 
-html.theme--light,
-html.theme--light::before,
-html.theme--light::after {
+.theme--light {
 	--tournament-tag-tier1-badge-background-color: #{$tournament-tag-tier1-badge-background-color--light};
 	--tournament-tag-tier1-badge-border-color: #{$tournament-tag-tier1-badge-border-color--light};
 	--tournament-tag-tier1-chip-background-color: #{$tournament-tag-tier1-chip-background-color--light};
