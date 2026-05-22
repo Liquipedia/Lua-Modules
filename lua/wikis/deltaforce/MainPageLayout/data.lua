@@ -130,15 +130,6 @@ return {
 			},
 		},
 		{
-			file = 'Delta Force Weapon Pills.jpg',
-			title = 'Weapons',
-			link = 'Portal:Weapons',
-			count = {
-				method = 'CATEGORY',
-				category = 'Weapons',
-			},
-		},
-		{
 			file = 'Delta Force Map Pills.png',
 			title = 'Maps',
 			link = 'Portal:Maps',
