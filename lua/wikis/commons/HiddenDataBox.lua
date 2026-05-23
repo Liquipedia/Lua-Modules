@@ -19,6 +19,7 @@ local Namespace = Lua.import('Module:Namespace')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
 local Tier = Lua.import('Module:Tier/Custom')
 local Variables = Lua.import('Module:Variables')
@@ -174,29 +175,29 @@ function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 	-- Would need a rework for the function that does it however
 	local participant = placement.opponentname
 	local participantResolved = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
+
+	local aliases = Array.map(placement.extradata.opponentaliases or {}, TeamTemplate.getPageName)
+	Array.appendWith(aliases,
+		participant,
+		participant ~= participantResolved and participantResolved or nil
+	)
+	aliases = Array.unique(aliases)
+
 	Table.iter.forEachPair(placement.opponentplayers or {}, function(key, value)
-		if Table.isNotEmpty((placement.extradata or {}).opponentaliases) then
-			Array.forEach(placement.extradata.opponentaliases, function(alias)
-				HiddenDataBox._setWikiVariableForParticipantKey(alias, participantResolved, key, value)
-			end)
-		else
-			HiddenDataBox._setWikiVariableForParticipantKey(participant, participantResolved, key, value)
-		end
+		Array.forEach(aliases, function(alias)
+			HiddenDataBox._setWikiVariableForParticipantKey(alias, key, value)
+		end)
 	end)
 end
 
 -- overridable so that wikis can add custom vars
----@param participant string
----@param participantResolved string
+---@param alias string
 ---@param key string
 ---@param value string|number
-function HiddenDataBox._setWikiVariableForParticipantKey(participant, participantResolved, key, value)
-	Variables.varDefine(participant .. '_' .. key, value)
-	participant = Language:ucfirst(participant)
-	Variables.varDefine(participant .. '_' .. key, value)
-	if participant ~= participantResolved then
-		Variables.varDefine(participantResolved .. '_' .. key, value)
-	end
+function HiddenDataBox._setWikiVariableForParticipantKey(alias, key, value)
+	Variables.varDefine(alias .. '_' .. key, value)
+	participant = Language:ucfirst(alias)
+	Variables.varDefine(alias .. '_' .. key, value)
 end
 
 ---Validates the provided tier, tierType pair
