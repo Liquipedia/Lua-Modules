@@ -40,8 +40,19 @@ function TeamParticipantsController.fromTemplate(frame)
 	local args = Arguments.getArgs(frame)
 	local parsedArgs = Json.parseStringifiedArgs(args)
 	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
+
+	local brokenParticipants = Array.filter(parsedData.participants, function(p) return p.broken end)
+	parsedData.participants = Array.filter(parsedData.participants, function(p) return not p.broken end)
+
+	if #brokenParticipants > 0 then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with missing team templates')
+	end
+
 	TeamParticipantsController.importParticipants(parsedData)
 	TeamParticipantsController.fillIncompleteRosters(parsedData)
+	if Logic.nilOr(Logic.readBoolOrNil(parsedArgs.enrichPlayerDates), true) then
+		TeamParticipantsController.enrichPlayerDates(parsedData)
+	end
 
 	local shouldStore = Logic.readBoolOrNil(args.store) ~= false and Lpdb.isStorageEnabled()
 
@@ -54,6 +65,7 @@ function TeamParticipantsController.fromTemplate(frame)
 
 	return TeamParticipantsDisplay{
 		participants = parsedData.participants,
+		brokenParticipants = brokenParticipants,
 		showPlayerInfo = Logic.readBool(args.showplayerinfo),
 		showControls = showControls,
 		mergeStaffTabIfOnlyOneStaff = Logic.nilOr(
@@ -105,11 +117,11 @@ function TeamParticipantsController.importSquadMembersFromDatabase(participant)
 	end)
 
 	return Array.map(membersToImport, function (member)
-		local memberType = member.type
+		local status
 		if member.hasLeft then
-			memberType = 'former'
+			status = 'former'
 		elseif member.role and member.role:lower() == 'substitute' then
-			memberType = 'sub'
+			status = 'sub'
 		end
 		return TeamParticipantsWikiParser.parsePlayer{
 			member.displayName,
@@ -117,7 +129,8 @@ function TeamParticipantsController.importSquadMembersFromDatabase(participant)
 			flag = member.nationality,
 			faction = member.faction,
 			role = member.role,
-			type = memberType,
+			type = member.type,
+			status = status,
 		}
 	end)
 end
@@ -133,11 +146,27 @@ function TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers,
 		end)
 
 		if indexOfManualPlayer == 0 then
-			table.insert(manualPlayers, player)
+			table.insert(manualPlayers, 1, player)
 		else
 			local newPlayer = Table.deepMerge(player, manualPlayers[indexOfManualPlayer])
 			manualPlayers[indexOfManualPlayer] = newPlayer
 		end
+	end)
+end
+
+--- Enriches each player with join/leave dates from the transfer LPDB table.
+--- Explicit dates from wiki input take precedence over auto-fetched ones.
+---@param parsedData {participants: TeamParticipant[], expectedPlayerCount: integer?}
+function TeamParticipantsController.enrichPlayerDates(parsedData)
+	Array.forEach(parsedData.participants, function(participant)
+		local players = participant.opponent.players or {}
+		local datesByPlayer = TeamParticipantsRepository.getPlayersDates(players, participant.aliases)
+		Array.forEach(players, function(player)
+			local dates = datesByPlayer[player.pageName] or {}
+			player.extradata = player.extradata or {}
+			player.extradata.joinDate = dates.joinDate
+			player.extradata.leaveDate = dates.leaveDate
+		end)
 	end)
 end
 

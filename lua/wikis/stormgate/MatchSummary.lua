@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Icon = Lua.import('Module:Icon')
 local Faction = Lua.import('Module:Faction')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
@@ -20,15 +19,13 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
+local VetoLabel = Lua.import('Module:Widget/Match/Summary/VetoLabel')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
-local ICONS = {
-	veto = Icon.makeIcon{iconName = 'veto', color = 'cinnabar-text', size = '110%'},
-	noCheck = '[[File:NoCheck.png|link=]]',
-}
+local MAP_VETO_LABEL = VetoLabel{vetoType = 'ban'}
 
 local TBD = 'TBD'
 local DEFAULT_HERO = 'default'
@@ -46,17 +43,12 @@ end
 function CustomMatchSummary.createBody(match)
 	CustomMatchSummary.computeOfffactions(match)
 	local hasHeroes = CustomMatchSummary.hasHeroes(match)
-	local isResetMatch = String.endsWith(match.matchId, '_RxMBR')
 	local subMatches
 	if not match.isUniformMode then
 		subMatches = match.submatches or {}
 	end
 
 	return WidgetUtil.collect(
-		isResetMatch and MatchSummaryWidgets.Row{
-			css = {['line-height'] = '80%', ['font-weight'] = 'bold', ['text-align'] = 'center'},
-			children = {'Reset match'},
-		} or nil,
 		Array.map(match.opponents, CustomMatchSummary.advantageOrPenalty),
 		subMatches and Array.map(subMatches, CustomMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {hasHeroes = hasHeroes})),
@@ -308,25 +300,30 @@ end
 ---@return MatchSummaryRow
 function CustomMatchSummary.Veto(veto)
 	local statusIcon = function(opponentIndex)
-		return opponentIndex == veto.by and ICONS.veto or ICONS.noCheck
+		return opponentIndex == veto.by and MAP_VETO_LABEL or nil
 	end
 
 	local map = (veto.map or TBD):upper() == TBD and TBD or ('[[' .. veto.map .. ']]')
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
+		css = {
+			display = 'grid',
+			['grid-template-columns'] = 'repeat(3, 1fr)',
+			['align-items'] = 'center',
+		},
 		children = {
 			HtmlWidgets.Div{
-				classes = {'brkts-popup-spaced brkts-popup-winloss-icon'},
-				children = {statusIcon(1)},
+				css = {['text-align'] = 'left'},
+				children = statusIcon(1),
 			},
 			HtmlWidgets.Div{
 				css = {['text-align'] = 'center'},
 				children = {map},
 			},
 			HtmlWidgets.Div{
-				classes = {'brkts-popup-spaced brkts-popup-winloss-icon'},
-				children = {statusIcon(2)},
+				css = {['text-align'] = 'right'},
+				children = statusIcon(2),
 			}
 		},
 	}

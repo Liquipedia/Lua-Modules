@@ -36,10 +36,10 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
-		Logic.readBool(args.hasDate) and {
+		Logic.readBool(args.hasDate) and Array.extend(
 			INDENT .. '|date= |youtube= |twitch=',
-			args.vod == 'series' and (INDENT .. '|vod=') or nil,
-		} or nil,
+			args.vod == 'series' and (INDENT .. '|vod=') or nil
+		) or nil,
 		Array.map(Array.range(1, bestof), function(mapIndex)
 			return WikiCopyPaste._getMapCode(mapIndex, showBans, args.vod == 'maps')
 		end),

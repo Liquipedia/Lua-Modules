@@ -14,7 +14,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Widget = Lua.import('Module:Widget')
-local ChevronToggle = Lua.import('Module:Widget/Participants/Team/ChevronToggle')
+local ChevronToggle = Lua.import('Module:Widget/GeneralCollapsible/ChevronToggle')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div

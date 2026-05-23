@@ -9,7 +9,7 @@ local CustomMatchSummary = {}
 
 local Lua = require('Module:Lua')
 
-local Array = require('Module:Array')
+local Array = Lua.import('Module:Array')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local SummaryHelper = Lua.import('Module:MatchSummary/Base/Ffa')
 

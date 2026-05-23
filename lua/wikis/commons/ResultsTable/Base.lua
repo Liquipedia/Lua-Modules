@@ -98,8 +98,10 @@ function BaseResultsTable:readConfig()
 		aliases = Array.parseCommaSeparatedString(args.aliases)
 	}
 
-	config.sort = args.sort or
-		(config.onlyAchievements and 'weight' or 'date')
+	config.sort = Logic.emptyOr(
+		Array.parseCommaSeparatedString(args.sort),
+		Array.extend(config.onlyAchievements and 'weight' or nil, 'date')
+	)
 
 	config.limit = tonumber(args.limit) or
 		(config.onlyAchievements and DEFAULT_VALUES.achievementsLimit or DEFAULT_VALUES.resultsLimit)
@@ -182,7 +184,7 @@ end
 function BaseResultsTable:queryData()
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = self.config.limit,
-		order = self.config.sort .. ' ' .. self.config.order,
+		order = self:_getQueryOrder(),
 		conditions = self:buildConditions(),
 	})
 
@@ -192,6 +194,14 @@ function BaseResultsTable:queryData()
 	end
 
 	return data
+end
+
+---@private
+---@return string
+function BaseResultsTable:_getQueryOrder()
+	return table.concat(Array.map(self.config.sort, function (sort)
+		return sort .. ' ' .. self.config.order
+	end), ',')
 end
 
 ---Builds the conditions for the results, achievements, awards table

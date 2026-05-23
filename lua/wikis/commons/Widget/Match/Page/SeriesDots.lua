@@ -15,6 +15,7 @@ local Logic = Lua.import('Module:Logic')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local Label = Lua.import('Module:Widget/Basic/Label')
 
 ---@class MatchPageSeriesDotsParameters
 ---@field seriesDots string[]?
@@ -36,10 +37,7 @@ local MatchPageSeriesDots = Class.new(Widget)
 ---@param result string
 ---@return Widget
 MatchPageSeriesDots._makeGameResultIcon = FnUtil.memoize(function (result)
-	return Div{classes = {
-		'brkts-result-label',
-		'result--' .. RESULT_DISPLAY_TYPES[result:lower()]
-	}}
+	return Label{labelType = 'result-' .. RESULT_DISPLAY_TYPES[result:lower()]}
 end)
 
 ---@return Widget?

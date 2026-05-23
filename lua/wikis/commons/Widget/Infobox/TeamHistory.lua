@@ -5,16 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
+local Class = Lua.import('Module:Class')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local TeamHistoryAuto = Lua.import('Module:Infobox/Extension/TeamHistory/Auto')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Widget = Lua.import('Module:Widget')
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 
 local Big = HtmlWidgets.Big
 local Br = HtmlWidgets.Br

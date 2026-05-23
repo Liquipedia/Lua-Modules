@@ -9,10 +9,11 @@
 local inGameRoles = {
 	['support'] = {category = 'Support players', display = 'Support'},
 	['rusher'] = {category = 'Rusher', display = 'Rusher'},
+	['rifler'] = {category = 'Rifler', display = 'Rifler'},
 	['sniper'] = {category = 'Snipers', display = 'Snipers'},
-	['granader'] = {category = 'Granader', display = 'Granader'},
-	['igl'] = {category = 'In-game leaders', display = 'In-game leaders'},
-	['captain'] = {category = 'Captain', display = 'Captain'},
+	['bomber'] = {category = 'Bomber', display = 'Bomber'},
 }
+
+inGameRoles['granader'] = inGameRoles.bomber
 
 return inGameRoles

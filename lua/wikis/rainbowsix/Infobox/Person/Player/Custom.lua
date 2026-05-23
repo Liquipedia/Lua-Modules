@@ -118,17 +118,14 @@ function CustomPlayer:adjustLPDB(lpdbData, args)
 	return lpdbData
 end
 
----@return string?
+---@return Widget?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = TeamTemplate.getPageName(self.args.team)
-		---@cast teamPage -nil
-		return HtmlWidgets.Fragment{
-			children = {
-				MatchTicker.recent{team = teamPage},
-				UpcomingTournaments.team{name = teamPage}
-			}
-		}
+		return HtmlWidgets.Fragment{children = {
+			MatchTicker.player(),
+			UpcomingTournaments.team{name = teamPage}
+		}}
 	end
 end
 

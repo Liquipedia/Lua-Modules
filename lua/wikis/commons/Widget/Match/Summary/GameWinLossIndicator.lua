@@ -11,14 +11,13 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Label = Lua.import('Module:Widget/Basic/Label')
 
-local ICONS = {
-	win = Div{classes = {'brkts-result-label', 'result--win'}},
-	draw = Div{classes = {'brkts-result-label', 'result--draw'}},
-	loss = Div{classes = {'brkts-result-label', 'result--loss'}},
-	empty = Div{classes = {'brkts-result-label'}},
+local LABELS = {
+	win = Label{labelType = 'result-win'},
+	draw = Label{labelType = 'result-draw'},
+	loss = Label{labelType = 'result-loss'},
+	empty = Label{labelType = 'result-empty'},
 }
 
 ---@class MatchSummaryGameWinLossIndicator: Widget
@@ -30,14 +29,14 @@ function MatchSummaryGameWinLossIndicator:render()
 	local winner = self.props.winner
 
 	if winner == self.props.opponentIndex then
-		return ICONS.win
+		return LABELS.win
 	elseif winner == 0 then
-		return ICONS.draw
+		return LABELS.draw
 	elseif Logic.isNotEmpty(winner) then
-		return ICONS.loss
+		return LABELS.loss
 	end
 
-	return ICONS.empty
+	return LABELS.empty
 end
 
 return MatchSummaryGameWinLossIndicator

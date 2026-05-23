@@ -7,7 +7,10 @@
 
 local Lua = require('Module:Lua')
 
+local Game = Lua.import('Module:Game')
 local Tier = Lua.import('Module:Tier/Utils')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+
 local Config = {}
 
 ---@type FilterButtonCategory[]
@@ -25,22 +28,28 @@ Config.categories = {
 		transform = function(tier)
 			return Tier.toName(tier)
 		end,
-		expandKey = "liquipediatiertype",
+		expandKey = "game",
 	},
 	{
-		name = 'liquipediatiertype',
-		property = 'liquipediaTierType',
+		name = 'game',
+		property = 'game',
+		items = {'pubgm', 'gfp', 'bgmi'},
 		expandable = true,
-		load = function(category)
-			category.items = {}
-			for _, tiertype in Tier.iterate('tierTypes') do
-				table.insert(category.items, Tier.toIdentifier(tiertype.value))
-			end
-		end,
-		transform = function(tiertype)
-			return select(2, Tier.toName(1, tiertype))
-		end,
-	},
+		transform = function(game)
+			return HtmlWidgets.Fragment{
+				children = {
+					Game.icon{game = game, noSpan = true, noLink = true, size = '20x20px'},
+					HtmlWidgets.Span{
+						classes = {'mobile-hide'},
+						children = {
+							'&nbsp;',
+							Game.text{game = game, noLink = true, useAbbreviation = true},
+						}
+					}
+				}
+			}
+		end
+	}
 }
 
 return Config

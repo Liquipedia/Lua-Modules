@@ -168,8 +168,8 @@ span.slash {
 	gap: 0.25rem;
 
 	@media ( min-width: 768px ) {
-		.brkts-result-label {
-			--result-label-scale: 1.2;
+		.generic-label {
+			--label-scale: 1.2;
 		}
 	}
 }
@@ -1310,10 +1310,13 @@ span.slash {
 		}
 
 		&-title {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
 			padding-top: 0.5rem;
-			text-align: center;
+			gap: 0.5rem;
 
-			& > a {
+			> a {
 				color: inherit !important;
 			}
 		}
@@ -1323,30 +1326,10 @@ span.slash {
 		}
 
 		&-map-info {
-			display: flex;
-			flex-direction: column;
-			padding-top: 0.5rem;
-		}
-
-		&--ban &-map-action {
-			color: var( --clr-semantic-negative-40 );
-			font-weight: bold;
-		}
-
-		&--pick &-map-action {
-			color: var( --clr-semantic-positive-40 );
-			font-weight: bold;
-		}
-
-		&--decider &-map-action {
-			color: var( --clr-semantic-positive-40 );
-			font-weight: bold;
+			display: contents;
 		}
 	}
 }
-
-$valorant-atk: #b20110;
-$valorant-def: #01654c;
 
 .match-bm-rounds-overview {
 	$cell-height: 1.75rem;
@@ -1402,13 +1385,13 @@ $valorant-def: #01654c;
 
 			&--atk {
 				.wiki-valorant & {
-					color: $valorant-atk;
+					color: var( --valorant-atk-score-color );
 				}
 			}
 
 			&--def {
 				.wiki-valorant & {
-					color: $valorant-def;
+					color: var( --valorant-def-score-color );
 				}
 			}
 		}
@@ -1471,14 +1454,14 @@ $valorant-def: #01654c;
 			&--atk {
 				.wiki-valorant & {
 					color: #ffffff;
-					background-color: $valorant-atk;
+					background-color: var( --valorant-atk-score-color );
 				}
 			}
 
 			&--def {
 				.wiki-valorant & {
 					color: #ffffff;
-					background-color: $valorant-def;
+					background-color: var( --valorant-def-score-color );
 				}
 			}
 		}
@@ -1497,13 +1480,13 @@ $valorant-def: #01654c;
 
 		&--atk {
 			.wiki-valorant & {
-				color: $valorant-atk;
+				color: var( --valorant-atk-score-color );
 			}
 		}
 
 		&--def {
 			.wiki-valorant & {
-				color: $valorant-def;
+				color: var( --valorant-def-score-color );
 			}
 		}
 	}
@@ -1529,14 +1512,14 @@ $valorant-def: #01654c;
 		&--atk {
 			.wiki-valorant & {
 				color: #ffffff;
-				background-color: $valorant-atk;
+				background-color: var( --valorant-atk-score-color );
 			}
 		}
 
 		&--def {
 			.wiki-valorant & {
 				color: #ffffff;
-				background-color: $valorant-def;
+				background-color: var( --valorant-def-score-color );
 			}
 		}
 	}

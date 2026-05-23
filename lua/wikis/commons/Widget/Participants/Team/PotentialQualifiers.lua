@@ -30,7 +30,7 @@ function PotentialQualifiers:render()
 
 	local children = {
 		Div{
-			classes = {'team-participant-card__potential-qualifiers-title'},
+			classes = {'team-participant-card__subheader'},
 			children = 'Potential qualifiers'
 		},
 		Div{

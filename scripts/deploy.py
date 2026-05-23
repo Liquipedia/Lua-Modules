@@ -6,16 +6,12 @@ import sys
 
 from typing import Iterable
 
-import requests
-
 from deploy_util import (
     get_git_deploy_reason,
-    deploy_file_to_wiki,
-    read_cookie_jar,
     read_file_from_path,
     write_to_github_summary_file,
 )
-from login_and_get_token import get_token
+from mediawiki_session import MediaWikiSession
 
 HEADER_PATTERN = re.compile(
     r"\A---\n" r"-- @Liquipedia\n" r"-- page=(?P<pageName>[^\n]*)\n"
@@ -26,9 +22,7 @@ def deploy_all_files_for_wiki(
     wiki: str, file_paths: Iterable[pathlib.Path], deploy_reason: str
 ) -> bool:
     all_modules_deployed = True
-    token = get_token(wiki)
-    with requests.Session() as session:
-        session.cookies = read_cookie_jar(wiki)
+    with MediaWikiSession(wiki) as session:
         for file_path in file_paths:
             print(f"::group::Checking {str(file_path)}")
             file_content = read_file_from_path(file_path)
@@ -40,8 +34,8 @@ def deploy_all_files_for_wiki(
                 page = header_match.groupdict()["pageName"] + (
                     os.getenv("LUA_DEV_ENV_NAME") or ""
                 )
-                module_deployed, _ = deploy_file_to_wiki(
-                    session, file_path, file_content, wiki, page, token, deploy_reason
+                module_deployed, _ = session.deploy_file(
+                    file_path, file_content, page, deploy_reason
                 )
                 all_modules_deployed &= module_deployed
             print("::endgroup::")
