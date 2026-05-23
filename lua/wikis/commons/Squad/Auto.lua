@@ -660,7 +660,7 @@ function SquadAuto._fetchNextTeam(pagename, date)
 		:add{
 			Condition.Util.anyOf(Condition.ColumnName('player'), {pagename, string.gsub(pagename, ' ', '_')}),
 			Condition.Node(Condition.ColumnName('date'), Comparator.ge, date),
-			Condition.Node(Condition.ColumnName('toteamtemplate', Comparator.neq, ''),
+			Condition.Node(Condition.ColumnName('toteamtemplate', Comparator.neq, '')),
 		}
 
 	local transfer = mw.ext.LiquipediaDB.lpdb('transfer', {
