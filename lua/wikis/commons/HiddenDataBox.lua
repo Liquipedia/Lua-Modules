@@ -32,8 +32,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local HiddenDataBox = {}
 local DEFAULT_TIER_TYPE = 'general'
 
-local Language = mw.getContentLanguage()
-
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 ---Entry point
