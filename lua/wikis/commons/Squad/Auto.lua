@@ -562,12 +562,12 @@ function SquadAuto:_selectHistoryEntries(entries)
 	if self.config.status == SquadUtils.SquadStatus.FORMER then
 		local history = {}
 
-		local currentEntry = nil
+		local joinEntry, changeEntry
 
 		Array.forEach(entries, function (entry)
-			if not currentEntry then
+			if not joinEntry then
 				if entry.type == SquadAuto.TransferType.JOIN then
-					currentEntry = entry
+					joinEntry = entry
 				else
 					mw.log('Invalid transfer history for player ' .. entry.pagename)
 					mw.logObject(entry, 'Invalid entry: Missing previous JOIN. Skipping')
@@ -576,11 +576,14 @@ function SquadAuto:_selectHistoryEntries(entries)
 				return
 			end
 
-			table.insert(history, self:_mapToSquadPerson(currentEntry, entry))
-			if entry.type == SquadAuto.TransferType.CHANGE then
-				currentEntry = entry
+			if entry.type == SquadAuto.TransferType.CHANGE and entry.toRole == ROLE_INACTIVE then
+				if not changeEntry then
+					changeEntry = entry
+				end
 			else
-				currentEntry = nil
+				table.insert(history, self:_mapToSquadPerson(joinEntry, changeEntry, entry))
+				joinEntry = nil
+				changeEntry = nil
 			end
 		end)
 
