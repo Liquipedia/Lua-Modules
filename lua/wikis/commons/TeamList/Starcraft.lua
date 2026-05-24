@@ -40,31 +40,18 @@ local TeamList = Class.new(
 function TeamListWrapper.TemplateTeamList(frame)
 	local args = Arguments.getArgs(frame)
 
-	for _, item in pairs(args) do
-		if item:find('<%s*br%s*/?>') then
-			mw.ext.TeamLiquidIntegration.add_category('TeamList with br')
-		end
-	end
-
 	local newArgs = TeamList(args):read():map()
 
 	if Logic.readBool(args.generate) then
 		return TeamListWrapper.generate(newArgs)
 	end
 
-	if Array.any(newArgs, function(section)
-		return Array.any(section, function(opp)
-			return Logic.isNotEmpty(opp.notes)
+	Array.forEach(newArgs, function(section)
+		Array.forEach(section, function(opp)
+			if Logic.isEmpty(opp.notes) then return end
+			opp.notes = Array.map(opp.notes, function(note) return {note} end)
 		end)
-	end) then
-		mw.ext.TeamLiquidIntegration.add_category('TeamList with notes')
-		Array.forEach(newArgs, function(section)
-			Array.forEach(section, function(opp)
-				if Logic.isEmpty(opp.notes) then return end
-				opp.notes = Array.map(opp.notes, function(note) return {note} end)
-			end)
-		end)
-	end
+	end)
 
 	if not newArgs[2] then
 		return TeamParticipantsController.fromTemplate(newArgs[1])
@@ -72,9 +59,6 @@ function TeamListWrapper.TemplateTeamList(frame)
 
 	local tabArgs = {}
 	Array.forEach(newArgs, function(tpArgs, index)
-		if not tpArgs.title then
-			mw.ext.TeamLiquidIntegration.add_category('TeamList with missing section title')
-		end
 		tabArgs['name' .. index] = tpArgs.title
 		tabArgs['content' .. index] = TeamParticipantsController.fromTemplate(tpArgs)
 	end)
@@ -162,7 +146,7 @@ function TeamListWrapper.generateOpponent(args)
 	if Logic.isNotEmpty(args.notes) then
 		table.insert(parts, '\t\t|notes={{Notes')
 		Array.forEach(args.notes, function(note)
-			table.insert(parts, '\t\t\t|{{Note|' .. note .. '}}')
+			table.insert(parts, '\t\t\t|{{Notes|' .. note .. '}}')
 		end)
 		table.insert(parts, '\t\t}}')
 	end
@@ -250,10 +234,6 @@ function TeamList.mapEntry(entry)
 		date = opp.date,
 	}
 	args.notes = notes
-
-	if opp.dq then
-		mw.ext.TeamLiquidIntegration.add_category('TeamList with dq opponent')
-	end
 
 	return args
 end
