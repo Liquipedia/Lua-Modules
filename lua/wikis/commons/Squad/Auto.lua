@@ -51,28 +51,6 @@ end)
 ---@field position string?
 ---@field date string?
 
----@class SquadAutoBase
----@field id string
----@field flag string?
----@field page string
----@field name string?
----@field localizedname string?
----@field faction string?
----@field captain boolean?
-
----TODO: Unify with SquadPerson
----@class SquadAutoPerson: SquadAutoBase
----@field idleavedate string?
----@field thisTeam SquadAutoTeam
----@field oldTeam SquadAutoTeam?
----@field newTeam SquadAutoTeam?
----@field joindate string
----@field joindatedisplay string?
----@field joindateRef table<string, string>?
----@field leavedate string?
----@field leavedatedisplay string
----@field leavedateRef table<string, string>?
-
 ---@class SquadAutoConfig
 ---@field team string
 ---@field status SquadStatus
@@ -241,7 +219,7 @@ function SquadAuto:enrichEntry(entry)
 end
 
 ---@return SquadPersonArgs[] manualPersons
----@return table<string, SquadAutoBase> enrichmentInfo
+---@return table<string, SquadPersonArgs> enrichmentInfo
 function SquadAuto:readManualRowInput()
 	---@type SquadPersonArgs[]
 	local persons = {}
@@ -278,8 +256,6 @@ function SquadAuto:readManualRowInput()
 				team = person.role == 'Loan' and person.oldteam or nil,
 
 				-- TODO: (Supported by Squad)
-				-- status
-				-- type
 				-- teamrole
 				-- newteamrole
 				-- newteamdate
@@ -294,7 +270,6 @@ function SquadAuto:readManualRowInput()
 				id = person.id,
 				captain = Logic.readBoolOrNil(person.captain),
 				name = person.name,
-				localizedname = person.localizedname,
 				flag = person.flag,
 				faction = person.faction or person.race,
 			}
