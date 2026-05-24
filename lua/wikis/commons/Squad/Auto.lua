@@ -18,6 +18,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local RoleUtil = Lua.import('Module:Role/Util')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
@@ -78,7 +79,6 @@ end)
 ---@field type SquadType
 ---@field title string?
 ---@field teams string[]?
----@field roles {excluded: string[]?, included: string[]?}
 
 ---@enum TransferType
 SquadAuto.TransferType = {
@@ -171,19 +171,7 @@ function SquadAuto:parseConfig()
 		team = args.team or mw.title.getCurrentTitle().text,
 		type = type,
 		status = status,
-		title = args.title,
-		roles = {
-			included = Logic.emptyOr(
-				Array.parseCommaSeparatedString(args.roles),
-				DEFAULT_INCLUDED_ROLES[type][status],
-				DEFAULT_INCLUDED_ROLES[type].DEFAULT
-			),
-			excluded = Logic.emptyOr(
-				Array.parseCommaSeparatedString(args.not_roles),
-				DEFAULT_EXCLUDED_ROLES[type][status],
-				DEFAULT_EXCLUDED_ROLES[type].DEFAULT
-			)
-		}
+		title = args.title
 	}
 
 	self.manualPlayers, self.enrichmentInfo = self:readManualRowInput()
@@ -200,10 +188,6 @@ function SquadAuto:parseConfig()
 
 	if Logic.isEmpty(self.config.teams) then
 		error(TeamTemplate.noTeamMessage(self.config.team))
-	end
-
-	if self.config.status == SquadUtils.SquadStatus.FORMER_INACTIVE then
-		error('SquadStatus \'FORMER_INACTIVE\' is not supported by SquadAuto.')
 	end
 end
 
@@ -515,21 +499,13 @@ function SquadAuto:selectEntries()
 		),
 		---@param entry SquadPersonArgs
 		function(entry)
-			local result = (
-				Logic.isEmpty(self.config.roles.included)
-				or Array.any(
-					self.config.roles.included,
-					FnUtil.curry(Operator.eq, entry.role)
-				)
-			) and (
-				Logic.isEmpty(self.config.roles.excluded)
-				or Array.all(
-					self.config.roles.excluded,
-					FnUtil.curry(Operator.neq, entry.role)
-				)
-			)
+			local roles = RoleUtil.readRoleArgs(table.concat({entry.role, entry.position}, ','))
+			local hasStaffRoles = Array.any(roles, function(role) return role.type == RoleUtil.ROLE_TYPE.STAFF end)
 
-			return result
+			if hasStaffRoles then
+				return self.config.type == SquadUtils.SquadType.STAFF
+			end
+			return self.config.type == SquadUtils.SquadType.PLAYER
 		end
 	)
 end
