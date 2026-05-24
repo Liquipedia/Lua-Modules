@@ -441,23 +441,25 @@ function SquadAuto:selectEntries()
 		--- Selects the appropriate entries based on the role.
 		---@param entry SquadPersonArgs
 		function(entry)
+			if self.config.status == SquadUtils.SquadStatus.INACTIVE then
+				-- For SquadStatus.INACTIVE the entries are already preselected
+				-- and won't have the role set to Inactive.
+				-- This also matches manual Squad, where status is inactive and role can e.g. be "On Loan"
+
+				return true
+			end
+
 			local roles = RoleUtil.readRoleArgs(table.concat({entry.role, entry.position}, ','))
 			local hasStaffRoles = Array.any(roles, function(role)
 				return role.type == RoleUtil.ROLE_TYPE.STAFF
 					or role.type == RoleUtil.ROLE_TYPE.UNKNOWN -- Unknown roles are assumed to be non-player
 			end)
-			local roleIsInactive = entry.role == ROLE_INACTIVE
 
 			if self.config.type == SquadUtils.SquadType.STAFF then
-				return hasStaffRoles and not roleIsInactive
+				return hasStaffRoles
 			end
 
-			if self.config.status == SquadUtils.SquadStatus.INACTIVE then
-				-- "Inactive" currently produces a false-positive hasStaffRoles
-				return roleIsInactive
-			end
-
-			return not hasStaffRoles and not roleIsInactive
+			return not hasStaffRoles
 		end
 	)
 end
@@ -474,9 +476,9 @@ function SquadAuto:_selectHistoryEntries(entries)
 	if self.config.status == SquadUtils.SquadStatus.ACTIVE then
 		-- Only most recent transfer is relevant
 		local last = entries[#entries]
-		if last.type == SquadAuto.TransferType.CHANGE
-				or last.type == SquadAuto.TransferType.JOIN then
-			-- When the last transfer is a leave transfer, the person wouldn't be active
+		if (last.type == SquadAuto.TransferType.CHANGE or last.type == SquadAuto.TransferType.JOIN)
+				and last.toRole ~= ROLE_INACTIVE then
+			-- When the last transfer is a leave transfer, or the role is inactive, the person wouldn't be active
 			return {self:_mapToSquadPerson(last)}
 		end
 	end
@@ -634,12 +636,12 @@ function SquadAuto._fetchNextTeam(pagename, date)
 	return transfer.toteamtemplate, transfer.role2, transfer.date
 end
 
----Sorts a list of SquadAutoPersons
+---Sorts a list of SquadPersonArgs
 -- Active entries (no leavedate) sorted by joindate,
 -- Former entries sorted by leavedate
 ---@param entries SquadPersonArgs[]
 ---@param useRankSort boolean?
----@return SquadAutoPerson[]
+---@return SquadPersonArgs[]
 function SquadAuto._sortEntries(entries, useRankSort)
 	return Array.sortBy(entries, function (element)
 		return {
