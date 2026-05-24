@@ -603,9 +603,14 @@ function SquadAuto:_mapToSquadPerson(joinEntry, inactiveEntry, leaveEntry)
 	local inactiveReference = TransferRefs.useReferences(inactiveEntry.references, inactiveEntry.date)
 	local leaveReference = TransferRefs.useReferences(leaveEntry.references, leaveEntry.date)
 
-	local joindate = (joinEntry.dateDisplay or joinEntry.date) .. ' ' .. joinReference
-	local inactivedate = (inactiveEntry.dateDisplay or inactiveEntry.date) .. ' ' .. inactiveReference
-	local leavedate = (leaveEntry.dateDisplay or leaveEntry.date) .. ' ' .. leaveReference
+
+	local function attachReference(entry, reference)
+		return (entry.dateDisplay or entry.date or '') .. ' ' .. reference
+	end
+
+	local joindate = attachReference(joinEntry, joinReference)
+	local inactivedate = attachReference(inactiveEntry, inactiveReference)
+	local leavedate = attachReference(leaveEntry, leaveReference)
 
 	---@type SquadPersonArgs
 	local entry = {
@@ -690,14 +695,14 @@ end
 ---Sorts a list of SquadAutoPersons
 -- Active entries (no leavedate) sorted by joindate,
 -- Former entries sorted by leavedate
----@param entries SquadAutoPerson[]
+---@param entries SquadPersonArgs[]
 ---@param useRankSort boolean?
 ---@return SquadAutoPerson[]
 function SquadAuto._sortEntries(entries, useRankSort)
 	return Array.sortBy(entries, function (element)
 		return {
-			useRankSort and SquadAutoRank[element.thisTeam.position] or SquadAutoRank[DEFAULT_RANK_KEY],
-			useRankSort and SquadAutoRank[element.thisTeam.role] or SquadAutoRank[DEFAULT_RANK_KEY],
+			useRankSort and SquadAutoRank[element.position] or SquadAutoRank[DEFAULT_RANK_KEY],
+			useRankSort and SquadAutoRank[element.role] or SquadAutoRank[DEFAULT_RANK_KEY],
 			element.leavedate or element.joindate,
 			element.id
 		}
