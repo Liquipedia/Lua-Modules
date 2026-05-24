@@ -717,7 +717,7 @@ function SquadAuto._sortEntries(entries, useRankSort)
 		return {
 			useRankSort and SquadAutoRank[element.position] or SquadAutoRank[DEFAULT_RANK_KEY],
 			useRankSort and SquadAutoRank[element.role] or SquadAutoRank[DEFAULT_RANK_KEY],
-			element.leavedate or element.joindate,
+			element.leavedate or element.joindate or '',
 			element.id
 		}
 	end)
