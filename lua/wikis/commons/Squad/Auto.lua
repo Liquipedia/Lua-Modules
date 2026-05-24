@@ -114,40 +114,6 @@ local DEFAULT_RANK_KEY = ''
 
 local ROLE_INACTIVE = 'Inactive'
 
--- TODO: Replace with Module:Roles
-local ROLES_PLAYER = {
-	'',
-	'Loan',
-	'Substitute',
-	'Trial',
-	'Stand-in',
-	'Uncontracted'
-}
-
-local DEFAULT_INCLUDED_ROLES = {
-	[SquadUtils.SquadType.PLAYER] = {
-		DEFAULT = ROLES_PLAYER,
-		[SquadUtils.SquadStatus.INACTIVE] = {
-			ROLE_INACTIVE
-		},
-		[SquadUtils.SquadStatus.FORMER] = Array.extend(
-			ROLES_PLAYER,
-			ROLE_INACTIVE
-		),
-	},
-	[SquadUtils.SquadType.STAFF] = {},
-}
-
-local DEFAULT_EXCLUDED_ROLES = {
-	[SquadUtils.SquadType.PLAYER] = {},
-	[SquadUtils.SquadType.STAFF] = {
-		DEFAULT = Array.extend(
-			ROLES_PLAYER,
-			ROLE_INACTIVE
-		),
-	},
-}
-
 ---Entrypoint for SquadAuto tables
 ---@param frame Frame|table
 ---@return Widget|Html|string?
@@ -497,15 +463,26 @@ function SquadAuto:selectEntries()
 			),
 			self.manualPlayers
 		),
+		--- Selects the appropriate entries based on the role.
 		---@param entry SquadPersonArgs
 		function(entry)
 			local roles = RoleUtil.readRoleArgs(table.concat({entry.role, entry.position}, ','))
-			local hasStaffRoles = Array.any(roles, function(role) return role.type == RoleUtil.ROLE_TYPE.STAFF end)
+			local hasStaffRoles = Array.any(roles, function(role)
+				return role.type == RoleUtil.ROLE_TYPE.STAFF
+					or role.type == RoleUtil.ROLE_TYPE.UNKNOWN -- Unknown roles are assumed to be non-player
+			end)
+			local roleIsInactive = entry.role == ROLE_INACTIVE
 
-			if hasStaffRoles then
-				return self.config.type == SquadUtils.SquadType.STAFF
+			if self.config.type == SquadUtils.SquadType.STAFF then
+				return hasStaffRoles and not roleIsInactive
 			end
-			return self.config.type == SquadUtils.SquadType.PLAYER
+
+			if self.config.status == SquadUtils.SquadStatus.INACTIVE then
+				-- "Inactive" currently produces a false-positive hasStaffRoles
+				return roleIsInactive
+			end
+
+			return not hasStaffRoles and not roleIsInactive
 		end
 	)
 end
