@@ -132,6 +132,12 @@ end
 ---@param player table
 ---@return table
 function SquadUtils.convertAutoParameters(player)
+	if Info.config.squads.standardizedAuto then
+		-- Temporary until all wikis have enabled the new version of automated squads
+		---@diagnostic disable-next-line: return-type-mismatch
+		return player
+	end
+
 	local newPlayer = Table.copy(player)
 	local joinReference = TransferRefs.useReferences(player.joindateRef, player.joindate)
 	local leaveReference = TransferRefs.useReferences(player.leavedateRef, player.leavedate)
@@ -164,7 +170,7 @@ end
 ---@field igl string?
 ---@field newteam string?
 ---@field newteamrole string?
----@field newrole string?
+---@field newrole string? -- Alternative to newteamrole
 ---@field joindate string?
 ---@field leavedate string?
 ---@field inactivedate string?
