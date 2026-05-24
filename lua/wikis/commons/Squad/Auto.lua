@@ -205,7 +205,7 @@ function SquadAuto:parseConfig()
 	end
 end
 
----@param entries SquadAutoPerson[]
+---@param entries SquadPersonArgs[]
 ---@return Widget|Html|string?
 function SquadAuto:display(entries)
 	if Logic.isEmpty(entries) then
@@ -222,12 +222,12 @@ function SquadAuto:display(entries)
 	return SquadCustom.runAuto(entries, self.config.status, self.config.type, self.config.title)
 end
 
----@param entries SquadAutoPerson[]
+---@param entries SquadPersonArgs[]
 ---@return Widget|Html|string?
 function SquadAuto:displayTabs(entries)
 	local _, groupedEntries = Array.groupBy(
 		entries,
-		---@param entry SquadAutoPerson
+		---@param entry SquadPersonArgs
 		function (entry)
 			return entry.leavedate:match('(%d%d%d%d)')
 		end
@@ -264,9 +264,9 @@ function SquadAuto:displayTabs(entries)
 	return Tabs.dynamic(tabs)
 end
 
----@param entry SquadAutoPerson
+---@param entry SquadPersonArgs
 function SquadAuto:enrichEntry(entry)
-	local pagename = Page.pageifyLink(entry.page)
+	local pagename = Page.pageifyLink(entry.link)
 	local enrichment = self.enrichmentInfo[pagename]
 	if enrichment then
 		Table.mergeInto(entry, enrichment)
@@ -275,23 +275,22 @@ function SquadAuto:enrichEntry(entry)
 	local personInfo = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = '[[pagename::' .. pagename .. ']]',
 		limit = 1,
-		query = 'pagename, nationality, id, name, localizedname, extradata'
+		query = 'pagename, nationality, id, name, extradata'
 	})[1]
 
 	if personInfo then
 		entry.id = Logic.nilIfEmpty(entry.id) or personInfo.id
 		entry.flag = Logic.nilIfEmpty(entry.flag) or personInfo.nationality
 		entry.name = Logic.nilIfEmpty(entry.name) or personInfo.name
-		entry.localizedname = Logic.nilIfEmpty(entry.localizedname) or personInfo.localizedname
 	end
 
 	--TODO: Captain from pagevar set in infobox?
 end
 
----@return SquadAutoPerson[] manualPersons
+---@return SquadPersonArgs[] manualPersons
 ---@return table<string, SquadAutoBase> enrichmentInfo
 function SquadAuto:readManualRowInput()
-	---@type SquadAutoPerson[]
+	---@type SquadPersonArgs[]
 	local persons = {}
 	local enrichmentInfo = {}
 
@@ -302,43 +301,43 @@ function SquadAuto:readManualRowInput()
 			return
 		end
 
-		local page = Page.pageifyLink(person.link or person.id or person.name)
-		assert(page, 'Missing identifier or link for SquadAutoRow ' .. entry)
+		local link = Page.pageifyLink(person.link or person.id or person.name)
+		assert(link, 'Missing identifier or link for SquadAutoRow ' .. entry)
 
 		if self.config.type == SquadUtils.SquadType.STAFF and Logic.isNotEmpty(person.role) then
 			-- Only allow manual entries for STAFF (organization) tables
-			table.insert(persons, {
-				page = page,
-				id = person.id,
-				captain = Logic.readBoolOrNil(person.captain),
+			---@type SquadPersonArgs
+			local manualPerson = {
 				name = person.name,
-				localizedname = person.localizedname,
-				thisTeam = {
-					team = self.config.team,
-					role = person.role,
-					position = person.position
-				},
-				newTeam = {
-					team = person.newteam,
-					role = person.newteamrole,
-					person.newteamdate
-				},
+				id = person.id,
+				link = link,
 				flag = person.flag,
-				oldTeam = {
-					team = person.oldteam
-				},
-				joindate = (person.joindate or ''):gsub('%?%?','01'),
-				joindatedisplay = person.joindate,
-				joindateRef = {},
-				leavedate = (person.leavedate or ''):gsub('%?%?','01'),
-				leavedatedisplay = person.leavedate,
-				leavedateRef = {},
+				position = person.position,
+				role = person.role,
+				captain = person.captain,
+
+				newteam = person.newteam,
+				newrole = person.newteamrole,
+
+				joindate = person.joindate,
+				leavedate = person.leavedate,
+				inactivedate = person.inactivedate,
+				team = person.role == 'Loan' and person.oldteam or nil,
+
+				-- TODO: (Supported by Squad)
+				-- status
+				-- type
+				-- teamrole
+				-- newteamrole
+				-- newteamdate
+
 				faction = person.faction or person.race,
 				race = person.faction or person.race,
-			})
+			}
+			table.insert(persons, manualPerson)
 		else
 			-- For PLAYER tables, or when no role is given: Treat as override
-			enrichmentInfo[page] = {
+			enrichmentInfo[link] = {
 				id = person.id,
 				captain = Logic.readBoolOrNil(person.captain),
 				name = person.name,
@@ -501,7 +500,7 @@ function SquadAuto:buildConditions()
 	return conditions:toString()
 end
 
----@return SquadAutoPerson[]
+---@return SquadPersonArgs[]
 function SquadAuto:selectEntries()
 	return Array.filter(
 		Array.extend(
@@ -511,19 +510,19 @@ function SquadAuto:selectEntries()
 			),
 			self.manualPlayers
 		),
-		---@param entry SquadAutoPerson
+		---@param entry SquadPersonArgs
 		function(entry)
 			local result = (
 				Logic.isEmpty(self.config.roles.included)
 				or Array.any(
 					self.config.roles.included,
-					FnUtil.curry(Operator.eq, entry.thisTeam.role)
+					FnUtil.curry(Operator.eq, entry.role)
 				)
 			) and (
 				Logic.isEmpty(self.config.roles.excluded)
 				or Array.all(
 					self.config.roles.excluded,
-					FnUtil.curry(Operator.neq, entry.thisTeam.role)
+					FnUtil.curry(Operator.neq, entry.role)
 				)
 			)
 
@@ -538,7 +537,7 @@ end
 ---If the status is former(_inactive), there might be multiple entries returned
 ---If the type does not match, no entries are returned
 ---@param entries TeamHistoryEntry[]
----@return SquadAutoPerson[]
+---@return SquadPersonArgs[]
 function SquadAuto:_selectHistoryEntries(entries)
 	-- Select entries to match status
 	if self.config.status == SquadUtils.SquadStatus.ACTIVE then
@@ -547,14 +546,14 @@ function SquadAuto:_selectHistoryEntries(entries)
 		if last.type == SquadAuto.TransferType.CHANGE
 				or last.type == SquadAuto.TransferType.JOIN then
 			-- When the last transfer is a leave transfer, the person wouldn't be active
-			return {self:_mapToSquadAutoPerson(last)}
+			return {self:_mapToSquadPerson(last)}
 		end
 	end
 
 	if self.config.status == SquadUtils.SquadStatus.INACTIVE then
 		local last, secondToLast = entries[#entries], entries[#entries - 1]
 		if secondToLast and last.type == SquadAuto.TransferType.CHANGE and last.toRole == ROLE_INACTIVE then
-			return {self:_mapToSquadAutoPerson(secondToLast, last)}
+			return {self:_mapToSquadPerson(secondToLast, last)}
 		end
 	end
 
@@ -575,7 +574,7 @@ function SquadAuto:_selectHistoryEntries(entries)
 				return
 			end
 
-			table.insert(history, self:_mapToSquadAutoPerson(currentEntry, entry))
+			table.insert(history, self:_mapToSquadPerson(currentEntry, entry))
 			if entry.type == SquadAuto.TransferType.CHANGE then
 				currentEntry = entry
 			else
@@ -591,16 +590,25 @@ end
 
 ---Maps one or a pair of TeamHistoryEntries to a single SquadAutoPerson
 ---@param joinEntry TeamHistoryEntry
+---@param inactiveEntry TeamHistoryEntry | nil
 ---@param leaveEntry TeamHistoryEntry | nil
----@return SquadAutoPerson
-function SquadAuto:_mapToSquadAutoPerson(joinEntry, leaveEntry)
+---@return SquadPersonArgs
+function SquadAuto:_mapToSquadPerson(joinEntry, inactiveEntry, leaveEntry)
 	leaveEntry = leaveEntry or {}
 
-	---@type SquadAutoPerson
-	local entry =  {
-		page = joinEntry.pagename,
+	---@type SquadPersonArgs
+	local entry = {
 		id = leaveEntry.displayname or joinEntry.displayname,
+		link = joinEntry.pagename,
 		flag = joinEntry.flag,
+
+		position = joinEntry.position,
+		role = joinEntry.toRole,
+
+		newteam = leaveEntry.toTeam,
+		newteamrole = leaveEntry.toRole,
+		newteamdate = leaveEntry.date,
+
 		joindate = joinEntry.date,
 		joindatedisplay = joinEntry.dateDisplay,
 		joindateRef = joinEntry.references,
