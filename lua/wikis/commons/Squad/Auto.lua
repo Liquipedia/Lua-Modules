@@ -18,9 +18,11 @@ local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
+local TransferRefs = Lua.import('Module:Transfer/References')
 
 local SquadUtils = Lua.import('Module:Squad/Utils')
 local SquadCustom = Lua.import('Module:Squad/Custom')
@@ -594,10 +596,20 @@ end
 ---@param leaveEntry TeamHistoryEntry | nil
 ---@return SquadPersonArgs
 function SquadAuto:_mapToSquadPerson(joinEntry, inactiveEntry, leaveEntry)
+	inactiveEntry = inactiveEntry or {}
 	leaveEntry = leaveEntry or {}
+
+	local joinReference = TransferRefs.useReferences(joinEntry.references, joinEntry.date)
+	local inactiveReference = TransferRefs.useReferences(inactiveEntry.references, inactiveEntry.date)
+	local leaveReference = TransferRefs.useReferences(leaveEntry.references, leaveEntry.date)
+
+	local joindate = (joinEntry.dateDisplay or joinEntry.date) .. ' ' .. joinReference
+	local inactivedate = (inactiveEntry.dateDisplay or inactiveEntry.date) .. ' ' .. inactiveReference
+	local leavedate = (leaveEntry.dateDisplay or leaveEntry.date) .. ' ' .. leaveReference
 
 	---@type SquadPersonArgs
 	local entry = {
+		-- name
 		id = leaveEntry.displayname or joinEntry.displayname,
 		link = joinEntry.pagename,
 		flag = joinEntry.flag,
@@ -609,50 +621,41 @@ function SquadAuto:_mapToSquadPerson(joinEntry, inactiveEntry, leaveEntry)
 		newteamrole = leaveEntry.toRole,
 		newteamdate = leaveEntry.date,
 
-		joindate = joinEntry.date,
-		joindatedisplay = joinEntry.dateDisplay,
-		joindateRef = joinEntry.references,
+		joindate = joindate,
+		joindateref = joinEntry.references,
 
-		idleavedate = leaveEntry.displayname,
-		leavedate = leaveEntry.date,
-		leavedatedisplay = leaveEntry.dateDisplay or '',
-		leavedateRef = leaveEntry.references,
+		inactivedate = String.nilIfEmpty(inactivedate),
+		inactivedateref = inactiveEntry.references,
 
-		thisTeam = {
-			team = joinEntry.toTeam,
-			role = joinEntry.toRole,
-			position = joinEntry.position
-		},
-		oldTeam = {
-			team = joinEntry.fromTeam,
-			role = joinEntry.fromRole,
-		},
-		newTeam = {
-			team = leaveEntry.toTeam,
-			role = leaveEntry.toRole,
-		},
+		leavedate = String.nilIfEmpty(leavedate),
+		leavedateref = leaveEntry.references,
+
+		-- Injected in SquadController.execute:
+		-- status
+		-- type
+
+		-- Used as loanedto, loanedtorole:
+		team = joinEntry.toRole == 'Loan' and joinEntry.fromTeam or nil,
+		teamrole = joinEntry.fromRole,
+
+		-- TODO: Fill for current-inactive transfers
+		-- activeteam,
+		-- activeteamrole,
 
 		-- From legacy: Prefer faction information from leaveEntry
 		faction = leaveEntry.faction or joinEntry.faction,
 		race = leaveEntry.faction or joinEntry.faction
+		-- game,
 	}
 
 	-- On leave: Fetch the next team a person joined
-	if Logic.isNotEmpty(leaveEntry) and Logic.isEmpty(entry.newTeam.team) then
-		local newTeam, newRole = SquadAuto._fetchNextTeam(joinEntry.pagename, leaveEntry.date)
+	if Logic.isNotEmpty(leaveEntry) and Logic.isEmpty(entry.newteam) then
+		local newTeam, newRole, newDate = SquadAuto._fetchNextTeam(joinEntry.pagename, leaveEntry.date)
 		if newTeam then
-			entry.newTeam.team = newTeam
-			entry.newTeam.role = newRole
+			entry.newteam = newTeam
+			entry.newteamrole = newRole
+			entry.newteamdate = newDate
 		end
-	end
-
-	-- Special case: Person went inactive.
-	-- Set thisTeam.role to inactive and remove newTeam.role,
-	-- otherwise Squad doesn't display the entries
-	if self.config.status == SquadUtils.SquadStatus.INACTIVE
-			and leaveEntry.toRole == 'Inactive' then
-		entry.thisTeam.role = entry.newTeam.role
-		entry.newTeam.role = ''
 	end
 
 	return entry
@@ -661,8 +664,9 @@ end
 ---Fetches the next team a person joined after a given date
 ---@param pagename string
 ---@param date string
----@return string?
----@return string?
+---@return string? newTeam
+---@return string? newRole
+---@return string? newDate
 function SquadAuto._fetchNextTeam(pagename, date)
 	local conditions = Condition.Tree(BooleanOperator.all)
 		:add{
@@ -675,12 +679,12 @@ function SquadAuto._fetchNextTeam(pagename, date)
 		conditions = conditions:toString(),
 		limit = 1,
 		order = 'date asc, objectname desc',
-		query = 'toteamtemplate, role2'
+		query = 'toteamtemplate, role2, date'
 	})[1] or {}
 
 	-- TODO: (Optional) Check if fetched transfer is in fact a join transfer (empty fromTeam)?
 
-	return transfer.toteamtemplate, transfer.role2
+	return transfer.toteamtemplate, transfer.role2, transfer.date
 end
 
 ---Sorts a list of SquadAutoPersons

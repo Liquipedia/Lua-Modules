@@ -129,15 +129,17 @@ function SquadUtils.readWrapperArgs(args)
 	return SquadUtils.createWrapperData(players, squadType, squadStatus, args.title, args)
 end
 
----@param player table
----@return table
+---@param player SquadAutoPerson|SquadPersonArgs
+---@return SquadPersonArgs
 function SquadUtils.convertAutoParameters(player)
 	if Info.config.squads.standardizedAuto then
 		-- Temporary until all wikis have enabled the new version of automated squads
-		---@diagnostic disable-next-line: return-type-mismatch
+		---@cast player -SquadAutoPerson
 		return player
 	end
+	---@cast player -SquadPersonArgs
 
+	---@type SquadPersonArgs
 	local newPlayer = Table.copy(player)
 	local joinReference = TransferRefs.useReferences(player.joindateRef, player.joindate)
 	local leaveReference = TransferRefs.useReferences(player.leavedateRef, player.leavedate)
@@ -160,27 +162,33 @@ function SquadUtils.convertAutoParameters(player)
 end
 
 ---@class SquadPersonArgs
----@field name string?
----@field id string?
----@field link string?
+---@field name string? Real name
+---@field id string? Display name
+---@field link string? Page name
 ---@field flag string?
 ---@field position string?
 ---@field role string?
----@field captain string?
----@field igl string?
----@field newteam string?
+---@field captain string? Truthy, only when role is empty
+---@field igl string? Truthy, alternative to captain
+---@field newteam string? as team template
 ---@field newteamrole string?
 ---@field newrole string? -- Alternative to newteamrole
----@field joindate string?
----@field leavedate string?
----@field inactivedate string?
----@field status string?
----@field type string?
----@field team string?
----@field teamrole string?
+---@field joindate string? including reference
+---@field leavedate string? including reference
+---@field inactivedate string? including reference
+---@field status SquadStatus?
+---@field type SquadStatus?
+---@field team string? as loanedto
+---@field teamrole string? as loanedtorole
 ---@field newteamdate string?
 ---@field faction string?
 ---@field race string?
+---@field activeteam string?
+---@field activeteamrole string?
+---@field game game?
+---@field joindateref table<string, string>?
+---@field leavedateref table<string, string>?
+---@field inactivedateref table<string, string>?
 
 ---@param args SquadPersonArgs
 ---@return ModelRow
@@ -213,8 +221,11 @@ function SquadUtils.readSquadPersonArgs(args)
 		newteamtemplate = getTeamInfo(args.newteam, 'templatename'),
 
 		joindate = ReferenceCleaner.clean{input = args.joindate},
+		joindateref = args.joindateref,
 		leavedate = ReferenceCleaner.clean{input = args.leavedate},
+		leavedateref = args.leavedateref,
 		inactivedate = ReferenceCleaner.clean{input = args.inactivedate},
+		inactivedateref = args.inactivedateref,
 
 		status = SquadUtils.SquadStatusToStorageValue[args.status],
 		type = SquadUtils.SquadTypeToStorageValue[args.type],
