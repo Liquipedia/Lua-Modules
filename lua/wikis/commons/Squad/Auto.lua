@@ -214,7 +214,8 @@ function SquadAuto:display(entries)
 		return
 	end
 
-	if self.config.status == SquadUtils.SquadStatus.FORMER then
+	if self.config.status == SquadUtils.SquadStatus.FORMER
+		or self.config.status == SquadUtils.SquadStatus.FORMER_INACTIVE then
 		return self:displayTabs(entries)
 	end
 
@@ -559,31 +560,43 @@ function SquadAuto:_selectHistoryEntries(entries)
 		end
 	end
 
-	if self.config.status == SquadUtils.SquadStatus.FORMER then
+	if self.config.status == SquadUtils.SquadStatus.FORMER
+		or self.config.status == SquadUtils.SquadStatus.FORMER_INACTIVE then
 		local history = {}
 
-		local joinEntry, changeEntry
+		local joinEntry, inactiveEntry
 
 		Array.forEach(entries, function (entry)
-			if not joinEntry then
-				if entry.type == SquadAuto.TransferType.JOIN then
-					joinEntry = entry
-				else
+			if entry.type == SquadAuto.TransferType.JOIN then
+				if joinEntry then
 					mw.log('Invalid transfer history for player ' .. entry.pagename)
-					mw.logObject(entry, 'Invalid entry: Missing previous JOIN. Skipping')
+					mw.logObject(entry, 'Invalid entry: Duplicate JOIN. Skipping')
 					mw.ext.TeamLiquidIntegration.add_category('SquadAuto with invalid player history')
+					return
 				end
+				joinEntry = entry
+				return
+			end
+			if not joinEntry then
+				mw.log('Invalid transfer history for player ' .. entry.pagename)
+				mw.logObject(entry, 'Invalid entry: Missing previous JOIN. Skipping')
+				mw.ext.TeamLiquidIntegration.add_category('SquadAuto with invalid player history')
 				return
 			end
 
 			if entry.type == SquadAuto.TransferType.CHANGE and entry.toRole == ROLE_INACTIVE then
-				if not changeEntry then
-					changeEntry = entry
-				end
-			else
-				table.insert(history, self:_mapToSquadPerson(joinEntry, changeEntry, entry))
-				joinEntry = nil
-				changeEntry = nil
+				-- FORMER_INACTIVE enables the Inactive Date display
+				self.config.status = SquadUtils.SquadStatus.FORMER_INACTIVE
+				inactiveEntry = entry
+				return
+			end
+
+			table.insert(history, self:_mapToSquadPerson(joinEntry, inactiveEntry, entry))
+			joinEntry = nil
+			inactiveEntry = nil
+
+			if entry.type == SquadAuto.TransferType.CHANGE then
+				joinEntry = entry
 			end
 		end)
 
@@ -689,8 +702,6 @@ function SquadAuto._fetchNextTeam(pagename, date)
 		order = 'date asc, objectname desc',
 		query = 'toteamtemplate, role2, date'
 	})[1] or {}
-
-	-- TODO: (Optional) Check if fetched transfer is in fact a join transfer (empty fromTeam)?
 
 	return transfer.toteamtemplate, transfer.role2, transfer.date
 end
