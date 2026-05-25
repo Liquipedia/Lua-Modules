@@ -11,8 +11,8 @@ $clr-gigas-10: var( --clr-gigas-10 );
 $clr-forest-10: var( --clr-forest-10 );
 $clr-wiki-theme-10: var( --clr-wiki-theme-10 );
 
-/* Check if the wiki color is included in the theme, 
-   if it is, use the wiki colors for panels, 
+/* Check if the wiki color is included in the theme,
+   if it is, use the wiki colors for panels,
    if not, use the default colors */
 @function isWikiColorIncluded() {
 	@return index( ( $clr-sun-10, $clr-tuliptree-10, $clr-redviolet-10, $clr-gigas-10, $clr-forest-10 ), $clr-wiki-theme-10 );
@@ -35,13 +35,13 @@ $panel-header-background-color--dark: color-mix( in srgb, var( --clr-wiki-primar
 	$panel-header-background-color--dark: var( --clr-wiki-theme-20 );
 }
 
-.theme--light,{
+.theme--light, {
 	--panel-box-border-color: #{$panel-box-border-color--light};
 	--panel-box-color: #{$panel-box-color--light};
 	--panel-header-background-color: #{$panel-header-background-color--light};
 }
 
-.theme--dark,{
+.theme--dark, {
 	--panel-box-border-color: #{$panel-box-border-color--dark};
 	--panel-box-color: #{$panel-box-color--dark};
 	--panel-header-background-color: #{$panel-header-background-color--dark};
