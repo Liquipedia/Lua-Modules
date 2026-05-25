@@ -176,12 +176,12 @@ function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 
 	local aliases = Array.map(placement.extradata.opponentaliases or {}, TeamTemplate.getPageName)
 	aliases = Array.extend(aliases,
+		placement.extradata.opponentaliases or {},
 		Array.map(aliases, String.upperCaseFirst),
 		participant,
 		participant ~= participantResolved and participantResolved or nil
 	)
 	aliases = Array.unique(aliases)
-	mw.logObject(aliases)
 
 	Table.iter.forEachPair(placement.opponentplayers or {}, function(key, value)
 		Array.forEach(aliases, function(alias)
