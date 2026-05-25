@@ -380,7 +380,7 @@ local SUFFIXES = {
 	},
 	['faceit-c'] = {'/'},
 	['faceit-hub'] = {'/'},
-	gol = {match = '/page-game/'},
+	gol = {match = '/page-summary/'},
 	iccup = {'.html'},
 	lazermplink = {match = '/events'},
 	metafy = {'?utm_source=liquipedia&campaign=infoblock'},
