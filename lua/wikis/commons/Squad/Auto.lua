@@ -29,8 +29,6 @@ local TransferRefs = Lua.import('Module:Transfer/References')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 local SquadCustom = Lua.import('Module:Squad/Custom')
 
-local SquadAutoRank = Lua.import('Module:SquadAuto/rank', {loadData=true})
-
 local BooleanOperator = Condition.BooleanOperator
 local Comparator = Condition.Comparator
 
@@ -45,12 +43,6 @@ local pageVars = PageVariableNamespace()
 local SquadAuto = Class.new(nil, function (self, frame)
 	self.args = Arguments.getArgs(frame)
 end)
-
----@class SquadAutoTeam
----@field team string
----@field role string?
----@field position string?
----@field date string?
 
 ---@class SquadAutoConfig
 ---@field team string
@@ -82,14 +74,16 @@ SquadAuto.TransferType = {
 ---@field toRole string?
 ---@field faction string?
 
+---@class SquadAutoPerson: SquadPersonArgs
+---@field roleData RoleData?
+---@field positionData RoleData?
+
 ---@enum TransferSide
 local Side = {
 	from = 'from',
 	to = 'to',
 }
 
--- Default key for SquadAuto/rank
-local DEFAULT_RANK_KEY = ''
 
 local ROLE_INACTIVE = 'Inactive'
 
@@ -155,7 +149,7 @@ function SquadAuto:_parseConfig()
 	end
 end
 
----@param entries SquadPersonArgs[]
+---@param entries SquadAutoPerson[]
 ---@return Widget|Html|string?
 function SquadAuto:display(entries)
 	if Logic.isEmpty(entries) then
@@ -174,12 +168,12 @@ function SquadAuto:display(entries)
 end
 
 ---@private
----@param entries SquadPersonArgs[]
+---@param entries SquadAutoPerson[]
 ---@return Widget|Html|string?
 function SquadAuto:displayTabs(entries)
 	local _, groupedEntries = Array.groupBy(
 		entries,
-		---@param entry SquadPersonArgs
+		---@param entry SquadAutoPerson
 		function (entry)
 			return entry.leavedate:match('(%d%d%d%d)')
 		end
@@ -217,7 +211,7 @@ function SquadAuto:displayTabs(entries)
 end
 
 ---@private
----@param entry SquadPersonArgs
+---@param entry SquadAutoPerson
 function SquadAuto:_enrichEntry(entry)
 	local pagename = Page.pageifyLink(entry.link)
 	local enrichment = self.enrichmentInfo[pagename]
@@ -241,10 +235,10 @@ function SquadAuto:_enrichEntry(entry)
 end
 
 ---@private
----@return SquadPersonArgs[] manualPersons
----@return table<string, SquadPersonArgs> enrichmentInfo
+---@return SquadAutoPerson[] manualPersons
+---@return table<string, SquadAutoPerson> enrichmentInfo
 function SquadAuto:_readManualRowInput()
-	---@type SquadPersonArgs[]
+	---@type SquadAutoPerson[]
 	local persons = {}
 	local enrichmentInfo = {}
 
@@ -260,7 +254,7 @@ function SquadAuto:_readManualRowInput()
 
 		if self.config.type == SquadUtils.SquadType.STAFF and Logic.isNotEmpty(person.role) then
 			-- Only allow manual entries for STAFF (organization) tables
-			---@type SquadPersonArgs
+			---@type SquadAutoPerson
 			local manualPerson = {
 				name = person.name,
 				id = person.id,
@@ -285,6 +279,10 @@ function SquadAuto:_readManualRowInput()
 
 				faction = person.faction or person.race,
 				race = person.faction or person.race,
+
+				-- Used only by SquadAuto
+				roleData = RoleUtil.readRoleArgs(person.role),
+				positionData = RoleUtil.readRoleArgs(person.position)
 			}
 			table.insert(persons, manualPerson)
 		else
@@ -454,7 +452,7 @@ function SquadAuto:_buildConditions()
 end
 
 ---@private
----@return SquadPersonArgs[]
+---@return SquadAutoPerson[]
 function SquadAuto:_selectEntries()
 	return Array.filter(
 		Array.extend(
@@ -465,7 +463,7 @@ function SquadAuto:_selectEntries()
 			self.manualPlayers
 		),
 		--- Selects the appropriate entries based on the role.
-		---@param entry SquadPersonArgs
+		---@param entry SquadAutoPerson
 		---@return boolean
 		function(entry)
 			if self.config.status == SquadUtils.SquadStatus.INACTIVE then
@@ -476,7 +474,7 @@ function SquadAuto:_selectEntries()
 				return true
 			end
 
-			local roles = RoleUtil.readRoleArgs(table.concat({entry.role, entry.position}, ','))
+			local roles = {entry.roleData, entry.positionData}
 			local hasStaffRoles = Array.any(roles, function(role)
 				return role.type == RoleUtil.ROLE_TYPE.STAFF
 					or role.type == RoleUtil.ROLE_TYPE.UNKNOWN -- Unknown roles are assumed to be non-player
@@ -498,7 +496,7 @@ end
 ---If the type does not match, no entries are returned
 ---@private
 ---@param entries TeamHistoryEntry[]
----@return SquadPersonArgs[]
+---@return SquadAutoPerson[]
 function SquadAuto:_selectHistoryEntries(entries)
 	-- Select entries to match status
 	if self.config.status == SquadUtils.SquadStatus.ACTIVE then
@@ -569,7 +567,7 @@ end
 ---@param joinEntry TeamHistoryEntry
 ---@param inactiveEntry TeamHistoryEntry | nil
 ---@param leaveEntry TeamHistoryEntry | nil
----@return SquadPersonArgs
+---@return SquadAutoPerson
 function SquadAuto:_mapToSquadPerson(joinEntry, inactiveEntry, leaveEntry)
 	inactiveEntry = inactiveEntry or {}
 	leaveEntry = leaveEntry or {}
@@ -587,7 +585,7 @@ function SquadAuto:_mapToSquadPerson(joinEntry, inactiveEntry, leaveEntry)
 	local inactivedate = attachReference(inactiveEntry, inactiveReference)
 	local leavedate = attachReference(leaveEntry, leaveReference)
 
-	---@type SquadPersonArgs
+	---@type SquadAutoPerson
 	local entry = {
 		-- name
 		id = leaveEntry.displayname or joinEntry.displayname,
@@ -624,8 +622,12 @@ function SquadAuto:_mapToSquadPerson(joinEntry, inactiveEntry, leaveEntry)
 
 		-- From legacy: Prefer faction information from leaveEntry
 		faction = leaveEntry.faction or joinEntry.faction,
-		race = leaveEntry.faction or joinEntry.faction
+		race = leaveEntry.faction or joinEntry.faction,
 		-- game,
+
+		-- Used only by SquadAuto
+		roleData = RoleUtil.readRoleArgs(joinEntry.toRole),
+		positionData = RoleUtil.readRoleArgs(joinEntry.position)
 	}
 
 	-- On leave: Fetch the next team a person joined
@@ -666,18 +668,18 @@ function SquadAuto._fetchNextTeam(pagename, date)
 	return transfer.toteamtemplate, transfer.role2, transfer.date
 end
 
----Sorts a list of SquadPersonArgs
+---Sorts a list of persons
 -- Active entries (no leavedate) sorted by joindate,
 -- Former entries sorted by leavedate
 ---@private
----@param entries SquadPersonArgs[]
+---@param entries SquadAutoPerson[]
 ---@param useRankSort boolean?
----@return SquadPersonArgs[]
+---@return SquadAutoPerson[]
 function SquadAuto._sortEntries(entries, useRankSort)
 	return Array.sortBy(entries, function (element)
 		return {
-			useRankSort and SquadAutoRank[element.position] or SquadAutoRank[DEFAULT_RANK_KEY],
-			useRankSort and SquadAutoRank[element.role] or SquadAutoRank[DEFAULT_RANK_KEY],
+			useRankSort and (element.positionData or {}).sortOrder or 0,
+			useRankSort and (element.roleData or {}).sortOrder or 0,
 			element.leavedate or element.joindate or '',
 			element.id
 		}
