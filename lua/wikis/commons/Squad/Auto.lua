@@ -469,6 +469,7 @@ end
 ---If the status is (in)active, then at most one entry will be returned
 ---If the status is former(_inactive), there might be multiple entries returned
 ---If the type does not match, no entries are returned
+---@private
 ---@param entries TeamHistoryEntry[]
 ---@return SquadPersonArgs[]
 function SquadAuto:_selectHistoryEntries(entries)
@@ -537,6 +538,7 @@ function SquadAuto:_selectHistoryEntries(entries)
 end
 
 ---Maps one or a pair of TeamHistoryEntries to a single SquadAutoPerson
+---@private
 ---@param joinEntry TeamHistoryEntry
 ---@param inactiveEntry TeamHistoryEntry | nil
 ---@param leaveEntry TeamHistoryEntry | nil
@@ -613,6 +615,7 @@ function SquadAuto:_mapToSquadPerson(joinEntry, inactiveEntry, leaveEntry)
 end
 
 ---Fetches the next team a person joined after a given date
+---@private
 ---@param pagename string
 ---@param date string
 ---@return string? newTeam
@@ -639,6 +642,7 @@ end
 ---Sorts a list of SquadPersonArgs
 -- Active entries (no leavedate) sorted by joindate,
 -- Former entries sorted by leavedate
+---@private
 ---@param entries SquadPersonArgs[]
 ---@param useRankSort boolean?
 ---@return SquadPersonArgs[]
