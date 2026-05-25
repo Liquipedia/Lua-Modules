@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Infobox/LP15Y/Custom
+-- page=Module:Infobox/Team/Liquipedia
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
