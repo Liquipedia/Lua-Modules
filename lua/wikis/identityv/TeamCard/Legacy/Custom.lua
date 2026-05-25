@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local LegacyTeamCard = Lua.import('Module:TeamCard/Legacy')
 
@@ -30,11 +31,13 @@ end
 ---@return table
 function CustomLegacyTeamCard.preprocessCard(tcArgs)
 	for n = 1, MAX_PLAYER_INDEX do
-		local oldKey = 'pos' .. n
-		local value = tcArgs[oldKey]
+		local value = Table.extract(tcArgs, 'pos' .. n)
 		if Logic.isNotEmpty(value) then
-			tcArgs['p' .. n .. 'pos'] = POSITION_ALIASES[value:lower()] or value
-			tcArgs[oldKey] = nil
+			tcArgs['p' .. n .. 'pos'] = Logic.emptyOr(
+				tcArgs['p' .. n .. 'pos'],
+				POSITION_ALIASES[value:lower()],
+				value
+			)
 		end
 	end
 	return tcArgs
