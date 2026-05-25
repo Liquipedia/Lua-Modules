@@ -12,6 +12,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Condition = Lua.import('Module:Condition')
 local FnUtil = Lua.import('Module:FnUtil')
+local Info = Lua.import('Module:Info')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -96,6 +97,19 @@ local ROLE_INACTIVE = 'Inactive'
 ---@param frame Frame|table
 ---@return Widget|Html|string?
 function SquadAuto.run(frame)
+	if not Info.config.squads.standardizedAuto then
+		-- Legacy mode: Call old SquadAuto
+		local OldSquadAuto = Lua.import('Module:SquadAuto')
+
+		local type = SquadUtils.TypeToSquadType[(frame.args.type or ''):lower()]
+		if type == SquadUtils.SquadType.STAFF then
+			-- Old module needs special type argument for organization tables
+			frame.args.type = 'Organization_' .. frame.args.status
+		end
+
+		return OldSquadAuto[frame.args.status](frame)
+	end
+
 	local autosquad = SquadAuto(frame)
 	autosquad:parseConfig()
 	autosquad:queryTransfers()
