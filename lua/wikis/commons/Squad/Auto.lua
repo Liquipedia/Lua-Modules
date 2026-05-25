@@ -95,7 +95,7 @@ local ROLE_INACTIVE = 'Inactive'
 
 ---Entrypoint for SquadAuto tables
 ---@param frame Frame|table
----@return Widget|Html|string?
+---@return Renderable?
 function SquadAuto.run(frame)
 	if not Info.config.squads.standardizedAuto then
 		-- Legacy mode: Call old SquadAuto
@@ -113,17 +113,21 @@ function SquadAuto.run(frame)
 	end
 
 	local autosquad = SquadAuto(frame)
-	autosquad:parseConfig()
-	autosquad:queryTransfers()
+	autosquad:build()
+	return autosquad:display()
+end
 
-	local entries = autosquad:selectEntries()
-	Array.forEach(entries, FnUtil.curry(SquadAuto.enrichEntry, autosquad))
-
-	return autosquad:display(entries)
+---Handles all necessary steps to fetch and sort data
+function SquadAuto:build()
+	self:_parseConfig()
+	self:_queryTransfers()
+	local entries = self:_selectEntries()
+	Array.forEach(entries, FnUtil.curry(SquadAuto._enrichEntry, self))
 end
 
 ---Parses the args into a SquadAutoConfig
-function SquadAuto:parseConfig()
+---@private
+function SquadAuto:_parseConfig()
 	local args = self.args
 	local type = SquadUtils.TypeToSquadType[(args.type or ''):lower()]
 	local status = SquadUtils.StatusToSquadStatus[(args.status or ''):lower()]
@@ -134,7 +138,7 @@ function SquadAuto:parseConfig()
 		title = args.title
 	}
 
-	self.manualPlayers, self.enrichmentInfo = self:readManualRowInput()
+	self.manualPlayers, self.enrichmentInfo = self:_readManualRowInput()
 
 	-- Override default 'Former Squad' title
 	if status == SquadUtils.SquadStatus.FORMER
@@ -169,6 +173,7 @@ function SquadAuto:display(entries)
 	return SquadCustom.runAuto(entries, self.config.status, self.config.type, self.config.title)
 end
 
+---@private
 ---@param entries SquadPersonArgs[]
 ---@return Widget|Html|string?
 function SquadAuto:displayTabs(entries)
@@ -190,7 +195,7 @@ function SquadAuto:displayTabs(entries)
 		)
 	end
 
-	---@type table<string, any>
+	---@type table<string, integer|boolean|Widget>
 	local tabs = {
 		This = tabCount,
 		removeEmptyTabs = true
@@ -211,8 +216,9 @@ function SquadAuto:displayTabs(entries)
 	return Tabs.dynamic(tabs)
 end
 
+---@private
 ---@param entry SquadPersonArgs
-function SquadAuto:enrichEntry(entry)
+function SquadAuto:_enrichEntry(entry)
 	local pagename = Page.pageifyLink(entry.link)
 	local enrichment = self.enrichmentInfo[pagename]
 	if enrichment then
@@ -234,9 +240,10 @@ function SquadAuto:enrichEntry(entry)
 	--TODO: Captain from pagevar set in infobox?
 end
 
+---@private
 ---@return SquadPersonArgs[] manualPersons
 ---@return table<string, SquadPersonArgs> enrichmentInfo
-function SquadAuto:readManualRowInput()
+function SquadAuto:_readManualRowInput()
 	---@type SquadPersonArgs[]
 	local persons = {}
 	local enrichmentInfo = {}
@@ -295,7 +302,8 @@ function SquadAuto:readManualRowInput()
 	return persons, enrichmentInfo
 end
 
-function SquadAuto:queryTransfers()
+---@private
+function SquadAuto:_queryTransfers()
 	---Checks whether a given team is the currently queried team
 	---@param team string?
 	---@return boolean
@@ -367,7 +375,7 @@ function SquadAuto:queryTransfers()
 	Lpdb.executeMassQuery(
 		'transfer',
 		{
-			conditions = self:buildConditions(),
+			conditions = self:_buildConditions(),
 			order = 'date asc, objectname desc',
 			limit = 5000
 		},
@@ -429,8 +437,9 @@ end
 
 ---Builds the conditions to fetch all transfers related
 ---to the given team, respecting historical templates.
+---@private
 ---@return string
-function SquadAuto:buildConditions()
+function SquadAuto:_buildConditions()
 	local conditions = Condition.Tree(BooleanOperator.any)
 	Array.forEach(self.config.teams, function (templatename)
 		conditions:add{
@@ -444,8 +453,9 @@ function SquadAuto:buildConditions()
 	return conditions:toString()
 end
 
+---@private
 ---@return SquadPersonArgs[]
-function SquadAuto:selectEntries()
+function SquadAuto:_selectEntries()
 	return Array.filter(
 		Array.extend(
 			Array.flatMap(
@@ -456,6 +466,7 @@ function SquadAuto:selectEntries()
 		),
 		--- Selects the appropriate entries based on the role.
 		---@param entry SquadPersonArgs
+		---@return boolean
 		function(entry)
 			if self.config.status == SquadUtils.SquadStatus.INACTIVE then
 				-- For SquadStatus.INACTIVE the entries are already preselected
