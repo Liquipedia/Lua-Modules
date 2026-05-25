@@ -129,12 +129,12 @@ function SquadUtils.readWrapperArgs(args)
 	return SquadUtils.createWrapperData(players, squadType, squadStatus, args.title, args)
 end
 
----@param player SquadAutoPerson|SquadPersonArgs
+---@param player table|SquadPersonArgs
 ---@return SquadPersonArgs
 function SquadUtils.convertAutoParameters(player)
 	if Info.config.squads.standardizedAuto then
 		-- Temporary until all wikis have enabled the new version of automated squads
-		---@cast player -SquadAutoPerson
+		---@cast player SquadPersonArgs
 		return player
 	end
 	---@cast player -SquadPersonArgs
