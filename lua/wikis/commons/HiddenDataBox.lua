@@ -174,7 +174,7 @@ function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 	local participant = placement.opponentname
 	local participantResolved = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
 
-	local aliases = Array.map(placement.extradata.opponentaliases or {}, TeamTemplate.getPageName)
+	local aliases = Array.map((placement.extradata or {}).opponentaliases or {}, TeamTemplate.getPageName)
 	aliases = Array.extend(aliases,
 		placement.extradata.opponentaliases or {},
 		Array.map(aliases, String.upperCaseFirst),
