@@ -102,9 +102,11 @@ function SquadAuto.run(frame)
 		local OldSquadAuto = Lua.import('Module:SquadAuto')
 
 		local type = SquadUtils.TypeToSquadType[(frame.args.type or ''):lower()]
+		-- Old module needs special type argument
 		if type == SquadUtils.SquadType.STAFF then
-			-- Old module needs special type argument for organization tables
 			frame.args.type = 'Organization_' .. frame.args.status
+		else
+			frame.args.type = 'Player_' .. frame.args.status
 		end
 
 		return OldSquadAuto[frame.args.status](frame)
