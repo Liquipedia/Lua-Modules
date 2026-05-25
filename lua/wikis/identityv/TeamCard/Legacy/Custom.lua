@@ -31,14 +31,9 @@ end
 ---@return table
 function CustomLegacyTeamCard.preprocessCard(tcArgs)
 	for n = 1, MAX_PLAYER_INDEX do
-		local value = Table.extract(tcArgs, 'pos' .. n)
-		if Logic.isNotEmpty(value) then
-			tcArgs['p' .. n .. 'pos'] = Logic.emptyOr(
-				tcArgs['p' .. n .. 'pos'],
-				POSITION_ALIASES[value:lower()],
-				value
-			)
-		end
+		local oldKey = 'pos' .. n
+		local value = Table.extract(tcArgs, oldKey)
+		tcArgs['p' .. n .. 'pos'] = Logic.emptyOr(tcArgs['p' .. n .. 'pos'], POSITION_ALIASES[value:lower()], value)
 	end
 	return tcArgs
 end
