@@ -129,16 +129,9 @@ function SquadUtils.readWrapperArgs(args)
 	return SquadUtils.createWrapperData(players, squadType, squadStatus, args.title, args)
 end
 
----@param player table|SquadPersonArgs
+---@param player table
 ---@return SquadPersonArgs
 function SquadUtils.convertAutoParameters(player)
-	if Info.config.squads.standardizedAuto then
-		-- Temporary until all wikis have enabled the new version of automated squads
-		---@cast player SquadPersonArgs
-		return player
-	end
-	---@cast player -SquadPersonArgs
-
 	---@type SquadPersonArgs
 	local newPlayer = Table.copy(player)
 	local joinReference = TransferRefs.useReferences(player.joindateRef, player.joindate)
