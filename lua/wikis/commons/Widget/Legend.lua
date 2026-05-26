@@ -21,10 +21,8 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local LABEL_COLORS = {'byeup', 'seedup', 'up', 'stayup', 'stay', 'staydown', 'down'}
 
----@class LegendComponent
 local LegendComponent = {}
 
---TODO: pass defaultProps directly to Component.component (see #7476)
 LegendComponent.defaultProps = {
 	title = 'Legend',
 	showConfirmed = true,
@@ -56,7 +54,7 @@ function LegendComponent._createHeader(props)
 		children = {
 			Html.Div{children = {
 				Icon{iconName = 'general-info'},
-				Html.Span{children = {Logic.emptyOr(props.title, LegendComponent.defaultProps.title)}}
+				Html.Span{children = props.title}
 			}},
 			ChevronToggle{}
 		}
@@ -131,10 +129,7 @@ function LegendComponent._createNumberSection(props)
 	end
 
 	local labels = WidgetUtil.collect(
-		Logic.nilOr(
-			Logic.readBoolOrNil(props.showConfirmed),
-			LegendComponent.defaultProps.showConfirmed
-		) and Html.Div{
+		Logic.readBool(props.showConfirmed) and Html.Div{
 			classes = {'legend-item'},
 			children = {
 				LabelWidget{
@@ -156,10 +151,7 @@ function LegendComponent._createNumberSection(props)
 				Html.Span{children = {'Minimum placement reached'}}
 			}
 		} or nil,
-		Logic.nilOr(
-			Logic.readBoolOrNil(props.showUndecided),
-			LegendComponent.defaultProps.showUndecided
-		) and Html.Div{
+		Logic.readBool(props.showUndecided) and Html.Div{
 			classes = {'legend-item'},
 			children = {
 				LabelWidget{
@@ -182,4 +174,4 @@ function LegendComponent._createNumberSection(props)
 	}
 end
 
-return Component.component(LegendComponent.render)
+return Component.component(LegendComponent.render, LegendComponent.defaultProps)
