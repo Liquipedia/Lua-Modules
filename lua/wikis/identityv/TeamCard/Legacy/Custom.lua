@@ -14,11 +14,6 @@ local LegacyTeamCard = Lua.import('Module:TeamCard/Legacy')
 
 local MAX_PLAYER_INDEX = 10
 
-local POSITION_ALIASES = {
-	s = 'survivor',
-	h = 'hunter',
-}
-
 local CustomLegacyTeamCard = {}
 
 -- Template entry point
@@ -32,8 +27,7 @@ end
 function CustomLegacyTeamCard.preprocessCard(tcArgs)
 	for n = 1, MAX_PLAYER_INDEX do
 		local oldKey = 'pos' .. n
-		local value = Table.extract(tcArgs, oldKey)
-		tcArgs['p' .. n .. 'pos'] = Logic.emptyOr(tcArgs['p' .. n .. 'pos'], POSITION_ALIASES[value:lower()], value)
+		tcArgs['p' .. n .. 'pos'] = Logic.emptyOr(tcArgs['p' .. n .. 'pos'], Table.extract(tcArgs, oldKey))
 	end
 	return tcArgs
 end

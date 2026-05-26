@@ -21,7 +21,17 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
 
+local PositionConvert = Lua.requireIfExists('Module:PositionName/data', {loadData = true}) or {}
+
 local LegacyTeamCard = {}
+
+---@param value string?
+---@return string?
+local function normalizePosition(value)
+	if Logic.isEmpty(value) then return value end
+	---@cast value -nil
+	return PositionConvert[value:lower()] or value
+end
 
 ---@param entries table[]
 ---@return table[], table?, table[]
@@ -203,7 +213,7 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
 		team = tcArgs[prefix .. 'team'],
 		id = tcArgs[prefix .. 'id'],
 		faction = tcArgs[prefix .. 'faction'] or tcArgs[prefix .. 'race'],
-		role = tcArgs[prefix .. 'pos'],
+		role = normalizePosition(tcArgs[prefix .. 'pos']),
 		trophies = trophies,
 		joindate = tcArgs[prefix .. 'joindate'],
 		leavedate = tcArgs[prefix .. 'leavedate'],
@@ -224,7 +234,7 @@ function LegacyTeamCard.mapCoach(tcArgs, prefix, sourceGroup)
 		trophies = (wins or 0) + (winsc or 0)
 	end
 
-	local role = tcArgs[prefix .. 'pos'] or 'coach'
+	local role = normalizePosition(tcArgs[prefix .. 'pos']) or 'coach'
 
 	local status
 	if Logic.readBool(tcArgs[prefix .. 'leave']) then
