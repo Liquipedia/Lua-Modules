@@ -310,6 +310,13 @@ describe('array', function()
 	describe('Interleave', function ()
 		it('works', function()
 			assert.are_same({'a', ' ', 'b', ' ', 'c'}, Array.interleave({'a', 'b', 'c'}, ' '))
+			assert.are_same({'a'}, Array.interleave({'a'}, ' '))
+			assert.are_same({}, Array.interleave({}, ' '))
+		end)
+
+		it('with nested array', function ()
+			local a, b = Array.range(1, 3), math.pi
+			assert.are_same({{1, 2, 3}, ' ', b}, Array.interleave({a, b}, ' '))
 		end)
 	end)
 end)
