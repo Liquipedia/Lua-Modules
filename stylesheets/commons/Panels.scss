@@ -3,48 +3,35 @@ Template(s): Panels
 Author(s): FO-nTTaX
 *******************************************************************************/
 
-/* These variable definitions is used for theme detection on the function below */
-$clr-sun-10: var( --clr-sun-10 );
-$clr-tuliptree-10: var( --clr-tuliptree-10 );
-$clr-redviolet-10: var( --clr-redviolet-10 );
-$clr-gigas-10: var( --clr-gigas-10 );
-$clr-forest-10: var( --clr-forest-10 );
-$clr-wiki-theme-10: var( --clr-wiki-theme-10 );
-
-/* Check if the wiki color is included in the theme,
-   if it is, use the wiki colors for panels,
-   if not, use the default colors */
-@function isWikiColorIncluded() {
-	@return index( ( $clr-sun-10, $clr-tuliptree-10, $clr-redviolet-10, $clr-gigas-10, $clr-forest-10 ), $clr-wiki-theme-10 );
-}
-
-$panel-box-border-color--light: color-mix( in srgb, var( --clr-wiki-primary-container ) 16%, #000000 );
-$panel-box-border-color--dark: var( --clr-surface-3 );
-$panel-box-color--light: var( --clr-wiki-on-primary-container );
-$panel-box-color--dark: var( --clr-wiki-on-primary-container );
-$panel-header-background-color--light: var( --clr-wiki-primary-container );
-$panel-header-background-color--dark: color-mix( in srgb, var( --clr-wiki-primary-container ) 16%, #000000 );
-
 /* Panel box */
-@if isWikiColorIncluded() {
-	$panel-box-border-color--light: var( --clr-wiki-theme-80 );
-	$panel-box-border-color--dark: var( --clr-wiki-theme-30 );
-	$panel-box-color--light: var( --clr-wiki-theme-10 );
-	$panel-box-color--dark: var( --clr-wiki-theme-90 );
-	$panel-header-background-color--light: var( --clr-wiki-theme-90 );
-	$panel-header-background-color--dark: var( --clr-wiki-theme-20 );
+/* Default values */
+.theme--light {
+	--panel-box-border-color: color-mix( in srgb, #000000 16%, var( --clr-wiki-primary-container ) );
+	--panel-box-color: var( --clr-wiki-on-primary-container );
+	--panel-header-background-color: var( --clr-wiki-primary-container );
 }
 
-.theme--light, {
-	--panel-box-border-color: #{$panel-box-border-color--light};
-	--panel-box-color: #{$panel-box-color--light};
-	--panel-header-background-color: #{$panel-header-background-color--light};
+.theme--dark {
+	--panel-box-border-color: var( --clr-surface-3 );
+	--panel-box-color: var( --clr-wiki-on-primary-container );
+	--panel-header-background-color: color-mix( in srgb, #000000 20%, var( --clr-wiki-theme-color-20 ) );
 }
 
-.theme--dark, {
-	--panel-box-border-color: #{$panel-box-border-color--dark};
-	--panel-box-color: #{$panel-box-color--dark};
-	--panel-header-background-color: #{$panel-header-background-color--dark};
+/* If theme was in the known list */
+$themes: sun, tuliptree, redviolet, gigas, forest;
+
+@each $theme in $themes {
+	html[data-wiki-theme='#{$theme}'].theme--light {
+		--panel-box-border-color: var( --clr-#{$theme}-80 );
+		--panel-box-color: var( --clr-#{$theme}-10 );
+		--panel-header-background-color: var( --clr-#{$theme}-90 );
+	}
+
+	html[data-wiki-theme='#{$theme}'].theme--dark {
+		--panel-box-border-color: var( --clr-#{$theme}-30 );
+		--panel-box-color: var( --clr-#{$theme}-90 );
+		--panel-header-background-color: var( --clr-#{$theme}-20 );
+	}
 }
 
 // Add html prefix to get higher specificity

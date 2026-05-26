@@ -8,16 +8,16 @@ $matches-transfer-green-background-color--light: rgba( 0, 255, 0, 0.065 );
 $matches-transfer-green-background-color--dark: var( --clr-semantic-positive-10 );
 $matches-transfer-red-background-color--light: rgba( 153, 0, 34, 0.065 );
 $matches-transfer-red-background-color--dark: var( --clr-semantic-negative-10 );
-$matches-toggle-button-background-color--light: color-mix( in srgb, #ffffff, var( --clr-wiki-primary-container ), 32% );
+$matches-toggle-button-background-color--light: color-mix( in srgb, #ffffff 32%, var( --clr-wiki-primary-container ) );
 $matches-toggle-button-background-color--dark: var( --clr-wiki-theme-20 );
-$matches-toggle-button-hover-background-color--light: color-mix( in srgb, #ffffff, var( --clr-wiki-primary-container ), 50% );
+$matches-toggle-button-hover-background-color--light: color-mix( in srgb, #ffffff 50%, var( --clr-wiki-primary-container ) );
 $matches-toggle-button-hover-background-color--dark: var( --clr-wiki-theme-30 );
 $matches-toggle-button-color--light: var( --clr-wiki-on-primary-container );
 $matches-toggle-button-color--dark: var( --clr-wiki-theme-90 );
 
 /* Tournaments */
 $tournament-list-header-background-color--light: var( --clr-surface-4 );
-$tournament-list-header-background-color--dark: color-mix( in srgb, #000000, var( --clr-wiki-theme-20 ), 20% );
+$tournament-list-header-background-color--dark: color-mix( in srgb, #000000 20%, var( --clr-wiki-theme-20 ) );
 
 :root {
 	--matches-transfer-red-background-color: #{$matches-transfer-red-background-color--light};
