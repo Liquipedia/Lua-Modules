@@ -5,17 +5,17 @@ Author(s): salle
 
 /* Buttons - General */
 $button-background-color--light: var( --clr-primary );
-$button-background-color--dark: var( --clr-wiki-theme-color-20 );
+$button-background-color--dark: var( --clr-wiki-theme-20 );
 $button-background-color-hover--light: color-mix( in srgb, #ffffff 16%, var( --clr-primary ) );
-$button-background-color-hover--dark: color-mix( in srgb, #000000 16%, var( --clr-wiki-theme-color-20 ) );
+$button-background-color-hover--dark: color-mix( in srgb, #000000 16%, var( --clr-wiki-theme-20 ) );
 $button-background-color-focus--light: color-mix( in srgb, #ffffff 12%, var( --clr-primary ) );
-$button-background-color-focus--dark: color-mix( in srgb, #ffffff 12%, var( --clr-wiki-theme-color-20 ) );
+$button-background-color-focus--dark: color-mix( in srgb, #ffffff 12%, var( --clr-wiki-theme-20 ) );
 $button-background-color-active--light: color-mix( in srgb, #ffffff 8%, var( --clr-primary ) );
-$button-background-color-active--dark: color-mix( in srgb, #ffffff 8%, var( --clr-wiki-theme-color-20 ) );
+$button-background-color-active--dark: color-mix( in srgb, #ffffff 8%, var( --clr-wiki-theme-20 ) );
 $button-background-color-disabled--light: color-mix( in srgb, #000000 12%, #e3e3e3 );
 $button-background-color-disabled--dark: color-mix( in srgb, #ffffff 12%, #1f1f1f );
-$button-border-color-focus--light: var( --clr-wiki-theme-color-20 );
-$button-border-color-focus--dark: var( --clr-wiki-theme-color-40 );
+$button-border-color-focus--light: var( --clr-wiki-theme-20 );
+$button-border-color-focus--dark: var( --clr-wiki-theme-40 );
 $button-color--light: var( --clr-on-primary );
 $button-color--dark: #ffffff;
 $button-secondary-background-color-hover--light: hsl( from var( --clr-primary ) h s l / 0.08 );
@@ -25,8 +25,8 @@ $button-secondary-color--dark: var( --clr-primary-80 );
 $button-error-color--light: var( --clr-semantic-negative-40 );
 $button-error-color--dark: var( --clr-semantic-negative-80 );
 
-$button-new-primary-color--light: var( --clr-wiki-theme-color-40 );
-$button-new-primary-color--dark: var( --clr-wiki-theme-color-30 );
+$button-new-primary-color--light: var( --clr-wiki-theme-40 );
+$button-new-primary-color--dark: var( --clr-wiki-theme-30 );
 
 :root {
 	--button-background-color: #{$button-background-color--light};
