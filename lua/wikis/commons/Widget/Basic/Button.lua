@@ -16,7 +16,7 @@ local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Div = Html.Div
 
----@class ButtonWidgetParameters: HtmlNodeProps
+---@class ButtonWidgetProps: HtmlNodeProps
 ---@field title string?
 ---@field link string?
 ---@field linktype 'internal'|'external'|nil
@@ -33,7 +33,7 @@ local defaultProps = {
 	aligncontent = nil,
 }
 
----@param props ButtonWidgetParameters
+---@param props ButtonWidgetProps
 ---@return HtmlNode
 local function Button(props)
 	--- MW Parser does not allowed the <button> tag, so we use a <div>
