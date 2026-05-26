@@ -98,7 +98,7 @@ end
 ---@operator call(table): ParticipantsTeamRoster
 local ParticipantsTeamRoster = Class.new(Widget)
 
----@return Widget
+---@return Renderable
 function ParticipantsTeamRoster:render()
 	local participant = self.props.participant
 
