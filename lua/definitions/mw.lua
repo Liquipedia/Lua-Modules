@@ -183,7 +183,7 @@ function mw.html:tag(tagName, args) end
 ---@param name string
 ---@param value string|number|nil
 ---@return self
----@overload fun(self, param: {[string]: string})
+---@overload fun(self, param: {[string]: string|number|nil})
 function mw.html:attr(name, value) end
 
 ---Get the value of a html attribute previously set using html:attr() with the given name.
