@@ -75,7 +75,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Minimum range', children = {args['min range']}},
 			Cell{
 				name = HtmlWidgets.Abbr{
-					title = 'Number of frames between clicking to attack until the attack is followed through',
+					attributes = {title = 'Number of frames between clicking to attack until the attack is followed through'},
 					children = {'Frame delay'},
 				},
 				children = {args['frame delay']},
@@ -162,7 +162,7 @@ function CustomInjector:parse(id, widgets)
 			},
 			Cell{
 				name = HtmlWidgets.Abbr{
-					title = 'Reload time (in seconds)',
+					attributes = {title = 'Reload time (in seconds)'},
 					children = {'Rate of Fire'},
 				},
 				children = {args['rate of fire']},

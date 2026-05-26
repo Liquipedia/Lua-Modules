@@ -377,7 +377,7 @@ end
 ---@return Widget
 function MatchesTable._bestof(value)
 	return HtmlWidgets.Abbr{
-		title = 'Best of ' .. value,
+		attributes = {title = 'Best of ' .. value},
 		children = 'Bo' .. value
 	}
 end

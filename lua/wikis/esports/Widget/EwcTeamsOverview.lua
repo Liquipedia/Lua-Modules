@@ -168,8 +168,8 @@ function EwcTeamsOverview:render()
 				children = WidgetUtil.collect(
 					HtmlWidgets.Th{children = 'Team Name'},
 					HtmlWidgets.Th{children = ''},
-					HtmlWidgets.Th{children = HtmlWidgets.Abbr{title = 'Qualified to X/25 Tournaments', children = 'Q#'}},
-					HtmlWidgets.Th{children = HtmlWidgets.Abbr{title = 'Number of Teams', children = 'T#'}},
+					HtmlWidgets.Th{children = 'Quals'},
+					HtmlWidgets.Th{children = 'Teams'},
 					Array.map(gameData, function(game)
 						return HtmlWidgets.Th{
 							children = Template.expandTemplate(mw.getCurrentFrame(), 'LeagueIconSmall/' .. game.lis),

@@ -374,7 +374,7 @@ function TransferList:_buildHeader()
 				classes = {'Empty'},
 				children = Html.Span{
 					classes = {'mobile-hide'},
-					children = Html.Abbr{children = 'Ref', title = 'Reference'}
+					children = Html.Abbr{children = 'Ref', attributes = {title = 'Reference'}}
 				}
 			}
 		)

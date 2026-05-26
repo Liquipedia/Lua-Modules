@@ -241,14 +241,17 @@ function BaseTournamentsListing:_header()
 			config.showRank and TableWidgets.CellHeader{children = '#'} or nil,
 			config.showTier and TableWidgets.CellHeader{children = 'Tier'} or nil,
 			config.showGameIcon and TableWidgets.CellHeader{
-				children = HtmlWidgets.Abbr{title = 'Game', children = 'G'}
+				children = HtmlWidgets.Abbr{attributes = {title = 'Game'}, children = 'G'}
 			} or nil,
 			TableWidgets.CellHeader{colspan = 2, children = 'Tournament'},
 			config.showOrganizer and TableWidgets.CellHeader{children = 'Organizer'} or nil,
 			TableWidgets.CellHeader{children = 'Date'},
 			TableWidgets.CellHeader{children = 'Prize' .. NONBREAKING_SPACE .. 'Pool'},
 			TableWidgets.CellHeader{children = 'Location'},
-			TableWidgets.CellHeader{children = HtmlWidgets.Abbr{title = 'Number of Participants', children = 'P#'}},
+			TableWidgets.CellHeader{children = HtmlWidgets.Abbr{
+				attributes = {title = 'Number of Participants'},
+				children = 'P#'
+			}},
 			config.showQualifierColumnOverWinnerRunnerup
 				and TableWidgets.CellHeader{children = 'Qualified'}
 				or WidgetUtil.collect(

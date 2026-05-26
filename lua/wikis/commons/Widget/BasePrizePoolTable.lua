@@ -210,7 +210,7 @@ function BasePrizePoolTable:_pointsHeader(data)
 	end
 
 	local titleText = Logic.isNotEmpty(data.titleLong) and HtmlWidgets.Abbr{
-		children = data.title, title = data.titleLong
+		children = data.title, attributes = {title = data.titleLong}
 	} or data.title
 
 	return TableWidgets.CellHeader{children = WidgetUtil.collect(

@@ -245,7 +245,7 @@ function Appearances:_header()
 		TableWidgets.Row{children = WidgetUtil.collect(
 			TableWidgets.CellHeader{},
 			TableWidgets.CellHeader{children = 'Player'},
-			TableWidgets.CellHeader{children = HtmlWidgets.Abbr{children = 'TA.', title = 'Total appearances'}},
+			TableWidgets.CellHeader{children = HtmlWidgets.Abbr{children = 'TA.', attributes = {title = 'Total appearances'}}},
 			Array.map(self.tournaments, function (tournament)
 				return TableWidgets.CellHeader{children = TournamentTitle{
 					tournament = tournament, useShortName = true

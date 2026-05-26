@@ -71,8 +71,8 @@ function CustomExpansion:getMaps()
 		return HtmlWidgets.Fragment{children = {
 			Link{link = map},
 			'&nbsp;',
-			mapInput[prefix .. 'mode'] == 'cs' and HtmlWidgets.Abbr{title = 'Hostage', children = {'(H)'}}
-				or HtmlWidgets.Abbr{title = 'Defuse', children = {'(D)'}},
+			mapInput[prefix .. 'mode'] == 'cs' and HtmlWidgets.Abbr{attributes = {title = 'Hostage'}, children = {'(H)'}}
+				or HtmlWidgets.Abbr{attributes = {title = 'Defuse'}, children = {'(D)'}},
 		}}
 	end)
 

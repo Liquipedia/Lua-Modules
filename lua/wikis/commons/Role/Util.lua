@@ -95,7 +95,7 @@ function RoleUtil._createRoleData(roleKey)
 		sortOrder = roleData.sortOrder,
 		abbreviation = roleData.abbreviation and Html.Abbr{
 			children = roleData.abbreviation,
-			title = roleData.display,
+			attributes = {title = roleData.display},
 		} or nil,
 		icon = POSITION_ICON_DATA and POSITION_ICON_DATA[key] or nil,
 	}
