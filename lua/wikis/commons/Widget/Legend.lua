@@ -21,7 +21,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local LABEL_COLORS = {'byeup', 'seedup', 'up', 'stayup', 'stay', 'staydown', 'down'}
 
----@class LegendComponent
 local LegendComponent = {}
 
 LegendComponent.defaultProps = {
