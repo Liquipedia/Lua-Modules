@@ -37,46 +37,46 @@ Class.PRIVATE_FUNCTION_SPECIFIER = '_'
 ---@overload fun(init: fun(self, ...)): table
 ---@nodiscard
 function Class.new(base, init)
-	local instance = {}
+	local classTable = {}
 
 	if not init and type(base) == 'function' then
 		init = base
 		base = nil
 	elseif type(base) == 'table' then
 		for index, value in pairs(base) do
-			instance[index] = value
+			classTable[index] = value
 		end
-		instance._base = base
+		classTable._base = base
 	end
 
-	instance.__index = instance
+	classTable.__index = classTable
 
 	local metatable = {}
 
 	metatable.__call = function(class_tbl, ...)
-		local object = {}
-		setmetatable(object, instance)
+		local instance = {}
+		setmetatable(instance, classTable)
 
-		instance.init(object, ...)
+		classTable.init(instance, ...)
 
-		return object
+		return instance
 	end
 
-	instance.init = function(object, ...)
+	classTable.init = function(instance, ...)
 		if base then
-			base.init(object, ...)
+			base.init(instance, ...)
 		end
 		if init then
-			init(object, ...)
+			init(instance, ...)
 		end
 	end
 
-	instance.export = function(options)
-		return Class.export(instance, options)
+	classTable.export = function(options)
+		return Class.export(classTable, options)
 	end
 
-	setmetatable(instance, metatable)
-	return instance
+	setmetatable(classTable, metatable)
+	return classTable
 end
 
 ---@generic T:table

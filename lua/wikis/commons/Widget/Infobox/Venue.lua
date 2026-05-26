@@ -34,7 +34,7 @@ function Venue:render()
 
 	local venues = Array.map(Venue._parseVenues(args), Venue._createLink)
 
-	return {Cell{name = 'Venue', children = venues}}
+	return Cell{name = 'Venue', options = {collapsible = #venues > 2}, children = venues}
 end
 
 

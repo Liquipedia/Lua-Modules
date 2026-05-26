@@ -19,10 +19,11 @@ local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local MessageBox = Lua.import('Module:Message box')
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WarningBox = Lua.import('Module:Widget/WarningBox')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
@@ -34,7 +35,6 @@ local CustomInjector = Class.new(Injector)
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=Health]]'
 local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local ICON_ENERGY = '[[File:EnergyIcon.gif|link=]]'
-local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 local HOTKEY_SEPERATOR = '&nbsp;&nbsp;/&nbsp;&nbsp;'
 local SORT_TABLE = {'1v1', 'coop', 'mayhem'}
 local GAME_MODE_NAME =	{
@@ -60,9 +60,12 @@ function CustomUnit.run(frame)
 
 	local builtInfobox = unit:createInfobox()
 
-	return mw.html.create()
-		:node(builtInfobox)
-		:node(CustomUnit._deprecatedWarning(unit.args.deprecatedDisplay))
+	return HtmlWidgets.Fragment{
+		children = {
+			builtInfobox,
+			CustomUnit._deprecatedWarning(unit.args.deprecatedDisplay)
+		}
+	}
 end
 
 ---@param id string
@@ -352,15 +355,11 @@ function CustomUnit:_processPatchFromId(key)
 end
 
 ---@param patch string?
----@return Html?
+---@return Widget?
 function CustomUnit._deprecatedWarning(patch)
 	if not patch then return end
 
-	return MessageBox.main('ambox', {
-		image= ICON_DEPRECATED,
-		class='ambox-red',
-		text= 'This has been removed with Patch ' .. patch,
-	})
+	return WarningBox{text = 'This has been removed with Patch ' .. patch}
 end
 
 return CustomUnit

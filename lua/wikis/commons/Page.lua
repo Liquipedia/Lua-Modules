@@ -88,4 +88,41 @@ function Page.applyUnderScoresIfEnforced(pageName)
 	return pageName
 end
 
+---Updates the display title of the current page.
+---This function is a no-op if the supplied title is empty.
+---@param props {frame: Frame?, title: string?, noReplace: boolean?}
+---@return string?
+function Page.setDisplayTitle(props)
+	local title = props.title
+
+	if String.isEmpty(title) then
+		return
+	end
+	---@cast title -nil
+
+	local frame = props.frame or mw.getCurrentFrame()
+	return frame:callParserFunction('DISPLAYTITLE', title, props.noReplace and 'noreplace' or nil)
+end
+
+--- Splits a page name into a namespace, base, and section.
+---@param pageName string
+---@return string?, string, string?
+function Page.splitPageName(pageName)
+	local title = mw.title.new(pageName)
+	assert(title, 'Invalid pagename "' .. pageName .. '"')
+	return String.nilIfEmpty(title.nsText), title.text, String.nilIfEmpty(title.fragment)
+end
+
+--- Joins given namespace, base page name, and section into a page name.
+---@param namespaceName string?
+---@param basePageName string
+---@param section string?
+---@return string
+function Page.createPageName(namespaceName, basePageName, section)
+	if String.isEmpty(basePageName) then
+		return ''
+	end
+	return mw.title.makeTitle(namespaceName or '', basePageName, section).fullText
+end
+
 return Page

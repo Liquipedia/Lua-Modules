@@ -18,12 +18,13 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tournament = Lua.import('Module:Tournament')
+local Variables = Lua.import('Module:Variables')
 
 local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
 ---qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer,
----potentialQualifiers: standardOpponent[]?, warnings: string[]?}
+---potentialQualifiers: standardOpponent[]?, warnings: string[]?, broken: boolean?, errorMessage: string?}
 
 ---@alias QualificationMethod 'invite'|'qual'
 ---@alias QualificationType 'tournament'|'internal'|'external'|'other'
@@ -133,7 +134,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 	local opponent
 	local warnings = {}
 
-	local date = DateExt.parseIsoDate(input.date) or defaultDate -- TODO: fetch from wiki var too
+	local date = DateExt.parseIsoDate(input.date)
 
 	if input.contenders then
 		opponent = Opponent.tbd(Opponent.team)
@@ -155,6 +156,21 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		opponent = Opponent.readOpponentArgs(Table.merge(input, {
 			type = Opponent.team,
 		}))
+
+		if not TeamTemplate.exists(opponent.template) then
+			return {
+				opponent = opponent,
+				broken = true,
+				errorMessage = TeamTemplate.noTeamMessage(opponent.template),
+				aliases = {},
+				notes = {},
+				potentialQualifiers = {},
+				warnings = {},
+				shouldImportFromDb = false,
+				date = date or defaultDate,
+			}
+		end
+
 		opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
 		local resolvedOptions = {
 			syncPlayer = true,
@@ -165,6 +181,12 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 				false
 			)
 		}
+
+		local opponentName = Opponent.toName(opponent)
+		local prizePoolDate = Variables.varDefault('enddate_' .. opponentName)
+			or Variables.varDefault('enddate_' .. opponentName .. '_date')
+		date = date or DateExt.parseIsoDate(prizePoolDate) or defaultDate
+
 		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), resolvedOptions)
 	end
 
@@ -193,7 +215,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		potentialQualifiers = potentialQualifiers,
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
-		date = date,
+		date = date or defaultDate,
 	}
 end
 
@@ -211,20 +233,26 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 	local playedInput = Logic.readBoolOrNil(playerInput.played)
 	local resultsInput = Logic.readBoolOrNil(playerInput.results)
 	local roles = RoleUtil.readRoleArgs(playerInput.role)
-	local playerType = playerInput.type or 'player'
+	local inputType = playerInput.type or 'player'
+	local hasStaffRoles = Array.any(roles, function(role) return role.type == RoleUtil.ROLE_TYPE.STAFF end)
 
-	local hasNoStaffRoles = Array.all(roles, function(role) return role.type ~= RoleUtil.ROLE_TYPE.STAFF end)
-
-	if playerType ~= 'staff' and not hasNoStaffRoles then
+	local playerType
+	if inputType == 'staff' or hasStaffRoles then
 		playerType = 'staff'
+	else
+		playerType = 'player'
 	end
 
 	player.extradata = {
 		roles = roles,
 		trophies = tonumber(playerInput.trophies),
 		type = playerType,
+		status = playerInput.status,
 		played = Logic.nilOr(playedInput, true),
 		results = Logic.nilOr(resultsInput, playedInput, true),
+		number = tonumber(playerInput.number),
+		joinDate = Logic.nilIfEmpty(playerInput.joindate),
+		leaveDate = Logic.nilIfEmpty(playerInput.leavedate),
 	}
 	return player
 end
@@ -239,16 +267,16 @@ function TeamParticipantsWikiParser.fillIncompleteRoster(opponent, minimumPlayer
 		return
 	end
 
-	local actualPlayers = Array.filter(opponent.players, function(player)
-		return player.extradata.type == 'player'
+	local activePlayers = Array.filter(opponent.players, function(player)
+		return player.extradata.type == 'player' and not player.extradata.status
 	end)
 
-	local actualPlayerCount = #actualPlayers
-	if actualPlayerCount >= expectedPlayerCount then
+	local activePlayerCount = #activePlayers
+	if activePlayerCount >= expectedPlayerCount then
 		return
 	end
 
-	local tbdPlayers = TeamParticipantsWikiParser.createTBDPlayers(expectedPlayerCount - actualPlayerCount)
+	local tbdPlayers = TeamParticipantsWikiParser.createTBDPlayers(expectedPlayerCount - activePlayerCount)
 	Array.extendWith(opponent.players, tbdPlayers)
 end
 

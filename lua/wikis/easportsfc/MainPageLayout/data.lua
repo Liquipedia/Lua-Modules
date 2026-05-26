@@ -67,7 +67,7 @@ local CONTENT = {
 	matches = {
 		heading = 'Matches',
 		body = MatchTicker{},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 		panelAttributes = {
 			['data-switch-group-container'] = 'countdown',
@@ -183,7 +183,7 @@ return {
 								},
 							},
 							{
-								size = 7,
+								size = 6,
 								children = {
 									{
 										noPanel = true,
@@ -192,7 +192,7 @@ return {
 								},
 							},
 							{
-								size = 5,
+								size = 6,
 								children = {
 									{
 										noPanel = true,

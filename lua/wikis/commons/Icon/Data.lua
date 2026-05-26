@@ -26,7 +26,6 @@ return {
 	matchpagelink = 'far fa-swords',
 	matchpopup = 'fas fa-info-circle',
 	timeout = 'far fa-clock',
-	veto = 'fas fa-times',
 	casters = 'fas fa-microphone-alt',
 	comment = 'far fa-comment',
 	mvp = 'fas fa-medal',
@@ -39,6 +38,13 @@ return {
 	surrendered = 'far fa-flag',
 	ace_valorant = 'fas fa-dagger',
 	flawless_valorant = 'fas fa-gem',
+
+	-- Usage: Veto labels
+	veto_pick = 'fas fa-check',
+	veto_ban = 'fas fa-times',
+	veto_defaultban = 'fas fa-times',
+	veto_decider = 'fas fa-flag-checkered',
+	veto_protect = 'fas fa-lock',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
@@ -65,8 +71,11 @@ return {
 	left = 'fas fa-chevron-circle-left',
 
 	-- Usage: Indicate if a team/player went up or down in placement in a league system or in a ranking system
-	rankup = 'fas fa-long-arrow-up',
-	rankdown = 'fas fa-long-arrow-down',
+	rankup = 'fas fa-chevron-up',
+	rankup_double = 'fas fa-chevron-double-up',
+	rankneutral = 'fas fa-minus',
+	rankdown = 'fas fa-chevron-down',
+	rankdown_double = 'fas fa-chevron-double-down',
 
 	-- Usage: Main Page buttons
 	featuredon = 'far fa-star',
@@ -256,6 +265,20 @@ return {
 	dota2_spl_interactions = 'fad fa-atom-alt',
 	dota2_spl_status = 'fas fa-hourglass-half',
 	dota2_spl_misc = 'fad fa-list-ul',
+
+	-- Usage: Dota2 Hero tabbber tabs
+	dota2_ht_overview = 'fas fa-id-badge',
+	dota2_ht_matches = 'fas fa-trophy',
+	dota2_ht_changelogs = 'fas fa-file-alt',
+	dota2_ht_responses = 'fas fa-microphone-alt',
+	dota2_ht_sounds = 'fas fa-volume',
+	dota2_ht_animations = 'far fa-running',
+	dota2_ht_lore = 'fas fa-scroll-old',
+	dota2_ht_equipment = 'fas fa-helmet-battle',
+	dota2_ht_relics = 'fad fa-diamond',
+	dota2_ht_old_abilties = 'fad fa-book-spells',
+	dota2_ht_calc = 'fas fa-function',
+	dota2_ht_unreleased = 'fad fa-archive',
 
 	-- Usage: Info button
 	['general-info'] = 'fas fa-info-circle',

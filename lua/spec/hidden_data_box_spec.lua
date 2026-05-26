@@ -5,6 +5,16 @@ describe('hidden data box', function()
 	local Variables = require('Module:Variables')
 	local WarningBox = require('Module:Widget/WarningBox')
 
+	local AddCategorySpy
+
+	before_each(function()
+		AddCategorySpy = spy.on(mw.ext.TeamLiquidIntegration, 'add_category')
+	end)
+
+	after_each(function()
+		AddCategorySpy:revert()
+	end)
+
 	describe('tier parseing', function()
 		it('empty tier return nil', function()
 			assert.is_nil(Hdb.validateTier())
@@ -19,12 +29,14 @@ describe('hidden data box', function()
 
 		it('unknown tier', function()
 			local _, _, warnings = Hdb.validateTier('Qualifier')
-			assert.are_same({'Qualifier is not a known Liquipedia Tier[[Category:Pages with invalid Tier]]'}, warnings)
+			assert.are_same({'Qualifier is not a known Liquipedia Tier'}, warnings)
+			assert.stub(AddCategorySpy).was.called_with('Pages with invalid Tier')
 		end)
 
 		it('unknown tiertype', function()
 			local _, _, warnings = Hdb.validateTier(nil, 'Abc')
-			assert.are_same({'Abc is not a known Liquipedia Tiertype[[Category:Pages with invalid Tiertype]]'}, warnings)
+			assert.are_same({'Abc is not a known Liquipedia Tiertype'}, warnings)
+			assert.stub(AddCategorySpy).was.called_with('Pages with invalid Tiertype')
 		end)
 	end)
 
@@ -40,9 +52,10 @@ describe('hidden data box', function()
 
 		it('has correct warning', function()
 			assert.are_same(
-				tostring(WarningBox{text = 'DummyPage is not a Liquipedia Tournament[[Category:Pages with invalid parent]]'}),
+				tostring(WarningBox{text = 'DummyPage is not a Liquipedia Tournament'}),
 				tostring(Hdb.run({parent = 'DummyPage'}))
 			)
+			assert.stub(AddCategorySpy).was.called_with('Pages with invalid parent')
 		end)
 	end)
 

@@ -36,6 +36,7 @@ function MatchTicker:render()
 				['font-size'] = '15px',
 				['font-style'] = 'italic',
 				['text-align'] = 'center',
+				padding = '0.5rem 1rem',
 			},
 			children = { Link{ children = 'See more matches', link = self.props.matchesPortal} }
 		}

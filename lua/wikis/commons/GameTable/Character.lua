@@ -10,10 +10,12 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
+local Tournament = Lua.import('Module:Tournament')
 
 local GameTable = Lua.import('Module:GameTable')
 
@@ -525,6 +527,7 @@ end
 ---@return Widget
 function CharacterGameTable:gameRow(match, game)
 	return TableWidgets.Row{
+		highlighted = HighlightConditions.tournament(Tournament.partialTournamentFromMatch(match), self.args),
 		children = WidgetUtil.collect(
 			self:_displayDate(match),
 			self:displayTier(match),

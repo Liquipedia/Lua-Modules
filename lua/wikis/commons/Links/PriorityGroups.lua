@@ -41,6 +41,8 @@ return {
 		'faceit-c',
 		'faceit-hub',
 		'faceit-org',
+		'csgo-fastcup',
+		'cs2-fastcup',
 		'fide',
 		'gamersclub',
 		'geoguessr',

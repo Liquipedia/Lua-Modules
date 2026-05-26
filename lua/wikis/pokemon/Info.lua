@@ -53,7 +53,7 @@ return {
 		go = {
 			abbreviation = 'GO',
 			link = 'Pokemon Go',
-			name = 'Pokemon Go',
+			name = 'Pokemon GO',
 			logo = {
 				darkMode = 'Pokemon GO allmode.png',
 				lightMode = 'Pokemon GO allmode.png',

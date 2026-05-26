@@ -98,8 +98,10 @@ function BaseResultsTable:readConfig()
 		aliases = Array.parseCommaSeparatedString(args.aliases)
 	}
 
-	config.sort = args.sort or
-		(config.onlyAchievements and 'weight' or 'date')
+	config.sort = Logic.emptyOr(
+		Array.parseCommaSeparatedString(args.sort),
+		Array.extend(config.onlyAchievements and 'weight' or nil, 'date')
+	)
 
 	config.limit = tonumber(args.limit) or
 		(config.onlyAchievements and DEFAULT_VALUES.achievementsLimit or DEFAULT_VALUES.resultsLimit)
@@ -182,7 +184,7 @@ end
 function BaseResultsTable:queryData()
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = self.config.limit,
-		order = self.config.sort .. ' ' .. self.config.order,
+		order = self:_getQueryOrder(),
 		conditions = self:buildConditions(),
 	})
 
@@ -192,6 +194,14 @@ function BaseResultsTable:queryData()
 	end
 
 	return data
+end
+
+---@private
+---@return string
+function BaseResultsTable:_getQueryOrder()
+	return table.concat(Array.map(self.config.sort, function (sort)
+		return sort .. ' ' .. self.config.order
+	end), ',')
 end
 
 ---Builds the conditions for the results, achievements, awards table
@@ -459,7 +469,7 @@ end
 ---@protected
 ---@param data placement
 ---@param options table?
----@return string|Widget?
+---@return string|Widget|Widget[]?
 function BaseResultsTable:opponentDisplay(data, options)
 	options = options or {}
 
@@ -498,7 +508,7 @@ function BaseResultsTable:opponentDisplay(data, options)
 	}
 
 	if self:shouldDisplayAdditionalText(rawTeamTemplate, not options.isLastVs) then
-		return BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, options.flip)
+		return BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate)
 	end
 
 	return teamDisplay
@@ -521,30 +531,23 @@ end
 ---Builds team icon display with text below it
 ---@param teamDisplay Widget
 ---@param rawTeamTemplate teamTemplateData
----@param flip boolean?
----@return Widget
-function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, flip)
-	return HtmlWidgets.Fragment{children = {
+---@return Widget[]
+function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate)
+	return {
 		teamDisplay,
 		HtmlWidgets.Div{
 			css = {
-				width = '60px',
-				float = flip and 'right' or 'left',
+				['line-height'] = 1,
+				['font-size'] = '80%',
+				['text-align'] = 'center',
 			},
-			children = HtmlWidgets.Div{
-				css = {
-					['line-height'] = 1,
-					['font-size'] = '80%',
-					['text-align'] = 'center',
-				},
-				children = {
-					'(',
-					LinkWidget{link = rawTeamTemplate.page, children = rawTeamTemplate.shortname},
-					')'
-				}
+			children = {
+				'(',
+				LinkWidget{link = rawTeamTemplate.page, children = rawTeamTemplate.shortname},
+				')'
 			}
 		}
-	}}
+	}
 end
 
 ---Builds the tournament display name

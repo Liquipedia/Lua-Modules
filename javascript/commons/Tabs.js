@@ -6,14 +6,19 @@
 
 const TABS_CONFIG = {
 	SELECTORS: {
-		CONTAINER: '.tabs-dynamic',
-		NAV_WRAPPER: '.tabs-nav-wrapper',
-		NAV_TABS: '.nav-tabs',
-		CONTENT_CONTAINER: '.tabs-content',
-		ARROW_LEFT: '.tabs-scroll-arrow-wrapper--left',
-		ARROW_RIGHT: '.tabs-scroll-arrow-wrapper--right',
+		DYNAMIC_CONTAINER: '[data-tabs-dynamic]',
+		STATIC_CONTAINER: '[data-tabs-static]',
+		NAV_WRAPPER: '[data-tabs-nav-wrapper]',
+		NAV_TABS: '[data-tabs-nav]',
+		CONTENT_CONTAINER: '[data-tabs-content]',
+		ARROW_LEFT: '[data-tabs-arrow-left]',
+		ARROW_RIGHT: '[data-tabs-arrow-right]',
 		ACTIVE_TAB: 'li.active',
-		TAB_ITEMS: 'li'
+		TAB_ITEMS: 'li',
+		STATIC_DROPDOWN: '[data-tabs-static-dropdown]',
+		STATIC_DROPDOWN_LABEL: '[data-tabs-static-dropdown-label]',
+		DIRECT_CHILD_TABS_CONTENT: ':scope > [data-tabs-content]',
+		DIRECT_CHILD_ANALYTICS_STATIC: ':scope > [data-analytics-name="Navigation tab"] > [data-tabs-static]'
 	},
 	SCROLL: {
 		ARROW_STEP: 200,
@@ -22,7 +27,6 @@ const TABS_CONFIG = {
 		ARROW_VISIBILITY_THRESHOLD: 5
 	},
 	TIMEOUTS: {
-		INITIAL_SCROLL: 100,
 		ARROW_UPDATE: 300,
 		HASH_SCROLL: 500
 	},
@@ -30,7 +34,16 @@ const TABS_CONFIG = {
 		ACTIVE: 'active',
 		DRAGGING: 'dragging',
 		SHOW_ALL: 'show-all',
-		VISIBLE: 'visible'
+		VISIBLE: 'visible',
+		STATIC_NESTING_ICON: 'tabs-static-dropdown-nesting-icon'
+	},
+	ATTRIBUTES: {
+		STATIC_DROPDOWN_GROUPED: 'data-mobile-dropdown-grouped',
+		STATIC_DROPDOWN_READY: 'data-mobile-dropdown-ready',
+		DROPDOWN_TOGGLE: 'data-dropdown-toggle'
+	},
+	ICONS: {
+		CHEVRON_RIGHT: 'fas fa-chevron-right fa-xs'
 	}
 };
 
@@ -99,10 +112,19 @@ class TabContainer {
 
 	init() {
 		this.indexElements();
+		if ( this.container.hasAttribute( 'data-tabs-dynamic' ) ) {
+			this.setupContentHandlers();
+		}
+		this.setupScrollHandlers();
+	}
+
+	setupContentHandlers() {
 		this.createMobileHeadings();
 		this.setupClickHandlers();
 		this.setupKeyboardNavigation();
+	}
 
+	setupScrollHandlers() {
 		if ( !this.wraps ) {
 			this.setupDragToScroll();
 			this.setupArrows();
@@ -116,7 +138,7 @@ class TabContainer {
 		}
 
 		const nextSibling = this.container.nextElementSibling;
-		if ( nextSibling?.classList.contains( 'tabs-content' ) ) {
+		if ( nextSibling?.hasAttribute( 'data-tabs-content' ) ) {
 			return Array.from( nextSibling.children );
 		}
 
@@ -422,10 +444,14 @@ class TabContainer {
 		const itemWidth = activeTab.clientWidth;
 		const targetScroll = itemOffset - ( sliderWidth / 2 ) + ( itemWidth / 2 );
 
-		this.navTabs.scrollTo( {
-			left: targetScroll,
-			behavior: instant ? 'auto' : 'smooth'
-		} );
+		if ( typeof this.navTabs.scrollTo === 'function' ) {
+			this.navTabs.scrollTo( {
+				left: targetScroll,
+				behavior: instant ? 'auto' : 'smooth'
+			} );
+		} else {
+			this.navTabs.scrollLeft = targetScroll;
+		}
 
 		setTimeout( () => {
 			if ( this.navWrapper ) {
@@ -443,7 +469,7 @@ class TabContainer {
 			this.scrollToActiveTab();
 		}
 
-		const content = this.container.querySelector( `.tabs-content > .content${ tabNumber }` );
+		const content = this.container.querySelector( `[data-tabs-content] > .content${ tabNumber }` );
 		if ( content ) {
 			content.classList.add( TABS_CONFIG.CLASSES.ACTIVE );
 		}
@@ -493,7 +519,7 @@ class HashRouter {
 			const element = document.getElementById( escapedHash );
 
 			if ( element ) {
-				const tabContent = element.closest( '.tabs-dynamic .tabs-content > div' );
+				const tabContent = element.closest( '[data-tabs-dynamic] [data-tabs-content] > div' );
 				if ( tabContent ) {
 					tabNumber = tabContent.dataset.count;
 					if ( tabNumber ) {
@@ -512,9 +538,9 @@ class HashRouter {
 		}
 
 		if ( scrollToElement ) {
-			const tabsContainer = scrollToElement.closest( TABS_CONFIG.SELECTORS.CONTAINER );
+			const tabsContainer = scrollToElement.closest( TABS_CONFIG.SELECTORS.DYNAMIC_CONTAINER );
 			if ( tabsContainer ) {
-				const container = this.tabsModule.getContainer( tabsContainer );
+				const container = this.tabsModule.getDynamicContainer( tabsContainer );
 				if ( container ) {
 					container.activateTab( tabNumber );
 				}
@@ -525,7 +551,7 @@ class HashRouter {
 				}, TABS_CONFIG.TIMEOUTS.HASH_SCROLL );
 			}
 		} else {
-			this.tabsModule.getAllContainers().forEach( ( container ) => {
+			this.tabsModule.getDynamicContainers().forEach( ( container ) => {
 				container.activateTab( tabNumber );
 			} );
 		}
@@ -542,7 +568,9 @@ class HashRouter {
  */
 class TabsModule {
 	constructor() {
-		this.tabContainers = new Map();
+		this.dynamicContainers = new Map();
+		this.staticScrollContainers = new Set();
+		this.staticCleanupFunctions = new Set();
 		this.hashRouter = new HashRouter( this );
 	}
 
@@ -552,26 +580,271 @@ class TabsModule {
 	}
 
 	initializeContainers() {
-		const containers = document.querySelectorAll( TABS_CONFIG.SELECTORS.CONTAINER );
-		containers.forEach( ( containerElement ) => {
+		const selector = `${ TABS_CONFIG.SELECTORS.DYNAMIC_CONTAINER }, ${ TABS_CONFIG.SELECTORS.STATIC_CONTAINER }`;
+		document.querySelectorAll( selector ).forEach( ( containerElement ) => {
 			const container = new TabContainer( containerElement );
-			if ( container.navTabs ) {
-				this.tabContainers.set( containerElement, container );
+			if ( !container.navTabs ) {
+				return;
 			}
+			if ( containerElement.hasAttribute( 'data-tabs-dynamic' ) ) {
+				this.dynamicContainers.set( containerElement, container );
+			} else {
+				this.staticScrollContainers.add( container );
+			}
+		} );
+
+		this.initializeStaticTabs();
+	}
+
+	initializeStaticTabs() {
+		const processed = new Set();
+		document.querySelectorAll( TABS_CONFIG.SELECTORS.STATIC_CONTAINER ).forEach( ( containerElement ) => {
+			if ( processed.has( containerElement ) ) {
+				return;
+			}
+
+			const group = this.collectStaticGroup( containerElement, processed );
+			this.setupStaticGroup( group );
 		} );
 	}
 
-	getContainer( element ) {
-		return this.tabContainers.get( element );
+	// Walks the static tab hierarchy starting from startElement, collecting all related containers
+	// (nested children and adjacent siblings) into a single group for the mobile dropdown.
+	collectStaticGroup( startElement, processed ) {
+		const group = [];
+		let currentElement = startElement;
+
+		while ( currentElement && !processed.has( currentElement ) ) {
+			group.push( currentElement );
+			processed.add( currentElement );
+			currentElement = this.getNextStaticGroupElement( currentElement, processed );
+		}
+
+		return group;
 	}
 
-	getAllContainers() {
-		return Array.from( this.tabContainers.values() );
+	// Returns the next container to add to the group: prefers a nested child tab row,
+	// then falls back to an adjacent sibling tab row at the same level.
+	getNextStaticGroupElement( containerElement, processed ) {
+		const nestedElement = this.getNestedStaticChild( containerElement );
+		if ( nestedElement && !processed.has( nestedElement ) ) {
+			return nestedElement;
+		}
+
+		const anchor = this.getStaticAnchor( containerElement );
+		const nextAnchor = anchor?.nextElementSibling;
+		const siblingElement = this.getStaticContainerFromNode( nextAnchor );
+		if ( siblingElement && !processed.has( siblingElement ) ) {
+			return siblingElement;
+		}
+
+		return null;
+	}
+
+	// Finds the first nested static tab container inside containerElement, handling both
+	// the tabsN pattern (static directly inside content) and the tabs1 pattern (analytics wrapper).
+	getNestedStaticChild( containerElement ) {
+		const directChildStatic = containerElement.querySelector( TABS_CONFIG.SELECTORS.DIRECT_CHILD_ANALYTICS_STATIC );
+		if ( directChildStatic ) {
+			return directChildStatic;
+		}
+
+		const contentContainer = containerElement.querySelector( TABS_CONFIG.SELECTORS.DIRECT_CHILD_TABS_CONTENT );
+		if ( !contentContainer ) {
+			return null;
+		}
+
+		return this.getStaticContainerFromNode( contentContainer.firstElementChild ) ||
+			Array.from( contentContainer.children )
+				.map( ( child ) => this.getStaticContainerFromNode( child ) )
+				.find( Boolean ) || null;
+	}
+
+	getStaticAnchor( containerElement ) {
+		const parent = containerElement.parentElement;
+		return parent?.getAttribute( 'data-analytics-name' ) === 'Navigation tab' ? parent : containerElement;
+	}
+
+	getStaticContainerFromNode( node ) {
+		if ( !node ) {
+			return null;
+		}
+
+		if ( node.matches?.( TABS_CONFIG.SELECTORS.STATIC_CONTAINER ) ) {
+			return node;
+		}
+
+		return node.querySelector?.( ':scope > .tabs-static' ) || null;
+	}
+
+	setupStaticGroup( group ) {
+		const primaryContainer = group[ 0 ];
+		if ( !primaryContainer ) {
+			return;
+		}
+
+		group.slice( 1 ).forEach( ( containerElement ) => {
+			containerElement.setAttribute( TABS_CONFIG.ATTRIBUTES.STATIC_DROPDOWN_GROUPED, 'true' );
+		} );
+
+		const dropdown = this.ensureStaticDropdown( primaryContainer );
+
+		const renderGroup = () => this.renderStaticGroup( group );
+		renderGroup();
+		primaryContainer.setAttribute( TABS_CONFIG.ATTRIBUTES.STATIC_DROPDOWN_READY, 'true' );
+
+		dropdown.addEventListener( 'dropdown:beforeopen', renderGroup );
+		this.staticCleanupFunctions.add( () => {
+			dropdown.removeEventListener( 'dropdown:beforeopen', renderGroup );
+			primaryContainer.removeAttribute( TABS_CONFIG.ATTRIBUTES.STATIC_DROPDOWN_READY );
+			group.slice( 1 ).forEach( ( containerElement ) => {
+				containerElement.removeAttribute( TABS_CONFIG.ATTRIBUTES.STATIC_DROPDOWN_GROUPED );
+			} );
+		} );
+	}
+
+	ensureStaticDropdown( containerElement ) {
+		const existingDropdown = containerElement.querySelector(
+			`:scope > ${ TABS_CONFIG.SELECTORS.STATIC_DROPDOWN }`
+		);
+		if ( existingDropdown ) {
+			return existingDropdown;
+		}
+
+		const dropdown = TabsDOMUtils.createElement(
+			'div',
+			{ class: 'dropdown-widget dropdown-widget--form', 'data-tabs-static-dropdown': '' },
+			[
+				TabsDOMUtils.createElement( 'div', {
+					class: 'dropdown-widget__toggle',
+					role: 'button',
+					tabindex: '0',
+					'aria-expanded': 'false',
+					'aria-haspopup': 'menu',
+					[ TABS_CONFIG.ATTRIBUTES.DROPDOWN_TOGGLE ]: 'true'
+				}, [
+					TabsDOMUtils.createElement( 'span', {
+						class: 'dropdown-widget__prefix tabs-static-dropdown-icon'
+					} ),
+					TabsDOMUtils.createElement( 'span', {
+						class: 'dropdown-widget__label',
+						'data-tabs-static-dropdown-label': ''
+					} ),
+					TabsDOMUtils.createElement( 'span', { class: 'dropdown-widget__indicator' }, [
+						TabsDOMUtils.createElement( 'i', { class: 'far fa-chevron-down fa-xs' } )
+					] )
+				] ),
+				TabsDOMUtils.createElement( 'div', { class: 'dropdown-widget__menu', 'aria-hidden': 'true' }, [
+					TabsDOMUtils.createElement( 'ul' )
+				] )
+			]
+		);
+
+		const navWrapper = containerElement.querySelector( `:scope > ${ TABS_CONFIG.SELECTORS.NAV_WRAPPER }` );
+		navWrapper?.insertAdjacentElement( 'afterend', dropdown );
+		return dropdown;
+	}
+
+	renderStaticGroup( group ) {
+		const primaryContainer = group[ 0 ];
+		const label = primaryContainer?.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN_LABEL );
+		const menuList = primaryContainer?.querySelector( '.dropdown-widget__menu > ul' );
+		if ( !label || !menuList ) {
+			return;
+		}
+
+		const segments = group
+			.map( ( container ) => this.getStaticActiveLabel( container ) )
+			.filter( Boolean );
+
+		label.replaceChildren( ...this.buildBreadcrumbNodes( segments ) );
+		menuList.replaceChildren( ...this.buildStaticMenuList( group ) );
+	}
+
+	getStaticNavTabs( containerElement ) {
+		return containerElement?.querySelector( ':scope > [data-tabs-nav-wrapper] > [data-tabs-nav]' ) ?? null;
+	}
+
+	getStaticActiveLabel( containerElement ) {
+		const activeItem = this.getStaticNavTabs( containerElement )?.querySelector( 'li.active' ) ?? null;
+		return activeItem ? ( activeItem.textContent || '' ).trim() : null;
+	}
+
+	buildBreadcrumbNodes( segments ) {
+		return segments.flatMap( ( segment, index ) => {
+			const nodes = [];
+			if ( index > 0 ) {
+				const separator = document.createElement( 'i' );
+				separator.classList.add( ...TABS_CONFIG.ICONS.CHEVRON_RIGHT.split( ' ' ) );
+				nodes.push( separator );
+			}
+			nodes.push( document.createElement( 'span' ) );
+			nodes[ nodes.length - 1 ].textContent = segment;
+			return nodes;
+		} );
+	}
+
+	buildStaticMenuList( group, level = 0 ) {
+		const containerElement = group[ level ];
+		if ( !containerElement ) {
+			return [];
+		}
+
+		const navItems = Array.from( this.getStaticNavTabs( containerElement )?.children || [] )
+			.map( ( navItem ) => this.cloneStaticMenuItem( navItem, level ) );
+
+		const activeItem = navItems.find( ( navItem ) => navItem.classList.contains( TABS_CONFIG.CLASSES.ACTIVE ) );
+		const nestedItems = this.buildStaticMenuList( group, level + 1 );
+		if ( activeItem && nestedItems.length > 0 ) {
+			const nestedList = document.createElement( 'ul' );
+			nestedList.replaceChildren( ...nestedItems );
+			activeItem.appendChild( nestedList );
+		}
+
+		return navItems;
+	}
+
+	cloneStaticMenuItem( navItem, level ) {
+		const clone = navItem.cloneNode( true );
+		const content = clone.querySelector( ':scope > a, :scope > span' );
+
+		if ( content ) {
+			content.classList.add( 'dropdown-widget__item' );
+			if ( clone.classList.contains( TABS_CONFIG.CLASSES.ACTIVE ) ) {
+				content.classList.add( TABS_CONFIG.CLASSES.ACTIVE );
+			}
+		}
+
+		if ( level === 0 ) {
+			return clone;
+		}
+
+		if ( content ) {
+			content.style.setProperty( '--tabs-static-menu-level', String( level ) );
+			const icon = document.createElement( 'i' );
+			icon.classList.add( TABS_CONFIG.CLASSES.STATIC_NESTING_ICON );
+			icon.classList.add( ...TABS_CONFIG.ICONS.CHEVRON_RIGHT.split( ' ' ) );
+			content.prepend( icon );
+		}
+
+		return clone;
+	}
+
+	getDynamicContainer( element ) {
+		return this.dynamicContainers.get( element );
+	}
+
+	getDynamicContainers() {
+		return Array.from( this.dynamicContainers.values() );
 	}
 
 	cleanup() {
-		this.tabContainers.forEach( ( container ) => container.cleanup() );
-		this.tabContainers.clear();
+		this.dynamicContainers.forEach( ( container ) => container.cleanup() );
+		this.dynamicContainers.clear();
+		this.staticScrollContainers.forEach( ( container ) => container.cleanup() );
+		this.staticScrollContainers.clear();
+		this.staticCleanupFunctions.forEach( ( cleanupFn ) => cleanupFn() );
+		this.staticCleanupFunctions.clear();
 		this.hashRouter.cleanup();
 	}
 }

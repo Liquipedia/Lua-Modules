@@ -106,9 +106,10 @@ end
 function CustomUnit:getWikiCategories(args)
 	local postfix = ' Cards'
 	local costType = self:getCostType()
+	local costDisplay = self:getCostDisplay()
 	return Array.append({},
 		'Cards',
-		'Cards costing ' .. self:getCostDisplay(),
+		costDisplay and ('Cards costing ' .. costDisplay) or nil,
 		(costType == TYPE_TO_COST_TYPE.default and 'Item' or '') .. postfix,
 		args.type and (args.type .. postfix) or nil,
 		args.color and (args.color .. postfix) or nil,
@@ -125,9 +126,12 @@ function CustomUnit:getCostType()
 	return TYPE_TO_COST_TYPE[(self.args.type or ''):lower()] or TYPE_TO_COST_TYPE.default
 end
 
----@return string
+---@return string?
 function CustomUnit:getCostDisplay()
 	local costType = self:getCostType()
+	if not self.args[costType] then
+		return
+	end
 	return self.args[costType] .. ' ' .. costType .. (costType ~= TYPE_TO_COST_TYPE.default and ' coins' or '')
 end
 

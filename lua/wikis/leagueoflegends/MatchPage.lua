@@ -59,7 +59,9 @@ local KEYSTONES = Table.map({
 	-- Sorcery
 	'Summon Aery',
 	'Arcane Comet',
+	'Deathfire Touch',
 	'Phase Rush',
+	'Stormraider\'s Surge',
 
 	-- Resolve
 	'Grasp of the Undying',
@@ -152,6 +154,7 @@ function MatchPage:renderOverallStats()
 							},
 							Div{
 								classes = {'match-bm-team-stats-list-cell'},
+								css = {flex = 1},
 								children = self:getTournamentIcon()
 							},
 							Div{
@@ -208,7 +211,9 @@ function MatchPage:renderOverallStats()
 						},
 						PlayerStat{
 							title = {KP_ICON, 'KP%'},
-							data = MathUtil.formatPercentage(player.extradata.killparticipation, 1)
+							data = player.extradata.killparticipation and MathUtil.formatPercentage(
+								player.extradata.killparticipation, 1
+							) or '-'
 						},
 						PlayerStat{
 							title = {
@@ -553,6 +558,7 @@ function MatchPage:_renderTeamStats(game)
 						},
 						Div{
 							classes = {'match-bm-team-stats-list-cell'},
+							css = {flex = 1},
 							children = self:isBestOfOne() and self:_buildGameResultSummary(game) or self:getTournamentIcon()
 						},
 						Div{
@@ -638,7 +644,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 					},
 					PlayerStat{
 						title = {KP_ICON, 'KP%'},
-						data = MathUtil.formatPercentage(player.killparticipation, 1)
+						data = player.killparticipation and MathUtil.formatPercentage(player.killparticipation, 1) or '-'
 					},
 					PlayerStat{
 						title = {

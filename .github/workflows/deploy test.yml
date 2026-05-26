@@ -21,7 +21,7 @@ jobs:
         id: forkpoint
 
       - id: changed-files
-        uses: tj-actions/changed-files@v45
+        uses: tj-actions/changed-files@v47
         with:
           base_sha: ${{ steps.forkpoint.outputs.fork_point_sha }}
           files: |
