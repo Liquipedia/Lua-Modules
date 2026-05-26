@@ -3,11 +3,11 @@ Template(s): All Crosstables
 Author(s): FO-nTTaX
 *******************************************************************************/
 .theme--light {
-	--crosstable-box-shadow-color: rgba( 0, 0, 0, 1 );
+	--crosstable-box-shadow-color: #000000;
 }
 
 .theme--dark {
-	--crosstable-box-shadow-color: rgba( 255, 255, 255, 1 );
+	--crosstable-box-shadow-color: #ffffff;
 }
 
 $crosstable-max: 40;
