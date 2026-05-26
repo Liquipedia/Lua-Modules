@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 local Tournament = Lua.import('Module:Tournament')
 
@@ -309,6 +310,15 @@ function LegacyTeamCard.mapPlayers(tcArgs)
 	local players = {}
 	local indexByKey = {}
 	local maxPlayerIndex = tonumber(tcArgs.maxPlayers) or DEFAULT_MAX_PLAYER_INDEX
+
+	-- Legacy commons TC alias: <group>posN was an accepted alternative for <prefix>Npos.
+	Array.forEach({{'', 'p'}, {'t2', 't2p'}, {'t3', 't3p'}}, function(pair)
+		local group, prefix = pair[1], pair[2]
+		Array.forEach(Array.range(1, maxPlayerIndex), function(n)
+			local newKey = prefix .. n .. 'pos'
+			tcArgs[newKey] = Logic.emptyOr(tcArgs[newKey], Table.extract(tcArgs, group .. 'pos' .. n))
+		end)
+	end)
 
 	local function add(person, allowOverwrite)
 		local key = normalizeKey(person.link or person[1])
