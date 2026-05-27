@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
@@ -18,22 +17,17 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local ColumnName = Condition.ColumnName
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local Fragment = Html.Fragment
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class InMemoryOfWidget: Widget
----@field props {pageLink: string}
----@operator call(table): InMemoryOfWidget
-local InMemoryOfWidget = Class.new(Widget)
-
----@private
+---@param pageLink string?
 ---@return {firstName: string?, lastName: string?, id: string?}
-function InMemoryOfWidget:_loadFromLPDB()
-	local pageLink = self.props.pageLink
+local function _loadFromLPDB(pageLink)
 	assert(String.isNotEmpty(pageLink), 'Empty page link')
+	---@cast pageLink -nil
 	local player = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = tostring(
 			ConditionNode(ColumnName('pagename'), Comparator.eq, Page.pageifyLink(pageLink))
@@ -56,16 +50,17 @@ function InMemoryOfWidget:_loadFromLPDB()
 	}
 end
 
----@return Widget
-function InMemoryOfWidget:render()
-	local nameData = self:_loadFromLPDB()
+---@param props {pageLink: string?}
+---@return VNode
+local function InMemoryOfWidget(props)
+	local nameData = _loadFromLPDB(props.pageLink)
 
 	return Html.Div{
 		classes = { 'sadbox' },
 		children = {
 			Link {
-				link = self.props.pageLink,
-				children = Fragment{children = Array.interleave(
+				link = props.pageLink,
+				children = Array.interleave(
 					WidgetUtil.collect(
 						'In memory of',
 						nameData.firstName,
@@ -80,10 +75,10 @@ function InMemoryOfWidget:render()
 						'🖤'
 					),
 					' '
-				)}
+				)
 			}
 		}
 	}
 end
 
-return InMemoryOfWidget
+return Component.component(InMemoryOfWidget)

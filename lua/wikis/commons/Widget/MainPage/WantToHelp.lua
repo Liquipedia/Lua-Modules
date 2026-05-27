@@ -8,13 +8,12 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Page = Lua.import('Module:Page')
 local Variables = Lua.import('Module:Variables')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local Builder = Lua.import('Module:Widget/Builder')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local Html = Lua.import('Module:Widget/Html')
@@ -30,14 +29,10 @@ local GREEN_CHECK_CIRCLE = IconFa{
 	size = 'lg',
 }
 
----@class WantToHelp: Widget
----@operator call(table): WantToHelp
-local WantToHelp = Class.new(Widget)
-
----@param icon string|Html|Widget
----@param entries (string|Html|Widget|nil|(string|Html|Widget|nil)[])[][]
+---@param icon Renderable
+---@param entries (Renderable|Renderable[])[]
 ---@param listCss table<string, string?>?
----@return Widget
+---@return VNode
 local function buildFontAwesomeList(icon, entries, listCss)
 	return Html.Ul{
 		classes = {'fa-ul'},
@@ -49,7 +44,7 @@ local function buildFontAwesomeList(icon, entries, listCss)
 						classes = {'fa-li'},
 						children = icon
 					},
-					unpack(entry)
+					entry
 				)
 			}
 		end)
@@ -64,8 +59,8 @@ local function getWikiType()
 	return 'esports'
 end
 
----@param content Widget?
----@return Widget
+---@param content Renderable|Renderable[]?
+---@return VNode
 local function showWhenLoggedOut(content)
 	return Div{
 		classes = {'show-when-logged-out'},
@@ -73,8 +68,8 @@ local function showWhenLoggedOut(content)
 	}
 end
 
----@return Widget[]
-function WantToHelp:render()
+---@return VNode[]
+local function WantToHelp()
 	return {
 		Div{
 			css = {['padding-bottom'] = '0.7em'},
@@ -165,4 +160,4 @@ function WantToHelp:render()
 	}
 end
 
-return WantToHelp
+return Component.component(WantToHelp)

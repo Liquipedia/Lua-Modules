@@ -7,14 +7,13 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 
 local TransferList = Lua.import('Module:TransferList')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -29,11 +28,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field transferQuery boolean?
 ---@field onlyNotableTransfers boolean?
 
----@class TransfersList: Widget
----@operator call(table): TransfersList
----@field props TransfersListParameters
-local TransfersList = Class.new(Widget)
-TransfersList.defaultProps = {
+local defaultProps = {
 	limit = 15,
 	rumours = false,
 	transferPortal = 'Portal:Transfers',
@@ -41,12 +36,13 @@ TransfersList.defaultProps = {
 	transferQuery = true
 }
 
+---@param props TransfersListParameters
 ---@return Renderable[]
-function TransfersList:render()
+function TransfersList(props)
 	return WidgetUtil.collect(
 		TransferList{
-			limit = self.props.limit,
-			onlyNotableTransfers = self.props.onlyNotableTransfers,
+			limit = props.limit,
+			onlyNotableTransfers = props.onlyNotableTransfers,
 		}:fetch():create(),
 		Div{
 			css = {
@@ -73,8 +69,8 @@ function TransfersList:render()
 						['text-align'] = 'center',
 					},
 					children = UnorderedList{children = WidgetUtil.collect(
-						Link { children = 'See more transfers', link = self.props.transferPortal },
-						Logic.readBool(self.props.transferQuery) and Link {
+						Link { children = 'See more transfers', link = props.transferPortal },
+						Logic.readBool(props.transferQuery) and Link {
 							children = 'Transfer query',
 							link = 'Special:RunQuery/Transfer history'
 						} or nil,
@@ -82,7 +78,7 @@ function TransfersList:render()
 							children = 'Input Form',
 							link = (Page.exists('Form:Transfer') and '' or 'lpcommons:') .. 'Special:RunQuery/Transfer'
 						},
-						Logic.readBool(self.props.rumours) and Link { children = 'Rumours', link = 'Portal:Rumours' } or nil
+						Logic.readBool(props.rumours) and Link { children = 'Rumours', link = 'Portal:Rumours' } or nil
 					)}
 				},
 				Div{
@@ -94,7 +90,7 @@ function TransfersList:render()
 						'&#91;',
 							Link {
 							children = 'edit',
-							link = 'Special:EditPage/' .. self.props.transferPage
+							link = 'Special:EditPage/' .. props.transferPage
 						},
 						'&#93;'
 					},
@@ -104,4 +100,4 @@ function TransfersList:render()
 	)
 end
 
-return TransfersList
+return Component.component(TransfersList, defaultProps)
