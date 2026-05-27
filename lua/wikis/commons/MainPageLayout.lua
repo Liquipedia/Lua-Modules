@@ -39,7 +39,7 @@ local MainPageLayout = {}
 local NO_TABLE_OF_CONTENTS = '__NOTOC__'
 
 ---@param frame Frame
----@return WidgetHtml
+---@return VNode
 function MainPageLayout.make(frame)
 	assert(WikiData.banner, 'MainPageLayout: Banner data not found')
 	assert(WikiData.layouts, 'MainPageLayout: Layout data not found')
@@ -116,8 +116,8 @@ function MainPageLayout._makeInMemoryOfDisplay(args)
 	end)
 end
 
----@param body (string|Widget|Html|nil)|(string|Widget|Html|nil)[]
----@return (string|Widget|Html|nil)|(string|Widget|Html|nil)[]
+---@param body Renderable|Renderable[]
+---@return Renderable|Renderable[]
 function MainPageLayout._processCellBody(body)
 	local frame = mw.getCurrentFrame()
 	return type(body) == 'string' and frame:preprocess(body) or body
