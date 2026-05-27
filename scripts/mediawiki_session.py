@@ -111,7 +111,7 @@ class MediaWikiSession(contextlib.AbstractContextManager):
                 raise MediaWikiSessionError(parsed_response["error"]["info"])
             return parsed_response[action]
         except requests.JSONDecodeError:
-            raise MediaWikiSessionError(response.text)
+            raise MediaWikiSessionError(f"{response.status_code} ({response.reason}): {response.text}")
 
     def cooldown(self):
         time.sleep(SLEEP_DURATION)
