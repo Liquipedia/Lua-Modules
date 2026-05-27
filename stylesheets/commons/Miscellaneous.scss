@@ -2345,6 +2345,14 @@ Author(s): Elysienna
 	background: linear-gradient( 90deg, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 0%, rgba( 237, 208, 80, 1 ) 75%, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 100% );
 }
 
+.theme--light {
+	--matchlist-header-background-color: #fbf2df;
+}
+
+.theme--dark {
+	--matchlist-header-background-color: var( --clr-secondary-16 );
+}
+
 .matchlist-header {
 	border-bottom: 0.125rem solid var( --table-border-color, #bbbbbb );
 }
