@@ -38,7 +38,7 @@ local defaultProps = {
 
 ---@param props TransfersListParameters
 ---@return Renderable[]
-function TransfersList(props)
+local function TransfersList(props)
 	return WidgetUtil.collect(
 		TransferList{
 			limit = props.limit,

@@ -55,7 +55,7 @@ end
 
 ---@param props table
 ---@return VNode
-function GridCell(props)
+local function GridCell(props)
 	local cellClasses = { 'lp-col' }
 	Array.forEach(GRID_WIDTHS, function (width)
 		if props[width] then
