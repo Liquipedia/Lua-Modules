@@ -22,7 +22,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Helpers = {}
 
 ---@param props {standings?: StandingsModel}
----@return Widget?
+---@return Renderable?
 local function StandingsSwiss(props)
 	local standings = props.standings
 	if not standings then
@@ -66,10 +66,10 @@ end
 
 ---@private
 ---@param standings StandingsModel
----@return Widget
+---@return Renderable
 function Helpers.headerRow(standings)
 	---@param text string?
-	---@return Widget
+	---@return Renderable
 	local makeHeaderCell = function(text)
 		return TableWidgets.CellHeader{children = text}
 	end
@@ -94,7 +94,7 @@ end
 ---@private
 ---@param standings StandingsModel
 ---@param slot StandingsEntryModel
----@return Widget
+---@return Renderable
 function Helpers.createRow(standings, slot)
 	return TableWidgets.Row{
 		attributes = {['data-position-status'] = slot.positionStatus},

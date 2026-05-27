@@ -30,14 +30,14 @@ local STATUS_TO_DISPLAY = {
 
 local Helpers = {}
 
----@param props {standings: StandingsModel}
+---@param props {standings?: StandingsModel}
 ---@return Renderable?
-local function StandingsFfa(props )
-	if not props.standings then
+local function StandingsFfa(props)
+	local standings = props.standings
+	if not standings then
 		return
 	end
 
-	local standings = props.standings
 	local activeRounds = (Array.maxBy(
 		Array.filter(standings.rounds, function(round) return round.started end),
 		function (round) return round.round end
@@ -117,7 +117,7 @@ end
 ---@return Renderable
 function Helpers._headerRow(standings)
 	---@param text string?
-	---@return Widget
+	---@return Renderable
 	local makeHeaderCell = function(text)
 		return TableWidgets.CellHeader{children = text}
 	end

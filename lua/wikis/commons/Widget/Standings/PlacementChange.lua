@@ -36,7 +36,7 @@ local function getMovementType(change)
 end
 
 ---@private
----@return Widget
+---@return Renderable
 local function getIndicator(change, threshold)
 	if change == 0 then
 		return PLACEMENT_MOVE_NEUTRAL
@@ -49,9 +49,10 @@ local function getIndicator(change, threshold)
 	return changeEmphasized and PLACEMENT_MOVE_DOUBLE_DOWN or PLACEMENT_MOVE_DOWN
 end
 
----@param props {change: integer, emphasisThreshold: integer}
+---@param props {change: integer?, emphasisThreshold: integer?}
 ---@return Renderable?
 local function PlacementChangeWidget(props)
+	---@cast props {change: integer, emphasisThreshold: integer}
 	local change = props.change
 
 	return HtmlWidgets.Span{

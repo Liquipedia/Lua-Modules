@@ -24,7 +24,7 @@ local function finalRoundTitle(hasEnded, rounds)
 end
 
 ---@param props {rounds: integer?, hasEnded: boolean?}
----@return Widget?
+---@return Renderable?
 local function RoundSelectorWidget(props)
 	if not props.rounds or props.rounds <= 1 then
 		return
