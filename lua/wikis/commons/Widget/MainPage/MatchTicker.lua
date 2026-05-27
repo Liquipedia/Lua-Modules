@@ -12,7 +12,7 @@ local Class = Lua.import('Module:Class')
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -28,7 +28,7 @@ MatchTicker.defaultProps = {
 function MatchTicker:render()
 	return WidgetUtil.collect(
 		MatchTickerContainer{displayGameIcons = self.props.displayGameIcons},
-		HtmlWidgets.Div{
+		Html.Div{
 			css = {
 				['white-space'] = 'nowrap',
 				display = 'block',

@@ -12,8 +12,8 @@ local Class = Lua.import('Module:Class')
 local ExternalMediaList = Lua.import('Module:ExternalMediaList')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
 local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -32,7 +32,7 @@ function Headlines:render()
 	assert(self.props.limit > 0, 'Invalid limit')
 	return WidgetUtil.collect(
 		ExternalMediaList.get{ subject = '!', limit = self.props.limit },
-		HtmlWidgets.Hr{},
+		Html.Hr{},
 		Div{
 			classes = {'hlist'},
 			css = {

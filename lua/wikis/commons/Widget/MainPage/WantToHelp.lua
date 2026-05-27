@@ -17,8 +17,8 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Widget = Lua.import('Module:Widget')
 local Builder = Lua.import('Module:Widget/Builder')
 local Button = Lua.import('Module:Widget/Basic/Button')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WantToHelpList = Lua.import('Module:Widget/WantToHelpList')
@@ -39,13 +39,13 @@ local WantToHelp = Class.new(Widget)
 ---@param listCss table<string, string?>?
 ---@return Widget
 local function buildFontAwesomeList(icon, entries, listCss)
-	return HtmlWidgets.Ul{
+	return Html.Ul{
 		classes = {'fa-ul'},
 		css = listCss,
 		children = Array.map(entries, function (entry)
-			return HtmlWidgets.Li{
+			return Html.Li{
 				children = WidgetUtil.collect(
-					HtmlWidgets.Span{
+					Html.Span{
 						classes = {'fa-li'},
 						children = icon
 					},
@@ -143,7 +143,7 @@ function WantToHelp:render()
 				} or nil
 			)
 		},
-		HtmlWidgets.Hr{
+		Html.Hr{
 			css = {['margin-top'] = '1em'}
 		},
 		Div{
@@ -153,7 +153,7 @@ function WantToHelp:render()
 			},
 			children = {'\n', WantToHelpList{}}
 		},
-		HtmlWidgets.Br{},
+		Html.Br{},
 		'In total there are ',
 		Builder{builder = function () -- need the builder so the var is available when accessing it
 			return Link{

@@ -11,7 +11,7 @@ local Class = Lua.import('Module:Class')
 local Image = Lua.import('Module:Image')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -36,27 +36,27 @@ function NavigationCard:render()
 
 	if self.props.iconName then
 		-- Icon rendering
-		contentDiv = HtmlWidgets.Div{
+		contentDiv = Html.Div{
 			classes = {'navigation-card__icon'},
 			children = IconFa{iconName = self.props.iconName}
 		}
 	else
 		-- Image rendering
-		contentDiv = HtmlWidgets.Div{
+		contentDiv = Html.Div{
 			classes = {'navigation-card__image'},
 			children = Image.display(self.props.file, nil, {size = 240, link = ''})
 		}
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'navigation-card'},
 		children = WidgetUtil.collect(
 				contentDiv,
-				HtmlWidgets.Span{
+				Html.Span{
 					classes = {'navigation-card__title'},
 					children = Link{link = self.props.link, children = self.props.title}
 				},
-				count and HtmlWidgets.Span{
+				count and Html.Span{
 					classes = {'navigation-card__subtitle'},
 					children = mw.getContentLanguage():formatNum(tonumber(count) --[[@as integer]]),
 				} or nil

@@ -14,8 +14,8 @@ local Flags = Lua.import('Module:Flags')
 local Info = Lua.import('Module:Info', {loadData = true})
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -35,13 +35,13 @@ local LiquipediaApp = Class.new(Widget)
 ---@param listCss table<string, string?>?
 ---@return Widget
 local function buildFontAwesomeList(icon, entries, listCss)
-	return HtmlWidgets.Ul{
+	return Html.Ul{
 		classes = {'fa-ul'},
 		css = listCss,
 		children = Array.map(entries, function (entry)
-			return HtmlWidgets.Li{
+			return Html.Li{
 				children = WidgetUtil.collect(
-					HtmlWidgets.Span{
+					Html.Span{
 						classes = {'fa-li'},
 						children = icon
 					},

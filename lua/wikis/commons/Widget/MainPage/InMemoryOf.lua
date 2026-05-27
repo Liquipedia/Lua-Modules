@@ -19,8 +19,8 @@ local Comparator = Condition.Comparator
 local ColumnName = Condition.ColumnName
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Fragment = HtmlWidgets.Fragment
+local Html = Lua.import('Module:Widget/Html')
+local Fragment = Html.Fragment
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -60,7 +60,7 @@ end
 function InMemoryOfWidget:render()
 	local nameData = self:_loadFromLPDB()
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = { 'sadbox' },
 		children = {
 			Link {
@@ -71,7 +71,7 @@ function InMemoryOfWidget:render()
 						nameData.firstName,
 						nameData.id and Fragment{children = {
 							'"',
-							HtmlWidgets.Strong{
+							Html.Strong{
 								children = { nameData.id }
 							},
 							'"'
