@@ -105,10 +105,13 @@ class MediaWikiSession(contextlib.AbstractContextManager):
             print(f"data: {data}")
             print(f"HTTP Status: {response.status_code}")
             print(f'Raw response: "{response}"')
-        parsed_response: dict[str, Any] = response.json()
-        if "error" in parsed_response.keys():
-            raise MediaWikiSessionError(parsed_response["error"]["info"])
-        return parsed_response[action]
+        try:
+            parsed_response: dict[str, Any] = response.json()
+            if "error" in parsed_response.keys():
+                raise MediaWikiSessionError(parsed_response["error"]["info"])
+            return parsed_response[action]
+        except requests.JSONDecodeError:
+            raise MediaWikiSessionError(response.text)
 
     def cooldown(self):
         time.sleep(SLEEP_DURATION)
