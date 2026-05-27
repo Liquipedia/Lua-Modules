@@ -7,14 +7,13 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class PanelParameters
@@ -30,15 +29,11 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 ---@field padding boolean?
 ---@field panelAttributes table<string, any>?
 
----@class Panel: Widget
----@operator call(PanelParameters): Panel
----@field props PanelParameters
-local Panel = Class.new(Widget)
-
+---@param props PanelParameters
 ---@return Widget
-function Panel:render()
-	local boxId = self.props.boxId
-	local attributes = self.props.headingAttributes or {}
+local function Panel(props)
+	local boxId = props.boxId
+	local attributes = props.headingAttributes or {}
 	local hasToggle = boxId ~= nil
 
 	if hasToggle then
@@ -58,9 +53,9 @@ function Panel:render()
 					children = { IconFa{iconName = 'collapse'}, }
 				}
 			} or nil,
-			self.props.heading,
-			self.props.headingH2 and HtmlWidgets.H2{children = { self.props.headingH2 }} or nil,
-			self.props.headingH3 and HtmlWidgets.H3{children = { self.props.headingH3 }} or nil
+			props.heading,
+			props.headingH2 and Html.H2{children = { props.headingH2 }} or nil,
+			props.headingH3 and Html.H3{children = { props.headingH3 }} or nil
 		)
 	}
 
@@ -68,24 +63,24 @@ function Panel:render()
 		classes = WidgetUtil.collect(
 			hasToggle and 'panel-box-collapsible-content' or nil,
 			'panel-box-body',
-			not Logic.readBool(self.props.padding) and 'panel-box-body--no-padding' or nil,
-			self.props.bodyClass
+			not Logic.readBool(props.padding) and 'panel-box-body--no-padding' or nil,
+			props.bodyClass
 		),
-		css = self.props.bodyStyle,
+		css = props.bodyStyle,
 		attributes = hasToggle and {
 			['data-component'] = 'panel-box-content'
 		} or {},
-		children = self.props.children
+		children = props.children
 	}
 
 	return Div{
-		classes = WidgetUtil.collect('panel-box', 'wiki-bordercolor-light', self.props.classes),
+		classes = WidgetUtil.collect('panel-box', 'wiki-bordercolor-light', props.classes),
 		attributes = Table.merge(
 			hasToggle and {
 				['data-component'] = 'panel-box',
 				['data-panel-box-id'] = boxId
 			} or {},
-			self.props.panelAttributes
+			props.panelAttributes
 		),
 		children = WidgetUtil.collect(
 			heading, body
@@ -94,4 +89,4 @@ function Panel:render()
 
 end
 
-return Panel
+return Component.component(Panel)
