@@ -8,30 +8,31 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local HtmlWidgets = Lua.import('Module:Widget/Html')
 local Button = Lua.import('Module:Widget/Basic/Button')
 
----@class RoundSelectorWidgetProps
----@field rounds integer?
----@field hasEnded boolean?
+---@private
+---@return string
+local function finalRoundTitle(hasEnded, rounds)
+	if not hasEnded then
+		return 'Current'
+	else
+		return 'Round ' .. tostring(rounds)
+	end
+end
 
----@class RoundSelectorWidget: Widget
----@operator call(RoundSelectorWidgetProps): RoundSelectorWidget
----@field props RoundSelectorWidgetProps
-local RoundSelectorWidget = Class.new(Widget)
-
+---@param props {rounds: integer?, hasEnded: boolean?}
 ---@return Widget?
-function RoundSelectorWidget:render()
-	if not self.props.rounds or self.props.rounds <= 1 then
+local function RoundSelectorWidget(props)
+	if not props.rounds or props.rounds <= 1 then
 		return
 	end
 
-	local roundTitles = Array.map(Array.range(1, self.props.rounds), function (round)
-		if round == self.props.rounds then
-			return self:_finalRoundTitle()
+	local roundTitles = Array.map(Array.range(1, props.rounds), function (round)
+		if round == props.rounds then
+			return finalRoundTitle(props.hasEnded, props.rounds)
 		else
 			return 'Round ' .. round
 		end
@@ -52,7 +53,7 @@ function RoundSelectorWidget:render()
 		css = {float = 'left'},
 		children = {
 			Button{
-				children = self:_finalRoundTitle(),
+				children = finalRoundTitle(props.hasEnded, props.rounds),
 				variant = 'primary',
 				size = 'sm',
 				classes = {'dropdown-box-button'},
@@ -66,14 +67,4 @@ function RoundSelectorWidget:render()
 	}
 end
 
----@private
----@return string
-function RoundSelectorWidget:_finalRoundTitle()
-	if not self.props.hasEnded then
-		return 'Current'
-	else
-		return 'Round ' .. tostring(self.props.rounds)
-	end
-end
-
-return RoundSelectorWidget
+return Component.component(RoundSelectorWidget)

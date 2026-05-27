@@ -8,11 +8,10 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local Label = Lua.import('Module:Widget/Basic/Label')
 local MatchOverview = Lua.import('Module:Widget/Standings/MatchOverview')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
@@ -20,33 +19,28 @@ local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
----@class StandingsSwissWidgetProps
----@field standings StandingsModel
+local Helpers = {}
 
----@class StandingsSwissWidget: Widget
----@operator call(StandingsSwissWidgetProps): StandingsSwissWidget
----@field props StandingsSwissWidgetProps
-local StandingsSwissWidget = Class.new(Widget)
-
+---@param props {standings?: StandingsModel}
 ---@return Widget?
-function StandingsSwissWidget:render()
-	if not self.props.standings then
+local function StandingsSwiss(props)
+	local standings = props.standings
+	if not standings then
 		return
 	end
 
-	local standings = self.props.standings
 	local lastRound = standings.rounds[#standings.rounds]
 
 	return TableWidgets.Table{
 		classes = {'standings-swiss'},
 		title = Logic.nilIfEmpty(standings.title),
-		columns = self:_buildColumnDefinitions(),
+		columns = Helpers.buildColumnDefinitions(standings),
 		children = WidgetUtil.collect(
 			-- Column Header
-			self:_headerRow(),
+			Helpers.headerRow(standings),
 			-- Rows
 			TableWidgets.TableBody{children = Array.map(lastRound.opponents, function(slot)
-				return self:_createRow(slot)
+				return Helpers.createRow(standings, slot)
 			end)}
 		),
 		striped = false
@@ -54,9 +48,9 @@ function StandingsSwissWidget:render()
 end
 
 ---@private
+---@param standings StandingsModel
 ---@return table[]
-function StandingsSwissWidget:_buildColumnDefinitions()
-	local standings = self.props.standings
+function Helpers.buildColumnDefinitions(standings)
 	return WidgetUtil.collect(
 		{align = 'left'},
 		{align = 'left'},
@@ -71,10 +65,9 @@ function StandingsSwissWidget:_buildColumnDefinitions()
 end
 
 ---@private
+---@param standings StandingsModel
 ---@return Widget
-function StandingsSwissWidget:_headerRow()
-	local standings = self.props.standings
-
+function Helpers.headerRow(standings)
 	---@param text string?
 	---@return Widget
 	local makeHeaderCell = function(text)
@@ -99,10 +92,10 @@ function StandingsSwissWidget:_headerRow()
 end
 
 ---@private
+---@param standings StandingsModel
 ---@param slot StandingsEntryModel
 ---@return Widget
-function StandingsSwissWidget:_createRow(slot)
-	local standings = self.props.standings
+function Helpers.createRow(standings, slot)
 	return TableWidgets.Row{
 		attributes = {['data-position-status'] = slot.positionStatus},
 		children = WidgetUtil.collect(
@@ -158,4 +151,4 @@ function StandingsSwissWidget:_createRow(slot)
 	}
 end
 
-return StandingsSwissWidget
+return Component.component(StandingsSwiss)
