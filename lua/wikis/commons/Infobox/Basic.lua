@@ -17,7 +17,7 @@ local Context = Lua.import('Module:Widget/ComponentContext')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Infobox = Lua.import('Module:Widget/Infobox/Core')
 
----@class BasicInfobox
+---@class BasicInfobox: BaseClass
 ---@operator call(Frame): BasicInfobox
 ---@field args table
 ---@field pagename string
@@ -49,7 +49,7 @@ function BasicInfobox:categories(...)
 end
 
 ---Adds top content
----@param content string|number|Html|Widget|nil
+---@param content Renderable?
 ---@return self
 function BasicInfobox:top(content)
 	table.insert(self.topContent, content)
@@ -57,7 +57,7 @@ function BasicInfobox:top(content)
 end
 
 ---Adds bottom content
----@param content string|number|Html|nil
+---@param content Renderable?
 ---@return self
 function BasicInfobox:bottom(content)
 	table.insert(self.bottomContent, content)
@@ -71,17 +71,17 @@ function BasicInfobox:setWidgetInjector(injector)
 	return self
 end
 
---- Allows for overriding this functionality
 ---Add bottom content below the infobox, e.g. matchtickers
----@return string?
+---@protected
+---@return Renderable?
 function BasicInfobox:createBottomContent()
 	return nil
 end
 
---- Allows for overriding this functionality
 ---Set wikispecific categories
+---@protected
 ---@param args table
----@return table
+---@return string[]
 function BasicInfobox:getWikiCategories(args)
 	return {}
 end
@@ -110,9 +110,9 @@ function BasicInfobox:getAllArgsForBase(args, base, options)
 	return foundArgs
 end
 
----@param widgets Widget[]
+---@param widgets Renderable[]
 ---@param infoboxType string?
----@return Widget
+---@return VNode
 function BasicInfobox:build(widgets, infoboxType)
 	local infobox = Infobox{
 		gameName = self.wiki,
