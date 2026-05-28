@@ -193,7 +193,7 @@ function CustomInjector:parse(id, widgets)
 			},
 			Cell{
 				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox') .. ' Tier',
-				content = self.caller:_createValveTierCell(),
+				children = self.caller:_createValveTierCell(),
 				classes = {'valvepremier-highlighted'},
 				options = {separator = '&ensp;'}
 			}

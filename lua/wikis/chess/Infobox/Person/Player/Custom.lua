@@ -74,7 +74,7 @@ function CustomInjector:parse(id, widgets)
 				Array.map(
 					titles,
 					function (title)
-						return Cell{name = title.name, content = {args['title_' .. title.code]}}
+						return Cell{name = title.name, children = {args['title_' .. title.code]}}
 					end
 				)
 			)
