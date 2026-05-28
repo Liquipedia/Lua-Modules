@@ -19,10 +19,11 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class CounterstrikeExpansionInfobox: ExpansionInfobox
+---@operator call(Frame): CounterstrikeExpansionInfobox
 local CustomExpansion = Class.new(Expansion)
 
 ---@class CounterstrikeExpansionInfoboxWidgetInjector: WidgetInjector
@@ -68,11 +69,11 @@ function CustomExpansion:getMaps()
 		local prefix = 'map' .. mapIndex
 		local map = mapInput[prefix]
 		if not map then return end
-		return HtmlWidgets.Fragment{children = {
+		return Html.Fragment{children = {
 			Link{link = map},
 			'&nbsp;',
-			mapInput[prefix .. 'mode'] == 'cs' and HtmlWidgets.Abbr{title = 'Hostage', children = {'(H)'}}
-				or HtmlWidgets.Abbr{title = 'Defuse', children = {'(D)'}},
+			mapInput[prefix .. 'mode'] == 'cs' and Html.Abbr{title = 'Hostage', children = {'(H)'}}
+				or Html.Abbr{title = 'Defuse', children = {'(D)'}},
 		}}
 	end)
 

@@ -24,7 +24,7 @@ local Player = Lua.import('Module:Infobox/Person')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
 
 local SIZE_CHAMPION = '25x25px'
@@ -73,7 +73,7 @@ function CustomPlayer.run(frame)
 		}
 	end
 
-	return HtmlWidgets.Fragment{children = {
+	return Html.Fragment{children = {
 		builtInfobox,
 		autoPlayerIntro,
 	}}
@@ -129,7 +129,7 @@ function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = TeamTemplate.getPageName(self.args.team)
 		---@cast teamPage -nil
-		return HtmlWidgets.Fragment{
+		return Html.Fragment{
 			children = {
 				MatchTicker.recent{team = teamPage},
 				UpcomingTournaments.team{name = teamPage}

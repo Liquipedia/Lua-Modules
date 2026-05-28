@@ -20,12 +20,14 @@ local Chronology = Widgets.Chronology
 local Title = Widgets.Title
 local AgeIcon = Lua.import('Module:Widget/Infobox/AgeIcon')
 local ExpansionIcon = Lua.import('Module:Widget/Infobox/ExpansionIcon')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class AoEBuildingInfobox: BuildingInfobox
+---@operator call(Frame): AoEBuildingInfobox
 local CustomBuilding = Class.new(Building)
+
 ---@class AoEBuildingInfoboxInjector: WidgetInjector
 ---@field caller AoEBuildingInfobox
 local CustomInjector = Class.new(Injector)
@@ -52,7 +54,7 @@ function CustomInjector:parse(id, widgets)
 		---@return Widget?
 		local costDisplay = function(input, label)
 			if not input then return end
-			return HtmlWidgets.Fragment{children = {
+			return Html.Fragment{children = {
 				input,
 				' ',
 				Link{link = label},
@@ -72,7 +74,7 @@ function CustomInjector:parse(id, widgets)
 		local ageIconWithText = function(keyPrefix, age)
 			local key = keyPrefix .. ' ' .. age
 			if Logic.isEmpty(args[key]) then return end
-			return HtmlWidgets.Fragment{
+			return Html.Fragment{
 				children = {
 					AgeIcon{age = age},
 					' ',
@@ -91,12 +93,12 @@ function CustomInjector:parse(id, widgets)
 				ageIconWithText('hit', 'imperial')
 			)},
 			Cell{
-				name = HtmlWidgets.Fragment{
+				name = Html.Fragment{
 					children = {
 						Link{link = 'Armor class'},
 						'es:',
-						HtmlWidgets.Br{},
-						HtmlWidgets.Small{
+						Html.Br{},
+						Html.Small{
 							children = {
 								'besides ',
 								Link{link = 'Pierce armor (armor class)', children = {'Pierce armor'}},
@@ -112,7 +114,7 @@ function CustomInjector:parse(id, widgets)
 				children = {args['armor classes']},
 			},
 			Cell{
-				name = HtmlWidgets.Abbr{
+				name = Html.Abbr{
 					title = 'Number of units that can be garrisoned inside the building',
 					children = {'Garrison'}
 				},
@@ -145,7 +147,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Projectile Speed', children = {args['projectile speed']}},
 			Cell{name = 'Accuracy', children = {args.accuracy}},
 			Cell{
-				name = HtmlWidgets.Abbr{title = 'Reload time (in seconds)', children = {'Rate of Fire'}},
+				name = Html.Abbr{title = 'Reload time (in seconds)', children = {'Rate of Fire'}},
 				children = {args['rate of fire']},
 			},
 		}
@@ -158,7 +160,7 @@ function CustomInjector:parse(id, widgets)
 			Title{children = {'Further Stats'}},
 			Cell{name = 'First introduced', children = {
 				ExpansionIcon{expansion = args.introduced},
-				HtmlWidgets.I{children = {Link{link = args.introduced}}},
+				Html.I{children = {Link{link = args.introduced}}},
 			}, options = {separator = ' '}},
 			Cell{name = 'Civilizations', children = {args.civilizations}},
 			Cell{name = 'Available in', children = {
@@ -173,11 +175,11 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Size', children = {args.size}},
 			Cell{name = 'Line of sight', children = {args['line of sight']}},
 			Cell{
-				name = HtmlWidgets.Fragment{
+				name = Html.Fragment{
 					children = {
 						'Description:',
-						HtmlWidgets.Br{},
-						HtmlWidgets.Small{children = {'(ingame description)'}},
+						Html.Br{},
+						Html.Small{children = {'(ingame description)'}},
 					}
 				},
 				options = {suppressColon = true},

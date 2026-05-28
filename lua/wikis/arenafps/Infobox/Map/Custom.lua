@@ -16,11 +16,13 @@ local Map = Lua.import('Module:Infobox/Map')
 local Widgets = Lua.import('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetImage = Lua.import('Module:Widget/Image/Icon/Image')
 
 ---@class ArenafpsMapInfobox: MapInfobox
+---@operator call(Frame): ArenafpsMapInfobox
 local CustomMap = Class.new(Map)
+
 ---@class ArenafpsMapInfoboxWidgetInjector: WidgetInjector
 ---@field caller ArenafpsMapInfobox
 local CustomInjector = Class.new(Injector)
@@ -49,7 +51,7 @@ function CustomInjector:parse(widgetId, widgets)
 			Cell{name = 'Spawns', children = {args.spawns}},
 			Cell{name = 'Starting Spawns', children = {args['starting-spawns']}},
 			args.minimap and Title{children = {'Minimap'}} or nil,
-			args.minimap and HtmlWidgets.Div{
+			args.minimap and Html.Div{
 				classes = {'infobox-image'},
 				children = {WidgetImage{
 					imageLight = args.minimap,

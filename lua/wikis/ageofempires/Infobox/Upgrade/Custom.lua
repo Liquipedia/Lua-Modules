@@ -20,7 +20,7 @@ local Center = Widgets.Center
 local Title = Widgets.Title
 local AgeIcon = Lua.import('Module:Widget/Infobox/AgeIcon')
 local ExpansionIcon = Lua.import('Module:Widget/Infobox/ExpansionIcon')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class AoeUpgradeInfobox: UpgradeInfobox
@@ -52,7 +52,7 @@ function CustomInjector:parse(id, widgets)
 			if not introduced then return end
 			return {
 				ExpansionIcon{expansion = introduced},
-				HtmlWidgets.I{children = {Link{link = introduced}}},
+				Html.I{children = {Link{link = introduced}}},
 			}
 		end
 		return {
@@ -93,7 +93,7 @@ function CustomInjector:parse(id, widgets)
 				Title{children = {
 					'Effect',
 					' ',
-					HtmlWidgets.Small{children = {
+					Html.Small{children = {
 						'(',
 						subTitle,
 						')'

@@ -19,7 +19,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -46,7 +46,7 @@ function CustomUnit.run(frame)
 	unit.args.informationType = 'Card'
 	unit:setWidgetInjector(CustomInjector(unit))
 
-	return HtmlWidgets.Fragment{children = {
+	return Html.Fragment{children = {
 		unit:createInfobox(),
 		unit:_buildDescription(unit.args),
 	}}
@@ -175,9 +175,9 @@ function CustomUnit:_buildDescription()
 		args.health and (args.health .. ' point' .. (tonumber(args.health) == 1 and '' or 's') .. ' of health') or nil
 	), ', ', ' and ')
 
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = WidgetUtil.collect(
-			HtmlWidgets.B{children = self.name},
+			Html.B{children = self.name},
 			' is a',
 			args.mana and (' ' .. args.mana .. '-mana cost') or nil,
 			args.gold and (' ' .. args.gold .. '-gold cost') or nil,

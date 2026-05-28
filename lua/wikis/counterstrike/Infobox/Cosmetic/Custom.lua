@@ -18,7 +18,7 @@ local Builder = Widgets.Builder
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 local WEAPON_STYLES = {
@@ -42,6 +42,7 @@ WEAPON_STYLES[7] = WEAPON_STYLES['custom paint job']
 WEAPON_STYLES[8] = WEAPON_STYLES['patina']
 
 ---@class CounterstrikeCosmeticInfobox: CosmeticInfobox
+---@operator call(Frame): CounterstrikeCosmeticInfobox
 local CustomCosmetic = Class.new(Cosmetic)
 local CustomInjector = Class.new(Injector)
 
@@ -122,7 +123,7 @@ function CustomCosmetic:_buyNow()
 	return Link{
 		linktype = 'external',
 		link = link,
-		children = {HtmlWidgets.Span{
+		children = {Html.Span{
 			classes = {'buynow_button', 'buynow_market'},
 			children = {'Buy Now on Market'},
 		}},

@@ -13,7 +13,7 @@ local Team = Lua.import('Module:Infobox/Team')
 local PlacementStats = Lua.import('Module:Infobox/Extension/PlacementStats')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class FreeFireInfoboxTeam: InfoboxTeam
@@ -29,7 +29,7 @@ end
 
 ---@return VNode
 function CustomTeam:createBottomContent()
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+	return Html.Fragment{children = WidgetUtil.collect(
 		PlacementStats.run{
 			tiers = {'1', '2', '3', '4'},
 			participant = self.name,

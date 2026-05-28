@@ -16,7 +16,7 @@ local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local CharacterNames = Lua.import('Module:HeroNames')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Injector = Lua.import('Module:Widget/Injector')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Player = Lua.import('Module:Infobox/Person')
@@ -29,7 +29,12 @@ local SIZE_HERO = '25x25px'
 local MAX_NUMBER_OF_SIGNATURE_HEROES = 3
 
 ---@class MarvelRivalsInfoboxPlayer: Person
+---@operator call(Frame): MarvelRivalsInfoboxPlayer
 local CustomPlayer = Class.new(Player)
+
+---@class MarvelRivalsInfoboxPlayerWidgetInjector: WidgetInjector
+---@operator call(MarvelRivalsInfoboxPlayer): MarvelRivalsInfoboxPlayerWidgetInjector
+---@field caller MarvelRivalsInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -93,7 +98,7 @@ function CustomPlayer:createBottomContent()
 	local teamPage = TeamTemplate.getPageName(self.args.team)
 	---@cast teamPage -nil
 
-	return HtmlWidgets.Fragment{children = {
+	return Html.Fragment{children = {
 		MatchTicker.player{recentLimit = 3},
 		UpcomingTournaments.team{name = teamPage}
 	}}

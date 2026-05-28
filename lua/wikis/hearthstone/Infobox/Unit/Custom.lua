@@ -20,7 +20,7 @@ local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
@@ -74,10 +74,10 @@ function CustomInjector:parse(id, widgets)
 		---@return Widget
 		local makeAttribute = function(image, link, value)
 			-- returning Fragment is needed to have placeholders where necessary
-			if not value then return HtmlWidgets.Fragment{} end
-			return HtmlWidgets.Fragment{children = {
+			if not value then return Html.Fragment{} end
+			return Html.Fragment{children = {
 				Image{size = 'x32px', verticalAlignment = 'text-top', link = link, imageLight = image},
-				HtmlWidgets.Br{},
+				Html.Br{},
 				value,
 			}}
 		end

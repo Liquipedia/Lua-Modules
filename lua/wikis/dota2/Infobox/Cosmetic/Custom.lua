@@ -20,7 +20,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Cosmetic = Lua.import('Module:Infobox/Cosmetic')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Builder = Widgets.Builder
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -39,6 +39,7 @@ local SpecialCategories = {
 }
 
 ---@class Dota2CosmeticInfobox: CosmeticInfobox
+---@operator call(Frame): Dota2CosmeticInfobox
 local CustomCosmetic = Class.new(Cosmetic)
 local CustomInjector = Class.new(Injector)
 
@@ -50,7 +51,7 @@ function CustomCosmetic.run(frame)
 	cosmetic.args.subHeader = cosmetic.args.prefab
 	cosmetic.args.imageText = 'ID: ' .. (cosmetic.args.defindex or 'N/A')
 
-	return HtmlWidgets.Fragment{children = {cosmetic:createInfobox(), cosmetic:_createIntroText()}}
+	return Html.Fragment{children = {cosmetic:createInfobox(), cosmetic:_createIntroText()}}
 end
 
 ---@param id string

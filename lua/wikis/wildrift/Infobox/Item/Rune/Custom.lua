@@ -19,7 +19,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class WildriftItemInfoboxRune: ItemInfobox
@@ -49,7 +49,7 @@ function CustomInjector:parse(id, widgets)
 			args.runename and Center{
 				children = {
 					Template.safeExpand(mw.getCurrentFrame(), 'RuneIcons', {args.runename}),
-					HtmlWidgets.Br{},
+					Html.Br{},
 					args.runetext,
 				},
 			} or nil,

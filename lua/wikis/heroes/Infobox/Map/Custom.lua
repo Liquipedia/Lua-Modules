@@ -14,7 +14,7 @@ local Logic = Lua.import('Module:Logic')
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
@@ -81,7 +81,7 @@ end
 ---@return Widget?
 function CustomMap:_image2()
 	if not self.args.image2 then return end
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'infobox-image'},
 		children = {Image{
 			imageLight = self.args.image2,

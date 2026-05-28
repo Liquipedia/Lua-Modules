@@ -23,16 +23,20 @@ local Table = Lua.import('Module:Table')
 local Injector = Lua.import('Module:Widget/Injector')
 local Building = Lua.import('Module:Infobox/Building')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local WarningBox = Lua.import('Module:Widget/WarningBox')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
 ---@class StormgateBuildingInfobox: BuildingInfobox
+---@operator call(Frame): StormgateBuildingInfobox
 ---@field faction string?
 local CustomBuilding = Class.new(Building)
 
+---@class StormgateBuildingInfoboxWidgetInjector: WidgetInjector
+---@operator call(StormgateBuildingInfobox): StormgateBuildingInfoboxWidgetInjector
+---@field caller StormgateBuildingInfobox
 local CustomInjector = Class.new(Injector)
 
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=Health]]'
@@ -59,7 +63,7 @@ function CustomBuilding.run(frame)
 
 	local builtInfobox = building:createInfobox()
 
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = {
 			builtInfobox,
 			CustomBuilding._deprecatedWarning(building.args.deprecatedDisplay)

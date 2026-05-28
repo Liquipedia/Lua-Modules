@@ -26,7 +26,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -122,7 +122,7 @@ function CustomPlayer.run(frame)
 		}
 	end
 
-	return HtmlWidgets.Fragment{children = {
+	return Html.Fragment{children = {
 		builtInfobox,
 		autoPlayerIntro,
 	}}

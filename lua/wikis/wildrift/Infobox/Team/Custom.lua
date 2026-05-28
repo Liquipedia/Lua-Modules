@@ -16,7 +16,7 @@ local PlacementStats = Lua.import('Module:Infobox/Extension/PlacementStats')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -40,7 +40,7 @@ end
 
 ---@return string?
 function CustomTeam:createBottomContent()
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+	return Html.Fragment{children = WidgetUtil.collect(
 		not self.args.disbanded and UpcomingTournaments.team{name = self.teamTemplate.templatename} or nil,
 		PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}}
 	)}

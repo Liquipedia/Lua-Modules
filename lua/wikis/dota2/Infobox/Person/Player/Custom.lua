@@ -18,7 +18,7 @@ local String = Lua.import('Module:StringUtils')
 local YearsActive = Lua.import('Module:YearsActive')
 
 local Flags = Lua.import('Module:Flags')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Injector = Lua.import('Module:Widget/Injector')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Player = Lua.import('Module:Infobox/Person')
@@ -35,6 +35,7 @@ local SIZE_HERO = '44x25px'
 local CONVERSION_PLAYER_ID_TO_STEAM = 61197960265728
 
 ---@class Dota2InfoboxPlayer: Person
+---@operator call(Frame): Dota2InfoboxPlayer
 ---@field basePageName string
 local CustomPlayer = Class.new(Player)
 
@@ -144,7 +145,7 @@ function CustomPlayer:createBottomContent()
 		return
 	end
 
-	return HtmlWidgets.Fragment{children = {
+	return Html.Fragment{children = {
 		MatchTicker.player(),
 		UpcomingTournaments.player{name = self.basePageName}
 	}}
