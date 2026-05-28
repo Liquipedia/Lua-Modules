@@ -42,4 +42,4 @@ local function Breakdown(props)
 	}
 end
 
-return Component.component(Breakdown)
+return Component.component(Breakdown, {contentClasses = {}})
