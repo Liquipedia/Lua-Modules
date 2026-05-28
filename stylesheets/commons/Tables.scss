@@ -11,7 +11,7 @@ $table-header-variant-background-color--dark: var( --clr-secondary-16 );
 $table-subheader-background-color--light: var( --clr-surface-4 );
 $table-subheader-background-color--dark: color-mix( in srgb, #000000 20%, var( --clr-wiki-theme-20 ) );
 
-/* Tables -background colors */
+/* Tables - background colors */
 $table-background-color--light: var( --clr-surface-1 );
 $table-background-color--dark: var( --clr-secondary-7 );
 $table-variant-background-color--light: var( --clr-surface-variant );
@@ -38,12 +38,6 @@ $table-border-color--light: rgba( #000000, 8% );
 $table-border-color--dark: var( --clr-secondary-25 );
 $table-green-border-color--light: var( --clr-semantic-positive-90 );
 $table-green-border-color--dark: var( --clr-semantic-positive-20 );
-
-/* Tables - Misc */
-$table-link-visited-color--light: color-mix( in srgb, #000000 24%, var( --clr-primary ) );
-$table-link-visited-color--dark: color-mix( in srgb, #000000 16%, var( --clr-primary-80 ) );
-$table-link-visited-hover-color--light: color-mix( in srgb, #000000 24%, var( --clr-primary ) );
-$table-link-visited-hover-color--dark: color-mix( in srgb, #000000 16%, var( --clr-primary-80 ) );
 
 /* Highlight colors */
 $publisher-premier-highlight-background-color--light: #ffffcc;
