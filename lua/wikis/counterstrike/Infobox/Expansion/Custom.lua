@@ -30,7 +30,7 @@ local CustomExpansion = Class.new(Expansion)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomExpansion.run(frame)
 	local expansion = CustomExpansion(frame)
 	expansion:setWidgetInjector(CustomInjector(expansion))
@@ -38,8 +38,8 @@ function CustomExpansion.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller  = self.caller
 	local args  = caller.args

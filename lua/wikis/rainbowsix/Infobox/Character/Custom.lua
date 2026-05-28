@@ -119,7 +119,7 @@ local CustomCharacter = Class.new(Character)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
@@ -128,8 +128,8 @@ function CustomCharacter.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'country' then
@@ -382,7 +382,7 @@ function CustomCharacter:_getBaseStats(args)
 end
 
 ---@param speed 'slow'|'medium'|'fast'
----@return CellWidget[]
+---@return VNode[]
 function CustomCharacter:_getArmorAndSpeedDisplay(speed)
 	local armorSpeedData = ARMOR_SPEED_DATA[speed]
 	return Logic.isNotEmpty(armorSpeedData) and {
@@ -396,7 +396,7 @@ function CustomCharacter:_getArmorAndSpeedDisplay(speed)
 end
 
 ---@param difficulty string
----@return CellWidget|nil
+---@return VNode?
 function CustomCharacter._generateDifficultyCell(difficulty)
 	local difficultyData = DIFFICULTY_DATA[difficulty]
 	return Logic.isNotEmpty(difficultyData)
@@ -408,7 +408,7 @@ end
 ---@param datatype string
 ---@param value number|string
 ---@param display string
----@return CellWidget
+---@return VNode
 function CustomCharacter._generateStatCell(title, datatype, value, display)
 	return Cell{
 		name = title,

@@ -28,7 +28,7 @@ local CustomInjector = Class.new(Injector)
 local HARVESTING_TOOL = 'Harvesting Tool'
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomWeapon.run(frame)
 	local weapon = CustomWeapon(frame)
 	local args = weapon.args
@@ -43,8 +43,8 @@ function CustomWeapon.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args

@@ -53,7 +53,7 @@ local ACHIEVEMENTS_BASE_CONDITIONS = {
 local CustomTeam = Class.new(Team)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 

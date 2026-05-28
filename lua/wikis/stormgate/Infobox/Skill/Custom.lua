@@ -46,7 +46,7 @@ local GAME_MODE_ICON = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomSkill.run(frame)
 	local skill = CustomSkill(frame)
 
@@ -82,8 +82,8 @@ function CustomSkill:nameDisplay(args)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args

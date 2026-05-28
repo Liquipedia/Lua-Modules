@@ -31,7 +31,7 @@ local CustomBuilding = Class.new(Building)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomBuilding.run(frame)
 	local building = CustomBuilding(frame)
 	building:setWidgetInjector(CustomInjector(building))
@@ -40,8 +40,8 @@ function CustomBuilding.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args

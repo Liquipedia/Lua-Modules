@@ -26,7 +26,7 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function CustomTeam:createBottomContent()
 	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
 		PlacementStats.run{

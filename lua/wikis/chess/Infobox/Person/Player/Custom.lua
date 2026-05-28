@@ -34,7 +34,7 @@ local TITLES = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -57,8 +57,8 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 

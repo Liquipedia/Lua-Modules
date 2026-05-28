@@ -32,7 +32,7 @@ local CustomUpgrade = Class.new(Upgrade)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomUpgrade.run(frame)
 	local upgrade = CustomUpgrade(frame)
 	upgrade.args.informationType = 'Tech'
@@ -41,8 +41,8 @@ function CustomUpgrade.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args  = self.caller.args
 	if id == 'introduced' then

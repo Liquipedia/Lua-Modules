@@ -43,7 +43,7 @@ local CustomCosmetic = Class.new(Cosmetic)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomCosmetic.run(frame)
 	local cosmetic = CustomCosmetic(frame)
 	cosmetic:setWidgetInjector(CustomInjector(cosmetic))
@@ -54,8 +54,8 @@ function CustomCosmetic.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 

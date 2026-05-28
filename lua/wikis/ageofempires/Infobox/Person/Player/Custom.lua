@@ -74,7 +74,7 @@ local INACTIVITY_THRESHOLD_PLAYER = {year = 1}
 local INACTIVITY_THRESHOLD_BROADCAST = {month = 6}
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -129,8 +129,8 @@ function CustomPlayer.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args

@@ -20,14 +20,14 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local CustomTeam = Class.new(Team)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 
 	return team:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function CustomTeam:createBottomContent()
 	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
 		PlacementStats.run{
