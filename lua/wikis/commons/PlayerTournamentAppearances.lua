@@ -152,7 +152,7 @@ function Appearances:_fetchPlayers(pageNames)
 			if Opponent.playerIsTbd(player) then
 				return
 			end
-			local pageName = player.pageName
+			local pageName = Page.pageifyLink(player.pageName)
 			---@cast pageName -nil
 			if not players[pageName] then
 				players[pageName] = player
