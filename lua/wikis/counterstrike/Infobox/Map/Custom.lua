@@ -31,7 +31,7 @@ local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomMap.run(frame)
 	local map = CustomMap(frame)
 	map:setWidgetInjector(CustomInjector(map))

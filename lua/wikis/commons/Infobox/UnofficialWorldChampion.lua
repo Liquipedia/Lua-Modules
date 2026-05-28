@@ -38,13 +38,13 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local UnofficialWorldChampion = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function UnofficialWorldChampion.run(frame)
 	local unofficialWorldChampion = UnofficialWorldChampion(frame)
 	return unofficialWorldChampion:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function UnofficialWorldChampion:createInfobox()
 	local args = self.args
 

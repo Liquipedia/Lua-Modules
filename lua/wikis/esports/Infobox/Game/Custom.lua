@@ -19,11 +19,16 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class EsportsGameInfobox: GameInfobox
+---@operator call(Frame): EsportsGameInfobox
 local CustomGame = Class.new(Game)
+
+---@class EsportsGameInfoboxWidgetInjector: WidgetInjector
+---@operator call(EsportsGameInfobox): EsportsGameInfoboxWidgetInjector
+---@field caller EsportsGameInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomGame.run(frame)
 	local game = CustomGame(frame)
 	game:setWidgetInjector(CustomInjector(game))
@@ -32,12 +37,12 @@ function CustomGame.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
-		Array.append(widgets,
+		Array.appendWith(widgets,
 			Cell{name = 'Engine', children = {args.engine}},
 			Cell{name = 'Genre(s)', children = {args.genre}},
 			Cell{name = 'Mode(s)', children = {args.mode}}

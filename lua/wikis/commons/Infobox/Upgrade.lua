@@ -25,7 +25,7 @@ local Chronology = Widgets.Chronology
 ---@operator call(Frame): UpgradeInfobox
 local Upgrade = Class.new(BasicInfobox)
 
----@return Widget
+---@return VNode
 function Upgrade:createInfobox()
 	local args = self.args
 	local links = Links.transform(args)

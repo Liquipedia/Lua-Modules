@@ -19,7 +19,7 @@ local Character = Lua.import('Module:Infobox/Character')
 local Injector = Lua.import('Module:Widget/Injector')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
 local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
 local Title = Widgets.Title
@@ -43,7 +43,7 @@ local CustomCharacter = Class.new(Character)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
@@ -52,8 +52,8 @@ function CustomCharacter.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	if id == 'country' then
 		return {
@@ -91,7 +91,7 @@ function CustomInjector:_toCellContent(key, dataModule)
 	local data = Lua.requireIfExists('Module:' .. dataModule, { loadData = true })
 	if Logic.isEmpty(data) then return end
 	local iconData = data[args[key]:lower()]
-	return Logic.isNotEmpty(iconData) and HtmlWidgets.Fragment{
+	return Logic.isNotEmpty(iconData) and Html.Fragment{
 		children = {
 			IconImageWidget{
 				imageLight = iconData.icon,
@@ -107,10 +107,10 @@ end
 function CustomCharacter:_getPriceCell()
 	local args = self.args
 	local costContent = WidgetUtil.collect(
-		String.isNotEmpty(args.costbe) and HtmlWidgets.Fragment{
+		String.isNotEmpty(args.costbe) and Html.Fragment{
 			children = { BLUE_ESSENCE_ICON, ' ', args.costbe }
 		} or nil,
-		String.isNotEmpty(args.costrp) and HtmlWidgets.Fragment{
+		String.isNotEmpty(args.costrp) and Html.Fragment{
 			children = { RIOT_POINTS_ICON, ' ', args.costrp }
 		} or nil
 	)
