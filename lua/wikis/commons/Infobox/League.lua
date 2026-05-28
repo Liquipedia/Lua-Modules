@@ -134,7 +134,7 @@ function League:createInfobox()
 								Cell{
 									name = 'Type',
 									children = {
-										mw.language.getContentLanguage():ucfirst(args.type)
+										String.upperCaseFirst(args.type)
 									}
 								}
 							}
