@@ -11,7 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 
 ---@class InfoboxTableWidgetWidgetOptions
 ---@field columns number?
@@ -40,11 +40,11 @@ function InfoboxTableWidget:render()
 	end
 
 	return Array.map(rows, function(row)
-		return HtmlWidgets.Div{
+		return Html.Div{
 			classes = self.props.classes,
 			children = Array.map(Array.range(1, options.columns), function(columnIndex)
 				local columnOptions = options.columnOptions[columnIndex] or {}
-				return HtmlWidgets.Div{
+				return Html.Div{
 					classes = columnOptions.classes or {},
 					children = row[columnIndex],
 				}

@@ -13,7 +13,7 @@ local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 
 ---@class BreakdownWidget: Widget
 ---@operator call(table):BreakdownWidget
@@ -33,7 +33,7 @@ function Breakdown:render()
 
 	local number = #self.props.children
 	local mappedChildren = Array.map(self.props.children, function(child, childIndex)
-		return HtmlWidgets.Div{
+		return Html.Div{
 			children = {child},
 			classes = WidgetUtil.collect(
 				'infobox-cell-' .. number,
@@ -42,7 +42,7 @@ function Breakdown:render()
 			),
 		}
 	end)
-	return HtmlWidgets.Div{
+	return Html.Div{
 		children = mappedChildren,
 	}
 end
