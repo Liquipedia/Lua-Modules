@@ -41,9 +41,9 @@ $table-green-border-color--dark: var( --clr-semantic-positive-20 );
 
 /* Tables - Misc */
 $table-link-visited-color--light: color-mix( in srgb, #000000 24%, var( --clr-primary ) );
-$table-link-visited-color--dark: $link-color-visited--dark;
+$table-link-visited-color--dark: color-mix( in srgb, #000000 16%, var( --clr-primary-80 ) );
 $table-link-visited-hover-color--light: color-mix( in srgb, #000000 24%, var( --clr-primary ) );
-$table-link-visited-hover-color--dark: $link-color-visited-hover--dark;
+$table-link-visited-hover-color--dark: color-mix( in srgb, #000000 16%, var( --clr-primary-80 ) );
 
 /* Highlight colors */
 $publisher-premier-highlight-background-color--light: #ffffcc;
