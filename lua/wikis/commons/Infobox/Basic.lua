@@ -13,6 +13,7 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
+local Context = Lua.import('Module:Widget/ComponentContext')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Infobox = Lua.import('Module:Widget/Infobox/Core')
 
@@ -125,7 +126,11 @@ function BasicInfobox:build(widgets, infoboxType)
 	if self.injector then
 		-- Customizable backwards compatibility
 		local CustomizableContext = Lua.import('Module:Widget/Contexts/Customizable')
-		return CustomizableContext.LegacyCustomizable{value = self.injector, children = {infobox}}
+		return Context.Provider{
+			def = CustomizableContext.Customizable,
+			value = self.injector,
+			children = infobox,
+		}
 	end
 	return infobox
 end
