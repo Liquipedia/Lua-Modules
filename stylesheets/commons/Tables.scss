@@ -45,6 +45,10 @@ $table-link-visited-color--dark: $link-color-visited--dark;
 $table-link-visited-hover-color--light: color-mix( in srgb, #000000 24%, var( --clr-primary ) );
 $table-link-visited-hover-color--dark: $link-color-visited-hover--dark;
 
+/* Highlight colors */
+$publisher-premier-highlight-background-color--light: #ffffcc;
+$publisher-premier-highlight-background-color--dark: var( --clr-sun-10 );
+
 .theme--light {
 	--table-background-color: #{$table-background-color--light};
 	--table-variant-background-color: #{$table-variant-background-color--light};
@@ -61,6 +65,7 @@ $table-link-visited-hover-color--dark: $link-color-visited-hover--dark;
 	--table-header-background-color: #{$table-header-background-color--light};
 	--table-header-variant-background-color: #{$table-header-variant-background-color--light};
 	--table-subheader-background-color: #{$table-subheader-background-color--light};
+	--publisher-premier-highlight-background-color: #{$publisher-premier-highlight-background-color--light};
 }
 
 .theme--dark {
@@ -79,6 +84,7 @@ $table-link-visited-hover-color--dark: $link-color-visited-hover--dark;
 	--table-header-background-color: #{$table-header-background-color--dark};
 	--table-header-variant-background-color: #{$table-header-variant-background-color--dark};
 	--table-subheader-background-color: #{$table-subheader-background-color--dark};
+	--publisher-premier-highlight-background-color: #{$publisher-premier-highlight-background-color--dark};
 }
 
 .table-responsive {
