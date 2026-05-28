@@ -316,9 +316,6 @@ local byFactionAoE3 = {
 	unitedstates = {
 		icon = 'File:United States AoE3 icon.png',
 	},
-	random = {
-		icon = 'File:Random AoE3 icon.png',
-	},
 
 	unknown = {
 		icon = 'File:Char head filler.png',
@@ -402,38 +399,17 @@ local byFactionAoE4 = {
 }
 
 local byFactionAoM = {
-	atlanteans = {
-		icon = 'File:Atlantean AoM R icon.png',
-	},
-	aztecs = {
-		icon = 'File:Aztecs AoM R icon.png',
-	},
-	chinese = {
-		icon = 'File:Chinese AoM R icon.png',
-	},
-	egyptians = {
-		icon = 'File:Egyptian AoM R icon.png',
-	},
-	greeks = {
-		icon = 'File:Greek AoM R icon.png',
-	},
-	japanese = {
-		icon = 'File:Japanese AoM R icon.png',
-	},
-	norse = {
-		icon = 'File:Norse AoM R icon.png',
-	},
 	amaterasu = {
 		icon = 'File:Amaterasu AoM R icon.png',
 	},
 	demeter = {
 		icon = 'File:Demeter AoM R icon.png',
 	},
-	fuxi = {
-		icon = 'File:Fuxi AoM R icon.png',
-	},
 	freyr = {
 		icon = 'File:Freyr AoM R icon.png',
+	},
+	fuxi = {
+		icon = 'File:Fuxi AoM R icon.png',
 	},
 	gaia = {
 		icon = 'File:Gaia AoM R icon.png',
