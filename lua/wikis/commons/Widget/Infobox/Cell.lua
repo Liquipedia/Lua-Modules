@@ -25,7 +25,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@field separator Renderable?
 
 ---@class CellWidgetProps
----@field name Renderable
+---@field name Renderable?
 ---@field classes string[]?
 ---@field children Renderable[]?
 ---@field options CellWidgetOptions?

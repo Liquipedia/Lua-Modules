@@ -20,12 +20,16 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 
 ---@class CustomInfoboxUser: InfoboxUser
+---@operator call(Frame): CustomInfoboxUser
 local CustomUser = Class.new(User)
 
+---@class CustomInfoboxUserWidgetInjector: WidgetInjector
+---@operator call(CustomInfoboxUser): CustomInfoboxUserWidgetInjector
+---@field caller CustomInfoboxUser
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomUser.run(frame)
 	local user = CustomUser(frame)
 	user:setWidgetInjector(CustomInjector(user))
@@ -36,8 +40,8 @@ function CustomUser.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 

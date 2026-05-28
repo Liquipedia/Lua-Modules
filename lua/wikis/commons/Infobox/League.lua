@@ -55,13 +55,13 @@ local Venue = Widgets.Venue
 local League = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function League.run(frame)
 	local league = League(frame)
 	return league:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function League:createInfobox()
 	local args = self.args
 	self:_parseArgs()
