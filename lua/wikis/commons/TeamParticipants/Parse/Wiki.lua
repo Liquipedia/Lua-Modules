@@ -22,8 +22,14 @@ local Variables = Lua.import('Module:Variables')
 
 local TeamParticipantsWikiParser = {}
 
+local STATUS_DISQUALIFIED = 'DISQUALIFIED'
+local STATUS_WITHDRAWN = 'WITHDRAWN'
+local STATUS_REPLACEMENT = 'REPLACEMENT'
+
+---@alias TeamParticipantStatus `STATUS_DISQUALIFIED`|`STATUS_WITHDRAWN`|`STATUS_REPLACEMENT`
+
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
----qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer,
+---qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer, status: TeamParticipantStatus?,
 ---potentialQualifiers: standardOpponent[]?, warnings: string[]?, broken: boolean?, errorMessage: string?}
 
 ---@alias QualificationMethod 'invite'|'qual'
@@ -202,6 +208,10 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		aliases = Array.flatMap(aliases, function(alias)
 			return TeamTemplate.queryHistoricalNames(alias)
 		end),
+		status = Logic.readBool(input.disqualified) and STATUS_DISQUALIFIED
+			or Logic.readBool(input.withdrawn) and STATUS_WITHDRAWN
+			or Logic.readBool(input.replacement) and STATUS_REPLACEMENT
+			or nil,
 		notes = Array.map(input.notes or {}, function(note)
 			local text = note[1]
 			if not text then
