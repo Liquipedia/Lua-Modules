@@ -73,7 +73,7 @@ local function TeamIcon(props)
 	local link = getPageLink(props.page, props.noLink)
 
 	---@param image string
-	---@return Widget
+	---@return VNode
 	local function getIcon(image)
 		return IconImage{
 			imageLight = image,

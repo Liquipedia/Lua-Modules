@@ -80,7 +80,7 @@ end
 ---@private
 ---@param teamTemplate teamTemplateData
 ---@param props BlockTeamParameters
----@return Widget|Widget[]?
+---@return VNode|VNode[]?
 function BlockTeamWidget._getNameComponent(teamTemplate, props)
 	local name = teamTemplate.name
 	local bracketName = teamTemplate.bracketname
