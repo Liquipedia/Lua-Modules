@@ -72,7 +72,7 @@ $clr-on-background--light: #1b1b1b;
 $clr-surface--light: #fdfcff;
 $clr-on-surface--light: #1b1b1b;
 
-$clr-background--dark: brandColorFromMap( secondary, 7 );
+$clr-background--dark: var( --clr-secondary-7 );
 $clr-on-background--dark: #e2e2e6;
 $clr-surface--dark: #1b1b1b;
 $clr-on-surface--dark: #e2e2e6;
@@ -83,7 +83,7 @@ $clr-on-surface-variant--light: #43474e;
 $clr-outline--light: #73777f;
 
 $clr-surface-variant--dark: #43474e;
-$clr-on-surface-variant--dark: brandColorFromMap( secondary, 100 );
+$clr-on-surface-variant--dark: var( --clr-secondary-100 );
 $clr-outline--dark: #8d9199;
 
 /** Confirmed **/
@@ -104,11 +104,11 @@ $clr-surface-3--light: #e3ebf5;
 $clr-surface-4--light: #e0e9f4;
 $clr-surface-5--light: #dbe6f2;
 
-$clr-surface-1--dark: brandColorFromMap( secondary, 7 );
-$clr-surface-2--dark: brandColorFromMap( secondary, 9 );
-$clr-surface-3--dark: brandColorFromMap( secondary, 16 );
-$clr-surface-4--dark: brandColorFromMap( secondary, 39 );
-$clr-surface-5--dark: brandColorFromMap( secondary, 80 );
+$clr-surface-1--dark: var( --clr-secondary-7 );
+$clr-surface-2--dark: var( --clr-secondary-9 );
+$clr-surface-3--dark: var( --clr-secondary-16 );
+$clr-surface-4--dark: var( --clr-secondary-39 );
+$clr-surface-5--dark: var( --clr-secondary-80 );
 
 $clr-border--light: rgba( #000000, 8% );
 $clr-border--dark: rgba( #ffffff, 8% );
