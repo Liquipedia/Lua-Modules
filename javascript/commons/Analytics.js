@@ -159,8 +159,7 @@ liquipedia.analytics = {
 			if ( !consent ) {
 				return;
 			}
-		} catch (error) {
-			console.error('[Amplitude Sampling] __tcfapi timeout');
+		} catch (_) {
 			return;
 		}
 
