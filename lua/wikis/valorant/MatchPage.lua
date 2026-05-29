@@ -18,9 +18,9 @@ local Table = Lua.import('Module:Table')
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Carousel = Lua.import('Module:Widget/Basic/Carousel')
-local Div = HtmlWidgets.Div
+local Div = Html.Div
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
@@ -29,7 +29,7 @@ local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local PlayerStatContainer = Lua.import('Module:Widget/Match/Page/PlayerStat/Container')
 local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
-local Span = HtmlWidgets.Span
+local Span = Html.Span
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -39,7 +39,7 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 ---@operator call(MatchPageMatch): ValorantMatchPage
 local MatchPage = Class.new(BaseMatchPage)
 
-local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
+local SPAN_SLASH = Span{classes = {'slash'}, children = '/'}
 
 local ROUNDS_BEFORE_SPLIT = 12
 local WIN_TYPES = {
@@ -66,7 +66,7 @@ local WIN_TYPES = {
 }
 
 ---@param props {match: MatchGroupUtilMatch}
----@return Widget
+---@return VNode
 function MatchPage.getByMatchId(props)
 	local matchPage = MatchPage(props.match)
 
@@ -84,7 +84,7 @@ function MatchPage:populateGames()
 	end)
 end
 
----@return Widget?
+---@return VNode?
 function MatchPage:renderOverallStats()
 	if self:isBestOfOne() then
 		return
@@ -119,7 +119,7 @@ function MatchPage:renderOverallStats()
 		end)
 	}
 
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = WidgetUtil.collect(
 			self:_renderTeamStats(overallTeamData),
 			self:_renderPerformance(overallPlayerData)
@@ -128,9 +128,9 @@ function MatchPage:renderOverallStats()
 end
 
 ---@param game MatchPageGame
----@return Widget
+---@return VNode
 function MatchPage:renderGame(game)
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = WidgetUtil.collect(
 			self:_renderGameOverview(game),
 			self:_renderRoundsOverview(game),
@@ -186,7 +186,7 @@ end
 
 ---@private
 ---@param game MatchPageGame
----@return Widget|Widget[]
+---@return Renderable|Renderable[]
 function MatchPage:_renderGameOverview(game)
 	local team1 = getTeamHalvesDetails(game, 1)
 	local team2 = getTeamHalvesDetails(game, 2)
@@ -268,7 +268,7 @@ function MatchPage:_renderGameOverview(game)
 
 	if self:isBestOfOne() then
 		return {
-			HtmlWidgets.H3{children = {'Game Overview: ', game.map}},
+			Html.H3{children = {'Game Overview: ', game.map}},
 			overview
 		}
 	end
@@ -308,10 +308,10 @@ end
 
 ---@private
 ---@param game MatchPageGame
----@return Widget[]
+---@return VNode[]
 function MatchPage:_renderTeamStats(game)
 	return {
-		HtmlWidgets.H3{children = 'Team Stats'},
+		Html.H3{children = 'Team Stats'},
 		Div{
 			classes = {'match-bm-team-stats'},
 			children = {
@@ -438,13 +438,13 @@ MatchPage._displayCeremony = FnUtil.memoize(function (ceremony)
 	return Span{children = {
 		ceremonyIcon,
 		' ',
-		HtmlWidgets.B{children = ceremony}
+		Html.B{children = ceremony}
 	}}
 end)
 
 ---@private
 ---@param game MatchPageGame
----@return Widget
+---@return Renderable
 function MatchPage:_renderRoundDetails(game)
 	local findPlayer = FnUtil.memoize(FnUtil.curry(MatchPage._findPlayerByPuuid, game))
 	return GeneralCollapsible{
@@ -462,7 +462,7 @@ end
 ---@param findPlayer fun(puuid: string): {player: string, displayName: string}?
 ---@param round ValorantRoundData
 ---@param roundIndex integer
----@return Widget
+---@return VNode
 function MatchPage:_renderRoundDetail(findPlayer, round, roundIndex)
 	local firstKillPlayer = findPlayer(round.firstKill.killer) or {}
 	local ceremonyPlayer = findPlayer(round.ceremonyFor)
@@ -498,15 +498,15 @@ function MatchPage:_renderRoundDetail(findPlayer, round, roundIndex)
 								classes = {'match-bm-match-round-detail-body-result-winner'},
 								children = {
 									self.opponents[(round.winningSide == round.t1side) and 1 or 2].iconDisplay,
-									HtmlWidgets.B{children = 'Winner'},
+									Html.B{children = 'Winner'},
 								}
 							}
 						)
 					},
-					HtmlWidgets.Hr{},
+					Html.Hr{},
 					Span{children = {
 						IconFa{iconName = 'team_firstkills'},
-						HtmlWidgets.B{children = ' First Kill'},
+						Html.B{children = ' First Kill'},
 						' ',
 						Link{link = firstKillPlayer.player, children = firstKillPlayer.displayName}
 					}},
@@ -526,10 +526,10 @@ end
 
 ---@private
 ---@param game MatchPageGame
----@return Widget[]
+---@return VNode[]
 function MatchPage:_renderPerformance(game)
 	return {
-		HtmlWidgets.H3{children = 'Player Performance'},
+		Html.H3{children = 'Player Performance'},
 		Div{
 			classes = {'match-bm-players-wrapper'},
 			children = {
@@ -543,7 +543,7 @@ end
 ---@private
 ---@param game MatchPageGame
 ---@param teamIndex integer
----@return Widget
+---@return VNode
 function MatchPage:_renderTeamPerformance(game, teamIndex)
 	return Div{
 		classes = {'match-bm-players-team'},
@@ -567,7 +567,7 @@ end
 
 ---@private
 ---@param player table
----@return Widget?
+---@return VNode?
 function MatchPage:_renderPlayerPerformance(player)
 	if Logic.isEmpty(player) then
 		return

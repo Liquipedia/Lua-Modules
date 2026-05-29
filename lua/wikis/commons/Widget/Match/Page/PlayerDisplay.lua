@@ -7,28 +7,22 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
-
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class MatchPagePlayerDisplayParameters
----@field characterIcon (string|Html|Widget|nil)
+---@field characterIcon Renderable?
 ---@field characterName string
----@field side string
----@field roleIcon (string|Html|Widget|nil)
+---@field side string?
+---@field roleIcon Renderable?
 ---@field playerName string
 ---@field playerLink string?
 
----@class MatchPagePlayerDisplay: Widget
----@operator call(MatchPagePlayerDisplayParameters): MatchPagePlayerDisplay
----@field props MatchPagePlayerDisplayParameters
-local MatchPagePlayerDisplay = Class.new(Widget)
-
+---@param props MatchPagePlayerDisplayParameters
 ---@return Widget
-function MatchPagePlayerDisplay:render()
+local function MatchPagePlayerDisplay(props)
 	return Div{
 		classes = {'match-bm-players-player-character'},
 		children = {
@@ -37,14 +31,14 @@ function MatchPagePlayerDisplay:render()
 				children = {
 					Div{
 						classes = {'match-bm-players-player-icon'},
-						children = self.props.characterIcon
+						children = props.characterIcon
 					},
 					Div{
 						classes = {
 							'match-bm-players-player-role',
-							self.props.side and 'role--' .. self.props.side  or nil
+							props.side and 'role--' .. props.side  or nil
 						},
-						children = self.props.roleIcon
+						children = props.roleIcon
 					}
 				}
 			},
@@ -52,14 +46,14 @@ function MatchPagePlayerDisplay:render()
 				classes = {'match-bm-players-player-name'},
 				children = {
 					Link{
-						link = self.props.playerLink or self.props.playerName,
-						children = self.props.playerName
+						link = props.playerLink or props.playerName,
+						children = props.playerName
 					},
-					HtmlWidgets.I{children = self.props.characterName}
+					Html.I{children = props.characterName}
 				}
 			}
 		}
 	}
 end
 
-return MatchPagePlayerDisplay
+return Component.component(MatchPagePlayerDisplay)
