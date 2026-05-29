@@ -21,7 +21,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@field page string?
 
 ---@param props TeamNameDisplayParameters
----@return Widget?
+---@return VNode?
 local function TeamNameDisplay(props)
 	local displayName = props.displayName
 	if String.isEmpty(displayName) then return end
