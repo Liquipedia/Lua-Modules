@@ -34,7 +34,7 @@ local makeGameResultIcon = FnUtil.memoize(function (result)
 end)
 
 ---@param props {seriesDots: string[]?}
----@return Widget?
+---@return VNode?
 local function MatchPageSeriesDots(props)
 	local seriesDots = props.seriesDots
 	if Logic.isEmpty(seriesDots) then

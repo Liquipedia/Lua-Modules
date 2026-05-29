@@ -21,7 +21,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@field playerLink string?
 
 ---@param props MatchPagePlayerDisplayParameters
----@return Widget
+---@return VNode
 local function MatchPagePlayerDisplay(props)
 	return Div{
 		classes = {'match-bm-players-player-character'},
