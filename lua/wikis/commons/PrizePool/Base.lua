@@ -63,6 +63,8 @@ local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 local PRIZE_TYPE_POINTS = 'POINTS'
 local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
 local PRIZE_TYPE_FREETEXT = 'FREETEXT'
+local PRIZE_TYPE_PLAYER_SHARE = 'PLAYER_SHARE'
+local PRIZE_TYPE_CLUB_SHARE = 'CLUB_SHARE'
 
 BasePrizePool.config = {
 	showBaseCurrency = {
@@ -357,8 +359,54 @@ BasePrizePool.prizeTypes = {
 			end
 		end,
 	},
-	[PRIZE_TYPE_FREETEXT] = {
+	[PRIZE_TYPE_PLAYER_SHARE] = {
 		sortOrder = 60,
+
+		header = 'playershare',
+		headerParse = function (prizePool, input, context, index)
+			return {title = 'Player Share'}
+		end,
+		headerDisplay = function (data)
+			return TableCell{children = {data.title}}
+		end,
+
+		row = 'playershare',
+		rowParse = function (placement, input, context, index)
+			return BasePrizePool._parseInteger(input)
+		end,
+		rowDisplay = function (headerData, data)
+			if data > 0 then
+				return TableCell{children = {
+					Currency.display(BASE_CURRENCY, data,
+						{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
+				}}
+			end
+		end,
+	},
+	[PRIZE_TYPE_CLUB_SHARE] = {
+		sortOrder = 70,
+		header = 'clubshare',
+		headerParse = function(prizePool, input, context, index)
+			return {title = String.isNotEmpty(input) and input or 'Club Share'}
+		end,
+		headerDisplay = function(data)
+			return TableCell{children = {data.title}}
+		end,
+		row = 'clubshare',
+		rowParse = function(placement, input, context, index)
+			return input
+		end,
+		rowDisplay = function(headerData, data)
+			if data and tonumber(data) > 0 then
+				return TableCell{children = {
+					Currency.display(BASE_CURRENCY, data,
+						{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
+				}}
+			end
+		end,
+	},
+	[PRIZE_TYPE_FREETEXT] = {
+		sortOrder = 80,
 
 		header = 'freetext',
 		headerParse = function (prizePool, input, context, index)
@@ -423,6 +471,22 @@ function BasePrizePool:create()
 		self:setConfig('showBaseCurrency', true)
 		self:addPrize(PRIZE_TYPE_BASE_CURRENCY, 1, {roundPrecision = self.options.currencyRoundPrecision})
 
+		local hasPlayerShare = Array.any(self.prizes, function(prize)
+			return prize.type == PRIZE_TYPE_PLAYER_SHARE
+		end)
+		if hasPlayerShare then
+			local alreadyHasClubShare = Array.any(self.prizes, function(prize)
+				return prize.type == PRIZE_TYPE_CLUB_SHARE
+			end)
+			if not alreadyHasClubShare then
+				local clubShareTitle = self.args.clubshare
+				self:addPrize(PRIZE_TYPE_CLUB_SHARE, 1, {
+					title = String.isNotEmpty(clubShareTitle) and clubShareTitle or 'Club Share',
+					roundPrecision = self.options.currencyRoundPrecision
+				})
+			end
+		end
+
 		if self.options.autoExchange then
 			local canConvertCurrency = function(prize)
 				return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
@@ -434,10 +498,16 @@ function BasePrizePool:create()
 				return prize.type == PRIZE_TYPE_PERCENTAGE and prize.index == 1
 			end)
 
-			for _, placement in ipairs(self.placements) do
+			Array.forEach(self.placements, function(placement)
 				if hasPercentage1 then placement:_calculateFromPercentage(BasePrizePool.prizeTypes, hasLocalCurrency1) end
 				placement:_setBaseFromRewards(Array.filter(self.prizes, canConvertCurrency), BasePrizePool.prizeTypes)
-			end
+			end)
+		end
+
+		if hasPlayerShare then
+			Array.forEach(self.placements, function(placement)
+				placement:_setClubShareFromPlayerShare(self.prizes)
+			end)
 		end
 	end
 
