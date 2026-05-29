@@ -128,11 +128,42 @@ liquipedia.analytics = {
 		}, true );
 	},
 
-	track: function( eventName, properties ) {
+	waitForProcessedConsent: function ( frequency, maxRetries ) {
+		return new Promise((resolve, reject) => {
+			let attempts = 0;
+
+			const timer = setInterval(() => {
+				attempts++;
+
+				if (window.consent === true || window.consent === false) {
+					clearInterval(timer);
+					resolve(window.consent);
+				}
+				else if (attempts >= maxRetries) {
+					clearInterval(timer);
+					reject(new Error(`Max retries reached`));
+				}
+			}, frequency);
+		});
+	},
+
+	track: async function( eventName, properties ) {
 		// amplitude is blocked, either by user choice or by an adblocker
 		if ( !window.amplitude ) {
 			return;
 		}
+
+		// make sure the consent handler has been initialized
+		try {
+			const consent = await this.waitForProcessedConsent(300, 100);
+			if ( !consent ) {
+				return;
+			}
+		} catch (error) {
+			console.error('[Amplitude Sampling] __tcfapi timeout');
+			return;
+		}
+
 		window.amplitude.track( eventName, {
 			'page domain': getPageDomain(),
 			'page location': getPageLocation(),
