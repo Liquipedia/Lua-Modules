@@ -8,52 +8,46 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
 local SeriesDots = Lua.import('Module:Widget/Match/Page/SeriesDots')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class MatchPageOpponentDisplayParameters
----@field opponent MatchPageOpponent
----@field flip boolean?
+local MatchPageOpponentDisplay = {}
 
----@class MatchPageOpponentDisplay: Widget
----@operator call(MatchPageOpponentDisplayParameters): MatchPageOpponentDisplay
----@field props MatchPageOpponentDisplayParameters
-local MatchPageOpponentDisplay = Class.new(Widget)
-
+---@param props {opponent: MatchPageOpponent, flip: boolean?}
 ---@return Widget?
-function MatchPageOpponentDisplay:render()
+function MatchPageOpponentDisplay.render(props)
 	return Div{
-		classes = self:_getClasses(),
-		children = self:_buildDisplay(),
+		classes = MatchPageOpponentDisplay._getClasses(props.opponent),
+		children = MatchPageOpponentDisplay._buildDisplay(props.opponent, props.flip),
 	}
 end
 
 ---@private
+---@param opponent standardOpponent
 ---@return boolean
-function MatchPageOpponentDisplay:_isPartyType()
-	return Opponent.typeIsParty(self.props.opponent.type)
+function MatchPageOpponentDisplay._isPartyType(opponent)
+	return Opponent.typeIsParty(opponent.type)
 end
 
 ---@private
+---@param opponent standardOpponent
 ---@return string[]
-function MatchPageOpponentDisplay:_getClasses()
-	local opponent = self.props.opponent
+function MatchPageOpponentDisplay._getClasses(opponent)
 	local classes = {'match-bm-match-header-opponent'}
 
 	if opponent.type ~= Opponent.literal then
 		Array.extendWith(
 			classes,
-			'match-bm-match-header-' .. (self:_isPartyType() and 'party' or 'team')
+			'match-bm-match-header-' .. (MatchPageOpponentDisplay._isPartyType(opponent) and 'party' or 'team')
 		)
 	end
 
@@ -61,9 +55,10 @@ function MatchPageOpponentDisplay:_getClasses()
 end
 
 ---@private
----@return Widget|Widget[]?
-function MatchPageOpponentDisplay:_buildDisplay()
-	local opponent = self.props.opponent
+---@param opponent MatchPageOpponent
+---@param flip boolean?
+---@return Renderable|Renderable[]?
+function MatchPageOpponentDisplay._buildDisplay(opponent, flip)
 	if Opponent.isEmpty(opponent) then
 		return
 	elseif opponent.type == Opponent.literal then
@@ -78,9 +73,9 @@ function MatchPageOpponentDisplay:_buildDisplay()
 		Div{
 			classes = {'match-bm-match-header-opponent-group'},
 			children = WidgetUtil.collect(
-				self:_isPartyType()
-					and self:_buildPartyDisplay()
-					or self:_buildTeamDisplay(),
+				MatchPageOpponentDisplay._isPartyType(opponent)
+					and MatchPageOpponentDisplay._buildPartyDisplay(opponent, flip)
+					or MatchPageOpponentDisplay._buildTeamDisplay(opponent),
 				SeriesDots{seriesDots = opponent.seriesDots}
 			)
 		}
@@ -88,11 +83,10 @@ function MatchPageOpponentDisplay:_buildDisplay()
 end
 
 ---@private
----@return Widget[]
-function MatchPageOpponentDisplay:_buildTeamDisplay()
-	local opponent = self.props.opponent
-
-	local data = self.props.opponent.teamTemplateData
+---@param opponent MatchPageOpponent
+---@return VNode[]
+function MatchPageOpponentDisplay._buildTeamDisplay(opponent)
+	local data = opponent.teamTemplateData
 	assert(data, TeamTemplate.noTeamMessage(opponent.template))
 	local hideLink = Opponent.isTbd(opponent)
 	return {
@@ -108,15 +102,16 @@ function MatchPageOpponentDisplay:_buildTeamDisplay()
 end
 
 ---@private
----@return Widget
-function MatchPageOpponentDisplay:_buildPartyDisplay()
-	local opponent = self.props.opponent
+---@param opponent MatchPageOpponent
+---@param flip boolean?
+---@return VNode
+function MatchPageOpponentDisplay._buildPartyDisplay(opponent, flip)
 	return Div{
 		classes = { 'match-bm-match-header-opponent-group-container' },
 		children = Array.map(opponent.players, function (player)
-			return PlayerDisplay.BlockPlayer{player = player, flip = self.props.flip}
+			return PlayerDisplay.BlockPlayer{player = player, flip = flip}
 		end)
 	}
 end
 
-return MatchPageOpponentDisplay
+return Component.component(MatchPageOpponentDisplay.render)
