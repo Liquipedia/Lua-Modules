@@ -2,6 +2,65 @@
 Template(s): Wikitables
 Author(s): FO-nTTaX, salle
 *******************************************************************************/
+
+/* Tables - headers */
+$table-header-background-color--light: var( --clr-surface-4 );
+$table-header-background-color--dark: var( --clr-wiki-theme-20 );
+$table-header-variant-background-color--light: var( --clr-surface-2 );
+$table-header-variant-background-color--dark: var( --clr-secondary-16 );
+
+/* Tables - background colors */
+$table-background-color--light: var( --clr-surface-1 );
+$table-background-color--dark: var( --clr-secondary-7 );
+$table-variant-background-color--light: var( --clr-surface-variant );
+$table-variant-background-color--dark: var( --clr-secondary-16 );
+$table-striped-background-color--light: var( --clr-surface-2 );
+$table-striped-background-color--dark: var( --clr-secondary-9 );
+$table-green-background-color--light: var( --clr-semantic-positive-90 );
+$table-green-background-color--dark: color-mix( in srgb, #000000 20%, var( --clr-semantic-positive-20 ) );
+$table-red-background-color--light: var( --clr-semantic-negative-90 );
+$table-red-background-color--dark: color-mix( in srgb, #000000 20%, var( --clr-semantic-negative-20 ) );
+$table-yellow-background-color--light: var( --clr-sun-90 );
+$table-yellow-background-color--dark: var( --clr-sun-20 );
+
+/* Tables - borders */
+$table-border-color--light: rgba( #000000, 8% );
+$table-border-color--dark: var( --clr-secondary-25 );
+$table-green-border-color--light: var( --clr-semantic-positive-90 );
+$table-green-border-color--dark: var( --clr-semantic-positive-20 );
+
+/* Highlight colors */
+$publisher-premier-highlight-background-color--light: #ffffcc;
+$publisher-premier-highlight-background-color--dark: var( --clr-sun-10 );
+
+.theme--light {
+	--table-background-color: #{$table-background-color--light};
+	--table-variant-background-color: #{$table-variant-background-color--light};
+	--table-striped-background-color: #{$table-striped-background-color--light};
+	--table-green-background-color: #{$table-green-background-color--light};
+	--table-red-background-color: #{$table-red-background-color--light};
+	--table-yellow-background-color: #{$table-yellow-background-color--light};
+	--table-border-color: #{$table-border-color--light};
+	--table-green-border-color: #{$table-green-border-color--light};
+	--table-header-background-color: #{$table-header-background-color--light};
+	--table-header-variant-background-color: #{$table-header-variant-background-color--light};
+	--publisher-premier-highlight-background-color: #{$publisher-premier-highlight-background-color--light};
+}
+
+.theme--dark {
+	--table-background-color: #{$table-background-color--dark};
+	--table-variant-background-color: #{$table-variant-background-color--dark};
+	--table-striped-background-color: #{$table-striped-background-color--dark};
+	--table-green-background-color: #{$table-green-background-color--dark};
+	--table-red-background-color: #{$table-red-background-color--dark};
+	--table-yellow-background-color: #{$table-yellow-background-color--dark};
+	--table-border-color: #{$table-border-color--dark};
+	--table-green-border-color: #{$table-green-border-color--dark};
+	--table-header-background-color: #{$table-header-background-color--dark};
+	--table-header-variant-background-color: #{$table-header-variant-background-color--dark};
+	--publisher-premier-highlight-background-color: #{$publisher-premier-highlight-background-color--dark};
+}
+
 .table-responsive {
 	display: block;
 	width: auto;
