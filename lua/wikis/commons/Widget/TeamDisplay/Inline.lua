@@ -8,14 +8,13 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Span = HtmlWidgets.Span
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Span = Html.Span
 local TeamIcon = Lua.import('Module:Widget/Image/Icon/TeamIcon')
 local TeamName = Lua.import('Module:Widget/TeamDisplay/Component/Name')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -58,36 +57,30 @@ local TEAM_INLINE_TYPES = {
 ---@field flip boolean?
 ---@field displayType teamStyle
 
----@class TeamInlineWidget: Widget
----@operator call(TeamInlineParameters): TeamInlineWidget
----@field name string?
----@field props TeamInlineParameters
----@field teamTemplate teamTemplateData
----@field flip boolean
----@field displayType InlineType
-local TeamInlineWidget = Class.new(Widget,
-	---@param self self
-	---@param input TeamInlineParameters
-	function (self, input)
-		assert(TEAM_INLINE_TYPES[input.displayType], 'Invalid display type')
-		self.teamTemplate = input.teamTemplate or TeamTemplate.getRawOrNil(input.name, input.date)
-		self.name = (self.teamTemplate or {}).name or input.name
-		self.flip = Logic.readBool(input.flip)
-		self.displayType = TEAM_INLINE_TYPES[input.displayType]
-	end
-)
+local TeamInlineWidget = {}
 
----@return Widget
-function TeamInlineWidget:render()
-	local teamTemplate = self.teamTemplate
+---@param props TeamInlineParameters
+---@return teamTemplateData?
+function TeamInlineWidget.readTeamTemplate(props)
+	if props.teamTemplate then
+		return props.teamTemplate
+	end
+	return TeamTemplate.getRawOrNil(props.name, props.date)
+end
+
+---@param props TeamInlineParameters
+---@return VNode
+function TeamInlineWidget.render(props)
+	local displayType = assert(TEAM_INLINE_TYPES[props.displayType], 'Invalid display type')
+	local teamTemplate = props.teamTemplate or TeamTemplate.getRawOrNil(props.name, props.date)
 	if not teamTemplate then
 		mw.ext.TeamLiquidIntegration.add_category('Pages with missing team templates')
-		return HtmlWidgets.Small{
+		return Html.Small{
 			classes = { 'error' },
-			children = { TeamTemplate.noTeamMessage(self.name) }
+			children = { TeamTemplate.noTeamMessage(props.name) }
 		}
 	end
-	local flip = self.flip
+	local flip = Logic.readBool(props.flip)
 	local imageLight = Logic.emptyOr(teamTemplate.image, teamTemplate.legacyimage)
 	local imageDark = Logic.emptyOr(teamTemplate.imagedark, teamTemplate.legacyimagedark)
 	local children = Array.interleave(WidgetUtil.collect(
@@ -99,28 +92,30 @@ function TeamInlineWidget:render()
 			legacy = Logic.isEmpty(teamTemplate.image) and Logic.isNotEmpty(teamTemplate.legacyimage),
 			noLink = teamTemplate.page == 'TBD',
 		},
-		self:_getNameComponent()
+		TeamInlineWidget._getNameComponent(displayType, teamTemplate)
 	), ' ')
 	return Span{
-		attributes = { ['data-highlighting-class'] = self.teamTemplate.name },
-		classes = { 'team-template-team' .. (flip and '2' or '') .. '-' .. self.displayType.displayType },
+		attributes = { ['data-highlighting-class'] = teamTemplate.name },
+		classes = { 'team-template-team' .. (flip and '2' or '') .. '-' .. displayType.displayType },
 		children = flip and Array.reverse(children) or children
 	}
 end
 
 ---@private
----@return Widget
-function TeamInlineWidget:_getNameComponent()
-	return HtmlWidgets.Fragment{
-		children = Array.map(Table.entries(self.displayType.displayNames), function (element)
+---@param displayType InlineType
+---@param teamTemplate teamTemplateData
+---@return VNode
+function TeamInlineWidget._getNameComponent(displayType, teamTemplate)
+	return Html.Fragment{
+		children = Array.map(Table.entries(displayType.displayNames), function (element)
 			return TeamName{
 				additionalClasses = element[2],
-				displayName = self.teamTemplate[element[1]],
-				page = self.teamTemplate.page,
-				noLink = self.teamTemplate.page == 'TBD',
+				displayName = teamTemplate[element[1]],
+				page = teamTemplate.page,
+				noLink = teamTemplate.page == 'TBD',
 			}
 		end)
 	}
 end
 
-return TeamInlineWidget
+return Component.component(TeamInlineWidget.render)
