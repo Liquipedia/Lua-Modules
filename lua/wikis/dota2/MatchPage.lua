@@ -15,6 +15,7 @@ local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 
+local Label = Lua.import('Module:Widget/Basic/Label')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
@@ -51,7 +52,7 @@ function MatchPage:populateGames()
 		game.teams = Array.map(Array.range(1, 2), function(teamIdx)
 			local team = {}
 
-			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
+			team.scoreDisplay = game.winner == teamIdx and 'win' or game.finished and 'loss' or '-'
 			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
 			team.players = Array.map(Array.filter(game.opponents[teamIdx].players or {}, Table.isNotEmpty), function(player)
 				local newPlayer = Table.mergeInto(player, {
@@ -233,6 +234,7 @@ end
 ---@return Renderable
 function MatchPage:_renderStatsTeamDisplay(game, teamIndex)
 	local team = game.teams[teamIndex]
+	local scoreDisplay = team.scoreDisplay
 	return Div{
 		classes = {'match-bm-team-stats-team'},
 		children = {
@@ -244,11 +246,9 @@ function MatchPage:_renderStatsTeamDisplay(game, teamIndex)
 				classes = {'match-bm-team-stats-team-side'},
 				children = team.side
 			},
-			Div{
-				classes = {
-					'match-bm-team-stats-team-state',
-					'state--' .. team.scoreDisplay
-				},
+			Label{
+				labelType = 'result-' .. (scoreDisplay == '-' and 'default' or scoreDisplay),
+				classes = {'match-bm-team-stats-team-state'},
 				children = team.scoreDisplay
 			}
 		}

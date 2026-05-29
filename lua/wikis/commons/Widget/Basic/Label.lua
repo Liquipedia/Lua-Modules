@@ -7,6 +7,8 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
+
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 
@@ -29,10 +31,11 @@ local function GenericLabel(props)
 
 	return Html.Div{
 		attributes = props.attributes,
-		classes = {
+		classes = Array.extend(
 			'generic-label',
 			props.labelScheme and ('label--' .. props.labelScheme) or nil,
-		},
+			props.classes
+		),
 		css = props.css,
 		children = props.children,
 	}
