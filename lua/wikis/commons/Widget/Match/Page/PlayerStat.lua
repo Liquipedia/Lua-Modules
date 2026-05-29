@@ -15,7 +15,7 @@ local Div = Html.Div
 
 ---@param props {title: Renderable|Renderable[], data?: Renderable|Renderable[]}
 ---@return VNode
-function MatchPagePlayerStat(props)
+local function MatchPagePlayerStat(props)
 	local title = props.title
 	local data = props.data
 	assert(Logic.isNotEmpty(title), 'Title not specified for this stat')
