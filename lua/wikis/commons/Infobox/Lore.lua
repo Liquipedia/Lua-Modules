@@ -1,4 +1,3 @@
-
 ---
 -- @Liquipedia
 -- page=Module:Infobox/Lore
