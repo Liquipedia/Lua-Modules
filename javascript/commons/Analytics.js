@@ -159,7 +159,7 @@ liquipedia.analytics = {
 			if ( !consent ) {
 				return;
 			}
-		} catch (_) {
+		} catch {
 			return;
 		}
 
