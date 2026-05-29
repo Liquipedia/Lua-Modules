@@ -25,7 +25,7 @@ local defaultProps = {
 }
 
 ---@param props MatchSummaryCharacterProps
----@return Widget[]?
+---@return VNode
 local function MatchSummaryCharacter(props)
 	local characterIcon = CharacterIcon.Icon{
 		character = props.character,

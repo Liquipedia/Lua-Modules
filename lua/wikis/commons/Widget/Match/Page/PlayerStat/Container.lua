@@ -16,7 +16,7 @@ local Div = Html.Div
 ---@field children? Renderable|Renderable[]
 
 ---@param props MatchPagePlayerStatContainerParameters
----@return Widget
+---@return VNode
 local function MatchPagePlayerStatContainer(props)
 	return Div{
 		classes = {'match-bm-players-player-stats-container'},

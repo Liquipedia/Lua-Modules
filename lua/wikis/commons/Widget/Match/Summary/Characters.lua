@@ -33,7 +33,7 @@ local defaultProps = {
 }
 
 ---@param props MatchSummaryCharactersProps
----@return Widget[]?
+---@return VNode?
 local function MatchSummaryCharacters(props)
 	if not props.characters then
 		return nil

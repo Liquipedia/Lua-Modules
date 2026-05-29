@@ -23,7 +23,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local MatchPageOpponentDisplay = {}
 
 ---@param props {opponent: MatchPageOpponent, flip: boolean?}
----@return Widget?
+---@return VNode?
 function MatchPageOpponentDisplay.render(props)
 	return Div{
 		classes = MatchPageOpponentDisplay._getClasses(props.opponent),

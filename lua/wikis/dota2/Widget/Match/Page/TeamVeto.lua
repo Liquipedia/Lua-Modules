@@ -16,7 +16,7 @@ local Div = Html.Div
 ---@field vetoRows VNode[]
 
 ---@param props Dota2MatchPageTeamVetoParameters
----@return Widget
+---@return VNode
 local function MatchPageTeamVeto(props)
 	return Div{
 		classes = {'match-bm-lol-game-veto-overview-team'},
