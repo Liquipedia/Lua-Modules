@@ -22,9 +22,9 @@ local Variables = Lua.import('Module:Variables')
 
 local TeamParticipantsWikiParser = {}
 
-local STATUS_DISQUALIFIED = 'DISQUALIFIED'
-local STATUS_WITHDRAWN = 'WITHDRAWN'
-local STATUS_REPLACEMENT = 'REPLACEMENT'
+local STATUS_DISQUALIFIED = 'disqualified'
+local STATUS_WITHDRAWN = 'withdrawn'
+local STATUS_REPLACEMENT = 'replacement'
 
 ---@alias TeamParticipantStatus `STATUS_DISQUALIFIED`|`STATUS_WITHDRAWN`|`STATUS_REPLACEMENT`
 

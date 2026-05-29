@@ -19,9 +19,9 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
-local STATUS_DISQUALIFIED = 'DISQUALIFIED'
-local STATUS_WITHDRAWN = 'WITHDRAWN'
-local STATUS_REPLACEMENT = 'REPLACEMENT'
+local STATUS_DISQUALIFIED = 'disqualified'
+local STATUS_WITHDRAWN = 'withdrawn'
+local STATUS_REPLACEMENT = 'replacement'
 
 ---@class ParticipantsTeamHeader: Widget
 ---@operator call(table): ParticipantsTeamHeader
