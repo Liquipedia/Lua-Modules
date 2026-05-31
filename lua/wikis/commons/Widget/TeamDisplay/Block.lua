@@ -12,9 +12,9 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local TeamIcon = Lua.import('Module:Widget/Image/Icon/TeamIcon')
 local BlockTeamName = Lua.import('Module:Widget/TeamDisplay/Component/BlockName')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -31,94 +31,103 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field dq boolean?
 ---@field note string|number?
 
----@class BlockTeamWidget: Widget
----@operator call(BlockTeamParameters): BlockTeamWidget
+---@class BlockTeamParsedProps
 ---@field name string?
 ---@field props BlockTeamParameters
 ---@field teamTemplate teamTemplateData
 ---@field flip boolean
 ---@field style teamStyle
-local BlockTeamWidget = Class.new(Widget,
-	---@param self self
-	---@param input BlockTeamParameters
-	function (self, input)
-		self.teamTemplate = input.teamTemplate or TeamTemplate.getRawOrNil(input.name, input.date)
-		self.name = (self.teamTemplate or {}).name or input.name
-		self.flip = Logic.readBool(input.flip)
-		self.style = input.style
-	end
-)
 
----@return Widget
-function BlockTeamWidget:render()
-	local teamTemplate = self.teamTemplate
+local BlockTeamWidget = {}
+
+local Helpers = {}
+
+function BlockTeamWidget.render(props)
+	local parsedProps = Helpers.parse(props)
+
+	local teamTemplate = parsedProps.teamTemplate
 	if not teamTemplate then
 		mw.ext.TeamLiquidIntegration.add_category('Pages with missing team templates')
 		return Div{
 			classes = {'error'},
-			children = TeamTemplate.noTeamMessage(self.name)
+			children = TeamTemplate.noTeamMessage(parsedProps.name)
 		}
 	end
-	local flip = self.flip
+	local flip = parsedProps.flip
 
 	local imageLight = Logic.emptyOr(teamTemplate.image, teamTemplate.legacyimage)
 	local imageDark = Logic.emptyOr(teamTemplate.imagedark, teamTemplate.legacyimagedark)
 
 	return Div{
-		classes = Array.extend('block-team', self.props.additionalClasses, flip and 'flipped' or nil),
+		classes = Array.extend('block-team', props.additionalClasses, flip and 'flipped' or nil),
 		children = WidgetUtil.collect(
 			TeamIcon{
 				imageLight = imageLight,
 				imageDark = imageDark,
 				page = teamTemplate.page,
 				legacy = Logic.isEmpty(teamTemplate.image) and Logic.isNotEmpty(teamTemplate.legacyimage),
-				noLink = self.props.noLink,
+				noLink = props.noLink,
 			},
-			self:_getNameComponent(),
-			Logic.isNotEmpty(self.props.note) and HtmlWidgets.Sup{
+			Helpers._getNameComponent(parsedProps),
+			Logic.isNotEmpty(props.note) and Html.Sup{
 				classes = {'note'},
-				children = self.props.note
+				children = props.note
 			} or nil
 		)
 	}
 end
 
+---@param props BlockTeamParameters
+---@return BlockTeamParsedProps
+function Helpers.parse(props)
+	local parsedProps = {props = props}
+
+	parsedProps.teamTemplate = props.teamTemplate or TeamTemplate.getRawOrNil(props.name, props.date)
+	parsedProps.name = (parsedProps.teamTemplate or {}).name or props.name
+	parsedProps.flip = Logic.readBool(props.flip)
+	parsedProps.style = props.style
+
+	return parsedProps
+end
+
 ---@private
+---@param props BlockTeamParsedProps
 ---@return Widget|Widget[]?
-function BlockTeamWidget:_getNameComponent()
-	local style = self.style
-	local displayName = self.teamTemplate.name
-	local bracketName = self.teamTemplate.bracketname
-	local shortName = self.teamTemplate.shortname
-	local overflow = self.props.overflow or 'ellipsis'
+function Helpers._getNameComponent(props)
+	local style = props.style
+	local displayName = props.teamTemplate.name
+	local bracketName = props.teamTemplate.bracketname
+	local shortName = props.teamTemplate.shortname
+	local overflow = props.props.overflow or 'ellipsis'
 	if style == 'standard' then
-		return self:_createNameNode(displayName, overflow)
+		return Helpers._createNameNode(props, displayName, overflow)
 	elseif style == 'bracket' then
-		return self:_createNameNode(bracketName, overflow)
+		return Helpers._createNameNode(props, bracketName, overflow)
 	elseif style == 'short' then
-		return self:_createNameNode(shortName, overflow)
+		return Helpers._createNameNode(props, shortName, overflow)
 	elseif style == 'hybrid' then
 		return {
-			self:_createNameNode(bracketName, 'ellipsis', {'hidden-xs'}),
-			self:_createNameNode(shortName, 'hidden', {'visible-xs'})
+			Helpers._createNameNode(props, bracketName, 'ellipsis', {'hidden-xs'}),
+			Helpers._createNameNode(props, shortName, 'hidden', {'visible-xs'})
 		}
 	end
 end
 
 ---@private
+---@param props BlockTeamParsedProps
 ---@param name string
 ---@param overflow OverflowModes
 ---@param additionalClasses string[]?
 ---@return Widget
-function BlockTeamWidget:_createNameNode(name, overflow, additionalClasses)
+function Helpers._createNameNode(props, name, overflow, additionalClasses)
 	return BlockTeamName{
 		additionalClasses = additionalClasses,
 		displayName = name,
-		page = self.teamTemplate.page,
-		noLink = self.props.noLink,
+		page = props.teamTemplate.page,
+		noLink = props.props.noLink,
 		overflowStyle = overflow,
-		dq = self.props.dq,
+		dq = props.props.dq,
 	}
 end
 
-return BlockTeamWidget
+return Component.component(BlockTeamWidget.render)

@@ -12,8 +12,8 @@ local Class = Lua.import('Module:Class')
 local DisplayUtil = Lua.import('Module:DisplayUtil')
 local String = Lua.import('Module:StringUtils')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class BlockTeamNameDisplayParameters
@@ -24,27 +24,25 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@field page string?
 ---@field dq boolean?
 
----@class BlockTeamNameDisplay: Widget
----@operator call(BlockTeamNameDisplayParameters): BlockTeamNameDisplay
----@field props BlockTeamNameDisplayParameters
-local BlockTeamNameDisplay = Class.new(Widget)
+local BlockTeamNameDisplay = {}
 BlockTeamNameDisplay.defaultProps = {overflowStyle = 'ellipsis'}
 
----@return Widget
-function BlockTeamNameDisplay:render()
-	local displayName = self.props.displayName
-	local page = self.props.page
-	local container = self.props.dq and HtmlWidgets.S or HtmlWidgets.Span
+---@param props BlockTeamNameDisplayParameters
+---@return VNode
+function BlockTeamNameDisplay.render(props)
+	local displayName = props.displayName
+	local page = props.page
+	local container = props.dq and Html.S or Html.Span
 	return container{
-		classes = Array.extend('name', self.props.additionalClasses),
-		css = DisplayUtil.getOverflowStyles(self.props.overflowStyle),
+		classes = Array.extend('name', props.additionalClasses),
+		css = DisplayUtil.getOverflowStyles(props.overflowStyle),
 		children = {
-			(self.props.noLink and String.isNotEmpty(page)) and displayName or Link{
+			(props.noLink and String.isNotEmpty(page)) and displayName or Link{
 				children = displayName,
-				link = self.props.page
+				link = props.page
 			}
 		}
 	}
 end
 
-return BlockTeamNameDisplay
+return Component.component(BlockTeamNameDisplay.render, BlockTeamNameDisplay.defaultProps)

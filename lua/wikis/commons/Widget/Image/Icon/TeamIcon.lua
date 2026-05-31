@@ -8,11 +8,10 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Span = HtmlWidgets.Span
-local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Span = Html.Span
 local WidgetIconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetIconFontawesome = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
@@ -25,22 +24,45 @@ local WidgetIconFontawesome = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 ---@field noLink boolean?
 ---@field legacy boolean?
 
----@class TeamIconWidget: IconWidget
----@operator call(TeamIconWidgetProps): TeamIconWidget
----@field props TeamIconWidgetProps
-local TeamIcon = Class.new(WidgetIcon)
-TeamIcon.defaultProps = {
-	size = '100x50px',
-}
-
 ---This is the TBD Team icon in Team Template. This will be replaced by the Icon for the TBD Team.
 ---This is a medium term solution until we have refactored and standardized more of the Team Template.
 ---Hopefully in the future we can remove this.
 local TBD_FILLER_IMAGE = 'Filler 600px.png'
 
+local TeamIcon = {}
+TeamIcon.defaultProps = {
+	size = '100x50px',
+}
+
+local Helpers = {}
+
+---@param props TeamIconWidgetProps
+---@return VNode|VNode[]
+function TeamIcon.render(props)
+	local size = props.size
+	local isLegacy = props.legacy or false
+	local imageLight = props.imageLight
+	local name = props.name
+
+	if imageLight == TBD_FILLER_IMAGE or not imageLight then
+		return Helpers._buildSpan(Helpers._getDefaultIcon(), nil, false)
+	end
+
+	local link = Helpers._getPageLink(props)
+	local imageDark = props.imageDark or imageLight
+	local allmode = imageLight == imageDark
+	if allmode then
+		return Helpers._buildSpan(Helpers._getIcon(imageLight, size, link, name), nil, isLegacy)
+	end
+	return {
+		Helpers._buildSpan(Helpers._getIcon(imageLight, size, link, name), 'lightmode', isLegacy),
+		Helpers._buildSpan(Helpers._getIcon(imageDark, size, link, name), 'darkmode', isLegacy),
+	}
+end
+
 ---@private
 ---@return Widget
-function TeamIcon:_getDefaultIcon()
+function Helpers._getDefaultIcon()
 	return WidgetIconFontawesome{
 		iconName = 'team_tbd',
 	}
@@ -50,13 +72,14 @@ end
 ---@param image string
 ---@param size string
 ---@param link string
+---@param name string?
 ---@return Widget
-function TeamIcon:_getIcon(image, size, link)
+function Helpers._getIcon(image, size, link, name)
 	return WidgetIconImage{
 		imageLight = image,
 		size = size,
 		verticalAlignment = 'middle',
-		caption = self.props.name,
+		caption = name,
 		link = link,
 	}
 end
@@ -66,7 +89,7 @@ end
 ---@param onlyForTheme 'lightmode'|'darkmode'|nil
 ---@param isLegacy boolean
 ---@return Widget
-function TeamIcon:_buildSpan(icon, onlyForTheme, isLegacy)
+function Helpers._buildSpan(icon, onlyForTheme, isLegacy)
 	return Span{
 		classes = Array.extend(
 			'team-template-image-' .. (isLegacy and 'legacy' or 'icon'),
@@ -79,34 +102,13 @@ function TeamIcon:_buildSpan(icon, onlyForTheme, isLegacy)
 end
 
 ---@private
+---@param props TeamIconWidgetProps
 ---@return string
-function TeamIcon:_getPageLink()
-	if self.props.noLink then
+function Helpers._getPageLink(props)
+	if props.noLink then
 		return ''
 	end
-	return self.props.page or ''
+	return props.page or ''
 end
 
----@return Widget|Widget[]
-function TeamIcon:render()
-	local size = self.props.size
-	local isLegacy = self.props.legacy or false
-	local imageLight = self.props.imageLight
-
-	if imageLight == TBD_FILLER_IMAGE or not imageLight then
-		return self:_buildSpan(self:_getDefaultIcon(), nil, false)
-	end
-
-	local link = self:_getPageLink()
-	local imageDark = self.props.imageDark or imageLight
-	local allmode = imageLight == imageDark
-	if allmode then
-		return self:_buildSpan(self:_getIcon(imageLight, size, link), nil, isLegacy)
-	end
-	return {
-		self:_buildSpan(self:_getIcon(imageLight, size, link), 'lightmode', isLegacy),
-		self:_buildSpan(self:_getIcon(imageDark, size, link), 'darkmode', isLegacy),
-	}
-end
-
-return TeamIcon
+return Component.component(TeamIcon.render, TeamIcon.defaultProps)
