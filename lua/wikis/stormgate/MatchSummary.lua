@@ -33,12 +33,12 @@ local DEFAULT_HERO = 'default'
 local CustomMatchSummary = {}
 
 ---@param args {bracketId: string, matchId: string, config: table?}
----@return Html
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px'})
 end
 
----@param match table
+---@param match StormgateMatchGroupUtilMatch
 ---@return Widget[]
 function CustomMatchSummary.createBody(match)
 	CustomMatchSummary.computeOfffactions(match)
@@ -197,7 +197,7 @@ function CustomMatchSummary.DisplayHeroes(opponent, options)
 	}
 end
 
----@param submatch table
+---@param submatch StormgateMatchGroupUtilSubmatch
 ---@return MatchSummaryRow
 function CustomMatchSummary.TeamSubmatch(submatch)
 	return MatchSummaryWidgets.Row{
@@ -225,7 +225,7 @@ function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 		}
 	end
 
-	---@param opponentIndex any
+	---@param opponentIndex integer
 	---@param additionalClasses string[]?
 	---@return Widget
 	local createScore = function(opponentIndex, additionalClasses)
@@ -258,7 +258,7 @@ function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 	}
 end
 
----@param submatch StarcraftMatchGroupUtilSubmatch
+---@param submatch StormgateMatchGroupUtilSubmatch
 ---@return Widget?
 function CustomMatchSummary.TeamSubMatchGames(submatch)
 	if not CustomMatchSummary._submatchHasDetails(submatch) then return nil end
@@ -286,7 +286,7 @@ function CustomMatchSummary.TeamSubMatchGames(submatch)
 	}
 end
 
----@param submatch table
+---@param submatch StormgateMatchGroupUtilSubmatch
 ---@return boolean
 function CustomMatchSummary._submatchHasDetails(submatch)
 	return #submatch.games > 0 and Array.any(submatch.games, function(game)
