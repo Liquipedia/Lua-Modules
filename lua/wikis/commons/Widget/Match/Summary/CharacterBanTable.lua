@@ -29,6 +29,7 @@ local ICONS = {
 	empty = Html.Span{},
 }
 
+---@param props {bans: {[1]: string[]?, [2]: string[]?, start: integer?}[], date: string?}
 ---@return VNode?
 local function MatchSummaryCharacterBanTable(props)
 	if Logic.isDeepEmpty(props.bans) then
