@@ -10,15 +10,15 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 
 local ListWidget = Lua.import('Module:Widget/List')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 
 ---@class UnorderedList: ListWidget
 ---@operator call(table): UnorderedList
 local UnorderedList = Class.new(ListWidget)
 
----@return WidgetHtml
+---@return HtmlComponent
 function UnorderedList:getType()
-	return HtmlWidgets.Ul
+	return Html.Ul
 end
 
 return UnorderedList

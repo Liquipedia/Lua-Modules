@@ -12,7 +12,7 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ListWidget: Widget
@@ -20,13 +20,13 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field props {children: (Renderable|Renderable[])[]}
 local ListWidget = Class.new(Widget)
 
----@return Widget?
+---@return VNode?
 function ListWidget:render()
 	local children = self.props.children
 	if Logic.isEmpty(children) then return end
 	return self:getType(){
 		children = Array.map(children, function (item)
-			return HtmlWidgets.Li{
+			return Html.Li{
 				children = WidgetUtil.collect(item)
 			}
 		end)
@@ -34,7 +34,7 @@ function ListWidget:render()
 end
 
 ---@protected
----@return WidgetHtml
+---@return HtmlComponent
 function ListWidget:getType()
 	error('ListWidget cannot be called directly and must be overridden.')
 end
