@@ -64,7 +64,6 @@ CustomMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 ---@field opponents StormgateMatchGroupUtilGameOpponent[]
 ---@field status string?
 ---@field winner number?
----@field header string?
 
 ---@class StormgateMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games StormgateMatchGroupUtilGame[]
@@ -93,7 +92,7 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 	if not match.isUniformMode then
 		-- Compute submatches
 		match.submatches = Array.map(
-			MatchGroupUtil.groupBySubgroup(match.games),
+			MatchGroupUtil.groupBySubgroup(match),
 			FnUtil.curry(CustomMatchGroupUtil.constructSubmatch, match)
 		)
 	end
@@ -201,7 +200,6 @@ function CustomMatchGroupUtil.constructSubmatch(match, subgroup)
 		mode = firstGame.mode,
 		opponents = opponents,
 		winner = winner,
-		header = Table.extract(match.extradata or {}, 'subgroup' .. subgroup.subgroup .. 'header'),
 	}, subgroup)
 end
 

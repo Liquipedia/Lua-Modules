@@ -29,7 +29,6 @@ local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 ---@class HearthstoneMatchGroupUtilSubmatch: MatchGroupUtilSubgroup
 ---@field opponents HearthstoneMatchGroupUtilGameOpponent[]
 ---@field winner number?
----@field header string?
 
 ---@class HearthstoneMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field submatches HearthstoneMatchGroupUtilSubmatch[]?
@@ -55,7 +54,7 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 
 	-- Compute submatches
 	match.submatches = Array.map(
-		MatchGroupUtil.groupBySubgroup(match.games),
+		MatchGroupUtil.groupBySubgroup(match),
 		FnUtil.curry(CustomMatchGroupUtil.constructSubmatch, match)
 	)
 
@@ -112,7 +111,6 @@ function CustomMatchGroupUtil.constructSubmatch(match, subgroup)
 	local matchExtradata = match.extradata or {}
 
 	return Table.mergeInto({
-		header = Table.extract(matchExtradata, 'subgroup' .. subgroup.subgroup .. 'header'),
 		opponents = opponents,
 		winner = winner,
 	}, subgroup)

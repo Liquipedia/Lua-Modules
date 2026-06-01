@@ -329,6 +329,7 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 ---@class MatchGroupUtilSubgroup
 ---@field games MatchGroupUtilGame[]
 ---@field subgroup number
+---@field header string?
 
 ---@class FFAMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games FFAMatchGroupUtilGame[]
@@ -776,15 +777,15 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 end
 
 ---Group games on the subgroup field to form submatches
----@param matchGames MatchGroupUtilGame[]
+---@param match MatchGroupUtilMatch
 ---@return MatchGroupUtilSubgroup[]
-function MatchGroupUtil.groupBySubgroup(matchGames)
+function MatchGroupUtil.groupBySubgroup(match)
 	local previousSubgroup = nil
 	---@type MatchGroupUtilGame[]?
 	local currentGames = nil
 	---@type MatchGroupUtilGame[][]
 	local submatchGames = {}
-	Array.forEach(matchGames, function (game)
+	Array.forEach(match.games, function (game)
 		if previousSubgroup == nil or previousSubgroup ~= game.subgroup then
 			currentGames = {}
 			Array.appendWith(submatchGames, currentGames)
@@ -797,7 +798,8 @@ function MatchGroupUtil.groupBySubgroup(matchGames)
 		---@type MatchGroupUtilSubgroup
 		return {
 			games = games,
-			subgroup = groupIndex
+			subgroup = groupIndex,
+			header = Table.extract(match.extradata or {}, 'subgroup' .. groupIndex .. 'header'),
 		}
 	end)
 end
