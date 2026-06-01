@@ -90,7 +90,7 @@ StarcraftOpponentDisplay.BracketOpponentEntry = BracketOpponentEntry
 ---Displays an opponent as a block element. The width of the component is
 ---determined by its layout context, and not of the opponent.
 ---@param props StarcraftBlockOpponentProps
----@return Widget
+---@return Renderable
 function StarcraftOpponentDisplay.BlockOpponent(props)
 	local opponent = props.opponent
 	opponent.extradata = opponent.extradata or {}
