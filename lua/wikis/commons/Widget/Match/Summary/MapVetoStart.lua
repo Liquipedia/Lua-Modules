@@ -18,14 +18,14 @@ local ARROW_LEFT = IconFa{iconName = 'startleft', size = '110%'}
 local ARROW_RIGHT = IconFa{iconName = 'startright', size = '110%'}
 local START_MAP_VETO = Html.B{children = I18n.translate('matchsummary-mapveto-start')}
 
----@param props table
+---@param props {firstVeto: integer?, vetoFormat: string?}
 ---@return VNode?
 local function MatchSummaryMapVetoStart(props)
 	if not props.firstVeto then
 		return
 	end
 
-	local format = props.vetoFormat and ('Veto Format: ' .. props.vetoFormat) or ''
+	local format = props.vetoFormat and {'Veto Format: ', props.vetoFormat} or ''
 	local children = {}
 	if props.firstVeto == 1 then
 		children = {

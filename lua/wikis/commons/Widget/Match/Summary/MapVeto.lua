@@ -8,23 +8,23 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MapVetoStart = Lua.import('Module:Widget/Match/Summary/MapVetoStart')
 local MapVetoRound = Lua.import('Module:Widget/Match/Summary/MapVetoRound')
 
----@class MatchSummaryMapVeto: Widget
----@operator call(table): MatchSummaryMapVeto
-local MatchSummaryMapVeto = Class.new(Widget)
+---@class MapVetoProps
+---@field vetoFormat string
+---@field firstVeto integer?
+---@field vetoRounds {type: VetoTypes, map1: VetoMap?, map2: VetoMap?}[]
 
----@return Widget?
-function MatchSummaryMapVeto:render()
-	if Logic.isEmpty(self.props.vetoRounds) then
+---@param props MapVetoProps
+---@return VNode?
+local function MatchSummaryMapVeto(props)
+	if Logic.isEmpty(props.vetoRounds) then
 		return
 	end
 
@@ -35,12 +35,12 @@ function MatchSummaryMapVeto:render()
 		titleClasses = {'brkts-popup-veto-header'};
 		title = 'Map Veto',
 		children = WidgetUtil.collect(
-			MapVetoStart{firstVeto = self.props.firstVeto, vetoFormat = self.props.vetoFormat},
-			Array.map(self.props.vetoRounds, function(veto)
+			MapVetoStart{firstVeto = props.firstVeto, vetoFormat = props.vetoFormat},
+			Array.map(props.vetoRounds, function(veto)
 				return MapVetoRound{vetoType = veto.type, map1 = veto.map1, map2 = veto.map2}
 			end)
 		)
 	}
 end
 
-return MatchSummaryMapVeto
+return Component.component(MatchSummaryMapVeto)
