@@ -7,13 +7,12 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
+local Component = Lua.import('Module:Widget/Component')
 local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 
 ---@class MatchSummaryGamesContainerProps
 ---@field children? Renderable|Renderable[]
@@ -21,33 +20,27 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 ---@field gamesSectionName? Renderable|Renderable[]
 ---@field gamesSectionResult? Renderable|Renderable[]
 
----@class MatchSummaryGamesContainer: Widget
----@operator call(MatchSummaryGamesContainerProps): MatchSummaryGamesContainer
----@field props MatchSummaryGamesContainerProps
-local MatchSummaryGamesContainer = Class.new(Widget)
-
+---@param props MatchSummaryGamesContainerProps
 ---@return Widget?
-function MatchSummaryGamesContainer:render()
-	local props = self.props
-
+local function MatchSummaryGamesContainer(props)
 	if Logic.isEmpty(props.children) then
 		return
 	elseif Logic.isEmpty(props.gamesSectionName) and Logic.isEmpty(props.gamesSectionResult) then
-		return HtmlWidgets.Div{
+		return Html.Div{
 			classes = {'brkts-popup-body-grid'},
 			css = props.css,
 			children = props.children,
 		}
 	end
 	return GeneralCollapsible{
-		titleWidget = HtmlWidgets.Div{
+		titleWidget = Html.Div{
 			classes = {
 				'general-collapsible-default-header',
 				'brkts-popup-body-grid-header'
 			},
 			children = {
-				HtmlWidgets.Div{children = props.gamesSectionName},
-				HtmlWidgets.Div{children = props.gamesSectionResult},
+				Html.Div{children = props.gamesSectionName},
+				Html.Div{children = props.gamesSectionResult},
 				CollapsibleToggle{},
 			}
 		},
@@ -58,4 +51,4 @@ function MatchSummaryGamesContainer:render()
 	}
 end
 
-return MatchSummaryGamesContainer
+return Component.component(MatchSummaryGamesContainer)
