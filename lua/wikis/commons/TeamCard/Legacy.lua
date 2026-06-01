@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 local Tournament = Lua.import('Module:Tournament')
@@ -37,14 +38,14 @@ end
 ---@param value string
 ---@return string
 local function cleanNote(value)
-	value = mw.text.trim(value)
+	value = String.trim(value)
 	-- Unwrap a single outer <div>...</div> (e.g. Template:NoteBig expands to one).
 	value = value:gsub('^<div>%s*', ''):gsub('%s*</div>$', '')
 	-- Strip wikitext definition-list markers (`:` at the start of a line). The new
 	-- notification widget provides its own styling, so we don't want MW to re-parse
 	-- these as <dl><dd>...</dd></dl>. Multi-note NoteBig expansions become <br>.
 	value = value:gsub('^:+%s*', ''):gsub('\n:+%s*', '<br>')
-	return mw.text.trim(value)
+	return String.trim(value)
 end
 
 ---@param entries table[]
