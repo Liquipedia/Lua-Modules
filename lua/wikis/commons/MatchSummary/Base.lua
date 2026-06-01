@@ -313,7 +313,7 @@ end
 
 ---@param mapVetoes table
 ---@param options {game: string?, emptyMapDisplay: string?}?
----@return {firstVeto: integer?, vetoFormat: string?, vetoRounds: table[]}?
+---@return MapVetoProps?
 function MatchSummary.preProcessMapVeto(mapVetoes, options)
 	if Logic.isEmpty(mapVetoes) then
 		return
