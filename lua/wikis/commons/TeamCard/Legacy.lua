@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 local Tournament = Lua.import('Module:Tournament')
 
@@ -21,7 +22,17 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
 
+local PositionConvert = Lua.requireIfExists('Module:PositionName/data', {loadData = true}) or {}
+
 local LegacyTeamCard = {}
+
+---@param value string?
+---@return string?
+local function normalizePosition(value)
+	if Logic.isEmpty(value) then return value end
+	---@cast value -nil
+	return PositionConvert[value:lower()] or value
+end
 
 ---@param entries table[]
 ---@return table[], table?, table[]
@@ -60,8 +71,15 @@ function LegacyTeamCard.run(dependency)
 
 	local toggleFolded = LegacyTeamCard._foldToggles(toggles)
 
+	local processedCards = Array.map(cardEntries, function(card)
+		if dependency.preprocessCard then
+			return dependency.preprocessCard(card)
+		end
+		return card
+	end)
+
 	local defaultRows, extraRows = 0, 0
-	Array.forEach(cardEntries, function(card)
+	Array.forEach(processedCards, function(card)
 		defaultRows = tonumber(card.defaultRowNumber) or defaultRows
 		extraRows = tonumber(card.extraRows) or extraRows
 	end)
@@ -70,10 +88,7 @@ function LegacyTeamCard.run(dependency)
 		minimumplayers = defaultRows + extraRows + toggleFolded.extraPlayers,
 		showplayerinfo = toggleFolded.showPlayerInfo and 'true' or nil,
 	}
-	Array.forEach(cardEntries, function(card)
-		if dependency.preprocessCard then
-			card = dependency.preprocessCard(card)
-		end
+	Array.forEach(processedCards, function(card)
 		table.insert(tpArgs, LegacyTeamCard.mapCard(card))
 	end)
 
@@ -199,7 +214,7 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
 		team = tcArgs[prefix .. 'team'],
 		id = tcArgs[prefix .. 'id'],
 		faction = tcArgs[prefix .. 'faction'] or tcArgs[prefix .. 'race'],
-		role = tcArgs[prefix .. 'pos'],
+		role = normalizePosition(tcArgs[prefix .. 'pos']),
 		trophies = trophies,
 		joindate = tcArgs[prefix .. 'joindate'],
 		leavedate = tcArgs[prefix .. 'leavedate'],
@@ -220,7 +235,7 @@ function LegacyTeamCard.mapCoach(tcArgs, prefix, sourceGroup)
 		trophies = (wins or 0) + (winsc or 0)
 	end
 
-	local role = tcArgs[prefix .. 'pos'] or 'coach'
+	local role = normalizePosition(tcArgs[prefix .. 'pos']) or 'coach'
 
 	local status
 	if Logic.readBool(tcArgs[prefix .. 'leave']) then
@@ -296,6 +311,15 @@ function LegacyTeamCard.mapPlayers(tcArgs)
 	local indexByKey = {}
 	local maxPlayerIndex = tonumber(tcArgs.maxPlayers) or DEFAULT_MAX_PLAYER_INDEX
 
+	-- Legacy commons TC alias: <group>posN was an accepted alternative for <prefix>Npos.
+	Array.forEach({{'', 'p'}, {'t2', 't2p'}, {'t3', 't3p'}}, function(pair)
+		local group, prefix = pair[1], pair[2]
+		Array.forEach(Array.range(1, maxPlayerIndex), function(n)
+			local newKey = prefix .. n .. 'pos'
+			tcArgs[newKey] = Logic.emptyOr(tcArgs[newKey], Table.extract(tcArgs, group .. 'pos' .. n))
+		end)
+	end)
+
 	local function add(person, allowOverwrite)
 		local key = normalizeKey(person.link or person[1])
 		if key ~= '' and indexByKey[key] then
@@ -344,6 +368,9 @@ end
 function LegacyTeamCard.mapCoaches(tcArgs)
 	local coaches = {}
 
+	if Logic.isNotEmpty(tcArgs.c) then
+		table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'c', nil))
+	end
 	Array.forEach(indicesPresent(tcArgs, 'c', MAX_COACH_INDEX), function(i)
 		table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'c' .. i, nil))
 	end)

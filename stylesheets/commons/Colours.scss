@@ -752,3 +752,31 @@ ul.nav-tabs li.game-wiiu,
 	--position-down-background-color: #3f1212;
 	--position-disqualified-background-color: var( --clr-on-surface-dark-primary-8 );
 }
+
+.byeup-text {
+	color: var( --position-byeup-color );
+}
+
+.seedup-text {
+	color: var( --position-seedup-color );
+}
+
+.up-text {
+	color: var( --position-up-color );
+}
+
+.stayup-text {
+	color: var( --position-stayup-color );
+}
+
+.stay-text {
+	color: var( --position-stay-color );
+}
+
+.staydown-text {
+	color: var( --position-staydown-color );
+}
+
+.down-text {
+	color: var( --position-down-color );
+}

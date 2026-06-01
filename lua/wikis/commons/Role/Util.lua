@@ -12,6 +12,8 @@ local String = Lua.import('Module:StringUtils')
 
 local Roles = Lua.import('Module:Roles')
 
+local Html = Lua.import('Module:Widget/Html')
+
 --- TODO: In the future this should be moved to role data entry
 local POSITION_ICON_DATA = Lua.requireIfExists('Module:PositionIcon/data', {loadData = true})
 
@@ -21,10 +23,12 @@ local RoleUtil = {}
 ---@field display string
 ---@field category string
 ---@field sortOrder integer?
+---@field abbreviation string?
 
 ---@class RoleData: RoleBaseData
 ---@field key string?
 ---@field type RoleTypes
+---@field abbreviation string?
 ---@field icon string?
 
 ---@enum RoleTypes
@@ -32,6 +36,7 @@ RoleUtil.ROLE_TYPE = {
 	CONTRACT = 'contract',
 	STAFF = 'staff',
 	INGAME = 'ingame',
+	TEAMROLE = 'teamrole',
 	UNKNOWN = 'unknown',
 }
 
@@ -73,6 +78,8 @@ function RoleUtil._createRoleData(roleKey)
 			return RoleUtil.ROLE_TYPE.CONTRACT
 		elseif Roles.StaffRoles[key] then
 			return RoleUtil.ROLE_TYPE.STAFF
+		elseif Roles.PlayerTeamRoles[key] then
+			return RoleUtil.ROLE_TYPE.TEAMROLE
 		elseif Roles.InGameRoles and Roles.InGameRoles[key] then
 			return RoleUtil.ROLE_TYPE.INGAME
 		else
@@ -86,6 +93,10 @@ function RoleUtil._createRoleData(roleKey)
 		key = key,
 		type = roleType(),
 		sortOrder = roleData.sortOrder,
+		abbreviation = roleData.abbreviation and Html.Abbr{
+			children = roleData.abbreviation,
+			title = roleData.display,
+		} or nil,
 		icon = POSITION_ICON_DATA and POSITION_ICON_DATA[key] or nil,
 	}
 end

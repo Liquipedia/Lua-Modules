@@ -57,13 +57,13 @@ local Status = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Team.run(frame)
 	local team = Team(frame)
 	return team:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Team:createInfobox()
 	local args = self.args
 

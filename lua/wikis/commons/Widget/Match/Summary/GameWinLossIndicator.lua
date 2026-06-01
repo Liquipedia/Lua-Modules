@@ -24,7 +24,7 @@ local LABELS = {
 ---@operator call(table): MatchSummaryGameWinLossIndicator
 local MatchSummaryGameWinLossIndicator = Class.new(Widget)
 
----@return Widget
+---@return VNode
 function MatchSummaryGameWinLossIndicator:render()
 	local winner = self.props.winner
 

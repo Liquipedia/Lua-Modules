@@ -12,10 +12,11 @@ local Class = Lua.import('Module:Class')
 local Company = Lua.import('Module:Infobox/Company')
 
 ---@class CustomCompanyInfobox: CompanyInfobox
+---@operator call(Frame): CustomCompanyInfobox
 local CustomCompany = Class.new(Company)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomCompany.run(frame)
 	local company = CustomCompany(frame)
 	return company:createInfobox()

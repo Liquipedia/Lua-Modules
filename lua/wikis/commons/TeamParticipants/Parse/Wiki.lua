@@ -24,7 +24,7 @@ local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
 ---qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer,
----potentialQualifiers: standardOpponent[]?, warnings: string[]?}
+---potentialQualifiers: standardOpponent[]?, warnings: string[]?, broken: boolean?, errorMessage: string?}
 
 ---@alias QualificationMethod 'invite'|'qual'
 ---@alias QualificationType 'tournament'|'internal'|'external'|'other'
@@ -156,6 +156,20 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		opponent = Opponent.readOpponentArgs(Table.merge(input, {
 			type = Opponent.team,
 		}))
+
+		if not TeamTemplate.exists(opponent.template) then
+			return {
+				opponent = opponent,
+				broken = true,
+				errorMessage = TeamTemplate.noTeamMessage(opponent.template),
+				aliases = {},
+				notes = {},
+				potentialQualifiers = {},
+				warnings = {},
+				shouldImportFromDb = false,
+				date = date or defaultDate,
+			}
+		end
 
 		opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
 		local resolvedOptions = {

@@ -7,62 +7,61 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Variables = Lua.import('Module:Variables')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
-local Fragment = HtmlWidgets.Fragment
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local WarningBoxGroup = Lua.import('Module:Widget/WarningBox/Group')
 
----@class Infobox: Widget
----@operator call(table): Infobox
----@field props table
-local Infobox = Class.new(Widget)
+---@class InfoboxCoreProps
+---@field children Renderable|Renderable[]
+---@field forceDarkMode? boolean
+---@field gameName string
+---@field infoboxType? string
+---@field topContent? Renderable|Renderable[]
+---@field bottomContent? Renderable|Renderable[]
+---@field warnings? (string|number)[]
 
+---@param props InfoboxCoreProps
 ---@return string
-function Infobox:render()
+local function Infobox(props)
 	local firstInfobox = not Variables.varDefault('has_infobox')
 	Variables.varDefine('has_infobox', 'true')
 
 	local topContent = Div{
 		classes = {'fo-nttax-infobox-topcontent'},
-		children = self.props.topContent
+		children = props.topContent
 	}
 	local adbox = Div{classes = {'fo-nttax-infobox-adbox'}, children = {mw.getCurrentFrame():preprocess('<adbox />')}}
-	local content = Div{classes = {'fo-nttax-infobox'}, children = self.props.children}
-	local bottomContent = Div{children = self.props.bottomContent}
+	local content = Div{classes = {'fo-nttax-infobox'}, children = props.children}
+	local bottomContent = Div{children = props.bottomContent}
 
-	local analyticsProps = {
+	return AnalyticsWidget{
 		analyticsName = 'Infobox',
 		analyticsProperties = {
-			['infobox-type'] = self.props.infoboxType
+			['infobox-type'] = props.infoboxType
 		},
 		classes = {'fo-nttax-infobox-container'},
-		children = {
-			Fragment{children = WidgetUtil.collect(
-				Div{
-					classes = {
-						'fo-nttax-infobox-wrapper',
-						'infobox-' .. self.props.gameName:lower(),
-						self.props.forceDarkMode and 'infobox-darkmodeforced' or nil,
-					},
-					children = WidgetUtil.collect(
-						content,
-						firstInfobox and adbox or nil,
-						bottomContent
-					)
+		children = WidgetUtil.collect(
+			Div{
+				classes = {
+					'fo-nttax-infobox-wrapper',
+					'infobox-' .. props.gameName:lower(),
+					props.forceDarkMode and 'infobox-darkmodeforced' or nil,
 				},
-				topContent,
-				WarningBoxGroup{data = self.props.warnings}
-			)}
-		}
+				children = WidgetUtil.collect(
+					content,
+					firstInfobox and adbox or nil,
+					bottomContent
+				)
+			},
+			topContent,
+			WarningBoxGroup{data = props.warnings}
+		)
 	}
-
-	return AnalyticsWidget(analyticsProps)
 end
 
-return Infobox
+return Component.component(Infobox)

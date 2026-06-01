@@ -18,7 +18,7 @@ local SignaturePlayerAgents = Lua.import('Module:SignaturePlayerAgents')
 local String = Lua.import('Module:StringUtils')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Injector = Lua.import('Module:Widget/Injector')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Player = Lua.import('Module:Infobox/Person')
@@ -30,13 +30,16 @@ local Cell = Widgets.Cell
 local SIZE_AGENT = '20px'
 
 ---@class ValorantPlayerInfobox: Person
+---@operator call(Frame): ValorantPlayerInfobox
 local CustomPlayer = Class.new(Player)
+
 ---@class ValorantPlayerInfoboxWidgetInjector: WidgetInjector
+---@operator call(ValorantPlayerInfobox): ValorantPlayerInfoboxWidgetInjector
 ---@field caller ValorantPlayerInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	local args = player.args
@@ -70,14 +73,15 @@ function CustomPlayer.run(frame)
 		}
 	end
 
-	return mw.html.create()
-		:node(builtInfobox)
-		:node(autoPlayerIntro)
+	return Html.Fragment{children = {
+		builtInfobox,
+		autoPlayerIntro,
+	}}
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -128,7 +132,7 @@ function CustomPlayer:createBottomContent()
 		local teamPage = TeamTemplate.getPageName(self.args.team)
 		---@cast teamPage -nil
 
-		return HtmlWidgets.Fragment{
+		return Html.Fragment{
 			children = {
 				MatchTicker.player{recentLimit = 3},
 				UpcomingTournaments.team{name = teamPage}

@@ -1339,7 +1339,7 @@ $placement-colors: (
 	"darkgrey": ( var( --clr-elm-10 ) ),
 	"win": ( var( --clr-semantic-positive-40 ), var( --clr-semantic-positive-20 ) ),
 	"draw": ( var( --clr-tuliptree-80 ), var( --clr-tuliptree-40 ) ),
-	"lose": ( var( --clr-secondary-70 ), var( --clr-secondary-25 ) ),
+	"lose": ( var( --clr-secondary-80 ), var( --clr-secondary-25 ) ),
 	"up": ( var( --clr-atlantis-40 ), var( --clr-atlantis-30 ) ),
 	"stay": ( var( --clr-sun-40 ), var( --clr-sun-30 ) ),
 	"down": ( color-mix( in srgb, #ffffff 30%, var( --clr-semantic-negative-40 ) ), var( --clr-semantic-negative-30 ) ),
@@ -2237,6 +2237,7 @@ Author: warnull
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	justify-self: center;
 }
 
 .general-collapsible-default-toggle {
@@ -2343,6 +2344,14 @@ Author(s): Elysienna
 
 .matchlist-gradient-yellow {
 	background: linear-gradient( 90deg, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 0%, rgba( 237, 208, 80, 1 ) 75%, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 100% );
+}
+
+.theme--light {
+	--matchlist-header-background-color: #fbf2df;
+}
+
+.theme--dark {
+	--matchlist-header-background-color: var( --clr-secondary-16 );
 }
 
 .matchlist-header {

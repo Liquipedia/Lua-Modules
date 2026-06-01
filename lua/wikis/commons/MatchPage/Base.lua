@@ -346,7 +346,7 @@ function BaseMatchPage:render()
 end
 
 ---@protected
----@return string|Html|Widget?
+---@return Renderable?
 function BaseMatchPage:renderGames()
 	local games = Array.map(Array.filter(self.games, function(game)
 		return game.status ~= BaseMatchPage.NOT_PLAYED

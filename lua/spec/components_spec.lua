@@ -242,6 +242,11 @@ describe('Components/Context', function()
 end)
 
 describe('Components/Html', function()
+	it('Html.Abbr with title property', function()
+		local abbr = Html.Abbr{children = {'Test'}, title = 'Title'}
+		assert.are.same('<abbr title="Title">Test</abbr>', tostring(abbr))
+	end)
+
 	it('Html.Div renders a div', function()
 		assert.are.equal('<div></div>', tostring(Html.Div{}))
 	end)
