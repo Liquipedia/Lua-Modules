@@ -30,8 +30,7 @@ end
 ---@param card table
 ---@return table
 function CustomLegacyTeamCard.preprocessCard(card)
-	-- Add local template overrides
-	card.defaultRowNumber = MathUtil.toInteger(card.defaultRowNumber) or 5
+	-- Add local template override
 	card.t3title = Logic.emptyOr(card.t3title, 'Staff')
 
 	-- Adjust position arguments and add default
