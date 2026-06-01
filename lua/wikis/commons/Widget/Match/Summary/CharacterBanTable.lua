@@ -53,7 +53,7 @@ local function MatchSummaryCharacterBanTable(props)
 	end
 
 	return GeneralCollapsible{
-		classes = {'brkts-popup-veto-wrapper', hasStartIndicator and 'veto-indicator' or nil},
+		classes = {'brkts-popup-veto-wrapper'},
 		shouldCollapse = true,
 		collapseAreaClasses = {'brkts-popup-veto'},
 		titleClasses = {'brkts-popup-veto-header'};
@@ -67,7 +67,7 @@ local function MatchSummaryCharacterBanTable(props)
 				children = WidgetUtil.collect(
 					Characters{characters = banData[1], flipped = false, date = props.date},
 					Div{
-						classes = {'brkts-popup-veto-row-indicator'},
+						classes = hasStartIndicator and {'brkts-popup-veto-row-indicator'} or nil,
 						children = WidgetUtil.collect(
 							hasStartIndicator and startIndicator(1, banData.start) or nil,
 							'Game&nbsp;' .. gameNumber,
