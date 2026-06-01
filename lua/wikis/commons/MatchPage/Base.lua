@@ -57,7 +57,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageOpponent: standardOpponent
 ---@field opponentIndex integer
----@field iconDisplay Widget?
+---@field iconDisplay Renderable?
 ---@field teamTemplateData teamTemplateData
 ---@field seriesDots string[]
 
