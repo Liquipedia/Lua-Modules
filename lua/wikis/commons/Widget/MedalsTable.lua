@@ -107,6 +107,10 @@ end
 ---@param dataColumns (string|integer)[]
 ---@return VNode[]
 function MedalsTable._rows(props, dataColumns)
+	if Logic.isEmpty(props.data) then
+		return {}
+	end
+
 	local totalRowDataSet = Table.extract(props.data, 'total')
 	local rows = {}
 
