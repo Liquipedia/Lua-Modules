@@ -8,21 +8,18 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Variables = Lua.import('Module:Variables')
 local Table = Lua.import('Module:Table')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local FilterButton = Lua.import('Module:Widget/FilterButtons/Button')
 local FilterButtonRow = Lua.import('Module:Widget/FilterButtons/ButtonRow')
-local Widget = Lua.import('Module:Widget')
 
----@class FilterButtons: Widget
----@operator call(table): FilterButtons
-local FilterButtons = Class.new(Widget)
+local FilterButtons = {}
 
 ---@class FilterButtonCategory
 ---@field name string
@@ -32,7 +29,7 @@ local FilterButtons = Class.new(Widget)
 ---@field defaultItem string?
 ---@field itemToPropertyValues? fun(item: string): string?
 ---@field itemIsValid? fun(item: string): boolean
----@field transform? fun(item: string): string|Widget|Html|nil
+---@field transform? fun(item: string): Renderable?
 ---@field expandKey string?
 ---@field expandable boolean?
 ---@field order? fun(a: string, b: string): boolean
@@ -40,10 +37,10 @@ local FilterButtons = Class.new(Widget)
 ---@field hasFeatured boolean?
 ---@field featuredByDefault boolean?
 
+---@param props {categories: FilterButtonCategory[]?}
 ---@return Widget
-function FilterButtons:render()
-	---@type FilterButtonCategory[]
-	local categories = self.props.categories or Lua.import('Module:FilterButtons/Config').categories
+function FilterButtons.render(props)
+	local categories = props.categories or Lua.import('Module:FilterButtons/Config').categories
 
 	Array.forEach(categories, FilterButtons._loadCategories)
 
@@ -86,7 +83,7 @@ function FilterButtons._makeButton(category, value, text)
 end
 
 ---@param category FilterButtonCategory
----@return Widget
+---@return VNode
 function FilterButtons.getButtonRow(category)
 	local transformValueToText = category.transform or FnUtil.identity
 	local itemToPropertyValues = category.itemToPropertyValues or FnUtil.identity
@@ -118,4 +115,4 @@ function FilterButtons.getButtonRow(category)
 	return buttons
 end
 
-return FilterButtons
+return Component.component(FilterButtons.render)
