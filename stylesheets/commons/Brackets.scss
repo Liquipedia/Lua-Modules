@@ -940,28 +940,6 @@ div.brkts-popup-body-element-thumbs {
 			padding: 0 0.5rem;
 			text-align: center;
 		}
-
-		&-picks {
-			.brkts-champion-icon {
-				gap: 0.125rem;
-				display: flex;
-				flex-wrap: wrap;
-
-				& img {
-					width: 1.25rem;
-					height: 1.25rem;
-					border-radius: 0.1875rem;
-
-					@media ( hover: hover ) {
-						&:hover {
-							height: unset;
-							border: 0.0625rem solid #ffffff;
-							box-shadow: 0 0.0625rem 0.25rem 0 var( --clr-on-surface-light-primary-12 );
-						}
-					}
-				}
-			}
-		}
 	}
 
 	table {
@@ -1029,6 +1007,26 @@ div.brkts-popup-body-element-thumbs {
 		&:last-child {
 			border-bottom-left-radius: 0.25rem;
 			border-bottom-right-radius: 0.25rem;
+		}
+
+		.brkts-champion-icon {
+			gap: 0.125rem;
+			display: flex;
+			flex-wrap: wrap;
+
+			img {
+				width: 1.25rem;
+				height: 1.25rem;
+				border-radius: 0.1875rem;
+
+				@media ( hover: hover ) {
+					&:hover {
+						height: unset;
+						border: 0.0625rem solid #ffffff;
+						box-shadow: 0 0.0625rem 0.25rem 0 var( --clr-on-surface-light-primary-12 );
+					}
+				}
+			}
 		}
 	}
 
