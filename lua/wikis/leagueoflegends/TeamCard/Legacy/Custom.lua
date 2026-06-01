@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local InGameRoles = Lua.import('Module:InGameRoles', {loadData = true})
 local LegacyTeamCard = Lua.import('Module:TeamCard/Legacy')
 local Logic = Lua.import('Module:Logic')
-local MathUtil = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
 
 local DEFAULT_MAX_PLAYER_INDEX = 10
