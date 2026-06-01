@@ -1030,8 +1030,7 @@ div.brkts-popup-body-element-thumbs {
 		}
 	}
 
-	&-header {
-		display: grid;
+	&-header.general-collapsible-default-header {
 		grid-column: 1 / -1;
 		grid-template-columns: subgrid;
 		padding: unset;

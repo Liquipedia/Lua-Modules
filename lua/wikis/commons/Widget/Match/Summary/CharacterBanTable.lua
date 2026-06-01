@@ -56,7 +56,7 @@ local function MatchSummaryCharacterBanTable(props)
 		shouldCollapse = true,
 		collapseAreaClasses = {'brkts-popup-veto'},
 		titleClasses = {'brkts-popup-veto-header'};
-		title = 'Map Veto',
+		title = 'Bans',
 		children = Array.map(props.bans, function(banData, gameNumber)
 			if Logic.isDeepEmpty(banData) then
 				return nil
