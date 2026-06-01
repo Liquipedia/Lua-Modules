@@ -60,15 +60,6 @@ local TEAM_INLINE_TYPES = {
 local TeamInlineWidget = {}
 
 ---@param props TeamInlineParameters
----@return teamTemplateData?
-function TeamInlineWidget.readTeamTemplate(props)
-	if props.teamTemplate then
-		return props.teamTemplate
-	end
-	return TeamTemplate.getRawOrNil(props.name, props.date)
-end
-
----@param props TeamInlineParameters
 ---@return VNode
 function TeamInlineWidget.render(props)
 	local displayType = assert(TEAM_INLINE_TYPES[props.displayType], 'Invalid display type')
