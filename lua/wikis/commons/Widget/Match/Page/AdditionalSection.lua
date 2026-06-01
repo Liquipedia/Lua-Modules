@@ -8,42 +8,36 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
 ---@class MatchPageAdditionalSectionParameters
----@field header string
----@field css table<string, (string|number)?>?
----@field bodyClasses string[]?
----@field children (string|Html|Widget|nil)|(string|Html|Widget|nil)[]
+---@field header? Renderable|Renderable[]
+---@field css? table<string, (string|number)?>
+---@field bodyClasses? string[]
+---@field children? Renderable|Renderable[]
 
----@class MatchPageAdditionalSection: Widget
----@operator call(MatchPageAdditionalSectionParameters): MatchPageAdditionalSection
----@field props MatchPageAdditionalSectionParameters
-local MatchPageAdditionalSection = Class.new(Widget)
-
----@return Widget?
-function MatchPageAdditionalSection:render()
-	if Logic.isDeepEmpty(self.props.children) then return end
+---@param props MatchPageAdditionalSectionParameters
+---@return HtmlNode?
+local function MatchPageAdditionalSection(props)
+	if Logic.isDeepEmpty(props.children) then return end
 	return Div{
 		classes = {'match-bm-match-additional-section'},
-		css = self.props.css,
+		css = props.css,
 		children = {
 			Div{
 				classes = { 'match-bm-match-additional-section-header' },
-				children = { self.props.header }
+				children = props.header
 			},
 			Div{
-				classes = Array.extend({'match-bm-match-additional-section-body'}, self.props.bodyClasses),
-				children = WidgetUtil.collect(self.props.children)
+				classes = Array.extend('match-bm-match-additional-section-body', props.bodyClasses),
+				children = props.children
 			},
 		}
 	}
 end
 
-return MatchPageAdditionalSection
+return Component.component(MatchPageAdditionalSection)
