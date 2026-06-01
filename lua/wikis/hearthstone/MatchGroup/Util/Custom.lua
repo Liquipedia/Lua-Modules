@@ -108,8 +108,6 @@ function CustomMatchGroupUtil.constructSubmatch(match, subgroup)
 		opponent.placement = MatchGroupInputUtil.placementFromWinner('', winner, opponentIndex)
 	end)
 
-	local matchExtradata = match.extradata or {}
-
 	return Table.mergeInto({
 		opponents = opponents,
 		winner = winner,
