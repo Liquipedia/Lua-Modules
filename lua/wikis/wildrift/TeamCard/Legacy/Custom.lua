@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local InGameRoles = Lua.import('Module:InGameRoles', {loadData = true})
 local LegacyTeamCard = Lua.import('Module:TeamCard/Legacy')
 local Logic = Lua.import('Module:Logic')
-local MathUtil = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
 
 local DEFAULT_MAX_PLAYER_INDEX = 10
@@ -30,10 +29,6 @@ end
 ---@param card table
 ---@return table
 function CustomLegacyTeamCard.preprocessCard(card)
-	card.defaultRowNumber = MathUtil.toInteger(card.defaultRowNumber) or 5
-	card.t2title = Logic.emptyOr(card.t2title, 'Substitutes')
-	card.t3title = Logic.emptyOr(card.t3title, 'Staff')
-
 	Array.forEach(Array.range(1, DEFAULT_MAX_PLAYER_INDEX), function(index)
 		local key = 'p' .. index
 		card[key .. 'pos'] = Logic.emptyOr(
