@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local ErrorDisplay = Lua.import('Module:Error/Display')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
+local Renderer = Lua.import('Module:Widget/Renderer')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
@@ -44,22 +45,7 @@ end
 ---@return string
 function Widget:tryMake()
 	local function renderComponent()
-		local ret = self:render()
-		if not Array.isArray(ret) then
-			ret = {ret}
-		end
-		---@cast ret Renderable[]
-
-		return table.concat(Array.map(ret, function(val)
-			if Class.instanceOf(val, Widget) then
-				---@cast val Widget
-				return val:tryMake()
-			end
-			if val ~= nil then
-				return tostring(val)
-			end
-			return nil
-		end))
+		return Renderer.render(self:render())
 	end
 
 	return Logic.tryOrElseLog(
