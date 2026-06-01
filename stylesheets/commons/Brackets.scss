@@ -1012,6 +1012,8 @@ div.brkts-popup-body-element-thumbs {
 		&-indicator {
 			display: grid;
 			grid-template-columns: 1fr auto 1fr;
+			gap: 0.25rem;
+			align-items: center;
 		}
 
 		.brkts-champion-icon {
