@@ -18,7 +18,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class FilterButtonRowParameters
 ---@field categoryName string
----@field buttons (FilterButton?)[]
+---@field buttons FilterButton[]
 ---@field expandKey string?
 ---@field featuredByDefault boolean?
 ---@field hasFeatured boolean?
