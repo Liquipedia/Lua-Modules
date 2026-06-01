@@ -48,7 +48,6 @@ local StarcraftMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 ---@field status string?
 ---@field opponents StarcraftMatchGroupUtilGameOpponent[]
 ---@field winner number?
----@field header string?
 
 ---@class StarcraftMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games StarcraftMatchGroupUtilGame[]
@@ -83,7 +82,7 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	if match.opponentMode == 'team' then
 		-- Compute submatches
 		match.submatches = Array.map(
-			MatchGroupUtil.groupBySubgroup(match.games),
+			MatchGroupUtil.groupBySubgroup(match),
 			FnUtil.curry(StarcraftMatchGroupUtil.constructSubmatch, match)
 		)
 	end
@@ -214,7 +213,6 @@ function StarcraftMatchGroupUtil.constructSubmatch(match, subgroup)
 		mode = firstGame.mode,
 		opponents = opponents,
 		winner = winner,
-		header = Table.extract(match.extradata or {}, 'subgroup' .. subgroup.subgroup .. 'header'),
 	}, subgroup)
 end
 
