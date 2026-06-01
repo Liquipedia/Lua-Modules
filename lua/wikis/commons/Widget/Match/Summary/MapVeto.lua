@@ -13,6 +13,7 @@ local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MapVetoStart = Lua.import('Module:Widget/Match/Summary/MapVetoStart')
 local MapVetoRound = Lua.import('Module:Widget/Match/Summary/MapVetoRound')
@@ -27,22 +28,18 @@ function MatchSummaryMapVeto:render()
 		return
 	end
 
-	return HtmlWidgets.Div{
-		classes = {'brkts-popup-mapveto'},
-		children = HtmlWidgets.Table{
-			classes = {'wikitable-striped', 'collapsible', 'collapsed'},
-			children = WidgetUtil.collect(
-				HtmlWidgets.Tr{children = {
-					HtmlWidgets.Th{css = {width = '33%'}},
-					HtmlWidgets.Th{css = {width = '34%', ['text-align'] = 'center'}, children = 'Map Veto'},
-					HtmlWidgets.Th{css = {width = '33%'}},
-				}},
-				MapVetoStart{firstVeto = self.props.firstVeto, vetoFormat = self.props.vetoFormat},
-				Array.map(self.props.vetoRounds, function(veto)
-					return MapVetoRound{vetoType = veto.type, map1 = veto.map1, map2 = veto.map2}
-				end)
-			)
-		}
+	return GeneralCollapsible{
+		classes = {'brkts-popup-veto-wrapper'},
+		shouldCollapse = true,
+		collapseAreaClasses = {'brkts-popup-veto'},
+		titleClasses = {'brkts-popup-veto-header'};
+		title = 'Map Veto',
+		children = WidgetUtil.collect(
+			MapVetoStart{firstVeto = self.props.firstVeto, vetoFormat = self.props.vetoFormat},
+			Array.map(self.props.vetoRounds, function(veto)
+				return MapVetoRound{vetoType = veto.type, map1 = veto.map1, map2 = veto.map2}
+			end)
+		)
 	}
 end
 
