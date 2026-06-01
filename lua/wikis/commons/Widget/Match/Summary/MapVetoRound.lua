@@ -12,7 +12,7 @@ local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local VetoLabel = Lua.import('Module:Widget/Match/Summary/VetoLabel')
 
----@alias VetoMap {name: string, page: string?}
+---@alias VetoMap {name: string, link: string?}
 
 ---@param props {vetoType: VetoTypes, map1: VetoMap?, map2: VetoMap?}
 ---@return Widget?
@@ -22,15 +22,15 @@ local function MatchSummaryMapVetoRound(props)
 		return
 	end
 
-	---@param map {name: string, page: string?}
+	---@param map {name: string, link: string?}
 	---@return Renderable
 	local function displayMap(map)
-		if not map.page then
+		if not map.link then
 			return map.name
 		end
 		return Link{
 			children = map.name,
-			link = map.page,
+			link = map.link,
 		}
 	end
 
