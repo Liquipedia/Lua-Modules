@@ -25,8 +25,6 @@ local Widget = Class.new(function(self, props)
 	if not Array.isArray(self.props.children) then
 		self.props.children = {self.props.children}
 	end
-
-	self.context = {} -- Populated by the parent
 end)
 
 Widget.defaultProps = {}
@@ -55,7 +53,6 @@ function Widget:tryMake()
 		return table.concat(Array.map(ret, function(val)
 			if Class.instanceOf(val, Widget) then
 				---@cast val Widget
-				val.context = self:_nextContext()
 				return val:tryMake()
 			end
 			if val ~= nil then
@@ -72,29 +69,10 @@ function Widget:tryMake()
 	)
 end
 
----@param widget WidgetContext
----@param default any
----@return any
-function Widget:useContext(widget, default)
-	local context = Array.find(self.context, function(node)
-		return Class.instanceOf(node, widget)
-	end)
-	if context then
-		---@cast context WidgetContext
-		return context:getValue(default)
-	end
-	return default
-end
-
 ---@param error Error
 ---@return string
 function Widget:getDerivedStateFromError(error)
 	return tostring(ErrorDisplay.InlineError(error))
-end
-
----@return Widget[]
-function Widget:_nextContext()
-	return {self, unpack(self.context)}
 end
 
 ---@param error Error
