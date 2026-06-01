@@ -1009,6 +1009,11 @@ div.brkts-popup-body-element-thumbs {
 			border-bottom-right-radius: 0.25rem;
 		}
 
+		&-indicator {
+			display: grid;
+			grid-template-columns: 1fr auto 1fr;
+		}
+
 		.brkts-champion-icon {
 			gap: 0.125rem;
 			display: flex;

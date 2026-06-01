@@ -66,6 +66,7 @@ local function MatchSummaryCharacterBanTable(props)
 				children = WidgetUtil.collect(
 					Characters{characters = banData[1], flipped = false, date = props.date},
 					Div{
+						classes = {'brkts-popup-veto-row-indicator'},
 						children = WidgetUtil.collect(
 							hasStartIndicator and startIndicator(1, banData.start) or nil,
 							'Game&nbsp;' .. gameNumber,
