@@ -3,73 +3,6 @@ Template(s): Panels
 Author(s): FO-nTTaX
 *******************************************************************************/
 
-/* Panel box */
-/* Default values */
-.theme--light {
-	--panel-box-border-color: color-mix( in srgb, #000000 16%, var( --clr-wiki-primary-container ) );
-	--panel-box-color: var( --clr-wiki-on-primary-container );
-	--panel-header-background-color: var( --clr-wiki-primary-container );
-}
-
-.theme--dark {
-	--panel-box-border-color: var( --clr-surface-3 );
-	--panel-box-color: var( --clr-wiki-on-primary-container );
-	--panel-header-background-color: color-mix( in srgb, #000000 20%, var( --clr-wiki-theme-20 ) );
-}
-
-/* If theme was in the known list */
-$themes: sun, tuliptree, redviolet, gigas, forest;
-
-@each $theme in $themes {
-	html[data-wiki-theme='#{$theme}'].theme--light {
-		--panel-box-border-color: var( --clr-#{$theme}-80 );
-		--panel-box-color: var( --clr-#{$theme}-10 );
-		--panel-header-background-color: var( --clr-#{$theme}-90 );
-	}
-
-	html[data-wiki-theme='#{$theme}'].theme--dark {
-		--panel-box-border-color: var( --clr-#{$theme}-30 );
-		--panel-box-color: var( --clr-#{$theme}-90 );
-		--panel-header-background-color: var( --clr-#{$theme}-20 );
-	}
-}
-
-// Add html prefix to get higher specificity
-html .panel-box {
-	margin-bottom: 10px;
-	border: 0.0625rem solid var( --panel-box-border-color, var( --wiki-bordercolor-light ) );
-
-	&.wiki-bordercolor-light {
-		border-color: var( --panel-box-border-color, var( --wiki-bordercolor-light ) );
-	}
-}
-
-// Add html prefix to get higher specificity
-html .panel-box-heading {
-	font-size: 18px;
-	font-weight: bold;
-	padding: 5px 10px;
-	background-color: var( --panel-header-background-color, var( --wiki-color-light ) );
-	border-bottom: 0.0625rem solid var( --panel-box-border-color, var( --wiki-bordercolor-light ) );
-	color: var( --panel-box-color );
-
-	&.wiki-bordercolor-light {
-		border-color: var( --panel-box-border-color, var( --wiki-bordercolor-light ) );
-	}
-}
-
-.panel-box-heading:not( :first-child ) {
-	border-top: 1px solid;
-	border-top-color: inherit;
-}
-
-.panel-box-heading > small {
-	font-weight: bold;
-}
-
-.panel-box-body {
-	padding: 10px;
-}
 
 /* New */
 .mainpage-v2 {
@@ -77,6 +10,7 @@ html .panel-box-heading {
 		box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
 		border: 0;
 		border-radius: 0.5rem;
+		margin-bottom: 0.625rem;
 
 		&.is--collapsed {
 			.panel-box-heading {
@@ -96,13 +30,14 @@ html .panel-box-heading {
 	.panel-box-heading {
 		display: flex;
 		align-items: center;
-		background-color: var( --clr-wiki-theme-primary, var( --wiki-color-medium ) );
+		background-color: var( --clr-wiki-theme-primary );
 		color: #ffffff;
 		border: 0;
 		border-radius: 0.5rem 0.5rem 0 0;
 		min-height: 3rem;
 		padding: 0 1rem;
 		font-size: 1rem;
+		font-weight: bold;
 
 		&-icon {
 			height: 1.5rem;
