@@ -35,23 +35,17 @@ $clr-on-primary-container--dark: #d1e4ff;
 
 /** Secondary **/
 $clr-secondary--light: #545f70;
-$clr-on-secondary--light: #ffffff;
 $clr-secondary-container--light: #d7e3f8;
 $clr-on-secondary-container--light: #101c2b;
 
 $clr-secondary--dark: #bbc7db;
-$clr-on-secondary--dark: #253141;
 $clr-secondary-container--dark: #3c4858;
 $clr-on-secondary-container--dark: #d7e3f8;
 
 /** Tertiary **/
-$clr-tertiary--light: #6c5778;
-$clr-on-tertiary--light: #ffffff;
 $clr-tertiary-container--light: #f4d9ff;
 $clr-on-tertiary-container--light: #251431;
 
-$clr-tertiary--dark: #d7bde4;
-$clr-on-tertiary--dark: #3c2948;
 $clr-tertiary-container--dark: #533f5f;
 $clr-on-tertiary-container--dark: #f4d9ff;
 
@@ -80,11 +74,9 @@ $clr-on-surface--dark: #e2e2e6;
 /** Surface variant **/
 $clr-surface-variant--light: #dfe2eb;
 $clr-on-surface-variant--light: #43474e;
-$clr-outline--light: #73777f;
 
 $clr-surface-variant--dark: #43474e;
 $clr-on-surface-variant--dark: var( --clr-secondary-100 );
-$clr-outline--dark: #8d9199;
 
 /** Confirmed **/
 $clr-confirmed--light: #106d34;
@@ -114,23 +106,11 @@ $clr-border--light: rgba( #000000, 8% );
 $clr-border--dark: rgba( #ffffff, 8% );
 
 /** Placing colors **/
-$clr-gold--light: #ccab00;
 $clr-on-gold--light: #fff5cc;
-$clr-silver--light: #557177;
 $clr-on-silver--light: #daedf1;
-$clr-bronze--light: #80704c;
-$clr-on-bronze--light: #f7ecd4;
-$clr-copper--light: #cc7800;
-$clr-on-copper--light: #331900;
 
-$clr-gold--dark: #998000;
 $clr-on-gold--dark: #f8e9a0;
-$clr-silver--dark: #3c585d;
 $clr-on-silver--dark: #bfd5d9;
-$clr-bronze--dark: #655634;
-$clr-on-bronze--dark: #e0d3b8;
-$clr-copper--dark: #995700;
-$clr-on-copper--dark: #ffcd99;
 
 :root {
 	--clr-primary: #{$clr-primary--light};
@@ -138,11 +118,8 @@ $clr-on-copper--dark: #ffcd99;
 	--clr-primary-container: #{$clr-primary-container--light};
 	--clr-on-primary-container: #{$clr-on-primary-container--light};
 	--clr-secondary: #{$clr-secondary--light};
-	--clr-on-secondary: #{$clr-on-secondary--light};
 	--clr-secondary-container: #{$clr-secondary-container--light};
 	--clr-on-secondary-container: #{$clr-on-secondary-container--light};
-	--clr-tertiary: #{$clr-tertiary--light};
-	--clr-on-tertiary: #{$clr-on-tertiary--light};
 	--clr-tertiary-container: #{$clr-tertiary-container--light};
 	--clr-on-tertiary-container: #{$clr-on-tertiary-container--light};
 	--clr-error: #{$clr-error--light};
@@ -155,7 +132,6 @@ $clr-on-copper--dark: #ffcd99;
 	--clr-on-surface: #{$clr-on-surface--light};
 	--clr-surface-variant: #{$clr-surface-variant--light};
 	--clr-on-surface-variant: #{$clr-on-surface-variant--light};
-	--clr-outline: #{$clr-outline--light};
 	--clr-confirmed: #{$clr-confirmed--light};
 	--clr-on-confirmed: #{$clr-on-confirmed--light};
 	--clr-confirmed-container: #{$clr-confirmed-container--light};
@@ -166,14 +142,8 @@ $clr-on-copper--dark: #ffcd99;
 	--clr-surface-4: #{$clr-surface-4--light};
 	--clr-surface-5: #{$clr-surface-5--light};
 	--clr-border: #{$clr-border--light};
-	--clr-gold: #{$clr-gold--light};
 	--clr-on-gold: #{$clr-on-gold--light};
-	--clr-silver: #{$clr-silver--light};
 	--clr-on-silver: #{$clr-on-silver--light};
-	--clr-bronze: #{$clr-bronze--light};
-	--clr-on-bronze: #{$clr-on-bronze--light};
-	--clr-copper: #{$clr-copper--light};
-	--clr-on-copper: #{$clr-on-copper--light};
 }
 
 .theme--dark {
@@ -182,11 +152,8 @@ $clr-on-copper--dark: #ffcd99;
 	--clr-primary-container: #{$clr-primary-container--dark};
 	--clr-on-primary-container: #{$clr-on-primary-container--dark};
 	--clr-secondary: #{$clr-secondary--dark};
-	--clr-on-secondary: #{$clr-on-secondary--dark};
 	--clr-secondary-container: #{$clr-secondary-container--dark};
 	--clr-on-secondary-container: #{$clr-on-secondary-container--dark};
-	--clr-tertiary: #{$clr-tertiary--dark};
-	--clr-on-tertiary: #{$clr-on-tertiary--dark};
 	--clr-tertiary-container: #{$clr-tertiary-container--dark};
 	--clr-on-tertiary-container: #{$clr-on-tertiary-container--dark};
 	--clr-error: #{$clr-error--dark};
@@ -199,7 +166,6 @@ $clr-on-copper--dark: #ffcd99;
 	--clr-on-surface: #{$clr-on-surface--dark};
 	--clr-surface-variant: #{$clr-surface-variant--dark};
 	--clr-on-surface-variant: #{$clr-on-surface-variant--dark};
-	--clr-outline: #{$clr-outline--dark};
 	--clr-confirmed: #{$clr-confirmed--dark};
 	--clr-on-confirmed: #{$clr-on-confirmed--dark};
 	--clr-confirmed-container: #{$clr-confirmed-container--dark};
@@ -210,14 +176,8 @@ $clr-on-copper--dark: #ffcd99;
 	--clr-surface-4: #{$clr-surface-4--dark};
 	--clr-surface-5: #{$clr-surface-5--dark};
 	--clr-border: #{$clr-border--dark};
-	--clr-gold: #{$clr-gold--dark};
 	--clr-on-gold: #{$clr-on-gold--dark};
-	--clr-silver: #{$clr-silver--dark};
 	--clr-on-silver: #{$clr-on-silver--dark};
-	--clr-bronze: #{$clr-bronze--dark};
-	--clr-on-bronze: #{$clr-on-bronze--dark};
-	--clr-copper: #{$clr-copper--dark};
-	--clr-on-copper: #{$clr-on-copper--dark};
 }
 
 /* GRAY */
