@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -16,9 +15,9 @@ local RoleUtil = Lua.import('Module:Role/Util')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local ParticipantsTeamMember = Lua.import('Module:Widget/Participants/Team/TeamMember')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 
@@ -94,13 +93,10 @@ local function getRoleDisplays(player)
 	return roleLeftDisplay(), roleRightDisplay()
 end
 
----@class ParticipantsTeamRoster: Widget
----@operator call(table): ParticipantsTeamRoster
-local ParticipantsTeamRoster = Class.new(Widget)
-
+---@param props {participant: TeamParticipant, mergeStaffTabIfOnlyOneStaff: boolean?}
 ---@return Renderable
-function ParticipantsTeamRoster:render()
-	local participant = self.props.participant
+local function ParticipantsTeamRoster(props)
+	local participant = props.participant
 
 	-- Used for making the sorting stable
 	local sortPlayers = function(players)
@@ -196,7 +192,7 @@ function ParticipantsTeamRoster:render()
 	tabs = Array.filter(tabs, function(tab)
 		return #tab.players > 0
 	end)
-	if self.props.mergeStaffTabIfOnlyOneStaff
+	if props.mergeStaffTabIfOnlyOneStaff
 		and #tabs == 2
 		and tabs[1].type == TAB_ENUM.MAIN
 		and tabs[2].type == TAB_ENUM.STAFF
@@ -225,4 +221,4 @@ function ParticipantsTeamRoster:render()
 	}
 end
 
-return ParticipantsTeamRoster
+return Component.component(ParticipantsTeamRoster)
