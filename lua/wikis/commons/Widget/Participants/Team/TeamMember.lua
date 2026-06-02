@@ -8,31 +8,26 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
----@class ParticipantsTeamMember: Widget
----@field props {even: boolean?, roleLeft: string?, roleRight: string[]?, trophies: integer?,
+---@param props {even: boolean?, roleLeft: string?, roleRight: string[]?, trophies: integer?,
 ---strikethrough: boolean?, player: standardPlayer, team: standardOpponent?, number: integer?}
----@operator call(table): ParticipantsTeamMember
-local ParticipantsTeamMember = Class.new(Widget)
-
 ---@return Widget
-function ParticipantsTeamMember:render()
-	local isEven = self.props.even
-	local roleLeft = self.props.roleLeft
-	local roleRight = self.props.roleRight
-	local trophies = self.props.trophies
-	local player = self.props.player
-	local team = self.props.team
-	local number = self.props.number
+local function ParticipantsTeamMember(props)
+	local isEven = props.even
+	local roleLeft = props.roleLeft
+	local roleRight = props.roleRight
+	local trophies = props.trophies
+	local player = props.player
+	local team = props.team
+	local number = props.number
 
 	local trophyIcon = Icon{iconName = 'firstplace'}
 
@@ -70,7 +65,7 @@ function ParticipantsTeamMember:render()
 					showLink = true,
 					showFaction = true,
 					showTbd = true,
-					dq = self.props.strikethrough,
+					dq = props.strikethrough,
 					showPlayerTeam = false,
 					overflow = 'ellipsis',
 				}
@@ -104,4 +99,4 @@ function ParticipantsTeamMember:render()
 	}
 end
 
-return ParticipantsTeamMember
+return Component.component(ParticipantsTeamMember)
