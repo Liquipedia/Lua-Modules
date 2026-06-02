@@ -448,10 +448,8 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 		&-item {
 			padding: 0.5rem 0.75rem;
 
-			&--odd {
-				.theme--light & {
-					background-color: var( --clr-on-surface-light-primary-4 );
-				}
+			&:nth-of-type( odd ) {
+				background-color: var( --clr-on-surface-light-primary-4 );
 
 				.theme--dark & {
 					background-color: var( --clr-on-surface-dark-primary-4 );

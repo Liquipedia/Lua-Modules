@@ -31,14 +31,11 @@ function PotentialQualifiers(props)
 		},
 		Div{
 			classes = {'team-participant-card__potential-qualifiers-list'},
-			children = Array.map(potentialQualifiers, function(qualifierOpponent, index)
+			children = Array.map(potentialQualifiers, function(qualifierOpponent)
 				return OpponentDisplay.BlockOpponent{
 					opponent = qualifierOpponent,
 					teamStyle = 'standard',
-					additionalClasses = {
-						'team-participant-card__potential-qualifiers-item',
-						(index % 2 == 1) and 'team-participant-card__potential-qualifiers-item--odd' or nil
-					}
+					additionalClasses = {'team-participant-card__potential-qualifiers-item'}
 				}
 			end)
 		}
