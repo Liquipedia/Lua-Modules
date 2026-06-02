@@ -7,25 +7,19 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local Array = Lua.import('Module:Array')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
----@class MatchSummaryBody: Widget
----@operator call(table): MatchSummaryBody
-local MatchSummaryBody = Class.new(Widget)
-MatchSummaryBody.defaultProps = {
-	classes = {},
-}
-
+---@param props {classes: string[]?, children: Renderable|Renderable[]?}
 ---@return Widget
-function MatchSummaryBody:render()
+local function MatchSummaryBody(props)
 	return Div{
-		classes = {'brkts-popup-body', unpack(self.props.classes)},
-		children = self.props.children,
+		classes = Array.extend('brkts-popup-body', props.classes),
+		children = props.children,
 	}
 end
 
-return MatchSummaryBody
+return Component.component(MatchSummaryBody)
