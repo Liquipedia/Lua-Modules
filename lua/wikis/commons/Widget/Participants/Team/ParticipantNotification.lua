@@ -7,22 +7,16 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
-
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
----@class ParticipantNotification: Widget
----@field props {text: string?, highlighted: boolean?}
----@operator call(table): ParticipantNotification
-local ParticipantNotification = Class.new(Widget)
-
----@return Widget?
-function ParticipantNotification:render()
-	local text = self.props.text
-	local highlighted = self.props.highlighted
+---@param props {text: string?, highlighted: boolean?}
+---@return VNode?
+local function ParticipantNotification(props)
+	local text = props.text
+	local highlighted = props.highlighted
 
 	if not text then
 		return
@@ -48,4 +42,4 @@ function ParticipantNotification:render()
 	}
 end
 
-return ParticipantNotification
+return Component.component(ParticipantNotification)
