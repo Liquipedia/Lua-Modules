@@ -22,7 +22,6 @@ local Html = Lua.import('Module:Widget/Html')
 local Carousel = Lua.import('Module:Widget/Basic/Carousel')
 local Div = Html.Div
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
-local Div = Html.Div
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
