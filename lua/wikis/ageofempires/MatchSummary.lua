@@ -30,13 +30,16 @@ local CustomMatchSummary = {}
 ---@field gameData string?
 ---@field soloMode boolean
 
----@class AoEMatchSummaryGameRow: MatchSummaryGameRow
----@operator call(AoEMatchSummaryGameRowProps): AoEMatchSummaryGameRow
----@field props AoEMatchSummaryGameRowProps
-local AoEMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
-AoEMatchSummaryGameRow.defaultProps = {
-	allowWrappingInOverview = true
-}
+---@type Component<AoEMatchSummaryGameRowProps>
+local AoEMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(
+	{
+		createGameOpponentView = CustomMatchSummary.createGameOpponentView,
+		createGameOverview = CustomMatchSummary.createGameOverview
+	},
+	{
+		allowWrappingInOverview = true
+	}
+)
 
 ---@param args table
 ---@return Widget
@@ -82,21 +85,22 @@ function CustomMatchSummary._isSolo(match)
 end
 
 ---@private
+---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
 ---@param playerIndex integer
 ---@return {displayName: string?, pageName: string?, flag: string?, civ: string?}
-function AoEMatchSummaryGameRow:_getPlayerData(opponentIndex, playerIndex)
-	local game = self.props.game
+function CustomMatchSummary._getPlayerData(game, opponentIndex, playerIndex)
 	return ((game.opponents[opponentIndex] or {}).players or {})[playerIndex] or {}
 end
 
 ---@private
 ---@param player table
 ---@param flipped boolean
+---@param gameData string?
 ---@return Widget
-function AoEMatchSummaryGameRow:_createParticipant(player, flipped)
+function CustomMatchSummary._createParticipant(player, flipped, gameData)
 	local children = {
-		self:_createFactionIcon(player.civ),
+		CustomMatchSummary._createFactionIcon(player.civ, gameData),
 		PlayerDisplay.BlockPlayer{player = player, flip = flipped},
 	}
 	return HtmlWidgets.Div{
@@ -112,27 +116,26 @@ function AoEMatchSummaryGameRow:_createParticipant(player, flipped)
 end
 
 ---@private
+---@param game MatchGroupUtilGame
 ---@param opponentId integer
 ---@return Widget[]
-function AoEMatchSummaryGameRow:_createOpponentDisplay(opponentId)
+function CustomMatchSummary._createOpponentDisplay(game, opponentId)
 	local flipped = opponentId == 1
 	return Array.map(
 		Array.sortBy(
-			Array.filter(self.props.game.opponents[opponentId].players, Table.isNotEmpty),
+			Array.filter(game.opponents[opponentId].players, Table.isNotEmpty),
 			Operator.property('index')
 		),
 		function (player)
-			return self:_createParticipant(player, flipped)
+			return CustomMatchSummary._createParticipant(player, flipped)
 		end
 	)
 end
 
----@protected
+---@param props AoEMatchSummaryGameRowProps
 ---@param opponentIndex integer
 ---@return table<string, string|number>?
-function AoEMatchSummaryGameRow:getGameOpponentViewCss(opponentIndex)
-	local props = self.props
-
+function CustomMatchSummary.getGameOpponentViewCss(props, opponentIndex)
 	if props.soloMode then
 		return
 	end
@@ -149,23 +152,23 @@ function AoEMatchSummaryGameRow:getGameOpponentViewCss(opponentIndex)
 	}
 end
 
----@protected
+---@param props AoEMatchSummaryGameRowProps
 ---@param opponentIndex integer
 ---@return Widget|Widget[]
-function AoEMatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	local props = self.props
-
+function CustomMatchSummary.createGameOpponentView(props, opponentIndex)
 	if props.soloMode then
-		return self:_createFactionIcon(self:_getPlayerData(opponentIndex, 1).civ)
+		return CustomMatchSummary._createFactionIcon(
+			CustomMatchSummary._getPlayerData(props.game, opponentIndex, 1).civ, props.gameData
+		)
 	end
 
-	return self:_createOpponentDisplay(opponentIndex)
+	return CustomMatchSummary._createOpponentDisplay(props.game, opponentIndex)
 end
 
----@protected
+---@param props AoEMatchSummaryGameRowProps
 ---@return Renderable?
-function AoEMatchSummaryGameRow:createGameOverview()
-	local game = self.props.game
+function CustomMatchSummary.createGameOverview(props)
+	local game = props.game
 	game.mapDisplayName = game.mapDisplayName or game.map
 
 	if game.mapDisplayName and game.extradata and game.extradata.mapmode then
@@ -176,9 +179,10 @@ end
 
 ---@private
 ---@param civ string?
+---@param gameData string?
 ---@return Widget
-function AoEMatchSummaryGameRow:_createFactionIcon(civ)
-	local normGame = Game.abbreviation{game = self.props.gameData}:lower()
+function CustomMatchSummary._createFactionIcon(civ, gameData)
+	local normGame = Game.abbreviation{game = gameData}:lower()
 	return HtmlWidgets.Span{
 		classes = {'brkts-champion-icon'},
 		children = Faction.Icon{
