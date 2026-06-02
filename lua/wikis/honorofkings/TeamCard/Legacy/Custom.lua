@@ -14,6 +14,7 @@ local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
 local DEFAULT_MAX_PLAYER_INDEX = 10
+local DEFAULT_LINEUP_SIZE = 5
 local INGAME_ROLES_BY_ORDER = Table.map(InGameRoles, function(_, roleData)
 	return roleData.sortOrder, roleData.display
 end)
@@ -34,7 +35,7 @@ function CustomLegacyTeamCard.preprocessCard(card)
 		card[key .. 'pos'] = Logic.emptyOr(
 			card[key .. 'pos'],
 			Table.extract(card, 'pos' .. index),
-			INGAME_ROLES_BY_ORDER[index]
+			index <= DEFAULT_LINEUP_SIZE and INGAME_ROLES_BY_ORDER[index] or nil
 		)
 	end)
 
