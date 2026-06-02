@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 
 local Component = Lua.import('Module:Widget/Component')
@@ -56,9 +55,9 @@ end
 ---@private
 ---@param props MatchSummaryContainerProps
 ---@return boolean
-MatchSummaryContainer._hasResetMatch = FnUtil.memoize(function (props)
+function MatchSummaryContainer._hasResetMatch(props)
 	return Logic.isNotEmpty(props.resetMatch)
-end)
+end
 
 ---@private
 ---@param props MatchSummaryContainerProps
