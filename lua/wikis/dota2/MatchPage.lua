@@ -249,7 +249,7 @@ function MatchPage:_renderStatsTeamDisplay(game, teamIndex)
 			Label{
 				labelType = 'result-' .. (scoreDisplay == '-' and 'default' or scoreDisplay),
 				classes = {'match-bm-team-stats-team-state'},
-				children = team.scoreDisplay
+				children = scoreDisplay
 			}
 		}
 	}
