@@ -15,7 +15,7 @@ local VetoLabel = Lua.import('Module:Widget/Match/Summary/VetoLabel')
 ---@alias VetoMap {name: string, link: string?}
 
 ---@param props {vetoType: VetoTypes, map1: VetoMap?, map2: VetoMap?}
----@return Widget?
+---@return VNode?
 local function MatchSummaryMapVetoRound(props)
 	local vetoType = props.vetoType
 	if not vetoType then

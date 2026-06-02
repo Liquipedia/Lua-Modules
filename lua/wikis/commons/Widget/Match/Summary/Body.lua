@@ -14,7 +14,7 @@ local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
 
 ---@param props {classes: string[]?, children: Renderable|Renderable[]?}
----@return Widget
+---@return VNode
 local function MatchSummaryBody(props)
 	return Div{
 		classes = Array.extend('brkts-popup-body', props.classes),

@@ -21,7 +21,7 @@ local Html = Lua.import('Module:Widget/Html')
 ---@field gamesSectionResult? Renderable|Renderable[]
 
 ---@param props MatchSummaryGamesContainerProps
----@return Widget?
+---@return VNode?
 local function MatchSummaryGamesContainer(props)
 	if Logic.isEmpty(props.children) then
 		return
