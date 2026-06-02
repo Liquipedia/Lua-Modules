@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 local Tournament = Lua.import('Module:Tournament')
@@ -151,23 +152,31 @@ end
 ---@param rawQualifier string
 ---@return string?, string?, string? # (linkText, internalLink, externalLink)
 function LegacyTeamCard._parseQualifierLink(rawQualifier)
-	local cleanQualifier = rawQualifier:gsub('%[', ''):gsub('%]', '')
-	if cleanQualifier:find('|') then
-		local parts = mw.text.split(cleanQualifier, '|', true)
-		local link, displayName = parts[1], parts[2]
-		if link:sub(1, 1) == '/' then
-			link = mw.title.getCurrentTitle().fullText .. link
+	-- A qualifier may be prefixed with an icon (e.g. {{LeagueIconSmall}}, which expands to
+	-- a File link / span before reaching here). Take the first internal wikilink that is not
+	-- such an embed; the new QualifierInfo widget renders its own tournament icon.
+	for inner in rawQualifier:gmatch('%[%[(.-)%]%]') do
+		local lowered = inner:lower()
+		local isEmbed = inner:find('<', 1, true) or Array.any({'file:', 'image:', 'media:'}, function(prefix)
+			return String.startsWith(lowered, prefix)
+		end)
+		if not isEmbed then
+			local parts = mw.text.split(inner, '|', true)
+			local link, displayName = parts[1], parts[2] or parts[1]
+			if String.startsWith(link, '/') then
+				link = mw.title.getCurrentTitle().fullText .. link
+			end
+			return mw.text.trim(displayName), mw.text.trim(link):gsub(' ', '_'), nil
 		end
-		link = link:gsub(' ', '_')
-		return displayName, link, nil
-	elseif rawQualifier:sub(1, 1) == '[' then
-		local parts = mw.text.split(cleanQualifier, ' ', true)
-		local link = parts[1]
-		table.remove(parts, 1)
-		return table.concat(parts, ' '), nil, link
-	else
-		return rawQualifier, nil, nil
 	end
+
+	if String.startsWith(rawQualifier, '[') then
+		local parts = mw.text.split(rawQualifier:gsub('[%[%]]', ''), ' ', true)
+		local link = table.remove(parts, 1)
+		return table.concat(parts, ' '), nil, link
+	end
+
+	return rawQualifier, nil, nil
 end
 
 ---@param tcArgs table
