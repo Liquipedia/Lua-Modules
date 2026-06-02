@@ -8,11 +8,11 @@
 ---@type table<string, RoleBaseData>
 local inGameRoles = {
 	['top'] = {category = 'Top Laners', display = 'Top Lane', sortOrder = 1},
-	['bottom'] = {category = 'Bottom Laners', display = 'Bottom Laner', sortOrder = 5},
-	['mid'] = {category = 'Mid Laners', display = 'Mid Laner', sortOrder = 4},
-	['side lane'] = {category = 'Side Laners', display = 'Side Laner', sortOrder = 2},
-	['jungler'] = {category = 'Junglers', display = 'Jungler', sortOrder = 3},
-	['roamer'] = {category = 'Roamers', display = 'Roamer', sortOrder = 6},
+	['bottom'] = {category = 'Bottom Laners', display = 'Bottom Laner', sortOrder = 4},
+	['mid'] = {category = 'Mid Laners', display = 'Mid Laner', sortOrder = 3},
+	['side lane'] = {category = 'Side Laners', display = 'Side Laner', sortOrder = 6},
+	['jungler'] = {category = 'Junglers', display = 'Jungler', sortOrder = 2},
+	['roamer'] = {category = 'Roamers', display = 'Roamer', sortOrder = 5},
 	['flex'] = {category = 'Flex', display = 'Flex', sortOrder = 7},
 }
 
