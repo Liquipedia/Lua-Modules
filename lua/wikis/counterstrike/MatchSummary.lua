@@ -22,9 +22,10 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@class CounterstrikeCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class CounterstrikeMatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): CounterstrikeMatchSummaryGameRow
-local CounterstrikeMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+local CounterstrikeMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent{
+	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay,
+	createGameOpponentView = CustomMatchSummary.createGameOpponentView
+}
 
 ---@param args table
 ---@return Widget
@@ -195,15 +196,11 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 	return footer
 end
 
----@return string
-function CounterstrikeMatchSummaryGameRow:createGameOverview()
-	return self:mapDisplay()
-end
-
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
 ---@return Widget
-function CounterstrikeMatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	local game = self.props.game
+function CustomMatchSummary.createGameOpponentView(props, opponentIndex)
+	local game = props.game
 
 	local sides = game.extradata['t' .. opponentIndex .. 'sides']
 	local halfs = game.extradata['t' .. opponentIndex .. 'halfs']
@@ -212,7 +209,7 @@ function CounterstrikeMatchSummaryGameRow:createGameOpponentView(opponentIndex)
 	end)
 
 	return MatchSummaryWidgets.DetailedScore{
-		score = self:scoreDisplay(opponentIndex),
+		score = MatchSummaryWidgets.GameRow.scoreDisplay(game, opponentIndex),
 		partialScores = scores,
 	}
 end
