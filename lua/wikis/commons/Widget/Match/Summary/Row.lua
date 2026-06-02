@@ -15,7 +15,7 @@ local Div = Html.Div
 
 ---@param props {classes: string[]?, css: table<string, string|number?>?, children: Renderable|Renderable[]}
 ---@return VNode
-function MatchSummaryRow(props)
+local function MatchSummaryRow(props)
 	return Div{
 		classes = Array.extend('brkts-popup-body-element', props.classes),
 		css = props.css,
