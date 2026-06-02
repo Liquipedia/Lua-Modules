@@ -13,7 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local GameCenter = Lua.import('Module:Widget/Match/Summary/GameCenter')
 local GameWinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLossIndicator')
 
@@ -28,10 +28,10 @@ local GameWinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLoss
 ---@field props MatchSummaryGameRowProps
 local MatchSummaryGameRow = Class.new(Widget)
 
----@return Widget?
+---@return VNode?
 function MatchSummaryGameRow:render()
 	local props = self.props
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'brkts-popup-body-grid-row'},
 		css = props.css,
 		children = {
@@ -39,7 +39,7 @@ function MatchSummaryGameRow:render()
 				opponentIndex = 1,
 				winner = props.game.winner,
 			},
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'brkts-popup-body-grid-row-detail'},
 				children = {
 					GameCenter{
@@ -111,13 +111,13 @@ function MatchSummaryGameRow:scoreDisplay(opponentIndex)
 end
 
 ---@private
----@return Widget?
+---@return VNode?
 function MatchSummaryGameRow:_renderGameComment()
 	local game = self.props.game
 	if Logic.isEmpty(game.comment) then
 		return
 	end
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'brkts-popup-comment'},
 		children = game.comment,
 	}
