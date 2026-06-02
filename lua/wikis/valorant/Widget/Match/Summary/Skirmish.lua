@@ -15,7 +15,8 @@ local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
 
----@return Widget?
+---@param props ValorantSkirmishResult
+---@return VNode?
 local function ValorantSkirmishDisplay(props)
 	if Logic.isEmpty(props) then
 		return
