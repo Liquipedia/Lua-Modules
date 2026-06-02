@@ -9,4 +9,10 @@ local Lua = require('Module:Lua')
 
 local ListWidgets = Lua.import('Module:Widget/List')
 
+--[[
+DEPRECATED
+
+Use Module:Widget/List.
+]]
+
 return ListWidgets.Unordered
