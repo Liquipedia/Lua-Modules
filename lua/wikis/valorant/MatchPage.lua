@@ -650,6 +650,9 @@ end
 ---@return VNode[]?
 function MatchPage:addComments()
 	local skirmishData = self.matchData.extradata.skirmish
+	if Logic.isEmpty(skirmishData) then
+		return
+	end
 	---@cast skirmishData ValorantSkirmishResult
 	return {
 		Comment{children = SkirmishDisplay(skirmishData)}
