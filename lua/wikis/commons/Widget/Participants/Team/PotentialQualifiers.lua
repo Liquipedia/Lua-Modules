@@ -8,20 +8,16 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
----@class PotentialQualifiers: Widget
----@operator call(table): PotentialQualifiers
-local PotentialQualifiers = Class.new(Widget)
-
+---@param props {participant: TeamParticipant}
 ---@return Widget?
-function PotentialQualifiers:render()
-	local participant = self.props.participant
+function PotentialQualifiers(props)
+	local participant = props.participant
 	local potentialQualifiers = participant.potentialQualifiers
 
 	if not potentialQualifiers or #potentialQualifiers == 0 then
@@ -54,4 +50,4 @@ function PotentialQualifiers:render()
 	}
 end
 
-return PotentialQualifiers
+return Component.component(PotentialQualifiers)
