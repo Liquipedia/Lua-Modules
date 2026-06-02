@@ -8,12 +8,11 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 
@@ -24,10 +23,7 @@ local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 ---@field match MatchGroupUtilMatch
 ---@field resetMatch MatchGroupUtilMatch?
 
----@class MatchSummaryContainer: Widget
----@operator call(MatchSummaryContainerProps): MatchSummaryContainer
----@field props MatchSummaryContainerProps
-local MatchSummaryContainer = Class.new(Widget)
+local MatchSummaryContainer = {}
 
 ---@private
 ---@param matchData MatchGroupUtilMatch
@@ -41,42 +37,45 @@ function MatchSummaryContainer._getExpandedHeader(matchData)
 	return DisplayHelper.expandHeader(header)[1]
 end
 
----@return Widget
-function MatchSummaryContainer:render()
+---@param props MatchSummaryContainerProps
+---@return VNode
+function MatchSummaryContainer.render(props)
 	return AnalyticsWidget{
 		analyticsName = 'Match popup',
 		classes = Array.extend(
 			'brkts-popup',
-			not self:_hasResetMatch() and 'brkts-popup-container' or nil,
-			self.props.classes
+			not MatchSummaryContainer._hasResetMatch(props) and 'brkts-popup-container' or nil,
+			props.classes
 		),
-		css = {width = self.props.width},
-		children = self:_buildChildren(),
+		css = {width = props.width},
+		children = MatchSummaryContainer._buildChildren(props),
 	}
 end
 
 ---@private
+---@param props MatchSummaryContainerProps
 ---@return boolean
-function MatchSummaryContainer:_hasResetMatch()
-	return Logic.isNotEmpty(self.props.resetMatch)
+function MatchSummaryContainer._hasResetMatch(props)
+	return Logic.isNotEmpty(props.resetMatch)
 end
 
 ---@private
+---@param props MatchSummaryContainerProps
 ---@return Renderable
-function MatchSummaryContainer:_buildChildren()
-	if not self:_hasResetMatch() then
-		return self.props.createMatch(self.props.match):create()
+function MatchSummaryContainer._buildChildren(props)
+	if not MatchSummaryContainer._hasResetMatch(props) then
+		return props.createMatch(props.match):create()
 	end
 
-	local resetMatch = self.props.resetMatch
+	local resetMatch = props.resetMatch
 	---@cast resetMatch -nil
 
 	---@param matchData MatchGroupUtilMatch
-	---@return Widget
+	---@return VNode
 	local function createMatchContainer(matchData)
-		return HtmlWidgets.Div{
+		return Html.Div{
 			classes = {'brkts-popup-container'},
-			children = self.props.createMatch(matchData):create()
+			children = props.createMatch(matchData):create()
 		}
 	end
 
@@ -84,8 +83,8 @@ function MatchSummaryContainer:_buildChildren()
 		css = {['margin-bottom'] = '0.5rem'},
 		tabs = {
 			{
-				label = MatchSummaryContainer._getExpandedHeader(self.props.match),
-				content = createMatchContainer(self.props.match),
+				label = MatchSummaryContainer._getExpandedHeader(props.match),
+				content = createMatchContainer(props.match),
 			},
 			{
 				label = MatchSummaryContainer._getExpandedHeader(resetMatch) .. ' Reset',
@@ -93,8 +92,8 @@ function MatchSummaryContainer:_buildChildren()
 			},
 		},
 		storeValue = false,
-		switchGroup = self.props.match.matchId .. '_resetSelector',
+		switchGroup = props.match.matchId .. '_resetSelector',
 	}
 end
 
-return MatchSummaryContainer
+return Component.component(MatchSummaryContainer.render)
