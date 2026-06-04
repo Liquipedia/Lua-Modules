@@ -231,7 +231,7 @@ function Standings.makeRounds(standings)
 	local roundCount = Array.maxBy(Array.map(standingsEntries, function(entry)
 		return tonumber(entry.roundindex) or 1 end), FnUtil.identity)
 
-	return Array.map(Array.range(1, roundCount or 1), function(roundIndex)
+	return Array.mapRange(1, roundCount or 1, function(roundIndex)
 		local roundEntries = Array.filter(standingsEntries, function(entry)
 			return tonumber(entry.roundindex) == roundIndex
 		end)

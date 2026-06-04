@@ -362,7 +362,7 @@ end
 ---@param maxNumberOfCharacters integer
 ---@return string[]
 function MatchSummary.buildCharacterList(data, prefix, maxNumberOfCharacters)
-	return Array.map(Array.range(1, maxNumberOfCharacters), function(index)
+	return Array.mapRange(1, maxNumberOfCharacters, function(index)
 		return data[prefix .. index]
 	end)
 end

@@ -283,7 +283,7 @@ end
 ---@param count number
 ---@return standardPlayer[]
 function TeamParticipantsWikiParser.createTBDPlayers(count)
-	return Array.map(Array.range(1, count), function()
+	return Array.mapRange(1, count, function()
 		return TeamParticipantsWikiParser.parsePlayer{'TBD'}
 	end)
 end
