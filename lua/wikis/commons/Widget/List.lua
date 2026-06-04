@@ -20,6 +20,7 @@ local ListWidgets = {}
 
 ---@package
 ---@param listType HtmlComponent
+---@return Component<ListWidgetProps>
 function ListWidgets._create(listType)
 	---@param props ListWidgetProps
 	---@return VNode?
