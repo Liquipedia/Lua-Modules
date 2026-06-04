@@ -175,18 +175,13 @@ function MatchFunctions.parseSkirmish(match, opponents)
 			return
 		end
 		---@cast playerName -nil
-		local nameComponents = Array.parseCommaSeparatedString(playerName, '|')
-		local link = Page.pageifyLink(Array.parseCommaSeparatedString(playerName, '|')[1]):gsub(' ', '_')
-		local playerData = Array.find(
+		local link = Page.pageifyLink(playerName)
+		return Array.find(
 			opponents[opponentIndex].match2players,
-			function (match2player, playerIndex)
-				return match2player.name == link
+			function (match2player)
+				return match2player.name == link or match2player.displayname == link or match2player.displayname == playerName
 			end
 		)
-		return Table.merge(playerData, {
-			name = link,
-			displayname = nameComponents[#nameComponents]
-		})
 	end
 
 	local player1 = lookupPlayer(skirmishData.t1p1, 1)
