@@ -7,13 +7,12 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html/All')
+local Div = Html.Div
 local TeamIcon = Lua.import('Module:Widget/Image/Icon/TeamIcon')
 
 ---@class TeamPartParameters
@@ -21,30 +20,15 @@ local TeamIcon = Lua.import('Module:Widget/Image/Icon/TeamIcon')
 ---@field date number|string?
 ---@field teamTemplate teamTemplateData?
 
----@class TeamPartWidget: Widget
----@operator call(TeamPartParameters): TeamPartWidget
----@field name string?
----@field props TeamPartParameters
----@field teamTemplate teamTemplateData
----@field flip boolean
----@field displayType InlineType
-local TeamPartWidget = Class.new(Widget,
-	---@param self self
-	---@param input TeamPartParameters
-	function (self, input)
-		self.teamTemplate = input.teamTemplate or TeamTemplate.getRawOrNil(input.name, input.date)
-		self.name = (self.teamTemplate or {}).name or input.name
-	end
-)
-
----@return Widget
-function TeamPartWidget:render()
-	local teamTemplate = self.teamTemplate
+---@param props TeamPartParameters
+---@return VNode
+local function TeamPartWidget(props)
+	local teamTemplate = props.teamTemplate or TeamTemplate.getRawOrNil(props.name, props.date)
 	if not teamTemplate then
 		mw.ext.TeamLiquidIntegration.add_category('Pages with missing team templates')
-		return HtmlWidgets.Small{
+		return Html.Small{
 			classes = { 'error' },
-			children = { TeamTemplate.noTeamMessage(self.name) }
+			children = { TeamTemplate.noTeamMessage(props.name) }
 		}
 	end
 
@@ -52,7 +36,7 @@ function TeamPartWidget:render()
 	local imageDark = Logic.emptyOr(teamTemplate.imagedark, teamTemplate.legacyimagedark)
 
 	return Div{
-		attributes = { ['data-highlighting-class'] = self.teamTemplate.name },
+		attributes = { ['data-highlighting-class'] = teamTemplate.name },
 		classes = {'team-template-team-part'},
 		children = TeamIcon{
 			imageLight = imageLight,
@@ -65,4 +49,4 @@ function TeamPartWidget:render()
 	}
 end
 
-return TeamPartWidget
+return Component.component(TeamPartWidget)
