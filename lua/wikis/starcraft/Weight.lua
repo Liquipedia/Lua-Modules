@@ -5,37 +5,49 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+
+local TIER_TO_FACTOR = {
+	8,
+	4,
+	2,
+}
+local TIER_TO_BASE_WEIGHT = {
+	2000,
+	200,
+	20
+}
+
 local Weight = {}
 
-function Weight.calc(prize, tier, place, tierType, offline)
-	return Weight.weight(prize, tier, place, tierType, offline == 'Offline')
-end
+---@param prize number?
+---@param tier string|integer
+---@param place string
+---@param tiertype string
+---@param tournamentType string?
+---@return number
+function Weight.calc(prize, tier, place, tiertype, tournamentType)
+	local isOffline = tournamentType == 'Offline'
 
-function Weight.weight(prizeMoney, tier, placement, tierType, isOffline)
-	local tiermultiplier, baseweigth
-	local placement2 = mw.text.split(placement or '', '-')
-	if #placement2 > 1 then
-		placement = (placement2[1] + placement2[2]) / 2
-	end
-	placement = (tonumber(placement) or 999)
-
-	if tonumber(tier) == 1 then
-		tiermultiplier = 8
-		baseweight = 2000 / placement
-	elseif tonumber(tier) == 2 then
-		tiermultiplier = 4
-		baseweight = 200 / placement
-	elseif tonumber(tier) == 3 then
-		tiermultiplier = 2
-		baseweight = 20 / placement
-	elseif (tier == 'Qualifier') or (tier == 'Show Match') then
-		tiermultiplier = 0.5
-		baseweight = 0
+	local placementFactor
+	local placements = Array.parseCommaSeparatedString(place, '-')
+	if placements[2] then
+		placementFactor = (placements[1] + placements[2]) / 2
 	else
-		tiermultiplier = 1
-		baseweight = 10 / placement
+		placementFactor = tonumber(placements[1]) or 999
 	end
-	return (isOffline and 1.5 or 1) * tiermultiplier * (prizeMoney + baseweight ) / placement
+
+	local tierFactor = (tiertype == 'Qualifier' or tiertype == 'Showmatch') and 0.5
+		or TIER_TO_FACTOR[tonumber(tier)]
+		or 1
+
+	local baseWeight = (tiertype == 'Qualifier' or tiertype == 'Showmatch') and 0
+		or TIER_TO_BASE_WEIGHT[tonumber(tier)]
+		or 10
+
+	return (isOffline and 1.5 or 1) * tierFactor * (prize + baseWeight / placementFactor) / placementFactor
 end
 
 return Weight

@@ -5,45 +5,44 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+
+local TIER_TO_FACTOR = {
+	8,
+	4,
+	2,
+}
+local DEFAULT_PRIZE_VALUE = 0.0001
+
 local Weight = {}
 
+---@param prize number?
+---@param tier string|integer
+---@param place string
+---@param tiertype string
+---@return number
 function Weight.calc(prize, tier, place, tiertype)
-	prize = tonumber(prize) or 0
-	tier = tonumber(tier)
 	place = string.lower(place or '')
-	if
-		place == 'l' or
-		place == 'dq' or
-		place == ''
-	then
+	if Logic.isEmpty(place) or place == 'l' or place == 'dq' then
 		return 0
 	end
 
-	if
-		place == 'w' or
-		place == 'd' or
-		place == 'q'
-	then
+	local tierFactor = TIER_TO_FACTOR[tonumber(tier)] or 1
+
+	local tierTypeFactor = tiertype == 'Qualifier' and 0.001 or 1
+
+	prize = tonumber(prize)
+	prize = prize ~= 0 and prize or DEFAULT_PRIZE_VALUE
+
+	if place == 'w' or place == 'd' or place == 'q' then
 		prize = 2
-		place = 1
+		place = '1'
 	end
 
-	local tierCovert = {
-		8,
-		4,
-		2,
-	}
-	local typeCovert = {
-		qualifier = 0.001,
-		external = 0.1,
-	}
-	if prize == 0 then
-		prize = 0.0001
-	end
-
-	local tierFactor = tierCovert[tier] or 1
-	local placementFactor = mw.text.split(place, '-', true)[1]
-	local tierTypeFactor = typeCovert[string.lower(tiertype or '')] or 1
+	local placementFactor = tonumber(Array.parseCommaSeparatedString(place, '-')[1]) --[[@as integer]]
 
 	return tierFactor * (prize / placementFactor) * tierTypeFactor
 end
