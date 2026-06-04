@@ -31,11 +31,24 @@ function Array.randomize(tbl)
 	return tbl
 end
 
----Return true if the input is a table in array format
+---Returns true if the argument is an array.
+---@param tbl any
+---@return boolean
+---@overload fun(tbl: any[]): true
+---@nodiscard
+function Array.isArray(tbl)
+	return type(tbl) == 'table' and Table.size(tbl) == #tbl
+end
+
+---Returns true if the input is a table in an array-like format.
+---
+---Unlike Array.isArray, this function also checks whether a table fetched by mw.loadData
+---is in an array-like format. Hence, `true` being returned from this method does NOT assert
+---that using the # operator on the argument will return a valid integer.
 ---@param tbl any
 ---@return boolean
 ---@nodiscard
-function Array.isArray(tbl)
+function Array.isArrayLike(tbl)
 	if type(tbl) ~= 'table' then
 		return false
 	end
@@ -455,7 +468,7 @@ function Array.appendWith(tbl, ...)
 end
 
 --[[
-Returns an array with elements from one or more arrays append to the end. Does
+Returns an array with elements from one or more arrays appended to the end. Does
 not mutate the inputs.
 
 Example:
@@ -474,6 +487,19 @@ function Array.extend(tbl, ...)
 	return Array.extendWith({}, tbl, ...)
 end
 
+---Returns an array with elements from one or more array-like objects appended to the end.
+---
+---See Array.isArrayLike for the description of array-like assumptions. Array.extend should be
+---preferred over this function if none of the arguments require the array-like check.
+---@generic T
+---@param tbl T[]|T
+---@param ... T[]|T
+---@return T[]
+---@nodiscard
+function Array.extendArrayLike(tbl, ...)
+	return Array._extendArrayImpl(Array.isArrayLike, {}, tbl, ...)
+end
+
 --[[
 Adds elements from one or more arrays to the end of a target array. The target
 array is mutated in the process.
@@ -483,9 +509,19 @@ array is mutated in the process.
 ---@param ... T[]|T
 ---@return T[]
 function Array.extendWith(tbl, ...)
+	return Array._extendArrayImpl(Array.isArray, tbl, ...)
+end
+
+---@package
+---@generic T
+---@param checkElement fun(elem: any): boolean
+---@param tbl T[]
+---@param ... T[]|T
+---@return T[]
+function Array._extendArrayImpl(checkElement, tbl, ...)
 	local arrays = Table.pack(...)
 	for index = 1, arrays.n do
-		if Array.isArray(arrays[index]) then
+		if checkElement(arrays[index]) then
 			for _, element in ipairs(arrays[index]) do
 				table.insert(tbl, element)
 			end
