@@ -522,8 +522,8 @@ end
 ---@nodiscard
 function Array.mapRange(from, to, funct)
 	local elements = {}
-	for element = from, to do
-		table.insert(elements, funct(element))
+	for i = from, to do
+		table.insert(elements, funct(i))
 	end
 	return elements
 end
