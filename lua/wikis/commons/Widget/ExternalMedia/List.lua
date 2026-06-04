@@ -33,7 +33,9 @@ function ExternalMediaListDisplay:render()
 	if Logic.isEmpty(data) then
 		return
 	end
-	return ListWidgets.Unordered{children = Array.map(data, FnUtil.curry(ExternalMediaListDisplay._createListElement, self))}
+	return ListWidgets.Unordered{
+		children = Array.map(data, FnUtil.curry(ExternalMediaListDisplay._createListElement, self))
+	}
 end
 
 ---@private
