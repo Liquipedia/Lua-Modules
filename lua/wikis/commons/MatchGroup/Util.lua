@@ -655,6 +655,10 @@ function MatchMT.__index(match, property)
 		end)
 	elseif property == 'links' then
 		match.links = Json.parseIfString(match.record.links) or {}
+	elseif property == 'opponents' then
+		match.opponents = Array.map(
+			match.record.match2opponents, FnUtil.curry(MatchGroupUtil.opponentFromRecord, match.record)
+		)
 	elseif property == 'phase' then
 		match.phase = MatchGroupUtil.computeMatchPhase(match)
 	elseif property == 'stream' then
@@ -675,7 +679,6 @@ end
 function MatchGroupUtil.matchFromRecord(record)
 	setmetatable(record, MatchRecordMT)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
-	local opponents = Array.map(record.match2opponents, FnUtil.curry(MatchGroupUtil.opponentFromRecord, record))
 
 	local walkover = nilIfEmpty(record.walkover)
 
@@ -693,7 +696,6 @@ function MatchGroupUtil.matchFromRecord(record)
 		liquipediatier = record.liquipediatier,
 		liquipediatiertype = record.liquipediatiertype,
 		mode = record.mode,
-		opponents = opponents,
 		pageName = record.pagename,
 		parent = record.parent,
 		patch = record.patch,
