@@ -58,6 +58,13 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 		'match2',
 		{
 			conditions = tostring(conditions),
+			query = table.concat({
+				'match2opponents', 'match2id', 'bestof', 'extradata', 'date', 'dateexact', 'finished', 'game',
+				'icon', 'icondark', 'liquipediatier', 'liquipediatiertype', 'mode', 'pagename', 'parent',
+				'patch', 'publishertier', 'resulttype', 'section', 'series', 'shortname', 'status',
+				'tickername', 'tournament', 'type', 'vod', 'walkover', 'winner'
+			}, ','),
+			order = 'date asc',
 		},
 		function(match2)
 			local roundNumbers = matchIdToRound[match2.match2id]
