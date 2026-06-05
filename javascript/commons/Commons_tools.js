@@ -32,7 +32,8 @@ liquipedia.commonstools = {
 		if ( liquipedia.commonstools.wikis === null ) {
 			const api = new mw.ForeignApi( '/api.php' );
 			api.get( {
-				action: 'listwikis'
+				action: false,
+				format: false
 			} ).then( ( data ) => {
 				liquipedia.commonstools.wikis = data.allwikis;
 				callback();

@@ -12,6 +12,7 @@ local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
@@ -90,7 +91,13 @@ function TeamParticipantsRepository.save(participant)
 		local activeOpponent = Table.deepCopy(participant.opponent)
 		activeOpponent.players = Array.filter(activeOpponent.players or {}, shouldStorePlayer)
 		-- Add full opponent data for players with results with this team
-		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(activeOpponent, { setPlayersInTeam = true }))
+		-- TODO: `forceUnderscores` is a stopgap so TP storage normalizes player pagenames
+		-- regardless of `Info.config.forceUnderscores`. Drop the option once underscore
+		-- normalization is unconditional at every LPDB write site.
+		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(activeOpponent, {
+			setPlayersInTeam = true,
+			forceUnderscores = true,
+		}))
 		-- Legacy participant fields
 		lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(activeOpponent))
 		lpdbData.players = lpdbData.opponentplayers
@@ -154,9 +161,13 @@ function TeamParticipantsRepository.setPageVars(participant)
 				playerPrefix = 'p' .. playerCount
 			end
 
+			-- TODO: stopgap so wiki-variable pagenames (consumed by matches/HiddenDataBox)
+			-- match the underscore-normalized form of the LPDB write above. Drop once
+			-- pagename normalization is unconditional everywhere.
+			local normalizedPageName = Page.pageifyLink(player.pageName)
 			Array.forEach(teamPrefixes, function(teamPrefix)
 				local combinedPrefix = teamPrefix .. '_' .. playerPrefix
-				globalVars:set(combinedPrefix, player.pageName)
+				globalVars:set(combinedPrefix, normalizedPageName)
 				globalVars:set(combinedPrefix .. 'flag', player.flag)
 				globalVars:set(combinedPrefix .. 'dn', player.displayName)
 				globalVars:set(combinedPrefix .. 'id', player.apiId)

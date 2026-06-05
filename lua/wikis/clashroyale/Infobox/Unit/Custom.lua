@@ -17,7 +17,7 @@ local Unit = Lua.import('Module:Infobox/Unit')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -28,21 +28,21 @@ local CustomUnit = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomUnit.run(frame)
 	local unit = CustomUnit(frame)
 	unit.args.informationType = 'Card'
 	unit:setWidgetInjector(CustomInjector(unit))
 
-	return HtmlWidgets.Fragment{children = {
+	return Html.Fragment{children = {
 		unit:createInfobox(),
 		unit:_buildDescription(unit.args),
 	}}
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -130,9 +130,9 @@ function CustomUnit:_buildDescription()
 		return input and (' ' .. input:lower()) or nil
 	end
 
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = WidgetUtil.collect(
-			HtmlWidgets.B{children = self.name},
+			Html.B{children = self.name},
 			' is a',
 			lowerCaseIfExist(args.elixir),
 			'-Elixir',

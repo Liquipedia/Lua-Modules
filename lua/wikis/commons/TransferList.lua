@@ -11,7 +11,6 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
-local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -19,7 +18,7 @@ local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local TransferRowWidget = Lua.import('Module:Widget/Transfer/Row')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -104,6 +103,7 @@ function TransferList:parseArgs(args)
 		shown = Logic.nilOr(Logic.readBoolOrNil(args.shown), true),
 		class = Logic.nilIfEmpty(args.class),
 		showMissingResultsMessage = Logic.readBool(args.form),
+		showTeamName = Logic.readBoolOrNil(args.showTeamName),
 		conditions = {
 			nationalities = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.nationality)),
 			players = Logic.nilIfEmpty(Array.map(players, mw.ext.TeamLiquidIntegration.resolve_redirect)),
@@ -306,12 +306,12 @@ function TransferList:create()
 	local config = self.config
 	if Logic.isDeepEmpty(self.groupedTransfers) then
 		if config.showMissingResultsMessage then
-			return HtmlWidgets.Pre{children = 'No results for: ' .. mw.text.nowiki(self.conditions)}
+			return Html.Pre{children = 'No results for: ' .. mw.text.nowiki(self.conditions)}
 		end
 		return
 	end
 
-	local display = HtmlWidgets.Div{
+	local display = Html.Div{
 		classes = {'divTable', 'mainpage-transfer', 'Ref', config.class},
 		css = {
 			['text-align'] = 'center',
@@ -332,24 +332,24 @@ function TransferList:create()
 	return GeneralCollapsible{
 		title = config.title,
 		classes = {'OffSeasonOverview'},
-		shouldCollapse = not config.shown,
+		shouldCollapse = config.shown,
 		children = display,
 	}
 end
 
 ---@private
----@return Widget
+---@return HtmlNode
 function TransferList:_buildHeader()
 	---@param props {classes: string[]?, children: Renderable|Renderable[]?}
-	---@return Widget
+	---@return HtmlNode
 	local function createDivCell(props)
-		return HtmlWidgets.Div{
+		return Html.Div{
 			classes = Array.extend('divCell', props.classes),
 			children = props.children,
 		}
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'divHeaderRow'},
 		children = WidgetUtil.collect(
 			createDivCell{
@@ -372,9 +372,9 @@ function TransferList:_buildHeader()
 			},
 			createDivCell{
 				classes = {'Empty'},
-				children = HtmlWidgets.Span{
+				children = Html.Span{
 					classes = {'mobile-hide'},
-					children = HtmlWidgets.Abbr{children = 'Ref', title = 'Reference'}
+					children = Html.Abbr{children = 'Ref', title = 'Reference'}
 				}
 			}
 		)
@@ -383,7 +383,7 @@ end
 
 ---@private
 ---@param transfers transfer[]
----@return Widget?
+---@return VNode?
 function TransferList:_buildRow(transfers)
 	local firstTransfer = transfers[1]
 	if not firstTransfer then
@@ -401,7 +401,7 @@ function TransferList:_buildRow(transfers)
 
 	return TransferRowWidget{
 		transfers = transfers,
-		showTeamName = (Info.config.transfers or {}).showTeamName
+		showTeamName = self.config.showTeamName
 	}
 end
 

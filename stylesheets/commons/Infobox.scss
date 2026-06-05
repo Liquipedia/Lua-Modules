@@ -2,6 +2,14 @@
 Template(s): All Infoboxes
 Author(s): FO-nTTaX
 *******************************************************************************/
+.theme--light {
+	--infobox-header-background-color: var( --clr-wiki-primary-container );
+}
+
+.theme--dark {
+	--infobox-header-background-color: var( --clr-wiki-theme-20 );
+}
+
 $infobox-width: 336px;
 $infobox-margin: 10px;
 $infobox-padding: 10px;

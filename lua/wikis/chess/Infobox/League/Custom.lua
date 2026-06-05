@@ -61,7 +61,7 @@ local RESTRICTIONS = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -70,8 +70,8 @@ function CustomLeague.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -115,7 +115,7 @@ function CustomLeague:customParseArguments(args)
 	-- Modes.
 	local modes = Array.mapIndexes(function(index)
 		local modeInput = self.args['mode' .. index] or (index == 1 and self.args.mode)
-		return modeInput and MODES[string.lower(modeInput)]
+		return modeInput and MODES[string.lower(modeInput)] or nil
 	end)
 	self.data.modes = Logic.emptyOr(modes, {MODES.classical})
 	self.data.mode = self.data.modes[1]

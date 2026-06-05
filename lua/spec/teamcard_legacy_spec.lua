@@ -495,6 +495,7 @@ describe('TeamCard Legacy', function()
 
             stubParse:revert()
         end)
+
     end)
 
     describe('integration', function()

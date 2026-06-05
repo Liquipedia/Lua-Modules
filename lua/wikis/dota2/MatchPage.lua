@@ -16,8 +16,8 @@ local Table = Lua.import('Module:Table')
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
@@ -35,7 +35,7 @@ local MatchPage = Class.new(BaseMatchPage)
 local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local ITEM_IMAGE_SIZE = '64px'
 local KDA_ICON = IconFa{iconName = 'kda', hover = 'KDA'}
-local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
+local SPAN_SLASH = Html.Span{classes = {'slash'}, children = '/'}
 
 ---@param props {match: MatchGroupUtilMatch}
 ---@return Widget
@@ -88,7 +88,7 @@ function MatchPage:populateGames()
 end
 
 ---@param item {name: string?, image: string?}
----@return Widget
+---@return Renderable
 function MatchPage.makeItemDisplay(item)
 	return IconImage{
 		imageLight = Logic.emptyOr(item.image, 'EmptyIcon itemicon dota2 gameasset.png'),
@@ -99,9 +99,9 @@ function MatchPage.makeItemDisplay(item)
 end
 
 ---@param game MatchPageGame
----@return Widget
+---@return Renderable
 function MatchPage:renderGame(game)
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = WidgetUtil.collect(
 			self:_renderDraft(game),
 			self:_renderTeamStats(game),
@@ -112,10 +112,10 @@ end
 
 ---@private
 ---@param game MatchPageGame
----@return Widget[]
+---@return Renderable[]
 function MatchPage:_renderDraft(game)
 	return {
-		HtmlWidgets.H3{children = 'Draft'},
+		Html.H3{children = 'Draft'},
 		Div{
 			classes = {'match-bm-game-veto-wrapper'},
 			children = Array.map(self.opponents, function (opponent, opponentIndex)
@@ -151,17 +151,17 @@ end
 
 ---@private
 ---@param game MatchPageGame
----@return Widget[]
+---@return Renderable[]
 function MatchPage:_renderTeamStats(game)
 	return {
-		HtmlWidgets.H3{children = 'Team Stats'},
+		Html.H3{children = 'Team Stats'},
 		Div{
 			classes = {'match-bm-team-stats'},
 			children = {
 				Div{
 					classes = {'match-bm-team-stats-header'},
 					children = WidgetUtil.collect(
-						HtmlWidgets.H4{
+						Html.H4{
 							classes = {'match-bm-team-stats-header-title'},
 							children = game.finished
 								and self.opponents[game.winner].teamTemplateData.name .. ' Victory'
@@ -210,7 +210,7 @@ function MatchPage:_renderTeamStats(game)
 									team2Value = game.teams[2].objectives.barracks
 								},
 								{
-									icon = HtmlWidgets.Span{
+									icon = Html.Span{
 										classes = {'liquipedia-custom-icon', 'liquipedia-custom-icon-roshan'}
 									},
 									name = 'Roshans',
@@ -230,7 +230,7 @@ end
 ---@private
 ---@param game MatchPageGame
 ---@param teamIndex integer
----@return Widget
+---@return Renderable
 function MatchPage:_renderStatsTeamDisplay(game, teamIndex)
 	local team = game.teams[teamIndex]
 	return Div{
@@ -257,10 +257,10 @@ end
 
 ---@private
 ---@param game MatchPageGame
----@return Widget[]
+---@return Renderable[]
 function MatchPage:_renderPlayersPerformance(game)
 	return {
-		HtmlWidgets.H3{children = 'Player Performance'},
+		Html.H3{children = 'Player Performance'},
 		Div{
 			classes = {'match-bm-players-wrapper'},
 			children = {
@@ -274,7 +274,7 @@ end
 ---@private
 ---@param game MatchPageGame
 ---@param teamIndex integer
----@return Widget
+---@return Renderable
 function MatchPage:_renderTeamPerformance(game, teamIndex)
 	return Div{
 		classes = {'match-bm-players-team'},
@@ -294,7 +294,7 @@ end
 ---@param game MatchPageGame
 ---@param teamIndex integer
 ---@param player table
----@return Widget
+---@return Renderable
 function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 	return Div{
 		classes = {'match-bm-players-player match-bm-players-player--col-3'},

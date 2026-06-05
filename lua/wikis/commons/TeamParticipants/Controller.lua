@@ -40,9 +40,19 @@ function TeamParticipantsController.fromTemplate(frame)
 	local args = Arguments.getArgs(frame)
 	local parsedArgs = Json.parseStringifiedArgs(args)
 	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
+
+	local brokenParticipants = Array.filter(parsedData.participants, function(p) return p.broken end)
+	parsedData.participants = Array.filter(parsedData.participants, function(p) return not p.broken end)
+
+	if #brokenParticipants > 0 then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with missing team templates')
+	end
+
 	TeamParticipantsController.importParticipants(parsedData)
 	TeamParticipantsController.fillIncompleteRosters(parsedData)
-	TeamParticipantsController.enrichPlayerDates(parsedData)
+	if Logic.nilOr(Logic.readBoolOrNil(parsedArgs.enrichPlayerDates), true) then
+		TeamParticipantsController.enrichPlayerDates(parsedData)
+	end
 
 	local shouldStore = Logic.readBoolOrNil(args.store) ~= false and Lpdb.isStorageEnabled()
 
@@ -55,6 +65,7 @@ function TeamParticipantsController.fromTemplate(frame)
 
 	return TeamParticipantsDisplay{
 		participants = parsedData.participants,
+		brokenParticipants = brokenParticipants,
 		showPlayerInfo = Logic.readBool(args.showplayerinfo),
 		showControls = showControls,
 		mergeStaffTabIfOnlyOneStaff = Logic.nilOr(

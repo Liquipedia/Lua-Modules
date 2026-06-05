@@ -15,7 +15,7 @@ local Variables = Lua.import('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent')
 
----@class FightersCustomOpponent
+---@class FightersCustomOpponent: Opponent
 local CustomOpponent = Table.deepCopy(Opponent)
 
 ---@class FightersStandardPlayer:standardPlayer

@@ -7,27 +7,17 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-
----@class GenericLabelProps
----@field attributes table<string, string>?
----@field css table<string, string|number>?
----@field children Renderable|Renderable[]
+---@class GenericLabelProps: HtmlNodeProps
 ---@field labelScheme string?
 ---@field labelScale number?
 ---@field labelType string?
 
----@class GenericLabel: Widget
----@operator call(GenericLabelProps): GenericLabel
----@field props GenericLabelProps
-local GenericLabel = Class.new(Widget)
-
----@return Widget
-function GenericLabel:render()
-	local props = self.props
+---@param props GenericLabelProps
+---@return HtmlNode
+local function GenericLabel(props)
 	if props.labelScale then
 		props.css = props.css or {}
 		props.css['--label-scale'] = props.labelScale
@@ -37,7 +27,7 @@ function GenericLabel:render()
 		props.attributes['data-label-type'] = props.labelType
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		attributes = props.attributes,
 		classes = {
 			'generic-label',
@@ -48,4 +38,4 @@ function GenericLabel:render()
 	}
 end
 
-return GenericLabel
+return Component.component(GenericLabel)
