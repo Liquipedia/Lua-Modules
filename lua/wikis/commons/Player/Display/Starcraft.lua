@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Faction = Lua.import('Module:Faction')
+local HiddenSort = Lua.import('Module:HiddenSort')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -116,9 +117,7 @@ function StarcraftPlayerDisplay.HiddenSort(name, flag, faction, field)
 		text = field
 	end
 
-	return mw.html.create('span')
-		:css('display', 'none')
-		:wikitext(text)
+	return HiddenSort.run(text)
 end
 
 return StarcraftPlayerDisplay
