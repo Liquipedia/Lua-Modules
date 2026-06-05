@@ -16,6 +16,9 @@ local Table = Lua.import('Module:Table')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
+local Html = Lua.import('Module:Widget/Html')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 ---Display components for players used in the starcraft and starcraft2 wikis.
 ---@class StarcraftPlayerDisplay: PlayerDisplay
 local StarcraftPlayerDisplay = Table.copy(PlayerDisplay)
@@ -23,7 +26,7 @@ local StarcraftPlayerDisplay = Table.copy(PlayerDisplay)
 ---Called from Template:Player and Template:Player2
 ---Only for non git usage!
 ---@param frame Frame
----@return string
+---@return VNode
 function StarcraftPlayerDisplay.TemplatePlayer(frame)
 	local args = Lua.import('Module:Arguments').getArgs(frame)
 
@@ -56,22 +59,21 @@ function StarcraftPlayerDisplay.TemplatePlayer(frame)
 		PlayerExt.saveToPageVars(player, {overwritePageVars = true})
 	end
 
-	local hiddenSortNode = args.hs
-		and StarcraftPlayerDisplay.HiddenSort(player.displayName, player.flag, player.faction, args.hs)
-		or ''
-	local playerNode = StarcraftPlayerDisplay.InlinePlayer({
-		dq = Logic.readBoolOrNil(args.dq),
-		flip = Logic.readBoolOrNil(args.flip),
-		player = player,
-		showFaction = Logic.nilOr(Logic.readBoolOrNil(args.showRace), Logic.readBoolOrNil(args.showFaction), true),
-	})
-	return tostring(hiddenSortNode) .. tostring(playerNode)
+	return Html.Fragment{children = WidgetUtil.collect(
+		args.hs and StarcraftPlayerDisplay.HiddenSort(player.displayName, player.flag, player.faction, args.hs)	or nil,
+		StarcraftPlayerDisplay.InlinePlayer{
+			dq = Logic.readBoolOrNil(args.dq),
+			flip = Logic.readBoolOrNil(args.flip),
+			player = player,
+			showFaction = Logic.nilOr(Logic.readBoolOrNil(args.showRace), Logic.readBoolOrNil(args.showFaction), true),
+		}
+	)}
 end
 
 ---Called from Template:InlinePlayer
 ---Only for non git usage!
 ---@param frame Frame
----@return Renderable
+---@return VNode
 function StarcraftPlayerDisplay.TemplateInlinePlayer(frame)
 	local args = Lua.import('Module:Arguments').getArgs(frame)
 
