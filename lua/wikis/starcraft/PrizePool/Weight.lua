@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Weight
+-- page=Module:PrizePool/Weight
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
