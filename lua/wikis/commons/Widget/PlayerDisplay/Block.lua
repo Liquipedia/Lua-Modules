@@ -10,10 +10,10 @@ local Lua = require('Module:Lua')
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
-local Html = Lua.import('Module:Widget/Html')
 local Component = Lua.import('Module:Widget/Component')
 local BlockName = Lua.import('Module:Widget/PlayerDisplay/Block/Name')
 local BlockWrapper = Lua.import('Module:Widget/PlayerDisplay/Block/Wrapper')
+local Html = Lua.import('Module:Widget/Html')
 local PlayerDisplayComponents = Lua.import('Module:Widget/PlayerDisplay/Components')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -51,7 +51,7 @@ local function BlockPlayer(props)
 				useDefault = useDefault,
 			},
 			Logic.isNotEmpty(props.note) and Html.Sup{children = props.note} or nil,
-			PlayerDisplayComponents.getTeam(player, props.showPlayerTeam)
+			PlayerDisplayComponents.team(player, props.showPlayerTeam)
 		)
 	}
 end

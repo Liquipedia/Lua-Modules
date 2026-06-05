@@ -65,7 +65,7 @@ local function SmashLikeInlinePlayer(props)
 				useDefault = useDefault,
 			},
 			Logic.isNotEmpty(props.note) and Html.Sup{children = props.note} or nil,
-			PlayerDisplayComponents.getTeam(player, props.showPlayerTeam)
+			PlayerDisplayComponents.team(player, props.showPlayerTeam)
 		)
 	}
 	if props.oneLine then

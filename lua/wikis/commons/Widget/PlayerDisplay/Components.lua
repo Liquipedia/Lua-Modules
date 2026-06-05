@@ -46,7 +46,7 @@ end
 ---@param player standardPlayer
 ---@param showPlayerTeam boolean?
 ---@return Renderable[]?
-function PlayerDisplayComponents.getTeam(player, showPlayerTeam)
+function PlayerDisplayComponents.team(player, showPlayerTeam)
 	local team = player.team
 
 	if not Logic.readBool(showPlayerTeam) then
