@@ -8,9 +8,9 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
 local BlockPlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Block')
@@ -41,12 +41,7 @@ end
 ---showLink: string|boolean?, showRace: string|boolean?, showFaction: string|boolean?}
 ---@return VNode
 function PlayerDisplay.TemplateInlinePlayer(props)
-	local player = {
-		displayName = props[1],
-		flag = props.flag,
-		pageName = props.link,
-		faction = Faction.read(props.race or props.faction),
-	}
+	local player = Opponent.readSinglePlayerArgs(props)
 
 	PlayerExt.syncPlayer(player, {
 		date = props.date,
