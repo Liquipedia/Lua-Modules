@@ -558,6 +558,9 @@ local MatchRecordMT = {
 ---@param property string
 function MatchRecordMT.__index(record, property)
 	local matchId = rawget(record, 'match2id')
+	if type(matchId) ~= 'string' then
+		return
+	end
 	if property == 'match2games' then
 		record.match2games = MatchRecordMT._fetchGames(matchId)
 	elseif property == 'match2opponents' then
