@@ -12,7 +12,7 @@ local Array = Lua.import('Module:Array')
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html/All')
 
----@param props {flip: boolean?, showPlayerTeam: boolean, classes: string[]?, children: Renderable[]}
+---@param props {flip: boolean?, showPlayerTeam: boolean?, classes: string[]?, children: Renderable[]}
 ---@return VNode
 local function BlockPlayerWrapper(props)
 	return Html.Div{

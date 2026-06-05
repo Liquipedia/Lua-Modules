@@ -48,8 +48,11 @@ local function SmashLikeBlockPlayer(props)
 	local playerClasses = type(props.playerClass) == 'string' and
 		{props.playerClass} or props.playerClass --[[ @as string[]? ]]
 	local useDefault = Logic.nilOr(Logic.readBoolOrNil(props.showTbd), not Opponent.playerIsTbd(player))
+	local showPlayerTeam = props.showPlayerTeam
 	local block = BlockWrapper{
 		classes = playerClasses,
+		flip = props.flip,
+		showPlayerTeam = showPlayerTeam,
 		children = WidgetUtil.collect(
 			PlayerDisplayComponents.flag{
 				player = player,
@@ -65,7 +68,7 @@ local function SmashLikeBlockPlayer(props)
 				useDefault = useDefault,
 			},
 			Logic.isNotEmpty(props.note) and Html.Sup{children = props.note} or nil,
-			PlayerDisplayComponents.team(player, props.showPlayerTeam)
+			PlayerDisplayComponents.team(player, showPlayerTeam)
 		)
 	}
 	if props.oneLine then
