@@ -36,7 +36,7 @@ local function InlinePlayer(props)
 			PlayerDisplayComponents.flag{
 				player = player,
 				showFlag = props.showFlag,
-				useDefault = Logic.nilOr(Logic.readBoolOrNil(props.showTbd), not Opponent.playerIsTbd(player))
+				useDefault = Logic.nilOr(Logic.readBoolOrNil(props.showTbd), true) or not Opponent.playerIsTbd(player)
 			},
 			PlayerDisplayComponents.faction(props),
 			InlineName(props)
