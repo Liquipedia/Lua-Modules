@@ -30,7 +30,7 @@ local function BlockPlayer(props)
 	local factionDisplay = PlayerDisplayComponents.faction(props)
 	local playerClasses = type(props.playerClass) == 'string' and
 		{props.playerClass} or props.playerClass --[[ @as string[]? ]]
-	local useDefault = Logic.nilOr(Logic.readBoolOrNil(props.showTbd), not Opponent.playerIsTbd(player))
+	local useDefault = Logic.nilOr(Logic.readBoolOrNil(props.showTbd), true) or not Opponent.playerIsTbd(player)
 	local showPlayerTeam = props.showPlayerTeam
 	return BlockWrapper{
 		classes = playerClasses,
