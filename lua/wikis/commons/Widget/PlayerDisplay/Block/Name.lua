@@ -17,20 +17,15 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 
 local ZERO_WIDTH_SPACE = '&#8203;'
 
----@class BlockPlayerNameProps: PlayerNameProps
----@field overflow OverflowModes?
----@field useDefault boolean?
-
----@param props BlockPlayerNameProps
+---@param props {player: standardPlayer, showLink: boolean?, dq: boolean?,
+---overflow: OverflowModes?, useDefault: boolean?}
 ---@return VNode?
 local function BlockPlayerName(props)
 	local player = props.player
 
-	---@return string|Widget
+	---@return Renderable
 	local function getChildren()
-		if not Opponent.playerIsTbd(player) and Logic.nilOr(
-			Logic.readBoolOrNil(props.showLink), true
-		) and Logic.isNotEmpty(player.pageName) then
+		if not Opponent.playerIsTbd(player) and Logic.readBool(props.showLink) and Logic.isNotEmpty(player.pageName) then
 			return Link{link = player.pageName, children = player.displayName}
 		elseif props.useDefault then
 			return Logic.emptyOr(player.displayName, 'TBD') --[[@as string]]

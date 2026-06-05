@@ -19,8 +19,8 @@ local PlayerDisplay = {}
 
 --Displays a player as a block element. The width of the component is
 --determined by its layout context, and not by the player name.
----@param props BlockPlayerProps
----@return Widget
+---@param props BlockPlayerDisplayProps
+---@return VNode
 function PlayerDisplay.BlockPlayer(props)
 	return BlockPlayerWidget(props)
 end
