@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Arguments = Lua.import('Module:Arguments')
 local Faction = Lua.import('Module:Faction')
 local HiddenSort = Lua.import('Module:HiddenSort')
 local Logic = Lua.import('Module:Logic')
@@ -28,7 +29,7 @@ local StarcraftPlayerDisplay = Table.copy(PlayerDisplay)
 ---@param frame Frame
 ---@return VNode
 function StarcraftPlayerDisplay.TemplatePlayer(frame)
-	local args = Lua.import('Module:Arguments').getArgs(frame)
+	local args = Arguments.getArgs(frame)
 
 	local pageName
 	local displayName
@@ -75,7 +76,7 @@ end
 ---@param frame Frame
 ---@return VNode
 function StarcraftPlayerDisplay.TemplateInlinePlayer(frame)
-	local args = Lua.import('Module:Arguments').getArgs(frame)
+	local args = Arguments.getArgs(frame)
 
 	local player = {
 		displayName = args[1],
