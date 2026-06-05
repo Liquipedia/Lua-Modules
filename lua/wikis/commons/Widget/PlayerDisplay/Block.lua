@@ -53,7 +53,10 @@ local function BlockPlayer(props)
 				overflow = props.overflow,
 				useDefault = useDefault,
 			},
-			Logic.isNotEmpty(props.note) and Html.Sup{children = props.note} or nil,
+			Logic.isNotEmpty(props.note) and Html.Sup{
+				classes = {'note'},
+				children = props.note
+			} or nil,
 			PlayerDisplayComponents.team(player, showPlayerTeam)
 		)
 	}
