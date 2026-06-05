@@ -104,7 +104,7 @@ end
 ---@param flag string?
 ---@param faction string?
 ---@param field string?
----@return Html
+---@return VNode
 function StarcraftPlayerDisplay.HiddenSort(name, flag, faction, field)
 	local text
 	if field == 'race' or field == 'faction' then
