@@ -246,7 +246,7 @@ function OpponentDisplay.BlockPlayers(props)
 end
 
 ---@param props BlockOpponentProps
----@return Html[]
+---@return VNode[]
 function OpponentDisplay.getBlockPlayerNodes(props)
 	local opponent = props.opponent
 
