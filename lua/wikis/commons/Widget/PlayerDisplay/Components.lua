@@ -18,7 +18,7 @@ local PlayerDisplayComponents = {}
 ---@param props {player: standardPlayer, showFlag: boolean?, useDefault: boolean?}
 ---@return string?
 function PlayerDisplayComponents.flag(props)
-	if not props.showFlag then
+	if not Logic.nilOr(Logic.readBoolOrNil(props.showFlag), true) then
 		return
 	end
 	local flag = props.player.flag
