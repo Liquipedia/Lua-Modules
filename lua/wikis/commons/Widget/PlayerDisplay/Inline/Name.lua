@@ -13,12 +13,7 @@ local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
----@class PlayerNameProps
----@field player standardPlayer
----@field showLink boolean?
----@field dq boolean?
-
----@param props PlayerNameProps
+---@param props {player: standardPlayer, showLink: boolean?, dq: boolean?}
 ---@return Renderable?
 local function InlinePlayerName(props)
 	local player = props.player

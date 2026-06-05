@@ -7,36 +7,41 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
 
-local BasePlayerDisplay = Lua.import('Module:Widget/PlayerDisplay/Base')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Span = HtmlWidgets.Span
+local Component = Lua.import('Module:Widget/Component')
+local InlineName = Lua.import('Module:Widget/PlayerDisplay/Inline/Name')
+local InlineWrapper = Lua.import('Module:Widget/PlayerDisplay/Inline/Wrapper')
+local PlayerDisplayComponents = Lua.import('Module:Widget/PlayerDisplay/Components')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class InlinePlayerWidget: BasePlayerDisplayWidget
----@operator call(BasePlayerDisplayProps): InlinePlayerWidget
-local InlinePlayerWidget = Class.new(BasePlayerDisplay)
+---@class InlinePlayerDisplayProps
+---@field flip boolean?
+---@field player standardPlayer
+---@field showFlag boolean?
+---@field showLink boolean?
+---@field dq boolean?
+---@field showFaction boolean?
+---@field game string?
+---@field showTbd boolean?
 
+---@param props InlinePlayerDisplayProps
 ---@return Widget
-function InlinePlayerWidget:render()
-	local children = WidgetUtil.collect(
-		self:getFlag(),
-		self:getFaction(),
-		self:getName()
-	)
-	return Span{
-		classes = {
-			'inline-player',
-			self.props.flip and 'flipped' or nil,
-		},
-		css = {['white-space'] = 'pre'},
-		children = Array.interleave(
-			self.props.flip and Array.reverse(children) or children,
-			'&nbsp;'
+local function InlinePlayer(props)
+	local player = props.player
+	return InlineWrapper{
+		flip = props.flip,
+		children = WidgetUtil.collect(
+			PlayerDisplayComponents.flag{
+				player = player,
+				showFlag = props.showFlag,
+				useDefault = Logic.nilOr(Logic.readBoolOrNil(props.showTbd), not Opponent.playerIsTbd(player))
+			},
+			PlayerDisplayComponents.faction(props),
+			InlineName(props)
 		)
 	}
 end
 
-return InlinePlayerWidget
+return Component.component(InlinePlayer)
