@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/PlayerDisplay/Block/SmashLike
+-- page=Module:Widget/PlayerDisplay/Block/Character
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -19,7 +19,7 @@ local Html = Lua.import('Module:Widget/Html')
 local PlayerDisplayComponents = Lua.import('Module:Widget/PlayerDisplay/Components')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class SmashLikeBlockPlayerDisplayProps: BlockPlayerDisplayProps
+---@class BlockCharacterPlayerDisplayProps: BlockPlayerDisplayProps
 ---@field player FightersStandardPlayer|SmashStandardPlayer
 ---@field oneLine boolean?
 
@@ -40,9 +40,9 @@ local function getCharacters(player)
 	)
 end
 
----@param props SmashLikeBlockPlayerDisplayProps
+---@param props BlockCharacterPlayerDisplayProps
 ---@return Renderable|Renderable[]
-local function SmashLikeBlockPlayer(props)
+local function BlockCharacterPlayer(props)
 	local player = props.player
 	local charactersDisplay = getCharacters(player)
 	local playerClasses = type(props.playerClass) == 'string' and
@@ -80,4 +80,4 @@ local function SmashLikeBlockPlayer(props)
 	return WidgetUtil.collect(block, charactersDisplay)
 end
 
-return Component.component(SmashLikeBlockPlayer, PlayerDisplayComponents.defaultProps)
+return Component.component(BlockCharacterPlayer, PlayerDisplayComponents.defaultProps)

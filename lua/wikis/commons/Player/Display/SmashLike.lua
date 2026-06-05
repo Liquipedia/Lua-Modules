@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Player/Display/SmashLike
+-- page=Module:Player/Display/Character
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -10,20 +10,20 @@ local Lua = require('Module:Lua')
 local Characters = Lua.import('Module:Characters')
 local Table = Lua.import('Module:Table')
 
-local BlockPlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Block/SmashLike')
-local InlinePlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Inline/SmashLike')
+local BlockPlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Block/Character')
+local InlinePlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Inline/Character')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 
----@class SmashLikePlayerDisplay: PlayerDisplay
+---@class CharacterPlayerDisplay: PlayerDisplay
 local CustomPlayerDisplay = Table.copy(PlayerDisplay)
 
----@param props SmashLikeBlockPlayerDisplayProps
+---@param props BlockCharacterPlayerDisplayProps
 ---@return Widget
 function CustomPlayerDisplay.BlockPlayer(props)
 	return BlockPlayerWidget(props)
 end
 
----@param props SmashLikeInlinePlayerDisplayProps
+---@param props InlineCharacterPlayerDisplayProps
 ---@return VNode
 function CustomPlayerDisplay.InlinePlayer(props)
 	return InlinePlayerWidget(props)

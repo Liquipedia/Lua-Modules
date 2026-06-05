@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/PlayerDisplay/Inline/SmashLike
+-- page=Module:Widget/PlayerDisplay/Inline/Character
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -19,12 +19,12 @@ local InlineWrapper = Lua.import('Module:Widget/PlayerDisplay/Inline/Wrapper')
 local PlayerDisplayComponents = Lua.import('Module:Widget/PlayerDisplay/Components')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class SmashLikeInlinePlayerDisplayProps: InlinePlayerDisplayProps
+---@class InlineCharacterPlayerDisplayProps: InlinePlayerDisplayProps
 ---@field player FightersStandardPlayer|SmashStandardPlayer
 
----@param props SmashLikeInlinePlayerDisplayProps
+---@param props InlineCharacterPlayerDisplayProps
 ---@return VNode
-local function SmashLikeInlinePlayer(props)
+local function InlineCharacterPlayer(props)
 	local player = props.player
 	return InlineWrapper{
 		flip = props.flip,
@@ -45,4 +45,4 @@ local function SmashLikeInlinePlayer(props)
 	}
 end
 
-return Component.component(SmashLikeInlinePlayer, PlayerDisplayComponents.defaultProps)
+return Component.component(InlineCharacterPlayer, PlayerDisplayComponents.defaultProps)

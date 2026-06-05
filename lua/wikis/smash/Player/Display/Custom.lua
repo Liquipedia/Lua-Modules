@@ -7,6 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local PlayerDisplay = Lua.import('Module:Player/Display/SmashLike')
+local PlayerDisplay = Lua.import('Module:Player/Display/Character')
 
 return PlayerDisplay
