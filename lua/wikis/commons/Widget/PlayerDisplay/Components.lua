@@ -15,10 +15,15 @@ local TeamPart = Lua.import('Module:Widget/TeamDisplay/Part')
 
 local PlayerDisplayComponents = {}
 
+PlayerDisplayComponents.defaultProps = {
+	showFlag = true,
+	showFaction = true,
+}
+
 ---@param props {player: standardPlayer, showFlag: boolean?, useDefault: boolean?}
 ---@return string?
 function PlayerDisplayComponents.flag(props)
-	if not Logic.nilOr(Logic.readBoolOrNil(props.showFlag), true) then
+	if not Logic.readBool(props.showFlag) then
 		return
 	end
 	local flag = props.player.flag
@@ -31,7 +36,7 @@ end
 ---@param props {player: standardPlayer, game: string?, showFaction: boolean?}
 ---@return string?
 function PlayerDisplayComponents.faction(props)
-	if not Logic.nilOr(Logic.readBoolOrNil(props.showFaction), true) then
+	if not Logic.readBool(props.showFaction) then
 		return
 	end
 	local player = props.player

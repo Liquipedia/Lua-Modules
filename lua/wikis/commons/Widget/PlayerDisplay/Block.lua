@@ -56,4 +56,4 @@ local function BlockPlayer(props)
 	}
 end
 
-return Component.component(BlockPlayer)
+return Component.component(BlockPlayer, PlayerDisplayComponents.defaultProps)

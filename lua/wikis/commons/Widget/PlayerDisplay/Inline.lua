@@ -44,4 +44,4 @@ local function InlinePlayer(props)
 	}
 end
 
-return Component.component(InlinePlayer)
+return Component.component(InlinePlayer, PlayerDisplayComponents.defaultProps)

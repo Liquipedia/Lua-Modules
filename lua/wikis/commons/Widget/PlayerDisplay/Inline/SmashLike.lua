@@ -45,4 +45,4 @@ local function SmashLikeInlinePlayer(props)
 	}
 end
 
-return Component.component(SmashLikeInlinePlayer)
+return Component.component(SmashLikeInlinePlayer, PlayerDisplayComponents.defaultProps)

@@ -42,7 +42,7 @@ end
 
 ---@param props SmashLikeBlockPlayerDisplayProps
 ---@return Renderable|Renderable[]
-local function SmashLikeInlinePlayer(props)
+local function SmashLikeBlockPlayer(props)
 	local player = props.player
 	local charactersDisplay = getCharacters(player)
 	local playerClasses = type(props.playerClass) == 'string' and
@@ -74,4 +74,4 @@ local function SmashLikeInlinePlayer(props)
 	return WidgetUtil.collect(block, charactersDisplay)
 end
 
-return Component.component(SmashLikeInlinePlayer)
+return Component.component(SmashLikeBlockPlayer, PlayerDisplayComponents.defaultProps)
