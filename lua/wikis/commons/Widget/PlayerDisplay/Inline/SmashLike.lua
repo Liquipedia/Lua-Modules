@@ -9,44 +9,40 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Characters = Lua.import('Module:Characters')
-local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
 
-local InlinePlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Inline')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Span = HtmlWidgets.Span
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local InlineName = Lua.import('Module:Widget/PlayerDisplay/Inline/Name')
+local InlineWrapper = Lua.import('Module:Widget/PlayerDisplay/Inline/Wrapper')
+local PlayerDisplayComponents = Lua.import('Module:Widget/PlayerDisplay/Components')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class SmashLikeInlinePlayerProps: BasePlayerDisplayProps
+---@class SmashLikeInlinePlayerDisplayProps: InlinePlayerDisplayProps
 ---@field player FightersStandardPlayer|SmashStandardPlayer
 
----@class SmashLikeInlinePlayerWidget: InlinePlayerWidget
----@operator call(SmashLikeInlinePlayerProps): InlinePlayerWidget
----@field protected player FightersStandardPlayer|SmashStandardPlayer
-local CustomInlinePlayerWidget = Class.new(InlinePlayerWidget)
-
----@return Widget
-function CustomInlinePlayerWidget:render()
-	local children = WidgetUtil.collect(
-		self:getFlag(),
-		HtmlWidgets.Fragment{children = Array.map(
-			self.player.chars,
-			function (character)
-				return Characters.GetIconAndName{character, game = self.player.game}
-			end
-		)},
-		self:getName()
-	)
-	return Span{
-		classes = {
-			'inline-player',
-			self.props.flip and 'flipped' or nil,
-		},
-		css = {['white-space'] = 'pre'},
-		children = Array.interleave(
-			self.props.flip and Array.reverse(children) or children,
-			'&nbsp;'
+---@param props SmashLikeInlinePlayerDisplayProps
+---@return VNode
+local function SmashLikeInlinePlayer(props)
+	local player = props.player
+	return InlineWrapper{
+		flip = props.flip,
+		children = WidgetUtil.collect(
+			PlayerDisplayComponents.flag{
+				player = player,
+				showFlag = props.showFlag,
+				useDefault = Logic.nilOr(Logic.readBoolOrNil(props.showTbd), not Opponent.playerIsTbd(player))
+			},
+			Html.Fragment{children = Array.map(
+				player.chars,
+				function (character)
+					return Characters.GetIconAndName{character, game = player.game}
+				end
+			)},
+			InlineName(props)
 		)
 	}
 end
 
-return CustomInlinePlayerWidget
+return Component.component(SmashLikeInlinePlayer)

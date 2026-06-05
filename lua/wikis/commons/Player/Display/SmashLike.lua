@@ -17,14 +17,14 @@ local PlayerDisplay = Lua.import('Module:Player/Display')
 ---@class SmashLikePlayerDisplay: PlayerDisplay
 local CustomPlayerDisplay = Table.copy(PlayerDisplay)
 
----@param props SmashLikeBlockPlayerProps
+---@param props SmashLikeBlockPlayerDisplayProps
 ---@return Widget
 function CustomPlayerDisplay.BlockPlayer(props)
 	return BlockPlayerWidget(props)
 end
 
----@param props SmashLikeInlinePlayerProps
----@return Widget
+---@param props SmashLikeInlinePlayerDisplayProps
+---@return VNode
 function CustomPlayerDisplay.InlinePlayer(props)
 	return InlinePlayerWidget(props)
 end
