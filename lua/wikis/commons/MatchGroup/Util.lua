@@ -649,7 +649,7 @@ function MatchMT.__index(match, property)
 		end
 		match.bracketData = bracketData
 	elseif property == 'games' then
-		local gamesRecord = match.record.match2games or MatchMT._fetchGames(match.matchId)
+		local gamesRecord = match.record.match2games or MatchRecordMT._fetchGames(match.matchId)
 		match.games = Array.map(gamesRecord, function(game)
 			return MatchGroupUtil.gameFromRecord(game, #match.opponents)
 		end)
