@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 local Tournament = Lua.import('Module:Tournament')
@@ -32,6 +33,19 @@ local function normalizePosition(value)
 	if Logic.isEmpty(value) then return value end
 	---@cast value -nil
 	return PositionConvert[value:lower()] or value
+end
+
+---@param value string
+---@return string
+local function cleanNote(value)
+	value = String.trim(value)
+	-- Unwrap a single outer <div>...</div> (e.g. Template:NoteBig expands to one).
+	value = value:gsub('^<div>%s*', ''):gsub('%s*</div>$', '')
+	-- Strip wikitext definition-list markers (`:` at the start of a line). The new
+	-- notification widget provides its own styling, so we don't want MW to re-parse
+	-- these as <dl><dd>...</dd></dl>. Multi-note NoteBig expansions become <br>.
+	value = value:gsub('^:+%s*', ''):gsub('\n:+%s*', '<br>')
+	return String.trim(value)
 end
 
 ---@param entries table[]
@@ -421,10 +435,10 @@ function LegacyTeamCard.mapCard(tcArgs)
 
 	local notes = {}
 	if Logic.isNotEmpty(tcArgs.notes) then
-		table.insert(notes, {[1] = tcArgs.notes, highlighted = false})
+		table.insert(notes, {[1] = cleanNote(tcArgs.notes), highlighted = false})
 	end
 	if Logic.isNotEmpty(tcArgs.inotes) then
-		table.insert(notes, {[1] = tcArgs.inotes, highlighted = false})
+		table.insert(notes, {[1] = cleanNote(tcArgs.inotes), highlighted = false})
 	end
 	if #notes > 0 then card.notes = notes end
 
