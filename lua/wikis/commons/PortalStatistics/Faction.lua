@@ -42,7 +42,8 @@ end)
 
 local Statistics = {}
 
----@param props {series: table[], height: number?, width: number?, legend: string[]?, xAxis: string?, yAxis: string?, xAxisData: string[]}
+---@param props {series: table[], height: number?, width: number?, legend: string[]?,
+---xAxis: string?, yAxis: string?, xAxisData: string[]}
 ---@return VNode
 local makeBarChart = function(props)
 	local series = Array.map(props.series, function(data)
