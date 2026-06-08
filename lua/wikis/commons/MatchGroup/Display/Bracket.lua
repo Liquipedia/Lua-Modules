@@ -445,14 +445,14 @@ function BracketDisplay.NodeBody(props)
 	end
 
 	-- Current match
-	local matchNode = BracketDisplay.Match({
+	local matchNode = BracketDisplay.Match{
 		MatchSummaryContainer = config.MatchSummaryContainer,
 		OpponentEntry = config.OpponentEntry,
 		match = match,
 		forceShortName = config.forceShortName,
 		matchHasDetails = config.matchHasDetails,
 		opponentHeight = config.opponentHeight,
-	})
+	}
 		:css('margin-top', layout.matchMarginTop .. 'px')
 		:css('margin-bottom', config.matchMargin .. 'px')
 
@@ -471,14 +471,14 @@ function BracketDisplay.NodeBody(props)
 				['margin-bottom'] = config.headerMargin .. 'px',
 			},
 		}
-		thirdPlaceMatchNode = BracketDisplay.Match({
+		thirdPlaceMatchNode = BracketDisplay.Match{
 			MatchSummaryContainer = config.MatchSummaryContainer,
 			OpponentEntry = config.OpponentEntry,
 			match = thirdPlaceMatch,
 			forceShortName = config.forceShortName,
 			matchHasDetails = config.matchHasDetails,
 			opponentHeight = config.opponentHeight,
-		})
+		}
 			:addClass('brkts-third-place-match')
 	end
 
@@ -494,15 +494,15 @@ function BracketDisplay.NodeBody(props)
 		local winner = (bracketResetMatch or match).winner
 		local opponent = winner
 			and match.opponents[winner]
-			or MatchGroupUtil.createOpponent({
+			or MatchGroupUtil.createOpponent{
 				type = 'literal',
 				name = match.bracketData.qualWinLiteral or '',
-			})
-		qualWinNode = BracketDisplay.Qualified({
+			}
+		qualWinNode = BracketDisplay.Qualified{
 			OpponentEntry = config.OpponentEntry,
 			height = config.opponentHeight,
 			opponent = opponent,
-		})
+		}
 			:css('margin-top', layout.matchMarginTop + layout.matchHeight / 2 - config.opponentHeight / 2 .. 'px')
 			:css('margin-bottom', config.matchMargin .. 'px')
 	end
