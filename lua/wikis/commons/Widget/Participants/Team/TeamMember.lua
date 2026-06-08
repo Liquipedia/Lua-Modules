@@ -48,10 +48,7 @@ local function ParticipantsTeamMember(props)
 	end
 
 	return Div{
-		classes = {
-			'team-participant-card__member',
-			(not isEven) and 'team-participant-card__member--odd' or nil,
-		},
+		classes = {'team-participant-card__member'},
 		children = WidgetUtil.collect(
 			roleLeft and Div{
 				classes = {'team-participant-card__member-role-left'},
