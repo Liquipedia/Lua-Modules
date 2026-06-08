@@ -12,6 +12,7 @@ local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local DisplayUtil = Lua.import('Module:DisplayUtil')
 local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -112,7 +113,7 @@ function MatchlistDisplay.Match(props)
 	local match = props.match
 
 	local function renderOpponent(opponentIx)
-		local opponent = match.opponents[opponentIx] or MatchGroupUtil.createOpponent({})
+		local opponent = match.opponents[opponentIx] or Opponent.blank(Opponent.literal)
 
 		return props.Opponent{
 			opponent = opponent,
@@ -122,7 +123,7 @@ function MatchlistDisplay.Match(props)
 	end
 
 	local function renderScore(opponentIx)
-		local opponent = match.opponents[opponentIx] or MatchGroupUtil.createOpponent({})
+		local opponent = match.opponents[opponentIx] or Opponent.blank(Opponent.literal)
 
 		return props.Score{
 			opponent = opponent,
