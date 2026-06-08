@@ -49,6 +49,8 @@ function CustomLegacyTeamCard.preprocessCard(card)
 	-- Subs 4-12 are regular substitutes (s-group). Flag/link borrow the matching pN slot,
 	-- mirroring the old `|sNflag={{{pNflag}}}` wiring. `subdnpdefault` is honored natively
 	-- by Module:TeamCard/Legacy for the s-group, so an empty result defaults to did-not-play.
+	-- Ensure the s-group iteration (capped at maxPlayers, default 10) reaches s12.
+	card.maxPlayers = math.max(tonumber(card.maxPlayers) or 0, LAST_SUB_INDEX)
 	for n = FIRST_SUB_INDEX, LAST_SUB_INDEX do
 		local sub = card['sub' .. n]
 		if Logic.isNotEmpty(sub) then
