@@ -667,38 +667,33 @@ end
 
 -- Connector lines between a match and its qualified spots
 ---@param props BracketDisplayNodeBodyProps
----@return Html
+---@return VNode
 function BracketDisplay.NodeQualConnectors(props)
 	DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.NodeQualConnectors)
 	local match = props.matchesById[props.matchId]
 	local layout = props.layoutsByMatchId[props.matchId]
 	local config = props.config
 
-	local qualConnectorsNode = mw.html.create('div'):addClass('brkts-round-qual-connectors')
-
-	-- Qualified winner connector
 	local leftTop = layout.matchMarginTop + layout.matchHeight / 2
-	qualConnectorsNode:node(
-		BracketNodeConnector{
-			leftTop = leftTop,
-			lineWidth = config.lineWidth,
-			rightTop = leftTop,
-		}
-	)
 
-	-- Qualified loser connector
-	if match.bracketData.qualLose then
-		qualConnectorsNode:node(
+	return Html.Div{
+		classes = {'brkts-round-qual-connectors'},
+		children = {
+			-- Qualified winner connector
 			BracketNodeConnector{
+				leftTop = leftTop,
+				lineWidth = config.lineWidth,
+				rightTop = leftTop,
+			},
+			-- Qualified loser connector
+			match.bracketData.qualLose and BracketNodeConnector{
 				jointRight = 11,
 				leftTop = leftTop,
 				lineWidth = config.lineWidth,
 				rightTop = leftTop + config.opponentHeight / 2 + config.matchMargin + 6 + config.opponentHeight / 2,
-			}
-		)
-	end
-
-	return qualConnectorsNode
+			} or nil,
+		}
+	}
 end
 
 ---A stub connector into an opponent that does not connect to a lower match.
