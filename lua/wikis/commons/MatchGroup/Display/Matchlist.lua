@@ -58,17 +58,17 @@ end
 ---The component fetches the match data from LPDB or page variables.
 ---@param props {bracketId: string, config: MatchlistConfigOptions}
 ---@param matches MatchGroupUtilMatch[]
----@return Widget
+---@return VNode
 function MatchlistDisplay.MatchlistContainer(props, matches)
-	return MatchlistDisplay.Matchlist({
+	return MatchlistDisplay.Matchlist{
 		config = props.config,
 		matches = matches or MatchGroupUtil.fetchMatches(props.bracketId),
-	})
+	}
 end
 
 ---Display component for a tournament matchlist. Match data is specified in the input.
 ---@param props {config: MatchlistConfigOptions, matches: MatchGroupUtilMatch[]}
----@return Widget
+---@return VNode
 function MatchlistDisplay.Matchlist(props)
 	local propsConfig = props.config or {}
 	local config = {
