@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
+local BracketLineNode = Lua.import('Module:Widget/Match/Bracket/LineNode')
 
 ---@class BracketNodeConnectorProps
 ---@field jointLeft number?
@@ -16,22 +17,6 @@ local Html = Lua.import('Module:Widget/Html')
 ---@field leftTop number
 ---@field lineWidth number
 ---@field rightTop number
-
----@param lineProps {height: string|number?, width: string|number?,
----top: string|number?, left: string|number?, right: string|number?}
----@return VNode
-local function createLineNode(lineProps)
-	return Html.Div{
-		classes = {'brkts-line'},
-		css = {
-			height = lineProps.height,
-			width = lineProps.width,
-			top = lineProps.top,
-			left = lineProps.left,
-			right = lineProps.right,
-		}
-	}
-end
 
 ---A connector between a lower round match and the current match.
 ---@param props BracketNodeConnectorProps
@@ -41,7 +26,7 @@ local function BracketNodeConnector(props)
 		-- Single line segment, no joint
 		return Html.Div{
 			classes = {'brkts-connector'},
-			children = createLineNode{
+			children = BracketLineNode{
 				height = props.lineWidth .. 'px',
 				right = 0,
 				left = 0,
@@ -54,21 +39,21 @@ local function BracketNodeConnector(props)
 	return Html.Div{
 		classes = {'brkts-connector'},
 		children = {
-			createLineNode{
+			BracketLineNode{
 				height = props.lineWidth .. 'px',
 				width = props.jointLeft and (props.jointLeft + props.lineWidth / 2) .. 'px',
 				right = props.jointRight and (props.jointRight - props.lineWidth / 2) .. 'px',
 				left = 0,
 				top = (props.leftTop - props.lineWidth / 2) .. 'px',
 			},
-			createLineNode{
+			BracketLineNode{
 				height = math.abs(props.leftTop - props.rightTop) .. 'px',
 				width = props.lineWidth .. 'px',
 				top = math.min(props.leftTop, props.rightTop) .. 'px',
 				left = props.jointLeft and (props.jointLeft - props.lineWidth / 2) .. 'px',
 				right = props.jointRight and (props.jointRight - props.lineWidth / 2) .. 'px',
 			},
-			createLineNode{
+			BracketLineNode{
 				height = props.lineWidth .. 'px',
 				left = props.jointLeft and (props.jointLeft - props.lineWidth / 2) .. 'px',
 				width = props.jointRight and (props.jointRight + props.lineWidth / 2) .. 'px',
