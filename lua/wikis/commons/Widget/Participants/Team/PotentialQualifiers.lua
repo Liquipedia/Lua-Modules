@@ -16,7 +16,7 @@ local Div = Html.Div
 
 ---@param props {participant: TeamParticipant}
 ---@return Widget?
-function PotentialQualifiers(props)
+local function PotentialQualifiers(props)
 	local participant = props.participant
 	local potentialQualifiers = participant.potentialQualifiers
 
