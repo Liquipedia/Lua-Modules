@@ -28,7 +28,7 @@ local NON_BREAKING_SPACE = '&nbsp;'
 local OPPONENT_HEIGHT_PADDING = 4
 
 ---@class BracketConfigOptions
----@field MatchSummaryContainer function?
+---@field MatchSummaryContainer? fun(props: table): Renderable
 ---@field OpponentEntry Component<BracketOpponentEntryProps>?
 ---@field forceShortName boolean?
 ---@field headerHeight number?
@@ -66,7 +66,7 @@ local OPPONENT_HEIGHT_PADDING = 4
 
 ---@class BracketDisplayMatchProps
 ---@field OpponentEntry Component<BracketOpponentEntryProps>
----@field MatchSummaryContainer function
+---@field MatchSummaryContainer? fun(props: table): Renderable
 ---@field match MatchGroupUtilMatch
 ---@field forceShortName boolean
 ---@field matchHasDetails function

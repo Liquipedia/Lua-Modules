@@ -283,7 +283,7 @@ in a different props.MatchSummaryContainer in the Bracket and Matchlist
 components.
 ]]
 ---@param props table
----@return Widget
+---@return Renderable
 function DisplayHelper.DefaultMatchSummaryContainer(props)
 	local MatchSummaryModule = Lua.import('Module:MatchSummary')
 
@@ -293,7 +293,7 @@ function DisplayHelper.DefaultMatchSummaryContainer(props)
 end
 
 ---@param props table
----@return Widget
+---@return Renderable
 function DisplayHelper.DefaultFfaMatchSummaryContainer(props)
 	local MatchSummaryModule = Lua.import('Module:MatchSummary/Ffa')
 
@@ -303,7 +303,7 @@ function DisplayHelper.DefaultFfaMatchSummaryContainer(props)
 end
 
 ---@param props table
----@return Html
+---@return Renderable
 function DisplayHelper.DefaultGameSummaryContainer(props)
 	local GameSummaryModule = Lua.import('Module:GameSummary')
 
@@ -316,7 +316,7 @@ function DisplayHelper.DefaultGameSummaryContainer(props)
 end
 
 ---@param props table
----@return Html
+---@return Renderable
 function DisplayHelper.DefaultMatchPageContainer(props)
 	local MatchPageModule = Lua.import('Module:MatchPage')
 
