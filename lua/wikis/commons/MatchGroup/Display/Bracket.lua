@@ -393,7 +393,8 @@ function BracketDisplay.NodeHeader(props)
 	end
 
 	local headerNode = mw.html.create('div'):addClass('brkts-round-header')
-		:css('margin', config.headerMargin .. 'px 0 ' .. math.max(0, config.headerMargin - config.matchMargin) .. 'px')
+		:css('--header-margin', config.headerMargin .. 'px')
+		:css('--match-margin', config.matchMargin .. 'px')
 
 	local cursorRoundIx = 1
 	for _, cell in ipairs(headerRow) do

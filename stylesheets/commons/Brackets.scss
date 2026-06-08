@@ -72,6 +72,7 @@
 
 .brkts-round-header {
 	display: flex;
+	margin: var( --header-margin ) 0 max( 0, calc( var( --header-margin ) - var( --match-margin ) ) );
 }
 
 .brkts-header {
