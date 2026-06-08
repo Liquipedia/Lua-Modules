@@ -115,7 +115,7 @@ local function ParticipantsTeamRoster(props)
 		end)
 	end
 
-	local makePlayerWidget = function(player, index)
+	local makePlayerWidget = function(player)
 		local playerTeam = participant.opponent.template ~= player.team and player.team or nil
 		local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
 			type = Opponent.team,
@@ -125,7 +125,6 @@ local function ParticipantsTeamRoster(props)
 		return ParticipantsTeamMember{
 			player = player,
 			team = playerTeamAsOpponent,
-			even = index % 2 == 0,
 			roleLeft = roleLeft,
 			roleRight = roleRight,
 			trophies = player.extradata.trophies or 0,

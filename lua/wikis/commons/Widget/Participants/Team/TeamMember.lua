@@ -17,11 +17,10 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
 
----@param props {even: boolean?, roleLeft: string?, roleRight: string[]?, trophies: integer?,
+---@param props {roleLeft: string?, roleRight: string[]?, trophies: integer?,
 ---strikethrough: boolean?, player: standardPlayer, team: standardOpponent?, number: integer?}
 ---@return Widget
 local function ParticipantsTeamMember(props)
-	local isEven = props.even
 	local roleLeft = props.roleLeft
 	local roleRight = props.roleRight
 	local trophies = props.trophies
