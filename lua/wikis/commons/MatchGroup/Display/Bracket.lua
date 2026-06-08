@@ -21,6 +21,7 @@ local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
+local Html = Lua.import('Module:Widget/Html')
 local BracketOpponentEntry = Lua.import('Module:Widget/Match/Bracket/OpponentEntry')
 local MatchInfoIcon = Lua.import('Module:Widget/Match/InfoIcon')
 
@@ -103,17 +104,17 @@ end
 ---Display component for a tournament bracket. The bracket is specified by ID.
 ---The component fetches the match data from LPDB or page variables.
 ---@param props {bracketId: string, config: BracketConfigOptions}
----@return Html
+---@return VNode
 function BracketDisplay.BracketContainer(props)
-	return BracketDisplay.Bracket({
+	return BracketDisplay.Bracket{
 		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId) --[[@as MatchGroupUtilBracket]],
 		config = props.config,
-	})
+	}
 end
 
 ---Display component for a tournament bracket. Match data is specified in the input.
 ---@param props {bracket: MatchGroupUtilBracket, config: BracketConfigOptions}
----@return Html
+---@return VNode
 function BracketDisplay.Bracket(props)
 	local defaultConfig = DisplayHelper.getGlobalConfig()
 	local propsConfig = props.config or {}
@@ -139,32 +140,37 @@ function BracketDisplay.Bracket(props)
 	local headerRowsByMatchId = BracketDisplay.computeHeaderRows(props.bracket, config)
 	local layoutsByMatchId = BracketDisplay.computeBracketLayout(props.bracket, config, headerRowsByMatchId)
 
-	local bracketNode = mw.html.create('div'):addClass('brkts-bracket')
-		:css('--match-width', config.matchWidth .. 'px')
-		:css('--match-width-mobile', config.matchWidthMobile .. 'px')
-		:css('--score-width', config.scoreWidth .. 'px')
-		:css('--round-horizontal-margin', config.roundHorizontalMargin .. 'px')
-		:css('--opponent-height', config.opponentHeight .. 'px')
-
-	-- Draw all top level subtrees of the bracket. These are subtrees rooted
-	-- at matches that do not advance to higher rounds.
-	for _, matchId in ipairs(props.bracket.rootMatchIds) do
-		local nodeProps = {
-			config = config,
-			headerRowsByMatchId = headerRowsByMatchId,
-			layoutsByMatchId = layoutsByMatchId,
-			matchId = matchId,
-			matchesById = props.bracket.matchesById,
+	return Html.Div{
+		classes = {'brkts-bracket-wrapper'},
+		children = Html.Div{
+			classes = {'brkts-bracket'},
+			css = {
+				['--match-width'] = config.matchWidth .. 'px',
+				['--match-width-mobile'] = config.matchWidthMobile .. 'px',
+				['--score-width'] = config.scoreWidth .. 'px',
+				['--round-horizontal-margin'] = config.roundHorizontalMargin .. 'px',
+				['--opponent-height'] = config.opponentHeight .. 'px',
+			},
+			children = Array.flatMap(props.bracket.rootMatchIds, function (matchId)
+				-- Draw all top level subtrees of the bracket. These are subtrees rooted
+				-- at matches that do not advance to higher rounds.
+				if StringUtils.endsWith(matchId, 'RxMTP') then
+					return
+				end
+				local nodeProps = {
+					config = config,
+					headerRowsByMatchId = headerRowsByMatchId,
+					layoutsByMatchId = layoutsByMatchId,
+					matchId = matchId,
+					matchesById = props.bracket.matchesById,
+				}
+				return {
+					BracketDisplay.NodeHeader(nodeProps),
+					BracketDisplay.NodeBody(nodeProps),
+				}
+			end)
 		}
-		if not StringUtils.endsWith(matchId, 'RxMTP') then
-			bracketNode
-				:node(BracketDisplay.NodeHeader(nodeProps))
-				:node(BracketDisplay.NodeBody(nodeProps))
-		end
-	end
-
-	return mw.html.create('div'):addClass('brkts-bracket-wrapper')
-		:node(bracketNode)
+	}
 end
 
 ---@param matchesById table<string, MatchGroupUtilMatch>
