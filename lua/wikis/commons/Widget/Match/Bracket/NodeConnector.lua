@@ -17,46 +17,66 @@ local Html = Lua.import('Module:Widget/Html')
 ---@field lineWidth number
 ---@field rightTop number
 
+---@param lineProps {height: string|number?, width: string|number?,
+---top: string|number?, left: string|number?, right: string|number?}
+---@return VNode
+local function createLineNode(lineProps)
+	return Html.Div{
+		classes = {'brkts-line'},
+		css = {
+			height = lineProps.height,
+			width = lineProps.width,
+			top = lineProps.top,
+			left = lineProps.left,
+			right = lineProps.right,
+		}
+	}
+end
+
 ---A connector between a lower round match and the current match.
 ---@param props BracketNodeConnectorProps
----@return Html
+---@return VNode
 local function BracketNodeConnector(props)
-	local connectorNode = mw.html.create('div'):addClass('brkts-connector')
-
 	if props.leftTop == props.rightTop then
 		-- Single line segment, no joint
-		local lineNode = mw.html.create('div'):addClass('brkts-line')
-			:css('height', props.lineWidth .. 'px')
-			:css('right', '0')
-			:css('left', '0')
-			:css('top', (props.leftTop - props.lineWidth / 2) .. 'px')
-		return connectorNode:node(lineNode)
+		return Html.Div{
+			classes = {'brkts-connector'},
+			children = createLineNode{
+				height = props.lineWidth .. 'px',
+				right = 0,
+				left = 0,
+				top = (props.leftTop - props.lineWidth / 2) .. 'px',
+			}
+		}
 
-	else
-		-- Three line segments
-		local leftNode = mw.html.create('div'):addClass('brkts-line')
-			:css('height', props.lineWidth .. 'px')
-			:css('width', props.jointLeft and (props.jointLeft + props.lineWidth / 2) .. 'px')
-			:css('right', props.jointRight and (props.jointRight - props.lineWidth / 2) .. 'px')
-			:css('left', '0')
-			:css('top', (props.leftTop - props.lineWidth / 2) .. 'px')
-
-		local middleNode = mw.html.create('div'):addClass('brkts-line')
-			:css('height', math.abs(props.leftTop - props.rightTop) .. 'px')
-			:css('width', props.lineWidth .. 'px')
-			:css('top', math.min(props.leftTop, props.rightTop) .. 'px')
-			:css('left', props.jointLeft and (props.jointLeft - props.lineWidth / 2) .. 'px')
-			:css('right', props.jointRight and (props.jointRight - props.lineWidth / 2) .. 'px')
-
-		local rightNode = mw.html.create('div'):addClass('brkts-line')
-			:css('height', props.lineWidth .. 'px')
-			:css('left', props.jointLeft and (props.jointLeft - props.lineWidth / 2) .. 'px')
-			:css('width', props.jointRight and (props.jointRight + props.lineWidth / 2) .. 'px')
-			:css('right', '0')
-			:css('top', (props.rightTop - props.lineWidth / 2) .. 'px')
-
-		return connectorNode:node(leftNode):node(middleNode):node(rightNode)
 	end
+	-- Three line segments
+	return Html.Div{
+		classes = {'brkts-connector'},
+		children = {
+			createLineNode{
+				height = props.lineWidth .. 'px',
+				width = props.jointLeft and (props.jointLeft + props.lineWidth / 2) .. 'px',
+				right = props.jointRight and (props.jointRight - props.lineWidth / 2) .. 'px',
+				left = 0,
+				top = (props.leftTop - props.lineWidth / 2) .. 'px',
+			},
+			createLineNode{
+				height = math.abs(props.leftTop - props.rightTop) .. 'px',
+				width = props.lineWidth .. 'px',
+				top = math.min(props.leftTop, props.rightTop) .. 'px',
+				left = props.jointLeft and (props.jointLeft - props.lineWidth / 2) .. 'px',
+				right = props.jointRight and (props.jointRight - props.lineWidth / 2) .. 'px',
+			},
+			createLineNode{
+				height = props.lineWidth .. 'px',
+				left = props.jointLeft and (props.jointLeft - props.lineWidth / 2) .. 'px',
+				width = props.jointRight and (props.jointRight + props.lineWidth / 2) .. 'px',
+				right = 0,
+				top = (props.rightTop - props.lineWidth / 2) .. 'px',
+			},
+		}
+	}
 end
 
 return Component.component(BracketNodeConnector)
