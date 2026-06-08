@@ -19,6 +19,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
+local MatchListHeader = Lua.import('Module:Widget/Match/List/Header')
 local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -89,16 +90,8 @@ function MatchlistDisplay.Matchlist(props)
 		attributes = {style = 'width: ' .. config.width .. 'px;'},
 		shouldCollapse = config.collapsed,
 		children = Array.flatMap(props.matches, function(match)
-			local headerNode = match.bracketData.header
-				and MatchlistDisplay.Header({
-				header = match.bracketData.header,
-				})
-				or nil
-
-			local dateHeaderNode = match.bracketData.dateHeader
-				and match.dateIsExact
-				and MatchlistDisplay.DateHeader(match)
-				or nil
+			local headerNode = MatchlistDisplay.Header(match.bracketData.header)
+			local dateHeaderNode = MatchlistDisplay.DateHeader(match)
 
 			local matchNode = MatchlistDisplay.Match({
 				MatchSummaryContainer = config.MatchSummaryContainer,
@@ -166,25 +159,25 @@ function MatchlistDisplay.Match(props)
 end
 
 ---Display component for a header in a matchlist.
----@param props {header: string}
----@return Html
-function MatchlistDisplay.Header(props)
-	local headerNode = mw.html.create('div'):addClass('brkts-matchlist-header')
-		:wikitext(props.header)
-
-	return DisplayUtil.applyOverflowStyles(headerNode, 'wrap')
+---@param header string?
+---@return VNode?
+function MatchlistDisplay.Header(header)
+	if not header then
+		return
+	end
+	return MatchListHeader{
+		children = header
+	}
 end
 
 ---Display component for a dateHeader in a matchlist.
 ---@param match MatchGroupUtilMatch
----@return VNode
+---@return VNode?
 function MatchlistDisplay.DateHeader(match)
-	return Html.Div{
-		classes = {'brkts-matchlist-header'},
-		css = {
-			['overflow-wrap'] = 'break-word',
-			['white-space'] = 'normal',
-		},
+	if not match.bracketData.dateHeader or not match.dateIsExact then
+		return
+	end
+	return MatchListHeader{
 		children = Html.Div{
 			css = {padding = '2px 10px'},
 			children = Countdown.create(Table.merge(match.stream, {
