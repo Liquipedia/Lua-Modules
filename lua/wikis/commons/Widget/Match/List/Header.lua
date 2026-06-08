@@ -12,8 +12,8 @@ local DisplayUtil = Lua.import('Module:DisplayUtil')
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 
----@param props {css: table<string, string|number?>?, children: Renderable|Renderable[]?}
----@return HtmlNode
+---@param props {children: Renderable|Renderable[]?}
+---@return VNode
 local function MatchListHeader(props)
 	return Html.Div{
 		classes = {'brkts-matchlist-header'},
