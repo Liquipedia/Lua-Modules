@@ -182,6 +182,8 @@ function Array.flatten(tbl)
 end
 
 ---Maps each element of an array to separate arrays, then flattens the mapped results.
+---
+---This is equivalent to `Array.flatten(Array.map(elements, funct))`.
 ---@generic V, T
 ---@param elements V[]
 ---@param funct fun(element: V, index?: integer): T[]|nil
