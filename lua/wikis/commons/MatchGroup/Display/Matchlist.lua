@@ -20,19 +20,17 @@ local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local MatchListHeader = Lua.import('Module:Widget/Match/List/Header')
+local MatchlistOpponent = Lua.import('Module:Widget/Match/List/Opponent')
+local MatchlistScore = Lua.import('Module:Widget/Match/List/Score')
 local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
-
 local MatchlistDisplay = {propTypes = {}, types = {}}
-
-local SCORE_DRAW = 0
 
 ---@class MatchlistConfigOptions
 ---@field MatchSummaryContainer function?
----@field Opponent function?
----@field Score function?
+---@field Opponent Component<{opponent: standardOpponent, winner: integer?, side: 'left'|'right'}>?
+---@field Score Component<{opponent: standardOpponent, side: 'left'|'right'}>?
 ---@field attached boolean?
 ---@field collapsed boolean?
 ---@field matchHasDetails function?
@@ -40,8 +38,8 @@ local SCORE_DRAW = 0
 
 ---@class MatchlistDisplayMatchProps
 ---@field MatchSummaryContainer function
----@field Opponent function
----@field Score function
+---@field Opponent Component<{opponent: standardOpponent, winner: integer?, side: 'left'|'right'}>
+---@field Score Component<{opponent: standardOpponent, side: 'left'|'right'}>
 ---@field match MatchGroupUtilMatch
 ---@field matchHasDetails function
 
@@ -74,8 +72,8 @@ function MatchlistDisplay.Matchlist(props)
 	local propsConfig = props.config or {}
 	local config = {
 		MatchSummaryContainer = propsConfig.MatchSummaryContainer or DisplayHelper.DefaultMatchSummaryContainer,
-		Opponent = propsConfig.Opponent or MatchlistDisplay.Opponent,
-		Score = propsConfig.Score or MatchlistDisplay.Score,
+		Opponent = propsConfig.Opponent or MatchlistOpponent,
+		Score = propsConfig.Score or MatchlistScore,
 		attached = propsConfig.attached or false,
 		collapsed = propsConfig.collapsed or false,
 		matchHasDetails = propsConfig.matchHasDetails or WikiSpecific.matchHasDetails or DisplayHelper.defaultMatchHasDetails,
@@ -93,13 +91,13 @@ function MatchlistDisplay.Matchlist(props)
 			local headerNode = MatchlistDisplay.Header(match.bracketData.header)
 			local dateHeaderNode = MatchlistDisplay.DateHeader(match)
 
-			local matchNode = MatchlistDisplay.Match({
+			local matchNode = MatchlistDisplay.Match{
 				MatchSummaryContainer = config.MatchSummaryContainer,
 				Opponent = config.Opponent,
 				Score = config.Score,
 				match = match,
 				matchHasDetails = config.matchHasDetails,
-			})
+			}
 
 			return WidgetUtil.collect(headerNode, dateHeaderNode, matchNode)
 		end)
@@ -116,22 +114,20 @@ function MatchlistDisplay.Match(props)
 	local function renderOpponent(opponentIx)
 		local opponent = match.opponents[opponentIx] or MatchGroupUtil.createOpponent({})
 
-		local opponentNode = props.Opponent({
+		return props.Opponent{
 			opponent = opponent,
 			winner = match.winner,
 			side = opponentIx == 1 and 'left' or 'right',
-		})
-		return DisplayHelper.addOpponentHighlight(opponentNode, opponent)
+		}
 	end
 
 	local function renderScore(opponentIx)
 		local opponent = match.opponents[opponentIx] or MatchGroupUtil.createOpponent({})
 
-		local scoreNode = props.Score({
+		return props.Score{
 			opponent = opponent,
 			side = opponentIx == 1 and 'left' or 'right',
-		})
-		return DisplayHelper.addOpponentHighlight(scoreNode, opponent)
+		}
 	end
 
 	local matchInfoIconNode
@@ -187,49 +183,6 @@ function MatchlistDisplay.DateHeader(match)
 			}))
 		}
 	}
-end
-
---[[
-Display component for an opponent in a matchlist.
-
-This is the default implementation used by the Matchlist component. Specific
-wikis may override this by passing a different props.Opponent to the Matchlist
-component.
-]]
----@param props {opponent: standardOpponent, winner: integer?, side: string}
----@return Html
-function MatchlistDisplay.Opponent(props)
-	local contentNode = OpponentDisplay.BlockOpponent{
-		flip = props.side == 'left',
-		opponent = props.opponent,
-		overflow = 'ellipsis',
-		showLink = false,
-		teamStyle = 'short',
-		additionalClasses = {'brkts-matchlist-cell-content'},
-	}
-	return mw.html.create('div')
-		:addClass('brkts-matchlist-cell brkts-matchlist-opponent')
-		:addClass(props.winner == SCORE_DRAW and 'brkts-matchlist-slot-bold bg-draw' or
-			props.opponent.placement == 1 and 'brkts-matchlist-slot-winner' or nil)
-		:node(contentNode)
-end
-
---[[
-Display component for the score of an opponent in a matchlist.
-
-This is the default implementation used by the Matchlist component. Specific
-wikis may override this by passing a different props.Score to the Matchlist
-component.
-]]
----@param props {opponent: standardOpponent, side: string}
----@return Html
-function MatchlistDisplay.Score(props)
-	local contentNode = mw.html.create('div'):addClass('brkts-matchlist-cell-content')
-		:node(OpponentDisplay.InlineScore(props.opponent))
-	return mw.html.create('div')
-		:addClass('brkts-matchlist-cell brkts-matchlist-score')
-		:addClass(props.opponent.placement == 1 and 'brkts-matchlist-slot-bold' or nil)
-		:node(contentNode)
 end
 
 return MatchlistDisplay
