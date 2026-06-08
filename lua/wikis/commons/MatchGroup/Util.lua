@@ -290,6 +290,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field timestamp number
 ---@field timezoneId string?
 ---@field bestof number?
+---@field package record match2
 
 MatchGroupUtil.types.Match = TypeUtil.struct({
 	bracketData = MatchGroupUtil.types.BracketData,
@@ -543,6 +544,36 @@ function MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId)
 	return match, bracketResetMatch
 end
 
+local MatchMT = {}
+
+---@param match MatchGroupUtilMatch
+---@param property any
+function MatchMT.__index(match, property)
+	if property == 'bracketData' then
+		local bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(match.record.match2bracketdata))
+		if bracketData.type == 'bracket' then
+			bracketData.lowerEdges = bracketData.lowerEdges
+				or MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #match.opponents)
+		end
+		match.bracketData = bracketData
+	elseif property == 'games' then
+		match.games = Array.map(match.record.match2games, function(game)
+			return MatchGroupUtil.gameFromRecord(game, #match.opponents)
+		end)
+	elseif property == 'links' then
+		match.links = Json.parseIfString(match.record.links) or {}
+	elseif property == 'opponents' then
+		match.opponents = Array.map(
+			match.record.match2opponents, FnUtil.curry(MatchGroupUtil.opponentFromRecord, match.record)
+		)
+	elseif property == 'phase' then
+		match.phase = MatchGroupUtil.computeMatchPhase(match)
+	elseif property == 'stream' then
+		match.stream = Json.parseIfString(match.record.stream) or {}
+	end
+	return rawget(match, property)
+end
+
 ---Converts a match record to a structurally typed table with the appropriate data types for field values.
 ---The match record is either a match created in the store bracket codepath (WikiSpecific.processMatch),
 ---or a record fetched from LPDB (MatchGroupUtil.fetchMatchRecords).
@@ -554,34 +585,23 @@ end
 ---@return MatchGroupUtilMatch
 function MatchGroupUtil.matchFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
-	local opponents = Array.map(record.match2opponents, FnUtil.curry(MatchGroupUtil.opponentFromRecord, record))
-	local games = Array.map(record.match2games, function(game) return MatchGroupUtil.gameFromRecord(game, #opponents) end)
-	local bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata))
-	if bracketData.type == 'bracket' then
-		bracketData.lowerEdges = bracketData.lowerEdges
-			or MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #opponents)
-	end
 
 	local walkover = nilIfEmpty(record.walkover)
 
 	local match = {
 		bestof = tonumber(record.bestof) or 0,
-		bracketData = bracketData,
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		extradata = extradata,
 		date = record.date,
 		dateIsExact = Logic.readBool(record.dateexact),
 		finished = Logic.readBool(record.finished),
 		game = record.game,
-		games = games,
 		icon = nilIfEmpty(record.icon),
 		iconDark = nilIfEmpty(record.icondark),
-		links = Json.parseIfString(record.links) or {},
 		matchId = record.match2id,
 		liquipediatier = record.liquipediatier,
 		liquipediatiertype = record.liquipediatiertype,
 		mode = record.mode,
-		opponents = opponents,
 		pageName = record.pagename,
 		parent = record.parent,
 		patch = record.patch,
@@ -591,7 +611,6 @@ function MatchGroupUtil.matchFromRecord(record)
 		series = nilIfEmpty(record.series),
 		shortname = nilIfEmpty(record.shortname),
 		status = nilIfEmpty(record.status),
-		stream = Json.parseIfString(record.stream) or {},
 		tickername = record.tickername,
 		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
 		timezoneId = Table.extract(extradata, 'timezoneid'),
@@ -600,11 +619,11 @@ function MatchGroupUtil.matchFromRecord(record)
 		vod = nilIfEmpty(record.vod),
 		walkover = walkover and walkover:lower() or nil,
 		winner = tonumber(record.winner),
+		record = record,
 	}
 
-	match.phase = MatchGroupUtil.computeMatchPhase(match)
-
-	return match
+	-- Some properties are not calculated until accessed
+	return setmetatable(match, MatchMT)
 end
 
 ---@param data table?
