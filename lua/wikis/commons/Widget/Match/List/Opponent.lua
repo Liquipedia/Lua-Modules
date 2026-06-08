@@ -25,7 +25,7 @@ component.
 ]]
 ---@param props {opponent: standardOpponent, winner: integer?, side: 'left'|'right'}
 ---@return VNode
-local function MatchlistOpponent(props)
+local function MatchListOpponent(props)
 	local opponent = props.opponent
 	local opponentNotTbd = not Opponent.isTbd(opponent)
 	return Html.Div{
@@ -52,4 +52,4 @@ local function MatchlistOpponent(props)
 	}
 end
 
-return Component.component(MatchlistOpponent)
+return Component.component(MatchListOpponent)

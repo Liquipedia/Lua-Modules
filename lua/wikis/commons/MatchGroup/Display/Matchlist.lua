@@ -22,8 +22,8 @@ local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local MatchInfoIcon = Lua.import('Module:Widget/Match/InfoIcon')
 local MatchListHeader = Lua.import('Module:Widget/Match/List/Header')
-local MatchlistOpponent = Lua.import('Module:Widget/Match/List/Opponent')
-local MatchlistScore = Lua.import('Module:Widget/Match/List/Score')
+local MatchListOpponent = Lua.import('Module:Widget/Match/List/Opponent')
+local MatchListScore = Lua.import('Module:Widget/Match/List/Score')
 local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -74,8 +74,8 @@ function MatchlistDisplay.Matchlist(props)
 	local propsConfig = props.config or {}
 	local config = {
 		MatchSummaryContainer = propsConfig.MatchSummaryContainer or DisplayHelper.DefaultMatchSummaryContainer,
-		Opponent = propsConfig.Opponent or MatchlistOpponent,
-		Score = propsConfig.Score or MatchlistScore,
+		Opponent = propsConfig.Opponent or MatchListOpponent,
+		Score = propsConfig.Score or MatchListScore,
 		attached = propsConfig.attached or false,
 		collapsed = propsConfig.collapsed or false,
 		matchHasDetails = propsConfig.matchHasDetails or WikiSpecific.matchHasDetails or DisplayHelper.defaultMatchHasDetails,

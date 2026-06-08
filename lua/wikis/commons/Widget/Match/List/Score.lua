@@ -25,7 +25,7 @@ component.
 ]]
 ---@param props {opponent: standardOpponent, side: 'left'|'right'}
 ---@return VNode
-local function MatchlistScore(props)
+local function MatchListScore(props)
 	local opponent = props.opponent
 
 	return Html.Div{
@@ -44,4 +44,4 @@ local function MatchlistScore(props)
 	}
 end
 
-return Component.component(MatchlistScore)
+return Component.component(MatchListScore)
