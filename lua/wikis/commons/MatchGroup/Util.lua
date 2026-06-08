@@ -649,13 +649,13 @@ function MatchMT.__index(match, property)
 		local bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(match.record.match2bracketdata))
 		if bracketData.type == 'bracket' then
 			bracketData.lowerEdges = bracketData.lowerEdges
-				or MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #match.opponents)
+				or MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #match.record.match2opponents)
 		end
 		match.bracketData = bracketData
 	elseif property == 'games' then
 		local gamesRecord = match.record.match2games or MatchRecordMT._fetchGames(match.matchId)
 		match.games = Array.map(gamesRecord, function(game)
-			return MatchGroupUtil.gameFromRecord(game, #match.opponents)
+			return MatchGroupUtil.gameFromRecord(game, #match.record.match2opponents)
 		end)
 	elseif property == 'links' then
 		match.links = Json.parseIfString(match.record.links) or {}
