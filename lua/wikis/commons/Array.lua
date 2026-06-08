@@ -188,7 +188,19 @@ end
 ---@return T[]
 ---@nodiscard
 function Array.flatMap(elements, funct)
-	return Array.flatten(Array.map(elements, funct))
+	local mappedArray = {}
+	for index, element in ipairs(elements) do
+		local mappedElement = funct(element, index)
+		if Array.isArray(mappedElement) then
+			---@cast mappedElement -nil
+			for _, x in ipairs(mappedElement) do
+				table.insert(mappedArray, x)
+			end
+		else
+			table.insert(mappedArray, mappedElement)
+		end
+	end
+	return mappedArray
 end
 
 ---Determines whether all elements in an array satisfy a predicate.
