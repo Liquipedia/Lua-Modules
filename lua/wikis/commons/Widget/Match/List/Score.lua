@@ -14,7 +14,9 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 
-local SCORE_DRAW = 0
+---@class MatchListScoreProps
+---@field opponent standardOpponent
+---@field side 'left'|'right'
 
 --[[
 Display component for the score of an opponent in a matchlist.
@@ -23,7 +25,7 @@ This is the default implementation used by the Matchlist component. Specific
 wikis may override this by passing a different props.Score to the Matchlist
 component.
 ]]
----@param props {opponent: standardOpponent, side: 'left'|'right'}
+---@param props MatchListScoreProps
 ---@return VNode
 local function MatchListScore(props)
 	local opponent = props.opponent
@@ -44,4 +46,4 @@ local function MatchListScore(props)
 	}
 end
 
-return Component.component(MatchListScore)
+return Component.component(MatchListScore, {opponent = Opponent.blank(Opponent.literal)})

@@ -31,8 +31,8 @@ local MatchlistDisplay = {propTypes = {}, types = {}}
 
 ---@class MatchlistConfigOptions
 ---@field MatchSummaryContainer function?
----@field Opponent Component<{opponent: standardOpponent, winner: integer?, side: 'left'|'right'}>?
----@field Score Component<{opponent: standardOpponent, side: 'left'|'right'}>?
+---@field Opponent Component<MatchListOpponentProps>?
+---@field Score Component<MatchListScoreProps>?
 ---@field attached boolean?
 ---@field collapsed boolean?
 ---@field matchHasDetails function?
@@ -40,8 +40,8 @@ local MatchlistDisplay = {propTypes = {}, types = {}}
 
 ---@class MatchlistDisplayMatchProps
 ---@field MatchSummaryContainer function
----@field Opponent Component<{opponent: standardOpponent, winner: integer?, side: 'left'|'right'}>
----@field Score Component<{opponent: standardOpponent, side: 'left'|'right'}>
+---@field Opponent Component<MatchListOpponentProps>
+---@field Score Component<MatchListScoreProps>
 ---@field match MatchGroupUtilMatch
 ---@field matchHasDetails function
 
@@ -109,17 +109,15 @@ end
 ---Display component for a match in a matchlist. Consists of two opponents, two scores,
 ---and a icon for the match summary popup.
 ---@param props MatchlistDisplayMatchProps
----@return Html
+---@return VNode
 function MatchlistDisplay.Match(props)
 	local match = props.match
 
 	---@param opponentIx integer
 	---@return VNode
 	local function renderOpponent(opponentIx)
-		local opponent = match.opponents[opponentIx] or Opponent.blank(Opponent.literal)
-
 		return props.Opponent{
-			opponent = opponent,
+			opponent = match.opponents[opponentIx],
 			winner = match.winner,
 			side = opponentIx == 1 and 'left' or 'right',
 		}
@@ -128,10 +126,8 @@ function MatchlistDisplay.Match(props)
 	---@param opponentIx integer
 	---@return VNode
 	local function renderScore(opponentIx)
-		local opponent = match.opponents[opponentIx] or Opponent.blank(Opponent.literal)
-
 		return props.Score{
-			opponent = opponent,
+			opponent = match.opponents[opponentIx],
 			side = opponentIx == 1 and 'left' or 'right',
 		}
 	end
