@@ -23,9 +23,9 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Html = Lua.import('Module:Widget/Html')
 local BracketOpponentEntry = Lua.import('Module:Widget/Match/Bracket/OpponentEntry')
+local MatchHeader = Lua.import('Module:Widget/Match/Bracket/MatchHeader')
 local MatchInfoIcon = Lua.import('Module:Widget/Match/InfoIcon')
 
-local NON_BREAKING_SPACE = '&nbsp;'
 local OPPONENT_HEIGHT_PADDING = 4
 
 ---@class BracketConfigOptions
@@ -405,44 +405,14 @@ function BracketDisplay.NodeHeader(props)
 	local cursorRoundIx = 1
 	for _, cell in ipairs(headerRow) do
 		headerNode:node(
-			BracketDisplay.MatchHeader({
+			MatchHeader{
 				header = cell.header,
 				height = config.headerHeight,
-			})
-				:addClass(cell.hasBrMatch and 'brkts-br-wrapper' or nil)
-				:css('--skip-round', cell.roundIx - cursorRoundIx)
+				additionalClasses = cell.hasBrMatch and {'brkts-br-wrapper'} or nil,
+				css = {['--skip-round'] = cell.roundIx - cursorRoundIx}
+			}
 		)
 		cursorRoundIx = cell.roundIx + 1
-	end
-
-	return headerNode
-end
-
----Display component for a header to a match.
----@param props {height: number, header: string}
----@return Html
-function BracketDisplay.MatchHeader(props)
-
-	local options = DisplayHelper.expandHeader(props.header)
-
-	local headerNode = mw.html.create('div'):addClass('brkts-header brkts-header-div')
-		:addClass(--do not display the header if it is "&nbsp;"
-			options[1] == NON_BREAKING_SPACE
-			and 'brkts-header-nodisplay' or ''
-		)
-		:css('height', props.height .. 'px')
-		:css('line-height', props.height - 11 .. 'px')
-		:wikitext(options[1])
-
-	-- Don't emit brkts-header-option if there is only one option. This is
-	-- because the JavaScript module for changing headers supports only text,
-	-- and will eat up tags like <abbr>.
-	if #options > 1 then
-		for _, option in ipairs(options) do
-			headerNode:node(
-				mw.html.create('div'):addClass('brkts-header-option'):wikitext(option)
-			)
-		end
 	end
 
 	return headerNode
@@ -497,13 +467,15 @@ function BracketDisplay.NodeBody(props)
 	local thirdPlaceHeaderNode
 	local thirdPlaceMatchNode
 	if thirdPlaceMatch then
-		thirdPlaceHeaderNode = BracketDisplay.MatchHeader({
+		thirdPlaceHeaderNode = MatchHeader{
 			header = thirdPlaceMatch.bracketData.header or '!tp',
 			height = config.headerHeight,
-		})
-			:addClass('brkts-third-place-header')
-			:css('margin-top', 20 + config.headerMargin .. 'px')
-			:css('margin-bottom', config.headerMargin .. 'px')
+			additionalClasses = {'brkts-third-place-header'},
+			css = {
+				['margin-top'] = 20 + config.headerMargin .. 'px',
+				['margin-bottom'] = config.headerMargin .. 'px',
+			},
+		}
 		thirdPlaceMatchNode = BracketDisplay.Match({
 			MatchSummaryContainer = config.MatchSummaryContainer,
 			OpponentEntry = config.OpponentEntry,
