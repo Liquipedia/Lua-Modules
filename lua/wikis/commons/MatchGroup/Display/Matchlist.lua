@@ -20,6 +20,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
+local MatchInfoIcon = Lua.import('Module:Widget/Match/InfoIcon')
 local MatchListHeader = Lua.import('Module:Widget/Match/List/Header')
 local MatchlistOpponent = Lua.import('Module:Widget/Match/List/Opponent')
 local MatchlistScore = Lua.import('Module:Widget/Match/List/Score')
@@ -138,7 +139,7 @@ function MatchlistDisplay.Match(props)
 	local matchInfoIconNode
 	local matchSummaryNode
 	if props.matchHasDetails(match) then
-		matchInfoIconNode = mw.html.create('div'):addClass('brkts-match-info-icon')
+		matchInfoIconNode = MatchInfoIcon{}
 		local bracketId = MatchGroupUtil.splitMatchId(props.match.matchId)
 		matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 			classes = {'brkts-match-info-popup'},
@@ -146,7 +147,9 @@ function MatchlistDisplay.Match(props)
 			matchId = props.match.matchId,
 		}, Lua.import('Module:Error/Display').ErrorDetails)
 	else
-		matchInfoIconNode = mw.html.create('div'):addClass('brkts-matchlist-placeholder-cell')
+		matchInfoIconNode = Html.Div{
+			classes = {'brkts-matchlist-placeholder-cell'}
+		}
 	end
 
 	return Html.Div{
