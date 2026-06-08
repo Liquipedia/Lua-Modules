@@ -19,7 +19,7 @@ local Div = Html.Div
 
 ---@param props {roleLeft: string?, roleRight: string[]?, trophies: integer?,
 ---strikethrough: boolean?, player: standardPlayer, team: standardOpponent?, number: integer?}
----@return Widget
+---@return VNode
 local function ParticipantsTeamMember(props)
 	local roleLeft = props.roleLeft
 	local roleRight = props.roleRight

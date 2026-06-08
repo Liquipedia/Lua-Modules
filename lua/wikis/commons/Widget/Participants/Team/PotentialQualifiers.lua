@@ -15,7 +15,7 @@ local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
 
 ---@param props {participant: TeamParticipant}
----@return Widget?
+---@return VNode?
 local function PotentialQualifiers(props)
 	local participant = props.participant
 	local potentialQualifiers = participant.potentialQualifiers

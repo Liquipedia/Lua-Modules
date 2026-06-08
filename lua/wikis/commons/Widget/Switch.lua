@@ -40,7 +40,7 @@ local defaultProps = {
 }
 
 ---@param props SwitchParameters
----@return Widget
+---@return VNode
 local function SwitchWidget(props)
 	local label = props.label
 	local switchGroup = props.switchGroup
