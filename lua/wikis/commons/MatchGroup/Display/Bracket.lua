@@ -21,6 +21,7 @@ local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
+local BracketNodeConnector = Lua.import('Module:Widget/Match/Bracket/NodeConnector')
 local Html = Lua.import('Module:Widget/Html')
 local BracketOpponentEntry = Lua.import('Module:Widget/Match/Bracket/OpponentEntry')
 local MatchHeader = Lua.import('Module:Widget/Match/Bracket/MatchHeader')
@@ -72,13 +73,6 @@ local OPPONENT_HEIGHT_PADDING = 4
 ---@field forceShortName boolean
 ---@field matchHasDetails function
 ---@field opponentHeight number
-
----@class BracketDisplayNodeConnector
----@field jointLeft number?
----@field jointRight number?
----@field leftTop number
----@field lineWidth number
----@field rightTop number
 
 local BracketDisplay = {propTypes = {}, types = {}}
 
@@ -647,12 +641,12 @@ function BracketDisplay.NodeLowerConnectors(props)
 	for _, lowerEdge in ipairs(bracketData.lowerEdges) do
 		local lowerLayout = lowerLayouts[lowerEdge.lowerMatchIndex]
 		lowerConnectorsNode:node(
-			BracketDisplay.NodeConnector({
+			BracketNodeConnector{
 				jointLeft = (config.roundHorizontalMargin - 2) * jointIxs[lowerEdge.opponentIndex] / (jointCount + 1),
 				leftTop = layout.lowerNodeMarginTop + heightSums[lowerEdge.lowerMatchIndex] + lowerLayout.mid,
 				lineWidth = config.lineWidth,
 				rightTop = layout.matchMarginTop + ((lowerEdge.opponentIndex - 1) + 0.5) * config.opponentHeight,
-			})
+			}
 		)
 	end
 
@@ -685,68 +679,26 @@ function BracketDisplay.NodeQualConnectors(props)
 	-- Qualified winner connector
 	local leftTop = layout.matchMarginTop + layout.matchHeight / 2
 	qualConnectorsNode:node(
-		BracketDisplay.NodeConnector({
+		BracketNodeConnector{
 			leftTop = leftTop,
 			lineWidth = config.lineWidth,
 			rightTop = leftTop,
-		})
+		}
 	)
 
 	-- Qualified loser connector
 	if match.bracketData.qualLose then
 		qualConnectorsNode:node(
-			BracketDisplay.NodeConnector({
+			BracketNodeConnector{
 				jointRight = 11,
 				leftTop = leftTop,
 				lineWidth = config.lineWidth,
 				rightTop = leftTop + config.opponentHeight / 2 + config.matchMargin + 6 + config.opponentHeight / 2,
-			})
+			}
 		)
 	end
 
 	return qualConnectorsNode
-end
-
----A connector between a lower round match and the current match.
----@param props BracketDisplayNodeConnector
----@return Html
-function BracketDisplay.NodeConnector(props)
-	local connectorNode = mw.html.create('div'):addClass('brkts-connector')
-
-	if props.leftTop == props.rightTop then
-		-- Single line segment, no joint
-		local lineNode = mw.html.create('div'):addClass('brkts-line')
-			:css('height', props.lineWidth .. 'px')
-			:css('right', '0')
-			:css('left', '0')
-			:css('top', (props.leftTop - props.lineWidth / 2) .. 'px')
-		return connectorNode:node(lineNode)
-
-	else
-		-- Three line segments
-		local leftNode = mw.html.create('div'):addClass('brkts-line')
-			:css('height', props.lineWidth .. 'px')
-			:css('width', props.jointLeft and (props.jointLeft + props.lineWidth / 2) .. 'px')
-			:css('right', props.jointRight and (props.jointRight - props.lineWidth / 2) .. 'px')
-			:css('left', '0')
-			:css('top', (props.leftTop - props.lineWidth / 2) .. 'px')
-
-		local middleNode = mw.html.create('div'):addClass('brkts-line')
-			:css('height', math.abs(props.leftTop - props.rightTop) .. 'px')
-			:css('width', props.lineWidth .. 'px')
-			:css('top', math.min(props.leftTop, props.rightTop) .. 'px')
-			:css('left', props.jointLeft and (props.jointLeft - props.lineWidth / 2) .. 'px')
-			:css('right', props.jointRight and (props.jointRight - props.lineWidth / 2) .. 'px')
-
-		local rightNode = mw.html.create('div'):addClass('brkts-line')
-			:css('height', props.lineWidth .. 'px')
-			:css('left', props.jointLeft and (props.jointLeft - props.lineWidth / 2) .. 'px')
-			:css('width', props.jointRight and (props.jointRight + props.lineWidth / 2) .. 'px')
-			:css('right', '0')
-			:css('top', (props.rightTop - props.lineWidth / 2) .. 'px')
-
-		return connectorNode:node(leftNode):node(middleNode):node(rightNode)
-	end
 end
 
 ---A stub connector into an opponent that does not connect to a lower match.
