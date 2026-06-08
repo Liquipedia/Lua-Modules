@@ -19,7 +19,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
@@ -177,15 +177,15 @@ end
 
 ---Display component for a dateHeader in a matchlist.
 ---@param match MatchGroupUtilMatch
----@return Widget
+---@return VNode
 function MatchlistDisplay.DateHeader(match)
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'brkts-matchlist-header'},
 		css = {
 			['overflow-wrap'] = 'break-word',
 			['white-space'] = 'normal',
 		},
-		children = HtmlWidgets.Div{
+		children = Html.Div{
 			css = {padding = '2px 10px'},
 			children = Countdown.create(Table.merge(match.stream, {
 				date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
