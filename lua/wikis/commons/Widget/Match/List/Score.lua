@@ -29,6 +29,7 @@ component.
 ---@return VNode
 local function MatchListScore(props)
 	local opponent = props.opponent
+	local opponentNotTbd = not Opponent.isTbd(opponent)
 
 	return Html.Div{
 		classes = Array.extendWith(
@@ -37,8 +38,11 @@ local function MatchListScore(props)
 				'brkts-matchlist-score',
 			},
 			opponent.placement == 1 and 'brkts-matchlist-slot-bold' or nil,
-			not Opponent.isTbd(opponent) and 'brkts-opponent-hover' or nil
+			opponentNotTbd and 'brkts-opponent-hover' or nil
 		),
+		attributes = opponentNotTbd and {
+			['aria-label'] = Opponent.toName(opponent),
+		} or nil,
 		children = Html.Div{
 			classes = {'brkts-matchlist-cell-content'},
 			children = OpponentDisplay.InlineScore(opponent),
