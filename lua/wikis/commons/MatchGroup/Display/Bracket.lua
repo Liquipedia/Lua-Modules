@@ -21,6 +21,7 @@ local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
+local BracketLineNode = Lua.import('Module:Widget/Match/Bracket/LineNode')
 local BracketNodeConnector = Lua.import('Module:Widget/Match/Bracket/NodeConnector')
 local Html = Lua.import('Module:Widget/Html')
 local BracketOpponentEntry = Lua.import('Module:Widget/Match/Bracket/OpponentEntry')
@@ -654,10 +655,10 @@ function BracketDisplay.NodeLowerConnectors(props)
 	for opponentIx, _ in ipairs(match.opponents) do
 		if not jointIxs[opponentIx] then
 			lowerConnectorsNode:node(
-				BracketDisplay.ConnectorStub({
+				BracketDisplay.ConnectorStub{
 					lineWidth = config.lineWidth,
 					rightTop = layout.matchMarginTop + ((opponentIx - 1) + 0.5) * config.opponentHeight,
-				})
+				}
 			)
 		end
 	end
@@ -698,16 +699,17 @@ end
 
 ---A stub connector into an opponent that does not connect to a lower match.
 ---@param props {lineWidth: number, rightTop: number}
----@return Html
+---@return VNode
 function BracketDisplay.ConnectorStub(props)
-	local rightNode = mw.html.create('div'):addClass('brkts-line')
-		:css('height', props.lineWidth .. 'px')
-		:css('left', 10 .. 'px')
-		:css('right', '0')
-		:css('top', (props.rightTop - props.lineWidth / 2) .. 'px')
-
-	return mw.html.create('div'):addClass('brkts-connector-stub')
-		:node(rightNode)
+	return Html.Div{
+		classes = {'brkts-connector-stub'},
+		children = BracketLineNode{
+			height = props.lineWidth .. 'px',
+			left = '10px',
+			right = 0,
+			top = (props.rightTop - props.lineWidth / 2) .. 'px',
+		}
+	}
 end
 
 ---@param match MatchGroupUtilMatch
