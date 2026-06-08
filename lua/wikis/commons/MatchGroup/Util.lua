@@ -565,7 +565,7 @@ function MatchRecordMT.__index(record, property)
 		record.match2games = MatchRecordMT._fetchGames(matchId)
 	elseif property == 'match2opponents' then
 		record.match2opponents = MatchRecordMT._fetchOpponents(matchId)
-	elseif not record._propertiesLoaded then
+	elseif not rawget(record, '_propertiesLoaded') then
 		Table.mergeInto(
 			record,
 			mw.ext.LiquipediaDB.lpdb('match2', {
