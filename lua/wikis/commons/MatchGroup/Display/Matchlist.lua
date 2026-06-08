@@ -112,6 +112,8 @@ end
 function MatchlistDisplay.Match(props)
 	local match = props.match
 
+	---@param opponentIx integer
+	---@return VNode
 	local function renderOpponent(opponentIx)
 		local opponent = match.opponents[opponentIx] or Opponent.blank(Opponent.literal)
 
@@ -122,6 +124,8 @@ function MatchlistDisplay.Match(props)
 		}
 	end
 
+	---@param opponentIx integer
+	---@return VNode
 	local function renderScore(opponentIx)
 		local opponent = match.opponents[opponentIx] or Opponent.blank(Opponent.literal)
 
@@ -145,14 +149,20 @@ function MatchlistDisplay.Match(props)
 		matchInfoIconNode = mw.html.create('div'):addClass('brkts-matchlist-placeholder-cell')
 	end
 
-	return mw.html.create('div'):addClass('brkts-matchlist-match')
-		:addClass(matchSummaryNode and 'brkts-match-has-details brkts-match-popup-wrapper' or nil)
-		:node(renderOpponent(1))
-		:node(renderScore(1))
-		:node(matchInfoIconNode)
-		:node(renderScore(2))
-		:node(renderOpponent(2))
-		:node(matchSummaryNode)
+	return Html.Div{
+		classes = Array.extend(
+			'brkts-matchlist-match',
+			matchSummaryNode and 'brkts-match-has-details brkts-match-popup-wrapper' or nil
+		),
+		children = WidgetUtil.collect(
+			renderOpponent(1),
+			renderScore(1),
+			matchInfoIconNode,
+			renderScore(2),
+			renderOpponent(2),
+			matchSummaryNode
+		)
+	}
 end
 
 ---Display component for a header in a matchlist.
