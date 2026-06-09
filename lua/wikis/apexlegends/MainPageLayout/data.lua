@@ -76,7 +76,7 @@ local CONTENT = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
 			upcomingDays = 60,
-			completedDays = 60,
+			completedDays = 30,
 			tierColorScheme = 'top3',
 			variant = 'collapsible',
 		},
