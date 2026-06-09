@@ -61,6 +61,7 @@ local INVALID_TIER_SORT = 'ZZ'
 
 ---@class BaseResultsTable
 ---@operator call(table): BaseResultsTable
+---@field data {header: string?, [integer]: placement}[]
 local BaseResultsTable = Class.new(function(self, ...) self:init(...) end)
 
 ---Init function of the BaseResultsTable
@@ -167,7 +168,7 @@ function BaseResultsTable:create()
 		return placementData.date:sub(1,4)
 	end)
 	--we want to insert values for named keys hence table[][] would cause annotation warnings
-	---@cast splitData table[]
+	---@cast splitData {header: string, [integer]: placement}[]
 
 	-- Set the header
 	Array.forEach(splitData, function(dataSet)
@@ -380,7 +381,7 @@ function BaseResultsTable:_isDataEmpty()
 end
 
 ---Builds the results/achievements/awards table
----@return Widget
+---@return VNode
 function BaseResultsTable:build()
 	return TableWidgets.Table{
 		sortable = true,
@@ -402,7 +403,7 @@ function BaseResultsTable:build()
 end
 
 ---@private
----@return Widget[]
+---@return Renderable[]
 function BaseResultsTable:_buildTableBody()
 	if self:_isDataEmpty() then
 		return {TableWidgets.Row{children = TableWidgets.Cell{
@@ -417,7 +418,7 @@ end
 
 ---@private
 ---@param placementData table
----@return Html[]
+---@return Renderable[]
 function BaseResultsTable:_buildRows(placementData)
 	local rows = {}
 
@@ -520,7 +521,7 @@ end
 
 ---Converts the lastvsdata to display components
 ---@param placement placement
----@return string, string|Widget?, string?
+---@return string, Renderable?, string?
 function BaseResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata or {}
 
@@ -539,27 +540,27 @@ function BaseResultsTable:processVsData(placement)
 end
 
 ---@protected
----@return table[]
+---@return Table2ColumnDef[]
 function BaseResultsTable:buildColumnDefinitions()
 	error('BaseResultsTable:buildColumnDefinitions() cannot be called directly and must be overridden.')
 end
 
 ---@protected
----@return Widget
+---@return Renderable
 function BaseResultsTable:buildHeader()
 	error('BaseResultsTable:buildHeader() cannot be called directly and must be overridden.')
 end
 
 ---@protected
 ---@param placement placement
----@return Widget
+---@return Renderable
 function BaseResultsTable:buildRow(placement)
 	error('BaseResultsTable:buildRow() cannot be called directly and must be overridden.')
 end
 
 ---@protected
 ---@param placement placement
----@return Widget
+---@return Renderable
 function BaseResultsTable:createDateCell(placement)
 	return TableWidgets.Cell{children = DateExt.toYmdInUtc(placement.date)}
 end
@@ -579,7 +580,7 @@ end
 
 ---@protected
 ---@param placement placement
----@return Widget?
+---@return VNode?
 function BaseResultsTable:createTypeCell(placement)
 	if not self.config.showType then
 		return
@@ -591,7 +592,7 @@ end
 
 ---@protected
 ---@param placement placement
----@return Widget[]
+---@return VNode[]
 function BaseResultsTable:createTournamentCells(placement)
 	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
 	return {
@@ -621,7 +622,7 @@ end
 
 ---@protected
 ---@param props {useIndivPrize: boolean?, placement: placement}
----@return Widget
+---@return VNode
 function BaseResultsTable:createPrizeCell(props)
 	local useIndivPrize = Logic.nilOr(props.useIndivPrize, self.config.queryType ~= Opponent.team)
 	local placement = props.placement
