@@ -88,7 +88,7 @@ local function StandingsFfa(props)
 						hasEnded = not hasFutureRounds,
 					},
 					Switch{
-						switchGroup = 'ffa-detailed-stats',
+						switchGroup = 'ffa-detailed-stats__' .. standings.pageName .. '_' .. standings.standingsIndex,
 						label = 'Detailed stats',
 					}
 				}
