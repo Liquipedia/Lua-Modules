@@ -301,6 +301,7 @@ end
 ---@return string
 local function normalizeKey(value)
 	if Logic.isEmpty(value) then return '' end
+	---@cast value -nil
 	return value:gsub(' ', '_'):lower()
 end
 
