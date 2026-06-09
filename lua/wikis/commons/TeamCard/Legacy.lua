@@ -213,6 +213,7 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
 		flag = tcArgs[prefix .. 'flag_o'] or tcArgs[prefix .. 'flag'],
 		team = tcArgs[prefix .. 'team'],
 		id = tcArgs[prefix .. 'id'],
+		number = tcArgs[prefix .. 'number'],
 		faction = tcArgs[prefix .. 'faction'] or tcArgs[prefix .. 'race'],
 		role = normalizePosition(tcArgs[prefix .. 'pos']),
 		trophies = trophies,
