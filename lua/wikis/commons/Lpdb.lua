@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
 local TypeUtil = Lua.import('Module:TypeUtil')
@@ -278,7 +279,7 @@ Lpdb.Placement = Model('placement', {
 	{name = 'lastvsdata', fieldType = 'table', default = {}},
 	{name = 'opponentname', fieldType = 'string', default = ''},
 	{name = 'opponenttemplate', fieldType = 'string', default = ''},
-	{name = 'opponenttype', fieldType = 'string', default = ''},
+	{name = 'opponenttype', fieldType = Opponent.types.OpponentType, default = ''},
 	{name = 'opponentplayers', fieldType = 'table', default = {}},
 	{name = 'qualifier', fieldType = 'string', default = ''},
 	{name = 'qualifierpage', fieldType = 'pagename?', default = ''},

@@ -100,6 +100,10 @@ Opponent.types.Opponent = TypeUtil.union(
 	Opponent.types.LiteralOpponent
 )
 
+Opponent.types.OpponentType = TypeUtil.literalUnion(
+	Opponent.solo, Opponent.duo, Opponent.trio, Opponent.quad, Opponent.team, Opponent.literal
+)
+
 ---Checks if the provided opponent type is a party type
 ---@param type OpponentType?
 ---@return boolean
@@ -206,7 +210,7 @@ end
 ---@param type string
 ---@return boolean
 function Opponent.isType(type)
-	return Table.includes(Opponent.types, type)
+	return #TypeUtil.checkValue(type, Opponent.types) == 0
 end
 
 ---Reads an opponent type.
@@ -214,13 +218,13 @@ end
 ---@param type string
 ---@return OpponentType?
 function Opponent.readType(type)
-	return Table.includes(Opponent.types, type) and type or nil
+	return Opponent.isType(type) and type or nil
 end
 
 ---Asserts that an arbitrary value is a valid representation of an opponent
 ---@param opponent any
 function Opponent.assertOpponent(opponent)
-	assert(Opponent.isOpponent(opponent), 'Invalid opponent')
+	TypeUtil.assertValue(opponent, Opponent.types.Opponent, {name = 'Opponent'})
 end
 
 ---Validates that an arbitrary value is a valid representation of an opponent
