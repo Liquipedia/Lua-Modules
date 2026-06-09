@@ -23,12 +23,34 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
+local POWER_RANKINGS_DATA = 'Module:PowerRankings/Data'
 
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
+---@param key string?
+---@return string
+local function normalizeKey(key)
+	return string.lower((key or ''):gsub('[%s_]', ''))
+end
+
+---@param pagename string
+---@param displayName string?
+---@return integer? points
+---@return integer? rank
+local function fetchPowerRanking(pagename, displayName)
+	local data = mw.loadData(POWER_RANKINGS_DATA)
+	local targets = {normalizeKey(pagename), normalizeKey(displayName)}
+	for _, player in ipairs(data.players or {}) do
+		local entryKey = normalizeKey(player.link or player.name)
+		if entryKey == targets[1] or entryKey == targets[2] then
+			return tonumber(player.points), tonumber(player.rank)
+		end
+	end
+end
+
 ---@param frame Frame
----@return VNode
+---@return Widget
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -39,8 +61,8 @@ function CustomPlayer.run(frame)
 end
 
 ---@param id string
----@param widgets Renderable[]
----@return Renderable[]
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -54,6 +76,8 @@ function CustomInjector:parse(id, widgets)
 			currentYearEarnings = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
 		end
 
+		local prPoints, prRank = fetchPowerRanking(caller.pagename, caller.name)
+
 		return {
 			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, children = {currentYearEarnings}},
 			Cell{name = 'Years active', children = {yearsActive}},
@@ -63,6 +87,10 @@ function CustomInjector:parse(id, widgets)
 					title = 'Support-A-Creator Code used when purchasing Fortnite or Epic Games Store products',
 				},
 				children = {args.creatorcode}
+			},
+			Cell{
+				name = '[[Fortnite Power Rankings|Fortnite PR]]',
+				children = {prPoints and prRank and (prPoints .. ' (Rank #' .. prRank .. ')') or nil}
 			},
 		}
 	elseif id == 'region' then return {}
