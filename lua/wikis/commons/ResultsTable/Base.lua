@@ -469,7 +469,7 @@ end
 ---@protected
 ---@param data placement
 ---@param options table?
----@return string|Widget|Widget[]?
+---@return Renderable?
 function BaseResultsTable:opponentDisplay(data, options)
 	options = options or {}
 
@@ -499,54 +499,11 @@ function BaseResultsTable:opponentDisplay(data, options)
 		return
 	end
 
-	local rawTeamTemplate = TeamTemplate.getRawOrNil(teamTemplate, data.date) or {}
-
-	local teamDisplay = OpponentDisplay.BlockOpponent{
-		opponent = Opponent.readOpponentArgs{template = rawTeamTemplate.templatename, type = Opponent.team},
+	return OpponentDisplay.BlockTeamContainer{
+		template = teamTemplate,
 		flip = options.flip,
-		teamStyle = 'icon',
-	}
-
-	if self:shouldDisplayAdditionalText(rawTeamTemplate, not options.isLastVs) then
-		return BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate)
-	end
-
-	return teamDisplay
-end
-
----Checks if additional text should be displayed below the team icon
----@param rawTeamTemplate table
----@param isNotLastVs boolean?
----@return boolean?
-function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate, isNotLastVs)
-	local config = self.config
-
-	return rawTeamTemplate and (
-		Game.isDefaultTeamLogo{logo = rawTeamTemplate.image} or
-		(isNotLastVs and config.nonAliasTeamTemplates
-			and not Table.includes(config.nonAliasTeamTemplates, rawTeamTemplate.templatename))
-	)
-end
-
----Builds team icon display with text below it
----@param teamDisplay Widget
----@param rawTeamTemplate teamTemplateData
----@return Widget[]
-function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate)
-	return {
-		teamDisplay,
-		HtmlWidgets.Div{
-			css = {
-				['line-height'] = 1,
-				['font-size'] = '80%',
-				['text-align'] = 'center',
-			},
-			children = {
-				'(',
-				LinkWidget{link = rawTeamTemplate.page, children = rawTeamTemplate.shortname},
-				')'
-			}
-		}
+		showLink = true,
+		style = 'short',
 	}
 end
 
