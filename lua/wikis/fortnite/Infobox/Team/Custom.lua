@@ -86,7 +86,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'custom' then
 		local prScore, prRank = fetchPowerRanking(self.caller.pagename)
 		table.insert(widgets, Cell{
-			name = Link{link = 'Fortnite Power Rankings/Organizations', children = 'Fortnite PR'},
+			name = Link{link = 'Fortnite Power Rankings/Organizations', children = 'Fortnite Org PR'},
 			children = prScore and prRank and (prScore .. ' (Rank #' .. prRank .. ')') or nil
 		})
 	end
