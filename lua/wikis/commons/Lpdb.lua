@@ -13,6 +13,7 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
+local TypeUtil = Lua.import('Module:TypeUtil')
 local Variables = Lua.import('Module:Variables')
 
 local Lpdb = {}
@@ -103,9 +104,9 @@ end
 
 --- LPDB Object-Relational Mapping
 
----@alias ModelColumnData {name: string, fieldType: string|any, default: any}
+---@alias ModelColumnData {name: string, fieldType: TypeUtilType, default: any}
 
----@class Model
+---@class Model: BaseClass
 ---@field tableName string
 ---@field tableColumns ModelColumnData[]
 local Model = Class.new(function(self, name, columns)
@@ -113,7 +114,7 @@ local Model = Class.new(function(self, name, columns)
 	self.tableColumns = columns
 end)
 
----@class ModelRow
+---@class ModelRow: BaseClass
 ---@field private tableName string
 ---@field private tableColumns ModelColumnData[]
 ---@field private fields table<string, any>
@@ -232,8 +233,8 @@ Lpdb.Match2 = Model('match2', {
 	{name = 'patch', fieldType = 'string', default = ''},
 	{name = 'date', fieldType = 'string', default = 0},
 	{name = 'dateexact', fieldType = 'number', default = 0},
-	{name = 'stream', fieldType = 'struct', default = {}},
-	{name = 'links', fieldType = 'struct', default = {}},
+	{name = 'stream', fieldType = 'table', default = {}},
+	{name = 'links', fieldType = 'table', default = {}},
 	{name = 'bestof', fieldType = 'number', default = 0},
 	{name = 'vod', fieldType = 'string', default = ''},
 	{name = 'tournament', fieldType = 'string', default = ''},
@@ -243,11 +244,11 @@ Lpdb.Match2 = Model('match2', {
 	{name = 'series', fieldType = 'string', default = ''},
 	{name = 'icon', fieldType = 'string', default = ''},
 	{name = 'icondark', fieldType = 'string', default = ''},
-	{name = 'liquipediatier', fieldType = 'string|number', default = ''},
+	{name = 'liquipediatier', fieldType = TypeUtil.union('string', 'number'), default = ''},
 	{name = 'liquipediatiertype', fieldType = 'string', default = ''},
 	{name = 'publishertier', fieldType = 'string', default = ''},
-	{name = 'extradata', fieldType = 'struct', default = {}},
-	{name = 'match2bracketdata', fieldType = 'struct', default = {}},
+	{name = 'extradata', fieldType = 'table', default = {}},
+	{name = 'match2bracketdata', fieldType = 'table', default = {}},
 	{name = 'match2opponents', fieldType = 'array', default = {}},
 	{name = 'match2games', fieldType = 'array', default = {}},
 })
@@ -268,21 +269,21 @@ Lpdb.Placement = Model('placement', {
 	{name = 'weight', fieldType = 'number', default = 0},
 	{name = 'mode', fieldType = 'string', default = ''},
 	{name = 'type', fieldType = 'string', default = ''},
-	{name = 'liquipediatier', fieldType = 'string|number', default = ''},
+	{name = 'liquipediatier', fieldType = TypeUtil.union('string', 'number'), default = ''},
 	{name = 'liquipediatiertype', fieldType = 'string', default = ''},
 	{name = 'publishertier', fieldType = 'string', default = ''},
 	{name = 'icon', fieldType = 'string', default = ''},
 	{name = 'icondark', fieldType = 'string', default = ''},
 	{name = 'game', fieldType = 'string', default = ''},
-	{name = 'lastvsdata', fieldType = 'struct', default = {}},
+	{name = 'lastvsdata', fieldType = 'table', default = {}},
 	{name = 'opponentname', fieldType = 'string', default = ''},
 	{name = 'opponenttemplate', fieldType = 'string', default = ''},
 	{name = 'opponenttype', fieldType = 'string', default = ''},
-	{name = 'opponentplayers', fieldType = 'struct', default = {}},
+	{name = 'opponentplayers', fieldType = 'table', default = {}},
 	{name = 'qualifier', fieldType = 'string', default = ''},
-	{name = 'qualifierpage', fieldType = 'string', default = ''},
+	{name = 'qualifierpage', fieldType = 'pagename?', default = ''},
 	{name = 'qualifierurl', fieldType = 'string', default = ''},
-	{name = 'extradata', fieldType = 'struct', default = {}},
+	{name = 'extradata', fieldType = 'table', default = {}},
 })
 
 ---@class SquadPlayerModel:Model
@@ -308,7 +309,7 @@ Lpdb.SquadPlayer = Model('squadplayer', {
 	{name = 'joindate', fieldType = 'string', default = ''},
 	{name = 'leavedate', fieldType = 'string', default = ''},
 	{name = 'inactivedate', fieldType = 'string', default = ''},
-	{name = 'extradata', fieldType = 'struct', default = {}},
+	{name = 'extradata', fieldType = 'table', default = {}},
 })
 
 ---@class DataPoint:Model
@@ -320,7 +321,7 @@ Lpdb.DataPoint = Model('datapoint', {
 	{name = 'image', fieldType = 'string', default = ''},
 	{name = 'imagedark', fieldType = 'string', default = ''},
 	{name = 'date', fieldType = 'string', default = 0},
-	{name = 'extradata', fieldType = 'struct', default = {}},
+	{name = 'extradata', fieldType = 'table', default = {}},
 })
 
 return Lpdb
