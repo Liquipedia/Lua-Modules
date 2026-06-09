@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
@@ -422,10 +423,32 @@ function LegacyTeamCard.mapCard(tcArgs)
 
 	local notes = {}
 	if Logic.isNotEmpty(tcArgs.notes) then
-		table.insert(notes, {[1] = tcArgs.notes, highlighted = false})
+		local parsedNotes = Json.parseIfTable(tcArgs.notes)
+		if parsedNotes then
+			for i = 1, math.huge do
+				local note = parsedNotes['n' .. i]
+				if Logic.isEmpty(note) then
+					break
+				end
+				table.insert(notes, {[1] = note, highlighted = false})
+			end
+		else
+			table.insert(notes, {[1] = tcArgs.notes, highlighted = false})
+		end
 	end
 	if Logic.isNotEmpty(tcArgs.inotes) then
-		table.insert(notes, {[1] = tcArgs.inotes, highlighted = false})
+		local parsedNotes = Json.parseIfTable(tcArgs.inotes)
+		if parsedNotes then
+			for i = 1, math.huge do
+				local note = parsedNotes['n' .. i]
+				if Logic.isEmpty(note) then
+					break
+				end
+				table.insert(notes, {[1] = note, highlighted = false})
+			end
+		else
+			table.insert(notes, {[1] = tcArgs.inotes, highlighted = false})
+		end
 	end
 	if #notes > 0 then card.notes = notes end
 
