@@ -90,7 +90,7 @@ function CustomInjector:parse(id, widgets)
 			},
 			Cell{
 				name = '[[Fortnite Power Rankings|Fortnite PR]]',
-				children = {prPoints and prRank and (prPoints .. ' (Rank #' .. prRank .. ')') or nil}
+				children = prPoints and prRank and (prPoints .. ' (Rank #' .. prRank .. ')') or nil
 			},
 		}
 	elseif id == 'region' then return {}
