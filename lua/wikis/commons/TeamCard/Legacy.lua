@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
@@ -301,6 +302,7 @@ end
 ---@return string
 local function normalizeKey(value)
 	if Logic.isEmpty(value) then return '' end
+	---@cast value -nil
 	return value:gsub(' ', '_'):lower()
 end
 
@@ -396,6 +398,18 @@ function LegacyTeamCard.mapCoaches(tcArgs)
 	return coaches
 end
 
+---@param parsedNotes table
+---@return {[1]: string, highlighted: boolean}[]
+local function parseNotes(parsedNotes)
+	return Array.mapIndexes(function (index)
+		local note = parsedNotes['n' .. index]
+		if Logic.isEmpty(note) then
+			return
+		end
+		return {[1] = note, highlighted = false}
+	end)
+end
+
 ---@param tcArgs table
 ---@return table  -- TP opponent arg
 function LegacyTeamCard.mapCard(tcArgs)
@@ -421,10 +435,20 @@ function LegacyTeamCard.mapCard(tcArgs)
 
 	local notes = {}
 	if Logic.isNotEmpty(tcArgs.notes) then
-		table.insert(notes, {[1] = tcArgs.notes, highlighted = false})
+		local parsedNotes = Json.parseIfTable(tcArgs.notes)
+		if parsedNotes then
+			Array.extendWith(notes, parseNotes(parsedNotes))
+		else
+			table.insert(notes, {[1] = tcArgs.notes, highlighted = false})
+		end
 	end
 	if Logic.isNotEmpty(tcArgs.inotes) then
-		table.insert(notes, {[1] = tcArgs.inotes, highlighted = false})
+		local parsedNotes = Json.parseIfTable(tcArgs.inotes)
+		if parsedNotes then
+			Array.extendWith(notes, parseNotes(parsedNotes))
+		else
+			table.insert(notes, {[1] = tcArgs.inotes, highlighted = false})
+		end
 	end
 	if #notes > 0 then card.notes = notes end
 
