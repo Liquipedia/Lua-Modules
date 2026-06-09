@@ -34,19 +34,19 @@ local function normalizeKey(key)
 	return string.lower((key or ''):gsub('[%s_]', ''))
 end
 
----@param pagename string
+---@param pageName string
 ---@param displayName string?
 ---@return integer? points
 ---@return integer? rank
-local function fetchPowerRanking(pagename, displayName)
-	local data = mw.loadData(POWER_RANKINGS_DATA)
-	local targets = {normalizeKey(pagename), normalizeKey(displayName)}
-	for _, player in ipairs(data.players or {}) do
+local function fetchPowerRanking(pageName, displayName)
+	local pageKey = normalizeKey(pageName)
+	local nameKey = normalizeKey(displayName)
+	local entry = Array.find(POWER_RANKINGS_DATA.players or {}, function(player)
 		local entryKey = normalizeKey(player.link or player.name)
-		if entryKey == targets[1] or entryKey == targets[2] then
-			return tonumber(player.points), tonumber(player.rank)
-		end
-	end
+		return entryKey == pageKey or entryKey == nameKey
+	end)
+
+	return tonumber(entry.points), tonumber(entry.rank)
 end
 
 ---@param frame Frame
