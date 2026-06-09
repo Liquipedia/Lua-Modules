@@ -111,10 +111,6 @@ function BaseResultsTable:readConfig()
 		(config.queryType == QUERY_TYPES.solo and (tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit))
 		or tonumber(args.coachLimit) or DEFAULT_VALUES.coachLimit
 
-	if config.queryType == QUERY_TYPES.team and Table.isNotEmpty(config.aliases) then
-		config.nonAliasTeamTemplates = BaseResultsTable._getOpponentTemplates(config.opponent)
-	end
-
 	return config
 end
 
@@ -534,7 +530,7 @@ function BaseResultsTable:processVsData(placement)
 		score = (placement.lastscore or '-') .. SCORE_CONCAT .. (lastVs.score or '-')
 	end
 
-	local vsDisplay = self:opponentDisplay(lastVs, {isLastVs = true})
+	local vsDisplay = self:opponentDisplay(lastVs)
 
 	return score, vsDisplay
 end
