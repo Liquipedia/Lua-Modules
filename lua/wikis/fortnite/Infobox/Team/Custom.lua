@@ -22,6 +22,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -45,10 +46,14 @@ local CustomInjector = Class.new(Injector)
 ---@return string? rank
 local function fetchPowerRanking(team)
 	local key = string.lower((team or ''):gsub('[%s_]', ''))
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('type'), Comparator.eq, 'FTN_ORG_PR'),
+		ConditionNode(ColumnName('name'), Comparator.eq, key),
+	}
 	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		limit = 1,
 		order = 'date DESC',
-		conditions = '[[type::FTN_ORG_PR]] AND [[name::' .. key .. ']]',
+		conditions = conditions:toString(),
 		query = 'information, extradata',
 	})[1]
 	if not data then
@@ -58,7 +63,7 @@ local function fetchPowerRanking(team)
 end
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
@@ -69,8 +74,8 @@ function CustomTeam.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
 		local playerEarnings = self.caller.totalPlayerEarnings
@@ -81,7 +86,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'custom' then
 		local prScore, prRank = fetchPowerRanking(self.caller.pagename)
 		table.insert(widgets, Cell{
-			name = '[[Fortnite Power Rankings/Organizations|LPRating]]',
+			name = Link{link = 'Fortnite Power Rankings/Organizations', children = 'Fortnite PR'},
 			children = prScore and prRank and (prScore .. ' (Rank #' .. prRank .. ')') or nil
 		})
 	end
