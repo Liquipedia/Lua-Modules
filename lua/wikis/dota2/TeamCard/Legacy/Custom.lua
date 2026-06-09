@@ -41,7 +41,9 @@ end
 ---@param card table
 ---@return table
 function CustomLegacyTeamCard.preprocessCard(card)
-	local maxPlayerIndex = tonumber(card.maxPlayers) or DEFAULT_MAX_PLAYER_INDEX
+	-- Pin maxPlayers so this loop and commons mapPlayers share the same bound (commons defaults to 10).
+	card.maxPlayers = tonumber(card.maxPlayers) or DEFAULT_MAX_PLAYER_INDEX
+	local maxPlayerIndex = card.maxPlayers
 
 	-- Main roster: number = explicit in-game position, else slot index.
 	Array.forEach(Array.range(1, maxPlayerIndex), function(index)
@@ -51,7 +53,7 @@ function CustomLegacyTeamCard.preprocessCard(card)
 		card[key .. 'number'] = Logic.emptyOr(card[key .. 'number'], number, index)
 	end)
 
-	-- Substitute / staff tabs: number = explicit in-game position only (no slot-index default).
+	-- Additional tabs (t2/t3): number = explicit in-game position only (no slot-index default).
 	for tabIndex = 2, 3 do
 		Array.forEach(Array.range(1, maxPlayerIndex), function(index)
 			local key = 't' .. tabIndex .. 'p' .. index

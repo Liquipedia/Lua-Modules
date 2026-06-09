@@ -87,6 +87,16 @@ describe('TeamCard Legacy', function()
             assert.are_equal('faker-id', p.id)
         end)
 
+        it('passes number through', function()
+            local p = LegacyTeamCard.mapPlayer({p1 = 'X', p1number = '3'}, 'p1', nil)
+            assert.are_equal('3', p.number)
+        end)
+
+        it('number nil when unset', function()
+            local p = LegacyTeamCard.mapPlayer({p1 = 'X'}, 'p1', nil)
+            assert.is_nil(p.number)
+        end)
+
         it('reads faction', function()
             local p = LegacyTeamCard.mapPlayer({p1 = 'X', p1faction = 'p'}, 'p1', nil)
             assert.are_equal('p', p.faction)
