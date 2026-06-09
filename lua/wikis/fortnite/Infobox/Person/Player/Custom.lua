@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Abbreviation = Lua.import('Module:Abbreviation')
 local ActiveYears = Lua.import('Module:YearsActive')
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Region = Lua.import('Module:Region')
 local Math = Lua.import('Module:MathUtil')
@@ -21,6 +22,7 @@ local PlayerAchievements = Lua.import('Module:Infobox/Extension/Achievements')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 local POWER_RANKINGS_DATA = Lua.import('Module:PowerRankings/Data', {loadData = true})
@@ -28,29 +30,22 @@ local POWER_RANKINGS_DATA = Lua.import('Module:PowerRankings/Data', {loadData = 
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
----@param key string?
----@return string
-local function normalizeKey(key)
-	return string.lower((key or ''):gsub('[%s_]', ''))
-end
-
 ---@param pageName string
----@param displayName string?
 ---@return integer? points
 ---@return integer? rank
-local function fetchPowerRanking(pageName, displayName)
-	local pageKey = normalizeKey(pageName)
-	local nameKey = normalizeKey(displayName)
+local function fetchPowerRanking(pageName)
 	local entry = Array.find(POWER_RANKINGS_DATA.players or {}, function(player)
-		local entryKey = normalizeKey(player.link or player.name)
-		return entryKey == pageKey or entryKey == nameKey
+		return ((player.link or player.name):gsub(' ', '_')) == (pageName:gsub(' ', '_'))
 	end)
+	if not entry then
+		return
+	end
 
-	return tonumber(entry.points), tonumber(entry.rank)
+	return entry.points, entry.rank
 end
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -61,8 +56,8 @@ function CustomPlayer.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -76,7 +71,7 @@ function CustomInjector:parse(id, widgets)
 			currentYearEarnings = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
 		end
 
-		local prPoints, prRank = fetchPowerRanking(caller.pagename, caller.name)
+		local prPoints, prRank = fetchPowerRanking(caller.pagename)
 
 		return {
 			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, children = {currentYearEarnings}},
@@ -89,7 +84,7 @@ function CustomInjector:parse(id, widgets)
 				children = {args.creatorcode}
 			},
 			Cell{
-				name = '[[Fortnite Power Rankings|Fortnite PR]]',
+				name = Link{link = 'Fortnite Power Rankings', children = 'Fortnite PR'},
 				children = prPoints and prRank and (prPoints .. ' (Rank #' .. prRank .. ')') or nil
 			},
 		}
