@@ -57,7 +57,8 @@ local function renderPlayer(name, link)
 				FLAG_SPACING, flagIcon)
 		end
 	end
-	items[#items + 1] = string.format('<span>[[%s|%s]]</span>', player.pageName, player.displayName)
+	local nameLink = Link{link = player.pageName, linktype = 'internal', children = player.displayName}
+	items[#items + 1] = string.format('<span>%s</span>', tostring(nameLink))
 
 	return string.format('<span style="%s">%s</span>', CONTAINER_STYLE, table.concat(items))
 end
