@@ -23,7 +23,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
-local POWER_RANKINGS_DATA = 'Module:PowerRankings/Data'
+local POWER_RANKINGS_DATA = Lua.import('Module:PowerRankings/Data', {loadData = true})
 
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
