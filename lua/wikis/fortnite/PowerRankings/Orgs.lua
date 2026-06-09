@@ -171,8 +171,12 @@ end
 local function tournamentIcon(icon, icondark, page, size)
 	if Logic.isEmpty(icon) then return '' end
 	icondark = Logic.nilIfEmpty(icondark) or icon
-	return '<span class="league-icon-small-image lightmode">[[File:' .. icon .. '|' .. size .. '|link=' .. page .. ']]</span>'
-		.. '<span class="league-icon-small-image darkmode">[[File:' .. icondark .. '|' .. size .. '|link=' .. page .. ']]</span>'
+	local function modeSpan(mode, image)
+		return string.format(
+			'<span class="league-icon-small-image %s">[[File:%s|%s|link=%s]]</span>',
+			mode, image, size, page)
+	end
+	return modeSpan('lightmode', icon) .. modeSpan('darkmode', icondark)
 end
 
 local function gatherPlacementData(year)
@@ -408,7 +412,8 @@ function p.main(frame)
 		row:tag('td'):css('text-align', 'center'):css('white-space', 'nowrap'):wikitext('<b>' .. i .. '</b>')
 		local flagCell = Logic.isNotEmpty(o.flag) and Flags.Icon{flag = o.flag, shouldLink = false} or ''
 		row:tag('td'):css('text-align', 'center'):css('white-space', 'nowrap'):css('padding', '0 8px'):wikitext(flagCell)
-		row:tag('td'):css('text-align', 'left'):css('white-space', 'nowrap'):wikitext(frame:expandTemplate{title = 'Team', args = {o.team}})
+		row:tag('td'):css('text-align', 'left'):css('white-space', 'nowrap')
+			:wikitext(frame:expandTemplate{title = 'Team', args = {o.team}})
 		local names = {}
 		for k = 1, o.count do
 			local m = o.members[k]
@@ -424,7 +429,8 @@ function p.main(frame)
 			end
 			row:tag('td'):css('text-align', 'center'):wikitext(achText)
 		end
-		row:tag('td'):css('text-align', 'center'):css('white-space', 'nowrap'):wikitext('<b>' .. string.format('%.1f', o.score) .. '</b>')
+		row:tag('td'):css('text-align', 'center'):css('white-space', 'nowrap')
+			:wikitext('<b>' .. string.format('%.1f', o.score) .. '</b>')
 		if not wrapped then
 			row:tag('td'):css('text-align', 'center'):css('white-space', 'nowrap'):wikitext(formatNumber(o.avgPR))
 			row:tag('td'):css('text-align', 'center'):css('white-space', 'nowrap'):wikitext('$' .. formatNumber(o.cash))
