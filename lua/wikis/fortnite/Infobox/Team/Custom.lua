@@ -40,8 +40,25 @@ local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = Info.config.defaultMaxPlayersPer
 
 local CustomInjector = Class.new(Injector)
 
+---@param team string
+---@return string? score
+---@return string? rank
+local function fetchPowerRanking(team)
+	local key = string.lower((team or ''):gsub('[%s_]', ''))
+	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		limit = 1,
+		order = 'date DESC',
+		conditions = '[[type::FTN_ORG_PR]] AND [[name::' .. key .. ']]',
+		query = 'information, extradata',
+	})[1]
+	if not data then
+		return
+	end
+	return (data.extradata or {}).score, data.information
+end
+
 ---@param frame Frame
----@return VNode
+---@return Widget
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
@@ -52,14 +69,20 @@ function CustomTeam.run(frame)
 end
 
 ---@param id string
----@param widgets Renderable[]
----@return Renderable[]
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
 		local playerEarnings = self.caller.totalPlayerEarnings
 		table.insert(widgets, Cell{
 			name = PLAYER_EARNINGS_ABBREVIATION,
 			children = {playerEarnings ~= 0 and ('$' .. mw.getContentLanguage():formatNum(Math.round(playerEarnings))) or nil}
+		})
+	elseif id == 'custom' then
+		local prScore, prRank = fetchPowerRanking(self.caller.pagename)
+		table.insert(widgets, Cell{
+			name = '[[Fortnite Power Rankings/Organizations|LPRating]]',
+			children = {prScore and prRank and (prScore .. ' (Rank #' .. prRank .. ')') or nil}
 		})
 	end
 
