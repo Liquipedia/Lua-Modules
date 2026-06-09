@@ -142,7 +142,10 @@ function ModelRow:_validateField(columnData)
 	if not self.fields[columnData.name] then
 		error(self.tableName .. ' expects ' .. columnData.name .. ' to be set')
 	end
-	-- TODO: Verify types (at least when running tests)
+	-- Verify types (at least when running tests)
+	TypeUtil.assertValue(
+		self.fields[columnData.name], columnData.fieldType, {name = self.tableName .. '.' .. columnData.name}
+	)
 end
 
 ---@private
