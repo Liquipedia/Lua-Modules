@@ -172,6 +172,8 @@ function TypeUtil.valueIsTypeNoTable (value, typeSpec)
 		elseif typeSpec == 'pagename' then
 			-- A pagename is a string, with first letter capitalized and may not contains spaces
 			return type(value) == 'string' and value:find('^%u') and not value:find(' ')
+		elseif typeSpec == 'array' then
+			return Array.isArray(value)
 		elseif String.endsWith(typeSpec, '?') then
 			return value == nil or TypeUtil.valueIsTypeNoTable(value, typeSpec:sub(1, -2))
 		elseif typeSpec == 'any' then
