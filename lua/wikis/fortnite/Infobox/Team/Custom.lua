@@ -82,7 +82,7 @@ function CustomInjector:parse(id, widgets)
 		local prScore, prRank = fetchPowerRanking(self.caller.pagename)
 		table.insert(widgets, Cell{
 			name = '[[Fortnite Power Rankings/Organizations|LPRating]]',
-			children = {prScore and prRank and (prScore .. ' (Rank #' .. prRank .. ')') or nil}
+			children = prScore and prRank and (prScore .. ' (Rank #' .. prRank .. ')') or nil
 		})
 	end
 
