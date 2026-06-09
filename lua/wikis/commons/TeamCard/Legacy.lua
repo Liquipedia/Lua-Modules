@@ -398,6 +398,18 @@ function LegacyTeamCard.mapCoaches(tcArgs)
 	return coaches
 end
 
+---@param parsedNotes table
+---@return {[1]: string, highlighted: boolean}[]
+local function parseNotes(parsedNotes)
+	return Array.mapIndexes(function (index)
+		local note = parsedNotes['n' .. index]
+		if Logic.isEmpty(note) then
+			return
+		end
+		return {[1] = note, highlighted = false}
+	end)
+end
+
 ---@param tcArgs table
 ---@return table  -- TP opponent arg
 function LegacyTeamCard.mapCard(tcArgs)
@@ -425,13 +437,7 @@ function LegacyTeamCard.mapCard(tcArgs)
 	if Logic.isNotEmpty(tcArgs.notes) then
 		local parsedNotes = Json.parseIfTable(tcArgs.notes)
 		if parsedNotes then
-			for i = 1, math.huge do
-				local note = parsedNotes['n' .. i]
-				if Logic.isEmpty(note) then
-					break
-				end
-				table.insert(notes, {[1] = note, highlighted = false})
-			end
+			Array.extendWith(notes, parseNotes(parsedNotes))
 		else
 			table.insert(notes, {[1] = tcArgs.notes, highlighted = false})
 		end
@@ -439,13 +445,7 @@ function LegacyTeamCard.mapCard(tcArgs)
 	if Logic.isNotEmpty(tcArgs.inotes) then
 		local parsedNotes = Json.parseIfTable(tcArgs.inotes)
 		if parsedNotes then
-			for i = 1, math.huge do
-				local note = parsedNotes['n' .. i]
-				if Logic.isEmpty(note) then
-					break
-				end
-				table.insert(notes, {[1] = note, highlighted = false})
-			end
+			Array.extendWith(notes, parseNotes(parsedNotes))
 		else
 			table.insert(notes, {[1] = tcArgs.inotes, highlighted = false})
 		end
