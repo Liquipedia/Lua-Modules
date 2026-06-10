@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local FeatureFlag = Lua.import('Module:FeatureFlag')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -142,7 +143,11 @@ function ModelRow:_validateField(columnData)
 	if not self.fields[columnData.name] then
 		error(self.tableName .. ' expects ' .. columnData.name .. ' to be set')
 	end
-	-- Verify types (at least when running tests)
+
+	local typeCheckFeature = FeatureFlag.get('force_type_check')
+	if not typeCheckFeature then
+		return
+	end
 	TypeUtil.assertValue(
 		self.fields[columnData.name], columnData.fieldType, {name = self.tableName .. '.' .. columnData.name}
 	)
