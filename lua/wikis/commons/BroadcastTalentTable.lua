@@ -37,7 +37,7 @@ local Dialog = Lua.import('Module:Widget/Basic/Dialog')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local ListWidgets = Lua.import('Module:Widget/List')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local DEFAULT_LIMIT = 500
@@ -399,7 +399,7 @@ function BroadcastTalentTable:_partnerList(broadcast, tournament)
 			link = tournament.pageName,
 			children = self:_tournamentDisplayName(broadcast, tournament)
 		},
-		children = UnorderedList{
+		children = ListWidgets.Unordered{
 			children = Array.map(partners, function (partner)
 				return {
 					Flags.Icon{flag = partner.flag},

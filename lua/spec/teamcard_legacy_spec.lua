@@ -87,6 +87,16 @@ describe('TeamCard Legacy', function()
             assert.are_equal('faker-id', p.id)
         end)
 
+        it('passes number through', function()
+            local p = LegacyTeamCard.mapPlayer({p1 = 'X', p1number = '3'}, 'p1', nil)
+            assert.are_equal('3', p.number)
+        end)
+
+        it('number nil when unset', function()
+            local p = LegacyTeamCard.mapPlayer({p1 = 'X'}, 'p1', nil)
+            assert.is_nil(p.number)
+        end)
+
         it('reads faction', function()
             local p = LegacyTeamCard.mapPlayer({p1 = 'X', p1faction = 'p'}, 'p1', nil)
             assert.are_equal('p', p.faction)
@@ -298,6 +308,37 @@ describe('TeamCard Legacy', function()
                 if p.link == 'Pawn (Korean)' then pawnCount = pawnCount + 1 end
             end
             assert.are_equal(1, pawnCount)
+        end)
+
+        it('keeps both player and staff entries for the same person (staff tab)', function()
+            local players = LegacyTeamCard.mapPlayers({
+                p1 = 'Dhokla',
+                t3p1 = 'Dhokla', t3p1pos = 'Positional Coach', t3title = 'Staff',
+            })
+            assert.are_equal(2, #players)
+            assert.is_nil(players[1].type)
+            assert.is_nil(players[1].role)
+            assert.are_equal('staff', players[2].type)
+            assert.are_equal('Positional Coach', players[2].role)
+        end)
+
+        it('keeps both entries when a staff role sits in a default former tab', function()
+            local players = LegacyTeamCard.mapPlayers({
+                p1 = 'Dhokla',
+                t3p1 = 'Dhokla', t3p1pos = 'Positional Coach',
+            })
+            assert.are_equal(2, #players)
+            assert.is_nil(players[1].role)
+            assert.are_equal('Positional Coach', players[2].role)
+        end)
+
+        it('staff tab entry still dedups against an earlier staff tab entry', function()
+            local players = LegacyTeamCard.mapPlayers({
+                t2p1 = 'Goldenglue', t2p1pos = 'Head Coach', t2title = 'Staff',
+                t3p1 = 'Goldenglue', t3p1pos = 'Strategic Coach', t3title = 'Staff',
+            })
+            assert.are_equal(1, #players)
+            assert.are_equal('Strategic Coach', players[1].role)
         end)
     end)
 
