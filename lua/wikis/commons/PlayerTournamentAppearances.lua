@@ -70,7 +70,11 @@ function Appearances:init(frame)
 		isFormQuery = Logic.readBool(args.query),
 		restrictToPlayersParticipatingIn = args.playerspage,
 		restrictToFirstPrizePool = Logic.readBool(args.restrictToFirstPrizePool),
+		player = Logic.nilOr(Logic.readBoolOrNil(args.player), true),
+		staff = Logic.readBool(args.staff),
 	}
+
+	assert(self.config.player or self.config.staff, 'Invalid config: at least one of |player= or |staff= must be true')
 
 	self.args = {
 		conditions = args.conditions,
@@ -168,7 +172,7 @@ function Appearances:_fetchPlayers(pageNames)
 			extradata.results[placement.parent] = {
 				placement = placement.placement,
 				date = placement.date,
-				team = placement.opponenttype == Opponent.team and placement.opponenttemplate or player.team
+				team = opponent.type == Opponent.team and opponent.template or player.team
 			}
 			local rawPlacement = Placement.raw(placement.placement)
 			extradata.placementSum = extradata.placementSum + (tonumber(rawPlacement.placement[1]) or 1000)
