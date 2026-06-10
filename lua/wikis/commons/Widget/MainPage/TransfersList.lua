@@ -17,7 +17,7 @@ local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local ListWidgets = Lua.import('Module:Widget/List')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class TransfersListParameters
@@ -68,7 +68,7 @@ local function TransfersList(props)
 						['font-style'] = 'italic',
 						['text-align'] = 'center',
 					},
-					children = UnorderedList{children = WidgetUtil.collect(
+					children = ListWidgets.Unordered{children = WidgetUtil.collect(
 						Link { children = 'See more transfers', link = props.transferPortal },
 						Logic.readBool(props.transferQuery) and Link {
 							children = 'Transfer query',

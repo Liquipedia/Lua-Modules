@@ -14,7 +14,7 @@ local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Html = Lua.import('Module:Widget/Html')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local ListWidgets = Lua.import('Module:Widget/List')
 
 ---@class Dota2PartnerWikis: Widget
 ---@operator call(table): Dota2PartnerWikis
@@ -123,7 +123,7 @@ function Dota2PartnerWikis:render()
 				Html.Td{
 					attributes = {colspan = 5},
 					css = {['text-align'] = 'left'},
-					children = UnorderedList{children = {
+					children = ListWidgets.Unordered{children = {
 						{
 							IconImage{
 								imageLight = 'Dota 2 Partners IWF.png',
