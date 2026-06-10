@@ -14,6 +14,8 @@ local Table = Lua.import('Module:Table')
 local Opponent = Lua.import('Module:Opponent')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 
+local BracketDisplayComponents = Lua.import('Module:Widget/Match/Bracket/All')
+
 ---@class TrackmaniaOpponentDisplay: OpponentDisplay
 local OpponentDisplayCustom = Table.deepCopy(OpponentDisplay)
 
@@ -37,18 +39,18 @@ function OpponentDisplayCustom.BracketOpponentEntry:addScores(opponent)
 		OpponentDisplay.BracketOpponentEntry.addScores(self, opponent)
 		return
 	end
-	self.root:node(OpponentDisplay.BracketScore{
+	self.root:node(BracketDisplayComponents.Score{
 		isWinner = extradata.set1win,
 		scoreText = OpponentDisplayCustom.InlineScore(opponent, 1),
 	})
 	if opponent.extradata.score2 or opponent.score2 then
-		self.root:node(OpponentDisplay.BracketScore{
+		self.root:node(BracketDisplayComponents.Score{
 			isWinner = extradata.set2win,
 			scoreText = OpponentDisplayCustom.InlineScore(opponent, 2),
 		})
 	end
 	if opponent.extradata.score3 then
-		self.root:node(OpponentDisplay.BracketScore{
+		self.root:node(BracketDisplayComponents.Score{
 			isWinner = extradata.set3win,
 			scoreText = OpponentDisplayCustom.InlineScore(opponent, 3)
 		})

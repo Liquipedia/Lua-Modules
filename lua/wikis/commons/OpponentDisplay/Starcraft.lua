@@ -17,6 +17,7 @@ local Table = Lua.import('Module:Table')
 local Opponent = Lua.import('Module:Opponent')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 
+local BracketDisplayComponents = Lua.import('Module:Widget/Match/Bracket/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -65,13 +66,13 @@ local BracketOpponentEntry = Class.new(OpponentDisplay.BracketOpponentEntry,
 ---Adds scores to BracketOpponentEntry
 ---@param opponent StarcraftStandardOpponent
 function BracketOpponentEntry:addScores(opponent)
-	self.root:node(OpponentDisplay.BracketScore{
+	self.root:node(BracketDisplayComponents.Score{
 		isWinner = opponent.placement == 1 or opponent.advances,
 		scoreText = StarcraftOpponentDisplay.InlineScore(opponent),
 	})
 
 	if opponent.score2 then
-		self.root:node(OpponentDisplay.BracketScore{
+		self.root:node(BracketDisplayComponents.Score{
 			isWinner = opponent.placement2 == 1,
 			scoreText = StarcraftOpponentDisplay.InlineScore2(opponent),
 		})
