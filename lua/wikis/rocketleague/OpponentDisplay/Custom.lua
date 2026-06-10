@@ -13,6 +13,8 @@ local Table = Lua.import('Module:Table')
 local Opponent = Lua.import('Module:Opponent')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 
+local BracketDisplayComponents = Lua.import('Module:Widget/Match/Bracket/All')
+
 ---@class RocketLeagueOpponentDisplay: OpponentDisplay
 local CustomOpponentDisplay = Table.deepCopy(OpponentDisplay)
 
@@ -31,33 +33,33 @@ function CustomOpponentDisplay.BracketOpponentEntry:addScores(opponent)
 		return
 	end
 
-	local score1Node = OpponentDisplay.BracketScore({
+	local score1Node = BracketDisplayComponents.Score{
 		isWinner = extradata.set1win,
 		scoreText = CustomOpponentDisplay.InlineScoreSpecial{
 			opponent = opponent, score = extradata.score1
 		},
-	})
+	}
 	self.root:node(score1Node)
 
 	local score2Node
 	if extradata.score2 or opponent.score2 then
-		score2Node = OpponentDisplay.BracketScore({
+		score2Node = BracketDisplayComponents.Score{
 			isWinner = extradata.set2win,
 			scoreText = CustomOpponentDisplay.InlineScoreSpecial{
 				opponent = opponent, score = extradata.score2
 			},
-		})
+		}
 	end
 	self.root:node(score2Node)
 
 	local score3Node
 	if extradata.score3 then
-		score3Node = OpponentDisplay.BracketScore({
+		score3Node = BracketDisplayComponents.Score{
 			isWinner = extradata.set3win,
 			scoreText = CustomOpponentDisplay.InlineScoreSpecial{
 				opponent = opponent, score = extradata.score3
 			},
-		})
+		}
 	end
 	self.root:node(score3Node)
 

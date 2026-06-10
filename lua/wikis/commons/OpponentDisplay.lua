@@ -20,6 +20,7 @@ local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local Html = Lua.import('Module:Widget/Html')
+local BracketDisplayComponents = Lua.import('Module:Widget/Match/Bracket/All')
 local BlockTeam = Lua.import('Module:Widget/TeamDisplay/Block')
 local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
 
@@ -104,18 +105,18 @@ end
 ---Adds scores to BracketOpponentEntry
 ---@param opponent standardOpponent
 function OpponentDisplay.BracketOpponentEntry:addScores(opponent)
-	local score1Node = OpponentDisplay.BracketScore({
+	local score1Node = BracketDisplayComponents.Score{
 		isWinner = opponent.placement == 1 or opponent.advances,
 		scoreText = OpponentDisplay.InlineScore(opponent),
-	})
+	}
 	self.root:node(score1Node)
 
 	local score2Node
 	if opponent.score2 then
-		score2Node = OpponentDisplay.BracketScore({
+		score2Node = BracketDisplayComponents.Score{
 			isWinner = opponent.placement2 == 1,
 			scoreText = OpponentDisplay.InlineScore2(opponent),
-		})
+		}
 	end
 	self.root:node(score2Node)
 
@@ -369,29 +370,6 @@ function OpponentDisplay.InlineScore2(opponent)
 	else
 		return opponent.status2 or ''
 	end
-end
-
-OpponentDisplay.propTypes.BracketScore = {
-	isWinner = 'boolean?',
-	scoreText = 'any',
-}
-
----Displays a score within the context of a bracket opponent entry.
----@param props {isWinner: boolean?, scoreText: string|number?}
----@return Html
-function OpponentDisplay.BracketScore(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BracketScore)
-
-	local scoreText = props.scoreText
-	if props.isWinner then
-		scoreText = '<b>' .. scoreText .. '</b>'
-	end
-
-	return mw.html.create('div'):addClass('brkts-opponent-score-outer')
-		:node(
-			mw.html.create('div'):addClass('brkts-opponent-score-inner')
-				:wikitext(scoreText)
-		)
 end
 
 return OpponentDisplay
