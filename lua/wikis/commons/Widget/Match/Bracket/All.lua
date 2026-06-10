@@ -10,5 +10,6 @@ local Widgets = {}
 local Lua = require('Module:Lua')
 
 Widgets.Score = Lua.import('Module:Widget/Match/Bracket/Score')
+Widgets.ScoreContainer = Lua.import('Module:Widget/Match/Bracket/ScoreContainer/Custom')
 
 return Widgets
