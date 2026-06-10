@@ -66,7 +66,11 @@ function TournamentPlayerInfo.create(frame)
 		return 'No conditions set.'
 	end
 
-	return tournamentPlayerInfo:query():build()
+	return Html.Fragment{children = {
+		mw.text.jsonEncode(tournamentPlayerInfo.config),
+		mw.text.jsonEncode(tournamentPlayerInfo.data),
+		tournamentPlayerInfo:query():build()
+	}}
 end
 
 ---@param args table
@@ -146,7 +150,7 @@ function TournamentPlayerInfo:_parseRecords(records)
 		end
 		if self.config.staff then
 			local staff = Array.mapIndexes(function (index)
-				return Logic.nilIfEmpty(Opponent.staffFromLpdbStruct(players, index))
+				return Logic.nilIfEmpty(Opponent.staffFromLpdbStruct(record.opponentplayers, index))
 			end)
 			Array.extendWith(players, Array.map(staff, processPlayer))
 		end
