@@ -169,6 +169,11 @@ function TournamentPlayerInfo:_parseRecords(records)
 		elseif a.team ~= b.team then
 			return a.team < b.team
 		end
+		local aType = (a.extradata or {}).type or 'player'
+		local bType = (a.extradata or {}).type or 'player'
+		if aType ~= bType then
+			return aType < bType
+		end
 		-- TODO: sort by role when it becomes available in queried placement data
 		return a.extradata.index < b.extradata.index
 	end)
