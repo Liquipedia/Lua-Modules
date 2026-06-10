@@ -25,7 +25,9 @@ end
 ---Resolves the player number for one dota2 roster slot.
 ---A numeric `pos` (the in-game position, 1-5) becomes the number and is dropped as a role;
 ---non-numeric markers (e.g. `S`) are left in place. `keys[1]` is the prefixed form
----(`p1pos`), `keys[2]` the commons group alias form (`pos1`).
+---(`p1pos`), `keys[2]` the commons group alias form (`pos1`). Precedence is
+---presence-based, not numeric-based: a non-empty `keys[1]` shadows `keys[2]` even when
+---non-numeric, matching how commons `mapPlayers` resolves the same alias.
 ---@param card table
 ---@param keys string[]
 ---@return integer?
