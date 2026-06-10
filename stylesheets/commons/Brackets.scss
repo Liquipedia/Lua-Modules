@@ -1232,11 +1232,11 @@ div.brkts-popup-body-element-thumbs {
 		cursor: default;
 		pointer-events: none;
 	}
-}
 
-@media ( max-width: 767px ) {
-	.visible-xs.block-team {
-		display: flex !important;
+	@media ( max-width: 767px ) {
+		&.visible-xs {
+			display: flex !important;
+		}
 	}
 }
 
