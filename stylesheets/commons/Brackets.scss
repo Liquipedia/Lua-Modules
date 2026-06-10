@@ -1214,16 +1214,22 @@ div.brkts-popup-body-element-thumbs {
 		> .team-name-dynamic {
 			content: none;
 
-			@container block-team-name ( min-width: 75px ) {
-				content: attr( data-team-shortname raw-string );
+			@container block-team-name ( min-width: 75px ) and ( max-width: 169px ) {
+				&::before {
+					content: attr( data-team-shortname raw-string );
+				}
 			}
 
-			@container block-team-name ( min-width: 170px ) {
-				content: attr( data-team-bracketname raw-string );
+			@container block-team-name ( min-width: 170px ) and ( max-width: 249px ) {
+				&::before {
+					content: attr( data-team-bracketname raw-string );
+				}
 			}
 
 			@container block-team-name ( min-width: 250px ) {
-				content: attr( data-team-name raw-string );
+				&::before {
+					content: attr( data-team-name raw-string );
+				}
 			}
 		}
 	}
