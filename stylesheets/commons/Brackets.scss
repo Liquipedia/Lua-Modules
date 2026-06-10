@@ -1209,6 +1209,23 @@ div.brkts-popup-body-element-thumbs {
 	> .name {
 		flex: 1 1;
 		min-width: 0;
+		container: block-team-name / inline-size;
+
+		> .team-name-dynamic {
+			content: none;
+
+			@container block-team-name ( min-width: 75px ) {
+				content: attr( data-team-shortname raw-string );
+			}
+
+			@container block-team-name ( min-width: 170px ) {
+				content: attr( data-team-bracketname raw-string );
+			}
+
+			@container block-team-name ( min-width: 250px ) {
+				content: attr( data-team-name raw-string );
+			}
+		}
 	}
 
 	> .team-template-team-icon {
@@ -1225,23 +1242,6 @@ div.brkts-popup-body-element-thumbs {
 
 		> .name {
 			text-align: right;
-			container: block-team-name / inline-size;
-
-			> .team-name-dynamic {
-				content: none;
-
-				@container block-team-name ( min-width: 75px ) {
-					content: attr( data-team-shortname raw-string );
-				}
-
-				@container block-team-name ( min-width: 170px ) {
-					content: attr( data-team-bracketname raw-string );
-				}
-
-				@container block-team-name ( min-width: 250px ) {
-					content: attr( data-team-name raw-string );
-				}
-			}
 		}
 	}
 
