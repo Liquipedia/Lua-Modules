@@ -66,11 +66,7 @@ function TournamentPlayerInfo.create(frame)
 		return 'No conditions set.'
 	end
 
-	return Html.Fragment{children = {
-		mw.text.jsonEncode(tournamentPlayerInfo.config),
-		mw.text.jsonEncode(tournamentPlayerInfo.data),
-		tournamentPlayerInfo:query():build()
-	}}
+	return tournamentPlayerInfo:query():build()
 end
 
 ---@param args table
