@@ -8,14 +8,13 @@
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
-local DateExt = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
 local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Page = Lua.import('Module:Page')
+local PlayerDisplay = Lua.import('Module:Player/Display')
 local PlayerExt = Lua.import('Module:Player/Ext')
-local String = Lua.import('Module:StringUtils')
 local Team = Lua.import('Module:Team')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -34,38 +33,7 @@ local TOP_N = 200
 local MAX_PLAYERS_PER_ORG = 4
 local DEFAULT_WEIGHTS = {count = 0.12, pr = 0.35, cash = 0.45}
 
-local CONTAINER_STYLE = 'display: inline-flex; align-items: center; white-space: nowrap; '
-	.. 'line-height: 1; font-size: 1em; vertical-align: middle;'
-local FLAG_SPACING = '5px'
-
 local p = {}
-
-local function renderPlayer(name, link)
-	if String.isEmpty(name) then
-		return ''
-	end
-	local date = DateExt.toYmdInUtc(DateExt.getContextualDateOrNow())
-	local pageNameFromLink, displayNameFromLink = PlayerExt.extractFromLink(name)
-	local player = {
-		displayName = displayNameFromLink or name,
-		pageName = String.nilIfEmpty(link) or pageNameFromLink,
-	}
-	PlayerExt.syncPlayer(player, {date = date})
-
-	local items = {}
-	if String.isNotEmpty(player.flag) then
-		local flagIcon = String.nilIfEmpty(Flags.Icon{flag = player.flag, shouldLink = false})
-		if flagIcon then
-			items[#items + 1] = string.format(
-				'<span style="display: inline-flex; align-items: center; margin-right: %s;">%s</span>',
-				FLAG_SPACING, flagIcon)
-		end
-	end
-	local nameLink = Link{link = player.pageName, linktype = 'internal', children = player.displayName}
-	items[#items + 1] = string.format('<span>%s</span>', tostring(nameLink))
-
-	return string.format('<span style="%s">%s</span>', CONTAINER_STYLE, table.concat(items))
-end
 
 local function queryPlayerOrg(name)
 	if Logic.isEmpty(name) then
@@ -417,7 +385,12 @@ function p.main(frame)
 		local names = {}
 		for k = 1, o.count do
 			local m = o.members[k]
-			local rendered = renderPlayer(m.name, m.link)
+			local player = {
+				displayName = m.name,
+				pageName = Logic.nilIfEmpty(m.link) or m.name,
+			}
+			PlayerExt.syncPlayer(player)
+			local rendered = tostring(PlayerDisplay.InlinePlayer{player = player})
 			table.insert(names, '<span style="white-space:nowrap">' .. rendered .. '</span>')
 		end
 		row:tag('td'):css('text-align', 'left')
