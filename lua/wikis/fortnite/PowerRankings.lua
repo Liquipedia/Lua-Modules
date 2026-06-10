@@ -8,105 +8,50 @@
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
-local Flags = Lua.import('Module:Flags')
 local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
-local Page = Lua.import('Module:Page')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local PlayerDisplay = Lua.import('Module:Player/Display')
 local PlayerExt = Lua.import('Module:Player/Ext')
-local String = Lua.import('Module:StringUtils')
 
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
-local Condition = Lua.import('Module:Condition')
-local ConditionTree = Condition.Tree
-local ConditionNode = Condition.Node
-local Comparator = Condition.Comparator
-local BooleanOperator = Condition.BooleanOperator
-local ColumnName = Condition.ColumnName
-
 local PowerRankingsData = Lua.import('Module:PowerRankings/Data', {loadData = true})
-local DISPLAY_PAGE = 'Fortnite Power Rankings'
-
-local CONTAINER_STYLE = 'display: inline-flex; align-items: center; white-space: nowrap; '
-	.. 'line-height: 1; font-size: 1em; vertical-align: middle;'
-local FLAG_SPACING = '5px'
 
 local p = {}
 
-local function renderPlayer(name, link)
-	if String.isEmpty(name) then
-		return ''
-	end
-	local date = DateExt.toYmdInUtc(DateExt.getContextualDateOrNow())
-	local pageNameFromLink, displayNameFromLink = PlayerExt.extractFromLink(name)
-	local player = {
-		displayName = displayNameFromLink or name,
-		pageName = String.nilIfEmpty(link) or pageNameFromLink,
-	}
-	PlayerExt.syncPlayer(player, {date = date})
-
-	local items = {}
-	if String.isNotEmpty(player.flag) then
-		local flagIcon = String.nilIfEmpty(Flags.Icon{flag = player.flag, shouldLink = false})
-		if flagIcon then
-			items[#items + 1] = string.format(
-				'<span style="display: inline-flex; align-items: center; margin-right: %s;">%s</span>',
-				FLAG_SPACING, flagIcon)
-		end
-	end
-	local nameLink = Link{link = player.pageName, linktype = 'internal', children = player.displayName}
-	items[#items + 1] = string.format('<span>%s</span>', tostring(nameLink))
-
-	return string.format('<span style="%s">%s</span>', CONTAINER_STYLE, table.concat(items))
-end
-
-local function queryPlayerOrg(name)
-	if Logic.isEmpty(name) then
-		return ''
-	end
-	local conditions = ConditionTree(BooleanOperator.any):add{
-		ConditionNode(ColumnName('pagename'), Comparator.eq, Page.pageifyLink(name)),
-		ConditionNode(ColumnName('id'), Comparator.eq, name),
-	}
-	local row = mw.ext.LiquipediaDB.lpdb('player', {
-		query = 'team',
-		conditions = conditions:toString(),
-		limit = 1,
-	})[1] or {}
-	return row.team or ''
-end
-
-local function renderOrg(name, frame)
-	local org = queryPlayerOrg(name)
-	if Logic.isEmpty(org) then
-		return ''
-	end
-	return frame:expandTemplate{title = 'Team', args = {org}}
-end
-
+---@param updated string?
+---@return Renderable
 local function buildTitle(updated)
-	local textChildren = {HtmlWidgets.B{children = 'Fortnite Power Rankings'}}
-	if Logic.isNotEmpty(updated) then
-		textChildren[#textChildren + 1] = HtmlWidgets.Span{children = 'Last updated: ' .. updated}
-	end
 	return HtmlWidgets.Div{
+		classes = {'ranking-table__top-row'},
 		children = {
-			HtmlWidgets.Div{children = textChildren, classes = {'ranking-table__top-row-text'}},
+			HtmlWidgets.Div{
+				children = WidgetUtil.collect(
+					HtmlWidgets.B{children = 'Fortnite Power Rankings'},
+					Logic.isNotEmpty(updated) and HtmlWidgets.Span{children = {'Last updated: ', updated}} or nil
+				),
+				classes = {'ranking-table__top-row-text'},
+			},
 			HtmlWidgets.Div{
 				children = {HtmlWidgets.Span{children = 'Data by Epic Games'}},
 				classes = {'ranking-table__top-row-logo-container'},
 			},
 		},
-		classes = {'ranking-table__top-row'},
 	}
 end
 
+---@return Renderable
 local function buildFooter()
 	return Link{
-		link = DISPLAY_PAGE,
+		link = 'Fortnite Power Rankings',
 		linktype = 'internal',
 		children = {
 			HtmlWidgets.Div{
@@ -117,34 +62,43 @@ local function buildFooter()
 	}
 end
 
+---@param frame Frame
+---@return VNode
 function p.main(frame)
 	local args = Arguments.getArgs(frame)
 	local limit = tonumber(args.limit)
 	local showMore = Logic.readBool(args.showMore)
 
 	local players = PowerRankingsData.players or {}
+	if limit then
+		players = Array.sub(players, 1, limit)
+	end
 
-	local updated = ''
+	local updated
 	if Logic.isNotEmpty(PowerRankingsData.updated) then
-		updated = PowerRankingsData.updated .. ' ' .. frame:expandTemplate{title = 'Abbr/UTC'}
+		updated = PowerRankingsData.updated .. ' ' .. DateExt.defaultTimezone
 	end
 
-	local rows = {}
-	for i, player in ipairs(players) do
-		if limit and i > limit then break end
-		local name = player.name or ''
-		local link = Logic.nilIfEmpty(player.link)
-		local orgKey = link or name
+	local rows = Array.map(players, function(entry)
+		local player = {
+			displayName = entry.name,
+			pageName = Logic.nilIfEmpty(entry.link) or entry.name,
+		}
+		PlayerExt.syncPlayer(player)
+		local teamTemplate = PlayerExt.syncTeam(player.pageName)
 
-		rows[#rows + 1] = TableWidgets.Row{children = {
-			TableWidgets.Cell{children = HtmlWidgets.B{children = player.rank}},
-			TableWidgets.Cell{children = HtmlWidgets.B{children = player.points}},
-			TableWidgets.Cell{children = renderPlayer(name, link)},
-			TableWidgets.Cell{children = renderOrg(orgKey, frame)},
+		return TableWidgets.Row{children = {
+			TableWidgets.Cell{children = HtmlWidgets.B{children = entry.rank}},
+			TableWidgets.Cell{children = HtmlWidgets.B{children = entry.points}},
+			TableWidgets.Cell{children = PlayerDisplay.BlockPlayer{player = player}},
+			TableWidgets.Cell{children = teamTemplate and OpponentDisplay.BlockOpponent{opponent = {
+				type = Opponent.team,
+				template = teamTemplate,
+			}} or nil},
 		}}
-	end
+	end)
 
-	return tostring(TableWidgets.Table{
+	return TableWidgets.Table{
 		title = buildTitle(updated),
 		sortable = false,
 		columns = {
@@ -166,7 +120,7 @@ function p.main(frame)
 			}},
 			TableWidgets.TableBody{children = rows},
 		},
-	})
+	}
 end
 
 return p
