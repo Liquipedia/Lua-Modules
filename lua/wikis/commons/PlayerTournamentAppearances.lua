@@ -32,7 +32,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
@@ -245,7 +245,7 @@ function Appearances:_header()
 		TableWidgets.Row{children = WidgetUtil.collect(
 			TableWidgets.CellHeader{},
 			TableWidgets.CellHeader{children = 'Player'},
-			TableWidgets.CellHeader{children = HtmlWidgets.Abbr{children = 'TA.', title = 'Total appearances'}},
+			TableWidgets.CellHeader{children = Html.Abbr{children = 'TA.', title = 'Total appearances'}},
 			Array.map(self.tournaments, function (tournament)
 				return TableWidgets.CellHeader{children = TournamentTitle{
 					tournament = tournament, useShortName = true

@@ -33,8 +33,8 @@ local Box = Lua.import('Module:Widget/Basic/Box')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local CopyToClipboard = Lua.import('Module:Widget/Basic/CopyToClipboard')
 local Dialog = Lua.import('Module:Widget/Basic/Dialog')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
@@ -221,7 +221,7 @@ end
 
 ---@return Widget
 function TournamentPlayerInfo:build()
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+	return Html.Fragment{children = WidgetUtil.collect(
 		self:buildIntro(),
 		Box{
 			children = WidgetUtil.collect(
@@ -443,7 +443,7 @@ function TournamentPlayerInfo:buildPlayerRow(player)
 			},
 			children = WidgetUtil.collect(
 				Link{link = player.pageName, children = player.displayName},
-				Logic.isNotEmpty(player.name) and HtmlWidgets.Span{
+				Logic.isNotEmpty(player.name) and Html.Span{
 					css = {
 						display = 'block',
 						['font-size'] = 'small',
@@ -457,7 +457,7 @@ function TournamentPlayerInfo:buildPlayerRow(player)
 			trigger = Button{
 				children = {
 					'Show',
-					HtmlWidgets.Span{
+					Html.Span{
 						classes = {'mobile-hide'},
 						children = ' photo'
 					}
