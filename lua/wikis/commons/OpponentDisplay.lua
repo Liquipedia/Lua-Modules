@@ -67,7 +67,7 @@ function OpponentDisplay.BracketOpponentEntry:createTeam(template, options)
 
 	local opponentNode = OpponentDisplay.BlockTeamContainer{
 		showLink = false,
-		style = forceShortName and 'short' or 'hybrid',
+		style = forceShortName and 'short' or 'dynamic',
 		template = template,
 	}
 
