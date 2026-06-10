@@ -19,7 +19,7 @@ local TypeUtil = Lua.import('Module:TypeUtil')
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local BracketDisplayComponents = Lua.import('Module:Widget/Match/Bracket/All')
 local BlockTeam = Lua.import('Module:Widget/TeamDisplay/Block')
 local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
@@ -212,7 +212,7 @@ function OpponentDisplay.BlockOpponent(props)
 
 	if opponent.type == Opponent.team then
 		if props.showTbd == false and Opponent.isTbd(opponent) then
-			return HtmlWidgets.Fragment{}
+			return Html.Fragment{}
 		end
 		return OpponentDisplay.BlockTeamContainer{
 			flip = props.flip,
@@ -238,9 +238,9 @@ function OpponentDisplay.BlockOpponent(props)
 end
 
 ---@param props BlockOpponentProps
----@return Widget
+---@return VNode
 function OpponentDisplay.BlockPlayers(props)
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = Array.extend('block-players-wrapper', props.additionalClasses),
 		children = OpponentDisplay.getBlockPlayerNodes(props)
 	}
@@ -303,11 +303,11 @@ OpponentDisplay.propTypes.BlockLiteral = {
 
 ---Displays the name of a literal opponent as a block element.
 ---@param props {flip: boolean?, name: string, overflow: OverflowModes, additionalClasses: string[]?}
----@return Widget
+---@return VNode
 function OpponentDisplay.BlockLiteral(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockLiteral)
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = Array.extend(
 			'brkts-opponent-block-literal',
 			props.flip and 'flipped' or nil,
@@ -326,15 +326,15 @@ OpponentDisplay.propTypes.BlockScore = {
 
 ---Displays a score within the context of a block element.
 ---@param props {isWinner: boolean?, scoreText: string|number?, additionalClasses: string[]?}
----@return Widget
+---@return VNode
 function OpponentDisplay.BlockScore(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockScore)
 
 	local scoreText = props.scoreText
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = props.additionalClasses,
-		children = props.isWinner and HtmlWidgets.B{children = scoreText} or scoreText
+		children = props.isWinner and Html.B{children = scoreText} or scoreText
 	}
 end
 
