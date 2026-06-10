@@ -367,17 +367,17 @@ function LegacyTeamCard.mapPlayers(tcArgs)
 	local function add(person, allowOverwrite)
 		local key = normalizeKey(person.link or person[1])
 		-- Dedup only within the same capacity: a staff entry must not replace a player entry.
-		if key ~= '' and isStaffCapacity(person) then
+		if Logic.isNotEmpty(key) and isStaffCapacity(person) then
 			key = key .. '::staff'
 		end
-		if key ~= '' and indexByKey[key] then
+		if Logic.isNotEmpty(key) and indexByKey[key] then
 			if allowOverwrite then
 				players[indexByKey[key]] = person
 			end
 			return
 		end
 		table.insert(players, person)
-		if key ~= '' then
+		if Logic.isNotEmpty(key) then
 			indexByKey[key] = #players
 		end
 	end
