@@ -13,6 +13,7 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local RoleUtil = Lua.import('Module:Role/Util')
 local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 local Tournament = Lua.import('Module:Tournament')
@@ -331,6 +332,22 @@ local function normalizeKey(value)
 	return value:gsub(' ', '_'):lower()
 end
 
+-- Mirrors the staff classification in TeamParticipants/Parse/Wiki so a person listed as
+-- both player and staff (e.g. coach subbing in as player) keeps both entries.
+---@param person table
+---@return boolean
+local function isStaffCapacity(person)
+	if person.type == 'staff' then
+		return true
+	end
+	if Logic.isEmpty(person.role) then
+		return false
+	end
+	return Array.any(RoleUtil.readRoleArgs(person.role), function(role)
+		return role.type == RoleUtil.ROLE_TYPE.STAFF
+	end)
+end
+
 ---@param tcArgs table
 ---@return table[]
 function LegacyTeamCard.mapPlayers(tcArgs)
@@ -349,14 +366,18 @@ function LegacyTeamCard.mapPlayers(tcArgs)
 
 	local function add(person, allowOverwrite)
 		local key = normalizeKey(person.link or person[1])
-		if key ~= '' and indexByKey[key] then
+		-- Dedup only within the same capacity: a staff entry must not replace a player entry.
+		if Logic.isNotEmpty(key) and isStaffCapacity(person) then
+			key = key .. '::staff'
+		end
+		if Logic.isNotEmpty(key) and indexByKey[key] then
 			if allowOverwrite then
 				players[indexByKey[key]] = person
 			end
 			return
 		end
 		table.insert(players, person)
-		if key ~= '' then
+		if Logic.isNotEmpty(key) then
 			indexByKey[key] = #players
 		end
 	end

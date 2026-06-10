@@ -299,6 +299,37 @@ describe('TeamCard Legacy', function()
             end
             assert.are_equal(1, pawnCount)
         end)
+
+        it('keeps both player and staff entries for the same person (staff tab)', function()
+            local players = LegacyTeamCard.mapPlayers({
+                p1 = 'Dhokla',
+                t3p1 = 'Dhokla', t3p1pos = 'Positional Coach', t3title = 'Staff',
+            })
+            assert.are_equal(2, #players)
+            assert.is_nil(players[1].type)
+            assert.is_nil(players[1].role)
+            assert.are_equal('staff', players[2].type)
+            assert.are_equal('Positional Coach', players[2].role)
+        end)
+
+        it('keeps both entries when a staff role sits in a default former tab', function()
+            local players = LegacyTeamCard.mapPlayers({
+                p1 = 'Dhokla',
+                t3p1 = 'Dhokla', t3p1pos = 'Positional Coach',
+            })
+            assert.are_equal(2, #players)
+            assert.is_nil(players[1].role)
+            assert.are_equal('Positional Coach', players[2].role)
+        end)
+
+        it('staff tab entry still dedups against an earlier staff tab entry', function()
+            local players = LegacyTeamCard.mapPlayers({
+                t2p1 = 'Goldenglue', t2p1pos = 'Head Coach', t2title = 'Staff',
+                t3p1 = 'Goldenglue', t3p1pos = 'Strategic Coach', t3title = 'Staff',
+            })
+            assert.are_equal(1, #players)
+            assert.are_equal('Strategic Coach', players[1].role)
+        end)
     end)
 
     describe('mapCoaches enumeration', function()
