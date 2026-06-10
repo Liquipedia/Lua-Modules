@@ -28,7 +28,7 @@ local zeroWidthSpace = '&#8203;'
 ---@class OpponentDisplay
 local OpponentDisplay = {propTypes = {}, types = {}}
 
-OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid', 'icon')
+OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid', 'icon', 'dynamic')
 ---@alias teamStyle 'standard'|'short'|'bracket'|'hybrid'|'icon'|'dynamic'
 
 ---Display component for an opponent entry appearing in a bracket match.
