@@ -161,12 +161,12 @@ function LegacyTeamCard._parseQualifierLink(rawQualifier)
 			return String.startsWith(lowered, prefix)
 		end)
 		if not isEmbed then
-			local parts = mw.text.split(inner, '|', true)
+			local parts = Array.parseCommaSeparatedString(inner, '|')
 			local link, displayName = parts[1], parts[2] or parts[1]
 			if String.startsWith(link, '/') then
 				link = mw.title.getCurrentTitle().fullText .. link
 			end
-			return mw.text.trim(displayName), mw.text.trim(link):gsub(' ', '_'), nil
+			return displayName, link:gsub(' ', '_'), nil
 		end
 	end
 
