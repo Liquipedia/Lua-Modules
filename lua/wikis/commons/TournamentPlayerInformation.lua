@@ -51,7 +51,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class TournamentPlayerInfo
 ---@operator call(table): TournamentPlayerInfo
----@field config {opponenttype: OpponentType?}
+---@field config {opponenttype: OpponentType?, player: boolean, staff: boolean}
 ---@field tournament StandardTournament
 ---@field protected data EnrichedStandardPlayer[]
 local TournamentPlayerInfo = Class.new(function(self, ...) self:init(...) end)
@@ -73,7 +73,9 @@ end
 ---@return self
 function TournamentPlayerInfo:init(args)
 	self.config = {
-		opponenttype = Logic.nilIfEmpty(args.opponenttype)
+		opponenttype = Logic.nilIfEmpty(args.opponenttype),
+		player = Logic.nilOr(Logic.readBoolOrNil(args.player), true),
+		staff = Logic.readBool(args.staff),
 	}
 
 	local pageName = Logic.emptyOr(args.pagename, args.page)
@@ -123,7 +125,10 @@ function TournamentPlayerInfo:_parseRecords(records)
 	local players = Array.flatMap(records, function (record)
 		local opponent = Opponent.fromLpdbStruct(record)
 
-		return Array.map(opponent.players, function (player, playerIndex)
+		---@param player standardPlayer
+		---@param playerIndex integer
+		---@return EnrichedStandardPlayer
+		local function processPlayer(player, playerIndex)
 			player.extradata = player.extradata or {}
 			player.extradata.index = playerIndex
 			if opponent.type == Opponent.team then
@@ -131,7 +136,21 @@ function TournamentPlayerInfo:_parseRecords(records)
 			end
 
 			return Table.merge(self:queryPlayerInfo(player), {fromOpponentType = opponent.type})
-		end)
+		end
+
+		---@type EnrichedStandardPlayer[]
+		local players = {}
+
+		if self.config.player then
+			Array.extendWith(players, Array.map(opponent.players, processPlayer))
+		end
+		if self.config.staff then
+			local staff = Array.mapIndexes(function (index)
+				return Logic.nilIfEmpty(Opponent.staffFromLpdbStruct(players, index))
+			end)
+			Array.extendWith(players, Array.map(staff, processPlayer))
+		end
+		return players
 	end)
 
 	-- sort by displayName if we have no team opponents

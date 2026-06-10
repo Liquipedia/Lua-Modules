@@ -152,7 +152,9 @@ function Appearances:_fetchPlayers(pageNames)
 		query = 'opponentplayers, opponenttype, opponentname, parent, date, placement, opponenttemplate',
 	}, function (placement)
 		local opponent = Opponent.fromLpdbStruct(placement)
-		Array.forEach(opponent.players, function (player)
+
+		---@param player standardPlayer
+		local function processPlayer(player)
 			if Opponent.playerIsTbd(player) then
 				return
 			end
@@ -176,7 +178,16 @@ function Appearances:_fetchPlayers(pageNames)
 			}
 			local rawPlacement = Placement.raw(placement.placement)
 			extradata.placementSum = extradata.placementSum + (tonumber(rawPlacement.placement[1]) or 1000)
-		end)
+		end
+
+		if self.config.player then
+			Array.forEach(opponent.players, processPlayer)
+		end
+		if self.config.staff then
+			Array.forEach(Array.mapIndexes(function (index)
+				return Logic.nilIfEmpty(Opponent.staffFromLpdbStruct(placement.opponentplayers, index))
+			end), processPlayer)
+		end
 	end)
 
 	local playersArray = Array.extractValues(players)
