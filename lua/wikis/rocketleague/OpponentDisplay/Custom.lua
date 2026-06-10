@@ -13,8 +13,11 @@ local Table = Lua.import('Module:Table')
 local Opponent = Lua.import('Module:Opponent')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 
+---@class RocketLeagueOpponentDisplay: OpponentDisplay
 local CustomOpponentDisplay = Table.deepCopy(OpponentDisplay)
 
+---@class RocketLeagueBracketOpponentEntry: BracketOpponentEntry
+---@operator call(...): RocketLeagueBracketOpponentEntry
 CustomOpponentDisplay.BracketOpponentEntry = Class.new(OpponentDisplay.BracketOpponentEntry, function(self) end)
 
 ---@class RocketLeagueStandardOpponent:standardOpponent

@@ -28,10 +28,8 @@ local StarcraftOpponentDisplay = Table.copy(OpponentDisplay)
 ---@field opponent StarcraftStandardOpponent
 
 ---Display component for an opponent entry appearing in a bracket match.
----@class StarcraftBracketOpponentEntry
+---@class StarcraftBracketOpponentEntry: BracketOpponentEntry
 ---@operator call(...): StarcraftBracketOpponentEntry
----@field content Html
----@field root Html
 local BracketOpponentEntry = Class.new(OpponentDisplay.BracketOpponentEntry,
 	---@param self self
 	---@param opponent StarcraftStandardOpponent

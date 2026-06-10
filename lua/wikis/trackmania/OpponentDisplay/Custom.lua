@@ -14,12 +14,15 @@ local Table = Lua.import('Module:Table')
 local Opponent = Lua.import('Module:Opponent')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 
+---@class TrackmaniaOpponentDisplay: OpponentDisplay
 local OpponentDisplayCustom = Table.deepCopy(OpponentDisplay)
 
 local SCORE_STATUS = 'S'
 local NO_SCORE = -1
 local ZERO_SCORE = 0
 
+---@class TrackmaniaBracketOpponentEntry: BracketOpponentEntry
+---@operator call(...): TrackmaniaBracketOpponentEntry
 OpponentDisplayCustom.BracketOpponentEntry = Class.new(OpponentDisplay.BracketOpponentEntry)
 
 ---@class TrackmaniaStandardOpponent:standardOpponent
