@@ -14,6 +14,7 @@ local inGameRoles = {
 	['support'] = {category = 'Support players', display = 'Support', sortOrder = 5},
 }
 
+inGameRoles['top'] = inGameRoles.baron
 inGameRoles['jgl'] = inGameRoles.jungle
 inGameRoles['solomiddle'] = inGameRoles.mid
 inGameRoles['carry'] = inGameRoles.dragon

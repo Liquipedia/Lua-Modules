@@ -7,7 +7,9 @@
 
 local Lua = require('Module:Lua')
 
+local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
@@ -22,6 +24,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
+local legacyVars = PageVariableNamespace('LegacyTeamCard')
 
 local PositionConvert = Lua.requireIfExists('Module:PositionName/data', {loadData = true}) or {}
 
@@ -56,6 +59,28 @@ local function partitionStash(entries)
 		end
 	end)
 	return toggles, header, cards
+end
+
+-- Invoked by Template:TeamCard columns start. Opens the wrapper and stashes the header entry.
+---@param frame Frame
+---@return string
+function LegacyTeamCard.stashHeader(frame)
+	legacyVars:set('wrapperOpen', 'true')
+	local args = Arguments.getArgs(frame)
+	args.__source = 'header'
+	return Template.stashReturnValue(args, 'LegacyTeamCard')
+end
+
+-- Invoked by Template:TeamCard. Flags the page if no wrapper is open, then stashes the card entry.
+---@param frame Frame
+---@return string
+function LegacyTeamCard.stashCard(frame)
+	if not Logic.readBool(legacyVars:get('wrapperOpen')) then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with unwrapped Legacy TeamCard')
+	end
+	local args = Arguments.getArgs(frame)
+	args.__source = 'card'
+	return Template.stashReturnValue(args, 'LegacyTeamCard')
 end
 
 ---@param dependency table<string, function>?
@@ -109,6 +134,7 @@ function LegacyTeamCard.run(dependency)
 		}
 	end
 
+	legacyVars:delete('wrapperOpen')
 	return HtmlWidgets.Fragment{children = WidgetUtil.collect(notesWidget, display)}
 end
 
@@ -310,6 +336,7 @@ end
 ---@return string
 local function normalizeKey(value)
 	if Logic.isEmpty(value) then return '' end
+	---@cast value -nil
 	return value:gsub(' ', '_'):lower()
 end
 
@@ -405,6 +432,18 @@ function LegacyTeamCard.mapCoaches(tcArgs)
 	return coaches
 end
 
+---@param parsedNotes table
+---@return {[1]: string, highlighted: boolean}[]
+local function parseNotes(parsedNotes)
+	return Array.mapIndexes(function (index)
+		local note = parsedNotes['n' .. index]
+		if Logic.isEmpty(note) then
+			return
+		end
+		return {[1] = note, highlighted = false}
+	end)
+end
+
 ---@param tcArgs table
 ---@return table  -- TP opponent arg
 function LegacyTeamCard.mapCard(tcArgs)
@@ -430,10 +469,20 @@ function LegacyTeamCard.mapCard(tcArgs)
 
 	local notes = {}
 	if Logic.isNotEmpty(tcArgs.notes) then
-		table.insert(notes, {[1] = tcArgs.notes, highlighted = false})
+		local parsedNotes = Json.parseIfTable(tcArgs.notes)
+		if parsedNotes then
+			Array.extendWith(notes, parseNotes(parsedNotes))
+		else
+			table.insert(notes, {[1] = tcArgs.notes, highlighted = false})
+		end
 	end
 	if Logic.isNotEmpty(tcArgs.inotes) then
-		table.insert(notes, {[1] = tcArgs.inotes, highlighted = false})
+		local parsedNotes = Json.parseIfTable(tcArgs.inotes)
+		if parsedNotes then
+			Array.extendWith(notes, parseNotes(parsedNotes))
+		else
+			table.insert(notes, {[1] = tcArgs.inotes, highlighted = false})
+		end
 	end
 	if #notes > 0 then card.notes = notes end
 

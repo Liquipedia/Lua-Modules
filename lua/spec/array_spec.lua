@@ -141,6 +141,13 @@ describe('array', function()
 		end)
 	end)
 
+	describe('FlatMap', function()
+		it('check', function()
+			local a = {1, 1, 2, 1, 2, 3, 1, 2, 3, 4}
+			assert.are_same(a, Array.flatMap(Array.range(1, 4), function(i) return Array.range(1, i) end))
+		end)
+	end)
+
 	describe('All', function()
 		it('check', function()
 			local a = {1, 2, 3}
