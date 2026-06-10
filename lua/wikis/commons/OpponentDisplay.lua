@@ -238,7 +238,7 @@ function OpponentDisplay.BlockOpponent(props)
 end
 
 ---@param props BlockOpponentProps
----@return Widget
+---@return VNode
 function OpponentDisplay.BlockPlayers(props)
 	return Html.Div{
 		classes = Array.extend('block-players-wrapper', props.additionalClasses),
@@ -303,7 +303,7 @@ OpponentDisplay.propTypes.BlockLiteral = {
 
 ---Displays the name of a literal opponent as a block element.
 ---@param props {flip: boolean?, name: string, overflow: OverflowModes, additionalClasses: string[]?}
----@return Widget
+---@return VNode
 function OpponentDisplay.BlockLiteral(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockLiteral)
 
@@ -326,7 +326,7 @@ OpponentDisplay.propTypes.BlockScore = {
 
 ---Displays a score within the context of a block element.
 ---@param props {isWinner: boolean?, scoreText: string|number?, additionalClasses: string[]?}
----@return Widget
+---@return VNode
 function OpponentDisplay.BlockScore(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockScore)
 
