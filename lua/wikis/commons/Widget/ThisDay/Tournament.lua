@@ -20,7 +20,7 @@ local ThisDayQuery = Lua.import('Module:ThisDay/Query')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local ListWidgets = Lua.import('Module:Widget/List')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -109,7 +109,7 @@ function ThisDayTournament._displayWins(yearData)
 		return Array.append(row, OpponentDisplay.InlineOpponent{opponent = opponent})
 	end)
 
-	return UnorderedList{ children = display }
+	return ListWidgets.Unordered{ children = display }
 end
 
 return ThisDayTournament
