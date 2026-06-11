@@ -39,6 +39,18 @@ describe('TeamCard Legacy', function()
 			stubTournament:revert()
 		end)
 
+		it('skips a leading icon embed and parses the real internal link', function()
+			local stubTournament = stub(require('Module:Tournament'), 'getTournament',
+				function() return {pageName = 'King_Pro_League/2020/Spring'} end)
+			local q = LegacyTeamCard.parseQualifier(
+				'[[File:KPL_Logo_small.png|link=KPL]] [[King_Pro_League/2020/Spring|KPL Champion]]')
+			assert.are_same(
+				{method = 'qual', type = 'tournament', page = 'King_Pro_League/2020/Spring', text = 'KPL Champion'},
+				q
+			)
+			stubTournament:revert()
+		end)
+
 		it('parses external link as method=qual type=external', function()
 			local q = LegacyTeamCard.parseQualifier('[https://foo.bar Foo Bar]')
 			assert.are_same({method = 'qual', type = 'external', url = 'https://foo.bar', text = 'Foo Bar'}, q)
