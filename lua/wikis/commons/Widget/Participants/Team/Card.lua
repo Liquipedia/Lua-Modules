@@ -14,8 +14,11 @@ local I18n = Lua.import('Module:I18n')
 
 local Widget = Lua.import('Module:Widget')
 local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local B = HtmlWidgets.B
 local Div = HtmlWidgets.Div
+local Span = HtmlWidgets.Span
 local TeamHeader = Lua.import('Module:Widget/Participants/Team/Header')
 local ParticipantNotification = Lua.import('Module:Widget/Participants/Team/ParticipantNotification')
 local TeamQualifierInfo = Lua.import('Module:Widget/Participants/Team/QualifierInfo')
@@ -53,8 +56,21 @@ function ParticipantsTeamCard:render()
 	})
 
 	if participant.notes and #participant.notes > 0 then
-		table.insert(content, Div{
-			classes = {'team-participant-card__notifications'},
+		table.insert(content, Collapsible{
+			shouldCollapse = true,
+			classes = {'team-participant-card__notes'},
+			collapseAreaClasses = {'team-participant-card__notifications'},
+			titleWidget = Div{
+				classes = {'team-participant-card__notes-header'},
+				attributes = {['data-collapsible-click-region'] = 'true'},
+				children = {
+					B{children = I18n.translate('participants-notes-label', {count = #participant.notes})},
+					Span{
+						classes = {'team-participant-card__notes-toggle'},
+						children = {Icon{iconName = 'expand'}},
+					},
+				},
+			},
 			children = Array.map(participant.notes, function(note)
 				return ParticipantNotification{
 					text = note.text,

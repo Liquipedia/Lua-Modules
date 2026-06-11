@@ -392,18 +392,47 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 		}
 	}
 
+	&__notes {
+		margin-top: 0.25rem;
+	}
+
+	&__notes-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.5rem 0.75rem;
+		font-size: 0.75rem;
+		cursor: pointer;
+
+		.theme--light & {
+			background-color: var( --clr-on-surface-light-primary-4 );
+			color: var( --clr-secondary-25 );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+			color: var( --clr-secondary-90 );
+		}
+	}
+
+	&__notes-toggle {
+		display: inline-flex;
+		transition: transform 0.2s;
+	}
+
+	&__notes:not( .collapsed ) &__notes-toggle {
+		transform: rotate( 180deg );
+	}
+
 	&__notifications {
 		display: flex;
 		flex-direction: column;
 		gap: 0.25rem;
-		margin: 0.5rem 0.5rem 0;
+		padding-top: 0.25rem;
 	}
 
 	&__notification {
-		display: flex;
-		gap: 0.25rem;
-		padding: 0.25rem;
-		border-radius: 0.25rem;
+		padding: 0.5rem 0.75rem;
 		font-size: 0.75rem;
 
 		.theme--light & {
@@ -425,12 +454,6 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 			.theme--dark & {
 				background-color: var( --clr-semantic-gold-30 );
 				color: var( --clr-semantic-gold-90 );
-			}
-
-			.team-participant-card__notification-icon {
-				.theme--light & {
-					color: var( --clr-semantic-gold-30 );
-				}
 			}
 		}
 	}
@@ -644,7 +667,7 @@ body:has( .switch-toggle-active#{ $compact-selector } ) {
 			}
 
 			.team-participant-card__qualifier--content,
-			.team-participant-card__notifications {
+			.team-participant-card__notes {
 				display: none;
 			}
 		}
