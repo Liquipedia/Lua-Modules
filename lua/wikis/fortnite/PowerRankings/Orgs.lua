@@ -8,17 +8,28 @@
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
 local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
+local MathUtil = Lua.import('Module:MathUtil')
 local Page = Lua.import('Module:Page')
-local PlayerDisplay = Lua.import('Module:Player/Display')
-local PlayerExt = Lua.import('Module:Player/Ext')
+local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Variables = Lua.import('Module:Variables')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
+local PlayerExt = Lua.import('Module:Player/Ext/Custom')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -26,16 +37,22 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local PowerRankingsData = Lua.import('Module:PowerRankings/Data', {loadData = true})
 local DISPLAY_PAGE = 'Fortnite Power Rankings/Organizations'
 local TOP_N = 200
 local MAX_PLAYERS_PER_ORG = 4
+local MAX_PLAYERS_PER_PLACEMENT = 10
 local DEFAULT_WEIGHTS = {count = 0.12, pr = 0.35, cash = 0.45}
 
-local p = {}
+local PowerRankingsOrgs = {}
 
-local function queryPlayerOrg(name)
+local function normalizeName(name)
+	return string.lower((name or ''):gsub('[%s_]', ''))
+end
+
+local function resolvePrimaryTeam(name)
 	if Logic.isEmpty(name) then
 		return ''
 	end
@@ -48,92 +65,36 @@ local function queryPlayerOrg(name)
 		conditions = conditions:toString(),
 		limit = 1,
 	})[1] or {}
-	return row.team or ''
-end
-
-local function wrap(tbl)
-	return tostring(mw.html.create('div')
-		:addClass('table-responsive')
-		:css('overflow-x', 'auto')
-		:css('width', '100%')
-		:node(tbl))
-end
-
-local function themedText(content)
-	return '<span class="show-when-light-mode" style="color:#000;">' .. content .. '</span>'
-		.. '<span class="show-when-dark-mode" style="color:#fff;">' .. content .. '</span>'
-end
-
-local function formatNumber(n)
-	local s = tostring(math.floor((tonumber(n) or 0) + 0.5))
-	return (s:reverse():gsub('(%d%d%d)', '%1,'):reverse():gsub('^,', ''))
-end
-
-local function resolvePlayerTeams(players)
-	local result = {}
-	for i, pl in ipairs(players) do
-		result[i] = Logic.nilIfEmpty(queryPlayerOrg(pl.link or pl.name))
+	local primary = Logic.nilIfEmpty(row.team)
+	if primary then
+		return primary
 	end
-	return result
+	return PlayerExt.syncTeam(Page.pageifyLink(name)) or ''
 end
 
-local function resolveOrgFlags(list)
-	local pageByTeam = {}
-	local pages = {}
-	for _, o in ipairs(list) do
-		local ok, raw = pcall(mw.ext.TeamTemplate.raw, o.team)
-		if ok and type(raw) == 'table' and Logic.isNotEmpty(raw.page) then
-			local page = raw.page:gsub(' ', '_')
-			pageByTeam[o.team] = page
-			table.insert(pages, page)
-		end
-	end
-
-	local locByPage = {}
-	local CHUNK = 50
-	for start = 1, #pages, CHUNK do
-		local conditions = ConditionTree(BooleanOperator.any)
-		for k = start, math.min(start + CHUNK - 1, #pages) do
-			conditions:add{ConditionNode(ColumnName('pagename'), Comparator.eq, pages[k])}
-		end
-		local rows = mw.ext.LiquipediaDB.lpdb('team', {
-			conditions = conditions:toString(),
-			query = 'pagename, location',
-			limit = 1000,
-		}) or {}
-		for _, r in ipairs(rows) do
-			if Logic.isNotEmpty(r.pagename) then
-				locByPage[r.pagename:gsub(' ', '_')] = r.location
-			end
-		end
-	end
-
-	for _, o in ipairs(list) do
-		local page = pageByTeam[o.team]
-		o.flag = page and Logic.nilIfEmpty(locByPage[page]) or nil
-	end
-end
-
-local function normalizeName(name)
-	return string.lower((name or ''):gsub('[%s_]', ''))
+local function formatNumber(value)
+	return mw.getContentLanguage():formatNum(MathUtil.round(tonumber(value) or 0))
 end
 
 local function orgPageKey(team)
-	local ok, raw = pcall(mw.ext.TeamTemplate.raw, team)
-	local page = (ok and type(raw) == 'table' and Logic.isNotEmpty(raw.page)) and raw.page or team
+	local raw = TeamTemplate.getRawOrNil(team)
+	local page = raw and Logic.nilIfEmpty(raw.page) or team
 	return normalizeName(page)
 end
 
 local function storeOrgRankings(list)
-	for rank, o in ipairs(list) do
+	if Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
+		return
+	end
+	Array.forEach(list, function(o, rank)
 		local key = orgPageKey(o.team)
 		mw.ext.LiquipediaDB.lpdb_datapoint('FTN_ORG_PR_' .. key, {
 			type = 'FTN_ORG_PR',
 			name = key,
 			information = rank,
-			extradata = {score = string.format('%.1f', o.score)},
+			extradata = {score = MathUtil.formatRounded{value = o.score, precision = 1}},
 		})
-	end
+	end)
 end
 
 local function tournamentIcon(icon, icondark, page, size)
@@ -163,25 +124,32 @@ local function gatherPlacementData(year)
 		local opType = item.opponenttype
 		local opName = item.opponentname
 
-		for i = 1, 10 do
-			local pName = opPlayers['p' .. i]
-			if Logic.isNotEmpty(pName) then
-				local teamRaw = opPlayers['p' .. i .. 'team']
-				if Logic.isEmpty(teamRaw) and opType == 'team' then
-					teamRaw = opName
-				end
-				if Logic.isNotEmpty(teamRaw) then
-					local norm = normalizeName(teamRaw)
-					earnings[norm] = (earnings[norm] or 0) + indiv
-					if isSTierWin and Logic.isNotEmpty(page) then
-						winPages[norm] = winPages[norm] or {}
-						if not winPages[norm][page] then
-							winPages[norm][page] = true
-							pageSet[page] = true
-						end
-					end
-				end
+		local function processPlayer(i)
+			if Logic.isEmpty(opPlayers['p' .. i]) then
+				return
 			end
+			local teamRaw = opPlayers['p' .. i .. 'team']
+			if Logic.isEmpty(teamRaw) and opType == 'team' then
+				teamRaw = opName
+			end
+			if Logic.isEmpty(teamRaw) then
+				return
+			end
+			local norm = normalizeName(teamRaw)
+			earnings[norm] = (earnings[norm] or 0) + indiv
+			if not (isSTierWin and Logic.isNotEmpty(page)) then
+				return
+			end
+			winPages[norm] = winPages[norm] or {}
+			if winPages[norm][page] then
+				return
+			end
+			winPages[norm][page] = true
+			pageSet[page] = page
+		end
+
+		for i = 1, MAX_PLAYERS_PER_PLACEMENT do
+			processPlayer(i)
 		end
 	end
 
@@ -197,40 +165,139 @@ local function gatherPlacementData(year)
 		limit = 5000,
 	}, process)
 
-	local pages = {}
-	for page in pairs(pageSet) do table.insert(pages, page) end
+	local pages = Array.extractValues(pageSet)
 
 	local details = {}
-	local CHUNK = 40
-	for start = 1, #pages, CHUNK do
-		local conditions = ConditionTree(BooleanOperator.any)
-		for k = start, math.min(start + CHUNK - 1, #pages) do
-			conditions:add{ConditionNode(ColumnName('pagename'), Comparator.eq, pages[k])}
-		end
-		local rows = mw.ext.LiquipediaDB.lpdb('tournament', {
-			conditions = conditions:toString(),
+	if Logic.isNotEmpty(pages) then
+		local tournamentRows = mw.ext.LiquipediaDB.lpdb('tournament', {
+			conditions = ConditionUtil.anyOf(ColumnName('pagename'), pages):toString(),
 			query = 'pagename, name, icon, icondark',
 			limit = 100,
 		}) or {}
-		for _, t in ipairs(rows) do
-			details[t.pagename] = {
-				name = Logic.nilIfEmpty(t.name) or t.pagename:gsub('_', ' '),
-				icon = t.icon,
-				icondark = t.icondark,
+		Array.forEach(tournamentRows, function(tournamentRow)
+			details[tournamentRow.pagename] = {
+				name = Logic.nilIfEmpty(tournamentRow.name) or tournamentRow.pagename:gsub('_', ' '),
+				icon = tournamentRow.icon,
+				icondark = tournamentRow.icondark,
 			}
-		end
+		end)
 	end
 
 	return earnings, winPages, details
 end
 
-function p.main(frame)
+local function resolveOrgFlags(list)
+	local pageByTeam = {}
+	local pages = {}
+	Array.forEach(list, function(o)
+		local raw = TeamTemplate.getRawOrNil(o.team)
+		if raw and Logic.isNotEmpty(raw.page) then
+			local page = raw.page:gsub(' ', '_')
+			pageByTeam[o.team] = page
+			table.insert(pages, page)
+		end
+	end)
+
+	local locByPage = {}
+	if Logic.isNotEmpty(pages) then
+		local teamRows = mw.ext.LiquipediaDB.lpdb('team', {
+			conditions = ConditionUtil.anyOf(ColumnName('pagename'), pages):toString(),
+			query = 'pagename, location',
+			limit = 1000,
+		}) or {}
+		Array.forEach(teamRows, function(teamRow)
+			if Logic.isNotEmpty(teamRow.pagename) then
+				locByPage[teamRow.pagename] = teamRow.location
+			end
+		end)
+	end
+
+	Array.forEach(list, function(o)
+		local page = pageByTeam[o.team]
+		o.flag = page and Logic.nilIfEmpty(locByPage[page]) or nil
+	end)
+end
+
+---@param updated string?
+---@return Widget
+local function buildTitle(updated)
+	return HtmlWidgets.Div{children = WidgetUtil.collect(
+		HtmlWidgets.B{children = 'Fortnite Organization Power Rankings'},
+		Logic.isNotEmpty(updated) and HtmlWidgets.Span{
+			css = {['font-weight'] = 'normal'},
+			children = {HtmlWidgets.Br{}, 'Last Updated: ', updated},
+		} or nil
+	)}
+end
+
+---@return Widget
+local function buildFooter()
+	return Link{
+		link = DISPLAY_PAGE,
+		linktype = 'internal',
+		children = {
+			HtmlWidgets.Div{
+				children = {'See Rankings Page', Icon.makeIcon{iconName = 'goto'}},
+				classes = {'ranking-table__footer-button'},
+			},
+		},
+	}
+end
+
+---@param wrapped boolean
+---@param year integer
+---@return Widget
+local function buildHeader(wrapped, year)
+	return TableWidgets.Row{children = WidgetUtil.collect(
+		TableWidgets.CellHeader{children = 'Rank'},
+		TableWidgets.CellHeader{children = ''},
+		TableWidgets.CellHeader{children = 'Organization'},
+		TableWidgets.CellHeader{children = 'Four Best Players (In Top ' .. TOP_N .. ')'},
+		not wrapped and TableWidgets.CellHeader{children = 'Recent Achievements'} or nil,
+		TableWidgets.CellHeader{children = 'Score'},
+		not wrapped and TableWidgets.CellHeader{children = 'Average Players PR'} or nil,
+		not wrapped and TableWidgets.CellHeader{children = 'Earnings (' .. year .. ')'} or nil
+	)}
+end
+
+---@param rank integer
+---@param o table
+---@param wrapped boolean
+---@return Widget
+local function buildRow(rank, o, wrapped)
+	local flagCell = Logic.isNotEmpty(o.flag) and Flags.Icon{flag = o.flag, shouldLink = false} or ''
+	local memberDisplays = Array.map(Array.sub(o.members, 1, o.count), function(m)
+		local player = {displayName = m.name, pageName = Logic.nilIfEmpty(m.link) or m.name}
+		PlayerExt.syncPlayer(player)
+		return tostring(PlayerDisplay.InlinePlayer{player = player})
+	end)
+	local membersText = table.concat(memberDisplays, ', ') .. ' (' .. o.count .. ')'
+	local achievementsText = table.concat(Array.map(o.achievements or {}, function(a)
+		return tournamentIcon(a.icon, a.icondark, a.page, '30x30px')
+	end))
+
+	return TableWidgets.Row{children = WidgetUtil.collect(
+		TableWidgets.Cell{children = HtmlWidgets.B{children = rank}},
+		TableWidgets.Cell{children = flagCell},
+		TableWidgets.Cell{children = OpponentDisplay.BlockOpponent{
+			opponent = {type = Opponent.team, template = o.team},
+		}},
+		TableWidgets.Cell{children = membersText},
+		not wrapped and TableWidgets.Cell{children = achievementsText} or nil,
+		TableWidgets.Cell{children = HtmlWidgets.B{children = MathUtil.formatRounded{value = o.score, precision = 1}}},
+		not wrapped and TableWidgets.Cell{children = formatNumber(o.avgPR)} or nil,
+		not wrapped and TableWidgets.Cell{children = '$' .. formatNumber(o.cash)} or nil
+	)}
+end
+
+---@param frame Frame
+---@return Widget
+function PowerRankingsOrgs.main(frame)
 	local args = Arguments.getArgs(frame)
 	local limit = tonumber(args.limit)
 	local showMore = Logic.readBool(args.showMore)
 	local wrapped = Logic.readBool(args.wrapped)
-	local colspan = wrapped and 5 or 8
-	local year = tonumber(args.year) or tonumber(os.date('!%Y'))
+	local year = tonumber(args.year) or DateExt.getYearOf(DateExt.getContextualDateOrNow())
 	local weights = {
 		count = tonumber(args.wCount) or DEFAULT_WEIGHTS.count,
 		pr = tonumber(args.wPR) or DEFAULT_WEIGHTS.pr,
@@ -238,59 +305,56 @@ function p.main(frame)
 	}
 	local weightSum = weights.count + weights.pr + weights.cash
 
-	local players = {}
-	for _, pl in ipairs(PowerRankingsData.players or {}) do
-		if (tonumber(pl.rank) or 0) <= TOP_N then
-			table.insert(players, pl)
-		end
+	local updated
+	if Logic.isNotEmpty(PowerRankingsData.updated) then
+		updated = PowerRankingsData.updated .. ' ' .. DateExt.defaultTimezone
 	end
-	local teams = resolvePlayerTeams(players)
+
+	local players = Array.filter(PowerRankingsData.players or {}, function(pl)
+		return (tonumber(pl.rank) or 0) <= TOP_N
+	end)
 
 	local byOrg = {}
-	for i, pl in ipairs(players) do
-		local team = teams[i]
-		if team then
-			byOrg[team] = byOrg[team] or {}
-			table.insert(byOrg[team], {
-				name = pl.name,
-				link = pl.link,
-				points = tonumber(pl.points) or 0,
-			})
+	Array.forEach(players, function(pl)
+		local team = Logic.nilIfEmpty(resolvePrimaryTeam(pl.link or pl.name))
+		if not team then
+			return
 		end
-	end
+		byOrg[team] = byOrg[team] or {}
+		table.insert(byOrg[team], {name = pl.name, link = pl.link, points = tonumber(pl.points) or 0})
+	end)
 
 	local list = {}
 	for team, members in pairs(byOrg) do
 		table.sort(members, function(a, b) return a.points > b.points end)
 		local count = math.min(#members, MAX_PLAYERS_PER_ORG)
-		local sum = 0
-		for k = 1, count do sum = sum + members[k].points end
+		local topPoints = Array.map(Array.sub(members, 1, count), function(m) return m.points end)
 		table.insert(list, {
 			team = team,
 			members = members,
 			count = count,
-			avgPR = sum / count,
+			avgPR = MathUtil.sum(topPoints) / count,
 		})
 	end
 
 	local teamEarnings, teamWinPages, tournamentDetails = gatherPlacementData(year)
-	for _, o in ipairs(list) do
-		o.histNames = Team.queryHistoricalNames(o.team) or {o.team}
-		local cash = 0
-		for _, nm in ipairs(o.histNames) do
-			cash = cash + (teamEarnings[normalizeName(nm)] or 0)
+	Array.forEach(list, function(o)
+		o.histNames = Team.queryHistoricalNames(o.team)
+		if Logic.isEmpty(o.histNames) then
+			o.histNames = {o.team}
 		end
-		o.cash = cash
-	end
+		o.cash = Array.reduce(o.histNames, function(total, nm)
+			return total + (teamEarnings[normalizeName(nm)] or 0)
+		end, 0)
+	end)
 
 	local n = #list
 	local function rankNormalize(getValue, field)
 		if n <= 1 then
-			for _, o in ipairs(list) do o[field] = 1 end
+			Array.forEach(list, function(o) o[field] = 1 end)
 			return
 		end
-		local sorted = {}
-		for _, o in ipairs(list) do table.insert(sorted, o) end
+		local sorted = Table.copy(list)
 		table.sort(sorted, function(a, b) return getValue(a) < getValue(b) end)
 		local i = 1
 		while i <= n do
@@ -306,9 +370,9 @@ function p.main(frame)
 	rankNormalize(function(o) return o.avgPR end, 'nPR')
 	rankNormalize(function(o) return o.cash end, 'nCash')
 
-	for _, o in ipairs(list) do
+	Array.forEach(list, function(o)
 		o.score = 100 * (weights.count * o.nCount + weights.pr * o.nPR + weights.cash * o.nCash) / weightSum
-	end
+	end)
 
 	table.sort(list, function(a, b)
 		if a.score ~= b.score then return a.score > b.score end
@@ -319,114 +383,57 @@ function p.main(frame)
 		storeOrgRankings(list)
 	end
 
-	local display = {}
-	for i, o in ipairs(list) do
-		if limit and i > limit then break end
-		table.insert(display, o)
-	end
+	local display = limit and Array.sub(list, 1, limit) or list
 
 	if not wrapped then
-		for _, o in ipairs(display) do
+		Array.forEach(display, function(o)
 			local achievements = {}
 			local seen = {}
-			for _, nm in ipairs(o.histNames) do
+			Array.forEach(o.histNames, function(nm)
 				local pagesForTeam = teamWinPages[normalizeName(nm)]
-				if pagesForTeam then
-					for page in pairs(pagesForTeam) do
-						if not seen[page] then
-							seen[page] = true
-							local d = tournamentDetails[page] or {name = page:gsub('_', ' '), icon = '', icondark = ''}
-							table.insert(achievements, {page = page, name = d.name, icon = d.icon, icondark = d.icondark})
-						end
+				if not pagesForTeam then
+					return
+				end
+				for page in pairs(pagesForTeam) do
+					if not seen[page] then
+						seen[page] = true
+						local d = tournamentDetails[page] or {name = page:gsub('_', ' '), icon = '', icondark = ''}
+						table.insert(achievements, {page = page, name = d.name, icon = d.icon, icondark = d.icondark})
 					end
 				end
-			end
+			end)
 			o.achievements = achievements
-		end
+		end)
 	end
 
 	resolveOrgFlags(display)
 
-	local tbl = mw.html.create('table')
-		:addClass('table2__table wikitable wikitable-striped wikitable-bordered')
-		:css('width', '100%')
-		:css('border-collapse', 'collapse')
+	local columns = WidgetUtil.collect(
+		{align = 'center'},
+		{align = 'center'},
+		{align = 'left'},
+		{align = 'left'},
+		not wrapped and {align = 'center'} or nil,
+		{align = 'center'},
+		not wrapped and {align = 'center'} or nil,
+		not wrapped and {align = 'center'} or nil
+	)
 
-	local title = "'''Fortnite Organization Power Rankings'''"
-	if Logic.isNotEmpty(PowerRankingsData.updated) then
-		local utc = frame:expandTemplate{title = 'Abbr/UTC'}
-		title = title .. "<br><small>''Last Updated: " .. PowerRankingsData.updated .. ' ' .. utc .. "''</small>"
-	end
-	tbl:tag('tr'):tag('th')
-		:attr('colspan', colspan)
-		:wikitext(themedText(title))
+	local rows = Array.map(display, function(o, rank)
+		return buildRow(rank, o, wrapped)
+	end)
 
-	local header = tbl:tag('tr')
-	header:tag('th'):css('width', '1%'):css('white-space', 'nowrap'):wikitext('Rank')
-	header:tag('th'):css('width', '1%'):css('padding', '0 8px'):wikitext('')
-	header:tag('th'):css('text-align', 'left'):wikitext('Organization')
-	header:tag('th'):css('text-align', 'left'):wikitext('Four Best Players (In Top 200)')
-	if not wrapped then
-		header:tag('th'):css('text-align', 'center'):wikitext('Recent Achievements')
-	end
-	header:tag('th'):css('width', '1%'):css('white-space', 'nowrap'):wikitext('Score')
-	if not wrapped then
-		header:tag('th'):css('width', '1%'):css('white-space', 'nowrap'):wikitext('Average Players PR')
-		header:tag('th'):css('width', '1%'):css('white-space', 'nowrap'):wikitext('Earnings (' .. year .. ')')
-	end
-
-	for i, o in ipairs(display) do
-		local row = tbl:tag('tr')
-		row:tag('td'):css('text-align', 'center'):css('white-space', 'nowrap'):wikitext('<b>' .. i .. '</b>')
-		local flagCell = Logic.isNotEmpty(o.flag) and Flags.Icon{flag = o.flag, shouldLink = false} or ''
-		row:tag('td'):css('text-align', 'center'):css('white-space', 'nowrap'):css('padding', '0 8px'):wikitext(flagCell)
-		row:tag('td'):css('text-align', 'left'):css('white-space', 'nowrap')
-			:wikitext(frame:expandTemplate{title = 'Team', args = {o.team}})
-		local names = {}
-		for k = 1, o.count do
-			local m = o.members[k]
-			local player = {
-				displayName = m.name,
-				pageName = Logic.nilIfEmpty(m.link) or m.name,
-			}
-			PlayerExt.syncPlayer(player)
-			local rendered = tostring(PlayerDisplay.InlinePlayer{player = player})
-			table.insert(names, '<span style="white-space:nowrap">' .. rendered .. '</span>')
-		end
-		row:tag('td'):css('text-align', 'left')
-			:wikitext(table.concat(names, ', ') .. ' (' .. o.count .. ')')
-		if not wrapped then
-			local achText = ''
-			for _, a in ipairs(o.achievements or {}) do
-				achText = achText .. tournamentIcon(a.icon, a.icondark, a.page, '30x30px')
-			end
-			row:tag('td'):css('text-align', 'center'):wikitext(achText)
-		end
-		row:tag('td'):css('text-align', 'center'):css('white-space', 'nowrap')
-			:wikitext('<b>' .. string.format('%.1f', o.score) .. '</b>')
-		if not wrapped then
-			row:tag('td'):css('text-align', 'center'):css('white-space', 'nowrap'):wikitext(formatNumber(o.avgPR))
-			row:tag('td'):css('text-align', 'center'):css('white-space', 'nowrap'):wikitext('$' .. formatNumber(o.cash))
-		end
-	end
-
-	if showMore then
-		local footer = Link{
-			link = DISPLAY_PAGE,
-			linktype = 'internal',
-			children = {
-				HtmlWidgets.Div{
-					children = {'See Rankings Page', Icon.makeIcon{iconName = 'goto'}},
-					classes = {'ranking-table__footer-button'},
-				},
-			},
-		}
-		tbl:tag('tr'):tag('td')
-			:attr('colspan', colspan)
-			:wikitext(tostring(footer))
-	end
-
-	return wrap(tbl)
+	return TableWidgets.Table{
+		title = buildTitle(updated),
+		sortable = false,
+		columns = columns,
+		footer = showMore and buildFooter() or nil,
+		css = {width = '100%'},
+		children = {
+			TableWidgets.TableHeader{children = {buildHeader(wrapped, year)}},
+			TableWidgets.TableBody{children = rows},
+		},
+	}
 end
 
-return p
+return PowerRankingsOrgs
