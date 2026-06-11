@@ -12,6 +12,7 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
 local Icon = Lua.import('Module:Icon')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local MathUtil = Lua.import('Module:MathUtil')
@@ -56,19 +57,6 @@ local function resolvePrimaryTeam(name)
 	if Logic.isEmpty(name) then
 		return ''
 	end
-	local conditions = ConditionTree(BooleanOperator.any):add{
-		ConditionNode(ColumnName('pagename'), Comparator.eq, Page.pageifyLink(name)),
-		ConditionNode(ColumnName('id'), Comparator.eq, name),
-	}
-	local row = mw.ext.LiquipediaDB.lpdb('player', {
-		query = 'team',
-		conditions = conditions:toString(),
-		limit = 1,
-	})[1] or {}
-	local primary = Logic.nilIfEmpty(row.team)
-	if primary then
-		return primary
-	end
 	return PlayerExt.syncTeam(Page.pageifyLink(name)) or ''
 end
 
@@ -95,17 +83,6 @@ local function storeOrgRankings(list)
 			extradata = {score = MathUtil.formatRounded{value = o.score, precision = 1}},
 		})
 	end)
-end
-
-local function tournamentIcon(icon, icondark, page, size)
-	if Logic.isEmpty(icon) then return '' end
-	icondark = Logic.nilIfEmpty(icondark) or icon
-	local function modeSpan(mode, image)
-		return string.format(
-			'<span class="league-icon-small-image %s">[[File:%s|%s|link=%s]]</span>',
-			mode, image, size, page)
-	end
-	return modeSpan('lightmode', icon) .. modeSpan('darkmode', icondark)
 end
 
 local function gatherPlacementData(year)
@@ -225,7 +202,7 @@ local function buildTitle(updated)
 		HtmlWidgets.B{children = 'Fortnite Organization Power Rankings'},
 		Logic.isNotEmpty(updated) and HtmlWidgets.Span{
 			css = {['font-weight'] = 'normal'},
-			children = {HtmlWidgets.Br{}, 'Last Updated: ', updated},
+			children = {HtmlWidgets.Br{}, 'Last updated: ', updated},
 		} or nil
 	)}
 end
@@ -273,7 +250,14 @@ local function buildRow(rank, o, wrapped)
 	end)
 	local membersText = table.concat(memberDisplays, ', ') .. ' (' .. o.count .. ')'
 	local achievementsText = table.concat(Array.map(o.achievements or {}, function(a)
-		return tournamentIcon(a.icon, a.icondark, a.page, '30x30px')
+		return LeagueIcon.display{
+			icon = a.icon,
+			iconDark = a.icondark,
+			link = a.page,
+			name = a.name,
+			size = 30,
+			options = {noTemplate = true},
+		}
 	end))
 
 	return TableWidgets.Row{children = WidgetUtil.collect(
