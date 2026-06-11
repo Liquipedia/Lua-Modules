@@ -18,7 +18,6 @@ local Lpdb = Lua.import('Module:Lpdb')
 local MathUtil = Lua.import('Module:MathUtil')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Variables = Lua.import('Module:Variables')
 
@@ -51,6 +50,22 @@ local PowerRankingsOrgs = {}
 
 local function normalizeName(name)
 	return string.lower((name or ''):gsub('[%s_]', ''))
+end
+
+local function buildMatchKeys(team)
+	local histNames = TeamTemplate.queryHistoricalNames(team)
+	if Logic.isEmpty(histNames) then
+		histNames = {team}
+	end
+	local keys = {}
+	Array.forEach(histNames, function(nm)
+		keys[normalizeName(nm)] = true
+		local raw = TeamTemplate.getRawOrNil(nm)
+		if raw and Logic.isNotEmpty(raw.page) then
+			keys[normalizeName(raw.page)] = true
+		end
+	end)
+	return keys
 end
 
 local function resolvePrimaryTeam(name)
@@ -323,13 +338,11 @@ function PowerRankingsOrgs.main(frame)
 
 	local teamEarnings, teamWinPages, tournamentDetails = gatherPlacementData(year)
 	Array.forEach(list, function(o)
-		o.histNames = Team.queryHistoricalNames(o.team)
-		if Logic.isEmpty(o.histNames) then
-			o.histNames = {o.team}
+		o.matchKeys = buildMatchKeys(o.team)
+		o.cash = 0
+		for key in pairs(o.matchKeys) do
+			o.cash = o.cash + (teamEarnings[key] or 0)
 		end
-		o.cash = Array.reduce(o.histNames, function(total, nm)
-			return total + (teamEarnings[normalizeName(nm)] or 0)
-		end, 0)
 	end)
 
 	local n = #list
@@ -373,19 +386,18 @@ function PowerRankingsOrgs.main(frame)
 		Array.forEach(display, function(o)
 			local achievements = {}
 			local seen = {}
-			Array.forEach(o.histNames, function(nm)
-				local pagesForTeam = teamWinPages[normalizeName(nm)]
-				if not pagesForTeam then
-					return
-				end
-				for page in pairs(pagesForTeam) do
-					if not seen[page] then
-						seen[page] = true
-						local d = tournamentDetails[page] or {name = page:gsub('_', ' '), icon = '', icondark = ''}
-						table.insert(achievements, {page = page, name = d.name, icon = d.icon, icondark = d.icondark})
+			for key in pairs(o.matchKeys) do
+				local pagesForTeam = teamWinPages[key]
+				if pagesForTeam then
+					for page in pairs(pagesForTeam) do
+						if not seen[page] then
+							seen[page] = true
+							local d = tournamentDetails[page] or {name = page:gsub('_', ' '), icon = '', icondark = ''}
+							table.insert(achievements, {page = page, name = d.name, icon = d.icon, icondark = d.icondark})
+						end
 					end
 				end
-			end)
+			end
 			o.achievements = achievements
 		end)
 	end
