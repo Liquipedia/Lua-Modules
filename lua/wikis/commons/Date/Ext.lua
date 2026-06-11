@@ -46,7 +46,8 @@ local SECONDS_PER_DAY = 86400
 function DateExt.readTimestamp(dateInput)
 	if type(dateInput) == 'table' then
 		-- in this case we have osdate really being osdateparam
-		return tonumber(os.time(dateInput --[[@as osdateparam]]))
+		---@cast dateInput osdateparam
+		return os.time(dateInput)
 	end
 
 	if Logic.isEmpty(dateInput) then
