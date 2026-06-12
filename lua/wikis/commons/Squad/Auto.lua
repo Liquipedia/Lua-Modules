@@ -107,8 +107,8 @@ function SquadAuto.run(frame)
 	end
 
 	local autosquad = SquadAuto(frame)
-	autosquad:build()
-	return autosquad:display()
+	local entries = autosquad:build()
+	return autosquad:display(entries)
 end
 
 ---Handles all necessary steps to fetch and sort data
@@ -117,6 +117,7 @@ function SquadAuto:build()
 	self:_queryTransfers()
 	local entries = self:_selectEntries()
 	Array.forEach(entries, FnUtil.curry(SquadAuto._enrichEntry, self))
+	return entries
 end
 
 ---Parses the args into a SquadAutoConfig
