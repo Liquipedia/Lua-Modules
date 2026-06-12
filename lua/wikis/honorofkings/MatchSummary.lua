@@ -12,7 +12,6 @@ local Logic = Lua.import('Module:Logic')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MAX_NUM_BANS = 5
 local NUM_CHAMPIONS_PICK = 5
@@ -26,13 +25,13 @@ local HoKMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent{
 }
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px', teamStyle = 'bracket'})
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return VNode[]
 function CustomMatchSummary.createBody(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
@@ -46,7 +45,7 @@ function CustomMatchSummary.createBody(match)
 		end)
 	end
 
-	return WidgetUtil.collect(
+	return {
 		MatchSummaryWidgets.GamesContainer{
 			children = Array.map(match.games, function (game, gameIndex)
 				if Logic.isEmpty(game.length) and Logic.isEmpty(game.winner) and not hasCharacterData(game) then
@@ -57,7 +56,7 @@ function CustomMatchSummary.createBody(match)
 		},
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	)
+	}
 end
 
 ---@param props MatchSummaryGameRowProps

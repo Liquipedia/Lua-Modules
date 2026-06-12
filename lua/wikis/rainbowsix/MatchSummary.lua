@@ -15,7 +15,6 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local ROUND_ICONS = {
 	atk = IconImage{
@@ -45,13 +44,13 @@ local RainbowsixMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponen
 }
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return VNode[]
 function CustomMatchSummary.createBody(match)
 
 	local characterBansData = Array.map(match.games, function(game)
@@ -62,7 +61,7 @@ function CustomMatchSummary.createBody(match)
 		}
 	end)
 
-	return WidgetUtil.collect(
+	return {
 		MatchSummaryWidgets.GamesContainer{
 			gridLayout = 'standard',
 			children = Array.map(match.games, function (game, gameIndex)
@@ -75,7 +74,7 @@ function CustomMatchSummary.createBody(match)
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	)
+	}
 end
 
 ---@private

@@ -17,7 +17,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local PlayerDisplay = Lua.import('Module:Player/Display')
@@ -41,7 +41,7 @@ local AoEMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(
 )
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {
 		width = CustomMatchSummary._determineWidth,
@@ -56,7 +56,7 @@ function CustomMatchSummary._determineWidth(match)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget
+---@return VNode
 function CustomMatchSummary.createBody(match)
 	return MatchSummaryWidgets.GamesContainer{
 		children = Array.map(match.games, function (game, gameIndex)
@@ -96,13 +96,13 @@ end
 ---@param player table
 ---@param flipped boolean
 ---@param gameData string?
----@return Widget
+---@return VNode
 function CustomMatchSummary._createParticipant(player, flipped, gameData)
 	local children = {
 		CustomMatchSummary._createFactionIcon(player.civ, gameData),
 		PlayerDisplay.BlockPlayer{player = player, flip = flipped},
 	}
-	return HtmlWidgets.Div{
+	return Html.Div{
 		css = {
 			display = 'grid',
 			['grid-template-columns'] = 'subgrid',
@@ -117,7 +117,7 @@ end
 ---@private
 ---@param game MatchGroupUtilGame
 ---@param opponentId integer
----@return Widget[]
+---@return VNode[]
 function CustomMatchSummary._createOpponentDisplay(game, opponentId)
 	local flipped = opponentId == 1
 	return Array.map(
@@ -153,7 +153,7 @@ end
 
 ---@param props AoEMatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Widget|Widget[]
+---@return VNode|VNode[]
 function CustomMatchSummary.createGameOpponentView(props, opponentIndex)
 	if props.soloMode then
 		return CustomMatchSummary._createFactionIcon(
@@ -179,10 +179,10 @@ end
 ---@private
 ---@param civ string?
 ---@param gameData string?
----@return Widget
+---@return VNode
 function CustomMatchSummary._createFactionIcon(civ, gameData)
 	local normGame = Game.abbreviation{game = gameData}:lower()
-	return HtmlWidgets.Span{
+	return Html.Span{
 		classes = {'brkts-champion-icon'},
 		children = Faction.Icon{
 			faction = civ or '',

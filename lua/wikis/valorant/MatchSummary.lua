@@ -14,7 +14,6 @@ local Operator = Lua.import('Module:Operator')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ValorantMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
@@ -25,15 +24,15 @@ local ValorantMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent{
 }
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '500px', teamStyle = 'bracket'})
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return VNode[]
 function CustomMatchSummary.createBody(match)
-	return WidgetUtil.collect(
+	return {
 		MatchSummaryWidgets.GamesContainer{
 			gridLayout = 'standard',
 			children = Array.map(match.games, function (game, gameIndex)
@@ -45,7 +44,7 @@ function CustomMatchSummary.createBody(match)
 		},
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
-	)
+	}
 end
 
 ---@private

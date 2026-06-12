@@ -13,7 +13,6 @@ local Logic = Lua.import('Module:Logic')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local Operator = Lua.import('Module:Operator')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class IdentityVCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
@@ -29,13 +28,13 @@ local IdentityVMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent
 )
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '500px'})
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return VNode[]
 function CustomMatchSummary.createBody(match)
 	local characterBansData = Array.map(match.games, function(game)
 		local extradata = game.extradata or {}
@@ -45,7 +44,7 @@ function CustomMatchSummary.createBody(match)
 		}
 	end)
 
-	return WidgetUtil.collect(
+	return {
 		MatchSummaryWidgets.GamesContainer{
 			children = Array.map(match.games, function (game, gameIndex)
 				if not game.map and not CustomMatchSummary.hasScores(game) then
@@ -57,7 +56,7 @@ function CustomMatchSummary.createBody(match)
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	)
+	}
 end
 
 ---@param props MatchSummaryGameRowProps
