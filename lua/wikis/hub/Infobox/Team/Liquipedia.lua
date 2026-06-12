@@ -17,8 +17,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
-
----@class LP15YInfoboxTeam: InfoboxTeam
+---@class LiquipediaInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
 local CustomInjector = Class.new(Injector)
 
