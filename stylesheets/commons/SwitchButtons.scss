@@ -112,12 +112,12 @@
 
 			.switch-pill-option.switch-pill-option-active {
 				background-color: var( --clr-secondary-100 );
-				border: 1px solid var( --clr-on-surface-light-primary-16 );
+				outline: 1px solid var( --clr-on-surface-light-primary-16 );
 				color: var( --clr-secondary-25 );
 
 				.theme--dark & {
 					background-color: var( --clr-on-surface-dark-primary-8 );
-					border: 1px solid var( --clr-on-surface-dark-primary-12 );
+					outline: 1px solid var( --clr-on-surface-dark-primary-12 );
 					color: var( --clr-secondary-100 );
 				}
 			}
@@ -142,7 +142,7 @@
 			border-radius: 0.5rem;
 			font-size: 0.875rem;
 			font-weight: bold;
-			line-height: 1.125rem;
+			line-height: 1.25rem;
 			text-align: center;
 			color: var( --clr-wiki-theme-primary );
 
@@ -158,12 +158,11 @@
 
 		&.switch-pill-small .switch-pill-option {
 			padding: 0.375rem 0.75rem;
-			line-height: 1.286;
 		}
 
 		&.switch-pill-extrasmall .switch-pill-option {
 			font-size: 0.75rem;
-			line-height: 1.334;
+			line-height: 1.5;
 			padding: 0.25rem 0.75rem;
 			border-radius: 0.25rem;
 		}
