@@ -21,9 +21,10 @@ local NUM_CHAMPIONS_PICK = 5
 ---@class MobileLegendsCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class MobileLegendsMatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): MobileLegendsMatchSummaryGameRow
-local MobileLegendsMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+local MobileLegendsMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent{
+	createGameOverview = MatchSummaryWidgets.GameRow.lengthDisplay,
+	createGameOpponentView = CustomMatchSummary.createGameOpponentView
+}
 
 ---@param args table
 ---@return Widget
@@ -60,15 +61,10 @@ function CustomMatchSummary.createBody(match)
 	)
 end
 
----@return Renderable?
-function MobileLegendsMatchSummaryGameRow:createGameOverview()
-	return self:lengthDisplay()
-end
-
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Widget
-function MobileLegendsMatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	local props = self.props
+---@return VNode
+function CustomMatchSummary.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local extradata = game.extradata or {}
 

@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -21,9 +20,10 @@ local NUM_CHAMPIONS_PICK = 5
 ---@class HoKCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class HoKMatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): HoKMatchSummaryGameRow
-local HoKMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+local HoKMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent{
+	createGameOverview = MatchSummaryWidgets.GameRow.lengthDisplay,
+	createGameOpponentView = CustomMatchSummary.createGameOpponentView
+}
 
 ---@param args table
 ---@return Widget
@@ -60,15 +60,10 @@ function CustomMatchSummary.createBody(match)
 	)
 end
 
----@return Renderable?
-function HoKMatchSummaryGameRow:createGameOverview()
-	return self:lengthDisplay()
-end
-
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Widget
-function HoKMatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	local props = self.props
+---@return VNode
+function CustomMatchSummary.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local extradata = game.extradata or {}
 

@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
@@ -21,9 +20,10 @@ local STATUS_NOT_PLAYED = 'notplayed'
 ---@class LoLCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class LoLMatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): LoLMatchSummaryGameRow
-local LoLMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+local LoLMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent{
+	createGameOverview = MatchSummaryWidgets.GameRow.lengthDisplay,
+	createGameOpponentView = CustomMatchSummary.createGameOpponentView
+}
 
 ---@param args table
 ---@return Widget
@@ -51,10 +51,10 @@ function CustomMatchSummary.createBody(match)
 	)
 end
 
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Widget
-function LoLMatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	local props = self.props
+---@return VNode
+function CustomMatchSummary.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local extradata = game.extradata or {}
 
@@ -66,11 +66,6 @@ function LoLMatchSummaryGameRow:createGameOpponentView(opponentIndex)
 		bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata['team' .. opponentIndex .. 'side'] or ''),
 		date = game.date,
 	}
-end
-
----@return Renderable?
-function LoLMatchSummaryGameRow:createGameOverview()
-	return self:lengthDisplay()
 end
 
 return CustomMatchSummary
