@@ -254,6 +254,14 @@ describe('array', function()
 		end)
 	end)
 
+	describe('mapRange', function()
+		it('check', function()
+			assert.are_same({'arg1', 'arg2', 'arg3'}, Array.mapRange(1, 3, function (index)
+				return 'arg' .. index
+			end))
+		end)
+	end)
+
 	describe('ForEach', function()
 		it('check', function()
 			local a = {}
