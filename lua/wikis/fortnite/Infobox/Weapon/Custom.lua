@@ -13,7 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local Variables = Lua.import('Module:Variables')
 local VersionDisplay = Lua.import('Module:Infobox/Extension/VersionDisplay')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Weapon = Lua.import('Module:Infobox/Weapon')
 
 local Widgets = Lua.import('Module:Infobox/Widget/All')
