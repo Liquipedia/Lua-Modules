@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -19,12 +18,15 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@class IdentityVCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class IdentityVMatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): IdentityVMatchSummaryGameRow
-local IdentityVMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
-IdentityVMatchSummaryGameRow.defaultProps = {
-	allowWrappingInOverview = true
-}
+local IdentityVMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(
+	{
+		createGameOpponentView = CustomMatchSummary.createGameOpponentView,
+		createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay
+	},
+	{
+		allowWrappingInOverview = true
+	}
+)
 
 ---@param args table
 ---@return Widget
@@ -58,10 +60,11 @@ function CustomMatchSummary.createBody(match)
 	)
 end
 
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Widget[]
-function IdentityVMatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	local game = self.props.game
+---@return VNode[]
+function CustomMatchSummary.createGameOpponentView(props, opponentIndex)
+	local game = props.game
 	local extradata = game.extradata or {}
 	local flipped = opponentIndex == 2
 
@@ -88,16 +91,11 @@ function IdentityVMatchSummaryGameRow:createGameOpponentView(opponentIndex)
 	return {
 		MatchSummaryWidgets.Characters{characters = characters, flipped = flipped, hideOnMobile = true},
 		MatchSummaryWidgets.DetailedScore{
-			score = self:scoreDisplay(opponentIndex),
+			score = MatchSummaryWidgets.GameRow.scoreDisplay(game, opponentIndex),
 			flipped = flipped,
 			partialScores = scoreDetails,
 		}
 	}
-end
-
----@return Renderable?
-function IdentityVMatchSummaryGameRow:createGameOverview()
-	return self:mapDisplay()
 end
 
 ---@param side string
