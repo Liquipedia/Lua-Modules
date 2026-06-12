@@ -130,8 +130,9 @@ function SquadUtils.readWrapperArgs(args)
 end
 
 ---@param player table
----@return table
+---@return SquadPersonArgs
 function SquadUtils.convertAutoParameters(player)
+	---@type SquadPersonArgs
 	local newPlayer = Table.copy(player)
 	local joinReference = TransferRefs.useReferences(player.joindateRef, player.joindate)
 	local leaveReference = TransferRefs.useReferences(player.leavedateRef, player.leavedate)
@@ -153,7 +154,36 @@ function SquadUtils.convertAutoParameters(player)
 	return newPlayer
 end
 
----@param args table
+---@class SquadPersonArgs
+---@field name string? Real name
+---@field id string? Display name
+---@field link string? Page name
+---@field flag string?
+---@field position string?
+---@field role string?
+---@field captain string? Truthy, only when role is empty
+---@field igl string? Truthy, alternative to captain
+---@field newteam string? as team template
+---@field newteamrole string?
+---@field newrole string? -- Alternative to newteamrole
+---@field joindate string? including reference
+---@field leavedate string? including reference
+---@field inactivedate string? including reference
+---@field status SquadStatus?
+---@field type SquadType?
+---@field team string? as loanedto
+---@field teamrole string? as loanedtorole
+---@field newteamdate string?
+---@field faction string?
+---@field race string?
+---@field activeteam string?
+---@field activeteamrole string?
+---@field game game?
+---@field joindateref table<string, string>?
+---@field leavedateref table<string, string>?
+---@field inactivedateref table<string, string>?
+
+---@param args SquadPersonArgs
 ---@return ModelRow
 function SquadUtils.readSquadPersonArgs(args)
 	local function getTeamInfo(page, property)
@@ -184,8 +214,11 @@ function SquadUtils.readSquadPersonArgs(args)
 		newteamtemplate = getTeamInfo(args.newteam, 'templatename'),
 
 		joindate = ReferenceCleaner.clean{input = args.joindate},
+		joindateref = args.joindateref,
 		leavedate = ReferenceCleaner.clean{input = args.leavedate},
+		leavedateref = args.leavedateref,
 		inactivedate = ReferenceCleaner.clean{input = args.inactivedate},
+		inactivedateref = args.inactivedateref,
 
 		status = SquadUtils.SquadStatusToStorageValue[args.status],
 		type = SquadUtils.SquadTypeToStorageValue[args.type],
