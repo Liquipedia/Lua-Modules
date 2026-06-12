@@ -154,8 +154,7 @@ function SquadUtils.convertAutoParameters(player)
 end
 
 ---@param args table
----@return ModelRow player
----@return string[] warning
+---@return ModelRow
 function SquadUtils.readSquadPersonArgs(args)
 	local function getTeamInfo(page, property)
 		if not page or not TeamTemplate.exists(page) then
@@ -218,19 +217,7 @@ function SquadUtils.readSquadPersonArgs(args)
 		person.extradata.inactivedatedisplay = args.inactivedate
 	end
 
-	local warnings = {}
-
-	local function warnForDate(key)
-		if String.isEmpty(person[key]) and String.isNotEmpty(args[key]) then
-			table.insert(warnings, "Invalid date input: " .. args[key] .. ' for ' .. id)
-		end
-	end
-
-	warnForDate('joindate')
-	warnForDate('inactivedate')
-	warnForDate('leavedate')
-
-	return person, warnings
+	return person
 end
 
 ---@param squadPerson ModelRow

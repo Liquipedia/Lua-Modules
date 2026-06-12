@@ -21,7 +21,6 @@ local SquadDisplay = Lua.import('Module:Widget/Squad/Container')
 local SquadHeader = Lua.import('Module:Widget/Squad/Header')
 local SquadPlayerDisplay = Lua.import('Module:Widget/Squad/Player')
 local Table2 = Lua.import('Module:Widget/Table2/All')
-local WarningBoxGroup = Lua.import('Module:Widget/WarningBox/Group')
 
 local SquadController = {}
 
@@ -29,14 +28,11 @@ local SquadController = {}
 ---@param adjustLpdb function?
 ---@return Component
 function SquadController.execute(squadData, adjustLpdb)
-	local warnings = {}
 	local squadPlayers = Array.map(squadData.players, function(player)
-		local squadPlayer, playerWarnings = SquadUtils.readSquadPersonArgs(Table.merge(
+		return SquadUtils.readSquadPersonArgs(Table.merge(
 			player,
 			{status = squadData.squadStatus, type = squadData.squadType}
 		))
-		Array.extendWith(warnings, playerWarnings)
-		return squadPlayer
 	end)
 
 	if adjustLpdb then
@@ -47,15 +43,10 @@ function SquadController.execute(squadData, adjustLpdb)
 		squadPlayer:save()
 	end)
 
-	if Table.isNotEmpty(warnings) then
-		mw.ext.TeamLiquidIntegration.add_category('Invalid date input in Squad')
-	end
-
 	local squadTable = Context.Provider{
 		def = SquadContexts.ColumnVisibility,
 		value = SquadUtils.analyzeColumnVisibility(squadPlayers, squadData.squadStatus),
 		children = {
-			WarningBoxGroup{data = warnings},
 			SquadDisplay{
 				status = squadData.squadStatus,
 				title = squadData.title,
