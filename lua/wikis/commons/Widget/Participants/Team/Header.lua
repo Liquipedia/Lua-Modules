@@ -19,6 +19,10 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
+local STATUS_DISQUALIFIED = 'disqualified'
+local STATUS_WITHDRAWN = 'withdrawn'
+local STATUS_REPLACEMENT = 'replacement'
+
 ---@class ParticipantsTeamHeader: Widget
 ---@operator call(table): ParticipantsTeamHeader
 local ParticipantsTeamHeader = Class.new(Widget)
@@ -101,11 +105,16 @@ function ParticipantsTeamHeader:_renderLabel(participant)
 	local labelText
 	local isTbd = Logic.isNotEmpty(participant.potentialQualifiers) or Opponent.isTbd(participant.opponent);
 	local qualificationData = participant.qualification
-	if not qualificationData then
-		return
-	end
 
-	if qualificationData.method == 'qual' then
+	if participant.status == STATUS_DISQUALIFIED then
+		labelText = 'Disqualified'
+	elseif participant.status == STATUS_WITHDRAWN then
+		labelText = 'Withdrawn'
+	elseif participant.status == STATUS_REPLACEMENT then
+		labelText = 'Replacement'
+	elseif not qualificationData then
+		return
+	elseif qualificationData.method == 'qual' then
 		labelText = 'Qualifier'
 	elseif qualificationData.method == 'invite' then
 		labelText = 'Invited'
