@@ -102,8 +102,6 @@
 
 		&.switch-pill-generic {
 			.switch-pill-option {
-				outline: 1px solid transparent;
-				outline-offset: -1px;
 				color: var( --clr-secondary-25 );
 
 				.theme--dark & {
