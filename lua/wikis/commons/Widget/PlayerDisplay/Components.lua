@@ -27,7 +27,10 @@ function PlayerDisplayComponents.flag(props)
 		return
 	end
 	local flag = props.player.flag
-	if Logic.isEmpty(flag) and props.useDefault then
+	if Logic.isEmpty(flag) then
+		if not props.useDefault then
+			return
+		end
 		flag = 'unknown'
 	end
 	return Flags.Icon{flag = flag, shouldLink = false}
