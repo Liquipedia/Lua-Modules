@@ -21,14 +21,14 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@type FfaMatchSummaryParser
+---@class WarcraftFfaMatchSummaryParser: FfaMatchSummaryParser
 local Parser = {}
 
 ---@param props {bracketId: string, matchId: string}
----@return Widget
+---@return Renderable
 function WarcraftMatchSummaryFfa.getByMatchId(props)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
-	---@cast match StarcraftMatchGroupUtilMatch
+	---@cast match FFAMatchGroupUtilMatch
 
 	BaseMatchSummary.updateMatchOpponents(match)
 

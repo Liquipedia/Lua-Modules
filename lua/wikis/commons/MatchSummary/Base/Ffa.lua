@@ -418,7 +418,7 @@ end
 
 ---@param match table
 ---@param Parser FfaMatchSummaryParser?
----@return MatchSummaryFfaTable
+---@return VNode
 function MatchSummaryFfa.standardMatch(match, Parser)
 	Parser = Parser or {}
 	local matchColumns = Parser.adjustMatchColumns
@@ -549,7 +549,7 @@ end
 
 ---@param game table
 ---@param Parser FfaGameSummaryParser?
----@return MatchSummaryFfaTable
+---@return VNode
 function MatchSummaryFfa.standardGame(game, Parser)
 	Parser = Parser or {}
 	local gameStandingsColumns = Parser.adjustGameStandingsColumns

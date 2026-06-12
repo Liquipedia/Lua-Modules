@@ -17,10 +17,10 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@param props {bracketId: string, matchId: string}
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(props)
-	---@class FFAMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
+	---@cast match FFAMatchGroupUtilMatch
 	SummaryHelper.updateMatchOpponents(match)
 	local scoringData = SummaryHelper.createScoringData(match)
 
