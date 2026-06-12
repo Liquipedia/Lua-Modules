@@ -175,9 +175,10 @@ function Standings.fetchMatches(standings)
 		return MatchGroupUtil.splitMatchId(matchid)
 	end))
 
+	local wantedMatchIds = Table.map(matchids, function(_, matchid) return matchid, true end)
 	local allMatchesFromBrackets = Array.flatMap(bracketIds, MatchGroupUtil.fetchMatches)
 	return Array.filter(allMatchesFromBrackets, function(match)
-		return Table.includes(matchids, match.matchId)
+		return wantedMatchIds[match.matchId]
 	end)
 end
 
@@ -193,10 +194,7 @@ function Standings.fetchMatch(entry)
 		return
 	end
 
-	local allMatchesFromBrackets = MatchGroupUtil.fetchMatches(bracketId)
-	return Array.filter(allMatchesFromBrackets, function(match)
-		return match.matchId == matchid
-	end)[1]
+	return MatchGroupUtil.fetchMatchGroup(bracketId).matchesById[matchid]
 end
 
 ---@param standings StandingsModel
