@@ -8,16 +8,15 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local Div = HtmlWidgets.Div
-local Span = HtmlWidgets.Span
+local Div = Html.Div
+local Span = Html.Span
 
 local VARIANT_CONFIG = {
 	inline = {
@@ -37,31 +36,28 @@ local VARIANT_CONFIG = {
 ---@field prefix Renderable|Renderable[]?
 ---@field label Renderable|Renderable[]?
 
----@class DropdownContainerWidget: Widget
----@operator call(DropdownContainerWidgetParameters): DropdownContainerWidget
----@field props DropdownContainerWidgetParameters
-local DropdownContainer = Class.new(Widget)
-DropdownContainer.defaultProps = {
+local defaultProps = {
 	variant = 'form',
 }
 
----@return Widget|nil
-function DropdownContainer:render()
-	if Logic.isEmpty(self.props.children) then
+---@param props DropdownContainerWidgetParameters
+---@return HtmlNode?
+local function DropdownContainer(props)
+	if Logic.isEmpty(props.children) then
 		return nil
 	end
 
-	local variantConfig = assert(VARIANT_CONFIG[self.props.variant],
-		'Invalid Dropdown variant "' .. self.props.variant .. '"')
+	local variantConfig = assert(VARIANT_CONFIG[props.variant],
+		'Invalid Dropdown variant "' .. props.variant .. '"')
 
 	local toggleChildren = WidgetUtil.collect(
-		Logic.isNotEmpty(self.props.prefix) and Span{
+		Logic.isNotEmpty(props.prefix) and Span{
 			classes = {'dropdown-widget__prefix'},
-			children = self.props.prefix,
+			children = props.prefix,
 		} or nil,
 		Span{
 			classes = {'dropdown-widget__label'},
-			children = self.props.label,
+			children = props.label,
 		},
 		Span{
 			classes = {'dropdown-widget__indicator'},
@@ -82,16 +78,16 @@ function DropdownContainer:render()
 	}
 
 	return Div{
-		classes = Array.extend({'dropdown-widget', 'dropdown-widget--' .. self.props.variant}, self.props.classes),
+		classes = Array.extend({'dropdown-widget', 'dropdown-widget--' .. props.variant}, props.classes),
 		children = {
 			toggleButton,
 			Div{
 				classes = {'dropdown-widget__menu'},
 				attributes = {['aria-hidden'] = 'true'},
-				children = self.props.children
+				children = props.children
 			}
 		}
 	}
 end
 
-return DropdownContainer
+return Component.component(DropdownContainer, defaultProps)

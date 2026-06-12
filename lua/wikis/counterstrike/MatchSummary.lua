@@ -14,6 +14,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local VodLink = Lua.import('Module:VodLink')
 
+local Html = Lua.import('Module:Widget/Html')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -40,7 +41,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 	if Logic.isNotEmpty(match.links.vod2) then
 		for _, vod2 in ipairs(match.links.vod2) do
 			local link, gameIndex = unpack(vod2)
-			secondVods[gameIndex] = Array.map(mw.text.split(link, ','), String.trim)
+			secondVods[gameIndex] = Array.parseCommaSeparatedString(link)
 		end
 		match.links.vod2 = nil
 	end
@@ -58,15 +59,15 @@ function CustomMatchSummary.addToFooter(match, footer)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return VNode[]
 function CustomMatchSummary.createBody(match)
 	if Logic.isNotEmpty(match.extradata.status) then
 		match.stream = {rawdatetime = true}
 	end
-	local matchStatusText
-	if match.extradata.status then
-		matchStatusText = '<b>Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '</b>'
-	end
+	local matchStatusText = match.extradata.status and Html.B{children = {
+		'Match ',
+		String.upperCaseFirst(match.extradata.status)
+	}} or nil
 	return WidgetUtil.collect(
 		MatchSummaryWidgets.GamesContainer{
 			children = Array.map(match.games, function (game, gameIndex)
@@ -77,7 +78,7 @@ function CustomMatchSummary.createBody(match)
 			end)
 		},
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
-		MatchSummaryWidgets.MatchComment{children = matchStatusText} or nil
+		MatchSummaryWidgets.MatchComment{children = {matchStatusText}} or nil
 	)
 end
 

@@ -7,10 +7,15 @@
 
 local Lua = require('Module:Lua')
 
+local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local String = Lua.import('Module:StringUtils')
+local RoleUtil = Lua.import('Module:Role/Util')
+local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 local Tournament = Lua.import('Module:Tournament')
 
@@ -20,8 +25,19 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
+local legacyVars = PageVariableNamespace('LegacyTeamCard')
+
+local PositionConvert = Lua.requireIfExists('Module:PositionName/data', {loadData = true}) or {}
 
 local LegacyTeamCard = {}
+
+---@param value string?
+---@return string?
+local function normalizePosition(value)
+	if Logic.isEmpty(value) then return value end
+	---@cast value -nil
+	return PositionConvert[value:lower()] or value
+end
 
 ---@param entries table[]
 ---@return table[], table?, table[]
@@ -44,6 +60,28 @@ local function partitionStash(entries)
 		end
 	end)
 	return toggles, header, cards
+end
+
+-- Invoked by Template:TeamCard columns start. Opens the wrapper and stashes the header entry.
+---@param frame Frame
+---@return string
+function LegacyTeamCard.stashHeader(frame)
+	legacyVars:set('wrapperOpen', 'true')
+	local args = Arguments.getArgs(frame)
+	args.__source = 'header'
+	return Template.stashReturnValue(args, 'LegacyTeamCard')
+end
+
+-- Invoked by Template:TeamCard. Flags the page if no wrapper is open, then stashes the card entry.
+---@param frame Frame
+---@return string
+function LegacyTeamCard.stashCard(frame)
+	if not Logic.readBool(legacyVars:get('wrapperOpen')) then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with unwrapped Legacy TeamCard')
+	end
+	local args = Arguments.getArgs(frame)
+	args.__source = 'card'
+	return Template.stashReturnValue(args, 'LegacyTeamCard')
 end
 
 ---@param dependency table<string, function>?
@@ -97,6 +135,7 @@ function LegacyTeamCard.run(dependency)
 		}
 	end
 
+	legacyVars:delete('wrapperOpen')
 	return HtmlWidgets.Fragment{children = WidgetUtil.collect(notesWidget, display)}
 end
 
@@ -140,23 +179,31 @@ end
 ---@param rawQualifier string
 ---@return string?, string?, string? # (linkText, internalLink, externalLink)
 function LegacyTeamCard._parseQualifierLink(rawQualifier)
-	local cleanQualifier = rawQualifier:gsub('%[', ''):gsub('%]', '')
-	if cleanQualifier:find('|') then
-		local parts = mw.text.split(cleanQualifier, '|', true)
-		local link, displayName = parts[1], parts[2]
-		if link:sub(1, 1) == '/' then
-			link = mw.title.getCurrentTitle().fullText .. link
+	-- A qualifier may be prefixed with an icon (e.g. {{LeagueIconSmall}}, which expands to
+	-- a File link / span before reaching here). Take the first internal wikilink that is not
+	-- such an embed; the new QualifierInfo widget renders its own tournament icon.
+	for inner in rawQualifier:gmatch('%[%[(.-)%]%]') do
+		local lowered = inner:lower()
+		local isEmbed = inner:find('<', 1, true) or Array.any({'file:', 'image:', 'media:'}, function(prefix)
+			return String.startsWith(lowered, prefix)
+		end)
+		if not isEmbed then
+			local parts = Array.parseCommaSeparatedString(inner, '|')
+			local link, displayName = parts[1], parts[2] or parts[1]
+			if String.startsWith(link, '/') then
+				link = mw.title.getCurrentTitle().fullText .. link
+			end
+			return displayName, link:gsub(' ', '_'), nil
 		end
-		link = link:gsub(' ', '_')
-		return displayName, link, nil
-	elseif rawQualifier:sub(1, 1) == '[' then
-		local parts = mw.text.split(cleanQualifier, ' ', true)
-		local link = parts[1]
-		table.remove(parts, 1)
-		return table.concat(parts, ' '), nil, link
-	else
-		return rawQualifier, nil, nil
 	end
+
+	if String.startsWith(rawQualifier, '[') then
+		local parts = mw.text.split(rawQualifier:gsub('[%[%]]', ''), ' ', true)
+		local link = table.remove(parts, 1)
+		return table.concat(parts, ' '), nil, link
+	end
+
+	return rawQualifier, nil, nil
 end
 
 ---@param tcArgs table
@@ -202,8 +249,9 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
 		flag = tcArgs[prefix .. 'flag_o'] or tcArgs[prefix .. 'flag'],
 		team = tcArgs[prefix .. 'team'],
 		id = tcArgs[prefix .. 'id'],
+		number = tcArgs[prefix .. 'number'],
 		faction = tcArgs[prefix .. 'faction'] or tcArgs[prefix .. 'race'],
-		role = tcArgs[prefix .. 'pos'],
+		role = normalizePosition(tcArgs[prefix .. 'pos']),
 		trophies = trophies,
 		joindate = tcArgs[prefix .. 'joindate'],
 		leavedate = tcArgs[prefix .. 'leavedate'],
@@ -224,7 +272,7 @@ function LegacyTeamCard.mapCoach(tcArgs, prefix, sourceGroup)
 		trophies = (wins or 0) + (winsc or 0)
 	end
 
-	local role = tcArgs[prefix .. 'pos'] or 'coach'
+	local role = normalizePosition(tcArgs[prefix .. 'pos']) or 'coach'
 
 	local status
 	if Logic.readBool(tcArgs[prefix .. 'leave']) then
@@ -290,7 +338,24 @@ end
 ---@return string
 local function normalizeKey(value)
 	if Logic.isEmpty(value) then return '' end
+	---@cast value -nil
 	return value:gsub(' ', '_'):lower()
+end
+
+-- Mirrors the staff classification in TeamParticipants/Parse/Wiki so a person listed as
+-- both player and staff (e.g. coach subbing in as player) keeps both entries.
+---@param person table
+---@return boolean
+local function isStaffCapacity(person)
+	if person.type == 'staff' then
+		return true
+	end
+	if Logic.isEmpty(person.role) then
+		return false
+	end
+	return Array.any(RoleUtil.readRoleArgs(person.role), function(role)
+		return role.type == RoleUtil.ROLE_TYPE.STAFF
+	end)
 end
 
 ---@param tcArgs table
@@ -300,16 +365,29 @@ function LegacyTeamCard.mapPlayers(tcArgs)
 	local indexByKey = {}
 	local maxPlayerIndex = tonumber(tcArgs.maxPlayers) or DEFAULT_MAX_PLAYER_INDEX
 
+	-- Legacy commons TC alias: <group>posN was an accepted alternative for <prefix>Npos.
+	Array.forEach({{'', 'p'}, {'t2', 't2p'}, {'t3', 't3p'}}, function(pair)
+		local group, prefix = pair[1], pair[2]
+		Array.forEach(Array.range(1, maxPlayerIndex), function(n)
+			local newKey = prefix .. n .. 'pos'
+			tcArgs[newKey] = Logic.emptyOr(tcArgs[newKey], Table.extract(tcArgs, group .. 'pos' .. n))
+		end)
+	end)
+
 	local function add(person, allowOverwrite)
 		local key = normalizeKey(person.link or person[1])
-		if key ~= '' and indexByKey[key] then
+		-- Dedup only within the same capacity: a staff entry must not replace a player entry.
+		if Logic.isNotEmpty(key) and isStaffCapacity(person) then
+			key = key .. '::staff'
+		end
+		if Logic.isNotEmpty(key) and indexByKey[key] then
 			if allowOverwrite then
 				players[indexByKey[key]] = person
 			end
 			return
 		end
 		table.insert(players, person)
-		if key ~= '' then
+		if Logic.isNotEmpty(key) then
 			indexByKey[key] = #players
 		end
 	end
@@ -348,6 +426,9 @@ end
 function LegacyTeamCard.mapCoaches(tcArgs)
 	local coaches = {}
 
+	if Logic.isNotEmpty(tcArgs.c) then
+		table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'c', nil))
+	end
 	Array.forEach(indicesPresent(tcArgs, 'c', MAX_COACH_INDEX), function(i)
 		table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'c' .. i, nil))
 	end)
@@ -371,6 +452,18 @@ function LegacyTeamCard.mapCoaches(tcArgs)
 	end)
 
 	return coaches
+end
+
+---@param parsedNotes table
+---@return {[1]: string, highlighted: boolean}[]
+local function parseNotes(parsedNotes)
+	return Array.mapIndexes(function (index)
+		local note = parsedNotes['n' .. index]
+		if Logic.isEmpty(note) then
+			return
+		end
+		return {[1] = note, highlighted = false}
+	end)
 end
 
 ---@param tcArgs table
@@ -398,10 +491,20 @@ function LegacyTeamCard.mapCard(tcArgs)
 
 	local notes = {}
 	if Logic.isNotEmpty(tcArgs.notes) then
-		table.insert(notes, {[1] = tcArgs.notes, highlighted = false})
+		local parsedNotes = Json.parseIfTable(tcArgs.notes)
+		if parsedNotes then
+			Array.extendWith(notes, parseNotes(parsedNotes))
+		else
+			table.insert(notes, {[1] = tcArgs.notes, highlighted = false})
+		end
 	end
 	if Logic.isNotEmpty(tcArgs.inotes) then
-		table.insert(notes, {[1] = tcArgs.inotes, highlighted = false})
+		local parsedNotes = Json.parseIfTable(tcArgs.inotes)
+		if parsedNotes then
+			Array.extendWith(notes, parseNotes(parsedNotes))
+		else
+			table.insert(notes, {[1] = tcArgs.inotes, highlighted = false})
+		end
 	end
 	if #notes > 0 then card.notes = notes end
 

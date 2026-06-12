@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Image = Lua.import('Module:Image')
 local Logic = Lua.import('Module:Logic')
 local StreamLinks = Lua.import('Module:Links/Stream')
@@ -16,16 +15,16 @@ local StreamLinks = Lua.import('Module:Links/Stream')
 local Info = Lua.import('Module:Info', {loadData = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchPageOpponentDisplay = Lua.import('Module:Widget/Match/Page/OpponentDisplay')
 local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageHeaderParameters
----@field countdownBlock Html?
+---@field countdownBlock Renderable?
 ---@field isBestOfOne boolean
 ---@field mvp {players: MatchGroupMvpPlayer[], points: integer?}?
 ---@field opponent1 MatchPageOpponent
@@ -37,22 +36,20 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field poweredBy string?
 ---@field highlighted boolean?
 
----@class MatchPageHeader: Widget
----@operator call(MatchPageHeaderParameters): MatchPageHeader
----@field props MatchPageHeaderParameters
-local MatchPageHeader = Class.new(Widget)
+local MatchPageHeader = {}
 
 ---@private
----@return Widget
-function MatchPageHeader:_makeResultDisplay()
-	local opponent1 = self.props.opponent1
-	local opponent2 = self.props.opponent2
-	local phase = self.props.phase
+---@param props MatchPageHeaderParameters
+---@return VNode
+function MatchPageHeader._makeResultDisplay(props)
+	local opponent1 = props.opponent1
+	local opponent2 = props.opponent2
+	local phase = props.phase
 
 	return Div{
 		classes = { 'match-bm-match-header-result' },
 		children = WidgetUtil.collect(
-			self:_showScore() and (
+			MatchPageHeader._showScore(props) and (
 				OpponentDisplay.InlineScore(opponent1) .. '&nbsp;:&nbsp;' .. OpponentDisplay.InlineScore(opponent2)
 			) or '',
 			Div{
@@ -64,30 +61,32 @@ function MatchPageHeader:_makeResultDisplay()
 end
 
 ---@private
+---@param props MatchPageHeaderParameters
 ---@return boolean
-function MatchPageHeader:_showScore()
-	if self.props.phase == 'upcoming' then
+function MatchPageHeader._showScore(props)
+	if props.phase == 'upcoming' then
 		return false
 	end
-	if self.props.isBestOfOne then
+	if props.isBestOfOne then
 		return Info.config.match2.gameScoresIfBo1
 	end
 	return true
 end
 
 ---@private
----@return Widget?
-function MatchPageHeader:_showMvps()
-	local mvpData = self.props.mvp
+---@param props MatchPageHeaderParameters
+---@return VNode?
+function MatchPageHeader._showMvps(props)
+	local mvpData = props.mvp
 	if Logic.isEmpty(mvpData) then return end
 	---@cast mvpData -nil
 	local points = tonumber(mvpData.points)
 	return Div{
-		classes = { 'match-bm-match-mvp' },
+		classes = {'match-bm-match-mvp'},
 		children = WidgetUtil.collect(
-			HtmlWidgets.B{ children = { 'MVP' } },
+			Html.B{children = 'MVP'},
 			Array.interleave(Array.map(mvpData.players, function (player)
-				return Link{ link = player.name, children = player.displayname }
+				return Link{link = player.name, children = player.displayname}
 			end), ' '),
 			points and points > 1 and ' (' .. points .. ' pts)' or nil
 		)
@@ -95,40 +94,42 @@ function MatchPageHeader:_showMvps()
 end
 
 ---@private
----@return Widget?
-function MatchPageHeader:_showStreams()
-	local phase = self.props.phase
+---@param props MatchPageHeaderParameters
+---@return VNode?
+function MatchPageHeader._showStreams(props)
+	local phase = props.phase
 	if phase == 'finished' then
 		return
 	end
 	return Div{
 		classes = {'match-info-links'},
 		children = StreamsContainer{
-			streams = StreamLinks.filterStreams(self.props.stream),
-			matchIsLive = self.props.phase == 'ongoing',
+			streams = StreamLinks.filterStreams(props.stream),
+			matchIsLive = props.phase == 'ongoing',
 			growButtons = true,
 		}
 	}
 end
 
----@return Widget[]
-function MatchPageHeader:render()
-	local opponent1 = self.props.opponent1
-	local opponent2 = self.props.opponent2
+---@param props MatchPageHeaderParameters
+---@return VNode
+function MatchPageHeader.render(props)
+	local opponent1 = props.opponent1
+	local opponent2 = props.opponent2
 
 	return Div{
 		classes = { 'match-bm-match-header' },
 		children = WidgetUtil.collect(
-			self.props.poweredBy and Div{
+			props.poweredBy and Div{
 				classes = { 'match-bm-match-header-powered-by' },
 				children = {
 					'Data provided by ',
-					Image.display(self.props.poweredBy, nil, {link = '', alt = 'SAP'})
+					Image.display(props.poweredBy, nil, {link = '', alt = 'SAP'})
 				}
 			} or nil,
 			Div{
 				classes = { 'match-bm-match-header-date' },
-				children = { self.props.countdownBlock }
+				children = props.countdownBlock
 			},
 			Div{
 				classes = { 'match-bm-match-header-overview' },
@@ -137,7 +138,7 @@ function MatchPageHeader:render()
 						opponent = opponent1,
 						flip = true
 					},
-					self:_makeResultDisplay(),
+					MatchPageHeader._makeResultDisplay(props),
 					MatchPageOpponentDisplay{
 						opponent = opponent2
 					},
@@ -146,16 +147,14 @@ function MatchPageHeader:render()
 			Div{
 				classes = Array.extend(
 					'match-bm-match-header-tournament',
-					self.props.highlighted and 'tournament-highlighted-bg' or nil
+					props.highlighted and 'tournament-highlighted-bg' or nil
 				),
-				children = {
-					Link{ link = self.props.parent, children = self.props.tournamentName }
-				}
+				children = Link{ link = props.parent, children = props.tournamentName }
 			},
-			self:_showMvps(),
-			self:_showStreams()
+			MatchPageHeader._showMvps(props),
+			MatchPageHeader._showStreams(props)
 		),
 	}
 end
 
-return MatchPageHeader
+return Component.component(MatchPageHeader.render)

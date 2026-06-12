@@ -16,8 +16,8 @@ local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 local Rankings = Lua.import('Module:Widget/Ratings')
 
 local Button = Lua.import('Module:Widget/Basic/Button')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local PartnerWikis = Lua.import('Module:Widget/MainPage/PartnerWikis')

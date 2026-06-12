@@ -16,7 +16,7 @@ local FactionInfobox = Lua.import('Module:Infobox/Faction')
 local CustomFactionInfobox = Class.new(FactionInfobox)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomFactionInfobox.run(frame)
 	local infobox = CustomFactionInfobox(frame)
 	return infobox:createInfobox()

@@ -10,7 +10,20 @@ local ComponentCore = Lua.import('Module:Widget/Component')
 
 local Html = {}
 
-Html.Abbr = ComponentCore.tag('abbr')
+---@class HtmlAbbrNodeProps: HtmlNodeProps
+---@field title string?
+
+local _AbbrCore = ComponentCore.tag('abbr')
+
+Html.Abbr = ComponentCore.component(
+	---@param props HtmlAbbrNodeProps
+	---@return VNode
+	function(props)
+		props.attributes = props.attributes or {}
+		props.attributes.title = props.attributes.title or props.title
+		return _AbbrCore(props)
+	end
+)
 Html.Aside = ComponentCore.tag('aside')
 Html.B = ComponentCore.tag('b')
 Html.Bdi = ComponentCore.tag('bdi')

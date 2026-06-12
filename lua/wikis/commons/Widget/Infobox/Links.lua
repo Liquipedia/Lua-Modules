@@ -13,7 +13,7 @@ local Table = Lua.import('Module:Table')
 
 local UtilLinks = Lua.import('Module:Links')
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Title = Lua.import('Module:Widget/Infobox/Title')
 
@@ -58,9 +58,9 @@ function Links:render()
 
 	return {
 		Title{children = 'Links'},
-		HtmlWidgets.Div{
+		Html.Div{
 			children = {
-				HtmlWidgets.Div{
+				Html.Div{
 					classes = {'infobox-center', 'infobox-icons'},
 					children = Array.interleave(links, ' '),
 				}
