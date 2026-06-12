@@ -77,6 +77,14 @@ function StandingsStorage.run(data, options)
 	if options and options.saveVars then
 		StandingsStorage.saveVars(storageTable, entries)
 	end
+
+	-- Return the record in model-ready form (matches as a table, not a JSON string)
+	-- so callers on the producing page can skip the var round-trip.
+	local directRecord = Table.merge(storageTable, {
+		pagename = mw.title.getCurrentTitle().text,
+		matches = data.matches or {},
+	})
+	return {record = directRecord, entries = entries}
 end
 
 ---@param data table
