@@ -31,6 +31,14 @@ local function StandingsSwiss(props)
 
 	local lastRound = standings.rounds[#standings.rounds]
 
+	local entryByRound = Array.map(standings.rounds, function(round)
+		local byName = {}
+		Array.forEach(round.opponents, function(entry)
+			byName[Opponent.toName(entry.opponent)] = entry
+		end)
+		return byName
+	end)
+
 	return TableWidgets.Table{
 		classes = {'standings-swiss'},
 		title = Logic.nilIfEmpty(standings.title),
@@ -40,7 +48,7 @@ local function StandingsSwiss(props)
 			Helpers.headerRow(standings),
 			-- Rows
 			TableWidgets.TableBody{children = Array.map(lastRound.opponents, function(slot)
-				return Helpers.createRow(standings, slot)
+				return Helpers.createRow(standings, slot, entryByRound)
 			end)}
 		),
 		striped = false
@@ -94,8 +102,10 @@ end
 ---@private
 ---@param standings StandingsModel
 ---@param slot StandingsEntryModel
+---@param entryByRound table[]
 ---@return Renderable
-function Helpers.createRow(standings, slot)
+function Helpers.createRow(standings, slot, entryByRound)
+	local slotName = Opponent.toName(slot.opponent)
 	return TableWidgets.Row{
 		attributes = {['data-position-status'] = slot.positionStatus},
 		children = WidgetUtil.collect(
@@ -123,10 +133,8 @@ function Helpers.createRow(standings, slot)
 					children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
 				}
 			end),
-			Array.map(standings.rounds, function(columnRound)
-				local entry = Array.find(columnRound.opponents, function(columnSlot)
-					return Opponent.same(columnSlot.opponent, slot.opponent)
-				end)
+			Array.map(standings.rounds, function(columnRound, columnIndex)
+				local entry = entryByRound[columnIndex][slotName]
 				if not entry then
 					return TableWidgets.Cell{}
 				end
