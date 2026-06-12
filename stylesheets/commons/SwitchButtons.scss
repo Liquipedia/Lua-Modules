@@ -102,7 +102,8 @@
 
 		&.switch-pill-generic {
 			.switch-pill-option {
-				border: 1px solid transparent;
+				outline: 1px solid transparent;
+				outline-offset: -1px;
 				color: var( --clr-secondary-25 );
 
 				.theme--dark & {
@@ -113,11 +114,13 @@
 			.switch-pill-option.switch-pill-option-active {
 				background-color: var( --clr-secondary-100 );
 				outline: 1px solid var( --clr-on-surface-light-primary-16 );
+				outline-offset: -1px;
 				color: var( --clr-secondary-25 );
 
 				.theme--dark & {
 					background-color: var( --clr-on-surface-dark-primary-8 );
 					outline: 1px solid var( --clr-on-surface-dark-primary-12 );
+					outline-offset: -1px;
 					color: var( --clr-secondary-100 );
 				}
 			}
