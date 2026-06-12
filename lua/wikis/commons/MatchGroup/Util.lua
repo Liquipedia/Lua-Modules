@@ -33,6 +33,7 @@ games, and etc in the new bracket framework.
 
 Display related functions go in Module:MatchGroup/Display/Helper.
 ]]
+---@class MatchGroupUtil
 local MatchGroupUtil = {types = {}}
 
 ---@class MatchGroupUtilLowerEdge
@@ -325,6 +326,10 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	extradata = 'table?',
 })
 
+---@class MatchGroupUtilSubgroup
+---@field games MatchGroupUtilGame[]
+---@field subgroup number
+---@field header string?
 
 ---@class FFAMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games FFAMatchGroupUtilGame[]
@@ -769,6 +774,34 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 		walkover = nilIfEmpty(record.walkover) and record.walkover:lower() or nil,
 		winner = tonumber(record.winner),
 	}
+end
+
+---Group games on the subgroup field to form submatches
+---@param match MatchGroupUtilMatch
+---@return MatchGroupUtilSubgroup[]
+function MatchGroupUtil.groupBySubgroup(match)
+	local previousSubgroup = nil
+	---@type MatchGroupUtilGame[]?
+	local currentGames = nil
+	---@type MatchGroupUtilGame[][]
+	local submatchGames = {}
+	Array.forEach(match.games, function (game)
+		if previousSubgroup == nil or previousSubgroup ~= game.subgroup then
+			currentGames = {}
+			Array.appendWith(submatchGames, currentGames)
+			previousSubgroup = game.subgroup
+		end
+		---@cast currentGames -nil
+		Array.appendWith(currentGames, game)
+	end)
+	return Array.map(submatchGames, function (games, groupIndex)
+		---@type MatchGroupUtilSubgroup
+		return {
+			games = games,
+			subgroup = groupIndex,
+			header = Table.extract(match.extradata or {}, 'subgroup' .. groupIndex .. 'header'),
+		}
+	end)
 end
 
 ---@param data table
