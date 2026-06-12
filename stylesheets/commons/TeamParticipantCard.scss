@@ -11,6 +11,7 @@ $participant-icon-size-expanded: 52px;
 $participant-icon-size-compact: 44px;
 $participant-icon-size-mobile: 33px;
 $participant-icon-size-small: 18px;
+$participant-card-min-width: 280px;
 
 $compact-selector: '[data-switch-group="team-cards-compact"]';
 $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
@@ -65,7 +66,7 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 .team-participant__grid {
 	display: grid;
 	gap: 0.25rem;
-	grid-template-columns: repeat( auto-fit, minmax( 280px, 1fr ) );
+	grid-template-columns: repeat( auto-fill, minmax( $participant-card-min-width, 1fr ) );
 
 	@media ( min-width: 1024px ) {
 		gap: 0.5rem;
