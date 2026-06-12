@@ -170,7 +170,7 @@ end
 ---@field leavedate string? including reference
 ---@field inactivedate string? including reference
 ---@field status SquadStatus?
----@field type SquadStatus?
+---@field type SquadType?
 ---@field team string? as loanedto
 ---@field teamrole string? as loanedtorole
 ---@field newteamdate string?
