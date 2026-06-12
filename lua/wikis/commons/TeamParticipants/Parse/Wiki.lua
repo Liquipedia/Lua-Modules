@@ -183,8 +183,9 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		}
 
 		local opponentName = Opponent.toName(opponent)
-		local prizePoolDate = Variables.varDefault('enddate_' .. opponentName)
-			or Variables.varDefault('enddate_' .. opponentName .. '_date')
+		local prizePoolDate = Variables.varDefault('enddate_' .. opponentName) -- set in multiple PrizePool/Custom
+			or Variables.varDefault('enddate_' .. opponentName .. '_date') -- set in valorant/PrizePool/Custom
+			or Variables.varDefault('ranking_' .. mw.ustring.lower(opponentName) .. '_placementdate') -- set in PrizePool/Base
 		date = date or DateExt.parseIsoDate(prizePoolDate) or defaultDate
 
 		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), resolvedOptions)
