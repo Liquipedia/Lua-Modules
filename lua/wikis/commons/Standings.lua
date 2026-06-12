@@ -213,7 +213,7 @@ function Standings.fetchEntries(standings)
 		'standingsentry',
 		{
 			conditions = conditions:toString(),
-			order = 'roundindex asc',
+			order = 'roundindex asc, slotindex asc',
 		},
 		function(record)
 			table.insert(standingsEntries, record)
@@ -231,13 +231,8 @@ function Standings.makeRounds(standings)
 	local roundCount = Array.maxBy(Array.map(standingsEntries, function(entry)
 		return tonumber(entry.roundindex) or 1 end), FnUtil.identity)
 
-	local entriesByRound = {}
-	Array.forEach(standingsEntries, function(entry)
-		local roundIndex = tonumber(entry.roundindex)
-		if roundIndex then
-			entriesByRound[roundIndex] = entriesByRound[roundIndex] or {}
-			table.insert(entriesByRound[roundIndex], entry)
-		end
+	local _, entriesByRound = Array.groupBy(standingsEntries, function(entry)
+		return tonumber(entry.roundindex)
 	end)
 
 	return Array.mapRange(1, roundCount or 1, function(roundIndex)

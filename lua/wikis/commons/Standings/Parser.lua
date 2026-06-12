@@ -76,10 +76,8 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		end)
 	end)
 
-	local entriesByRound = {}
-	Array.forEach(entries, function(entry)
-		entriesByRound[entry.roundindex] = entriesByRound[entry.roundindex] or {}
-		table.insert(entriesByRound[entry.roundindex], entry)
+	local _, entriesByRound = Array.groupBy(entries, function(entry)
+		return entry.roundindex
 	end)
 
 	Array.forEach(rounds, function(round)
