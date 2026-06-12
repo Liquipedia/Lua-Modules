@@ -28,8 +28,9 @@ end
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
+---@param value integer?
 ---@return string
-function TiebreakerMatchDiff:display(state, opponent)
+function TiebreakerMatchDiff:display(state, opponent, value)
 	return opponent.match.w .. ' - ' .. opponent.match.l
 end
 
