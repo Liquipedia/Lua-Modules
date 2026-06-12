@@ -76,16 +76,18 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		end)
 	end)
 
-	Array.forEach(rounds, function(round)
-		StandingsParser.calculateTiebreakerValues(Array.filter(entries, function(opponentRound)
-			return opponentRound.roundindex == round.roundNumber
-		end), tiebreakerIds)
+	local entriesByRound = {}
+	Array.forEach(entries, function(entry)
+		entriesByRound[entry.roundindex] = entriesByRound[entry.roundindex] or {}
+		table.insert(entriesByRound[entry.roundindex], entry)
 	end)
 
 	Array.forEach(rounds, function(round)
-		StandingsParser.determinePlacements(Array.filter(entries, function(opponentRound)
-			return opponentRound.roundindex == round.roundNumber
-		end), tiebreakerIds)
+		StandingsParser.calculateTiebreakerValues(entriesByRound[round.roundNumber] or {}, tiebreakerIds)
+	end)
+
+	Array.forEach(rounds, function(round)
+		StandingsParser.determinePlacements(entriesByRound[round.roundNumber] or {}, tiebreakerIds)
 	end)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer,
 	---points: number, placement: integer?, slotindex: integer}[]
@@ -96,9 +98,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 
 	StandingsParser.addStatuses(entries, bgs, 'currentstatus')
 	if isFinished then
-		StandingsParser.addStatuses(Array.filter(entries, function(opponentRound)
-			return opponentRound.roundindex == #rounds
-		end), bgs, 'definitestatus')
+		StandingsParser.addStatuses(entriesByRound[#rounds] or {}, bgs, 'definitestatus')
 	end
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
 	---placement: integer?, slotindex: integer, placementchange: integer?,

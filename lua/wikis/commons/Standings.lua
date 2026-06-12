@@ -231,11 +231,18 @@ function Standings.makeRounds(standings)
 	local roundCount = Array.maxBy(Array.map(standingsEntries, function(entry)
 		return tonumber(entry.roundindex) or 1 end), FnUtil.identity)
 
+	local entriesByRound = {}
+	Array.forEach(standingsEntries, function(entry)
+		local roundIndex = tonumber(entry.roundindex)
+		if roundIndex then
+			entriesByRound[roundIndex] = entriesByRound[roundIndex] or {}
+			table.insert(entriesByRound[roundIndex], entry)
+		end
+	end)
+
 	return Array.mapRange(1, roundCount or 1, function(roundIndex)
-		local roundEntries = Array.filter(standingsEntries, function(entry)
-			return tonumber(entry.roundindex) == roundIndex
-		end)
-		local opponents = Array.sortBy(Array.map(roundEntries, Standings.entryFromRecord), Operator.property('position'))
+		local roundEntries = Array.map(entriesByRound[roundIndex] or {}, Standings.entryFromRecord)
+		local opponents = Array.sortBy(roundEntries, Operator.property('position'))
 		return {
 			round = roundIndex,
 			opponents = opponents,
