@@ -7,25 +7,24 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local Component = Lua.import('Module:Widget/Component')
+local Context = Lua.import('Module:Widget/ComponentContext')
 
-local Widget = Lua.import('Module:Widget')
 local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 
 ---@class Table2BodyProps
----@field children Renderable[]?
+---@field children? Renderable|Renderable[]
 
----@class Table2Body: Widget
----@operator call(Table2BodyProps): Table2Body
----@field props Table2BodyProps
-local Table2Body = Class.new(Widget)
-
----@return Widget
-function Table2Body:render()
-	return Table2Contexts.Section{
+---@param props Table2BodyProps
+---@return Renderable
+local function Table2Body(props)
+	return Context.Provider{
+		def = Table2Contexts.Section,
 		value = 'body',
-		children = self.props.children or {},
+		children = props.children or {},
 	}
 end
 
-return Table2Body
+return Component.component(
+	Table2Body
+)

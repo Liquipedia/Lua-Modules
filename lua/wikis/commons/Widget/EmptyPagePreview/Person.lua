@@ -53,9 +53,14 @@ function EmptyPersonPagePreview:render()
 
 	self.person = Page.applyUnderScoresIfEnforced(self.props.pageName)
 
+	local infobox = self:_infobox()
+	if not infobox then
+		return
+	end
+
 	return HtmlWidgets.Div{
 		children = WidgetUtil.collect(
-			self:_infobox(),
+			infobox,
 			HtmlWidgets.H2{children = {'Overview'}},
 			self:_results(),
 			self:_matches(),
@@ -66,7 +71,7 @@ function EmptyPersonPagePreview:render()
 end
 
 ---@private
----@return Widget
+---@return Widget?
 function EmptyPersonPagePreview:_infobox()
 	local infoboxArgsFromSquadInfo = self:_backfillInformationFromSquadInfo()
 
@@ -79,6 +84,9 @@ function EmptyPersonPagePreview:_infobox()
 		self:_backfillInformationFromPlacements()
 	)
 	table.insert(infoboxArgs.idsArray, infoboxArgsFromSquadInfo.id)
+	if Logic.isEmpty(infoboxArgs.idsArray) then
+		return
+	end
 	infoboxArgs.idsArray = Array.unique(infoboxArgs.idsArray)
 	infoboxArgs.idsArray = Array.filter(infoboxArgs.idsArray, function(id)
 		return id ~= infoboxArgs.id
@@ -157,11 +165,11 @@ end
 function EmptyPersonPagePreview:_backfillInformationFromPlacements()
 	local personConditions = ConditionTree(BooleanOperator.any)
 		-- players
-		:add(Array.map(Array.range(1, DEFAULT_MAX_PLAYERS_PER_PLACEMENT), function(index)
+		:add(Array.mapRange(1, DEFAULT_MAX_PLAYERS_PER_PLACEMENT, function(index)
 			return ConditionNode(ColumnName('p' .. index, 'opponentplayers'), Comparator.eq, self.person)
 		end))
 		-- coaches (etc)
-		:add(Array.map(Array.range(1, 5), function(index)
+		:add(Array.mapRange(1, 5, function(index)
 			return ConditionNode(ColumnName('c' .. index, 'opponentplayers'), Comparator.eq, self.person)
 		end))
 

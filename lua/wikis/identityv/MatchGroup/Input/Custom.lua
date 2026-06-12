@@ -22,7 +22,7 @@ local MatchFunctions = {}
 ---@class IdentityvMapParser: MapParserInterface
 local MapFunctions = {}
 
-local MAX_NUM_BANS = 6
+local MAX_NUM_BANS = 9
 local MAX_NUM_PICKS = 5
 local VALID_SIDES = {
 	'hunter',
@@ -81,7 +81,7 @@ end
 
 local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, CharacterNames)
 
--- Parse extradata information, particularally info about halfs and operator bans and picks
+-- Parse extradata information, particularly info about halfs and operator bans and picks
 ---@param match table
 ---@param map table
 ---@param opponents MGIParsedOpponent[]

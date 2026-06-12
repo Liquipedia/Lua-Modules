@@ -27,7 +27,7 @@ local ConditionUtil = Condition.Util
 local AnalyticsMapping = Lua.import('Module:MainPageLayout/AnalyticsMapping', {loadData = true})
 local WikiData = Lua.import('Module:MainPageLayout/data')
 local GridWidgets = Lua.import('Module:Widget/Grid')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local InMemoryOf = Lua.import('Module:Widget/MainPage/InMemoryOf')
 local NavigationCard = Lua.import('Module:Widget/MainPage/NavigationCard')
 local PanelWidget = Lua.import('Module:Widget/Panel')
@@ -39,7 +39,7 @@ local MainPageLayout = {}
 local NO_TABLE_OF_CONTENTS = '__NOTOC__'
 
 ---@param frame Frame
----@return WidgetHtml
+---@return VNode
 function MainPageLayout.make(frame)
 	assert(WikiData.banner, 'MainPageLayout: Banner data not found')
 	assert(WikiData.layouts, 'MainPageLayout: Layout data not found')
@@ -52,22 +52,22 @@ function MainPageLayout.make(frame)
 
 	mw.ext.SearchEngineOptimization.metadesc(WikiData.metadesc)
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'mainpage-v2'},
 		children = WidgetUtil.collect(
 			NO_TABLE_OF_CONTENTS,
 			Page.setDisplayTitle{frame = frame, title = WikiData.title},
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'header-banner'},
 				children = {
-					HtmlWidgets.Div{
+					Html.Div{
 						classes = {'header-banner__logo'},
 						children = {
-							HtmlWidgets.Div{
+							Html.Div{
 								classes = {'logo--light-theme'},
 								children = { Image.display(WikiData.banner.lightmode, nil, {size = 200, link = ''}) }
 							},
-							HtmlWidgets.Div{
+							Html.Div{
 								classes = {'logo--dark-theme'},
 								children = { Image.display(WikiData.banner.darkmode, nil, {size = 200, link = ''}) }
 							}
@@ -80,7 +80,7 @@ function MainPageLayout.make(frame)
 			AnalyticsWidget{
 				analyticsName = 'Quick navigation',
 				children = {
-					HtmlWidgets.Div{
+					Html.Div{
 						classes = {'navigation-cards'},
 						children = Array.map(WikiData.navigation, MainPageLayout._makeNavigationCard)
 					}
@@ -116,8 +116,8 @@ function MainPageLayout._makeInMemoryOfDisplay(args)
 	end)
 end
 
----@param body (string|Widget|Html|nil)|(string|Widget|Html|nil)[]
----@return (string|Widget|Html|nil)|(string|Widget|Html|nil)[]
+---@param body Renderable|Renderable[]
+---@return Renderable|Renderable[]
 function MainPageLayout._processCellBody(body)
 	local frame = mw.getCurrentFrame()
 	return type(body) == 'string' and frame:preprocess(body) or body

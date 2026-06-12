@@ -18,7 +18,7 @@ local Table = Lua.import('Module:Table')
 local Injector = Lua.import('Module:Widget/Injector')
 local Item = Lua.import('Module:Infobox/Item')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local WarningBox = Lua.import('Module:Widget/WarningBox')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
@@ -26,8 +26,13 @@ local Center = Widgets.Center
 local Title = Widgets.Title
 
 ---@class StormgateItemInfobox: ItemInfobox
+---@operator call(Frame): StormgateItemInfobox
 ---@field data table
 local CustomItem = Class.new(Item)
+
+---@class StormgateItemInfoboxWidgetInjector: WidgetInjector
+---@operator call(StormgateItemInfobox): StormgateItemInfoboxWidgetInjector
+---@field caller StormgateItemInfobox
 local CustomInjector = Class.new(Injector)
 
 local VALID_ITEMS = {
@@ -35,7 +40,7 @@ local VALID_ITEMS = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomItem.run(frame)
 	local item = CustomItem(frame)
 
@@ -50,7 +55,7 @@ function CustomItem.run(frame)
 
 	local builtInfobox = item:createInfobox()
 
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = {
 			builtInfobox,
 			CustomItem._deprecatedWarning(item.data.deprecated.display)
@@ -59,8 +64,8 @@ function CustomItem.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args

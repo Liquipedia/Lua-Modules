@@ -12,10 +12,11 @@ local Class = Lua.import('Module:Class')
 local Player = Lua.import('Module:Infobox/Person')
 
 ---@class CustomInfoboxPlayer: Person
+---@operator call(Frame): CustomInfoboxPlayer
 local CustomPlayer = Class.new(Player)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPlayer.run(frame)
 	return CustomPlayer(frame):createInfobox()
 end

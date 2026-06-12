@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local ErrorDisplay = Lua.import('Module:Error/Display')
 
 local Widget = Lua.import('Module:Widget')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
@@ -20,6 +21,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ParticipantsTeamCardsGroupProps
 ---@field participants TeamParticipant[]|nil
+---@field brokenParticipants TeamParticipant[]|nil
 ---@field showPlayerInfo boolean
 ---@field showControls boolean
 ---@field mergeStaffTabIfOnlyOneStaff boolean|nil
@@ -37,8 +39,14 @@ function ParticipantsTeamCardsGroup:render()
 	end
 
 	local showControls = self.props.showControls
+	local brokenParticipants = self.props.brokenParticipants or {}
+
+	local errorBoxes = Array.map(brokenParticipants, function(broken)
+		return ErrorDisplay.Box{text = broken.errorMessage}
+	end)
 
 	local children = WidgetUtil.collect(
+		errorBoxes,
 		showControls and ParticipantControls{showPlayerInfo = self.props.showPlayerInfo} or nil,
 		AnalyticsWidget{
 			analyticsName = 'Team participants card',

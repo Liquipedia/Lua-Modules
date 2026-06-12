@@ -22,7 +22,7 @@ local CustomPatch = Class.new(Patch)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPatch.run(frame)
 	local customPatch = CustomPatch(frame)
 	customPatch:setWidgetInjector(CustomInjector(customPatch))
@@ -30,8 +30,8 @@ function CustomPatch.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args  = caller.args

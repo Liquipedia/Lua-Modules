@@ -8,49 +8,47 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageStat
----@field icon string|Widget
+---@field icon Renderable
 ---@field name string
----@field team1Value (string|Widget)|(string|Widget)[]
----@field team2Value (string|Widget)|(string|Widget)[]
+---@field team1Value? Renderable|Renderable[]
+---@field team2Value? Renderable|Renderable[]
 
 ---@class MatchPageStatsListParameters
 ---@field finished boolean
 ---@field data MatchPageStat[]
 
----@class MatchPageStatsList: Widget
----@operator call(MatchPageStatsListParameters): MatchPageStatsList
----@field props MatchPageStatsListParameters
-local MatchPageStatsList = Class.new(Widget)
+local MatchPageStatsList = {}
 
----@return Widget?
-function MatchPageStatsList:render()
-	if Logic.isEmpty(self.props.data) then return end
+---@param props MatchPageStatsListParameters
+---@return VNode?
+function MatchPageStatsList.render(props)
+	if Logic.isEmpty(props.data) then
+		return
+	end
 	return Div{
 		classes = {'match-bm-team-stats-list'},
 		children = Array.map(
-			Array.filter(self.props.data, function (element)
+			Array.filter(props.data, function (element)
 				return element.team1Value ~= nil or element.team2Value ~= nil
 			end),
-			function (dataElement)
-				return self:_renderStat(dataElement)
-			end
+			FnUtil.curry(MatchPageStatsList._renderStat, props.finished)
 		)
 	}
 end
 
+---@param finished boolean
 ---@param data MatchPageStat
----@return Widget?
-function MatchPageStatsList:_renderStat(data)
-	local finished = self.props.finished
+---@return VNode
+function MatchPageStatsList._renderStat(finished, data)
 	return Div{
 		classes = {'match-bm-team-stats-list-row'},
 		children = WidgetUtil.collect(
@@ -70,4 +68,4 @@ function MatchPageStatsList:_renderStat(data)
 	}
 end
 
-return MatchPageStatsList
+return Component.component(MatchPageStatsList.render)
