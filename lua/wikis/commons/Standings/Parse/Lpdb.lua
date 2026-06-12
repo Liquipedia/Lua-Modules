@@ -54,6 +54,8 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 
 	---@type StandingTableOpponentData[]
 	local opponents = {}
+	---@type table<string, StandingTableOpponentData>
+	local opponentsByName = {}
 	Lpdb.executeMassQuery(
 		'match2',
 		{
@@ -62,7 +64,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 		function(match2)
 			local roundNumbers = matchIdToRound[match2.match2id]
 			Array.forEach(roundNumbers, function(roundNumber)
-				StandingsParseLpdb.parseMatch(roundNumber, match2, opponents, scoreMapper, #rounds)
+				StandingsParseLpdb.parseMatch(roundNumber, match2, opponents, opponentsByName, scoreMapper, #rounds)
 			end)
 		end
 	)
@@ -116,18 +118,28 @@ end
 ---@param roundNumber integer
 ---@param match match2
 ---@param opponents StandingTableOpponentData[]
+---@param opponentsByName table<string, StandingTableOpponentData>
 ---@param scoreMapper fun(opponent: standardOpponent): number?
 ---@param maxRounds integer
-function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMapper, maxRounds)
+function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, opponentsByName, scoreMapper, maxRounds)
 	local match2 = MatchGroupUtil.matchFromRecord(match)
 	Array.forEach(match2.opponents, function(opponent)
 		---Find matching opponent
-		local standingsOpponentData = Array.find(opponents, function(opponentData)
-			return Opponent.same(opponentData.opponent, opponent)
-		end)
+		local key = Opponent.toName(opponent)
+		local standingsOpponentData = opponentsByName[key]
+		if not standingsOpponentData and opponent.type == Opponent.team then
+			-- renamed teams have differing names but compare equal via historicaltemplate
+			standingsOpponentData = Array.find(opponents, function(opponentData)
+				return Opponent.same(opponentData.opponent, opponent)
+			end)
+			if standingsOpponentData then
+				opponentsByName[key] = standingsOpponentData
+			end
+		end
 		if not standingsOpponentData then
 			standingsOpponentData = StandingsParseLpdb.newOpponent(opponent, maxRounds)
 			table.insert(opponents, standingsOpponentData)
+			opponentsByName[key] = standingsOpponentData
 		end
 		assert(standingsOpponentData.rounds[roundNumber], 'Round number out of bounds')
 
