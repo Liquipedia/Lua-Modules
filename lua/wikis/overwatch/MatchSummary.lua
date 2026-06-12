@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
@@ -22,9 +21,10 @@ local MAX_NUM_BANS = 1
 ---@class OverwatchCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class OverwatchMatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): OverwatchMatchSummaryGameRow
-local OverwatchMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+local OverwatchMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent{
+	createGameOverview = CustomMatchSummary.createGameOverview,
+	createGameOpponentView = CustomMatchSummary.createGameOpponentView
+}
 
 ---@param args table
 ---@return Widget
@@ -51,15 +51,17 @@ function CustomMatchSummary.createBody(match)
 	)
 end
 
+---@param props MatchSummaryGameRowProps
 ---@return string
-function OverwatchMatchSummaryGameRow:createGameOverview()
-	return DisplayHelper.MapAndMode(self.props.game)
+function CustomMatchSummary.createGameOverview(props)
+	return DisplayHelper.MapAndMode(props.game)
 end
 
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return string
-function OverwatchMatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	local game = self.props.game
+---@return Renderable
+function CustomMatchSummary.createGameOpponentView(props, opponentIndex)
+	local game = props.game
 	local opponentCopy = Table.deepCopy(game.opponents[opponentIndex])
 	if opponentCopy.score and game.mode == 'Push' then
 		opponentCopy.score = opponentCopy.score .. 'm'
