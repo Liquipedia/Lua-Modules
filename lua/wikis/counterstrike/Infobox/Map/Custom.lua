@@ -15,7 +15,7 @@ local Logic = Lua.import('Module:Logic')
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = Lua.import('Module:Infobox/Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Center = Widgets.Center
 local Cell = Widgets.Cell
 local Title = Widgets.Title
