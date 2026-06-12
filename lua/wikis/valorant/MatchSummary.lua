@@ -45,7 +45,7 @@ function CustomMatchSummary.createBody(match)
 		},
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(
-			match.extradata.mapveto, {game = match.game, useLpdb = true}
+			match.extradata.mapveto, {useLpdb = true}
 		))
 	)
 end
