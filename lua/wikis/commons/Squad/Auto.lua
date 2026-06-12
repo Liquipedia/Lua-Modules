@@ -176,6 +176,7 @@ function SquadAuto:displayTabs(entries)
 		entries,
 		---@param entry SquadAutoPerson
 		function (entry)
+			assert(entry.leavedate, "Missing leavedate for " .. entry.id)
 			return entry.leavedate:match('(%d%d%d%d)')
 		end
 	)
