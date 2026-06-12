@@ -388,11 +388,18 @@ function SquadAuto:_queryTransfers()
 			local relevantToTeam, isToMain = parseRelevantTeam(Side.to, record)
 			local transferType = getTransferType(relevantFromTeam, relevantToTeam)
 
+			local fromRole = parseRelevantRole(Side.from, record, relevantFromTeam, isFromMain)
+			local toRole = parseRelevantRole(Side.to, record, relevantToTeam, isToMain)
+
 			-- For leave transfers: Pass on new team for display as next team
 			if transferType == SquadAuto.TransferType.LEAVE and Logic.isEmpty(relevantToTeam) then
-				relevantToTeam = isFromMain
-					and Logic.nilIfEmpty(record.toteamtemplate)
-					or record.extradata.toteamsectemplate
+				if isFromMain then
+					relevantToTeam = Logic.nilIfEmpty(record.toteamtemplate)
+					toRole = Logic.nilIfEmpty(record.role2)
+				else
+					relevantToTeam = Logic.nilIfEmpty(record.extradata.toteamsectemplate)
+					toRole = Logic.nilIfEmpty(record.extradata.role2sec)
+				end
 			end
 
 			---@type TeamHistoryEntry
@@ -410,8 +417,8 @@ function SquadAuto:_queryTransfers()
 				references = record.reference,
 
 				-- Roles
-				fromRole = parseRelevantRole(Side.from, record, relevantFromTeam, isFromMain),
-				toRole = parseRelevantRole(Side.to, record, relevantToTeam, isToMain),
+				fromRole = fromRole,
+				toRole = toRole,
 
 				fromTeam = relevantFromTeam,
 				toTeam = relevantToTeam,
