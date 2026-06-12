@@ -77,8 +77,8 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Delta Force logo lightmode.svg ',
-		darkmode = 'Delta Force logo darkmode.svg ',
+		lightmode = 'Delta Force logo lightmode.svg',
+		darkmode = 'Delta Force logo darkmode.svg',
 	},
 	metadesc = 'The Delta Force esports wiki covering everything from players, teams and transfers, to ' ..
 		'tournaments and results, maps, and weapons.',
