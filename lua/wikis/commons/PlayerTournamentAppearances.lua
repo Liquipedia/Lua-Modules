@@ -231,7 +231,7 @@ function Appearances:build()
 		children = WidgetUtil.collect(
 			self:_header(),
 			TableWidgets.TableBody{
-				children = Array.map(Array.range(1, limit), FnUtil.curry(Appearances._row, self))
+				children = Array.mapRange(1, limit, FnUtil.curry(Appearances._row, self))
 			}
 		),
 		footer = self:_buildQueryLink()

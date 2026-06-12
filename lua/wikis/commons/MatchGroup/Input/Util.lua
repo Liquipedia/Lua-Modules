@@ -1629,7 +1629,7 @@ function MatchGroupInputUtil.parseSettings(match, opponentCount)
 	end)
 
 	-- Info per Placement
-	local placementInfo = Array.map(Array.range(1, opponentCount), function(index)
+	local placementInfo = Array.mapRange(1, opponentCount, function(index)
 		return {
 			placement = index,
 			killPoints = tonumber(match['p' .. index .. '_kill']) or tonumber(match.p_kill),
