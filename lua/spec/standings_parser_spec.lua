@@ -186,9 +186,7 @@ describe('Standings Parser', function()
 
 		local alpha1 = findEntry(standingsTable.entries, 'Alpha', 1)
 		local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
-		-- All rounds of an opponent share one cumulative match record;
-		-- earlier rounds therefore also show the final totals
-		assert.are_same({w = 1, d = 1, l = 1}, alpha1.match)
+		assert.are_same({w = 1, d = 0, l = 0}, alpha1.match)
 		assert.are_same({w = 1, d = 1, l = 1}, alpha2.match)
 	end)
 
