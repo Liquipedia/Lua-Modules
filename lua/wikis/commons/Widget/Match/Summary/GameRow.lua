@@ -32,8 +32,9 @@ local MatchSummaryGameRow = {}
 
 ---@generic P: MatchSummaryGameRowProps
 ---@param implProps MatchSummaryGameRowComponentProps
----@param defaultProps P?
+---@param defaultProps P
 ---@return Component<P>
+---@overload fun(implProps: MatchSummaryGameRowComponentProps): Component<MatchSummaryGameRowProps>
 function MatchSummaryGameRow.createComponent(implProps, defaultProps)
 	---@param componentProps MatchSummaryGameRowProps
 	---@return VNode
