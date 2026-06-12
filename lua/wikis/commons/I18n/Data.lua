@@ -109,6 +109,7 @@ return {
 
 		-- Team Participant Card
 		['participants-hover-roster-label'] = 'Player roster',
+		['participants-notes-label'] = 'Notes (${count})',
 
 		-- MatchSummary Map Veto
 		['matchsummary-mapveto-start'] = 'Start Map Veto',

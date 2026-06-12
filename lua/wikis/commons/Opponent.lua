@@ -455,7 +455,7 @@ function Opponent.readOpponentArgs(args)
 		return {type = Opponent.solo, players = {player}, extradata = {}}
 
 	elseif partySize then
-		local players = Array.map(Array.range(1, partySize), function(playerIndex)
+		local players = Array.mapRange(1, partySize, function(playerIndex)
 			return Opponent.readPlayerArgs(args, playerIndex)
 		end)
 		return {type = args.type, players = players, extradata = {}}
@@ -606,7 +606,7 @@ function Opponent.fromLpdbStruct(storageStruct)
 	if partySize then
 		local players = storageStruct.opponentplayers
 		return {
-			players = Array.map(Array.range(1, partySize), FnUtil.curry(Opponent.playerFromLpdbStruct, players)),
+			players = Array.mapRange(1, partySize, FnUtil.curry(Opponent.playerFromLpdbStruct, players)),
 			type = storageStruct.opponenttype,
 			extradata = {},
 		}

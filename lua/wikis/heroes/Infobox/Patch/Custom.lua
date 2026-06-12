@@ -34,7 +34,7 @@ end
 ---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
-	local args  = caller.args
+	local args = caller.args
 	if id == 'release' then
 		table.insert(widgets, Cell{name = 'NA Release Date', children = {args.narelease}})
 	end

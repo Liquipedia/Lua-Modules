@@ -22,8 +22,8 @@ local Label = Lua.import('Module:Widget/Basic/Label')
 local RESULT_DISPLAY_TYPES = {
 	['w'] = 'win',
 	['l'] = 'loss',
-	['winner'] = 'win',
-	['loser'] = 'loss',
+	['win'] = 'win',
+	['loss'] = 'loss',
 	['-'] = 'default'
 }
 

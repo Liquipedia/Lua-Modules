@@ -54,8 +54,8 @@ function PatchCalendar:render()
 		tableCss = {['text-align'] = 'center', ['font-size'] = '110%'},
 		children = {
 			Tr{children = {Th{attributes = {colspan = 6}, children = {self.displayYear}}}},
-			Tr{children = Array.map(Array.range(1, 6), buildMonthCell)},
-			Tr{children = Array.map(Array.range(7, 12), buildMonthCell)},
+			Tr{children = Array.mapRange(1, 6, buildMonthCell)},
+			Tr{children = Array.mapRange(7, 12, buildMonthCell)},
 		}
 	}
 end

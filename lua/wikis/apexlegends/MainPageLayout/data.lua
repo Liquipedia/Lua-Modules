@@ -75,9 +75,10 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays = 30,
+			upcomingDays = 60,
 			completedDays = 30,
 			tierColorScheme = 'top3',
+			variant = 'collapsible',
 		},
 		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
