@@ -14,7 +14,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local SummaryHelper = Lua.import('Module:MatchSummary/Base/Ffa')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ThefinalsFfaMatchSummaryParser: FfaMatchSummaryParser
@@ -28,7 +28,7 @@ function CustomMatchSummary.getByMatchId(props)
 	SummaryHelper.updateMatchOpponents(match)
 	local scoringData = SummaryHelper.createScoringData(match)
 
-	return HtmlWidgets.Fragment{children = {
+	return Html.Fragment{children = {
 		MatchSummaryWidgets.Header{matchId = match.matchId, games = match.games},
 		MatchSummaryWidgets.Tab{
 			matchId = match.matchId,
