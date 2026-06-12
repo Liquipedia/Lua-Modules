@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
@@ -20,9 +19,10 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@class ValorantMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class ValorantMatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): ValorantMatchSummaryGameRow
-local ValorantMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+local ValorantMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent{
+	createGameOpponentView = CustomMatchSummary.createGameOpponentView,
+	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay
+}
 
 ---@param args table
 ---@return Widget
@@ -48,16 +48,11 @@ function CustomMatchSummary.createBody(match)
 	)
 end
 
----@return string
-function ValorantMatchSummaryGameRow:createGameOverview()
-	return self:mapDisplay()
-end
-
 ---@private
+---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
 ---@return table[]
-function ValorantMatchSummaryGameRow:_makePartialScores(opponentIndex)
-	local game = self.props.game
+function CustomMatchSummary._makePartialScores(game, opponentIndex)
 	local extradata = game.extradata or {}
 	local firstSide = extradata.t1firstside or ''
 	local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
@@ -73,17 +68,18 @@ function ValorantMatchSummaryGameRow:_makePartialScores(opponentIndex)
 	}
 end
 
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Widget[]
-function ValorantMatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	local game = self.props.game
+---@return VNode[]
+function CustomMatchSummary.createGameOpponentView(props, opponentIndex)
+	local game = props.game
 	local flipped = opponentIndex == 2
 	local characters = Array.map((game.opponents[opponentIndex] or {}).players or {}, Operator.property('agent'))
 	return {
 		MatchSummaryWidgets.Characters{characters = characters, flipped = flipped, hideOnMobile = true},
 		MatchSummaryWidgets.DetailedScore{
-			score = self:scoreDisplay(opponentIndex),
-			partialScores = self:_makePartialScores(opponentIndex)
+			score = MatchSummaryWidgets.GameRow.scoreDisplay(game, opponentIndex),
+			partialScores = CustomMatchSummary._makePartialScores(game, opponentIndex)
 		}
 	}
 end
