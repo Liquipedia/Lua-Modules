@@ -70,13 +70,13 @@ local STATUS_TRANSLATE = {
 local BANNED = 'banned' -- Temporary until conversion
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Person.run(frame)
 	local person = Person(frame)
 	return person:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Person:createInfobox()
 	local args = self.args
 	assert(String.isNotEmpty(args.id), 'You need to specify an "id"')

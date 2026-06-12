@@ -15,7 +15,7 @@ local ThisDayQuery = Lua.import('Module:ThisDay/Query')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local ListWidgets = Lua.import('Module:Widget/List')
 local Widget = Lua.import('Module:Widget')
 
 local HEADER = HtmlWidgets.H3{children = 'Patches'}
@@ -64,7 +64,7 @@ function ThisDayPatch:render()
 
 	return {
 		HEADER,
-		UnorderedList{ children = lines }
+		ListWidgets.Unordered{ children = lines }
 	}
 end
 

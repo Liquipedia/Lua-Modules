@@ -40,7 +40,7 @@ jobs:
           node-version: lts/*
 
       - name: Setup luarocks
-        uses: leafo/gh-actions-luarocks@v5
+        uses: leafo/gh-actions-luarocks@v6
 
       - name: Setup dependencies
         run: |

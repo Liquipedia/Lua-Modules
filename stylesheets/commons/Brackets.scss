@@ -940,28 +940,6 @@ div.brkts-popup-body-element-thumbs {
 			padding: 0 0.5rem;
 			text-align: center;
 		}
-
-		&-picks {
-			.brkts-champion-icon {
-				gap: 0.125rem;
-				display: flex;
-				flex-wrap: wrap;
-
-				& img {
-					width: 1.25rem;
-					height: 1.25rem;
-					border-radius: 0.1875rem;
-
-					@media ( hover: hover ) {
-						&:hover {
-							height: unset;
-							border: 0.0625rem solid #ffffff;
-							box-shadow: 0 0.0625rem 0.25rem 0 var( --clr-on-surface-light-primary-12 );
-						}
-					}
-				}
-			}
-		}
 	}
 
 	table {
@@ -991,6 +969,91 @@ div.brkts-popup-body-element-thumbs {
 
 		&-text-right {
 			text-align: right;
+		}
+	}
+}
+
+.brkts-popup-veto {
+	display: grid;
+	grid-column: 1 / -1;
+	grid-template-columns: subgrid;
+
+	&-row {
+		display: grid;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+		padding: 0.5rem;
+
+		> :nth-child( 3n + 1 ) {
+			text-align: left;
+		}
+
+		> :nth-child( 3n + 2 ) {
+			text-align: center;
+		}
+
+		> :nth-child( 3n ) {
+			text-align: right;
+		}
+
+		&:nth-child( even ) {
+			background-color: var( --clr-on-surface-light-primary-4 );
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+			}
+		}
+
+		&:last-child {
+			border-bottom-left-radius: 0.25rem;
+			border-bottom-right-radius: 0.25rem;
+		}
+
+		&-indicator {
+			display: grid;
+			grid-template-columns: 1fr auto 1fr;
+			gap: 0.25rem;
+			align-items: center;
+		}
+
+		.brkts-champion-icon {
+			gap: 0.125rem;
+			display: flex;
+			flex-wrap: wrap;
+
+			img {
+				width: 1.25rem;
+				height: 1.25rem;
+				border-radius: 0.1875rem;
+
+				@media ( hover: hover ) {
+					&:hover {
+						height: unset;
+						border: 0.0625rem solid #ffffff;
+						box-shadow: 0 0.0625rem 0.25rem 0 var( --clr-on-surface-light-primary-12 );
+					}
+				}
+			}
+		}
+	}
+
+	&-header.general-collapsible-default-header {
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+		padding: unset;
+	}
+
+	&-wrapper {
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		background-color: var( --clr-on-surface-light-primary-4 );
+		color: var( --clr-secondary-25 );
+		padding: 0.25rem;
+		border-radius: 0.5rem;
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+			color: #ffffff;
 		}
 	}
 }

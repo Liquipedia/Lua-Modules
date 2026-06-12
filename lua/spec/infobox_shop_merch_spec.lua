@@ -1,8 +1,8 @@
 local ShopMerch = require('Module:Widget/Infobox/ShopMerch')
 
 local function render(args)
-	local widget = ShopMerch{args = args}
-	local rendered = widget:render()
+	---@diagnostic disable-next-line: undefined-field
+	local rendered = ShopMerch.renderFn{args = args} --[[ @as Renderable[] ]]
 	if not rendered then
 		return
 	end

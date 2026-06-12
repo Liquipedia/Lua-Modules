@@ -18,6 +18,168 @@ The final class names are all lower case with all spaces made into hyphens "-" s
 Besides these twelve there is Gray which will fit in with them very well. There is also White, and Black if you wish to use a dark background element with white text for example, or white background with dark text. ( as a child element of something that is already coloured, this will use the default text and background colours. ) There is also a Gold colour, this one stands out within the colour palette that was developed so it should only be used
 *******************************************************************************/
 
+/**
+ * Colors from first light/dark theme setup from Lakesideview
+ */
+
+/** Primary **/
+$clr-primary--light: #0d61a4;
+$clr-on-primary--light: #ffffff;
+$clr-primary-container--light: #d1e4ff;
+$clr-on-primary-container--light: #001c38;
+
+$clr-primary--dark: #9fc9ff;
+$clr-on-primary--dark: #00325b;
+$clr-primary-container--dark: #004880;
+$clr-on-primary-container--dark: #d1e4ff;
+
+/** Secondary **/
+$clr-secondary--light: #545f70;
+$clr-secondary-container--light: #d7e3f8;
+$clr-on-secondary-container--light: #101c2b;
+
+$clr-secondary--dark: #bbc7db;
+$clr-secondary-container--dark: #3c4858;
+$clr-on-secondary-container--dark: #d7e3f8;
+
+/** Tertiary **/
+$clr-tertiary-container--light: #f4d9ff;
+$clr-on-tertiary-container--light: #251431;
+
+$clr-tertiary-container--dark: #533f5f;
+$clr-on-tertiary-container--dark: #f4d9ff;
+
+/** Error **/
+$clr-error--light: #ba1b1b;
+$clr-on-error--light: #ffffff;
+$clr-error-container--light: #ffdad4;
+$clr-on-error-container--light: #410001;
+
+$clr-error--dark: #ffb4a9;
+$clr-on-error--dark: #680003;
+$clr-error-container--dark: #930006;
+$clr-on-error-container--dark: #ffdad4;
+
+/** Background/Surface **/
+$clr-background--light: #fdfcff;
+$clr-on-background--light: #1b1b1b;
+$clr-surface--light: #fdfcff;
+$clr-on-surface--light: #1b1b1b;
+
+$clr-background--dark: var( --clr-secondary-7 );
+$clr-on-background--dark: #e2e2e6;
+$clr-surface--dark: #1b1b1b;
+$clr-on-surface--dark: #e2e2e6;
+
+/** Surface variant **/
+$clr-surface-variant--light: #dfe2eb;
+$clr-on-surface-variant--light: #43474e;
+
+$clr-surface-variant--dark: #43474e;
+$clr-on-surface-variant--dark: var( --clr-secondary-100 );
+
+/** Confirmed **/
+$clr-confirmed--light: #106d34;
+$clr-on-confirmed--light: #ffffff;
+$clr-confirmed-container--light: #9ff6ae;
+$clr-on-confirmed-container--light: #002109;
+
+$clr-confirmed--dark: #84d994;
+$clr-on-confirmed--dark: #003915;
+$clr-confirmed-container--dark: #005322;
+$clr-on-confirmed-container--dark: #9ff6ae;
+
+/** Surface **/
+$clr-surface-1--light: #f1f4fa;
+$clr-surface-2--light: #eaf0f8;
+$clr-surface-3--light: #e3ebf5;
+$clr-surface-4--light: #e0e9f4;
+$clr-surface-5--light: #dbe6f2;
+
+$clr-surface-1--dark: var( --clr-secondary-7 );
+$clr-surface-2--dark: var( --clr-secondary-9 );
+$clr-surface-3--dark: var( --clr-secondary-16 );
+$clr-surface-4--dark: var( --clr-secondary-39 );
+$clr-surface-5--dark: var( --clr-secondary-80 );
+
+$clr-border--light: rgba( #000000, 8% );
+$clr-border--dark: rgba( #ffffff, 8% );
+
+/** Placing colors **/
+$clr-on-gold--light: #fff5cc;
+$clr-on-silver--light: #daedf1;
+
+$clr-on-gold--dark: #f8e9a0;
+$clr-on-silver--dark: #bfd5d9;
+
+:root {
+	--clr-primary: #{$clr-primary--light};
+	--clr-on-primary: #{$clr-on-primary--light};
+	--clr-primary-container: #{$clr-primary-container--light};
+	--clr-on-primary-container: #{$clr-on-primary-container--light};
+	--clr-secondary: #{$clr-secondary--light};
+	--clr-secondary-container: #{$clr-secondary-container--light};
+	--clr-on-secondary-container: #{$clr-on-secondary-container--light};
+	--clr-tertiary-container: #{$clr-tertiary-container--light};
+	--clr-on-tertiary-container: #{$clr-on-tertiary-container--light};
+	--clr-error: #{$clr-error--light};
+	--clr-on-error: #{$clr-on-error--light};
+	--clr-error-container: #{$clr-error-container--light};
+	--clr-on-error-container: #{$clr-on-error-container--light};
+	--clr-background: #{$clr-background--light};
+	--clr-on-background: #{$clr-on-background--light};
+	--clr-surface: #{$clr-surface--light};
+	--clr-on-surface: #{$clr-on-surface--light};
+	--clr-surface-variant: #{$clr-surface-variant--light};
+	--clr-on-surface-variant: #{$clr-on-surface-variant--light};
+	--clr-confirmed: #{$clr-confirmed--light};
+	--clr-on-confirmed: #{$clr-on-confirmed--light};
+	--clr-confirmed-container: #{$clr-confirmed-container--light};
+	--clr-on-confirmed-container: #{$clr-on-confirmed-container--light};
+	--clr-surface-1: #{$clr-surface-1--light};
+	--clr-surface-2: #{$clr-surface-2--light};
+	--clr-surface-3: #{$clr-surface-3--light};
+	--clr-surface-4: #{$clr-surface-4--light};
+	--clr-surface-5: #{$clr-surface-5--light};
+	--clr-border: #{$clr-border--light};
+	--clr-on-gold: #{$clr-on-gold--light};
+	--clr-on-silver: #{$clr-on-silver--light};
+}
+
+.theme--dark {
+	--clr-primary: #{$clr-primary--dark};
+	--clr-on-primary: #{$clr-on-primary--dark};
+	--clr-primary-container: #{$clr-primary-container--dark};
+	--clr-on-primary-container: #{$clr-on-primary-container--dark};
+	--clr-secondary: #{$clr-secondary--dark};
+	--clr-secondary-container: #{$clr-secondary-container--dark};
+	--clr-on-secondary-container: #{$clr-on-secondary-container--dark};
+	--clr-tertiary-container: #{$clr-tertiary-container--dark};
+	--clr-on-tertiary-container: #{$clr-on-tertiary-container--dark};
+	--clr-error: #{$clr-error--dark};
+	--clr-on-error: #{$clr-on-error--dark};
+	--clr-error-container: #{$clr-error-container--dark};
+	--clr-on-error-container: #{$clr-on-error-container--dark};
+	--clr-background: #{$clr-background--dark};
+	--clr-on-background: #{$clr-on-background--dark};
+	--clr-surface: #{$clr-surface--dark};
+	--clr-on-surface: #{$clr-on-surface--dark};
+	--clr-surface-variant: #{$clr-surface-variant--dark};
+	--clr-on-surface-variant: #{$clr-on-surface-variant--dark};
+	--clr-confirmed: #{$clr-confirmed--dark};
+	--clr-on-confirmed: #{$clr-on-confirmed--dark};
+	--clr-confirmed-container: #{$clr-confirmed-container--dark};
+	--clr-on-confirmed-container: #{$clr-on-confirmed-container--dark};
+	--clr-surface-1: #{$clr-surface-1--dark};
+	--clr-surface-2: #{$clr-surface-2--dark};
+	--clr-surface-3: #{$clr-surface-3--dark};
+	--clr-surface-4: #{$clr-surface-4--dark};
+	--clr-surface-5: #{$clr-surface-5--dark};
+	--clr-border: #{$clr-border--dark};
+	--clr-on-gold: #{$clr-on-gold--dark};
+	--clr-on-silver: #{$clr-on-silver--dark};
+}
+
 /* GRAY */
 .gray-text {
 	color: #616161;

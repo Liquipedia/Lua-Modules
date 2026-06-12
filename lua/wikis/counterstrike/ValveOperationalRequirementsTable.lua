@@ -241,24 +241,24 @@ end
 ---@param link string?
 ---@return IconFontawesomeWidget?
 function ValveOperationalRequirementsTable._makeGitHubIcon(link)
-    if Logic.isEmpty(link) then return end
-    return Link{
-        children = {IconFa{iconName = 'github'}},
-        linktype = 'external',
-        link = link
-    }
+	if Logic.isEmpty(link) then return end
+	return Link{
+		children = {IconFa{iconName = 'github'}},
+		linktype = 'external',
+		link = link
+	}
 end
 
 ---@private
 ---@param link string?
 ---@return IconFontawesomeWidget?
 function ValveOperationalRequirementsTable._makeRefIcon(link)
-    if Logic.isEmpty(link) then return nil end
-    return Link{
-        children = {IconFa{iconName = 'external_link'}},
-        linktype = 'external',
-        link = link
-    }
+	if Logic.isEmpty(link) then return nil end
+	return Link{
+		children = {IconFa{iconName = 'external_link'}},
+		linktype = 'external',
+		link = link
+	}
 end
 
 ---@private

@@ -21,17 +21,21 @@ local Player = Lua.import('Module:Infobox/Person')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
 
 ---@class BrawlstarsInfoboxPlayer: Person
+---@operator call(Frame): BrawlstarsInfoboxPlayer
 local CustomPlayer = Class.new(Player)
+
+---@class BrawlstarsInfoboxPlayerWidgetInjector: WidgetInjector
+---@operator call(BrawlstarsInfoboxPlayer): BrawlstarsInfoboxPlayerWidgetInjector
+---@field caller BrawlstarsInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPlayer.run(frame)
-	---@type BrawlstarsInfoboxPlayer
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
@@ -65,14 +69,15 @@ function CustomPlayer.run(frame)
 		autoPlayerIntro = args.freetext
 	end
 
-	return mw.html.create()
-		:node(builtInfobox)
-		:node(autoPlayerIntro)
+	return Html.Fragment{children = {
+		builtInfobox,
+		autoPlayerIntro,
+	}}
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -114,7 +119,7 @@ function CustomPlayer:createBottomContent()
 		local teamPage = TeamTemplate.getPageName(self.args.team)
 		---@cast teamPage -nil
 
-		return HtmlWidgets.Fragment{
+		return Html.Fragment{
 			children = {
 				MatchTicker.recent{team = teamPage},
 				UpcomingTournaments.team{name = teamPage}

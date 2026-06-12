@@ -36,7 +36,7 @@ function MatchSummaryFfaPointsDistribution:render()
 			HtmlWidgets.Span{children = suffixPoints(placementPoints)},
 			hasKillPoints and HtmlWidgets.Span{children = suffixPoints(killPoints)} or nil,
 		}
-		return {icon = icon, title = title, content =  contentDisplay}
+		return {icon = icon, title = title, content = contentDisplay}
 	end
 
 	local header = {title = 'Placement', content = {

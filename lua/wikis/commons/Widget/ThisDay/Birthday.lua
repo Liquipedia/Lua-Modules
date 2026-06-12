@@ -19,7 +19,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local ListWidgets = Lua.import('Module:Widget/List')
 local Widget = Lua.import('Module:Widget')
 
 local HEADER = HtmlWidgets.H3{children = 'Birthdays'}
@@ -57,7 +57,7 @@ function ThisDayBirthday:render()
 
 	return {
 		HEADER,
-		UnorderedList{
+		ListWidgets.Unordered{
 			children = Array.map(birthdayData, FnUtil.curry(ThisDayBirthday._toLine, self))
 		}
 	}

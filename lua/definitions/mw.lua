@@ -159,7 +159,7 @@ mw.html = {}
 function mw.html.create(tagName, args) end
 
 ---Appends a child mw.html (builder) node to the current mw.html instance. If a nil parameter is passed, this is a no-op. A (builder) node is a string representation of an html element.
----@param builder? Html|string|number|Widget
+---@param builder? Renderable
 ---@return self
 function mw.html:node(builder) end
 
@@ -1142,7 +1142,7 @@ mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
 mw.ext.Dota2Ranking = {}
 
 ---@alias Dota2RankingEntry {external_id: string, name: string, rating: number, rank: integer}
----@alias Dota2RankingRecord {date: string, provisional: boolean,  entries: Dota2RankingEntry[]}
+---@alias Dota2RankingRecord {date: string, provisional: boolean, entries: Dota2RankingEntry[]}
 ---@return Dota2RankingRecord[]
 function mw.ext.Dota2Ranking.get() end
 
