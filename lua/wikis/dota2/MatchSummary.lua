@@ -21,9 +21,10 @@ local STATUS_NOT_PLAYED = 'notplayed'
 ---@class Dota2CustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class Dota2MatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): Dota2MatchSummaryGameRow
-local Dota2MatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+local Dota2MatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent{
+	createGameOverview = MatchSummaryWidgets.GameRow.lengthDisplay,
+	createGameOpponentView = CustomMatchSummary.createGameOpponentView
+}
 
 ---@param args table
 ---@return Widget
@@ -51,10 +52,10 @@ function CustomMatchSummary.createBody(match)
 	)
 end
 
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Widget
-function Dota2MatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	local props = self.props
+---@return VNode
+function CustomMatchSummary.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local extradata = game.extradata or {}
 
@@ -66,11 +67,6 @@ function Dota2MatchSummaryGameRow:createGameOpponentView(opponentIndex)
 		bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata['team' .. opponentIndex .. 'side'] or ''),
 		date = game.date,
 	}
-end
-
----@return Renderable?
-function Dota2MatchSummaryGameRow:createGameOverview()
-	return self:lengthDisplay()
 end
 
 return CustomMatchSummary
