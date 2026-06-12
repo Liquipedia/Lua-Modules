@@ -146,9 +146,10 @@ function StandingsParser.calculateTiebreakerValues(opponentsInRound, tiebreakerI
 			return
 		end
 		Array.forEach(opponentsInRound, function(opponent)
+			local value = tiebreaker:valueOf(opponentsInRound, opponent)
 			opponent.extradata.tiebreakerValues[tiebreakerId] = {
-				value = tiebreaker:valueOf(opponentsInRound, opponent),
-				display = tiebreaker:display(opponentsInRound, opponent),
+				value = value,
+				display = tiebreaker:display(opponentsInRound, opponent, value),
 			}
 		end)
 	end)
