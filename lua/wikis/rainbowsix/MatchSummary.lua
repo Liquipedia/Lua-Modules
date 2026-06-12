@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
@@ -40,9 +39,10 @@ local ROUND_ICONS = {
 ---@class RainbowsixMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class RainbowsixMatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): RainbowsixMatchSummaryGameRow
-local RainbowsixMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+local RainbowsixMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent{
+	createGameOpponentView = CustomMatchSummary.createGameOpponentView,
+	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay
+}
 
 ---@param args table
 ---@return Widget
@@ -79,10 +79,10 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@private
+---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
 ---@return table[]
-function RainbowsixMatchSummaryGameRow:_makePartialScores(opponentIndex)
-	local game = self.props.game
+function CustomMatchSummary._makePartialScores(game, opponentIndex)
 	local extradata = game.extradata or {}
 	local halves = extradata['t' .. opponentIndex .. 'halfs']
 
@@ -108,18 +108,15 @@ function RainbowsixMatchSummaryGameRow:_makePartialScores(opponentIndex)
 	}
 end
 
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Widget
-function RainbowsixMatchSummaryGameRow:createGameOpponentView(opponentIndex)
+---@return VNode
+function CustomMatchSummary.createGameOpponentView(props, opponentIndex)
+	local game = props.game
 	return MatchSummaryWidgets.DetailedScore{
-		score = self:scoreDisplay(opponentIndex),
-		partialScores = self:_makePartialScores(opponentIndex)
+		score = MatchSummaryWidgets.GameRow.scoreDisplay(game, opponentIndex),
+		partialScores = CustomMatchSummary._makePartialScores(game, opponentIndex)
 	}
-end
-
----@return string
-function RainbowsixMatchSummaryGameRow:createGameOverview()
-	return self:mapDisplay()
 end
 
 ---@param side string
