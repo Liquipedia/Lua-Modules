@@ -95,7 +95,7 @@ describe('prize pool', function()
 	end)
 
 	describe('prize pool is correct', function()
-		it('display', function()
+		it('display #snapshot', function()
 			GoldenTest('prize_pool', tostring(PrizePool(prizePoolArgs):create():build()))
 		end)
 

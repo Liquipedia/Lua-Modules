@@ -1,6 +1,6 @@
 --- Triple Comment to Enable our LLS Plugin
 insulate('DateRange', function()
-	it('DateRange display test', function()
+	it('DateRange display test #snapshot', function()
 		local Array = require('Module:Array')
 		local DateRange = require('Module:Widget/Misc/DateRange')
 		local HtmlWidgets = require('Module:Widget/Html/All')

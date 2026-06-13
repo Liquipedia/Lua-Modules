@@ -2,7 +2,7 @@
 local Slider = require('Module:Widget/Basic/Slider')
 
 insulate('Slider', function()
-	GoldenTest('Slider', tostring(Slider{
+	GoldenTest('Slider #snapshot', tostring(Slider{
 		id = 'test-slider',
 		min = 0,
 		max = 10,

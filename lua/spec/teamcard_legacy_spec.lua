@@ -552,7 +552,7 @@ describe('TeamCard Legacy', function()
     end)
 
     describe('integration', function()
-        it('renders a representative legacy block via Module:Template stash', function()
+        it('renders a representative legacy block via Module:Template stash #snapshot', function()
             local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
             TeamTemplateMock.setUp()
             local LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function() return {} end)

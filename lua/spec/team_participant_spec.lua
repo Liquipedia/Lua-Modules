@@ -1,7 +1,7 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('Team Participant', function()
 	insulate('integration tests', function()
-		it('renders team participants template with multiple teams', function()
+		it('renders team participants template with multiple teams #snapshot', function()
 			local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 			TeamTemplateMock.setUp()
 			local LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function() return {} end)
