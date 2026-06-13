@@ -152,6 +152,8 @@ return function(busted, helper, options)
 			return
 		end
 
+		testName = testName:gsub('%s#snapshot', '')
+
 		local generatedHtml = simpleMediaWikiParser(tostring(actual))
 			.. (extraHTML or '')
 
