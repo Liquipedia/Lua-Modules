@@ -1,6 +1,6 @@
 --- Triple Comment to Enable our LLS Plugin
 insulate('Rankings', function()
-	it('dota2', function()
+	it('dota2 #snapshot', function()
 		local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 		local TestAsset = require('test_assets/dota2_rankings_example')
 		TeamTemplateMock.setUp()

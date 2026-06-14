@@ -9,4 +9,8 @@ return {
 	ci = {
 		ROOT = {"spec"},
 	},
+	snapshots = {
+		ROOT = {"spec"},
+		tags = "snapshot",
+	}
 }

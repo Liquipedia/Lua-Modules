@@ -2,7 +2,7 @@ local Tabs = require('Module:Tabs')
 local HtmlWidgets = require('Module:Widget/Html/All')
 
 insulate('Tabs snapshots', function()
-	it('dynamic variants', function()
+	it('dynamic variants #snapshot', function()
 		local arrayContent = HtmlWidgets.Ul{children = {
 			HtmlWidgets.Li{children = {'Item A1'}},
 			HtmlWidgets.Li{children = {'Item A2'}},

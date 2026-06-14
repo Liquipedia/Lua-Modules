@@ -1,6 +1,6 @@
 --- Triple Comment to Enable our LLS Plugin
 insulate('Widget/Legend', function()
-	it('integration', function()
+	it('integration #snapshot', function()
 		local LegendComponent = require('Module:Widget/Legend')
 
 		GoldenTest('standings_legend', tostring(LegendComponent{
