@@ -1,5 +1,14 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('TeamCard Legacy', function()
+	before_each(function()
+		stub(mw.ext.LiquipediaDB, "lpdb", {})
+	end)
+
+	after_each(function ()
+		---@diagnostic disable-next-line: undefined-field
+		mw.ext.LiquipediaDB.lpdb:revert()
+	end)
+
 	describe('parseQualifier', function()
 		local LegacyTeamCard = require('Module:TeamCard/Legacy')
 
