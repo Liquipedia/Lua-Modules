@@ -13,9 +13,9 @@ local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local LiquipediaApp = Lua.import('Module:Widget/MainPage/LiquipediaApp')
-local Div = HtmlWidgets.Div
+local Div = Html.Div
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
@@ -67,7 +67,7 @@ local CONTENT = {
 	matches = {
 		heading = 'Matches',
 		body = MatchTicker{},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 		panelAttributes = {
 			['data-switch-group-container'] = 'countdown',
@@ -183,7 +183,7 @@ return {
 								},
 							},
 							{
-								size = 7,
+								size = 6,
 								children = {
 									{
 										noPanel = true,
@@ -192,7 +192,7 @@ return {
 								},
 							},
 							{
-								size = 5,
+								size = 6,
 								children = {
 									{
 										noPanel = true,

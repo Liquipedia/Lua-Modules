@@ -2,6 +2,22 @@
 * Styles shared between BracketDisplay, MatchlistDisplay, and MatchSummary
 */
 
+.theme--light {
+	--brackets-header-background-color: #cfcfcf;
+	--brackets-header-border-color: #aaaaaa;
+	--brackets-background-color: #f2f2f2;
+	--brackets-score-background-color: #ebebeb;
+	--brackets-border-color: #aaaaaa;
+}
+
+.theme--dark {
+	--brackets-header-background-color: var( --clr-secondary-16 );
+	--brackets-header-border-color: var( --clr-secondary-16 );
+	--brackets-background-color: var( --clr-secondary-9 );
+	--brackets-score-background-color: var( --clr-secondary-16 );
+	--brackets-border-color: var( --clr-secondary-16 );
+}
+
 .brkts-match-has-details {
 	cursor: pointer;
 }
@@ -308,12 +324,22 @@
 	color: var( --clr-primary, #0000ff );
 }
 
-.brkts-valorant-score-color-def {
-	color: #46b09c;
-}
+.wiki-valorant {
+	--valorant-def-score-color: #01654c;
+	--valorant-atk-score-color: #b20110;
 
-.brkts-valorant-score-color-atk {
-	color: #c04845;
+	.theme--dark & {
+		--valorant-def-score-color: #46b09c;
+		--valorant-atk-score-color: #c04845;
+	}
+
+	.brkts-valorant-score-color-def {
+		color: var( --valorant-def-score-color );
+	}
+
+	.brkts-valorant-score-color-atk {
+		color: var( --valorant-atk-score-color );
+	}
 }
 
 .brkts-identityv-score-color-survivor {
@@ -682,6 +708,23 @@ div.brkts-popup-body-element-thumbs {
 			}
 		}
 	}
+
+	&-header {
+		padding: unset;
+		grid-template-columns: 1fr 2fr 1fr;
+
+		> div {
+			display: flex;
+
+			&:first-child {
+				justify-content: flex-start;
+			}
+
+			&:nth-child( 2 ) {
+				justify-content: center;
+			}
+		}
+	}
 }
 
 .brkts-champion-icon {
@@ -692,6 +735,7 @@ div.brkts-popup-body-element-thumbs {
 		width: 1.5rem;
 		height: 1.5rem;
 		border-radius: 0.25rem;
+		object-fit: cover;
 
 		@media ( max-width: 768px ) {
 			width: 1.25rem;
@@ -705,6 +749,8 @@ div.brkts-popup-body-element-thumbs {
 				outline: 0.0625rem solid #ffffff;
 				outline-offset: -0.0625rem;
 				background-color: var( --clr-background );
+				transform: scale( 1.5 ) translateY( 0.0625rem ); // added 1px to Y-center the image
+				object-fit: contain;
 			}
 		}
 	}
@@ -894,28 +940,6 @@ div.brkts-popup-body-element-thumbs {
 			padding: 0 0.5rem;
 			text-align: center;
 		}
-
-		&-picks {
-			.brkts-champion-icon {
-				gap: 0.125rem;
-				display: flex;
-				flex-wrap: wrap;
-
-				& img {
-					width: 1.25rem;
-					height: 1.25rem;
-					border-radius: 0.1875rem;
-
-					@media ( hover: hover ) {
-						&:hover {
-							height: unset;
-							border: 0.0625rem solid #ffffff;
-							box-shadow: 0 0.0625rem 0.25rem 0 var( --clr-on-surface-light-primary-12 );
-						}
-					}
-				}
-			}
-		}
 	}
 
 	table {
@@ -945,6 +969,91 @@ div.brkts-popup-body-element-thumbs {
 
 		&-text-right {
 			text-align: right;
+		}
+	}
+}
+
+.brkts-popup-veto {
+	display: grid;
+	grid-column: 1 / -1;
+	grid-template-columns: subgrid;
+
+	&-row {
+		display: grid;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+		padding: 0.5rem;
+
+		> :nth-child( 3n + 1 ) {
+			text-align: left;
+		}
+
+		> :nth-child( 3n + 2 ) {
+			text-align: center;
+		}
+
+		> :nth-child( 3n ) {
+			text-align: right;
+		}
+
+		&:nth-child( even ) {
+			background-color: var( --clr-on-surface-light-primary-4 );
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+			}
+		}
+
+		&:last-child {
+			border-bottom-left-radius: 0.25rem;
+			border-bottom-right-radius: 0.25rem;
+		}
+
+		&-indicator {
+			display: grid;
+			grid-template-columns: 1fr auto 1fr;
+			gap: 0.25rem;
+			align-items: center;
+		}
+
+		.brkts-champion-icon {
+			gap: 0.125rem;
+			display: flex;
+			flex-wrap: wrap;
+
+			img {
+				width: 1.25rem;
+				height: 1.25rem;
+				border-radius: 0.1875rem;
+
+				@media ( hover: hover ) {
+					&:hover {
+						height: unset;
+						border: 0.0625rem solid #ffffff;
+						box-shadow: 0 0.0625rem 0.25rem 0 var( --clr-on-surface-light-primary-12 );
+					}
+				}
+			}
+		}
+	}
+
+	&-header.general-collapsible-default-header {
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+		padding: unset;
+	}
+
+	&-wrapper {
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		background-color: var( --clr-on-surface-light-primary-4 );
+		color: var( --clr-secondary-25 );
+		padding: 0.25rem;
+		border-radius: 0.5rem;
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+			color: #ffffff;
 		}
 	}
 }
@@ -1028,17 +1137,6 @@ div.brkts-popup-body-element-thumbs {
 
 	&--dire img {
 		outline-color: #e79e7e;
-	}
-}
-
-.brkts-champion-icon img {
-	object-fit: cover;
-
-	@media ( hover: hover ) {
-		&:hover {
-			transform: scale( 2 ) translateY( 0.0625rem ); // added 1px to Y-center the image
-			object-fit: contain;
-		}
 	}
 }
 

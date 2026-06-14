@@ -25,7 +25,7 @@ local Comparator = Condition.Comparator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
@@ -45,11 +45,17 @@ local BANNED = Lua.import('Module:Banned', {loadData = true})
 
 local SIZE_OPERATOR = '25x25px'
 
+---@class RainbowsixInfoboxPlayer: Person
+---@operator call(Frame): RainbowsixInfoboxPlayer
 local CustomPlayer = Class.new(Player)
+
+---@class RainbowsixInfoboxPlayerWidgetInjector: WidgetInjector
+---@operator call(RainbowsixInfoboxPlayer): RainbowsixInfoboxPlayerWidgetInjector
+---@field caller RainbowsixInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -65,8 +71,8 @@ function CustomPlayer.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -118,17 +124,14 @@ function CustomPlayer:adjustLPDB(lpdbData, args)
 	return lpdbData
 end
 
----@return string?
+---@return Widget?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = TeamTemplate.getPageName(self.args.team)
-		---@cast teamPage -nil
-		return HtmlWidgets.Fragment{
-			children = {
-				MatchTicker.recent{team = teamPage},
-				UpcomingTournaments.team{name = teamPage}
-			}
-		}
+		return Html.Fragment{children = {
+			MatchTicker.player(),
+			UpcomingTournaments.team{name = teamPage}
+		}}
 	end
 end
 

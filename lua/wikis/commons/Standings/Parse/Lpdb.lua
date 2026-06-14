@@ -103,7 +103,7 @@ end
 function StandingsParseLpdb.newOpponent(opponentData, maxRounds)
 	return {
 		opponent = opponentData,
-		rounds = Array.map(Array.range(1, maxRounds), function()
+		rounds = Array.mapRange(1, maxRounds, function()
 			return {
 				scoreboard = {
 					match = {w = 0, d = 0, l = 0},

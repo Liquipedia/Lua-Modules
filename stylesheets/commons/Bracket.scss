@@ -735,10 +735,6 @@ Author(s): FO-nTTaX, salle
 	width: 385px;
 }
 
-.wiki-teamfortress .bracket-popup-wrapper.bracket-popup-team {
-	width: 330px;
-}
-
 .wiki-fifa .bracket-popup-wrapper.bracket-popup-player {
 	width: 300px;
 }
@@ -771,11 +767,6 @@ Author(s): FO-nTTaX, salle
 	line-height: 33px;
 	padding-top: 1px;
 	position: relative;
-
-	.wiki-teamfortress & {
-		line-height: 21px;
-		min-height: 21px;
-	}
 }
 
 .bracket-popup .left div.side {
@@ -857,14 +848,6 @@ Author(s): FO-nTTaX, salle
 	.bracket-popup-player & {
 		left: 50px;
 	}
-
-	.wiki-teamfortress & {
-		float: left;
-		width: 40px;
-		text-align: center;
-		position: initial;
-		left: initial;
-	}
 }
 
 .bracket-popup .right .check {
@@ -873,14 +856,6 @@ Author(s): FO-nTTaX, salle
 
 	.bracket-popup-player & {
 		right: 50px;
-	}
-
-	.wiki-teamfortress & {
-		float: right;
-		width: 40px;
-		text-align: center;
-		position: initial;
-		right: initial;
 	}
 }
 
@@ -1377,72 +1352,4 @@ Author(s): spazer
 	line-height: 22px;
 	width: 4px;
 	float: right;
-}
-
-/*******************************************************************************
-Template(s): Group tables and colors
-Author(s): spazer
-*******************************************************************************/
-
-.bg-u,
-.bg-up,
-.bg-proceed,
-.bg-win {
-	background-color: var( --clr-forest-background-color, #ddf4dd ) !important;
-}
-
-.bg-su,
-.bg-stayup {
-	background-color: var( --clr-atlantis-background-color, #e5f4c6 ) !important;
-}
-
-.bg-s,
-.bg-stay {
-	background-color: var( --clr-sun-background-color, #f9f0c7 ) !important;
-}
-
-.bg-draw {
-	background-color: var( --clr-pear-background-color, #f9f9c7 ) !important;
-}
-
-.bg-sd,
-.bg-staydown {
-	background-color: var( --clr-california-background-color, #f9dec7 ) !important;
-}
-
-.bg-d,
-.bg-down,
-.bg-drop {
-	background-color: var( --clr-cinnabar-background-color, #fbdfdf ) !important;
-}
-
-.bg-neutral {
-	background-color: var( --clr-moon-background-color, #f0f0f0 ) !important;
-}
-
-.bg-seedup {
-	background-color: var( --clr-elm-background-color, #dbeded ) !important;
-}
-
-.bg-byeup {
-	background-color: var( --clr-vividviolet-background-color, #e8ddef ) !important;
-}
-
-.bg-dq,
-.bg-disqualified,
-.bg-lightblue {
-	background-color: var( --clr-sapphire-background-color, #dee3ef ) !important;
-}
-
-.matchlistslot.bg-draw,
-.matchlistslot.bg-win {
-	font-weight: bold;
-}
-
-.matchlistdate {
-	background-color: #f2f2f2;
-	font-weight: bold;
-	font-size: 85%;
-	line-height: 90%;
-	height: 13px;
 }

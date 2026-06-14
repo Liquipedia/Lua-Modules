@@ -23,7 +23,7 @@ local CustomCharacter = Class.new(Character)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
@@ -32,11 +32,16 @@ function CustomCharacter.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-	if id == 'custom' then
+	if id == 'role' then
+		Array.appendWith(
+			widgets,
+			Cell{name = 'Subrole', children = {args.subrole}}
+		)
+	elseif id == 'custom' then
 		Array.appendWith(
 			widgets,
 			Cell{name = 'Age', children = {args.age}},
@@ -56,7 +61,8 @@ end
 function CustomCharacter:getWikiCategories(args)
 	if not Namespace.isMain() then return {} end
 	return Array.append({'Heroes'},
-		String.isNotEmpty(args.role) and (args.role .. ' Heroes') or nil
+		String.isNotEmpty(args.role) and (args.role .. ' Heroes') or nil,
+		String.isNotEmpty(args.subrole) and (args.subrole .. ' Heroes') or nil
 	)
 end
 

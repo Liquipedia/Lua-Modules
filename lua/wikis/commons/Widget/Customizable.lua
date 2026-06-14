@@ -7,28 +7,22 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
+local Context = Lua.import('Module:Widget/ComponentContext')
 local CustomizableContext = Lua.import('Module:Widget/Contexts/Customizable')
 
----@class CustomizableWidget: Widget
----@operator call({id: string, children: Widget[]}): CustomizableWidget
----@field id string
-local Customizable = Class.new(
-	Widget,
-	function(self, input)
-		self.id = self:assertExistsAndCopy(input.id)
-	end
-)
-
----@return Widget[]?
-function Customizable:render()
-	local injector = self:useContext(CustomizableContext.LegacyCustomizable)
+---@param props {id: string, children: Renderable[]}
+---@param context Context
+---@return Renderable[]?
+local function Customizable(props, context)
+	assert(String.isNotEmpty(props.id), 'CustomizableWidget: id must be a nonempty string')
+	local injector = Context.read(context, CustomizableContext.Customizable)
 	if injector == nil then
-		return self.props.children
+		return props.children
 	end
-	return injector:parse(self.id, self.props.children)
+	return injector:parse(props.id, props.children)
 end
 
-return Customizable
+return Component.component(Customizable)

@@ -70,7 +70,7 @@ local CustomPlayer = Class.new(CustomPerson)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -85,8 +85,8 @@ function CustomPlayer.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -113,7 +113,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Race',
-				children = {caller:getRaceData(args.race, RACE_FIELD_AS_CATEGORY_LINK)}
+				children = {caller:getRaceData(args.race or args.faction, RACE_FIELD_AS_CATEGORY_LINK)}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -246,7 +246,7 @@ function CustomPlayer:_addToStats(match, player)
 	if playerScore < 0 or vsScore < 0 or (vsScore + playerScore == 0) then return end
 
 	local getFaction = function(opponent)
-		local faction = Faction.read(opponent.match2players[1].extradata.faction)
+		local faction = Faction.read(((opponent.match2players[1] or {}).extradata or {}).faction)
 		-- treat default faction as random
 		return faction ~= Faction.defaultFaction and faction or Faction.read('r')
 	end
@@ -455,7 +455,7 @@ end
 ---@param categories string[]
 ---@return string[]
 function CustomPlayer:getWikiCategories(categories)
-	for _, faction in pairs(self:readFactions(self.args.race).factions) do
+	for _, faction in pairs(self:readFactions(self.args.race or self.args.faction).factions) do
 		table.insert(categories, faction .. ' Players')
 	end
 

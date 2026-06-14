@@ -8,11 +8,11 @@
 ---@type table<string, RoleBaseData>
 local inGameRoles = {
 	['top'] = {category = 'Top Laners', display = 'Top Lane', sortOrder = 1},
-	['bottom'] = {category = 'Bottom Laners', display = 'Bottom Laner', sortOrder = 5},
-	['mid'] = {category = 'Mid Laners', display = 'Mid Laner', sortOrder = 4},
-	['side lane'] = {category = 'Side Laners', display = 'Side Laner', sortOrder = 2},
-	['jungler'] = {category = 'Junglers', display = 'Jungler', sortOrder = 3},
-	['roamer'] = {category = 'Roamers', display = 'Roamer', sortOrder = 6},
+	['jungler'] = {category = 'Junglers', display = 'Jungler', sortOrder = 2},
+	['mid'] = {category = 'Mid Laners', display = 'Middle', sortOrder = 3},
+	['bottom'] = {category = 'Bottom Laners', display = 'Bottom Lane', sortOrder = 4},
+	['roamer'] = {category = 'Roamers', display = 'Roamer', sortOrder = 5},
+	['side lane'] = {category = 'Side Laners', display = 'Side Laner', sortOrder = 6},
 	['flex'] = {category = 'Flex', display = 'Flex', sortOrder = 7},
 }
 
@@ -29,10 +29,13 @@ inGameRoles['adc'] = inGameRoles.bottom
 inGameRoles['bot'] = inGameRoles.bottom
 inGameRoles['carry'] = inGameRoles.bottom
 inGameRoles['farm'] = inGameRoles.bottom
+inGameRoles['bottom lane'] = inGameRoles.bottom
 inGameRoles['mid laner'] = inGameRoles.mid
+inGameRoles['middle'] = inGameRoles.mid
 inGameRoles['ds lane'] = inGameRoles.top
 inGameRoles['dsl'] = inGameRoles.top
 inGameRoles['dark slayer lane'] = inGameRoles.top
+inGameRoles['top lane'] = inGameRoles.top
 inGameRoles['confront'] = inGameRoles.top
 inGameRoles['clash'] = inGameRoles.top
 inGameRoles['fill'] = inGameRoles.flex

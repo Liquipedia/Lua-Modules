@@ -7,19 +7,17 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 
 local TransferList = Lua.import('Module:TransferList')
 
-local CenterDot = Lua.import('Module:Widget/MainPage/CenterDot')
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
+local ListWidgets = Lua.import('Module:Widget/List')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class TransfersListParameters
@@ -30,11 +28,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field transferQuery boolean?
 ---@field onlyNotableTransfers boolean?
 
----@class TransfersList: Widget
----@operator call(table): TransfersList
----@field props TransfersListParameters
-local TransfersList = Class.new(Widget)
-TransfersList.defaultProps = {
+local defaultProps = {
 	limit = 15,
 	rumours = false,
 	transferPortal = 'Portal:Transfers',
@@ -42,44 +36,41 @@ TransfersList.defaultProps = {
 	transferQuery = true
 }
 
-function TransfersList:render()
+---@param props TransfersListParameters
+---@return Renderable[]
+local function TransfersList(props)
 	return WidgetUtil.collect(
 		TransferList{
-			limit = self.props.limit,
-			onlyNotableTransfers = self.props.onlyNotableTransfers,
+			limit = props.limit,
+			onlyNotableTransfers = props.onlyNotableTransfers,
 		}:fetch():create(),
-		Div {
-			css = { display = 'block', ['text-align'] = 'center', padding = '0.5em' },
+		Div{
+			css = {
+				display = 'grid',
+				['grid-template-columns'] = '1fr auto 1fr',
+				['align-items'] = 'center',
+				padding = '0.5rem',
+				gap = '0.25rem',
+			},
 			children = {
-				Div {
-					css = { display = 'inline', float = 'left', ['font-style'] = 'italic' },
-					children = { Link { children = 'Back to top', link = '#Top' } }
-				},
-				Div {
-					classes = { 'plainlinks', 'smalledit' },
-					css = { display = 'inline', float = 'right' },
-					children = {
-						'&#91;',
-							Link {
-							children = 'edit',
-							link = 'Special:EditPage/' .. self.props.transferPage
-						},
-						'&#93;'
-					},
-				},
-				Div {
+				Div{
 					css = {
+						['font-style'] = 'italic',
+						['justify-self'] = 'flex-start',
 						['white-space'] = 'nowrap',
-						display = 'inline flex',
-						['flex-wrap'] = 'wrap',
-						['justify-content'] = 'center',
-						margin = '0 10px',
-						['font-size'] = '15px',
-						['font-style'] = 'italic'
 					},
-					children = Array.interleave(WidgetUtil.collect(
-						Link { children = 'See more transfers', link = self.props.transferPortal },
-						Logic.readBool(self.props.transferQuery) and Link {
+					children = Link{children = 'Back to top', link = '#Top'},
+				},
+				Div{
+					classes = {'hlist'},
+					css = {
+						['font-size'] = '15px',
+						['font-style'] = 'italic',
+						['text-align'] = 'center',
+					},
+					children = ListWidgets.Unordered{children = WidgetUtil.collect(
+						Link { children = 'See more transfers', link = props.transferPortal },
+						Logic.readBool(props.transferQuery) and Link {
 							children = 'Transfer query',
 							link = 'Special:RunQuery/Transfer history'
 						} or nil,
@@ -87,12 +78,26 @@ function TransfersList:render()
 							children = 'Input Form',
 							link = (Page.exists('Form:Transfer') and '' or 'lpcommons:') .. 'Special:RunQuery/Transfer'
 						},
-						Logic.readBool(self.props.rumours) and Link { children = 'Rumours', link = 'Portal:Rumours' } or nil
-					), CenterDot())
+						Logic.readBool(props.rumours) and Link { children = 'Rumours', link = 'Portal:Rumours' } or nil
+					)}
+				},
+				Div{
+					classes = { 'plainlinks', 'smalledit' },
+					css = {
+						['justify-self'] = 'flex-end',
+					},
+					children = {
+						'&#91;',
+							Link {
+							children = 'edit',
+							link = 'Special:EditPage/' .. props.transferPage
+						},
+						'&#93;'
+					},
 				},
 			}
 		}
 	)
 end
 
-return TransfersList
+return Component.component(TransfersList, defaultProps)

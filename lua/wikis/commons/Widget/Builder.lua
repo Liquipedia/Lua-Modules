@@ -7,17 +7,13 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local Component = Lua.import('Module:Widget/Component')
 
-local Widget = Lua.import('Module:Widget')
-
----@class BuilderWidget: Widget
----@operator call({builder: function}): BuilderWidget
-local Builder = Class.new(Widget)
-
----@return Widget[]?
-function Builder:render()
-	return self.props.builder()
+---@generic T
+---@param props {builder: fun(): T?}
+---@return T?
+local function Builder(props)
+	return props.builder()
 end
 
-return Builder
+return Component.component(Builder)

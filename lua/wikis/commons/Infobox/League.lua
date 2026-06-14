@@ -37,7 +37,7 @@ local Variables = Lua.import('Module:Variables')
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Accommodation = Widgets.Accommodation
 local Builder = Widgets.Builder
 local Cell = Widgets.Cell
@@ -55,13 +55,13 @@ local Venue = Widgets.Venue
 local League = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function League.run(frame)
 	local league = League(frame)
 	return league:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function League:createInfobox()
 	local args = self.args
 	self:_parseArgs()
@@ -134,7 +134,7 @@ function League:createInfobox()
 								Cell{
 									name = 'Type',
 									children = {
-										mw.language.getContentLanguage():ucfirst(args.type)
+										String.upperCaseFirst(args.type)
 									}
 								}
 							}
@@ -193,10 +193,27 @@ function League:createInfobox()
 		self:_setSeoTags(args)
 	end
 
-	return HtmlWidgets.Fragment{children = Array.interleave({
+	return Html.Fragment{children = Array.interleave({
 		self:build(widgets, 'Tournament'),
 		Logic.readBool(args.autointro) and self:seoText(args) or nil
-	}, HtmlWidgets.Br{})}
+	}, Html.Br{})}
+end
+
+---@private
+---@param dateString string
+---@return string
+function League:_standardiseRawDate(dateString)
+	-- Length 7 = YYYY-MM
+	-- Length 10 = YYYY-MM-??
+	if String.isEmpty(dateString) or (#dateString ~= 7 and #dateString ~= 10) then
+		return ''
+	end
+
+	if #dateString == 7 then
+		dateString = dateString .. '-??'
+	end
+	dateString = dateString:gsub('%-XX', '-??')
+	return dateString
 end
 
 ---@private
@@ -234,8 +251,10 @@ function League:_parseArgs()
 		parent = (args.parent or mw.title.getCurrentTitle().prefixedText):gsub(' ', '_'),
 		startDate = ReferenceCleaner.cleanDateIfKnown{date = args.sdate}
 			or ReferenceCleaner.cleanDateIfKnown{date = args.date},
+		startDateDisplay = self:_standardiseRawDate(args.sdate or args.date),
 		endDate = ReferenceCleaner.cleanDateIfKnown{date = args.edate}
 			or ReferenceCleaner.cleanDateIfKnown{date = args.date},
+		endDateDisplay = self:_standardiseRawDate(args.edate or args.date),
 		mode = args.mode,
 		patch = args.patch,
 		endPatch = args.endpatch or args.epatch or args.patch,
@@ -554,6 +573,8 @@ function League:_setLpdbData(args, links)
 		summary = self:seoText(args),
 		extradata = {
 			series2 = args.series2 and mw.ext.TeamLiquidIntegration.resolve_redirect(args.series2) or nil,
+			startdatetext = self.data.startDateDisplay,
+			enddatetext = self.data.endDateDisplay,
 		},
 	}
 

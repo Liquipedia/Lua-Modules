@@ -39,7 +39,7 @@ local VALID_PUBLISHERTIERS = {
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -61,8 +61,8 @@ function CustomLeague:customParseArguments(args)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
@@ -114,8 +114,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(self:getAllArgsForBase(args, 'map'), ';')
 
 	lpdbData.extradata.region = Template.safeExpand(mw.getCurrentFrame(), 'Template:Player region', {args.country})
-	lpdbData.extradata.startdate_raw = args.sdate or args.date
-	lpdbData.extradata.enddate_raw = args.edate or args.date
 	lpdbData.extradata.gamechangers = tostring(self.data.gameChangers)
 
 	return lpdbData

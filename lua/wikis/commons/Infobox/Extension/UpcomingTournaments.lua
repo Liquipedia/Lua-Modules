@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -26,7 +27,7 @@ local UpcomingTournamentsWidget = Lua.import('Module:Widget/Infobox/UpcomingTour
 local UpcomingTournaments = {}
 
 ---@param args {name: string|string[]?, additionalConditions: AbstractConditionNode?}
----@return Widget?
+---@return VNode?
 function UpcomingTournaments.team(args)
 	args = args or {}
 	local name = args.name
@@ -46,7 +47,7 @@ function UpcomingTournaments.team(args)
 end
 
 ---@param args {name: string, prefix: string?}
----@return Widget?
+---@return VNode?
 function UpcomingTournaments.player(args)
 	if Logic.isEmpty(args.name) then
 		return
@@ -69,4 +70,4 @@ function UpcomingTournaments.player(args)
 	}
 end
 
-return UpcomingTournaments
+return Class.export(UpcomingTournaments, {exports = {'team', 'player'}})

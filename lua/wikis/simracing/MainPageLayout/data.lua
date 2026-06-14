@@ -10,10 +10,10 @@ local Lua = require('Module:Lua')
 local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local Template = Lua.import('Module:Template')
-local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
@@ -56,14 +56,14 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = HtmlWidgets.Fragment{children = {
+		body = Html.Fragment{children = {
 			Template.safeExpand(mw.getCurrentFrame(), 'Liquipedia:Upcoming_and_ongoing_matches_on_mainpage'),
 			Div{
 				css = {
 					['text-align'] = 'center',
 					padding = '5px',
 				},
-				children = HtmlWidgets.I{
+				children = Html.I{
 					children = Link{
 						link = 'Liquipedia:Upcoming and ongoing matches',
 						children = 'See more matches'
@@ -71,7 +71,7 @@ local CONTENT = {
 				}
 			}
 		}},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {
@@ -80,8 +80,9 @@ local CONTENT = {
 			upcomingDays = 60,
 			completedDays = 60,
 			displayGameIcons = true,
+			variant = 'collapsible',
 		},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }

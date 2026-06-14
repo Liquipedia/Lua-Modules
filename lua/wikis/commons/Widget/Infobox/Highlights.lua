@@ -12,7 +12,7 @@ local Class = Lua.import('Module:Class')
 local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 
 ---@class HighlightsWidget: Widget
 ---@operator call(table):HighlightsWidget
@@ -24,11 +24,11 @@ function Highlights:render()
 		return nil
 	end
 	local listItems = Array.map(self.props.children, function(child)
-		return HtmlWidgets.Li{children = {child}}
+		return Html.Li{children = {child}}
 	end)
-	return HtmlWidgets.Div{
-		children = HtmlWidgets.Div{
-			children = {HtmlWidgets.Ul{children = listItems}},
+	return Html.Div{
+		children = Html.Div{
+			children = {Html.Ul{children = listItems}},
 		}
 	}
 end

@@ -14,7 +14,7 @@ local Logic = Lua.import('Module:Logic')
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
@@ -30,7 +30,7 @@ local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomMap.run(frame)
 	local map = CustomMap(frame)
 	map.args.informationType = 'Battleground'
@@ -40,8 +40,8 @@ function CustomMap.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -81,12 +81,12 @@ end
 ---@return Widget?
 function CustomMap:_image2()
 	if not self.args.image2 then return end
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'infobox-image'},
 		children = {Image{
 			imageLight = self.args.image2,
 			size = '294px',
-			alignment = 'center',
+			horizontalAlignment = 'center',
 		}}
 	}
 end

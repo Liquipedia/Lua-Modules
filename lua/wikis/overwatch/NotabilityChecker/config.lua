@@ -107,7 +107,7 @@ Config.weights = {
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 700,
+				points = 1000,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,

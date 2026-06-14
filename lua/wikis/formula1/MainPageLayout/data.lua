@@ -11,13 +11,13 @@ local DateExt = Lua.import('Module:Date/Ext')
 local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
-local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
 
 local ONGOING_SERIES = IconFa{
 	iconName = 'ongoing_series',
@@ -59,7 +59,7 @@ local CONTENT = {
 		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	specialEvents = {
-		heading = HtmlWidgets.Fragment{children = {ONGOING_SERIES, '&nbsp;Active and Upcoming Series'}},
+		heading = Html.Fragment{children = {ONGOING_SERIES, '&nbsp;Active and Upcoming Series'}},
 		body = '{{Liquipedia:Active Upcoming Series}}',
 		padding = true,
 		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS
@@ -72,22 +72,23 @@ local CONTENT = {
 		},
 	},
 	tournaments = {
-		heading = HtmlWidgets.Fragment{children = {TROPHY, '&nbsp;F1 & Feeder Series Seasons'}},
+		heading = Html.Fragment{children = {TROPHY, '&nbsp;F1 & Feeder Series Seasons'}},
 		body = TournamentsTicker{
 			upcomingDays = 90,
-			completedDays = 90
+			completedDays = 90,
+			variant = 'collapsible',
 		},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER
 	},
 	seasonOverview = {
-		heading =HtmlWidgets.Fragment{children = {TROPHY, '&nbsp;Current Season Overview'}},
+		heading =Html.Fragment{children = {TROPHY, '&nbsp;Current Season Overview'}},
 		body = '{{Liquipedia:Season Overview}}',
 		padding = true,
 		boxid = 1517
 	},
 	seasonCalendar = {
-		heading =HtmlWidgets.Fragment{children = {CALENDAR, '&nbsp;Season Calendar'}},
+		heading =Html.Fragment{children = {CALENDAR, '&nbsp;Season Calendar'}},
 		body = '{{Liquipedia:Season Calendar}}',
 		padding = true,
 		boxid = MainPageLayoutUtil.BoxId.MOBILE_APP
@@ -107,18 +108,18 @@ local CONTENT = {
 		boxid = MainPageLayoutUtil.BoxId.THIS_DAY,
 	},
 	upcomingRace = {
-		heading =HtmlWidgets.Fragment{children = {TROPHY, '&nbsp;Upcoming Race'}},
+		heading =Html.Fragment{children = {TROPHY, '&nbsp;Upcoming Race'}},
 		body = '{{Liquipedia:Upcoming Grand Prix}}',
 		padding = true,
 		boxid = 1518
 	},
 	previousRace = {
-		heading =HtmlWidgets.Fragment{children = {FINISHED_RACE, '&nbsp;Previous Race Weekend'}},
+		heading =Html.Fragment{children = {FINISHED_RACE, '&nbsp;Previous Race Weekend'}},
 		body = '{{Liquipedia:Previous Race Weekend}}',
 		boxid = 1515
 	},
 	allF1Seasons = {
-		heading =HtmlWidgets.Fragment{children = {HISTORY, '&nbsp;Formula 1 Seasons'}},
+		heading =Html.Fragment{children = {HISTORY, '&nbsp;Formula 1 Seasons'}},
 		body = '{{Liquipedia:All F1 Seasons}}',
 		boxid = 1512
 	},
