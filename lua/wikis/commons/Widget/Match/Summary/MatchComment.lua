@@ -8,29 +8,23 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local Break = Lua.import('Module:Widget/Match/Summary/Break')
 
----@class MatchSummaryMatchMatchComment: Widget
----@operator call(table): MatchSummaryMatchMatchComment
-local MatchSummaryMatchMatchComment = Class.new(Widget)
-
----@return Widget?
-function MatchSummaryMatchMatchComment:render()
-	if Logic.isEmpty(self.props.children) then
+---@param props {children: Renderable[]}
+---@return VNode?
+local function MatchSummaryMatchMatchComment(props)
+	if Logic.isEmpty(props.children) then
 		return
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'brkts-popup-comment'},
-		children = Array.flatMap(self.props.children, function (child)
-			return {child, Break{}}
-		end)
+		children = Array.interleave(props.children, Break{})
 	}
 end
 
-return MatchSummaryMatchMatchComment
+return Component.component(MatchSummaryMatchMatchComment)

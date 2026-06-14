@@ -21,7 +21,7 @@ local Chronology = Widgets.Chronology
 local Title = Widgets.Title
 local AgeIcon = Lua.import('Module:Widget/Infobox/AgeIcon')
 local ExpansionIcon = Lua.import('Module:Widget/Infobox/ExpansionIcon')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -34,7 +34,7 @@ local CustomUnit = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomUnit.run(frame)
 	local unit = CustomUnit(frame)
 	unit:setWidgetInjector(CustomInjector(unit))
@@ -43,8 +43,8 @@ function CustomUnit.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -54,7 +54,7 @@ function CustomInjector:parse(id, widgets)
 	---@return Widget?
 	local costDisplay = function(input, label)
 		if not input then return end
-		return HtmlWidgets.Fragment{children = {
+		return Html.Fragment{children = {
 			input,
 			' ',
 			Link{link = label},
@@ -74,7 +74,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Conversion time', children = {args.convtime}},
 			Cell{name = 'Minimum range', children = {args['min range']}},
 			Cell{
-				name = HtmlWidgets.Abbr{
+				name = Html.Abbr{
 					title = 'Number of frames between clicking to attack until the attack is followed through',
 					children = {'Frame delay'},
 				},
@@ -124,7 +124,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'First introduced', children = {
 				ExpansionIcon{expansion = args.introduced},
-				HtmlWidgets.I{children = {Link{link = args.introduced}}},
+				Html.I{children = {Link{link = args.introduced}}},
 			}, options = {separator = ' '}},
 			Cell{name = 'Civilizations', children = {args.civilizations or args.civs}},
 			Cell{name = 'Available in', children = {
@@ -161,7 +161,7 @@ function CustomInjector:parse(id, widgets)
 				options = {suppressColon = true}
 			},
 			Cell{
-				name = HtmlWidgets.Abbr{
+				name = Html.Abbr{
 					title = 'Reload time (in seconds)',
 					children = {'Rate of Fire'},
 				},

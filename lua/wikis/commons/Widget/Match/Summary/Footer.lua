@@ -7,20 +7,16 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
----@class MatchSummaryFooter: Widget
----@operator call(table): MatchSummaryFooter
-local MatchSummaryFooter = Class.new(Widget)
-
----@return Widget?
-function MatchSummaryFooter:render()
-	local children = self.props.children
+---@param props {children: Renderable|Renderable[]?}
+---@return VNode?
+local function MatchSummaryFooter(props)
+	local children = props.children
 	if Logic.isEmpty(children) then
 		return
 	end
@@ -33,4 +29,4 @@ function MatchSummaryFooter:render()
 	}
 end
 
-return MatchSummaryFooter
+return Component.component(MatchSummaryFooter)

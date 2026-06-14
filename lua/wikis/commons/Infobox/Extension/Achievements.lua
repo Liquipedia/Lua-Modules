@@ -85,7 +85,7 @@ function Achievements._playerConditions(player, onlySolo, playerLimit)
 	end
 
 	local playerConditions = ConditionTree(BooleanOperator.any):add(
-		Array.map(Array.range(1, playerLimit), function(playerIndex)
+		Array.mapRange(1, playerLimit, function(playerIndex)
 			return ConditionUtil.anyOf(ColumnName('p' .. playerIndex, 'opponentplayers'), playerNames)
 		end)
 	)
@@ -207,7 +207,7 @@ function Achievements._getLpdbKeys(opponentType)
 		return {'opponenttemplate'}
 	end
 
-	return Array.map(Array.range(1, MAX_PARTY_SIZE), function(opponentIndex)
+	return Array.mapRange(1, MAX_PARTY_SIZE, function(opponentIndex)
 		return 'opponentplayers_p' .. opponentIndex .. 'team'
 	end)
 end

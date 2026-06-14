@@ -22,13 +22,18 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Skill = Lua.import('Module:Infobox/Skill')
 
 local WarningBox = Lua.import('Module:Widget/WarningBox')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class StormgateSkillInfobox: SkillInfobox
+---@operator call(Frame): StormgateSkillInfobox
 ---@field faction string?
 local CustomSkill = Class.new(Skill)
+
+---@class StormgateSkillInfoboxWidgetInjector: WidgetInjector
+---@operator call(StormgateSkillInfobox): StormgateSkillInfoboxWidgetInjector
+---@field caller StormgateSkillInfobox
 local CustomInjector = Class.new(Injector)
 
 local ENERGY_ICON = '[[File:EnergyIcon.gif|link=Energy]]'
@@ -46,7 +51,7 @@ local GAME_MODE_ICON = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomSkill.run(frame)
 	local skill = CustomSkill(frame)
 
@@ -64,7 +69,7 @@ function CustomSkill.run(frame)
 
 	local builtInfobox = skill:createInfobox()
 
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = {
 			builtInfobox,
 			CustomSkill._deprecatedWarning(skill.args.deprecatedDisplay)
@@ -82,8 +87,8 @@ function CustomSkill:nameDisplay(args)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args

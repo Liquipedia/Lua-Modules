@@ -12,10 +12,11 @@ local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Infobox/Game')
 
 ---@class CustomGameInfobox: GameInfobox
+---@operator call(Frame): CustomGameInfobox
 local CustomGame = Class.new(Game)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomGame.run(frame)
 	local customGame = CustomGame(frame)
 	return customGame:createInfobox()

@@ -26,7 +26,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -74,7 +74,7 @@ local INACTIVITY_THRESHOLD_PLAYER = {year = 1}
 local INACTIVITY_THRESHOLD_BROADCAST = {month = 6}
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -122,15 +122,15 @@ function CustomPlayer.run(frame)
 		}
 	end
 
-	return HtmlWidgets.Fragment{children = {
+	return Html.Fragment{children = {
 		builtInfobox,
 		autoPlayerIntro,
 	}}
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args

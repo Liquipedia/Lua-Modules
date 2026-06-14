@@ -3,6 +3,30 @@ Template(s): Prize pool tables
 Author(s): FO-nTTaX
 *******************************************************************************/
 
+:root {
+	--prize-pool-background-color: transparent;
+}
+
+.theme--light {
+	--prize-pool-variant-background-color: #f2f2f2;
+	--prize-pool-header-background-color: #eaecf0;
+	--prize-pool-alt-background-color: #f5f5f5;
+	--prize-pool-gold: var( --clr-semantic-gold-40 );
+	--prize-pool-silver: var( --clr-semantic-silver-40 );
+	--prize-pool-bronze: var( --clr-semantic-bronze-40 );
+	--prize-pool-copper: var( --clr-semantic-copper-40 );
+}
+
+.theme--dark {
+	--prize-pool-variant-background-color: var( --clr-moon-20 );
+	--prize-pool-header-background-color: var( --table-header-variant-background-color );
+	--prize-pool-alt-background-color: var( --clr-secondary-9 );
+	--prize-pool-gold: var( --clr-semantic-gold-30 );
+	--prize-pool-silver: var( --clr-secondary-39 );
+	--prize-pool-bronze: var( --clr-semantic-bronze-20 );
+	--prize-pool-copper: var( --clr-semantic-copper-20 );
+}
+
 table.prizepooltable:not( .collapsed ) .prizepooltableshow,
 table.prizepooltable.collapsed .prizepooltablehide {
 	display: none;
