@@ -91,6 +91,8 @@ body {
 	--clr-moon-40: #666666;
 
 	--clr-primary-44: #1f73c1;
+	--clr-primary-100: #ffffff;
+
 	--clr-secondary-25: #404040;
 	--clr-secondary-80: #b3b3b3;
 	--clr-secondary-100: #ffffff;
@@ -98,8 +100,8 @@ body {
 	--clr-semantic-gold-20: #665400;
 	--clr-semantic-gold-40: #ccab00;
 	--clr-semantic-gold-90: #fff5cc;
+
 	--clr-semantic-silver-40: #557177;
-	--clr-wiki-primary-container: #e2e2e6;
 
 	--clr-semantic-positive-30: #1d7c1d;
 	--clr-semantic-negative-40: #b81414;
@@ -108,6 +110,7 @@ body {
 	--clr-on-surface-light-primary-8: rgba( 0, 0, 0, 0.08 );
 	--clr-on-surface-light-primary-12: rgba( 0, 0, 0, 0.12 );
 
+	--clr-wiki-primary-container: #e2e2e6;
 	--clr-wiki-theme-primary: var( --clr-moon-40 );
 }
 
@@ -125,7 +128,7 @@ a {
 	background-color: transparent;
 }
 
-.btn, {
+.btn {
 	display: inline-flex;
 	justify-content: center;
 	align-items: center;
@@ -173,6 +176,11 @@ a {
 	background-color: var( --clr-primary-44 );
 }
 
+.btn.btn-secondary {
+	outline-color: var( --clr-secondary-80 );
+	color: var( --clr-secondary-25 );
+}
+
 img {
 	vertical-align: middle;
 	border-style: unset;
@@ -189,4 +197,19 @@ img {
 	padding-left: 0;
 	margin-bottom: 0;
 	list-style: none;
+}
+
+pre {
+	border: 1px solid #adb5bd;
+	page-break-inside: avoid;
+	font-family: "Source Code Pro", monospace;
+	font-size: 1em;
+	margin-top: 0;
+	margin-bottom: 1rem;
+	overflow: auto;
+	-ms-overflow-style: scrollbar;
+	background-color: #f8f9fa;
+	white-space: pre-wrap;
+	overflow-x: hidden;
+	word-wrap: break-word;
 }
