@@ -178,7 +178,7 @@ function Tournament.calculatePhase(tournament)
 	if not tournament.endDate then
 		return TOURNAMENT_PHASE.ONGOING
 	end
-	if DateExt.getCurrentTimestamp() < (tournament.endDate.timestamp + 24 * 60 * 60) then
+	if DateExt.getCurrentTimestamp() < (tournament.endDate.timestamp + DateExt.daysToSeconds(1)) then
 		return TOURNAMENT_PHASE.ONGOING
 	end
 	return TOURNAMENT_PHASE.FINISHED
