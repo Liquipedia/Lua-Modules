@@ -86,9 +86,17 @@ body {
 /* Styles that are not yet part of this repository, but used in snapshot tests */
 :root {
 	--clr-primary-44: #1f73c1;
+	--clr-semantic-gold-40: #ccab00;
+	--clr-semantic-silver-40: #557177;
 	--clr-wiki-primary-container: #e2e2e6;
 }
 
 .wiki-backgroundcolor-light {
 	background-color: var( --clr-wiki-primary-container );
+}
+
+a {
+	text-decoration: none;
+	color: var( --clr-primary );
+	background-color: transparent;
 }
