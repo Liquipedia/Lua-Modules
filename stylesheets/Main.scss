@@ -82,3 +82,13 @@ body {
 ::after {
 	box-sizing: border-box;
 }
+
+/* Styles that are not yet part of this repository, but used in snapshot tests */
+:root {
+	--clr-primary-44: #1f73c1;
+	--clr-wiki-primary-container: #e2e2e6;
+}
+
+.wiki-backgroundcolor-light {
+	background-color: var( --clr-wiki-primary-container );
+}
