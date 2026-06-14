@@ -101,6 +101,9 @@ body {
 	--clr-semantic-silver-40: #557177;
 	--clr-wiki-primary-container: #e2e2e6;
 
+	--clr-semantic-positive-30: #1d7c1d;
+	--clr-semantic-negative-40: #b81414;
+
 	--clr-on-surface-light-primary-4: rgba( 0, 0, 0, 0.04 );
 	--clr-on-surface-light-primary-8: rgba( 0, 0, 0, 0.08 );
 	--clr-on-surface-light-primary-12: rgba( 0, 0, 0, 0.12 );
@@ -110,6 +113,10 @@ body {
 
 .wiki-backgroundcolor-light {
 	background-color: var( --clr-wiki-primary-container );
+}
+
+.d-none {
+	display: none !important;
 }
 
 a {
