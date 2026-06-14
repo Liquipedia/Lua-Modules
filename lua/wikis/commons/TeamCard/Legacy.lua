@@ -12,7 +12,9 @@ local Array = Lua.import('Module:Array')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
+local Page = Lua.import('Module:Page')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local PlayerExt = Lua.import('Module:Player/Ext')
 local String = Lua.import('Module:StringUtils')
 local RoleUtil = Lua.import('Module:Role/Util')
 local Table = Lua.import('Module:Table')
@@ -20,6 +22,11 @@ local Template = Lua.import('Module:Template')
 local Tournament = Lua.import('Module:Tournament')
 
 local TeamParticipantsController = Lua.import('Module:TeamParticipants/Controller')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -243,10 +250,28 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
 		end
 	end
 
+	-- can't rely on PlayerExt.syncPlayer because the old TC did not read from wiki vars
+	-- hence you would get unexpectedly different data compared to the old stuff with syncPlayer
+	---@param player string
+	---@return string?
+	local function getNationality(player)
+		local playerLink = Page.pageifyLink(player)
+
+		local results = mw.ext.LiquipediaDB.lpdb('player', {
+			limit = 1,
+			conditions = tostring(ConditionNode(ColumnName('pagename'), Comparator.eq, playerLink)),
+			query = 'nationality',
+		})[1] or {}
+
+		return results.nationality
+	end
+
+	local pageName = tcArgs[prefix .. 'link'] or tcArgs[prefix]
+
 	return {
 		[1] = tcArgs[prefix],
-		link = tcArgs[prefix .. 'link'],
-		flag = tcArgs[prefix .. 'flag_o'] or tcArgs[prefix .. 'flag'],
+		link = pageName,
+		flag = tcArgs[prefix .. 'flag_o'] or tcArgs[prefix .. 'flag'] or getNationality(pageName),
 		team = tcArgs[prefix .. 'team'],
 		id = tcArgs[prefix .. 'id'],
 		number = tcArgs[prefix .. 'number'],
