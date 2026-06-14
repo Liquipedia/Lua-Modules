@@ -9,12 +9,12 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Class = Lua.import('Module:Class')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Logic = Lua.import('Module:Logic')
 local Variables = Lua.import('Module:Variables')
-local HighlightConditions = Lua.import('Module:HighlightConditions')
 
 local PrizePool = Lua.import('Module:PrizePool')
-local Opponent = Lua.import('Module:Opponent/Custom')
+local Opponent = Lua.import('Module:Opponent')
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 local CustomLpdbInjector = Class.new(LpdbInjector)
@@ -56,6 +56,8 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	Variables.varDefine(participantLower .. '_prizepoints', lpdbData.extradata.prizepoints)
 	Variables.varDefine(participantLower .. '_prizepoints2', lpdbData.extradata.prizepoints2)
+	Variables.varDefine('enddate_'.. lpdbData.participant .. '_date', lpdbData.date)
+	Variables.varDefine('status'.. lpdbData.participant .. '_date', lpdbData.date)
 
 	if Opponent.isTbd(opponent.opponentData) then
 		Variables.varDefine('minimum_secured', lpdbData.extradata.prizepoints)
@@ -71,7 +73,7 @@ end
 ---@param tierType string?
 ---@param isHighlighted boolean
 ---@return number
-function CustomPrizePool.calculateWeight(prizeMoney, tier, place, tournamentType, tierType, isHighlighted)	
+function CustomPrizePool.calculateWeight(prizeMoney, tier, place, tournamentType, tierType, isHighlighted)
 	if Logic.isEmpty(tier) then
 		return 0
 	end
