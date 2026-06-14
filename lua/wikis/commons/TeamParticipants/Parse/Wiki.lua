@@ -23,7 +23,7 @@ local Variables = Lua.import('Module:Variables')
 local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
----qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer,
+---qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer, autoPlayed: boolean,
 ---potentialQualifiers: standardOpponent[]?, warnings: string[]?, broken: boolean?, errorMessage: string?}
 
 ---@alias QualificationMethod 'invite'|'qual'
@@ -216,6 +216,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		potentialQualifiers = potentialQualifiers,
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
+		autoPlayed = Logic.readBool(input.autoplayed),
 		date = date or defaultDate,
 	}
 end
@@ -249,8 +250,8 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 		trophies = tonumber(playerInput.trophies),
 		type = playerType,
 		status = playerInput.status,
-		played = Logic.nilOr(playedInput, true),
-		results = Logic.nilOr(resultsInput, playedInput, true),
+		played = playedInput,
+		results = resultsInput,
 		number = tonumber(playerInput.number),
 		joinDate = Logic.nilIfEmpty(playerInput.joindate),
 		leaveDate = Logic.nilIfEmpty(playerInput.leavedate),
