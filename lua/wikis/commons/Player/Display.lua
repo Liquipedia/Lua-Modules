@@ -9,6 +9,9 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
+local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
 local BlockPlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Block')
 local InlinePlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Inline')
@@ -32,6 +35,32 @@ function PlayerDisplay.InlinePlayer(props)
 	return InlinePlayerWidget(props)
 end
 
+---Called from Template:InlinePlayer
+---@param props {[1]: string, flag: string?, link: string?, race: string?, faction: string?, date: string?,
+---novar: string|boolean?, dq: string|boolean?, flip: string|boolean?, showFlag: string|boolean?,
+---showLink: string|boolean?, showRace: string|boolean?, showFaction: string|boolean?}
+---@return VNode
+function PlayerDisplay.TemplateInlinePlayer(props)
+	local player = Opponent.readSinglePlayerArgs(props)
+
+	PlayerExt.syncPlayer(player, {
+		date = props.date,
+		savePageVar = not Logic.readBool(props.novar),
+		overwritePageVars = true,
+	})
+
+	return InlinePlayerWidget{
+		date = props.date,
+		dq = Logic.readBoolOrNil(props.dq),
+		flip = Logic.readBoolOrNil(props.flip),
+		player = player,
+		savePageVar = not Logic.readBool(props.novar),
+		showFlag = Logic.readBoolOrNil(props.showFlag),
+		showLink = Logic.readBoolOrNil(props.showLink),
+		showFaction = Logic.nilOr(Logic.readBoolOrNil(props.showRace), Logic.readBoolOrNil(props.showFaction)),
+	}
+end
+
 -- Note: Lua.import('Module:Flags').Icon automatically includes a span with class="flag"
 ---@param props {flag: string?, useDefault: boolean}
 ---@return string
@@ -47,4 +76,5 @@ return Class.export(PlayerDisplay, {exports = {
 	'BlockPlayer',
 	'InlinePlayer',
 	'Flag',
+	'TemplateInlinePlayer',
 }})
