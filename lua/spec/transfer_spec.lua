@@ -2,7 +2,7 @@
 local Json = require('Module:Json')
 local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 insulate('Transfer', function()
-	allwikis('smoke #snapshotsudo', function (args, wikiName)
+	allwikis('smoke #snapshot', function (args, wikiName)
 		local LpdbTransferStub = stub(mw.ext.LiquipediaDB, 'lpdb_transfer')
 		local LpdbQueryStub = stub(mw.ext.LiquipediaDB, 'lpdb', {})
 
