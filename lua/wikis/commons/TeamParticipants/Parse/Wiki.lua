@@ -24,7 +24,7 @@ local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
 ---qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer, autoPlayed: boolean,
----potentialQualifiers: standardOpponent[]?, warnings: string[]?}
+---potentialQualifiers: standardOpponent[]?, warnings: string[]?, broken: boolean?, errorMessage: string?}
 
 ---@alias QualificationMethod 'invite'|'qual'
 ---@alias QualificationType 'tournament'|'internal'|'external'|'other'
@@ -157,6 +157,20 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 			type = Opponent.team,
 		}))
 
+		if not TeamTemplate.exists(opponent.template) then
+			return {
+				opponent = opponent,
+				broken = true,
+				errorMessage = TeamTemplate.noTeamMessage(opponent.template),
+				aliases = {},
+				notes = {},
+				potentialQualifiers = {},
+				warnings = {},
+				shouldImportFromDb = false,
+				date = date or defaultDate,
+			}
+		end
+
 		opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
 		local resolvedOptions = {
 			syncPlayer = true,
@@ -169,8 +183,9 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		}
 
 		local opponentName = Opponent.toName(opponent)
-		local prizePoolDate = Variables.varDefault('enddate_' .. opponentName)
-			or Variables.varDefault('enddate_' .. opponentName .. '_date')
+		local prizePoolDate = Variables.varDefault('enddate_' .. opponentName) -- set in multiple PrizePool/Custom
+			or Variables.varDefault('enddate_' .. opponentName .. '_date') -- set in valorant/PrizePool/Custom
+			or Variables.varDefault('ranking_' .. mw.ustring.lower(opponentName) .. '_placementdate') -- set in PrizePool/Base
 		date = date or DateExt.parseIsoDate(prizePoolDate) or defaultDate
 
 		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), resolvedOptions)
@@ -238,6 +253,8 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 		played = playedInput,
 		results = resultsInput,
 		number = tonumber(playerInput.number),
+		joinDate = Logic.nilIfEmpty(playerInput.joindate),
+		leaveDate = Logic.nilIfEmpty(playerInput.leavedate),
 	}
 	return player
 end
@@ -268,7 +285,7 @@ end
 ---@param count number
 ---@return standardPlayer[]
 function TeamParticipantsWikiParser.createTBDPlayers(count)
-	return Array.map(Array.range(1, count), function()
+	return Array.mapRange(1, count, function()
 		return TeamParticipantsWikiParser.parsePlayer{'TBD'}
 	end)
 end

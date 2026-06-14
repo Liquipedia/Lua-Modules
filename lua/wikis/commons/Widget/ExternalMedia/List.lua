@@ -17,7 +17,7 @@ local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local Widget = Lua.import('Module:Widget')
 local ExternalMediaLinkDisplay = Lua.import('Module:Widget/ExternalMedia/Link')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local ListWidgets = Lua.import('Module:Widget/List')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local NON_BREAKING_SPACE = '&nbsp;'
@@ -33,7 +33,9 @@ function ExternalMediaListDisplay:render()
 	if Logic.isEmpty(data) then
 		return
 	end
-	return UnorderedList{children = Array.map(data, FnUtil.curry(ExternalMediaListDisplay._createListElement, self))}
+	return ListWidgets.Unordered{
+		children = Array.map(data, FnUtil.curry(ExternalMediaListDisplay._createListElement, self))
+	}
 end
 
 ---@private

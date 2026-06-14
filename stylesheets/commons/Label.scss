@@ -115,10 +115,6 @@
 
 		--placement-text-color: var( --clr-secondary-100 );
 
-		.theme--dark & {
-			--placement-text-color: var( --clr-secondary-9 );
-		}
-
 		&:not( [ data-placement-type ] ) {
 			--placement-solid-color: var( --clr-on-surface-light-primary-4 );
 			--placement-text-color: var( --clr-secondary-25 );
@@ -132,7 +128,50 @@
 		&[ data-label-type="placement-minimum" ] {
 			color: var( --placement-solid-color );
 			background-color: hsl( from var( --placement-solid-color ) h s l / 0.08 );
-			box-shadow: 0 0 0 calc( var( --label-scale ) * 0.0125rem ) var( --placement-solid-color ) inset;
+			box-shadow: 0 0 0 calc( var( --label-scale ) * 0.0625rem ) var( --placement-solid-color ) inset;
+
+			.theme--dark & {
+				color: var( --placement-text-color );
+			}
+		}
+
+		&[ data-label-type|="legend" ] {
+			--label-scale: 0.75;
+		}
+
+		&[ data-label-type="legend-confirmed" ] {
+			--placement-solid-color: var( --clr-secondary-25 );
+			--placement-text-color: var( --clr-secondary-100 );
+
+			.theme--dark & {
+				--placement-solid-color: var( --clr-secondary-90 );
+				--placement-text-color: var( --clr-secondary-25 );
+			}
+		}
+
+		&[ data-label-type="legend-minimum" ] {
+			color: var( --placement-solid-color );
+			background-color: var( --placement-background-color );
+			box-shadow: 0 0 0 0.0625rem var( --placement-border-color, var( --placement-solid-color ) ) inset;
+
+			--placement-solid-color: var( --clr-secondary-25 );
+			--placement-background-color: var( --clr-on-surface-light-primary-12 );
+
+			.theme--dark & {
+				--placement-solid-color: var( --clr-secondary-100 );
+				--placement-background-color: var( --clr-on-surface-dark-primary-12 );
+				--placement-border-color: var( --clr-secondary-80 );
+			}
+		}
+
+		&[ data-label-type="legend-undecided" ] {
+			--placement-solid-color: var( --clr-on-surface-light-primary-12 );
+			--placement-text-color: var( --clr-secondary-25 );
+
+			.theme--dark & {
+				--placement-solid-color: var( --clr-on-surface-dark-primary-12 );
+				--placement-text-color: var( --clr-secondary-100 );
+			}
 		}
 
 		&[ data-placement-type="byeup" ] {
@@ -161,6 +200,10 @@
 
 		&[ data-placement-type="down" ] {
 			--placement-solid-color: var( --position-down-color );
+		}
+
+		&[ data-placement-type="dq" ] {
+			--placement-solid-color: var( --position-disqualified-color );
 		}
 	}
 

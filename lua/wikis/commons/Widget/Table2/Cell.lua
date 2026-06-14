@@ -7,15 +7,15 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local Component = Lua.import('Module:Widget/Component')
+local Context = Lua.import('Module:Widget/ComponentContext')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
 ---@class Table2CellProps
----@field children Renderable[]?
+---@field children? Renderable|Renderable[]
 ---@field align ('left'|'right'|'center')?
 ---@field shrink (string|number|boolean)?
 ---@field nowrap (string|number|boolean)?
@@ -29,24 +29,16 @@ local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 ---@field css {[string]: string|number|nil}?
 ---@field attributes {[string]: any}?
 
----@class Table2Cell: Widget
----@operator call(Table2CellProps): Table2Cell
----@field props Table2CellProps
-local Table2Cell = Class.new(Widget)
-
-Table2Cell.defaultProps = {
-	nowrap = true,
-}
-
----@return Widget
-function Table2Cell:render()
-	local props = self.props
-
-	local columns = self:useContext(Table2Contexts.ColumnContext)
+---@param props Table2CellProps
+---@return Renderable
+local function Table2Cell(props, context)
+	local children = props.children
+	---@cast children Renderable[]
+	local columns = Context.read(context, Table2Contexts.ColumnContext)
 
 	-- Skip context lookups and property merging if there are no column definitions
-	if not columns then
-		return HtmlWidgets.Td{
+	if #columns == 0 then
+		return Html.Td{
 			attributes = ColumnUtil.buildCellAttributes(
 				props.align,
 				props.nowrap,
@@ -54,7 +46,7 @@ function Table2Cell:render()
 				props.attributes
 			),
 			classes = props.classes,
-			children = props.children,
+			children = children,
 		}
 	end
 
@@ -65,23 +57,28 @@ function Table2Cell:render()
 		columnDef = columns[columnIndex]
 	end
 
-	local mergedProps = ColumnUtil.mergeProps(props, columnDef)
+	ColumnUtil.mergeProps(props, columnDef)
 
-	local css = ColumnUtil.buildCss(mergedProps.width, mergedProps.minWidth, mergedProps.maxWidth, mergedProps.css)
+	local css = ColumnUtil.buildCss(props.width, props.minWidth, props.maxWidth, props.css)
 
 	local attributes = ColumnUtil.buildCellAttributes(
-		mergedProps.align,
-		mergedProps.nowrap,
-		mergedProps.shrink,
-		ColumnUtil.buildAttributes(mergedProps)
+		props.align,
+		props.nowrap,
+		props.shrink,
+		ColumnUtil.buildAttributes(props)
 	)
 
-	return HtmlWidgets.Td{
-		classes = mergedProps.classes,
+	return Html.Td{
+		classes = props.classes,
 		css = css,
 		attributes = attributes,
-		children = mergedProps.children,
+		children = props.children,
 	}
 end
 
-return Table2Cell
+return Component.component(
+	Table2Cell,
+	{
+		nowrap = true,
+	}
+)

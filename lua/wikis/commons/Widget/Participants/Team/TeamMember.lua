@@ -77,7 +77,7 @@ function ParticipantsTeamMember:render()
 			},
 			trophies and trophies > 0 and Div{
 				classes = {'team-participant-card__member-trophies'},
-				children = trophies < 4 and Array.map(Array.range(1, trophies), function()
+				children = trophies < 4 and Array.mapRange(1, trophies, function()
 						return trophyIcon
 					end) or WidgetUtil.collect(
 						Div{

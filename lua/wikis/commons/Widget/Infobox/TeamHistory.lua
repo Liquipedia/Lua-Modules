@@ -12,14 +12,14 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local TeamHistoryAuto = Lua.import('Module:Infobox/Extension/TeamHistory/Auto')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Widget = Lua.import('Module:Widget')
 local Widgets = Lua.import('Module:Widget/All')
 
-local Big = HtmlWidgets.Big
-local Br = HtmlWidgets.Br
-local Div = HtmlWidgets.Div
-local Small = HtmlWidgets.Small
+local Big = Html.Big
+local Br = Html.Br
+local Div = Html.Div
+local Small = Html.Small
 
 local DEFAULT_MODE = 'manual'
 

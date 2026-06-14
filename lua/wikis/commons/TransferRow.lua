@@ -13,7 +13,6 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
-local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -66,8 +65,6 @@ local TransferRow = Class.new(
 	---@return self
 	function(self, args)
 		self.args = args
-
-		return self
 	end
 )
 
@@ -349,10 +346,7 @@ end
 
 ---@return Widget?
 function TransferRow:build()
-	return TransferRowWidget{
-		transfers = self.transfers,
-		showTeamName = (Info.config.transfers or {}).showTeamName
-	}
+	return TransferRowWidget{transfers = self.transfers}
 end
 
 return TransferRow

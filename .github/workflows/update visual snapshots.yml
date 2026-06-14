@@ -6,7 +6,7 @@ jobs:
   update-snapshots:
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.59.0-noble
+      image: mcr.microsoft.com/playwright:v1.60.0-noble
 
     permissions:
       contents: write
@@ -40,7 +40,7 @@ jobs:
           node-version: lts/*
 
       - name: Setup luarocks
-        uses: leafo/gh-actions-luarocks@v5
+        uses: leafo/gh-actions-luarocks@v6
 
       - name: Setup dependencies
         run: |
