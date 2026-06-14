@@ -14,7 +14,7 @@ local Logic = Lua.import('Module:Logic')
 local Variables = Lua.import('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool')
-local Opponent = Lua.import('Module:Opponent')
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 local CustomLpdbInjector = Class.new(LpdbInjector)
@@ -56,8 +56,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	Variables.varDefine(participantLower .. '_prizepoints', lpdbData.extradata.prizepoints)
 	Variables.varDefine(participantLower .. '_prizepoints2', lpdbData.extradata.prizepoints2)
-	Variables.varDefine('enddate_'.. lpdbData.participant .. '_date', lpdbData.date)
-	Variables.varDefine('status'.. lpdbData.participant .. '_date', lpdbData.date)
 
 	if Opponent.isTbd(opponent.opponentData) then
 		Variables.varDefine('minimum_secured', lpdbData.extradata.prizepoints)
