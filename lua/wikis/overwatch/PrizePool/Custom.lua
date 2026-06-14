@@ -71,7 +71,8 @@ end
 ---@param tierType string?
 ---@param isHighlighted boolean
 ---@return number
-function CustomPrizePool.calculateWeight(prizeMoney, tier, place, tournamentType, tierType, isHighlighted)	if Logic.isEmpty(tier) then
+function CustomPrizePool.calculateWeight(prizeMoney, tier, place, tournamentType, tierType, isHighlighted)	
+	if Logic.isEmpty(tier) then
 		return 0
 	end
 
