@@ -92,6 +92,7 @@ body {
 
 	--clr-primary-44: #1f73c1;
 	--clr-secondary-25: #404040;
+	--clr-secondary-80: #b3b3b3;
 	--clr-secondary-100: #ffffff;
 
 	--clr-semantic-gold-20: #665400;
@@ -173,4 +174,12 @@ img {
 .main-container .main-content-column {
 	position: relative;
 	overflow-x: hidden;
+}
+
+.nav {
+	display: flex;
+	flex-wrap: wrap;
+	padding-left: 0;
+	margin-bottom: 0;
+	list-style: none;
 }
