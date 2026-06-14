@@ -14,7 +14,7 @@ local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
-local Weight = Lua.import('Module:Weight')
+local Weight = Lua.import('Module:PrizePool/Weight')
 
 local PrizePool = Lua.import('Module:PrizePool')
 
