@@ -92,6 +92,9 @@ body {
 	--clr-semantic-gold-40: #ccab00;
 	--clr-semantic-silver-40: #557177;
 	--clr-wiki-primary-container: #e2e2e6;
+
+	--clr-on-surface-light-primary-4: rgba( 0, 0, 0, 0.04 );
+	--clr-on-surface-light-primary-12: rgba( 0, 0, 0, 0.12 );
 }
 
 .wiki-backgroundcolor-light {
@@ -150,4 +153,9 @@ a {
 .btn.btn-primary {
 	color: var( --clr-primary-100 );
 	background-color: var( --clr-primary-44 );
+}
+
+img {
+	vertical-align: middle;
+	border-style: unset;
 }
