@@ -57,7 +57,7 @@ end
 ---@private
 function CustomItem:_createDescription()
 	local rarities = self:getAllArgsForBase(self.args, 'rarity')
-	local description = '<b>' .. self.name .. '</b> is an item that is available in  '
+	local description = '<b>' .. self.name .. '</b> is an item that is available in '
 		.. mw.text.listToText(rarities, ', ', ' and ')
 		.. ' ' .. (#rarities > 1 and 'rarities' or 'rarity')
 

@@ -176,7 +176,7 @@ local factionPropsAoE2 = {
 	byzantines = {
 		index = 12,
 		name = 'Byzantines',
-		pageName = 'Byzantines'  .. AOE2_SUFFIX,
+		pageName = 'Byzantines' .. AOE2_SUFFIX,
 		faction = 'byzantines',
 	},
 	celts = {
