@@ -234,6 +234,7 @@ MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed
 ---@field winner integer?
 ---@field status string?
 ---@field extradata table?
+---@field package record match2game
 
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',
@@ -290,6 +291,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field timestamp number
 ---@field timezoneId string?
 ---@field bestof number?
+---@field package record match2
 
 MatchGroupUtil.types.Match = TypeUtil.struct({
 	bracketData = MatchGroupUtil.types.BracketData,
@@ -543,6 +545,132 @@ function MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId)
 	return match, bracketResetMatch
 end
 
+local MatchRecordMT = {
+	PROPERTIES = {
+		'bestof', 'extradata', 'date', 'dateexact', 'finished', 'game', 'icon', 'icondark', 'links', 'liquipediatier',
+		'liquipediatiertype', 'mode', 'pagename', 'parent', 'patch', 'publishertier', 'resulttype', 'section',
+		'series', 'shortname', 'status', 'stream', 'tickername', 'tournament', 'type', 'vod', 'walkover', 'winner',
+		'match2bracketdata'
+	}
+}
+
+---@param record match2
+---@param property string
+function MatchRecordMT.__index(record, property)
+	local matchId = rawget(record, 'match2id')
+	if type(matchId) ~= 'string' then
+		return
+	end
+	if property == 'match2games' then
+		record.match2games = MatchRecordMT._fetchGames(matchId)
+	elseif property == 'match2opponents' then
+		record.match2opponents = MatchRecordMT._fetchOpponents(matchId)
+	elseif not rawget(record, '_propertiesLoaded') then
+		Table.mergeInto(
+			record,
+			mw.ext.LiquipediaDB.lpdb('match2', {
+				conditions = '[[match2id::' .. matchId .. ']]',
+				query = table.concat(
+					Array.filter(MatchRecordMT.PROPERTIES, function (recordProperty)
+						return rawget(record, recordProperty) == nil
+					end),
+					','
+				),
+				limit = 1,
+			})[1]
+		)
+		record._propertiesLoaded = true
+	end
+	return rawget(record, property)
+end
+
+---@param matchId string
+---@return match2game[]
+function MatchRecordMT._fetchGames(matchId)
+	local gameRecords = mw.ext.LiquipediaDB.lpdb('match2game', {
+		conditions = '[[match2id::' .. matchId .. ']]',
+		query = 'date, game, length, map, mode, opponents, patch, resulttype, status, scores,' ..
+			'subgroup, type, vod, walkover, winner',
+		order = 'match2gameid asc',
+		limit = 1000,
+	})
+
+	Array.forEach(gameRecords, function (gameRecord, index)
+		setmetatable(gameRecord, {
+			__index = function (t, k)
+				if k == 'extradata' then
+					local queriedExtradata = mw.ext.LiquipediaDB.lpdb('match2game', {
+						conditions = '[[match2id::' .. matchId .. ']] AND [[match2gameid::' .. index .. ']]',
+						query = 'extradata',
+						limit = 1,
+					})[1].extradata
+					t.extradata = queriedExtradata
+					return queriedExtradata
+				end
+			end
+		})
+	end)
+	return gameRecords
+end
+
+---@param matchId string
+---@return match2opponent[]
+function MatchRecordMT._fetchOpponents(matchId)
+	local opponentRecords = mw.ext.LiquipediaDB.lpdb('match2opponent', {
+		conditions = '[[match2id::' .. matchId .. ']]',
+		query = 'match2opponentid, name, placement, score, status, template, type, extradata',
+		order = 'match2opponentid asc',
+		limit = 1000,
+	})
+	local _, players = Array.groupBy(
+		mw.ext.LiquipediaDB.lpdb('match2player', {
+			conditions = '[[match2id::' .. matchId .. ']]',
+			query = 'match2opponentid, name, displayname, flag, extradata',
+			order = 'match2playerid asc',
+			groupby = 'match2opponentid asc',
+			limit = 1000,
+		}),
+		function (player)
+			return tonumber(player.match2opponentid)
+		end
+	)
+	Array.forEach(opponentRecords, function (opponentRecord)
+		opponentRecord.match2players = players[tonumber(opponentRecord.match2opponentid)]
+	end)
+	return opponentRecords
+end
+
+local MatchMT = {}
+
+---@param match MatchGroupUtilMatch
+---@param property any
+function MatchMT.__index(match, property)
+	if property == 'bracketData' then
+		local bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(match.record.match2bracketdata))
+		if bracketData.type == 'bracket' then
+			bracketData.lowerEdges = bracketData.lowerEdges
+				or MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #match.record.match2opponents)
+		end
+		match.bracketData = bracketData
+	elseif property == 'games' then
+		local gamesRecord = match.record.match2games or MatchRecordMT._fetchGames(match.matchId)
+		match.games = Array.map(gamesRecord, function(game)
+			return MatchGroupUtil.gameFromRecord(game, #match.record.match2opponents)
+		end)
+	elseif property == 'links' then
+		match.links = Json.parseIfString(match.record.links) or {}
+	elseif property == 'opponents' then
+		match.opponents = Array.map(
+			match.record.match2opponents, FnUtil.curry(MatchGroupUtil.opponentFromRecord, match.record)
+		)
+	elseif property == 'phase' then
+		match.phase = MatchGroupUtil.computeMatchPhase(match)
+	elseif property == 'stream' then
+		match.stream = Json.parseIfString(match.record.stream) or {}
+	end
+	return rawget(match, property)
+end
+
 ---Converts a match record to a structurally typed table with the appropriate data types for field values.
 ---The match record is either a match created in the store bracket codepath (WikiSpecific.processMatch),
 ---or a record fetched from LPDB (MatchGroupUtil.fetchMatchRecords).
@@ -553,35 +681,25 @@ end
 ---@param record match2
 ---@return MatchGroupUtilMatch
 function MatchGroupUtil.matchFromRecord(record)
+	setmetatable(record, MatchRecordMT)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
-	local opponents = Array.map(record.match2opponents, FnUtil.curry(MatchGroupUtil.opponentFromRecord, record))
-	local games = Array.map(record.match2games, function(game) return MatchGroupUtil.gameFromRecord(game, #opponents) end)
-	local bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata))
-	if bracketData.type == 'bracket' then
-		bracketData.lowerEdges = bracketData.lowerEdges
-			or MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #opponents)
-	end
 
 	local walkover = nilIfEmpty(record.walkover)
 
 	local match = {
 		bestof = tonumber(record.bestof) or 0,
-		bracketData = bracketData,
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		extradata = extradata,
 		date = record.date,
 		dateIsExact = Logic.readBool(record.dateexact),
 		finished = Logic.readBool(record.finished),
 		game = record.game,
-		games = games,
 		icon = nilIfEmpty(record.icon),
 		iconDark = nilIfEmpty(record.icondark),
-		links = Json.parseIfString(record.links) or {},
 		matchId = record.match2id,
 		liquipediatier = record.liquipediatier,
 		liquipediatiertype = record.liquipediatiertype,
 		mode = record.mode,
-		opponents = opponents,
 		pageName = record.pagename,
 		parent = record.parent,
 		patch = record.patch,
@@ -591,7 +709,6 @@ function MatchGroupUtil.matchFromRecord(record)
 		series = nilIfEmpty(record.series),
 		shortname = nilIfEmpty(record.shortname),
 		status = nilIfEmpty(record.status),
-		stream = Json.parseIfString(record.stream) or {},
 		tickername = record.tickername,
 		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
 		timezoneId = Table.extract(extradata, 'timezoneid'),
@@ -600,11 +717,10 @@ function MatchGroupUtil.matchFromRecord(record)
 		vod = nilIfEmpty(record.vod),
 		walkover = walkover and walkover:lower() or nil,
 		winner = tonumber(record.winner),
+		record = record,
 	}
 
-	match.phase = MatchGroupUtil.computeMatchPhase(match)
-
-	return match
+	return setmetatable(match, MatchMT)
 end
 
 ---@param data table?
@@ -741,22 +857,34 @@ function MatchGroupUtil.playerFromRecord(record)
 	}
 end
 
+local GameMT = {
+	---@param game MatchGroupUtilGame
+	---@param property any
+	__index = function (game, property)
+		if property == 'extradata' then
+			game.extradata = MatchGroupUtil.parseOrCopyExtradata(game.record.extradata)
+		elseif property == 'comment' then
+			game.comment = Table.extract(game.extradata, 'comment')
+		elseif property == 'dateIsExact' then
+			game.dateIsExact = Logic.readBool(Table.extract(game.extradata, 'dateexact'))
+		elseif property == 'header' then
+			game.header = nilIfEmpty(Table.extract(game.extradata, 'header'))
+		elseif property == 'mapDisplayName' then
+			game.mapDisplayName = nilIfEmpty(Table.extract(game.extradata, 'displayname'))
+		end
+		return rawget(game, property)
+	end
+}
+
 ---@param record match2game
 ---@param opponentCount integer?
 ---@return MatchGroupUtilGame
 function MatchGroupUtil.gameFromRecord(record, opponentCount)
-	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
-
-	return {
-		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
+	return setmetatable({
 		date = record.date,
-		dateIsExact = nilIfEmpty(Table.extract(extradata, 'dateexact')),
-		extradata = extradata,
 		game = record.game,
-		header = nilIfEmpty(Table.extract(extradata, 'header')),
 		length = record.length,
 		map = nilIfEmpty(record.map),
-		mapDisplayName = nilIfEmpty(Table.extract(extradata, 'displayname')),
 		mode = nilIfEmpty(record.mode),
 		opponents = record.opponents,
 		patch = record.patch,
@@ -768,7 +896,8 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 		vod = nilIfEmpty(record.vod),
 		walkover = nilIfEmpty(record.walkover) and record.walkover:lower() or nil,
 		winner = tonumber(record.winner),
-	}
+		record = record,
+	}, GameMT)
 end
 
 ---@param data table
