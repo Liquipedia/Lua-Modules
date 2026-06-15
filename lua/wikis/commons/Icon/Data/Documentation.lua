@@ -13,7 +13,7 @@ local Table = Lua.import('Module:Table')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local ListWidgets = Lua.import('Module:Widget/List')
 
 local IconDataDoc = {}
 
@@ -30,7 +30,7 @@ function IconDataDoc.generate()
 
 		Array.appendWith(children,
 			HtmlWidgets.H3{children = letter},
-			UnorderedList{children = Array.map(group, IconDataDoc._displayIcon)}
+			ListWidgets.Unordered{children = Array.map(group, IconDataDoc._displayIcon)}
 		)
 	end
 

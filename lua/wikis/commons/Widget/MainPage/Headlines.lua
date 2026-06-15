@@ -13,7 +13,7 @@ local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local ListWidgets = Lua.import('Module:Widget/List')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local defaultProps = {
@@ -34,7 +34,7 @@ local function Headlines(props)
 				['text-align'] = 'center',
 				['font-style'] = 'italic',
 			},
-			children = UnorderedList{
+			children = ListWidgets.Unordered{
 				children = {
 					Link{ children = 'See all Headlines', link = props.headlinesPortal },
 					Link{ children = 'Add a Headline', link = 'Special:FormEdit/ExternalMediaLinks' }

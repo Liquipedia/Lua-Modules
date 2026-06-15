@@ -58,7 +58,7 @@ Config.weights = {
 	{
 		tier = 2,
 		options = {
-			dateLossIgnored = false,
+			dateLossIgnored = true,
 		},
 		tiertype = {
 			{
@@ -82,7 +82,7 @@ Config.weights = {
 	{
 		tier = 3,
 		options = {
-			dateLossIgnored = false,
+			dateLossIgnored = true,
 		},
 		tiertype = {
 			{
@@ -106,7 +106,7 @@ Config.weights = {
 	{
 		tier = 4,
 		options = {
-			dateLossIgnored = false,
+			dateLossIgnored = true,
 		},
 		tiertype = {
 			{
@@ -130,7 +130,7 @@ Config.weights = {
 	{
 		tier = 5,
 		options = {
-			dateLossIgnored = false,
+			dateLossIgnored = true,
 		},
 		tiertype = {
 			{

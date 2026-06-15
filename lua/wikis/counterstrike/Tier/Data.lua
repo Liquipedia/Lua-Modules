@@ -5,6 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+---@type {tiers: table<''|integer, TierRawData?>, tierTypes: table<string, CounterstrikeTierTypeRawData?>}
 return {
 	tiers = {
 		{
