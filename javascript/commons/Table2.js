@@ -19,7 +19,7 @@ class Table2Striper {
 	constructor( table ) {
 		this.table = table;
 		this.isSortable = table.classList.contains( 'sortable' );
-		this.shouldStripe = table.getAttribute( 'data-striped' ) !== 'false';
+		this.shouldStripe = table.dataset.striped !== 'false';
 		this.groupCounter = 0;
 	}
 
@@ -53,7 +53,7 @@ class Table2Striper {
 			if ( isSubheader ) {
 				isEven = true;
 				groupRemaining = 0;
-				row.removeAttribute( 'data-group-id' );
+				delete row.dataset.groupId;
 				return;
 			}
 
@@ -70,7 +70,7 @@ class Table2Striper {
 			groupRemaining = Math.max( groupRemaining, rowspanCount );
 
 			row.classList.toggle( TABLE2_CONFIG.CLASSES.EVEN, isEven );
-			row.setAttribute( 'data-group-id', this.groupCounter );
+			row.dataset.groupId = this.groupCounter;
 
 			groupRemaining--;
 		} );
@@ -91,7 +91,7 @@ class Table2Striper {
 			return;
 		}
 
-		const groupId = row.getAttribute( 'data-group-id' );
+		const groupId = row.dataset.groupId;
 		if ( !groupId ) {
 			return;
 		}
@@ -108,7 +108,7 @@ class Table2Striper {
 			return;
 		}
 
-		const groupId = row.getAttribute( 'data-group-id' );
+		const groupId = row.dataset.groupId;
 		if ( !groupId ) {
 			return;
 		}
