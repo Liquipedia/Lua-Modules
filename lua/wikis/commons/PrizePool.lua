@@ -22,6 +22,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local Widgets = Lua.import('Module:Widget/All')
 local Div = Widgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Span = Widgets.Span
 local TableRow = Widgets.TableRow
 local TableCell = Widgets.TableCell
 
@@ -29,8 +30,6 @@ local TableCell = Widgets.TableCell
 ---@operator call(...): PrizePool
 ---@field placements PrizePoolPlacement[]
 local PrizePool = Class.new(BasePrizePool)
-
-local NON_BREAKING_SPACE = '&nbsp;'
 
 ---@param args table
 function PrizePool:readPlacements(args)
@@ -54,14 +53,17 @@ end
 ---@param placement PrizePoolPlacement
 ---@return WidgetTableCell
 function PrizePool:placeOrAwardCell(placement)
-	local placeCell = TableCell{
-		children = {placement:getMedal() or '', NON_BREAKING_SPACE, placement:_displayPlace()},
-		css = {['font-weight'] = 'bolder'},
-		classes = {'prizepooltable-place'},
-	}
-	placeCell.rowSpan = #placement.opponents
+	local badgeClass = placement:getBadgeClass()
+	local placeDisplay = placement:_displayPlace()
+	local content = badgeClass
+		and Span{classes = {'prizepooltable-badge', badgeClass}, children = {placeDisplay}}
+		or placeDisplay
 
-	return placeCell
+	return TableCell{
+		children = {content},
+		classes = {'prizepooltable-place'},
+		rowspan = #placement.opponents,
+	}
 end
 
 ---@param placement PrizePoolPlacement

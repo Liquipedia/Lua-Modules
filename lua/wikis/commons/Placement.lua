@@ -88,7 +88,6 @@ local prizepoolClasses = {
 	'background-color-first-place',
 	'background-color-second-place',
 	'background-color-third-place',
-	'background-color-fourth-place',
 	w = 'bg-win',
 	q = 'bg-win',
 	l = 'bg-lose',
