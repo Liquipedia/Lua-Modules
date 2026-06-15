@@ -55,7 +55,10 @@ function Renderer.render(vNode, context)
 
 	-- Backward Compatibility (with Widgets and mw.html)
 	if not renderFn then
-		if vNode.__tostring or vNode._build then
+		if vNode.tryMake then
+			---@cast vNode Widget
+			return Renderer.render(vNode:render(), context)
+		elseif vNode.__tostring or vNode._build then
 			return tostring(vNode)
 		end
 		mw.log('ERROR! Bad renderable:' .. mw.dumpObject(vNode))
