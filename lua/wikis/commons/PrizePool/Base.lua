@@ -252,7 +252,7 @@ BasePrizePool.prizeTypes = {
 		end,
 	},
 	[PRIZE_TYPE_QUALIFIES] = {
-		sortOrder = 40,
+		sortOrder = 50,
 
 		header = 'qualifies',
 		headerParse = function (prizePool, input, context, index)
@@ -305,7 +305,7 @@ BasePrizePool.prizeTypes = {
 		mergeDisplayColumns = true,
 	},
 	[PRIZE_TYPE_POINTS] = {
-		sortOrder = 50,
+		sortOrder = 40,
 
 		header = 'points',
 		headerParse = function (prizePool, input, context, index)
