@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Component = Lua.import('Module:Widget/Component')
-local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
 
@@ -27,18 +26,7 @@ local function ParticipantNotification(props)
 			'team-participant-card__notification',
 			highlighted and 'team-participant-card__notification--highlighted' or nil,
 		},
-		children = {
-			Div{
-				classes = {'team-participant-card__notification-icon'},
-				children = {
-					Icon{iconName = 'notification'},
-				}
-			},
-			Div{
-				classes = {'team-participant-card__notification-text'},
-				children = {text}
-			}
-		}
+		children = {text}
 	}
 end
 

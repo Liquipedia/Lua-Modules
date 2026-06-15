@@ -42,8 +42,8 @@ end
 ---@param widgets Renderable[]
 ---@return Renderable[]
 function CustomInjector:parse(id, widgets)
-	local caller  = self.caller
-	local args  = caller.args
+	local caller = self.caller
+	local args = caller.args
 	if id == 'custom' then
 		local maps = caller:getMaps()
 		return Array.append({},

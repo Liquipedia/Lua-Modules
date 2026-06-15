@@ -195,7 +195,7 @@ function Config.placementDropOffFunction(tier, tierType)
 
 		else
 			return 0
-        end
+		end
 	end
 end
 

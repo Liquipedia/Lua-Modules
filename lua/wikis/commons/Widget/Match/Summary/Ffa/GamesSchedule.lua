@@ -40,7 +40,7 @@ function MatchSummaryFfaGamesSchedule:render()
 		contentClass = 'panel-content__game-schedule',
 		items = Array.map(scheduleItems, function (game, idx)
 			return {
-				icon =  CountdownIcon{game = game},
+				icon = CountdownIcon{game = game},
 				title = showMatchDate and 'Match:' or ('Game ' .. idx .. ':'),
 				content = GameCountdown{game = game},
 			}

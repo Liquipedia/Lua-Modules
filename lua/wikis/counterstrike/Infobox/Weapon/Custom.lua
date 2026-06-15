@@ -63,7 +63,7 @@ end
 function CustomWeapon:_achievementsDisplay()
 	local args = self.args
 	local achievements = Array.mapIndexes(function(index)
-		local prefix = 'achievement'  .. index
+		local prefix = 'achievement' .. index
 		if (not args[prefix]) or (not args[prefix .. 'image']) then return end
 		return WidgetImage{
 			imageLight = args[prefix .. 'image'],
