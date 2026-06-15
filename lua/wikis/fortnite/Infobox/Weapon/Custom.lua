@@ -76,7 +76,7 @@ end
 function CustomWeapon:_createDescription()
 	local rarities = self:getAllArgsForBase(self.args, 'rarity')
 	local weaponType = self.args.type == HARVESTING_TOOL and HARVESTING_TOOL or 'Weapons'
-	local description = '<b>' .. self.name .. '</b> is a ' .. weaponType .. ' that is available in  '
+	local description = '<b>' .. self.name .. '</b> is a ' .. weaponType .. ' that is available in '
 		.. mw.text.listToText(rarities, ', ', ' and ')
 		.. ' ' .. (#rarities > 1 and 'rarities' or 'rarity') .. '.'
 

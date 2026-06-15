@@ -296,7 +296,7 @@ function CharacterStatsTable:_buildFooterRow()
 					classes = {'sortbottom', 'wikitable--' .. side .. '-bg'},
 					attributes = {colspan = 4},
 					children = {
-						sideWin .. ' W - ' ..  sideLoss .. ' L',
+						sideWin .. ' W - ' .. sideLoss .. ' L',
 						' ',
 						'(' .. CharacterStatsTable._calculatePercentage(sideWin, self.props.numGames) .. ')'
 					}

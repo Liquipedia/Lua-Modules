@@ -36,7 +36,7 @@ local function MatchPagePlayerDisplay(props)
 					Div{
 						classes = {
 							'match-bm-players-player-role',
-							props.side and 'role--' .. props.side  or nil
+							props.side and 'role--' .. props.side or nil
 						},
 						children = props.roleIcon
 					}
