@@ -46,7 +46,7 @@ function AwardPrizePool:readPlacements(args)
 end
 
 ---@param placement AwardPlacement
----@return WidgetTableCell
+---@return Renderable
 function AwardPrizePool:placeOrAwardCell(placement)
 	return TableCell{
 		children = {placement.award},

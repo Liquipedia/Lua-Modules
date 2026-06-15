@@ -23,8 +23,8 @@ liquipedia.prizepooltable = {
 				closeText = prizepooltable.dataset.closetext;
 			}
 			closeText += ' <i class="fa fa-chevron-up"></i>';
-			if ( numRows > cutAfter ) {
-				const row = prizepooltable.querySelector( 'tr:nth-child(' + ( cutAfter + 2 ) + ')' );
+			if ( numRows - 1 > cutAfter ) {
+				const row = prizepooltable.querySelector( 'tbody tr:nth-child(' + ( cutAfter + 1 ) + ')' );
 				if ( row !== null ) {
 					const rowNode = document.createElement( 'tr' );
 					rowNode.innerHTML = '<td colspan="' + Math.max( prizepooltable.querySelectorAll( 'tr:nth-child(1) th, tr:nth-child(1) td' ).length, prizepooltable.querySelectorAll( 'tr:nth-child(2) th, tr:nth-child(2) td' ).length ) + '" class="prizepooltabletoggle"><small class="prizepooltableshow">' + openText + '</small><small class="prizepooltablehide">' + closeText + '</small></td>';

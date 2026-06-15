@@ -606,7 +606,7 @@ function BasePrizePool:_buildTable(isAward)
 end
 
 ---@param isAward boolean?
----@return WidgetTableRow
+---@return Renderable
 function BasePrizePool:_buildHeader(isAward)
 	local children = {
 		TableWidgets.CellHeader{children = {isAward and 'Award' or 'Place'}, align = 'center'},
@@ -626,7 +626,7 @@ function BasePrizePool:_buildHeader(isAward)
 	return TableWidgets.Row{classes = {'prizepooltable-header'}, children = children}
 end
 
----@return WidgetTableRow[]
+---@return Renderable[]
 function BasePrizePool:_buildRows()
 	local rows = {}
 
@@ -699,7 +699,7 @@ end
 
 ---@param placement BasePlacement
 ---@param opponent table
----@return WidgetTableCell[]
+---@return Renderable[]
 function BasePrizePool:_opponentPrizeCells(placement, opponent)
 	local previousOfPrizeType = {}
 	local prizeCells = Array.map(self.prizes, function(prize)
@@ -823,7 +823,7 @@ function BasePrizePool:_hasBaseCurrency()
 end
 
 --- Creates an empty table cell
----@return WidgetTableCell
+---@return Renderable
 function BasePrizePool._emptyCell()
 	return TableCell{children = {DASH}}
 end

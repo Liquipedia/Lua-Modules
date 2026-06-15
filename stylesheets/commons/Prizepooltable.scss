@@ -176,10 +176,10 @@ table.prizepooltable.collapsed .prizepooltablehide {
 }
 
 // Hide rows past the cut-off while collapsed. The toggle row is injected by
-// Prizepooltable.js before the (cutAfter + 2)-th row, so rows from
-// (cutAfter + 3) onward are hidden when collapsed.
+// Prizepooltable.js before the (cutAfter + 1)-th tbody row, so rows from
+// (cutAfter + 2) onward are hidden when collapsed.
 @for $i from 0 through 32 {
-	html.client-js .prizepooltable.collapsed[ data-cutafter="#{$i}" ] tbody tr:nth-child( n + #{ $i + 3 } ) {
+	html.client-js .prizepooltable.collapsed[ data-cutafter="#{$i}" ] tbody tr:nth-child( n + #{ $i + 2 } ) {
 		display: none;
 	}
 }

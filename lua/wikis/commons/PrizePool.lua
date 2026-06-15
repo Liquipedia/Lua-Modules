@@ -47,7 +47,7 @@ function PrizePool:readPlacements(args)
 end
 
 ---@param placement PrizePoolPlacement
----@return WidgetTableCell
+---@return Renderable
 function PrizePool:placeOrAwardCell(placement)
 	local badgeClass = placement:getBadgeClass()
 	local placeDisplay = placement:_displayPlace()
