@@ -13,6 +13,7 @@ local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
 local Image = Lua.import('Module:Image')
 local Logic = Lua.import('Module:Logic')
+local Map = Lua.import('Module:Map')
 local Table = Lua.import('Module:Table')
 local VodLink = Lua.import('Module:VodLink')
 
@@ -312,7 +313,7 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 end
 
 ---@param mapVetoes table
----@param options {game: string?, emptyMapDisplay: string?}?
+---@param options {game: string?, emptyMapDisplay: string?, useLpdb: boolean?}?
 ---@return MapVetoProps?
 function MatchSummary.preProcessMapVeto(mapVetoes, options)
 	if Logic.isEmpty(mapVetoes) then
@@ -320,15 +321,26 @@ function MatchSummary.preProcessMapVeto(mapVetoes, options)
 	end
 
 	options = options or {}
-	local mapInputToDisplay = function(map)
+
+	---@param map string?
+	---@return {name: string, link: string?}
+	local mapInputToDisplay = FnUtil.memoize(function(map)
 		if Logic.isEmpty(map) then
 			return {name = options.emptyMapDisplay or TBD}
+		end
+		---@cast map -nil
+		if options.useLpdb then
+			local mapData = Map.getMapByName(map)
+			if mapData then
+				return {name = mapData.displayName, link = mapData.pageName}
+			end
+			return {name = map}
 		end
 		if options.game then
 			return {name = map, link = map .. '/' .. options.game}
 		end
 		return {name = map, link = map}
-	end
+	end)
 
 	return {
 		firstVeto = tonumber(mapVetoes[1].vetostart),
