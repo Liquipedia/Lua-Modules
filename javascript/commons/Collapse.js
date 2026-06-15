@@ -112,7 +112,7 @@ liquipedia.collapse = {
 			// Can pass empty string for "no exclusions" (everything toggles collapse)
 			const exclusionSelector = region.getAttribute( 'data-collapsible-exclude' ) || 'a';
 
-			region.addEventListener( 'click', ( event ) => {
+			const toggleCollapsible = ( event ) => {
 				if ( exclusionSelector ) {
 					const clickedExcluded = event.target.closest( exclusionSelector );
 
@@ -125,6 +125,27 @@ liquipedia.collapse = {
 				if ( collapsible ) {
 					event.preventDefault();
 					collapsible.classList.toggle( 'collapsed' );
+					if ( region.hasAttribute( 'aria-expanded' ) ) {
+						const isExpanded = !collapsible.classList.contains( 'collapsed' );
+						region.setAttribute( 'aria-expanded', String( isExpanded ) );
+					}
+				}
+			};
+
+			region.setAttribute( 'tabindex', '0' );
+			// role="button" makes child elements presentational, so only set it
+			// on regions without interactive children (e.g. links)
+			if ( !exclusionSelector || region.querySelector( exclusionSelector ) === null ) {
+				const collapsible = region.closest( '.general-collapsible' );
+				const isExpanded = collapsible !== null && !collapsible.classList.contains( 'collapsed' );
+				region.setAttribute( 'role', 'button' );
+				region.setAttribute( 'aria-expanded', String( isExpanded ) );
+			}
+
+			region.addEventListener( 'click', toggleCollapsible );
+			region.addEventListener( 'keydown', ( event ) => {
+				if ( event.key === 'Enter' || event.key === ' ' ) {
+					toggleCollapsible( event );
 				}
 			} );
 		} );

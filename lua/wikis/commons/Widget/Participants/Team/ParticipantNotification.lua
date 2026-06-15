@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
-local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
@@ -33,18 +32,7 @@ function ParticipantNotification:render()
 			'team-participant-card__notification',
 			highlighted and 'team-participant-card__notification--highlighted' or nil,
 		},
-		children = {
-			Div{
-				classes = {'team-participant-card__notification-icon'},
-				children = {
-					Icon{iconName = 'notification'},
-				}
-			},
-			Div{
-				classes = {'team-participant-card__notification-text'},
-				children = {text}
-			}
-		}
+		children = {text}
 	}
 end
 
