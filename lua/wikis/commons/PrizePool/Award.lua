@@ -70,6 +70,11 @@ function AwardPrizePool:_cutafterRows()
 	return count > 0 and count or nil
 end
 
+---@return {opentext: string, closetext: string}?
+function AwardPrizePool:_collapseText()
+	return {opentext = 'Show more Awards', closetext = 'Show less Awards'}
+end
+
 -- Get the lpdbObjectName depending on opponenttype
 ---@param lpdbEntry placement
 ---@param prizePoolIndex integer|string

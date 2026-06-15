@@ -86,6 +86,25 @@ function PrizePool:_cutafterRows()
 	return count > 0 and count or nil
 end
 
+---@return {opentext: string, closetext: string}?
+function PrizePool:_collapseText()
+	local firstHidden, lastPlace
+	for _, placement in ipairs(self.placements) do
+		if placement.placeStart > self.options.hideafter then
+			break
+		end
+		lastPlace = placement.placeEnd
+		if not firstHidden and placement.placeStart > self.options.cutafter then
+			firstHidden = placement.placeStart
+		end
+	end
+	if not firstHidden or not lastPlace then
+		return nil
+	end
+	local text = 'place ' .. firstHidden .. ' to ' .. lastPlace
+	return {opentext = text, closetext = text}
+end
+
 -- get the lpdbObjectName depending on opponenttype
 ---@param lpdbEntry placement
 ---@param prizePoolIndex integer|string

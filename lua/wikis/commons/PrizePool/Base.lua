@@ -588,6 +588,7 @@ end
 function BasePrizePool:_buildTable(isAward)
 	local bodyRows = self:_buildRows()
 	local cutafterRows = self:_cutafterRows()
+	local collapseText = cutafterRows and self:_collapseText() or nil
 
 	return TableWidgets.Table{
 		classes = {'prizepool-table-wrapper'},
@@ -597,7 +598,11 @@ function BasePrizePool:_buildTable(isAward)
 			'prizepooltable-' .. (isAward and 'award' or 'placement'),
 			cutafterRows and 'collapsed' or nil
 		),
-		tableAttributes = cutafterRows and {['data-cutafter'] = cutafterRows} or nil,
+		tableAttributes = cutafterRows and {
+			['data-cutafter'] = cutafterRows,
+			['data-opentext'] = collapseText and collapseText.opentext or nil,
+			['data-closetext'] = collapseText and collapseText.closetext or nil,
+		} or nil,
 		children = {
 			TableWidgets.TableHeader{children = {self:_buildHeader(isAward)}},
 			TableWidgets.TableBody{children = bodyRows},
@@ -742,6 +747,12 @@ end
 --- Child classes override this to drive the JS `data-cutafter` behaviour.
 ---@return integer?
 function BasePrizePool:_cutafterRows()
+	return nil
+end
+
+---Open/close labels for the collapse toggle. Child classes override.
+---@return {opentext: string, closetext: string}?
+function BasePrizePool:_collapseText()
 	return nil
 end
 

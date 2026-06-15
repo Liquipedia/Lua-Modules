@@ -5,6 +5,9 @@
 liquipedia.prizepooltable = {
 	init: function() {
 		document.querySelectorAll( '.prizepooltable' ).forEach( ( prizepooltable ) => {
+			if ( prizepooltable.querySelector( '.prizepooltabletoggle' ) !== null ) {
+				return;
+			}
 			let cutAfter;
 			if ( typeof prizepooltable.dataset.cutafter !== 'undefined' ) {
 				cutAfter = parseInt( prizepooltable.dataset.cutafter );
