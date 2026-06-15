@@ -117,8 +117,7 @@
 
 				.theme--dark & {
 					background-color: var( --clr-on-surface-dark-primary-8 );
-					outline: 1px solid var( --clr-on-surface-dark-primary-12 );
-					outline-offset: -1px;
+					outline-color: var( --clr-on-surface-dark-primary-12 );
 					color: var( --clr-secondary-100 );
 				}
 			}
