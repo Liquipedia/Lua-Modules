@@ -1216,19 +1216,19 @@ div.brkts-popup-body-element-thumbs {
 
 			@container block-team-name ( min-width: 15px ) and ( max-width: 109px ) {
 				&::before {
-					content: attr( data-team-shortname raw-string );
+					content: attr( data-team-shortname );
 				}
 			}
 
 			@container block-team-name ( min-width: 110px ) and ( max-width: 179px ) {
 				&::before {
-					content: attr( data-team-bracketname raw-string );
+					content: attr( data-team-bracketname );
 				}
 			}
 
 			@container block-team-name ( min-width: 180px ) {
 				&::before {
-					content: attr( data-team-name raw-string );
+					content: attr( data-team-name );
 				}
 			}
 		}
