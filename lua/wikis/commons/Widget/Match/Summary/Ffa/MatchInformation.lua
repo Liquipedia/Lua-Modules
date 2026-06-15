@@ -34,8 +34,6 @@ function MatchSummaryFfaMatchInformation:render()
 	)
 	if #items == 0 then return end
 	return ContentItemContainer{
-		collapsible = #items > 1,
-		collapsed = #items > 1,
 		contentClass = 'panel-content__game-schedule',
 		title = 'Match Information',
 		items = items
