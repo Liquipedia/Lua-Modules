@@ -525,6 +525,23 @@ function Array.range(from, to)
 	return elements
 end
 
+---Returns the array `{funct(from), funct(from + 1), funct(from + 2), ..., funct(to)}`.
+---
+---This is equivalent to `Array.map(Array.range(from, to), funct)`.
+---@generic T
+---@param from integer
+---@param to integer
+---@param funct fun(index: integer): T
+---@return T[]
+---@nodiscard
+function Array.mapRange(from, to, funct)
+	local elements = {}
+	for i = from, to do
+		table.insert(elements, funct(i))
+	end
+	return elements
+end
+
 ---Extracts keys from a given table into an array. An order can be supplied via an iterator.
 ---@generic K, V
 ---@param tbl {[K]: V}

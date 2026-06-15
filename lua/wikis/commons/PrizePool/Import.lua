@@ -221,7 +221,7 @@ function Import:_computeStagePlacementEntries(stage, options)
 		and math.min(maxPlacementCount, endingPlacement)
 		or maxPlacementCount
 
-	return Array.map(Array.range(startingPlacement, maxPlacementCount), function(placementIndex)
+	return Array.mapRange(startingPlacement, maxPlacementCount, function(placementIndex)
 		return Array.flatten(Array.map(groupPlacementEntries, function(placementEntries)
 			return placementEntries[placementIndex]
 		end))
@@ -482,7 +482,7 @@ function Import._findBracketFirstDropdownRounds(bracket)
 	local countsByRound = MatchGroupCoordinates.computeRawCounts(bracket)
 	local roundIndexes = Array.range(1, #bracket.rounds)
 
-	return Array.map(Array.range(2, #bracket.sections), function(sectionIndex)
+	return Array.mapRange(2, #bracket.sections, function(sectionIndex)
 		local firstRoundWithPositiveCount = Array.find(roundIndexes, function(roundIndex)
 			return countsByRound[roundIndex][sectionIndex] >= 0 end)
 

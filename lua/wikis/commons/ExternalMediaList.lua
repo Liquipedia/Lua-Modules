@@ -148,7 +148,7 @@ function MediaList._buildMultiKeyCondition(value, prefix, limit)
 		return
 	end
 	return ConditionTree(BooleanOperator.any):add(
-		Array.map(Array.range(1, limit), function (index)
+		Array.mapRange(1, limit, function (index)
 			return ConditionUtil.anyOf(ColumnName(prefix .. index), {value, value:gsub(' ', '_')})
 		end)
 	)
