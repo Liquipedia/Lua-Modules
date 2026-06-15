@@ -13,10 +13,10 @@ local Logic = Lua.import('Module:Logic')
 local Variables = Lua.import('Module:Variables')
 local VersionDisplay = Lua.import('Infobox/Extension/VersionDisplay')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Item = Lua.import('Module:Infobox/Item')
 
-local Widgets = Lua.import('Module:Infobox/Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class FortniteItemInfobox: ItemInfobox
