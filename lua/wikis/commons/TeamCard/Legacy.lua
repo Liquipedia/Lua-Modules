@@ -446,6 +446,11 @@ function LegacyTeamCard.mapCoaches(tcArgs)
 		elseif tabType == 'former' then sourceGroup = 'fc'
 		else sourceGroup = nil end
 
+		if tcArgs[tab .. 'c'] then
+			mw.ext.TeamLiquidIntegration.add_category('Pages with malformed Legacy TeamCard coach input')
+			tcArgs[tab .. 'c1'] = tcArgs[tab .. 'c']
+		end
+
 		Array.forEach(indicesPresent(tcArgs, tab .. 'c', MAX_COACH_INDEX), function(i)
 			table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, tab .. 'c' .. i, sourceGroup))
 		end)
