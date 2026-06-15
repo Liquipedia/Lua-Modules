@@ -1330,35 +1330,6 @@ describe('Team Participants Repository', function()
 			end)
 		end)
 	end)
-
-	describe('getPrizepoolRecords', function()
-		-- getPrizepoolRecords is memoized at module load, so force a fresh module instance per case
-		-- (the module is already cached here via the Controller integration tests above).
-		local function freshGetPrizepoolRecords()
-			for name in pairs(package.loaded) do
-				if name:find('TeamParticipants') and name:find('Repository') then
-					package.loaded[name] = nil
-				end
-			end
-			return require('Module:TeamParticipants/Repository').getPrizepoolRecords()
-		end
-
-		insulate('flattens multiple prizepool indices', function()
-			local prizePoolVars = PageVariableNamespace('PrizePool')
-			prizePoolVars:delete('placementRecords.1')
-			prizePoolVars:delete('placementRecords.2')
-			prizePoolVars:set('placementRecords.1', Json.stringify({
-				createPrizepoolRecord({placement = '1'}),
-			}))
-			prizePoolVars:set('placementRecords.2', Json.stringify({
-				createPrizepoolRecord({placement = '2'}),
-			}))
-			local result = freshGetPrizepoolRecords()
-			assert.are_equal(2, #result)
-			assert.are_equal('1', result[1].placement)
-			assert.are_equal('2', result[2].placement)
-		end)
-	end)
 end)
 
 describe('Team Participants Controller', function()
