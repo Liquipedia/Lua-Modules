@@ -500,17 +500,14 @@ describe('Team Participant', function()
 	end)
 
 	describe('player dates', function()
-		local TeamParticipantsRepository
-		local Variables
-		local PageVariableNamespace
+		local TeamParticipantsRepository = require('Module:TeamParticipants/Repository')
+		local Variables = require('Module:Variables')
+		local PageVariableNamespace = require('Module:PageVariableNamespace')
 		local LpdbQuery
 
 		before_each(function()
-			Variables = require('Module:Variables')
 			Variables.varDefine('tournament_startdate', '2024-01-01')
 			Variables.varDefine('tournament_enddate', '2024-12-31')
-			PageVariableNamespace = require('Module:PageVariableNamespace')
-			TeamParticipantsRepository = require('Module:TeamParticipants/Repository')
 			LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function() return {} end)
 		end)
 
@@ -805,29 +802,27 @@ describe('Team Participant', function()
 		end)
 
 		describe('parsePlayer date input', function()
+			local TeamParticipantsWikiParser = require('Module:TeamParticipants/Parse/Wiki')
+
 			it('stores explicit joindate from wiki input in extradata', function()
-				local TeamParticipantsWikiParser = require('Module:TeamParticipants/Parse/Wiki')
 				local player = TeamParticipantsWikiParser.parsePlayer{'Alexis', joindate = '2024-03-01'}
 				assert.are_equal('2024-03-01', player.extradata.joinDate)
 				assert.is_nil(player.extradata.leaveDate)
 			end)
 
 			it('stores explicit leavedate from wiki input in extradata', function()
-				local TeamParticipantsWikiParser = require('Module:TeamParticipants/Parse/Wiki')
 				local player = TeamParticipantsWikiParser.parsePlayer{'Alexis', leavedate = '2024-09-01'}
 				assert.is_nil(player.extradata.joinDate)
 				assert.are_equal('2024-09-01', player.extradata.leaveDate)
 			end)
 
 			it('stores nothing for missing date input', function()
-				local TeamParticipantsWikiParser = require('Module:TeamParticipants/Parse/Wiki')
 				local player = TeamParticipantsWikiParser.parsePlayer{'Alexis'}
 				assert.is_nil(player.extradata.joinDate)
 				assert.is_nil(player.extradata.leaveDate)
 			end)
 
 			it('treats empty string date input as nil', function()
-				local TeamParticipantsWikiParser = require('Module:TeamParticipants/Parse/Wiki')
 				local player = TeamParticipantsWikiParser.parsePlayer{'Alexis', joindate = ''}
 				assert.is_nil(player.extradata.joinDate)
 			end)
@@ -838,19 +833,11 @@ describe('Team Participant', function()
 end)
 
 describe('Team Participants Repository', function()
-	local TeamParticipantsRepository
-	local Table
-	local Variables
-	local Json
-	local PageVariableNamespace
-
-	before_each(function()
-		TeamParticipantsRepository = require('Module:TeamParticipants/Repository')
-		Table = require('Module:Table')
-		Variables = require('Module:Variables')
-		Json = require('Module:Json')
-		PageVariableNamespace = require('Module:PageVariableNamespace')
-	end)
+	local TeamParticipantsRepository = require('Module:TeamParticipants/Repository')
+	local Table = require('Module:Table')
+	local Variables = require('Module:Variables')
+	local Json = require('Module:Json')
+	local PageVariableNamespace = require('Module:PageVariableNamespace')
 
 	local function createBasicParticipant(overrides)
 		return Table.merge({
@@ -1173,15 +1160,9 @@ describe('Team Participants Repository', function()
 end)
 
 describe('Team Participants Controller', function()
-	local TeamParticipantsController
-	local Array
-	local Table
-
-	before_each(function()
-		TeamParticipantsController = require('Module:TeamParticipants/Controller')
-		Array = require('Module:Array')
-		Table = require('Module:Table')
-	end)
+	local TeamParticipantsController = require('Module:TeamParticipants/Controller')
+	local Array = require('Module:Array')
+	local Table = require('Module:Table')
 
 	local function createSquadMember(overrides)
 		return Table.merge({
@@ -1540,13 +1521,8 @@ describe('Team Participants Controller', function()
 end)
 
 describe('Team Participants Parser', function()
-	local TeamParticipantsWikiParser
-	local Table
-
-	before_each(function()
-		TeamParticipantsWikiParser = require('Module:TeamParticipants/Parse/Wiki')
-		Table = require('Module:Table')
-	end)
+	local TeamParticipantsWikiParser = require('Module:TeamParticipants/Parse/Wiki')
+	local Table = require('Module:Table')
 
 	-- Helper to create a minimal valid participant input for testing.
 	local function createBasicParticipantInput(overrides)
