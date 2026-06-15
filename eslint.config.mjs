@@ -12,7 +12,7 @@ export default defineConfig([{
     extends: compat.extends(
         "wikimedia/mediawiki",
         "wikimedia/client/common",
-        "wikimedia/language/es2020",
+        "wikimedia/language/es2022",
         "wikimedia/jquery",
     ),
 
