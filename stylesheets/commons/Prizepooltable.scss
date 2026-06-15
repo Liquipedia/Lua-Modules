@@ -142,6 +142,20 @@ Table2-based placement prize pool table
 		}
 	}
 
+	// Status rows (win / lose / disqualified): tint the place cell, preserving
+	// the pre-Table2 treatment.
+	tr.table2__row--body.bg-win .prizepooltable-place {
+		background-color: var( --clr-forest-background-color, inherit );
+	}
+
+	tr.table2__row--body.bg-lose .prizepooltable-place {
+		background-color: var( --clr-cinnabar-background-color, inherit );
+	}
+
+	tr.table2__row--body.bg-dq .prizepooltable-place {
+		background-color: var( --clr-sapphire-background-color, inherit );
+	}
+
 	// Footer toggle: full-width, centered, brand-blue link with chevron.
 	.prizepooltabletoggle {
 		cursor: pointer;
@@ -181,24 +195,16 @@ table.prizepooltable.collapsed .prizepooltablehide {
 }
 
 /*******************************************************************************
-Legacy css-grid prize pool tables (still used by Module:PrizePool/Award)
+Legacy css-grid table widget (Module:Widget/Table/Old), still used by
+non-prizepool modules (e.g. infoboxes). Prizepool no longer renders via this.
 *******************************************************************************/
-
-.collapsed > .ppt-hide-on-collapse {
-	display: none !important;
-}
-
-.collapsed .ppt-toggle-expand .general-collapsible-collapse-button,
-.general-collapsible:not( .collapsed ) .ppt-toggle-expand .general-collapsible-expand-button {
-	display: none !important;
-}
 
 .csstable-widget {
 	border-right: 1px solid var( --table-border-color, #bbbbbb );
 	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
 	display: inline-grid;
 
-	&-row:not( .ppt-toggle-expand ) {
+	&-row {
 		display: contents;
 	}
 
@@ -212,42 +218,6 @@ Legacy css-grid prize pool tables (still used by Module:PrizePool/Award)
 		justify-content: center;
 		flex-wrap: wrap;
 	}
-}
-
-.ppt-toggle-expand {
-	grid-column: 1 / -1;
-
-	> * {
-		color: unset !important;
-		text-decoration: none !important;
-	}
-}
-
-div.csstable-widget-row.bg-win {
-	div.prizepooltable > & {
-		/* need the `!important` due to bg-win ( sadly ) having an important in one of its definitions ... */
-		background-color: inherit !important;
-	}
-
-	> .csstable-widget-cell {
-		border-bottom: 0.125rem solid var( --clr-forest-background-color, transparent );
-	}
-}
-
-div.bg-win > *.prizepooltable-place {
-	background-color: var( --clr-forest-background-color, inherit );
-}
-
-div.csstable-widget-row.bg-lose {
-	background-color: inherit;
-
-	> .csstable-widget-cell {
-		border-bottom: 0.125rem solid var( --clr-cinnabar-background-color, transparent );
-	}
-}
-
-div.bg-lose > *.prizepooltable-place {
-	background-color: var( --clr-cinnabar-background-color, inherit );
 }
 
 /*******************************************************************************

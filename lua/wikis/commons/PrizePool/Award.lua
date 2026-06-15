@@ -17,11 +17,7 @@ local Placement = Lua.import('Module:PrizePool/Award/Placement')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
-local Widgets = Lua.import('Module:Widget/All')
-local Div = Widgets.Div
-local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-local TableRow = Widgets.TableRow
-local TableCell = Widgets.TableCell
+local TableCell = Lua.import('Module:Widget/Table2/All').Cell
 
 --- @class AwardPrizePool: BasePrizePool
 --- @operator call(...): AwardPrizePool
@@ -52,56 +48,26 @@ end
 ---@param placement AwardPlacement
 ---@return WidgetTableCell
 function AwardPrizePool:placeOrAwardCell(placement)
-	local awardCell = TableCell{
+	return TableCell{
 		children = {placement.award},
-		css = {['font-weight'] = 'bolder'},
 		classes = {'prizepooltable-place'},
+		rowspan = #placement.opponents,
 	}
-	awardCell.rowSpan = #placement.opponents
-
-	return awardCell
 end
 
----@param placement AwardPlacement
----@return boolean
-function AwardPrizePool:applyCutAfter(placement)
-	if (placement.previousTotalNumberOfParticipants + 1) > self.options.cutafter then
-		return true
+---@return integer?
+function AwardPrizePool:_cutafterRows()
+	if self.options.cutafter == math.huge then
+		return nil
 	end
-	return false
-end
-
----@param placement AwardPlacement?
----@param nextPlacement AwardPlacement
----@param rows WidgetTableRow[]
-function AwardPrizePool:applyToggleExpand(placement, nextPlacement, rows)
-	if placement ~= nil
-		and (placement.previousTotalNumberOfParticipants + 1) <= self.options.cutafter
-		and placement.currentTotalNumberOfParticipants >= self.options.cutafter
-		and placement ~= self.placements[#self.placements] then
-
-		table.insert(rows, self:_toggleExpand())
+	local count = 0
+	for _, placement in ipairs(self.placements) do
+		if (placement.previousTotalNumberOfParticipants + 1) > self.options.cutafter then
+			break
+		end
+		count = count + math.max(#placement.opponents, 1)
 	end
-end
-
----@return WidgetTableRow
-function AwardPrizePool:_toggleExpand()
-	local expandButton = TableCell{
-		children = Div{children = {
-			'Show more Awards&nbsp;',
-			IconFa{iconName = 'expand'},
-		}},
-		classes = {'general-collapsible-expand-button'},
-	}
-	local collapseButton = TableCell{
-		children = Div{children = {
-			'Show less Awards&nbsp;',
-			IconFa{iconName = 'collapse'},
-		}},
-		classes = {'general-collapsible-collapse-button'},
-	}
-
-	return TableRow{classes = {'ppt-toggle-expand'}, children = {expandButton, collapseButton}}
+	return count > 0 and count or nil
 end
 
 -- Get the lpdbObjectName depending on opponenttype
