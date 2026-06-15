@@ -211,7 +211,7 @@ function MatchlistDisplay.Opponent(props)
 		opponent = props.opponent,
 		overflow = 'ellipsis',
 		showLink = false,
-		teamStyle = 'short',
+		teamStyle = 'dynamic',
 		additionalClasses = {'brkts-matchlist-cell-content'},
 	}
 	return mw.html.create('div')
