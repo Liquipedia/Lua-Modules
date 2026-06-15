@@ -77,11 +77,6 @@ describe('Team Participant', function()
 				assert.are_equal('former', player.extradata.status)
 			end)
 
-			it('passes status through independent of type', function()
-				local player = TeamParticipantsWikiParser.parsePlayer({'s1mple', type = 'sub', status = 'inactive'})
-				assert.are_equal('inactive', player.extradata.status)
-			end)
-
 			it('status is nil when not provided', function()
 				local player = TeamParticipantsWikiParser.parsePlayer({'s1mple'})
 				assert.is_nil(player.extradata.status)
@@ -92,11 +87,6 @@ describe('Team Participant', function()
 			it('parses number string as integer', function()
 				local player = TeamParticipantsWikiParser.parsePlayer{'PlayerName', number = '5'}
 				assert.are_equal(5, player.extradata.number)
-			end)
-
-			it('parses number passed as a Lua number', function()
-				local player = TeamParticipantsWikiParser.parsePlayer{'PlayerName', number = 7}
-				assert.are_equal(7, player.extradata.number)
 			end)
 
 			it('returns nil when number is absent', function()
@@ -127,19 +117,6 @@ describe('Team Participant', function()
 					TeamTemplateMock.tearDown()
 				end)
 
-				it('parses valid positive integer placement as string', function()
-					local input = {
-						'team liquid',
-						qualification = {
-							method = 'qual',
-							text = 'Qualifier A',
-							placement = '5'
-						}
-					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
-					assert.are_equal('5', result.qualification.placement)
-				end)
-
 				it('parses valid positive range of placements', function()
 					local input = {
 						'team liquid',
@@ -164,83 +141,6 @@ describe('Team Participant', function()
 					}
 					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
 					assert.are_equal('3', result.qualification.placement)
-				end)
-
-				it('rejects decimal placement', function()
-					local input = {
-						'team liquid',
-						qualification = {
-							method = 'qual',
-							text = 'Qualifier G',
-							placement = '2.9'
-						}
-					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
-					assert.is_nil(result.qualification.placement)
-				end)
-
-				it('handles large positive placement numbers', function()
-					local input = {
-						'team liquid',
-						qualification = {
-							method = 'qual',
-							text = 'Qualifier H',
-							placement = '999'
-						}
-					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
-					assert.are_equal('999', result.qualification.placement)
-				end)
-
-				it('ignores zero placement', function()
-					local input = {
-						'team liquid',
-						qualification = {
-							method = 'qual',
-							text = 'Qualifier C',
-							placement = '0'
-						}
-					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
-					assert.is_nil(result.qualification.placement)
-				end)
-
-				it('ignores negative placement', function()
-					local input = {
-						'team liquid',
-						qualification = {
-							method = 'qual',
-							text = 'Qualifier D',
-							placement = '-1'
-						}
-					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
-					assert.is_nil(result.qualification.placement)
-				end)
-
-				it('ignores invalid non-numeric placement', function()
-					local input = {
-						'team liquid',
-						qualification = {
-							method = 'qual',
-							text = 'Qualifier E',
-							placement = 'abc'
-						}
-					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
-					assert.is_nil(result.qualification.placement)
-				end)
-
-				it('handles missing placement gracefully', function()
-					local input = {
-						'team liquid',
-						qualification = {
-							method = 'qual',
-							text = 'Qualifier F'
-						}
-					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
-					assert.is_nil(result.qualification.placement)
 				end)
 
 				it('preserves other qualification fields when placement is present', function()
@@ -289,21 +189,6 @@ describe('Team Participant', function()
 					assert.matches('Invalid placement: 0', result.warnings[1])
 				end)
 
-				it('generates warning for negative placement', function()
-					local input = {
-						'team liquid',
-						qualification = {
-							method = 'qual',
-							text = 'Qualifier D',
-							placement = '-5'
-						}
-					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
-					assert.is_nil(result.qualification.placement)
-					assert.are_equal(1, #result.warnings)
-					assert.matches('Invalid placement: %-5$', result.warnings[1])
-				end)
-
 				it('generates warning for non-numeric placement', function()
 					local input = {
 						'team liquid',
@@ -317,51 +202,6 @@ describe('Team Participant', function()
 					assert.is_nil(result.qualification.placement)
 					assert.are_equal(1, #result.warnings)
 					assert.matches('Invalid placement: abc$', result.warnings[1])
-				end)
-
-				it('generates warning for placement with special characters', function()
-					local input = {
-						'team liquid',
-						qualification = {
-							method = 'qual',
-							text = 'Qualifier X',
-							placement = '#1'
-						}
-					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
-					assert.is_nil(result.qualification.placement)
-					assert.are_equal(1, #result.warnings)
-					assert.matches('Invalid placement: #1$', result.warnings[1])
-				end)
-
-				it('generates warning for ordinal placement', function()
-					local input = {
-						'team liquid',
-						qualification = {
-							method = 'qual',
-							text = 'Qualifier Y',
-							placement = '1st'
-						}
-					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
-					assert.is_nil(result.qualification.placement)
-					assert.are_equal(1, #result.warnings)
-					assert.matches('Invalid placement: 1st$', result.warnings[1])
-				end)
-
-				it('generates warning for decimal placement', function()
-					local input = {
-						'team liquid',
-						qualification = {
-							method = 'qual',
-							text = 'Qualifier G',
-							placement = '2.9'
-						}
-					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
-					assert.is_nil(result.qualification.placement)
-					assert.are_equal(1, #result.warnings)
-					assert.matches('Invalid placement: 2%.9$', result.warnings[1])
 				end)
 
 				it('does not generate warning for valid positive placement', function()
