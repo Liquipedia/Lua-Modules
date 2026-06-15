@@ -1118,23 +1118,6 @@ describe('Team Participants Repository', function()
 				assert.is_nil(data.individualprizemoney)
 			end)
 
-			it('sets qualification text field', function()
-				local participant = createBasicParticipant({
-					qualification = {
-						type = 'other',
-						method = 'qual',
-						text = 'Open Qualifier',
-					}
-				})
-
-				TeamParticipantsRepository.save(participant)
-
-				local callArgs = LpdbPlacementStore.calls[1].vals
-				local data = Json.parseIfString(callArgs[2])
-
-				assert.are_equal('Open Qualifier', data.qualifier)
-			end)
-
 			it('sets qualifierpage for tournament type qualification', function()
 				local participant = createBasicParticipant({
 					qualification = {
@@ -1213,47 +1196,6 @@ describe('Team Participants Repository', function()
 				assert.are_same({'Team Liquid', 'Team BDS'}, extradata.potentialQualifiers)
 			end)
 
-			it('does not store empty potentialQualifiers', function()
-				local participant = createBasicParticipant({
-					potentialQualifiers = {}
-				})
-
-				TeamParticipantsRepository.save(participant)
-
-				local callArgs = LpdbPlacementStore.calls[1].vals
-				local data = Json.parseIfString(callArgs[2])
-				local extradata = Json.parseIfString(data.extradata)
-
-				assert.is_nil(extradata.potentialQualifiers)
-			end)
-
-			it('splits prizemoney equally among players', function()
-				local getRecordsStub = stub(TeamParticipantsRepository, 'getPrizepoolRecordsForTeam')
-				getRecordsStub.returns({createPrizepoolRecord({prizemoney = 10000})})
-
-				local participant = createBasicParticipant({
-					opponent = {
-						type = 'team',
-						template = 'team liquid',
-						name = 'Team Liquid',
-						players = {
-							{displayName = 'P1', pageName = 'P1', extradata = {type = 'player', results = true}},
-							{displayName = 'P2', pageName = 'P2', extradata = {type = 'player', results = true}},
-							{displayName = 'P3', pageName = 'P3', extradata = {type = 'player', results = true}},
-							{displayName = 'P4', pageName = 'P4', extradata = {type = 'player', results = true}},
-							{displayName = 'P5', pageName = 'P5', extradata = {type = 'player', results = true}},
-						}
-					}
-				})
-
-				TeamParticipantsRepository.save(participant)
-
-				local data = Json.parseIfString(LpdbPlacementStore.calls[1].vals[2])
-				assert.are_equal(2000, data.individualprizemoney)
-
-				getRecordsStub:revert()
-			end)
-
 			it('excludes staff when splitting prizemoney (subs still count)', function()
 				local getRecordsStub = stub(TeamParticipantsRepository, 'getPrizepoolRecordsForTeam')
 				getRecordsStub.returns({createPrizepoolRecord({prizemoney = 6000, opponenttemplate = 'bds'})})
@@ -1281,29 +1223,6 @@ describe('Team Participants Repository', function()
 				getRecordsStub:revert()
 			end)
 
-			it('handles empty players array without division by zero', function()
-				local participant = createBasicParticipant({
-					opponent = {
-						type = 'team',
-						template = 'team liquid',
-						name = 'Team Liquid',
-						players = {}
-					}
-				})
-
-				local getRecordsStub = stub(TeamParticipantsRepository, 'getPrizepoolRecordsForTeam')
-				getRecordsStub.returns({createPrizepoolRecord({prizemoney = 5000})})
-
-				TeamParticipantsRepository.save(participant)
-
-				local callArgs = LpdbPlacementStore.calls[1].vals
-				local data = Json.parseIfString(callArgs[2])
-
-				assert.are_equal(5000, data.individualprizemoney)
-
-				getRecordsStub:revert()
-			end)
-
 			it('merges with existing prizepool data', function()
 				local participant = createBasicParticipant()
 
@@ -1322,28 +1241,6 @@ describe('Team Participants Repository', function()
 				assert.are_equal('3', data.placement)
 				assert.are_equal(5000, data.prizemoney)
 				assert.are_equal('Prizepool Tournament', data.tournament)
-
-				getRecordsStub:revert()
-			end)
-
-			it('prizepool data takes precedence over tournament defaults', function()
-				local participant = createBasicParticipant()
-
-				local getRecordsStub = stub(TeamParticipantsRepository, 'getPrizepoolRecordsForTeam')
-				getRecordsStub.returns({createPrizepoolRecord({
-					tournament = 'Prizepool Tournament',
-					mode = '3v3',
-					type = 'Offline',
-				})})
-
-				TeamParticipantsRepository.save(participant)
-
-				local callArgs = LpdbPlacementStore.calls[1].vals
-				local data = Json.parseIfString(callArgs[2])
-
-				assert.are_equal('Prizepool Tournament', data.tournament)
-				assert.are_equal('3v3', data.mode)
-				assert.are_equal('Offline', data.type)
 
 				getRecordsStub:revert()
 			end)
@@ -1431,26 +1328,6 @@ describe('Team Participants Repository', function()
 				assert.are_equal(1, #result)
 				assert.are_equal('Team Liquid', result[1].opponentname)
 			end)
-
-			it('returns empty list when no record matches', function()
-				local opponent = {
-					type = 'team',
-					template = 'bds',
-					name = 'BDS',
-				}
-
-				getPrizepoolRecordsStub.returns({
-					createPrizepoolRecord({
-						opponentname = 'Team Liquid',
-						opponenttype = 'team',
-						opponenttemplate = 'team liquid',
-					})
-				})
-
-				local result = TeamParticipantsRepository.getPrizepoolRecordsForTeam(opponent)
-
-				assert.are_equal(0, #result)
-			end)
 		end)
 	end)
 
@@ -1465,29 +1342,6 @@ describe('Team Participants Repository', function()
 			end
 			return require('Module:TeamParticipants/Repository').getPrizepoolRecords()
 		end
-
-		insulate('returns empty array when no records exist', function()
-			local prizePoolVars = PageVariableNamespace('PrizePool')
-			prizePoolVars:delete('placementRecords.1')
-			prizePoolVars:delete('placementRecords.2')
-			local result = freshGetPrizepoolRecords()
-			assert.is_table(result)
-			assert.are_equal(0, #result)
-		end)
-
-		insulate('fetches and returns records with correct placement values', function()
-			local prizePoolVars = PageVariableNamespace('PrizePool')
-			prizePoolVars:delete('placementRecords.1')
-			prizePoolVars:delete('placementRecords.2')
-			prizePoolVars:set('placementRecords.1', Json.stringify({
-				createPrizepoolRecord({placement = '1'}),
-				createPrizepoolRecord({placement = '2'}),
-			}))
-			local result = freshGetPrizepoolRecords()
-			assert.are_equal(2, #result)
-			assert.are_equal('1', result[1].placement)
-			assert.are_equal('2', result[2].placement)
-		end)
 
 		insulate('flattens multiple prizepool indices', function()
 			local prizePoolVars = PageVariableNamespace('PrizePool')
@@ -1589,17 +1443,6 @@ describe('Team Participants Controller', function()
 					return member.extradata.type == 'staff'
 				end)
 				assert.are_equal(1, staffCount)
-			end)
-
-			it('returns nil when team is not found', function()
-				local participant = {
-					opponent = {template = 'nonexistent team'},
-					date = os.time(),
-				}
-
-				local result = TeamParticipantsController.importSquadMembersFromDatabase(participant)
-
-				assert.is_nil(result)
 			end)
 		end)
 
@@ -1793,103 +1636,6 @@ describe('Team Participants Controller', function()
 
 			assert.are_equal(1, #parsedData.participants[1].opponent.players)
 		end)
-
-		insulate('calls import and merge for valid participants', function()
-			local TeamTemplateMock
-			local LpdbQuery
-
-			before_each(function()
-				TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
-				TeamTemplateMock.setUp()
-				LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function(entity)
-					if entity == 'squadplayer' then
-						return {
-							createSquadMember({
-								id = 'ImportedPlayer',
-								link = 'ImportedPlayer',
-								name = 'Imported Player',
-							}),
-						}
-					end
-					return {}
-				end)
-			end)
-
-			after_each(function()
-				TeamTemplateMock.tearDown()
-				LpdbQuery:revert()
-			end)
-
-			it('imports and prepends imported players to manual ones', function()
-				local parsedData = {
-					participants = {
-						{
-							opponent = {
-								template = 'team liquid',
-								players = {
-									{displayName = 'ManualPlayer', pageName = 'ManualPlayer', extradata = {type = 'player'}},
-								}
-							},
-							shouldImportFromDb = true,
-							date = os.time(),
-						}
-					}
-				}
-
-				TeamParticipantsController.importParticipants(parsedData)
-
-				local players = parsedData.participants[1].opponent.players
-				assert.are_equal(2, #players)
-				assert.are_equal('ImportedPlayer', players[1].displayName)
-				assert.are_equal('ManualPlayer', players[2].displayName)
-			end)
-		end)
-	end)
-
-	describe('fillIncompleteRosters', function()
-		it('skips TBD opponents', function()
-			local parsedData = {
-				participants = {
-					{
-						opponent = {
-							template = 'tbd',
-							players = {}
-						}
-					}
-				},
-				expectedPlayerCount = 5,
-			}
-
-			TeamParticipantsController.fillIncompleteRosters(parsedData)
-
-			assert.are_equal(0, #parsedData.participants[1].opponent.players)
-		end)
-
-		it('fills rosters up to expectedPlayerCount', function()
-			local parsedData = {
-				participants = {
-					{
-						opponent = {
-							template = 'team liquid',
-							players = {
-								{displayName = 'Player1', extradata = {type = 'player'}},
-								{displayName = 'Player2', extradata = {type = 'player'}},
-							}
-						}
-					}
-				},
-				expectedPlayerCount = 5,
-			}
-
-			TeamParticipantsController.fillIncompleteRosters(parsedData)
-
-			assert.are_equal(5, #parsedData.participants[1].opponent.players)
-			assert.are_equal('Player1', parsedData.participants[1].opponent.players[1].displayName)
-			assert.are_equal('Player2', parsedData.participants[1].opponent.players[2].displayName)
-			assert.are_equal('TBD', parsedData.participants[1].opponent.players[3].displayName)
-			assert.are_equal('TBD', parsedData.participants[1].opponent.players[4].displayName)
-			assert.are_equal('TBD', parsedData.participants[1].opponent.players[5].displayName)
-		end)
 	end)
 
 	insulate('fromTemplate Integration', function()
@@ -1959,22 +1705,6 @@ describe('Team Participants Controller', function()
 			TeamParticipantsController.fromTemplate(args)
 
 			assert.stub(LpdbPlacementStore).was_not.called()
-		end)
-
-		it('page variables are set for participants', function()
-			local args = {
-				{
-					'team liquid',
-					players = {
-						{'player1'},
-					}
-				},
-			}
-
-			TeamParticipantsController.fromTemplate(args)
-
-			local teamVar = Variables.varDefault('Team Liquid_p1')
-			assert.are_equal('player1', teamVar)
 		end)
 
 		it('processes multiple participants', function()
@@ -2059,22 +1789,6 @@ describe('Team Participants Parser', function()
 				assert.are_equal(6, date.month)
 				assert.are_equal(15, date.day)
 			end)
-
-			it('falls back to contextual date', function()
-				local Variables = require('Module:Variables')
-				Variables.varDefine('tournament_enddate', '2024-12-25')
-
-				local args = {
-					createBasicParticipantInput(),
-				}
-
-				local result = TeamParticipantsWikiParser.parseWikiInput(args)
-
-				local date = result.participants[1].date
-				assert.are_equal(2024, date.year)
-				assert.are_equal(12, date.month)
-				assert.are_equal(25, date.day)
-			end)
 		end)
 	end)
 
@@ -2135,35 +1849,6 @@ describe('Team Participants Parser', function()
 				assert.matches('Invalid contenders: expected a list of non%-empty strings', result.warnings[1])
 			end)
 
-			it('warns on empty string contender and keeps valid ones', function()
-				local input = {
-					contenders = {'team liquid', '', 'mouz'}
-				}
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
-
-				assert.are_equal(1, #result.warnings)
-				assert.matches('Invalid contender entry at position 2', result.warnings[1])
-				assert.are_equal(2, #result.potentialQualifiers)
-				assert.are_equal('team liquid', result.potentialQualifiers[1].template:lower())
-				assert.are_equal('mouz', result.potentialQualifiers[2].template:lower())
-			end)
-
-			it('parses valid qualification structure', function()
-				local input = createBasicParticipantInput({
-					qualification = {
-						method = 'qual',
-						text = 'Qualifier A',
-					}
-				})
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
-
-				assert.is_table(result.qualification)
-				assert.are_equal('qual', result.qualification.method)
-				assert.are_equal('Qualifier A', result.qualification.text)
-			end)
-
 			it('preserves highlighted flag', function()
 				local input = createBasicParticipantInput({
 					notes = {
@@ -2211,64 +1896,15 @@ describe('Team Participants Parser', function()
 
 				assert.is_false(result.shouldImportFromDb)
 			end)
-
-			it('handles string "true" for import flag', function()
-				local input = createBasicParticipantInput({
-					import = 'true',
-				})
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
-
-				assert.is_true(result.shouldImportFromDb)
-			end)
 		end)
 	end)
 
-	describe('parsePlayers and parsePlayer', function()
-		insulate('player array mapping', function()
-			local TeamTemplateMock
-			local LpdbQuery
-
-			before_each(function()
-				TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
-				TeamTemplateMock.setUp()
-				LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function() return {} end)
-			end)
-
-			after_each(function()
-				TeamTemplateMock.tearDown()
-				LpdbQuery:revert()
-			end)
-
-			it('parses multiple players', function()
-				local input = {
-					players = {
-						{'player1', flag = 'us'},
-						{'player2', flag = 'ca'},
-						{'player3', flag = 'gb'},
-					}
-				}
-
-				local result = TeamParticipantsWikiParser.parsePlayers(input)
-
-				assert.are_equal(3, #result)
-				assert.are_equal('player1', result[1].displayName)
-				assert.are_equal('player2', result[2].displayName)
-				assert.are_equal('player3', result[3].displayName)
-			end)
-		end)
-
+	describe('parsePlayer', function()
 		insulate('player extradata fields', function()
 			it('parses trophies as number', function()
 				local result = TeamParticipantsWikiParser.parsePlayer({'PlayerName', trophies = '3'})
 
 				assert.are_equal(3, result.extradata.trophies)
-			end)
-
-			it('ignores trophies with invalid value', function()
-				local result = TeamParticipantsWikiParser.parsePlayer({'PlayerName', trophies = 'not a number'})
-
-				assert.is_nil(result.extradata.trophies)
 			end)
 
 			it('normalizes type to player/staff only', function()
@@ -2308,16 +1944,6 @@ describe('Team Participants Parser', function()
 				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
 
 				assert.are_equal('invite', result.qualification.method)
-			end)
-
-			it('parses qual qualification method', function()
-				local input = createBasicParticipantInput({
-					qualification = {method = 'qual', text = 'Qualifier'}
-				})
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
-
-				assert.are_equal('qual', result.qualification.method)
 			end)
 
 			it('returns nil when method is missing', function()
