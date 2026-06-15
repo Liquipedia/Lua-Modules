@@ -1,48 +1,173 @@
-/*******************************************************************************
-Template(s): Prize pool tables
-Author(s): FO-nTTaX
-*******************************************************************************/
+$prizepool-badge-size: 1.5rem;
+$prizepool-accent-width: 0.25rem;
 
 :root {
-	--prize-pool-background-color: transparent;
-}
+	// Placement badge / left-accent colours (light defaults)
+	--prizepool-place-1-accent: #f0b419;
+	--prizepool-place-2-accent: #58b5e3;
+	--prizepool-place-3-accent: #de7d1d;
 
-.theme--light {
-	--prize-pool-variant-background-color: #f2f2f2;
-	--prize-pool-header-background-color: #eaecf0;
-	--prize-pool-alt-background-color: #f5f5f5;
-	--prize-pool-gold: var( --clr-semantic-gold-40 );
-	--prize-pool-silver: var( --clr-semantic-silver-40 );
-	--prize-pool-bronze: var( --clr-semantic-bronze-40 );
-	--prize-pool-copper: var( --clr-semantic-copper-40 );
+	// Subtle full-row tints (light defaults)
+	--prizepool-place-1-tint: #fff9eb;
+	--prizepool-place-2-tint: #f0fcff;
+	--prizepool-place-3-tint: #fff3ec;
 }
 
 .theme--dark {
-	--prize-pool-variant-background-color: var( --clr-moon-20 );
-	--prize-pool-header-background-color: var( --table-header-variant-background-color );
-	--prize-pool-alt-background-color: var( --clr-secondary-9 );
-	--prize-pool-gold: var( --clr-semantic-gold-30 );
-	--prize-pool-silver: var( --clr-secondary-39 );
-	--prize-pool-bronze: var( --clr-semantic-bronze-20 );
-	--prize-pool-copper: var( --clr-semantic-copper-20 );
+	--prizepool-place-1-accent: #fbcb50;
+	--prizepool-place-2-accent: #91d7f9;
+	--prizepool-place-3-accent: #ffb267;
+
+	--prizepool-place-1-tint: #353932;
+	--prizepool-place-2-tint: #243b4d;
+	--prizepool-place-3-tint: #363535;
 }
 
+/*******************************************************************************
+Table2-based placement prize pool table
+*******************************************************************************/
+
+.prizepool-table-wrapper {
+	.table2__container {
+		overflow-x: auto;
+		scrollbar-width: none;
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
+	}
+}
+
+.prizepooltable {
+	// Header row: light fill, muted bold text, bottom divider (mostly inherited
+	// from Table2's head-row styling; only the divider weight is reinforced here).
+	.prizepooltable-header {
+		th,
+		td {
+			font-weight: bold;
+		}
+	}
+
+	// Placement number badge: small rounded-square chip, centered, white text.
+	.prizepooltable-badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: $prizepool-badge-size;
+		height: $prizepool-badge-size;
+		padding: 0 0.25rem;
+		border-radius: 0.25rem;
+		font-weight: bold;
+		line-height: 1;
+		color: #ffffff;
+
+		&.placement-1 {
+			background-color: var( --prizepool-place-1-accent );
+		}
+
+		&.placement-2 {
+			background-color: var( --prizepool-place-2-accent );
+		}
+
+		&.placement-3 {
+			background-color: var( --prizepool-place-3-accent );
+		}
+	}
+
+	// Min widths so opponent columns do not collapse on wide tables.
+	.prizepooltable-col-player,
+	.prizepooltable-col-team {
+		min-width: 150px;
+	}
+
+	.prizepooltable-col-two-players {
+		min-width: 300px;
+	}
+
+	// Top-3 placement rows: subtle full-row tint + coloured left accent bar.
+	// The extra `.table2__row--body` class plus `!important`-free higher
+	// specificity makes these win over the Table2 zebra (`--odd`/`--even`)
+	// rule, which itself sits under a `.theme--*` wrapper.
+	tr.table2__row--body.background-color-first-place,
+	tr.table2__row--body.background-color-second-place,
+	tr.table2__row--body.background-color-third-place {
+		.prizepooltable-place {
+			position: relative;
+
+			&::before {
+				content: "";
+				position: absolute;
+				inset: 0 auto 0 0;
+				width: $prizepool-accent-width;
+			}
+		}
+	}
+
+	// Theme wrappers + the `.table2__table` qualifier raise specificity to
+	// (0,5,2) so the tint outranks the Table2 zebra rule (0,4,2) regardless of
+	// stylesheet load order, and the `:hover` variant keeps it from washing out.
+	.theme--light &.table2__table,
+	.theme--dark &.table2__table {
+		tr.table2__row--body.background-color-first-place {
+			&,
+			&:hover {
+				background-color: var( --prizepool-place-1-tint );
+			}
+
+			.prizepooltable-place::before {
+				background-color: var( --prizepool-place-1-accent );
+			}
+		}
+
+		tr.table2__row--body.background-color-second-place {
+			&,
+			&:hover {
+				background-color: var( --prizepool-place-2-tint );
+			}
+
+			.prizepooltable-place::before {
+				background-color: var( --prizepool-place-2-accent );
+			}
+		}
+
+		tr.table2__row--body.background-color-third-place {
+			&,
+			&:hover {
+				background-color: var( --prizepool-place-3-tint );
+			}
+
+			.prizepooltable-place::before {
+				background-color: var( --prizepool-place-3-accent );
+			}
+		}
+	}
+
+	// Footer toggle: full-width, centered, brand-blue link with chevron.
+	.prizepooltabletoggle {
+		cursor: pointer;
+		font-weight: bold;
+		text-align: center;
+		color: var( --clr-wiki-theme-30, #0a558f );
+
+		.theme--dark & {
+			color: var( --clr-wiki-theme-80, #81a0bf );
+		}
+	}
+}
+
+// Show/hide the correct toggle label depending on collapse state.
 table.prizepooltable:not( .collapsed ) .prizepooltableshow,
 table.prizepooltable.collapsed .prizepooltablehide {
 	display: none;
 }
 
-.prizepooltabletoggle {
-	cursor: pointer;
-}
-
-.prizepooltable-col-player,
-.prizepooltable-col-team {
-	min-width: 150px;
-}
-
-.prizepooltable-col-two-players {
-	min-width: 300px;
+// Hide rows past the cut-off while collapsed. The toggle row is injected by
+// Prizepooltable.js before the (cutAfter + 2)-th row, so rows from
+// (cutAfter + 3) onward are hidden when collapsed.
+@for $i from 0 through 32 {
+	html.client-js .prizepooltable.collapsed[ data-cutafter="#{$i}" ] tbody tr:nth-child( n + #{ $i + 3 } ) {
+		display: none;
+	}
 }
 
 @media ( max-width: 600px ) {
@@ -55,225 +180,8 @@ table.prizepooltable.collapsed .prizepooltablehide {
 	}
 }
 
-@for $i from 0 through 32 {
-	html.client-js .prizepooltable.collapsed[ data-cutafter="#{$i}" ] tr:nth-child( n + #{ $i + 3 } ) {
-		display: none;
-	}
-}
-
-.prizepooltable-header {
-	background-color: var( --prize-pool-header-background-color, inherit );
-}
-
-.csstable-widget.prizepooltable {
-	border: 0.125rem solid var( --prize-pool-header-background-color );
-
-	.csstable-widget-row,
-	.csstable-widget-cell {
-		border: 0;
-	}
-
-	.csstable-widget-row:nth-child( odd ):not( .prizepooltable-header ):not( .ppt-toggle-expand ) {
-		background-color: var( --prize-pool-alt-background-color );
-	}
-}
-
-/* Background colours */
-
-tr.bg-first,
-div.bg-first,
-tr.bg-p1,
-div.bg-p1,
-tr.background-color-first-place,
-div.background-color-first-place {
-	background-color: var( --prize-pool-background-color, #ffe982 );
-}
-
-td.bg-first,
-td.bg-p1,
-td.background-color-first-place {
-	background-color: var( --prize-pool-gold, #ffe982 );
-}
-
-tr.bg-first,
-div.bg-first,
-tr.bg-p1,
-div.bg-p1,
-tr.background-color-first-place,
-div.background-color-first-place,
-div.csstable-widget-row.background-color-first-place > .csstable-widget-cell {
-	border-bottom: 0.125rem solid var( --prize-pool-gold, transparent );
-}
-
-tr.bg-first > td.prizepooltable-place,
-div.bg-first > td.prizepooltable-place,
-tr.bg-p1 > td.prizepooltable-place,
-div.bg-p1 > td.prizepooltable-place,
-tr.background-color-first-place > td.prizepooltable-place,
-div.background-color-first-place > *.prizepooltable-place {
-	background-color: var( --prize-pool-gold, inherit );
-	color: #ffffff;
-}
-
-tr.bg-second,
-div.bg-second,
-tr.bg-p2,
-div.bg-p2,
-tr.background-color-second-place,
-div.background-color-second-place {
-	background-color: var( --prize-pool-background-color, #eeeeee );
-}
-
-td.bg-second,
-td.bg-p2,
-td.background-color-second-place {
-	background-color: var( --prize-pool-silver, #eeeeee );
-}
-
-tr.bg-second,
-div.bg-second,
-tr.bg-p2,
-div.bg-p2,
-tr.background-color-second-place,
-div.background-color-second-place,
-div.csstable-widget-row.background-color-second-place > .csstable-widget-cell {
-	border-bottom: 0.125rem solid var( --prize-pool-silver, transparent );
-}
-
-tr.bg-second > td.prizepooltable-place,
-div.bg-second > td.prizepooltable-place,
-tr.bg-p2 > td.prizepooltable-place,
-div.bg-p2 > td.prizepooltable-place,
-tr.background-color-second-place > td.prizepooltable-place,
-div.background-color-second-place > *.prizepooltable-place {
-	background-color: var( --prize-pool-silver, inherit );
-	color: #ffffff;
-}
-
-tr.bg-third,
-div.bg-third,
-tr.bg-p3,
-div.bg-p3,
-tr.background-color-third-place,
-div.background-color-third-place:not( :first-child ) {
-	background-color: var( --prize-pool-background-color, #f9e8c7 );
-}
-
-td.bg-third,
-td.bg-p3,
-td.background-color-third-place {
-	background-color: var( --prize-pool-bronze, #f9e8c7 );
-}
-
-tr.bg-third,
-div.bg-third,
-tr.bg-p3,
-div.bg-p3,
-tr.background-color-third-place,
-div.background-color-third-place,
-div.csstable-widget-row.background-color-third-place > .csstable-widget-cell {
-	border-bottom: 0.125rem solid var( --prize-pool-bronze, transparent );
-}
-
-tr.bg-third > td.prizepooltable-place,
-div.bg-third > td.prizepooltable-place,
-tr.bg-p3 > td.prizepooltable-place,
-div.bg-p3 > td.prizepooltable-place,
-tr.background-color-third-place > td.prizepooltable-place,
-div.background-color-third-place > *.prizepooltable-place {
-	background-color: var( --prize-pool-bronze, inherit );
-	color: #ffffff;
-}
-
-tr.bg-fourth,
-div.bg-fourth,
-tr.bg-p4,
-div.bg-p4,
-tr.background-color-fourth-place,
-div.background-color-fourth-place {
-	background-color: var( --prize-pool-background-color, #f9dec7 );
-}
-
-td.bg-fourth,
-td.bg-p4,
-td.background-color-fourth-place {
-	background-color: var( --prize-pool-copper, #f9dec7 );
-}
-
-tr.bg-fourth,
-div.bg-fourth,
-tr.bg-p4,
-div.bg-p4,
-tr.background-color-fourth-place,
-div.background-color-fourth-place,
-div.csstable-widget-row.background-color-fourth-place > .csstable-widget-cell {
-	border-bottom: 0.125rem solid var( --prize-pool-copper, transparent );
-}
-
-tr.bg-fourth > td.prizepooltable-place,
-div.bg-fourth > td.prizepooltable-place,
-tr.bg-p4 > td.prizepooltable-place,
-div.bg-p4 > td.prizepooltable-place,
-tr.background-color-fourth-place > td.prizepooltable-place,
-div.background-color-fourth-place > *.prizepooltable-place {
-	background-color: var( --prize-pool-copper, inherit );
-	color: #ffffff;
-}
-
-div.csstable-widget-row.bg-win {
-	div.prizepooltable > & {
-		/* need the `!important` due to bg-win ( sadly ) having an important in one of its definitions ... */
-		background-color: inherit !important;
-	}
-
-	> .csstable-widget-cell {
-		border-bottom: 0.125rem solid var( --clr-forest-background-color, transparent );
-	}
-}
-
-div.bg-win > *.prizepooltable-place {
-	background-color: var( --clr-forest-background-color, inherit );
-}
-
-div.csstable-widget-row.bg-lose {
-	background-color: inherit;
-
-	> .csstable-widget-cell {
-		border-bottom: 0.125rem solid var( --clr-cinnabar-background-color, transparent );
-	}
-}
-
-div.bg-lose > *.prizepooltable-place {
-	background-color: var( --clr-cinnabar-background-color, inherit );
-}
-
-tr.background-color-disqualified,
-div.background-color-disqualified {
-	background-color: #dee3ef;
-}
-
-tr.background-color-win,
-div.background-color-win {
-	background-color: #ddf4dd;
-}
-
-tr.background-color-lose,
-div.background-color-lose {
-	background-color: #fbdfdf;
-}
-
-tr.background-color-highlight,
-div.background-color-highlight {
-	background-color: #cce5ea;
-}
-
-.prizepooltable-background-variant {
-	background-color: var( --prize-pool-variant-background-color, #f2f2f2 );
-}
-
 /*******************************************************************************
-Template: ( Standardized ) prize pool tables
-Author: Rathoz
+Legacy css-grid prize pool tables (still used by Module:PrizePool/Award)
 *******************************************************************************/
 
 .collapsed > .ppt-hide-on-collapse {
@@ -315,9 +223,35 @@ Author: Rathoz
 	}
 }
 
+div.csstable-widget-row.bg-win {
+	div.prizepooltable > & {
+		/* need the `!important` due to bg-win ( sadly ) having an important in one of its definitions ... */
+		background-color: inherit !important;
+	}
+
+	> .csstable-widget-cell {
+		border-bottom: 0.125rem solid var( --clr-forest-background-color, transparent );
+	}
+}
+
+div.bg-win > *.prizepooltable-place {
+	background-color: var( --clr-forest-background-color, inherit );
+}
+
+div.csstable-widget-row.bg-lose {
+	background-color: inherit;
+
+	> .csstable-widget-cell {
+		border-bottom: 0.125rem solid var( --clr-cinnabar-background-color, transparent );
+	}
+}
+
+div.bg-lose > *.prizepooltable-place {
+	background-color: var( --clr-cinnabar-background-color, inherit );
+}
+
 /*******************************************************************************
-Template: ( Standardized ) prize pool section
-Author: iMarbot
+( Standardized ) prize pool section
 *******************************************************************************/
 
 .prizepool-section-wrapper {
