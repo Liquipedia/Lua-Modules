@@ -28,11 +28,10 @@ local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
-local Widgets = Lua.import('Module:Widget/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local WidgetTable = Widgets.TableOld
-local TableRow = Widgets.TableRow
-local TableCell = Widgets.TableCell
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local TableCell = TableWidgets.Cell
+local TableRow = TableWidgets.Row
 local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -587,35 +586,36 @@ end
 ---@param isAward boolean?
 ---@return Widget
 function BasePrizePool:_buildTable(isAward)
-	local headerRow = self:_buildHeader(isAward)
+	local bodyRows = self:_buildRows()
+	local cutafterRows = self:_cutafterRows()
 
-	return Div{
-		css = {['overflow-x'] = 'auto'},
-		children = {WidgetTable{
-			classes = {
-				'collapsed',
-				'general-collapsible',
-				'prizepooltable',
-				'prizepooltable-' .. (isAward and 'award' or 'placement')
-			},
-			css = {width = 'max-content'},
-			columns = headerRow:getCellCount(),
-			children = WidgetUtil.collect(headerRow, unpack(self:_buildRows()))
-		}},
+	return TableWidgets.Table{
+		classes = {'prizepool-table-wrapper'},
+		striped = true,
+		tableClasses = WidgetUtil.collect(
+			'prizepooltable',
+			'prizepooltable-' .. (isAward and 'award' or 'placement'),
+			cutafterRows and 'collapsed' or nil
+		),
+		tableAttributes = cutafterRows and {['data-cutafter'] = cutafterRows} or nil,
+		children = {
+			TableWidgets.TableHeader{children = {self:_buildHeader(isAward)}},
+			TableWidgets.TableBody{children = bodyRows},
+		},
 	}
 end
 
 ---@param isAward boolean?
 ---@return WidgetTableRow
 function BasePrizePool:_buildHeader(isAward)
-	local children = {}
-
-	table.insert(children, TableCell{children = {isAward and 'Award' or 'Place'}, css = {['min-width'] = '80px'}})
+	local children = {
+		TableWidgets.CellHeader{children = {isAward and 'Award' or 'Place'}, align = 'center'},
+		TableWidgets.CellHeader{children = {'Participant'}, classes = {'prizepooltable-col-team'}, align = 'left'},
+	}
 
 	local previousOfType = {}
 	for _, prize in ipairs(self.prizes) do
 		local prizeTypeData = self.prizeTypes[prize.type]
-
 		if not prizeTypeData.mergeDisplayColumns or not previousOfType[prize.type] then
 			local cell = prizeTypeData.headerDisplay(prize.data)
 			table.insert(children, cell)
@@ -623,90 +623,106 @@ function BasePrizePool:_buildHeader(isAward)
 		end
 	end
 
-	table.insert(children, TableCell{children = {'Participant'}, classes = {'prizepooltable-col-team'}})
-
-	return TableRow{classes = {'prizepooltable-header'}, css = {['font-weight'] = 'bold'}, children = children}
+	return TableWidgets.Row{classes = {'prizepooltable-header'}, children = children}
 end
 
 ---@return WidgetTableRow[]
 function BasePrizePool:_buildRows()
 	local rows = {}
-	local previousPlacement = nil
 
 	for _, placement in ipairs(self.placements) do
-		local previousOpponent = {}
-
 		if self:applyHideAfter(placement) then
 			break
 		end
 
-		self:applyToggleExpand(previousPlacement, placement, rows)
+		local opponents = placement.opponents
+		local opponentCount = math.max(#opponents, 1)
+		local placeCell = self:placeOrAwardCell(placement)
+		local backgroundClass = placement:getBackground()
 
-		local cells = {}
-		table.insert(cells, self:placeOrAwardCell(placement))
+		-- Build the prize-cell matrix: prizeMatrix[opponentIndex] = {cell, …} in display-column order.
+		local prizeMatrix = Array.map(opponents, function(opponent)
+			return self:_opponentPrizeCells(placement, opponent)
+		end)
 
-		for _, opponent in ipairs(placement.opponents) do
-			local previousOfPrizeType = {}
-			local prizeCells = Array.map(self.prizes, function (prize)
-				local prizeTypeData = self.prizeTypes[prize.type]
-				local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
-
-				local cell = reward and prizeTypeData.rowDisplay(prize.data, reward) or TableCell{}
-
-				-- Update the previous column of this type in the same row
-				local lastCellOfType = previousOfPrizeType[prize.type]
-				if lastCellOfType and prizeTypeData.mergeDisplayColumns then
-
-					if Table.isNotEmpty(lastCellOfType.props.children) and Table.isNotEmpty(cell.props.children) then
-						table.insert(lastCellOfType.props.children, tostring(mw.html.create('hr'):css('width', '100%')))
-					end
-
-					Array.extendWith(lastCellOfType.props.children, cell.props.children)
-					lastCellOfType.css['flex-direction'] = 'column'
-
-					return nil
+		-- Vertically merge consecutive-equal prize cells per column (declare span on the run's first row).
+		local numCols = prizeMatrix[1] and #prizeMatrix[1] or 0
+		local omitted = {} -- omitted[opponentIndex][col] = true
+		for col = 1, numCols do
+			local opponentIndex = 1
+			while opponentIndex <= opponentCount do
+				local runLength = 1
+				while opponentIndex + runLength <= opponentCount
+					and Table.deepEquals(
+						prizeMatrix[opponentIndex][col].props.children,
+						prizeMatrix[opponentIndex + runLength][col].props.children
+					) do
+					omitted[opponentIndex + runLength] = omitted[opponentIndex + runLength] or {}
+					omitted[opponentIndex + runLength][col] = true
+					runLength = runLength + 1
 				end
-
-				previousOfPrizeType[prize.type] = cell
-				return cell
-			end)
-
-			Array.forEach(prizeCells, function (prizeCell, columnIndex)
-				local lastInColumn = previousOpponent[columnIndex]
-
-				---@cast prizeCell -nil
-				if Table.isEmpty(prizeCell.props.children) then
-					prizeCell = BasePrizePool._emptyCell()
+				if runLength > 1 then
+					prizeMatrix[opponentIndex][col].props.rowspan = runLength
 				end
+				opponentIndex = opponentIndex + runLength
+			end
+		end
 
-				if lastInColumn and Table.deepEquals(lastInColumn.props.children, prizeCell.props.children) then
-					lastInColumn.rowSpan = (lastInColumn.rowSpan or 1) + 1
-				else
-					previousOpponent[columnIndex] = prizeCell
-					table.insert(cells, prizeCell)
-				end
-			end)
+		for opponentIndex, opponent in ipairs(opponents) do
+			local cells = {}
+			if opponentIndex == 1 then
+				table.insert(cells, placeCell)
+			end
 
-			local opponentDisplay = tostring(OpponentDisplay.BlockOpponent{
-				opponent = opponent.opponentData,
-				showPlayerTeam = true,
+			table.insert(cells, TableCell{
+				children = {tostring(OpponentDisplay.BlockOpponent{
+					opponent = opponent.opponentData,
+					showPlayerTeam = true,
+				})},
+				classes = {'prizepooltable-col-team'},
+				align = 'left',
+				nowrap = false,
 			})
-			local opponentCss = {['justify-content'] = 'start'}
 
-			table.insert(cells, TableCell{children = {opponentDisplay}, css = opponentCss})
+			for col = 1, numCols do
+				if not (omitted[opponentIndex] and omitted[opponentIndex][col]) then
+					table.insert(cells, prizeMatrix[opponentIndex][col])
+				end
+			end
+
+			table.insert(rows, TableRow{children = cells, classes = {backgroundClass}})
 		end
-		local classes = {placement:getBackground()}
-		if self:applyCutAfter(placement) then
-			table.insert(classes, 'ppt-hide-on-collapse')
-		end
-		local row = TableRow{children = cells, classes = classes}
-
-		table.insert(rows, row)
-
-		previousPlacement = placement
 	end
 
 	return rows
+end
+
+---@param placement BasePlacement
+---@param opponent table
+---@return WidgetTableCell[]
+function BasePrizePool:_opponentPrizeCells(placement, opponent)
+	local previousOfPrizeType = {}
+	local prizeCells = Array.map(self.prizes, function(prize)
+		local prizeTypeData = self.prizeTypes[prize.type]
+		local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
+		local cell = reward and prizeTypeData.rowDisplay(prize.data, reward) or TableCell{}
+
+		local lastCellOfType = previousOfPrizeType[prize.type]
+		if lastCellOfType and prizeTypeData.mergeDisplayColumns then
+			if Table.isNotEmpty(lastCellOfType.props.children) and Table.isNotEmpty(cell.props.children) then
+				table.insert(lastCellOfType.props.children, tostring(mw.html.create('hr'):css('width', '100%')))
+			end
+			Array.extendWith(lastCellOfType.props.children, cell.props.children)
+			return nil
+		end
+
+		previousOfPrizeType[prize.type] = cell
+		return cell
+	end)
+
+	return Array.map(prizeCells, function(cell)
+		return Table.isEmpty(cell.props.children) and BasePrizePool._emptyCell() or cell
+	end)
 end
 
 ---@protected
@@ -722,19 +738,11 @@ function BasePrizePool:applyHideAfter(placement)
 	return false
 end
 
----@protected
----@param placement BasePlacement
----@return boolean
-function BasePrizePool:applyCutAfter(placement)
-	error('Function applyCutAfter needs to be implemented by a child class of "Module:PrizePool/Base"')
-end
-
----@protected
----@param placement BasePlacement?
----@param nextPlacement BasePlacement
----@param row WidgetTableRow
-function BasePrizePool:applyToggleExpand(placement, nextPlacement, row)
-	error('Function applyToggleExpand needs to be implemented by a child class of "Module:PrizePool/Base"')
+--- Number of body rows to show before collapse; nil disables collapse.
+--- Child classes override this to drive the JS `data-cutafter` behaviour.
+---@return integer?
+function BasePrizePool:_cutafterRows()
+	return nil
 end
 
 ---@return string

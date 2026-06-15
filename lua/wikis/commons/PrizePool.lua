@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
-local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 
 local Import = Lua.import('Module:PrizePool/Import')
@@ -20,11 +19,8 @@ local Placement = Lua.import('Module:PrizePool/Placement')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Widgets = Lua.import('Module:Widget/All')
-local Div = Widgets.Div
-local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Span = Widgets.Span
-local TableRow = Widgets.TableRow
-local TableCell = Widgets.TableCell
+local TableCell = Lua.import('Module:Widget/Table2/All').Cell
 
 ---@class PrizePool: BasePrizePool
 ---@operator call(...): PrizePool
@@ -72,64 +68,22 @@ function PrizePool:applyHideAfter(placement)
 	return placement.placeStart > self.options.hideafter
 end
 
----@param placement PrizePoolPlacement
----@return boolean
-function PrizePool:applyCutAfter(placement)
-	if placement.placeStart > self.options.cutafter then
-		return true
+---@return integer?
+function PrizePool:_cutafterRows()
+	if self.options.cutafter == math.huge then
+		return nil
 	end
-	return false
-end
-
----@param placement PrizePoolPlacement?
----@param nextPlacement PrizePoolPlacement
----@param rows WidgetTableRow[]
-function PrizePool:applyToggleExpand(placement, nextPlacement, rows)
-	if placement ~= nil
-		and placement.placeStart <= self.options.cutafter
-		and placement.placeEnd >= self.options.cutafter
-		and placement ~= self.placements[#self.placements]
-		and nextPlacement.placeStart ~= placement.placeStart
-		and nextPlacement.placeEnd ~= placement.placeEnd then
-
-		table.insert(rows, self:_toggleExpand(placement.placeEnd + 1))
+	local count = 0
+	for _, placement in ipairs(self.placements) do
+		if placement.placeStart > self.options.cutafter then
+			break
+		end
+		if placement.placeStart > self.options.hideafter then
+			break
+		end
+		count = count + math.max(#placement.opponents, 1)
 	end
-end
-
----@param placeStart number
----@return WidgetTableRow
-function PrizePool:_toggleExpand(placeStart)
-	local placeEnd = self.placements[#self.placements].placeEnd
-
-	if self.options.hideafter < math.huge then
-		local lastCut = Array.max(
-			Array.filter(self.placements, function (placement)
-				return placement.placeEnd <= self.options.hideafter
-			end),
-			Operator.property('placeEnd')
-		)
-		placeEnd = lastCut.placeEnd
-	end
-
-	local text = 'place ' .. placeStart .. ' to ' .. placeEnd
-	local expandButton = TableCell{
-		children = Div{children = {
-			text,
-			'&nbsp;',
-			IconFa{iconName = 'expand'},
-		}},
-		classes = {'general-collapsible-expand-button'},
-	}
-	local collapseButton = TableCell{
-		children = Div{children = {
-			text,
-			'&nbsp;',
-			IconFa{iconName = 'collapse'},
-		}},
-		classes = {'general-collapsible-collapse-button'},
-	}
-
-	return TableRow{classes = {'ppt-toggle-expand'}, children = {expandButton, collapseButton}}
+	return count > 0 and count or nil
 end
 
 -- get the lpdbObjectName depending on opponenttype
