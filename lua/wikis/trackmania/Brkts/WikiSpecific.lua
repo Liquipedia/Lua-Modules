@@ -23,7 +23,7 @@ function WikiSpecific.getMatchGroupContainer(matchGroupType, maxOpponentCount)
 		return MatchList.MatchlistContainer
 	end
 
-	local Bracket = Lua.import('Module:MatchGroup/Display/Bracket/Custom')
+	local Bracket = Lua.import('Module:MatchGroup/Display/Bracket')
 	return Bracket.BracketContainer
 end
 
