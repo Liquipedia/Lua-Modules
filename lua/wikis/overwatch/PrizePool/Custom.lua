@@ -21,7 +21,7 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
-local TIER_VALUE = {10000, 5000, 2}
+local TIER_VALUE = {8, 4, 2}
 local TYPE_MODIFIER = {Online = 0.65}
 local TIER_TYPE_MODIFIER = {Showmatch = 0.1,  Misc = 0.25, Qualifier = 0.001, Monthly = 0.4, Weekly = 0.1}
 
@@ -77,7 +77,7 @@ function CustomPrizePool.calculateWeight(prizeMoney, tier, place, tournamentType
 	end
 
 	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier) or ''] or 1
-	local prizeFactor = (1000000 + prizeMoney) / 1000000
+	local prizeFactor = (100000 + prizeMoney) / 100000
 	local tierTypeFactor = TIER_TYPE_MODIFIER[tierType] or 1
 	local highlightedFactor = isHighlighted and 2 or 1
 	local typeFactor = TYPE_MODIFIER[tournamentType] or 1
