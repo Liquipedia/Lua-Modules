@@ -587,8 +587,10 @@ end
 ---@return Widget
 function BasePrizePool:_buildTable(isAward)
 	local bodyRows = self:_buildRows()
-	local cutafterRows = self:_cutafterRows()
-	local collapseText = cutafterRows and self:_collapseText() or nil
+	local hasCutRows = Array.any(self.placements, function(placement)
+		return not self:applyHideAfter(placement) and self:applyCutAfter(placement)
+	end)
+	local collapseText = hasCutRows and self:_collapseText() or nil
 
 	return TableWidgets.Table{
 		classes = {'prizepool-table-wrapper'},
@@ -596,12 +598,11 @@ function BasePrizePool:_buildTable(isAward)
 		tableClasses = WidgetUtil.collect(
 			'prizepooltable',
 			'prizepooltable-' .. (isAward and 'award' or 'placement'),
-			cutafterRows and 'collapsed' or nil
+			hasCutRows and 'collapsed' or nil
 		),
-		tableAttributes = cutafterRows and {
-			['data-cutafter'] = cutafterRows,
-			['data-opentext'] = collapseText and collapseText.opentext or nil,
-			['data-closetext'] = collapseText and collapseText.closetext or nil,
+		tableAttributes = collapseText and {
+			['data-opentext'] = collapseText.opentext,
+			['data-closetext'] = collapseText.closetext,
 		} or nil,
 		children = {
 			TableWidgets.TableHeader{children = {self:_buildHeader(isAward)}},
@@ -695,7 +696,10 @@ function BasePrizePool:_buildRows()
 				end
 			end
 
-			table.insert(rows, TableRow{children = cells, classes = {backgroundClass}})
+			table.insert(rows, TableRow{children = cells, classes = WidgetUtil.collect(
+				backgroundClass,
+				self:applyCutAfter(placement) and 'ppt-hide-on-collapse' or nil
+			)})
 		end
 	end
 
@@ -743,11 +747,12 @@ function BasePrizePool:applyHideAfter(placement)
 	return false
 end
 
---- Number of body rows to show before collapse; nil disables collapse.
---- Child classes override this to drive the JS `data-cutafter` behaviour.
----@return integer?
-function BasePrizePool:_cutafterRows()
-	return nil
+--- Whether a placement's rows are hidden behind the collapse toggle.
+--- Child classes override this; the default keeps every row visible.
+---@param placement BasePlacement
+---@return boolean
+function BasePrizePool:applyCutAfter(placement)
+	return false
 end
 
 ---Open/close labels for the collapse toggle. Child classes override.

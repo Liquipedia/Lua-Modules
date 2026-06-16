@@ -175,11 +175,18 @@ table.prizepooltable.collapsed .prizepooltablehide {
 	display: none;
 }
 
-// Hide rows past the cut-off while collapsed. The toggle row is injected by
-// Prizepooltable.js before the (cutAfter + 1)-th tbody row, so rows from
-// (cutAfter + 2) onward are hidden when collapsed.
+// Class-based collapse (prize pool): Lua marks every row past the cut-off with
+// `ppt-hide-on-collapse`, and Prizepooltable.js injects the toggle directly
+// before the first such row. Gated on `client-js` so non-JS readers see all rows.
+html.client-js .prizepooltable.collapsed .ppt-hide-on-collapse {
+	display: none;
+}
+
+// Legacy data-cutafter collapse (mvp / medal / winnings tables, which share the
+// `prizepooltable` class and Prizepooltable.js). The JS injects the toggle before
+// the (cutAfter + 2)-th row, so rows from (cutAfter + 3) onward are hidden.
 @for $i from 0 through 32 {
-	html.client-js .prizepooltable.collapsed[ data-cutafter="#{$i}" ] tbody tr:nth-child( n + #{ $i + 2 } ) {
+	html.client-js .prizepooltable.collapsed[ data-cutafter="#{$i}" ] tr:nth-child( n + #{ $i + 3 } ) {
 		display: none;
 	}
 }

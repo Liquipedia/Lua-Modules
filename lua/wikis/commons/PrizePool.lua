@@ -68,22 +68,10 @@ function PrizePool:applyHideAfter(placement)
 	return placement.placeStart > self.options.hideafter
 end
 
----@return integer?
-function PrizePool:_cutafterRows()
-	if self.options.cutafter == math.huge then
-		return nil
-	end
-	local count = 0
-	for _, placement in ipairs(self.placements) do
-		if placement.placeStart > self.options.cutafter then
-			break
-		end
-		if placement.placeStart > self.options.hideafter then
-			break
-		end
-		count = count + math.max(#placement.opponents, 1)
-	end
-	return count > 0 and count or nil
+---@param placement PrizePoolPlacement
+---@return boolean
+function PrizePool:applyCutAfter(placement)
+	return placement.placeStart > self.options.cutafter
 end
 
 ---@return {opentext: string, closetext: string}?

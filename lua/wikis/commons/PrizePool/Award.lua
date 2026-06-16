@@ -55,19 +55,10 @@ function AwardPrizePool:placeOrAwardCell(placement)
 	}
 end
 
----@return integer?
-function AwardPrizePool:_cutafterRows()
-	if self.options.cutafter == math.huge then
-		return nil
-	end
-	local count = 0
-	for _, placement in ipairs(self.placements) do
-		if (placement.previousTotalNumberOfParticipants + 1) > self.options.cutafter then
-			break
-		end
-		count = count + math.max(#placement.opponents, 1)
-	end
-	return count > 0 and count or nil
+---@param placement AwardPlacement
+---@return boolean
+function AwardPrizePool:applyCutAfter(placement)
+	return (placement.previousTotalNumberOfParticipants + 1) > self.options.cutafter
 end
 
 ---@return {opentext: string, closetext: string}?
