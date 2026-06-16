@@ -22,40 +22,32 @@ Author(s): spazer, Lafungo
 	white-space: nowrap;
 }
 
-$placement-colors: (
-	"1": ( var( --clr-semantic-gold-40 ), var( --clr-semantic-gold-30 ) ),
-	"2": ( var( --clr-semantic-silver-40 ) ),
-	"3": ( var( --clr-semantic-bronze-40 ), var( --clr-semantic-bronze-30 ) ),
-	"4": ( var( --clr-semantic-copper-40 ), var( --clr-semantic-copper-30 ) ),
-	"5": ( var( --clr-elm-40 ), var( --clr-elm-30 ) ),
-	"6": ( var( --clr-elm-30 ), var( --clr-elm-20 ) ),
-	"lightblue": ( var( --clr-elm-40 ), color-mix( in srgb, #000000 20%, var( --clr-elm-40 ) ) ),
-	"blue": ( var( --clr-elm-30 ), color-mix( in srgb, #000000 20%, var( --clr-elm-30 ) ) ),
-	"darkblue": ( var( --clr-elm-20 ), color-mix( in srgb, #000000 20%, var( --clr-elm-20 ) ) ),
-	"darkgrey": ( var( --clr-elm-10 ) ),
-	"win": ( var( --clr-semantic-positive-40 ), var( --clr-semantic-positive-20 ) ),
-	"draw": ( var( --clr-tuliptree-80 ), var( --clr-tuliptree-40 ) ),
-	"lose": ( var( --clr-secondary-80 ), var( --clr-secondary-25 ) ),
-	"up": ( var( --clr-atlantis-40 ), var( --clr-atlantis-30 ) ),
-	"stay": ( var( --clr-sun-40 ), var( --clr-sun-30 ) ),
-	"down": ( color-mix( in srgb, #ffffff 30%, var( --clr-semantic-negative-40 ) ), var( --clr-semantic-negative-30 ) ),
-	"dnp": ( var( --clr-moon-80 ), color-mix( in srgb, #000000 20%, var( --clr-moon-80 ) ) ),
-);
-
-@each $name, $colors in $placement-colors {
+@mixin placement-color($name, $lightmode-color, $darkmode-color: false) {
 	.placement-#{$name} {
-		@if length( $colors ) == 2 {
-			.theme--light & {
-				background-color: nth( $colors, 1 );
-			}
+		background-color: $lightmode-color;
 
+		@if $darkmode-color {
 			.theme--dark & {
-				background-color: nth( $colors, 2 );
+				background-color: $darkmode-color;
 			}
-		}
-
-		@else {
-			background-color: nth( $colors, 1 );
 		}
 	}
 }
+
+@include placement-color( 1, var( --clr-semantic-gold-40 ), var( --clr-semantic-gold-30 ) );
+@include placement-color( 2, var( --clr-semantic-silver-40 ) );
+@include placement-color( 3, var( --clr-semantic-bronze-40 ), var( --clr-semantic-bronze-30 ) );
+@include placement-color( 4, var( --clr-semantic-copper-40 ), var( --clr-semantic-copper-30 ) );
+@include placement-color( 5, var( --clr-elm-40 ), var( --clr-elm-30 ) );
+@include placement-color( 6, var( --clr-elm-30 ), var( --clr-elm-20 ) );
+@include placement-color( "lightblue", var( --clr-elm-40 ), color-mix( in srgb, #000000 20%, var( --clr-elm-40 ) ) );
+@include placement-color( "blue", var( --clr-elm-30 ), color-mix( in srgb, #000000 20%, var( --clr-elm-30 ) ) );
+@include placement-color( "darkblue", var( --clr-elm-20 ), color-mix( in srgb, #000000 20%, var( --clr-elm-20 ) ) );
+@include placement-color( "darkgrey", var( --clr-elm-10 ) );
+@include placement-color( "win", var( --clr-semantic-positive-40 ), var( --clr-semantic-positive-20 ) );
+@include placement-color( "draw", var( --clr-tuliptree-80 ), var( --clr-tuliptree-40 ) );
+@include placement-color( "lose", var( --clr-secondary-80 ), var( --clr-secondary-25 ) );
+@include placement-color( "up", var( --clr-atlantis-40 ), var( --clr-atlantis-30 ) );
+@include placement-color( "stay", var( --clr-sun-40 ), var( --clr-sun-30 ) );
+@include placement-color( "down", color-mix( in srgb, #ffffff 30%, var( --clr-semantic-negative-40 ) ), var( --clr-semantic-negative-30 ) );
+@include placement-color( "dnp", var( --clr-moon-80 ), color-mix( in srgb, #000000 20%, var( --clr-moon-80 ) ) );
