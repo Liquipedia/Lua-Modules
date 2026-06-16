@@ -8,9 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local DisplayUtil = Lua.import('Module:DisplayUtil')
-local Faction = Lua.import('Module:Faction')
 local Logic = Lua.import('Module:Logic')
 local Math = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
@@ -20,7 +18,6 @@ local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local Html = Lua.import('Module:Widget/Html')
-local BracketDisplayComponents = Lua.import('Module:Widget/Match/Bracket/All')
 local BlockTeam = Lua.import('Module:Widget/TeamDisplay/Block')
 local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
 
