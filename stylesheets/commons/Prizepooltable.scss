@@ -240,6 +240,7 @@ non-prizepool modules (e.g. infoboxes). Prizepool no longer renders via this.
 .prizepool-section-tables {
 	display: flex;
 	flex-flow: row wrap;
+	align-items: flex-start;
 	gap: 1em;
 
 	@media ( max-width: 600px ) {
