@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Faction = Lua.import('Module:Faction')
 local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
