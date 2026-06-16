@@ -49,7 +49,7 @@ local function MatchListOpponent(props)
 			opponent = opponent,
 			overflow = 'ellipsis',
 			showLink = false,
-			teamStyle = 'short',
+			teamStyle = 'dynamic',
 			additionalClasses = {'brkts-matchlist-cell-content'},
 		}
 	}
