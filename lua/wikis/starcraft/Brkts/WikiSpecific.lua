@@ -11,6 +11,7 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Table = Lua.import('Module:Table')
 
 local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
+local StarcraftBracketOpponentEntry = Lua.import('Module:Widget/Match/Bracket/OpponentEntry')
 
 ---@class StarcraftBrktsWikiSpecific: BrktsWikiSpecific
 local WikiSpecific = Table.copy(BaseWikiSpecific)
@@ -38,7 +39,7 @@ function WikiSpecific.getMatchGroupContainer(matchGroupType, maxOpponentCount)
 	end
 
 	local Bracket = Lua.import('Module:MatchGroup/Display/Bracket')
-	return WikiSpecific.adjustMatchGroupContainerConfig(Bracket.BracketContainer)
+	return WikiSpecific.adjustBracketContainerConfig(Bracket.BracketContainer)
 end
 
 ---@param displayContainer function
@@ -48,6 +49,19 @@ function WikiSpecific.adjustMatchGroupContainerConfig(displayContainer)
 	return function(props, matches)
 		local config = Table.merge(props.config, {MatchSummaryContainer = StarcraftMatchSummary.getByMatchId})
 		return displayContainer(Table.merge(props, {config = config}), matches)
+	end
+end
+
+---@param displayContainer fun(props: {bracketId: string, config: BracketConfigOptions}): Html
+---@return fun(props: {bracketId: string, config: BracketConfigOptions}): Html
+function WikiSpecific.adjustBracketContainerConfig(displayContainer)
+	local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft')
+	return function(props)
+		local config = Table.merge(props.config, {
+			MatchSummaryContainer = StarcraftMatchSummary.getByMatchId,
+			OpponentEntry = StarcraftBracketOpponentEntry
+		})
+		return displayContainer(Table.merge(props, {config = config}))
 	end
 end
 
