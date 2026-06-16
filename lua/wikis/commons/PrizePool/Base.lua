@@ -364,7 +364,7 @@ BasePrizePool.prizeTypes = {
 			return {title = input}
 		end,
 		headerDisplay = function (data)
-			return TableCell{children = {data.title}, align = 'right'}
+			return TableCell{children = {data.title}}
 		end,
 
 		row = 'freetext',
@@ -373,7 +373,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if String.isNotEmpty(data) then
-				return TableCell{children = {data}, align = 'right'}
+				return TableCell{children = {data}}
 			end
 		end,
 	}
