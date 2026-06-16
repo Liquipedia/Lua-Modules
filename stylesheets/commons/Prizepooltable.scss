@@ -156,15 +156,18 @@ Table2-based placement prize pool table
 		background-color: var( --clr-sapphire-background-color, inherit );
 	}
 
-	// Footer toggle: full-width, centered, brand-blue link with chevron.
 	.prizepooltabletoggle {
 		cursor: pointer;
 		font-weight: bold;
 		text-align: center;
-		color: var( --clr-wiki-theme-30, #0a558f );
+		color: var( --clr-brand-30, #0a558f );
 
 		.theme--dark & {
-			color: var( --clr-wiki-theme-80, #81a0bf );
+			color: var( --clr-brand-80, #a7cdf1 );
+		}
+
+		> small {
+			font-weight: unset;
 		}
 	}
 }
