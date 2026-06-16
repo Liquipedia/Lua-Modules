@@ -59,7 +59,13 @@ Table2-based placement prize pool table
 		border-radius: 0.25rem;
 		font-weight: bold;
 		line-height: 1;
+		font-size: 0.75rem;
+		text-shadow: 0 1px 1px rgba( 0, 0, 0, 0.5 );
 		color: #ffffff;
+
+		.theme--dark & {
+			color: var( --clr-secondary-16 );
+		}
 
 		&.placement-1 {
 			background-color: var( --prizepool-place-1-accent );
@@ -71,6 +77,16 @@ Table2-based placement prize pool table
 
 		&.placement-3 {
 			background-color: var( --prizepool-place-3-accent );
+		}
+	}
+
+	&.prizepooltable-placement .prizepooltable-place {
+		text-align: center;
+		font-weight: bold;
+		color: var( --clr-secondary-25 );
+
+		.theme--dark & {
+			color: var( --clr-secondary-100 );
 		}
 	}
 

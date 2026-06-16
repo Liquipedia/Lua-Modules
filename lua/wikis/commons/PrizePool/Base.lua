@@ -155,7 +155,7 @@ BasePrizePool.prizeTypes = {
 
 		headerDisplay = function (data)
 			local currencyText = Currency.display(BASE_CURRENCY)
-			return TableCell{children = {currencyText}}
+			return TableCell{children = {currencyText}, align = 'right'}
 		end,
 
 		row = BASE_CURRENCY:lower() .. 'prize',
@@ -167,7 +167,7 @@ BasePrizePool.prizeTypes = {
 				return TableCell{children = {
 					Currency.display(BASE_CURRENCY, data,
 						{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
-				}}
+				}, align = 'right'}
 			end
 		end,
 	},
@@ -194,7 +194,7 @@ BasePrizePool.prizeTypes = {
 			}
 		end,
 		headerDisplay = function (data)
-			return TableCell{children = {Currency.display(data.currency)}}
+			return TableCell{children = {Currency.display(data.currency)}, align = 'right'}
 		end,
 
 		row = 'localprize',
@@ -206,7 +206,7 @@ BasePrizePool.prizeTypes = {
 				return TableCell{children = {
 					Currency.display(headerData.currency, data,
 					{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
-				}}
+				}, align = 'right'}
 			end
 		end,
 
@@ -364,7 +364,7 @@ BasePrizePool.prizeTypes = {
 			return {title = input}
 		end,
 		headerDisplay = function (data)
-			return TableCell{children = {data.title}}
+			return TableCell{children = {data.title}, align = 'right'}
 		end,
 
 		row = 'freetext',
@@ -373,7 +373,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if String.isNotEmpty(data) then
-				return TableCell{children = {data}}
+				return TableCell{children = {data}, align = 'right'}
 			end
 		end,
 	}
