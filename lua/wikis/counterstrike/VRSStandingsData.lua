@@ -135,28 +135,22 @@ function VRSStandingsData._parseSettings(props)
 		error('A date must be provided when not fetching data')
 	end
 
+	local filterType = string.lower(props.filterType or 'none')
+
 	---@type VRSStandingsSettings
 	local settings = {
 		title = props.title,
 		shouldFetch = Logic.readBool(props.shouldFetch),
 		fetchLimit = tonumber(props.fetchLimit),
-		filterRegion = props.filterRegion,
-		filterSubregion = props.filterSubregion,
-		filterCountry = Array.parseCommaSeparatedString(props.filterCountry),
+		filterRegion = filterType == 'region' and props.filterRegion or nil,
+		filterSubregion = filterType == 'subregion' and props.filterSubregion or nil,
+		filterCountry = filterType == 'country' and Array.parseCommaSeparatedString(props.filterCountry) or nil,
 		filterDisplayName = props.filterDisplayName,
 		mainpage = Logic.readBool(props.mainpage),
 		datapointType = datapointType,
 		updated = updated,
-		filterType = 'none',
+		filterType = filterType,
 	}
-
-	if settings.filterRegion then
-		settings.filterType = 'region'
-	elseif settings.filterSubregion then
-		settings.filterType = 'subregion'
-	elseif settings.filterCountry and #settings.filterCountry > 0 then
-		settings.filterType = 'country'
-	end
 
 	return settings
 end
