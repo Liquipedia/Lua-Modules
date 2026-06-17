@@ -15,10 +15,10 @@ local WidgetFactory = {}
 ---@param args {widget: string, children: Renderable|Renderable[], [any]:any}
 ---@return Widget
 function WidgetFactory.fromTemplate(args)
-	local copiedArgs = Table.copy(args)
-	local widgetClass = Table.extract(copiedArgs, 'widget')
-	copiedArgs.children = type(copiedArgs.children) == 'table' and copiedArgs.children or {copiedArgs.children}
+	local widgetClass = Table.extract(args, 'widget')
 	local WidgetClass = Lua.import('Module:Widget/' .. widgetClass)
+	local copiedArgs = Table.copy(args)
+	copiedArgs.children = type(copiedArgs.children) == 'table' and copiedArgs.children or {copiedArgs.children}
 	return WidgetClass(copiedArgs)
 end
 
