@@ -53,7 +53,7 @@ end
 ---@private
 ---@param mvp {players: MatchGroupMvpPlayer[], points: integer?}?
 ---@return MatchSummaryFfaContentItem?
-function MatchSummaryFfaMatchInformation:_getMvpItem(mvp)
+function MatchSummaryFfaMatchInformation._getMvpItem(mvp)
 	if Logic.isEmpty(mvp) then
 		return
 	end
@@ -83,7 +83,7 @@ end
 ---@private
 ---@param rawCasters {name:string, displayName: string, flag: string?}[]?
 ---@return MatchSummaryFfaContentItem?
-function MatchSummaryFfaMatchInformation:_getCasterItem(rawCasters)
+function MatchSummaryFfaMatchInformation._getCasterItem(rawCasters)
 	if Logic.isEmpty(rawCasters) then return end
 	---@cast rawCasters -nil
 	local casters = DisplayHelper.createCastersDisplay(rawCasters)

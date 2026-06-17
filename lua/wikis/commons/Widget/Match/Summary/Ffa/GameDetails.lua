@@ -14,7 +14,7 @@ local Page = Lua.import('Module:Page')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local Component = Lua.import('Module:Widget/Component')
-local HtmlWidgets = Lua.import('Module:Widget/Html')
+local Html = Lua.import('Module:Widget/Html')
 local ContentItemContainer = Lua.import('Module:Widget/Match/Summary/Ffa/ContentItemContainer')
 local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local CountdownIcon = Lua.import('Module:Widget/Match/Summary/Ffa/CountdownIcon')
@@ -36,7 +36,7 @@ local function MatchSummaryFfaGameDetails(props)
 		},
 		game.map and {
 			icon = IconWidget{iconName = 'map'},
-			content = HtmlWidgets.Span{children = Page.makeInternalLink(game.mapDisplayName or game.map, game.map)},
+			content = Html.Span{children = Page.makeInternalLink(game.mapDisplayName or game.map, game.map)},
 		} or nil,
 		Logic.isNotEmpty(casters) and {
 			icon = IconWidget{
@@ -44,11 +44,11 @@ local function MatchSummaryFfaGameDetails(props)
 				additionalClasses = {'fa-fw'},
 				hover = 'Caster' .. (#casters > 1 and 's' or '')
 			},
-			content = HtmlWidgets.Span{children = Array.interleave(casters, ', ')},
+			content = Html.Span{children = Array.interleave(casters, ', ')},
 		} or nil,
 		game.comment and {
 			icon = IconWidget{iconName = 'comment'},
-			content = HtmlWidgets.Span{children = game.comment},
+			content = Html.Span{children = game.comment},
 		} or nil
 	)}
 end

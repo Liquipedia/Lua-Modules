@@ -11,7 +11,7 @@ local Logic = Lua.import('Module:Logic')
 
 local Component = Lua.import('Module:Widget/Component')
 local ContentItemContainer = Lua.import('Module:Widget/Match/Summary/Ffa/ContentItemContainer')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@param props {match: FFAMatchGroupUtilMatch}
@@ -21,7 +21,7 @@ local function MatchSummaryFfaMatchComment(props)
 	if Logic.isEmpty(comment) then return nil end
 	return ContentItemContainer{contentClass = 'panel-content__game-schedule', items = {{
 		icon = IconWidget{iconName = 'comment'},
-		content = HtmlWidgets.Span{children = comment},
+		content = Html.Span{children = comment},
 	}}}
 end
 
