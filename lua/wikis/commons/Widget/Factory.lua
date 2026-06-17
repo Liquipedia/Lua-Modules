@@ -13,8 +13,8 @@ local Table = Lua.import('Module:Table')
 
 local WidgetFactory = {}
 
----@param args {widget: string, children: Renderable|Renderable[], [any]:any}
----@return Widget
+---@param args {widget: string, [any]: any}
+---@return Widget|VNode
 function WidgetFactory.fromTemplate(args)
 	local widgetClass = Table.extract(args, 'widget')
 	assert(String.isNotEmpty(widgetClass), 'WidgetFactory: widget must be specified')
