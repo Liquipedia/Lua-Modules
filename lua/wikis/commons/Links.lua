@@ -363,7 +363,7 @@ local PREFIXES = {
 	weibo = {'https://weibo.com/'},
 	wgidna = {'https://worldoftanks.com/community/accounts/'},
 	wgideu = {'https://worldoftanks.eu/community/accounts/'},
-	wgidasia = {'https://wotgame.cn/community/accounts/'},
+	wgidasia = {'https://worldoftanks.asia/en/community/accounts/'},
 	['360id'] = {'https://wotgame.cn/community/accounts/'},
 	lestaid = {'https://tanki.su/ru/community/accounts/'},
 	wl = {match = 'https://www.winstonslab.com/matches/match.php?id='},
