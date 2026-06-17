@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local WidgetFactory = {}
@@ -16,6 +17,7 @@ local WidgetFactory = {}
 ---@return Widget
 function WidgetFactory.fromTemplate(args)
 	local widgetClass = Table.extract(args, 'widget')
+	assert(String.isNotEmpty(widgetClass), 'WidgetFactory: widget must be specified')
 	local WidgetClass = Lua.import('Module:Widget/' .. widgetClass)
 	local copiedArgs = Table.copy(args)
 	copiedArgs.children = type(copiedArgs.children) == 'table' and copiedArgs.children or {copiedArgs.children}
