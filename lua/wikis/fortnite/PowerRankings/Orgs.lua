@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
 local Icon = Lua.import('Module:Icon')
@@ -16,10 +17,10 @@ local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local MathUtil = Lua.import('Module:MathUtil')
+local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
-local Variables = Lua.import('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
@@ -43,176 +44,304 @@ local PowerRankingsData = Lua.import('Module:PowerRankings/Data', {loadData = tr
 local DISPLAY_PAGE = 'Fortnite Power Rankings/Organizations'
 local TOP_N = 200
 local MAX_PLAYERS_PER_ORG = 4
-local MAX_PLAYERS_PER_PLACEMENT = 10
 local DEFAULT_WEIGHTS = {count = 0.12, pr = 0.35, cash = 0.45}
+
+---@class FortniteRankingsPlayer: standardPlayer
+---@field rank integer
+---@field points number
+
+---@class FortniteRankingsTeam
+---@field team string
+---@field pageName string
+---@field count integer
+---@field score number
+---@field earnings number
+---@field average number
+---@field achievements string[]
+---@field players FortniteRankingsPlayer[]
+---@field rank integer
+---@field flag string?
+---@field countRank integer?
+---@field averageRank integer?
+---@field earningsRank integer?
+
 
 local PowerRankingsOrgs = {}
 
-local function normalizeName(name)
-	return string.lower((name or ''):gsub('[%s_]', ''))
-end
+---@param frame Frame
+---@return Renderable
+function PowerRankingsOrgs.main(frame)
+	local args = Arguments.getArgs(frame)
 
-local function buildMatchKeys(team)
-	local histNames = TeamTemplate.queryHistoricalNames(team)
-	if Logic.isEmpty(histNames) then
-		histNames = {team}
-	end
-	local keys = {}
-	Array.forEach(histNames, function(nm)
-		keys[normalizeName(nm)] = true
-		local raw = TeamTemplate.getRawOrNil(nm)
-		if raw and Logic.isNotEmpty(raw.page) then
-			keys[normalizeName(raw.page)] = true
+	local config = {
+		limit = tonumber(args.limit),
+		showMore = Logic.readBool(args.showMore),
+		wrapped = Logic.readBool(args.wrapped),
+		year = tonumber(args.year) or DateExt.getYearOf(),
+		weights = {
+			count = tonumber(args.wCount) or DEFAULT_WEIGHTS.count,
+			pr = tonumber(args.wPR) or DEFAULT_WEIGHTS.pr,
+			cash = tonumber(args.wCash) or DEFAULT_WEIGHTS.cash,
+		},
+		updated = Logic.isNotEmpty(PowerRankingsData.updated)
+			and PowerRankingsData.updated .. ' ' .. DateExt.defaultTimezone
+			or nil,
+	}
+	config.weightSum = config.weights.count + config.weights.pr + config.weights.cash
+
+	---@type FortniteRankingsPlayer[]
+	local players = Array.map(PowerRankingsData.players or {}, function(player)
+		local rank = tonumber(player.rank)
+		if not rank or rank > TOP_N then
+			return
 		end
+
+		local pageName = Page.pageifyLink(player.link or player.name) --[[@as string]]
+
+		return PlayerExt.syncPlayer{
+			pageName = pageName,
+			displayName = player.name,
+			--todo: test if "updated" works, else: team = PlayerExt.syncTeam(pageName),
+			team = PlayerExt.syncTeam(pageName, nil, config.updated),
+			rank = rank,
+			points = tonumber(player.points),
+		}
 	end)
-	return keys
-end
 
-local function resolvePrimaryTeam(name)
-	if Logic.isEmpty(name) then
-		return ''
+	local historicalToTeam = {}
+	local byTeam = {}
+	Array.forEach(players, function(player)
+		if not player.team then return end
+		local team = historicalToTeam[player.team]
+		if not team then
+			team = player.team --[[@as string]]
+			historicalToTeam[team] = team
+			local teamPage = Page.pageifyLink(TeamTemplate.getPageName(team)) --[[@as string]]
+			Array.forEach(TeamTemplate.queryHistoricalNames(teamPage), function(t)
+				historicalToTeam[t] = team
+			end)
+			byTeam[team] = {players = {}, team = team, earnings = 0, achievements = {}, pageName = teamPage}
+		end
+		table.insert(byTeam[team].players, player)
+	end)
+
+	for _, team in pairs(byTeam) do
+		Array.sortInPlaceBy(team.players, Operator.property('points'))
+		team.players = Array.reverse(team.players)
+		team.count = math.min(#team.players, MAX_PLAYERS_PER_ORG)
+		local points = Array.map(Array.sub(team.players, 1, team.count), Operator.property('points'))
+		team.average = MathUtil.sum(points) / team.count
 	end
-	return PlayerExt.syncTeam(Page.pageifyLink(name)) or ''
-end
 
-local function formatNumber(value)
-	return mw.getContentLanguage():formatNum(MathUtil.round(tonumber(value) or 0))
-end
+	local achievementsInfo = PowerRankingsOrgs._addPlacementData(byTeam, historicalToTeam, config.year)
 
-local function orgPageKey(team)
-	local raw = TeamTemplate.getRawOrNil(team)
-	local page = raw and Logic.nilIfEmpty(raw.page) or team
-	return normalizeName(page)
-end
+	local teams = Array.extractValues(byTeam)
+	Array.forEach(teams, function(team)
+		team.achievements = Array.unique(team.achievements)
+	end)
 
-local function storeOrgRankings(list)
-	if Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
-		return
+	PowerRankingsOrgs._determineScore(teams, config.weights, config.weightSum)
+
+	table.sort(teams, function(a, b)
+		if a.score ~= b.score then
+			return a.score > b.score
+		end
+		return a.average > b.average
+	end)
+
+	if not config.wrapped then
+		PowerRankingsOrgs._store(teams)
 	end
-	Array.forEach(list, function(o, rank)
-		local key = orgPageKey(o.team)
-		mw.ext.LiquipediaDB.lpdb_datapoint('FTN_ORG_PR_' .. key, {
-			type = 'FTN_ORG_PR',
-			name = key,
-			information = rank,
-			extradata = {score = MathUtil.formatRounded{value = o.score, precision = 1}},
-		})
+
+	if config.limit then
+		teams = Array.sub(teams, 1, config.limit)
+	end
+
+	PowerRankingsOrgs._fetchTeamFlags(teams)
+
+	return PowerRankingsOrgs._buildDisplay(teams, achievementsInfo, config)
+end
+
+---@param teams FortniteRankingsTeam[]
+function PowerRankingsOrgs._fetchTeamFlags(teams)
+	local teamByPageName = {}
+	Array.forEach(teams, function(team, teamIndex)
+		teamByPageName[team.pageName] = teamIndex
+	end)
+
+	local pages = Array.extractKeys(teamByPageName)
+	local queryResults = mw.ext.LiquipediaDB.lpdb('team', {
+		conditions = tostring(ConditionUtil.anyOf(ColumnName('pagename'), pages)),
+		query = 'pagename, locations, location',
+		limit = 5000,
+	})
+	Array.forEach(queryResults, function(teamRecord)
+		local index = teamByPageName[teamRecord.pagename]
+		-- `.location` (deprecated) is needed on fortnite since their input on team infoboxes is bad ...
+		teams[index].flag = Logic.emptyOr(teamRecord.locations['country1'], teamRecord.location)
 	end)
 end
 
-local function gatherPlacementData(year)
-	local earnings = {}
-	local winPages = {}
-	local pageSet = {}
-
-	local function process(item)
-		local indiv = tonumber(item.individualprizemoney) or 0
-		local page = item.pagename
-		local isSTierWin = item.placement == '1'
-			and (item.liquipediatier == '1' or item.liquipediatier == 'S-Tier')
-			and item.liquipediatiertype ~= 'Qualifier'
-			and item.liquipediatiertype ~= 'Showmatch'
-		local opPlayers = item.opponentplayers or {}
-		local opType = item.opponenttype
-		local opName = item.opponentname
-
-		local function processPlayer(i)
-			if Logic.isEmpty(opPlayers['p' .. i]) then
-				return
-			end
-			local teamRaw = opPlayers['p' .. i .. 'team']
-			if Logic.isEmpty(teamRaw) and opType == 'team' then
-				teamRaw = opName
-			end
-			if Logic.isEmpty(teamRaw) then
-				return
-			end
-			local norm = normalizeName(teamRaw)
-			earnings[norm] = (earnings[norm] or 0) + indiv
-			if not (isSTierWin and Logic.isNotEmpty(page)) then
-				return
-			end
-			winPages[norm] = winPages[norm] or {}
-			if winPages[norm][page] then
-				return
-			end
-			winPages[norm][page] = true
-			pageSet[page] = page
-		end
-
-		for i = 1, MAX_PLAYERS_PER_PLACEMENT do
-			processPlayer(i)
-		end
-	end
-
+---@param byTeam table<string, {players: FortniteRankingsPlayer[], team: string, earnings: number, achievements: string[]}>
+---@param historicalToTeam table<string, string>
+---@param year integer
+---@return {pageName: string, displayName: string, icon: string?, iconDark: string?}[]
+function PowerRankingsOrgs._addPlacementData(byTeam, historicalToTeam, year)
 	local placementConditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('date_year'), Comparator.eq, tostring(year)),
 		ConditionNode(ColumnName('prizemoney'), Comparator.gt, '0'),
 	}
 
+	---@type table<string, true>
+	local achievements = {}
+
 	Lpdb.executeMassQuery('placement', {
-		conditions = placementConditions:toString(),
-		query = 'pagename, opponentname, opponenttype, opponentplayers, '
+		conditions = tostring(placementConditions),
+		query = 'pagename, opponentname, opponenttemplate, opponenttype, opponentplayers, '
 			.. 'individualprizemoney, placement, liquipediatier, liquipediatiertype',
 		limit = 5000,
-	}, process)
+	}, function(placement)
+		local prize = tonumber(placement.individualprizemoney) or 0
+		local isAchievement = tonumber(placement.placement) == 1
+			and tonumber(placement.liquipediatier) == 1
+			and not Table.includes({'Qualifier', 'Showmatch'}, placement.liquipediatiertype)
 
-	local pages = Array.extractValues(pageSet)
-
-	local details = {}
-	if Logic.isNotEmpty(pages) then
-		local tournamentRows = mw.ext.LiquipediaDB.lpdb('tournament', {
-			conditions = ConditionUtil.anyOf(ColumnName('pagename'), pages):toString(),
-			query = 'pagename, name, icon, icondark',
-			limit = 100,
-		}) or {}
-		Array.forEach(tournamentRows, function(tournamentRow)
-			details[tournamentRow.pagename] = {
-				name = Logic.nilIfEmpty(tournamentRow.name) or tournamentRow.pagename:gsub('_', ' '),
-				icon = tournamentRow.icon,
-				icondark = tournamentRow.icondark,
-			}
-		end)
-	end
-
-	return earnings, winPages, details
-end
-
-local function resolveOrgFlags(list)
-	local pageByTeam = {}
-	local pages = {}
-	Array.forEach(list, function(o)
-		local raw = TeamTemplate.getRawOrNil(o.team)
-		if raw and Logic.isNotEmpty(raw.page) then
-			local page = raw.page:gsub(' ', '_')
-			pageByTeam[o.team] = page
-			table.insert(pages, page)
-		end
-	end)
-
-	local locByPage = {}
-	if Logic.isNotEmpty(pages) then
-		local teamRows = mw.ext.LiquipediaDB.lpdb('team', {
-			conditions = ConditionUtil.anyOf(ColumnName('pagename'), pages):toString(),
-			query = 'pagename, location',
-			limit = 1000,
-		}) or {}
-		Array.forEach(teamRows, function(teamRow)
-			if Logic.isNotEmpty(teamRow.pagename) then
-				locByPage[teamRow.pagename] = teamRow.location
+		local opponent = Opponent.fromLpdbStruct(placement)
+		Array.forEach(opponent.players, function(player)
+			local teamTemplate = historicalToTeam[player.team]
+			local team = byTeam[teamTemplate]
+			if not team then return end
+			team.earnings = team.earnings + prize
+			if isAchievement then
+				achievements[placement.pagename] = true
+				table.insert(team.achievements, placement.pagename)
 			end
 		end)
+	end)
+
+	return PowerRankingsOrgs._getTournamentInfo(Array.extractKeys(achievements))
+end
+
+---@param pages string[]
+---@return table<string, {pageName: string, displayName: string, icon: string?, iconDark: string?}>
+function PowerRankingsOrgs._getTournamentInfo(pages)
+	if Logic.isEmpty(pages) then return {} end
+
+	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
+		conditions = tostring(ConditionUtil.anyOf(ColumnName('pagename'), pages)),
+		query = 'pagename, name, icon, icondark',
+		limit = 5000,
+	})
+
+	return Table.map(queryData, function(key, tournament)
+		return tournament.pagename, {
+			pageName = tournament.pagename,
+			displayName = Logic.nilIfEmpty(tournament.name) or tournament.pagename:gsub('_', ' '),
+			icon = tournament.icon,
+			iconDark = tournament.icondark,
+		}
+	end)
+end
+
+---@param teams FortniteRankingsTeam[]
+---@param weights {count: number, pr: number, cash: number}
+---@param weightSum number
+function PowerRankingsOrgs._determineScore(teams, weights, weightSum)
+	local numberOfTeams = #teams
+
+	---@param key string
+	local function getRankForKey(key)
+		if numberOfTeams <= 1 then
+			return
+		end
+
+		local sorted = Array.sortBy(teams, Operator.property(key))
+
+		local i = 1
+		while i <= numberOfTeams do
+			local j = i
+			while j < numberOfTeams and sorted[j + 1][key] == sorted[i][key] do
+				j = j + 1
+			end
+			local norm = ((i + j) / 2 - 1) / (numberOfTeams - 1)
+			for k = i, j do
+				sorted[k][key .. 'Rank'] = norm
+			end
+			i = j + 1
+		end
 	end
 
-	Array.forEach(list, function(o)
-		local page = pageByTeam[o.team]
-		o.flag = page and Logic.nilIfEmpty(locByPage[page]) or nil
+	getRankForKey('count')
+	getRankForKey('average')
+	getRankForKey('earnings')
+
+	Array.forEach(teams, function(team, teamIndex)
+		team.score = 100 * (
+			weights.count * (team.countRank or 1) +
+			weights.pr * (team.averageRank or 1) +
+			weights.cash * (team.earningsRank or 1)
+		) / weightSum
 	end)
+end
+
+---@param teams FortniteRankingsTeam
+function PowerRankingsOrgs._store(teams)
+	if Lpdb.isStorageDisabled() then return end
+	Array.forEach(teams, function(team)
+		mw.ext.LiquipediaDB.lpdb_datapoint('FTN_ORG_PR_' .. team.pageName, {
+			type = 'FTN_ORG_PR',
+			name = team.pageName,
+			information = team.rank,
+			extradata = {score = MathUtil.formatRounded{value = team.score, precision = 1}},
+		})
+	end)
+end
+
+---@param teams FortniteRankingsTeam[]
+---@param achievementsInfo table<string, {pageName: string, displayName: string, icon: string?, iconDark: string?}>
+---@param config {wrapped: boolean, updated: string?, year: integer, showMore: integer}
+---@return Renderable
+function PowerRankingsOrgs._buildDisplay(teams, achievementsInfo, config)
+	local columns = WidgetUtil.collect(
+		{align = 'center'},
+		{align = 'center'},
+		{align = 'left'},
+		{align = 'left'},
+		not config.wrapped and {align = 'center'} or nil,
+		{align = 'center'},
+		not config.wrapped and {align = 'center'} or nil,
+		not config.wrapped and {align = 'center'} or nil
+	)
+
+	local rows = Array.map(teams, function(team, rank)
+		return PowerRankingsOrgs._buildRow(rank, team, config.wrapped, achievementsInfo)
+	end)
+
+	return TableWidgets.Table{
+		title = PowerRankingsOrgs._buildTitle(config.updated),
+		sortable = false,
+		columns = columns,
+		footer = config.showMore and Link{
+			link = DISPLAY_PAGE,
+			linktype = 'internal',
+			children = {
+				HtmlWidgets.Div{
+					children = {'See Rankings Page', Icon.makeIcon{iconName = 'goto'}},
+					classes = {'ranking-table__footer-button'},
+				},
+			},
+		} or nil,
+		css = {width = '100%'},
+		children = {
+			TableWidgets.TableHeader{children = {PowerRankingsOrgs._buildHeader(config.wrapped, config.year)}},
+			TableWidgets.TableBody{children = rows},
+		},
+	}
 end
 
 ---@param updated string?
----@return Widget
-local function buildTitle(updated)
+---@return Renderable
+function PowerRankingsOrgs._buildTitle(updated)
 	return HtmlWidgets.Div{children = WidgetUtil.collect(
 		HtmlWidgets.B{children = 'Fortnite Organization Power Rankings'},
 		Logic.isNotEmpty(updated) and HtmlWidgets.Span{
@@ -222,24 +351,10 @@ local function buildTitle(updated)
 	)}
 end
 
----@return Widget
-local function buildFooter()
-	return Link{
-		link = DISPLAY_PAGE,
-		linktype = 'internal',
-		children = {
-			HtmlWidgets.Div{
-				children = {'See Rankings Page', Icon.makeIcon{iconName = 'goto'}},
-				classes = {'ranking-table__footer-button'},
-			},
-		},
-	}
-end
-
 ---@param wrapped boolean
 ---@param year integer
----@return Widget
-local function buildHeader(wrapped, year)
+---@return Renderable
+function PowerRankingsOrgs._buildHeader(wrapped, year)
 	return TableWidgets.Row{children = WidgetUtil.collect(
 		TableWidgets.CellHeader{children = 'Rank'},
 		TableWidgets.CellHeader{children = ''},
@@ -253,183 +368,47 @@ local function buildHeader(wrapped, year)
 end
 
 ---@param rank integer
----@param o table
+---@param team FortniteRankingsTeam
 ---@param wrapped boolean
----@return Widget
-local function buildRow(rank, o, wrapped)
-	local flagCell = Logic.isNotEmpty(o.flag) and Flags.Icon{flag = o.flag, shouldLink = false} or ''
-	local memberDisplays = Array.map(Array.sub(o.members, 1, o.count), function(m)
-		local player = {displayName = m.name, pageName = Logic.nilIfEmpty(m.link) or m.name}
-		PlayerExt.syncPlayer(player)
-		return tostring(PlayerDisplay.InlinePlayer{player = player})
+---@param achievementsInfo table<string, {pageName: string, displayName: string, icon: string?, iconDark: string?}>
+---@return VNode<Table2RowProps>
+function PowerRankingsOrgs._buildRow(rank, team, wrapped, achievementsInfo)
+	local flagCell = Logic.isNotEmpty(team.flag) and Flags.Icon{flag = team.flag, shouldLink = false} or ''
+	local memberDisplays = Array.map(Array.sub(team.players, 1, team.count), function(player)
+		return PlayerDisplay.InlinePlayer{player = player}
 	end)
-	local membersText = table.concat(memberDisplays, ', ') .. ' (' .. o.count .. ')'
-	local achievementsText = table.concat(Array.map(o.achievements or {}, function(a)
+	local membersText = Array.append(
+		Array.interleave(memberDisplays, ', '),
+		' (' .. team.count .. ')'
+	)
+
+	local achievements = Array.map(team.achievements or {}, function(achievement)
+		local info = achievementsInfo[achievement]
+		if not info then
+			return
+		end
 		return LeagueIcon.display{
-			icon = a.icon,
-			iconDark = a.icondark,
-			link = a.page,
-			name = a.name,
+			icon = info.icon,
+			iconDark = info.iconDark,
+			link = info.pageName,
+			name = info.displayName,
 			size = 30,
 			options = {noTemplate = true},
 		}
-	end))
+	end)
 
 	return TableWidgets.Row{children = WidgetUtil.collect(
 		TableWidgets.Cell{children = HtmlWidgets.B{children = rank}},
 		TableWidgets.Cell{children = flagCell},
 		TableWidgets.Cell{children = OpponentDisplay.BlockOpponent{
-			opponent = {type = Opponent.team, template = o.team},
+			opponent = {type = Opponent.team, template = team.team, extradata = {}},
 		}},
 		TableWidgets.Cell{children = membersText},
-		not wrapped and TableWidgets.Cell{children = achievementsText} or nil,
-		TableWidgets.Cell{children = HtmlWidgets.B{children = MathUtil.formatRounded{value = o.score, precision = 1}}},
-		not wrapped and TableWidgets.Cell{children = formatNumber(o.avgPR)} or nil,
-		not wrapped and TableWidgets.Cell{children = '$' .. formatNumber(o.cash)} or nil
+		not wrapped and TableWidgets.Cell{children = achievements} or nil,
+		TableWidgets.Cell{children = HtmlWidgets.B{children = MathUtil.formatRounded{value = team.score, precision = 1}}},
+		not wrapped and TableWidgets.Cell{children = Currency.formatMoney(team.average, 0)} or nil,
+		not wrapped and TableWidgets.Cell{children = '$' .. Currency.formatMoney(team.earnings, 0)} or nil
 	)}
-end
-
----@param frame Frame
----@return Widget
-function PowerRankingsOrgs.main(frame)
-	local args = Arguments.getArgs(frame)
-	local limit = tonumber(args.limit)
-	local showMore = Logic.readBool(args.showMore)
-	local wrapped = Logic.readBool(args.wrapped)
-	local year = tonumber(args.year) or DateExt.getYearOf(DateExt.getContextualDateOrNow())
-	local weights = {
-		count = tonumber(args.wCount) or DEFAULT_WEIGHTS.count,
-		pr = tonumber(args.wPR) or DEFAULT_WEIGHTS.pr,
-		cash = tonumber(args.wCash) or DEFAULT_WEIGHTS.cash,
-	}
-	local weightSum = weights.count + weights.pr + weights.cash
-
-	local updated
-	if Logic.isNotEmpty(PowerRankingsData.updated) then
-		updated = PowerRankingsData.updated .. ' ' .. DateExt.defaultTimezone
-	end
-
-	local players = Array.filter(PowerRankingsData.players or {}, function(pl)
-		return (tonumber(pl.rank) or 0) <= TOP_N
-	end)
-
-	local byOrg = {}
-	Array.forEach(players, function(pl)
-		local team = Logic.nilIfEmpty(resolvePrimaryTeam(pl.link or pl.name))
-		if not team then
-			return
-		end
-		byOrg[team] = byOrg[team] or {}
-		table.insert(byOrg[team], {name = pl.name, link = pl.link, points = tonumber(pl.points) or 0})
-	end)
-
-	local list = {}
-	for team, members in pairs(byOrg) do
-		table.sort(members, function(a, b) return a.points > b.points end)
-		local count = math.min(#members, MAX_PLAYERS_PER_ORG)
-		local topPoints = Array.map(Array.sub(members, 1, count), function(m) return m.points end)
-		table.insert(list, {
-			team = team,
-			members = members,
-			count = count,
-			avgPR = MathUtil.sum(topPoints) / count,
-		})
-	end
-
-	local teamEarnings, teamWinPages, tournamentDetails = gatherPlacementData(year)
-	Array.forEach(list, function(o)
-		o.matchKeys = buildMatchKeys(o.team)
-		o.cash = 0
-		for key in pairs(o.matchKeys) do
-			o.cash = o.cash + (teamEarnings[key] or 0)
-		end
-	end)
-
-	local n = #list
-	local function rankNormalize(getValue, field)
-		if n <= 1 then
-			Array.forEach(list, function(o) o[field] = 1 end)
-			return
-		end
-		local sorted = Table.copy(list)
-		table.sort(sorted, function(a, b) return getValue(a) < getValue(b) end)
-		local i = 1
-		while i <= n do
-			local j = i
-			while j < n and getValue(sorted[j + 1]) == getValue(sorted[i]) do j = j + 1 end
-			local norm = ((i + j) / 2 - 1) / (n - 1)
-			for k = i, j do sorted[k][field] = norm end
-			i = j + 1
-		end
-	end
-
-	rankNormalize(function(o) return o.count end, 'nCount')
-	rankNormalize(function(o) return o.avgPR end, 'nPR')
-	rankNormalize(function(o) return o.cash end, 'nCash')
-
-	Array.forEach(list, function(o)
-		o.score = 100 * (weights.count * o.nCount + weights.pr * o.nPR + weights.cash * o.nCash) / weightSum
-	end)
-
-	table.sort(list, function(a, b)
-		if a.score ~= b.score then return a.score > b.score end
-		return a.avgPR > b.avgPR
-	end)
-
-	if not wrapped then
-		storeOrgRankings(list)
-	end
-
-	local display = limit and Array.sub(list, 1, limit) or list
-
-	if not wrapped then
-		Array.forEach(display, function(o)
-			local achievements = {}
-			local seen = {}
-			for key in pairs(o.matchKeys) do
-				local pagesForTeam = teamWinPages[key]
-				if pagesForTeam then
-					for page in pairs(pagesForTeam) do
-						if not seen[page] then
-							seen[page] = true
-							local d = tournamentDetails[page] or {name = page:gsub('_', ' '), icon = '', icondark = ''}
-							table.insert(achievements, {page = page, name = d.name, icon = d.icon, icondark = d.icondark})
-						end
-					end
-				end
-			end
-			o.achievements = achievements
-		end)
-	end
-
-	resolveOrgFlags(display)
-
-	local columns = WidgetUtil.collect(
-		{align = 'center'},
-		{align = 'center'},
-		{align = 'left'},
-		{align = 'left'},
-		not wrapped and {align = 'center'} or nil,
-		{align = 'center'},
-		not wrapped and {align = 'center'} or nil,
-		not wrapped and {align = 'center'} or nil
-	)
-
-	local rows = Array.map(display, function(o, rank)
-		return buildRow(rank, o, wrapped)
-	end)
-
-	return TableWidgets.Table{
-		title = buildTitle(updated),
-		sortable = false,
-		columns = columns,
-		footer = showMore and buildFooter() or nil,
-		css = {width = '100%'},
-		children = {
-			TableWidgets.TableHeader{children = {buildHeader(wrapped, year)}},
-			TableWidgets.TableBody{children = rows},
-		},
-	}
 end
 
 return PowerRankingsOrgs
