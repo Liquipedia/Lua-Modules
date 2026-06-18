@@ -182,7 +182,7 @@ function PowerRankingsOrgs._fetchTeamFlags(teams)
 	end)
 end
 
----@param byTeam table<string, {players: FortniteRankingsPlayer[], team: string, earnings: number, achievements: string[]}>
+---@param byTeam table<string, FortniteRankingsTeam>
 ---@param historicalToTeam table<string, string>
 ---@param year integer
 ---@return {pageName: string, displayName: string, icon: string?, iconDark: string?}[]
