@@ -148,6 +148,10 @@ function PowerRankingsOrgs.main(frame)
 		return a.average > b.average
 	end)
 
+	Array.forEach(teams, function(team, rank)
+		team.rank = rank
+	end)
+
 	if not config.wrapped then
 		PowerRankingsOrgs._store(teams)
 	end
