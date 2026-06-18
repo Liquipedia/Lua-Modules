@@ -13,12 +13,14 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Lpdb = Lua.import('Module:Lpdb')
 local Math = Lua.import('Module:MathUtil')
 local Namespace = Lua.import('Module:Namespace')
+local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
+local PowerRankings = Lua.import('Module:PowerRankings')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
@@ -40,27 +42,6 @@ local PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on 
 local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = Info.config.defaultMaxPlayersPerPlacement or 10
 
 local CustomInjector = Class.new(Injector)
-
----@param team string
----@return string? score
----@return string? rank
-local function fetchPowerRanking(team)
-	local key = string.lower((team or ''):gsub('[%s_]', ''))
-	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionNode(ColumnName('type'), Comparator.eq, 'FTN_ORG_PR'),
-		ConditionNode(ColumnName('name'), Comparator.eq, key),
-	}
-	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		limit = 1,
-		order = 'date DESC',
-		conditions = conditions:toString(),
-		query = 'information, extradata',
-	})[1]
-	if not data then
-		return
-	end
-	return (data.extradata or {}).score, data.information
-end
 
 ---@param frame Frame
 ---@return VNode
@@ -84,10 +65,9 @@ function CustomInjector:parse(id, widgets)
 			children = {playerEarnings ~= 0 and ('$' .. mw.getContentLanguage():formatNum(Math.round(playerEarnings))) or nil}
 		})
 	elseif id == 'custom' then
-		local prScore, prRank = fetchPowerRanking(self.caller.pagename)
 		table.insert(widgets, Cell{
 			name = Link{link = 'Fortnite Power Rankings/Organizations', children = 'Fortnite Org PR'},
-			children = prScore and prRank and (prScore .. ' (Rank #' .. prRank .. ')') or nil
+			children = PowerRankings.queryForInfobox(Page.pageifyLink(self.caller.pagename), 'FTN_ORG_PR'),
 		})
 	end
 
