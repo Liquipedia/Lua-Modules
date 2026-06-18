@@ -1216,13 +1216,13 @@ div.brkts-popup-body-element-thumbs {
 			> .team-name-dynamic {
 				content: none;
 
-				@container block-team-name ( min-width: 15px ) and ( width < 110px ) {
+				@container block-team-name ( min-width: 15px ) and ( width < 100px ) {
 					&::before {
 						content: attr( data-team-shortname );
 					}
 				}
 
-				@container block-team-name ( min-width: 110px ) and ( width < 180px ) {
+				@container block-team-name ( min-width: 100px ) and ( width < 180px ) {
 					&::before {
 						content: attr( data-team-bracketname );
 					}
