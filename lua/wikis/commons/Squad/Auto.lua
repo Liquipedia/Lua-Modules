@@ -75,8 +75,8 @@ SquadAuto.TransferType = {
 ---@field faction string?
 
 ---@class SquadAutoPerson: SquadPersonArgs
----@field roleData RoleData?
----@field positionData RoleData?
+---@field roleData RoleData[]
+---@field positionData RoleData[]
 
 ---@enum TransferSide
 local Side = {
@@ -157,12 +157,11 @@ function SquadAuto:display(entries)
 		return
 	end
 
-	if self.config.status == SquadUtils.SquadStatus.FORMER
-		or self.config.status == SquadUtils.SquadStatus.FORMER_INACTIVE then
+	if self:_isStatus(SquadUtils.SquadStatus.FORMER) or self:_isStatus(SquadUtils.SquadStatus.FORMER_INACTIVE) then
 		return self:displayTabs(entries)
 	end
 
-	local useRankSort = self.config.status == SquadUtils.SquadStatus.ACTIVE
+	local useRankSort = self:_isStatus(SquadUtils.SquadStatus.ACTIVE)
 	entries = SquadAuto._sortEntries(entries, useRankSort)
 
 	return SquadCustom.runAuto(entries, self.config.status, self.config.type, self.config.title)
@@ -254,7 +253,7 @@ function SquadAuto:_readManualRowInput()
 		local link = Page.pageifyLink(person.link or person.id or person.name)
 		assert(link, 'Missing identifier or link for SquadAutoRow ' .. entry)
 
-		if self.config.type == SquadUtils.SquadType.STAFF and Logic.isNotEmpty(person.role) then
+		if self:_isStaffTable() and Logic.isNotEmpty(person.role) then
 			-- Only allow manual entries for STAFF (organization) tables
 			---@type SquadAutoPerson
 			local manualPerson = {
@@ -283,8 +282,8 @@ function SquadAuto:_readManualRowInput()
 				race = person.faction or person.race,
 
 				-- Used only by SquadAuto
-				roleData = RoleUtil.readRoleArgs(person.role)[1] or {},
-				positionData = RoleUtil.readRoleArgs(person.position)[1] or {}
+				roleData = RoleUtil.readRoleArgs(person.role),
+				positionData = RoleUtil.readRoleArgs(person.position)
 			}
 			table.insert(persons, manualPerson)
 		else
@@ -475,7 +474,7 @@ function SquadAuto:_selectEntries()
 		---@param entry SquadAutoPerson
 		---@return boolean
 		function(entry)
-			if self.config.status == SquadUtils.SquadStatus.INACTIVE then
+			if self:_isStatus(SquadUtils.SquadStatus.INACTIVE) then
 				-- For SquadStatus.INACTIVE the entries are already preselected
 				-- and won't have the role set to Inactive.
 				-- This also matches manual Squad, where status is inactive and role can e.g. be "On Loan"
@@ -483,17 +482,13 @@ function SquadAuto:_selectEntries()
 				return true
 			end
 
-			local roles = {entry.roleData, entry.positionData}
+			local roles = Array.extendWith(entry.roleData, entry.positionData)
 			local hasStaffRoles = Array.any(roles, function(role)
 				return role.type == RoleUtil.ROLE_TYPE.STAFF
 					or role.type == RoleUtil.ROLE_TYPE.UNKNOWN -- Unknown roles are assumed to be non-player
 			end)
 
-			if self.config.type == SquadUtils.SquadType.STAFF then
-				return hasStaffRoles
-			end
-
-			return not hasStaffRoles
+			return self:_isStaffTable() == hasStaffRoles
 		end
 	)
 end
@@ -508,7 +503,7 @@ end
 ---@return SquadAutoPerson[]
 function SquadAuto:_selectHistoryEntries(entries)
 	-- Select entries to match status
-	if self.config.status == SquadUtils.SquadStatus.ACTIVE then
+	if self:_isStatus(SquadUtils.SquadStatus.ACTIVE) then
 		-- Only most recent transfer is relevant
 		local last = entries[#entries]
 		if (last.type == SquadAuto.TransferType.CHANGE or last.type == SquadAuto.TransferType.JOIN)
@@ -518,15 +513,14 @@ function SquadAuto:_selectHistoryEntries(entries)
 		end
 	end
 
-	if self.config.status == SquadUtils.SquadStatus.INACTIVE then
+	if self:_isStatus(SquadUtils.SquadStatus.INACTIVE) then
 		local last, secondToLast = entries[#entries], entries[#entries - 1]
 		if secondToLast and last.type == SquadAuto.TransferType.CHANGE and last.toRole == ROLE_INACTIVE then
 			return {self:_mapToSquadPerson(secondToLast, last)}
 		end
 	end
 
-	if self.config.status == SquadUtils.SquadStatus.FORMER
-		or self.config.status == SquadUtils.SquadStatus.FORMER_INACTIVE then
+	if self:_isStatus(SquadUtils.SquadStatus.FORMER) or self:_isStatus(SquadUtils.SquadStatus.FORMER_INACTIVE) then
 		local history = {}
 
 		local joinEntry, inactiveEntry
@@ -687,12 +681,25 @@ end
 function SquadAuto._sortEntries(entries, useRankSort)
 	return Array.sortBy(entries, function (element)
 		return {
-			useRankSort and (element.positionData or {}).sortOrder or 0,
-			useRankSort and (element.roleData or {}).sortOrder or 0,
+			useRankSort and (element.positionData[1] or {}).sortOrder or 0,
+			useRankSort and (element.roleData[1] or {}).sortOrder or 0,
 			element.leavedate or element.joindate or '',
 			element.id
 		}
 	end)
+end
+
+---Whether the current table is for staff
+---@return boolean
+function SquadAuto:_isStaffTable()
+	return self.config.type == SquadUtils.SquadType.STAFF
+end
+
+---Whether the current table is for a specific status
+---@param status SquadStatus
+---@return boolean
+function SquadAuto:_isStatus(status)
+	return self.config.status == status
 end
 
 return SquadAuto
