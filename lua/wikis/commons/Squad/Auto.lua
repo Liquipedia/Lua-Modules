@@ -176,7 +176,7 @@ function SquadAuto:displayTabs(entries)
 		entries,
 		---@param entry SquadAutoPerson
 		function (entry)
-			assert(entry.leavedate, "Missing leavedate for " .. entry.id)
+			assert(entry.leavedate, "Missing leavedate for " .. (entry.id or entry.name))
 			return entry.leavedate:match('(%d%d%d%d)')
 		end
 	)
@@ -283,8 +283,8 @@ function SquadAuto:_readManualRowInput()
 				race = person.faction or person.race,
 
 				-- Used only by SquadAuto
-				roleData = RoleUtil.readRoleArgs(person.role),
-				positionData = RoleUtil.readRoleArgs(person.position)
+				roleData = RoleUtil.readRoleArgs(person.role)[1] or {},
+				positionData = RoleUtil.readRoleArgs(person.position)[1] or {}
 			}
 			table.insert(persons, manualPerson)
 		else
