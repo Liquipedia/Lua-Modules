@@ -2,10 +2,12 @@ $prizepool-badge-size: 1.5rem;
 $prizepool-accent-width: 0.25rem;
 
 :root {
-	// Placement badge / left-accent colours (light defaults)
-	--prizepool-place-1-accent: #f0b419;
-	--prizepool-place-2-accent: #58b5e3;
-	--prizepool-place-3-accent: #de7d1d;
+	// Placement badge / left-accent colours. Reuse the standard placement-box
+	// medal tokens (see Miscellaneous.scss `$placement-colors`) so the prize-pool
+	// top-3 badges match every other placement badge: gold / silver / bronze.
+	--prizepool-place-1-accent: var( --clr-semantic-gold-40 );
+	--prizepool-place-2-accent: var( --clr-semantic-silver-40 );
+	--prizepool-place-3-accent: var( --clr-semantic-bronze-40 );
 
 	// Subtle full-row tints (light defaults)
 	--prizepool-place-1-tint: #fff9eb;
@@ -14,9 +16,9 @@ $prizepool-accent-width: 0.25rem;
 }
 
 .theme--dark {
-	--prizepool-place-1-accent: #fbcb50;
-	--prizepool-place-2-accent: #91d7f9;
-	--prizepool-place-3-accent: #ffb267;
+	--prizepool-place-1-accent: var( --clr-semantic-gold-30 );
+	--prizepool-place-2-accent: var( --clr-semantic-silver-40 );
+	--prizepool-place-3-accent: var( --clr-semantic-bronze-30 );
 
 	--prizepool-place-1-tint: #353932;
 	--prizepool-place-2-tint: #243b4d;
