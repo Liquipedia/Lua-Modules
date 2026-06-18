@@ -38,7 +38,7 @@ local function getTitle(squadStatus, title, squadType)
 
 		defaultTitle = 'Former Squad'
 	elseif squadStatus ~= SquadUtils.SquadStatus.ACTIVE then
-		defaultTitle = SquadStatusToDisplay[squadStatus]  .. ' ' .. SquadTypeToDisplay[squadType]
+		defaultTitle = SquadStatusToDisplay[squadStatus] .. ' ' .. SquadTypeToDisplay[squadType]
 	end
 
 	local titleText = Logic.emptyOr(title, defaultTitle)
