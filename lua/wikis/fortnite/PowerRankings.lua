@@ -9,21 +9,30 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
 local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
-
+local Lpdb = Lua.import('Module:Lpdb')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
+local PowerRankingsData = Lua.import('Module:PowerRankings/Data', {loadData = true})
+
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
 
 local HtmlWidgets = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local PowerRankingsData = Lua.import('Module:PowerRankings/Data', {loadData = true})
+local PLAYER_DATAPOINT_TYPE = 'FTN_PR'
 
 local PowerRankings = {}
 
@@ -74,9 +83,10 @@ function PowerRankings.main(frame)
 		players = Array.sub(players, 1, limit)
 	end
 
-	local updated
+	local updated, updatedIso
 	if Logic.isNotEmpty(PowerRankingsData.updated) then
 		updated = PowerRankingsData.updated .. ' ' .. DateExt.defaultTimezone
+		updatedIso = DateExt.toYmdInUtc(PowerRankingsData.updated)
 	end
 
 	local rows = Array.map(players, function(entry)
@@ -85,15 +95,18 @@ function PowerRankings.main(frame)
 			pageName = Logic.nilIfEmpty(entry.link) or entry.name,
 		}
 		PlayerExt.syncPlayer(player)
-		local teamTemplate = PlayerExt.syncTeam(player.pageName)
+		local teamTemplate = PlayerExt.syncTeam(player.pageName, nil, {date = updatedIso})
+
+		PowerRankings._store(player, entry)
 
 		return TableWidgets.Row{children = {
 			TableWidgets.Cell{children = HtmlWidgets.B{children = entry.rank}},
-			TableWidgets.Cell{children = HtmlWidgets.B{children = entry.points}},
+			TableWidgets.Cell{children = HtmlWidgets.B{children = Currency.formatMoney(entry.points, 0)}},
 			TableWidgets.Cell{children = PlayerDisplay.BlockPlayer{player = player}},
 			TableWidgets.Cell{children = teamTemplate and OpponentDisplay.BlockOpponent{opponent = {
 				type = Opponent.team,
 				template = teamTemplate,
+				extradata = {},
 			}} or nil},
 		}}
 	end)
@@ -121,6 +134,45 @@ function PowerRankings.main(frame)
 			TableWidgets.TableBody{children = rows},
 		},
 	}
+end
+
+---@param player standardPlayer
+---@param entry {rank: integer, points: number}
+function PowerRankings._store(player, entry)
+	if Lpdb.isStorageDisabled() then return end
+	mw.ext.LiquipediaDB.lpdb_datapoint(PLAYER_DATAPOINT_TYPE .. '_' .. player.pageName, {
+		type = PLAYER_DATAPOINT_TYPE,
+		name = player.pageName,
+		information = entry.rank,
+		extradata = {score = entry.points},
+	})
+end
+
+---@param pageName string
+---@param datapointType string
+---@return string?
+function PowerRankings.queryForInfobox(pageName, datapointType)
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('type'), Comparator.eq, datapointType),
+		ConditionNode(ColumnName('name'), Comparator.eq, pageName),
+	}
+
+	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		limit = 1,
+		order = 'date DESC',
+		conditions = tostring(conditions),
+		query = 'information, extradata',
+	})[1]
+
+	if not data then return end
+
+	local points = data.extradata.score
+	local rank = data.information
+	if not points or not rank then return end
+
+	points = Currency.formatMoney(points, datapointType == PLAYER_DATAPOINT_TYPE and 0 or 1)
+
+	return points .. ' (Rank #' .. rank .. ')'
 end
 
 return PowerRankings
