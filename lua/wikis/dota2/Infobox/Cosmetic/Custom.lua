@@ -65,7 +65,7 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets,
 			Cell{
 				options = {columns = args.hero and 3 or 10, suppressColon = true},
-				name = args.hero and Template.expandTemplate(mw.getCurrentFrame(), 'Hero entry', {args.hero}) or ' ',
+				name = args.hero and Template.expandTemplate(mw.getCurrentFrame(), 'Hero entry', {args.hero, 'x'}) or ' ',
 				children = {
 					'<b>Rarity:</b> ' .. Template.safeExpand(mw.getCurrentFrame(), 'Raritylink', {args.rarity}),
 					args.slot and ('<b>Slot:</b> ' .. slotText) or nil,
