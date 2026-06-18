@@ -9,20 +9,19 @@ $prizepool-accent-width: 0.25rem;
 	--prizepool-place-2-accent: var( --clr-semantic-silver-40 );
 	--prizepool-place-3-accent: var( --clr-semantic-bronze-40 );
 
-	// Subtle full-row tints (light defaults)
-	--prizepool-place-1-tint: #fff9eb;
-	--prizepool-place-2-tint: #f0fcff;
-	--prizepool-place-3-tint: #fff3ec;
+	// Subtle full-row tints: the placement accent blended into the page surface so
+	// each top-3 row reads as a faint gold / silver / bronze wash. Defined once via
+	// the accent var + surface, so both the light/dark accents above and the
+	// surface flip through the cascade — no separate dark overrides needed.
+	--prizepool-place-1-tint: color-mix( in srgb, var( --prizepool-place-1-accent ) 15%, var( --clr-background ) );
+	--prizepool-place-2-tint: color-mix( in srgb, var( --prizepool-place-2-accent ) 15%, var( --clr-background ) );
+	--prizepool-place-3-tint: color-mix( in srgb, var( --prizepool-place-3-accent ) 15%, var( --clr-background ) );
 }
 
 .theme--dark {
 	--prizepool-place-1-accent: var( --clr-semantic-gold-30 );
 	--prizepool-place-2-accent: var( --clr-semantic-silver-40 );
 	--prizepool-place-3-accent: var( --clr-semantic-bronze-30 );
-
-	--prizepool-place-1-tint: #353932;
-	--prizepool-place-2-tint: #243b4d;
-	--prizepool-place-3-tint: #363535;
 }
 
 /*******************************************************************************
