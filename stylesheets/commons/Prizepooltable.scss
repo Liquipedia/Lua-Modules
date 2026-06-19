@@ -337,3 +337,40 @@ Author: iMarbot
 		}
 	}
 }
+
+/*******************************************************************************
+Template: Prize Pool Table
+*******************************************************************************/
+
+.prize-pool-table {
+	display: grid;
+	grid-template-columns: repeat( var( --prize-pool-columns ), auto );
+	overflow-x: auto;
+
+	&-row {
+		display: grid;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+		grid-template-rows: repeat( var( --prize-pool-row-height, 1 ), auto );
+
+		&.ppt-toggle-expand {
+			display: block;
+		}
+	}
+
+	&-cell {
+		display: flex;
+		grid-row: span var( --prize-pool-cell-height, 1 );
+
+		&.full-height {
+			grid-row: span var( --prize-pool-row-height, 1 );
+		}
+
+		&.prize-cell,
+		&.opponent-cell:has( > :nth-child( 2 ) ) {
+			display: grid;
+			grid-row: span var( --prize-pool-row-height, 1 );
+			grid-template-rows: subgrid;
+		}
+	}
+}

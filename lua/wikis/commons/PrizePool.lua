@@ -22,8 +22,8 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local Widgets = Lua.import('Module:Widget/All')
 local Div = Widgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-local TableRow = Widgets.TableRow
-local TableCell = Widgets.TableCell
+local PrizePoolRow = Lua.import('Module:Widget/PrizePool/Row')
+local PrizePoolCell = Lua.import('Module:Widget/PrizePool/Cell')
 
 ---@class PrizePool: BasePrizePool
 ---@operator call(...): PrizePool
@@ -54,12 +54,10 @@ end
 ---@param placement PrizePoolPlacement
 ---@return WidgetTableCell
 function PrizePool:placeOrAwardCell(placement)
-	local placeCell = TableCell{
+	local placeCell = PrizePoolCell{
 		children = {placement:getMedal() or '', NON_BREAKING_SPACE, placement:_displayPlace()},
-		css = {['font-weight'] = 'bolder'},
-		classes = {'prizepooltable-place'},
+		fullHeight = true,
 	}
-	placeCell.rowSpan = #placement.opponents
 
 	return placeCell
 end
@@ -110,7 +108,7 @@ function PrizePool:_toggleExpand(placeStart)
 	end
 
 	local text = 'place ' .. placeStart .. ' to ' .. placeEnd
-	local expandButton = TableCell{
+	local expandButton = PrizePoolCell{
 		children = Div{children = {
 			text,
 			'&nbsp;',
@@ -118,7 +116,7 @@ function PrizePool:_toggleExpand(placeStart)
 		}},
 		classes = {'general-collapsible-expand-button'},
 	}
-	local collapseButton = TableCell{
+	local collapseButton = PrizePoolCell{
 		children = Div{children = {
 			text,
 			'&nbsp;',
@@ -127,7 +125,7 @@ function PrizePool:_toggleExpand(placeStart)
 		classes = {'general-collapsible-collapse-button'},
 	}
 
-	return TableRow{classes = {'ppt-toggle-expand'}, children = {expandButton, collapseButton}}
+	return PrizePoolRow{classes = {'ppt-toggle-expand'}, children = {expandButton, collapseButton}}
 end
 
 -- get the lpdbObjectName depending on opponenttype
