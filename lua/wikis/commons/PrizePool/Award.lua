@@ -25,6 +25,7 @@ local TableCell = Widgets.TableCell
 
 --- @class AwardPrizePool: BasePrizePool
 --- @operator call(...): AwardPrizePool
+--- @field placements AwardPlacement[]
 local AwardPrizePool = Class.new(BasePrizePool)
 
 ---@param args table
