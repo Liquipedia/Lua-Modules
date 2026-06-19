@@ -24,7 +24,7 @@ function CustomMatchSummary.getByMatchId(props)
 	SummaryHelper.updateMatchOpponents(match)
 	local scoringData = SummaryHelper.createScoringData(match)
 
-	return HtmlWidgets.Fragment{children = {
+	return Html.Fragment{children = {
 		MatchSummaryWidgets.Header{matchId = match.matchId, games = match.games},
 		MatchSummaryWidgets.Tab{
 			matchId = match.matchId,
