@@ -435,6 +435,10 @@ local ICON_KEYS_TO_RENAME = {
 	tlpdkr = 'tlpd-wol-korea',
 	tlpdsospa = 'tlpd-sospa',
 	douyin_page = 'douyin',
+	wotidam = 'wotid',
+	wotidasia = 'wotid',
+	wotideu = 'wotid',
+	wotidcn = 'wotid',
 }
 
 local MATCH_ICONS = {
