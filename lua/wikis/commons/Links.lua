@@ -361,7 +361,7 @@ local PREFIXES = {
 	},
 	vod = {''},
 	weibo = {'https://weibo.com/'},
-	wotidna  = {'https://worldoftanks.com/community/accounts/'},
+	wotidam  = {'https://worldoftanks.com/community/accounts/'},
 	wotideu = {'https://worldoftanks.eu/community/accounts/'},
 	wotidasia = {'https://worldoftanks.asia/en/community/accounts/'},
 	wotidcn = {'https://wotgame.cn/community/accounts/'},
