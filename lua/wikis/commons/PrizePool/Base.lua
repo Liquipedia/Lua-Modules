@@ -623,8 +623,6 @@ function BasePrizePool:_buildRows()
 	local previousPlacement = nil
 
 	for _, placement in ipairs(self.placements) do
-		local previousOpponent = {}
-
 		if self:applyHideAfter(placement) then
 			break
 		end
@@ -644,47 +642,42 @@ function BasePrizePool:_buildRows()
 			}
 		}
 
-		local _, prizes = Array.groupBy(self.prizes, function (prize) return prize.type end)
-
-		for prizeType, v in Table.iter.spairs(
-			prizes,
-			function (_, a, b)
-				return self.prizeTypes[a].sortOrder < self.prizeTypes[b].sortOrder
-			end
-		) do
-			---@cast v BasePrizePoolPrize[]
-			local prizeTypeData = self.prizeTypes[prizeType]
-			local prizeDisplay = Array.map(placement.opponents, function (opponent)
-				---@type string[]
-				local rewards = Array.map(v, function (prize)
-					local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
-					return reward and prizeTypeData.rowDisplay(prize.data, reward) or nil
+		Array.forEach(
+			Array.groupAdjacentBy(self.prizes, function (prize) return prize.type end),
+			function (prizes)
+				local prizeTypeData = self.prizeTypes[prizes[1].type]
+				local prizeDisplay = Array.map(placement.opponents, function (opponent)
+					---@type string[]
+					local rewards = Array.map(prizes, function (prize)
+						local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
+						return reward and prizeTypeData.rowDisplay(prize.data, reward) or nil
+					end)
+					return rewards
 				end)
-				return rewards
-			end)
 
-			local children = {
-				PrizePoolCell{
-					height = 1,
-					children = Array.interleave(prizeDisplay[1], HtmlWidgets.Hr{})
-				}
-			}
-
-			for i = 2, #prizeDisplay do
-				if Table.deepEquals(prizeDisplay[i - 1], prizeDisplay[i]) then
-					children[#children].props.height = children[#children].props.height + 1
-				else
-					table.insert(children, PrizePoolCell{
+				local children = {
+					PrizePoolCell{
 						height = 1,
-						children = Array.interleave(prizeDisplay[i], HtmlWidgets.Hr{})
-					})
+						children = Array.interleave(prizeDisplay[1], HtmlWidgets.Hr{})
+					}
+				}
+
+				for i = 2, #prizeDisplay do
+					if Array.equals(prizeDisplay[i - 1], prizeDisplay[i]) then
+						children[#children].props.height = children[#children].props.height + 1
+					else
+						table.insert(children, PrizePoolCell{
+							height = 1,
+							children = Array.interleave(prizeDisplay[i], HtmlWidgets.Hr{})
+						})
+					end
 				end
+				table.insert(cells, PrizePoolCell{
+					classes = {'prize-cell'},
+					children = children
+				})
 			end
-			table.insert(cells, PrizePoolCell{
-				classes = {'prize-cell'},
-				children = children
-			})
-		end
+		)
 
 		local classes = {placement:getBackground()}
 		if self:applyCutAfter(placement) then
@@ -803,12 +796,6 @@ function BasePrizePool:_hasBaseCurrency()
 	end)) or (self.options.autoExchange and Array.any(self.prizes, function (prize)
 		return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
 	end))
-end
-
---- Creates an empty table cell
----@return WidgetPrizePoolCell
-function BasePrizePool._emptyCell()
-	return PrizePoolCell{children = {DASH}}
 end
 
 --- Remove all non-numeric characters from an input and changes it to a number.
