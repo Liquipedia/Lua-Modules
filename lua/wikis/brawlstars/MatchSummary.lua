@@ -1,4 +1,3 @@
----
 -- @Liquipedia
 -- page=Module:MatchSummary
 --
@@ -22,7 +21,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Widget
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', teamStyle = 'bracket'})
 end
@@ -30,17 +29,60 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return Widget[]
 function CustomMatchSummary.createBody(match)
-	local characterBansData = Array.map(match.games, function (game)
+
+	local characterBansData = {}
+
+	if match.games[1] then
+		local extradata = match.games[1].extradata or {}
+		local bans = extradata.bans or {}
+
+		if #((bans.global) or {}) > 0 then
+local global = bans.global or {}
+
+local left = {}
+local right = {}
+
+local split = math.ceil(#global / 2)
+
+for i, character in ipairs(global) do
+	if i <= split then
+		table.insert(left, character)
+	else
+		table.insert(right, character)
+	end
+end
+
+table.insert(characterBansData,{
+	left,
+	right,
+	label = 'Global Bans'
+})
+		end
+	end
+
+	Array.forEach(match.games, function(game)
 		local extradata = game.extradata or {}
 		local bans = extradata.bans or {}
-		return {bans.team1 or {}, bans.team2 or {}}
-	end)
 
+		table.insert(characterBansData, {
+			bans.team1 or {},
+			bans.team2 or {}
+		})
+	end)
+mw.logObject(characterBansData)
 	return WidgetUtil.collect(
 		Array.map(match.games, CustomMatchSummary._createMapRow),
-		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto)),
-		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
+
+		MatchSummaryWidgets.MapVeto(
+			MatchSummary.preProcessMapVeto(match.extradata.mapveto)
+		),
+
+		MatchSummaryWidgets.CharacterBanTable{
+			bans = characterBansData,
+			date = match.date
+		},
+
+		MatchSummaryWidgets.Mvp(match.extradata.mvp)
 	)
 end
 
