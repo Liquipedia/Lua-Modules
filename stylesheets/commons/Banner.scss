@@ -70,6 +70,10 @@
 			@include banner-background( "8/8f/Deadlock_mainpage_banner.png" );
 		}
 
+		.wiki-deltaforce & {
+			@include banner-background( "d/d2/Deltaforce-bg.webp" );
+		}
+
 		.wiki-dota2 & {
 			@include banner-background( "1/19/Bgdota2.jpg" );
 		}

@@ -19,7 +19,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -40,21 +40,21 @@ local CustomUnit = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomUnit.run(frame)
 	local unit = CustomUnit(frame)
 	unit.args.informationType = 'Card'
 	unit:setWidgetInjector(CustomInjector(unit))
 
-	return HtmlWidgets.Fragment{children = {
+	return Html.Fragment{children = {
 		unit:createInfobox(),
 		unit:_buildDescription(unit.args),
 	}}
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -106,9 +106,10 @@ end
 function CustomUnit:getWikiCategories(args)
 	local postfix = ' Cards'
 	local costType = self:getCostType()
+	local costDisplay = self:getCostDisplay()
 	return Array.append({},
 		'Cards',
-		'Cards costing ' .. self:getCostDisplay(),
+		costDisplay and ('Cards costing ' .. costDisplay) or nil,
 		(costType == TYPE_TO_COST_TYPE.default and 'Item' or '') .. postfix,
 		args.type and (args.type .. postfix) or nil,
 		args.color and (args.color .. postfix) or nil,
@@ -125,9 +126,12 @@ function CustomUnit:getCostType()
 	return TYPE_TO_COST_TYPE[(self.args.type or ''):lower()] or TYPE_TO_COST_TYPE.default
 end
 
----@return string
+---@return string?
 function CustomUnit:getCostDisplay()
 	local costType = self:getCostType()
+	if not self.args[costType] then
+		return
+	end
 	return self.args[costType] .. ' ' .. costType .. (costType ~= TYPE_TO_COST_TYPE.default and ' coins' or '')
 end
 
@@ -171,9 +175,9 @@ function CustomUnit:_buildDescription()
 		args.health and (args.health .. ' point' .. (tonumber(args.health) == 1 and '' or 's') .. ' of health') or nil
 	), ', ', ' and ')
 
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = WidgetUtil.collect(
-			HtmlWidgets.B{children = self.name},
+			Html.B{children = self.name},
 			' is a',
 			args.mana and (' ' .. args.mana .. '-mana cost') or nil,
 			args.gold and (' ' .. args.gold .. '-gold cost') or nil,

@@ -7,26 +7,24 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local ChevronToggle = Lua.import('Module:Widget/GeneralCollapsible/ChevronToggle')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
----@class ParticipantsTeamHeader: Widget
----@operator call(table): ParticipantsTeamHeader
-local ParticipantsTeamHeader = Class.new(Widget)
+local ParticipantsTeamHeader = {}
 
----@return Widget
-function ParticipantsTeamHeader:render()
-	local participant = self.props.participant
-	local labelDiv = self:_renderLabel(participant)
+---@param props {participant: TeamParticipant}
+---@return VNode
+function ParticipantsTeamHeader.render(props)
+	local participant = props.participant
+	local labelDiv = ParticipantsTeamHeader._renderLabel(participant)
 
 	local isTbdOpponent = Opponent.isTbd(participant.opponent)
 	local isQualificationTournament = participant.qualification and participant.qualification.type == 'tournament'
@@ -61,8 +59,6 @@ function ParticipantsTeamHeader:render()
 							opponent = participant.opponent,
 							teamStyle = 'bracket',
 							additionalClasses = opponentClasses,
-							image = participant.image,
-							imagedark = participant.imagedark,
 						}
 					}
 				},
@@ -73,8 +69,6 @@ function ParticipantsTeamHeader:render()
 							opponent = participant.opponent,
 							teamStyle = 'standard',
 							additionalClasses = opponentClasses,
-							image = participant.image,
-							imagedark = participant.imagedark,
 						}
 					}
 				}
@@ -100,8 +94,8 @@ end
 
 ---@private
 ---@param participant TeamParticipant
----@return Widget?
-function ParticipantsTeamHeader:_renderLabel(participant)
+---@return VNode?
+function ParticipantsTeamHeader._renderLabel(participant)
 	local labelText
 	local isTbd = Logic.isNotEmpty(participant.potentialQualifiers) or Opponent.isTbd(participant.opponent);
 	local qualificationData = participant.qualification
@@ -123,11 +117,11 @@ function ParticipantsTeamHeader:_renderLabel(participant)
 			isTbd and 'team-participant-card__label--tbd' or nil
 		},
 		children = {
-			HtmlWidgets.Span{
+			Html.Span{
 				children = { labelText }
 			}
 		}
 	}
 end
 
-return ParticipantsTeamHeader
+return Component.component(ParticipantsTeamHeader.render)

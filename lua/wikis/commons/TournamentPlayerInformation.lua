@@ -29,11 +29,12 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local Box = Lua.import('Module:Widget/Basic/Box')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local CopyToClipboard = Lua.import('Module:Widget/Basic/CopyToClipboard')
 local Dialog = Lua.import('Module:Widget/Basic/Dialog')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
@@ -50,7 +51,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class TournamentPlayerInfo
 ---@operator call(table): TournamentPlayerInfo
----@field config {opponenttype: OpponentType?}
+---@field config {opponenttype: OpponentType?, player: boolean, staff: boolean}
 ---@field tournament StandardTournament
 ---@field protected data EnrichedStandardPlayer[]
 local TournamentPlayerInfo = Class.new(function(self, ...) self:init(...) end)
@@ -72,7 +73,9 @@ end
 ---@return self
 function TournamentPlayerInfo:init(args)
 	self.config = {
-		opponenttype = Logic.nilIfEmpty(args.opponenttype)
+		opponenttype = Logic.nilIfEmpty(args.opponenttype),
+		player = Logic.nilOr(Logic.readBoolOrNil(args.player), true),
+		staff = Logic.readBool(args.staff),
 	}
 
 	local pageName = Logic.emptyOr(args.pagename, args.page)
@@ -122,7 +125,10 @@ function TournamentPlayerInfo:_parseRecords(records)
 	local players = Array.flatMap(records, function (record)
 		local opponent = Opponent.fromLpdbStruct(record)
 
-		return Array.map(opponent.players, function (player, playerIndex)
+		---@param player standardPlayer
+		---@param playerIndex integer
+		---@return EnrichedStandardPlayer
+		local function processPlayer(player, playerIndex)
 			player.extradata = player.extradata or {}
 			player.extradata.index = playerIndex
 			if opponent.type == Opponent.team then
@@ -130,7 +136,21 @@ function TournamentPlayerInfo:_parseRecords(records)
 			end
 
 			return Table.merge(self:queryPlayerInfo(player), {fromOpponentType = opponent.type})
-		end)
+		end
+
+		---@type EnrichedStandardPlayer[]
+		local players = {}
+
+		if self.config.player then
+			Array.extendWith(players, Array.map(opponent.players, processPlayer))
+		end
+		if self.config.staff then
+			local staff = Array.mapIndexes(function (index)
+				return Logic.nilIfEmpty(Opponent.staffFromLpdbStruct(record.opponentplayers, index))
+			end)
+			Array.extendWith(players, Array.map(staff, processPlayer))
+		end
+		return players
 	end)
 
 	-- sort by displayName if we have no team opponents
@@ -148,6 +168,11 @@ function TournamentPlayerInfo:_parseRecords(records)
 			return Logic.isEmpty(a.team)
 		elseif a.team ~= b.team then
 			return a.team < b.team
+		end
+		local aType = (a.extradata or {}).type or 'player'
+		local bType = (a.extradata or {}).type or 'player'
+		if aType ~= bType then
+			return aType < bType
 		end
 		-- TODO: sort by role when it becomes available in queried placement data
 		return a.extradata.index < b.extradata.index
@@ -220,10 +245,14 @@ end
 
 ---@return Widget
 function TournamentPlayerInfo:build()
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+	return Html.Fragment{children = WidgetUtil.collect(
 		self:buildIntro(),
-		self:buildOverallAgeTable(),
-		self:buildTeamAgeTable(),
+		Box{
+			children = WidgetUtil.collect(
+				self:buildOverallAgeTable(),
+				self:buildTeamAgeTable()
+			)
+		},
 		self:buildPlayersTable()
 	)}
 end
@@ -257,16 +286,6 @@ function TournamentPlayerInfo:buildIntro()
 	}
 end
 
----@param props table
----@return Widget
-local function createTemplateBox(props)
-	return Div{
-		classes = Array.extend('template-box', props.classes),
-		css = {['padding-right'] = props.padding},
-		children = props.children
-	}
-end
-
 ---@private
 ---@param ageInSeconds integer?
 ---@return string
@@ -296,24 +315,21 @@ function TournamentPlayerInfo:buildOverallAgeTable()
 	if not overallData then
 		return
 	end
-	return createTemplateBox{
-		padding = '2em',
-		children = TableWidgets.Table{
-			css = {margin = '1em 0'},
-			children = {
-				TableWidgets.TableHeader{children = TableWidgets.Row{
-					children = {
-						TableWidgets.CellHeader{children = 'Average Age'},
-						TableWidgets.CellHeader{children = 'Youngest'},
-						TableWidgets.CellHeader{children = 'Oldest'},
-					}
-				}},
-				TableWidgets.TableBody{children = TableWidgets.Row{children = {
-					TableWidgets.Cell{children = self:_formatAge(overallData.averageAge)},
-					TableWidgets.Cell{children = self:_displayPlayerWithAge(overallData.youngest)},
-					TableWidgets.Cell{children = self:_displayPlayerWithAge(overallData.oldest)},
-				}}}
-			}
+	return TableWidgets.Table{
+		css = {margin = '1em 0'},
+		children = {
+			TableWidgets.TableHeader{children = TableWidgets.Row{
+				children = {
+					TableWidgets.CellHeader{children = 'Average Age'},
+					TableWidgets.CellHeader{children = 'Youngest'},
+					TableWidgets.CellHeader{children = 'Oldest'},
+				}
+			}},
+			TableWidgets.TableBody{children = TableWidgets.Row{children = {
+				TableWidgets.Cell{children = self:_formatAge(overallData.averageAge)},
+				TableWidgets.Cell{children = self:_displayPlayerWithAge(overallData.youngest)},
+				TableWidgets.Cell{children = self:_displayPlayerWithAge(overallData.oldest)},
+			}}}
 		}
 	}
 end
@@ -348,7 +364,7 @@ function TournamentPlayerInfo:buildTeamAgeTable()
 		}})
 	end
 
-	return createTemplateBox{children = TableWidgets.Table{
+	return TableWidgets.Table{
 		tableClasses = {'prizepooltable', 'collapsed'},
 		tableAttributes = {
 			['data-cutafter'] = 3,
@@ -356,7 +372,7 @@ function TournamentPlayerInfo:buildTeamAgeTable()
 			['data-closetext'] = '4 to ' .. #teamTableRows
 		},
 		css = {
-			margin =  '1em 0',
+			margin = '1em 0',
 		},
 		children = WidgetUtil.collect(
 			TableWidgets.TableHeader{
@@ -369,7 +385,7 @@ function TournamentPlayerInfo:buildTeamAgeTable()
 			},
 			TableWidgets.TableBody{children = teamTableRows}
 		)
-	}}
+	}
 end
 
 ---@protected
@@ -451,7 +467,7 @@ function TournamentPlayerInfo:buildPlayerRow(player)
 			},
 			children = WidgetUtil.collect(
 				Link{link = player.pageName, children = player.displayName},
-				Logic.isNotEmpty(player.name) and HtmlWidgets.Span{
+				Logic.isNotEmpty(player.name) and Html.Span{
 					css = {
 						display = 'block',
 						['font-size'] = 'small',
@@ -465,7 +481,7 @@ function TournamentPlayerInfo:buildPlayerRow(player)
 			trigger = Button{
 				children = {
 					'Show',
-					HtmlWidgets.Span{
+					Html.Span{
 						classes = {'mobile-hide'},
 						children = ' photo'
 					}

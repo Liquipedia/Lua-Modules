@@ -28,8 +28,8 @@ local zeroWidthSpace = '&#8203;'
 ---@class OpponentDisplay
 local OpponentDisplay = {propTypes = {}, types = {}}
 
-OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid', 'icon')
----@alias teamStyle 'standard'|'short'|'bracket'|'hybrid'|'icon'
+OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid', 'icon', 'dynamic')
+---@alias teamStyle 'standard'|'short'|'bracket'|'hybrid'|'icon'|'dynamic'
 
 ---Display component for an opponent entry appearing in a bracket match.
 ---@class BracketOpponentEntry
@@ -65,11 +65,11 @@ function OpponentDisplay.BracketOpponentEntry:createTeam(template, options)
 	options = options or {}
 	local forceShortName = options.forceShortName
 
-	local opponentNode = OpponentDisplay.BlockTeamContainer({
+	local opponentNode = OpponentDisplay.BlockTeamContainer{
 		showLink = false,
-		style = forceShortName and 'short' or 'hybrid',
+		style = forceShortName and 'short' or 'dynamic',
 		template = template,
-	})
+	}
 
 	self.content:node(opponentNode)
 end
@@ -147,11 +147,11 @@ function OpponentDisplay.InlineOpponent(props)
 		if props.showTbd == false and Opponent.isTbd(opponent) then
 			return mw.html.create()
 		end
-		opponentNode = OpponentDisplay.InlineTeamContainer({
+		opponentNode = OpponentDisplay.InlineTeamContainer{
 			flip = props.flip,
 			style = props.teamStyle,
 			template = opponent.template or 'tbd',
-		})
+		}
 	elseif opponent.type == Opponent.literal then
 		opponentNode = opponent.name or ''
 	elseif Opponent.typeIsParty(opponent.type) then
@@ -196,15 +196,13 @@ end
 ---@field showFaction boolean?
 ---@field showTbd boolean?
 ---@field additionalClasses string[]?
----@field image string?
----@field imagedark string?
 
 --[[
 Displays an opponent as a block element. The width of the component is
 determined by its layout context, and not of the opponent.
 ]]
 ---@param props BlockOpponentProps
----@return Widget
+---@return Renderable
 function OpponentDisplay.BlockOpponent(props)
 	local opponent = props.opponent
 	opponent.extradata = opponent.extradata or {}
@@ -215,7 +213,7 @@ function OpponentDisplay.BlockOpponent(props)
 		if props.showTbd == false and Opponent.isTbd(opponent) then
 			return HtmlWidgets.Fragment{}
 		end
-		return OpponentDisplay.BlockTeamContainer({
+		return OpponentDisplay.BlockTeamContainer{
 			flip = props.flip,
 			overflow = props.overflow,
 			showLink = showLink,
@@ -223,16 +221,14 @@ function OpponentDisplay.BlockOpponent(props)
 			template = opponent.template or 'tbd',
 			additionalClasses = props.additionalClasses,
 			note = props.note,
-			image = props.image,
-			imagedark = props.imagedark,
-		})
+		}
 	elseif opponent.type == Opponent.literal then
-		return OpponentDisplay.BlockLiteral({
+		return OpponentDisplay.BlockLiteral{
 			flip = props.flip,
 			name = opponent.name or '',
 			overflow = props.overflow,
 			additionalClasses = props.additionalClasses
-		})
+		}
 	elseif Opponent.typeIsParty(opponent.type) then
 		return OpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
 	else
@@ -268,10 +264,11 @@ end
 
 ---Displays a team as an inline element. The team is specified by a template.
 ---@param props {flip: boolean?, template: string, date: number|string?, style: teamStyle?}
----@return Widget?
+---@return VNode
 function OpponentDisplay.InlineTeamContainer(props)
 	local style = props.style or 'standard'
 	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
+	assert(style ~= 'dynamic', 'style=dynamic is not supported inline')
 	assert(style ~= 'bracket' or not props.flip, 'Flipped style=bracket is not supported')
 	return TeamInline{name = props.template, date = props.date, flip = props.flip, displayType = style}
 end
@@ -281,9 +278,8 @@ Displays a team as a block element. The width of the component is determined by
 its layout context, and not of the team name. The team is specified by template.
 ]]
 ---@param props {flip: boolean?, overflow: OverflowModes?, showLink: boolean?,
----style: teamStyle?, template: string, additionalClasses: string[]?, note: string|number?,
----image: string?, imagedark: string?}
----@return Widget
+---style: teamStyle?, template: string, additionalClasses: string[]?, note: string|number?}
+---@return VNode
 function OpponentDisplay.BlockTeamContainer(props)
 	local style = props.style or 'standard'
 	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
@@ -295,8 +291,6 @@ function OpponentDisplay.BlockTeamContainer(props)
 		noLink = not props.showLink,
 		additionalClasses = props.additionalClasses,
 		note = props.note,
-		image = props.image,
-		imagedark = props.imagedark,
 	}
 end
 

@@ -8,33 +8,31 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local HtmlWidgets = Lua.import('Module:Widget/Html')
 local Button = Lua.import('Module:Widget/Basic/Button')
 
----@class RoundSelectorWidget: Widget
----@operator call(table): RoundSelectorWidget
-local RoundSelectorWidget = Class.new(Widget)
+---@private
+---@return string
+local function finalRoundTitle(hasEnded, rounds)
+	if not hasEnded then
+		return 'Current'
+	else
+		return 'Round ' .. tostring(rounds)
+	end
+end
 
----@return Widget?
-function RoundSelectorWidget:render()
-	if not self.props.rounds or self.props.rounds <= 1 then
+---@param props {rounds: integer?, hasEnded: boolean?}
+---@return Renderable?
+local function RoundSelectorWidget(props)
+	if not props.rounds or props.rounds <= 1 then
 		return
 	end
 
-	local function finalRoundTitle()
-		if not self.props.hasEnded then
-			return 'Current'
-		else
-			return 'Round ' .. tostring(self.props.rounds)
-		end
-	end
-
-	local roundTitles = Array.map(Array.range(1, self.props.rounds), function (round)
-		if round == self.props.rounds then
-			return finalRoundTitle()
+	local roundTitles = Array.mapRange(1, props.rounds, function (round)
+		if round == props.rounds then
+			return finalRoundTitle(props.hasEnded, props.rounds)
 		else
 			return 'Round ' .. round
 		end
@@ -55,7 +53,7 @@ function RoundSelectorWidget:render()
 		css = {float = 'left'},
 		children = {
 			Button{
-				children = finalRoundTitle(),
+				children = finalRoundTitle(props.hasEnded, props.rounds),
 				variant = 'primary',
 				size = 'sm',
 				classes = {'dropdown-box-button'},
@@ -69,4 +67,4 @@ function RoundSelectorWidget:render()
 	}
 end
 
-return RoundSelectorWidget
+return Component.component(RoundSelectorWidget)

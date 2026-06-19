@@ -51,7 +51,7 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
----@return Widget?
+---@return VNode?
 function CustomTeam:createBottomContent()
 	if not self.args.disbanded then
 		return UpcomingTournaments.team{name = self.teamTemplate.templatename}

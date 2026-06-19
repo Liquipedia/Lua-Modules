@@ -18,6 +18,7 @@ local GameCenter = Lua.import('Module:Widget/Match/Summary/GameCenter')
 local GameWinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLossIndicator')
 
 ---@class MatchSummaryGameRowProps
+---@field allowWrappingInOverview boolean?
 ---@field css table<string, string|number>?
 ---@field game MatchGroupUtilGame
 ---@field gameIndex integer
@@ -41,9 +42,20 @@ function MatchSummaryGameRow:render()
 			HtmlWidgets.Div{
 				classes = {'brkts-popup-body-grid-row-detail'},
 				children = {
-					GameCenter{children = self:createGameOpponentView(1)},
-					GameCenter{children = self:createGameOverview()},
-					GameCenter{children = self:createGameOpponentView(2)}
+					GameCenter{
+						css = self:getGameOpponentViewCss(1),
+						children = self:createGameOpponentView(1)
+					},
+					GameCenter{
+						css = self.props.allowWrappingInOverview and {
+							['white-space'] = 'wrap',
+						} or nil,
+						children = self:createGameOverview()
+					},
+					GameCenter{
+						css = self:getGameOpponentViewCss(2),
+						children = self:createGameOpponentView(2)
+					}
 				},
 			},
 			GameWinLossIndicator{
@@ -53,6 +65,13 @@ function MatchSummaryGameRow:render()
 			self:_renderGameComment()
 		},
 	}
+end
+
+---@protected
+---@param opponentIndex integer
+---@return table<string, string|number>?
+function MatchSummaryGameRow:getGameOpponentViewCss(opponentIndex)
+	return
 end
 
 ---@protected

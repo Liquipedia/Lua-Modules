@@ -257,12 +257,15 @@ MatchPage
 MatchSection
 NavBox
 NavBoxChild
+Next_match
 Opponent
+OpponentPlayer
 Patches_calendar
 Patches_list
 Person
 Persons
 Placement
+PlayerSubstitutions
 QuadOpponent
 Qualification
 Round
@@ -275,6 +278,9 @@ SoloPrizePool
 Stage
 StageWinnings
 Streams
+Substitution
+SubstitutionReference
+SubstitutionReferences
 SwissStandings
 Tabs_dynamic
 Tabs_static

@@ -13,10 +13,10 @@ local Logic = Lua.import('Module:Logic')
 local Variables = Lua.import('Module:Variables')
 local VersionDisplay = Lua.import('Infobox/Extension/VersionDisplay')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Item = Lua.import('Module:Infobox/Item')
 
-local Widgets = Lua.import('Module:Infobox/Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class FortniteItemInfobox: ItemInfobox
@@ -26,7 +26,7 @@ local CustomItem = Class.new(Item)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomItem.run(frame)
 	local item = CustomItem(frame)
 	local args = item.args
@@ -40,8 +40,8 @@ function CustomItem.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'released' then
@@ -57,7 +57,7 @@ end
 ---@private
 function CustomItem:_createDescription()
 	local rarities = self:getAllArgsForBase(self.args, 'rarity')
-	local description = '<b>' .. self.name .. '</b> is an item that is available in  '
+	local description = '<b>' .. self.name .. '</b> is an item that is available in '
 		.. mw.text.listToText(rarities, ', ', ' and ')
 		.. ' ' .. (#rarities > 1 and 'rarities' or 'rarity')
 

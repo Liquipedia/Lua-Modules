@@ -51,7 +51,8 @@ return {
 		defaultMaxPlayersPerPlacement = 12,
 		infoboxPlayer = {
 			automatedHistory = {
-				mode = 'manual',
+				mode = 'manualPrio',
+				storeFromWikiCode = true,
 			},
 		},
 		participants = {

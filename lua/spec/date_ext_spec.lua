@@ -68,12 +68,12 @@ describe('Date', function()
 
 	describe('parse iso date', function()
 		it('verify', function()
-			assert.are_same({year = 2023, month = 7, day = 24}, DateExt.parseIsoDate('2023-07-24'))
-			assert.are_same({year = 2023, month = 7, day = 24},
+			assert.are_same({year = 2023, month = 7, day = 24, hour = 0}, DateExt.parseIsoDate('2023-07-24'))
+			assert.are_same({year = 2023, month = 7, day = 24, hour = 0},
 				DateExt.parseIsoDate('2023-07-24asdkosdkmoasjoikmakmslkm'))
-			assert.are_same({year = 2023, month = 7, day = 1}, DateExt.parseIsoDate('2023-07'))
-			assert.are_same({year = 2023, month = 7, day = 1}, DateExt.parseIsoDate('2023-07sdfsdfdfs'))
-			assert.are_same({year = 2023, month = 1, day = 1}, DateExt.parseIsoDate('2023'))
+			assert.are_same({year = 2023, month = 7, day = 1, hour = 0}, DateExt.parseIsoDate('2023-07'))
+			assert.are_same({year = 2023, month = 7, day = 1, hour = 0}, DateExt.parseIsoDate('2023-07sdfsdfdfs'))
+			assert.are_same({year = 2023, month = 1, day = 1, hour = 0}, DateExt.parseIsoDate('2023'))
 			assert.is_nil(DateExt.parseIsoDate())
 		end)
 	end)
