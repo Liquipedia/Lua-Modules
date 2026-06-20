@@ -121,6 +121,7 @@ function AwardPlacement:_getLpdbData(...)
 end
 
 -- No BG for awards
+---@return string?
 function AwardPlacement:getBackground()
 	return
 end

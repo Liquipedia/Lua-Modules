@@ -242,4 +242,9 @@ function BasePlacement._isValidDateFormat(date)
 	return date:match('%d%d%d%d%-%d%d%-%d%d') and true or false
 end
 
+---@return string?
+function BasePlacement:getBackground()
+	error('BasePlacement:getBackground() cannot be called directly and must be overridden.')
+end
+
 return BasePlacement
