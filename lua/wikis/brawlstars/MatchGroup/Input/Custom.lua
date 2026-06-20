@@ -44,7 +44,7 @@ local CustomMatchGroupInput = {}
 
 ---@param obj table #match or game
 ---@param numberOfOpponents integer
----@return {string[], string[]}
+---@return table
 local getBans = function(obj, numberOfOpponents)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, BrawlerNames)
 

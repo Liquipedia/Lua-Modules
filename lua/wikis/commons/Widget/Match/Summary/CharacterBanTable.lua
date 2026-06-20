@@ -70,7 +70,7 @@ local function MatchSummaryCharacterBanTable(props)
 						classes = hasStartIndicator and {'brkts-popup-veto-row-indicator'} or nil,
 						children = WidgetUtil.collect(
 							hasStartIndicator and startIndicator(1, banData.start) or nil,
-							banData.label or 'Game&nbsp;' .. gameNumber,
+							banData.label or ('Game&nbsp;' .. gameNumber),
 							hasStartIndicator and startIndicator(2, banData.start) or nil
 						)
 					},
