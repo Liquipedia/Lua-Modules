@@ -247,4 +247,9 @@ function BasePlacement:getBackground()
 	error('BasePlacement:getBackground() cannot be called directly and must be overridden.')
 end
 
+---@return number?
+function BasePlacement:getPlacement()
+	return
+end
+
 return BasePlacement

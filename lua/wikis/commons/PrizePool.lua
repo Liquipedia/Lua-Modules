@@ -19,10 +19,9 @@ local Placement = Lua.import('Module:PrizePool/Placement')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
-local Widgets = Lua.import('Module:Widget/All')
-local Div = Widgets.Div
-local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-local PrizePoolRow = Lua.import('Module:Widget/PrizePool/Row')
+local ChevronToggle = Lua.import('Module:Widget/GeneralCollapsible/ChevronToggle')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local PrizePoolCell = Lua.import('Module:Widget/PrizePool/Cell')
 
 ---@class PrizePool: BasePrizePool
@@ -77,24 +76,14 @@ function PrizePool:applyCutAfter(placement)
 	return false
 end
 
----@param placement PrizePoolPlacement?
----@param nextPlacement PrizePoolPlacement
----@param rows WidgetTableRow[]
-function PrizePool:applyToggleExpand(placement, nextPlacement, rows)
-	if placement ~= nil
-		and placement.placeStart <= self.options.cutafter
-		and placement.placeEnd >= self.options.cutafter
-		and placement ~= self.placements[#self.placements]
-		and nextPlacement.placeStart ~= placement.placeStart
-		and nextPlacement.placeEnd ~= placement.placeEnd then
-
-		table.insert(rows, self:_toggleExpand(placement.placeEnd + 1))
+---@return VNode?
+function PrizePool:getCollapsibleToggle()
+	local placeStart = Array.find(self.placements, function (placement)
+		return placement.placeStart > self.options.cutafter
+	end)
+	if not placeStart then
+		return
 	end
-end
-
----@param placeStart number
----@return WidgetTableRow
-function PrizePool:_toggleExpand(placeStart)
 	local placeEnd = self.placements[#self.placements].placeEnd
 
 	if self.options.hideafter < math.huge then
@@ -107,25 +96,16 @@ function PrizePool:_toggleExpand(placeStart)
 		placeEnd = lastCut.placeEnd
 	end
 
-	local text = 'place ' .. placeStart .. ' to ' .. placeEnd
-	local expandButton = PrizePoolCell{
-		children = Div{children = {
-			text,
-			'&nbsp;',
-			IconFa{iconName = 'expand'},
-		}},
-		classes = {'general-collapsible-expand-button'},
-	}
-	local collapseButton = PrizePoolCell{
-		children = Div{children = {
-			text,
-			'&nbsp;',
-			IconFa{iconName = 'collapse'},
-		}},
-		classes = {'general-collapsible-collapse-button'},
-	}
+	local text = 'place ' .. placeStart.placeStart .. ' to ' .. placeEnd
 
-	return PrizePoolRow{classes = {'ppt-toggle-expand'}, children = {expandButton, collapseButton}}
+	return Div{
+		classes = {'prize-pool-toggle'},
+		attributes = {['data-collapsible-click-region'] = 'true'},
+		children = {
+			text,
+			ChevronToggle{}
+		}
+	}
 end
 
 -- get the lpdbObjectName depending on opponenttype

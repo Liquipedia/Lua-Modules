@@ -346,21 +346,124 @@ Template: Prize Pool Table
 	display: grid;
 	grid-template-columns: repeat( var( --prize-pool-columns ), auto );
 	overflow-x: auto;
+	border-radius: 0.5rem;
+	border: 1px solid var( --clr-on-surface-light-primary-12 );
+	background-color: var( --clr-background, #ffffff );
+	color: var( --clr-secondary-16 );
+	color-scheme: light;
+
+	.theme--dark & {
+		background-color: var( --clr-background, #121212 );
+		border-color: var( --clr-on-surface-dark-primary-12 );
+		color: var( --clr-secondary-100 );
+		color-scheme: dark;
+	}
+
+	&-body {
+		display: grid;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+
+		> .prize-pool-toggle {
+			display: flex;
+			grid-column: 1 / -1;
+			padding: 0.5rem 0.75rem;
+			place-self: center;
+			width: 100%;
+			justify-content: center;
+
+			.general-collapsible-default-toggle {
+				min-width: unset;
+
+				.general-collapsible-expand-button,
+				.general-collapsible-expand-button:visited,
+				.general-collapsible-collapse-button,
+				.general-collapsible-collapse-button:visited {
+					outline: unset;
+					color: var( --clr-secondary-7 );
+
+					.theme--dark & {
+						color: var( --clr-secondary-90 );
+					}
+				}
+			}
+		}
+
+		&:not( .collapsed ) > .should-collapse {
+			display: contents;
+		}
+	}
 
 	&-row {
 		display: grid;
 		grid-column: 1 / -1;
 		grid-template-columns: subgrid;
 		grid-template-rows: repeat( var( --prize-pool-row-height, 1 ), auto );
+		background-color: var( --clr-on-surface-light-primary-4 );
 
-		&.ppt-toggle-expand {
-			display: block;
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+		}
+
+		&:nth-of-type( even ):not( [ data-placement ] ) {
+			background-color: var( --clr-on-surface-light-primary-8 );
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-8 );
+			}
+		}
+
+		&[ data-placement ] {
+			border-left: 0.25rem solid var( --prize-pool-placement-color, transparent );
+			background-color: var( --prize-pool-placement-background-color );
+		}
+
+		&[ data-placement="1" ] {
+			--prize-pool-placement-color: #f0b419;
+			--prize-pool-placement-background-color: #fff9eb;
+
+			.theme--dark & {
+				--prize-pool-placement-color: #fbcb50;
+				--prize-pool-placement-background-color: hsl( from var( --prize-pool-placement-color ) h s l / 0.16 );
+			}
+		}
+
+		&[ data-placement="2" ] {
+			--prize-pool-placement-color: #58b5e3;
+			--prize-pool-placement-background-color: #f0fcff;
+
+			.theme--dark & {
+				--prize-pool-placement-color: #91d7f9;
+				--prize-pool-placement-background-color: hsl( from var( --prize-pool-placement-color ) h s l / 0.16 );
+			}
+		}
+
+		&[ data-placement="3" ] {
+			--prize-pool-placement-color: #de7d1d;
+			--prize-pool-placement-background-color: #fff3ec;
+
+			.theme--dark & {
+				--prize-pool-placement-color: #ffb267;
+				--prize-pool-placement-background-color: hsl( from var( --prize-pool-placement-color ) h s l / 0.16 );
+			}
+		}
+	}
+
+	> &-row {
+		background-color: var( --clr-on-surface-light-primary-4 );
+		color: var( --clr-secondary-25 );
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+			color: var( --clr-secondary-80 );
 		}
 	}
 
 	&-cell {
 		display: flex;
 		grid-row: span var( --prize-pool-cell-height, 1 );
+		padding: 0.5rem 0.75rem;
+		align-items: center;
 
 		&.full-height {
 			grid-row: span var( --prize-pool-row-height, 1 );
@@ -370,6 +473,7 @@ Template: Prize Pool Table
 		&.opponent-cell:has( > :nth-child( 2 ) ) {
 			display: grid;
 			grid-row: span var( --prize-pool-row-height, 1 );
+			row-gap: 0.5rem;
 			grid-template-rows: subgrid;
 		}
 	}

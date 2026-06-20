@@ -323,15 +323,9 @@ function Placement:_displayPlace()
 	return start
 end
 
----@return string?
-function Placement:getBackground()
-	for statusName, status in pairs(Placement.specialStatuses) do
-		if status.active(self.args) then
-			return PlacementInfo.getBgClass{placement = statusName:lower()}
-		end
-	end
-
-	return PlacementInfo.getBgClass{placement = self.placeStart}
+---@return number?
+function Placement:getPlacement()
+	return self.placeStart
 end
 
 ---@return string?

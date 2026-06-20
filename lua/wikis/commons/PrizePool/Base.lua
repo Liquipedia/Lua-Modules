@@ -587,16 +587,22 @@ end
 function BasePrizePool:_buildTable(isAward)
 	local headerRow = self:_buildHeader(isAward)
 
+	local rows, collapsedRows = self:_buildRows()
+
 	return Div{
 		css = {['overflow-x'] = 'auto'},
 		children = PrizePoolTable{
-			children = WidgetUtil.collect(headerRow, unpack(self:_buildRows()))
+			prizeTypes = #self.prizes,
+			header = headerRow,
+			toggle = self:getCollapsibleToggle(),
+			displayedRows = rows,
+			collapsedRows = collapsedRows,
 		},
 	}
 end
 
 ---@param isAward boolean?
----@return WidgetTableRow
+---@return VNode
 function BasePrizePool:_buildHeader(isAward)
 	local children = {}
 
@@ -617,17 +623,15 @@ function BasePrizePool:_buildHeader(isAward)
 	return PrizePoolRow{classes = {'prizepooltable-header'}, css = {['font-weight'] = 'bold'}, children = children}
 end
 
----@return WidgetTableRow[]
+---@return VNode[], VNode[]
 function BasePrizePool:_buildRows()
 	local rows = {}
-	local previousPlacement = nil
+	local collapsedRows = {}
 
 	for _, placement in ipairs(self.placements) do
 		if self:applyHideAfter(placement) then
 			break
 		end
-
-		self:applyToggleExpand(previousPlacement, placement, rows)
 
 		local cells = {
 			self:placeOrAwardCell(placement),
@@ -679,22 +683,25 @@ function BasePrizePool:_buildRows()
 			end
 		)
 
-		local classes = {placement:getBackground()}
+		local row = PrizePoolRow{
+			height = #placement.opponents,
+			children = cells,
+			placement = placement:getPlacement()
+		}
+
 		if self:applyCutAfter(placement) then
-			table.insert(classes, 'ppt-hide-on-collapse')
+			table.insert(collapsedRows, row)
+		else
+			table.insert(rows, row)
 		end
-		local row = PrizePoolRow{height = #placement.opponents, children = cells, classes = classes}
-
-		table.insert(rows, row)
-
-		previousPlacement = placement
 	end
 
-	return rows
+	return rows, collapsedRows
 end
 
 ---@protected
 ---@param placement BasePlacement
+---@return Renderable
 function BasePrizePool:placeOrAwardCell(placement)
 	error('Function placeOrAwardCell needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
@@ -714,11 +721,9 @@ function BasePrizePool:applyCutAfter(placement)
 end
 
 ---@protected
----@param placement BasePlacement?
----@param nextPlacement BasePlacement
----@param row WidgetTableRow
-function BasePrizePool:applyToggleExpand(placement, nextPlacement, row)
-	error('Function applyToggleExpand needs to be implemented by a child class of "Module:PrizePool/Base"')
+---@return Renderable?
+function BasePrizePool:getCollapsibleToggle()
+	error('BasePrizePool:getCollapsibleToggle() cannot be called directly and must be overridden.')
 end
 
 ---@return string
