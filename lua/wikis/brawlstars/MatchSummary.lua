@@ -21,7 +21,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Html
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', teamStyle = 'bracket'})
 end
