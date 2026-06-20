@@ -1,3 +1,4 @@
+---
 -- @Liquipedia
 -- page=Module:MatchSummary
 --
@@ -8,11 +9,12 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local Logic = Lua.import('Module:Logic')
 local MapTypeIcon = Lua.import('Module:MapType')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -27,67 +29,29 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return Renderable[]
 function CustomMatchSummary.createBody(match)
+	local globalBans = (match.extradata or {}).globalbans
+	local characterBansData = Array.extend(
+		Logic.isNotDeepEmpty(globalBans) and {globalBans.team1 or {}, globalBans.team2 or {}, label = 'Global Bans'} or nil,
+		Array.map(match.games, function(game, gameIndex)
+			local extradata = game.extradata or {}
+			local bans = extradata.bans or {}
+			if Logic.isDeepEmpty(bans) then return end
+			return {bans.team1 or {}, bans.team2 or {}, label = 'Game&nbsp;' .. gameIndex}
+		end)
+	)
 
-	local characterBansData = {}
-
-	if match.games[1] then
-		local extradata = match.games[1].extradata or {}
-		local bans = extradata.bans or {}
-
-		if #((bans.global) or {}) > 0 then
-local global = bans.global or {}
-
-local left = {}
-local right = {}
-
-local split = math.ceil(#global / 2)
-
-for i, character in ipairs(global) do
-	if i <= split then
-		table.insert(left, character)
-	else
-		table.insert(right, character)
-	end
-end
-
-table.insert(characterBansData,{
-	left,
-	right,
-	label = 'Global Bans'
-})
-		end
-	end
-
-	Array.forEach(match.games, function(game)
-		local extradata = game.extradata or {}
-		local bans = extradata.bans or {}
-
-		table.insert(characterBansData, {
-			bans.team1 or {},
-			bans.team2 or {}
-		})
-	end)
-mw.logObject(characterBansData)
 	return WidgetUtil.collect(
 		Array.map(match.games, CustomMatchSummary._createMapRow),
-
-		MatchSummaryWidgets.MapVeto(
-			MatchSummary.preProcessMapVeto(match.extradata.mapveto)
-		),
-
-		MatchSummaryWidgets.CharacterBanTable{
-			bans = characterBansData,
-			date = match.date
-		},
-
-		MatchSummaryWidgets.Mvp(match.extradata.mvp)
+		MatchSummaryWidgets.Mvp(match.extradata.mvp),
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto)),
+		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
 	)
 end
 
 ---@param game MatchGroupUtilGame
----@return Widget?
+---@return Renderable?
 function CustomMatchSummary._createMapRow(game)
 	if not game.map then
 		return
@@ -119,13 +83,13 @@ function CustomMatchSummary._createMapRow(game)
 end
 
 ---@param game MatchGroupUtilGame
----@return Widget
+---@return Renderable
 function CustomMatchSummary._getMapDisplay(game)
 	local mapDisplay = LinkWidget{link = game.map}
 
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+	return Html.Fragment{children = WidgetUtil.collect(
 		String.isNotEmpty(game.extradata.maptype) and MapTypeIcon.display(game.extradata.maptype) or nil,
-		game.status == 'notplayed' and HtmlWidgets.S{children = mapDisplay} or mapDisplay
+		game.status == 'notplayed' and Html.S{children = mapDisplay} or mapDisplay
 	)}
 end
 
