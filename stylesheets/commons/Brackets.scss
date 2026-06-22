@@ -544,6 +544,10 @@
 		flex-wrap: unset;
 		gap: 0.5rem;
 
+		.theme--dark & {
+			color-scheme: dark;
+		}
+
 		.toggle-area & {
 			max-height: 55vh; // 10vh for the switcher (compared to height in .brkts-popup)
 
