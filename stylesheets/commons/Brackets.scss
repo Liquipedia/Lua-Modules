@@ -543,6 +543,14 @@
 		justify-content: flex-start;
 		flex-wrap: unset;
 		gap: 0.5rem;
+
+		.toggle-area & {
+			max-height: 55vh; // 10vh for the switcher (compared to height in .brkts-popup)
+
+			@media ( max-width: 768px ) {
+				max-height: calc( 100dvh - ( 2.75rem + 4.1875rem + 4rem ) ); // 4 rem for the switcher (compared to .brkts-popup.brkts-match-info-popup)
+			}
+		}
 	}
 
 	.theme--light & {
