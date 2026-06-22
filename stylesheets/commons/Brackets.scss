@@ -562,7 +562,7 @@
 		border-color: var( --clr-on-surface-dark-primary-8 );
 	}
 
-	@media ( min-width: 769px ) {
+	@media ( width > 768px ) {
 		max-height: 65vh;
 	}
 
