@@ -63,10 +63,6 @@ local function getRoleDisplays(player)
 	local played = player.extradata.played
 
 	local function roleLeftDisplay()
-		local firstRole = roles[1]
-		if firstRole and firstRole.icon then
-			return firstRole.icon
-		end
 		for _, role in ipairs(roles) do
 			if role.type == RoleUtil.ROLE_TYPE.INGAME and role.icon then
 				return role.icon
