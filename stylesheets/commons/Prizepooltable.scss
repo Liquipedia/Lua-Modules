@@ -365,12 +365,16 @@ Template: Prize Pool Table
 		grid-template-columns: subgrid;
 
 		> .prize-pool-toggle {
-			display: flex;
+			display: inline-block;
 			grid-column: 1 / -1;
 			padding: 0.5rem 0.75rem;
 			place-self: center;
 			width: 100%;
-			justify-content: center;
+
+			> div {
+				position: sticky;
+				left: 0.75rem;
+			}
 
 			.general-collapsible-default-toggle {
 				min-width: unset;
@@ -399,23 +403,39 @@ Template: Prize Pool Table
 		grid-column: 1 / -1;
 		grid-template-columns: subgrid;
 		grid-template-rows: repeat( var( --prize-pool-row-height, 1 ), auto );
-		background-color: var( --clr-on-surface-light-primary-4 );
+		background-color: var( --prize-pool-placement-background-color );
 
-		.theme--dark & {
-			background-color: var( --clr-on-surface-dark-primary-4 );
-		}
+		--prize-pool-placement-background-color: var( --clr-on-surface-light-primary-4 );
 
-		&:nth-of-type( even ):not( [ data-placement ] ) {
-			background-color: var( --clr-on-surface-light-primary-8 );
+		&.prize-pool-table-header-row {
+			background-color: var( --clr-on-surface-light-primary-4 );
+			color: var( --clr-secondary-25 );
 
 			.theme--dark & {
-				background-color: var( --clr-on-surface-dark-primary-8 );
+				background-color: var( --clr-on-surface-dark-primary-4 );
+				color: var( --clr-secondary-80 );
+			}
+		}
+
+		.theme--dark & {
+			--prize-pool-placement-background-color: var( --clr-on-surface-dark-primary-4 );
+		}
+
+		&:nth-of-type( even ) {
+			--prize-pool-placement-background-color: var( --clr-on-surface-light-primary-8 );
+
+			.theme--dark & {
+				--prize-pool-placement-background-color: var( --clr-on-surface-dark-primary-8 );
 			}
 		}
 
 		&[ data-placement ] {
 			border-left: 0.25rem solid var( --prize-pool-placement-color, transparent );
-			background-color: var( --prize-pool-placement-background-color );
+
+			.generic-label.label--prize-pool-placement {
+				background-color: var( --prize-pool-placement-color, transparent );
+				box-shadow: 0 1px 1px 0 #000000;
+			}
 		}
 
 		&[ data-placement="1" ] {
@@ -446,16 +466,6 @@ Template: Prize Pool Table
 				--prize-pool-placement-color: #ffb267;
 				--prize-pool-placement-background-color: hsl( from var( --prize-pool-placement-color ) h s l / 0.16 );
 			}
-		}
-	}
-
-	& > &-row {
-		background-color: var( --clr-on-surface-light-primary-4 );
-		color: var( --clr-secondary-25 );
-
-		.theme--dark & {
-			background-color: var( --clr-on-surface-dark-primary-4 );
-			color: var( --clr-secondary-80 );
 		}
 	}
 

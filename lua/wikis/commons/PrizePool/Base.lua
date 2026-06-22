@@ -604,10 +604,10 @@ end
 ---@param isAward boolean?
 ---@return VNode
 function BasePrizePool:_buildHeader(isAward)
-	local children = {}
-
-	table.insert(children, PrizePoolCell{children = {isAward and 'Award' or 'Place'}, css = {['min-width'] = '80px'}})
-	table.insert(children, PrizePoolCell{children = {'Participant'}, classes = {'prizepooltable-col-team'}})
+	local children = {
+		PrizePoolCell{children = {isAward and 'Award' or '#'}},
+		PrizePoolCell{children = {'Participant'}},
+	}
 
 	local previousOfType = {}
 	for _, prize in ipairs(self.prizes) do
@@ -620,7 +620,10 @@ function BasePrizePool:_buildHeader(isAward)
 		end
 	end
 
-	return PrizePoolRow{classes = {'prizepooltable-header'}, css = {['font-weight'] = 'bold'}, children = children}
+	return PrizePoolRow{
+		classes = {'prize-pool-table-header-row'},
+		children = children,
+	}
 end
 
 ---@return VNode[], VNode[]

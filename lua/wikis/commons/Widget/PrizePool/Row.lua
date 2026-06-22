@@ -23,7 +23,7 @@ local function PrizePoolRow(props)
 	css['--prize-pool-row-height'] = props.height
 
 	local attributes = props.attributes or {}
-	attributes['data-placement'] = (props.placement or 0) <= 3 and props.placement or nil
+	attributes['data-placement'] = props.placement
 
 	return Html.Div{
 		classes = Array.extend(

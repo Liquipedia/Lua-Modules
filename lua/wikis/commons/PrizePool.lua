@@ -22,14 +22,13 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local ChevronToggle = Lua.import('Module:Widget/GeneralCollapsible/ChevronToggle')
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
+local Label = Lua.import('Module:Widget/Basic/Label')
 local PrizePoolCell = Lua.import('Module:Widget/PrizePool/Cell')
 
 ---@class PrizePool: BasePrizePool
 ---@operator call(...): PrizePool
 ---@field placements PrizePoolPlacement[]
 local PrizePool = Class.new(BasePrizePool)
-
-local NON_BREAKING_SPACE = '&nbsp;'
 
 ---@param args table
 function PrizePool:readPlacements(args)
@@ -51,14 +50,17 @@ function PrizePool:readPlacements(args)
 end
 
 ---@param placement PrizePoolPlacement
----@return WidgetTableCell
+---@return VNode
 function PrizePool:placeOrAwardCell(placement)
-	local placeCell = PrizePoolCell{
-		children = {placement:getMedal() or '', NON_BREAKING_SPACE, placement:_displayPlace()},
+	local placementDisplay = placement:_lpdbValue()
+
+	return PrizePoolCell{
+		children = Label{
+			labelScheme = 'prize-pool-placement',
+			children = placementDisplay
+		},
 		fullHeight = true,
 	}
-
-	return placeCell
 end
 
 ---@param placement PrizePoolPlacement
@@ -101,10 +103,10 @@ function PrizePool:getCollapsibleToggle()
 	return Div{
 		classes = {'prize-pool-toggle'},
 		attributes = {['data-collapsible-click-region'] = 'true'},
-		children = {
+		children = Div{children = {
 			text,
 			ChevronToggle{}
-		}
+		}}
 	}
 end
 
