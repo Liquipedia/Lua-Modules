@@ -549,10 +549,14 @@
 		}
 
 		.toggle-area & {
-			max-height: 55vh; // 10vh for the switcher (compared to height in .brkts-popup)
+			max-height: calc( 100dvh - ( 2.75rem + 4.1875rem + 3.5rem ) ); // 3.5rem for the switcher (compared to .brkts-popup.brkts-match-info-popup)
+		}
 
-			@media ( max-width: 768px ) {
-				max-height: calc( 100dvh - ( 2.75rem + 4.1875rem + 4rem ) ); // 4 rem for the switcher (compared to .brkts-popup.brkts-match-info-popup)
+		@media ( width > 768px ) {
+			max-height: 65vh;
+
+			.toggle-area & {
+				max-height: calc( 65vh - 3.5rem ); // 3.5rem for the switcher
 			}
 		}
 	}
@@ -564,10 +568,6 @@
 	.theme--dark & {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-on-surface-dark-primary-8 );
-	}
-
-	@media ( width > 768px ) {
-		max-height: 65vh;
 	}
 
 	.timer-object-date {
