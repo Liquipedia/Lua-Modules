@@ -7,14 +7,13 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 
+local Component = Lua.import('Module:Widget/Component')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class TournamentTitleProps
@@ -22,26 +21,22 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@field displayGameIcon boolean?
 ---@field useShortName boolean?
 
----@class TournamentTitleWidget: Widget
----@operator call(TournamentTitleProps): TournamentTitleWidget
----@field props TournamentTitleProps
-local TournamentTitleWidget = Class.new(Widget)
-
----@return Widget[]?
-function TournamentTitleWidget:render()
-	local tournament = self.props.tournament
+---@param props TournamentTitleProps
+---@return Renderable[]?
+local function TournamentTitle(props)
+	local tournament = props.tournament
 	if not tournament then
 		return
 	end
 
 	return WidgetUtil.collect(
-		self.props.displayGameIcon and Game.icon{
+		props.displayGameIcon and Game.icon{
 			game = tournament.game,
 			noLink = true,
 			spanClass = 'tournament-game-icon icon-small',
 			size = '50px',
 		} or nil,
-		HtmlWidgets.Span{
+		Html.Span{
 			classes = {'tournament-icon'},
 			children = {
 				LeagueIcon.display{
@@ -53,16 +48,16 @@ function TournamentTitleWidget:render()
 				}
 			}
 		},
-		HtmlWidgets.Span{
+		Html.Span{
 			classes = {'tournament-name'},
 			children = {
 				Link{
 					link = tournament.pageName,
-					children = Logic.readBool(self.props.useShortName) and tournament.shortName or tournament.displayName,
+					children = Logic.readBool(props.useShortName) and tournament.shortName or tournament.displayName,
 				},
 			}
 		}
 	)
 end
 
-return TournamentTitleWidget
+return Component.component(TournamentTitle)
