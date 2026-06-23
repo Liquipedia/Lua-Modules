@@ -8,10 +8,10 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
@@ -26,14 +26,12 @@ local QUALIFIED_ICON = IconFa{iconName = 'qualified', color = 'forest-green-text
 ---@field limit integer
 ---@field positionBackgrounds string[]
 
----@class AutomaticPointsTableWidget: Widget
----@operator call(AutomaticPointsTableWidgetProps): AutomaticPointsTableWidget
----@field props AutomaticPointsTableWidgetProps
-local AutomaticPointsTableWidget = Class.new(Widget)
+local AutomaticPointsTableWidget = {}
 
----@return Widget
-function AutomaticPointsTableWidget:render()
-	local numCols = Array.reduce(self.props.tournaments, function (aggregate, tournament)
+---@param props AutomaticPointsTableWidgetProps
+---@return VNode
+function AutomaticPointsTableWidget.renderFn(props)
+	local numCols = Array.reduce(props.tournaments, function (aggregate, tournament)
 		if tournament.extradata.includesDeduction then
 			return aggregate + 2
 		end
@@ -44,27 +42,25 @@ function AutomaticPointsTableWidget:render()
 		children = Div{
 			classes = {'fixed-size-table-container', 'border-color-grey'},
 			css = {width = (450 + numCols * 50) .. 'px'},
-			children = self:createTable()
+			children = AutomaticPointsTableWidget.createTable(props)
 		}
 	}
 end
 
----@protected
----@return Widget
-function AutomaticPointsTableWidget:createTable()
+---@param props AutomaticPointsTableWidgetProps
+---@return VNode
+function AutomaticPointsTableWidget.createTable(props)
 	return Div{
 		classes = {'divTable', 'border-color-grey', 'border-bottom'},
 		children = WidgetUtil.collect(
-			self:createHeader(),
-			Array.map(self.props.opponents, function (opponent, opponentIndex)
-				return self:createRow(opponent, opponentIndex)
-			end)
+			AutomaticPointsTableWidget.createHeader(props),
+			Array.map(props.opponents, FnUtil.curry(AutomaticPointsTableWidget.createRow, props))
 		)
 	}
 end
 
 ---@private
----@param child string|Widget
+---@param child Renderable
 ---@param additionalClass string?
 ---@return Widget
 function AutomaticPointsTableWidget._createHeaderCell(child, additionalClass)
@@ -77,10 +73,10 @@ function AutomaticPointsTableWidget._createHeaderCell(child, additionalClass)
 	}
 end
 
----@protected
+---@param props AutomaticPointsTableWidgetProps
 ---@return Widget
-function AutomaticPointsTableWidget:createHeader()
-	local tournaments = self.props.tournaments
+function AutomaticPointsTableWidget.createHeader(props)
+	local tournaments = props.tournaments
 
 	return Div{
 		classes = {'divHeaderRow', 'diagonal'},
@@ -99,9 +95,9 @@ function AutomaticPointsTableWidget:createHeader()
 end
 
 ---@private
----@param props {children: string|number|Widget|Html|(string|number|Widget|Html)[]?,
+---@param props {children: Renderable|Renderable[]?,
 ---additionalClasses: string[]?, background: string?, bold: boolean?, css: table?}
----@return Widget
+---@return VNode
 function AutomaticPointsTableWidget._createRowCell(props)
 	return Div{
 		classes = Array.extend(
@@ -121,16 +117,16 @@ function AutomaticPointsTableWidget._createRowCell(props)
 	}
 end
 
----@protected
+---@param props AutomaticPointsTableWidgetProps
 ---@param opponent AutomaticPointsTableOpponent
 ---@param opponentIndex integer
----@return Widget
-function AutomaticPointsTableWidget:createRow(opponent, opponentIndex)
+---@return VNode
+function AutomaticPointsTableWidget.createRow(props, opponent, opponentIndex)
 	return Div{
 		classes = {'divRow', opponent.background and ('bg-' .. opponent.background) or nil},
 		children = WidgetUtil.collect(
 			AutomaticPointsTableWidget._createRowCell{
-				background = self.props.positionBackgrounds[opponentIndex],
+				background = props.positionBackgrounds[opponentIndex],
 				children = opponent.placement,
 				css = {['font-weight'] = 'bold'},
 			},
@@ -143,14 +139,14 @@ function AutomaticPointsTableWidget:createRow(opponent, opponentIndex)
 					showPlayerTeam = true
 				},
 			},
-			self:_createTotalPointsCell(opponent),
+			AutomaticPointsTableWidget._createTotalPointsCell(opponent),
 			Array.flatMap(opponent.results, function (result, resultIndex)
 				local resultDisplay
 				if result.qualified then
 					resultDisplay = QUALIFIED_ICON
 				elseif result.amount then
 					resultDisplay = result.amount
-				elseif self.props.tournaments[resultIndex].phase == 'FINISHED' then
+				elseif props.tournaments[resultIndex].phase == 'FINISHED' then
 					resultDisplay = '-'
 				end
 				return {
@@ -161,7 +157,7 @@ function AutomaticPointsTableWidget:createRow(opponent, opponentIndex)
 						} or nil,
 						children = resultDisplay,
 					},
-					self.props.tournaments[resultIndex].extradata.includesDeduction and AutomaticPointsTableWidget._createRowCell{
+					props.tournaments[resultIndex].extradata.includesDeduction and AutomaticPointsTableWidget._createRowCell{
 						children = result.deduction and {
 							Html.Abbr{
 								classes = {'deduction-box'},
@@ -178,12 +174,12 @@ end
 
 ---@private
 ---@param opponent AutomaticPointsTableOpponent
----@return Widget
-function AutomaticPointsTableWidget:_createTotalPointsCell(opponent)
+---@return VNode
+function AutomaticPointsTableWidget._createTotalPointsCell(opponent)
 	return AutomaticPointsTableWidget._createRowCell{
 		css = {['font-weight'] = 'bold'},
 		children = opponent.qualified and QUALIFIED_ICON or opponent.totalPoints,
 	}
 end
 
-return AutomaticPointsTableWidget
+return Component.component(AutomaticPointsTableWidget.renderFn)
