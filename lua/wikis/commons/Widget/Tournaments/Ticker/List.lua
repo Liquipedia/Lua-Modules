@@ -29,7 +29,7 @@ local defaultProps = {
 }
 
 ---@param props TournamentsTickerListWidgetProps
----@return Widget
+---@return VNode
 local function TournamentsTickerList(props)
 	local data = TickerData.get(props)
 	local displayGameIcons = props.displayGameIcons
