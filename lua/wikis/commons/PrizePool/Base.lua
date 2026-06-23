@@ -31,6 +31,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local TableCell = TableWidgets.Cell
+local TableCellHeader = TableWidgets.CellHeader
 local TableRow = TableWidgets.Row
 local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
@@ -156,7 +157,7 @@ BasePrizePool.prizeTypes = {
 
 		headerDisplay = function (data)
 			local currencyText = Currency.display(BASE_CURRENCY)
-			return TableCell{children = {currencyText}, align = 'right'}
+			return TableCellHeader{children = {currencyText}, align = 'right'}
 		end,
 
 		row = BASE_CURRENCY:lower() .. 'prize',
@@ -195,7 +196,7 @@ BasePrizePool.prizeTypes = {
 			}
 		end,
 		headerDisplay = function (data)
-			return TableCell{children = {Currency.display(data.currency)}, align = 'right'}
+			return TableCellHeader{children = {Currency.display(data.currency)}, align = 'right'}
 		end,
 
 		row = 'localprize',
@@ -233,7 +234,7 @@ BasePrizePool.prizeTypes = {
 			return {title = 'Percentage'}
 		end,
 		headerDisplay = function (data)
-			return TableCell{children = {data.title}}
+			return TableCellHeader{children = {data.title}}
 		end,
 
 		row = 'percentage',
@@ -271,7 +272,7 @@ BasePrizePool.prizeTypes = {
 			}
 		end,
 		headerDisplay = function (data)
-			return TableCell{children = {'Qualifies To'}}
+			return TableCellHeader{children = {'Qualifies To'}}
 		end,
 
 		row = 'qualified',
@@ -344,7 +345,7 @@ BasePrizePool.prizeTypes = {
 				table.insert(headerDisplay, text)
 			end
 
-			return TableCell{children = {table.concat(headerDisplay)}}
+			return TableCellHeader{children = {table.concat(headerDisplay)}}
 		end,
 
 		row = 'points',
@@ -365,7 +366,7 @@ BasePrizePool.prizeTypes = {
 			return {title = input}
 		end,
 		headerDisplay = function (data)
-			return TableCell{children = {data.title}}
+			return TableCellHeader{children = {data.title}}
 		end,
 
 		row = 'freetext',
@@ -636,8 +637,8 @@ end
 ---@return Renderable
 function BasePrizePool:_buildHeader(isAward)
 	local children = {
-		TableWidgets.CellHeader{children = {isAward and 'Award' or 'Place'}, align = 'center'},
-		TableWidgets.CellHeader{children = {'Participant'}, classes = {'prizepooltable-col-team'}, align = 'left'},
+		TableCellHeader{children = {isAward and 'Award' or 'Place'}, align = 'center'},
+		TableCellHeader{children = {'Participant'}, classes = {'prizepooltable-col-team'}, align = 'left'},
 	}
 
 	local previousOfType = {}
@@ -650,7 +651,7 @@ function BasePrizePool:_buildHeader(isAward)
 		end
 	end
 
-	return TableWidgets.Row{classes = {'prizepooltable-header'}, children = children}
+	return TableRow{classes = {'prizepooltable-header'}, children = children}
 end
 
 ---@return Renderable[]
