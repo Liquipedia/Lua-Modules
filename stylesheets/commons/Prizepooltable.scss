@@ -346,6 +346,7 @@ Template: Prize Pool Table
 	display: grid;
 	grid-template-columns: repeat( var( --prize-pool-columns ), auto );
 	overflow-x: auto;
+	height: fit-content;
 	border-radius: 0.5rem;
 	border: 1px solid var( --clr-on-surface-light-primary-12 );
 	background-color: var( --clr-background, #ffffff );
@@ -380,6 +381,8 @@ Template: Prize Pool Table
 			padding: 0.5rem 0.75rem;
 			place-self: center;
 			width: 100%;
+			cursor: pointer;
+			font-weight: bold;
 
 			> div {
 				position: sticky;
