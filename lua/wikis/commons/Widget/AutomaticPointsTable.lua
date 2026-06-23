@@ -12,8 +12,8 @@ local Class = Lua.import('Module:Class')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -163,7 +163,7 @@ function AutomaticPointsTableWidget:createRow(opponent, opponentIndex)
 					},
 					self.props.tournaments[resultIndex].extradata.includesDeduction and AutomaticPointsTableWidget._createRowCell{
 						children = result.deduction and {
-							HtmlWidgets.Abbr{
+							Html.Abbr{
 								classes = {'deduction-box'},
 								title = result.note,
 								children = result.deduction
