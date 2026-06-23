@@ -593,17 +593,12 @@ function BasePrizePool:_buildTable(isAward)
 	end)
 	local toggle = hasCutRows and self:_collapseToggle() or nil
 
-	-- The collapse runs through `general-collapsible` (Collapse.js): the wrapper
-	-- carries the state class and the footer holds the toggle anchors, so no
-	-- prize-pool-specific JS is needed. The cut rows stay in `<tbody>` in document
-	-- order (after the visible rows) and are merely CSS-hidden while collapsed.
 	return TableWidgets.Table{
 		classes = WidgetUtil.collect(
 			'prizepool-table-wrapper',
 			toggle and 'general-collapsible' or nil,
 			toggle and 'collapsed' or nil
 		),
-		striped = true,
 		tableClasses = {
 			'prizepooltable',
 			'prizepooltable-' .. (isAward and 'award' or 'placement'),
@@ -668,7 +663,6 @@ function BasePrizePool:_buildRows()
 		end
 
 		local opponents = placement.opponents
-		local opponentCount = math.max(#opponents, 1)
 		local placeCell = self:placeOrAwardCell(placement)
 		local backgroundClass = placement:getBackground()
 
@@ -677,36 +671,29 @@ function BasePrizePool:_buildRows()
 			return self:_opponentPrizeCells(placement, opponent)
 		end)
 
-		-- Vertically merge consecutive-equal prize cells per column (declare span on the run's first row).
+		-- Vertically merge consecutive-equal prize cells per column: the first cell of
+		-- each run spans the run, the rest are dropped (tracked by cell identity).
 		local numCols = prizeMatrix[1] and #prizeMatrix[1] or 0
-		local omitted = {} -- omitted[opponentIndex][col] = true
+		local omittedCells = {}
 		for col = 1, numCols do
-			local opponentIndex = 1
-			while opponentIndex <= opponentCount do
-				local runLength = 1
-				while opponentIndex + runLength <= opponentCount
-					and Table.deepEquals(
-						prizeMatrix[opponentIndex][col].props.children,
-						prizeMatrix[opponentIndex + runLength][col].props.children
-					) do
-					omitted[opponentIndex + runLength] = omitted[opponentIndex + runLength] or {}
-					omitted[opponentIndex + runLength][col] = true
-					runLength = runLength + 1
+			local columnCells = Array.map(prizeMatrix, function(row) return row[col] end)
+			local runs = Array.groupAdjacentBy(columnCells, function(cell)
+				return cell.props.children
+			end, Table.deepEquals)
+			Array.forEach(runs, function(run)
+				if #run <= 1 then
+					return
 				end
-				if runLength > 1 then
-					prizeMatrix[opponentIndex][col].props.rowspan = runLength
-				end
-				opponentIndex = opponentIndex + runLength
-			end
+				run[1].props.rowspan = #run
+				Array.forEach(Array.sub(run, 2), function(cell)
+					omittedCells[cell] = true
+				end)
+			end)
 		end
 
-		for opponentIndex, opponent in ipairs(opponents) do
-			local cells = {}
-			if opponentIndex == 1 then
-				table.insert(cells, placeCell)
-			end
-
-			table.insert(cells, TableCell{
+		local isCut = self:applyCutAfter(placement)
+		Array.forEach(opponents, function(opponent, opponentIndex)
+			local opponentCell = TableCell{
 				children = {tostring(OpponentDisplay.BlockOpponent{
 					opponent = opponent.opponentData,
 					showPlayerTeam = true,
@@ -714,19 +701,20 @@ function BasePrizePool:_buildRows()
 				classes = {'prizepooltable-col-team'},
 				align = 'left',
 				nowrap = false,
+			}
+			local prizeCells = Array.filter(prizeMatrix[opponentIndex], function(cell)
+				return not omittedCells[cell]
+			end)
+
+			table.insert(rows, TableRow{
+				children = WidgetUtil.collect(
+					opponentIndex == 1 and placeCell or nil,
+					opponentCell,
+					prizeCells
+				),
+				classes = WidgetUtil.collect(backgroundClass, isCut and 'ppt-hide-on-collapse' or nil),
 			})
-
-			for col = 1, numCols do
-				if not (omitted[opponentIndex] and omitted[opponentIndex][col]) then
-					table.insert(cells, prizeMatrix[opponentIndex][col])
-				end
-			end
-
-			table.insert(rows, TableRow{children = cells, classes = WidgetUtil.collect(
-				backgroundClass,
-				self:applyCutAfter(placement) and 'ppt-hide-on-collapse' or nil
-			)})
-		end
+		end)
 	end
 
 	return rows

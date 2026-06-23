@@ -76,20 +76,17 @@ end
 
 ---@return {opentext: string, closetext: string}?
 function PrizePool:_collapseText()
-	local firstHidden, lastPlace
-	for _, placement in ipairs(self.placements) do
-		if placement.placeStart > self.options.hideafter then
-			break
-		end
-		lastPlace = placement.placeEnd
-		if not firstHidden and placement.placeStart > self.options.cutafter then
-			firstHidden = placement.placeStart
-		end
-	end
-	if not firstHidden or not lastPlace then
+	local visible = Array.filter(self.placements, function(placement)
+		return placement.placeStart <= self.options.hideafter
+	end)
+	local lastVisible = visible[#visible]
+	local firstHidden = Array.find(visible, function(placement)
+		return placement.placeStart > self.options.cutafter
+	end)
+	if not firstHidden or not lastVisible then
 		return nil
 	end
-	local text = 'place ' .. firstHidden .. ' to ' .. lastPlace
+	local text = 'place ' .. firstHidden.placeStart .. ' to ' .. lastVisible.placeEnd
 	return {opentext = text, closetext = text}
 end
 
