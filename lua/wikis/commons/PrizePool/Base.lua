@@ -156,7 +156,12 @@ BasePrizePool.prizeTypes = {
 
 		headerDisplay = function (data)
 			local currencyText = Currency.display(BASE_CURRENCY)
-			return PrizePoolCell{children = {currencyText}}
+			return currencyText
+		end,
+		headerParse = function (prizePool, input, context, index)
+			return {
+				currency = BASE_CURRENCY,
+			}
 		end,
 
 		row = BASE_CURRENCY:lower() .. 'prize',
@@ -194,7 +199,7 @@ BasePrizePool.prizeTypes = {
 			}
 		end,
 		headerDisplay = function (data)
-			return PrizePoolCell{children = {Currency.display(data.currency)}}
+			return Currency.display(data.currency)
 		end,
 
 		row = 'localprize',
@@ -269,7 +274,7 @@ BasePrizePool.prizeTypes = {
 			}
 		end,
 		headerDisplay = function (data)
-			return PrizePoolCell{children = {'Qualifies To'}}
+			return 'Qualifies To'
 		end,
 
 		row = 'qualified',
@@ -342,7 +347,7 @@ BasePrizePool.prizeTypes = {
 				table.insert(headerDisplay, text)
 			end
 
-			return PrizePoolCell{children = {headerDisplay}}
+			return headerDisplay
 		end,
 
 		row = 'points',
@@ -363,7 +368,7 @@ BasePrizePool.prizeTypes = {
 			return {title = input}
 		end,
 		headerDisplay = function (data)
-			return PrizePoolCell{children = {data.title}}
+			return data.title
 		end,
 
 		row = 'freetext',
@@ -419,7 +424,10 @@ function BasePrizePool:create()
 
 	if self:_hasBaseCurrency() then
 		self:setConfig('showBaseCurrency', true)
-		self:addPrize(PRIZE_TYPE_BASE_CURRENCY, 1, {roundPrecision = self.options.currencyRoundPrecision})
+		self:addPrize(PRIZE_TYPE_BASE_CURRENCY, 1, {
+			currency = BASE_CURRENCY,
+			roundPrecision = self.options.currencyRoundPrecision
+		})
 
 		if self.options.autoExchange then
 			local canConvertCurrency = function(prize)
@@ -589,15 +597,15 @@ function BasePrizePool:_buildTable(isAward)
 
 	local rows, collapsedRows = self:_buildRows()
 
-	return Div{
-		css = {['overflow-x'] = 'auto'},
-		children = PrizePoolTable{
+	return PrizePoolTable{
 			prizeTypes = #self.prizes,
+			currencies = Array.map(self.prizes, function (prize)
+				return prize.data.currency
+			end),
 			header = headerRow,
 			toggle = self:getCollapsibleToggle(),
 			displayedRows = rows,
 			collapsedRows = collapsedRows,
-		},
 	}
 end
 
@@ -610,13 +618,31 @@ function BasePrizePool:_buildHeader(isAward)
 	}
 
 	local previousOfType = {}
+
+	local currencyIndex = 1
+
 	for _, prize in ipairs(self.prizes) do
 		local prizeTypeData = self.prizeTypes[prize.type]
 
 		if not prizeTypeData.mergeDisplayColumns or not previousOfType[prize.type] then
-			local cell = prizeTypeData.headerDisplay(prize.data)
-			table.insert(children, cell)
-			previousOfType[prize.type] = cell
+			local header = prizeTypeData.headerDisplay(prize.data)
+			if prize.data.currency then
+				table.insert(children, PrizePoolCell{
+					classes = {
+						currencyIndex and (
+							currencyIndex == 1 and 'toggle-area-content-active' or 'toggle-area-content-inactive'
+						) or nil
+					},
+					attributes = {
+						['data-toggle-area-content'] = currencyIndex,
+					},
+					children = header,
+				})
+				currencyIndex = currencyIndex + 1
+			elseif Logic.isNotEmpty(header) then
+				table.insert(children, PrizePoolCell{children = header})
+				previousOfType[prize.type] = true
+			end
 		end
 	end
 
@@ -649,10 +675,39 @@ function BasePrizePool:_buildRows()
 			}
 		}
 
+		---@type BasePrizePoolPrize[][]
+		local groupedPrizes = {}
+
+		local currentCurrencyIndex = 1
+		local currencyIndices = {}
+
+		Array.forEach(self.prizes, function (prize, index)
+			if index == 1 or prize.type ~= groupedPrizes[#groupedPrizes][1].type then
+				if prize.data.currency and currencyIndices[prize.data.currency] == nil then
+					currencyIndices[prize.data.currency:lower()] = currentCurrencyIndex
+					currentCurrencyIndex = currentCurrencyIndex + 1
+				end
+				table.insert(groupedPrizes, {prize})
+				return
+			end
+			local prizeType = self.prizeTypes[prize.type]
+			if prizeType.mergeDisplayColumns then
+				table.insert(groupedPrizes[#groupedPrizes], prize)
+			else
+				if prize.data.currency and currencyIndices[prize.data.currency] == nil then
+					currencyIndices[prize.data.currency:lower()] = currentCurrencyIndex
+					currentCurrencyIndex = currentCurrencyIndex + 1
+				end
+				table.insert(groupedPrizes, {prize})
+			end
+		end)
+
 		Array.forEach(
-			Array.groupAdjacentBy(self.prizes, function (prize) return prize.type end),
+			groupedPrizes,
 			function (prizes)
-				local prizeTypeData = self.prizeTypes[prizes[1].type]
+				local prizeType = prizes[1].type
+				local prizeTypeData = self.prizeTypes[prizeType]
+				local currency = (prizes[1].data.currency or ''):lower()
 				local prizeDisplay = Array.map(placement.opponents, function (opponent)
 					---@type string[]
 					local rewards = Array.map(prizes, function (prize)
@@ -679,8 +734,17 @@ function BasePrizePool:_buildRows()
 						})
 					end
 				end
+				local currencyIndex = currency and currencyIndices[currency] or nil
 				table.insert(cells, PrizePoolCell{
-					classes = {'prize-cell'},
+					classes = {
+						'prize-cell',
+						currencyIndex and (
+							currencyIndex == 1 and 'toggle-area-content-active' or 'toggle-area-content-inactive'
+						) or nil
+					},
+					attributes = {
+						['data-toggle-area-content'] = currencyIndex,
+					},
 					children = children
 				})
 			end

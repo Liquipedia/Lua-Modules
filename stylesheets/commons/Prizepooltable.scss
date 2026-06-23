@@ -359,6 +359,16 @@ Template: Prize Pool Table
 		color-scheme: dark;
 	}
 
+	&-container {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+
+		> .switch-pill-container {
+			width: fit-content;
+		}
+	}
+
 	&-body {
 		display: grid;
 		grid-column: 1 / -1;
@@ -477,6 +487,10 @@ Template: Prize Pool Table
 
 		&.full-height {
 			grid-row: span var( --prize-pool-row-height, 1 );
+		}
+
+		&:has( > & ) {
+			padding: unset;
 		}
 
 		&.prize-cell,

@@ -12,10 +12,15 @@ local Array = Lua.import('Module:Array')
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 
----@param props {classes: string[]?, children: Renderable|Renderable[]?, fullHeight: boolean?, height: integer?}
+---@class PrizePoolCellProps:HtmlNodeProps
+---@field fullHeight boolean?
+---@field height integer?
+
+---@param props PrizePoolCellProps
 ---@return VNode
 local function PrizePoolCell(props)
 	return Html.Div{
+		attributes = props.attributes,
 		classes = Array.extend(
 			'prize-pool-table-cell',
 			props.classes,
