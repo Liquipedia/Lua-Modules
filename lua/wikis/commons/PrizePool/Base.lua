@@ -621,12 +621,26 @@ function BasePrizePool:_buildHeader(isAward)
 
 	local currencyIndex = 1
 
+	local nCurrencies = Array.reduce(
+		self.prizes,
+		---@param currencyCount integer
+		---@param prize BasePrizePoolPrize
+		---@return integer
+		function (currencyCount, prize)
+			if Logic.isEmpty(prize.data.currency) then
+				return currencyCount
+			end
+			return currencyCount + 1
+		end,
+		0
+	)
+
 	for _, prize in ipairs(self.prizes) do
 		local prizeTypeData = self.prizeTypes[prize.type]
 
 		if not prizeTypeData.mergeDisplayColumns or not previousOfType[prize.type] then
 			local header = prizeTypeData.headerDisplay(prize.data)
-			if prize.data.currency then
+			if nCurrencies > 1 and prize.data.currency then
 				table.insert(children, PrizePoolCell{
 					classes = {
 						currencyIndex and (
@@ -639,6 +653,7 @@ function BasePrizePool:_buildHeader(isAward)
 					children = header,
 				})
 				currencyIndex = currencyIndex + 1
+				previousOfType[prize.type] = true
 			elseif Logic.isNotEmpty(header) then
 				table.insert(children, PrizePoolCell{children = header})
 				previousOfType[prize.type] = true
@@ -701,6 +716,10 @@ function BasePrizePool:_buildRows()
 				table.insert(groupedPrizes, {prize})
 			end
 		end)
+
+		if Table.size(currencyIndices) == 1 then
+			currencyIndices = {}
+		end
 
 		Array.forEach(
 			groupedPrizes,
