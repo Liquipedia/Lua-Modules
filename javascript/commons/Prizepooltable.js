@@ -5,30 +5,12 @@
 liquipedia.prizepooltable = {
 	init: function() {
 		document.querySelectorAll( '.prizepooltable' ).forEach( ( prizepooltable ) => {
-			if ( prizepooltable.querySelector( '.prizepooltabletoggle' ) !== null ) {
+			// The redesigned (Table2) prize pool wraps its table in
+			// `.prizepool-table-wrapper` and collapses via general-collapsible, so it
+			// supplies its own toggle. Skip it here to avoid a duplicate legacy toggle.
+			if ( prizepooltable.closest( '.prizepool-table-wrapper' ) !== null ) {
 				return;
 			}
-			// Class-based collapse (prize pool): Lua marks the cut rows with
-			// `ppt-hide-on-collapse`; the toggle goes directly before the first one.
-			const firstHiddenRow = prizepooltable.querySelector( '.ppt-hide-on-collapse' );
-			if ( firstHiddenRow !== null ) {
-				let openLabel = 'show more';
-				if ( typeof prizepooltable.dataset.opentext !== 'undefined' ) {
-					openLabel = prizepooltable.dataset.opentext;
-				}
-				openLabel += ' <i class="fa fa-chevron-down"></i>';
-				let closeLabel = 'show less';
-				if ( typeof prizepooltable.dataset.closetext !== 'undefined' ) {
-					closeLabel = prizepooltable.dataset.closetext;
-				}
-				closeLabel += ' <i class="fa fa-chevron-up"></i>';
-				const colspan = prizepooltable.querySelectorAll( 'tr:nth-child(1) th, tr:nth-child(1) td' ).length;
-				const rowNode = document.createElement( 'tr' );
-				rowNode.innerHTML = '<td colspan="' + colspan + '" class="prizepooltabletoggle"><small class="prizepooltableshow">' + openLabel + '</small><small class="prizepooltablehide">' + closeLabel + '</small></td>';
-				firstHiddenRow.parentNode.insertBefore( rowNode, firstHiddenRow );
-				return;
-			}
-			// Legacy data-cutafter collapse (mvp / medal / winnings tables).
 			let cutAfter;
 			if ( typeof prizepooltable.dataset.cutafter !== 'undefined' ) {
 				cutAfter = parseInt( prizepooltable.dataset.cutafter );

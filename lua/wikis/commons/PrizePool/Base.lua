@@ -34,6 +34,7 @@ local TableCell = TableWidgets.Cell
 local TableRow = TableWidgets.Row
 local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local pageVars = PageVariableNamespace('PrizePool')
@@ -590,23 +591,51 @@ function BasePrizePool:_buildTable(isAward)
 	local hasCutRows = Array.any(self.placements, function(placement)
 		return not self:applyHideAfter(placement) and self:applyCutAfter(placement)
 	end)
-	local collapseText = hasCutRows and self:_collapseText() or nil
+	local toggle = hasCutRows and self:_collapseToggle() or nil
 
+	-- The collapse runs through `general-collapsible` (Collapse.js): the wrapper
+	-- carries the state class and the footer holds the toggle anchors, so no
+	-- prize-pool-specific JS is needed. The cut rows stay in `<tbody>` in document
+	-- order (after the visible rows) and are merely CSS-hidden while collapsed.
 	return TableWidgets.Table{
-		classes = {'prizepool-table-wrapper'},
+		classes = WidgetUtil.collect(
+			'prizepool-table-wrapper',
+			toggle and 'general-collapsible' or nil,
+			toggle and 'collapsed' or nil
+		),
 		striped = true,
-		tableClasses = WidgetUtil.collect(
+		tableClasses = {
 			'prizepooltable',
 			'prizepooltable-' .. (isAward and 'award' or 'placement'),
-			hasCutRows and 'collapsed' or nil
-		),
-		tableAttributes = collapseText and {
-			['data-opentext'] = collapseText.opentext,
-			['data-closetext'] = collapseText.closetext,
-		} or nil,
+		},
+		footer = toggle,
 		children = {
 			TableWidgets.TableHeader{children = {self:_buildHeader(isAward)}},
 			TableWidgets.TableBody{children = bodyRows},
+		},
+	}
+end
+
+--- Footer toggle for the collapse. The two buttons carry the `general-collapsible-*`
+--- classes that Collapse.js turns into anchors; the global stylesheet shows exactly
+--- one of them per collapse state.
+---@return Renderable?
+function BasePrizePool:_collapseToggle()
+	local collapseText = self:_collapseText()
+	if not collapseText then
+		return nil
+	end
+	return Div{
+		classes = {'prizepooltable-toggle'},
+		children = {
+			Span{
+				classes = {'general-collapsible-expand-button'},
+				children = {collapseText.opentext, ' ', IconFa{iconName = 'expand'}},
+			},
+			Span{
+				classes = {'general-collapsible-collapse-button'},
+				children = {collapseText.closetext, ' ', IconFa{iconName = 'collapse'}},
+			},
 		},
 	}
 end

@@ -191,10 +191,36 @@ table.prizepooltable.collapsed .prizepooltablehide {
 	display: none;
 }
 
-// Class-based collapse (prize pool): Lua marks every row past the cut-off with
-// `ppt-hide-on-collapse`, and Prizepooltable.js injects the toggle directly
-// before the first such row. Gated on `client-js` so non-JS readers see all rows.
-html.client-js .prizepooltable.collapsed .ppt-hide-on-collapse {
+// Class-based collapse (prize pool): the table is wrapped in a `general-collapsible`
+// whose footer holds the toggle, and Lua marks every row past the cut-off with
+// `ppt-hide-on-collapse`. Collapse.js wires the toggle; CSS hides the cut rows while
+// collapsed. Gated on `client-js` so non-JS readers see all rows and no dead toggle.
+html.client-js .prizepool-table-wrapper.collapsed .ppt-hide-on-collapse {
+	display: none;
+}
+
+.prizepooltable-toggle {
+	text-align: center;
+	font-weight: bold;
+	cursor: pointer;
+	color: var( --clr-brand-30, #0a558f );
+
+	.theme--dark & {
+		color: var( --clr-brand-80, #a7cdf1 );
+	}
+
+	a {
+		color: inherit;
+	}
+}
+
+// Show exactly one button per collapse state (the wrapper carries `collapsed`).
+.general-collapsible.collapsed .prizepooltable-toggle .general-collapsible-collapse-button,
+.general-collapsible:not( .collapsed ) .prizepooltable-toggle .general-collapsible-expand-button {
+	display: none;
+}
+
+html:not( .client-js ) .prizepooltable-toggle {
 	display: none;
 }
 
