@@ -7,11 +7,11 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local I18n = Lua.import('Module:I18n')
-local Widget = Lua.import('Module:Widget')
+
+local Component = Lua.import('Module:Widget/Component')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local ListItem = Lua.import('Module:Widget/Tournaments/Ticker/ListItem')
 local PhaseCollapsible = Lua.import('Module:Widget/Tournaments/Ticker/PhaseCollapsible')
 local Sublist = Lua.import('Module:Widget/Tournaments/Ticker/Sublist')
@@ -22,43 +22,40 @@ local TickerData = Lua.import('Module:TournamentsTicker/Data')
 ---@field displayGameIcons boolean?
 ---@field tierColorScheme string?
 
----@class TournamentsTickerListWidget: Widget
----@operator call(TournamentsTickerListWidgetProps): TournamentsTickerListWidget
----@field props TournamentsTickerListWidgetProps
-local TournamentsTickerListWidget = Class.new(Widget)
-TournamentsTickerListWidget.defaultProps = {
+local defaultProps = {
 	upcomingDays = 5,
 	completedDays = 5,
 	variant = 'tabs',
 }
 
+---@param props TournamentsTickerListWidgetProps
 ---@return Widget
-function TournamentsTickerListWidget:render()
-	local data = TickerData.get(self.props)
-	local displayGameIcons = self.props.displayGameIcons
+local function TournamentsTickerList(props)
+	local data = TickerData.get(props)
+	local displayGameIcons = props.displayGameIcons
 
 	---@param tournament StandardTournament
-	---@return Widget
+	---@return VNode
 	local function createItem(tournament)
 		return ListItem{
 			tournament = tournament,
 			displayGameIcon = displayGameIcons,
-			tierColorScheme = self.props.tierColorScheme,
+			tierColorScheme = props.tierColorScheme,
 		}
 	end
 
 	---@param tournaments StandardTournament[]
-	---@return Widget
+	---@return VNode
 	local function buildSublist(tournaments)
 		return Sublist{
 			tournaments = tournaments,
 			createItem = createItem,
-			fallback = HtmlWidgets.Div{
+			fallback = Html.Div{
 				attributes = {
 					['data-filter-hideable-group-fallback'] = '',
 					['data-filter-effect'] = 'fade',
 				},
-				children = HtmlWidgets.Center{
+				children = Html.Center{
 					css = {margin = '1.5rem 0', ['font-style'] = 'italic'},
 					children = I18n.translate('tournament-ticker-no-tournaments'),
 				},
@@ -79,13 +76,13 @@ function TournamentsTickerListWidget:render()
 	}
 
 	local listContainer
-	if self.props.variant == 'collapsible' then
+	if props.variant == 'collapsible' then
 		listContainer = {
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'tournaments-list--tabs'},
 				children = tabsWidget,
 			},
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'tournaments-list--collapsible'},
 				children = {
 					PhaseCollapsible{label = 'Ongoing', children = buildSublist(data.ongoing)},
@@ -98,10 +95,10 @@ function TournamentsTickerListWidget:render()
 		listContainer = tabsWidget
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		css = {['padding-top'] = '0.75rem'},
 		children = listContainer,
 	}
 end
 
-return TournamentsTickerListWidget
+return Component.component(TournamentsTickerList, defaultProps)
