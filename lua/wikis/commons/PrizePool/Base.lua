@@ -616,9 +616,6 @@ function BasePrizePool:_buildTable(isAward)
 	}
 end
 
---- Footer toggle for the collapse. The two buttons carry the `general-collapsible-*`
---- classes that Collapse.js turns into anchors; the global stylesheet shows exactly
---- one of them per collapse state.
 ---@return Renderable?
 function BasePrizePool:_collapseToggle()
 	local collapseText = self:_collapseText()
@@ -630,11 +627,11 @@ function BasePrizePool:_collapseToggle()
 		children = {
 			Span{
 				classes = {'general-collapsible-expand-button'},
-				children = {collapseText.opentext, ' ', IconFa{iconName = 'expand'}},
+				children = {Span{children = {collapseText.opentext, ' ', IconFa{iconName = 'expand'}}}},
 			},
 			Span{
 				classes = {'general-collapsible-collapse-button'},
-				children = {collapseText.closetext, ' ', IconFa{iconName = 'collapse'}},
+				children = {Span{children = {collapseText.closetext, ' ', IconFa{iconName = 'collapse'}}}},
 			},
 		},
 	}
