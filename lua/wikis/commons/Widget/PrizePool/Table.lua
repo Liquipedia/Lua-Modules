@@ -28,6 +28,8 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@param props PrizePoolTableProps
 ---@return VNode
 local function PrizePoolTable(props)
+	local isCollapsed = Table.isNotEmpty(props.collapsedRows)
+
 	local prizePoolTable = Html.Div{
 		classes = {'prize-pool-table'},
 		css = {
@@ -36,12 +38,14 @@ local function PrizePoolTable(props)
 		children = {
 			props.header,
 			Html.Div{
-				classes = {
+				classes = Array.extend(
 					'prize-pool-table-body',
 					'content-switch-content-container',
-					'collapsed',
-					'general-collapsible',
-				},
+					isCollapsed and {
+						'general-collapsible',
+						'collapsed',
+					} or nil
+				),
 				children = WidgetUtil.collect(
 					props.displayedRows,
 					Table.isNotEmpty(props.collapsedRows) and {
@@ -56,7 +60,7 @@ local function PrizePoolTable(props)
 		}
 	}
 
-	if Logic.isEmpty(props.currencies) then
+	if Logic.isEmpty(props.currencies) or #props.currencies < 2 then
 		return prizePoolTable
 	end
 
