@@ -2,17 +2,13 @@ $prizepool-badge-size: 1.5rem;
 $prizepool-accent-width: 0.25rem;
 
 :root {
-	// Placement badge / left-accent colours. Reuse the standard placement-box
-	// medal tokens (see Miscellaneous.scss `$placement-colors`) so the prize-pool
-	// top-3 badges match every other placement badge: gold / silver / bronze.
+	// Reuse the standard gold/silver/bronze placement tokens so top-3 badges match.
 	--prizepool-place-1-accent: var( --clr-semantic-gold-40 );
 	--prizepool-place-2-accent: var( --clr-semantic-silver-40 );
 	--prizepool-place-3-accent: var( --clr-semantic-bronze-40 );
 
-	// Subtle full-row tints: the placement accent blended into the page surface so
-	// each top-3 row reads as a faint gold / silver / bronze wash. Defined once via
-	// the accent var + surface, so both the light/dark accents above and the
-	// surface flip through the cascade — no separate dark overrides needed.
+	// Faint full-row tint per place, built from the accent var so the dark-theme
+	// accents and surface flip through the cascade — no separate dark overrides.
 	--prizepool-place-1-tint: color-mix( in srgb, var( --prizepool-place-1-accent ) 15%, var( --clr-background ) );
 	--prizepool-place-2-tint: color-mix( in srgb, var( --prizepool-place-2-accent ) 15%, var( --clr-background ) );
 	--prizepool-place-3-tint: color-mix( in srgb, var( --prizepool-place-3-accent ) 15%, var( --clr-background ) );
@@ -40,8 +36,6 @@ Table2-based placement prize pool table
 }
 
 .prizepooltable {
-	// Header row: light fill, muted bold text, bottom divider (mostly inherited
-	// from Table2's head-row styling; only the divider weight is reinforced here).
 	.prizepooltable-header {
 		th,
 		td {
@@ -49,7 +43,6 @@ Table2-based placement prize pool table
 		}
 	}
 
-	// Placement number badge: small rounded-square chip, centered, white text.
 	.prizepooltable-badge {
 		display: inline-flex;
 		align-items: center;
@@ -87,7 +80,6 @@ Table2-based placement prize pool table
 		}
 	}
 
-	// Min widths so opponent columns do not collapse on wide tables.
 	.prizepooltable-col-player,
 	.prizepooltable-col-team {
 		min-width: 150px;
@@ -97,10 +89,7 @@ Table2-based placement prize pool table
 		min-width: 300px;
 	}
 
-	// Top-3 placement rows: subtle full-row tint + coloured left accent bar.
-	// The extra `.table2__row--body` class plus `!important`-free higher
-	// specificity makes these win over the Table2 zebra (`--odd`/`--even`)
-	// rule, which itself sits under a `.theme--*` wrapper.
+	// Top-3 rows: left accent bar (coloured, with the row tint, in the theme block below).
 	tr.table2__row--body.background-color-first-place,
 	tr.table2__row--body.background-color-second-place,
 	tr.table2__row--body.background-color-third-place {
@@ -116,9 +105,8 @@ Table2-based placement prize pool table
 		}
 	}
 
-	// Theme wrappers + the `.table2__table` qualifier raise specificity to
-	// (0,5,2) so the tint outranks the Table2 zebra rule (0,4,2) regardless of
-	// stylesheet load order, and the `:hover` variant keeps it from washing out.
+	// The theme wrapper + `.table2__table` qualifier raise specificity above the
+	// Table2 zebra rule so the tint wins regardless of load order; `:hover` keeps it.
 	.theme--light &.table2__table,
 	.theme--dark &.table2__table {
 		tr.table2__row--body.background-color-first-place {
@@ -155,8 +143,6 @@ Table2-based placement prize pool table
 		}
 	}
 
-	// Status rows (win / lose / disqualified): tint the place cell, preserving
-	// the pre-Table2 treatment.
 	tr.table2__row--body.bg-win .prizepooltable-place {
 		background-color: var( --clr-forest-background-color, inherit );
 	}
@@ -185,16 +171,12 @@ Table2-based placement prize pool table
 	}
 }
 
-// Show/hide the correct toggle label depending on collapse state.
 table.prizepooltable:not( .collapsed ) .prizepooltableshow,
 table.prizepooltable.collapsed .prizepooltablehide {
 	display: none;
 }
 
-// Class-based collapse (prize pool): the table is wrapped in a `general-collapsible`
-// whose footer holds the toggle, and Lua marks every row past the cut-off with
-// `ppt-hide-on-collapse`. Collapse.js wires the toggle; CSS hides the cut rows while
-// collapsed. Gated on `client-js` so non-JS readers see all rows and no dead toggle.
+// Gated on `client-js` so non-JS readers see all rows (the toggle can't expand them).
 html.client-js .prizepool-table-wrapper.collapsed .ppt-hide-on-collapse {
 	display: none;
 }
@@ -214,7 +196,6 @@ html.client-js .prizepool-table-wrapper.collapsed .ppt-hide-on-collapse {
 	}
 }
 
-// Show exactly one button per collapse state (the wrapper carries `collapsed`).
 .general-collapsible.collapsed .prizepooltable-toggle .general-collapsible-collapse-button,
 .general-collapsible:not( .collapsed ) .prizepooltable-toggle .general-collapsible-expand-button {
 	display: none;
