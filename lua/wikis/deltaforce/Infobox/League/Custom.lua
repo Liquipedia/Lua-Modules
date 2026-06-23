@@ -45,8 +45,8 @@ function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
 
-	league.args.mode = MODES[(league.args.mode or 'default'):lower():gsub(' ', '')]
-	league.args.platform = PLATFORMS[(league.args.platform or 'default'):lower():gsub(' ', '')]
+	league.args.mode = MODES[(league.args.mode or ''):lower():gsub(' ', '')] or MODES.default
+	league.args.platform = PLATFORMS[(league.args.platform or ''):lower():gsub(' ', '')] or PLATFORMS.default
 
 	return league:createInfobox()
 end
@@ -102,8 +102,8 @@ end
 ---@return string[]
 function CustomLeague:getWikiCategories(args)
 	return {
-		args.mode and (args.mode .. ' Competitions') or 'Tournaments without specified mode',
-		args.platform and (args.platform .. ' Tournaments') or 'Tournaments on unknown platforms',
+		args.mode and (args.mode .. ' Competitions'),
+		args.platform and (args.platform .. ' Tournaments'),
 	}
 end
 
