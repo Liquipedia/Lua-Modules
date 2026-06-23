@@ -13,7 +13,6 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Medals = Lua.import('Module:Medals')
 local Ordinal = Lua.import('Module:Ordinal')
-local PlacementInfo = Lua.import('Module:Placement')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 

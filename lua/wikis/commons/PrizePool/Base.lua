@@ -52,7 +52,6 @@ local BasePrizePool = Class.new(function(self, ...) self:init(...) end)
 ---@field data table
 
 local LANG = mw.language.getContentLanguage()
-local DASH = '&#045;'
 local NON_BREAKING_SPACE = '&nbsp;'
 local BASE_CURRENCY = 'USD'
 local EXCHANGE_SUMMARY_PRECISION = 5
