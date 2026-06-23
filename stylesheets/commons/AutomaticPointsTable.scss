@@ -8,6 +8,7 @@ Author(s): XtratoS
 		border-width: 1px 0 0 1px;
 		overflow: hidden;
 		margin-bottom: 20px;
+		width: calc( 450px + var( --num-columns ) * 50px );
 	}
 
 	.divTable.border-bottom {
