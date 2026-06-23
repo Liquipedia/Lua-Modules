@@ -1,7 +1,18 @@
 $prizepool-badge-size: 1.5rem;
 $prizepool-accent-width: 0.25rem;
 
+/*******************************************************************************
+Shared prize-pool custom properties
+
+`--prize-pool-*` are consumed by legacy tables here AND by Colours.scss
+(`.background-color-first-place` / `.bg-first` / `.bg-p1` resolve `--prize-pool-gold`),
+so they must stay defined even though the redesigned table no longer uses them.
+`--prizepool-place-*` are the redesign tokens for the Table2 placement table.
+*******************************************************************************/
+
 :root {
+	--prize-pool-background-color: transparent;
+
 	// Reuse the standard gold/silver/bronze placement tokens so top-3 badges match.
 	--prizepool-place-1-accent: var( --clr-semantic-gold-40 );
 	--prizepool-place-2-accent: var( --clr-semantic-silver-40 );
@@ -14,14 +25,338 @@ $prizepool-accent-width: 0.25rem;
 	--prizepool-place-3-tint: color-mix( in srgb, var( --prizepool-place-3-accent ) 15%, var( --clr-background ) );
 }
 
+.theme--light {
+	--prize-pool-variant-background-color: #f2f2f2;
+	--prize-pool-header-background-color: #eaecf0;
+	--prize-pool-alt-background-color: #f5f5f5;
+	--prize-pool-gold: var( --clr-semantic-gold-40 );
+	--prize-pool-silver: var( --clr-semantic-silver-40 );
+	--prize-pool-bronze: var( --clr-semantic-bronze-40 );
+	--prize-pool-copper: var( --clr-semantic-copper-40 );
+}
+
 .theme--dark {
+	--prize-pool-variant-background-color: var( --clr-moon-20 );
+	--prize-pool-header-background-color: var( --table-header-variant-background-color );
+	--prize-pool-alt-background-color: var( --clr-secondary-9 );
+	--prize-pool-gold: var( --clr-semantic-gold-30 );
+	--prize-pool-silver: var( --clr-secondary-39 );
+	--prize-pool-bronze: var( --clr-semantic-bronze-20 );
+	--prize-pool-copper: var( --clr-semantic-copper-20 );
+
 	--prizepool-place-1-accent: var( --clr-semantic-gold-30 );
 	--prizepool-place-2-accent: var( --clr-semantic-silver-40 );
 	--prizepool-place-3-accent: var( --clr-semantic-bronze-30 );
 }
 
 /*******************************************************************************
-Table2-based placement prize pool table
+Legacy / shared prize pool table styles
+Template(s): Prize pool tables — Author(s): FO-nTTaX
+
+Still relied on by non-redesigned consumers that share the `prizepooltable`
+class and the global `bg-*` / `background-color-*-place` placement classes
+(MvpTable, SeriesMedalStats, StageWinnings, TournamentPlayerInformation,
+TournamentsListing, css-grid tables). Do not remove without auditing those.
+*******************************************************************************/
+
+table.prizepooltable:not( .collapsed ) .prizepooltableshow,
+table.prizepooltable.collapsed .prizepooltablehide {
+	display: none;
+}
+
+.prizepooltable-col-player,
+.prizepooltable-col-team {
+	min-width: 150px;
+}
+
+.prizepooltable-col-two-players {
+	min-width: 300px;
+}
+
+@media ( max-width: 600px ) {
+	.prizepooltable-col-team {
+		min-width: 65px;
+
+		a:nth-child( 2 ) {
+			display: none;
+		}
+	}
+}
+
+// Legacy data-cutafter collapse (mvp / medal / winnings tables, which share the
+// `prizepooltable` class and Prizepooltable.js). The JS injects the toggle before
+// the (cutAfter + 2)-th row, so rows from (cutAfter + 3) onward are hidden.
+@for $i from 0 through 32 {
+	html.client-js .prizepooltable.collapsed[ data-cutafter="#{$i}" ] tr:nth-child( n + #{ $i + 3 } ) {
+		display: none;
+	}
+}
+
+.prizepooltable-header {
+	background-color: var( --prize-pool-header-background-color, inherit );
+}
+
+.csstable-widget.prizepooltable {
+	border: 0.125rem solid var( --prize-pool-header-background-color );
+
+	.csstable-widget-row,
+	.csstable-widget-cell {
+		border: 0;
+	}
+
+	.csstable-widget-row:nth-child( odd ):not( .prizepooltable-header ):not( .ppt-toggle-expand ) {
+		background-color: var( --prize-pool-alt-background-color );
+	}
+}
+
+/* Background colours */
+
+tr.bg-first,
+div.bg-first,
+tr.bg-p1,
+div.bg-p1,
+tr.background-color-first-place,
+div.background-color-first-place {
+	background-color: var( --prize-pool-background-color, #ffe982 );
+}
+
+td.bg-first,
+td.bg-p1,
+td.background-color-first-place {
+	background-color: var( --prize-pool-gold, #ffe982 );
+}
+
+tr.bg-first,
+div.bg-first,
+tr.bg-p1,
+div.bg-p1,
+tr.background-color-first-place,
+div.background-color-first-place,
+div.csstable-widget-row.background-color-first-place > .csstable-widget-cell {
+	border-bottom: 0.125rem solid var( --prize-pool-gold, transparent );
+}
+
+tr.bg-first > td.prizepooltable-place,
+div.bg-first > td.prizepooltable-place,
+tr.bg-p1 > td.prizepooltable-place,
+div.bg-p1 > td.prizepooltable-place,
+tr.background-color-first-place > td.prizepooltable-place,
+div.background-color-first-place > *.prizepooltable-place {
+	background-color: var( --prize-pool-gold, inherit );
+	color: #ffffff;
+}
+
+tr.bg-second,
+div.bg-second,
+tr.bg-p2,
+div.bg-p2,
+tr.background-color-second-place,
+div.background-color-second-place {
+	background-color: var( --prize-pool-background-color, #eeeeee );
+}
+
+td.bg-second,
+td.bg-p2,
+td.background-color-second-place {
+	background-color: var( --prize-pool-silver, #eeeeee );
+}
+
+tr.bg-second,
+div.bg-second,
+tr.bg-p2,
+div.bg-p2,
+tr.background-color-second-place,
+div.background-color-second-place,
+div.csstable-widget-row.background-color-second-place > .csstable-widget-cell {
+	border-bottom: 0.125rem solid var( --prize-pool-silver, transparent );
+}
+
+tr.bg-second > td.prizepooltable-place,
+div.bg-second > td.prizepooltable-place,
+tr.bg-p2 > td.prizepooltable-place,
+div.bg-p2 > td.prizepooltable-place,
+tr.background-color-second-place > td.prizepooltable-place,
+div.background-color-second-place > *.prizepooltable-place {
+	background-color: var( --prize-pool-silver, inherit );
+	color: #ffffff;
+}
+
+tr.bg-third,
+div.bg-third,
+tr.bg-p3,
+div.bg-p3,
+tr.background-color-third-place,
+div.background-color-third-place:not( :first-child ) {
+	background-color: var( --prize-pool-background-color, #f9e8c7 );
+}
+
+td.bg-third,
+td.bg-p3,
+td.background-color-third-place {
+	background-color: var( --prize-pool-bronze, #f9e8c7 );
+}
+
+tr.bg-third,
+div.bg-third,
+tr.bg-p3,
+div.bg-p3,
+tr.background-color-third-place,
+div.background-color-third-place,
+div.csstable-widget-row.background-color-third-place > .csstable-widget-cell {
+	border-bottom: 0.125rem solid var( --prize-pool-bronze, transparent );
+}
+
+tr.bg-third > td.prizepooltable-place,
+div.bg-third > td.prizepooltable-place,
+tr.bg-p3 > td.prizepooltable-place,
+div.bg-p3 > td.prizepooltable-place,
+tr.background-color-third-place > td.prizepooltable-place,
+div.background-color-third-place > *.prizepooltable-place {
+	background-color: var( --prize-pool-bronze, inherit );
+	color: #ffffff;
+}
+
+tr.bg-fourth,
+div.bg-fourth,
+tr.bg-p4,
+div.bg-p4,
+tr.background-color-fourth-place,
+div.background-color-fourth-place {
+	background-color: var( --prize-pool-background-color, #f9dec7 );
+}
+
+td.bg-fourth,
+td.bg-p4,
+td.background-color-fourth-place {
+	background-color: var( --prize-pool-copper, #f9dec7 );
+}
+
+tr.bg-fourth,
+div.bg-fourth,
+tr.bg-p4,
+div.bg-p4,
+tr.background-color-fourth-place,
+div.background-color-fourth-place,
+div.csstable-widget-row.background-color-fourth-place > .csstable-widget-cell {
+	border-bottom: 0.125rem solid var( --prize-pool-copper, transparent );
+}
+
+tr.bg-fourth > td.prizepooltable-place,
+div.bg-fourth > td.prizepooltable-place,
+tr.bg-p4 > td.prizepooltable-place,
+div.bg-p4 > td.prizepooltable-place,
+tr.background-color-fourth-place > td.prizepooltable-place,
+div.background-color-fourth-place > *.prizepooltable-place {
+	background-color: var( --prize-pool-copper, inherit );
+	color: #ffffff;
+}
+
+div.csstable-widget-row.bg-win {
+	div.prizepooltable > & {
+		/* need the `!important` due to bg-win ( sadly ) having an important in one of its definitions ... */
+		background-color: inherit !important;
+	}
+
+	> .csstable-widget-cell {
+		border-bottom: 0.125rem solid var( --clr-forest-background-color, transparent );
+	}
+}
+
+div.bg-win > *.prizepooltable-place {
+	background-color: var( --clr-forest-background-color, inherit );
+}
+
+div.csstable-widget-row.bg-lose {
+	background-color: inherit;
+
+	> .csstable-widget-cell {
+		border-bottom: 0.125rem solid var( --clr-cinnabar-background-color, transparent );
+	}
+}
+
+div.bg-lose > *.prizepooltable-place {
+	background-color: var( --clr-cinnabar-background-color, inherit );
+}
+
+tr.background-color-disqualified,
+div.background-color-disqualified {
+	background-color: #dee3ef;
+}
+
+tr.background-color-win,
+div.background-color-win {
+	background-color: #ddf4dd;
+}
+
+tr.background-color-lose,
+div.background-color-lose {
+	background-color: #fbdfdf;
+}
+
+tr.background-color-highlight,
+div.background-color-highlight {
+	background-color: #cce5ea;
+}
+
+.prizepooltable-background-variant {
+	background-color: var( --prize-pool-variant-background-color, #f2f2f2 );
+}
+
+/*******************************************************************************
+Legacy ( standardized ) prize pool tables — Author: Rathoz
+*******************************************************************************/
+
+.collapsed > .ppt-hide-on-collapse {
+	display: none !important;
+}
+
+.collapsed .ppt-toggle-expand .general-collapsible-collapse-button,
+.general-collapsible:not( .collapsed ) .ppt-toggle-expand .general-collapsible-expand-button {
+	display: none !important;
+}
+
+.prizepooltabletoggle {
+	cursor: pointer;
+}
+
+// Legacy css-grid table widget (Module:Widget/Table/Old), still used by
+// non-prizepool modules (e.g. infoboxes). Prizepool no longer renders via this.
+.csstable-widget {
+	border-right: 1px solid var( --table-border-color, #bbbbbb );
+	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
+	display: inline-grid;
+
+	&-row:not( .ppt-toggle-expand ) {
+		display: contents;
+	}
+
+	&-cell {
+		border-left: 1px solid var( --table-border-color, #bbbbbb );
+		border-top: 1px solid var( --table-border-color, #bbbbbb );
+		background: inherit;
+		padding: 4px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-wrap: wrap;
+	}
+}
+
+.ppt-toggle-expand {
+	grid-column: 1 / -1;
+
+	> * {
+		color: unset !important;
+		text-decoration: none !important;
+	}
+}
+
+/*******************************************************************************
+Table2-based placement / award prize pool table ( redesign )
+
+Scoped to `.prizepooltable-placement` / `.prizepool-table-wrapper` so it owns the
+redesigned table only and does not affect the other Table2 tables that merely
+share the `prizepooltable` class.
 *******************************************************************************/
 
 .prizepool-table-wrapper {
@@ -36,13 +371,6 @@ Table2-based placement prize pool table
 }
 
 .prizepooltable {
-	.prizepooltable-header {
-		th,
-		td {
-			font-weight: bold;
-		}
-	}
-
 	.prizepooltable-badge {
 		display: inline-flex;
 		align-items: center;
@@ -75,41 +403,41 @@ Table2-based placement prize pool table
 		font-weight: bold;
 		color: var( --clr-secondary-25 );
 
+		// Override the legacy `… > td.prizepooltable-place` metal fill so the row
+		// tint + accent bar show through on the redesigned table instead.
+		background-color: transparent;
+
 		.theme--dark & {
 			color: var( --clr-secondary-100 );
 		}
 	}
 
-	.prizepooltable-col-player,
-	.prizepooltable-col-team {
-		min-width: 150px;
-	}
-
-	.prizepooltable-col-two-players {
-		min-width: 300px;
-	}
-
 	// Top-3 rows: left accent bar (coloured, with the row tint, in the theme block below).
-	tr.table2__row--body.background-color-first-place,
-	tr.table2__row--body.background-color-second-place,
-	tr.table2__row--body.background-color-third-place {
-		.prizepooltable-place {
-			position: relative;
+	&.prizepooltable-placement {
+		tr.table2__row--body.background-color-first-place,
+		tr.table2__row--body.background-color-second-place,
+		tr.table2__row--body.background-color-third-place {
+			.prizepooltable-place {
+				position: relative;
 
-			&::before {
-				content: "";
-				position: absolute;
-				inset: 0 auto 0 0;
-				width: $prizepool-accent-width;
+				&::before {
+					content: "";
+					position: absolute;
+					inset: 0 auto 0 0;
+					width: $prizepool-accent-width;
+				}
 			}
 		}
 	}
 
 	// The theme wrapper + `.table2__table` qualifier raise specificity above the
 	// Table2 zebra rule so the tint wins regardless of load order; `:hover` keeps it.
-	.theme--light &.table2__table,
-	.theme--dark &.table2__table {
+	// `border-bottom: 0` drops the legacy per-place coloured row border.
+	.theme--light &.prizepooltable-placement.table2__table,
+	.theme--dark &.prizepooltable-placement.table2__table {
 		tr.table2__row--body.background-color-first-place {
+			border-bottom: 0;
+
 			&,
 			&:hover {
 				background-color: var( --prizepool-place-1-tint );
@@ -121,6 +449,8 @@ Table2-based placement prize pool table
 		}
 
 		tr.table2__row--body.background-color-second-place {
+			border-bottom: 0;
+
 			&,
 			&:hover {
 				background-color: var( --prizepool-place-2-tint );
@@ -132,6 +462,8 @@ Table2-based placement prize pool table
 		}
 
 		tr.table2__row--body.background-color-third-place {
+			border-bottom: 0;
+
 			&,
 			&:hover {
 				background-color: var( --prizepool-place-3-tint );
@@ -154,33 +486,9 @@ Table2-based placement prize pool table
 	tr.table2__row--body.bg-dq .prizepooltable-place {
 		background-color: var( --clr-sapphire-background-color, inherit );
 	}
-
-	.prizepooltabletoggle {
-		cursor: pointer;
-		font-weight: bold;
-		text-align: center;
-		color: var( --clr-brand-30, #0a558f );
-
-		.theme--dark & {
-			color: var( --clr-brand-80, #a7cdf1 );
-		}
-
-		> small {
-			font-weight: unset;
-		}
-	}
 }
 
-table.prizepooltable:not( .collapsed ) .prizepooltableshow,
-table.prizepooltable.collapsed .prizepooltablehide {
-	display: none;
-}
-
-// Gated on `client-js` so non-JS readers see all rows (the toggle can't expand them).
-html.client-js .prizepool-table-wrapper.collapsed .ppt-hide-on-collapse {
-	display: none;
-}
-
+// Footer toggle for the redesigned (general-collapsible) table.
 .prizepooltable-toggle {
 	text-align: center;
 	font-weight: bold;
@@ -205,53 +513,13 @@ html:not( .client-js ) .prizepooltable-toggle {
 	display: none;
 }
 
-// Legacy data-cutafter collapse (mvp / medal / winnings tables, which share the
-// `prizepooltable` class and Prizepooltable.js). The JS injects the toggle before
-// the (cutAfter + 2)-th row, so rows from (cutAfter + 3) onward are hidden.
-@for $i from 0 through 32 {
-	html.client-js .prizepooltable.collapsed[ data-cutafter="#{$i}" ] tr:nth-child( n + #{ $i + 3 } ) {
-		display: none;
-	}
-}
-
-@media ( max-width: 600px ) {
-	.prizepooltable-col-team {
-		min-width: 65px;
-
-		a:nth-child( 2 ) {
-			display: none;
-		}
-	}
+// Gated on `client-js` so non-JS readers see all rows (the toggle can't expand them).
+html.client-js .prizepool-table-wrapper.collapsed .ppt-hide-on-collapse {
+	display: none;
 }
 
 /*******************************************************************************
-Legacy css-grid table widget (Module:Widget/Table/Old), still used by
-non-prizepool modules (e.g. infoboxes). Prizepool no longer renders via this.
-*******************************************************************************/
-
-.csstable-widget {
-	border-right: 1px solid var( --table-border-color, #bbbbbb );
-	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
-	display: inline-grid;
-
-	&-row {
-		display: contents;
-	}
-
-	&-cell {
-		border-left: 1px solid var( --table-border-color, #bbbbbb );
-		border-top: 1px solid var( --table-border-color, #bbbbbb );
-		background: inherit;
-		padding: 4px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-wrap: wrap;
-	}
-}
-
-/*******************************************************************************
-( Standardized ) prize pool section
+( Standardized ) prize pool section — Author: iMarbot
 *******************************************************************************/
 
 .prizepool-section-wrapper {
