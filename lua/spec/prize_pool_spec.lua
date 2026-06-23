@@ -44,7 +44,15 @@ describe('prize pool', function()
 
 		assert.are_same(
 			{
-				{id = 'BASE_CURRENCY1', type = 'BASE_CURRENCY', index = 1, data = {roundPrecision = 3}},
+				{
+					id = 'BASE_CURRENCY1',
+					type = 'BASE_CURRENCY',
+					index = 1,
+					data = {
+						roundPrecision = 3,
+						currency = 'USD',
+					}
+				},
 				{
 					id = 'LOCAL_CURRENCY1',
 					type = 'LOCAL_CURRENCY',
