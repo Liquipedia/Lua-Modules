@@ -234,7 +234,7 @@ BasePrizePool.prizeTypes = {
 			return {title = 'Percentage'}
 		end,
 		headerDisplay = function (data)
-			return TableCellHeader{children = {data.title}}
+			return TableCellHeader{children = {data.title}, align = 'right'}
 		end,
 
 		row = 'percentage',
@@ -248,7 +248,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if String.isNotEmpty(data) then
-				return TableCell{children = {data .. '%'}}
+				return TableCell{children = {data .. '%'}, align = 'right'}
 			end
 		end,
 	},
@@ -345,7 +345,7 @@ BasePrizePool.prizeTypes = {
 				table.insert(headerDisplay, text)
 			end
 
-			return TableCellHeader{children = {table.concat(headerDisplay)}}
+			return TableCellHeader{children = {table.concat(headerDisplay)}, align = 'right'}
 		end,
 
 		row = 'points',
@@ -354,7 +354,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{children = {LANG:formatNum(data)}}
+				return TableCell{children = {LANG:formatNum(data)}, align = 'right'}
 			end
 		end,
 	},
