@@ -13,7 +13,7 @@ local Logic = Lua.import('Module:Logic')
 
 local Component = Lua.import('Module:Widget/Component')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local Html = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class TournamentTitleProps
