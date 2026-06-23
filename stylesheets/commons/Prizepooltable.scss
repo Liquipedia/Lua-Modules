@@ -418,6 +418,7 @@ Template: Prize Pool Table
 		--prize-pool-placement-background-color: var( --clr-on-surface-light-primary-4 );
 
 		&.prize-pool-table-header-row {
+			font-weight: bold;
 			background-color: var( --clr-on-surface-light-primary-4 );
 			color: var( --clr-secondary-25 );
 
