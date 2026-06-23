@@ -415,8 +415,6 @@ Template: Prize Pool Table
 		grid-template-rows: repeat( var( --prize-pool-row-height, 1 ), auto );
 		background-color: var( --prize-pool-placement-background-color );
 
-		--prize-pool-placement-background-color: var( --clr-on-surface-light-primary-4 );
-
 		&.prize-pool-table-header-row {
 			font-weight: bold;
 			background-color: var( --clr-on-surface-light-primary-4 );
@@ -428,11 +426,17 @@ Template: Prize Pool Table
 			}
 		}
 
-		.theme--dark & {
-			--prize-pool-placement-background-color: var( --clr-on-surface-dark-primary-4 );
+		&:nth-of-type( even ) {
+			--prize-pool-placement-background-color: var( --clr-on-surface-light-primary-4 );
+			--prize-pool-placement-label-color: var( --clr-secondary-25 );
+
+			.theme--dark & {
+				--prize-pool-placement-background-color: var( --clr-on-surface-dark-primary-4 );
+				--prize-pool-placement-label-color: var( --clr-secondary-100 );
+			}
 		}
 
-		&:nth-of-type( even ) {
+		&:hover {
 			--prize-pool-placement-background-color: var( --clr-on-surface-light-primary-8 );
 
 			.theme--dark & {
@@ -445,37 +449,44 @@ Template: Prize Pool Table
 
 			.generic-label.label--prize-pool-placement {
 				background-color: var( --prize-pool-placement-color, transparent );
-				box-shadow: 0 1px 1px 0 #000000;
+				color: var( --prize-pool-placement-label-color );
+				font-weight: bold;
 			}
 		}
 
 		&[ data-placement="1" ] {
 			--prize-pool-placement-color: #f0b419;
 			--prize-pool-placement-background-color: #fff9eb;
+			--prize-pool-placement-label-color: var( --clr-secondary-100 );
 
 			.theme--dark & {
 				--prize-pool-placement-color: #fbcb50;
 				--prize-pool-placement-background-color: hsl( from var( --prize-pool-placement-color ) h s l / 0.16 );
+				--prize-pool-placement-label-color: var( --clr-secondary-16 );
 			}
 		}
 
 		&[ data-placement="2" ] {
 			--prize-pool-placement-color: #58b5e3;
 			--prize-pool-placement-background-color: #f0fcff;
+			--prize-pool-placement-label-color: var( --clr-secondary-100 );
 
 			.theme--dark & {
 				--prize-pool-placement-color: #91d7f9;
 				--prize-pool-placement-background-color: hsl( from var( --prize-pool-placement-color ) h s l / 0.16 );
+				--prize-pool-placement-label-color: var( --clr-secondary-16 );
 			}
 		}
 
 		&[ data-placement="3" ] {
 			--prize-pool-placement-color: #de7d1d;
 			--prize-pool-placement-background-color: #fff3ec;
+			--prize-pool-placement-label-color: var( --clr-secondary-100 );
 
 			.theme--dark & {
 				--prize-pool-placement-color: #ffb267;
 				--prize-pool-placement-background-color: hsl( from var( --prize-pool-placement-color ) h s l / 0.16 );
+				--prize-pool-placement-label-color: var( --clr-secondary-16 );
 			}
 		}
 	}
