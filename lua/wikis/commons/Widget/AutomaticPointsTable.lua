@@ -41,7 +41,7 @@ function AutomaticPointsTableWidget.renderFn(props)
 		classes = {'table-responsive', 'automatic-points-table'},
 		children = Div{
 			classes = {'fixed-size-table-container', 'border-color-grey'},
-			css = {width = (450 + numCols * 50) .. 'px'},
+			css = {['--num-columns'] = numCols},
 			children = AutomaticPointsTableWidget.createTable(props)
 		}
 	}
