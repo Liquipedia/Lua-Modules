@@ -20,7 +20,7 @@ local FilterConfig = Lua.import('Module:FilterButtons/Config')
 ---@field tournaments StandardTournament[]
 ---@field displayGameIcons boolean?
 ---@field createItem (fun(tournament: StandardTournament): Renderable)?
----@field fallback Widget?
+---@field fallback Renderable?
 
 ---@param props TournamentsTickerSublistProps
 ---@return VNode?
