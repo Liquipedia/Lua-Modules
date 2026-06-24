@@ -89,7 +89,7 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return Widget?
+---@return Renderable?
 function CustomPlayer:createBottomContent()
 	if String.isEmpty(self.args.team) or not self:shouldStoreData(self.args) then
 		return
