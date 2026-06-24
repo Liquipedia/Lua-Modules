@@ -56,19 +56,9 @@ Template(s): Page preview hovercards
 		opacity: 0.8;
 	}
 
-	&__row {
-		display: flex;
-		justify-content: space-between;
-		gap: 1rem;
-		margin-top: 0.125rem;
-	}
-
-	&__key {
-		font-weight: bold;
-		white-space: nowrap;
-	}
-
-	&__value {
-		text-align: right;
+	// the fields render as an embedded Table2; stretch it to the card width so
+	// the right-aligned values line up against the card's right edge
+	.table2 {
+		width: 100%;
 	}
 }
