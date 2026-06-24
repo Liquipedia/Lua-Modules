@@ -233,7 +233,7 @@ function MatchTickerController.fetchMatches(config)
 		DEFAULT_LIMIT * 20
 	)
 
-	if not type(matches[1]) == 'table' then
+	if type(matches[1]) ~= 'table' then
 		return {}
 	end
 
