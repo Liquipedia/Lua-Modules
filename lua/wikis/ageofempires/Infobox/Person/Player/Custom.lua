@@ -182,7 +182,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return Html?
+---@return Renderable?
 function CustomPlayer:createBottomContent()
 	return MatchTicker.recent{player = self.pagename}
 end

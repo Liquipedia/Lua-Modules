@@ -38,7 +38,7 @@ function CustomPlayer:_getStatusContents()
 	return {Page.makeInternalLink({onlyIfExists = true}, self.args.status) or self.args.status}
 end
 
----@return Html?
+---@return Renderable?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) then
 		return MatchTicker.recent{player = self.pagename}
