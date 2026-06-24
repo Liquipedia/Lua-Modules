@@ -357,7 +357,7 @@ function League:_createUpcomingMatches()
 
 	return Logic.tryCatch(
 		function()
-			return MatchTicker{
+			return MatchTicker.makeMatchTicker{
 				tournament = self.pagename,
 				limit = 5,
 				upcoming = true,

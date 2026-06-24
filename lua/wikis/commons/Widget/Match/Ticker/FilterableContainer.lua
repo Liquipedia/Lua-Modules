@@ -16,7 +16,7 @@ local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html')
 local Switch = Lua.import('Module:Widget/Switch')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
 

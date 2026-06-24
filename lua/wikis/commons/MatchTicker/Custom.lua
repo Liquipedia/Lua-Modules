@@ -33,9 +33,9 @@ function CustomMatchTicker.mainPage(frame)
 	args.games = args['filterbuttons-game']
 
 	if args.type == 'upcoming' then
-		return MatchTicker(Table.merge(args, {ongoing = true, upcoming = true}))
+		return MatchTicker.makeMatchTicker(Table.merge(args, {ongoing = true, upcoming = true}))
 	elseif args.type == 'recent' then
-		return MatchTicker(Table.merge(args, {recent = true}))
+		return MatchTicker.makeMatchTicker(Table.merge(args, {recent = true}))
 	end
 end
 
@@ -59,7 +59,7 @@ function CustomMatchTicker.recent(args)
 	args.limit = args.limit or args.recentLimit or 5
 	args.header = InfoboxHeader{name = 'Recent Matches', displayButtons = false}
 
-	return MatchTicker(args)
+	return MatchTicker.makeMatchTicker(args)
 end
 
 return CustomMatchTicker

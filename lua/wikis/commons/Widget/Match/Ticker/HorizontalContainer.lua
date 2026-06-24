@@ -12,7 +12,7 @@ local I18n = Lua.import('Module:I18n')
 
 local Carousel = Lua.import('Module:Widget/Basic/Carousel')
 local Switch = Lua.import('Module:Widget/Switch')
-local Html = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 
 local TABLE_OF_CONTENTS = '__TOC__'
 
