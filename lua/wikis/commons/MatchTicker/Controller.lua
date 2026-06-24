@@ -237,6 +237,10 @@ function MatchTickerController.fetchMatches(config)
 		return {}
 	end
 
+	matches = MatchTickerController.sortMatches(matches, config)
+	matches = Array.sub(matches, 1, config.limit)
+	matches = Array.map(matches, function(match) return MatchTickerController.adjustMatch(match, config) end)
+
 	return matches
 end
 
