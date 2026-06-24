@@ -25,7 +25,7 @@ local MatchUtil = Lua.import('Module:Match/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Tournament = Lua.import('Module:Tournament')
 
-local Html = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local MatchCard = Lua.import('Module:Widget/Match/Card')
 local Carousel = Lua.import('Module:Widget/Basic/Carousel')
 local Switch = Lua.import('Module:Widget/Switch')

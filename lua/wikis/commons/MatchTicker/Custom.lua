@@ -16,7 +16,7 @@ local InfoboxHeader = Lua.import('Module:Widget/Infobox/Header')
 
 local CustomMatchTicker = {}
 
----Entry point for display on the main page with the new style
+---Entry point for display on the main page
 ---@param frame Frame|table|nil
 ---@return Renderable?
 function CustomMatchTicker.mainPage(frame)
@@ -62,7 +62,7 @@ function CustomMatchTicker.recent(args, matches)
 	args.limit = args.limit or args.recentLimit or 5
 
 	return MatchTicker(args):query(matches.recent):create(
-		InfoboxHeader{name = 'Recent Matches'}
+		InfoboxHeader{name = 'Recent Matches', displayButtons = false}
 	)
 end
 

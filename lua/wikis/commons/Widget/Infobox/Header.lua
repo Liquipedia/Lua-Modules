@@ -24,10 +24,12 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@field imageText Renderable?
 ---@field name Renderable?
 ---@field subHeader Renderable?
+---@field displayButtons boolean?
 
 local Header = {}
-Header.defaultProps = {
+local defaultProps = {
 	name = mw.title.getCurrentTitle().text,
+	displayButtons = true,
 }
 
 ---@param props InfoboxHeaderProps
@@ -57,7 +59,7 @@ function Header._name(props)
 	return Div{children = {Div{
 		classes = {'infobox-header', 'wiki-backgroundcolor-light'},
 		children = {
-			Header._createInfoboxButtons(),
+			Header._createInfoboxButtons(props),
 			props.name,
 		}
 	}}}
@@ -138,8 +140,11 @@ function Header._makeSizedImage(imageName, size, mode)
 	}
 end
 
----@return VNode
-function Header._createInfoboxButtons()
+---@return VNode?
+function Header._createInfoboxButtons(props)
+	if not props.displayButtons then
+		return
+	end
 	local rootFrame
 	local currentFrame = mw.getCurrentFrame()
 	while currentFrame ~= nil do
@@ -188,4 +193,4 @@ function Header._makeImageText(text)
 	return Div{classes = {'infobox-image-text'}, children = {text}}
 end
 
-return Component.component(Header.render, Header.defaultProps)
+return Component.component(Header.render, defaultProps)
