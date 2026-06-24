@@ -204,14 +204,22 @@ class PagePreviewModule {
 		if ( Array.isArray( card.extra ) ) {
 			card.extra.forEach( ( field ) => field && addRow( field.label, field.value ) );
 		}
-		const rowsHtml = rows.map( ( row ) => '<div class="page-preview-card__row">' +
-			`<span class="page-preview-card__key">${ e( row.label ) }</span>` +
-			`<span class="page-preview-card__value">${ e( row.value ) }</span></div>`
-		).join( '' );
+		// render the fields as a Table2 (reuses the already-bundled .table2 styles):
+		// bold key header cell, right-aligned value, striped rows. The even-row class
+		// is set here because Table2.js only stripes tables present at page init, not
+		// this card which is built on hover.
+		const rowsHtml = rows.map( ( row, i ) => {
+			const even = i % 2 === 1 ? ' table2__row--even' : '';
+			return `<tr class="table2__row--body${ even }">` +
+				`<th>${ e( row.label ) }</th>` +
+				`<td data-align="right">${ e( row.value ) }</td></tr>`;
+		} ).join( '' );
+		const table = rowsHtml ?
+			`<div class="table2"><table class="table2__table"><tbody>${ rowsHtml }</tbody></table></div>` : '';
 		return img + '<div class="page-preview-card__body">' +
 			`<div class="page-preview-card__name">${ e( card.name ) }</div>` +
 			( card.realName ? `<div class="page-preview-card__subtitle">${ e( card.realName ) }</div>` : '' ) +
-			rowsHtml + '</div>';
+			table + '</div>';
 	}
 
 	/**
