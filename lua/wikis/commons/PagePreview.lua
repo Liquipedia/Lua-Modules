@@ -9,8 +9,15 @@ local Lua = require('Module:Lua')
 
 local AgeCalculation = Lua.import('Module:AgeCalculation')
 local Array = Lua.import('Module:Array')
+local Info = Lua.import('Module:Info')
 local PlayerTeamRoles = Lua.import('Module:PlayerTeamRoles')
 local String = Lua.import('Module:StringUtils')
+
+---@class PagePreviewFieldSpec
+---@field label string the row label shown on the card
+---@field column string? a top-level LPDB column to fetch and display
+---@field extradata (string|string[])? key(s) within the extradata blob to display
+---@field separator string? joiner for multiple extradata keys (default ', ')
 
 local PagePreview = {}
 
@@ -20,6 +27,20 @@ local MAX_ENTITIES = 100
 -- wiki Variables do persist across a single page parse. '|' is forbidden in
 -- page titles, so it is a safe delimiter.
 local COLLECT_VAR = 'pagepreview_pages'
+
+-- Generic LPDB columns fetched for every player card, on every wiki.
+local GENERIC_COLUMNS = {
+	'pagename', 'id', 'name', 'nationality', 'teampagename', 'status',
+	'earnings', 'imageurl', 'birthdate', 'deathdate', 'extradata',
+}
+
+---@param name any
+---@return boolean
+local function isValidColumn(name)
+	-- column names come from wiki Info.lua and are spliced into the LPDB query,
+	-- so restrict them to bare identifiers to keep the query uninjectable
+	return type(name) == 'string' and name:match('^[%w_]+$') ~= nil
+end
 
 ---clears the collected page names (test-only)
 function PagePreview.reset()
@@ -52,10 +73,72 @@ function PagePreview.key(pageName)
 	return (pageName:gsub(' ', '_'))
 end
 
+---the wiki-specific extra preview field specs, from Info.config.pagePreview.player
+---@return PagePreviewFieldSpec[]
+function PagePreview.extraSpecs()
+	local config = Info.config.pagePreview or {}
+	return config.player or {}
+end
+
+---the extra wiki-specific LPDB columns to add to the query (validated, deduped
+---against the generic columns)
+---@param specs PagePreviewFieldSpec[]
+---@return string[]
+function PagePreview.extraColumns(specs)
+	local generic = {}
+	Array.forEach(GENERIC_COLUMNS, function(column) generic[column] = true end)
+	local columns, seen = {}, {}
+	Array.forEach(specs, function(spec)
+		local column = spec.column
+		if isValidColumn(column) and not generic[column] and not seen[column] then
+			seen[column] = true
+			table.insert(columns, column)
+		end
+	end)
+	return columns
+end
+
+---resolves the wiki-specific extra fields for a row into {label, value} rows,
+---or nil when none resolve. `column` reads a top-level LPDB column; `extradata`
+---reads one or more keys from the (already fetched) extradata blob, joined.
+---@param row table
+---@param specs PagePreviewFieldSpec[]
+---@return {label: string, value: string}[]?
+function PagePreview._extra(row, specs)
+	local extradata = row.extradata or {}
+	local extra = {}
+	Array.forEach(specs, function(spec)
+		local label = String.nilIfEmpty(spec.label)
+		if not label then
+			return
+		end
+		local value
+		if isValidColumn(spec.column) then
+			local raw = row[spec.column]
+			value = raw ~= nil and String.nilIfEmpty(tostring(raw)) or nil
+		elseif spec.extradata then
+			local keys = type(spec.extradata) == 'table' and spec.extradata or {spec.extradata}
+			local parts = {}
+			Array.forEach(keys, function(key)
+				local part = String.nilIfEmpty(extradata[key])
+				if part then
+					table.insert(parts, part)
+				end
+			end)
+			value = #parts > 0 and table.concat(parts, spec.separator or ', ') or nil
+		end
+		if value then
+			table.insert(extra, {label = label, value = value})
+		end
+	end)
+	return #extra > 0 and extra or nil
+end
+
 ---transforms a raw LPDB player row into a compact preview card table
 ---@param row table
+---@param specs PagePreviewFieldSpec[]? wiki-specific extra field specs (defaults to Info config)
 ---@return table
-function PagePreview.parseCard(row)
+function PagePreview.parseCard(row, specs)
 	local extradata = row.extradata or {}
 	local earnings = String.nilIfEmpty(row.earnings)
 	return {
@@ -73,6 +156,7 @@ function PagePreview.parseCard(row)
 			local imageurl = String.nilIfEmpty(row.imageurl)
 			return imageurl and mw.text.decode(imageurl) or nil
 		end)(),
+		extra = PagePreview._extra(row, specs or PagePreview.extraSpecs()),
 	}
 end
 
@@ -149,11 +233,13 @@ function PagePreview.collectCards()
 		return '[[pagename::' .. key .. ']]'
 	end), ' OR ')
 
+	local specs = PagePreview.extraSpecs()
+	local columns = Array.extend(GENERIC_COLUMNS, PagePreview.extraColumns(specs))
+
 	local ok, rows = pcall(function()
 		return mw.ext.LiquipediaDB.lpdb('player', {
 			conditions = conditions,
-			query = 'pagename, id, name, nationality, teampagename, status, earnings, '
-				.. 'imageurl, birthdate, deathdate, extradata',
+			query = table.concat(columns, ', '),
 			limit = MAX_ENTITIES,
 		})
 	end)
@@ -163,7 +249,7 @@ function PagePreview.collectCards()
 
 	local cards = {}
 	for _, row in ipairs(rows) do
-		local card = PagePreview.parseCard(row)
+		local card = PagePreview.parseCard(row, specs)
 		cards[card.page] = card
 	end
 	return cards

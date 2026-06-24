@@ -59,5 +59,10 @@ return {
 		participants = {
 			defaultPlayerNumber = 5,
 		},
+		pagePreview = {
+			player = {
+				{label = 'Region', column = 'region'},
+			},
+		},
 	},
 }
