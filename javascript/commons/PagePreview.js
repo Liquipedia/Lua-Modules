@@ -207,6 +207,15 @@ class PagePreviewModule {
 		if ( card.earnings ) {
 			rows.push( `<div class="page-preview-card__row">Earnings: $${ e( Number( card.earnings ).toLocaleString( 'en-US' ) ) }</div>` );
 		}
+		// wiki-specific extra fields (declared in Info.config.pagePreview); plain text, escaped like the rest
+		if ( Array.isArray( card.extra ) ) {
+			card.extra.forEach( ( field ) => {
+				if ( field && field.label && field.value ) {
+					const row = `${ e( field.label ) }: ${ e( field.value ) }`;
+					rows.push( `<div class="page-preview-card__row">${ row }</div>` );
+				}
+			} );
+		}
 		return img + '<div class="page-preview-card__body">' +
 			`<div class="page-preview-card__name">${ e( card.name ) }</div>` +
 			( card.realName ? `<div class="page-preview-card__subtitle">${ e( card.realName ) }</div>` : '' ) +

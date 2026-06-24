@@ -64,5 +64,10 @@ return {
 				swiss = {'matchdiff', 'gamediff'},
 			},
 		},
+		pagePreview = {
+			player = {
+				{label = 'Region', column = 'region'},
+			},
+		},
 	},
 }
