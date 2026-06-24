@@ -187,18 +187,22 @@ class PagePreviewModule {
 		const e = ( v ) => this.escapeHtml( v );
 		const img = card.image ?
 			`<img class="page-preview-card__image" src="${ e( card.image ) }" alt="">` : '';
+		// row order mirrors the player infobox: Nationality, Born, Status, Role, Team, Earnings
 		const rows = [];
 		if ( card.flag ) {
 			rows.push( `<div class="page-preview-card__row">${ e( card.flag ) }</div>` );
 		}
-		if ( card.team ) {
-			rows.push( `<div class="page-preview-card__row">Team: ${ e( card.team ) }</div>` );
+		if ( card.born ) {
+			rows.push( `<div class="page-preview-card__row">Born: ${ e( card.born ) }</div>` );
+		}
+		if ( card.status ) {
+			rows.push( `<div class="page-preview-card__row">Status: ${ e( card.status ) }</div>` );
 		}
 		if ( card.role ) {
 			rows.push( `<div class="page-preview-card__row">Role: ${ e( card.role ) }</div>` );
 		}
-		if ( card.status ) {
-			rows.push( `<div class="page-preview-card__row">Status: ${ e( card.status ) }</div>` );
+		if ( card.team ) {
+			rows.push( `<div class="page-preview-card__row">Team: ${ e( card.team ) }</div>` );
 		}
 		if ( card.earnings ) {
 			rows.push( `<div class="page-preview-card__row">Earnings: $${ e( Number( card.earnings ).toLocaleString( 'en-US' ) ) }</div>` );

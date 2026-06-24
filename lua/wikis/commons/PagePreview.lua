@@ -7,7 +7,9 @@
 
 local Lua = require('Module:Lua')
 
+local AgeCalculation = Lua.import('Module:AgeCalculation')
 local Array = Lua.import('Module:Array')
+local PlayerTeamRoles = Lua.import('Module:PlayerTeamRoles')
 local String = Lua.import('Module:StringUtils')
 
 local PagePreview = {}
@@ -62,8 +64,9 @@ function PagePreview.parseCard(row)
 		name = String.nilIfEmpty(row.id) or String.nilIfEmpty(row.name),
 		realName = String.nilIfEmpty(row.name),
 		flag = String.nilIfEmpty(row.nationality),
-		team = String.nilIfEmpty(row.team),
-		role = String.nilIfEmpty(extradata.role),
+		born = PagePreview._born(row),
+		team = PagePreview._team(row),
+		role = PagePreview._role(extradata),
 		status = String.nilIfEmpty(row.status),
 		earnings = earnings and tonumber(earnings) or nil,
 		image = (function()
@@ -71,6 +74,46 @@ function PagePreview.parseCard(row)
 			return imageurl and mw.text.decode(imageurl) or nil
 		end)(),
 	}
+end
+
+---builds the infobox-style "Born" string (date + age), or nil. The card JS
+---escapes every field, so the &nbsp; AgeCalculation emits is normalized to a
+---plain space here to avoid it rendering literally.
+---@param row table
+---@return string?
+function PagePreview._born(row)
+	local birthdate = String.nilIfEmpty(row.birthdate)
+	if not birthdate then
+		return nil
+	end
+	local ok, age = pcall(AgeCalculation.run, {birthdate = birthdate, deathdate = row.deathdate})
+	if not ok or type(age) ~= 'table' then
+		return nil
+	end
+	local born = String.nilIfEmpty(age.birth)
+	return born and (born:gsub('&nbsp;', ' ')) or nil
+end
+
+---resolves the player's current team from the (non-deprecated) teampagename,
+---prettified to display form
+---@param row table
+---@return string?
+function PagePreview._team(row)
+	local team = String.nilIfEmpty(row.teampagename)
+	return team and (team:gsub('_', ' ')) or nil
+end
+
+---maps an extradata role code to its display name via PlayerTeamRoles,
+---falling back to the raw code when unmapped (keeps it generic across wikis)
+---@param extradata table
+---@return string?
+function PagePreview._role(extradata)
+	local role = String.nilIfEmpty(extradata.role)
+	if not role then
+		return nil
+	end
+	local mapped = PlayerTeamRoles[role:lower()]
+	return mapped and mapped.display or role
 end
 
 ---reads the collected page names (deduped, capped) from the wiki Variable
@@ -109,7 +152,8 @@ function PagePreview.collectCards()
 	local ok, rows = pcall(function()
 		return mw.ext.LiquipediaDB.lpdb('player', {
 			conditions = conditions,
-			query = 'pagename, id, name, nationality, team, status, earnings, image, imageurl, extradata',
+			query = 'pagename, id, name, nationality, teampagename, status, earnings, '
+				.. 'imageurl, birthdate, deathdate, extradata',
 			limit = MAX_ENTITIES,
 		})
 	end)
