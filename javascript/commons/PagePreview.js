@@ -5,7 +5,8 @@
 const PAGE_PREVIEW_CONFIG = {
 	SELECTORS: {
 		island: '#page-preview-data',
-		link: '.link-preview[data-preview-page]'
+		link: '.link-preview[data-preview-page]',
+		contentRoot: '#mw-content-text'
 	},
 	ATTRIBUTES: {
 		previewData: 'data-preview',
@@ -47,7 +48,7 @@ class PagePreviewModule {
 		let parsed;
 		try {
 			parsed = JSON.parse( island.getAttribute( PAGE_PREVIEW_CONFIG.ATTRIBUTES.previewData ) );
-		} catch ( e ) {
+		} catch {
 			return;
 		}
 		if ( !parsed ) {
@@ -66,7 +67,161 @@ class PagePreviewModule {
 	}
 
 	bindEvents() {
-		// implemented in Task 5
+		const root = document.getElementById( 'mw-content-text' ) || document.body;
+		const onOver = ( e ) => {
+			const link = e.target.closest( PAGE_PREVIEW_CONFIG.SELECTORS.link );
+			if ( !link || link === this.activeLink ) {
+				return;
+			}
+			this.scheduleShow( link );
+		};
+		const onOut = ( e ) => {
+			const link = e.target.closest( PAGE_PREVIEW_CONFIG.SELECTORS.link );
+			if ( !link ) {
+				return;
+			}
+			const to = e.relatedTarget;
+			if ( to && ( link.contains( to ) || ( this.card && this.card.contains( to ) ) ) ) {
+				return;
+			}
+			this.scheduleHide();
+		};
+		root.addEventListener( 'mouseover', onOver );
+		root.addEventListener( 'mouseout', onOut );
+		this.cleanupFunctions.add( () => root.removeEventListener( 'mouseover', onOver ) );
+		this.cleanupFunctions.add( () => root.removeEventListener( 'mouseout', onOut ) );
+	}
+
+	/**
+	 * @param {HTMLElement} link
+	 */
+	scheduleShow( link ) {
+		window.clearTimeout( this.hideTimer );
+		window.clearTimeout( this.showTimer );
+		this.showTimer = window.setTimeout( () => this.show( link ), this.HOVER_INTENT_MS );
+	}
+
+	scheduleHide() {
+		window.clearTimeout( this.showTimer );
+		window.clearTimeout( this.hideTimer );
+		this.hideTimer = window.setTimeout( () => this.hide(), this.HIDE_GRACE_MS );
+	}
+
+	/**
+	 * @param {HTMLElement} link
+	 */
+	show( link ) {
+		const card = this.getCard( link );
+		if ( !card ) {
+			return;
+		}
+		this.activeLink = link;
+		this.render( card );
+		this.position( link );
+	}
+
+	hide() {
+		if ( this.card ) {
+			this.card.style.display = 'none';
+		}
+		this.activeLink = null;
+	}
+
+	/**
+	 * @return {HTMLElement}
+	 */
+	ensureCard() {
+		if ( this.card ) {
+			return this.card;
+		}
+		const el = document.createElement( 'div' );
+		el.className = 'page-preview-card';
+		el.addEventListener( 'mouseover', () => window.clearTimeout( this.hideTimer ) );
+		el.addEventListener( 'mouseout', ( e ) => {
+			if ( !e.relatedTarget || !el.contains( e.relatedTarget ) ) {
+				this.scheduleHide();
+			}
+		} );
+		document.body.appendChild( el );
+		this.card = el;
+		this.cleanupFunctions.add( () => el.remove() );
+		return el;
+	}
+
+	/**
+	 * @param {*} value
+	 * @return {string}
+	 */
+	escapeHtml( value ) {
+		return String( value )
+			.replace( /&/g, '&amp;' )
+			.replace( /</g, '&lt;' )
+			.replace( />/g, '&gt;' )
+			.replace( /"/g, '&quot;' );
+	}
+
+	/**
+	 * @param {Object} card
+	 * @return {string}
+	 */
+	template( card ) {
+		const e = ( v ) => this.escapeHtml( v );
+		const img = card.image ?
+			`<img class="page-preview-card__image" src="${ e( card.image ) }" alt="" loading="lazy">` : '';
+		const rows = [];
+		if ( card.flag ) {
+			rows.push( `<div class="page-preview-card__row">${ e( card.flag ) }</div>` );
+		}
+		if ( card.team ) {
+			rows.push( `<div class="page-preview-card__row">Team: ${ e( card.team ) }</div>` );
+		}
+		if ( card.role ) {
+			rows.push( `<div class="page-preview-card__row">Role: ${ e( card.role ) }</div>` );
+		}
+		if ( card.status ) {
+			rows.push( `<div class="page-preview-card__row">Status: ${ e( card.status ) }</div>` );
+		}
+		if ( card.earnings ) {
+			rows.push( `<div class="page-preview-card__row">Earnings: $${ e( Number( card.earnings ).toLocaleString( 'en-US' ) ) }</div>` );
+		}
+		return img + '<div class="page-preview-card__body">' +
+			`<div class="page-preview-card__name">${ e( card.name ) }</div>` +
+			( card.realName ? `<div class="page-preview-card__subtitle">${ e( card.realName ) }</div>` : '' ) +
+			rows.join( '' ) + '</div>';
+	}
+
+	/**
+	 * @param {Object} card
+	 */
+	render( card ) {
+		const el = this.ensureCard();
+		el.innerHTML = this.template( card );
+		el.style.display = 'block';
+	}
+
+	/**
+	 * @param {HTMLElement} link
+	 */
+	position( link ) {
+		const el = this.card;
+		const rect = link.getBoundingClientRect();
+		el.style.position = 'absolute';
+		el.style.top = `${ window.scrollY + rect.bottom + 8 }px`;
+		el.style.left = `${ window.scrollX + rect.left }px`;
+		// viewport flip: if the card would overflow the bottom, place it above the link
+		const cardRect = el.getBoundingClientRect();
+		if ( rect.bottom + cardRect.height + 8 > window.innerHeight && rect.top - cardRect.height - 8 > 0 ) {
+			el.style.top = `${ window.scrollY + rect.top - cardRect.height - 8 }px`;
+		}
+	}
+
+	destroy() {
+		window.clearTimeout( this.showTimer );
+		window.clearTimeout( this.hideTimer );
+		this.cleanupFunctions.forEach( ( fn ) => fn() );
+		this.cleanupFunctions.clear();
+		this.card = null;
+		this.activeLink = null;
 	}
 
 }
