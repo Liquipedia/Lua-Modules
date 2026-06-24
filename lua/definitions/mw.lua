@@ -637,7 +637,16 @@ mw.text = {}
 ---@param s string
 ---@param decodeNamedEntities boolean?
 ---@return string
-function mw.text.decode(s, decodeNamedEntities) end
+function mw.text.decode(s, decodeNamedEntities)
+	-- decode numeric entities (&#58; → ':') and a handful of named entities
+	s = s:gsub('&#(%d+);', function(n) return string.char(tonumber(n)) end)
+	s = s:gsub('&#x(%x+);', function(h) return string.char(tonumber(h, 16)) end)
+	s = s:gsub('&amp;', '&')
+	s = s:gsub('&lt;', '<')
+	s = s:gsub('&gt;', '>')
+	s = s:gsub('&quot;', '"')
+	return s
+end
 
 ---Replaces characters in a string with HTML entities. Characters '<', '>', '&', '"', and the non-breaking space are replaced with the appropriate named entities; all others are replaced with numeric entities.
 ---@param s string
