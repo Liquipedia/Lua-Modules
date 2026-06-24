@@ -189,37 +189,29 @@ class PagePreviewModule {
 			`<img class="page-preview-card__image" src="${ e( card.image ) }" alt="">` : '';
 		// row order mirrors the player infobox: Nationality, Born, Status, Role, Team, Earnings
 		const rows = [];
-		if ( card.flag ) {
-			rows.push( `<div class="page-preview-card__row">${ e( card.flag ) }</div>` );
-		}
-		if ( card.born ) {
-			rows.push( `<div class="page-preview-card__row">Born: ${ e( card.born ) }</div>` );
-		}
-		if ( card.status ) {
-			rows.push( `<div class="page-preview-card__row">Status: ${ e( card.status ) }</div>` );
-		}
-		if ( card.role ) {
-			rows.push( `<div class="page-preview-card__row">Role: ${ e( card.role ) }</div>` );
-		}
-		if ( card.team ) {
-			rows.push( `<div class="page-preview-card__row">Team: ${ e( card.team ) }</div>` );
-		}
-		if ( card.earnings ) {
-			rows.push( `<div class="page-preview-card__row">Earnings: $${ e( Number( card.earnings ).toLocaleString( 'en-US' ) ) }</div>` );
-		}
+		const addRow = ( label, value ) => {
+			if ( label && value ) {
+				rows.push( { label, value } );
+			}
+		};
+		addRow( 'Nationality', card.flag );
+		addRow( 'Born', card.born );
+		addRow( 'Status', card.status );
+		addRow( 'Role', card.role );
+		addRow( 'Team', card.team );
+		addRow( 'Earnings', card.earnings && `$${ Number( card.earnings ).toLocaleString( 'en-US' ) }` );
 		// wiki-specific extra fields (declared in Info.config.pagePreview); plain text, escaped like the rest
 		if ( Array.isArray( card.extra ) ) {
-			card.extra.forEach( ( field ) => {
-				if ( field && field.label && field.value ) {
-					const row = `${ e( field.label ) }: ${ e( field.value ) }`;
-					rows.push( `<div class="page-preview-card__row">${ row }</div>` );
-				}
-			} );
+			card.extra.forEach( ( field ) => field && addRow( field.label, field.value ) );
 		}
+		const rowsHtml = rows.map( ( row ) => '<div class="page-preview-card__row">' +
+			`<span class="page-preview-card__key">${ e( row.label ) }</span>` +
+			`<span class="page-preview-card__value">${ e( row.value ) }</span></div>`
+		).join( '' );
 		return img + '<div class="page-preview-card__body">' +
 			`<div class="page-preview-card__name">${ e( card.name ) }</div>` +
 			( card.realName ? `<div class="page-preview-card__subtitle">${ e( card.realName ) }</div>` : '' ) +
-			rows.join( '' ) + '</div>';
+			rowsHtml + '</div>';
 	}
 
 	/**
