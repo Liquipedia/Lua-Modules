@@ -26,7 +26,7 @@ local MatchTickerContainer = Class.new(Widget)
 MatchTickerContainer.defaultProps = {
 	limit = 10,
 	module = 'MatchTicker/Custom',
-	fn = 'newMainPage',
+	fn = 'mainPage',
 }
 
 ---@return Widget

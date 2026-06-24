@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
+local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
@@ -23,6 +24,11 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local MatchUtil = Lua.import('Module:Match/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Tournament = Lua.import('Module:Tournament')
+
+local Html = Lua.import('Module:Widget/Html/All')
+local MatchCard = Lua.import('Module:Widget/Match/Card')
+local Carousel = Lua.import('Module:Widget/Basic/Carousel')
+local Switch = Lua.import('Module:Widget/Switch')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -63,36 +69,7 @@ local DEFAULT_LIMIT = 20
 local DEFAULT_ORDER = 'date asc, liquipediatier asc, tournament asc'
 local DEFAULT_RECENT_ORDER = 'date desc, liquipediatier asc, tournament asc'
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
-
----@class MatchTickerMatchInterface
----@operator call({config: MatchTickerConfig, match: table}): MatchTickerMatchInterface
----@field config MatchTickerConfig
----@field match table
----@field create fun(self: MatchTickerMatchInterface): Widget|Html?
-
----@class MatchTickerContainerInterface
----@operator call({config: MatchTickerConfig, matches: table[]}): MatchTickerContainerInterface
----@field config MatchTickerConfig
----@field matches table[]
----@field create fun(self: MatchTickerContainerInterface): Widget|Html?
-
---- Extract externally if it grows
----@param matchTickerConfig MatchTickerConfig
----@return {Container?: MatchTickerContainerInterface, Match: MatchTickerMatchInterface}
-local MatchTickerDisplayFactory = function (matchTickerConfig)
-	assert(not (matchTickerConfig.entityStyle and matchTickerConfig.newStyle),
-		"Invalid MatchTicker configuration: 'entityStyle' and 'newStyle' are mutually exclusive. " ..
-		"Choose one display mode: use 'entityStyle' for carousel-based entity display, " ..
-		"'newStyle' for new-style match cards, or neither for legacy display.")
-
-	if matchTickerConfig.entityStyle then
-		return Lua.import('Module:MatchTicker/DisplayComponents/Entity')
-	elseif matchTickerConfig.newStyle then
-		return Lua.import('Module:MatchTicker/DisplayComponents/New')
-	else
-		return Lua.import('Module:MatchTicker/DisplayComponents')
-	end
-end
+local TABLE_OF_CONTENTS = '__TOC__'
 
 ---@class MatchTickerConfig
 ---@field tournaments string[]
@@ -117,8 +94,7 @@ end
 ---@field tierTypes string[]?
 ---@field regions string[]?
 ---@field games string[]?
----@field newStyle boolean?
----@field entityStyle boolean?
+---@field variant 'vertical' | 'horizontal'
 ---@field featuredOnly boolean?
 ---@field displayGameIcons boolean?
 
@@ -174,9 +150,9 @@ function MatchTicker:init(args)
 		games = args.games and Array.map(Array.parseCommaSeparatedString(args.games), function (game)
 					return Game.toIdentifier{game=game}
 				end) or nil,
-		newStyle = Logic.readBool(args.newStyle),
 		featuredOnly = Logic.readBool(args.featuredOnly),
-		displayGameIcons = Logic.readBool(args.displayGameIcons)
+		displayGameIcons = Logic.readBool(args.displayGameIcons),
+		variant = Logic.readBool(args.entityStyle) and 'horizontal' or 'vertical',
 	}
 
 	--min 1 of them has to be set; recent can not be set while any of the others is set
@@ -219,8 +195,6 @@ function MatchTicker:init(args)
 		end
 	end
 	config.wrapperClasses = wrapperClasses
-
-	MatchTicker.DisplayComponents = MatchTickerDisplayFactory(config)
 
 	self.config = config
 
@@ -565,43 +539,85 @@ MatchTicker.fetchTournament = FnUtil.memoize(function(tournamentPage)
 	return Tournament.getTournament(tournamentPage)
 end)
 
----@param header MatchTickerHeader?
----@return Html
+local function HorizontalLayout(matchCards, config)
+	local carousel = Carousel{
+		children = matchCards,
+		itemWidth = '12.5rem',
+		gap = '0.5rem',
+	}
+
+	return Html.Div{
+		css = {['margin-bottom'] = '1rem'},
+		children = {
+			Html.Div{
+				classes = {'mw-heading', 'mw-heading2'},
+				children = {
+					Html.H2{
+						css = {border = 'unset'},
+						children = I18n.translate('matchticker-upcoming-matches'),
+					},
+				},
+			},
+			Switch{
+				label = 'Show countdown',
+				switchGroup = 'countdown',
+				storeValue = true,
+				defaultActive = true,
+				css = {margin = '0.75rem 0 1rem'},
+				content = carousel,
+			},
+			Html.Div{
+				css = {['margin-top'] = '1rem'},
+				children = {
+					TABLE_OF_CONTENTS,
+				},
+			},
+		},
+	}
+end
+
+---@param header Renderable?
+---@return Renderable?
 function MatchTicker:create(header)
 	if not self.matches and not self.config.showInfoForEmptyResults then
-		return mw.html.create()
+		return
 	end
 
-	local wrapper = mw.html.create('div')
-
-	for _, class in pairs(self.config.wrapperClasses) do
-		wrapper:addClass(class)
+	if not self.matches or #self.matches == 0 then
+		return Html.Div{
+			classes = self.config.wrapperClasses,
+			css = {['text-align'] = 'center'},
+			children = Array.extend({header}, {'No Results found.'}),
+		}
 	end
 
-	if header then
-		wrapper:node(header:create())
+	local matchCards = Array.map(self.matches, function(match)
+		return MatchCard{
+			match = MatchGroupUtil.matchFromRecord(match),
+			hideTournament = self.config.hideTournament,
+			displayGameIcons = self.config.displayGameIcons,
+			onlyHighlightOnValue = self.config.onlyHighlightOnValue,
+			variant = self.config.variant == 'horizontal' and 'vertical' or nil,
+			gameData = {
+				asGame = match.asGame,
+				gameIds = match.asGameIndexes,
+				map = match.map,
+				mapDisplayName = match.extradata and match.extradata.displayname or nil
+			}
+		}
+	end)
+
+	if self.config.variant == 'vertical' then
+		return Html.Div{
+			classes = self.config.wrapperClasses,
+			children = Array.extend({header}, matchCards),
+		}
 	end
 
-	if not self.matches then
-		return wrapper:css('text-align', 'center'):wikitext('No Results found.')
-	end
-
-	if MatchTicker.DisplayComponents.Container then
-		local container = MatchTicker.DisplayComponents.Container{
-			config = self.config,
-			matches = self.matches
-		}:create()
-
-		if container then
-			wrapper:node(container)
-		end
-	else
-		Array.forEach(self.matches or {}, function(match)
-			wrapper:node(MatchTicker.DisplayComponents.Match{config = self.config, match = match}:create())
-		end)
-	end
-
-	return wrapper
+	return Html.Div{
+		classes = self.config.wrapperClasses,
+		children = Array.extend({header}, HorizontalLayout(matchCards, self.config)),
+	}
 end
 
 return MatchTicker
