@@ -7,16 +7,10 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local I18n = Lua.import('Module:I18n')
 
-local Widget = Lua.import('Module:Widget')
-
----@class DateRangeWidget: Widget
----@operator call(table): DateRangeWidget
----@field props {startDate: string|osdateparam?, endDate: string|osdateparam?, showYear: boolean?}
-local DateRange = Class.new(Widget)
+local Component = Lua.import('Module:Widget/Component')
 
 ---@param startDate {day?: integer, month?: integer, year?: integer}?
 ---@param endDate {day?: integer, month?: integer, year?: integer}?
@@ -95,9 +89,10 @@ local function determineTranslateString(startDate, endDate, showYear)
 	end
 end
 
+---@param props {startDate: string|osdateparam?, endDate: string|osdateparam?, showYear: boolean?}
 ---@return string
-function DateRange:render()
-	local startDate, endDate = self.props.startDate, self.props.endDate
+local function DateRange(props)
+	local startDate, endDate = props.startDate, props.endDate
 	if type(startDate) ~= 'table' then
 		startDate = DateExt.parseIsoDate(startDate --[[ @as string? ]])
 	end
@@ -127,12 +122,12 @@ function DateRange:render()
 		endDate = calculatingEndDate and os.date('%d', os.time(calculatingEndDate)) or nil,
 	}
 
-	local translateString = determineTranslateString(startDate, endDate, self.props.showYear)
-	if not self.props.showYear then
+	local translateString = determineTranslateString(startDate, endDate, props.showYear)
+	if not props.showYear then
 		translateString = translateString:gsub('year%-', '')
 	end
 
 	return I18n.translate(translateString, dateData)
 end
 
-return DateRange
+return Component.component(DateRange)
