@@ -22,7 +22,7 @@ local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
 local ExternalMediaListDisplay = Lua.import('Module:Widget/ExternalMedia/List')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -32,7 +32,7 @@ local MediaList = {}
 ---Queries External Media Links for the given conditions (via arguments).
 ---Calls the display functions based on setting (supplied in arguments).
 ---@param args table
----@return Html?
+---@return Renderable?
 function MediaList.get(args)
 	args = MediaList._parseArgs(args)
 
@@ -45,7 +45,7 @@ function MediaList.get(args)
 	--if we do not get any results from the query return empty
 	if type(data[1]) ~= 'table' then return end
 
-	---@return string|Widget|Widget[]|Html?
+	---@return Renderable?
 	local function createDisplay()
 		if args.separateByYears and args.dynamic and not args.year then
 			return MediaList._displayDynamic(data, args)
@@ -55,7 +55,7 @@ function MediaList.get(args)
 		return MediaList._displayYear(data, args)
 	end
 
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+	return Html.Fragment{children = WidgetUtil.collect(
 		createDisplay(),
 		MediaList._formLink(args.linkToForm)
 	)}
@@ -157,7 +157,7 @@ end
 ---Builds the display for the dynamic tabs per year option
 ---@param data externalmedialink[]
 ---@param args table
----@return Html|string?
+---@return Renderable?
 function MediaList._displayDynamic(data, args)
 	local tabsData = {}
 
@@ -175,12 +175,12 @@ end
 ---Builds the display for the per year option (without tabs)
 ---@param data externalmedialink[]
 ---@param args table
----@return Widget[]
+---@return VNode[]
 function MediaList._displayByYear(data, args)
 	local display = {}
 
 	for year, yearItems in Table.iter.spairs(MediaList._groupByYear(data), MediaList._sortInYear) do
-		Array.appendWith(display, HtmlWidgets.H4{children = year}, MediaList._displayYear(yearItems, args))
+		Array.appendWith(display, Html.H4{children = year}, MediaList._displayYear(yearItems, args))
 	end
 
 	return display
@@ -209,7 +209,7 @@ end
 ---Displays the External Media Links for a given data set (usually of a year)
 ---@param data externalmedialink[]
 ---@param args table
----@return Widget
+---@return VNode
 function MediaList._displayYear(data, args)
 	return ExternalMediaListDisplay{
 		data = data,
@@ -221,17 +221,17 @@ end
 
 ---Displays the link to the Form with which External Media Links are to be created.
 ---@param show boolean defines if the link is to be displayed or not
----@return Widget?
+---@return VNode?
 function MediaList._formLink(show)
 	if not show then return end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		css = {
 			display = 'block',
 			['text-align'] = 'center',
 			padding = '0.5em',
 		},
-		children = HtmlWidgets.Div{
+		children = Html.Div{
 			css = {
 				display = 'inline',
 				['white-space'] = 'nowrap',
