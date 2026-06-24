@@ -74,6 +74,13 @@ class PagePreviewModule {
 			if ( !link || link === this.activeLink ) {
 				return;
 			}
+			// only trigger over the actual link text (the <a>), not the surrounding
+			// component box — the marker sits on a wrapper span that, in block
+			// layouts, stretches well beyond the link text via flex/ellipsis.
+			const anchor = e.target.closest( 'a' );
+			if ( !anchor || !link.contains( anchor ) ) {
+				return;
+			}
 			this.scheduleShow( link );
 		};
 		const onOut = ( e ) => {
