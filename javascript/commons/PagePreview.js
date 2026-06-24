@@ -62,12 +62,13 @@ class PagePreviewModule {
 	 * @return {object|undefined}
 	 */
 	getCard( link ) {
+		// key is pre-normalized server-side by PagePreview.key (spaces → underscores); no JS normalization needed
 		const key = link.getAttribute( PAGE_PREVIEW_CONFIG.ATTRIBUTES.previewPage );
 		return key ? this.data.get( key ) : undefined;
 	}
 
 	bindEvents() {
-		const root = document.getElementById( 'mw-content-text' ) || document.body;
+		const root = document.querySelector( PAGE_PREVIEW_CONFIG.SELECTORS.contentRoot ) || document.body;
 		const onOver = ( e ) => {
 			const link = e.target.closest( PAGE_PREVIEW_CONFIG.SELECTORS.link );
 			if ( !link || link === this.activeLink ) {

@@ -54,14 +54,17 @@ function PagePreview.parseCard(row)
 	return {
 		page = PagePreview.key(row.pagename),
 		type = 'player',
-		name = String.nilIfEmpty(row.id) or row.name,
+		name = String.nilIfEmpty(row.id) or String.nilIfEmpty(row.name),
 		realName = String.nilIfEmpty(row.name),
 		flag = String.nilIfEmpty(row.nationality),
 		team = String.nilIfEmpty(row.team),
 		role = String.nilIfEmpty(extradata.role),
 		status = String.nilIfEmpty(row.status),
 		earnings = earnings and tonumber(earnings) or nil,
-		image = String.nilIfEmpty(row.imageurl),
+		image = (function()
+			local imageurl = String.nilIfEmpty(row.imageurl)
+			return imageurl and mw.text.decode(imageurl) or nil
+		end)(),
 	}
 end
 
