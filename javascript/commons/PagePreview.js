@@ -194,6 +194,8 @@ class PagePreviewModule {
 				rows.push( { label, value } );
 			}
 		};
+		// the nickname is already the link text the card hangs off, so it is not repeated here
+		addRow( 'Name', card.realName );
 		addRow( 'Nationality', card.flag );
 		addRow( 'Born', card.born );
 		addRow( 'Status', card.status );
@@ -216,10 +218,7 @@ class PagePreviewModule {
 		} ).join( '' );
 		const table = rowsHtml ?
 			`<div class="table2"><table class="table2__table"><tbody>${ rowsHtml }</tbody></table></div>` : '';
-		return img + '<div class="page-preview-card__body">' +
-			`<div class="page-preview-card__name">${ e( card.name ) }</div>` +
-			( card.realName ? `<div class="page-preview-card__subtitle">${ e( card.realName ) }</div>` : '' ) +
-			table + '</div>';
+		return img + `<div class="page-preview-card__body">${ table }</div>`;
 	}
 
 	/**

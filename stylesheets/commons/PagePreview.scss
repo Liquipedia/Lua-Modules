@@ -46,16 +46,6 @@ Template(s): Page preview hovercards
 		gap: 0.125rem;
 	}
 
-	&__name {
-		font-size: 1rem;
-		font-weight: bold;
-	}
-
-	&__subtitle {
-		margin-bottom: 0.25rem;
-		opacity: 0.8;
-	}
-
 	// the fields render as an embedded Table2; stretch it to the card width so
 	// the right-aligned values line up against the card's right edge
 	.table2 {
