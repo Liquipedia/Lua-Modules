@@ -30,7 +30,7 @@ local NON_BREAKING_SPACE = '&nbsp;'
 local ExternalMediaListDisplay = {}
 
 ---@param props ExternalMediaListDisplayProps
----@return Widget?
+---@return VNode?
 function ExternalMediaListDisplay.render(props)
 	local data = props.data
 	if Logic.isEmpty(data) then
