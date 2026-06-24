@@ -99,7 +99,22 @@ class PagePreviewModule {
 	scheduleShow( link ) {
 		window.clearTimeout( this.hideTimer );
 		window.clearTimeout( this.showTimer );
+		this.warmImage( link );
 		this.showTimer = window.setTimeout( () => this.show( link ), this.HOVER_INTENT_MS );
+	}
+
+	/**
+	 * Start fetching the card image during the hover-intent delay so it is
+	 * usually decoded by the time the card renders, avoiding a flash-in.
+	 *
+	 * @param {HTMLElement} link
+	 */
+	warmImage( link ) {
+		const card = this.getCard( link );
+		if ( card && card.image ) {
+			const img = new Image();
+			img.src = card.image;
+		}
 	}
 
 	scheduleHide() {
@@ -168,7 +183,7 @@ class PagePreviewModule {
 	template( card ) {
 		const e = ( v ) => this.escapeHtml( v );
 		const img = card.image ?
-			`<img class="page-preview-card__image" src="${ e( card.image ) }" alt="" loading="lazy">` : '';
+			`<img class="page-preview-card__image" src="${ e( card.image ) }" alt="">` : '';
 		const rows = [];
 		if ( card.flag ) {
 			rows.push( `<div class="page-preview-card__row">${ e( card.flag ) }</div>` );

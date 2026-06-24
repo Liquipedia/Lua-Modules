@@ -22,9 +22,19 @@ Template(s): Page preview hovercards
 
 	&__image {
 		display: block;
-		max-width: 100%;
+		width: 100%;
 		margin-bottom: 0.5rem;
 		border-radius: 0.25rem;
+		// fixed landscape box: reserves space (no reflow when the image loads)
+		// and normalizes every photo to the same ratio regardless of source size
+		aspect-ratio: 16 / 9;
+		object-fit: cover;
+		object-position: center top;
+		background-color: rgba( 0, 0, 0, 0.06 );
+
+		.theme--dark & {
+			background-color: rgba( 255, 255, 255, 0.06 );
+		}
 	}
 
 	&__body {
