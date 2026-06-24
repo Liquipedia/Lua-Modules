@@ -216,7 +216,7 @@ function UnofficialWorldChampion:_createUpcomingMatches()
 
 	return Logic.tryCatch(
 		function()
-			return MatchTicker{
+			return MatchTicker.makeMatchTicker{
 				team = currentChampion.template,
 				limit = 5,
 				upcoming = true,

@@ -230,7 +230,7 @@ function HiddenDataBox._matchTicker(supressMatchTicker)
 
 	return Logic.tryCatch(
 		function()
-			return MatchTicker{
+			return MatchTicker.makeMatchTicker{
 				tournament = mw.title.getCurrentTitle().prefixedText,
 				limit = 5,
 				upcoming = true,

@@ -310,7 +310,7 @@ function Team:_createUpcomingMatches()
 
 	return Logic.tryCatch(
 		function()
-			return MatchTicker{
+			return MatchTicker.makeMatchTicker{
 				team = self.pagename,
 				limit = 5,
 				upcoming = true,

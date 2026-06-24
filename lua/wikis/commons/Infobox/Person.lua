@@ -212,7 +212,7 @@ function Person:_createUpcomingMatches()
 
 	return Logic.tryCatch(
 		function()
-			return MatchTicker{
+			return MatchTicker.makeMatchTicker{
 				player = self.pagename,
 				limit = 5,
 				upcoming = true,
