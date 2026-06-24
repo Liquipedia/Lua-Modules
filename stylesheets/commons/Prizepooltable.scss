@@ -65,19 +65,6 @@ table.prizepooltable.collapsed .prizepooltablehide {
 	background-color: var( --prize-pool-header-background-color, inherit );
 }
 
-.csstable-widget.prizepooltable {
-	border: 0.125rem solid var( --prize-pool-header-background-color );
-
-	.csstable-widget-row,
-	.csstable-widget-cell {
-		border: 0;
-	}
-
-	.csstable-widget-row:nth-child( odd ):not( .prizepooltable-header ):not( .ppt-toggle-expand ) {
-		background-color: var( --prize-pool-alt-background-color );
-	}
-}
-
 /* Background colours */
 
 tr.bg-first,
@@ -100,8 +87,7 @@ div.bg-first,
 tr.bg-p1,
 div.bg-p1,
 tr.background-color-first-place,
-div.background-color-first-place,
-div.csstable-widget-row.background-color-first-place > .csstable-widget-cell {
+div.background-color-first-place {
 	border-bottom: 0.125rem solid var( --prize-pool-gold, transparent );
 }
 
@@ -135,8 +121,7 @@ div.bg-second,
 tr.bg-p2,
 div.bg-p2,
 tr.background-color-second-place,
-div.background-color-second-place,
-div.csstable-widget-row.background-color-second-place > .csstable-widget-cell {
+div.background-color-second-place {
 	border-bottom: 0.125rem solid var( --prize-pool-silver, transparent );
 }
 
@@ -170,8 +155,7 @@ div.bg-third,
 tr.bg-p3,
 div.bg-p3,
 tr.background-color-third-place,
-div.background-color-third-place,
-div.csstable-widget-row.background-color-third-place > .csstable-widget-cell {
+div.background-color-third-place {
 	border-bottom: 0.125rem solid var( --prize-pool-bronze, transparent );
 }
 
@@ -205,8 +189,7 @@ div.bg-fourth,
 tr.bg-p4,
 div.bg-p4,
 tr.background-color-fourth-place,
-div.background-color-fourth-place,
-div.csstable-widget-row.background-color-fourth-place > .csstable-widget-cell {
+div.background-color-fourth-place {
 	border-bottom: 0.125rem solid var( --prize-pool-copper, transparent );
 }
 
@@ -220,27 +203,8 @@ div.background-color-fourth-place > *.prizepooltable-place {
 	color: #ffffff;
 }
 
-div.csstable-widget-row.bg-win {
-	div.prizepooltable > & {
-		/* need the `!important` due to bg-win ( sadly ) having an important in one of its definitions ... */
-		background-color: inherit !important;
-	}
-
-	> .csstable-widget-cell {
-		border-bottom: 0.125rem solid var( --clr-forest-background-color, transparent );
-	}
-}
-
 div.bg-win > *.prizepooltable-place {
 	background-color: var( --clr-forest-background-color, inherit );
-}
-
-div.csstable-widget-row.bg-lose {
-	background-color: inherit;
-
-	> .csstable-widget-cell {
-		border-bottom: 0.125rem solid var( --clr-cinnabar-background-color, transparent );
-	}
 }
 
 div.bg-lose > *.prizepooltable-place {
@@ -283,27 +247,6 @@ Author: Rathoz
 .collapsed .ppt-toggle-expand .general-collapsible-collapse-button,
 .general-collapsible:not( .collapsed ) .ppt-toggle-expand .general-collapsible-expand-button {
 	display: none !important;
-}
-
-.csstable-widget {
-	border-right: 1px solid var( --table-border-color, #bbbbbb );
-	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
-	display: inline-grid;
-
-	&-row:not( .ppt-toggle-expand ) {
-		display: contents;
-	}
-
-	&-cell {
-		border-left: 1px solid var( --table-border-color, #bbbbbb );
-		border-top: 1px solid var( --table-border-color, #bbbbbb );
-		background: inherit;
-		padding: 4px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-wrap: wrap;
-	}
 }
 
 .ppt-toggle-expand {
