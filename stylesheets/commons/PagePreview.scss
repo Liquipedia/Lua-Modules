@@ -6,6 +6,9 @@ Template(s): Page preview hovercards
 	position: absolute;
 	z-index: 100;
 	display: none;
+	// passive display surface: never intercept the cursor or block clicks beneath,
+	// so the card dismisses the instant the cursor leaves the link
+	pointer-events: none;
 	width: max-content;
 	max-width: 20rem;
 	padding: 0.75rem;

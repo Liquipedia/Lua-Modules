@@ -89,7 +89,7 @@ class PagePreviewModule {
 				return;
 			}
 			const to = e.relatedTarget;
-			if ( to && ( link.contains( to ) || ( this.card && this.card.contains( to ) ) ) ) {
+			if ( to && link.contains( to ) ) {
 				return;
 			}
 			this.scheduleHide();
@@ -159,12 +159,8 @@ class PagePreviewModule {
 		}
 		const el = document.createElement( 'div' );
 		el.className = 'page-preview-card';
-		el.addEventListener( 'mouseover', () => window.clearTimeout( this.hideTimer ) );
-		el.addEventListener( 'mouseout', ( e ) => {
-			if ( !e.relatedTarget || !el.contains( e.relatedTarget ) ) {
-				this.scheduleHide();
-			}
-		} );
+		// the card is purely a passive display surface — no hover listeners, so it
+		// dismisses as soon as the cursor leaves the link (not Wikipedia-style sticky)
 		document.body.appendChild( el );
 		this.card = el;
 		this.cleanupFunctions.add( () => el.remove() );
