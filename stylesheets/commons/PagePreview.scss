@@ -11,7 +11,9 @@ Template(s): Page preview hovercards
 	pointer-events: none;
 	width: max-content;
 	max-width: 20rem;
-	padding: 0.75rem;
+	// no padding: the image and the table run edge-to-edge; overflow clips the
+	// full-bleed children to the card's rounded corners
+	overflow: hidden;
 	border: 1px solid var( --clr-on-surface-light-primary-12 );
 	border-radius: 0.25rem;
 	background-color: var( --clr-secondary-100 );
@@ -26,8 +28,6 @@ Template(s): Page preview hovercards
 	&__image {
 		display: block;
 		width: 100%;
-		margin-bottom: 0.5rem;
-		border-radius: 0.25rem;
 		// fixed landscape box: reserves space (no reflow when the image loads)
 		// and normalizes every photo to the same ratio regardless of source size
 		aspect-ratio: 16 / 9;
@@ -46,9 +46,11 @@ Template(s): Page preview hovercards
 		gap: 0.125rem;
 	}
 
-	// the fields render as an embedded Table2; stretch it to the card width so
-	// the right-aligned values line up against the card's right edge
+	// the fields render as an embedded Table2; stretch it to the full card width
+	// and drop its own border/corners since the card already provides them
 	.table2 {
 		width: 100%;
+		border: 0;
+		border-radius: 0;
 	}
 }
