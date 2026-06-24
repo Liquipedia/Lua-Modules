@@ -12,6 +12,7 @@ local DisplayUtil = Lua.import('Module:DisplayUtil')
 local Logic = Lua.import('Module:Logic')
 local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
+local PagePreview = Lua.import('Module:PagePreview')
 
 local Opponent = Lua.import('Module:Opponent')
 
@@ -58,7 +59,11 @@ function PlayerDisplay.BlockPlayer(props)
 	local nameNode = mw.html.create(props.dq and 's' or 'span'):addClass('name')
 
 	if not Opponent.playerIsTbd(player) and props.showLink ~= false and Logic.isNotEmpty(player.pageName) then
-		nameNode:wikitext('[[' .. player.pageName .. '|' .. player.displayName .. ']]')
+		PagePreview.register(player.pageName)
+		nameNode
+			:addClass('link-preview')
+			:attr('data-preview-page', PagePreview.key(player.pageName))
+			:wikitext('[[' .. player.pageName .. '|' .. player.displayName .. ']]')
 	elseif useDefault then
 		nameNode:wikitext(Logic.emptyOr(player.displayName, 'TBD'))
 	else
@@ -119,6 +124,11 @@ function PlayerDisplay.InlinePlayer(props)
 	local nameAndLink = props.showLink ~= false and player.pageName
 		and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
 		or player.displayName
+	if props.showLink ~= false and player.pageName then
+		PagePreview.register(player.pageName)
+		nameAndLink = '<span class="link-preview" data-preview-page="'
+			.. PagePreview.key(player.pageName) .. '">' .. nameAndLink .. '</span>'
+	end
 	if props.dq then
 		nameAndLink = '<s>' .. nameAndLink .. '</s>'
 	end
