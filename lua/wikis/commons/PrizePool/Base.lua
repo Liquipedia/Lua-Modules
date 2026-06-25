@@ -345,7 +345,7 @@ BasePrizePool.prizeTypes = {
 				table.insert(headerDisplay, text)
 			end
 
-			return TableCellHeader{children = {table.concat(headerDisplay)}, align = 'right'}
+			return TableCellHeader{children = headerDisplay, align = 'right'}
 		end,
 
 		row = 'points',
