@@ -764,6 +764,7 @@ end
 
 --- Whether a placement's rows are hidden behind the collapse toggle.
 --- Child classes override this; the default keeps every row visible.
+---@protected
 ---@param placement BasePlacement
 ---@return boolean
 function BasePrizePool:applyCutAfter(placement)
@@ -771,6 +772,7 @@ function BasePrizePool:applyCutAfter(placement)
 end
 
 ---Open/close labels for the collapse toggle. Child classes override.
+---@protected
 ---@return {opentext: string, closetext: string}?
 function BasePrizePool:_collapseText()
 	return nil
