@@ -65,6 +65,10 @@ local PRIZE_TYPE_POINTS = 'POINTS'
 local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
 local PRIZE_TYPE_FREETEXT = 'FREETEXT'
 
+-- Alignment for the fixed (non-prize) columns; prize columns carry `align` on their prize type.
+local PLACE_COLUMN_ALIGN = 'center'
+local OPPONENT_COLUMN_ALIGN = 'left'
+
 BasePrizePool.config = {
 	showBaseCurrency = {
 		default = false
@@ -154,10 +158,11 @@ BasePrizePool.config = {
 BasePrizePool.prizeTypes = {
 	[PRIZE_TYPE_BASE_CURRENCY] = {
 		sortOrder = 10,
+		align = 'right',
 
 		headerDisplay = function (data)
 			local currencyText = Currency.display(BASE_CURRENCY)
-			return TableCellHeader{children = {currencyText}, align = 'right'}
+			return TableCellHeader{children = {currencyText}}
 		end,
 
 		row = BASE_CURRENCY:lower() .. 'prize',
@@ -169,12 +174,13 @@ BasePrizePool.prizeTypes = {
 				return TableCell{children = {
 					Currency.display(BASE_CURRENCY, data,
 						{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
-				}, align = 'right'}
+				}}
 			end
 		end,
 	},
 	[PRIZE_TYPE_LOCAL_CURRENCY] = {
 		sortOrder = 20,
+		align = 'right',
 
 		header = 'localcurrency',
 		headerParse = function (prizePool, input, context, index)
@@ -196,7 +202,7 @@ BasePrizePool.prizeTypes = {
 			}
 		end,
 		headerDisplay = function (data)
-			return TableCellHeader{children = {Currency.display(data.currency)}, align = 'right'}
+			return TableCellHeader{children = {Currency.display(data.currency)}}
 		end,
 
 		row = 'localprize',
@@ -208,7 +214,7 @@ BasePrizePool.prizeTypes = {
 				return TableCell{children = {
 					Currency.display(headerData.currency, data,
 					{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
-				}, align = 'right'}
+				}}
 			end
 		end,
 
@@ -227,6 +233,7 @@ BasePrizePool.prizeTypes = {
 	},
 	[PRIZE_TYPE_PERCENTAGE] = {
 		sortOrder = 30,
+		align = 'right',
 
 		header = 'percentage',
 		headerParse = function (prizePool, input, context, index)
@@ -234,7 +241,7 @@ BasePrizePool.prizeTypes = {
 			return {title = 'Percentage'}
 		end,
 		headerDisplay = function (data)
-			return TableCellHeader{children = {data.title}, align = 'right'}
+			return TableCellHeader{children = {data.title}}
 		end,
 
 		row = 'percentage',
@@ -248,12 +255,13 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if String.isNotEmpty(data) then
-				return TableCell{children = {data .. '%'}, align = 'right'}
+				return TableCell{children = {data .. '%'}}
 			end
 		end,
 	},
 	[PRIZE_TYPE_QUALIFIES] = {
 		sortOrder = 50,
+		align = 'left',
 
 		header = 'qualifies',
 		headerParse = function (prizePool, input, context, index)
@@ -307,6 +315,7 @@ BasePrizePool.prizeTypes = {
 	},
 	[PRIZE_TYPE_POINTS] = {
 		sortOrder = 40,
+		align = 'right',
 
 		header = 'points',
 		headerParse = function (prizePool, input, context, index)
@@ -345,7 +354,7 @@ BasePrizePool.prizeTypes = {
 				table.insert(headerDisplay, text)
 			end
 
-			return TableCellHeader{children = headerDisplay, align = 'right'}
+			return TableCellHeader{children = headerDisplay}
 		end,
 
 		row = 'points',
@@ -354,12 +363,13 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{children = {LANG:formatNum(data)}, align = 'right'}
+				return TableCell{children = {LANG:formatNum(data)}}
 			end
 		end,
 	},
 	[PRIZE_TYPE_FREETEXT] = {
 		sortOrder = 60,
+		align = 'left',
 
 		header = 'freetext',
 		headerParse = function (prizePool, input, context, index)
@@ -637,8 +647,8 @@ end
 ---@return Renderable
 function BasePrizePool:_buildHeader(isAward)
 	local children = {
-		TableCellHeader{children = {isAward and 'Award' or 'Place'}, align = 'center'},
-		TableCellHeader{children = {'Participant'}, classes = {'prizepooltable-col-team'}, align = 'left'},
+		TableCellHeader{children = {isAward and 'Award' or 'Place'}, align = PLACE_COLUMN_ALIGN},
+		TableCellHeader{children = {'Participant'}, classes = {'prizepooltable-col-team'}, align = OPPONENT_COLUMN_ALIGN},
 	}
 
 	local previousOfType = {}
@@ -646,6 +656,7 @@ function BasePrizePool:_buildHeader(isAward)
 		local prizeTypeData = self.prizeTypes[prize.type]
 		if not prizeTypeData.mergeDisplayColumns or not previousOfType[prize.type] then
 			local cell = prizeTypeData.headerDisplay(prize.data)
+			cell.props.align = cell.props.align or prizeTypeData.align
 			table.insert(children, cell)
 			previousOfType[prize.type] = cell
 		end
@@ -700,7 +711,7 @@ function BasePrizePool:_buildRows()
 					showPlayerTeam = true,
 				}},
 				classes = {'prizepooltable-col-team'},
-				align = 'left',
+				align = OPPONENT_COLUMN_ALIGN,
 				nowrap = false,
 			}
 			local prizeCells = Array.filter(prizeMatrix[opponentIndex], function(cell)
@@ -731,6 +742,7 @@ function BasePrizePool:_opponentPrizeCells(placement, opponent)
 		local prizeTypeData = self.prizeTypes[prize.type]
 		local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
 		local cell = reward and prizeTypeData.rowDisplay(prize.data, reward) or TableCell{}
+		cell.props.align = cell.props.align or prizeTypeData.align
 
 		local lastCellOfType = previousOfPrizeType[prize.type]
 		if lastCellOfType and prizeTypeData.mergeDisplayColumns then
