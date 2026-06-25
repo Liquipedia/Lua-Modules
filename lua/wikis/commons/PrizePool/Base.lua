@@ -695,10 +695,10 @@ function BasePrizePool:_buildRows()
 		local isCut = self:applyCutAfter(placement)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			local opponentCell = TableCell{
-				children = {tostring(OpponentDisplay.BlockOpponent{
+				children = {OpponentDisplay.BlockOpponent{
 					opponent = opponent.opponentData,
 					showPlayerTeam = true,
-				})},
+				}},
 				classes = {'prizepooltable-col-team'},
 				align = 'left',
 				nowrap = false,
