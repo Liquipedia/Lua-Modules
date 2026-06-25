@@ -336,11 +336,10 @@ end
 ---Colored by the top of the range (placeStart).
 ---@return string?
 function Placement:getBadgeClass()
-	if self:hasSpecialStatus() then
+	if self:hasSpecialStatus() or self.placeStart > 3 then
 		return
 	end
-	local badges = {[1] = 'placement-1', [2] = 'placement-2', [3] = 'placement-3'}
-	return badges[self.placeStart]
+	return PlacementInfo.raw(self.placeStart).backgroundClass
 end
 
 ---@return string?
