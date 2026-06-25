@@ -12,7 +12,7 @@ local Html = Lua.import('Module:Widget/Html')
 
 ---@param props {children?: Renderable|Renderable[]}
 ---@return HtmlNode
-function MatchSummaryFfaTableHeader(props)
+local function MatchSummaryFfaTableHeader(props)
 	return Html.Div{
 		classes = {'panel-table__row', 'row--header'},
 		attributes = {
