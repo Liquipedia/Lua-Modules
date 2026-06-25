@@ -35,7 +35,7 @@ local TableCellHeader = TableWidgets.CellHeader
 local TableRow = TableWidgets.Row
 local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
-local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local ChevronToggle = Lua.import('Module:Widget/GeneralCollapsible/ChevronToggle')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local pageVars = PageVariableNamespace('PrizePool')
@@ -630,16 +630,7 @@ function BasePrizePool:_collapseToggle()
 	end
 	return Div{
 		classes = {'prizepooltable-toggle'},
-		children = {
-			Span{
-				classes = {'general-collapsible-expand-button'},
-				children = {Span{children = {collapseText.opentext, ' ', IconFa{iconName = 'expand'}}}},
-			},
-			Span{
-				classes = {'general-collapsible-collapse-button'},
-				children = {Span{children = {collapseText.closetext, ' ', IconFa{iconName = 'collapse'}}}},
-			},
-		},
+		children = {ChevronToggle{expandText = collapseText.opentext, collapseText = collapseText.closetext}},
 	}
 end
 
