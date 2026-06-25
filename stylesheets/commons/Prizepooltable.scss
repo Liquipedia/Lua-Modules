@@ -432,11 +432,11 @@ share the `prizepooltable` class.
 		}
 	}
 
-	// The theme wrapper + `.table2__table` qualifier raise specificity above the
-	// Table2 zebra rule so the tint wins regardless of load order; `:hover` keeps it.
-	// `border-bottom: 0` drops the legacy per-place coloured row border.
-	.theme--light &.prizepooltable-placement.table2__table,
-	.theme--dark &.prizepooltable-placement.table2__table {
+	// Top-3 row tint + accent bar. The Table2 zebra rule is `:where()`-wrapped, so
+	// these plain selectors out-specify it without a theme/`.table2__table` qualifier;
+	// `:hover` keeps the tint on hover. `border-bottom: 0` drops the legacy per-place
+	// coloured row border.
+	&.prizepooltable-placement {
 		tr.table2__row--body.background-color-first-place {
 			border-bottom: 0;
 
