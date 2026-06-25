@@ -16,7 +16,7 @@ local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 
 ---@param props {game: FFAMatchGroupUtilMatch|FFAMatchGroupUtilGame?}
----@return HtmlNode?
+---@return VNode?
 local function MatchSummaryFfaGameCountdown(props)
 	local game = props.game
 	if not game then

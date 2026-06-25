@@ -18,7 +18,7 @@ local Html = Lua.import('Module:Widget/Html')
 ---@field value? Renderable|Renderable[]
 
 ---@param props MatchSummaryFfaTableRowCellProps
----@return HtmlNode
+---@return VNode
 local function MatchSummaryFfaTableRowCell(props)
 	local isSortable = props.sortable
 

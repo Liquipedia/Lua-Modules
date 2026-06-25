@@ -11,7 +11,7 @@ local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 
 ---@param props {matchId: string, idx: integer, children?: Renderable|Renderable[]}
----@return HtmlNode
+---@return VNode
 local function MatchSummaryFfaTab(props)
 	return Html.Div{
 		classes = {'panel-content'},

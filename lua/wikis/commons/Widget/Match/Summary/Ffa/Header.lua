@@ -17,7 +17,7 @@ local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local CountdownIcon = Lua.import('Module:Widget/Match/Summary/Ffa/CountdownIcon')
 
 ---@param props {matchId: string, games: FFAMatchGroupUtilGame[]}
----@return HtmlNode
+---@return VNode
 local function MatchSummaryFfaHeader(props)
 	assert(props.matchId, 'No matchId provided')
 	assert(type(props.games) == 'table', 'No games provided')

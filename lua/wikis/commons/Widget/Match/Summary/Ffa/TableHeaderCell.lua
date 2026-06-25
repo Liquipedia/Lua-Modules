@@ -21,7 +21,7 @@ local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 ---@field value? Renderable|Renderable[]
 
 ---@param props MatchSummaryFfaTableHeaderCellProps
----@return HtmlNode
+---@return VNode
 local function MatchSummaryFfaTableHeaderCell(props)
 	local isSortable = props.sortable
 
