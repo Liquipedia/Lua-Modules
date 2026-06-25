@@ -721,8 +721,9 @@ function BasePrizePool:_buildRows()
 	return rows
 end
 
+---@private
 ---@param placement BasePlacement
----@param opponent table
+---@param opponent BasePlacementOpponent
 ---@return Renderable[]
 function BasePrizePool:_opponentPrizeCells(placement, opponent)
 	local previousOfPrizeType = {}
