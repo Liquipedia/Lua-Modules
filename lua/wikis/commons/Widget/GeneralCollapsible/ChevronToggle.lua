@@ -17,14 +17,15 @@ local Span = Html.Span
 ---@param class string
 ---@param text (string|Widget)?
 ---@param iconName string
+---@param size 'xs'|'sm'|'md'|'lg'
 ---@return Widget
-local function chevronButton(class, text, iconName)
+local function chevronButton(class, text, iconName, size)
 	return Button{
 		classes = {class},
 		children = Span{
 			children = WidgetUtil.collect(text, text and ' ' or nil, Icon{iconName = iconName}),
 		},
-		size = 'xs',
+		size = size,
 		-- Ghost (borderless, text-friendly) when a label is shown; icon-only otherwise.
 		variant = text and 'ghost' or 'icon',
 	}
@@ -33,13 +34,15 @@ end
 ---@class ChevronToggleProps
 ---@field expandText (string|Widget)? optional label shown next to the expand chevron
 ---@field collapseText (string|Widget)? optional label shown next to the collapse chevron
+---@field size ('xs'|'sm'|'md'|'lg')? button size, defaults to 'xs'
 
 ---@param props ChevronToggleProps?
 ---@return HtmlNode
 local function ChevronToggle(props)
 	props = props or {}
-	local expandButton = chevronButton('general-collapsible-expand-button', props.expandText, 'expand')
-	local collapseButton = chevronButton('general-collapsible-collapse-button', props.collapseText, 'collapse')
+	local size = props.size or 'xs'
+	local expandButton = chevronButton('general-collapsible-expand-button', props.expandText, 'expand', size)
+	local collapseButton = chevronButton('general-collapsible-collapse-button', props.collapseText, 'collapse', size)
 
 	return Span{
 		classes = {'general-collapsible-default-toggle'},
