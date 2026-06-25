@@ -197,7 +197,7 @@ function PagePreview._role(extradata)
 		return nil
 	end
 	local mapped = PlayerTeamRoles[role:lower()]
-	return mapped and mapped.display or role
+	return String.upperCaseFirst(mapped and mapped.display or role)
 end
 
 ---reads the collected page names (deduped, capped) from the wiki Variable

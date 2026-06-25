@@ -9,10 +9,9 @@ Template(s): Page preview hovercards
 	// passive display surface: never intercept the cursor or block clicks beneath,
 	// so the card dismisses the instant the cursor leaves the link
 	pointer-events: none;
-	width: max-content;
-	max-width: 20rem;
-	// no padding: the image and the table run edge-to-edge; overflow clips the
-	// full-bleed children to the card's rounded corners
+	width: 18rem;
+	// the table runs edge-to-edge; the image is inset by its own margin. overflow
+	// clips the full-bleed table to the card's rounded corners
 	overflow: hidden;
 	border: 1px solid var( --clr-on-surface-light-primary-12 );
 	border-radius: 0.25rem;
@@ -27,10 +26,13 @@ Template(s): Page preview hovercards
 
 	&__image {
 		display: block;
-		width: 100%;
+		// inset from the card edges; the table below stays full-bleed
+		width: calc( 100% - 0.5rem );
+		margin: 0.25rem;
+		border-radius: 0.125rem;
 		// fixed landscape box: reserves space (no reflow when the image loads)
 		// and normalizes every photo to the same ratio regardless of source size
-		aspect-ratio: 16 / 9;
+		aspect-ratio: 4 / 3;
 		object-fit: cover;
 		object-position: center top;
 		background-color: rgba( 0, 0, 0, 0.06 );
