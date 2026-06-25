@@ -364,8 +364,10 @@ share the `prizepooltable` class.
 		overflow-x: auto;
 		scrollbar-width: none;
 
-		&::-webkit-scrollbar {
-			display: none;
+		@supports not ( scrollbar-width: none ) {
+			&::-webkit-scrollbar {
+				display: none;
+			}
 		}
 	}
 }
