@@ -90,7 +90,7 @@ StarcraftOpponentDisplay.BracketOpponentEntry = BracketOpponentEntry
 ---Displays an opponent as a block element. The width of the component is
 ---determined by its layout context, and not of the opponent.
 ---@param props StarcraftBlockOpponentProps
----@return Widget
+---@return Renderable
 function StarcraftOpponentDisplay.BlockOpponent(props)
 	local opponent = props.opponent
 	opponent.extradata = opponent.extradata or {}
@@ -135,7 +135,7 @@ function StarcraftOpponentDisplay.BlockPlayers(props)
 	-- remaining case: opponent.isSpecialArchon
 	return HtmlWidgets.Div{
 		classes = {'starcraft-special-archon-block-opponent', 'block-players-wrapper'},
-		children = Array.map(Array.range(1, #opponent.players / 2), function (archonIx)
+		children = Array.mapRange(1, #opponent.players / 2, function (archonIx)
 			local primaryFaction = opponent.players[2 * archonIx - 1].faction
 			local secondaryFaction = opponent.players[2 * archonIx].faction
 			local primaryIcon = Faction.Icon{size = 'large', faction = primaryFaction}

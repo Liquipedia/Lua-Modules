@@ -165,11 +165,11 @@ end
 function EmptyPersonPagePreview:_backfillInformationFromPlacements()
 	local personConditions = ConditionTree(BooleanOperator.any)
 		-- players
-		:add(Array.map(Array.range(1, DEFAULT_MAX_PLAYERS_PER_PLACEMENT), function(index)
+		:add(Array.mapRange(1, DEFAULT_MAX_PLAYERS_PER_PLACEMENT, function(index)
 			return ConditionNode(ColumnName('p' .. index, 'opponentplayers'), Comparator.eq, self.person)
 		end))
 		-- coaches (etc)
-		:add(Array.map(Array.range(1, 5), function(index)
+		:add(Array.mapRange(1, 5, function(index)
 			return ConditionNode(ColumnName('c' .. index, 'opponentplayers'), Comparator.eq, self.person)
 		end))
 

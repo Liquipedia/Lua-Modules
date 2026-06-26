@@ -35,13 +35,13 @@ local Show = Class.new(BasicInfobox)
 
 ---Entry point
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Show.run(frame)
 	local show = Show(frame)
 	return show:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Show:createInfobox()
 	local args = self.args
 

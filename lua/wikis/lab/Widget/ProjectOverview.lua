@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Count = Lua.import('Module:Count')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
@@ -20,13 +19,13 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local Component = Lua.import('Module:Widget/Component')
 local Grid = Lua.import('Module:Widget/Grid')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Panel = Lua.import('Module:Widget/Panel')
-local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LabProjectOverviewParameters
@@ -35,23 +34,22 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field projectImage string?
 ---@field projectImageDark string?
 
----@class LabProjectOverview: Widget
----@field props LabProjectOverviewParameters
-local ProjectOverview = Class.new(Widget)
+local ProjectOverview = {}
 
----@return Widget
-function ProjectOverview:render()
-	assert(Logic.isNotEmpty(self.props.projectUrl), '|projectUrl= not specified')
+---@param props LabProjectOverviewParameters
+---@return VNode
+function ProjectOverview.render(props)
+	assert(Logic.isNotEmpty(props.projectUrl), '|projectUrl= not specified')
 	return Grid.Cell{
 		xs = 12,
 		md = 6,
 		cellContent = Panel{
-			heading = self.props.projectName,
+			heading = props.projectName,
 			padding = true,
 			children = Grid.Container{
 				gridCells = {
-					self:_generateImage(),
-					self:_generateOverview()
+					ProjectOverview._generateImage(props),
+					ProjectOverview._generateOverview(props)
 				}
 			}
 		}
@@ -59,15 +57,16 @@ function ProjectOverview:render()
 end
 
 ---@private
----@return Widget
-function ProjectOverview:_generateImage()
-	local hasImage = Logic.isNotEmpty(self.props.projectImage)
+---@param props LabProjectOverviewParameters
+---@return VNode
+function ProjectOverview._generateImage(props)
+	local hasImage = Logic.isNotEmpty(props.projectImage)
 
 	return Grid.Cell{
 		xs = 12,
 		sm = 12,
 		md = 6,
-		cellContent = HtmlWidgets.Div{
+		cellContent = Html.Div{
 			classes = not hasImage and {'mobile-hide'} or nil,
 			css = {
 				height = '160px',
@@ -77,10 +76,10 @@ function ProjectOverview:_generateImage()
 			},
 			children = {
 				IconImage{
-					imageLight = hasImage and self.props.projectImage or 'Filler 600px.png',
-					imageDark = hasImage and Logic.emptyOr(self.props.projectImageDark, self.props.projectImage) or 'Filler 600px.png',
+					imageLight = hasImage and props.projectImage or 'Filler 600px.png',
+					imageDark = hasImage and Logic.emptyOr(props.projectImageDark, props.projectImage) or 'Filler 600px.png',
 					size = '260x160px',
-					link = self.props.projectUrl
+					link = props.projectUrl
 				}
 			}
 		}
@@ -88,13 +87,14 @@ function ProjectOverview:_generateImage()
 end
 
 ---@private
----@return Widget
-function ProjectOverview:_generateOverview()
+---@param props LabProjectOverviewParameters
+---@return VNode
+function ProjectOverview._generateOverview(props)
 
 	local timestamp = DateExt.readTimestamp(
 		mw.getCurrentFrame():callParserFunction(
 			'#lastupdated_by_prefix',
-			self.props.projectUrl .. '/'
+			props.projectUrl .. '/'
 		)
 	)
 
@@ -103,10 +103,10 @@ function ProjectOverview:_generateOverview()
 		sm = 12,
 		md = 6,
 		cellContent = WidgetUtil.collect(
-			HtmlWidgets.H5{
+			Html.H5{
 				children = {
 					IconFa{iconName = 'projecthome', screenReaderHidden = true},
-					Link{link = self.props.projectUrl}
+					Link{link = props.projectUrl}
 				}
 			},
 			{
@@ -116,17 +116,17 @@ function ProjectOverview:_generateOverview()
 					'datapoint',
 					ConditionTree(BooleanOperator.all):add{
 						ConditionNode(ColumnName('type'), Comparator.eq, 'project contributor'),
-						ConditionNode(ColumnName('name'), Comparator.eq, self.props.projectUrl)
+						ConditionNode(ColumnName('name'), Comparator.eq, props.projectUrl)
 					}
 				),
 			},
-			HtmlWidgets.Br{},
+			Html.Br{},
 			{
 				IconFa{iconName = 'articles', screenReaderHidden = true},
 				' Articles Created: ',
-				mw.getCurrentFrame():callParserFunction('#count_pages_by_prefix', self.props.projectUrl),
+				mw.getCurrentFrame():callParserFunction('#count_pages_by_prefix', props.projectUrl),
 			},
-			HtmlWidgets.Br{},
+			Html.Br{},
 			{
 				IconFa{iconName = 'lastupdated', screenReaderHidden = true},
 				' Last Update: ',
@@ -140,4 +140,4 @@ function ProjectOverview:_generateOverview()
 	}
 end
 
-return ProjectOverview
+return Component.component(ProjectOverview.render)

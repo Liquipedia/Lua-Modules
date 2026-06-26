@@ -141,6 +141,13 @@ describe('array', function()
 		end)
 	end)
 
+	describe('FlatMap', function()
+		it('check', function()
+			local a = {1, 1, 2, 1, 2, 3, 1, 2, 3, 4}
+			assert.are_same(a, Array.flatMap(Array.range(1, 4), function(i) return Array.range(1, i) end))
+		end)
+	end)
+
 	describe('All', function()
 		it('check', function()
 			local a = {1, 2, 3}
@@ -247,6 +254,14 @@ describe('array', function()
 		end)
 	end)
 
+	describe('mapRange', function()
+		it('check', function()
+			assert.are_same({'arg1', 'arg2', 'arg3'}, Array.mapRange(1, 3, function (index)
+				return 'arg' .. index
+			end))
+		end)
+	end)
+
 	describe('ForEach', function()
 		it('check', function()
 			local a = {}
@@ -310,6 +325,13 @@ describe('array', function()
 	describe('Interleave', function ()
 		it('works', function()
 			assert.are_same({'a', ' ', 'b', ' ', 'c'}, Array.interleave({'a', 'b', 'c'}, ' '))
+			assert.are_same({'a'}, Array.interleave({'a'}, ' '))
+			assert.are_same({}, Array.interleave({}, ' '))
+		end)
+
+		it('with nested array', function ()
+			local a, b = Array.range(1, 3), math.pi
+			assert.are_same({{1, 2, 3}, ' ', b}, Array.interleave({a, b}, ' '))
 		end)
 	end)
 end)

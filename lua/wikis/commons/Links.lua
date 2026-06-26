@@ -361,6 +361,11 @@ local PREFIXES = {
 	},
 	vod = {''},
 	weibo = {'https://weibo.com/'},
+	wotidam  = {'https://worldoftanks.com/community/accounts/'},
+	wotidasia = {'https://worldoftanks.asia/en/community/accounts/'},
+	wotidcn = {'https://wotgame.cn/community/accounts/'},
+	wotideu = {'https://worldoftanks.eu/community/accounts/'},
+	wotidru = {'https://tanki.su/ru/community/accounts/'},
 	wl = {match = 'https://www.winstonslab.com/matches/match.php?id='},
 	yandexefir = {'https://yandex.ru/efir?stream_channel='},
 	youtube = {'https://www.youtube.com/'},
@@ -380,7 +385,7 @@ local SUFFIXES = {
 	},
 	['faceit-c'] = {'/'},
 	['faceit-hub'] = {'/'},
-	gol = {match = '/page-game/'},
+	gol = {match = '/page-summary/'},
 	iccup = {'.html'},
 	lazermplink = {match = '/events'},
 	metafy = {'?utm_source=liquipedia&campaign=infoblock'},
@@ -430,6 +435,10 @@ local ICON_KEYS_TO_RENAME = {
 	tlpdkr = 'tlpd-wol-korea',
 	tlpdsospa = 'tlpd-sospa',
 	douyin_page = 'douyin',
+	wotidam = 'wotid',
+	wotidasia = 'wotid',
+	wotideu = 'wotid',
+	wotidcn = 'wotid',
 }
 
 local MATCH_ICONS = {

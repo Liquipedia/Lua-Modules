@@ -28,13 +28,13 @@ local Builder = Widgets.Builder
 local Game = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Game.run(frame)
 	local game = Game(frame)
 	return game:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Game:createInfobox()
 	local args = self.args
 	local links = Links.transform(args)

@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -16,9 +15,9 @@ local RoleUtil = Lua.import('Module:Role/Util')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local ParticipantsTeamMember = Lua.import('Module:Widget/Participants/Team/TeamMember')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 
@@ -56,7 +55,7 @@ end
 --   * Returns an array of labels to display (can be multiple)
 -- * Left-role:
 --   * If the first role has an icon, we use that to render the left-role
---   * If not then we instead display the icon or text of the first ingame role
+--   * If not then we instead display the icon of the first ingame role with icon
 ---@param player table
 ---@return string?, string[]?
 local function getRoleDisplays(player)
@@ -69,8 +68,8 @@ local function getRoleDisplays(player)
 			return firstRole.icon
 		end
 		for _, role in ipairs(roles) do
-			if role.type == RoleUtil.ROLE_TYPE.INGAME then
-				return role.icon or role.display
+			if role.type == RoleUtil.ROLE_TYPE.INGAME and role.icon then
+				return role.icon
 			end
 		end
 	end
@@ -85,7 +84,7 @@ local function getRoleDisplays(player)
 		-- Add non-ingame role if present
 		for _, role in ipairs(roles) do
 			if role.type ~= RoleUtil.ROLE_TYPE.INGAME then
-				table.insert(rightRoles, role.display)
+				table.insert(rightRoles, role.abbreviation or role.display)
 				break
 			end
 		end
@@ -94,13 +93,10 @@ local function getRoleDisplays(player)
 	return roleLeftDisplay(), roleRightDisplay()
 end
 
----@class ParticipantsTeamRoster: Widget
----@operator call(table): ParticipantsTeamRoster
-local ParticipantsTeamRoster = Class.new(Widget)
-
----@return Widget
-function ParticipantsTeamRoster:render()
-	local participant = self.props.participant
+---@param props {participant: TeamParticipant, mergeStaffTabIfOnlyOneStaff: boolean?}
+---@return Renderable
+local function ParticipantsTeamRoster(props)
+	local participant = props.participant
 
 	-- Used for making the sorting stable
 	local sortPlayers = function(players)
@@ -119,7 +115,7 @@ function ParticipantsTeamRoster:render()
 		end)
 	end
 
-	local makePlayerWidget = function(player, index)
+	local makePlayerWidget = function(player)
 		local playerTeam = participant.opponent.template ~= player.team and player.team or nil
 		local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
 			type = Opponent.team,
@@ -129,7 +125,6 @@ function ParticipantsTeamRoster:render()
 		return ParticipantsTeamMember{
 			player = player,
 			team = playerTeamAsOpponent,
-			even = index % 2 == 0,
 			roleLeft = roleLeft,
 			roleRight = roleRight,
 			trophies = player.extradata.trophies or 0,
@@ -138,6 +133,7 @@ function ParticipantsTeamRoster:render()
 	end
 
 	---@param groups {label: string?, players: table[]}[]
+	---@return Widget
 	local makeRostersDisplay = function(groups)
 		local children = {}
 		for _, group in ipairs(groups) do
@@ -195,7 +191,7 @@ function ParticipantsTeamRoster:render()
 	tabs = Array.filter(tabs, function(tab)
 		return #tab.players > 0
 	end)
-	if self.props.mergeStaffTabIfOnlyOneStaff
+	if props.mergeStaffTabIfOnlyOneStaff
 		and #tabs == 2
 		and tabs[1].type == TAB_ENUM.MAIN
 		and tabs[2].type == TAB_ENUM.STAFF
@@ -224,4 +220,4 @@ function ParticipantsTeamRoster:render()
 	}
 end
 
-return ParticipantsTeamRoster
+return Component.component(ParticipantsTeamRoster)
