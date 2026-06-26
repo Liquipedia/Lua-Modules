@@ -12,8 +12,8 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 
-local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
+local Injector = Lua.import('Module:Widget/Injector')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
