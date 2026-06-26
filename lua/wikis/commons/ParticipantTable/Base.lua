@@ -66,7 +66,7 @@ local prizePoolVars = PageVariableNamespace('PrizePool')
 ---@field isResolved boolean?
 ---@field sortName string
 
----@class ParticipantTable
+---@class ParticipantTable: BaseClass
 ---@operator call(Frame): ParticipantTable
 ---@field args table
 ---@field config ParticipantTableConfig
