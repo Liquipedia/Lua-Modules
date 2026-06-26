@@ -105,14 +105,8 @@ function LegacyTeamCard.run(dependency)
 		return card
 	end)
 
-	local defaultRows, extraRows = 0, 0
-	Array.forEach(processedCards, function(card)
-		defaultRows = tonumber(card.defaultRowNumber) or defaultRows
-		extraRows = tonumber(card.extraRows) or extraRows
-	end)
-
 	local tpArgs = {
-		minimumplayers = defaultRows + extraRows + toggleFolded.extraPlayers,
+		minimumplayers = 0,
 		showplayerinfo = toggleFolded.showPlayerInfo and 'true' or nil,
 	}
 	Array.forEach(processedCards, function(card)
