@@ -90,7 +90,7 @@ local function readIds(args)
 	end))
 end
 
----@param row table
+---@param row any
 ---@return TournamentPlayerStats.RawRow?
 local function rowFromInput(row)
 	if type(row) ~= 'table' then
@@ -121,15 +121,7 @@ local function readPlayers(rawData)
 		return {}
 	end
 
-	local players = {}
-	Array.forEach(list, function(row)
-		local player = rowFromInput(row)
-		if player then
-			table.insert(players, player)
-		end
-	end)
-
-	return players
+	return Array.map(list, rowFromInput)
 end
 
 ---@param frame Frame|table
