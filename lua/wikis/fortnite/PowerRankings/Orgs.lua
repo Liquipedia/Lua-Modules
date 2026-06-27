@@ -85,6 +85,7 @@ function PowerRankingsOrgs.main(frame)
 		updated = Logic.isNotEmpty(PowerRankingsData.updated)
 			and PowerRankingsData.updated .. ' ' .. DateExt.defaultTimezone
 			or nil,
+		displayUpdated = mw.getContentLanguage():formatDate('F j, Y - H:i') .. ' ' .. DateExt.defaultTimezone,
 	}
 	config.weightSum = config.weights.count + config.weights.pr + config.weights.cash
 
@@ -191,8 +192,8 @@ end
 ---@return {pageName: string, displayName: string, icon: string?, iconDark: string?}[]
 function PowerRankingsOrgs._addPlacementData(byTeam, historicalToTeam, year)
 	local placementConditions = ConditionTree(BooleanOperator.all):add{
-		ConditionNode(ColumnName('date_year'), Comparator.eq, tostring(year)),
-		ConditionNode(ColumnName('prizemoney'), Comparator.gt, '0'),
+		ConditionNode(ColumnName('date_year'), Comparator.eq, year),
+		ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0),
 	}
 
 	---@type table<string, true>
@@ -302,7 +303,7 @@ end
 
 ---@param teams FortniteRankingsTeam[]
 ---@param achievementsInfo table<string, {pageName: string, displayName: string, icon: string?, iconDark: string?}>
----@param config {wrapped: boolean, updated: string?, year: integer, showMore: integer}
+---@param config {wrapped: boolean, displayUpdated: string?, year: integer, showMore: integer}
 ---@return Renderable
 function PowerRankingsOrgs._buildDisplay(teams, achievementsInfo, config)
 	local columns = WidgetUtil.collect(
@@ -321,7 +322,7 @@ function PowerRankingsOrgs._buildDisplay(teams, achievementsInfo, config)
 	end)
 
 	return TableWidgets.Table{
-		title = PowerRankingsOrgs._buildTitle(config.updated),
+		title = PowerRankingsOrgs._buildTitle(config.displayUpdated),
 		sortable = false,
 		columns = columns,
 		footer = config.showMore and Link{
@@ -403,9 +404,7 @@ function PowerRankingsOrgs._buildRow(rank, team, wrapped, achievementsInfo)
 	return TableWidgets.Row{children = WidgetUtil.collect(
 		TableWidgets.Cell{children = HtmlWidgets.B{children = rank}},
 		TableWidgets.Cell{children = flagCell},
-		TableWidgets.Cell{children = OpponentDisplay.BlockOpponent{
-			opponent = {type = Opponent.team, template = team.team, extradata = {}},
-		}},
+		TableWidgets.Cell{children = OpponentDisplay.BlockTeamContainer{template = team.team, showLink = true}},
 		TableWidgets.Cell{children = membersText},
 		not wrapped and TableWidgets.Cell{children = achievements} or nil,
 		TableWidgets.Cell{children = HtmlWidgets.B{children = MathUtil.formatRounded{value = team.score, precision = 1}}},
