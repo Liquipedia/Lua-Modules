@@ -23,6 +23,7 @@ local Table = Lua.import('Module:Table')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
@@ -141,10 +142,13 @@ end
 ---@private
 ---@return string
 function TournamentInputStats:_buildPlacementConditions()
-	return Condition.Tree(BooleanOperator.all):add{
-		ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual'),
-		ConditionUtil.anyOf(ColumnName('pagename'), self.tournamentPageNames),
-	}:toString()
+	local conditions = ConditionTree(BooleanOperator.all)
+		:add{
+			ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual'),
+			ConditionUtil.anyOf(ColumnName('pagename'), self.tournamentPageNames),
+		}
+
+	return tostring(conditions)
 end
 
 ---@private

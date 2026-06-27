@@ -154,10 +154,11 @@ end
 ---@param id string
 ---@return table?
 local function fetchById(id)
-	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionNode(ColumnName('type'), Comparator.eq, DATAPOINT_TYPE),
-		ConditionNode(ColumnName('name'), Comparator.eq, id),
-	}
+	local conditions = ConditionTree(BooleanOperator.all)
+		:add{
+			ConditionNode(ColumnName('type'), Comparator.eq, DATAPOINT_TYPE),
+			ConditionNode(ColumnName('name'), Comparator.eq, id),
+		}
 
 	return mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = tostring(conditions),
@@ -178,10 +179,11 @@ local function buildPlacementIndex(tournamentPage)
 		return index
 	end
 
-	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionNode(ColumnName('pagename'), Comparator.eq, title.text:gsub(' ', '_')),
-		title.namespace ~= 0 and ConditionNode(ColumnName('namespace'), Comparator.eq, title.namespace) or nil,
-	}
+	local conditions = ConditionTree(BooleanOperator.all)
+		:add{
+			ConditionNode(ColumnName('pagename'), Comparator.eq, title.text:gsub(' ', '_')),
+			title.namespace ~= 0 and ConditionNode(ColumnName('namespace'), Comparator.eq, title.namespace) or nil,
+		}
 
 	local rows = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = tostring(conditions),
