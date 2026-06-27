@@ -17,8 +17,8 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 ---@param props {bracketId: string, matchId: string, gameIdx: integer}
 ---@return Html
 function CustomGameSummary.getGameByMatchId(props)
-	---@class FFAMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
+	---@cast match FFAMatchGroupUtilMatch
 
 	local game = match.games[props.gameIdx]
 	assert(game, 'Error Game ID ' .. tostring(props.gameIdx) .. ' not found')
