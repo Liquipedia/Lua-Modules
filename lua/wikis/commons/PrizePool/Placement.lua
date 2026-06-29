@@ -337,7 +337,7 @@ end
 ---@return string?
 function Placement:getBadgeClass()
 	if self:hasSpecialStatus() or self.placeStart > 3 then
-		return
+		return nil
 	end
 	return PlacementInfo.raw(self.placeStart).backgroundClass
 end

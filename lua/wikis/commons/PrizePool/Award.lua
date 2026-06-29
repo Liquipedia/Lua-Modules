@@ -17,7 +17,8 @@ local Placement = Lua.import('Module:PrizePool/Award/Placement')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
-local TableCell = Lua.import('Module:Widget/Table2/All').Cell
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local TableCell = TableWidgets.Cell
 
 --- @class AwardPrizePool: BasePrizePool
 --- @operator call(...): AwardPrizePool
@@ -45,6 +46,7 @@ function AwardPrizePool:readPlacements(args)
 	end)
 end
 
+---@protected
 ---@param placement AwardPlacement
 ---@return Renderable
 function AwardPrizePool:placeOrAwardCell(placement)
@@ -55,12 +57,14 @@ function AwardPrizePool:placeOrAwardCell(placement)
 	}
 end
 
+---@protected
 ---@param placement AwardPlacement
 ---@return boolean
 function AwardPrizePool:applyCutAfter(placement)
 	return (placement.previousTotalNumberOfParticipants + 1) > self.options.cutafter
 end
 
+---@protected
 ---@return {opentext: string, closetext: string}?
 function AwardPrizePool:_collapseText()
 	return {opentext = 'Show more Awards', closetext = 'Show less Awards'}

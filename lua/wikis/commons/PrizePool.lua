@@ -20,7 +20,8 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Span = Widgets.Span
-local TableCell = Lua.import('Module:Widget/Table2/All').Cell
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local TableCell = TableWidgets.Cell
 
 ---@class PrizePool: BasePrizePool
 ---@operator call(...): PrizePool
@@ -46,6 +47,7 @@ function PrizePool:readPlacements(args)
 	self.placements = Import.run(self)
 end
 
+---@protected
 ---@param placement PrizePoolPlacement
 ---@return Renderable
 function PrizePool:placeOrAwardCell(placement)
@@ -62,18 +64,21 @@ function PrizePool:placeOrAwardCell(placement)
 	}
 end
 
+---@protected
 ---@param placement PrizePoolPlacement
 ---@return boolean
 function PrizePool:applyHideAfter(placement)
 	return placement.placeStart > self.options.hideafter
 end
 
+---@protected
 ---@param placement PrizePoolPlacement
 ---@return boolean
 function PrizePool:applyCutAfter(placement)
 	return placement.placeStart > self.options.cutafter
 end
 
+---@protected
 ---@return {opentext: string, closetext: string}?
 function PrizePool:_collapseText()
 	local visible = Array.filter(self.placements, function(placement)

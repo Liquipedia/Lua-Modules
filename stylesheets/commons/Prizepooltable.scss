@@ -313,7 +313,8 @@ div.background-color-highlight {
 }
 
 /*******************************************************************************
-Legacy ( standardized ) prize pool tables — Author: Rathoz
+Template: ( Standardized ) prize pool tables
+Author: Rathoz
 *******************************************************************************/
 
 .collapsed > .ppt-hide-on-collapse {
@@ -441,10 +442,9 @@ share the `prizepooltable` class.
 			}
 		}
 
-		// Top-3 row tint + accent bar. The Table2 zebra rule is `:where()`-wrapped, so
-		// these plain selectors out-specify it without a theme/`.table2__table` qualifier;
-		// `:hover` shifts to the matching hover tint so these rows feel like the rest of
-		// the table. `border-bottom: 0` drops the legacy per-place coloured row border.
+		// Top-3 row tint + accent bar. The Table2 zebra rule is `:where()`-wrapped, so these
+		// plain selectors out-specify it without a theme/`.table2__table` qualifier.
+		// `border-bottom: 0` drops the legacy per-place coloured row border.
 		tr.table2__row--body.background-color-first-place {
 			border-bottom: 0;
 			background-color: var( --prizepool-place-1-tint );
