@@ -73,7 +73,7 @@ function PowerRankingsOrgs.main(frame)
 	local args = Arguments.getArgs(frame)
 
 	local config = {
-		limit = tonumber(args.limit),
+		limit = MathUtil.toInteger(args.limit),
 		showMore = Logic.readBool(args.showMore),
 		wrapped = Logic.readBool(args.wrapped),
 		year = tonumber(args.year) or DateExt.getYearOf(),
