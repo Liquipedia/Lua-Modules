@@ -73,7 +73,7 @@ function WikiCopyPaste.getFfaMatchCode(bestof, mode, index, opponents, args)
 		INDENT .. '|p_kill=1' ..
 		INDENT .. '|twitch=|youtube=',
 		Array.map(Array.range(1, bestof), function(mapIndex)
-			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|date=|finished=|vod=}}'
+			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|team1side=|team2side= |date=|finished=|vod=}}'
 		end),
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getFfaOpponent(mode, bestof)
