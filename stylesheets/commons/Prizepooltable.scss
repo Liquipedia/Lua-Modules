@@ -410,22 +410,22 @@ share the `prizepooltable` class.
 		}
 	}
 
-	&.prizepooltable-placement .prizepooltable-place {
-		text-align: center;
-		font-weight: bold;
-		color: var( --clr-secondary-25 );
-
-		// Override the legacy `… > td.prizepooltable-place` metal fill so the row
-		// tint + accent bar show through on the redesigned table instead.
-		background-color: transparent;
-
-		.theme--dark & {
-			color: var( --clr-secondary-100 );
-		}
-	}
-
-	// Top-3 rows: left accent bar (coloured, with the row tint, in the theme block below).
 	&.prizepooltable-placement {
+		.prizepooltable-place {
+			text-align: center;
+			font-weight: bold;
+			color: var( --clr-secondary-25 );
+
+			// Override the legacy `… > td.prizepooltable-place` metal fill so the row
+			// tint + accent bar show through on the redesigned table instead.
+			background-color: transparent;
+
+			.theme--dark & {
+				color: var( --clr-secondary-100 );
+			}
+		}
+
+		// Top-3 rows: left accent bar geometry on the place cell (per-place colour below).
 		tr.table2__row--body.background-color-first-place,
 		tr.table2__row--body.background-color-second-place,
 		tr.table2__row--body.background-color-third-place {
@@ -440,13 +440,11 @@ share the `prizepooltable` class.
 				}
 			}
 		}
-	}
 
-	// Top-3 row tint + accent bar. The Table2 zebra rule is `:where()`-wrapped, so
-	// these plain selectors out-specify it without a theme/`.table2__table` qualifier;
-	// `:hover` shifts to the matching hover tint so these rows feel like the rest of
-	// the table. `border-bottom: 0` drops the legacy per-place coloured row border.
-	&.prizepooltable-placement {
+		// Top-3 row tint + accent bar. The Table2 zebra rule is `:where()`-wrapped, so
+		// these plain selectors out-specify it without a theme/`.table2__table` qualifier;
+		// `:hover` shifts to the matching hover tint so these rows feel like the rest of
+		// the table. `border-bottom: 0` drops the legacy per-place coloured row border.
 		tr.table2__row--body.background-color-first-place {
 			border-bottom: 0;
 			background-color: var( --prizepool-place-1-tint );
