@@ -11,7 +11,7 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Table = Lua.import('Module:Table')
 
 local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
-local StarcraftBracketOpponentEntry = Lua.import('Module:Widget/Match/Bracket/OpponentEntry')
+local StarcraftBracketOpponentEntry = Lua.import('Module:Widget/Match/Bracket/OpponentEntry/Starcraft')
 
 ---@class Starcraft2BrktsWikiSpecific: BrktsWikiSpecific
 local WikiSpecific = Table.copy(BaseWikiSpecific)
