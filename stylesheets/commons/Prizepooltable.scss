@@ -324,11 +324,6 @@ Author: Rathoz
 	display: none !important;
 }
 
-.collapsed .ppt-toggle-expand .general-collapsible-collapse-button,
-.general-collapsible:not( .collapsed ) .ppt-toggle-expand .general-collapsible-expand-button {
-	display: none !important;
-}
-
 .prizepooltabletoggle {
 	cursor: pointer;
 }
@@ -353,15 +348,6 @@ Author: Rathoz
 		align-items: center;
 		justify-content: center;
 		flex-wrap: wrap;
-	}
-}
-
-.ppt-toggle-expand {
-	grid-column: 1 / -1;
-
-	> * {
-		color: unset !important;
-		text-decoration: none !important;
 	}
 }
 
@@ -515,11 +501,6 @@ share the `prizepooltable` class.
 	a {
 		color: inherit;
 	}
-}
-
-.general-collapsible.collapsed .prizepooltable-toggle .general-collapsible-collapse-button,
-.general-collapsible:not( .collapsed ) .prizepooltable-toggle .general-collapsible-expand-button {
-	display: none;
 }
 
 html:not( .client-js ) .prizepooltable-toggle {

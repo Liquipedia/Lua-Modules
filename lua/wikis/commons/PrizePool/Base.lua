@@ -630,6 +630,7 @@ function BasePrizePool:_collapseToggle()
 	end
 	return Div{
 		classes = {'prizepooltable-toggle'},
+		attributes = {['data-collapsible-click-region'] = 'true'},
 		children = {ChevronToggle{
 			expandText = collapseText.opentext,
 			collapseText = collapseText.closetext,
