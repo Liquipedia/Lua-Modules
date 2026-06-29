@@ -18,14 +18,13 @@ so they must stay defined even though the redesigned table no longer uses them.
 	--prizepool-place-2-accent: var( --clr-semantic-silver-40 );
 	--prizepool-place-3-accent: var( --clr-semantic-bronze-40 );
 
-	// Faint full-row tint per place, built from the accent var so the dark-theme
-	// accents and surface flip through the cascade — no separate dark overrides.
-	--prizepool-place-1-tint: color-mix( in srgb, var( --prizepool-place-1-accent ) 15%, var( --clr-background ) );
-	--prizepool-place-2-tint: color-mix( in srgb, var( --prizepool-place-2-accent ) 15%, var( --clr-background ) );
-	--prizepool-place-3-tint: color-mix( in srgb, var( --prizepool-place-3-accent ) 15%, var( --clr-background ) );
+	// Faint full-row tint per place (light theme; dark overrides in `.theme--dark`).
+	--prizepool-place-1-tint: #f7f2d9;
+	--prizepool-place-2-tint: #e6eaeb;
+	--prizepool-place-3-tint: #eceae4;
 
-	// Hover tint: darken in light theme (overridden to lighten in dark), so the
-	// top-3 rows give the same hover feedback as the rest of the table.
+	// Hover tint derived from the row tint. hsl( from … ) is safe here — `:hover` is
+	// never captured by the exporter, so this value never reaches html2canvas.
 	--prizepool-place-1-tint-hover: hsl( from var( --prizepool-place-1-tint ) h s calc( l * 0.9 ) );
 	--prizepool-place-2-tint-hover: hsl( from var( --prizepool-place-2-tint ) h s calc( l * 0.9 ) );
 	--prizepool-place-3-tint-hover: hsl( from var( --prizepool-place-3-tint ) h s calc( l * 0.9 ) );
@@ -53,6 +52,10 @@ so they must stay defined even though the redesigned table no longer uses them.
 	--prizepool-place-1-accent: var( --clr-semantic-gold-30 );
 	--prizepool-place-2-accent: var( --clr-semantic-silver-40 );
 	--prizepool-place-3-accent: var( --clr-semantic-bronze-30 );
+
+	--prizepool-place-1-tint: #2e2a17;
+	--prizepool-place-2-tint: #242829;
+	--prizepool-place-3-tint: #26241f;
 
 	--prizepool-place-1-tint-hover: hsl( from var( --prizepool-place-1-tint ) h s calc( l * 1.25 ) );
 	--prizepool-place-2-tint-hover: hsl( from var( --prizepool-place-2-tint ) h s calc( l * 1.25 ) );

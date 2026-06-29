@@ -473,6 +473,7 @@ class ExportService {
 		this.hideInfoIcons( clonedDoc );
 		this.removeContentSwitchers( clonedDoc );
 		this.removePrizepoolToggles( clonedDoc );
+		this.expandPrizepoolTables( clonedDoc );
 	}
 
 	// Hides info icons that shouldn't appear in exports
@@ -493,10 +494,21 @@ class ExportService {
 	}
 
 	removePrizepoolToggles( clonedDoc ) {
-		const prizepoolToggles = clonedDoc.querySelectorAll( '.ppt-toggle-expand, .prizepooltabletoggle' );
+		// Only the legacy in-table toggle needs removing; the redesigned table's
+		// `.prizepooltable-toggle` sits outside the captured `<table>`.
+		const prizepoolToggles = clonedDoc.querySelectorAll( '.prizepooltabletoggle' );
 
 		for ( const prizepoolToggle of prizepoolToggles ) {
 			prizepoolToggle.remove();
+		}
+	}
+
+	// Cut placements are hidden by `.collapsed` on the wrapper; expand so they export.
+	expandPrizepoolTables( clonedDoc ) {
+		const collapsedTables = clonedDoc.querySelectorAll( '.prizepool-table-wrapper.collapsed' );
+
+		for ( const collapsedTable of collapsedTables ) {
+			collapsedTable.classList.remove( 'collapsed' );
 		}
 	}
 
@@ -694,9 +706,12 @@ class ExportImageDOMUtils {
 				return false;
 			}
 
-			if ( parent.classList.contains( 'collapsed' ) ||
+			// Prize pool collapse is a partial cut-after: the table stays visible, only
+			// extra rows are hidden, so its wrapper isn't hidden content.
+			if ( !parent.classList.contains( 'prizepool-table-wrapper' ) &&
+				( parent.classList.contains( 'collapsed' ) ||
 				parent.classList.contains( 'is--collapsed' ) ||
-				parent.dataset.collapsibleState === 'collapsed' ) {
+				parent.dataset.collapsibleState === 'collapsed' ) ) {
 				return false;
 			}
 
