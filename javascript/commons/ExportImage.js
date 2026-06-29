@@ -67,12 +67,12 @@ const EXPORT_IMAGE_CONFIG = {
 		{ selector: '.crosstable', targetSelector: 'tbody', typeName: 'Crosstable' },
 		{ selector: '.brkts-matchlist', targetSelector: '.brkts-matchlist-collapse-area', typeName: 'Match List' },
 		{
-			selector: '.prizepooltable.prizepooltable-placement',
+			selector: '.prizepool-table-wrapper:has( .prizepooltable-placement )',
 			targetSelector: null,
 			typeName: 'Prize Pool'
 		},
 		{
-			selector: '.prizepooltable.prizepooltable-award',
+			selector: '.prizepool-table-wrapper:has( .prizepooltable-award )',
 			targetSelector: null,
 			typeName: 'Awards',
 			manualSubtitle: 'Awards'
@@ -494,9 +494,11 @@ class ExportService {
 	}
 
 	removePrizepoolToggles( clonedDoc ) {
-		// Only the legacy in-table toggle needs removing; the redesigned table's
-		// `.prizepooltable-toggle` sits outside the captured `<table>`.
-		const prizepoolToggles = clonedDoc.querySelectorAll( '.prizepooltabletoggle' );
+		// The legacy in-table toggle and the redesigned table's footer (now inside the
+		// captured wrapper) shouldn't appear in a static export.
+		const prizepoolToggles = clonedDoc.querySelectorAll(
+			'.prizepooltabletoggle, .prizepool-table-wrapper .table2__footer'
+		);
 
 		for ( const prizepoolToggle of prizepoolToggles ) {
 			prizepoolToggle.remove();
@@ -706,12 +708,9 @@ class ExportImageDOMUtils {
 				return false;
 			}
 
-			// Prize pool collapse is a partial cut-after: the table stays visible, only
-			// extra rows are hidden, so its wrapper isn't hidden content.
-			if ( !parent.classList.contains( 'prizepool-table-wrapper' ) &&
-				( parent.classList.contains( 'collapsed' ) ||
+			if ( parent.classList.contains( 'collapsed' ) ||
 				parent.classList.contains( 'is--collapsed' ) ||
-				parent.dataset.collapsibleState === 'collapsed' ) ) {
+				parent.dataset.collapsibleState === 'collapsed' ) {
 				return false;
 			}
 
