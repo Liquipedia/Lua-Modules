@@ -23,6 +23,12 @@ so they must stay defined even though the redesigned table no longer uses them.
 	--prizepool-place-1-tint: color-mix( in srgb, var( --prizepool-place-1-accent ) 15%, var( --clr-background ) );
 	--prizepool-place-2-tint: color-mix( in srgb, var( --prizepool-place-2-accent ) 15%, var( --clr-background ) );
 	--prizepool-place-3-tint: color-mix( in srgb, var( --prizepool-place-3-accent ) 15%, var( --clr-background ) );
+
+	// Hover tint: darken in light theme (overridden to lighten in dark), so the
+	// top-3 rows give the same hover feedback as the rest of the table.
+	--prizepool-place-1-tint-hover: hsl( from var( --prizepool-place-1-tint ) h s calc( l * 0.9 ) );
+	--prizepool-place-2-tint-hover: hsl( from var( --prizepool-place-2-tint ) h s calc( l * 0.9 ) );
+	--prizepool-place-3-tint-hover: hsl( from var( --prizepool-place-3-tint ) h s calc( l * 0.9 ) );
 }
 
 .theme--light {
@@ -47,6 +53,10 @@ so they must stay defined even though the redesigned table no longer uses them.
 	--prizepool-place-1-accent: var( --clr-semantic-gold-30 );
 	--prizepool-place-2-accent: var( --clr-semantic-silver-40 );
 	--prizepool-place-3-accent: var( --clr-semantic-bronze-30 );
+
+	--prizepool-place-1-tint-hover: hsl( from var( --prizepool-place-1-tint ) h s calc( l * 1.25 ) );
+	--prizepool-place-2-tint-hover: hsl( from var( --prizepool-place-2-tint ) h s calc( l * 1.25 ) );
+	--prizepool-place-3-tint-hover: hsl( from var( --prizepool-place-3-tint ) h s calc( l * 1.25 ) );
 }
 
 /*******************************************************************************
@@ -434,15 +444,15 @@ share the `prizepooltable` class.
 
 	// Top-3 row tint + accent bar. The Table2 zebra rule is `:where()`-wrapped, so
 	// these plain selectors out-specify it without a theme/`.table2__table` qualifier;
-	// `:hover` keeps the tint on hover. `border-bottom: 0` drops the legacy per-place
-	// coloured row border.
+	// `:hover` shifts to the matching hover tint so these rows feel like the rest of
+	// the table. `border-bottom: 0` drops the legacy per-place coloured row border.
 	&.prizepooltable-placement {
 		tr.table2__row--body.background-color-first-place {
 			border-bottom: 0;
+			background-color: var( --prizepool-place-1-tint );
 
-			&,
 			&:hover {
-				background-color: var( --prizepool-place-1-tint );
+				background-color: var( --prizepool-place-1-tint-hover );
 			}
 
 			.prizepooltable-place::before {
@@ -452,10 +462,10 @@ share the `prizepooltable` class.
 
 		tr.table2__row--body.background-color-second-place {
 			border-bottom: 0;
+			background-color: var( --prizepool-place-2-tint );
 
-			&,
 			&:hover {
-				background-color: var( --prizepool-place-2-tint );
+				background-color: var( --prizepool-place-2-tint-hover );
 			}
 
 			.prizepooltable-place::before {
@@ -465,10 +475,10 @@ share the `prizepooltable` class.
 
 		tr.table2__row--body.background-color-third-place {
 			border-bottom: 0;
+			background-color: var( --prizepool-place-3-tint );
 
-			&,
 			&:hover {
-				background-color: var( --prizepool-place-3-tint );
+				background-color: var( --prizepool-place-3-tint-hover );
 			}
 
 			.prizepooltable-place::before {
