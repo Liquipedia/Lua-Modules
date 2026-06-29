@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Match/Bracket/OpponentEntry
+-- page=Module:Widget/Match/Bracket/OpponentEntry/Starcraft
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
