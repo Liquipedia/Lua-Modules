@@ -14,6 +14,15 @@ local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Span = Html.Span
 
+---@class ChevronToggleProps
+---@field expandText (string|Widget)? optional label shown next to the expand chevron
+---@field collapseText (string|Widget)? optional label shown next to the collapse chevron
+---@field size ('xs'|'sm'|'md'|'lg')? button size, defaults to 'xs'
+
+local defaultProps = {
+	size = 'xs',
+}
+
 ---@param class string
 ---@param text (string|Widget)?
 ---@param iconName string
@@ -31,18 +40,11 @@ local function chevronButton(class, text, iconName, size)
 	}
 end
 
----@class ChevronToggleProps
----@field expandText (string|Widget)? optional label shown next to the expand chevron
----@field collapseText (string|Widget)? optional label shown next to the collapse chevron
----@field size ('xs'|'sm'|'md'|'lg')? button size, defaults to 'xs'
-
----@param props ChevronToggleProps?
+---@param props ChevronToggleProps
 ---@return HtmlNode
 local function ChevronToggle(props)
-	props = props or {}
-	local size = props.size or 'xs'
-	local expandButton = chevronButton('general-collapsible-expand-button', props.expandText, 'expand', size)
-	local collapseButton = chevronButton('general-collapsible-collapse-button', props.collapseText, 'collapse', size)
+	local expandButton = chevronButton('general-collapsible-expand-button', props.expandText, 'expand', props.size)
+	local collapseButton = chevronButton('general-collapsible-collapse-button', props.collapseText, 'collapse', props.size)
 
 	return Span{
 		classes = {'general-collapsible-default-toggle'},
@@ -53,4 +55,4 @@ local function ChevronToggle(props)
 	}
 end
 
-return Component.component(ChevronToggle)
+return Component.component(ChevronToggle, defaultProps)
