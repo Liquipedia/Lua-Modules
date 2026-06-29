@@ -741,7 +741,7 @@ function BasePrizePool:_opponentPrizeCells(placement, opponent)
 
 		local lastCellOfType = previousOfPrizeType[prize.type]
 		if lastCellOfType and prizeTypeData.mergeDisplayColumns then
-			if Table.isNotEmpty(lastCellOfType.props.children) and Table.isNotEmpty(cell.props.children) then
+			if Logic.isNotEmpty(lastCellOfType.props.children) and Logic.isNotEmpty(cell.props.children) then
 				table.insert(lastCellOfType.props.children, tostring(mw.html.create('hr'):css('width', '100%')))
 			end
 			Array.extendWith(lastCellOfType.props.children, cell.props.children)
@@ -753,7 +753,7 @@ function BasePrizePool:_opponentPrizeCells(placement, opponent)
 	end)
 
 	return Array.map(prizeCells, function(cell)
-		return Table.isEmpty(cell.props.children) and BasePrizePool._emptyCell() or cell
+		return Logic.isEmpty(cell.props.children) and BasePrizePool._emptyCell() or cell
 	end)
 end
 
