@@ -15,7 +15,6 @@ local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TypeUtil = Lua.import('Module:TypeUtil')
 
