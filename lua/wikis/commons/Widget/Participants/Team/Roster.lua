@@ -154,10 +154,25 @@ local function ParticipantsTeamRoster(props)
 		}
 	end
 
+	local players = participant.opponent.players or {}
+
+	-- If there's exactly one staff member, always show them in the Main tab instead of a separate
+	-- Staff tab, regardless of whether subs/formers are also present.
+	local promoteLoneStaff = props.mergeStaffTabIfOnlyOneStaff and #Array.filter(players, function(player)
+		return getPlayerTab(player) == TAB_ENUM.STAFF
+	end) == 1
+	local getTab = function(player)
+		local tab = getPlayerTab(player)
+		if promoteLoneStaff and tab == TAB_ENUM.STAFF then
+			return TAB_ENUM.MAIN
+		end
+		return tab
+	end
+
 	local tabs = Array.map(Table.entries(TAB_DATA), function(tabTuple)
 		local tabTypeEnum, tabData = tabTuple[1], tabTuple[2]
-		local tabPlayers = sortPlayers(Array.filter(participant.opponent.players or {}, function(player)
-			return getPlayerTab(player) == tabTypeEnum
+		local tabPlayers = sortPlayers(Array.filter(players, function(player)
+			return getTab(player) == tabTypeEnum
 		end))
 
 		local groups
@@ -191,16 +206,6 @@ local function ParticipantsTeamRoster(props)
 	tabs = Array.filter(tabs, function(tab)
 		return #tab.players > 0
 	end)
-	if props.mergeStaffTabIfOnlyOneStaff
-		and #tabs == 2
-		and tabs[1].type == TAB_ENUM.MAIN
-		and tabs[2].type == TAB_ENUM.STAFF
-		and #tabs[2].players == 1
-	then
-		-- If we only have main and staff, and exactly one staff, just show both rosters without a switch
-		local mergedPlayers = sortPlayers(Array.extend(tabs[1].players, tabs[2].players))
-		return makeRostersDisplay({ { players = mergedPlayers } })
-	end
 	tabs = Array.sortBy(tabs, Operator.property('order'))
 
 	local switchGroupUniqueId = tonumber(Variables.varDefault('teamParticipantRostersSwitchGroupId')) or 0
