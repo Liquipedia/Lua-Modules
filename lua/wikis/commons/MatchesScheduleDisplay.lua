@@ -277,7 +277,7 @@ end
 ---@param flip boolean
 ---@return VNode
 function MatchesTable._buildOpponent(opponent, flip)
-	if Opponent.isTbd(opponent) or Opponent.isEmpty(opponent) then
+	if Opponent.isEmpty(opponent) then
 		opponent = Opponent.tbd(Opponent.literal)
 	end
 
