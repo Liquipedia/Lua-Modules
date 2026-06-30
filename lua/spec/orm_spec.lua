@@ -42,7 +42,7 @@ describe('LPDB Object-Relational Mapping', function()
 	describe('saving data', function()
 		it('saving', function()
 			local stub = stub(mw.ext.LiquipediaDB, 'lpdb_match2')
-			Lpdb.Match2:new({match2id = 'Foo', match2bracketid = 'Bar', bestof = 3, game = 'r6s'}):save()
+			Lpdb.Match2:new({match2id = 'Foo', match2bracketid = 'Bar', bestof = 3, game = 'r6s', parent = 'DummyPage'}):save()
 			assert.stub(stub).called_with('Foo', {
 				bestof = 3,
 				date = 0,
@@ -61,7 +61,7 @@ describe('LPDB Object-Relational Mapping', function()
 				match2id = 'Foo',
 				match2opponents = {},
 				mode = '',
-				parent = '',
+				parent = 'DummyPage',
 				patch = '',
 				publishertier = '',
 				section = '',
