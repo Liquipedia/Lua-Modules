@@ -622,9 +622,33 @@ function BasePrizePool:_getCurrencies()
 	return currencies
 end
 
+---@param cell Widget
+---@param prize BasePrizePoolPrize
+function BasePrizePool:_tagCurrencyColumn(cell, prize)
+	if not self.currencyToggleIndices then
+		return
+	end
+	local code = self:_prizeCurrencyCode(prize)
+	local index = code and self.currencyToggleIndices[code]
+	if not index then
+		return
+	end
+	cell.props.attributes = cell.props.attributes or {}
+	cell.props.attributes['data-toggle-area-content'] = index
+end
+
 ---@param isAward boolean?
 ---@return Widget
 function BasePrizePool:_buildTable(isAward)
+	local currencies = self:_getCurrencies()
+	self.currencyToggleIndices = nil
+	if #currencies >= 2 then
+		self.currencyToggleIndices = {}
+		for index, code in ipairs(currencies) do
+			self.currencyToggleIndices[code] = index
+		end
+	end
+
 	local bodyRows = self:_buildRows()
 	local hasCutRows = Array.any(self.placements, function(placement)
 		return not self:applyHideAfter(placement) and self:applyCutAfter(placement)
@@ -679,6 +703,7 @@ function BasePrizePool:_buildHeader(isAward)
 		if not prizeTypeData.mergeDisplayColumns or not previousOfType[prize.type] then
 			local cell = prizeTypeData.headerDisplay(prize.data)
 			cell.props.align = cell.props.align or prizeTypeData.align
+			self:_tagCurrencyColumn(cell, prize)
 			table.insert(children, cell)
 			previousOfType[prize.type] = cell
 		end
@@ -765,6 +790,7 @@ function BasePrizePool:_opponentPrizeCells(placement, opponent)
 		local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
 		local cell = reward and prizeTypeData.rowDisplay(prize.data, reward) or TableCell{}
 		cell.props.align = cell.props.align or prizeTypeData.align
+		self:_tagCurrencyColumn(cell, prize)
 
 		local lastCellOfType = previousOfPrizeType[prize.type]
 		if lastCellOfType and prizeTypeData.mergeDisplayColumns then
