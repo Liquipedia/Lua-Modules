@@ -109,9 +109,9 @@ function MatchesTable:create()
 				sortType = 'isoDate',
 			},
 			self.config.showRound and {align = 'left'} or nil,
-			{align = 'right'},
-			{align = 'center'},
-			{align = 'left'},
+			{align = 'right'}, -- Opponent
+			{align = 'center'}, -- Score
+			{align = 'left'}, -- vs. Opponent
 			self.config.showMatchPage and {
 				unsortable = true,
 				align = 'center'
