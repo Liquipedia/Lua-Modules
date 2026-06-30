@@ -8,58 +8,50 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class MatchSummaryFfaContentItem
 ---@field icon Widget?
 ---@field title string?
----@field content (string|Html|Widget)?
+---@field content Renderable?
 
----@class MatchSummaryFfaContentItemContainerParameters
+---@class MatchSummaryFfaContentItemContainerProps
 ---@field collapsed boolean?
 ---@field collapsible boolean?
 ---@field contentClass string?
 ---@field title string?
 ---@field items MatchSummaryFfaContentItem[]
 
----@class MatchSummaryFfaContentItemContainer: Widget
----@operator call(table): MatchSummaryFfaContentItemContainer
----@field props MatchSummaryFfaContentItemContainerParameters
-local MatchSummaryFfaContentItem = Class.new(Widget)
-MatchSummaryFfaContentItem.defaultProps = {
-	collapsible = false,
-	collapsed = false,
-}
-
----@return Widget
-function MatchSummaryFfaContentItem:render()
-	local hasContentClass = self.props.contentClass ~= nil
-	local contentContainer = HtmlWidgets.Div{
+---@param props MatchSummaryFfaContentItemContainerProps
+---@return VNode
+local function MatchSummaryFfaContentItem(props)
+	local hasContentClass = props.contentClass ~= nil
+	local contentContainer = Html.Div{
 		classes = {'panel-content__container'},
 		attributes = {
-			['data-js-battle-royale'] = self.props.collapsible and 'collapsible-container' or nil,
+			['data-js-battle-royale'] = props.collapsible and 'collapsible-container' or nil,
 			role = 'tabpanel',
 		},
-		children = HtmlWidgets.Ul{
-			classes = {self.props.contentClass},
-			children = Array.map(self.props.items, function(item)
-				return HtmlWidgets.Li{
-					classes = hasContentClass and {self.props.contentClass .. '__list-item'} or nil,
+		children = Html.Ul{
+			classes = {props.contentClass},
+			children = Array.map(props.items, function(item)
+				return Html.Li{
+					classes = hasContentClass and {props.contentClass .. '__list-item'} or nil,
 					children = {
-						HtmlWidgets.Span{
-							classes = hasContentClass and {self.props.contentClass .. '__icon'} or nil,
+						Html.Span{
+							classes = hasContentClass and {props.contentClass .. '__icon'} or nil,
 							children = item.icon,
 						},
-						HtmlWidgets.Span{
-							classes = hasContentClass and {self.props.contentClass .. '__title'} or nil,
+						Html.Span{
+							classes = hasContentClass and {props.contentClass .. '__title'} or nil,
 							children = item.title,
 						},
-						HtmlWidgets.Div{
-							classes = hasContentClass and {self.props.contentClass .. '__container'} or nil,
+						Html.Div{
+							classes = hasContentClass and {props.contentClass .. '__container'} or nil,
 							children = item.content,
 						},
 					},
@@ -68,17 +60,17 @@ function MatchSummaryFfaContentItem:render()
 		}
 	}
 
-	if not self.props.collapsible then
+	if not Logic.readBool(props.collapsible) then
 		return contentContainer
 	end
 
-	return HtmlWidgets.Div{
-		classes = {'panel-content__collapsible', self.props.collapsed and 'is--collapsed' or nil},
+	return Html.Div{
+		classes = {'panel-content__collapsible', Logic.readBool(props.collapsed) and 'is--collapsed' or nil},
 		attributes = {
 			['data-js-battle-royale'] = 'collapsible',
 		},
 		children = {
-			HtmlWidgets.H5{
+			Html.H5{
 				classes = {'panel-content__button'},
 				attributes = {
 					['data-js-battle-royale'] = 'collapsible-button',
@@ -89,7 +81,7 @@ function MatchSummaryFfaContentItem:render()
 						iconName = 'collapse',
 						additionalClasses = {'panel-content__button-icon'},
 					},
-					HtmlWidgets.Span{children = self.props.title},
+					Html.Span{children = props.title},
 				}
 			},
 			contentContainer,
@@ -97,4 +89,4 @@ function MatchSummaryFfaContentItem:render()
 	}
 end
 
-return MatchSummaryFfaContentItem
+return Component.component(MatchSummaryFfaContentItem)
