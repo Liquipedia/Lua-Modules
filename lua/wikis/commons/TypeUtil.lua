@@ -136,8 +136,7 @@ function TypeUtil.table (keyType, valueType)
 end
 
 --[[
-Type for tables that are arrays. Not strict - arrays may have additional fields
-besides numeric indexes, and may have gaps in indexes.
+Type for tables that are arrays.
 ]]
 ---@param elemType TypeUtilType
 ---@return TypeUtilArrayType
@@ -194,7 +193,9 @@ function TypeUtil.valueIsTypeNoTable (value, typeSpec)
 				typeSpec.types,
 				function(t) return TypeUtil.valueIsTypeNoTable(value, t) end
 			)
-		elseif typeSpec.op == 'table' or typeSpec.op == 'struct' or typeSpec.op == 'array' then
+		elseif typeSpec.op == 'array' then
+			return Array.isArray(value)
+		elseif typeSpec.op == 'table' or typeSpec.op == 'struct' then
 			return type(value) == 'table'
 		end
 	end
