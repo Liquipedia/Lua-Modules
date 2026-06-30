@@ -320,7 +320,7 @@ liquipedia.analytics = {
 
 	setupButtonClickAnalytics: function() {
 		liquipedia.analytics.clickTrackers.push( {
-			selector: 'button:not(a *)',
+			selector: '.btn:not(a *), button:not(a *)',
 			trackerName: BUTTON_CLICKED,
 			propertiesBuilder: ( link ) => ( {
 				title: link.innerText,
