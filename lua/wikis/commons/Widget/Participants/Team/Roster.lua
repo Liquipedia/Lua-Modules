@@ -54,8 +54,7 @@ end
 --   * If there's a non-ingame role assigned, display it after the status
 --   * Returns an array of labels to display (can be multiple)
 -- * Left-role:
---   * If the first role has an icon, we use that to render the left-role
---   * If not then we instead display the icon of the first ingame role with icon
+--   * Display the icon of the first ingame role with icon
 ---@param player table
 ---@return string?, string[]?
 local function getRoleDisplays(player)
@@ -63,10 +62,6 @@ local function getRoleDisplays(player)
 	local played = player.extradata.played
 
 	local function roleLeftDisplay()
-		local firstRole = roles[1]
-		if firstRole and firstRole.icon then
-			return firstRole.icon
-		end
 		for _, role in ipairs(roles) do
 			if role.type == RoleUtil.ROLE_TYPE.INGAME and role.icon then
 				return role.icon
