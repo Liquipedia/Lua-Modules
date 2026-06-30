@@ -209,7 +209,7 @@ end
 ---@param type string
 ---@return boolean
 function Opponent.isType(type)
-	return #TypeUtil.checkValue(type, Opponent.types) == 0
+	return #TypeUtil.checkValue(type, Opponent.types.OpponentType) == 0
 end
 
 ---Reads an opponent type.
