@@ -302,7 +302,6 @@ function MatchesTable.score(match)
 	local showBestOf = (tonumber(match.bestof) or 0) > 0
 
 	return TableWidgets.Cell{
-		classes = {'Score'},
 		children = WidgetUtil.collect(
 			showBestOf and {
 				Div{
