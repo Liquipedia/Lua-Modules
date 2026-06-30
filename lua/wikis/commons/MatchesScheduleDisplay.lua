@@ -165,7 +165,6 @@ function MatchesTable:dateDisplay(match)
 	---@return VNode
 	local function createDateCell(props)
 		return TableWidgets.Cell{
-			classes = {'Date'},
 			css = props.css,
 			attributes = {['data-sort-value'] = match.date},
 			children = props.children
