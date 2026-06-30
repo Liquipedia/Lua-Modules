@@ -13,7 +13,7 @@ local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
-local Table = Lua.import('Module:Table')
+local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
@@ -27,7 +27,6 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
-local ConditionUtil = Condition.Util
 
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
@@ -61,23 +60,17 @@ function MatchesTable:init(args)
 	args = args or {}
 	self.args = args
 
-	args.tournament = args.tournament or mw.title.getCurrentTitle().prefixedText
-
 	self.config = {
 		limit = tonumber(args.limit) or DEFAULT_QUERY_LIMIT,
 		startDate = args.sdate,
 		endDate = args.edate,
-		section = args.section,
-		matchSection = args.matchsection,
 		showRound = not Logic.readBool(args.hideround),
 		sortRound = Logic.readBool(args.sortround),
 		showCountdown = Logic.readBool(args.countdown),
 		showMatchPage = Info.config.match2.matchPage,
 		onlyShowExactDates = Logic.readBool(args.dateexact),
 		shortenRoundNames = Logic.readBool(args.shortedroundnames),
-		pages = Array.map(Array.extractValues(
-				Table.filterByKey(args, function(key) return string.find(key, '^tournament%d-$') ~= nil end)
-			), function(page) return (page:gsub(' ', '_')) end),
+		matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(args) or TournamentStructure.currentPageSpec(),
 	}
 
 	return self
@@ -127,7 +120,7 @@ function MatchesTable:buildConditions()
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('date'), Comparator.gt, DateExt.defaultDate),
-		ConditionUtil.anyOf(ColumnName('pagename'), config.pages --[[ @as string[] ]]),
+		TournamentStructure.getMatch2Filter(config.matchGroupsSpec),
 	}
 
 	if config.startDate then
@@ -136,14 +129,6 @@ function MatchesTable:buildConditions()
 
 	if config.endDate then
 		conditions:add(ConditionNode(ColumnName('date'), Comparator.le, config.endDate))
-	end
-
-	if config.matchSection then
-		conditions:add{ConditionNode(ColumnName('extradata_matchsection'), Comparator.eq, config.matchSection)}
-	end
-
-	if config.section then
-		conditions:add{ConditionNode(ColumnName('match2bracketdata_sectionheader'), Comparator.eq, config.section)}
 	end
 
 	return conditions
