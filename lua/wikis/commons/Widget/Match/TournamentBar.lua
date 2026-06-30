@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Game = Lua.import('Module:Game')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Tournament = Lua.import('Module:Tournament')
 
@@ -39,7 +40,7 @@ local function MatchTournamentBar(props)
 	end
 
 	local tournament = Tournament.partialTournamentFromMatch(match)
-	local tournamentLink = mw.title.makeTitle(0, match.pageName, match.section).fullText
+	local tournamentLink = Page.createPageName(0, match.pageName, match.section)
 
 	local stageName
 	if match.bracketData.inheritedHeader then
