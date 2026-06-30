@@ -46,10 +46,22 @@ local ABBREVIATIONS = {
 	["Lower Bracket"] = "LB",
 }
 
+---@class MatchesTableConfig
+---@field limit integer
+---@field startDate string?
+---@field endDate string?
+---@field showRound boolean
+---@field sortRound boolean
+---@field showCountdown boolean
+---@field showMatchPage boolean
+---@field onlyShowExactDates boolean
+---@field shortenRoundNames boolean
+---@field matchGroupsSpec MatchGroupsSpec
+
 ---@class MatchesTable
 ---@operator call(table<string, any>): MatchesTable
 ---@field args table<string, any>
----@field config table<string, boolean|string|number|string[]>
+---@field config MatchesTableConfig
 ---@field currentId string?
 ---@field currentMatchHeader string[]?
 local MatchesTable = Class.new(function(self, args) self:init(args) end)
@@ -161,7 +173,7 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return VNode
 function MatchesTable:dateDisplay(match)
-	---@param props {css: table<string, string|number|nil>, children: Renderable|Renderable[]}
+	---@param props {css: table<string, string|number?>?, children: Renderable|Renderable[]}
 	---@return VNode
 	local function createDateCell(props)
 		return TableWidgets.Cell{
