@@ -8,13 +8,12 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Operator = Lua.import('Module:Operator')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html/All')
 local Trophy = Lua.import('Module:Widget/Match/Summary/Ffa/Trophy')
-local Div = HtmlWidgets.Div
+local Div = Html.Div
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Placement = Lua.import('Module:Placement')
@@ -23,17 +22,14 @@ local Placement = Lua.import('Module:Placement')
 ---@field match FFAMatchGroupUtilMatch
 ---@field teamStyle? teamStyle
 
----@class MatchHeaderFfa: Widget
----@operator call(MatchHeaderFfaProps): MatchHeaderFfa
----@field props MatchHeaderFfaProps
-local MatchHeaderFfa = Class.new(Widget)
-MatchHeaderFfa.defaultProps = {
+local defaultProps = {
 	teamStyle = 'short',
 }
 
----@return Widget?
-function MatchHeaderFfa:render()
-	local match = self.props.match
+---@param props MatchHeaderFfaProps
+---@return VNode?
+local function MatchHeaderFfa(props)
+	local match = props.match
 	if not match then
 		return nil
 	end
@@ -69,7 +65,7 @@ function MatchHeaderFfa:render()
 					children = {
 						OpponentDisplay.BlockOpponent {
 							opponent = opponent,
-							teamStyle = self.props.teamStyle,
+							teamStyle = props.teamStyle,
 							overflow = 'ellipsis',
 						}
 					}
@@ -84,4 +80,4 @@ function MatchHeaderFfa:render()
 	}
 end
 
-return MatchHeaderFfa
+return Component.component(MatchHeaderFfa, defaultProps)
