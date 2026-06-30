@@ -84,7 +84,7 @@ end
 Same as TeamTemplate.getRaw, except that it returns nil if the team template
 does not exist.
 
-Throws if `team` is nil.
+Throws if `team` is `nil`.
 ]]
 ---@param team string?
 ---@param date string|number?
