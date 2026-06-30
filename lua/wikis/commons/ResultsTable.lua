@@ -36,7 +36,7 @@ function ResultsTable:buildColumnDefinitions()
 		self.config.showType and {align = 'center'} or nil,
 		self.config.displayGameIcons and {align = 'center'} or nil,
 		{align = 'left'},
-		{align = 'left', nowrap = false},
+		{align = 'left'},
 		(self.config.queryType ~= Opponent.team or Table.isNotEmpty(self.config.aliases)) and {
 			align = 'center',
 		} or self.config.playerResultsOfTeam and {
