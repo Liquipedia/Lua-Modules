@@ -7,18 +7,12 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local ListWidgets = Lua.import('Module:Widget/List')
 
-local ListWidget = Lua.import('Module:Widget/List')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+--[[
+DEPRECATED
 
----@class UnorderedList: ListWidget
----@operator call(table): UnorderedList
-local UnorderedList = Class.new(ListWidget)
+Use Module:Widget/List.
+]]
 
----@return WidgetHtml
-function UnorderedList:getType()
-	return HtmlWidgets.Ul
-end
-
-return UnorderedList
+return ListWidgets.Unordered
