@@ -37,6 +37,7 @@ local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
 local Hr = HtmlWidgets.Hr
 local LabeledChevronToggle = Lua.import('Module:Widget/GeneralCollapsible/LabeledChevronToggle')
+local SwitchPill = Lua.import('Module:Widget/ContentSwitch/Pill')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local pageVars = PageVariableNamespace('PrizePool')
@@ -655,7 +656,7 @@ function BasePrizePool:_buildTable(isAward)
 	end)
 	local toggle = hasCutRows and self:_collapseToggle() or nil
 
-	return TableWidgets.Table{
+	local prizePoolTable = TableWidgets.Table{
 		classes = WidgetUtil.collect(
 			'prizepool-table-wrapper',
 			toggle and 'general-collapsible' or nil,
@@ -669,6 +670,39 @@ function BasePrizePool:_buildTable(isAward)
 		children = {
 			TableWidgets.TableHeader{children = {self:_buildHeader(isAward)}},
 			TableWidgets.TableBody{children = bodyRows},
+		},
+	}
+
+	if #currencies < 2 then
+		return prizePoolTable
+	end
+
+	local defaultActive = 1
+	for index, code in ipairs(currencies) do
+		if code ~= BASE_CURRENCY then
+			defaultActive = index
+			break
+		end
+	end
+
+	local switchGroupId = (tonumber(Variables.varDefault('prizePoolCurrencySwitchGroupId')) or 0) + 1
+	Variables.varDefine('prizePoolCurrencySwitchGroupId', switchGroupId)
+
+	return Div{
+		classes = {'prizepool-currency-switch', 'toggle-area', 'toggle-area-' .. defaultActive},
+		attributes = {['data-toggle-area'] = defaultActive},
+		children = {
+			SwitchPill{
+				switchGroup = 'prize-pool-currency-' .. switchGroupId,
+				storeValue = false,
+				defaultActive = defaultActive,
+				size = 'extrasmall',
+				variant = 'generic',
+				tabs = Array.map(currencies, function(code)
+					return {label = Currency.display(code), value = code:lower()}
+				end),
+			},
+			prizePoolTable,
 		},
 	}
 end
