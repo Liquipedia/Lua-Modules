@@ -193,10 +193,10 @@ function TypeUtil.valueIsTypeNoTable (value, typeSpec)
 				typeSpec.types,
 				function(t) return TypeUtil.valueIsTypeNoTable(value, t) end
 			)
-		elseif typeSpec.op == 'array' then
-			return Array.isArray(value)
 		elseif typeSpec.op == 'table' or typeSpec.op == 'struct' then
 			return type(value) == 'table'
+		elseif typeSpec.op == 'array' then
+			return Array.isArray(value)
 		end
 	end
 	return true
