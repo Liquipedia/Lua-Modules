@@ -596,6 +596,32 @@ function BasePrizePool:build(isAward)
 	)}
 end
 
+---@param prize BasePrizePoolPrize
+---@return string?
+function BasePrizePool:_prizeCurrencyCode(prize)
+	if prize.type == PRIZE_TYPE_BASE_CURRENCY then
+		return BASE_CURRENCY
+	elseif prize.type == PRIZE_TYPE_LOCAL_CURRENCY then
+		return prize.data.currency
+	end
+	return nil
+end
+
+---Ordered, distinct currency codes used by the money columns (USD first).
+---@return string[]
+function BasePrizePool:_getCurrencies()
+	local currencies = {}
+	local seen = {}
+	for _, prize in ipairs(self.prizes) do
+		local code = self:_prizeCurrencyCode(prize)
+		if code and not seen[code] then
+			seen[code] = true
+			table.insert(currencies, code)
+		end
+	end
+	return currencies
+end
+
 ---@param isAward boolean?
 ---@return Widget
 function BasePrizePool:_buildTable(isAward)
