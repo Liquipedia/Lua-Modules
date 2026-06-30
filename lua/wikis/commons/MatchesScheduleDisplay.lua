@@ -282,6 +282,7 @@ function MatchesTable._buildOpponent(opponent, flip)
 	end
 
 	return TableWidgets.Cell{
+		attributes = {['data-sort-value'] = Opponent.toName(opponent)},
 		children = OpponentDisplay.BlockOpponent{
 			opponent = opponent,
 			teamStyle = 'hybrid',
