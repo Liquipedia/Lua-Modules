@@ -8,16 +8,18 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local InGameRoles = Lua.import('Module:InGameRoles', {loadData = true})
 local LegacyTeamCard = Lua.import('Module:TeamCard/Legacy')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
 local DEFAULT_MAX_PLAYER_INDEX = 10
 local LANE_COUNT = 5
-local INGAME_ROLES_BY_ORDER = Table.map(InGameRoles, function(_, roleData)
-	return roleData.sortOrder, roleData.display
-end)
+-- Default lane role per slot, indexed by InGameRoles sortOrder. These are the canonical
+-- role *keys* (not displays): RoleUtil lowercases the position and looks it up in both
+-- Roles.All and PositionIcon/data, so the value must be a real key. mlbb displays
+-- ('EXP Laner', 'Mid Laner', 'Gold Laner') don't match their keys, so feeding displays
+-- back as positions fails to resolve and renders them as plain-text labels.
+local LANE_ROLE_BY_ORDER = {'exp lane', 'jungler', 'middle', 'gold lane', 'roamer'}
 
 local CustomLegacyTeamCard = {}
 
@@ -37,7 +39,7 @@ function CustomLegacyTeamCard.preprocessCard(card)
 			Table.extract(card, 'pos' .. index),
 			-- Only the five lane slots get a slot-index role default;
 			-- non-lane roles (e.g. flex) must not auto-fill higher slots
-			index <= LANE_COUNT and INGAME_ROLES_BY_ORDER[index] or nil
+			index <= LANE_COUNT and LANE_ROLE_BY_ORDER[index] or nil
 		)
 	end)
 
