@@ -8,14 +8,14 @@
 local Lua = require('Module:Lua')
 
 local I18n = Lua.import('Module:I18n')
-local Logic = Lua.import('Module:Logic')
-
 local Info = Lua.import('Module:Info', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local MatchUtil = Lua.import('Module:Match/Util')
+
 local Component = Lua.import('Module:Widget/Component')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local MatchUtil = Lua.import('Module:Match/Util')
 
 ---@class MatchPageButtonProps
 ---@field match MatchGroupUtilMatch
