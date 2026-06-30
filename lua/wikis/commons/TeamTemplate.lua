@@ -84,13 +84,14 @@ end
 Same as TeamTemplate.getRaw, except that it returns nil if the team template
 does not exist.
 ]]
----@param team string
+---@param team string?
 ---@param date string|number?
 ---@return teamTemplateData?
 function TeamTemplate.getRawOrNil(team, date)
 	if Logic.isEmpty(team) then
 		return
 	end
+	---@cast team -nil
 	team = team:gsub('_', ' '):lower()
 
 	-- return mw.ext.TeamTemplate.raw(team, date)
