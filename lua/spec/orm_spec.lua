@@ -1,6 +1,15 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('LPDB Object-Relational Mapping', function()
+	local FeatureFlag = require('Module:FeatureFlag')
 	local Lpdb = require('Module:Lpdb')
+
+	before_each(function ()
+		FeatureFlag.set('force_type_check', true)
+	end)
+
+	after_each(function ()
+		FeatureFlag.set('force_type_check', false)
+	end)
 
 	describe('setting data', function()
 		it('assign value on init', function()

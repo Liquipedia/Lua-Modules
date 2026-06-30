@@ -2,11 +2,9 @@
 describe('match2', function()
 	local tournamentData = require('test_assets.tournaments').dummy
 	insulate('matchlist', function()
-		local FeatureFlag = require('Module:FeatureFlag')
 		local Json = require('Module:Json')
 
 		before_each(function ()
-			FeatureFlag.set('force_type_check', true)
 			local dataSaved, dataSavedOpponent, dataSavedPlayer, dataSavedGame = {}, {}, {}, {}
 			-- Mock the lpdb functions
 			stub(mw.ext.LiquipediaDB, 'lpdb_match2', function (objName, data)
