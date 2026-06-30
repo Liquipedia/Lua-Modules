@@ -43,7 +43,7 @@ function VodsDropdownButton:render()
 		variant = 'secondary',
 	}
 	local hideButton = Button{
-		classes = {'general-collapsible-collapse-button', 'button--active'}
+		classes = {'general-collapsible-collapse-button', 'button--active'},
 		children = Span{
 			children = {
 				ImageIcon{imageLight = VodLink.getIcon()},
