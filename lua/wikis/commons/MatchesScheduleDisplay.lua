@@ -12,7 +12,6 @@ local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Info = Lua.import('Module:Info', {loadData = true})
-local HiddenSort = Lua.import('Module:HiddenSort')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
@@ -30,12 +29,9 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
-local Td = HtmlWidgets.Td
-local Th = HtmlWidgets.Th
-local Tr = HtmlWidgets.Tr
-local DataTable = Lua.import('Module:Widget/Basic/DataTable')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -43,8 +39,6 @@ local WINNER_LEFT = 1
 local WINNER_RIGHT = 2
 local DO_FLIP = true
 local NO_FLIP = false
-local LEFT_SIDE_OPPONENT = 'Left'
-local RIGHT_SIDE_OPPONENT = 'Right'
 local DEFAULT_QUERY_LIMIT = 1000
 
 -- If run in abbreviated roundnames mode
@@ -102,14 +96,28 @@ function MatchesTable:create()
 	end
 	self.matches = matches
 
-	return DataTable{
-		css = {['margin-bottom'] = '10px'},
-		classes = {'wikitable-striped', 'match-card'},
+	return TableWidgets.Table{
 		sortable = true,
-		children = WidgetUtil.collect(
-			self:header(),
-			Array.map(self.matches, function (match) return self:row(match) end)
-		)
+		columns = WidgetUtil.collect(
+			{
+				align = 'left',
+				sortType = 'isoDate',
+			},
+			self.config.showRound and {align = 'left'} or nil,
+			{align = 'right'},
+			{align = 'center'},
+			{align = 'left'},
+			self.config.showMatchPage and {
+				unsortable = true,
+				align = 'center'
+			} or nil
+		),
+		children = {
+			TableWidgets.TableHeader{children = self:header()},
+			TableWidgets.TableBody{
+				children = Array.map(self.matches, function (match) return self:row(match) end)
+			}
+		}
 	}
 end
 
@@ -141,53 +149,41 @@ function MatchesTable:buildConditions()
 	return conditions
 end
 
----@return Widget
+---@return VNode
 function MatchesTable:header()
-	return Tr{
-		classes = {'HeaderRow'},
+	return TableWidgets.Row{
 		children = WidgetUtil.collect(
-			Th{
-				classes = {'divCell'},
-				attributes = {['data-sort-type'] = 'isoDate'},
+			TableWidgets.CellHeader{
 				children = 'Date'
 			},
-			self.config.showRound and Th{
-				classes = {'divCell', not self.config.sortRound and 'unsortable' or nil},
+			self.config.showRound and TableWidgets.CellHeader{
 				children = 'Round'
 			} or nil,
-			Th{
-				classes = {'divCell'},
+			TableWidgets.CellHeader{
 				children = 'Opponent'
 			},
-			Th{
-				classes = {'divCell'},
-				css = {width = 50},
+			TableWidgets.CellHeader{
 				children = 'Score'
 			},
-			Th{
-				classes = {'divCell'},
+			TableWidgets.CellHeader{
 				children = 'vs. Opponent'
 			},
-			self.config.showMatchPage and Th{
-				classes = {'divCell', 'unsortable'}
-			} or nil
+			self.config.showMatchPage and TableWidgets.CellHeader{} or nil
 		)
 	}
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget
+---@return VNode
 function MatchesTable:dateDisplay(match)
-	---@param props {css: table<string, string|number|nil>, children: string|Widget|(string|Widget)[]}
-	---@return Widget
+	---@param props {css: table<string, string|number|nil>, children: Renderable|Renderable[]}
+	---@return VNode
 	local function createDateCell(props)
-		return Td{
+		return TableWidgets.Cell{
 			classes = {'Date'},
 			css = props.css,
-			children = WidgetUtil.collect(
-				HiddenSort.run(match.date),
-				props.children
-			)
+			attributes = {['data-sort-value'] = match.date},
+			children = props.children
 		}
 	end
 
@@ -216,23 +212,21 @@ function MatchesTable:dateDisplay(match)
 end
 
 ---@param record match2
----@return Widget
+---@return VNode
 function MatchesTable:row(record)
 	local matchHeader = self:determineMatchHeader(record)
 
 	local match = MatchGroupUtil.matchFromRecord(record)
 
-	return Tr{
-		classes = {'Match'},
+	return TableWidgets.Row{
 		children = WidgetUtil.collect(
 			self:dateDisplay(match),
-			self.config.showRound and Td{
-				classes = {'Round'},
+			self.config.showRound and TableWidgets.Cell{
 				children = matchHeader
 			} or nil,
-			MatchesTable._buildOpponent(match.opponents[1], DO_FLIP, LEFT_SIDE_OPPONENT),
+			MatchesTable._buildOpponent(match.opponents[1], DO_FLIP),
 			MatchesTable.score(match),
-			MatchesTable._buildOpponent(match.opponents[2], NO_FLIP, RIGHT_SIDE_OPPONENT),
+			MatchesTable._buildOpponent(match.opponents[2], NO_FLIP),
 			self.config.showMatchPage and MatchesTable.matchPageLinkDisplay(match) or nil
 		)
 	}
@@ -285,25 +279,23 @@ end
 
 ---@param opponent standardOpponent
 ---@param flip boolean
----@param side string
----@return Widget
-function MatchesTable._buildOpponent(opponent, flip, side)
+---@return VNode
+function MatchesTable._buildOpponent(opponent, flip)
 	if Opponent.isTbd(opponent) or Opponent.isEmpty(opponent) then
 		opponent = Opponent.tbd(Opponent.literal)
 	end
 
-	return Td{
-		classes = {'Team' .. side},
-		children = OpponentDisplay.InlineOpponent{
+	return TableWidgets.Cell{
+		children = OpponentDisplay.BlockOpponent{
 			opponent = opponent,
-			teamStyle = 'short',
+			teamStyle = 'hybrid',
 			flip = flip,
 		}
 	}
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget
+---@return VNode
 function MatchesTable.score(match)
 	local scoreDisplay = (match.finished or (
 		match.dateIsExact and
@@ -312,7 +304,7 @@ function MatchesTable.score(match)
 
 	local showBestOf = (tonumber(match.bestof) or 0) > 0
 
-	return Td{
+	return TableWidgets.Cell{
 		classes = {'Score'},
 		children = WidgetUtil.collect(
 			showBestOf and {
@@ -337,7 +329,7 @@ function MatchesTable.score(match)
 end
 
 ---@param match MatchGroupUtilMatch
----@return (string|Widget)[]
+---@return Renderable[]
 function MatchesTable.scoreDisplay(match)
 	return {
 		MatchesTable.getOpponentScore(
@@ -353,30 +345,27 @@ function MatchesTable.scoreDisplay(match)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget
+---@return VNode
 function MatchesTable.matchPageLinkDisplay(match)
-	return Td{
-		classes = {'MatchPage'},
-		children = MatchPageButton{match = match}
-	}
+	return TableWidgets.Cell{children = MatchPageButton{match = match}}
 end
 
 ---@param opponent standardOpponent
 ---@param isWinner boolean
----@return string|Widget
+---@return Renderable
 function MatchesTable.getOpponentScore(opponent, isWinner)
 	local score = OpponentDisplay.InlineScore(opponent)
 	if isWinner then
-		return HtmlWidgets.B{children = score}
+		return Html.B{children = score}
 	end
 
 	return score
 end
 
 ---@param value string|number
----@return Widget
+---@return VNode
 function MatchesTable._bestof(value)
-	return HtmlWidgets.Abbr{
+	return Html.Abbr{
 		title = 'Best of ' .. value,
 		children = 'Bo' .. value
 	}
