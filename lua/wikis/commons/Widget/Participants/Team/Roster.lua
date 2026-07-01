@@ -99,8 +99,9 @@ local function ParticipantsTeamRoster(props)
 		local isStaff = function(player) return player.extradata.type == 'staff' end
 		return Array.sortBy(players, FnUtil.identity, function(a, b)
 			-- Staff render after players (incl. TBD placeholders) within a tab
-			if isStaff(a) ~= isStaff(b) then
-				return isStaff(b)
+			local aIsStaff, bIsStaff = isStaff(a), isStaff(b)
+			if aIsStaff ~= bIsStaff then
+				return bIsStaff
 			end
 			local function getPlayerSortOrder(player)
 				local roles = player.extradata.roles or {}
