@@ -543,6 +543,22 @@
 		justify-content: flex-start;
 		flex-wrap: unset;
 		gap: 0.5rem;
+
+		.theme--dark & {
+			color-scheme: dark;
+		}
+
+		.toggle-area & {
+			max-height: calc( 100dvh - ( 2.75rem + 4.1875rem + 3.5rem ) ); // 3.5rem for the switcher (compared to .brkts-popup.brkts-match-info-popup)
+		}
+
+		@media ( width > 768px ) {
+			max-height: 65vh;
+
+			.toggle-area & {
+				max-height: calc( 65vh - 3.5rem ); // 3.5rem for the switcher
+			}
+		}
 	}
 
 	.theme--light & {
@@ -552,10 +568,6 @@
 	.theme--dark & {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-on-surface-dark-primary-8 );
-	}
-
-	@media ( min-width: 769px ) {
-		max-height: 65vh;
 	}
 
 	.timer-object-date {
