@@ -54,7 +54,7 @@ function PrizePool:placeOrAwardCell(placement)
 	local badgeClass = placement:getBadgeClass()
 	local placeDisplay = placement:_displayPlace()
 	local content = badgeClass
-		and Span{classes = {'prizepooltable-badge', badgeClass}, children = {placeDisplay}}
+		and Span{classes = {'prizepooltable-badge', badgeClass}, children = placeDisplay}
 		or placeDisplay
 
 	return TableCell{
