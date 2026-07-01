@@ -21,8 +21,10 @@ local PlayerAchievements = Lua.import('Module:Infobox/Extension/Achievements')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
+local PowerRankings = Lua.import('Module:PowerRankings')
 
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
@@ -63,6 +65,10 @@ function CustomInjector:parse(id, widgets)
 					title = 'Support-A-Creator Code used when purchasing Fortnite or Epic Games Store products',
 				},
 				children = {args.creatorcode}
+			},
+			Cell{
+				name = Link{link = 'Fortnite Power Rankings', children = 'Fortnite PR'},
+				children = PowerRankings.queryForInfobox(caller.pagename, 'FTN_PR'),
 			},
 		}
 	elseif id == 'region' then return {}

@@ -13,15 +13,18 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Lpdb = Lua.import('Module:Lpdb')
 local Math = Lua.import('Module:MathUtil')
 local Namespace = Lua.import('Module:Namespace')
+local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
+local PowerRankings = Lua.import('Module:PowerRankings')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -60,6 +63,11 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Cell{
 			name = PLAYER_EARNINGS_ABBREVIATION,
 			children = {playerEarnings ~= 0 and ('$' .. mw.getContentLanguage():formatNum(Math.round(playerEarnings))) or nil}
+		})
+	elseif id == 'custom' then
+		table.insert(widgets, Cell{
+			name = Link{link = 'Fortnite Power Rankings/Organizations', children = 'Fortnite Org PR'},
+			children = PowerRankings.queryForInfobox(Page.pageifyLink(self.caller.pagename), 'FTN_ORG_PR'),
 		})
 	end
 
