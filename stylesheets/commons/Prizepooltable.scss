@@ -493,6 +493,14 @@ share the `prizepooltable` class.
 	flex-direction: column;
 	gap: 0.5rem;
 	width: fit-content;
+
+	.switch-pill-container {
+		align-self: flex-start;
+	}
+
+	.switch-pill-option {
+		flex: none;
+	}
 }
 
 // Footer toggle for the redesigned (general-collapsible) table.
