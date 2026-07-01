@@ -102,7 +102,7 @@ ComponentCore.ComponentMT = {
 
 -- Factory to create Functional Components
 ---@generic P
----@param renderFunction fun(props: P, context?: Context): Renderable
+---@param renderFunction fun(props: P, context?: Context): Renderable|Renderable[]?
 ---@param defaultProps P? -- May not contain table values
 ---@return Component<P>
 function ComponentCore.component(renderFunction, defaultProps)
