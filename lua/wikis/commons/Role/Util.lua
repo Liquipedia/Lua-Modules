@@ -13,6 +13,8 @@ local String = Lua.import('Module:StringUtils')
 local Roles = Lua.import('Module:Roles')
 
 local Html = Lua.import('Module:Widget/Html')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Icon = Lua.import('Module:Widget/Image/Icon/Image')
 
 --- TODO: In the future this should be moved to role data entry
 local POSITION_ICON_DATA = Lua.requireIfExists('Module:PositionIcon/data', {loadData = true})
@@ -23,13 +25,16 @@ local RoleUtil = {}
 ---@field display string
 ---@field category string
 ---@field sortOrder integer?
+---@field iconFa string?
+---@field icon string?
+---@field iconDark string?
 ---@field abbreviation string?
 
 ---@class RoleData: RoleBaseData
 ---@field key string?
 ---@field type RoleTypes
+---@field icon Renderable?
 ---@field abbreviation string?
----@field icon string?
 
 ---@enum RoleTypes
 RoleUtil.ROLE_TYPE = {
@@ -93,11 +98,19 @@ function RoleUtil._createRoleData(roleKey)
 		key = key,
 		type = roleType(),
 		sortOrder = roleData.sortOrder,
+		icon = roleData.iconFa and IconFa{iconName = roleData.iconFa, hover = roleData.display}
+			or roleData.icon and Icon{
+				imageLight = roleData.icon,
+				imageDark = roleData.iconDark,
+				size = '16px',
+				alt = roleData.display,
+			}
+			or POSITION_ICON_DATA and POSITION_ICON_DATA[key]
+			or nil,
 		abbreviation = roleData.abbreviation and Html.Abbr{
 			children = roleData.abbreviation,
 			title = roleData.display,
 		} or nil,
-		icon = POSITION_ICON_DATA and POSITION_ICON_DATA[key] or nil,
 	}
 end
 

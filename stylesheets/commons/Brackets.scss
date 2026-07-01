@@ -1209,6 +1209,32 @@ div.brkts-popup-body-element-thumbs {
 	> .name {
 		flex: 1 1;
 		min-width: 0;
+
+		&:has( > .team-name-dynamic ) {
+			container: block-team-name / inline-size;
+
+			> .team-name-dynamic {
+				content: none;
+
+				@container block-team-name ( min-width: 15px ) and ( width < 100px ) {
+					&::before {
+						content: attr( data-team-shortname );
+					}
+				}
+
+				@container block-team-name ( min-width: 100px ) and ( width < 180px ) {
+					&::before {
+						content: attr( data-team-bracketname );
+					}
+				}
+
+				@container block-team-name ( min-width: 180px ) {
+					&::before {
+						content: attr( data-team-name );
+					}
+				}
+			}
+		}
 	}
 
 	> .team-template-team-icon {
@@ -1232,11 +1258,11 @@ div.brkts-popup-body-element-thumbs {
 		cursor: default;
 		pointer-events: none;
 	}
-}
 
-@media ( max-width: 767px ) {
-	.visible-xs.block-team {
-		display: flex !important;
+	@media ( max-width: 767px ) {
+		&.visible-xs {
+			display: flex !important;
+		}
 	}
 }
 
