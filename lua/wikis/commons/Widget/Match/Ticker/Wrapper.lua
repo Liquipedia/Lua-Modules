@@ -20,12 +20,13 @@ local HorizontalContainer = Lua.import('Module:Widget/Match/Ticker/HorizontalCon
 ---@return Renderable?
 local function MatchTickerWrapper(props)
 	local matches = props.matches
-	if not matches and not props.showInfoForEmptyResults then
+	local hasMatches = not matches or #matches == 0
+	if not hasMatches and not props.showInfoForEmptyResults then
 		return
 	end
 	local header = props.header
 
-	if not matches or #matches == 0 then
+	if not hasMatches then
 		return Html.Div{
 			classes = props.wrapperClasses,
 			css = {['text-align'] = 'center'},
