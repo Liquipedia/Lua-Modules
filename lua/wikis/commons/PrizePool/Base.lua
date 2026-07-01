@@ -35,6 +35,7 @@ local TableCellHeader = TableWidgets.CellHeader
 local TableRow = TableWidgets.Row
 local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
+local Hr = HtmlWidgets.Hr
 local ChevronToggle = Lua.import('Module:Widget/GeneralCollapsible/ChevronToggle')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -743,7 +744,7 @@ function BasePrizePool:_opponentPrizeCells(placement, opponent)
 		local lastCellOfType = previousOfPrizeType[prize.type]
 		if lastCellOfType and prizeTypeData.mergeDisplayColumns then
 			if Logic.isNotEmpty(lastCellOfType.props.children) and Logic.isNotEmpty(cell.props.children) then
-				table.insert(lastCellOfType.props.children, tostring(mw.html.create('hr'):css('width', '100%')))
+				table.insert(lastCellOfType.props.children, Hr{css = {width = '100%'}})
 			end
 			Array.extendWith(lastCellOfType.props.children, cell.props.children)
 			return nil
