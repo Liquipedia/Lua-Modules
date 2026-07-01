@@ -11,7 +11,7 @@ local Array = Lua.import('Module:Array')
 local Operator = Lua.import('Module:Operator')
 
 local Component = Lua.import('Module:Widget/Component')
-local Html = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Trophy = Lua.import('Module:Widget/Match/Summary/Ffa/Trophy')
 local Div = Html.Div
 
