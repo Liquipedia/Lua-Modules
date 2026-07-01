@@ -18,8 +18,8 @@ local Placement = Lua.import('Module:PrizePool/Placement')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
-local Widgets = Lua.import('Module:Widget/All')
-local Span = Widgets.Span
+local HtmlWidgets = Lua.import('Module:Widget/Html')
+local Span = HtmlWidgets.Span
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local TableCell = TableWidgets.Cell
 
