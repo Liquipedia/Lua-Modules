@@ -44,7 +44,7 @@ local function ContentSwitchPill(props)
 				['data-toggle-area-btn'] = tostring(index),
 				['data-switch-value'] = tab.value or tostring(index),
 			},
-			children = Logic.emptyOr(tab.label, tostring(index)),
+			children = Logic.emptyOr(tab.label, index),
 		}
 	end)
 
