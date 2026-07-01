@@ -81,7 +81,7 @@ jobs:
       - name: Setup LuaLS
         if: steps.lua-changed-files.outputs.any_changed == 'true'
         env:
-          LUALS_VERSION: 3.17.1
+          LUALS_VERSION: 3.18.2
         run: |
           mkdir -p ~/.local/bin/luals
           curl -L https://github.com/LuaLS/lua-language-server/releases/download/$LUALS_VERSION/lua-language-server-$LUALS_VERSION-linux-x64.tar.gz | tar -xzv -C ~/.local/bin/luals
