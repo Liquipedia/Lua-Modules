@@ -674,13 +674,8 @@ function BasePrizePool:_buildTable(isAward)
 		return prizePoolTable
 	end
 
-	local defaultActive = 1
-	for index, code in ipairs(currencies) do
-		if code ~= BASE_CURRENCY then
-			defaultActive = index
-			break
-		end
-	end
+	-- Default to the first local (non-base) currency; fall back to 1 if somehow all are USD.
+	local defaultActive = math.max(Array.indexOf(currencies, function(code) return code ~= BASE_CURRENCY end), 1)
 
 	local switchGroupId = (tonumber(Variables.varDefault('prizePoolCurrencySwitchGroupId')) or 0) + 1
 	Variables.varDefine('prizePoolCurrencySwitchGroupId', switchGroupId)
