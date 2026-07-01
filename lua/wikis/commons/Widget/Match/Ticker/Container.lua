@@ -8,29 +8,26 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local FeatureFlag = Lua.import('Module:FeatureFlag')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Switch = Lua.import('Module:Widget/Switch')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
 
----@class MatchTickerContainer: Widget
----@operator call(table): MatchTickerContainer
-local MatchTickerContainer = Class.new(Widget)
-MatchTickerContainer.defaultProps = {
+local defaultProps = {
 	limit = 10,
 	module = 'MatchTicker/Custom',
-	fn = 'newMainPage',
+	fn = 'mainPage',
 }
 
----@return Widget
-function MatchTickerContainer:render()
+---@param props {module: string?, fn: string?, limit: integer?, displayGameIcons: boolean?}
+---@return VNode
+local function MatchTickerContainer(props)
 	local function filterName(filter)
 		return 'filterbuttons-' .. filter
 	end
@@ -43,8 +40,8 @@ function MatchTickerContainer:render()
 	end)
 
 	local matchTickerArgs = {
-		limit = self.props.limit,
-		displayGameIcons = self.props.displayGameIcons
+		limit = props.limit,
+		displayGameIcons = props.displayGameIcons
 	}
 
 	local devFlag = FeatureFlag.get('dev')
@@ -55,8 +52,8 @@ function MatchTickerContainer:render()
 		return String.interpolate(
 			'#invoke:Lua|invoke|module=${module}|fn=${fn}${args}',
 			{
-				module = self.defaultProps.module,
-				fn = self.defaultProps.fn,
+				module = props.module,
+				fn = props.fn,
 				args = table.concat(Array.extractValues(Table.map(
 					Table.merge(matchTickerArgs, {type=type, dev=devFlag}),
 					function (key, value)
@@ -70,8 +67,8 @@ function MatchTickerContainer:render()
 	---@param type 'upcoming' |'recent'
 	---@return Renderable
 	local function callTemplate(type)
-		local ticker = Lua.import('Module:' .. self.defaultProps.module)
-		return ticker[self.defaultProps.fn](
+		local ticker = Lua.import('Module:' .. props.module)
+		return ticker[props.fn](
 			Table.merge(
 				{type=type},
 				matchTickerArgs,
@@ -80,7 +77,7 @@ function MatchTickerContainer:render()
 		)
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'match-section-header'},
 		css = {['padding-top'] = '0.75rem'},
 		children = {
@@ -97,7 +94,7 @@ function MatchTickerContainer:render()
 								storeValue = true,
 								defaultActive = true,
 								css = {margin = '1rem 0', ['justify-content'] = 'center'},
-								content = HtmlWidgets.Div{
+								content = Html.Div{
 									attributes = {
 										['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
 										['data-filter-groups'] = filterText,
@@ -111,7 +108,7 @@ function MatchTickerContainer:render()
 						label = 'Completed',
 						value = 'completed',
 						content = {
-							HtmlWidgets.Div{
+							Html.Div{
 								attributes = {
 									['data-filter-expansion-template'] = buildTemplateExpansionString('recent'),
 									['data-filter-groups'] = filterText,
@@ -128,4 +125,4 @@ function MatchTickerContainer:render()
 	}
 end
 
-return MatchTickerContainer
+return Component.component(MatchTickerContainer, defaultProps)
