@@ -179,6 +179,10 @@ end
 ---@param rawQualifier string
 ---@return string?, string?, string? # (linkText, internalLink, externalLink)
 function LegacyTeamCard._parseQualifierLink(rawQualifier)
+	-- Some qualifier templates (e.g. {{VRS}}) categorise the page as a side effect, emitting a
+	-- [[Category:...]] link into the value. Strip it so it is not mistaken for the qualifier link.
+	rawQualifier = mw.text.trim((rawQualifier:gsub('%[%[:?[Cc]ategory:.-%]%]', '')))
+
 	-- A qualifier may be prefixed with an icon (e.g. {{LeagueIconSmall}}, which expands to
 	-- a File link / span before reaching here). Take the first internal wikilink that is not
 	-- such an embed; the new QualifierInfo widget renders its own tournament icon.

@@ -23,6 +23,7 @@ local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournam
 local Widgets = Lua.import('Module:Widget/All')
 local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class BrawlstarsInfoboxPlayer: Person
 ---@operator call(Frame): BrawlstarsInfoboxPlayer
@@ -120,10 +121,10 @@ function CustomPlayer:createBottomContent()
 		---@cast teamPage -nil
 
 		return Html.Fragment{
-			children = {
+			children = WidgetUtil.collect(
 				MatchTicker.recent{team = teamPage},
 				UpcomingTournaments.team{name = teamPage}
-			}
+			)
 		}
 	end
 end
