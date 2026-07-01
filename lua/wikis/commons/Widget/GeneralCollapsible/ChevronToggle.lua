@@ -15,8 +15,8 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local Span = Html.Span
 
 ---@class ChevronToggleProps
----@field expandText (string|Widget)? optional label shown next to the expand chevron
----@field collapseText (string|Widget)? optional label shown next to the collapse chevron
+---@field expandText Renderable? optional label shown next to the expand chevron
+---@field collapseText Renderable? optional label shown next to the collapse chevron
 ---@field size ('xs'|'sm'|'md'|'lg')? button size, defaults to 'xs'
 
 local defaultProps = {
@@ -24,7 +24,7 @@ local defaultProps = {
 }
 
 ---@param class string
----@param text (string|Widget)?
+---@param text Renderable?
 ---@param iconName string
 ---@param size 'xs'|'sm'|'md'|'lg'
 ---@return Widget
