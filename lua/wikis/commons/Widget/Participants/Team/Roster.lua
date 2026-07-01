@@ -96,7 +96,13 @@ local function ParticipantsTeamRoster(props)
 	-- Used for making the sorting stable
 	local sortPlayers = function(players)
 		local playerToIndex = Table.map(players, function(index, player) return player, index end)
+		local isStaff = function(player) return player.extradata.type == 'staff' end
 		return Array.sortBy(players, FnUtil.identity, function(a, b)
+			-- Staff render after players (incl. TBD placeholders) within a tab
+			local aIsStaff, bIsStaff = isStaff(a), isStaff(b)
+			if aIsStaff ~= bIsStaff then
+				return bIsStaff
+			end
 			local function getPlayerSortOrder(player)
 				local roles = player.extradata.roles or {}
 				return roles[1] and roles[1].sortOrder or math.huge
