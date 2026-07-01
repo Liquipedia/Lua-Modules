@@ -2,17 +2,27 @@
 local LeagueIcon = require('Module:LeagueIcon')
 
 local FILLER_EXPECT = '<span class="league-icon-small-image">[[File:Logo filler event.png|link=]]</span>'
-local ICON_DARK_EXPECT = '<span class="league-icon-small-image">[[File:DarkIcon.png|link=||50x50px]]</span>'
+local ICON_DARK_EXPECT = '<span class="league-icon-small-image">[[File:DarkIcon.png|link=|50x50px]]</span>'
 
 local ICON_BOTH_EXPECT =
-	'<span class="league-icon-small-image lightmode">[[File:LightIcon.png|link=||50x50px]]</span>' ..
-	'<span class="league-icon-small-image darkmode">[[File:DarkIcon.png|link=||50x50px]]</span>'
+	'<span class="league-icon-small-image lightmode">[[File:LightIcon.png|link=|50x50px]]</span>' ..
+	'<span class="league-icon-small-image darkmode">[[File:DarkIcon.png|link=|50x50px]]</span>'
 local ICON_WITH_LINK_EXPECT = '<span class="league-icon-small-image">[[File:Icon.png|link=link|name|50x50px]]</span>'
 local ICON_WITH_LINK_BOTH_EXPECT =
 	'<span class="league-icon-small-image lightmode">[[File:LightIcon.png|link=link|name|50x50px]]</span>' ..
 	'<span class="league-icon-small-image darkmode">[[File:DarkIcon.png|link=link|name|50x50px]]</span>'
 
 insulate('LeagueIcon.display', function()
+	local AddCategorySpy
+
+	before_each(function()
+		AddCategorySpy = spy.on(mw.ext.TeamLiquidIntegration, 'add_category')
+	end)
+
+	after_each(function()
+		AddCategorySpy:revert()
+	end)
+
 	it('should return filler icon when no icons are provided', function()
 		local args = {}
 		local result = LeagueIcon.display(args)
@@ -22,25 +32,29 @@ insulate('LeagueIcon.display', function()
 	it('should return iconDark when only iconDark is provided', function()
 		local args = {iconDark = 'DarkIcon.png'}
 		local result = LeagueIcon.display(args)
-		assert.are.equal(ICON_DARK_EXPECT .. '[[Category:Pages with only icondark]]', result)
+		assert.are.equal(ICON_DARK_EXPECT, result)
+		assert.stub(AddCategorySpy).was.called_with('Pages with only icondark')
 	end)
 
 	it('should return both icons when both icon and iconDark are provided', function()
 		local args = {icon = 'LightIcon.png', iconDark = 'DarkIcon.png'}
 		local result = LeagueIcon.display(args)
 		assert.are.equal(ICON_BOTH_EXPECT, result)
+		assert.stub(AddCategorySpy).was.called_at_most(0)
 	end)
 
 	it('should not use template when noTemplate option is true', function()
 		local args = {options = {noTemplate = true}}
 		local result = LeagueIcon.display(args)
 		assert.are.equal(FILLER_EXPECT, result)
+		assert.stub(AddCategorySpy).was.called_at_most(0)
 	end)
 
 	it('should not include link when noLink option is true', function()
 		local args = {icon = 'LightIcon.png', iconDark = 'DarkIcon.png', options = {noLink = true}}
 		local result = LeagueIcon.display(args)
 		assert.are.equal(ICON_BOTH_EXPECT, result)
+		assert.stub(AddCategorySpy).was.called_at_most(0)
 	end)
 end)
 
@@ -109,7 +123,7 @@ end)
 insulate('LeagueIcon.generate', function()
 	it('should generate code with valid arguments', function()
 		local args = {icon = 'Icon.png', link = 'link', name = 'name', series = 'series'}
-		GoldenTest('LeagueIcon.generate_copy_paste_gen', LeagueIcon.generate(args))
+		GoldenTest('LeagueIcon.generate_copy_paste_gen', tostring(LeagueIcon.generate(args)))
 	end)
 
 	it('should throw error when no link or series is provided', function()
