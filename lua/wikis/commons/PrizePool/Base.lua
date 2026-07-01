@@ -644,10 +644,7 @@ function BasePrizePool:_buildTable(isAward)
 	local currencies = self:_getCurrencies()
 	self.currencyToggleIndices = nil
 	if #currencies >= 2 then
-		self.currencyToggleIndices = {}
-		for index, code in ipairs(currencies) do
-			self.currencyToggleIndices[code] = index
-		end
+		self.currencyToggleIndices = Table.map(currencies, function(index, code) return code, index end)
 	end
 
 	local bodyRows = self:_buildRows()
