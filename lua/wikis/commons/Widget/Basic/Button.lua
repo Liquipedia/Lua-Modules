@@ -37,25 +37,25 @@ local defaultProps = {
 ---@return HtmlNode
 local function Button(props)
 	--- MW Parser does not allowed the <button> tag, so we use a <div>
-	local cssClasses = {'btn'}
+	local cssClasses = {'button'}
 	if props.variant == 'primary' then
-		table.insert(cssClasses, 'btn-primary')
+		table.insert(cssClasses, 'button--primary')
 	elseif props.variant == 'secondary' then
-		table.insert(cssClasses, 'btn-secondary')
+		table.insert(cssClasses, 'button--secondary')
 	elseif props.variant == 'themed' then
-		table.insert(cssClasses, 'btn-themed')
+		table.insert(cssClasses, 'button--themed')
 	elseif props.variant == 'ghost' then
-		table.insert(cssClasses, 'btn-ghost')
+		table.insert(cssClasses, 'button--ghost')
 	elseif props.variant == 'destructive' then
-		table.insert(cssClasses, 'btn-destructive')
+		table.insert(cssClasses, 'button--destructive')
 	end
 
 	if props.size == 'xs' then
-		table.insert(cssClasses, 'btn-extrasmall')
+		table.insert(cssClasses, 'button--extrasmall')
 	elseif props.size == 'sm' then
-		table.insert(cssClasses, 'btn-small')
+		table.insert(cssClasses, 'button--small')
 	elseif props.size == 'lg' then
-		table.insert(cssClasses, 'btn-large')
+		table.insert(cssClasses, 'button--large')
 	end
 
 	local cssTable = {}

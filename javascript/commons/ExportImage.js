@@ -934,7 +934,7 @@ class DropdownWidget {
 			'<span style="line-height: 1">Share</span>';
 
 		const button = this.createElement( 'button', {
-			class: 'btn btn-ghost btn-extrasmall dropdown-widget__toggle',
+			class: 'button button--ghost button--extrasmall dropdown-widget__toggle',
 			type: 'button',
 			title: 'Share',
 			'aria-label': 'Share this content',
