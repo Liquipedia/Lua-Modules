@@ -840,7 +840,14 @@ function BasePrizePool:_opponentPrizeCells(placement, opponent)
 	end)
 
 	return Array.map(prizeCells, function(cell)
-		return Logic.isEmpty(cell.props.children) and BasePrizePool._emptyCell(cell.props.align) or cell
+		if Logic.isNotEmpty(cell.props.children) then
+			return cell
+		end
+		-- Preserve tagging attributes (e.g. the currency toggle index) so empty cells hide
+		-- alongside their column; a fresh empty cell would drop them and leak a phantom column.
+		local emptyCell = BasePrizePool._emptyCell(cell.props.align)
+		emptyCell.props.attributes = cell.props.attributes
+		return emptyCell
 	end)
 end
 
