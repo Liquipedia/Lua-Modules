@@ -487,6 +487,22 @@ share the `prizepooltable` class.
 	}
 }
 
+// Currency toggle: pill stacked above the card.
+.prizepool-currency-switch {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	width: fit-content;
+
+	.switch-pill-container {
+		align-self: flex-start;
+	}
+
+	.switch-pill-option {
+		flex: none;
+	}
+}
+
 // Footer toggle for the redesigned (general-collapsible) table.
 .prizepooltable-toggle {
 	text-align: center;
