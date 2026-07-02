@@ -174,7 +174,7 @@ function AutomaticPointsTable:parseOpponents(args, tournaments)
 					type = POINTS_TYPE.MANUAL,
 					amount = tonumber(manualPoints)
 
-				}, self:parseDeduction(parsedArgs, tournament, tournamentIndex))
+				}, self:parseDeduction(parsedArgs, tournament.tournament, tournamentIndex))
 			end
 
 			local queriedPoints = self:queryPlacement(aliases[tournamentIndex], parsedOpponent.opponent, tournament)
