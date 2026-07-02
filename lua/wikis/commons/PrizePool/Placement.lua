@@ -12,7 +12,6 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Medals = Lua.import('Module:Medals')
-local Ordinal = Lua.import('Module:Ordinal')
 local PlacementInfo = Lua.import('Module:Placement')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -315,12 +314,11 @@ function Placement:_displayPlace()
 		end
 	end
 
-	local start = Ordinal.toOrdinal(self.placeStart)
 	if self.placeEnd > self.placeStart then
-		return start .. DASH .. Ordinal.toOrdinal(self.placeEnd)
+		return self.placeStart .. DASH .. self.placeEnd
 	end
 
-	return start
+	return tostring(self.placeStart)
 end
 
 ---@return string?
@@ -332,6 +330,16 @@ function Placement:getBackground()
 	end
 
 	return PlacementInfo.getBgClass{placement = self.placeStart}
+end
+
+---Returns the placement-badge color class for top-3 placements, else nil.
+---Colored by the top of the range (placeStart).
+---@return string?
+function Placement:getBadgeClass()
+	if self:hasSpecialStatus() or self.placeStart > 3 then
+		return nil
+	end
+	return PlacementInfo.raw(self.placeStart).backgroundClass
 end
 
 ---@return string?
