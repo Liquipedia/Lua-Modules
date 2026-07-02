@@ -14,6 +14,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
+local Dialog = Lua.import('Module:Widget/Basic/Dialog')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -159,12 +160,16 @@ function AutomaticPointsTableWidget.createRow(props, opponent, opponentIndex)
 						children = resultDisplay,
 					},
 					props.tournaments[resultIndex].extradata.includesDeduction and AutomaticPointsTableWidget._createRowCell{
-						children = result.deduction and {
-							Html.Abbr{
+						children = result.deduction and Dialog{
+							trigger = Html.Span{
 								classes = {'deduction-box'},
-								title = result.note,
 								children = result.deduction
-							}
+							},
+							title = {
+								'Deductions for ',
+								OpponentDisplay.InlineOpponent{opponent = opponent.opponent},
+							},
+							children = result.note
 						} or nil
 					} or nil
 				}
