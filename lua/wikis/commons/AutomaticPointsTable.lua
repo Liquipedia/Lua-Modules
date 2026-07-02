@@ -305,38 +305,6 @@ function AutomaticPointsTable._getSecuredPoints(tournament)
 	end))
 end
 
----@param placement {prizePoints: number?, securedPoints: number?}
----@param manualPoints number?
----@return {amount: number?, type: PointsType?}
-function AutomaticPointsTable:calculatePointsForTournament(placement, manualPoints)
-	-- manual points get highest priority
-	if manualPoints ~= nil then
-		return {
-			amount = manualPoints,
-			type = POINTS_TYPE.MANUAL
-		}
-	-- placement points get next priority
-	elseif placement ~= nil then
-		local prizePoints = placement.prizePoints
-		local securedPoints = placement.securedPoints
-		if prizePoints ~= nil then
-			return {
-				amount = prizePoints,
-				type = POINTS_TYPE.PRIZE
-			}
-		-- secured points are the points that are guaranteed for a team in a tournament
-		-- a team with X secured points will get X or more points at the end of the tournament
-		elseif securedPoints ~= nil then
-			return {
-				amount = securedPoints,
-				type = POINTS_TYPE.SECURED
-			}
-		end
-	end
-
-	return {}
-end
-
 --- sort by total points (desc) then by name (asc)
 ---@param opponents AutomaticPointsTableOpponent[]
 ---@return AutomaticPointsTableOpponent[]
