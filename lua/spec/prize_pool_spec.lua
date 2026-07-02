@@ -171,6 +171,10 @@ describe('prize pool', function()
 		assert.is_truthy(output:find('data-toggle-area-content="2"', 1, true))
 		assert.is_truthy(output:find('Player Prize', 1, true))
 		assert.is_truthy(output:find('Club Reward', 1, true))
+		-- Positively assert the pill is present.
+		assert.is_truthy(output:find('switch-pill', 1, true))
+		-- Assert column order (Player Prize appears before Club Reward).
+		assert.is_true(output:find('Player Prize', 1, true) < output:find('Club Reward', 1, true))
 	end)
 
 	it('renders club-share columns without a currency toggle for a single currency', function()
@@ -178,6 +182,10 @@ describe('prize pool', function()
 		assert.is_truthy(output:find('Player Prize', 1, true))
 		assert.is_truthy(output:find('Club Reward', 1, true))
 		assert.is_nil(output:find('switch-pill', 1, true))
+		-- Assert no toggle attribute is emitted.
+		assert.is_nil(output:find('data-toggle-area-content', 1, true))
+		-- Assert column order too.
+		assert.is_true(output:find('Player Prize', 1, true) < output:find('Club Reward', 1, true))
 	end)
 
 	describe('prize pool is correct', function()
