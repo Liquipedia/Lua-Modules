@@ -22,7 +22,6 @@ $table2-cell-padding-x: 0.75rem;
 	max-width: stretch;
 	border: 1px solid;
 	border-radius: $table2-radius;
-	overflow: hidden;
 
 	@supports not ( max-width: stretch ) {
 		max-width: -webkit-fill-available;
@@ -241,7 +240,6 @@ $table2-cell-padding-x: 0.75rem;
 	width: auto;
 	border: 1px solid;
 	border-radius: $table2-radius;
-	overflow: hidden;
 
 	@include table2-surface-colors();
 
