@@ -1013,6 +1013,14 @@ describe('Team Participant', function()
 		it('is nil when neither is present', function()
 			assert.is_nil(Repository._individualPrizeValue{extradata = {}})
 		end)
+
+		it('returns 0 when playershare is explicitly 0', function()
+			local value = Repository._individualPrizeValue{
+				prizemoney = 400000,
+				extradata = {playershare = 0},
+			}
+			assert.are_equal(0, value)
+		end)
 	end)
 
 end)
