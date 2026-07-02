@@ -28,8 +28,8 @@ local zeroWidthSpace = '&#8203;'
 ---@class OpponentDisplay
 local OpponentDisplay = {propTypes = {}, types = {}}
 
-OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid', 'icon')
----@alias teamStyle 'standard'|'short'|'bracket'|'hybrid'|'icon'
+OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid', 'icon', 'dynamic')
+---@alias teamStyle 'standard'|'short'|'bracket'|'hybrid'|'icon'|'dynamic'
 
 ---Display component for an opponent entry appearing in a bracket match.
 ---@class BracketOpponentEntry
@@ -67,7 +67,7 @@ function OpponentDisplay.BracketOpponentEntry:createTeam(template, options)
 
 	local opponentNode = OpponentDisplay.BlockTeamContainer{
 		showLink = false,
-		style = forceShortName and 'short' or 'hybrid',
+		style = forceShortName and 'short' or 'dynamic',
 		template = template,
 	}
 
@@ -246,7 +246,7 @@ function OpponentDisplay.BlockPlayers(props)
 end
 
 ---@param props BlockOpponentProps
----@return Html[]
+---@return VNode[]
 function OpponentDisplay.getBlockPlayerNodes(props)
 	local opponent = props.opponent
 
@@ -258,7 +258,7 @@ function OpponentDisplay.getBlockPlayerNodes(props)
 			player = player,
 			team = player.team,
 			note = playerIndex == 1 and note or nil,
-		})):addClass(props.playerClass)
+		}))
 	end)
 end
 
@@ -268,6 +268,7 @@ end
 function OpponentDisplay.InlineTeamContainer(props)
 	local style = props.style or 'standard'
 	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
+	assert(style ~= 'dynamic', 'style=dynamic is not supported inline')
 	assert(style ~= 'bracket' or not props.flip, 'Flipped style=bracket is not supported')
 	return TeamInline{name = props.template, date = props.date, flip = props.flip, displayType = style}
 end
@@ -345,6 +346,8 @@ function OpponentDisplay.InlineScore(opponent)
 			return ''
 		elseif opponent.score == -1 then
 			return ''
+		elseif opponent.scoreDisplay ~= nil then
+			return tostring(Math.round(opponent.scoreDisplay, 2))
 		else
 			return tostring(Math.round(opponent.score, 2))
 		end

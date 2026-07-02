@@ -8,16 +8,15 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-local Span = HtmlWidgets.Span
-local Div = HtmlWidgets.Div
+local Span = Html.Span
+local Div = Html.Div
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
@@ -26,18 +25,16 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 ---@field teamStyle? teamStyle
 ---@field variant 'horizontal'|'vertical'
 
----@class MatchHeader: Widget
----@operator call(MatchHeaderProps): MatchHeader
----@field props MatchHeaderProps
-local MatchHeader = Class.new(Widget)
+local MatchHeader = {}
 MatchHeader.defaultProps = {
 	teamStyle = 'short',
 	variant = 'horizontal',
 }
 
----@return Widget?
-function MatchHeader:render()
-	local match = self.props.match
+---@param props MatchHeaderProps
+---@return VNode?
+function MatchHeader.render(props)
+	local match = props.match
 	if not match then
 		return nil
 	end
@@ -47,16 +44,17 @@ function MatchHeader:render()
 		return
 	end
 
-	if self.props.variant == 'vertical' then
-		return self:_renderVertical(match)
+	if props.variant == 'vertical' then
+		return MatchHeader._renderVertical(match, props.teamStyle)
 	end
 
-	return self:_renderHorizontal(match)
+	return MatchHeader._renderHorizontal(match, props.teamStyle)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget
-function MatchHeader:_renderHorizontal(match)
+---@param teamStyle teamStyle?
+---@return VNode
+function MatchHeader._renderHorizontal(match, teamStyle)
 	local hasBestof = match.bestof and match.bestof > 0
 	local matchPhase = MatchGroupUtil.computeMatchPhase(match)
 
@@ -88,7 +86,7 @@ function MatchHeader:_renderHorizontal(match)
 				children = {
 					OpponentDisplay.BlockOpponent{
 						opponent = match.opponents[1],
-						teamStyle = self.props.teamStyle,
+						teamStyle = teamStyle,
 						overflow = 'ellipsis',
 						flip = true,
 					}
@@ -148,7 +146,7 @@ function MatchHeader:_renderHorizontal(match)
 				children = {
 					OpponentDisplay.BlockOpponent{
 						opponent = match.opponents[2],
-						teamStyle = self.props.teamStyle,
+						teamStyle = teamStyle,
 						overflow = 'ellipsis',
 					}
 				}
@@ -158,8 +156,9 @@ function MatchHeader:_renderHorizontal(match)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget
-function MatchHeader:_renderVertical(match)
+---@param teamStyle teamStyle?
+---@return VNode
+function MatchHeader._renderVertical(match, teamStyle)
 	local matchPhase = MatchGroupUtil.computeMatchPhase(match)
 
 	return Div{
@@ -181,7 +180,7 @@ function MatchHeader:_renderVertical(match)
 							children = {
 								OpponentDisplay.BlockOpponent{
 									opponent = opponent,
-									teamStyle = self.props.teamStyle,
+									teamStyle = teamStyle,
 									overflow = 'ellipsis',
 								}
 							}
@@ -200,4 +199,4 @@ function MatchHeader:_renderVertical(match)
 	}
 end
 
-return MatchHeader
+return Component.component(MatchHeader.render, MatchHeader.defaultProps)

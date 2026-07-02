@@ -114,7 +114,7 @@ function Page.splitPageName(pageName)
 end
 
 --- Joins given namespace, base page name, and section into a page name.
----@param namespaceName string?
+---@param namespaceName string|integer?
 ---@param basePageName string
 ---@param section string?
 ---@return string

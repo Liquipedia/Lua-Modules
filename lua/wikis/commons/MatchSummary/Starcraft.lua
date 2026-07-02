@@ -17,7 +17,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Custom')
+local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Custom') --[[@as StarcraftMatchGroupUtil]]
 local VetoLabel = Lua.import('Module:Widget/Match/Summary/VetoLabel')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -32,7 +32,7 @@ local TBD = 'TBD'
 local StarcraftMatchSummary = {}
 
 ---@param args {bracketId: string, matchId: string, config: table?}
----@return Html
+---@return Renderable
 function StarcraftMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(StarcraftMatchSummary, args, {width = '380px'})
 end
@@ -205,7 +205,7 @@ function StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch)
 		}
 	end
 
-	---@param opponentIndex any
+	---@param opponentIndex integer
 	---@param additionalClasses string[]?
 	---@return Widget
 	local createScore = function(opponentIndex, additionalClasses)

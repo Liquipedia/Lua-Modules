@@ -179,6 +179,10 @@ end
 ---@param rawQualifier string
 ---@return string?, string?, string? # (linkText, internalLink, externalLink)
 function LegacyTeamCard._parseQualifierLink(rawQualifier)
+	-- Some qualifier templates (e.g. {{VRS}}) categorise the page as a side effect, emitting a
+	-- [[Category:...]] link into the value. Strip it so it is not mistaken for the qualifier link.
+	rawQualifier = mw.text.trim((rawQualifier:gsub('%[%[:?[Cc]ategory:.-%]%]', '')))
+
 	-- A qualifier may be prefixed with an icon (e.g. {{LeagueIconSmall}}, which expands to
 	-- a File link / span before reaching here). Take the first internal wikilink that is not
 	-- such an embed; the new QualifierInfo widget renders its own tournament icon.
@@ -204,6 +208,13 @@ function LegacyTeamCard._parseQualifierLink(rawQualifier)
 	end
 
 	return rawQualifier, nil, nil
+end
+
+---@private
+---@param key string
+---@return boolean
+function LegacyTeamCard._isSubPrefix(key)
+	return key:gsub('^t%d', ''):match('^s%d+') ~= nil
 end
 
 ---@param tcArgs table
@@ -237,10 +248,14 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
 	end
 
 	-- Default-DNP rules (only when no explicit played/result and no explicit dnp).
-	if explicitPlayResult == nil and not Logic.readBool(tcArgs[prefix .. 'dnp']) then
-		if sourceGroup == 's' and (Logic.readBool(tcArgs.subdnpdefault) or Logic.readBool(tcArgs.noVarDefault)) then
-			played = false
-		end
+	if (
+		explicitPlayResult == nil and
+		not Logic.readBool(tcArgs[prefix .. 'dnp']) and
+		sourceGroup == 's' and
+		(Logic.readBool(tcArgs.subdnpdefault) or Logic.readBool(tcArgs.noVarDefault)) and
+		LegacyTeamCard._isSubPrefix(prefix)
+	) then
+		played = false
 	end
 
 	return {
@@ -445,6 +460,11 @@ function LegacyTeamCard.mapCoaches(tcArgs)
 		if tabType == 'sub' then sourceGroup = 'sc'
 		elseif tabType == 'former' then sourceGroup = 'fc'
 		else sourceGroup = nil end
+
+		if tcArgs[tab .. 'c'] then
+			mw.ext.TeamLiquidIntegration.add_category('Pages with malformed Legacy TeamCard coach input')
+			tcArgs[tab .. 'c1'] = tcArgs[tab .. 'c']
+		end
 
 		Array.forEach(indicesPresent(tcArgs, tab .. 'c', MAX_COACH_INDEX), function(i)
 			table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, tab .. 'c' .. i, sourceGroup))

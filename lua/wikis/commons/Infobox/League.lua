@@ -355,7 +355,7 @@ function League:_createUpcomingMatches()
 		return nil
 	end
 
-	local result = Logic.tryCatch(
+	return Logic.tryCatch(
 		function()
 			local matchTicker = MatchTicker{
 				tournament = self.pagename,
@@ -364,24 +364,14 @@ function League:_createUpcomingMatches()
 				ongoing = true,
 				hideTournament = true,
 				queryByParent = true,
+				entityStyle = true,
 			}
-			matchTicker:query()
-			return matchTicker
+			return matchTicker:query():create()
 		end,
 		function()
 			return nil
 		end
 	)
-
-	if not result or not result.matches or #result.matches == 0 then
-		return nil
-	end
-
-	local EntityDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
-	return EntityDisplay.Container{
-		config = result.config,
-		matches = result.matches,
-	}:create()
 end
 
 ---@param args table
