@@ -29,7 +29,7 @@ local ICONS = {
 	empty = Html.Span{},
 }
 
----@param props {bans: {[1]: string[]?, [2]: string[]?, start: integer?}[], date: string?}
+---@param props {bans: {[1]: string[]?, [2]: string[]?, start: integer?, label: string?}[], date: string?}
 ---@return VNode?
 local function MatchSummaryCharacterBanTable(props)
 	if Logic.isDeepEmpty(props.bans) then
@@ -70,7 +70,7 @@ local function MatchSummaryCharacterBanTable(props)
 						classes = hasStartIndicator and {'brkts-popup-veto-row-indicator'} or nil,
 						children = WidgetUtil.collect(
 							hasStartIndicator and startIndicator(1, banData.start) or nil,
-							'Game&nbsp;' .. gameNumber,
+							banData.label or ('Game&nbsp;' .. gameNumber),
 							hasStartIndicator and startIndicator(2, banData.start) or nil
 						)
 					},
