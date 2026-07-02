@@ -34,12 +34,12 @@ local function InlineCharacterPlayer(props)
 				showFlag = props.showFlag,
 				useDefault = Logic.nilOr(Logic.readBoolOrNil(props.showTbd), true) or not Opponent.playerIsTbd(player)
 			},
-			Html.Fragment{children = Array.map(
+			player.chars and Html.Fragment{children = Array.map(
 				player.chars,
 				function (character)
 					return Characters.GetIconAndName{character, game = player.game}
 				end
-			)},
+			)} or nil,
 			InlineName(props)
 		)
 	}
