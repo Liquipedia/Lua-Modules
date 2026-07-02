@@ -174,6 +174,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field placement2 number?
 ---@field players standardPlayer[]?
 ---@field score number?
+---@field scoreDisplay number?
 ---@field score2 number?
 ---@field status string?
 ---@field status2 string?
@@ -693,9 +694,10 @@ function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 	local game1 = (matchRecord.match2games or {})[1]
 	local hasOnlyScores = Array.all(matchRecord.match2opponents, function(opponent)
 			return opponent.status == 'S' end)
+	local scoreDisplay = nil
 	if bestof == 1 and Info.config.match2.gameScoresIfBo1 and game1 and hasOnlyScores then
 		local mapOpponent = (game1.opponents or {})[opponentIndex] or {}
-		score = mapOpponent.score
+		scoreDisplay = tonumber(mapOpponent.score)
 		status = mapOpponent.status
 	end
 
@@ -708,6 +710,7 @@ function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 		placement = tonumber(record.placement),
 		players = Array.map(record.match2players, MatchGroupUtil.playerFromRecord),
 		score = tonumber(score),
+		scoreDisplay = scoreDisplay,
 		status = status,
 		template = nilIfEmpty(record.template),
 		type = nilIfEmpty(record.type) or 'literal',
