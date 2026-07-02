@@ -34,8 +34,13 @@ describe('match2', function()
 					dataSaved.match2games = dataSavedGame
 
 					local ret = {dataSaved}
-					dataSaved, dataSavedGame, dataSavedOpponent = {}, {}, {}
 					return ret
+				elseif tbl == 'match2opponent' then
+					return dataSavedOpponent
+				elseif tbl == 'match2player' then
+					return dataSavedPlayer
+				elseif tbl == 'match2game' then
+					return dataSavedGame
 				end
 				return {}
 			end)
