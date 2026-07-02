@@ -232,7 +232,7 @@ end
 ---@param args table
 ---@param tournament StandardTournament
 ---@param tournamentIndex integer
----@return {deduction: number?, note: string?}[]
+---@return {deduction: number?, note: string?}
 function AutomaticPointsTable:parseDeduction(args, tournament, tournamentIndex)
 	local deduction = args['deduction' .. tournamentIndex]
 	if String.isEmpty(deduction) then
