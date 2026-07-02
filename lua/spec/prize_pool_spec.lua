@@ -279,19 +279,23 @@ describe('prize pool', function()
 	end)
 
 	it('stores the USD player share in placement extradata', function()
+		local Json = require('Module:Json')
 		local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 		TeamTemplateMock.setUp()
 		PrizePool(clubShareUsdPoolArgs):create():build()
 		TeamTemplateMock.tearDown()
 
-		local found = false
+		local playerShares = {}
 		for _, call in ipairs(LpdbPlacementStub.calls) do
 			local extradata = call.vals[2] and call.vals[2].extradata
-			if type(extradata) == 'string' and extradata:find('"playershare":250000', 1, true) then
-				found = true
+			if type(extradata) == 'string' then
+				local parsed = Json.parse(extradata)
+				if parsed.playershare then
+					table.insert(playerShares, parsed.playershare)
+				end
 			end
 		end
-		assert.is_true(found)
+		assert.are_same({250000, 100000}, playerShares)
 	end)
 
 	describe('enabling/disabling lpdb storage', function()
