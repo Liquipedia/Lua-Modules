@@ -120,6 +120,32 @@ describe('Standings model round trip', function()
 		GoldenTest('standings_ffa', html)
 	end)
 
+	it('direct-path render matches var-path render', function()
+		local StandingsDisplay = require('Module:Widget/Standings')
+
+		local rounds = {
+			{roundNumber = 1, started = true, finished = true, title = 'Day 1'},
+			{roundNumber = 2, started = true, finished = true, title = 'Day 2'},
+		}
+		local opponents = {
+			makeOpponent('Alpha', {3, 0}),
+			makeOpponent('Bravo', {1, 4}),
+			makeOpponent('Charlie', {0, 1}),
+		}
+		local standingsTable = StandingsParser.parse(
+			rounds, opponents, {[1] = 'up', [3] = 'down'}, 'Dir Standings', {}, 'ffa', {'full.points'})
+
+		-- Direct path: use the returned record/entries from StandingsStorage.run
+		local stored = StandingsStorage.run(standingsTable, {saveVars = true})
+		local directModel = Standings.standingsFromRecord(stored.record, stored.entries)
+		local htmlDirect = tostring(StandingsDisplay{standings = directModel})
+
+		-- Var path: read back from page variables (the same wiki-var write)
+		local htmlVar = tostring(StandingsDisplay{pageName = 'FakePage', standingsIndex = standingsTable.standingsindex})
+
+		assert.are_equal(htmlDirect, htmlVar)
+	end)
+
 	it('renders the swiss standings widget from the model', function()
 		local SwissStandings = require('Module:Widget/Standings/Swiss')
 
