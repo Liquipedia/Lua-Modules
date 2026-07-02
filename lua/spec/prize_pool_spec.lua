@@ -39,6 +39,18 @@ describe('prize pool', function()
 		[2] = {qualified1 = true, [1] = {'Salt'}},
 	}
 
+	local clubSharePoolArgs = {
+		type = {type = 'team'},
+		currencyroundprecision = 0,
+		lpdb_prefix = 'cs',
+		import = false,
+		playershare = true,
+		localcurrency = 'cny',
+		autoexchange = true,
+		[1] = {localprize = '160,000', playershare = '120,000', [1] = {'mouz'}},
+		[2] = {localprize = '70,000', playershare = '50,000', [1] = {'t1'}},
+	}
+
 	it('parameters are correctly parsed', function()
 		local ppt = PrizePool(prizePoolArgs):create()
 
@@ -84,6 +96,7 @@ describe('prize pool', function()
 				exchangeInfo = true,
 				fillPlaceRange = true,
 				lpdbPrefix = 'abc',
+				playerShare = false,
 				prizeSummary = true,
 				resolveRedirect = false,
 				showBaseCurrency = true,
@@ -97,6 +110,14 @@ describe('prize pool', function()
 	it('enumerates currencies USD-first and distinct', function()
 		local ppt = PrizePool(prizePoolArgs):create()
 		assert.are_same({'USD', 'EUR', 'SEK'}, ppt:_getCurrencies())
+	end)
+
+	it('reads the playerShare config flag and raw player amounts', function()
+		local ppt = PrizePool(clubSharePoolArgs):create()
+		assert.is_true(ppt.options.playerShare)
+		-- Raw player share is captured on the opponent, in the input (local) currency.
+		assert.are_equal(120000, ppt.placements[1].opponents[1].prizeRewards.playerShareInput)
+		assert.are_equal(50000, ppt.placements[2].opponents[1].prizeRewards.playerShareInput)
 	end)
 
 	describe('prize pool is correct', function()

@@ -66,6 +66,8 @@ local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 local PRIZE_TYPE_POINTS = 'POINTS'
 local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
 local PRIZE_TYPE_FREETEXT = 'FREETEXT'
+local PRIZE_TYPE_PLAYER_SHARE = 'PLAYER_SHARE'
+local PRIZE_TYPE_CLUB_SHARE = 'CLUB_SHARE'
 
 -- Alignment for the fixed (non-prize) columns; prize columns carry `align` on their prize type.
 local PLACE_COLUMN_ALIGN = 'center'
@@ -74,6 +76,12 @@ local OPPONENT_COLUMN_ALIGN = 'left'
 BasePrizePool.config = {
 	showBaseCurrency = {
 		default = false
+	},
+	playerShare = {
+		default = false,
+		read = function(args)
+			return Logic.readBoolOrNil(args.playershare)
+		end
 	},
 	autoExchange = {
 		default = true,

@@ -21,6 +21,7 @@ local LOCAL_CURRENCY_VARIABLE_POST_FIX = 'local'
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
 local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
+local RAW_PLAYER_SHARE_KEY = 'playerShareInput'
 
 --- A BasePlacement is a set of opponents who all share the same final place/award in the tournament.
 --- Its input is generally a table created by `Template:Slot`.
@@ -85,6 +86,16 @@ function BasePlacement:_readPrizeRewards(args)
 	if baseType.row and args[baseType.row] then
 		self.hasBaseCurrency = true
 		rewards[PRIZE_TYPE_BASE_CURRENCY .. 1] = baseType.rowParse(self, args[baseType.row], args, 1)
+	end
+
+	-- Raw player share is captured here (not as a prize) because the per-currency
+	-- PLAYER_SHARE / CLUB_SHARE prizes are added after placements are parsed. It is
+	-- entered in the pool's input currency and converted later in _setSharesFromPlayerShare.
+	if self.parent.options.playerShare then
+		local playerShareValue = args.playershare or self.args.playershare
+		if playerShareValue then
+			rewards[RAW_PLAYER_SHARE_KEY] = tonumber((tostring(playerShareValue):gsub('[^%d.]', '')))
+		end
 	end
 
 	return rewards
