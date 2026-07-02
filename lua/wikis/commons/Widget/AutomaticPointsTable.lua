@@ -50,11 +50,12 @@ end
 ---@param props AutomaticPointsTableWidgetProps
 ---@return VNode
 function AutomaticPointsTableWidget.createTable(props)
+	local opponents = Array.sub(props.opponents, 1, props.limit)
 	return Div{
 		classes = {'divTable', 'border-color-grey', 'border-bottom'},
 		children = WidgetUtil.collect(
 			AutomaticPointsTableWidget.createHeader(props),
-			Array.map(props.opponents, FnUtil.curry(AutomaticPointsTableWidget.createRow, props))
+			Array.map(opponents, FnUtil.curry(AutomaticPointsTableWidget.createRow, props))
 		)
 	}
 end
