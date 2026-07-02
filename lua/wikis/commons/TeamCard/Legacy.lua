@@ -247,15 +247,25 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
 		status = 'former'
 	end
 
-	-- Default-DNP rules (only when no explicit played/result and no explicit dnp).
+	-- subdnpdefault: subs entered via the s* group with no explicit result are shown as DNP
+	-- (visible label + excluded from results). Restricted to real s* input (not tXpY tabs).
 	if (
 		explicitPlayResult == nil and
 		not Logic.readBool(tcArgs[prefix .. 'dnp']) and
 		sourceGroup == 's' and
-		(Logic.readBool(tcArgs.subdnpdefault) or Logic.readBool(tcArgs.noVarDefault)) and
+		Logic.readBool(tcArgs.subdnpdefault) and
 		LegacyTeamCard._isSubPrefix(prefix)
 	) then
 		played = false
+	end
+
+	-- noVarDefault: subs/formers without an explicit played/result are not counted for results,
+	-- but keep their normal display (no DNP label). An explicit played/result=true overrides.
+	local results
+	if (status == 'sub' or status == 'former')
+		and Logic.readBool(tcArgs.noVarDefault)
+		and explicitPlayResult ~= true then
+		results = false
 	end
 
 	return {
@@ -271,6 +281,7 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
 		joindate = tcArgs[prefix .. 'joindate'],
 		leavedate = tcArgs[prefix .. 'leavedate'],
 		played = played,
+		results = results,
 		status = status,
 	}
 end
@@ -300,6 +311,19 @@ function LegacyTeamCard.mapCoach(tcArgs, prefix, sourceGroup)
 		status = 'former'
 	end
 
+	-- noVarDefault: sub/former coaches without an explicit played/result are not counted for
+	-- results (an explicit played/result=true, e.g. fcresult=true, overrides). Coaches are
+	-- never shown as DNP, so only results (not played) is affected.
+	local explicitPlayResult = Logic.readBoolOrNil(tcArgs[prefix .. 'played'] or tcArgs[prefix .. 'result'])
+	local results
+	if Logic.readBool(tcArgs[prefix .. 'dnp']) then
+		results = false
+	elseif (status == 'sub' or status == 'former')
+		and Logic.readBool(tcArgs.noVarDefault)
+		and explicitPlayResult ~= true then
+		results = false
+	end
+
 	return {
 		[1] = tcArgs[prefix],
 		link = tcArgs[prefix .. 'link'],
@@ -308,6 +332,7 @@ function LegacyTeamCard.mapCoach(tcArgs, prefix, sourceGroup)
 		role = role,
 		type = 'staff',
 		trophies = trophies,
+		results = results,
 		status = status,
 	}
 end
@@ -447,9 +472,16 @@ function LegacyTeamCard.mapCoaches(tcArgs)
 	Array.forEach(indicesPresent(tcArgs, 'c', MAX_COACH_INDEX), function(i)
 		table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'c' .. i, nil))
 	end)
+	-- Bare `sc`/`fc` is the first sub/former coach in legacy syntax (numbered slots start at 2).
+	if Logic.isNotEmpty(tcArgs.sc) then
+		table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'sc', 'sc'))
+	end
 	Array.forEach(indicesPresent(tcArgs, 'sc', MAX_COACH_INDEX), function(i)
 		table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'sc' .. i, 'sc'))
 	end)
+	if Logic.isNotEmpty(tcArgs.fc) then
+		table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'fc', 'fc'))
+	end
 	Array.forEach(indicesPresent(tcArgs, 'fc', MAX_COACH_INDEX), function(i)
 		table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'fc' .. i, 'fc'))
 	end)
