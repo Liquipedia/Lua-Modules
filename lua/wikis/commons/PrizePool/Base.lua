@@ -514,7 +514,7 @@ function BasePrizePool:_buildShareColumns()
 	local localPrizes = Array.filter(self.prizes, function(prize)
 		return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
 	end)
-	table.sort(localPrizes, function(a, b) return a.index < b.index end)
+	Array.sortInPlaceBy(localPrizes, function(prize) return prize.index end)
 
 	local currencyEntries = WidgetUtil.collect(
 		{code = BASE_CURRENCY, totalKey = PRIZE_TYPE_BASE_CURRENCY .. 1},
@@ -687,9 +687,9 @@ end
 function BasePrizePool:_prizeCurrencyCode(prize)
 	if prize.type == PRIZE_TYPE_BASE_CURRENCY then
 		return BASE_CURRENCY
-	elseif prize.type == PRIZE_TYPE_LOCAL_CURRENCY then
-		return prize.data.currency
-	elseif prize.type == PRIZE_TYPE_PLAYER_SHARE or prize.type == PRIZE_TYPE_CLUB_SHARE then
+	elseif prize.type == PRIZE_TYPE_LOCAL_CURRENCY
+		or prize.type == PRIZE_TYPE_PLAYER_SHARE
+		or prize.type == PRIZE_TYPE_CLUB_SHARE then
 		return prize.data.currency
 	end
 	return nil
