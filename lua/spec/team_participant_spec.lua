@@ -829,6 +829,26 @@ describe('Team Participant', function()
 		end)
 	end)
 
+	describe('individual prize value', function()
+		local Repository = require('Module:TeamParticipants/Repository')
+
+		it('prefers player share over total prize money', function()
+			local value = Repository._individualPrizeValue{
+				prizemoney = 400000,
+				extradata = {playershare = 250000},
+			}
+			assert.are_equal(250000, value)
+		end)
+
+		it('falls back to total prize money when no player share', function()
+			local value = Repository._individualPrizeValue{prizemoney = 400000, extradata = {}}
+			assert.are_equal(400000, value)
+		end)
+
+		it('is nil when neither is present', function()
+			assert.is_nil(Repository._individualPrizeValue{extradata = {}})
+		end)
+	end)
 
 end)
 
