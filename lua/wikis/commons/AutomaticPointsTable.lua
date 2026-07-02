@@ -70,7 +70,7 @@ local AutomaticPointsTable = Class.new(
 )
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function AutomaticPointsTable.run(frame)
 	local pointsTable = AutomaticPointsTable(frame):process()
 	return pointsTable:display()
@@ -360,7 +360,7 @@ function AutomaticPointsTable:process()
 	return self
 end
 
----@return Widget
+---@return VNode
 function AutomaticPointsTable:display()
 	return AutomaticPointsTableWidget{
 		opponents = self.opponents,
