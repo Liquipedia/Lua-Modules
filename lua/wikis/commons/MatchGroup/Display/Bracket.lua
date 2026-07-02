@@ -20,8 +20,8 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
+local BracketOpponentEntry = Lua.import('Module:Widget/Match/Bracket/OpponentEntry')
 local MatchInfoIcon = Lua.import('Module:Widget/Match/InfoIcon')
 
 local NON_BREAKING_SPACE = '&nbsp;'
@@ -29,7 +29,7 @@ local OPPONENT_HEIGHT_PADDING = 4
 
 ---@class BracketConfigOptions
 ---@field MatchSummaryContainer function?
----@field OpponentEntry function?
+---@field OpponentEntry Component<BracketOpponentEntryProps>?
 ---@field forceShortName boolean?
 ---@field headerHeight number?
 ---@field headerMargin number?
@@ -65,7 +65,7 @@ local OPPONENT_HEIGHT_PADDING = 4
 ---@field matchesById table<string, MatchGroupUtilMatch>
 
 ---@class BracketDisplayMatchProps
----@field OpponentEntry function
+---@field OpponentEntry Component<BracketOpponentEntryProps>
 ---@field MatchSummaryContainer function
 ---@field match MatchGroupUtilMatch
 ---@field forceShortName boolean
@@ -119,7 +119,7 @@ function BracketDisplay.Bracket(props)
 	local propsConfig = props.config or {}
 	local config = {
 		MatchSummaryContainer = propsConfig.MatchSummaryContainer or DisplayHelper.DefaultMatchSummaryContainer,
-		OpponentEntry = propsConfig.OpponentEntry or BracketDisplay.OpponentEntry,
+		OpponentEntry = propsConfig.OpponentEntry or BracketOpponentEntry,
 		forceShortName = propsConfig.forceShortName or defaultConfig.forceShortName,
 		headerHeight = propsConfig.headerHeight or defaultConfig.headerHeight,
 		headerMargin = propsConfig.headerMargin or defaultConfig.headerMargin,
@@ -540,11 +540,11 @@ function BracketDisplay.NodeBody(props)
 				type = 'literal',
 				name = match.bracketData.qualLoseLiteral or '',
 			})
-		qualLoseNode = BracketDisplay.Qualified({
+		qualLoseNode = BracketDisplay.Qualified{
 			OpponentEntry = config.OpponentEntry,
 			height = config.opponentHeight,
 			opponent = opponent,
-		})
+		}
 			:css('margin-top', config.matchMargin + 6 .. 'px')
 			:css('margin-bottom', config.matchMargin .. 'px')
 	end
@@ -573,15 +573,13 @@ function BracketDisplay.Match(props)
 	local matchNode = mw.html.create('div'):addClass('brkts-match brkts-match-popup-wrapper')
 
 	for ix, opponent in ipairs(props.match.opponents) do
-		local opponentEntryNode = props.OpponentEntry({
+		local opponentEntryNode = props.OpponentEntry{
 			displayType = 'bracket',
 			forceShortName = props.forceShortName,
 			height = props.opponentHeight,
 			opponent = opponent,
-		})
-			:addClass(ix == #props.match.opponents and 'brkts-opponent-entry-last' or nil)
-			:css('height', props.opponentHeight .. 'px')
-		DisplayHelper.addOpponentHighlight(opponentEntryNode, opponent)
+			classes = ix == #props.match.opponents and {'brkts-opponent-entry-last'} or nil,
+		}
 		matchNode:node(opponentEntryNode)
 	end
 
@@ -610,17 +608,15 @@ function BracketDisplay.Match(props)
 end
 
 ---Display component for a qualification spot.
----@param props {OpponentEntry: function, height: number, opponent: standardOpponent}
+---@param props {OpponentEntry: Component<BracketOpponentEntryProps>, height: number, opponent: standardOpponent}
 ---@return Html
 function BracketDisplay.Qualified(props)
-	local opponentEntryNode = props.OpponentEntry({
+	local opponentEntryNode = props.OpponentEntry{
 		displayType = 'bracket-qualified',
 		height = props.height,
 		opponent = props.opponent,
-	})
-		:addClass('brkts-opponent-entry-last')
-		:css('height', props.height .. 'px')
-	DisplayHelper.addOpponentHighlight(opponentEntryNode, props.opponent)
+		classes = {'brkts-opponent-entry-last'},
+	}
 
 	return mw.html.create('div'):addClass('brkts-qualified')
 		:node(opponentEntryNode)
@@ -814,26 +810,6 @@ function BracketDisplay.getRunnerUpOpponent(match, bracketResetMatch)
 				return place == 2
 			end) or nil
 	end
-end
-
---[[
-Display component for an opponent in a bracket match. Shows the name and flag
-of the opponent, as well as the opponent's scores.
-
-This is the default opponent entry component. Specific wikis may override this
-by passing in a different props.OpponentEntry in the Bracket component.
-]]
----@param props {opponent: standardOpponent, displayType: string, forceShortName: boolean?, height: number}
----@return Html
-function BracketDisplay.OpponentEntry(props)
-	local opponentEntry = OpponentDisplay.BracketOpponentEntry(
-		props.opponent,
-		{forceShortName = props.forceShortName, showTbd = false}
-	)
-	if props.displayType == 'bracket' then
-		opponentEntry:addScores(props.opponent)
-	end
-	return opponentEntry.root
 end
 
 return BracketDisplay

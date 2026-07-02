@@ -8,9 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local DisplayUtil = Lua.import('Module:DisplayUtil')
-local Faction = Lua.import('Module:Faction')
 local Logic = Lua.import('Module:Logic')
 local Math = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
@@ -19,7 +17,7 @@ local TypeUtil = Lua.import('Module:TypeUtil')
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local BlockTeam = Lua.import('Module:Widget/TeamDisplay/Block')
 local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
 
@@ -30,100 +28,6 @@ local OpponentDisplay = {propTypes = {}, types = {}}
 
 OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid', 'icon', 'dynamic')
 ---@alias teamStyle 'standard'|'short'|'bracket'|'hybrid'|'icon'|'dynamic'
-
----Display component for an opponent entry appearing in a bracket match.
----@class BracketOpponentEntry
----@operator call(...): BracketOpponentEntry
----@field content Html
----@field root Html
-OpponentDisplay.BracketOpponentEntry = Class.new(
-	---@param self self
-	---@param opponent standardOpponent
-	---@param options {forceShortName: boolean, showTbd: boolean}
-	function(self, opponent, options)
-		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
-
-		if opponent.type == Opponent.team then
-			if options.showTbd ~= false or not Opponent.isTbd(opponent) then
-				self:createTeam(opponent.template or 'tbd', options)
-			end
-		elseif Opponent.typeIsParty(opponent.type) then
-			self:createPlayers(opponent, options)
-		elseif opponent.type == Opponent.literal then
-			self:createLiteral(opponent.name or '')
-		end
-
-		self.root = mw.html.create('div'):addClass('brkts-opponent-entry')
-			:node(self.content)
-	end
-)
-
----Creates team display as BracketOpponentEntry
----@param template string
----@param options {forceShortName: boolean}
-function OpponentDisplay.BracketOpponentEntry:createTeam(template, options)
-	options = options or {}
-	local forceShortName = options.forceShortName
-
-	local opponentNode = OpponentDisplay.BlockTeamContainer{
-		showLink = false,
-		style = forceShortName and 'short' or 'dynamic',
-		template = template,
-	}
-
-	self.content:node(opponentNode)
-end
-
----Creates party display as BracketOpponentEntry
----@param opponent standardOpponent
----@param options {showTbd: boolean?}
-function OpponentDisplay.BracketOpponentEntry:createPlayers(opponent, options)
-	local playerNode = OpponentDisplay.BlockPlayers({
-		opponent = opponent,
-		overflow = 'ellipsis',
-		showLink = false,
-		showTbd = options.showTbd,
-	})
-	self.content:node(playerNode)
-
-	if opponent.type == Opponent.solo then
-		self.content:addClass(Faction.bgClass(opponent.players[1].faction))
-	end
-end
-
----Creates literal display as BracketOpponentEntry
----@param name string
-function OpponentDisplay.BracketOpponentEntry:createLiteral(name)
-	local literal = OpponentDisplay.BlockLiteral({
-		name = name,
-		overflow = 'ellipsis',
-	})
-	self.content:node(literal)
-end
-
----Adds scores to BracketOpponentEntry
----@param opponent standardOpponent
-function OpponentDisplay.BracketOpponentEntry:addScores(opponent)
-	local score1Node = OpponentDisplay.BracketScore({
-		isWinner = opponent.placement == 1 or opponent.advances,
-		scoreText = OpponentDisplay.InlineScore(opponent),
-	})
-	self.root:node(score1Node)
-
-	local score2Node
-	if opponent.score2 then
-		score2Node = OpponentDisplay.BracketScore({
-			isWinner = opponent.placement2 == 1,
-			scoreText = OpponentDisplay.InlineScore2(opponent),
-		})
-	end
-	self.root:node(score2Node)
-
-	if (opponent.placement2 or opponent.placement or 0) == 1
-		or opponent.advances then
-		self.content:addClass('brkts-opponent-win')
-	end
-end
 
 ---@class InlineOpponentProps
 ---@field flip boolean?
@@ -211,7 +115,7 @@ function OpponentDisplay.BlockOpponent(props)
 
 	if opponent.type == Opponent.team then
 		if props.showTbd == false and Opponent.isTbd(opponent) then
-			return HtmlWidgets.Fragment{}
+			return Html.Fragment{}
 		end
 		return OpponentDisplay.BlockTeamContainer{
 			flip = props.flip,
@@ -237,9 +141,9 @@ function OpponentDisplay.BlockOpponent(props)
 end
 
 ---@param props BlockOpponentProps
----@return Widget
+---@return VNode
 function OpponentDisplay.BlockPlayers(props)
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = Array.extend('block-players-wrapper', props.additionalClasses),
 		children = OpponentDisplay.getBlockPlayerNodes(props)
 	}
@@ -302,11 +206,11 @@ OpponentDisplay.propTypes.BlockLiteral = {
 
 ---Displays the name of a literal opponent as a block element.
 ---@param props {flip: boolean?, name: string, overflow: OverflowModes, additionalClasses: string[]?}
----@return Widget
+---@return VNode
 function OpponentDisplay.BlockLiteral(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockLiteral)
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = Array.extend(
 			'brkts-opponent-block-literal',
 			props.flip and 'flipped' or nil,
@@ -325,15 +229,15 @@ OpponentDisplay.propTypes.BlockScore = {
 
 ---Displays a score within the context of a block element.
 ---@param props {isWinner: boolean?, scoreText: string|number?, additionalClasses: string[]?}
----@return Widget
+---@return VNode
 function OpponentDisplay.BlockScore(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockScore)
 
 	local scoreText = props.scoreText
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = props.additionalClasses,
-		children = props.isWinner and HtmlWidgets.B{children = scoreText} or scoreText
+		children = props.isWinner and Html.B{children = scoreText} or scoreText
 	}
 end
 
@@ -367,29 +271,6 @@ function OpponentDisplay.InlineScore2(opponent)
 	else
 		return opponent.status2 or ''
 	end
-end
-
-OpponentDisplay.propTypes.BracketScore = {
-	isWinner = 'boolean?',
-	scoreText = 'any',
-}
-
----Displays a score within the context of a bracket opponent entry.
----@param props {isWinner: boolean?, scoreText: string|number?}
----@return Html
-function OpponentDisplay.BracketScore(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BracketScore)
-
-	local scoreText = props.scoreText
-	if props.isWinner then
-		scoreText = '<b>' .. scoreText .. '</b>'
-	end
-
-	return mw.html.create('div'):addClass('brkts-opponent-score-outer')
-		:node(
-			mw.html.create('div'):addClass('brkts-opponent-score-inner')
-				:wikitext(scoreText)
-		)
 end
 
 return OpponentDisplay
