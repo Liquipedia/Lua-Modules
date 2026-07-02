@@ -115,9 +115,8 @@ describe('prize pool', function()
 	it('reads the playerShare config flag and raw player amounts', function()
 		local ppt = PrizePool(clubSharePoolArgs):create()
 		assert.is_true(ppt.options.playerShare)
-		-- Raw player share is captured on the opponent, in the input (local) currency.
-		assert.are_equal(120000, ppt.placements[1].opponents[1].prizeRewards.playerShareInput)
-		assert.are_equal(50000, ppt.placements[2].opponents[1].prizeRewards.playerShareInput)
+		assert.are_equal(120000, ppt.placements[1].prizeRewards.playerShareInput)
+		assert.are_equal(50000, ppt.placements[2].prizeRewards.playerShareInput)
 	end)
 
 	describe('prize pool is correct', function()
