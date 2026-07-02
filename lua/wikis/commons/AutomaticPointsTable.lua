@@ -137,7 +137,10 @@ end
 function AutomaticPointsTable:parseTournaments(args)
 	local tournaments = {}
 	for key, tournament in Table.iter.pairsByPrefix(args, 'tournament') do
-		local tournamentData = Tournament.getTournament(tournament)
+		local tournamentData = assert(
+			Tournament.getTournament(tournament),
+			'AutomaticPointsTable.parseTournaments: Invalid tournament \'' .. tournament .. '\''
+		)
 		Array.appendWith(tournaments, {
 			tournament = tournamentData,
 			usePoints2 = Logic.readBool(args[key .. 'Points2'])
@@ -159,7 +162,10 @@ function AutomaticPointsTable:parseOpponents(args, tournaments)
 			background = parsedArgs.bg,
 			note = parsedArgs.note,
 		}
-		assert(not Opponent.isTbd(parsedOpponent.opponent))
+		assert(
+			not Opponent.isTbd(parsedOpponent.opponent),
+			'AutomaticPointsTable.parseOpponents: TBD opponent cannot be used'
+		)
 		local aliases = self:parseAliases(parsedArgs, parsedOpponent.opponent, #tournaments)
 		local resolveDate = DateExt.readTimestamp(args.date) or DateExt.getContextualDateOrNow()
 		parsedOpponent.opponent = Opponent.resolve(parsedOpponent.opponent, resolveDate, {syncPlayer = true})
