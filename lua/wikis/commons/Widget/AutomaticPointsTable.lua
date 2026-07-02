@@ -21,7 +21,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local QUALIFIED_ICON = IconFa{iconName = 'qualified', color = 'forest-green-text', hover = 'Qualified'}
 
 ---@class AutomaticPointsTableWidgetProps
----@field opponents AutomaticPointsTableOpponent
+---@field opponents AutomaticPointsTableOpponent[]
 ---@field tournaments StandardTournament[]
 ---@field limit integer
 ---@field positionBackgrounds string[]
