@@ -62,12 +62,12 @@ local EXCHANGE_SUMMARY_PRECISION = 5
 
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
+local PRIZE_TYPE_PLAYER_SHARE = 'PLAYER_SHARE'
+local PRIZE_TYPE_CLUB_SHARE = 'CLUB_SHARE'
 local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 local PRIZE_TYPE_POINTS = 'POINTS'
 local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
 local PRIZE_TYPE_FREETEXT = 'FREETEXT'
-local PRIZE_TYPE_PLAYER_SHARE = 'PLAYER_SHARE'
-local PRIZE_TYPE_CLUB_SHARE = 'CLUB_SHARE'
 
 -- Alignment for the fixed (non-prize) columns; prize columns carry `align` on their prize type.
 local PLACE_COLUMN_ALIGN = 'center'
@@ -377,6 +377,40 @@ BasePrizePool.prizeTypes = {
 			end
 		end,
 	},
+	[PRIZE_TYPE_PLAYER_SHARE] = {
+		sortOrder = 22,
+		align = 'right',
+
+		headerDisplay = function (data)
+			return TableCellHeader{children = {data.title}}
+		end,
+
+		rowDisplay = function (headerData, data)
+			if Logic.isNumeric(data) then
+				return TableCell{children = {
+					Currency.display(headerData.currency, data,
+						{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
+				}}
+			end
+		end,
+	},
+	[PRIZE_TYPE_CLUB_SHARE] = {
+		sortOrder = 24,
+		align = 'right',
+
+		headerDisplay = function (data)
+			return TableCellHeader{children = {data.title}}
+		end,
+
+		rowDisplay = function (headerData, data)
+			if Logic.isNumeric(data) then
+				return TableCell{children = {
+					Currency.display(headerData.currency, data,
+						{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
+				}}
+			end
+		end,
+	},
 	[PRIZE_TYPE_FREETEXT] = {
 		sortOrder = 60,
 		align = 'left',
@@ -460,11 +494,54 @@ function BasePrizePool:create()
 				placement:_setBaseFromRewards(Array.filter(self.prizes, canConvertCurrency), BasePrizePool.prizeTypes)
 			end
 		end
+
+		if self.options.playerShare then
+			self:_buildShareColumns()
+		end
 	end
 
 	table.sort(self.prizes, BasePrizePool._comparePrizes)
 
 	return self
+end
+
+--- Adds a PLAYER_SHARE and CLUB_SHARE prize per currency (USD-first) and derives
+--- each opponent's player/club amounts. Requires a base currency and player share input.
+---@protected
+function BasePrizePool:_buildShareColumns()
+	-- Currency order is built explicitly (USD-first) because self.prizes is not yet
+	-- sorted at this point in create(), so _getCurrencies() would not be USD-first.
+	local localPrizes = Array.filter(self.prizes, function(prize)
+		return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
+	end)
+	table.sort(localPrizes, function(a, b) return a.index < b.index end)
+
+	local currencyEntries = WidgetUtil.collect(
+		{code = BASE_CURRENCY, totalKey = PRIZE_TYPE_BASE_CURRENCY .. 1},
+		unpack(Array.map(localPrizes, function(prize)
+			return {code = prize.data.currency, totalKey = prize.id}
+		end))
+	)
+
+	local inputCode = localPrizes[1] and localPrizes[1].data.currency or BASE_CURRENCY
+	local localData = localPrizes[1] and localPrizes[1].data or nil
+	local clubTitle = Logic.emptyOr(self.args.clubshare, 'Club Reward')
+	local roundPrecision = self.options.currencyRoundPrecision
+
+	Array.forEach(currencyEntries, function(entry, shareIndex)
+		self:addPrize(PRIZE_TYPE_PLAYER_SHARE, shareIndex,
+			{currency = entry.code, roundPrecision = roundPrecision, title = 'Player Prize'})
+		self:addPrize(PRIZE_TYPE_CLUB_SHARE, shareIndex,
+			{currency = entry.code, roundPrecision = roundPrecision, title = clubTitle})
+	end)
+
+	local plan = Array.map(currencyEntries, function(entry, shareIndex)
+		return {shareIndex = shareIndex, code = entry.code, totalKey = entry.totalKey}
+	end)
+
+	Array.forEach(self.placements, function(placement)
+		placement:_setSharesFromPlayerShare(plan, inputCode, localData)
+	end)
 end
 
 ---@protected
@@ -611,6 +688,8 @@ function BasePrizePool:_prizeCurrencyCode(prize)
 	if prize.type == PRIZE_TYPE_BASE_CURRENCY then
 		return BASE_CURRENCY
 	elseif prize.type == PRIZE_TYPE_LOCAL_CURRENCY then
+		return prize.data.currency
+	elseif prize.type == PRIZE_TYPE_PLAYER_SHARE or prize.type == PRIZE_TYPE_CLUB_SHARE then
 		return prize.data.currency
 	end
 	return nil

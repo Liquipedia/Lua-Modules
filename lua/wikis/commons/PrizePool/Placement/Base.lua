@@ -20,6 +20,8 @@ local BASE_CURRENCY = 'USD'
 local LOCAL_CURRENCY_VARIABLE_POST_FIX = 'local'
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
+local PRIZE_TYPE_PLAYER_SHARE = 'PLAYER_SHARE'
+local PRIZE_TYPE_CLUB_SHARE = 'CLUB_SHARE'
 local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
 local RAW_PLAYER_SHARE_KEY = 'playerShareInput'
 
@@ -215,6 +217,42 @@ function BasePlacement:_setBaseFromRewards(prizesToUse, prizeTypes)
 		end)
 
 		opponent.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] = baseReward
+	end)
+end
+
+--- Derives per-currency player and club share rewards from the raw player share input.
+--- Player is the raw input in the input currency, or exchanged from the local input into
+--- the base currency; club is total − player. Skipped for currencies without a positive total.
+---@param plan {shareIndex: integer, code: string, totalKey: string}[]
+---@param inputCode string
+---@param localData table?
+function BasePlacement:_setSharesFromPlayerShare(plan, inputCode, localData)
+	Array.forEach(self.opponents, function(opponent)
+		local raw = opponent.prizeRewards[RAW_PLAYER_SHARE_KEY] or self.prizeRewards[RAW_PLAYER_SHARE_KEY]
+		if not raw then
+			return
+		end
+
+		Array.forEach(plan, function(entry)
+			local total = tonumber(opponent.prizeRewards[entry.totalKey] or self.prizeRewards[entry.totalKey])
+			if not total or total <= 0 then
+				return
+			end
+
+			local player
+			if entry.code == inputCode then
+				player = raw
+			elseif entry.code == BASE_CURRENCY and localData then
+				player = self.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToBaseCurrency(
+					localData, raw, opponent.date, self.parent.options.currencyRatePerOpponent)
+			end
+			if not player then
+				return
+			end
+
+			opponent.prizeRewards[PRIZE_TYPE_PLAYER_SHARE .. entry.shareIndex] = player
+			opponent.prizeRewards[PRIZE_TYPE_CLUB_SHARE .. entry.shareIndex] = total - player
+		end)
 	end)
 end
 

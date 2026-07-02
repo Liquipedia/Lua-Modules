@@ -119,6 +119,41 @@ describe('prize pool', function()
 		assert.are_equal(50000, ppt.placements[2].prizeRewards.playerShareInput)
 	end)
 
+	it('adds per-currency player/club share prizes in total→player→club order', function()
+		local ppt = PrizePool(clubSharePoolArgs):create()
+		local ids = {}
+		for _, prize in ipairs(ppt.prizes) do
+			table.insert(ids, prize.id)
+		end
+		assert.are_same(
+			{'BASE_CURRENCY1', 'LOCAL_CURRENCY1', 'PLAYER_SHARE1', 'PLAYER_SHARE2', 'CLUB_SHARE1', 'CLUB_SHARE2'},
+			ids
+		)
+		-- currency codes are carried on the share prizes (USD-first, then the local)
+		local byId = {}
+		for _, prize in ipairs(ppt.prizes) do byId[prize.id] = prize end
+		assert.are_equal('USD', byId.PLAYER_SHARE1.data.currency)
+		assert.are_equal('CNY', byId.PLAYER_SHARE2.data.currency)
+		assert.are_equal('USD', byId.CLUB_SHARE1.data.currency)
+		assert.are_equal('CNY', byId.CLUB_SHARE2.data.currency)
+		-- enumeration is unaffected (deduped by code, USD-first)
+		assert.are_same({'USD', 'CNY'}, ppt:_getCurrencies())
+	end)
+
+	it('derives club as total minus player, per currency', function()
+		local ppt = PrizePool(clubSharePoolArgs):create()
+		local placement = ppt.placements[1]
+		local rewards = placement.opponents[1].prizeRewards
+		-- Local (CNY, input currency): player is the raw input, club the remainder.
+		-- The CNY total is at placement level (localprize is a slot-level input).
+		local cnyTotal = placement.prizeRewards.LOCAL_CURRENCY1
+		assert.are_equal(120000, rewards.PLAYER_SHARE2)
+		assert.are_equal(cnyTotal - rewards.PLAYER_SHARE2, rewards.CLUB_SHARE2)
+		-- Base (USD): player exchanged from the local input; club still total − player.
+		assert.are_equal(rewards.BASE_CURRENCY1 - rewards.PLAYER_SHARE1, rewards.CLUB_SHARE1)
+		assert.is_true(rewards.PLAYER_SHARE1 > 0)
+	end)
+
 	describe('prize pool is correct', function()
 		it('display', function()
 			GoldenTest('prize_pool', tostring(PrizePool(prizePoolArgs):create():build()))
