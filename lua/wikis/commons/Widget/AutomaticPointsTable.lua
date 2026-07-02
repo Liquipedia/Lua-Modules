@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
+local String = Lua.import('Module:StringUtils')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Component = Lua.import('Module:Widget/Component')
@@ -160,21 +161,39 @@ function AutomaticPointsTableWidget.createRow(props, opponent, opponentIndex)
 						children = resultDisplay,
 					},
 					props.tournaments[resultIndex].extradata.includesDeduction and AutomaticPointsTableWidget._createRowCell{
-						children = result.deduction and Dialog{
-							trigger = Html.Span{
-								classes = {'deduction-box'},
-								children = result.deduction
-							},
-							title = {
-								'Deductions for ',
-								OpponentDisplay.InlineOpponent{opponent = opponent.opponent},
-							},
-							children = result.note
-						} or nil
+						children = AutomaticPointsTableWidget._createDeductionDisplay(
+							opponent.opponent, result.deduction, result.note
+						)
 					} or nil
 				}
 			end)
 		)
+	}
+end
+
+---@private
+---@param opponent standardOpponent
+---@param amount number?
+---@param note string?
+---@return VNode?
+function AutomaticPointsTableWidget._createDeductionDisplay(opponent, amount, note)
+	if amount == nil then
+		return
+	end
+	local deductionDisplay = Html.Span{
+		classes = {'deduction-box'},
+		children = amount
+	}
+	if String.isEmpty(note) then
+		return deductionDisplay
+	end
+	return Dialog{
+		trigger = deductionDisplay,
+		title = {
+			'Deductions for ',
+			OpponentDisplay.InlineOpponent{opponent = opponent},
+		},
+		children = note
 	}
 end
 
