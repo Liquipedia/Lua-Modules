@@ -278,6 +278,22 @@ describe('prize pool', function()
 		assert.is_nil(output:find('switch-pill', 1, true))
 	end)
 
+	it('stores the USD player share in placement extradata', function()
+		local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
+		TeamTemplateMock.setUp()
+		PrizePool(clubShareUsdPoolArgs):create():build()
+		TeamTemplateMock.tearDown()
+
+		local found = false
+		for _, call in ipairs(LpdbPlacementStub.calls) do
+			local extradata = call.vals[2] and call.vals[2].extradata
+			if type(extradata) == 'string' and extradata:find('"playershare":250000', 1, true) then
+				found = true
+			end
+		end
+		assert.is_true(found)
+	end)
+
 	describe('enabling/disabling lpdb storage', function()
 		it('normal behavior', function()
 			PrizePool(prizePoolArgs):create():build()
