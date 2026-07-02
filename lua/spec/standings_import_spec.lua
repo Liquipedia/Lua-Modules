@@ -54,7 +54,7 @@ describe('Standings import from matches', function()
 		end)
 	end
 
-	local swissScoreMapper = function(opponent)
+	local function swissScoreMapper(opponent)
 		return opponent.placement == 1 and 1 or 0
 	end
 
