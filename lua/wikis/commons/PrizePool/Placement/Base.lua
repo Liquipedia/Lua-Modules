@@ -94,7 +94,7 @@ function BasePlacement:_readPrizeRewards(args)
 	-- PLAYER_SHARE / CLUB_SHARE prizes are added after placements are parsed. It is
 	-- entered in the pool's input currency and converted later in _setSharesFromPlayerShare.
 	if self.parent.options.playerShare and args.playershare then
-		rewards[RAW_PLAYER_SHARE_KEY] = tonumber((tostring(args.playershare):gsub('[^%d.]', '')))
+		rewards[RAW_PLAYER_SHARE_KEY] = self.parent._parseInteger(args.playershare)
 	end
 
 	return rewards
