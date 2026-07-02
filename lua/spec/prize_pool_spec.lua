@@ -51,6 +51,16 @@ describe('prize pool', function()
 		[2] = {localprize = '70,000', playershare = '50,000', [1] = {'t1'}},
 	}
 
+	local clubShareUsdPoolArgs = {
+		type = {type = 'team'},
+		currencyroundprecision = 0,
+		lpdb_prefix = 'csu',
+		import = false,
+		playershare = true,
+		[1] = {usdprize = '400,000', playershare = '250,000', [1] = {'mouz'}},
+		[2] = {usdprize = '130,000', playershare = '100,000', [1] = {'t1'}},
+	}
+
 	it('parameters are correctly parsed', function()
 		local ppt = PrizePool(prizePoolArgs):create()
 
@@ -154,9 +164,27 @@ describe('prize pool', function()
 		assert.is_true(rewards.PLAYER_SHARE1 > 0)
 	end)
 
+	it('tags player/club money cells with their currency toggle index', function()
+		local output = tostring(PrizePool(Table.merge(clubSharePoolArgs, {storelpdb = false})):create():build())
+		-- USD columns (toggle area 1) and CNY columns (toggle area 2) both present.
+		assert.is_truthy(output:find('data-toggle-area-content="1"', 1, true))
+		assert.is_truthy(output:find('data-toggle-area-content="2"', 1, true))
+		assert.is_truthy(output:find('Player Prize', 1, true))
+		assert.is_truthy(output:find('Club Reward', 1, true))
+	end)
+
+	it('renders club-share columns without a currency toggle for a single currency', function()
+		local output = tostring(PrizePool(Table.merge(clubShareUsdPoolArgs, {storelpdb = false})):create():build())
+		assert.is_truthy(output:find('Player Prize', 1, true))
+		assert.is_truthy(output:find('Club Reward', 1, true))
+		assert.is_nil(output:find('switch-pill', 1, true))
+	end)
+
 	describe('prize pool is correct', function()
 		it('display', function()
 			GoldenTest('prize_pool', tostring(PrizePool(prizePoolArgs):create():build()))
+			local clubShareNoStore = Table.merge(clubSharePoolArgs, {storelpdb = false})
+			GoldenTest('prize_pool_club_share', tostring(PrizePool(clubShareNoStore):create():build()))
 		end)
 
 		it('lpdb storage', function()
