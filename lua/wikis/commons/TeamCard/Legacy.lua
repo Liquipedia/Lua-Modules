@@ -259,10 +259,11 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
 		played = false
 	end
 
-	-- noVarDefault: subs/formers without an explicit played/result are not counted for results,
-	-- but keep their normal display (no DNP label). An explicit played/result=true overrides.
+	-- noVarDefault: players entered via a sub/former source (s*/f* groups, or t2/t3 sub/former
+	-- tabs) without an explicit played/result are not counted for results, but keep their normal
+	-- display (no DNP label). An explicit played/result=true overrides.
 	local results
-	if (status == 'sub' or status == 'former')
+	if (sourceGroup == 's' or sourceGroup == 'f')
 		and Logic.readBool(tcArgs.noVarDefault)
 		and explicitPlayResult ~= true then
 		results = false
@@ -318,7 +319,7 @@ function LegacyTeamCard.mapCoach(tcArgs, prefix, sourceGroup)
 	local results
 	if Logic.readBool(tcArgs[prefix .. 'dnp']) then
 		results = false
-	elseif (status == 'sub' or status == 'former')
+	elseif (sourceGroup == 'sc' or sourceGroup == 'fc')
 		and Logic.readBool(tcArgs.noVarDefault)
 		and explicitPlayResult ~= true then
 		results = false
