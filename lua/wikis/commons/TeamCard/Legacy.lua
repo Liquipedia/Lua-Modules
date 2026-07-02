@@ -247,7 +247,7 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
 		status = 'former'
 	end
 
-	-- subdnpdefault: subs entered via the s* group with no explicit result are shown as DNP
+	-- subdnpdefault: subs entered via the s* group with no explicit played/result are shown as DNP
 	-- (visible label + excluded from results). Restricted to real s* input (not tXpY tabs).
 	if (
 		explicitPlayResult == nil and

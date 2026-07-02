@@ -237,7 +237,7 @@ describe('TeamCard Legacy', function()
             assert.is_true(p.played)
         end)
 
-        it('subdnpdefault alone (no noVarDefault) does not exclude subs from results', function()
+        it('subdnpdefault sets played=false and leaves results unset (exclusion cascades from played)', function()
             local p = LegacyTeamCard.mapPlayer({s1 = 'X', subdnpdefault = 'true'}, 's1', 's')
             assert.is_false(p.played)
             assert.is_nil(p.results)
