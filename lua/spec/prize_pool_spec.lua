@@ -40,15 +40,15 @@ describe('prize pool', function()
 	}
 
 	local clubSharePoolArgs = {
-		type = {type = 'team'},
+		type = {type = 'solo'},
 		currencyroundprecision = 0,
 		lpdb_prefix = 'cs',
 		import = false,
 		playershare = true,
 		localcurrency = 'cny',
 		autoexchange = true,
-		[1] = {localprize = '160,000', playershare = '120,000', [1] = {'mouz'}},
-		[2] = {localprize = '70,000', playershare = '50,000', [1] = {'t1'}},
+		[1] = {localprize = '160,000', playershare = '120,000', [1] = {'Serral', flag = 'fi'}},
+		[2] = {localprize = '70,000', playershare = '50,000', [1] = {'Reynor', flag = 'it'}},
 	}
 
 	local clubShareUsdPoolArgs = {
