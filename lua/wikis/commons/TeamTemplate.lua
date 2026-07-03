@@ -86,7 +86,7 @@ does not exist.
 
 Throws if `team` is `nil`.
 ]]
----@param team string?
+---@param team string
 ---@param date string|number?
 ---@return teamTemplateData?
 function TeamTemplate.getRawOrNil(team, date)
