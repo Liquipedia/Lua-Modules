@@ -26,6 +26,7 @@ local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournam
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local SIZE_AGENT = '20px'
 
@@ -133,10 +134,10 @@ function CustomPlayer:createBottomContent()
 		---@cast teamPage -nil
 
 		return Html.Fragment{
-			children = {
+			children = WidgetUtil.collect(
 				MatchTicker.player{recentLimit = 3},
 				UpcomingTournaments.team{name = teamPage}
-			}
+			)
 		}
 	end
 end

@@ -5,15 +5,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
+
+local Html = Lua.import('Module:Widget/Html')
+
 local HiddenSort = {}
 
 ---Creates a hiddensort span
----@param sortText string|number|nil
----@return Html
+---@param sortText string|number?
+---@return VNode
 function HiddenSort.run(sortText)
-	return mw.html.create('span')
-		:css('display', 'none')
-		:wikitext(sortText)
+	return Html.Span{
+		css = {display = 'none'},
+		children = sortText
+	}
 end
 
 return HiddenSort

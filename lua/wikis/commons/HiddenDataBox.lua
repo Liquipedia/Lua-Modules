@@ -14,7 +14,6 @@ local Game = Lua.import('Module:Game')
 local I18n = Lua.import('Module:I18n')
 local Info = Lua.import('Module:Info', {loadData = true})
 local MatchTicker = Lua.import('Module:MatchTicker')
-local MatchTickerEntityDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
 local Namespace = Lua.import('Module:Namespace')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local String = Lua.import('Module:StringUtils')
@@ -229,7 +228,7 @@ function HiddenDataBox._matchTicker(supressMatchTicker)
 		return nil
 	end
 
-	local result = Logic.tryCatch(
+	return Logic.tryCatch(
 		function()
 			local matchTicker = MatchTicker{
 				tournament = mw.title.getCurrentTitle().prefixedText,
@@ -238,23 +237,14 @@ function HiddenDataBox._matchTicker(supressMatchTicker)
 				ongoing = true,
 				hideTournament = true,
 				queryByParent = false,
+				entityStyle = true,
 			}
-			matchTicker:query()
-			return matchTicker
+			return matchTicker:query():create()
 		end,
 		function()
 			return nil
 		end
 	)
-
-	if not result or not result.matches or #result.matches == 0 then
-		return nil
-	end
-
-	return MatchTickerEntityDisplay.Container{
-		config = result.config,
-		matches = result.matches,
-	}:create()
 end
 
 return Class.export(HiddenDataBox, {exports = {'run'}})

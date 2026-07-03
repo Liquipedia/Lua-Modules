@@ -393,6 +393,9 @@ liquipedia.togglearea = {
 	init: function() {
 		document.querySelectorAll( '.toggle-area' ).forEach( ( area ) => {
 			area.querySelectorAll( '.toggle-area-button' ).forEach( ( btn ) => {
+				if ( btn.closest( '.toggle-area' ) !== area ) {
+					return;
+				}
 				btn.addEventListener( 'click', () => {
 					area.classList.remove( 'toggle-area-' + area.dataset.toggleArea );
 					area.dataset.toggleArea = btn.dataset.toggleAreaBtn;
