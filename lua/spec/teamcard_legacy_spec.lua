@@ -499,7 +499,7 @@ describe('TeamCard Legacy', function()
         local Template = require('Module:Template')
         local LegacyTeamCard = require('Module:TeamCard/Legacy')
 
-        it('passes minimumplayers = defaultRowNumber + extraRows + sum(p_extra)', function()
+        it('Ignores defaultRowNumber and extraRows', function()
             local TPParser = require('Module:TeamParticipants/Parse/Wiki')
             local captured
             local stubParse = stub(TPParser, 'parseWikiInput', function(args)
@@ -513,7 +513,7 @@ describe('TeamCard Legacy', function()
                 {__source = 'card', team = 'A', defaultRowNumber = '5', extraRows = '1'}, 'LegacyTeamCard')
 
             LegacyTeamCard.run()
-            assert.are_equal('8', tostring(captured.minimumplayers))
+            assert.are_equal('0', tostring(captured.minimumplayers))
 
             stubParse:revert()
         end)
