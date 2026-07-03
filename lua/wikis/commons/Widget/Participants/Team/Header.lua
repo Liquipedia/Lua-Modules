@@ -104,7 +104,7 @@ function ParticipantsTeamHeader._renderLabel(participant)
 	end
 
 	if qualificationData.method == 'qual' then
-		labelText = 'Qualifier'
+		labelText = 'Qualified'
 	elseif qualificationData.method == 'invite' then
 		labelText = 'Invited'
 	else

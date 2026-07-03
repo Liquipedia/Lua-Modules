@@ -246,7 +246,7 @@ function OpponentDisplay.BlockPlayers(props)
 end
 
 ---@param props BlockOpponentProps
----@return Html[]
+---@return VNode[]
 function OpponentDisplay.getBlockPlayerNodes(props)
 	local opponent = props.opponent
 
@@ -258,7 +258,7 @@ function OpponentDisplay.getBlockPlayerNodes(props)
 			player = player,
 			team = player.team,
 			note = playerIndex == 1 and note or nil,
-		})):addClass(props.playerClass)
+		}))
 	end)
 end
 
@@ -346,6 +346,8 @@ function OpponentDisplay.InlineScore(opponent)
 			return ''
 		elseif opponent.score == -1 then
 			return ''
+		elseif opponent.scoreDisplay ~= nil then
+			return tostring(Math.round(opponent.scoreDisplay, 2))
 		else
 			return tostring(Math.round(opponent.score, 2))
 		end
