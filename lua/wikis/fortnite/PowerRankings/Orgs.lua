@@ -82,9 +82,6 @@ function PowerRankingsOrgs.main(frame)
 			pr = tonumber(args.wPR) or DEFAULT_WEIGHTS.pr,
 			cash = tonumber(args.wCash) or DEFAULT_WEIGHTS.cash,
 		},
-		updated = Logic.isNotEmpty(PowerRankingsData.updated)
-			and PowerRankingsData.updated .. ' ' .. DateExt.defaultTimezone
-			or nil,
 		displayUpdated = mw.getContentLanguage():formatDate('F j, Y - H:i') .. ' ' .. DateExt.defaultTimezone,
 	}
 	config.weightSum = config.weights.count + config.weights.pr + config.weights.cash
@@ -101,8 +98,7 @@ function PowerRankingsOrgs.main(frame)
 		return PlayerExt.syncPlayer{
 			pageName = pageName,
 			displayName = player.name,
-			--todo: test if "updated" works, else: team = PlayerExt.syncTeam(pageName),
-			team = PlayerExt.syncTeam(pageName, nil, config.updated),
+			team = PowerRankingsOrgs._fetchCurrentTeam(pageName),
 			rank = rank,
 			points = tonumber(player.points),
 		}
@@ -164,6 +160,35 @@ function PowerRankingsOrgs.main(frame)
 	PowerRankingsOrgs._fetchTeamFlags(teams)
 
 	return PowerRankingsOrgs._buildDisplay(teams, achievementsInfo, config)
+end
+
+---@param pageName string
+---@return string?
+function PowerRankingsOrgs._fetchCurrentTeam(pageName)
+	local today = DateExt.getContextualDateOrNow()
+
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('type'), Comparator.eq, 'teamhistory'),
+		ConditionNode(ColumnName('pagename'), Comparator.eq, (pageName:gsub(' ', '_'))),
+		ConditionNode(ColumnName('extradata_joindate'), Comparator.neq, ''),
+		ConditionNode(ColumnName('extradata_joindate'), Comparator.le, today),
+	}
+
+	local records = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = tostring(conditions),
+		query = 'information, extradata',
+		limit = 500,
+	})
+
+	local current = Array.filter(records, function(record)
+		return record.extradata.leavedate and today < record.extradata.leavedate
+	end)
+	if Logic.isEmpty(current) then return nil end
+
+	Array.sortInPlaceBy(current, function(record) return record.extradata.joindate end)
+	local entry = current[#current]
+
+	return TeamTemplate.resolve(entry.information:lower(), today)
 end
 
 ---@param teams FortniteRankingsTeam[]
