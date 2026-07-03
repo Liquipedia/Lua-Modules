@@ -12,6 +12,7 @@ local AgentNames = Lua.import('Module:AgentNames')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
@@ -70,6 +71,11 @@ local VALORANT_REGIONS = {'eu', 'na', 'ap', 'kr', 'latam', 'br', 'pbe1', 'esport
 ---@field roundsPlayed integer
 ---@field totalKastRounds integer
 ---@field damageDealt integer
+
+---@class ValorantSkirmishResult
+---@field players MGIParsedPlayer[]
+---@field scores number[]
+---@field winner number
 
 ---@param match table
 ---@param options table?
@@ -148,6 +154,51 @@ function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
+		skirmish = MatchFunctions.parseSkirmish(match, opponents),
+	}
+end
+
+---@param match table
+---@param opponents MGIParsedOpponent[]
+---@return ValorantSkirmishResult?
+function MatchFunctions.parseSkirmish(match, opponents)
+	local skirmishData = match.skirmish
+	if Logic.isEmpty(skirmishData) then
+		return
+	end
+
+	---@param playerName string?
+	---@param opponentIndex integer
+	---@return MGIParsedPlayer?
+	local function lookupPlayer(playerName, opponentIndex)
+		if Logic.isEmpty(playerName) then
+			return
+		end
+		---@cast playerName -nil
+		local link = Page.pageifyLink(playerName)
+		return Array.find(
+			opponents[opponentIndex].match2players,
+			function (match2player)
+				return match2player.name == link or match2player.displayname == link or match2player.displayname == playerName
+			end
+		)
+	end
+
+	local player1 = lookupPlayer(skirmishData.t1p1, 1)
+	local player2 = lookupPlayer(skirmishData.t2p1, 2)
+	if Logic.isEmpty(player1) or Logic.isEmpty(player2) then
+		return
+	end
+	local scores = Array.mapIndexes(function (index)
+		return tonumber(skirmishData['score' .. index])
+	end)
+	if #scores ~= 2 then
+		return
+	end
+	return {
+		players = {player1, player2},
+		scores = scores,
+		winner = tonumber(skirmishData.winner) or (match.finished and (scores[1] > scores[2] and 1 or 2) or nil)
 	}
 end
 
