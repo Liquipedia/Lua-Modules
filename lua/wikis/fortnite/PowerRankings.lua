@@ -18,6 +18,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local PowerRankingsData = Lua.import('Module:PowerRankings/Data', {loadData = true})
 
 local Condition = Lua.import('Module:Condition')
@@ -83,10 +84,9 @@ function PowerRankings.main(frame)
 		players = Array.sub(players, 1, limit)
 	end
 
-	local updated, updatedIso
+	local updated
 	if Logic.isNotEmpty(PowerRankingsData.updated) then
 		updated = PowerRankingsData.updated .. ' ' .. DateExt.defaultTimezone
-		updatedIso = DateExt.toYmdInUtc(PowerRankingsData.updated)
 	end
 
 	local rows = Array.map(players, function(entry)
@@ -95,7 +95,7 @@ function PowerRankings.main(frame)
 			pageName = Logic.nilIfEmpty(entry.link) or entry.name,
 		}
 		PlayerExt.syncPlayer(player)
-		local teamTemplate = PlayerExt.syncTeam(player.pageName, nil, {date = updatedIso})
+		local teamTemplate = PowerRankings._fetchCurrentTeam(player.pageName)
 
 		PowerRankings._store(player, entry)
 
@@ -134,6 +134,35 @@ function PowerRankings.main(frame)
 			TableWidgets.TableBody{children = rows},
 		},
 	}
+end
+
+---@param pageName string
+---@return string?
+function PowerRankings._fetchCurrentTeam(pageName)
+	local today = DateExt.getContextualDateOrNow()
+
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('type'), Comparator.eq, 'teamhistory'),
+		ConditionNode(ColumnName('pagename'), Comparator.eq, (pageName:gsub(' ', '_'))),
+		ConditionNode(ColumnName('extradata_joindate'), Comparator.neq, ''),
+		ConditionNode(ColumnName('extradata_joindate'), Comparator.le, today),
+	}
+
+	local records = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = tostring(conditions),
+		query = 'information, extradata',
+		limit = 500,
+	})
+
+	local current = Array.filter(records, function(record)
+		return record.extradata.leavedate and today < record.extradata.leavedate
+	end)
+	if Logic.isEmpty(current) then return nil end
+
+	Array.sortInPlaceBy(current, function(record) return record.extradata.joindate end)
+	local entry = current[#current]
+
+	return TeamTemplate.resolve(entry.information:lower(), today)
 end
 
 ---@param player standardPlayer
