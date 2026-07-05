@@ -12,8 +12,8 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 
-local League = Lua.import('Module:Infobox/League')
 local Injector = Lua.import('Module:Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
@@ -29,18 +29,19 @@ local CustomInjector = Class.new(Injector)
 local PLATFORMS = {
 	pc = 'PC',
 	mobile = 'Mobile',
-	cross = 'Cross-Platform',
 	default = 'Unknown',
 }
 
 local MODES = {
 	wf = 'Warfare',
+	warfare = 'Warfare',
+	operations = 'Operations',
 	op = 'Operations',
 	default = 'Unknown',
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -63,9 +64,9 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Platform', children = {args.platform}}
 		)
 	elseif id == 'customcontent' then
-		if Logic.isEmpty(args.map1) then return end
-		local gameSuffix = Logic.isNotEmpty(args.game) and ('/' .. args.game) or ''
 		local maps = self.caller:getAllArgsForBase(args, 'map')
+		if Logic.isEmpty(maps) then return end
+		local gameSuffix = Logic.isNotEmpty(args.game) and ('/' .. args.game) or ''
 		table.sort(maps)
 		local mapDisplays = Array.map(maps, function(map)
 			return Link{link = map .. gameSuffix, children = map}
