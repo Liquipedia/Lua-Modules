@@ -23,6 +23,7 @@ local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournam
 local Widgets = Lua.import('Module:Widget/All')
 local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LeagueoflegendsInfoboxPlayer: Person
 ---@operator call(Frame): LeagueoflegendsInfoboxPlayer
@@ -124,10 +125,10 @@ function CustomPlayer:createBottomContent()
 		local teamPage = TeamTemplate.getPageName(self.args.team)
 		---@cast teamPage -nil
 		return Html.Fragment{
-			children = {
+			children = WidgetUtil.collect(
 				MatchTicker.recent{team = teamPage},
-				UpcomingTournaments.team{name = teamPage},
-			}
+				UpcomingTournaments.team{name = teamPage}
+			)
 		}
 	end
 end
