@@ -16,10 +16,6 @@ local Variables = Lua.import('Module:Variables')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local DEFAULT_BESTOF = 3
-local SIDE_ALIASES = {
-	atk = 'ATK',
-	def = 'DEF',
-}
 
 local CustomMatchGroupInput = {}
 
@@ -57,15 +53,17 @@ function MatchFunctions.extractMaps(match, opponents)
 end
 
 ---@param bestofInput string|integer?
+---@param games table[]
 ---@return integer?
-function MatchFunctions.getBestOf(bestofInput)
-	local bestof = tonumber(bestofInput) or tonumber(Variables.varDefault('bestof'))
+function MatchFunctions.getBestOf(bestofInput, games)
+	local bestof = tonumber(bestofInput)
 
 	if bestof then
 		Variables.varDefine('bestof', bestof)
+		return bestof
 	end
 
-	return bestof
+	return tonumber(Variables.varDefault('bestof')) or (games and #games) or DEFAULT_BESTOF
 end
 
 ---@param maps table[]
@@ -85,7 +83,7 @@ function MatchFunctions.getExtraData(match, games, opponents)
 	}
 end
 
--- Parse extradata information, particularally info about halfs and operator bans
+-- Parse extradata information, particularly info about halfs and operator bans
 ---@param match table
 ---@param map table
 ---@param opponents MGIParsedOpponent[]
