@@ -38,9 +38,10 @@ function CustomInjector:parse(widgetId, widgets)
 	local args = self.caller.args
 
 	if widgetId == 'custom' then
+	local gameModes = self.caller:getGameModes(args)
 		return Array.append(
 			widgets,
-			Cell{name = 'Game Mode', children = {args.mode}},
+			Cell{name = #gameModes == 1 and 'Game Mode' or 'Game Modes', children = gameModes},
 			Cell{name = 'Map Type', children = {args.type}}
 		)
 	end
@@ -52,7 +53,6 @@ end
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.extradata.type = args.type
-	lpdbData.extradata.mode = args.mode
 	return lpdbData
 end
 
