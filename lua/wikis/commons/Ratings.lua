@@ -413,7 +413,7 @@ function Ratings.transfer(frame)
 	local from = TeamTemplate.getRaw(args.from, args.date)
 	local to = String.isNotEmpty(args.to) and TeamTemplate.getRaw(args.to, args.date) or {}
 	Ratings._storeTransfer(from.page, to.page, date, tonumber(args.mod))
-	return '<code>' .. args.date .. ': ' .. from.page .. ' --> ' .. to.page .. '</code><br>'
+	return '<code>' .. args.date .. ': ' .. from.page .. ' --> ' .. (to.page or '') .. '</code><br>'
 end
 
 return Ratings
