@@ -94,7 +94,7 @@ function SquadAuto.run(frame)
 	if not Info.config.squads.standardizedAuto then
 		-- Legacy mode: Call old SquadAuto
 		local OldSquadAuto = Lua.import('Module:SquadAuto')
-		args = Arguments.getArgs(frame)
+		local args = Arguments.getArgs(frame)
 
 		local type = SquadUtils.TypeToSquadType[(args.type or ''):lower()]
 		-- Old module needs special type argument
