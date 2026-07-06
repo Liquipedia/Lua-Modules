@@ -26,6 +26,9 @@ local SIZE_HERO = '44x25px'
 ---@class Dota2InfoboxUser: InfoboxUser
 local CustomUser = Class.new(User)
 
+---@class Dota2InfoboxUserWidgetInjector: WidgetInjector
+---@operator call(Dota2InfoboxUser): Dota2InfoboxUserWidgetInjector
+---@field caller Dota2InfoboxUser
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
