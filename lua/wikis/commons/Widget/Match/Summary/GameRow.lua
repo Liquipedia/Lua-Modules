@@ -24,7 +24,7 @@ local GameWinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLoss
 
 ---@class MatchSummaryGameRowProps
 ---@field allowWrappingInOverview boolean?
----@field css table<string, string|number>?
+---@field css HtmlStyleProps?
 ---@field game MatchGroupUtilGame
 ---@field gameIndex integer
 
