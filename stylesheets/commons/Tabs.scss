@@ -50,10 +50,6 @@ $tabs-bg-hover-dark: var( --clr-on-surface-dark-primary-8 );
 	}
 }
 
-html .tabs-content > div:not( .active ) {
-	display: block;
-}
-
 /* SHARED NAV STYLES */
 .tabs-static,
 .tabs-dynamic {
@@ -265,16 +261,6 @@ html .tabs-content > div:not( .active ) {
 		}
 
 		&[ data-mobile-dropdown-grouped ] {
-			display: none;
-		}
-	}
-
-	html & {
-		.tabs-nav-wrapper {
-			display: flex;
-		}
-
-		.dropdown-widget {
 			display: none;
 		}
 	}
