@@ -133,7 +133,7 @@ end
 
 ---@param props AoEMatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return table<string, string|number>?
+---@return HtmlStyleProps?
 function CustomMatchSummary.getGameOpponentViewCss(props, opponentIndex)
 	if props.soloMode then
 		return
