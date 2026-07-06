@@ -40,7 +40,7 @@ function MatchSummaryGameRow.createComponent(implProps, defaultProps)
 	---@return VNode
 	local function componentImpl(componentProps)
 		---@param opponentIndex integer
-		---@return table<string, string|number?>?
+		---@return HtmlStyleProps?
 		local function getGameOpponentViewCss(opponentIndex)
 			if not implProps.getGameOpponentViewCss then
 				return
