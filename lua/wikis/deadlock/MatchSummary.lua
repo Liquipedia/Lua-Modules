@@ -66,19 +66,19 @@ end
 
 ---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return VNode
+---@return VNode[]
 function GameRowComponentImpl.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local extradata = game.extradata or {}
 
-	return WidgetUtil.collect(
+	return {
 		ICONS[extradata['team' .. opponentIndex .. 'side']],
 		MatchSummaryWidgets.Characters{
 			characters = GameRowComponentImpl._getHeroesForOpponent(game, opponentIndex),
 			flipped = opponentIndex == 2,
 			hideOnMobile = true,
 		}
-	)
+	}
 end
 
 return CustomMatchSummary
