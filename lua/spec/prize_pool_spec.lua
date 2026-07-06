@@ -94,6 +94,11 @@ describe('prize pool', function()
 		)
 	end)
 
+	it('enumerates currencies USD-first and distinct', function()
+		local ppt = PrizePool(prizePoolArgs):create()
+		assert.are_same({'USD', 'EUR', 'SEK'}, ppt:_getCurrencies())
+	end)
+
 	describe('prize pool is correct', function()
 		it('display', function()
 			GoldenTest('prize_pool', tostring(PrizePool(prizePoolArgs):create():build()))
@@ -158,6 +163,28 @@ describe('prize pool', function()
 				qualified = 1,
 			})
 		end)
+	end)
+
+	it('tags money columns with their currency toggle index', function()
+		local output = tostring(PrizePool(prizePoolArgs):create():build())
+		assert.is_truthy(output:find('data-toggle-area-content="1"', 1, true)) -- USD
+		assert.is_truthy(output:find('data-toggle-area-content="2"', 1, true)) -- EUR
+		assert.is_truthy(output:find('data-toggle-area-content="3"', 1, true)) -- SEK
+	end)
+
+	it('wraps a multi-currency table in a currency toggle', function()
+		local output = tostring(PrizePool(prizePoolArgs):create():build())
+		assert.is_truthy(output:find('switch-pill', 1, true))
+		assert.is_truthy(output:find('prizepool-currency-switch', 1, true))
+		assert.is_truthy(output:find('data-toggle-area="2"', 1, true)) -- default = first local (EUR)
+	end)
+
+	it('renders no currency toggle for a single currency', function()
+		local singleArgs = Table.merge({}, prizePoolArgs)
+		singleArgs.localcurrency1 = nil
+		singleArgs.localcurrency2 = nil
+		local output = tostring(PrizePool(singleArgs):create():build())
+		assert.is_nil(output:find('switch-pill', 1, true))
 	end)
 
 	describe('enabling/disabling lpdb storage', function()

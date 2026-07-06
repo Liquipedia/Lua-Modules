@@ -37,6 +37,7 @@ local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
 local Hr = HtmlWidgets.Hr
 local LabeledChevronToggle = Lua.import('Module:Widget/GeneralCollapsible/LabeledChevronToggle')
+local SwitchPill = Lua.import('Module:Widget/ContentSwitch/Pill')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local pageVars = PageVariableNamespace('PrizePool')
@@ -596,16 +597,63 @@ function BasePrizePool:build(isAward)
 	)}
 end
 
+---@param prize BasePrizePoolPrize
+---@return string?
+function BasePrizePool:_prizeCurrencyCode(prize)
+	if prize.type == PRIZE_TYPE_BASE_CURRENCY then
+		return BASE_CURRENCY
+	elseif prize.type == PRIZE_TYPE_LOCAL_CURRENCY then
+		return prize.data.currency
+	end
+	return nil
+end
+
+---Ordered, distinct currency codes used by the money columns (USD first).
+---@return string[]
+function BasePrizePool:_getCurrencies()
+	local currencies = {}
+	local seen = {}
+	for _, prize in ipairs(self.prizes) do
+		local code = self:_prizeCurrencyCode(prize)
+		if code and not seen[code] then
+			seen[code] = true
+			table.insert(currencies, code)
+		end
+	end
+	return currencies
+end
+
+---@param cell Widget
+---@param prize BasePrizePoolPrize
+function BasePrizePool:_tagCurrencyColumn(cell, prize)
+	if not self.currencyToggleIndices then
+		return
+	end
+	local code = self:_prizeCurrencyCode(prize)
+	local index = code and self.currencyToggleIndices[code]
+	if not index then
+		return
+	end
+	cell.props.attributes = cell.props.attributes or {}
+	cell.props.attributes['data-toggle-area-content'] = index
+end
+
 ---@param isAward boolean?
 ---@return Widget
 function BasePrizePool:_buildTable(isAward)
+	local currencies = self:_getCurrencies()
+	self.currencyToggleIndices = nil
+	if #currencies >= 2 then
+		self.currencyToggleIndices = Table.map(currencies, function(index, code) return code, index end)
+	end
+
 	local bodyRows = self:_buildRows()
 	local hasCutRows = Array.any(self.placements, function(placement)
 		return not self:applyHideAfter(placement) and self:applyCutAfter(placement)
 	end)
 	local toggle = hasCutRows and self:_collapseToggle() or nil
 
-	return TableWidgets.Table{
+	local prizePoolTable = TableWidgets.Table{
 		classes = WidgetUtil.collect(
 			'prizepool-table-wrapper',
 			toggle and 'general-collapsible' or nil,
@@ -619,6 +667,34 @@ function BasePrizePool:_buildTable(isAward)
 		children = {
 			TableWidgets.TableHeader{children = {self:_buildHeader(isAward)}},
 			TableWidgets.TableBody{children = bodyRows},
+		},
+	}
+
+	if #currencies < 2 then
+		return prizePoolTable
+	end
+
+	-- Default to the first local (non-base) currency; fall back to 1 if somehow all are USD.
+	local defaultActive = math.max(Array.indexOf(currencies, function(code) return code ~= BASE_CURRENCY end), 1)
+
+	local switchGroupId = (tonumber(Variables.varDefault('prizePoolCurrencySwitchGroupId')) or 0) + 1
+	Variables.varDefine('prizePoolCurrencySwitchGroupId', switchGroupId)
+
+	return Div{
+		classes = {'prizepool-currency-switch', 'toggle-area', 'toggle-area-' .. defaultActive},
+		attributes = {['data-toggle-area'] = defaultActive},
+		children = {
+			SwitchPill{
+				switchGroup = 'prize-pool-currency-' .. switchGroupId,
+				storeValue = false,
+				defaultActive = defaultActive,
+				size = 'extrasmall',
+				variant = 'generic',
+				tabs = Array.map(currencies, function(code)
+					return {label = Currency.display(code), value = code:lower()}
+				end),
+			},
+			prizePoolTable,
 		},
 	}
 end
@@ -653,6 +729,7 @@ function BasePrizePool:_buildHeader(isAward)
 		if not prizeTypeData.mergeDisplayColumns or not previousOfType[prize.type] then
 			local cell = prizeTypeData.headerDisplay(prize.data)
 			cell.props.align = cell.props.align or prizeTypeData.align
+			self:_tagCurrencyColumn(cell, prize)
 			table.insert(children, cell)
 			previousOfType[prize.type] = cell
 		end
@@ -739,6 +816,7 @@ function BasePrizePool:_opponentPrizeCells(placement, opponent)
 		local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
 		local cell = reward and prizeTypeData.rowDisplay(prize.data, reward) or TableCell{}
 		cell.props.align = cell.props.align or prizeTypeData.align
+		self:_tagCurrencyColumn(cell, prize)
 
 		local lastCellOfType = previousOfPrizeType[prize.type]
 		if lastCellOfType and prizeTypeData.mergeDisplayColumns then
@@ -754,7 +832,14 @@ function BasePrizePool:_opponentPrizeCells(placement, opponent)
 	end)
 
 	return Array.map(prizeCells, function(cell)
-		return Logic.isEmpty(cell.props.children) and BasePrizePool._emptyCell(cell.props.align) or cell
+		if Logic.isNotEmpty(cell.props.children) then
+			return cell
+		end
+		-- Preserve tagging attributes (e.g. the currency toggle index) so empty cells hide
+		-- alongside their column; a fresh empty cell would drop them and leak a phantom column.
+		local emptyCell = BasePrizePool._emptyCell(cell.props.align)
+		emptyCell.props.attributes = cell.props.attributes
+		return emptyCell
 	end)
 end
 
