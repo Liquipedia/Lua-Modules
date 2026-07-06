@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:MatchTicker
+-- page=Module:MatchTicker/Controller
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
