@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 
@@ -87,7 +88,7 @@ does not exist.
 ---@param team string
 ---@param date string|number?
 ---@return teamTemplateData?
-function TeamTemplate.getRawOrNil(team, date)
+TeamTemplate.getRawOrNil = FnUtil.memoize2(function (team, date)
 	if Logic.isEmpty(team) then
 		return
 	end
@@ -107,7 +108,7 @@ function TeamTemplate.getRawOrNil(team, date)
 		mw.ext.TeamLiquidIntegration.add_category('Pages with underscore team templates')
 	end
 	return teamTemplateData
-end
+end)
 
 ---Creates error message for missing team templates.
 ---@param pageName string
