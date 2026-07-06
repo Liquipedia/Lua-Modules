@@ -754,7 +754,7 @@ function BasePrizePool:_opponentPrizeCells(placement, opponent)
 	end)
 
 	return Array.map(prizeCells, function(cell)
-		return Logic.isEmpty(cell.props.children) and BasePrizePool._emptyCell() or cell
+		return Logic.isEmpty(cell.props.children) and BasePrizePool._emptyCell(cell.props.align) or cell
 	end)
 end
 
@@ -865,9 +865,10 @@ function BasePrizePool:_hasBaseCurrency()
 end
 
 --- Creates an empty table cell
+---@param align ('left'|'right'|'center')?
 ---@return Renderable
-function BasePrizePool._emptyCell()
-	return TableCell{children = {DASH}}
+function BasePrizePool._emptyCell(align)
+	return TableCell{children = {DASH}, align = align}
 end
 
 --- Remove all non-numeric characters from an input and changes it to a number.
