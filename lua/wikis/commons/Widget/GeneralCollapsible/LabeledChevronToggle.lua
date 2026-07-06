@@ -14,13 +14,13 @@ local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Span = Html.Span
 
----@param class string
+---@param buttonType 'expand'|'collapse'
 ---@param text Renderable?
 ---@param iconName string
----@return Widget
-local function labeledButton(class, text, iconName)
+---@return VNode
+local function labeledButton(buttonType, text, iconName)
 	return Button{
-		classes = {class},
+		classes = {'general-collapsible-' .. buttonType .. '-button'},
 		children = Span{
 			children = WidgetUtil.collect(text, text and ' ' or nil, Icon{iconName = iconName}),
 		},
@@ -39,8 +39,8 @@ local function LabeledChevronToggle(props)
 	return Span{
 		classes = {'general-collapsible-default-toggle'},
 		children = {
-			labeledButton('general-collapsible-expand-button', props.expandText, 'expand'),
-			labeledButton('general-collapsible-collapse-button', props.collapseText, 'collapse'),
+			labeledButton('expand', props.expandText, 'expand'),
+			labeledButton('collapse', props.collapseText, 'collapse'),
 		}
 	}
 end
