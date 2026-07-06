@@ -25,12 +25,12 @@ local STATUS_NOT_PLAYED = 'notplayed'
 ---@class DeadlockCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class DeadlockMatchSummaryGameRowComponentImpl: MatchSummaryGameRowComponentImpl
-local GameRowComponentImpl = {
+---@class DeadlockMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
 	createGameOverview = MatchSummaryWidgets.GameRow.lengthDisplay,
 }
 
-local DeadlockMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentImpl)
+local DeadlockMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
 ---@param args table
 ---@return Renderable
@@ -59,7 +59,7 @@ end
 ---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
 ---@return string[]
-function GameRowComponentImpl._getHeroesForOpponent(game, opponentIndex)
+function GameRowComponentProps._getHeroesForOpponent(game, opponentIndex)
 	local opponent = game.opponents[opponentIndex]
 	return Array.map(opponent.players or {}, Operator.property('character'))
 end
@@ -67,14 +67,14 @@ end
 ---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
 ---@return VNode[]
-function GameRowComponentImpl.createGameOpponentView(props, opponentIndex)
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local extradata = game.extradata or {}
 
 	return WidgetUtil.collect(
 		ICONS[extradata['team' .. opponentIndex .. 'side']],
 		MatchSummaryWidgets.Characters{
-			characters = GameRowComponentImpl._getHeroesForOpponent(game, opponentIndex),
+			characters = GameRowComponentProps._getHeroesForOpponent(game, opponentIndex),
 			flipped = opponentIndex == 2,
 			hideOnMobile = true,
 		}

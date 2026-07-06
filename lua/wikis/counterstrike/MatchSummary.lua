@@ -21,12 +21,12 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@class CounterstrikeCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class CounterstrikeMatchSummaryGameRowComponentImpl: MatchSummaryGameRowComponentImpl
-local GameRowComponentImpl = {
+---@class CounterstrikeMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
 	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay,
 }
 
-local CounterstrikeMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentImpl)
+local CounterstrikeMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
 ---@param args table
 ---@return Renderable
@@ -200,7 +200,7 @@ end
 ---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
 ---@return VNode
-function GameRowComponentImpl.createGameOpponentView(props, opponentIndex)
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 
 	local sides = game.extradata['t' .. opponentIndex .. 'sides']

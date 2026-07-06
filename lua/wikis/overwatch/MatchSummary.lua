@@ -20,10 +20,10 @@ local MAX_NUM_BANS = 1
 ---@class OverwatchCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class OverwatchMatchSummaryGameRowComponentImpl: MatchSummaryGameRowComponentImpl
-local GameRowComponentImpl = {}
+---@class OverwatchMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {}
 
-local OverwatchMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentImpl)
+local OverwatchMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
 ---@param args table
 ---@return Renderable
@@ -52,14 +52,14 @@ end
 
 ---@param props MatchSummaryGameRowProps
 ---@return string
-function GameRowComponentImpl.createGameOverview(props)
+function GameRowComponentProps.createGameOverview(props)
 	return DisplayHelper.MapAndMode(props.game)
 end
 
 ---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
 ---@return Renderable
-function GameRowComponentImpl.createGameOpponentView(props, opponentIndex)
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local opponentCopy = Table.deepCopy(game.opponents[opponentIndex])
 	if opponentCopy.score and game.mode == 'Push' then

@@ -19,12 +19,12 @@ local NUM_CHAMPIONS_PICK = 5
 ---@class HoKCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class HoKMatchSummaryGameRowComponentImpl: MatchSummaryGameRowComponentImpl
-local GameRowComponentImpl = {
+---@class HoKMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
 	createGameOverview = MatchSummaryWidgets.GameRow.lengthDisplay,
 }
 
-local HoKMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentImpl)
+local HoKMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
 ---@param args table
 ---@return Renderable
@@ -64,7 +64,7 @@ end
 ---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
 ---@return VNode
-function GameRowComponentImpl.createGameOpponentView(props, opponentIndex)
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local extradata = game.extradata or {}
 

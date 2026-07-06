@@ -17,7 +17,7 @@ local Html = Lua.import('Module:Widget/Html')
 local GameCenter = Lua.import('Module:Widget/Match/Summary/GameCenter')
 local GameWinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLossIndicator')
 
----@class MatchSummaryGameRowComponentImpl
+---@class MatchSummaryGameRowComponentProps
 ---@field getGameOpponentViewCss? fun(props: MatchSummaryGameRowProps, opponentIndex: integer): HtmlStyleProps?
 ---@field createGameOpponentView fun(props: MatchSummaryGameRowProps, opponentIndex: integer): Renderable|Renderable[]?
 ---@field createGameOverview fun(props: MatchSummaryGameRowProps): Renderable|Renderable[]
@@ -31,10 +31,10 @@ local GameWinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLoss
 local MatchSummaryGameRow = {}
 
 ---@generic P: MatchSummaryGameRowProps
----@param implProps MatchSummaryGameRowComponentImpl
+---@param implProps MatchSummaryGameRowComponentProps
 ---@param defaultProps P
 ---@return Component<P>
----@overload fun(implProps: MatchSummaryGameRowComponentImpl): Component<MatchSummaryGameRowProps>
+---@overload fun(implProps: MatchSummaryGameRowComponentProps): Component<MatchSummaryGameRowProps>
 function MatchSummaryGameRow.createComponent(implProps, defaultProps)
 	---@param componentProps MatchSummaryGameRowProps
 	---@return VNode

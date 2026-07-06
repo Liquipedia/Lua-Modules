@@ -18,12 +18,12 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 ---@class ValorantMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class ValorantMatchSummaryGameRowComponentImpl: MatchSummaryGameRowComponentImpl
-local GameRowComponentImpl = {
+---@class ValorantMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
 	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay,
 }
 
-local ValorantMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentImpl)
+local ValorantMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
 ---@param args table
 ---@return Renderable
@@ -52,10 +52,10 @@ end
 ---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
 ---@return table[]
-function GameRowComponentImpl._makePartialScores(game, opponentIndex)
+function GameRowComponentProps._makePartialScores(game, opponentIndex)
 	local extradata = game.extradata or {}
 	local firstSide = extradata.t1firstside or ''
-	local oppositeSide = GameRowComponentImpl._getOppositeSide(firstSide)
+	local oppositeSide = GameRowComponentProps._getOppositeSide(firstSide)
 	local halves = extradata['t' .. opponentIndex .. 'halfs'] or {}
 	if opponentIndex == 2 then
 		firstSide, oppositeSide = oppositeSide, firstSide
@@ -71,7 +71,7 @@ end
 ---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
 ---@return VNode[]
-function GameRowComponentImpl.createGameOpponentView(props, opponentIndex)
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local flipped = opponentIndex == 2
 	local characters = Array.map((game.opponents[opponentIndex] or {}).players or {}, Operator.property('agent'))
@@ -79,14 +79,14 @@ function GameRowComponentImpl.createGameOpponentView(props, opponentIndex)
 		MatchSummaryWidgets.Characters{characters = characters, flipped = flipped, hideOnMobile = true},
 		MatchSummaryWidgets.DetailedScore{
 			score = MatchSummaryWidgets.GameRow.scoreDisplay(game, opponentIndex),
-			partialScores = GameRowComponentImpl._makePartialScores(game, opponentIndex)
+			partialScores = GameRowComponentProps._makePartialScores(game, opponentIndex)
 		}
 	}
 end
 
 ---@param side string?
 ---@return string
-function GameRowComponentImpl._getOppositeSide(side)
+function GameRowComponentProps._getOppositeSide(side)
 	if Logic.isEmpty(side) then
 		return ''
 	elseif side == 'atk' then

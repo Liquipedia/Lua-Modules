@@ -38,12 +38,12 @@ local ROUND_ICONS = {
 ---@class RainbowsixMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class RainbowsixMatchSummaryGameRowComponentImpl: MatchSummaryGameRowComponentImpl
-local GameRowComponentImpl = {
+---@class RainbowsixMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
 	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay,
 }
 
-local RainbowsixMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentImpl)
+local RainbowsixMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
 ---@param args table
 ---@return Renderable
@@ -82,7 +82,7 @@ end
 ---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
 ---@return table[]
-function GameRowComponentImpl._makePartialScores(game, opponentIndex)
+function GameRowComponentProps._makePartialScores(game, opponentIndex)
 	local extradata = game.extradata or {}
 	local halves = extradata['t' .. opponentIndex .. 'halfs']
 
@@ -93,13 +93,13 @@ function GameRowComponentImpl._makePartialScores(game, opponentIndex)
 			if opponentIndex == 1 then
 				return side
 			end
-			return GameRowComponentImpl._getOppositeSide(side:lower())
+			return GameRowComponentProps._getOppositeSide(side:lower())
 		end
 	)
 	local firstSide = (firstSides.rt or '')
 	local firstSideOt = (firstSides.ot or '')
-	local oppositeSide = GameRowComponentImpl._getOppositeSide(firstSide)
-	local oppositeSideOt = GameRowComponentImpl._getOppositeSide(firstSideOt)
+	local oppositeSide = GameRowComponentProps._getOppositeSide(firstSide)
+	local oppositeSideOt = GameRowComponentProps._getOppositeSide(firstSideOt)
 	return {
 		{score = halves[firstSide], icon = ROUND_ICONS[firstSide]},
 		{score = halves[oppositeSide], icon = ROUND_ICONS[oppositeSide]},
@@ -111,17 +111,17 @@ end
 ---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
 ---@return VNode
-function GameRowComponentImpl.createGameOpponentView(props, opponentIndex)
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	return MatchSummaryWidgets.DetailedScore{
 		score = MatchSummaryWidgets.GameRow.scoreDisplay(game, opponentIndex),
-		partialScores = GameRowComponentImpl._makePartialScores(game, opponentIndex)
+		partialScores = GameRowComponentProps._makePartialScores(game, opponentIndex)
 	}
 end
 
 ---@param side string
 ---@return string
-function GameRowComponentImpl._getOppositeSide(side)
+function GameRowComponentProps._getOppositeSide(side)
 	if side == 'atk' then
 		return 'def'
 	elseif side == 'def' then

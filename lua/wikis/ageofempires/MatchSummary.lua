@@ -25,8 +25,8 @@ local PlayerDisplay = Lua.import('Module:Player/Display')
 ---@class AoECustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class AoEMatchSummaryGameRowComponentImpl: MatchSummaryGameRowComponentImpl
-local GameRowComponentImpl = {}
+---@class AoEMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {}
 
 ---@class AoEMatchSummaryGameRowProps: MatchSummaryGameRowProps
 ---@field gameData string?
@@ -34,7 +34,7 @@ local GameRowComponentImpl = {}
 
 ---@type Component<AoEMatchSummaryGameRowProps>
 local AoEMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(
-	GameRowComponentImpl, {allowWrappingInOverview = true}
+	GameRowComponentProps, {allowWrappingInOverview = true}
 )
 
 ---@param args table
@@ -94,9 +94,9 @@ end
 ---@param flipped boolean
 ---@param gameData string?
 ---@return VNode
-function GameRowComponentImpl._createParticipant(player, flipped, gameData)
+function GameRowComponentProps._createParticipant(player, flipped, gameData)
 	local children = {
-		GameRowComponentImpl._createFactionIcon(player.civ, gameData),
+		GameRowComponentProps._createFactionIcon(player.civ, gameData),
 		PlayerDisplay.BlockPlayer{player = player, flip = flipped},
 	}
 	return Html.Div{
@@ -116,7 +116,7 @@ end
 ---@param opponentId integer
 ---@param gameData string?
 ---@return VNode[]
-function GameRowComponentImpl._createOpponentDisplay(game, opponentId, gameData)
+function GameRowComponentProps._createOpponentDisplay(game, opponentId, gameData)
 	local flipped = opponentId == 1
 	return Array.map(
 		Array.sortBy(
@@ -124,7 +124,7 @@ function GameRowComponentImpl._createOpponentDisplay(game, opponentId, gameData)
 			Operator.property('index')
 		),
 		function (player)
-			return GameRowComponentImpl._createParticipant(player, flipped, gameData)
+			return GameRowComponentProps._createParticipant(player, flipped, gameData)
 		end
 	)
 end
@@ -132,7 +132,7 @@ end
 ---@param props AoEMatchSummaryGameRowProps
 ---@param opponentIndex integer
 ---@return HtmlStyleProps?
-function GameRowComponentImpl.getGameOpponentViewCss(props, opponentIndex)
+function GameRowComponentProps.getGameOpponentViewCss(props, opponentIndex)
 	if props.soloMode then
 		return
 	end
@@ -152,19 +152,19 @@ end
 ---@param props AoEMatchSummaryGameRowProps
 ---@param opponentIndex integer
 ---@return VNode|VNode[]
-function GameRowComponentImpl.createGameOpponentView(props, opponentIndex)
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	if props.soloMode then
-		return GameRowComponentImpl._createFactionIcon(
+		return GameRowComponentProps._createFactionIcon(
 			CustomMatchSummary._getPlayerData(props.game, opponentIndex, 1).civ, props.gameData
 		)
 	end
 
-	return GameRowComponentImpl._createOpponentDisplay(props.game, opponentIndex, props.gameData)
+	return GameRowComponentProps._createOpponentDisplay(props.game, opponentIndex, props.gameData)
 end
 
 ---@param props AoEMatchSummaryGameRowProps
 ---@return Renderable?
-function GameRowComponentImpl.createGameOverview(props)
+function GameRowComponentProps.createGameOverview(props)
 	local game = props.game
 	game.mapDisplayName = game.mapDisplayName or game.map
 
@@ -178,7 +178,7 @@ end
 ---@param civ string?
 ---@param gameData string?
 ---@return VNode
-function GameRowComponentImpl._createFactionIcon(civ, gameData)
+function GameRowComponentProps._createFactionIcon(civ, gameData)
 	local normGame = Game.abbreviation{game = gameData}:lower()
 	return Html.Span{
 		classes = {'brkts-champion-icon'},
