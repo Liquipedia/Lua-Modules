@@ -50,7 +50,7 @@ $tabs-bg-hover-dark: var( --clr-on-surface-dark-primary-8 );
 	}
 }
 
-html.client-nojs .tabs-content > div:not( .active ) {
+html .tabs-content > div:not( .active ) {
 	display: block;
 }
 
@@ -269,7 +269,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		}
 	}
 
-	html.client-nojs & {
+	html & {
 		.tabs-nav-wrapper {
 			display: flex;
 		}
