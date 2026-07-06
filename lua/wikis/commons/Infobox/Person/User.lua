@@ -17,7 +17,6 @@ local Person = Lua.import('Module:Infobox/Person')
 ---@operator call(Frame): InfoboxUser
 local User = Class.new(Person)
 
----@private
 ---@return VNode[]
 function User:_getFavouriteTeams()
 	local foundArgs = self:getAllArgsForBase(self.args, 'fav-team-')
