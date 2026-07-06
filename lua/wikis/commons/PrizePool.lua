@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
-local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 
 local Import = Lua.import('Module:PrizePool/Import')
@@ -19,18 +18,15 @@ local Placement = Lua.import('Module:PrizePool/Placement')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
-local Widgets = Lua.import('Module:Widget/All')
-local Div = Widgets.Div
-local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-local TableRow = Widgets.TableRow
-local TableCell = Widgets.TableCell
+local HtmlWidgets = Lua.import('Module:Widget/Html')
+local Span = HtmlWidgets.Span
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local TableCell = TableWidgets.Cell
 
 ---@class PrizePool: BasePrizePool
 ---@operator call(...): PrizePool
 ---@field placements PrizePoolPlacement[]
 local PrizePool = Class.new(BasePrizePool)
-
-local NON_BREAKING_SPACE = '&nbsp;'
 
 ---@param args table
 function PrizePool:readPlacements(args)
@@ -51,83 +47,52 @@ function PrizePool:readPlacements(args)
 	self.placements = Import.run(self)
 end
 
+---@protected
 ---@param placement PrizePoolPlacement
----@return WidgetTableCell
+---@return Renderable
 function PrizePool:placeOrAwardCell(placement)
-	local placeCell = TableCell{
-		children = {placement:getMedal() or '', NON_BREAKING_SPACE, placement:_displayPlace()},
-		css = {['font-weight'] = 'bolder'},
-		classes = {'prizepooltable-place'},
-	}
-	placeCell.rowSpan = #placement.opponents
+	local badgeClass = placement:getBadgeClass()
+	local placeDisplay = placement:_displayPlace()
+	local content = badgeClass
+		and Span{classes = {'prizepooltable-badge', badgeClass}, children = placeDisplay}
+		or placeDisplay
 
-	return placeCell
+	return TableCell{
+		children = {content},
+		classes = {'prizepooltable-place'},
+		rowspan = #placement.opponents,
+	}
 end
 
+---@protected
 ---@param placement PrizePoolPlacement
 ---@return boolean
 function PrizePool:applyHideAfter(placement)
 	return placement.placeStart > self.options.hideafter
 end
 
+---@protected
 ---@param placement PrizePoolPlacement
 ---@return boolean
 function PrizePool:applyCutAfter(placement)
-	if placement.placeStart > self.options.cutafter then
-		return true
-	end
-	return false
+	return placement.placeStart > self.options.cutafter
 end
 
----@param placement PrizePoolPlacement?
----@param nextPlacement PrizePoolPlacement
----@param rows WidgetTableRow[]
-function PrizePool:applyToggleExpand(placement, nextPlacement, rows)
-	if placement ~= nil
-		and placement.placeStart <= self.options.cutafter
-		and placement.placeEnd >= self.options.cutafter
-		and placement ~= self.placements[#self.placements]
-		and nextPlacement.placeStart ~= placement.placeStart
-		and nextPlacement.placeEnd ~= placement.placeEnd then
-
-		table.insert(rows, self:_toggleExpand(placement.placeEnd + 1))
+---@protected
+---@return {opentext: string, closetext: string}?
+function PrizePool:_collapseText()
+	local visible = Array.filter(self.placements, function(placement)
+		return placement.placeStart <= self.options.hideafter
+	end)
+	local lastVisible = visible[#visible]
+	local firstHidden = Array.find(visible, function(placement)
+		return placement.placeStart > self.options.cutafter
+	end)
+	if not firstHidden or not lastVisible then
+		return nil
 	end
-end
-
----@param placeStart number
----@return WidgetTableRow
-function PrizePool:_toggleExpand(placeStart)
-	local placeEnd = self.placements[#self.placements].placeEnd
-
-	if self.options.hideafter < math.huge then
-		local lastCut = Array.max(
-			Array.filter(self.placements, function (placement)
-				return placement.placeEnd <= self.options.hideafter
-			end),
-			Operator.property('placeEnd')
-		)
-		placeEnd = lastCut.placeEnd
-	end
-
-	local text = 'place ' .. placeStart .. ' to ' .. placeEnd
-	local expandButton = TableCell{
-		children = Div{children = {
-			text,
-			'&nbsp;',
-			IconFa{iconName = 'expand'},
-		}},
-		classes = {'general-collapsible-expand-button'},
-	}
-	local collapseButton = TableCell{
-		children = Div{children = {
-			text,
-			'&nbsp;',
-			IconFa{iconName = 'collapse'},
-		}},
-		classes = {'general-collapsible-collapse-button'},
-	}
-
-	return TableRow{classes = {'ppt-toggle-expand'}, children = {expandButton, collapseButton}}
+	local text = 'place ' .. firstHidden.placeStart .. ' to ' .. lastVisible.placeEnd
+	return {opentext = text, closetext = text}
 end
 
 -- get the lpdbObjectName depending on opponenttype
