@@ -415,61 +415,34 @@ share the `prizepooltable` class.
 			}
 		}
 
-		// Top-3 rows: left accent bar geometry on the place cell (per-place colour below).
-		tr.table2__row--body.background-color-first-place,
-		tr.table2__row--body.background-color-second-place,
-		tr.table2__row--body.background-color-third-place {
-			.prizepooltable-place {
-				position: relative;
-
-				&::before {
-					content: "";
-					position: absolute;
-					inset: 0 auto 0 0;
-					width: $prizepool-accent-width;
-				}
-			}
-		}
-
 		// Top-3 row tint + accent bar. The Table2 zebra rule is `:where()`-wrapped, so these
 		// plain selectors out-specify it without a theme/`.table2__table` qualifier.
-		// `border-bottom: 0` drops the legacy per-place coloured row border.
-		tr.table2__row--body.background-color-first-place {
-			border-bottom: 0;
-			background-color: var( --prizepool-place-1-tint );
+		// `border-bottom: 0` drops the legacy per-place coloured row border. The hover tint
+		// re-applies on `table2__row--group-hover` (added by Table2.js to every row in a
+		// hovered group) since the base tint above out-specifies the generic group-hover rule.
+		$prizepool-top-placements: ( first: 1, second: 2, third: 3 );
 
-			&:hover {
-				background-color: var( --prizepool-place-1-tint-hover );
-			}
+		@each $name, $n in $prizepool-top-placements {
+			tr.table2__row--body.background-color-#{ $name }-place {
+				border-bottom: 0;
+				background-color: var( --prizepool-place-#{ $n }-tint );
 
-			.prizepooltable-place::before {
-				background-color: var( --prizepool-place-1-accent );
-			}
-		}
+				.prizepooltable-place {
+					position: relative;
 
-		tr.table2__row--body.background-color-second-place {
-			border-bottom: 0;
-			background-color: var( --prizepool-place-2-tint );
+					&::before {
+						content: "";
+						position: absolute;
+						inset: 0 auto 0 0;
+						width: $prizepool-accent-width;
+						background-color: var( --prizepool-place-#{ $n }-accent );
+					}
+				}
 
-			&:hover {
-				background-color: var( --prizepool-place-2-tint-hover );
-			}
-
-			.prizepooltable-place::before {
-				background-color: var( --prizepool-place-2-accent );
-			}
-		}
-
-		tr.table2__row--body.background-color-third-place {
-			border-bottom: 0;
-			background-color: var( --prizepool-place-3-tint );
-
-			&:hover {
-				background-color: var( --prizepool-place-3-tint-hover );
-			}
-
-			.prizepooltable-place::before {
-				background-color: var( --prizepool-place-3-accent );
+				&:hover,
+				&.table2__row--group-hover {
+					background-color: var( --prizepool-place-#{ $n }-tint-hover );
+				}
 			}
 		}
 	}
