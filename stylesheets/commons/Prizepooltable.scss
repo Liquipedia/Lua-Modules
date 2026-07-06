@@ -494,12 +494,7 @@ share the `prizepooltable` class.
 	}
 }
 
-html:not( .client-js ) .prizepooltable-toggle {
-	display: none;
-}
-
-// Gated on `client-js` so non-JS readers see all rows (the toggle can't expand them).
-html.client-js .prizepool-table-wrapper.collapsed .ppt-hide-on-collapse {
+html .prizepool-table-wrapper.collapsed .ppt-hide-on-collapse {
 	display: none;
 }
 
