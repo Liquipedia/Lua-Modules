@@ -49,7 +49,7 @@ function CustomMatchGroupInputNormal.getParticipants(map, opponentIndex)
 	return Logic.nilIfEmpty(Array.mapRange(1, MAX_NUM_PICKS, function (playerIndex)
 		local playerData = Json.parseIfTable(map['t' .. opponentIndex .. 'p' .. playerIndex])
 		if Logic.isEmpty(playerData) then
-			return
+			return nil
 		end
 		---@cast playerData -nil
 		if Logic.isEmpty(playerData.role) then
