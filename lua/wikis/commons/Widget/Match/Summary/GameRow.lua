@@ -18,7 +18,7 @@ local GameCenter = Lua.import('Module:Widget/Match/Summary/GameCenter')
 local GameWinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLossIndicator')
 
 ---@class MatchSummaryGameRowComponentProps
----@field getGameOpponentViewCss? fun(props: MatchSummaryGameRowProps, opponentIndex: integer): table<string, string|number?>
+---@field getGameOpponentViewCss? fun(props: MatchSummaryGameRowProps, opponentIndex: integer): HtmlStyleProps
 ---@field createGameOpponentView fun(props: MatchSummaryGameRowProps, opponentIndex: integer): Renderable|Renderable[]?
 ---@field createGameOverview fun(props: MatchSummaryGameRowProps): Renderable|Renderable[]
 
