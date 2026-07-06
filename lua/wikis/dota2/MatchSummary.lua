@@ -39,7 +39,6 @@ function CustomMatchSummary.createBody(match)
 
 	return {
 		MatchSummaryWidgets.GamesContainer{
-			gridLayout = 'standard',
 			children = Array.map(match.games, function (game, gameIndex)
 				if game.status == STATUS_NOT_PLAYED then
 					return

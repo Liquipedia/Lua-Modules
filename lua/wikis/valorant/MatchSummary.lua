@@ -36,7 +36,6 @@ end
 function CustomMatchSummary.createBody(match)
 	return {
 		MatchSummaryWidgets.GamesContainer{
-			gridLayout = 'standard',
 			children = Array.map(match.games, function (game, gameIndex)
 				if Logic.isEmpty(game.map) then
 					return
