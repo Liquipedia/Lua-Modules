@@ -17,14 +17,13 @@ local Operator = Lua.import('Module:Operator')
 ---@class IdentityVCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
+---@class IdentityVMatchSummaryGameRowComponentImpl: MatchSummaryGameRowComponentImpl
+local GameRowComponentImpl = {
+	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay,
+}
+
 local IdentityVMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(
-	{
-		createGameOpponentView = CustomMatchSummary.createGameOpponentView,
-		createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay
-	},
-	{
-		allowWrappingInOverview = true
-	}
+	GameRowComponentImpl, {allowWrappingInOverview = true}
 )
 
 ---@param args table
@@ -62,7 +61,7 @@ end
 ---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
 ---@return VNode[]
-function CustomMatchSummary.createGameOpponentView(props, opponentIndex)
+function GameRowComponentImpl.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local extradata = game.extradata or {}
 	local flipped = opponentIndex == 2
@@ -71,11 +70,11 @@ function CustomMatchSummary.createGameOpponentView(props, opponentIndex)
 		if opponentIndex == 1 then
 			return extradata.t1firstside
 		end
-		return CustomMatchSummary._getOppositeSide(extradata.t1firstside)
+		return GameRowComponentImpl._getOppositeSide(extradata.t1firstside)
 	end
 
 	local firstSide = getFirstSide()
-	local secondSide = CustomMatchSummary._getOppositeSide(firstSide)
+	local secondSide = GameRowComponentImpl._getOppositeSide(firstSide)
 	local halfs = extradata['t' .. opponentIndex .. 'halfs'] or {}
 	local scoreDetails = {}
 
@@ -99,7 +98,7 @@ end
 
 ---@param side string
 ---@return string
-function CustomMatchSummary._getOppositeSide(side)
+function GameRowComponentImpl._getOppositeSide(side)
 	if side == 'hunter' then
 		return 'survivor'
 	elseif side == 'survivor' then

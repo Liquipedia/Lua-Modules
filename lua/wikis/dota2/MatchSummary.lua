@@ -19,10 +19,12 @@ local STATUS_NOT_PLAYED = 'notplayed'
 ---@class Dota2CustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
-local Dota2MatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent{
+---@class Dota2MatchSummaryGameRowComponentImpl: MatchSummaryGameRowComponentImpl
+local GameRowComponentImpl = {
 	createGameOverview = MatchSummaryWidgets.GameRow.lengthDisplay,
-	createGameOpponentView = CustomMatchSummary.createGameOpponentView
 }
+
+local Dota2MatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentImpl)
 
 ---@param args table
 ---@return Renderable
@@ -53,7 +55,7 @@ end
 ---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
 ---@return VNode
-function CustomMatchSummary.createGameOpponentView(props, opponentIndex)
+function GameRowComponentImpl.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local extradata = game.extradata or {}
 
