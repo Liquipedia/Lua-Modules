@@ -57,7 +57,7 @@ function CustomInjector:parse(id, widgets)
 		if not String.isEmpty(args['fav-team-1']) then
 			Array.appendWith(widgets,
 				Title{children = 'Favorite teams'},
-				Center{children = {self.caller:_getFavouriteTeams()}}
+				Center{children = self.caller:_getFavouriteTeams()}
 			)
 		end
 	elseif
