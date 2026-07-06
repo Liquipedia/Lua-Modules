@@ -459,7 +459,7 @@ end
 --- Allows for overriding this functionality
 --- e.g. to add faction icons to the display for SC2, SC, WC
 ---@param args table
----@return (string|Widget)[]
+---@return Renderable[]
 function Person:nameDisplay(args)
 	local team = string.lower(args.teamicon or args.ttlink or args.teamlink or args.team or '')
 	local icon = TeamTemplate.exists(team)
