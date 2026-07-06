@@ -288,11 +288,9 @@ describe('prize pool', function()
 		local playerShares = {}
 		for _, call in ipairs(LpdbPlacementStub.calls) do
 			local extradata = call.vals[2] and call.vals[2].extradata
-			if type(extradata) == 'string' then
-				local parsed = Json.parse(extradata)
-				if parsed.playershare then
-					table.insert(playerShares, parsed.playershare)
-				end
+			local parsed = extradata and Json.parseIfString(extradata)
+			if parsed and parsed.playershare then
+				table.insert(playerShares, parsed.playershare)
 			end
 		end
 		assert.are_same({250000, 100000}, playerShares)
