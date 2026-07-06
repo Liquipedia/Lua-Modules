@@ -114,8 +114,9 @@ end
 ---@private
 ---@param game MatchGroupUtilGame
 ---@param opponentId integer
+---@param gameData string?
 ---@return VNode[]
-function GameRowComponentImpl._createOpponentDisplay(game, opponentId)
+function GameRowComponentImpl._createOpponentDisplay(game, opponentId, gameData)
 	local flipped = opponentId == 1
 	return Array.map(
 		Array.sortBy(
@@ -123,7 +124,7 @@ function GameRowComponentImpl._createOpponentDisplay(game, opponentId)
 			Operator.property('index')
 		),
 		function (player)
-			return GameRowComponentImpl._createParticipant(player, flipped)
+			return GameRowComponentImpl._createParticipant(player, flipped, gameData)
 		end
 	)
 end
@@ -158,7 +159,7 @@ function GameRowComponentImpl.createGameOpponentView(props, opponentIndex)
 		)
 	end
 
-	return GameRowComponentImpl._createOpponentDisplay(props.game, opponentIndex)
+	return GameRowComponentImpl._createOpponentDisplay(props.game, opponentIndex, props.gameData)
 end
 
 ---@param props AoEMatchSummaryGameRowProps
