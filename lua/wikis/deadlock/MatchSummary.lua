@@ -13,7 +13,6 @@ local Operator = Lua.import('Module:Operator')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MAX_NUM_BANS = 6
 local ICONS = {
