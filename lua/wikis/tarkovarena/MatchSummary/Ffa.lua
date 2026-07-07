@@ -13,18 +13,18 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local SummaryHelper = Lua.import('Module:MatchSummary/Base/Ffa')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
-local Html = Lua.import('Module:Widget/Html')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@param props {bracketId: string, matchId: string}
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(props)
-	---@class FFAMatchGroupUtilMatch
+	---@cast match FFAMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
 	SummaryHelper.updateMatchOpponents(match)
 	local scoringData = SummaryHelper.createScoringData(match)
 
-	return Html.Fragment{children = {
+	return HtmlWidgets.Fragment{children = {
 		MatchSummaryWidgets.Header{matchId = match.matchId, games = match.games},
 		MatchSummaryWidgets.Tab{
 			matchId = match.matchId,
