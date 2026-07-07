@@ -40,7 +40,7 @@ function Array.isArray(tbl)
 	return type(tbl) == 'table' and Table.size(tbl) == #tbl
 end
 
--- Creates a copy of an array with the same elements.
+-- Creates a shallow copy of the supplied array.
 ---@generic T
 ---@param tbl T[]
 ---@return T[]
