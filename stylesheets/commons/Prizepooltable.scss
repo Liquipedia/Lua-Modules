@@ -1,5 +1,6 @@
 $prizepool-badge-size: 1.5rem;
 $prizepool-accent-width: 0.25rem;
+$prizepool-place-font-size: 0.75rem;
 
 /*******************************************************************************
 Shared prize-pool custom properties
@@ -383,7 +384,7 @@ share the `prizepooltable` class.
 		border-radius: 0.25rem;
 		font-weight: bold;
 		line-height: 1;
-		font-size: 0.75rem;
+		font-size: $prizepool-place-font-size;
 		text-shadow: 0 1px 1px rgba( 0, 0, 0, 0.5 );
 		color: #ffffff;
 
@@ -404,6 +405,7 @@ share the `prizepooltable` class.
 		.prizepooltable-place {
 			text-align: center;
 			font-weight: bold;
+			font-size: $prizepool-place-font-size;
 			color: var( --clr-secondary-25 );
 
 			// Override the legacy `… > td.prizepooltable-place` metal fill so the row
