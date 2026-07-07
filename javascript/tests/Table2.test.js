@@ -81,6 +81,31 @@ describe( 'Table2 module', () => {
 		expect( rows[ 3 ].classList.contains( 'table2__row--even' ) ).toBe( true );
 	} );
 
+	test( 'should tag inner boundaries of a multi-row rowspan group', () => {
+		document.body.innerHTML = `
+			<div class="table2">
+				<table class="table2__table">
+					<tbody>
+						<tr class="table2__row--body" data-rowspan-count="3"><td>a1</td></tr>
+						<tr class="table2__row--body"><td>a2</td></tr>
+						<tr class="table2__row--body"><td>a3</td></tr>
+						<tr class="table2__row--body"><td>single</td></tr>
+					</tbody>
+				</table>
+			</div>
+		`;
+
+		globalThis.liquipedia.table2.init();
+
+		const boundaries = ( row ) => [
+			row.classList.contains( 'table2__row--group-inner-top' ) && 'top',
+			row.classList.contains( 'table2__row--group-inner-bottom' ) && 'bottom'
+		].filter( Boolean ).join( '+' ) || 'none';
+
+		const rows = document.querySelectorAll( '.table2__row--body' );
+		expect( [ ...rows ].map( boundaries ) ).toEqual( [ 'bottom', 'top+bottom', 'top', 'none' ] );
+	} );
+
 	test( 'should ignore standalone tables without .table2 wrapper', () => {
 		document.body.innerHTML = `
 			<table class="table2__table">
