@@ -181,11 +181,11 @@ $table2-cell-padding-x: 0.75rem;
 		// span the whole group, so their padding sits at the group's outer edges and
 		// must stay — hence `:not( [ rowspan ] )`.
 		&.table2__row--group-inner-top > td:not( [ rowspan ] ) {
-			padding-top: 0;
+			padding-top: 0.125rem;
 		}
 
 		&.table2__row--group-inner-bottom > td:not( [ rowspan ] ) {
-			padding-bottom: 0;
+			padding-bottom: 0.125rem;
 		}
 	}
 
