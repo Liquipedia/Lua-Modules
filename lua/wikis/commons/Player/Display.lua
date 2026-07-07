@@ -40,7 +40,7 @@ end
 ---novar: string|boolean?, dq: string|boolean?, flip: string|boolean?, showFlag: string|boolean?,
 ---showLink: string|boolean?, showRace: string|boolean?, showFaction: string|boolean?}
 ---@return VNode
-function PlayerDisplay.TemplateInlinePlayer(props)
+function PlayerDisplay.InlinePlayerByProps(props)
 	local player = Opponent.readSinglePlayerArgs(props)
 
 	PlayerExt.syncPlayer(player, {
