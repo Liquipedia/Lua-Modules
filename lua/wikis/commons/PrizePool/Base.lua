@@ -777,6 +777,7 @@ function BasePrizePool:_buildRows()
 		end
 
 		local isCut = self:applyCutAfter(placement)
+		local isMultiOpponent = #opponents > 1
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			local opponentCell = TableCell{
 				children = {OpponentDisplay.BlockOpponent{
@@ -797,7 +798,14 @@ function BasePrizePool:_buildRows()
 					opponentCell,
 					prizeCells
 				),
-				classes = WidgetUtil.collect(backgroundClass, isCut and 'ppt-hide-on-collapse' or nil),
+				classes = WidgetUtil.collect(
+					backgroundClass,
+					isCut and 'ppt-hide-on-collapse' or nil,
+					-- Collapse the inner vertical padding between stacked team rows of a
+					-- multi-opponent placement so the opponents read as one group.
+					isMultiOpponent and opponentIndex > 1 and 'prizepooltable-group-inner-top' or nil,
+					isMultiOpponent and opponentIndex < #opponents and 'prizepooltable-group-inner-bottom' or nil
+				),
 			})
 		end)
 	end
