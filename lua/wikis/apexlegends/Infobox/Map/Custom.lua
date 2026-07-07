@@ -55,28 +55,18 @@ function CustomInjector:parse(id, widgets)
 
 		if String.isEmpty(args.ring) then return widgets end
 
-		local rows = Array.extend(
-			{self.caller:_createRingTableHeader()},
-			Array.map(self.caller:getAllArgsForBase(args, 'ring'), function(ringData)
-				return self.caller:_createRingTableRow(ringData)
-			end)
-		)
-
-		local ringTable = WidgetTable.Table{
-			classes = {'fo-nttax-infobox' ,'wiki-bordercolor-light'}, --row alternating bg
-			css = {
-				['text-align'] = 'center',
-				display = 'inline-grid !important',
-				['padding-top'] = '0px',
-				['padding-bottom'] = '0px',
-				['border-top-style'] = 'none',
-			},
-			children = rows,
-		}
-
 		Array.appendWith(widgets,
 			Title{children = 'Ring Information'},
-			ringTable
+			WidgetTable.Table{
+				children = {
+					WidgetTable.TableHeader{children = self.caller:_createRingTableHeader()},
+					WidgetTable.TableBody{
+						children = Array.map(self.caller:getAllArgsForBase(args, 'ring'), function(ringData)
+							return self.caller:_createRingTableRow(ringData)
+						end)
+					}
+				},
+			}
 		)
 	end
 
