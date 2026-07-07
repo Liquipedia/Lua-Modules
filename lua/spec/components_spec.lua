@@ -3,7 +3,7 @@ local ComponentCore = require('Module:Widget/Component')
 local Context = require('Module:Widget/ComponentContext')
 local ErrorBoundary = require('Module:Widget/ErrorBoundary')
 local Html = require('Module:Widget/Html')
-local WidgetHtml = require('Module:Widget/Html/All')
+local WidgetHtml = require('Module:Widget/Html')
 local Renderer = require('Module:Widget/Renderer')
 
 describe('Components/Renderer', function()

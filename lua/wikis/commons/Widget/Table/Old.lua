@@ -13,7 +13,7 @@ local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 
 ---@class WidgetTableInput
 ---@field children WidgetTableRow[]?
@@ -39,7 +39,7 @@ local TableOld = Class.new(
 function TableOld:render()
 	local styles = Table.copy(self.css)
 	styles['grid-template-columns'] = 'repeat(' .. (self.columns or self:_getMaxCells()) .. ', auto)'
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = WidgetUtil.collect('csstable-widget', unpack(self.classes)),
 		css = styles,
 		children = self.props.children

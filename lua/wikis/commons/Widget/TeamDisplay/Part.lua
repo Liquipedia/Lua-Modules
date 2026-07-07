@@ -11,7 +11,7 @@ local Logic = Lua.import('Module:Logic')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Component = Lua.import('Module:Widget/Component')
-local Html = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
 local TeamIcon = Lua.import('Module:Widget/Image/Icon/TeamIcon')
 

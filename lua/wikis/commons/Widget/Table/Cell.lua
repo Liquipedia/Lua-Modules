@@ -12,7 +12,7 @@ local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 
 ---@class WidgetCellInput
 ---@field children (string|number|table|Html)[]?
@@ -38,7 +38,7 @@ function TableCell:render()
 	local styles = Table.copy(self.css)
 	styles['grid-row'] = self.rowSpan and 'span ' .. self.rowSpan or nil
 	styles['grid-column'] = self.colSpan and 'span ' .. self.colSpan or nil
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = WidgetUtil.collect('csstable-widget-cell', unpack(self.classes)),
 		css = styles,
 		children = self.props.children

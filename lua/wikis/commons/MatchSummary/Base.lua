@@ -19,7 +19,7 @@ local VodLink = Lua.import('Module:VodLink')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Links = Lua.import('Module:Links')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchHeader = Lua.import('Module:Widget/Match/Header')
 local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
@@ -178,7 +178,7 @@ local MatchSummary = {
 function MatchSummary.createDefaultHeader(match, options)
 	options = options or {}
 
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = WidgetUtil.collect(
 			MatchCountdown{
 				match = match,
@@ -255,7 +255,7 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 
 	local substituteComment = DisplayHelper.createSubstitutesComment(matchData)
 
-	match:comment(HtmlWidgets.Fragment{
+	match:comment(Html.Fragment{
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.Casters{casters = matchData.extradata.casters},
 			MatchSummaryWidgets.MatchComment{

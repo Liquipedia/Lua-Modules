@@ -18,12 +18,12 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local Collapsible = Lua.import('Module:Widget/Match/Summary/Collapsible')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
-local Span = HtmlWidgets.Span
-local Tr = HtmlWidgets.Tr
-local Th = HtmlWidgets.Th
-local Td = HtmlWidgets.Td
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
+local Span = Html.Span
+local Tr = Html.Tr
+local Th = Html.Th
+local Td = Html.Td
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 

@@ -17,7 +17,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
-local WidgetsHtml = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
@@ -25,9 +25,9 @@ local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local Div = WidgetsHtml.Div
-local Abbr = WidgetsHtml.Abbr
-local Hr = WidgetsHtml.Hr
+local Div = Html.Div
+local Abbr = Html.Abbr
+local Hr = Html.Hr
 
 -- table2 aliases
 local Row = TableWidgets.Row
@@ -143,7 +143,7 @@ function ValveOperationalRequirementsTable.make(frame)
 			linkType = 'github'
 		} or nil,
 		ValveOperationalRequirementsTable._makeTableRow{
-			title = WidgetsHtml.Fragment{children = {
+			title = Html.Fragment{children = {
 				'Applicable ',
 				Abbr{children = 'TOR', title = 'Tournament Operating Requirements'}
 			}},
@@ -184,9 +184,9 @@ end
 ---@return Widget
 function ValveOperationalRequirementsTable._makeTorDisplay(commit)
 	if commit == 'latest' then
-		return WidgetsHtml.I{children = 'Latest Version'}
+		return Html.I{children = 'Latest Version'}
 	end
-	return WidgetsHtml.Code{children = commit}
+	return Html.Code{children = commit}
 end
 
 ---@private
@@ -202,15 +202,15 @@ function ValveOperationalRequirementsTable._makeVrsDisplay(vrsData)
 		vrsRegion.displayName,
 		Logic.isNotEmpty(vrsData.startingRank) and vrsData.startingRank ~= 1 and {
 			' ',
-			WidgetsHtml.I{children = {
+			Html.I{children = {
 				'(Starting at #',
 				vrsData.startingRank,
 				')'
 			}}
 		} or nil,
 		Logic.isNotEmpty(vrsData.filtering) and {
-			WidgetsHtml.Br{},
-			WidgetsHtml.I{children = {
+			Html.Br{},
+			Html.I{children = {
 				'(Filtered: ',
 				vrsData.filtering,
 				')'
