@@ -90,7 +90,7 @@ end
 ---Attempts to parse a JSON encoded table. Returns nil if unsuccessful.
 ---Checks if the given string starts with `'{'` or `'['`
 ---
----Example: JsonExt.parseIfTable('{"a" = 3}') = {a = 3}
+---Example: `JsonExt.parseIfTable('{"a" = 3}') = {a = 3}`
 ---@param any string
 ---@return table?
 ---@overload fun(any: any): nil
