@@ -98,16 +98,18 @@ function Logic.isNotDeepEmpty(val)
 end
 
 ---Check if the input is a representation of a boolean
----@param val string|number|boolean|nil
+---@param val string|number|nil
 ---@return boolean
+---@overload fun(val: boolean): boolean
 function Logic.readBool(val)
 	return val == 'true' or val == 't' or val == 'yes' or val == 'y' or val == true or val == '1' or val == 1
 end
 
 ---Reads a boolean string/number representation to a boolean.
 ---If the supplied value is nil will return nil
----@param val string|number|boolean|nil
+---@param val string|number|nil
 ---@return boolean?
+---@overload fun(val: boolean): boolean
 function Logic.readBoolOrNil(val)
 	if Logic.readBool(val) then
 		return true
