@@ -1,10 +1,34 @@
+$prizepool-badge-size: 1.5rem;
+$prizepool-accent-width: 0.25rem;
+$prizepool-place-font-size: 0.75rem;
+
 /*******************************************************************************
-Template(s): Prize pool tables
-Author(s): FO-nTTaX
+Shared prize-pool custom properties
+
+`--prize-pool-*` are consumed by legacy tables here AND by Colours.scss
+(`.background-color-first-place` / `.bg-first` / `.bg-p1` resolve `--prize-pool-gold`),
+so they must stay defined even though the redesigned table no longer uses them.
+`--prizepool-place-*` are the redesign tokens for the Table2 placement table.
 *******************************************************************************/
 
 :root {
 	--prize-pool-background-color: transparent;
+
+	// Reuse the standard gold/silver/bronze placement tokens so top-3 badges match.
+	--prizepool-place-1-accent: var( --clr-semantic-gold-40 );
+	--prizepool-place-2-accent: var( --clr-semantic-silver-40 );
+	--prizepool-place-3-accent: var( --clr-semantic-bronze-40 );
+
+	// Faint full-row tint per place (light theme; dark overrides in `.theme--dark`).
+	--prizepool-place-1-tint: #f7f2d9;
+	--prizepool-place-2-tint: #e6eaeb;
+	--prizepool-place-3-tint: #eceae4;
+
+	// Hover tint derived from the row tint. hsl( from … ) is safe here — `:hover` is
+	// never captured by the exporter, so this value never reaches html2canvas.
+	--prizepool-place-1-tint-hover: hsl( from var( --prizepool-place-1-tint ) h s calc( l * 0.9 ) );
+	--prizepool-place-2-tint-hover: hsl( from var( --prizepool-place-2-tint ) h s calc( l * 0.9 ) );
+	--prizepool-place-3-tint-hover: hsl( from var( --prizepool-place-3-tint ) h s calc( l * 0.9 ) );
 }
 
 .theme--light {
@@ -25,15 +49,33 @@ Author(s): FO-nTTaX
 	--prize-pool-silver: var( --clr-secondary-39 );
 	--prize-pool-bronze: var( --clr-semantic-bronze-20 );
 	--prize-pool-copper: var( --clr-semantic-copper-20 );
+
+	--prizepool-place-1-accent: var( --clr-semantic-gold-30 );
+	--prizepool-place-2-accent: var( --clr-semantic-silver-40 );
+	--prizepool-place-3-accent: var( --clr-semantic-bronze-30 );
+
+	--prizepool-place-1-tint: #2e2a17;
+	--prizepool-place-2-tint: #242829;
+	--prizepool-place-3-tint: #26241f;
+
+	--prizepool-place-1-tint-hover: hsl( from var( --prizepool-place-1-tint ) h s calc( l * 1.25 ) );
+	--prizepool-place-2-tint-hover: hsl( from var( --prizepool-place-2-tint ) h s calc( l * 1.25 ) );
+	--prizepool-place-3-tint-hover: hsl( from var( --prizepool-place-3-tint ) h s calc( l * 1.25 ) );
 }
+
+/*******************************************************************************
+Legacy / shared prize pool table styles
+Template(s): Prize pool tables — Author(s): FO-nTTaX
+
+Still relied on by non-redesigned consumers that share the `prizepooltable`
+class and the global `bg-*` / `background-color-*-place` placement classes
+(MvpTable, SeriesMedalStats, StageWinnings, TournamentPlayerInformation,
+TournamentsListing, css-grid tables). Do not remove without auditing those.
+*******************************************************************************/
 
 table.prizepooltable:not( .collapsed ) .prizepooltableshow,
 table.prizepooltable.collapsed .prizepooltablehide {
 	display: none;
-}
-
-.prizepooltabletoggle {
-	cursor: pointer;
 }
 
 .prizepooltable-col-player,
@@ -55,6 +97,9 @@ table.prizepooltable.collapsed .prizepooltablehide {
 	}
 }
 
+// Legacy data-cutafter collapse (mvp / medal / winnings tables, which share the
+// `prizepooltable` class and Prizepooltable.js). The JS injects the toggle before
+// the (cutAfter + 2)-th row, so rows from (cutAfter + 3) onward are hidden.
 @for $i from 0 through 32 {
 	html.client-js .prizepooltable.collapsed[ data-cutafter="#{$i}" ] tr:nth-child( n + #{ $i + 3 } ) {
 		display: none;
@@ -280,11 +325,12 @@ Author: Rathoz
 	display: none !important;
 }
 
-.collapsed .ppt-toggle-expand .general-collapsible-collapse-button,
-.general-collapsible:not( .collapsed ) .ppt-toggle-expand .general-collapsible-expand-button {
-	display: none !important;
+.prizepooltabletoggle {
+	cursor: pointer;
 }
 
+// Legacy css-grid table widget (Module:Widget/Table/Old), still used by
+// non-prizepool modules (e.g. infoboxes). Prizepool no longer renders via this.
 .csstable-widget {
 	border-right: 1px solid var( --table-border-color, #bbbbbb );
 	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
@@ -306,18 +352,159 @@ Author: Rathoz
 	}
 }
 
-.ppt-toggle-expand {
-	grid-column: 1 / -1;
+/*******************************************************************************
+Table2-based placement / award prize pool table ( redesign )
 
-	> * {
-		color: unset !important;
-		text-decoration: none !important;
+Scoped to `.prizepooltable-placement` / `.prizepool-table-wrapper` so it owns the
+redesigned table only and does not affect the other Table2 tables that merely
+share the `prizepooltable` class.
+*******************************************************************************/
+
+.prizepool-table-wrapper {
+	.table2__container {
+		overflow-x: auto;
+		scrollbar-width: none;
+
+		@supports not ( scrollbar-width: none ) {
+			&::-webkit-scrollbar {
+				display: none;
+			}
+		}
 	}
 }
 
+.prizepooltable {
+	.prizepooltable-badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: $prizepool-badge-size;
+		height: $prizepool-badge-size;
+		padding: 0 0.25rem;
+		border-radius: 0.25rem;
+		font-weight: bold;
+		line-height: 1;
+		font-size: $prizepool-place-font-size;
+		text-shadow: 0 1px 1px rgba( 0, 0, 0, 0.5 );
+		color: #ffffff;
+
+		&.placement-1 {
+			background-color: var( --prizepool-place-1-accent );
+		}
+
+		&.placement-2 {
+			background-color: var( --prizepool-place-2-accent );
+		}
+
+		&.placement-3 {
+			background-color: var( --prizepool-place-3-accent );
+		}
+	}
+
+	&.prizepooltable-placement {
+		.prizepooltable-place {
+			text-align: center;
+			font-weight: bold;
+			font-size: $prizepool-place-font-size;
+			color: var( --clr-secondary-25 );
+
+			// Override the legacy `… > td.prizepooltable-place` metal fill so the row
+			// tint + accent bar show through on the redesigned table instead.
+			background-color: transparent;
+
+			.theme--dark & {
+				color: var( --clr-secondary-100 );
+			}
+		}
+
+		// Top-3 row tint + accent bar. The Table2 zebra rule is `:where()`-wrapped, so these
+		// plain selectors out-specify it without a theme/`.table2__table` qualifier.
+		// `border-bottom: 0` drops the legacy per-place coloured row border. The hover tint
+		// re-applies on `table2__row--group-hover` (added by Table2.js to every row in a
+		// hovered group) since the base tint above out-specifies the generic group-hover rule.
+		$prizepool-top-placements: ( first: 1, second: 2, third: 3 );
+
+		@each $name, $n in $prizepool-top-placements {
+			tr.table2__row--body.background-color-#{ $name }-place {
+				border-bottom: 0;
+				background-color: var( --prizepool-place-#{ $n }-tint );
+
+				.prizepooltable-place {
+					position: relative;
+
+					&::before {
+						content: "";
+						position: absolute;
+						inset: 0 auto 0 0;
+						width: $prizepool-accent-width;
+						background-color: var( --prizepool-place-#{ $n }-accent );
+					}
+				}
+
+				&:hover,
+				&.table2__row--group-hover {
+					background-color: var( --prizepool-place-#{ $n }-tint-hover );
+				}
+			}
+		}
+	}
+
+	tr.table2__row--body.bg-win .prizepooltable-place {
+		background-color: var( --clr-forest-background-color, inherit );
+	}
+
+	tr.table2__row--body.bg-lose .prizepooltable-place {
+		background-color: var( --clr-cinnabar-background-color, inherit );
+	}
+
+	tr.table2__row--body.bg-dq .prizepooltable-place {
+		background-color: var( --clr-sapphire-background-color, inherit );
+	}
+}
+
+// Currency toggle: pill stacked above the card.
+.prizepool-currency-switch {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	width: fit-content;
+
+	.switch-pill-container {
+		align-self: flex-start;
+	}
+
+	.switch-pill-option {
+		flex: none;
+	}
+}
+
+// Footer toggle for the redesigned (general-collapsible) table.
+.prizepooltable-toggle {
+	text-align: center;
+	font-weight: bold;
+	cursor: pointer;
+	color: var( --clr-brand-30, #0a558f );
+
+	.theme--dark & {
+		color: var( --clr-brand-80, #a7cdf1 );
+	}
+
+	a {
+		color: inherit;
+	}
+}
+
+html:not( .client-js ) .prizepooltable-toggle {
+	display: none;
+}
+
+// Gated on `client-js` so non-JS readers see all rows (the toggle can't expand them).
+html.client-js .prizepool-table-wrapper.collapsed .ppt-hide-on-collapse {
+	display: none;
+}
+
 /*******************************************************************************
-Template: ( Standardized ) prize pool section
-Author: iMarbot
+( Standardized ) prize pool section — Author: iMarbot
 *******************************************************************************/
 
 .prizepool-section-wrapper {
@@ -329,6 +516,7 @@ Author: iMarbot
 .prizepool-section-tables {
 	display: flex;
 	flex-flow: row wrap;
+	align-items: flex-start;
 	gap: 1em;
 
 	@media ( max-width: 600px ) {

@@ -15,9 +15,11 @@
 ---@field renderFn string|fun(props: P, context?: Context?): Renderable
 ---@field props P
 
+---@alias HtmlStyleProps table<string, string|number?>
+
 ---@class HtmlNodeProps
 ---@field classes? string[]
----@field css? table<string, string|number?>
+---@field css? HtmlStyleProps
 ---@field attributes? table<string, string|number?>
 ---@field children? Renderable|Renderable[]
 
