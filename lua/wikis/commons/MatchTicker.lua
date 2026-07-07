@@ -15,6 +15,7 @@ local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
@@ -36,6 +37,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local DEFAULT_QUERY_COLUMNS = {
 	'match2opponents',
@@ -75,7 +77,7 @@ local TABLE_OF_CONTENTS = '__TOC__'
 ---@field tournaments string[]
 ---@field limit integer
 ---@field order string
----@field player string?
+---@field players string[]?
 ---@field teamPages string[]?
 ---@field hideTournament boolean
 ---@field queryColumns string[]
@@ -117,7 +119,11 @@ function MatchTicker:init(args)
 	args = args or {}
 	self.args = args
 
-	local hasOpponent = Logic.isNotEmpty(args.player or args.team)
+	local rawPlayers = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.player))
+		or self:_fetchPlayersOnTeam()
+	local players = Logic.nilIfEmpty(Array.map(rawPlayers or {}, Page.pageifyLink))
+
+	local hasOpponent = Logic.isNotEmpty(players or args.team)
 
 	local config = {
 		tournaments = Array.extractValues(
@@ -127,7 +133,7 @@ function MatchTicker:init(args)
 		queryByParent = Logic.readBool(args.queryByParent),
 		limit = tonumber(args.limit) or DEFAULT_LIMIT,
 		order = args.order or (Logic.readBool(args.recent) and DEFAULT_RECENT_ORDER or DEFAULT_ORDER),
-		player = args.player and mw.ext.TeamLiquidIntegration.resolve_redirect(args.player):gsub(' ', '_') or nil,
+		players = players,
 		queryColumns = args.queryColumns or DEFAULT_QUERY_COLUMNS,
 		additionalConditions = args.additionalConditions or '',
 		recent = Logic.readBool(args.recent),
@@ -201,6 +207,26 @@ function MatchTicker:init(args)
 	return self
 end
 
+---@return string[]?
+function MatchTicker:_fetchPlayersOnTeam()
+	if not self.args.playerTeam then
+		return
+	end
+
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('status'), Comparator.eq, 'active'),
+		ConditionNode(ColumnName('pagename'), Comparator.eq, Page.pageifyLink(self.args.playerTeam)),
+	}
+
+	local squadPlayers = mw.ext.LiquipediaDB.lpdb('squadplayer', {
+		limit = 5000,
+		conditions = tostring(conditions),
+		query = 'link'
+	})
+
+	return Array.map(squadPlayers, Operator.property('link'))
+end
+
 ---queries the matches and filters them for unwanted ones
 ---@param matches table?
 ---@return MatchTicker
@@ -257,13 +283,13 @@ function MatchTicker:buildQueryConditions()
 		conditions:add(tournamentConditions)
 	end
 
-	if config.player then
-		local playerNoUnderScore = config.player:gsub('_', ' ')
+	if config.players then
+		local playersWithoutUnderScore = Array.map(config.players, function(player) return (player:gsub('_', ' ')) end)
 		conditions:add(ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('opponent'), Comparator.eq, config.player),
-			ConditionNode(ColumnName('opponent'), Comparator.eq, playerNoUnderScore),
-			ConditionNode(ColumnName('player'), Comparator.eq, config.player),
-			ConditionNode(ColumnName('player'), Comparator.eq, playerNoUnderScore),
+			ConditionUtil.anyOf(ColumnName('opponent'), config.players),
+			ConditionUtil.anyOf(ColumnName('opponent'), playersWithoutUnderScore),
+			ConditionUtil.anyOf(ColumnName('player'), config.players),
+			ConditionUtil.anyOf(ColumnName('player'), playersWithoutUnderScore),
 		})
 	end
 
@@ -500,13 +526,13 @@ function MatchTicker:adjustMatch(match)
 		return match
 	end
 
-	local opponentNames = Array.extend({self.config.player}, self.config.teamPages)
+	local opponentNames = Array.extend(self.config.players, self.config.teamPages)
 	if
 		--check for the name value
 		Table.includes(opponentNames, ((match.opponents[2].name or ''):gsub(' ', '_')))
 		--check inside match2players too for the player value
-		or self.config.player and Table.any(match.opponents[2].players, function(_, playerData)
-			return (playerData.pageName or ''):gsub(' ', '_') == self.config.player end)
+		or self.config.players and Table.any(match.opponents[2].players, function(_, playerData)
+			return Table.includes(self.config.players, (playerData.pageName or ''):gsub(' ', '_')) end)
 	then
 		return MatchTicker.switchOpponents(match)
 	end
