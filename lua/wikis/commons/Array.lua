@@ -617,8 +617,7 @@ If `initialValue` is not provided then the `operator(initialValue, array[1])` st
 
 Example:
 ```
-local function pow(x, y) return x ^ y end
-Array.reduce({2, 3, 5}, pow)
+Array.reduce({2, 3, 5}, math.pow)
 -- Returns 32768
 ```
 ]]
