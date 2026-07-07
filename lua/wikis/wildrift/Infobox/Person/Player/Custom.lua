@@ -24,8 +24,9 @@ local Player = Lua.import('Module:Infobox/Person')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local SIZE_CHAMPION = '25x25px'
 
@@ -39,7 +40,7 @@ local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	local args = player.args
@@ -73,15 +74,15 @@ function CustomPlayer.run(frame)
 		}
 	end
 
-	return HtmlWidgets.Fragment{children = {
+	return Html.Fragment{children = {
 		builtInfobox,
 		autoPlayerIntro,
 	}}
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -118,7 +119,7 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {args.country})
 
 	if String.isNotEmpty(args.team2) then
-		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(args.team2).page
+		lpdbData.extradata.team2 = TeamTemplate.getPageName(args.team2)
 	end
 
 	return lpdbData
@@ -129,11 +130,11 @@ function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = TeamTemplate.getPageName(self.args.team)
 		---@cast teamPage -nil
-		return HtmlWidgets.Fragment{
-			children = {
+		return Html.Fragment{
+			children = WidgetUtil.collect(
 				MatchTicker.recent{team = teamPage},
 				UpcomingTournaments.team{name = teamPage}
-			}
+			)
 		}
 	end
 end

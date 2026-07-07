@@ -57,13 +57,13 @@ local Status = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Team.run(frame)
 	local team = Team(frame)
 	return team:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Team:createInfobox()
 	local args = self.args
 
@@ -308,7 +308,7 @@ function Team:_createUpcomingMatches()
 		return nil
 	end
 
-	local result = Logic.tryCatch(
+	return Logic.tryCatch(
 		function()
 			local matchTicker = MatchTicker{
 				team = self.pagename,
@@ -316,24 +316,14 @@ function Team:_createUpcomingMatches()
 				upcoming = true,
 				ongoing = true,
 				hideTournament = false,
+				entityStyle = true,
 			}
-			matchTicker:query()
-			return matchTicker
+			return matchTicker:query():create()
 		end,
 		function()
 			return nil
 		end
 	)
-
-	if not result or not result.matches or #result.matches == 0 then
-		return nil
-	end
-
-	local EntityDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
-	return EntityDisplay.Container{
-		config = result.config,
-		matches = result.matches,
-	}:create()
 end
 
 ---@param location string?

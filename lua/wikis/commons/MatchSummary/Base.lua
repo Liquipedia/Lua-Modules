@@ -293,7 +293,7 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 		args.bracketId, args.matchId)
 
 	---@type (fun(match: MatchGroupUtilMatch):string?)|string|integer?
-	local width = args.width or options.width
+	local width = args.width or options.width or (args.config or {}).width
 	if type(width) == 'function' then
 		width = width(match)
 	elseif Logic.isNumeric(width) then
@@ -313,7 +313,7 @@ end
 
 ---@param mapVetoes table
 ---@param options {game: string?, emptyMapDisplay: string?}?
----@return {firstVeto: integer?, vetoFormat: string?, vetoRounds: table[]}?
+---@return MapVetoProps?
 function MatchSummary.preProcessMapVeto(mapVetoes, options)
 	if Logic.isEmpty(mapVetoes) then
 		return
@@ -362,7 +362,7 @@ end
 ---@param maxNumberOfCharacters integer
 ---@return string[]
 function MatchSummary.buildCharacterList(data, prefix, maxNumberOfCharacters)
-	return Array.map(Array.range(1, maxNumberOfCharacters), function(index)
+	return Array.mapRange(1, maxNumberOfCharacters, function(index)
 		return data[prefix .. index]
 	end)
 end

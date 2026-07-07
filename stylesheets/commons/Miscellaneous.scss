@@ -1303,67 +1303,6 @@ kbd {
 	font-family: "Open Sans", sans-serif;
 }
 
-/*******************************************************************************
-Template(s): Achievement Table Placement Numbers
-Author(s): spazer, Lafungo
-*******************************************************************************/
-.placement-text {
-	text-shadow: 1px 1px rgba( 64, 64, 64, 0.4 ), 1px -1px rgba( 64, 64, 64, 0.4 ), -1px -1px rgba( 64, 64, 64, 0.4 ), -1px 1px rgba( 64, 64, 64, 0.4 );
-	font-weight: bold;
-	color: #ffffff;
-}
-
-.placement-box {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	align-self: center;
-	border-radius: 0.25rem;
-	padding: 0 0.5rem;
-	min-width: 2.75rem;
-	height: 1.5rem;
-	font-size: 0.8125rem;
-	line-height: 1.25;
-}
-
-$placement-colors: (
-	"1": ( var( --clr-semantic-gold-40 ), var( --clr-semantic-gold-30 ) ),
-	"2": ( var( --clr-semantic-silver-40 ) ),
-	"3": ( var( --clr-semantic-bronze-40 ), var( --clr-semantic-bronze-30 ) ),
-	"4": ( var( --clr-semantic-copper-40 ), var( --clr-semantic-copper-30 ) ),
-	"5": ( var( --clr-elm-40 ), var( --clr-elm-30 ) ),
-	"6": ( var( --clr-elm-30 ), var( --clr-elm-20 ) ),
-	"lightblue": ( var( --clr-elm-40 ), color-mix( in srgb, #000000 20%, var( --clr-elm-40 ) ) ),
-	"blue": ( var( --clr-elm-30 ), color-mix( in srgb, #000000 20%, var( --clr-elm-30 ) ) ),
-	"darkblue": ( var( --clr-elm-20 ), color-mix( in srgb, #000000 20%, var( --clr-elm-20 ) ) ),
-	"darkgrey": ( var( --clr-elm-10 ) ),
-	"win": ( var( --clr-semantic-positive-40 ), var( --clr-semantic-positive-20 ) ),
-	"draw": ( var( --clr-tuliptree-80 ), var( --clr-tuliptree-40 ) ),
-	"lose": ( var( --clr-secondary-80 ), var( --clr-secondary-25 ) ),
-	"up": ( var( --clr-atlantis-40 ), var( --clr-atlantis-30 ) ),
-	"stay": ( var( --clr-sun-40 ), var( --clr-sun-30 ) ),
-	"down": ( color-mix( in srgb, #ffffff 30%, var( --clr-semantic-negative-40 ) ), var( --clr-semantic-negative-30 ) ),
-	"dnp": ( var( --clr-moon-80 ), color-mix( in srgb, #000000 20%, var( --clr-moon-80 ) ) ),
-);
-
-@each $name, $colors in $placement-colors {
-	.placement-#{$name} {
-		@if length( $colors ) == 2 {
-			.theme--light & {
-				background-color: nth( $colors, 1 );
-			}
-
-			.theme--dark & {
-				background-color: nth( $colors, 2 );
-			}
-		}
-
-		@else {
-			background-color: nth( $colors, 1 );
-		}
-	}
-}
-
 .green-check {
 	color: #00a901;
 	font-size: 14px;
@@ -1405,118 +1344,6 @@ Author(s): iMarbot
 		> * {
 			box-sizing: border-box;
 		}
-	}
-}
-
-/*******************************************************************************
-Template(s):Bracket Match Cards
-Author(s):Rapture
-*******************************************************************************/
-.match-card > tbody > tr.Match {
-	display: table-row;
-}
-
-.match-card > tbody > tr.Match > td {
-	display: table-cell;
-	line-height: 1.42857143;
-	padding: 5px;
-	text-align: center;
-}
-
-.match-card > tbody > tr.Match > td.TeamLeft {
-	text-align: right;
-}
-
-.match-card > tbody > tr.Match > td.TeamRight {
-	text-align: left;
-}
-
-.match-card > tbody > tr.Match > td.Date {
-	text-align: right;
-}
-
-.match-card > tbody > tr.Match > td.Round {
-	text-align: left;
-	padding-left: 4px;
-}
-
-@media screen and ( max-width: 700px ) {
-	.match-card {
-		width: 100% !important;
-		max-width: 425px;
-		border: 1px solid #bbbbbb;
-		text-align: center;
-	}
-
-	.match-card > thead > tr.HeaderRow {
-		display: none;
-	}
-
-	.match-card > tbody > tr.Match {
-		display: block;
-		padding: 3px 5px 5px 5px;
-	}
-
-	.match-card > tbody > tr.Match:not( :last-of-type ) {
-		border-bottom: 1px solid #bbbbbb;
-	}
-
-	.match-card > tbody > tr.Match > td {
-		display: inline;
-		line-height: 1.42857143;
-		padding: 0;
-		border: 0 !important;
-	}
-
-	.match-card > tbody > tr.Match > td.Date {
-		display: block;
-		font-size: 80%;
-		color: #757575;
-	}
-
-	.match-card > tbody > tr.Match > td.Round {
-		display: block;
-		font-size: 80%;
-		color: #757575;
-		font-style: italic;
-		padding-bottom: 3px;
-	}
-
-	.match-card > tbody > tr.Match > td.Round-solo {
-		display: block;
-		font-size: 80%;
-		color: #757575;
-		font-style: italic;
-	}
-
-	.match-card > tbody > tr.Match > td.TeamLeft {
-		display: inline-block;
-		width: 42%;
-		text-align: right;
-	}
-
-	.match-card > tbody > tr.Match > td.Score {
-		display: inline-block;
-		width: 16%;
-	}
-
-	.match-card > tbody > tr.Match > td.TeamRight {
-		display: inline-block;
-		width: 42%;
-		text-align: left;
-	}
-
-	.match-card > tbody > tr.Match > td.Date {
-		text-align: center;
-	}
-
-	.match-card > tbody > tr.Match > td.Round {
-		text-align: center;
-		padding-left: 0;
-	}
-
-	.match-card > tbody > tr.Match > td.MatchPage > a > span.fa-stack {
-		font-size: 75%;
 	}
 }
 
@@ -2237,6 +2064,7 @@ Author: warnull
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	justify-self: center;
 }
 
 .general-collapsible-default-toggle {
@@ -2343,6 +2171,14 @@ Author(s): Elysienna
 
 .matchlist-gradient-yellow {
 	background: linear-gradient( 90deg, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 0%, rgba( 237, 208, 80, 1 ) 75%, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 100% );
+}
+
+.theme--light {
+	--matchlist-header-background-color: #fbf2df;
+}
+
+.theme--dark {
+	--matchlist-header-background-color: var( --clr-secondary-16 );
 }
 
 .matchlist-header {

@@ -13,8 +13,8 @@ local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
@@ -50,7 +50,7 @@ local CONTENT = {
 	},
 	eloRanking = {
 		heading = 'Warcraft3.info Elo Ranking',
-		body = HtmlWidgets.Fragment{children = {
+		body = Html.Fragment{children = {
 			W3EloRanking{},
 			Div{
 				css = {['text-align'] = 'center'},

@@ -7,24 +7,18 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Tier = Lua.import('Module:Tier/Utils')
 
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
----@class TournamentsTickerPillWidgetProps
+---@class TournamentsTickerPillProps
 ---@field tournament StandardTournament
 ---@field variant 'solid'|'subtle'?
 ---@field colorScheme 'full'|'top3'?
 
----@class TournamentsTickerPillWidget: Widget
----@operator call(TournamentsTickerPillWidgetProps): TournamentsTickerPillWidget
----@field props TournamentsTickerPillWidgetProps
-local TournamentsTickerPillWidget = Class.new(Widget)
-
-TournamentsTickerPillWidget.defaultProps = {
+local defaultProps = {
 	variant = 'solid',
 	colorScheme = 'full',
 }
@@ -46,14 +40,15 @@ local COLOR_CLASSES = {
 	['default'] = 'misc', -- Fallback for when there's no match
 }
 
----@return Widget?
-function TournamentsTickerPillWidget:render()
-	local tournament = self.props.tournament
+---@param props TournamentsTickerPillProps
+---@return VNode?
+local function TournamentsTickerPill(props)
+	local tournament = props.tournament
 	if not tournament then
 		return
 	end
 
-	local subtle = self.props.variant == 'subtle'
+	local subtle = props.variant == 'subtle'
 	local tierShort, tierTypeShort = Tier.toShortName(tournament.liquipediaTier, tournament.liquipediaTierType)
 
 	local colorClass
@@ -67,22 +62,22 @@ function TournamentsTickerPillWidget:render()
 	local chipText = subtle and Tier.toName(tournament.liquipediaTier) or tierShort
 	local textContent = tierTypeShort and tierTypeShort or Tier.toName(tournament.liquipediaTier)
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = WidgetUtil.collect(
 			'tournament-badge',
 			'badge--' .. colorClass,
 			subtle and 'tournament-badge--subtle' or nil,
-			self.props.colorScheme == 'top3' and 'tournament-badge--top3' or nil
+			props.colorScheme == 'top3' and 'tournament-badge--top3' or nil
 		),
 		children = WidgetUtil.collect(
-			tierTypeShort and HtmlWidgets.Div{
+			tierTypeShort and Html.Div{
 				classes = WidgetUtil.collect(
 					'tournament-badge__chip',
 					not subtle and 'chip--' .. COLOR_CLASSES[tournament.liquipediaTier] or nil
 				),
 				children = chipText,
 			} or nil,
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'tournament-badge__text'},
 				children = textContent,
 			}
@@ -90,4 +85,4 @@ function TournamentsTickerPillWidget:render()
 	}
 end
 
-return TournamentsTickerPillWidget
+return Component.component(TournamentsTickerPill, defaultProps)

@@ -15,7 +15,6 @@ local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TypeUtil = Lua.import('Module:TypeUtil')
 
@@ -98,6 +97,10 @@ Opponent.types.Opponent = TypeUtil.union(
 	Opponent.types.TeamOpponent,
 	Opponent.types.PartyOpponent,
 	Opponent.types.LiteralOpponent
+)
+
+Opponent.types.OpponentType = TypeUtil.literalUnion(
+	Opponent.solo, Opponent.duo, Opponent.trio, Opponent.quad, Opponent.team, Opponent.literal
 )
 
 ---Checks if the provided opponent type is a party type
@@ -206,7 +209,7 @@ end
 ---@param type string
 ---@return boolean
 function Opponent.isType(type)
-	return Table.includes(Opponent.types, type)
+	return #TypeUtil.checkValue(type, Opponent.types.OpponentType) == 0
 end
 
 ---Reads an opponent type.
@@ -214,13 +217,13 @@ end
 ---@param type string
 ---@return OpponentType?
 function Opponent.readType(type)
-	return Table.includes(Opponent.types, type) and type or nil
+	return Opponent.isType(type) and type or nil
 end
 
 ---Asserts that an arbitrary value is a valid representation of an opponent
 ---@param opponent any
 function Opponent.assertOpponent(opponent)
-	assert(Opponent.isOpponent(opponent), 'Invalid opponent')
+	TypeUtil.assertValue(opponent, Opponent.types.Opponent, {name = 'Opponent'})
 end
 
 ---Validates that an arbitrary value is a valid representation of an opponent
@@ -455,7 +458,7 @@ function Opponent.readOpponentArgs(args)
 		return {type = Opponent.solo, players = {player}, extradata = {}}
 
 	elseif partySize then
-		local players = Array.map(Array.range(1, partySize), function(playerIndex)
+		local players = Array.mapRange(1, partySize, function(playerIndex)
 			return Opponent.readPlayerArgs(args, playerIndex)
 		end)
 		return {type = args.type, players = players, extradata = {}}
@@ -549,7 +552,7 @@ end
 
 ---Reads an opponent struct and builds a standings/placement lpdb struct from it
 ---@param opponent standardOpponent
----@param options {setPlayersInTeam: boolean?}?
+---@param options {setPlayersInTeam: boolean?, forceUnderscores: boolean?}?
 ---@return {opponentname: string, opponenttemplate: string?, opponenttype: OpponentType, opponentplayers: table?}
 function Opponent.toLpdbStruct(opponent, options)
 	options = options or {}
@@ -558,6 +561,13 @@ function Opponent.toLpdbStruct(opponent, options)
 		opponenttemplate = opponent.template,
 		opponenttype = opponent.type,
 	}
+
+	-- TODO: this per-call `forceUnderscores` override is a stopgap. Storage of player
+	-- pagenames should be unconditionally underscore-normalized at every write site,
+	-- not gated by a wiki-level config flag. Remove this option once that lands.
+	local normalizePageName = options.forceUnderscores
+		and function(pageName) return pageName and (pageName:gsub(' ', '_')) or pageName end
+		or Page.applyUnderScoresIfEnforced
 
 	-- Add players for Party Type opponents, or if config is set to force it.
 	if Opponent.typeIsParty(opponent.type) or options.setPlayersInTeam then
@@ -575,7 +585,7 @@ function Opponent.toLpdbStruct(opponent, options)
 				prefix = 'p' .. playerCount
 			end
 
-			players[prefix] = Page.applyUnderScoresIfEnforced(player.pageName)
+			players[prefix] = normalizePageName(player.pageName)
 			players[prefix .. 'dn'] = player.displayName
 			players[prefix .. 'flag'] = player.flag
 			players[prefix .. 'team'] = player.team and
@@ -599,7 +609,7 @@ function Opponent.fromLpdbStruct(storageStruct)
 	if partySize then
 		local players = storageStruct.opponentplayers
 		return {
-			players = Array.map(Array.range(1, partySize), FnUtil.curry(Opponent.playerFromLpdbStruct, players)),
+			players = Array.mapRange(1, partySize, FnUtil.curry(Opponent.playerFromLpdbStruct, players)),
 			type = storageStruct.opponenttype,
 			extradata = {},
 		}

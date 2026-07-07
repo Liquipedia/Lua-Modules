@@ -17,6 +17,7 @@ local Matches = Lua.import('Module:Matches_Player')
 local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -38,7 +39,7 @@ local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -65,8 +66,8 @@ function CustomPlayer:_parseActive(manualInput, varName, autoFunction, autoFunct
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -224,7 +225,7 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 	end
 
 	local team = args.teamlink or args.team
-	if team and not mw.ext.TeamTemplate.teamexists(team) then
+	if team and not TeamTemplate.exists(team) then
 		table.insert(categories, 'Players with invalid team')
 	end
 
