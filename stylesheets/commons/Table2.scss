@@ -175,6 +175,18 @@ $table2-cell-padding-x: 0.75rem;
 				background-color: var( --clr-semantic-gold-18 );
 			}
 		}
+
+		// Collapse the inner vertical padding between stacked rows of a rowspan group
+		// (marked by Table2.js) so grouped rows read as one block. `[rowspan]` cells
+		// span the whole group, so their padding sits at the group's outer edges and
+		// must stay — hence `:not( [ rowspan ] )`.
+		&.table2__row--group-inner-top > td:not( [ rowspan ] ) {
+			padding-top: 0;
+		}
+
+		&.table2__row--group-inner-bottom > td:not( [ rowspan ] ) {
+			padding-bottom: 0;
+		}
 	}
 
 	&__title {

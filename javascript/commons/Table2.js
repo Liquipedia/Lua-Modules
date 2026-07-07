@@ -11,7 +11,9 @@ const TABLE2_CONFIG = {
 	},
 	CLASSES: {
 		EVEN: 'table2__row--even',
-		HEAD: 'table2__row--head'
+		HEAD: 'table2__row--head',
+		GROUP_INNER_TOP: 'table2__row--group-inner-top',
+		GROUP_INNER_BOTTOM: 'table2__row--group-inner-bottom'
 	}
 };
 
@@ -61,7 +63,8 @@ class Table2Striper {
 				return;
 			}
 
-			if ( groupRemaining === 0 ) {
+			const isGroupStart = groupRemaining === 0;
+			if ( isGroupStart ) {
 				isEven = !isEven;
 				this.groupCounter++;
 			}
@@ -73,6 +76,12 @@ class Table2Striper {
 			row.dataset.groupId = this.groupCounter;
 
 			groupRemaining--;
+
+			// Tighten the inner boundaries of a multi-row rowspan group: drop the top
+			// padding on every row after the first and the bottom padding on every row
+			// before the last, so grouped rows read as one block.
+			row.classList.toggle( TABLE2_CONFIG.CLASSES.GROUP_INNER_TOP, !isGroupStart );
+			row.classList.toggle( TABLE2_CONFIG.CLASSES.GROUP_INNER_BOTTOM, groupRemaining > 0 );
 		} );
 	}
 
