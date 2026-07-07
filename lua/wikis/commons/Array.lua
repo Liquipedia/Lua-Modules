@@ -531,7 +531,7 @@ end
 ---@generic T
 ---@param from integer
 ---@param to integer
----@param funct fun(index: integer): T
+---@param funct fun(index: integer): T?
 ---@return T[]
 ---@nodiscard
 function Array.mapRange(from, to, funct)

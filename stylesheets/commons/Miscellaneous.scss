@@ -1303,67 +1303,6 @@ kbd {
 	font-family: "Open Sans", sans-serif;
 }
 
-/*******************************************************************************
-Template(s): Achievement Table Placement Numbers
-Author(s): spazer, Lafungo
-*******************************************************************************/
-.placement-text {
-	text-shadow: 1px 1px rgba( 64, 64, 64, 0.4 ), 1px -1px rgba( 64, 64, 64, 0.4 ), -1px -1px rgba( 64, 64, 64, 0.4 ), -1px 1px rgba( 64, 64, 64, 0.4 );
-	font-weight: bold;
-	color: #ffffff;
-}
-
-.placement-box {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	align-self: center;
-	border-radius: 0.25rem;
-	padding: 0 0.5rem;
-	min-width: 2.75rem;
-	height: 1.5rem;
-	font-size: 0.8125rem;
-	line-height: 1.25;
-}
-
-$placement-colors: (
-	"1": ( var( --clr-semantic-gold-40 ), var( --clr-semantic-gold-30 ) ),
-	"2": ( var( --clr-semantic-silver-40 ) ),
-	"3": ( var( --clr-semantic-bronze-40 ), var( --clr-semantic-bronze-30 ) ),
-	"4": ( var( --clr-semantic-copper-40 ), var( --clr-semantic-copper-30 ) ),
-	"5": ( var( --clr-elm-40 ), var( --clr-elm-30 ) ),
-	"6": ( var( --clr-elm-30 ), var( --clr-elm-20 ) ),
-	"lightblue": ( var( --clr-elm-40 ), color-mix( in srgb, #000000 20%, var( --clr-elm-40 ) ) ),
-	"blue": ( var( --clr-elm-30 ), color-mix( in srgb, #000000 20%, var( --clr-elm-30 ) ) ),
-	"darkblue": ( var( --clr-elm-20 ), color-mix( in srgb, #000000 20%, var( --clr-elm-20 ) ) ),
-	"darkgrey": ( var( --clr-elm-10 ) ),
-	"win": ( var( --clr-semantic-positive-40 ), var( --clr-semantic-positive-20 ) ),
-	"draw": ( var( --clr-tuliptree-80 ), var( --clr-tuliptree-40 ) ),
-	"lose": ( var( --clr-secondary-80 ), var( --clr-secondary-25 ) ),
-	"up": ( var( --clr-atlantis-40 ), var( --clr-atlantis-30 ) ),
-	"stay": ( var( --clr-sun-40 ), var( --clr-sun-30 ) ),
-	"down": ( color-mix( in srgb, #ffffff 30%, var( --clr-semantic-negative-40 ) ), var( --clr-semantic-negative-30 ) ),
-	"dnp": ( var( --clr-moon-80 ), color-mix( in srgb, #000000 20%, var( --clr-moon-80 ) ) ),
-);
-
-@each $name, $colors in $placement-colors {
-	.placement-#{$name} {
-		@if length( $colors ) == 2 {
-			.theme--light & {
-				background-color: nth( $colors, 1 );
-			}
-
-			.theme--dark & {
-				background-color: nth( $colors, 2 );
-			}
-		}
-
-		@else {
-			background-color: nth( $colors, 1 );
-		}
-	}
-}
-
 .green-check {
 	color: #00a901;
 	font-size: 14px;
