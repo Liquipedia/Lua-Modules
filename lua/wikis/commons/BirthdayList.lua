@@ -176,9 +176,9 @@ function BirthdayList._queryPersons()
 		local birthDate = DateExt.readTimestamp(person.birthdate)
 		return {
 			month = DateExt.getMonthOf(birthDate),
-			person = {
-				pageName = person.pagename,
-				displayName = person.id,
+			person = Opponent.readSinglePlayerArgs{
+				link = person.pagename,
+				name = person.id,
 				flag = person.nationality,
 				faction = (person.extradata or {}).faction,
 			},
@@ -202,10 +202,9 @@ function BirthdayList._queryTeams()
 		local createDate = DateExt.readTimestamp(team.createdate)
 		return {
 			month = DateExt.getMonthOf(createDate),
-			team = {
-				extradata = {},
+			team = Opponent.readOpponentArgs{
 				type = Opponent.team,
-				template = team.pagename:gsub('_', ' '),
+				template = team.pagename,
 			},
 			date = createDate,
 			age = DateExt.calculateAge(DateExt.nilIfDefaultTimestamp(team.disbanddate), createDate),
