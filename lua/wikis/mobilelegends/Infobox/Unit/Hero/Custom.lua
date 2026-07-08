@@ -85,7 +85,31 @@ function CustomInjector:parse(id, widgets)
 			toBreakDownCell('lane', 'Lane'),
 			toBreakDownCell('primaryrole', 'Primary Role'),
 			toBreakDownCell('secondaryrole', 'Secondary Role')
-		)
+			if String.isEmpty(key) then return nil end
+			local iconData = ClassIcon[key:lower()]
+			if not iconData then return nil end
+			return Html.Fragment{
+				children = {
+					Html.B{
+						children = {title}
+						},
+					Html.Br{},
+					IconImageWidget{
+						imageLight = iconData.icon,
+						link = iconData.link,
+						size = '40px'
+					},
+					Html.Br{},
+					iconData.displayName
+				}
+			}
+end
+
+local breakDownContents = Array.append({},
+	toBreakDownCell(args.lane, 'Lane'),
+	toBreakDownCell(args.primaryrole, 'Primary Role'),
+	toBreakDownCell(args.secondaryrole, 'Secondary Role')
+)
 		return {
 			Breakdown{classes = {'infobox-center'}, children = breakDownContents},
 		}
