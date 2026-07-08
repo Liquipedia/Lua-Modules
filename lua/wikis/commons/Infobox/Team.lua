@@ -18,7 +18,7 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
-local MatchTicker = Lua.import('Module:MatchTicker')
+local MatchTicker = Lua.import('Module:MatchTicker/Controller')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
@@ -310,7 +310,7 @@ function Team:_createUpcomingMatches()
 
 	return Logic.tryCatch(
 		function()
-			local matchTicker = MatchTicker{
+			return MatchTicker.makeMatchTicker{
 				team = self.pagename,
 				limit = 5,
 				upcoming = true,
@@ -318,7 +318,6 @@ function Team:_createUpcomingMatches()
 				hideTournament = false,
 				entityStyle = true,
 			}
-			return matchTicker:query():create()
 		end,
 		function()
 			return nil

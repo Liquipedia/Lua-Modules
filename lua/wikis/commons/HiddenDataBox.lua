@@ -13,7 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local Game = Lua.import('Module:Game')
 local I18n = Lua.import('Module:I18n')
 local Info = Lua.import('Module:Info', {loadData = true})
-local MatchTicker = Lua.import('Module:MatchTicker')
+local MatchTicker = Lua.import('Module:MatchTicker/Controller')
 local Namespace = Lua.import('Module:Namespace')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local String = Lua.import('Module:StringUtils')
@@ -230,7 +230,7 @@ function HiddenDataBox._matchTicker(supressMatchTicker)
 
 	return Logic.tryCatch(
 		function()
-			local matchTicker = MatchTicker{
+			return MatchTicker.makeMatchTicker{
 				tournament = mw.title.getCurrentTitle().prefixedText,
 				limit = 5,
 				upcoming = true,
@@ -239,7 +239,6 @@ function HiddenDataBox._matchTicker(supressMatchTicker)
 				queryByParent = false,
 				entityStyle = true,
 			}
-			return matchTicker:query():create()
 		end,
 		function()
 			return nil

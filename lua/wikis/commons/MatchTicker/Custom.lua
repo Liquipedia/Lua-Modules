@@ -11,7 +11,7 @@ local Arguments = Lua.import('Module:Arguments')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
-local MatchTicker = Lua.import('Module:MatchTicker')
+local MatchTicker = Lua.import('Module:MatchTicker/Controller')
 local InfoboxHeader = Lua.import('Module:Widget/Infobox/Header')
 
 local CustomMatchTicker = {}
@@ -33,9 +33,9 @@ function CustomMatchTicker.mainPage(frame)
 	args.games = args['filterbuttons-game']
 
 	if args.type == 'upcoming' then
-		return MatchTicker(Table.merge(args, {ongoing = true, upcoming = true})):query():create()
+		return MatchTicker.makeMatchTicker(Table.merge(args, {ongoing = true, upcoming = true}))
 	elseif args.type == 'recent' then
-		return MatchTicker(Table.merge(args, {recent = true})):query():create()
+		return MatchTicker.makeMatchTicker(Table.merge(args, {recent = true}))
 	end
 end
 
@@ -51,19 +51,15 @@ end
 
 ---Displays recent matches for a player or team.
 ---@param args table
----@param matches {recent: table?}?
 ---@return Renderable?
-function CustomMatchTicker.recent(args, matches)
-	matches = matches or {}
-
+function CustomMatchTicker.recent(args)
 	--adjusting args
 	args.infoboxClass = Logic.nilOr(Logic.readBoolOrNil(args.infoboxClass), true)
 	args.recent = true
 	args.limit = args.limit or args.recentLimit or 5
+	args.header = InfoboxHeader{name = 'Recent Matches', displayButtons = false}
 
-	return MatchTicker(args):query(matches.recent):create(
-		InfoboxHeader{name = 'Recent Matches', displayButtons = false}
-	)
+	return MatchTicker.makeMatchTicker(args)
 end
 
 return CustomMatchTicker
