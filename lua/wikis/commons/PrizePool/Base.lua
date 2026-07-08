@@ -382,7 +382,14 @@ BasePrizePool.prizeTypes = {
 		align = 'right',
 
 		headerDisplay = function (data)
-			return TableCellHeader{children = {data.title}}
+			return TableCellHeader{children = {data.title or 'Player Prize'}}
+		end,
+
+		--- The player share is a single pool-input-currency value; the per-currency
+		--- PLAYER_SHARE columns are derived from it later in _setSharesFromPlayerShare.
+		row = 'playershare',
+		rowParse = function (placement, input, context, index)
+			return BasePrizePool._parseInteger(input)
 		end,
 
 		rowDisplay = function (headerData, data)
@@ -399,7 +406,7 @@ BasePrizePool.prizeTypes = {
 		align = 'right',
 
 		headerDisplay = function (data)
-			return TableCellHeader{children = {data.title}}
+			return TableCellHeader{children = {data.title or 'Club Reward'}}
 		end,
 
 		rowDisplay = function (headerData, data)
@@ -526,14 +533,13 @@ function BasePrizePool:_buildShareColumns()
 
 	local inputCode = inputPrize and inputPrize.data.currency or BASE_CURRENCY
 	local localData = inputPrize and inputPrize.data or nil
-	local clubTitle = Logic.emptyOr(self.args.clubshare, 'Club Reward')
 	local roundPrecision = self.options.currencyRoundPrecision
 
 	Array.forEach(currencyEntries, function(entry, shareIndex)
 		self:addPrize(PRIZE_TYPE_PLAYER_SHARE, shareIndex,
-			{currency = entry.code, roundPrecision = roundPrecision, title = 'Player Prize'})
+			{currency = entry.code, roundPrecision = roundPrecision})
 		self:addPrize(PRIZE_TYPE_CLUB_SHARE, shareIndex,
-			{currency = entry.code, roundPrecision = roundPrecision, title = clubTitle})
+			{currency = entry.code, roundPrecision = roundPrecision, title = Logic.emptyOr(self.args.clubshare)})
 	end)
 
 	local plan = Array.map(currencyEntries, function(entry, shareIndex)
