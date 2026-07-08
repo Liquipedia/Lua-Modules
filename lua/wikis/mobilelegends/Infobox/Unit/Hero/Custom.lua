@@ -61,7 +61,7 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Center{children = {args.quote}})
 	elseif id == 'type' then
 		local toBreakDownCell = function(key, title)	
-			if Logic.isEmpty(args[key]) then return nil end
+			if String.isEmpty(args[key]) then return nil end
 			local Data = ClassIcon[args[key]:lower()]
 			if not Data then return nil end
 			return Html.Fragment{
