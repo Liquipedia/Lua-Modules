@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local CharacterWinLoss = Lua.import('Module:CharacterWinLoss')
 local Class = Lua.import('Module:Class')
-local ClassIcon = Lua.import('Module:ClassIcon')
+local ClassIcon = Lua.import('Module:ClassIcon', {loadData = true})
 local Flags = Lua.import('Module:Flags')
 local Image = Lua.import('Module:Image')
 local Logic = Lua.import('Module:Logic')
@@ -23,6 +23,8 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
 local Widgets = Lua.import('Module:Widget/All')
+local Html = Lua.import('Module:Widget/Html')
+local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -58,9 +60,25 @@ function CustomInjector:parse(id, widgets)
 	if id == 'caption' then
 		table.insert(widgets, Center{children = {args.quote}})
 	elseif id == 'type' then
-		local toBreakDownCell = function(key, title)
-			if String.isEmpty(args[key]) then return end
-			return '<b>' .. title .. '</b><br>' .. ClassIcon.display({}, args[key])
+		local toBreakDownCell = function(key, title)	
+			if Logic.isEmpty(args[key]) then return nil end
+			local Data = ClassIcon[args[key]:lower()]
+			if not Data then return nil end
+			return Html.Fragment{
+				children = {
+					Html.B{
+						children = {title} 
+						},
+					Html.Br{},
+					IconImageWidget{
+						imageLight = Data.icon,
+						link = Data.link,
+						size = '40px'
+					},
+					Html.Br{},
+					Data.displayName
+				}
+			}
 		end
 
 		local breakDownContents = Array.append({},
