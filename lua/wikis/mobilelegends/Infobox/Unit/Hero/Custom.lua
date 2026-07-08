@@ -60,10 +60,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'caption' then
 		table.insert(widgets, Center{children = {args.quote}})
 	elseif id == 'type' then
-		local breakDownContents = Array.append({},
-			toBreakDownCell('lane', 'Lane'),
-			toBreakDownCell('primaryrole', 'Primary Role'),
-			toBreakDownCell('secondaryrole', 'Secondary Role')
+		local toBreakDownCell = function(key, title)	
 			if String.isEmpty(key) then return nil end
 			local iconData = ClassIcon[key:lower()]
 			if not iconData then return nil end
