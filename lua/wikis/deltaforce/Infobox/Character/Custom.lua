@@ -61,4 +61,12 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomCharacter:addToLpdb(lpdbData, args)
+	lpdbData.extradata.class = args.class
+	return lpdbData
+end
+
 return CustomCharacter
