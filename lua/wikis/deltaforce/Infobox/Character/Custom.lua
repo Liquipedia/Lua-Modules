@@ -18,10 +18,10 @@ local Builder = Widgets.Builder
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
----@class DeltaforceAgentInfobox: CharacterInfobox
+---@class DeltaforceCharacterInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)
----@class DeltaforceAgentInfoboxWidgetInjector: WidgetInjector
----@field caller DeltaforceAgentInfobox
+---@class DeltaforceCharacterInfoboxWidgetInjector: WidgetInjector
+---@field caller DeltaforceCharacterInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -29,7 +29,7 @@ local CustomInjector = Class.new(Injector)
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
-	character.args.informationType = 'Agents'
+	character.args.informationType = 'Characters'
 	return character:createInfobox()
 end
 
