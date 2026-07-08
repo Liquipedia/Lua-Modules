@@ -113,7 +113,7 @@ function CustomCharacter:_getPriceCell()
 			children = {CostDisplay.display('ticket', '15px', args.costticket)}
 		} or nil
 	)
-	return Cell{name = 'Price', children = costContent}
+	return Cell{name = 'Price', children = costchildren}
 end
 
 ---@return Widget[]
