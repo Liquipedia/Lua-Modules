@@ -505,8 +505,10 @@ function BasePrizePool:create()
 	return self
 end
 
---- Adds a PLAYER_SHARE and CLUB_SHARE prize per currency (USD-first) and derives
---- each opponent's player/club amounts. Requires a base currency and player share input.
+--- Adds a PLAYER_SHARE and CLUB_SHARE prize for USD and the pool's input currency, and
+--- derives each opponent's player/club amounts. Player share is a single-currency input, so
+--- shares are only derived for that input currency (the first local currency) and USD; any
+--- further local currencies are intentionally not split. Requires a player share input.
 ---@protected
 function BasePrizePool:_buildShareColumns()
 	-- Currency order is built explicitly (USD-first) because self.prizes is not yet
@@ -515,16 +517,15 @@ function BasePrizePool:_buildShareColumns()
 		return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
 	end)
 	Array.sortInPlaceBy(localPrizes, function(prize) return prize.index end)
+	local inputPrize = localPrizes[1]
 
 	local currencyEntries = WidgetUtil.collect(
 		{code = BASE_CURRENCY, totalKey = PRIZE_TYPE_BASE_CURRENCY .. 1},
-		unpack(Array.map(localPrizes, function(prize)
-			return {code = prize.data.currency, totalKey = prize.id}
-		end))
+		inputPrize and {code = inputPrize.data.currency, totalKey = inputPrize.id} or nil
 	)
 
-	local inputCode = localPrizes[1] and localPrizes[1].data.currency or BASE_CURRENCY
-	local localData = localPrizes[1] and localPrizes[1].data or nil
+	local inputCode = inputPrize and inputPrize.data.currency or BASE_CURRENCY
+	local localData = inputPrize and inputPrize.data or nil
 	local clubTitle = Logic.emptyOr(self.args.clubshare, 'Club Reward')
 	local roundPrecision = self.options.currencyRoundPrecision
 
