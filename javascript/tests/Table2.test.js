@@ -98,12 +98,12 @@ describe( 'Table2 module', () => {
 		globalThis.liquipedia.table2.init();
 
 		const boundaries = ( row ) => [
-			row.classList.contains( 'table2__row--group-inner-top' ) && 'top',
-			row.classList.contains( 'table2__row--group-inner-bottom' ) && 'bottom'
+			row.classList.contains( 'table2__row--group-joined-above' ) && 'above',
+			row.classList.contains( 'table2__row--group-joined-below' ) && 'below'
 		].filter( Boolean ).join( '+' ) || 'none';
 
 		const rows = document.querySelectorAll( '.table2__row--body' );
-		expect( [ ...rows ].map( boundaries ) ).toEqual( [ 'bottom', 'top+bottom', 'top', 'none' ] );
+		expect( [ ...rows ].map( boundaries ) ).toEqual( [ 'below', 'above+below', 'above', 'none' ] );
 	} );
 
 	test( 'should ignore standalone tables without .table2 wrapper', () => {

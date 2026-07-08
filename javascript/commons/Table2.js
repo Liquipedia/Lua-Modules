@@ -12,8 +12,8 @@ const TABLE2_CONFIG = {
 	CLASSES: {
 		EVEN: 'table2__row--even',
 		HEAD: 'table2__row--head',
-		GROUP_INNER_TOP: 'table2__row--group-inner-top',
-		GROUP_INNER_BOTTOM: 'table2__row--group-inner-bottom'
+		GROUP_JOINED_ABOVE: 'table2__row--group-joined-above',
+		GROUP_JOINED_BELOW: 'table2__row--group-joined-below'
 	}
 };
 
@@ -77,11 +77,10 @@ class Table2Striper {
 
 			groupRemaining--;
 
-			// Tighten the inner boundaries of a multi-row rowspan group: drop the top
-			// padding on every row after the first and the bottom padding on every row
-			// before the last, so grouped rows read as one block.
-			row.classList.toggle( TABLE2_CONFIG.CLASSES.GROUP_INNER_TOP, !isGroupStart );
-			row.classList.toggle( TABLE2_CONFIG.CLASSES.GROUP_INNER_BOTTOM, groupRemaining > 0 );
+			// Flag which group neighbours a row touches, so the shared edge's padding
+			// can be collapsed and the group reads as one block.
+			row.classList.toggle( TABLE2_CONFIG.CLASSES.GROUP_JOINED_ABOVE, !isGroupStart );
+			row.classList.toggle( TABLE2_CONFIG.CLASSES.GROUP_JOINED_BELOW, groupRemaining > 0 );
 		} );
 	}
 
