@@ -60,14 +60,14 @@ function CustomInjector:parse(id, widgets)
 	if id == 'caption' then
 		table.insert(widgets, Center{children = {args.quote}})
 	elseif id == 'type' then
-		local toBreakDownCell = function(key, title)	
+		local toBreakDownCell = function(key, title)
 			if String.isEmpty(args[key]) then return nil end
 			local Data = ClassIcon[args[key]:lower()]
 			if not Data then return nil end
 			return Html.Fragment{
 				children = {
 					Html.B{
-						children = {title} 
+						children = {title}
 						},
 					Html.Br{},
 					IconImageWidget{
