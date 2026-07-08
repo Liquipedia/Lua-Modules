@@ -21,7 +21,7 @@ local Tournament = Lua.import('Module:Tournament')
 
 local TeamParticipantsController = Lua.import('Module:TeamParticipants/Controller')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
@@ -123,14 +123,14 @@ function LegacyTeamCard.run(dependency)
 	local notesWidget
 	if #toggleFolded.notes > 0 then
 		mw.ext.TeamLiquidIntegration.add_category('Pages with Legacy TeamCard toggle note')
-		notesWidget = HtmlWidgets.Div{
+		notesWidget = Html.Div{
 			classes = {'team-participant__notes'},
-			children = Array.interleave(toggleFolded.notes, HtmlWidgets.Br{}),
+			children = Array.interleave(toggleFolded.notes, Html.Br{}),
 		}
 	end
 
 	legacyVars:delete('wrapperOpen')
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(notesWidget, display)}
+	return Html.Fragment{children = WidgetUtil.collect(notesWidget, display)}
 end
 
 ---@param rawQualifier string|table|nil

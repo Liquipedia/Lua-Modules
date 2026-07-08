@@ -11,11 +11,11 @@ local Class = Lua.import('Module:Class')
 local VodLink = Lua.import('Module:VodLink')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local ImageIcon = Lua.import('Module:Widget/Image/Icon/Image')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-local Span = HtmlWidgets.Span
+local Span = Html.Span
 
 ---@class VodsDropdownButton: Widget
 ---@operator call(table): VodsDropdownButton

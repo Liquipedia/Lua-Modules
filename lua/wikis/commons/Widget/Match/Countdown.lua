@@ -11,7 +11,7 @@ local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 
 local Component = Lua.import('Module:Widget/Component')
-local HtmlWidgets = Lua.import('Module:Widget/Html')
+local Html = Lua.import('Module:Widget/Html')
 
 ---@class MatchCountdownProps
 ---@field match MatchGroupUtilMatch
@@ -31,7 +31,7 @@ local function MatchCountdown(props)
 
 	local format = props.format
 
-	return HtmlWidgets.Span{
+	return Html.Span{
 		classes = {'match-info-countdown'},
 		children = Countdown.create{
 			rawdatetime = (not match.dateIsExact) or match.finished,

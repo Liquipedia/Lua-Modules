@@ -8,13 +8,13 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Ordinal = Lua.import('Module:Ordinal')
 local Table = Lua.import('Module:Table')
 
-local Span = HtmlWidgets.Span
+local Span = Html.Span
 
 ---@class rawPlacement
 ---@field backgroundClass string?
