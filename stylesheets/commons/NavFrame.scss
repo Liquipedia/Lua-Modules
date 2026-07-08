@@ -56,7 +56,7 @@ a.NavToggle {
 	overflow: auto hidden;
 }
 
-html .NavFrame.collapsed .NavContent {
+.NavFrame.collapsed .NavContent {
 	display: none;
 }
 
@@ -74,11 +74,11 @@ html .NavFrame.collapsed .NavContent {
 Template(s): CSS for Collapsibles
 Author(s): FO-nTTaX
 *******************************************************************************/
-html .collapsible.collapsed > thead > tr:nth-child( n+2 ),
-html .collapsible.collapsed > thead + tbody,
-html .collapsible.collapsed > tbody > tr:nth-child( n+2 ),
-html .collapsible.collapsed > tfoot,
-html .collapsible.collapsed > tr:nth-child( n+2 ) {
+.collapsible.collapsed > thead > tr:nth-child( n+2 ),
+.collapsible.collapsed > thead + tbody,
+.collapsible.collapsed > tbody > tr:nth-child( n+2 ),
+.collapsible.collapsed > tfoot,
+.collapsible.collapsed > tr:nth-child( n+2 ) {
 	display: none;
 }
 

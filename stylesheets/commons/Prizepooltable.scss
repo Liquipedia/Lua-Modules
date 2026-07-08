@@ -101,7 +101,7 @@ table.prizepooltable.collapsed .prizepooltablehide {
 // `prizepooltable` class and Prizepooltable.js). The JS injects the toggle before
 // the (cutAfter + 2)-th row, so rows from (cutAfter + 3) onward are hidden.
 @for $i from 0 through 32 {
-	html .prizepooltable.collapsed[ data-cutafter="#{$i}" ] tr:nth-child( n + #{ $i + 3 } ) {
+	.prizepooltable.collapsed[ data-cutafter="#{$i}" ] tr:nth-child( n + #{ $i + 3 } ) {
 		display: none;
 	}
 }
@@ -494,7 +494,7 @@ share the `prizepooltable` class.
 	}
 }
 
-html .prizepool-table-wrapper.collapsed .ppt-hide-on-collapse {
+.prizepool-table-wrapper.collapsed .ppt-hide-on-collapse {
 	display: none;
 }
 
