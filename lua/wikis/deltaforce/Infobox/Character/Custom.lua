@@ -33,34 +33,6 @@ function CustomCharacter.run(frame)
 	return character:createInfobox()
 end
 
----@param id string
----@param widgets Renderable[]
----@return Renderable[]
-function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
-	if id == 'custom' then
-		Array.appendWith(
-			widgets,
-			Title{children = 'Abilities'},
-			Builder{
-				builder = function()
-					local gadgets = self.caller:getAllArgsForBase(args, 'gadget')
-					return {
-						Cell{
-							name = 'Gadgets',
-							children = gadgets,
-						}
-					}
-				end
-			},
-			Cell{name = 'Tactical Gear', children = {args.tacticalgear}},
-			Cell{name = 'Trait', children = {args.trait}}
-		)
-	end
-
-	return widgets
-end
-
 ---@param lpdbData table
 ---@param args table
 ---@return table
