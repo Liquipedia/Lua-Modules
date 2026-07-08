@@ -28,11 +28,6 @@ Widgets.ShopMerch = Lua.import('Module:Widget/Infobox/ShopMerch')
 Widgets.Title = Lua.import('Module:Widget/Infobox/Title')
 Widgets.Venue = Lua.import('Module:Widget/Infobox/Venue')
 
---- Table Widgets (div-table) (will be removed)
-Widgets.TableOld = Lua.import('Module:Widget/Table/Old')
-Widgets.TableRow = Lua.import('Module:Widget/Table/Row')
-Widgets.TableCell = Lua.import('Module:Widget/Table/Cell')
-
 --- Data Table Widgets (html-table)
 Widgets.DataTable = Lua.import('Module:Widget/Basic/DataTable')
 
