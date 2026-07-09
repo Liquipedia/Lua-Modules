@@ -19,7 +19,7 @@ local TypeUtil = Lua.import('Module:TypeUtil')
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local BlockTeam = Lua.import('Module:Widget/TeamDisplay/Block')
 local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
 
@@ -211,7 +211,7 @@ function OpponentDisplay.BlockOpponent(props)
 
 	if opponent.type == Opponent.team then
 		if props.showTbd == false and Opponent.isTbd(opponent) then
-			return HtmlWidgets.Fragment{}
+			return Html.Fragment{}
 		end
 		return OpponentDisplay.BlockTeamContainer{
 			flip = props.flip,
@@ -239,14 +239,14 @@ end
 ---@param props BlockOpponentProps
 ---@return Widget
 function OpponentDisplay.BlockPlayers(props)
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = Array.extend('block-players-wrapper', props.additionalClasses),
 		children = OpponentDisplay.getBlockPlayerNodes(props)
 	}
 end
 
 ---@param props BlockOpponentProps
----@return Html[]
+---@return VNode[]
 function OpponentDisplay.getBlockPlayerNodes(props)
 	local opponent = props.opponent
 
@@ -258,7 +258,7 @@ function OpponentDisplay.getBlockPlayerNodes(props)
 			player = player,
 			team = player.team,
 			note = playerIndex == 1 and note or nil,
-		})):addClass(props.playerClass)
+		}))
 	end)
 end
 
@@ -306,7 +306,7 @@ OpponentDisplay.propTypes.BlockLiteral = {
 function OpponentDisplay.BlockLiteral(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockLiteral)
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = Array.extend(
 			'brkts-opponent-block-literal',
 			props.flip and 'flipped' or nil,
@@ -331,9 +331,9 @@ function OpponentDisplay.BlockScore(props)
 
 	local scoreText = props.scoreText
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = props.additionalClasses,
-		children = props.isWinner and HtmlWidgets.B{children = scoreText} or scoreText
+		children = props.isWinner and Html.B{children = scoreText} or scoreText
 	}
 end
 
@@ -346,6 +346,8 @@ function OpponentDisplay.InlineScore(opponent)
 			return ''
 		elseif opponent.score == -1 then
 			return ''
+		elseif opponent.scoreDisplay ~= nil then
+			return tostring(Math.round(opponent.scoreDisplay, 2))
 		else
 			return tostring(Math.round(opponent.score, 2))
 		end

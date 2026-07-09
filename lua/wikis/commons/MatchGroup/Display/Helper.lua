@@ -27,7 +27,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local DisplayHelper = {}
 local NONBREAKING_SPACE = '&nbsp;'
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@param node Html
@@ -173,7 +173,7 @@ function DisplayHelper.createCastersDisplay(casters)
 			return casterLink
 		end
 
-		return HtmlWidgets.Fragment{children = {
+		return Html.Fragment{children = {
 			Flags.Icon{flag = caster.flag},
 			NONBREAKING_SPACE,
 			casterLink,

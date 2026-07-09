@@ -41,6 +41,7 @@ local REGION_TO_SUPERREGION = {
 	['Southeast Asia'] = 'Pacific',
 	['Asia'] = 'Pacific',
 	['India'] = 'Pacific',
+	['Indonesia'] = 'Pacific',
 	['Other'] = 'Other',
 }
 
