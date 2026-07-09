@@ -299,6 +299,9 @@ function TournamentPlayerStatsCalculator.getData(args)
 			end
 
 			local key = player.pageName
+			if not key then
+				return
+			end
 
 			if not playersByKey[key] then
 				playersByKey[key] = player
