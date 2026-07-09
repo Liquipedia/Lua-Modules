@@ -114,10 +114,9 @@ function LegacyTeamCard.run(dependency)
 		table.insert(tpArgs, LegacyTeamCard.mapCard(card))
 	end)
 
-	local storageDisabled = Array.map(processedCards, function(args)
+	local numStorageDisabled = #Array.filter(processedCards, function(args)
 		return Logic.readBool(args.disable_storage or args.nostorage)
 	end)
-	local numStorageDisabled = #Array.filter(storageDisabled, FnUtil.identity)
 
 	if numStorageDisabled > 0 and numStorageDisabled ~= #processedCards then
 		error("Only some cards have storage disabled. Failed to wrap using a single wrapper")
