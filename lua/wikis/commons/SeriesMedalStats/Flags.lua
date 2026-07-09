@@ -50,8 +50,9 @@ function MedalStats:create()
 		medalsTableType = 'Country',
 		dataColumns = self.config.columns,
 		data = self.data,
-		renderRowFirstCell = function(identifier)
-			return Flags.Icon{flag = identifier, shouldLink = false} .. ' ' .. Flags.CountryName{flag = identifier}
+		renderRowFirstCell = function(flag)
+			---@cast flag string?
+			return Flags.Icon{flag = flag, shouldLink = false} .. ' ' .. Flags.CountryName{flag = flag}
 		end,
 		rowSort = MedalStatsBase.rowSort,
 		hideTotalRow = true,

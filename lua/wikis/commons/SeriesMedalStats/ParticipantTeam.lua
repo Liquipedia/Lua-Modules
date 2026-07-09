@@ -38,7 +38,7 @@ function MedalStats.run(frame)
 	return MedalStats(args):create()
 end
 
----@return Html?
+---@return Renderable?
 function MedalStats:create()
 	if Logic.isEmpty(self.rawData) then return end
 

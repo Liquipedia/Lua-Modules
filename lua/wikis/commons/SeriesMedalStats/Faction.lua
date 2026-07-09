@@ -50,8 +50,9 @@ function MedalStats:create()
 		medalsTableType = 'Faction',
 		dataColumns = self.config.columns,
 		data = self.data,
-		renderRowFirstCell = function(identifier)
-			return Faction.Icon{faction = identifier, showLink = false} .. ' ' .. Faction.toName(identifier)
+		renderRowFirstCell = function(faction)
+			---@cast faction string?
+			return Faction.Icon{faction = faction, showLink = false} .. ' ' .. Faction.toName(faction)
 		end,
 		rowSort = MedalStatsBase.rowSort,
 		hideTotalRow = true,
