@@ -49,10 +49,9 @@ function MedalStats:create()
 		dataColumns = self.config.columns,
 		data = self.data,
 		renderRowFirstCell = function(identifier)
-			return OpponentDisplay.BlockOpponent{opponent = {
+			return OpponentDisplay.BlockOpponent{opponent = Opponent.readOpponentArgs{
 				type = Opponent.team,
 				template = identifier,
-				extradata = {},
 			}}
 		end,
 		rowSort = MedalStatsBase.rowSort,
