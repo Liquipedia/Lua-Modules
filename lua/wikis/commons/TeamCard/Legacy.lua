@@ -113,7 +113,16 @@ function LegacyTeamCard.run(dependency)
 		table.insert(tpArgs, LegacyTeamCard.mapCard(card))
 	end)
 
-	if not Namespace.isMain() then
+	local numStorageDisabled = #Array.filter(processedCards, function(args)
+		return Logic.readBool(args.disable_storage or args.nostorage)
+	end)
+
+	if numStorageDisabled > 0 and numStorageDisabled ~= #processedCards then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with bad TeamCard Legacy storage')
+		error("Only some cards have storage disabled. Failed to wrap using a single wrapper")
+	end
+
+	if not Namespace.isMain() or numStorageDisabled > 0 then
 		tpArgs.store = 'false'
 	end
 
