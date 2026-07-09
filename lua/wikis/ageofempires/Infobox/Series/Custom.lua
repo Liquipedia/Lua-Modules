@@ -17,7 +17,7 @@ local Series = Lua.import('Module:Infobox/Series')
 local CustomSeries = Class.new(Series)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomSeries.run(frame)
 	local series = CustomSeries(frame)
 

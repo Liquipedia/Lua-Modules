@@ -7,27 +7,22 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Placement = Lua.import('Module:Placement')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
-local Span = HtmlWidgets.Span
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
+local Span = Html.Span
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
----@class ParticipantsTeamQualifierInfo: Widget
----@field props {participant: TeamParticipant, location: 'card'|'list'}
----@operator call(table): ParticipantsTeamQualifierInfo
-local ParticipantsTeamQualifierInfo = Class.new(Widget)
-
----@return Widget?
-function ParticipantsTeamQualifierInfo:render()
-	local participant = self.props.participant
-	local location = self.props.location
+---@param props {participant: TeamParticipant, location: 'card'|'list'}
+---@return VNode?
+local function ParticipantsTeamQualifierInfo(props)
+	local participant = props.participant
+	local location = props.location
 	local qualification = participant.qualification
 
 	if not qualification then
@@ -78,7 +73,7 @@ function ParticipantsTeamQualifierInfo:render()
 		}
 	end
 
-	local content = Div{
+	return Div{
 		classes = {'team-participant-card__qualifier', 'team-participant-card__qualifier--' .. location},
 		children = {
 			Div{
@@ -94,8 +89,6 @@ function ParticipantsTeamQualifierInfo:render()
 			Placement.renderInWidget{placement = qualification.placement}
 		}
 	}
-
-	return content
 end
 
-return ParticipantsTeamQualifierInfo
+return Component.component(ParticipantsTeamQualifierInfo)

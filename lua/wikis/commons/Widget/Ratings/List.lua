@@ -22,7 +22,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Widget = Lua.import('Module:Widget')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
 local RatingsStorageFactory = Lua.import('Module:Ratings/Storage/Factory')
@@ -161,18 +161,18 @@ function RatingsList:render()
 		{ align = 'center' },
 	}
 
-	local title = HtmlWidgets.Div {
+	local title = Html.Div {
 		children = {
-			HtmlWidgets.Div {
+			Html.Div {
 				children = {
-					HtmlWidgets.B { children = 'BETA' },
-					HtmlWidgets.Span { children = 'Last updated: ' .. formattedDate }
+					Html.B { children = 'BETA' },
+					Html.Span { children = 'Last updated: ' .. formattedDate }
 				},
 				classes = { 'ranking-table__top-row-text' }
 			},
-			HtmlWidgets.Div {
+			Html.Div {
 				children = {
-					HtmlWidgets.Span { children = 'Data provided by ' },
+					Html.Span { children = 'Data provided by ' },
 					IconImage { imageLight = 'SAP_logo.svg', size = '90px' }
 				},
 				classes = { 'ranking-table__top-row-logo-container' }
@@ -229,7 +229,7 @@ function RatingsList:render()
 					class = 'ranking-table__toggle-graph-cell',
 					['data-ranking-table-cell'] = 'graph'
 				},
-				children = HtmlWidgets.Span {
+				children = Html.Span {
 					attributes = {
 						class = 'ranking-table__toggle-graph',
 						['data-ranking-table'] = 'toggle',
@@ -254,9 +254,9 @@ function RatingsList:render()
 						colspan = '6',
 						['data-ranking-table-cell'] = 'graph'
 					},
-					children = HtmlWidgets.Div {
+					children = Html.Div {
 						children = {
-							HtmlWidgets.Div {
+							Html.Div {
 								classes = { 'ranking-table__graph-switch' },
 								children = ContentSwitch {
 									switchGroup = graphSwitchGroup,
@@ -306,7 +306,7 @@ function RatingsList:render()
 		}
 	end)
 
-	local buttonDiv = HtmlWidgets.Div {
+	local buttonDiv = Html.Div {
 		children = { 'See Rankings Page', Icon.makeIcon { iconName = 'goto' } },
 		classes = { 'ranking-table__footer-button' },
 	}
@@ -317,7 +317,7 @@ function RatingsList:render()
 		children = { buttonDiv },
 	}
 
-	return HtmlWidgets.Div {
+	return Html.Div {
 		attributes = {
 			['data-ranking-table'] = 'content',
 		},

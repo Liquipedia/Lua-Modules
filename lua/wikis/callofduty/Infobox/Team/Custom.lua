@@ -16,7 +16,7 @@ local Team = Lua.import('Module:Infobox/Team')
 local CustomTeam = Class.new(Team)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 

@@ -24,7 +24,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
@@ -35,9 +35,9 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@param label string
 ---@return Widget
 local function createPriceLabel(label)
-	return HtmlWidgets.Sup{
+	return Html.Sup{
 		children = {
-			HtmlWidgets.Span{
+			Html.Span{
 				classes = { 'elm-bg' },
 				css = {
 					['font-family'] = 'monospace',
@@ -115,11 +115,16 @@ local DIFFICULTY_DATA = {
 }
 
 ---@class RainbowsixOperatorInfobox: CharacterInfobox
+---@operator call(Frame): RainbowsixOperatorInfobox
 local CustomCharacter = Class.new(Character)
+
+---@class RainbowsixOperatorInfoboxWidgetInjector: WidgetInjector
+---@operator call(RainbowsixOperatorInfobox): RainbowsixOperatorInfoboxWidgetInjector
+---@field caller RainbowsixOperatorInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
@@ -128,8 +133,8 @@ function CustomCharacter.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'country' then
@@ -186,7 +191,7 @@ function CustomInjector:parse(id, widgets)
 						link = patchData.pageName,
 						children = patchData.displayName
 					} or 'Launch',
-					HtmlWidgets.Small{
+					Html.Small{
 						children = { args.releasedate }
 					}
 				)
@@ -272,11 +277,11 @@ function CustomCharacter:_getAdditionalInfo(args)
 		Cell{
 			name = 'Has Elite Skin',
 			children = WidgetUtil.collect(
-				HtmlWidgets.Fragment{
+				Html.Fragment{
 					children = Logic.readBool(args.eliteskin) and {
 						IconFa{ iconName = 'yes', color = 'forest-green-text' },
 						' ',
-						HtmlWidgets.I{
+						Html.I{
 							css = {
 								['padding-left'] = '2px',
 								['vertical-align'] = '-1px'
@@ -286,7 +291,7 @@ function CustomCharacter:_getAdditionalInfo(args)
 					} or {
 						IconFa{ iconName = 'no', color = 'cinnabar-text' },
 						' ',
-						HtmlWidgets.I{
+						Html.I{
 							css = {
 								['padding-left'] = '2px',
 								['vertical-align'] = '-1px'
@@ -295,9 +300,9 @@ function CustomCharacter:_getAdditionalInfo(args)
 						}
 					}
 				},
-				Logic.isNotEmpty(args['eliteskin-date']) and HtmlWidgets.I{
+				Logic.isNotEmpty(args['eliteskin-date']) and Html.I{
 					children = {
-						HtmlWidgets.Small{
+						Html.Small{
 							children = { args['eliteskin-date'] }
 						}
 					}
@@ -323,7 +328,7 @@ function CustomCharacter:_getPriceCells(input)
 				children = WidgetUtil.collect(
 					'Free',
 					Array.map({ 500, 1000, 1500, 2000 }, function (renownPrice)
-						return HtmlWidgets.Fragment{
+						return Html.Fragment{
 							children = {
 								lang:formatNum(renownPrice),
 								' ',
@@ -331,7 +336,7 @@ function CustomCharacter:_getPriceCells(input)
 							}
 						}
 					end),
-					HtmlWidgets.Fragment{
+					Html.Fragment{
 						children = {
 							'10% off ',
 							SEASON_PASS_LABEL
@@ -360,7 +365,7 @@ function CustomCharacter:_getPriceCell(currency, price)
 		name = currency .. ' price',
 		children = {
 			lang:formatNum(price),
-			HtmlWidgets.Fragment{
+			Html.Fragment{
 				children = {
 					lang:formatNum(price * 0.9),
 					' ',
@@ -382,7 +387,7 @@ function CustomCharacter:_getBaseStats(args)
 end
 
 ---@param speed 'slow'|'medium'|'fast'
----@return CellWidget[]
+---@return VNode[]
 function CustomCharacter:_getArmorAndSpeedDisplay(speed)
 	local armorSpeedData = ARMOR_SPEED_DATA[speed]
 	return Logic.isNotEmpty(armorSpeedData) and {
@@ -396,7 +401,7 @@ function CustomCharacter:_getArmorAndSpeedDisplay(speed)
 end
 
 ---@param difficulty string
----@return CellWidget|nil
+---@return VNode?
 function CustomCharacter._generateDifficultyCell(difficulty)
 	local difficultyData = DIFFICULTY_DATA[difficulty]
 	return Logic.isNotEmpty(difficultyData)
@@ -408,17 +413,17 @@ end
 ---@param datatype string
 ---@param value number|string
 ---@param display string
----@return CellWidget
+---@return VNode
 function CustomCharacter._generateStatCell(title, datatype, value, display)
 	return Cell{
 		name = title,
 		children = {
 			Image.display(
-				'R6S operator-rating-' .. datatype .. '-' ..  value .. ' lightmode.png',
-				'R6S operator-rating-' .. datatype .. '-' ..  value .. ' darkmode.png',
+				'R6S operator-rating-' .. datatype .. '-' .. value .. ' lightmode.png',
+				'R6S operator-rating-' .. datatype .. '-' .. value .. ' darkmode.png',
 				{ size = '40x20px', link = '' }
 			),
-			HtmlWidgets.I{
+			Html.I{
 				css = {
 					['padding-left'] = '2px',
 					['vertical-align'] = '-1px'

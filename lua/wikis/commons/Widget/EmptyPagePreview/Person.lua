@@ -24,7 +24,7 @@ local Tabs = Lua.import('Module:Tabs')
 local Variables = Lua.import('Module:Variables')
 
 local PlayerAutoTeamNavBox = Lua.import('Module:Widget/NavBox/AutoTeam/Player')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -58,13 +58,13 @@ function EmptyPersonPagePreview:render()
 		return
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		children = WidgetUtil.collect(
 			infobox,
-			HtmlWidgets.H2{children = {'Overview'}},
+			Html.H2{children = {'Overview'}},
 			self:_results(),
 			self:_matches(),
-			HtmlWidgets.Br{},
+			Html.Br{},
 			PlayerAutoTeamNavBox{}
 		),
 	}
@@ -101,7 +101,7 @@ end
 ---@return Widget[]
 function EmptyPersonPagePreview:_matches()
 	return {
-		HtmlWidgets.H3{children = 'Most Recent Matches'},
+		Html.H3{children = 'Most Recent Matches'},
 		MatchTable.results{
 			tableMode = 'solo',
 			player = self.person,
@@ -154,7 +154,7 @@ function EmptyPersonPagePreview:_results()
 	end
 
 	return {
-		HtmlWidgets.H3{children = 'Achievements'},
+		Html.H3{children = 'Achievements'},
 		Tabs.dynamic(tabArgs)
 	}
 end
@@ -165,11 +165,11 @@ end
 function EmptyPersonPagePreview:_backfillInformationFromPlacements()
 	local personConditions = ConditionTree(BooleanOperator.any)
 		-- players
-		:add(Array.map(Array.range(1, DEFAULT_MAX_PLAYERS_PER_PLACEMENT), function(index)
+		:add(Array.mapRange(1, DEFAULT_MAX_PLAYERS_PER_PLACEMENT, function(index)
 			return ConditionNode(ColumnName('p' .. index, 'opponentplayers'), Comparator.eq, self.person)
 		end))
 		-- coaches (etc)
-		:add(Array.map(Array.range(1, 5), function(index)
+		:add(Array.mapRange(1, 5, function(index)
 			return ConditionNode(ColumnName('c' .. index, 'opponentplayers'), Comparator.eq, self.person)
 		end))
 

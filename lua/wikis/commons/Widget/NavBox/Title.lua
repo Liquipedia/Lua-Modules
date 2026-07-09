@@ -9,12 +9,12 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local B = HtmlWidgets.B
-local Div = HtmlWidgets.Div
-local Span = HtmlWidgets.Span
-local Tr = HtmlWidgets.Tr
-local Th = HtmlWidgets.Th
+local Html = Lua.import('Module:Widget/Html')
+local B = Html.B
+local Div = Html.Div
+local Span = Html.Span
+local Tr = Html.Tr
+local Th = Html.Th
 
 local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
 local EditButton = Lua.import('Module:Widget/NavBox/EditButton')

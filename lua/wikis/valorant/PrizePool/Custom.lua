@@ -23,7 +23,7 @@ local CustomPrizePool = {}
 
 local TIER_VALUE = {10, 6, 4, 2}
 local TYPE_MODIFIER = {Online = 0.65}
-local TIER_TYPE_MODIFIER = {Showmatch = 0,  Misc = 0.25, Qualifier = 0.25, Monthly = 0.4, Weekly = 0.1}
+local TIER_TYPE_MODIFIER = {Showmatch = 0, Misc = 0.25, Qualifier = 0.25, Monthly = 0.4, Weekly = 0.1}
 
 -- Template entry point
 ---@param frame Frame

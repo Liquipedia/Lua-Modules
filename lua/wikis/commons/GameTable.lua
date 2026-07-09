@@ -19,7 +19,7 @@ local VodLink = Lua.import('Module:VodLink')
 
 local MatchTable = Lua.import('Module:MatchTable')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLossIndicator')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -84,7 +84,7 @@ function GameTable:_displayGameScore(result, game)
 	local toScore = function(opponentIndex)
 		local isWinner = opponentIndex == tonumber(game.winner)
 		local score = scores[opponentIndex] or (isWinner and 1) or 0
-		return HtmlWidgets.Span{
+		return Html.Span{
 			css = {['font-weight'] = isWinner and 'bold' or nil},
 			children = score
 		}
