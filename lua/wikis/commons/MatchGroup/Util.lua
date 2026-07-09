@@ -33,6 +33,7 @@ games, and etc in the new bracket framework.
 
 Display related functions go in Module:MatchGroup/Display/Helper.
 ]]
+---@class MatchGroupUtil
 local MatchGroupUtil = {types = {}}
 
 ---@class MatchGroupUtilLowerEdge
@@ -173,6 +174,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field placement2 number?
 ---@field players standardPlayer[]?
 ---@field score number?
+---@field scoreDisplay number?
 ---@field score2 number?
 ---@field status string?
 ---@field status2 string?
@@ -325,6 +327,10 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	extradata = 'table?',
 })
 
+---@class MatchGroupUtilSubgroup
+---@field games MatchGroupUtilGame[]
+---@field subgroup number
+---@field header string?
 
 ---@class FFAMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games FFAMatchGroupUtilGame[]
@@ -688,9 +694,10 @@ function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 	local game1 = (matchRecord.match2games or {})[1]
 	local hasOnlyScores = Array.all(matchRecord.match2opponents, function(opponent)
 			return opponent.status == 'S' end)
+	local scoreDisplay = nil
 	if bestof == 1 and Info.config.match2.gameScoresIfBo1 and game1 and hasOnlyScores then
 		local mapOpponent = (game1.opponents or {})[opponentIndex] or {}
-		score = mapOpponent.score
+		scoreDisplay = tonumber(mapOpponent.score)
 		status = mapOpponent.status
 	end
 
@@ -703,6 +710,7 @@ function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 		placement = tonumber(record.placement),
 		players = Array.map(record.match2players, MatchGroupUtil.playerFromRecord),
 		score = tonumber(score),
+		scoreDisplay = scoreDisplay,
 		status = status,
 		template = nilIfEmpty(record.template),
 		type = nilIfEmpty(record.type) or 'literal',
@@ -769,6 +777,34 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 		walkover = nilIfEmpty(record.walkover) and record.walkover:lower() or nil,
 		winner = tonumber(record.winner),
 	}
+end
+
+---Group games on the subgroup field to form submatches
+---@param match MatchGroupUtilMatch
+---@return MatchGroupUtilSubgroup[]
+function MatchGroupUtil.groupBySubgroup(match)
+	local previousSubgroup = nil
+	---@type MatchGroupUtilGame[]?
+	local currentGames = nil
+	---@type MatchGroupUtilGame[][]
+	local submatchGames = {}
+	Array.forEach(match.games, function (game)
+		if previousSubgroup == nil or previousSubgroup ~= game.subgroup then
+			currentGames = {}
+			Array.appendWith(submatchGames, currentGames)
+			previousSubgroup = game.subgroup
+		end
+		---@cast currentGames -nil
+		Array.appendWith(currentGames, game)
+	end)
+	return Array.map(submatchGames, function (games, groupIndex)
+		---@type MatchGroupUtilSubgroup
+		return {
+			games = games,
+			subgroup = groupIndex,
+			header = Table.extract(match.extradata or {}, 'subgroup' .. groupIndex .. 'header'),
+		}
+	end)
 end
 
 ---@param data table

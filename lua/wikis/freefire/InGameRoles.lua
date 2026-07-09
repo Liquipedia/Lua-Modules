@@ -12,8 +12,6 @@ local inGameRoles = {
 	['rifler'] = {category = 'Rifler', display = 'Rifler'},
 	['sniper'] = {category = 'Snipers', display = 'Snipers'},
 	['bomber'] = {category = 'Bomber', display = 'Bomber'},
-	['igl'] = {category = 'In-game leaders', display = 'In-game leaders'},
-	['captain'] = {category = 'Captain', display = 'Captain'},
 }
 
 inGameRoles['granader'] = inGameRoles.bomber

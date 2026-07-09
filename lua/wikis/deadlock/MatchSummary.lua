@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Operator = Lua.import('Module:Operator')
 
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
@@ -26,22 +25,25 @@ local STATUS_NOT_PLAYED = 'notplayed'
 ---@class DeadlockCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class DeadlockMatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): DeadlockMatchSummaryGameRow
-local DeadlockMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+---@class DeadlockMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
+	createGameOverview = MatchSummaryWidgets.GameRow.lengthDisplay,
+}
+
+local DeadlockMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '480px', teamStyle = 'bracket'})
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return VNode[]
 function CustomMatchSummary.createBody(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
-	return WidgetUtil.collect(
+	return {
 		MatchSummaryWidgets.GamesContainer{
 			children = Array.map(match.games, function (game, gameIndex)
 				if game.status == STATUS_NOT_PLAYED then
@@ -51,37 +53,32 @@ function CustomMatchSummary.createBody(match)
 			end)
 		},
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	)
+	}
 end
 
----@private
+---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
 ---@return string[]
-function DeadlockMatchSummaryGameRow:_getHeroesForOpponent(opponentIndex)
-	local opponent = self.props.game.opponents[opponentIndex]
+function GameRowComponentProps._getHeroesForOpponent(game, opponentIndex)
+	local opponent = game.opponents[opponentIndex]
 	return Array.map(opponent.players or {}, Operator.property('character'))
 end
 
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Widget
-function DeadlockMatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	local props = self.props
+---@return VNode[]
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local extradata = game.extradata or {}
 
 	return WidgetUtil.collect(
 		ICONS[extradata['team' .. opponentIndex .. 'side']],
 		MatchSummaryWidgets.Characters{
-			characters = self:_getHeroesForOpponent(opponentIndex),
+			characters = GameRowComponentProps._getHeroesForOpponent(game, opponentIndex),
 			flipped = opponentIndex == 2,
 			hideOnMobile = true,
 		}
 	)
-end
-
----@return Renderable?
-function DeadlockMatchSummaryGameRow:createGameOverview()
-	return self:lengthDisplay()
 end
 
 return CustomMatchSummary

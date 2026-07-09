@@ -21,8 +21,8 @@ end)
 
 ---Parses the widgets
 ---@param id string
----@param widgets Widget[]
----@return Widget[]?
+---@param widgets Renderable[]
+---@return Renderable[]?
 function Injector:parse(id, widgets)
 	return widgets
 end

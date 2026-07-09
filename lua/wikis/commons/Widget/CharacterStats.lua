@@ -25,7 +25,7 @@ local ConditionUtil = Condition.Util
 local Widget = Lua.import('Module:Widget')
 local CharacterStatsTable = Lua.import('Module:Widget/CharacterStats/Table')
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -127,10 +127,10 @@ function CharacterStatsWidget:_buildUnchosenCharactersTable(titlePrefix, exclude
 	end
 	return DataTable{
 		children = {
-			HtmlWidgets.Tr{children = HtmlWidgets.Th{
-				children = {titlePrefix .. ' ' .. self.props.characterType, ' ', HtmlWidgets.I{children = {'(', #characters, ')'}}
+			Html.Tr{children = Html.Th{
+				children = {titlePrefix .. ' ' .. self.props.characterType, ' ', Html.I{children = {'(', #characters, ')'}}
 			}}},
-			HtmlWidgets.Tr{children = HtmlWidgets.Td{
+			Html.Tr{children = Html.Td{
 				children = Array.map(characters, function (character)
 					return IconImage{
 						imageLight = character.iconLight,

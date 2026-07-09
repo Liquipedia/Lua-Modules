@@ -7,29 +7,25 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
+
+local Component = Lua.import('Module:Widget/Component')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local DateRange = Lua.import('Module:Widget/Misc/DateRange')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TierPill = Lua.import('Module:Widget/Tournament/TierPill')
 
 ---@class TournamentsTickerListItemProps
 ---@field tournament StandardTournament
----@field displayGameIcon boolean
+---@field displayGameIcon boolean?
 ---@field tierColorScheme string?
 
----@class TournamentsTickerListItemWidget: Widget
----@operator call(TournamentsTickerListItemProps): TournamentsTickerListItemWidget
----@field props TournamentsTickerListItemProps
-local TournamentsTickerListItemWidget = Class.new(Widget)
-
----@return Widget?
-function TournamentsTickerListItemWidget:render()
-	local tournament = self.props.tournament
+---@param props TournamentsTickerListItemProps
+---@return VNode?
+local function TournamentsTickerListItem(props)
+	local tournament = props.tournament
 	if not tournament then
 		return
 	end
@@ -43,11 +39,11 @@ function TournamentsTickerListItemWidget:render()
 	}
 
 	local badgeChildren = WidgetUtil.collect(
-		HtmlWidgets.Span{
+		Html.Span{
 			classes = {'tournaments-list-item__badge-icon'},
 			children = iconWidget,
 		},
-		self.props.displayGameIcon and Game.icon{
+		props.displayGameIcon and Game.icon{
 			game = tournament.game,
 			noLink = true,
 			spanClass = 'tournaments-list-item__game-icon',
@@ -55,35 +51,35 @@ function TournamentsTickerListItemWidget:render()
 		TierPill{
 			tournament = tournament,
 			variant = 'subtle',
-			colorScheme = self.props.tierColorScheme,
+			colorScheme = props.tierColorScheme,
 		}
 	)
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'tournaments-list-item'},
 		children = {
-			HtmlWidgets.Span{
+			Html.Span{
 				classes = {'tournament-icon'},
 				children = iconWidget,
 			},
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'tournaments-list-item__content'},
 				children = {
-					HtmlWidgets.Div{
+					Html.Div{
 						classes = {'tournaments-list-item__name'},
 						children = Link{
 							link = tournament.pageName,
 							children = tournament.displayName,
 						},
 					},
-					HtmlWidgets.Div{
+					Html.Div{
 						classes = {'tournaments-list-item__meta'},
 						children = {
-							HtmlWidgets.Div{
+							Html.Div{
 								classes = {'tournaments-list-item__badges'},
 								children = badgeChildren,
 							},
-							HtmlWidgets.Div{
+							Html.Div{
 								classes = {'tournaments-list-item__date'},
 								children = DateRange{
 									startDate = tournament.startDate,
@@ -98,4 +94,4 @@ function TournamentsTickerListItemWidget:render()
 	}
 end
 
-return TournamentsTickerListItemWidget
+return Component.component(TournamentsTickerListItem)
