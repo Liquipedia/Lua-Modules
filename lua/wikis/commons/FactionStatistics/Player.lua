@@ -33,14 +33,14 @@ local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
 local Box = Lua.import('Module:Widget/Basic/Box')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local DEFAULT_TIERS = {1, 2}
 local DEFAULT_TIER_TYPE = 'Unset'
-local SUM_ABBR = HtmlWidgets.Abbr{title = 'Sum of', children = 'Σ'}
+local SUM_ABBR = Html.Abbr{title = 'Sum of', children = 'Σ'}
 
 ---@class StormgatePlayerMatchupStatistics
 ---@operator call(table): StormgatePlayerMatchupStatistics
@@ -380,7 +380,7 @@ function PlayerStatistics:_matchesPerBestof()
 		if key == '-1' then
 			return 'Unknown'
 		end
-		return HtmlWidgets.Abbr{title = 'Best of ' .. key, children = 'Bo' .. key}
+		return Html.Abbr{title = 'Best of ' .. key, children = 'Bo' .. key}
 	end
 	local order = Array.extractKeys(self.byBestof)
 	Array.sortInPlaceBy(order, tonumber, function(a, b)
