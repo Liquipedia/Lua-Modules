@@ -197,6 +197,14 @@ function CustomCharacter:getWikiCategories(args)
 		String.isNotEmpty(args.secondaryrole) and (args.secondaryrole .. ' Hero') or nil
 	)
 end
+---@param args table
+---@return string[]
+function CustomCharacter:getRoles(args)
+	return {
+		args.primaryrole,
+		args.secondaryrole
+	}
+end
 
 ---@param lpdbData table
 ---@param args table
@@ -205,8 +213,6 @@ function CustomCharacter:addToLpdb(lpdbData, args)
 	lpdbData.extradata = {
 		region = args.region,
 		lane = args.lane,
-		primaryrole = args.primaryrole,
-		secondaryrole = args.secondaryrole,
 	}
 	return lpdbData
 end
