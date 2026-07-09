@@ -19,7 +19,7 @@ local BroadcasterTable = Lua.import('Module:BroadcastTalentTable')
 local PlayerAchievementsTableWrapper = {}
 
 ---@param frame Frame
----@return Widget|string?
+---@return Renderable?
 function PlayerAchievementsTableWrapper.run(frame)
 	local awards = Json.parseIfTable(Variables.varDefault('awardAchievements'))
 
