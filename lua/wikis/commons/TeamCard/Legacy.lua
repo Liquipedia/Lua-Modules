@@ -518,6 +518,8 @@ end
 function LegacyTeamCard.mapCard(tcArgs)
 	local card = {}
 
+	card.store = not Logic.readBool(args.disable_storage or args.nostorage)
+
 	local hasContenders = Logic.isNotEmpty(tcArgs.team2) or Logic.isNotEmpty(tcArgs.team3)
 	if hasContenders then
 		card.contenders = {}
