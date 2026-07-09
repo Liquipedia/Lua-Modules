@@ -5,10 +5,15 @@ describe('prize pool', function()
 	local Table = require('Module:Table')
 	local Variables = require('Module:Variables')
 	local tournamentData = require('test_assets.tournaments').dummy
+	local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 
 	local LpdbPlacementStub
 
 	before_each(function()
+		-- Team templates are mocked for every test: TeamTemplate.getRawOrNil is
+		-- memoized at module scope, so a team resolved without the mock caches a
+		-- nil result that leaks into later tests that do expect the mock.
+		TeamTemplateMock.setUp()
 		stub(mw.ext.LiquipediaDB, "lpdb", {})
 		stub(mw.ext.LiquipediaDB, "lpdb_tournament")
 		LpdbPlacementStub = stub(mw.ext.LiquipediaDB, "lpdb_placement")
@@ -16,6 +21,7 @@ describe('prize pool', function()
 	end)
 
 	after_each(function ()
+		TeamTemplateMock.tearDown()
 		LpdbPlacementStub:revert()
 		---@diagnostic disable-next-line: undefined-field
 		mw.ext.LiquipediaDB.lpdb:revert()
@@ -280,10 +286,7 @@ describe('prize pool', function()
 
 	it('stores the USD player share in placement extradata', function()
 		local Json = require('Module:Json')
-		local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
-		TeamTemplateMock.setUp()
 		PrizePool(clubShareUsdPoolArgs):create():build()
-		TeamTemplateMock.tearDown()
 
 		local playerShares = {}
 		for _, call in ipairs(LpdbPlacementStub.calls) do
