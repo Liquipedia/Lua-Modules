@@ -40,7 +40,7 @@ end
 
 ---@private
 ---@return VNode[]
----@return {display: Widget, seasons: table<integer, true>, sortKey: string}[]
+---@return {display: Renderable, seasons: table<integer, true>, sortKey: string}[]
 function GslMaps._fetch()
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('seriespage'), Comparator.eq, 'Global_StarCraft_II_League'),
@@ -55,7 +55,7 @@ function GslMaps._fetch()
 		order = 'sortdate asc',
 	})
 
-	---@type table<string, {display: Widget, seasons: table<integer, true>}>
+	---@type table<string, {display: Renderable, seasons: table<integer, true>}>
 	local maps = {}
 	local seasons = Array.map(queryData, function(tournament, tournamentIndex)
 		Array.forEach(Json.parseIfString(tournament.maps) or {}, function(mapInfo)
@@ -81,7 +81,7 @@ function GslMaps._fetch()
 end
 
 ---@private
----@param seasons Widget[]
+---@param seasons Renderable[]
 ---@return VNode
 function GslMaps._header(seasons)
 	return TableWidgets.Row{
@@ -96,7 +96,7 @@ end
 
 ---@private
 ---@param numberOfSeasons integer
----@param mapData {display: Widget, seasons: table<integer, true>}
+---@param mapData {display: Renderable, seasons: table<integer, true>}
 ---@return VNode
 function GslMaps._row(numberOfSeasons, mapData)
 	return TableWidgets.Row{

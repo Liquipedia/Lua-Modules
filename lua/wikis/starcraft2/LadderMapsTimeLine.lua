@@ -54,7 +54,7 @@ end
 ---@param mode string
 ---@param game string?
 ---@return {name: string, date_value: string}[]
----@return {display: Widget, seasons: table<integer, true>, introduction: string[], removal: string[]}[]
+---@return {display: Renderable, seasons: table<integer, true>, introduction: string[], removal: string[]}[]
 function LadderMapsTimeLine._fetch(mode, game)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('type'), Comparator.eq, 'maphistory'),
@@ -70,7 +70,7 @@ function LadderMapsTimeLine._fetch(mode, game)
 
 	local seasons = Seasons[game]
 
-	---@type table<string, {display: Widget, seasons: table<integer, true>, introduction: string[],
+	---@type table<string, {display: Renderable, seasons: table<integer, true>, introduction: string[],
 	---removal: string[], sortKey: string}>
 	local maps = {}
 	Array.forEach(queryData, function(mapHistory)
@@ -128,7 +128,7 @@ end
 
 ---@private
 ---@param numberOfSeasons integer
----@param mapData {display: Widget, seasons: table<integer, true>, introduction: string[], removal: string[]}
+---@param mapData {display: Renderable, seasons: table<integer, true>, introduction: string[], removal: string[]}
 ---@return VNode
 function LadderMapsTimeLine._row(numberOfSeasons, mapData)
 	---@param dates string[]
