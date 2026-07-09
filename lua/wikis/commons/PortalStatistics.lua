@@ -379,11 +379,11 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 
 	if String.isNotEmpty(args.showOther) then
 		local countOther = Array.reduce(
-			Array.flatten(Array.map(Array.extractValues(countData),
+			Array.flatMap(Array.extractValues(countData),
 				function(typeCounts, index)
 					return Table.isNotEmpty(typeCounts) and Array.extractValues(typeCounts) or 0
 				end
-			)), Operator.add, 0) --[[@as number]]
+			), Operator.add, 0) --[[@as number]]
 		runningTally = runningTally + countOther
 		resultsRow:tag(tagType)
 			:wikitext(LANG:formatNum(countOther))

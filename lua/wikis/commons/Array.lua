@@ -186,7 +186,7 @@ end
 ---This is equivalent to `Array.flatten(Array.map(elements, funct))`.
 ---@generic V, T
 ---@param elements V[]
----@param funct fun(element: V, index?: integer): T[]|nil
+---@param funct fun(element: V, index?: integer): T|T[]|nil
 ---@return T[]
 ---@nodiscard
 function Array.flatMap(elements, funct)
