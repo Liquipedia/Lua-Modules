@@ -17,7 +17,7 @@ local Table = Lua.import('Module:Table')
 local AnalyticsWidgets = Lua.import('Module:Widget/Analytics')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -41,6 +41,9 @@ function Tabs.static(args)
 
 	Tabs._setThis(tabArgs)
 
+	-- Temporary solution for fighters
+	local wrapsClass = Logic.readBool(args.wrapping) and Info.wikiName == 'fighters' and 'wraps' or nil
+
 	local function buildTabLiItems(additionalClasses)
 		return Array.map(tabArgs, function(tab)
 			--if tab.name is unset tab.link is set as per `Tabs._readArguments`
@@ -52,22 +55,22 @@ function Tabs.static(args)
 						iconName = tab.icon,
 						additionalClasses = {'tabs-static-tab-icon'},
 					},
-					HtmlWidgets.Span{children = {name}},
+					Html.Span{children = {name}},
 				}
 				child = tab.link
-					and Link{link = tab.link, children = {HtmlWidgets.Fragment{children = displayChildren}}}
-					or HtmlWidgets.Span{children = displayChildren}
+					and Link{link = tab.link, children = {Html.Fragment{children = displayChildren}}}
+					or Html.Span{children = displayChildren}
 			else
-				child = tab.link and Link{link = tab.link, children = {name}} or HtmlWidgets.Span{children = {tab.name}}
+				child = tab.link and Link{link = tab.link, children = {name}} or Html.Span{children = {tab.name}}
 			end
-			return HtmlWidgets.Li{
+			return Html.Li{
 				classes = Array.extend(additionalClasses, tab.this and 'active' or nil),
 				children = child
 			}
 		end)
 	end
 
-	local navTabs = HtmlWidgets.Ul{
+	local navTabs = Html.Ul{
 		classes = {'nav', 'nav-tabs', 'navigation-not-searchable', 'tabs', 'tabs' .. tabCount},
 		attributes = {['data-nosnippet'] = '', ['data-tabs-nav'] = ''},
 		children = buildTabLiItems()
@@ -76,8 +79,8 @@ function Tabs.static(args)
 	return AnalyticsWidgets{
 		analyticsName = 'Navigation tab',
 		children = {
-			HtmlWidgets.Div{
-				classes = {'tabs-static'},
+			Html.Div{
+				classes = {'tabs-static', wrapsClass},
 				attributes = {['data-nosnippet'] = '', ['data-tabs-static'] = ''},
 				children = WidgetUtil.collect(
 					Tabs._buildNavWrapper(navTabs),
@@ -135,22 +138,22 @@ function Tabs.dynamic(args)
 	local wraps = Logic.readBool(args.wrapping) and Info.wikiName == 'fighters'
 	local wrapsClass = wraps and 'wraps' or nil
 
-	local navTabs = HtmlWidgets.Ul{
+	local navTabs = Html.Ul{
 		classes = {'nav', 'nav-tabs', 'tabs', 'tabs' .. tabCount},
 		attributes = {['data-tabs-nav'] = ''},
 		children = WidgetUtil.collect(
 			Array.map(tabArgs, function(tabData, tabIndex)
-				return HtmlWidgets.Li{
+				return Html.Li{
 					classes = {'tab' .. tabIndex, tabData.this and 'active' or nil},
 					children = WidgetUtil.collect(
 						tabData.icon and Icon{iconName = tabData.icon} or nil,
-						HtmlWidgets.Span{children = {tabData.name}}
+						Html.Span{children = {tabData.name}}
 					)
 				}
 			end),
-			not Logic.nilOr(Logic.readBoolOrNil(args['hide-showall']), isSingular) and HtmlWidgets.Li{
+			not Logic.nilOr(Logic.readBoolOrNil(args['hide-showall']), isSingular) and Html.Li{
 				classes = {'show-all'},
-				children = {HtmlWidgets.Span{children = {'Show All'}}}
+				children = {Html.Span{children = {'Show All'}}}
 			} or nil
 		)
 	}
@@ -159,7 +162,7 @@ function Tabs.dynamic(args)
 
 	if hasContent then
 		contentChildren = Array.map(tabArgs, function(tabData, tabIndex)
-			return HtmlWidgets.Div{
+			return Html.Div{
 				classes = {'content' .. tabIndex, tabData.this and 'active' or nil},
 				attributes = {['data-count'] = tabIndex},
 				children = WidgetUtil.collect('\n\n', tabData.content)
@@ -185,7 +188,7 @@ function Tabs.dynamic(args)
 	return AnalyticsWidgets{
 		analyticsName = 'Dynamic Navigation tab',
 		css = {width = '-webkit-fill-available'},
-		children = HtmlWidgets.Div{
+		children = Html.Div{
 			classes = {'tabs-dynamic', 'navigation-not-searchable', variantClass, wrapsClass},
 			attributes = {['data-nosnippet'] = '', ['data-tabs-dynamic'] = ''},
 			children = {
@@ -267,11 +270,11 @@ end
 ---@param navTabs Widget
 ---@return Widget
 function Tabs._buildNavWrapper(navTabs)
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'tabs-nav-wrapper'},
 		attributes = {['data-tabs-nav-wrapper'] = ''},
 		children = {
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'tabs-scroll-arrow-wrapper', 'tabs-scroll-arrow-wrapper--left'},
 				attributes = {['data-tabs-arrow-left'] = ''},
 				children = {
@@ -281,7 +284,7 @@ function Tabs._buildNavWrapper(navTabs)
 						variant = 'ghost',
 						size = 'md',
 						children = {
-							HtmlWidgets.Span{
+							Html.Span{
 								css = {display = 'inline-flex'},
 								children = {Icon{iconName = 'previous', size = 'xs'}}
 							},
@@ -290,7 +293,7 @@ function Tabs._buildNavWrapper(navTabs)
 				}
 			},
 			navTabs,
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'tabs-scroll-arrow-wrapper', 'tabs-scroll-arrow-wrapper--right'},
 				attributes = {['data-tabs-arrow-right'] = ''},
 				children = {
@@ -300,7 +303,7 @@ function Tabs._buildNavWrapper(navTabs)
 						variant = 'ghost',
 						size = 'md',
 						children = {
-							HtmlWidgets.Span{
+							Html.Span{
 								css = {display = 'inline-flex'},
 								children = {Icon{iconName = 'next', size = 'xs'}}
 							},
@@ -319,7 +322,7 @@ end
 ---@return Widget|string
 function Tabs._buildContentDiv(hasContent, hybridTabs, noPadding, children)
 	if hasContent then
-		return HtmlWidgets.Div{
+		return Html.Div{
 			classes = {'tabs-content'},
 			attributes = {['data-tabs-content'] = ''},
 			css = {
@@ -343,9 +346,9 @@ end
 ---@param showHeader boolean
 ---@return Widget
 function Tabs._single(tab, showHeader)
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = WidgetUtil.collect(
-			showHeader and HtmlWidgets.H6{children = {tab.name}} or nil,
+			showHeader and Html.H6{children = {tab.name}} or nil,
 			showHeader and '\n' or nil,
 			tab.content
 		)

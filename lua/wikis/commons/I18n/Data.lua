@@ -107,6 +107,10 @@ return {
 		['matchpage-meta-desc-no-opponent']
 				= 'Find detailed results about the ${ongoingTense}${game} match in ${tournamentName}${tense}.',
 
+		-- Team Participant Card
+		['participants-hover-roster-label'] = 'Player roster',
+		['participants-notes-label'] = 'Notes (${count})',
+
 		-- MatchSummary Map Veto
 		['matchsummary-mapveto-start'] = 'Start Map Veto',
 

@@ -7,15 +7,14 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local Button = Lua.import('Module:Widget/Basic/Button')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Switch = Lua.import('Module:Widget/Switch')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -24,26 +23,17 @@ local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
 
 ---@class ParticipantsTeamParticipantControlsProps
 ---@field showPlayerInfo boolean
----@field externalUsage boolean
+---@field externalUsage boolean?
 
----@class ParticipantsTeamParticipantControls: Widget
----@operator call(ParticipantsTeamParticipantControlsProps): ParticipantsTeamParticipantControls
----@field props ParticipantsTeamParticipantControlsProps
-local ParticipantsTeamParticipantControls = Class.new(Widget, function(self, props)
-	if Logic.readBool(props.externalUsage) then
-		teamParticipantsVars:set('externalControlsRendered', 'true')
-	end
-	self.props.showPlayerInfo = Logic.readBool(self.props.showPlayerInfo or self.props.showplayerinfo)
-end)
-
-ParticipantsTeamParticipantControls.defaultProps = {
+local defaultProps = {
 	showPlayerInfo = false,
 	externalUsage = false,
 }
 
----@return Widget?
-function ParticipantsTeamParticipantControls:_buildPlayerInfoButton()
-	if not Logic.readBool(self.props.showPlayerInfo) then
+---@param showPlayerInfo boolean?
+---@return VNode?
+local function buildPlayerInfoButton(showPlayerInfo)
+	if not Logic.readBool(showPlayerInfo) then
 		return nil
 	end
 
@@ -64,10 +54,20 @@ function ParticipantsTeamParticipantControls:_buildPlayerInfoButton()
 	}
 end
 
----@return Widget?
-function ParticipantsTeamParticipantControls:render()
+---@param props ParticipantsTeamParticipantControlsProps
+---@return VNode
+local function ParticipantsTeamParticipantControls(props)
+	if Logic.readBool(props.externalUsage) then
+		teamParticipantsVars:set('externalControlsRendered', 'true')
+	end
+	local showPlayerInfo = Logic.nilOr(
+		---@diagnostic disable-next-line: undefined-field
+		Logic.readBoolOrNil(props.showplayerinfo),
+		Logic.readBool(props.showPlayerInfo)
+	) --[[@as boolean]]
+
 	local children = WidgetUtil.collect(
-		self:_buildPlayerInfoButton(),
+		buildPlayerInfoButton(showPlayerInfo),
 		AnalyticsWidget{
 			analyticsName = 'ParticipantsShowRostersSwitch',
 			analyticsProperties = {
@@ -90,6 +90,17 @@ function ParticipantsTeamParticipantControls:render()
 				switchGroup = 'team-cards-compact',
 				defaultActive = true,
 			},
+		},
+		AnalyticsWidget{
+			analyticsName = 'ParticipantsHoverRosterSwitch',
+			analyticsProperties = {
+				['track-value-as'] = 'participants hover roster',
+			},
+			children = Switch{
+				label = 'Enable hover',
+				switchGroup = 'team-cards-hover-roster',
+				defaultActive = true,
+			},
 		}
 	)
 
@@ -99,4 +110,4 @@ function ParticipantsTeamParticipantControls:render()
 	}
 end
 
-return ParticipantsTeamParticipantControls
+return Component.component(ParticipantsTeamParticipantControls, defaultProps)

@@ -159,7 +159,7 @@ mw.html = {}
 function mw.html.create(tagName, args) end
 
 ---Appends a child mw.html (builder) node to the current mw.html instance. If a nil parameter is passed, this is a no-op. A (builder) node is a string representation of an html element.
----@param builder? Html|string|number|Widget
+---@param builder? Renderable
 ---@return self
 function mw.html:node(builder) end
 
@@ -183,7 +183,7 @@ function mw.html:tag(tagName, args) end
 ---@param name string
 ---@param value string|number|nil
 ---@return self
----@overload fun(self, param: {[string]: string})
+---@overload fun(self, param: {[string]: string|number|nil})
 function mw.html:attr(name, value) end
 
 ---Get the value of a html attribute previously set using html:attr() with the given name.
@@ -446,6 +446,21 @@ function mw.language:formatDate(format, timestamp, localTime)
 			return day or ''
 		end
 		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
+	elseif format == 'Y-m-d' then
+		if not timestamp then
+			return os.date('!%Y-%m-%d') --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			local seconds = tonumber(string.sub(timestamp, 2))
+			if not seconds then return '' end
+			return os.date('!%Y-%m-%d', seconds) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local year, month, day = parseDateString(timestamp)
+			if not year then return '' end
+			return year .. '-' .. month .. '-' .. day
+		end
+		return os.date('!%Y-%m-%d', ostimeWrapper(timestamp)) --[[@as string]]
 	end
 	return ''
 end
@@ -1127,7 +1142,7 @@ mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
 mw.ext.Dota2Ranking = {}
 
 ---@alias Dota2RankingEntry {external_id: string, name: string, rating: number, rank: integer}
----@alias Dota2RankingRecord {date: string, provisional: boolean,  entries: Dota2RankingEntry[]}
+---@alias Dota2RankingRecord {date: string, provisional: boolean, entries: Dota2RankingEntry[]}
 ---@return Dota2RankingRecord[]
 function mw.ext.Dota2Ranking.get() end
 

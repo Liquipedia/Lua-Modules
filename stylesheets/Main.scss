@@ -29,10 +29,14 @@
 @use "commons/Jquery";
 @use "commons/Dialog";
 @use "commons/Label";
+@use "commons/Legend";
 @use "commons/Mainpage";
 @use "commons/Matchseries";
 @use "commons/MatchTable";
 @use "commons/NavigationCard";
+@use "commons/LiquipediaLinks";
+@use "commons/Timeline";
+@use "commons/SpellCard";
 @use "commons/Miscellaneous";
 @use "commons/BigMatch";
 @use "commons/BootstrapVisibility";
@@ -46,6 +50,7 @@
 @use "commons/Navbox";
 @use "commons/OpponentList";
 @use "commons/Panels";
+@use "commons/Placement";
 @use "commons/Prizepooltable";
 @use "commons/Quote";
 @use "commons/Selectall";

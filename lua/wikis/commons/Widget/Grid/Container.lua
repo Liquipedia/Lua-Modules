@@ -7,39 +7,34 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 
 ---@class GridContainerParameters
 ---@field center boolean?
 ---@field rowGap string?
 ---@field gridCells Renderable|Renderable[]
 
----@class GridContainer: Widget
----@operator call(GridContainerParameters): GridContainer
----@field props GridContainerParameters
-local GridContainer = Class.new(Widget)
-
-GridContainer.defaultProps = {
+local defaultProps = {
 	center = false,
 	rowGap = '0px'
 }
 
----@return Widget
-function GridContainer:render()
-	return HtmlWidgets.Div{
+---@param props GridContainerParameters
+---@return VNode
+local function GridContainer(props)
+	return Html.Div{
 		classes = { 'lp-container-fluid' },
 		children = {
-			HtmlWidgets.Div{
-				classes = { Logic.readBool(self.props.center) and 'lp-row-center' or 'lp-row' },
-				css = { ['row-gap'] = self.props.rowGap },
-				children = self.props.gridCells
+			Html.Div{
+				classes = { Logic.readBool(props.center) and 'lp-row-center' or 'lp-row' },
+				css = { ['row-gap'] = props.rowGap },
+				children = props.gridCells
 			}
 		}
 	}
 end
 
-return GridContainer
+return Component.component(GridContainer, defaultProps)

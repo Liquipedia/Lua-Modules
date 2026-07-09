@@ -2,6 +2,22 @@
 * Styles shared between BracketDisplay, MatchlistDisplay, and MatchSummary
 */
 
+.theme--light {
+	--brackets-header-background-color: #cfcfcf;
+	--brackets-header-border-color: #aaaaaa;
+	--brackets-background-color: #f2f2f2;
+	--brackets-score-background-color: #ebebeb;
+	--brackets-border-color: #aaaaaa;
+}
+
+.theme--dark {
+	--brackets-header-background-color: var( --clr-secondary-16 );
+	--brackets-header-border-color: var( --clr-secondary-16 );
+	--brackets-background-color: var( --clr-secondary-9 );
+	--brackets-score-background-color: var( --clr-secondary-16 );
+	--brackets-border-color: var( --clr-secondary-16 );
+}
+
 .brkts-match-has-details {
 	cursor: pointer;
 }
@@ -692,6 +708,23 @@ div.brkts-popup-body-element-thumbs {
 			}
 		}
 	}
+
+	&-header {
+		padding: unset;
+		grid-template-columns: 1fr 2fr 1fr;
+
+		> div {
+			display: flex;
+
+			&:first-child {
+				justify-content: flex-start;
+			}
+
+			&:nth-child( 2 ) {
+				justify-content: center;
+			}
+		}
+	}
 }
 
 .brkts-champion-icon {
@@ -907,28 +940,6 @@ div.brkts-popup-body-element-thumbs {
 			padding: 0 0.5rem;
 			text-align: center;
 		}
-
-		&-picks {
-			.brkts-champion-icon {
-				gap: 0.125rem;
-				display: flex;
-				flex-wrap: wrap;
-
-				& img {
-					width: 1.25rem;
-					height: 1.25rem;
-					border-radius: 0.1875rem;
-
-					@media ( hover: hover ) {
-						&:hover {
-							height: unset;
-							border: 0.0625rem solid #ffffff;
-							box-shadow: 0 0.0625rem 0.25rem 0 var( --clr-on-surface-light-primary-12 );
-						}
-					}
-				}
-			}
-		}
 	}
 
 	table {
@@ -958,6 +969,91 @@ div.brkts-popup-body-element-thumbs {
 
 		&-text-right {
 			text-align: right;
+		}
+	}
+}
+
+.brkts-popup-veto {
+	display: grid;
+	grid-column: 1 / -1;
+	grid-template-columns: subgrid;
+
+	&-row {
+		display: grid;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+		padding: 0.5rem;
+
+		> :nth-child( 3n + 1 ) {
+			text-align: left;
+		}
+
+		> :nth-child( 3n + 2 ) {
+			text-align: center;
+		}
+
+		> :nth-child( 3n ) {
+			text-align: right;
+		}
+
+		&:nth-child( even ) {
+			background-color: var( --clr-on-surface-light-primary-4 );
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+			}
+		}
+
+		&:last-child {
+			border-bottom-left-radius: 0.25rem;
+			border-bottom-right-radius: 0.25rem;
+		}
+
+		&-indicator {
+			display: grid;
+			grid-template-columns: 1fr auto 1fr;
+			gap: 0.25rem;
+			align-items: center;
+		}
+
+		.brkts-champion-icon {
+			gap: 0.125rem;
+			display: flex;
+			flex-wrap: wrap;
+
+			img {
+				width: 1.25rem;
+				height: 1.25rem;
+				border-radius: 0.1875rem;
+
+				@media ( hover: hover ) {
+					&:hover {
+						height: unset;
+						border: 0.0625rem solid #ffffff;
+						box-shadow: 0 0.0625rem 0.25rem 0 var( --clr-on-surface-light-primary-12 );
+					}
+				}
+			}
+		}
+	}
+
+	&-header.general-collapsible-default-header {
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+		padding: unset;
+	}
+
+	&-wrapper {
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		background-color: var( --clr-on-surface-light-primary-4 );
+		color: var( --clr-secondary-25 );
+		padding: 0.25rem;
+		border-radius: 0.5rem;
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+			color: #ffffff;
 		}
 	}
 }
@@ -1113,6 +1209,32 @@ div.brkts-popup-body-element-thumbs {
 	> .name {
 		flex: 1 1;
 		min-width: 0;
+
+		&:has( > .team-name-dynamic ) {
+			container: block-team-name / inline-size;
+
+			> .team-name-dynamic {
+				content: none;
+
+				@container block-team-name ( min-width: 15px ) and ( width < 100px ) {
+					&::before {
+						content: attr( data-team-shortname );
+					}
+				}
+
+				@container block-team-name ( min-width: 100px ) and ( width < 180px ) {
+					&::before {
+						content: attr( data-team-bracketname );
+					}
+				}
+
+				@container block-team-name ( min-width: 180px ) {
+					&::before {
+						content: attr( data-team-name );
+					}
+				}
+			}
+		}
 	}
 
 	> .team-template-team-icon {
@@ -1136,11 +1258,11 @@ div.brkts-popup-body-element-thumbs {
 		cursor: default;
 		pointer-events: none;
 	}
-}
 
-@media ( max-width: 767px ) {
-	.visible-xs.block-team {
-		display: flex !important;
+	@media ( max-width: 767px ) {
+		&.visible-xs {
+			display: flex !important;
+		}
 	}
 }
 

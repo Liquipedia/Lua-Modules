@@ -12,9 +12,9 @@ local Array = Lua.import('Module:Array')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
-local Namespace = Lua.import('Module:Namespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Variables = Lua.import('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -213,7 +213,7 @@ end
 
 ---@return boolean
 function StandingsStorage.shouldStoreLpdb()
-	return Namespace.isMain() and Lpdb.isStorageEnabled()
+	return Lpdb.isStorageEnabled()
 end
 
 ---@param data table
@@ -297,11 +297,11 @@ function StandingsStorage.fromTemplateEntry(frame)
 		local team
 
 		-- Input contains an actual team
-		if data.team and mw.ext.TeamTemplate.teamexists(data.team) then
-			team = mw.ext.TeamTemplate.raw(data.team, date)
+		if data.team and TeamTemplate.exists(data.team) then
+			team = TeamTemplate.getRaw(data.team, date)
 		-- Input is link (possiblity with icon etc), and we managed to parse it
-		elseif teamPage and mw.ext.TeamTemplate.teamexists(teamPage) then
-			team = mw.ext.TeamTemplate.raw(teamPage, date)
+		elseif teamPage and TeamTemplate.exists(teamPage) then
+			team = TeamTemplate.getRaw(teamPage, date)
 		end
 
 		opponentArgs = {type = Opponent.team}

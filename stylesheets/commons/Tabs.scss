@@ -50,10 +50,6 @@ $tabs-bg-hover-dark: var( --clr-on-surface-dark-primary-8 );
 	}
 }
 
-html.client-nojs .tabs-content > div:not( .active ) {
-	display: block;
-}
-
 /* SHARED NAV STYLES */
 .tabs-static,
 .tabs-dynamic {
@@ -185,6 +181,27 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		}
 	}
 
+	/* Temporary solution for fighters */
+	&.wraps {
+		.tabs-nav-wrapper {
+			flex-wrap: wrap;
+		}
+
+		.tabs-nav-wrapper .nav-tabs {
+			flex-wrap: wrap;
+			overflow-x: visible;
+			scrollbar-width: auto;
+		}
+
+		.tabs-nav-wrapper .nav-tabs::-webkit-scrollbar {
+			display: initial;
+		}
+
+		.tabs-scroll-arrow-wrapper {
+			display: none !important;
+		}
+	}
+
 	/* Scroll Arrows */
 	.tabs-scroll-arrow-wrapper {
 		position: absolute;
@@ -244,16 +261,6 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		}
 
 		&[ data-mobile-dropdown-grouped ] {
-			display: none;
-		}
-	}
-
-	html.client-nojs & {
-		.tabs-nav-wrapper {
-			display: flex;
-		}
-
-		.dropdown-widget {
 			display: none;
 		}
 	}
@@ -477,27 +484,6 @@ html.client-nojs .tabs-content > div:not( .active ) {
 	& > .tabs-content {
 		border: unset !important;
 		padding: 0.5rem 0 0 0.5rem;
-	}
-
-	/* Temporary solution for fighters */
-	&.wraps {
-		.tabs-nav-wrapper {
-			flex-wrap: wrap;
-		}
-
-		.tabs-nav-wrapper .nav-tabs {
-			flex-wrap: wrap;
-			overflow-x: visible;
-			scrollbar-width: auto;
-		}
-
-		.tabs-nav-wrapper .nav-tabs::-webkit-scrollbar {
-			display: initial;
-		}
-
-		.tabs-scroll-arrow-wrapper {
-			display: none !important;
-		}
 	}
 
 	&.tabs-variant-vertical {
