@@ -40,7 +40,7 @@ local ConditionUtil = Condition.Util
 local Count = Lua.import('Module:Count')
 
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, displayCurrencyCode = false, formatValue = true}
@@ -792,20 +792,20 @@ function StatisticsPortal.playerAgeTable(args)
 			['margin-right'] = 'auto',
 		},
 		children = WidgetUtil.collect(
-			HtmlWidgets.Tr{children = {
-				HtmlWidgets.Th{classes = {'unsortable'}, children = 'ID'},
-				HtmlWidgets.Th{children = 'Age'},
+			Html.Tr{children = {
+				Html.Th{classes = {'unsortable'}, children = 'ID'},
+				Html.Th{children = 'Age'},
 			}},
 			Array.map(playerData, function (player)
 				local birthdate = DateExt.readTimestamp(player.birthdate) --[[@as integer]]
 				local ageInSeconds = os.difftime(DateExt.getCurrentTimestamp(), birthdate)
 
-				return HtmlWidgets.Tr{children = {
-					HtmlWidgets.Td{children = OpponentDisplay.BlockOpponent{
+				return Html.Tr{children = {
+					Html.Td{children = OpponentDisplay.BlockOpponent{
 						opponent = StatisticsPortal._toOpponent(player),
 						showPlayerTeam = true,
 					}},
-					HtmlWidgets.Td{children = LANG:formatDuration(ageInSeconds, {'years', 'days'})}
+					Html.Td{children = LANG:formatDuration(ageInSeconds, {'years', 'days'})}
 				}}
 			end)
 		)
@@ -1148,7 +1148,7 @@ end
 ---@param placements table
 ---@param earnings number
 ---@param opponentIndex number
----@param opponentDisplay Widget|Html
+---@param opponentDisplay Renderable
 ---@return Html
 function StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay)
 	local row = mw.html.create('tr')
