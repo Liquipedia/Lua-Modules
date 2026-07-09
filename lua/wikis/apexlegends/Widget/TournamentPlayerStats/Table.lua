@@ -114,7 +114,11 @@ end
 ---@param stat string
 ---@return Renderable?
 local function summaryCard(title, player, stat)
-	local value = player and player[stat]
+	if not player then
+		return nil
+	end
+
+	local value = player[stat]
 	if type(value) ~= 'number' or value <= 0 then
 		return nil
 	end
