@@ -237,7 +237,7 @@ function Standings.makeRounds(standings)
 
 	return Array.mapRange(1, roundCount or 1, function(roundIndex)
 		local roundEntries = Array.map(entriesByRound[roundIndex] or {}, Standings.entryFromRecord)
-		local opponents = Array.sortBy(roundEntries, Operator.property('position'))
+		local opponents = Array.sortInPlaceBy(roundEntries, Operator.property('position'))
 		return {
 			round = roundIndex,
 			opponents = opponents,
