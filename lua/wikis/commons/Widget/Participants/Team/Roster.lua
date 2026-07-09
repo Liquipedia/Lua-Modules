@@ -142,7 +142,7 @@ local function ParticipantsTeamRoster(props)
 	end
 
 	---@param groups {label: string?, players: table[]}[]
-	---@return Widget
+	---@return Renderable
 	local makeRostersDisplay = function(groups)
 		local children = {}
 		for _, group in ipairs(groups) do
