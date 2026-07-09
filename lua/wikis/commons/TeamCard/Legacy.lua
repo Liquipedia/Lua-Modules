@@ -284,6 +284,7 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
 	---@return string?
 	local function getNationality(player)
 		local playerLink = Page.pageifyLink(player)
+		if not playerLink then return end
 
 		local queryResults = mw.ext.LiquipediaDB.lpdb('player', {
 			limit = 1,
