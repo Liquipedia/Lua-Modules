@@ -238,7 +238,7 @@ function MatchTickerController.fetchMatches(config)
 		return {}
 	end
 
-	matches = MatchTickerController.sortMatches(matches, config)
+	MatchTickerController.sortMatches(matches, config)
 	matches = Array.sub(matches, 1, config.limit)
 	Array.forEach(matches, function(match) return MatchTickerController.adjustMatch(match, config) end)
 
@@ -474,10 +474,9 @@ end
 ---@private
 ---@param matches {match: MatchGroupUtilMatch, gameData: MatchTickerGameData?}[]
 ---@param config MatchTickerConfig
----@return {match: MatchGroupUtilMatch, gameData: MatchTickerGameData?}[]
 function MatchTickerController.sortMatches(matches, config)
 	local reverse = config.recent and true or false
-	return Array.sortBy(matches, FnUtil.identity, function (a, b)
+	Array.sortInPlaceBy(matches, FnUtil.identity, function (a, b)
 		local aDate, bDate = a.match.date, b.match.date
 		if aDate ~= bDate then
 			if reverse then
@@ -485,8 +484,8 @@ function MatchTickerController.sortMatches(matches, config)
 			end
 			return bDate > aDate
 		end
-		if a.match.match2id ~= b.match.match2id then
-			return a.match.match2id < b.match.match2id
+		if a.match.matchId ~= b.match.matchId then
+			return a.match.matchId < b.match.matchId
 		end
 		return (((a.gameData or {}).gameIds or {})[1] or 0) < (((b.gameData or {}).gameIds or {})[1] or 0)
 	end)
