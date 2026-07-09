@@ -89,3 +89,52 @@ body {
 ::after {
 	box-sizing: border-box;
 }
+
+/* Styles that are not yet part of this repository, but used in snapshot tests */
+
+.wiki-backgroundcolor-light {
+	background-color: var( --clr-wiki-primary-container );
+}
+
+.d-none {
+	display: none !important;
+}
+
+a {
+	text-decoration: none;
+	color: var( --clr-primary );
+	background-color: transparent;
+}
+
+img {
+	vertical-align: middle;
+	border-style: unset;
+}
+
+.main-container .main-content-column {
+	position: relative;
+	overflow-x: hidden;
+}
+
+.nav {
+	display: flex;
+	flex-wrap: wrap;
+	padding-left: 0;
+	margin-bottom: 0;
+	list-style: none;
+}
+
+pre {
+	border: 1px solid #adb5bd;
+	page-break-inside: avoid;
+	font-family: "Source Code Pro", monospace;
+	font-size: 1em;
+	margin-top: 0;
+	margin-bottom: 1rem;
+	overflow: auto;
+	-ms-overflow-style: scrollbar;
+	background-color: #f8f9fa;
+	white-space: pre-wrap;
+	overflow-x: hidden;
+	word-wrap: break-word;
+}
