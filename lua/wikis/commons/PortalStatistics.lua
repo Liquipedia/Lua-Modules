@@ -20,6 +20,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local Math = Lua.import('Module:MathUtil')
 local Medals = Lua.import('Module:Medals')
 local Operator = Lua.import('Module:Operator')
+local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -837,7 +838,7 @@ end
 ---@return table[]
 function StatisticsPortal._getPlayers(limit, addConditions, addOrder)
 	return StatisticsPortal._massQuery('player', {
-		query = 'pagename, id, nationality, earnings, birthdate, team, earningsbyyear',
+		query = 'pagename, id, nationality, earnings, birthdate, teamtemplate, earningsbyyear',
 		conditions = addConditions and tostring(addConditions) or '',
 		order = addOrder,
 		limit = limit,
@@ -868,7 +869,7 @@ function StatisticsPortal._getOpponentEarningsData(args, config)
 	if opponentType == Opponent.team then
 		queryFields = 'pagename, name, template, earnings, earningsbyyear'
 	else
-		queryFields = 'pagename, id, nationality, earnings, birthdate, team, earningsbyyear'
+		queryFields = 'pagename, id, nationality, earnings, birthdate, teamtemplate, earningsbyyear'
 	end
 
 	local data = {}
@@ -1430,15 +1431,14 @@ function StatisticsPortal._defaultProcessFunction(tablePlace, item, config)
 end
 
 
----@param player table
+---@param player player
 ---@return standardOpponent
 function StatisticsPortal._toOpponent(player)
-	return Opponent.readOpponentArgs{
+	return {
 		type = Opponent.solo,
-		link = player.pagename,
-		name = player.id,
-		flag = player.nationality,
-		team = String.nilIfEmpty(player.team),
+		players = {
+			PlayerExt.fromLpdbPlayerRecord(player)
+		},
 	}
 end
 
