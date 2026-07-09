@@ -12,7 +12,6 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
-local Game = Lua.import('Module:Game')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Info = Lua.import('Module:Info', {loadData = true})
 local LeagueIcon = Lua.import('Module:LeagueIcon')
@@ -33,7 +32,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -61,6 +60,7 @@ local INVALID_TIER_SORT = 'ZZ'
 
 ---@class BaseResultsTable
 ---@operator call(table): BaseResultsTable
+---@field data {header: string?, [integer]: placement}[]
 local BaseResultsTable = Class.new(function(self, ...) self:init(...) end)
 
 ---Init function of the BaseResultsTable
@@ -109,10 +109,6 @@ function BaseResultsTable:readConfig()
 	config.playerLimit =
 		(config.queryType == QUERY_TYPES.solo and (tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit))
 		or tonumber(args.coachLimit) or DEFAULT_VALUES.coachLimit
-
-	if config.queryType == QUERY_TYPES.team and Table.isNotEmpty(config.aliases) then
-		config.nonAliasTeamTemplates = BaseResultsTable._getOpponentTemplates(config.opponent)
-	end
 
 	return config
 end
@@ -167,7 +163,7 @@ function BaseResultsTable:create()
 		return placementData.date:sub(1,4)
 	end)
 	--we want to insert values for named keys hence table[][] would cause annotation warnings
-	---@cast splitData table[]
+	---@cast splitData {header: string, [integer]: placement}[]
 
 	-- Set the header
 	Array.forEach(splitData, function(dataSet)
@@ -380,7 +376,7 @@ function BaseResultsTable:_isDataEmpty()
 end
 
 ---Builds the results/achievements/awards table
----@return Widget
+---@return VNode
 function BaseResultsTable:build()
 	return TableWidgets.Table{
 		sortable = true,
@@ -388,9 +384,9 @@ function BaseResultsTable:build()
 		children = WidgetUtil.collect(
 			TableWidgets.TableHeader{children = {self:buildHeader()}},
 			-- Hidden tr that contains a td to prevent the first yearHeader from being inside thead
-			not self:_isDataEmpty() and HtmlWidgets.Tr{
+			not self:_isDataEmpty() and Html.Tr{
 				css = {display = 'none'},
-				children = HtmlWidgets.Td{}
+				children = Html.Td{}
 			} or nil,
 			TableWidgets.TableBody{children = WidgetUtil.collect(self:_buildTableBody(), self.args.manualContent)}
 		),
@@ -402,7 +398,7 @@ function BaseResultsTable:build()
 end
 
 ---@private
----@return Widget[]
+---@return Renderable[]
 function BaseResultsTable:_buildTableBody()
 	if self:_isDataEmpty() then
 		return {TableWidgets.Row{children = TableWidgets.Cell{
@@ -417,7 +413,7 @@ end
 
 ---@private
 ---@param placementData table
----@return Html[]
+---@return Renderable[]
 function BaseResultsTable:_buildRows(placementData)
 	local rows = {}
 
@@ -469,7 +465,7 @@ end
 ---@protected
 ---@param data placement
 ---@param options table?
----@return string|Widget|Widget[]?
+---@return Renderable?
 function BaseResultsTable:opponentDisplay(data, options)
 	options = options or {}
 
@@ -499,54 +495,11 @@ function BaseResultsTable:opponentDisplay(data, options)
 		return
 	end
 
-	local rawTeamTemplate = TeamTemplate.getRawOrNil(teamTemplate, data.date) or {}
-
-	local teamDisplay = OpponentDisplay.BlockOpponent{
-		opponent = Opponent.readOpponentArgs{template = rawTeamTemplate.templatename, type = Opponent.team},
+	return OpponentDisplay.BlockTeamContainer{
+		template = teamTemplate,
 		flip = options.flip,
-		teamStyle = 'icon',
-	}
-
-	if self:shouldDisplayAdditionalText(rawTeamTemplate, not options.isLastVs) then
-		return BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate)
-	end
-
-	return teamDisplay
-end
-
----Checks if additional text should be displayed below the team icon
----@param rawTeamTemplate table
----@param isNotLastVs boolean?
----@return boolean?
-function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate, isNotLastVs)
-	local config = self.config
-
-	return rawTeamTemplate and (
-		Game.isDefaultTeamLogo{logo = rawTeamTemplate.image} or
-		(isNotLastVs and config.nonAliasTeamTemplates
-			and not Table.includes(config.nonAliasTeamTemplates, rawTeamTemplate.templatename))
-	)
-end
-
----Builds team icon display with text below it
----@param teamDisplay Widget
----@param rawTeamTemplate teamTemplateData
----@return Widget[]
-function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate)
-	return {
-		teamDisplay,
-		HtmlWidgets.Div{
-			css = {
-				['line-height'] = 1,
-				['font-size'] = '80%',
-				['text-align'] = 'center',
-			},
-			children = {
-				'(',
-				LinkWidget{link = rawTeamTemplate.page, children = rawTeamTemplate.shortname},
-				')'
-			}
-		}
+		showLink = true,
+		style = 'short',
 	}
 end
 
@@ -563,7 +516,7 @@ end
 
 ---Converts the lastvsdata to display components
 ---@param placement placement
----@return string, string|Widget?, string?
+---@return string, Renderable?, string?
 function BaseResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata or {}
 
@@ -576,33 +529,33 @@ function BaseResultsTable:processVsData(placement)
 		score = (placement.lastscore or '-') .. SCORE_CONCAT .. (lastVs.score or '-')
 	end
 
-	local vsDisplay = self:opponentDisplay(lastVs, {isLastVs = true})
+	local vsDisplay = self:opponentDisplay(lastVs)
 
 	return score, vsDisplay
 end
 
 ---@protected
----@return table[]
+---@return Table2ColumnDef[]
 function BaseResultsTable:buildColumnDefinitions()
 	error('BaseResultsTable:buildColumnDefinitions() cannot be called directly and must be overridden.')
 end
 
 ---@protected
----@return Widget
+---@return Renderable
 function BaseResultsTable:buildHeader()
 	error('BaseResultsTable:buildHeader() cannot be called directly and must be overridden.')
 end
 
 ---@protected
 ---@param placement placement
----@return Widget
+---@return Renderable
 function BaseResultsTable:buildRow(placement)
 	error('BaseResultsTable:buildRow() cannot be called directly and must be overridden.')
 end
 
 ---@protected
 ---@param placement placement
----@return Widget
+---@return Renderable
 function BaseResultsTable:createDateCell(placement)
 	return TableWidgets.Cell{children = DateExt.toYmdInUtc(placement.date)}
 end
@@ -622,7 +575,7 @@ end
 
 ---@protected
 ---@param placement placement
----@return Widget?
+---@return VNode?
 function BaseResultsTable:createTypeCell(placement)
 	if not self.config.showType then
 		return
@@ -634,7 +587,7 @@ end
 
 ---@protected
 ---@param placement placement
----@return Widget[]
+---@return VNode[]
 function BaseResultsTable:createTournamentCells(placement)
 	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
 	return {
@@ -664,7 +617,7 @@ end
 
 ---@protected
 ---@param props {useIndivPrize: boolean?, placement: placement}
----@return Widget
+---@return VNode
 function BaseResultsTable:createPrizeCell(props)
 	local useIndivPrize = Logic.nilOr(props.useIndivPrize, self.config.queryType ~= Opponent.team)
 	local placement = props.placement

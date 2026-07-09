@@ -38,8 +38,8 @@ local function Panel(props)
 
 	if hasToggle then
 		attributes = Table.merge(attributes, {
-			tabindex = "0",
-			['data-component'] =  "panel-box-collapsible-button"
+			tabindex = '0',
+			['data-component'] = 'panel-box-collapsible-button'
 		})
 	end
 

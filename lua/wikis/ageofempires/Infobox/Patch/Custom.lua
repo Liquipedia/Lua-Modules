@@ -40,7 +40,7 @@ end
 ---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
-	local args  = caller.args
+	local args = caller.args
 	if id == 'version' then
 		return {
 			Cell{name = 'Game', children = {Game.name{game = args.game, useDefault = false}}, options = {makeLink = true}},

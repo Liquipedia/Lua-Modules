@@ -13,7 +13,7 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
-local MatchTicker = Lua.import('Module:MatchTicker')
+local MatchTicker = Lua.import('Module:MatchTicker/Controller')
 local Namespace = Lua.import('Module:Namespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -214,32 +214,21 @@ function UnofficialWorldChampion:_createUpcomingMatches()
 		return nil
 	end
 
-	local result = Logic.tryCatch(
+	return Logic.tryCatch(
 		function()
-			local matchTicker = MatchTicker{
+			return MatchTicker.makeMatchTicker{
 				team = currentChampion.template,
 				limit = 5,
 				upcoming = true,
 				ongoing = true,
 				hideTournament = false,
+				entityStyle = true,
 			}
-			matchTicker:query()
-			return matchTicker
 		end,
 		function()
 			return nil
 		end
 	)
-
-	if not result or not result.matches or #result.matches == 0 then
-		return nil
-	end
-
-	local EntityDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
-	return EntityDisplay.Container{
-		config = result.config,
-		matches = result.matches,
-	}:create()
 end
 
 ---@param args table
