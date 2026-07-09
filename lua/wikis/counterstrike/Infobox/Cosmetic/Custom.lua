@@ -101,7 +101,7 @@ function CustomInjector:parse(id, widgets)
 					return {Cell{name = 'Souvenir?', children = {'None'}}}
 				end
 				if string.lower(souvenir) == 'yes' or string.lower(souvenir) == 'all' then
-					return {Cell{name = 'Souvenir?', children =  {'Yes, all'}}}
+					return {Cell{name = 'Souvenir?', children = {'Yes, all'}}}
 				elseif string.lower(souvenir) == 'some' then
 					return {Cell{name = 'Souvenir?', children = {'Yes, some'}}}
 				end

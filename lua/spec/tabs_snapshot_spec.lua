@@ -1,5 +1,5 @@
 local Tabs = require('Module:Tabs')
-local HtmlWidgets = require('Module:Widget/Html/All')
+local Html = require('Module:Widget/Html')
 
 insulate('Tabs snapshots', function()
 	it('dynamic variants #snapshot', function()
@@ -8,10 +8,10 @@ insulate('Tabs snapshots', function()
 			HtmlWidgets.Li{children = {'Item A2'}},
 		}}
 
-		local output = HtmlWidgets.Div{children = {
-			HtmlWidgets.Div{children = {'Dynamic Tabs Variants (Snapshot)'}},
+		local output = Html.Div{children = {
+			Html.Div{children = {'Dynamic Tabs Variants (Snapshot)'}},
 
-			HtmlWidgets.Div{children = {'Horizontal (icons)'}},
+			Html.Div{children = {'Horizontal (icons)'}},
 			Tabs.dynamic{
 				variant = 'horizontal',
 				name1 = 'Overview',
@@ -25,7 +25,7 @@ insulate('Tabs snapshots', function()
 				content3 = 'Stats content',
 			},
 
-			HtmlWidgets.Div{children = {'Vertical'}},
+			Html.Div{children = {'Vertical'}},
 			Tabs.dynamic{
 				variant = 'vertical',
 				name1 = 'Spring Split',
@@ -39,7 +39,7 @@ insulate('Tabs snapshots', function()
 				content3 = 'Worlds content',
 			},
 
-			HtmlWidgets.Div{children = {'Icon-only (with show all)'}},
+			Html.Div{children = {'Icon-only (with show all)'}},
 			Tabs.dynamic{
 				variant = 'icon-only',
 				name1 = 'Home',
@@ -53,7 +53,7 @@ insulate('Tabs snapshots', function()
 				content3 = 'Profile content',
 			},
 
-			HtmlWidgets.Div{children = {'Array content'}},
+			Html.Div{children = {'Array content'}},
 			Tabs.dynamic{
 				variant = 'horizontal',
 				name1 = 'Array A',

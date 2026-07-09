@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
@@ -55,7 +56,7 @@ function AwardPlacement:_getLpdbData(...)
 		local opponentType = opponent.opponentData.type
 
 		if opponentType == Opponent.team then
-			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template) or {}
+			local teamTemplate = TeamTemplate.getRawOrNil(opponent.opponentData.template) or {}
 
 			participant = teamTemplate.page or ''
 			if self.parent.options.resolveRedirect then

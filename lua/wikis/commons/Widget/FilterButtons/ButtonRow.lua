@@ -7,39 +7,34 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local I18n = Lua.import('Module:I18n')
 local String = Lua.import('Module:StringUtils')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local FilterButton = Lua.import('Module:Widget/FilterButtons/Button')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class FilterButtonRowParameters
 ---@field categoryName string
----@field buttons (FilterButton?)[]
+---@field buttons FilterButton[]
 ---@field expandKey string?
 ---@field featuredByDefault boolean?
 ---@field hasFeatured boolean?
 
 local CLASS_NAME = 'filter-buttons'
 
----@class FilterButtonRow: Widget
----@operator call(table): FilterButtonRow
----@field props FilterButtonRowParameters
-local FilterButtonRow = Class.new(Widget)
-
----@return Widget
-function FilterButtonRow:render()
-	return HtmlWidgets.Div{
+---@param props FilterButtonRowParameters
+---@return VNode
+local function FilterButtonRow(props)
+	return Html.Div{
 		classes = {CLASS_NAME},
 		attributes = {
 			['data-filter'] = 'data-filter',
 			['data-filter-effect'] = 'fade',
-			['data-filter-group'] = 'filterbuttons-' .. self.props.categoryName,
-			['data-filter-default-curated'] = self.props.featuredByDefault and 'true' or nil,
+			['data-filter-group'] = 'filterbuttons-' .. props.categoryName,
+			['data-filter-default-curated'] = props.featuredByDefault and 'true' or nil,
 		},
 		children = WidgetUtil.collect(
 			FilterButton{
@@ -47,22 +42,22 @@ function FilterButtonRow:render()
 				value = 'all',
 				display = I18n.translate('filterbuttons-all')
 			},
-			self.props.hasFeatured and FilterButton{
+			props.hasFeatured and FilterButton{
 				value = 'curated',
 				display = I18n.translate('filterbuttons-featured')
 			},
-			self.props.buttons,
-			String.isNotEmpty(self.props.expandKey) and HtmlWidgets.Div{
+			props.buttons,
+			String.isNotEmpty(props.expandKey) and Html.Div{
 				classes = {CLASS_NAME},
 				attributes = {
 					['data-filter'] = 'data-filter',
 					['data-filter-effect'] ='fade',
-					['data-filter-group'] = 'tournaments-list-dropdown-' .. self.props.expandKey
+					['data-filter-group'] = 'tournaments-list-dropdown-' .. props.expandKey
 				},
 				children = {
 					FilterButton{
 						buttonClasses = { 'filter-button-dropdown' },
-						value = 'dropdown-' .. self.props.expandKey,
+						value = 'dropdown-' .. props.expandKey,
 						display = IconFa{iconName = 'expand'}
 					},
 					FilterButton{
@@ -75,4 +70,4 @@ function FilterButtonRow:render()
 	}
 end
 
-return FilterButtonRow
+return Component.component(FilterButtonRow)

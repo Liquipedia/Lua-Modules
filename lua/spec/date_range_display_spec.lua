@@ -3,7 +3,7 @@ insulate('DateRange', function()
 	it('DateRange display test #snapshot', function()
 		local Array = require('Module:Array')
 		local DateRange = require('Module:Widget/Misc/DateRange')
-		local HtmlWidgets = require('Module:Widget/Html/All')
+		local Html = require('Module:Widget/Html')
 
 		local start_y = {year = 2023}
 		local start_ym = {year = 2023, month = 10}
@@ -52,27 +52,27 @@ insulate('DateRange', function()
 		end
 
 		GoldenTest('date range display',
-			tostring(HtmlWidgets.Table{
-				classes={'wikitable wikitable-striped'},
-				children=Array.extend(
+			tostring(Html.Table{
+				classes = {'wikitable', 'wikitable-striped'},
+				children = Array.extend(
 					{
-						HtmlWidgets.Tr{children={
-							HtmlWidgets.Th{children="startDate"},
-							HtmlWidgets.Th{children="endDate"},
-							HtmlWidgets.Th{children="DateRange (showYear)"},
-							HtmlWidgets.Th{children="DateRange (not showYear)"},
+						Html.Tr{children={
+							Html.Th{children="startDate"},
+							Html.Th{children="endDate"},
+							Html.Th{children="DateRange (showYear)"},
+							Html.Th{children="DateRange (not showYear)"},
 						}}
 					},
 					Array.map(data, function (entry)
-						return HtmlWidgets.Tr{children={
-							HtmlWidgets.Td{children=dateDisplay(entry[1])},
-							HtmlWidgets.Td{children=dateDisplay(entry[2])},
-							HtmlWidgets.Td{children=DateRange{
+						return Html.Tr{children={
+							Html.Td{children=dateDisplay(entry[1])},
+							Html.Td{children=dateDisplay(entry[2])},
+							Html.Td{children=DateRange{
 								startDate = entry[1],
 								endDate = entry[2],
 								showYear = true
 							}},
-							HtmlWidgets.Td{children=DateRange{
+							Html.Td{children=DateRange{
 								startDate = entry[1],
 								endDate = entry[2],
 							}},

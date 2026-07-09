@@ -74,7 +74,7 @@ end
 ---@param platform string?
 ---@return string?
 function CustomLeague:_platformLookup(platform)
-	platform  = Logic.nilIfEmpty(platform) or DEFAULT_PLATFORM
+	platform = Logic.nilIfEmpty(platform) or DEFAULT_PLATFORM
 	return PLATFORM_ALIAS[platform:lower()]
 end
 

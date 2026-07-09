@@ -63,7 +63,7 @@ function Disambiguation.player(frame)
 	local typeDisplay = Logic.emptyOr(data.type, 'player'):lower()
 
 	---@return string
-	local  getPlayingWorkingInfo = function()
+	local getPlayingWorkingInfo = function()
 		if Logic.isEmpty(data.teamtemplate) then return '' end
 		return String.interpolate(
 			' currently ${playOrWork} for ${opponent}',

@@ -8,25 +8,27 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
-
 local StreamLinks = Lua.import('Module:Links/Stream')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local MatchStream = Lua.import('Module:Widget/Match/Stream')
 
----@class MatchStreamsContainer: Widget
----@operator call(table): MatchStreamsContainer
-local MatchStreamsContainer = Class.new(Widget)
-MatchStreamsContainer.defaultProps = {
+---@class MatchStreamsContainerProps
+---@field streams table
+---@field maxStreams integer?
+---@field matchIsLive boolean?
+---@field growButtons boolean?
+---@field buttonSize 'xs'|'sm'|'md'|'lg'?
+
+local defaultProps = {
 	matchIsLive = true,
-	maxStreams = nil,
 	buttonSize = 'sm',
 }
 
----@return Widget?
-function MatchStreamsContainer:render()
-	local streams = self.props.streams
+---@param props MatchStreamsContainerProps
+---@return VNode?
+local function MatchStreamsContainer(props)
+	local streams = props.streams
 	if not streams then
 		return nil
 	end
@@ -42,19 +44,19 @@ function MatchStreamsContainer:render()
 		return nil
 	end
 
-	if self.props.maxStreams and numberOfStreams > self.props.maxStreams then
-		processedStreams = Array.sub(processedStreams, 1, self.props.maxStreams)
+	if props.maxStreams and numberOfStreams > props.maxStreams then
+		processedStreams = Array.sub(processedStreams, 1, props.maxStreams)
 	end
 
 	return Array.map(processedStreams, function(stream)
 		return MatchStream{
 			platform = stream.platform,
 			stream = stream.stream,
-			matchIsLive = self.props.matchIsLive,
-			grow = self.props.growButtons,
-			buttonSize = self.props.buttonSize,
+			matchIsLive = props.matchIsLive,
+			grow = props.growButtons,
+			buttonSize = props.buttonSize,
 		}
 	end)
 end
 
-return MatchStreamsContainer
+return Component.component(MatchStreamsContainer, defaultProps)
