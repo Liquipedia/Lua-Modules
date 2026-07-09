@@ -418,27 +418,24 @@ function MatchTickerController.expandGamesOfMatch(match, config)
 		return {{match = match}}
 	end
 
-	local gamesToExpand = Array.filter(match.games, function(game)
+	---@type {match: MatchGroupUtilMatch, gameData: MatchTickerGameData?}[]
+	local expandedGames = Array.map(match.games, function(game, gameIndex)
 		if config.recent and Logic.isEmpty(game.winner) then
-			return false
+			return
 		end
 		if (config.upcoming or config.ongoing) and Logic.isNotEmpty(game.winner) then
-			return false
+			return
 		end
 		if not game.date then
-			return false
+			return
 		end
 		if not config.upcoming and NOW < game.date then
-			return false
+			return
 		end
 		if not (config.ongoing or config.recent) and NOW >= game.date then
-			return false
+			return
 		end
 
-		return true
-	end)
-
-	local expandedGames = Array.map(gamesToExpand, function(game, gameIndex)
 		local gameMatch = Table.copy(match)
 		gameMatch.games = {}
 
