@@ -42,8 +42,8 @@ local DEFAULT_TIERS = {1, 2}
 local DEFAULT_TIER_TYPE = 'Unset'
 local SUM_ABBR = Html.Abbr{title = 'Sum of', children = 'Σ'}
 
----@class StormgatePlayerMatchupStatistics
----@operator call(table): StormgatePlayerMatchupStatistics
+---@class FactionPlayerMatchupStatistics
+---@operator call(table): FactionPlayerMatchupStatistics
 ---@field args table<string, string>
 ---@field matchIds string[]
 ---@field player string
