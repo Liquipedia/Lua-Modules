@@ -71,8 +71,7 @@ local STAT_FIELDS = {
 	'damageTaken',
 }
 
----@param name string
----@return string?
+---@type fun(name: string): string?
 local getPageName = FnUtil.memoize(Page.pageifyLink)
 
 ---@param args table
@@ -121,7 +120,14 @@ local function readPlayers(rawData)
 		return {}
 	end
 
-	return Array.map(list, rowFromInput)
+	local rows = {}
+	for _, item in ipairs(list) do
+		local row = rowFromInput(item)
+		if row then
+			table.insert(rows, row)
+		end
+	end
+	return rows
 end
 
 ---@param frame Frame|table
@@ -160,11 +166,12 @@ local function fetchById(id)
 			ConditionNode(ColumnName('name'), Comparator.eq, id),
 		}
 
-	return mw.ext.LiquipediaDB.lpdb('datapoint', {
+	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = tostring(conditions),
 		query = 'extradata, information',
 		limit = 1,
-	})[1]
+	})
+	return type(data) == 'table' and data[1] or nil
 end
 
 ---@param tournamentPage string
@@ -191,27 +198,29 @@ local function buildPlacementIndex(tournamentPage)
 		limit = 5000,
 	})
 
-	Array.forEach(rows, function(row)
-		if Logic.isEmpty(row.opponentplayers) then
-			return
-		end
-
-		local opponent = Opponent.fromLpdbStruct(row)
-
-		Array.forEach(opponent.players or {}, function(player)
-			local pageName = Page.pageifyLink(player.pageName)
-			if not pageName or index.byPage[pageName] then
+	if type(rows) == 'table' then
+		Array.forEach(rows, function(row)
+			if Logic.isEmpty(row.opponentplayers) then
 				return
 			end
 
-			index.byPage[pageName] = {
-				displayName = player.displayName,
-				pageName = pageName,
-				flag = player.flag,
-				team = opponent.type == Opponent.team and opponent.template or player.team,
-			}
+			local opponent = Opponent.fromLpdbStruct(row)
+
+			Array.forEach(opponent and opponent.players or {}, function(player)
+				local pageName = Page.pageifyLink(player.pageName)
+				if not pageName or index.byPage[pageName] then
+					return
+				end
+
+				index.byPage[pageName] = {
+					displayName = player.displayName,
+					pageName = pageName,
+					flag = player.flag,
+					team = opponent.type == Opponent.team and opponent.template or player.team,
+				}
+			end)
 		end)
-	end)
+	end
 
 	return index
 end
@@ -272,14 +281,19 @@ function TournamentPlayerStatsCalculator.getData(args)
 		end
 
 		local tournamentPage = row.information
+		if not tournamentPage or type(tournamentPage) ~= 'string' then
+			return
+		end
+
 		local storedPlayers = (row.extradata or {}).players or {}
 
 		Array.forEach(storedPlayers, function(rawPlayer)
-			if type(rawPlayer) ~= 'table' then
+			local rawRow = rowFromInput(rawPlayer)
+			if not rawRow then
 				return
 			end
 
-			local player = playerFromRow(rawPlayer, tournamentPage)
+			local player = playerFromRow(rawRow, tournamentPage)
 			if not player then
 				return
 			end
