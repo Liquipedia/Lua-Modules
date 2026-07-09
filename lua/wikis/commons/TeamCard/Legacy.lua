@@ -285,13 +285,13 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
 	local function getNationality(player)
 		local playerLink = Page.pageifyLink(player)
 
-		local results = mw.ext.LiquipediaDB.lpdb('player', {
+		local queryResults = mw.ext.LiquipediaDB.lpdb('player', {
 			limit = 1,
 			conditions = tostring(ConditionNode(ColumnName('pagename'), Comparator.eq, playerLink)),
 			query = 'nationality',
 		})[1] or {}
 
-		return results.nationality
+		return queryResults.nationality
 	end
 
 	local pageName = tcArgs[prefix .. 'link'] or tcArgs[prefix]
