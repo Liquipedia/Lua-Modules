@@ -362,6 +362,9 @@ local byFactionAoE4 = {
 	jeannedarc = {
 		icon = 'File:Jeanne d\'Arc AoE4 Icon.png',
 	},
+	jindynasty = {
+		icon = 'File:Jin AoE4 Icon.png',
+	},
 	knightstemplar = {
 		icon = 'File:Knights Templar AoE4 Icon.png',
 	},

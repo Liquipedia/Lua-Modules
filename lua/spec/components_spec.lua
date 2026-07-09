@@ -3,7 +3,6 @@ local ComponentCore = require('Module:Widget/Component')
 local Context = require('Module:Widget/ComponentContext')
 local ErrorBoundary = require('Module:Widget/ErrorBoundary')
 local Html = require('Module:Widget/Html')
-local WidgetHtml = require('Module:Widget/Html/All')
 local Renderer = require('Module:Widget/Renderer')
 
 describe('Components/Renderer', function()
@@ -107,7 +106,16 @@ describe('Components/Renderer', function()
 		end)
 
 		it('renders widget2', function()
-			assert.are.equal('<p>built</p>', Renderer.render(WidgetHtml.P{children = {'built'}}))
+			local Class = require('Module:Class')
+			local Widget = require('Module:Widget')
+
+			local Widget2HtmlP = Class.new(Widget)
+
+			function Widget2HtmlP:render()
+				return Html.P(self.props)
+			end
+
+			assert.are.equal('<p>built</p>', Renderer.render(Widget2HtmlP{children = {'built'}}))
 		end)
 	end)
 end)
@@ -242,6 +250,11 @@ describe('Components/Context', function()
 end)
 
 describe('Components/Html', function()
+	it('Html.Abbr with title property', function()
+		local abbr = Html.Abbr{children = {'Test'}, title = 'Title'}
+		assert.are.same('<abbr title="Title">Test</abbr>', tostring(abbr))
+	end)
+
 	it('Html.Div renders a div', function()
 		assert.are.equal('<div></div>', tostring(Html.Div{}))
 	end)

@@ -7,41 +7,36 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
-
 local ExternalMediaList = Lua.import('Module:ExternalMediaList')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local ListWidgets = Lua.import('Module:Widget/List')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class Headlines: Widget
----@field props { headlinesPortal: string?, limit: integer? }
----@operator call(table): Headlines
-local Headlines = Class.new(Widget)
-Headlines.defaultProps = {
+local defaultProps = {
 	headlinesPortal = 'Portal:News',
 	limit = 4,
 }
 
----@return (Html|Widget)[]
-function Headlines:render()
-	assert(self.props.limit > 0, 'Invalid limit')
+---@param props { headlinesPortal: string?, limit: integer? }
+---@return Renderable[]
+local function Headlines(props)
+	assert(props.limit > 0, 'Invalid limit')
 	return WidgetUtil.collect(
-		ExternalMediaList.get{ subject = '!', limit = self.props.limit },
-		HtmlWidgets.Hr{},
+		ExternalMediaList.get{ subject = '!', limit = props.limit },
+		Html.Hr{},
 		Div{
 			classes = {'hlist'},
 			css = {
 				['text-align'] = 'center',
 				['font-style'] = 'italic',
 			},
-			children = UnorderedList{
+			children = ListWidgets.Unordered{
 				children = {
-					Link{ children = 'See all Headlines', link = self.props.headlinesPortal },
+					Link{ children = 'See all Headlines', link = props.headlinesPortal },
 					Link{ children = 'Add a Headline', link = 'Special:FormEdit/ExternalMediaLinks' }
 				}
 			}
@@ -49,4 +44,4 @@ function Headlines:render()
 	)
 end
 
-return Headlines
+return Component.component(Headlines, defaultProps)

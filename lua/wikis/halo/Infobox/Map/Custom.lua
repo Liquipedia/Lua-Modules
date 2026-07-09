@@ -24,7 +24,7 @@ local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomMap.run(frame)
 	local map = CustomMap(frame)
 	map:setWidgetInjector(CustomInjector(map))
@@ -33,8 +33,8 @@ function CustomMap.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then

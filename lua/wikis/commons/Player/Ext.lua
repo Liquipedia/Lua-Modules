@@ -352,7 +352,8 @@ function PlayerExt.syncTeam(pageName, template, options)
 
 	if entry and not entry.isResolved then
 		entry.raw = entry.template
-		entry.template = entry.template and TeamTemplate.resolve(entry.template, options.date --[[@as string|number?]])
+		entry.template = entry.template
+			and TeamTemplate.resolve(entry.template, options.date --[[@as string|number?]]) --[[@as string]]
 		entry.isResolved = true
 	end
 
@@ -396,6 +397,28 @@ function PlayerExt.TemplateStorePlayerLink(frame)
 		flag = String.nilIfEmpty(Flags.CountryName{flag = args.flag}),
 		faction = Faction.read(args.faction or args.race) or Faction.defaultFaction,
 	}, {overwritePageVars = true})
+end
+
+---@param record player
+---@return standardPlayer
+---@overload fun(record: {}?): nil
+function PlayerExt.fromLpdbPlayerRecord(record)
+	if Logic.isEmpty(record) then
+		return
+	end
+
+	local extradata = record.extradata or {}
+
+	return {
+		pageName = record.pagename,
+		displayName = record.id,
+		flag = record.nationality,
+		faction = extradata.faction,
+		team = record.teamtemplate,
+		extradata = extradata,
+		pageIsResolved = true,
+		apiId = extradata.playerid, -- dota appid is stored that way
+	}
 end
 
 return PlayerExt

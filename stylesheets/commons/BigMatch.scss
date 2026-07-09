@@ -1146,23 +1146,9 @@ span.slash {
 		}
 
 		&-state {
-			background-color: var( --clr-on-background );
-			border-radius: 0.875rem;
-			min-height: 1.5rem;
-			color: #ffffff;
-			padding: 0.125rem 0.5rem;
-			text-transform: uppercase;
 			font-weight: bold;
-			width: 5.5rem;
-			text-align: center;
-
-			&.state--winner {
-				background-color: var( --clr-semantic-positive-40 );
-			}
-
-			&.state--loser {
-				background-color: var( --clr-semantic-negative-40 );
-			}
+			text-transform: uppercase;
+			--label-scale: 1.25;
 		}
 	}
 

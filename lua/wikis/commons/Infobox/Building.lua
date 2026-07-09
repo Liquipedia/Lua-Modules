@@ -27,14 +27,14 @@ local Building = Class.new(BasicInfobox)
 
 ---Entry point
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Building.run(frame)
 	local building = Building(frame)
 	return building:createInfobox()
 end
 
 ---creates the infobox
----@return Widget
+---@return VNode
 function Building:createInfobox()
 	local args = self.args
 

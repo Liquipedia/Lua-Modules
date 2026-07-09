@@ -22,6 +22,8 @@ local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
+local MatchInfoIcon = Lua.import('Module:Widget/Match/InfoIcon')
+
 local NON_BREAKING_SPACE = '&nbsp;'
 local OPPONENT_HEIGHT_PADDING = 4
 
@@ -591,10 +593,13 @@ function BracketDisplay.Match(props)
 			matchId = props.match.matchId,
 		}, Lua.import('Module:Error/Display').ErrorDetails)
 
-		local matchInfoIconNode = mw.html.create('div'):addClass('brkts-match-info-icon')
-			-- Vertically align the middle of the match with the middle
-			-- of the 12px icon. The -1 is for the top border of the match.
-			:css('top', #props.match.opponents * props.opponentHeight / 2 - 12 / 2 - 1 .. 'px')
+		local matchInfoIconNode = MatchInfoIcon{
+			css = {
+				-- Vertically align the middle of the match with the middle
+				-- of the 12px icon. The -1 is for the top border of the match.
+				top = #props.match.opponents * props.opponentHeight / 2 - 12 / 2 - 1 .. 'px'
+			}
+		}
 
 		matchNode
 			:node(matchInfoIconNode):node(matchSummaryNode)

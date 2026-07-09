@@ -6,7 +6,6 @@
 // Event names
 const PAGE_VIEW = 'Page view';
 const LINK_CLICKED = 'Link clicked';
-const WIKI_SWITCHED = 'Wiki switched';
 const SEARCH_PERFORMED = 'Page searched';
 const BUTTON_CLICKED = 'Button clicked';
 const MATCH_POPUP_OPENED = 'Match popup opened';
@@ -105,8 +104,6 @@ liquipedia.analytics = {
 
 	init: function() {
 		liquipedia.analytics.sendPageViewEvent();
-
-		liquipedia.analytics.setupWikiMenuLinkClickAnalytics();
 		liquipedia.analytics.setupLinkClickAnalytics();
 		liquipedia.analytics.setupButtonClickAnalytics();
 		liquipedia.analytics.setupSearchAnalytics();
@@ -117,6 +114,9 @@ liquipedia.analytics = {
 		liquipedia.analytics.setupToggleClickAnalytics();
 
 		document.body.addEventListener( 'click', ( event ) => {
+			if ( event.target.closest( '#ncmp__tool, #ncmp__modal' ) ) {
+				return;
+			}
 			for ( const tracker of liquipedia.analytics.clickTrackers ) {
 				const element = event.target.closest( tracker.selector );
 
@@ -128,11 +128,41 @@ liquipedia.analytics = {
 		}, true );
 	},
 
-	track: function( eventName, properties ) {
+	waitForProcessedConsent: function ( frequency, maxRetries ) {
+		return new Promise((resolve, reject) => {
+			let attempts = 0;
+
+			const timer = setInterval(() => {
+				attempts++;
+
+				if (window.consent === true || window.consent === false) {
+					clearInterval(timer);
+					resolve(window.consent);
+				}
+				else if (attempts >= maxRetries) {
+					clearInterval(timer);
+					reject(new Error(`Max retries reached`));
+				}
+			}, frequency);
+		});
+	},
+
+	track: async function( eventName, properties ) {
 		// amplitude is blocked, either by user choice or by an adblocker
 		if ( !window.amplitude ) {
 			return;
 		}
+
+		// make sure the consent handler has been initialized
+		try {
+			const consent = await this.waitForProcessedConsent(300, 100);
+			if ( !consent ) {
+				return;
+			}
+		} catch {
+			return;
+		}
+
 		window.amplitude.track( eventName, {
 			'page domain': getPageDomain(),
 			'page location': getPageLocation(),
@@ -290,25 +320,11 @@ liquipedia.analytics = {
 
 	setupButtonClickAnalytics: function() {
 		liquipedia.analytics.clickTrackers.push( {
-			selector: '.btn:not(a *), button:not(a *)',
+			selector: '.btn:not(a *), .button:not(a *), button:not(a *)',
 			trackerName: BUTTON_CLICKED,
 			propertiesBuilder: ( link ) => ( {
 				title: link.innerText,
 				position: liquipedia.analytics.findLinkPosition( link )
-			} )
-		} );
-	},
-
-	setupWikiMenuLinkClickAnalytics: function() {
-		liquipedia.analytics.clickTrackers.push( {
-			selector: '[data-wiki-menu="link"]',
-			trackerName: WIKI_SWITCHED,
-			propertiesBuilder: ( wikiMenuLink ) => ( {
-				wiki: wikiMenuLink.closest( '[data-wiki-id]' ).dataset.wikiId,
-				position: 'wiki menu',
-				destination: wikiMenuLink.href,
-				'trending page': false,
-				'trending position': null
 			} )
 		} );
 	},
