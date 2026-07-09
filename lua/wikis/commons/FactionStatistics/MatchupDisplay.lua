@@ -14,7 +14,7 @@ local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local MatchupDisplay = {}
 
 ---@param matchupData {w: number, l: number}
----@return Widget[]
+---@return Renderable[]
 function MatchupDisplay.display(matchupData)
 	local total = matchupData.w + matchupData.l
 

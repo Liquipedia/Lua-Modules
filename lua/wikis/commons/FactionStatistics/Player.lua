@@ -57,7 +57,7 @@ local SUM_ABBR = Html.Abbr{title = 'Sum of', children = 'Σ'}
 local PlayerStatistics = Class.new(function(self, args) self:init(args) end)
 
 ---@param frame Frame
----@return Widget|string
+---@return Renderable
 function PlayerStatistics.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -310,7 +310,7 @@ function PlayerStatistics:_getMapConditions()
 	return tostring(conditions)
 end
 
----@return Widget|string
+---@return Renderable
 function PlayerStatistics:create()
 	if Logic.isEmpty(self.matchIds) then
 		return 'No data found'
@@ -329,7 +329,7 @@ function PlayerStatistics:create()
 end
 
 ---@private
----@return Widget
+---@return Renderable
 function PlayerStatistics:_matchesPerFaction()
 	local display = function(key)
 		return {
@@ -354,14 +354,14 @@ function PlayerStatistics._getFactionOrder()
 end
 
 ---@private
----@return Widget
+---@return Renderable
 function PlayerStatistics:_matchesPerType()
 	local order = {'offline', 'online'}
 	return PlayerStatistics._simpleTable(self.byType, String.upperCaseFirst, order, 'Matches per Environment')
 end
 
 ---@private
----@return Widget
+---@return Renderable
 function PlayerStatistics:_matchesPerOpponentType()
 	local order = {
 		Opponent.solo,
@@ -374,7 +374,7 @@ function PlayerStatistics:_matchesPerOpponentType()
 end
 
 ---@private
----@return Widget
+---@return Renderable
 function PlayerStatistics:_matchesPerBestof()
 	local display = function(key)
 		if key == '-1' then
@@ -394,7 +394,7 @@ end
 ---@param display fun(string): Renderable
 ---@param order string[]
 ---@param title string
----@return Widget
+---@return Renderable
 function PlayerStatistics._simpleTable(data, display, order, title)
 	local rows = Array.map(order, function(key)
 		local matchupData = data[key]
@@ -423,7 +423,7 @@ end
 
 ---@private
 ---@param emptyCell boolean
----@return Widget[]
+---@return Renderable[]
 function PlayerStatistics._headerCells(emptyCell)
 	return WidgetUtil.collect(
 		emptyCell and TableWidgets.CellHeader{children = ''} or nil,
@@ -435,7 +435,7 @@ function PlayerStatistics._headerCells(emptyCell)
 end
 
 ---@private
----@return Widget
+---@return Renderable
 function PlayerStatistics:_gamesPerMapAndFaction()
 	local factionOrder = Array.filter(PlayerStatistics._getFactionOrder(), function (key)
 		local data = self.byMap.total[key]
@@ -443,7 +443,7 @@ function PlayerStatistics:_gamesPerMapAndFaction()
 	end)
 
 	---@param key string
-	---@return Widget
+	---@return Renderable
 	local factionHeader = function(key)
 		local display = key == 'total' and 'vs. All' or {
 			'vs. ',
@@ -466,7 +466,7 @@ function PlayerStatistics:_gamesPerMapAndFaction()
 
 	---@param rowData table<string, {w: integer, l: integer}>
 	---@param mapDisplay Renderable
-	---@return Widget
+	---@return Renderable
 	local makeRow = function(rowData, mapDisplay)
 		return TableWidgets.Row{
 			children = WidgetUtil.collect(
