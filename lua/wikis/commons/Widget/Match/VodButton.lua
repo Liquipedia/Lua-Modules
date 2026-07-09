@@ -7,32 +7,28 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local VodLink = Lua.import('Module:VodLink')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local ImageIcon = Lua.import('Module:Widget/Image/Icon/Image')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
----@class VodButton: Widget
----@operator call(table): VodButton
-local VodButton = Class.new(Widget)
-
----@return Widget?
-function VodButton:render()
-	local vodLink = self.props.vodLink
+---@param props {vodLink: string, variant: string?, showText: boolean?, gameNumber: integer, grow: boolean?}
+---@return VNode?
+local function VodButton(props)
+	local vodLink = props.vodLink
 
 	if not vodLink then
 		return
 	end
 
-	local useDropdownVariant = self.props.variant == 'dropdown'
-	local showText = self.props.showText
-	local gameNumber = self.props.gameNumber
-	local useGrow = Logic.readBool(self.props.grow)
+	local useDropdownVariant = props.variant == 'dropdown'
+	local showText = props.showText
+	local gameNumber = props.gameNumber
+	local useGrow = Logic.readBool(props.grow)
 
 	return Button{
 		linktype = 'external',
@@ -43,12 +39,12 @@ function VodButton:render()
 		grow = useGrow,
 		children = useDropdownVariant and {
 			Icon{iconName = 'vod_play', size = 'sm'},
-			HtmlWidgets.Span{
+			Html.Span{
 				children = showText and ('Game ' .. gameNumber) or gameNumber,
 			}
 		} or {
 			ImageIcon{imageLight = VodLink.getIcon(gameNumber)},
-			HtmlWidgets.Span{
+			Html.Span{
 				classes = {'match-button-cta-text'},
 				children = 'Watch VOD',
 			},
@@ -56,4 +52,4 @@ function VodButton:render()
 	}
 end
 
-return VodButton
+return Component.component(VodButton)

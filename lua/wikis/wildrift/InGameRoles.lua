@@ -7,13 +7,14 @@
 
 ---@type table<string, RoleBaseData>
 local inGameRoles = {
-	['baron'] = {category = 'Baron Lane players', display = 'Baron'},
-	['support'] = {category = 'Support players', display = 'Support'},
-	['jungle'] = {category = 'Jungle players', display = 'Jungle'},
-	['mid'] = {category = 'Mid Lane players', display = 'Mid'},
-	['dragon'] = {category = 'Dragon Lane players', display = 'Dragon'},
+	['baron'] = {category = 'Baron Lane players', display = 'Baron', sortOrder = 1},
+	['jungle'] = {category = 'Jungle players', display = 'Jungle', sortOrder = 2},
+	['mid'] = {category = 'Mid Lane players', display = 'Mid', sortOrder = 3},
+	['dragon'] = {category = 'Dragon Lane players', display = 'Dragon', sortOrder = 4},
+	['support'] = {category = 'Support players', display = 'Support', sortOrder = 5},
 }
 
+inGameRoles['top'] = inGameRoles.baron
 inGameRoles['jgl'] = inGameRoles.jungle
 inGameRoles['solomiddle'] = inGameRoles.mid
 inGameRoles['carry'] = inGameRoles.dragon

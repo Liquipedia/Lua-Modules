@@ -44,7 +44,7 @@ function CopyPaste._generateID()
 		return string.char(60 + num)
 	end
 
-	local id = table.concat(Array.map(Array.range(1, 10), function()
+	local id = table.concat(Array.mapRange(1, 10, function()
 		return charFromNumber(math.random(62))
 	end))
 
@@ -190,7 +190,7 @@ function CopyPaste.matchlist(frame, args)
 	local namedMatchParams = Logic.readBool(Logic.nilOr(args.namedMatchParams, true))
 	local headersUpTop = Logic.readBool(args.headersUpTop)
 
-	local matchesCopyPaste = Array.map(Array.range(1, matches), function(matchIndex)
+	local matchesCopyPaste = Array.mapRange(1, matches, function(matchIndex)
 		if customHeader and headersUpTop then
 			display = display .. '\n|M' .. matchIndex .. 'header='
 		end

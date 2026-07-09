@@ -16,11 +16,9 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
 local Widgets = Lua.import('Module:Widget/All')
+local WidgetTable = Lua.import('Module:Widget/Table2/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
-local TableCell = Widgets.TableCell
-local TableRow = Widgets.TableRow
-local WidgetTable = Widgets.TableOld
 
 ---@class ApexMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
@@ -29,7 +27,7 @@ local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomMap.run(frame)
 	local map = CustomMap(frame)
 
@@ -44,69 +42,61 @@ function CustomMap:getGameModes(args)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
 			Cell{name = 'Game Mode(s)', children = {args.gamemode}},
-			Cell{name = 'Played in ALGS', children = {self.caller:_createSpan(args)}}
+			Cell{name = 'Played in ALGS', children = {self.caller:_playedInAlgsDisplay(args)}}
 		)
 
 		if String.isEmpty(args.ring) then return widgets end
 
-		local rows = {self.caller:_createRingTableHeader()}
-		Array.forEach(self.caller:getAllArgsForBase(args, 'ring'), function(ringData)
-			table.insert(rows, self.caller:_createRingTableRow(ringData))
-		end)
-
-		local ringTable = WidgetTable{
-			classes = {'fo-nttax-infobox' ,'wiki-bordercolor-light'}, --row alternating bg
-			css = {
-				['text-align'] = 'center',
-				display = 'inline-grid !important',
-				['padding-top'] = '0px',
-				['padding-bottom'] = '0px',
-				['border-top-style'] = 'none',
-			},
-			children = rows,
-		}
-
 		Array.appendWith(widgets,
 			Title{children = 'Ring Information'},
-			ringTable
+			WidgetTable.Table{
+				children = {
+					WidgetTable.TableHeader{children = self.caller:_createRingTableHeader()},
+					WidgetTable.TableBody{
+						children = Array.map(self.caller:getAllArgsForBase(args, 'ring'), function(ringData)
+							return self.caller:_createRingTableRow(ringData)
+						end)
+					}
+				},
+			}
 		)
 	end
 
 	return widgets
 end
 
----@return WidgetTableRow
+---@return Renderable
 function CustomMap:_createRingTableHeader()
-	return TableRow{css = {['font-weight'] = 'bold'}, children = {
-		TableCell{children = {'Ring'}},
-		TableCell{children = {'Wait (s)'}},
-		TableCell{children = {'Close Time (s)'}},
-		TableCell{children = {'Damage per tick'}},
-		TableCell{children = {'End Diameter (m)'}},
-	}} -- bg needed
+	return WidgetTable.Row{children = {
+		WidgetTable.CellHeader{children = {'Ring'}},
+		WidgetTable.CellHeader{children = {'Wait (s)'}},
+		WidgetTable.CellHeader{children = {'Close Time (s)'}},
+		WidgetTable.CellHeader{children = {'Damage per tick'}},
+		WidgetTable.CellHeader{children = {'End Diameter (m)'}},
+	}}
 end
 
 ---@param ringData string
----@return WidgetTableRow
+---@return Renderable
 function CustomMap:_createRingTableRow(ringData)
-	local cells = {}
-	for _, item in ipairs(mw.text.split(ringData, ',')) do
-		table.insert(cells, TableCell{children = {item}})
-	end
-	return TableRow{children = cells}
+	return WidgetTable.Row{
+		children = Array.map(Array.parseCommaSeparatedString(ringData), function(item)
+			return WidgetTable.Cell{children = {item}}
+		end)
+	}
 end
 
 ---@param args table
 ---@return string
-function CustomMap:_createSpan(args)
+function CustomMap:_playedInAlgsDisplay(args)
 	local sep = ' - '
 	local spanEnd = args.spanend
 	if String.isEmpty(args.spanstart) then

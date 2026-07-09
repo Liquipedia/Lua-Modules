@@ -14,7 +14,7 @@ local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
 local Box = Lua.import('Module:Widget/Basic/Box')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local ListWidgets = Lua.import('Module:Widget/List')
 local Widget = Lua.import('Module:Widget')
 
 local COLUMN_BREAK = 6
@@ -33,7 +33,7 @@ function TranslationList:render()
 
 	---@type Widget[]
 	local parts = Array.map(self:_parse(), function(group)
-		return UnorderedList{children = Array.map(group, displayItem)}
+		return ListWidgets.Unordered{children = Array.map(group, displayItem)}
 	end)
 
 	return Box{children = parts}

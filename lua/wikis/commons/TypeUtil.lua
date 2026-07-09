@@ -136,8 +136,7 @@ function TypeUtil.table (keyType, valueType)
 end
 
 --[[
-Type for tables that are arrays. Not strict - arrays may have additional fields
-besides numeric indexes, and may have gaps in indexes.
+Type for tables that are arrays.
 ]]
 ---@param elemType TypeUtilType
 ---@return TypeUtilArrayType
@@ -172,6 +171,8 @@ function TypeUtil.valueIsTypeNoTable (value, typeSpec)
 		elseif typeSpec == 'pagename' then
 			-- A pagename is a string, with first letter capitalized and may not contains spaces
 			return type(value) == 'string' and value:find('^%u') and not value:find(' ')
+		elseif typeSpec == 'array' then
+			return Array.isArray(value)
 		elseif String.endsWith(typeSpec, '?') then
 			return value == nil or TypeUtil.valueIsTypeNoTable(value, typeSpec:sub(1, -2))
 		elseif typeSpec == 'any' then
@@ -192,8 +193,10 @@ function TypeUtil.valueIsTypeNoTable (value, typeSpec)
 				typeSpec.types,
 				function(t) return TypeUtil.valueIsTypeNoTable(value, t) end
 			)
-		elseif typeSpec.op == 'table' or typeSpec.op == 'struct' or typeSpec.op == 'array' then
+		elseif typeSpec.op == 'table' or typeSpec.op == 'struct' then
 			return type(value) == 'table'
+		elseif typeSpec.op == 'array' then
+			return Array.isArray(value)
 		end
 	end
 	return true

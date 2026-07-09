@@ -16,7 +16,7 @@ local Variables = Lua.import('Module:Variables')
 local CharacterStandardizationData = Lua.import('module:CharacterStandardization', {loadData = true})
 local Opponent = Lua.import('Module:Opponent')
 
----@class SmashCustomOpponent
+---@class SmashCustomOpponent: Opponent
 local CustomOpponent = Table.deepCopy(Opponent)
 
 ---@class SmashStandardPlayer:standardPlayer

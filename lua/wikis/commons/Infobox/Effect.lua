@@ -22,7 +22,7 @@ local Customizable = Widgets.Customizable
 ---@operator call(Frame): EffectInfobox
 local Effect = Class.new(BasicInfobox)
 
----@return Widget
+---@return VNode
 function Effect:createInfobox()
 	local args = self.args
 

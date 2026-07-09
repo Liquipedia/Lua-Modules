@@ -11,9 +11,9 @@ local FnUtil = Lua.import('Module:FnUtil')
 local IconData = Lua.import('Module:Icon/Data', {loadData = true})
 local Table = Lua.import('Module:Table')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local ListWidgets = Lua.import('Module:Widget/List')
 
 local IconDataDoc = {}
 
@@ -29,12 +29,12 @@ function IconDataDoc.generate()
 		Array.sortInPlaceBy(group, FnUtil.identity)
 
 		Array.appendWith(children,
-			HtmlWidgets.H3{children = letter},
-			UnorderedList{children = Array.map(group, IconDataDoc._displayIcon)}
+			Html.H3{children = letter},
+			ListWidgets.Unordered{children = Array.map(group, IconDataDoc._displayIcon)}
 		)
 	end
 
-	return HtmlWidgets.Fragment{children = children}
+	return Html.Fragment{children = children}
 end
 
 ---@param iconName string
