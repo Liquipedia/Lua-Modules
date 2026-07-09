@@ -23,7 +23,7 @@ local Span = Html.Span
 ---@field flipped boolean?
 
 ---@param props InlineIconAndTextWidgetParameters
----@return Widget
+---@return VNode
 local function InlineIconAndText(props)
 	local children = {
 		props.icon,

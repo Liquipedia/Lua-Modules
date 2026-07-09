@@ -12,10 +12,10 @@ local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
 local Table = Lua.import('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = Lua.import('Module:Infobox/Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class CallofdutyMapInfobox: MapInfobox

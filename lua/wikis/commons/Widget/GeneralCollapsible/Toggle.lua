@@ -21,7 +21,7 @@ local Span = Html.Span
 ---@field hideButtonChildren? Renderable|Renderable[]
 
 ---@param props CollapsibleToggleProps
----@return HtmlNode
+---@return VNode
 local function CollapsibleToggle(props)
 	local showButton = Button{
 		classes = {'general-collapsible-expand-button'},

@@ -8,11 +8,9 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MAX_NUM_BANS = 7
 local NUM_HEROES_PICK = 5
@@ -21,24 +19,26 @@ local STATUS_NOT_PLAYED = 'notplayed'
 ---@class Dota2CustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class Dota2MatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): Dota2MatchSummaryGameRow
-local Dota2MatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+---@class Dota2MatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
+	createGameOverview = MatchSummaryWidgets.GameRow.lengthDisplay,
+}
+
+local Dota2MatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', teamStyle = 'bracket'})
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return VNode[]
 function CustomMatchSummary.createBody(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
-	return WidgetUtil.collect(
+	return {
 		MatchSummaryWidgets.GamesContainer{
-			gridLayout = 'standard',
 			children = Array.map(match.games, function (game, gameIndex)
 				if game.status == STATUS_NOT_PLAYED then
 					return
@@ -48,13 +48,13 @@ function CustomMatchSummary.createBody(match)
 		},
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	)
+	}
 end
 
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Widget
-function Dota2MatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	local props = self.props
+---@return VNode
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local extradata = game.extradata or {}
 
@@ -66,11 +66,6 @@ function Dota2MatchSummaryGameRow:createGameOpponentView(opponentIndex)
 		bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata['team' .. opponentIndex .. 'side'] or ''),
 		date = game.date,
 	}
-end
-
----@return Renderable?
-function Dota2MatchSummaryGameRow:createGameOverview()
-	return self:lengthDisplay()
 end
 
 return CustomMatchSummary

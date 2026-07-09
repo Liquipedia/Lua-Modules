@@ -11,7 +11,7 @@ local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local RatingsList = Lua.import('Module:Widget/Ratings/List')
 
 ---@class Ratings: Widget
@@ -26,7 +26,7 @@ Ratings.defaultProps = {
 
 ---@return Widget
 function Ratings:render()
-	return HtmlWidgets.Div {
+	return Html.Div {
 		attributes = {
 			class = 'ranking-table__wrapper',
 		},

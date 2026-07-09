@@ -21,7 +21,7 @@ local Tournament = Lua.import('Module:Tournament')
 
 local TeamParticipantsController = Lua.import('Module:TeamParticipants/Controller')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
@@ -105,21 +105,24 @@ function LegacyTeamCard.run(dependency)
 		return card
 	end)
 
-	local defaultRows, extraRows = 0, 0
-	Array.forEach(processedCards, function(card)
-		defaultRows = tonumber(card.defaultRowNumber) or defaultRows
-		extraRows = tonumber(card.extraRows) or extraRows
-	end)
-
 	local tpArgs = {
-		minimumplayers = defaultRows + extraRows + toggleFolded.extraPlayers,
+		minimumplayers = 0,
 		showplayerinfo = toggleFolded.showPlayerInfo and 'true' or nil,
 	}
 	Array.forEach(processedCards, function(card)
 		table.insert(tpArgs, LegacyTeamCard.mapCard(card))
 	end)
 
-	if not Namespace.isMain() then
+	local numStorageDisabled = #Array.filter(processedCards, function(args)
+		return Logic.readBool(args.disable_storage or args.nostorage)
+	end)
+
+	if numStorageDisabled > 0 and numStorageDisabled ~= #processedCards then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with bad TeamCard Legacy storage')
+		error("Only some cards have storage disabled. Failed to wrap using a single wrapper")
+	end
+
+	if not Namespace.isMain() or numStorageDisabled > 0 then
 		tpArgs.store = 'false'
 	end
 
@@ -129,14 +132,14 @@ function LegacyTeamCard.run(dependency)
 	local notesWidget
 	if #toggleFolded.notes > 0 then
 		mw.ext.TeamLiquidIntegration.add_category('Pages with Legacy TeamCard toggle note')
-		notesWidget = HtmlWidgets.Div{
+		notesWidget = Html.Div{
 			classes = {'team-participant__notes'},
-			children = Array.interleave(toggleFolded.notes, HtmlWidgets.Br{}),
+			children = Array.interleave(toggleFolded.notes, Html.Br{}),
 		}
 	end
 
 	legacyVars:delete('wrapperOpen')
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(notesWidget, display)}
+	return Html.Fragment{children = WidgetUtil.collect(notesWidget, display)}
 end
 
 ---@param rawQualifier string|table|nil
@@ -179,6 +182,10 @@ end
 ---@param rawQualifier string
 ---@return string?, string?, string? # (linkText, internalLink, externalLink)
 function LegacyTeamCard._parseQualifierLink(rawQualifier)
+	-- Some qualifier templates (e.g. {{VRS}}) categorise the page as a side effect, emitting a
+	-- [[Category:...]] link into the value. Strip it so it is not mistaken for the qualifier link.
+	rawQualifier = mw.text.trim((rawQualifier:gsub('%[%[:?[Cc]ategory:.-%]%]', '')))
+
 	-- A qualifier may be prefixed with an icon (e.g. {{LeagueIconSmall}}, which expands to
 	-- a File link / span before reaching here). Take the first internal wikilink that is not
 	-- such an embed; the new QualifierInfo widget renders its own tournament icon.
@@ -204,6 +211,13 @@ function LegacyTeamCard._parseQualifierLink(rawQualifier)
 	end
 
 	return rawQualifier, nil, nil
+end
+
+---@private
+---@param key string
+---@return boolean
+function LegacyTeamCard._isSubPrefix(key)
+	return key:gsub('^t%d', ''):match('^s%d+') ~= nil
 end
 
 ---@param tcArgs table
@@ -236,11 +250,26 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
 		status = 'former'
 	end
 
-	-- Default-DNP rules (only when no explicit played/result and no explicit dnp).
-	if explicitPlayResult == nil and not Logic.readBool(tcArgs[prefix .. 'dnp']) then
-		if sourceGroup == 's' and (Logic.readBool(tcArgs.subdnpdefault) or Logic.readBool(tcArgs.noVarDefault)) then
-			played = false
-		end
+	-- subdnpdefault: subs entered via the s* group with no explicit played/result are shown as DNP
+	-- (visible label + excluded from results). Restricted to real s* input (not tXpY tabs).
+	if (
+		explicitPlayResult == nil and
+		not Logic.readBool(tcArgs[prefix .. 'dnp']) and
+		sourceGroup == 's' and
+		Logic.readBool(tcArgs.subdnpdefault) and
+		LegacyTeamCard._isSubPrefix(prefix)
+	) then
+		played = false
+	end
+
+	-- noVarDefault: players entered via a sub/former source (s*/f* groups, or t2/t3 sub/former
+	-- tabs) without an explicit played/result are not counted for results, but keep their normal
+	-- display (no DNP label). An explicit played/result=true overrides.
+	local results
+	if (sourceGroup == 's' or sourceGroup == 'f')
+		and Logic.readBool(tcArgs.noVarDefault)
+		and explicitPlayResult ~= true then
+		results = false
 	end
 
 	return {
@@ -256,6 +285,7 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
 		joindate = tcArgs[prefix .. 'joindate'],
 		leavedate = tcArgs[prefix .. 'leavedate'],
 		played = played,
+		results = results,
 		status = status,
 	}
 end
@@ -285,6 +315,19 @@ function LegacyTeamCard.mapCoach(tcArgs, prefix, sourceGroup)
 		status = 'former'
 	end
 
+	-- noVarDefault: sub/former coaches without an explicit played/result are not counted for
+	-- results (an explicit played/result=true, e.g. fcresult=true, overrides). Coaches are
+	-- never shown as DNP, so only results (not played) is affected.
+	local explicitPlayResult = Logic.readBoolOrNil(tcArgs[prefix .. 'played'] or tcArgs[prefix .. 'result'])
+	local results
+	if Logic.readBool(tcArgs[prefix .. 'dnp']) then
+		results = false
+	elseif (sourceGroup == 'sc' or sourceGroup == 'fc')
+		and Logic.readBool(tcArgs.noVarDefault)
+		and explicitPlayResult ~= true then
+		results = false
+	end
+
 	return {
 		[1] = tcArgs[prefix],
 		link = tcArgs[prefix .. 'link'],
@@ -293,6 +336,7 @@ function LegacyTeamCard.mapCoach(tcArgs, prefix, sourceGroup)
 		role = role,
 		type = 'staff',
 		trophies = trophies,
+		results = results,
 		status = status,
 	}
 end
@@ -432,9 +476,16 @@ function LegacyTeamCard.mapCoaches(tcArgs)
 	Array.forEach(indicesPresent(tcArgs, 'c', MAX_COACH_INDEX), function(i)
 		table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'c' .. i, nil))
 	end)
+	-- Bare `sc`/`fc` is the first sub/former coach in legacy syntax (numbered slots start at 2).
+	if Logic.isNotEmpty(tcArgs.sc) then
+		table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'sc', 'sc'))
+	end
 	Array.forEach(indicesPresent(tcArgs, 'sc', MAX_COACH_INDEX), function(i)
 		table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'sc' .. i, 'sc'))
 	end)
+	if Logic.isNotEmpty(tcArgs.fc) then
+		table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'fc', 'fc'))
+	end
 	Array.forEach(indicesPresent(tcArgs, 'fc', MAX_COACH_INDEX), function(i)
 		table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, 'fc' .. i, 'fc'))
 	end)
@@ -445,6 +496,11 @@ function LegacyTeamCard.mapCoaches(tcArgs)
 		if tabType == 'sub' then sourceGroup = 'sc'
 		elseif tabType == 'former' then sourceGroup = 'fc'
 		else sourceGroup = nil end
+
+		if tcArgs[tab .. 'c'] then
+			mw.ext.TeamLiquidIntegration.add_category('Pages with malformed Legacy TeamCard coach input')
+			tcArgs[tab .. 'c1'] = tcArgs[tab .. 'c']
+		end
 
 		Array.forEach(indicesPresent(tcArgs, tab .. 'c', MAX_COACH_INDEX), function(i)
 			table.insert(coaches, LegacyTeamCard.mapCoach(tcArgs, tab .. 'c' .. i, sourceGroup))
