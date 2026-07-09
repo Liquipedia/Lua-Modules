@@ -31,7 +31,7 @@ local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local PortalTeams = {}
 
 ---@param frame Frame
----@return Widget
+---@return Renderable
 function PortalTeams.active(frame)
 	local teams = PortalTeams._fetch(frame, 'active')
 	Array.sortInPlaceBy(teams, Operator.property('name'))
@@ -40,7 +40,7 @@ function PortalTeams.active(frame)
 end
 
 ---@param team team
----@return Widget?
+---@return Renderable?
 function PortalTeams._displayActiveTeam(team)
 	local pageName = team.pagename
 
@@ -66,7 +66,7 @@ function PortalTeams._displayActiveTeam(team)
 	Array.sortInPlaceBy(players, Operator.property('id'))
 
 	---@param player squadplayer
-	---@return Widget
+	---@return Renderable
 	local makeRow = function(player)
 		return TableWidgets.Row{
 			children = {
@@ -118,12 +118,12 @@ function PortalTeams._displayActiveTeam(team)
 end
 
 ---@param frame Frame
----@return Widget
+---@return Renderable
 function PortalTeams.disbanded(frame)
 	local queriedTeams = PortalTeams._fetch(frame, 'disbanded')
 
 	---@param teams team[]
-	---@return Widget
+	---@return Renderable
 	local makeColumn = function(teams)
 		return UnorderedList{
 			children = Array.map(teams, function(team)
