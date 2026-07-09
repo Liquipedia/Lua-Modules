@@ -36,6 +36,7 @@ h1#firstHeading,
 #mw-subcategories h2,
 .mw-category-group h3 {
 	font-weight: 500;
+	display: inline;
 
 	.theme--light & {
 		color: var( --clr-wiki-theme-20 );
@@ -106,4 +107,26 @@ h1#firstHeading,
 
 .mw-heading.mw-heading3 h3 .mw-editsection {
 	padding-top: 0.8125rem;
+}
+
+.mw-heading {
+	.mw-editsection {
+		font-size: small;
+		font-weight: normal;
+		margin-left: 1em;
+		margin-right: 0;
+		-webkit-margin-start: 1em;
+		-webkit-margin-end: 0;
+		margin-inline: 1em 0;
+		vertical-align: baseline;
+		line-height: 0;
+		unicode-bidi: isolate;
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		user-select: none;
+
+		.mw-editsection-bracket {
+			color: #555555;
+		}
+	}
 }
