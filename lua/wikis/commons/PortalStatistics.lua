@@ -1445,7 +1445,7 @@ end
 
 ---@param input string|table|nil
 ---@param default table?
----@return table
+---@return table|string[]
 function StatisticsPortal._isTableOrSplitOrDefault(input, default)
 	if type(input) == 'table' then
 		return input
