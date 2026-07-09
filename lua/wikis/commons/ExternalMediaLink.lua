@@ -25,7 +25,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local ExternalMediaLinkDisplay = Lua.import('Module:Widget/ExternalMedia/Link')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -42,7 +42,7 @@ local DEFAULT_LANGUAGE = 'en'
 ---Main function for External Media Links.
 ---Calls storage and display (if not disabled).
 ---@param args table
----@return Widget?
+---@return Renderable?
 function ExternalMediaLink.run(args)
 	ExternalMediaLink._fallBackArgs(args)
 	local parsedData = ExternalMediaLink._readArgs(args)
@@ -146,13 +146,13 @@ end
 ---Builds the display for an External Media Link
 ---@param data table
 ---@param note string?
----@return Widget
+---@return VNode
 function ExternalMediaLink._display(data, note)
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+	return Html.Fragment{children = WidgetUtil.collect(
 		ExternalMediaLinkDisplay{data = data},
 		Logic.isNotEmpty(note) and {
 			'&nbsp;',
-			HtmlWidgets.Span{
+			Html.Span{
 				css = {['font-style'] = 'italic'},
 				children = {'(', note, ')'},
 			}
@@ -162,7 +162,7 @@ end
 
 ---Wrapper function for External Media Link display in the Data namespace
 ---@param args table
----@return Widget
+---@return VNode
 function ExternalMediaLink.wrapper(args)
 	local parsedArgs = {
 		date = DateExt.toYmdInUtc(args.date),
@@ -203,9 +203,9 @@ function ExternalMediaLink.wrapper(args)
 		end
 	end
 
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+	return Html.Fragment{children = WidgetUtil.collect(
 		Link{link = 'Special:FormEdit/ExternalMediaLinks', children = 'Go back to the form'},
-		HtmlWidgets.Br{},
+		Html.Br{},
 		ExternalMediaLink.run(parsedArgs),
 		ExternalMediaLink._wrapperDisplay(parsedArgs)
 	)}
@@ -213,11 +213,11 @@ end
 
 ---@private
 ---@param parsedArgs table
----@return Widget
+---@return VNode
 function ExternalMediaLink._wrapperDisplay(parsedArgs)
 	---@param prefix string
 	---@param linkPrefix string?
-	---@return Widget[]
+	---@return Renderable[]
 	local makeLinkList = function(prefix, linkPrefix)
 		local list = Array.mapIndexes(function(index)
 			if Logic.isEmpty(parsedArgs[prefix .. index]) then
@@ -232,8 +232,8 @@ function ExternalMediaLink._wrapperDisplay(parsedArgs)
 	end
 
 	---@param desc string
-	---@param data Widget[]|Widget?
-	---@return Widget?
+	---@param data Renderable|Renderable[]?
+	---@return VNode?
 	local rowIfNotEmpty = function(desc, data)
 		if Logic.isEmpty(data) then
 			return

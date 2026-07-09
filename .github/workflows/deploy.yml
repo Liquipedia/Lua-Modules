@@ -26,8 +26,8 @@ jobs:
         uses: tj-actions/changed-files@v47
         with:
           files: |
-            stylesheets/**/*.scss
-            javascript/**/*.js
+            stylesheets/commons/**/*.scss
+            javascript/commons/**/*.js
 
       - name: Setup Python
         if: steps.res-changed-files.outputs.any_changed == 'true' || steps.lua-changed-files.outputs.any_changed == 'true'

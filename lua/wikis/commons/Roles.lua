@@ -11,13 +11,15 @@ local Table = Lua.import('Module:Table')
 
 local ContractRoles = Lua.import('Module:ContractRoles', {loadData = true})
 local StaffRoles = Lua.import('Module:StaffRoles', {loadData = true})
+local PlayerTeamRoles = Lua.import('Module:PlayerTeamRoles', {loadData = true})
 local InGameRoles = Lua.requireIfExists('Module:InGameRoles', {loadData = true})
 
 local Roles = {
 	ContractRoles = ContractRoles,
 	StaffRoles = StaffRoles,
 	InGameRoles = InGameRoles,
-	All = Table.merge(ContractRoles, StaffRoles, InGameRoles)
+	PlayerTeamRoles = PlayerTeamRoles,
+	All = Table.merge(ContractRoles, StaffRoles, InGameRoles, PlayerTeamRoles)
 }
 
 return Roles

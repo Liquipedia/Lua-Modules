@@ -19,7 +19,7 @@ local TypeUtil = Lua.import('Module:TypeUtil')
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local BlockTeam = Lua.import('Module:Widget/TeamDisplay/Block')
 local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
 
@@ -28,8 +28,8 @@ local zeroWidthSpace = '&#8203;'
 ---@class OpponentDisplay
 local OpponentDisplay = {propTypes = {}, types = {}}
 
-OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid', 'icon')
----@alias teamStyle 'standard'|'short'|'bracket'|'hybrid'|'icon'
+OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid', 'icon', 'dynamic')
+---@alias teamStyle 'standard'|'short'|'bracket'|'hybrid'|'icon'|'dynamic'
 
 ---Display component for an opponent entry appearing in a bracket match.
 ---@class BracketOpponentEntry
@@ -65,11 +65,11 @@ function OpponentDisplay.BracketOpponentEntry:createTeam(template, options)
 	options = options or {}
 	local forceShortName = options.forceShortName
 
-	local opponentNode = OpponentDisplay.BlockTeamContainer({
+	local opponentNode = OpponentDisplay.BlockTeamContainer{
 		showLink = false,
-		style = forceShortName and 'short' or 'hybrid',
+		style = forceShortName and 'short' or 'dynamic',
 		template = template,
-	})
+	}
 
 	self.content:node(opponentNode)
 end
@@ -147,11 +147,11 @@ function OpponentDisplay.InlineOpponent(props)
 		if props.showTbd == false and Opponent.isTbd(opponent) then
 			return mw.html.create()
 		end
-		opponentNode = OpponentDisplay.InlineTeamContainer({
+		opponentNode = OpponentDisplay.InlineTeamContainer{
 			flip = props.flip,
 			style = props.teamStyle,
 			template = opponent.template or 'tbd',
-		})
+		}
 	elseif opponent.type == Opponent.literal then
 		opponentNode = opponent.name or ''
 	elseif Opponent.typeIsParty(opponent.type) then
@@ -202,7 +202,7 @@ Displays an opponent as a block element. The width of the component is
 determined by its layout context, and not of the opponent.
 ]]
 ---@param props BlockOpponentProps
----@return Widget
+---@return Renderable
 function OpponentDisplay.BlockOpponent(props)
 	local opponent = props.opponent
 	opponent.extradata = opponent.extradata or {}
@@ -211,9 +211,9 @@ function OpponentDisplay.BlockOpponent(props)
 
 	if opponent.type == Opponent.team then
 		if props.showTbd == false and Opponent.isTbd(opponent) then
-			return HtmlWidgets.Fragment{}
+			return Html.Fragment{}
 		end
-		return OpponentDisplay.BlockTeamContainer({
+		return OpponentDisplay.BlockTeamContainer{
 			flip = props.flip,
 			overflow = props.overflow,
 			showLink = showLink,
@@ -221,14 +221,14 @@ function OpponentDisplay.BlockOpponent(props)
 			template = opponent.template or 'tbd',
 			additionalClasses = props.additionalClasses,
 			note = props.note,
-		})
+		}
 	elseif opponent.type == Opponent.literal then
-		return OpponentDisplay.BlockLiteral({
+		return OpponentDisplay.BlockLiteral{
 			flip = props.flip,
 			name = opponent.name or '',
 			overflow = props.overflow,
 			additionalClasses = props.additionalClasses
-		})
+		}
 	elseif Opponent.typeIsParty(opponent.type) then
 		return OpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
 	else
@@ -239,14 +239,14 @@ end
 ---@param props BlockOpponentProps
 ---@return Widget
 function OpponentDisplay.BlockPlayers(props)
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = Array.extend('block-players-wrapper', props.additionalClasses),
 		children = OpponentDisplay.getBlockPlayerNodes(props)
 	}
 end
 
 ---@param props BlockOpponentProps
----@return Html[]
+---@return VNode[]
 function OpponentDisplay.getBlockPlayerNodes(props)
 	local opponent = props.opponent
 
@@ -258,16 +258,17 @@ function OpponentDisplay.getBlockPlayerNodes(props)
 			player = player,
 			team = player.team,
 			note = playerIndex == 1 and note or nil,
-		})):addClass(props.playerClass)
+		}))
 	end)
 end
 
 ---Displays a team as an inline element. The team is specified by a template.
 ---@param props {flip: boolean?, template: string, date: number|string?, style: teamStyle?}
----@return Widget?
+---@return VNode
 function OpponentDisplay.InlineTeamContainer(props)
 	local style = props.style or 'standard'
 	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
+	assert(style ~= 'dynamic', 'style=dynamic is not supported inline')
 	assert(style ~= 'bracket' or not props.flip, 'Flipped style=bracket is not supported')
 	return TeamInline{name = props.template, date = props.date, flip = props.flip, displayType = style}
 end
@@ -278,7 +279,7 @@ its layout context, and not of the team name. The team is specified by template.
 ]]
 ---@param props {flip: boolean?, overflow: OverflowModes?, showLink: boolean?,
 ---style: teamStyle?, template: string, additionalClasses: string[]?, note: string|number?}
----@return Widget
+---@return VNode
 function OpponentDisplay.BlockTeamContainer(props)
 	local style = props.style or 'standard'
 	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
@@ -305,7 +306,7 @@ OpponentDisplay.propTypes.BlockLiteral = {
 function OpponentDisplay.BlockLiteral(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockLiteral)
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = Array.extend(
 			'brkts-opponent-block-literal',
 			props.flip and 'flipped' or nil,
@@ -330,9 +331,9 @@ function OpponentDisplay.BlockScore(props)
 
 	local scoreText = props.scoreText
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = props.additionalClasses,
-		children = props.isWinner and HtmlWidgets.B{children = scoreText} or scoreText
+		children = props.isWinner and Html.B{children = scoreText} or scoreText
 	}
 end
 
@@ -345,6 +346,8 @@ function OpponentDisplay.InlineScore(opponent)
 			return ''
 		elseif opponent.score == -1 then
 			return ''
+		elseif opponent.scoreDisplay ~= nil then
+			return tostring(Math.round(opponent.scoreDisplay, 2))
 		else
 			return tostring(Math.round(opponent.score, 2))
 		end

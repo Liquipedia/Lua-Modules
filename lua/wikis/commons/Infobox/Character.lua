@@ -26,13 +26,13 @@ local Customizable = Widgets.Customizable
 local Character = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Character.run(frame)
 	local character = Character(frame)
 	return character:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Character:createInfobox()
 	local args = self.args
 

@@ -18,7 +18,7 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
-local MatchTicker = Lua.import('Module:MatchTicker')
+local MatchTicker = Lua.import('Module:MatchTicker/Controller')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
@@ -57,13 +57,13 @@ local Status = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Team.run(frame)
 	local team = Team(frame)
 	return team:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Team:createInfobox()
 	local args = self.args
 
@@ -308,32 +308,21 @@ function Team:_createUpcomingMatches()
 		return nil
 	end
 
-	local result = Logic.tryCatch(
+	return Logic.tryCatch(
 		function()
-			local matchTicker = MatchTicker{
+			return MatchTicker.makeMatchTicker{
 				team = self.pagename,
 				limit = 5,
 				upcoming = true,
 				ongoing = true,
 				hideTournament = false,
+				entityStyle = true,
 			}
-			matchTicker:query()
-			return matchTicker
 		end,
 		function()
 			return nil
 		end
 	)
-
-	if not result or not result.matches or #result.matches == 0 then
-		return nil
-	end
-
-	local EntityDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
-	return EntityDisplay.Container{
-		config = result.config,
-		matches = result.matches,
-	}:create()
 end
 
 ---@param location string?

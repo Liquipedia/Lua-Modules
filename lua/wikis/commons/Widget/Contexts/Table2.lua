@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 local Context = Lua.import('Module:Widget/ComponentContext')
 
 return {
-	BodyStripe = Context.create('disabled'),
 	ColumnContext = Context.create({}),
 	HeaderRowKind = Context.create('title'),
 	Section = Context.create('head'),
