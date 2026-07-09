@@ -24,6 +24,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local DASH = '&#045;'
 
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
+local PRIZE_TYPE_PLAYER_SHARE = 'PLAYER_SHARE'
 local PRIZE_TYPE_POINTS = 'POINTS'
 local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 
@@ -232,6 +233,7 @@ function Placement:_getLpdbData(...)
 		end
 
 		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_BASE_CURRENCY .. 1)) or 0
+		local playerShare = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_PLAYER_SHARE .. 1))
 		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
 		local pointsReward2 = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
 		local isQualified = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_QUALIFIES .. '1')
@@ -262,6 +264,7 @@ function Placement:_getLpdbData(...)
 				participantteam = (opponentType == Opponent.solo and players.p1team)
 									and Opponent.toName{template = players.p1team, type = 'team', extradata = {}}
 									or nil,
+				playershare = playerShare,
 			},
 			qualified = isQualified and 1 or 0
 			-- TODO: We need to create additional LPDB Fields
