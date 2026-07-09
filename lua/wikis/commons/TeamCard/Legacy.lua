@@ -113,7 +113,16 @@ function LegacyTeamCard.run(dependency)
 		table.insert(tpArgs, LegacyTeamCard.mapCard(card))
 	end)
 
-	if not Namespace.isMain() then
+	local storageDisabled = Array.map(processedCards, function(card)
+		return Logic.readBool(args.disable_storage or args.nostorage)
+	end)
+	local numStorageDisabled = #Array.filter(storageDisabled, FnUtil.identity)
+
+	if numStorageDisabled ~= #cards then
+		error("Only some cards have storage disabled. Failed to wrap using a single wrapper")
+	end
+
+	if not Namespace.isMain() or numStorageDisabled > 0 then
 		tpArgs.store = 'false'
 	end
 
@@ -517,8 +526,6 @@ end
 ---@return table  -- TP opponent arg
 function LegacyTeamCard.mapCard(tcArgs)
 	local card = {}
-
-	card.store = not Logic.readBool(args.disable_storage or args.nostorage)
 
 	local hasContenders = Logic.isNotEmpty(tcArgs.team2) or Logic.isNotEmpty(tcArgs.team3)
 	if hasContenders then
