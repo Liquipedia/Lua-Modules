@@ -123,7 +123,7 @@ local function ParticipantsTeamRoster(props)
 	end
 
 	---@param player standardPlayer
-	---@return Widget
+	---@return Renderable
 	local makePlayerWidget = function(player)
 		local playerTeam = participant.opponent.template ~= player.team and player.team or nil
 		local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
