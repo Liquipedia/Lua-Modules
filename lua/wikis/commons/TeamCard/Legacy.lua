@@ -119,6 +119,7 @@ function LegacyTeamCard.run(dependency)
 
 	if numStorageDisabled > 0 and numStorageDisabled ~= #processedCards then
 		error("Only some cards have storage disabled. Failed to wrap using a single wrapper")
+		mw.ext.TeamLiquidIntegration.add_category('Pages with bad TeamCard Legacy storage')
 	end
 
 	if not Namespace.isMain() or numStorageDisabled > 0 then
