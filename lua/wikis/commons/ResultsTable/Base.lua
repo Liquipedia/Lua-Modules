@@ -534,55 +534,6 @@ function BaseResultsTable:opponentDisplay(data, options)
 		showLink = true,
 		style = 'short',
 	}
-
-	if self:shouldDisplayAdditionalText(rawTeamTemplate, not options.isLastVs) then
-		return BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, options.flip)
-	end
-
-	return teamDisplay
-end
-
----Checks if additional text should be displayed below the team icon
----@param rawTeamTemplate table
----@param isNotLastVs boolean?
----@return boolean?
-function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate, isNotLastVs)
-	local config = self.config
-
-	return rawTeamTemplate and (
-		Game.isDefaultTeamLogo{logo = rawTeamTemplate.image} or
-		(isNotLastVs and config.nonAliasTeamTemplates
-			and not Table.includes(config.nonAliasTeamTemplates, rawTeamTemplate.templatename))
-	)
-end
-
----Builds team icon display with text below it
----@param teamDisplay Renderable
----@param rawTeamTemplate teamTemplateData
----@param flip boolean?
----@return Renderable
-function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, flip)
-	return HtmlWidgets.Fragment{children = {
-		teamDisplay,
-		HtmlWidgets.Div{
-			css = {
-				width = '60px',
-				float = flip and 'right' or 'left',
-			},
-			children = HtmlWidgets.Div{
-				css = {
-					['line-height'] = 1,
-					['font-size'] = '80%',
-					['text-align'] = 'center',
-				},
-				children = {
-					'(',
-					LinkWidget{link = rawTeamTemplate.page, children = rawTeamTemplate.shortname},
-					')'
-				}
-			}
-		}
-	}}
 end
 
 ---Builds the tournament display name
