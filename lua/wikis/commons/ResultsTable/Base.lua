@@ -379,7 +379,6 @@ function BaseResultsTable:_isDataEmpty()
 end
 
 ---Builds the results/achievements/awards table
-
 ---@return VNode
 function BaseResultsTable:build()
 	return TableWidgets.Table{
