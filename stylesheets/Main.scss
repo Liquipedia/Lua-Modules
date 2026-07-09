@@ -91,6 +91,32 @@ body {
 }
 
 /* Styles that are not yet part of this repository, but used in snapshot tests */
+:root {
+	--clr-moon-40: #666666;
+
+	--clr-primary-44: #1f73c1;
+	--clr-primary-100: #ffffff;
+
+	--clr-secondary-25: #404040;
+	--clr-secondary-80: #b3b3b3;
+	--clr-secondary-100: #ffffff;
+
+	--clr-semantic-gold-20: #665400;
+	--clr-semantic-gold-40: #ccab00;
+	--clr-semantic-gold-90: #fff5cc;
+
+	--clr-semantic-silver-40: #557177;
+
+	--clr-semantic-positive-30: #1d7c1d;
+	--clr-semantic-negative-40: #b81414;
+
+	--clr-on-surface-light-primary-4: rgba( 0, 0, 0, 0.04 );
+	--clr-on-surface-light-primary-8: rgba( 0, 0, 0, 0.08 );
+	--clr-on-surface-light-primary-12: rgba( 0, 0, 0, 0.12 );
+
+	--clr-wiki-primary-container: #e2e2e6;
+	--clr-wiki-theme-primary: var( --clr-moon-40 );
+}
 
 .wiki-backgroundcolor-light {
 	background-color: var( --clr-wiki-primary-container );
