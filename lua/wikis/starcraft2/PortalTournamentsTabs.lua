@@ -20,7 +20,7 @@ local PAST = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() - DateExt.daysToSe
 
 local PortalTournamentsTabs = {}
 
----@return Widget?
+---@return Renderable?
 function PortalTournamentsTabs.run()
 	---@type table<string, Renderable>
 	local tabArgs = {
