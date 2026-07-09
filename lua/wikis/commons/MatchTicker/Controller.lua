@@ -497,19 +497,19 @@ end
 
 --- Will only switch if enteredOpponentOnLeft is enabled AND there are exactly 2 opponents
 ---@private
----@param match MatchGroupUtilMatch
+---@param match {match: MatchGroupUtilMatch, gameData: MatchTickerGameData?}
 ---@param config MatchTickerConfig
 function MatchTickerController.adjustMatch(match, config)
-	if not config.enteredOpponentOnLeft or #match.opponents ~= 2 then
+	if not config.enteredOpponentOnLeft or #match.match.opponents ~= 2 then
 		return
 	end
 
 	local opponentNames = Array.extend({config.player}, config.teamPages)
 	if
 		--check for the name value
-		Table.includes(opponentNames, ((match.opponents[2].name or ''):gsub(' ', '_')))
+		Table.includes(opponentNames, ((match.match.opponents[2].name or ''):gsub(' ', '_')))
 		--check inside match2players too for the player value
-		or config.player and Table.any(match.opponents[2].players, function(_, playerData)
+		or config.player and Table.any(match.match.opponents[2].players, function(_, playerData)
 			return (playerData.pageName or ''):gsub(' ', '_') == config.player end)
 	then
 		MatchTickerController.switchOpponents(match)
@@ -518,17 +518,17 @@ end
 
 --- Will only switch if there are exactly 2 opponents
 ---@private
----@param match MatchGroupUtilMatch
+---@param match {match: MatchGroupUtilMatch, gameData: MatchTickerGameData?}
 function MatchTickerController.switchOpponents(match)
-	if #match.opponents ~= 2 then
+	if #match.match.opponents ~= 2 then
 		return
 	end
-	local winner = tonumber(match.winner) or 0
-	match.winner = winner == 1 and 2
+	local winner = tonumber(match.match.winner) or 0
+	match.match.winner = winner == 1 and 2
 		or winner == 2 and 1
-		or match.winner
+		or match.match.winner
 
-	match.opponents[1], match.opponents[2] = match.opponents[2], match.opponents[1]
+	match.match.opponents[1], match.match.opponents[2] = match.match.opponents[2], match.match.opponents[1]
 end
 
 --- Fetches region of a tournament
