@@ -71,6 +71,7 @@ local PLAYER_INPUT_ICON_DATA = {
 	},
 }
 
+---@type table<string, string>
 local INPUT_SUMMARY_BADGE_CLASSES = {
 	[PLAYER_INPUT.CONTROLLER] = 'forest-green-bg',
 	[PLAYER_INPUT.MOUSE_KEYBOARD] = 'sapphire-bg',
@@ -80,6 +81,13 @@ local INPUT_SUMMARY_BADGE_CLASSES = {
 }
 
 ---@class TournamentInputStats: BaseClass
+---@field args table<string, any>
+---@field tournamentPageNames string[]
+---@field teamRows table[]
+---@field totalPlayerCount integer
+---@field lpdbInputsByPage table<string, string>
+---@field manualFallbackInputsByPage table<string, string>
+---@field playerCounts table<string, integer>
 ---@operator call(table<string, any>): TournamentInputStats
 local TournamentInputStats = Class.new(function(self, args)
 	self.args = args
@@ -112,14 +120,20 @@ end
 ---@return string[]
 function TournamentInputStats:_readTournamentPageNames(args)
 	local spec = TournamentStructure.readMatchGroupsSpec(args) or TournamentStructure.currentPageSpec()
+	local pageNames = spec and spec.pageNames or {}
 
 	local tournamentPageNames = Array.unique(Array.filter(
-		Array.map(Array.flatten(spec.pageNames), Page.pageifyLink),
+		Array.map(Array.flatten(pageNames), Page.pageifyLink),
 		String.isNotEmpty
-	))
+	)) --[[@as string[] ]]
 
 	if Logic.isEmpty(tournamentPageNames) then
-		return {Page.pageifyLink(mw.title.getCurrentTitle().prefixedText)}
+		local currentPage = Page.pageifyLink(mw.title.getCurrentTitle().prefixedText)
+		if currentPage then
+			return {currentPage}
+		else
+			return {}
+		end
 	end
 
 	return tournamentPageNames
@@ -155,11 +169,12 @@ end
 ---@param input string?
 ---@return string
 function TournamentInputStats:_toPlayerInput(input)
-	if input == PLAYER_INPUT.MOUSE_KEYBOARD
-		or input == PLAYER_INPUT.CONTROLLER
-		or input == PLAYER_INPUT.HYBRID
-	then
-		return input
+	if input == PLAYER_INPUT.MOUSE_KEYBOARD then
+		return PLAYER_INPUT.MOUSE_KEYBOARD
+	elseif input == PLAYER_INPUT.CONTROLLER then
+		return PLAYER_INPUT.CONTROLLER
+	elseif input == PLAYER_INPUT.HYBRID then
+		return PLAYER_INPUT.HYBRID
 	end
 
 	return PLAYER_INPUT.UNKNOWN
@@ -198,10 +213,12 @@ function TournamentInputStats:_fetchLpdbInputs(players)
 		query = 'pagename, extradata',
 		limit = 5000,
 	}, function(playerRecord)
-		self:_storeLpdbInput(
-			playerRecord.pagename,
-			Table.getByPathOrNil(playerRecord, {'extradata', 'input'})
-		)
+		if playerRecord then
+			self:_storeLpdbInput(
+				playerRecord.pagename,
+				Table.getByPathOrNil(playerRecord, {'extradata', 'input'})
+			)
+		end
 	end)
 end
 
@@ -216,7 +233,7 @@ function TournamentInputStats:_getPlayerInput(player)
 
 	local lpdbInput = Logic.nilIfEmpty(self.lpdbInputsByPage[pageName])
 	if lpdbInput then
-		return lpdbInput
+		return lpdbInput --[[@as string]]
 	end
 
 	-- Manual fallback inputs are intentionally only used for redlinks.
@@ -229,7 +246,9 @@ end
 
 ---@return self
 function TournamentInputStats:fetch()
+	---@type table[]
 	local opponents = {}
+	---@type standardPlayer[]
 	local allPlayers = {}
 
 	Lpdb.executeMassQuery('placement', {
@@ -238,10 +257,11 @@ function TournamentInputStats:fetch()
 		query = 'opponentname, opponenttemplate, opponenttype, opponentplayers',
 	}, function(placement)
 		local opponent = Opponent.fromLpdbStruct(placement)
-		if Logic.isNotEmpty(opponent.players) then
+		local players = opponent and opponent.players
+		if players and Logic.isNotEmpty(players) then
 			table.insert(opponents, opponent)
-			Array.forEach(opponent.players, function(player)
-				if Logic.isNotEmpty(player.displayName) then
+			Array.forEach(players, function(player)
+				if player and Logic.isNotEmpty(player.displayName) then
 					table.insert(allPlayers, player)
 				end
 			end)
@@ -252,11 +272,11 @@ function TournamentInputStats:fetch()
 
 	Array.forEach(opponents, function(opponent)
 		local playerEntries = {}
-		local players = opponent.players or {}
+		local players = opponent and opponent.players or {}
 
 		for index = 1, math.min(#players, DEFAULT_PLAYER_COUNT) do
 			local player = players[index]
-			if Logic.isNotEmpty(player.displayName) then
+			if player and Logic.isNotEmpty(player.displayName) then
 				local input = self:_toPlayerInput(self:_getPlayerInput(player))
 
 				self.playerCounts[input] = (self.playerCounts[input] or 0) + 1
@@ -340,7 +360,8 @@ end
 ---@param summaryValue string
 ---@return string
 function TournamentInputStats:_getSummaryBadgeClass(summaryValue)
-	return INPUT_SUMMARY_BADGE_CLASSES[summaryValue] or INPUT_SUMMARY_BADGE_CLASSES[PLAYER_INPUT.UNKNOWN]
+	local class = INPUT_SUMMARY_BADGE_CLASSES[summaryValue] or INPUT_SUMMARY_BADGE_CLASSES[PLAYER_INPUT.UNKNOWN]
+	return class or 'gray-bg'
 end
 
 ---@private
@@ -350,9 +371,9 @@ function TournamentInputStats:_buildInputIcon(input)
 	local data = PLAYER_INPUT_ICON_DATA[input] or PLAYER_INPUT_ICON_DATA[PLAYER_INPUT.UNKNOWN]
 
 	return Abbr{
-		attributes = {title = data.title},
+		attributes = {title = data and data.title or input},
 		children = I{
-			classes = data.iconClasses,
+			classes = data and data.iconClasses or {'fas', 'fa-question-circle'},
 			attributes = {['aria-hidden'] = 'true'},
 		}
 	}
@@ -363,7 +384,7 @@ end
 ---@return Renderable|string
 function TournamentInputStats:_buildTeamDisplay(row)
 	if String.isEmpty(row.opponentTemplate) then
-		return row.opponentName or '-'
+		return tostring(row.opponentName or '-')
 	end
 
 	return OpponentDisplay.InlineTeamContainer{
@@ -422,13 +443,13 @@ function TournamentInputStats:_buildSummaryBoxes()
 			['margin-bottom'] = '16px',
 		},
 		children = WidgetUtil.collect(
-			self:_buildSummaryBox('Mouse & Keyboard Players', self.playerCounts[PLAYER_INPUT.MOUSE_KEYBOARD]),
-			self:_buildSummaryBox('Controller Players', self.playerCounts[PLAYER_INPUT.CONTROLLER]),
-			self.playerCounts[PLAYER_INPUT.HYBRID] > 0
-				and self:_buildSummaryBox('Hybrid Players', self.playerCounts[PLAYER_INPUT.HYBRID])
+			self:_buildSummaryBox('Mouse & Keyboard Players', self.playerCounts[PLAYER_INPUT.MOUSE_KEYBOARD] or 0),
+			self:_buildSummaryBox('Controller Players', self.playerCounts[PLAYER_INPUT.CONTROLLER] or 0),
+			(self.playerCounts[PLAYER_INPUT.HYBRID] or 0) > 0
+				and self:_buildSummaryBox('Hybrid Players', self.playerCounts[PLAYER_INPUT.HYBRID] or 0)
 				or nil,
-			self.playerCounts[PLAYER_INPUT.UNKNOWN] > 0
-				and self:_buildSummaryBox('Unknown', self.playerCounts[PLAYER_INPUT.UNKNOWN])
+			(self.playerCounts[PLAYER_INPUT.UNKNOWN] or 0) > 0
+				and self:_buildSummaryBox('Unknown', self.playerCounts[PLAYER_INPUT.UNKNOWN] or 0)
 				or nil
 		)
 	}
