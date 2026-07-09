@@ -20,6 +20,7 @@ local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 local MostAllKills = {}
 
+---@return Renderable
 function MostAllKills.render()
 	return TableWidgets.Table{
 		sortable = false,
@@ -48,7 +49,7 @@ function MostAllKills.render()
 end
 
 ---@private
----@return Widget[]
+---@return Renderable[]
 function MostAllKills._rows()
 	local allKillList = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = tostring(ConditionNode(ColumnName('type'), Comparator.eq, 'allkills')),
