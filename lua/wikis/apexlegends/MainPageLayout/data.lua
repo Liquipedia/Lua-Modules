@@ -12,8 +12,8 @@ local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Headlines = Lua.import('Module:Widget/MainPage/Headlines')
 local LiquipediaApp = Lua.import('Module:Widget/MainPage/LiquipediaApp')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
@@ -75,9 +75,10 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays = 30,
+			upcomingDays = 60,
 			completedDays = 30,
 			tierColorScheme = 'top3',
+			variant = 'collapsible',
 		},
 		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,

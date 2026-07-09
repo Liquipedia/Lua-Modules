@@ -16,9 +16,9 @@ local Injector = Lua.import('Module:Widget/Injector')
 local FactionInfobox = Lua.import('Module:Infobox/Faction')
 
 local Widgets = Lua.import('Module:Widget/All')
-local WidgetsHtml = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
-local Fragment = WidgetsHtml.Fragment
+local Fragment = Html.Fragment
 local AgeIcon = Lua.import('Module:Widget/Infobox/AgeIcon')
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 
@@ -32,7 +32,7 @@ local CustomFactionInfobox = Class.new(FactionInfobox)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomFactionInfobox.run(frame)
 	local infobox = CustomFactionInfobox(frame)
 

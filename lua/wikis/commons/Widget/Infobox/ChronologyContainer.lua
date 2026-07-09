@@ -8,20 +8,15 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local ChronologyDisplay = Lua.import('Module:Widget/Infobox/Chronology')
 
----@class ChronologyWidget: Widget
----@operator call(table): ChronologyWidget
----@field props {title: string?, showTitle: boolean?, args: table?}
-local Chronology = Class.new(Widget)
-
+---@param props {title: string?, showTitle: boolean?, args: table?}
 ---@return Widget?
-function Chronology:render()
-	local args = self.props.args or {}
+local function Chronology(props)
+	local args = props.args or {}
 
 	---@param input string?
 	---@return {link:string, display: string}?
@@ -47,9 +42,9 @@ function Chronology:render()
 
 	return ChronologyDisplay{
 		links = links,
-		title = self.props.title,
-		showTitle = self.props.showTitle,
+		title = props.title,
+		showTitle = props.showTitle,
 	}
 end
 
-return Chronology
+return Component.component(Chronology)

@@ -9,22 +9,29 @@
 
 ---@alias ContextDef<T> {defaultValue: T}
 ---@alias ContextParam<T> {def: ContextDef<T>, value: T, children?: Renderable|Renderable[]}
----@alias HtmlParam {classes?: string[], css?: table, attributes?: table, children?: Renderable|Renderable[]}
 ---@alias ErrorParam {children?: Renderable|Renderable[], fallback?: fun(error: Error, context: Context?): Renderable}
 
 ---@class VNode<P>
 ---@field renderFn string|fun(props: P, context?: Context?): Renderable
 ---@field props P
 
+---@alias HtmlStyleProps table<string, string|number?>
+
+---@class HtmlNodeProps
+---@field classes? string[]
+---@field css? HtmlStyleProps
+---@field attributes? table<string, string|number?>
+---@field children? Renderable|Renderable[]
+
 ---@alias Context<T> {props:{parent: Context?, def: ContextDef<T>, value: T}}
 
 ---@alias ContextNode<T> VNode<ContextParam<T>>
----@alias HtmlNode VNode<HtmlParam>
+---@alias HtmlNode VNode<HtmlNodeProps>
 ---@alias ErrorBoundaryNode VNode<ErrorParam>
 
 ---@alias Component<P> fun(props?: P, context: Context?): VNode<P>
 ---@alias ContextComponent<T> Component<ContextParam<T>>
----@alias HtmlComponent Component<HtmlParam>
+---@alias HtmlComponent Component<HtmlNodeProps>
 ---@alias ErrorBoundaryComponent Component<ErrorParam>
 
 local Lua = require('Module:Lua')
@@ -33,6 +40,7 @@ local Renderer = Lua.import('Module:Widget/Renderer')
 local ComponentCore = {}
 
 -- Virtual Nodes (The table returned after calling a component)
+---@package
 ComponentCore.VNodeMT = {
 	-- Automatically trigger rendering
 	__tostring = Renderer.render,
@@ -96,7 +104,7 @@ ComponentCore.ComponentMT = {
 
 -- Factory to create Functional Components
 ---@generic P
----@param renderFunction fun(props: P, context?: Context): Renderable
+---@param renderFunction fun(props: P, context?: Context): Renderable|Renderable[]?
 ---@param defaultProps P? -- May not contain table values
 ---@return Component<P>
 function ComponentCore.component(renderFunction, defaultProps)

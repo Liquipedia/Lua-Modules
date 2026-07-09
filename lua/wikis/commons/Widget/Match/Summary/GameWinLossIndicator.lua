@@ -7,10 +7,9 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local Label = Lua.import('Module:Widget/Basic/Label')
 
 local LABELS = {
@@ -20,15 +19,12 @@ local LABELS = {
 	empty = Label{labelType = 'result-empty'},
 }
 
----@class MatchSummaryGameWinLossIndicator: Widget
----@operator call(table): MatchSummaryGameWinLossIndicator
-local MatchSummaryGameWinLossIndicator = Class.new(Widget)
+---@param props {winner: integer?, opponentIndex: integer?}
+---@return VNode
+local function MatchSummaryGameWinLossIndicator(props)
+	local winner = props.winner
 
----@return Widget
-function MatchSummaryGameWinLossIndicator:render()
-	local winner = self.props.winner
-
-	if winner == self.props.opponentIndex then
+	if winner == props.opponentIndex then
 		return LABELS.win
 	elseif winner == 0 then
 		return LABELS.draw
@@ -39,4 +35,4 @@ function MatchSummaryGameWinLossIndicator:render()
 	return LABELS.empty
 end
 
-return MatchSummaryGameWinLossIndicator
+return Component.component(MatchSummaryGameWinLossIndicator)

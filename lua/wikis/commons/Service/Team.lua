@@ -12,6 +12,7 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local TeamService = {}
 
@@ -48,11 +49,7 @@ local LPDB_TEAM_FIELDS = {
 ---@param teamTemplate string
 ---@return StandardTeam?
 function TeamService.getTeamByTemplate(teamTemplate)
-	if not teamTemplate or not mw.ext.TeamTemplate.teamexists(teamTemplate) then
-		return nil
-	end
-
-	local team = mw.ext.TeamTemplate.raw(teamTemplate)
+	local team = TeamTemplate.getRawOrNil(teamTemplate)
 
 	if not team then
 		return nil

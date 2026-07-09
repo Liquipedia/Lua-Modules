@@ -63,7 +63,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 				standingsindex = standingsindex,
 				roundindex = round.roundNumber,
 				points = carryData.points,
-				match = carryData.match,
+				match = Table.copy(carryData.match),
 				matches = playedMatches or {},
 				extradata = {
 					pointschange = pointsFromRound,

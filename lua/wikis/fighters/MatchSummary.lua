@@ -13,7 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -134,7 +134,7 @@ function CustomMatchSummary._createCharacterDisplay(players, game, reverse, solo
 				character
 			} or nil
 		)
-		return HtmlWidgets.Div{
+		return Html.Div{
 			classes = {'brkts-popup-body-element-thumbs'},
 			children = reverse and Array.reverse(children) or children
 		}
@@ -152,7 +152,7 @@ function CustomMatchSummary._createCharacterDisplay(players, game, reverse, solo
 			if Logic.isEmpty(player.characters) then
 				return
 			end
-			return HtmlWidgets.Div{
+			return Html.Div{
 				css = {
 					display = 'flex',
 					['flex-direction'] = 'row' .. (reverse and '-reverse' or ''),
@@ -168,7 +168,7 @@ function CustomMatchSummary._createCharacterDisplay(players, game, reverse, solo
 		end)
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		css = {
 			display = 'inline-flex',
 			flex = '2 1 30%',
