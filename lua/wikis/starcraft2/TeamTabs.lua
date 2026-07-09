@@ -32,7 +32,7 @@ local TOMORROW = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() + DateExt.days
 local TeamTabs = {}
 
 ---@param frame Frame
----@return Widget?
+---@return Renderable?
 function TeamTabs.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -111,7 +111,7 @@ end
 ---@param currentSubTeam string?
 ---@param currentSubTab integer?
 ---@param displayName string?
----@return Widget?
+---@return Renderable?
 function TeamTabs._display(mainTeam, subTeams, showPlayerSubTabs, currentSubTeam, currentSubTab, displayName)
 	if Logic.isEmpty(subTeams) then
 		return TeamTabs._getTabsForSubTeam(mainTeam, showPlayerSubTabs, currentSubTab)
@@ -153,10 +153,10 @@ end
 ---@param team string
 ---@param showPlayerSubTabs boolean
 ---@param currentTab integer?
----@return Widget?
+---@return Renderable?
 function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 	---@param args {form: string, template: string, display: string, queryArgs: table}
-	---@return Widget
+	---@return Renderable
 	local makeQueryLink = function(args)
 		return Link{
 			linktype = 'external',

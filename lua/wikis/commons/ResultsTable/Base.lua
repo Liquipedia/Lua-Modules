@@ -383,7 +383,7 @@ function BaseResultsTable:_isDataEmpty()
 end
 
 ---Builds the results/achievements/awards table
----@return Widget
+---@return Renderable
 function BaseResultsTable:build()
 	return TableWidgets.Table{
 		sortable = true,
@@ -402,7 +402,7 @@ function BaseResultsTable:build()
 end
 
 ---@private
----@return Widget?
+---@return Renderable?
 function BaseResultsTable:_footer()
 	if not self.config.onlyAchievements then
 		return
@@ -434,7 +434,7 @@ function BaseResultsTable:_footer()
 end
 
 ---@private
----@return Widget[]
+---@return Renderable[]
 function BaseResultsTable:_buildTableBody()
 	if self:_isDataEmpty() then
 		return {TableWidgets.Row{children = TableWidgets.Cell{
@@ -501,7 +501,7 @@ end
 ---@protected
 ---@param data placement
 ---@param options table?
----@return string|Widget?
+---@return Renderable?
 function BaseResultsTable:opponentDisplay(data, options)
 	options = options or {}
 
@@ -561,10 +561,10 @@ function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate, isNotLast
 end
 
 ---Builds team icon display with text below it
----@param teamDisplay Widget
+---@param teamDisplay Renderable
 ---@param rawTeamTemplate teamTemplateData
 ---@param flip boolean?
----@return Widget
+---@return Renderable
 function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, flip)
 	return HtmlWidgets.Fragment{children = {
 		teamDisplay,
@@ -602,7 +602,7 @@ end
 
 ---Converts the lastvsdata to display components
 ---@param placement placement
----@return string, string|Widget?, string?
+---@return string, Renderable?, string?
 function BaseResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata or {}
 
@@ -627,28 +627,28 @@ function BaseResultsTable:buildColumnDefinitions()
 end
 
 ---@protected
----@return Widget
+---@return Renderable
 function BaseResultsTable:buildHeader()
 	error('BaseResultsTable:buildHeader() cannot be called directly and must be overridden.')
 end
 
 ---@protected
 ---@param placement placement
----@return Widget
+---@return Renderable
 function BaseResultsTable:buildRow(placement)
 	error('BaseResultsTable:buildRow() cannot be called directly and must be overridden.')
 end
 
 ---@protected
 ---@param placement placement
----@return Widget
+---@return Renderable
 function BaseResultsTable:createDateCell(placement)
 	return TableWidgets.Cell{children = DateExt.toYmdInUtc(placement.date)}
 end
 
 ---@protected
 ---@param placement placement
----@return Widget
+---@return Renderable
 function BaseResultsTable:createTierCell(placement)
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)
 	return TableWidgets.Cell{
@@ -661,7 +661,7 @@ end
 
 ---@protected
 ---@param placement placement
----@return Widget?
+---@return Renderable?
 function BaseResultsTable:createTypeCell(placement)
 	if not self.config.showType then
 		return
@@ -673,7 +673,7 @@ end
 
 ---@protected
 ---@param placement placement
----@return Widget[]
+---@return Renderable[]
 function BaseResultsTable:createTournamentCells(placement)
 	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
 	return {
@@ -703,7 +703,7 @@ end
 
 ---@protected
 ---@param props {useIndivPrize: boolean?, placement: placement}
----@return Widget
+---@return Renderable
 function BaseResultsTable:createPrizeCell(props)
 	local useIndivPrize = Logic.nilOr(props.useIndivPrize, self.config.queryType ~= Opponent.team)
 	local placement = props.placement
