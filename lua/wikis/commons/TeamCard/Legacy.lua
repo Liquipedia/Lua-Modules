@@ -299,7 +299,7 @@ function LegacyTeamCard.mapPlayer(tcArgs, prefix, sourceGroup)
 	return {
 		[1] = tcArgs[prefix],
 		link = pageName,
-		flag = tcArgs[prefix .. 'flag_o'] or tcArgs[prefix .. 'flag'] or getNationality(pageName),
+		flag = tcArgs[prefix .. 'flag_o'] or tcArgs[prefix .. 'flag'] or getNationality(pageName) or 'unknown',
 		team = tcArgs[prefix .. 'team'],
 		id = tcArgs[prefix .. 'id'],
 		number = tcArgs[prefix .. 'number'],
