@@ -49,7 +49,7 @@ local EXLUDE_PATTERNS = {
 local BuildingStats = {}
 
 ---@param frame Frame
----@return Widget|string?
+---@return Renderable|string?
 function BuildingStats.wrapper(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -64,7 +64,7 @@ end
 
 ---@private
 ---@param args {game: string?, faction: string}
----@return Widget?
+---@return Renderable?
 function BuildingStats._build(args)
 	local game = Game.name{game = args.game or 'Legacy of the Void'}
 	assert(game, 'Invalid or missing game input')
@@ -116,7 +116,7 @@ end
 
 ---@private
 ---@param faction string
----@return {}[]
+---@return {align: string}[]
 function BuildingStats._columns(faction)
 	return WidgetUtil.collect(
 		{align = 'left'}, -- name
@@ -132,7 +132,7 @@ end
 
 ---@private
 ---@param faction string
----@return Widget
+---@return Renderable
 function BuildingStats._header(faction)
 	return TableWidgets.TableHeader{
 		children = TableWidgets.Row{
@@ -153,7 +153,7 @@ end
 ---@private
 ---@param faction string
 ---@param building table
----@return Html
+---@return Renderable
 function BuildingStats._row(faction, building)
 	local extradata = building.extradata or {}
 
