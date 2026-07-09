@@ -19,7 +19,7 @@ local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local FindMatchesByPlayerDisplayName = {}
 
 ---@param frame Frame
----@return Widget
+---@return Renderable
 function FindMatchesByPlayerDisplayName.run(frame)
 	local args = Arguments.getArgs(frame)
 	assert(Logic.isNotEmpty(args.p1), 'No player(s) specified')

@@ -26,7 +26,7 @@ local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local FindPlayersOnTeamFromPlacements = {}
 
 ---@param frame Frame
----@return Widget
+---@return Renderable
 function FindPlayersOnTeamFromPlacements.get(frame)
 	local args = Arguments.getArgs(frame)
 	assert(args.team, 'No player(s) specified')
