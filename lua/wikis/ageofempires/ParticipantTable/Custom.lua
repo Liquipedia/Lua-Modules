@@ -123,7 +123,7 @@ function AoEParticipantTable:_createTitle(tabletitle, buttontitle, togglearea, b
 			:css('width', width or self.config.width)
 			:css('vertical-align', 'middle')
 			:tag('span')
-				:addClass('toggle-area-button btn btn-small btn-primary')
+				:addClass('toggle-area-button button button--small button--primary')
 				:attr('data-toggle-area-btn', buttonarea)
 				:css('position', 'absolute')
 				:wikitext(buttontitle)
