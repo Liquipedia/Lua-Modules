@@ -55,7 +55,7 @@ end
 ---@return string
 function WikiCopyPaste._getMapCode(mapIndex, showBans, showVod)
 	return table.concat(Array.extend(
-		INDENT .. '|map' .. mapIndex .. '={{Map' ..  (showVod and '|vod=' or ''),
+		INDENT .. '|map' .. mapIndex .. '={{Map' .. (showVod and '|vod=' or ''),
 		INDENT .. INDENT .. '|team1side= |team2side= |length= |winner=',
 		INDENT .. INDENT .. '<!-- God picks -->',
 		INDENT .. INDENT .. '|t1g1= |t1g2= |t1g3= |t1g4= |t1g5=',

@@ -13,13 +13,14 @@ local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
 local Image = Lua.import('Module:Image')
 local Logic = Lua.import('Module:Logic')
+local Map = Lua.import('Module:Map')
 local Table = Lua.import('Module:Table')
 local VodLink = Lua.import('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Links = Lua.import('Module:Links')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchHeader = Lua.import('Module:Widget/Match/Header')
 local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
@@ -178,7 +179,7 @@ local MatchSummary = {
 function MatchSummary.createDefaultHeader(match, options)
 	options = options or {}
 
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = WidgetUtil.collect(
 			MatchCountdown{
 				match = match,
@@ -255,7 +256,7 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 
 	local substituteComment = DisplayHelper.createSubstitutesComment(matchData)
 
-	match:comment(HtmlWidgets.Fragment{
+	match:comment(Html.Fragment{
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.Casters{casters = matchData.extradata.casters},
 			MatchSummaryWidgets.MatchComment{
@@ -293,7 +294,7 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 		args.bracketId, args.matchId)
 
 	---@type (fun(match: MatchGroupUtilMatch):string?)|string|integer?
-	local width = args.width or options.width
+	local width = args.width or options.width or (args.config or {}).width
 	if type(width) == 'function' then
 		width = width(match)
 	elseif Logic.isNumeric(width) then
@@ -312,7 +313,7 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 end
 
 ---@param mapVetoes table
----@param options {game: string?, emptyMapDisplay: string?}?
+---@param options {game: string?, emptyMapDisplay: string?, useLpdb: boolean?}?
 ---@return MapVetoProps?
 function MatchSummary.preProcessMapVeto(mapVetoes, options)
 	if Logic.isEmpty(mapVetoes) then
@@ -320,15 +321,26 @@ function MatchSummary.preProcessMapVeto(mapVetoes, options)
 	end
 
 	options = options or {}
-	local mapInputToDisplay = function(map)
+
+	---@param map string?
+	---@return {name: string, link: string?}
+	local mapInputToDisplay = FnUtil.memoize(function(map)
 		if Logic.isEmpty(map) then
 			return {name = options.emptyMapDisplay or TBD}
+		end
+		---@cast map -nil
+		if options.useLpdb then
+			local mapData = Map.getMapByName(map)
+			if mapData then
+				return {name = mapData.displayName, link = mapData.pageName}
+			end
+			return {name = map}
 		end
 		if options.game then
 			return {name = map, link = map .. '/' .. options.game}
 		end
 		return {name = map, link = map}
-	end
+	end)
 
 	return {
 		firstVeto = tonumber(mapVetoes[1].vetostart),
@@ -362,7 +374,7 @@ end
 ---@param maxNumberOfCharacters integer
 ---@return string[]
 function MatchSummary.buildCharacterList(data, prefix, maxNumberOfCharacters)
-	return Array.map(Array.range(1, maxNumberOfCharacters), function(index)
+	return Array.mapRange(1, maxNumberOfCharacters, function(index)
 		return data[prefix .. index]
 	end)
 end

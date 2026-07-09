@@ -15,6 +15,7 @@ local Logic = Lua.import('Module:Logic')
 local MedalStatsBase = Lua.import('Module:SeriesMedalStats')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local MedalsTable = Lua.import('Module:Widget/MedalsTable')
 
@@ -57,7 +58,7 @@ function MedalStats:_processData()
 	---@param teamTemplate string
 	---@return string?
 	local resolveTeamToIdentifier = function(teamTemplate)
-		local rawData = mw.ext.TeamTemplate.raw(teamTemplate)
+		local rawData = TeamTemplate.getRawOrNil(teamTemplate)
 
 		if not rawData or not rawData.page then return end
 

@@ -100,7 +100,7 @@ function TransferList:parseArgs(args)
 		sortOrder = (args.sort or DEFAULT_VALUES.sort) .. ' ' .. (args.order or DEFAULT_VALUES.order) ..
 			', objectname ' .. objectNameSortOrder,
 		title = Logic.nilIfEmpty(args.title),
-		shown = Logic.nilOr(Logic.readBoolOrNil(args.shown), true),
+		shown = Logic.readBool(args.shown),
 		class = Logic.nilIfEmpty(args.class),
 		showMissingResultsMessage = Logic.readBool(args.form),
 		showTeamName = Logic.readBoolOrNil(args.showTeamName),
@@ -135,8 +135,8 @@ function TransferList:_getTeams(args)
 
 	local teamList = {}
 	Array.forEach(teams, function(team)
-		if not mw.ext.TeamTemplate.teamexists(team) then
-			mw.log('Missing team teamplate: ' .. team)
+		if not TeamTemplate.exists(team) then
+			mw.log(TeamTemplate.noTeamMessage(team))
 		end
 		Array.extendWith(teamList, TeamTemplate.queryHistoricalNames(team))
 	end)
@@ -332,7 +332,7 @@ function TransferList:create()
 	return GeneralCollapsible{
 		title = config.title,
 		classes = {'OffSeasonOverview'},
-		shouldCollapse = config.shown,
+		shouldCollapse = not config.shown,
 		children = display,
 	}
 end

@@ -39,6 +39,18 @@ describe('TeamCard Legacy', function()
 			stubTournament:revert()
 		end)
 
+		it('skips a leading icon embed and parses the real internal link', function()
+			local stubTournament = stub(require('Module:Tournament'), 'getTournament',
+				function() return {pageName = 'King_Pro_League/2020/Spring'} end)
+			local q = LegacyTeamCard.parseQualifier(
+				'[[File:KPL_Logo_small.png|link=KPL]] [[King_Pro_League/2020/Spring|KPL Champion]]')
+			assert.are_same(
+				{method = 'qual', type = 'tournament', page = 'King_Pro_League/2020/Spring', text = 'KPL Champion'},
+				q
+			)
+			stubTournament:revert()
+		end)
+
 		it('parses external link as method=qual type=external', function()
 			local q = LegacyTeamCard.parseQualifier('[https://foo.bar Foo Bar]')
 			assert.are_same({method = 'qual', type = 'external', url = 'https://foo.bar', text = 'Foo Bar'}, q)
@@ -85,6 +97,16 @@ describe('TeamCard Legacy', function()
         it('reads id', function()
             local p = LegacyTeamCard.mapPlayer({p1 = 'X', p1id = 'faker-id'}, 'p1', nil)
             assert.are_equal('faker-id', p.id)
+        end)
+
+        it('passes number through', function()
+            local p = LegacyTeamCard.mapPlayer({p1 = 'X', p1number = '3'}, 'p1', nil)
+            assert.are_equal('3', p.number)
+        end)
+
+        it('number nil when unset', function()
+            local p = LegacyTeamCard.mapPlayer({p1 = 'X'}, 'p1', nil)
+            assert.is_nil(p.number)
         end)
 
         it('reads faction', function()
@@ -197,14 +219,28 @@ describe('TeamCard Legacy', function()
             assert.is_nil(p.played)
         end)
 
-        it('source group s with noVarDefault and no result sets played=false', function()
+        it('source group s with noVarDefault excludes from results but keeps played (no DNP)', function()
             local p = LegacyTeamCard.mapPlayer({s1 = 'X', noVarDefault = 'true'}, 's1', 's')
-            assert.is_false(p.played)
+            assert.is_nil(p.played)
+            assert.is_false(p.results)
         end)
 
-        it('source group f with noVarDefault leaves played untouched', function()
+        it('source group f with noVarDefault excludes from results but keeps played', function()
             local p = LegacyTeamCard.mapPlayer({f1 = 'X', noVarDefault = 'true'}, 'f1', 'f')
             assert.is_nil(p.played)
+            assert.is_false(p.results)
+        end)
+
+        it('noVarDefault results exclusion is overridden by an explicit result=true', function()
+            local p = LegacyTeamCard.mapPlayer({f1 = 'X', f1result = 'true', noVarDefault = 'true'}, 'f1', 'f')
+            assert.is_nil(p.results)
+            assert.is_true(p.played)
+        end)
+
+        it('subdnpdefault sets played=false and leaves results unset (exclusion cascades from played)', function()
+            local p = LegacyTeamCard.mapPlayer({s1 = 'X', subdnpdefault = 'true'}, 's1', 's')
+            assert.is_false(p.played)
+            assert.is_nil(p.results)
         end)
 
         it('source group s + pNsub=true: status=sub (redundant, no conflict)', function()
@@ -253,6 +289,37 @@ describe('TeamCard Legacy', function()
             local c = LegacyTeamCard.mapCoach({c1 = 'X', c1flag = 'kr', c1flag_o = 'us'}, 'c1', nil)
             assert.are_equal('us', c.flag)
         end)
+
+        it('former coach with noVarDefault is excluded from results without a DNP label', function()
+            local c = LegacyTeamCard.mapCoach({fc = 'X', noVarDefault = 'true'}, 'fc', 'fc')
+            assert.is_false(c.results)
+            assert.is_nil(c.played)
+        end)
+
+        it('fcresult=true overrides the noVarDefault results exclusion', function()
+            local c = LegacyTeamCard.mapCoach({fc = 'X', fcresult = 'true', noVarDefault = 'true'}, 'fc', 'fc')
+            assert.is_nil(c.results)
+        end)
+    end)
+
+    describe('mapCoaches enumeration', function()
+        local LegacyTeamCard = require('Module:TeamCard/Legacy')
+
+        it('maps the bare fc as the first former coach', function()
+            local coaches = LegacyTeamCard.mapCoaches({fc = 'kkOma', fc2 = 'Bengi'})
+            assert.are_equal(2, #coaches)
+            assert.are_equal('kkOma', coaches[1][1])
+            assert.are_equal('former', coaches[1].status)
+            assert.are_equal('Bengi', coaches[2][1])
+            assert.are_equal('former', coaches[2].status)
+        end)
+
+        it('maps the bare sc as the first sub coach', function()
+            local coaches = LegacyTeamCard.mapCoaches({sc = 'Mata'})
+            assert.are_equal(1, #coaches)
+            assert.are_equal('Mata', coaches[1][1])
+            assert.are_equal('sub', coaches[1].status)
+        end)
     end)
 
     describe('mapPlayers enumeration', function()
@@ -298,6 +365,37 @@ describe('TeamCard Legacy', function()
                 if p.link == 'Pawn (Korean)' then pawnCount = pawnCount + 1 end
             end
             assert.are_equal(1, pawnCount)
+        end)
+
+        it('keeps both player and staff entries for the same person (staff tab)', function()
+            local players = LegacyTeamCard.mapPlayers({
+                p1 = 'Dhokla',
+                t3p1 = 'Dhokla', t3p1pos = 'Positional Coach', t3title = 'Staff',
+            })
+            assert.are_equal(2, #players)
+            assert.is_nil(players[1].type)
+            assert.is_nil(players[1].role)
+            assert.are_equal('staff', players[2].type)
+            assert.are_equal('Positional Coach', players[2].role)
+        end)
+
+        it('keeps both entries when a staff role sits in a default former tab', function()
+            local players = LegacyTeamCard.mapPlayers({
+                p1 = 'Dhokla',
+                t3p1 = 'Dhokla', t3p1pos = 'Positional Coach',
+            })
+            assert.are_equal(2, #players)
+            assert.is_nil(players[1].role)
+            assert.are_equal('Positional Coach', players[2].role)
+        end)
+
+        it('staff tab entry still dedups against an earlier staff tab entry', function()
+            local players = LegacyTeamCard.mapPlayers({
+                t2p1 = 'Goldenglue', t2p1pos = 'Head Coach', t2title = 'Staff',
+                t3p1 = 'Goldenglue', t3p1pos = 'Strategic Coach', t3title = 'Staff',
+            })
+            assert.are_equal(1, #players)
+            assert.are_equal('Strategic Coach', players[1].role)
         end)
     end)
 
@@ -446,7 +544,7 @@ describe('TeamCard Legacy', function()
         local Template = require('Module:Template')
         local LegacyTeamCard = require('Module:TeamCard/Legacy')
 
-        it('passes minimumplayers = defaultRowNumber + extraRows + sum(p_extra)', function()
+        it('Ignores defaultRowNumber and extraRows', function()
             local TPParser = require('Module:TeamParticipants/Parse/Wiki')
             local captured
             local stubParse = stub(TPParser, 'parseWikiInput', function(args)
@@ -460,7 +558,7 @@ describe('TeamCard Legacy', function()
                 {__source = 'card', team = 'A', defaultRowNumber = '5', extraRows = '1'}, 'LegacyTeamCard')
 
             LegacyTeamCard.run()
-            assert.are_equal('8', tostring(captured.minimumplayers))
+            assert.are_equal('0', tostring(captured.minimumplayers))
 
             stubParse:revert()
         end)

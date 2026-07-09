@@ -12,6 +12,9 @@ local Tier = Lua.import('Module:Tier/Utils')
 
 local NON_BREAKING_SPACE = '&nbsp;'
 
+---@class CounterstrikeTierTypeRawData: TierRawData
+---@field prioTierType boolean
+
 ---@class CounterstrikeTierUtils: TierUtils
 local TierCustom = Table.copy(Tier)
 
@@ -24,6 +27,8 @@ function TierCustom.display(tier, tierType, options)
 	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	if not tierData then return end
+
+	---@cast tierTypeData CounterstrikeTierTypeRawData
 
 	options = options or {}
 

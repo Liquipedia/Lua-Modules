@@ -38,6 +38,14 @@ local function shouldStorePlayer(player)
 	return player.extradata.results
 end
 
+--- Selects the per-team prize value used for individual earnings: the player share
+--- (players' real cut) when present, otherwise the full prize money.
+---@param lpdbData table
+---@return number?
+function TeamParticipantsRepository._individualPrizeValue(lpdbData)
+	return lpdbData.extradata and lpdbData.extradata.playershare or lpdbData.prizemoney
+end
+
 --- Save a team participant to lpdb placement table, after merging data from prizepool if exists
 ---@param participant TeamParticipant
 function TeamParticipantsRepository.save(participant)
@@ -102,13 +110,15 @@ function TeamParticipantsRepository.save(participant)
 		lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(activeOpponent))
 		lpdbData.players = lpdbData.opponentplayers
 
-		-- Calculate individual prize money (prize money per player on team)
-		if lpdbData.prizemoney then
+		-- Calculate individual prize money (prize money per player on team).
+		-- Prefer the player share over the full prize so org money does not inflate earnings.
+		local prizeValue = TeamParticipantsRepository._individualPrizeValue(lpdbData)
+		if prizeValue then
 			local filteredPlayers = Array.filter(activeOpponent.players, function(player)
 				return player.extradata.type ~= 'staff'
 			end)
 			local numberOfPlayersOnTeam = math.max(#(filteredPlayers), 1)
-			lpdbData.individualprizemoney = lpdbData.prizemoney / numberOfPlayersOnTeam
+			lpdbData.individualprizemoney = prizeValue / numberOfPlayersOnTeam
 		end
 
 		if lpdbData.mode ~= 'award_individual' then

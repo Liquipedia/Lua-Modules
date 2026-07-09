@@ -8,11 +8,11 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Logic = Lua.import('Module:Logic')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
+local SwitchPill = Lua.import('Module:Widget/ContentSwitch/Pill')
 
 ---@class ContentSwitchTab
 ---@field label? Renderable|Renderable[]
@@ -40,30 +40,11 @@ local defaultProps = {
 ---@return Renderable|Renderable[]
 local function ContentSwitch(props)
 	local tabs = assert(props.tabs, 'ContentSwitch requires at least the tabs property to be set')
-	local variant = props.variant
 	local defaultActive = props.defaultActive
-	local switchGroup = assert(Logic.nilIfEmpty(props.switchGroup), 'ContentSwitch: missing \'switchGroup\' property')
 
 	if #tabs < 2 then
 		return (tabs[1] or {}).content
 	end
-
-	local tabOptions = Array.map(tabs, function(tab, index)
-		local isActive = index == defaultActive
-		local classes = {'switch-pill-option', 'toggle-area-button'}
-		if isActive then
-			table.insert(classes, 'switch-pill-option-active')
-		end
-
-		return Div{
-			classes = classes,
-			attributes = {
-				['data-toggle-area-btn'] = tostring(index),
-				['data-switch-value'] = tab.value or tostring(index),
-			},
-			children = Logic.emptyOr(tab.label, tostring(index)),
-		}
-	end)
 
 	local contentAreas = Array.map(tabs, function(tab, index)
 		local isActive = index == defaultActive
@@ -76,35 +57,11 @@ local function ContentSwitch(props)
 		}
 	end)
 
-	local switchPillClasses = {'switch-pill'}
-	if variant == 'generic' then
-		table.insert(switchPillClasses, 'switch-pill-generic')
-	end
-	if props.size == 'small' then
-		table.insert(switchPillClasses, 'switch-pill-small')
-	elseif props.size == 'extrasmall' then
-		table.insert(switchPillClasses, 'switch-pill-extrasmall')
-	end
-
-
 	return Div{
 		classes = {'toggle-area', 'toggle-area-' .. tostring(defaultActive)},
 		attributes = {['data-toggle-area'] = tostring(defaultActive)},
 		children = {
-			Div{
-				classes = {'switch-pill-container'},
-				css = props.css,
-				children = {
-					Div{
-						classes = switchPillClasses,
-						attributes = {
-							['data-switch-group'] = switchGroup,
-							['data-store-value'] = Logic.readBool(props.storeValue) and 'true' or nil,
-						},
-						children = tabOptions,
-					},
-				},
-			},
+			SwitchPill(props),
 			Div{
 				classes = {'content-switch-content-container'},
 				children = contentAreas,

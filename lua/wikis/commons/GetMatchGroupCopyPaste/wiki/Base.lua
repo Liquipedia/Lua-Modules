@@ -46,7 +46,7 @@ end
 ---@return string
 function WikiCopyPaste._getMaps(bestof)
 	local map = '{{Map|map=}}'
-	local lines = Array.map(Array.range(1, bestof), function(mapIndex)
+	local lines = Array.mapRange(1, bestof, function(mapIndex)
 		return INDENT .. '|map' .. mapIndex .. '=' .. map
 	end)
 
@@ -66,7 +66,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 	return table.concat(Array.extend({},
 		'{{Match',
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return '\n' .. INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
 		end),
 		'\n' .. INDENT .. '|finished=\n' .. INDENT .. '|date=\n' .. INDENT .. '}}'
@@ -109,7 +109,7 @@ end
 ---@param mapCount integer
 ---@return string
 function WikiCopyPaste.getFfaOpponent(mode, mapCount)
-	local mapScores = table.concat(Array.map(Array.range(1, mapCount), function(idx)
+	local mapScores = table.concat(Array.mapRange(1, mapCount, function(idx)
 		return '|m' .. idx .. '={{MS||}}'
 	end))
 

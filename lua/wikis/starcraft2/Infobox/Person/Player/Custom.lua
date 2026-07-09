@@ -157,7 +157,7 @@ function CustomPlayer:_getActiveCasterYears()
 	return YearsActive.displayYears(years:toArray())
 end
 
----@return Html?
+---@return Renderable?
 function CustomPlayer:createBottomContent()
 	if self.shouldQueryData then
 		return MatchTicker.recent({
@@ -246,7 +246,7 @@ function CustomPlayer:_addToStats(match, player)
 	if playerScore < 0 or vsScore < 0 or (vsScore + playerScore == 0) then return end
 
 	local getFaction = function(opponent)
-		local faction = Faction.read(opponent.match2players[1].extradata.faction)
+		local faction = Faction.read(((opponent.match2players[1] or {}).extradata or {}).faction)
 		-- treat default faction as random
 		return faction ~= Faction.defaultFaction and faction or Faction.read('r')
 	end

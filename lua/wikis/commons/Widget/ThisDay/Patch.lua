@@ -13,12 +13,12 @@ local Logic = Lua.import('Module:Logic')
 
 local ThisDayQuery = Lua.import('Module:ThisDay/Query')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local ListWidgets = Lua.import('Module:Widget/List')
 local Widget = Lua.import('Module:Widget')
 
-local HEADER = HtmlWidgets.H3{children = 'Patches'}
+local HEADER = Html.H3{children = 'Patches'}
 local TODAY = os.date("*t")
 
 ---@class ThisDayPatchParameters: ThisDayParameters
@@ -53,7 +53,7 @@ function ThisDayPatch:render()
 	local lines = Array.map(patchData, function (patch)
 		local patchYear = patch.releaseDate.year
 		return {
-			HtmlWidgets.B{
+			Html.B{
 				children = {patchYear}
 			},
 			': ',
@@ -64,7 +64,7 @@ function ThisDayPatch:render()
 
 	return {
 		HEADER,
-		UnorderedList{ children = lines }
+		ListWidgets.Unordered{ children = lines }
 	}
 end
 
