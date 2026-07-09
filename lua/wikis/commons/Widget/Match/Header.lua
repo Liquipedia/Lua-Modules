@@ -23,7 +23,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 ---@class MatchHeaderProps
 ---@field match MatchGroupUtilMatch
 ---@field teamStyle? teamStyle
----@field variant 'horizontal'|'vertical'
+---@field variant? 'horizontal'|'vertical'
 
 local MatchHeader = {}
 MatchHeader.defaultProps = {
