@@ -85,6 +85,10 @@ async function main() {
 	process.on( 'SIGINT', teardown );
 	process.on( 'SIGTERM', teardown );
 	browser.on( 'exit', teardown );
+	browser.on( 'error', ( e ) => {
+		console.error( `[dev] browser process error: ${ e.message }` );
+		teardown();
+	} );
 }
 
 main();
