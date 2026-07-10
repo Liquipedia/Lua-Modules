@@ -23,7 +23,10 @@ class LiquipediaMapper:
             flow.response = http.Response.make(
                 HTTPStatus.OK,
                 f.read(),
-                {"Content-Type": "text/css; charset=utf-8", "Via": "LiquipediaMapper"},
+                {"Content-Type": "text/css; charset=utf-8"},
+            )
+            flow.response.headers["Via"] = (
+                f"{flow.response.http_version} LiquipediaMapper"
             )
 
     def __serve_local_js_resource(self, flow: http.HTTPFlow):
@@ -31,10 +34,10 @@ class LiquipediaMapper:
             flow.response = http.Response.make(
                 HTTPStatus.OK,
                 f.read(),
-                {
-                    "Content-Type": "text/javascript; charset=utf-8",
-                    "Via": "LiquipediaMapper",
-                },
+                {"Content-Type": "text/css; charset=utf-8"},
+            )
+            flow.response.headers["Via"] = (
+                f"{flow.response.http_version} LiquipediaMapper"
             )
 
 
