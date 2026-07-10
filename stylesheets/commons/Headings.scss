@@ -36,7 +36,6 @@ h1#firstHeading,
 #mw-subcategories h2,
 .mw-category-group h3 {
 	font-weight: 500;
-	display: inline;
 
 	.theme--light & {
 		color: var( --clr-wiki-theme-20 );
@@ -107,6 +106,20 @@ h1#firstHeading,
 
 .mw-heading.mw-heading3 h3 .mw-editsection {
 	padding-top: 0.8125rem;
+}
+
+.mw-heading h1,
+.mw-heading h2,
+.mw-heading h3,
+.mw-heading h4,
+.mw-heading h5,
+.mw-heading h6 {
+	display: inline;
+	border: 0;
+	margin: 0;
+	padding: 0;
+	color: inherit;
+	font: inherit;
 }
 
 .mw-heading {
