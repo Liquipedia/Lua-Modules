@@ -46,7 +46,7 @@ class LiquipediaMapper:
 
 
 async def main():
-    m = master.Master()
+    m = master.Master(None)
     m.addons.add(
         *addons.default_addons(),
         LiquipediaMapper(),
