@@ -91,6 +91,7 @@ body {
 }
 
 /* Styles that are not yet part of this repository, but used in snapshot tests */
+/** Disabled to serve as test ground for LH base styles
 :root {
 	--clr-moon-40: #666666;
 
@@ -164,3 +165,4 @@ pre {
 	overflow-x: hidden;
 	word-wrap: break-word;
 }
+*/
