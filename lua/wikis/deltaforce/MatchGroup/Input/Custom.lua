@@ -63,7 +63,7 @@ function MatchFunctions.getBestOf(bestofInput, games)
 		return bestof
 	end
 
-	return tonumber(Variables.varDefault('bestof')) or (games and #games) or DEFAULT_BESTOF
+	return tonumber(Variables.varDefault('bestof')) or ((games and #games > 0) and #games) or DEFAULT_BESTOF
 end
 
 ---@param maps table[]
@@ -83,7 +83,7 @@ function MatchFunctions.getExtraData(match, games, opponents)
 	}
 end
 
--- Parse extradata information, particularly info about halfs and operator bans
+ -- Parse map-side extradata (Attack/Defense) for use in MatchSummary
 ---@param match table
 ---@param map table
 ---@param opponents MGIParsedOpponent[]
@@ -101,7 +101,7 @@ function MapFunctions.getExtraData(match, map, opponents)
 	} or t1side == 'DEF' and {
 		t1side = 'DEF',
 		t2side = 'ATK',
-	} or error('Invalid side specified: "' .. map.team1side .. '"')
+	} or error('Invalid side specified: "' .. map.team1side .. '" (expected ATK or DEF)')
 end
 
 --- FFA Match
