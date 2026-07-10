@@ -63,13 +63,16 @@ function startWatcher( { state } ) {
 		cwd: REPO_ROOT,
 		ignoreInitial: true
 	} );
-	watcher.on( 'change', ( file ) => {
+	function onFileEvent( file ) {
 		if ( file.endsWith( '.scss' ) ) {
 			schedule( 'css' );
 		} else if ( file.endsWith( '.js' ) ) {
 			schedule( 'js' );
 		}
-	} );
+	}
+	watcher.on( 'change', onFileEvent );
+	watcher.on( 'add', onFileEvent );
+	watcher.on( 'unlink', onFileEvent );
 
 	return { stop: () => watcher.close() };
 }

@@ -175,7 +175,8 @@ Environment overrides:
 **This previews CSS/JS only.** Lua modules render server-side and cannot be
 previewed locally — use the dev-wiki deploy flow for those. This tool launches a
 dedicated, disposable browser profile that ignores certificate errors and proxies
-only `*.liquipedia.net`; your normal browser and browsing are untouched.
+only `*.liquipedia.net`; your normal browser and browsing are untouched. Because
+certificate validation is disabled in this profile, avoid browsing other sites in it.
 
 ## Support
 

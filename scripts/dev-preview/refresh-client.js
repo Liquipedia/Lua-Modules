@@ -4,6 +4,8 @@
 const REFRESH_CLIENT = `
 ;(function () {
 	'use strict';
+	if ( window.__lpDevRefresh ) { return; }
+	window.__lpDevRefresh = true;
 	function check() {
 		fetch( '/__lp_dev_rebuild_check__', { cache: 'no-store' } )
 			.then( function ( r ) { return r.ok ? r.json() : null; } )
