@@ -1,6 +1,6 @@
 --- Triple Comment to Enable our LLS Plugin
 insulate('Squad', function()
-	allwikis('integration tests', function(args, wikiName)
+	allwikis('integration tests #snapshot', function(args, wikiName)
 		local Info = require('Module:Info')
 		if Info.config.squads.allowManual == false then
 			return

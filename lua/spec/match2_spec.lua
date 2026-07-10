@@ -56,7 +56,7 @@ describe('match2', function()
 			mw.ext.LiquipediaDB.lpdb_match2game:revert()
 			mw.ext.LiquipediaDB.lpdb_tournament:revert()
 		end)
-		allwikis('smoketest', function(args, wikiName)
+		allwikis('smoketest #snapshot', function(args, wikiName)
 			local Info = require('Module:Info')
 			if Info.config.match2.status == 0 then
 				return

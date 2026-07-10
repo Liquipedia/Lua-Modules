@@ -44,6 +44,6 @@
 		"build:js": "node build-js.js",
 		"build": "npm run build:css && npm run build:js",
 		"lua-test": "npm run build:css && busted -C lua",
-		"update-snapshots": "UPDATE_SNAPSHOTS=true npm run lua-test"
+		"update-snapshots": "npm run build:css && UPDATE_SNAPSHOTS=true busted --run=snapshots -C lua"
 	}
 }

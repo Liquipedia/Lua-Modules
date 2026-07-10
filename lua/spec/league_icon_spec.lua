@@ -121,7 +121,7 @@ insulate('LeagueIcon.getTemplate', function()
 end)
 
 insulate('LeagueIcon.generate', function()
-	it('should generate code with valid arguments', function()
+	it('should generate code with valid arguments #snapshot', function()
 		local args = {icon = 'Icon.png', link = 'link', name = 'name', series = 'series'}
 		GoldenTest('LeagueIcon.generate_copy_paste_gen', tostring(LeagueIcon.generate(args)))
 	end)

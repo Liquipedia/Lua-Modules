@@ -195,7 +195,7 @@ describe('prize pool', function()
 	end)
 
 	describe('prize pool is correct', function()
-		it('display', function()
+		it('display #snapshot', function()
 			GoldenTest('prize_pool', tostring(PrizePool(prizePoolArgs):create():build()))
 			local clubShareNoStore = Table.merge(clubSharePoolArgs, {storelpdb = false})
 			GoldenTest('prize_pool_club_share', tostring(PrizePool(clubShareNoStore):create():build()))
