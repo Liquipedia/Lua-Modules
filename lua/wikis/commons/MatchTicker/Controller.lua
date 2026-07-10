@@ -441,6 +441,8 @@ function MatchTickerController.expandGamesOfMatch(match, config)
 
 		gameMatch.winner = game.winner
 		gameMatch.date = game.date
+		gameMatch.timestamp = game.extradata.timestamp
+		gameMatch.timezoneId = game.extradata.timezoneid
 		gameMatch.vod = Logic.nilIfEmpty(game.vod) or match.vod
 		gameMatch.opponents = Array.map(match.opponents, function(opponent, opponentIndex)
 			return MatchUtil.enrichGameOpponentFromMatchOpponent(opponent, game.opponents[opponentIndex])
