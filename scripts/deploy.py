@@ -2,9 +2,12 @@ import itertools
 import os
 import pathlib
 import re
+import subprocess
 import sys
 
 from typing import Iterable
+
+from dotenv import load_dotenv
 
 from deploy_util import (
     get_git_deploy_reason,
@@ -12,6 +15,8 @@ from deploy_util import (
     write_to_github_summary_file,
 )
 from mediawiki_session import MediaWikiSession
+
+load_dotenv()
 
 HEADER_PATTERN = re.compile(
     r"\A---\n" r"-- @Liquipedia\n" r"-- page=(?P<pageName>[^\n]*)\n"
@@ -46,11 +51,33 @@ def main():
     all_modules_deployed = True
     lua_files: Iterable[pathlib.Path]
     git_deploy_reason: str
-    if len(sys.argv[1:]) == 0:
+    assert (
+        os.getenv("LUA_DEV_ENV_NAME") is None
+        or os.getenv("LUA_DEV_ENV_NAME") != "/dev/"
+    ), f"Invalid dev environment: {os.getenv('LUA_DEV_ENV_NAME')}"
+    if len(sys.argv[1:]) == 0 and os.getenv("LUA_DEV_ENV_NAME") is None:
         lua_files = pathlib.Path("./lua/wikis/").rglob("*.lua")
         git_deploy_reason = "Automated Weekly Re-Sync"
     else:
-        lua_files = [pathlib.Path(arg) for arg in sys.argv[1:]]
+        if len(sys.argv[1:]) == 0:
+            lua_files = [
+                pathlib.Path(changed_file)
+                for changed_file in subprocess.check_output(
+                    [
+                        "git",
+                        "diff",
+                        "--name-only",
+                        "--diff-filter=d",
+                        "main",
+                        "lua/wikis/*",
+                    ]
+                )
+                .decode()
+                .strip()
+                .splitlines()
+            ]
+        else:
+            lua_files = [pathlib.Path(arg) for arg in sys.argv[1:]]
         git_deploy_reason = get_git_deploy_reason()
 
     for wiki, files in itertools.groupby(sorted(lua_files), lambda path: path.parts[2]):

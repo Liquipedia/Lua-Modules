@@ -1,0 +1,47 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Deploy current file",
+			"type": "shell",
+			"command": "venv/bin/python3",
+			"windows": {
+				"command": "venv/Scripts/python.exe"
+			},
+			"args": [
+				"scripts/deploy.py",
+				"${relativeFile}"
+			],
+			"options": {
+				"env": {
+					"LUA_DEV_ENV_NAME": "/dev/${input:devEnvironment}"
+				}
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Deploy all changed file",
+			"type": "shell",
+			"command": "venv/bin/python3",
+			"windows": {
+				"command": "venv/Scripts/python.exe"
+			},
+			"args": [
+				"scripts/deploy.py",
+			],
+			"options": {
+				"env": {
+					"LUA_DEV_ENV_NAME": "/dev/${input:devEnvironment}"
+				}
+			},
+			"problemMatcher": []
+		}
+	],
+	"inputs": [
+		{
+			"id": "devEnvironment",
+			"type": "promptString",
+			"description": "Lua Dev Enviroment name"
+		}
+	]
+}
