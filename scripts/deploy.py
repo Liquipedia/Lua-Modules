@@ -51,9 +51,9 @@ def main():
     all_modules_deployed = True
     lua_files: Iterable[pathlib.Path]
     git_deploy_reason: str
-    assert (
-        os.getenv("LUA_DEV_ENV_NAME") is None
-        or os.getenv("LUA_DEV_ENV_NAME") != "/dev/"
+    assert os.getenv("LUA_DEV_ENV_NAME") is None or (
+        os.getenv("LUA_DEV_ENV_NAME") != "/dev/"
+        and os.getenv("LUA_DEV_ENV_NAME").startswith("/dev/")
     ), f"Invalid dev environment: {os.getenv('LUA_DEV_ENV_NAME')}"
     if len(sys.argv[1:]) == 0 and os.getenv("LUA_DEV_ENV_NAME") is None:
         lua_files = pathlib.Path("./lua/wikis/").rglob("*.lua")
