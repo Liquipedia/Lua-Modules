@@ -19,6 +19,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local DEFAULT_SIZE = 50
 local FILLER_IMAGE = 'Logo filler event.png'
 local NO_ICON_BUT_ICONDARK_TRACKING_CATEGORY = 'Pages with only icondark'
 
@@ -43,7 +44,7 @@ local NO_ICON_BUT_ICONDARK_TRACKING_CATEGORY = 'Pages with only icondark'
 function LeagueIcon.display(args)
 	local options = args.options or {}
 
-	local size = tonumber(args.size) or 50
+	local size = tonumber(args.size) or DEFAULT_SIZE
 	local iconDark = args.iconDark
 	local icon = args.icon
 	local trackingCategory = ''
@@ -62,7 +63,7 @@ function LeagueIcon.display(args)
 
 	--if icon and iconDark are not given and can not be retrieved return filler icon
 	if String.isEmpty(icon) and String.isEmpty(iconDark) then
-		return tostring(LeagueIcon._generateWikiCode(FILLER_IMAGE, '', nil, 50))
+		return tostring(LeagueIcon._generateWikiCode(FILLER_IMAGE, '', nil, DEFAULT_SIZE))
 	end
 
 	if String.isEmpty(icon) then
@@ -240,13 +241,13 @@ function LeagueIcon._generateTemplateCode(icon, iconDark, link, name)
 	local linkOption = '{{{1|{{{link|' .. link .. '}}}}}}'
 	local nameOption = '{{{name|{{{1|{{{link|' .. name .. '}}}}}}}}}'
 	if String.isEmpty(iconDark) or icon == iconDark then
-		return tostring(LeagueIcon._generateWikiCode(icon, linkOption, nameOption, 50))
+		return tostring(LeagueIcon._generateWikiCode(icon, linkOption, nameOption, DEFAULT_SIZE))
 			.. '<!--\n--><noinclude>[[Category:Small League Icon Templates]]</noinclude>'
 	end
 	---@cast iconDark -nil
-	return tostring(LeagueIcon._generateWikiCode(icon, linkOption, nameOption, 50, 'lightmode'))
+	return tostring(LeagueIcon._generateWikiCode(icon, linkOption, nameOption, DEFAULT_SIZE, 'lightmode'))
 		.. '<!--\n-->'
-		.. tostring(LeagueIcon._generateWikiCode(iconDark, linkOption, nameOption, 50, 'darkmode'))
+		.. tostring(LeagueIcon._generateWikiCode(iconDark, linkOption, nameOption, DEFAULT_SIZE, 'darkmode'))
 		.. '<!--\n--><noinclude>[[Category:Small League Icon Templates]]</noinclude>'
 end
 
