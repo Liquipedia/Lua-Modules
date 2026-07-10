@@ -125,7 +125,7 @@ function LeagueIcon._generateWikiCode(icon, link, name, size, additionalClasses)
 			imageLight = icon,
 			link = link,
 			caption = Logic.emptyOr(name, link),
-			size .. 'x' .. size .. 'px'
+			size = size .. 'x' .. size .. 'px'
 		}
 	}
 end
