@@ -34,7 +34,7 @@ class LiquipediaMapper:
             flow.response = http.Response.make(
                 HTTPStatus.OK,
                 f.read(),
-                {"Content-Type": "text/css; charset=utf-8"},
+                {"Content-Type": "text/javascript; charset=utf-8"},
             )
             flow.response.headers["Via"] = (
                 f"{flow.response.http_version} LiquipediaMapper"
