@@ -76,5 +76,5 @@ return Class.export(PlayerDisplay, {exports = {
 	'BlockPlayer',
 	'InlinePlayer',
 	'Flag',
-	'TemplateInlinePlayer',
+	'InlinePlayerByProps',
 }})
