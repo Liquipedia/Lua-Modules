@@ -53,7 +53,7 @@ function WikiCopyPaste.getStandardMatchCode(bestof, mode, index, opponents, args
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
 		end),
 		bestof ~= 0 and Array.map(Array.range(1, bestof), function(mapIndex)
-			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|team1side=|team2side= |date=|finished=|vod=}}'
+			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|team1side=|team2side=|winner=|vod=}}'
 		end) or nil,
 		INDENT .. '}}'
 	)
