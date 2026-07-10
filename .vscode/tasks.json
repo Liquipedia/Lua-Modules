@@ -4,12 +4,9 @@
 		{
 			"label": "Launch proxy",
 			"type": "process",
-			"command": "${workspaceFolder}/venv/bin/mitmproxy",
-			"windows": {
-				"command": "${workspaceFolder}/venv/Scripts/mitmproxy.exe"
-			},
+			"command": "${command:python.interpreterPath}",
 			"args": [
-				"-s scripts/proxy_lp.py"
+				"scripts${/}proxy_lp.py"
 			],
 			"isBackground": true,
 			"presentation": {
@@ -17,7 +14,7 @@
 				"panel": "dedicated"
 			},
 			"problemMatcher": [],
-			"detail": "mitmproxy -s scripts/proxy_lp.py",
+			"detail": "python3 scripts/proxy_lp.py",
 			"runOptions": {
 				"instanceLimit": 1,
 				"instancePolicy": "terminateOldest"
