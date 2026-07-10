@@ -68,7 +68,7 @@ def main():
                         "diff",
                         "--name-only",
                         "--diff-filter=d",
-                        "main",
+                        os.getenv("LUA_DEV_BASE_REF") or "main",
                         "lua/wikis/*",
                     ]
                 )

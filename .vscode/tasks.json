@@ -14,7 +14,8 @@
 			],
 			"options": {
 				"env": {
-					"LUA_DEV_ENV_NAME": "/dev/${input:devEnvironment}"
+					"LUA_DEV_ENV_NAME": "/dev/${input:devEnvironment}",
+					"LUA_DEV_BASE": "${input:devBaseRef}"
 				}
 			},
 			"problemMatcher": []
@@ -31,7 +32,8 @@
 			],
 			"options": {
 				"env": {
-					"LUA_DEV_ENV_NAME": "/dev/${input:devEnvironment}"
+					"LUA_DEV_ENV_NAME": "/dev/${input:devEnvironment}",
+					"LUA_DEV_BASE_REF": "${input:devBaseRef}"
 				}
 			},
 			"problemMatcher": []
@@ -42,6 +44,12 @@
 			"id": "devEnvironment",
 			"type": "promptString",
 			"description": "Lua Dev Enviroment name"
+		},
+		{
+			"id": "devBaseRef",
+			"type": "promptString",
+			"description": "Base ref to compare against for dev deployment",
+			"default": "main"
 		}
 	]
 }
