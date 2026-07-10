@@ -12,7 +12,10 @@ class LiquipediaMapper:
             and "skin=lakesideview" not in flow.request.pretty_url
         ):
             self.__serve_local_css_resource(flow)
-        elif "only=scripts" in flow.request.pretty_url:
+        elif (
+            "only=scripts" in flow.request.pretty_url
+            and "skin=lakesideview" not in flow.request.pretty_url
+        ):
             self.__serve_local_js_resource(flow)
 
     def __serve_local_css_resource(self, flow: http.HTTPFlow):
