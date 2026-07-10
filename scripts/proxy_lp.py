@@ -1,6 +1,3 @@
-import logging
-import subprocess
-
 from http import HTTPStatus
 from mitmproxy import http
 
@@ -19,16 +16,6 @@ class LiquipediaMapper:
             self.__build_js_resource(flow)
 
     def __build_css_resource(self, flow: http.HTTPFlow):
-        try:
-            logging.info(
-                subprocess.check_output(
-                    ["npm", "run", "build:css"], stderr=subprocess.STDOUT
-                ).decode()
-            )
-            logging.info("Successfully compiled stylesheet")
-        except subprocess.SubprocessError as e:
-            logging.exception(e)
-            return
         with open("lua/output/css/main.css", "rb") as f:
             flow.response = http.Response.make(
                 HTTPStatus.OK,
@@ -37,16 +24,6 @@ class LiquipediaMapper:
             )
 
     def __build_js_resource(self, flow: http.HTTPFlow):
-        try:
-            logging.info(
-                subprocess.check_output(
-                    ["node", "build-js.js"], stderr=subprocess.STDOUT
-                ).decode()
-            )
-            logging.info("Successfully compiled javascript")
-        except subprocess.SubprocessError as e:
-            logging.exception(e)
-            return
         with open("lua/output/js/main.js", "rb") as f:
             flow.response = http.Response.make(
                 HTTPStatus.OK,
