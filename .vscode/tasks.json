@@ -15,7 +15,7 @@
 			"options": {
 				"env": {
 					"LUA_DEV_ENV_NAME": "/dev/${input:devEnvironment}",
-					"LUA_DEV_BASE": "${input:devBaseRef}"
+					"LUA_DEV_BASE_REF": "${input:devBaseRef}"
 				}
 			},
 			"problemMatcher": []
