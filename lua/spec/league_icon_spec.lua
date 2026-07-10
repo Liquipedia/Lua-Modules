@@ -1,16 +1,16 @@
 --- Triple Comment to Enable our LLS Plugin
 local LeagueIcon = require('Module:LeagueIcon')
 
-local FILLER_EXPECT = '<span class="league-icon-small-image">[[File:Logo filler event.png|link=]]</span>'
-local ICON_DARK_EXPECT = '<span class="league-icon-small-image">[[File:DarkIcon.png|link=|50x50px]]</span>'
+local FILLER_EXPECT = '<span class="league-icon-small-image">[[File:Logo filler event.png|50x50px|link=]]</span>'
+local ICON_DARK_EXPECT = '<span class="league-icon-small-image">[[File:DarkIcon.png|50x50px|link=]]</span>'
 
 local ICON_BOTH_EXPECT =
-	'<span class="league-icon-small-image lightmode">[[File:LightIcon.png|link=|50x50px]]</span>' ..
-	'<span class="league-icon-small-image darkmode">[[File:DarkIcon.png|link=|50x50px]]</span>'
-local ICON_WITH_LINK_EXPECT = '<span class="league-icon-small-image">[[File:Icon.png|link=link|name|50x50px]]</span>'
+	'<span class="league-icon-small-image lightmode">[[File:LightIcon.png|50x50px|link=]]</span>' ..
+	'<span class="league-icon-small-image darkmode">[[File:DarkIcon.png|50x50px|link=]]</span>'
+local ICON_WITH_LINK_EXPECT = '<span class="league-icon-small-image">[[File:Icon.png|50x50px|link=link|name]]</span>'
 local ICON_WITH_LINK_BOTH_EXPECT =
-	'<span class="league-icon-small-image lightmode">[[File:LightIcon.png|link=link|name|50x50px]]</span>' ..
-	'<span class="league-icon-small-image darkmode">[[File:DarkIcon.png|link=link|name|50x50px]]</span>'
+	'<span class="league-icon-small-image lightmode">[[File:LightIcon.png|50x50px|link=link|name]]</span>' ..
+	'<span class="league-icon-small-image darkmode">[[File:DarkIcon.png|50x50px|link=link|name]]</span>'
 
 insulate('LeagueIcon.display', function()
 	local AddCategorySpy

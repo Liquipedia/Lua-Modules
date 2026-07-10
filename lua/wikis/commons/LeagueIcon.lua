@@ -16,6 +16,7 @@ local String = Lua.import('Module:StringUtils')
 
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local FILLER_IMAGE = 'Logo filler event.png'
@@ -61,7 +62,7 @@ function LeagueIcon.display(args)
 
 	--if icon and iconDark are not given and can not be retrieved return filler icon
 	if String.isEmpty(icon) and String.isEmpty(iconDark) then
-		return tostring(LeagueIcon._generateWikiCode(FILLER_IMAGE, ''))
+		return tostring(LeagueIcon._generateWikiCode(FILLER_IMAGE, '', nil, 50))
 	end
 
 	if String.isEmpty(icon) then
@@ -112,22 +113,18 @@ end
 ---@private
 ---@param icon string
 ---@param link string
----@param name string?
----@param size number?
+---@param name string|nil
+---@param size number
 ---@param additionalClasses string|string[]?
 ---@return HtmlNode
 function LeagueIcon._generateWikiCode(icon, link, name, size, additionalClasses)
 	return Html.Span{
 		classes = Array.extend('league-icon-small-image', additionalClasses),
-		children = {
-			'[[',
-			table.concat(Array.extend(
-				'File:' .. icon,
-				'link=' .. link,
-				Logic.emptyOr(name, link),
-				size and (size .. 'x' .. size .. 'px') or nil
-			), '|'),
-			']]'
+		children = IconImage{
+			imageLight = icon,
+			link = link,
+			caption = Logic.emptyOr(name, link),
+			size .. 'x' .. size .. 'px'
 		}
 	}
 end
