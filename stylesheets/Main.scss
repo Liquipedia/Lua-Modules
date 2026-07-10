@@ -91,7 +91,16 @@ body {
 }
 
 /* Styles that are not yet part of this repository, but used in snapshot tests */
-/** Disabled to serve as test ground for LH base styles
+
+/** Definitely still needed */
+/** For image alignment, especially in transfer rows */
+img {
+	vertical-align: middle;
+	border-style: unset;
+}
+
+/** Reevaluate whether still needed: 
+    Disabled to serve as test ground for LH base styles
 :root {
 	--clr-moon-40: #666666;
 
@@ -115,7 +124,6 @@ body {
 	--clr-on-surface-light-primary-8: rgba( 0, 0, 0, 0.08 );
 	--clr-on-surface-light-primary-12: rgba( 0, 0, 0, 0.12 );
 
-	--clr-wiki-primary-container: #e2e2e6;
 	--clr-wiki-theme-primary: var( --clr-moon-40 );
 }
 
@@ -131,11 +139,6 @@ a {
 	text-decoration: none;
 	color: var( --clr-primary );
 	background-color: transparent;
-}
-
-img {
-	vertical-align: middle;
-	border-style: unset;
 }
 
 .main-container .main-content-column {
