@@ -13,6 +13,7 @@ local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
+local Table = Lua.import('Module:Table')
 
 local BlockPlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Block')
 local InlinePlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Inline')
@@ -42,7 +43,9 @@ end
 ---showLink: string|boolean?, showRace: string|boolean?, showFaction: string|boolean?, game: string?}
 ---@return VNode
 function PlayerDisplay.InlinePlayerByProps(props)
-	local player = Opponent.readSinglePlayerArgs(props)
+	-- needed for aoe faction lookups
+	local game = props.game and Game.abbreviation{game = props.game}:lower() or nil
+	local player = Opponent.readSinglePlayerArgs(Table.merge(props, {game = game}))
 
 	PlayerExt.syncPlayer(player, {
 		date = props.date,
@@ -59,8 +62,7 @@ function PlayerDisplay.InlinePlayerByProps(props)
 		showFlag = Logic.readBoolOrNil(props.showFlag),
 		showLink = Logic.readBoolOrNil(props.showLink),
 		showFaction = Logic.nilOr(Logic.readBoolOrNil(props.showRace), Logic.readBoolOrNil(props.showFaction)),
-		-- needed for aoe faction lookups
-		game = props.game and Game.abbreviation{game = props.game}:lower() or nil,
+		game = game,
 	}
 end
 
