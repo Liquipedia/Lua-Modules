@@ -12,15 +12,14 @@ local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Placement = Lua.import('Module:PrizePool/Placement')
-local TournamentStructure = Lua.import('Module:TournamentStructure')
-
-local Opponent = Lua.import('Module:Opponent/Custom')
 
 local AUTOMATION_START_DATE = '2023-01-01'
 local GROUPSCORE_DELIMITER = '/'
