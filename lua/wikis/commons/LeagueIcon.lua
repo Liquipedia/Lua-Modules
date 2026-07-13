@@ -8,13 +8,20 @@
 local Lua = require('Module:Lua')
 
 local LeagueIcon = {}
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Template = Lua.import('Module:Template')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 
-local FILLER = '<span class="league-icon-small-image">[[File:Logo filler event.png|link=]]</span>'
-local NO_ICON_BUT_ICONDARK_TRACKING_CATEGORY = '[[Category:Pages with only icondark]]'
+local Html = Lua.import('Module:Widget/Html')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
+local DEFAULT_SIZE = 50
+local FILLER_IMAGE = 'Logo filler event.png'
+local NO_ICON_BUT_ICONDARK_TRACKING_CATEGORY = 'Pages with only icondark'
 
 ---@class LeagueIconDisplayArgs
 ---@field icon string?
@@ -37,26 +44,26 @@ local NO_ICON_BUT_ICONDARK_TRACKING_CATEGORY = '[[Category:Pages with only icond
 function LeagueIcon.display(args)
 	local options = args.options or {}
 
-	local size = tonumber(args.size) or 50
+	local size = tonumber(args.size) or DEFAULT_SIZE
 	local iconDark = args.iconDark
 	local icon = args.icon
 	local trackingCategory = ''
 	if not Logic.readBool(options.noTemplate) and String.isEmpty(icon) and String.isEmpty(iconDark) then
-		local stringOfExpandedTemplate = LeagueIcon.getTemplate({
+		local stringOfExpandedTemplate = LeagueIcon.getTemplate{
 			series = args.series,
 			abbreviation = args.abbreviation,
 			date = args.date
-		})
-		icon, iconDark, trackingCategory = LeagueIcon.getIconFromTemplate({
+		}
+		icon, iconDark, trackingCategory = LeagueIcon.getIconFromTemplate{
 			icon = icon,
 			iconDark = iconDark,
 			stringOfExpandedTemplate = stringOfExpandedTemplate
-		})
+		}
 	end
 
 	--if icon and iconDark are not given and can not be retrieved return filler icon
 	if String.isEmpty(icon) and String.isEmpty(iconDark) then
-		return FILLER
+		return tostring(LeagueIcon._generateWikiCode(FILLER_IMAGE, '', nil, DEFAULT_SIZE))
 	end
 
 	if String.isEmpty(icon) then
@@ -76,9 +83,13 @@ function LeagueIcon.display(args)
 	else
 		link = args.link or args.series or args.abbreviation or args.name or ''
 	end
-	return LeagueIcon._make(icon, iconDark, link, args.name, size) .. trackingCategory
+	if String.isNotEmpty(trackingCategory) then
+		mw.ext.TeamLiquidIntegration.add_category(trackingCategory)
+	end
+	return LeagueIcon._make(icon, iconDark, link, args.name, size)
 end
 
+---@private
 ---@param icon string
 ---@param iconDark string
 ---@param link string
@@ -91,21 +102,32 @@ function LeagueIcon._make(icon, iconDark, link, name, size)
 	icon = string.gsub(icon, '^File:', '')
 	iconDark = string.gsub(iconDark, '^File:', '')
 
-	local imageOptions = '|link=' .. link .. '|' .. (name or link) .. '|' .. size .. 'x' .. size .. 'px]]'
-
 	if icon == iconDark then
-		return tostring(mw.html.create('span')
-		:addClass('league-icon-small-image')
-		:wikitext('[[File:' .. icon .. imageOptions))
+		return tostring(LeagueIcon._generateWikiCode(icon, link, name, size))
 	end
 
-	local lightSpan = mw.html.create('span')
-		:addClass('league-icon-small-image lightmode')
-		:wikitext('[[File:' .. icon .. imageOptions)
-	local darkSpan = mw.html.create('span')
-		:addClass('league-icon-small-image darkmode')
-		:wikitext('[[File:' .. iconDark .. imageOptions)
+	local lightSpan = LeagueIcon._generateWikiCode(icon, link, name, size, 'lightmode')
+	local darkSpan = LeagueIcon._generateWikiCode(iconDark, link, name, size, 'darkmode')
 	return tostring(lightSpan) .. tostring(darkSpan)
+end
+
+---@private
+---@param icon string
+---@param link string
+---@param name string|nil
+---@param size number
+---@param additionalClasses string|string[]?
+---@return HtmlNode
+function LeagueIcon._generateWikiCode(icon, link, name, size, additionalClasses)
+	return Html.Span{
+		classes = Array.extend('league-icon-small-image', additionalClasses),
+		children = IconImage{
+			imageLight = icon,
+			link = link,
+			caption = Logic.emptyOr(name, link),
+			size = size .. 'x' .. size .. 'px'
+		}
+	}
 end
 
 ---Retrieve icon and iconDark from LeagueIconSmall templates
@@ -190,48 +212,52 @@ end
 --generate copy paste code for new LeagueIconSmall templates
 --to be used with a form
 ---@param args LeagueIconGenerateArgs
----@return string
+---@return Renderable
 function LeagueIcon.generate(args)
 	local link = args.link or args.series
-	if String.isEmpty(link) then
-		error('No series/link specified')
-	end
+	assert(String.isNotEmpty(link), 'No series/link specified')
+	---@cast link -nil
 	local name = args.name or link
 
 	local icon = args.icon
-	if String.isEmpty(icon) then
-		error('No icon file specified')
+	assert(String.isNotEmpty(icon), 'No icon file specified')
+
+	return Html.Fragment{children = WidgetUtil.collect(
+		Html.Pre{
+			classes = {'selectall'},
+			children = {mw.text.nowiki(LeagueIcon._generateTemplateCode(icon, args.iconDark, link, name))}
+		},
+		LeagueIcon._buildLinkToTemplate(args)
+	)}
+end
+
+---@private
+---@param icon string
+---@param iconDark string?
+---@param link string
+---@param name string
+---@return string
+function LeagueIcon._generateTemplateCode(icon, iconDark, link, name)
+	local linkOption = '{{{1|{{{link|' .. link .. '}}}}}}'
+	local nameOption = '{{{name|{{{1|{{{link|' .. name .. '}}}}}}}}}'
+	if String.isEmpty(iconDark) or icon == iconDark then
+		return tostring(LeagueIcon._generateWikiCode(icon, linkOption, nameOption, DEFAULT_SIZE))
+			.. '<!--\n--><noinclude>[[Category:Small League Icon Templates]]</noinclude>'
 	end
-	local iconDark = args.iconDark or icon
-
-	local imageOptions = '|link={{{1|{{{link|' .. link .. '}}}}}}|{{{name|{{{1|{{{link|' .. name .. '}}}}}}}}}|50x50px]]'
-
-	if icon == iconDark then
-		return '<pre class="selectall" width=50%>' .. mw.text.nowiki(
-			'<span class="league-icon-small-image">' ..
-			'[[File:' .. icon .. imageOptions .. '</span><!--\n' ..
-			'--><noinclude>[[Category:Small League Icon Templates]]</noinclude>') .. '</pre>'
-			.. LeagueIcon._buildLinkToTemplate(args)
-	end
-
-	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(
-		'<span class="league-icon-small-image lightmode">' ..
-		'[[File:' .. icon .. imageOptions .. '</span><!--\n' ..
-		'--><span class="league-icon-small-image darkmode">' ..
-		'[[File:' .. iconDark .. imageOptions .. '</span><!--\n' ..
-		'--><noinclude>[[Category:Small League Icon Templates]]</noinclude>') .. '</pre>'
-		.. LeagueIcon._buildLinkToTemplate(args)
+	---@cast iconDark -nil
+	return tostring(LeagueIcon._generateWikiCode(icon, linkOption, nameOption, DEFAULT_SIZE, 'lightmode'))
+		.. '<!--\n-->'
+		.. tostring(LeagueIcon._generateWikiCode(iconDark, linkOption, nameOption, DEFAULT_SIZE, 'darkmode'))
+		.. '<!--\n--><noinclude>[[Category:Small League Icon Templates]]</noinclude>'
 end
 
 --generate copy paste code for new historical LeagueIconSmall templates
 --to be used with a form
 ---@param args table
----@return string
+---@return HtmlNode
 function LeagueIcon.generateHistorical(args)
 	local title = args.title or args.series
-	if String.isEmpty(title) then
-		error('No template title specified')
-	end
+	assert(String.isNotEmpty(title), 'No template title specified')
 	local link = args.link or title
 	local name = args.name or link
 	local timeName = title:lower() .. 'time'
@@ -272,20 +298,31 @@ function LeagueIcon.generateHistorical(args)
 	end
 	comparisons = '-->{{#ifexpr:' .. comparisons
 
-	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(
-			defineTime .. comparisons .. '--><noinclude>[[Category:Historical Small League Icon template]]</noinclude>'
-		) .. '</pre>' .. LeagueIcon._buildLinkToTemplate(args)
+	return Html.Fragment{children = WidgetUtil.collect(
+		Html.Pre{
+			classes = {'selectall'},
+			children = {mw.text.nowiki(
+				defineTime .. comparisons .. '--><noinclude>[[Category:Historical Small League Icon template]]</noinclude>'
+			)}
+		},
+		LeagueIcon._buildLinkToTemplate(args)
+	)}
 end
 
+---@private
 ---@param args {templateName: string?, wiki: string?}
----@return string
+---@return Renderable[]?
 function LeagueIcon._buildLinkToTemplate(args)
 	if String.isEmpty(args.templateName) or String.isEmpty(args.wiki) then
-		return ''
+		return
 	end
 
-	return '<br><b>Link to the template page:</b> [[' .. args.wiki ..
-		':Template:LeagueIconSmall/' .. args.templateName:lower() .. ']]'
+	return {
+		Html.Br{},
+		Html.B{children = {'Link to the template page:'}},
+		' ',
+		Link{link = args.wiki .. ':Template:LeagueIconSmall/' .. args.templateName:lower()}
+	}
 end
 
 return Class.export(LeagueIcon, {frameOnly = true, exports = {

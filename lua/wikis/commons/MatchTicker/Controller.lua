@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:MatchTicker
+-- page=Module:MatchTicker/Controller
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -8,13 +8,10 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
-local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
-local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
@@ -25,10 +22,7 @@ local MatchUtil = Lua.import('Module:Match/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Tournament = Lua.import('Module:Tournament')
 
-local Html = Lua.import('Module:Widget/Html')
-local MatchCard = Lua.import('Module:Widget/Match/Card')
-local Carousel = Lua.import('Module:Widget/Basic/Carousel')
-local Switch = Lua.import('Module:Widget/Switch')
+local MatchTickerWrapper = Lua.import('Module:Widget/Match/Ticker/Wrapper')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -37,7 +31,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local DEFAULT_QUERY_COLUMNS = {
+local QUERY_COLUMNS = {
 	'match2opponents',
 	'winner',
 	'pagename',
@@ -69,7 +63,6 @@ local DEFAULT_LIMIT = 20
 local DEFAULT_ORDER = 'date asc, liquipediatier asc, tournament asc'
 local DEFAULT_RECENT_ORDER = 'date desc, liquipediatier asc, tournament asc'
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
-local TABLE_OF_CONTENTS = '__TOC__'
 
 ---@class MatchTickerConfig
 ---@field tournaments string[]
@@ -78,7 +71,6 @@ local TABLE_OF_CONTENTS = '__TOC__'
 ---@field player string?
 ---@field teamPages string[]?
 ---@field hideTournament boolean
----@field queryColumns string[]
 ---@field additionalConditions string
 ---@field recent boolean
 ---@field upcoming boolean
@@ -97,26 +89,36 @@ local TABLE_OF_CONTENTS = '__TOC__'
 ---@field variant 'vertical' | 'horizontal'
 ---@field featuredOnly boolean?
 ---@field displayGameIcons boolean?
+---@field header Renderable?
 
 ---@class MatchTickerGameData
----@field asGame boolean?
 ---@field gameIds number[]
 ---@field map string?
 ---@field mapDisplayName string?
 
----@class MatchTicker
----@operator call(table): MatchTicker
----@field args table
----@field config MatchTickerConfig
----@field matches table[]?
-local MatchTicker = Class.new(function(self, args) self:init(args) end)
+local MatchTickerController = {}
 
 ---@param args table?
----@return table
-function MatchTicker:init(args)
-	args = args or {}
-	self.args = args
+---@return Renderable?
+function MatchTickerController.makeMatchTicker(args)
+	local config = MatchTickerController.parseConfig(args or {})
+	local matches = MatchTickerController.fetchMatches(config)
+	return MatchTickerWrapper{
+		matches = matches,
+		header = config.header,
+		showInfoForEmptyResults = config.showInfoForEmptyResults,
+		wrapperClasses = config.wrapperClasses,
+		hideTournament = config.hideTournament,
+		displayGameIcons = config.displayGameIcons,
+		onlyHighlightOnValue = config.onlyHighlightOnValue,
+		variant = config.variant
+	}
+end
 
+---@private
+---@param args table
+---@return MatchTickerConfig
+function MatchTickerController.parseConfig(args)
 	local hasOpponent = Logic.isNotEmpty(args.player or args.team)
 
 	local config = {
@@ -128,7 +130,6 @@ function MatchTicker:init(args)
 		limit = tonumber(args.limit) or DEFAULT_LIMIT,
 		order = args.order or (Logic.readBool(args.recent) and DEFAULT_RECENT_ORDER or DEFAULT_ORDER),
 		player = args.player and mw.ext.TeamLiquidIntegration.resolve_redirect(args.player):gsub(' ', '_') or nil,
-		queryColumns = args.queryColumns or DEFAULT_QUERY_COLUMNS,
 		additionalConditions = args.additionalConditions or '',
 		recent = Logic.readBool(args.recent),
 		upcoming = Logic.readBool(args.upcoming),
@@ -153,6 +154,7 @@ function MatchTicker:init(args)
 		featuredOnly = Logic.readBool(args.featuredOnly),
 		displayGameIcons = Logic.readBool(args.displayGameIcons),
 		variant = Logic.readBool(args.entityStyle) and 'horizontal' or 'vertical',
+		header = args.header,
 	}
 
 	--min 1 of them has to be set; recent can not be set while any of the others is set
@@ -196,53 +198,57 @@ function MatchTicker:init(args)
 	end
 	config.wrapperClasses = wrapperClasses
 
-	self.config = config
-
-	return self
+	return config
 end
 
 ---queries the matches and filters them for unwanted ones
----@param matches table?
----@return MatchTicker
-function MatchTicker:query(matches)
-	if not matches then
-		matches = {}
-		Lpdb.executeMassQuery('match2',
-			{
-				conditions = self:buildQueryConditions(),
-				order = self.config.order,
-				query = table.concat(self.config.queryColumns, ','),
-				limit = DEFAULT_LIMIT,
-			},
-			function(record)
-				record = self:parseMatch(record)
-				if not self:keepMatch(record) then
-					return
-				end
-				for _, match in ipairs(self:expandGamesOfMatch(record)) do
-					table.insert(matches, match)
-				end
-				if #matches >= self.config.limit then
-					return false
-				end
-			end,
-			DEFAULT_LIMIT * 20
-		)
+---@private
+---@param config MatchTickerConfig
+---@return {match: MatchGroupUtilMatch, gameData: MatchTickerGameData?}[]
+function MatchTickerController.fetchMatches(config)
+	local shouldFetchTournamentData = config.regions or config.featuredOnly
+	local matches = {}
+	Lpdb.executeMassQuery('match2',
+		{
+			conditions = MatchTickerController.buildQueryConditions(config),
+			order = config.order,
+			query = table.concat(QUERY_COLUMNS, ','),
+			limit = DEFAULT_LIMIT,
+		},
+		function(record)
+			local parsedMatch = MatchGroupUtil.matchFromRecord(record)
+			local tournamentData
+			if shouldFetchTournamentData then
+				tournamentData = MatchTickerController.fetchTournament(parsedMatch.parent)
+			end
+			if not MatchTickerController.keepMatch(parsedMatch, tournamentData, config) then
+				return
+			end
+			for _, match in ipairs(MatchTickerController.expandGamesOfMatch(parsedMatch, config)) do
+				table.insert(matches, match)
+			end
+			if #matches >= config.limit then
+				return false
+			end
+		end,
+		DEFAULT_LIMIT * 20
+	)
+
+	if type(matches[1]) ~= 'table' then
+		return {}
 	end
 
-	if type(matches[1]) == 'table' then
-		matches = self:sortMatches(matches)
-		matches = Array.sub(matches, 1, self.config.limit)
-		self.matches = Array.map(matches, function(match) return self:adjustMatch(match) end)
-		return self
-	end
+	MatchTickerController.sortMatches(matches, config)
+	matches = Array.sub(matches, 1, config.limit)
+	Array.forEach(matches, function(match) return MatchTickerController.adjustMatch(match, config) end)
 
-	return self
+	return matches
 end
 
+---@private
+---@param config MatchTickerConfig
 ---@return string
-function MatchTicker:buildQueryConditions()
-	local config = self.config
+function MatchTickerController.buildQueryConditions(config)
 	local conditions = ConditionTree(BooleanOperator.all)
 
 	if Table.isNotEmpty(config.tournaments) then
@@ -313,15 +319,15 @@ function MatchTicker:buildQueryConditions()
 		conditions:add(tierConditions)
 	end
 
-	conditions:add(self:dateConditions())
+	conditions:add(MatchTickerController.dateConditions(config))
 
 	return conditions:toString() .. config.additionalConditions
 end
 
+---@private
+---@param config MatchTickerConfig
 ---@return ConditionTree
-function MatchTicker:dateConditions()
-	local config = self.config
-
+function MatchTickerController.dateConditions(config)
 	local dateConditions = ConditionTree(BooleanOperator.all)
 
 	if config.onlyExact then
@@ -353,39 +359,28 @@ function MatchTicker:dateConditions()
 	return dateConditions:add{ConditionNode(ColumnName('date'), Comparator.gt, NOW)}
 end
 
----Overwritable per wiki decision
----@param match table
----@return table
-function MatchTicker:parseMatch(match)
-	match.opponents = Array.map(match.match2opponents, function(opponent, opponentIndex)
-		return MatchGroupUtil.opponentFromRecord(match, opponent, opponentIndex)
-	end)
-	if self.config.regions or self.config.featuredOnly then
-		match.tournamentData = MatchTicker.fetchTournament(match.parent)
-	end
-	return match
-end
-
-local previousMatchWasTbd
----Overwritable per wiki decision
----@param match table
+local previousMatchWasTbd = false
+---@private
+---@param match MatchGroupUtilMatch
+---@param tournamentData StandardTournament?
+---@param config MatchTickerConfig
 ---@return boolean
-function MatchTicker:keepMatch(match)
+function MatchTickerController.keepMatch(match, tournamentData, config)
 	if match.extradata and match.extradata.hidden then
 		return false
 	end
 	-- Remove matches with wrong region
-	if self.config.regions then
-		if not match.tournamentData then
+	if config.regions then
+		if not tournamentData then
 			return false
 		end
-		if not Table.includes(self.config.regions, match.tournamentData.region) then
+		if not Table.includes(config.regions, tournamentData.region) then
 			return false
 		end
 	end
 
-	if self.config.featuredOnly then
-		local matchIsInFeaturedTournament = match.tournamentData and match.tournamentData.featured
+	if config.featuredOnly then
+		local matchIsInFeaturedTournament = tournamentData and tournamentData.featured
 		local matchIsFeatured = match.extradata and match.extradata.featured
 		if not matchIsInFeaturedTournament and not matchIsFeatured then
 			return false
@@ -397,39 +392,34 @@ function MatchTicker:keepMatch(match)
 		return false
 	end
 
-	if not self.config.showAllTbdMatches then
+	if not config.showAllTbdMatches then
 		local isTbdMatch = Array.all(match.opponents, function(opponent)
 			return Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)
 		end)
-		local toss = isTbdMatch and previousMatchWasTbd
-		if isTbdMatch then
-			previousMatchWasTbd = true
-		else
-			previousMatchWasTbd = false
-		end
+		local throwAway = isTbdMatch and previousMatchWasTbd
+		previousMatchWasTbd = isTbdMatch
 
-		if toss == true then
-			return false
-		end
+		return not throwAway
 	end
 
 	return true
 end
 
----Overwritable per wiki decision
----@param match table
----@return table[]
-function MatchTicker:expandGamesOfMatch(match)
-	local config = self.config
-	if not match.match2games or #match.match2games < 2 then
-		return {match}
+---@private
+---@param match MatchGroupUtilMatch
+---@param config MatchTickerConfig
+---@return {match: MatchGroupUtilMatch, gameData: MatchTickerGameData?}[]
+function MatchTickerController.expandGamesOfMatch(match, config)
+	if not match.games or #match.games < 2 then
+		return {{match = match}}
 	end
 
-	if Array.all(match.match2games, function(game) return game.date == match.date end) then
-		return {match}
+	if Array.all(match.games, function(game) return game.date == match.date end) then
+		return {{match = match}}
 	end
 
-	local expandedGames = Array.map(match.match2games, function(game, gameIndex)
+	---@type {match: MatchGroupUtilMatch, gameData: MatchTickerGameData?}[]
+	local expandedGames = Array.map(match.games, function(game, gameIndex)
 		if config.recent and Logic.isEmpty(game.winner) then
 			return
 		end
@@ -447,177 +437,102 @@ function MatchTicker:expandGamesOfMatch(match)
 		end
 
 		local gameMatch = Table.copy(match)
-		gameMatch.match2games = {}
-		gameMatch.asGame = true
-		gameMatch.asGameIndexes = {gameIndex}
+		gameMatch.games = {}
 
 		gameMatch.winner = game.winner
 		gameMatch.date = game.date
-		gameMatch.map = game.map
 		gameMatch.vod = Logic.nilIfEmpty(game.vod) or match.vod
-		gameMatch.opponents = Array.map(match.match2opponents, function(opponent, opponentIndex)
+		gameMatch.opponents = Array.map(match.opponents, function(opponent, opponentIndex)
 			return MatchUtil.enrichGameOpponentFromMatchOpponent(opponent, game.opponents[opponentIndex])
 		end)
-		gameMatch.match2opponents = gameMatch.opponents
 		gameMatch.extradata = Table.merge(gameMatch.extradata, game.extradata)
-		return gameMatch
+		---@type MatchTickerGameData
+		local gameData = {
+			gameIds = {gameIndex},
+			map = game.map,
+			mapDisplayName = game.extradata and game.extradata.displayname
+		}
+		return {match = gameMatch, gameData = gameData}
 	end)
 
-	return Array.map(Array.groupAdjacentBy(expandedGames, Operator.property('date')), function (gameGroup)
-		if #gameGroup > 1 then
-			local lastIndexes = gameGroup[#gameGroup].asGameIndexes
-			table.insert(gameGroup[1].asGameIndexes, lastIndexes[#lastIndexes])
+	return Array.map(
+		Array.groupAdjacentBy(
+			expandedGames,
+			function(gameAsMatch) return gameAsMatch.match.date end
+		),
+		function (gameGroup)
+			if #gameGroup > 1 then
+				local lastIds = gameGroup[#gameGroup].gameData.gameIds
+				table.insert(gameGroup[1].gameData.gameIds, lastIds[#lastIds])
+			end
+
+			return {match = gameGroup[1].match, gameData = gameGroup[1].gameData}
 		end
-
-		return gameGroup[1]
-	end)
+	)
 end
 
----Overwritable per wiki decision
----@param matches table[]
----@return table[]
-function MatchTicker:sortMatches(matches)
-	local reverse = self.config.recent and true or false
-	return Array.sortBy(matches, FnUtil.identity, function (a, b)
-		if a.date ~= b.date then
+---@private
+---@param matches {match: MatchGroupUtilMatch, gameData: MatchTickerGameData?}[]
+---@param config MatchTickerConfig
+function MatchTickerController.sortMatches(matches, config)
+	local reverse = config.recent and true or false
+	Array.sortInPlaceBy(matches, FnUtil.identity, function (a, b)
+		local aDate, bDate = a.match.date, b.match.date
+		if aDate ~= bDate then
 			if reverse then
-				return a.date > b.date
+				return aDate > bDate
 			end
-			return b.date > a.date
+			return bDate > aDate
 		end
-		if a.match2id ~= b.match2id then
-			return a.match2id < b.match2id
+		if a.match.matchId ~= b.match.matchId then
+			return a.match.matchId < b.match.matchId
 		end
-		return ((a.asGameIndexes or {})[1] or 0) < ((b.asGameIndexes or {})[1] or 0)
+		return (((a.gameData or {}).gameIds or {})[1] or 0) < (((b.gameData or {}).gameIds or {})[1] or 0)
 	end)
 end
 
 --- Will only switch if enteredOpponentOnLeft is enabled AND there are exactly 2 opponents
----@param match table
----@return table
-function MatchTicker:adjustMatch(match)
-	if not self.config.enteredOpponentOnLeft or #match.opponents ~= 2 then
-		return match
-	end
-
-	local opponentNames = Array.extend({self.config.player}, self.config.teamPages)
-	if
-		--check for the name value
-		Table.includes(opponentNames, ((match.opponents[2].name or ''):gsub(' ', '_')))
-		--check inside match2players too for the player value
-		or self.config.player and Table.any(match.opponents[2].players, function(_, playerData)
-			return (playerData.pageName or ''):gsub(' ', '_') == self.config.player end)
-	then
-		return MatchTicker.switchOpponents(match)
-	end
-
-	return match
-end
-
---- Will only switch if there are exactly 2 opponents
----@param match table
----@return table
-function MatchTicker.switchOpponents(match)
-	if #match.opponents ~= 2 then
-		return match
-	end
-	local winner = tonumber(match.winner) or 0
-	match.winner = winner == 1 and 2
-		or winner == 2 and 1
-		or match.winner
-
-	match.match2opponents[1], match.match2opponents[2] = match.match2opponents[2], match.match2opponents[1]
-	match.opponents[1], match.opponents[2] = match.opponents[2], match.opponents[1]
-
-	return match
-end
-
---- Fetches region of a tournament
----@param tournamentPage string
----@return StandardTournament?
-MatchTicker.fetchTournament = FnUtil.memoize(function(tournamentPage)
-	return Tournament.getTournament(tournamentPage)
-end)
-
-local function HorizontalLayout(matchCards, config)
-	local carousel = Carousel{
-		children = matchCards,
-		itemWidth = '12.5rem',
-		gap = '0.5rem',
-	}
-
-	return Html.Div{
-		css = {['margin-bottom'] = '1rem'},
-		children = {
-			Html.Div{
-				classes = {'mw-heading', 'mw-heading2'},
-				children = {
-					Html.H2{
-						css = {border = 'unset'},
-						children = I18n.translate('matchticker-upcoming-matches'),
-					},
-				},
-			},
-			Switch{
-				label = 'Show countdown',
-				switchGroup = 'countdown',
-				storeValue = true,
-				defaultActive = true,
-				css = {margin = '0.75rem 0 1rem'},
-				content = carousel,
-			},
-			Html.Div{
-				css = {['margin-top'] = '1rem'},
-				children = {
-					TABLE_OF_CONTENTS,
-				},
-			},
-		},
-	}
-end
-
----@param header Renderable?
----@return Renderable?
-function MatchTicker:create(header)
-	if not self.matches and not self.config.showInfoForEmptyResults then
+---@private
+---@param match {match: MatchGroupUtilMatch, gameData: MatchTickerGameData?}
+---@param config MatchTickerConfig
+function MatchTickerController.adjustMatch(match, config)
+	if not config.enteredOpponentOnLeft or #match.match.opponents ~= 2 then
 		return
 	end
 
-	if not self.matches or #self.matches == 0 then
-		return Html.Div{
-			classes = self.config.wrapperClasses,
-			css = {['text-align'] = 'center'},
-			children = Array.extend({header}, {'No Results found.'}),
-		}
+	local opponentNames = Array.extend({config.player}, config.teamPages)
+	if
+		--check for the name value
+		Table.includes(opponentNames, ((match.match.opponents[2].name or ''):gsub(' ', '_')))
+		--check inside match2players too for the player value
+		or config.player and Table.any(match.match.opponents[2].players, function(_, playerData)
+			return (playerData.pageName or ''):gsub(' ', '_') == config.player end)
+	then
+		MatchTickerController.switchOpponents(match)
 	end
-
-	local matchCards = Array.map(self.matches, function(match)
-		return MatchCard{
-			match = MatchGroupUtil.matchFromRecord(match),
-			hideTournament = self.config.hideTournament,
-			displayGameIcons = self.config.displayGameIcons,
-			onlyHighlightOnValue = self.config.onlyHighlightOnValue,
-			variant = self.config.variant == 'horizontal' and 'vertical' or nil,
-			gameData = {
-				asGame = match.asGame,
-				gameIds = match.asGameIndexes,
-				map = match.map,
-				mapDisplayName = match.extradata and match.extradata.displayname or nil
-			}
-		}
-	end)
-
-	if self.config.variant == 'vertical' then
-		return Html.Div{
-			classes = self.config.wrapperClasses,
-			children = Array.extend({header}, matchCards),
-		}
-	end
-
-	return Html.Div{
-		classes = self.config.wrapperClasses,
-		children = Array.extend({header}, HorizontalLayout(matchCards, self.config)),
-	}
 end
 
-return MatchTicker
+--- Will only switch if there are exactly 2 opponents
+---@private
+---@param match {match: MatchGroupUtilMatch, gameData: MatchTickerGameData?}
+function MatchTickerController.switchOpponents(match)
+	if #match.match.opponents ~= 2 then
+		return
+	end
+	local winner = tonumber(match.match.winner) or 0
+	match.match.winner = winner == 1 and 2
+		or winner == 2 and 1
+		or match.match.winner
+
+	match.match.opponents[1], match.match.opponents[2] = match.match.opponents[2], match.match.opponents[1]
+end
+
+--- Fetches region of a tournament
+---@private
+---@param tournamentPage string
+---@return StandardTournament?
+MatchTickerController.fetchTournament = FnUtil.memoize(function(tournamentPage)
+	return Tournament.getTournament(tournamentPage)
+end)
+
+return MatchTickerController

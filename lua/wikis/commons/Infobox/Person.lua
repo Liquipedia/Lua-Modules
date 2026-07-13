@@ -27,7 +27,7 @@ local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Earnings = Lua.import('Module:Earnings')
 local Flags = Lua.import('Module:Flags')
 local Links = Lua.import('Module:Links')
-local MatchTicker = Lua.import('Module:MatchTicker')
+local MatchTicker = Lua.import('Module:MatchTicker/Controller')
 local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
 
@@ -215,7 +215,7 @@ function Person:_createUpcomingMatches()
 
 	return Logic.tryCatch(
 		function()
-			local matchTicker = MatchTicker{
+			return MatchTicker.makeMatchTicker{
 				player = self.pagename,
 				limit = 5,
 				upcoming = true,
@@ -223,7 +223,6 @@ function Person:_createUpcomingMatches()
 				hideTournament = false,
 				entityStyle = true,
 			}
-			return matchTicker:query():create()
 		end,
 		function()
 			return nil

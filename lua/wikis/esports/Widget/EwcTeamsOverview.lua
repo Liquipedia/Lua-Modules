@@ -16,7 +16,7 @@ local Page = Lua.import('Module:Page')
 local Template = Lua.import('Module:Template')
 
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -165,29 +165,29 @@ function EwcTeamsOverview:render()
 			['font-size'] = '16px',
 		},
 		children = WidgetUtil.collect(
-			HtmlWidgets.Tr{
+			Html.Tr{
 				children = WidgetUtil.collect(
-					HtmlWidgets.Th{children = 'Team Name'},
-					HtmlWidgets.Th{children = ''},
-					HtmlWidgets.Th{children = HtmlWidgets.Abbr{title = 'Qualified to X/25 Tournaments', children = 'Q#'}},
-					HtmlWidgets.Th{children = HtmlWidgets.Abbr{title = 'Number of Teams', children = 'T#'}},
+					Html.Th{children = 'Team Name'},
+					Html.Th{children = ''},
+					Html.Th{children = Html.Abbr{title = 'Qualified to X/25 Tournaments', children = 'Q#'}},
+					Html.Th{children = Html.Abbr{title = 'Number of Teams', children = 'T#'}},
 					Array.map(gameData, function(game)
-						return HtmlWidgets.Th{
+						return Html.Th{
 							children = Template.expandTemplate(mw.getCurrentFrame(), 'LeagueIconSmall/' .. game.lis),
 						}
 					end)
 				)
 			},
 			Array.map(clubs, function(club)
-				return HtmlWidgets.Tr{
+				return Html.Tr{
 					children = WidgetUtil.collect(
-						HtmlWidgets.Td{
+						Html.Td{
 							children = OpponentDisplay.InlineTeamContainer{template = club.name},
 							css = {['text-align'] = 'left', ['text-wrap'] = 'nowrap'}
 						},
-						HtmlWidgets.Td{children = club.club and Template.safeExpand(mw.getCurrentFrame(), 'LeagueIconSmall/ewc') or nil},
-						HtmlWidgets.Td{children = (club.qualified or 0) .. '/' .. #gameData},
-						HtmlWidgets.Td{children = club.teams},
+						Html.Td{children = club.club and Template.safeExpand(mw.getCurrentFrame(), 'LeagueIconSmall/ewc') or nil},
+						Html.Td{children = (club.qualified or 0) .. '/' .. #gameData},
+						Html.Td{children = club.teams},
 						Array.map(gameData, function(game)
 							local background, sortValue, content
 							local orgInGame = club[game.lis]
@@ -204,7 +204,7 @@ function EwcTeamsOverview:render()
 								end), '&nbsp;')
 							end
 
-							return HtmlWidgets.Td{
+							return Html.Td{
 								classes = {background},
 								attributes = {['data-sort-value'] = sortValue or DEFAULT_ORDER_VALUE},
 								children = content

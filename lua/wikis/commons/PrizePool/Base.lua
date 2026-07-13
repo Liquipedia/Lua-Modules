@@ -28,14 +28,14 @@ local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local TableCell = TableWidgets.Cell
 local TableCellHeader = TableWidgets.CellHeader
 local TableRow = TableWidgets.Row
-local Div = HtmlWidgets.Div
-local Span = HtmlWidgets.Span
-local Hr = HtmlWidgets.Hr
+local Div = Html.Div
+local Span = Html.Span
+local Hr = Html.Hr
 local LabeledChevronToggle = Lua.import('Module:Widget/GeneralCollapsible/LabeledChevronToggle')
 local SwitchPill = Lua.import('Module:Widget/ContentSwitch/Pill')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -62,6 +62,8 @@ local EXCHANGE_SUMMARY_PRECISION = 5
 
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
+local PRIZE_TYPE_PLAYER_SHARE = 'PLAYER_SHARE'
+local PRIZE_TYPE_CLUB_SHARE = 'CLUB_SHARE'
 local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 local PRIZE_TYPE_POINTS = 'POINTS'
 local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
@@ -74,6 +76,12 @@ local OPPONENT_COLUMN_ALIGN = 'left'
 BasePrizePool.config = {
 	showBaseCurrency = {
 		default = false
+	},
+	playerShare = {
+		default = false,
+		read = function(args)
+			return Logic.readBoolOrNil(args.playershare)
+		end
 	},
 	autoExchange = {
 		default = true,
@@ -369,6 +377,47 @@ BasePrizePool.prizeTypes = {
 			end
 		end,
 	},
+	[PRIZE_TYPE_PLAYER_SHARE] = {
+		sortOrder = 22,
+		align = 'right',
+
+		headerDisplay = function (data)
+			return TableCellHeader{children = {data.title or 'Player Prize'}}
+		end,
+
+		--- The player share is a single pool-input-currency value; the per-currency
+		--- PLAYER_SHARE columns are derived from it later in _setSharesFromPlayerShare.
+		row = 'playershare',
+		rowParse = function (placement, input, context, index)
+			return BasePrizePool._parseInteger(input)
+		end,
+
+		rowDisplay = function (headerData, data)
+			if Logic.isNumeric(data) then
+				return TableCell{children = {
+					Currency.display(headerData.currency, data,
+						{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
+				}}
+			end
+		end,
+	},
+	[PRIZE_TYPE_CLUB_SHARE] = {
+		sortOrder = 24,
+		align = 'right',
+
+		headerDisplay = function (data)
+			return TableCellHeader{children = {data.title or 'Club Reward'}}
+		end,
+
+		rowDisplay = function (headerData, data)
+			if Logic.isNumeric(data) then
+				return TableCell{children = {
+					Currency.display(headerData.currency, data,
+						{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
+				}}
+			end
+		end,
+	},
 	[PRIZE_TYPE_FREETEXT] = {
 		sortOrder = 60,
 		align = 'left',
@@ -452,11 +501,54 @@ function BasePrizePool:create()
 				placement:_setBaseFromRewards(Array.filter(self.prizes, canConvertCurrency), BasePrizePool.prizeTypes)
 			end
 		end
+
+		if self.options.playerShare then
+			self:_buildShareColumns()
+		end
 	end
 
 	table.sort(self.prizes, BasePrizePool._comparePrizes)
 
 	return self
+end
+
+--- Adds a PLAYER_SHARE and CLUB_SHARE prize for USD and the pool's input currency, and
+--- derives each opponent's player/club amounts. Player share is a single-currency input, so
+--- shares are only derived for that input currency (the first local currency) and USD; any
+--- further local currencies are intentionally not split. Requires a player share input.
+---@protected
+function BasePrizePool:_buildShareColumns()
+	-- Currency order is built explicitly (USD-first) because self.prizes is not yet
+	-- sorted at this point in create(), so _getCurrencies() would not be USD-first.
+	local localPrizes = Array.filter(self.prizes, function(prize)
+		return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
+	end)
+	Array.sortInPlaceBy(localPrizes, function(prize) return prize.index end)
+	local inputPrize = localPrizes[1]
+
+	local currencyEntries = WidgetUtil.collect(
+		{code = BASE_CURRENCY, totalKey = PRIZE_TYPE_BASE_CURRENCY .. 1},
+		inputPrize and {code = inputPrize.data.currency, totalKey = inputPrize.id} or nil
+	)
+
+	local inputCode = inputPrize and inputPrize.data.currency or BASE_CURRENCY
+	local localData = inputPrize and inputPrize.data or nil
+	local roundPrecision = self.options.currencyRoundPrecision
+
+	Array.forEach(currencyEntries, function(entry, shareIndex)
+		self:addPrize(PRIZE_TYPE_PLAYER_SHARE, shareIndex,
+			{currency = entry.code, roundPrecision = roundPrecision})
+		self:addPrize(PRIZE_TYPE_CLUB_SHARE, shareIndex,
+			{currency = entry.code, roundPrecision = roundPrecision, title = Logic.emptyOr(self.args.clubshare)})
+	end)
+
+	local plan = Array.map(currencyEntries, function(entry, shareIndex)
+		return {shareIndex = shareIndex, code = entry.code, totalKey = entry.totalKey}
+	end)
+
+	Array.forEach(self.placements, function(placement)
+		placement:_setSharesFromPlayerShare(plan, inputCode, localData)
+	end)
 end
 
 ---@protected
@@ -602,7 +694,9 @@ end
 function BasePrizePool:_prizeCurrencyCode(prize)
 	if prize.type == PRIZE_TYPE_BASE_CURRENCY then
 		return BASE_CURRENCY
-	elseif prize.type == PRIZE_TYPE_LOCAL_CURRENCY then
+	elseif prize.type == PRIZE_TYPE_LOCAL_CURRENCY
+		or prize.type == PRIZE_TYPE_PLAYER_SHARE
+		or prize.type == PRIZE_TYPE_CLUB_SHARE then
 		return prize.data.currency
 	end
 	return nil

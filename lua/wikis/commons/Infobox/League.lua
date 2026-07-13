@@ -22,7 +22,7 @@ local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
-local MatchTicker = Lua.import('Module:MatchTicker')
+local MatchTicker = Lua.import('Module:MatchTicker/Controller')
 local MetadataGenerator = Lua.import('Module:MetadataGenerator')
 local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
@@ -357,7 +357,7 @@ function League:_createUpcomingMatches()
 
 	return Logic.tryCatch(
 		function()
-			local matchTicker = MatchTicker{
+			return MatchTicker.makeMatchTicker{
 				tournament = self.pagename,
 				limit = 5,
 				upcoming = true,
@@ -366,7 +366,6 @@ function League:_createUpcomingMatches()
 				queryByParent = true,
 				entityStyle = true,
 			}
-			return matchTicker:query():create()
 		end,
 		function()
 			return nil

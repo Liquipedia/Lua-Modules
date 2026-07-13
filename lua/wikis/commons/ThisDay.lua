@@ -13,7 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Template = Lua.import('Module:Template')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local ThisDayBirthday = Lua.import('Module:Widget/ThisDay/Birthday')
 local ThisDayPatch = Lua.import('Module:Widget/ThisDay/Patch')
 local ThisDayTournament = Lua.import('Module:Widget/ThisDay/Tournament')
@@ -44,7 +44,7 @@ function ThisDay.run(args)
 	local birthdays = ThisDay.birthday(args)
 	local patches = ThisDay.patch(args)
 	local trivia = Logic.readBool(Config.showTrivia) and ThisDay.trivia(args) or nil
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = WidgetUtil.collect(tournaments, birthdays, patches, trivia)
 	}
 end
@@ -99,7 +99,7 @@ function ThisDay.trivia(args)
 		String.interpolate('Liquipedia:This day/${month}/${day}', {month = month, day = day})
 	)
 	return String.isNotEmpty(triviaText) and {
-		HtmlWidgets.H3{children = 'Trivia'},
+		Html.H3{children = 'Trivia'},
 		triviaText
 	} or {}
 end

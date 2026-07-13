@@ -16,7 +16,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
@@ -47,7 +47,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 	end
 
 	local header = String.isNotEmpty(game.header) and {
-		HtmlWidgets.Div{
+		Html.Div{
 			children = game.header,
 			css = {
 				['font-weight'] = 'bold',

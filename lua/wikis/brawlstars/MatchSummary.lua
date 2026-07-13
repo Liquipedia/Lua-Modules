@@ -13,7 +13,7 @@ local MapTypeIcon = Lua.import('Module:MapType')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -81,9 +81,9 @@ end
 function CustomMatchSummary._getMapDisplay(game)
 	local mapDisplay = LinkWidget{link = game.map}
 
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+	return Html.Fragment{children = WidgetUtil.collect(
 		String.isNotEmpty(game.extradata.maptype) and MapTypeIcon.display(game.extradata.maptype) or nil,
-		game.status == 'notplayed' and HtmlWidgets.S{children = mapDisplay} or mapDisplay
+		game.status == 'notplayed' and Html.S{children = mapDisplay} or mapDisplay
 	)}
 end
 
