@@ -319,8 +319,8 @@ function MatchTable:query()
 	Lpdb.executeMassQuery('match2', {
 		conditions = tostring(self:buildConditions()),
 		order = 'date desc',
-		query = 'match2id, match2opponents, match2games, date, dateexact, icon, icondark, liquipediatier, game, type,'
-			.. 'liquipediatiertype, tournament, pagename, parent, section, tickername, vod, winner, match2bracketdata,'
+		query = 'match2id, match2opponents, date, dateexact, icon, icondark, liquipediatier, game, type,'
+			.. 'liquipediatiertype, tournament, pagename, parent, section, tickername, vod, winner,'
 			.. 'extradata, bestof, publishertier',
 		limit = 50,
 	}, function(match)
