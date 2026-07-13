@@ -22,10 +22,6 @@ local HtmlWidgets = Lua.import('Module:Widget/Html')
 
 local Div = HtmlWidgets.Div
 
----@class POIDraftDateBoundItem
----@field startDate string?
----@field endDate string?
-
 ---@type table<string, PoiMapData>
 local MAPS_DATA = Lua.import('Module:Widget/POIDraft/POIMap/Data', {loadData = true})
 
