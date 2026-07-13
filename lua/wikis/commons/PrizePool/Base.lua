@@ -270,7 +270,7 @@ BasePrizePool.prizeTypes = {
 		end,
 	},
 	[PRIZE_TYPE_QUALIFIES] = {
-		sortOrder = 50,
+		sortOrder = 40,
 		align = 'left',
 
 		header = 'qualifies',
@@ -324,7 +324,7 @@ BasePrizePool.prizeTypes = {
 		mergeDisplayColumns = true,
 	},
 	[PRIZE_TYPE_POINTS] = {
-		sortOrder = 40,
+		sortOrder = 50,
 		align = 'right',
 
 		header = 'points',
@@ -926,6 +926,7 @@ function BasePrizePool:_opponentPrizeCells(placement, opponent)
 	end)
 
 	return Array.map(prizeCells, function(cell)
+		---@cast cell -nil
 		if Logic.isNotEmpty(cell.props.children) then
 			return cell
 		end
