@@ -44,7 +44,7 @@ end
 ---@return VNode
 function PlayerDisplay.InlinePlayerByProps(props)
 	-- needed for aoe faction lookups
-	local game = props.game and Game.abbreviation{game = props.game}:lower() or nil
+	local game = Game.toIdentifier{game = props.game}
 	local player = Opponent.readSinglePlayerArgs(Table.merge(props, {game = game}))
 
 	PlayerExt.syncPlayer(player, {
