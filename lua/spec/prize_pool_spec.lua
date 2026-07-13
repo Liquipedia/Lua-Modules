@@ -95,8 +95,8 @@ describe('prize pool', function()
 						currency = 'SEK',
 					}
 				},
-				{id = 'POINTS1', type = 'POINTS', index = 1, data = {title = 'Points', link = 'A Page'}},
 				{id = 'QUALIFIES1', type = 'QUALIFIES', index = 1, data = {title = 'A Display', link = 'A_Tournament'}},
+				{id = 'POINTS1', type = 'POINTS', index = 1, data = {title = 'Points', link = 'A Page'}},
 				{id = 'FREETEXT1', type = 'FREETEXT', index = 1, data = {title = 'A title'}},
 			},
 			ppt.prizes
