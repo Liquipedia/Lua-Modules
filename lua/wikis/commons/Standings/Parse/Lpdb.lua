@@ -23,6 +23,15 @@ local ColumnName = Condition.ColumnName
 
 local StandingsParseLpdb = {}
 
+---Slim match struct carrying only the fields consumed by standings tiebreakers and import.
+---Dropped: bracketData, extradata, full game payloads.
+---@class StandingsImportMatch
+---@field matchId string
+---@field finished boolean
+---@field winner integer?
+---@field opponents standardOpponent[] -- by reference from matchFromRecord
+---@field games {winner: integer?, status: string?, scores: table?}[]
+
 ---@param rounds {roundNumber: integer, matches: string[]}[]
 ---@param scoreMapper fun(opponent: match2opponent): number|nil
 ---@return StandingTableOpponentData[]
@@ -59,10 +68,21 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 		{
 			conditions = tostring(conditions),
 		},
-		function(match2)
-			local roundNumbers = matchIdToRound[match2.match2id]
+		function(record)
+			local match2 = MatchGroupUtil.matchFromRecord(record)
+			---@type StandingsImportMatch
+			local slimMatch = {
+				matchId = match2.matchId,
+				finished = match2.finished,
+				winner = match2.winner,
+				opponents = match2.opponents,
+				games = Array.map(match2.games, function(game)
+					return {winner = game.winner, status = game.status, scores = game.scores}
+				end),
+			}
+			local roundNumbers = matchIdToRound[record.match2id]
 			Array.forEach(roundNumbers, function(roundNumber)
-				StandingsParseLpdb.parseMatch(roundNumber, match2, opponents, scoreMapper, #rounds)
+				StandingsParseLpdb.parseMatch(roundNumber, slimMatch, opponents, scoreMapper, #rounds)
 			end)
 		end
 	)
@@ -114,13 +134,12 @@ function StandingsParseLpdb.newOpponent(opponentData, maxRounds)
 end
 
 ---@param roundNumber integer
----@param match match2
+---@param slimMatch StandingsImportMatch
 ---@param opponents StandingTableOpponentData[]
 ---@param scoreMapper fun(opponent: standardOpponent): number?
 ---@param maxRounds integer
-function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMapper, maxRounds)
-	local match2 = MatchGroupUtil.matchFromRecord(match)
-	Array.forEach(match2.opponents, function(opponent)
+function StandingsParseLpdb.parseMatch(roundNumber, slimMatch, opponents, scoreMapper, maxRounds)
+	Array.forEach(slimMatch.opponents, function(opponent)
 		---Find matching opponent
 		local standingsOpponentData = Array.find(opponents, function(opponentData)
 			return Opponent.same(opponentData.opponent, opponent)
@@ -137,11 +156,11 @@ function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMappe
 			opponentRoundData.scoreboard.points = (opponentRoundData.scoreboard.points or 0) + points
 		end
 		opponentRoundData.specialstatus = ''
-		opponentRoundData.match = match2
-		if not match2.finished then
+		opponentRoundData.match = slimMatch
+		if not slimMatch.finished then
 			return
 		end
-		local matchResult = match2.winner == 0 and 'd' or opponent.placement == 1 and 'w' or 'l'
+		local matchResult = slimMatch.winner == 0 and 'd' or opponent.placement == 1 and 'w' or 'l'
 		opponentRoundData.scoreboard.match[matchResult] = (opponentRoundData.scoreboard.match[matchResult] or 0) + 1
 	end)
 end
