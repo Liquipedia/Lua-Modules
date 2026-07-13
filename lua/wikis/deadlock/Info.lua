@@ -33,6 +33,7 @@ return {
 		},
 		match2 = {
 			status = 2,
+			matchWidth = 180,
 		},
 		participants = {
 			defaultPlayerNumber = 6,

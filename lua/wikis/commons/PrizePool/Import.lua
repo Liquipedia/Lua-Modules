@@ -12,15 +12,15 @@ local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Placement = Lua.import('Module:PrizePool/Placement')
-local TournamentStructure = Lua.import('Module:TournamentStructure')
-
-local Opponent = Lua.import('Module:Opponent/Custom')
 
 local AUTOMATION_START_DATE = '2023-01-01'
 local GROUPSCORE_DELIMITER = '/'
@@ -339,7 +339,7 @@ end
 
 ---@param placementEntry table
 ---@param match MatchGroupUtilMatch
----@return table
+---@return {date: string, matchId: string, opponent: standardOpponent?, vsOpponent: standardOpponent?}
 function Import._makeEntryFromMatch(placementEntry, match)
 	local entry = {
 		date = match.date,
@@ -356,8 +356,6 @@ function Import._makeEntryFromMatch(placementEntry, match)
 		vsOpponent.isResolved = true
 
 		Table.mergeInto(entry, {
-			lastGameScore = {opponent.score, 0, vsOpponent.score},
-			lastStatuses = {opponent.status, vsOpponent.status},
 			opponent = opponent,
 			vsOpponent = vsOpponent,
 		})
@@ -599,8 +597,8 @@ function Import:_entryToOpponent(lpdbEntry, placement)
 		additionalData = self:_groupLastVsAdditionalData(lpdbEntry)
 	end
 
-	local score = additionalData.score or Import._getScore(lpdbEntry.opponent)
-	local vsScore = additionalData.vsScore or Import._getScore(lpdbEntry.vsOpponent)
+	local score = additionalData.score or OpponentDisplay.InlineScore(lpdbEntry.opponent)
+	local vsScore = additionalData.vsScore or OpponentDisplay.InlineScore(lpdbEntry.vsOpponent)
 	local lastVsScore
 	if score or vsScore then
 		lastVsScore = (score or '') .. '-' .. (vsScore or '')
@@ -647,17 +645,6 @@ function Import:_formatGroupScore(lpdbEntry)
 	end
 
 	return table.concat(wdl, self.config.groupScoreDelimiter)
-end
-
----@param opponentData match2opponent
----@return string|number?
-function Import._getScore(opponentData)
-	if not opponentData then
-		return
-	end
-
-	return opponentData.status == SCORE_STATUS and opponentData.score
-		or opponentData.status
 end
 
 ---@param lpdbEntry table
@@ -717,12 +704,13 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 	end
 
 	local score, vsScore, lastVs
-	for opponentIndex, opponent in pairs(match.match2opponents) do
+	for opponentIndex, opponentRecord in pairs(match.match2opponents) do
+		local opponent = MatchGroupUtil.opponentFromRecord(match, opponentRecord, opponentIndex)
 		if opponent.name == opponentName then
-			score = Import._getScore(opponent)
+			score = OpponentDisplay.InlineScore(opponent)
 		else
-			vsScore = Import._getScore(opponent)
-			lastVs = MatchGroupUtil.opponentFromRecord(match, opponent, opponentIndex)
+			vsScore = OpponentDisplay.InlineScore(opponent)
+			lastVs = opponent
 		end
 	end
 
