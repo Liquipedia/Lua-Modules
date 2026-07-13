@@ -597,8 +597,8 @@ function Import:_entryToOpponent(lpdbEntry, placement)
 		additionalData = self:_groupLastVsAdditionalData(lpdbEntry)
 	end
 
-	local score = additionalData.score or OpponentDisplay.InlineScore(lpdbEntry.opponent)
-	local vsScore = additionalData.vsScore or OpponentDisplay.InlineScore(lpdbEntry.vsOpponent)
+	local score = additionalData.score or Import._getScore(lpdbEntry.opponent)
+	local vsScore = additionalData.vsScore or Import._getScore(lpdbEntry.vsOpponent)
 	local lastVsScore
 	if score or vsScore then
 		lastVsScore = (score or '') .. '-' .. (vsScore or '')
@@ -645,6 +645,17 @@ function Import:_formatGroupScore(lpdbEntry)
 	end
 
 	return table.concat(wdl, self.config.groupScoreDelimiter)
+end
+
+---@param opponentData standardOpponent
+---@return string
+---@overload fun(opponentData: nil): nil
+function Import._getScore(opponentData)
+	if not opponentData then
+		return
+	end
+
+	return OpponentDisplay.InlineScore(opponentData)
 end
 
 ---@param lpdbEntry table
@@ -707,9 +718,9 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 	for opponentIndex, opponentRecord in pairs(match.match2opponents) do
 		local opponent = MatchGroupUtil.opponentFromRecord(match, opponentRecord, opponentIndex)
 		if opponent.name == opponentName then
-			score = OpponentDisplay.InlineScore(opponent)
+			score = Import._getScore(opponent)
 		else
-			vsScore = OpponentDisplay.InlineScore(opponent)
+			vsScore = Import._getScore(opponent)
 			lastVs = opponent
 		end
 	end
