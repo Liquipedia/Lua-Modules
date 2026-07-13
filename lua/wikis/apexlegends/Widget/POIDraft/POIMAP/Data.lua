@@ -18,8 +18,6 @@
 ---@field mobileY number?
 ---@field hideIfAny string[]?
 ---@field hideIfAllMissing string[]?
----@field startDate string?
----@field endDate string?
 
 ---@class MapImageData: POIDraftDateBoundItem
 ---@field file string
@@ -49,7 +47,10 @@ local MAPS_DATA = {
 			{ name = 'Cenote Cave', x = 0.192, y = 0.716, mobileName = 'Cenote Cave' },
 			{ name = 'Ceto Station', x = 0.347, y = 0.506, mobileName = 'Ceto Station' },
 			{ name = 'Checkpoint', x = 0.307, y = 0.326, mobileName = 'Checkpoint', mobileY = 0.333 },
-			{ name = 'Checkpoint North', x = 0.307, y = 0.326, mobileName = 'Checkpoint N.', mobileY = 0.333, endDate = '2025-04-30' },
+			{
+				name = 'Checkpoint North', x = 0.307, y = 0.326, mobileName = 'Checkpoint N.',
+				mobileY = 0.333, endDate = '2025-04-30'
+			},
 			{ name = 'Checkpoint South', x = 0.267, y = 0.401, mobileName = 'Checkpoint S.', endDate = '2025-04-30' },
 			{ name = 'Cliff Side', x = 0.880, y = 0.366, mobileName = 'Cliff Side', endDate = '2025-04-30' },
 			{ name = 'Coastal Camp', x = 0.477, y = 0.856, mobileName = 'Coastal<br>Camp' },
@@ -58,7 +59,10 @@ local MAPS_DATA = {
 			{ name = 'Downed Beast', x = 0.105, y = 0.296, mobileName = 'Downed Beast', mobileX = 0.120 },
 			{ name = 'East Trail', x = 0.880, y = 0.366, mobileName = 'East Trail', startDate = '2025-05-01' },
 			{ name = 'Echo HQ', x = 0.677, y = 0.846, mobileName = 'Echo HQ' },
-			{ name = 'Forbidden Zone', x = 0.477, y = 0.581, mobileName = 'Forbidden<br>Zone', mobileY = 0.585, startDate = '2025-05-01' },
+			{
+				name = 'Forbidden Zone', x = 0.477, y = 0.581, mobileName = 'Forbidden<br>Zone',
+				mobileY = 0.585, startDate = '2025-05-01'
+			},
 			{ name = 'Jurassic', x = 0.477, y = 0.581, mobileName = 'Jurassic', endDate = '2025-04-30' },
 			{ name = 'Launch Pad', x = 0.787, y = 0.656, mobileName = 'Launch Pad' },
 			{ name = 'Lift', x = 0.577, y = 0.496, mobileName = 'Lift', endDate = '2025-04-30' },
@@ -88,15 +92,15 @@ local MAPS_DATA = {
 			{ name = 'Climatizer East', x = 0.772, y = 0.236, mobileName = 'Climatizer East', endDate = '2025-04-30' },
 			{ name = 'Climatizer West', x = 0.672, y = 0.126, mobileName = 'Climatizer West', endDate = '2025-04-30' },
 			{ name = 'Countdown', x = 0.302, y = 0.336, mobileName = 'Countdown' },
-			{ 
+			{
 				name = 'Fragment', x = 0.642, y = 0.476, mobileName = 'Fragment',
 				hideIfAny = {'Fragment East team', 'Fragment West team'}
 			},
-			{ 
+			{
 				name = 'Fragment East', x = 0.672, y = 0.476, mobileName = 'Fragment E.',
 				hideIfAllMissing = {'Fragment East team', 'Fragment West team'}
 			},
-			{ 
+			{
 				name = 'Fragment West', x = 0.492, y = 0.456, mobileName = 'Fragment W.',
 				hideIfAllMissing = {'Fragment East team', 'Fragment West team'}
 			},
@@ -146,8 +150,8 @@ local MAPS_DATA = {
 			{ name = 'Stadium', x = 0.792, y = 0.556, mobileName = 'Stadium' },
 			{ name = 'Street Market', x = 0.192, y = 0.706, mobileName = 'Street Market' },
 			{ name = 'The Lotus', x = 0.422, y = 0.146, mobileName = 'The Lotus' },
-			{ name = 'Uptown', x = 0.682, y = 0.476, startDate = '2025-02-03' },
-			{ name = 'Vibe Isle', x = 0.682, y = 0.476, endDate = '2025-02-03' },
+			{ name = 'Uptown', x = 0.682, y = 0.476, mobileName = 'Uptown', startDate = '2025-02-03' },
+			{ name = 'Vibe Isle', x = 0.682, y = 0.476, mobileName = 'Vibe Isle', endDate = '2025-02-03' },
 			{ name = 'Viaduct', x = 0.342, y = 0.776, mobileName = 'Viaduct' }
 		}
 	},
