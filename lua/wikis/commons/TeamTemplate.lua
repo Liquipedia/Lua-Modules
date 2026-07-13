@@ -60,12 +60,13 @@ Returns the resolved page name of a team template that has been resolved to a
 date. Returns nil if the team does not exist, or if the page is not specified.
 ]]
 ---@param resolvedTemplate string
+---@param date string|number?
 ---@return string|nil
-TeamTemplate.getPageName = FnUtil.memoize(function(resolvedTemplate)
-	local raw = TeamTemplate.getRawOrNil(resolvedTemplate)
+function TeamTemplate.getPageName(resolvedTemplate, date)
+	local raw = TeamTemplate.getRawOrNil(resolvedTemplate, date)
 	local pageName = raw and mw.ext.TeamLiquidIntegration.resolve_redirect(raw.page) or nil
 	return Page.applyUnderScoresIfEnforced(pageName)
-end)
+end
 
 --[[
 Returns raw data of a team template for a team on a given date. Throws if the
@@ -87,7 +88,10 @@ does not exist.
 ---@param team string
 ---@param date string|number?
 ---@return teamTemplateData?
-function TeamTemplate.getRawOrNil(team, date)
+TeamTemplate.getRawOrNil = FnUtil.memoize2(function (team, date)
+	if Logic.isEmpty(team) then
+		return
+	end
 	team = team:gsub('_', ' '):lower()
 
 	-- return mw.ext.TeamTemplate.raw(team, date)
@@ -104,7 +108,7 @@ function TeamTemplate.getRawOrNil(team, date)
 		mw.ext.TeamLiquidIntegration.add_category('Pages with underscore team templates')
 	end
 	return teamTemplateData
-end
+end)
 
 ---Creates error message for missing team templates.
 ---@param pageName string

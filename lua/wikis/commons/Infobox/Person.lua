@@ -15,9 +15,11 @@ local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local NameOrder = Lua.import('Module:NameOrder')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Variables = Lua.import('Module:Variables')
 
 local AgeCalculation = Lua.import('Module:AgeCalculation')
@@ -25,7 +27,7 @@ local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Earnings = Lua.import('Module:Earnings')
 local Flags = Lua.import('Module:Flags')
 local Links = Lua.import('Module:Links')
-local MatchTicker = Lua.import('Module:MatchTicker')
+local MatchTicker = Lua.import('Module:MatchTicker/Controller')
 local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
 
@@ -40,6 +42,7 @@ local Center = Widgets.Center
 local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 local TeamHistoryWidget = Lua.import('Module:Widget/Infobox/TeamHistory')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class Person: BasicInfobox
 ---@operator call(Frame): Person
@@ -212,7 +215,7 @@ function Person:_createUpcomingMatches()
 
 	return Logic.tryCatch(
 		function()
-			local matchTicker = MatchTicker{
+			return MatchTicker.makeMatchTicker{
 				player = self.pagename,
 				limit = 5,
 				upcoming = true,
@@ -220,7 +223,6 @@ function Person:_createUpcomingMatches()
 				hideTournament = false,
 				entityStyle = true,
 			}
-			return matchTicker:query():create()
 		end,
 		function()
 			return nil
@@ -325,7 +327,7 @@ end
 function Person:_setLpdbData(args, links, status, personType)
 	local teamLink, teamTemplate
 	local team = args.teamlink or args.team
-	local teamRaw = team and mw.ext.TeamTemplate.raw(team) or nil
+	local teamRaw = team and TeamTemplate.getRawOrNil(team) or nil
 	if teamRaw then
 		teamLink = teamRaw.page
 		teamTemplate = teamRaw.templatename
@@ -369,7 +371,7 @@ function Person:_setLpdbData(args, links, status, personType)
 	for teamKey, otherTeam, teamIndex in Table.iter.pairsByPrefix(args, 'team', {requireIndex = false}) do
 		if teamIndex > 1 then
 			otherTeam = args[teamKey .. 'link'] or otherTeam
-			lpdbData.extradata[teamKey] = (mw.ext.TeamTemplate.raw(otherTeam) or {}).templatename
+			lpdbData.extradata[teamKey] = TeamTemplate.resolve(otherTeam)
 		end
 	end
 
@@ -456,27 +458,23 @@ end
 --- Allows for overriding this functionality
 --- e.g. to add faction icons to the display for SC2, SC, WC
 ---@param args table
----@return string
+---@return Renderable[]
 function Person:nameDisplay(args)
 	local team = string.lower(args.teamicon or args.ttlink or args.teamlink or args.team or '')
-	local icon = mw.ext.TeamTemplate.teamexists(team)
-		and mw.ext.TeamTemplate.teamicon(team) or ''
+	local icon = TeamTemplate.exists(team)
+		and OpponentDisplay.InlineTeamContainer{template = team, style = 'icon'} or nil
 
 	local team2 = string.lower(args.team2icon or args.ttlink2 or args.team2link or args.team2 or '')
-	local icon2 = mw.ext.TeamTemplate.teamexists(team2)
-		and mw.ext.TeamTemplate.teamicon(team2) or ''
+	local icon2 = TeamTemplate.exists(team2)
+		and OpponentDisplay.InlineTeamContainer{template = team2, style = 'icon'} or nil
 
 	local name = args.id or mw.title.getCurrentTitle().text
 
-	local display = name
-	if not String.isEmpty(icon) then
-		display = icon .. '&nbsp;' .. name
-	end
-	if not String.isEmpty(icon2) then
-		display = display .. ' ' .. icon2
-	end
 
-	return display
+	return Array.interleave(
+		WidgetUtil.collect(icon, name, icon2),
+		'&nbsp;'
+	)
 end
 
 --- Allows for overriding this functionality
@@ -545,7 +543,7 @@ function Person:_createTeam(team, link)
 	end
 	---@cast link -nil
 
-	local teamRaw = mw.ext.TeamTemplate.raw(link)
+	local teamRaw = TeamTemplate.getRawOrNil(link)
 	if teamRaw then
 		link, team = teamRaw.page, teamRaw.name
 	end
@@ -602,7 +600,7 @@ function Person:getCategories(args, birthDisplay, personType, status)
 		table.insert(categories, personType .. 's with unknown birth date')
 	end
 
-	if String.isNotEmpty(team) and not mw.ext.TeamTemplate.teamexists(team) then
+	if String.isNotEmpty(team) and not TeamTemplate.exists(team) then
 		table.insert(categories, 'Players with invalid team')
 	end
 

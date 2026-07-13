@@ -7,7 +7,7 @@
 
 local Lua = require('Module:Lua')
 
-local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
+local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/FilterableContainer')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')

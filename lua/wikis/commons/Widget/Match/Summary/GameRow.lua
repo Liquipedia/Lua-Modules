@@ -7,117 +7,117 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local GameCenter = Lua.import('Module:Widget/Match/Summary/GameCenter')
 local GameWinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLossIndicator')
 
+---@class MatchSummaryGameRowComponentProps
+---@field getGameOpponentViewCss? fun(props: MatchSummaryGameRowProps, opponentIndex: integer): HtmlStyleProps?
+---@field createGameOpponentView fun(props: MatchSummaryGameRowProps, opponentIndex: integer): Renderable|Renderable[]?
+---@field createGameOverview fun(props: MatchSummaryGameRowProps): Renderable|Renderable[]
+
 ---@class MatchSummaryGameRowProps
 ---@field allowWrappingInOverview boolean?
----@field css table<string, string|number>?
+---@field css HtmlStyleProps?
 ---@field game MatchGroupUtilGame
 ---@field gameIndex integer
 
----@class MatchSummaryGameRow: Widget
----@operator call(MatchSummaryGameRowProps): MatchSummaryGameRow
----@field props MatchSummaryGameRowProps
-local MatchSummaryGameRow = Class.new(Widget)
+local MatchSummaryGameRow = {}
 
----@return Widget?
-function MatchSummaryGameRow:render()
-	local props = self.props
-	return HtmlWidgets.Div{
-		classes = {'brkts-popup-body-grid-row'},
-		css = props.css,
-		children = {
-			GameWinLossIndicator{
-				opponentIndex = 1,
-				winner = props.game.winner,
-			},
-			HtmlWidgets.Div{
-				classes = {'brkts-popup-body-grid-row-detail'},
-				children = {
-					GameCenter{
-						css = self:getGameOpponentViewCss(1),
-						children = self:createGameOpponentView(1)
-					},
-					GameCenter{
-						css = self.props.allowWrappingInOverview and {
-							['white-space'] = 'wrap',
-						} or nil,
-						children = self:createGameOverview()
-					},
-					GameCenter{
-						css = self:getGameOpponentViewCss(2),
-						children = self:createGameOpponentView(2)
-					}
+---@generic P: MatchSummaryGameRowProps
+---@param implProps MatchSummaryGameRowComponentProps
+---@param defaultProps P
+---@return Component<P>
+---@overload fun(implProps: MatchSummaryGameRowComponentProps): Component<MatchSummaryGameRowProps>
+function MatchSummaryGameRow.createComponent(implProps, defaultProps)
+	---@param componentProps MatchSummaryGameRowProps
+	---@return VNode
+	local function componentImpl(componentProps)
+		---@param opponentIndex integer
+		---@return HtmlStyleProps?
+		local function getGameOpponentViewCss(opponentIndex)
+			if not implProps.getGameOpponentViewCss then
+				return
+			end
+			return implProps.getGameOpponentViewCss(componentProps, opponentIndex)
+		end
+		local createGameOpponentView = FnUtil.curry(implProps.createGameOpponentView, componentProps)
+
+		return Html.Div{
+			classes = {'brkts-popup-body-grid-row'},
+			css = componentProps.css,
+			children = {
+				GameWinLossIndicator{
+					opponentIndex = 1,
+					winner = componentProps.game.winner,
 				},
+				Html.Div{
+					classes = {'brkts-popup-body-grid-row-detail'},
+					children = {
+						GameCenter{
+							css = getGameOpponentViewCss(1),
+							children = createGameOpponentView(1)
+						},
+						GameCenter{
+							css = componentProps.allowWrappingInOverview and {
+								['white-space'] = 'wrap',
+							} or nil,
+							children = implProps.createGameOverview(componentProps)
+						},
+						GameCenter{
+							css = getGameOpponentViewCss(2),
+							children = createGameOpponentView(2)
+						}
+					},
+				},
+				GameWinLossIndicator{
+					opponentIndex = 2,
+					winner = componentProps.game.winner,
+				},
+				MatchSummaryGameRow._renderGameComment(componentProps.game)
 			},
-			GameWinLossIndicator{
-				opponentIndex = 2,
-				winner = props.game.winner,
-			},
-			self:_renderGameComment()
-		},
-	}
+		}
+	end
+
+	return Component.component(componentImpl, defaultProps)
 end
 
----@protected
----@param opponentIndex integer
----@return table<string, string|number>?
-function MatchSummaryGameRow:getGameOpponentViewCss(opponentIndex)
-	return
-end
-
----@protected
----@param opponentIndex integer
----@return Renderable|Renderable[]
-function MatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	error('MatchSummaryGameRow:createGameOpponentView() cannot be called directly and must be overridden.')
-end
-
----@protected
----@return Renderable|Renderable[]
-function MatchSummaryGameRow:createGameOverview()
-	error('MatchSummaryGameRow:createGameOverview() cannot be called directly and must be overridden.')
-end
-
----@protected
+---@param props MatchSummaryGameRowProps
 ---@return Renderable?
-function MatchSummaryGameRow:lengthDisplay()
-	local game = self.props.game
-	return Logic.emptyOr(game.length, 'Game ' .. self.props.gameIndex)
+function MatchSummaryGameRow.lengthDisplay(props)
+	local game = props.game
+	return Logic.emptyOr(game.length, 'Game ' .. props.gameIndex)
 end
 
----@protected
+---@param props MatchSummaryGameRowProps
 ---@param config {noLink: boolean?}?
 ---@return string
-function MatchSummaryGameRow:mapDisplay(config)
-	local game = self.props.game
+function MatchSummaryGameRow.mapDisplay(props, config)
+	local game = props.game
 	return DisplayHelper.Map(game, config)
 end
 
----@protected
+---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
 ---@return string
-function MatchSummaryGameRow:scoreDisplay(opponentIndex)
-	local game = self.props.game
+function MatchSummaryGameRow.scoreDisplay(game, opponentIndex)
 	return DisplayHelper.MapScore(game.opponents[opponentIndex], game.status)
 end
 
----@private
----@return Widget?
-function MatchSummaryGameRow:_renderGameComment()
-	local game = self.props.game
+---@package
+---@param game MatchGroupUtilGame
+---@return VNode?
+function MatchSummaryGameRow._renderGameComment(game)
 	if Logic.isEmpty(game.comment) then
 		return
 	end
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'brkts-popup-comment'},
 		children = game.comment,
 	}

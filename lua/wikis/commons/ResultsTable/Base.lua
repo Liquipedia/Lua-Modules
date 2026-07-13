@@ -32,7 +32,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -384,9 +384,9 @@ function BaseResultsTable:build()
 		children = WidgetUtil.collect(
 			TableWidgets.TableHeader{children = {self:buildHeader()}},
 			-- Hidden tr that contains a td to prevent the first yearHeader from being inside thead
-			not self:_isDataEmpty() and HtmlWidgets.Tr{
+			not self:_isDataEmpty() and Html.Tr{
 				css = {display = 'none'},
-				children = HtmlWidgets.Td{}
+				children = Html.Td{}
 			} or nil,
 			TableWidgets.TableBody{children = WidgetUtil.collect(self:_buildTableBody(), self.args.manualContent)}
 		),

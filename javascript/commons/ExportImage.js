@@ -67,12 +67,12 @@ const EXPORT_IMAGE_CONFIG = {
 		{ selector: '.crosstable', targetSelector: 'tbody', typeName: 'Crosstable' },
 		{ selector: '.brkts-matchlist', targetSelector: '.brkts-matchlist-collapse-area', typeName: 'Match List' },
 		{
-			selector: '.prizepooltable.prizepooltable-placement',
+			selector: '.prizepool-table-wrapper:has( .prizepooltable-placement )',
 			targetSelector: null,
 			typeName: 'Prize Pool'
 		},
 		{
-			selector: '.prizepooltable.prizepooltable-award',
+			selector: '.prizepool-table-wrapper:has( .prizepooltable-award )',
 			targetSelector: null,
 			typeName: 'Awards',
 			manualSubtitle: 'Awards'
@@ -473,6 +473,7 @@ class ExportService {
 		this.hideInfoIcons( clonedDoc );
 		this.removeContentSwitchers( clonedDoc );
 		this.removePrizepoolToggles( clonedDoc );
+		this.expandPrizepoolTables( clonedDoc );
 	}
 
 	// Hides info icons that shouldn't appear in exports
@@ -493,10 +494,23 @@ class ExportService {
 	}
 
 	removePrizepoolToggles( clonedDoc ) {
-		const prizepoolToggles = clonedDoc.querySelectorAll( '.ppt-toggle-expand, .prizepooltabletoggle' );
+		// The legacy in-table toggle and the redesigned table's footer (now inside the
+		// captured wrapper) shouldn't appear in a static export.
+		const prizepoolToggles = clonedDoc.querySelectorAll(
+			'.prizepooltabletoggle, .prizepool-table-wrapper .table2__footer'
+		);
 
 		for ( const prizepoolToggle of prizepoolToggles ) {
 			prizepoolToggle.remove();
+		}
+	}
+
+	// Cut placements are hidden by `.collapsed` on the wrapper; expand so they export.
+	expandPrizepoolTables( clonedDoc ) {
+		const collapsedTables = clonedDoc.querySelectorAll( '.prizepool-table-wrapper.collapsed' );
+
+		for ( const collapsedTable of collapsedTables ) {
+			collapsedTable.classList.remove( 'collapsed' );
 		}
 	}
 
@@ -934,7 +948,7 @@ class DropdownWidget {
 			'<span style="line-height: 1">Share</span>';
 
 		const button = this.createElement( 'button', {
-			class: 'btn btn-ghost btn-extrasmall dropdown-widget__toggle',
+			class: 'button button--ghost button--extrasmall dropdown-widget__toggle',
 			type: 'button',
 			title: 'Share',
 			'aria-label': 'Share this content',

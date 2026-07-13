@@ -11,7 +11,7 @@ local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -48,7 +48,7 @@ function CustomMatchSummary.TeamSubmatch(submatch)
 		classes = {'brkts-popup-body-game'},
 		children = WidgetUtil.collect(
 			submatch.header and {
-				HtmlWidgets.Div{css = {margin = 'auto', ['font-weight'] = 'bold'}, children = {submatch.header}},
+				Html.Div{css = {margin = 'auto', ['font-weight'] = 'bold'}, children = {submatch.header}},
 				MatchSummaryWidgets.Break{},
 			} or nil,
 			CustomMatchSummary.TeamSubMatchOpponentRow(submatch),
@@ -93,7 +93,7 @@ end
 ---@param gameIndex number
 ---@return Widget
 function CustomMatchSummary.Game(options, game, gameIndex)
-	local rowWidget = options.isPartOfSubMatch and HtmlWidgets.Div or MatchSummaryWidgets.Row
+	local rowWidget = options.isPartOfSubMatch and Html.Div or MatchSummaryWidgets.Row
 
 	---@param opponentIndex any
 	---@return Widget[]
@@ -128,7 +128,7 @@ function CustomMatchSummary.DisplayClass(opponent, flip)
 	end
 	---@cast player -nil
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'brkts-champion-icon'},
 		css = {
 			display = 'flex',

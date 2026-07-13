@@ -112,7 +112,7 @@ function CustomPlayer:_getActiveCasterYears()
 	return YearsActive.displayYears(years:toArray())
 end
 
----@return Html?
+---@return Renderable?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) then
 		return MatchTicker.recent({player = self.pagename})

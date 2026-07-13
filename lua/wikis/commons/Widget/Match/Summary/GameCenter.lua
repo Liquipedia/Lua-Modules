@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 
----@param props {css: table<string, string|number?>?, children: Renderable|Renderable[]?}
+---@param props {css: HtmlStyleProps?, children: Renderable|Renderable[]?}
 ---@return VNode
 local function MatchSummaryGameCenter(props)
 	return Html.Div{

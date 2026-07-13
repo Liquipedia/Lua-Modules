@@ -23,7 +23,7 @@ liquipedia.collapse = {
 	makeDesignButton: function( collapsible, isShow ) {
 		const title = ( isShow ? 'Show' : 'Hide' );
 		const button = document.createElement( 'button' );
-		button.classList.add( 'collapseButton', 'btn', 'btn-secondary', 'btn-extrasmall' );
+		button.classList.add( 'collapseButton', 'button', 'button--secondary', 'button--extrasmall' );
 		button.classList.add( isShow ? 'collapseButtonShow' : 'collapseButtonHide' );
 		button.setAttribute( 'role', 'button' );
 		button.setAttribute( 'aria-label', title );
@@ -174,7 +174,7 @@ liquipedia.collapse = {
 				hideAllText = 'Hide all';
 			}
 			const button = document.createElement( 'button' );
-			button.classList.add( 'btn', 'btn-secondary', 'btn-small' );
+			button.classList.add( 'button', 'button--secondary', 'button--small' );
 			if ( toggleGroup.classList.contains( 'toggle-state-hide' ) ) {
 				button.innerHTML = this.makeIcon( false ) + ' ' + hideAllText;
 			} else {
@@ -219,7 +219,7 @@ liquipedia.collapse = {
 					} else {
 						box.classList.add( 'dropdown-box-visible' );
 						toggleActive = true;
-						box.querySelectorAll( '.btn' ).forEach( ( btn ) => {
+						box.querySelectorAll( '.button' ).forEach( ( btn ) => {
 							btn.addEventListener( 'click', () => {
 								dropdownButton.innerHTML = btn.textContent + ' <span class="caret"></span>';
 								box.classList.remove( 'dropdown-box-visible' );
