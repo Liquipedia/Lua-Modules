@@ -652,7 +652,7 @@ end
 ---@overload fun(opponentData: nil): nil
 function Import._getScore(opponentData)
 	if not opponentData then
-		return
+		return nil
 	end
 
 	return OpponentDisplay.InlineScore(opponentData)
