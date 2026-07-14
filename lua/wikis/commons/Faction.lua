@@ -203,7 +203,7 @@ function Faction.Icon(props)
 		size = size .. 'px'
 	end
 
-	props.game = props.game or Data.defaultGame
+	props.game = Game.toIdentifier{game = props.game, useDefault = true}
 	local iconData = props.game and (IconData.byFaction[props.game] or {})[faction]
 		or {}
 	local iconName = iconData.icon
