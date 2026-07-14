@@ -27,7 +27,7 @@ local function SmashBracketScoreContainer(props)
 	local player = opponent.players[1]
 	local game = player.game
 
-	if Opponent.playerIsTbd(player) or Logic.isEmpty(game) or Logic.isEmpty(player.chars) then
+	if Opponent.playerIsTbd(player) or Logic.isEmpty(game) or Logic.isEmpty(player.extradata.heads) then
 		return BracketScoreContainer(props)
 	end
 
