@@ -257,7 +257,7 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 		end,
 		function(playerIndex, playerIdData, playerInputData)
 			local civ = Logic.emptyOr(civs[playerIndex], Faction.defaultFaction)
-			civ = Faction.read(civ, {game = Game.abbreviation{game = map.game}:lower()})
+			civ = Faction.read(civ, {game = Game.toIdentifier{game = map.game}})
 			return {
 				civ = civ,
 				displayName = playerIdData.displayname or playerInputData.name,
@@ -352,7 +352,7 @@ function FfaMapFunctions.getPlayersOfMapOpponent(map, opponent, opponentMapInput
 		end,
 		function(playerIndex, playerIdData, playerInputData)
 			local faction = Logic.emptyOr(factions[playerIndex], Faction.defaultFaction)
-			faction = Faction.read(faction, {game = Game.abbreviation{game = map.game}:lower()})
+			faction = Faction.read(faction, {game = Game.toIdentifier{game = map.game}})
 			return {
 				faction = faction,
 			}
