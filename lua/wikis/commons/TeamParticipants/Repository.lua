@@ -30,7 +30,7 @@ function TeamParticipantsRepository.save(participant)
 	local lpdbData = TeamParticipantsRepository.getPrizepoolRecordForTeam(participant.opponent) or {}
 
 	local function generateObjectName()
-		local team = Opponent.toName(participant.opponent)
+		local team = TeamTemplate.getPageNameNoRedirect(participant.opponent.template)
 		local isTbd = Opponent.isTbd(participant.opponent)
 
 		if not isTbd then
