@@ -64,7 +64,7 @@ function Faction._parseOptions(options)
 		options = {}
 	end
 
-	options.game = Game.toIdentifier({game = options.game, useDefault = true})
+	options.game = Game.toIdentifier{game = options.game, useDefault = true}
 	return options
 end
 
