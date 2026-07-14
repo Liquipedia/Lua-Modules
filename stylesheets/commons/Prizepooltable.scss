@@ -261,22 +261,22 @@ div.bg-lose > *.prizepooltable-place {
 	background-color: var( --clr-cinnabar-background-color, inherit );
 }
 
-tr.background-color-disqualified,
+tr.background-color-disqualified:not( .table2__row--body ),
 div.background-color-disqualified {
 	background-color: #dee3ef;
 }
 
-tr.background-color-win,
+tr.background-color-win:not( .table2__row--body ),
 div.background-color-win {
 	background-color: #ddf4dd;
 }
 
-tr.background-color-lose,
+tr.background-color-lose:not( .table2__row--body ),
 div.background-color-lose {
 	background-color: #fbdfdf;
 }
 
-tr.background-color-highlight,
+tr.background-color-highlight:not( .table2__row--body ),
 div.background-color-highlight {
 	background-color: #cce5ea;
 }
