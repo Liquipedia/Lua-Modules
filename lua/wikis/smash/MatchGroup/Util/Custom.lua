@@ -14,6 +14,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
+---@class SmashMatchGroupUtil: MatchGroupUtil
 local SmashMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
 ---@class SmashMatchGroupUtilMatch: MatchGroupUtilMatch
