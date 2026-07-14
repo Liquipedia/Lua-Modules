@@ -8,29 +8,19 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
-local FnUtil = Lua.import('Module:FnUtil')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local Label = Lua.import('Module:Widget/Basic/Label')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
----@class MatchOverviewWidgetProps
----@field match MatchGroupUtilMatch
----@field showOpponent integer
-
----@class MatchOverviewWidget: Widget
----@operator call(MatchOverviewWidgetProps): MatchOverviewWidget
----@field props MatchOverviewWidgetProps
-local MatchOverviewWidget = Class.new(Widget)
-
----@return Widget?
-function MatchOverviewWidget:render()
-	local match = self.props.match
-	local opponentIndexToShow = tonumber(self.props.showOpponent)
+---@param props {match: MatchGroupUtilMatch, showOpponent: integer}
+---@return Renderable?
+local function MatchOverviewWidget(props)
+	local match = props.match
+	local opponentIndexToShow = tonumber(props.showOpponent)
 	if not match or not opponentIndexToShow or #match.opponents ~= 2 then
 		return
 	end
@@ -45,13 +35,37 @@ function MatchOverviewWidget:render()
 		return
 	end
 
-	return HtmlWidgets.Div{
+	local phase = match.phase
+	local resultType
+
+	if match.phase ~= 'finished' then
+		resultType = 'default'
+	elseif match.winner == opponentIndexToShow then
+		resultType = 'loss'
+	elseif match.winner == 0 then
+		resultType = 'draw'
+	else
+		resultType = 'win'
+	end
+
+	return Html.Div{
 		classes = {'standings-match-overview'},
 		children = WidgetUtil.collect(
-			self:_createResultDisplay(
-				OpponentDisplay.InlineScore(leftOpponent),
-				OpponentDisplay.InlineScore(opponentToShow)
-			),
+			phase ~= 'upcoming' and Label{
+				labelScheme = 'standings-result',
+				labelType = 'result-' .. resultType,
+				children = {
+					Html.Span{
+						css = resultType == 'win' and {['font-weight'] = 'bold'} or nil,
+						children = OpponentDisplay.InlineScore(leftOpponent)
+					},
+					Html.Span{children = ':'},
+					Html.Span{
+						css = resultType == 'loss' and {['font-weight'] = 'bold'} or nil,
+						children = OpponentDisplay.InlineScore(opponentToShow)
+					}
+				}
+			} or nil,
 			OpponentDisplay.InlineOpponent{
 				opponent = opponentToShow,
 				overflow = 'ellipsis',
@@ -61,54 +75,4 @@ function MatchOverviewWidget:render()
 	}
 end
 
----@private
----@param self MatchOverviewWidget
----@return string
-MatchOverviewWidget._getMatchResultType = FnUtil.memoize(function (self)
-	local match = self.props.match
-	local opponentIndexToShow = tonumber(self.props.showOpponent)
-
-	if match.phase == 'ongoing' then
-		return 'default'
-	elseif match.winner == opponentIndexToShow then
-		return 'loss'
-	elseif match.winner == 0 then
-		return 'draw'
-	end
-	return 'win'
-end)
-
----@private
----@param leftScore string
----@param rightScore string
----@return Widget[]
-function MatchOverviewWidget:_createScoreContainer(leftScore, rightScore)
-	local resultType = self:_getMatchResultType()
-	return {
-		HtmlWidgets.Span{
-			css = resultType == 'win' and {['font-weight'] = 'bold'} or nil,
-			children = leftScore
-		},
-		HtmlWidgets.Span{children = ':'},
-		HtmlWidgets.Span{
-			css = resultType == 'loss' and {['font-weight'] = 'bold'} or nil,
-			children = rightScore
-		}
-	}
-end
-
----@private
----@return Widget?
-function MatchOverviewWidget:_createResultDisplay(leftScore, rightScore)
-	if self.props.match.phase == 'upcoming' then
-		return
-	end
-	local resultType = self:_getMatchResultType()
-	return Label{
-		labelScheme = 'standings-result',
-		labelType = 'result-' .. resultType,
-		children = self:_createScoreContainer(leftScore, rightScore)
-	}
-end
-
-return MatchOverviewWidget
+return Component.component(MatchOverviewWidget)

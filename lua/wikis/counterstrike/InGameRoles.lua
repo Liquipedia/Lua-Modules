@@ -8,7 +8,6 @@
 ---@type table<string, RoleBaseData>
 local inGameRoles = {
 	['awper'] = {category = 'AWPers', display = 'AWPer'},
-	['igl'] = {category = 'In-game leaders', display = 'In-game leader'},
 	['lurker'] = {category = 'Lurkers', display = 'Lurker'},
 	['support'] = {category = 'Support players', display = 'Support'},
 	['entry'] = {category = 'Entry fraggers', display = 'Entry'},

@@ -125,7 +125,7 @@ function StatisticsPortal.topEarningsChart(args)
 	local config = StatisticsPortal._getChartConfig(args, params)
 	local topEarningsList = StatisticsPortal._getOpponentEarningsData(args, config)
 
-	local yearSeriesData = Array.map(Array.range(config.startYear, tonumber(args.year) or CURRENT_YEAR), function(year)
+	local yearSeriesData = Array.mapRange(config.startYear, tonumber(args.year) or CURRENT_YEAR, function(year)
 		return Array.map(Array.reverse(topEarningsList), function(teamData)
 			return teamData.earningsbyyear[year] or 0
 		end)
@@ -1283,7 +1283,7 @@ function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategor
 	local yearList = {}
 	local chartData = {}
 	local seriesData = {}
-	local earningsTable = Array.map(Array.range(1, Table.size(nonYearCategories)), function() return 0 end)
+	local earningsTable = Array.mapRange(1, Table.size(nonYearCategories), function() return 0 end)
 
 	for yearIndex, yearValue in pairs(defaultYearTable) do
 		earningsTable = StatisticsPortal._addArrays({earningsTable, yearSeriesData[yearIndex]})
@@ -1292,7 +1292,7 @@ function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategor
 			table.insert(yearList, yearText)
 			table.insert(seriesData, earningsTable)
 			prevYear = yearValue + 1
-			earningsTable = Array.map(Array.range(1, Table.size(nonYearCategories)), function() return 0 end)
+			earningsTable = Array.mapRange(1, Table.size(nonYearCategories), function() return 0 end)
 		end
 	end
 
@@ -1300,10 +1300,10 @@ function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategor
 	local seriesNames = yearList
 
 	if transpose == true then
-		seriesData = Array.map(Array.range(1, Table.size(nonYearCategories)), function(index)
+		seriesData = Array.mapRange(1, Table.size(nonYearCategories), function(index)
 			return Array.map(seriesData, function(teamData)
-					return teamData[index] or 0
-				end)
+				return teamData[index] or 0
+			end)
 		end)
 		seriesNames, categoryNames = categoryNames, seriesNames
 	end

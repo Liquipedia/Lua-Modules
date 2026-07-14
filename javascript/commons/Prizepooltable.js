@@ -5,6 +5,12 @@
 liquipedia.prizepooltable = {
 	init: function() {
 		document.querySelectorAll( '.prizepooltable' ).forEach( ( prizepooltable ) => {
+			// The redesigned (Table2) prize pool wraps its table in
+			// `.prizepool-table-wrapper` and collapses via general-collapsible, so it
+			// supplies its own toggle. Skip it here to avoid a duplicate legacy toggle.
+			if ( prizepooltable.closest( '.prizepool-table-wrapper' ) !== null ) {
+				return;
+			}
 			let cutAfter;
 			if ( typeof prizepooltable.dataset.cutafter !== 'undefined' ) {
 				cutAfter = parseInt( prizepooltable.dataset.cutafter );

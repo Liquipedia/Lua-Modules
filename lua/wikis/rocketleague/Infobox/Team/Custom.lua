@@ -23,7 +23,7 @@ local CustomTeam = Class.new(Team)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
@@ -34,8 +34,8 @@ function CustomTeam.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
@@ -48,13 +48,15 @@ function CustomInjector:parse(id, widgets)
 						or 'Not enough data'
 				}
 			},
-			Cell{
+			--- option to suppress this in EmptyPagePreview
+			--- intentional to only check on true to avoid the option for disabling from wiki code
+			args.suppressRanking ~= true and Cell{
 				name = '[[RankingTableRLCS|RLCS Points]]',
 				children = {TeamRanking.run{
 					ranking = args.ranking_name,
 					team = self.caller.pagename
 				}}
-			}
+			} or nil
 		)
 	end
 

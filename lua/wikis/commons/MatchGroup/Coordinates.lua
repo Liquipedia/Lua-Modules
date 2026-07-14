@@ -319,7 +319,7 @@ function MatchGroupCoordinates.groupMatchIdsByField(bracket, fieldName)
 	local countFieldName = fieldName:gsub('Index$', 'Count')
 	local count = Table.getByPathOrNil(bracket.matches, {1, 'bracketData', 'coordinates', countFieldName}) or 0
 
-	local byField = Array.map(Array.range(1, count), function() return {} end)
+	local byField = Array.mapRange(1, count, function() return {} end)
 	for matchId in MatchGroupCoordinates.dfs(bracket) do
 		local coordinates = bracket.coordinatesByMatchId[matchId]
 		table.insert(byField[coordinates[fieldName]], matchId)
@@ -363,7 +363,7 @@ The third place match is not counted.
 function MatchGroupCoordinates.computeRawCounts(bracket)
 	local reverseRounds = Array.reverse(bracket.rounds)
 
-	local countsBySection = Array.map(Array.range(1, #bracket.sections), function(sectionIx) return 0 end)
+	local countsBySection = Array.mapRange(1, #bracket.sections, function(sectionIx) return 0 end)
 	local countsByReverseRound = {}
 	for _, round in ipairs(reverseRounds) do
 		for _, matchId in ipairs(round) do

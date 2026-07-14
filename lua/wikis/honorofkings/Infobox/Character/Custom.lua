@@ -20,7 +20,7 @@ local Character = Lua.import('Module:Infobox/Character')
 local Injector = Lua.import('Module:Widget/Injector')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
@@ -34,7 +34,7 @@ local CustomCharacter = Class.new(Character)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
@@ -43,8 +43,8 @@ function CustomCharacter.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	if id == 'role' then
 		return {
@@ -79,7 +79,7 @@ function CustomInjector:_toCellContent(key)
 	local args = self.caller.args
 	if String.isEmpty(args[key]) then return end
 	local iconData = ClassIcon[args[key]:lower()]
-	return Logic.isNotEmpty(iconData) and HtmlWidgets.Fragment{
+	return Logic.isNotEmpty(iconData) and Html.Fragment{
 		children = {
 			IconImageWidget{
 				imageLight = iconData.icon,

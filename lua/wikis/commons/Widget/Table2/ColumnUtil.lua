@@ -15,6 +15,11 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local ColumnUtil = {}
 
+local INHERITABLE_PROPS = {
+	'align', 'shrink', 'nowrap', 'width', 'minWidth', 'maxWidth',
+	'sortType', 'unsortable',
+}
+
 ---Gets the column index for this cell
 ---@param columnIndexProp integer|string? - explicit column index from props
 ---@param columnIndexContext integer|string? - implicit column index from context
@@ -26,59 +31,29 @@ end
 
 ---Merges column definition properties with cell properties
 ---Cell props take precedence over column props
----Uses lazy merging: only creates merged table when column def has inheritable properties
+---Adds valid props from columnDef to cellProps (mutates)
 ---@param cellProps table
 ---@param columnDef table?
----@return table mergedProps
 function ColumnUtil.mergeProps(cellProps, columnDef)
 	if not columnDef then
-		return cellProps
+		return
 	end
 
-	local inheritableProps = {
-		'align', 'shrink', 'nowrap', 'width', 'minWidth', 'maxWidth',
-		'sortType', 'unsortable',
-	}
-
-	local hasInheritableProps = false
-	for _, prop in ipairs(inheritableProps) do
-		if columnDef[prop] ~= nil then
-			hasInheritableProps = true
-			break
+	Array.forEach(INHERITABLE_PROPS, function(prop)
+		if cellProps[prop] == nil and columnDef[prop] ~= nil then
+			cellProps[prop] = columnDef[prop]
 		end
+	end)
+
+	if columnDef.css then
+		cellProps.css = Table.merge(columnDef.css, cellProps.css or {})
 	end
-
-	local hasCss = columnDef.css ~= nil
-	local hasClasses = columnDef.classes ~= nil
-	local hasAttributes = columnDef.attributes ~= nil
-
-	if not hasInheritableProps and not hasCss and not hasClasses and not hasAttributes then
-		return cellProps
+	if columnDef.classes then
+		cellProps.classes = WidgetUtil.collect(columnDef.classes, cellProps.classes)
 	end
-
-	local merged = Table.copy(cellProps or {})
-
-	if hasInheritableProps then
-		Array.forEach(inheritableProps, function(prop)
-			if merged[prop] == nil and columnDef[prop] ~= nil then
-				merged[prop] = columnDef[prop]
-			end
-		end)
+	if columnDef.attributes then
+		cellProps.attributes = Table.merge(columnDef.attributes, cellProps.attributes or {})
 	end
-
-	if hasCss then
-		merged.css = Table.merge(columnDef.css, merged.css or {})
-	end
-
-	if hasClasses then
-		merged.classes = WidgetUtil.collect(columnDef.classes, merged.classes)
-	end
-
-	if hasAttributes then
-		merged.attributes = Table.merge(columnDef.attributes, merged.attributes or {})
-	end
-
-	return merged
 end
 
 ---Builds CSS rules for sizing

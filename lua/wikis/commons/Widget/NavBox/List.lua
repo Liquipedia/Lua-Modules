@@ -12,10 +12,10 @@ local Class = Lua.import('Module:Class')
 local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
-local Ul = HtmlWidgets.Ul
-local Li = HtmlWidgets.Li
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
+local Ul = Html.Ul
+local Li = Html.Li
 
 ---@class NavBoxList: Widget
 ---@operator call(table): NavBoxList

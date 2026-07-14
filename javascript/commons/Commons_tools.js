@@ -11,11 +11,11 @@ liquipedia.commonstools = {
 	createForms: function() {
 		const checkForPageExistenceForm = document.getElementById( 'checkforpageexistence' );
 		if ( checkForPageExistenceForm !== null ) {
-			checkForPageExistenceForm.innerHTML = '<form id="checkforpageexistenceform"><input id="checkforpageexistenceinput" placeholder="Name of page" class="form-control"><button id="checkforpageexistencebutton" class="btn btn-primary" type="submit">Search</button></form><div id="checkforpageexistenceresult"></div>';
+			checkForPageExistenceForm.innerHTML = '<form id="checkforpageexistenceform"><input id="checkforpageexistenceinput" placeholder="Name of page" class="form-control"><button id="checkforpageexistencebutton" class="button button--primary" type="submit">Search</button></form><div id="checkforpageexistenceresult"></div>';
 		}
 		const checkPageTextForm = document.getElementById( 'checkpagetext' );
 		if ( checkPageTextForm !== null ) {
-			checkPageTextForm.innerHTML = '<form id="checkpagetextform"><input id="checkpagetextforminputname" placeholder="Name of page" class="form-control"><input id="checkpagetextforminputsource" placeholder="Source wiki" class="form-control"><button id="checkpagetextbutton" class="btn btn-primary" type="submit">Search</button></form><div id="checkpagetextresult"></div>';
+			checkPageTextForm.innerHTML = '<form id="checkpagetextform"><input id="checkpagetextforminputname" placeholder="Name of page" class="form-control"><input id="checkpagetextforminputsource" placeholder="Source wiki" class="form-control"><button id="checkpagetextbutton" class="button button--primary" type="submit">Search</button></form><div id="checkpagetextresult"></div>';
 		}
 	},
 	createCallbacks: function() {
@@ -32,7 +32,8 @@ liquipedia.commonstools = {
 		if ( liquipedia.commonstools.wikis === null ) {
 			const api = new mw.ForeignApi( '/api.php' );
 			api.get( {
-				action: 'listwikis'
+				action: false,
+				format: false
 			} ).then( ( data ) => {
 				liquipedia.commonstools.wikis = data.allwikis;
 				callback();
@@ -177,8 +178,8 @@ liquipedia.commonstools = {
 				const page = data.query.pages[ 0 ];
 				const link = document.createElement( 'a' );
 				const postButton = document.createElement( 'button' );
-				postButton.classList.add( 'btn' );
-				postButton.classList.add( 'btn-primary' );
+				postButton.classList.add( 'button' );
+				postButton.classList.add( 'button--primary' );
 				const span = document.createElement( 'span' );
 				link.href = '/' + wiki + '/' + page.title;
 				postButton.type = 'button';

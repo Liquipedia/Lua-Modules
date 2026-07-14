@@ -143,6 +143,8 @@ local PREFIXES = {
 		player = 'https://faceitdb.com/profile/faceit/',
 	},
 	fanclub = {''},
+	['csgo-fastcup'] = {'https://csgo.fastcup.net/tournaments/'},
+	['cs2-fastcup'] = {'https://cs2.fastcup.net/tournaments/'},
 	fide = {
 		'https://ratings.fide.com/tournament_information.phtml?event=',
 		player = 'https://ratings.fide.com/profile/',
@@ -308,7 +310,7 @@ local PREFIXES = {
 		team = 'https://stratz.com/teams/'
 	},
 	stream = {''},
-	telegram = {'https://t.me/'},
+	telegram = {'https://telegram.me/'},
 	tespa = {match = 'https://web.archive.org/web/compete.tespa.org/tournament/'},
 	tetrio = {
 		'',
@@ -350,6 +352,7 @@ local PREFIXES = {
 	twitter = {'https://twitter.com/'},
 	vidio = {'https://www.vidio.com/@'},
 	vk = {'https://www.vk.com/'},
+	['vk-video'] = {'https:// live.vkvideo.ru/'},
 	vlr = {
 		'https://www.vlr.gg/event/',
 		team = 'https://www.vlr.gg/team/',
@@ -358,6 +361,11 @@ local PREFIXES = {
 	},
 	vod = {''},
 	weibo = {'https://weibo.com/'},
+	wotidam  = {'https://worldoftanks.com/community/accounts/'},
+	wotidasia = {'https://worldoftanks.asia/en/community/accounts/'},
+	wotidcn = {'https://wotgame.cn/community/accounts/'},
+	wotideu = {'https://worldoftanks.eu/community/accounts/'},
+	wotidru = {'https://tanki.su/ru/community/accounts/'},
 	wl = {match = 'https://www.winstonslab.com/matches/match.php?id='},
 	yandexefir = {'https://yandex.ru/efir?stream_channel='},
 	youtube = {'https://www.youtube.com/'},
@@ -377,7 +385,7 @@ local SUFFIXES = {
 	},
 	['faceit-c'] = {'/'},
 	['faceit-hub'] = {'/'},
-	gol = {match = '/page-game/'},
+	gol = {match = '/page-summary/'},
 	iccup = {'.html'},
 	lazermplink = {match = '/events'},
 	metafy = {'?utm_source=liquipedia&campaign=infoblock'},
@@ -416,6 +424,8 @@ local ICON_KEYS_TO_RENAME = {
 	['faceit-hub'] = 'faceit',
 	['faceit-org'] = 'faceit',
 	['faceitdb'] = 'faceit',
+	['csgo-fastcup'] = 'fastcup',
+	['cs2-fastcup'] = 'fastcup',
 	matcherinolink = 'matcherino',
 	playlist = 'music',
 	privsteam = 'steam',
@@ -425,6 +435,10 @@ local ICON_KEYS_TO_RENAME = {
 	tlpdkr = 'tlpd-wol-korea',
 	tlpdsospa = 'tlpd-sospa',
 	douyin_page = 'douyin',
+	wotidam = 'wotid',
+	wotidasia = 'wotid',
+	wotideu = 'wotid',
+	wotidcn = 'wotid',
 }
 
 local MATCH_ICONS = {

@@ -60,6 +60,7 @@ Returns the page name with resolved redirects of a team template that has been r
 date. Returns nil if the team does not exist, or if the page is not specified.
 ]]
 ---@param resolvedTemplate string
+---@param date string|number?
 ---@return string|nil
 TeamTemplate.getPageName = FnUtil.memoize(function(resolvedTemplate)
 	local page = TeamTemplate.getPageNameNoRedirect(resolvedTemplate)
@@ -103,7 +104,10 @@ does not exist.
 ---@param team string
 ---@param date string|number?
 ---@return teamTemplateData?
-function TeamTemplate.getRawOrNil(team, date)
+TeamTemplate.getRawOrNil = FnUtil.memoize2(function (team, date)
+	if Logic.isEmpty(team) then
+		return
+	end
 	team = team:gsub('_', ' '):lower()
 
 	-- return mw.ext.TeamTemplate.raw(team, date)
@@ -120,7 +124,7 @@ function TeamTemplate.getRawOrNil(team, date)
 		mw.ext.TeamLiquidIntegration.add_category('Pages with underscore team templates')
 	end
 	return teamTemplateData
-end
+end)
 
 ---Creates error message for missing team templates.
 ---@param pageName string

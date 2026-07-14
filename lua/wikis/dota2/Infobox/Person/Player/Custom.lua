@@ -18,7 +18,7 @@ local String = Lua.import('Module:StringUtils')
 local YearsActive = Lua.import('Module:YearsActive')
 
 local Flags = Lua.import('Module:Flags')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Injector = Lua.import('Module:Widget/Injector')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Player = Lua.import('Module:Infobox/Person')
@@ -28,6 +28,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local BANNED = Lua.import('Module:Banned', {loadData = true})
 
@@ -35,6 +36,7 @@ local SIZE_HERO = '44x25px'
 local CONVERSION_PLAYER_ID_TO_STEAM = 61197960265728
 
 ---@class Dota2InfoboxPlayer: Person
+---@operator call(Frame): Dota2InfoboxPlayer
 ---@field basePageName string
 local CustomPlayer = Class.new(Player)
 
@@ -43,7 +45,7 @@ local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -66,8 +68,8 @@ function CustomPlayer.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -138,16 +140,16 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return Widget?
+---@return Renderable?
 function CustomPlayer:createBottomContent()
 	if not Namespace.isMain() then
 		return
 	end
 
-	return HtmlWidgets.Fragment{children = {
+	return Html.Fragment{children = WidgetUtil.collect(
 		MatchTicker.player(),
 		UpcomingTournaments.player{name = self.basePageName}
-	}}
+	)}
 end
 
 ---@return string[]

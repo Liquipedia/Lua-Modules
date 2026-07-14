@@ -7,27 +7,22 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
-local Table = Lua.import('Module:Table')
+local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 
----@class CentereWidget: Widget
----@operator call(table): CentereWidget
----@field classes string[]
-local Center = Class.new(Widget)
-
----@return Widget?
-function Center:render()
-	if Table.isEmpty(self.props.children) then
+---@param props {classes: string[]?, children: Renderable|Renderable[]?}
+---@return VNode?
+local function Center(props)
+	if Logic.isEmpty(props.children) then
 		return nil
 	end
-	return HtmlWidgets.Div{children = {HtmlWidgets.Div{
-		classes = WidgetUtil.collect('infobox-center', self.props.classes),
-		children = self.props.children
+	return Html.Div{children = {Html.Div{
+		classes = WidgetUtil.collect('infobox-center', props.classes),
+		children = props.children
 	}}}
 end
 
-return Center
+return Component.component(Center)

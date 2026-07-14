@@ -35,7 +35,7 @@ local MODES = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -44,12 +44,14 @@ function CustomLeague.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
-	if id == 'custom' then
+	if id == 'sponsors' then
+		table.insert(widgets, Cell{name = 'Official Device', children = {args.device}})
+	elseif id == 'custom' then
 		Array.appendWith(widgets,
 			Cell{name = 'Number of Players', children = {args.player_number}},
 			Cell{name = 'Number of Teams', children = {args.team_number}}

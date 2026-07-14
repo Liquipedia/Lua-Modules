@@ -8,13 +8,11 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local String = Lua.import('Module:StringUtils')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local Span = HtmlWidgets.Span
 
 ---@class TeamNameDisplayParameters
 ---@field additionalClasses string[]?
@@ -22,20 +20,16 @@ local Span = HtmlWidgets.Span
 ---@field noLink boolean?
 ---@field page string?
 
----@class TeamNameDisplay: Widget
----@operator call(TeamNameDisplayParameters): TeamNameDisplay
----@field props TeamNameDisplayParameters
-local TeamNameDisplay = Class.new(Widget)
-
----@return Widget?
-function TeamNameDisplay:render()
-	local displayName = self.props.displayName
+---@param props TeamNameDisplayParameters
+---@return VNode?
+local function TeamNameDisplay(props)
+	local displayName = props.displayName
 	if String.isEmpty(displayName) then return end
-	local page = self.props.page
-	return Span{
-		classes = Array.extend({ 'team-template-text' }, self.props.additionalClasses),
+	local page = props.page
+	return Html.Span{
+		classes = Array.extend({ 'team-template-text' }, props.additionalClasses),
 		children = {
-			self.props.noLink and displayName or Link{
+			props.noLink and displayName or Link{
 				children = displayName,
 				link = page
 			}
@@ -43,4 +37,4 @@ function TeamNameDisplay:render()
 	}
 end
 
-return TeamNameDisplay
+return Component.component(TeamNameDisplay)
