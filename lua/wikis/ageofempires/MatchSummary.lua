@@ -179,12 +179,11 @@ end
 ---@param gameData string?
 ---@return VNode
 function GameRowComponentProps._createFactionIcon(civ, gameData)
-	local normGame = Game.abbreviation{game = gameData}:lower()
 	return Html.Span{
 		classes = {'brkts-champion-icon'},
 		children = Faction.Icon{
 			faction = civ or '',
-			game = normGame,
+			game = Game.toIdentifier{game = gameData},
 			size = 64,
 			showTitle = true,
 			showLink = true,
