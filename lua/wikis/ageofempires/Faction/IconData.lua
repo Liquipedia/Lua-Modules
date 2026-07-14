@@ -532,11 +532,11 @@ local byFactionAoEO = {
 
 return {
 	byFaction = {
-		aoe1 = byFactionAoE1,
-		aoe2 = byFactionAoE2,
-		aoe3 = byFactionAoE3,
-		aoe4 = byFactionAoE4,
-		aom = byFactionAoM,
-		aoeo = byFactionAoEO,
+		['Age of Empires I'] = byFactionAoE1,
+		['Age of Empires II'] = byFactionAoE2,
+		['Age of Empires III'] = byFactionAoE3,
+		['Age of Empires IV'] = byFactionAoE4,
+		['Age of Mythology'] = byFactionAoM,
+		['Age of Empires Online'] = byFactionAoEO,
 	},
 }
