@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Faction = Lua.import('Module:Faction')
-local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local MapMode = Lua.import('Module:MapMode')
 local Operator = Lua.import('Module:Operator')
@@ -183,7 +182,7 @@ function GameRowComponentProps._createFactionIcon(civ, gameData)
 		classes = {'brkts-champion-icon'},
 		children = Faction.Icon{
 			faction = civ or '',
-			game = Game.toIdentifier{game = gameData},
+			game = gameData,
 			size = 64,
 			showTitle = true,
 			showLink = true,
