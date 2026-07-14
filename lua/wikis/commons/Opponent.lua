@@ -481,6 +481,7 @@ function Opponent.readSinglePlayerArgs(args)
 		p1team = args.team or args.p1team,
 		p1faction = args.faction or args.race or args.p1race,
 		p1id = args.id or args.p1id,
+		game = args.game,
 	}, 1)
 end
 
@@ -496,7 +497,7 @@ function Opponent.readPlayerArgs(args, playerIndex)
 		pageName = Page.applyUnderScoresIfEnforced(args['p' .. playerIndex .. 'link']),
 		team = playerTeam,
 		faction = Logic.nilIfEmpty(Faction.read(args['p' .. playerIndex .. 'faction']
-			or args['p' .. playerIndex .. 'race'])),
+			or args['p' .. playerIndex .. 'race'], {game = args.game})),
 		apiId = args['p' .. playerIndex .. 'id'],
 	}
 	assert(not player.displayName:find('|'), 'Invalid character "|" in player name')
