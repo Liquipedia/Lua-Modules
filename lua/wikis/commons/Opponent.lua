@@ -244,13 +244,8 @@ function Opponent.same(opponent1, opponent2)
 		if opponent1.template == opponent2.template then
 			return true
 		end
-		local opponent1Name = Opponent.toName(opponent1)
-		local opponent2Name = Opponent.toName(opponent2)
-		if opponent1Name == opponent2Name then
-			return true
-		end
-		local opponent1Historical = TeamTemplate.getRaw(opponent1Name).historicaltemplate
-		local opponent2Historical = TeamTemplate.getRaw(opponent2Name).historicaltemplate
+		local opponent1Historical = TeamTemplate.getRaw(opponent1.template).historicaltemplate
+		local opponent2Historical = TeamTemplate.getRaw(opponent2.template).historicaltemplate
 		if Logic.isEmpty(opponent1Historical) or Logic.isEmpty(opponent2Historical) then
 			return false
 		end
