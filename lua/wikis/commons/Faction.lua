@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
+local Game = Lua.import('Module:Game')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TypeUtil = Lua.import('Module:TypeUtil')
@@ -63,7 +64,7 @@ function Faction._parseOptions(options)
 		options = {}
 	end
 
-	options.game = options.game or Data.defaultGame
+	options.game = Game.toIdentifier({game = options.game, useDefault = true})
 	return options
 end
 
