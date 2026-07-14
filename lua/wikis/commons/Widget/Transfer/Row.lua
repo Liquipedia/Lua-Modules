@@ -297,7 +297,7 @@ function TransferRowWidget._displayTeam(args)
 	end
 
 	---@param team string
-	---@return Widget?
+	---@return VNode
 	local function teamDisplay(team)
 		return OpponentDisplay.InlineTeamContainer{
 			template = team,
@@ -351,14 +351,14 @@ end
 
 ---@private
 ---@param status string?
----@return Renderable?
+---@return VNode
 TransferRowWidget._getTransferArrow = FnUtil.memoize(function (status)
 	return IconFa{iconName = TRANSFER_STATUS_TO_ICON_NAME[status]}
 end)
 
 ---@private
 ---@param iconInput string?
----@return string|Widget
+---@return Renderable
 TransferRowWidget._getIcon = FnUtil.memoize(function (iconInput)
 	if Logic.isEmpty(iconInput) then
 		return EMPTY_POSITION_ICON
