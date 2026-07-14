@@ -170,6 +170,7 @@ end
 ---@field title string?
 ---@field game string?
 ---@field showName boolean?
+
 Faction.propTypes.Icon = TypeUtil.struct{
 	faction = 'string',
 	showLink = 'boolean?',
