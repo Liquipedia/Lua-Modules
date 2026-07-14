@@ -16,8 +16,14 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 local SmashMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
+---@class SmashMatchGroupUtilMatch: MatchGroupUtilMatch
+---@field opponents SmashStandardOpponent[]
+
+---@param record match2
+---@return SmashMatchGroupUtilMatch
 function SmashMatchGroupUtil.matchFromRecord(record)
 	local match = MatchGroupUtil.matchFromRecord(record)
+	---@cast match SmashMatchGroupUtilMatch
 
 	-- Add additional fields to opponents
 	SmashMatchGroupUtil.populateOpponents(match)
@@ -26,7 +32,7 @@ function SmashMatchGroupUtil.matchFromRecord(record)
 end
 
 ---Move additional fields from extradata to struct
----@param match MatchGroupUtilMatch
+---@param match SmashMatchGroupUtilMatch
 function SmashMatchGroupUtil.populateOpponents(match)
 	local opponents = match.opponents
 
@@ -34,6 +40,8 @@ function SmashMatchGroupUtil.populateOpponents(match)
 		if opponent.type ~= Opponent.solo then
 			return
 		end
+
+		---@param game MatchGroupUtilGame
 		local function getCharacters(game)
 			return (game.opponents[opponentIndex].players[1] or {}).characters or {}
 		end
@@ -48,7 +56,7 @@ function SmashMatchGroupUtil.populateOpponents(match)
 		end
 
 		opponent.players[1].game = match.game
-		opponent.players[1].heads = Array.map(match.games, function(game)
+		opponent.players[1].extradata.heads = Array.map(match.games, function(game)
 			return getCharacters(game)[#getCharacters(game)]
 		end)
 	end)
