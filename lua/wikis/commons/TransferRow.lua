@@ -57,6 +57,7 @@ local VALID_CONFIDENCES = {
 ---@field chars string[]
 
 ---@class TransferRow: BaseClass
+---@operator call(table): TransferRow
 ---@field config {storage: boolean, isRumour: boolean}
 ---@field transfers transfer[]
 ---@field args table
@@ -113,6 +114,7 @@ function TransferRow:readInput()
 	return transfers
 end
 
+---@private
 ---@return table
 function TransferRow:_readBaseData()
 	local args = self.args
@@ -184,7 +186,8 @@ function TransferRow:_readBaseData()
 	}
 end
 
----@return {}
+---@private
+---@return {confirmed: string?, confidence: string?, isRumour: boolean?}
 function TransferRow:_getRumourInformation()
 	if not self.config.isRumour then return {} end
 
@@ -210,6 +213,7 @@ function TransferRow:readPlatform()
 	return self.args.platform
 end
 
+---@private
 ---@param dateInput string?
 ---@return string?
 function TransferRow._shiftDate(dateInput)
@@ -248,6 +252,7 @@ function TransferRow:readPlayer(playerIndex)
 	}
 end
 
+---@private
 ---@param data {player: transferPlayer, index: integer|string, sortIndex: integer}
 ---@return transfer
 function TransferRow:_convertToTransferStructure(data)
@@ -305,6 +310,7 @@ function TransferRow:readIconsAndPosition(playerIndex)
 	return icons, positions
 end
 
+---@private
 ---@param numberOfPlayers integer
 ---@return table
 function TransferRow:_readReferences(numberOfPlayers)
@@ -339,6 +345,7 @@ function TransferRow:store()
 	return self
 end
 
+---@private
 ---@param transfer transfer
 ---@return string
 function TransferRow._objectName(transfer)
