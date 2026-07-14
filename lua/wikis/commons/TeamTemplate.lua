@@ -60,7 +60,6 @@ Returns the page name with resolved redirects of a team template that has been r
 date. Returns nil if the team does not exist, or if the page is not specified.
 ]]
 ---@param resolvedTemplate string
----@param date string|number?
 ---@return string|nil
 TeamTemplate.getPageName = FnUtil.memoize(function(resolvedTemplate)
 	local page = TeamTemplate.getPageNameNoRedirect(resolvedTemplate)
