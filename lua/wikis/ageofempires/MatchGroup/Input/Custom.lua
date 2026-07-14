@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local FnUtil = Lua.import('Module:FnUtil')
-local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
@@ -257,7 +256,7 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 		end,
 		function(playerIndex, playerIdData, playerInputData)
 			local civ = Logic.emptyOr(civs[playerIndex], Faction.defaultFaction)
-			civ = Faction.read(civ, {game = Game.toIdentifier{game = map.game}})
+			civ = Faction.read(civ, {game = map.game})
 			return {
 				civ = civ,
 				displayName = playerIdData.displayname or playerInputData.name,
@@ -352,7 +351,7 @@ function FfaMapFunctions.getPlayersOfMapOpponent(map, opponent, opponentMapInput
 		end,
 		function(playerIndex, playerIdData, playerInputData)
 			local faction = Logic.emptyOr(factions[playerIndex], Faction.defaultFaction)
-			faction = Faction.read(faction, {game = Game.toIdentifier{game = map.game}})
+			faction = Faction.read(faction, {game = map.game})
 			return {
 				faction = faction,
 			}
