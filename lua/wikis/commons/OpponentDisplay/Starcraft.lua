@@ -16,7 +16,6 @@ local Table = Lua.import('Module:Table')
 local Opponent = Lua.import('Module:Opponent')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 
-local BracketDisplayComponents = Lua.import('Module:Widget/Match/Bracket/All')
 local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
