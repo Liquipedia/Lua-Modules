@@ -345,7 +345,7 @@ function TransferRow._objectName(transfer)
 	return 'transfer_' .. transfer.date .. '_' .. string.format('%06d', transfer.extradata.sortindex)
 end
 
----@return Widget?
+---@return VNode
 function TransferRow:build()
 	return TransferRowWidget{transfers = self.transfers}
 end
