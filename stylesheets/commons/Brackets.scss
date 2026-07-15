@@ -2,12 +2,20 @@
 * Styles shared between BracketDisplay, MatchlistDisplay, and MatchSummary
 */
 
-:root {
-	--brackets-header-background-color: var( --clr-surface-2 );
-	--brackets-header-border-color: var( --clr-surface-4 );
-	--brackets-background-color: var( --clr-surface-2 );
-	--brackets-score-background-color: var( --clr-surface-2 );
-	--brackets-border-color: var( --clr-surface-4 );
+.theme--light {
+	--brackets-header-background-color: #cfcfcf;
+	--brackets-header-border-color: #aaaaaa;
+	--brackets-background-color: #f2f2f2;
+	--brackets-score-background-color: #ebebeb;
+	--brackets-border-color: #aaaaaa;
+}
+
+.theme--dark {
+	--brackets-header-background-color: var( --clr-secondary-16 );
+	--brackets-header-border-color: var( --clr-secondary-16 );
+	--brackets-background-color: var( --clr-secondary-9 );
+	--brackets-score-background-color: var( --clr-secondary-16 );
+	--brackets-border-color: var( --clr-secondary-16 );
 }
 
 .brkts-match-has-details {
