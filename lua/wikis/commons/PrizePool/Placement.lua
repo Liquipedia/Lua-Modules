@@ -327,40 +327,27 @@ end
 
 ---@return string?
 function Placement:getBackground()
-	for statusName, status in pairs(Placement.specialStatuses) do
-		if status.active(self.args) then
-			return PlacementInfo.getBgClass{placement = statusName:lower()}
-		end
-	end
-
-	return PlacementInfo.getBgClass{placement = self.placeStart}
+	return PlacementInfo.getBgClass{placement = self:getSpecialStatus() or self.placeStart}
 end
 
 ---Returns the placement-badge color class for top-3 placements, else nil.
 ---Colored by the top of the range (placeStart).
 ---@return string?
 function Placement:getBadgeClass()
-	if self:hasSpecialStatus() or self.placeStart > 3 then
+	local specialStatus = self:getSpecialStatus()
+	if (not specialStatus) and self.placeStart > 3 then
 		return nil
 	end
-	return PlacementInfo.raw(self.placeStart).backgroundClass
+	return PlacementInfo.raw(specialStatus or self.placeStart).backgroundClass
 end
 
 ---@return string?
-function Placement:getMedal()
-	if self:hasSpecialStatus() then
-		return
+function Placement:getSpecialStatus()
+	for statusName, status in pairs(Placement.specialStatuses) do
+		if status.active(self.args) then
+			return statusName:lower()
+		end
 	end
-
-	local medal = Medals.display{medal = self:_lpdbValue()}
-	if medal then
-		return tostring(medal)
-	end
-end
-
----@return boolean
-function Placement:hasSpecialStatus()
-	return Table.any(Placement.specialStatuses, function(_, status) return status.active(self.args) end)
 end
 
 return Placement

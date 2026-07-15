@@ -19,16 +19,28 @@ so they must stay defined even though the redesigned table no longer uses them.
 	--prizepool-place-2-accent: var( --clr-semantic-silver-40 );
 	--prizepool-place-3-accent: var( --clr-semantic-bronze-40 );
 
+	--prizepool-place-w-accent: var( --position-up-color );
+	--prizepool-place-l-accent: var( --position-down-color );
+	--prizepool-place-dq-accent: var( --position-disqualified-color );
+
 	// Faint full-row tint per place (light theme; dark overrides in `.theme--dark`).
 	--prizepool-place-1-tint: #f7f2d9;
 	--prizepool-place-2-tint: #e6eaeb;
 	--prizepool-place-3-tint: #eceae4;
+
+	--prizepool-place-w-tint: var( --position-up-background-color );
+	--prizepool-place-l-tint: var( --position-down-background-color );
+	--prizepool-place-dq-tint: var( --position-disqualified-background-color );
 
 	// Hover tint derived from the row tint. hsl( from … ) is safe here — `:hover` is
 	// never captured by the exporter, so this value never reaches html2canvas.
 	--prizepool-place-1-tint-hover: hsl( from var( --prizepool-place-1-tint ) h s calc( l * 0.9 ) );
 	--prizepool-place-2-tint-hover: hsl( from var( --prizepool-place-2-tint ) h s calc( l * 0.9 ) );
 	--prizepool-place-3-tint-hover: hsl( from var( --prizepool-place-3-tint ) h s calc( l * 0.9 ) );
+
+	--prizepool-place-w-tint-hover: hsl( from var( --prizepool-place-w-tint ) h s calc( l * 0.9 ) );
+	--prizepool-place-l-tint-hover: hsl( from var( --prizepool-place-l-tint ) h s calc( l * 0.9 ) );
+	--prizepool-place-dq-tint-hover: hsl( from var( --prizepool-place-dq-tint ) h s calc( l * 0.9 ) );
 }
 
 .theme--light {
@@ -61,6 +73,10 @@ so they must stay defined even though the redesigned table no longer uses them.
 	--prizepool-place-1-tint-hover: hsl( from var( --prizepool-place-1-tint ) h s calc( l * 1.25 ) );
 	--prizepool-place-2-tint-hover: hsl( from var( --prizepool-place-2-tint ) h s calc( l * 1.25 ) );
 	--prizepool-place-3-tint-hover: hsl( from var( --prizepool-place-3-tint ) h s calc( l * 1.25 ) );
+
+	--prizepool-place-w-tint-hover: hsl( from var( --prizepool-place-w-tint ) h s calc( l * 1.25 ) );
+	--prizepool-place-l-tint-hover: hsl( from var( --prizepool-place-l-tint ) h s calc( l * 1.25 ) );
+	--prizepool-place-dq-tint-hover: hsl( from var( --prizepool-place-dq-tint ) h s calc( l * 1.25 ) );
 }
 
 /*******************************************************************************
@@ -345,6 +361,18 @@ share the `prizepooltable` class.
 		&.placement-3 {
 			background-color: var( --prizepool-place-3-accent );
 		}
+
+		&.placement-win {
+			background-color: var( --prizepool-place-w-accent );
+		}
+
+		&.placement-lose {
+			background-color: var( --prizepool-place-l-accent );
+		}
+
+		&.placement-disqualified {
+			background-color: var( --prizepool-place-dq-accent );
+		}
 	}
 
 	&.prizepooltable-placement {
@@ -368,7 +396,7 @@ share the `prizepooltable` class.
 		// `border-bottom: 0` drops the legacy per-place coloured row border. The hover tint
 		// re-applies on `table2__row--group-hover` (added by Table2.js to every row in a
 		// hovered group) since the base tint above out-specifies the generic group-hover rule.
-		$prizepool-top-placements: ( first: 1, second: 2, third: 3 );
+		$prizepool-top-placements: ( first: 1, second: 2, third: 3, win: w, lose: l, dq: dq );
 
 		@each $name, $n in $prizepool-top-placements {
 			tr.table2__row--body.background-color-#{ $name }-place {
@@ -393,18 +421,6 @@ share the `prizepooltable` class.
 				}
 			}
 		}
-	}
-
-	tr.table2__row--body.bg-win .prizepooltable-place {
-		background-color: var( --clr-forest-background-color, inherit );
-	}
-
-	tr.table2__row--body.bg-lose .prizepooltable-place {
-		background-color: var( --clr-cinnabar-background-color, inherit );
-	}
-
-	tr.table2__row--body.bg-dq .prizepooltable-place {
-		background-color: var( --clr-sapphire-background-color, inherit );
 	}
 }
 
