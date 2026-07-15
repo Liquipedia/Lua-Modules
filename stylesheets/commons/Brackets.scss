@@ -2,20 +2,12 @@
 * Styles shared between BracketDisplay, MatchlistDisplay, and MatchSummary
 */
 
-.theme--light {
-	--brackets-header-background-color: #cfcfcf;
-	--brackets-header-border-color: #aaaaaa;
-	--brackets-background-color: #f2f2f2;
-	--brackets-score-background-color: #ebebeb;
-	--brackets-border-color: #aaaaaa;
-}
-
-.theme--dark {
-	--brackets-header-background-color: var( --clr-secondary-16 );
-	--brackets-header-border-color: var( --clr-secondary-16 );
-	--brackets-background-color: var( --clr-secondary-9 );
-	--brackets-score-background-color: var( --clr-secondary-16 );
-	--brackets-border-color: var( --clr-secondary-16 );
+:root {
+	--brackets-header-background-color: var( --clr-surface-2 );
+	--brackets-header-border-color: var( --clr-surface-4 );
+	--brackets-background-color: var( --clr-surface-2 );
+	--brackets-score-background-color: var( --clr-surface-2 );
+	--brackets-border-color: var( --clr-surface-4 );
 }
 
 .brkts-match-has-details {
@@ -1371,9 +1363,10 @@ div.brkts-opponent-hover {
 	height: 22px;
 }
 
-.brkts-designer-small-button {
-	background-color: #e0e0e0;
-	border: solid 1px #c0c0c0;
+.brkts-match .brkts-designer-small-button {
+	background-color: var( --clr-surface-3 );
+	border: solid 1px var( --clr-surface-4 );
+	color: var( --clr-on-surface );
 	display: block;
 	font-size: 11px;
 	padding: 0;
