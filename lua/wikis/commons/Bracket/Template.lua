@@ -59,7 +59,7 @@ end
 function BracketTemplate.BracketContainer(props)
 	local matchRecords = MatchGroupUtil.fetchMatchRecords(props.bracketId)
 	Array.forEach(matchRecords, function(match)
-		match.match2opponents = {Opponent.blank(Opponent.literal)}
+		match.match2opponents = {{type = Opponent.literal, name = '', match2players = {}}}
 	end)
 	local bracket = MatchGroupUtil.makeMatchGroup(matchRecords) --[[@as MatchGroupUtilBracket]]
 
