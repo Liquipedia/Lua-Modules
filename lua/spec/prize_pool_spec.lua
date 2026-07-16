@@ -67,6 +67,19 @@ describe('prize pool', function()
 		[2] = {usdprize = '130,000', playershare = '100,000', [1] = {'t1'}},
 	}
 
+	local specialPrizePoolArgs = {
+		type = {type = 'solo'},
+		import = false,
+		lpdb_storage = false,
+		[1] = {dq = true},
+		[2] = {dnp = true},
+		[3] = {dnf = true},
+		[4] = {w = true},
+		[5] = {d = true},
+		[6] = {l = true},
+		[7] = {q = true},
+	}
+
 	it('parameters are correctly parsed', function()
 		local ppt = PrizePool(prizePoolArgs):create()
 
@@ -199,6 +212,7 @@ describe('prize pool', function()
 			GoldenTest('prize_pool', tostring(PrizePool(prizePoolArgs):create():build()))
 			local clubShareNoStore = Table.merge(clubSharePoolArgs, {storelpdb = false})
 			GoldenTest('prize_pool_club_share', tostring(PrizePool(clubShareNoStore):create():build()))
+			GoldenTest('prize_pool_special_placements', tostring(PrizePool(specialPrizePoolArgs):create():build()))
 		end)
 
 		it('lpdb storage', function()
