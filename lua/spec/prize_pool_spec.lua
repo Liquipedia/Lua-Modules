@@ -71,6 +71,7 @@ describe('prize pool', function()
 		type = {type = 'solo'},
 		import = false,
 		lpdb_storage = false,
+		cutafter = 7,
 		[1] = {dq = true},
 		[2] = {dnp = true},
 		[3] = {dnf = true},
