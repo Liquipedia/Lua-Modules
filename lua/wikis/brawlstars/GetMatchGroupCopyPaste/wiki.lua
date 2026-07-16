@@ -59,7 +59,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, matchIndex, opponents, args)
 		Logic.readBool(args.hasCasters) and Array.map(Array.range(1, numberOfCasters), function(casterIndex)
 			return INDENT .. '|caster' .. casterIndex .. '='
 		end) or {},
-		Logic.readBool(args.hasCasters) and (INDENT .. '|vod=') or nil,
+		Logic.readBool(args.hasVod) and (INDENT .. '|vod=') or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
