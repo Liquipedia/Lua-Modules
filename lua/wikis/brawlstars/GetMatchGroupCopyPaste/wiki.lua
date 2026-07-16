@@ -49,21 +49,21 @@ local INDENT = WikiCopyPaste.Indent
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, matchIndex, opponents, args)
 	local showScore = Logic.readBool(args.score)
-	local casters = tonumber(args.casters) or 2
-	local globals = tonumber(args.globals) or 2
+	local numberOfCasters = tonumber(args.casters) or 2
+	local numberOfGlobalBans = tonumber(args.globals) or 2
 
 	local lines = Array.extend(
 		'{{Match',
 		matchIndex == 1 and (INDENT .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
 		Logic.readBool(args.hasDate) and {INDENT .. '|date=', INDENT .. '|twitch='} or {},
-		Logic.readBool(args.hasCasters) and Array.map(Array.range(1, casters), function(casterNumber)
-			return INDENT .. '|caster' .. casterNumber .. '=|caster' .. casterNumber .. 'flag='
+		Logic.readBool(args.hasCasters) and Array.map(Array.range(1, numberOfCasters), function(casterIndex)
+			return INDENT .. '|caster' .. casterIndex .. '=|caster' .. casterIndex .. 'flag='
 		end) or {},
 		Logic.readBool(args.hasCasters) and (INDENT .. '|vod=') or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
-		Logic.readBool(args.hasGlobals) and WikiCopyPaste._globalBanParams(opponents, globals) or {}
+		Logic.readBool(args.hasGlobalBans) and WikiCopyPaste._globalBanParams(opponents, numberOfGlobalBans) or {}
 	)
 
 	Array.extendWith(lines, WikiCopyPaste._getMapVetoCode(args.mapVeto, args.customVeto))
@@ -119,9 +119,7 @@ function WikiCopyPaste._getMapVetoCode(mapVeto, customVeto)
 	local vetoTypes = mapVeto == 'custom' and customVeto or mapVeto
 	vetoTypes = string.gsub(vetoTypes, '%-', ',')
 
-	local types = Array.map(String.split(vetoTypes, ','), function(vetoType)
-		return String.trim(vetoType)
-	end)
+	local types = Array.parseCommaSeparatedString(vetoTypes)
 	vetoTypes = table.concat(types, ',')
 
 	local lines = {
@@ -134,17 +132,15 @@ function WikiCopyPaste._getMapVetoCode(mapVeto, customVeto)
 	local deciderAdded = false
 
 	Array.forEach(types, function(vetoType)
-		vetoType = String.trim(vetoType)
-
-			assert(
-				vetoType == 'pick'
-					or vetoType == 'ban'
-					or vetoType == 'default'
-					or vetoType == 'decider',
-				'Unknown map veto type "' .. vetoType ..
-					'". Expected a comma-separated list using only: pick, ban, decider, default. ' ..
-					'Example: pick,ban,decider,default'
-			)
+		assert(
+			vetoType == 'pick'
+				or vetoType == 'ban'
+				or vetoType == 'default'
+				or vetoType == 'decider',
+			'Unknown map veto type "' .. vetoType ..
+				'". Expected a comma-separated list using only: pick, ban, decider, default. ' ..
+				'Example: pick,ban,decider,default'
+		)
 
 		if vetoType == 'pick' or vetoType == 'ban' then
 			table.insert(lines,
