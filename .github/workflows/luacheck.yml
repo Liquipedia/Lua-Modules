@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup lua
         uses: Liquipedia/gh-actions-lua@7615c1c345af98bd9898fa5b53c488c5f58246cf
@@ -40,7 +40,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup lua
         uses: Liquipedia/gh-actions-lua@7615c1c345af98bd9898fa5b53c488c5f58246cf
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - id: lua-changed-files
         uses: tj-actions/changed-files@v47
