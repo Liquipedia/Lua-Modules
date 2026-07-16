@@ -179,7 +179,7 @@ function WikiCopyPaste._pickBanParams(key, numberOfOpponents)
 end
 
 ---@param numberOfOpponents integer
----@param globals integer
+---@param numberOfGlobals integer
 ---@return string[]
 function WikiCopyPaste._globalBanParams(numberOfOpponents, numberOfGlobals)
 	return {
