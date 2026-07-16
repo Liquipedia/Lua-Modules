@@ -48,7 +48,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.dq)
 		end,
 		display = function ()
-			return Abbreviation.make{text = 'DQ', title = 'Disqualified'}
+			return 'DQ'
 		end,
 		lpdb = 'DQ',
 	},
@@ -57,7 +57,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.dnf)
 		end,
 		display = function ()
-			return Abbreviation.make{text = 'DNF', title = 'Did not finish'}
+			return 'DNF'
 		end,
 		lpdb = 'DNF',
 	},
@@ -66,7 +66,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.dnp)
 		end,
 		display = function ()
-			return Abbreviation.make{text = 'DNP', title = 'Did not participate'}
+			return 'DNP'
 		end,
 		lpdb = 'DNP',
 	},
@@ -102,7 +102,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.q)
 		end,
 		display = function ()
-			return Abbreviation.make{text = 'Q', title = 'Qualified Automatically'}
+			return 'Q'
 		end,
 		lpdb = 'Q',
 	},
