@@ -56,14 +56,14 @@ function WikiCopyPaste.getMatchCode(bestof, mode, matchIndex, opponents, args)
 		'{{Match',
 		matchIndex == 1 and (INDENT .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
 		Logic.readBool(args.hasDate) and {INDENT .. '|date=', INDENT .. '|twitch='} or {},
-		Logic.readBool(args.hasCasters) and Array.map(Array.range(1, numberOfCasters), function(casterIndex)
+		numberOfCasters ~= 0 and Array.map(Array.range(1, numberOfCasters), function(casterIndex)
 			return INDENT .. '|caster' .. casterIndex .. '='
 		end) or {},
 		Logic.readBool(args.hasVod) and (INDENT .. '|vod=') or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
-		Logic.readBool(args.hasGlobalBans) and WikiCopyPaste._globalBanParams(opponents, numberOfGlobalBans) or {}
+		numberOfGlobalBans ~= 0 and WikiCopyPaste._globalBanParams(opponents, numberOfGlobalBans) or {}
 	)
 
 	Array.extendWith(lines, WikiCopyPaste._getMapVetoCode(args.mapVeto, args.customVeto))
