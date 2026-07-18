@@ -1977,3 +1977,71 @@ body .fieldBox {
 	background: var( --clr-surface-2 );
 	color: var( --clr-on-surface );
 }
+
+/*******************************************************************************
+Template(s): TournamentPlayerStats, TournamentInputStats
+Author(s): Slothyman
+Custom summary boxes above tables
+*******************************************************************************/
+
+.stats-summary-cards {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	position: relative;
+	margin-bottom: 1rem;
+}
+
+.stats-summary-card {
+	flex: 1 1 150px;
+	min-width: 0;
+	border: 1px solid var( --clr-on-surface-light-primary-8 );
+	border-top: 3px solid var( --clr-wiki-theme-primary );
+	border-radius: 0.5rem;
+	padding: 0.75rem 0.5rem;
+	text-align: center;
+	background-color: #ffffff;
+	box-shadow: 0 0.125rem 0.25rem rgba( 0, 0, 0, 0.05 );
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+	.theme--dark & {
+		background-color: var( --clr-on-surface-dark-primary-4 );
+		border-color: var( --clr-on-surface-dark-primary-8 );
+		border-top-color: var( --clr-wiki-theme-primary );
+		box-shadow: 0 0.125rem 0.375rem rgba( 0, 0, 0, 0.2 );
+	}
+
+	@media ( hover: hover ) {
+		&:hover {
+			transform: translateY( -2px );
+			box-shadow: 0 0.25rem 0.5rem rgba( 0, 0, 0, 0.1 );
+
+			.theme--dark & {
+				box-shadow: 0 0.25rem 0.5rem rgba( 0, 0, 0, 0.4 );
+			}
+		}
+	}
+
+	&__title {
+		font-size: 1.125rem;
+		font-weight: bold;
+		margin-top: 0.25rem;
+		color: var( --clr-secondary-7 );
+
+		.theme--dark & {
+			color: #ffffff;
+		}
+	}
+
+	&__subtitle {
+		font-size: 0.75rem;
+		text-transform: uppercase;
+		font-weight: bold;
+		letter-spacing: 0.05em;
+		color: var( --clr-secondary-25 );
+
+		.theme--dark & {
+			color: var( --clr-secondary-90 );
+		}
+	}
+}
