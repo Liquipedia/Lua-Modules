@@ -56,13 +56,17 @@ local TEAM_INLINE_TYPES = {
 ---@field teamTemplate teamTemplateData?
 ---@field flip boolean?
 ---@field displayType teamStyle
+---@field nilIfEmpty boolean? only for usage from wikicode
 
 local TeamInlineWidget = {}
 
 ---@param props TeamInlineParameters
----@return VNode
+---@return VNode?
 function TeamInlineWidget.render(props)
 	local displayType = assert(TEAM_INLINE_TYPES[props.displayType], 'Invalid display type')
+	if Logic.readBool(props.nilIfEmpty) and (not props.teamTemplate) and (not props.name) then
+		return
+	end
 	local teamTemplate = props.teamTemplate or TeamTemplate.getRawOrNil(props.name, props.date)
 	if not teamTemplate then
 		mw.ext.TeamLiquidIntegration.add_category('Pages with missing team templates')

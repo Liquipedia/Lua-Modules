@@ -29,11 +29,16 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field style teamStyle
 ---@field dq boolean?
 ---@field note string|number?
+---@field nilIfEmpty boolean? only for usage from wikicode
 
 local BlockTeamWidget = {}
 
 ---@param props BlockTeamParameters
+---@return VNode?
 function BlockTeamWidget.render(props)
+	if Logic.readBool(props.nilIfEmpty) and (not props.teamTemplate) and (not props.name) then
+		return
+	end
 	local teamTemplate = props.teamTemplate or TeamTemplate.getRawOrNil(props.name, props.date)
 
 	if not teamTemplate then
