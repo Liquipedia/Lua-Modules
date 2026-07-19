@@ -20,7 +20,7 @@ local Box = Lua.import('Module:Widget/Basic/Box')
 
 local FactionLists = Class.new(Widget)
 
----@return Box
+---@return Renderable
 function FactionLists:render()
 	return Box{
 		children = Array.map(Game.listGames{ordered=true}, FactionLists._getTable)
