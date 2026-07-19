@@ -22,7 +22,7 @@ local FactionLists = {}
 ---@return Renderable
 function FactionLists.render(props)
 	return Box{
-		children = Array.map(Game.listGames{ordered=true}, FactionLists._getTable)
+		children = Array.map(Game.listGames{ordered = true}, FactionLists._getTable)
 	}
 end
 
