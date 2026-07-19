@@ -56,14 +56,14 @@ function WikiCopyPaste.getMatchCode(bestof, mode, matchIndex, opponents, args)
 		'{{Match',
 		matchIndex == 1 and (INDENT .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
 		Logic.readBool(args.hasDate) and {INDENT .. '|date=', INDENT .. '|twitch='} or {},
-		numberOfCasters ~= 0 and Array.map(Array.range(1, numberOfCasters), function(casterIndex)
+		numberOfCasters > 0 and Array.mapRange(1, numberOfCasters, function(casterIndex)
 			return INDENT .. '|caster' .. casterIndex .. '='
 		end) or {},
 		Logic.readBool(args.hasVod) and (INDENT .. '|vod=') or nil,
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
-		numberOfGlobalBans ~= 0 and WikiCopyPaste._globalBanParams(opponents, numberOfGlobalBans) or {}
+		numberOfGlobalBans > 0 and WikiCopyPaste._globalBanParams(opponents, numberOfGlobalBans) or {}
 	)
 
 	Array.extendWith(lines, WikiCopyPaste._getMapVetoCode(args.mapVeto, args.customVeto))
@@ -167,8 +167,8 @@ function WikiCopyPaste._pickBanParams(key, numberOfOpponents)
 	local shortKey = PARAM_TO_SHORT[key]
 	local limit = LIMIT_OF_PARAM[key]
 
-	return Array.map(Array.range(1, numberOfOpponents), function(opponentIndex)
-		return INDENT .. INDENT .. table.concat(Array.map(Array.range(1, limit), function(keyIndex)
+	return Array.mapRange(1, numberOfOpponents, function(opponentIndex)
+		return INDENT .. INDENT .. table.concat(Array.mapRange(1, limit, function(keyIndex)
 			return '|t' .. opponentIndex .. shortKey .. keyIndex .. '='
 		end))
 	end)
@@ -179,8 +179,8 @@ end
 ---@return string[]
 function WikiCopyPaste._globalBanParams(numberOfOpponents, numberOfGlobals)
 	return {
-		INDENT .. table.concat(Array.map(Array.range(1, numberOfOpponents), function(opponentIndex)
-			return table.concat(Array.map(Array.range(1, numberOfGlobals), function(globalIndex)
+		INDENT .. table.concat(Array.mapRange(1, numberOfOpponents, function(opponentIndex)
+			return table.concat(Array.mapRange(1, numberOfGlobals, function(globalIndex)
 				return '|t' .. opponentIndex .. 'b' .. globalIndex .. '='
 			end))
 		end))
