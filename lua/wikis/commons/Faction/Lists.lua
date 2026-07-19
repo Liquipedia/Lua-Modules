@@ -1,70 +1,79 @@
-local Array = require('Module:Array')
-local Box = require('Module:Box')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
+---
+-- @Liquipedia
+-- page=Module:Widget/FactionLists
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
 
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 local Faction = Lua.import('Module:Faction')
+local FnUtil = Lua.import('Module:FnUtil')
+local Game = Lua.import('Module:Game')
+local Table = Lua.import('Module:Table')
 
-local FactionLists = {}
+local Widget = Lua.import('Module:Widget')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local Box = Lua.import('Module:Widget/Basic/Box')
 
-function FactionLists.getLists(args)
-	return Box.start{}
-	.. table.concat(
-		Array.extractValues(
-			Table.map(
-				Faction.factions,
-				function(game, factions)
-					return game, FactionLists._getTable(factions, game)
-				end
-			),
-			Table.iter.spairs
-		), Box.brk{})
-	.. Box.finish()
+local FactionLists = Class.new(Widget)
+
+---@return Box
+function FactionLists:render()
+	return Box{
+		children = Array.map(Game.listGames{ordered=true}, FactionLists._getTable)
+	}
 end
 
-function FactionLists._getTable(factions, game)
+---@private
+---@param game string
+---@return string
+function FactionLists._getTable(game)
+	local factions = Faction.getFactions{game = game}
+	local aliases = Table.groupBy(Faction.getAliases{game = game}, function (_, value) return value end)
+
 	local header = Game.name{game = game} or 'Factions'
-	local tbl = mw.html.create('table')
-		:addClass('wikitable')
-			:tag('tr')
-				:tag('th')
-					:attr('colspan', 3)
-					:wikitext(header)
-					:done()
-				:done()
-			:tag('tr')
-				:tag('th')
-					:wikitext('Civilization')
-					:done()
-				:tag('th')
-					:wikitext('Aliases')
-					:done()
-				:tag('th')
-					:wikitext('Identifier')
-					:done()
-				:done()
 
-	local aliases = Table.groupBy(game and Faction.aliases[game] or Faction.aliases, function(_, faction) return faction end)
-	for _, faction in Table.iter.spairs(factions, function(tbl, a, b) return tbl[a] < tbl[b] end) do
-			tbl:tag('tr')
-				:tag('th')
-					:css('text-align', 'left')
-					:addClass('draft')
-					:addClass('faction')
-					:wikitext((Faction.Icon{faction=faction, game=game, showLink=true, showTitle=true, size=64} or '') .. ' ' .. (Faction.toName(faction, {game=game}) or ''))
-					:done()
-				:tag('td')
-					:wikitext(aliases[faction] and table.concat(Array.extractKeys(aliases[faction]), ', ') or '')
-					:done()
-				:tag('td')
-					:wikitext(faction)
-					:done()
-				:done()
-	end
-	return tostring(tbl:allDone())
+	return TableWidgets.Table{
+		title = header,
+		children = Array.extend(
+			TableWidgets.TableHeader{
+				children = {
+					TableWidgets.CellHeader{children = 'Civilization'},
+					TableWidgets.CellHeader{children = 'Aliases'},
+					TableWidgets.CellHeader{children = 'Identifier'},
+				}
+			},
+			Array.map(
+				Array.sortBy(factions, FnUtil.identity),
+				function (faction)
+					return TableWidgets.Row{
+						children = {
+							TableWidgets.Cell{
+								classes = {'draft', 'faction'},
+								children = Faction.Icon{
+									faction=faction,
+									game=game,
+									showLink=true,
+									showTitle=true,
+									showName=true,
+									size=64
+								},
+							},
+							TableWidgets.Cell{
+								children = Array.interleave(Array.extractKeys(aliases[faction] or {}), ', ')
+							},
+							TableWidgets.Cell{
+								children = faction
+							}
+						}
+					}
+				end
+			)
+		)
+	}
 end
 
-return Class.export(FactionLists)
+return FactionLists
