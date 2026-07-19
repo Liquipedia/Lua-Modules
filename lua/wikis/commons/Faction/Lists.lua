@@ -14,11 +14,11 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
 local Table = Lua.import('Module:Table')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local Box = Lua.import('Module:Widget/Basic/Box')
 
-local FactionLists = Class.new(Widget)
+local FactionLists = {}
 
 ---@return Renderable
 function FactionLists:render()
@@ -76,4 +76,4 @@ function FactionLists._getTable(game)
 	}
 end
 
-return FactionLists
+return Component.component(FactionLists.render)
