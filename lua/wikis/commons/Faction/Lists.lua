@@ -40,7 +40,7 @@ function FactionLists._getTable(game)
 		children = Array.extend(
 			TableWidgets.TableHeader{
 				children = {
-					TableWidgets.CellHeader{children = 'Civilization'},
+					TableWidgets.CellHeader{children = 'Name'},
 					TableWidgets.CellHeader{children = 'Aliases'},
 					TableWidgets.CellHeader{children = 'Identifier'},
 				}
