@@ -53,12 +53,12 @@ function FactionLists._getTable(game)
 							TableWidgets.Cell{
 								classes = {'draft', 'faction'},
 								children = Faction.Icon{
-									faction=faction,
-									game=game,
-									showLink=true,
-									showTitle=true,
-									showName=true,
-									size=64
+									faction = faction,
+									game = game,
+									showLink = true,
+									showTitle = true,
+									showName = true,
+									size = 64
 								},
 							},
 							TableWidgets.Cell{
