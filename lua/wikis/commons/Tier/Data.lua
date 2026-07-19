@@ -1,11 +1,11 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Tier/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+---@type TierData
 return {
 	tiers = {
 		{

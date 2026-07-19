@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Links/Stream
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -11,14 +10,16 @@ Module containing utility functions for streaming platforms.
 ]]
 local StreamLinks = {}
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
-local Page = require('Module:Page')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local streamVars = PageVariableNamespace('StreamCache')
 
@@ -160,6 +161,7 @@ function StreamLinks._processStreamsOfPlatform(streamValues, platformName)
 	return platformStreams
 end
 
+---@deprecated Widget/Match/Stream
 ---@param platform string
 ---@param streamValue string
 ---@return string?
@@ -177,6 +179,7 @@ function StreamLinks.displaySingle(platform, streamValue)
 	return Page.makeInternalLink({}, icon, 'Special:Stream/' .. platform .. '/' .. streamValue)
 end
 
+---@deprecated Widget/Match/StreamsContainer
 ---@param streams {string: string[]}
 ---@return string[]?
 function StreamLinks.buildDisplays(streams)

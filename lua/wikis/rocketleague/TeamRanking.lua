@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:TeamRanking
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -12,7 +11,9 @@
 
 local TeamRanking = {}
 
-local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 --- Entry point
 -- returns a string representation which contains the current RLCS Points and rank of a team in terms of RLCS Points
@@ -48,4 +49,4 @@ function TeamRanking.run(args)
 end
 
 
-return Class.export(TeamRanking)
+return Class.export(TeamRanking, {exports = {'run'}})

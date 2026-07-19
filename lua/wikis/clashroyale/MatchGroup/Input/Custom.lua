@@ -1,23 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=clashroyale
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local CardNames = mw.loadData('Module:CardNames')
-local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local CardNames = Lua.import('Module:CardNames', {loadData = true})
+local FnUtil = Lua.import('Module:FnUtil')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 
 local CustomMatchGroupInput = {}
@@ -41,7 +40,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
@@ -73,7 +72,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	local extradata = {
@@ -107,7 +106,7 @@ function MapFunctions.calculateMapScore(map)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]?
 function MapFunctions.getPlayersOfMapOpponent(mapInput, opponent, opponentIndex)
@@ -120,7 +119,7 @@ function MapFunctions.getPlayersOfMapOpponent(mapInput, opponent, opponentIndex)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return {player: string, played: boolean, cards: table}[]
 function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
@@ -150,7 +149,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return {player: string, played: boolean, cards: table}[]
 function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
@@ -169,7 +168,7 @@ end
 
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	return MapFunctions.getCardsExtradata(map.opponents)

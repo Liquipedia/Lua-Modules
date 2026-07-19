@@ -1,41 +1,46 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:Infobox/Item/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Faction = require('Module:Faction')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local MessageBox = require('Module:Message box')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Faction = Lua.import('Module:Faction')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Item = Lua.import('Module:Infobox/Item')
 
-local Widgets = require('Module:Widget/All')
+local Html = Lua.import('Module:Widget/Html')
+local WarningBox = Lua.import('Module:Widget/WarningBox')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
 
 ---@class StormgateItemInfobox: ItemInfobox
+---@operator call(Frame): StormgateItemInfobox
 ---@field data table
 local CustomItem = Class.new(Item)
+
+---@class StormgateItemInfoboxWidgetInjector: WidgetInjector
+---@operator call(StormgateItemInfobox): StormgateItemInfoboxWidgetInjector
+---@field caller StormgateItemInfobox
 local CustomInjector = Class.new(Injector)
 
-local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 local VALID_ITEMS = {
 	'Gear',
 }
 
 ---@param frame Frame
----@return Html
+---@return VNode
 function CustomItem.run(frame)
 	local item = CustomItem(frame)
 
@@ -50,14 +55,17 @@ function CustomItem.run(frame)
 
 	local builtInfobox = item:createInfobox()
 
-	return mw.html.create()
-		:node(builtInfobox)
-		:node(CustomItem._deprecatedWarning(item.data.deprecated.display))
+	return Html.Fragment{
+		children = {
+			builtInfobox,
+			CustomItem._deprecatedWarning(item.data.deprecated.display)
+		}
+	}
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -65,22 +73,20 @@ function CustomInjector:parse(id, widgets)
 	if id == 'info' then
 		return {
 			Title{children = args.informationType .. ' Information'},
-			Cell{name = 'Slot', content = {tonumber(args.slot)}},
-			Cell{name = 'Introduced', content = {caller.data.introduced.display}}
+			Cell{name = 'Slot', children = {tonumber(args.slot)}},
+			Cell{name = 'Introduced', children = {caller.data.introduced.display}}
 		}
 	elseif id == 'availability' then
 		return {
 			Title{children = 'Availability'},
-			Cell{name = 'Faction', content = {CustomItem._getFactionsDisplay(args.faction)}},
-			Cell{name = 'Unlocked', content = {CustomItem._getUnlockedDisplay(args.unlocked)}},
+			Cell{name = 'Faction', children = {CustomItem._getFactionsDisplay(args.faction)}},
+			Cell{name = 'Unlocked', children = {CustomItem._getUnlockedDisplay(args.unlocked)}},
 		}
 	elseif id == 'recipe' then
 		return {
 			Title{children = 'Tags'},
 			Center{children = {CustomItem._getTagsDisplay(args.tags)}}
 		}
-	elseif Table.includes({'attributes', 'ability', 'maps', 'recipe'}, id) then
-		return {}
 	end
 
 	return widgets
@@ -181,15 +187,11 @@ function CustomItem:_processPatchFromId(input)
 end
 
 ---@param patch string?
----@return Html?
+---@return Widget?
 function CustomItem._deprecatedWarning(patch)
 	if not patch then return end
 
-	return MessageBox.main('ambox', {
-		image = ICON_DEPRECATED,
-		class ='ambox-red',
-		text = 'This has been removed with Patch ' .. patch,
-	})
+	return WarningBox{text = 'This has been removed with Patch ' .. patch}
 end
 
 return CustomItem

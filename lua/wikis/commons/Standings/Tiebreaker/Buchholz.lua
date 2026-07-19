@@ -1,17 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Standings/Tiebreaker/Buchholz
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
 
@@ -23,6 +22,9 @@ local TiebreakerBuchholz = Class.new(TiebreakerInterface)
 ---@return integer
 function TiebreakerBuchholz:valueOf(state, opponent)
 	local enemies = Array.flatMap(opponent.matches, function(match)
+		if not match.finished then
+			return {}
+		end
 		return Array.filter(match.opponents, function (opp)
 			return not Opponent.same(opp, opponent.opponent)
 		end)
@@ -39,6 +41,11 @@ function TiebreakerBuchholz:valueOf(state, opponent)
 
 		return score + groupMember.match.w - groupMember.match.l
 	end, 0)
+end
+
+---@return string
+function TiebreakerBuchholz:headerTitle()
+	return 'Buchholz'
 end
 
 return TiebreakerBuchholz

@@ -1,57 +1,64 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/Characters
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Array = Lua.import('Module:Array')
+
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Character = Lua.import('Module:Widget/Match/Summary/Character')
 
 local BASE_SIZE = 24 -- From brkts-champion-icon in Brackets.less
 local HOVER_MODIFIER = 2.5 -- From brkts-champion-icon in Brackets.less
 
----@class MatchSummaryCharacters: Widget
----@operator call(table): MatchSummaryCharacters
-local MatchSummaryCharacters = Class.new(Widget)
-MatchSummaryCharacters.defaultProps = {
+---@class MatchSummaryCharactersProps
+---@field characters string[]?
+---@field flipped boolean?
+---@field date string?
+---@field bg string?
+---@field hideOnMobile boolean?
+---@field css table<string, string|number?>?
+---@field size number?
+
+local defaultProps = {
 	flipped = false,
 	hideOnMobile = false,
 	size = BASE_SIZE * HOVER_MODIFIER,
 }
 
----@return Widget[]?
-function MatchSummaryCharacters:render()
-	if not self.props.characters then
+---@param props MatchSummaryCharactersProps
+---@return VNode?
+local function MatchSummaryCharacters(props)
+	if not props.characters then
 		return nil
 	end
-	local flipped = self.props.flipped
+	local flipped = props.flipped
 
 	return Div{
 		classes = Array.extend(
 			'brkts-popup-body-element-thumbs',
 			'brkts-champion-icon',
 			flipped and 'brkts-popup-body-element-thumbs-right' or nil,
-			self.props.hideOnMobile and 'hide-mobile' or nil
+			props.hideOnMobile and 'mobile-hide' or nil
 		),
-		children = Array.map(self.props.characters, function(character)
+		css = props.css,
+		children = Array.map(props.characters, function(character)
 			return Character{
 				character = character,
-				date = self.props.date,
-				bg = self.props.bg,
-				showName = #self.props.characters == 1,
+				date = props.date,
+				bg = props.bg,
+				showName = #props.characters == 1,
 				flipped = flipped,
-				size = self.props.size .. 'px',
+				size = props.size .. 'px',
 			}
 		end)
 	}
 end
 
-return MatchSummaryCharacters
+return Component.component(MatchSummaryCharacters, defaultProps)

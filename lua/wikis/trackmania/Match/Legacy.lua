@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=trackmania
 -- page=Module:Match/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,15 +7,16 @@
 
 local MatchLegacy = {}
 
-local Array = require('Module:Array')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
 
@@ -79,7 +79,7 @@ function MatchLegacy._convertParameters(match2)
 		local opponent = match2.match2opponents[index] or {}
 		local opponentMatch2Players = opponent.match2players or {}
 		if opponent.type == Opponent.team then
-			match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
+			match[prefix] = TeamTemplate.getRaw(opponent.template).page
 			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			local opponentPlayers = {}
 			for playerIndex, player in ipairs(opponentMatch2Players) do

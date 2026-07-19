@@ -1,18 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:ParticipantTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Json = require('Module:Json')
-local Faction = require('Module:Faction')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Faction = Lua.import('Module:Faction')
+local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 ---@class WarcraftParticipantTableConfig: ParticipantTableConfig
 ---@field displayUnknownColumn boolean?
@@ -23,43 +26,21 @@ local Variables = require('Module:Variables')
 ---@field soloColumnWidth number
 
 ---@class WarcraftParticipantTableEntry: ParticipantTableEntry
----@field opponent WarcraftStandardOpponent
+---@field opponent standardOpponent
 
 ---@class WarcraftParticipantTableSection: ParticipantTableSection
 ---@field entries WarcraftParticipantTableEntry[]
 
 ---@class WarcraftParticipantTable: ParticipantTable
----@field isPureSolo boolean
----@field _displaySoloFactionTableSection function
----@field _displayHeader function
----@field _getFactionNumbers function
-
-local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
-
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
-
-local CustomParticipantTable = {}
+---@operator call(Frame): WarcraftParticipantTable
+---@field config WarcraftParticipantTableConfig
+---@field sections WarcraftParticipantTableSection[]
+local CustomParticipantTable = Class.new(ParticipantTable)
 
 ---@param frame Frame
 ---@return Html?
 function CustomParticipantTable.run(frame)
-	local participantTable = ParticipantTable(frame) --[[@as WarcraftParticipantTable]]
-
-	participantTable.readConfig = CustomParticipantTable.readConfig
-	participantTable.readEntry = CustomParticipantTable.readEntry
-	participantTable.adjustLpdbData = CustomParticipantTable.adjustLpdbData
-	participantTable._displaySoloFactionTableSection = CustomParticipantTable._displaySoloFactionTableSection
-	participantTable._displayHeader = CustomParticipantTable._displayHeader
-	participantTable._getFactionNumbers = CustomParticipantTable._getFactionNumbers
-
-	participantTable:read():store()
-
-	if CustomParticipantTable.isPureSolo(participantTable.sections) then
-		participantTable.create = CustomParticipantTable.createSoloFactionTable
-	end
-
-	return participantTable:create()
+	return CustomParticipantTable(frame):read():store():create()
 end
 
 ---@param args table
@@ -106,10 +87,9 @@ function CustomParticipantTable:readEntry(sectionArgs, key, index, config)
 		faction = valueFromArgs('race'),
 	}
 
-	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
-		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
+	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
+	local opponent = Opponent.readOpponentArgs(opponentArgs)
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)
@@ -135,12 +115,19 @@ function CustomParticipantTable:adjustLpdbData(lpdbData, entry, config)
 	lpdbData.extradata.seriesnumber = seriesNumber and string.format('%05d', seriesNumber) or nil
 end
 
----@param sections WarcraftParticipantTableSection[]
 ---@return boolean
-function CustomParticipantTable.isPureSolo(sections)
-	return Array.all(sections, function(section) return Array.all(section.entries, function(entry)
+function CustomParticipantTable:isPureSolo()
+	return Array.all(self.sections, function(section) return Array.all(section.entries, function(entry)
 		return entry.opponent.type == Opponent.solo
 	end) end)
+end
+
+---@return Html?
+function CustomParticipantTable:create()
+	if self:isPureSolo() then
+		return self:createSoloFactionTable()
+	end
+	return ParticipantTable.create(self)
 end
 
 ---@return Html?
@@ -149,22 +136,22 @@ function CustomParticipantTable:createSoloFactionTable()
 
 	if not config.display then return end
 
-	local factioNumbers = self:_getFactionNumbers()
+	local factionNumbers = self:_getFactionNumbers()
 
 	local factionColumns = Array.copy(Faction.coreFactions)
 
-	if config.displayRandomColumn or config.displayRandomColumn == nil and factioNumbers.r > 0 then
+	if config.displayRandomColumn or config.displayRandomColumn == nil and factionNumbers.r > 0 then
 		table.insert(factionColumns, Faction.read('r'))
 	end
 
 	if config.displayUnknownColumn or
-		config.displayUnknownColumn == nil and factioNumbers[Faction.defaultFaction] > 0 then
+		config.displayUnknownColumn == nil and factionNumbers[Faction.defaultFaction] > 0 then
 
 		table.insert(factionColumns, Faction.defaultFaction)
 	end
 
 	if config.displayMultipleFactionColumn or
-		config.displayMultipleFactionColumn == nil and factioNumbers.m > 0 then
+		config.displayMultipleFactionColumn == nil and factionNumbers.m > 0 then
 
 		table.insert(factionColumns, Faction.read('m'))
 	end
@@ -175,7 +162,7 @@ function CustomParticipantTable:createSoloFactionTable()
 		:addClass('participantTable participantTable-faction')
 		:css('grid-template-columns', 'repeat(' .. colSpan .. ', 1fr)')
 		:css('width', (colSpan * config.soloColumnWidth) .. 'px')
-		:node(self:_displayHeader(factionColumns, factioNumbers))
+		:node(self:_displayHeader(factionColumns, factionNumbers))
 
 	Array.forEach(self.sections, function(section) self:_displaySoloFactionTableSection(section, factionColumns) end)
 

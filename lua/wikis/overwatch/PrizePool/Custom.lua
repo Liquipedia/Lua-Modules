@@ -1,33 +1,33 @@
 ---
 -- @Liquipedia
--- wiki=overwatch
 -- page=Module:PrizePool/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
-local Variables = require('Module:Variables')
+
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
+local Logic = Lua.import('Module:Logic')
+local Variables = Lua.import('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool')
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
-local TIER_VALUE = {10000, 5000, 2}
+local TIER_VALUE = {8, 4, 2}
 local TYPE_MODIFIER = {Online = 0.65}
-local TIER_TYPE_MODIFIER = {Qualifier = 0.001}
+local TIER_TYPE_MODIFIER = {Showmatch = 0.1,  Misc = 0.25, Qualifier = 0.001, Monthly = 0.4, Weekly = 0.1}
 
 -- Template entry point
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	local prizePool = PrizePool(args):create()
@@ -42,18 +42,20 @@ end
 ---@param opponent BasePlacementOpponent
 ---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
+	lpdbData.publishertier = Variables.varDefault('tournament_publishertier', '')
 	lpdbData.weight = CustomPrizePool.calculateWeight(
 		lpdbData.prizemoney,
 		Variables.varDefault('tournament_liquipediatier'),
 		placement.placeStart,
 		Variables.varDefault('tournament_type'),
-		Variables.varDefault('tournament_liquipediatiertype')
+		Variables.varDefault('tournament_liquipediatiertype'),
+		HighlightConditions.tournament(lpdbData)
 	)
 
 	local participantLower = mw.ustring.lower(lpdbData.participant)
 
 	Variables.varDefine(participantLower .. '_prizepoints', lpdbData.extradata.prizepoints)
-	lpdbData.qualified = placement:getPrizeRewardForOpponent(opponent, 'QUALIFIES1') and 1 or 0
+	Variables.varDefine(participantLower .. '_prizepoints2', lpdbData.extradata.prizepoints2)
 
 	if Opponent.isTbd(opponent.opponentData) then
 		Variables.varDefine('minimum_secured', lpdbData.extradata.prizepoints)
@@ -65,17 +67,22 @@ end
 ---@param prizeMoney number
 ---@param tier string?
 ---@param place integer
----@param type string?
+---@param tournamentType string?
 ---@param tierType string?
----@return integer
-function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type, tierType)
+---@param isHighlighted boolean
+---@return number
+function CustomPrizePool.calculateWeight(prizeMoney, tier, place, tournamentType, tierType, isHighlighted)
 	if Logic.isEmpty(tier) then
 		return 0
 	end
 
 	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier) or ''] or 1
+	local prizeFactor = (100000 + prizeMoney) / 100000
+	local tierTypeFactor = TIER_TYPE_MODIFIER[tierType] or 1
+	local highlightedFactor = isHighlighted and 2 or 1
+	local typeFactor = TYPE_MODIFIER[tournamentType] or 1
 
-	return tierValue * math.max(prizeMoney, 1) * (TYPE_MODIFIER[type] or 1) * (TIER_TYPE_MODIFIER[tierType] or 1) / place
+	return prizeFactor * tierValue * tierTypeFactor * highlightedFactor * typeFactor / place
 end
 
 return CustomPrizePool

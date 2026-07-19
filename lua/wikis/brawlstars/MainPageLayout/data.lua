@@ -1,45 +1,44 @@
 ---
 -- @Liquipedia
--- wiki=brawlstars
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
+
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
+local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 local CONTENT = {
 	usefulArticles = {
 		heading = 'Useful Articles',
 		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
-		boxid = 1503,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
-		body = '{{Liquipedia:Want_to_help}}',
+		body = WantToHelp{},
 		padding = true,
-		boxid = 1504,
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
 	},
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
 			rumours = true,
-			transferPage = function ()
-				return 'Player Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
-			end
+			transferPage = MainPageLayoutUtil.getQuarterlyTransferPage()
 		},
-		boxid = 1509,
+		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
@@ -47,12 +46,12 @@ local CONTENT = {
 			birthdayListPage = 'Birthday list'
 		},
 		padding = true,
-		boxid = 1510,
+		boxid = MainPageLayoutUtil.BoxId.THIS_DAY,
 	},
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
-		boxid = 1516,
+		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -64,11 +63,8 @@ local CONTENT = {
 	matches = {
 		heading = 'Matches',
 		body = MatchTicker{},
-		padding = true,
-		boxid = 1507,
-		panelAttributes = {
-			['data-switch-group-container'] = 'countdown',
-		},
+		padding = false,
+		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -77,14 +73,14 @@ local CONTENT = {
 			completedDays = 20
 		},
 		padding = true,
-		boxid = 1508,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }
 
 return {
 	banner = {
-		lightmode = 'Brawl Stars full allmode.png',
-		darkmode = 'Brawl Stars full allmode.png',
+		lightmode = 'Brawl Stars 2025 allmode.png',
+		darkmode = 'Brawl Stars 2025 allmode.png',
 	},
 	metadesc = 'The Brawl Stars esports wiki covering everything from players, teams and transfers, ' ..
 		'to tournaments and results, maps, and Brawlers.',
@@ -155,7 +151,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				sizes = {xxl = 5, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
@@ -165,14 +161,10 @@ return {
 						mobileOrder = 3,
 						content = CONTENT.transfers,
 					},
-					{
-						mobileOrder = 6,
-						content = CONTENT.wantToHelp,
-					},
 				}
 			},
 			{ -- Right
-				size = 6,
+				sizes = {xxl = 7, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 2,
@@ -206,11 +198,15 @@ return {
 						},
 					},
 					{
+						mobileOrder = 4,
+						content = CONTENT.wantToHelp,
+					},
+					{
 						mobileOrder = 5,
 						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 6,
 						content = CONTENT.usefulArticles,
 					},
 				},

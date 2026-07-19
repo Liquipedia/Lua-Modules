@@ -1,18 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:YearsActive
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local Set = require('Module:Set')
-local Table = require('Module:Table')
 
-local Condition = require('Module:Condition')
+local Class = Lua.import('Module:Class')
+local Info = Lua.import('Module:Info', {loadData = true})
+local Lpdb = Lua.import('Module:Lpdb')
+local Set = Lua.import('Module:Set')
+local Table = Lua.import('Module:Table')
+
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -20,10 +21,6 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local CustomActiveYears = Lua.import('Module:YearsActive/Base')
-
--- wiki specific settings
-CustomActiveYears.defaultNumberOfStoredPlayersPerPlacement = 6
-CustomActiveYears.additionalConditions = ''
 
 -- legacy entry point
 function CustomActiveYears.get(input)
@@ -56,7 +53,7 @@ function CustomActiveYears._getBroadcastConditions(broadcaster, positions)
 
 	local tree = ConditionTree(BooleanOperator.all):add({
 		ConditionNode(ColumnName('page'), Comparator.eq, broadcaster),
-		ConditionNode(ColumnName('date_year'), Comparator.gt, CustomActiveYears.startYear - 1),
+		ConditionNode(ColumnName('date_year'), Comparator.gt, Info.startYear - 1),
 		positionTree,
 	})
 
@@ -90,4 +87,4 @@ function CustomActiveYears._getYearsBroadcast(conditions)
 	return years:toArray()
 end
 
-return Class.export(CustomActiveYears)
+return Class.export(CustomActiveYears, {exports = {'get', 'getTalent', 'display'}})

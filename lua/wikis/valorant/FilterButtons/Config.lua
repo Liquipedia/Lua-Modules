@@ -1,14 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:FilterButtons/Config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Table = require('Module:Table')
-local Tier = require('Module:Tier/Utils')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Utils')
 
 local Config = {}
 
@@ -21,12 +22,14 @@ local REGION_TO_SUPERREGION = {
 	['CIS'] = 'EMEA',
 	['Levant'] = 'EMEA',
 	['Africa'] = 'EMEA',
+	['North Africa'] = 'EMEA',
 	['Korea'] = 'Pacific',
 	['China'] = 'CN',
 	['North America'] = 'Americas',
 	['Latin America North'] = 'Americas',
 	['Latin America South'] = 'Americas',
 	['Brazil'] = 'Americas',
+	['Asia-Pacific'] = 'Pacific',
 	['Taiwan'] = 'Pacific',
 	['Hong Kong'] = 'Pacific',
 	['Thailand'] = 'Pacific',
@@ -38,6 +41,7 @@ local REGION_TO_SUPERREGION = {
 	['Southeast Asia'] = 'Pacific',
 	['Asia'] = 'Pacific',
 	['India'] = 'Pacific',
+	['Indonesia'] = 'Pacific',
 	['Other'] = 'Other',
 }
 

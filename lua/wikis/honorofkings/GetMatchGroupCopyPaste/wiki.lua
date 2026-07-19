@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=honorofkings
 -- page=Module:GetMatchGroupCopyPaste/wiki
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
@@ -36,12 +36,12 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
-		Logic.readBool(args.hasDate) and {
+		Logic.readBool(args.hasDate) and Array.extend(
 			INDENT .. '|date=',
 			INDENT .. '|twitch= |youtube= |bilibili= |douyu= |huya=',
-			INDENT .. '|mvp=',
-			args.vod == 'series' and (INDENT .. '|vod=') or nil,
-		} or nil,
+			Logic.readBool(args.mvp) and INDENT .. '|mvp=' or nil,
+			args.vod == 'series' and (INDENT .. '|vod=') or nil
+		) or nil,
 		Array.map(Array.range(1, bestof), function(mapIndex)
 			return WikiCopyPaste._getMapCode(mapIndex, numberOfBans, args.vod == 'maps')
 		end),
@@ -67,7 +67,7 @@ function WikiCopyPaste._getMapCode(mapIndex, numberOfBans, showVod)
 	end
 
 	return table.concat(Array.extend(
-		INDENT .. '|map' .. mapIndex .. '={{Map' ..  (showVod and '|vod=' or ''),
+		INDENT .. '|map' .. mapIndex .. '={{Map' .. (showVod and '|vod=' or ''),
 		INDENT .. INDENT .. '|team1side= |team2side= |length= |winner=',
 		INDENT .. INDENT .. '<!-- Hero picks -->',
 		INDENT .. INDENT .. '|t1h1= |t1h2= |t1h3= |t1h4= |t1h5=',

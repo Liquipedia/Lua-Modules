@@ -16,12 +16,80 @@ describe('array', function()
 		end)
 	end)
 
+	describe('equals', function()
+		it('Empty arrays are equal', function()
+			assert.is_true(Array.equals({}, {}))
+		end)
+		it('check array equality', function()
+			local a = {0, 1}
+
+			assert.is_true(Array.equals(a, a))
+			assert.is_false(Array.equals({0}, {0, 1}))
+			assert.is_true(Array.equals(a, {0, 1}))
+			assert.is_true(Array.equals(Array.range(1, 5), {1, 2, 3, 4, 5}))
+			assert.is_true(Array.equals({'a', 'b', 'c'}, {'a', 'b', 'c'}))
+		end)
+		it('Error if argument is not an array', function()
+			assert.error(function ()
+				return Array.equals({key = 'value'}, {'key', 'value'})
+			end)
+		end)
+	end)
+
 	describe('Copy', function()
 		it('check', function()
 			local a, b, c = {1, 2, 3}, {}, {{5}}
 			assert.are_same(a, Array.copy(a))
 			assert.is_false(Array.copy(b) == b)
 			assert.is_true(Array.copy(c)[1] == c[1])
+		end)
+	end)
+
+	describe('rep', function()
+		it('check', function()
+			assert.are_same({1}, Array.rep(1, 1))
+			assert.are_same({2, 2}, Array.rep(2, 2))
+			assert.are_same({3, 3, 3}, Array.rep(3, 3))
+			assert.are_same(
+				{
+					'The quick brown fox jumps over the lazy dog',
+					'The quick brown fox jumps over the lazy dog',
+					'The quick brown fox jumps over the lazy dog',
+					'The quick brown fox jumps over the lazy dog',
+					'The quick brown fox jumps over the lazy dog'
+				},
+				Array.rep('The quick brown fox jumps over the lazy dog', 5)
+			)
+			assert.are_same(
+				{
+					{1, 2, 3},
+					{1, 2, 3},
+				},
+				Array.rep(Array.range(1, 3), 2)
+			)
+			assert.are_same(
+				{
+					{1, 2, 3},
+					{1, 2, 3},
+				},
+				Array.rep(Array.range(1, 3), 2, Array.copy)
+			)
+		end)
+
+		it('check count==0', function ()
+			assert.is_true(Array.equals({}, Array.rep('Lorem ipsum', 0)))
+		end)
+
+		it('Error if illegal arguments are passed in', function()
+			assert.error(function ()
+				return Array.rep(nil, 1)
+			end)
+			assert.error(function ()
+				return Array.rep('nil', -3)
+			end)
+			assert.error(function ()
+				return Array.rep(nil, -1)
+			end)
 		end)
 	end)
 
@@ -61,6 +129,22 @@ describe('array', function()
 		it('check', function()
 			local a = {1, 2, 3, {5, 3}, {6, 4}}
 			assert.are_same({1, 2, 3, 5, 3, 6, 4}, Array.flatten(a))
+
+			local b = {
+				{
+					hello = 'world'
+				},
+				2,
+				3
+			}
+			assert.are_same(b, Array.flatten(b))
+		end)
+	end)
+
+	describe('FlatMap', function()
+		it('check', function()
+			local a = {1, 1, 2, 1, 2, 3, 1, 2, 3, 4}
+			assert.are_same(a, Array.flatMap(Array.range(1, 4), function(i) return Array.range(1, i) end))
 		end)
 	end)
 
@@ -135,9 +219,11 @@ describe('array', function()
 
 	describe('ExtendWith', function()
 		it('check', function()
-			local a, b, c = {2, 3}, {5, 7, 11}, {13}
+			local a, b, c, d = {2, 3}, {5, 7, 11}, {13}, {hello = 'world'}
 			assert.are_same({2, 3, 5, 7, 11, 13}, Array.extendWith(a, b, c))
 			assert.are_same({2, 3, 5, 7, 11, 13}, a)
+			assert.are_same({2, 3, 5, 7, 11, 13, {hello = 'world'}}, Array.extendWith(a, d))
+			assert.are_same({2, 3, 5, 7, 11, 13, {hello = 'world'}}, a)
 		end)
 	end)
 
@@ -149,12 +235,30 @@ describe('array', function()
 				return a[prefix] ~= 'cake' and (prefix .. a[prefix]) or nil
 			end))
 		end)
+
+		it('accept \'false\' literal', function()
+			local a = Array.mapIndexes(function (index)
+				if index > 10 then
+					return
+				end
+				return index % 2 == 0
+			end)
+			assert.are_same(Array.flatten(Array.rep({false, true}, 5)), a)
+		end)
 	end)
 
 	describe('Range', function()
 		it('check', function()
 			assert.are_same({1, 2, 3}, Array.range(1, 3))
 			assert.are_same({2, 3}, Array.range(2, 3))
+		end)
+	end)
+
+	describe('mapRange', function()
+		it('check', function()
+			assert.are_same({'arg1', 'arg2', 'arg3'}, Array.mapRange(1, 3, function (index)
+				return 'arg' .. index
+			end))
 		end)
 	end)
 
@@ -221,6 +325,13 @@ describe('array', function()
 	describe('Interleave', function ()
 		it('works', function()
 			assert.are_same({'a', ' ', 'b', ' ', 'c'}, Array.interleave({'a', 'b', 'c'}, ' '))
+			assert.are_same({'a'}, Array.interleave({'a'}, ' '))
+			assert.are_same({}, Array.interleave({}, ' '))
+		end)
+
+		it('with nested array', function ()
+			local a, b = Array.range(1, 3), math.pi
+			assert.are_same({{1, 2, 3}, ' ', b}, Array.interleave({a, b}, ' '))
 		end)
 	end)
 end)

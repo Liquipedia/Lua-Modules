@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=smite
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Game = require('Module:Game')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class SmiteLeagueInfobox: InfoboxLeague
@@ -21,7 +21,7 @@ local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -30,19 +30,19 @@ function CustomLeague.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
 		return {
-			Cell{name = 'Number of teams', content = {args.team_number}},
-			Cell{name = 'Number of players', content = {args.player_number}},
+			Cell{name = 'Number of teams', children = {args.team_number}},
+			Cell{name = 'Number of players', children = {args.player_number}},
 		}
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game', content = {Game.name{game = args.game}}},
+			Cell{name = 'Game', children = {Game.name{game = args.game}}},
 		}
 	end
 	return widgets

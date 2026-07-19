@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Abbreviation
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,8 +7,10 @@
 
 local Abbreviation = {}
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 
 ---@param args {text: string, title: string}
@@ -27,4 +28,4 @@ function Abbreviation.make(args)
 	return '<abbr title="' .. title .. '">' .. text .. '</abbr>'
 end
 
-return Class.export(Abbreviation)
+return Class.export(Abbreviation, {exports = {'make'}})

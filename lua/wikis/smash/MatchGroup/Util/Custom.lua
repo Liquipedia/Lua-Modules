@@ -1,19 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=smash
 -- page=Module:MatchGroup/Util/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Table = Lua.import('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local SmashMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 

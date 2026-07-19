@@ -1,14 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:Ratings/Display
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local RatingsStorageLpdb = require('Module:Ratings/Storage/Lpdb')
+local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local RatingsStorageLpdb = Lua.import('Module:Ratings/Storage/Lpdb')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local RatingsDisplay = {}
 
@@ -30,7 +32,7 @@ local LIMIT_HISTORIC_ENTRIES = 24 -- How many historic entries are fetched
 ---@param frame Frame
 ---@return string
 function RatingsDisplay.graph(frame)
-	local Display = require('Module:Ratings/Display/Graph')
+	local Display = Lua.import('Module:Ratings/Display/Graph')
 	return RatingsDisplay.make(frame, Display)
 end
 
@@ -38,7 +40,7 @@ end
 ---@param frame Frame
 ---@return string
 function RatingsDisplay.list(frame)
-	local Display = require('Module:Ratings/Display/List')
+	local Display = Lua.import('Module:Ratings/Display/List')
 	return RatingsDisplay.make(frame, Display)
 end
 
@@ -77,8 +79,8 @@ function RatingsDisplay._getTeamInfo(teamName)
 
 	return {
 		region = teamInfo.region or '???',
-		shortName = mw.ext.TeamTemplate.teamexists(teamInfo.template or '')
-			and mw.ext.TeamTemplate.raw(teamInfo.template).shortname or teamName
+		shortName = TeamTemplate.exists(teamInfo.template)
+			and TeamTemplate.getRaw(teamInfo.template).shortname or teamName
 	}
 end
 

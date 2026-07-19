@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=halo
 -- page=Module:Infobox/Patch/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Game = Lua.import('Module:Game')
 local Injector = Lua.import('Module:Widget/Injector')
 local Patch = Lua.import('Module:Infobox/Patch')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@Class HaloPatchInfobox: PatchInfobox
@@ -21,7 +21,7 @@ local CustomPatch = Class.new(Patch)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return VNode
 function CustomPatch.run(frame)
 	local patch = CustomPatch(frame)
 	patch:setWidgetInjector(CustomInjector(patch))
@@ -32,12 +32,12 @@ function CustomPatch.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return{
-			Cell{name = 'Game Version', content = {Game.name{game = self.caller.args.game}}, options = {makeLink = true}},
+			Cell{name = 'Game Version', children = {Game.name{game = self.caller.args.game}}, options = {makeLink = true}},
 		}
 	end
 	return widgets

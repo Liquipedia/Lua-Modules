@@ -1,39 +1,43 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Basic/DataTable
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Widget')
+local Logic = Lua.import('Module:Logic')
+
+local Component = Lua.import('Module:Widget/Component')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
-local Table = HtmlWidgets.Table
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
+local Table = Html.Table
 
----@class WidgetDataTable: Widget
-local DataTable = Class.new(Widget)
-DataTable.defaultProps = {
-	classes = {},
-	wrapperClasses = {},
-}
+---@class DataTableProps: HtmlNodeProps
+---@field sortable boolean?
+---@field tableCss? table<string, string|number?>
+---@field tableAttributes? table<string, string|number?>
+---@field wrapperClasses? string[]
 
----@return Widget
-function DataTable:render()
+---@param props DataTableProps
+---@return HtmlNode
+local function DataTable(props)
+	local isSortable = Logic.readBool(props.sortable)
 	return Div{
 		children = {
 			Table{
-				children = self.props.children,
-				classes = WidgetUtil.collect('wikitable', unpack(self.props.classes)),
+				children = props.children,
+				classes = WidgetUtil.collect('wikitable', isSortable and 'sortable' or nil, props.classes),
+				css = props.tableCss,
+				attributes = props.tableAttributes,
 			},
 		},
-		classes = WidgetUtil.collect('table-responsive', unpack(self.props.wrapperClasses)),
-		attributes = self.props.attributes,
+		classes = WidgetUtil.collect('table-responsive', props.wrapperClasses),
+		attributes = props.attributes,
+		css = props.css,
 	}
 end
 
-return DataTable
+return Component.component(DataTable)

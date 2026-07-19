@@ -34,6 +34,8 @@
  * HTML Attributes:
  * - data-switch-group (required): The name of the switch group. Elements with the same switch group name are connected.
  * - data-store-value (optional): If set to true, the state of the switch button will be stored in the local storage.
+ * - data-sync-level (optional): Defines storage scope - 'site' (default, shared across all wikis),
+ *   'wiki' (shared within a wiki), or 'page' (unique per page).
  * - data-switch-value (only for pill): The value that the switch button will have when it is active.
  *
  * Events:
@@ -52,15 +54,19 @@
  */
 
 liquipedia.switchButtons = {
-	baseLocalStorageKey: null,
 	triggerEventName: 'switchButtonChanged',
 	switchGroups: {},
 	isInitialized: false,
+	syncLevels: {
+		PAGE: 'page',
+		WIKI: 'wiki',
+		SITE: 'site'
+	},
+	baseLocalStorageKey: 'LiquipediaSwitchButtons',
 
 	init: function () {
-		this.baseLocalStorageKey = this.buildLocalStorageKey();
 		this.initSwitchElements( 'toggle', '.switch-toggle', 'switch-toggle-active' );
-		this.initSwitchElements( 'pill', '.switch-pill', 'switch-pill-active' );
+		this.initSwitchElements( 'pill', '.switch-pill', 'switch-pill-option-active' );
 		this.isInitialized = true;
 	},
 
@@ -77,6 +83,47 @@ liquipedia.switchButtons = {
 		} );
 	},
 
+	buildLocalStorageKey: function ( groupName, syncLevel ) {
+		const base = this.baseLocalStorageKey;
+
+		if ( syncLevel === this.syncLevels.SITE ) {
+			return `${ base }_${ groupName }`;
+		}
+
+		const scriptPath = mw.config.get( 'wgScriptPath' ).replace( /[\W]/g, '' );
+		const pageName = mw.config.get( 'wgPageName' );
+
+		if ( syncLevel === this.syncLevels.WIKI ) {
+			return `${ base }-${ scriptPath }_${ groupName }`;
+		}
+
+		return `${ base }-${ scriptPath }-${ pageName }_${ groupName }`;
+	},
+
+	getLocalStorageValue: function ( switchGroup ) {
+		const groupName = switchGroup.name;
+		const syncLevel = switchGroup.syncLevel;
+		const localStorageKey = this.buildLocalStorageKey( groupName, syncLevel );
+		const storageValue = window.localStorage.getItem( localStorageKey );
+
+		if ( storageValue === null ) {
+			return null;
+		}
+
+		if ( switchGroup.type === 'toggle' ) {
+			return storageValue === 'true';
+		} else {
+			return storageValue;
+		}
+	},
+
+	setLocalStorageValue: function ( switchGroup, value ) {
+		const groupName = switchGroup.name;
+		const syncLevel = switchGroup.syncLevel;
+		const localStorageKey = this.buildLocalStorageKey( groupName, syncLevel );
+		window.localStorage.setItem( localStorageKey, value );
+	},
+
 	getOrCreateSwitchGroup: function ( type, groupName, element, activeClassName ) {
 		if ( !this.switchGroups[ groupName ] ) {
 			const switchGroup = {
@@ -84,25 +131,45 @@ liquipedia.switchButtons = {
 				name: groupName,
 				activeClassName,
 				nodes: [],
+				nodeSet: new Set(),
+				boundNodes: new WeakSet(),
 				isStoredInLocalStorage: element.dataset.storeValue === 'true',
+				syncLevel: element.dataset.syncLevel || this.syncLevels.SITE,
 				value: null // Default value
 			};
 
-			if ( type === 'toggle' ) {
-				switchGroup.nodes.push( element );
-			} else {
-				element.querySelectorAll( '.switch-pill-option' ).forEach( ( optionNode ) => {
-					switchGroup.nodes.push( optionNode );
-				} );
-			}
+			this.addNodesToSwitchGroup( switchGroup, element );
 
 			this.switchGroups[ groupName ] = switchGroup;
+		} else {
+			this.addNodesToSwitchGroup( this.switchGroups[ groupName ], element );
 		}
 
 		return this.switchGroups[ groupName ];
 	},
 
+	addNodesToSwitchGroup: function ( switchGroup, element ) {
+		const addNode = ( node ) => {
+			if ( !switchGroup.nodeSet.has( node ) ) {
+				switchGroup.nodeSet.add( node );
+				switchGroup.nodes.push( node );
+			}
+		};
+
+		if ( switchGroup.type === 'toggle' ) {
+			addNode( element );
+			return;
+		}
+
+		element.querySelectorAll( '.switch-pill-option' ).forEach( addNode );
+	},
+
 	setupSwitchGroupValueAndDOM: function ( switchGroup ) {
+		if ( switchGroup.value !== null ) {
+			this.updateDOM( switchGroup, switchGroup.value );
+			return;
+		}
+
 		const localStorageValue = this.getLocalStorageValue( switchGroup );
 
 		if ( localStorageValue !== null ) {
@@ -130,20 +197,24 @@ liquipedia.switchButtons = {
 		}
 	},
 
-	getValueFromDOM: function ( switchGroup, activeClassName ) {
+	getValueFromDOM: function ( switchGroup ) {
 		if ( switchGroup.type === 'toggle' ) {
-			return switchGroup.nodes[ 0 ]?.classList.contains( activeClassName ) ?? false;
+			return switchGroup.nodes[ 0 ]?.classList.contains( switchGroup.activeClassName ) ?? false;
 		} else {
-			switchGroup.nodes.forEach( ( pillNode ) => {
-				if ( pillNode.classList.contains( activeClassName ) ) {
-					return pillNode.dataset.switchValue;
-				}
-			} );
+			const activeNode = switchGroup.nodes.find( ( pillNode ) => (
+				pillNode.classList.contains( switchGroup.activeClassName )
+			) );
+			return activeNode?.dataset.switchValue;
 		}
 	},
 
 	attachEventListener: function ( switchGroup, activeClassName ) {
 		switchGroup.nodes.forEach( ( node ) => {
+			if ( switchGroup.boundNodes.has( node ) ) {
+				return;
+			}
+			switchGroup.boundNodes.add( node );
+
 			node.addEventListener( 'click', () => {
 				const newValue = this.getNewValue( node, switchGroup.type, activeClassName );
 
@@ -151,7 +222,7 @@ liquipedia.switchButtons = {
 					switchGroup.value = newValue;
 
 					if ( switchGroup.isStoredInLocalStorage ) {
-						this.setLocalStorageValue( switchGroup.name, newValue );
+						this.setLocalStorageValue( switchGroup, newValue );
 					}
 					this.updateDOM( switchGroup, newValue );
 					this.triggerCustomEvent( node, switchGroup );
@@ -168,32 +239,11 @@ liquipedia.switchButtons = {
 		}
 	},
 
-	buildLocalStorageKey: function () {
-		const base = 'LiquipediaSwitchButtons';
-		const scriptPath = mw.config.get( 'wgScriptPath' ).replace( /[\W]/g, '' );
-		const pageName = mw.config.get( 'wgPageName' );
-		return `${ base }-${ scriptPath }-${ pageName }`;
-	},
-
-	getLocalStorageValue: function ( switchGroup ) {
-		const groupName = switchGroup.name;
-		const localStorageKey = `${ this.baseLocalStorageKey }_${ groupName }`;
-		const storageValue = window.localStorage.getItem( localStorageKey );
-
-		if ( switchGroup.type === 'toggle' ) {
-			return storageValue === 'true';
-		} else {
-			return storageValue;
-		}
-	},
-
-	setLocalStorageValue: function ( groupName, value ) {
-		const localStorageKey = `${ this.baseLocalStorageKey }_${ groupName }`;
-		window.localStorage.setItem( localStorageKey, value );
-	},
-
 	triggerCustomEvent: function ( node, data ) {
-		const customEvent = new CustomEvent( this.triggerEventName, { detail: { data } } );
+		const customEvent = new CustomEvent( this.triggerEventName, {
+			detail: { data },
+			bubbles: true
+		} );
 		node.dispatchEvent( customEvent );
 	},
 

@@ -8,15 +8,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup lua
-        uses: leafo/gh-actions-lua@v11
+        uses: Liquipedia/gh-actions-lua@7615c1c345af98bd9898fa5b53c488c5f58246cf
         with:
           luaVersion: '5.1'
 
       - name: Setup luarock
-        uses: leafo/gh-actions-luarocks@v5
+        uses: leafo/gh-actions-luarocks@v6
 
       - name: Setup dependencies
         run: |
@@ -28,7 +28,7 @@ jobs:
           luacheck lua --config lua/.luacheckrc --formatter=JUnit > report.xml
 
       - name: Report lint
-        uses: mikepenz/action-junit-report@v5
+        uses: mikepenz/action-junit-report@v6
         if: always()
         with:
           report_paths: 'report.xml'
@@ -40,15 +40,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup lua
-        uses: leafo/gh-actions-lua@v11
+        uses: Liquipedia/gh-actions-lua@7615c1c345af98bd9898fa5b53c488c5f58246cf
         with:
           luaVersion: '5.1'
 
       - name: Setup luarocks
-        uses: leafo/gh-actions-luarocks@v5
+        uses: leafo/gh-actions-luarocks@v6
 
       - name: Setup dependencies
         run: |
@@ -59,9 +59,39 @@ jobs:
           busted -C lua -v --run=ci --output=junit > busted.xml
 
       - name: Report test
-        uses: mikepenz/action-junit-report@v5
+        uses: mikepenz/action-junit-report@v6
         if: always()
         with:
           report_paths: 'busted.xml'
-          check_name: 'Test Report'
+          check_name: 'Lua Test Report'
           annotate_only: ${{ (github.event.pull_request.head.repo.full_name != github.repository) }}
+
+  luals-code-style:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - id: lua-changed-files
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            lua/wikis/**/*.lua
+
+      - name: Setup LuaLS
+        if: steps.lua-changed-files.outputs.any_changed == 'true'
+        env:
+          LUALS_VERSION: 3.18.2
+        run: |
+          mkdir -p ~/.local/bin/luals
+          curl -L https://github.com/LuaLS/lua-language-server/releases/download/$LUALS_VERSION/lua-language-server-$LUALS_VERSION-linux-x64.tar.gz | tar -xzv -C ~/.local/bin/luals
+
+      - name: Check
+        if: steps.lua-changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          ~/.local/bin/luals/bin/lua-language-server --check ./ | tee luals-check && true
+          cat luals-check | (sed -e 's/\x1b\[[0-9;]*m//g'| sed -n 's/\(lua[^:]\+\):\([[:digit:]]*\):[[:digit:]]* \[Warning\] /::error file=\1,line=\2::/p') | (! grep -E $(echo ${{ steps.lua-changed-files.outputs.all_changed_files }} | sed -- 's/ /|/g'))
+          echo "| | Files | Errors |" >> $GITHUB_STEP_SUMMARY
+          echo "|-|-------|----------|" >> $GITHUB_STEP_SUMMARY
+          echo "| LuaLS check | $(find lua -name '*.lua' | wc -l) | $(cat luals-check | grep 'Warning' | wc -l) |" >> $GITHUB_STEP_SUMMARY

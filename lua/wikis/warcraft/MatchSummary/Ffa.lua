@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:MatchSummary/Ffa
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,32 +7,32 @@
 
 local WarcraftMatchSummaryFfa = {}
 
-local Array = require('Module:Array')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Array = Lua.import('Module:Array')
+local Table = Lua.import('Module:Table')
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local BaseMatchSummary = Lua.import('Module:MatchSummary/Base/Ffa')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@type FfaMatchSummaryParser
+---@class WarcraftFfaMatchSummaryParser: FfaMatchSummaryParser
 local Parser = {}
 
 ---@param props {bracketId: string, matchId: string}
----@return Widget
+---@return Renderable
 function WarcraftMatchSummaryFfa.getByMatchId(props)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
-	---@cast match StarcraftMatchGroupUtilMatch
+	---@cast match FFAMatchGroupUtilMatch
 
 	BaseMatchSummary.updateMatchOpponents(match)
 
-	return HtmlWidgets.Fragment{children = {
+	return Html.Fragment{children = {
 		MatchSummaryWidgets.Header{matchId = match.matchId, games = match.games},
 		MatchSummaryWidgets.Tab{
 			matchId = match.matchId,

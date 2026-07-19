@@ -1,63 +1,78 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Standings/MatchOverview
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Array = Lua.import('Module:Array')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Label = Lua.import('Module:Widget/Basic/Label')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class MatchOverviewWidget: Widget
----@operator call(table): MatchOverviewWidget
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
-local MatchOverviewWidget = Class.new(Widget)
-
----@return Widget?
-function MatchOverviewWidget:render()
-	---@type MatchGroupUtilMatch
-	local match = self.props.match
-	local showOpponent = tonumber(self.props.showOpponent)
-	if not match or not showOpponent or #match.opponents < 2 then
+---@param props {match: MatchGroupUtilMatch, showOpponent: integer}
+---@return Renderable?
+local function MatchOverviewWidget(props)
+	local match = props.match
+	local opponentIndexToShow = tonumber(props.showOpponent)
+	if not match or not opponentIndexToShow or #match.opponents ~= 2 then
 		return
 	end
 
-	local opponent = match.opponents[showOpponent]
-	if not opponent then
+	local opponentToShow = match.opponents[opponentIndexToShow]
+	if not opponentToShow then
 		return
 	end
 
-	return HtmlWidgets.Div{
-		css = {
-			['display'] = 'flex',
-			['justify-content'] = 'space-between',
-			['flex-direction'] = 'column',
-			['align-items'] = 'center',
-		},
-		children = {
-			HtmlWidgets.Span{
-				children = OpponentDisplay.BlockOpponent{
-					opponent = opponent,
-					showLink = true,
-					overflow = 'ellipsis',
-					teamStyle = 'icon',
+	local leftOpponent = Array.find(match.opponents, function(op) return op ~= opponentToShow end)
+	if not leftOpponent then
+		return
+	end
+
+	local phase = match.phase
+	local resultType
+
+	if match.phase ~= 'finished' then
+		resultType = 'default'
+	elseif match.winner == opponentIndexToShow then
+		resultType = 'loss'
+	elseif match.winner == 0 then
+		resultType = 'draw'
+	else
+		resultType = 'win'
+	end
+
+	return Html.Div{
+		classes = {'standings-match-overview'},
+		children = WidgetUtil.collect(
+			phase ~= 'upcoming' and Label{
+				labelScheme = 'standings-result',
+				labelType = 'result-' .. resultType,
+				children = {
+					Html.Span{
+						css = resultType == 'win' and {['font-weight'] = 'bold'} or nil,
+						children = OpponentDisplay.InlineScore(leftOpponent)
+					},
+					Html.Span{children = ':'},
+					Html.Span{
+						css = resultType == 'loss' and {['font-weight'] = 'bold'} or nil,
+						children = OpponentDisplay.InlineScore(opponentToShow)
+					}
 				}
-			},
-			HtmlWidgets.Span{
-				css = {
-					['font-size'] = '0.8em',
-				},
-				children = match.opponents[1].score .. ' - ' .. match.opponents[2].score,
-			},
-		},
+			} or nil,
+			OpponentDisplay.InlineOpponent{
+				opponent = opponentToShow,
+				overflow = 'ellipsis',
+				teamStyle = 'icon',
+			}
+		),
 	}
 end
 
-return MatchOverviewWidget
+return Component.component(MatchOverviewWidget)

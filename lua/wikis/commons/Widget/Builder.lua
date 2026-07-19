@@ -1,23 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Builder
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 
----@class BuilderWidget: Widget
----@operator call({builder: function}): BuilderWidget
-local Builder = Class.new(Widget)
-
----@return Widget[]?
-function Builder:render()
-	return self.props.builder()
+---@generic T
+---@param props {builder: fun(): T?}
+---@return T?
+local function Builder(props)
+	return props.builder()
 end
 
-return Builder
+return Component.component(Builder)

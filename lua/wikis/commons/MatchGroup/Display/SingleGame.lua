@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Display/SingleGame
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DisplayUtil = require('Module:DisplayUtil')
 local Lua = require('Module:Lua')
+
+local DisplayUtil = Lua.import('Module:DisplayUtil')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
@@ -68,7 +68,7 @@ function SingleGameDisplay.Game(props)
 		bracketId = bracketId,
 		matchId = props.match.matchId,
 		gameIdx = props.gameIdx,
-	}, require('Module:Error/Display').ErrorList)
+	}, Lua.import('Module:Error/Display').ErrorList)
 end
 
 return SingleGameDisplay

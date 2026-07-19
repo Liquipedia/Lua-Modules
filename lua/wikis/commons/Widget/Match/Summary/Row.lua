@@ -1,32 +1,26 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/Row
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Array = Lua.import('Module:Array')
 
----@class MatchSummaryRow: Widget
----@operator call(table): MatchSummaryRow
-local MatchSummaryRow = Class.new(Widget)
-MatchSummaryRow.defaultProps = {
-	classes = {},
-}
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
----@return Widget
-function MatchSummaryRow:render()
+---@param props {classes: string[]?, css: table<string, string|number?>?, children: Renderable|Renderable[]}
+---@return VNode
+local function MatchSummaryRow(props)
 	return Div{
-		classes = {'brkts-popup-body-element', unpack(self.props.classes)},
-		css = self.props.css,
-		children = self.props.children,
+		classes = Array.extend('brkts-popup-body-element', props.classes),
+		css = props.css,
+		children = props.children,
 	}
 end
 
-return MatchSummaryRow
+return Component.component(MatchSummaryRow)

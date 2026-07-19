@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=tft
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -48,6 +47,18 @@ return {
 		match2 = {
 			status = 1,
 			sortCasters = true,
+		},
+		teamRosterNavbox = {
+			hidePlayedMatches = true,
+		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				storeFromWikiCode = true,
+			},
+		},
+		participants = {
+			defaultPlayerNumber = 4,
 		},
 	},
 	defaultRoundPrecision = 0,

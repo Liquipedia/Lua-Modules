@@ -1,24 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/Ffa/RankRange
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Ordinal = require('Module:Ordinal')
 
-local Widget = Lua.import('Module:Widget')
+local Array = Lua.import('Module:Array')
+local Ordinal = Lua.import('Module:Ordinal')
 
----@class MatchSummaryFfaRankRange: Widget
----@operator call(table): MatchSummaryFfaRankRange
-local MatchSummaryFfaRankRange = Class.new(Widget)
+local Component = Lua.import('Module:Widget/Component')
 
----@return string
-function MatchSummaryFfaRankRange:render()
-	local placementStart, placementEnd = self.props.rankStart, self.props.rankEnd
+---@param props {rankStart: integer?, rankEnd: integer?}
+---@return string[]
+local function MatchSummaryFfaRankRange(props)
+	local placementStart, placementEnd = props.rankStart, props.rankEnd
 	local places = {}
 
 	if placementStart then
@@ -29,7 +26,7 @@ function MatchSummaryFfaRankRange:render()
 		table.insert(places, Ordinal.toOrdinal(placementEnd))
 	end
 
-	return table.concat(places, ' - ')
+	return Array.interleave(places, ' - ')
 end
 
-return MatchSummaryFfaRankRange
+return Component.component(MatchSummaryFfaRankRange)

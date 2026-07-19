@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=clashofclans
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -35,6 +34,7 @@ return {
 		match2 = {
 			status = 2,
 			matchWidth = 200,
+			gameScoresIfBo1 = true,
 		},
 		transfers = {
 			showTeamName = true,

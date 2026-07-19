@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=osu
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -49,6 +48,12 @@ return {
 			status = 2,
 			matchWidth = 180,
 			sortCasters = true,
+		},
+		defaultMaxPlayersPerPlacement = 20,
+		infoboxPlayer = {
+			automatedHistory = {
+				mode = 'automatic',
+			},
 		},
 	},
 	defaultRoundPrecision = 0,

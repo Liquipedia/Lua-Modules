@@ -1,74 +1,69 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/MapVetoRound
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local VetoLabel = Lua.import('Module:Widget/Match/Summary/VetoLabel')
 
-local DEFAULT_VETO_TYPE_TO_TEXT = {
-	ban = 'BAN',
-	pick = 'PICK',
-	decider = 'DECIDER',
-	defaultban = 'DEFAULT BAN',
-	protect = 'PROTECT',
-}
-local VETO_DECIDER = 'decider'
+---@alias VetoMap {name: string, link: string?}
 
----@class MatchSummaryMapVetoRound: Widget
----@operator call(table): MatchSummaryMapVetoRound
-local MatchSummaryMapVetoRound = Class.new(Widget)
-
----@return Widget?
-function MatchSummaryMapVetoRound:render()
-	local vetoType = self.props.vetoType
+---@param props {vetoType: VetoTypes, map1: VetoMap?, map2: VetoMap?}
+---@return VNode?
+local function MatchSummaryMapVetoRound(props)
+	local vetoType = props.vetoType
 	if not vetoType then
 		return
 	end
 
-	local vetoText = DEFAULT_VETO_TYPE_TO_TEXT[vetoType]
-	if not vetoText then
-		return
-	end
-
+	---@param map {name: string, link: string?}
+	---@return Renderable
 	local function displayMap(map)
-		if not map.page then
+		if not map.link then
 			return map.name
 		end
 		return Link{
 			children = map.name,
-			link = map.page,
+			link = map.link,
 		}
 	end
 
-	local typeClass = 'brkts-popup-mapveto-' .. vetoType
-	local function createVetoTypeElement()
-		return HtmlWidgets.Span{classes = {typeClass, 'brkts-popup-mapveto-vetotype'}, children = vetoText}
-	end
+	local vetoLabel = VetoLabel{vetoType = vetoType}
 
 	local children
-	if vetoType == VETO_DECIDER then
+	if vetoType == 'decider' then
 		children = {
-			HtmlWidgets.Td{children = createVetoTypeElement()},
-			HtmlWidgets.Td{children = displayMap(self.props.map1)},
-			HtmlWidgets.Td{children = createVetoTypeElement()},
+			Html.Div{
+				children = vetoLabel
+			},
+			Html.Div{
+				children = displayMap(props.map1)
+			},
+			Html.Div{
+				children = vetoLabel
+			},
 		}
 	else
 		children = {
-			HtmlWidgets.Td{children = displayMap(self.props.map1)},
-			HtmlWidgets.Td{children = createVetoTypeElement()},
-			HtmlWidgets.Td{children = displayMap(self.props.map2)},
+			Html.Div{
+				children = displayMap(props.map1)
+			},
+			Html.Div{
+				children = vetoLabel
+			},
+			Html.Div{
+				children = displayMap(props.map2)
+			},
 		}
 	end
 
-	return HtmlWidgets.Tr{classes = {'brkts-popup-mapveto-vetoround'}, children = children}
+	return Html.Div{classes = {'brkts-popup-veto-row'}, children = children}
 end
 
-return MatchSummaryMapVetoRound
+return Component.component(MatchSummaryMapVetoRound)

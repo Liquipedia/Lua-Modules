@@ -1,25 +1,27 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:GameTable/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local MathUtil = require('Module:MathUtil')
-local Page = require('Module:Page')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local MathUtil = Lua.import('Module:MathUtil')
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CharacterGameTable = Lua.import('Module:GameTable/Character')
 
+local LinkWidget = Lua.import('Module:Widget/Basic/Link')
+local MatchSummaryCharacters = Lua.import('Module:Widget/Match/Summary/Characters')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 ---@class ValorantCharacterGameTable: CharacterGameTable
+---@operator call(table): ValorantCharacterGameTable
 local CustomCharacterGameTable = Class.new(CharacterGameTable, function (self)
 	self.args.showBans = false
 
@@ -66,45 +68,129 @@ function CustomCharacterGameTable:getCharacterKey(opponentIndex, playerIndex)
 	return 't' .. opponentIndex .. 'p' .. playerIndex .. 'agent'
 end
 
+---@protected
+---@return table[]
+function CustomCharacterGameTable:buildColumnDefinitions()
+	local config = self.config
+	return WidgetUtil.collect(
+		{
+			-- Date column
+			align = 'left',
+			sortType = 'number',
+		},
+		config.showTier and {align = 'left'} or nil,
+		config.showType and {align = 'center'} or nil,
+		config.showIcon and {
+			align = 'center',
+			unsortable = true,
+		} or nil,
+		{
+			-- Tournament column
+			align = 'left',
+		},
+		{
+			-- Map column
+			align = 'left',
+		},
+		config.showResult and WidgetUtil.collect(
+			config.mode == Opponent.solo and {align = 'left'} or nil,
+			config.mode ~= Opponent.team and {
+				{align = 'right'}, -- Kills
+				{align = 'right'}, -- Deaths
+				{align = 'right'}, -- Assists
+				{align = 'right'} -- Ratio
+			} or nil,
+			{
+				-- Picks column
+				align = 'center',
+				unsortable = true,
+			},
+			{
+				-- Team column
+				align = 'center',
+			},
+			{
+				-- Result indicator column
+				align = 'center',
+			},
+			{
+				-- Score column
+				align = 'center',
+			},
+			{
+				-- vs. Team column
+				align = 'center',
+			},
+			{
+				-- vs. Picks column
+				align = 'center',
+			}
+		) or nil,
+		config.showLength and {
+			align = 'left',
+		} or nil,
+		config.showPatch and {
+			align = 'left',
+		} or nil,
+		config.showVod and {
+			align = 'left',
+			unsortable = true,
+		} or nil,
+		config.showMatchPage and {
+			align = 'center',
+			unsortable = true,
+		} or nil
+	)
+end
+
 ---@return Html
 function CustomCharacterGameTable:headerRow()
-	local makeHeaderCell = function(text, width)
-		return mw.html.create('th'):css('max-width', width):node(text)
+	---@param text string?
+	---@return Widget
+	local makeHeaderCell = function(text)
+		return TableWidgets.CellHeader{children = text}
 	end
 
 	local config = self.config
 
-	local nodes = Array.append({},
-		makeHeaderCell('Date', '100px'),
-		config.showTier and makeHeaderCell('Tier', '70px') or nil,
-		config.showType and makeHeaderCell('Type', '70px') or nil,
-		config.showIcon and makeHeaderCell(nil, '25px'):addClass('unsortable') or nil,
-		makeHeaderCell('Tournament'),
-		makeHeaderCell('Map'),
-		(config.showResult and config.mode == Opponent.solo) and makeHeaderCell('') or nil,
-		(config.showResult and config.mode ~= Opponent.team) and makeHeaderCell('K') or nil,
-		(config.showResult and config.mode ~= Opponent.team) and makeHeaderCell('D') or nil,
-		(config.showResult and config.mode ~= Opponent.team) and makeHeaderCell('A') or nil,
-		(config.showResult and config.mode ~= Opponent.team) and makeHeaderCell('Ratio') or nil,
-		config.showResult and makeHeaderCell('Picks'):addClass('unsortable') or nil,
-		config.showResult and makeHeaderCell(nil, '80px') or nil,
-		config.showResult and makeHeaderCell('Score') or nil,
-		config.showResult and makeHeaderCell(nil, '80px') or nil,
-		config.showResult and makeHeaderCell('vs. Picks'):addClass('unsortable') or nil,
-		config.showLength and makeHeaderCell('Length') or nil,
-		config.showVod and makeHeaderCell('VOD', '60px') or nil
-	)
-
-	local header = mw.html.create('tr')
-	Array.forEach(nodes, function (node)
-		header:node(node)
-	end)
-
-	return header
+	return TableWidgets.TableHeader{children = {
+		TableWidgets.Row{children = WidgetUtil.collect(
+			makeHeaderCell('Date'),
+			config.showTier and makeHeaderCell('Tier') or nil,
+			config.showType and makeHeaderCell('Type') or nil,
+			config.showIcon and makeHeaderCell() or nil,
+			makeHeaderCell('Tournament'),
+			makeHeaderCell('Map'),
+			config.showResult and WidgetUtil.collect(
+				config.mode == Opponent.solo and makeHeaderCell('Pick') or nil,
+				config.mode ~= Opponent.team and {
+					makeHeaderCell('K'),
+					makeHeaderCell('D'),
+					makeHeaderCell('A'),
+					makeHeaderCell('Ratio'),
+				} or nil,
+				makeHeaderCell(config.mode == Opponent.solo and 'Team Picks' or 'Picks'),
+				makeHeaderCell(),
+				TableWidgets.CellHeader{
+					colspan = 2,
+					children = 'Score'
+				},
+				makeHeaderCell(),
+				makeHeaderCell('vs. Picks')
+			) or nil,
+			config.showLength and makeHeaderCell('Length') or nil,
+			config.showPatch and makeHeaderCell('Patch') or nil,
+			config.showVod and TableWidgets.CellHeader{
+				align = 'center',
+				children = 'VOD'
+			} or nil,
+			config.showMatchPage and makeHeaderCell() or nil
+		)}
+	}}
 end
 
 ---@param participant table
----@return number?
+---@return string?
 function CustomCharacterGameTable:_getRatio(participant)
 	local kills = tonumber(participant.kills) or 0
 	local deaths = tonumber(participant.deaths) or 0
@@ -112,35 +198,31 @@ function CustomCharacterGameTable:_getRatio(participant)
 		return nil
 	end
 
-	return MathUtil.round(kills / deaths, 1)
+	return MathUtil.formatRounded{value = kills / deaths, precision = 1}
 end
 
----@param match GameTableMatch
+---@param match CharacterGameTableMatch
 ---@param game CharacterGameTableGame
----@return Html?
+---@return Widget[]?
 function CustomCharacterGameTable:displayGame(match, game)
-	local makeCell = function (text)
-		return mw.html.create('td'):node(text)
+	---@param children Renderable|Renderable[]?
+	---@return Table2Cell
+	local makeCell = function (children)
+		return TableWidgets.Cell{children = children}
 	end
 
-	local makeIcon = function (character)
-		if not character then return nil end
-		return mw.html.create('td')
-			:node(CharacterIcon.Icon{character = character, size = self.config.iconSize, date = game.date})
-	end
+	local indexes = ((self.isCharacterTable and game.pickedBy == game.winner) or match.result.flipped) and {2, 1} or {1, 2}
 
-	local opponent = match.result.opponent
-	local opponentVs = match.result.vs
-	if self.isCharacterTable then
-		local pickedBy = game.pickedBy
-		---@cast pickedBy -nil
-		if pickedBy == 2 then
-			opponent, opponentVs = opponentVs, opponent
-		end
-	end
+	local opponent = match.opponents[indexes[1]]
+	local opponentVs = match.opponents[indexes[2]]
 
-	local node = mw.html.create()
-		:node(makeCell(Page.makeInternalLink(game.map)))
+	---@type Widget[]
+	local cells = {makeCell(LinkWidget{link = game.map})}
+
+	---@param cell Widget
+	local function addCell(cell)
+		table.insert(cells, cell)
+	end
 
 	if self.config.mode ~= Opponent.team then
 		local participant = game.opponents[game.pickedBy].players[game.pickedByplayer]
@@ -148,25 +230,27 @@ function CustomCharacterGameTable:displayGame(match, game)
 			local index = Array.indexOf(game.picks[game.pickedBy], function (pick)
 				return participant.agent == pick
 			end)
-			node:node(index > 0 and makeIcon(table.remove(game.picks[game.pickedBy], index)) or makeCell())
+			addCell(makeCell(index > 0 and MatchSummaryCharacters{
+				characters = {table.remove(game.picks[game.pickedBy], index)}
+			} or nil))
 		end
-		node
-			:node(makeCell(participant and participant.kills or nil))
-			:node(makeCell(participant and participant.deaths or nil))
-			:node(makeCell(participant and participant.assists or nil))
-			:node(makeCell(participant and self:_getRatio(participant) or nil))
+		addCell(makeCell(participant and participant.kills or nil))
+		addCell(makeCell(participant and participant.deaths or nil))
+		addCell(makeCell(participant and participant.assists or nil))
+		addCell(makeCell(participant and self:_getRatio(participant) or nil))
 	end
 
-	return node
-		:node(self:_displayCharacters(game, opponent.id, 'picks'))
-		:node(self:_displayOpponent(opponent, false))
-		:node(self:_displayScore(game, opponent.id, opponentVs.id))
-		:node(self:_displayOpponent(opponentVs, true))
-		:node(self:_displayCharacters(game, opponentVs.id, 'picks'))
+	addCell(self:_displayCharacters(game, indexes[1], 'picks'))
+	addCell(self:_displayOpponent(opponent, false))
+	Array.forEach(self:_displayScore(game, indexes[1], indexes[2]), addCell)
+	addCell(self:_displayOpponent(opponentVs, true))
+	addCell(self:_displayCharacters(game, indexes[2], 'picks'))
+
+	return cells
 end
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomCharacterGameTable.results(frame)
 	local args = Arguments.getArgs(frame)
 

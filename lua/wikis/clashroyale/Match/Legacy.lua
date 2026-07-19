@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=clashroyale
 -- page=Module:Match/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,10 +7,12 @@
 
 local MatchLegacy = {}
 
-local Json = require('Module:Json')
-local Opponent = require('Module:Opponent')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Json = Lua.import('Module:Json')
+local Opponent = Lua.import('Module:Opponent')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 function MatchLegacy.storeMatch(match2)
 	return MatchLegacy.store(match2)

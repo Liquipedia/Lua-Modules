@@ -1,50 +1,38 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/GameWinLossIndicator
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Logic = Lua.import('Module:Logic')
 
-local ICONS = {
-	win = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
-	draw = Icon.makeIcon{iconName = 'draw', color = 'bright-sun-text', size = '110%'},
-	loss = Icon.makeIcon{iconName = 'loss', color = 'cinnabar-text', size = '110%'},
-	empty = '[[File:NoCheck.png|link=|16px]]',
+local Component = Lua.import('Module:Widget/Component')
+local Label = Lua.import('Module:Widget/Basic/Label')
+
+local LABELS = {
+	win = Label{labelType = 'result-win'},
+	draw = Label{labelType = 'result-draw'},
+	loss = Label{labelType = 'result-loss'},
+	empty = Label{labelType = 'result-empty'},
 }
 
----@class MatchSummaryGameWinLossIndicator: Widget
----@operator call(table): MatchSummaryGameWinLossIndicator
-local MatchSummaryGameWinLossIndicator = Class.new(Widget)
+---@param props {winner: integer?, opponentIndex: integer?}
+---@return VNode
+local function MatchSummaryGameWinLossIndicator(props)
+	local winner = props.winner
 
----@return Widget
-function MatchSummaryGameWinLossIndicator:render()
-	local winner = self.props.winner
-
-	local icon
-	if winner == self.props.opponentIndex then
-		icon = ICONS.win
+	if winner == props.opponentIndex then
+		return LABELS.win
 	elseif winner == 0 then
-		icon = ICONS.draw
+		return LABELS.draw
 	elseif Logic.isNotEmpty(winner) then
-		icon = ICONS.loss
-	else
-		icon = ICONS.empty
+		return LABELS.loss
 	end
 
-	return Div{
-		classes = {'brkts-popup-spaced brkts-popup-winloss-icon'},
-		children = {icon},
-	}
+	return LABELS.empty
 end
 
-return MatchSummaryGameWinLossIndicator
+return Component.component(MatchSummaryGameWinLossIndicator)

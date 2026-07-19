@@ -1,33 +1,34 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:TransferList
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
-local Team = require('Module:Team')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
-local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
+local Html = Lua.import('Module:Widget/Html')
+local TransferRowWidget = Lua.import('Module:Widget/Transfer/Row')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
 local DEFAULT_VALUES = {
@@ -61,6 +62,7 @@ local DEFAULT_VALUES = {
 ---@field onlyNotableTransfers boolean
 
 ---@class TransferList: BaseClass
+---@operator call(table): TransferList
 ---@field config TransferListConfig
 ---@field groupedTransfers transfer[][]
 ---@field teamConditions ConditionTree?
@@ -71,12 +73,11 @@ local TransferList = Class.new(
 	---@return self
 	function(self, args)
 		self.config = self:parseArgs(args)
-		return self
 	end
 )
 
 ---@param frame Frame
----@return Html
+---@return Widget?
 function TransferList.run(frame)
 	local args = Arguments.getArgs(frame)
 	return TransferList(args):fetch():create()
@@ -99,9 +100,10 @@ function TransferList:parseArgs(args)
 		sortOrder = (args.sort or DEFAULT_VALUES.sort) .. ' ' .. (args.order or DEFAULT_VALUES.order) ..
 			', objectname ' .. objectNameSortOrder,
 		title = Logic.nilIfEmpty(args.title),
-		shown = Logic.nilOr(Logic.readBoolOrNil(args.shown), true),
+		shown = Logic.readBool(args.shown),
 		class = Logic.nilIfEmpty(args.class),
 		showMissingResultsMessage = Logic.readBool(args.form),
+		showTeamName = Logic.readBoolOrNil(args.showTeamName),
 		conditions = {
 			nationalities = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.nationality)),
 			players = Logic.nilIfEmpty(Array.map(players, mw.ext.TeamLiquidIntegration.resolve_redirect)),
@@ -133,10 +135,10 @@ function TransferList:_getTeams(args)
 
 	local teamList = {}
 	Array.forEach(teams, function(team)
-		if not mw.ext.TeamTemplate.teamexists(team) then
-			mw.log('Missing team teamplate: ' .. team)
+		if not TeamTemplate.exists(team) then
+			mw.log(TeamTemplate.noTeamMessage(team))
 		end
-		Array.extendWith(teamList, Team.queryHistoricalNames(team) or {team})
+		Array.extendWith(teamList, TeamTemplate.queryHistoricalNames(team))
 	end)
 
 	return teamList
@@ -166,47 +168,47 @@ function TransferList:fetch()
 	self.conditions = self:_buildConditions()
 	local queryData = mw.ext.LiquipediaDB.lpdb('transfer', {
 		conditions = self.conditions,
-		limit = self.config.limit,
+		limit = self.config.limit * 5,
 		order = self.config.sortOrder,
-		groupby = 'date desc, toteam desc, fromteam desc, role1 desc',--role2 desc
 	})
 
 	local groupedData = {}
-	Array.forEach(queryData, function(transfer)
-		local transfers = mw.ext.LiquipediaDB.lpdb('transfer', {
-			conditions = self:_buildConditions{
-				date = transfer.date,
-				fromTeam = transfer.fromteam or '',
-				toTeam = transfer.toteam or '',
-				roles1 = {transfer.role1},
-			},
-			limit = self.config.limit + 10,
-			order = self.config.sortOrder,
-		})
-		local currentGroup
-		local cache = {}
-		Array.forEach(transfers, function(transf)
-			if
-				cache.role2 ~= transf.role2 or
-				cache.team1_2 ~= transf.extradata.fromteamsec or
-				cache.team2_2 ~= transf.extradata.toteamsec
-			then
-				cache.role2 = transf.role2
-				cache.team1_2 = transfer.extradata.fromteamsec
-				cache.team2_2 = transfer.extradata.toteamsec
-				Array.appendWith(groupedData, currentGroup)
-				currentGroup = {}
+	local currentGroup
+	local cache = {}
+	for _, transfer in ipairs(queryData) do
+		if
+			cache.team1 ~= transfer.fromteam or
+			cache.team2 ~= transfer.toteam or
+			cache.date ~= transfer.date or
+			cache.role1 ~= transfer.role1 or
+			cache.role2 ~= transfer.role2 or
+			cache.team1_2 ~= transfer.extradata.fromteamsec or
+			cache.team2_2 ~= transfer.extradata.toteamsec
+		then
+			cache.team1 = transfer.fromteam
+			cache.team2 = transfer.toteam
+			cache.date = transfer.date
+			cache.role1 = transfer.role1
+			cache.role2 = transfer.role2
+			cache.team1_2 = transfer.extradata.fromteamsec
+			cache.team2_2 = transfer.extradata.toteamsec
+
+			if #groupedData == self.config.limit - 1 then
+				break
 			end
-			table.insert(currentGroup, transf)
-		end)
-		Array.appendWith(groupedData, currentGroup)
-	end)
+			Array.appendWith(groupedData, currentGroup)
+			currentGroup = {}
+		end
+		table.insert(currentGroup, transfer)
+	end
+	Array.appendWith(groupedData, currentGroup)
 
 	self.groupedTransfers = groupedData
 
 	return self
 end
 
+---@private
 ---@param config {date: string, fromTeam: string, toTeam: string, roles1: string[]}?
 ---@return string
 function TransferList:_buildConditions(config)
@@ -215,20 +217,21 @@ function TransferList:_buildConditions(config)
 	local conditions = self:_buildBaseConditions()
 		:add(self:_buildDateCondition(config.date))
 		:add(self:_buildTeamConditions(config.toTeam, config.fromTeam))
-		:add(self:_buildOrConditions('role1', config.roles1 or self.config.conditions.roles1))
+		:add(ConditionUtil.anyOf(ColumnName('role1'), config.roles1 or self.config.conditions.roles1))
 
 	return conditions:toString()
 end
 
+---@private
 ---@return ConditionTree
 function TransferList:_buildBaseConditions()
 	local config = self.config.conditions
 
 	self.baseConditions = ConditionTree(BooleanOperator.all)
-		:add(self:_buildOrConditions('player', config.players))
-		:add(self:_buildOrConditions('nationality', config.nationalities))
-		:add(self:_buildOrConditions('role2', config.roles2))
-		:add(self:_buildOrConditions('extradata_position', config.positions))
+		:add(ConditionUtil.anyOf(ColumnName('player'), config.players))
+		:add(ConditionUtil.anyOf(ColumnName('nationality'), config.nationalities))
+		:add(ConditionUtil.anyOf(ColumnName('role2'), config.roles2))
+		:add(ConditionUtil.anyOf(ColumnName('extradata_position'), config.positions))
 
 	if config.platform then
 		self.baseConditions:add{ConditionNode(ColumnName('extradata_platform'), Comparator.eq, config.platform)}
@@ -241,6 +244,7 @@ function TransferList:_buildBaseConditions()
 	return self.baseConditions
 end
 
+---@private
 ---@param date string?
 ---@return ConditionTree?
 function TransferList:_buildDateCondition(date)
@@ -257,25 +261,24 @@ function TransferList:_buildDateCondition(date)
 	end
 
 	if config.startDate then
-		dateConditions:add(ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('date'), Comparator.gt, config.startDate),
-			ConditionNode(ColumnName('date'), Comparator.eq, config.startDate),
-		})
+		dateConditions:add(
+			ConditionNode(ColumnName('date'), Comparator.ge, config.startDate)
+		)
 	else
-		dateConditions:add{ConditionNode(ColumnName('date'), Comparator.gt, DateExt.defaultDate)}
+		dateConditions:add(ConditionNode(ColumnName('date'), Comparator.gt, DateExt.defaultDate))
 	end
 
 	if config.endDate then
 		local endDate = config.endDate .. ' 23:59:59'
-		dateConditions:add(ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('date'), Comparator.lt, endDate),
-			ConditionNode(ColumnName('date'), Comparator.eq, endDate),
-		})
+		dateConditions:add(
+			ConditionNode(ColumnName('date'), Comparator.le, endDate)
+		)
 	end
 
 	return dateConditions
 end
 
+---@private
 ---@param toTeam string?
 ---@param fromTeam string?
 ---@return ConditionTree?
@@ -292,83 +295,95 @@ function TransferList:_buildTeamConditions(toTeam, fromTeam)
 	if Logic.isEmpty(self.config.conditions.teams) then return end
 
 	self.teamConditions = ConditionTree(BooleanOperator.any)
-		:add(self:_buildOrConditions('fromteam', self.config.conditions.teams))
-		:add(self:_buildOrConditions('toteam', self.config.conditions.teams))
+		:add(ConditionUtil.anyOf(ColumnName('fromteamtemplate'), self.config.conditions.teams))
+		:add(ConditionUtil.anyOf(ColumnName('toteamtemplate'), self.config.conditions.teams))
 
 	return self.teamConditions
 end
 
----@param lpdbField string
----@param data string[]
----@return ConditionTree?
-function TransferList:_buildOrConditions(lpdbField, data)
-	if Logic.isEmpty(data) then return nil end
-	return ConditionTree(BooleanOperator.any)
-		:add(Array.map(data, function(item)
-			return ConditionNode(ColumnName(lpdbField), Comparator.eq, item)
-		end))
-end
-
----@return Html|string?
+---@return Widget?
 function TransferList:create()
 	local config = self.config
-	if config.showMissingResultsMessage and Logic.isDeepEmpty(self.groupedTransfers) then
-		return mw.html.create('pre'):wikitext('No results for: ' .. mw.text.nowiki(self.conditions))
-	elseif Logic.isDeepEmpty(self.groupedTransfers) then
+	if Logic.isDeepEmpty(self.groupedTransfers) then
+		if config.showMissingResultsMessage then
+			return Html.Pre{children = 'No results for: ' .. mw.text.nowiki(self.conditions)}
+		end
 		return
 	end
 
-	local display = mw.html.create('div')
-		:addClass('divTable mainpage-transfer Ref')
-		:css('text-align', 'center')
-		:css('width', '100%')
-		:node(self:_buildHeader())
-
-	Array.forEach(self.groupedTransfers, function(rowData)
-		display:node(self:_buildRow(rowData))
-	end)
+	local display = Html.Div{
+		classes = {'divTable', 'mainpage-transfer', 'Ref', config.class},
+		css = {
+			['text-align'] = 'center',
+			width = '100%',
+		},
+		children = WidgetUtil.collect(
+			self:_buildHeader(),
+			Array.map(self.groupedTransfers, function (rowData)
+				return self:_buildRow(rowData)
+			end)
+		)
+	}
 
 	if not config.title then
-		-- for whatever reason currently class is only applied in this case ...
-		if config.class then
-			display:addClass(config.class)
-		end
-		return mw.html.create('div')
-			:node(display)
+		return display
 	end
 
-	return mw.html.create('table')
-		:css('margin-top','0px')
-		:addClass('wikitable OffSeasonOverview')
-		:addClass(config.shown and 'collapsible collapsed' or nil)
-		:tag('tr'):tag('th'):attr('colspan', 7):wikitext(config.title):allDone()
-		:tag('tr'):tag('td'):css('padding', '0'):node(display):allDone()
+	return GeneralCollapsible{
+		title = config.title,
+		classes = {'OffSeasonOverview'},
+		shouldCollapse = not config.shown,
+		children = display,
+	}
 end
 
----@return Html
+---@private
+---@return HtmlNode
 function TransferList:_buildHeader()
-	local headerRow = mw.html.create('div')
-		:addClass('divHeaderRow')
-		:tag('div'):addClass('divCell Date'):wikitext('Date'):allDone()
-
-	if HAS_PLATFORM_ICONS then
-		headerRow:tag('div'):addClass('divCell GameIcon')
+	---@param props {classes: string[]?, children: Renderable|Renderable[]?}
+	---@return HtmlNode
+	local function createDivCell(props)
+		return Html.Div{
+			classes = Array.extend('divCell', props.classes),
+			children = props.children,
+		}
 	end
 
-	return headerRow
-		:tag('div'):addClass('divCell Name'):wikitext('Player'):done()
-		:tag('div'):addClass('divCell Team OldTeam'):wikitext('Old'):done()
-		:tag('div'):addClass('divCell Icon'):done()
-		:tag('div'):addClass('divCell Team NewTeam'):wikitext('New'):done()
-		:tag('div'):addClass('divCell Empty')
-			:tag('span')
-				:addClass('mobile-hide')
-				:wikitext(Abbreviation.make{text = 'Ref', title = 'Reference'})
-		:allDone()
+	return Html.Div{
+		classes = {'divHeaderRow'},
+		children = WidgetUtil.collect(
+			createDivCell{
+				classes = {'Date'},
+				children = 'Date'
+			},
+			HAS_PLATFORM_ICONS and createDivCell{classes = {'GameIcon'}} or nil,
+			createDivCell{
+				classes = {'Name'},
+				children = 'Player',
+			},
+			createDivCell{
+				classes = {'Team', 'OldTeam'},
+				children = 'Old',
+			},
+			createDivCell{classes = {'Icon'}},
+			createDivCell{
+				classes = {'Team', 'NewTeam'},
+				children = 'New',
+			},
+			createDivCell{
+				classes = {'Empty'},
+				children = Html.Span{
+					classes = {'mobile-hide'},
+					children = Html.Abbr{children = 'Ref', title = 'Reference'}
+				}
+			}
+		)
+	}
 end
 
+---@private
 ---@param transfers transfer[]
----@return Html?
+---@return VNode?
 function TransferList:_buildRow(transfers)
 	local firstTransfer = transfers[1]
 	if not firstTransfer then
@@ -384,7 +399,10 @@ function TransferList:_buildRow(transfers)
 		firstTransfer.role2 = nil
 	end
 
-	return TransferRowDisplay(transfers):build()
+	return TransferRowWidget{
+		transfers = transfers,
+		showTeamName = self.config.showTeamName
+	}
 end
 
 return TransferList

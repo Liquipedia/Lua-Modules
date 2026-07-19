@@ -1,12 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=deadlock
 -- page=Module:FilterButtons/Config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Tier = require('Module:Tier/Utils')
+local Lua = require('Module:Lua')
+
+local Tier = Lua.import('Module:Tier/Utils')
 local Config = {}
 
 ---@type FilterButtonCategory[]
@@ -20,7 +21,6 @@ Config.categories = {
 				table.insert(category.items, tier.value)
 			end
 		end,
-		defaultItems = {'1', '2', '3'},
 		transform = function(tier)
 			return Tier.toName(tier)
 		end,

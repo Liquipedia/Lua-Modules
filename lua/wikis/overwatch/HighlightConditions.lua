@@ -1,12 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=overwatch
 -- page=Module:HighlightConditions
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local String = require('Module:StringUtils')
+local Lua = require('Module:Lua')
+
+local String = Lua.import('Module:StringUtils')
 
 local HighlightConditions = {}
 
@@ -15,7 +16,7 @@ local HighlightConditions = {}
 ---@param options table?
 ---@return boolean
 function HighlightConditions.tournament(data, options)
-	return String.isNotEmpty(data.publishertier) and tonumber(data.liquipediatier) == 1
+	return String.isNotEmpty(data.publishertier or data.publisherTier) and tonumber(data.liquipediatier) == 1
 end
 
 return HighlightConditions

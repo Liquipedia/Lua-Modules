@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Tier/Utils
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,16 +7,28 @@
 
 -- module intended to be moved to `Module:Tier` after the old ones usage has been eliminated
 
-local Logic = require('Module:Logic')
-local FnUtil = require('Module:FnUtil')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
 
-local TierData = mw.loadData('Module:Tier/Data')
+local Logic = Lua.import('Module:Logic')
+local FnUtil = Lua.import('Module:FnUtil')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+
+local TierData = Lua.import('Module:Tier/Data', {loadData = true})
 
 local NON_BREAKING_SPACE = '&nbsp;'
 local DEFAULT_TIER_TYPE = 'General'
+
+---@alias TierData {tiers: table<''|integer, TierRawData?>, tierTypes: table<string, TierRawData?>}
+
+---@class TierRawData
+---@field value string?
+---@field sort string
+---@field name string
+---@field short string
+---@field link string?
+---@field category string?
 
 ---@class TierUtils
 local Tier = {}
@@ -38,7 +49,7 @@ end
 --- Retrieves the raw data for a given (tier, tierType) tuple
 ---@param tier string|integer?
 ---@param tierType string?
----@return table?, table?
+---@return TierRawData?, TierRawData?
 function Tier.raw(tier, tierType)
 	return (TierData.tiers or {})[Tier.toIdentifier(tier)],
 		(TierData.tierTypes or {})[Tier.toIdentifier(tierType)]
@@ -63,7 +74,7 @@ end
 --- Converts input to (storage) values for a given (tier, tierType) tuple
 ---@param tier string|integer?
 ---@param tierType string?
----@return integer?, string?
+---@return string?, string?
 function Tier.toValue(tier, tierType)
 	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
@@ -112,7 +123,7 @@ end
 
 --- Parses queryData to be processable for other Tier functions
 --- overwritable on a per wiki basis if additional data needs to be passed
----@param queryData {liquipediatier: string, liquipediatiertype: string}
+---@param queryData {liquipediatier: string, liquipediatiertype: string?}
 ---@return string, string?, table
 function Tier.parseFromQueryData(queryData)
 	local tierType = queryData.liquipediatiertype
@@ -183,7 +194,7 @@ end
 
 --- Iterate over tiers/tierTypes in a sorted order
 ---@param subTable 'tiers'|'tierTypes'
----@return function
+---@return fun(): string|integer, TierRawData
 function Tier.iterate(subTable)
 	return Table.iter.spairs(TierData[subTable], function(tierData, key1, key2)
 		return tierData[key1].sort < tierData[key2].sort
@@ -193,25 +204,24 @@ end
 ---@return {[string]: integer?}
 Tier.legacyNumbers = FnUtil.memoize(function()
 	return Table.map(TierData.tiers, function(key, data)
-		return data.name:lower():gsub(' ', ''), tonumber(key)
+		return data.name:lower(), tonumber(key)
 	end)
 end)
 
 ---@return {[string]: integer?}
 Tier.legacyShortNumbers = FnUtil.memoize(function()
 	return Table.map(TierData.tiers, function(key, data)
-		return data.short:lower():gsub(' ', ''), tonumber(key)
+		return data.short:lower(), tonumber(key)
 	end)
 end)
 
---- Legacy: Converts legacy tier input to its numeric value. DEPRECATED!!!
+--- Converts legacy tier input to its numeric value.
 ---@param tier string|integer|nil
 ---@return integer?
----@deprecated
 function Tier.toNumber(tier)
 	return tonumber(tier)
-		or Tier.legacyNumbers()[string.lower(tier or ''):gsub(' ', '')]
-		or Tier.legacyShortNumbers()[string.lower(tier or ''):gsub(' ', '')]
+		or Tier.legacyNumbers()[string.lower(tier or '')]
+		or Tier.legacyShortNumbers()[string.lower(tier or '')]
 end
 
 return Tier

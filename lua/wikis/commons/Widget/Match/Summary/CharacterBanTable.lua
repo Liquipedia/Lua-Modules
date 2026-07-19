@@ -1,45 +1,42 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/CharacterBanTable
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
 
 local Icon = Lua.import('Module:Icon')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Abbr, Tr, Th, Td = HtmlWidgets.Abbr, HtmlWidgets.Tr, HtmlWidgets.Th, HtmlWidgets.Td
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Characters = Lua.import('Module:Widget/Match/Summary/Characters')
-local Collapsible = Lua.import('Module:Widget/Match/Summary/Collapsible')
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class MatchSummaryCharacterBanTable: Widget
----@operator call(table): MatchSummaryCharacterBanTable
-local MatchSummaryCharacterBanTable = Class.new(Widget)
-MatchSummaryCharacterBanTable.defaultProps = {
+local defaultProps = {
 	flipped = false,
 }
 
 local ICONS = {
 	left = Icon.makeIcon{iconName = 'startleft', size = '110%'},
 	right = Icon.makeIcon{iconName = 'startright', size = '110%'},
-	empty = '[[File:NoCheck.png|link=|16px]]',
+	empty = Html.Span{},
 }
 
----@return Widget[]?
-function MatchSummaryCharacterBanTable:render()
-	if Logic.isDeepEmpty(self.props.bans) then
+---@param props {bans: {[1]: string[]?, [2]: string[]?, start: integer?}[], date: string?}
+---@return VNode?
+local function MatchSummaryCharacterBanTable(props)
+	if Logic.isDeepEmpty(props.bans) then
 		return nil
 	end
 
-	local hasStartIndicator = Array.any(self.props.bans, function(banData)
+	local hasStartIndicator = Array.any(props.bans, function(banData)
 		return Logic.isNotEmpty(banData.start)
 	end)
 
@@ -55,48 +52,33 @@ function MatchSummaryCharacterBanTable:render()
 		return ICONS.right
 	end
 
-	local rows = Array.map(self.props.bans, function(banData, gameNumber)
-		if Logic.isDeepEmpty(banData) then
-			return nil
-		end
-		return Tr{
-			children = WidgetUtil.collect(
-				Td{
-					css = {float = 'left'},
-					children = {Characters{characters = banData[1], flipped = false, date = self.props.date}}
-				},
-				hasStartIndicator and Td{
-					children = {startIndicator(1, banData.start)}
-				} or nil,
-				Td{
-					css = {['font-size'] = '80%'},
-					children = {Abbr{
-						title = 'Bans in game ' .. gameNumber,
-						children = {'Game ' .. gameNumber},
-					}}
-				},
-				hasStartIndicator and Td{
-					children = {startIndicator(2, banData.start)}
-				} or nil,
-				Td{
-					css = {float = 'right'},
-					children = {Characters{characters = banData[2], flipped = true, date = self.props.date}}
-				}
-			),
-		}
-	end)
-
-	return Collapsible{
-		tableClasses = {'wikitable-striped'},
-		header = Tr{children = WidgetUtil.collect(
-			Th{css = {width = hasStartIndicator and '35%' or '40%'}},
-			hasStartIndicator and Th{css = {width = '5%'}} or nil,
-			Th{css = {width = '20%'}, children = {'Bans'}},
-			hasStartIndicator and Th{css = {width = '5%'}} or nil,
-			Th{css = {width = hasStartIndicator and '35%' or '40%'}}
-		)},
-		children = rows,
+	return GeneralCollapsible{
+		classes = {'brkts-popup-veto-wrapper'},
+		shouldCollapse = true,
+		collapseAreaClasses = {'brkts-popup-veto'},
+		titleClasses = {'brkts-popup-veto-header'};
+		title = 'Bans',
+		children = Array.map(props.bans, function(banData, gameNumber)
+			if Logic.isDeepEmpty(banData) then
+				return nil
+			end
+			return Div{
+				classes = {'brkts-popup-veto-row'},
+				children = WidgetUtil.collect(
+					Characters{characters = banData[1], flipped = false, date = props.date},
+					Div{
+						classes = hasStartIndicator and {'brkts-popup-veto-row-indicator'} or nil,
+						children = WidgetUtil.collect(
+							hasStartIndicator and startIndicator(1, banData.start) or nil,
+							'Game&nbsp;' .. gameNumber,
+							hasStartIndicator and startIndicator(2, banData.start) or nil
+						)
+					},
+					Characters{characters = banData[2], flipped = true, date = props.date}
+				),
+			}
+		end)
 	}
 end
 
-return MatchSummaryCharacterBanTable
+return Component.component(MatchSummaryCharacterBanTable, defaultProps)

@@ -1,63 +1,63 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Tournament/Title
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Game = require('Module:Game')
-local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Game = Lua.import('Module:Game')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Logic = Lua.import('Module:Logic')
 
+local Component = Lua.import('Module:Widget/Component')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
----@class TournamentsTickerTitleWidget: Widget
----@operator call(table): TournamentsTickerTitleWidget
-local TournamentsTickerTitleWidget = Class.new(Widget)
+---@class TournamentTitleProps
+---@field tournament StandardTournamentPartial
+---@field displayGameIcon boolean?
+---@field useShortName boolean?
 
----@return Widget?
-function TournamentsTickerTitleWidget:render()
-	local tournament = self.props.tournament
+---@param props TournamentTitleProps
+---@return Renderable[]?
+local function TournamentTitle(props)
+	local tournament = props.tournament
 	if not tournament then
 		return
 	end
-	return HtmlWidgets.Fragment{
-		children = {
-			self.props.displayGameIcon and Game.icon{
-				game = tournament.game,
-				noLink = true,
-				spanClass = 'tournament-game-icon icon-small',
-				size = '50px',
-			} or '',
-			HtmlWidgets.Span{
-				classes = {'tournament-icon'},
-				children = {
-					LeagueIcon.display{
-						icon = tournament.icon,
-						iconDark = tournament.iconDark,
-						series = tournament.series,
-						abbreviation = tournament.abbreviation,
-						link = tournament.pageName,
-						options = {noTemplate = true},
-					}
-				}
-			},
-			HtmlWidgets.Span{
-				classes = {'tournament-name'},
-				children = {
-					Link{
-						link = tournament.pageName,
-						children = tournament.displayName,
-					},
+
+	return WidgetUtil.collect(
+		props.displayGameIcon and Game.icon{
+			game = tournament.game,
+			noLink = true,
+			spanClass = 'tournament-game-icon icon-small',
+			size = '50px',
+		} or nil,
+		Html.Span{
+			classes = {'tournament-icon'},
+			children = {
+				LeagueIcon.display{
+					icon = tournament.icon,
+					iconDark = tournament.iconDark,
+					series = tournament.series,
+					link = tournament.pageName,
+					options = {noTemplate = true},
 				}
 			}
 		},
-	}
+		Html.Span{
+			classes = {'tournament-name'},
+			children = {
+				Link{
+					link = tournament.pageName,
+					children = Logic.readBool(props.useShortName) and tournament.shortName or tournament.displayName,
+				},
+			}
+		}
+	)
 end
 
-return TournamentsTickerTitleWidget
+return Component.component(TournamentTitle)

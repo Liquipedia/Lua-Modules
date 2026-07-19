@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Array
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -51,6 +50,53 @@ function Array.copy(tbl)
 		table.insert(copy, element)
 	end
 	return copy
+end
+
+---Creates an array that contains `count` copies of the specified element.
+---
+---If `count == 0`, then an empty array is returned.
+---
+---If `element` is a table and `copyFunction` is not specified,
+---then all elements in the returned array are reference equal.
+---@generic T
+---@param element T
+---@param count integer
+---@param copyFunction? fun(origElement: T): T
+---@return T[]
+---@nodiscard
+function Array.rep(element, count, copyFunction)
+	assert(element ~= nil, 'Array.rep: element must not be nil')
+	assert(count >= 0, 'Array.rep: count must be non-negative')
+	local arr = {}
+	for _ = 1, count do
+		if copyFunction then
+			table.insert(arr, copyFunction(element))
+		else
+			table.insert(arr, element)
+		end
+	end
+	return arr
+end
+
+---Returns true if two arrays are equal to each other.
+---@param arr1 any[]
+---@param arr2 any[]
+---@return boolean
+---@nodiscard
+function Array.equals(arr1, arr2)
+	assert(Array.isArray(arr1), 'arr1 is not an array')
+	assert(Array.isArray(arr2), 'arr2 is not an array')
+	if arr1 == arr2 then
+		return true
+	elseif #arr1 ~= #arr2 then
+		return false
+	end
+	for index = 1, #arr1 do
+		if arr1[index] ~= arr2[index] then
+			return false
+		end
+	end
+	return true
 end
 
 --[[
@@ -118,13 +164,13 @@ end
 
 ---Flattens an array of arrays into an array.
 ---@generic T
----@param tbl T[]
+---@param tbl (T|T[])[]
 ---@return T[]
 ---@nodiscard
 function Array.flatten(tbl)
 	local flattenedArray = {}
 	for _, x in ipairs(tbl) do
-		if type(x) == 'table' then
+		if Array.isArray(x) then
 			for _, y in ipairs(x) do
 				table.insert(flattenedArray, y)
 			end
@@ -136,13 +182,27 @@ function Array.flatten(tbl)
 end
 
 ---Maps each element of an array to separate arrays, then flattens the mapped results.
+---
+---This is equivalent to `Array.flatten(Array.map(elements, funct))`.
 ---@generic V, T
 ---@param elements V[]
 ---@param funct fun(element: V, index?: integer): T[]|nil
 ---@return T[]
 ---@nodiscard
 function Array.flatMap(elements, funct)
-	return Array.flatten(Array.map(elements, funct))
+	local mappedArray = {}
+	for index, element in ipairs(elements) do
+		local mappedElement = funct(element, index)
+		if Array.isArray(mappedElement) then
+			---@cast mappedElement -nil
+			for _, x in ipairs(mappedElement) do
+				table.insert(mappedArray, x)
+			end
+		else
+			table.insert(mappedArray, mappedElement)
+		end
+	end
+	return mappedArray
 end
 
 ---Determines whether all elements in an array satisfy a predicate.
@@ -418,7 +478,7 @@ array is mutated in the process.
 function Array.extendWith(tbl, ...)
 	local arrays = Table.pack(...)
 	for index = 1, arrays.n do
-		if type(arrays[index]) == 'table' then
+		if Array.isArray(arrays[index]) then
 			for _, element in ipairs(arrays[index]) do
 				table.insert(tbl, element)
 			end
@@ -443,7 +503,7 @@ function Array.mapIndexes(funct)
 	local arr = {}
 	for index = 1, math.huge do
 		local y = funct(index)
-		if y then
+		if y ~= nil then
 			table.insert(arr, y)
 		else
 			break
@@ -461,6 +521,23 @@ function Array.range(from, to)
 	local elements = {}
 	for element = from, to do
 		table.insert(elements, element)
+	end
+	return elements
+end
+
+---Returns the array `{funct(from), funct(from + 1), funct(from + 2), ..., funct(to)}`.
+---
+---This is equivalent to `Array.map(Array.range(from, to), funct)`.
+---@generic T
+---@param from integer
+---@param to integer
+---@param funct fun(index: integer): T?
+---@return T[]
+---@nodiscard
+function Array.mapRange(from, to, funct)
+	local elements = {}
+	for i = from, to do
+		table.insert(elements, funct(i))
 	end
 	return elements
 end
@@ -681,13 +758,12 @@ end
 ---@param x T
 ---@return (V|T)[]
 function Array.interleave(elements, x)
-	local size = #elements
-	return Array.flatMap(elements, function(element, index)
-		if index == size then
-			return {element}
-		end
-		return {element, x}
-	end)
+	local ret = {elements[1]}
+	for i = 2, #elements do
+		table.insert(ret, x)
+		table.insert(ret, elements[i])
+	end
+	return ret
 end
 
 return Array

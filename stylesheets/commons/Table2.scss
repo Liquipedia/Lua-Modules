@@ -1,0 +1,304 @@
+$table2-radius: 0.5rem;
+$table2-cell-padding-y: 0.5rem;
+$table2-cell-padding-x: 0.75rem;
+
+@mixin table2-surface-colors() {
+	background-color: var( --clr-background, #ffffff );
+	border-color: var( --clr-on-surface-light-primary-12 );
+	color: var( --clr-secondary-16 );
+	color-scheme: light;
+
+	.theme--dark & {
+		background-color: var( --clr-background, #121212 );
+		border-color: var( --clr-on-surface-dark-primary-12 );
+		color: var( --clr-secondary-100 );
+		color-scheme: dark;
+	}
+}
+
+.table2 {
+	display: block;
+	width: fit-content;
+	max-width: stretch;
+	border: 1px solid;
+	border-radius: $table2-radius;
+	overflow: hidden;
+
+	@supports not ( max-width: stretch ) {
+		max-width: -webkit-fill-available;
+
+		@supports not ( max-width: -webkit-fill-available ) {
+			max-width: 100%;
+		}
+	}
+
+	@include table2-surface-colors();
+
+	&__container {
+		overflow: auto hidden;
+		max-width: 100%;
+		-webkit-overflow-scrolling: touch;
+		touch-action: pan-x pan-y;
+		overscroll-behavior-x: contain;
+	}
+
+	&__footer {
+		font-weight: bold;
+		padding: 0.25rem 0.75rem;
+		text-align: center;
+		border-top: 1px solid;
+		border-top-color: var( --clr-on-surface-light-primary-12 );
+
+		.theme--dark & {
+			border-top-color: var( --clr-on-surface-dark-primary-12 );
+		}
+	}
+
+	&__table {
+		width: 100%;
+		border-spacing: unset;
+		border-collapse: separate;
+		border: 0;
+
+		td,
+		th {
+			padding: $table2-cell-padding-y $table2-cell-padding-x;
+			vertical-align: middle;
+			text-align: left;
+
+			&[ data-align="right" ] {
+				text-align: right;
+			}
+
+			&[ data-align="center" ] {
+				text-align: center;
+			}
+
+			&[ data-nowrap ] {
+				white-space: nowrap;
+			}
+
+			&[ data-shrink ] {
+				width: fit-content;
+				white-space: nowrap;
+			}
+		}
+
+		thead tr,
+		tr:has( th ):not( :has( td ) ) {
+			outline: 1px solid;
+			white-space: nowrap;
+			background-color: var( --clr-on-surface-light-primary-4 );
+			outline-color: var( --clr-on-surface-light-primary-12 );
+			color: var( --clr-secondary-25 );
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+				outline-color: var( --clr-on-surface-dark-primary-12 );
+				color: var( --clr-secondary-80 );
+			}
+
+			th {
+				font-weight: bold;
+			}
+		}
+
+		.prizepooltabletoggle {
+			text-align: center;
+		}
+	}
+
+	tr.table2__row--body {
+		// `:where()` keeps the zebra tint at low specificity so consumers (e.g. the
+		// prize-pool placement tints) can override it without a specificity arms race.
+		&:where( .table2__row--even ) {
+			background-color: var( --clr-on-surface-light-primary-4 );
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+			}
+		}
+
+		&.table2__row--highlighted {
+			position: relative;
+			background-color: var( --clr-semantic-gold-90 );
+			box-shadow: inset 0 -1px 0 var( --clr-semantic-gold-80 );
+
+			.theme--dark & {
+				background-color: var( --clr-semantic-gold-16 );
+				box-shadow: inset 0 -1px 0 var( --clr-semantic-gold-20 );
+			}
+
+			&::after {
+				content: "";
+				position: absolute;
+				left: 0;
+				top: 0;
+				bottom: 0;
+				width: 6px;
+				background-color: var( --clr-semantic-gold-40 );
+
+				.theme--dark & {
+					background-color: var( --clr-semantic-gold-30 );
+				}
+			}
+		}
+
+		&:hover {
+			background-color: var( --clr-on-surface-light-primary-8 );
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-8 );
+			}
+		}
+
+		&.table2__row--highlighted:hover {
+			background-color: var( --clr-semantic-gold-85 );
+
+			.theme--dark & {
+				background-color: var( --clr-semantic-gold-18 );
+			}
+		}
+
+		&.table2__row--group-hover {
+			background-color: var( --clr-on-surface-light-primary-8 );
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-8 );
+			}
+		}
+
+		&.table2__row--highlighted.table2__row--group-hover {
+			background-color: var( --clr-semantic-gold-85 );
+
+			.theme--dark & {
+				background-color: var( --clr-semantic-gold-18 );
+			}
+		}
+
+		// Collapse the inner vertical padding between stacked rows of a rowspan group
+		// (marked by Table2.js) so grouped rows read as one block. `[rowspan]` cells
+		// span the whole group, so their padding sits at the group's outer edges and
+		// must stay — hence `:not( [ rowspan ] )`.
+		&.table2__row--group-joined-above > td:not( [ rowspan ] ) {
+			padding-top: 0.125rem;
+		}
+
+		&.table2__row--group-joined-below > td:not( [ rowspan ] ) {
+			padding-bottom: 0.125rem;
+		}
+	}
+
+	&__title {
+		padding: $table2-cell-padding-y $table2-cell-padding-x;
+		font-weight: bold;
+		border-bottom: 1px solid;
+		background-color: var( --clr-on-surface-light-primary-4 );
+		color: var( --clr-secondary-16 );
+		border-color: var( --clr-on-surface-light-primary-12 );
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+			color: var( --clr-secondary-100 );
+			border-color: var( --clr-on-surface-dark-primary-12 );
+		}
+	}
+
+	&__caption {
+		margin-bottom: 0.75rem;
+		font-weight: bold;
+		color: var( --clr-secondary-39 );
+
+		.theme--dark & {
+			color: var( --clr-secondary-80 );
+		}
+	}
+
+	tr.table2__row--head {
+		outline: 1px solid;
+		white-space: nowrap;
+		background-color: var( --clr-on-surface-light-primary-4 );
+		outline-color: var( --clr-on-surface-light-primary-12 );
+		color: var( --clr-secondary-25 );
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+			outline-color: var( --clr-on-surface-dark-primary-12 );
+			color: var( --clr-secondary-80 );
+		}
+
+		th {
+			font-weight: bold;
+		}
+	}
+
+	.table2__subheader-cell {
+		position: sticky;
+		left: 0.75rem;
+		width: min-content;
+	}
+
+	&--themed {
+		.table2__title {
+			background-color: var( --clr-wiki-theme-40, var( --clr-wiki-theme-primary, #1f3d7a ) );
+
+			.theme--dark & {
+				background-color: var( --clr-wiki-theme-20, var( --clr-wiki-theme-primary, #1f3d7a ) );
+			}
+			color: #ffffff;
+		}
+	}
+}
+
+// Standalone table2__table for MediaWiki usage (without .table2 wrapper)
+.table2__table:not( .table2 .table2__table ) {
+	width: auto;
+	border: 1px solid;
+	border-radius: $table2-radius;
+	overflow: hidden;
+
+	@include table2-surface-colors();
+
+	tbody tr:not( :has( th ):not( :has( td ) ) ):nth-child( odd ) {
+		background-color: var( --clr-on-surface-light-primary-4 );
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+		}
+	}
+
+	tbody tr:not( :has( th ):not( :has( td ) ) ):hover {
+		background-color: var( --clr-on-surface-light-primary-8 );
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-8 );
+		}
+	}
+}
+
+// TournamentsListing variant (Module:TournamentsListing/CardList)
+.tournaments-listing {
+	width: 100%;
+
+	.column {
+		&__tournament {
+			width: 100%;
+			min-width: 15rem;
+			max-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		&__placement > div {
+			display: inline-grid;
+			grid-template-columns: repeat( auto-fit, minmax( 150px, 1fr ) );
+			min-width: 12vw;
+		}
+
+		&__qualified > div {
+			display: inline-grid;
+			grid-template-columns: repeat( auto-fit, minmax( 150px, 1fr ) );
+			min-width: 20vw;
+		}
+	}
+}

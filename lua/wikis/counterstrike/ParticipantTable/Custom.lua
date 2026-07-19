@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:ParticipantTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
-local TextSanitizer = require('Module:TextSanitizer')
-local Variables = require('Module:Variables')
+
+local TextSanitizer = Lua.import('Module:TextSanitizer')
+local Variables = Lua.import('Module:Variables')
 
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 

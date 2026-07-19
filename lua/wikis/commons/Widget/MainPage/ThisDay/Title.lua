@@ -1,34 +1,32 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/MainPage/ThisDay/Title
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Ordinal = require('Module:Ordinal')
-local String = require('Module:StringUtils')
+
+local Ordinal = Lua.import('Module:Ordinal')
+local String = Lua.import('Module:StringUtils')
 
 local Info = Lua.import('Module:Info', { loadData = true })
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Small = HtmlWidgets.Small
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Small = Html.Small
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class ThisDayTitle: Widget
----@field props { name: string? }
----@operator call(table): ThisDayTitle
-local ThisDayTitle = Class.new(Widget)
-ThisDayTitle.defaultProps = {
+local defaultProps = {
 	name = Info.name
 }
 
-function ThisDayTitle:render()
-	local name = self.props.name
+---@param props {name: string?}
+---@return Renderable[]
+local function ThisDayTitle(props)
+	local name = props.name
 	assert(String.isNotEmpty(name), 'Invalid name: ' .. tostring(name))
+	---@cast name -nil
 	return WidgetUtil.collect(
 		'This day in ' .. name .. ' ',
 		Small{
@@ -39,4 +37,4 @@ function ThisDayTitle:render()
 	)
 end
 
-return ThisDayTitle
+return Component.component(ThisDayTitle, defaultProps)

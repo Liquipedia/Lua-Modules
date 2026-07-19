@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=formula1
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -37,6 +36,15 @@ return {
 		},
 		transfers = {
 			showTeamName = true,
+		},
+		teamRosterNavbox = {
+			hideOverview = true,
+		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'automatic',
+			},
 		},
 	},
 }

@@ -1,28 +1,33 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:TransferRow
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
-local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
+local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Variables = Lua.import('Module:Variables')
+
+local Platform = Lua.import('Module:Platform')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local PositionConvert = Lua.requireIfExists('Module:PositionName/data', {loadData = true})
-local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 local References = Lua.import('Module:Transfer/References')
+
+local TransferRowWidget = Lua.import('Module:Widget/Transfer/Row')
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
 local VALID_CONFIDENCES = {
@@ -33,7 +38,26 @@ local VALID_CONFIDENCES = {
 	'unknown',
 }
 
+---@class enrichedTransfer
+---@field from {teams: string[], roles: string[]}
+---@field to {teams: string[], roles: string[]}
+---@field platform string?
+---@field displayDate string
+---@field date string
+---@field wholeteam boolean
+---@field players transferPlayer[]
+---@field references string[]
+---@field confirmed boolean?
+---@field confidence string?
+---@field isRumour boolean?
+
+---@class transferPlayer: standardPlayer
+---@field icons string[]
+---@field faction string?
+---@field chars string[]
+
 ---@class TransferRow: BaseClass
+---@operator call(table): TransferRow
 ---@field config {storage: boolean, isRumour: boolean}
 ---@field transfers transfer[]
 ---@field args table
@@ -43,8 +67,6 @@ local TransferRow = Class.new(
 	---@return self
 	function(self, args)
 		self.args = args
-
-		return self
 	end
 )
 
@@ -61,8 +83,8 @@ function TransferRow:readConfig()
 	local isRumour = Logic.readBool(self.args.isRumour)
 	return {
 		storage = not isRumour and
-			not Logic.readBool(self.args.disable_storage) and
-			not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+			not Logic.readBool(self.args.disable_storage)
+			and Lpdb.isStorageEnabled()
 			and Namespace.isMain(),
 		isRumour = isRumour,
 	}
@@ -92,6 +114,7 @@ function TransferRow:readInput()
 	return transfers
 end
 
+---@private
 ---@return table
 function TransferRow:_readBaseData()
 	local args = self.args
@@ -103,7 +126,7 @@ function TransferRow:_readBaseData()
 	---@param teamInput string
 	---@return {name: string?, template: string?}
 	local checkTeam = function(dateInput, teamInput)
-		local teamData = Logic.isNotEmpty(teamInput) and mw.ext.TeamTemplate.raw(teamInput, dateInput)
+		local teamData = Logic.isNotEmpty(teamInput) and TeamTemplate.getRawOrNil(teamInput, dateInput)
 		if not teamData then
 			return {}
 		end
@@ -163,7 +186,8 @@ function TransferRow:_readBaseData()
 	}
 end
 
----@return {}
+---@private
+---@return {confirmed: string?, confidence: string?, isRumour: boolean?}
 function TransferRow:_getRumourInformation()
 	if not self.config.isRumour then return {} end
 
@@ -185,11 +209,11 @@ end
 ---@return string
 function TransferRow:readPlatform()
 	if not HAS_PLATFORM_ICONS then return '' end
-	local Platform = require('Module:Platform')
 	self.args.platform = Platform._getName(self.args.platform) or ''
 	return self.args.platform
 end
 
+---@private
 ---@param dateInput string?
 ---@return string?
 function TransferRow._shiftDate(dateInput)
@@ -197,7 +221,7 @@ function TransferRow._shiftDate(dateInput)
 
 	local year, month, day = dateInput:match('(%d+)-(%d+)-(%d+)')
 	local date = os.time{day=day, month=month, year=year}
-	date = date - 86400
+	date = date - DateExt.daysToSeconds(1)
 	return os.date( "%Y-%m-%d", date) --[[@as string]]
 end
 
@@ -228,6 +252,7 @@ function TransferRow:readPlayer(playerIndex)
 	}
 end
 
+---@private
 ---@param data {player: transferPlayer, index: integer|string, sortIndex: integer}
 ---@return transfer
 function TransferRow:_convertToTransferStructure(data)
@@ -285,6 +310,7 @@ function TransferRow:readIconsAndPosition(playerIndex)
 	return icons, positions
 end
 
+---@private
 ---@param numberOfPlayers integer
 ---@return table
 function TransferRow:_readReferences(numberOfPlayers)
@@ -319,15 +345,16 @@ function TransferRow:store()
 	return self
 end
 
+---@private
 ---@param transfer transfer
 ---@return string
 function TransferRow._objectName(transfer)
 	return 'transfer_' .. transfer.date .. '_' .. string.format('%06d', transfer.extradata.sortindex)
 end
 
----@return Html?
+---@return VNode
 function TransferRow:build()
-	return TransferRowDisplay(self.transfers):build()
+	return TransferRowWidget{transfers = self.transfers}
 end
 
 return TransferRow

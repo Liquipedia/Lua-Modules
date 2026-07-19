@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/All
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -15,30 +14,30 @@ Widgets.Builder = Lua.import('Module:Widget/Builder')
 Widgets.Customizable = Lua.import('Module:Widget/Customizable')
 
 --- Infobox Widgets
+Widgets.Accommodation = Lua.import('Module:Widget/Infobox/Accommodation')
 Widgets.Breakdown = Lua.import('Module:Widget/Infobox/Breakdown')
 Widgets.Cell = Lua.import('Module:Widget/Infobox/Cell')
 Widgets.Center = Lua.import('Module:Widget/Infobox/Center')
-Widgets.Chronology = Lua.import('Module:Widget/Infobox/Chronology')
+Widgets.Chronology = Lua.import('Module:Widget/Infobox/ChronologyContainer')
 Widgets.Header = Lua.import('Module:Widget/Infobox/Header')
 Widgets.Highlights = Lua.import('Module:Widget/Infobox/Highlights')
 Widgets.Links = Lua.import('Module:Widget/Infobox/Links')
+Widgets.Location = Lua.import('Module:Widget/Infobox/Location')
+Widgets.Organizers = Lua.import('Module:Widget/Infobox/Organizers')
+Widgets.ShopMerch = Lua.import('Module:Widget/Infobox/ShopMerch')
 Widgets.Title = Lua.import('Module:Widget/Infobox/Title')
-
---- Table Widgets (div-table) (will be removed)
-Widgets.TableOld = Lua.import('Module:Widget/Table/Old')
-Widgets.TableRow = Lua.import('Module:Widget/Table/Row')
-Widgets.TableCell = Lua.import('Module:Widget/Table/Cell')
+Widgets.Venue = Lua.import('Module:Widget/Infobox/Venue')
 
 --- Data Table Widgets (html-table)
 Widgets.DataTable = Lua.import('Module:Widget/Basic/DataTable')
 
 --- Base Html Widgets
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-Widgets.Div = HtmlWidgets.Div
-Widgets.Span = HtmlWidgets.Span
-Widgets.Table = HtmlWidgets.Table
-Widgets.Td = HtmlWidgets.Td
-Widgets.Th = HtmlWidgets.Th
-Widgets.Tr = HtmlWidgets.Tr
+local Html = Lua.import('Module:Widget/Html')
+Widgets.Div = Html.Div
+Widgets.Span = Html.Span
+Widgets.Table = Html.Table
+Widgets.Td = Html.Td
+Widgets.Th = Html.Th
+Widgets.Tr = Html.Tr
 
 return Widgets

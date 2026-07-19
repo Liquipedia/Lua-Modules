@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=smite
 -- page=Module:GetMatchGroupCopyPaste/wiki
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
@@ -36,10 +36,10 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
-		Logic.readBool(args.hasDate) and {
+		Logic.readBool(args.hasDate) and Array.extend(
 			INDENT .. '|date= |youtube= |twitch=',
-			args.vod == 'series' and (INDENT .. '|vod=') or nil,
-		} or nil,
+			args.vod == 'series' and (INDENT .. '|vod=') or nil
+		) or nil,
 		Array.map(Array.range(1, bestof), function(mapIndex)
 			return WikiCopyPaste._getMapCode(mapIndex, showBans, args.vod == 'maps')
 		end),
@@ -55,7 +55,7 @@ end
 ---@return string
 function WikiCopyPaste._getMapCode(mapIndex, showBans, showVod)
 	return table.concat(Array.extend(
-		INDENT .. '|map' .. mapIndex .. '={{Map' ..  (showVod and '|vod=' or ''),
+		INDENT .. '|map' .. mapIndex .. '={{Map' .. (showVod and '|vod=' or ''),
 		INDENT .. INDENT .. '|team1side= |team2side= |length= |winner=',
 		INDENT .. INDENT .. '<!-- God picks -->',
 		INDENT .. INDENT .. '|t1g1= |t1g2= |t1g3= |t1g4= |t1g5=',

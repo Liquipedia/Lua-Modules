@@ -1,38 +1,51 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Tournaments/Ticker/Sublist
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Array = Lua.import('Module:Array')
+
+local Component = Lua.import('Module:Widget/Component')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+local Html = Lua.import('Module:Widget/Html')
 local TournamentLabel = Lua.import('Module:Widget/Tournament/Label')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
 
----@class TournamentsTickerSublistWidget: Widget
----@operator call(table): TournamentsTickerSublistWidget
+---@class TournamentsTickerSublistProps
+---@field title string?
+---@field tournaments StandardTournament[]
+---@field displayGameIcons boolean?
+---@field createItem (fun(tournament: StandardTournament): Renderable)?
+---@field fallback Renderable?
 
-local TournamentsTickerSublistWidget = Class.new(Widget)
-
----@return Widget?
-function TournamentsTickerSublistWidget:render()
-	if not self.props.tournaments then
+---@param props TournamentsTickerSublistProps
+---@return VNode?
+local function TournamentsTickerSublist(props)
+	if not props.tournaments then
 		return
 	end
 
+	local createItem = props.createItem or function(tournament)
+		return TournamentLabel{
+			tournament = tournament,
+			displayGameIcon = props.displayGameIcons,
+		}
+	end
+
+	---@param tournament StandardTournament
+	---@param child Renderable
+	---@return Renderable
 	local createFilterWrapper = function(tournament, child)
 		return Array.reduce(FilterConfig.categories, function(prev, filterCategory)
 			local itemIsValid = filterCategory.itemIsValid or function(item) return true end
 			local itemToPropertyValues = filterCategory.itemToPropertyValues or function(item) return item end
 			local value = tournament[filterCategory.property]
 			local filterValue = itemIsValid(value) and value or filterCategory.defaultItem
-			return HtmlWidgets.Div{
+			return Html.Div{
 				attributes = {
 					['data-filter-group'] = 'filterbuttons-' .. filterCategory.name,
 					['data-filter-category'] = itemToPropertyValues(filterValue),
@@ -43,31 +56,27 @@ function TournamentsTickerSublistWidget:render()
 		end, child)
 	end
 
-	local list = HtmlWidgets.Ul{
+	local list = Html.Ul{
 		classes = {'tournaments-list-type-list'},
-		children = Array.map(self.props.tournaments, function(tournament)
-			return HtmlWidgets.Li{children = createFilterWrapper(tournament, TournamentLabel{
-				tournament = tournament,
-				displayGameIcon = self.props.displayGameIcons
-			})}
+		children = Array.map(props.tournaments, function(tournament)
+			return Html.Li{children = createFilterWrapper(tournament, createItem(tournament))}
 		end),
 	}
 
-	return HtmlWidgets.Li{
+	return Html.Div{
 		attributes = {
 			['data-filter-hideable-group'] = '',
 			['data-filter-effect'] = 'fade',
 		},
-		children = {
-			HtmlWidgets.Span{
+		children = WidgetUtil.collect(
+			props.title and Html.Span{
 				classes = {'tournaments-list-heading'},
-				children = self.props.title,
-			},
-			HtmlWidgets.Div{
-				children = list,
-			}
-		},
+				children = props.title,
+			} or nil,
+			list,
+			props.fallback
+		),
 	}
 end
 
-return TournamentsTickerSublistWidget
+return Component.component(TournamentsTickerSublist)

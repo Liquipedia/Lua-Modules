@@ -1,17 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:GetMatchGroupCopyPaste/wiki/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 ---Base-WikiSpecific Code for MatchList and Bracket Code Generators
 ---@class Match2CopyPasteBase
@@ -46,7 +46,7 @@ end
 ---@return string
 function WikiCopyPaste._getMaps(bestof)
 	local map = '{{Map|map=}}'
-	local lines = Array.map(Array.range(1, bestof), function(mapIndex)
+	local lines = Array.mapRange(1, bestof, function(mapIndex)
 		return INDENT .. '|map' .. mapIndex .. '=' .. map
 	end)
 
@@ -66,7 +66,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 	return table.concat(Array.extend({},
 		'{{Match',
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return '\n' .. INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
 		end),
 		'\n' .. INDENT .. '|finished=\n' .. INDENT .. '|date=\n' .. INDENT .. '}}'
@@ -109,7 +109,7 @@ end
 ---@param mapCount integer
 ---@return string
 function WikiCopyPaste.getFfaOpponent(mode, mapCount)
-	local mapScores = table.concat(Array.map(Array.range(1, mapCount), function(idx)
+	local mapScores = table.concat(Array.mapRange(1, mapCount, function(idx)
 		return '|m' .. idx .. '={{MS||}}'
 	end))
 
@@ -125,7 +125,7 @@ function WikiCopyPaste.getFfaOpponent(mode, mapCount)
 end
 
 ---function that sets the text that starts the invoke of the MatchGroup Modules,
----contains mandatory stuff like bracketid, templateid and MatchGroup type (matchlist or bracket)
+---contains mandatory stuff like bracketid, bracketType and MatchGroup type (matchlist or bracket)
 ---@param template string?
 ---@param id string
 ---@param modus string

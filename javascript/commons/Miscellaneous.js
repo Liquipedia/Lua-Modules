@@ -33,6 +33,9 @@ liquipedia.teamcard = {
 				hideplayers = 'Hide Players';
 			}
 			const button = document.createElement( 'button' );
+			button.classList.add( 'button' );
+			button.classList.add( 'button--secondary' );
+			button.classList.add( 'button--small' );
 			button.innerHTML = showplayers;
 			button.addEventListener( 'click', () => {
 				if ( teamcardsopened ) {
@@ -64,6 +67,7 @@ liquipedia.teamcard = {
 		document.querySelectorAll( '.teamcard-former-toggle-button' ).forEach( ( wrap ) => {
 			const teamcard = wrap.closest( '.teamcard' );
 			const button = document.createElement( 'button' );
+			button.classList.add( 'button', 'button--secondary', 'button--small' );
 			let width = 156;
 			if ( typeof wrap.dataset.width !== 'undefined' ) {
 				width = parseInt( wrap.dataset.width );
@@ -114,6 +118,7 @@ liquipedia.teamcard = {
 		document.querySelectorAll( '.teamcard-subs-toggle-button' ).forEach( ( wrap ) => {
 			const teamcard = wrap.closest( '.teamcard' );
 			const button = document.createElement( 'button' );
+			button.classList.add( 'button', 'button--secondary', 'button--small' );
 			let width = 156;
 			if ( typeof wrap.dataset.width !== 'undefined' ) {
 				width = parseInt( wrap.dataset.width );
@@ -165,6 +170,7 @@ liquipedia.teamcard = {
 		document.querySelectorAll( '.teamcard-active-toggle-button' ).forEach( ( wrap ) => {
 			const teamcard = wrap.closest( '.teamcard' );
 			const button = document.createElement( 'button' );
+			button.classList.add( 'button', 'button--secondary', 'button--small' );
 			let width = 156;
 			if ( typeof wrap.dataset.width !== 'undefined' ) {
 				width = parseInt( wrap.dataset.width );
@@ -387,6 +393,9 @@ liquipedia.togglearea = {
 	init: function() {
 		document.querySelectorAll( '.toggle-area' ).forEach( ( area ) => {
 			area.querySelectorAll( '.toggle-area-button' ).forEach( ( btn ) => {
+				if ( btn.closest( '.toggle-area' ) !== area ) {
+					return;
+				}
 				btn.addEventListener( 'click', () => {
 					area.classList.remove( 'toggle-area-' + area.dataset.toggleArea );
 					area.dataset.toggleArea = btn.dataset.toggleAreaBtn;
@@ -523,42 +532,42 @@ liquipedia.tracker = {
 				liquipedia.tracker.track( 'In Content TOC item clicked', true );
 			} );
 		} );
-		document.querySelectorAll( '.bruinen-menu-share' ).forEach( ( node ) => {
+		document.querySelectorAll( '.lakesideview-menu-share' ).forEach( ( node ) => {
 			node.addEventListener( 'click', () => {
 				liquipedia.tracker.track( 'Share link clicked', true );
 			} );
 		} );
-		document.querySelectorAll( '.bruinen-menu-share a[data-type=twitter], .lakesideview-menu-share a[data-type=twitter]' ).forEach( ( node ) => {
+		document.querySelectorAll( '.lakesideview-menu-share a[data-type=twitter]' ).forEach( ( node ) => {
 			node.addEventListener( 'click', () => {
 				liquipedia.tracker.track( 'Share link clicked (twitter)' );
 			} );
 		} );
-		document.querySelectorAll( '.bruinen-menu-share a[data-type=facebook], .lakesideview-menu-share a[data-type=facebook]' ).forEach( ( node ) => {
+		document.querySelectorAll( '.lakesideview-menu-share a[data-type=facebook]' ).forEach( ( node ) => {
 			node.addEventListener( 'click', () => {
 				liquipedia.tracker.track( 'Share link clicked (facebook)' );
 			} );
 		} );
-		document.querySelectorAll( '.bruinen-menu-share a[data-type=reddit], .lakesideview-menu-share a[data-type=reddit]' ).forEach( ( node ) => {
+		document.querySelectorAll( '.lakesideview-menu-share a[data-type=reddit]' ).forEach( ( node ) => {
 			node.addEventListener( 'click', () => {
 				liquipedia.tracker.track( 'Share link clicked (reddit)' );
 			} );
 		} );
-		document.querySelectorAll( '.bruinen-menu-share a[data-type=qq], .lakesideview-menu-share a[data-type=qq]' ).forEach( ( node ) => {
+		document.querySelectorAll( '.lakesideview-menu-share a[data-type=qq]' ).forEach( ( node ) => {
 			node.addEventListener( 'click', () => {
 				liquipedia.tracker.track( 'Share link clicked (qq)' );
 			} );
 		} );
-		document.querySelectorAll( '.bruinen-menu-share a[data-type=vk], .lakesideview-menu-share a[data-type=vk]' ).forEach( ( node ) => {
+		document.querySelectorAll( '.lakesideview-menu-share a[data-type=vk]' ).forEach( ( node ) => {
 			node.addEventListener( 'click', () => {
 				liquipedia.tracker.track( 'Share link clicked (vk)' );
 			} );
 		} );
-		document.querySelectorAll( '.bruinen-menu-share a[data-type=weibo], .lakesideview-menu-share a[data-type=weibo]' ).forEach( ( node ) => {
+		document.querySelectorAll( '.lakesideview-menu-share a[data-type=weibo]' ).forEach( ( node ) => {
 			node.addEventListener( 'click', () => {
 				liquipedia.tracker.track( 'Share link clicked (weibo)' );
 			} );
 		} );
-		document.querySelectorAll( '.bruinen-menu-share a[data-type=whatsapp], .lakesideview-menu-share a[data-type=whatsapp]' ).forEach( ( node ) => {
+		document.querySelectorAll( '.lakesideview-menu-share a[data-type=whatsapp]' ).forEach( ( node ) => {
 			node.addEventListener( 'click', () => {
 				liquipedia.tracker.track( 'Share link clicked (whatsapp)' );
 			} );
@@ -717,12 +726,13 @@ liquipedia.tracker = {
 				} );
 			} );
 		}
-		if ( mw.config.get( 'skin' ) === 'lakesideview' ) {
-			if ( window.localStorage.getItem( 'LiquipediaDarkMode' ) === 'true' ) {
-				liquipedia.tracker.track( 'Page view with dark theme enabled' );
-			} else {
-				liquipedia.tracker.track( 'Page view with dark theme disabled' );
-			}
+
+		if ( window.localStorage.getItem( 'LiquipediaTheme' ) === 'dark' ) {
+			liquipedia.tracker.track( 'Page view with dark theme enabled' );
+		} else if ( window.localStorage.getItem( 'LiquipediaTheme' ) === 'light' ) {
+			liquipedia.tracker.track( 'Page view with light theme enabled' );
+		} else if ( window.localStorage.getItem( 'LiquipediaTheme' ) === 'system' ) {
+			liquipedia.tracker.track( 'Page view with auto theme enabled' );
 		}
 	}
 };
@@ -772,7 +782,7 @@ liquipedia.customLuaErrors = {
 					$newError.on( 'click', ( e ) => {
 						$dialog.dialog( 'close' ).html( $errorDiv ).dialog( 'option', 'position', [ e.clientX + 5, e.clientY + 5 ] ).dialog( 'open' );
 					} );
-				} catch ( ignored ) {}
+				} catch {}
 			} );
 		} );
 	}

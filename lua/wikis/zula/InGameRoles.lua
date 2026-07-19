@@ -1,0 +1,15 @@
+---
+-- @Liquipedia
+-- page=Module:InGameRoles
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+---@type table<string, RoleBaseData>
+local inGameRoles = {
+	['rifler'] = {category = 'Riflers', display = 'Rifler'},
+}
+
+inGameRoles['rifle'] = inGameRoles['rifler']
+
+return inGameRoles

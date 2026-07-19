@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=trackmania
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -153,7 +152,11 @@ return {
 			status = 1,
 			sortCasters = true,
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				storeFromWikiCode = true,
+			},
+		},
+		defaultMaxPlayersPerPlacement = 20,
 	},
-	opponentLibrary = 'Opponent',
-	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

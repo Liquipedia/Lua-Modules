@@ -1,20 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=fighters
 -- page=Module:PrizePool/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Array = Lua.import('Module:Array')
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Lpdb = Lua.import('Module:Lpdb')
+local Logic = Lua.import('Module:Logic')
+local Variables = Lua.import('Module:Variables')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local PrizePool = Lua.import('Module:PrizePool')
 
@@ -34,7 +35,7 @@ function CustomPrizePool.run(frame)
 	args.syncPlayers = true
 	args.import = true
 
-	local prizePool = PrizePool(args) ---@type PrizePool
+	local prizePool = PrizePool(args)
 
 	local output = prizePool:create():setLpdbInjector(CustomLpdbInjector()):build()
 
@@ -100,7 +101,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		if Opponent.isTbd(opponent.opponentData) then
 			return
 		end
-		CustomPrizePool.addPointsDatapoint(lpdbData, placement:getPrizeRewardForOpponent(opponent, prize.id))
+		CustomPrizePool.addPointsDatapoint(lpdbData, prize.index, placement:getPrizeRewardForOpponent(opponent, prize.id))
 	end)
 
 	return lpdbData
@@ -117,28 +118,36 @@ function CustomPrizePool.calculateWeight(prizeMoney, tier, place)
 end
 
 ---@param data placement
+---@param index integer
 ---@param prize string|number|boolean?
-function CustomPrizePool.addPointsDatapoint(data, prize)
-	mw.ext.LiquipediaDB.lpdb_datapoint('Points_' .. data.participant, {
+function CustomPrizePool.addPointsDatapoint(data, index, prize)
+	local opponentData = Opponent.fromLpdbStruct(data)
+	if opponentData.type ~= Opponent.solo then return
+	elseif Logic.isEmpty(prize) then return end
+	local player = opponentData.players[1]
+	local prefix = 'circuit' .. (index > 1 and index or '')
+	local pointsDataPoint = Lpdb.DataPoint:new{
+		objectname = 'Points' .. index .. '_' .. player.pageName,
 		type = 'points',
-		name = mw.ext.TeamLiquidIntegration.resolve_redirect(data.extradata.circuit),
-		information = data.participant,
+		name = mw.ext.TeamLiquidIntegration.resolve_redirect(data.extradata[prefix]),
+		information = player.pageName,
 		date = data.date,
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
+		extradata = {
 			points = prize,
 			placement = data.placement,
 			tournament = Variables.varDefault('tournament_link'),
 			parent = Variables.varDefault('tournament_parent'),
 			shortname = Variables.varDefault('tournament_name'),
-			participant = data.participant,
+			participant = player.pageName,
 			game = Variables.varDefault('tournament_game'),
 			type = Variables.varDefault('tournament_type'),
-			participantname = data.participant,
-			participantflag = data.participantflag,
-			publishertier = data.extradata.circuit_tier or Variables.varDefault('circuittier'),
-			region = Variables.varDefault('circuitregion'),
-		})
-	})
+			participantname = player.displayName,
+			participantflag = player.flag,
+			publishertier = data.extradata[prefix .. '_tier'] or Variables.varDefault(prefix .. 'tier'),
+			region = Variables.varDefault(prefix .. 'region'),
+		}
+	}
+	pointsDataPoint:save()
 end
 
 return CustomPrizePool

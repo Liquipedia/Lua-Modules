@@ -1,12 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Hotkey
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 local Hotkeys = {}
 
 local SEPERATORS = {
@@ -48,4 +49,4 @@ function Hotkeys.hotkey2(args)
 	return '<b>' .. hotkey1 .. seperator .. hotkey2 .. '</b>'
 end
 
-return Class.export(Hotkeys, {frameOnly = true})
+return Class.export(Hotkeys, {frameOnly = true, exports = {'hotkey', 'hotkey2'}})

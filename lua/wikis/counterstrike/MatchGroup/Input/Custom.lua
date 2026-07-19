@@ -1,22 +1,23 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local EarningsOf = require('Module:Earnings of')
-local Logic = require('Module:Logic')
+
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local EarningsOf = Lua.import('Module:Earnings of')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local FEATURED_TIERS = {1, 2}
@@ -24,6 +25,8 @@ local MIN_EARNINGS_FOR_FEATURED = 200000
 
 -- containers for process helper functions
 local CustomMatchGroupInput = {}
+
+---@class CounterstrikeMatchParser: MatchParserInterface
 local MatchFunctions = {
 	DEFAULT_MODE = 'team',
 	getBestOf = MatchGroupInputUtil.getBestOf,
@@ -33,7 +36,11 @@ local MatchFunctions = {
 		applyUnderScores = true,
 	},
 }
+
+---@class CounterstrikeMapParser: MapParserInterface
 local MapFunctions = {}
+
+---@class CounterstrikeFfaMatchParser: FfaMatchParserInterface
 local FfaMatchFunctions = {
 	DEFAULT_MODE = 'team',
 	OPPONENT_CONFIG = {
@@ -42,6 +49,8 @@ local FfaMatchFunctions = {
 		applyUnderScores = true,
 	},
 }
+
+---@class CounterstrikeFfaMapParser: FfaMapParserInterface
 local FfaMapFunctions = {}
 
 ---@param match table
@@ -60,7 +69,7 @@ end
 -- "Normal" match
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
@@ -69,9 +78,7 @@ end
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(maps)
-	return function(opponentIndex)
-		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	end
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
 ---@param games table[]
@@ -86,7 +93,7 @@ end
 ---@param maps table[]
 ---@return table
 function MatchFunctions.getLinks(match, maps)
-	local platforms = mw.loadData('Module:MatchExternalLinks')
+	local platforms = Lua.import('Module:MatchExternalLinks', {loadData = true})
 	table.insert(platforms, {name = 'vod2', isMapStats = true})
 
 	return Table.map(platforms, function (key, platform)
@@ -141,7 +148,7 @@ function MatchFunctions.getEarnings(name, year)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return boolean
 function MatchFunctions.isFeatured(match, opponents)
 	if Table.includes(FEATURED_TIERS, tonumber(match.liquipediatier)) then
@@ -172,7 +179,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
@@ -185,7 +192,7 @@ end
 
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	return MapFunctions._getHalfScores(map)
@@ -249,14 +256,14 @@ end
 --- FFA Match
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param scoreSettings table
 ---@return table[]
 function FfaMatchFunctions.extractMaps(match, opponents, scoreSettings)
 	return MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, FfaMapFunctions)
 end
 
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function FfaMatchFunctions.calculateMatchScore(opponents, maps)

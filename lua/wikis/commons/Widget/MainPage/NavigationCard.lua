@@ -1,46 +1,56 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/MainPage/NavigationCard
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Image = require('Module:Image')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class NavigationCardParameters
 ---@field file string?
+---@field iconName string?
 ---@field link string?
 ---@field title string?
 ---@field count integer?
 
----@class NavigationCard: Widget
----@field props NavigationCardParameters
----@operator call(NavigationCardParameters): NavigationCard
-local NavigationCard = Class.new(Widget)
+---@param props NavigationCardParameters
+---@return VNode
+local function NavigationCard(props)
+	local count = props.count
 
----@return Widget
-function NavigationCard:render()
-	local count = self.props.count
-	return HtmlWidgets.Div{
+	local contentDiv
+
+	if props.iconName then
+		-- Icon rendering
+		contentDiv = Html.Div{
+			classes = {'navigation-card__icon'},
+			children = IconFa{iconName = props.iconName}
+		}
+	else
+		-- Image rendering
+		contentDiv = Html.Div{
+			classes = {'navigation-card__image'},
+			children = IconImage{imageLight = props.file, size = '240px'}
+		}
+	end
+
+	return Html.Div{
 		classes = {'navigation-card'},
 		children = WidgetUtil.collect(
-			HtmlWidgets.Div{
-				classes = {'navigation-card__image'},
-				children = Image.display(self.props.file, nil, {size = 240, link = ''}),
-			},
-			HtmlWidgets.Span{
+			contentDiv,
+			Html.Span{
 				classes = {'navigation-card__title'},
-				children = Link{link = self.props.link, children = self.props.title}
+				children = Link{link = props.link, children = props.title}
 			},
-			count and HtmlWidgets.Span{
+			count and Html.Span{
 				classes = {'navigation-card__subtitle'},
 				children = mw.getContentLanguage():formatNum(tonumber(count) --[[@as integer]]),
 			} or nil
@@ -48,4 +58,4 @@ function NavigationCard:render()
 	}
 end
 
-return NavigationCard
+return Component.component(NavigationCard)

@@ -1,20 +1,20 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
 -- page=Module:HiddenDataBox/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
+
+local Class = Lua.import('Module:Class')
+local Variables = Lua.import('Module:Variables')
 
 local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox')
 local CustomHiddenDataBox = {}
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomHiddenDataBox.run(args)
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
 	return BasicHiddenDataBox.run(args)
@@ -35,4 +35,4 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 
 end
 
-return Class.export(CustomHiddenDataBox)
+return Class.export(CustomHiddenDataBox, {exports = {'run'}})

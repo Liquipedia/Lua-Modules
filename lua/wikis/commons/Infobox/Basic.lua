@@ -1,22 +1,23 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Basic
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
-local Table = require('Module:Table')
 
-local Info = Lua.import('Module:Info')
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+
+local Context = Lua.import('Module:Widget/ComponentContext')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Infobox = Lua.import('Module:Widget/Infobox/Core')
 
----@class BasicInfobox
+---@class BasicInfobox: BaseClass
 ---@operator call(Frame): BasicInfobox
 ---@field args table
 ---@field pagename string
@@ -24,6 +25,7 @@ local Infobox = Lua.import('Module:Widget/Infobox/Core')
 ---@field wiki string
 ---@field injector WidgetInjector?
 ---@field warnings string[]
+---@field topContent string[]
 ---@field bottomContent string[]
 local BasicInfobox = Class.new(
 	function(self, frame)
@@ -31,6 +33,7 @@ local BasicInfobox = Class.new(
 		self.pagename = mw.title.getCurrentTitle().text
 		self.name = self.args.name or self.pagename
 		self.wiki = self.args.wiki or Info.wikiName
+		self.topContent = {}
 		self.bottomContent = {}
 		self.warnings = {}
 		self.injector = nil
@@ -45,8 +48,16 @@ function BasicInfobox:categories(...)
 	return self
 end
 
+---Adds top content
+---@param content Renderable?
+---@return self
+function BasicInfobox:top(content)
+	table.insert(self.topContent, content)
+	return self
+end
+
 ---Adds bottom content
----@param content string|number|Html|nil
+---@param content Renderable?
 ---@return self
 function BasicInfobox:bottom(content)
 	table.insert(self.bottomContent, content)
@@ -60,17 +71,17 @@ function BasicInfobox:setWidgetInjector(injector)
 	return self
 end
 
---- Allows for overriding this functionality
 ---Add bottom content below the infobox, e.g. matchtickers
----@return string?
+---@protected
+---@return Renderable?
 function BasicInfobox:createBottomContent()
 	return nil
 end
 
---- Allows for overriding this functionality
 ---Set wikispecific categories
+---@protected
 ---@param args table
----@return table
+---@return string[]
 function BasicInfobox:getWikiCategories(args)
 	return {}
 end
@@ -99,22 +110,29 @@ function BasicInfobox:getAllArgsForBase(args, base, options)
 	return foundArgs
 end
 
----@param widgets Widget[]
----@return string
-function BasicInfobox:build(widgets)
+---@param widgets Renderable[]
+---@param infoboxType string?
+---@return VNode
+function BasicInfobox:build(widgets, infoboxType)
 	local infobox = Infobox{
 		gameName = self.wiki,
 		forceDarkMode = Logic.readBool(self.args.darkmodeforced),
+		topContent = self.topContent,
 		bottomContent = self.bottomContent,
 		warnings = self.warnings,
 		children = widgets,
+		infoboxType = infoboxType,
 	}
 	if self.injector then
 		-- Customizable backwards compatibility
 		local CustomizableContext = Lua.import('Module:Widget/Contexts/Customizable')
-		return CustomizableContext.LegacyCustomizable{value = self.injector, children = {infobox}}:tryMake()
+		return Context.Provider{
+			def = CustomizableContext.Customizable,
+			value = self.injector,
+			children = infobox,
+		}
 	end
-	return infobox:tryMake()
+	return infobox
 end
 
 return BasicInfobox

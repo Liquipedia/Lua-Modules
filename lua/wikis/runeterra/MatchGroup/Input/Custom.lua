@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=runeterra
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -29,7 +28,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)

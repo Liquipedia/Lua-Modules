@@ -1,0 +1,143 @@
+---
+-- @Liquipedia
+-- page=Module:Widget/Table2/Row
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+local Component = Lua.import('Module:Widget/Component')
+local Context = Lua.import('Module:Widget/ComponentContext')
+
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
+
+local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
+local Table2Cell = Lua.import('Module:Widget/Table2/Cell')
+local Table2CellHeader = Lua.import('Module:Widget/Table2/CellHeader')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+local Html = Lua.import('Module:Widget/Html')
+
+---@class Table2RowProps
+---@field children? Renderable|Renderable[]
+---@field section 'head'|'body'|'subhead'?
+---@field classes string[]?
+---@field css {[string]: string|number|nil}?
+---@field attributes {[string]: any}?
+---@field highlighted (string|number|boolean)?
+
+---@param rowChildren Renderable[]
+---@return integer|nil
+local function getMaxRowspan(rowChildren)
+	local maxRowspan = Array.reduce(rowChildren, function(max, child)
+		if type(child) == 'table' and
+				---@diagnostic disable-next-line: undefined-field
+				(child.renderFn == Table2Cell.renderFn or child.renderFn == Table2CellHeader.renderFn) then
+
+			local rowspan = MathUtil.toInteger(child.props.rowspan) or 1
+			return math.max(max, math.max(rowspan, 1))
+		end
+		return max
+	end, 1)
+	return maxRowspan > 1 and maxRowspan or nil
+end
+
+---@param props Table2RowProps
+---@param context Context
+---@return Renderable
+local function Table2Row(props, context)
+	local children = props.children
+	---@cast children Renderable[]
+
+	local section = props.section or Context.read(context, Table2Contexts.Section)
+	local headerRowKind = Context.read(context, Table2Contexts.HeaderRowKind)
+
+	local sectionClass = 'table2__row--body'
+	if section == 'head' or section == 'subhead' then
+		sectionClass = 'table2__row--head'
+	end
+
+	local kindClass
+	if section == 'head' then
+		if headerRowKind == 'title' then
+			kindClass = 'table2__row--head-title'
+		elseif headerRowKind == 'columns' then
+			kindClass = 'table2__row--head-columns'
+		end
+	end
+
+	local highlightClass
+	if section == 'body' and Logic.readBool(props.highlighted) then
+		highlightClass = 'table2__row--highlighted'
+	end
+
+	local columns = Context.read(context, Table2Contexts.ColumnContext)
+	if section == 'subhead' and #columns > 0 and #children == 1 and
+			---@diagnostic disable-next-line: undefined-field
+			type(children[1]) == 'table' and children[1].renderFn == Table2CellHeader.renderFn then
+
+		local singleCell = children[1]
+		if singleCell.props.colspan == nil then
+			singleCell.props.colspan = #columns
+		end
+	end
+
+	local columnIndex = 1
+	local indexedChildren = Array.map(children, function(child)
+		if type(child) == 'table' and
+				---@diagnostic disable-next-line: undefined-field
+				(child.renderFn == Table2Cell.renderFn or child.renderFn == Table2CellHeader.renderFn) then
+
+			local cellChild = child
+			local explicitIndex = MathUtil.toInteger(cellChild.props.columnIndex)
+			if explicitIndex and explicitIndex >= 1 then
+				columnIndex = math.max(columnIndex, explicitIndex)
+			elseif cellChild.props.columnIndex == nil then
+				cellChild.props.columnIndex = columnIndex
+			end
+
+			local span = MathUtil.toInteger(cellChild.props.colspan) or 1
+			if span < 1 then
+				span = 1
+			end
+			columnIndex = columnIndex + span
+			return cellChild
+		end
+		return child
+	end)
+
+	local trChildren = indexedChildren
+	if section == 'subhead' then
+		trChildren = Array.map(trChildren, function(child)
+			---@diagnostic disable-next-line: undefined-field
+			if type(child) == 'table' and child.renderFn == Table2CellHeader.renderFn then
+				return Context.Provider{
+					def = Table2Contexts.Section,
+					value = 'subhead',
+					children = {child},
+				}
+			end
+			return child
+		end)
+	end
+
+	local attributes = props.attributes or {}
+	if section == 'body' then
+		local maxRowspan = getMaxRowspan(children)
+		if maxRowspan then
+			attributes['data-rowspan-count'] = maxRowspan
+		end
+	end
+
+	return Html.Tr{
+		classes = WidgetUtil.collect(sectionClass, kindClass, highlightClass, props.classes),
+		css = props.css,
+		attributes = attributes,
+		children = trChildren,
+	}
+end
+
+return Component.component(
+	Table2Row
+)

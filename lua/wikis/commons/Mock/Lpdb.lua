@@ -1,18 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Mock/Lpdb
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
+
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
+local Opponent = Lua.import('Module:Opponent')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TypeUtil = Lua.import('Module:TypeUtil')
 
 -- Parses a single condition into it's three components,
 -- Eg. `[[field::!value]]` is parsed into `field`, `!`, `value`
@@ -131,7 +131,7 @@ dbStructure.squadplayer = {
 ---- groupby
 ---@generic T:LpdbBaseData
 ---@param dbTable `T`
----@param parameters table
+---@param parameters LpdbQueryParameters
 ---@return T[]
 function mockLpdb.lpdb(dbTable, parameters)
 	local lpdbData = mockLpdb._getMockData(dbTable)
@@ -149,7 +149,7 @@ end
 ---@param dbTable string
 ---@return table
 function mockLpdb._getMockData(dbTable)
-	local data = Lua.import('Module:TestAssets/Lpdb/' .. dbTable)
+	local data = Lua.import('Module:test_assets/lpdb_' .. dbTable)
 
 	if not data then
 		error(mw.message.new('liquipediadb-error-invalid-datatype'))

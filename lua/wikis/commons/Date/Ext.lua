@@ -1,15 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Date/Ext
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
-local Ordinal = require('Module:Ordinal')
-local Variables = require('Module:Variables')
+local Lua = require('Module:Lua')
+
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Ordinal = Lua.import('Module:Ordinal')
+local Timezone = Lua.import('Module:Timezone')
+local Variables = Lua.import('Module:Variables')
 
 --[[
 Functions for working with dates strings and timestamps.
@@ -31,6 +33,10 @@ DateExt.defaultDateTimeExtended = '0000-01-01T00:00:00+00:00'
 DateExt.defaultDate = '0000-01-01'
 DateExt.defaultYear = '0000'
 
+DateExt.defaultTimezone = 'UTC'
+
+local SECONDS_PER_DAY = 86400
+
 --- Parses a date string into a timestamp, returning the number of seconds since UNIX epoch.
 --- The timezone offset is incorporated into the timestamp, and the timezone is discarded.
 --- If the timezone is not specified, then the date is assumed to be in UTC.
@@ -40,7 +46,8 @@ DateExt.defaultYear = '0000'
 function DateExt.readTimestamp(dateInput)
 	if type(dateInput) == 'table' then
 		-- in this case we have osdate really being osdateparam
-		return tonumber(os.time(dateInput --[[@as osdateparam]]))
+		---@cast dateInput osdateparam
+		return os.time(dateInput)
 	end
 
 	if Logic.isEmpty(dateInput) then
@@ -70,7 +77,7 @@ function DateExt.readTimestampOrNil(dateString)
 end
 
 --- Our runtime measures at most in seconds, and we don't care about that level of precision anyway.
---- Hence we can memoize it for performane, as it's relatively expensive if called a lot.
+--- Hence we can memoize it for performance, as it's relatively expensive if called a lot.
 ---@return number
 DateExt.getCurrentTimestamp = FnUtil.memoize(function()
 	local ts = tonumber(mw.getContentLanguage():formatDate('U'))
@@ -89,10 +96,35 @@ end
 
 --- Converts a date string or timestamp into a format that can be used in the date param to Module:Countdown.
 ---@param dateOrTimestamp string|integer|osdate|osdateparam
+---@param timezoneId string?
+---@param showTime boolean? #default to true
+---@param format ('full'|'compact')? #default to 'full'
 ---@return string
-function DateExt.toCountdownArg(dateOrTimestamp)
-	local timestamp = DateExt.readTimestamp(dateOrTimestamp)
-	return DateExt.formatTimestamp('F j, Y - H:i', timestamp or '') .. ' <abbr data-tz="+0:00"></abbr>'
+function DateExt.toCountdownArg(dateOrTimestamp, timezoneId, showTime, format)
+	local baseTimestamp = DateExt.readTimestamp(dateOrTimestamp)
+	format = format or 'full'
+
+	if showTime ~= false then
+		local timestamp = baseTimestamp + (Timezone.getOffset{timezone = timezoneId or DateExt.defaultTimezone})
+		local timezoneString = Timezone.getTimezoneString{timezone = timezoneId or DateExt.defaultTimezone}
+
+		local dateFormat
+		if format == 'compact' then
+			local currentYear = DateExt.formatTimestamp('Y', DateExt.getCurrentTimestamp())
+			local dateYear = DateExt.formatTimestamp('Y', timestamp)
+			if currentYear == dateYear then
+				dateFormat = 'M j - H:i'
+			else
+				dateFormat = 'M j, Y - H:i'
+			end
+		else
+			dateFormat = 'F j, Y - H:i'
+		end
+
+		return DateExt.formatTimestamp(dateFormat, timestamp) .. ' ' .. timezoneString
+	end
+
+	return DateExt.formatTimestamp('F j, Y', baseTimestamp or '')
 end
 
 --- Truncates the time of day in a date string or timestamp, and returns the date formatted as yyyy-mm-dd.
@@ -129,6 +161,13 @@ function DateExt.getContextualDateOrNow()
 		or os.date('%F') --[[@as string]]
 end
 
+--- Fetches startDate on a tournament page with fallback to now.
+---@return string
+function DateExt.getStartDateOrNow()
+	return Variables.varDefault('tournament_startdate')
+		or os.date('%F') --[[@as string]]
+end
+
 --- Parses a YYYY-MM-DD string into a simplified osdate class
 --- String must start with the YYYY. Text is allowed after after the DD.
 --- YYYY is required, MM and DD are optional. They are assumed to be 1 if not supplied.
@@ -153,7 +192,16 @@ function DateExt.parseIsoDate(str)
 		day = 1
 	end
 	-- create simplified osdate
-	return {year = year, month = month, day = day}
+	return {
+		year = year,
+		month = month,
+		day = day,
+		--[[
+		Lua uses 12 as fallback of hour but we expect hour to be set to 0.
+		See https://github.com/Liquipedia/Lua-Modules/issues/7639
+		]]
+		hour = 0,
+	}
 end
 
 --- Converts a timezone offset (e.g. `+2:00`) to a UTC offset in seconds.
@@ -179,6 +227,51 @@ function DateExt.quarterOf(props)
 	end
 
 	return quarter .. Ordinal.suffix(quarter)
+end
+
+---@param date string|integer|osdateparam?
+---@return integer
+function DateExt.getYearOf(date)
+	local timestamp = DateExt.readTimestamp(date) or DateExt.getCurrentTimestamp()
+	return tonumber(DateExt.formatTimestamp('Y', timestamp)) --[[@as integer]]
+end
+
+---@param date string|integer|osdateparam?
+---@return integer
+function DateExt.getMonthOf(date)
+	local timestamp = DateExt.readTimestamp(date) or DateExt.getCurrentTimestamp()
+	return tonumber(DateExt.formatTimestamp('n', timestamp)) --[[@as integer]]
+end
+
+---@param date string|integer|osdateparam?
+---@return integer
+function DateExt.getDayOf(date)
+	local timestamp = DateExt.readTimestamp(date) or DateExt.getCurrentTimestamp()
+	return tonumber(DateExt.formatTimestamp('d', timestamp)) --[[@as integer]]
+end
+
+---@param to string|integer|osdateparam?
+---@param from string|integer|osdateparam?
+---@return integer
+function DateExt.calculateAge(to, from)
+	local age = DateExt.getYearOf(to) - DateExt.getYearOf(from)
+
+	local monthDiff = DateExt.getMonthOf(to) - DateExt.getMonthOf(from)
+	local dayDiff = DateExt.getDayOf(to) - DateExt.getDayOf(from)
+
+	if monthDiff > 0 or (monthDiff == 0 and dayDiff >= 0) then
+		--- birthday passed
+		return age
+	end
+	return age - 1
+end
+
+---@param days number
+---@return number
+---@nodiscard
+function DateExt.daysToSeconds(days)
+	assert(days >= 0, 'Invalid number of days')
+	return days * SECONDS_PER_DAY
 end
 
 return DateExt

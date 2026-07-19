@@ -1,31 +1,35 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Person/User/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local User = Lua.import('Module:Infobox/Person/User')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
 ---@class CustomInfoboxUser: InfoboxUser
+---@operator call(Frame): CustomInfoboxUser
 local CustomUser = Class.new(User)
 
+---@class CustomInfoboxUserWidgetInjector: WidgetInjector
+---@operator call(CustomInfoboxUser): CustomInfoboxUserWidgetInjector
+---@field caller CustomInfoboxUser
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return VNode
 function CustomUser.run(frame)
 	local user = CustomUser(frame)
 	user:setWidgetInjector(CustomInjector(user))
@@ -36,23 +40,23 @@ function CustomUser.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Gender', content = {args.gender}},
-			Cell{name = 'Languages', content = {args.languages}},
-			Cell{name = 'Favorite Players', content = self.caller:_getArgsfromBaseDefault('fav-player', 'fav-players')},
-			Cell{name = 'Favorite Casters', content = self.caller:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
-			Cell{name = 'Favorite Teams', content = {args['fav-teams']}}
+			Cell{name = 'Gender', children = {args.gender}},
+			Cell{name = 'Languages', children = {args.languages}},
+			Cell{name = 'Favorite Players', children = self.caller:_getArgsfromBaseDefault('fav-player', 'fav-players')},
+			Cell{name = 'Favorite Casters', children = self.caller:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
+			Cell{name = 'Favorite Teams', children = {args['fav-teams']}}
 		)
 		if not String.isEmpty(args['fav-team-1']) then
 			Array.appendWith(widgets,
 				Title{children = 'Favorite Teams'},
-				Center{children = {self.caller:_getFavouriteTeams()}}
+				Center{children = self.caller:_getFavouriteTeams()}
 			)
 		end
 	elseif

@@ -1,24 +1,39 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:MatchGroup/Input/Custom/Normal
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local InGameRoles = Lua.import('Module:InGameRoles', {loadData = true})
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+
+---@class LeagueOfLegendsNormalMapParser: LeagueOfLegendsMapParserInterface
 local CustomMatchGroupInputNormal = {}
 
 local MAX_NUM_PICKS = 5
 local MAX_NUM_BANS = 5
 
+---@param mapInput table
+---@return table
 function CustomMatchGroupInputNormal.getMap(mapInput)
 	return mapInput
 end
 
+---@param map table
+---@return string?
 function CustomMatchGroupInputNormal.getLength(map)
 	return map.length
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return string?
 function CustomMatchGroupInputNormal.getSide(map, opponentIndex)
 	local side = map['team' .. opponentIndex .. 'side']
 	if not side then
@@ -27,32 +42,60 @@ function CustomMatchGroupInputNormal.getSide(map, opponentIndex)
 	return string.lower(side)
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return table[]?
 function CustomMatchGroupInputNormal.getParticipants(map, opponentIndex)
-	return
+	return Logic.nilIfEmpty(Array.mapRange(1, MAX_NUM_PICKS, function (playerIndex)
+		local playerData = Json.parseIfTable(map['t' .. opponentIndex .. 'p' .. playerIndex])
+		if Logic.isEmpty(playerData) then
+			return nil
+		end
+		---@cast playerData -nil
+		if Logic.isEmpty(playerData.role) then
+			return playerData
+		end
+		local playerRole = InGameRoles[playerData.role:lower()]
+		assert(playerRole, 'Invalid |role=' .. playerData.role)
+		playerData.role = playerRole.display:lower()
+		return playerData
+	end))
 end
 
-function CustomMatchGroupInputNormal.getHeroPicks(map, opponentIndex)
-	local picks = {}
-	local teamPrefix = 't' .. opponentIndex
-	for playerIndex = 1, MAX_NUM_PICKS do
-		table.insert(picks, map[teamPrefix .. 'c' .. playerIndex])
+---@param map table
+---@param opponentIndex integer
+---@return string[]
+function CustomMatchGroupInputNormal.getChampionPicks(map, opponentIndex)
+	local participants = CustomMatchGroupInputNormal.getParticipants(map, opponentIndex)
+	if Logic.isNotEmpty(participants) then
+		---@cast participants -nil
+		return Array.map(participants, Operator.property('character'))
 	end
-	return picks
-end
-
-function CustomMatchGroupInputNormal.getHeroBans(map, opponentIndex)
-	local bans = {}
 	local teamPrefix = 't' .. opponentIndex
-	for playerIndex = 1, MAX_NUM_BANS do
-		table.insert(bans, map[teamPrefix .. 'b' .. playerIndex])
-	end
-	return bans
+	return Array.mapRange(1, MAX_NUM_PICKS, function (playerIndex)
+		return map[teamPrefix .. 'c' .. playerIndex]
+	end)
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return string[]
+function CustomMatchGroupInputNormal.getChampionBans(map, opponentIndex)
+	local teamPrefix = 't' .. opponentIndex
+	return Array.mapRange(1, MAX_NUM_BANS, function (playerIndex)
+		return map[teamPrefix .. 'b' .. playerIndex]
+	end)
+end
+
+---@param map table
+---@return table?
 function CustomMatchGroupInputNormal.getVetoPhase(map)
 	return
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return table?
 function CustomMatchGroupInputNormal.getObjectives(map, opponentIndex)
 	return
 end

@@ -1,24 +1,37 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Tabs
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
-local Operator = require('Module:Operator')
-local Page = require('Module:Page')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Info = Lua.import('Module:Info', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
+
+local AnalyticsWidgets = Lua.import('Module:Widget/Analytics')
+local Button = Lua.import('Module:Widget/Basic/Button')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local Html = Lua.import('Module:Widget/Html')
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Tabs = {}
+local VALID_VARIANTS = {
+	'horizontal',
+	'vertical',
+	'icon-only',
+}
 
 ---Creates static tabs.
 ---Entry point of Template:Tabs static
 ---@param args table?
----@return Html?
+---@return Widget?
 function Tabs.static(args)
 	args = args or {}
 
@@ -28,33 +41,60 @@ function Tabs.static(args)
 
 	Tabs._setThis(tabArgs)
 
-	local tabs = mw.html.create('ul')
-		:attr('class', 'nav nav-tabs navigation-not-searchable tabs tabs' .. tabCount)
-		:attr('data-nosnippet')
+	-- Temporary solution for fighters
+	local wrapsClass = Logic.readBool(args.wrapping) and Info.wikiName == 'fighters' and 'wraps' or nil
 
-	local subTabs = mw.html.create()
+	local function buildTabLiItems(additionalClasses)
+		return Array.map(tabArgs, function(tab)
+			--if tab.name is unset tab.link is set as per `Tabs._readArguments`
+			local name = tab.name or Tabs._getDisplayNameFromLink(tab.link --[[@as string]])
+			local child
+			if tab.icon then
+				local displayChildren = {
+					Icon{
+						iconName = tab.icon,
+						additionalClasses = {'tabs-static-tab-icon'},
+					},
+					Html.Span{children = {name}},
+				}
+				child = tab.link
+					and Link{link = tab.link, children = {Html.Fragment{children = displayChildren}}}
+					or Html.Span{children = displayChildren}
+			else
+				child = tab.link and Link{link = tab.link, children = {name}} or Html.Span{children = {tab.name}}
+			end
+			return Html.Li{
+				classes = Array.extend(additionalClasses, tab.this and 'active' or nil),
+				children = child
+			}
+		end)
+	end
 
-	Array.forEach(tabArgs, function(tab)
-		--if tab.name is unset tab.link is set as per `Tabs._readArguments`
-		local name = tab.name or Tabs._getDisplayNameFromLink(tab.link --[[@as string]])
-		local text = tab.link and Page.makeInternalLink({}, name, tab.link) or tab.name
-		tabs:tag('li'):addClass(tab.this and 'active' or nil):wikitext(text)
-		subTabs:node(tab.this and tab.tabs or nil)
-	end)
+	local navTabs = Html.Ul{
+		classes = {'nav', 'nav-tabs', 'navigation-not-searchable', 'tabs', 'tabs' .. tabCount},
+		attributes = {['data-nosnippet'] = '', ['data-tabs-nav'] = ''},
+		children = buildTabLiItems()
+	}
 
-	return mw.html.create()
-		:tag('div')
-			:addClass('tabs-static')
-			:attr('data-nosnippet', '')
-			:node(tabs)
-			:done()
-		:node(subTabs)
+	return AnalyticsWidgets{
+		analyticsName = 'Navigation tab',
+		children = {
+			Html.Div{
+				classes = {'tabs-static', wrapsClass},
+				attributes = {['data-nosnippet'] = '', ['data-tabs-static'] = ''},
+				children = WidgetUtil.collect(
+					Tabs._buildNavWrapper(navTabs),
+					Array.map(Array.filter(tabArgs, Operator.property('this')), Operator.property('tabs'))
+				)
+			}
+		}
+	}
 end
 
 ---Creates dynamic tabs.
 ---Entry point of Template:Tabs dynamic
 ---@param args table
----@return Html|string?
+---@return Widget|string?
 function Tabs.dynamic(args)
 	args = args or {}
 
@@ -73,67 +113,95 @@ function Tabs.dynamic(args)
 		return Tabs._single(tabArgs[1], not Logic.readBool(args.suppressHeader))
 	end
 
-	local tabs = mw.html.create('ul')
-		:addClass('nav nav-tabs tabs tabs' .. tabCount)
-
 	if not Array.any(tabArgs, Operator.property('this')) then
 		tabArgs[1].this = true
 	end
 
-	---@param obj Html
-	---@param elementType string
-	---@param content string|Html|?
-	---@param class string
-	---@param isActive boolean
-	local build = function(obj, elementType, content, class, isActive)
-		local element = mw.html.create(elementType)
-			:addClass(class)
-			:addClass(isActive and 'active' or nil)
-			:newline()
-			:node(content)
+	local variant = args.variant or 'horizontal'
+	assert(
+		Table.includes(VALID_VARIANTS, variant),
+		'Invalid variant "' .. variant .. '". Allowed values are: ' .. table.concat(VALID_VARIANTS, ', ')
+	)
 
-		obj:newline():node(element)
+	local hasIcon = Array.any(tabArgs, function(tab) return Logic.isNotEmpty(tab.icon) end)
+	local allHaveIcon = Array.all(tabArgs, function(tab) return Logic.isNotEmpty(tab.icon) end)
+
+	-- Design decision: mixed icon and non-icon tab toggles are not supported.
+	assert(not hasIcon or allHaveIcon, 'If one tab has an icon, all tabs must have icons')
+	if variant == 'icon-only' then
+		assert(allHaveIcon, 'The "icon-only" variant requires all tabs to have icons')
 	end
 
-	Array.forEach(tabArgs, function(tabData, tabIndex)
-		build(tabs, 'li', tabData.name, 'tab' .. tabIndex, tabData.this)
-	end)
+	local variantClass = 'tabs-variant-' .. variant
 
-	if not Logic.nilOr(Logic.readBoolOrNil(args['hide-showall']), isSingular) then
-		tabs:tag('li')
-			:addClass('show-all')
-			:wikitext('Show All')
+	-- Temporary solution for fighters
+	local wraps = Logic.readBool(args.wrapping) and Info.wikiName == 'fighters'
+	local wrapsClass = wraps and 'wraps' or nil
+
+	local navTabs = Html.Ul{
+		classes = {'nav', 'nav-tabs', 'tabs', 'tabs' .. tabCount},
+		attributes = {['data-tabs-nav'] = ''},
+		children = WidgetUtil.collect(
+			Array.map(tabArgs, function(tabData, tabIndex)
+				return Html.Li{
+					classes = {'tab' .. tabIndex, tabData.this and 'active' or nil},
+					children = WidgetUtil.collect(
+						tabData.icon and Icon{iconName = tabData.icon} or nil,
+						Html.Span{children = {tabData.name}}
+					)
+				}
+			end),
+			not Logic.nilOr(Logic.readBoolOrNil(args['hide-showall']), isSingular) and Html.Li{
+				classes = {'show-all'},
+				children = {Html.Span{children = {'Show All'}}}
+			} or nil
+		)
+	}
+
+	local contentChildren = {}
+
+	if hasContent then
+		contentChildren = Array.map(tabArgs, function(tabData, tabIndex)
+			return Html.Div{
+				classes = {'content' .. tabIndex, tabData.this and 'active' or nil},
+				attributes = {['data-count'] = tabIndex},
+				children = WidgetUtil.collect('\n\n', tabData.content)
+			}
+		end)
 	end
-
-	tabs:newline()
 
 	local contents = Tabs._buildContentDiv(
 		hasContent,
 		Logic.readBool(args['hybrid-tabs']),
-		Logic.readBool(args['no-padding'])
+		Logic.readBool(args['no-padding']),
+		contentChildren
 	)
 
+	local navWrapper = Tabs._buildNavWrapper(navTabs)
+
 	if not hasContent then
-		return '<div class="tabs-dynamic navigation-not-searchable" data-nosnippet>\n'
-			.. tostring(tabs) .. contents
+		local startTag = '<div class="tabs-dynamic navigation-not-searchable ' .. variantClass ..
+			(wraps and ' wraps' or '') .. '" data-nosnippet data-tabs-dynamic>\n'
+		return startTag .. tostring(navWrapper) .. (contents --[[@as string]])
 	end
-	---@cast contents -string
 
-	Array.forEach(tabArgs, function(tabData, tabIndex)
-		build(contents, 'div', tabData.content, 'content' .. tabIndex, tabData.this)
-	end)
-
-	return mw.html.create('div')
-		:addClass('tabs-dynamic navigation-not-searchable')
-		:attr('data-nosnippet')
-		:node(tabs)
-		:newline()
-		:node(contents)
+	return AnalyticsWidgets{
+		analyticsName = 'Dynamic Navigation tab',
+		css = {width = '-webkit-fill-available'},
+		children = Html.Div{
+			classes = {'tabs-dynamic', 'navigation-not-searchable', variantClass, wrapsClass},
+			attributes = {['data-nosnippet'] = '', ['data-tabs-dynamic'] = ''},
+			children = {
+				navWrapper,
+				contents
+			}
+		}
+	}
 end
 
 ---@param args table
 ---@param options {allowThis2: boolean?, removeEmptyTabs: boolean?}
----@return {name: string?, link: string?, content: string|Html?, tabs: string|Html?, this: boolean}[]
+---@return {name: string?, link: string?, content: string|Html?, tabs: string|Html?, this: boolean, icon: string?}[]
 function Tabs._readArguments(args, options)
 	local tabArgs = {}
 	local tabIndex = 1
@@ -147,6 +215,7 @@ function Tabs._readArguments(args, options)
 				link = Table.extract(args, 'link' .. tabIndex),
 				content = Table.extract(args, 'content' .. tabIndex),
 				tabs = Table.extract(args, 'tabs' .. tabIndex),
+				icon = Table.extract(args, 'icon' .. tabIndex),
 				this = this == tabIndex or (options.allowThis2 and this2 == tabIndex),
 			})
 		end
@@ -171,12 +240,12 @@ function Tabs._setThis(tabArgs)
 
 	-- Finds the link that is a prefix of the current page. If there are more than one, choose the longest, then first.
 	-- For example, if the current page is ab/cd/e3, then among
-	--   ab/cd/e1
-	--   ab/cd/e2
-	--   ab/cd/e
-	--   ab/cd
-	--   ab/cg
-	--   ab
+	--   ab/cd/e1
+	--   ab/cd/e2
+	--   ab/cd/e
+	--   ab/cd
+	--   ab/cg
+	--   ab
 	-- it will pick ab/cd.
 	local maxLinkLength = -1
 
@@ -198,23 +267,70 @@ function Tabs._setThis(tabArgs)
 	tabArgs[this].this = true
 end
 
+---@param navTabs Widget
+---@return Widget
+function Tabs._buildNavWrapper(navTabs)
+	return Html.Div{
+		classes = {'tabs-nav-wrapper'},
+		attributes = {['data-tabs-nav-wrapper'] = ''},
+		children = {
+			Html.Div{
+				classes = {'tabs-scroll-arrow-wrapper', 'tabs-scroll-arrow-wrapper--left'},
+				attributes = {['data-tabs-arrow-left'] = ''},
+				children = {
+					Button{
+						classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--left'},
+						title = 'Previous',
+						variant = 'ghost',
+						size = 'md',
+						children = {
+							Html.Span{
+								css = {display = 'inline-flex'},
+								children = {Icon{iconName = 'previous', size = 'xs'}}
+							},
+						},
+					}
+				}
+			},
+			navTabs,
+			Html.Div{
+				classes = {'tabs-scroll-arrow-wrapper', 'tabs-scroll-arrow-wrapper--right'},
+				attributes = {['data-tabs-arrow-right'] = ''},
+				children = {
+					Button{
+						classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--right'},
+						title = 'Next',
+						variant = 'ghost',
+						size = 'md',
+						children = {
+							Html.Span{
+								css = {display = 'inline-flex'},
+								children = {Icon{iconName = 'next', size = 'xs'}}
+							},
+						},
+					}
+				}
+			},
+		}
+	}
+end
+
 ---@param hasContent boolean
 ---@param hybridTabs boolean
 ---@param noPadding boolean
----@return Html|string
-function Tabs._buildContentDiv(hasContent, hybridTabs, noPadding)
+---@param children table?
+---@return Widget|string
+function Tabs._buildContentDiv(hasContent, hybridTabs, noPadding, children)
 	if hasContent then
-		local contentDiv = mw.html.create('div')
-			:addClass('tabs-content')
-		if hybridTabs then
-			contentDiv
-				:css('border-style', 'none !important')
-				:css('padding', '0 !important')
-		elseif noPadding then
-			contentDiv
-				:css('padding', '0 !important')
-		end
-		return contentDiv
+		return Html.Div{
+			classes = {'tabs-content'},
+			attributes = {['data-tabs-content'] = ''},
+			css = {
+				['border-style'] = hybridTabs and 'none !important' or nil,
+				['padding'] = (hybridTabs or noPadding) and '0 !important' or nil,
+			},
+			children = children
+		}
 	end
 
 	local style = ''
@@ -223,22 +339,20 @@ function Tabs._buildContentDiv(hasContent, hybridTabs, noPadding)
 	elseif noPadding then
 		style = 'padding:0 !important;'
 	end
-	return '\n<div class="tabs-content" style="' .. style .. '">'
+	return '\n<div class="tabs-content" data-tabs-content style="' .. style .. '">'
 end
 
 ---@param tab {name: string?, link: string?, content: string|Html?, tabs: string|Html?, this: boolean}
 ---@param showHeader boolean
----@return Html
+---@return Widget
 function Tabs._single(tab, showHeader)
-	local header
-	if showHeader then
-		header = mw.html.create()
-			:tag('h6'):wikitext(tab.name):done()
-			:newline()
-	end
-	return mw.html.create()
-		:node(header)
-		:node(tab.content)
+	return Html.Fragment{
+		children = WidgetUtil.collect(
+			showHeader and Html.H6{children = {tab.name}} or nil,
+			showHeader and '\n' or nil,
+			tab.content
+		)
+	}
 end
 
 ---@param link string
@@ -248,4 +362,4 @@ function Tabs._getDisplayNameFromLink(link)
 	return linkParts[#linkParts]
 end
 
-return Class.export(Tabs)
+return Class.export(Tabs, {exports = {'static', 'dynamic'}})

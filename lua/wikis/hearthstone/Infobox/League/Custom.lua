@@ -1,22 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=hearthstone
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
 
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Variables = Lua.import('Module:Variables')
+
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extension/PrizePool')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class HearthstoneLeagueInfobox: InfoboxLeague
@@ -32,7 +32,7 @@ local MODES = {
 }
 
 ---@param frame Frame
----@return Html
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -44,20 +44,20 @@ function CustomLeague.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Mode', content = {args.mode}},
-			Cell{name = 'Number of Players', content = {args.player_number}},
-			Cell{name = 'Number of Teams', content = {args.team_number}}
+			Cell{name = 'Mode', children = {args.mode}},
+			Cell{name = 'Number of Players', children = {args.player_number}},
+			Cell{name = 'Number of Teams', children = {args.team_number}}
 		)
 	elseif id == 'prizepool' then
 		if args.bin or args.binusd then
-			table.insert(widgets, Cell{name = 'Buy-in', content = {
+			table.insert(widgets, Cell{name = 'Buy-in', children = {
 				InfoboxPrizePool.display{
 					prizepool = args.bin,
 					prizepoolusd = args.binusd,

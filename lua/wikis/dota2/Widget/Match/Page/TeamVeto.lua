@@ -1,42 +1,36 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:Widget/Match/Page/TeamVeto
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
 ---@class Dota2MatchPageTeamVetoParameters
----@field teamIcon (string|Html|Widget|nil)
----@field vetoRows MatchPageVetoRow[]
+---@field teamIcon Renderable?
+---@field vetoRows VNode[]
 
----@class Dota2MatchPageTeamVeto: Widget
----@operator call(Dota2MatchPageTeamVetoParameters): Dota2MatchPageTeamVeto
----@field props Dota2MatchPageTeamVetoParameters
-local MatchPageTeamVeto = Class.new(Widget)
-
----@return Widget
-function MatchPageTeamVeto:render()
+---@param props Dota2MatchPageTeamVetoParameters
+---@return VNode
+local function MatchPageTeamVeto(props)
 	return Div{
 		classes = {'match-bm-lol-game-veto-overview-team'},
 		children = {
 			Div{
 				classes = {'match-bm-game-veto-overview-team-header'},
-				children = self.props.teamIcon
+				children = props.teamIcon
 			},
 			Div{
 				classes = {'match-bm-game-veto-overview-team-veto'},
-				children = self.props.vetoRows
+				children = props.vetoRows
 			}
 		}
 	}
 end
 
-return MatchPageTeamVeto
+return Component.component(MatchPageTeamVeto)

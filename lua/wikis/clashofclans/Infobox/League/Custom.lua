@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=clashofclans
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local VALID_PUBLISHERTIERS = {'sponsored'}
@@ -27,7 +27,7 @@ local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -36,13 +36,13 @@ function CustomLeague.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Teams', content = {args.team_number}})
+		table.insert(widgets, Cell{name = 'Teams', children = {args.team_number}})
 	end
 
 	return widgets

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Earnings/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -12,13 +11,15 @@
 -- Legacy version for smash, brawhalla and fighters as they are not on standardized prize pools yet
 -- they do not have team events (and no teamCard usage) hence only overwrite the player function
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Lpdb = require('Module:Lpdb')
-local MathUtils = require('Module:MathUtil')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local Info = Lua.import('Module:Info', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local MathUtils = Lua.import('Module:MathUtil')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local CustomEarnings = Table.deepCopy(Lua.import('Module:Earnings/Base'))
 
@@ -43,7 +44,7 @@ function CustomEarnings.calculateForPlayer(args)
 	-- we need to check for both options
 	local playerAsPageName = player:gsub(' ', '_')
 
-	local playerPositionLimit = tonumber(args.playerPositionLimit) or CustomEarnings.defaultNumberOfStoredPlayersPerMatch
+	local playerPositionLimit = tonumber(args.playerPositionLimit) or Info.config.defaultMaxPlayersPerPlacement or 10
 	if playerPositionLimit <= 0 then
 		error('"playerPositionLimit" has to be >= 1')
 	end
@@ -128,4 +129,4 @@ function CustomEarnings._determineValue(placement)
 	return tonumber(placement.prizemoney) or 0
 end
 
-return Class.export(CustomEarnings)
+return Class.export(CustomEarnings, {exports = {'calculateForPlayer', 'calculateForTeam'}})

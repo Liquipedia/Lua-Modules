@@ -1,40 +1,34 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Page/Footer
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Widget')
+local Logic = Lua.import('Module:Logic')
+
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
 
 ---@class MatchPageFooterParameters
----@field comments MatchPageComment[]?
----@field children (string|Html|Widget|nil)|(string|Html|Widget|nil)[]
+---@field comments VNode<MatchPageCommentParameters>[]?
+---@field children Renderable|Renderable[]
 
----@class MatchPageFooter: Widget
----@operator call(MatchPageFooterParameters): MatchPageFooter
----@field props MatchPageFooterParameters
-local MatchPageFooter = Class.new(Widget)
-
----@return Widget[]?
-function MatchPageFooter:render()
-	local comments = self.props.comments
-	local children = self.props.children
+---@param props MatchPageFooterParameters
+---@return HtmlNode[]?
+local function MatchPageFooter(props)
+	local comments = props.comments
+	local children = props.children
 	if Logic.isEmpty(comments) and Logic.isEmpty(children) then return end
 	return {
-		HtmlWidgets.H3{ children = 'Additional Information' },
-		Div{
+		Html.H3{children = 'Additional Information'},
+		Html.Div{
 			classes = { 'match-bm-match-additional' },
 			children = WidgetUtil.collect(
-				Logic.isNotEmpty(comments) and Div{
+				Logic.isNotEmpty(comments) and Html.Div{
 					classes = {'match-bm-match-additional-comments'},
 					children = comments
 				} or nil,
@@ -44,4 +38,4 @@ function MatchPageFooter:render()
 	}
 end
 
-return MatchPageFooter
+return Component.component(MatchPageFooter)

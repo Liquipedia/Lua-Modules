@@ -105,7 +105,6 @@ liquipedia.battleRoyale = {
 	implementOnElementResize: function( instanceId ) {
 		this.instancesLoaded[ instanceId ] = false;
 
-		// eslint-disable-next-line compat/compat
 		const obs = new ResizeObserver( ( entries ) => {
 			for ( const entry of entries ) {
 				if ( entry.borderBoxSize[ 0 ].blockSize > 0 && !this.instancesLoaded[ instanceId ] ) {

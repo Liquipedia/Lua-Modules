@@ -1,28 +1,35 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local VodLink = require('Module:VodLink')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local VodLink = Lua.import('Module:VodLink')
+
+local Html = Lua.import('Module:Widget/Html')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+---@class CounterstrikeCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
+---@class CounterstrikeMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
+	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay,
+}
+
+local CounterstrikeMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
+
 ---@param args table
----@return Html
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
@@ -36,7 +43,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 	if Logic.isNotEmpty(match.links.vod2) then
 		for _, vod2 in ipairs(match.links.vod2) do
 			local link, gameIndex = unpack(vod2)
-			secondVods[gameIndex] = Array.map(mw.text.split(link, ','), String.trim)
+			secondVods[gameIndex] = Array.parseCommaSeparatedString(link)
 		end
 		match.links.vod2 = nil
 	end
@@ -54,23 +61,27 @@ function CustomMatchSummary.addToFooter(match, footer)
 end
 
 ---@param match MatchGroupUtilMatch
----@return MatchSummaryBody
+---@return VNode[]
 function CustomMatchSummary.createBody(match)
 	if Logic.isNotEmpty(match.extradata.status) then
 		match.stream = {rawdatetime = true}
 	end
-	local matchStatusText
-	if match.extradata.status then
-		matchStatusText = '<b>Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '</b>'
-	end
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
-		Array.map(match.games, CustomMatchSummary._createMap),
+	local matchStatusText = match.extradata.status and Html.B{children = {
+		'Match ',
+		String.upperCaseFirst(match.extradata.status)
+	}} or nil
+	return WidgetUtil.collect(
+		MatchSummaryWidgets.GamesContainer{
+			children = Array.map(match.games, function (game, gameIndex)
+				if Logic.isEmpty(game.map) then
+					return
+				end
+				return CounterstrikeMatchSummaryGameRow{game = game, gameIndex = gameIndex}
+			end)
+		},
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
-		MatchSummaryWidgets.MatchComment{children = matchStatusText} or nil
-	)}
+		MatchSummaryWidgets.MatchComment{children = {matchStatusText}} or nil
+	)
 end
 
 ---@param match MatchGroupUtilMatch
@@ -88,11 +99,6 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 		end
 		if index > 0 then
 			label = label .. ' for Game ' .. index
-		end
-
-		icon = 'File:' .. icon
-		if iconDark then
-			iconDark = 'File:' .. iconDark
 		end
 
 		footer:addLink(url, icon, iconDark, label)
@@ -148,7 +154,7 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 	end
 
 	--- Platforms is used to keep the order of the links in footer
-	local platforms = mw.loadData('Module:MatchExternalLinks')
+	local platforms = Lua.import('Module:MatchExternalLinks', {loadData = true})
 	local links = match.links
 
 	local insertDotNext = false
@@ -191,50 +197,21 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 	return footer
 end
 
----@param game MatchGroupUtilGame
----@return Widget?
-function CustomMatchSummary._createMap(game)
-	if not game.map then
-		return
-	end
+---@param props MatchSummaryGameRowProps
+---@param opponentIndex integer
+---@return VNode
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
+	local game = props.game
 
-	local function score(oppIdx)
-		return DisplayHelper.MapScore(game.opponents[oppIdx], game.status)
-	end
+	local sides = game.extradata['t' .. opponentIndex .. 'sides']
+	local halfs = game.extradata['t' .. opponentIndex .. 'halfs']
+	local scores = Array.map(sides, function (side, sideIndex)
+		return {style = side and ('brkts-cs-score-color-'.. side) or nil, score = halfs[sideIndex]}
+	end)
 
-	-- Teams scores
-	local extradata = game.extradata or {}
-	local t1sides = extradata.t1sides or {}
-	local t2sides = extradata.t2sides or {}
-	local t1halfs = extradata.t1halfs or {}
-	local t2halfs = extradata.t2halfs or {}
-
-	local team1Scores = {}
-	local team2Scores = {}
-	for sideIndex in ipairs(t1sides) do
-		local side1, side2 = t1sides[sideIndex], t2sides[sideIndex]
-		local score1, score2 = t1halfs[sideIndex], t2halfs[sideIndex]
-		table.insert(team1Scores, {style = side1 and ('brkts-cs-score-color-'.. side1) or nil, score = score1})
-		table.insert(team2Scores, {style = side2 and ('brkts-cs-score-color-'.. side2) or nil, score = score2})
-	end
-
-	local mapInfo = {
-		mapDisplayName = game.map,
-		map = game.game and (game.map .. '/' .. game.game) or game.map,
-		status = game.status,
-	}
-
-	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '85%'},
-		children = WidgetUtil.collect(
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.DetailedScore{score = score(1), partialScores = team1Scores, flipped = false},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(mapInfo), css = {['flex-grow'] = '1'}},
-			MatchSummaryWidgets.DetailedScore{score = score(2), partialScores = team2Scores, flipped = true},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			MatchSummaryWidgets.GameComment{children = game.comment}
-		)
+	return MatchSummaryWidgets.DetailedScore{
+		score = MatchSummaryWidgets.GameRow.scoreDisplay(game, opponentIndex),
+		partialScores = scores,
 	}
 end
 

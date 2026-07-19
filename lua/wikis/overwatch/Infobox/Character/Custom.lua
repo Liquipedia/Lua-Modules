@@ -1,21 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=overwatch
 -- page=Module:Infobox/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class OverwatchHeroInfobox: CharacterInfobox
@@ -23,7 +23,7 @@ local CustomCharacter = Class.new(Character)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return VNode
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
@@ -32,19 +32,24 @@ function CustomCharacter.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-	if id == 'custom' then
+	if id == 'role' then
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Age', content = {args.age}},
-			Cell{name = 'Relations', content = {args.relations}},
-			Cell{name = 'Occupation', content = {args.occupation}},
-			Cell{name = 'Base of Operations', content = {args.baseofoperations}},
-			Cell{name = 'Affiliation', content = {args.affiliation}},
-			Cell{name = 'Voice Actor(s)', content = {args.voiceactor}}
+			Cell{name = 'Subrole', children = {args.subrole}}
+		)
+	elseif id == 'custom' then
+		Array.appendWith(
+			widgets,
+			Cell{name = 'Age', children = {args.age}},
+			Cell{name = 'Relations', children = {args.relations}},
+			Cell{name = 'Occupation', children = {args.occupation}},
+			Cell{name = 'Base of Operations', children = {args.baseofoperations}},
+			Cell{name = 'Affiliation', children = {args.affiliation}},
+			Cell{name = 'Voice Actor(s)', children = {args.voiceactor}}
 		)
 	end
 
@@ -56,7 +61,8 @@ end
 function CustomCharacter:getWikiCategories(args)
 	if not Namespace.isMain() then return {} end
 	return Array.append({'Heroes'},
-		String.isNotEmpty(args.role) and (args.role .. ' Heroes') or nil
+		String.isNotEmpty(args.role) and (args.role .. ' Heroes') or nil,
+		String.isNotEmpty(args.subrole) and (args.subrole .. ' Heroes') or nil
 	)
 end
 

@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:Infobox/Patch/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local Game = Lua.import('Module:Game')
 local Patch = Lua.import('Module:Infobox/Patch')
@@ -30,7 +30,7 @@ local CustomPatch = Class.new(Patch)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return VNode
 function CustomPatch.run(frame)
 	local patch = CustomPatch(frame)
 	patch.gameIdentifier = Game.toIdentifier{game = patch.args.game, useDefault = false}
@@ -41,8 +41,8 @@ function CustomPatch.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return WidgetUtil.collect(
@@ -61,7 +61,7 @@ function CustomPatch:_createGameCell()
 
 	return Cell{
 		name = 'Game',
-		content = {
+		children = {
 			IconImageWidget{
 				imageLight = self.gameData.logo.lightMode,
 				imageDark = self.gameData.logo.darkMode,

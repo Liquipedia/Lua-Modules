@@ -1,0 +1,67 @@
+---
+-- @Liquipedia
+-- page=Module:Infobox/Map/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+
+local Injector = Lua.import('Module:Widget/Injector')
+local Map = Lua.import('Module:Infobox/Map')
+
+local Widgets = Lua.import('Module:Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Html = Lua.import('Module:Widget/Html')
+local WidgetImage = Lua.import('Module:Widget/Image/Icon/Image')
+
+---@class ArenafpsMapInfobox: MapInfobox
+---@operator call(Frame): ArenafpsMapInfobox
+local CustomMap = Class.new(Map)
+
+---@class ArenafpsMapInfoboxWidgetInjector: WidgetInjector
+---@field caller ArenafpsMapInfobox
+local CustomInjector = Class.new(Injector)
+
+---@param frame Frame
+---@return VNode
+function CustomMap.run(frame)
+	local map = CustomMap(frame)
+	map:setWidgetInjector(CustomInjector(map))
+	return map:createInfobox()
+end
+
+---@param widgetId string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(widgetId, widgets)
+	local caller = self.caller
+	local args = caller.args
+
+	if widgetId == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Game', children = {args.game}},
+			Cell{name = 'Health Items', children = {args['health-items']}},
+			Cell{name = 'Armor Items', children = {args['armor-items']}},
+			Cell{name = 'Cooldown Items', children = {args['cooldown-items']}},
+			Cell{name = 'Spawns', children = {args.spawns}},
+			Cell{name = 'Starting Spawns', children = {args['starting-spawns']}},
+			args.minimap and Title{children = {'Minimap'}} or nil,
+			args.minimap and Html.Div{
+				classes = {'infobox-image'},
+				children = {WidgetImage{
+					imageLight = args.minimap,
+					size = '350px',
+					horizontalAlignment = 'center',
+				}}
+			} or nil
+		)
+	end
+	return widgets
+end
+
+return CustomMap

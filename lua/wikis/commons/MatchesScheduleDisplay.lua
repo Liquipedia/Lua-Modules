@@ -1,42 +1,43 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchesScheduleDisplay
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Countdown = require('Module:Countdown')
-local DateExt = require('Module:Date/Ext')
-local HiddenSort = require('Module:HiddenSort')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Countdown = Lua.import('Module:Countdown')
+local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local UTC = ' <abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 local WINNER_LEFT = 1
 local WINNER_RIGHT = 2
-local SCORE_STATUS = 'S'
 local DO_FLIP = true
 local NO_FLIP = false
-local LEFT_SIDE_OPPONENT = 'Left'
-local RIGHT_SIDE_OPPONENT = 'Right'
 local DEFAULT_QUERY_LIMIT = 1000
 
 -- If run in abbreviated roundnames mode
@@ -45,10 +46,22 @@ local ABBREVIATIONS = {
 	["Lower Bracket"] = "LB",
 }
 
+---@class MatchesTableConfig
+---@field limit integer
+---@field startDate string?
+---@field endDate string?
+---@field showRound boolean
+---@field sortRound boolean
+---@field showCountdown boolean
+---@field showMatchPage boolean
+---@field onlyShowExactDates boolean
+---@field shortenRoundNames boolean
+---@field matchGroupsSpec MatchGroupsSpec
+
 ---@class MatchesTable
 ---@operator call(table<string, any>): MatchesTable
 ---@field args table<string, any>
----@field config table<string, boolean|string|number|string[]>
+---@field config MatchesTableConfig
 ---@field currentId string?
 ---@field currentMatchHeader string[]?
 local MatchesTable = Class.new(function(self, args) self:init(args) end)
@@ -59,34 +72,28 @@ function MatchesTable:init(args)
 	args = args or {}
 	self.args = args
 
-	args.tournament = args.tournament or mw.title.getCurrentTitle().prefixedText
-
 	self.config = {
 		limit = tonumber(args.limit) or DEFAULT_QUERY_LIMIT,
 		startDate = args.sdate,
 		endDate = args.edate,
-		section = args.section,
-		matchSection = args.matchsection,
 		showRound = not Logic.readBool(args.hideround),
 		sortRound = Logic.readBool(args.sortround),
 		showCountdown = Logic.readBool(args.countdown),
-		showMatchPage = Logic.readBool(args.matchpage),
+		showMatchPage = Info.config.match2.matchPage,
 		onlyShowExactDates = Logic.readBool(args.dateexact),
 		shortenRoundNames = Logic.readBool(args.shortedroundnames),
-		pages = Array.map(Array.extractValues(
-				Table.filterByKey(args, function(key) return string.find(key, '^tournament%d-$') ~= nil end)
-			), function(page) return (page:gsub(' ', '_')) end),
+		matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(args) or TournamentStructure.currentPageSpec(),
 	}
 
 	return self
 end
 
----@return Html?
+---@return Widget?
 function MatchesTable:create()
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
 		limit = self.config.limit,
 		order = 'date asc',
-		conditions = self:buildConditions(),
+		conditions = tostring(self:buildConditions()),
 	})
 
 	if type(matches[1]) ~= 'table' then
@@ -94,88 +101,89 @@ function MatchesTable:create()
 	end
 	self.matches = matches
 
-	local output = mw.html.create('table')
-		:addClass('wikitable wikitable-striped sortable match-card')
-		:node(self:header())
-
-	Array.forEach(self.matches, function(match, matchIndex) output:node(self:row(match)) end)
-
-	return mw.html.create('div')
-		:addClass('table-responsive')
-		:css('margin-bottom', '10px')
-		:node(output)
+	return TableWidgets.Table{
+		sortable = true,
+		columns = WidgetUtil.collect(
+			{
+				align = 'left',
+				sortType = 'isoDate',
+			},
+			self.config.showRound and {align = 'left'} or nil,
+			{align = 'right'}, -- Opponent
+			{align = 'center'}, -- Score
+			{align = 'left'}, -- vs. Opponent
+			self.config.showMatchPage and {
+				unsortable = true,
+				align = 'center'
+			} or nil
+		),
+		children = {
+			TableWidgets.TableHeader{children = self:header()},
+			TableWidgets.TableBody{
+				children = Array.map(self.matches, function (match) return self:row(match) end)
+			}
+		}
+	}
 end
 
----@return string
+---@return ConditionTree
 function MatchesTable:buildConditions()
 	local config = self.config
 
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('date'), Comparator.gt, DateExt.defaultDate)}
-
-	local pageConditions = ConditionTree(BooleanOperator.any)
-	for _, page in pairs(config.pages --[[@as string[] ]]) do
-		pageConditions:add{ConditionNode(ColumnName('pagename'), Comparator.eq, page)}
-	end
-	conditions:add(pageConditions)
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('date'), Comparator.gt, DateExt.defaultDate),
+		TournamentStructure.getMatch2Filter(config.matchGroupsSpec),
+	}
 
 	if config.startDate then
-		conditions:add(ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('date'), Comparator.eq, config.startDate),
-			ConditionNode(ColumnName('date'), Comparator.gt, config.startDate),
-		})
+		conditions:add(ConditionNode(ColumnName('date'), Comparator.ge, config.startDate))
 	end
 
 	if config.endDate then
-		conditions:add(ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('date'), Comparator.eq, config.endDate),
-			ConditionNode(ColumnName('date'), Comparator.lt, config.endDate),
-		})
+		conditions:add(ConditionNode(ColumnName('date'), Comparator.le, config.endDate))
 	end
 
-	if config.matchSection then
-		conditions:add{ConditionNode(ColumnName('extradata_matchsection'), Comparator.eq, config.matchSection)}
-	end
-
-	if config.section then
-		conditions:add{ConditionNode(ColumnName('match2bracketdata_sectionheader'), Comparator.eq, config.section)}
-	end
-
-	return conditions:toString()
+	return conditions
 end
 
----@return Html
+---@return VNode
 function MatchesTable:header()
-	local header = mw.html.create('tr')
-		:addClass('HeaderRow')
-		:node(mw.html.create('th')
-			:addClass('divCell')
-			:attr('data-sort-type','isoDate')
-			:wikitext('Date')
+	return TableWidgets.Row{
+		children = WidgetUtil.collect(
+			TableWidgets.CellHeader{
+				children = 'Date'
+			},
+			self.config.showRound and TableWidgets.CellHeader{
+				children = 'Round'
+			} or nil,
+			TableWidgets.CellHeader{
+				children = 'Opponent'
+			},
+			TableWidgets.CellHeader{
+				children = 'Score'
+			},
+			TableWidgets.CellHeader{
+				children = 'vs. Opponent'
+			},
+			self.config.showMatchPage and TableWidgets.CellHeader{} or nil
 		)
-
-	if self.config.showRound then
-		header:tag('th')
-			:addClass('divCell')
-			:addClass(not self.config.sortRound and 'unsortable' or nil)
-			:wikitext('Round')
-	end
-
-	return header
-		:tag('th'):addClass('divCell'):wikitext('Opponent'):done()
-		:tag('th'):addClass('divCell'):css('width','50'):wikitext('Score'):done()
-		:tag('th'):addClass('divCell'):wikitext('vs. Opponent'):done()
-		:node(self.config.showMatchPage and mw.html.create('th'):addClass('divCell') or nil)
+	}
 end
 
----@param match table
----@return Html
+---@param match MatchGroupUtilMatch
+---@return VNode
 function MatchesTable:dateDisplay(match)
-	local dateCell = mw.html.create('td')
-		:addClass('Date')
-		:node(HiddenSort.run(match.date))
+	---@param props {css: table<string, string|number?>?, children: Renderable|Renderable[]}
+	---@return VNode
+	local function createDateCell(props)
+		return TableWidgets.Cell{
+			css = props.css,
+			attributes = {['data-sort-value'] = match.date},
+			children = props.children
+		}
+	end
 
-	if Logic.readBool(match.dateexact) then
+	if Logic.readBool(match.dateIsExact) then
 		local countdownArgs = {}
 		if self.config.showCountdown and not Logic.readBool(match.finished) then
 			countdownArgs = match.stream or {}
@@ -183,39 +191,44 @@ function MatchesTable:dateDisplay(match)
 		else
 			countdownArgs.rawdatetime = true
 		end
-		countdownArgs.date = match.date .. UTC
-		return dateCell:wikitext(Countdown._create(countdownArgs))
+		countdownArgs.timestamp = match.timestamp
+		countdownArgs.date = DateExt.toCountdownArg(match.timestamp, match.timezoneId)
+		return createDateCell{children = Countdown.create(countdownArgs)}
 	elseif self.config.onlyShowExactDates then
-		return dateCell
-			:css('text-align', 'center')
-			:css('font-style', 'italic')
-			:wikitext('To be announced')
+		return createDateCell{
+			css = {
+				['text-align'] = 'center',
+				['font-style'] = 'italic'
+			},
+			children = 'To be announced'
+		}
 	end
 
-	return dateCell:wikitext(mw.getContentLanguage():formatDate('F j, Y', match.date))
+	return createDateCell{children = DateExt.formatTimestamp('F j, Y', match.timestamp)}
 end
 
----@param match table
----@return Html
-function MatchesTable:row(match)
-	local matchHeader = self:determineMatchHeader(match)
+---@param record match2
+---@return VNode
+function MatchesTable:row(record)
+	local matchHeader = self:determineMatchHeader(record)
 
-	local row = mw.html.create('tr')
-		:addClass('Match')
-		:node(self:dateDisplay(match))
+	local match = MatchGroupUtil.matchFromRecord(record)
 
-	if self.config.showRound then
-		row:tag('td'):addClass('Round'):wikitext(matchHeader)
-	end
-
-	return row
-		:node(MatchesTable._buildOpponent(match.match2opponents[1], DO_FLIP, LEFT_SIDE_OPPONENT))
-		:node(MatchesTable.score(match))
-		:node(MatchesTable._buildOpponent(match.match2opponents[2], NO_FLIP, RIGHT_SIDE_OPPONENT))
-		:node(self.config.showMatchPage and MatchesTable.matchPageLinkDisplay(match) or nil)
+	return TableWidgets.Row{
+		children = WidgetUtil.collect(
+			self:dateDisplay(match),
+			self.config.showRound and TableWidgets.Cell{
+				children = matchHeader
+			} or nil,
+			MatchesTable._buildOpponent(match.opponents[1], DO_FLIP),
+			MatchesTable.score(match),
+			MatchesTable._buildOpponent(match.opponents[2], NO_FLIP),
+			self.config.showMatchPage and MatchesTable.matchPageLinkDisplay(match) or nil
+		)
+	}
 end
 
----@param match table
+---@param match match2
 ---@return string
 function MatchesTable:determineMatchHeader(match)
 	local matchHeader = Logic.emptyOr(
@@ -260,126 +273,98 @@ function MatchesTable._applyCustomAbbreviations(matchHeader)
 	return matchHeader
 end
 
----@param opponent table
+---@param opponent standardOpponent
 ---@param flip boolean
----@param side string
----@return Html
-function MatchesTable._buildOpponent(opponent, flip, side)
-	local opponentCell = mw.html.create('td'):addClass('Team' .. side)
-
-	opponent = Opponent.fromMatch2Record(opponent) --[[@as standardOpponent]]
-
-	if Opponent.isTbd(opponent) or Opponent.isEmpty(opponent) then
+---@return VNode
+function MatchesTable._buildOpponent(opponent, flip)
+	if Opponent.isEmpty(opponent) then
 		opponent = Opponent.tbd(Opponent.literal)
 	end
 
-	return opponentCell:node(OpponentDisplay.InlineOpponent{
-		opponent = opponent,
-		teamStyle = 'short',
-		flip = flip,
-		abbreviateTbd = true,
-	})
+	return TableWidgets.Cell{
+		attributes = {['data-sort-value'] = Opponent.toName(opponent)},
+		children = OpponentDisplay.BlockOpponent{
+			opponent = opponent,
+			teamStyle = 'hybrid',
+			flip = flip,
+		}
+	}
 end
 
----@param match table
----@return Html
+---@param match MatchGroupUtilMatch
+---@return VNode
 function MatchesTable.score(match)
-	local scoreCell = mw.html.create('td')
-		:addClass('Score')
-
-	local scoreDisplay = (Logic.readBool(match.finished) or (
-		Logic.readBool(match.dateexact) and
-		os.time() >= MatchesTable._parseDateTime(match.date)
+	local scoreDisplay = (match.finished or (
+		match.dateIsExact and
+		DateExt.getCurrentTimestamp() >= match.timestamp
 	)) and MatchesTable.scoreDisplay(match) or 'vs'
 
-	if (tonumber(match.bestof) or 0) <= 0 then
-		return scoreCell:wikitext(scoreDisplay)
-	end
+	local showBestOf = (tonumber(match.bestof) or 0) > 0
 
-	return scoreCell
-		:tag('div'):css('line-height', '1.1'):node(scoreDisplay):done()
-		:tag('div')
-			:css('font-size', '75%')
-			:css('padding-bottom', '1px')
-			:wikitext('(')
-			:node(MatchesTable._bestof(match.bestof))
-			:wikitext(')')
-			:done()
+	return TableWidgets.Cell{
+		children = WidgetUtil.collect(
+			showBestOf and {
+				Div{
+					css = {['line-height'] = '1.1'},
+					children = scoreDisplay
+				},
+				Div{
+					css = {
+						['font-size'] = '75%',
+						['padding-bottom'] = '1px'
+					},
+					children = {
+						'(',
+						MatchesTable._bestof(match.bestof),
+						')'
+					}
+				}
+			} or scoreDisplay
+		)
+	}
 end
 
----@param match table
----@return string
+---@param match MatchGroupUtilMatch
+---@return Renderable[]
 function MatchesTable.scoreDisplay(match)
-	return MatchesTable.getOpponentScore(
-		match.match2opponents[1],
-		match.winner == WINNER_LEFT
-	) .. ':' .. MatchesTable.getOpponentScore(
-		match.match2opponents[2],
-		match.winner == WINNER_RIGHT
-	)
+	return {
+		MatchesTable.getOpponentScore(
+			match.opponents[1],
+			match.winner == WINNER_LEFT
+		),
+		':',
+		MatchesTable.getOpponentScore(
+			match.opponents[2],
+			match.winner == WINNER_RIGHT
+		)
+	}
 end
 
----@param match table
----@return Html
+---@param match MatchGroupUtilMatch
+---@return VNode
 function MatchesTable.matchPageLinkDisplay(match)
-	return mw.html.create('td'):addClass('MatchPage')
-		:wikitext('[[Match:ID_' .. match.match2id .. '|')
-		:tag('span')
-			:addClass('fa-stack')
-			:tag('i')
-				:addClass('fad fa-file fa-stack-2x')
-				:done()
-			:tag('i')
-				:addClass('fas fa-info fa-stack-1x')
-				:done()
-			:done()
-		:wikitext('Match Page')
-		:wikitext(']]')
+	return TableWidgets.Cell{children = MatchPageButton{match = match}}
 end
 
----@param opponent match2opponent
+---@param opponent standardOpponent
 ---@param isWinner boolean
----@return string|number?
+---@return Renderable
 function MatchesTable.getOpponentScore(opponent, isWinner)
-	local score
-	if opponent.status == SCORE_STATUS then
-		score = tonumber(opponent.score)
-		score = score == -1 and 0 or score
-	else
-		score = opponent.status or ''
-	end
+	local score = OpponentDisplay.InlineScore(opponent)
 	if isWinner then
-		return '<b>' .. score .. '</b>'
+		return Html.B{children = score}
 	end
 
 	return score
 end
 
----@param str string
----@return integer
-function MatchesTable._parseDateTime(str)
-	local year, month, day, hour, minutes, seconds
-		= str:match('(%d%d%d%d)-?(%d?%d?)-?(%d?%d?) (%d?%d?):(%d?%d?):(%d?%d?)$')
-
-	-- Adjust time based on server timezone offset from UTC
-	local offset = os.time(os.date("*t") --[[@as osdateparam]]) - os.time(os.date("!*t") --[[@as osdateparam]])
-	-- create time - this will take our UTC timestamp and put it into localtime without converting
-	local localTime = os.time{
-		year = year,
-		month = month,
-		day = day,
-		hour = hour,
-		min = minutes,
-		sec = seconds
-	}
-
-	return localTime + offset -- "Convert" back to UTC
-end
-
 ---@param value string|number
----@return string
+---@return VNode
 function MatchesTable._bestof(value)
-	return Abbreviation.make{text = 'Bo' .. value, title = 'Best of ' .. value} --[[@as string]]
+	return Html.Abbr{
+		title = 'Best of ' .. value,
+		children = 'Bo' .. value
+	}
 end
 
 return MatchesTable

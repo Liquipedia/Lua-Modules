@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:MatchExternalLinks
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -33,7 +32,7 @@ return {
 		name = 'esl',
 		icon = 'ESL 2019 icon lightmode.png',
 		iconDark = 'ESL 2019 icon darkmode.png',
-		prefixLink = 'https://play.eslgaming.com/match/',
+		prefixLink = 'https://web.archive.org/web/play.eslgaming.com/match/',
 		label = 'Matchpage and Stats on ESL Play',
 		isMapStats = true
 	},
@@ -216,6 +215,14 @@ return {
 		icon = 'Coliseum icon.png',
 		prefixLink = 'https://coliseum.gg/tournament/',
 		label = 'Matchpage and Stats on Coliseum',
+		isMapStats = true
+	},
+	{
+		name = 'fastcup',
+		icon = 'FASTCUP icon lightmode.png',
+		iconDark = 'FASTCUP icon darkmode.png',
+		prefixLink = 'https://cs2.fastcup.net/matches/',
+		label = 'Matchpage and Stats on FASTCUP',
 		isMapStats = true
 	},
 	{},

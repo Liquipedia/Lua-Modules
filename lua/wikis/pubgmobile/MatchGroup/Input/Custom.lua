@@ -1,17 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=pubgmobile
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
+
+local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
+local Operator = Lua.import('Module:Operator')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
+---@class PubgMobileMatchParser: MatchParserInterface
 local MatchFunctions = {
 	OPPONENT_CONFIG = {
 		resolveRedirect = true,
@@ -21,8 +23,11 @@ local MatchFunctions = {
 	DEFAULT_MODE = 'tdm',
 	getBestOf = MatchGroupInputUtil.getBestOf,
 }
+
+---@class PubgMobileMapParser: MapParserInterface
 local MapFunctions = {}
 
+---@class PubgMobileFfaMatchParser: FfaMatchParserInterface
 local FfaMatchFunctions = {
 	OPPONENT_CONFIG = {
 		resolveRedirect = true,
@@ -31,6 +36,8 @@ local FfaMatchFunctions = {
 	},
 	DEFAULT_MODE = 'team'
 }
+
+---@class PubgMobileFfaMapParser: FfaMapParserInterface
 local FfaMapFunctions = {}
 
 local CustomMatchGroupInput = {}
@@ -45,7 +52,7 @@ end
 --- Normal 2-opponent Match
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
@@ -54,14 +61,12 @@ end
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(maps)
-	return function(opponentIndex)
-		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	end
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
@@ -85,14 +90,14 @@ end
 --- FFA Match
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param scoreSettings table
 ---@return table[]
 function FfaMatchFunctions.extractMaps(match, opponents, scoreSettings)
 	return MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, FfaMapFunctions)
 end
 
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function FfaMatchFunctions.calculateMatchScore(opponents, maps)

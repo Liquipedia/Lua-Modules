@@ -1,0 +1,55 @@
+---
+-- @Liquipedia
+-- page=Module:Infobox/Map/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Map = Lua.import('Module:Infobox/Map')
+local Injector = Lua.import('Module:Widget/Injector')
+
+local Link = Lua.import('Module:Widget/Basic/Link')
+local Widgets = Lua.import('Module:Widget/All')
+local Cell = Widgets.Cell
+
+---@class GeoguessrMapInfobox: MapInfobox
+local CustomMap = Class.new(Map)
+---@class GeoguessrMapInfoboxWidgetInjector: WidgetInjector
+---@field caller GeoguessrMapInfobox
+local CustomInjector = Class.new(Injector)
+
+---@param frame Frame
+---@return VNode
+function CustomMap.run(frame)
+	local map = CustomMap(frame)
+	map:setWidgetInjector(CustomInjector(map))
+
+	return map:createInfobox()
+end
+
+---@param id string
+---@param widgets Renderable[]
+---@return Renderable[]
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
+	if id == 'custom' then
+		Array.appendWith(
+			widgets,
+			Cell{name = 'Level', children = {args.level}},
+			Cell{name = 'Tags', children = {args.tags}},
+			Cell{name = 'Map Link', children = {tostring(Link{
+				linktype = 'external',
+				link = args.maplink,
+				children = {args.name},
+			})}}
+		)
+	end
+	return widgets
+end
+
+return CustomMap

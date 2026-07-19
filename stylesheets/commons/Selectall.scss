@@ -1,0 +1,13 @@
+/*******************************************************************************
+Template(s): Select all for pre elements
+*******************************************************************************/
+.selectall-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
+.selectall-buttons {
+	display: flex;
+	gap: 0.25rem;
+}

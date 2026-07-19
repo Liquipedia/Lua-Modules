@@ -1,25 +1,50 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Icon/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 
 return {
+	-- Usage: Team information
+	team_tbd = 'far fa-users',
+	notification = 'fas fa-info-circle',
+	external_link = 'fas fa-external-link-alt',
+	internal_link = 'fas fa-link',
+
+	-- Usage: Different ways to see data
+	schedule = 'far fa-table',
+	bracket = 'far fa-sitemap',
+
 	-- Usage: Match results
 	winner = 'fas fa-check',
 	draw = 'fas fa-minus',
 	loss = 'fas fa-times',
+	winner_left = 'fas fa-caret-left',
+	winner_right = 'fas fa-caret-right',
 
-	-- Usage: Other Match detail pop up icons
+	-- Usage: Other Match information icons
+	matchpagelink = 'far fa-swords',
 	matchpopup = 'fas fa-info-circle',
 	timeout = 'far fa-clock',
-	veto = 'fas fa-times',
 	casters = 'fas fa-microphone-alt',
 	comment = 'far fa-comment',
 	mvp = 'fas fa-medal',
 	startleft = 'fas fa-chevron-left',
 	startright = 'fas fa-chevron-right',
+	elimination = 'fas fa-skull',
+	explosion_valorant = 'fas fa-fire-alt',
+	defuse = 'fas fa-wrench',
+	outoftime = 'fas fa-hourglass',
+	surrendered = 'far fa-flag',
+	ace_valorant = 'fas fa-dagger',
+	flawless_valorant = 'fas fa-gem',
+
+	-- Usage: Veto labels
+	veto_pick = 'fas fa-check',
+	veto_ban = 'fas fa-times',
+	veto_defaultban = 'fas fa-times',
+	veto_decider = 'fas fa-flag-checkered',
+	veto_protect = 'fas fa-lock',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
@@ -29,13 +54,15 @@ return {
 	--Usage: A match or stream is live
 	live = 'fas fa-circle',
 
-	-- Usage: Previous and Next event in infoboxes
+	-- Usage: Previous and Next navigation
 	previous = 'fas fa-chevron-left',
 	next = 'fas fa-chevron-right',
 
 	-- Usage: Expanding and collapsing hidden sections
 	expand = 'far fa-chevron-down',
 	collapse = 'far fa-chevron-up',
+	show = 'far fa-eye',
+	hide = 'far fa-eye-slash',
 
 	-- Usage: to indicate a selection of something was either left, right, down or up
 	up = 'fas fa-chevron-circle-up',
@@ -44,8 +71,11 @@ return {
 	left = 'fas fa-chevron-circle-left',
 
 	-- Usage: Indicate if a team/player went up or down in placement in a league system or in a ranking system
-	rankup = 'fas fa-long-arrow-up',
-	rankdown = 'fas fa-long-arrow-down',
+	rankup = 'fas fa-chevron-up',
+	rankup_double = 'fas fa-chevron-double-up',
+	rankneutral = 'fas fa-minus',
+	rankdown = 'fas fa-chevron-down',
+	rankdown_double = 'fas fa-chevron-double-down',
 
 	-- Usage: Main Page buttons
 	featuredon = 'far fa-star',
@@ -55,11 +85,15 @@ return {
 	upcomingandongoing = 'far fa-clock',
 	concluded = 'fas fa-check',
 	transfers = 'fas fa-handshake-alt',
+	createaccount = 'fas fa-user-plus',
+	login = 'fas fa-sign-in-alt',
+	discord = 'fab fa-discord',
+	helparticles = 'far fa-life-ring',
 
 	-- Usage: To indicate different transfer type with icon difference not just background colour
-	transferbetween = 'fas fa-arrow-alt-right',
-	transfertofreeagent = 'fas fa-arrow-alt-from-left',
-	fransferfromfreeagent = 'fas fa-arrow-alt-to-right',
+	transferbetween = 'far fa-arrow-alt-right',
+	transfertofreeagent = 'far fa-arrow-alt-to-right',
+	transferfromfreeagent = 'far fa-arrow-alt-from-left',
 
 	-- Usage: Reference links in tables (ie transfers)
 	reference = 'fad fa-external-link-alt',
@@ -83,7 +117,7 @@ return {
 	-- Usage: buildtime, duration, cooldown, ...
 	time = 'far fa-clock',
 
-	-- Usage: Squad Table
+	-- Usage: Player Roles
 	captain = 'fas fa-crown',
 	substitute = 'fas fa-people-arrows',
 
@@ -93,6 +127,9 @@ return {
 
 	-- Usage: Accommodations
 	accommodation = 'far fa-home-alt',
+
+	-- Usage: Shop merchandise
+	shopping_bag = 'fas fa-shopping-bag',
 
 	-- Usage: Matches etc
 	firstplace = 'fas fa-trophy',
@@ -104,6 +141,12 @@ return {
 	kills = 'fas fa-skull',
 	matchpoint = 'fad fa-diamond',
 
+	-- Usage: qualification
+	qualified = 'fas fa-check-circle',
+	tobedetermined = 'fas fa-question',
+	notqualified = 'fas fa-times',
+	ineligible = 'fas fa-ban',
+
 	-- Usage: standings
 	standings_up = 'fas fa-chevron-double-up',
 	standings_stayup = 'fas fa-chevron-up',
@@ -114,27 +157,37 @@ return {
 	-- Usage: sorting
 	sort = 'far fa-arrows-alt-v',
 
-	-- Usage: Main Page
+	-- Usage: Lists
 	checkcircle = 'fas fa-check-circle',
 
-	-- Usage: Dota2 Main Page
-	hub = 'fas fa-external-link-alt',
+	-- Usage: "Hubs" (additional Main Pages)
+	esports_hub = 'far fa-trophy',
+	game_hub = 'far fa-swords',
+	main_hub = 'far fa-user-chart',
 
-	-- Usage: Match Pages
+	-- Usage: Match Stats
 	damage = 'fas fa-sword',
 	gold = 'fas fa-coins',
+	kda = 'fas fa-skull-crossbones',
+	acs = 'far fa-abacus',
+	kast = 'fas fa-hands-helping',
+	headshot = 'far fa-crosshairs',
+	firstkill = 'liquipedia-custom-icon liquipedia-custom-icon-fk-kd-icon',
+	team_firstkills = 'fas fa-swords fa-flip-vertical',
 
-	-- Usage: Dota2 Match Pages
 	dota2_gpm = 'fas fa-coin',
-	dota2_kda = 'fas fa-skull-crossbones',
 	dota2_lhdn = 'fas fa-swords',
 	dota2_tower = 'fas fa-chess-rook',
 	dota2_barrack = 'fas fa-warehouse',
 
-	-- Usage: LeagueOfLegends Match Pages
 	leagueoflegends_kda = 'fas fa-swords fa-flip-vertical',
+	leagueoflegends_killparticipation = 'fas fa-dagger',
 
-	-- Usage: Indicate boolean info in Infobox
+	-- Usage: Day night cycle information
+	day = 'fas fa-sun',
+	night = 'fas fa-moon',
+
+	-- Usage: Boolean info
 	yes = 'fa fa-check',
 	no = 'fa fa-times',
 
@@ -145,7 +198,88 @@ return {
 	-- Usage: Charts
 	chart = 'far fa-chart-line',
 
+	-- Usage: PatchList
+	patch = 'fas fa-file-alt',
+	calendar = 'fas fa-calendar-alt',
+	highlights = 'fas fa-star',
+
 	-- Usage: Chess
 	chesskingoutline = 'far fa-chess-king',
 	chesskingfull = 'fas fa-chess-king',
+
+	-- Usage: Labs Project overview
+	projecthome = 'fas fa-home',
+	contributors = 'fas fa-people-carry',
+	articles = 'fas fa-newspaper',
+	lastupdated = 'fas fa-clock',
+
+	-- Usage: For support hub related actions and links
+	upload = 'far fa-upload',
+	support_hub = 'liquipedia-custom-icon liquipedia-custom-icon-support-hub',
+	copyright = 'far fa-copyright',
+	getting_started = 'far fa-seedling',
+	file_standards_guide = 'far fa-file-check',
+	find_images = 'fad fa-file-search',
+	clipboard = 'fad fa-clipboard-list',
+
+	-- Usage: Main Pages navcards
+	player = 'fas fa-user',
+	statistics = 'fad fa-chart-bar',
+	maps = 'fad fa-map',
+
+	-- Streams and Vods
+	youtube = 'fab fa-youtube',
+	twitch = 'fab fa-twitch',
+	facebook = 'fab fa-facebook-f',
+	kick = 'liquipedia-custom-icon liquipedia-custom-icon-kick',
+	afreeca = 'liquipedia-custom-icon liquipedia-custom-icon-afreecatv',
+	bilibili = 'liquipedia-custom-icon liquipedia-custom-icon-bilibili',
+	cc = 'lp-icon lp-icon-21 lp-cc',
+	dailymotion = 'liquipedia-custom-icon liquipedia-custom-icon-dailymotion',
+	douyu = 'liquipedia-custom-icon liquipedia-custom-icon-duotone liquipedia-custom-icon-douyu-duotone',
+	huomao = 'liquipedia-custom-icon liquipedia-custom-icon-huomao',
+	huya = 'liquipedia-custom-icon liquipedia-custom-icon-duotone liquipedia-custom-icon-huya-duotone',
+	loco = 'lp-icon lp-icon-21 lp-loco',
+	mildom = 'lp-icon lp-icon-21 lp-mildom',
+	nimo = 'liquipedia-custom-icon liquipedia-custom-icon-nimo-tv',
+	trovo = 'liquipedia-custom-icon liquipedia-custom-icon-trovo',
+	tl = 'liquipedia-custom-icon liquipedia-custom-icon-team-liquid',
+	stream = 'liquipedia-custom-icon liquipedia-custom-icon-team-liquid',
+	vod_play = 'far fa-play',
+
+	-- Usage: Formula 1
+	ongoing_series = 'fas fa-hourglass-half ',
+	season_history = 'fas fa-landmark',
+	finished_race = 'fas fa-flag-checkered',
+
+	-- Usage: Export functions
+	share = 'fas fa-share-alt',
+	copy = 'fas fa-clone',
+	download = 'fas fa-download',
+
+	-- Usage: Github links
+	github = 'fab fa-github',
+
+	-- Usage: Dota2 Spellcard
+	dota2_spl_mechanics = 'fas fa-cog',
+	dota2_spl_interactions = 'fad fa-atom-alt',
+	dota2_spl_status = 'fas fa-hourglass-half',
+	dota2_spl_misc = 'fad fa-list-ul',
+
+	-- Usage: Dota2 Hero tabbber tabs
+	dota2_ht_overview = 'fas fa-id-badge',
+	dota2_ht_matches = 'fas fa-trophy',
+	dota2_ht_changelogs = 'fas fa-file-alt',
+	dota2_ht_responses = 'fas fa-microphone-alt',
+	dota2_ht_sounds = 'fas fa-volume',
+	dota2_ht_animations = 'far fa-running',
+	dota2_ht_lore = 'fas fa-scroll-old',
+	dota2_ht_equipment = 'fas fa-helmet-battle',
+	dota2_ht_relics = 'fad fa-diamond',
+	dota2_ht_old_abilties = 'fad fa-book-spells',
+	dota2_ht_calc = 'fas fa-function',
+	dota2_ht_unreleased = 'fad fa-archive',
+
+	-- Usage: Info button
+	['general-info'] = 'fas fa-info-circle',
 }

@@ -1,0 +1,20 @@
+---
+-- @Liquipedia
+-- page=Module:InGameRoles
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+---@type table<string, RoleBaseData>
+local inGameRoles = {
+	['frontline'] = {category = 'Frontline', display = 'Frontline'},
+	['backline'] = {category = 'Backline', display = 'Backline'},
+	['support'] = {category = 'Support', display = 'Support'},
+	['flex'] = {category = 'Flex', display = 'Flex'},
+}
+
+inGameRoles['front'] = inGameRoles['frontline']
+inGameRoles['sup'] = inGameRoles['support']
+inGameRoles['back'] = inGameRoles['backline']
+
+return inGameRoles

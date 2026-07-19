@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:Infobox/Unit/Car/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
+
+local Class = Lua.import('Module:Class')
+local Namespace = Lua.import('Module:Namespace')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class RocketLeagueUnitInfobox: UnitInfobox
@@ -21,7 +21,7 @@ local CustomUnit = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return VNode
 function CustomUnit.run(frame)
 	local unit = CustomUnit(frame)
 	unit:setWidgetInjector(CustomInjector(unit))
@@ -30,13 +30,13 @@ function CustomUnit.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		return {
-			Cell{name = 'Released', content = {args.released}},
+			Cell{name = 'Released', children = {args.released}},
 		}
 	end
 

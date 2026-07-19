@@ -1,79 +1,110 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Infobox/Cell
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+
+local Component = Lua.import('Module:Widget/Component')
+local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
+local Html = Lua.import('Module:Widget/Html')
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class CellWidgetOptions
+---@field collapsible boolean?
 ---@field columns number?
 ---@field makeLink boolean?
 ---@field suppressColon boolean?
----@field separator Widget|string|Html|nil
+---@field separator Renderable?
 
----@class CellWidget: Widget
----@operator call(table):CellWidget
-local Cell = Class.new(Widget,
-	function(self, input)
-		self.name = self:assertExistsAndCopy(input.name)
-		self.props.children = input.children or input.content or {}
-	end
-)
-Cell.defaultProps = {
-	options = {
-		columns = 2,
-		makeLink = false,
-		suppressColon = false,
-		separator = '<br />',
-	},
+---@class CellWidgetProps
+---@field name Renderable?
+---@field classes string[]?
+---@field children Renderable[]?
+---@field options CellWidgetOptions?
+
+local Cell = {}
+---@type CellWidgetOptions
+Cell.defaultOptions = {
+	collapsible = false,
+	columns = 2,
+	makeLink = false,
+	suppressColon = false,
+	separator = '<br />',
 }
 
+---@param props CellWidgetProps
 ---@return Widget?
-function Cell:render()
-	if Logic.isEmpty(self.props.children) then
+function Cell.render(props)
+	local name = assert(Logic.nilIfEmpty(props.name))
+	local children = props.children
+	if Logic.isEmpty(children) then
 		return
 	end
 
-	local options = self.props.options
+	---@type CellWidgetOptions
+	local options = setmetatable(props.options or {}, {__index = Cell.defaultOptions})
 
-	local mappedChildren = {}
-	for i, child in ipairs(self.props.children) do
-		if i > 1 then
-			table.insert(mappedChildren, options.separator)
-		end
+	local mappedChildren = Array.map(props.children, function(child)
 		if options.makeLink then
-			table.insert(mappedChildren, Link{children = {child}, link = child})
+			---@cast child string
+			return Link{children = {child}, link = child}
 		else
-			table.insert(mappedChildren, child)
+			return child
 		end
-	end
+	end)
 
 	if Logic.isEmpty(mappedChildren[1]) then
 		return
 	end
 
-	return HtmlWidgets.Div{
-		classes = self.props.classes,
+	return Html.Div{
+		classes = props.classes,
 		children = {
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'infobox-cell-' .. options.columns, 'infobox-description'},
-				children = {self.props.name, not options.suppressColon and ':' or nil}
+				children = {name, not options.suppressColon and ':' or nil}
 			},
-			HtmlWidgets.Div{
-				css = {width = (100 * (options.columns - 1) / options.columns) .. '%'}, -- 66.66% for col = 3
-				children = mappedChildren,
-			}
+			Cell._buildChildrenContainer(mappedChildren, options)
 		}
 	}
 end
 
-return Cell
+---@private
+---@param mappedChildren Renderable[]
+---@return Widget
+function Cell._buildChildrenContainer(mappedChildren, options)
+	local widgetProps = {
+		css = {width = (100 * (options.columns - 1) / options.columns) .. '%'}, -- 66.66% for col = 3
+		children = Array.interleave(mappedChildren, options.separator)
+	}
+
+	if not options.collapsible then
+		return Html.Div(widgetProps)
+	end
+
+	widgetProps.shouldCollapse = true
+	widgetProps.titleWidget = CollapsibleToggle{
+		showButtonChildren = {
+			'Expand',
+			' ',
+			Icon{iconName = 'expand'}
+		},
+		hideButtonChildren = {
+			'Collapse',
+			' ',
+			Icon{iconName = 'collapse'}
+		}
+	}
+
+	return GeneralCollapsible(widgetProps)
+end
+
+return Component.component(Cell.render)

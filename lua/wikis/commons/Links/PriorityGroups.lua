@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Links/PriorityGroups
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -20,6 +19,7 @@ return {
 		'apexlegendsstatus',
 		'battlefy',
 		'b5csgo',
+		'blasttv',
 		'cfs',
 		'challengermode',
 		'challonge',
@@ -36,10 +36,13 @@ return {
 		'esportal',
 		'etf2l',
 		'faceit',
+		'faceitdb',
 		'faceit-l',
 		'faceit-c',
 		'faceit-hub',
 		'faceit-org',
+		'csgo-fastcup',
+		'cs2-fastcup',
 		'fide',
 		'gamersclub',
 		'geoguessr',
@@ -78,9 +81,9 @@ return {
 		'pubsteam',
 		'reddit',
 		'snapchat',
-		'steam',
-		'steamalternative',
+		'steam64ID',
 		'telegram',
+		'threads',
 		'tiktok',
 		'twitter',
 		'vk',

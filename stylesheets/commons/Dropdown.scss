@@ -1,0 +1,193 @@
+/*******************************************************************************
+Template(s): Dropdown box
+Author(s): Rapture
+*******************************************************************************/
+.dropdown-box-wrapper {
+	position: relative;
+	display: inline-block;
+}
+
+.dropdown-box {
+	display: none;
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: 1000;
+	float: left;
+	margin: 0;
+	padding: 5px;
+}
+
+.dropdown-box-visible {
+	display: block;
+}
+
+/*******************************************************************************
+Template(s): Dropdown Widget
+*******************************************************************************/
+.dropdown-widget {
+	position: relative;
+
+	a {
+		text-decoration: none;
+	}
+
+	&__toggle {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+	}
+
+	&__menu {
+		display: none;
+		position: absolute;
+		min-width: max-content;
+		padding: 0.25rem;
+		margin-top: 0.5rem;
+		border: 1px solid;
+		border-radius: 0.25rem;
+		z-index: 10;
+		background-color: var( --clr-secondary-100 );
+		border-color: var( --clr-on-surface-light-primary-12 );
+		box-shadow: 0 1px 4px var( --clr-on-surface-light-primary-12 );
+
+		.theme--dark & {
+			background-color: var( --clr-secondary-9 );
+			border-color: var( --clr-on-surface-dark-primary-12 );
+			box-shadow: 0 1px 4px var( --clr-on-surface-dark-primary-4 );
+		}
+
+		&.show {
+			display: flex;
+			flex-direction: column;
+			gap: 0.25rem;
+		}
+	}
+
+	&__prefix {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	&__label {
+		flex: 1;
+	}
+
+	&__indicator {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1rem;
+		height: 1rem;
+		flex-shrink: 0;
+		transition: transform 0.2s ease;
+	}
+
+	&__toggle[ aria-expanded="true" ] .dropdown-widget__indicator {
+		transform: rotate( 180deg );
+	}
+
+	&__menu > ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	&__item {
+		display: flex;
+		align-items: center;
+		padding: 0.25rem 0.5rem;
+		font-size: 0.6875rem;
+		font-weight: normal;
+		border-radius: 0.25rem;
+		cursor: pointer;
+		gap: 0.25rem;
+		color: var( --clr-secondary-25 );
+
+		.theme--dark & {
+			color: var( --clr-secondary-90 );
+		}
+
+		&.active {
+			font-weight: bold;
+			color: var( --clr-secondary-25 ) !important;
+
+			.theme--dark & {
+				color: var( --clr-secondary-100 ) !important;
+			}
+		}
+
+		&:hover {
+			background-color: var( --clr-on-surface-light-primary-4 );
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+			}
+		}
+	}
+
+	&--form {
+		width: 100%;
+		--dropdown-menu-shadow: 0 1px 4px var( --dropdown-menu-shadow-color );
+		--dropdown-toggle-border: var( --clr-secondary-90 );
+		--dropdown-toggle-text: var( --clr-secondary-16 );
+		--dropdown-menu-border: var( --clr-on-surface-light-primary-16 );
+		--dropdown-menu-shadow-color: var( --clr-on-surface-light-primary-12 );
+		--dropdown-item-color: var( --clr-secondary-25 );
+		--dropdown-item-bg: var( --clr-on-surface-light-primary-4 );
+
+		.theme--dark & {
+			--dropdown-toggle-border: var( --clr-secondary-25 );
+			--dropdown-toggle-text: var( --clr-secondary-100 );
+			--dropdown-menu-border: var( --clr-secondary-25 );
+			--dropdown-menu-shadow-color: var( --clr-on-surface-dark-primary-4 );
+			--dropdown-item-color: var( --clr-secondary-100 );
+			--dropdown-item-bg: var( --clr-on-surface-dark-primary-8 );
+		}
+
+		.dropdown-widget__toggle {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			width: 100%;
+			min-height: 2.75rem;
+			padding: 0.5rem 0.75rem;
+			border-radius: 0.25rem;
+			border: 1px solid var( --dropdown-toggle-border );
+			cursor: pointer;
+			background-color: var( --clr-background );
+			color: var( --dropdown-toggle-text ) !important;
+		}
+
+		.dropdown-widget__label {
+			font-size: 0.875rem;
+			font-weight: normal;
+			line-height: 1.25rem;
+			text-align: left;
+		}
+
+		.dropdown-widget__menu {
+			min-width: 100%;
+			padding: 0 0;
+			margin-top: 0.25rem;
+			z-index: 20;
+			background-color: var( --clr-background );
+			border-color: var( --dropdown-menu-border );
+			box-shadow: var( --dropdown-menu-shadow );
+		}
+
+		.dropdown-widget__item {
+			padding: 0.5rem 0.75rem;
+			margin: 0.25rem;
+			font-size: 0.875rem;
+			color: var( --dropdown-item-color );
+
+			&:hover,
+			&.active {
+				background-color: var( --dropdown-item-bg );
+			}
+		}
+	}
+}

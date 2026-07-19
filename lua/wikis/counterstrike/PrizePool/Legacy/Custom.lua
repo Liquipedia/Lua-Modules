@@ -1,20 +1,20 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:PrizePool/Legacy/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Logic = Lua.import('Module:Logic')
 
 local PrizePoolLegacy = Lua.import('Module:PrizePool/Legacy')
 
 local CustomLegacyPrizePool = {}
 
 -- Template entry point
----@return Html
+---@return Widget
 function CustomLegacyPrizePool.run()
 	return PrizePoolLegacy.run(CustomLegacyPrizePool)
 end

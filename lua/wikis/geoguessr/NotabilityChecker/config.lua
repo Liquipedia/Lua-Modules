@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=geoguessr
 -- page=Module:NotabilityChecker/config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -24,7 +23,7 @@ Config.MAX_NUMBER_OF_PARTICIPANTS = 7
 Config.MAX_NUMBER_OF_COACHES = 2
 
 -- These are the notability thresholds needed by a team/player
-Config.NOTABILITY_THRESHOLD_MIN = 13
+Config.NOTABILITY_THRESHOLD_MIN = 15
 Config.NOTABILITY_THRESHOLD_NOTABLE = 15
 
 -- These are all the liquipediatiertypes which should be extra "penalised"
@@ -271,9 +270,12 @@ Config.scoreRanges = {
 -- 1st Place Qualification points
 Config.scoreRangeQuali = {5, 3, 2, 0.5, 0.5}
 
--- This function adjusts the score for the placement, e.g.
--- a first placement should score more than a 10th placement.
--- See also the EXTRA_DROP_OFF_TYPES and NO_POINTS_TYPES.
+--- This function adjusts the score for the placement, e.g.
+--- a first placement should score more than a 10th placement.
+--- See also the EXTRA_DROP_OFF_TYPES and NO_POINTS_TYPES.
+---@param tier string|integer
+---@param tierType string
+---@return fun(number, number): number
 function Config.placementDropOffFunction(tier, tierType)
 	-- Return scoreRangeQuali or score if tiertype is not equal to general
 	if (tierType ~= nil) and (tierType:lower() ~= Config.TIER_TYPE_GENERAL) then
@@ -287,7 +289,7 @@ function Config.placementDropOffFunction(tier, tierType)
 	end
 
 	return function(score, placement)
-        -- The current notability guidelines award set amount of points based on placement and tier of event.
+		-- The current notability guidelines award set amount of points based on placement and tier of event.
 		for _, range in ipairs(Config.scoreRanges[tier]) do
 			if placement <= range.max then
 				local points = range.points

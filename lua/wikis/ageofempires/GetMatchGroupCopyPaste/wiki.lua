@@ -1,18 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:GetMatchGroupCopyPaste/wiki
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
@@ -30,18 +29,23 @@ local INDENT = WikiCopyPaste.Indent
 ---@param args table
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+	local isFfa = Logic.readBool(args.ffa)
+
 	local lines = Array.extend(
 		'{{Match',
 		INDENT .. '|date=',
 		INDENT .. '|bestof=' .. bestof,
-		INDENT .. '|twitch=|vod=',
-		INDENT .. '|mapdraft=|civdraft=',
+		INDENT .. '|twitch=|youtube=|vod=',
+		not isFfa and (INDENT .. '|mapdraft=|civdraft=') or nil,
+		isFfa and Logic.readBool(args.hasPointsMapping)
+			and (INDENT .. WikiCopyPaste._getPointsMapping(opponents)) or nil,
 		Logic.readBool(args.casters) and (INDENT .. '|caster1= |caster2=') or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
-			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' ..
+				(isFfa and WikiCopyPaste.getFfaOpponent(mode, bestof) or WikiCopyPaste.getOpponent(mode))
 		end),
 		Array.map(Array.range(1, bestof), function(mapIndex)
-			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getMap(mode)
+			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getMap(mode, isFfa)
 		end),
 		'}}'
 	)
@@ -52,7 +56,7 @@ end
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent
 ---@param mode string
 ---@return string
-function WikiCopyPaste._getOpponent(mode)
+function WikiCopyPaste.getOpponent(mode)
 	if mode == Opponent.solo then
 		return '{{SoloOpponent|}}'
 	elseif mode == Opponent.team then
@@ -64,20 +68,52 @@ function WikiCopyPaste._getOpponent(mode)
 	return ''
 end
 
+---@param mode string
+---@param mapCount integer
+---@return string
+function WikiCopyPaste.getFfaOpponent(mode, mapCount)
+	local mapArgs = table.concat(
+		Array.map(Array.range(1, mapCount), function (index)
+			return '|m' .. index .. '={{MS||civs=}}'
+		end)
+	)
+
+	local opponent = WikiCopyPaste.getOpponent(mode)
+		:gsub('}}', mapArgs .. '}}')
+	return opponent
+end
+
 --subfunction used to generate code for the Map template, depending on the type of opponent
 ---@param mode string
+---@param isFfa boolean
 ---@return string
-function WikiCopyPaste._getMap(mode)
-	local lines = Array.extend(
-		'={{Map',
-		INDENT .. INDENT .. '|map=|winner=',
+function WikiCopyPaste._getMap(mode, isFfa)
+	local opponentLines = isFfa and {
+		INDENT .. INDENT .. '|date=',
+	} or {
 		mode == Opponent.team and INDENT .. INDENT .. '|players1=' or nil,
 		INDENT .. INDENT .. '|civs1=',
 		mode == Opponent.team and INDENT .. INDENT .. '|players2=' or nil,
 		INDENT .. INDENT .. '|civs2=',
+	}
+
+	local lines = Array.extend(
+		'={{Map',
+		INDENT .. INDENT .. '|map=' .. (not isFfa and '|winner=' or ''),
+		Array.extractValues(opponentLines),
 		INDENT .. '}}'
 	)
 	return table.concat(lines, '\n')
+end
+
+---@param opponents integer
+---@return string
+function WikiCopyPaste._getPointsMapping(opponents)
+	return table.concat(
+		Array.map(Array.range(1, opponents), function (index)
+			return '|p' .. index .. '='
+		end)
+	)
 end
 
 return WikiCopyPaste

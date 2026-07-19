@@ -1,12 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Iterator
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Table = Lua.import('Module:Table')
 
 local Iterator = {}
 

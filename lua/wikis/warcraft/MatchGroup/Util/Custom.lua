@@ -1,32 +1,33 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:MatchGroup/Util/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Faction = require('Module:Faction')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Faction = Lua.import('Module:Faction')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local TEAM_DISPLAY_MODE = 'team'
 local UNIFORM_DISPLAY_MODE = 'uniform'
 local SCORE_STATUS = MatchGroupInputUtil.STATUS.SCORE
 
+---@class WarcraftMatchGroupUtil: MatchGroupUtil
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
----@class WarcraftMatchGroupUtilGamePlayer: WarcraftStandardPlayer
+---@class WarcraftMatchGroupUtilGamePlayer: standardPlayer
 ---@field matchplayerIndex integer
 ---@field heroes string[]?
 ---@field position integer
@@ -45,19 +46,18 @@ local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 ---@field by number?
 ---@field map string
 
----@class WarcraftMatchGroupUtilSubmatch
+---@class WarcraftMatchGroupUtilSubmatch: MatchGroupUtilSubgroup
 ---@field games WarcraftMatchGroupUtilGame[]
 ---@field mode string
 ---@field opponents WarcraftMatchGroupUtilGameOpponent[]
 ---@field status string?
----@field subgroup number
 ---@field winner number?
 ---@field header string?
 
 ---@class WarcraftMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games WarcraftMatchGroupUtilGame[]
 ---@field opponentMode 'uniform'|'team'
----@field opponents WarcraftStandardOpponent[]
+---@field opponents standardOpponent[]
 ---@field vetoes WarcraftMatchGroupUtilVeto[]
 ---@field submatches WarcraftMatchGroupUtilSubmatch[]?
 ---@field casters string?
@@ -84,8 +84,8 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 	if match.opponentMode == TEAM_DISPLAY_MODE then
 		-- Compute submatches
 		match.submatches = Array.map(
-			CustomMatchGroupUtil.groupBySubmatch(match.games),
-			function(games) return CustomMatchGroupUtil.constructSubmatch(games, match) end
+			MatchGroupUtil.groupBySubgroup(match),
+			FnUtil.curry(CustomMatchGroupUtil.constructSubmatch, match)
 		)
 	end
 
@@ -98,9 +98,6 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 
 		table.insert(match.vetoes, {map = map, by = by})
 	end
-
-	-- Misc
-	match.casters = Table.extract(extradata, 'casters')
 
 	return match
 end
@@ -129,7 +126,7 @@ end
 
 
 ---@param game WarcraftMatchGroupUtilGame
----@param matchOpponents WarcraftStandardOpponent[]
+---@param matchOpponents standardOpponent[]
 ---@return WarcraftMatchGroupUtilGameOpponent[]
 function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	return Array.map(game.opponents, function(mapOpponent, opponentIndex)
@@ -149,31 +146,12 @@ function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	end)
 end
 
----Group games on the subgroup field to form submatches
----@param matchGames WarcraftMatchGroupUtilGame[]
----@return WarcraftMatchGroupUtilGame[][]
-function CustomMatchGroupUtil.groupBySubmatch(matchGames)
-	-- Group games on adjacent subgroups
-	local previousSubgroup = nil
-	local currentGames = nil
-	local submatchGames = {}
-	for _, game in ipairs(matchGames) do
-		if previousSubgroup == nil or previousSubgroup ~= game.subgroup then
-			currentGames = {}
-			table.insert(submatchGames, currentGames)
-			previousSubgroup = game.subgroup
-		end
-		---@cast currentGames -nil
-		table.insert(currentGames, game)
-	end
-	return submatchGames
-end
-
 ---Constructs a submatch object whose properties are aggregated from that of its games.
----@param games WarcraftMatchGroupUtilGame[]
 ---@param match WarcraftMatchGroupUtilMatch
+---@param subgroup MatchGroupUtilSubgroup
 ---@return WarcraftMatchGroupUtilSubmatch
-function CustomMatchGroupUtil.constructSubmatch(games, match)
+function CustomMatchGroupUtil.constructSubmatch(match, subgroup)
+	local games = subgroup.games
 	local firstGame = games[1]
 	local opponents = Table.deepCopy(firstGame.opponents)
 	local isSubmatch = String.startsWith(firstGame.map or '', 'Submatch')
@@ -208,14 +186,11 @@ function CustomMatchGroupUtil.constructSubmatch(games, match)
 		CustomMatchGroupUtil._determineSubmatchPlayerFactions(match, games, opponents, opponentIndex)
 	end)
 
-	return {
-		games = games,
+	return Table.mergeInto({
 		mode = firstGame.mode,
 		opponents = opponents,
-		subgroup = firstGame.subgroup,
 		winner = winner,
-		header = Table.extract(match.extradata or {}, 'subgroup' .. firstGame.subgroup .. 'header'),
-	}
+	}, subgroup)
 end
 
 ---@param match WarcraftMatchGroupUtilMatch
@@ -257,7 +232,7 @@ end
 ---Determines if any player in an opponent is not playing their main faction by comparing them to a reference opponent.
 ---Returns the factions played if at least one player chose an offfaction or nil if otherwise.
 ---@param gameOpponent WarcraftMatchGroupUtilGameOpponent
----@param referenceOpponent WarcraftStandardOpponent|WarcraftMatchGroupUtilGameOpponent
+---@param referenceOpponent standardOpponent|WarcraftMatchGroupUtilGameOpponent
 ---@return string[]?
 function CustomMatchGroupUtil.computeOfffactions(gameOpponent, referenceOpponent)
 	local gameFactions = {}

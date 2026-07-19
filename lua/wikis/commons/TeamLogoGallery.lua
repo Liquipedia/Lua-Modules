@@ -1,20 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:TeamLogoGallery
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Gallery = require('Module:Gallery')
-local Game = require('Module:Game')
-local Logic = require('Module:Logic')
-local Ordinal = require('Module:Ordinal')
-local Table = require('Module:Table')
-local Team = require('Module:Team')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Gallery = Lua.import('Module:Gallery')
+local Game = Lua.import('Module:Game')
+local Logic = Lua.import('Module:Logic')
+local Ordinal = Lua.import('Module:Ordinal')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local TeamLogoGallery = {}
 
@@ -24,7 +25,7 @@ function TeamLogoGallery.run(args)
 	args = args or {}
 	local name = (args.name or mw.title.getCurrentTitle().prefixedText):gsub('_', ' '):lower()
 
-	assert(mw.ext.TeamTemplate.teamexists(name), 'Missing team template "' .. name .. '"')
+	assert(TeamTemplate.exists(name), TeamTemplate.noTeamMessage(name))
 
 	local imageData = TeamLogoGallery._getImageData(name, Logic.readBool(args.showPresentLogo))
 
@@ -35,13 +36,13 @@ end
 ---@param showPresentLogo boolean
 ---@return {imageLightMode: string, imageDarkMode: string?, caption: string}[]
 function TeamLogoGallery._getImageData(name, showPresentLogo)
-	local historicalTeamTemplates = Logic.emptyOr(Team.queryHistorical(name)) or {[DateExt.defaultDate] = name}
+	local historicalTeamTemplates = Logic.emptyOr(TeamTemplate.queryHistorical(name)) or {[DateExt.defaultDate] = name}
 
 	local imageDatas = {}
 	for startDate, teamTemplate in Table.iter.spairs(historicalTeamTemplates) do
 		table.insert(imageDatas, {
 			startDate = startDate,
-			raw = mw.ext.TeamTemplate.raw(teamTemplate)
+			raw = TeamTemplate.getRaw(teamTemplate)
 		})
 	end
 
@@ -120,4 +121,4 @@ function TeamLogoGallery._makeCaptionAndBelow(imageData, index, finalName)
 	return caption, below
 end
 
-return Class.export(TeamLogoGallery)
+return Class.export(TeamLogoGallery, {exports = {'run'}})

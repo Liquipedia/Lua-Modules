@@ -1,12 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Injector
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 ---@class WidgetInjector: BaseClass
 ---@operator call(table?): WidgetInjector
@@ -20,8 +21,8 @@ end)
 
 ---Parses the widgets
 ---@param id string
----@param widgets Widget[]
----@return Widget[]?
+---@param widgets Renderable[]
+---@return Renderable[]?
 function Injector:parse(id, widgets)
 	return widgets
 end

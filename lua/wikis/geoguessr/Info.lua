@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=geoguessr
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -37,6 +36,11 @@ return {
 		},
 		transfers = {
 			showTeamName = true,
+		},
+		infoboxPlayer = {
+			automatedHistory = {
+				mode = 'automatic',
+			},
 		},
 	},
 	defaultRoundPrecision = 0,

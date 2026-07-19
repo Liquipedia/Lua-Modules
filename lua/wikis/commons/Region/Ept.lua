@@ -1,14 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Region/Ept
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local EptRegionData = mw.loadData('Module:Region/Ept/Data')
-local FnUtil = require('Module:FnUtil')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local EptRegionData = Lua.import('Module:Region/Ept/Data', {loadData = true})
+local FnUtil = Lua.import('Module:FnUtil')
 
 --[[
 Module for ESL Pro Tour regions. Each country and some dependent territories

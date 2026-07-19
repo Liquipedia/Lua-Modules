@@ -1,35 +1,32 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:PrizePool
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local String = Lua.import('Module:StringUtils')
 
 local Import = Lua.import('Module:PrizePool/Import')
 local BasePrizePool = Lua.import('Module:PrizePool/Base')
 local Placement = Lua.import('Module:PrizePool/Placement')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
-local Widgets = Lua.import('Module:Widget/All')
-local TableRow = Widgets.TableRow
-local TableCell = Widgets.TableCell
+local Html = Lua.import('Module:Widget/Html')
+local Span = Html.Span
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local TableCell = TableWidgets.Cell
 
 ---@class PrizePool: BasePrizePool
----@field options table
----@field _lpdbInjector LpdbInjector?
+---@operator call(...): PrizePool
 ---@field placements PrizePoolPlacement[]
 local PrizePool = Class.new(BasePrizePool)
-
-local NON_BREAKING_SPACE = '&nbsp;'
 
 ---@param args table
 function PrizePool:readPlacements(args)
@@ -50,58 +47,52 @@ function PrizePool:readPlacements(args)
 	self.placements = Import.run(self)
 end
 
+---@protected
 ---@param placement PrizePoolPlacement
----@return WidgetTableCell
+---@return Renderable
 function PrizePool:placeOrAwardCell(placement)
-	local placeCell = TableCell{
-		children = {placement:getMedal() or '', NON_BREAKING_SPACE, placement:_displayPlace()},
-		css = {['font-weight'] = 'bolder'},
-		classes = {'prizepooltable-place'},
-	}
-	placeCell.rowSpan = #placement.opponents
+	local badgeClass = placement:getBadgeClass()
+	local placeDisplay = placement:_displayPlace()
+	local content = badgeClass
+		and Span{classes = {'prizepooltable-badge', badgeClass}, children = placeDisplay}
+		or placeDisplay
 
-	return placeCell
+	return TableCell{
+		children = {content},
+		classes = {'prizepooltable-place'},
+		rowspan = #placement.opponents,
+	}
 end
 
+---@protected
+---@param placement PrizePoolPlacement
+---@return boolean
+function PrizePool:applyHideAfter(placement)
+	return placement.placeStart > self.options.hideafter
+end
+
+---@protected
 ---@param placement PrizePoolPlacement
 ---@return boolean
 function PrizePool:applyCutAfter(placement)
-	if placement.placeStart > self.options.cutafter then
-		return true
-	end
-	return false
+	return placement.placeStart > self.options.cutafter
 end
 
----@param placement PrizePoolPlacement?
----@param nextPlacement PrizePoolPlacement
----@param rows WidgetTableRow[]
-function PrizePool:applyToggleExpand(placement, nextPlacement, rows)
-	if placement ~= nil
-		and placement.placeStart <= self.options.cutafter
-		and placement.placeEnd >= self.options.cutafter
-		and placement ~= self.placements[#self.placements]
-		and nextPlacement.placeStart ~= placement.placeStart
-		and nextPlacement.placeEnd ~= placement.placeEnd then
-
-		table.insert(rows, self:_toggleExpand(placement.placeEnd + 1, self.placements[#self.placements].placeEnd))
+---@protected
+---@return {opentext: string, closetext: string}?
+function PrizePool:_collapseText()
+	local visible = Array.filter(self.placements, function(placement)
+		return placement.placeStart <= self.options.hideafter
+	end)
+	local lastVisible = visible[#visible]
+	local firstHidden = Array.find(visible, function(placement)
+		return placement.placeStart > self.options.cutafter
+	end)
+	if not firstHidden or not lastVisible then
+		return nil
 	end
-end
-
----@param placeStart number
----@param placeEnd number
----@return WidgetTableRow
-function PrizePool:_toggleExpand(placeStart, placeEnd)
-	local text = 'place ' .. placeStart .. ' to ' .. placeEnd
-	local expandButton = TableCell{
-		children = {'<div>' .. text .. '&nbsp;<i class="fa fa-chevron-down"></i></div>'},
-		classes = {'general-collapsible-expand-button'},
-	}
-	local collapseButton = TableCell{
-		children = {'<div>' .. text .. '&nbsp;<i class="fa fa-chevron-up"></i></div>'},
-		classes = {'general-collapsible-collapse-button'},
-	}
-
-	return TableRow{classes = {'ppt-toggle-expand'}, children = {expandButton, collapseButton}}
+	local text = 'place ' .. firstHidden.placeStart .. ' to ' .. lastVisible.placeEnd
+	return {opentext = text, closetext = text}
 end
 
 -- get the lpdbObjectName depending on opponenttype

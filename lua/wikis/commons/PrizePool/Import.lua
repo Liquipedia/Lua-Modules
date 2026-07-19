@@ -1,27 +1,26 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:PrizePool/Import
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MathUtil = require('Module:MathUtil')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Placement = Lua.import('Module:PrizePool/Placement')
-local TournamentStructure = Lua.import('Module:TournamentStructure')
-
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
 
 local AUTOMATION_START_DATE = '2023-01-01'
 local GROUPSCORE_DELIMITER = '/'
@@ -40,13 +39,16 @@ local GSL_STYLE_SCORES = {
 local BYE_OPPONENT_NAME = 'bye'
 
 ---@class PrizePoolImport
+---@operator call(PrizePool): PrizePoolImport
+---@field parent PrizePool
+---@field config PrizePoolImportConfig
 local Import = Class.new(function(self, ...) self:init(...) end)
 
 ---@class PrizePoolImportConfig
 ---@field ignoreNonScoreEliminations boolean
 ---@field importLimit integer
 ---@field placementsToSkip integer
----@field matchGroupsSpec table
+---@field matchGroupsSpec MatchGroupsSpec
 ---@field groupElimStatuses string[]
 ---@field groupScoreDelimiter string
 ---@field allGroupsUseWdl boolean
@@ -113,18 +115,13 @@ function Import._getConfig(args, placements)
 		placementsToSkip = tonumber(args.placementsToSkip),
 		matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(args)
 			or TournamentStructure.currentPageSpec(),
-		groupElimStatuses = Array.map(
-			mw.text.split(args.groupElimStatuses or DEFAULT_ELIMINATION_STATUS, ','),
-			String.trim
-		),
+		groupElimStatuses = Array.parseCommaSeparatedString(args.groupElimStatuses or DEFAULT_ELIMINATION_STATUS),
 		groupScoreDelimiter = args.groupScoreDelimiter or GROUPSCORE_DELIMITER,
 		allGroupsUseWdl = Logic.readBool(args.allGroupsUseWdl),
 		stageImportLimits = processStagesConfig('importLimit', tonumber),
 		stagePlacementsToSkip = processStagesConfig('placementsToSkip', tonumber),
 		stageImportWinners = processStagesConfig('importWinners', Logic.readBoolOrNil),
-		stageGroupElimStatuses = processStagesConfig('groupElimStatuses', function(val)
-			return Array.map(mw.text.split(val, ','), String.trim)
-		end),
+		stageGroupElimStatuses = processStagesConfig('groupElimStatuses', Array.parseCommaSeparatedString),
 		shiftPlacementsBy = tonumber(args.shiftPlacementsBy) or 0,
 	}
 end
@@ -219,7 +216,7 @@ function Import:_computeStagePlacementEntries(stage, options)
 		and math.min(maxPlacementCount, endingPlacement)
 		or maxPlacementCount
 
-	return Array.map(Array.range(startingPlacement, maxPlacementCount), function(placementIndex)
+	return Array.mapRange(startingPlacement, maxPlacementCount, function(placementIndex)
 		return Array.flatten(Array.map(groupPlacementEntries, function(placementEntries)
 			return placementEntries[placementIndex]
 		end))
@@ -337,7 +334,7 @@ end
 
 ---@param placementEntry table
 ---@param match MatchGroupUtilMatch
----@return table
+---@return {date: string, matchId: string, opponent: standardOpponent?, vsOpponent: standardOpponent?}
 function Import._makeEntryFromMatch(placementEntry, match)
 	local entry = {
 		date = match.date,
@@ -354,8 +351,6 @@ function Import._makeEntryFromMatch(placementEntry, match)
 		vsOpponent.isResolved = true
 
 		Table.mergeInto(entry, {
-			lastGameScore = {opponent.score, 0, vsOpponent.score},
-			lastStatuses = {opponent.status, vsOpponent.status},
 			opponent = opponent,
 			vsOpponent = vsOpponent,
 		})
@@ -480,7 +475,7 @@ function Import._findBracketFirstDropdownRounds(bracket)
 	local countsByRound = MatchGroupCoordinates.computeRawCounts(bracket)
 	local roundIndexes = Array.range(1, #bracket.rounds)
 
-	return Array.map(Array.range(2, #bracket.sections), function(sectionIndex)
+	return Array.mapRange(2, #bracket.sections, function(sectionIndex)
 		local firstRoundWithPositiveCount = Array.find(roundIndexes, function(roundIndex)
 			return countsByRound[roundIndex][sectionIndex] >= 0 end)
 
@@ -647,15 +642,15 @@ function Import:_formatGroupScore(lpdbEntry)
 	return table.concat(wdl, self.config.groupScoreDelimiter)
 end
 
----@param opponentData match2opponent
----@return string|number?
+---@param opponentData standardOpponent
+---@return string
+---@overload fun(opponentData: nil): nil
 function Import._getScore(opponentData)
 	if not opponentData then
-		return
+		return nil
 	end
 
-	return opponentData.status == SCORE_STATUS and opponentData.score
-		or opponentData.status
+	return OpponentDisplay.InlineScore(opponentData)
 end
 
 ---@param lpdbEntry table
@@ -715,12 +710,13 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 	end
 
 	local score, vsScore, lastVs
-	for opponentIndex, opponent in pairs(match.match2opponents) do
+	for opponentIndex, opponentRecord in pairs(match.match2opponents) do
+		local opponent = MatchGroupUtil.opponentFromRecord(match, opponentRecord, opponentIndex)
 		if opponent.name == opponentName then
 			score = Import._getScore(opponent)
 		else
 			vsScore = Import._getScore(opponent)
-			lastVs = MatchGroupUtil.opponentFromRecord(match, opponent, opponentIndex)
+			lastVs = opponent
 		end
 	end
 

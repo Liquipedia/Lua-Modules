@@ -1,22 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:Infobox/Person/User/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
-local Class = require('Module:Class')
-local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local Class = Lua.import('Module:Class')
+local HeroNames = Lua.import('Module:HeroNames', {loadData = true})
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local User = Lua.import('Module:Infobox/Person/User')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -26,10 +26,13 @@ local SIZE_HERO = '44x25px'
 ---@class Dota2InfoboxUser: InfoboxUser
 local CustomUser = Class.new(User)
 
+---@class Dota2InfoboxUserWidgetInjector: WidgetInjector
+---@operator call(Dota2InfoboxUser): Dota2InfoboxUserWidgetInjector
+---@field caller Dota2InfoboxUser
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return VNode
 function CustomUser.run(frame)
 	local user = CustomUser(frame)
 	user:setWidgetInjector(CustomInjector(user))
@@ -40,24 +43,24 @@ function CustomUser.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Gender', content = {args.gender}},
-			Cell{name = 'Languages', content = {args.languages}},
-			Cell{name = 'Favorite heroes', content = {self.caller:_getFavouriteHeroes()}},
-			Cell{name = 'Favorite players', content = self.caller:_getArgsfromBaseDefault('fav-player', 'fav-players')},
-			Cell{name = 'Favorite casters', content = self.caller:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
-			Cell{name = 'Favorite teams', content = {args['fav-teams']}}
+			Cell{name = 'Gender', children = {args.gender}},
+			Cell{name = 'Languages', children = {args.languages}},
+			Cell{name = 'Favorite heroes', children = {self.caller:_getFavouriteHeroes()}},
+			Cell{name = 'Favorite players', children = self.caller:_getArgsfromBaseDefault('fav-player', 'fav-players')},
+			Cell{name = 'Favorite casters', children = self.caller:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
+			Cell{name = 'Favorite teams', children = {args['fav-teams']}}
 		)
 		if not String.isEmpty(args['fav-team-1']) then
 			Array.appendWith(widgets,
 				Title{children = 'Favorite teams'},
-				Center{children = {self.caller:_getFavouriteTeams()}}
+				Center{children = self.caller:_getFavouriteTeams()}
 			)
 		end
 	elseif

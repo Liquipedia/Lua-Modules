@@ -1,27 +1,26 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Panel
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
-local Widget = Lua.import('Module:Widget')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+
+local Component = Lua.import('Module:Widget/Component')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class PanelParameters
 ---@field bodyClass string[]?
 ---@field bodyStyle table<string, any>?
 ---@field boxId integer?
----@field children (Widget|string|Html|nil)|(Widget|string|Html|nil)[]
+---@field children Renderable|Renderable[]
 ---@field classes string[]?
 ---@field heading string|Html|Widget
 ---@field headingAttributes table<string, any>?
@@ -30,21 +29,17 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 ---@field padding boolean?
 ---@field panelAttributes table<string, any>?
 
----@class Panel: Widget
----@operator call(PanelParameters): Panel
----@field props PanelParameters
-local Panel = Class.new(Widget)
-
+---@param props PanelParameters
 ---@return Widget
-function Panel:render()
-	local boxId = self.props.boxId
-	local attributes = self.props.headingAttributes or {}
+local function Panel(props)
+	local boxId = props.boxId
+	local attributes = props.headingAttributes or {}
 	local hasToggle = boxId ~= nil
 
 	if hasToggle then
 		attributes = Table.merge(attributes, {
-			tabindex = "0",
-			['data-component'] =  "panel-box-collapsible-button"
+			tabindex = '0',
+			['data-component'] = 'panel-box-collapsible-button'
 		})
 	end
 
@@ -58,33 +53,34 @@ function Panel:render()
 					children = { IconFa{iconName = 'collapse'}, }
 				}
 			} or nil,
-			self.props.heading,
-			self.props.headingH2 and HtmlWidgets.H2{children = { self.props.headingH2 }} or nil,
-			self.props.headingH3 and HtmlWidgets.H3{children = { self.props.headingH3 }} or nil
+			props.heading,
+			props.headingH2 and Html.H2{children = { props.headingH2 }} or nil,
+			props.headingH3 and Html.H3{children = { props.headingH3 }} or nil
 		)
 	}
 
 	local body = Div{
 		classes = WidgetUtil.collect(
 			hasToggle and 'panel-box-collapsible-content' or nil,
-			Logic.readBool(self.props.padding) and 'panel-box-body' or nil,
-			self.props.bodyClass
+			'panel-box-body',
+			not Logic.readBool(props.padding) and 'panel-box-body--no-padding' or nil,
+			props.bodyClass
 		),
-		css = self.props.bodyStyle,
+		css = props.bodyStyle,
 		attributes = hasToggle and {
 			['data-component'] = 'panel-box-content'
 		} or {},
-		children = self.props.children
+		children = props.children
 	}
 
 	return Div{
-		classes = WidgetUtil.collect('panel-box', 'wiki-bordercolor-light', self.props.classes),
+		classes = WidgetUtil.collect('panel-box', 'wiki-bordercolor-light', props.classes),
 		attributes = Table.merge(
 			hasToggle and {
 				['data-component'] = 'panel-box',
 				['data-panel-box-id'] = boxId
 			} or {},
-			self.props.panelAttributes
+			props.panelAttributes
 		),
 		children = WidgetUtil.collect(
 			heading, body
@@ -93,4 +89,4 @@ function Panel:render()
 
 end
 
-return Panel
+return Component.component(Panel)

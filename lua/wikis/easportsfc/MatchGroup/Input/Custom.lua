@@ -1,20 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=easportsfc
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Ordinal = require('Module:Ordinal')
-local Operator = require('Module:Operator')
+
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+local Ordinal = Lua.import('Module:Ordinal')
+local Operator = Lua.import('Module:Operator')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CustomMatchGroupInput = {}
 CustomMatchGroupInput.DEFAULT_MODE = 'solo'
@@ -110,7 +109,7 @@ function CustomMatchGroupInput._submatchPenaltyScores(map, opponents, hasSubmatc
 end
 
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
@@ -158,7 +157,7 @@ end
 
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	return {

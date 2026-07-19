@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=heroes
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -37,6 +36,9 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 190,
 			sortCasters = true,
+		},
+		participants = {
+			defaultPlayerNumber = 5,
 		},
 	},
 	defaultRoundPrecision = 0,

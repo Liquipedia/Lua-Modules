@@ -23,5 +23,10 @@
 	"workspace.ignoreDir": [
 		".vscode",
 		"lua/3rd"
-	]
+	],
+	"runtime.special": {
+		"Lua.import": "require",
+		"Lua.requireIfExists": "require",
+		"mw.loadData": "require"
+	}
 }

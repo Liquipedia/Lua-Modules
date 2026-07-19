@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=overwatch
 -- page=Module:MapToMode
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

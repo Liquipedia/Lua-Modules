@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Table
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -37,6 +36,21 @@ function Table.includes(tbl, value, isPattern)
 		end
 	end
 	return false
+end
+
+---Gets the key for a value in a table. If there's multiple keys for the value,
+---the first one (without any ordering) is returned. If the value is not found, nil is returned.
+---@generic K, V
+---@param tbl {[K]: V}
+---@param value V
+---@return K
+function Table.getKeyOfValue(tbl, value)
+	for key, entry in pairs(tbl) do
+		if entry == value then
+			return key
+		end
+	end
+	return nil
 end
 
 ---@generic K, V, T
@@ -123,9 +137,10 @@ end
 ---options.reuseRef
 ---If a table reference exists at two locations in the input, then this option
 ---will allow the locations to share a reference in the output. Enabled by default.
----@param tbl_ table
+---@generic T:table
+---@param tbl_ T
 ---@param options? {copyMetatable: boolean, reuseRef: boolean}
----@return table
+---@return T
 function Table.deepCopy(tbl_, options)
 	options = options or {}
 	assert(type(tbl_) == 'table', 'Table.deepCopy: Input must be a table')
@@ -514,8 +529,8 @@ Table.iter = {}
 -- iterate over table in a sorted order
 ---@generic K, V
 ---@param tbl {[K]: V}
----@param order? fun(tbl: table, a: K, b: K): boolean
----@return function
+---@param order? fun(tbl: {[K]: V}, a: K, b: K): boolean
+---@return fun(): K?, V?
 function Table.iter.spairs(tbl, order)
 	-- collect the keys
 	local keys = {}

@@ -1,31 +1,29 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Person/User
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Person = Lua.import('Module:Infobox/Person')
 
 ---@class InfoboxUser: Person
+---@operator call(Frame): InfoboxUser
 local User = Class.new(Person)
 
----@return string
+---@return VNode[]
 function User:_getFavouriteTeams()
 	local foundArgs = self:getAllArgsForBase(self.args, 'fav-team-')
 
-	local display = ''
-	for _, item in ipairs(foundArgs) do
-		local team = item:lower():gsub('_', ' ')
-		display = display .. mw.ext.TeamTemplate.teamicon(team)
-	end
-
-	return display
+	return Array.map(foundArgs, function (favouriteTeam)
+		return OpponentDisplay.InlineTeamContainer{template = favouriteTeam, style = 'icon'}
+	end)
 end
 
 ---@param base string

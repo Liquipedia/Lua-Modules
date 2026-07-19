@@ -1,20 +1,20 @@
 ---
 -- @Liquipedia
--- wiki=freefire
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class FreefireLeagueInfobox: InfoboxLeague
@@ -35,7 +35,7 @@ local MODES = {
 }
 
 ---@param frame Frame
----@return Html
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -44,19 +44,21 @@ function CustomLeague.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
-	if id == 'custom' then
+	if id == 'sponsors' then
+		table.insert(widgets, Cell{name = 'Official Device', children = {args.device}})
+	elseif id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Number of Players', content = {args.player_number}},
-			Cell{name = 'Number of Teams', content = {args.team_number}}
+			Cell{name = 'Number of Players', children = {args.player_number}},
+			Cell{name = 'Number of Teams', children = {args.team_number}}
 		)
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game Mode', content = {CustomLeague._getGameMode(args.mode)}},
+			Cell{name = 'Game Mode', children = {CustomLeague._getGameMode(args.mode)}},
 		}
 	end
 	return widgets

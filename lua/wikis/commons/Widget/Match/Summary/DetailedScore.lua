@@ -1,65 +1,57 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/DetailedScore
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Array = Lua.import('Module:Array')
 
----@class MatchSummaryDetailedScore: Widget
----@operator call(table): MatchSummaryDetailedScore
-local MatchSummaryDetailedScore = Class.new(Widget)
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 
----@return Widget
-function MatchSummaryDetailedScore:render()
-	local flipped = self.props.flipped
-	local partialScores = Array.map(self.props.partialScores or {}, function(partialScore)
+---@class MatchSummaryDetailedScoreProps
+---@field partialScores {style: string?, icon: Renderable?, score: Renderable?}[]
+---@field flipped boolean?
+---@field score Renderable?
+
+---@param props MatchSummaryDetailedScoreProps
+---@return VNode
+local function MatchSummaryDetailedScore(props)
+	local flipped = props.flipped
+	local partialScores = Array.map(props.partialScores or {}, function(partialScore)
 		local children = {partialScore.score or '', partialScore.icon}
 
-		local styles = Array.append({},
-			'brkts-popup-body-match-sidewins',
+		local styles = Array.extend(
+			'brkts-popup-body-detailed-score',
 			partialScore.style,
-			partialScore.icon and 'brkts-popup-body-match-sidewins-icon' or nil
+			partialScore.icon and 'brkts-popup-body-detailed-score-icon' or nil
 		)
 
-		return HtmlWidgets.Td{
+		return Html.Span{
 			classes = styles,
-			children = flipped and Array.reverse(children) or children,
+			children = children,
 		}
 	end)
 
-	return HtmlWidgets.Div{
-		css = {['text-align'] = 'center', direction = flipped and 'rtl' or 'ltr'},
-		children = HtmlWidgets.Table{
-			css = {['line-height'] = '28px', float = flipped and 'right' or 'left'},
-			children = {
-				HtmlWidgets.Tr{
-					children = {
-						HtmlWidgets.Td{
-							attributes = {rowspan = 2},
-							css = {['font-size'] = '16px', width = '24px'},
-							children = self.props.score
-						},
-						unpack(Array.filter(partialScores, function(_, i)
-							return i % 2 == 1
-						end))
-					}
-				},
-				HtmlWidgets.Tr{
-					children = Array.filter(partialScores, function(_, i)
-						return i % 2 == 0
-					end)
-				}
+	return Html.Div{
+		classes = {
+			'brkts-popup-body-detailed-scores-container',
+			flipped and 'flipped' or nil,
+		},
+		children = {
+			Html.Div{
+				classes = {'brkts-popup-body-detailed-scores-main-score'},
+				children = props.score
+			},
+			Html.Div{
+				classes = {'brkts-popup-body-detailed-scores'},
+				children = partialScores
 			}
 		}
 	}
 end
 
-return MatchSummaryDetailedScore
+return Component.component(MatchSummaryDetailedScore)

@@ -1,20 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:SeriesMedalStats/ParticipantTeam
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local MedalStatsBase = Lua.import('Module:SeriesMedalStats')
 
@@ -41,7 +42,7 @@ function MedalStats:create()
 	self:_processData()
 
 	local nameDisplay = function(identifier)
-		return mw.ext.TeamTemplate.team(identifier)
+		return OpponentDisplay.InlineTeamContainer{template = identifier}
 	end
 
 	local display = self:defaultBuild(nameDisplay, 'Team', 'Teams')
@@ -61,7 +62,7 @@ function MedalStats:_processData()
 	---@param teamTemplate string
 	---@return string?
 	local resolveTeamToIdentifier = function(teamTemplate)
-		local rawData = mw.ext.TeamTemplate.raw(teamTemplate)
+		local rawData = TeamTemplate.getRawOrNil(teamTemplate)
 
 		if not rawData or not rawData.page then return end
 

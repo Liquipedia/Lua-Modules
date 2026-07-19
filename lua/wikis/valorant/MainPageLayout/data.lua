@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,13 +7,16 @@
 
 local Lua = require('Module:Lua')
 
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
+
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local LiquipediaApp = Lua.import('Module:Widget/MainPage/LiquipediaApp')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
+local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 
 local CONTENT = {
@@ -22,23 +24,29 @@ local CONTENT = {
 		heading = 'The Game',
 		body = '{{Liquipedia:The Game}}',
 		padding = true,
-		boxid = 1503,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
 	},
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{rumours = true},
-		boxid = 1509,
+		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
+	},
+	thisDay = {
+		heading = ThisDayWidgets.Title(),
+		body = ThisDayWidgets.Content(),
+		padding = true,
+		boxid = MainPageLayoutUtil.BoxId.THIS_DAY,
 	},
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
-		boxid = 1516,
+		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
 	liquipediaApp = {
 		heading = 'Download the Liquipedia App',
 		padding = true,
 		body = LiquipediaApp{},
-		boxid = 1505,
+		boxid = MainPageLayoutUtil.BoxId.MOBILE_APP,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -50,11 +58,8 @@ local CONTENT = {
 	matches = {
 		heading = 'Matches',
 		body = MatchTicker{},
-		padding = true,
-		boxid = 1507,
-		panelAttributes = {
-			['data-switch-group-container'] = 'countdown',
-		},
+		padding = false,
+		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -63,7 +68,7 @@ local CONTENT = {
 			completedDays = 14,
 		},
 		padding = true,
-		boxid = 1508,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }
 
@@ -141,7 +146,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				sizes = {xxl = 5, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 2,
@@ -158,7 +163,7 @@ return {
 				}
 			},
 			{ -- Right
-				size = 6,
+				sizes = {xxl = 7, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 3,
@@ -190,6 +195,10 @@ return {
 								},
 							},
 						},
+					},
+					{
+						mobileOrder = 6,
+						content = CONTENT.thisDay,
 					},
 				},
 			},

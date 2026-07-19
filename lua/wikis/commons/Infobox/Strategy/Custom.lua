@@ -1,21 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Strategy/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Strategy = Lua.import('Module:Infobox/Strategy')
 
 ---@class CustomStrategyInfobox: StrategyInfobox
+---@operator call(Frame): CustomStrategyInfobox
 local CustomStrategy = Class.new(Strategy)
 
 ---@param frame Frame
----@return Html
+---@return VNode
 function CustomStrategy.run(frame)
 	local customStrategy = CustomStrategy(frame)
 	return customStrategy:createInfobox()

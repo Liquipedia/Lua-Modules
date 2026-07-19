@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/All
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -17,14 +16,17 @@ Widgets.CharacterBanTable = Lua.import('Module:Widget/Match/Summary/CharacterBan
 Widgets.Characters = Lua.import('Module:Widget/Match/Summary/Characters')
 Widgets.Character = Lua.import('Module:Widget/Match/Summary/Character')
 Widgets.Collapsible = Lua.import('Module:Widget/Match/Summary/Collapsible')
+Widgets.Container = Lua.import('Module:Widget/Match/Summary/Container')
 Widgets.DetailedScore = Lua.import('Module:Widget/Match/Summary/DetailedScore')
+Widgets.Footer = Lua.import('Module:Widget/Match/Summary/Footer')
 Widgets.GameCenter = Lua.import('Module:Widget/Match/Summary/GameCenter')
 Widgets.GameComment = Lua.import('Module:Widget/Match/Summary/GameComment')
+Widgets.GamesContainer = Lua.import('Module:Widget/Match/Summary/GamesContainer')
+Widgets.GameRow = Lua.import('Module:Widget/Match/Summary/GameRow')
 Widgets.GameTeamWrapper = Lua.import('Module:Widget/Match/Summary/GameTeamWrapper')
 Widgets.GameWinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLossIndicator')
 Widgets.MapVeto = Lua.import('Module:Widget/Match/Summary/MapVeto')
 Widgets.MatchComment = Lua.import('Module:Widget/Match/Summary/MatchComment')
-Widgets.MatchPageLink = Lua.import('Module:Widget/Match/Summary/MatchPageLink')
 Widgets.Mvp = Lua.import('Module:Widget/Match/Summary/Mvp')
 Widgets.Row = Lua.import('Module:Widget/Match/Summary/Row')
 

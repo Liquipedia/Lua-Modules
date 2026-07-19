@@ -1,23 +1,23 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local PageLink = require('Module:Page')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local PageLink = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -38,6 +38,7 @@ local PLATFORM_ALIAS = {
 	playstation = 'Playstation',
 	ps = 'Playstation',
 	ps4 = 'Playstation',
+	mobile = 'Mobile',
 }
 
 local UBISOFT_TIERS = {
@@ -50,7 +51,7 @@ local UBISOFT_TIERS = {
 }
 
 ---@param frame Frame
----@return Html
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -59,18 +60,19 @@ function CustomLeague.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-		Cell{name = 'Teams', content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
-		Cell{name = 'Game', content = {Game.name{game = args.game}}},
-		Cell{name = 'Platform', content = {caller:_createPlatformCell(args)}},
-		Cell{name = 'Players', content = {args.player_number}}
+		Cell{name = 'Teams', children = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
+		Cell{name = 'Game', children = {Game.name{game = args.game}}},
+		Cell{name = 'Platform', children = {caller:_createPlatformCell(args)}},
+		Cell{name = 'Players', children = {args.player_number}},
+		Cell{name = 'Mode', children = {args.mode or '5v5'}}
 	)
 	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
@@ -90,7 +92,7 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets,
 				Cell{
 					name = 'Ubisoft Tier',
-					content = {'[[' .. UBISOFT_TIERS[caller.data.publishertier] .. ']]'},
+					children = {'[[' .. UBISOFT_TIERS[caller.data.publishertier] .. ']]'},
 					classes = {'valvepremier-highlighted'}
 				}
 			)
@@ -104,10 +106,7 @@ end
 ---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(self:getAllArgsForBase(args, 'map'), ';')
-
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
-	lpdbData.extradata.startdatetext = self:_standardiseRawDate(args.sdate or args.date)
-	lpdbData.extradata.enddatetext = self:_standardiseRawDate(args.edate or args.date)
 
 	return lpdbData
 end
@@ -118,21 +117,6 @@ function CustomLeague:_validPublisherTier(publishertier)
 	return UBISOFT_TIERS[string.lower(publishertier or '')]
 end
 
----@param dateString string
----@return string
-function CustomLeague:_standardiseRawDate(dateString)
-	-- Length 7 = YYYY-MM
-	-- Length 10 = YYYY-MM-??
-	if String.isEmpty(dateString) or (#dateString ~= 7 and #dateString ~= 10) then
-		return ''
-	end
-
-	if #dateString == 7 then
-		dateString = dateString .. '-??'
-	end
-	dateString = dateString:gsub('%-XX', '-??')
-	return dateString
-end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)

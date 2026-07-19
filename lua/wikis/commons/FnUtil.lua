@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:FnUtil
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -12,6 +11,7 @@
 local FnUtil = {}
 
 ---@alias memoizableFunction fun(input: any): any
+---@alias memoizableFunction2 fun(input: any, input2: any): any
 
 ---Creates a memoized copy of a 0 or 1 param function.
 ---@generic T:memoizableFunction
@@ -35,6 +35,34 @@ function FnUtil.memoize(func)
 				results[x] = func(x)
 			end
 			return results[x]
+		end
+	end
+end
+
+---Creates a memoized copy of a 2 param function.
+---@generic T:memoizableFunction2
+---@param func T
+---@return T
+function FnUtil.memoize2(func)
+	local called = {}
+	local results = {}
+	local xNil = FnUtil.memoize(function(y) return func(nil, y) end)
+	local yNil = FnUtil.memoize(function(x) return func(x, nil) end)
+	return function(x, y)
+		if y == nil then
+			return yNil(x)
+		elseif x == nil then
+			return xNil(y)
+		else
+			if not called[x] then
+				called[x] = {}
+				results[x] = {}
+			end
+			if not called[x][y] then
+				called[x][y] = true
+				results[x][y] = func(x, y)
+			end
+			return results[x][y]
 		end
 	end
 end

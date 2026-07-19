@@ -1,38 +1,36 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/MainPage/ThisDay/Content
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Template = require('Module:Template')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local DateExt = Lua.import('Module:Date/Ext')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Template = Lua.import('Module:Template')
+
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
-local Small = HtmlWidgets.Small
+local Small = Html.Small
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class ThisDayContent: Widget
----@field props { month: integer?, day: integer?, birthdayListPage: string? }
----@operator call(table): ThisDayContent
-local ThisDayContent = Class.new(Widget)
-ThisDayContent.defaultProps = {
-	month = tonumber(os.date('%m')),
-	day = tonumber(os.date('%d'))
+local defaultProps = {
+	month = DateExt.getMonthOf(),
+	day = DateExt.getDayOf()
 }
 
-function ThisDayContent:render()
-	local month = self.props.month
-	local day = self.props.day
+---@param props { month: integer?, day: integer?, birthdayListPage: string? }
+---@return Renderable[]
+local function ThisDayContent(props)
+	local month = props.month
+	local day = props.day
 	local frame = mw.getCurrentFrame()
-	local birthdayListPage = self.props.birthdayListPage
+	local birthdayListPage = props.birthdayListPage
 	local showBirthdayList = String.isNotEmpty(birthdayListPage) and Page.exists(birthdayListPage --[[@as string]])
 	return WidgetUtil.collect(
 		Div{
@@ -41,18 +39,16 @@ function ThisDayContent:render()
 				Template.safeExpand(frame, 'Liquipedia:This day/' .. month .. '/' .. day)
 			}
 		},
-		showBirthdayList and HtmlWidgets.Fragment{
-			children = {
-				HtmlWidgets.Hr(),
-				Small{
-					css = { ['font-style'] = 'italic' },
-					children = {
-						Link{ children = 'Click to see all birthdays', link = birthdayListPage }
-					}
+		showBirthdayList and {
+			Html.Hr(),
+			Small{
+				css = { ['font-style'] = 'italic' },
+				children = {
+					Link{ children = 'Click to see all birthdays', link = birthdayListPage }
 				}
 			}
 		} or nil,
-		HtmlWidgets.Br(),
+		Html.Br(),
 		Small{
 			attributes = { id = 'this-day-trivialink' },
 			children = {
@@ -66,4 +62,4 @@ function ThisDayContent:render()
 	)
 end
 
-return ThisDayContent
+return Component.component(ThisDayContent, defaultProps)

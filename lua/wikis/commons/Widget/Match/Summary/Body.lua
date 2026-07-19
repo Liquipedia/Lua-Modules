@@ -1,31 +1,25 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/Body
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Array = Lua.import('Module:Array')
 
----@class MatchSummaryBody: Widget
----@operator call(table): MatchSummaryBody
-local MatchSummaryBody = Class.new(Widget)
-MatchSummaryBody.defaultProps = {
-	classes = {},
-}
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
----@return Widget
-function MatchSummaryBody:render()
+---@param props {classes: string[]?, children: Renderable|Renderable[]?}
+---@return VNode
+local function MatchSummaryBody(props)
 	return Div{
-		classes = {'brkts-popup-body', unpack(self.props.classes)},
-		children = self.props.children,
+		classes = Array.extend('brkts-popup-body', props.classes),
+		children = props.children,
 	}
 end
 
-return MatchSummaryBody
+return Component.component(MatchSummaryBody)

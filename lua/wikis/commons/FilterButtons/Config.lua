@@ -1,12 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:FilterButtons/Config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Tier = require('Module:Tier/Utils')
+local Lua = require('Module:Lua')
+
+local Tier = Lua.import('Module:Tier/Utils')
+
 local Config = {}
 
 ---@type FilterButtonCategory[]

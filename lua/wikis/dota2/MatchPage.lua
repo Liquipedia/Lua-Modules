@@ -1,31 +1,29 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:MatchPage
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
+local Label = Lua.import('Module:Widget/Basic/Label')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local Comment = Lua.import('Module:Widget/Match/Page/Comment')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
+local PlayerStatContainer = Lua.import('Module:Widget/Match/Page/PlayerStat/Container')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local TeamVeto = Lua.import('Module:Widget/Match/Page/TeamVeto')
 local VetoItem = Lua.import('Module:Widget/Match/Page/VetoItem')
@@ -37,29 +35,13 @@ local MatchPage = Class.new(BaseMatchPage)
 
 local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local ITEM_IMAGE_SIZE = '64px'
-local KDA_ICON = IconFa{iconName = 'dota2_kda', hover = 'KDA'}
-local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
-
-local AVAILABLE_FOR_TIERS = {1}
-local MATCH_PAGE_START_TIME = 1725148800 -- September 1st 2024 midnight
-
----@param match table
----@return boolean
-function MatchPage.isEnabledFor(match)
-	return Table.includes(AVAILABLE_FOR_TIERS, tonumber(match.liquipediatier))
-			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > MATCH_PAGE_START_TIME)
-end
+local KDA_ICON = IconFa{iconName = 'kda', hover = 'KDA'}
+local SPAN_SLASH = Html.Span{classes = {'slash'}, children = '/'}
 
 ---@param props {match: MatchGroupUtilMatch}
 ---@return Widget
 function MatchPage.getByMatchId(props)
 	local matchPage = MatchPage(props.match)
-
-	-- Update the view model with game and team data
-	matchPage:populateGames()
-
-	-- Add more opponent data field
-	matchPage:populateOpponents()
 
 	return matchPage:render()
 end
@@ -70,9 +52,9 @@ function MatchPage:populateGames()
 		game.teams = Array.map(Array.range(1, 2), function(teamIdx)
 			local team = {}
 
-			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
+			team.scoreDisplay = game.winner == teamIdx and 'win' or game.finished and 'loss' or '-'
 			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
-			team.players = Array.map(game.opponents[teamIdx].players or {}, function(player)
+			team.players = Array.map(Array.filter(game.opponents[teamIdx].players or {}, Table.isNotEmpty), function(player)
 				local newPlayer = Table.mergeInto(player, {
 					displayName = player.name or player.player,
 					link = player.player,
@@ -107,7 +89,7 @@ function MatchPage:populateGames()
 end
 
 ---@param item {name: string?, image: string?}
----@return Widget
+---@return Renderable
 function MatchPage.makeItemDisplay(item)
 	return IconImage{
 		imageLight = Logic.emptyOr(item.image, 'EmptyIcon itemicon dota2 gameasset.png'),
@@ -118,9 +100,9 @@ function MatchPage.makeItemDisplay(item)
 end
 
 ---@param game MatchPageGame
----@return Widget
+---@return Renderable
 function MatchPage:renderGame(game)
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = WidgetUtil.collect(
 			self:_renderDraft(game),
 			self:_renderTeamStats(game),
@@ -131,10 +113,10 @@ end
 
 ---@private
 ---@param game MatchPageGame
----@return Widget[]
+---@return Renderable[]
 function MatchPage:_renderDraft(game)
 	return {
-		HtmlWidgets.H3{children = 'Draft'},
+		Html.H3{children = 'Draft'},
 		Div{
 			classes = {'match-bm-game-veto-wrapper'},
 			children = Array.map(self.opponents, function (opponent, opponentIndex)
@@ -170,20 +152,20 @@ end
 
 ---@private
 ---@param game MatchPageGame
----@return Widget[]
+---@return Renderable[]
 function MatchPage:_renderTeamStats(game)
 	return {
-		HtmlWidgets.H3{children = 'Team Stats'},
+		Html.H3{children = 'Team Stats'},
 		Div{
 			classes = {'match-bm-team-stats'},
 			children = {
 				Div{
 					classes = {'match-bm-team-stats-header'},
 					children = WidgetUtil.collect(
-						HtmlWidgets.H4{
+						Html.H4{
 							classes = {'match-bm-team-stats-header-title'},
 							children = game.finished
-								and self.opponents[game.winner].name .. ' Victory'
+								and self.opponents[game.winner].teamTemplateData.name .. ' Victory'
 								or 'No winner determined yet'
 						},
 						game.length and Div{children = game.length} or nil
@@ -229,7 +211,7 @@ function MatchPage:_renderTeamStats(game)
 									team2Value = game.teams[2].objectives.barracks
 								},
 								{
-									icon = HtmlWidgets.Span{
+									icon = Html.Span{
 										classes = {'liquipedia-custom-icon', 'liquipedia-custom-icon-roshan'}
 									},
 									name = 'Roshans',
@@ -249,9 +231,10 @@ end
 ---@private
 ---@param game MatchPageGame
 ---@param teamIndex integer
----@return Widget
+---@return Renderable
 function MatchPage:_renderStatsTeamDisplay(game, teamIndex)
 	local team = game.teams[teamIndex]
+	local scoreDisplay = team.scoreDisplay
 	return Div{
 		classes = {'match-bm-team-stats-team'},
 		children = {
@@ -263,12 +246,10 @@ function MatchPage:_renderStatsTeamDisplay(game, teamIndex)
 				classes = {'match-bm-team-stats-team-side'},
 				children = team.side
 			},
-			Div{
-				classes = {
-					'match-bm-team-stats-team-state',
-					'state--' .. team.scoreDisplay
-				},
-				children = team.scoreDisplay
+			Label{
+				labelType = 'result-' .. (scoreDisplay == '-' and 'default' or scoreDisplay),
+				classes = {'match-bm-team-stats-team-state'},
+				children = scoreDisplay
 			}
 		}
 	}
@@ -276,10 +257,10 @@ end
 
 ---@private
 ---@param game MatchPageGame
----@return Widget[]
+---@return Renderable[]
 function MatchPage:_renderPlayersPerformance(game)
 	return {
-		HtmlWidgets.H3{children = 'Player Performance'},
+		Html.H3{children = 'Player Performance'},
 		Div{
 			classes = {'match-bm-players-wrapper'},
 			children = {
@@ -293,7 +274,7 @@ end
 ---@private
 ---@param game MatchPageGame
 ---@param teamIndex integer
----@return Widget
+---@return Renderable
 function MatchPage:_renderTeamPerformance(game, teamIndex)
 	return Div{
 		classes = {'match-bm-players-team'},
@@ -313,10 +294,10 @@ end
 ---@param game MatchPageGame
 ---@param teamIndex integer
 ---@param player table
----@return Widget
+---@return Renderable
 function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 	return Div{
-		classes = {'match-bm-players-player'},
+		classes = {'match-bm-players-player match-bm-players-player--col-3'},
 		children = {
 			PlayerDisplay{
 				characterIcon = self:getCharacterIcon(player.character),
@@ -375,8 +356,8 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 					}
 				}
 			},
-			Div{
-				classes = {'match-bm-players-player-stats'},
+			PlayerStatContainer{
+				columns = 5,
 				children = {
 					PlayerStat{
 						title = {KDA_ICON, 'KDA'},
@@ -411,18 +392,8 @@ function MatchPage:getPatchLink()
 	return Link{ link = 'Version ' .. self.matchData.patch }
 end
 
----@return MatchPageComment[]
-function MatchPage:addComments()
-	local casters = Json.parseIfString(self.matchData.extradata.casters)
-	if Logic.isEmpty(casters) then return {} end
-	return {
-		Comment{
-			children = WidgetUtil.collect(
-				#casters > 1 and 'Casters: ' or 'Caster: ',
-				Array.interleave(DisplayHelper.createCastersDisplay(casters), ', ')
-			)
-		}
-	}
+function MatchPage.getPoweredBy()
+	return 'SAP logo.svg'
 end
 
 return MatchPage

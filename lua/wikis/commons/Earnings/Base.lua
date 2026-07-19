@@ -1,28 +1,28 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Earnings/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Logic = require('Module:Logic')
-local Lpdb = require('Module:Lpdb')
-local MathUtils = require('Module:MathUtil')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Team = require('Module:Team')
+local Lua = require('Module:Lua')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local MathUtils = Lua.import('Module:MathUtil')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
+
+local DEFAULT_MAX_PLAYERS_PER_PLACEMENT = Info.config.defaultMaxPlayersPerPlacement or 10
 
 local Earnings = {}
-
--- customizable in /Custom
-Earnings.defaultNumberOfStoredPlayersPerMatch = 10
 
 ---@class playerEarningsArgs
 ---@field player string the player/individual for whom the earnings shall be calculated
@@ -56,7 +56,7 @@ function Earnings.calculateForPlayer(args)
 
 	local prefix = args.prefix or 'p'
 
-	local playerPositionLimit = tonumber(args.playerPositionLimit) or Earnings.defaultNumberOfStoredPlayersPerMatch
+	local playerPositionLimit = tonumber(args.playerPositionLimit) or DEFAULT_MAX_PLAYERS_PER_PLACEMENT
 	if playerPositionLimit <= 0 then
 		error('"playerPositionLimit" has to be >= 1')
 	end
@@ -100,26 +100,28 @@ function Earnings.calculateForTeam(args)
 		return 0
 	end
 
-	local playerPositionLimit = tonumber(args.playerPositionLimit) or Earnings.defaultNumberOfStoredPlayersPerMatch
+	local playerPositionLimit = tonumber(args.playerPositionLimit) or DEFAULT_MAX_PLAYERS_PER_PLACEMENT
 	if playerPositionLimit <= 0 then
 		error('"playerPositionLimit" has to be >= 1')
 	end
 
 	local queryTeams = {}
-	if Logic.readBool(args.queryHistorical) then
+	if Logic.nilOr(Logic.readBoolOrNil(args.queryHistorical), true) then
 		for _, team in pairs(teams) do
-			local historicalNames = Team.queryHistoricalNames(team)
+			local historicalNames = TeamTemplate.queryHistoricalNames(team)
 
-			if not historicalNames then
+			if Logic.isEmpty(historicalNames) then
 				return 0
 			end
 
-			Array.extendWith(queryTeams, Array.map(historicalNames, String.upperCaseFirst))
+			Array.extendWith(queryTeams, historicalNames)
 		end
 	elseif not Logic.readBool(args.noRedirect) then
-		queryTeams = Array.map(teams, mw.ext.TeamLiquidIntegration.resolve_redirect)
+		queryTeams = Array.map(teams, function(team)
+			return string.lower(mw.ext.TeamLiquidIntegration.resolve_redirect(team))
+		end)
 	else
-		queryTeams = Array.map(teams, String.upperCaseFirst)
+		queryTeams = Array.map(teams, string.lower)
 	end
 
 	local formatParticipant = function(lpdbField)
@@ -129,13 +131,13 @@ function Earnings.calculateForTeam(args)
 	end
 
 	if Logic.readBool(args.doNotIncludePlayerEarnings) then
-		return Earnings.calculate(formatParticipant('opponentname'), args.year, args.mode, args.perYear, queryTeams)
+		return Earnings.calculate(formatParticipant('opponenttemplate'), args.year, args.mode, args.perYear, queryTeams)
 	end
 
-	local teamConditions = {formatParticipant('opponentname')}
+	local teamConditions = {formatParticipant('opponenttemplate')}
 
 	for playerIndex = 1, playerPositionLimit do
-		table.insert(teamConditions, formatParticipant('opponentplayers_p' .. playerIndex .. 'team'))
+		table.insert(teamConditions, formatParticipant('opponentplayers_p' .. playerIndex .. 'template'))
 	end
 	local teamConditionString = '(' .. table.concat(teamConditions, ' OR ') .. ')'
 
@@ -169,7 +171,7 @@ function Earnings.calculate(conditions, queryYear, mode, perYear, aliases, isPla
 
 	local queryParameters = {
 		conditions = conditions,
-		query = 'individualprizemoney, prizemoney, opponentplayers, date, opponenttype, opponentname',
+		query = 'individualprizemoney, prizemoney, opponentplayers, date, opponenttype, opponentname, opponenttemplate',
 	}
 	Lpdb.executeMassQuery('placement', queryParameters, sumUp)
 
@@ -213,7 +215,7 @@ function Earnings._determineValue(placement, aliases, isPlayerQuery)
 
 	if isPlayerQuery then
 		return indivPrize or 0
-	elseif placement.opponenttype == Opponent.team and Table.includes(aliases, placement.opponentname) then
+	elseif placement.opponenttype == Opponent.team and Table.includes(aliases, placement.opponenttemplate) then
 		return placement.prizemoney
 	end
 
@@ -223,9 +225,9 @@ function Earnings._determineValue(placement, aliases, isPlayerQuery)
 
 	-- calcualte the number of players on the team that are part of the placement
 	-- so we can get the real value of earnings for the team from their players from this placement
-	local playerData = Table.filterByKey(placement.opponentplayers or {}, function(key) return key:find('team') end)
+	local playerData = Table.filterByKey(placement.opponentplayers or {}, function(key) return key:find('template') end)
 
 	return indivPrize * Table.size(Table.filter(playerData, function(team) return Table.includes(aliases, team) end))
 end
 
-return Class.export(Earnings)
+return Class.export(Earnings, {exports = {'calculateForPlayer', 'calculateForTeam'}})

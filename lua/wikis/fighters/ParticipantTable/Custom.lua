@@ -1,18 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=fighters
 -- page=Module:ParticipantTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Table = Lua.import('Module:Table')
 
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibrary.OpponentDisplay
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local CustomParticipantTable = {}
 

@@ -1,17 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:Tier/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
+local Table = Lua.import('Module:Table')
 local Tier = Lua.import('Module:Tier/Utils')
 
 local NON_BREAKING_SPACE = '&nbsp;'
+
+---@class CounterstrikeTierTypeRawData: TierRawData
+---@field prioTierType boolean
 
 ---@class CounterstrikeTierUtils: TierUtils
 local TierCustom = Table.copy(Tier)
@@ -25,6 +27,8 @@ function TierCustom.display(tier, tierType, options)
 	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	if not tierData then return end
+
+	---@cast tierTypeData CounterstrikeTierTypeRawData
 
 	options = options or {}
 

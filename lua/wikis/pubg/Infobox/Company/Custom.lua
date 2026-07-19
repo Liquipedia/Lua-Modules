@@ -1,18 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=pubg
 -- page=Module:Infobox/Company/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Company = Lua.import('Module:Infobox/Company')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class PubgCompanyInfobox: CompanyInfobox
@@ -20,7 +20,7 @@ local CustomCompany = Class.new(Company)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return VNode
 function CustomCompany.run(frame)
 	local company = CustomCompany(frame)
 	company:setWidgetInjector(CustomInjector(company))
@@ -28,15 +28,15 @@ function CustomCompany.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
 		table.insert(widgets, Cell{
 			name = CustomCompany._createSisterCompaniesDescription(args),
-			content = self.caller:getAllArgsForBase(args, 'sister', {})
+			children = self.caller:getAllArgsForBase(args, 'sister', {})
 		})
 	end
 	return widgets

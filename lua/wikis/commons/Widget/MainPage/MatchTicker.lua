@@ -1,34 +1,28 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/MainPage/MatchTicker
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
+local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/FilterableContainer')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class MatchTicker: Widget
----@field props { matchesPortal: string?, displayGameIcons: boolean? }
----@operator call(table): MatchTicker
-local MatchTicker = Class.new(Widget)
-MatchTicker.defaultProps = {
+local defaultProps = {
 	matchesPortal = 'Liquipedia:Matches'
 }
 
----@return Widget[]
-function MatchTicker:render()
-	return WidgetUtil.collect(
-		MatchTickerContainer{displayGameIcons = self.props.displayGameIcons},
-		HtmlWidgets.Div{
+---@param props { matchesPortal: string?, displayGameIcons: boolean? }
+---@return Renderable[]
+local function MatchTicker(props)
+	return {
+		MatchTickerContainer{displayGameIcons = props.displayGameIcons},
+		Html.Div{
 			css = {
 				['white-space'] = 'nowrap',
 				display = 'block',
@@ -36,10 +30,11 @@ function MatchTicker:render()
 				['font-size'] = '15px',
 				['font-style'] = 'italic',
 				['text-align'] = 'center',
+				padding = '0.5rem 1rem',
 			},
-			children = { Link{ children = 'See more matches', link = self.props.matchesPortal} }
+			children = { Link{ children = 'See more matches', link = props.matchesPortal} }
 		}
-	)
+	}
 end
 
-return MatchTicker
+return Component.component(MatchTicker, defaultProps)

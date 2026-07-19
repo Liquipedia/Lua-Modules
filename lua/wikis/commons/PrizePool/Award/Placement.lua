@@ -1,32 +1,30 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:PrizePool/Award/Placement
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local _tbd_index = 0
 
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_POINTS = 'POINTS'
 
---- @class AwardPlacement
 --- An AwardPlacement is a set of opponents who all share the same award in the tournament.
 --- Its input is generally a table created by `Template:Slot`.
---- @field args table
+--- @class AwardPlacement: BasePlacement
+--- @operator call(...): AwardPlacement
 --- @field parent AwardPrizePool
---- @field parseOpponents function
---- @field getPrizeRewardForOpponent function
 --- @field previousTotalNumberOfParticipants integer
 --- @field currentTotalNumberOfParticipants integer
 local AwardPlacement = Class.new(BasePlacement)
@@ -58,7 +56,7 @@ function AwardPlacement:_getLpdbData(...)
 		local opponentType = opponent.opponentData.type
 
 		if opponentType == Opponent.team then
-			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template) or {}
+			local teamTemplate = TeamTemplate.getRawOrNil(opponent.opponentData.template) or {}
 
 			participant = teamTemplate.page or ''
 			if self.parent.options.resolveRedirect then
@@ -77,6 +75,7 @@ function AwardPlacement:_getLpdbData(...)
 
 		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_BASE_CURRENCY .. 1)) or 0
 		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
+		local pointsReward2 = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
 		local lpdbData = {
 			date = opponent.date,
 			prizemoney = prizeMoney,
@@ -86,6 +85,7 @@ function AwardPlacement:_getLpdbData(...)
 			extradata = {
 				award = self.award,
 				prizepoints = tostring(pointsReward or ''),
+				prizepoints2 = tostring(pointsReward2 or ''),
 				-- legacy
 				participantteam = (opponentType == Opponent.solo and players.p1team)
 									and Opponent.toName{template = players.p1team, type = 'team'}

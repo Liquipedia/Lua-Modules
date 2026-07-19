@@ -1,0 +1,81 @@
+.carousel {
+	position: relative;
+
+	--carousel-face-width: 3rem;
+
+	.theme--light & {
+		--carousel-fade-color-default: var( --clr-background, #ffffff );
+	}
+
+	.theme--dark & {
+		--carousel-fade-color-default: var( --clr-background, #121212 );
+	}
+
+	@media ( min-width: 1024px ) {
+		--carousel-face-width: 5rem;
+	}
+
+	&-content {
+		display: flex;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
+	}
+
+	&-item {
+		flex: 0 0 auto;
+		scroll-snap-align: start;
+		scroll-margin-left: var( --carousel-face-width );
+
+		&:first-child {
+			scroll-margin-left: 0;
+		}
+	}
+
+	&-button {
+		position: absolute;
+		top: 50%;
+		transform: translateY( -50% );
+		z-index: 2;
+
+		&--left {
+			left: 0;
+
+			@media ( min-width: 1024px ) {
+				left: 1.25rem;
+			}
+		}
+
+		&--right {
+			right: 0;
+
+			@media ( min-width: 1024px ) {
+				right: 1.25rem;
+			}
+		}
+	}
+
+	&-fade {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: var( --carousel-face-width );
+		z-index: 1;
+		opacity: 1;
+
+		&--left {
+			left: 0;
+			background: linear-gradient( to right, var( --carousel-fade-color, var( --carousel-fade-color-default ) ), transparent );
+		}
+
+		&--right {
+			right: 0;
+			background: linear-gradient( to left, var( --carousel-fade-color, var( --carousel-fade-color-default ) ), transparent );
+		}
+	}
+}

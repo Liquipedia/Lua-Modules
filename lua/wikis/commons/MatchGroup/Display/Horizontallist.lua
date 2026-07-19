@@ -1,20 +1,20 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Display/Horizontallist
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Date = require('Module:Date/Ext')
-local DisplayUtil = require('Module:DisplayUtil')
-local FnUtil = require('Module:FnUtil')
-local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Date = Lua.import('Module:Date/Ext')
+local DisplayUtil = Lua.import('Module:DisplayUtil')
+local FnUtil = Lua.import('Module:FnUtil')
+local Icon = Lua.import('Module:Icon')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
@@ -234,7 +234,7 @@ function HorizontallistDisplay.Match(props)
 	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 		bracketId = bracketId,
 		matchId = props.matchId,
-	}, require('Module:Error/Display').ErrorDetails)
+	}, Lua.import('Module:Error/Display').ErrorDetails)
 	matchNode:node(matchSummaryNode)
 
 	return matchNode

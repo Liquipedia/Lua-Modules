@@ -1,34 +1,38 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:PrizePool/Placement/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+local Lua = require('Module:Lua')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local BASE_CURRENCY = 'USD'
 local LOCAL_CURRENCY_VARIABLE_POST_FIX = 'local'
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
+local PRIZE_TYPE_PLAYER_SHARE = 'PLAYER_SHARE'
+local PRIZE_TYPE_CLUB_SHARE = 'CLUB_SHARE'
 local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
+local RAW_PLAYER_SHARE_KEY = 'playerShareInput'
 
---- @class BasePlacement
 --- A BasePlacement is a set of opponents who all share the same final place/award in the tournament.
 --- Its input is generally a table created by `Template:Slot`.
 --- It has a range from placeStart to placeEnd (e.g. 5 to 8) or a slotSize (count) or an award.
+--- @class BasePlacement
+--- @operator call(...): BasePlacement
 --- @field parent BasePrizePool
 --- @field count integer
---- @field opponents BasePlacementOpponent
+--- @field opponents BasePlacementOpponent[]
 local BasePlacement = Class.new(function(self, ...) self:init(...) end)
 
 ---@class BasePlacementOpponent
@@ -86,11 +90,19 @@ function BasePlacement:_readPrizeRewards(args)
 		rewards[PRIZE_TYPE_BASE_CURRENCY .. 1] = baseType.rowParse(self, args[baseType.row], args, 1)
 	end
 
+	-- Raw player share is captured here (not as a prize) because the per-currency
+	-- PLAYER_SHARE / CLUB_SHARE prizes are added after placements are parsed. It is
+	-- entered in the pool's input currency and converted later in _setSharesFromPlayerShare.
+	local playerShareType = self.prizeTypes[PRIZE_TYPE_PLAYER_SHARE]
+	if self.parent.options.playerShare and args[playerShareType.row] then
+		rewards[RAW_PLAYER_SHARE_KEY] = playerShareType.rowParse(self, args[playerShareType.row], args, 1)
+	end
+
 	return rewards
 end
 
 ---@param args table
----@return table[]
+---@return BasePlacementOpponent[]
 function BasePlacement:parseOpponents(args)
 	return Array.mapIndexes(function(opponentIndex)
 		local opponentInput = Json.parseIfString(args[opponentIndex])
@@ -144,6 +156,7 @@ function BasePlacement:_shouldAddTbdOpponent(opponentIndex, place)
 	return false
 end
 
+---@protected
 ---@param args table
 function BasePlacement:readAdditionalData(args)
 	error('Function readAdditionalData needs to be implemented by child class of `PrizePool/Placement/Base`')
@@ -205,6 +218,42 @@ function BasePlacement:_setBaseFromRewards(prizesToUse, prizeTypes)
 		end)
 
 		opponent.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] = baseReward
+	end)
+end
+
+--- Derives per-currency player and club share rewards from the raw player share input.
+--- Player is the raw input in the input currency, or exchanged from the local input into
+--- the base currency; club is total − player. Skipped for currencies without a positive total.
+---@param plan {shareIndex: integer, code: string, totalKey: string}[]
+---@param inputCode string
+---@param localData table?
+function BasePlacement:_setSharesFromPlayerShare(plan, inputCode, localData)
+	Array.forEach(self.opponents, function(opponent)
+		local raw = opponent.prizeRewards[RAW_PLAYER_SHARE_KEY] or self.prizeRewards[RAW_PLAYER_SHARE_KEY]
+		if not raw then
+			return
+		end
+
+		Array.forEach(plan, function(entry)
+			local total = tonumber(opponent.prizeRewards[entry.totalKey] or self.prizeRewards[entry.totalKey])
+			if not total or total <= 0 then
+				return
+			end
+
+			local player
+			if entry.code == inputCode then
+				player = raw
+			elseif entry.code == BASE_CURRENCY and localData then
+				player = self.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToBaseCurrency(
+					localData, raw, opponent.date, self.parent.options.currencyRatePerOpponent)
+			end
+			if not player then
+				return
+			end
+
+			opponent.prizeRewards[PRIZE_TYPE_PLAYER_SHARE .. entry.shareIndex] = player
+			opponent.prizeRewards[PRIZE_TYPE_CLUB_SHARE .. entry.shareIndex] = total - player
+		end)
 	end)
 end
 

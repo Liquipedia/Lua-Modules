@@ -1,0 +1,1979 @@
+/*******************************************************************************
+This forces a new stacking context for the content area of the wiki. This should
+lead to things from the content area not being able to overlap things outside of
+it. Putting it here so we can easily remove it again in case things break...
+Author(s): FO-nTTaX
+*******************************************************************************/
+#mw-content-text {
+	/* isolation: isolate; */
+}
+
+/*******************************************************************************
+Template(s): Documentation
+Author(s): FO-nTTaX
+*******************************************************************************/
+.documentation {
+	border: 0.0625rem solid;
+	clear: both;
+	padding: 0.3125rem;
+
+	.theme--light & {
+		background-color: var( --clr-atlantis-90 );
+		border-color: var( --clr-atlantis-10 );
+	}
+
+	.theme--dark & {
+		background-color: var( --clr-atlantis-10 );
+		border-color: var( --clr-atlantis-20 );
+	}
+
+	h2 {
+		.theme--light & {
+			border-color: var( --clr-atlantis-10 );
+		}
+
+		.theme--dark & {
+			border-color: var( --clr-atlantis-20 );
+		}
+	}
+}
+
+/*******************************************************************************
+Template(s): Countdowns
+Author(s): FO-nTTaX
+*******************************************************************************/
+.timer-object-countdown-live {
+	color: #008000;
+	font-weight: bold;
+}
+
+.timer-object:not( .timer-object-datetime-only ):has( .timer-object-countdown-time:empty ),
+.timer-object-countdown-only .timer-object-date,
+.timer-object-countdown-only .timer-object-separator,
+.timer-object-datetime-only .timer-object-countdown,
+.timer-object-datetime-only .timer-object-separator {
+	display: none;
+}
+
+/*******************************************************************************
+Template(s): Flags
+Author(s): FO-nTTaX, salle
+*******************************************************************************/
+.flag img {
+	width: 18px;
+	height: 12px;
+	vertical-align: -1px;
+	image-rendering: -webkit-optimize-contrast;
+
+	.bracket-game & {
+		vertical-align: -3px;
+	}
+}
+
+/*******************************************************************************
+Template(s): Flag/, FlagNoLink/
+Author(s): salle
+*******************************************************************************/
+.flag-template img {
+	height: 12px;
+	width: 18px;
+	vertical-align: baseline;
+}
+
+/*******************************************************************************
+Template(s): Toggle button
+Author(s): FO-nTTaX
+*******************************************************************************/
+@mixin toggle-area-func( $no ) {
+	&:not( .toggle-area-#{$no} ) {
+		[data-toggle-area-content='#{$no}'] {
+			display: none;
+		}
+	}
+}
+
+.toggle-area {
+	@for $i from 1 through 50 {
+		@include toggle-area-func( $i );
+	}
+
+	#{&}-button {
+		cursor: pointer;
+	}
+}
+/*******************************************************************************
+Template(s): Flex Table
+Author(s): FO-nTTaX
+*******************************************************************************/
+.flextable-wrap {
+	margin-bottom: 10px;
+
+	.flextable {
+		display: flex;
+		flex-flow: row wrap;
+		border-top: 1px solid var( --clr-border, #bbbbbb );
+		border-bottom: 1px solid var( --clr-border, #bbbbbb );
+		border-left: 1px solid var( --clr-border, #bbbbbb );
+
+		.flextable-fw {
+			width: 100%;
+			background-color: #eaecf0;
+			border-right: 1px solid var( --clr-border, #bbbbbb );
+			padding: 5px;
+		}
+
+		.flextable-cell {
+			flex-grow: 1;
+			border-top: 1px solid var( --clr-border, #bbbbbb );
+			border-right: 1px solid var( --clr-border, #bbbbbb );
+			padding: 5px;
+		}
+	}
+}
+
+/*******************************************************************************
+Template(s): Box
+Author(s): FO-nTTaX
+*******************************************************************************/
+.template-box {
+	@media ( min-width: 601px ) {
+		display: inline-block;
+		vertical-align: top;
+		margin: 0 0 0 0;
+		box-sizing: content-box;
+		max-width: 100%;
+
+		&:not( :last-child ) {
+			padding-right: 2em;
+		}
+
+		> * {
+			box-sizing: border-box;
+		}
+	}
+
+	@media ( max-width: 600px ) {
+		padding-right: 0 !important;
+	}
+}
+
+/*******************************************************************************
+Template(s): TeamHistory
+Author(s): FO-nTTaX
+*******************************************************************************/
+.th-mono {
+	font-family: "Droid Sans Mono", monospace;
+	letter-spacing: -1.4px;
+}
+
+/*******************************************************************************
+Template(s): Fake TOC
+Author(s): FO-nTTaX
+*******************************************************************************/
+#mw-content-text .faketoc {
+	display: none;
+}
+
+#sidebar-toc .row,
+#scroll-wrapper-toc .row {
+	margin: 0;
+}
+
+#sidebar-toc .row > [ class*="col-" ],
+#scroll-wrapper-toc .row > [ class*="col-" ] {
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+#scroll-wrapper-toc .liquipedia-custom-icon-box {
+	font-size: 51px !important;
+}
+
+/*******************************************************************************
+Template(s): LeagueIconSmall
+Author(s): FO-nTTaX
+*******************************************************************************/
+span.league-icon-small-image,
+span.icon-small {
+	vertical-align: middle;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 25px;
+	min-width: 25px;
+
+	[ data-darkreader-scheme="dark" ] &.lightmode,
+	.theme--dark &.lightmode {
+		display: none;
+	}
+}
+
+.league-icon-small-image,
+.icon-small {
+	img {
+		max-width: 25px;
+		max-height: 25px;
+		height: auto;
+		width: auto;
+	}
+
+	a {
+		display: contents;
+	}
+}
+
+/* LeagueIconSmall dark mode support */
+span.league-icon-small-image.darkmode,
+span.icon-small.darkmode {
+	display: none;
+
+	[ data-darkreader-scheme="dark" ] &,
+	.theme--dark & {
+		display: inline-flex;
+	}
+}
+
+/*******************************************************************************
+Template(s): Progress bars
+Author(s): FO-nTTaX
+*******************************************************************************/
+.progress {
+	border-radius: 5px;
+	width: 100%;
+	height: 24px;
+	border: 1px solid var( --clr-border, #bbbbbb );
+	position: relative;
+	text-align: center;
+	margin-bottom: 0;
+
+	> div.bar {
+		height: 22px;
+		border-radius: 4px;
+		float: left;
+		line-height: 17px;
+
+		&.bg-color {
+			background-color: var( --clr-surface-variant, #e5b6c0 );
+		}
+
+		&-text {
+			height: 22px;
+			width: 100%;
+			border-radius: 5px;
+			position: absolute;
+			top: 0;
+			left: 0;
+
+			&.bar-text-left {
+				text-align: left;
+				padding-left: 5px;
+			}
+
+			&.bar-text-right {
+				text-align: right;
+				padding-right: 5px;
+			}
+		}
+	}
+}
+
+/* Allow limiting of which header levels are shown in a TOC;
+	<div class="toclimit-3">, for instance, will limit to
+	showing ==headings== and ===headings=== but no further
+	( as long as there are no =headings= on the page, which
+	there shouldn't be according to the MoS ).
+
+    MediaWiki may render the TOC outside of the wrapper that contains __TOC__
+	(e.g. when __TOC__ is emitted by a module). Use :has() so the presence of the
+	toclimit wrapper anywhere on the page limits the actual TOC.
+*/
+.toclimit-2 .toclevel-1 ul,
+.toclimit-3 .toclevel-2 ul,
+.toclimit-4 .toclevel-3 ul,
+.toclimit-5 .toclevel-4 ul,
+.toclimit-6 .toclevel-5 ul,
+.toclimit-7 .toclevel-6 ul,
+body:has( .toclimit-2 ) #toc .toclevel-1 ul,
+body:has( .toclimit-3 ) #toc .toclevel-2 ul,
+body:has( .toclimit-4 ) #toc .toclevel-3 ul,
+body:has( .toclimit-5 ) #toc .toclevel-4 ul,
+body:has( .toclimit-6 ) #toc .toclevel-5 ul,
+body:has( .toclimit-7 ) #toc .toclevel-6 ul {
+	display: none !important;
+}
+
+/* Add an additional margin between ordered/unordered lists and the TOC table */
+ol + table.toc,
+ul + table.toc {
+	margin-top: 11px;
+}
+
+/* Bold white text style for the placement texts */
+.bold-white-text,
+td.bold-white-text {
+	color: #ffffff;
+	font-weight: bold;
+	text-shadow: 1px 1px rgba( 64, 64, 64, 0.4 ), 1px -1px rgba( 64, 64, 64, 0.4 ), -1px -1px rgba( 64, 64, 64, 0.4 ), -1px 1px rgba( 64, 64, 64, 0.4 );
+}
+
+.bold-white-text b {
+	font-weight: bold;
+}
+
+/* Highlight tournament */
+.tournament-highlighted-bg,
+.valvepremier-highlighted,
+.valvemajor-highlighted {
+	background-color: var( --publisher-premier-highlight-background-color, #ffffcc ) !important;
+}
+
+/* align reflist */
+.mw-content-ltr ol,
+.mw-content-rtl .mw-content-ltr ol {
+	margin-left: 1.6em !important;
+}
+
+.mw-references-columns {
+	-webkit-column-width: auto;
+	-moz-column-width: auto;
+	column-width: auto;
+}
+
+/* Broadcast talent partner list */
+.broadcast-talent-partner-list {
+	margin-left: -0.5em;
+	text-align: left;
+}
+
+/* tournament overview page boxes */
+.tournament-image-link {
+	text-align: center;
+	display: inline-block;
+	margin: 0 3em 4em;
+}
+
+/*******************************************************************************
+Template(s): WC3 Creep Spots
+Author(s): FO-nTTaX, turbosau
+*******************************************************************************/
+.creep-spot {
+	img {
+		cursor: pointer;
+	}
+
+	&-popup {
+		display: none;
+	}
+}
+
+/*******************************************************************************
+Template(s): Player Info Cards
+Author(s): spazer
+*******************************************************************************/
+.player-info-card {
+	width: 100% !important;
+	display: inline-block;
+	min-width: 200px;
+	padding: 10px 0;
+
+	@media ( max-width: 601px ) {
+		width: 100% !important;
+		max-width: 100% !important;
+		display: inline-block;
+		padding: 10px 0;
+	}
+
+	&-title {
+		font-size: 150%;
+		font-weight: bold;
+		text-align: center;
+	}
+
+	&-realname {
+		font-style: italic;
+		text-align: center;
+		padding-bottom: 5px;
+	}
+
+	&-main {
+		background-color: #eeeeee;
+		width: 100%;
+
+		&-top {
+			display: inline-block;
+			border-width: 0 0 2px 0;
+			border-style: solid;
+			padding-left: 2px;
+			margin: 5px 0 0 5px;
+			width: calc( 100% - 10px );
+			text-align: center;
+			padding-bottom: 5px;
+		}
+
+		&-bottom {
+			display: inline-block;
+			margin: 5px 5px 5px 5px;
+			padding-right: 5px;
+
+			> table {
+				width: 100%;
+				margin: 5px 5px 5px 5px;
+
+				> tbody > tr > th {
+					text-align: right;
+					padding-right: 10px;
+					vertical-align: middle;
+					max-width: 175px;
+					white-space: nowrap;
+					padding-bottom: 5px;
+					margin-bottom: 5px;
+					height: 30px;
+				}
+
+				> tbody > tr > td {
+					vertical-align: middle;
+					padding-bottom: 5px;
+					height: 30px;
+				}
+			}
+		}
+	}
+}
+
+/*******************************************************************************
+Template(s): Vodlink
+Author(s): salle
+*******************************************************************************/
+.vodlink img {
+	max-height: 16px;
+	max-width: 16px;
+	height: auto;
+	width: auto;
+}
+
+span.vodlink.darkmode {
+	display: none;
+}
+
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
+	span.vodlink.lightmode {
+		display: none;
+	}
+
+	span.vodlink.darkmode {
+		display: inline-block;
+	}
+}
+
+.vodlink span.darkmode {
+	display: none;
+}
+
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
+	.vodlink span.lightmode {
+		display: none;
+	}
+
+	.vodlink span.darkmode {
+		display: inline;
+	}
+}
+
+/*******************************************************************************
+Template(s): Rumour row
+Author(s): Vogan
+*******************************************************************************/
+.StatusIcon {
+	font-size: 1.2em;
+}
+
+.RumourRow {
+	display: table-row;
+	width: auto;
+	line-height: 1.42857143;
+
+	&:nth-child( 2n+1 ) {
+		background-color: var( --table-striped-background-color, #f9f9f9 );
+	}
+
+	.divCell {
+		border-top: 1px solid var( --clr-border, #bbbbbb );
+	}
+}
+
+@media ( max-width: 560px ) {
+	.divCell.Status {
+		display: block;
+		float: initial;
+		border-top: 0 !important;
+		margin-bottom: -31px;
+		margin-top: 5px;
+	}
+}
+
+/*******************************************************************************
+Template(s): OffSeasonOverview
+Author(s): Vogan
+*******************************************************************************/
+.OffSeasonOverview {
+	width: 70%;
+	border: 1px solid var( --table-border-color );
+
+	@media ( max-width: 560px ) {
+		width: 100%;
+	}
+
+	> .general-collapsible-default-header {
+		background-color: var( --table-header-variant-background-color );
+		padding: 0.3125rem;
+	}
+}
+
+/*******************************************************************************
+Template(s): Documentation
+Author(s): Wikipedia
+*******************************************************************************/
+.template-startbox {
+	padding-bottom: 3px;
+	border-bottom: 1px solid #aaaaaa;
+	margin-bottom: 1ex;
+}
+
+.template-documentation {
+	clear: both;
+	margin: 1em 0 0 0;
+	border: 1px solid var( --clr-border, #a2a9b1 );
+	background-color: var( --clr-background, #f8f9fa );
+	padding: 1em;
+}
+
+table.fmbox {
+	clear: both;
+	margin: 0.2em 0;
+	width: 100%;
+	border: 1px solid var( --clr-border, #a2a9b1 );
+	background: var( --clr-surface-2, #f8f9fa );
+}
+
+th.mbox-text,
+td.mbox-text {
+	border: 0;
+	padding: 0.25em 0.9em;
+	width: 100%;
+}
+
+/*******************************************************************************
+Template(s): Match history tables
+Author(s): Inflicted
+*******************************************************************************/
+.match-history {
+	height: 35px;
+	width: 150px;
+	padding: 5px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: clip;
+	margin: -5px;
+
+	img {
+		width: 28px;
+		height: 28px;
+		border: 2px solid transparent;
+		margin-top: -2px;
+		image-rendering: -webkit-optimize-contrast;
+	}
+}
+
+/*******************************************************************************
+Template(s): Page Form Checkboxes
+Author(s): Inflicted
+*******************************************************************************/
+.checkboxLabel {
+	padding-right: 10px;
+}
+
+/*******************************************************************************
+Template(s): Gradient colours for Fortnite rarities
+Author(s): Ricci
+*******************************************************************************/
+.fortnitebg-rarity-common {
+	background: radial-gradient( circle at 80% 30%, #bdc0c3, #7b8187 );
+}
+
+.fortnitebg-rarity-uncommon {
+	background: radial-gradient( circle at 80% 30%, #8bc281, #188604 );
+}
+
+.fortnitebg-rarity-rare {
+	background: radial-gradient( circle at 80% 30%, #7fb0e2, #0062c5 );
+}
+
+.fortnitebg-rarity-epic {
+	background: radial-gradient( circle at 80% 30%, #bf98eb, #8032d7 );
+}
+
+.fortnitebg-rarity-legendary {
+	background: radial-gradient( circle at 80% 30%, #e2aa80, #c55602 );
+}
+
+.fortnitebg-rarity-epic-skin {
+	background-image: radial-gradient( rgba( 0, 0, 0, 0.01 ), rgba( 0, 0, 0, 0.5 ) ), linear-gradient( 170deg, #8032d7, #8032d7 25%, #bf98eb 25%, #bf98eb 75%, #8032d7 75%, #8032d7 );
+}
+
+/*******************************************************************************
+Template(s): Mobile Group Tables, Match Lists & Showmatches
+Author(s): iMarbot
+*******************************************************************************/
+@media ( max-width: 435px ) {
+	.table.table-bordered.grouptable,
+	.wikitable.matchlist,
+	.wikitable.wikitable-bordered.grouptable,
+	.table.table-bordered.matchlist {
+		width: 100% !important;
+	}
+}
+
+@media ( max-width: 767px ) {
+	.toggle-group .table-responsive {
+		padding-bottom: 0;
+	}
+}
+
+/*******************************************************************************
+Template(s): Misc Mobile Improvements
+Author(s): iMarbot
+*******************************************************************************/
+@media ( min-width: 650px ) {
+	.roster-notes-squash div {
+		max-width: calc( 100% - 350px );
+	}
+}
+
+@media ( max-width: 600px ) {
+	.mobile-hide {
+		display: none !important;
+	}
+
+	.mobile-unset-max-width {
+		max-width: unset !important;
+	}
+
+	.wikitable.collapsible {
+		width: 100%;
+	}
+
+	.teamcard + .toccolours.mw-collapsible {
+		margin-left: -10px !important;
+		width: 100%;
+	}
+
+	.mobile-max-width {
+		width: 100% !important;
+	}
+
+	.mobile-min-width {
+		width: 1px;
+	}
+}
+
+@media ( max-width: 800px ) {
+	.mobile-wide-hide {
+		display: none !important;
+	}
+
+	.mobile-wide-unset-max-width {
+		max-width: unset !important;
+	}
+
+	.mobile-wide-max-width {
+		width: 100% !important;
+	}
+
+	.mobile-wide-min-width {
+		width: 1px;
+	}
+}
+
+@media ( max-width: 435px ) {
+	.wikitable.showmatch {
+		width: 100% !important;
+	}
+}
+
+@media ( min-width: 601px ) {
+	.mobile-only {
+		display: none !important;
+	}
+}
+
+@media ( min-width: 801px ) {
+	.mobile-wide-only {
+		display: none !important;
+	}
+}
+
+/*******************************************************************************
+Template(s): Player Role Icons
+Author(s): salle
+*******************************************************************************/
+.player-role-icon > img,
+img.player-role-icon {
+	height: 13px;
+	width: 13px;
+	vertical-align: baseline;
+	image-rendering: -webkit-optimize-contrast;
+}
+
+.player-role-icon img[ title="Captain" ],
+.player-role-icon img[ title="In-Game Leader" ],
+img.player-role-icon[ alt="Captain" ],
+img.player-role-icon[ alt="In-Game Leader" ] {
+	height: 13px;
+	width: 18px;
+	vertical-align: baseline;
+	image-rendering: -webkit-optimize-contrast;
+}
+
+/*******************************************************************************
+Template(s): Building settings table, Button translation
+Author(s): salle
+*******************************************************************************/
+
+kbd {
+	background-color: #0f0f0f;
+	color: #f0f0f0;
+	border-style: solid;
+	border-color: #666666;
+	border-width: 2px 3px 3px 3px;
+	padding: 1px 2px;
+	border-radius: 3px;
+	font-weight: 500;
+	font-family: "Open Sans", sans-serif;
+}
+
+.green-check {
+	color: #00a901;
+	font-size: 14px;
+	vertical-align: middle;
+}
+
+/*******************************************************************************
+Template(s): Mobile LeagueCards
+Author(s): iMarbot
+*******************************************************************************/
+@media ( max-width: 600px ) {
+	.teamcard.leaguecard {
+		width: 100% !important;
+
+		.table.table.table-bordered.logo {
+			width: 100% !important;
+		}
+
+		&:not( .teamcard-nomobile ) table.logo div.center {
+			width: 100% !important;
+		}
+
+		&:not( .teamcard-nomobile ) table.list {
+			background-color: rgba( 249, 249, 249, 0.95 );
+			width: 100% !important;
+			left: 0% !important;
+		}
+	}
+
+	.leaguecard .template-box {
+		display: inline-block;
+		vertical-align: top;
+		margin: 0 0 0 0;
+		box-sizing: content-box;
+		max-width: 100%;
+		padding-right: 0.5em !important;
+		padding-bottom: 0.25em !important;
+
+		> * {
+			box-sizing: border-box;
+		}
+	}
+}
+
+/*******************************************************************************
+Template(s): Match Page CSS
+Author(s): iMarbot
+*******************************************************************************/
+tr.stats-row:nth-child( 2n+1 ) {
+	background-color: var( --clr-surface-2, #f5f5f5 );
+}
+
+@media ( max-width: 599px ) {
+	.matchpage-vscell {
+		padding: 0 10px;
+	}
+}
+
+@media ( min-width: 600px ) {
+	.matchpage-teamcell {
+		font-size: 200%;
+	}
+
+	.matchpage-vscell {
+		padding: 0 20px;
+		font-size: 150%;
+	}
+}
+
+@media ( max-width: 1023px ) {
+	.matchpage-team2col {
+		order: 2;
+	}
+}
+
+@media ( min-width: 1024px ) {
+	.matchpage-team2col {
+		order: 4;
+	}
+}
+
+/*******************************************************************************
+Template(s): Legends of Runeterra region colors
+Author(s): Darkrai
+*******************************************************************************/
+.lor-region-bilgewater {
+	background-color: #f9dec7;
+}
+
+.lor-region-demacia {
+	background-color: #f9f9c7;
+}
+
+.lor-region-freljord {
+	background-color: #dee3ef;
+}
+
+.lor-region-ionia {
+	background-color: #f4ddea;
+}
+
+.lor-region-piltover-zaun {
+	background-color: #f9e8c7;
+}
+
+.lor-region-noxus {
+	background-color: #fbdfdf;
+}
+
+.lor-region-shadow-isles {
+	background-color: #ddf4dd;
+}
+
+.lor-cost {
+	float: right;
+	background-color: #1367fa;
+	width: 20px;
+	border-radius: 50%;
+	color: #98d7f3;
+	margin-left: 5px;
+}
+
+.lor-amount {
+	float: left;
+	width: 35px;
+	background-color: #daa520;
+	border: 1px solid #000000;
+	margin-right: 4px;
+	border-radius: 20%;
+	color: #000000;
+}
+
+/*******************************************************************************
+Template(s): Copy to clipboard
+Author(s): FO-nTTaX
+*******************************************************************************/
+.copy-to-clipboard .copy-this {
+	display: none;
+}
+
+.copy-to-clipboard .see-this {
+	cursor: copy;
+}
+
+/*******************************************************************************
+Template(s): Legends of Runeterra Card Patch Note Greyscale
+Author(s): iMarbot
+*******************************************************************************/
+.lor-graycard img {
+	filter: grayscale( 80% );
+}
+/*******************************************************************************
+Template(s): Miscellaneous Fixes/Changes
+Author(s): iMarbot
+*******************************************************************************/
+@media ( min-width: 601px ) {
+	.hlist li {
+		white-space: nowrap;
+	}
+}
+
+.grouptable td.prizepooltabletoggle {
+	text-align: center;
+}
+
+.prizepooltable hr {
+	background-color: #bbbbbb;
+}
+
+/* Stats */
+.stats-title {
+	display: inline-block;
+	font-weight: bold;
+}
+
+.stats-subtitle {
+	padding: 2px 0 0 10px;
+	font-weight: bold;
+}
+
+.stats-value {
+	float: right;
+	text-align: right;
+}
+
+.stats-pcnt {
+	display: inline-block;
+	float: right;
+	width: 64px;
+	text-align: right;
+}
+
+.mw-content-ltr dd,
+.mw-content-rtl .mw-content-ltr dd {
+	margin-bottom: 0.1em;
+}
+
+/*******************************************************************************
+Form: Match history
+Author(s): Rapture
+*******************************************************************************/
+#main-content-column .form-field,
+#main-content-column #pfForm select.form-field {
+	width: 100% !important;
+	margin: 0 !important;
+}
+
+#main-content-column .form-field-tokens,
+#main-content-column #pfForm select.form-field-tokens {
+	padding: 0 !important;
+}
+
+#main-content-column .form-field-tokens input[ type="search" ] {
+	height: auto;
+	padding: 0;
+	margin: 3px 0 0 5px;
+	border: 0;
+	box-shadow: none;
+}
+
+#main-content-column .form-field-combobox,
+#main-content-column #pfForm select.form-field-combobox {
+	height: 28px;
+	padding: 0 8px;
+}
+
+#main-content-column .select2-search--inline {
+	height: 29px;
+}
+
+/*******************************************************************************
+Template(s): Responsive floats
+Author(s): FO-nTTaX
+*******************************************************************************/
+.pull-right {
+	float: right;
+}
+
+@media ( min-width: 768px ) {
+	.pull-right-sm {
+		float: right;
+	}
+}
+
+@media ( min-width: 1024px ) {
+	.pull-right-md {
+		float: right;
+	}
+}
+
+@media ( min-width: 1440px ) {
+	.pull-right-lg {
+		float: right;
+	}
+}
+
+@media ( min-width: 1560px ) {
+	.pull-right-xl {
+		float: right;
+	}
+}
+
+/*******************************************************************************
+Template(s): Battleground/Map Portal Banners ( initially created for Heroes wiki )
+Author(s): salle
+*******************************************************************************/
+div.battleground-banner {
+	position: relative;
+	height: 104px;
+	width: 960px;
+	background-color: #040006;
+	text-align: left;
+	overflow: hidden;
+	border: 1px solid #000000;
+
+	.wiki-valorant & {
+		position: relative;
+		height: 100px;
+		width: 456px;
+		background-color: #040006;
+		text-align: left;
+		overflow: hidden;
+		border: 1px solid #000000;
+	}
+}
+
+.battleground-banner > div {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.block-link > a {
+	position: absolute;
+	display: block;
+	height: 100%;
+	width: 100%;
+	padding-left: 26px;
+	line-height: 104px;
+	color: #f8f8f9 !important;
+	font-family: "Exo", "Trebuchet MS", "Helvetica", sans-serif;
+	font-size: 390%;
+	font-weight: 600;
+	text-shadow: 0 0 25px #3622f2;
+
+	.wiki-valorant & {
+		position: absolute;
+		display: block;
+		height: 100%;
+		width: 100%;
+		padding-left: 26px;
+		line-height: 104px;
+		color: #f8f8f9 !important;
+		font-family: "Exo", "Trebuchet MS", "Helvetica", sans-serif;
+		font-size: 390%;
+		font-weight: 600;
+		text-shadow: 0 0 25px #b12a2a;
+	}
+
+	&:active,
+	&:hover {
+		text-decoration: none;
+		text-shadow: 0 0 25px #fffec8;
+	}
+
+	@media ( max-width: 750px ) {
+		font-size: 300%;
+	}
+
+	@media ( max-width: 570px ) {
+		font-size: 200%;
+	}
+
+	@media ( max-width: 400px ) {
+		font-size: 150%;
+	}
+}
+
+/* Table Header diagonal CSS */
+.diagonal-table-header {
+	background-color: var( --table-header-variant-background-color, #eaecf0 );
+	border-top: hidden;
+}
+
+.diagonal-table-cell-variant {
+	background-color: var( --table-variant-background-color, #eaeaea );
+}
+
+.table-header-col {
+	border-right: hidden !important;
+	transform: translate( 29px, 26px ) rotate( 315deg );
+	max-width: 50px;
+}
+
+.table-header-div {
+	border-bottom: 1px solid #aaaaaa;
+	text-align: left;
+	height: 30px;
+	width: 141px;
+	background-color: var( --table-header-variant-background-color, #eaecf0 );
+}
+
+/*******************************************************************************
+Template(s): Hiding Legend box for mobiles
+Author(s): Ricci
+*******************************************************************************/
+@media ( max-width: 435px ) {
+	.legend-box-mobile {
+		display: none !important;
+	}
+}
+
+/* hat note */
+.hatnote {
+	padding-left: 1.6em;
+	margin-bottom: 0.5em;
+	font-style: italic;
+}
+
+/* Heroes / Weapons Portal */
+ul.halfbox {
+	width: 100%;
+	padding: 5px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+
+	> li {
+		background: none repeat scroll 0 0 var( --clr-surface-1, #f2f2f2 );
+		border: 1px solid #aaaaaa;
+		display: block;
+		float: left;
+		font-weight: bold;
+		height: 70px;
+		margin: 5px;
+		width: 125px;
+
+		.wiki-counterstrike & {
+			height: 150px;
+			width: 200px;
+		}
+
+		.wiki-leagueoflegends & {
+			height: 120px;
+			width: 120px;
+		}
+	}
+}
+
+.halfbox li img {
+	height: 100%;
+	width: 100%;
+}
+
+.halfbox li span a {
+	color: #ffffff;
+	text-shadow: 1px 1px 0 #000000, -1px 1px 0 #000000, -1px -1px 0 #000000, 1px -1px 0 #000000;
+	position: absolute;
+	min-width: 121px;
+	text-align: center;
+	margin: -19px 0 0 1px;
+
+	.wiki-leagueoflegends & {
+		min-width: 116px;
+	}
+
+	&.new {
+		color: #dd0000;
+	}
+}
+
+/*******************************************************************************
+Template(s): Esports wiki team portal
+Author(s): Vogan, salle
+*******************************************************************************/
+.esports-team-game-list {
+	display: flex;
+	flex-wrap: wrap;
+
+	> p {
+		margin-bottom: 20px !important;
+		margin-top: 10px !important;
+	}
+}
+
+.esports-team-game {
+	display: inline-block;
+	margin: 5px;
+	font-weight: bold;
+	width: 160px;
+}
+
+/*******************************************************************************
+Template/Module: Recent games // Recent matches ( for new Bracket/Match System )
+Author(s): hjpalpha
+*******************************************************************************/
+.recent-matches-left {
+	background-image: linear-gradient( to left, var( --clr-cinnabar-background-color, #fbdfdf ) 25%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 45%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 55%, var( --clr-forest-background-color, #ddf4dd ) 75% ) !important;
+}
+
+.recent-matches-right {
+	background-image: linear-gradient( to right, var( --clr-cinnabar-background-color, #fbdfdf ) 25%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 45%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 55%, var( --clr-forest-background-color, #ddf4dd ) 75% ) !important;
+}
+
+.recent-matches-draw {
+	background-image: linear-gradient( to left, var( --clr-pear-background-color, #f9f9c7 ) 25%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 45%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 55%, var( --clr-pear-background-color, #f9f9c7 ) 75% ) !important;
+}
+
+.recent-matches-left-publishertier {
+	background-image: linear-gradient( to left, var( --clr-cinnabar-background-color, #fbdfdf ) 25%, var( --publisher-premier-highlight-background-color, #ffffcc ) 45%, var( --publisher-premier-highlight-background-color, #ffffcc ) 55%, var( --clr-forest-background-color, #ddf4dd ) 75% ) !important;
+}
+
+.recent-matches-right-publishertier {
+	background-image: linear-gradient( to right, var( --clr-cinnabar-background-color, #fbdfdf ) 25%, var( --publisher-premier-highlight-background-color, #ffffcc ) 45%, var( --publisher-premier-highlight-background-color, #ffffcc ) 55%, var( --clr-forest-background-color, #ddf4dd ) 75% ) !important;
+}
+
+.recent-matches-draw-publishertier {
+	background-image: linear-gradient( to left, var( --clr-pear-background-color, #f9f9c7 ) 25%, var( --publisher-premier-highlight-background-color, #ffffcc ) 45%, var( --publisher-premier-highlight-background-color, #ffffcc ) 55%, var( --clr-pear-background-color, #f9f9c7 ) 75% ) !important;
+}
+
+/*******************************************************************************
+Template // Module: Key/Key2 // Hotkey
+Author(s): hjpalpha
+*******************************************************************************/
+.hotkey-key {
+	background-color: var( --clr-moon-background-color, #f0f0f0 );
+	width: 32px;
+	font-size: 9pt;
+	border-style: outset;
+	border-width: 2px;
+	margin: 0;
+	padding: 0 3px 0 3px;
+	clear: none;
+}
+
+.hotkey-button {
+	background-color: var( --clr-moon-background-color, #f0f0f0 );
+	width: 54px;
+	height: 54px;
+	border-radius: 4px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-weight: bold;
+}
+
+/*******************************************************************************
+Template: LightModeDarkMode
+Use case: Display images, text, ... only in light or only in darkmode
+Author(s): hjpalpha
+*******************************************************************************/
+
+.show-when-dark-mode,
+[ data-darkreader-scheme="dark" ] .show-when-light-mode,
+.theme--dark .show-when-light-mode {
+	display: none !important;
+}
+
+[ data-darkreader-scheme="dark" ] .show-when-dark-mode,
+.theme--dark .show-when-dark-mode {
+	display: unset !important;
+}
+
+/*******************************************************************************
+Invert colors for dark theme - moved here from Fountain.scss
+*******************************************************************************/
+
+html.theme--dark .componentsinvert {
+	filter: invert( 1 );
+}
+
+/*******************************************************************************
+Template: GroupTableLeague
+Use case: up/down arrows to indicate a ranking change between rounds
+Author(s): hjpalpha
+*******************************************************************************/
+
+.ranking-change-up {
+	float: right;
+	color: #3ea34c !important;
+	font-size: 0.9em;
+}
+
+.ranking-change-down {
+	float: right;
+	color: #b12a2a !important;
+	font-size: 0.9em;
+}
+
+/*******************************************************************************
+Template: Matchpage Lightmode/Darkmode class
+Author(s): iMarbot
+*******************************************************************************/
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
+	.matchpage span.banner.lightmode,
+	.matchpage div.logo.lightmode {
+		display: none;
+	}
+}
+
+.matchpage span.banner.darkmode,
+.matchpage div.logo.darkmode {
+	display: none;
+}
+
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
+	.matchpage span.banner.darkmode,
+	.matchpage div.logo.darkmode {
+		display: unset !important;
+	}
+}
+
+/*******************************************************************************
+Template: Bans filter
+Author(s): trev
+*******************************************************************************/
+.bans-filter {
+	filter: grayscale( 0.8 ) contrast( 0.8 );
+}
+
+/*******************************************************************************
+Template: General Collapsible
+Author: warnull
+*******************************************************************************/
+.collapsed .general-collapsible-default-toggle > .general-collapsible-collapse-button,
+.general-collapsible:not( .collapsed ) .general-collapsible-default-toggle > .general-collapsible-expand-button {
+	display: none;
+}
+
+.general-collapsible-default-header {
+	display: grid;
+	align-items: center;
+	grid-template-columns: 1fr auto 1fr;
+	gap: 1em;
+	padding: 0 0.5rem;
+}
+
+.general-collapsible-default-title {
+	grid-column: 2;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	justify-self: center;
+}
+
+.general-collapsible-default-toggle {
+	display: inline-block;
+	min-width: 48px;
+	text-align: right;
+	grid-column: 3;
+	justify-self: end;
+}
+
+.collapsed > .should-collapse {
+	display: none;
+}
+
+/*******************************************************************************
+Usage: Only display for admins
+Author: hjpalpha
+*******************************************************************************/
+.show-when-admin {
+	display: none !important;
+
+	.user-is-sysop & {
+		display: unset !important;
+	}
+}
+
+/*******************************************************************************
+Template(s): Random background and text colors
+Author(s): iMarbot
+*******************************************************************************/
+.bg-color-e6e6ff {
+	background: #e6e6ff;
+}
+
+.color-dimgray {
+	color: #696969;
+}
+
+.color-darkred {
+	color: #8b0000;
+}
+
+/*******************************************************************************
+Template(s): white-space as classes
+Author(s): iMarbot
+*******************************************************************************/
+.white-space-pre {
+	white-space: pre;
+}
+
+.white-space-normal {
+	white-space: normal;
+}
+
+/*******************************************************************************
+Template(s): Example title popup hover
+Author(s): iMarbot via ???
+*******************************************************************************/
+.example-title-popup {
+	border: #000000 1px solid;
+	padding: 2px;
+	background-color: #fffbe1;
+}
+
+/*******************************************************************************
+Template(s): App notices
+Author(s): FO-nTTaX
+*******************************************************************************/
+.appnotice-sm,
+.appnotice-md,
+.appnotice-lg {
+	display: none;
+}
+
+@media ( max-width: 320px ) {
+	.appnotice-sm {
+		display: inline;
+	}
+}
+
+@media ( min-width: 321px ) and ( max-width: 390px ) {
+	.appnotice-md {
+		display: inline;
+	}
+}
+
+@media ( min-width: 391px ) {
+	.appnotice-lg {
+		display: inline;
+	}
+}
+
+/*******************************************************************************
+Template(s): Head2HeadOverview
+Author(s): Elysienna
+*******************************************************************************/
+.matchlist-gradient-green {
+	background: linear-gradient( 90deg, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 0%, rgba( 105, 211, 105, 1 ) 75%, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 100% );
+}
+
+.matchlist-gradient-red {
+	background: linear-gradient( 90deg, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 0%, rgba( 234, 88, 83, 1 ) 75%, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 100% );
+}
+
+.matchlist-gradient-yellow {
+	background: linear-gradient( 90deg, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 0%, rgba( 237, 208, 80, 1 ) 75%, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 100% );
+}
+
+.theme--light {
+	--matchlist-header-background-color: #fbf2df;
+}
+
+.theme--dark {
+	--matchlist-header-background-color: var( --clr-secondary-16 );
+}
+
+.matchlist-header {
+	border-bottom: 0.125rem solid var( --table-border-color, #bbbbbb );
+}
+
+.matchlist-header > th {
+	background-color: var( --matchlist-header-background-color, #fbf2df ) !important;
+}
+
+/*******************************************************************************
+Map on Portal:Players
+Author(s): Elysienna
+*******************************************************************************/
+.portal-map {
+	background-color: #b6cfe5;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #00005d;
+
+	[ data-darkreader-scheme="dark" ] &,
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-secondary-25 );
+
+		.dynamicmap > div {
+			&:first-child {
+				background-color: #000000;
+			}
+
+			> img {
+				filter: invert( 1 );
+			}
+		}
+	}
+}
+
+/*******************************************************************************
+Template: Driver Standings ( F1 Wiki )
+Use case: Moving styling from inline to css file.
+Author(s): salle
+*******************************************************************************/
+
+table.f1-driver-standings-table > tbody > tr {
+	> td:nth-child( n+3 ) {
+		text-align: center;
+		white-space: pre;
+	}
+
+	> th:nth-child( n+3 ) {
+		width: 41px;
+	}
+
+	&:nth-child( n+3 ) {
+		height: 40px;
+
+		> th:first-child {
+			width: 28px;
+		}
+
+		> td:nth-child( 3 ) {
+			font-weight: bold;
+		}
+	}
+}
+
+/*******************************************************************************
+Template: Next Circuit  ( F1 Wiki )
+Use case: Main page styling with custom break-point.
+Author(s): salle
+*******************************************************************************/
+
+.next-circuit-image {
+	display: flex;
+	font-size: 14px;
+
+	@media ( max-width: 569px ) {
+		flex-direction: column;
+
+		> div:first-child {
+			display: flex;
+			justify-content: center;
+			padding: 0;
+		}
+	}
+
+	@media ( min-width: 570px ) {
+		flex-direction: row;
+
+		> div:first-child {
+			padding: 12px;
+			display: block;
+		}
+	}
+}
+
+.next-circuit-boxes {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+
+	> div {
+		display: flex;
+		height: 25%;
+
+		> div {
+			padding: 8px 12px;
+
+			&:only-child {
+				width: 100%;
+			}
+
+			&:not( :only-child ) {
+				width: 50%;
+				border-bottom: 1px solid #bbbbbb;
+			}
+
+			&:nth-child( n+2 ) {
+				border-left: 1px solid #bbbbbb;
+			}
+		}
+
+		&:first-child > div {
+			border-bottom: 1px solid #bbbbbb;
+		}
+	}
+
+	@media ( max-width: 569px ) {
+		border-top: 1px solid #bbbbbb;
+		border-left: 0;
+	}
+
+	@media ( min-width: 570px ) {
+		border-left: 1px solid #bbbbbb;
+		border-top: 0;
+	}
+}
+
+/*******************************************************************************
+Template: StreamPage ( SC2 )
+Use case: Stream Pages on sc2
+Author(s): hjpalpha
+*******************************************************************************/
+.sc2-stream-page-oppponent-info {
+	width: 20%;
+	flex: 0 0 20%;
+	padding: 5px;
+	order: 1;
+}
+
+.sc2-stream-page-oppponent-info2 {
+	width: 20%;
+	flex: 0 0 20%;
+	padding: 5px;
+	order: 3;
+}
+
+.sc2-stream-page-middle {
+	width: 60%;
+	flex: 0 0 60%;
+	order: 2;
+}
+
+.sc2-stream-page-middle-column,
+.sc2-stream-page-middle-column1,
+.sc2-stream-page-middle-column2 {
+	width: 33.3333333333%;
+	flex: 0 0 33.3333333333%;
+	padding: 5px;
+}
+
+.sc2-stream-page-middle-column-no-form,
+.sc2-stream-page-middle-column1-no-form {
+	width: 50% !important;
+	flex: 0 0 50% !important;
+}
+
+.sc2-stream-page-middle-column1 .opponent-form {
+	display: none;
+}
+
+@media screen and ( max-width: 1560px ) {
+	.sc2-stream-page-oppponent-info,
+	.sc2-stream-page-oppponent-info2 {
+		width: 25%;
+		flex: 0 0 25%;
+	}
+
+	.sc2-stream-page-middle,
+	.sc2-stream-page-middle-column,
+	.sc2-stream-page-middle-column1 {
+		width: 50%;
+		flex: 0 0 50%;
+	}
+
+	.sc2-stream-page-middle-column2 {
+		display: none !important;
+	}
+
+	.sc2-stream-page-middle-column1 .opponent-form {
+		display: unset;
+	}
+}
+
+@media screen and ( max-width: 1024px ) {
+	.sc2-stream-page-oppponent-info,
+	.sc2-stream-page-oppponent-info2 {
+		width: 50%;
+		flex: 0 0 50%;
+		order: unset;
+	}
+
+	.sc2-stream-page-middle {
+		width: 100%;
+		flex: 0 0 100%;
+	}
+}
+
+@media screen and ( max-width: 576px ) {
+	.sc2-stream-page-oppponent-info,
+	.sc2-stream-page-oppponent-info2,
+	.sc2-stream-page-middle,
+	.sc2-stream-page-middle-column,
+	.sc2-stream-page-middle-column1 {
+		width: 100%;
+		flex: 0 0 100%;
+	}
+
+	.sc2-stream-page-middle-column1 {
+		order: 2;
+	}
+
+	.sc2-stream-page-middle-column {
+		order: 1;
+	}
+}
+
+/*******************************************************************************
+Template(s): TyreGraph
+Author(s): salle
+*******************************************************************************/
+
+.tyre-graph-key-label {
+	font-size: 14px;
+	font-weight: bold;
+	width: 100%;
+	text-align: center;
+}
+
+.tyre-graph-key-row {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+}
+
+.tyre-graph-key-cell {
+	border: 1px solid var( --clr-secondary-39, #646464 );
+	width: 14%;
+	height: 12px;
+}
+
+.tyre-graph-row {
+	height: 25px;
+	align-items: center;
+	display: flex;
+}
+
+.tyre-graph-driver {
+	width: 40px;
+	text-align: left;
+	display: inline-flex;
+	padding: 0 5px;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.tyre-graph-bar {
+	width: calc( 100% - 80px );
+	border-left: 1px solid var( --clr-secondary-39, #646464 );
+	height: 12px;
+	display: inline-flex;
+}
+
+.tyre-graph-cell {
+	display: inline-flex;
+	height: 12px;
+	border: 1px solid var( --clr-secondary-39, #646464 );
+	border-left: 0;
+	position: relative;
+}
+
+.tyre-graph-pit-lap {
+	position: absolute;
+	width: 16px;
+	font-size: 10px;
+	display: flex;
+	height: 16px;
+	right: 0;
+	transform: translate( 50%, -90% );
+	top: 0;
+	border-radius: 100%;
+	align-items: center;
+	justify-content: center;
+	font-weight: bold;
+	z-index: 1;
+}
+
+.tyre-graph-raced-laps {
+	width: 32px;
+	display: inline-flex;
+	text-align: center;
+	padding: 0 5px;
+	font-size: 14px;
+	font-weight: bold;
+	margin-right: 8px;
+	justify-content: flex-end;
+}
+
+/*******************************************************************************
+.scribunto-error when not added via <style> tags
+Author(s): Scribunto developer( s )
+*******************************************************************************/
+.scribunto-error {
+	cursor: pointer;
+
+	&:hover,
+	&:focus {
+		text-decoration: underline;
+	}
+}
+
+/*******************************************************************************
+Author(s): Hjpalpha, based on a template copied from Wikipedia
+Template: Sfrac
+*******************************************************************************/
+.sfrac {
+	display: inline-block;
+	font-size: 85%;
+	text-align: center;
+
+	.numerator {
+		display: block;
+		line-height: 1em;
+		margin: 0 0.1em;
+	}
+
+	.denominator {
+		display: block;
+		line-height: 1em;
+		margin: 0 0.1em;
+		border-top: 1px solid;
+	}
+
+	.frac {
+		position: absolute;
+		left: -10000px;
+		top: auto;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+	}
+}
+
+/*******************************************************************************
+Author(s): salle
+Template: DeadlockSpiritScalingBox
+*******************************************************************************/
+
+div.dl-spirit-x-box {
+	position: relative;
+	width: 100px;
+	height: 24px;
+
+	> div.dl-spirit-x-box-ratio {
+		font-weight: bold;
+		padding: 0 8px 0 12px;
+		position: absolute;
+		left: 28px;
+		top: 3px;
+	}
+
+	> div.dl-spirit-x-box-image {
+		position: absolute;
+		top: 0;
+	}
+}
+
+/*******************************************************************************
+Author(s): SlothyMan
+Template(s): HeroIconTable
+	ItemIconTable
+*******************************************************************************/
+
+.zoom-container {
+	transition: transform 0.2s ease-in-out;
+
+	&:hover {
+		transform: scale( 1.05 );
+		cursor: pointer;
+	}
+}
+
+/*******************************************************************************
+Author(s): SlothyMan, Elisa
+Template(s): ChampionIconTable
+	SummonIconTable
+*******************************************************************************/
+
+.wildcard-chronos-theme {
+	.theme--light & {
+		background-color: #ffc000;
+	}
+
+	.theme--dark & {
+		background-color: #fb8300;
+	}
+}
+
+.wildcard-lubabub-theme {
+	.theme--light & {
+		background-color: #35cd00;
+	}
+
+	.theme--dark & {
+		background-color: #008000;
+	}
+}
+
+.wildcard-malus-theme {
+	.theme--light & {
+		background-color: #e70015;
+	}
+
+	.theme--dark & {
+		background-color: #a90012;
+	}
+}
+
+/*******************************************************************************
+Author(s): Rathoz
+Attritute highlight, so far only used in Infoboxes, but can be used anywhere
+*******************************************************************************/
+.primaryAttribute img {
+	.dota2 &,
+	.dota2gameru & {
+		border: 0.125rem solid var( --clr-primary-100 );
+		border-radius: 50%;
+	}
+
+	.warcraft & {
+		border: 0.25rem solid var( --clr-wiki-theme-primary );
+		border-radius: 0.75rem;
+	}
+}
+
+.secondaryAttribute img {
+	.dota2 &,
+	.dota2gameru & {
+		border: 0.125rem solid var( --clr-secondary-7 );
+		border-radius: 50%;
+	}
+}
+/*******************************************************************************
+Template(s): POIDraft
+Author(s): Slothyman
+Slightly transparent imagelabel on POIDraft
+*******************************************************************************/
+.poi-label-rotation-one {
+	.theme--light & {
+		background-color: rgba( 204, 171, 0, 0.75 );
+	}
+
+	.theme--dark & {
+		background-color: rgba( 102, 84, 0, 0.75 );
+	}
+}
+
+.poi-label-rotation-two {
+	.theme--light & {
+		background-color: rgba( 204, 225, 255, 0.75 );
+	}
+
+	.theme--dark & {
+		background-color: rgba( 0, 25, 51, 0.75 );
+	}
+}
+
+// resources/styles/components/_catlinks.scss
+.catlinks {
+	background-color: transparent;
+
+	.theme--light & {
+		border: 0.0625rem solid var( --clr-on-surface-light-primary-8 );
+	}
+
+	.theme--dark & {
+		border: 0.0625rem solid var( --clr-on-surface-dark-primary-8 );
+	}
+}
+
+// resources/styles/components/_fieldbox.scss
+body .fieldBox {
+	background: var( --clr-surface-2 );
+	color: var( --clr-on-surface );
+}

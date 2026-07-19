@@ -1,28 +1,29 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Util/Starcraft
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Faction = require('Module:Faction')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Faction = Lua.import('Module:Faction')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local SCORE_STATUS = MatchGroupInputUtil.STATUS.SCORE
 
 --Utility functions for match group related things specific to the starcraft and starcraft2 wikis.
+---@class StarcraftMatchGroupUtil: MatchGroupUtil
 local StarcraftMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
 ---@class StarcraftMatchGroupUtilGameOpponent:GameOpponent
@@ -41,14 +42,12 @@ local StarcraftMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 ---@field map string
 ---@field displayName string?
 
----@class StarcraftMatchGroupUtilSubmatch
+---@class StarcraftMatchGroupUtilSubmatch: MatchGroupUtilSubgroup
 ---@field games StarcraftMatchGroupUtilGame[]
 ---@field mode string
 ---@field status string?
 ---@field opponents StarcraftMatchGroupUtilGameOpponent[]
----@field subgroup number
 ---@field winner number?
----@field header string?
 
 ---@class StarcraftMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games StarcraftMatchGroupUtilGame[]
@@ -83,8 +82,8 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	if match.opponentMode == 'team' then
 		-- Compute submatches
 		match.submatches = Array.map(
-			StarcraftMatchGroupUtil.groupBySubmatch(match.games),
-			function(games) return StarcraftMatchGroupUtil.constructSubmatch(games, match) end
+			MatchGroupUtil.groupBySubgroup(match),
+			FnUtil.curry(StarcraftMatchGroupUtil.constructSubmatch, match)
 		)
 	end
 
@@ -102,7 +101,6 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 
 	-- Misc
 	match.isFfa = Logic.readBool(Table.extract(extradata, 'ffa'))
-	match.casters = String.nilIfEmpty(Table.extract(extradata, 'casters'))
 
 	return match
 end
@@ -162,31 +160,12 @@ function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	end)
 end
 
----Group games on the subgroup field to form submatches
----@param matchGames StarcraftMatchGroupUtilGame[]
----@return StarcraftMatchGroupUtilGame[][]
-function StarcraftMatchGroupUtil.groupBySubmatch(matchGames)
-	-- Group games on adjacent subgroups
-	local previousSubgroup = nil
-	local currentGames = nil
-	local submatchGames = {}
-	for _, game in ipairs(matchGames) do
-		if previousSubgroup == nil or previousSubgroup ~= game.subgroup then
-			currentGames = {}
-			table.insert(submatchGames, currentGames)
-			previousSubgroup = game.subgroup
-		end
-		---@cast currentGames -nil
-		table.insert(currentGames, game)
-	end
-	return submatchGames
-end
-
 ---Constructs a submatch object whose properties are aggregated from that of its games.
----@param games StarcraftMatchGroupUtilGame[]
 ---@param match StarcraftMatchGroupUtilMatch
+---@param subgroup MatchGroupUtilSubgroup
 ---@return StarcraftMatchGroupUtilSubmatch
-function StarcraftMatchGroupUtil.constructSubmatch(games, match)
+function StarcraftMatchGroupUtil.constructSubmatch(match, subgroup)
+	local games = subgroup.games
 	local firstGame = games[1]
 	local opponents = Table.deepCopy(firstGame.opponents)
 	local isSubmatch = String.startsWith(firstGame.map or '', 'Submatch')
@@ -230,14 +209,11 @@ function StarcraftMatchGroupUtil.constructSubmatch(games, match)
 		opponent.placement = MatchGroupInputUtil.placementFromWinner('', winner, opponentIndex)
 	end)
 
-	return {
-		games = games,
+	return Table.mergeInto({
 		mode = firstGame.mode,
 		opponents = opponents,
-		subgroup = firstGame.subgroup,
 		winner = winner,
-		header = Table.extract(match.extradata or {}, 'subgroup' .. firstGame.subgroup .. 'header'),
-	}
+	}, subgroup)
 end
 
 ---Determine if a match has details that should be displayed via popup

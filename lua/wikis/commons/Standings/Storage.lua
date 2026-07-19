@@ -1,22 +1,23 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Standings/Storage
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+local Lua = require('Module:Lua')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Variables = Lua.import('Module:Variables')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local StandingsStorage = {}
 local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
@@ -212,7 +213,7 @@ end
 
 ---@return boolean
 function StandingsStorage.shouldStoreLpdb()
-	return Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+	return Lpdb.isStorageEnabled()
 end
 
 ---@param data table
@@ -296,11 +297,11 @@ function StandingsStorage.fromTemplateEntry(frame)
 		local team
 
 		-- Input contains an actual team
-		if data.team and mw.ext.TeamTemplate.teamexists(data.team) then
-			team = mw.ext.TeamTemplate.raw(data.team, date)
+		if data.team and TeamTemplate.exists(data.team) then
+			team = TeamTemplate.getRaw(data.team, date)
 		-- Input is link (possiblity with icon etc), and we managed to parse it
-		elseif teamPage and mw.ext.TeamTemplate.teamexists(teamPage) then
-			team = mw.ext.TeamTemplate.raw(teamPage, date)
+		elseif teamPage and TeamTemplate.exists(teamPage) then
+			team = TeamTemplate.getRaw(teamPage, date)
 		end
 
 		opponentArgs = {type = Opponent.team}
@@ -320,7 +321,7 @@ function StandingsStorage.fromTemplateEntry(frame)
 		end
 	end
 
-	data.opponent = Opponent.resolve(Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd(), date)
+	data.opponent = Opponent.resolve(Opponent.readOpponentArgs(opponentArgs), date)
 
 	if (data.placement or ''):lower() == DISQUALIFIED then
 		data.definitestatus = DISQUALIFIED

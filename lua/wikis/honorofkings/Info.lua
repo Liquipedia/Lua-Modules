@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=honorofkings
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -18,12 +17,12 @@ return {
 			name = 'Arena of Valor',
 			link = 'Arena of Valor',
 			logo = {
-				darkMode = 'Arena of Valor Icon.png',
-				lightMode = 'Arena of Valor Icon.png',
+				darkMode = 'Arena of Valor 2022 darkmode.png',
+				lightMode = 'Arena of Valor 2022 lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Arena of ValorLogo.png',
-				lightMode = 'Arena of ValorLogo.png',
+				darkMode = 'Arena of Valor 2022 darkmode.png',
+				lightMode = 'Arena of Valor 2022 lightmode.png',
 			},
 		},
 		aovas = {
@@ -44,12 +43,12 @@ return {
 			name = 'Honor of Kings',
 			link = 'Honor of Kings',
 			logo = {
-				darkMode = 'Honor of Kings Icon.png',
-				lightMode = 'Honor of Kings Icon.png',
+				darkMode = 'Honor of Kings 2026 allmode.png',
+				lightMode = 'Honor of Kings 2026 allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Honor of Kings 2018-12-24 Logo.png',
-				lightMode = 'Honor of Kings 2018-12-24 Logo.png',
+				darkMode = 'Honor of Kings 2026 allmode.png',
+				lightMode = 'Honor of Kings 2026 allmode.png',
 			},
 		},
 		hokic = {
@@ -80,6 +79,16 @@ return {
 		},
 		transfers = {
 			showTeamName = true,
+		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'manual',
+				storeFromWikiCode = true,
+			},
+		},
+		participants = {
+			defaultPlayerNumber = 5,
 		},
 	},
 }

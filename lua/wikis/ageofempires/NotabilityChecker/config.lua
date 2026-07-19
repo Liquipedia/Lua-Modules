@@ -1,12 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:NotabilityChecker/config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Table = Lua.import('Module:Table')
 
 local Config = {}
 
@@ -22,9 +23,6 @@ Config.TIER_TYPE_CHARITY = 'charity'
 
 -- How many placements should we retrieve from LPDB for a team/player?
 Config.PLACEMENT_LIMIT = 2000
-
--- How many players can be in a team?
-Config.MAX_NUMBER_OF_PARTICIPANTS = 10
 
 -- How many coaches can be in a team?
 Config.MAX_NUMBER_OF_COACHES = 1
@@ -210,9 +208,12 @@ Config.weights = {
 	},
 }
 
--- This function adjusts the score for the placement, e.g.
--- a first placement should score more than a 10th placement.
--- See also the EXTRA_DROP_OFF_TYPES.
+--- This function adjusts the score for the placement, e.g.
+--- a first placement should score more than a 10th placement.
+--- See also the EXTRA_DROP_OFF_TYPES.
+---@param tier string|integer
+---@param tierType string
+---@return fun(number, number): number
 function Config.placementDropOffFunction(tier, tierType)
 	if tierType ~= nil and Table.includes(Config.EXTRA_DROP_OFF_TYPES, tierType:lower()) then
 		return function(score, placement) return score / (placement * placement) end

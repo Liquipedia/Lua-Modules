@@ -1,33 +1,36 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local AllowedServers = require('Module:Server')
-local Array = require('Module:Array')
-local Autopatch = require('Module:Automated Patch')
-local Class = require('Module:Class')
-local Countdown = require('Module:Countdown')
-local DateExt = require('Module:Date/Ext')
-local Game = require('Module:Game')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
+local AllowedServers = Lua.import('Module:Server')
+local Array = Lua.import('Module:Array')
+local PatchAuto = Lua.import('Module:Infobox/Extension/PatchAuto')
+local Class = Lua.import('Module:Class')
+local Countdown = Lua.import('Module:Countdown')
+local DateExt = Lua.import('Module:Date/Ext')
+local Game = Lua.import('Module:Game')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Namespace = Lua.import('Module:Namespace')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
+
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extension/PrizePool')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
-local Widgets = require('Module:Widget/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -42,13 +45,12 @@ local FINISHED = 'finished'
 local DEFAULT_MODE = '1v1'
 local GREATER_EQUAL = '&#8805;'
 local PRIZE_POOL_ROUND_PRECISION = 2
-local TODAY = os.date('%Y-%m-%d', os.time())
 
 local GAME_MOD = 'mod'
 local GAME_LOTV = Game.toIdentifier{game = 'lotv'}
 
 ---@param frame Frame
----@return Html
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -63,9 +65,10 @@ function CustomLeague:customParseArguments(args)
 	args.raceBreakDown = RaceBreakdown.run(args) or {}
 	args.player_number = args.raceBreakDown.total
 	args.maps = self:_getMaps('map', args)
-	args.number = tonumber(args.number)
+	self.data.number = tonumber(args.number)
 	self.data.mode = args.mode or DEFAULT_MODE
 	self.data.game = (args.game or ''):lower() == GAME_MOD and GAME_MOD or self.data.game
+	self.data.mod = self.data.game == GAME_MOD and args.modname or nil
 	self.data.status = self:_getStatus(args)
 
 	self.data.startTime = Logic.wrapTryOrLog(CustomLeague._readStartTime)(self)
@@ -99,20 +102,19 @@ end
 function CustomLeague:_computePatch(args)
 	local prefixPatch = function(patch)
 		if not patch then return end
-		return 'Patch ' .. patch
+		return 'Patch ' .. patch:gsub('_', ' ')
+	end
+	self.data.patch = prefixPatch(args.patch)
+	self.data.endPatch = prefixPatch(args.epatch)
+
+	if self.data.game ~= GAME_LOTV or not Logic.nilOr(Logic.readBoolOrNil(args.autopatch), true) then
+		return
 	end
 
-	local shouldFetchPatch = Logic.nilOr(Logic.readBoolOrNil(args.autopatch), true)
-	local fetchPatch = function(date)
-		if not shouldFetchPatch or self.data.game ~= GAME_LOTV then return end
-		return Autopatch._main{date}
-	end
-
-	local patch = args.patch or fetchPatch(self.data.startDate or TODAY)
-	local endPatch = args.epatch or fetchPatch(self.data.endDate or TODAY) or patch
-
-	self.data.patch = prefixPatch(patch)
-	self.data.endPatch = prefixPatch(endPatch)
+	self.data = PatchAuto.run(self.data, {
+		patch_display = prefixPatch(args.patch),
+		epatch_display = prefixPatch(args.epatch),
+	})
 end
 
 ---@param args table
@@ -147,13 +149,15 @@ function CustomLeague:_isFinished(args)
 		return false
 	end
 
-	return mw.ext.LiquipediaDB.lpdb('placement', {
+	local winner = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = '[[pagename::' .. string.gsub(self.pagename, ' ', '_') .. ']] '
 			.. 'AND [[opponentname::!TBD]] AND [[opponentname::!]] AND [[placement::1]]',
-		query = 'date',
+		query = 'opponenttype, opponentplayers, opponenttemplate, opponentname',
 		order = 'date asc',
 		limit = 1
-	})[1] ~= nil
+	})[1]
+
+	return winner and not Opponent.isTbd(Opponent.fromLpdbStruct(winner))
 end
 
 -- Automatically fill in next/previous for touranaments that are part of a series
@@ -168,7 +172,7 @@ function CustomLeague:_computeChronology(args)
 	local number = tonumber(title.subpageText)
 	local automateChronology = String.isNotEmpty(args.series)
 		and number
-		and args.number == number
+		and self.data.number == number
 		and title.subpageText ~= title.text
 		and Logic.readBool(args.auto_chronology or true)
 		and (String.isEmpty(args.next) or String.isEmpty(args.previous))
@@ -187,8 +191,8 @@ function CustomLeague:_computeChronology(args)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -196,25 +200,25 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game Version', content = {caller:_getGameVersion(args)}},
-			Cell{name = 'Server', content = {caller:_getServer(args)}}
+			Cell{name = 'Game Version', children = caller:_getGameVersion(args)},
+			Cell{name = 'Server', children = {caller:_getServer(args)}}
 		}
 	elseif id == 'dates' and data.startTime.display then
-		local startTime = Countdown._create{date = data.startTime.display, rawdatetime = true}
+		local startTime = Countdown.create{date = data.startTime.display, rawdatetime = true}
 
 		if data.startDate == data.endDate then
-			return {Cell{name = 'Start Time', content = {startTime}}}
+			return {Cell{name = 'Start Time', children = {startTime}}}
 		end
 		return {
-			Cell{name = 'Start Time', content = {startTime}},
-			Cell{name = 'End Date', content = {args.edate}},
+			Cell{name = 'Start Time', children = {startTime}},
+			Cell{name = 'End Date', children = {args.edate}},
 		}
 	elseif id == 'customcontent' then
 		if args.player_number and args.player_number > 0 or args.team_number then
 			Array.appendWith(widgets,
 				Title{children = 'Participants'},
-				Cell{name = 'Number of Players', content = {args.raceBreakDown.total}},
-				Cell{name = 'Number of Teams', content = {args.team_number}},
+				Cell{name = 'Number of Players', children = {args.raceBreakDown.total}},
+				Cell{name = 'Number of Teams', children = {args.team_number}},
 				Breakdown{children = args.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 		end
@@ -306,22 +310,24 @@ function CustomLeague._removePlus(inputValue, alreadyHasPlus)
 end
 
 ---@param args table
----@return string
+---@return Renderable[]
 function CustomLeague:_getGameVersion(args)
 	local betaPrefix = String.isNotEmpty(args.beta) and 'Beta ' or ''
 
 	local gameDisplay = self.data.game == GAME_MOD and (args.modname or 'Mod')
-		or Page.makeInternalLink(Game.name{game = self.data.game})
+		or Link{link = Game.name{game = self.data.game}}
 
 	local patch = self.data.patch
 	local endPatch = self.data.endPatch
 
-	local patchDisplay = betaPrefix .. table.concat({
-		Page.makeInternalLink(patch),
-		Page.makeInternalLink(endPatch ~= patch and patch and endPatch or nil)
-	}, ' &ndash; ')
+	local patches = Array.map(Array.map({
+		Link{link = patch, children = self.data.patchDisplay},
+		Link{link = endPatch ~= patch and patch and endPatch or nil, children = self.data.endPatchDisplay}
+	}, tostring), Logic.nilIfEmpty)
 
-	return table.concat({gameDisplay, patchDisplay}, '<br>')
+	local patchDisplay = betaPrefix .. table.concat(patches, ' &ndash; ')
+
+	return {gameDisplay, patchDisplay}
 end
 
 ---@param args table
@@ -330,7 +336,7 @@ function CustomLeague:shouldStore(args)
 	return Namespace.isMain() and
 		not Logic.readBool(args.disable_lpdb) and
 		not Logic.readBool(args.disable_storage) and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage', 'false'))
+		Lpdb.isStorageEnabled()
 end
 
 ---@param args table
@@ -356,9 +362,10 @@ end
 
 ---@param args table
 function CustomLeague:defineCustomPageVariables(args)
+	Variables.varDefine('tournament_mod', self.data.mod)
 	Variables.varDefine('headtohead', args.headtohead or 'true')
 	Variables.varDefine('tournament_maps', Json.stringify(args.maps))
-	Variables.varDefine('tournament_series_number', args.number and string.format('%05i', args.number) or nil)
+	Variables.varDefine('tournament_series_number', self.data.number and string.format('%05i', self.data.number) or nil)
 	Variables.varDefine('match_date', self.data.startTime.storage)
 end
 
@@ -384,8 +391,9 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
 	lpdbData.maps = Json.stringify(args.maps)
 
-	lpdbData.extradata.seriesnumber = args.number and string.format('%05i', args.number) or nil
+	lpdbData.extradata.seriesnumber = self.data.number and string.format('%05i', self.data.number) or nil
 	lpdbData.extradata.starttime = self.data.startTime.storage
+	lpdbData.extradata.mod = self.data.mod
 
 	return lpdbData
 end

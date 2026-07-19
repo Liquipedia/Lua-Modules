@@ -1,50 +1,44 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Misc/InlineIconAndText
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
-local Span = HtmlWidgets.Span
+local Span = Html.Span
 
 ---@class InlineIconAndTextWidgetParameters
 ---@field icon IconWidget
 ---@field text string?
 ---@field link string?
+---@field flipped boolean?
 
----@class InlineIconAndTextWidget: Widget
----@operator call(InlineIconAndTextWidgetParameters): InlineIconAndTextWidget
-
-local InlineIconAndText = Class.new(Widget)
-InlineIconAndText.defaultProps = {
-	flipped = false,
-}
-
----@return Widget
-function InlineIconAndText:render()
+---@param props InlineIconAndTextWidgetParameters
+---@return VNode
+local function InlineIconAndText(props)
 	local children = {
-		self.props.icon,
+		props.icon,
 		' ',
-		Link{
-			link = self.props.link,
+		Logic.isNotEmpty(props.link) and Link{
+			link = props.link,
 			linktype = 'internal',
-			children = {self.props.text}
-		},
+			children = {props.text}
+		} or props.text,
 	}
 
 	return Span{
 		classes = {'image-link'},
-		children = self.props.flipped and Array.reverse(children) or children,
+		children = props.flipped and Array.reverse(children) or children,
 	}
 end
 
-return InlineIconAndText
+return Component.component(InlineIconAndText, {flipped = false})

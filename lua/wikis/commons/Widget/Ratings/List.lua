@@ -1,41 +1,93 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Ratings/List
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Date = require('Module:Date/Ext')
-local Flags = require('Module:Flags')
-local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Date = Lua.import('Module:Date/Ext')
+local Flags = Lua.import('Module:Flags')
+local Icon = Lua.import('Module:Icon')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
+local Operator = Lua.import('Module:Operator')
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Widget = Lua.import('Module:Widget')
+local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
 local RatingsStorageFactory = Lua.import('Module:Ratings/Storage/Factory')
+
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 ---@class RatingsList: Widget
 ---@field _base Widget
 ---@operator call(table): RatingsList
 local RatingsList = Class.new(Widget)
 
+local GRAPH_VIEW_RANK = 'rank'
+local GRAPH_VIEW_POINTS = 'points'
+local GRAPH_COLOR_RANK = '#EE6666'
+local GRAPH_COLOR_POINTS = '#2F80ED'
+
+---@alias RatingsProgression {date: string, rating: number?, rank: integer?}[]
+---@alias AxisBoundsFn fun(progression: RatingsProgression, defaultMaxY: integer): number, number
+
+---@param progression RatingsProgression
+---@return number
+---@return number
+local function pointsAxisBounds(progression)
+	local points = Array.filter(Array.map(progression, Operator.property('rating')), Logic.isNotEmpty)
+	local minPoints = Array.min(points) or 0
+	local maxPoints = Array.max(points) or minPoints
+	local roundedMinPoints = math.max(0, math.floor(minPoints))
+	local roundedMaxPoints = math.ceil(maxPoints)
+
+	if roundedMinPoints == roundedMaxPoints then
+		return math.max(0, roundedMinPoints - 1), roundedMaxPoints + 1
+	end
+
+	return roundedMinPoints, roundedMaxPoints
+end
+
+---@param progression RatingsProgression
+---@param defaultMaxY integer
+---@return number
+---@return number
+local function rankAxisBounds(progression, defaultMaxY)
+	local worstRank = Array.max(Array.map(progression, Operator.property('rank'))) or defaultMaxY
+	return 1, math.max(worstRank, defaultMaxY)
+end
+
+---@param progression {date: string, rating: number?, rank: integer?}[]
+---@param graphView string
+---@return (number|string)[]
+local function makeGraphSeriesData(progression, graphView)
+	return Array.map(progression, function(progress)
+		local value = graphView == GRAPH_VIEW_POINTS and progress.rating or progress.rank
+		return value or ''
+	end)
+end
+
 ---@param teamData RatingsEntry
 ---@param defaultMaxY integer
+---@param graphView string
+---@param getAxisBounds AxisBoundsFn
 ---@return string
-local function makeTeamChart(teamData, defaultMaxY)
+local function makeTeamChart(teamData, defaultMaxY, graphView, getAxisBounds)
 	local progression = Array.sortBy(teamData.progression, Operator.property('date'))
-	local worstRankOfTeam = Array.max(Array.map(progression, Operator.property('rank')))
+	local axisMin, axisMax = getAxisBounds(progression, defaultMaxY)
+	local axisName = graphView == GRAPH_VIEW_POINTS and 'Points' or 'Rank'
+	local graphColor = graphView == GRAPH_VIEW_POINTS and GRAPH_COLOR_POINTS or GRAPH_COLOR_RANK
 
 	local dates = Array.map(Array.map(progression, Operator.property('date')), function(isoDate)
 		return os.date('%b %d', os.time(Date.parseIsoDate(isoDate)))
@@ -49,13 +101,13 @@ local function makeTeamChart(teamData, defaultMaxY)
 			data = dates,
 		},
 		yAxis = {
-			name = 'Rank',
+			name = axisName,
 			nameLocation = 'middle',
 			nameRotate = 90,
 			type = 'value',
-			inverse = true,
-			min = 1,
-			max = math.max(worstRankOfTeam, defaultMaxY),
+			inverse = graphView == GRAPH_VIEW_RANK,
+			min = axisMin,
+			max = axisMax,
 		},
 		tooltip = {
 			trigger = 'axis',
@@ -69,14 +121,15 @@ local function makeTeamChart(teamData, defaultMaxY)
 		},
 		series = {
 			{
-				data = Array.map(progression, function(progress)
-					return progress.rank and tostring(progress.rank) or ''
-				end),
+				data = makeGraphSeriesData(progression, graphView),
 				type = 'line',
-				name = 'Rank',
+				name = axisName,
 				symbolSize = 8,
+				color = graphColor,
 				itemStyle = {
-					color = '#EE6666',
+					color = graphColor,
+					borderColor = '#FFFFFF',
+					borderWidth = 2,
 				},
 			}
 		}
@@ -85,56 +138,98 @@ end
 
 ---@return Widget
 function RatingsList:render()
-	-- Simple check to verify that the input is a osdate
-	assert(self.props.date and self.props.date.wday, 'Invalid date provided')
-	---@type osdate
-	local date = self.props.date
-	local dateAsString = os.date('%F', os.time(date)) --[[@as string]]
-
 	local teamLimit = tonumber(self.props.teamLimit) or self.defaultProps.teamLimit
-	local progressionLimit = tonumber(self.props.progressionLimit) or self.defaultProps.progressionLimit
 	local showGraph = Logic.readBool(self.props.showGraph)
 	local isSmallerVersion = Logic.readBool(self.props.isSmallerVersion)
 
 	local getRankings = RatingsStorageFactory.createGetRankings {
 		storageType = self.props.storageType,
-		date = dateAsString,
 		id = self.props.id,
 	}
-	local teams = getRankings(teamLimit, progressionLimit)
+	local teams = getRankings(teamLimit)
 
-	local teamRows = Array.map(teams, function(team, rank)
-		local uniqueId = dateAsString .. '-' .. rank
-		local streakText = team.streak > 1 and team.streak .. 'W' or (team.streak < -1 and (-team.streak) .. 'L') or '-'
-		local streakClass = (team.streak > 1 and 'group-table-rank-change-up')
-			or (team.streak < -1 and 'group-table-rank-change-down')
-			or nil
+	local anyTeam = teams[1]
+	local lastDate = anyTeam.progression[#anyTeam.progression].date
+	local formattedDate = Date.toYmdInUtc(Date.parseIsoDate(lastDate))
 
+	local columns = {
+		{ align = 'right' },
+		{ align = 'left' },
+		{ align = 'left' },
+		{ align = 'right' },
+		{ align = 'left' },
+		{ align = 'center' },
+	}
+
+	local title = Html.Div {
+		children = {
+			Html.Div {
+				children = {
+					Html.B { children = 'BETA' },
+					Html.Span { children = 'Last updated: ' .. formattedDate }
+				},
+				classes = { 'ranking-table__top-row-text' }
+			},
+			Html.Div {
+				children = {
+					Html.Span { children = 'Data provided by ' },
+					IconImage { imageLight = 'SAP_logo.svg', size = '90px' }
+				},
+				classes = { 'ranking-table__top-row-logo-container' }
+			}
+		},
+		classes = { 'ranking-table__top-row' },
+	}
+
+	local columnHeaderRow = TableWidgets.Row {
+		children = WidgetUtil.collect(
+			TableWidgets.CellHeader { attributes = { ['data-ranking-table-cell'] = 'rank' }, children = 'Rank' },
+			TableWidgets.CellHeader { attributes = { ['data-ranking-table-cell'] = 'change' }, children = '+/-' },
+			TableWidgets.CellHeader { attributes = { ['data-ranking-table-cell'] = 'team' }, children = 'Team' },
+			TableWidgets.CellHeader { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = 'Points' },
+			TableWidgets.CellHeader { attributes = { ['data-ranking-table-cell'] = 'region' }, children = 'Region' },
+			showGraph and TableWidgets.CellHeader {
+				attributes = { ['data-ranking-table-cell'] = 'graph' },
+				children = Icon.makeIcon { iconName = 'chart' }
+			} or nil
+		),
+	}
+
+	local teamRows = Array.map(teams, function(team, index)
+		local uniqueId = index
+		local graphSwitchGroup = 'ratings-graph-view-' .. tostring(self.props.id or 'default') .. '-' .. uniqueId
 		local changeText = (not team.change and 'NEW') or PlacementChange { change = team.change }
 
-		local teamRow = WidgetUtil.collect(
-			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'rank' }, children = rank },
-			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'change' }, children = changeText },
-			HtmlWidgets.Td {
+		local rowClasses = {}
+		local isEven = team.rank % 2 == 0
+		if isEven then
+			table.insert(rowClasses, 'ranking-table__row--even')
+		end
+		if team.rank > 5 and isSmallerVersion then
+			table.insert(rowClasses, 'ranking-table__row--overfive')
+		end
+
+		local teamRowCells = WidgetUtil.collect(
+			TableWidgets.Cell { attributes = { ['data-ranking-table-cell'] = 'rank' }, children = team.rank },
+			TableWidgets.Cell { attributes = { ['data-ranking-table-cell'] = 'change' }, children = changeText },
+			TableWidgets.Cell {
 				attributes = { ['data-ranking-table-cell'] = 'team' },
 				children = OpponentDisplay.BlockOpponent { opponent = team.opponent, teamStyle = 'hybrid' }
 			},
-			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = team.rating },
-			HtmlWidgets.Td {
+			TableWidgets.Cell {
+				attributes = { ['data-ranking-table-cell'] = 'rating' },
+				children = MathUtil.round(team.rating)
+			},
+			TableWidgets.Cell {
 				attributes = { ['data-ranking-table-cell'] = 'region' },
-				children = Flags.Icon{flag = team.region} .. Flags.CountryName{flag = team.region}
+				children = Flags.Icon { flag = team.region } .. Flags.CountryName { flag = team.region }
 			},
-			HtmlWidgets.Td {
-				attributes = { ['data-ranking-table-cell'] = 'streak' },
-				children = streakText,
-				classes = { streakClass }
-			},
-			showGraph and (HtmlWidgets.Td {
+			showGraph and TableWidgets.Cell {
 				attributes = {
 					class = 'ranking-table__toggle-graph-cell',
 					['data-ranking-table-cell'] = 'graph'
 				},
-				children = HtmlWidgets.Span {
+				children = Html.Span {
 					attributes = {
 						class = 'ranking-table__toggle-graph',
 						['data-ranking-table'] = 'toggle',
@@ -143,132 +238,107 @@ function RatingsList:render()
 						tabindex = '1'
 					},
 					children = Icon.makeIcon { iconName = 'expand' }
-			} }) or nil
+				} } or nil
 		)
 
-		local graphRow = showGraph and {
-			HtmlWidgets.Td {
-				attributes = {
-					colspan = '7',
-					['data-ranking-table-cell'] = 'graph'
-				},
-				children = HtmlWidgets.Div {
-					children = {
-						OpponentDisplay.InlineOpponent { opponent = team.opponent },
-						Logic.tryOrElseLog(
-							function() return makeTeamChart(team, teamLimit) end,
-							function() return 'Failed to make graph for team' end
-						)
+		local teamRow = TableWidgets.Row {
+			children = teamRowCells,
+			classes = rowClasses,
+		}
+
+		local graphRow = nil
+		if showGraph then
+			graphRow = TableWidgets.Row {
+				children = TableWidgets.Cell {
+					attributes = {
+						colspan = '6',
+						['data-ranking-table-cell'] = 'graph'
+					},
+					children = Html.Div {
+						children = {
+							Html.Div {
+								classes = { 'ranking-table__graph-switch' },
+								children = ContentSwitch {
+									switchGroup = graphSwitchGroup,
+									storeValue = false,
+									defaultActive = 1,
+									css = { display = 'flex', ['justify-self'] = 'center' },
+									tabs = {
+										{
+											label = 'Rank',
+											value = GRAPH_VIEW_RANK,
+											content = Logic.tryOrElseLog(
+												function()
+													return makeTeamChart(team, teamLimit, GRAPH_VIEW_RANK, rankAxisBounds)
+												end,
+												function() return 'Failed to make rank graph for team' end
+											)
+										},
+										{
+											label = 'Points',
+											value = GRAPH_VIEW_POINTS,
+											content = Logic.tryOrElseLog(
+												function()
+													return makeTeamChart(team, teamLimit, GRAPH_VIEW_POINTS, pointsAxisBounds)
+												end,
+												function() return 'Failed to make points graph for team' end
+											)
+										},
+									},
+								},
+							}
+						}
 					},
 					classes = { 'ranking-table__graph-row-container' }
-				}
-			}
-		} or nil
-
-		local isEven = rank % 2 == 0
-		local rowClasses = { 'ranking-table__row' }
-		if isEven then
-			table.insert(rowClasses, 'ranking-table__row--even')
-		end
-		if rank > 5 and isSmallerVersion then
-			table.insert(rowClasses, 'ranking-table__row--overfive')
-		end
-
-		return {
-			HtmlWidgets.Tr { children = teamRow, classes = rowClasses },
-			showGraph and HtmlWidgets.Tr {
-				children = graphRow,
+				},
 				classes = { 'ranking-table__graph-row d-none' },
 				attributes = {
 					['data-ranking-table'] = 'graph-row',
 					['aria-expanded'] = 'false',
 					['data-ranking-table-id'] = uniqueId
 				},
-			} or nil
+			}
+		end
+
+		return {
+			teamRow,
+			graphRow
 		}
 	end)
 
-	local formattedDate = os.date('%b %d, %Y', os.time(date)) --[[@as string]]
-	local tableHeader = HtmlWidgets.Tr {
-		children = HtmlWidgets.Th {
-			attributes = { colspan = '7' },
-			children = HtmlWidgets.Div {
-				children = {
-					HtmlWidgets.Div {
-						children = {
-							HtmlWidgets.B{children = 'BETA'},
-							HtmlWidgets.Span{children = 'Last updated: ' .. formattedDate}
-						},
-						classes = { 'ranking-table__top-row-text' }
-					},
-					HtmlWidgets.Div {
-						children = {
-							HtmlWidgets.Span {children = 'Data provided by '},
-							HtmlWidgets.Div {children = '[[File:SAP_logo.svg|link=|SAP]]'}
-						},
-						classes = { 'ranking-table__top-row-logo-container' }
-					}
-				}
-			},
-			classes = { 'ranking-table__top-row' },
-		}
-	}
-
-	local buttonDiv = HtmlWidgets.Div {
+	local buttonDiv = Html.Div {
 		children = { 'See Rankings Page', Icon.makeIcon { iconName = 'goto' } },
+		classes = { 'ranking-table__footer-button' },
 	}
 
-	local tableFooter = HtmlWidgets.Tr {
-		children = HtmlWidgets.Th {
-			attributes = { colspan = '7' },
-			children = Link {
-				link = 'Portal:Rating',
-				linktype = 'internal',
-				children = { buttonDiv },
-			},
-			classes = { 'ranking-table__footer-row' },
-		}
+	local footer = Link {
+		link = 'Portal:Rankings',
+		linktype = 'internal',
+		children = { buttonDiv },
 	}
 
-	return HtmlWidgets.Div {
+	return Html.Div {
 		attributes = {
 			['data-ranking-table'] = 'content',
 		},
-		children = WidgetUtil.collect(
-
-			HtmlWidgets.Table {
-				attributes = { ['data-ranking-table'] = 'table' },
-				classes = { 'ranking-table', isSmallerVersion and 'ranking-table--small' or nil },
-				children = WidgetUtil.collect(
-					tableHeader,
-					HtmlWidgets.Tr {
-						children = WidgetUtil.collect(
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'rank' }, children = 'Rank' },
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'change' }, children = '+/-' },
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'team' }, children = 'Team' },
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = 'Points' },
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'region' }, children = 'Region' },
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'streak' }, children = 'Streak' },
-							showGraph and HtmlWidgets.Th {
-								attributes = { ['data-ranking-table-cell'] = 'graph' },
-								children = Icon.makeIcon { iconName = 'chart' }
-							} or nil
-						),
-						classes = { 'ranking-table__header-row' },
-					},
-					Array.flatten(teamRows),
-					isSmallerVersion and tableFooter or nil
-				)
-			}
-		)
+		children = TableWidgets.Table {
+			columns = columns,
+			striped = false,
+			title = title,
+			footer = isSmallerVersion and footer or nil,
+			classes = { isSmallerVersion and 'ranking-table--small' or nil },
+			tableAttributes = { ['data-ranking-table'] = 'table' },
+			tableClasses = { 'ranking-table' },
+			children = WidgetUtil.collect(
+				TableWidgets.TableHeader {
+					children = { columnHeaderRow }
+				},
+				TableWidgets.TableBody {
+					children = Array.flatten(teamRows)
+				}
+			)
+		}
 	}
-end
-
----@param error Error
----@return string
-function RatingsList:getDerivedStateFromError(error)
-	error.message = 'Could not load the selected week.'
-	return self._base:getDerivedStateFromError(error)
 end
 
 return RatingsList

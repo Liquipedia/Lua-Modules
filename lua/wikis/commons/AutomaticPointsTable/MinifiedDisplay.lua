@@ -1,13 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:AutomaticPointsTable/MinifiedDisplay
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local PointsDivTable = Class.new(
 	function(self, pointsData, tournaments, positionBackgrounds, limit)
@@ -122,7 +124,7 @@ end
 
 function TableRow:nameCell(team)
 	local lastAlias = team.aliases[#team.aliases]
-	local teamDisplay = team.display and team.display or mw.ext.TeamTemplate.team(lastAlias)
+	local teamDisplay = team.display and team.display or OpponentDisplay.InlineTeamContainer{template = lastAlias}
 	local nameCell = self:baseCell(teamDisplay, team.bg):addClass('name-cell')
 	table.insert(self.cells, nameCell)
 	return self

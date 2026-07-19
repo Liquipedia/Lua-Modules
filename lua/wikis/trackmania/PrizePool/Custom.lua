@@ -1,17 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=trackmania
 -- page=Module:PrizePool/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
-local Variables = require('Module:Variables')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Variables = Lua.import('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool')
 
@@ -28,7 +28,7 @@ local TYPE_MODIFIER = {Online = 0.65}
 
 -- Template entry point
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -67,6 +67,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	Variables.varDefine(lpdbData.participant:lower() .. '_prizepoints', lpdbData.extradata.prizepoints)
 	Variables.varDefine(lpdbData.participant:lower() .. '_prizepointsTitle', lpdbData.extradata.prizepointsTitle)
+	Variables.varDefine(lpdbData.participant:lower() .. '_prizepoints2', lpdbData.extradata.prizepoints2)
 
 	return lpdbData
 end

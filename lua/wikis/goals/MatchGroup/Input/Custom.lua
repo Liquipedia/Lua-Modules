@@ -1,12 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=goals
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
+
+local FnUtil = Lua.import('Module:FnUtil')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
@@ -36,9 +37,7 @@ end
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
 function CustomMatchGroupInput.calculateMatchScore(maps)
-	return function(opponentIndex)
-		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	end
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
 return CustomMatchGroupInput

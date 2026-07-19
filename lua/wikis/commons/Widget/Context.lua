@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Context
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
 
@@ -23,7 +23,7 @@ function WidgetContext:getValue(default)
 	return self.props.value
 end
 
----@return (Widget|Html|string|number)[]
+---@return Renderable[]
 function WidgetContext:render()
 	return self.props.children
 end

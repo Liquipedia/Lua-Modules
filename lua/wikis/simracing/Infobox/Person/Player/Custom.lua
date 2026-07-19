@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=simracing
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local GameAppearances = Lua.import('Module:Infobox/Extension/GameAppearances')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class SimracingInfoboxPlayer: Person
@@ -21,7 +21,7 @@ local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return VNode
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -30,12 +30,12 @@ function CustomPlayer.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return {
-			Cell{name = 'Game Appearances', content = GameAppearances.player{player = self.caller.pagename}},
+			Cell{name = 'Game Appearances', children = GameAppearances.player{player = self.caller.pagename}},
 		}
 	end
 

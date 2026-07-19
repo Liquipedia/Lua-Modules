@@ -1,39 +1,70 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Standings/PlacementChange
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
----@class PlacementChangeWidget: Widget
----@operator call(table): PlacementChangeWidget
+local PLACEMENT_MOVE_DOUBLE_UP = IconFa{iconName = 'rankup_double'}
+local PLACEMENT_MOVE_UP = IconFa{iconName = 'rankup'}
+local PLACEMENT_MOVE_NEUTRAL = IconFa{iconName = 'rankneutral'}
+local PLACEMENT_MOVE_DOWN = IconFa{iconName = 'rankdown'}
+local PLACEMENT_MOVE_DOUBLE_DOWN = IconFa{iconName = 'rankdown_double'}
 
-local PlacementChangeWidget = Class.new(Widget)
-PlacementChangeWidget.defaultProps = {
+local defaultProps = {
 	change = 0,
+	emphasisThreshold = 5,
 }
 
----@return Widget?
-function PlacementChangeWidget:render()
-	local change = self.props.change
+---@private
+---@param change integer
+---@return string
+local function getMovementType(change)
 	if change == 0 then
-		return HtmlWidgets.Span{children = '-'}
+		return 'neutral'
+	elseif change > 0 then
+		return 'up'
+	else
+		return 'down'
 	end
-	local positive = change > 0
-	return HtmlWidgets.Span{
-		classes = {'group-table-rank-change-' .. (positive and 'up' or 'down')},
+end
+
+---@private
+---@return Renderable
+local function getIndicator(change, threshold)
+	if change == 0 then
+		return PLACEMENT_MOVE_NEUTRAL
+	end
+
+	local changeEmphasized = math.abs(change) >= threshold
+	if change > 0 then
+		return changeEmphasized and PLACEMENT_MOVE_DOUBLE_UP or PLACEMENT_MOVE_UP
+	end
+	return changeEmphasized and PLACEMENT_MOVE_DOUBLE_DOWN or PLACEMENT_MOVE_DOWN
+end
+
+---@param props {change: integer?, emphasisThreshold: integer?}
+---@return Renderable?
+local function PlacementChangeWidget(props)
+	---@cast props {change: integer, emphasisThreshold: integer}
+	local change = props.change
+
+	return Html.Span{
+		classes = {
+			'standings-position-indicator',
+			'movement-' .. getMovementType(change)
+		},
 		children = {
-			positive and '▲' or '▼',
-			math.abs(change),
+			getIndicator(change, props.emphasisThreshold),
+			change ~= 0 and Html.Span{children = math.abs(change)} or nil
 		},
 	}
 end
 
-return PlacementChangeWidget
+return Component.component(PlacementChangeWidget, defaultProps)

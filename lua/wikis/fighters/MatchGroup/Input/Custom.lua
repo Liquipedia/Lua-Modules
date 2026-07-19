@@ -1,16 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=fighters
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Game = require('Module:Game')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
+local Game = Lua.import('Module:Game')
+local Json = Lua.import('Module:Json')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
@@ -28,6 +29,7 @@ CustomMatchGroupInput.DATE_FALLBACKS = {
 	'tournament_startdate',
 }
 
+CustomMatchGroupInput.getBestOf = MatchGroupInputUtil.getBestOf
 
 -- called from Module:MatchGroup
 ---@param match table
@@ -38,28 +40,20 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function CustomMatchGroupInput.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
----@param bestofInput string
----@return integer?
-function CustomMatchGroupInput.getBestOf(bestofInput)
-	return tonumber(bestofInput)
-end
-
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
 function CustomMatchGroupInput.calculateMatchScore(maps)
-	return function(opponentIndex)
-		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	end
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
@@ -71,12 +65,12 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 end
 
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 	local game = Game.toIdentifier{game = Variables.varDefault('tournament_game')}
-	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization/' .. game)
+	local CharacterStandardizationData = Lua.import('Module:CharacterStandardization/' .. game, {loadData = true})
 
 	local players = Array.mapIndexes(function(playerIndex)
 		return map['t' .. opponentIndex .. 'p' .. playerIndex] or map['o' .. opponentIndex .. 'p' .. playerIndex]

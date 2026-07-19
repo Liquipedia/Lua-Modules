@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
 -- page=Module:NotabilityChecker/config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -79,19 +78,19 @@ Config.weights = {
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 10,
+				points = 15,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 10,
+				points = 15,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 10,
+				points = 15,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 10,
+				points = 15,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -111,19 +110,19 @@ Config.weights = {
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 5,
+				points = 8,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 5,
+				points = 8,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 5,
+				points = 8,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 5,
+				points = 8,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -143,19 +142,19 @@ Config.weights = {
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 2,
+				points = 5,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 2,
+				points = 5,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 2
+				points = 5,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 2,
+				points = 5,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -201,33 +200,47 @@ Config.weights = {
 	},
 }
 
--- This function adjusts the score for the placement, e.g.
--- a first placement should score more than a 10th placement.
--- See also the EXTRA_DROP_OFF_TYPES.
+--- This function adjusts the score for the placement, e.g.
+--- a first placement should score more than a 10th placement.
+--- See also the EXTRA_DROP_OFF_TYPES.
+---@param tier string|integer
+---@param tierType string
+---@return fun(number, number): number
 function Config.placementDropOffFunction(tier, tierType)
 
 		return function(score, placement)
 			if (tier == 1)
-				or (tier == 2 and placement <= 10)
-				or (tier == 3 and placement <= 10)
+				or (tier == 2 and placement <= 3)
+				or (tier == 3 and placement <= 3)
 				or (tier == 4 and placement <= 3)
 				or (tier == 5 and placement <= 3)
 			then
 				return score
 
-			elseif (tier == 2 and placement <= 20)
-				or (tier == 4 and placement <= 5)
-			then
-				return (score * 0.5)
-
-			elseif (tier == 3 and placement <= 20) then
-				return (score * 0.4)
-
-			elseif ((tier == 2 or tier == 3) and (placement <= 30)) then
-				return (score * 0.2)
-
+			elseif (tier == 2 and placement <= 10) then
+				return (score * 10 / 15)
+			elseif (tier == 2 and placement <= 20) then
+				return (score * 5 / 15)
+			elseif (tier == 2 and placement <= 30) then
+				return (score * 2 / 15)
 			elseif (tier == 2) then
-				return (score * 0.1)
+				return (score * 1 / 15)
+
+			elseif (tier == 3 and placement <= 5) then
+				return (score * 5 / 8)
+			elseif (tier == 3 and placement <= 10) then
+				return (score * 3 / 8)
+			elseif (tier == 3 and placement <= 20) then
+				return (score * 2 / 8)
+			elseif (tier == 3 and placement <= 30) then
+				return (score * 1 / 8)
+
+			elseif (tier == 4 and placement <= 5) then
+				return (score * 3 / 5)
+			elseif (tier == 4 and placement <= 10) then
+				return (score * 2 / 5)
+			elseif (tier == 4 and placement <= 20) then
+				return (score * 1 / 5)
 
 			else
 				return (score * 0)
