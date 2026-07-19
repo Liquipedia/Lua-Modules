@@ -156,9 +156,9 @@ function MatchLegacy._convertParameters(match2)
 			player.extradata = Json.parseIfString(player.extradata or '{}') or player.extradata
 			match.extradata.opponent2race = player.extradata.faction
 		elseif opponent1.type == 'team' then
-			match.opponent1 = TeamTemplate.getPageName(opponent1.name)
+			match.opponent1 = TeamTemplate.getPageName(opponent1.name) or 'TBD'
 			match.opponent1score = (tonumber(opponent1.score or 0) or 0) >= 0 and opponent1.score or 0
-			match.opponent2 = TeamTemplate.getPageName(opponent2.name)
+			match.opponent2 = TeamTemplate.getPageName(opponent2.name) or 'TBD'
 			match.opponent2score = (tonumber(opponent2.score or 0) or 0) >= 0 and opponent2.score or 0
 			match.mode = 'team'
 		else
