@@ -24,6 +24,19 @@ local PlayerDisplay = Lua.import('Module:Player/Display')
 ---@class FightersCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
+---@class FightersMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {}
+
+---@class FightersMatchSummaryGameRowProps: MatchSummaryGameRowProps
+---@field gameData string?
+---@field matchOpponents standardOpponent[]
+---@field soloMode boolean
+
+---@type Component<FightersMatchSummaryGameRowProps>
+local FightersMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(
+	GameRowComponentProps, {allowWrappingInOverview = true}
+)
+
 ---@param args table
 ---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
@@ -48,85 +61,59 @@ function CustomMatchSummary._isSolo(match)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return VNode
 function CustomMatchSummary.createBody(match)
-	local games = Array.map(match.games, function(game)
-		return CustomMatchSummary._createStandardGame(game, {
-			opponents = match.opponents,
-			game = match.game,
-			soloMode = CustomMatchSummary._isSolo(match),
-		})
-	end)
-
-	return WidgetUtil.collect(
-		games
-	)
+	return MatchSummaryWidgets.GamesContainer{
+		children = Array.map(match.games, function (game, gameIndex)
+			if Array.all(game.opponents, function(opponent) return Logic.isDeepEmpty(opponent.players) end) then
+				return
+			end
+			return FightersMatchSummaryGameRow{
+				game = game,
+				gameIndex = gameIndex,
+				gameData = match.game,
+				matchOpponents = match.opponents,
+				soloMode = CustomMatchSummary._isSolo(match),
+			}
+		end)
+	}
 end
 
 ---@param game MatchGroupUtilGame
 ---@param matchOpponents standardOpponent[]
----@param teamIdx integer
+---@param opponentIndex integer
 ---@return {player: standardPlayer, characters: string[]}[]
-function CustomMatchSummary.fetchCharactersOfPlayers(game, matchOpponents, teamIdx)
-	return Array.map(game.opponents[teamIdx].players, function (players, index)
+function CustomMatchSummary.fetchCharactersOfPlayers(game, matchOpponents, opponentIndex)
+	return Array.map(game.opponents[opponentIndex].players, function (players, index)
 		if players.characters then
 			local characters = Array.map(players.characters, Operator.property('name'))
-			return {player = matchOpponents[teamIdx].players[index], characters = characters}
+			return {player = matchOpponents[opponentIndex].players[index], characters = characters}
 		end
 	end)
 end
 
----@param game MatchGroupUtilGame
----@param props {game: string?, soloMode: boolean, opponents: table[]}
----@return Widget?
-function CustomMatchSummary._createStandardGame(game, props)
-	if not game or Array.all(game.opponents, function(opponent) return Logic.isDeepEmpty(opponent.players) end) then
-		return
-	end
-
+---@param props FightersMatchSummaryGameRowProps
+---@return string
+function GameRowComponentProps.createGameOverview(props)
+	local game = props.game
 	local scores = Array.map(game.opponents, function(opponent)
 		return DisplayHelper.MapScore(opponent, game.status)
 	end)
 
-	local scoreDisplay = table.concat(scores, '&nbsp;-&nbsp;')
-
-	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-body-game'},
-		css = {
-			['align-items'] = 'center',
-			gap = '0.5rem',
-		},
-		children = WidgetUtil.collect(
-			CustomMatchSummary._createCharacterDisplay(
-				CustomMatchSummary.fetchCharactersOfPlayers(game, props.opponents, 1),
-				props.game,
-				true,
-				props.soloMode
-			),
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.GameCenter{children = scoreDisplay, css = {flex = 'auto'}},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			CustomMatchSummary._createCharacterDisplay(
-				CustomMatchSummary.fetchCharactersOfPlayers(game, props.opponents, 2),
-				props.game,
-				false,
-				props.soloMode
-			)
-		)
-	}
+	return table.concat(scores, '&nbsp;-&nbsp;')
 end
 
----@param players {player: standardPlayer, characters: string[]}[]
----@param game string?
----@param reverse boolean?
----@param soloMode boolean?
----@return Widget
-function CustomMatchSummary._createCharacterDisplay(players, game, reverse, soloMode)
-	local CharacterIcons = Lua.import('Module:CharacterIcons/' .. (game or ''), {loadData = true})
+---@param props FightersMatchSummaryGameRowProps
+---@param opponentIndex integer
+---@return Renderable?
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
+	local players = CustomMatchSummary.fetchCharactersOfPlayers(props.game, props.matchOpponents, opponentIndex)
+	local reverse = opponentIndex == 1
+	local CharacterIcons = Lua.import('Module:CharacterIcons/' .. (props.gameData or ''), {loadData = true})
 
 	---@param showCharacterName boolean
 	---@param character string
-	---@return Widget
+	---@return VNode
 	local function createCharacterDisplay(showCharacterName, character)
 		local children = WidgetUtil.collect(
 			CharacterIcons[character],
@@ -141,11 +128,11 @@ function CustomMatchSummary._createCharacterDisplay(players, game, reverse, solo
 		}
 	end
 
-	---@return Widget|Widget[]?
+	---@return VNode|VNode[]?
 	local function buildPlayerDisplay()
 		if Logic.isDeepEmpty(players) then
 			return
-		elseif soloMode then
+		elseif props.soloMode then
 			local player = players[1]
 			return Array.map(player.characters, FnUtil.curry(createCharacterDisplay, true))
 		end
