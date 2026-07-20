@@ -19,6 +19,7 @@ from mediawiki_session import MediaWikiSession
 
 load_dotenv()
 
+INVALID_DEV_ENV_NAMES = {"/dev", "/dev/"}
 HEADER_PATTERN = re.compile(
     r"\A---\n" r"-- @Liquipedia\n" r"-- page=(?P<pageName>[^\n]*)\n"
 )
@@ -52,7 +53,7 @@ def deploy_all_files_for_wiki(
 def get_dev_environment(dev_environment: Optional[str]) -> Optional[str]:
     if dev_environment is None:
         return None
-    elif dev_environment == "/dev/" or not dev_environment.startswith("/dev/"):
+    elif dev_environment in INVALID_DEV_ENV_NAMES or not dev_environment.startswith("/dev/"):
         raise ValueError(f"Invalid dev environment name: {dev_environment}")
     return dev_environment
 
