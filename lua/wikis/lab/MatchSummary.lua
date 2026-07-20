@@ -12,10 +12,11 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+---@class LabMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
@@ -23,7 +24,7 @@ end
 ---@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return Widget?
+---@return VNode
 function CustomMatchSummary.createGame(date, game, gameIndex)
 	local function makeTeamSection(opponentIndex)
 		return {
