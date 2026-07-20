@@ -33,9 +33,7 @@ local GameRowComponentProps = {}
 ---@field soloMode boolean
 
 ---@type Component<FightersMatchSummaryGameRowProps>
-local FightersMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(
-	GameRowComponentProps, {allowWrappingInOverview = true}
-)
+local FightersMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
 ---@param args table
 ---@return Renderable
