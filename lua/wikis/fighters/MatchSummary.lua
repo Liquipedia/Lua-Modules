@@ -105,7 +105,7 @@ end
 
 ---@param props FightersMatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Renderable?
+---@return VNode[]?
 function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	local players = CustomMatchSummary.fetchCharactersOfPlayers(props.game, props.matchOpponents, opponentIndex)
 	local reverse = opponentIndex == 1
@@ -128,43 +128,42 @@ function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 		}
 	end
 
-	---@return VNode|VNode[]?
-	local function buildPlayerDisplay()
-		if Logic.isDeepEmpty(players) then
-			return
-		elseif props.soloMode then
-			local player = players[1]
-			return Array.map(player.characters, FnUtil.curry(createCharacterDisplay, true))
-		end
-		return Array.map(players, function (player)
-			if Logic.isEmpty(player.characters) then
-				return
-			end
-			return Html.Div{
-				css = {
-					display = 'flex',
-					['flex-direction'] = 'row' .. (reverse and '-reverse' or ''),
-				},
-				children = Array.interleave(
-					WidgetUtil.collect(
-						Array.map(player.characters, FnUtil.curry(createCharacterDisplay, false)),
-						PlayerDisplay.BlockPlayer{player = player.player, flip = reverse}
-					),
-					'&nbsp;'
-				)
-			}
-		end)
+	if Logic.isDeepEmpty(players) then
+		return
+	elseif props.soloMode then
+		local player = players[1]
+		return Array.map(player.characters, FnUtil.curry(createCharacterDisplay, true))
 	end
+	return Array.map(players, function (player)
+		if Logic.isEmpty(player.characters) then
+			return
+		end
+		return Html.Div{
+			css = {
+				display = 'flex',
+				['flex-direction'] = 'row' .. (reverse and '-reverse' or ''),
+			},
+			children = Array.interleave(
+				WidgetUtil.collect(
+					Array.map(player.characters, FnUtil.curry(createCharacterDisplay, false)),
+					PlayerDisplay.BlockPlayer{player = player.player, flip = reverse}
+				),
+				'&nbsp;'
+			)
+		}
+	end)
+end
 
-	return Html.Div{
-		css = {
-			display = 'inline-flex',
-			flex = '2 1 30%',
-			['flex-direction'] = 'column',
-			gap = '0.25rem',
-			['align-items'] = reverse and 'flex-end' or nil,
-		},
-		children = buildPlayerDisplay()
+---@param props FightersMatchSummaryGameRowProps
+---@param opponentIndex integer
+---@return HtmlStyleProps
+function GameRowComponentProps.getGameOpponentViewCss(props, opponentIndex)
+	local reverse = opponentIndex == 1
+
+	return {
+		['align-self'] = 'center',
+		['flex-direction'] = 'column',
+		['align-items'] = reverse and 'flex-end' or 'flex-start',
 	}
 end
 
