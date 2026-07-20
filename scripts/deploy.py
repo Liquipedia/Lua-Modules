@@ -50,7 +50,7 @@ def deploy_all_files_for_wiki(
     return all_modules_deployed
 
 
-def get_dev_environment(dev_environment: Optional[str]) -> Optional[str]:
+def dev_environment(dev_environment: Optional[str]) -> Optional[str]:
     if dev_environment is None:
         return None
     elif dev_environment in INVALID_DEV_ENV_NAMES or not dev_environment.startswith(
@@ -82,7 +82,7 @@ def build_argument_parser() -> argparse.ArgumentParser:
     )
     dev_arg_group.add_argument(
         "--dev-environment",
-        type=get_dev_environment,
+        type=dev_environment,
         default=os.getenv("LUA_DEV_ENV_NAME"),
         help="Name of the dev environment to deploy to (default: LUA_DEV_ENV_NAME environment variable)",
     )
