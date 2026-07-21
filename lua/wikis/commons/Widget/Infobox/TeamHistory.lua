@@ -56,7 +56,7 @@ function TeamHistory:render()
 	}
 end
 
----@return Widget|string?
+---@return Renderable?
 function TeamHistory:_getHistory()
 	local config = (Info.config.infoboxPlayer or {}).automatedHistory or {}
 	local manualInput = self.props.manualInput
