@@ -82,7 +82,7 @@ end
 ---@param opponentIndex integer
 ---@return {player: standardPlayer, characters: string[]}[]
 function CustomMatchSummary.fetchCharactersOfPlayers(game, matchOpponents, opponentIndex)
-	return Array.map(game.opponents[opponentIndex].players, function (players, index)
+	return Array.map(game.opponents[opponentIndex].players or {}, function (players, index)
 		if players.characters then
 			local characters = Array.map(players.characters, Operator.property('name'))
 			return {player = matchOpponents[opponentIndex].players[index], characters = characters}
