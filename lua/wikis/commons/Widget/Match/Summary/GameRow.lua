@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 
@@ -19,6 +20,7 @@ local GameWinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLoss
 
 ---@class MatchSummaryGameRowComponentProps
 ---@field getGameOpponentViewCss? fun(props: MatchSummaryGameRowProps, opponentIndex: integer): HtmlStyleProps?
+---@field createAdditionalComment? fun(props: MatchSummaryGameRowProps): string?
 ---@field createGameOpponentView fun(props: MatchSummaryGameRowProps, opponentIndex: integer): Renderable|Renderable[]?
 ---@field createGameOverview fun(props: MatchSummaryGameRowProps): Renderable|Renderable[]
 
@@ -80,7 +82,7 @@ function MatchSummaryGameRow.createComponent(implProps, defaultProps)
 					opponentIndex = 2,
 					winner = componentProps.game.winner,
 				},
-				MatchSummaryGameRow._renderGameComment(componentProps.game)
+				MatchSummaryGameRow._renderGameComment(implProps, componentProps)
 			},
 		}
 	end
@@ -111,15 +113,30 @@ function MatchSummaryGameRow.scoreDisplay(game, opponentIndex)
 end
 
 ---@package
----@param game MatchGroupUtilGame
+---@param implProps MatchSummaryGameRowComponentProps
+---@param componentProps MatchSummaryGameRowProps
 ---@return VNode?
-function MatchSummaryGameRow._renderGameComment(game)
-	if Logic.isEmpty(game.comment) then
+function MatchSummaryGameRow._renderGameComment(implProps, componentProps)
+	local game = componentProps.game
+	if not implProps.createAdditionalComment then
+		if Logic.isEmpty(game.comment) then
+			return
+		end
+		return Html.Div{
+			classes = {'brkts-popup-comment'},
+			children = game.comment,
+		}
+	end
+	local comments = Array.extend(
+		game.comment,
+		implProps.createAdditionalComment(componentProps)
+	)
+	if Logic.isEmpty(comments) then
 		return
 	end
 	return Html.Div{
 		classes = {'brkts-popup-comment'},
-		children = game.comment,
+		children = Array.interleave(comments, Html.Br{}),
 	}
 end
 

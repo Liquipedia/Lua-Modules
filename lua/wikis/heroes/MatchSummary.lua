@@ -9,8 +9,6 @@ local Lua = require('Module:Lua')
 
 local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -19,11 +17,19 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MAX_NUM_BANS = 3
 local NUM_CHAMPIONS_PICK = 5
+local STATUS_NOT_PLAYED = 'notplayed'
 
 local FP = Abbreviation.make{text = 'First Pick', title = 'First Pick for Heroes on this map'}
 
 ---@class HeroesCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
+
+---@class HeroesMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
+	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay,
+}
+
+local HeroesMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
 ---@param args table
 ---@return Renderable
@@ -37,53 +43,46 @@ function CustomMatchSummary.createBody(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
 	return WidgetUtil.collect(
-		Array.map(match.games, FnUtil.curry(CustomMatchSummary._createGame, match.date)),
+		MatchSummaryWidgets.GamesContainer{
+			children = Array.map(match.games, function (game, gameIndex)
+				if game.status == STATUS_NOT_PLAYED or (Logic.isEmpty(game.length) and Logic.isEmpty(game.winner)) then
+					return
+				end
+				return HeroesMatchSummaryGameRow{game = game, gameIndex = gameIndex}
+			end)
+		},
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {emptyMapDisplay = FP}))
 	)
 end
 
----@param date string
----@param game MatchGroupUtilGame
----@return VNode?
-function CustomMatchSummary._createGame(date, game)
+---@param props MatchSummaryGameRowProps
+---@param opponentIndex integer
+---@return VNode
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
+	local game = props.game
 	local extradata = game.extradata or {}
 
-	-- TODO: Change to use participant data
-	local characterData = {
-		MatchSummary.buildCharacterList(extradata, 'team1champion', NUM_CHAMPIONS_PICK),
-		MatchSummary.buildCharacterList(extradata, 'team2champion', NUM_CHAMPIONS_PICK),
+	return MatchSummaryWidgets.Characters{
+		flipped = opponentIndex == 2,
+		date = game.date,
+		-- TODO: Change to use participant data
+		characters = MatchSummary.buildCharacterList(
+			extradata, 'team' .. opponentIndex .. 'champion', NUM_CHAMPIONS_PICK
+		),
+		bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata['team' .. opponentIndex .. 'side'] or ''),
 	}
+end
 
-	if Logic.isEmpty(game.length) and Logic.isEmpty(game.winner) and Logic.isDeepEmpty(characterData) then
-		return nil
+---@param props MatchSummaryGameRowProps
+---@return string?
+function GameRowComponentProps.createAdditionalComment(props)
+	local game = props.game
+	if Logic.isEmpty(game.length) then
+		return
 	end
-
-	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-body-game'},
-		children = WidgetUtil.collect(
-			MatchSummaryWidgets.Characters{
-				flipped = false,
-				date = date,
-				characters = characterData[1],
-				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team1side or ''),
-			},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game), css = {['flex-grow'] = 1}},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			MatchSummaryWidgets.Characters{
-				flipped = true,
-				date = date,
-				characters = characterData[2],
-				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team2side or ''),
-			},
-			MatchSummaryWidgets.GameComment{children = WidgetUtil.collect(
-				game.comment,
-				game.length and ('Match Duration: ' .. game.length) or nil
-			)}
-		)
-	}
+	return 'Match Duration: ' .. game.length
 end
 
 return CustomMatchSummary
