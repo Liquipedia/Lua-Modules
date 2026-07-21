@@ -12,6 +12,7 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local TeamHistoryAuto = Lua.import('Module:Infobox/Extension/TeamHistory/Auto')
 
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local Html = Lua.import('Module:Widget/Html')
 local Widget = Lua.import('Module:Widget')
 local Widgets = Lua.import('Module:Widget/All')
@@ -35,21 +36,27 @@ local DEFAULT_MODE = 'manual'
 ---@field props {player: string, manualInput: string?}
 local TeamHistory = Class.new(Widget)
 
----@return Widget[]
+---@return VNode?
 function TeamHistory:render()
 	local teamHistory = self:_getHistory()
 
 	if Logic.isEmpty(teamHistory) then
-		return {}
+		return
 	end
 
-	return {
-		Widgets.Title{children = 'History'},
-		Widgets.Center{children = {teamHistory}},
+	return GeneralCollapsible{
+		shouldCollapse = true,
+		titleWidget = Widgets.Title{
+			isCollapsibleToggle = true,
+			children = {
+				'Team History',
+			},
+		},
+		children = Widgets.Center{children = {teamHistory}},
 	}
 end
 
----@return Widget|string?
+---@return Renderable?
 function TeamHistory:_getHistory()
 	local config = (Info.config.infoboxPlayer or {}).automatedHistory or {}
 	local manualInput = self.props.manualInput
