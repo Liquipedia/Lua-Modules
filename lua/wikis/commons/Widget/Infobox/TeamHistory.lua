@@ -12,7 +12,10 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local TeamHistoryAuto = Lua.import('Module:Infobox/Extension/TeamHistory/Auto')
 
+local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local Html = Lua.import('Module:Widget/Html')
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Widget = Lua.import('Module:Widget')
 local Widgets = Lua.import('Module:Widget/All')
 
@@ -43,9 +46,27 @@ function TeamHistory:render()
 		return {}
 	end
 
-	return {
-		Widgets.Title{children = 'History'},
-		Widgets.Center{children = {teamHistory}},
+	return GeneralCollapsible{
+		shouldCollapse = true,
+		titleWidget = Widgets.Title{
+			children = {
+				'Team History',
+				'&nbsp;',
+				CollapsibleToggle{
+					showButtonChildren = {
+						'Expand',
+						' ',
+						Icon{iconName = 'expand'}
+					},
+					hideButtonChildren = {
+						'Collapse',
+						' ',
+						Icon{iconName = 'collapse'}
+					}
+				}
+			},
+		},
+		children = Widgets.Center{children = {teamHistory}},
 	}
 end
 
