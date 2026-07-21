@@ -42,6 +42,22 @@ function DisplayHelper.addOpponentHighlight(node, opponent)
 		:attr('aria-label', Opponent.toName(opponent))
 end
 
+---@param props HtmlNodeProps
+---@param opponent standardOpponent
+---@return HtmlNodeProps
+function DisplayHelper.addOpponentHighlightToProps(props, opponent)
+	if Opponent.isTbd(opponent) then
+		return props
+	end
+	props.classes = props.classes or {}
+	table.insert(props.classes, 'brkts-opponent-hover')
+
+	props.attributes = props.attributes or {}
+	props.attributes['aria-label'] = Opponent.toName(opponent)
+
+	return props
+end
+
 -- Expands a header code by making a RPC call.
 ---@param headerCode string
 ---@return string[]
