@@ -701,6 +701,10 @@ div.brkts-popup-body-element-thumbs {
 		> .brkts-popup-comment {
 			padding: unset;
 			grid-column: 1 / -1;
+
+			&:empty {
+				display: none;
+			}
 		}
 
 		&-detail {
