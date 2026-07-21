@@ -36,12 +36,12 @@ local DEFAULT_MODE = 'manual'
 ---@field props {player: string, manualInput: string?}
 local TeamHistory = Class.new(Widget)
 
----@return VNode[]
+---@return VNode?
 function TeamHistory:render()
 	local teamHistory = self:_getHistory()
 
 	if Logic.isEmpty(teamHistory) then
-		return {}
+		return
 	end
 
 	return GeneralCollapsible{
