@@ -5,8 +5,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local CustomMatchSummary = {}
-
 local Lua = require('Module:Lua')
 
 local Abbreviation = Lua.import('Module:Abbreviation')
@@ -24,14 +22,17 @@ local NUM_CHAMPIONS_PICK = 5
 
 local FP = Abbreviation.make{text = 'First Pick', title = 'First Pick for Heroes on this map'}
 
+---@class HeroesCustomMatchSummary: CustomMatchSummaryInterface
+local CustomMatchSummary = {}
+
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '480px'})
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return VNode[]
 function CustomMatchSummary.createBody(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
@@ -45,7 +46,7 @@ end
 
 ---@param date string
 ---@param game MatchGroupUtilGame
----@return Widget?
+---@return VNode?
 function CustomMatchSummary._createGame(date, game)
 	local extradata = game.extradata or {}
 
