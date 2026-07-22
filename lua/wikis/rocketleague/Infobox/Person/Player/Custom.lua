@@ -131,7 +131,8 @@ function CustomInjector:parse(id, widgets)
 			getHistoryCells('history_gfinity', '[[Gfinity/Elite_Series|Gfinity Elite Series]] History'),
 			getHistoryCells('history_odl', '[[Oceania Draft League|Oceania Draft League]] History'),
 			getHistoryCells('history_irc', '[[Italian Rocket Championship]] History'),
-			getHistoryCells('history_elite_series', '[[Elite Series]] History')
+			getHistoryCells('history_elite_series', '[[Elite Series]] History'),
+			getHistoryCells('history_enc', '[[Esports Nations Cup]] History')
 		)
 	elseif id == 'nationality' then
 		return {
