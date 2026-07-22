@@ -580,7 +580,7 @@ end
 ---@param game LoLMatchPageGame
 ---@return VNode[]
 function MatchPage:_renderPlayersPerformance(game)
-	return {
+	return WidgetUtil.collect(
 		Html.H3{children = 'Player Performance'},
 		Div{
 			classes = {'match-bm-players-wrapper'},
@@ -588,8 +588,9 @@ function MatchPage:_renderPlayersPerformance(game)
 				self:_renderTeamPerformance(game, 1),
 				self:_renderTeamPerformance(game, 2)
 			}
-		}
-	}
+		},
+		self:_renderDamageDealt(game)
+	)
 end
 
 ---@private
@@ -742,6 +743,66 @@ function MatchPage._buildPlayerLoadout(player)
 			Div{
 				classes = {'match-bm-players-player-loadout-items'},
 				children = Array.map(player.items, MatchPage._generateItemImage)
+			}
+		}
+	}
+end
+
+---@param side 'red'|'blue'
+---@return string
+---@overload fun(side: nil): nil
+local sideToColor = FnUtil.memoize(function (side)
+	if side == 'red' then
+		return '#b12a2a'
+	elseif side == 'blue' then
+		return '#31519c'
+	end
+	return nil
+end)
+
+---@private
+---@param game LoLMatchPageGame
+---@return VNode[]?
+function MatchPage:_renderDamageDealt(game)
+	if not game.finished or Array.any(game.teams, function (team)
+		return Logic.isDeepEmpty(team.players)
+	end) then
+		return
+	end
+	return {
+		Html.H4{children = 'Damage Dealt'},
+		Html.Div{
+			classes = {'table-responsive'},
+			css = {
+				width = '100%'
+			},
+			children = mw.ext.Charts.chart{
+				size = {
+					width = 640,
+					height = 480
+				},
+				tooltip = {
+					trigger = 'axis'
+				},
+				xAxis = {
+					data = {'Top', 'Jungle', 'Mid', 'Bot', 'Support'},
+					type = 'category',
+				},
+				yAxis = {
+					name = 'Damage dealt',
+					type = 'value',
+				},
+				series = Array.map(game.teams, function (team)
+					return {
+						type = 'bar',
+						data = Array.map(team.players, function (player)
+							return player.damagedone
+						end),
+						itemStyle = {
+							color = sideToColor(team.side)
+						}
+					}
+				end),
 			}
 		}
 	}
