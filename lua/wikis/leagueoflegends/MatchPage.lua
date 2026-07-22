@@ -589,7 +589,7 @@ function MatchPage:_renderPlayersPerformance(game)
 				self:_renderTeamPerformance(game, 2)
 			}
 		},
-		self:_renderDamageDistribution(game)
+		self:_renderDamageDealt(game)
 	)
 end
 
@@ -763,14 +763,14 @@ end)
 ---@private
 ---@param game LoLMatchPageGame
 ---@return VNode[]?
-function MatchPage:_renderDamageDistribution(game)
+function MatchPage:_renderDamageDealt(game)
 	if not game.finished or Array.any(game.teams, function (team)
 		return Logic.isDeepEmpty(team.players)
 	end) then
 		return
 	end
 	return {
-		Html.H4{children = 'Damage Distribution'},
+		Html.H4{children = 'Damage Dealt'},
 		Html.Div{
 			classes = {'table-responsive'},
 			css = {
