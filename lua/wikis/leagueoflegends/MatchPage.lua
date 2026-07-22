@@ -749,6 +749,18 @@ function MatchPage._buildPlayerLoadout(player)
 	}
 end
 
+---@param side 'red'|'blue'
+---@return string
+---@overload fun(side: nil): nil
+local function sideToColor(side)
+	if side == 'red' then
+		return '#b12a2a'
+	elseif side == 'blue' then
+		return '#31519c'
+	end
+	return nil
+end
+
 ---@private
 ---@param game LoLMatchPageGame
 function MatchPage:_renderDamageDistribution(game)
@@ -778,7 +790,10 @@ function MatchPage:_renderDamageDistribution(game)
 					type = 'bar',
 					data = Array.map(team.players, function (player)
 						return player.damagedone
-					end)
+					end),
+					itemStyle = {
+						color = sideToColor(team.side)
+					}
 				}
 			end),
 		}
