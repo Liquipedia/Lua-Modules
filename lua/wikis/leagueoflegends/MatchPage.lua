@@ -588,7 +588,9 @@ function MatchPage:_renderPlayersPerformance(game)
 				self:_renderTeamPerformance(game, 1),
 				self:_renderTeamPerformance(game, 2)
 			}
-		}
+		},
+		Html.H4{children = 'Damage Distribution'},
+		self:_renderDamageDistribution(game)
 	}
 end
 
@@ -743,6 +745,42 @@ function MatchPage._buildPlayerLoadout(player)
 				classes = {'match-bm-players-player-loadout-items'},
 				children = Array.map(player.items, MatchPage._generateItemImage)
 			}
+		}
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+function MatchPage:_renderDamageDistribution(game)
+	return Html.Div{
+		classes = {'table-responsive'},
+		css = {
+			width = '100%'
+		},
+		children = mw.ext.Charts.chart{
+			size = {
+				width = 640,
+				height = 480
+			},
+			tooltip = {
+				trigger = 'axis'
+			},
+			xAxis = {
+				data = {'Top', 'Jungle', 'Mid', 'Bot', 'Support'},
+				type = 'category',
+			},
+			yAxis = {
+				name = 'Damage dealt',
+				type = 'value',
+			},
+			series = Array.map(game.teams, function (team)
+				return {
+					type = 'bar',
+					data = Array.map(team.players, function (player)
+						return player.damagedone
+					end)
+				}
+			end),
 		}
 	}
 end
