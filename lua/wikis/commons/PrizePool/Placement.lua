@@ -7,11 +7,9 @@
 
 local Lua = require('Module:Lua')
 
-local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
-local Medals = Lua.import('Module:Medals')
 local PlacementInfo = Lua.import('Module:Placement')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -49,7 +47,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.dq)
 		end,
 		display = function ()
-			return Abbreviation.make{text = 'DQ', title = 'Disqualified'}
+			return 'DQ'
 		end,
 		lpdb = 'DQ',
 	},
@@ -58,7 +56,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.dnf)
 		end,
 		display = function ()
-			return Abbreviation.make{text = 'DNF', title = 'Did not finish'}
+			return 'DNF'
 		end,
 		lpdb = 'DNF',
 	},
@@ -67,7 +65,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.dnp)
 		end,
 		display = function ()
-			return Abbreviation.make{text = 'DNP', title = 'Did not participate'}
+			return 'DNP'
 		end,
 		lpdb = 'DNP',
 	},
@@ -103,7 +101,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.q)
 		end,
 		display = function ()
-			return Abbreviation.make{text = 'Q', title = 'Qualified Automatically'}
+			return 'Q'
 		end,
 		lpdb = 'Q',
 	},
@@ -327,40 +325,27 @@ end
 
 ---@return string?
 function Placement:getBackground()
-	for statusName, status in pairs(Placement.specialStatuses) do
-		if status.active(self.args) then
-			return PlacementInfo.getBgClass{placement = statusName:lower()}
-		end
-	end
-
-	return PlacementInfo.getBgClass{placement = self.placeStart}
+	return PlacementInfo.getBgClass{placement = self:getSpecialStatus() or self.placeStart}
 end
 
 ---Returns the placement-badge color class for top-3 placements, else nil.
 ---Colored by the top of the range (placeStart).
 ---@return string?
 function Placement:getBadgeClass()
-	if self:hasSpecialStatus() or self.placeStart > 3 then
+	local specialStatus = self:getSpecialStatus()
+	if (not specialStatus) and self.placeStart > 3 then
 		return nil
 	end
-	return PlacementInfo.raw(self.placeStart).backgroundClass
+	return PlacementInfo.raw(specialStatus or self.placeStart).backgroundClass
 end
 
 ---@return string?
-function Placement:getMedal()
-	if self:hasSpecialStatus() then
-		return
+function Placement:getSpecialStatus()
+	for statusName, status in pairs(Placement.specialStatuses) do
+		if status.active(self.args) then
+			return statusName:lower()
+		end
 	end
-
-	local medal = Medals.display{medal = self:_lpdbValue()}
-	if medal then
-		return tostring(medal)
-	end
-end
-
----@return boolean
-function Placement:hasSpecialStatus()
-	return Table.any(Placement.specialStatuses, function(_, status) return status.active(self.args) end)
 end
 
 return Placement

@@ -18,7 +18,7 @@ describe('placement', function()
 		it('check', function()
 			assert.is_nil(Placement.getBgClass{placement = 'DummyDummy'})
 			assert.are_equal('background-color-first-place', Placement.getBgClass{placement = 1})
-			assert.are_equal('bg-dq', Placement.getBgClass{placement = 'dq'})
+			assert.are_equal('background-color-dq-place', Placement.getBgClass{placement = 'dq'})
 		end)
 	end)
 
