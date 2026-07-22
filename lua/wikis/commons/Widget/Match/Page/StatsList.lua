@@ -38,7 +38,7 @@ function MatchPageStatsList.render(props)
 		classes = {'match-bm-team-stats-list'},
 		children = Array.map(
 			Array.filter(props.data, function (element)
-				return element.team1Value ~= nil or element.team2Value ~= nil
+				return Logic.isNotEmpty(element.team1Value) or Logic.isNotEmpty(element.team2Value)
 			end),
 			FnUtil.curry(MatchPageStatsList._renderStat, props.finished)
 		)
