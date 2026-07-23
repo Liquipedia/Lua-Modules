@@ -94,8 +94,8 @@ end
 ---@return string
 function GameRowComponentProps.createGameOverview(props)
 	local game = props.game
-	local scores = Array.map(game.opponents, function(opponent)
-		return DisplayHelper.MapScore(opponent, game.status)
+	local scores = Array.mapRange(1, #game.opponents, function(opponentIndex)
+		return MatchSummaryWidgets.GameRow.scoreDisplay(game, opponentIndex)
 	end)
 
 	return table.concat(scores, '&nbsp;-&nbsp;')
