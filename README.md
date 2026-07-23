@@ -150,6 +150,34 @@ To test your changes in action, you can run the GitHub Action called "Personal D
 To check the workflow progress from the CLI, you can run:
 `gh run list --workflow="deploy test.yml"`
 
+#### Local asset preview (CSS/JS)
+
+`npm run dev` opens a browser rendering liquipedia.net with your locally-built
+CSS and JS injected, and auto-reloads it whenever you save a `.scss` or `.js`
+file. Any editor works — there is no editor integration to configure.
+
+Requirements: a Chromium-family browser (Chrome, Chromium, Brave, or Edge) and
+`npm install` already run.
+
+```bash
+npm run dev
+```
+
+- Edit a `.scss` or `.js` file and save — the browser reloads automatically.
+- Press Ctrl-C to stop the proxy, watcher, and browser.
+
+Environment overrides:
+
+- `LP_DEV_BROWSER` — absolute path to a browser binary if auto-detection fails.
+- `LP_DEV_PORT` — proxy port (default 8081).
+- `npm run dev -- --clean` — wipe the throwaway browser profile before starting.
+
+**This previews CSS/JS only.** Lua modules render server-side and cannot be
+previewed locally — use the dev-wiki deploy flow for those. This tool launches a
+dedicated, disposable browser profile that ignores certificate errors and proxies
+only `*.liquipedia.net`; your normal browser and browsing are untouched. Because
+certificate validation is disabled in this profile, avoid browsing other sites in it.
+
 ## Support
 
 If you encounter any issues or have questions, feel free to open an issue on GitHub or reach out to the Liquipedia community for support.
