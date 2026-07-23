@@ -107,17 +107,12 @@ end
 
 ---@class MatchSummaryMatch: BaseClass
 ---@operator call: MatchSummaryMatch
----@field root Html
 ---@field headerElement Renderable?
 ---@field bodyElement Renderable|Renderable[]?
 ---@field commentElement Renderable|Renderable[]?
 ---@field footerElement VNode?
 ---@field buttonElement Renderable?
-local Match = Class.new(
-	function(self)
-		self.root = mw.html.create()
-	end
-)
+local Match = Class.new()
 
 ---@param header Renderable
 ---@return MatchSummaryMatch
@@ -154,16 +149,13 @@ function Match:button(button)
 	return self
 end
 
----@return Html
+---@return VNode
 function Match:create()
-	self.root
-		:node(self.headerElement)
-		:node(
-			MatchSummaryWidgets.Body{children = WidgetUtil.collect(self.bodyElement, self.commentElement, self.footerElement)}
-		)
-		:node(self.buttonElement)
-
-	return self.root
+	return Html.Fragment{children = WidgetUtil.collect(
+		self.headerElement,
+		MatchSummaryWidgets.Body{children = WidgetUtil.collect(self.bodyElement, self.commentElement, self.footerElement)},
+		self.buttonElement
+	)}
 end
 
 ---@class MatchSummary
