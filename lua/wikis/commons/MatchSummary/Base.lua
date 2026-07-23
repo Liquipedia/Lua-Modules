@@ -37,7 +37,7 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 ---@field addToFooter? fun(match: MatchGroupUtilMatch, footer: MatchSummaryFooter): MatchSummaryFooter
 ---@field createMatch? fun(matchData: MatchGroupUtilMatch): MatchSummaryMatch
 
----@class MatchSummaryFooter
+---@class MatchSummaryFooter: BaseClass
 ---@operator call: MatchSummaryFooter
 ---@field elements Renderable[]
 local Footer = Class.new(
@@ -100,18 +100,18 @@ function Footer:addLinks(links)
 	return self
 end
 
----@return Widget?
+---@return VNode
 function Footer:create()
 	return MatchSummaryWidgets.Footer{children = self.elements}
 end
 
----@class MatchSummaryMatch
+---@class MatchSummaryMatch: BaseClass
 ---@operator call: MatchSummaryMatch
 ---@field root Html
 ---@field headerElement Renderable?
 ---@field bodyElement Renderable|Renderable[]?
 ---@field commentElement Renderable|Renderable[]?
----@field footerElement Widget?
+---@field footerElement VNode?
 ---@field buttonElement Renderable?
 local Match = Class.new(
 	function(self)
@@ -175,7 +175,7 @@ local MatchSummary = {
 ---Default header function
 ---@param match MatchGroupUtilMatch
 ---@param options {teamStyle: teamStyle?}?
----@return Widget
+---@return VNode
 function MatchSummary.createDefaultHeader(match, options)
 	options = options or {}
 
@@ -195,7 +195,7 @@ end
 -- Default body function
 ---@param match MatchGroupUtilMatch
 ---@param createGame fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
----@return Widget[]
+---@return Renderable[]
 function MatchSummary.createDefaultBody(match, createGame)
 	return WidgetUtil.collect(
 		Array.map(match.games, FnUtil.curry(createGame, match.date)),
@@ -281,7 +281,7 @@ end
 ---@param CustomMatchSummary CustomMatchSummaryInterface
 ---@param args table
 ---@param options {teamStyle:teamStyle?, width: (fun(match: MatchGroupUtilMatch):string?)|string?, noScore:boolean?}?
----@return Widget
+---@return VNode
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(
 		(type(CustomMatchSummary.createBody) == 'function' or type(CustomMatchSummary.createGame) == 'function'),
