@@ -172,7 +172,7 @@ function MatchSummary.createDefaultHeader(match, options)
 	options = options or {}
 
 	return Html.Fragment{
-		children = WidgetUtil.collect(
+		children = {
 			MatchCountdown{
 				match = match,
 			},
@@ -180,7 +180,7 @@ function MatchSummary.createDefaultHeader(match, options)
 				match = match,
 				teamStyle = options.teamStyle,
 			}
-		)
+		}
 	}
 end
 
@@ -249,7 +249,7 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	local substituteComment = DisplayHelper.createSubstitutesComment(matchData)
 
 	match:comment(Html.Fragment{
-		children = WidgetUtil.collect(
+		children = {
 			MatchSummaryWidgets.Casters{casters = matchData.extradata.casters},
 			MatchSummaryWidgets.MatchComment{
 				children = WidgetUtil.collect(
@@ -257,7 +257,7 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 					substituteComment
 				)
 			}
-		)
+		}
 	})
 
 	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.createDefaultFooter
