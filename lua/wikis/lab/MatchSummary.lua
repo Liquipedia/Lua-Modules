@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
@@ -48,9 +47,8 @@ end
 ---@param opponentIndex integer
 ---@return Renderable[]
 function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
-	local game = props.game
 	return {
-		DisplayHelper.MapScore(game.opponents[opponentIndex], game.status)
+		MatchSummaryWidgets.GameRow.scoreDisplay(props.game, opponentIndex)
 	}
 end
 
