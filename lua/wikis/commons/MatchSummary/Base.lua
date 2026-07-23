@@ -39,14 +39,14 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 
 ---@class MatchSummaryFooter
 ---@operator call: MatchSummaryFooter
----@field elements (Widget|Html|string|number)[]
+---@field elements Renderable[]
 local Footer = Class.new(
 	function(self)
 		self.elements = {}
 	end
 )
 
----@param element Widget|Html|string|number|nil
+---@param element Renderable|nil
 ---@return MatchSummaryFooter
 function Footer:addElement(element)
 	table.insert(self.elements, element)
