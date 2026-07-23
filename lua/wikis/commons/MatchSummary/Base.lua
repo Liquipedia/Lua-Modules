@@ -31,23 +31,23 @@ local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {load
 local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 
 ---@class CustomMatchSummaryInterface
----@field createHeader? fun(match: MatchGroupUtilMatch, options: {teamStyle: teamStyle?}?): Widget
+---@field createHeader? fun(match: MatchGroupUtilMatch, options: {teamStyle: teamStyle?}?): Renderable
 ---@field createBody? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 ---@field createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
 ---@field addToFooter? fun(match: MatchGroupUtilMatch, footer: MatchSummaryFooter): MatchSummaryFooter
 ---@field createMatch? fun(matchData: MatchGroupUtilMatch): MatchSummaryMatch
 
----@class MatchSummaryFooter
+---@class MatchSummaryFooter: BaseClass
 ---@operator call: MatchSummaryFooter
----@field elements (Widget|Html|string|number)[]
+---@field elements Renderable[]
 local Footer = Class.new(
 	function(self)
 		self.elements = {}
 	end
 )
 
----@param element Widget|Html|string|number|nil
----@return MatchSummaryFooter
+---@param element Renderable|nil
+---@return self
 function Footer:addElement(element)
 	table.insert(self.elements, element)
 	return self
@@ -66,7 +66,7 @@ function Footer:addLink(link, icon, iconDark, text)
 end
 
 ---@param links table<string, string|table>
----@return MatchSummaryFooter
+---@return self
 function Footer:addLinks(links)
 	local processLink = function(linkType, link)
 		local currentLinkData = Links.getMatchIconData(linkType)
@@ -100,70 +100,62 @@ function Footer:addLinks(links)
 	return self
 end
 
----@return Widget?
+---@return VNode
 function Footer:create()
 	return MatchSummaryWidgets.Footer{children = self.elements}
 end
 
----@class MatchSummaryMatch
+---@class MatchSummaryMatch: BaseClass
 ---@operator call: MatchSummaryMatch
----@field root Html
 ---@field headerElement Renderable?
 ---@field bodyElement Renderable|Renderable[]?
 ---@field commentElement Renderable|Renderable[]?
----@field footerElement Widget?
+---@field footerElement VNode?
 ---@field buttonElement Renderable?
-local Match = Class.new(
-	function(self)
-		self.root = mw.html.create()
-	end
-)
+local Match = Class.new()
 
 ---@param header Renderable
----@return MatchSummaryMatch
+---@return self
 function Match:header(header)
 	self.headerElement = header
 	return self
 end
 
 ---@param body Renderable|Renderable[]
----@return MatchSummaryMatch
+---@return self
 function Match:body(body)
 	self.bodyElement = body
 	return self
 end
 
 ---@param comment Renderable
----@return MatchSummaryMatch
+---@return self
 function Match:comment(comment)
 	self.commentElement = comment
 	return self
 end
 
 ---@param footer MatchSummaryFooter
----@return MatchSummaryMatch
+---@return self
 function Match:footer(footer)
 	self.footerElement = footer:create()
 	return self
 end
 
 ---@param button Renderable
----@return MatchSummaryMatch
+---@return self
 function Match:button(button)
 	self.buttonElement = button
 	return self
 end
 
----@return Html
+---@return VNode
 function Match:create()
-	self.root
-		:node(self.headerElement)
-		:node(
-			MatchSummaryWidgets.Body{children = WidgetUtil.collect(self.bodyElement, self.commentElement, self.footerElement)}
-		)
-		:node(self.buttonElement)
-
-	return self.root
+	return Html.Fragment{children = WidgetUtil.collect(
+		self.headerElement,
+		MatchSummaryWidgets.Body{children = WidgetUtil.collect(self.bodyElement, self.commentElement, self.footerElement)},
+		self.buttonElement
+	)}
 end
 
 ---@class MatchSummary
@@ -175,12 +167,12 @@ local MatchSummary = {
 ---Default header function
 ---@param match MatchGroupUtilMatch
 ---@param options {teamStyle: teamStyle?}?
----@return Widget
+---@return VNode
 function MatchSummary.createDefaultHeader(match, options)
 	options = options or {}
 
 	return Html.Fragment{
-		children = WidgetUtil.collect(
+		children = {
 			MatchCountdown{
 				match = match,
 			},
@@ -188,14 +180,14 @@ function MatchSummary.createDefaultHeader(match, options)
 				match = match,
 				teamStyle = options.teamStyle,
 			}
-		)
+		}
 	}
 end
 
 -- Default body function
 ---@param match MatchGroupUtilMatch
 ---@param createGame fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
----@return Widget[]
+---@return Renderable[]
 function MatchSummary.createDefaultBody(match, createGame)
 	return WidgetUtil.collect(
 		Array.map(match.games, FnUtil.curry(createGame, match.date)),
@@ -257,7 +249,7 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	local substituteComment = DisplayHelper.createSubstitutesComment(matchData)
 
 	match:comment(Html.Fragment{
-		children = WidgetUtil.collect(
+		children = {
 			MatchSummaryWidgets.Casters{casters = matchData.extradata.casters},
 			MatchSummaryWidgets.MatchComment{
 				children = WidgetUtil.collect(
@@ -265,7 +257,7 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 					substituteComment
 				)
 			}
-		)
+		}
 	})
 
 	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.createDefaultFooter
@@ -281,7 +273,7 @@ end
 ---@param CustomMatchSummary CustomMatchSummaryInterface
 ---@param args table
 ---@param options {teamStyle:teamStyle?, width: (fun(match: MatchGroupUtilMatch):string?)|string?, noScore:boolean?}?
----@return Widget
+---@return VNode
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(
 		(type(CustomMatchSummary.createBody) == 'function' or type(CustomMatchSummary.createGame) == 'function'),
