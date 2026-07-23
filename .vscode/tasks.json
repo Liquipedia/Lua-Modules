@@ -1,0 +1,24 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Launch proxy",
+			"type": "process",
+			"command": "${command:python.interpreterPath}",
+			"args": [
+				"scripts${/}proxy_lp.py"
+			],
+			"isBackground": true,
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			},
+			"problemMatcher": [],
+			"detail": "python3 scripts/proxy_lp.py",
+			"runOptions": {
+				"instanceLimit": 1,
+				"instancePolicy": "terminateOldest"
+			}
+		}
+	]
+}

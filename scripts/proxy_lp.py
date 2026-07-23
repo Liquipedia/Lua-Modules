@@ -1,5 +1,9 @@
+import asyncio
+
 from http import HTTPStatus
-from mitmproxy import http
+
+from mitmproxy import http, master
+from mitmproxy.addons import default_addons, dumper, errorcheck, keepserving, readfile
 
 
 class LiquipediaMapper:
@@ -41,4 +45,23 @@ class LiquipediaMapper:
             )
 
 
-addons = [LiquipediaMapper()]
+async def main():
+    m = master.Master(None)
+    m.addons.add(
+        *default_addons(),
+        LiquipediaMapper(),
+        dumper.Dumper(),
+        keepserving.KeepServing(),
+        readfile.ReadFileStdin(),
+        errorcheck.ErrorCheck(),
+    )
+    try:
+        await m.run()
+    except asyncio.CancelledError:
+        await m.done()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+else:
+    addons = [LiquipediaMapper()]
