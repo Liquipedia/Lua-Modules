@@ -337,7 +337,7 @@ end
 ---@return {date: string, matchId: string, opponent: standardOpponent?, vsOpponent: standardOpponent?}
 function Import._makeEntryFromMatch(placementEntry, match)
 	local entry = {
-		date = match.date,
+		date = DateExt.nilIfDefaultTimestamp(match.date) or DateExt.getContextualDate(),
 		matchId = match.matchId,
 	}
 
