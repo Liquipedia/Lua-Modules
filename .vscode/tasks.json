@@ -1,0 +1,49 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Deploy current file",
+			"type": "shell",
+			"command": "${command:python.interpreterPath}",
+			"args": [
+				"scripts${/}deploy.py",
+				"${relativeFile}"
+			],
+			"options": {
+				"env": {
+					"LUA_DEV_ENV_NAME": "/dev/${input:devEnvironment}",
+					"LUA_DEV_BASE_REF": "${input:devBaseRef}"
+				}
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Deploy all changed file",
+			"type": "shell",
+			"command": "${command:python.interpreterPath}",
+			"args": [
+				"scripts${/}deploy.py",
+			],
+			"options": {
+				"env": {
+					"LUA_DEV_ENV_NAME": "/dev/${input:devEnvironment}",
+					"LUA_DEV_BASE_REF": "${input:devBaseRef}"
+				}
+			},
+			"problemMatcher": []
+		}
+	],
+	"inputs": [
+		{
+			"id": "devEnvironment",
+			"type": "promptString",
+			"description": "Lua Dev Enviroment name"
+		},
+		{
+			"id": "devBaseRef",
+			"type": "promptString",
+			"description": "Base ref to compare against for dev deployment",
+			"default": "main"
+		}
+	]
+}
