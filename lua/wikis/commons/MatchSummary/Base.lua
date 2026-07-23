@@ -47,7 +47,7 @@ local Footer = Class.new(
 )
 
 ---@param element Renderable|nil
----@return MatchSummaryFooter
+---@return self
 function Footer:addElement(element)
 	table.insert(self.elements, element)
 	return self
@@ -66,7 +66,7 @@ function Footer:addLink(link, icon, iconDark, text)
 end
 
 ---@param links table<string, string|table>
----@return MatchSummaryFooter
+---@return self
 function Footer:addLinks(links)
 	local processLink = function(linkType, link)
 		local currentLinkData = Links.getMatchIconData(linkType)
@@ -115,35 +115,35 @@ end
 local Match = Class.new()
 
 ---@param header Renderable
----@return MatchSummaryMatch
+---@return self
 function Match:header(header)
 	self.headerElement = header
 	return self
 end
 
 ---@param body Renderable|Renderable[]
----@return MatchSummaryMatch
+---@return self
 function Match:body(body)
 	self.bodyElement = body
 	return self
 end
 
 ---@param comment Renderable
----@return MatchSummaryMatch
+---@return self
 function Match:comment(comment)
 	self.commentElement = comment
 	return self
 end
 
 ---@param footer MatchSummaryFooter
----@return MatchSummaryMatch
+---@return self
 function Match:footer(footer)
 	self.footerElement = footer:create()
 	return self
 end
 
 ---@param button Renderable
----@return MatchSummaryMatch
+---@return self
 function Match:button(button)
 	self.buttonElement = button
 	return self
