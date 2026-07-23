@@ -1371,9 +1371,10 @@ div.brkts-opponent-hover {
 	height: 22px;
 }
 
-.brkts-designer-small-button {
-	background-color: #e0e0e0;
-	border: solid 1px #c0c0c0;
+.brkts-match .brkts-designer-small-button {
+	background-color: var( --clr-surface-3 );
+	border: solid 1px var( --clr-surface-4 );
+	color: var( --clr-on-surface );
 	display: block;
 	font-size: 11px;
 	padding: 0;

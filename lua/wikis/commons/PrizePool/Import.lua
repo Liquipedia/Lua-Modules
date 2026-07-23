@@ -115,18 +115,13 @@ function Import._getConfig(args, placements)
 		placementsToSkip = tonumber(args.placementsToSkip),
 		matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(args)
 			or TournamentStructure.currentPageSpec(),
-		groupElimStatuses = Array.map(
-			mw.text.split(args.groupElimStatuses or DEFAULT_ELIMINATION_STATUS, ','),
-			String.trim
-		),
+		groupElimStatuses = Array.parseCommaSeparatedString(args.groupElimStatuses or DEFAULT_ELIMINATION_STATUS),
 		groupScoreDelimiter = args.groupScoreDelimiter or GROUPSCORE_DELIMITER,
 		allGroupsUseWdl = Logic.readBool(args.allGroupsUseWdl),
 		stageImportLimits = processStagesConfig('importLimit', tonumber),
 		stagePlacementsToSkip = processStagesConfig('placementsToSkip', tonumber),
 		stageImportWinners = processStagesConfig('importWinners', Logic.readBoolOrNil),
-		stageGroupElimStatuses = processStagesConfig('groupElimStatuses', function(val)
-			return Array.map(mw.text.split(val, ','), String.trim)
-		end),
+		stageGroupElimStatuses = processStagesConfig('groupElimStatuses', Array.parseCommaSeparatedString),
 		shiftPlacementsBy = tonumber(args.shiftPlacementsBy) or 0,
 	}
 end
@@ -597,8 +592,8 @@ function Import:_entryToOpponent(lpdbEntry, placement)
 		additionalData = self:_groupLastVsAdditionalData(lpdbEntry)
 	end
 
-	local score = additionalData.score or OpponentDisplay.InlineScore(lpdbEntry.opponent)
-	local vsScore = additionalData.vsScore or OpponentDisplay.InlineScore(lpdbEntry.vsOpponent)
+	local score = additionalData.score or Import._getScore(lpdbEntry.opponent)
+	local vsScore = additionalData.vsScore or Import._getScore(lpdbEntry.vsOpponent)
 	local lastVsScore
 	if score or vsScore then
 		lastVsScore = (score or '') .. '-' .. (vsScore or '')
@@ -645,6 +640,17 @@ function Import:_formatGroupScore(lpdbEntry)
 	end
 
 	return table.concat(wdl, self.config.groupScoreDelimiter)
+end
+
+---@param opponentData standardOpponent
+---@return string
+---@overload fun(opponentData: nil): nil
+function Import._getScore(opponentData)
+	if not opponentData then
+		return nil
+	end
+
+	return OpponentDisplay.InlineScore(opponentData)
 end
 
 ---@param lpdbEntry table
@@ -707,9 +713,9 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 	for opponentIndex, opponentRecord in pairs(match.match2opponents) do
 		local opponent = MatchGroupUtil.opponentFromRecord(match, opponentRecord, opponentIndex)
 		if opponent.name == opponentName then
-			score = OpponentDisplay.InlineScore(opponent)
+			score = Import._getScore(opponent)
 		else
-			vsScore = OpponentDisplay.InlineScore(opponent)
+			vsScore = Import._getScore(opponent)
 			lastVs = opponent
 		end
 	end
