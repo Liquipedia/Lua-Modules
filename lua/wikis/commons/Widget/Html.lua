@@ -48,7 +48,13 @@ Html.Em = ComponentCore.tag('em')
 Html.Figcaption = ComponentCore.tag('figcaption')
 Html.Figure = ComponentCore.tag('figure')
 Html.Font = ComponentCore.tag('font')
-Html.Fragment = ComponentCore.tag('fragment')
+Html.Fragment = ComponentCore.component(
+	---@param props HtmlNodeProps
+	---@return Renderable|Renderable[]?
+	function(props)
+		return props.children
+	end
+)
 Html.H1 = ComponentCore.tag('h1')
 Html.H2 = ComponentCore.tag('h2')
 Html.H3 = ComponentCore.tag('h3')
