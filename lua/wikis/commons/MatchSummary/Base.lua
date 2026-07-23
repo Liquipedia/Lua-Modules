@@ -31,7 +31,7 @@ local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {load
 local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 
 ---@class CustomMatchSummaryInterface
----@field createHeader? fun(match: MatchGroupUtilMatch, options: {teamStyle: teamStyle?}?): Widget
+---@field createHeader? fun(match: MatchGroupUtilMatch, options: {teamStyle: teamStyle?}?): Renderable
 ---@field createBody? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 ---@field createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
 ---@field addToFooter? fun(match: MatchGroupUtilMatch, footer: MatchSummaryFooter): MatchSummaryFooter
