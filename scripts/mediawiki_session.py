@@ -45,7 +45,7 @@ class MediaWikiSession(contextlib.AbstractContextManager):
         self.__session.headers.update(HEADER)
 
     def __read_cookie_jar(self) -> http.cookiejar.FileCookieJar:
-        ckf = f"cookie_{self.wiki}.ck"
+        ckf = f"cookies/cookie_{self.wiki}.ck"
         cookie_jar = http.cookiejar.LWPCookieJar(filename=ckf)
         with contextlib.suppress(OSError):
             cookie_jar.load(ignore_discard=True)
