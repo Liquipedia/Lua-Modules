@@ -12,7 +12,6 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Html = Lua.import('Module:Widget/Html')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
@@ -94,8 +93,8 @@ end
 ---@return string
 function GameRowComponentProps.createGameOverview(props)
 	local game = props.game
-	local scores = Array.map(game.opponents, function(opponent)
-		return DisplayHelper.MapScore(opponent, game.status)
+	local scores = Array.mapRange(1, #game.opponents, function(opponentIndex)
+		return MatchSummaryWidgets.GameRow.scoreDisplay(game, opponentIndex)
 	end)
 
 	return table.concat(scores, '&nbsp;-&nbsp;')
