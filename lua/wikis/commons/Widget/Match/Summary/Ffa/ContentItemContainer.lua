@@ -27,8 +27,11 @@ local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 ---@field items MatchSummaryFfaContentItem[]
 
 ---@param props MatchSummaryFfaContentItemContainerProps
----@return VNode
+---@return VNode?
 local function MatchSummaryFfaContentItem(props)
+	if Logic.isEmpty(props.items) then
+		return
+	end
 	local hasContentClass = props.contentClass ~= nil
 	local contentContainer = Html.Div{
 		classes = {'panel-content__container'},
