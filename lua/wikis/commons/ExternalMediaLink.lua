@@ -78,6 +78,7 @@ function ExternalMediaLink._fallBackArgs(args)
 	local eventLink = Logic.emptyOr(args['event-link'], args.event)
 
 	if Logic.isNotEmpty(eventLink) then
+		---@cast eventLink -nil
 		args.tournament = Tournament.getTournament(eventLink)
 	end
 end
