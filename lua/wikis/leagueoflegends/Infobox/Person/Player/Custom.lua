@@ -30,6 +30,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local CustomPlayer = Class.new(Player)
 
 ---@class LeagueoflegendsInfoboxPlayerWidgetInjector: WidgetInjector
+---@operator call(LeagueoflegendsInfoboxPlayer): LeagueoflegendsInfoboxPlayerWidgetInjector
 ---@field caller LeagueoflegendsInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
