@@ -29,6 +29,7 @@ describe('tournament', function()
 			return {}
 		end)
 		stub(mw.ext.LiquipediaDB, "lpdb_tournament", function(objName, data)
+			data.pagename = 'FakePage'
 			table.insert(dataSaved, data)
 			return objName
 		end)
