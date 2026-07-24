@@ -9,12 +9,14 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Lpdb = Lua.import('Module:Lpdb')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 local Tier = Lua.import('Module:Tier/Custom')
+local Variables = Lua.import('Module:Variables')
 
 local Tournament = {}
 
@@ -104,6 +106,25 @@ local TournamentMT = {
 		return rawget(tournament, property)
 	end
 }
+
+---@return StandardTournamentPartial
+Tournament.partialTournamentFromContext = FnUtil.memoize(function ()
+	local fullName = Variables.varDefault('tournament_name')
+	local parent = Variables.varDefault('tournament_parent')
+	return {
+		displayName = Logic.emptyOr(Variables.varDefault('tournament_tickername'), fullName) or (parent or ''):gsub('_', ' '),
+		shortName = Variables.varDefault('tournament_shortname'),
+		fullName = fullName,
+		pageName = parent,
+		liquipediaTier = Tier.toIdentifier(Variables.varDefault('tournament_liquipediatier')),
+		liquipediaTierType = Tier.toIdentifier(Variables.varDefault('tournament_liquipediatiertype')) --[[ @as string? ]],
+		icon = Variables.varDefault('tournament_icon'),
+		iconDark = Variables.varDefault('tournament_icondark'),
+		series = Variables.varDefault('tournament_series'),
+		game = Variables.varDefault('tournament_game'),
+		publisherTier = Variables.varDefault('tournament_publishertier'),
+	}
+end)
 
 ---@param match MatchGroupUtilMatch
 ---@return StandardTournamentPartial
