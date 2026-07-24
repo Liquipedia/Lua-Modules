@@ -29,6 +29,7 @@ local TOURNAMENT_PHASE = {
 
 ---@class StandardTournamentPartial
 ---@field displayName string
+---@field tickerName string?
 ---@field shortName string?
 ---@field fullName string
 ---@field pageName string
@@ -39,6 +40,7 @@ local TOURNAMENT_PHASE = {
 ---@field liquipediaTierType string?
 ---@field game string?
 ---@field publisherTier string?
+---@field type string?
 
 ---@class StandardTournament: StandardTournamentPartial
 ---@field startDate {year: integer, month: integer?, day: integer?, timestamp: integer?}?
@@ -111,8 +113,10 @@ local TournamentMT = {
 Tournament.partialTournamentFromContext = FnUtil.memoize(function ()
 	local fullName = Variables.varDefault('tournament_name')
 	local parent = Variables.varDefault('tournament_parent')
+	local tickerName = Variables.varDefault('tournament_tickername')
 	return {
-		displayName = Logic.emptyOr(Variables.varDefault('tournament_tickername'), fullName) or (parent or ''):gsub('_', ' '),
+		displayName = Logic.emptyOr(tickerName, fullName) or (parent or ''):gsub('_', ' '),
+		tickerName = tickerName,
 		shortName = Variables.varDefault('tournament_shortname'),
 		fullName = fullName,
 		pageName = parent,
@@ -123,6 +127,7 @@ Tournament.partialTournamentFromContext = FnUtil.memoize(function ()
 		series = Variables.varDefault('tournament_series'),
 		game = Variables.varDefault('tournament_game'),
 		publisherTier = Variables.varDefault('tournament_publishertier'),
+		type = Variables.varDefault('tournament_type'),
 	}
 end)
 
@@ -132,6 +137,7 @@ function Tournament.partialTournamentFromMatch(match)
 	---@type StandardTournamentPartial
 	return {
 		displayName = Logic.emptyOr(match.tickername, match.tournament) or (match.parent or ''):gsub('_', ' '),
+		tickerName = match.tickername,
 		shortName = match.shortname,
 		fullName = match.tournament,
 		pageName = match.parent,
@@ -142,6 +148,7 @@ function Tournament.partialTournamentFromMatch(match)
 		series = match.series,
 		game = match.game,
 		publisherTier = match.publisherTier,
+		type = match.type,
 	}
 end
 
@@ -155,6 +162,7 @@ function Tournament.tournamentFromRecord(record)
 
 	local tournament = {
 		displayName = Logic.emptyOr(record.tickername, record.name) or record.pagename:gsub('_', ' '),
+		tickerName = Logic.nilIfEmpty(record.tickername),
 		shortName = Logic.nilIfEmpty(record.shortname),
 		fullName = record.name,
 		pageName = record.pagename,
