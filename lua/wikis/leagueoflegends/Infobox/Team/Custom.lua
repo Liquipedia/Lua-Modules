@@ -78,7 +78,7 @@ function CustomTeam:createRegion(region)
 	return remappedRegion and self:createRegion(remappedRegion) or regionData
 end
 
----@return Widget?
+---@return VNode?
 function CustomTeam:createBottomContent()
 	return UpcomingTournaments.team{name = self.teamTemplate.templatename}
 end

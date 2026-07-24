@@ -85,7 +85,7 @@ end
 
 ---@param key string
 ---@param dataModule string
----@return Widget?
+---@return VNode?
 function CustomInjector:_toCellContent(key, dataModule)
 	local args = self.caller.args
 	if String.isEmpty(args[key]) then return end
@@ -104,7 +104,7 @@ function CustomInjector:_toCellContent(key, dataModule)
 	} or nil
 end
 
----@return Widget
+---@return VNode
 function CustomCharacter:_getPriceCell()
 	local args = self.args
 	local costContent = WidgetUtil.collect(
@@ -118,7 +118,7 @@ function CustomCharacter:_getPriceCell()
 	return Cell{ name = 'Price', children = costContent }
 end
 
----@return Widget[]
+---@return VNode[]
 function CustomCharacter:_getCustomCells()
 	local args = self.args
 	local widgets = {
