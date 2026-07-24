@@ -34,8 +34,13 @@ local BANNED = Lua.import('Module:Banned', {loadData = true})
 local NOT_APPLICABLE = 'N/A'
 
 ---@class RocketleagueInfoboxPlayer: Person
+---@operator call(Frame): RocketleagueInfoboxPlayer
 ---@field basePageName string
 local CustomPlayer = Class.new(Player)
+
+---@class RocketleagueInfoboxPlayerWidgetInjector: WidgetInjector
+---@operator call(RocketleagueInfoboxPlayer): RocketleagueInfoboxPlayerWidgetInjector
+---@field caller RocketleagueInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -53,6 +58,7 @@ function CustomPlayer.run(frame)
 	return player:createInfobox()
 end
 
+---@package
 ---@param manualInput string
 ---@param varName string
 ---@param autoFunction function
