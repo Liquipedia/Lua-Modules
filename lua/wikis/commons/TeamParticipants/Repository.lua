@@ -16,6 +16,7 @@ local Page = Lua.import('Module:Page')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Tournament = Lua.import('Module:Tournament')
 local Variables = Lua.import('Module:Variables')
 
 local Condition = Lua.import('Module:Condition')
@@ -74,21 +75,22 @@ function TeamParticipantsRepository.save(participant)
 	-- Use the tournament defaults if no data is provided from prizepool
 	-- TODO: Refactor in the future to have a util function deal with this, including prizepool, broadcasters, etc.
 	if not lpdbDatas[1] then
+		local tournamentContext = Tournament.partialTournamentFromContext()
 		---@diagnostic disable-next-line: missing-fields
 		lpdbDatas[1] = {
 			objectName = generateObjectName(),
-			tournament = Variables.varDefault('tournament_name') or '',
-			parent = Variables.varDefault('tournament_parent') or '',
-			series = Variables.varDefault('tournament_series') or '',
-			shortname = Variables.varDefault('tournament_tickername') or '',
+			tournament = tournamentContext.fullName or '',
+			parent = tournamentContext.pageName or '',
+			series = tournamentContext.series or '',
+			shortname = tournamentContext.tickerName or '',
 			mode = Variables.varDefault('tournament_mode') or '',
-			type = Variables.varDefault('tournament_type') or '',
-			liquipediatier = Variables.varDefault('tournament_liquipediatier') or '',
-			liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype') or '',
-			publishertier = Variables.varDefault('tournament_publishertier') or '',
-			icon = Variables.varDefault('tournament_icon') or '',
-			icondark = Variables.varDefault('tournament_icondark') or '',
-			game = Variables.varDefault('tournament_game') or '',
+			type = tournamentContext.type or '',
+			liquipediatier = tostring(tournamentContext.liquipediaTier or ''),
+			liquipediatiertype = tournamentContext.liquipediaTierType or '',
+			publishertier = tournamentContext.publisherTier or '',
+			icon = tournamentContext.icon or '',
+			icondark = tournamentContext.iconDark or '',
+			game = tournamentContext.game or '',
 			startdate = Variables.varDefault('tournament_startdate') or '',
 			date = Variables.varDefault('tournament_enddate') or '',
 		}
