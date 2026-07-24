@@ -1079,20 +1079,22 @@ function BasePrizePool:storeData()
 	local prizePoolIndex = (tonumber(Variables.varDefault('prizepool_index')) or 0) + 1
 	Variables.varDefine('prizepool_index', prizePoolIndex)
 
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
 	local lpdbTournamentData = {
-		tournament = Variables.varDefault('tournament_name'),
-		parent = Variables.varDefault('tournament_parent'),
-		series = Variables.varDefault('tournament_series'),
-		shortname = Variables.varDefault('tournament_tickername'),
+		tournament = tournamentContext.fullName,
+		parent = tournamentContext.pageName,
+		series = tournamentContext.series,
+		shortname = tournamentContext.tickerName,
 		startdate = Variables.varDefault('tournament_startdate'),
 		mode = Variables.varDefault('tournament_mode'),
-		type = Variables.varDefault('tournament_type'),
-		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
-		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
-		publishertier = Variables.varDefault('tournament_publishertier'),
-		icon = Variables.varDefault('tournament_icon'),
-		icondark = Variables.varDefault('tournament_icondark'),
-		game = Variables.varDefault('tournament_game'),
+		type = tournamentContext.type,
+		liquipediatier = tostring(tournamentContext.liquipediaTier),
+		liquipediatiertype = tournamentContext.liquipediaTierType,
+		publishertier = tournamentContext.publisherTier,
+		icon = tournamentContext.icon,
+		icondark = tournamentContext.iconDark,
+		game = tournamentContext.game,
 		prizepoolindex = prizePoolIndex,
 	}
 
