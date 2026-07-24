@@ -16,6 +16,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
+local Tournament = Lua.import('Module:Tournament')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -73,6 +74,13 @@ function ExternalMediaLink._fallBackArgs(args)
 	for subjectIndex = 2, MAXIMUM_VALUES.subjects do
 		args['subject' .. subjectIndex] = args['subject' .. subjectIndex] or args['player' .. subjectIndex]
 	end
+
+	local eventLink = Logic.emptyOr(args['event-link'], args.event)
+
+	if Logic.isNotEmpty(eventLink) then
+		---@cast eventLink -nil
+		args.tournament = Tournament.getTournament(eventLink)
+	end
 end
 
 ---Parses the supplied arguments and returns as LPDB form
@@ -99,13 +107,14 @@ function ExternalMediaLink._readArgs(args)
 		'Maximum Value of authors (' .. MAXIMUM_VALUES.authors .. ') exceeded')
 	lpdbData.authors = authors
 
+	---@type StandardTournament
+	local tournament = args.tournament or {}
+
 	local extradata = {
 		translation = args.translation,
 		translator = args.translator,
-		event = args.event,
-		event_link = Page.pageifyLink(
-			Logic.emptyOr(args['event-link'], args.event) or ''
-		),
+		event = tournament.displayName or args.event,
+		event_link = tournament.pageName or Page.pageifyLink(Logic.emptyOr(args['event-link'], args.event) or ''),
 		subject_organization = args.subject_organization1, --legacy
 	}
 
@@ -244,6 +253,23 @@ function ExternalMediaLink._wrapperDisplay(parsedArgs)
 		}}
 	end
 
+	---@return VNode?
+	local function eventDisplay()
+		local tournament = parsedArgs.tournament
+		if tournament ~= nil then
+			---@cast tournament StandardTournament
+			return Link{
+				link = tournament.pageName,
+				children = tournament.fullName,
+			}
+		elseif Logic.isNotEmpty(parsedArgs.event) then
+			return Link{
+				link = parsedArgs['event-link'] or parsedArgs.event,
+				children = parsedArgs.event,
+			}
+		end
+	end
+
 	return TableWidgets.Table{
 		sortable = false,
 		columns = {{}, {}},
@@ -253,10 +279,7 @@ function ExternalMediaLink._wrapperDisplay(parsedArgs)
 			rowIfNotEmpty('Date', parsedArgs.date),
 			rowIfNotEmpty('Subject(s)', makeLinkList('subject')),
 			rowIfNotEmpty('Org Subject(s)', makeLinkList('subject_organization')),
-			rowIfNotEmpty('Event', parsedArgs.event and Link{
-				link = parsedArgs['event-link'] or parsedArgs.event,
-				children = parsedArgs.event,
-			} or nil),
+			rowIfNotEmpty('Event', eventDisplay()),
 			rowIfNotEmpty('URL', parsedArgs.link)
 		)}},
 	}
