@@ -13,7 +13,6 @@ local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
-local Matches = Lua.import('Module:Matches_Player')
 local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
@@ -266,13 +265,6 @@ end
 ---@param args table
 function CustomPlayer:defineCustomPageVariables(args)
 	Variables.varDefine('id', args.id or self.pagename)
-end
-
----@return string?
-function CustomPlayer:createBottomContent()
-	if Namespace.isMain() then
-		return tostring(Matches.get({args = {noClass = true}}))
-	end
 end
 
 ---@param args table
