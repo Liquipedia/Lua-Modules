@@ -21,6 +21,7 @@ local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Streams = Lua.import('Module:Links/Stream')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local Tournament = Lua.import('Module:Tournament')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -306,30 +307,31 @@ end
 ---@nodiscard
 function MatchGroupInputUtil.getTournamentContext(obj, parent)
 	parent = parent or {}
+	local tournamentContext = Tournament.partialTournamentFromContext()
 	local vars = {}
-	vars.game = Logic.emptyOr(obj.game, parent.game, globalVars:get('tournament_game'))
-	vars.icon = Logic.emptyOr(obj.icon, parent.icon, globalVars:get('tournament_icon'))
-	vars.icondark = Logic.emptyOr(obj.iconDark, parent.icondark, globalVars:get('tournament_icondark'))
+	vars.game = Logic.emptyOr(obj.game, parent.game, tournamentContext.game)
+	vars.icon = Logic.emptyOr(obj.icon, parent.icon, tournamentContext.icon)
+	vars.icondark = Logic.emptyOr(obj.iconDark, parent.icondark, tournamentContext.iconDark)
 	vars.liquipediatier = Logic.emptyOr(
 		obj.liquipediatier,
 		parent.liquipediatier,
-		globalVars:get('tournament_liquipediatier')
+		tournamentContext.liquipediaTier
 	)
 	vars.liquipediatiertype = Logic.emptyOr(
 		obj.liquipediatiertype,
 		parent.liquipediatiertype,
-		globalVars:get('tournament_liquipediatiertype')
+		tournamentContext.liquipediaTierType
 	)
 	vars.publishertier = Logic.emptyOr(
 		obj.publishertier,
 		parent.publishertier,
-		globalVars:get('tournament_publishertier')
+		tournamentContext.publisherTier
 	)
-	vars.series = Logic.emptyOr(obj.series, parent.series, globalVars:get('tournament_series'))
-	vars.shortname = Logic.emptyOr(obj.shortname, parent.shortname, globalVars:get('tournament_shortname'))
-	vars.tickername = Logic.emptyOr(obj.tickername, parent.tickername, globalVars:get('tournament_tickername'))
-	vars.tournament = Logic.emptyOr(obj.tournament, parent.tournament, globalVars:get('tournament_name'))
-	vars.type = Logic.emptyOr(obj.type, parent.type, globalVars:get('tournament_type'))
+	vars.series = Logic.emptyOr(obj.series, parent.series, tournamentContext.series)
+	vars.shortname = Logic.emptyOr(obj.shortname, parent.shortname, tournamentContext.shortName)
+	vars.tickername = Logic.emptyOr(obj.tickername, parent.tickername, tournamentContext.tickerName)
+	vars.tournament = Logic.emptyOr(obj.tournament, parent.tournament, tournamentContext.fullName)
+	vars.type = Logic.emptyOr(obj.type, parent.type, tournamentContext.type)
 	vars.patch = Logic.emptyOr(obj.patch, parent.patch, globalVars:get('tournament_patch'))
 	vars.date = Logic.emptyOr(obj.date, parent.date)
 	vars.mode = Logic.emptyOr(obj.mode, parent.mode)
