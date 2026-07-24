@@ -36,7 +36,7 @@ local TOURNAMENT_PHASE = {
 ---@field icon string?
 ---@field iconDark string?
 ---@field series string?
----@field liquipediaTier integer|string|nil
+---@field liquipediaTier string?
 ---@field liquipediaTierType string?
 ---@field game string?
 ---@field publisherTier string?
@@ -114,14 +114,15 @@ Tournament.partialTournamentFromContext = FnUtil.memoize(function ()
 	local fullName = Variables.varDefault('tournament_name')
 	local parent = Variables.varDefault('tournament_parent')
 	local tickerName = Variables.varDefault('tournament_tickername')
+
 	return {
 		displayName = Logic.emptyOr(tickerName, fullName) or (parent or ''):gsub('_', ' '),
 		tickerName = tickerName,
 		shortName = Variables.varDefault('tournament_shortname'),
 		fullName = fullName,
 		pageName = parent,
-		liquipediaTier = Tier.toIdentifier(Variables.varDefault('tournament_liquipediatier')),
-		liquipediaTierType = Tier.toIdentifier(Variables.varDefault('tournament_liquipediatiertype')) --[[ @as string? ]],
+		liquipediaTier = Variables.varDefault('tournament_liquipediatier'),
+		liquipediaTierType = Variables.varDefault('tournament_liquipediatiertype'),
 		icon = Variables.varDefault('tournament_icon'),
 		iconDark = Variables.varDefault('tournament_icondark'),
 		series = Variables.varDefault('tournament_series'),
@@ -141,8 +142,8 @@ function Tournament.partialTournamentFromMatch(match)
 		shortName = match.shortname,
 		fullName = match.tournament,
 		pageName = match.parent,
-		liquipediaTier = Tier.toIdentifier(match.liquipediatier),
-		liquipediaTierType = Tier.toIdentifier(match.liquipediatiertype) --[[ @as string? ]],
+		liquipediaTier = match.liquipediatier,
+		liquipediaTierType = match.liquipediatiertype,
 		icon = match.icon,
 		iconDark = match.iconDark,
 		series = match.series,
@@ -168,8 +169,8 @@ function Tournament.tournamentFromRecord(record)
 		pageName = record.pagename,
 		startDate = startDate,
 		endDate = endDate,
-		liquipediaTier = Tier.toIdentifier(tier),
-		liquipediaTierType = Tier.toIdentifier(tierType) --[[ @as string? ]],
+		liquipediaTier = tier,
+		liquipediaTierType = tierType,
 		publisherTier = record.publishertier,
 		locations = record.locations,
 		region = (record.locations or {}).region1,
