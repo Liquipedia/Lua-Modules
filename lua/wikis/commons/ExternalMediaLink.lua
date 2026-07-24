@@ -75,7 +75,9 @@ function ExternalMediaLink._fallBackArgs(args)
 		args['subject' .. subjectIndex] = args['subject' .. subjectIndex] or args['player' .. subjectIndex]
 	end
 
-	args.tournament = args.tournament or Tournament.getTournament(Logic.emptyOr(args['event-link'], args.event))
+	args.tournament = type(args.tournament) == 'table'
+		and args.tournament
+		or Tournament.getTournament(Logic.emptyOr(args['event-link'], args.event))
 end
 
 ---Parses the supplied arguments and returns as LPDB form
