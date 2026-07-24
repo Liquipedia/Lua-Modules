@@ -29,27 +29,27 @@ body:
     description: Your device
     placeholder: Desktop PC, Galaxy S26, iPhone 15
   validations:
-    required: true
+    required: false
 - type: input
   attributes:
     label: OS
     description: Your operating system
     placeholder: Windows 11, iOS 26, Android 15
   validations:
-    required: true
+    required: false
 - type: input
   attributes:
     label: Browser
     description: Your web browser
     placeholder: Chrome, Safari, Firefox
   validations:
-    required: true
+    required: false
 - type: input
   attributes:
     label: Browser version
     description: Version of your web browser
   validations:
-    required: true
+    required: false
 - type: textarea
   attributes:
     label: Additional context
