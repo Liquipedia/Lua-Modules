@@ -39,6 +39,7 @@ local RIOT_POINTS_ICON = IconImageWidget{
 local CustomCharacter = Class.new(Character)
 
 ---@class LeagueofLegendsChampionInfoboxWidgetInjector: WidgetInjector
+---@operator call(LeagueofLegendsChampionInfobox): LeagueofLegendsChampionInfoboxWidgetInjector
 ---@field caller LeagueofLegendsChampionInfobox
 local CustomInjector = Class.new(Injector)
 
@@ -84,7 +85,7 @@ end
 
 ---@param key string
 ---@param dataModule string
----@return Widget?
+---@return VNode?
 function CustomInjector:_toCellContent(key, dataModule)
 	local args = self.caller.args
 	if String.isEmpty(args[key]) then return end
@@ -103,7 +104,7 @@ function CustomInjector:_toCellContent(key, dataModule)
 	} or nil
 end
 
----@return Widget
+---@return VNode
 function CustomCharacter:_getPriceCell()
 	local args = self.args
 	local costContent = WidgetUtil.collect(
@@ -117,7 +118,7 @@ function CustomCharacter:_getPriceCell()
 	return Cell{ name = 'Price', children = costContent }
 end
 
----@return Widget[]
+---@return VNode[]
 function CustomCharacter:_getCustomCells()
 	local args = self.args
 	local widgets = {

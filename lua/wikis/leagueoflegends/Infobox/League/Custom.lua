@@ -25,6 +25,7 @@ local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Premier
 local CustomLeague = Class.new(League)
 
 ---@class LeagueoflegendsLeagueInfoboxWidgetInjector: WidgetInjector
+---@operator call(LeagueoflegendsLeagueInfobox): LeagueoflegendsLeagueInfoboxWidgetInjector
 ---@field caller LeagueoflegendsLeagueInfobox
 local CustomInjector = Class.new(Injector)
 
