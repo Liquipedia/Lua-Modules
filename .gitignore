@@ -1,4 +1,5 @@
 /.idea/
+/cookies
 /node_modules
 /lua/output
 /lua/spec/snapshots/diffs
@@ -7,4 +8,4 @@
 /luacov.stats.out
 **/__pycache__/
 .env
-*.ck
+**/*.ck
