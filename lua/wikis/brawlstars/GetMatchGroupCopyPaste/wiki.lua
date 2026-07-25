@@ -104,7 +104,7 @@ function WikiCopyPaste._getMapCode(args, matchIndex, numberOfOpponents, mapIndex
 end
 
 ---@param mapVeto string
----@param customVeto string
+---@param customVeto string?
 ---@return string[]
 function WikiCopyPaste._getMapVetoCode(mapVeto, customVeto)
 	if mapVeto == 'none' then
@@ -120,7 +120,6 @@ function WikiCopyPaste._getMapVetoCode(mapVeto, customVeto)
 	vetoTypes = string.gsub(vetoTypes, '%-', ',')
 
 	local types = Array.parseCommaSeparatedString(vetoTypes)
-	vetoTypes = table.concat(types, ',')
 
 	local lines = {
 		INDENT .. '|mapveto={{MapVeto',
