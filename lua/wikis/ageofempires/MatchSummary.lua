@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Faction = Lua.import('Module:Faction')
-local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local MapMode = Lua.import('Module:MapMode')
 local Operator = Lua.import('Module:Operator')
@@ -179,12 +178,11 @@ end
 ---@param gameData string?
 ---@return VNode
 function GameRowComponentProps._createFactionIcon(civ, gameData)
-	local normGame = Game.abbreviation{game = gameData}:lower()
 	return Html.Span{
 		classes = {'brkts-champion-icon'},
 		children = Faction.Icon{
 			faction = civ or '',
-			game = normGame,
+			game = gameData,
 			size = 64,
 			showTitle = true,
 			showLink = true,
