@@ -137,6 +137,13 @@ function TeamParticipantsRepository.save(participant)
 				local serializedQualifiers = Array.map(participant.potentialQualifiers, Opponent.toName)
 				lpdbData.extradata.potentialQualifiers = serializedQualifiers
 			end
+
+			-- Store the guaranteed minimum points (set by Module:PrizePool) for display in
+			-- Module:AutomaticPointsTable, without overwriting real prize points.
+			local minimumSecured = Variables.varDefault('minimum_secured')
+			if Logic.isNotEmpty(minimumSecured) and Logic.isEmpty(lpdbData.extradata.prizepoints) then
+				lpdbData.extradata.securedpoints = minimumSecured
+			end
 		end
 
 		mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, Json.stringifySubTables(lpdbData))

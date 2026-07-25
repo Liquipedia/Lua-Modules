@@ -1051,6 +1051,46 @@ describe('Team Participants Repository', function()
 				assert.are_same({'Team Liquid', 'Team BDS'}, extradata.potentialQualifiers)
 			end)
 
+			it('stores minimum_secured as securedpoints when no prizepool record exists', function()
+				Variables.varDefine('minimum_secured', '1')
+
+				TeamParticipantsRepository.save(createBasicParticipant())
+
+				local data = Json.parseIfString(LpdbPlacementStore.calls[1].vals[2])
+				local extradata = Json.parseIfString(data.extradata)
+
+				Variables.varDefine('minimum_secured', nil)
+
+				assert.are_equal('1', extradata.securedpoints)
+			end)
+
+			it('does not overwrite real prizepoints with securedpoints', function()
+				Variables.varDefine('minimum_secured', '1')
+
+				local getRecordsStub = stub(TeamParticipantsRepository, 'getPrizepoolRecordsForTeam')
+				getRecordsStub.returns({createPrizepoolRecord({extradata = {prizepoints = 20}})})
+
+				TeamParticipantsRepository.save(createBasicParticipant())
+
+				local data = Json.parseIfString(LpdbPlacementStore.calls[1].vals[2])
+				local extradata = Json.parseIfString(data.extradata)
+
+				getRecordsStub:revert()
+				Variables.varDefine('minimum_secured', nil)
+
+				assert.are_equal(20, extradata.prizepoints)
+				assert.is_nil(extradata.securedpoints)
+			end)
+
+			it('stores no securedpoints when minimum_secured is unset', function()
+				TeamParticipantsRepository.save(createBasicParticipant())
+
+				local data = Json.parseIfString(LpdbPlacementStore.calls[1].vals[2])
+				local extradata = Json.parseIfString(data.extradata)
+
+				assert.is_nil(extradata.securedpoints)
+			end)
+
 			it('excludes staff when splitting prizemoney (subs still count)', function()
 				local getRecordsStub = stub(TeamParticipantsRepository, 'getPrizepoolRecordsForTeam')
 				getRecordsStub.returns({createPrizepoolRecord({prizemoney = 6000, opponenttemplate = 'bds'})})
