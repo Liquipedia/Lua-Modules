@@ -14,7 +14,7 @@ local TableWidgets = Lua.import('ModuleWidgetTable2All')
 
 local MatchFormatTable = {}
 
----@param frame Frametable
+---@param frame Frame|table
 ---@return VNode
 function MatchFormatTable.run(frame)
   local args = Arguments.getArgs(frame)
@@ -30,7 +30,7 @@ function MatchFormatTable.run(frame)
 	local headerCells = Array.mapRange(1, #modeCells, function(setIndex)
 		return TableWidgets.CellHeader{children = 'Set ' .. setIndex}
 	end)
-	
+
 	return TableWidgets.Table{
 		title = assert(args.title, 'title= not specified'),
 		children = {
