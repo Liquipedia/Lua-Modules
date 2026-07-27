@@ -37,7 +37,7 @@ local defaultProps = {
 }
 
 ---@param props TransfersListParameters
----@return Renderable[]
+---@return VNode[]
 local function TransfersList(props)
 	return WidgetUtil.collect(
 		TransferList{
