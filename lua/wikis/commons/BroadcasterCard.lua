@@ -25,6 +25,11 @@ local Variables = Lua.import('Module:Variables')
 
 local Weight = Lua.requireIfExists('Module:BroadCasterWeight')
 
+local Html = Lua.import('Module:Widget/Html')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local ListWidgets = Lua.import('Module:Widget/List')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 local TBD = 'TBD'
 
 local BroadcasterCard = {}
@@ -84,14 +89,6 @@ function BroadcasterCard.create(frame)
 		title = table.concat(positions, '/') .. ':'
 	end
 
-	-- Html for header
-	local outputList = tostring(mw.html.create():wikitext('*'):tag('b'):wikitext(title):allDone())
-
-	-- Reference
-	if String.isNotEmpty(args.ref) then
-		outputList = outputList .. ' ' .. frame:extensionTag('ref', args.ref)
-	end
-
 	local date = DateExt.getContextualDate()
 
 	-- Add people
@@ -125,10 +122,6 @@ function BroadcasterCard.create(frame)
 		table.insert(casters, broadcaster)
 	end
 
-	if Table.isEmpty(casters) then
-		return outputList .. '\n**' .. Abbreviation.make{text = 'TBA', title = 'To Be Announced'}
-	end
-
 	Array.sortInPlaceBy(casters, FnUtil.identity,
 		---@param a broadCasterData
 		---@param b broadCasterData
@@ -141,28 +134,33 @@ function BroadcasterCard.create(frame)
 		end
 	)
 
-	for _, broadcaster in ipairs(casters) do
-		outputList = outputList .. BroadcasterCard._display(broadcaster, config)
-	end
-
-	return outputList
+	return ListWidgets.Unordered{children = {WidgetUtil.collect(
+		Html.B{children = title},
+		String.isNotEmpty(args.ref) and (' ' .. frame:extensionTag('ref', args.ref)) or nil,
+		ListWidgets.Unordered{
+			children = BroadcasterCard._displayCasters(casters, config)
+		}
+	)}}
 end
 
----@param broadcaster broadCasterData
+---@param broadcasters broadCasterData[]
 ---@param options {alwaysShowName: boolean}
----@return string
-function BroadcasterCard._display(broadcaster, options)
-	local displayName = broadcaster.displayName or broadcaster.name
-
-	if String.isNotEmpty(displayName) and (options.alwaysShowName or displayName ~= broadcaster.id) then
-		displayName = ('&nbsp;(' .. displayName ..')')
-	else
-		displayName = ''
+---@return (Renderable|Renderable[])[]
+function BroadcasterCard._displayCasters(broadcasters, options)
+	if Logic.isEmpty(broadcasters) then
+		return {Html.Abbr{children = 'TBA', title = 'To Be Announced'}}
 	end
-
-	return '\n**' .. Flags.Icon{flag = broadcaster.flag, shouldLink = true}
-		.. '&nbsp;[[' .. broadcaster.page .. '|'.. broadcaster.id .. ']]'
-		.. displayName
+	return Array.map(broadcasters, function (broadcaster)
+		local children = {
+			Flags.Icon{flag = broadcaster.flag, shouldLink = true},
+			Link{link = broadcaster.page, children = broadcaster.id},
+		}
+		local displayName = broadcaster.displayName or broadcaster.name
+		if String.isNotEmpty(displayName) and (options.alwaysShowName or displayName ~= broadcaster.id) then
+			Array.appendWith(children, '(' .. displayName .. ')')
+		end
+		return Array.interleave(children, '&nbsp;')
+	end)
 end
 
 ---@param position string
