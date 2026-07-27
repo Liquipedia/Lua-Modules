@@ -125,7 +125,7 @@ end
 ---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
-	---@type table
+	---@type table<string, any>
 	local extradata = {
 		bestof = map.bestof,
 		maptype = map.maptype,
@@ -139,6 +139,7 @@ function MapFunctions.getExtraData(match, map, opponents)
 		for playerIndex = 1, 3 do
 			local brawler = map['t' .. opponentIndex .. 'c' .. playerIndex]
 			if String.isNotEmpty(brawler) then
+				---@type string
 				extradata['team' .. opponentIndex .. 'champion' .. playerIndex] =
 					getCharacterName(brawler)
 			end
