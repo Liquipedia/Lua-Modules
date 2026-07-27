@@ -36,9 +36,13 @@ end
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
+---@param value integer?
 ---@return string
-function StandingsTiebreaker:display(state, opponent)
-	return tostring(self:valueOf(state, opponent))
+function StandingsTiebreaker:display(state, opponent, value)
+	if value == nil then
+		value = self:valueOf(state, opponent)
+	end
+	return tostring(value)
 end
 
 ---@return 'full'|'ml'|'h2h'

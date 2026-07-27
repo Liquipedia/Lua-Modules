@@ -31,13 +31,14 @@ end
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
+---@param value integer?
 ---@return string
-function TiebreakerGameWinRate:display(state, opponent)
+function TiebreakerGameWinRate:display(state, opponent, value)
 	local games = TiebreakerGameUtil.getGames(opponent)
 	if games == 0 then
 		return '-'
 	end
-	return MathUtil.formatPercentage(self:valueOf(state, opponent), 2)
+	return MathUtil.formatPercentage(value ~= nil and value or self:valueOf(state, opponent), 2)
 end
 
 return TiebreakerGameWinRate

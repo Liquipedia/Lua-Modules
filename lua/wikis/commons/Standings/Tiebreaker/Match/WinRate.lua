@@ -30,9 +30,10 @@ end
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
+---@param value integer?
 ---@return string
-function TiebreakerMatchWinRate:display(state, opponent)
-	return MathUtil.formatPercentage(self:valueOf(state, opponent), 2)
+function TiebreakerMatchWinRate:display(state, opponent, value)
+	return MathUtil.formatPercentage(value ~= nil and value or self:valueOf(state, opponent), 2)
 end
 
 return TiebreakerMatchWinRate

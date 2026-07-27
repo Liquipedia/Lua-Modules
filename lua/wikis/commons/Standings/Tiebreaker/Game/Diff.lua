@@ -30,8 +30,9 @@ end
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
+---@param value integer?
 ---@return string
-function TiebreakerGameDiff:display(state, opponent)
+function TiebreakerGameDiff:display(state, opponent, value)
 	local games = TiebreakerGameUtil.getGames(opponent)
 	return games.w .. ' - ' .. games.l
 end

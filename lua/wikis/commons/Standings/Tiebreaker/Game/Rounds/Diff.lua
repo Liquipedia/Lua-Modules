@@ -30,8 +30,9 @@ end
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
+---@param value integer?
 ---@return string
-function TiebreakerRoundDiff:display(state, opponent)
+function TiebreakerRoundDiff:display(state, opponent, value)
 	local rounds = TiebreakerRoundUtil.getRounds(opponent)
 	return rounds.w .. ' - ' .. rounds.l
 end
