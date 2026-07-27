@@ -43,6 +43,14 @@ local function StandingsFfa(props)
 		function (round) return round.round end
 	) or {round = 0}).round
 
+	local entryByRound = Array.map(standings.rounds, function(round)
+		local byName = {}
+		Array.forEach(round.opponents, function(entry)
+			byName[Opponent.toName(entry.opponent)] = entry
+		end)
+		return byName
+	end)
+
 	local standingsTable = TableWidgets.Table{
 		classes = {'standings-ffa'},
 		columns = WidgetUtil.collect(
@@ -64,7 +72,7 @@ local function StandingsFfa(props)
 				if round.round > activeRounds then
 					return
 				end
-				return Helpers._createRoundBody(standings, round)
+				return Helpers._createRoundBody(standings, round, entryByRound)
 			end)
 		),
 		striped = false
@@ -146,9 +154,11 @@ end
 ---@private
 ---@param standings StandingsModel
 ---@param round StandingsRound
+---@param entryByRound table[]
 ---@return Renderable
-function Helpers._createRoundBody(standings, round)
+function Helpers._createRoundBody(standings, round, entryByRound)
 	return TableWidgets.TableBody{children = Array.map(round.opponents, function (slot)
+		local slotName = Opponent.toName(slot.opponent)
 		return TableWidgets.Row{
 			attributes = {
 				['data-position-status'] = slot.positionStatus,
@@ -180,12 +190,10 @@ function Helpers._createRoundBody(standings, round)
 						children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
 					}
 				end),
-				Helpers._showRoundColumns(standings) and Array.map(standings.rounds, function (columnRound)
+				Helpers._showRoundColumns(standings) and Array.map(standings.rounds, function (columnRound, columnIndex)
 					local text
 					if columnRound.round <= round.round then
-						local opponent = Array.find(columnRound.opponents, function(columnSlot)
-							return Opponent.same(columnSlot.opponent, slot.opponent)
-						end)
+						local opponent = entryByRound[columnIndex][slotName]
 						if opponent then
 							local roundStatus = opponent.specialStatus
 							if roundStatus == '' then
