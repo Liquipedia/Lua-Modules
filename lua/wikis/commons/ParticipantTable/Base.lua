@@ -20,6 +20,7 @@ local Namespace = Lua.import('Module:Namespace')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
+local Tournament = Lua.import('Module:Tournament')
 local Variables = Lua.import('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -270,19 +271,21 @@ end
 function ParticipantTable:store()
 	if self.config.noStorage then return self end
 
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
 	local lpdbTournamentData = {
-		tournament = Variables.varDefault('tournament_name'),
-		parent = Variables.varDefault('tournament_parent'),
-		series = Variables.varDefault('tournament_series'),
+		tournament = tournamentContext.fullName,
+		parent = tournamentContext.pageName,
+		series = tournamentContext.pageName,
 		startdate = Variables.varDefault('tournament_startdate'),
 		mode = Variables.varDefault('tournament_mode'),
-		type = Variables.varDefault('tournament_type'),
-		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
-		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
-		publishertier = Variables.varDefault('tournament_publishertier'),
-		icon = Variables.varDefault('tournament_icon'),
-		icondark = Variables.varDefault('tournament_icondark'),
-		game = Variables.varDefault('tournament_game'),
+		type = tournamentContext.type,
+		liquipediatier = tournamentContext.liquipediaTier,
+		liquipediatiertype = tournamentContext.liquipediaTierType,
+		publishertier = tournamentContext.publisherTier,
+		icon = tournamentContext.icon,
+		icondark = tournamentContext.iconDark,
+		game = tournamentContext.game,
 		prizepoolindex = tonumber(Variables.varDefault('prizepool_index')) or 0,
 	}
 
