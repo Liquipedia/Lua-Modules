@@ -540,11 +540,11 @@ span.slash {
 			padding: 0.1rem;
 
 			&.role--blue {
-				background-color: #0d71bf;
+				background-color: var( --clr-sapphire-40 );
 			}
 
 			&.role--red {
-				background-color: #b81414;
+				background-color: var( --clr-cinnabar-40 );
 			}
 		}
 
@@ -855,14 +855,14 @@ span.slash {
 
 			&--blue {
 				.match-bm-game-veto-overview-team-veto-row-item-text {
-					background-color: #0d71bf;
+					background-color: var( --clr-sapphire-40 );
 					min-height: 0.25rem;
 				}
 			}
 
 			&--red {
 				.match-bm-game-veto-overview-team-veto-row-item-text {
-					background-color: #b81414;
+					background-color: var( --clr-cinnabar-40 );
 					min-height: 0.25rem;
 				}
 			}
