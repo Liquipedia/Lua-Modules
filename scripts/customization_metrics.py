@@ -12,6 +12,10 @@ non-local function, or when a `local function` is exported via a `return`
 statement (the widget pattern: `local function X` ... `return wrap(X)`).
 Purely-local helpers inside an otherwise declarative file do not promote it.
 
+Shares are against the whole of lua/wikis (commons included), so "override code
+is 37% of all Lua" is answerable. Vendored code, type stubs, specs and test
+assets under lua/ are excluded from the denominator -- they are not the product.
+
 Prints `key=value` lines so a caller can diff two runs and report the change.
 
 Usage:
@@ -53,24 +57,26 @@ def is_override_code(lines):
 
 
 def measure(root):
-    declarative = legacy = override = 0
+    declarative = legacy = override = commons = 0
 
     for path in sorted(pathlib.Path(root).rglob("*.lua")):
         posix = path.as_posix()
-        # commons is the shared implementation, not per-wiki customization.
-        if f"/{COMMONS}/" in posix or posix.endswith(f"/{COMMONS}"):
-            continue
         text = path.read_text(encoding="utf-8", errors="replace")
         count = len(text.splitlines())
 
-        if "Legacy" in posix:
+        # commons is the shared implementation, not per-wiki customization. It is
+        # still counted, so shares have the whole of lua/wikis as denominator.
+        if f"/{COMMONS}/" in posix or posix.endswith(f"/{COMMONS}"):
+            commons += count
+        elif "Legacy" in posix:
             legacy += count
         elif is_override_code(text.splitlines()):
             override += count
         else:
             declarative += count
 
-    total = override + declarative + legacy
+    per_wiki = override + declarative + legacy
+    total = per_wiki + commons
 
     def share(count):
         return round(count / total * 100, 2) if total else 0.0
@@ -79,10 +85,14 @@ def measure(root):
         "override_code": override,
         "declarative": declarative,
         "legacy": legacy,
+        "per_wiki_total": per_wiki,
+        "commons": commons,
         "total": total,
         "override_code_pct": share(override),
         "declarative_pct": share(declarative),
         "legacy_pct": share(legacy),
+        "per_wiki_total_pct": share(per_wiki),
+        "commons_pct": share(commons),
     }
 
 
