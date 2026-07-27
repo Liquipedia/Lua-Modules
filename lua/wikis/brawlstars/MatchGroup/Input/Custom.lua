@@ -125,12 +125,26 @@ end
 ---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
-	return {
+	local extradata = {
 		bestof = map.bestof,
 		maptype = map.maptype,
 		firstpick = FIRST_PICK_CONVERSION[string.lower(map.firstpick or '')],
 		bans = getBans(map, #opponents),
 	}
+
+	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, BrawlerNames)
+
+	for opponentIndex = 1, #opponents do
+		for playerIndex = 1, 3 do
+			local brawler = map['t' .. opponentIndex .. 'c' .. playerIndex]
+			if String.isNotEmpty(brawler) then
+				extradata['team' .. opponentIndex .. 'champion' .. playerIndex] =
+					getCharacterName(brawler)
+			end
+		end
+	end
+
+	return extradata
 end
 
 ---@param map table
