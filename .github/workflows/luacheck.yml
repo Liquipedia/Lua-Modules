@@ -72,6 +72,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # need the base commit to compare coverage against
 
       - name: Setup lua
         uses: Liquipedia/gh-actions-lua@7615c1c345af98bd9898fa5b53c488c5f58246cf
@@ -95,16 +97,42 @@ jobs:
         run: |
           luacov
 
-      - name: Report coverage
-        working-directory: lua
+      - name: Coverage for base commit
+        if: github.event.pull_request.base.sha != ''
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          read -r hits missed pct <<< "$(awk '/^Total/ {print $2, $3, $4}' luacov.report.out)"
-          files=$(grep -cE '^wikis/commons/.*[0-9]+\.[0-9][0-9]%$' luacov.report.out || true)
-          uncovered=$(grep -cE '^wikis/commons/.*[[:space:]]0\.00%$' luacov.report.out || true)
+          git worktree add ../base "$BASE_SHA"
+          # Run the base commit under *this* PR's luacov config, so the delta
+          # reflects the code change rather than a change to the config itself.
+          cp lua/.luacov ../base/lua/.luacov
+          cd ../base
+          busted -C lua --run=ci -c
+          cd lua && luacov
+
+      - name: Report coverage
+        run: |
+          report=lua/luacov.report.out
+          base_report=../base/lua/luacov.report.out
+
+          read -r hits missed pct <<< "$(awk '/^Total/ {print $2, $3, $4}' "$report")"
+          files=$(grep -cE '^wikis/commons/.*[0-9]+\.[0-9][0-9]%$' "$report" || true)
+          uncovered=$(grep -cE '^wikis/commons/.*[[:space:]]0\.00%$' "$report" || true)
+
+          delta_row="| Change vs base | _no baseline available_ |"
+          if [ -s "$base_report" ]; then
+            base_pct=$(awk '/^Total/ {gsub("%", "", $4); print $4}' "$base_report")
+            if [ -n "$base_pct" ]; then
+              delta=$(awk -v a="${pct%\%}" -v b="$base_pct" 'BEGIN {printf "%+.2f", a - b}')
+              delta_row="| Change vs base | **${delta} pp** (base ${base_pct}%) |"
+            fi
+          fi
+
           {
             echo "| Coverage (lua/wikis/commons) | |"
             echo "|-|-|"
             echo "| Coverage | **$pct** |"
+            echo "$delta_row"
             echo "| Lines hit | $hits |"
             echo "| Lines missed | $missed |"
             echo "| Files | $files |"
