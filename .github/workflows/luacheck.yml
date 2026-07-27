@@ -92,6 +92,81 @@ jobs:
         run: |
           ~/.local/bin/luals/bin/lua-language-server --check ./ | tee luals-check && true
           cat luals-check | (sed -e 's/\x1b\[[0-9;]*m//g'| sed -n 's/\(lua[^:]\+\):\([[:digit:]]*\):[[:digit:]]* \[Warning\] /::error file=\1,line=\2::/p') | (! grep -E $(echo ${{ steps.lua-changed-files.outputs.all_changed_files }} | sed -- 's/ /|/g'))
-          echo "| | Files | Errors |" >> $GITHUB_STEP_SUMMARY
-          echo "|-|-------|----------|" >> $GITHUB_STEP_SUMMARY
-          echo "| LuaLS check | $(find lua -name '*.lua' | wc -l) | $(cat luals-check | grep 'Warning' | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          # Use the totals LuaLS reports itself. Counting lines that contain
+          # "Warning" overcounts, because a single diagnostic can span several.
+          plain=$(sed -e 's/\x1b\[[0-9;]*m//g' luals-check)
+          problems=$(echo "$plain" | grep -oE 'Diagnosis complete, [0-9]+ problems found' | tail -1 | grep -oE '[0-9]+' || true)
+          dirty=$(echo "$plain" | grep -oE 'Found [0-9]+ problems in [0-9]+ files' | tail -1 | sed -E 's/.* in ([0-9]+) files/\1/' || true)
+          {
+            echo "| | Files scanned | Files with problems | Problems |"
+            echo "|-|-------|----------|----------|"
+            echo "| LuaLS check | $(find lua -name '*.lua' | wc -l) | ${dirty:-?} | ${problems:-?} |"
+            echo ""
+            echo "_LuaLS reports a slightly different problem count between runs on identical"
+            echo "code (237-240 observed over 8 runs), so read small movements as noise._"
+          } >> $GITHUB_STEP_SUMMARY
+
+  lua-annotations:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # need the base commit to compare against
+
+      - name: Measure annotation coverage
+        run: |
+          python3 scripts/annotation_coverage.py | tee annotations-head.txt
+
+      - name: Measure base commit
+        if: github.event.pull_request.base.sha != ''
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git worktree add ../base "$BASE_SHA"
+          # Measure the base tree with *this* PR's script, so the delta reflects
+          # the code change rather than a change to how we measure.
+          python3 scripts/annotation_coverage.py ../base/lua/wikis/commons | tee annotations-base.txt
+
+      - name: Report annotation coverage
+        run: |
+          head_file=annotations-head.txt
+          base_file=annotations-base.txt
+
+          get() { grep -E "^$2=" "$1" | cut -d= -f2; }
+
+          functions=$(get "$head_file" functions)
+          unannotated=$(get "$head_file" unannotated)
+          coverage=$(get "$head_file" coverage_pct)
+          params=$(get "$head_file" params_pct)
+
+          have_base=0
+          if [ -s "$base_file" ]; then
+            b_functions=$(get "$base_file" functions)
+            b_unannotated=$(get "$base_file" unannotated)
+            b_coverage=$(get "$base_file" coverage_pct)
+            b_params=$(get "$base_file" params_pct)
+            [ -n "$b_coverage" ] && have_base=1
+          fi
+
+          num() {
+            if [ "$have_base" = 1 ]; then printf '%s (%+d)' "$1" "$(($1 - $2))"; else printf '%s' "$1"; fi
+          }
+          pct_of() {
+            if [ "$have_base" = 1 ]; then
+              awk -v v="$1" -v b="$2" 'BEGIN {printf "%.2f%% (%+.2f pp)", v, v - b}'
+            else
+              awk -v v="$1" 'BEGIN {printf "%.2f%%", v}'
+            fi
+          }
+
+          {
+            echo "| Annotations (lua/wikis/commons) | |"
+            echo "|-|-|"
+            echo "| Exported functions annotated | $(pct_of "$coverage" "$b_coverage") |"
+            echo "| Exported functions | $(num "$functions" "$b_functions") |"
+            echo "| Unannotated | $(num "$unannotated" "$b_unannotated") |"
+            echo "| Functions with all params annotated | $(pct_of "$params" "$b_params") |"
+            [ "$have_base" = 1 ] || echo "| | _no baseline available; deltas omitted_ |"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
