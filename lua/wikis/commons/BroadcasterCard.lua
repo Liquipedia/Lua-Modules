@@ -12,6 +12,7 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -127,7 +128,17 @@ function BroadcasterCard.create(frame)
 		return outputList .. '\n**' .. Abbreviation.make{text = 'TBA', title = 'To Be Announced'}
 	end
 
-	table.sort(casters, function(a, b) return a.sort < b.sort or (a.sort == b.sort and a.id:lower() < b.id:lower()) end)
+	Array.sortInPlaceBy(casters, FnUtil.identity,
+		---@param a broadCasterData
+		---@param b broadCasterData
+		---@return boolean
+		function (a, b)
+			if a.sort ~= b.sort then
+				return a.sort < b.sort
+			end
+			return a.id:lower() < b.id:lower()
+		end
+	)
 
 	for _, broadcaster in ipairs(casters) do
 		outputList = outputList .. BroadcasterCard._display(broadcaster, config)
