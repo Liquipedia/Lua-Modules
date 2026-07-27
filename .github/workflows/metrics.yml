@@ -1,0 +1,62 @@
+name: Metrics
+
+on: [pull_request, workflow_dispatch]
+
+jobs:
+  customization:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # need the base commit to compare against
+
+      - name: Measure customization
+        run: |
+          python3 scripts/customization_metrics.py | tee customization-head.txt
+
+      - name: Measure base commit
+        if: github.event.pull_request.base.sha != ''
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git worktree add ../base "$BASE_SHA"
+          # Measure the base tree with *this* PR's script, so the delta reflects
+          # the code change rather than a change to how we measure.
+          python3 scripts/customization_metrics.py ../base/lua/wikis | tee customization-base.txt
+
+      - name: Report customization
+        run: |
+          head_file=customization-head.txt
+          base_file=customization-base.txt
+
+          get() { grep -E "^$2=" "$1" | cut -d= -f2; }
+
+          override=$(get "$head_file" override_code)
+          declarative=$(get "$head_file" declarative)
+          legacy=$(get "$head_file" legacy)
+          total=$(get "$head_file" total)
+
+          have_base=0
+          if [ -s "$base_file" ]; then
+            b_override=$(get "$base_file" override_code)
+            b_declarative=$(get "$base_file" declarative)
+            b_legacy=$(get "$base_file" legacy)
+            b_total=$(get "$base_file" total)
+            [ -n "$b_override" ] && have_base=1
+          fi
+
+          num() {
+            if [ "$have_base" = 1 ]; then printf '%s (%+d)' "$1" "$(($1 - $2))"; else printf '%s' "$1"; fi
+          }
+
+          {
+            echo "| Per-wiki customization, LOC (excludes lua/wikis/commons) | |"
+            echo "|-|-|"
+            echo "| **Override code** | **$(num "$override" "$b_override")** |"
+            echo "| Declarative (data + config) | $(num "$declarative" "$b_declarative") |"
+            echo "| Legacy | $(num "$legacy" "$b_legacy") |"
+            echo "| Total | $(num "$total" "$b_total") |"
+            [ "$have_base" = 1 ] || echo "| | _no baseline available; deltas omitted_ |"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
