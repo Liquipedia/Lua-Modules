@@ -65,9 +65,10 @@ function CustomInjector:parse(id, widgets)
 			children = {playerEarnings ~= 0 and ('$' .. mw.getContentLanguage():formatNum(Math.round(playerEarnings))) or nil}
 		})
 	elseif id == 'custom' then
+		local pageName = Page.pageifyLink(self.caller.pagename) --[[@as string]]
 		table.insert(widgets, Cell{
 			name = Link{link = 'Fortnite Power Rankings/Organizations', children = 'Fortnite Org PR'},
-			children = PowerRankings.queryForInfobox(Page.pageifyLink(self.caller.pagename), 'FTN_ORG_PR'),
+			children = {PowerRankings.queryForInfobox(pageName, 'FTN_ORG_PR')},
 		})
 	end
 
