@@ -125,6 +125,7 @@ end
 ---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
+	---@type table
 	local extradata = {
 		bestof = map.bestof,
 		maptype = map.maptype,
