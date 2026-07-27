@@ -63,7 +63,7 @@ function CustomInjector:parse(id, widgets)
 		return {}
 	elseif id == 'custom' then
 		Array.appendWith(widgets, self.caller:_getTypeCells())
-		
+
 	local wins, loses = CharacterWinLoss.run(args.name)
 	if wins + loses == 0 then return widgets end
 
