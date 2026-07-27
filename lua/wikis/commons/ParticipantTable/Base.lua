@@ -276,7 +276,7 @@ function ParticipantTable:store()
 	local lpdbTournamentData = {
 		tournament = tournamentContext.fullName,
 		parent = tournamentContext.pageName,
-		series = tournamentContext.pageName,
+		series = tournamentContext.series,
 		startdate = Variables.varDefault('tournament_startdate'),
 		mode = Variables.varDefault('tournament_mode'),
 		type = tournamentContext.type,
