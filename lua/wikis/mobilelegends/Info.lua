@@ -30,6 +30,7 @@ return {
 			hasPosition = true,
 			hasSpecialTeam = false,
 			allowManual = true,
+			standardizedAuto = true,
 		},
 		match2 = {
 			status = 2,
