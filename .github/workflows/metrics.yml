@@ -37,6 +37,9 @@ jobs:
           declarative=$(get "$head_file" declarative)
           legacy=$(get "$head_file" legacy)
           total=$(get "$head_file" total)
+          override_pct=$(get "$head_file" override_code_pct)
+          declarative_pct=$(get "$head_file" declarative_pct)
+          legacy_pct=$(get "$head_file" legacy_pct)
 
           have_base=0
           if [ -s "$base_file" ]; then
@@ -44,19 +47,29 @@ jobs:
             b_declarative=$(get "$base_file" declarative)
             b_legacy=$(get "$base_file" legacy)
             b_total=$(get "$base_file" total)
+            b_override_pct=$(get "$base_file" override_code_pct)
+            b_declarative_pct=$(get "$base_file" declarative_pct)
+            b_legacy_pct=$(get "$base_file" legacy_pct)
             [ -n "$b_override" ] && have_base=1
           fi
 
           num() {
             if [ "$have_base" = 1 ]; then printf '%s (%+d)' "$1" "$(($1 - $2))"; else printf '%s' "$1"; fi
           }
+          pct_of() {
+            if [ "$have_base" = 1 ]; then
+              awk -v v="$1" -v b="$2" 'BEGIN {printf "%.2f%% (%+.2f pp)", v, v - b}'
+            else
+              awk -v v="$1" 'BEGIN {printf "%.2f%%", v}'
+            fi
+          }
 
           {
-            echo "| Per-wiki customization, LOC (excludes lua/wikis/commons) | |"
-            echo "|-|-|"
-            echo "| **Override code** | **$(num "$override" "$b_override")** |"
-            echo "| Declarative (data + config) | $(num "$declarative" "$b_declarative") |"
-            echo "| Legacy | $(num "$legacy" "$b_legacy") |"
-            echo "| Total | $(num "$total" "$b_total") |"
-            [ "$have_base" = 1 ] || echo "| | _no baseline available; deltas omitted_ |"
+            echo "| Per-wiki customization (excludes lua/wikis/commons) | LOC | Share |"
+            echo "|-|-|-|"
+            echo "| **Override code** | **$(num "$override" "$b_override")** | **$(pct_of "$override_pct" "$b_override_pct")** |"
+            echo "| Declarative (data + config) | $(num "$declarative" "$b_declarative") | $(pct_of "$declarative_pct" "$b_declarative_pct") |"
+            echo "| Legacy | $(num "$legacy" "$b_legacy") | $(pct_of "$legacy_pct" "$b_legacy_pct") |"
+            echo "| Total | $(num "$total" "$b_total") | |"
+            [ "$have_base" = 1 ] || echo "| | _no baseline available; deltas omitted_ | |"
           } | tee -a "$GITHUB_STEP_SUMMARY"

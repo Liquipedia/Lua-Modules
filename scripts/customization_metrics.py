@@ -70,11 +70,19 @@ def measure(root):
         else:
             declarative += count
 
+    total = override + declarative + legacy
+
+    def share(count):
+        return round(count / total * 100, 2) if total else 0.0
+
     return {
         "override_code": override,
         "declarative": declarative,
         "legacy": legacy,
-        "total": override + declarative + legacy,
+        "total": total,
+        "override_code_pct": share(override),
+        "declarative_pct": share(declarative),
+        "legacy_pct": share(legacy),
     }
 
 
