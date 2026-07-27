@@ -63,10 +63,9 @@ function WikiCopyPaste.getMatchCode(bestof, mode, matchIndex, opponents, args)
 		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
-		numberOfGlobalBans > 0 and WikiCopyPaste._globalBanParams(opponents, numberOfGlobalBans) or {}
+		numberOfGlobalBans > 0 and WikiCopyPaste._globalBanParams(opponents, numberOfGlobalBans) or {},
+		WikiCopyPaste._getMapVetoCode(args.mapVeto, args.customVeto)
 	)
-
-	Array.extendWith(lines, WikiCopyPaste._getMapVetoCode(args.mapVeto, args.customVeto))
 
 	Array.forEach(Array.range(1, bestof), function(mapIndex)
 		Array.extendWith(lines, WikiCopyPaste._getMapCode(args, matchIndex, opponents, mapIndex))
@@ -146,11 +145,10 @@ function WikiCopyPaste._getMapVetoCode(mapVeto, customVeto)
 				INDENT .. INDENT .. '|t1map' .. mapNumber .. '=|t2map' .. mapNumber .. '='
 			)
 			mapNumber = mapNumber + 1
-		elseif vetoType == 'default' or vetoType == 'decider' then
-			if not deciderAdded then
-				table.insert(lines, INDENT .. INDENT .. '|decider=')
-				deciderAdded = true
-			end
+		end
+		if not deciderAdded then
+			table.insert(lines, INDENT .. INDENT .. '|decider=')
+			deciderAdded = true
 		end
 	end)
 
@@ -174,12 +172,12 @@ function WikiCopyPaste._pickBanParams(key, numberOfOpponents)
 end
 
 ---@param numberOfOpponents integer
----@param numberOfGlobals integer
+---@param numberOfGlobalBans integer
 ---@return string[]
-function WikiCopyPaste._globalBanParams(numberOfOpponents, numberOfGlobals)
+function WikiCopyPaste._globalBanParams(numberOfOpponents, numberOfGlobalBans)
 	return {
 		INDENT .. table.concat(Array.mapRange(1, numberOfOpponents, function(opponentIndex)
-			return table.concat(Array.mapRange(1, numberOfGlobals, function(globalIndex)
+			return table.concat(Array.mapRange(1, numberOfGlobalBans, function(globalIndex)
 				return '|t' .. opponentIndex .. 'b' .. globalIndex .. '='
 			end))
 		end))
