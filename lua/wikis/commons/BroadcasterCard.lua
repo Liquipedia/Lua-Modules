@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Abbreviation = Lua.import('Module:Abbreviation')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
@@ -85,6 +86,8 @@ function BroadcasterCard.create(frame)
 		outputList = outputList .. ' ' .. frame:callParserFunction{name = '#tag', args = {'ref', args.ref}}
 	end
 
+	local date = DateExt.getContextualDate()
+
 	-- Add people
 	local casters = {}
 	for prefix, caster, casterIndex in Table.iter.pairsByPrefix(args, 'b') do
@@ -92,7 +95,6 @@ function BroadcasterCard.create(frame)
 		args[prefix .. 'flag' ] = Flags.CountryName{flag = args[prefix .. 'flag' ]}
 
 		local name, nationality = BroadcasterCard.getData(args, prefix, link, restrictedQuery)
-		local date = Variables.varDefault('tournament_enddate')
 
 		local broadcaster = {
 			id = caster,
