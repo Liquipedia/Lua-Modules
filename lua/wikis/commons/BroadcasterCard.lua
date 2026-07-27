@@ -16,6 +16,7 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
@@ -91,7 +92,7 @@ function BroadcasterCard.create(frame)
 	-- Add people
 	local casters = {}
 	for prefix, caster, casterIndex in Table.iter.pairsByPrefix(args, 'b') do
-		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(args[prefix .. 'link'] or caster):gsub(' ','_')
+		local link = Page.pageifyLink(args[prefix .. 'link'] or caster) --[[@as string]]
 		args[prefix .. 'flag' ] = Flags.CountryName{flag = args[prefix .. 'flag' ]}
 
 		local name, nationality = BroadcasterCard.getData(args, prefix, link, restrictedQuery)
