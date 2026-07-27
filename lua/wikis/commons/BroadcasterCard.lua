@@ -83,7 +83,7 @@ function BroadcasterCard.create(frame)
 
 	-- Reference
 	if String.isNotEmpty(args.ref) then
-		outputList = outputList .. ' ' .. frame:callParserFunction{name = '#tag', args = {'ref', args.ref}}
+		outputList = outputList .. ' ' .. frame:extensionTag('ref', args.ref)
 	end
 
 	local date = DateExt.getContextualDate()
