@@ -7,20 +7,27 @@
 
 local Lua = require('Module:Lua')
 
-local Abbreviation = Lua.import('Module:Abbreviation')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 local Variables = Lua.import('Module:Variables')
 
 local Weight = Lua.requireIfExists('Module:BroadCasterWeight')
+
+local Html = Lua.import('Module:Widget/Html')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local ListWidgets = Lua.import('Module:Widget/List')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local TBD = 'TBD'
 
@@ -45,7 +52,11 @@ local BroadcasterCard = {}
 function BroadcasterCard.create(frame)
 	local args = Arguments.getArgs(frame)
 	local language = args.lang
-	local restrictedQuery = Logic.readBool(args.restrictedQuery)
+
+	local config = {
+		restrictedQuery = Logic.readBool(args.restrictedQuery),
+		alwaysShowName = Logic.readBool(args.alwaysShowName),
+	}
 
 	-- Get position & title from various input variants
 	local position, title
@@ -64,35 +75,26 @@ function BroadcasterCard.create(frame)
 	if args.title then
 		title = args.title
 	elseif position == TBD then
-		title = Abbreviation.make{text = TBD, title = 'To Be Determined'}
+		title = Html.Abbr{children = TBD, title = 'To Be Determined'}
 	else
 		-- Create a title from the position.
-		local positions = Array.map(
-			mw.text.split(position, '/'),
-			String.trim
-		)
+		local positions = Array.parseCommaSeparatedString(position, '/')
 		if args.b2 then
 			positions = Array.map(positions, BroadcasterCard._pluralisePosition)
 		end
 		title = table.concat(positions, '/') .. ':'
 	end
 
-	-- Html for header
-	local outputList = tostring(mw.html.create():wikitext('*'):tag('b'):wikitext(title):allDone())
-
-	-- Refence
-	if String.isNotEmpty(args.ref) then
-		outputList = outputList .. ' ' .. frame:callParserFunction{name = '#tag', args = {'ref', args.ref}}
-	end
+	local date = DateExt.getContextualDate()
 
 	-- Add people
+	---@type broadCasterData[]
 	local casters = {}
 	for prefix, caster, casterIndex in Table.iter.pairsByPrefix(args, 'b') do
-		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(args[prefix .. 'link'] or caster):gsub(' ','_')
+		local link = Page.pageifyLink(args[prefix .. 'link'] or caster) --[[@as string]]
 		args[prefix .. 'flag' ] = Flags.CountryName{flag = args[prefix .. 'flag' ]}
 
-		local name, nationality = BroadcasterCard.getData(args, prefix, link, restrictedQuery)
-		local date = Variables.varDefault('tournament_enddate')
+		local name, nationality = BroadcasterCard.getData(args, prefix, link, config.restrictedQuery)
 
 		local broadcaster = {
 			id = caster,
@@ -116,35 +118,45 @@ function BroadcasterCard.create(frame)
 		table.insert(casters, broadcaster)
 	end
 
-	if Table.isEmpty(casters) then
-		return outputList .. '\n**' .. Abbreviation.make{text = 'TBA', title = 'To Be Announced'}
-	end
+	Array.sortInPlaceBy(casters, FnUtil.identity,
+		---@param a broadCasterData
+		---@param b broadCasterData
+		---@return boolean
+		function (a, b)
+			if a.sort ~= b.sort then
+				return a.sort < b.sort
+			end
+			return a.id:lower() < b.id:lower()
+		end
+	)
 
-	table.sort(casters, function(a, b) return a.sort < b.sort or (a.sort == b.sort and a.id:lower() < b.id:lower()) end)
-
-	for _, broadcaster in ipairs(casters) do
-		local alwaysShowName = Logic.readBool(args.alwaysShowName)
-		outputList = outputList .. BroadcasterCard._display(broadcaster, {alwaysShowName = alwaysShowName})
-	end
-
-	return outputList
+	return ListWidgets.Unordered{children = {WidgetUtil.collect(
+		Html.B{children = title},
+		String.isNotEmpty(args.ref) and (' ' .. frame:extensionTag('ref', args.ref)) or nil,
+		ListWidgets.Unordered{
+			children = BroadcasterCard._displayCasters(casters, config)
+		}
+	)}}
 end
 
----@param broadcaster broadCasterData
+---@param broadcasters broadCasterData[]
 ---@param options {alwaysShowName: boolean}
----@return string
-function BroadcasterCard._display(broadcaster, options)
-	local displayName = broadcaster.displayName or broadcaster.name
-
-	if String.isNotEmpty(displayName) and (options.alwaysShowName or displayName ~= broadcaster.id) then
-		displayName = ('&nbsp;(' .. displayName ..')')
-	else
-		displayName = ''
+---@return (Renderable|Renderable[])[]
+function BroadcasterCard._displayCasters(broadcasters, options)
+	if Logic.isEmpty(broadcasters) then
+		return {Html.Abbr{children = 'TBA', title = 'To Be Announced'}}
 	end
-
-	return '\n**' .. Flags.Icon{flag = broadcaster.flag, shouldLink = true}
-		.. '&nbsp;[[' .. broadcaster.page .. '|'.. broadcaster.id .. ']]'
-		.. displayName
+	return Array.map(broadcasters, function (broadcaster)
+		local children = {
+			Flags.Icon{flag = broadcaster.flag, shouldLink = true},
+			Link{link = broadcaster.page, children = broadcaster.id},
+		}
+		local displayName = broadcaster.displayName or broadcaster.name
+		if String.isNotEmpty(displayName) and (options.alwaysShowName or displayName ~= broadcaster.id) then
+			Array.appendWith(children, '(' .. displayName .. ')')
+		end
+		return Array.interleave(children, '&nbsp;')
+	end)
 end
 
 ---@param position string
