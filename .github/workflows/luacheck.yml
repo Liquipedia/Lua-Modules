@@ -137,7 +137,7 @@ jobs:
             echo "| Lines missed | $missed |"
             echo "| Files | $files |"
             echo "| Files at 0% | $uncovered |"
-          } >> "$GITHUB_STEP_SUMMARY"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v7
