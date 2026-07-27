@@ -1,10 +1,10 @@
 ---
 -- @Liquipedia
--- page=Module:Brkts/WikiSpecific
+-- page=Module:Widget/Match/Bracket/ScoreContainer/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
 
-return Lua.import('Module:Brkts/WikiSpecific/Base')
+return Lua.import('Module:Widget/Match/Bracket/ScoreContainer')
