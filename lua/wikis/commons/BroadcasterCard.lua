@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Abbreviation = Lua.import('Module:Abbreviation')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
@@ -76,7 +75,7 @@ function BroadcasterCard.create(frame)
 	if args.title then
 		title = args.title
 	elseif position == TBD then
-		title = Abbreviation.make{text = TBD, title = 'To Be Determined'}
+		title = Html.Abbr{children = TBD, title = 'To Be Determined'}
 	else
 		-- Create a title from the position.
 		local positions = Array.parseCommaSeparatedString(position, '/')
