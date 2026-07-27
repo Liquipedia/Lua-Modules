@@ -104,7 +104,7 @@ jobs:
             echo ""
             echo "_LuaLS reports a slightly different problem count between runs on identical"
             echo "code (237-240 observed over 8 runs), so read small movements as noise._"
-          } >> $GITHUB_STEP_SUMMARY
+          } | tee -a $GITHUB_STEP_SUMMARY
 
   lua-annotations:
     runs-on: ubuntu-latest
