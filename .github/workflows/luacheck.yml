@@ -115,28 +115,45 @@ jobs:
           report=lua/luacov.report.out
           base_report=../base/lua/luacov.report.out
 
-          read -r hits missed pct <<< "$(awk '/^Total/ {print $2, $3, $4}' "$report")"
-          files=$(grep -cE '^wikis/commons/.*[0-9]+\.[0-9][0-9]%$' "$report" || true)
-          uncovered=$(grep -cE '^wikis/commons/.*[[:space:]]0\.00%$' "$report" || true)
+          # Echoes "hits missed pct files uncovered" for a given luacov report.
+          metrics() {
+            local r="$1" hits missed pct files uncovered
+            read -r hits missed pct <<< "$(awk '/^Total/ {print $2, $3, $4}' "$r")"
+            files=$(grep -cE '^wikis/commons/.*[0-9]+\.[0-9][0-9]%$' "$r" || true)
+            uncovered=$(grep -cE '^wikis/commons/.*[[:space:]]0\.00%$' "$r" || true)
+            echo "$hits $missed ${pct%\%} $files $uncovered"
+          }
 
-          delta_row="| Change vs base | _no baseline available_ |"
+          read -r hits missed pct files uncovered <<< "$(metrics "$report")"
+
+          have_base=0
           if [ -s "$base_report" ]; then
-            base_pct=$(awk '/^Total/ {gsub("%", "", $4); print $4}' "$base_report")
-            if [ -n "$base_pct" ]; then
-              delta=$(awk -v a="${pct%\%}" -v b="$base_pct" 'BEGIN {printf "%+.2f", a - b}')
-              delta_row="| Change vs base | **${delta} pp** (base ${base_pct}%) |"
-            fi
+            read -r b_hits b_missed b_pct b_files b_uncovered <<< "$(metrics "$base_report")"
+            [ -n "$b_pct" ] && have_base=1
           fi
+
+          # Value plus its change against the base, or the bare value when there
+          # is no baseline to compare against.
+          num() {
+            if [ "$have_base" = 1 ]; then printf '%s (%+d)' "$1" "$(($1 - $2))"; else printf '%s' "$1"; fi
+          }
+          pct_of() {
+            if [ "$have_base" = 1 ]; then
+              awk -v v="$1" -v b="$2" 'BEGIN {printf "%.2f%% (%+.2f pp)", v, v - b}'
+            else
+              awk -v v="$1" 'BEGIN {printf "%.2f%%", v}'
+            fi
+          }
 
           {
             echo "| Coverage (lua/wikis/commons) | |"
             echo "|-|-|"
-            echo "| Coverage | **$pct** |"
-            echo "$delta_row"
-            echo "| Lines hit | $hits |"
-            echo "| Lines missed | $missed |"
-            echo "| Files | $files |"
-            echo "| Files at 0% | $uncovered |"
+            echo "| Coverage | $(pct_of "$pct" "$b_pct") |"
+            echo "| Lines hit | $(num "$hits" "$b_hits") |"
+            echo "| Lines missed | $(num "$missed" "$b_missed") |"
+            echo "| Files | $(num "$files" "$b_files") |"
+            echo "| Files at 0% | $(num "$uncovered" "$b_uncovered") |"
+            [ "$have_base" = 1 ] || echo "| | _no baseline available; deltas omitted_ |"
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Upload coverage report
