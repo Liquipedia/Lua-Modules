@@ -80,7 +80,7 @@ function BroadcasterCard.create(frame)
 	-- Html for header
 	local outputList = tostring(mw.html.create():wikitext('*'):tag('b'):wikitext(title):allDone())
 
-	-- Refence
+	-- Reference
 	if String.isNotEmpty(args.ref) then
 		outputList = outputList .. ' ' .. frame:callParserFunction{name = '#tag', args = {'ref', args.ref}}
 	end
