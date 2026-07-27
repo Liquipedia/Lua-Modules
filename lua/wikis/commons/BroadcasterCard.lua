@@ -47,7 +47,11 @@ local BroadcasterCard = {}
 function BroadcasterCard.create(frame)
 	local args = Arguments.getArgs(frame)
 	local language = args.lang
-	local restrictedQuery = Logic.readBool(args.restrictedQuery)
+
+	local config = {
+		restrictedQuery = Logic.readBool(args.restrictedQuery),
+		alwaysShowName = Logic.readBool(args.alwaysShowName),
+	}
 
 	-- Get position & title from various input variants
 	local position, title
@@ -95,7 +99,7 @@ function BroadcasterCard.create(frame)
 		local link = Page.pageifyLink(args[prefix .. 'link'] or caster) --[[@as string]]
 		args[prefix .. 'flag' ] = Flags.CountryName{flag = args[prefix .. 'flag' ]}
 
-		local name, nationality = BroadcasterCard.getData(args, prefix, link, restrictedQuery)
+		local name, nationality = BroadcasterCard.getData(args, prefix, link, config.restrictedQuery)
 
 		local broadcaster = {
 			id = caster,
@@ -126,8 +130,7 @@ function BroadcasterCard.create(frame)
 	table.sort(casters, function(a, b) return a.sort < b.sort or (a.sort == b.sort and a.id:lower() < b.id:lower()) end)
 
 	for _, broadcaster in ipairs(casters) do
-		local alwaysShowName = Logic.readBool(args.alwaysShowName)
-		outputList = outputList .. BroadcasterCard._display(broadcaster, {alwaysShowName = alwaysShowName})
+		outputList = outputList .. BroadcasterCard._display(broadcaster, config)
 	end
 
 	return outputList
