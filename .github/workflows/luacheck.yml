@@ -66,6 +66,58 @@ jobs:
           check_name: 'Lua Test Report'
           annotate_only: ${{ (github.event.pull_request.head.repo.full_name != github.repository) }}
 
+  lua-coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup lua
+        uses: Liquipedia/gh-actions-lua@7615c1c345af98bd9898fa5b53c488c5f58246cf
+        with:
+          luaVersion: '5.1'
+
+      - name: Setup luarocks
+        uses: leafo/gh-actions-luarocks@v6
+
+      - name: Setup dependencies
+        run: |
+          luarocks install --lua-version=5.1 busted
+          luarocks install --lua-version=5.1 luacov
+
+      - name: Run test with coverage
+        run: |
+          busted -C lua --run=ci -c
+
+      - name: Generate coverage report
+        working-directory: lua
+        run: |
+          luacov
+
+      - name: Report coverage
+        working-directory: lua
+        run: |
+          read -r hits missed pct <<< "$(awk '/^Total/ {print $2, $3, $4}' luacov.report.out)"
+          files=$(grep -cE '^wikis/commons/.*[0-9]+\.[0-9][0-9]%$' luacov.report.out || true)
+          uncovered=$(grep -cE '^wikis/commons/.*[[:space:]]0\.00%$' luacov.report.out || true)
+          {
+            echo "| Coverage (lua/wikis/commons) | |"
+            echo "|-|-|"
+            echo "| Coverage | **$pct** |"
+            echo "| Lines hit | $hits |"
+            echo "| Lines missed | $missed |"
+            echo "| Files | $files |"
+            echo "| Files at 0% | $uncovered |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: luacov-report
+          path: lua/luacov.report.out
+
   luals-code-style:
     runs-on: ubuntu-latest
     steps:
