@@ -95,6 +95,7 @@ function BroadcasterCard.create(frame)
 	local date = DateExt.getContextualDate()
 
 	-- Add people
+	---@type broadCasterData[]
 	local casters = {}
 	for prefix, caster, casterIndex in Table.iter.pairsByPrefix(args, 'b') do
 		local link = Page.pageifyLink(args[prefix .. 'link'] or caster) --[[@as string]]
