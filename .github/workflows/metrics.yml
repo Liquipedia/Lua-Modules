@@ -12,74 +12,25 @@ jobs:
         with:
           fetch-depth: 0 # need the base commit to compare against
 
-      - name: Measure customization
-        run: |
-          python3 scripts/customization_metrics.py | tee customization-head.txt
+      - name: Setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
 
-      - name: Measure base commit
+      - name: Add base commit worktree
         if: github.event.pull_request.base.sha != ''
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           git worktree add ../base "$BASE_SHA"
-          # Measure the base tree with *this* PR's script, so the delta reflects
-          # the code change rather than a change to how we measure.
-          python3 scripts/customization_metrics.py ../base/lua/wikis | tee customization-base.txt
 
       - name: Report customization
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          head_file=customization-head.txt
-          base_file=customization-base.txt
-
-          get() { grep -E "^$2=" "$1" | cut -d= -f2; }
-
-          override=$(get "$head_file" override_code)
-          declarative=$(get "$head_file" declarative)
-          legacy=$(get "$head_file" legacy)
-          total=$(get "$head_file" total)
-          per_wiki=$(get "$head_file" per_wiki_total)
-          commons=$(get "$head_file" commons)
-          override_pct=$(get "$head_file" override_code_pct)
-          declarative_pct=$(get "$head_file" declarative_pct)
-          legacy_pct=$(get "$head_file" legacy_pct)
-          per_wiki_pct=$(get "$head_file" per_wiki_total_pct)
-          commons_pct=$(get "$head_file" commons_pct)
-
-          have_base=0
-          if [ -s "$base_file" ]; then
-            b_override=$(get "$base_file" override_code)
-            b_declarative=$(get "$base_file" declarative)
-            b_legacy=$(get "$base_file" legacy)
-            b_total=$(get "$base_file" total)
-            b_per_wiki=$(get "$base_file" per_wiki_total)
-            b_commons=$(get "$base_file" commons)
-            b_override_pct=$(get "$base_file" override_code_pct)
-            b_declarative_pct=$(get "$base_file" declarative_pct)
-            b_legacy_pct=$(get "$base_file" legacy_pct)
-            b_per_wiki_pct=$(get "$base_file" per_wiki_total_pct)
-            b_commons_pct=$(get "$base_file" commons_pct)
-            [ -n "$b_override" ] && have_base=1
+          # The base tree is measured with *this* PR's script, so the delta
+          # reflects the code change rather than a change to how we measure.
+          if [ -n "$BASE_SHA" ]; then
+            set -- --base ../base/lua/wikis
           fi
-
-          num() {
-            if [ "$have_base" = 1 ]; then printf '%s (%+d)' "$1" "$(($1 - $2))"; else printf '%s' "$1"; fi
-          }
-          pct_of() {
-            if [ "$have_base" = 1 ]; then
-              awk -v v="$1" -v b="$2" 'BEGIN {printf "%.2f%% (%+.2f pp)", v, v - b}'
-            else
-              awk -v v="$1" 'BEGIN {printf "%.2f%%", v}'
-            fi
-          }
-
-          {
-            echo "| Per-wiki customization | LOC | Share of all Lua |"
-            echo "|-|-|-|"
-            echo "| **Override code** | **$(num "$override" "$b_override")** | **$(pct_of "$override_pct" "$b_override_pct")** |"
-            echo "| Declarative (data + config) | $(num "$declarative" "$b_declarative") | $(pct_of "$declarative_pct" "$b_declarative_pct") |"
-            echo "| Legacy | $(num "$legacy" "$b_legacy") | $(pct_of "$legacy_pct" "$b_legacy_pct") |"
-            echo "| Per-wiki total | $(num "$per_wiki" "$b_per_wiki") | $(pct_of "$per_wiki_pct" "$b_per_wiki_pct") |"
-            echo "| lua/wikis/commons (shared) | $(num "$commons" "$b_commons") | $(pct_of "$commons_pct" "$b_commons_pct") |"
-            echo "| All of lua/wikis | $(num "$total" "$b_total") | |"
-            [ "$have_base" = 1 ] || echo "| | _no baseline available; deltas omitted_ | |"
-          } | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 scripts/customization_metrics.py "$@" | tee -a "$GITHUB_STEP_SUMMARY"

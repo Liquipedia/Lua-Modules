@@ -16,12 +16,14 @@ Shares are against the whole of lua/wikis (commons included), so "override code
 is 37% of all Lua" is answerable. Vendored code, type stubs, specs and test
 assets under lua/ are excluded from the denominator -- they are not the product.
 
-Prints `key=value` lines so a caller can diff two runs and report the change.
+Prints a Markdown table, optionally with deltas against a second tree. Pass
+--raw for `key=value` output instead.
 
 Usage:
-    python scripts/customization_metrics.py [wikis-root]
+    python scripts/customization_metrics.py [wikis-root] [--base BASE_ROOT] [--raw]
 """
 
+import argparse
 import pathlib
 import re
 import sys
@@ -60,15 +62,18 @@ def measure(root):
     declarative = legacy = override = commons = 0
 
     for path in sorted(pathlib.Path(root).rglob("*.lua")):
-        posix = path.as_posix()
         text = path.read_text(encoding="utf-8", errors="replace")
         count = len(text.splitlines())
 
         # commons is the shared implementation, not per-wiki customization. It is
         # still counted, so shares have the whole of lua/wikis as denominator.
-        if f"/{COMMONS}/" in posix or posix.endswith(f"/{COMMONS}"):
+        if COMMONS in path.parts:
             commons += count
-        elif "Legacy" in posix:
+        # Substring, not a path component: legacy lives in directories
+        # (TeamCard/Legacy/Custom.lua) *and* in filenames (Match/Legacy.lua).
+        # `"Legacy" in path.parts` would miss the latter -- 52 of 78 files,
+        # moving 6279 lines out of legacy and into override code.
+        elif "Legacy" in path.as_posix():
             legacy += count
         elif is_override_code(text.splitlines()):
             override += count
@@ -96,13 +101,67 @@ def measure(root):
     }
 
 
+def count_cell(value, base):
+    return f"{value}" if base is None else f"{value} ({value - base:+d})"
+
+
+def pct_cell(value, base):
+    if base is None:
+        return f"{value:.2f}%"
+    return f"{value:.2f}% ({value - base:+.2f} pp)"
+
+
+def table(head, base):
+    def of(key):
+        return None if base is None else base[key]
+
+    rows = [
+        ("**Override code**", "override_code", "override_code_pct"),
+        ("Declarative (data + config)", "declarative", "declarative_pct"),
+        ("Legacy", "legacy", "legacy_pct"),
+        ("Per-wiki total", "per_wiki_total", "per_wiki_total_pct"),
+        ("lua/wikis/commons (shared)", "commons", "commons_pct"),
+    ]
+    lines = [
+        "| Per-wiki customization | LOC | Share of all Lua |",
+        "|-|-|-|",
+    ]
+    for label, loc_key, pct_key in rows:
+        loc = count_cell(head[loc_key], of(loc_key))
+        pct = pct_cell(head[pct_key], of(pct_key))
+        if label.startswith("**"):
+            loc, pct = f"**{loc}**", f"**{pct}**"
+        lines.append(f"| {label} | {loc} | {pct} |")
+    lines.append(f"| All of lua/wikis | {count_cell(head['total'], of('total'))} | |")
+    if base is None:
+        lines.append("| | _no baseline available; deltas omitted_ | |")
+    return lines
+
+
 def main():
-    root = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_ROOT
-    if not pathlib.Path(root).is_dir():
-        print(f"::error::wikis root not found: {root}")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("root", nargs="?", default=DEFAULT_ROOT)
+    parser.add_argument("--base", help="second tree to compare against")
+    parser.add_argument("--raw", action="store_true", help="print key=value instead")
+    args = parser.parse_args()
+
+    if not pathlib.Path(args.root).is_dir():
+        print(f"::error::wikis root not found: {args.root}")
         return 1
-    for key, value in measure(root).items():
-        print(f"{key}={value}")
+
+    head = measure(args.root)
+    if args.raw:
+        for key, value in head.items():
+            print(f"{key}={value}")
+        return 0
+
+    base = None
+    if args.base:
+        if pathlib.Path(args.base).is_dir():
+            base = measure(args.base)
+        else:
+            print(f"::warning::base root not found, omitting deltas: {args.base}")
+    print("\n".join(table(head, base)))
     return 0
 
 
