@@ -65,9 +65,9 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets, self.caller:_getTypeCells())
 		local wins, loses = CharacterWinLoss.run(args.name)
 		if wins + loses == 0 then return widgets end
-	
+
 		local winPercentage = Math.formatPercentage(wins / (wins + loses), 2)
-	
+
 		return Array.append(widgets,
 			Title{children = 'Esports Statistics'},
 			Cell{name = 'Win Rate', children = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. ')'}}
