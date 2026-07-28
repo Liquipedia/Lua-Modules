@@ -76,6 +76,11 @@ local KEYSTONES = Table.map({
 	return value, true
 end)
 
+local ROLES = Array.map(
+	Array.sortBy(Array.unique(Array.extractValues(InGameRoles)), Operator.property('sortOrder')),
+	Operator.property('display')
+)
+
 local DEFAULT_ITEM = 'EmptyIcon'
 local LOADOUT_ICON_SIZE = '64px'
 local ITEMS_TO_SHOW = 6
@@ -787,7 +792,7 @@ function MatchPage:_renderDamageDealt(game)
 					trigger = 'axis'
 				},
 				xAxis = {
-					data = {'Top', 'Jungle', 'Mid', 'Bot', 'Support'},
+					data = ROLES,
 					type = 'category',
 				},
 				yAxis = {
