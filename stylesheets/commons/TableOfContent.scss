@@ -1,0 +1,86 @@
+/**
+ * Styles for the Table of Contents from Mediawiki.
+ * Source: https://gerrit.wikimedia.org/g/mediawiki/core/+/9f9f3e60eb2bc825be36c73555d7a48dfc8d1fad/resources/src/mediawiki.skinning/toc/screen.less
+ */
+
+.toc {
+	display: table;
+	padding: 7px;
+
+	.theme--light & {
+		background-color: var( --clr-surface-1 );
+	}
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+	}
+
+	h2 {
+		display: inline;
+		border: 0;
+		padding: 0;
+		font-size: 100%;
+		font-weight: bold;
+	}
+
+	.toctitle {
+		text-align: center;
+		direction: ltr;
+	}
+
+	.tocnumber {
+		padding-inline: 0 0.5em;
+	}
+
+	ul {
+		list-style: none;
+		text-align: start;
+
+		ul {
+			margin: 0;
+			margin-inline: 2em 0;
+		}
+	}
+}
+
+/* Make the label look like a link. */
+.toctogglelabel {
+	color: var( --clr-primary, #0645ad );
+	cursor: pointer;
+}
+
+.toctogglelabel:hover {
+	text-decoration: underline;
+}
+
+.toctogglespan {
+	font-size: 94%;
+}
+
+.toctogglespan::before {
+	content: " [";
+}
+
+.toctogglespan::after {
+	content: "]";
+}
+
+/* Show a focus ring around the label when focusing the invisible checkbox. */
+/* This simulates that the label is in focus. */
+.toctogglecheckbox:focus + .toctitle .toctogglelabel {
+	text-decoration: underline;
+	outline: auto;
+}
+
+/* Change the text of the button based on the state of the checkbox. */
+.toctogglecheckbox:checked + .toctitle .toctogglelabel::after {
+	content: "show";
+}
+
+.toctogglecheckbox:not( :checked ) + .toctitle .toctogglelabel::after {
+	content: "hide";
+}
+
+.toctogglecheckbox:checked ~ ul {
+	display: none;
+}
