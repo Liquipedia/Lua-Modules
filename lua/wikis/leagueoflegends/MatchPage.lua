@@ -753,9 +753,11 @@ end
 ---@overload fun(side: nil): nil
 local sideToColor = FnUtil.memoize(function (side)
 	if side == 'red' then
-		return '#b12a2a'
+		-- clr-cinnabar-40
+		return '#b81414'
 	elseif side == 'blue' then
-		return '#31519c'
+		-- clr-sapphire-40
+		return '#0d71bf'
 	end
 	return nil
 end)
