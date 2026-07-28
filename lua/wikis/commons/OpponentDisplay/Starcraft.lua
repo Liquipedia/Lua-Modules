@@ -60,7 +60,7 @@ end
 
 ---Displays a player opponent (solo, duo, trio, or quad) as a block element.
 ---@param props StarcraftBlockOpponentProps
----@return Renderable
+---@return VNode
 function StarcraftOpponentDisplay.BlockPlayers(props)
 	local opponent = props.opponent
 	local showFaction = props.showFaction ~= false
@@ -115,8 +115,8 @@ function StarcraftOpponentDisplay.BlockPlayers(props)
 end
 
 ---Displays a block archon opponent
----@param props {flip: boolean?, playerNodes: Html[], factionNode: VNode, additionalClasses: string[]?}
----@return Widget
+---@param props {flip: boolean?, playerNodes: VNode[], factionNode: VNode, additionalClasses: string[]?}
+---@return VNode
 function StarcraftOpponentDisplay.BlockArchon(props)
 	return Html.Div{
 		classes = Array.extend(
