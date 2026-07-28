@@ -70,7 +70,7 @@ function CustomInjector:parse(id, widgets)
 	
 		return Array.append(widgets,
 			Title{children = 'Esports Statistics'},
-			Cell{name = 'Win Rate', children = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. ')'}
+			Cell{name = 'Win Rate', children = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. ')'}}
 		)
 	end
 
