@@ -48,6 +48,16 @@ function StarcraftOpponentDisplay.BlockOpponent(props)
 	return OpponentDisplay.BlockOpponent(props)
 end
 
+---@param props {css: HtmlStyleProps?, children: Renderable|Renderable[]?}
+---@return VNode
+local function createFactionNode(props)
+	return Html.Div{
+		classes = {'starcraft-block-archon-race'},
+		css = props.css,
+		children = props.children,
+	}
+end
+
 ---Displays a player opponent (solo, duo, trio, or quad) as a block element.
 ---@param props StarcraftBlockOpponentProps
 ---@return Renderable
@@ -62,11 +72,12 @@ function StarcraftOpponentDisplay.BlockPlayers(props)
 	local playerNodes = OpponentDisplay.getBlockPlayerNodes(Table.merge(props, {showFaction = false}))
 
 	if opponent.isArchon then
-		local factionIcon = Faction.Icon{size = 'large', faction = opponent.players[1].faction}
 		return StarcraftOpponentDisplay.BlockArchon{
 			flip = props.flip,
 			playerNodes = playerNodes,
-			factionNode = mw.html.create('div'):wikitext(factionIcon),
+			factionNode = createFactionNode{
+				children = Faction.Icon{size = 'large', faction = opponent.players[1].faction}
+			},
 			additionalClasses = {'block-players-wrapper'}
 		}
 	end
@@ -80,16 +91,19 @@ function StarcraftOpponentDisplay.BlockPlayers(props)
 			local primaryIcon = Faction.Icon{size = 'large', faction = primaryFaction}
 			local secondaryIcon
 			if primaryFaction ~= secondaryFaction then
-				secondaryIcon = mw.html.create('div')
-					:css('position', 'absolute')
-					:css('right', '1px')
-					:css('bottom', '1px')
-					:node(Faction.Icon{faction = secondaryFaction})
+				secondaryIcon = Html.Div{
+					css = {
+						position = 'absolute',
+						right = '1px',
+						bottom = '1px',
+					},
+					children = Faction.Icon{faction = secondaryFaction}
+				}
 			end
-			local factionNode = mw.html.create('div')
-				:css('position', 'relative')
-				:node(primaryIcon)
-				:node(secondaryIcon)
+			local factionNode = createFactionNode{
+				css = {position = 'relative'},
+				children = {primaryIcon, secondaryIcon}
+			}
 
 			return StarcraftOpponentDisplay.BlockArchon({
 				flip = props.flip,
@@ -101,11 +115,9 @@ function StarcraftOpponentDisplay.BlockPlayers(props)
 end
 
 ---Displays a block archon opponent
----@param props {flip: boolean?, playerNodes: Html[], factionNode: Html, additionalClasses: string[]?}
+---@param props {flip: boolean?, playerNodes: Html[], factionNode: VNode, additionalClasses: string[]?}
 ---@return Widget
 function StarcraftOpponentDisplay.BlockArchon(props)
-	props.factionNode:addClass('starcraft-block-archon-race')
-
 	return Html.Div{
 		classes = Array.extend(
 			'starcraft-block-archon',
