@@ -81,6 +81,13 @@ local ROLES = Array.map(
 	Operator.property('display')
 )
 
+local SIDE_COLORS = {
+	-- clr-cinnabar-40
+	red = '#b81414',
+	-- clr-sapphire-40
+	blue = '#0d71bf',
+}
+
 local DEFAULT_ITEM = 'EmptyIcon'
 local LOADOUT_ICON_SIZE = '64px'
 local ITEMS_TO_SHOW = 6
@@ -753,20 +760,6 @@ function MatchPage._buildPlayerLoadout(player)
 	}
 end
 
----@param side 'red'|'blue'
----@return string
----@overload fun(side: nil): nil
-local sideToColor = FnUtil.memoize(function (side)
-	if side == 'red' then
-		-- clr-cinnabar-40
-		return '#b81414'
-	elseif side == 'blue' then
-		-- clr-sapphire-40
-		return '#0d71bf'
-	end
-	return nil
-end)
-
 ---@private
 ---@param game LoLMatchPageGame
 ---@return VNode[]?
@@ -806,7 +799,7 @@ function MatchPage:_renderDamageDealt(game)
 							return player.damagedone
 						end),
 						itemStyle = {
-							color = sideToColor(team.side)
+							color = SIDE_COLORS[team.side]
 						}
 					}
 				end),
