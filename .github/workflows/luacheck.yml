@@ -98,11 +98,18 @@ jobs:
           luacov
 
       - name: Coverage for base commit
-        if: github.event.pull_request.base.sha != ''
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        if: github.event_name == 'pull_request'
         run: |
-          git worktree add ../base "$BASE_SHA"
+          # HEAD is the PR merge commit, so its first parent is the base branch
+          # tip and the delta covers only this PR's own changes. Not
+          # pull_request.base.sha: that is the fork point, so it drifts behind as
+          # the base branch advances and the delta then also reports commits from
+          # everyone else that got merged in.
+          if ! git rev-parse --verify -q HEAD^2 >/dev/null; then
+            echo "::warning::HEAD is not a merge commit; deltas will be omitted"
+            exit 0
+          fi
+          git worktree add ../base "$(git rev-parse HEAD^1)"
           # Run the base commit under *this* PR's luacov config, so the delta
           # reflects the code change rather than a change to the config itself.
           cp lua/.luacov ../base/lua/.luacov
