@@ -115,58 +115,25 @@ jobs:
         with:
           fetch-depth: 0 # need the base commit to compare against
 
-      - name: Measure annotation coverage
-        run: |
-          python3 scripts/annotation_coverage.py | tee annotations-head.txt
+      - name: Setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
 
-      - name: Measure base commit
+      - name: Add base commit worktree
         if: github.event.pull_request.base.sha != ''
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           git worktree add ../base "$BASE_SHA"
-          # Measure the base tree with *this* PR's script, so the delta reflects
-          # the code change rather than a change to how we measure.
-          python3 scripts/annotation_coverage.py ../base/lua/wikis/commons | tee annotations-base.txt
 
       - name: Report annotation coverage
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          head_file=annotations-head.txt
-          base_file=annotations-base.txt
-
-          get() { grep -E "^$2=" "$1" | cut -d= -f2; }
-
-          functions=$(get "$head_file" functions)
-          unannotated=$(get "$head_file" unannotated)
-          coverage=$(get "$head_file" coverage_pct)
-          params=$(get "$head_file" params_pct)
-
-          have_base=0
-          if [ -s "$base_file" ]; then
-            b_functions=$(get "$base_file" functions)
-            b_unannotated=$(get "$base_file" unannotated)
-            b_coverage=$(get "$base_file" coverage_pct)
-            b_params=$(get "$base_file" params_pct)
-            [ -n "$b_coverage" ] && have_base=1
+          # The base tree is measured with *this* PR's script, so the delta
+          # reflects the code change rather than a change to how we measure.
+          if [ -n "$BASE_SHA" ]; then
+            set -- --base ../base/lua/wikis/commons
           fi
-
-          num() {
-            if [ "$have_base" = 1 ]; then printf '%s (%+d)' "$1" "$(($1 - $2))"; else printf '%s' "$1"; fi
-          }
-          pct_of() {
-            if [ "$have_base" = 1 ]; then
-              awk -v v="$1" -v b="$2" 'BEGIN {printf "%.2f%% (%+.2f pp)", v, v - b}'
-            else
-              awk -v v="$1" 'BEGIN {printf "%.2f%%", v}'
-            fi
-          }
-
-          {
-            echo "| Annotations (lua/wikis/commons) | |"
-            echo "|-|-|"
-            echo "| Exported functions annotated | $(pct_of "$coverage" "$b_coverage") |"
-            echo "| Exported functions | $(num "$functions" "$b_functions") |"
-            echo "| Unannotated | $(num "$unannotated" "$b_unannotated") |"
-            echo "| Functions with all params annotated | $(pct_of "$params" "$b_params") |"
-            [ "$have_base" = 1 ] || echo "| | _no baseline available; deltas omitted_ |"
-          } | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 scripts/annotation_coverage.py "$@" | tee -a "$GITHUB_STEP_SUMMARY"
