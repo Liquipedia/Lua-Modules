@@ -105,11 +105,11 @@ function StarcraftOpponentDisplay.BlockPlayers(props)
 				children = {primaryIcon, secondaryIcon}
 			}
 
-			return StarcraftOpponentDisplay.BlockArchon({
+			return StarcraftOpponentDisplay.BlockArchon{
 				flip = props.flip,
 				playerNodes = Array.sub(playerNodes, 2 * archonIx - 1, 2 * archonIx),
 				factionNode = factionNode,
-			})
+			}
 		end)
 	}
 end
