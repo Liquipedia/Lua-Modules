@@ -19,7 +19,7 @@ local defaultProps = {
 }
 
 ---@param props {teamLimit: integer?, storageType: string?, showGraph: boolean?, isSmallerVersion: boolean?}
----@return Widget
+---@return VNode
 local function Ratings(props)
 	return Html.Div {
 		attributes = {
