@@ -121,19 +121,24 @@ jobs:
           python-version: '3.13'
 
       - name: Add base commit worktree
-        if: github.event.pull_request.base.sha != ''
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        if: github.event_name == 'pull_request'
         run: |
-          git worktree add ../base "$BASE_SHA"
+          # HEAD is the PR merge commit, so its first parent is the base branch
+          # tip and the delta covers only this PR's own changes. Not
+          # pull_request.base.sha: that is the fork point, so it drifts behind as
+          # the base branch advances and the delta then also reports commits from
+          # everyone else that got merged in.
+          if git rev-parse --verify -q HEAD^2 >/dev/null; then
+            git worktree add ../base "$(git rev-parse HEAD^1)"
+          else
+            echo "::warning::HEAD is not a merge commit; deltas will be omitted"
+          fi
 
       - name: Report annotation coverage
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           # The base tree is measured with *this* PR's script, so the delta
           # reflects the code change rather than a change to how we measure.
-          if [ -n "$BASE_SHA" ]; then
+          if [ -d ../base ]; then
             set -- --base ../base/lua/wikis/commons
           fi
           python3 scripts/annotation_coverage.py "$@" | tee -a "$GITHUB_STEP_SUMMARY"
