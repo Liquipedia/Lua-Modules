@@ -11,6 +11,7 @@ local Table = Lua.import('Module:Table')
 
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local CustomParticipantTable = {}
@@ -31,9 +32,8 @@ end
 function CustomParticipantTable:displayEntry(entry, additionalProps)
 	additionalProps = additionalProps or {}
 
-	return mw.html.create('div')
-		:addClass('participantTable-entry brkts-opponent-hover')
-		:attr('aria-label', entry.name)
+	local entryNode = mw.html.create('div')
+		:addClass('participantTable-entry')
 		:node(OpponentDisplay.BlockOpponent(Table.merge(additionalProps, {
 			dq = entry.dq,
 			note = entry.note,
@@ -41,6 +41,8 @@ function CustomParticipantTable:displayEntry(entry, additionalProps)
 			opponent = entry.opponent,
 			oneLine = true,
 		})))
+
+	return DisplayHelper.addOpponentHighlight(entryNode, entry.opponent)
 end
 
 return CustomParticipantTable

@@ -26,6 +26,7 @@ local Variables = Lua.import('Module:Variables')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Import = Lua.import('Module:ParticipantTable/Import')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
@@ -467,15 +468,16 @@ end
 function ParticipantTable:displayEntry(entry, additionalProps)
 	additionalProps = additionalProps or {}
 
-	return mw.html.create('div')
-		:addClass('participantTable-entry brkts-opponent-hover')
-		:attr('aria-label', entry.name)
+	local entryNode = mw.html.create('div')
+		:addClass('participantTable-entry')
 		:node(OpponentDisplay.BlockOpponent(Table.merge(additionalProps, {
 			dq = entry.dq,
 			note = entry.note,
 			showPlayerTeam = self.config.showTeams,
 			opponent = entry.opponent,
 		})))
+
+	return DisplayHelper.addOpponentHighlight(entryNode, entry.opponent)
 end
 
 ---@param entries ParticipantTableEntry[]
