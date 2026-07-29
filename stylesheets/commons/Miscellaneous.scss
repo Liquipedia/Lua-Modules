@@ -1977,3 +1977,8 @@ body .fieldBox {
 	background: var( --clr-surface-2 );
 	color: var( --clr-on-surface );
 }
+
+.mw-selflink,
+.selflink {
+	font-weight: bold;
+}
