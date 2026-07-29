@@ -93,6 +93,9 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 
 	local tiebreakers = Array.map(tiebreakerIds, loadTiebreaker)
 	local alwaysStatsToLoad = ((Info.config.standings or {}).alwaysShowStats or {})[standingsType] or {}
+	alwaysStatsToLoad = Array.map(alwaysStatsToLoad, function (stat)
+		return TiebreakerFactory.validateAndNormalizeInput(stat)
+	end)
 	local alwaysStats = Array.map(alwaysStatsToLoad, loadTiebreaker)
 	local additionalStats = Array.extend(alwaysStats, tiebreakers)
 	local additionalStatsIds = Array.map(additionalStats, function(stat) return stat.id end)

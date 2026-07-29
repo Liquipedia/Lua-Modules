@@ -67,6 +67,11 @@ return {
 				mode = 'automatic',
 			},
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchdiff', 'gamediff'},
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 }

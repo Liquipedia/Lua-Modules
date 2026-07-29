@@ -141,6 +141,11 @@ local infoData = {
 		tournamentsListing = {
 			showGameIcon = true,
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchdiff', 'gamediff'},
+			},
+		},
 	},
 }
 

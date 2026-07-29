@@ -111,6 +111,11 @@ return {
 			useParent = false,
 			onlyTierTypeIfBoth = false,
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchdiff', 'gamediff'},
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 }
