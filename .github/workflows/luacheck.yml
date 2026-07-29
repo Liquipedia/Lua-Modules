@@ -92,19 +92,9 @@ jobs:
         run: |
           ~/.local/bin/luals/bin/lua-language-server --check ./ | tee luals-check && true
           cat luals-check | (sed -e 's/\x1b\[[0-9;]*m//g'| sed -n 's/\(lua[^:]\+\):\([[:digit:]]*\):[[:digit:]]* \[Warning\] /::error file=\1,line=\2::/p') | (! grep -E $(echo ${{ steps.lua-changed-files.outputs.all_changed_files }} | sed -- 's/ /|/g'))
-          # Use the totals LuaLS reports itself. Counting lines that contain
-          # "Warning" overcounts, because a single diagnostic can span several.
-          plain=$(sed -e 's/\x1b\[[0-9;]*m//g' luals-check)
-          problems=$(echo "$plain" | grep -oE 'Diagnosis complete, [0-9]+ problems found' | tail -1 | grep -oE '[0-9]+' || true)
-          dirty=$(echo "$plain" | grep -oE 'Found [0-9]+ problems in [0-9]+ files' | tail -1 | sed -E 's/.* in ([0-9]+) files/\1/' || true)
-          {
-            echo "| | Files scanned | Files with problems | Problems |"
-            echo "|-|-------|----------|----------|"
-            echo "| LuaLS check | $(find lua -name '*.lua' | wc -l) | ${dirty:-?} | ${problems:-?} |"
-            echo ""
-            echo "_LuaLS reports a slightly different problem count between runs on identical"
-            echo "code (237-240 observed over 8 runs), so read small movements as noise._"
-          } | tee -a $GITHUB_STEP_SUMMARY
+          echo "| | Files | Errors |" >> $GITHUB_STEP_SUMMARY
+          echo "|-|-------|----------|" >> $GITHUB_STEP_SUMMARY
+          echo "| LuaLS check | $(find lua -name '*.lua' | wc -l) | $(cat luals-check | grep 'Warning' | wc -l) |" >> $GITHUB_STEP_SUMMARY
 
   lua-annotations:
     runs-on: ubuntu-latest
