@@ -229,7 +229,7 @@ function Tournament.isFeatured(record)
 	if Table.includes(curatedData.include, pagename) then
 		return true
 	end
-	if Table.includes({1, 2}, record.liquipediaTier) then
+	if Table.includes({1, 2}, tonumber(record.liquipediaTier)) then
 		return true
 	end
 
