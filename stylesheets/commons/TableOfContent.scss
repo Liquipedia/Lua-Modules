@@ -1,5 +1,5 @@
 /**
- * Styles for the Table of Contents in Content from Mediawiki.
+ * Styles for the Table of Contents from Mediawiki.
  * Source: https://gerrit.wikimedia.org/g/mediawiki/core/+/9f9f3e60eb2bc825be36c73555d7a48dfc8d1fad/resources/src/mediawiki.skinning/toc/screen.less
  */
 
@@ -114,27 +114,4 @@ body:has( .toclimit-7 ) #toc .toclevel-6 ul {
 ol + table.toc,
 ul + table.toc {
 	margin-top: 11px;
-}
-
-/*******************************************************************************
-Template(s): Fake TOC (Sidebar TOC)
-Author(s): FO-nTTaX
-*******************************************************************************/
-#mw-content-text .faketoc {
-	display: none;
-}
-
-#sidebar-toc .row,
-#scroll-wrapper-toc .row {
-	margin: 0;
-}
-
-#sidebar-toc .row > [ class*="col-" ],
-#scroll-wrapper-toc .row > [ class*="col-" ] {
-	padding-left: 5px;
-	padding-right: 5px;
-}
-
-#scroll-wrapper-toc .liquipedia-custom-icon-box {
-	font-size: 51px !important;
 }
