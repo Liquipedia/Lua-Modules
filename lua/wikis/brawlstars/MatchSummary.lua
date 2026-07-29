@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local Logic = Lua.import('Module:Logic')
 local MapTypeIcon = Lua.import('Module:MapType')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
@@ -22,19 +23,24 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', teamStyle = 'bracket'})
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return Renderable[]
 function CustomMatchSummary.createBody(match)
-	local characterBansData = Array.map(match.games, function (game)
-		local extradata = game.extradata or {}
-		local bans = extradata.bans or {}
-		return {bans.team1 or {}, bans.team2 or {}}
-	end)
+	local globalBans = (match.extradata or {}).globalbans
+	local characterBansData = Array.extend(
+		Logic.isNotDeepEmpty(globalBans) and {globalBans.team1 or {}, globalBans.team2 or {}, label = 'Global Bans'} or nil,
+		Array.map(match.games, function(game, gameIndex)
+			local extradata = game.extradata or {}
+			local bans = extradata.bans or {}
+			if Logic.isDeepEmpty(bans) then return end
+			return {bans.team1 or {}, bans.team2 or {}, label = 'Game&nbsp;' .. gameIndex}
+		end)
+	)
 
 	return WidgetUtil.collect(
 		Array.map(match.games, CustomMatchSummary._createMapRow),
@@ -45,7 +51,7 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
----@return Widget?
+---@return Renderable?
 function CustomMatchSummary._createMapRow(game)
 	if not game.map then
 		return
@@ -77,7 +83,7 @@ function CustomMatchSummary._createMapRow(game)
 end
 
 ---@param game MatchGroupUtilGame
----@return Widget
+---@return Renderable
 function CustomMatchSummary._getMapDisplay(game)
 	local mapDisplay = LinkWidget{link = game.map}
 

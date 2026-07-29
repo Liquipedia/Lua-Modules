@@ -1128,11 +1128,11 @@ div.brkts-popup-body-element-thumbs {
 	}
 
 	&--blue img {
-		outline-color: #31519c;
+		outline-color: var( --clr-sapphire-40 );
 	}
 
 	&--red img {
-		outline-color: #b12a2a;
+		outline-color: var( --clr-cinnabar-40 );
 	}
 
 	&--purple img {
