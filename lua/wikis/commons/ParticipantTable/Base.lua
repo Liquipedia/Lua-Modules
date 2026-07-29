@@ -24,14 +24,13 @@ local Tournament = Lua.import('Module:Tournament')
 local Variables = Lua.import('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Import = Lua.import('Module:ParticipantTable/Import')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local Html = Lua.import('Module:Widget/Html')
+local Entry = Lua.import('Module:Widget/Participants/Table/Entry')
 local SectionTitle = Lua.import('Module:Widget/Participants/Table/SectionTitle')
 
 local pageVars = PageVariableNamespace('ParticipantTable')
@@ -410,14 +409,14 @@ function ParticipantTable:displaySection(section)
 	local sectionNode = ParticipantTable.newSectionNode()
 
 	Array.forEach(entries, function(entry, entryIndex)
-		sectionNode:node(self:displayEntry(entry):css('width', self.config.columnWidth))
+		sectionNode:node(self:displayEntry(entry))
 	end)
 
 	local tbdsAdded = 0
 	if section.config.count and section.config.count > sectionEntryCount then
 		Array.forEach(Array.range(sectionEntryCount + 1, section.config.count), function(index)
 			tbdsAdded = tbdsAdded + 1
-			sectionNode:node(self:tbdEntry():css('width', self.config.columnWidth))
+			sectionNode:node(self:tbdEntry())
 		end)
 	end
 
@@ -450,31 +449,25 @@ function ParticipantTable:sectionTitle(section, amountOfEntries)
 	return SectionTitle{tableConfig = self.config, sectionConfig = section.config, numEntries = amountOfEntries}
 end
 
----@return Html
+---@return VNode
 function ParticipantTable:tbdEntry()
-	return mw.html.create('div')
-		:addClass('participantTable-entry')
-		:node(OpponentDisplay.BlockOpponent{
-			opponent = Opponent.tbd(),
-		})
+	return Entry{
+		config = self.config,
+		opponent = Opponent.tbd(),
+	}
 end
 
 ---@param entry ParticipantTableEntry
 ---@param additionalProps table?
----@return Html
+---@return VNode
 function ParticipantTable:displayEntry(entry, additionalProps)
-	additionalProps = additionalProps or {}
-
-	local entryNode = mw.html.create('div')
-		:addClass('participantTable-entry')
-		:node(OpponentDisplay.BlockOpponent(Table.merge(additionalProps, {
-			dq = entry.dq,
-			note = entry.note,
-			showPlayerTeam = self.config.showTeams,
-			opponent = entry.opponent,
-		})))
-
-	return DisplayHelper.addOpponentHighlight(entryNode, entry.opponent)
+	return Entry{
+		config = self.config,
+		dq = entry.dq,
+		note = entry.note,
+		opponent = entry.opponent,
+		additionalProps = additionalProps,
+	}
 end
 
 ---@param entries ParticipantTableEntry[]
