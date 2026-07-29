@@ -56,7 +56,7 @@ return {
 		},
 		standings = {
 			alwaysShowStats = {
-				swiss = {'matchdiff', 'gamediff'},
+				swiss = {'matchdiff'},
 			},
 		},
 	},
