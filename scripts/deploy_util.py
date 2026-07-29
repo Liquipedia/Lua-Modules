@@ -20,8 +20,9 @@ USER_AGENT = f"GitHub Autodeploy Bot/2.1.0 ({os.getenv('WIKI_UA_EMAIL')})"
 
 HEADER = {
     "User-Agent": USER_AGENT,
-    "accept": "application/json",
+    "Accept": "application/json",
     "Accept-Encoding": "gzip",
+    "Content-Type": "application/x-www-form-urlencoded",
 }
 SLEEP_DURATION = 4
 
