@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Class = Lua.import('Module:Class')
 local Table = Lua.import('Module:Table')
 
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
@@ -14,16 +15,14 @@ local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
-local CustomParticipantTable = {}
+---@class FightersParticipantTable: ParticipantTable
+---@operator call(Frame): FightersParticipantTable
+local CustomParticipantTable = Class.new(ParticipantTable)
 
 ---@param frame Frame
 ---@return Html?
 function CustomParticipantTable.run(frame)
-	local participantTable = ParticipantTable(frame)
-
-	participantTable.displayEntry = CustomParticipantTable.displayEntry
-
-	return participantTable:read():store():create()
+	return CustomParticipantTable(frame):read():store():create()
 end
 
 ---@param entry ParticipantTableEntry
