@@ -1,5 +1,5 @@
 /**
- * Styles for the Table of Contents from Mediawiki.
+ * Styles for the Table of Contents in Content from Mediawiki.
  * Source: https://gerrit.wikimedia.org/g/mediawiki/core/+/9f9f3e60eb2bc825be36c73555d7a48dfc8d1fad/resources/src/mediawiki.skinning/toc/screen.less
  */
 
@@ -83,4 +83,58 @@
 
 .toctogglecheckbox:checked ~ ul {
 	display: none;
+}
+
+/* Allow limiting of which header levels are shown in a TOC;
+	<div class="toclimit-3">, for instance, will limit to
+	showing ==headings== and ===headings=== but no further
+	( as long as there are no =headings= on the page, which
+	there shouldn't be according to the MoS ).
+
+    MediaWiki may render the TOC outside of the wrapper that contains __TOC__
+	(e.g. when __TOC__ is emitted by a module). Use :has() so the presence of the
+	toclimit wrapper anywhere on the page limits the actual TOC.
+*/
+.toclimit-2 .toclevel-1 ul,
+.toclimit-3 .toclevel-2 ul,
+.toclimit-4 .toclevel-3 ul,
+.toclimit-5 .toclevel-4 ul,
+.toclimit-6 .toclevel-5 ul,
+.toclimit-7 .toclevel-6 ul,
+body:has( .toclimit-2 ) #toc .toclevel-1 ul,
+body:has( .toclimit-3 ) #toc .toclevel-2 ul,
+body:has( .toclimit-4 ) #toc .toclevel-3 ul,
+body:has( .toclimit-5 ) #toc .toclevel-4 ul,
+body:has( .toclimit-6 ) #toc .toclevel-5 ul,
+body:has( .toclimit-7 ) #toc .toclevel-6 ul {
+	display: none !important;
+}
+
+/* Add an additional margin between ordered/unordered lists and the TOC table */
+ol + table.toc,
+ul + table.toc {
+	margin-top: 11px;
+}
+
+/*******************************************************************************
+Template(s): Fake TOC (Sidebar TOC)
+Author(s): FO-nTTaX
+*******************************************************************************/
+#mw-content-text .faketoc {
+	display: none;
+}
+
+#sidebar-toc .row,
+#scroll-wrapper-toc .row {
+	margin: 0;
+}
+
+#sidebar-toc .row > [ class*="col-" ],
+#scroll-wrapper-toc .row > [ class*="col-" ] {
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+#scroll-wrapper-toc .liquipedia-custom-icon-box {
+	font-size: 51px !important;
 }
