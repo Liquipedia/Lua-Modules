@@ -7,38 +7,33 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
-
-local Widget = Lua.import('Module:Widget')
-local WidgetUtil = Lua.import('Module:Widget/Util')
+local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local RatingsList = Lua.import('Module:Widget/Ratings/List')
 
----@class Ratings: Widget
----@operator call(table): Ratings
-local Ratings = Class.new(Widget)
-Ratings.defaultProps = {
+local defaultProps = {
 	teamLimit = 20,
 	storageType = 'lpdb',
 	showGraph = true,
 	isSmallerVersion = false,
 }
 
----@return Widget
-function Ratings:render()
+---@param props {teamLimit: integer?, storageType: string?, showGraph: boolean?, isSmallerVersion: boolean?}
+---@return VNode
+local function Ratings(props)
 	return Html.Div {
 		attributes = {
 			class = 'ranking-table__wrapper',
 		},
-		children = WidgetUtil.collect(
+		children = {
 			RatingsList {
-				teamLimit = self.props.teamLimit,
-				storageType = self.props.storageType,
-				showGraph = self.props.showGraph,
-				isSmallerVersion = self.props.isSmallerVersion,
-			}
-		),
+				teamLimit = props.teamLimit,
+				storageType = props.storageType,
+				showGraph = props.showGraph,
+				isSmallerVersion = props.isSmallerVersion,
+			},
+		},
 	}
 end
 
-return Ratings
+return Component.component(Ratings, defaultProps)
