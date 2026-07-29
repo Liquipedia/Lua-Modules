@@ -31,6 +31,7 @@ local Import = Lua.import('Module:ParticipantTable/Import')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
+local Html = Lua.import('Module:Widget/Html')
 local SectionTitle = Lua.import('Module:Widget/Participants/Table/SectionTitle')
 
 local pageVars = PageVariableNamespace('ParticipantTable')
@@ -435,9 +436,11 @@ function ParticipantTable:tbd()
 		:wikitext('To be determined')
 end
 
----@return Html
+---@return VNode
 function ParticipantTable:empty()
-	return mw.html.create('div'):addClass('participantTable-entry participantTable-empty')
+	return Html.Div{
+		classes = {'participantTable-entry', 'participantTable-empty'}
+	}
 end
 
 ---@param section ParticipantTableSection
