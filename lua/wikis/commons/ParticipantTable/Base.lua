@@ -31,6 +31,8 @@ local Import = Lua.import('Module:ParticipantTable/Import')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
+local SectionTitle = Lua.import('Module:Widget/Participants/Table/SectionTitle')
+
 local pageVars = PageVariableNamespace('ParticipantTable')
 local prizePoolVars = PageVariableNamespace('PrizePool')
 
@@ -440,17 +442,9 @@ end
 
 ---@param section ParticipantTableSection
 ---@param amountOfEntries number
----@return Html?
+---@return VNode
 function ParticipantTable:sectionTitle(section, amountOfEntries)
-	if Logic.isEmpty(section.config.title) or section.config.title == self.config.title then
-		return
-	end
-
-	local title = mw.html.create('div'):addClass('participantTable-title'):wikitext(section.config.title)
-
-	if not section.config.showCountBySection then return title end
-
-	return title:tag('i'):wikitext(' (' .. (section.config.count or amountOfEntries) .. ')'):done()
+	return SectionTitle{tableConfig = self.config, sectionConfig = section.config, numEntries = amountOfEntries}
 end
 
 ---@return Html
