@@ -57,7 +57,7 @@ local prizePoolVars = PageVariableNamespace('PrizePool')
 
 ---@class ParticipantTableSection
 ---@field config ParticipantTableConfig
----@field entries ParticipantTableEntry
+---@field entries ParticipantTableEntry[]
 
 ---@class ParticipantTableEntry
 ---@field opponent standardOpponent
