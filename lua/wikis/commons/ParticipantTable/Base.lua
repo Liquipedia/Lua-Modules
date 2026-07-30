@@ -407,14 +407,14 @@ function ParticipantTable:displaySection(section)
 	local sectionNode = ParticipantTable.newSectionNode()
 
 	Array.forEach(entries, function(entry, entryIndex)
-		sectionNode:node(self:displayEntry(entry))
+		sectionNode:node(self:displayEntry(entry, nil, true))
 	end)
 
 	local tbdsAdded = 0
 	if section.config.count and section.config.count > sectionEntryCount then
 		Array.forEach(Array.range(sectionEntryCount + 1, section.config.count), function(index)
 			tbdsAdded = tbdsAdded + 1
-			sectionNode:node(self:tbdEntry())
+			sectionNode:node(self:tbdEntry(true))
 		end)
 	end
 
@@ -447,24 +447,28 @@ function ParticipantTable:sectionTitle(section, amountOfEntries)
 	return SectionTitle{tableConfig = self.config, sectionConfig = section.config, numEntries = amountOfEntries}
 end
 
+---@param useDefaultWidth boolean?
 ---@return VNode
-function ParticipantTable:tbdEntry()
+function ParticipantTable:tbdEntry(useDefaultWidth)
 	return Entry{
 		config = self.config,
 		opponent = Opponent.tbd(),
+		useDefaultWidth = useDefaultWidth,
 	}
 end
 
 ---@param entry ParticipantTableEntry
 ---@param additionalProps table?
+---@param useDefaultWidth boolean?
 ---@return VNode
-function ParticipantTable:displayEntry(entry, additionalProps)
+function ParticipantTable:displayEntry(entry, additionalProps, useDefaultWidth)
 	return Entry{
 		config = self.config,
 		dq = entry.dq,
 		note = entry.note,
 		opponent = entry.opponent,
 		additionalProps = additionalProps,
+		useDefaultWidth = useDefaultWidth,
 	}
 end
 

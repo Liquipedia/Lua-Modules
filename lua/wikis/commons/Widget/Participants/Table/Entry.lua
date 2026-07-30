@@ -21,6 +21,7 @@ local Html = Lua.import('Module:Widget/Html')
 ---@field dq boolean?
 ---@field config ParticipantTableConfig
 ---@field additionalProps table?
+---@field useDefaultWidth boolean?
 
 ---@param props ParticipantsTableEntryProps
 ---@return VNode
@@ -28,7 +29,7 @@ local function ParticipantsTableEntry(props)
 	---@type HtmlNodeProps
 	local entryProps = {
 		classes = {'participantTable-entry'},
-		css = {width = props.config.columnWidth},
+		css = props.useDefaultWidth and {width = props.config.columnWidth} or nil,
 		children = OpponentDisplay.BlockOpponent(Table.merge(
 			{
 				dq = props.dq,

@@ -26,14 +26,16 @@ end
 
 ---@param entry ParticipantTableEntry
 ---@param additionalProps table?
+---@param useDefaultWidth boolean?
 ---@return VNode
-function CustomParticipantTable:displayEntry(entry, additionalProps)
+function CustomParticipantTable:displayEntry(entry, additionalProps, useDefaultWidth)
 	return Entry{
 		config = self.config,
 		dq = entry.dq,
 		note = entry.note,
 		opponent = entry.opponent,
 		additionalProps = Table.mergeInto({oneLine = true}, additionalProps),
+		useDefaultWidth = useDefaultWidth,
 	}
 end
 
