@@ -54,15 +54,23 @@ describe('Standings Tiebreakers', function()
 		end)
 
 		it('exposes context', function()
-			assert.are_equal('full', TiebreakerFactory.tiebreakerFromId('full.points'):getContextType())
-			assert.are_equal('h2h', TiebreakerFactory.tiebreakerFromId('h2h.matchdiff'):getContextType())
+			assert.are_equal('full', TiebreakerFactory.getTiebreaker(
+				TiebreakerFactory.validateAndNormalizeInput('full.points')
+			):getContextType())
+			assert.are_equal('h2h', TiebreakerFactory.getTiebreaker(
+				TiebreakerFactory.validateAndNormalizeInput('h2h.matchdiff')
+			):getContextType())
 		end)
 	end)
 
 	describe('points and manual', function()
 		it('read from the opponent', function()
-			local points = TiebreakerFactory.tiebreakerFromId('full.points')
-			local manual = TiebreakerFactory.tiebreakerFromId('full.manual')
+			local points = TiebreakerFactory.getTiebreaker(
+				TiebreakerFactory.validateAndNormalizeInput('full.points')
+			)
+			local manual = TiebreakerFactory.getTiebreaker(
+				TiebreakerFactory.validateAndNormalizeInput('full.manual')
+			)
 			local opp = opponent('Alpha', {points = 7, tiebreakerpoints = 2})
 			assert.are_equal(7, points:valueOf({opp}, opp))
 			assert.are_equal('7', points:display({opp}, opp))
@@ -72,7 +80,9 @@ describe('Standings Tiebreakers', function()
 
 	describe('matchdiff', function()
 		it('uses the match scoreboard', function()
-			local matchdiff = TiebreakerFactory.tiebreakerFromId('full.matchdiff')
+			local matchdiff = TiebreakerFactory.getTiebreaker(
+				TiebreakerFactory.validateAndNormalizeInput('full.matchdiff')
+			)
 			local opp = opponent('Alpha', {match = {w = 3, d = 1, l = 1}})
 			assert.are_equal(2, matchdiff:valueOf({opp}, opp))
 			assert.are_equal('3 - 1', matchdiff:display({opp}, opp))
@@ -81,7 +91,9 @@ describe('Standings Tiebreakers', function()
 
 	describe('buchholz', function()
 		it('sums match diff of faced opponents from finished matches', function()
-			local buchholz = TiebreakerFactory.tiebreakerFromId('full.buchholz')
+			local buchholz = TiebreakerFactory.getTiebreaker(
+				TiebreakerFactory.validateAndNormalizeInput(('full.buchholz'))
+			)
 			local alpha = opponent('Alpha', {
 				match = {w = 2, d = 0, l = 0},
 				matches = {
@@ -102,7 +114,9 @@ describe('Standings Tiebreakers', function()
 
 	describe('gamediff', function()
 		it('sums game scores of finished non-walkover matches', function()
-			local gamediff = TiebreakerFactory.tiebreakerFromId('full.gamediff')
+			local gamediff = TiebreakerFactory.getTiebreaker(
+				TiebreakerFactory.validateAndNormalizeInput('full.gamediff')
+			)
 			local alpha = opponent('Alpha', {
 				matches = {
 					makeMatch({'Alpha', 'Bravo'}, {winner = 1, scores = {2, 1}}),
@@ -115,7 +129,9 @@ describe('Standings Tiebreakers', function()
 		end)
 
 		it('excludes walkover matches from the game count', function()
-			local gamediff = TiebreakerFactory.tiebreakerFromId('full.gamediff')
+			local gamediff = TiebreakerFactory.getTiebreaker(
+				TiebreakerFactory.validateAndNormalizeInput('full.gamediff')
+			)
 			local alpha = opponent('Alpha', {
 				matches = {
 					makeMatch({'Alpha', 'Bravo'}, {winner = 1, scores = {2, 0}}),
@@ -128,7 +144,9 @@ describe('Standings Tiebreakers', function()
 
 	describe('rounddiff', function()
 		it('sums round scores from played games', function()
-			local rounddiff = TiebreakerFactory.tiebreakerFromId('full.rounddiff')
+			local rounddiff = TiebreakerFactory.getTiebreaker(
+				TiebreakerFactory.validateAndNormalizeInput('full.rounddiff')
+			)
 			local alpha = opponent('Alpha', {
 				matches = {
 					makeMatch({'Alpha', 'Bravo'}, {winner = 1, games = {
