@@ -361,6 +361,8 @@
 */
 
 .brkts-matchlist {
+	display: grid;
+	grid-template-columns: [opponent] 4fr [score] minmax( 30px, 1fr ) [icon] 0 [score] minmax( 30px, 1fr ) [opponent] 4fr;
 	border: 1px solid var( --table-border-color, #bbbbbb );
 	font-size: 13px;
 	line-height: 1.48;
@@ -372,42 +374,50 @@
 	@media ( max-width: 768px ) {
 		max-width: 100%;
 	}
-}
 
-.brkts-matchlist-collapse-area {
-	display: grid;
-	grid-template-columns: [opponent] 4fr [score] minmax( 30px, 1fr ) [icon] 0 [score] minmax( 30px, 1fr ) [opponent] 4fr;
-}
-
-.brkts-matchlist-attached {
-	margin-top: -1px;
-}
-
-.brkts-matchlist-title {
-	background-color: var( --table-header-variant-background-color, #eaecf0 );
-	font-weight: bold;
-	padding: 0.25rem;
-	position: relative;
-	text-align: center;
-}
-
-.brkts-matchlist-header {
-	background-color: var( --table-background-color, #f2f2f2 );
-	border-top: 1px solid var( --table-border-color, #bbbbbb );
-	font-size: 90%;
-	font-weight: bold;
-	grid-column: span 5;
-	padding: 1px 0.25rem;
-	text-align: center;
-}
-
-.brkts-matchlist-match {
-	display: contents;
-
-	@supports not ( display: contents ) {
+	&:not( .collapsed ) &-collapse-area {
 		display: grid;
-		grid-column: span 5;
-		grid-template-columns: [opponent] 4fr [score] minmax( 30px, 1fr ) [icon] 0 [score] minmax( 30px, 1fr ) [opponent] 4fr;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+	}
+
+	&-attached {
+		margin-top: -1px;
+	}
+
+	&-title {
+		background-color: var( --table-header-variant-background-color, #eaecf0 );
+		font-weight: bold;
+		grid-column: 1 / -1;
+		padding: 0.25rem;
+		position: relative;
+		text-align: center;
+	}
+
+	&-header {
+		background-color: var( --table-background-color, #f2f2f2 );
+		border-top: 1px solid var( --table-border-color, #bbbbbb );
+		font-size: 90%;
+		font-weight: bold;
+		grid-column: 1 / -1;
+		padding: 1px 0.25rem;
+		text-align: center;
+	}
+
+	&-match {
+		display: grid;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+
+		> .brkts-match-info-icon {
+			align-self: center;
+			position: relative;
+			left: -6px;
+		}
+	}
+
+	.brkts-opponent-block-literal {
+		color: #696969;
 	}
 }
 
@@ -456,17 +466,11 @@
 			box-shadow: 1px 0 2px var( --brackets-opponent-hover-color ), 0 1px 2px var( --brackets-opponent-hover-color ), 0 -1px 2px var( --brackets-opponent-hover-color );
 		}
 	}
-}
 
-.brkts-matchlist-match > .brkts-match-info-icon {
-	align-self: center;
-	position: relative;
-	left: -6px;
-}
-
-.brkts-matchlist-cell-content {
-	flex: 1 1;
-	min-width: 0;
+	&-content {
+		flex: 1 1;
+		min-width: 0;
+	}
 }
 
 .brkts-matchlist-slot-winner {
@@ -481,10 +485,6 @@
 	.flag + .name {
 		margin-left: -1px;
 	}
-}
-
-.brkts-matchlist .brkts-opponent-block-literal {
-	color: #696969;
 }
 
 .brkts-matchlist-score {
