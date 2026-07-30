@@ -61,7 +61,7 @@ def is_override_code(lines):
 def measure(root):
     declarative = legacy = override = commons = 0
 
-    for path in sorted(pathlib.Path(root).rglob("*.lua")):
+    for path in sorted(root.rglob("*.lua")):
         text = path.read_text(encoding="utf-8", errors="replace")
         count = len(text.splitlines())
 
@@ -140,12 +140,14 @@ def table(head, base):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("root", nargs="?", default=DEFAULT_ROOT)
-    parser.add_argument("--base", help="second tree to compare against")
+    parser.add_argument("root", nargs="?", type=pathlib.Path, default=DEFAULT_ROOT)
+    parser.add_argument(
+        "--base", type=pathlib.Path, help="second tree to compare against"
+    )
     parser.add_argument("--raw", action="store_true", help="print key=value instead")
     args = parser.parse_args()
 
-    if not pathlib.Path(args.root).is_dir():
+    if not args.root.is_dir():
         print(f"::error::wikis root not found: {args.root}")
         return 1
 
@@ -157,7 +159,7 @@ def main():
 
     base = None
     if args.base:
-        if pathlib.Path(args.base).is_dir():
+        if args.base.is_dir():
             base = measure(args.base)
         else:
             print(f"::warning::base root not found, omitting deltas: {args.base}")
