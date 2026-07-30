@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Info = Lua.import('Module:Info', { loadData = true })
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
@@ -70,7 +71,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 					specialstatus = statusInRound,
 					tiebreakerpoints = tiebreakerPoints or 0,
 					matchid = matchId,
-					tiebreakerValues = {}
+					additionalStatsValues = {},
 				}
 			}
 		end)
@@ -78,10 +79,20 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 
 	local tiebreakers = Array.map(parsedTiebreakers, TiebreakerFactory.getTiebreaker)
 
+
+	local alwaysStatsToLoad = Array.map(
+		((Info.config.standings or {}).alwaysShowStats or {})[standingsType] or {},
+		function (stat)
+			return TiebreakerFactory.validateAndNormalizeInput(stat)
+		end
+	)
+	local alwaysStats = Array.map(alwaysStatsToLoad, TiebreakerFactory.getTiebreaker)
+	local additionalStats = Array.extend(tiebreakers, parsedTiebreakers)
+
 	Array.forEach(rounds, function(round)
-		StandingsParser.calculateTiebreakerValues(Array.filter(entries, function(opponentRound)
+		StandingsParser.calculateAdditionalStatsValues(Array.filter(entries, function(opponentRound)
 			return opponentRound.roundindex == round.roundNumber
-		end), parsedTiebreakers, tiebreakers)
+		end), parsedTiebreakers, Array.extend(tiebreakers, alwaysStats))
 	end)
 
 	Array.forEach(rounds, function(round)
@@ -120,28 +131,8 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		finished = isFinished,
 		extradata = {
 			rounds = rounds,
-			tiebreakers = Array.map(parsedTiebreakers, function(parsedTiebreaker, tiebreakerIndex)
-				local tiebreakerName = parsedTiebreaker.name
-				local tiebreakerContextType = parsedTiebreaker.context
-				local tiebreakerId = parsedTiebreaker.id
-				local tiebreaker = tiebreakers[tiebreakerIndex]
-				if tiebreakerContextType ~= 'full' then
-					return {
-						id = tiebreakerId,
-						name = tiebreakerName,
-						context = tiebreakerContextType,
-						config = parsedTiebreaker.config,
-					}
-				end
-				return {
-					id = tiebreakerId,
-					name = tiebreakerName,
-					context = tiebreakerContextType,
-					config = parsedTiebreaker.config,
-					title = tiebreaker:headerTitle(),
-				}
-			end),
-		},
+			additionalStats = additionalStats,
+		}
 	}
 end
 
@@ -151,14 +142,19 @@ end
 ---@param opponentsInRound TiebreakerOpponent[]
 ---@param parsedTiebreakers ParsedTiebreaker[]
 ---@param tiebreakers StandingsTiebreaker[]
-function StandingsParser.calculateTiebreakerValues(opponentsInRound, parsedTiebreakers, tiebreakers)
+function StandingsParser.calculateAdditionalStatsValues(opponentsInRound, parsedTiebreakers, tiebreakers)
 	Array.forEach(tiebreakers, function(tiebreaker, tiebreakerIndex)
+		local parsedTiebreaker = parsedTiebreakers[tiebreakerIndex]
 		local tiebreakerContextType = tiebreaker:getContextType()
 		if tiebreakerContextType == 'h2h' or tiebreakerContextType == 'ml' then
 			return
 		end
 		Array.forEach(opponentsInRound, function(opponent)
-			opponent.extradata.tiebreakerValues[parsedTiebreakers[tiebreakerIndex].id] = {
+			if opponent.extradata.additionalStatsValues[parsedTiebreaker.id] then
+				-- We have already calculated this value, no need to do it twice
+				return
+			end
+			opponent.extradata.additionalStatsValues[parsedTiebreaker.id] = {
 				value = tiebreaker:valueOf(opponentsInRound, opponent),
 				display = tiebreaker:display(opponentsInRound, opponent),
 			}
@@ -180,10 +176,10 @@ local function resolveTieForGroup(allOpponents, tiedOpponents, parsedTiebreakers
 	local tiebreakerId = parsedTiebreakers[tiebreakerIndex].id
 
 	local _, groupedOpponents = Array.groupBy(tiedOpponents, function(opponent)
-		if not opponent.extradata.tiebreakerValues[tiebreakerId] then
+		if not opponent.extradata.additionalStatsValues[tiebreakerId] then
 			return tiebreaker:valueOf(allOpponents, opponent)
 		end
-		return opponent.extradata.tiebreakerValues[tiebreakerId].value
+		return opponent.extradata.additionalStatsValues[tiebreakerId].value
 	end)
 
 	local groupedOpponentsInOrder = Array.extractValues(groupedOpponents, Table.iter.spairs, function(_, a, b)
