@@ -376,7 +376,6 @@ function ParticipantTable:create()
 
 	self.display = mw.html.create('div')
 		:addClass('participantTable')
-		:css('max-width', '100%!important')
 		:css('width', config.width)
 		:node(config.showTitle and
 			mw.html.create('div'):addClass('participantTable-title'):wikitext(config.title or 'Participants')
