@@ -359,6 +359,8 @@
 */
 
 .brkts-matchlist {
+	display: grid;
+	grid-template-columns: [opponent] 4fr [score] minmax( 30px, 1fr ) [icon] 0 [score] minmax( 30px, 1fr ) [opponent] 4fr;
 	border: 1px solid var( --table-border-color, #bbbbbb );
 	font-size: 13px;
 	line-height: 1.48;
@@ -371,9 +373,10 @@
 		max-width: 100%;
 	}
 
-	&-collapse-area {
+	&:not( .collapsed ) &-collapse-area {
 		display: grid;
-		grid-template-columns: [opponent] 4fr [score] minmax( 30px, 1fr ) [icon] 0 [score] minmax( 30px, 1fr ) [opponent] 4fr;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
 	}
 
 	&-attached {
@@ -383,6 +386,7 @@
 	&-title {
 		background-color: var( --table-header-variant-background-color, #eaecf0 );
 		font-weight: bold;
+		grid-column: 1 / -1;
 		padding: 0.25rem;
 		position: relative;
 		text-align: center;
@@ -393,19 +397,15 @@
 		border-top: 1px solid var( --table-border-color, #bbbbbb );
 		font-size: 90%;
 		font-weight: bold;
-		grid-column: span 5;
+		grid-column: 1 / -1;
 		padding: 1px 0.25rem;
 		text-align: center;
 	}
 
 	&-match {
-		display: contents;
-
-		@supports not ( display: contents ) {
-			display: grid;
-			grid-column: span 5;
-			grid-template-columns: [opponent] 4fr [score] minmax( 30px, 1fr ) [icon] 0 [score] minmax( 30px, 1fr ) [opponent] 4fr;
-		}
+		display: grid;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
 
 		> .brkts-match-info-icon {
 			align-self: center;
