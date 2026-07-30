@@ -12,8 +12,7 @@ local Table = Lua.import('Module:Table')
 
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local Entry = Lua.import('Module:Widget/Participants/Table/Entry')
 
 ---@class FightersParticipantTable: ParticipantTable
 ---@operator call(Frame): FightersParticipantTable
@@ -27,21 +26,15 @@ end
 
 ---@param entry ParticipantTableEntry
 ---@param additionalProps table?
----@return Html
+---@return VNode
 function CustomParticipantTable:displayEntry(entry, additionalProps)
-	additionalProps = additionalProps or {}
-
-	local entryNode = mw.html.create('div')
-		:addClass('participantTable-entry')
-		:node(OpponentDisplay.BlockOpponent(Table.merge(additionalProps, {
-			dq = entry.dq,
-			note = entry.note,
-			showPlayerTeam = self.config.showTeams,
-			opponent = entry.opponent,
-			oneLine = true,
-		})))
-
-	return DisplayHelper.addOpponentHighlight(entryNode, entry.opponent)
+	return Entry{
+		config = self.config,
+		dq = entry.dq,
+		note = entry.note,
+		opponent = entry.opponent,
+		additionalProps = Table.mergeInto({oneLine = true}, additionalProps),
+	}
 end
 
 return CustomParticipantTable
