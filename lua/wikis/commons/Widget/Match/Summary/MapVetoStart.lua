@@ -8,36 +8,32 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local I18n = Lua.import('Module:I18n')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 local ARROW_LEFT = IconFa{iconName = 'startleft', size = '110%'}
 local ARROW_RIGHT = IconFa{iconName = 'startright', size = '110%'}
-local START_MAP_VETO = HtmlWidgets.B{children = I18n.translate('matchsummary-mapveto-start')}
+local START_MAP_VETO = Html.B{children = I18n.translate('matchsummary-mapveto-start')}
 
----@class MatchSummaryMapVetoStart: Widget
----@operator call(table): MatchSummaryMapVetoStart
-local MatchSummaryMapVetoStart = Class.new(Widget)
-
----@return Widget?
-function MatchSummaryMapVetoStart:render()
-	if not self.props.firstVeto then
+---@param props {firstVeto: integer?, vetoFormat: string?}
+---@return VNode?
+local function MatchSummaryMapVetoStart(props)
+	if not props.firstVeto then
 		return
 	end
 
-	local format = self.props.vetoFormat and ('Veto Format: ' .. self.props.vetoFormat) or ''
+	local format = props.vetoFormat and {'Veto Format: ', props.vetoFormat} or ''
 	local children = {}
-	if self.props.firstVeto == 1 then
+	if props.firstVeto == 1 then
 		children = {
 			START_MAP_VETO,
 			ARROW_LEFT,
 			format,
 		}
-	elseif self.props.firstVeto == 2 then
+	elseif props.firstVeto == 2 then
 		children = {
 			format,
 			ARROW_RIGHT,
@@ -45,17 +41,12 @@ function MatchSummaryMapVetoStart:render()
 		}
 	end
 
-	local alignments = {'left', 'center', 'right'}
-	return HtmlWidgets.Tr{
-		classes = {'brkts-popup-mapveto-vetostart'},
-		children = Array.map(children, function(child, i)
-			return HtmlWidgets.Th{
-				classes = {'brkts-popup-mapveto__data-cell'},
-				css = {['text-align'] = alignments[i] or nil},
-				children = child
-			}
+	return Html.Div{
+		classes = {'brkts-popup-veto-row'},
+		children = Array.map(children, function(child)
+			return Html.Div{children = child}
 		end)
 	}
 end
 
-return MatchSummaryMapVetoStart
+return Component.component(MatchSummaryMapVetoStart)

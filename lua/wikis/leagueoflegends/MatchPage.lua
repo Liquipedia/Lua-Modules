@@ -19,8 +19,8 @@ local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
@@ -76,6 +76,18 @@ local KEYSTONES = Table.map({
 	return value, true
 end)
 
+local ROLES = Array.map(
+	Array.sortBy(Array.unique(Array.extractValues(InGameRoles)), Operator.property('sortOrder')),
+	Operator.property('display')
+)
+
+local SIDE_COLORS = {
+	-- clr-cinnabar-40
+	red = '#b81414',
+	-- clr-sapphire-40
+	blue = '#0d71bf',
+}
+
 local DEFAULT_ITEM = 'EmptyIcon'
 local LOADOUT_ICON_SIZE = '64px'
 local ITEMS_TO_SHOW = 6
@@ -83,10 +95,10 @@ local ITEMS_TO_SHOW = 6
 local KDA_ICON = IconFa{iconName = 'leagueoflegends_kda', hover = 'KDA'}
 local KP_ICON = IconFa{iconName = 'leagueoflegends_killparticipation', hover = 'KP'}
 local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
-local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
+local SPAN_SLASH = Html.Span{classes = {'slash'}, children = '/'}
 
 ---@param props {match: MatchGroupUtilMatch}
----@return Widget
+---@return VNode
 function MatchPage.getByMatchId(props)
 	local matchPage = MatchPage(props.match)
 
@@ -133,7 +145,7 @@ function MatchPage:populateGames()
 	end)
 end
 
----@return Widget?
+---@return VNode?
 function MatchPage:renderOverallStats()
 	if self:isBestOfOne() then
 		return
@@ -141,7 +153,7 @@ function MatchPage:renderOverallStats()
 
 	local function renderOverallTeamStats()
 		return {
-			HtmlWidgets.H3{children = 'Overall Team Stats'},
+			Html.H3{children = 'Overall Team Stats'},
 			Div{
 				classes = {'match-bm-team-stats'},
 				children = {
@@ -183,7 +195,7 @@ function MatchPage:renderOverallStats()
 	end
 
 	---@param player standardPlayer
-	---@return Widget?
+	---@return VNode?
 	local function renderPlayerOverallPerformance(player)
 		if Logic.isEmpty(player.extradata) then
 			return
@@ -248,10 +260,10 @@ function MatchPage:renderOverallStats()
 		}
 	end
 
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = WidgetUtil.collect(
 			renderOverallTeamStats(),
-			HtmlWidgets.H3{children = 'Overall Player Performance'},
+			Html.H3{children = 'Overall Player Performance'},
 			Div{
 				classes = {'match-bm-players-wrapper'},
 				children = Array.map(self.opponents, function (opponent)
@@ -283,7 +295,7 @@ end
 ---@param props {finished: boolean, data: {kills: integer, deaths: integer, assists: integer, gold: number?,
 ---towers: integer, inhibitors: integer, grubs: integer?, heralds: integer?, atakhans: integer?, dragons: integer?,
 ---barons: integer?}[]}
----@return MatchPageStatsList
+---@return VNode
 function MatchPage._buildTeamStatsList(props)
 	return StatsList{
 		finished = props.finished,
@@ -355,9 +367,9 @@ function MatchPage._buildTeamStatsList(props)
 end
 
 ---@param game LoLMatchPageGame
----@return Widget
+---@return VNode
 function MatchPage:renderGame(game)
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = WidgetUtil.collect(
 			self:_renderGameOverview(game),
 			self:_renderDraft(game),
@@ -369,7 +381,7 @@ end
 
 ---@private
 ---@param game LoLMatchPageGame
----@return Widget[]
+---@return VNode[]
 function MatchPage:_buildGameResultSummary(game)
 	return {
 		Div{
@@ -410,7 +422,7 @@ end
 
 ---@private
 ---@param game LoLMatchPageGame
----@return Widget?
+---@return VNode?
 function MatchPage:_renderGameOverview(game)
 	if self:isBestOfOne() then return end
 	return Div{
@@ -439,10 +451,10 @@ end
 
 ---@private
 ---@param game LoLMatchPageGame
----@return Widget[]
+---@return VNode[]
 function MatchPage:_renderDraft(game)
 	return {
-		HtmlWidgets.H3{children = 'Draft'},
+		Html.H3{children = 'Draft'},
 		Div{
 			classes = {'match-bm-lol-game-veto'},
 			children = {
@@ -473,7 +485,7 @@ end
 ---@private
 ---@param game LoLMatchPageGame
 ---@param teamIndex integer
----@return Widget
+---@return VNode
 function MatchPage:_renderGameTeamVetoOverview(game, teamIndex)
 	return Div{
 		classes = {'match-bm-lol-game-veto-overview-team'},
@@ -511,7 +523,7 @@ end
 ---@private
 ---@param game LoLMatchPageGame
 ---@param teamIndex integer
----@return Widget
+---@return VNode
 function MatchPage:_renderGameTeamVetoOrder(game, teamIndex)
 	local teamVetoGroups = game.vetoGroups[teamIndex]
 	return Div{
@@ -542,10 +554,10 @@ end
 
 ---@private
 ---@param game LoLMatchPageGame
----@return Widget[]
+---@return VNode[]
 function MatchPage:_renderTeamStats(game)
 	return {
-		HtmlWidgets.H3{children = 'Team Stats'},
+		Html.H3{children = 'Team Stats'},
 		Div{
 			classes = {'match-bm-team-stats'},
 			children = {
@@ -578,24 +590,25 @@ end
 
 ---@private
 ---@param game LoLMatchPageGame
----@return Widget[]
+---@return VNode[]
 function MatchPage:_renderPlayersPerformance(game)
-	return {
-		HtmlWidgets.H3{children = 'Player Performance'},
+	return WidgetUtil.collect(
+		Html.H3{children = 'Player Performance'},
 		Div{
 			classes = {'match-bm-players-wrapper'},
 			children = {
 				self:_renderTeamPerformance(game, 1),
 				self:_renderTeamPerformance(game, 2)
 			}
-		}
-	}
+		},
+		self:_renderDamageDealt(game)
+	)
 end
 
 ---@private
 ---@param game LoLMatchPageGame
 ---@param teamIndex integer
----@return Widget
+---@return VNode
 function MatchPage:_renderTeamPerformance(game, teamIndex)
 	return Div{
 		classes = {'match-bm-players-team'},
@@ -615,7 +628,7 @@ end
 ---@param game LoLMatchPageGame
 ---@param teamIndex integer
 ---@param player table
----@return Widget
+---@return VNode
 function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 	return Div{
 		classes = {'match-bm-players-player match-bm-players-player--col-3'},
@@ -677,7 +690,7 @@ end
 
 ---@private
 ---@param props {prefix: string, name: string, caption: string?}
----@return Widget
+---@return Renderable
 function MatchPage._generateLoadoutImage(props)
 	return IconImage{
 		imageLight = props.prefix .. ' ' .. props.name .. '.png',
@@ -689,21 +702,21 @@ end
 
 ---@private
 ---@param runeName string
----@return Widget
+---@return Renderable
 MatchPage._generateRuneImage = FnUtil.memoize(function (runeName)
 	return MatchPage._generateLoadoutImage{prefix = 'Rune', name = runeName}
 end)
 
 ---@private
 ---@param spellName string
----@return Widget
+---@return Renderable
 MatchPage._generateSpellImage = FnUtil.memoize(function (spellName)
 	return MatchPage._generateLoadoutImage{prefix = 'Summoner spell', name = spellName}
 end)
 
 ---@private
 ---@param itemName string
----@return Widget
+---@return VNode
 MatchPage._generateItemImage = FnUtil.memoize(function (itemName)
 	local isDefaultItem = itemName == DEFAULT_ITEM
 	return Div{
@@ -718,7 +731,7 @@ end)
 
 ---@private
 ---@param player table
----@return Widget
+---@return VNode
 function MatchPage._buildPlayerLoadout(player)
 	return Div{
 		classes = {'match-bm-players-player-loadout'},
@@ -742,6 +755,54 @@ function MatchPage._buildPlayerLoadout(player)
 			Div{
 				classes = {'match-bm-players-player-loadout-items'},
 				children = Array.map(player.items, MatchPage._generateItemImage)
+			}
+		}
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@return VNode[]?
+function MatchPage:_renderDamageDealt(game)
+	if not game.finished or Array.any(game.teams, function (team)
+		return Logic.isDeepEmpty(team.players)
+	end) then
+		return
+	end
+	return {
+		Html.H4{children = 'Damage Dealt'},
+		Html.Div{
+			classes = {'table-responsive'},
+			css = {
+				width = '100%'
+			},
+			children = mw.ext.Charts.chart{
+				size = {
+					width = 640,
+					height = 480
+				},
+				tooltip = {
+					trigger = 'axis'
+				},
+				xAxis = {
+					data = ROLES,
+					type = 'category',
+				},
+				yAxis = {
+					name = 'Damage dealt',
+					type = 'value',
+				},
+				series = Array.map(game.teams, function (team)
+					return {
+						type = 'bar',
+						data = Array.map(team.players, function (player)
+							return player.damagedone
+						end),
+						itemStyle = {
+							color = SIDE_COLORS[team.side]
+						}
+					}
+				end),
 			}
 		}
 	}

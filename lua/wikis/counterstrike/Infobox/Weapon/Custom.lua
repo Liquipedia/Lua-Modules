@@ -28,7 +28,7 @@ local CustomWeapon = Class.new(Weapon)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomWeapon.run(frame)
 	local weapon = CustomWeapon(frame)
 	weapon:setWidgetInjector(CustomInjector(weapon))
@@ -37,8 +37,8 @@ function CustomWeapon.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -63,7 +63,7 @@ end
 function CustomWeapon:_achievementsDisplay()
 	local args = self.args
 	local achievements = Array.mapIndexes(function(index)
-		local prefix = 'achievement'  .. index
+		local prefix = 'achievement' .. index
 		if (not args[prefix]) or (not args[prefix .. 'image']) then return end
 		return WidgetImage{
 			imageLight = args[prefix .. 'image'],

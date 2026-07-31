@@ -11,10 +11,11 @@ local Class = Lua.import('Module:Class')
 local Patch = Lua.import('Module:Infobox/Patch')
 
 ---@class RockatleaguePatchInfobox: PatchInfobox
+---@operator call(Frame): RockatleaguePatchInfobox
 local CustomPatch = Class.new(Patch)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPatch.run(frame)
 	local customPatch = CustomPatch(frame)
 	return customPatch:createInfobox()

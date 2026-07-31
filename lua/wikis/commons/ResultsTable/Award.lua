@@ -19,7 +19,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local AwardsTable = Class.new(BaseResultsTable)
 
 ---@protected
----@return table[]
+---@return Table2ColumnDef[]
 function AwardsTable:buildColumnDefinitions()
 	return WidgetUtil.collect(
 		{
@@ -44,7 +44,7 @@ function AwardsTable:buildColumnDefinitions()
 end
 
 ---Builds the Header of the award table
----@return Widget
+---@return VNode
 function AwardsTable:buildHeader()
 	return TableWidgets.Row{children = WidgetUtil.collect(
 		TableWidgets.CellHeader{children = 'Date'},
@@ -66,7 +66,7 @@ end
 
 ---Builds a row of the award table
 ---@param placement placement
----@return Widget
+---@return VNode
 function AwardsTable:buildRow(placement)
 	return TableWidgets.Row{
 		highlighted = self:rowHighlight(placement),

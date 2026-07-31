@@ -32,7 +32,7 @@ local ADDITIONAL_GAME_NAMES = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomMission.run(frame)
 	local mission = CustomMission(frame)
 	mission:setWidgetInjector(CustomInjector(mission))
@@ -53,8 +53,8 @@ function CustomMission:_getEvolution()
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 

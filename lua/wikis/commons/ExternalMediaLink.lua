@@ -16,6 +16,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
+local Tournament = Lua.import('Module:Tournament')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -25,7 +26,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local ExternalMediaLinkDisplay = Lua.import('Module:Widget/ExternalMedia/Link')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -42,7 +43,7 @@ local DEFAULT_LANGUAGE = 'en'
 ---Main function for External Media Links.
 ---Calls storage and display (if not disabled).
 ---@param args table
----@return Widget?
+---@return Renderable?
 function ExternalMediaLink.run(args)
 	ExternalMediaLink._fallBackArgs(args)
 	local parsedData = ExternalMediaLink._readArgs(args)
@@ -73,6 +74,13 @@ function ExternalMediaLink._fallBackArgs(args)
 	for subjectIndex = 2, MAXIMUM_VALUES.subjects do
 		args['subject' .. subjectIndex] = args['subject' .. subjectIndex] or args['player' .. subjectIndex]
 	end
+
+	local eventLink = Logic.emptyOr(args['event-link'], args.event)
+
+	if Logic.isNotEmpty(eventLink) then
+		---@cast eventLink -nil
+		args.tournament = Tournament.getTournament(eventLink)
+	end
 end
 
 ---Parses the supplied arguments and returns as LPDB form
@@ -99,13 +107,14 @@ function ExternalMediaLink._readArgs(args)
 		'Maximum Value of authors (' .. MAXIMUM_VALUES.authors .. ') exceeded')
 	lpdbData.authors = authors
 
+	---@type StandardTournament
+	local tournament = args.tournament or {}
+
 	local extradata = {
 		translation = args.translation,
 		translator = args.translator,
-		event = args.event,
-		event_link = Page.pageifyLink(
-			Logic.emptyOr(args['event-link'], args.event) or ''
-		),
+		event = tournament.displayName or args.event,
+		event_link = tournament.pageName or Page.pageifyLink(Logic.emptyOr(args['event-link'], args.event) or ''),
 		subject_organization = args.subject_organization1, --legacy
 	}
 
@@ -146,13 +155,13 @@ end
 ---Builds the display for an External Media Link
 ---@param data table
 ---@param note string?
----@return Widget
+---@return VNode
 function ExternalMediaLink._display(data, note)
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+	return Html.Fragment{children = WidgetUtil.collect(
 		ExternalMediaLinkDisplay{data = data},
 		Logic.isNotEmpty(note) and {
 			'&nbsp;',
-			HtmlWidgets.Span{
+			Html.Span{
 				css = {['font-style'] = 'italic'},
 				children = {'(', note, ')'},
 			}
@@ -162,7 +171,7 @@ end
 
 ---Wrapper function for External Media Link display in the Data namespace
 ---@param args table
----@return Widget
+---@return VNode
 function ExternalMediaLink.wrapper(args)
 	local parsedArgs = {
 		date = DateExt.toYmdInUtc(args.date),
@@ -203,9 +212,9 @@ function ExternalMediaLink.wrapper(args)
 		end
 	end
 
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+	return Html.Fragment{children = WidgetUtil.collect(
 		Link{link = 'Special:FormEdit/ExternalMediaLinks', children = 'Go back to the form'},
-		HtmlWidgets.Br{},
+		Html.Br{},
 		ExternalMediaLink.run(parsedArgs),
 		ExternalMediaLink._wrapperDisplay(parsedArgs)
 	)}
@@ -213,11 +222,11 @@ end
 
 ---@private
 ---@param parsedArgs table
----@return Widget
+---@return VNode
 function ExternalMediaLink._wrapperDisplay(parsedArgs)
 	---@param prefix string
 	---@param linkPrefix string?
-	---@return Widget[]
+	---@return Renderable[]
 	local makeLinkList = function(prefix, linkPrefix)
 		local list = Array.mapIndexes(function(index)
 			if Logic.isEmpty(parsedArgs[prefix .. index]) then
@@ -232,8 +241,8 @@ function ExternalMediaLink._wrapperDisplay(parsedArgs)
 	end
 
 	---@param desc string
-	---@param data Widget[]|Widget?
-	---@return Widget?
+	---@param data Renderable|Renderable[]?
+	---@return VNode?
 	local rowIfNotEmpty = function(desc, data)
 		if Logic.isEmpty(data) then
 			return
@@ -242,6 +251,23 @@ function ExternalMediaLink._wrapperDisplay(parsedArgs)
 			TableWidgets.CellHeader{children = desc},
 			TableWidgets.Cell{children = data},
 		}}
+	end
+
+	---@return VNode?
+	local function eventDisplay()
+		local tournament = parsedArgs.tournament
+		if tournament ~= nil then
+			---@cast tournament StandardTournament
+			return Link{
+				link = tournament.pageName,
+				children = tournament.fullName,
+			}
+		elseif Logic.isNotEmpty(parsedArgs.event) then
+			return Link{
+				link = parsedArgs['event-link'] or parsedArgs.event,
+				children = parsedArgs.event,
+			}
+		end
 	end
 
 	return TableWidgets.Table{
@@ -253,10 +279,7 @@ function ExternalMediaLink._wrapperDisplay(parsedArgs)
 			rowIfNotEmpty('Date', parsedArgs.date),
 			rowIfNotEmpty('Subject(s)', makeLinkList('subject')),
 			rowIfNotEmpty('Org Subject(s)', makeLinkList('subject_organization')),
-			rowIfNotEmpty('Event', parsedArgs.event and Link{
-				link = parsedArgs['event-link'] or parsedArgs.event,
-				children = parsedArgs.event,
-			} or nil),
+			rowIfNotEmpty('Event', eventDisplay()),
 			rowIfNotEmpty('URL', parsedArgs.link)
 		)}},
 	}

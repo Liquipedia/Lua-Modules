@@ -7,13 +7,12 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
 ---@class AnalyticsWidgetParameters
 ---@field analyticsName string?
@@ -22,43 +21,39 @@ local Div = HtmlWidgets.Div
 ---@field children Renderable|Renderable[]?
 ---@field css table<string, string|integer?>?
 
----@class AnalyticsWidget: Widget
----@operator call(AnalyticsWidgetParameters): AnalyticsWidget
----@field props AnalyticsWidgetParameters
-local AnalyticsWidget = Class.new(Widget)
-
+---@param props AnalyticsWidgetParameters
 ---@return Renderable|Renderable[]?
-function AnalyticsWidget:render()
-	local analyticsName = self.props.analyticsName
+local function AnalyticsWidget(props)
+	local analyticsName = props.analyticsName
 
 	if analyticsName then
 		local attributes = {
 			['data-analytics-name'] = analyticsName
 		}
 
-		if self.props.analyticsProperties then
-			Table.iter.forEachPair(self.props.analyticsProperties, function(key, value)
+		if props.analyticsProperties then
+			Table.iter.forEachPair(props.analyticsProperties, function(key, value)
 				attributes['data-analytics-' .. key] = value
 			end)
 		end
 
 		return Div{
 			attributes = attributes,
-			classes = self.props.classes,
-			css = self.props.css,
-			children = self.props.children
+			classes = props.classes,
+			css = props.css,
+			children = props.children
 		}
 	end
 
-	if Logic.isEmpty(self.props.classes) then
-		return self.props.children
+	if Logic.isEmpty(props.classes) then
+		return props.children
 	end
 
 	return Div{
-		classes = self.props.classes,
-		children = self.props.children
+		classes = props.classes,
+		children = props.children
 	}
 end
 
-return AnalyticsWidget
+return Component.component(AnalyticsWidget)
 

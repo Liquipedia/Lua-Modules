@@ -24,7 +24,7 @@ local CustomFactionInfobox = Class.new(FactionInfobox)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomFactionInfobox.run(frame)
 	local infobox = CustomFactionInfobox(frame)
 

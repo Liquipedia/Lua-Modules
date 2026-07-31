@@ -12,7 +12,7 @@ local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Sublist = Lua.import('Module:Widget/Tournaments/Ticker/Sublist')
 local TickerData = Lua.import('Module:TournamentsTicker/Data')
 
@@ -29,12 +29,12 @@ function TournamentsTickerWidget:render()
 	local data = TickerData.get(self.props)
 	local displayGameIcons = Logic.readBool(self.props.displayGameIcons)
 
-	local fallbackElement = HtmlWidgets.Div{
+	local fallbackElement = Html.Div{
 		attributes = {
 			['data-filter-hideable-group-fallback'] = '',
 		},
 		children = {
-			HtmlWidgets.Center{
+			Html.Center{
 				css = {
 					['margin'] = '1.5rem 0',
 					['font-style'] = 'italic',
@@ -44,9 +44,9 @@ function TournamentsTickerWidget:render()
 		}
 	}
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		children = {
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'tournaments-list'},
 				attributes = {
 					['data-filter-hideable-group'] = '',

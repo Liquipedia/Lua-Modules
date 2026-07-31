@@ -7,25 +7,26 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-local Span = HtmlWidgets.Span
+local Span = Html.Span
 
----@class CollapsibleToggle: Widget
----@operator call(table?): CollapsibleToggle
-local CollapsibleToggle = Class.new(Widget)
+---@class CollapsibleToggleProps: HtmlNodeProps
+---@field showButtonChildren? Renderable|Renderable[]
+---@field hideButtonChildren? Renderable|Renderable[]
 
----@return Widget
-function CollapsibleToggle:render()
+---@param props CollapsibleToggleProps
+---@return VNode
+local function CollapsibleToggle(props)
 	local showButton = Button{
 		classes = {'general-collapsible-expand-button'},
 		children = Span{
-			children = Logic.emptyOr(self.props.showButtonChildren, {
+			children = Logic.emptyOr(props.showButtonChildren, {
 				Icon{iconName = 'show'},
 				' ',
 				'Show'
@@ -37,7 +38,7 @@ function CollapsibleToggle:render()
 	local hideButton = Button{
 		classes = {'general-collapsible-collapse-button'},
 		children = Span{
-			children = Logic.emptyOr(self.props.hideButtonChildren, {
+			children = Logic.emptyOr(props.hideButtonChildren, {
 				Icon{iconName = 'hide'},
 				' ',
 				'Hide'
@@ -48,9 +49,12 @@ function CollapsibleToggle:render()
 	}
 
 	return Span{
-		classes = {'general-collapsible-default-toggle', unpack(self.props.classes or {})},
-		css = self.props.css,
-		attributes = self.props.attributes,
+		classes = Array.extend(
+			'general-collapsible-default-toggle',
+			props.classes
+		),
+		css = props.css,
+		attributes = props.attributes,
 		children = {
 			showButton,
 			hideButton,
@@ -58,4 +62,4 @@ function CollapsibleToggle:render()
 	}
 end
 
-return CollapsibleToggle
+return Component.component(CollapsibleToggle)

@@ -8,13 +8,12 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
@@ -23,43 +22,39 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@field columns number?
 ---@field makeLink boolean?
 ---@field suppressColon boolean?
----@field separator Widget|string|Html|nil
+---@field separator Renderable?
 
 ---@class CellWidgetProps
----@field name string|Widget|Html
+---@field name Renderable?
 ---@field classes string[]?
----@field children (string|Widget|Html)[]
----@field options CellWidgetOptions
+---@field children Renderable[]?
+---@field options CellWidgetOptions?
 
----@class CellWidget: Widget
----@operator call(CellWidgetProps): CellWidget
----@field props CellWidgetProps
-local Cell = Class.new(Widget,
-	function(self, input)
-		self.name = self:assertExistsAndCopy(input.name)
-		self.props.children = input.children or input.content or {}
-	end
-)
-Cell.defaultProps = {
-	options = {
-		collapsible = false,
-		columns = 2,
-		makeLink = false,
-		suppressColon = false,
-		separator = '<br />',
-	},
+local Cell = {}
+---@type CellWidgetOptions
+Cell.defaultOptions = {
+	collapsible = false,
+	columns = 2,
+	makeLink = false,
+	suppressColon = false,
+	separator = '<br />',
 }
 
+---@param props CellWidgetProps
 ---@return Widget?
-function Cell:render()
-	if Logic.isEmpty(self.props.children) then
+function Cell.render(props)
+	local name = assert(Logic.nilIfEmpty(props.name))
+	local children = props.children
+	if Logic.isEmpty(children) then
 		return
 	end
 
-	local options = self.props.options
+	---@type CellWidgetOptions
+	local options = setmetatable(props.options or {}, {__index = Cell.defaultOptions})
 
-	local mappedChildren = Array.map(self.props.children, function(child)
+	local mappedChildren = Array.map(props.children, function(child)
 		if options.makeLink then
+			---@cast child string
 			return Link{children = {child}, link = child}
 		else
 			return child
@@ -70,31 +65,29 @@ function Cell:render()
 		return
 	end
 
-	return HtmlWidgets.Div{
-		classes = self.props.classes,
+	return Html.Div{
+		classes = props.classes,
 		children = {
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'infobox-cell-' .. options.columns, 'infobox-description'},
-				children = {self.props.name, not options.suppressColon and ':' or nil}
+				children = {name, not options.suppressColon and ':' or nil}
 			},
-			self:_buildChildrenContainer(mappedChildren)
+			Cell._buildChildrenContainer(mappedChildren, options)
 		}
 	}
 end
 
 ---@private
----@param mappedChildren (string|Widget|Html)[]
+---@param mappedChildren Renderable[]
 ---@return Widget
-function Cell:_buildChildrenContainer(mappedChildren)
-	local options = self.props.options
-
+function Cell._buildChildrenContainer(mappedChildren, options)
 	local widgetProps = {
 		css = {width = (100 * (options.columns - 1) / options.columns) .. '%'}, -- 66.66% for col = 3
 		children = Array.interleave(mappedChildren, options.separator)
 	}
 
 	if not options.collapsible then
-		return HtmlWidgets.Div(widgetProps)
+		return Html.Div(widgetProps)
 	end
 
 	widgetProps.shouldCollapse = true
@@ -114,4 +107,4 @@ function Cell:_buildChildrenContainer(mappedChildren)
 	return GeneralCollapsible(widgetProps)
 end
 
-return Cell
+return Component.component(Cell.render)

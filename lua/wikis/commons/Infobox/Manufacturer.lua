@@ -26,7 +26,7 @@ local Builder = Widgets.Builder
 ---@operator call(Frame): ManufacturerInfobox
 local Manufacturer = Class.new(BasicInfobox)
 
----@return Widget
+---@return VNode
 function Manufacturer:createInfobox()
 	local args = self.args
 

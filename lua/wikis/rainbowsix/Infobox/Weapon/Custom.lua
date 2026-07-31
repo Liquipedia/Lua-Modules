@@ -26,7 +26,7 @@ local CustomInjector = Class.new(Injector)
 local SIZE_OPERATOR = '25x25px'
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomWeapon.run(frame)
 	local weapon = CustomWeapon(frame)
 	weapon:setWidgetInjector(CustomInjector(weapon))
@@ -35,8 +35,8 @@ function CustomWeapon.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return {

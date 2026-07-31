@@ -21,7 +21,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Title = Widgets.Title
@@ -30,13 +30,15 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local MapWL = Lua.import('Module:MapWL')
 
 ---@class RainbowsixMapInfobox: MapInfobox
+---@operator call(Frame): RainbowsixMapInfobox
 local CustomMap = Class.new(Map)
+
 ---@class RainbowsixMapInfoboxWidgetInjector: WidgetInjector
 ---@field caller RainbowsixMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomMap.run(frame)
 	local map = CustomMap(frame)
 	map:setWidgetInjector(CustomInjector(map))
@@ -45,8 +47,8 @@ function CustomMap.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'release' then
@@ -78,7 +80,7 @@ function CustomMap._formatPatchInfoCell(patchData, placeholderText)
 			link = patchData.pageName,
 			children = patchData.displayName
 		},
-		HtmlWidgets.Small{
+		Html.Small{
 			children = {DateExt.toYmdInUtc(patchData.releaseDate)}
 		}
 	}
@@ -125,7 +127,7 @@ function CustomMap._createTeamDisplayWidget(teamType)
 		atk = 'attackTeam',
 		def = 'defenseTeam',
 	}
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = {
 			AutoInlineIcon.display{onlyicon = true, category = 'M', lookup = lookupKey[teamType]},
 			' ',
@@ -174,12 +176,12 @@ function CustomMap:getStatsCells(args)
 		Cell{
 			name = 'Win Rate',
 			children = {
-				HtmlWidgets.Fragment{children = {
+				Html.Fragment{children = {
 					CustomMap._createTeamDisplayWidget('atk'),
 					': ',
 					formatWinRateDisplay(attackWins)
 				}},
-				HtmlWidgets.Fragment{children = {
+				Html.Fragment{children = {
 					CustomMap._createTeamDisplayWidget('def'),
 					': ',
 					formatWinRateDisplay(defenseWins)

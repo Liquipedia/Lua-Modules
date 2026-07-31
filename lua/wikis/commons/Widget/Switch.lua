@@ -7,12 +7,11 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Table = Lua.import('Module:Table')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
 ---@enum SwitchSyncLevel
 local SwitchSyncLevel = {
@@ -24,18 +23,15 @@ local SwitchSyncLevel = {
 ---@class SwitchParameters
 ---@field label string
 ---@field switchGroup string
----@field storeValue boolean
----@field defaultActive boolean
----@field syncLevel SwitchSyncLevel
----@field css table?
+---@field storeValue boolean?
+---@field defaultActive boolean?
+---@field syncLevel SwitchSyncLevel?
+---@field css table<string, string|number?>?
 ---@field content Renderable|Renderable[]?
 ---@field collapsibleSelector string?
 
----@class SwitchWidget: Widget
----@operator call(SwitchParameters): SwitchWidget
----@field props SwitchParameters
-local SwitchWidget = Class.new(Widget)
-SwitchWidget.defaultProps = {
+---@type SwitchParameters
+local defaultProps = {
 	label = '',
 	switchGroup = 'switch',
 	storeValue = true,
@@ -43,14 +39,15 @@ SwitchWidget.defaultProps = {
 	syncLevel = SwitchSyncLevel.site,
 }
 
----@return Widget
-function SwitchWidget:render()
-	local label = self.props.label
-	local switchGroup = self.props.switchGroup
-	local storeValue = self.props.storeValue
-	local defaultActive = self.props.defaultActive
-	local syncLevelInput = self.props.syncLevel
-	local content = self.props.content
+---@param props SwitchParameters
+---@return VNode
+local function SwitchWidget(props)
+	local label = props.label
+	local switchGroup = props.switchGroup
+	local storeValue = props.storeValue
+	local defaultActive = props.defaultActive
+	local syncLevelInput = props.syncLevel
+	local content = props.content
 
 	assert(Table.includes(SwitchSyncLevel, syncLevelInput), 'Invalid syncLevel: ' .. tostring(syncLevelInput))
 	local syncLevel = syncLevelInput
@@ -68,13 +65,13 @@ function SwitchWidget:render()
 		['data-sync-level'] = syncLevel,
 	}
 
-	if self.props.collapsibleSelector then
-		toggleAttributes['data-collapsible-selector'] = self.props.collapsibleSelector
+	if props.collapsibleSelector then
+		toggleAttributes['data-collapsible-selector'] = props.collapsibleSelector
 	end
 
 	local switchElement = Div{
 		classes = switchToggleClasses,
-		css = self.props.css,
+		css = props.css,
 		children = {
 			Div{
 				classes = toggleClasses,
@@ -102,4 +99,4 @@ function SwitchWidget:render()
 	}
 end
 
-return SwitchWidget
+return Component.component(SwitchWidget, defaultProps)

@@ -32,13 +32,13 @@ local Map = Class.new(BasicInfobox)
 
 ---Entry point of map infobox
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Map.run(frame)
 	local map = Map(frame)
 	return map:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Map:createInfobox()
 	local args = self.args
 

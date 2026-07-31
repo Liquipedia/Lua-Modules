@@ -1,4 +1,3 @@
-
 ---
 -- @Liquipedia
 -- page=Module:Infobox/Extension/TeamHistory/SpecialRoles

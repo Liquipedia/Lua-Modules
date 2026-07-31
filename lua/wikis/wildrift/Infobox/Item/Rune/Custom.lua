@@ -19,7 +19,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class WildriftItemInfoboxRune: ItemInfobox
@@ -29,7 +29,7 @@ local CustomItem = Class.new(Item)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomItem.run(frame)
 	local item = CustomItem(frame)
 	item:setWidgetInjector(CustomInjector(item))
@@ -38,8 +38,8 @@ function CustomItem.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -49,7 +49,7 @@ function CustomInjector:parse(id, widgets)
 			args.runename and Center{
 				children = {
 					Template.safeExpand(mw.getCurrentFrame(), 'RuneIcons', {args.runename}),
-					HtmlWidgets.Br{},
+					Html.Br{},
 					args.runetext,
 				},
 			} or nil,

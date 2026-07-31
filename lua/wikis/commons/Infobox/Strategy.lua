@@ -25,13 +25,13 @@ local Customizable = Widgets.Customizable
 local Strategy = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Strategy.run(frame)
 	local strategy = Strategy(frame)
 	return strategy:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Strategy:createInfobox()
 	local args = self.args
 

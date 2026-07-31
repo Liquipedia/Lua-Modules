@@ -8,11 +8,10 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local Label = Lua.import('Module:Widget/Basic/Label')
 local MatchOverview = Lua.import('Module:Widget/Standings/MatchOverview')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
@@ -20,33 +19,29 @@ local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
----@class StandingsSwissWidgetProps
----@field standings StandingsModel
+local Helpers = {}
 
----@class StandingsSwissWidget: Widget
----@operator call(StandingsSwissWidgetProps): StandingsSwissWidget
----@field props StandingsSwissWidgetProps
-local StandingsSwissWidget = Class.new(Widget)
-
----@return Widget?
-function StandingsSwissWidget:render()
-	if not self.props.standings then
+---@param props {standings?: StandingsModel}
+---@return Renderable?
+local function StandingsSwiss(props)
+	local standings = props.standings
+	if not standings then
 		return
 	end
 
-	local standings = self.props.standings
 	local lastRound = standings.rounds[#standings.rounds]
+	local statsToShow = Helpers.statsColumnsToShow(standings)
 
 	return TableWidgets.Table{
 		classes = {'standings-swiss'},
 		title = Logic.nilIfEmpty(standings.title),
-		columns = self:_buildColumnDefinitions(),
+		columns = Helpers.buildColumnDefinitions(standings, statsToShow),
 		children = WidgetUtil.collect(
 			-- Column Header
-			self:_headerRow(),
+			Helpers.headerRow(standings, statsToShow),
 			-- Rows
 			TableWidgets.TableBody{children = Array.map(lastRound.opponents, function(slot)
-				return self:_createRow(slot)
+				return Helpers.createRow(standings, slot, statsToShow)
 			end)}
 		),
 		striped = false
@@ -54,16 +49,31 @@ function StandingsSwissWidget:render()
 end
 
 ---@private
+---@param standings StandingsModel
+---@return {id: string, title: string?}[]
+function Helpers.statsColumnsToShow(standings)
+	local seenStatsBefore = {}
+	return Array.filter(standings.additionalStats, function(tiebreaker)
+		if not tiebreaker.title then
+			return false
+		end
+		if seenStatsBefore[tiebreaker.id] then
+			return false
+		end
+		seenStatsBefore[tiebreaker.id] = true
+		return true
+	end)
+end
+
+---@private
+---@param standings StandingsModel
+---@param statsToShow {id: string, title: string?}[]
 ---@return table[]
-function StandingsSwissWidget:_buildColumnDefinitions()
-	local standings = self.props.standings
+function Helpers.buildColumnDefinitions(standings, statsToShow)
 	return WidgetUtil.collect(
 		{align = 'left'},
 		{align = 'left'},
-		Array.map(standings.tiebreakers, function(tiebreaker)
-			if not tiebreaker.title then
-				return
-			end
+		Array.map(statsToShow, function(tiebreaker)
 			return {align = 'center'}
 		end),
 		Array.rep({align = 'center'}, #standings.rounds)
@@ -71,12 +81,12 @@ function StandingsSwissWidget:_buildColumnDefinitions()
 end
 
 ---@private
----@return Widget
-function StandingsSwissWidget:_headerRow()
-	local standings = self.props.standings
-
+---@param standings StandingsModel
+---@param statsToShow {id: string, title: string?}[]
+---@return Renderable
+function Helpers.headerRow(standings, statsToShow)
 	---@param text string?
-	---@return Widget
+	---@return Renderable
 	local makeHeaderCell = function(text)
 		return TableWidgets.CellHeader{children = text}
 	end
@@ -85,10 +95,7 @@ function StandingsSwissWidget:_headerRow()
 		TableWidgets.Row{children = WidgetUtil.collect(
 			makeHeaderCell('#'),
 			makeHeaderCell('Participant'),
-			Array.map(standings.tiebreakers, function(tiebreaker)
-				if not tiebreaker.title then
-					return
-				end
+			Array.map(statsToShow, function(tiebreaker, index)
 				return makeHeaderCell(tiebreaker.title)
 			end),
 			Array.map(standings.rounds, function(round)
@@ -99,10 +106,10 @@ function StandingsSwissWidget:_headerRow()
 end
 
 ---@private
+---@param standings StandingsModel
 ---@param slot StandingsEntryModel
----@return Widget
-function StandingsSwissWidget:_createRow(slot)
-	local standings = self.props.standings
+---@return Renderable
+function Helpers.createRow(standings, slot, statsToShow)
 	return TableWidgets.Row{
 		attributes = {['data-position-status'] = slot.positionStatus},
 		children = WidgetUtil.collect(
@@ -121,13 +128,10 @@ function StandingsSwissWidget:_createRow(slot)
 					showPlayerTeam = true,
 				}
 			},
-			Array.map(standings.tiebreakers, function(tiebreaker, tiebreakerIndex)
-				if not tiebreaker.title then
-					return
-				end
+			Array.map(statsToShow, function(tiebreaker, tiebreakerIndex)
 				return TableWidgets.Cell{
 					css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil},
-					children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
+					children = slot.additionalStatsValues[tiebreaker.id] and slot.additionalStatsValues[tiebreaker.id].display or ''
 				}
 			end),
 			Array.map(standings.rounds, function(columnRound)
@@ -158,4 +162,4 @@ function StandingsSwissWidget:_createRow(slot)
 	}
 end
 
-return StandingsSwissWidget
+return Component.component(StandingsSwiss)

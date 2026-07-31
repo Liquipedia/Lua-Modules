@@ -25,7 +25,7 @@ local CustomWeapon = Class.new(Weapon)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomWeapon.run(frame)
 	local weapon = CustomWeapon(frame)
 	weapon:setWidgetInjector(CustomInjector(weapon))
@@ -34,8 +34,8 @@ function CustomWeapon.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then

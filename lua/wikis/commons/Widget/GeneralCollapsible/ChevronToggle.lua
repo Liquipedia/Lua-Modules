@@ -7,20 +7,14 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
-
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-local Span = HtmlWidgets.Span
+local Span = Html.Span
 
----@class ChevronToggle: Widget
----@operator call(table?): ChevronToggle
-local ChevronToggle = Class.new(Widget)
-
----@return Widget
-function ChevronToggle:render()
+---@return HtmlNode
+local function ChevronToggle()
 	local expandButton = Button{
 		classes = {'general-collapsible-expand-button'},
 		children = Span{
@@ -51,4 +45,4 @@ function ChevronToggle:render()
 	}
 end
 
-return ChevronToggle
+return Component.component(ChevronToggle)

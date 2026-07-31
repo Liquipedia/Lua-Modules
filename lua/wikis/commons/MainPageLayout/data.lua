@@ -9,7 +9,7 @@ local Lua = require('Module:Lua')
 
 local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 local CONTENT = {
@@ -21,7 +21,7 @@ local CONTENT = {
 	},
 	latestUploads = {
 		heading = 'Latest Uploads',
-		body = HtmlWidgets.Fragment{children = {
+		body = Html.Fragment{children = {
 			mw.getCurrentFrame():preprocess('{{Special:NewFiles|limit=18}}'),
 			'For all latest uploads click ',
 			Link{link = 'Special:NewFiles', children = 'here'}

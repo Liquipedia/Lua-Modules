@@ -1,0 +1,109 @@
+/*******************************************************************************
+Template(s): Liquipedia links
+Author(s): FO-nTTaX, Elysienna
+*******************************************************************************/
+@keyframes badgePopAnimation {
+	0% {
+		transform: scale( 0 );
+	}
+
+	50% {
+		transform: scale( 1.2 );
+	}
+
+	100% {
+		transform: scale( 1 );
+	}
+}
+
+@keyframes badgeTooltipAnimation {
+	0% {
+		transform: translateX( 97% );
+		opacity: 0;
+	}
+
+	20% {
+		transform: translateX( 100% );
+		opacity: 1;
+	}
+
+	90% {
+		transform: translateX( 100% );
+		opacity: 1;
+	}
+
+	99% {
+		transform: translateX( 97% );
+		opacity: 0;
+	}
+
+	100% {
+		visibility: hidden;
+		pointer-events: none;
+	}
+}
+
+.liquipedia-links-badge {
+	position: absolute;
+	top: 0.0625rem;
+	padding: 0.125rem 0.25rem;
+	right: 0;
+	font-size: 0.75rem;
+	display: flex;
+	animation-name: badgePopAnimation;
+	animation-delay: 1s;
+	animation-duration: 0.4s;
+	animation-fill-mode: forwards;
+	transform: scale( 0 );
+	border-radius: 0.5rem;
+
+	&--tooltip {
+		background-color: #ffffff;
+		position: absolute;
+		color: var( --clr-secondary-39 );
+		border-radius: 0.25rem;
+		font-size: 0.75rem;
+		font-family: "Open Sans", sans-serif;
+		font-weight: bold;
+		padding: 0.125rem 0.25rem;
+		top: 0.0625rem;
+		right: -0.5rem;
+		z-index: 1;
+		opacity: 0;
+		box-shadow: 0 0 0.625rem 0 rgba( 0, 0, 0, 0.5 );
+		animation-name: badgePopAnimation;
+		animation-delay: 2s;
+		animation-duration: 4s;
+		animation-fill-mode: forwards;
+		line-height: 1.2;
+
+		@media screen and ( max-width: 767px ) {
+			width: 30vw;
+			white-space: normal;
+		}
+
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0.25rem;
+			left: -0.3125rem;
+			width: 0;
+			height: 0;
+			border-top: 4px solid transparent;
+			border-bottom: 4px solid transparent;
+			border-right: 5px solid var( --clr-primary-100 );
+		}
+	}
+
+	&-mobile {
+		position: relative;
+		top: -5px;
+		padding: 2px 4px;
+		left: 0;
+		margin-right: 3px;
+	}
+}
+
+.menu-italic {
+	font-style: italic;
+}

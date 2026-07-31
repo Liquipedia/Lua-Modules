@@ -8,38 +8,44 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local ExternalMediaLinkDisplay = Lua.import('Module:Widget/ExternalMedia/Link')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local ListWidgets = Lua.import('Module:Widget/List')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local NON_BREAKING_SPACE = '&nbsp;'
 
----@class ExternalMediaListDisplay: Widget
----@operator call(table): ExternalMediaListDisplay
----@field props {data: externalmedialink[], showSubjectTeam: boolean?, showUsUk: boolean?, subject: string?}
-local ExternalMediaListDisplay = Class.new(Widget)
+---@class ExternalMediaListDisplayProps
+---@field data externalmedialink[]
+---@field showSubjectTeam boolean?
+---@field showUsUk boolean?
+---@field subject string?
 
----@return Widget?
-function ExternalMediaListDisplay:render()
-	local data = self.props.data
+local ExternalMediaListDisplay = {}
+
+---@param props ExternalMediaListDisplayProps
+---@return VNode?
+function ExternalMediaListDisplay.render(props)
+	local data = props.data
 	if Logic.isEmpty(data) then
 		return
 	end
-	return UnorderedList{children = Array.map(data, FnUtil.curry(ExternalMediaListDisplay._createListElement, self))}
+	return ListWidgets.Unordered{
+		children = Array.map(data, FnUtil.curry(ExternalMediaListDisplay._createListElement, props))
+	}
 end
 
 ---@private
+---@param props ExternalMediaListDisplayProps
 ---@param item externalmedialink
----@return (string|Widget)[]
-function ExternalMediaListDisplay:_createListElement(item)
+---@return Renderable[]
+function ExternalMediaListDisplay._createListElement(props, item)
 	return WidgetUtil.collect(
 		{
 			mw.text.nowiki('['),
@@ -47,16 +53,16 @@ function ExternalMediaListDisplay:_createListElement(item)
 			mw.text.nowiki(']'),
 			NON_BREAKING_SPACE
 		},
-		self.props.showSubjectTeam and self:_displayTeam(item.date) or nil,
-		ExternalMediaLinkDisplay{data = item, showUsUk = self.props.showUsUk}
+		props.showSubjectTeam and ExternalMediaListDisplay._displayTeam(props.subject, item.date) or nil,
+		ExternalMediaLinkDisplay{data = item, showUsUk = props.showUsUk}
 	)
 end
 
 ---Displays the subject's team for a given External Media Link
+---@param subject string?
 ---@param date string
----@return Widget?
-function ExternalMediaListDisplay:_displayTeam(date)
-	local subject = self.props.subject
+---@return VNode?
+function ExternalMediaListDisplay._displayTeam(subject, date)
 	if Logic.isEmpty(subject) then
 		return
 	end
@@ -68,4 +74,4 @@ function ExternalMediaListDisplay:_displayTeam(date)
 	return OpponentDisplay.InlineTeamContainer{template = team, date = date, style = 'icon'}
 end
 
-return ExternalMediaListDisplay
+return Component.component(ExternalMediaListDisplay.render)

@@ -8,12 +8,12 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local VodLink = Lua.import('Module:VodLink')
 
+local Html = Lua.import('Module:Widget/Html')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -21,12 +21,15 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@class CounterstrikeCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class CounterstrikeMatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): CounterstrikeMatchSummaryGameRow
-local CounterstrikeMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+---@class CounterstrikeMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
+	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay,
+}
+
+local CounterstrikeMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
@@ -40,7 +43,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 	if Logic.isNotEmpty(match.links.vod2) then
 		for _, vod2 in ipairs(match.links.vod2) do
 			local link, gameIndex = unpack(vod2)
-			secondVods[gameIndex] = Array.map(mw.text.split(link, ','), String.trim)
+			secondVods[gameIndex] = Array.parseCommaSeparatedString(link)
 		end
 		match.links.vod2 = nil
 	end
@@ -58,15 +61,15 @@ function CustomMatchSummary.addToFooter(match, footer)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return VNode[]
 function CustomMatchSummary.createBody(match)
 	if Logic.isNotEmpty(match.extradata.status) then
 		match.stream = {rawdatetime = true}
 	end
-	local matchStatusText
-	if match.extradata.status then
-		matchStatusText = '<b>Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '</b>'
-	end
+	local matchStatusText = match.extradata.status and Html.B{children = {
+		'Match ',
+		String.upperCaseFirst(match.extradata.status)
+	}} or nil
 	return WidgetUtil.collect(
 		MatchSummaryWidgets.GamesContainer{
 			children = Array.map(match.games, function (game, gameIndex)
@@ -77,7 +80,7 @@ function CustomMatchSummary.createBody(match)
 			end)
 		},
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
-		MatchSummaryWidgets.MatchComment{children = matchStatusText} or nil
+		MatchSummaryWidgets.MatchComment{children = {matchStatusText}} or nil
 	)
 end
 
@@ -194,15 +197,11 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 	return footer
 end
 
----@return string
-function CounterstrikeMatchSummaryGameRow:createGameOverview()
-	return self:mapDisplay()
-end
-
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Widget
-function CounterstrikeMatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	local game = self.props.game
+---@return VNode
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
+	local game = props.game
 
 	local sides = game.extradata['t' .. opponentIndex .. 'sides']
 	local halfs = game.extradata['t' .. opponentIndex .. 'halfs']
@@ -211,7 +210,7 @@ function CounterstrikeMatchSummaryGameRow:createGameOpponentView(opponentIndex)
 	end)
 
 	return MatchSummaryWidgets.DetailedScore{
-		score = self:scoreDisplay(opponentIndex),
+		score = MatchSummaryWidgets.GameRow.scoreDisplay(game, opponentIndex),
 		partialScores = scores,
 	}
 end

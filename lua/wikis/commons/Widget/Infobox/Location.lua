@@ -15,7 +15,7 @@ local Table = Lua.import('Module:Table')
 local Widget = Lua.import('Module:Widget')
 
 local Cell = Lua.import('Module:Widget/Infobox/Cell')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 
 ---@class InfoboxLocationWidget: Widget
 ---@operator call(table):InfoboxLocationWidget
@@ -42,7 +42,7 @@ function Location:_getLocations()
 	local props = self.props
 	local args = props.args
 	if Logic.isEmpty(args.country) and props.showTbdOnEmpty then
-		return {HtmlWidgets.Abbr{title = 'To be determined (or to be decided)', children = {'TBD'}}}
+		return {Html.Abbr{title = 'To be determined (or to be decided)', children = {'TBD'}}}
 	end
 
 	local locations = {}
@@ -56,7 +56,7 @@ function Location:_getLocations()
 			local location = Logic.nilIfEmpty(args['city' .. index]) or Logic.nilIfEmpty(args['location' .. index])
 			local displayText = Logic.nilIfEmpty(location or Flags.CountryName{flag = country}) or country
 
-			table.insert(locations, HtmlWidgets.Fragment{children = {
+			table.insert(locations, Html.Fragment{children = {
 				Flags.Icon{flag = country, shouldLink = true},
 				'&nbsp;',
 				displayText,

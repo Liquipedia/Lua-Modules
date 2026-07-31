@@ -13,13 +13,13 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
-local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Variables = Lua.import('Module:Variables')
 
 local Platform = Lua.import('Module:Platform')
@@ -57,6 +57,7 @@ local VALID_CONFIDENCES = {
 ---@field chars string[]
 
 ---@class TransferRow: BaseClass
+---@operator call(table): TransferRow
 ---@field config {storage: boolean, isRumour: boolean}
 ---@field transfers transfer[]
 ---@field args table
@@ -66,8 +67,6 @@ local TransferRow = Class.new(
 	---@return self
 	function(self, args)
 		self.args = args
-
-		return self
 	end
 )
 
@@ -115,6 +114,7 @@ function TransferRow:readInput()
 	return transfers
 end
 
+---@private
 ---@return table
 function TransferRow:_readBaseData()
 	local args = self.args
@@ -126,7 +126,7 @@ function TransferRow:_readBaseData()
 	---@param teamInput string
 	---@return {name: string?, template: string?}
 	local checkTeam = function(dateInput, teamInput)
-		local teamData = Logic.isNotEmpty(teamInput) and mw.ext.TeamTemplate.raw(teamInput, dateInput)
+		local teamData = Logic.isNotEmpty(teamInput) and TeamTemplate.getRawOrNil(teamInput, dateInput)
 		if not teamData then
 			return {}
 		end
@@ -186,7 +186,8 @@ function TransferRow:_readBaseData()
 	}
 end
 
----@return {}
+---@private
+---@return {confirmed: string?, confidence: string?, isRumour: boolean?}
 function TransferRow:_getRumourInformation()
 	if not self.config.isRumour then return {} end
 
@@ -212,6 +213,7 @@ function TransferRow:readPlatform()
 	return self.args.platform
 end
 
+---@private
 ---@param dateInput string?
 ---@return string?
 function TransferRow._shiftDate(dateInput)
@@ -250,6 +252,7 @@ function TransferRow:readPlayer(playerIndex)
 	}
 end
 
+---@private
 ---@param data {player: transferPlayer, index: integer|string, sortIndex: integer}
 ---@return transfer
 function TransferRow:_convertToTransferStructure(data)
@@ -307,6 +310,7 @@ function TransferRow:readIconsAndPosition(playerIndex)
 	return icons, positions
 end
 
+---@private
 ---@param numberOfPlayers integer
 ---@return table
 function TransferRow:_readReferences(numberOfPlayers)
@@ -341,18 +345,16 @@ function TransferRow:store()
 	return self
 end
 
+---@private
 ---@param transfer transfer
 ---@return string
 function TransferRow._objectName(transfer)
 	return 'transfer_' .. transfer.date .. '_' .. string.format('%06d', transfer.extradata.sortindex)
 end
 
----@return Widget?
+---@return VNode
 function TransferRow:build()
-	return TransferRowWidget{
-		transfers = self.transfers,
-		showTeamName = (Info.config.transfers or {}).showTeamName
-	}
+	return TransferRowWidget{transfers = self.transfers}
 end
 
 return TransferRow

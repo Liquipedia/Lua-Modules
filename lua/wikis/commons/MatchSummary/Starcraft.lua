@@ -14,10 +14,10 @@ local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Custom')
+local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Custom') --[[@as StarcraftMatchGroupUtil]]
 local VetoLabel = Lua.import('Module:Widget/Match/Summary/VetoLabel')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -32,7 +32,7 @@ local TBD = 'TBD'
 local StarcraftMatchSummary = {}
 
 ---@param args {bracketId: string, matchId: string, config: table?}
----@return Html
+---@return Renderable
 function StarcraftMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(StarcraftMatchSummary, args, {width = '380px'})
 end
@@ -53,7 +53,7 @@ function StarcraftMatchSummary.createBody(match)
 			or Array.map(match.games, FnUtil.curry(StarcraftMatchSummary.Game, {})),
 		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
 			css = {['text-align'] = 'center'},
-			children = {HtmlWidgets.B{children = {'Vetoes'}}},
+			children = {Html.B{children = {'Vetoes'}}},
 		} or nil,
 		Array.map(match.vetoes or {}, StarcraftMatchSummary.Veto) or nil
 	)
@@ -130,14 +130,14 @@ function StarcraftMatchSummary.Game(options, game)
 		end
 	end
 
-	local rowWidget = options.isPartOfSubMatch and HtmlWidgets.Div or MatchSummaryWidgets.Row
+	local rowWidget = options.isPartOfSubMatch and Html.Div or MatchSummaryWidgets.Row
 
 	return rowWidget{
 		classes = {'brkts-popup-body-game'},
 		css = {width = options.isPartOfSubMatch and '100%' or nil},
 		children = WidgetUtil.collect(
 			game.header and {
-				HtmlWidgets.Div{css = {margin = 'auto'}, children = {game.header}},
+				Html.Div{css = {margin = 'auto'}, children = {game.header}},
 				MatchSummaryWidgets.Break{},
 			} or nil,
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
@@ -157,7 +157,7 @@ end
 ---@param factions string[]
 ---@return Html
 function StarcraftMatchSummary.OffFactionIcons(factions)
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'brkts-popup-sc-game-offrace-icons brkts-popup-spaced'},
 		children = Array.map(factions, function(faction)
 			return Faction.Icon{size = '12px', faction = faction}
@@ -173,7 +173,7 @@ function StarcraftMatchSummary.TeamSubmatch(submatch)
 		css = {gap = '0.25rem'},
 		children = WidgetUtil.collect(
 			submatch.header and {
-				HtmlWidgets.Div{css = {margin = 'auto', ['font-weight'] = 'bold'}, children = {submatch.header}},
+				Html.Div{css = {margin = 'auto', ['font-weight'] = 'bold'}, children = {submatch.header}},
 				MatchSummaryWidgets.Break{},
 			} or nil,
 			StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch),
@@ -205,7 +205,7 @@ function StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch)
 		}
 	end
 
-	---@param opponentIndex any
+	---@param opponentIndex integer
 	---@param additionalClasses string[]?
 	---@return Widget
 	local createScore = function(opponentIndex, additionalClasses)
@@ -216,18 +216,18 @@ function StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch)
 		}
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'brkts-popup-header-dev'},
 		css = {['justify-content'] = 'center', margin = 'auto'},
 		children = WidgetUtil.collect(
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'brkts-popup-header-opponent', 'brkts-popup-header-opponent-left'},
 				children = {
 					createOpponent(1),
 					createScore(1, {'brkts-popup-header-opponent-score-left'}),
 				},
 			},
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'brkts-popup-header-opponent', 'brkts-popup-header-opponent-right'},
 				children = {
 					createScore(2, {'brkts-popup-header-opponent-score-right'}),
@@ -260,15 +260,15 @@ function StarcraftMatchSummary.Veto(veto)
 			['align-items'] = 'center',
 		},
 		children = {
-			HtmlWidgets.Div{
+			Html.Div{
 				css = {['text-align'] = 'left'},
 				children = statusIcon(1),
 			},
-			HtmlWidgets.Div{
+			Html.Div{
 				css = {['text-align'] = 'center'},
 				children = {map},
 			},
-			HtmlWidgets.Div{
+			Html.Div{
 				css = {['text-align'] = 'right'},
 				children = statusIcon(2),
 			}

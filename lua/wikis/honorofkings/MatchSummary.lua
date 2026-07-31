@@ -8,12 +8,10 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MAX_NUM_BANS = 5
 local NUM_CHAMPIONS_PICK = 5
@@ -21,18 +19,21 @@ local NUM_CHAMPIONS_PICK = 5
 ---@class HoKCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class HoKMatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): HoKMatchSummaryGameRow
-local HoKMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+---@class HoKMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
+	createGameOverview = MatchSummaryWidgets.GameRow.lengthDisplay,
+}
+
+local HoKMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px', teamStyle = 'bracket'})
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return VNode[]
 function CustomMatchSummary.createBody(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
@@ -46,7 +47,7 @@ function CustomMatchSummary.createBody(match)
 		end)
 	end
 
-	return WidgetUtil.collect(
+	return {
 		MatchSummaryWidgets.GamesContainer{
 			children = Array.map(match.games, function (game, gameIndex)
 				if Logic.isEmpty(game.length) and Logic.isEmpty(game.winner) and not hasCharacterData(game) then
@@ -57,18 +58,13 @@ function CustomMatchSummary.createBody(match)
 		},
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	)
+	}
 end
 
----@return Renderable?
-function HoKMatchSummaryGameRow:createGameOverview()
-	return self:lengthDisplay()
-end
-
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Widget
-function HoKMatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	local props = self.props
+---@return VNode
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local extradata = game.extradata or {}
 

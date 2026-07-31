@@ -243,7 +243,7 @@ $team-icon-size: 22px;
 				flex: 1;
 			}
 
-			& .btn {
+			& .button {
 				width: 100%;
 			}
 
@@ -272,7 +272,7 @@ $team-icon-size: 22px;
 			background-color: var( --clr-on-surface-dark-primary-8 );
 		}
 
-		.btn {
+		.button {
 			.theme--light & {
 				background-color: var( --clr-secondary-100 );
 			}

@@ -46,7 +46,8 @@ local SECONDS_PER_DAY = 86400
 function DateExt.readTimestamp(dateInput)
 	if type(dateInput) == 'table' then
 		-- in this case we have osdate really being osdateparam
-		return tonumber(os.time(dateInput --[[@as osdateparam]]))
+		---@cast dateInput osdateparam
+		return os.time(dateInput)
 	end
 
 	if Logic.isEmpty(dateInput) then
@@ -191,7 +192,16 @@ function DateExt.parseIsoDate(str)
 		day = 1
 	end
 	-- create simplified osdate
-	return {year = year, month = month, day = day}
+	return {
+		year = year,
+		month = month,
+		day = day,
+		--[[
+		Lua uses 12 as fallback of hour but we expect hour to be set to 0.
+		See https://github.com/Liquipedia/Lua-Modules/issues/7639
+		]]
+		hour = 0,
+	}
 end
 
 --- Converts a timezone offset (e.g. `+2:00`) to a UTC offset in seconds.

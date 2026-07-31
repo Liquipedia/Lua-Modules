@@ -17,14 +17,14 @@ local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournam
 local CustomTeam = Class.new(Team)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 
 	return team:createInfobox()
 end
 
----@return Widget?
+---@return VNode?
 function CustomTeam:createBottomContent()
 	return UpcomingTournaments.team{name = self.teamTemplate.templatename}
 end

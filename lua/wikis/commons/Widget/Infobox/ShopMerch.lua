@@ -7,26 +7,16 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 
-local Widget = Lua.import('Module:Widget')
-
+local Component = Lua.import('Module:Widget/Component')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local Center = Lua.import('Module:Widget/Infobox/Center')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Title = Lua.import('Module:Widget/Infobox/Title')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
----@class InfoboxShopMerchWidget: Widget
----@operator call(table): InfoboxShopMerchWidget
----@field args table<string, string>
-local ShopMerch = Class.new(Widget)
-ShopMerch.defaultProps = {
-	args = {},
-}
 
 local TARGET_HOST = 'links.liquipedia.net'
 
@@ -67,9 +57,10 @@ local function normalizeAndValidateShopLink(shopLink)
 	return url
 end
 
----@return Widget[]?
-function ShopMerch:render()
-	local args = self.props.args or {}
+---@param props {args: table<string, string>}
+---@return VNode[]?
+local function ShopMerch(props)
+	local args = props.args or {}
 
 	local rawShopLink = String.trim(args.shoplink or '')
 	if Logic.isEmpty(rawShopLink) then
@@ -100,4 +91,4 @@ function ShopMerch:render()
 	}
 end
 
-return ShopMerch
+return Component.component(ShopMerch)

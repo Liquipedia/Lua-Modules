@@ -12,7 +12,7 @@ local Class = Lua.import('Module:Class')
 local Variables = Lua.import('Module:Variables')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
-local HtmlWidget = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Widget = Lua.import('Module:Widget')
 
 ---@class WantToHelpList: Widget
@@ -31,8 +31,8 @@ function WantToHelpList:render()
 
 	todos = Array.sub(Array.randomize(todos), 1, limit)
 
-	return HtmlWidget.Ul{children = Array.map(todos, function(todo)
-		return HtmlWidget.Li{
+	return Html.Ul{children = Array.map(todos, function(todo)
+		return Html.Li{
 			children = {
 				Link{link = todo.pagename, children = {todo.name}},
 				': ',

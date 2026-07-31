@@ -8,16 +8,16 @@
 local Lua = require('Module:Lua')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Li = HtmlWidgets.Li
-local Ul = HtmlWidgets.Ul
+local Html = Lua.import('Module:Widget/Html')
+local Li = Html.Li
+local Ul = Html.Ul
 
 local CONTENT = {
 	contribute = {
 		heading = 'Want to Contribute?',
 		body = Ul{children = {
 			Li{
-				children = HtmlWidgets.B{children = Link{
+				children = Html.B{children = Link{
 					link = 'Support/Getting started',
 					children = 'Getting started'
 				}}
@@ -43,7 +43,7 @@ local CONTENT = {
 	},
 	liquipedia = {
 		heading = 'Liquipedia',
-		body = HtmlWidgets.Fragment{children = {
+		body = Html.Fragment{children = {
 			Ul{children = {
 				Li{children = Link{
 					link = 'Support/Liquipedia',
@@ -62,31 +62,31 @@ local CONTENT = {
 					children = 'Community Showcase',
 				}},
 			}},
-			HtmlWidgets.Br{classes = {'mobile-hide'}},
+			Html.Br{classes = {'mobile-hide'}},
 		}},
 		padding = true,
 	},
 	dev = {
 		heading = 'LP Dev',
-		body = HtmlWidgets.Fragment{children = {
+		body = Html.Fragment{children = {
 			Ul{children = {
 				Li{children = Link{
 					link = 'Liquipedia:Changelogs',
 					children = 'Dev updates',
 				}},
 			}},
-			HtmlWidgets.Br{classes = {'mobile-hide'}},
-			HtmlWidgets.Br{classes = {'mobile-hide'}},
-			HtmlWidgets.Br{classes = {'mobile-hide'}},
+			Html.Br{classes = {'mobile-hide'}},
+			Html.Br{classes = {'mobile-hide'}},
+			Html.Br{classes = {'mobile-hide'}},
 		}},
 		padding = true,
 	},
 	contact = {
 		heading = 'Contact',
-		body = HtmlWidgets.Fragment{children = {
+		body = Html.Fragment{children = {
 			Ul{children = {
 				Li{
-					children = HtmlWidgets.B{children = Link{
+					children = Html.B{children = Link{
 						link = 'https://discord.gg/liquipedia',
 						children = 'Join our Discord',
 						linktype = 'external',
@@ -100,7 +100,7 @@ local CONTENT = {
 					link = 'Contact',
 				}},
 			}},
-			HtmlWidgets.Br{classes = {'mobile-hide'}},
+			Html.Br{classes = {'mobile-hide'}},
 		}},
 		padding = true,
 	},

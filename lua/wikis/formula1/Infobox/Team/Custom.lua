@@ -42,7 +42,7 @@ local STATISTICS = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
@@ -51,8 +51,8 @@ function CustomTeam.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 

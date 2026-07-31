@@ -5,6 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+---@type TierData
 return {
 	tiers = {
 		{

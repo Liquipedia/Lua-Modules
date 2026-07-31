@@ -13,10 +13,10 @@ local Logic = Lua.import('Module:Logic')
 local Variables = Lua.import('Module:Variables')
 local VersionDisplay = Lua.import('Module:Infobox/Extension/VersionDisplay')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Weapon = Lua.import('Module:Infobox/Weapon')
 
-local Widgets = Lua.import('Module:Infobox/Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class FortniteWeaponInfobox: WeaponInfobox
@@ -28,7 +28,7 @@ local CustomInjector = Class.new(Injector)
 local HARVESTING_TOOL = 'Harvesting Tool'
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomWeapon.run(frame)
 	local weapon = CustomWeapon(frame)
 	local args = weapon.args
@@ -43,8 +43,8 @@ function CustomWeapon.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -76,7 +76,7 @@ end
 function CustomWeapon:_createDescription()
 	local rarities = self:getAllArgsForBase(self.args, 'rarity')
 	local weaponType = self.args.type == HARVESTING_TOOL and HARVESTING_TOOL or 'Weapons'
-	local description = '<b>' .. self.name .. '</b> is a ' .. weaponType .. ' that is available in  '
+	local description = '<b>' .. self.name .. '</b> is a ' .. weaponType .. ' that is available in '
 		.. mw.text.listToText(rarities, ', ', ' and ')
 		.. ' ' .. (#rarities > 1 and 'rarities' or 'rarity') .. '.'
 

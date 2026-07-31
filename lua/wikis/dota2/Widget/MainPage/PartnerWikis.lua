@@ -13,8 +13,8 @@ local Widget = Lua.import('Module:Widget')
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local Html = Lua.import('Module:Widget/Html')
+local ListWidgets = Lua.import('Module:Widget/List')
 
 ---@class Dota2PartnerWikis: Widget
 ---@operator call(table): Dota2PartnerWikis
@@ -25,7 +25,7 @@ function Dota2PartnerWikis:render()
 	---@param props {image: string, link: string, caption: string, description: string}
 	---@return Widget
 	local function createCellHeader(props)
-		return HtmlWidgets.Th{
+		return Html.Th{
 			attributes = {width = '17%'},
 			children = {
 				IconImage{
@@ -34,9 +34,9 @@ function Dota2PartnerWikis:render()
 					size = '60px',
 					caption = props.caption,
 				},
-				HtmlWidgets.Br{},
-				HtmlWidgets.Small{
-					children = HtmlWidgets.I{children = props.description}
+				Html.Br{},
+				Html.Small{
+					children = Html.I{children = props.description}
 				}
 			}
 		}
@@ -47,8 +47,8 @@ function Dota2PartnerWikis:render()
 		tableAttributes = {width = '100%'},
 		tableCss = {['text-align'] = 'center'},
 		children = {
-			HtmlWidgets.Tr{children = {
-				HtmlWidgets.Th{
+			Html.Tr{children = {
+				Html.Th{
 					attributes = {
 						rowspan = 2,
 						width = '15%',
@@ -90,40 +90,40 @@ function Dota2PartnerWikis:render()
 					description = 'Dota 2 Game + E-Sports',
 				},
 			}},
-			HtmlWidgets.Tr{children = {
-				HtmlWidgets.Td{children = Link{
+			Html.Tr{children = {
+				Html.Td{children = Link{
 					linktype = 'external',
 					link = 'https://combineoverwiki.net/wiki/Main_Page',
 					children = 'Combine OverWiki',
 				}},
-				HtmlWidgets.Td{children = Link{
+				Html.Td{children = Link{
 					linktype = 'external',
 					link = 'https://left4deadwiki.com/wiki/Left_4_Dead_Wiki',
 					children = 'Left 4 Dead Wiki',
 				}},
-				HtmlWidgets.Td{children = Link{
+				Html.Td{children = Link{
 					linktype = 'external',
 					link = 'https://theportalwiki.com/wiki/Main_Page',
 					children = 'Portal Wiki',
 				}},
-				HtmlWidgets.Td{children = Link{
+				Html.Td{children = Link{
 					linktype = 'external',
 					link = 'https://wiki.teamfortress.com/wiki/Main_Page',
 					children = 'Team Fortress Wiki',
 				}},
-				HtmlWidgets.Td{children = Link{
+				Html.Td{children = Link{
 					link = 'Main Page',
 					children = 'Dota 2 Wiki'
 				}}
 			}},
-			HtmlWidgets.Tr{children = {
-				HtmlWidgets.Th{
+			Html.Tr{children = {
+				Html.Th{
 					children = Link{link = 'Dota 2 Wiki Partners', children = 'Other Partners'}
 				},
-				HtmlWidgets.Td{
+				Html.Td{
 					attributes = {colspan = 5},
 					css = {['text-align'] = 'left'},
-					children = UnorderedList{children = {
+					children = ListWidgets.Unordered{children = {
 						{
 							IconImage{
 								imageLight = 'Dota 2 Partners IWF.png',

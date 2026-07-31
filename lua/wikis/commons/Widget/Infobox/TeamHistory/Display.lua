@@ -22,13 +22,13 @@ local Variables = Lua.import('Module:Variables')
 local Widget = Lua.import('Module:Widget')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Fragment = HtmlWidgets.Fragment
-local Span = HtmlWidgets.Span
-local Tbl = HtmlWidgets.Table
-local Td = HtmlWidgets.Td
-local Th = HtmlWidgets.Th
-local Tr = HtmlWidgets.Tr
+local Html = Lua.import('Module:Widget/Html')
+local Fragment = Html.Fragment
+local Span = Html.Span
+local Tbl = Html.Table
+local Td = Html.Td
+local Th = Html.Th
+local Tr = Html.Tr
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local SPECIAL_ROLES = Lua.import('Module:Infobox/Extension/TeamHistory/SpecialRoles', {loadData = true})

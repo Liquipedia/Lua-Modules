@@ -8,37 +8,33 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class MatchSummaryCasters: Widget
----@operator call(table): MatchSummaryCasters
-local MatchSummaryCasters = Class.new(Widget)
-
----@return Widget?
-function MatchSummaryCasters:render()
-	if type(self.props.casters) ~= 'table' then
-		return nil
+---@param props {casters: {name: string?, displayName: string?, flag: string?}[]}
+---@return VNode?
+local function MatchSummaryCasters(props)
+	if type(props.casters) ~= 'table' then
+		return
 	end
 
-	local casters = DisplayHelper.createCastersDisplay(self.props.casters)
+	local casters = DisplayHelper.createCastersDisplay(props.casters)
 
 	if #casters == 0 then
-		return nil
+		return
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'brkts-popup-comment'},
 		children = WidgetUtil.collect(
-			HtmlWidgets.B{children = {#casters > 1 and 'Casters: ' or 'Caster: '}},
+			Html.B{children = {#casters > 1 and 'Casters: ' or 'Caster: '}},
 			Array.interleave(casters, ', ')
 		),
 	}
 end
 
-return MatchSummaryCasters
+return Component.component(MatchSummaryCasters)

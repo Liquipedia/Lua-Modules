@@ -12,10 +12,11 @@ local Class = Lua.import('Module:Class')
 local Show = Lua.import('Module:Infobox/Show')
 
 ---@class CustomShowInfobox: ShowInfobox
+---@operator call(Frame): CustomShowInfobox
 local CustomShow = Class.new(Show)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomShow.run(frame)
 	local customShow = CustomShow(frame)
 	return customShow:createInfobox()

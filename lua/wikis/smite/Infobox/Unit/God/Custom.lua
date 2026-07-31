@@ -33,7 +33,7 @@ local FAVOR_ICON = '[[File:Smite Currency Favor.png|x20px|Favor|link=Favor]]'
 local GEMS_ICON = '[[File:Smite Currency Gems.png|x20px|Gems|link=Gems]]'
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomGod.run(frame)
 	local unit = CustomGod(frame)
 	unit:setWidgetInjector(CustomInjector(unit))
@@ -43,8 +43,8 @@ function CustomGod.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'header' then

@@ -37,7 +37,7 @@ local StandingsTable = {}
 ---@field startingPoints number?
 
 ---@param frame Frame
----@return Widget
+---@return Renderable
 function StandingsTable.fromTemplate(frame)
 	local args = Arguments.getArgs(frame)
 	local tableType = args.tabletype

@@ -104,7 +104,7 @@ function StandingTableLegacyFfa.templateEnd(frame)
 		return
 	end
 	Variables.varDefine('standings_legacy_start', nil)
-	local slots = Array.map(Array.range(1, cnt), function(index)
+	local slots = Array.mapRange(1, cnt, function(index)
 		local data = (Json.parseIfString(Variables.varDefault('standings_legacy_slot_' .. index)))
 		Variables.varDefine('standings_legacy_slot_' .. index, nil)
 		return data

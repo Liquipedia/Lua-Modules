@@ -26,7 +26,7 @@ local ConditionUtil = Condition.Util
 local ListingConditions = Lua.import('Module:TournamentsListing/Conditions')
 local TournamentsListing = Lua.import('Module:TournamentsListing/CardList')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 
 local DEFAULT_START_YEAR = Info.startYear
 local DEFAULT_END_YEAR = DateExt.getYearOf()
@@ -86,12 +86,12 @@ function CustomTournamentsListing.byYear(args)
 		local tournaments = CustomTournamentsListing(Table.merge(args, {year = year})):create():build()
 		if not tournaments then return end
 		Array.appendWith(children,
-			HtmlWidgets.H3{children = year},
+			Html.H3{children = year},
 			tournaments
 		)
 	end)
 
-	return HtmlWidgets.Fragment{children = children}
+	return Html.Fragment{children = children}
 end
 
 ---@param frame Frame

@@ -11,8 +11,8 @@ local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local LiquipediaApp = Lua.import('Module:Widget/MainPage/LiquipediaApp')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')

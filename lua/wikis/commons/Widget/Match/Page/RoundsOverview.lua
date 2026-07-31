@@ -8,12 +8,11 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
@@ -24,34 +23,31 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 ---@field opponent1 standardOpponent
 ---@field opponent2 standardOpponent
 
----@class MatchPageRoundsOverview: Widget
----@operator call(MatchPageRoundsOverviewProps): MatchPageRoundsOverview
----@field props MatchPageRoundsOverviewProps
-local MatchPageRoundsOverview = Class.new(Widget)
 
----@return Widget?
-function MatchPageRoundsOverview:render()
-	if not self.props.rounds then
+---@param props MatchPageRoundsOverviewProps
+---@return VNode?
+local function MatchPageRoundsOverview(props)
+	if not props.rounds then
 		return
 	end
-	assert(self.props.iconRender, 'MatchPageRoundsOverview: iconRender prop is required')
-	local roundsPerHalf = self.props.roundsPerHalf
+	assert(props.iconRender, 'MatchPageRoundsOverview: iconRender prop is required')
+	local roundsPerHalf = props.roundsPerHalf
 	assert(roundsPerHalf, 'MatchPageRoundsOverview: roundsPerHalf prop is required')
 	local function makeIcon(round, side)
 		if round.winningSide == side then
-			return self.props.iconRender(side, round.winBy)
+			return props.iconRender(side, round.winBy)
 		end
 		return '&nbsp;'
 	end
 
-	local numTeamContainers = math.ceil(#self.props.rounds / roundsPerHalf)
+	local numTeamContainers = math.ceil(#props.rounds / roundsPerHalf)
 
 	local scoreForContainer = function(container, team)
 		local start = (container - 1) * roundsPerHalf + 1
-		local endIdx = math.min(container * roundsPerHalf, #self.props.rounds)
+		local endIdx = math.min(container * roundsPerHalf, #props.rounds)
 
 		return Array.reduce(
-			Array.sub(self.props.rounds, start, endIdx),
+			Array.sub(props.rounds, start, endIdx),
 			function(acc, round)
 				if round.winningSide == round['t' .. team .. 'side'] then
 					return acc + 1
@@ -65,12 +61,12 @@ function MatchPageRoundsOverview:render()
 	local sideInContainer = function(container, team)
 		local start = (container - 1) * roundsPerHalf + 1
 
-		local round = self.props.rounds[start]
+		local round = props.rounds[start]
 		if not round then return '' end
 		return round['t' .. team .. 'side']
 	end
 
-	local teamContainers = Array.map(Array.range(1, numTeamContainers), function(container)
+	local teamContainers = Array.mapRange(1, numTeamContainers, function(container)
 		return Div{
 			classes = {'match-bm-rounds-overview-teams'},
 			children = {
@@ -78,7 +74,7 @@ function MatchPageRoundsOverview:render()
 				Div{
 					classes = {'match-bm-rounds-overview-teams-team'},
 					children = {
-						OpponentDisplay.InlineOpponent{opponent = self.props.opponent1, teamStyle = 'icon'},
+						OpponentDisplay.InlineOpponent{opponent = props.opponent1, teamStyle = 'icon'},
 						Div{
 							classes = {
 								'match-bm-rounds-overview-teams-score',
@@ -91,7 +87,7 @@ function MatchPageRoundsOverview:render()
 				Div{
 					classes = {'match-bm-rounds-overview-teams-team'},
 					children = {
-						OpponentDisplay.InlineOpponent{opponent = self.props.opponent2, teamStyle = 'icon'},
+						OpponentDisplay.InlineOpponent{opponent = props.opponent2, teamStyle = 'icon'},
 						Div{
 							classes = {
 								'match-bm-rounds-overview-teams-score',
@@ -105,7 +101,7 @@ function MatchPageRoundsOverview:render()
 		}
 	end)
 
-	return HtmlWidgets.Div{
+	return Div{
 		classes = {'match-bm-rounds-overview'},
 		children = WidgetUtil.collect(
 			Div{
@@ -114,7 +110,7 @@ function MatchPageRoundsOverview:render()
 			},
 			Div{
 				classes = {'match-bm-rounds-overview-round-container'},
-				children = Array.map(self.props.rounds, function(round)
+				children = Array.map(props.rounds, function(round)
 					return Div{
 						classes = {'match-bm-rounds-overview-round'},
 						children = WidgetUtil.collect(
@@ -129,4 +125,4 @@ function MatchPageRoundsOverview:render()
 	}
 end
 
-return MatchPageRoundsOverview
+return Component.component(MatchPageRoundsOverview)

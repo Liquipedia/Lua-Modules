@@ -9,8 +9,8 @@ local Lua = require('Module:Lua')
 
 local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')

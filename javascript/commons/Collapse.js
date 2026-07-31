@@ -23,7 +23,7 @@ liquipedia.collapse = {
 	makeDesignButton: function( collapsible, isShow ) {
 		const title = ( isShow ? 'Show' : 'Hide' );
 		const button = document.createElement( 'button' );
-		button.classList.add( 'collapseButton', 'btn', 'btn-secondary', 'btn-extrasmall' );
+		button.classList.add( 'collapseButton', 'button', 'button--secondary', 'button--extrasmall' );
 		button.classList.add( isShow ? 'collapseButtonShow' : 'collapseButtonHide' );
 		button.setAttribute( 'role', 'button' );
 		button.setAttribute( 'aria-label', title );
@@ -112,7 +112,7 @@ liquipedia.collapse = {
 			// Can pass empty string for "no exclusions" (everything toggles collapse)
 			const exclusionSelector = region.getAttribute( 'data-collapsible-exclude' ) || 'a';
 
-			region.addEventListener( 'click', ( event ) => {
+			const toggleCollapsible = ( event ) => {
 				if ( exclusionSelector ) {
 					const clickedExcluded = event.target.closest( exclusionSelector );
 
@@ -125,6 +125,27 @@ liquipedia.collapse = {
 				if ( collapsible ) {
 					event.preventDefault();
 					collapsible.classList.toggle( 'collapsed' );
+					if ( region.hasAttribute( 'aria-expanded' ) ) {
+						const isExpanded = !collapsible.classList.contains( 'collapsed' );
+						region.setAttribute( 'aria-expanded', String( isExpanded ) );
+					}
+				}
+			};
+
+			region.setAttribute( 'tabindex', '0' );
+			// role="button" makes child elements presentational, so only set it
+			// on regions without interactive children (e.g. links)
+			if ( !exclusionSelector || region.querySelector( exclusionSelector ) === null ) {
+				const collapsible = region.closest( '.general-collapsible' );
+				const isExpanded = collapsible !== null && !collapsible.classList.contains( 'collapsed' );
+				region.setAttribute( 'role', 'button' );
+				region.setAttribute( 'aria-expanded', String( isExpanded ) );
+			}
+
+			region.addEventListener( 'click', toggleCollapsible );
+			region.addEventListener( 'keydown', ( event ) => {
+				if ( event.key === 'Enter' || event.key === ' ' ) {
+					toggleCollapsible( event );
 				}
 			} );
 		} );
@@ -153,7 +174,7 @@ liquipedia.collapse = {
 				hideAllText = 'Hide all';
 			}
 			const button = document.createElement( 'button' );
-			button.classList.add( 'btn', 'btn-secondary', 'btn-small' );
+			button.classList.add( 'button', 'button--secondary', 'button--small' );
 			if ( toggleGroup.classList.contains( 'toggle-state-hide' ) ) {
 				button.innerHTML = this.makeIcon( false ) + ' ' + hideAllText;
 			} else {
@@ -198,7 +219,7 @@ liquipedia.collapse = {
 					} else {
 						box.classList.add( 'dropdown-box-visible' );
 						toggleActive = true;
-						box.querySelectorAll( '.btn' ).forEach( ( btn ) => {
+						box.querySelectorAll( '.button' ).forEach( ( btn ) => {
 							btn.addEventListener( 'click', () => {
 								dropdownButton.innerHTML = btn.textContent + ' <span class="caret"></span>';
 								box.classList.remove( 'dropdown-box-visible' );

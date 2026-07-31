@@ -16,7 +16,7 @@ local PlacementStats = Lua.import('Module:Infobox/Extension/PlacementStats')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -25,7 +25,7 @@ local CustomTeam = Class.new(Team)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
@@ -40,15 +40,15 @@ end
 
 ---@return string?
 function CustomTeam:createBottomContent()
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+	return Html.Fragment{children = WidgetUtil.collect(
 		not self.args.disbanded and UpcomingTournaments.team{name = self.teamTemplate.templatename} or nil,
 		PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}}
 	)}
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 

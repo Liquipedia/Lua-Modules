@@ -7,36 +7,27 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
-
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
 ---@class MatchPagePlayerStatContainerParameters
 ---@field columns integer
----@field children? string|Html|Widget|(string|Html|Widget)[]
+---@field children? Renderable|Renderable[]
 
----@class MatchPagePlayerStatContainer: Widget
----@operator call(MatchPagePlayerStatContainerParameters): MatchPagePlayerStatContainer
----@field props MatchPagePlayerStatContainerParameters
-local MatchPagePlayerStatContainer = Class.new(Widget)
-MatchPagePlayerStatContainer.defaultProps = {
-	columns = 6
-}
-
----@return Widget
-function MatchPagePlayerStatContainer:render()
+---@param props MatchPagePlayerStatContainerParameters
+---@return VNode
+local function MatchPagePlayerStatContainer(props)
 	return Div{
 		classes = {'match-bm-players-player-stats-container'},
 		children = Div{
 			classes = {
 				'match-bm-players-player-stats',
-				'match-bm-players-player-stats--col-' .. self.props.columns
+				'match-bm-players-player-stats--col-' .. props.columns
 			},
-			children = self.props.children
+			children = props.children
 		}
 	}
 end
 
-return MatchPagePlayerStatContainer
+return Component.component(MatchPagePlayerStatContainer, {columns = 6})

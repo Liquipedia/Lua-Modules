@@ -14,10 +14,11 @@ local Namespace = Lua.import('Module:Namespace')
 local UnofficialWorldChampion = Lua.import('Module:Infobox/UnofficialWorldChampion')
 
 ---@class RocketLeagueUnofficialWorldChampionInfobox: UnofficialWorldChampionInfobox
+---@operator call(Frame): RocketLeagueUnofficialWorldChampionInfobox
 local CustomUnofficialWorldChampion = Class.new(UnofficialWorldChampion)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomUnofficialWorldChampion.run(frame)
 	local unofficialWorldChampion = CustomUnofficialWorldChampion(frame)
 	return unofficialWorldChampion:createInfobox()

@@ -7,7 +7,7 @@
 
 local Lua = require('Module:Lua')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 local VERSION_DATA = {
@@ -39,15 +39,15 @@ function VersionDisplay.run(input)
 	local versionData = VERSION_DATA[input]
 	if not versionData then return input end
 
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = {
 			Link{
 				link = 'Version ' .. versionData.version,
 				children = {versionData.version},
 			},
 			'&nbsp;',
-			HtmlWidgets.I{
-				children = {HtmlWidgets.Small{
+			Html.I{
+				children = {Html.Small{
 					children = {
 						'(',
 						versionData.date,

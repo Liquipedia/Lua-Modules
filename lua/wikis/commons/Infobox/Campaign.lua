@@ -20,13 +20,13 @@ local Center = Widgets.Center
 local Campaign = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Campaign.run(frame)
 	local campaign = Campaign(frame)
 	return campaign:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Campaign:createInfobox()
 	local args = self.args
 

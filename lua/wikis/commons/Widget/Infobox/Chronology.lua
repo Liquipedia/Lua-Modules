@@ -8,37 +8,34 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local InlineIconAndText = Lua.import('Module:Widget/Misc/InlineIconAndText')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Title = Lua.import('Module:Widget/Infobox/Title')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class ChronologyDisplayWidget: Widget
----@operator call(table): ChronologyDisplayWidget
----@field props {links: {previous: {link:string, text: string}?, next: {link:string, text: string}?}[],
----title: string, showTitle: boolean}
-local Chronology = Class.new(Widget)
+local Chronology = {}
 Chronology.defaultProps = {
 	title = 'Chronology',
 	showTitle = false,
 }
 
+---@param props {links: {previous: {link:string, text: string}?, next: {link:string, text: string}?}[],
+---title: string, showTitle: boolean}
 ---@return Widget[]?
-function Chronology:render()
-	local links = self.props.links
+function Chronology.render(props)
+	local links = props.links
 	if Logic.isEmpty(links) then
 		return
 	end
 
 	return WidgetUtil.collect(
-		Logic.readBool(self.props.showTitle) and Title{children = self.props.title} or nil,
-		Array.map(self.props.links, Chronology._createChronologyRow)
+		Logic.readBool(props.showTitle) and Title{children = props.title} or nil,
+		Array.map(props.links, Chronology._createChronologyRow)
 	)
 end
 
@@ -73,4 +70,4 @@ function Chronology._createChronologyRow(links)
 	}
 end
 
-return Chronology
+return Component.component(Chronology.render, Chronology.defaultProps)

@@ -1,4 +1,3 @@
-
 ---
 -- @Liquipedia
 -- page=Module:Infobox/Lore
@@ -22,7 +21,7 @@ local Customizable = Widgets.Customizable
 ---@operator call(Frame): LoreInfobox
 local Cosmetic = Class.new(BasicInfobox)
 
----@return Widget
+---@return VNode
 function Cosmetic:createInfobox()
 	local args = self.args
 	self:customParseArguments(args)

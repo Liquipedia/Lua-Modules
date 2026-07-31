@@ -27,7 +27,7 @@ local CustomUnofficialWorldChampion = Class.new(UnofficialWorldChampion)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomUnofficialWorldChampion.run(frame)
 	local unofficialWorldChampion = CustomUnofficialWorldChampion(frame)
 	unofficialWorldChampion:setWidgetInjector(CustomInjector(unofficialWorldChampion))
@@ -35,8 +35,8 @@ function CustomUnofficialWorldChampion.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 

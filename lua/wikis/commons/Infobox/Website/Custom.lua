@@ -12,10 +12,11 @@ local Class = Lua.import('Module:Class')
 local Website = Lua.import('Module:Infobox/Website')
 
 ---@class CustomWebsiteInfobox: WebsiteInfobox
+---@operator call(Frame): CustomWebsiteInfobox
 local CustomWebsite = Class.new(Website)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomWebsite.run(frame)
 	local website = CustomWebsite(frame)
 	return website:createInfobox()

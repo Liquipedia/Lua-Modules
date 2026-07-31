@@ -11,7 +11,7 @@ local Array = Lua.import('Module:Array')
 local Condition = Lua.import('Module:Condition')
 local DateExt = Lua.import('Module:Date/Ext')
 local Operator = Lua.import('Module:Operator')
-
+local Tier = Lua.import('Module:Tier/Custom')
 local Tournament = Lua.import('Module:Tournament')
 
 local TournamentsTickerData = {}
@@ -57,8 +57,12 @@ function TournamentsTickerData.get(props)
 	---@param tournament StandardTournament
 	---@return boolean
 	local function isWithinDateRange(tournament)
-		local modifiedThreshold = tierThresholdModifiers[tournament.liquipediaTier] or 0
-		local modifiedCompletedThreshold = tierTypeThresholdModifiers[tournament.liquipediaTierType] or modifiedThreshold
+		local modifiedThreshold = tierThresholdModifiers[
+			Tier.toIdentifier(tournament.liquipediaTier)
+		] or 0
+		local modifiedCompletedThreshold = tierTypeThresholdModifiers[
+			Tier.toIdentifier(tournament.liquipediaTierType)
+		] or modifiedThreshold
 
 		if not tournament.startDate then
 			return false

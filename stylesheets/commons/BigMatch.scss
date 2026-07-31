@@ -540,11 +540,11 @@ span.slash {
 			padding: 0.1rem;
 
 			&.role--blue {
-				background-color: #0d71bf;
+				background-color: var( --clr-sapphire-40 );
 			}
 
 			&.role--red {
-				background-color: #b81414;
+				background-color: var( --clr-cinnabar-40 );
 			}
 		}
 
@@ -855,14 +855,14 @@ span.slash {
 
 			&--blue {
 				.match-bm-game-veto-overview-team-veto-row-item-text {
-					background-color: #0d71bf;
+					background-color: var( --clr-sapphire-40 );
 					min-height: 0.25rem;
 				}
 			}
 
 			&--red {
 				.match-bm-game-veto-overview-team-veto-row-item-text {
-					background-color: #b81414;
+					background-color: var( --clr-cinnabar-40 );
 					min-height: 0.25rem;
 				}
 			}
@@ -1146,23 +1146,9 @@ span.slash {
 		}
 
 		&-state {
-			background-color: var( --clr-on-background );
-			border-radius: 0.875rem;
-			min-height: 1.5rem;
-			color: #ffffff;
-			padding: 0.125rem 0.5rem;
-			text-transform: uppercase;
 			font-weight: bold;
-			width: 5.5rem;
-			text-align: center;
-
-			&.state--winner {
-				background-color: var( --clr-semantic-positive-40 );
-			}
-
-			&.state--loser {
-				background-color: var( --clr-semantic-negative-40 );
-			}
+			text-transform: uppercase;
+			--label-scale: 1.25;
 		}
 	}
 

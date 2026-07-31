@@ -45,7 +45,8 @@ class MediaWikiSession(contextlib.AbstractContextManager):
         self.__session.headers.update(HEADER)
 
     def __read_cookie_jar(self) -> http.cookiejar.FileCookieJar:
-        ckf = f"cookie_{self.wiki}.ck"
+        pathlib.Path("cookies").mkdir(exist_ok=True)
+        ckf = f"cookies/cookie_{self.wiki}.ck"
         cookie_jar = http.cookiejar.LWPCookieJar(filename=ckf)
         with contextlib.suppress(OSError):
             cookie_jar.load(ignore_discard=True)
@@ -105,10 +106,15 @@ class MediaWikiSession(contextlib.AbstractContextManager):
             print(f"data: {data}")
             print(f"HTTP Status: {response.status_code}")
             print(f'Raw response: "{response}"')
-        parsed_response: dict[str, Any] = response.json()
-        if "error" in parsed_response.keys():
-            raise MediaWikiSessionError(parsed_response["error"]["info"])
-        return parsed_response[action]
+        try:
+            parsed_response: dict[str, Any] = response.json()
+            if "error" in parsed_response.keys():
+                raise MediaWikiSessionError(parsed_response["error"]["info"])
+            return parsed_response[action]
+        except requests.JSONDecodeError:
+            raise MediaWikiSessionError(
+                f"{response.status_code} ({response.reason}): {response.text}"
+            )
 
     def cooldown(self):
         time.sleep(SLEEP_DURATION)

@@ -50,7 +50,7 @@ local GAME_MOD = 'mod'
 local GAME_LOTV = Game.toIdentifier{game = 'lotv'}
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -102,7 +102,7 @@ end
 function CustomLeague:_computePatch(args)
 	local prefixPatch = function(patch)
 		if not patch then return end
-		return 'Patch ' .. patch:gsub(' ', '_')
+		return 'Patch ' .. patch:gsub('_', ' ')
 	end
 	self.data.patch = prefixPatch(args.patch)
 	self.data.endPatch = prefixPatch(args.epatch)
@@ -191,8 +191,8 @@ function CustomLeague:_computeChronology(args)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args

@@ -12,8 +12,8 @@ local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local RatingsDisplay = Lua.import('Module:Ratings/Display')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
@@ -54,12 +54,12 @@ local CONTENT = {
 	rating = {
 		heading = 'Liquipedia Rating',
 		boxid = 1520,
-		body = HtmlWidgets.Fragment{
+		body = Html.Fragment{
 			children = {
 				RatingsDisplay.graph{id = 'rating'},
 				Div{
 					css = { ['text-align'] = 'center' },
-					children = HtmlWidgets.I{children = '[[Portal:Rating#The Rating|See the full ranking]]' }
+					children = Html.I{children = '[[Portal:Rating#The Rating|See the full ranking]]' }
 				}
 			}
 		}

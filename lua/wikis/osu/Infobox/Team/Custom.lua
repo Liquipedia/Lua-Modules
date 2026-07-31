@@ -17,7 +17,7 @@ local PlacementStats = Lua.import('Module:Infobox/Extension/PlacementStats')
 local CustomTeam = Class.new(Team)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 

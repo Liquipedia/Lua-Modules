@@ -28,13 +28,13 @@ local Builder = Widgets.Builder
 local Scene = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Scene.run(frame)
 	local scene = Scene(frame)
 	return scene:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Scene:createInfobox()
 	local args = self.args
 

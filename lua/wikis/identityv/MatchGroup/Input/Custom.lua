@@ -22,7 +22,7 @@ local MatchFunctions = {}
 ---@class IdentityvMapParser: MapParserInterface
 local MapFunctions = {}
 
-local MAX_NUM_BANS = 6
+local MAX_NUM_BANS = 9
 local MAX_NUM_PICKS = 5
 local VALID_SIDES = {
 	'hunter',

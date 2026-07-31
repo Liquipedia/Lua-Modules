@@ -8,7 +8,7 @@ return {
 	{
 		['alternateid'] = 'suprmane, supr2turnt, suprSayian, suprWRLD',
 		['birthdate'] = '1989-03-16',
-		['deathdate'] = '1970-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '74410',
 		['earningsbyyear'] = {
 			[2017] = 900,
@@ -55,7 +55,7 @@ return {
 	{
 		['alternateid'] = '',
 		['birthdate'] = '1993-05-07',
-		['deathdate'] = '1970-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '18038',
 		['earningsbyyear'] = {
 			[2017] = 10988,
@@ -94,7 +94,7 @@ return {
 	{
 		['alternateid'] = '',
 		['birthdate'] = '1999-08-03',
-		['deathdate'] = '1970-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '225491',
 		['earningsbyyear'] = {
 			[2017] = 1352,
@@ -139,7 +139,7 @@ return {
 	{
 		['alternateid'] = '',
 		['birthdate'] = '1999-05-08',
-		['deathdate'] = '1970-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '222124',
 		['earningsbyyear'] = {
 			[2017] = 3524,
@@ -187,7 +187,7 @@ return {
 	{
 		['alternateid'] = 'BBooAF',
 		['birthdate'] = '1997-02-21',
-		['deathdate'] = '1970-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '56737',
 		['earningsbyyear'] = {
 			[2016] = 4750,
@@ -232,7 +232,7 @@ return {
 	{
 		['alternateid'] = '',
 		['birthdate'] = '1995-05-09',
-		['deathdate'] = '1970-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '354870',
 		['earningsbyyear'] = {
 			[2016] = 1750,
@@ -277,7 +277,7 @@ return {
 	{
 		['alternateid'] = 'Psycho0',
 		['birthdate'] = '1999-02-02',
-		['deathdate'] = '1970-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '392682',
 		['earningsbyyear'] = {
 			[2017] = 12481,
@@ -325,8 +325,8 @@ return {
 	},
 	{
 		['alternateid'] = '',
-		['birthdate'] = '1970-01-01',
-		['deathdate'] = '1970-01-01',
+		['birthdate'] = '0000-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '39346',
 		['earningsbyyear'] = {
 			[2017] = 12481,
@@ -367,8 +367,8 @@ return {
 	},
 	{
 		['alternateid'] = 'wagao, waaaaaaaag',
-		['birthdate'] = '1970-01-01',
-		['deathdate'] = '1970-01-01',
+		['birthdate'] = '0000-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '39316',
 		['earningsbyyear'] = {
 			[2017] = 9618,
@@ -408,8 +408,8 @@ return {
 	},
 	{
 		['alternateid'] = '',
-		['birthdate'] = '1970-01-01',
-		['deathdate'] = '1970-01-01',
+		['birthdate'] = '0000-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '5645',
 		['earningsbyyear'] = {
 			[2017] = 5645,
@@ -443,8 +443,8 @@ return {
 	},
 	{
 		['alternateid'] = '',
-		['birthdate'] = '1970-01-01',
-		['deathdate'] = '1970-01-01',
+		['birthdate'] = '0000-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '9796',
 		['earningsbyyear'] = {
 			[2017] = 3446,
@@ -484,7 +484,7 @@ return {
 	{
 		['alternateid'] = '',
 		['birthdate'] = '1997-11-22',
-		['deathdate'] = '1970-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '261091',
 		['earningsbyyear'] = {
 			[2016] = 4750,
@@ -529,8 +529,8 @@ return {
 	},
 	{
 		['alternateid'] = '',
-		['birthdate'] = '1970-01-01',
-		['deathdate'] = '1970-01-01',
+		['birthdate'] = '0000-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '23573',
 		['earningsbyyear'] = {
 			[2016] = 4750,
@@ -570,7 +570,7 @@ return {
 	{
 		['alternateid'] = '',
 		['birthdate'] = '1995-04-01',
-		['deathdate'] = '1970-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '31509',
 		['earningsbyyear'] = {
 			[2016] = 3000,
@@ -609,7 +609,7 @@ return {
 	{
 		['alternateid'] = '',
 		['birthdate'] = '1994-02-19',
-		['deathdate'] = '1970-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '19179',
 		['earningsbyyear'] = {
 			[2017] = 2416,
@@ -651,8 +651,8 @@ return {
 	},
 	{
 		['alternateid'] = '',
-		['birthdate'] = '1970-01-01',
-		['deathdate'] = '1970-01-01',
+		['birthdate'] = '0000-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '9661',
 		['earningsbyyear'] = {
 			[2017] = 2111,
@@ -690,7 +690,7 @@ return {
 	{
 		['alternateid'] = 'Faker, fk',
 		['birthdate'] = '1998-11-28',
-		['deathdate'] = '1970-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '8861',
 		['earningsbyyear'] = {
 			[2017] = 2361,
@@ -727,7 +727,7 @@ return {
 	{
 		['alternateid'] = 'geoolicious, geoo, sleepygeo, senpapigeo, geoometrics, geonidas',
 		['birthdate'] = '1995-08-10',
-		['deathdate'] = '1970-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '396760',
 		['earningsbyyear'] = {
 			[2017] = 2500,
@@ -772,7 +772,7 @@ return {
 	{
 		['alternateid'] = 'ShuttleAK, ShuttleMK, Shutt',
 		['birthdate'] = '1999-06-11',
-		['deathdate'] = '1970-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '74140',
 		['earningsbyyear'] = {
 			[2017] = 6900,
@@ -813,7 +813,7 @@ return {
 	{
 		['alternateid'] = 'Whiteshark, Wshark',
 		['birthdate'] = '1994-08-30',
-		['deathdate'] = '1970-01-01',
+		['deathdate'] = '0000-01-01',
 		['earnings'] = '7095',
 		['earningsbyyear'] = {
 			[2017] = 116,
@@ -849,6 +849,55 @@ return {
 		['team'] = '',
 		['teampagename'] = '',
 		['teamtemplate'] = '',
+		['type'] = 'player',
+	},
+	{
+		['alternateid'] = 'Xavier',
+		['birthdate'] = '2002-04-08',
+		['deathdate'] = '0000-01-01',
+		['earnings'] = '945973',
+		['earningsbyyear'] = {
+			[2016] = 887,
+			[2017] = 510,
+			[2018] = 9461,
+			[2019] = 18224,
+			[2020] = 63378,
+			[2021] = 81181,
+			[2022] = 66171,
+			[2023] = 90202,
+			[2024] = 520388,
+			[2025] = 77691,
+			[2026] = 17880,
+		},
+		['extradata'] = {
+			['firstname'] = 'Clément',
+			['faction'] = 'Terran',
+			['lastname'] = 'Desplanches',
+			['roles'] = {},
+		},
+		['id'] = 'Clem',
+		['image'] = 'Liquid Clem at the 2025 Esports World Cup.jpg',
+		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/2/2f/Liquid_Clem_at_the_2025_Esports_World_Cup.jpg/400px-Liquid_Clem_at_the_2025_Esports_World_Cup.jpg',
+		['links'] = {
+			['aligulac'] = 'https&#58;//aligulac.com/players/5878',
+			['twitter'] = 'https&#58;//twitter.com/Clem_sc2',
+			['twitch'] = 'https&#58;//www.twitch.tv/liquidclem',
+		},
+		['localizedname'] = '',
+		['name'] = 'Clément Desplanches',
+		['namespace'] = '0',
+		['nationality'] = 'France',
+		['nationality2'] = '',
+		['nationality3'] = '',
+		['objectname'] = '65124_player_Clem',
+		['pageid'] = '65124',
+		['pagename'] = 'Clem',
+		['region'] = '',
+		['romanizedname'] = 'Clément Desplanches',
+		['status'] = 'Active',
+		['team'] = 'Team Liquid',
+		['teampagename'] = 'Team_Liquid',
+		['teamtemplate'] = 'team liquid 2024',
 		['type'] = 'player',
 	},
 }

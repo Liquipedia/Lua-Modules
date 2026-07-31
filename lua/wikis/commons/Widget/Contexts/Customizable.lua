@@ -7,10 +7,9 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
-local Context = Lua.import('Module:Widget/Context')
+local ComponentContext = Lua.import('Module:Widget/ComponentContext')
 
--- Customizable backwards compatibility
 return {
-	LegacyCustomizable = Class.new(Context),
+	---@type ContextDef<WidgetInjector?>
+	Customizable = ComponentContext.create(nil),
 }

@@ -20,7 +20,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local BreakDown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Title = Widgets.Title
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Slider = Lua.import('Module:Widget/Basic/Slider')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
@@ -51,7 +51,7 @@ local HP_REGEN_NIGHT = 'night'
 local FACTION_TO_HP_REGEN_TYPE = {u = HP_REGEN_BLIGHT, n = HP_REGEN_NIGHT}
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
@@ -60,8 +60,8 @@ function CustomCharacter.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	---@type WarcraftCharacterInfobox
 	local caller = self.caller
@@ -99,7 +99,7 @@ function CustomInjector:parse(id, widgets)
 		local buildingInfo = fetchBuildingInfo(args.trainedat)
 
 		local breakDownCard = function(content)
-			return HtmlWidgets.Div{
+			return Html.Div{
 				attributes = {style = 'display: flex; flex-direction: column; align-items: center;'},
 				children = content,
 			}
@@ -108,21 +108,21 @@ function CustomInjector:parse(id, widgets)
 		return Array.append(widgets,
 			BreakDown{children = {
 				breakDownCard{
-					HtmlWidgets.Div{children = {factionIcon}},
-					HtmlWidgets.Div{children = {'Race:'}},
-					HtmlWidgets.Div{children = Link{children = factionData.name, link = factionData.pageName}},
+					Html.Div{children = {factionIcon}},
+					Html.Div{children = {'Race:'}},
+					Html.Div{children = Link{children = factionData.name, link = factionData.pageName}},
 				},
 				breakDownCard{
-					HtmlWidgets.Div{children = {buildingInfo.image and
+					Html.Div{children = {buildingInfo.image and
 						('[[File:' .. buildingInfo.image .. '|link='.. buildingInfo.page ..'|54px]]') or ''
 					}},
-					HtmlWidgets.Div{children = {'Trained at:'}},
-					HtmlWidgets.Div{children = {Link{children = buildingInfo.name or 'Unknown', link = buildingInfo.page or ''}}},
+					Html.Div{children = {'Trained at:'}},
+					Html.Div{children = {Link{children = buildingInfo.name or 'Unknown', link = buildingInfo.page or ''}}},
 				},
 				breakDownCard{
-					HtmlWidgets.Div{classes = {'hotkey-button'}, children = {args.hotkey}},
-					HtmlWidgets.Div{children = {'Hotkey:'}},
-					HtmlWidgets.Div{children = {args.hotkey}},
+					Html.Div{classes = {'hotkey-button'}, children = {args.hotkey}},
+					Html.Div{children = {'Hotkey:'}},
+					Html.Div{children = {args.hotkey}},
 				},
 			}, classes = {'infobox-center'}},
 
@@ -162,7 +162,7 @@ end
 ---@param highlight boolean
 ---@return Widget
 function CustomCharacter:_basicAttribute(attribute, highlight)
-	return HtmlWidgets.Div{
+	return Html.Div{
 		children = {
 			ATTRIBUTE_ICONS[ATTRIBUTES[attribute]:lower()],
 			'<br><b>' .. (self.args['base' .. attribute] or '') .. '</b>',

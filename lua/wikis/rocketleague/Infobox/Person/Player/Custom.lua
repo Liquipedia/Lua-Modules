@@ -13,10 +13,10 @@ local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
-local Matches = Lua.import('Module:Matches_Player')
 local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -33,12 +33,17 @@ local BANNED = Lua.import('Module:Banned', {loadData = true})
 local NOT_APPLICABLE = 'N/A'
 
 ---@class RocketleagueInfoboxPlayer: Person
+---@operator call(Frame): RocketleagueInfoboxPlayer
 ---@field basePageName string
 local CustomPlayer = Class.new(Player)
+
+---@class RocketleagueInfoboxPlayerWidgetInjector: WidgetInjector
+---@operator call(RocketleagueInfoboxPlayer): RocketleagueInfoboxPlayerWidgetInjector
+---@field caller RocketleagueInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -52,6 +57,7 @@ function CustomPlayer.run(frame)
 	return player:createInfobox()
 end
 
+---@package
 ---@param manualInput string
 ---@param varName string
 ---@param autoFunction function
@@ -65,8 +71,8 @@ function CustomPlayer:_parseActive(manualInput, varName, autoFunction, autoFunct
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -130,7 +136,8 @@ function CustomInjector:parse(id, widgets)
 			getHistoryCells('history_gfinity', '[[Gfinity/Elite_Series|Gfinity Elite Series]] History'),
 			getHistoryCells('history_odl', '[[Oceania Draft League|Oceania Draft League]] History'),
 			getHistoryCells('history_irc', '[[Italian Rocket Championship]] History'),
-			getHistoryCells('history_elite_series', '[[Elite Series]] History')
+			getHistoryCells('history_elite_series', '[[Elite Series]] History'),
+			getHistoryCells('history_enc', '[[Esports Nations Cup]] History')
 		)
 	elseif id == 'nationality' then
 		return {
@@ -224,7 +231,7 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 	end
 
 	local team = args.teamlink or args.team
-	if team and not mw.ext.TeamTemplate.teamexists(team) then
+	if team and not TeamTemplate.exists(team) then
 		table.insert(categories, 'Players with invalid team')
 	end
 
@@ -265,13 +272,6 @@ end
 ---@param args table
 function CustomPlayer:defineCustomPageVariables(args)
 	Variables.varDefine('id', args.id or self.pagename)
-end
-
----@return string?
-function CustomPlayer:createBottomContent()
-	if Namespace.isMain() then
-		return tostring(Matches.get({args = {noClass = true}}))
-	end
 end
 
 ---@param args table

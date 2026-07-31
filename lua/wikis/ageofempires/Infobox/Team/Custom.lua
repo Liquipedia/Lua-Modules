@@ -39,7 +39,7 @@ local MAX_NUMBER_OF_PLAYERS = 10
 local INACTIVITY_THRESHOLD_YEARS = 1
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 
@@ -52,8 +52,8 @@ function CustomTeam.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	if id == 'region' then
 		return {}

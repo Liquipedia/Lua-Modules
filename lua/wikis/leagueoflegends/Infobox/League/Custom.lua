@@ -25,11 +25,12 @@ local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Premier
 local CustomLeague = Class.new(League)
 
 ---@class LeagueoflegendsLeagueInfoboxWidgetInjector: WidgetInjector
+---@operator call(LeagueoflegendsLeagueInfobox): LeagueoflegendsLeagueInfoboxWidgetInjector
 ---@field caller LeagueoflegendsLeagueInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -40,8 +41,8 @@ function CustomLeague.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 

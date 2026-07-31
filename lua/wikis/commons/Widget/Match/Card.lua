@@ -13,7 +13,7 @@ local HighlightConditions = Lua.import('Module:HighlightConditions')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local MatchHeader = Lua.import('Module:Widget/Match/Header')
 local MatchHeaderFfa = Lua.import('Module:Widget/Match/Header/Ffa')
 local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
@@ -79,12 +79,12 @@ function MatchCard:_renderHorizontal(match, gameData, highlight)
 		displayGameIcon = self.props.displayGameIcons,
 	}
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'match-info'},
 		children = WidgetUtil.collect(
 			MatchCountdown{match = match},
 			MatchHeader{match = match},
-			not self.props.hideTournament and HtmlWidgets.Div{
+			not self.props.hideTournament and Html.Div{
 				classes = {'match-info-tournament', highlight and HIGHLIGHT_CLASS or nil},
 				children = {tournamentLink},
 			} or nil,
@@ -108,13 +108,13 @@ function MatchCard:_renderVertical(match, gameData)
 
 	local stageName = self:_renderStageName(match, 3)
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'match-info', 'match-info--vertical'},
 		children = WidgetUtil.collect(
 			self:_renderVerticalTopRow(match),
 			self.props.hideTournament
 				and self:_renderStageName(match, 1)
-				or HtmlWidgets.Div{
+				or Html.Div{
 					classes = {'match-info-tournament'},
 					children = WidgetUtil.collect(
 						tournamentLink,
@@ -134,11 +134,11 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return Widget
 function MatchCard:_renderVerticalTopRow(match)
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'match-info-top-row'},
 		children = WidgetUtil.collect(
 			MatchCountdown{match = match, format = 'compact'},
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'match-info-stream-buttons'},
 				children = self:_renderStreamButtons(match)
 			}
@@ -183,7 +183,7 @@ function MatchCard:_renderStageName(match, variantIndex)
 		return nil
 	end
 
-	return HtmlWidgets.Span{
+	return Html.Span{
 		classes = {'match-info-stage'},
 		children = stageName
 	}
@@ -194,7 +194,7 @@ end
 ---@return Widget
 function MatchCard:_renderFfaInfo(match, gameData)
 	if not gameData or not gameData.gameIds then
-		return HtmlWidgets.Span{
+		return Html.Span{
 			classes = {'match-info-ffa-info'},
 			children = 'FFA Match'
 		}
@@ -202,7 +202,7 @@ function MatchCard:_renderFfaInfo(match, gameData)
 
 	local mapIsSet = not String.isEmpty(gameData.map)
 
-	return HtmlWidgets.Span{
+	return Html.Span{
 		classes = {'match-info-ffa-info'},
 		children = WidgetUtil.collect(
 			'Game #',

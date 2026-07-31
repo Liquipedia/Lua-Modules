@@ -52,7 +52,7 @@ local function Table2CellHeader(props, context)
 	-- Skip context lookups and property merging if there are no column definitions
 	if #columns == 0 then
 		local align = props.align
-		local attributes = props.attributes or {}
+		local attributes = ColumnUtil.buildAttributes(props)
 		if align == 'right' or align == 'center' then
 			attributes['data-align'] = align
 		end

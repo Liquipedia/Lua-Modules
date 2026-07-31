@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 local TournamentsList = Lua.import('Module:TournamentsList')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
@@ -44,11 +44,11 @@ local CONTENT = {
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = HtmlWidgets.Fragment{children = {
+		body = Html.Fragment{children = {
 			TournamentsList.getFromLpdb(),
-			HtmlWidgets.P{
+			Html.P{
 				classes = {'mainpage-editlink'},
-				children = HtmlWidgets.Small{children = {
+				children = Html.Small{children = {
 					'&#91;',
 					Link{link = 'Special:EditPage/Liquipedia:Tournaments/dynamic', children = 'edit'},
 					'&#93;'

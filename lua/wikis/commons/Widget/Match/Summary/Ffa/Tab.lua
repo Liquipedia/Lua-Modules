@@ -7,25 +7,20 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-
----@class MatchSummaryFfaTab: Widget
----@operator call(table): MatchSummaryFfaTab
-local MatchSummaryFfaTab = Class.new(Widget)
-
----@return Widget
-function MatchSummaryFfaTab:render()
-	return HtmlWidgets.Div{
+---@param props {matchId: string, idx: integer, children?: Renderable|Renderable[]}
+---@return VNode
+local function MatchSummaryFfaTab(props)
+	return Html.Div{
 		classes = {'panel-content'},
 		attributes = {
 			['data-js-battle-royale'] = 'panel-content',
-			id = self.props.matchId .. 'panel' .. self.props.idx,
+			id = props.matchId .. 'panel' .. props.idx,
 		},
-		children = self.props.children,
+		children = props.children,
 	}
 end
 
-return MatchSummaryFfaTab
+return Component.component(MatchSummaryFfaTab)

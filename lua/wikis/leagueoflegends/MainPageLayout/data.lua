@@ -19,8 +19,8 @@ local ColumnName = Condition.ColumnName
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Headlines = Lua.import('Module:Widget/MainPage/Headlines')
 local LiquipediaApp = Lua.import('Module:Widget/MainPage/LiquipediaApp')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
@@ -164,7 +164,7 @@ return {
 			},
 		},
 		{
-			file = 'Worlds Trophy 2024.jpg',
+			file = '2025 Summoners Cup.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -173,7 +173,7 @@ return {
 			},
 		},
 		{
-			file = 'T1 Worlds24 Skins Splash Art.jpg',
+			file = 'T1 Worlds25 Skins Splash Art.jpg',
 			title = 'Champions',
 			link = 'Champions',
 			count = {
@@ -183,7 +183,7 @@ return {
 			},
 		},
 		{
-			file = 'LoL Patch 25.19 Art.jpg',
+			file = 'LoL Patch 26.11 Art.jpg',
 			title = 'Patches',
 			link = 'Patches',
 			count = {
@@ -193,7 +193,7 @@ return {
 			},
 		},
 		{
-			file = 'Worlds 2024 Finalists.jpg',
+			file = 'Worlds 2025 Finalists.jpg',
 			title = 'News',
 			link = 'Portal:News',
 			count = {

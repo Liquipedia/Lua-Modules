@@ -82,7 +82,7 @@ local ESL_TIERS = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -247,8 +247,8 @@ function CustomLeague:_isFinished(args)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args

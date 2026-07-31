@@ -16,11 +16,16 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class RocketleagueCompanyInfobox: CompanyInfobox
+---@operator call(Frame): RocketleagueCompanyInfobox
 local CustomCompany = Class.new(Company)
+
+---@class RocketleagueCompanyInfoboxWidgetInjector: WidgetInjector
+---@operator call(RocketleagueCompanyInfobox): RocketleagueCompanyInfoboxWidgetInjector
+---@field caller RocketleagueCompanyInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomCompany.run(frame)
 	local company = CustomCompany(frame)
 	company:setWidgetInjector(CustomInjector(company))
@@ -28,8 +33,8 @@ function CustomCompany.run(frame)
 	return company:createInfobox()
 end
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 

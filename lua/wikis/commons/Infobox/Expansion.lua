@@ -26,7 +26,7 @@ local Chronology = Widgets.Chronology
 ---@operator call(Frame): ExpansionInfobox
 local Expansion = Class.new(BasicInfobox)
 
----@return Widget
+---@return VNode
 function Expansion:createInfobox()
 	local args = self.args
 	local links = Links.transform(args)
