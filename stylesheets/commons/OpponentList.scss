@@ -7,13 +7,16 @@ Author: hjpalpha
 	border-top: 1px solid var( --table-border-color, #bbbbbb );
 	border-left: 1px solid var( --table-border-color, #bbbbbb );
 	margin-bottom: 8px;
-	max-width: 100% !important;
 	overflow-x: auto;
 
 	@media ( max-width: 900px ) {
 		min-width: 100% !important;
+	}
 
-		&:not( .participantTable-faction ) {
+	&:not( .participantTable-faction ) {
+		max-width: 100% !important;
+
+		@media ( max-width: 900px ) {
 			width: 100% !important;
 		}
 	}
