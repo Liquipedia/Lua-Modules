@@ -47,42 +47,44 @@
 .toctogglelabel {
 	color: var( --clr-primary, #0645ad );
 	cursor: pointer;
-}
 
-.toctogglelabel:hover {
-	text-decoration: underline;
+	&:hover {
+		text-decoration: underline;
+	}
 }
 
 .toctogglespan {
 	font-size: 94%;
+
+	&::before {
+		content: " [";
+	}
+
+	&::after {
+		content: "]";
+	}
 }
 
-.toctogglespan::before {
-	content: " [";
-}
+.toctogglecheckbox {
+	/* Show a focus ring around the label when focusing the invisible checkbox. */
+	/* This simulates that the label is in focus. */
+	&:focus + .toctitle .toctogglelabel {
+		text-decoration: underline;
+		outline: auto;
+	}
 
-.toctogglespan::after {
-	content: "]";
-}
+	/* Change the text of the button based on the state of the checkbox. */
+	&:checked + .toctitle .toctogglelabel::after {
+		content: "show";
+	}
 
-/* Show a focus ring around the label when focusing the invisible checkbox. */
-/* This simulates that the label is in focus. */
-.toctogglecheckbox:focus + .toctitle .toctogglelabel {
-	text-decoration: underline;
-	outline: auto;
-}
+	&:not( :checked ) + .toctitle .toctogglelabel::after {
+		content: "hide";
+	}
 
-/* Change the text of the button based on the state of the checkbox. */
-.toctogglecheckbox:checked + .toctitle .toctogglelabel::after {
-	content: "show";
-}
-
-.toctogglecheckbox:not( :checked ) + .toctitle .toctogglelabel::after {
-	content: "hide";
-}
-
-.toctogglecheckbox:checked ~ ul {
-	display: none;
+	&:checked ~ ul {
+		display: none;
+	}
 }
 
 /* Allow limiting of which header levels are shown in a TOC;
