@@ -270,7 +270,8 @@ end)
 function TeamCard.fetchDnpData(matchGroupSpec)
 	local conditions = matchGroupSpec and
 		tostring(TournamentStructure.getMatch2Filter(matchGroupSpec)) or
-		tostring(TournamentStructure.getMatch2Filter(TournamentStructure.currentPageSpec())):gsub('%[%[pagename:', '[[parent:')
+		tostring(TournamentStructure.getMatch2Filter(
+			TournamentStructure.currentPageSpec())):gsub('%[%[pagename:', '[[parent:')
 
 	local matchRecords = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = conditions,
