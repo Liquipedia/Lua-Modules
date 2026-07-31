@@ -772,6 +772,8 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 		status = nilIfEmpty(record.status),
 		scores = Json.parseIfString(record.scores) or {},
 		subgroup = tonumber(record.subgroup),
+		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
+		timezoneId = Table.extract(extradata, 'timezoneid'),
 		type = nilIfEmpty(record.type),
 		vod = nilIfEmpty(record.vod),
 		walkover = nilIfEmpty(record.walkover) and record.walkover:lower() or nil,
