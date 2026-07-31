@@ -236,6 +236,8 @@ MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed
 ---@field winner integer?
 ---@field status string?
 ---@field extradata table?
+---@field timestamp number
+---@field timezoneId string?
 
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',
