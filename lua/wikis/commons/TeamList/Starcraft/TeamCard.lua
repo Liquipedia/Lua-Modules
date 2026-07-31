@@ -235,7 +235,7 @@ function TeamCard:sync(parentMatchGroupSpec)
 	end
 
 	if config.autoDnp then
-		local matchGroupSpec = parentMatchGroupSpec or TournamentStructure.currentPageSpec()
+		local matchGroupSpec = parentMatchGroupSpec
 		players = self:dnp(players, matchGroupSpec)
 	end
 
@@ -249,7 +249,7 @@ function TeamCard:sync(parentMatchGroupSpec)
 end
 
 ---@param players StarcraftTeamCardPlayer[]
----@param matchGroupSpec {matchGroupIds: string[], pageNames: string[]}
+---@param matchGroupSpec {matchGroupIds: string[], pageNames: string[]}?
 ---@return StarcraftTeamCardPlayer[]
 function TeamCard:dnp(players, matchGroupSpec)
 	local dnpData = TeamCard.fetchDnp(matchGroupSpec)
@@ -265,11 +265,15 @@ TeamCard.fetchDnp = FnUtil.memoize(function(matchGroupSpec)
 	return TeamCard.fetchDnpData(matchGroupSpec)
 end)
 
----@param matchGroupSpec {matchGroupIds: string[], pageNames: string[]}
+---@param matchGroupSpec {matchGroupIds: string[], pageNames: string[]}?
 ---@return table<string, table<string, boolean>>
 function TeamCard.fetchDnpData(matchGroupSpec)
+	local conditions = matchGroupSpec and
+		tostring(TournamentStructure.getMatch2Filter(matchGroupSpec)) or
+		tostring(TournamentStructure.getMatch2Filter(TournamentStructure.currentPageSpec())):gsub('%[%[pagename:', '[[parent:')
+
 	local matchRecords = mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = tostring(TournamentStructure.getMatch2Filter(matchGroupSpec)),
+		conditions = conditions,
 		query = 'pagename, match2bracketdata, match2opponents, winner, match2games',
 		order = 'date asc',
 		limit = 5000,
