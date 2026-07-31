@@ -34,6 +34,7 @@ local StandingsTable = {}
 ---@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?,
 ---match: MatchGroupUtilMatch?, matches: MatchGroupUtilMatch[], matchId: string}[]?
 ---@field opponent standardOpponent
+---@field aliases string[]
 ---@field startingPoints number?
 
 ---@param frame Frame
@@ -85,7 +86,9 @@ function StandingsTable.mergeOpponentsData(manualOpponents, importedOpponents, a
 	Array.forEach(importedOpponents, function(importedOpponent)
 		--- Find the matching manual opponent
 		local manualOpponentId = Array.indexOf(newOpponents, function(manualOpponent)
-			return Opponent.same(manualOpponent.opponent, importedOpponent.opponent)
+			return Array.any(manualOpponent.aliases, function (alias)
+				return Opponent.same(alias, importedOpponent.opponent)
+			end)
 		end)
 		--- If there isn't one, means this is a new opponent
 		if manualOpponentId == 0 then
