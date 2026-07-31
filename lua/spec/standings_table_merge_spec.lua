@@ -12,7 +12,7 @@ describe('Standings Table opponent merge', function()
 		for _, points in ipairs(pointsPerRound) do
 			table.insert(rounds, {scoreboard = {points = points}, specialstatus = ''})
 		end
-		return {opponent = literal(name), rounds = rounds}
+		return {opponent = literal(name), rounds = rounds, aliases = {literal(name)}}
 	end
 
 	---Imported opponents as produced by StandingsParseLpdb.importFromMatches

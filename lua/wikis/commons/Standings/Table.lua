@@ -34,7 +34,7 @@ local StandingsTable = {}
 ---@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?,
 ---match: MatchGroupUtilMatch?, matches: MatchGroupUtilMatch[], matchId: string}[]?
 ---@field opponent standardOpponent
----@field aliases string[]
+---@field aliases standardOpponent[]
 ---@field startingPoints number?
 
 ---@param frame Frame
