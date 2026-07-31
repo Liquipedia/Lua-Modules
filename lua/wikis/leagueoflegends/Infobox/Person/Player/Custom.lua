@@ -125,13 +125,15 @@ function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = TeamTemplate.getPageName(self.args.team)
 		---@cast teamPage -nil
+
 		return Html.Fragment{
 			children = WidgetUtil.collect(
-				MatchTicker.recent{team = teamPage},
+				MatchTicker.player{recentLimit = 3},
 				UpcomingTournaments.team{name = teamPage}
 			)
 		}
 	end
 end
+
 
 return CustomPlayer
