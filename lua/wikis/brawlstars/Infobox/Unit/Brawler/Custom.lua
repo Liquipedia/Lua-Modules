@@ -8,7 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local CharacterWinLoss = Lua.import('Module:CharacterWinLoss')
+local BrawlerWinLoss = Lua.import('Module:BrawlerWinLoss')
 local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
 local Math = Lua.import('Module:MathUtil')
@@ -63,15 +63,16 @@ function CustomInjector:parse(id, widgets)
 		return {}
 	elseif id == 'custom' then
 		Array.appendWith(widgets, self.caller:_getTypeCells())
-		local wins, loses = CharacterWinLoss.run(args.name)
-		if wins + loses == 0 then return widgets end
 
-		local winPercentage = Math.formatPercentage(wins / (wins + loses), 2)
+	local wins, loses = BrawlerWinLoss.run(args.name)
+	if wins + loses == 0 then return widgets end
 
-		return Array.append(widgets,
-			Title{children = 'Esports Statistics'},
-			Cell{name = 'Win Rate', children = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. ')'}}
-		)
+	local winPercentage = Math.round(wins * 100 / (wins + loses), 2)
+
+	return Array.append(widgets,
+		Title{children = 'Esports Statistics'},
+		Cell{name = 'Win Rate', children = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
+	)
 	end
 
 	return widgets
