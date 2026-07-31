@@ -6,10 +6,7 @@
 .toc {
 	display: table;
 	padding: 7px;
-
-	.theme--light & {
-		background-color: var( --clr-surface-1 );
-	}
+	background-color: var( --clr-surface-1 );
 
 	.theme--dark & {
 		background-color: var( --clr-secondary-16 );
