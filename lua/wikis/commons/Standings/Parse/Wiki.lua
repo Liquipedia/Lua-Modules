@@ -144,9 +144,19 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, res
 	local opponent = Opponent.readOpponentArgs(opponentData)
 	opponent = Opponent.resolve(opponent, resolveDate, {syncPlayer = true})
 
+	local aliases = {opponent}
+	if opponent.type == Opponent.team then
+		Array.extendWith(aliases,
+			Array.map(Array.parseCommaSeparatedString(opponentData.aliases, ';'), function(alias)
+				return Opponent.readOpponentArgs{type = Opponent.team, template = alias}
+			end)
+		)
+	end
+
 	return {
 		rounds = rounds,
 		opponent = opponent,
+		aliases = aliases,
 		startingPoints = opponentData.startingpoints,
 	}
 end
