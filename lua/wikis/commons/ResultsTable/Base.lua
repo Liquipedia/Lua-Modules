@@ -14,11 +14,13 @@ local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Info = Lua.import('Module:Info', {loadData = true})
+local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
@@ -95,7 +97,8 @@ function BaseResultsTable:readConfig()
 		displayDefaultLogoAsIs = Logic.readBool(args.displayDefaultLogoAsIs),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
 		useIndivPrize = Logic.readBool(args.useIndivPrize),
-		aliases = Array.parseCommaSeparatedString(args.aliases)
+		aliases = Array.parseCommaSeparatedString(args.aliases),
+		queryLinkProps = Json.parseIfString(args.queryLinkProps),
 	}
 
 	config.sort = Logic.emptyOr(
@@ -390,10 +393,39 @@ function BaseResultsTable:build()
 			} or nil,
 			TableWidgets.TableBody{children = WidgetUtil.collect(self:_buildTableBody(), self.args.manualContent)}
 		),
-		footer = self.config.onlyAchievements and LinkWidget{
+		footer = self:_footer(),
+	}
+end
+
+---@private
+---@return Renderable?
+function BaseResultsTable:_footer()
+	if not self.config.onlyAchievements then
+		return
+	end
+
+	if not self.config.queryLinkProps then
+		return LinkWidget{
 			link = self.config.opponent .. '/' .. self.config.resultsSubPage,
 			children = 'Extended list of results',
-		} or nil
+		}
+	end
+
+	local form = self.config.queryType == QUERY_TYPES.team and 'Team Results' or 'Player Results'
+	local template = self.config.queryType == QUERY_TYPES.team and 'Team results' or 'Player results'
+
+	return LinkWidget{
+		linktype = 'external',
+		children = 'Extended list of results',
+		link = Page.makeFormQueryLink{
+			form = form,
+			display = 'Extended list of results',
+			template = template,
+			queryArgs = Table.merge({
+				team = self.config.opponent,
+				player = self.config.opponent,
+			}, self.config.queryLinkProps),
+		}
 	}
 end
 
@@ -562,7 +594,7 @@ end
 
 ---@protected
 ---@param placement placement
----@return Widget
+---@return Renderable
 function BaseResultsTable:createTierCell(placement)
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)
 	return TableWidgets.Cell{
