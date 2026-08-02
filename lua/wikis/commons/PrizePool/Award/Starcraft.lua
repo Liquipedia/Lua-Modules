@@ -14,7 +14,6 @@ local Logic = Lua.import('Module:Logic')
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
-local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
 ---@class StarcraftCustomAwardPrizePoolLpdbInjector: LpdbInjector
