@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
-local Medals = Lua.import('Module:Medals')
+local Placement = Lua.import('Module:Placement')
 local Table = Lua.import('Module:Table')
 local Tier = Lua.import('Module:Tier/Utils')
 
@@ -93,7 +93,7 @@ function MedalsTable._headerCell(props, dataColumn)
 	elseif dataColumn == 'top3' then
 		header = Html.Abbr{title = 'Total of top 3', children = 'Top3'}
 	else
-		header = Medals.display{medal = dataColumn}
+		header = Placement.renderInWidget{placement = dataColumn}
 	end
 
 	return TableWidgets.CellHeader{
