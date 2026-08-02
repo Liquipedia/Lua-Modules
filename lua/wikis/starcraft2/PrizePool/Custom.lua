@@ -89,7 +89,7 @@ end
 ---@return integer?
 function CustomPrizePool._defaultImportLimit()
 	local tier = tonumber(Variables.varDefault('tournament_liquipediatier'))
-	assert(tier, 'Prize Pool Import: Unset/Invalid liquipediatier')
+	if not tier then return end
 
 	return tier >= 4 and 8
 		or tier == 3 and 16
