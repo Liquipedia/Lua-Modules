@@ -58,7 +58,7 @@ describe('Standings Parser', function()
 		assert.are_same({
 			{id = 'full.points', title = 'Points'},
 			{id = 'full.manual'},
-		}, standingsTable.extradata.tiebreakers)
+		}, standingsTable.extradata.additionalStats)
 
 		-- Round 1: Alpha and Bravo are fully tied at 3 points (shared placement),
 		-- Charlie is last
@@ -113,10 +113,10 @@ describe('Standings Parser', function()
 		assert.are_equal(1, charlie2.extradata.tiebreakerpoints)
 		assert.are_equal(0, alpha2.extradata.tiebreakerpoints)
 
-		-- tiebreakerValues are calculated for "full" context tiebreakers
-		assert.are_equal(6, bravo2.extradata.tiebreakerValues['full.points'].value)
-		assert.are_equal(3, charlie2.extradata.tiebreakerValues['full.points'].value)
-		assert.are_equal(1, charlie2.extradata.tiebreakerValues['full.manual'].value)
+		-- additionalStats are calculated for "full" context tiebreakers
+		assert.are_equal(6, bravo2.extradata.additionalStatsValues['full.points'].value)
+		assert.are_equal(3, charlie2.extradata.additionalStatsValues['full.points'].value)
+		assert.are_equal(1, charlie2.extradata.additionalStatsValues['full.manual'].value)
 	end)
 
 	it('applies starting points', function()

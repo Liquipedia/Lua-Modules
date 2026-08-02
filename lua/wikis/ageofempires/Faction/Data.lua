@@ -934,24 +934,24 @@ local factionPropsAoEO = {
 
 return {
 	factionProps = {
-		aoe1 = factionPropsAoE1,
-		aoe2 = factionPropsAoE2,
-		aoe3 = factionPropsAoE3,
-		aoe4 = factionPropsAoE4,
-		aom = factionPropsAoM,
-		aoeo = factionPropsAoEO,
+		['Age of Empires I'] = factionPropsAoE1,
+		['Age of Empires II'] = factionPropsAoE2,
+		['Age of Empires III'] = factionPropsAoE3,
+		['Age of Empires IV'] = factionPropsAoE4,
+		['Age of Mythology'] = factionPropsAoM,
+		['Age of Empires Online'] = factionPropsAoEO,
 	},
 	defaultFaction = 'unknown',
 	factions = {
-		aoe1 = Array.extractKeys(factionPropsAoE1),
-		aoe2 = Array.extractKeys(factionPropsAoE2),
-		aoe3 = Array.extractKeys(factionPropsAoE3),
-		aoe4 = Array.extractKeys(factionPropsAoE4),
-		aom = Array.extractKeys(factionPropsAoM),
-		aoeo = Array.extractKeys(factionPropsAoEO),
+		['Age of Empires I'] = Array.extractKeys(factionPropsAoE1),
+		['Age of Empires II'] = Array.extractKeys(factionPropsAoE2),
+		['Age of Empires III'] = Array.extractKeys(factionPropsAoE3),
+		['Age of Empires IV'] = Array.extractKeys(factionPropsAoE4),
+		['Age of Mythology'] = Array.extractKeys(factionPropsAoM),
+		['Age of Empires Online'] = Array.extractKeys(factionPropsAoEO),
 	},
 	aliases = {
-		aoe1 = {
+		['Age of Empires I'] = {
 			asr = 'assyrians',
 			asy = 'assyrians',
 			bab = 'babylonians',
@@ -973,7 +973,7 @@ return {
 			lv = 'lacviet',
 			['lac viet'] = 'lacviet',
 		 },
-		aoe2 = {
+		['Age of Empires II'] = {
 			ach = 'achaemenids',
 			arm = 'armenians',
 			ath = 'athenians',
@@ -1037,7 +1037,7 @@ return {
 			vie = 'vietnamese',
 			vik = 'vikings',
 		},
-		aoe3 = {
+		['Age of Empires III'] = {
 			azt = 'aztecs',
 			brt = 'british',
 			bri = 'british',
@@ -1066,7 +1066,7 @@ return {
 			swe = 'swedes',
 			usa = 'unitedstates',
 		},
-		aoe4 = {
+		['Age of Empires IV'] = {
 			abb = 'abbasiddynasty',
 			aba = 'abbasiddynasty',
 			abba = 'abbasiddynasty',
@@ -1099,7 +1099,7 @@ return {
 			tug = 'tughlaqdynasty',
 			zhu = 'zhuxislegacy',
 		},
-		aom = {
+		['Age of Mythology'] = {
 			ama = 'amaterasu',
 			atl = 'atlanteans',
 			chi = 'chinese',
@@ -1130,7 +1130,7 @@ return {
 			hui = 'huitzilopochtli',
 			tez = 'tezcatlipoca',
 		},
-		aoeo = {
+		['Age of Empires Online'] = {
 			bab = 'babylonians',
 			cel = 'celts',
 			egy = 'egyptians',

@@ -35,6 +35,11 @@ return {
 			status = 2,
 			matchWidth = 180,
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchdiff', 'gamediff'},
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 }

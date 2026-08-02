@@ -310,7 +310,7 @@ local PREFIXES = {
 		team = 'https://stratz.com/teams/'
 	},
 	stream = {''},
-	telegram = {'https://t.me/'},
+	telegram = {'https://telegram.me/'},
 	tespa = {match = 'https://web.archive.org/web/compete.tespa.org/tournament/'},
 	tetrio = {
 		'',
