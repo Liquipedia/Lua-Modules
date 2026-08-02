@@ -7,23 +7,18 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local Date = Lua.import('Module:Date/Ext')
 local Table = Lua.import('Module:Table')
 local VodLink = Lua.import('Module:VodLink')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 
----@class MatchSummaryFfaGameCountdown: Widget
----@operator call(table): MatchSummaryFfaGameCountdown
----@field props {game: FFAMatchGroupUtilGame?}
-local MatchSummaryFfaGameCountdown = Class.new(Widget)
-
----@return Widget?
-function MatchSummaryFfaGameCountdown:render()
-	local game = self.props.game
+---@param props {game: FFAMatchGroupUtilMatch|FFAMatchGroupUtilGame?}
+---@return VNode?
+local function MatchSummaryFfaGameCountdown(props)
+	local game = props.game
 	if not game then
 		return nil
 	end
@@ -40,7 +35,7 @@ function MatchSummaryFfaGameCountdown:render()
 		rawdatetime = (not game.dateIsExact) or game.winner ~= nil
 	})
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'match-countdown-block'},
 		children = {
 			Countdown.create(streamParameters),
@@ -49,4 +44,4 @@ function MatchSummaryFfaGameCountdown:render()
 	}
 end
 
-return MatchSummaryFfaGameCountdown
+return Component.component(MatchSummaryFfaGameCountdown)

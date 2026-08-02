@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
@@ -16,7 +15,6 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local ROUND_ICONS = {
 	atk = IconImage{
@@ -40,18 +38,21 @@ local ROUND_ICONS = {
 ---@class RainbowsixMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class RainbowsixMatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): RainbowsixMatchSummaryGameRow
-local RainbowsixMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+---@class RainbowsixMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
+	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay,
+}
+
+local RainbowsixMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return VNode[]
 function CustomMatchSummary.createBody(match)
 
 	local characterBansData = Array.map(match.games, function(game)
@@ -62,9 +63,8 @@ function CustomMatchSummary.createBody(match)
 		}
 	end)
 
-	return WidgetUtil.collect(
+	return {
 		MatchSummaryWidgets.GamesContainer{
-			gridLayout = 'standard',
 			children = Array.map(match.games, function (game, gameIndex)
 				if Logic.isEmpty(game.map) then
 					return
@@ -75,14 +75,14 @@ function CustomMatchSummary.createBody(match)
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	)
+	}
 end
 
 ---@private
+---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
 ---@return table[]
-function RainbowsixMatchSummaryGameRow:_makePartialScores(opponentIndex)
-	local game = self.props.game
+function GameRowComponentProps._makePartialScores(game, opponentIndex)
 	local extradata = game.extradata or {}
 	local halves = extradata['t' .. opponentIndex .. 'halfs']
 
@@ -93,13 +93,13 @@ function RainbowsixMatchSummaryGameRow:_makePartialScores(opponentIndex)
 			if opponentIndex == 1 then
 				return side
 			end
-			return CustomMatchSummary._getOppositeSide(side:lower())
+			return GameRowComponentProps._getOppositeSide(side:lower())
 		end
 	)
 	local firstSide = (firstSides.rt or '')
 	local firstSideOt = (firstSides.ot or '')
-	local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
-	local oppositeSideOt = CustomMatchSummary._getOppositeSide(firstSideOt)
+	local oppositeSide = GameRowComponentProps._getOppositeSide(firstSide)
+	local oppositeSideOt = GameRowComponentProps._getOppositeSide(firstSideOt)
 	return {
 		{score = halves[firstSide], icon = ROUND_ICONS[firstSide]},
 		{score = halves[oppositeSide], icon = ROUND_ICONS[oppositeSide]},
@@ -108,23 +108,20 @@ function RainbowsixMatchSummaryGameRow:_makePartialScores(opponentIndex)
 	}
 end
 
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Widget
-function RainbowsixMatchSummaryGameRow:createGameOpponentView(opponentIndex)
+---@return VNode
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
+	local game = props.game
 	return MatchSummaryWidgets.DetailedScore{
-		score = self:scoreDisplay(opponentIndex),
-		partialScores = self:_makePartialScores(opponentIndex)
+		score = MatchSummaryWidgets.GameRow.scoreDisplay(game, opponentIndex),
+		partialScores = GameRowComponentProps._makePartialScores(game, opponentIndex)
 	}
-end
-
----@return string
-function RainbowsixMatchSummaryGameRow:createGameOverview()
-	return self:mapDisplay()
 end
 
 ---@param side string
 ---@return string
-function CustomMatchSummary._getOppositeSide(side)
+function GameRowComponentProps._getOppositeSide(side)
 	if side == 'atk' then
 		return 'def'
 	elseif side == 'def' then

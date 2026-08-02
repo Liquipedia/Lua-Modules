@@ -505,7 +505,7 @@ Match.gameFields = Table.map({
 	'participants', -- LPDB API v3: backwards compatibility
 	'patch',
 	'opponents',
-	'resulttype',  -- LPDB API v3: backwards compatibility
+	'resulttype', -- LPDB API v3: backwards compatibility
 	'rounds',
 	'scores', -- LPDB API v3: backwards compatibility
 	'status',

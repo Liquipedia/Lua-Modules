@@ -32,7 +32,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
@@ -70,7 +70,11 @@ function Appearances:init(frame)
 		isFormQuery = Logic.readBool(args.query),
 		restrictToPlayersParticipatingIn = args.playerspage,
 		restrictToFirstPrizePool = Logic.readBool(args.restrictToFirstPrizePool),
+		player = Logic.nilOr(Logic.readBoolOrNil(args.player), true),
+		staff = Logic.readBool(args.staff),
 	}
+
+	assert(self.config.player or self.config.staff, 'Invalid config: at least one of |player= or |staff= must be true')
 
 	self.args = {
 		conditions = args.conditions,
@@ -148,7 +152,9 @@ function Appearances:_fetchPlayers(pageNames)
 		query = 'opponentplayers, opponenttype, opponentname, parent, date, placement, opponenttemplate',
 	}, function (placement)
 		local opponent = Opponent.fromLpdbStruct(placement)
-		Array.forEach(opponent.players, function (player)
+
+		---@param player standardPlayer
+		local function processPlayer(player)
 			if Opponent.playerIsTbd(player) then
 				return
 			end
@@ -168,11 +174,20 @@ function Appearances:_fetchPlayers(pageNames)
 			extradata.results[placement.parent] = {
 				placement = placement.placement,
 				date = placement.date,
-				team = placement.opponenttype == Opponent.team and placement.opponenttemplate or player.team
+				team = opponent.type == Opponent.team and opponent.template or player.team
 			}
 			local rawPlacement = Placement.raw(placement.placement)
 			extradata.placementSum = extradata.placementSum + (tonumber(rawPlacement.placement[1]) or 1000)
-		end)
+		end
+
+		if self.config.player then
+			Array.forEach(opponent.players, processPlayer)
+		end
+		if self.config.staff then
+			Array.forEach(Array.mapIndexes(function (index)
+				return Logic.nilIfEmpty(Opponent.staffFromLpdbStruct(placement.opponentplayers, index))
+			end), processPlayer)
+		end
 	end)
 
 	local playersArray = Array.extractValues(players)
@@ -231,7 +246,7 @@ function Appearances:build()
 		children = WidgetUtil.collect(
 			self:_header(),
 			TableWidgets.TableBody{
-				children = Array.map(Array.range(1, limit), FnUtil.curry(Appearances._row, self))
+				children = Array.mapRange(1, limit, FnUtil.curry(Appearances._row, self))
 			}
 		),
 		footer = self:_buildQueryLink()
@@ -245,7 +260,7 @@ function Appearances:_header()
 		TableWidgets.Row{children = WidgetUtil.collect(
 			TableWidgets.CellHeader{},
 			TableWidgets.CellHeader{children = 'Player'},
-			TableWidgets.CellHeader{children = HtmlWidgets.Abbr{children = 'TA.', title = 'Total appearances'}},
+			TableWidgets.CellHeader{children = Html.Abbr{children = 'TA.', title = 'Total appearances'}},
 			Array.map(self.tournaments, function (tournament)
 				return TableWidgets.CellHeader{children = TournamentTitle{
 					tournament = tournament, useShortName = true

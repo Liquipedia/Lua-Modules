@@ -149,7 +149,7 @@ end
 ---@param dbTable string
 ---@return table
 function mockLpdb._getMockData(dbTable)
-	local data = Lua.import('Module:TestAssets/Lpdb/' .. dbTable)
+	local data = Lua.import('Module:test_assets/lpdb_' .. dbTable)
 
 	if not data then
 		error(mw.message.new('liquipediadb-error-invalid-datatype'))

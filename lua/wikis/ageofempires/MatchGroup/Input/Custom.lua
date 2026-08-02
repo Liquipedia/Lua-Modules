@@ -11,13 +11,13 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local FnUtil = Lua.import('Module:FnUtil')
-local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
@@ -94,7 +94,7 @@ function MatchFunctions.readOpponent(match, opponentIndex, options)
 		local manualPlayersInput = MatchGroupInputUtil.extractManualPlayersInput(match, opponentIndex, opponentInput)
 		substitutions = manualPlayersInput.substitutions
 		-- Change compared to commons MatchGroupInputUtil.readOpponent
-		local template = mw.ext.TeamTemplate.raw(opponent.template or '') or {}
+		local template = TeamTemplate.getRawOrNil(opponent.template) or {}
 		opponent.players = MatchGroupInputUtil.readPlayersOfTeam(
 			template.page or '',
 			manualPlayersInput,
@@ -256,7 +256,7 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 		end,
 		function(playerIndex, playerIdData, playerInputData)
 			local civ = Logic.emptyOr(civs[playerIndex], Faction.defaultFaction)
-			civ = Faction.read(civ, {game = Game.abbreviation{game = map.game}:lower()})
+			civ = Faction.read(civ, {game = map.game})
 			return {
 				civ = civ,
 				displayName = playerIdData.displayname or playerInputData.name,
@@ -351,7 +351,7 @@ function FfaMapFunctions.getPlayersOfMapOpponent(map, opponent, opponentMapInput
 		end,
 		function(playerIndex, playerIdData, playerInputData)
 			local faction = Logic.emptyOr(factions[playerIndex], Faction.defaultFaction)
-			faction = Faction.read(faction, {game = Game.abbreviation{game = map.game}:lower()})
+			faction = Faction.read(faction, {game = map.game})
 			return {
 				faction = faction,
 			}

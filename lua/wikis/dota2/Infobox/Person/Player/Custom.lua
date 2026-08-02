@@ -28,6 +28,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local BANNED = Lua.import('Module:Banned', {loadData = true})
 
@@ -139,16 +140,16 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return Widget?
+---@return Renderable?
 function CustomPlayer:createBottomContent()
 	if not Namespace.isMain() then
 		return
 	end
 
-	return Html.Fragment{children = {
+	return Html.Fragment{children = WidgetUtil.collect(
 		MatchTicker.player(),
 		UpcomingTournaments.player{name = self.basePageName}
-	}}
+	)}
 end
 
 ---@return string[]

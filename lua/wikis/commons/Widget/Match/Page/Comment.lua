@@ -11,7 +11,7 @@ local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 
 ---@param props {children: Renderable|Renderable[]?}
----@return HtmlNode
+---@return VNode
 local function MatchPageComment(props)
 	return Html.Div{
 		classes = { 'match-bm-match-additional-comment' },

@@ -8,7 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Component = Lua.import('Module:Widget/Component')
-local HtmlWidgets = Lua.import('Module:Widget/Html')
+local Html = Lua.import('Module:Widget/Html')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 local PLACEMENT_MOVE_DOUBLE_UP = IconFa{iconName = 'rankup_double'}
@@ -55,14 +55,14 @@ local function PlacementChangeWidget(props)
 	---@cast props {change: integer, emphasisThreshold: integer}
 	local change = props.change
 
-	return HtmlWidgets.Span{
+	return Html.Span{
 		classes = {
 			'standings-position-indicator',
 			'movement-' .. getMovementType(change)
 		},
 		children = {
 			getIndicator(change, props.emphasisThreshold),
-			change ~= 0 and HtmlWidgets.Span{children = math.abs(change)} or nil
+			change ~= 0 and Html.Span{children = math.abs(change)} or nil
 		},
 	}
 end

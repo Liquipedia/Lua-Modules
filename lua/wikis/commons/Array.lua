@@ -182,13 +182,27 @@ function Array.flatten(tbl)
 end
 
 ---Maps each element of an array to separate arrays, then flattens the mapped results.
+---
+---This is equivalent to `Array.flatten(Array.map(elements, funct))`.
 ---@generic V, T
 ---@param elements V[]
 ---@param funct fun(element: V, index?: integer): T[]|nil
 ---@return T[]
 ---@nodiscard
 function Array.flatMap(elements, funct)
-	return Array.flatten(Array.map(elements, funct))
+	local mappedArray = {}
+	for index, element in ipairs(elements) do
+		local mappedElement = funct(element, index)
+		if Array.isArray(mappedElement) then
+			---@cast mappedElement -nil
+			for _, x in ipairs(mappedElement) do
+				table.insert(mappedArray, x)
+			end
+		else
+			table.insert(mappedArray, mappedElement)
+		end
+	end
+	return mappedArray
 end
 
 ---Determines whether all elements in an array satisfy a predicate.
@@ -507,6 +521,23 @@ function Array.range(from, to)
 	local elements = {}
 	for element = from, to do
 		table.insert(elements, element)
+	end
+	return elements
+end
+
+---Returns the array `{funct(from), funct(from + 1), funct(from + 2), ..., funct(to)}`.
+---
+---This is equivalent to `Array.map(Array.range(from, to), funct)`.
+---@generic T
+---@param from integer
+---@param to integer
+---@param funct fun(index: integer): T?
+---@return T[]
+---@nodiscard
+function Array.mapRange(from, to, funct)
+	local elements = {}
+	for i = from, to do
+		table.insert(elements, funct(i))
 	end
 	return elements
 end

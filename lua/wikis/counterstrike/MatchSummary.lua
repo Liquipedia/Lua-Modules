@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -22,12 +21,15 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@class CounterstrikeCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class CounterstrikeMatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): CounterstrikeMatchSummaryGameRow
-local CounterstrikeMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+---@class CounterstrikeMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
+	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay,
+}
+
+local CounterstrikeMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
@@ -195,15 +197,11 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 	return footer
 end
 
----@return string
-function CounterstrikeMatchSummaryGameRow:createGameOverview()
-	return self:mapDisplay()
-end
-
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Widget
-function CounterstrikeMatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	local game = self.props.game
+---@return VNode
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
+	local game = props.game
 
 	local sides = game.extradata['t' .. opponentIndex .. 'sides']
 	local halfs = game.extradata['t' .. opponentIndex .. 'halfs']
@@ -212,7 +210,7 @@ function CounterstrikeMatchSummaryGameRow:createGameOpponentView(opponentIndex)
 	end)
 
 	return MatchSummaryWidgets.DetailedScore{
-		score = self:scoreDisplay(opponentIndex),
+		score = MatchSummaryWidgets.GameRow.scoreDisplay(game, opponentIndex),
 		partialScores = scores,
 	}
 end

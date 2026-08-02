@@ -236,7 +236,7 @@ return {
 	bilibili = 'liquipedia-custom-icon liquipedia-custom-icon-bilibili',
 	cc = 'lp-icon lp-icon-21 lp-cc',
 	dailymotion = 'liquipedia-custom-icon liquipedia-custom-icon-dailymotion',
-	douyu = 'liquipedia-custom-icon liquipedia-custom-icon-duotone  liquipedia-custom-icon-douyu-duotone',
+	douyu = 'liquipedia-custom-icon liquipedia-custom-icon-duotone liquipedia-custom-icon-douyu-duotone',
 	huomao = 'liquipedia-custom-icon liquipedia-custom-icon-huomao',
 	huya = 'liquipedia-custom-icon liquipedia-custom-icon-duotone liquipedia-custom-icon-huya-duotone',
 	loco = 'lp-icon lp-icon-21 lp-loco',

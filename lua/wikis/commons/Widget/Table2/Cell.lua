@@ -43,7 +43,7 @@ local function Table2Cell(props, context)
 				props.align,
 				props.nowrap,
 				props.shrink,
-				props.attributes
+				ColumnUtil.buildAttributes(props)
 			),
 			classes = props.classes,
 			children = children,

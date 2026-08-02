@@ -89,8 +89,11 @@ end
 ---@param customTitle string?
 ---@return Widget
 function SquadController.runAuto(players, squadStatus, squadType, customTitle, adjustLpdb)
-	local mappedPlayers = Array.map(players, SquadUtils.convertAutoParameters)
-	local squadData = SquadUtils.createWrapperData(mappedPlayers, squadType, squadStatus, customTitle)
+	-- Temporary until all wikis have enabled the new version of automated squads
+	if not Info.config.squads.standardizedAuto then
+		players = Array.map(players, SquadUtils.convertAutoParameters)
+	end
+	local squadData = SquadUtils.createWrapperData(players, squadType, squadStatus, customTitle)
 	return SquadController.execute(squadData, adjustLpdb)
 end
 

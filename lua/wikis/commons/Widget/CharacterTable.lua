@@ -14,8 +14,8 @@ local Operator = Lua.import('Module:Operator')
 local Character = Lua.import('Module:Character')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Entry = Lua.import('Module:Widget/CharacterTable/Entry/Custom')
 
 ---@class CharacterTable: Widget

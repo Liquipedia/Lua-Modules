@@ -85,16 +85,13 @@ local function Table2(props, context)
 		}}
 	end
 
-	if Logic.readBool(props.striped) then
-		tableChildren = {Context.Provider{
-			def = Table2Contexts.BodyStripe,
-			value = true,
-			children = tableChildren,
-		}}
+	local tableAttributes = props.tableAttributes or {}
+	if not Logic.readBool(props.striped) then
+		tableAttributes['data-striped'] = 'false'
 	end
 
 	local tableNode = Html.Table{
-		attributes = props.tableAttributes,
+		attributes = tableAttributes,
 		classes = tableClasses,
 		children = tableChildren,
 	}

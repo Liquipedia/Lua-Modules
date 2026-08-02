@@ -31,7 +31,7 @@ local Tier = Lua.import('Module:Tier/Custom')
 
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local DateRange = Lua.import('Module:Widget/Misc/DateRange')
 
@@ -87,12 +87,12 @@ function BaseTournamentsListing.byYear(args)
 		local tournaments = BaseTournamentsListing(Table.merge(args, {year = year})):create():build()
 		if not tournaments then return end
 		Array.appendWith(children,
-			HtmlWidgets.H3{children = year},
+			Html.H3{children = year},
 			tournaments
 		)
 	end)
 
-	return HtmlWidgets.Fragment{children = children}
+	return Html.Fragment{children = children}
 end
 
 ---@param args table
@@ -241,14 +241,14 @@ function BaseTournamentsListing:_header()
 			config.showRank and TableWidgets.CellHeader{children = '#'} or nil,
 			config.showTier and TableWidgets.CellHeader{children = 'Tier'} or nil,
 			config.showGameIcon and TableWidgets.CellHeader{
-				children = HtmlWidgets.Abbr{title = 'Game', children = 'G'}
+				children = Html.Abbr{title = 'Game', children = 'G'}
 			} or nil,
 			TableWidgets.CellHeader{colspan = 2, children = 'Tournament'},
 			config.showOrganizer and TableWidgets.CellHeader{children = 'Organizer'} or nil,
 			TableWidgets.CellHeader{children = 'Date'},
 			TableWidgets.CellHeader{children = 'Prize' .. NONBREAKING_SPACE .. 'Pool'},
 			TableWidgets.CellHeader{children = 'Location'},
-			TableWidgets.CellHeader{children = HtmlWidgets.Abbr{title = 'Number of Participants', children = 'P#'}},
+			TableWidgets.CellHeader{children = Html.Abbr{title = 'Number of Participants', children = 'P#'}},
 			config.showQualifierColumnOverWinnerRunnerup
 				and TableWidgets.CellHeader{children = 'Qualified'}
 				or WidgetUtil.collect(
@@ -361,7 +361,7 @@ end
 ---@param opponents table[]
 ---@return Widget
 function BaseTournamentsListing:_buildParticipants(opponents)
-	return HtmlWidgets.Div{
+	return Html.Div{
 		children = Array.map(opponents, function (opponent)
 			return OpponentDisplay.BlockOpponent{opponent = opponent}
 		end)
@@ -413,7 +413,7 @@ function BaseTournamentsListing._displayLocations(locationData, tournamentType)
 		return tournamentType and mw.getContentLanguage():ucfirst(tournamentType) or nil
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		css = {
 			display = 'inline-grid'
 		},
@@ -444,7 +444,7 @@ function BaseTournamentsListing._displayLocation(locationData, locationIndex)
 		return nil
 	end
 
-	return HtmlWidgets.Span{
+	return Html.Span{
 		children = {
 			icon,
 			text

@@ -133,12 +133,12 @@ return {
 			name = 'Avatar Legends',
 			link = 'Avatar Legends',
 			logo = {
-				darkMode = 'Avatar Legends icon darkmode.png',
-				lightMode = 'Avatar Legends icon lightmode.png',
+				darkMode = 'Avatar Legends allmode.png',
+				lightMode = 'Avatar Legends allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Avatar Legends darkmode.png',
-				lightMode = 'Avatar Legends lightmode.png',
+				darkMode = 'Avatar Legends allmode.png',
+				lightMode = 'Avatar Legends allmode.png',
 			},
 		},
 		arms = {
@@ -2008,6 +2008,11 @@ return {
 		},
 		participants = {
 			syncPlayerTeam = true,
+		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchdiff', 'gamediff'},
+			},
 		},
 	},
 }

@@ -15,7 +15,6 @@ local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TypeUtil = Lua.import('Module:TypeUtil')
 
@@ -98,6 +97,10 @@ Opponent.types.Opponent = TypeUtil.union(
 	Opponent.types.TeamOpponent,
 	Opponent.types.PartyOpponent,
 	Opponent.types.LiteralOpponent
+)
+
+Opponent.types.OpponentType = TypeUtil.literalUnion(
+	Opponent.solo, Opponent.duo, Opponent.trio, Opponent.quad, Opponent.team, Opponent.literal
 )
 
 ---Checks if the provided opponent type is a party type
@@ -206,7 +209,7 @@ end
 ---@param type string
 ---@return boolean
 function Opponent.isType(type)
-	return Table.includes(Opponent.types, type)
+	return #TypeUtil.checkValue(type, Opponent.types.OpponentType) == 0
 end
 
 ---Reads an opponent type.
@@ -214,13 +217,13 @@ end
 ---@param type string
 ---@return OpponentType?
 function Opponent.readType(type)
-	return Table.includes(Opponent.types, type) and type or nil
+	return Opponent.isType(type) and type or nil
 end
 
 ---Asserts that an arbitrary value is a valid representation of an opponent
 ---@param opponent any
 function Opponent.assertOpponent(opponent)
-	assert(Opponent.isOpponent(opponent), 'Invalid opponent')
+	TypeUtil.assertValue(opponent, Opponent.types.Opponent, {name = 'Opponent'})
 end
 
 ---Validates that an arbitrary value is a valid representation of an opponent
@@ -455,7 +458,7 @@ function Opponent.readOpponentArgs(args)
 		return {type = Opponent.solo, players = {player}, extradata = {}}
 
 	elseif partySize then
-		local players = Array.map(Array.range(1, partySize), function(playerIndex)
+		local players = Array.mapRange(1, partySize, function(playerIndex)
 			return Opponent.readPlayerArgs(args, playerIndex)
 		end)
 		return {type = args.type, players = players, extradata = {}}
@@ -478,6 +481,7 @@ function Opponent.readSinglePlayerArgs(args)
 		p1team = args.team or args.p1team,
 		p1faction = args.faction or args.race or args.p1race,
 		p1id = args.id or args.p1id,
+		game = args.game,
 	}, 1)
 end
 
@@ -493,7 +497,7 @@ function Opponent.readPlayerArgs(args, playerIndex)
 		pageName = Page.applyUnderScoresIfEnforced(args['p' .. playerIndex .. 'link']),
 		team = playerTeam,
 		faction = Logic.nilIfEmpty(Faction.read(args['p' .. playerIndex .. 'faction']
-			or args['p' .. playerIndex .. 'race'])),
+			or args['p' .. playerIndex .. 'race'], {game = args.game})),
 		apiId = args['p' .. playerIndex .. 'id'],
 	}
 	assert(not player.displayName:find('|'), 'Invalid character "|" in player name')
@@ -606,7 +610,7 @@ function Opponent.fromLpdbStruct(storageStruct)
 	if partySize then
 		local players = storageStruct.opponentplayers
 		return {
-			players = Array.map(Array.range(1, partySize), FnUtil.curry(Opponent.playerFromLpdbStruct, players)),
+			players = Array.mapRange(1, partySize, FnUtil.curry(Opponent.playerFromLpdbStruct, players)),
 			type = storageStruct.opponenttype,
 			extradata = {},
 		}

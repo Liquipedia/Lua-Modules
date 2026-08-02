@@ -78,7 +78,7 @@ function MatchPage:populateGames()
 		game.finished = game.winner ~= nil and game.winner ~= -1
 		game.teams = game.opponents
 		Array.forEach(game.teams, function(team, teamIdx)
-			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
+			team.scoreDisplay = game.winner == teamIdx and 'win' or game.finished and 'loss' or '-'
 			team.postPlant = team.postPlant or {}
 		end)
 	end)
@@ -256,10 +256,10 @@ function MatchPage:_renderGameOverview(game)
 					},
 					Div{
 						classes = {'match-bm-lol-game-summary-team'},
-						children = {
+						children = WidgetUtil.collect(
 							self.opponents[2].iconDisplay,
-							makeTeamHalvesDisplay(team2),
-						}
+							makeTeamHalvesDisplay(team2)
+						)
 					},
 				}
 			}

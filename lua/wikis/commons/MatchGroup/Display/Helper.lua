@@ -27,7 +27,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local DisplayHelper = {}
 local NONBREAKING_SPACE = '&nbsp;'
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@param node Html
@@ -40,6 +40,22 @@ function DisplayHelper.addOpponentHighlight(node, opponent)
 	return node
 		:addClass('brkts-opponent-hover')
 		:attr('aria-label', Opponent.toName(opponent))
+end
+
+---@param props HtmlNodeProps
+---@param opponent standardOpponent
+---@return HtmlNodeProps
+function DisplayHelper.addOpponentHighlightToProps(props, opponent)
+	if Opponent.isTbd(opponent) then
+		return props
+	end
+	props.classes = props.classes or {}
+	table.insert(props.classes, 'brkts-opponent-hover')
+
+	props.attributes = props.attributes or {}
+	props.attributes['aria-label'] = Opponent.toName(opponent)
+
+	return props
 end
 
 -- Expands a header code by making a RPC call.
@@ -173,7 +189,7 @@ function DisplayHelper.createCastersDisplay(casters)
 			return casterLink
 		end
 
-		return HtmlWidgets.Fragment{children = {
+		return Html.Fragment{children = {
 			Flags.Icon{flag = caster.flag},
 			NONBREAKING_SPACE,
 			casterLink,

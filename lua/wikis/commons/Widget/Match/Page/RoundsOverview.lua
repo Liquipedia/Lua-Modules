@@ -66,7 +66,7 @@ local function MatchPageRoundsOverview(props)
 		return round['t' .. team .. 'side']
 	end
 
-	local teamContainers = Array.map(Array.range(1, numTeamContainers), function(container)
+	local teamContainers = Array.mapRange(1, numTeamContainers, function(container)
 		return Div{
 			classes = {'match-bm-rounds-overview-teams'},
 			children = {

@@ -11,6 +11,7 @@ $participant-icon-size-expanded: 52px;
 $participant-icon-size-compact: 44px;
 $participant-icon-size-mobile: 33px;
 $participant-icon-size-small: 18px;
+$participant-card-min-width: 280px;
 
 $compact-selector: '[data-switch-group="team-cards-compact"]';
 $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
@@ -65,10 +66,21 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 .team-participant__grid {
 	display: grid;
 	gap: 0.25rem;
-	grid-template-columns: repeat( auto-fit, minmax( 280px, 1fr ) );
+	grid-template-columns: repeat( auto-fill, minmax( $participant-card-min-width, 1fr ) );
 
 	@media ( min-width: 1024px ) {
 		gap: 0.5rem;
+	}
+}
+
+// `auto-fill` collapses to one column inside a shrink-to-fit wikitable cell (indefinite width).
+// Flex-wrap with no shrink lets the cell size to the cards, so they sit side by side when they fit.
+table .team-participant__grid {
+	display: flex;
+	flex-wrap: wrap;
+
+	> * {
+		flex: 1 0 $participant-card-min-width;
 	}
 }
 
@@ -82,11 +94,8 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 	border: 1px solid;
 	padding: 0.5rem 0;
 	overflow: hidden;
-
-	.theme--light & {
-		background-color: var( --clr-secondary-100 );
-		border-color: var( --clr-on-surface-light-primary-8 );
-	}
+	background-color: var( --clr-secondary-100 );
+	border-color: var( --clr-on-surface-light-primary-8 );
 
 	.theme--dark & {
 		background-color: var( --clr-on-surface-dark-primary-4 );
@@ -100,10 +109,7 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 		align-self: stretch;
 		padding: 0 0.5rem;
 		cursor: pointer;
-
-		.theme--light & {
-			color: var( --clr-secondary-25 );
-		}
+		color: var( --clr-secondary-25 );
 
 		.theme--dark & {
 			color: var( --clr-secondary-90 );
@@ -116,10 +122,7 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 		.general-collapsible-expand-button,
 		.general-collapsible-collapse-button {
 			outline: unset;
-
-			.theme--light & {
-				color: var( --clr-secondary-7 );
-			}
+			color: var( --clr-secondary-7 );
 
 			.theme--dark & {
 				color: var( --clr-secondary-90 );
@@ -178,11 +181,8 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 		border: 1px solid;
 		font-weight: bold;
 		font-size: 0.6875rem;
-
-		.theme--light & {
-			border-color: var( --clr-on-surface-light-primary-8 );
-			color: var( --clr-secondary-9 );
-		}
+		border-color: var( --clr-on-surface-light-primary-8 );
+		color: var( --clr-secondary-9 );
 
 		.theme--dark & {
 			border-color: var( --clr-on-surface-dark-primary-8 );
@@ -190,9 +190,7 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 		}
 
 		&--tbd {
-			.theme--light & {
-				color: var( --clr-secondary-80 );
-			}
+			color: var( --clr-secondary-80 );
 
 			.theme--dark & {
 				color: var( --clr-secondary-44 );
@@ -208,11 +206,8 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 		padding: 0.25rem 0.5rem;
 		margin: 0.25rem 0.5rem;
 		min-height: 2rem;
-
-		.theme--light & {
-			background-color: var( --clr-on-surface-light-primary-4 );
-			color: var( --clr-secondary-25 );
-		}
+		background-color: var( --clr-on-surface-light-primary-4 );
+		color: var( --clr-secondary-25 );
 
 		.theme--dark & {
 			background-color: var( --clr-on-surface-dark-primary-4 );
@@ -255,9 +250,7 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 	}
 
 	&__qualifier-icon {
-		.theme--light & {
-			color: var( --clr-primary-44 );
-		}
+		color: var( --clr-primary-44 );
 
 		.theme--dark & {
 			color: var( --clr-primary-80 );
@@ -310,10 +303,8 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 		align-items: center;
 		padding: 0.5rem 0.75rem;
 
-		&--odd {
-			.theme--light & {
-				background-color: var( --clr-on-surface-light-primary-4 );
-			}
+		&:nth-of-type( odd ) {
+			background-color: var( --clr-on-surface-light-primary-4 );
 
 			.theme--dark & {
 				background-color: var( --clr-on-surface-dark-primary-4 );
@@ -329,9 +320,7 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 			margin-right: 0.25rem;
 
 			& > *:not( span ):not( img ) {
-				.theme--light & {
-					background-color: var( --clr-on-surface-light-primary-4 );
-				}
+				background-color: var( --clr-on-surface-light-primary-4 );
 
 				.theme--dark & {
 					background-color: var( --clr-on-surface-dark-primary-4 );
@@ -360,11 +349,8 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 			border-radius: 0.25rem;
 			font-weight: bold;
 			font-size: 0.6875rem;
-
-			.theme--light & {
-				background-color: var( --clr-on-surface-light-primary-4 );
-				color: var( --clr-secondary-25 );
-			}
+			background-color: var( --clr-on-surface-light-primary-4 );
+			color: var( --clr-secondary-25 );
 
 			.theme--dark & {
 				background-color: var( --clr-on-surface-dark-primary-4 );
@@ -392,45 +378,61 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 		}
 	}
 
-	&__notifications {
-		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
+	&__notes {
 		margin: 0.5rem 0.5rem 0;
-	}
-
-	&__notification {
-		display: flex;
-		gap: 0.25rem;
-		padding: 0.25rem;
-		border-radius: 0.25rem;
-		font-size: 0.75rem;
-
-		.theme--light & {
-			background-color: var( --clr-on-surface-light-primary-4 );
-			color: var( --clr-secondary-25 );
-		}
+		border-radius: 0.5rem;
+		overflow: hidden;
+		background-color: var( --clr-on-surface-light-primary-4 );
+		color: var( --clr-secondary-25 );
 
 		.theme--dark & {
 			background-color: var( --clr-on-surface-dark-primary-4 );
 			color: var( --clr-secondary-90 );
 		}
 
-		&--highlighted {
-			.theme--light & {
-				background-color: var( --clr-semantic-gold-90 );
-				color: var( --clr-semantic-gold-20 );
+		&-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.5rem 0.75rem;
+			font-size: 0.75rem;
+			cursor: pointer;
+		}
+
+		&-toggle {
+			display: inline-flex;
+			transition: transform 0.2s;
+		}
+
+		&:not( .collapsed ) &-toggle {
+			transform: rotate( 180deg );
+		}
+	}
+
+	&__notifications {
+		display: flex;
+		flex-direction: column;
+	}
+
+	&__notification {
+		padding: 0.5rem 0.75rem;
+		font-size: 0.75rem;
+
+		& + & {
+			border-top: 1px solid var( --clr-on-surface-light-primary-12 );
+
+			.theme--dark & {
+				border-top: 1px solid var( --clr-on-surface-dark-primary-12 );
 			}
+		}
+
+		&--highlighted {
+			background-color: var( --clr-semantic-gold-90 );
+			color: var( --clr-semantic-gold-20 );
 
 			.theme--dark & {
 				background-color: var( --clr-semantic-gold-30 );
 				color: var( --clr-semantic-gold-90 );
-			}
-
-			.team-participant-card__notification-icon {
-				.theme--light & {
-					color: var( --clr-semantic-gold-30 );
-				}
 			}
 		}
 	}
@@ -448,10 +450,8 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 		&-item {
 			padding: 0.5rem 0.75rem;
 
-			&--odd {
-				.theme--light & {
-					background-color: var( --clr-on-surface-light-primary-4 );
-				}
+			&:nth-of-type( odd ) {
+				background-color: var( --clr-on-surface-light-primary-4 );
 
 				.theme--dark & {
 					background-color: var( --clr-on-surface-dark-primary-4 );
@@ -471,10 +471,7 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 		padding: 0 0.5rem;
 		font-size: 0.875rem;
 		font-weight: bold;
-
-		.theme--light & {
-			color: var( --clr-secondary-25 );
-		}
+		color: var( --clr-secondary-25 );
 
 		.theme--dark & {
 			color: var( --clr-secondary-90 );
@@ -644,7 +641,7 @@ body:has( .switch-toggle-active#{ $compact-selector } ) {
 			}
 
 			.team-participant-card__qualifier--content,
-			.team-participant-card__notifications {
+			.team-participant-card__notes {
 				display: none;
 			}
 		}

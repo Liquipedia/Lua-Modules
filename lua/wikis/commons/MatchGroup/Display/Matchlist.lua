@@ -19,19 +19,19 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local MatchInfoIcon = Lua.import('Module:Widget/Match/InfoIcon')
+local MatchListHeader = Lua.import('Module:Widget/Match/List/Header')
+local MatchListOpponent = Lua.import('Module:Widget/Match/List/Opponent')
+local MatchListScore = Lua.import('Module:Widget/Match/List/Score')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local MatchlistDisplay = {propTypes = {}, types = {}}
 
-local SCORE_DRAW = 0
-
 ---@class MatchlistConfigOptions
 ---@field MatchSummaryContainer function?
----@field Opponent function?
----@field Score function?
+---@field Opponent Component<MatchListOpponentProps>?
+---@field Score Component<MatchListScoreProps>?
 ---@field attached boolean?
 ---@field collapsed boolean?
 ---@field matchHasDetails function?
@@ -39,8 +39,8 @@ local SCORE_DRAW = 0
 
 ---@class MatchlistDisplayMatchProps
 ---@field MatchSummaryContainer function
----@field Opponent function
----@field Score function
+---@field Opponent Component<MatchListOpponentProps>
+---@field Score Component<MatchListScoreProps>
 ---@field match MatchGroupUtilMatch
 ---@field matchHasDetails function
 
@@ -58,23 +58,23 @@ end
 ---The component fetches the match data from LPDB or page variables.
 ---@param props {bracketId: string, config: MatchlistConfigOptions}
 ---@param matches MatchGroupUtilMatch[]
----@return Widget
+---@return VNode
 function MatchlistDisplay.MatchlistContainer(props, matches)
-	return MatchlistDisplay.Matchlist({
+	return MatchlistDisplay.Matchlist{
 		config = props.config,
 		matches = matches or MatchGroupUtil.fetchMatches(props.bracketId),
-	})
+	}
 end
 
 ---Display component for a tournament matchlist. Match data is specified in the input.
 ---@param props {config: MatchlistConfigOptions, matches: MatchGroupUtilMatch[]}
----@return Widget
+---@return VNode
 function MatchlistDisplay.Matchlist(props)
 	local propsConfig = props.config or {}
 	local config = {
 		MatchSummaryContainer = propsConfig.MatchSummaryContainer or DisplayHelper.DefaultMatchSummaryContainer,
-		Opponent = propsConfig.Opponent or MatchlistDisplay.Opponent,
-		Score = propsConfig.Score or MatchlistDisplay.Score,
+		Opponent = propsConfig.Opponent or MatchListOpponent,
+		Score = propsConfig.Score or MatchListScore,
 		attached = propsConfig.attached or false,
 		collapsed = propsConfig.collapsed or false,
 		matchHasDetails = propsConfig.matchHasDetails or WikiSpecific.matchHasDetails or DisplayHelper.defaultMatchHasDetails,
@@ -89,24 +89,16 @@ function MatchlistDisplay.Matchlist(props)
 		attributes = {style = 'width: ' .. config.width .. 'px;'},
 		shouldCollapse = config.collapsed,
 		children = Array.flatMap(props.matches, function(match)
-			local headerNode = match.bracketData.header
-				and MatchlistDisplay.Header({
-				header = match.bracketData.header,
-				})
-				or nil
+			local headerNode = MatchlistDisplay.Header(match.bracketData.header)
+			local dateHeaderNode = MatchlistDisplay.DateHeader(match)
 
-			local dateHeaderNode = match.bracketData.dateHeader
-				and match.dateIsExact
-				and MatchlistDisplay.DateHeader(match)
-				or nil
-
-			local matchNode = MatchlistDisplay.Match({
+			local matchNode = MatchlistDisplay.Match{
 				MatchSummaryContainer = config.MatchSummaryContainer,
 				Opponent = config.Opponent,
 				Score = config.Score,
 				match = match,
 				matchHasDetails = config.matchHasDetails,
-			})
+			}
 
 			return WidgetUtil.collect(headerNode, dateHeaderNode, matchNode)
 		end)
@@ -116,35 +108,33 @@ end
 ---Display component for a match in a matchlist. Consists of two opponents, two scores,
 ---and a icon for the match summary popup.
 ---@param props MatchlistDisplayMatchProps
----@return Html
+---@return VNode
 function MatchlistDisplay.Match(props)
 	local match = props.match
 
+	---@param opponentIx integer
+	---@return VNode
 	local function renderOpponent(opponentIx)
-		local opponent = match.opponents[opponentIx] or MatchGroupUtil.createOpponent({})
-
-		local opponentNode = props.Opponent({
-			opponent = opponent,
+		return props.Opponent{
+			opponent = match.opponents[opponentIx],
 			winner = match.winner,
 			side = opponentIx == 1 and 'left' or 'right',
-		})
-		return DisplayHelper.addOpponentHighlight(opponentNode, opponent)
+		}
 	end
 
+	---@param opponentIx integer
+	---@return VNode
 	local function renderScore(opponentIx)
-		local opponent = match.opponents[opponentIx] or MatchGroupUtil.createOpponent({})
-
-		local scoreNode = props.Score({
-			opponent = opponent,
+		return props.Score{
+			opponent = match.opponents[opponentIx],
 			side = opponentIx == 1 and 'left' or 'right',
-		})
-		return DisplayHelper.addOpponentHighlight(scoreNode, opponent)
+		}
 	end
 
 	local matchInfoIconNode
 	local matchSummaryNode
 	if props.matchHasDetails(match) then
-		matchInfoIconNode = mw.html.create('div'):addClass('brkts-match-info-icon')
+		matchInfoIconNode = MatchInfoIcon{}
 		local bracketId = MatchGroupUtil.splitMatchId(props.match.matchId)
 		matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 			classes = {'brkts-match-info-popup'},
@@ -152,40 +142,48 @@ function MatchlistDisplay.Match(props)
 			matchId = props.match.matchId,
 		}, Lua.import('Module:Error/Display').ErrorDetails)
 	else
-		matchInfoIconNode = mw.html.create('div'):addClass('brkts-matchlist-placeholder-cell')
+		matchInfoIconNode = Html.Div{
+			classes = {'brkts-matchlist-placeholder-cell'}
+		}
 	end
 
-	return mw.html.create('div'):addClass('brkts-matchlist-match')
-		:addClass(matchSummaryNode and 'brkts-match-has-details brkts-match-popup-wrapper' or nil)
-		:node(renderOpponent(1))
-		:node(renderScore(1))
-		:node(matchInfoIconNode)
-		:node(renderScore(2))
-		:node(renderOpponent(2))
-		:node(matchSummaryNode)
+	return Html.Div{
+		classes = Array.extend(
+			'brkts-matchlist-match',
+			matchSummaryNode and 'brkts-match-has-details brkts-match-popup-wrapper' or nil
+		),
+		children = WidgetUtil.collect(
+			renderOpponent(1),
+			renderScore(1),
+			matchInfoIconNode,
+			renderScore(2),
+			renderOpponent(2),
+			matchSummaryNode
+		)
+	}
 end
 
 ---Display component for a header in a matchlist.
----@param props {header: string}
----@return Html
-function MatchlistDisplay.Header(props)
-	local headerNode = mw.html.create('div'):addClass('brkts-matchlist-header')
-		:wikitext(props.header)
-
-	return DisplayUtil.applyOverflowStyles(headerNode, 'wrap')
+---@param header string?
+---@return VNode?
+function MatchlistDisplay.Header(header)
+	if not header then
+		return
+	end
+	return MatchListHeader{
+		children = header
+	}
 end
 
 ---Display component for a dateHeader in a matchlist.
 ---@param match MatchGroupUtilMatch
----@return Widget
+---@return VNode?
 function MatchlistDisplay.DateHeader(match)
-	return HtmlWidgets.Div{
-		classes = {'brkts-matchlist-header'},
-		css = {
-			['overflow-wrap'] = 'break-word',
-			['white-space'] = 'normal',
-		},
-		children = HtmlWidgets.Div{
+	if not match.bracketData.dateHeader or not match.dateIsExact then
+		return
+	end
+	return MatchListHeader{
+		children = Html.Div{
 			css = {padding = '2px 10px'},
 			children = Countdown.create(Table.merge(match.stream, {
 				date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
@@ -194,49 +192,6 @@ function MatchlistDisplay.DateHeader(match)
 			}))
 		}
 	}
-end
-
---[[
-Display component for an opponent in a matchlist.
-
-This is the default implementation used by the Matchlist component. Specific
-wikis may override this by passing a different props.Opponent to the Matchlist
-component.
-]]
----@param props {opponent: standardOpponent, winner: integer?, side: string}
----@return Html
-function MatchlistDisplay.Opponent(props)
-	local contentNode = OpponentDisplay.BlockOpponent{
-		flip = props.side == 'left',
-		opponent = props.opponent,
-		overflow = 'ellipsis',
-		showLink = false,
-		teamStyle = 'short',
-		additionalClasses = {'brkts-matchlist-cell-content'},
-	}
-	return mw.html.create('div')
-		:addClass('brkts-matchlist-cell brkts-matchlist-opponent')
-		:addClass(props.winner == SCORE_DRAW and 'brkts-matchlist-slot-bold bg-draw' or
-			props.opponent.placement == 1 and 'brkts-matchlist-slot-winner' or nil)
-		:node(contentNode)
-end
-
---[[
-Display component for the score of an opponent in a matchlist.
-
-This is the default implementation used by the Matchlist component. Specific
-wikis may override this by passing a different props.Score to the Matchlist
-component.
-]]
----@param props {opponent: standardOpponent, side: string}
----@return Html
-function MatchlistDisplay.Score(props)
-	local contentNode = mw.html.create('div'):addClass('brkts-matchlist-cell-content')
-		:node(OpponentDisplay.InlineScore(props.opponent))
-	return mw.html.create('div')
-		:addClass('brkts-matchlist-cell brkts-matchlist-score')
-		:addClass(props.opponent.placement == 1 and 'brkts-matchlist-slot-bold' or nil)
-		:node(contentNode)
 end
 
 return MatchlistDisplay

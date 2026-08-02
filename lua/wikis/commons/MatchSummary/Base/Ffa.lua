@@ -18,7 +18,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local MatchUtil = Lua.import('Module:Match/Util')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 local MatchSummaryFfa = {}
@@ -87,9 +87,9 @@ local MATCH_OVERVIEW_COLUMNS = {
 			value = function (opponent, idx)
 				local place = opponent.placement ~= -1 and opponent.placement or idx
 				local placementDisplay = tostring(MatchSummaryWidgets.RankRange{rankStart = place})
-				return HtmlWidgets.Fragment{children = {
+				return Html.Fragment{children = {
 					MatchSummaryWidgets.Trophy{place = place, additionalClasses = {'panel-table__cell-icon'}},
-					HtmlWidgets.Span{children = placementDisplay},
+					Html.Span{children = placementDisplay},
 				}}
 			end,
 		},
@@ -187,9 +187,9 @@ local GAME_OVERVIEW_COLUMNS = {
 				else
 					placementDisplay = tostring(MatchSummaryWidgets.RankRange{rankStart = opponent.placement})
 				end
-				return HtmlWidgets.Fragment{children = {
+				return Html.Fragment{children = {
 					MatchSummaryWidgets.Trophy{place = opponent.placement, additionalClasses = {'panel-table__cell-icon'}},
-					HtmlWidgets.Span{
+					Html.Span{
 						classes = {'panel-table__cell-game__text'},
 						children = placementDisplay,
 					}
@@ -262,9 +262,9 @@ local GAME_STANDINGS_COLUMNS = {
 				else
 					placementDisplay = tostring(MatchSummaryWidgets.RankRange{rankStart = place})
 				end
-				return HtmlWidgets.Fragment{children = {
+				return Html.Fragment{children = {
 					MatchSummaryWidgets.Trophy{place = place, additionalClasses = {'panel-table__cell-icon'}},
-					HtmlWidgets.Span{children = placementDisplay},
+					Html.Span{children = placementDisplay},
 				}}
 			end,
 		},
@@ -418,7 +418,7 @@ end
 
 ---@param match table
 ---@param Parser FfaMatchSummaryParser?
----@return MatchSummaryFfaTable
+---@return VNode
 function MatchSummaryFfa.standardMatch(match, Parser)
 	Parser = Parser or {}
 	local matchColumns = Parser.adjustMatchColumns
@@ -442,13 +442,13 @@ function MatchSummaryFfa.standardMatch(match, Parser)
 			}
 		end)
 
-		local gameRowContainer = HtmlWidgets.Div{
+		local gameRowContainer = Html.Div{
 			classes = {'panel-table__cell', 'cell--game-container'},
 			attributes = {
 				['data-js-battle-royale'] = 'game-container'
 			},
 			children = Array.map(opponent.games, function(gameOpponent)
-				local gameRow = HtmlWidgets.Div{
+				local gameRow = Html.Div{
 					classes = {'panel-table__cell', 'cell--game'},
 					children = Array.map(gameOverviewColumns, function(column)
 						if column.show and not column.show(match) then
@@ -485,29 +485,29 @@ function MatchSummaryFfa.standardMatch(match, Parser)
 	local dates = Array.map(match.games, Operator.property('date'))
 	local gamesHaveDifferentDates = Array.any(dates, function(date) return date ~= match.date end)
 
-	table.insert(cells, HtmlWidgets.Div{
+	table.insert(cells, Html.Div{
 		classes = {'panel-table__cell', 'cell--game-container-nav-holder'},
 		attributes = {
 			['data-js-battle-royale'] = 'game-nav-holder'
 		},
 		children = {
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'panel-table__cell', 'cell--game-container'},
 				attributes = {
 					['data-js-battle-royale'] = 'game-container'
 				},
 				children = Array.map(match.games, function(game, idx)
-					return HtmlWidgets.Div{
+					return Html.Div{
 						classes = {'panel-table__cell', 'cell--game'},
 						children = {
-							HtmlWidgets.Div{
+							Html.Div{
 								classes = {'panel-table__cell__game-head'},
 								children = {
-									HtmlWidgets.Div{
+									Html.Div{
 										classes = {'panel-table__cell__game-title'},
 										children = {
 											MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-table__cell-icon'}},
-											HtmlWidgets.Span{
+											Html.Span{
 												classes = {'panel-table__cell-text'},
 												children = 'Game ' .. idx
 											}
@@ -516,7 +516,7 @@ function MatchSummaryFfa.standardMatch(match, Parser)
 									gamesHaveDifferentDates and MatchSummaryWidgets.GameCountdown{game = game} or nil,
 								}
 							},
-							HtmlWidgets.Div{
+							Html.Div{
 								classes = {'panel-table__cell__game-details'},
 								children = Array.map(gameOverviewColumns, function(column)
 									if column.show and not column.show(match) then
@@ -549,7 +549,7 @@ end
 
 ---@param game table
 ---@param Parser FfaGameSummaryParser?
----@return MatchSummaryFfaTable
+---@return VNode
 function MatchSummaryFfa.standardGame(game, Parser)
 	Parser = Parser or {}
 	local gameStandingsColumns = Parser.adjustGameStandingsColumns

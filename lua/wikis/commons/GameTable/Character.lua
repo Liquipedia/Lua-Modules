@@ -26,7 +26,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchSummaryCharacters = Lua.import('Module:Widget/Match/Summary/Characters')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
@@ -478,7 +478,7 @@ function CharacterGameTable:_displayScore(game, pickedBy, pickedVs)
 
 	local toScore = function(opponentId)
 		local isWinner = winner == opponentId
-		return HtmlWidgets.Span{
+		return Html.Span{
 			css = {['font-weight'] = isWinner and 'bold' or nil},
 			children = scores[opponentId] or (isWinner and 'W' or 'L')
 		}

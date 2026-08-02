@@ -42,7 +42,7 @@ function InfoboxTableWidget:render()
 	return Array.map(rows, function(row)
 		return Html.Div{
 			classes = self.props.classes,
-			children = Array.map(Array.range(1, options.columns), function(columnIndex)
+			children = Array.mapRange(1, options.columns, function(columnIndex)
 				local columnOptions = options.columnOptions[columnIndex] or {}
 				return Html.Div{
 					classes = columnOptions.classes or {},

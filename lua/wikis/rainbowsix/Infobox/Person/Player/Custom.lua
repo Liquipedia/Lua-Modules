@@ -26,6 +26,7 @@ local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
 local Html = Lua.import('Module:Widget/Html')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
@@ -124,14 +125,14 @@ function CustomPlayer:adjustLPDB(lpdbData, args)
 	return lpdbData
 end
 
----@return Widget?
+---@return Renderable?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = TeamTemplate.getPageName(self.args.team)
-		return Html.Fragment{children = {
+		return Html.Fragment{children = WidgetUtil.collect(
 			MatchTicker.player(),
 			UpcomingTournaments.team{name = teamPage}
-		}}
+		)}
 	end
 end
 

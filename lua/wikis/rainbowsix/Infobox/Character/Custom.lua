@@ -419,8 +419,8 @@ function CustomCharacter._generateStatCell(title, datatype, value, display)
 		name = title,
 		children = {
 			Image.display(
-				'R6S operator-rating-' .. datatype .. '-' ..  value .. ' lightmode.png',
-				'R6S operator-rating-' .. datatype .. '-' ..  value .. ' darkmode.png',
+				'R6S operator-rating-' .. datatype .. '-' .. value .. ' lightmode.png',
+				'R6S operator-rating-' .. datatype .. '-' .. value .. ' darkmode.png',
 				{ size = '40x20px', link = '' }
 			),
 			Html.I{

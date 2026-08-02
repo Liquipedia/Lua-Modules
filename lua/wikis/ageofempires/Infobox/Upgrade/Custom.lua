@@ -44,7 +44,7 @@ end
 ---@param widgets Renderable[]
 ---@return Renderable[]
 function CustomInjector:parse(id, widgets)
-	local args  = self.caller.args
+	local args = self.caller.args
 	if id == 'introduced' then
 		---@param introduced string?
 		---@return (string|Widget)[]?

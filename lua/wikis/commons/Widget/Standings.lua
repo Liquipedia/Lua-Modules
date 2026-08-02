@@ -7,9 +7,7 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
-
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local FfaStandings = Lua.import('Module:Widget/Standings/Ffa')
 local SwissStandings = Lua.import('Module:Widget/Standings/Swiss')
@@ -17,15 +15,10 @@ local SwissStandings = Lua.import('Module:Widget/Standings/Swiss')
 local Standings = Lua.import('Module:Standings')
 local StringUtils = Lua.import('Module:StringUtils')
 
----@class StandingsWidget: Widget
----@operator call(table): StandingsWidget
-local StandingsWidget = Class.new(Widget)
-StandingsWidget.defaultProps = {
-}
-
----@return Widget?
-function StandingsWidget:render()
-	local standings = Standings.getStandingsTable(self.props.pageName, self.props.standingsIndex)
+---@param props {pageName: string, standingsIndex: integer?}
+---@return VNode?
+local function StandingsWidget(props)
+	local standings = Standings.getStandingsTable(props.pageName, props.standingsIndex)
 	if not standings then
 		return
 	end
@@ -50,4 +43,4 @@ function StandingsWidget:render()
 
 end
 
-return StandingsWidget
+return Component.component(StandingsWidget)
