@@ -16,6 +16,8 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
+local TeamService = Lua.import('Module:Service/Team')
+
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
@@ -25,6 +27,7 @@ local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
 local Box = Lua.import('Module:Widget/Basic/Box')
+local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 
@@ -42,39 +45,48 @@ end
 ---@param team team
 ---@return Renderable?
 function PortalTeams._displayActiveTeam(team)
-	local players = mw.ext.LiquipediaDB.lpdb('squadplayer', {
-		conditions = tostring(ConditionNode(ColumnName('pagename'), Comparator.eq, team.pagename)),
-		query = 'id, link, name, nationality, extradata',
-		order = 'id asc',
-		limit = 500,
-	})
-
-	if Logic.isEmpty(players) then
+	local teamInfo = TeamService.getTeamByTemplate(team.pagename)
+	local activeMembers = Array.filter((teamInfo or {}).members or {}, function(member)
+		return member.status == 'active' and Logic.isNotEmpty(member.displayName)
+	end)
+	if Logic.isEmpty(activeMembers) then
 		return
 	end
 
-	Array.sortInPlaceBy(players, Operator.property('id'))
+	Array.sortInPlaceBy(activeMembers, Operator.property('displayName'))
 
-	---@param player squadplayer
+	---@param member StandardTeamMember
 	---@return Renderable
-	local makeRow = function(player)
+	local makeRow = function(member)
 		local standardizedPlayer = Opponent.readSinglePlayerArgs{
-			name = player.id,
-			link = player.link,
-			flag = player.nationality,
-			faction = player.extradata.faction,
+			name = member.displayName,
+			link = member.pageName,
+			flag = member.nationality,
+			faction = member.faction,
 		}
+		local role = Logic.nilIfEmpty(member.role)
+
 		return TableWidgets.Row{
 			children = {
-				TableWidgets.Cell{children = PlayerDisplay.InlinePlayer{player = standardizedPlayer}},
-				TableWidgets.Cell{children = player.name},
+				TableWidgets.Cell{
+					children = {
+						PlayerDisplay.InlinePlayer{player = standardizedPlayer},
+						role and Html.Br{},
+						role and Html.Small{children = {
+							'(',
+							role,
+							')',
+						}} or nil,
+					},
+				},
+				TableWidgets.Cell{children = member.realName},
 			},
 		}
 	end
 
 	return TableWidgets.Table{
 		tableClasses = {'collapsible', 'collapsed'},
-		css = {width = '340px', ['margin-bottom'] = '0.5rem'},
+		css = {width = '400px', ['margin-bottom'] = '0.5rem'},
 		columns = {{}, {}},
 		children = {
 			TableWidgets.TableHeader{
@@ -99,7 +111,7 @@ function PortalTeams._displayActiveTeam(team)
 					},
 				},
 			},
-			TableWidgets.TableBody{children = Array.map(players, makeRow)}
+			TableWidgets.TableBody{children = Array.map(activeMembers, makeRow)}
 		},
 	}
 end
