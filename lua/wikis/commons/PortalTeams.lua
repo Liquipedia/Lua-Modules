@@ -42,18 +42,8 @@ end
 ---@param team team
 ---@return Renderable?
 function PortalTeams._displayActiveTeam(team)
-	local pageName = team.pagename
-
-	local playerConditions = ConditionTree(BooleanOperator.all):add{
-		ConditionNode(ColumnName('pagename'), Comparator.eq, pageName),
-		ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('extradata_ismain'), Comparator.eq, 'true'),
-			ConditionNode(ColumnName('extradata_group'), Comparator.eq, 'main'),
-		},
-	}
-
 	local players = mw.ext.LiquipediaDB.lpdb('squadplayer', {
-		conditions = tostring(playerConditions),
+		conditions = tostring(ConditionNode(ColumnName('pagename'), Comparator.eq, team.pagename)),
 		query = 'id, link, name, nationality, extradata',
 		order = 'id asc',
 		limit = 500,
@@ -68,18 +58,15 @@ function PortalTeams._displayActiveTeam(team)
 	---@param player squadplayer
 	---@return Renderable
 	local makeRow = function(player)
+		local standardizedPlayer = Opponent.readSinglePlayerArgs{
+			name = player.id,
+			link = player.link,
+			flag = player.nationality,
+			faction = player.extradata.faction,
+		}
 		return TableWidgets.Row{
 			children = {
-				TableWidgets.Cell{
-					children = PlayerDisplay.InlinePlayer{
-						player = {
-							displayName = player.id,
-							pageName = player.link,
-							flag = player.nationality,
-							faction = player.extradata.faction,
-						},
-					},
-				},
+				TableWidgets.Cell{children = PlayerDisplay.InlinePlayer{player = standardizedPlayer}},
 				TableWidgets.Cell{children = player.name},
 			},
 		}
@@ -98,7 +85,7 @@ function PortalTeams._displayActiveTeam(team)
 							children = OpponentDisplay.InlineOpponent{
 								opponent = {
 									type = Opponent.team,
-									template = pageName,
+									template = team.pagename,
 									extradata = {},
 								},
 							},
