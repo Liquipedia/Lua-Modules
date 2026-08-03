@@ -100,11 +100,7 @@ end
 function CustomPrizePool._weight(lpdbData, placement)
 	local offlineFactor = lpdbData.type == 'Offline' and 1.5 or 1
 
-	local placeStart = tonumber(placement.placeStart)
-	local placeEnd = tonumber(placement.placeEnd)
-	local placementFactor = placeStart ~= placeEnd and placeStart and placeEnd
-		and (placeStart + placeEnd) / 2
-		or placeStart or 999
+	local placementFactor = (placement.placeStart + placement.placeEnd) / 2
 
 	local tierFactor = (lpdbData.liquipediatiertype == 'Qualifier' or lpdbData.liquipediatiertype == 'Showmatch') and 0.5
 		or TIER_TO_FACTOR[tonumber(lpdbData.liquipediatier)]
