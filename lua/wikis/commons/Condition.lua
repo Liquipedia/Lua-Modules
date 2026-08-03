@@ -176,6 +176,11 @@ function ColumnName:toString()
 	return self.name
 end
 
+---@return string
+function ColumnName:__tostring()
+	return self:toString()
+end
+
 local ConditionUtil = {}
 
 ---Builds "matches any of" condition from the given collection of values.
