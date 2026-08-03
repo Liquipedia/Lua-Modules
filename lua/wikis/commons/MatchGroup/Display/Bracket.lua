@@ -24,8 +24,8 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local BracketLineNode = Lua.import('Module:Widget/Match/Bracket/LineNode')
 local BracketNodeConnector = Lua.import('Module:Widget/Match/Bracket/NodeConnector')
 local Html = Lua.import('Module:Widget/Html')
+local BracketMatchHeader = Lua.import('Module:Widget/Match/Bracket/MatchHeader')
 local BracketOpponentEntry = Lua.import('Module:Widget/Match/Bracket/OpponentEntry')
-local MatchHeader = Lua.import('Module:Widget/Match/Bracket/MatchHeader')
 local MatchInfoIcon = Lua.import('Module:Widget/Match/InfoIcon')
 
 local OPPONENT_HEIGHT_PADDING = 4
@@ -400,11 +400,11 @@ function BracketDisplay.NodeHeader(props)
 	local cursorRoundIx = 1
 	for _, cell in ipairs(headerRow) do
 		headerNode:node(
-			MatchHeader{
+			BracketMatchHeader{
 				header = cell.header,
 				height = config.headerHeight,
-				additionalClasses = cell.hasBrMatch and {'brkts-br-wrapper'} or nil,
-				css = {['--skip-round'] = cell.roundIx - cursorRoundIx}
+				hasBracketReset = cell.hasBrMatch,
+				skipRound = cell.roundIx - cursorRoundIx,
 			}
 		)
 		cursorRoundIx = cell.roundIx + 1
@@ -462,14 +462,11 @@ function BracketDisplay.NodeBody(props)
 	local thirdPlaceHeaderNode
 	local thirdPlaceMatchNode
 	if thirdPlaceMatch then
-		thirdPlaceHeaderNode = MatchHeader{
+		thirdPlaceHeaderNode = BracketMatchHeader{
 			header = thirdPlaceMatch.bracketData.header or '!tp',
 			height = config.headerHeight,
-			additionalClasses = {'brkts-third-place-header'},
-			css = {
-				['margin-top'] = 20 + config.headerMargin .. 'px',
-				['margin-bottom'] = config.headerMargin .. 'px',
-			},
+			isThirdPlaceMatch = true,
+			headerMargin = config.headerMargin,
 		}
 		thirdPlaceMatchNode = BracketDisplay.Match{
 			MatchSummaryContainer = config.MatchSummaryContainer,
