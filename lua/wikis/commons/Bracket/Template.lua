@@ -66,7 +66,7 @@ function BracketTemplate.BracketContainer(props)
 	return BracketDisplay.Bracket({
 		bracket = bracket,
 		config = Table.merge(props.config, {
-			OpponentEntry = function() return Html.Div{classes = {'brkts-opponent-entry'}} end,
+			OpponentEntry = function() return Html.Div{classes = {'brkts-opponent-entry'}, css = {height = '26px'}} end,
 			matchHasDetails = function() return false end,
 		})
 	})
