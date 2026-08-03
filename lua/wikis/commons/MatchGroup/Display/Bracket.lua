@@ -385,7 +385,7 @@ end
 ---Display component for the headers of a node in the bracket tree. Draws a row of headers for the match,
 ---everything to the left of it, and for the qualification spots.
 ---@param props BracketDisplayNodeHeaderProps
----@return Html?
+---@return VNode?
 function BracketDisplay.NodeHeader(props)
 	local headerRow = props.headerRowsByMatchId[props.matchId]
 	local config = props.config
@@ -393,24 +393,21 @@ function BracketDisplay.NodeHeader(props)
 		return nil
 	end
 
-	local headerNode = mw.html.create('div'):addClass('brkts-round-header')
-		:css('--header-margin', config.headerMargin .. 'px')
-		:css('--match-margin', config.matchMargin .. 'px')
-
-	local cursorRoundIx = 1
-	for _, cell in ipairs(headerRow) do
-		headerNode:node(
-			BracketMatchHeader{
+	return Html.Div{
+		classes = {'brkts-round-header'},
+		css = {
+			['--header-margin'] = config.headerMargin .. 'px',
+			['--match-margin'] = config.matchMargin .. 'px',
+		},
+		children = Array.map(headerRow, function (cell, cursorRoundIx)
+			return BracketMatchHeader{
 				header = cell.header,
 				height = config.headerHeight,
 				hasBracketReset = cell.hasBrMatch,
 				skipRound = cell.roundIx - cursorRoundIx,
 			}
-		)
-		cursorRoundIx = cell.roundIx + 1
-	end
-
-	return headerNode
+		end)
+	}
 end
 
 ---Display component for a node in the bracket tree, which consists of a match and all the lower round matches leading
