@@ -16,7 +16,7 @@ local Table = Lua.import('Module:Table')
 local Condition = {}
 
 -- Abstract class, node of the conditions tree
----@class AbstractConditionNode:BaseClass
+---@class AbstractConditionNode: BaseClass
 local _ConditionNode = Class.new()
 
 ---Returns the string representation of this condition node.
@@ -102,7 +102,7 @@ Comparator.ge = Comparator.greaterThanOrEqualTo
 Comparator.le = Comparator.lessThanOrEqualTo
 
 ---A condition in a ConditionTree
----@class ConditionNode:AbstractConditionNode
+---@class ConditionNode: AbstractConditionNode
 ---@operator call(...): ConditionNode
 ---@field name ColumnName
 ---@field comparator lpdbComparator
@@ -145,7 +145,7 @@ local BooleanOperator = {
 }
 
 ---Represents a column name in LPDB, including an optional super key
----@class ColumnName
+---@class ColumnName: BaseClass
 ---@operator call(...): ColumnName
 ---@field name string
 ---@field superName string?
