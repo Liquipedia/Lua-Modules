@@ -25,7 +25,7 @@ local function StarcraftBracketOpponent(props)
 		playerClass = 'starcraft-bracket-block-player',
 		showLink = false,
 		showTbd = props.showTbd,
-		teamStyle = props.forceShortName and 'short' or 'hybrid',
+		teamStyle = props.forceShortName and 'short' or 'dynamic',
 	}
 end
 
