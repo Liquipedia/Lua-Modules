@@ -34,7 +34,7 @@ local StandingsTable = {}
 ---@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?,
 ---match: MatchGroupUtilMatch?, matches: MatchGroupUtilMatch[], matchId: string}[]?
 ---@field opponent standardOpponent
----@field aliases standardOpponent[]
+---@field aliases standardOpponent[]? # Only for team opponents
 ---@field startingPoints number?
 
 ---@param frame Frame
@@ -60,7 +60,15 @@ function StandingsTable.fromTemplate(frame)
 	if importScoreFromMatches then
 		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args)
 
-		local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction)
+		---@type table<string, standardOpponent>
+		local aliasLookup = {}
+		Array.forEach(opponents, function(opponentData)
+			Array.forEach(opponentData.aliases or {}, function(alias)
+				aliasLookup[alias.template] = opponentData.opponent
+			end)
+		end)
+
+		local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction, aliasLookup)
 		opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
 	end
 
@@ -86,9 +94,7 @@ function StandingsTable.mergeOpponentsData(manualOpponents, importedOpponents, a
 	Array.forEach(importedOpponents, function(importedOpponent)
 		--- Find the matching manual opponent
 		local manualOpponentId = Array.indexOf(newOpponents, function(manualOpponent)
-			return Array.any(manualOpponent.aliases, function (alias)
-				return Opponent.same(alias, importedOpponent.opponent)
-			end)
+			return Opponent.same(manualOpponent.opponent, importedOpponent.opponent)
 		end)
 		--- If there isn't one, means this is a new opponent
 		if manualOpponentId == 0 then

@@ -25,13 +25,14 @@ local StandingsParseLpdb = {}
 
 ---@param rounds {roundNumber: integer, matches: string[]}[]
 ---@param scoreMapper fun(opponent: match2opponent): number|nil
+---@param aliasLookup table<string, standardOpponent>
 ---@return StandingTableOpponentData[]
-function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
+function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, aliasLookup)
 	local matchIds = Array.flatMap(rounds, function(round)
 		return round.matches
 	end)
 
-	-- No Matches in the round, cannot import
+	-- No Matches, cannot import
 	if #matchIds == 0 then
 		return {}
 	end
@@ -62,7 +63,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 		function(match2)
 			local roundNumbers = matchIdToRound[match2.match2id]
 			Array.forEach(roundNumbers, function(roundNumber)
-				StandingsParseLpdb.parseMatch(roundNumber, match2, opponents, scoreMapper, #rounds)
+				StandingsParseLpdb.parseMatch(roundNumber, match2, opponents, scoreMapper, #rounds, aliasLookup)
 			end)
 		end
 	)
@@ -118,15 +119,17 @@ end
 ---@param opponents StandingTableOpponentData[]
 ---@param scoreMapper fun(opponent: standardOpponent): number?
 ---@param maxRounds integer
-function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMapper, maxRounds)
+---@param aliasLookup table<string, standardOpponent>
+function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMapper, maxRounds, aliasLookup)
 	local match2 = MatchGroupUtil.matchFromRecord(match)
 	Array.forEach(match2.opponents, function(opponent)
 		---Find matching opponent
+		local resolvedAlias = aliasLookup[opponent.template] or opponent
 		local standingsOpponentData = Array.find(opponents, function(opponentData)
-			return Opponent.same(opponentData.opponent, opponent)
+			return Opponent.same(opponentData.opponent, resolvedAlias)
 		end)
 		if not standingsOpponentData then
-			standingsOpponentData = StandingsParseLpdb.newOpponent(opponent, maxRounds)
+			standingsOpponentData = StandingsParseLpdb.newOpponent(resolvedAlias, maxRounds)
 			table.insert(opponents, standingsOpponentData)
 		end
 		assert(standingsOpponentData.rounds[roundNumber], 'Round number out of bounds')
