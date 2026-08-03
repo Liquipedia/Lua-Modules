@@ -25,6 +25,7 @@ local BracketConnectorStub = Lua.import('Module:Widget/Match/Bracket/ConnectorSt
 local BracketMatchHeader = Lua.import('Module:Widget/Match/Bracket/MatchHeader')
 local BracketNodeConnector = Lua.import('Module:Widget/Match/Bracket/NodeConnector')
 local BracketOpponentEntry = Lua.import('Module:Widget/Match/Bracket/OpponentEntry')
+local BracketQualified = Lua.import('Module:Widget/Match/Bracket/Qualified')
 local MatchInfoIcon = Lua.import('Module:Widget/Match/InfoIcon')
 
 local OPPONENT_HEIGHT_PADDING = 4
@@ -494,13 +495,13 @@ function BracketDisplay.NodeBody(props)
 				type = Opponent.literal,
 				name = match.bracketData.qualWinLiteral or '',
 			}
-		qualWinNode = BracketDisplay.Qualified{
+		qualWinNode = BracketQualified{
 			OpponentEntry = config.OpponentEntry,
 			height = config.opponentHeight,
 			opponent = opponent,
+			topMargin = layout.matchMarginTop + layout.matchHeight / 2 - config.opponentHeight / 2,
+			bottomMargin = config.matchMargin,
 		}
-			:css('margin-top', layout.matchMarginTop + layout.matchHeight / 2 - config.opponentHeight / 2 .. 'px')
-			:css('margin-bottom', config.matchMargin .. 'px')
 	end
 
 	local qualLoseNode
@@ -510,13 +511,13 @@ function BracketDisplay.NodeBody(props)
 				type = Opponent.literal,
 				name = match.bracketData.qualLoseLiteral or '',
 			}
-		qualLoseNode = BracketDisplay.Qualified{
+		qualLoseNode = BracketQualified{
 			OpponentEntry = config.OpponentEntry,
 			height = config.opponentHeight,
 			opponent = opponent,
+			topMargin = config.matchMargin + 6,
+			bottomMargin = config.matchMargin,
 		}
-			:css('margin-top', config.matchMargin + 6 .. 'px')
-			:css('margin-bottom', config.matchMargin .. 'px')
 	end
 
 	local qualNode
@@ -575,21 +576,6 @@ function BracketDisplay.Match(props)
 	end
 
 	return matchNode
-end
-
----Display component for a qualification spot.
----@param props {OpponentEntry: Component<BracketOpponentEntryProps>, height: number, opponent: standardOpponent}
----@return Html
-function BracketDisplay.Qualified(props)
-	local opponentEntryNode = props.OpponentEntry{
-		displayType = 'bracket-qualified',
-		height = props.height,
-		opponent = props.opponent,
-		classes = {'brkts-opponent-entry-last'},
-	}
-
-	return mw.html.create('div'):addClass('brkts-qualified')
-		:node(opponentEntryNode)
 end
 
 ---@param props BracketDisplayNodeBodyProps
