@@ -22,8 +22,8 @@ local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local Html = Lua.import('Module:Widget/Html')
 local BracketConnectorStub = Lua.import('Module:Widget/Match/Bracket/ConnectorStub')
-local BracketNodeConnector = Lua.import('Module:Widget/Match/Bracket/NodeConnector')
 local BracketMatchHeader = Lua.import('Module:Widget/Match/Bracket/MatchHeader')
+local BracketNodeConnector = Lua.import('Module:Widget/Match/Bracket/NodeConnector')
 local BracketOpponentEntry = Lua.import('Module:Widget/Match/Bracket/OpponentEntry')
 local MatchInfoIcon = Lua.import('Module:Widget/Match/InfoIcon')
 
