@@ -1216,10 +1216,12 @@ div.brkts-popup-body-element-thumbs {
 		flex: 1 1;
 		min-width: 0;
 
-		&:has( > .team-name-dynamic ) {
+		&:has( > .team-name-dynamic ),
+		&:has( > a > .team-name-dynamic ) {
 			container: block-team-name / inline-size;
 
-			> .team-name-dynamic {
+			> .team-name-dynamic,
+			> a > .team-name-dynamic {
 				content: none;
 
 				@container block-team-name ( min-width: 15px ) and ( width < 100px ) {
