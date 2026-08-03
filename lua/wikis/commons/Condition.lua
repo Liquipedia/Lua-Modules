@@ -117,6 +117,7 @@ local ConditionNode = Class.new(_ConditionNode,
 
 ---@return string
 function ConditionNode:toString()
+	assert(self.name ~= nil, 'ConditionNode: nil cannot be used as a column name.')
 	assert(
 		Table.any(Comparator, function (_, value)
 			return self.comparator == value
