@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
-local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
