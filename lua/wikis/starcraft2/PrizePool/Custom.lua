@@ -117,7 +117,7 @@ function CustomPrizePool._weight(lpdbData, placement)
 	local prize = tonumber(lpdbData.individualprizemoney) or 0
 	prize = prize ~= 0 and prize or DEFAULT_PRIZE_VALUE
 
-	local placementFactor = tonumber(placement.placeStart) or 0
+	local placementFactor = placement.placeStart or 0
 	if place == 'w' or place == 'd' or place == 'q' then
 		prize = 1
 		placementFactor = 1
