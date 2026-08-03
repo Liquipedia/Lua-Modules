@@ -18,6 +18,7 @@ local StandingsParseLpdb = Lua.import('Module:Standings/Parse/Lpdb')
 local StandingsParser = Lua.import('Module:Standings/Parser')
 local StandingsStorage = Lua.import('Module:Standings/Storage')
 
+local Standings = Lua.import('Module:Standings')
 local StandingsDisplay = Lua.import('Module:Widget/Standings')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -69,8 +70,9 @@ function StandingsTable.fromTemplate(frame)
 		standingsTable.extradata.placemapping = Logic.wrapTryOrLog(StandingsParseWiki.parsePlaceMapping)(args, opponents)
 	end
 
-	StandingsStorage.run(standingsTable, {saveVars = true})
-	return StandingsDisplay{pageName = mw.title.getCurrentTitle().text, standingsIndex = standingsTable.standingsindex}
+	local stored = StandingsStorage.run(standingsTable, {saveVars = true})
+	local model = Standings.standingsFromRecord(stored.record, stored.entries)
+	return StandingsDisplay{standings = model}
 end
 
 ---@param manualOpponents StandingTableOpponentData[]

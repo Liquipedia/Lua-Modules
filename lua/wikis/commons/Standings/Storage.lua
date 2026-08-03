@@ -70,12 +70,22 @@ function StandingsStorage.run(data, options)
 		return StandingsStorage.entry(entry, data.standingsindex)
 	end)
 
+	local storageTable = StandingsStorage.table(data)
+
 	if StandingsStorage.shouldStoreLpdb() then
-		StandingsStorage.saveLpdb(StandingsStorage.table(data), entries)
+		StandingsStorage.saveLpdb(storageTable, entries)
 	end
 	if options and options.saveVars then
-		StandingsStorage.saveVars(StandingsStorage.table(data), entries)
+		StandingsStorage.saveVars(storageTable, entries)
 	end
+
+	-- Return the record in model-ready form (matches as a table, not a JSON string)
+	-- so callers on the producing page can skip the var round-trip.
+	local directRecord = Table.merge(storageTable, {
+		pagename = mw.title.getCurrentTitle().text,
+		matches = data.matches or {},
+	})
+	return {record = directRecord, entries = entries}
 end
 
 ---@param data table
