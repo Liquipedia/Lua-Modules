@@ -127,7 +127,7 @@ function ConditionNode:toString()
 		return String.interpolate(
 			'[[${name}${comparator}${value}]]',
 			{
-				name = self.name:toString(),
+				name = tostring(self.name),
 				comparator = comp,
 				value = self.value
 			}
