@@ -60,15 +60,7 @@ function StandingsTable.fromTemplate(frame)
 	if importScoreFromMatches then
 		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args)
 
-		---@type table<string, standardOpponent>
-		local aliasLookup = {}
-		Array.forEach(opponents, function(opponentData)
-			Array.forEach(opponentData.aliases or {}, function(alias)
-				aliasLookup[alias.template] = opponentData.opponent
-			end)
-		end)
-
-		local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction, aliasLookup)
+		local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction, opponents)
 		opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
 	end
 
