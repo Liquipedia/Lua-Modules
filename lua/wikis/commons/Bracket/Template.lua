@@ -63,13 +63,15 @@ function BracketTemplate.BracketContainer(props)
 	end)
 	local bracket = MatchGroupUtil.makeMatchGroup(matchRecords) --[[@as MatchGroupUtilBracket]]
 
-	return BracketDisplay.Bracket({
+	return BracketDisplay.Bracket{
 		bracket = bracket,
 		config = Table.merge(props.config, {
-			OpponentEntry = function() return Html.Div{classes = {'brkts-opponent-entry'}, css = {height = '26px'}} end,
+			OpponentEntry = function()
+				return Html.Div{classes = {'brkts-opponent-entry'}, css = {height = '26px'}}
+			end,
 			matchHasDetails = function() return false end,
 		})
-	})
+	}
 end
 
 ---@param argsList table[]
