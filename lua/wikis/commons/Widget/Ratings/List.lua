@@ -315,7 +315,7 @@ local function RatingsList(props)
 		},
 		children = TableWidgets.Table {
 			columns = columns,
-			striped = false,
+			striped = true,
 			title = title,
 			footer = isSmallerVersion and footer or nil,
 			classes = { isSmallerVersion and 'ranking-table--small' or nil },
