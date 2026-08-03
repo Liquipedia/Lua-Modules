@@ -225,8 +225,14 @@ describe('Standings import from matches', function()
 		local opponents = StandingsParseLpdb.importFromMatches({
 			{roundNumber = 1, matches = {'M1'}},
 		}, swissScoreMapper, {
-			{aliases = {{template = 'team liquid 2023', name = 'Team Liquid', type = 'team', extradata = {}}}, opponent = {template = 'heroic', name = 'Heroic', type = 'team', extradata = {}}},
-			{aliases = {}, opponent = {template = 'wolves esports', name = 'Wolves Esports', type = 'team', extradata = {}}}
+			{
+				aliases = {{template = 'team liquid 2023', name = 'Team Liquid', type = 'team', extradata = {}}},
+				opponent = {template = 'heroic', name = 'Heroic', type = 'team', extradata = {}},
+			},
+			{
+				aliases = {},
+				opponent = {template = 'wolves esports', name = 'Wolves Esports', type = 'team', extradata = {}},
+			}
 		})
 
 		local heroic = findOpponent(opponents, 'Heroic')
