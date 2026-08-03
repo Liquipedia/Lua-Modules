@@ -491,7 +491,7 @@ function BracketDisplay.NodeBody(props)
 		local opponent = winner
 			and match.opponents[winner]
 			or MatchGroupUtil.createOpponent{
-				type = 'literal',
+				type = Opponent.literal,
 				name = match.bracketData.qualWinLiteral or '',
 			}
 		qualWinNode = BracketDisplay.Qualified{
@@ -506,10 +506,10 @@ function BracketDisplay.NodeBody(props)
 	local qualLoseNode
 	if match.bracketData.qualLose then
 		local opponent = BracketDisplay.getRunnerUpOpponent(match, bracketResetMatch)
-			or MatchGroupUtil.createOpponent({
-				type = 'literal',
+			or MatchGroupUtil.createOpponent{
+				type = Opponent.literal,
 				name = match.bracketData.qualLoseLiteral or '',
-			})
+			}
 		qualLoseNode = BracketDisplay.Qualified{
 			OpponentEntry = config.OpponentEntry,
 			height = config.opponentHeight,
