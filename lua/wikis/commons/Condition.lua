@@ -184,7 +184,7 @@ end
 local ConditionUtil = {}
 
 ---Builds "matches any of" condition from the given collection of values.
----@param column ColumnName
+---@param column string|ColumnName
 ---@param values (string|number)[]
 ---@return ConditionTree?
 function ConditionUtil.anyOf(column, values)
@@ -192,7 +192,7 @@ function ConditionUtil.anyOf(column, values)
 end
 
 ---Builds "matches none of" condition from the given collection of values.
----@param column ColumnName
+---@param column string|ColumnName
 ---@param values (string|number)[]
 ---@return ConditionTree?
 function ConditionUtil.noneOf(column, values)
@@ -200,7 +200,7 @@ function ConditionUtil.noneOf(column, values)
 end
 
 ---@package
----@param column ColumnName
+---@param column string|ColumnName
 ---@param booleanOperator lpdbBooleanOperator
 ---@param comparator lpdbComparator
 ---@param values (string|number)[]
