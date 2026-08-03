@@ -131,8 +131,8 @@ function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMappe
 		end)
 
 		if opponentToUse and opponentToUse.opponent then
-			match2.opponents[index] = opponentToUse.opponent
-			opponent = opponentToUse.opponent
+			opponent.template = opponentToUse.opponent.template
+			opponent.name = opponentToUse.opponent.name
 		end
 
 		local standingsOpponentData = Array.find(opponents, function(opponentData)
