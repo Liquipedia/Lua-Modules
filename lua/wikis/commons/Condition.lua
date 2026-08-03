@@ -104,7 +104,7 @@ Comparator.le = Comparator.lessThanOrEqualTo
 ---A condition in a ConditionTree
 ---@class ConditionNode: AbstractConditionNode
 ---@operator call(...): ConditionNode
----@field name ColumnName
+---@field name string|ColumnName
 ---@field comparator lpdbComparator
 ---@field value string|number
 local ConditionNode = Class.new(_ConditionNode,
