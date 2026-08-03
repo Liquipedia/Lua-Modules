@@ -66,7 +66,7 @@ end
 ---@param opponent BasePlacementOpponent
 ---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
-	lpdbData.weight = CustomPrizePool._weight(lpdbData)
+	lpdbData.weight = CustomPrizePool._weight(lpdbData, placement)
 
 	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, {
 		seriesnumber = CustomPrizePool._seriesNumber(),
@@ -96,17 +96,16 @@ function CustomPrizePool._seriesNumber()
 end
 
 ---@param lpdbData placement
+---@param placement PrizePoolPlacement
 ---@return number
-function CustomPrizePool._weight(lpdbData)
+function CustomPrizePool._weight(lpdbData, placement)
 	local offlineFactor = lpdbData.type == 'Offline' and 1.5 or 1
 
-	local placementFactor
-	local placements = Array.parseCommaSeparatedString(lpdbData.placement, '-')
-	if placements[2] then
-		placementFactor = (placements[1] + placements[2]) / 2
-	else
-		placementFactor = tonumber(placements[1]) or 999
-	end
+	local placeStart = tonumber(placement.placeStart)
+	local placeEnd = tonumber(placement.placeEnd)
+	local placementFactor = placeStart ~= placeEnd and placeStart and placeEnd
+		and (placeStart + placeEnd) / 2
+		or placeStart or 999
 
 	local tierFactor = (lpdbData.liquipediatiertype == 'Qualifier' or lpdbData.liquipediatiertype == 'Showmatch') and 0.5
 		or TIER_TO_FACTOR[tonumber(lpdbData.liquipediatier)]

@@ -57,14 +57,15 @@ end
 ---@param opponent BasePlacementOpponent
 ---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
-	lpdbData.weight = CustomPrizePool._weight(lpdbData)
+	lpdbData.weight = CustomPrizePool._weight(lpdbData, placement)
 
 	return lpdbData
 end
 
 ---@param lpdbData placement
+---@param placement PrizePoolPlacement
 ---@return number
-function CustomPrizePool._weight(lpdbData)
+function CustomPrizePool._weight(lpdbData, placement)
 	local place = string.lower(lpdbData.placement or '')
 	if Logic.isEmpty(place) or place == 'l' or place == 'dq' then
 		return 0
@@ -77,12 +78,11 @@ function CustomPrizePool._weight(lpdbData)
 	local prize = tonumber(lpdbData.individualprizemoney) or 0
 	prize = prize ~= 0 and prize or DEFAULT_PRIZE_VALUE
 
+	local placementFactor = tonumber(placement.placeStart) or 0
 	if place == 'w' or place == 'd' or place == 'q' then
-		prize = 2
-		place = '1'
+		prize = 1
+		placementFactor = 1
 	end
-
-	local placementFactor = tonumber(Array.parseCommaSeparatedString(place, '-')[1]) --[[@as integer]]
 
 	return tierFactor * (prize / placementFactor) * tierTypeFactor
 end
