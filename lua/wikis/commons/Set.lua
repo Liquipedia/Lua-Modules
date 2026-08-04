@@ -7,20 +7,29 @@
 
 local Class = require('Module:Class')
 
+---@class Set<T>: BaseClass
+---@operator call(T[]): Set<T>
+---@field private data table<T, boolean?>
 local Set = Class.new(
 	function(set,tbl)
 		set:_new(tbl)
 	end
 )
 
+---@private
 function Set:_new(tbl)
 	self.data = Set._tableToSet(tbl or {})
 end
 
+---@param value T
+---@private
 function Set:_add(value)
 	self.data[value] = true
 end
 
+---@param value T
+---@return self
+---@overload fun(self: Set<T>, value: Set<T>): Set
 function Set:add(value)
 	if Class.instanceOf(value, Set) then
 		for val in pairs(value) do
@@ -32,14 +41,22 @@ function Set:add(value)
 	return self
 end
 
+---@param value T
+---@return Set<T>
+---@private
 function Set:_addImmutable(value)
 	return self:copy():add(value)
 end
 
+---@param value T
+---@private
 function Set:_remove(value)
 	self.data[value] = nil
 end
 
+---@param value T
+---@return self
+---@overload fun(self: Set<T>, value: Set<T>): Set
 function Set:remove(value)
 	if Class.instanceOf(value, Set) then
 		for val in pairs(value) do
@@ -51,6 +68,9 @@ function Set:remove(value)
 	return self
 end
 
+---@param value T
+---@return Set<T>
+---@private
 function Set:_removeImmutable(value)
 	return self:copy():remove(value)
 end
@@ -60,10 +80,14 @@ function Set:clear()
 	return self
 end
 
+---@param value T
+---@return boolean
 function Set:contains(value)
 	return self.data[value] or false
 end
 
+---@param set Set<T>
+---@return boolean
 function Set:containsAll(set)
 	for val in pairs(set) do
 		if not self:contains(val) then
@@ -73,10 +97,12 @@ function Set:containsAll(set)
 	return true
 end
 
+---@return boolean
 function Set:isEmpty()
 	return next(self.data) == nil
 end
 
+---@return integer
 function Set:size()
 	local count = 0
 	for _ in pairs(self) do
@@ -85,6 +111,7 @@ function Set:size()
 	return count
 end
 
+---@return T[]
 function Set:toArray()
 	local array = {}
 	for val in pairs(self) do
@@ -93,19 +120,26 @@ function Set:toArray()
 	return array
 end
 
+---@return Set<T>
 function Set:copy()
 	return Set(self:toArray())
 end
 
+---@param other Set<T>
+---@return boolean
 function Set:equals(other)
 	return self:containsAll(other) and other:containsAll(self)
 end
 
+---@return string
 function Set:toString()
 	return '{'.. table.concat(self:toArray(), ', ') .. '}'
 end
 
 -- Based on http://lua-users.org/wiki/GeneralizedPairsAndIpairs
+---@return fun(tbl: table<T, boolean?>, k: T): T
+---@return table<T, boolean?>
+---@return nil
 function Set:_iterator()
 	local function stateless_iter(tbl, k)
 		local v
@@ -116,6 +150,10 @@ function Set:_iterator()
 	return stateless_iter, self.data, nil
 end
 
+---@package
+---@generic T
+---@param tbl T[]
+---@return table<T, boolean?>
 function Set._tableToSet(tbl)
 	local set = {}
 	for _, value in pairs(tbl) do
