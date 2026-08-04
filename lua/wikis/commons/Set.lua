@@ -44,19 +44,13 @@ function Set:_remove(value)
 	self.data[value] = nil
 end
 
----@param value T|Set<T>
+---@param value T
 ---@return Set<T>
 function Set:remove(value)
 	if value == nil then
 		return self
-	elseif Class.instanceOf(value, Set) then
-		---@cast value Set<any>
-		for val in pairs(value) do
-			self:_remove(val)
-		end
-	else
-		self:_remove(value)
 	end
+	self:_remove(value)
 	return self
 end
 
@@ -78,6 +72,16 @@ end
 function Set:union(set)
 	local copy = self:copy()
 	Table.mergeInto(copy.data, set.data)
+	return copy
+end
+
+---@param set Set<T>
+---@return Set<T>
+function Set:difference(set)
+	local copy = self:copy()
+	for entry in pairs(set) do
+		copy:_remove(entry)
+	end
 	return copy
 end
 
@@ -174,6 +178,6 @@ Set.__eq = Set.equals
 Set.__tostring = Set.toString
 Set.__pairs = Set._iterator
 Set.__add = Set.union
-Set.__sub = Set._removeImmutable
+Set.__sub = Set.difference
 
 return Set
