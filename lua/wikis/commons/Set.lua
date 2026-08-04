@@ -143,6 +143,7 @@ end
 ---@return fun(tbl: table<T, boolean?>, k: T): T
 ---@return table<T, boolean?>
 ---@return nil
+---@package
 function Set:_iterator()
 	local function stateless_iter(tbl, k)
 		local v
