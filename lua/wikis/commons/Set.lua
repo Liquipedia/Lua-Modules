@@ -44,6 +44,14 @@ function Set:add(value)
 	return self
 end
 
+---Adds all elements from the specified set to this set.
+---@param set Set<T>
+---@return Set<T>
+function Set:addAll(set)
+	Table.mergeInto(self.data, set.data)
+	return self
+end
+
 ---@param value T
 ---@private
 function Set:_remove(value)
@@ -62,6 +70,16 @@ function Set:remove(value)
 		return self
 	end
 	self:_remove(value)
+	return self
+end
+
+---Removes all elements in the specified set from this set.
+---@param set Set<T>
+---@return Set<T>
+function Set:removeAll(set)
+	for entry in pairs(set) do
+		self:_remove(entry)
+	end
 	return self
 end
 
@@ -99,10 +117,7 @@ end
 ---@return Set<T>
 function Set:difference(set)
 	local copy = self:copy()
-	for entry in pairs(set) do
-		copy:_remove(entry)
-	end
-	return copy
+	return copy:removeAll(set)
 end
 
 ---Returns `true` if this set contains the specified value.
