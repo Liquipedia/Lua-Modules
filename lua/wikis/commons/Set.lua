@@ -18,6 +18,7 @@ local Set = Class.new(function(set, tbl)
 	set:_new(tbl)
 end)
 
+---@param tbl T[]?
 ---@private
 function Set:_new(tbl)
 	self.data = Set._tableToSet(tbl or {})
