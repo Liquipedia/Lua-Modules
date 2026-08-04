@@ -119,7 +119,9 @@ end
 
 ---@return Set<T>
 function Set:copy()
-	return Set(self:toArray())
+	local copy = Set()
+	copy.data = Table.copy(self.data)
+	return copy
 end
 
 ---@param other Set<T>
