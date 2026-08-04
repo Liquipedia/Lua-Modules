@@ -130,4 +130,4 @@ Set.__pairs = Set._iterator
 Set.__add = Set._addImmutable
 Set.__sub = Set._removeImmutable
 
-return Class.export(Set, {trim = false, removeBlanks = false})
+return Set
