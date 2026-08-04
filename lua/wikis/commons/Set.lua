@@ -10,8 +10,8 @@ local Table = require('Module:Table')
 
 ---@class Set<T>: BaseClass
 ---@operator call(T[]?): Set<T>
----@operator add(T|Set<T>): Set<T>
----@operator sub(T|Set<T>): Set<T>
+---@operator add(Set<T>): Set<T>
+---@operator sub(Set<T>): Set<T>
 ---@field private data table<T, boolean?>
 local Set = Class.new(function(set, tbl)
 	set:_new(tbl)
