@@ -134,7 +134,7 @@ function Set:equals(other)
 	if self:size() ~= other:size() then
 		return false
 	end
-	return self:containsAll(other) and other:containsAll(self)
+	return self:containsAll(other)
 end
 
 ---@return string
