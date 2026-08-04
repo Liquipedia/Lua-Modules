@@ -69,6 +69,18 @@ end
 
 ---@param set Set<T>
 ---@return Set<T>
+function Set:intersection(set)
+	local intersection = Set()
+	for entry in pairs(self) do
+		if set:contains(entry) then
+			intersection:add(entry)
+		end
+	end
+	return intersection
+end
+
+---@param set Set<T>
+---@return Set<T>
 function Set:union(set)
 	local copy = self:copy()
 	Table.mergeInto(copy.data, set.data)
