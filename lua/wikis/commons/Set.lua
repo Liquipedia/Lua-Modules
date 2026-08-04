@@ -8,6 +8,7 @@
 local Class = require('Module:Class')
 local Table = require('Module:Table')
 
+---Implementation of a mathematical set.
 ---@class Set<T>: BaseClass
 ---@operator call(T[]?): Set<T>
 ---@operator add(Set<T>): Set<T>
@@ -28,6 +29,11 @@ function Set:_add(value)
 	self.data[value] = true
 end
 
+--[[
+Adds the specified value to this set.
+
+This function errors if argument is `nil`.
+]]
 ---@param value T
 ---@return Set<T>
 function Set:add(value)
@@ -44,6 +50,11 @@ function Set:_remove(value)
 	self.data[value] = nil
 end
 
+--[[
+Removes the specified value from this set.
+
+This function is a no-op if argument is `nil`.
+]]
 ---@param value T
 ---@return Set<T>
 function Set:remove(value)
@@ -54,12 +65,14 @@ function Set:remove(value)
 	return self
 end
 
+---Removes all elements from this set.
 ---@return Set<T>
 function Set:clear()
 	self.data = {}
 	return self
 end
 
+---Creates and returns the intersection of this set and the specified set.
 ---@param set Set<T>
 ---@return Set<T>
 function Set:intersection(set)
@@ -72,6 +85,7 @@ function Set:intersection(set)
 	return intersection
 end
 
+---Creates and returns the union of this set and the specified set.
 ---@param set Set<T>
 ---@return Set<T>
 function Set:union(set)
@@ -80,6 +94,7 @@ function Set:union(set)
 	return copy
 end
 
+---Creates and returns the set difference of this set and the specified set.
 ---@param set Set<T>
 ---@return Set<T>
 function Set:difference(set)
@@ -90,6 +105,7 @@ function Set:difference(set)
 	return copy
 end
 
+---Returns `true` if this set contains the specified value.
 ---@param value T
 ---@return boolean
 function Set:contains(value)
@@ -107,16 +123,23 @@ function Set:containsAll(set)
 	return true
 end
 
+---Returns `true` if this set is empty.
 ---@return boolean
 function Set:isEmpty()
 	return next(self.data) == nil
 end
 
+---Returns the size of this set.
 ---@return integer
 function Set:size()
 	return Table.size(self.data)
 end
 
+--[[
+Returns the elements of this set as an array.
+
+The order of elements in the returned array is not specified.
+]]
 ---@return T[]
 function Set:toArray()
 	local array = {}
@@ -126,6 +149,7 @@ function Set:toArray()
 	return array
 end
 
+---Returns a copy of this set.
 ---@return Set<T>
 ---@nodiscard
 function Set:copy()
@@ -134,6 +158,7 @@ function Set:copy()
 	return copy
 end
 
+---Returns `true` if this set and the specified set are equal.
 ---@param other Set<any>
 ---@return boolean
 function Set:equals(other)
