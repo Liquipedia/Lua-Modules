@@ -13,11 +13,9 @@ local Table = require('Module:Table')
 ---@operator add(T|Set<T>): Set<T>
 ---@operator sub(T|Set<T>): Set<T>
 ---@field private data table<T, boolean?>
-local Set = Class.new(
-	function(set,tbl)
-		set:_new(tbl)
-	end
-)
+local Set = Class.new(function(set, tbl)
+	set:_new(tbl)
+end)
 
 ---@private
 function Set:_new(tbl)
@@ -151,7 +149,9 @@ function Set:_iterator()
 	local function stateless_iter(tbl, k)
 		local v
 		k, v = next(tbl, k)
-		if nil~=v then return k end -- A normal iterator returns k,v here
+		if v ~= nil then
+			return k -- A normal iterator returns k,v here
+		end
 	end
 	-- Return an iterator function, the table, starting point
 	return stateless_iter, self.data, nil
