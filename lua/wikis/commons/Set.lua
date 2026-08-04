@@ -28,27 +28,14 @@ function Set:_add(value)
 	self.data[value] = true
 end
 
----@param value T|Set<T>
+---@param value T
 ---@return Set<T>
 function Set:add(value)
 	if value == nil then
 		error('Set.add: nil cannot be added to sets')
-	elseif Class.instanceOf(value, Set) then
-		---@cast value Set<any>
-		for val in pairs(value) do
-			self:_add(val)
-		end
-	else
-		self:_add(value)
 	end
+	self:_add(value)
 	return self
-end
-
----@param value T|Set<T>
----@return Set<T>
----@private
-function Set:_addImmutable(value)
-	return self:copy():add(value)
 end
 
 ---@param value T
@@ -84,6 +71,14 @@ end
 function Set:clear()
 	self.data = {}
 	return self
+end
+
+---@param set Set<T>
+---@return Set<T>
+function Set:union(set)
+	local copy = self:copy()
+	Table.mergeInto(copy.data, set.data)
+	return copy
 end
 
 ---@param value T
@@ -178,7 +173,7 @@ end
 Set.__eq = Set.equals
 Set.__tostring = Set.toString
 Set.__pairs = Set._iterator
-Set.__add = Set._addImmutable
+Set.__add = Set.union
 Set.__sub = Set._removeImmutable
 
 return Set
