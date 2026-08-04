@@ -1,8 +1,8 @@
 local Class = require('Module:Class')
 
 local Set = Class.new(
-	function(set,tbl) 
-		set:_new(tbl) 
+	function(set,tbl)
+		set:_new(tbl)
 	end
 )
 
