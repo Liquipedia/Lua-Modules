@@ -6,6 +6,7 @@
 --
 
 local Class = require('Module:Class')
+local Table = require('Module:Table')
 
 ---@class Set<T>: BaseClass
 ---@operator call(T[]): Set<T>
@@ -104,11 +105,7 @@ end
 
 ---@return integer
 function Set:size()
-	local count = 0
-	for _ in pairs(self) do
-		count = count + 1
-	end
-	return count
+	return Table.size(self.data)
 end
 
 ---@return T[]
