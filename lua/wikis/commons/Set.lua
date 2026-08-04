@@ -1,3 +1,10 @@
+---
+-- @Liquipedia
+-- page=Module:Set
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Class = require('Module:Class')
 
 local Set = Class.new(
