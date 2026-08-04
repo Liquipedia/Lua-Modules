@@ -9,7 +9,9 @@ local Class = require('Module:Class')
 local Table = require('Module:Table')
 
 ---@class Set<T>: BaseClass
----@operator call(T[]): Set<T>
+---@operator call(T[]?): Set<T>
+---@operator add(Set<T>): Set<T>
+---@operator sub(Set<T>): Set<T>
 ---@field private data table<T, boolean?>
 local Set = Class.new(
 	function(set,tbl)
@@ -28,11 +30,11 @@ function Set:_add(value)
 	self.data[value] = true
 end
 
----@param value T
----@return self
----@overload fun(self: Set<T>, value: Set<T>): Set
+---@param value T|Set<T>
+---@return Set<T>
 function Set:add(value)
 	if Class.instanceOf(value, Set) then
+		---@cast value Set<any>
 		for val in pairs(value) do
 			self:_add(val)
 		end
@@ -42,7 +44,7 @@ function Set:add(value)
 	return self
 end
 
----@param value T
+---@param value T|Set<T>
 ---@return Set<T>
 ---@private
 function Set:_addImmutable(value)
@@ -55,11 +57,11 @@ function Set:_remove(value)
 	self.data[value] = nil
 end
 
----@param value T
----@return self
----@overload fun(self: Set<T>, value: Set<T>): Set
+---@param value T|Set<T>
+---@return Set<T>
 function Set:remove(value)
 	if Class.instanceOf(value, Set) then
+		---@cast value Set<any>
 		for val in pairs(value) do
 			self:_remove(val)
 		end
@@ -69,14 +71,14 @@ function Set:remove(value)
 	return self
 end
 
----@param value T
+---@param value T|Set<T>
 ---@return Set<T>
 ---@private
 function Set:_removeImmutable(value)
 	return self:copy():remove(value)
 end
 
----@return self
+---@return Set<T>
 function Set:clear()
 	self.data = {}
 	return self
@@ -119,13 +121,14 @@ function Set:toArray()
 end
 
 ---@return Set<T>
+---@nodiscard
 function Set:copy()
 	local copy = Set()
 	copy.data = Table.copy(self.data)
 	return copy
 end
 
----@param other Set<T>
+---@param other Set<any>
 ---@return boolean
 function Set:equals(other)
 	if self:size() ~= other:size() then
