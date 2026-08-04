@@ -64,16 +64,11 @@ describe('array', function()
 			---@type Set<integer>
 			local set2 = Set{2, 4, 6, 8}
 
-			local intersection1 = set1:intersection(set2)
-			local intersection2 = set1 - set2
+			local intersection = set1:intersection(set2)
 
-			assert.is_false(intersection1:isEmpty())
-			assert.is_false(intersection2:isEmpty())
+			assert.is_false(intersection:isEmpty())
 
-			assert.are_same({2}, intersection1:toArray())
-			assert.are_same({2}, intersection2:toArray())
-
-			assert.is_true(intersection1 == intersection2)
+			assert.are_same({2}, intersection:toArray())
 		end)
 
 		it('check set difference', function()
@@ -82,11 +77,16 @@ describe('array', function()
 			---@type Set<integer>
 			local set2 = Set{2, 4, 6, 8}
 
-			local diff = set1:difference(set2)
+			local diff1 = set1:difference(set2)
+			local diff2 = set1 - set2
 
-			assert.is_false(diff:isEmpty())
+			assert.is_false(diff1:isEmpty())
+			assert.is_false(diff2:isEmpty())
 
-			assert.are_same({1, 3}, diff:toArray())
+			assert.are_same({1, 3}, diff1:toArray())
+			assert.are_same({1, 3}, diff2:toArray())
+
+			assert.is_true(diff1 == diff2)
 		end)
 	end)
 end)
