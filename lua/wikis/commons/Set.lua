@@ -54,13 +54,6 @@ function Set:remove(value)
 	return self
 end
 
----@param value T|Set<T>
----@return Set<T>
----@private
-function Set:_removeImmutable(value)
-	return self:copy():remove(value)
-end
-
 ---@return Set<T>
 function Set:clear()
 	self.data = {}
