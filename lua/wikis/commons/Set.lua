@@ -31,7 +31,9 @@ end
 ---@param value T|Set<T>
 ---@return Set<T>
 function Set:add(value)
-	if Class.instanceOf(value, Set) then
+	if value == nil then
+		error('Set.add: nil cannot be added to sets')
+	elseif Class.instanceOf(value, Set) then
 		---@cast value Set<any>
 		for val in pairs(value) do
 			self:_add(val)
@@ -58,7 +60,9 @@ end
 ---@param value T|Set<T>
 ---@return Set<T>
 function Set:remove(value)
-	if Class.instanceOf(value, Set) then
+	if value == nil then
+		return self
+	elseif Class.instanceOf(value, Set) then
 		---@cast value Set<any>
 		for val in pairs(value) do
 			self:_remove(val)
