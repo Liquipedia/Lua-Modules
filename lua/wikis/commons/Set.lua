@@ -129,7 +129,9 @@ end
 ---@param other Set<any>
 ---@return boolean
 function Set:equals(other)
-	if self:size() ~= other:size() then
+	if rawequal(self, other) then
+		return true
+	elseif self:size() ~= other:size() then
 		return false
 	end
 	return self:containsAll(other)
