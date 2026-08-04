@@ -76,6 +76,7 @@ function Set:_removeImmutable(value)
 	return self:copy():remove(value)
 end
 
+---@return self
 function Set:clear()
 	self.data = {}
 	return self
