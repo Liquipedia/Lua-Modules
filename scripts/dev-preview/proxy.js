@@ -1,81 +1,92 @@
-const fs = require( 'fs' );
-const { Proxy } = require( 'http-mitm-proxy' );
-const { classifyRequest, contentTypeFor } = require( './classify.js' );
-const { REFRESH_CLIENT } = require( './refresh-client.js' );
-const { OUTPUT_CSS, OUTPUT_JS, CA_DIR } = require( './constants.js' );
+const { spawn, spawnSync } = require( 'child_process' );
+const { MITM_CONFDIR, PROXY_SCRIPT, REPO_ROOT } = require( './constants.js' );
 
-const REBUILD_PATH = '/__lp_dev_rebuild_check__';
+const MITMDUMP = process.env.LP_DEV_MITMDUMP || 'mitmdump';
 
-function readOrNull( file ) {
-	try {
-		return fs.readFileSync( file, 'utf8' );
-	} catch ( e ) {
-		return null;
+// How long to wait for mitmdump to prove it stayed up. It exits within
+// milliseconds on the common failures (port taken, bad addon, missing dep), so
+// this only has to outlast process spawn.
+const STARTUP_GRACE_MS = 1500;
+
+const INSTALL_HINT = `Could not run "${ MITMDUMP }". Install it with:\n` +
+	'  pip install mitmproxy\n' +
+	'Or point LP_DEV_MITMDUMP at the binary.';
+
+// Cheap pre-flight so a missing mitmproxy fails with an install hint rather
+// than an ENOENT stack trace after we have already run a build.
+function checkAvailable() {
+	const probe = spawnSync( MITMDUMP, [ '--version' ], { stdio: 'ignore' } );
+	return !probe.error;
+}
+
+/**
+ * Spawn mitmdump with scripts/proxy_lp.py as its addon. The addon owns all
+ * request handling (interception, the rebuild-check endpoint, reload-client
+ * injection); this module only owns the process lifecycle.
+ *
+ * @param {Object} options
+ * @param {number} options.port Port to listen on, loopback only.
+ * @param {boolean} options.reload Whether the addon should inject the reload client.
+ * @return {Promise<{stop: Function}>}
+ */
+function startProxy( { port, reload } ) {
+	if ( !checkAvailable() ) {
+		return Promise.reject( new Error( INSTALL_HINT ) );
 	}
-}
 
-function serve( res, body, contentType ) {
-	res.writeHead( 200, {
-		'Content-Type': contentType,
-		'Cache-Control': 'no-store'
-	} );
-	res.end( body );
-}
+	const args = [
+		'--listen-host', '127.0.0.1',
+		'--listen-port', String( port ),
+		'--set', `confdir=${ MITM_CONFDIR }`,
+		// Drop the per-request flow log; startup errors and the addon's own
+		// output still come through. Do not turn termlog_verbosity down to do
+		// this — that hides addon warnings too.
+		'--flow-detail', '0',
+		'-s', PROXY_SCRIPT
+	];
 
-function startProxy( { port, state } ) {
-	const proxy = new Proxy();
-
-	proxy.onError( ( ctx, err ) => {
-		console.error( `[proxy] ${ err && err.message ? err.message : err }` );
-	} );
-
-	proxy.onRequest( ( ctx, callback ) => {
-		const req = ctx.clientToProxyRequest;
-		const host = req.headers.host || '';
-		const res = ctx.proxyToClientResponse;
-
-		// Rebuild-check endpoint (fetched relative to liquipedia.net origin).
-		if ( req.url.startsWith( REBUILD_PATH ) ) {
-			const reload = state.needsReload === true;
-			state.needsReload = false;
-			serve( res, JSON.stringify( { reload } ), 'application/json; charset=utf-8' );
-			return;
-		}
-
-		const kind = classifyRequest( `https://${ host }${ req.url }` );
-		if ( kind === 'styles' ) {
-			const css = readOrNull( OUTPUT_CSS );
-			if ( css !== null ) {
-				serve( res, css, contentTypeFor( 'styles' ) );
-				return;
-			}
-		} else if ( kind === 'scripts' ) {
-			const js = readOrNull( OUTPUT_JS );
-			if ( js !== null ) {
-				serve( res, js + '\n' + REFRESH_CLIENT, contentTypeFor( 'scripts' ) );
-				return;
-			}
-		}
-
-		// passthrough, or local file missing → forward untouched.
-		callback();
+	const child = spawn( MITMDUMP, args, {
+		cwd: REPO_ROOT,
+		stdio: [ 'ignore', 'inherit', 'inherit' ],
+		env: Object.assign( {}, process.env, { LP_DEV_RELOAD: reload ? '1' : '0' } )
 	} );
 
 	return new Promise( ( resolve, reject ) => {
-		// Force IPv4 loopback: http-mitm-proxy's internal per-hostname HTTPS
-		// tunnel dials out via a hardcoded 0.0.0.0 (which the OS resolves as
-		// 127.0.0.1). If host defaults to 'localhost' and that resolves to
-		// ::1 first (common on modern Linux), the internal server binds
-		// IPv6-only and the tunnel connect fails with ECONNREFUSED.
-		proxy.listen( { host: '127.0.0.1', port, sslCaDir: CA_DIR }, ( err ) => {
-			if ( err ) {
-				reject( err );
+		let settled = false;
+
+		child.on( 'error', ( err ) => {
+			if ( settled ) {
 				return;
 			}
-			console.log( `[proxy] listening on 127.0.0.1:${ port }` );
-			resolve( { stop: () => proxy.close() } );
+			settled = true;
+			reject( new Error( `${ INSTALL_HINT }\n(${ err.message })` ) );
 		} );
+
+		// Exiting during the grace period means it never got listening — surface
+		// that as a startup failure instead of a silently dead proxy.
+		child.on( 'exit', ( code ) => {
+			if ( settled ) {
+				console.error( `[proxy] mitmdump exited (code ${ code })` );
+				return;
+			}
+			settled = true;
+			reject( new Error(
+				`mitmdump exited immediately (code ${ code }); see output above. ` +
+				`If port ${ port } is taken, set LP_DEV_PORT to another one.`
+			) );
+		} );
+
+		setTimeout( () => {
+			if ( settled ) {
+				return;
+			}
+			settled = true;
+			console.log( `[proxy] mitmdump listening on 127.0.0.1:${ port }` );
+			resolve( {
+				stop: () => child.kill( 'SIGTERM' )
+			} );
+		}, STARTUP_GRACE_MS );
 	} );
 }
 
-module.exports = { startProxy, REBUILD_PATH };
+module.exports = { startProxy };

@@ -1,8 +1,24 @@
+const fs = require( 'fs' );
 const { execFile } = require( 'child_process' );
 const chokidar = require( 'chokidar' );
-const { WATCH_GLOBS, REPO_ROOT } = require( './constants.js' );
+const { WATCH_GLOBS, REPO_ROOT, MARKER_FILE } = require( './constants.js' );
 
 const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+
+const DEBOUNCE_MS = 300;
+
+// Hand the rebuild off to scripts/proxy_lp.py, which the browser polls. Written
+// via a temp file + rename so the proxy can never read a half-written marker.
+function writeMarker( kinds ) {
+	const body = `${ Date.now() } ${ kinds.join( ',' ) }`;
+	const temp = `${ MARKER_FILE }.tmp`;
+	try {
+		fs.writeFileSync( temp, body );
+		fs.renameSync( temp, MARKER_FILE );
+	} catch ( e ) {
+		console.error( `[watch] could not write rebuild marker: ${ e.message }` );
+	}
+}
 
 // chokidar v4 dropped glob-string support (watches literal paths only), so
 // WATCH_GLOBS entries like 'stylesheets/**/*.scss' must be reduced to their
@@ -31,7 +47,7 @@ function runBuild( script ) {
 	} );
 }
 
-function startWatcher( { state } ) {
+function startWatcher() {
 	let timer = null;
 	let pending = { css: false, js: false };
 
@@ -44,18 +60,20 @@ function startWatcher( { state } ) {
 			timer = null;
 			const todo = pending;
 			pending = { css: false, js: false };
-			let built = false;
+			const built = [];
 			if ( todo.css && await runBuild( 'build:css' ) ) {
-				built = true;
+				built.push( 'css' );
 			}
 			if ( todo.js && await runBuild( 'build:js' ) ) {
-				built = true;
+				built.push( 'js' );
 			}
-			if ( built ) {
-				state.needsReload = true;
-				console.log( '[watch] rebuilt — browser will reload' );
+			if ( built.length > 0 ) {
+				writeMarker( built );
+				// A css-only rebuild is hot-swapped in place; js needs a reload.
+				const effect = built.includes( 'js' ) ? 'reload' : 'css swap';
+				console.log( `[watch] rebuilt ${ built.join( '+' ) } — ${ effect }` );
 			}
-		}, 300 );
+		}, DEBOUNCE_MS );
 	}
 
 	const watchDirs = [ ...new Set( WATCH_GLOBS.map( globBaseDir ) ) ];

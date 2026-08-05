@@ -6,11 +6,17 @@ const DEV_DIR = path.join( repoRoot, '.dev-preview' );
 
 module.exports = {
 	REPO_ROOT: repoRoot,
-	OUTPUT_CSS: path.join( repoRoot, 'lua', 'output', 'css', 'main.css' ),
-	OUTPUT_JS: path.join( repoRoot, 'lua', 'output', 'js', 'main.js' ),
 	DEV_DIR,
 	PROFILE_DIR: path.join( DEV_DIR, 'profile' ),
-	CA_DIR: path.join( DEV_DIR, 'ca' ),
+	// mitmdump keeps its generated CA here rather than in ~/.mitmproxy, so it is
+	// disposable along with the rest of .dev-preview. Nothing is ever installed
+	// into a trust store — the throwaway browser profile ignores cert errors.
+	MITM_CONFDIR: path.join( DEV_DIR, 'mitmproxy' ),
+	// Watcher → proxy handshake. Content is "<buildId> <kinds>", e.g.
+	// "1754400000000 css,js". Written atomically here, read (never consumed) by
+	// scripts/proxy_lp.py.
+	MARKER_FILE: path.join( DEV_DIR, 'rebuild_marker' ),
+	PROXY_SCRIPT: path.join( repoRoot, 'scripts', 'proxy_lp.py' ),
 	DEFAULT_PORT: 8081,
 	WATCH_GLOBS: [ 'stylesheets/**/*.scss', 'javascript/**/*.js' ],
 	// First existing entry wins. LP_DEV_BROWSER env overrides all of this.

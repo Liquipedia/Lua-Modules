@@ -5,7 +5,7 @@ const { startWatcher } = require( './watch.js' );
 const { detectBrowser, launchBrowser, defaultExistsSync } = require( './browser.js' );
 const { pacDataUrl } = require( './pac.js' );
 const {
-	REPO_ROOT, DEV_DIR, PROFILE_DIR, DEFAULT_PORT
+	REPO_ROOT, DEV_DIR, PROFILE_DIR, MARKER_FILE, DEFAULT_PORT
 } = require( './constants.js' );
 
 const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
@@ -18,12 +18,18 @@ function fail( message ) {
 async function main() {
 	const args = process.argv.slice( 2 );
 	const port = Number( process.env.LP_DEV_PORT ) || DEFAULT_PORT;
+	// Opt out when a reload would get in the way — long-lived wiki previews,
+	// sandbox pages, anything holding state you do not want disturbed.
+	const reload = !args.includes( '--no-reload' );
 
 	if ( args.includes( '--clean' ) ) {
 		fs.rmSync( PROFILE_DIR, { recursive: true, force: true } );
 		console.log( '[dev] wiped browser profile' );
 	}
 	fs.mkdirSync( DEV_DIR, { recursive: true } );
+	// Start from a clean slate so a marker from a previous session cannot be
+	// mistaken for a rebuild in this one.
+	fs.rmSync( MARKER_FILE, { force: true } );
 
 	// Fail fast: find a browser before doing anything expensive.
 	const browserPath = detectBrowser( {
@@ -43,16 +49,14 @@ async function main() {
 		fail( 'Initial build failed (see output above).' );
 	}
 
-	const state = { needsReload: false };
-
 	let proxy;
 	try {
-		proxy = await startProxy( { port, state } );
+		proxy = await startProxy( { port, reload } );
 	} catch ( e ) {
-		fail( `Could not start proxy on port ${ port } (${ e.message }). Set LP_DEV_PORT to another port.` );
+		fail( e.message );
 	}
 
-	const watcher = startWatcher( { state } );
+	const watcher = startWatcher();
 
 	const browser = launchBrowser( {
 		browserPath,
@@ -61,7 +65,11 @@ async function main() {
 		url: 'https://liquipedia.net'
 	} );
 	console.log( `[dev] launched ${ browserPath }` );
-	console.log( '[dev] edit .scss/.js and the browser reloads. Ctrl-C to stop.' );
+	if ( reload ) {
+		console.log( '[dev] edit .scss for an in-place style swap, .js to reload. Ctrl-C to stop.' );
+	} else {
+		console.log( '[dev] reload disabled — edits are rebuilt, refresh to see them. Ctrl-C to stop.' );
+	}
 
 	let closing = false;
 	function teardown() {
