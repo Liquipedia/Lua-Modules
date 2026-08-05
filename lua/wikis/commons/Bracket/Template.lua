@@ -18,6 +18,8 @@ local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Opponent = Lua.import('Module:Opponent')
 
+local Html = Lua.import('Module:Widget/Html')
+
 ---@class BracketTemplateBracket
 ---@field bracketDatasById table<string,MatchGroupUtilBracketBracketData>
 ---@field rootMatchIds string[]
@@ -61,13 +63,15 @@ function BracketTemplate.BracketContainer(props)
 	end)
 	local bracket = MatchGroupUtil.makeMatchGroup(matchRecords) --[[@as MatchGroupUtilBracket]]
 
-	return BracketDisplay.Bracket({
+	return BracketDisplay.Bracket{
 		bracket = bracket,
 		config = Table.merge(props.config, {
-			OpponentEntry = function() return mw.html.create('div'):addClass('brkts-opponent-entry') end,
+			OpponentEntry = function()
+				return Html.Div{classes = {'brkts-opponent-entry'}, css = {height = '26px'}}
+			end,
 			matchHasDetails = function() return false end,
 		})
-	})
+	}
 end
 
 ---@param argsList table[]

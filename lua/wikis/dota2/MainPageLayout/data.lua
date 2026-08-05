@@ -167,7 +167,7 @@ local CONTENT = {
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 	rankings = {
-		heading = 'Liquipedia Rankings (Beta)',
+		heading = 'Liquipedia Rankings',
 		body = Rankings{
 			teamLimit = 5,
 			storageType = 'extension',
