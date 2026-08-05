@@ -55,28 +55,6 @@ function MatchSummaryGameRow.createComponent(implProps, defaultProps)
 		end
 		local createGameOpponentView = FnUtil.curry(implProps.createGameOpponentView, componentProps)
 
-		local function createDetailedOverview()
-			if not implProps.hasDetail then
-				return
-			elseif not implProps.hasDetail(componentProps) then
-				return
-			end
-			return GeneralCollapsible{
-				shouldCollapse = true,
-				classes = {'brkts-popup-body-grid-row-collapsible'},
-				titleWidget = Html.Div{
-					classes = {'brkts-popup-body-grid-row-collapsible-title'},
-					attributes = {['data-collapsible-click-region'] = 'true'},
-					children = LabeledChevronToggle{
-						expandText = 'Show Detail',
-						collapseText = 'Hide detail',
-						buttonSize = 'xs',
-					},
-				},
-				children = implProps.createGameDetail(componentProps)
-			}
-		end
-
 		return Html.Div{
 			classes = {'brkts-popup-body-grid-row'},
 			css = componentProps.css,
@@ -111,7 +89,7 @@ function MatchSummaryGameRow.createComponent(implProps, defaultProps)
 					}
 				},
 				MatchSummaryGameRow._renderGameComment(implProps, componentProps),
-				createDetailedOverview()
+				MatchSummaryGameRow._createDetailedOverview(implProps, componentProps)
 			),
 		}
 	end
@@ -166,6 +144,32 @@ function MatchSummaryGameRow._renderGameComment(implProps, componentProps)
 	return Html.Div{
 		classes = {'brkts-popup-comment'},
 		children = Array.interleave(comments, Html.Br{}),
+	}
+end
+
+---@package
+---@param implProps MatchSummaryGameRowComponentProps
+---@param componentProps MatchSummaryGameRowProps
+---@return VNode?
+function MatchSummaryGameRow._createDetailedOverview(implProps, componentProps)
+	if implProps.hasDetail == nil then
+		return
+	elseif not implProps.hasDetail(componentProps) then
+		return
+	end
+	return GeneralCollapsible{
+		shouldCollapse = true,
+		classes = {'brkts-popup-body-grid-row-collapsible'},
+		titleWidget = Html.Div{
+			classes = {'brkts-popup-body-grid-row-collapsible-title'},
+			attributes = {['data-collapsible-click-region'] = 'true'},
+			children = LabeledChevronToggle{
+				expandText = 'Show Detail',
+				collapseText = 'Hide detail',
+				buttonSize = 'xs',
+			},
+		},
+		children = implProps.createGameDetail(componentProps)
 	}
 end
 
