@@ -50,29 +50,49 @@ function runBuild( script ) {
 function startWatcher() {
 	let timer = null;
 	let pending = { css: false, js: false };
+	let building = false;
+
+	// Single-flight. The debounce only coalesces events that arrive before the
+	// timer fires; saves landing *during* a build would otherwise start a second
+	// one, and two `sass` runs writing lua/output/css/main.css concurrently can
+	// leave the older build's bytes in place while the marker says "rebuilt".
+	// Anything changed mid-build stays in `pending` and the loop picks it up.
+	async function drain() {
+		if ( building ) {
+			return;
+		}
+		building = true;
+		try {
+			while ( pending.css || pending.js ) {
+				const todo = pending;
+				pending = { css: false, js: false };
+				const built = [];
+				if ( todo.css && await runBuild( 'build:css' ) ) {
+					built.push( 'css' );
+				}
+				if ( todo.js && await runBuild( 'build:js' ) ) {
+					built.push( 'js' );
+				}
+				if ( built.length > 0 ) {
+					writeMarker( built );
+					// A css-only rebuild is hot-swapped in place; js needs a reload.
+					const effect = built.includes( 'js' ) ? 'reload' : 'css swap';
+					console.log( `[watch] rebuilt ${ built.join( '+' ) } — ${ effect }` );
+				}
+			}
+		} finally {
+			building = false;
+		}
+	}
 
 	function schedule( kind ) {
 		pending[ kind ] = true;
 		if ( timer ) {
 			clearTimeout( timer );
 		}
-		timer = setTimeout( async () => {
+		timer = setTimeout( () => {
 			timer = null;
-			const todo = pending;
-			pending = { css: false, js: false };
-			const built = [];
-			if ( todo.css && await runBuild( 'build:css' ) ) {
-				built.push( 'css' );
-			}
-			if ( todo.js && await runBuild( 'build:js' ) ) {
-				built.push( 'js' );
-			}
-			if ( built.length > 0 ) {
-				writeMarker( built );
-				// A css-only rebuild is hot-swapped in place; js needs a reload.
-				const effect = built.includes( 'js' ) ? 'reload' : 'css swap';
-				console.log( `[watch] rebuilt ${ built.join( '+' ) } — ${ effect }` );
-			}
+			drain().catch( ( e ) => console.error( `[watch] ${ e.message }` ) );
 		}, DEBOUNCE_MS );
 	}
 

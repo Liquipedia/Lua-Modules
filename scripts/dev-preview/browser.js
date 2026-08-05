@@ -18,7 +18,10 @@ function detectBrowser( { env, platform, existsSync } ) {
 	return null;
 }
 
-// Thin shell: spawn the browser detached-but-tracked so we can kill it on teardown.
+// Thin shell: spawn the browser in our own process group — deliberately not
+// detached — so Ctrl-C reaches it, and index.js also kills it explicitly and
+// tears down when it exits. Detaching would take it out of the group, leaving an
+// orphaned browser holding the profile lock whenever teardown does not run.
 // --disable-quic is required: HTTP/3 bypasses the HTTP proxy entirely.
 function launchBrowser( { browserPath, profileDir, pacUrl, url } ) {
 	const args = [
