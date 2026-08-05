@@ -132,4 +132,11 @@ function String.upperCaseFirst(str)
 	return mw.getContentLanguage():ucfirst(str)
 end
 
+---Lowercase the first letter of a string
+---@param str string
+---@return string
+function String.lowerCaseFirst(str)
+	return mw.getContentLanguage():lcfirst(str)
+end
+
 return String
