@@ -78,7 +78,7 @@ end
 ---@param set Set<T>
 ---@return Set<T>
 function Set:removeAll(set)
-	for entry, _ in pairs(set.data) do
+	for entry in pairs(set.data) do
 		self:_remove(entry)
 	end
 	return self
@@ -96,7 +96,7 @@ end
 ---@return Set<T>
 function Set:intersection(set)
 	local intersection = Set()
-	for entry, _ in pairs(self.data) do
+	for entry in pairs(self.data) do
 		if set:contains(entry) then
 			intersection:add(entry)
 		end
@@ -108,17 +108,14 @@ end
 ---@param set Set<T>
 ---@return Set<T>
 function Set:union(set)
-	local copy = self:copy()
-	Table.mergeInto(copy.data, set.data)
-	return copy
+	return self:copy():addAll(set)
 end
 
 ---Creates and returns the set difference of this set and the specified set.
 ---@param set Set<T>
 ---@return Set<T>
 function Set:difference(set)
-	local copy = self:copy()
-	return copy:removeAll(set)
+	return self:copy():removeAll(set)
 end
 
 ---Returns `true` if this set contains the specified value.
@@ -131,7 +128,7 @@ end
 ---@param set Set<T>
 ---@return boolean
 function Set:containsAll(set)
-	for val, _ in pairs(set.data) do
+	for val in pairs(set.data) do
 		if not self:contains(val) then
 			return false
 		end
@@ -159,7 +156,7 @@ The order of elements in the returned array is not specified.
 ---@return T[]
 function Set:toArray()
 	local array = {}
-	for k, _ in pairs(self.data) do
+	for k in pairs(self.data) do
 		table.insert(array, k)
 	end
 	return array
