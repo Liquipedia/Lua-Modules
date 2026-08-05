@@ -121,6 +121,36 @@ function GameRowComponentProps.createGameDetail(props)
 					return maxDamage < damage
 				end
 			)
+
+			---@param damageDone number
+			---@return VNode?
+			local function buildDamageBar(damageDone)
+				if maxDamage == nil then
+					return
+				end
+				local damageRatio = damageDone / maxDamage
+				return Html.Div{
+					css = {
+						['grid-column'] = '1 / -1',
+						background = String.interpolate(
+							'linear-gradient(to right, ${leftBarColor} ${leftBarLength}, ${rightBarColor} ${leftBarLength} ${rightBarLength})',
+							{
+								leftBarColor = gameOpponentIndex == 1 and SIDE_COLORS[side] or 'transparent',
+								leftBarLength = MathUtil.formatPercentage(
+									gameOpponentIndex == 1 and damageRatio or (1 - damageRatio)
+								),
+								rightBarColor = gameOpponentIndex == 2 and SIDE_COLORS[side] or 'transparent',
+								rightBarLength = MathUtil.formatPercentage(
+									gameOpponentIndex == 2 and damageRatio or (1 - damageRatio)
+								),
+							}
+						),
+						height = '0.25rem',
+						width = '90%'
+					}
+				}
+			end
+
 			return Html.Div{
 				css = {
 					display = 'grid',
@@ -138,7 +168,6 @@ function GameRowComponentProps.createGameDetail(props)
 							')'
 						}} or nil
 					}, ' ')
-					local damageRatio = maxDamage ~= nil and (gamePlayer.damagedone / maxDamage) or nil
 					return Html.Div{
 						css = {
 							display = 'grid',
@@ -165,26 +194,7 @@ function GameRowComponentProps.createGameDetail(props)
 								},
 								children = gameOpponentIndex == 1 and stats or Array.reverse(stats)
 							},
-							maxDamage and Html.Div{
-								css = {
-									['grid-column'] = '1 / -1',
-									background = String.interpolate(
-										'linear-gradient(to right, ${leftBarColor} ${leftBarLength}, ${rightBarColor} ${leftBarLength} ${rightBarLength})',
-										{
-											leftBarColor = gameOpponentIndex == 1 and SIDE_COLORS[side] or 'transparent',
-											leftBarLength = MathUtil.formatPercentage(
-												gameOpponentIndex == 1 and damageRatio or (1 - damageRatio)
-											),
-											rightBarColor = gameOpponentIndex == 2 and SIDE_COLORS[side] or 'transparent',
-											rightBarLength = MathUtil.formatPercentage(
-												gameOpponentIndex == 2 and damageRatio or (1 - damageRatio)
-											),
-										}
-									),
-									height = '0.25rem',
-									width = '90%'
-								}
-							} or nil
+							buildDamageBar(gamePlayer.damagedone)
 						}
 					}
 				end)
