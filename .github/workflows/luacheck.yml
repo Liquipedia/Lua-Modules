@@ -66,6 +66,110 @@ jobs:
           check_name: 'Lua Test Report'
           annotate_only: ${{ (github.event.pull_request.head.repo.full_name != github.repository) }}
 
+  lua-coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # need the base commit to compare coverage against
+
+      - name: Setup lua
+        uses: Liquipedia/gh-actions-lua@7615c1c345af98bd9898fa5b53c488c5f58246cf
+        with:
+          luaVersion: '5.1'
+
+      - name: Setup luarocks
+        uses: leafo/gh-actions-luarocks@v6
+
+      - name: Setup dependencies
+        run: |
+          luarocks install --lua-version=5.1 busted
+          luarocks install --lua-version=5.1 luacov
+
+      - name: Run test with coverage
+        run: |
+          busted -C lua --run=ci -c
+
+      - name: Generate coverage report
+        working-directory: lua
+        run: |
+          luacov
+
+      - name: Coverage for base commit
+        if: github.event_name == 'pull_request'
+        run: |
+          # HEAD is the PR merge commit, so its first parent is the base branch
+          # tip and the delta covers only this PR's own changes. Not
+          # pull_request.base.sha: that is the fork point, so it drifts behind as
+          # the base branch advances and the delta then also reports commits from
+          # everyone else that got merged in.
+          if ! git rev-parse --verify -q HEAD^2 >/dev/null; then
+            echo "::warning::HEAD is not a merge commit; deltas will be omitted"
+            exit 0
+          fi
+          git worktree add ../base "$(git rev-parse HEAD^1)"
+          # Run the base commit under *this* PR's luacov config, so the delta
+          # reflects the code change rather than a change to the config itself.
+          cp lua/.luacov ../base/lua/.luacov
+          cd ../base
+          busted -C lua --run=ci -c
+          cd lua && luacov
+
+      - name: Report coverage
+        run: |
+          report=lua/luacov.report.out
+          base_report=../base/lua/luacov.report.out
+
+          # Echoes "hits missed pct files uncovered" for a given luacov report.
+          metrics() {
+            local r="$1" hits missed pct files uncovered
+            read -r hits missed pct <<< "$(awk '/^Total/ {print $2, $3, $4}' "$r")"
+            files=$(grep -cE '^wikis/commons/.*[0-9]+\.[0-9][0-9]%$' "$r" || true)
+            uncovered=$(grep -cE '^wikis/commons/.*[[:space:]]0\.00%$' "$r" || true)
+            echo "$hits $missed ${pct%\%} $files $uncovered"
+          }
+
+          read -r hits missed pct files uncovered <<< "$(metrics "$report")"
+
+          have_base=0
+          if [ -s "$base_report" ]; then
+            read -r b_hits b_missed b_pct b_files b_uncovered <<< "$(metrics "$base_report")"
+            [ -n "$b_pct" ] && have_base=1
+          fi
+
+          # Value plus its change against the base, or the bare value when there
+          # is no baseline to compare against.
+          num() {
+            if [ "$have_base" = 1 ]; then printf '%s (%+d)' "$1" "$(($1 - $2))"; else printf '%s' "$1"; fi
+          }
+          pct_of() {
+            if [ "$have_base" = 1 ]; then
+              awk -v v="$1" -v b="$2" 'BEGIN {printf "%.2f%% (%+.2f pp)", v, v - b}'
+            else
+              awk -v v="$1" 'BEGIN {printf "%.2f%%", v}'
+            fi
+          }
+
+          {
+            echo "| Coverage (lua/wikis/commons) | |"
+            echo "|-|-|"
+            echo "| Coverage | $(pct_of "$pct" "$b_pct") |"
+            echo "| Lines hit | $(num "$hits" "$b_hits") |"
+            echo "| Lines missed | $(num "$missed" "$b_missed") |"
+            echo "| Files | $(num "$files" "$b_files") |"
+            echo "| Files at 0% | $(num "$uncovered" "$b_uncovered") |"
+            [ "$have_base" = 1 ] || echo "| | _no baseline available; deltas omitted_ |"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: luacov-report
+          path: lua/luacov.report.out
+
   luals-code-style:
     runs-on: ubuntu-latest
     steps:
