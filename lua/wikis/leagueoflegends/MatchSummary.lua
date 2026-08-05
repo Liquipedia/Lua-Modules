@@ -99,9 +99,8 @@ function GameRowComponentProps.createGameDetail(props)
 					return InGameRoles[a].sortOrder < InGameRoles[b].sortOrder
 				end
 			)
-			local totalDamage = Array.reduce(
-				Array.map(gamePlayers, Operator.property('damagedone')),
-				Operator.nilSafeAdd
+			local maxDamage = Array.max(
+				Array.map(gamePlayers, Operator.property('damagedone'))
 			)
 			return Html.Div{
 				css = {
@@ -120,7 +119,7 @@ function GameRowComponentProps.createGameDetail(props)
 							')'
 						}} or nil
 					}, ' ')
-					local damageRatio = totalDamage ~= nil and (gamePlayer.damagedone / totalDamage) or nil
+					local damageRatio = maxDamage ~= nil and (gamePlayer.damagedone / maxDamage) or nil
 					return Html.Div{
 						css = {
 							display = 'grid',
@@ -147,7 +146,7 @@ function GameRowComponentProps.createGameDetail(props)
 								},
 								children = gameOpponentIndex == 1 and stats or Array.reverse(stats)
 							},
-							totalDamage and Html.Div{
+							maxDamage and Html.Div{
 								css = {
 									['grid-column'] = '1 / -1',
 									background = String.interpolate(
