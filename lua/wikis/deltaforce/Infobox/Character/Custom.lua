@@ -53,7 +53,6 @@ function CustomInjector:_toCellContent(key)
 	if not args[key] or args[key] == '' then return end
 	local iconData = PositionIcon[args[key]:lower()]
 	if not iconData then return args[key] end
-	
 	return '[[File:' .. iconData.icon .. '|15px|link=' .. (iconData.link or '') .. ']] ' .. iconData.displayName
 end
 
