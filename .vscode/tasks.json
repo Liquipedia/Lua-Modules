@@ -22,7 +22,7 @@
 			"type": "shell",
 			"command": "${command:python.interpreterPath}",
 			"args": [
-				"scripts${/}deploy.py",
+				"scripts${/}deploy.py"
 			],
 			"options": {
 				"env": {
