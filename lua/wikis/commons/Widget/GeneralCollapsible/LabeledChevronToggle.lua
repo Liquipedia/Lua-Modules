@@ -17,14 +17,15 @@ local Span = Html.Span
 ---@param buttonType 'expand'|'collapse'
 ---@param text Renderable?
 ---@param iconName string
+---@param buttonSize 'xs'|'sm'|'md'|'lg'|nil
 ---@return VNode
-local function labeledButton(buttonType, text, iconName)
+local function labeledButton(buttonType, text, iconName, buttonSize)
 	return Button{
 		classes = {'general-collapsible-' .. buttonType .. '-button'},
 		children = Span{
 			children = WidgetUtil.collect(text, text and ' ' or nil, Icon{iconName = iconName}),
 		},
-		size = 'sm',
+		size = buttonSize,
 		variant = 'ghost',
 	}
 end
@@ -32,6 +33,7 @@ end
 ---@class LabeledChevronToggleProps
 ---@field expandText Renderable? label shown next to the expand chevron
 ---@field collapseText Renderable? label shown next to the collapse chevron
+---@field buttonSize 'xs'|'sm'|'md'|'lg'|nil
 
 ---@param props LabeledChevronToggleProps
 ---@return HtmlNode
@@ -39,10 +41,10 @@ local function LabeledChevronToggle(props)
 	return Span{
 		classes = {'general-collapsible-default-toggle'},
 		children = {
-			labeledButton('expand', props.expandText, 'expand'),
-			labeledButton('collapse', props.collapseText, 'collapse'),
+			labeledButton('expand', props.expandText, 'expand', props.buttonSize),
+			labeledButton('collapse', props.collapseText, 'collapse', props.buttonSize),
 		}
 	}
 end
 
-return Component.component(LabeledChevronToggle)
+return Component.component(LabeledChevronToggle, {buttonSize = 'sm'})
