@@ -5,12 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Lua = require('ModuleLua')
+local Lua = require('Module:Lua')
 
-local Arguments = Lua.import('ModuleArguments')
-local Array = Lua.import('ModuleArray')
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
 
-local TableWidgets = Lua.import('ModuleWidgetTable2All')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 local MatchFormatTable = {}
 
