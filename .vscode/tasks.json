@@ -37,7 +37,7 @@
 		{
 			"id": "devEnvironment",
 			"type": "promptString",
-			"description": "Lua Dev Enviroment name"
+			"description": "Lua Dev Environment name"
 		},
 		{
 			"id": "devBaseRef",
