@@ -111,7 +111,15 @@ function GameRowComponentProps.createGameDetail(props)
 				end
 			)
 			local maxDamage = Array.max(
-				Array.map(gamePlayers, Operator.property('damagedone'))
+				Array.map(gamePlayers, Operator.property('damagedone')),
+				function (maxDamage, damage)
+					if maxDamage == nil then
+						return damage
+					elseif damage == nil then
+						return maxDamage
+					end
+					return maxDamage < damage
+				end
 			)
 			return Html.Div{
 				css = {
