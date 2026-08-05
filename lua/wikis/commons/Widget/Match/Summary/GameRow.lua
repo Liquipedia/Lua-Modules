@@ -17,12 +17,16 @@ local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local GameCenter = Lua.import('Module:Widget/Match/Summary/GameCenter')
 local GameWinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLossIndicator')
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
+local LabeledChevronToggle = Lua.import('Module:Widget/GeneralCollapsible/LabeledChevronToggle')
 
 ---@class MatchSummaryGameRowComponentProps
 ---@field getGameOpponentViewCss? fun(props: MatchSummaryGameRowProps, opponentIndex: integer): HtmlStyleProps?
 ---@field createAdditionalComment? fun(props: MatchSummaryGameRowProps): string?
 ---@field createGameOpponentView fun(props: MatchSummaryGameRowProps, opponentIndex: integer): Renderable|Renderable[]?
 ---@field createGameOverview fun(props: MatchSummaryGameRowProps): Renderable|Renderable[]
+---@field hasDetail? fun(props: MatchSummaryGameRowProps): boolean
+---@field createGameDetail? fun(props: MatchSummaryGameRowProps): Renderable|Renderable[]?
 
 ---@class MatchSummaryGameRowProps
 ---@field allowWrappingInOverview boolean?
@@ -51,39 +55,64 @@ function MatchSummaryGameRow.createComponent(implProps, defaultProps)
 		end
 		local createGameOpponentView = FnUtil.curry(implProps.createGameOpponentView, componentProps)
 
+		local function createDetailedOverview()
+			if not implProps.hasDetail then
+				return
+			elseif not implProps.hasDetail(componentProps) then
+				return
+			end
+			return GeneralCollapsible{
+				shouldCollapse = true,
+				classes = {'brkts-popup-body-grid-row-collapsible'},
+				titleWidget = Html.Div{
+					classes = {'brkts-popup-body-grid-row-collapsible-title'},
+					attributes = {['data-collapsible-click-region'] = 'true'},
+					children = LabeledChevronToggle{
+						expandText = 'Show Detail',
+						collapseText = 'Hide detail',
+						buttonSize = 'xs',
+					},
+				},
+				children = implProps.createGameDetail(componentProps)
+			}
+		end
+
 		return Html.Div{
 			classes = {'brkts-popup-body-grid-row'},
 			css = componentProps.css,
-			children = {
-				GameWinLossIndicator{
-					opponentIndex = 1,
-					winner = componentProps.game.winner,
-				},
-				Html.Div{
-					classes = {'brkts-popup-body-grid-row-detail'},
-					children = {
-						GameCenter{
-							css = getGameOpponentViewCss(1),
-							children = createGameOpponentView(1)
-						},
-						GameCenter{
-							css = componentProps.allowWrappingInOverview and {
-								['white-space'] = 'wrap',
-							} or nil,
-							children = implProps.createGameOverview(componentProps)
-						},
-						GameCenter{
-							css = getGameOpponentViewCss(2),
-							children = createGameOpponentView(2)
-						}
+			children = Array.extendWith(
+				{
+						GameWinLossIndicator{
+						opponentIndex = 1,
+						winner = componentProps.game.winner,
 					},
+					Html.Div{
+						classes = {'brkts-popup-body-grid-row-detail'},
+						children = {
+							GameCenter{
+								css = getGameOpponentViewCss(1),
+								children = createGameOpponentView(1)
+							},
+							GameCenter{
+								css = componentProps.allowWrappingInOverview and {
+									['white-space'] = 'wrap',
+								} or nil,
+								children = implProps.createGameOverview(componentProps)
+							},
+							GameCenter{
+								css = getGameOpponentViewCss(2),
+								children = createGameOpponentView(2)
+							}
+						},
+					},
+					GameWinLossIndicator{
+						opponentIndex = 2,
+						winner = componentProps.game.winner,
+					}
 				},
-				GameWinLossIndicator{
-					opponentIndex = 2,
-					winner = componentProps.game.winner,
-				},
-				MatchSummaryGameRow._renderGameComment(implProps, componentProps)
-			},
+				MatchSummaryGameRow._renderGameComment(implProps, componentProps),
+				createDetailedOverview()
+			),
 		}
 	end
 
