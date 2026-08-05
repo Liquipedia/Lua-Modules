@@ -29,7 +29,9 @@ local GameRowComponentProps = {
 	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay,
 }
 
-local HeroesMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
+local HeroesMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(
+	GameRowComponentProps, {allowWrappingInOverview = true}
+)
 
 ---@param args table
 ---@return Renderable
