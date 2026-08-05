@@ -123,6 +123,14 @@ function GameRowComponentProps.createGameDetail(props)
 				},
 				children = Array.map(gamePlayers, function (gamePlayer)
 					local kda = {gamePlayer.kills, gamePlayer.deaths, gamePlayer.assists}
+					local stats = Array.interleave({
+						Html.Div{children = Array.interleave(kda, SPAN_SLASH)},
+						gamePlayer.damagedone and Html.Div{children = {
+							'(',
+							string.format('%.1fK', gamePlayer.damagedone / 1000),
+							')'
+						}} or nil
+					}, ' ')
 					local damageRatio = totalDamage ~= nil and (gamePlayer.damagedone / totalDamage) or nil
 					return Html.Div{
 						css = {
@@ -134,19 +142,21 @@ function GameRowComponentProps.createGameDetail(props)
 						},
 						children = {
 							MatchSummaryWidgets.Character{
-								bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (side or ''),
 								date = game.date,
 								flipped = gameOpponentIndex == 2,
 								showName = false,
 								size = '16px',
 								character = gamePlayer.character
 							},
-							Link{link = gamePlayer.player, gamePlayer.displayName},
+							Link{link = gamePlayer.player, children = gamePlayer.displayName},
 							Html.Div{
 								css = {
+									display = 'flex',
+									['flex-direction'] = gameOpponentIndex == 2 and 'row-reverse' or nil,
+									gap = '0.25rem',
 									['grid-column'] = '1 / -1',
 								},
-								children = Array.interleave(kda, SPAN_SLASH)
+								children = gameOpponentIndex == 1 and stats or Array.reverse(stats)
 							},
 							totalDamage and Html.Div{
 								css = {
@@ -164,8 +174,8 @@ function GameRowComponentProps.createGameDetail(props)
 											),
 										}
 									),
-									height = '0.125rem',
-									width = '100%'
+									height = '0.25rem',
+									width = '90%'
 								}
 							} or nil
 						}
