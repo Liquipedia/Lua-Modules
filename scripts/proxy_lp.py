@@ -58,7 +58,9 @@ async def main():
     try:
         await m.run()
     except asyncio.CancelledError:
-        await m.done()
+        pass
+    finally:
+        m.shutdown()
 
 
 if __name__ == "__main__":
