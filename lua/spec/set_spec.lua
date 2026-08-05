@@ -1,5 +1,5 @@
 --- Triple Comment to Enable our LLS Plugin
-describe('array', function()
+describe('Set', function()
 	local Set = require('Module:Set')
 
 	describe('basic properties', function()
