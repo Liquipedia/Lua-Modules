@@ -23,8 +23,8 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local MAX_NUM_BANS = 5
 local NUM_HEROES_PICK = 5
 local SIDE_COLORS = {
-	red = '--clr-cinnabar-40',
-	blue = '--clr-sapphire-40',
+	red = 'var( --clr-cinnabar-40 )',
+	blue = 'var( --clr-sapphire-40 )',
 }
 local STATUS_NOT_PLAYED = 'notplayed'
 local SPAN_SLASH = Html.Span{classes = {'slash'}, children = '/'}
@@ -154,11 +154,11 @@ function GameRowComponentProps.createGameDetail(props)
 									background = String.interpolate(
 										'linear-gradient(to right, ${leftBarColor} ${leftBarLength}, ${rightBarColor} ${leftBarLength} ${rightBarLength})',
 										{
-											leftBarColor = gameOpponentIndex == 1 and ('var(' .. SIDE_COLORS[side] .. ')') or 'transparent',
+											leftBarColor = gameOpponentIndex == 1 and SIDE_COLORS[side] or 'transparent',
 											leftBarLength = MathUtil.formatPercentage(
 												gameOpponentIndex == 1 and damageRatio or (1 - damageRatio)
 											),
-											rightBarColor = gameOpponentIndex == 2 and ('var(' .. SIDE_COLORS[side] .. ')') or 'transparent',
+											rightBarColor = gameOpponentIndex == 2 and SIDE_COLORS[side] or 'transparent',
 											rightBarLength = MathUtil.formatPercentage(
 												gameOpponentIndex == 2 and damageRatio or (1 - damageRatio)
 											),
