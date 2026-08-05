@@ -7,6 +7,7 @@
 		"@playwright/test": "^1.61.1",
 		"@stylistic/stylelint-plugin": "^2.1.2",
 		"@typescript-eslint/eslint-plugin": "^8.56.1",
+		"chokidar": "^4.0.3",
 		"eslint": "9.x.x",
 		"eslint-config-wikimedia": "0.32.3",
 		"eslint-plugin-jsdoc": "^62.6.0",
@@ -33,6 +34,7 @@
 		]
 	},
 	"scripts": {
+		"dev": "node scripts/dev-preview/index.js",
 		"lint": "npm run lint:js && npm run lint:scss",
 		"lint:ci": "npm run lint:js && npm run lint:scss:ci",
 		"lint:js": "eslint --fix",
