@@ -17,11 +17,11 @@ local Template = Lua.import('Module:Template')
 local OverviewData = Lua.import('Module:EwcTeamsOverview/data')
 
 local Component = Lua.import('Module:Widget/Component')
-local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 local STATUSES = {
 	q = {icon = 'qualified', order = 1},
@@ -81,36 +81,31 @@ local function EwcTeamsOverview(props)
 		return Link{children = Icon{iconName = icon}, link = link}
 	end
 
-	return DataTable{
+	return TableWidgets.Table{
 		sortable = true,
-		tableCss = {
-			['text-align'] = 'center',
-			['font-size'] = '16px',
-		},
-		children = WidgetUtil.collect(
-			Html.Tr{
+		children = {
+			TableWidgets.TableHeader{
 				children = WidgetUtil.collect(
-					Html.Th{children = 'Team Name'},
-					Html.Th{children = ''},
-					Html.Th{children = Html.Abbr{title = 'Qualified to X/25 Tournaments', children = 'Q#'}},
-					Html.Th{children = Html.Abbr{title = 'Number of Teams', children = 'T#'}},
+					TableWidgets.CellHeader{children = 'Team Name'},
+					TableWidgets.CellHeader{children = ''},
+					TableWidgets.CellHeader{children = Html.Abbr{title = 'Qualified to X/25 Tournaments', children = 'Q#'}},
+					TableWidgets.CellHeader{children = Html.Abbr{title = 'Number of Teams', children = 'T#'}},
 					Array.map(gameData, function(game)
-						return Html.Th{
+						return TableWidgets.CellHeader{
 							children = Template.expandTemplate(mw.getCurrentFrame(), 'LeagueIconSmall/' .. game.lis),
 						}
 					end)
 				)
 			},
-			Array.map(clubs, function(club)
-				return Html.Tr{
+			TableWidgets.TableBody{children = Array.map(clubs, function(club)
+				return TableWidgets.Row{
 					children = WidgetUtil.collect(
-						Html.Td{
+						TableWidgets.Cell{
 							children = OpponentDisplay.InlineTeamContainer{template = club.name},
-							css = {['text-align'] = 'left', ['text-wrap'] = 'nowrap'}
 						},
-						Html.Td{children = club.club and Template.safeExpand(mw.getCurrentFrame(), 'LeagueIconSmall/ewc') or nil},
-						Html.Td{children = (club.qualified or 0) .. '/' .. #gameData},
-						Html.Td{children = club.teams},
+						TableWidgets.Cell{children = club.club and Template.safeExpand(mw.getCurrentFrame(), 'LeagueIconSmall/ewc') or nil},
+						TableWidgets.Cell{children = (club.qualified or 0) .. '/' .. #gameData},
+						TableWidgets.Cell{children = club.teams},
 						Array.map(gameData, function(game)
 							local background, sortValue, content
 							local orgInGame = club[game.lis]
@@ -127,7 +122,7 @@ local function EwcTeamsOverview(props)
 								end), '&nbsp;')
 							end
 
-							return Html.Td{
+							return TableWidgets.Cell{
 								classes = {background},
 								attributes = {['data-sort-value'] = sortValue or DEFAULT_ORDER_VALUE},
 								children = content
@@ -135,8 +130,8 @@ local function EwcTeamsOverview(props)
 						end)
 					)
 				}
-			end)
-		)
+			end)}
+		}
 	}
 end
 
