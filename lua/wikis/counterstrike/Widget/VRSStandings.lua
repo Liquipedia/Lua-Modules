@@ -101,7 +101,7 @@ local function buildTitle(settings)
 					Html.B{children = 'Unofficial ' .. titleName .. ' VRS'},
 					Html.Span{children = 'Last updated: ' .. settings.updated}
 				},
-				classes = {'ranking-table__top-row-text'}
+				classes = {'ranking-table__top-row-cs'}
 			},
 			Html.Div{
 				children = {
