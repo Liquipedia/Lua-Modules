@@ -33,7 +33,7 @@ function BSCharacterStats.run(frame)
 	local games = stats:queryGames()
 	local processedData = stats:processGames(games)
 	return CharacterStatsWidget{
-		characterType = 'Champion',
+		characterType = 'Brawler',
 		data = processedData.characterData,
 		includeBans = Array.any(processedData.characterData, function (data)
 			return data.bans > 0
@@ -53,11 +53,11 @@ end
 function BSCharacterStats:getTeamCharacters(game, opponentIndex)
 	local players = ((game.opponents or {})[opponentIndex] or {}).players or {}
 	local characters = {}
-	for _, player in ipairs(players) do
+	Array.map(players, function(player)
 		if type(player) == 'table' and String.isNotEmpty(player.brawler) then
 			table.insert(characters, player.brawler)
 		end
-	end
+	end)
 	return characters
 end
 
@@ -67,11 +67,11 @@ end
 function BSCharacterStats:getTeamBans(game, opponentIndex)
 	local teamBans = ((game.extradata or {}).bans or {})['team' .. opponentIndex] or {}
 	local bans = {}
-	for _, ban in pairs(teamBans) do
+	Array.map(teamBans, function(ban)
 		if String.isNotEmpty(ban) then
 			table.insert(bans, ban)
 		end
-	end
+	end)
 	return bans
 end
 
