@@ -195,7 +195,9 @@ end
 ---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
-	return MapFunctions._getHalfScores(map)
+	local extradata = MapFunctions._getHalfScores(map)
+	-- Id of the on wiki page holding the player stats JSON.
+	return extradata
 end
 
 ---@param map table

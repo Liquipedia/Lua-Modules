@@ -26,4 +26,10 @@ return {
 			player = 'https://web.archive.org/web/play.eslgaming.com/counterstrike/csgo/player/',
 		}
 	},
+	matchIcons = {
+		nuselo = {
+			icon = 'stats',
+			text = 'Match Stats'
+		},
+	}
 }

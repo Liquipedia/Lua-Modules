@@ -263,5 +263,15 @@ return {
 		prefixLink = '',
 		label = 'Matchpage and Stats',
 		isMapStats = true
+	},
+	{},
+	{
+		-- Internal, links to  on wiki Data, with page holding the JSON for supplied map.
+		name = 'nuselo',
+		icon = 'stats',
+		prefixLink = 'Data:Nuselo_',
+		suffixLink = '.json',
+		label = 'Match Stats (raw data)',
+		isMapStats = true
 	}
 }
