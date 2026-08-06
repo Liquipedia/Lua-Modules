@@ -88,7 +88,14 @@ local function EwcTeamsOverview(props)
 	return TableWidgets.Table{
 		sortable = true,
 		columns = Array.extendWith(
-			Array.rep({align = 'left'}, 4),
+			{
+				{align = 'left'},
+				{align = 'center'},
+			},
+			Array.rep({
+				align = 'right',
+				sortType = 'number',
+			}, 2),
 			Array.rep({align = 'center'}, #gameData)
 		),
 		children = {
@@ -112,7 +119,12 @@ local function EwcTeamsOverview(props)
 							children = OpponentDisplay.InlineTeamContainer{template = club.name},
 						},
 						TableWidgets.Cell{children = club.club and Template.safeExpand(mw.getCurrentFrame(), 'LeagueIconSmall/ewc') or nil},
-						TableWidgets.Cell{children = (club.qualified or 0) .. '/' .. #gameData},
+						TableWidgets.Cell{
+							attributes = {
+								['data-sort-value'] = club.qualified or 0
+							},
+							children = (club.qualified or 0) .. '/' .. #gameData
+						},
 						TableWidgets.Cell{children = club.teams},
 						Array.map(gameData, function(game)
 							local background, sortValue, content
