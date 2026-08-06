@@ -12,6 +12,7 @@ local Array = Lua.import('Module:Array')
 local BaseCharacterStats = Lua.import('Module:CharacterStats')
 local Class = Lua.import('Module:Class')
 local String = Lua.import('Module:StringUtils')
+local Logic = Lua.import('Module:Logic')
 
 local CharacterStatsWidget = Lua.import('Module:Widget/CharacterStats')
 
@@ -64,12 +65,7 @@ end
 ---@return string[]
 function BSCharacterStats:getTeamBans(game, opponentIndex)
 	local teamBans = ((game.extradata or {}).bans or {})['team' .. opponentIndex] or {}
-	local bans = {}
-	return Array.map(teamBans, function(ban)
-		if String.isNotEmpty(ban) then
-			return ban
-		end
-	end)
+	return Array.map(teamBans, Logic.nilIfEmpty)
 end
 
 return BSCharacterStats
