@@ -107,20 +107,22 @@ local function EwcTeamsOverview(props)
 		),
 		children = {
 			TableWidgets.TableHeader{
-				children = WidgetUtil.collect(
-					TableWidgets.CellHeader{children = 'Team Name'},
-					TableWidgets.CellHeader{children = ''},
-					TableWidgets.CellHeader{children = Html.Abbr{
-						title = 'Qualified to X/' .. #gameData .. ' Tournaments',
-						children = 'Q#',
-					}},
-					TableWidgets.CellHeader{children = Html.Abbr{title = 'Number of Teams', children = 'T#'}},
-					Array.map(gameData, function(game)
-						return TableWidgets.CellHeader{
-							children = Template.expandTemplate(mw.getCurrentFrame(), 'LeagueIconSmall/' .. game.lis),
-						}
-					end)
-				)
+				children = TableWidgets.Row{
+					children = WidgetUtil.collect(
+						TableWidgets.CellHeader{children = 'Team Name'},
+						TableWidgets.CellHeader{children = ''},
+						TableWidgets.CellHeader{children = Html.Abbr{
+							title = 'Qualified to X/' .. #gameData .. ' Tournaments',
+							children = 'Q#',
+						}},
+						TableWidgets.CellHeader{children = Html.Abbr{title = 'Number of Teams', children = 'T#'}},
+						Array.map(gameData, function(game)
+							return TableWidgets.CellHeader{
+								children = Template.expandTemplate(mw.getCurrentFrame(), 'LeagueIconSmall/' .. game.lis),
+							}
+						end)
+					)
+				}
 			},
 			TableWidgets.TableBody{children = Array.map(clubs, function(club)
 				return TableWidgets.Row{
