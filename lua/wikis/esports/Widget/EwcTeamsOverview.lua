@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Json = Lua.import('Module:Json')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Page = Lua.import('Module:Page')
@@ -33,6 +34,9 @@ local STATUSES = {
 local DEFAULT_ORDER_VALUE = 9
 
 local function storeClubs(clubs, gameData, season)
+	if Lpdb.isStorageDisabled() then
+		return
+	end
 	Array.forEach(clubs, function(club)
 		if not club.name or not club.teams then return end
 
