@@ -89,7 +89,7 @@ function CharacterStatsTable:_buildHeaderRow()
 			Html.Th{children = 'L'},
 			Html.Th{children = 'WR'},
 			Html.Th{children = '%T'},
-			Array.flatMap(Array.range(1, 2), function (_)
+			Array.flatMap(self.props.sides, function (_)
 				return {
 					Html.Th{children = '∑'},
 					Html.Th{children = 'W'},
