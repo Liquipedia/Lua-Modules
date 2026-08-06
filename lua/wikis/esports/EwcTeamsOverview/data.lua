@@ -5,6 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+---@type {[string]: {lis: string, wiki: string}[]}
 return {
 	EWC2025 = {
 		{lis = 'apex', wiki = 'apexlegends'},
