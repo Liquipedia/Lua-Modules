@@ -29,7 +29,7 @@ local LoLMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameR
 ---@param args table
 ---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', teamStyle = 'bracket'})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px'})
 end
 
 ---@param match MatchGroupUtilMatch

@@ -6,6 +6,7 @@
 --
 
 local Logic = require('Module:Logic')
+local Set = require('Module:Set')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -712,6 +713,8 @@ end
 --[[
 Returns distinct/unique elements of an array.
 
+Unlike `Set:toArray()`, the order of elements is preserved in the returned array.
+
 Example:
 
 Array.unique({4, 5, 4, 3})
@@ -722,12 +725,12 @@ Array.unique({4, 5, 4, 3})
 ---@return V[]
 ---@nodiscard
 function Array.unique(elements)
-	local elementCache = {}
+	local elementCache = Set()
 	local uniqueElements = {}
 	for _, element in ipairs(elements) do
-		if elementCache[element] == nil then
+		if not elementCache:contains(element) then
 			table.insert(uniqueElements, element)
-			elementCache[element] = true
+			elementCache:add(element)
 		end
 	end
 	return uniqueElements

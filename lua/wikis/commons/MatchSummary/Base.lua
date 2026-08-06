@@ -178,7 +178,7 @@ function MatchSummary.createDefaultHeader(match, options)
 			},
 			MatchHeader{
 				match = match,
-				teamStyle = options.teamStyle,
+				teamStyle = options.teamStyle or 'dynamic',
 			}
 		}
 	}

@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
@@ -29,25 +30,20 @@ component.
 ---@return VNode
 local function MatchListScore(props)
 	local opponent = props.opponent
-	local opponentNotTbd = not Opponent.isTbd(opponent)
 
-	return Html.Div{
+	return Html.Div(DisplayHelper.addOpponentHighlightToProps({
 		classes = Array.extendWith(
 			{
 				'brkts-matchlist-cell',
 				'brkts-matchlist-score',
 			},
-			opponent.placement == 1 and 'brkts-matchlist-slot-bold' or nil,
-			opponentNotTbd and 'brkts-opponent-hover' or nil
+			opponent.placement == 1 and 'brkts-matchlist-slot-bold' or nil
 		),
-		attributes = opponentNotTbd and {
-			['aria-label'] = Opponent.toName(opponent),
-		} or nil,
 		children = Html.Div{
 			classes = {'brkts-matchlist-cell-content'},
 			children = OpponentDisplay.InlineScore(opponent),
 		}
-	}
+	}, opponent))
 end
 
 return Component.component(MatchListScore, {opponent = Opponent.blank(Opponent.literal)})
