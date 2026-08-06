@@ -25,13 +25,14 @@ local StandingsParseLpdb = {}
 
 ---@param rounds {roundNumber: integer, matches: string[]}[]
 ---@param scoreMapper fun(opponent: match2opponent): number|nil
+---@param manualOpponents StandingTableOpponentData[]
 ---@return StandingTableOpponentData[]
-function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
+function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponents)
 	local matchIds = Array.flatMap(rounds, function(round)
 		return round.matches
 	end)
 
-	-- No Matches in the round, cannot import
+	-- No Matches, cannot import
 	if #matchIds == 0 then
 		return {}
 	end
@@ -62,7 +63,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 		function(match2)
 			local roundNumbers = matchIdToRound[match2.match2id]
 			Array.forEach(roundNumbers, function(roundNumber)
-				StandingsParseLpdb.parseMatch(roundNumber, match2, opponents, scoreMapper, #rounds)
+				StandingsParseLpdb.parseMatch(roundNumber, match2, opponents, scoreMapper, #rounds, manualOpponents)
 			end)
 		end
 	)
@@ -118,10 +119,22 @@ end
 ---@param opponents StandingTableOpponentData[]
 ---@param scoreMapper fun(opponent: standardOpponent): number?
 ---@param maxRounds integer
-function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMapper, maxRounds)
+---@param manualOpponents StandingTableOpponentData[]
+function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMapper, maxRounds, manualOpponents)
 	local match2 = MatchGroupUtil.matchFromRecord(match)
-	Array.forEach(match2.opponents, function(opponent)
+	Array.forEach(match2.opponents, function(opponent, index)
 		---Find matching opponent
+		local opponentToUse = Array.find(manualOpponents, function(manualOpponent)
+			return Array.any(manualOpponent.aliases, function (alias)
+				return Opponent.same(opponent, alias)
+			end)
+		end)
+
+		if opponentToUse and opponentToUse.opponent then
+			opponent.template = opponentToUse.opponent.template
+			opponent.name = opponentToUse.opponent.name
+		end
+
 		local standingsOpponentData = Array.find(opponents, function(opponentData)
 			return Opponent.same(opponentData.opponent, opponent)
 		end)

@@ -21,7 +21,7 @@ describe('Standings import from matches', function()
 			match2games = {},
 			match2opponents = Array.map(props.opponents, function(opponentSpec)
 				return {
-					type = opponentSpec.type or 'team',
+					type = 'team',
 					template = opponentSpec.template,
 					name = opponentSpec.name,
 					score = opponentSpec.score,
@@ -76,7 +76,7 @@ describe('Standings import from matches', function()
 
 	it('returns no opponents without matches', function()
 		stubMatchQuery{}
-		assert.are_same({}, StandingsParseLpdb.importFromMatches({{roundNumber = 1, matches = {}}}, swissScoreMapper))
+		assert.are_same({}, StandingsParseLpdb.importFromMatches({{roundNumber = 1, matches = {}}}, swissScoreMapper, {}))
 	end)
 
 	it('builds opponents with per round scoreboards and accumulated matches', function()
@@ -94,7 +94,7 @@ describe('Standings import from matches', function()
 		local opponents = StandingsParseLpdb.importFromMatches({
 			{roundNumber = 1, matches = {'M1'}},
 			{roundNumber = 2, matches = {'M2'}},
-		}, swissScoreMapper)
+		}, swissScoreMapper, {})
 
 		assert.are_equal(3, #opponents)
 
@@ -135,7 +135,7 @@ describe('Standings import from matches', function()
 
 		local opponents = StandingsParseLpdb.importFromMatches({
 			{roundNumber = 1, matches = {'M1'}},
-		}, swissScoreMapper)
+		}, swissScoreMapper, {})
 
 		local heroic = findOpponent(opponents, 'Heroic')
 		assert.are_same({w = 0, d = 0, l = 0}, heroic.rounds[1].scoreboard.match)
@@ -152,7 +152,7 @@ describe('Standings import from matches', function()
 
 		local opponents = StandingsParseLpdb.importFromMatches({
 			{roundNumber = 1, matches = {'M1'}},
-		}, swissScoreMapper)
+		}, swissScoreMapper, {})
 
 		local heroic = findOpponent(opponents, 'Heroic')
 		assert.are_same({w = 0, d = 1, l = 0}, heroic.rounds[1].scoreboard.match)
@@ -169,7 +169,7 @@ describe('Standings import from matches', function()
 		local opponents = StandingsParseLpdb.importFromMatches({
 			{roundNumber = 1, matches = {'M1'}},
 			{roundNumber = 2, matches = {'M1'}},
-		}, swissScoreMapper)
+		}, swissScoreMapper, {})
 
 		local heroic = findOpponent(opponents, 'Heroic')
 		assert.are_same({w = 1, d = 0, l = 0}, heroic.rounds[1].scoreboard.match)
@@ -186,7 +186,7 @@ describe('Standings import from matches', function()
 
 		local opponents = StandingsParseLpdb.importFromMatches({
 			{roundNumber = 1, matches = {'M1'}},
-		}, swissScoreMapper)
+		}, swissScoreMapper, {})
 
 		assert.are_equal(1, #opponents)
 		assert.are_equal('Heroic', opponents[1].opponent.name)
@@ -207,9 +207,36 @@ describe('Standings import from matches', function()
 				return tonumber(opponent.score)
 			end
 			return nil
-		end)
+		end,
+		{})
 
 		assert.are_equal(13, findOpponent(opponents, 'Heroic').rounds[1].scoreboard.points)
 		assert.are_equal(7, findOpponent(opponents, 'Wolves Esports').rounds[1].scoreboard.points)
+	end)
+
+	it('applies aliases correctly', function()
+		stubMatchQuery{
+			match2Record{matchId = 'M1', finished = false, opponents = {
+				{template = 'team liquid 2023', name = 'Team Liquid', score = 1, placement = 1},
+				{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 2},
+			}},
+		}
+
+		local opponents = StandingsParseLpdb.importFromMatches({
+			{roundNumber = 1, matches = {'M1'}},
+		}, swissScoreMapper, {
+			{
+				aliases = {{template = 'team liquid 2023', name = 'Team Liquid', type = 'team', extradata = {}}},
+				opponent = {template = 'heroic', name = 'Heroic', type = 'team', extradata = {}},
+			},
+			{
+				aliases = {},
+				opponent = {template = 'wolves esports', name = 'Wolves Esports', type = 'team', extradata = {}},
+			}
+		})
+
+		local heroic = findOpponent(opponents, 'Heroic')
+		assert.are_same({w = 1, d = 0, l = 0}, heroic.rounds[1].scoreboard.match)
+		assert.are_equal('M1', heroic.rounds[1].matchId)
 	end)
 end)
