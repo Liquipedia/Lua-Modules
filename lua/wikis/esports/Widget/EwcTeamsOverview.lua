@@ -15,6 +15,8 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Page = Lua.import('Module:Page')
 local Template = Lua.import('Module:Template')
 
+local OverviewData = Lua.import('Module:EwcTeamsOverview/data')
+
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -25,81 +27,6 @@ local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 ---@class EwcTeamsOverview: Widget
 ---@operator call(table): EwcTeamsOverview
 local EwcTeamsOverview = Class.new(Widget)
-
-local GAMES = {
-	EWC2025 = {
-		{lis = 'apex', wiki = 'apexlegends'},
-		{lis = 'cf', wiki = 'crossfire'},
-		{lis = 'chess', wiki = 'chess'},
-		{lis = 'codbo6', wiki = 'callofduty'},
-		{lis = 'codwz', wiki = 'callofduty'},
-		{lis = 'cs2', wiki = 'counterstrike'},
-		{lis = 'dota2', wiki = 'dota2'},
-		{lis = 'fc25', wiki = 'easportsfc'},
-		{lis = 'ff', wiki = 'freefire'},
-		{lis = 'ffcotw', wiki = 'fighters'},
-		{lis = 'hok', wiki = 'honorofkings'},
-		{lis = 'lol', wiki = 'leagueoflegends'},
-		{lis = 'mlbb', wiki = 'mobilelegends'},
-		{lis = 'mwi', wiki = 'mobilelegends'},
-		{lis = 'ow2', wiki = 'overwatch'},
-		{lis = 'pubg', wiki = 'pubg'},
-		{lis = 'pubgm', wiki = 'pubgmobile'},
-		{lis = 'r6s', wiki = 'rainbowsix'},
-		{lis = 'rennsport', wiki = 'simracing'},
-		{lis = 'rl', wiki = 'rocketleague'},
-		{lis = 'sc2', wiki = 'starcraft2'},
-		{lis = 'sf6', wiki = 'fighters'},
-		{lis = 't8', wiki = 'fighters'},
-		{lis = 'tft', wiki = 'tft'},
-		{lis = 'valorant', wiki = 'valorant'},
-	},
-	EWC2026 = {
-		{lis = 'apex', wiki = 'apexlegends'},
-		{lis = 'cf', wiki = 'crossfire'},
-		{lis = 'chess', wiki = 'chess'},
-		{lis = 'codbo7', wiki = 'callofduty'},
-		{lis = 'codwz', wiki = 'callofduty'},
-		{lis = 'cs2', wiki = 'counterstrike'},
-		{lis = 'dota2', wiki = 'dota2'},
-		{lis = 'fc26', wiki = 'easportsfc'},
-		{lis = 'ff', wiki = 'freefire'},
-		{lis = 'ffcotw', wiki = 'fighters'},
-		{lis = 'fortnite', wiki = 'fortnite'},
-		{lis = 'hok', wiki = 'honorofkings'},
-		{lis = 'lol', wiki = 'leagueoflegends'},
-		{lis = 'mlbb', wiki = 'mobilelegends'},
-		{lis = 'mwi', wiki = 'mobilelegends'},
-		{lis = 'ow2', wiki = 'overwatch'},
-		{lis = 'pubg', wiki = 'pubg'},
-		{lis = 'pubgm', wiki = 'pubgmobile'},
-		{lis = 'r6s', wiki = 'rainbowsix'},
-		{lis = 'rl', wiki = 'rocketleague'},
-		{lis = 'sf6', wiki = 'fighters'},
-		{lis = 't8', wiki = 'fighters'},
-		{lis = 'tft', wiki = 'tft'},
-		{lis = 'tm', wiki = 'trackmania'},
-		{lis = 'valorant', wiki = 'valorant'},
-	},
-	ENC2026 = {
-		{lis = 'apex', wiki = 'apexlegends'},
-		{lis = 'chess', wiki = 'chess'},
-		{lis = 'cs2', wiki = 'counterstrike'},
-		{lis = 'dota2', wiki = 'dota2'},
-		{lis = 'fc26', wiki = 'easportsfc'},
-		{lis = 'ffcotw', wiki = 'fighters'},
-		{lis = 'hok', wiki = 'honorofkings'},
-		{lis = 'lol', wiki = 'leagueoflegends'},
-		{lis = 'mlbb', wiki = 'mobilelegends'},
-		{lis = 'pubg', wiki = 'pubg'},
-		{lis = 'pubgm', wiki = 'pubgmobile'},
-		{lis = 'r6s', wiki = 'rainbowsix'},
-		{lis = 'rl', wiki = 'rocketleague'},
-		{lis = 'sf6', wiki = 'fighters'},
-		{lis = 'tm', wiki = 'trackmania'},
-		{lis = 'valorant', wiki = 'valorant'},
-	}
-}
 
 local STATUSES = {
 	q = {icon = 'qualified', order = 1},
@@ -142,7 +69,7 @@ end
 ---@return Widget
 function EwcTeamsOverview:render()
 	local season = self.props.season
-	local gameData = GAMES[season]
+	local gameData = OverviewData[season]
 	assert(gameData, 'Invalid season: ' .. tostring(season))
 	assert(self.props.clubs, 'No clubs provided')
 
