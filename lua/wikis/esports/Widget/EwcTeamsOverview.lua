@@ -103,7 +103,10 @@ local function EwcTeamsOverview(props)
 				children = WidgetUtil.collect(
 					TableWidgets.CellHeader{children = 'Team Name'},
 					TableWidgets.CellHeader{children = ''},
-					TableWidgets.CellHeader{children = Html.Abbr{title = 'Qualified to X/' .. #gameData .. ' Tournaments', children = 'Q#'}},
+					TableWidgets.CellHeader{children = Html.Abbr{
+						title = 'Qualified to X/' .. #gameData .. ' Tournaments',
+						children = 'Q#',
+					}},
 					TableWidgets.CellHeader{children = Html.Abbr{title = 'Number of Teams', children = 'T#'}},
 					Array.map(gameData, function(game)
 						return TableWidgets.CellHeader{
@@ -118,7 +121,9 @@ local function EwcTeamsOverview(props)
 						TableWidgets.Cell{
 							children = OpponentDisplay.InlineTeamContainer{template = club.name},
 						},
-						TableWidgets.Cell{children = club.club and Template.safeExpand(mw.getCurrentFrame(), 'LeagueIconSmall/ewc') or nil},
+						TableWidgets.Cell{
+							children = club.club and Template.safeExpand(mw.getCurrentFrame(), 'LeagueIconSmall/ewc') or nil
+						},
 						TableWidgets.Cell{
 							attributes = {
 								['data-sort-value'] = club.qualified or 0
