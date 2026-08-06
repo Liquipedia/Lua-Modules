@@ -42,4 +42,4 @@ jobs:
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
           DEPLOY_TRIGGER: ${{ github.event_name }}
           PYTHONUNBUFFERED: 1
-        run: python3 ./scripts/deploy.py
+        run: python3 ./scripts/deploy.py -A
