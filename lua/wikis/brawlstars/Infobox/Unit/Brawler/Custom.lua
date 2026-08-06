@@ -68,16 +68,16 @@ function CustomInjector:parse(id, widgets)
 		local wins, loses = BrawlerWinLoss.run(args.name)
 		if wins + loses == 0 then return widgets end
 
-		local winPercentage = Math.round(wins * 100 / (wins + loses), 2)
+		local winPercentage = Math.formatPercentage(wins / (wins + loses), 2)
 		local picks, bans, totalGames = BrawlerPickBan.run(args.name)
-		local pickPercentage = totalGames > 0 and Math.round(picks * 100 / totalGames, 2) or 0
-		local banPercentage = totalGames > 0 and Math.round(bans * 100 / totalGames, 2) or 0
+		local pickPercentage = totalGames > 0 and Math.formatPercentage(picks / totalGames, 2) or 0
+		local banPercentage = totalGames > 0 and Math.formatPercentage(bans / totalGames, 2) or 0
 
 		return Array.append(widgets,
 			Title{children = '<abbr title="Last 365 days">Esports Statistics</abbr>'},
-			Cell{name = 'Win Rate', children = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}},
-			Cell{name = 'Pick Rate', children = {picks .. ' (' .. pickPercentage .. '%)'}},
-			Cell{name = 'Ban Rate', children = {bans .. ' (' .. banPercentage .. '%)'}}
+			Cell{name = 'Win Rate', children = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. ')'}},
+			Cell{name = 'Pick Rate', children = {picks .. ' (' .. pickPercentage .. ')'}},
+			Cell{name = 'Ban Rate', children = {bans .. ' (' .. banPercentage .. ')'}}
 		)
 	end
 
@@ -100,18 +100,22 @@ function CustomUnit:_getTypeCells()
 	}
 end
 
----@return string[]
+---@return string
 function CustomUnit:_getVoiceActors()
 	local args = self.args
-	local voiceActors = {}
-	for voiceActorKey, voiceActor in Table.iter.pairsByPrefix(args, 'voice', {requireIndex = false}) do
-		local flag = args[voiceActorKey .. 'flag']
-		if flag then
-			voiceActor = Flags.Icon{flag = flag} .. ' ' .. voiceActor
-		end
-		table.insert(voiceActors, voiceActor)
+	local voiceActors = self:getAllArgsForBase(args, 'voice')
+	local voiceFlags = {}
+	for key, _ in Table.iter.pairsByPrefix(args, 'voice', {requireIndex = false}) do
+		table.insert(voiceFlags, args[key .. 'flag'])
 	end
-	return voiceActors
+
+	for index, voiceActor in ipairs(voiceActors) do
+		local flag = voiceFlags[index]
+		if flag then
+			voiceActors[index] = Flags.Icon{flag = flag} .. ' ' .. voiceActor
+		end
+	end
+	return table.concat(voiceActors, '<br>')
 end
 
 ---@param args table
