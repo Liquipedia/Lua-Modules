@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local BrawlerWinLoss = Lua.import('Module:BrawlerWinLoss')
+local BrawlerPickBan = Lua.import('Module:BrawlerPickBan')
 local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
 local Math = Lua.import('Module:MathUtil')
@@ -64,15 +65,20 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'custom' then
 		Array.appendWith(widgets, self.caller:_getTypeCells())
 
-	local wins, loses = BrawlerWinLoss.run(args.name)
-	if wins + loses == 0 then return widgets end
+		local wins, loses = BrawlerWinLoss.run(args.name)
+		if wins + loses == 0 then return widgets end
 
-	local winPercentage = Math.round(wins * 100 / (wins + loses), 2)
+		local winPercentage = Math.round(wins * 100 / (wins + loses), 2)
+		local picks, bans, totalGames = BrawlerPickBan.run(args.name)
+		local pickPercentage = totalGames > 0 and Math.round(picks * 100 / totalGames, 2) or 0
+		local banPercentage = totalGames > 0 and Math.round(bans * 100 / totalGames, 2) or 0
 
-	return Array.append(widgets,
-		Title{children = 'Esports Statistics'},
-		Cell{name = 'Win Rate', children = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
-	)
+		return Array.append(widgets,
+			Title{children = '<abbr title="Last 365 days">Esports Statistics</abbr>'},
+			Cell{name = 'Win Rate', children = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}},
+			Cell{name = 'Pick Rate', children = {picks .. ' (' .. pickPercentage .. '%)'}},
+			Cell{name = 'Ban Rate', children = {bans .. ' (' .. banPercentage .. '%)'}}
+		)
 	end
 
 	return widgets
