@@ -87,6 +87,10 @@ local function EwcTeamsOverview(props)
 
 	return TableWidgets.Table{
 		sortable = true,
+		columns = Array.extendWith(
+			Array.rep({align = 'left'}, 4),
+			Array.rep({align = 'center'}, #gameData)
+		),
 		children = {
 			TableWidgets.TableHeader{
 				children = WidgetUtil.collect(
