@@ -25,7 +25,7 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 ---@field maxWidth string?
 ---@field sortType string?
 ---@field unsortable (string|number|boolean)?
----@field css {[string]: string|number|nil}?
+---@field css HtmlStyleProps?
 ---@field classes string[]?
 ---@field attributes {[string]: any}?
 
