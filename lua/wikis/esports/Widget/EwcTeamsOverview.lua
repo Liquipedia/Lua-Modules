@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Json = Lua.import('Module:Json')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
@@ -17,16 +16,12 @@ local Template = Lua.import('Module:Template')
 
 local OverviewData = Lua.import('Module:EwcTeamsOverview/data')
 
+local Component = Lua.import('Module:Widget/Component')
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local Widget = Lua.import('Module:Widget')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-
----@class EwcTeamsOverview: Widget
----@operator call(table): EwcTeamsOverview
-local EwcTeamsOverview = Class.new(Widget)
 
 local STATUSES = {
 	q = {icon = 'qualified', order = 1},
@@ -66,14 +61,15 @@ local function storeClubs(clubs, gameData, season)
 
 end
 
----@return Widget
-function EwcTeamsOverview:render()
-	local season = self.props.season
+---@param props table
+---@return VNode
+local function EwcTeamsOverview(props)
+	local season = props.season
 	local gameData = OverviewData[season]
 	assert(gameData, 'Invalid season: ' .. tostring(season))
-	assert(self.props.clubs, 'No clubs provided')
+	assert(props.clubs, 'No clubs provided')
 
-	local clubs = Json.parseStringified(self.props.clubs)
+	local clubs = Json.parseStringified(props.clubs)
 	storeClubs(clubs, gameData, season)
 
 	local function makeTeamCell(game, team)
@@ -144,4 +140,4 @@ function EwcTeamsOverview:render()
 	}
 end
 
-return EwcTeamsOverview
+return Component.component(EwcTeamsOverview)
