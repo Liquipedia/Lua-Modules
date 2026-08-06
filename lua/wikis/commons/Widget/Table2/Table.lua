@@ -29,19 +29,15 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 ---@field classes string[]?
 ---@field attributes {[string]: any}?
 
----@class Table2Props
----@field children? Renderable|Renderable[]
+---@class Table2Props: HtmlNodeProps
 ---@field variant 'generic'|'themed'?
 ---@field sortable (string|number|boolean)?
 ---@field striped (string|number|boolean)?
 ---@field caption Renderable|Renderable[]?
 ---@field title Renderable|Renderable[]?
 ---@field footer Renderable|Renderable[]?
----@field classes string[]?
 ---@field tableClasses string[]?
 ---@field columns Table2ColumnDef[]?
----@field css {[string]: string|number|nil}?
----@field attributes {[string]: any}?
 ---@field tableAttributes {[string]: any}?
 
 ---@param props Table2Props
