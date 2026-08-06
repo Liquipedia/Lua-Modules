@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Json = Lua.import('Module:Json')
@@ -24,6 +25,12 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
+local EWC_ICON = LeagueIcon.display{
+	icon = 'Esports World Cup icon lightmode.png',
+	iconDark = 'Esports World Cup icon darkmode.png',
+	link = 'Esports World Cup',
+	name = 'EWC'
+}
 local STATUSES = {
 	q = {icon = 'qualified', order = 1},
 	tbd = {icon = 'tobedetermined', order = 2},
@@ -122,7 +129,7 @@ local function EwcTeamsOverview(props)
 							children = OpponentDisplay.InlineTeamContainer{template = club.name},
 						},
 						TableWidgets.Cell{
-							children = club.club and Template.safeExpand(mw.getCurrentFrame(), 'LeagueIconSmall/ewc') or nil
+							children = club.club and EWC_ICON or nil
 						},
 						TableWidgets.Cell{
 							attributes = {
