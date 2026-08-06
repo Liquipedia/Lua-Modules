@@ -8,27 +8,20 @@
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
+local AwardPrizePool = Lua.import('Module:PrizePool/Award')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
+local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 local Namespace = Lua.import('Module:Namespace')
-local Table = Lua.import('Module:Table')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Variables = Lua.import('Module:Variables')
 
-local AwardPrizePool = Lua.import('Module:PrizePool/Award')
-
-local LpdbInjector = Lua.import('Module:Lpdb/Injector')
-
-local Opponent = Lua.import('Module:Opponent/Custom')
-
+---@class StarcraftCustomAwardPrizePoolLpdbInjector: LpdbInjector
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
 local IS_AWARD = true
-
-local _series
-local _tier
-local _tournament_name
 
 -- Template entry point
 ---@param frame Frame
@@ -42,21 +35,13 @@ function CustomPrizePool.run(frame)
 	args.storelpdb = Logic.emptyOr(args.storelpdb, Namespace.isMain())
 	args.syncPlayers = Logic.emptyOr(args.syncPlayers, true)
 
-	-- overwrite some wiki vars for this PrizePool call
-	_tournament_name = args['tournament name']
-	_series = args.series
-	_tier = args.tier or Variables.varDefault('tournament_liquipediatier')
-
 	-- fixed setting
 	args.resolveRedirect = true
 
-	local prizePool = AwardPrizePool(args):create()
-
-	prizePool:setLpdbInjector(CustomLpdbInjector())
-
-	local builtPrizePool = prizePool:build(IS_AWARD)
-
-	return builtPrizePool
+	return AwardPrizePool(args)
+		:create()
+		:setLpdbInjector(CustomLpdbInjector())
+		:build(IS_AWARD)
 end
 
 ---@param lpdbData placement
@@ -64,40 +49,22 @@ end
 ---@param opponent BasePlacementOpponent
 ---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
-	-- make these available for the stash further down
-	lpdbData.liquipediatier = _tier or lpdbData.liquipediatier
-	lpdbData.liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype') or lpdbData.liquipediatiertype
-	lpdbData.type = Variables.varDefault('tournament_type') or lpdbData.type
+	lpdbData.extradata.mod = Variables.varDefault('tournament_mod')
 
-	Table.mergeInto(lpdbData.extradata, {
-		seriesnumber = CustomPrizePool._seriesNumber(),
-		mod = Variables.varDefault('tournament_mod'),
-	})
-
-	lpdbData.tournament = _tournament_name
-	lpdbData.series = _series
-
-	local prizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
-	lpdbData.objectName = CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
+	lpdbData.objectName = CustomPrizePool._overwriteObjectName(lpdbData)
 
 	return lpdbData
 end
 
 ---@param lpdbData placement
----@param prizePoolIndex integer
 ---@return string
-function CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
+function CustomPrizePool._overwriteObjectName(lpdbData)
 	if lpdbData.opponenttype == Opponent.team then
+		local prizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
 		return lpdbData.objectName .. '_' .. prizePoolIndex
 	end
 
 	return lpdbData.objectName
-end
-
----@return string
-function CustomPrizePool._seriesNumber()
-	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
-	return seriesNumber and string.format('%05d', seriesNumber) or ''
 end
 
 return CustomPrizePool
