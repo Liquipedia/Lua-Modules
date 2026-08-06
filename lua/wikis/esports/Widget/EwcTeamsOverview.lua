@@ -92,7 +92,7 @@ local function EwcTeamsOverview(props)
 				children = WidgetUtil.collect(
 					TableWidgets.CellHeader{children = 'Team Name'},
 					TableWidgets.CellHeader{children = ''},
-					TableWidgets.CellHeader{children = Html.Abbr{title = 'Qualified to X/25 Tournaments', children = 'Q#'}},
+					TableWidgets.CellHeader{children = Html.Abbr{title = 'Qualified to X/' .. #gameData .. ' Tournaments', children = 'Q#'}},
 					TableWidgets.CellHeader{children = Html.Abbr{title = 'Number of Teams', children = 'T#'}},
 					Array.map(gameData, function(game)
 						return TableWidgets.CellHeader{
