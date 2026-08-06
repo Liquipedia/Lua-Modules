@@ -52,13 +52,11 @@ end
 ---@return string[]
 function BSCharacterStats:getTeamCharacters(game, opponentIndex)
 	local players = ((game.opponents or {})[opponentIndex] or {}).players or {}
-	local characters = {}
-	Array.map(players, function(player)
+	return Array.map(players, function(player)
 		if type(player) == 'table' and String.isNotEmpty(player.brawler) then
-			table.insert(characters, player.brawler)
+			return player.brawler
 		end
 	end)
-	return characters
 end
 
 ---@param game CharacterStatsGame
@@ -67,12 +65,11 @@ end
 function BSCharacterStats:getTeamBans(game, opponentIndex)
 	local teamBans = ((game.extradata or {}).bans or {})['team' .. opponentIndex] or {}
 	local bans = {}
-	Array.map(teamBans, function(ban)
+	return Array.map(teamBans, function(ban)
 		if String.isNotEmpty(ban) then
-			table.insert(bans, ban)
+			return ban
 		end
 	end)
-	return bans
 end
 
 return BSCharacterStats
