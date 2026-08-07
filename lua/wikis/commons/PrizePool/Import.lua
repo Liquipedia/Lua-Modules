@@ -732,7 +732,7 @@ end
 ---@param entry BasePlacementOpponent
 ---@return BasePlacementOpponent
 function Import._removeDefaultDate(entry)
-	local date = DateExt.nilIfDefaultTimestamp(entry.date)
+	local date = DateExt.nilIfDefaultTimestamp(entry.date) or DateExt.getContextualDate()
 	---as input was not integer can not get integer back
 	---@cast date -integer
 	entry.date = date

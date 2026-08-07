@@ -50,12 +50,13 @@ local function TournamentsTickerPill(props)
 
 	local subtle = props.variant == 'subtle'
 	local tierShort, tierTypeShort = Tier.toShortName(tournament.liquipediaTier, tournament.liquipediaTierType)
+	local tierIdentifier = Tier.toIdentifier(tournament.liquipediaTier)
 
 	local colorClass
 	if tierTypeShort and not subtle then
-		colorClass = COLOR_CLASSES[tournament.liquipediaTierType]
+		colorClass = COLOR_CLASSES[Tier.toIdentifier(tournament.liquipediaTierType)]
 	else
-		colorClass = COLOR_CLASSES[tournament.liquipediaTier]
+		colorClass = COLOR_CLASSES[tierIdentifier]
 	end
 	colorClass = colorClass or COLOR_CLASSES.default
 
@@ -73,7 +74,7 @@ local function TournamentsTickerPill(props)
 			tierTypeShort and Html.Div{
 				classes = WidgetUtil.collect(
 					'tournament-badge__chip',
-					not subtle and 'chip--' .. COLOR_CLASSES[tournament.liquipediaTier] or nil
+					not subtle and 'chip--' .. COLOR_CLASSES[tierIdentifier] or nil
 				),
 				children = chipText,
 			} or nil,

@@ -2009,5 +2009,10 @@ return {
 		participants = {
 			syncPlayerTeam = true,
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchdiff', 'gamediff'},
+			},
+		},
 	},
 }
