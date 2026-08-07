@@ -53,9 +53,14 @@ local BOT_INFORMATION_TYPE = 'Bot'
 local AVAILABLE_RACES = Array.append(Faction.knownFactions, 'total')
 
 ---@class StarcraftInfoboxPlayer: InfoboxPerson
+---@operator call(Frame): StarcraftInfoboxPlayer
 ---@field achievements placement[]
 ---@field awardAchievements placement[]
 local CustomPlayer = Class.new(Player)
+
+---@class StarcraftInfoboxPlayerWidgetInjector: WidgetInjector
+---@operator call(StarcraftInfoboxPlayer): StarcraftInfoboxPlayerWidgetInjector
+---@field caller StarcraftInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -109,7 +114,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param args table
----@return Widget[]
+---@return VNode[]
 function CustomPlayer:_addCustomCells(args)
 	if args.informationType == BOT_INFORMATION_TYPE then
 		return {

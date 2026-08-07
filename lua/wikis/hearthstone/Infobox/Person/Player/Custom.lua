@@ -22,7 +22,12 @@ local Cell = Widgets.Cell
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
 ---@class HearthstoneInfoboxPlayer: InfoboxPerson
+---@operator call(Frame): HearthstoneInfoboxPlayer
 local CustomPlayer = Class.new(Player)
+
+---@class HearthstoneInfoboxPlayerWidgetInjector: WidgetInjector
+---@operator call(HearthstoneInfoboxPlayer): HearthstoneInfoboxPlayerWidgetInjector
+---@field caller HearthstoneInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
