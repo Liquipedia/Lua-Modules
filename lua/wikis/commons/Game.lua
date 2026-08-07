@@ -96,7 +96,7 @@ function Game.listGames(options)
 		return tonumber(GamesData[gameIdentifier].order)
 	end
 
-	local gamesList = Array.extractKeys(GamesData)
+	local gamesList = Table.keys(GamesData):toArray()
 
 	gamesList = Array.filter(gamesList, function(gameIdentifier)
 		return not GamesData[gameIdentifier].unlisted
@@ -112,7 +112,7 @@ end
 ---Fetches all unlisted game identifiers
 ---@return string[]
 function Game.unlistedGames()
-	local gamesList = Array.extractKeys(GamesData)
+	local gamesList = Table.keys(GamesData):toArray()
 
 	return Array.filter(gamesList, function(gameIdentifier)
 		return GamesData[gameIdentifier].unlisted

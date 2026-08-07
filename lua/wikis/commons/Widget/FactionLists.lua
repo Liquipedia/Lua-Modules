@@ -62,7 +62,7 @@ function FactionLists._getTable(game)
 								},
 							},
 							TableWidgets.Cell{
-								children = Array.interleave(Array.extractKeys(aliases[faction] or {}), ', ')
+								children = Array.interleave(Table.keys(aliases[faction] or {}):toArray(), ', ')
 							},
 							TableWidgets.Cell{
 								children = faction
