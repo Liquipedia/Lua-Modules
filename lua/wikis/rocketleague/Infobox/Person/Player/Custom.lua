@@ -32,7 +32,7 @@ local BANNED = Lua.import('Module:Banned', {loadData = true})
 
 local NOT_APPLICABLE = 'N/A'
 
----@class RocketleagueInfoboxPlayer: Person
+---@class RocketleagueInfoboxPlayer: InfoboxPerson
 ---@operator call(Frame): RocketleagueInfoboxPlayer
 ---@field basePageName string
 local CustomPlayer = Class.new(Player)

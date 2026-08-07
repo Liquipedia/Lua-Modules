@@ -20,7 +20,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Injector = Lua.import('Module:Widget/Injector')
 local Cell = Widgets.Cell
 
----@class BrawlhallaInfoboxPlayer: Person
+---@class BrawlhallaInfoboxPlayer: InfoboxPerson
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 

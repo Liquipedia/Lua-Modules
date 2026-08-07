@@ -21,7 +21,7 @@ local Cell = Widgets.Cell
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
----@class HearthstoneInfoboxPlayer: Person
+---@class HearthstoneInfoboxPlayer: InfoboxPerson
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 

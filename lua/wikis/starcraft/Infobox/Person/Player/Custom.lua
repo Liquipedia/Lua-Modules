@@ -52,7 +52,7 @@ local BOT_INFORMATION_TYPE = 'Bot'
 -- race stuff
 local AVAILABLE_RACES = Array.append(Faction.knownFactions, 'total')
 
----@class StarcraftInfoboxPlayer: Person
+---@class StarcraftInfoboxPlayer: InfoboxPerson
 ---@field achievements placement[]
 ---@field awardAchievements placement[]
 local CustomPlayer = Class.new(Player)

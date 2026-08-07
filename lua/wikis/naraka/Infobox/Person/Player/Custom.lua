@@ -24,7 +24,7 @@ local Cell = Widgets.Cell
 
 local SIZE_HERO = '25x25px'
 
----@class NarakaInfoboxPlayer: Person
+---@class NarakaInfoboxPlayer: InfoboxPerson
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
