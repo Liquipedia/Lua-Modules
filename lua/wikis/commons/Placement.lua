@@ -52,7 +52,7 @@ local PLACEMENT_CLASSES = {
 	['q'] = 'placement-win',
 	['w'] = 'placement-win',
 	['l'] = 'placement-lose',
-	['dq'] = 'placement-lose',
+	['dq'] = 'placement-disqualified',
 	['dnf'] = 'placement-dnp',
 	['dns'] = 'placement-dnp',
 	['dnpq'] = 'placement-dnp',
@@ -88,16 +88,16 @@ local prizepoolClasses = {
 	'background-color-first-place',
 	'background-color-second-place',
 	'background-color-third-place',
-	w = 'bg-win',
-	q = 'bg-win',
-	l = 'bg-lose',
-	dq = 'bg-dq',
-	dnq = 'bg-dq',
-	dns = 'bg-dq',
-	dnf = 'bg-dq',
-	dnp = 'bg-dq',
-	dnpq = 'bg-dq',
-	nc = 'bg-dq',
+	w = 'background-color-win-place',
+	q = 'background-color-win-place',
+	l = 'background-color-lose-place',
+	dq = 'background-color-dq-place',
+	dnq = 'background-color-dq-place',
+	dns = 'background-color-dq-place',
+	dnf = 'background-color-dq-place',
+	dnp = 'background-color-dq-place',
+	dnpq = 'background-color-dq-place',
+	nc = 'background-color-dq-place',
 }
 
 local USE_BLACK_TEXT = {
@@ -203,7 +203,7 @@ end
 
 ---Takes string place value and returns prize pool color class.
 ---May return `nil` if no color is registered.
----@param args {placement: string|number}
+---@param args {placement: string|number?}
 ---@return string?
 function Placement.getBgClass(args)
 	return prizepoolClasses[args.placement]

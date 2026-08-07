@@ -22,7 +22,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 local LegacyPrizePool = {}
 
-local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l', q = 'q'}
+local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l'}
 
 local CACHED_DATA = {
 	next = {points = 1, qual = 1, freetext = 1},
