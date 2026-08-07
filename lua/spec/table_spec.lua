@@ -135,6 +135,14 @@ describe('Table', function()
 		end)
 	end)
 
+	describe('Keys', function()
+		it('check', function()
+			local a = {k = 3, i = 1, z = 0, j = 2}
+
+			assert.are_same({'i', 'j', 'k', 'z'}, Table.keys(a):toArray())
+		end)
+	end)
+
 	describe('extract', function()
 		it('verify', function()
 			local a = {1, 2, 3}
