@@ -145,12 +145,12 @@ function CustomLegacyPrizePool._readOpponentArgs(props)
 		if not nameInput then
 			return nil
 		end
-		nameInput = mw.text.split(nameInput, '|')
+		local nameInputArray = Array.parseCommaSeparatedString(nameInput, '|')
 
 		return {
 			type = _cache.opponentType,
-			[1] = nameInput[#nameInput],
-			link = slot[prefix .. 'link' .. opponentIndex] or slot[prefix .. opponentIndex .. 'link'] or nameInput[1],
+			[1] = nameInputArray[#nameInputArray],
+			link = slot[prefix .. 'link' .. opponentIndex] or slot[prefix .. opponentIndex .. 'link'] or nameInputArray[1],
 			flag = slot[prefix .. 'flag' .. opponentIndex] or slot[prefix .. opponentIndex .. 'flag'],
 			team = slot[prefix .. 'team' .. opponentIndex] or slot[prefix .. opponentIndex .. 'team'],
 			race = slot[prefix .. 'race' .. opponentIndex] or slot[prefix .. opponentIndex .. 'race'],
