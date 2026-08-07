@@ -88,13 +88,13 @@ return {
 		['brkts-header-ux'] = 'Upper Bracket Round ${round},UB Round ${round},UBR${round}',
 
 		['brkts-header-m1'] = 'Mid Bracket Final,MB Final,MBF',
-		['brkts-header-m2'] = 'Mid Bracket Semifinal,MB Semifinal,MBSF',
-		['brkts-header-m3'] = 'Mid Bracket Quarterfinal,MB Quarterfinal,MBQF',
+		['brkts-header-m2'] = 'Mid Bracket Semifinals,MB Semifinals,MBSF',
+		['brkts-header-m3'] = 'Mid Bracket Quarterfinals,MB Quarterfinals,MBQF',
 		['brkts-header-m4'] = 'Mid Bracket Round ${round},MB Round ${round},MBR${round}',
 		['brkts-header-mx'] = 'Mid Bracket Round ${round},MB Round ${round},MBR${round}',
 
 		['brkts-header-l2'] = 'Lower Bracket Final,LB Final,LBF',
-		['brkts-header-l3'] = 'Lower Bracket Semifinal,LB Semifinal,LBSF',
+		['brkts-header-l3'] = 'Lower Bracket Semifinals,LB Semifinals,LBSF',
 		['brkts-header-l4'] = 'Lower Bracket Quarterfinals,LB Quarterfinals,LBQF',
 		['brkts-header-lx'] = 'Lower Bracket Round ${round},LB Round ${round},LBR${round}',
 
