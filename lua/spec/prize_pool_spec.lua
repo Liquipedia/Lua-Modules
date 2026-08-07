@@ -78,7 +78,6 @@ describe('prize pool', function()
 		[4] = {w = true},
 		[5] = {d = true},
 		[6] = {l = true},
-		[7] = {q = true},
 	}
 
 	it('parameters are correctly parsed', function()
