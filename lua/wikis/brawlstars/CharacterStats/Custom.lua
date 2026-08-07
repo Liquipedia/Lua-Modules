@@ -11,25 +11,26 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local BaseCharacterStats = Lua.import('Module:CharacterStats')
 local Class = Lua.import('Module:Class')
-local String = Lua.import('Module:StringUtils')
 local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
 
 local CharacterStatsWidget = Lua.import('Module:Widget/CharacterStats')
 
----@class BSCharacterStats: CharacterStats
----@operator call(table): BSCharacterStats
-local BSCharacterStats = Class.new(BaseCharacterStats)
+---@class BrawlStarsCharacterStats: CharacterStats
+---@operator call(table): BrawlStarsCharacterStats
+local BrawlStarsCharacterStats = Class.new(BaseCharacterStats)
 
 ---@return string[]
-function BSCharacterStats:getSides()
+function BrawlStarsCharacterStats:getSides()
 	return {}
 end
 
 ---@param frame Frame
 ---@return Widget
-function BSCharacterStats.run(frame)
+function BrawlStarsCharacterStats.run(frame)
 	local args = Arguments.getArgs(frame)
-	local stats = BSCharacterStats(args)
+	local stats = BrawlStarsCharacterStats(args)
 
 	local games = stats:queryGames()
 	local processedData = stats:processGames(games)
@@ -51,21 +52,17 @@ end
 ---@param game CharacterStatsGame
 ---@param opponentIndex integer
 ---@return string[]
-function BSCharacterStats:getTeamCharacters(game, opponentIndex)
+function BrawlStarsCharacterStats:getTeamCharacters(game, opponentIndex)
 	local players = ((game.opponents or {})[opponentIndex] or {}).players or {}
-	return Array.map(players, function(player)
-		if type(player) == 'table' and String.isNotEmpty(player.brawler) then
-			return player.brawler
-		end
-	end)
+	return Array.filter(Array.map(players, Operator.property('brawler')), String.isNotEmpty)
 end
 
 ---@param game CharacterStatsGame
 ---@param opponentIndex integer
 ---@return string[]
-function BSCharacterStats:getTeamBans(game, opponentIndex)
+function BrawlStarsCharacterStats:getTeamBans(game, opponentIndex)
 	local teamBans = ((game.extradata or {}).bans or {})['team' .. opponentIndex] or {}
-	return Array.map(teamBans, Logic.nilIfEmpty)
+	return Array.filter(teamBans, String.isNotEmpty)
 end
 
-return BSCharacterStats
+return BrawlStarsCharacterStats
