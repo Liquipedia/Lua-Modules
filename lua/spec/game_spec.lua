@@ -1,5 +1,8 @@
 --- Triple Comment to Enable our LLS Plugin
+
 describe('Game', function()
+	local Set = require('Module:Set')
+
 	insulate('Commons', function ()
 		local Game = require('Module:Game')
 		local Info = require('Module:Info')
@@ -93,7 +96,7 @@ describe('Game', function()
 		end)
 		describe('list games hiddens', function ()
 			it('default', function ()
-				assert.are_same({'cs1', 'css', 'cscz', 'cs2', 'csgo', 'cs16', 'cs', 'cso'}, Game.listGames())
+				assert.is_true(Set{'cs1', 'css', 'cscz', 'cs2', 'csgo', 'cs16', 'cs', 'cso'}:equals(Set(Game.listGames())))
 			end)
 			it('ordered', function ()
 				assert.are_same({'cs1', 'cs', 'cs16', 'cscz', 'css', 'cso', 'csgo', 'cs2'}, Game.listGames{ordered = true})

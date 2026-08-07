@@ -135,6 +135,21 @@ describe('Table', function()
 		end)
 	end)
 
+	describe('Keys', function()
+		it('check', function()
+			local a = {k = 3, i = 1, z = 0, j = 2}
+
+			local keys = Table.keys(a)
+
+			for key in pairs(a) do
+				assert.is_true(keys:contains(key))
+			end
+
+			assert.are_equal(keys:size(), 4)
+			assert.is_false(keys:contains('p'))
+		end)
+	end)
+
 	describe('extract', function()
 		it('verify', function()
 			local a = {1, 2, 3}
