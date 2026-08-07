@@ -96,15 +96,6 @@ Placement.specialStatuses = {
 		end,
 		lpdb = 'L',
 	},
-	Q = {
-		active = function (args)
-			return Logic.readBool(args.q)
-		end,
-		display = function ()
-			return 'Q'
-		end,
-		lpdb = 'Q',
-	},
 }
 
 Placement.additionalData = {

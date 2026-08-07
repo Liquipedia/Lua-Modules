@@ -25,7 +25,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local StarcraftLegacyPrizePool = {}
 
 local AUTOMATION_START_DATE = '2022-01-14'
-local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l', q = 'q'}
+local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l'}
 local BASE_CURRENCY_PRIZE = LegacyPrizePool.BASE_CURRENCY:lower() .. 'prize'
 
 local CACHED_DATA = {
