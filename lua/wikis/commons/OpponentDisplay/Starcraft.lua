@@ -42,9 +42,6 @@ function StarcraftOpponentDisplay.BlockOpponent(props)
 		)
 	end
 
-	if props.showTbd == false and Opponent.isTbd(opponent) then
-		return Html.Fragment{}
-	end
 	return OpponentDisplay.BlockOpponent(props)
 end
 
