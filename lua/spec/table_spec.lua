@@ -139,7 +139,14 @@ describe('Table', function()
 		it('check', function()
 			local a = {k = 3, i = 1, z = 0, j = 2}
 
-			assert.are_same({'i', 'j', 'k', 'z'}, Table.keys(a):toArray())
+			local keys = Table.keys(a)
+
+			for key in pairs(a) do
+				assert.is_true(keys:contains(key))
+			end
+
+			assert.are_equal(keys:size(), 4)
+			assert.is_false(keys:contains('p'))
 		end)
 	end)
 
