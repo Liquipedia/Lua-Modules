@@ -132,7 +132,6 @@ return {
 		['dota2-mainpage-about-body'] = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. ' ..
 			'This wiki currently covers esports and game content, containing over ${articleCount} articles ' ..
 			'managed by ${activeUsersCount} active users.',
-		
 		['dota2-mainpage-hub-button'] = 'Click here to get to the ',
 		['dota2-mainpage-hub-main-title'] = 'Main Page',
 		['dota2-mainpage-hub-main-link'] = 'Main Page',
@@ -140,7 +139,6 @@ return {
 		['dota2-mainpage-hub-esports-link'] = 'Portal:Esports',
 		['dota2-mainpage-hub-game-title'] = 'Game Hub',
 		['dota2-mainpage-hub-game-link'] = 'Portal:Game',
-
 		['dota2-mainpage-block-heroes-title'] = 'Heroes',
 		['dota2-mainpage-block-updates-title'] = 'Updates',
 		['dota2-mainpage-block-usefulArticles-title'] = 'Useful Articles',
@@ -150,7 +148,6 @@ return {
 		['dota2-mainpage-block-partnerWikis-title'] = 'Partner Wikis',
 		['dota2-mainpage-block-tournaments-title'] = 'Tournaments',
 		['dota2-mainpage-block-rankings-title'] = 'Liquipedia Rankings',
-
 		['dota2-mainpage-button-heroes-title'] = 'Heroes',
 		['dota2-mainpage-button-heroes-link'] = 'Heroes',
 		['dota2-mainpage-button-items-title'] = 'Items',
@@ -297,7 +294,6 @@ return {
 		['dota2-mainpage-about-body'] = 'Мы - крупнейшая вики по Dota 2, поддерживаемая такими же фанатами, как и Вы. ' ..
 			'Эта вики содержит в себе информацию об игре и её киберспорте, насчитывая ${articleCount} статей, ' ..
 			'за которыми следят ${activeUsersCount} активных пользователей.',
-		
 		['dota2-mainpage-hub-button'] = 'Нажмите, чтобы открыть ',
 		['dota2-mainpage-hub-main-title'] = 'Заглавная',
 		['dota2-mainpage-hub-main-link'] = 'Заглавная страница',
@@ -305,7 +301,6 @@ return {
 		['dota2-mainpage-hub-esports-link'] = 'Портал:Киберспорт',
 		['dota2-mainpage-hub-game-title'] = 'Портал Игра',
 		['dota2-mainpage-hub-game-link'] = 'Портал:Игра',
-
 		['dota2-mainpage-block-heroes-title'] = 'Герои',
 		['dota2-mainpage-block-updates-title'] = 'Обновления',
 		['dota2-mainpage-block-usefulArticles-title'] = 'Полезные статьи',
@@ -315,7 +310,6 @@ return {
 		['dota2-mainpage-block-partnerWikis-title'] = 'Вики-партнёры',
 		['dota2-mainpage-block-tournaments-title'] = 'Турниры',
 		['dota2-mainpage-block-rankings-title'] = 'Рейтинги Liquipedia',
-
 		['dota2-mainpage-button-heroes-title'] = 'Герои',
 		['dota2-mainpage-button-heroes-link'] = 'Герои',
 		['dota2-mainpage-button-items-title'] = 'Предметы',
