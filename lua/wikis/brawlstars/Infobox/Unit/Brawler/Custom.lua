@@ -8,9 +8,14 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local BrawlerWinLoss = Lua.import('Module:BrawlerWinLoss')
+local BrawlerPickBan = Lua.import('Module:BrawlerPickBan')
 local Class = Lua.import('Module:Class')
+local Flags = Lua.import('Module:Flags')
+local Math = Lua.import('Module:MathUtil')
 local Namespace = Lua.import('Module:Namespace')
 local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
@@ -42,33 +47,75 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Center{children = {args.quote}})
 	elseif id == 'type' then
 		return {
-			Cell{name = 'Real Name', children = {args.realname}},
 			Cell{name = 'Rarity', children = {args.rarity}},
+			Cell{name = 'Class', children = {args.class}},
+			Cell{name = 'Voice Actor(s)', children = {self.caller:_getVoiceActors()}},
+			Cell{name = 'Release Date', children = {args.releasedate}},
+			Cell{name = 'Health', children = {args.hp}},
+			Cell{name = 'Movespeed', children = {args.movespeed}}
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Unlock', children = {args.unlock}},
+			Cell{name = 'Price', children = {args.price}},
 		}
 	elseif id == 'attack' then
 		return {}
 	elseif id == 'defense' then
 		return {}
 	elseif id == 'custom' then
-		Array.appendWith(widgets,
-			Cell{name = 'Release Date', children = {args.releasedate}},
-			Cell{name = 'Health', children = {args.hp}},
-			Cell{name = 'Movespeed', children = {args.movespeed}},
-			Title{children = 'Weapon & Super'},
-			Cell{name = 'Primary Weapon', children = {args.attack}},
-			Cell{name = 'Super Ability', children = {args.super}},
-			Title{children = 'Abilities'},
-			Cell{name = 'Gadgets', children = {args.gadget}},
-			Cell{name = 'Star Powers', children = {args.star}},
-			Cell{name = 'Hypercharge', children = {args.hypercharge}}
+		Array.appendWith(widgets, self.caller:_getTypeCells())
+
+		local wins, loses = BrawlerWinLoss.run(args.name)
+		if wins + loses == 0 then return widgets end
+
+		local winPercentage = Math.formatPercentage(wins / (wins + loses), 2)
+		local picks, bans, totalGames = BrawlerPickBan.run(args.name)
+		local pickPercentage = totalGames > 0 and Math.formatPercentage(picks / totalGames, 2) or 0
+		local banPercentage = totalGames > 0 and Math.formatPercentage(bans / totalGames, 2) or 0
+
+		return Array.append(widgets,
+			Title{children = '<abbr title="Last 365 days">Esports Statistics</abbr>'},
+			Cell{name = 'Win Rate', children = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. ')'}},
+			Cell{name = 'Pick Rate', children = {picks .. ' (' .. pickPercentage .. ')'}},
+			Cell{name = 'Ban Rate', children = {bans .. ' (' .. banPercentage .. ')'}}
 		)
 	end
 
 	return widgets
+end
+
+---@return Widget[]
+function CustomUnit:_getTypeCells()
+	local args = self.args
+	return {
+		Title{children = 'Weapon & Super'},
+		Cell{name = 'Primary Weapon', children = {args.attack}},
+		Cell{name = 'Super Ability', children = {args.super}},
+		Title{children = 'Abilities'},
+		Cell{name = 'Traits', children = {args.trait}},
+		Cell{name = 'Gadgets', children = {args.gadget}},
+		Cell{name = 'Star Powers', children = {args.star}},
+		Cell{name = 'Hypercharge', children = {args.hypercharge}},
+		Cell{name = 'Buffies', children = {args.buffies}}
+	}
+end
+
+---@return string
+function CustomUnit:_getVoiceActors()
+	local args = self.args
+	local voiceActors = self:getAllArgsForBase(args, 'voice')
+	local voiceFlags = {}
+	for key, _ in Table.iter.pairsByPrefix(args, 'voice', {requireIndex = false}) do
+		table.insert(voiceFlags, args[key .. 'flag'])
+	end
+
+	for index, voiceActor in ipairs(voiceActors) do
+		local flag = voiceFlags[index]
+		if flag then
+			voiceActors[index] = Flags.Icon{flag = flag} .. ' ' .. voiceActor
+		end
+	end
+	return table.concat(voiceActors, '<br>')
 end
 
 ---@param args table
