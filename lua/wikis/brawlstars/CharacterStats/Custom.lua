@@ -11,6 +11,7 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local BaseCharacterStats = Lua.import('Module:CharacterStats')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 
@@ -39,6 +40,7 @@ function BrawlStarsCharacterStats.run(frame)
 		includeBans = Array.any(processedData.characterData, function (data)
 			return data.bans > 0
 		end),
+		includeGlobalBans = true,
 		numGames = #games,
 		sides = stats:getSides(),
 		sideWins = processedData.overall.wins,
@@ -62,6 +64,14 @@ end
 function BrawlStarsCharacterStats:getTeamBans(game, opponentIndex)
 	local teamBans = ((game.extradata or {}).bans or {})['team' .. opponentIndex] or {}
 	return Array.filter(teamBans, String.isNotEmpty)
+end
+
+---@param game CharacterStatsGame
+---@param opponentIndex integer
+---@return string[]
+function BrawlStarsCharacterStats:getTeamGlobalBans(game, opponentIndex)
+	local teamGlobalBans = (game.globalBans or {})['team' .. opponentIndex] or {}
+	return Array.filter(teamGlobalBans, String.isNotEmpty)
 end
 
 return BrawlStarsCharacterStats
