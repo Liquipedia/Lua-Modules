@@ -126,11 +126,14 @@ return {
 
 		-- Dota 2 Main Page
 		['dota2-mainpage-title'] = 'The Dota 2 Wiki',
-		['dota2-mainpage-metadesc'] = 'Comprehensive Dota 2 wiki with articles covering everything from heroes and items, to strategies, ' ..
-		'to tournaments, to competitive players, and teams.',
+		['dota2-mainpage-metadesc'] = 'Comprehensive Dota 2 wiki with articles covering ' .. 
+			'everything from heroes and items, to strategies, ' ..
+			'to tournaments, to competitive players, and teams.',
 		['dota2-mainpage-about-heading'] = 'About Liquipedia\'s Dota 2 Wiki',
-		['dota2-mainpage-about-body'] = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. ' ..
-			'This wiki currently covers esports and game content, containing over ${articleCount} articles ' ..
+		['dota2-mainpage-about-body'] = 'We are the largest Dota 2 wiki that anyone can edit, ' .. 
+			'maintained by fans just like you. ' ..
+			'This wiki currently covers esports and game content, ' .. 
+			'containing over ${articleCount} articles ' ..
 			'managed by ${activeUsersCount} active users.',
 		['dota2-mainpage-hub-button'] = 'Click here to get to the ',
 		['dota2-mainpage-hub-main-title'] = 'Main Page',
@@ -288,11 +291,14 @@ return {
 
 		-- Dota 2 Main Page / Заглавная Dota 2
 		['dota2-mainpage-title'] = 'Dota 2 Вики',
-		['dota2-mainpage-metadesc'] = 'Обширная вики по Dota 2, содержащая статьи обо всех аспектах игры: от героев, предметов и стратегий' ..
-		'до турниров, профессиональных игроков и команд.',
+		['dota2-mainpage-metadesc'] = 'Обширная вики по Dota 2, содержащая статьи ' .. 
+			'обо всех аспектах игры: от героев, предметов и стратегий' ..
+			'до турниров, профессиональных игроков и команд.',
 		['dota2-mainpage-about-heading'] = 'О Dota 2 Wiki от Liquipedia',
-		['dota2-mainpage-about-body'] = 'Мы - крупнейшая вики по Dota 2, поддерживаемая такими же фанатами, как и Вы. ' ..
-			'Эта вики содержит в себе информацию об игре и её киберспорте, насчитывая ${articleCount} статей, ' ..
+		['dota2-mainpage-about-body'] = 'Мы - крупнейшая вики по Dota 2, ' .. 
+			'поддерживаемая такими же фанатами, как и Вы. ' ..
+			'Эта вики содержит в себе информацию об игре и её киберспорте, ' .. 
+			'насчитывая ${articleCount} статей, ' ..
 			'за которыми следят ${activeUsersCount} активных пользователей.',
 		['dota2-mainpage-hub-button'] = 'Нажмите, чтобы открыть ',
 		['dota2-mainpage-hub-main-title'] = 'Заглавная',
