@@ -292,7 +292,7 @@ return {
 		-- Dota 2 Main Page / Заглавная Dota 2
 		['dota2-mainpage-title'] = 'Dota 2 Вики',
 		['dota2-mainpage-metadesc'] = 'Обширная вики по Dota 2, содержащая статьи ' .. 
-			'обо всех аспектах игры: от героев, предметов и стратегий' ..
+			'обо всех аспектах игры: от героев, предметов и стратегий ' ..
 			'до турниров, профессиональных игроков и команд.',
 		['dota2-mainpage-about-heading'] = 'О Dota 2 Wiki от Liquipedia',
 		['dota2-mainpage-about-body'] = 'Мы - крупнейшая вики по Dota 2, ' .. 
