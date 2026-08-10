@@ -103,6 +103,7 @@ def handle_renamed_files(
                 "-r",
                 "--no-commit-id",
                 "--name-status",
+                "--diff-filter=R",
                 "-M",
                 "HEAD",
                 "lua/wikis/*",
