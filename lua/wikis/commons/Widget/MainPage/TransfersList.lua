@@ -70,16 +70,16 @@ local function TransfersList(props)
 					},
 					children = ListWidgets.Unordered{children = WidgetUtil.collect(
 						Link { children = 'See more transfers', link = props.transferPortal },
-						Logic.readBool(props.transferQuery) and Div {
+						Logic.readBool(props.transferQuery) and Html.Span {
 							children = {
-								Div {
+								Html.Span {
 									classes = { 'hide-when-lighthouse' },
 									children = Link {
 										children = 'Transfer query',
 										link = 'Special:RunQuery/Transfer history'
 									}
 								},
-								Div {
+								Html.Span {
 									classes = { 'hide-when-mediawiki' },
 									children = Link {
 										children = 'Transfer query',
