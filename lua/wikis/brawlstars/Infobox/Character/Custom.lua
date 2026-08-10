@@ -123,10 +123,8 @@ end
 ---@param args table
 ---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
-	lpdbData.extradata = {
-		rarity = args.rarity,
-		price = args.price
-	}
+	lpdbData.extradata.rarity = args.rarity
+	lpdbData.extradata.price = args.price
 	return lpdbData
 end
 
