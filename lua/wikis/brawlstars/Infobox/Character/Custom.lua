@@ -27,7 +27,7 @@ local CustomCharacter = Class.new(Character)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Renderable
 ---@diagnostic disable-next-line: duplicate-set-field
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
