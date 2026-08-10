@@ -8,7 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local BrawlerWinLoss = Lua.import('Module:BrawlerWinLoss')
+local CharacterWinLoss = Lua.import('Module:CharacterWinLoss')
 local BrawlerPickBan = Lua.import('Module:BrawlerPickBan')
 local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
@@ -81,7 +81,7 @@ end
 ---@return Widget[]
 function CustomCharacter:_getEsportsStats(widgets)
 	local args = self.args
-	local wins, loses = BrawlerWinLoss.run(args.name)
+	local wins, loses = CharacterWinLoss.run(args.name)
 	if wins + loses == 0 then return widgets end
 
 	local winPercentage = Math.formatPercentage(wins / (wins + loses), 2)
