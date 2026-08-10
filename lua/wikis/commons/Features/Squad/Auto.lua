@@ -191,7 +191,7 @@ function SquadAuto:displayTabs(entries)
 		)
 	end
 
-	---@type table<string, integer|boolean|Widget>
+	---@type table<string, integer|boolean|Renderable>
 	local tabs = {
 		This = tabCount,
 		removeEmptyTabs = true
