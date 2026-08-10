@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- page=Module:Features/Squad/Types
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
 
 ---@alias SquadWrapper {players: table[], squadType: SquadType, squadStatus: SquadStatus, title: string?, args: table}
 
