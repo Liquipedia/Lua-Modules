@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Features/Squad/Utils
+-- page=Module:Features/Squad/Lib/Parse
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -22,20 +22,21 @@ local Faction = Lua.import('Module:Faction')
 local TransferRefs = Lua.import('Module:Transfer/References')
 local SquadTypes = Lua.import('Module:Features/Squad/Types')
 
-local SquadUtils = {}
+local SquadParse = {}
 
 ---@param status string?
 ---@return SquadStatus?
-function SquadUtils.statusToSquadStatus(status)
+local function statusToSquadStatus(status)
 	if not status then
 		return
 	end
+
 	return SquadTypes.StatusToSquadStatus[status:lower()]
 end
 
 ---@param args table
 ---@return table[]
-function SquadUtils.parsePlayers(args)
+function SquadParse.parsePlayers(args)
 	return Array.mapIndexes(function(index)
 		return Json.parseIfString(args[index])
 	end)
@@ -43,7 +44,7 @@ end
 
 ---@param players {inactivedate: string|nil}[]
 ---@return boolean
-function SquadUtils.anyInactive(players)
+function SquadParse.anyInactive(players)
 	return Array.any(players, function(player)
 		return Logic.isNotEmpty(player.inactivedate)
 	end)
@@ -55,7 +56,7 @@ end
 ---@param title string?
 ---@param args table?
 ---@return SquadWrapper
-function SquadUtils.createWrapperData(players, squadType, squadStatus, title, args)
+function SquadParse.createWrapperData(players, squadType, squadStatus, title, args)
 	return {
 		players = players,
 		squadType = squadType,
@@ -67,22 +68,22 @@ end
 
 ---@param args table
 ---@return SquadWrapper
-function SquadUtils.readWrapperArgs(args)
-	local players = SquadUtils.parsePlayers(args)
+function SquadParse.readWrapperArgs(args)
+	local players = SquadParse.parsePlayers(args)
 
 	local squadType = SquadTypes.TypeToSquadType[args.type] or SquadTypes.SquadType.PLAYER
-	local squadStatus = SquadUtils.statusToSquadStatus(args.status) or SquadTypes.SquadStatus.ACTIVE
+	local squadStatus = statusToSquadStatus(args.status) or SquadTypes.SquadStatus.ACTIVE
 
-	if squadStatus == SquadTypes.SquadStatus.FORMER and SquadUtils.anyInactive(players) then
+	if squadStatus == SquadTypes.SquadStatus.FORMER and SquadParse.anyInactive(players) then
 		squadStatus = SquadTypes.SquadStatus.FORMER_INACTIVE
 	end
 
-	return SquadUtils.createWrapperData(players, squadType, squadStatus, args.title, args)
+	return SquadParse.createWrapperData(players, squadType, squadStatus, args.title, args)
 end
 
 ---@param player table
 ---@return SquadPersonArgs
-function SquadUtils.convertAutoParameters(player)
+function SquadParse.convertAutoParameters(player)
 	---@type SquadPersonArgs
 	local newPlayer = Table.copy(player)
 	local joinReference = TransferRefs.useReferences(player.joindateRef, player.joindate)
@@ -107,7 +108,7 @@ end
 
 ---@param args SquadPersonArgs
 ---@return ModelRow
-function SquadUtils.readSquadPersonArgs(args)
+function SquadParse.readSquadPersonArgs(args)
 	local function getTeamInfo(page, property)
 		if not page or not TeamTemplate.exists(page) then
 			return
@@ -175,49 +176,4 @@ function SquadUtils.readSquadPersonArgs(args)
 	return person
 end
 
----@param squadPerson ModelRow
-function SquadUtils.storeSquadPerson(squadPerson)
-	squadPerson:save()
-end
-
----@param players ModelRow[]
----@param squadStatus SquadStatus
----@return table<string, boolean>
-function SquadUtils.analyzeColumnVisibility(players, squadStatus)
-	local isInactive = squadStatus == SquadTypes.SquadStatus.INACTIVE
-		or squadStatus == SquadTypes.SquadStatus.FORMER_INACTIVE
-	local isFormer = squadStatus == SquadTypes.SquadStatus.FORMER
-		or squadStatus == SquadTypes.SquadStatus.FORMER_INACTIVE
-
-	return {
-		teamIcon = Array.any(players, function(p)
-			return p.extradata.loanedto
-		end),
-		name = Array.any(players, function(p)
-			return String.isNotEmpty(p.name)
-		end),
-		role = Array.any(players, function(p)
-			local role = String.nilIfEmpty(p.role) or String.nilIfEmpty(p.position)
-			return role ~= nil and role ~= 'Captain' and role ~= 'Sub'
-		end),
-		joindate = Array.any(players, function(p)
-			return String.isNotEmpty(p.joindate)
-		end),
-		inactivedate = isInactive and Array.any(players, function(p)
-			return String.isNotEmpty(p.inactivedate)
-		end),
-		activeteam = isInactive and Array.any(players, function(p)
-			return p.extradata.activeteam and TeamTemplate.exists(p.extradata.activeteam)
-		end),
-		leavedate = isFormer and Array.any(players, function(p)
-			return String.isNotEmpty(p.leavedate)
-		end),
-		newteam = isFormer and Array.any(players, function(p)
-			return String.isNotEmpty(p.newteam)
-				or String.isNotEmpty(p.newteamrole)
-				or String.isNotEmpty(p.extradata.newteamspecial)
-		end),
-	}
-end
-
-return SquadUtils
+return SquadParse
