@@ -20,6 +20,7 @@ local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Lpdb = Lua.import('Module:Lpdb')
 local Faction = Lua.import('Module:Faction')
 local TransferRefs = Lua.import('Module:Transfer/References')
+local SquadTypes = Lua.import('Module:Features/Squad/Types')
 
 local SquadUtils = {}
 
@@ -29,7 +30,7 @@ function SquadUtils.statusToSquadStatus(status)
 	if not status then
 		return
 	end
-	return SquadUtils.StatusToSquadStatus[status:lower()]
+	return SquadTypes.StatusToSquadStatus[status:lower()]
 end
 
 ---@param args table
@@ -69,11 +70,11 @@ end
 function SquadUtils.readWrapperArgs(args)
 	local players = SquadUtils.parsePlayers(args)
 
-	local squadType = SquadUtils.TypeToSquadType[args.type] or SquadUtils.SquadType.PLAYER
-	local squadStatus = SquadUtils.statusToSquadStatus(args.status) or SquadUtils.SquadStatus.ACTIVE
+	local squadType = SquadTypes.TypeToSquadType[args.type] or SquadTypes.SquadType.PLAYER
+	local squadStatus = SquadUtils.statusToSquadStatus(args.status) or SquadTypes.SquadStatus.ACTIVE
 
-	if squadStatus == SquadUtils.SquadStatus.FORMER and SquadUtils.anyInactive(players) then
-		squadStatus = SquadUtils.SquadStatus.FORMER_INACTIVE
+	if squadStatus == SquadTypes.SquadStatus.FORMER and SquadUtils.anyInactive(players) then
+		squadStatus = SquadTypes.SquadStatus.FORMER_INACTIVE
 	end
 
 	return SquadUtils.createWrapperData(players, squadType, squadStatus, args.title, args)
@@ -141,8 +142,8 @@ function SquadUtils.readSquadPersonArgs(args)
 		inactivedate = ReferenceCleaner.clean{input = args.inactivedate},
 		inactivedateref = args.inactivedateref,
 
-		status = SquadUtils.SquadStatusToStorageValue[args.status],
-		type = SquadUtils.SquadTypeToStorageValue[args.type],
+		status = SquadTypes.SquadStatusToStorageValue[args.status],
+		type = SquadTypes.SquadTypeToStorageValue[args.type],
 
 		extradata = {
 			loanedto = args.team,
@@ -183,10 +184,10 @@ end
 ---@param squadStatus SquadStatus
 ---@return table<string, boolean>
 function SquadUtils.analyzeColumnVisibility(players, squadStatus)
-	local isInactive = squadStatus == SquadUtils.SquadStatus.INACTIVE
-		or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE
-	local isFormer = squadStatus == SquadUtils.SquadStatus.FORMER
-		or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE
+	local isInactive = squadStatus == SquadTypes.SquadStatus.INACTIVE
+		or squadStatus == SquadTypes.SquadStatus.FORMER_INACTIVE
+	local isFormer = squadStatus == SquadTypes.SquadStatus.FORMER
+		or squadStatus == SquadTypes.SquadStatus.FORMER_INACTIVE
 
 	return {
 		teamIcon = Array.any(players, function(p)
