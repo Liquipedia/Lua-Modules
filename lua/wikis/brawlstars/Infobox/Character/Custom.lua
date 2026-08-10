@@ -31,10 +31,8 @@ local CustomCharacter = Class.new(Character)
 ---@field caller BrawlStarsChampionInfobox
 local CustomInjector = Class.new(Injector)
 
-
 ---@param frame Frame
 ---@return Renderable
----@diagnostic disable-next-line: duplicate-set-field
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
@@ -63,7 +61,7 @@ end
 function CustomCharacter:_getTypeCells()
 	local args = self.args
 	return {
-		Cell{name = 'Voice Actor(s)', children = {self:_getVoiceActors()}},
+		Cell{name = 'Voice Actor(s)', children = self:_getVoiceActors()},
 		Cell{name = 'Price', children = {args.price}},
 		Cell{name = 'Health', children = {args.hp}},
 		Cell{name = 'Movespeed', children = {args.movespeed}},
@@ -100,7 +98,6 @@ function CustomCharacter:_getEsportsStats(widgets)
 end
 
 ---@return string[]
----@diagnostic disable-next-line: duplicate-set-field
 function CustomCharacter:_getVoiceActors()
 	local args = self.args
 	local voiceActors = {}
@@ -116,7 +113,6 @@ end
 
 ---@param args table
 ---@return string[]
----@diagnostic disable-next-line: duplicate-set-field
 function CustomCharacter:getRoles(args)
 	return {
 		args.class
@@ -126,7 +122,6 @@ end
 ---@param lpdbData table
 ---@param args table
 ---@return table
----@diagnostic disable-next-line: duplicate-set-field
 function CustomCharacter:addToLpdb(lpdbData, args)
 	lpdbData.extradata = {
 		rarity = args.rarity,
