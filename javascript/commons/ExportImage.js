@@ -573,8 +573,6 @@ class ExportService {
 		try {
 			element.style.background = backgroundColor;
 
-			const captureStart = performance.now();
-
 			captureClone = this.createCaptureClone( element );
 			this.applyCloneFixes( captureClone );
 
