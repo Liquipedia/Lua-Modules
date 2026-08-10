@@ -96,7 +96,7 @@ function SquadUtils.convertAutoParameters(player)
 	newPlayer.link = String.nilIfEmpty(player.page)
 	newPlayer.role = player.thisTeam.role
 	newPlayer.position = player.thisTeam.position
-	newPlayer.team = player.thisTeam.role == 'Loan' and player.oldTeam.team
+	newPlayer.team = player.thisTeam.role == 'Loan' and player.oldTeam.team or nil
 
 	newPlayer.newteam = player.newTeam.team
 	newPlayer.newteamrole = player.newTeam.role
