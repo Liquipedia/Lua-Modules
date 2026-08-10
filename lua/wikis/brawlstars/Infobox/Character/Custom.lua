@@ -22,9 +22,15 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
----@class BrawlStarsHeroInfobox: CharacterInfobox
+---@class BrawlStarsChampionInfobox: CharacterInfobox
+---@operator call(Frame): BrawlStarsChampionInfobox
 local CustomCharacter = Class.new(Character)
+
+---@class BrawlStarsChampionInfoboxWidgetInjector: WidgetInjector
+---@operator call(BrawlStarsChampionInfobox): BrawlStarsChampionInfoboxWidgetInjector
+---@field caller BrawlStarsChampionInfobox
 local CustomInjector = Class.new(Injector)
+
 
 ---@param frame Frame
 ---@return Renderable
@@ -53,6 +59,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@return Widget[]
 function CustomCharacter:_getTypeCells()
 	local args = self.args
 	return {
@@ -72,6 +79,8 @@ function CustomCharacter:_getTypeCells()
 	}
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomCharacter:_getEsportsStats(widgets)
 	local args = self.args
 	local wins, loses = BrawlerWinLoss.run(args.name)
