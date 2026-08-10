@@ -88,7 +88,7 @@ local function TransfersList(props)
 								},
 							}
 						} or nil,
-						Div {
+						Html.Span {
 							classes = { 'show-when-logged-in' },
 							children = Link {
 								children = 'Input Form',
