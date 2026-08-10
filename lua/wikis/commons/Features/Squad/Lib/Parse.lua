@@ -26,7 +26,7 @@ local SquadParse = {}
 
 ---@param status string?
 ---@return SquadStatus?
-local function statusToSquadStatus(status)
+function SquadParse.statusToSquadStatus(status)
 	if not status then
 		return
 	end
@@ -72,7 +72,7 @@ function SquadParse.readWrapperArgs(args)
 	local players = SquadParse.parsePlayers(args)
 
 	local squadType = SquadTypes.TypeToSquadType[args.type] or SquadTypes.SquadType.PLAYER
-	local squadStatus = statusToSquadStatus(args.status) or SquadTypes.SquadStatus.ACTIVE
+	local squadStatus = SquadParse.statusToSquadStatus(args.status) or SquadTypes.SquadStatus.ACTIVE
 
 	if squadStatus == SquadTypes.SquadStatus.FORMER and SquadParse.anyInactive(players) then
 		squadStatus = SquadTypes.SquadStatus.FORMER_INACTIVE
