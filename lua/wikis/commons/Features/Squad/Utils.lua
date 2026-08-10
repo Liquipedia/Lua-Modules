@@ -157,7 +157,7 @@ function SquadUtils.readSquadPersonArgs(args)
 	}
 
 	if Info.config.squads.hasSpecialTeam and not person.newteam and args.newteam then
-		person.extradata.newteamspecial = SquadUtils.specialTeamsTemplateMapping[args.newteam]
+		person.extradata.newteamspecial = SquadTypes.specialTeamsTemplateMapping[args.newteam]
 	end
 
 	if person.joindate ~= args.joindate then

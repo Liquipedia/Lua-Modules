@@ -141,40 +141,44 @@ insulate('Squad/Utils', function()
 	describe('readWrapperArgs', function()
 		it('defaults to an active player squad', function()
 			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadTypes = require('Module:Features/Squad/Types')
 			local wrapper = SquadUtils.readWrapperArgs{{id = 'Baz'}}
-			assert.are_equal(SquadUtils.SquadType.PLAYER, wrapper.squadType)
-			assert.are_equal(SquadUtils.SquadStatus.ACTIVE, wrapper.squadStatus)
+			assert.are_equal(SquadTypes.SquadType.PLAYER, wrapper.squadType)
+			assert.are_equal(SquadTypes.SquadStatus.ACTIVE, wrapper.squadStatus)
 			assert.is_nil(wrapper.title)
 			assert.are_equal(1, #wrapper.players)
 		end)
 
 		it('keeps the raw args around for custom modules', function()
 			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadTypes = require('Module:Features/Squad/Types')
 			local args = {{id = 'Baz'}, status = 'former', type = 'staff', title = 'Former Staff'}
 			local wrapper = SquadUtils.readWrapperArgs(args)
-			assert.are_equal(SquadUtils.SquadType.STAFF, wrapper.squadType)
-			assert.are_equal(SquadUtils.SquadStatus.FORMER, wrapper.squadStatus)
+			assert.are_equal(SquadTypes.SquadType.STAFF, wrapper.squadType)
+			assert.are_equal(SquadTypes.SquadStatus.FORMER, wrapper.squadStatus)
 			assert.are_equal('Former Staff', wrapper.title)
 			assert.are_equal(args, wrapper.args)
 		end)
 
 		it('upgrades former to former inactive when any row has an inactive date', function()
+			local SquadTypes = require('Module:Features/Squad/Types')
 			local SquadUtils = require('Module:Features/Squad/Utils')
 			local wrapper = SquadUtils.readWrapperArgs{
 				status = 'former',
 				{id = 'Baz'},
 				{id = 'Qux', inactivedate = '2022-03-03'},
 			}
-			assert.are_equal(SquadUtils.SquadStatus.FORMER_INACTIVE, wrapper.squadStatus)
+			assert.are_equal(SquadTypes.SquadStatus.FORMER_INACTIVE, wrapper.squadStatus)
 		end)
 
 		it('does not upgrade active squads that have inactive dates', function()
+			local SquadTypes = require('Module:Features/Squad/Types')
 			local SquadUtils = require('Module:Features/Squad/Utils')
 			local wrapper = SquadUtils.readWrapperArgs{
 				status = 'active',
 				{id = 'Qux', inactivedate = '2022-03-03'},
 			}
-			assert.are_equal(SquadUtils.SquadStatus.ACTIVE, wrapper.squadStatus)
+			assert.are_equal(SquadTypes.SquadStatus.ACTIVE, wrapper.squadStatus)
 		end)
 
 		it('falls back to the defaults for unknown status and type', function()
@@ -545,7 +549,7 @@ insulate('Squad/Utils', function()
 				oldTeam = {team = 'Team Liquid'},
 				newTeam = {},
 			}
-			assert.is_false(notLoaned.team)
+			assert.is_nil(notLoaned.team)
 		end)
 	end)
 end)
