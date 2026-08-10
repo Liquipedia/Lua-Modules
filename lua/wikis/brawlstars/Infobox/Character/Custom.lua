@@ -13,14 +13,12 @@ local BrawlerPickBan = Lua.import('Module:BrawlerPickBan')
 local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
 local Math = Lua.import('Module:MathUtil')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local Character = Lua.import('Module:Infobox/Character')
 local Injector = Lua.import('Module:Widget/Injector')
 
 local Widgets = Lua.import('Module:Widget/All')
-local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -47,7 +45,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Rarity', children = {args.rarity}},
 		}
 	elseif id == 'custom' then
-		Array.appendWith(widgets, self.caller:_getTypeCells())	
+		Array.appendWith(widgets, self.caller:_getTypeCells())
 		widgets = self.caller:_getEsportsStats(widgets)
 	end
 
@@ -77,8 +75,7 @@ function CustomCharacter:_getEsportsStats(widgets)
 	local args = self.args
 	local wins, loses = BrawlerWinLoss.run(args.name)
 	if wins + loses == 0 then return widgets end
-	mw.log('DEBUG wins=' .. tostring(wins) .. ' loses=' .. tostring(loses) .. ' name=' .. tostring(args.name))
-	
+
 	local winPercentage = Math.formatPercentage(wins / (wins + loses), 2)
 	local picks, bans, totalGames = BrawlerPickBan.run(args.name)
 	local pickPercentage = totalGames > 0 and Math.formatPercentage(picks / totalGames, 2) or 0
