@@ -70,13 +70,30 @@ local function TransfersList(props)
 					},
 					children = ListWidgets.Unordered{children = WidgetUtil.collect(
 						Link { children = 'See more transfers', link = props.transferPortal },
-						Logic.readBool(props.transferQuery) and Link {
-							children = 'Transfer query',
-							link = 'Special:RunQuery/Transfer history'
+						Logic.readBool(props.transferQuery) and Div {
+							children = {
+								Div {
+									classes = { 'hide-when-lighthouse' },
+									children = Link {
+										children = 'Transfer query',
+										link = 'Special:RunQuery/Transfer history'
+									}
+								},
+								Div {
+									classes = { 'hide-when-mediawiki' },
+									children = Link {
+										children = 'Transfer query',
+										link = 'Special:RunQuery/Transfer query'
+									}
+								},
+							}
 						} or nil,
-						Link {
-							children = 'Input Form',
-							link = (Page.exists('Form:Transfer') and '' or 'lpcommons:') .. 'Special:RunQuery/Transfer'
+						Div {
+							classes = { 'show-when-logged-in' },
+							children = Link {
+								children = 'Input Form',
+								link = (Page.exists('Form:Transfer') and '' or 'lpcommons:') .. 'Special:RunQuery/Transfer'
+							}
 						},
 						Logic.readBool(props.rumours) and Link { children = 'Rumours', link = 'Portal:Rumours' } or nil
 					)}

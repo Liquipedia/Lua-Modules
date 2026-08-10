@@ -9,6 +9,27 @@ Author(s): FO-nTTaX
 }
 
 /*******************************************************************************
+Temporary show/hide during MW/LH Migrations
+*******************************************************************************/
+body:not( .mediawiki ) .hide-when-mediawiki {
+	display: none;
+}
+
+body.mediawiki .hide-when-lighthouse {
+	display: none;
+}
+
+/*******************************************************************************
+Hide/show content based on user login status
+*******************************************************************************/
+body.logged-in .hide-when-logged-in,
+body.logged-in .show-when-logged-out,
+body.logged-out .hide-when-logged-out,
+body.logged-out .show-when-logged-in {
+	display: none;
+}
+
+/*******************************************************************************
 Template(s): Documentation
 Author(s): FO-nTTaX
 *******************************************************************************/
