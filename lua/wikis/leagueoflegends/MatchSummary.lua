@@ -133,7 +133,8 @@ function GameRowComponentProps.createGameDetail(props)
 					css = {
 						['grid-column'] = '1 / -1',
 						background = String.interpolate(
-							'linear-gradient(to right, ${leftBarColor} ${leftBarLength}, ${rightBarColor} ${leftBarLength} ${rightBarLength})',
+							'linear-gradient(to right, ${leftBarColor} ${leftBarLength}, ' ..
+							'${rightBarColor} ${leftBarLength} ${rightBarLength})',
 							{
 								leftBarColor = gameOpponentIndex == 1 and SIDE_COLORS[side] or 'transparent',
 								leftBarLength = MathUtil.formatPercentage(
