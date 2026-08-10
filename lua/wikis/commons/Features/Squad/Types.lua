@@ -67,7 +67,7 @@ SquadTypes.SquadType = {
 	STAFF = 1,
 }
 
----@type {string: SquadType}
+---@type table<string, SquadType>
 SquadTypes.TypeToSquadType = {
 	player = SquadTypes.SquadType.PLAYER,
 	staff = SquadTypes.SquadType.STAFF,

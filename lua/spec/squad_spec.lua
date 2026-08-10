@@ -66,14 +66,15 @@ code does today, not necessarily what it ought to do.
 insulate('Squad/Utils', function()
 	describe('status parsing', function()
 		it('maps the storable statuses case insensitively', function()
-			local SquadUtils = require('Module:Squad/Utils')
-			assert.are_equal(SquadUtils.SquadStatus.ACTIVE, SquadUtils.statusToSquadStatus('active'))
-			assert.are_equal(SquadUtils.SquadStatus.INACTIVE, SquadUtils.statusToSquadStatus('INACTIVE'))
-			assert.are_equal(SquadUtils.SquadStatus.FORMER, SquadUtils.statusToSquadStatus('Former'))
+			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadTypes = require('Module:Features/Squad/Types')
+			assert.are_equal(SquadTypes.SquadStatus.ACTIVE, SquadUtils.statusToSquadStatus('active'))
+			assert.are_equal(SquadTypes.SquadStatus.INACTIVE, SquadUtils.statusToSquadStatus('INACTIVE'))
+			assert.are_equal(SquadTypes.SquadStatus.FORMER, SquadUtils.statusToSquadStatus('Former'))
 		end)
 
 		it('returns nil for nil and for unknown statuses', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
 			assert.is_nil(SquadUtils.statusToSquadStatus(nil))
 			assert.is_nil(SquadUtils.statusToSquadStatus('retired'))
 			-- FORMER_INACTIVE is derived, never parsed from input
@@ -81,26 +82,26 @@ insulate('Squad/Utils', function()
 		end)
 
 		it('maps every status to a storage value, folding former inactive into former', function()
-			local SquadUtils = require('Module:Squad/Utils')
-			local toStorage = SquadUtils.SquadStatusToStorageValue
-			assert.are_equal('active', toStorage[SquadUtils.SquadStatus.ACTIVE])
-			assert.are_equal('inactive', toStorage[SquadUtils.SquadStatus.INACTIVE])
-			assert.are_equal('former', toStorage[SquadUtils.SquadStatus.FORMER])
-			assert.are_equal('former', toStorage[SquadUtils.SquadStatus.FORMER_INACTIVE])
+			local SquadTypes = require('Module:Features/Squad/Types')
+			local toStorage = SquadTypes.SquadStatusToStorageValue
+			assert.are_equal('active', toStorage[SquadTypes.SquadStatus.ACTIVE])
+			assert.are_equal('inactive', toStorage[SquadTypes.SquadStatus.INACTIVE])
+			assert.are_equal('former', toStorage[SquadTypes.SquadStatus.FORMER])
+			assert.are_equal('former', toStorage[SquadTypes.SquadStatus.FORMER_INACTIVE])
 		end)
 
 		it('maps types both ways', function()
-			local SquadUtils = require('Module:Squad/Utils')
-			assert.are_equal(SquadUtils.SquadType.PLAYER, SquadUtils.TypeToSquadType.player)
-			assert.are_equal(SquadUtils.SquadType.STAFF, SquadUtils.TypeToSquadType.staff)
-			assert.are_equal('player', SquadUtils.SquadTypeToStorageValue[SquadUtils.SquadType.PLAYER])
-			assert.are_equal('staff', SquadUtils.SquadTypeToStorageValue[SquadUtils.SquadType.STAFF])
+			local SquadTypes = require('Module:Features/Squad/Types')
+			assert.are_equal(SquadTypes.SquadType.PLAYER, SquadTypes.TypeToSquadType.player)
+			assert.are_equal(SquadTypes.SquadType.STAFF, SquadTypes.TypeToSquadType.staff)
+			assert.are_equal('player', SquadTypes.SquadTypeToStorageValue[SquadTypes.SquadType.PLAYER])
+			assert.are_equal('staff', SquadTypes.SquadTypeToStorageValue[SquadTypes.SquadType.STAFF])
 		end)
 	end)
 
 	describe('parsePlayers', function()
 		it('reads the numbered arguments and stops at the first gap', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
 			local players = SquadUtils.parsePlayers{
 				{id = 'One'},
 				{id = 'Two'},
@@ -113,25 +114,25 @@ insulate('Squad/Utils', function()
 		end)
 
 		it('parses json encoded rows', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
 			local players = SquadUtils.parsePlayers{'{"id":"Baz","flag":"se"}'}
 			assert.are_same({{id = 'Baz', flag = 'se'}}, players)
 		end)
 
 		it('returns an empty list when there are no rows', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
 			assert.are_same({}, SquadUtils.parsePlayers{status = 'active'})
 		end)
 	end)
 
 	describe('anyInactive', function()
 		it('is true as soon as one player has an inactive date', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
 			assert.is_true(SquadUtils.anyInactive{{}, {inactivedate = '2022-03-03'}})
 		end)
 
 		it('treats empty strings as no inactive date', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
 			assert.is_false(SquadUtils.anyInactive{{inactivedate = ''}, {}})
 			assert.is_false(SquadUtils.anyInactive{})
 		end)
@@ -139,7 +140,7 @@ insulate('Squad/Utils', function()
 
 	describe('readWrapperArgs', function()
 		it('defaults to an active player squad', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
 			local wrapper = SquadUtils.readWrapperArgs{{id = 'Baz'}}
 			assert.are_equal(SquadUtils.SquadType.PLAYER, wrapper.squadType)
 			assert.are_equal(SquadUtils.SquadStatus.ACTIVE, wrapper.squadStatus)
@@ -148,7 +149,7 @@ insulate('Squad/Utils', function()
 		end)
 
 		it('keeps the raw args around for custom modules', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
 			local args = {{id = 'Baz'}, status = 'former', type = 'staff', title = 'Former Staff'}
 			local wrapper = SquadUtils.readWrapperArgs(args)
 			assert.are_equal(SquadUtils.SquadType.STAFF, wrapper.squadType)
@@ -158,7 +159,7 @@ insulate('Squad/Utils', function()
 		end)
 
 		it('upgrades former to former inactive when any row has an inactive date', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
 			local wrapper = SquadUtils.readWrapperArgs{
 				status = 'former',
 				{id = 'Baz'},
@@ -168,7 +169,7 @@ insulate('Squad/Utils', function()
 		end)
 
 		it('does not upgrade active squads that have inactive dates', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
 			local wrapper = SquadUtils.readWrapperArgs{
 				status = 'active',
 				{id = 'Qux', inactivedate = '2022-03-03'},
@@ -177,17 +178,19 @@ insulate('Squad/Utils', function()
 		end)
 
 		it('falls back to the defaults for unknown status and type', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadTypes = require('Module:Features/Squad/Types')
 			local wrapper = SquadUtils.readWrapperArgs{status = 'retired', type = 'organization'}
-			assert.are_equal(SquadUtils.SquadType.PLAYER, wrapper.squadType)
-			assert.are_equal(SquadUtils.SquadStatus.ACTIVE, wrapper.squadStatus)
+			assert.are_equal(SquadTypes.SquadType.PLAYER, wrapper.squadType)
+			assert.are_equal(SquadTypes.SquadStatus.ACTIVE, wrapper.squadStatus)
 		end)
 	end)
 
 	describe('createWrapperData', function()
 		it('defaults args to an empty table', function()
-			local SquadUtils = require('Module:Squad/Utils')
-			local wrapper = SquadUtils.createWrapperData({}, SquadUtils.SquadType.STAFF, SquadUtils.SquadStatus.FORMER)
+			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadTypes = require('Module:Features/Squad/Types')
+			local wrapper = SquadUtils.createWrapperData({}, SquadTypes.SquadType.STAFF, SquadTypes.SquadStatus.FORMER)
 			assert.are_same({}, wrapper.args)
 			assert.is_nil(wrapper.title)
 		end)
@@ -202,14 +205,15 @@ insulate('Squad/Utils', function()
 		---@return string objectName
 		---@return table fields
 		local function store(args)
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadTypes = require('Module:Features/Squad/Types')
 			local objectName, fields
 			local storeStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer', function(name, row)
 				objectName, fields = name, row
 			end)
 			local ok, err = pcall(function()
 				local person = SquadUtils.readSquadPersonArgs(
-					require('Module:Table').merge({status = SquadUtils.SquadStatus.ACTIVE}, args)
+					require('Module:Table').merge({status = SquadTypes.SquadStatus.ACTIVE}, args)
 				)
 				person:save()
 			end)
@@ -222,13 +226,13 @@ insulate('Squad/Utils', function()
 		after_each(TeamTemplateMock.tearDown)
 
 		it('requires an id or a name', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
 			assert.has_error(function() SquadUtils.readSquadPersonArgs{flag = 'se'} end, 'id or name is required')
 			assert.has_error(function() SquadUtils.readSquadPersonArgs{id = '', name = ''} end, 'id or name is required')
 		end)
 
 		it('cannot be stored without a status', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
 			local storeStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer')
 			local ok, err = pcall(function() SquadUtils.readSquadPersonArgs{id = 'Baz'}:save() end)
 			storeStub:revert()
@@ -346,20 +350,20 @@ insulate('Squad/Utils', function()
 		end)
 
 		it('builds the object name from link, join date, role and status', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadTypes = require('Module:Features/Squad/Types')
 			local objectName = store{
 				id = 'Baz',
 				joindate = '2022-01-01',
 				role = 'sub',
-				status = SquadUtils.SquadStatus.FORMER,
-				type = SquadUtils.SquadType.PLAYER,
+				status = SquadTypes.SquadStatus.FORMER,
+				type = SquadTypes.SquadType.PLAYER,
 			}
 			assert.are_equal('Baz_2022-01-01_Sub_former', objectName)
 		end)
 
 		it('stores former inactive as former', function()
-			local SquadUtils = require('Module:Squad/Utils')
-			local _, fields = store{id = 'Baz', status = SquadUtils.SquadStatus.FORMER_INACTIVE}
+			local SquadTypes = require('Module:Features/Squad/Types')
+			local _, fields = store{id = 'Baz', status = SquadTypes.SquadStatus.FORMER_INACTIVE}
 			assert.are_equal('former', fields.status)
 		end)
 
@@ -369,11 +373,11 @@ insulate('Squad/Utils', function()
 		end)
 
 		it('stores staff squads as staff', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadTypes = require('Module:Features/Squad/Types')
 			local _, fields = store{
 				id = 'Baz',
-				status = SquadUtils.SquadStatus.ACTIVE,
-				type = SquadUtils.SquadType.STAFF,
+				status = SquadTypes.SquadStatus.ACTIVE,
+				type = SquadTypes.SquadType.STAFF,
 			}
 			assert.are_equal('staff', fields.type)
 		end)
@@ -389,7 +393,7 @@ insulate('Squad/Utils', function()
 		---@param status SquadStatus
 		---@return table<string, boolean>
 		local function analyze(players, status)
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
 			return SquadUtils.analyzeColumnVisibility(players, status)
 		end
 
@@ -400,7 +404,7 @@ insulate('Squad/Utils', function()
 		end
 
 		it('hides every optional column for an empty active squad', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadTypes = require('Module:Features/Squad/Types')
 			assert.are_same({
 				teamIcon = false,
 				name = false,
@@ -410,72 +414,72 @@ insulate('Squad/Utils', function()
 				activeteam = false,
 				leavedate = false,
 				newteam = false,
-			}, analyze({}, SquadUtils.SquadStatus.ACTIVE))
+			}, analyze({}, SquadTypes.SquadStatus.ACTIVE))
 		end)
 
 		it('shows the team icon column when someone is on loan', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadTypes = require('Module:Features/Squad/Types')
 			local columns = analyze({player(), player{extradata = {loanedto = 'team liquid'}}},
-				SquadUtils.SquadStatus.ACTIVE)
+				SquadTypes.SquadStatus.ACTIVE)
 			assert.is_truthy(columns.teamIcon)
 		end)
 
 		it('shows the name and join date columns as soon as one row fills them', function()
-			local SquadUtils = require('Module:Squad/Utils')
-			local columns = analyze({player{name = 'Foo Bar', joindate = '2022-01-01'}}, SquadUtils.SquadStatus.ACTIVE)
+			local SquadTypes = require('Module:Features/Squad/Types')
+			local columns = analyze({player{name = 'Foo Bar', joindate = '2022-01-01'}}, SquadTypes.SquadStatus.ACTIVE)
 			assert.is_true(columns.name)
 			assert.is_true(columns.joindate)
 		end)
 
 		it('treats Captain and Sub as roles that do not warrant a role column', function()
-			local SquadUtils = require('Module:Squad/Utils')
-			assert.is_false(analyze({player{role = 'Captain'}, player{role = 'Sub'}}, SquadUtils.SquadStatus.ACTIVE).role)
-			assert.is_true(analyze({player{role = 'Coach'}}, SquadUtils.SquadStatus.ACTIVE).role)
+			local SquadTypes = require('Module:Features/Squad/Types')
+			assert.is_false(analyze({player{role = 'Captain'}, player{role = 'Sub'}}, SquadTypes.SquadStatus.ACTIVE).role)
+			assert.is_true(analyze({player{role = 'Coach'}}, SquadTypes.SquadStatus.ACTIVE).role)
 		end)
 
 		it('falls back to the position when there is no role', function()
-			local SquadUtils = require('Module:Squad/Utils')
-			assert.is_true(analyze({player{position = 'Mid'}}, SquadUtils.SquadStatus.ACTIVE).role)
+			local SquadTypes = require('Module:Features/Squad/Types')
+			assert.is_true(analyze({player{position = 'Mid'}}, SquadTypes.SquadStatus.ACTIVE).role)
 			-- an empty role falls through to the position, a Captain role does not
-			assert.is_false(analyze({player{role = 'Captain', position = 'Mid'}}, SquadUtils.SquadStatus.ACTIVE).role)
+			assert.is_false(analyze({player{role = 'Captain', position = 'Mid'}}, SquadTypes.SquadStatus.ACTIVE).role)
 		end)
 
 		it('only offers the inactive columns for inactive statuses', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadTypes = require('Module:Features/Squad/Types')
 			local rows = {player{inactivedate = '2022-03-03'}}
-			assert.is_false(analyze(rows, SquadUtils.SquadStatus.ACTIVE).inactivedate)
-			assert.is_false(analyze(rows, SquadUtils.SquadStatus.FORMER).inactivedate)
-			assert.is_true(analyze(rows, SquadUtils.SquadStatus.INACTIVE).inactivedate)
-			assert.is_true(analyze(rows, SquadUtils.SquadStatus.FORMER_INACTIVE).inactivedate)
+			assert.is_false(analyze(rows, SquadTypes.SquadStatus.ACTIVE).inactivedate)
+			assert.is_false(analyze(rows, SquadTypes.SquadStatus.FORMER).inactivedate)
+			assert.is_true(analyze(rows, SquadTypes.SquadStatus.INACTIVE).inactivedate)
+			assert.is_true(analyze(rows, SquadTypes.SquadStatus.FORMER_INACTIVE).inactivedate)
 		end)
 
 		it('only offers the former columns for former statuses', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadTypes = require('Module:Features/Squad/Types')
 			local rows = {player{leavedate = '2022-05-01', newteam = 'MOUZ'}}
-			assert.is_false(analyze(rows, SquadUtils.SquadStatus.ACTIVE).leavedate)
-			assert.is_false(analyze(rows, SquadUtils.SquadStatus.INACTIVE).leavedate)
-			assert.is_true(analyze(rows, SquadUtils.SquadStatus.FORMER).leavedate)
-			assert.is_true(analyze(rows, SquadUtils.SquadStatus.FORMER_INACTIVE).leavedate)
-			assert.is_true(analyze(rows, SquadUtils.SquadStatus.FORMER).newteam)
+			assert.is_false(analyze(rows, SquadTypes.SquadStatus.ACTIVE).leavedate)
+			assert.is_false(analyze(rows, SquadTypes.SquadStatus.INACTIVE).leavedate)
+			assert.is_true(analyze(rows, SquadTypes.SquadStatus.FORMER).leavedate)
+			assert.is_true(analyze(rows, SquadTypes.SquadStatus.FORMER_INACTIVE).leavedate)
+			assert.is_true(analyze(rows, SquadTypes.SquadStatus.FORMER).newteam)
 		end)
 
 		it('shows the new team column for a role or a special team without a team', function()
-			local SquadUtils = require('Module:Squad/Utils')
-			assert.is_true(analyze({player{newteamrole = 'Coach'}}, SquadUtils.SquadStatus.FORMER).newteam)
+			local SquadTypes = require('Module:Features/Squad/Types')
+			assert.is_true(analyze({player{newteamrole = 'Coach'}}, SquadTypes.SquadStatus.FORMER).newteam)
 			assert.is_true(
-				analyze({player{extradata = {newteamspecial = 'Team/retired'}}}, SquadUtils.SquadStatus.FORMER).newteam
+				analyze({player{extradata = {newteamspecial = 'Team/retired'}}}, SquadTypes.SquadStatus.FORMER).newteam
 			)
 		end)
 
 		it('only shows the active team column for teams that have a template', function()
 			local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadTypes = require('Module:Features/Squad/Types')
 			TeamTemplateMock.setUp()
 			assert.is_true(
-				analyze({player{extradata = {activeteam = 'mouz'}}}, SquadUtils.SquadStatus.INACTIVE).activeteam
+				analyze({player{extradata = {activeteam = 'mouz'}}}, SquadTypes.SquadStatus.INACTIVE).activeteam
 			)
 			assert.is_false(
-				analyze({player{extradata = {activeteam = 'not a team'}}}, SquadUtils.SquadStatus.INACTIVE).activeteam
+				analyze({player{extradata = {activeteam = 'not a team'}}}, SquadTypes.SquadStatus.INACTIVE).activeteam
 			)
 			TeamTemplateMock.tearDown()
 		end)
@@ -483,7 +487,7 @@ insulate('Squad/Utils', function()
 
 	describe('convertAutoParameters', function()
 		it('maps the legacy auto squad shape onto squad person args', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
 			local converted = SquadUtils.convertAutoParameters{
 				id = 'Baz',
 				page = 'Baz (player)',
@@ -506,7 +510,7 @@ insulate('Squad/Utils', function()
 		end)
 
 		it('prefers the display dates when they are given', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
 			local converted = SquadUtils.convertAutoParameters{
 				id = 'Baz',
 				joindate = '2022-01-01',
@@ -522,7 +526,7 @@ insulate('Squad/Utils', function()
 		end)
 
 		it('only carries the old team over for loans', function()
-			local SquadUtils = require('Module:Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Utils')
 			local loaned = SquadUtils.convertAutoParameters{
 				id = 'Baz',
 				joindate = '2022-01-01',
@@ -565,14 +569,15 @@ insulate('Squad/Utils on starcraft2', function()
 	---@param args table
 	---@return table fields
 	local function store(args)
-		local SquadUtils = require('Module:Squad/Utils')
+		local SquadUtils = require('Module:Features/Squad/Utils')
+		local SquadTypes = require('Module:Features/Squad/Types')
 		local fields
 		local storeStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer', function(_, row)
 			fields = row
 		end)
 		local ok, err = pcall(function()
 			SquadUtils.readSquadPersonArgs(
-				require('Module:Table').merge({status = SquadUtils.SquadStatus.ACTIVE}, args)
+				require('Module:Table').merge({status = SquadTypes.SquadStatus.ACTIVE}, args)
 			):save()
 		end)
 		storeStub:revert()
@@ -581,13 +586,13 @@ insulate('Squad/Utils on starcraft2', function()
 	end
 
 	it('maps the known special teams', function()
-		local SquadUtils = require('Module:Squad/Utils')
+		local SquadTypes = require('Module:Features/Squad/Types')
 		assert.are_same({
 			retired = 'Team/retired',
 			inactive = 'Team/inactive',
 			['passed away'] = 'Team/passed away',
 			military = 'Team/military',
-		}, SquadUtils.specialTeamsTemplateMapping)
+		}, SquadTypes.specialTeamsTemplateMapping)
 
 		assert.are_equal('Team/retired', store{id = 'Baz', newteam = 'retired'}.extradata.newteamspecial)
 		assert.are_equal('Team/military', store{id = 'Baz', newteam = 'military'}.extradata.newteamspecial)
@@ -624,13 +629,14 @@ insulate('Squad/Controller', function()
 	end)
 
 	after_each(function()
+		---@diagnostic disable-next-line: undefined-field
 		mw.ext.LiquipediaDB.lpdb:revert()
 		TeamTemplateMock.tearDown()
 	end)
 
 	it('stores one row per player and renders them in input order', function()
 		local storeStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer')
-		local SquadController = require('Module:Squad/Controller')
+		local SquadController = require('Module:Features/Squad/Controller')
 
 		local html = tostring(SquadController.run{
 			status = 'active',
@@ -647,7 +653,7 @@ insulate('Squad/Controller', function()
 
 	it('renders a former squad with every column the rows ask for', function()
 		local storeStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer')
-		local SquadController = require('Module:Squad/Controller')
+		local SquadController = require('Module:Features/Squad/Controller')
 
 		local html = tostring(SquadController.run{
 			status = 'former',
@@ -692,7 +698,7 @@ insulate('Squad/Controller', function()
 		local storeStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer', function(objectName, fields)
 			stored[objectName] = fields
 		end)
-		local SquadController = require('Module:Squad/Controller')
+		local SquadController = require('Module:Features/Squad/Controller')
 
 		SquadController.run({status = 'active', {id = 'Baz'}, {id = 'Qux'}}, function(squadData, squadPlayer)
 			table.insert(seen, {status = squadData.squadStatus, id = squadPlayer.id})
@@ -700,10 +706,10 @@ insulate('Squad/Controller', function()
 		end)
 		storeStub:revert()
 
-		local SquadUtils = require('Module:Squad/Utils')
+		local SquadTypes = require('Module:Features/Squad/Types')
 		assert.are_same({
-			{status = SquadUtils.SquadStatus.ACTIVE, id = 'Baz'},
-			{status = SquadUtils.SquadStatus.ACTIVE, id = 'Qux'},
+			{status = SquadTypes.SquadStatus.ACTIVE, id = 'Baz'},
+			{status = SquadTypes.SquadStatus.ACTIVE, id = 'Qux'},
 		}, seen)
 		assert.are_same({adjusted = 'yes'}, stored['Baz___active'].extradata)
 		assert.are_same({adjusted = 'yes'}, stored['Qux___active'].extradata)
@@ -711,7 +717,7 @@ insulate('Squad/Controller', function()
 
 	it('renders an untitled empty table for an active squad without players', function()
 		local storeStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer')
-		local SquadController = require('Module:Squad/Controller')
+		local SquadController = require('Module:Features/Squad/Controller')
 
 		local html = tostring(SquadController.run{status = 'active'})
 		storeStub:revert()
@@ -724,8 +730,8 @@ insulate('Squad/Controller', function()
 
 	it('converts legacy auto rows when the wiki has not moved to the standardized auto squad', function()
 		local storeStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer')
-		local SquadController = require('Module:Squad/Controller')
-		local SquadUtils = require('Module:Squad/Utils')
+		local SquadController = require('Module:Features/Squad/Controller')
+		local SquadTypes = require('Module:Features/Squad/Types')
 
 		SquadController.runAuto({
 			{
@@ -737,7 +743,7 @@ insulate('Squad/Controller', function()
 				oldTeam = {},
 				newTeam = {team = 'mouz'},
 			},
-		}, SquadUtils.SquadStatus.FORMER, SquadUtils.SquadType.PLAYER, 'Former Players')
+		}, SquadTypes.SquadStatus.FORMER, SquadTypes.SquadType.PLAYER, 'Former Players')
 
 		assert.stub(storeStub).was.called_with('Baz_2022-01-01_Sub_former', match.is_table())
 		storeStub:revert()
@@ -745,13 +751,13 @@ insulate('Squad/Controller', function()
 
 	it('titles the table with the custom title given to runAuto', function()
 		local storeStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer')
-		local SquadController = require('Module:Squad/Controller')
-		local SquadUtils = require('Module:Squad/Utils')
+		local SquadController = require('Module:Features/Squad/Controller')
+		local SquadTypes = require('Module:Features/Squad/Types')
 
 		local html = tostring(SquadController.runAuto(
 			{},
-			SquadUtils.SquadStatus.FORMER,
-			SquadUtils.SquadType.PLAYER,
+			SquadTypes.SquadStatus.FORMER,
+			SquadTypes.SquadType.PLAYER,
 			'Former Players'
 		))
 		assert.is_truthy(html:find('<div class="table2__title">Former Players</div>', 1, true))
@@ -764,7 +770,7 @@ insulate('Squad/Controller on a wiki without manual squads', function()
 	teardown(function() SetActiveWiki() end)
 
 	it('refuses to run', function()
-		local SquadController = require('Module:Squad/Controller')
+		local SquadController = require('Module:Features/Squad/Controller')
 		assert.has_error(function()
 			SquadController.run{status = 'active', {id = 'Baz'}}
 		end, 'This wiki does not use manual squad tables')
