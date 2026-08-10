@@ -726,7 +726,7 @@ insulate('Squad/Controller', function()
 		local html = tostring(SquadController.run{status = 'active'})
 		storeStub:revert()
 
-		assert.spy(storeStub).was_not.called()
+		assert.spy(storeStub).called(0)
 		-- an active player squad has no default title, unlike inactive/former ones
 		assert.is_nil(html:find('table2__title', 1, true))
 		assert.is_nil(html:find('table2__row--body', 1, true))
