@@ -8,7 +8,7 @@ insulate('Squad', function()
 
 		local LpdbSquadStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer')
 		local LpdbQueryStub = stub(mw.ext.LiquipediaDB, 'lpdb', {})
-		local SquadCustom = require('Module:Squad/Custom')
+		local SquadCustom = require('Module:Features/Squad/Custom')
 
 		GoldenTest('squad_row_' .. wikiName, tostring(SquadCustom.run(args.input)))
 
