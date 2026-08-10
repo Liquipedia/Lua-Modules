@@ -22,12 +22,13 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
----@class MobileLegendsHeroInfobox: CharacterInfobox
+---@class BrawlStarsHeroInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Html
+---@diagnostic disable-next-line: duplicate-set-field
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
@@ -90,6 +91,7 @@ function CustomCharacter:_getEsportsStats(widgets)
 end
 
 ---@return string[]
+---@diagnostic disable-next-line: duplicate-set-field
 function CustomCharacter:_getVoiceActors()
 	local args = self.args
 	local voiceActors = {}
@@ -105,6 +107,7 @@ end
 
 ---@param args table
 ---@return string[]
+---@diagnostic disable-next-line: duplicate-set-field
 function CustomCharacter:getRoles(args)
 	return {
 		args.class
@@ -114,6 +117,7 @@ end
 ---@param lpdbData table
 ---@param args table
 ---@return table
+---@diagnostic disable-next-line: duplicate-set-field
 function CustomCharacter:addToLpdb(lpdbData, args)
 	lpdbData.extradata = {
 		rarity = args.rarity,
