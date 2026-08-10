@@ -36,7 +36,46 @@
 ---@field leavedateref table<string, string>?
 ---@field inactivedateref table<string, string>?
 
+--- One transfer, seen from the point of view of one team.
+---@class (exact) TeamHistoryEntry
+---@field pagename string
+---@field displayname string
+---@field flag string
+---@field date string
+---@field dateDisplay string
+---@field type TransferType
+---@field references table<string, string>
+---@field wholeTeam boolean
+---@field position string
+---@field fromTeam string?
+---@field fromRole string?
+---@field toTeam string?
+---@field toRole string?
+---@field faction string?
+
+--- One uninterrupted period a person spent on a team, as a set of the transfers that bound it.
+---@class (exact) SquadStint
+---@field joinEntry TeamHistoryEntry
+---@field inactiveEntry TeamHistoryEntry?
+---@field leaveEntry TeamHistoryEntry?
+
 local SquadTypes = {}
+
+---@enum TransferType
+SquadTypes.TransferType = {
+	LEAVE = 'LEAVE',
+	JOIN = 'JOIN',
+	CHANGE = 'CHANGE',
+}
+
+---@enum TransferSide
+SquadTypes.TransferSide = {
+	FROM = 'from',
+	TO = 'to',
+}
+
+--- The role a transfer sets to take someone off the active squad.
+SquadTypes.ROLE_INACTIVE = 'Inactive'
 
 ---@enum SquadStatus
 SquadTypes.SquadStatus = {

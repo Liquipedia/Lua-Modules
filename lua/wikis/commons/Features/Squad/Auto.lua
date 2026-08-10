@@ -10,15 +10,11 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Condition = Lua.import('Module:Condition')
 local FnUtil = Lua.import('Module:FnUtil')
 local Info = Lua.import('Module:Info')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
-local Lpdb = Lua.import('Module:Lpdb')
-local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
-local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local RoleUtil = Lua.import('Module:Role/Util')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -27,12 +23,11 @@ local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TransferRefs = Lua.import('Module:Transfer/References')
 
 local SquadTypes = Lua.import('Module:Features/Squad/Types')
+local SquadHistory = Lua.import('Module:Features/Squad/Lib/History')
+local SquadTransferHistory = Lua.import('Module:Features/Squad/Api/TransferHistory')
 local SquadCustom = Lua.import('Module:Features/Squad/Custom')
 
-local BooleanOperator = Condition.BooleanOperator
-local Comparator = Condition.Comparator
-
-local pageVars = PageVariableNamespace()
+local INVALID_HISTORY_CATEGORY = 'SquadAuto with invalid player history'
 
 ---@class SquadAuto
 ---@field args table
@@ -51,41 +46,9 @@ end)
 ---@field title string?
 ---@field teams string[]?
 
----@enum TransferType
-SquadAuto.TransferType = {
-	LEAVE = 'LEAVE',
-	JOIN = 'JOIN',
-	CHANGE = 'CHANGE',
-}
-
----@class (exact) TeamHistoryEntry
----@field pagename string
----@field displayname string
----@field flag string
----@field date string
----@field dateDisplay string
----@field type TransferType
----@field references table<string, string>
----@field wholeTeam boolean
----@field position string
----@field fromTeam string?
----@field fromRole string?
----@field toTeam string?
----@field toRole string?
----@field faction string?
-
 ---@class SquadAutoPerson: SquadPersonArgs
 ---@field roleData RoleData[]
 ---@field positionData RoleData[]
-
----@enum TransferSide
-local Side = {
-	from = 'from',
-	to = 'to',
-}
-
-
-local ROLE_INACTIVE = 'Inactive'
 
 ---Entrypoint for SquadAuto tables
 ---@param frame Frame|table
@@ -115,7 +78,7 @@ end
 ---Handles all necessary steps to fetch and sort data
 function SquadAuto:build()
 	self:_parseConfig()
-	self:_queryTransfers()
+	self.playersTeamHistory = SquadTransferHistory.forTeam(self.config.team, self.config.teams)
 	local entries = self:_selectEntries()
 	Array.forEach(entries, FnUtil.curry(SquadAuto._enrichEntry, self))
 	return entries
@@ -303,171 +266,13 @@ function SquadAuto:_readManualRowInput()
 end
 
 ---@private
-function SquadAuto:_queryTransfers()
-	---Checks whether a given team is the currently queried team
-	---@param team string?
-	---@return boolean
-	local function isCurrentTeam(team)
-		if not team then
-			return false
-		end
-		return Array.any(self.config.teams, FnUtil.curry(Operator.eq, team))
-	end
-
-	---@param side TransferSide
-	---@param transfer transfer
-	---@return string | nil, boolean
-	local function parseRelevantTeam(side, transfer)
-		local mainTeam = transfer[side .. 'teamtemplate']
-		if mainTeam and isCurrentTeam(mainTeam) then
-			return mainTeam, true
-		end
-
-		local secondaryTeam = transfer.extradata[side .. 'teamsectemplate']
-		if secondaryTeam and isCurrentTeam(secondaryTeam) then
-			return secondaryTeam, false
-		end
-
-		return nil, false
-	end
-
-	---Maps a transfer to a transfertype, with regards to the current team.
-	---@param relevantFromTeam string?
-	---@param relevantToTeam string?
-	---@return TransferType
-	local function getTransferType(relevantFromTeam, relevantToTeam)
-		if relevantFromTeam then
-			if relevantToTeam then
-				return SquadAuto.TransferType.CHANGE
-			end
-			return SquadAuto.TransferType.LEAVE
-		end
-		return SquadAuto.TransferType.JOIN
-	end
-
-	---Parses the relevant role for the current team from a transfer
-	---@param side TransferSide
-	---@param transfer transfer
-	---@param team string?
-	---@param isMain boolean
-	---@return string?
-	local function parseRelevantRole(side, transfer, team, isMain)
-		if not team then
-			return nil
-		end
-
-		if isMain then
-			return side == Side.from and transfer.role1 or transfer.role2
-		else
-			return side == Side.from and transfer.extradata.role1sec or transfer.extradata.role2sec
-		end
-	end
-
-	local teamHistoryKey = self.config.team .. '_all_transfers'
-
-	---@type table<string, TeamHistoryEntry>
-	self.playersTeamHistory = Json.parseIfTable(pageVars:get(teamHistoryKey)) or {}
-
-	if Logic.isNotEmpty(self.playersTeamHistory) then
-		return
-	end
-
-	Lpdb.executeMassQuery(
-		'transfer',
-		{
-			conditions = self:_buildConditions(),
-			order = 'date asc, objectname desc',
-			limit = 5000
-		},
-		function(record)
-			self.playersTeamHistory[record.player] = self.playersTeamHistory[record.player] or {}
-			record.extradata = record.extradata or {}
-
-
-			local relevantFromTeam, isFromMain = parseRelevantTeam(Side.from, record)
-			local relevantToTeam, isToMain = parseRelevantTeam(Side.to, record)
-			local transferType = getTransferType(relevantFromTeam, relevantToTeam)
-
-			local fromRole = parseRelevantRole(Side.from, record, relevantFromTeam, isFromMain)
-			local toRole = parseRelevantRole(Side.to, record, relevantToTeam, isToMain)
-
-			-- For leave transfers: Pass on new team for display as next team
-			if transferType == SquadAuto.TransferType.LEAVE and Logic.isEmpty(relevantToTeam) then
-				if isFromMain then
-					relevantToTeam = Logic.nilIfEmpty(record.toteamtemplate)
-					toRole = Logic.nilIfEmpty(record.role2)
-				else
-					relevantToTeam = Logic.nilIfEmpty(record.extradata.toteamsectemplate)
-					toRole = Logic.nilIfEmpty(record.extradata.role2sec)
-				end
-			end
-
-			---@type TeamHistoryEntry
-			local entry = {
-				type = transferType,
-
-				-- Person related information
-				pagename = record.player,
-				displayname = record.extradata.displayname,
-				flag = record.nationality,
-
-				-- Date and references
-				date = record.date,
-				dateDisplay = record.extradata.displaydate,
-				references = record.reference,
-
-				-- Roles
-				fromRole = fromRole,
-				toRole = toRole,
-
-				fromTeam = relevantFromTeam,
-				toTeam = relevantToTeam,
-
-				-- Other
-				wholeTeam = Logic.readBool(record.wholeteam),
-				position = record.extradata.position,
-				faction = record.extradata.faction
-			}
-
-			-- Skip this transfer if there is no relevant change, i.e. the role in this team didn't change
-			-- E.g. this is grabbed by secondary team, but only main team changed
-			if relevantFromTeam == relevantToTeam
-					and entry.fromRole == entry.toRole then
-				return
-			end
-
-			table.insert(self.playersTeamHistory[record.player], entry)
-		end
-	)
-	pageVars:set(teamHistoryKey, Json.stringify(self.playersTeamHistory))
-end
-
----Builds the conditions to fetch all transfers related
----to the given team, respecting historical templates.
----@private
----@return string
-function SquadAuto:_buildConditions()
-	local conditions = Condition.Tree(BooleanOperator.any)
-	Array.forEach(self.config.teams, function (templatename)
-		conditions:add{
-			Condition.Node(Condition.ColumnName('fromteamtemplate'), Comparator.eq, templatename),
-			Condition.Node(Condition.ColumnName('extradata_fromteamsectemplate'), Comparator.eq, templatename),
-			Condition.Node(Condition.ColumnName('toteamtemplate'), Comparator.eq, templatename),
-			Condition.Node(Condition.ColumnName('extradata_toteamsectemplate'), Comparator.eq, templatename)
-		}
-	end)
-
-	return conditions:toString()
-end
-
----@private
 ---@return SquadAutoPerson[]
 function SquadAuto:_selectEntries()
 	return Array.filter(
 		Array.extend(
 			Array.flatMap(
 				Array.extractValues(self.playersTeamHistory),
-				FnUtil.curry(self._selectHistoryEntries, self)
+				FnUtil.curry(self._selectPersons, self)
 			),
 			self.manualPlayers
 		),
@@ -494,87 +299,45 @@ function SquadAuto:_selectEntries()
 	)
 end
 
----Returns a function that maps a set of transfers to a list of SquadAutoPersons.
+---Turns one person's team history into the squad rows that belong in this table.
 ---Behavior depends on the current config:
 ---If the status is (in)active, then at most one entry will be returned
 ---If the status is former(_inactive), there might be multiple entries returned
----If the type does not match, no entries are returned
 ---@private
 ---@param entries TeamHistoryEntry[]
 ---@return SquadAutoPerson[]
-function SquadAuto:_selectHistoryEntries(entries)
-	-- Select entries to match status
-	if self:_isStatus(SquadTypes.SquadStatus.ACTIVE) then
-		-- Only most recent transfer is relevant
-		local last = entries[#entries]
-		if (last.type == SquadAuto.TransferType.CHANGE or last.type == SquadAuto.TransferType.JOIN)
-				and last.toRole ~= ROLE_INACTIVE then
-			-- When the last transfer is a leave transfer, or the role is inactive, the person wouldn't be active
-			return {self:_mapToSquadPerson(last)}
-		end
+function SquadAuto:_selectPersons(entries)
+	local selection = SquadHistory.selectStints(entries, self.config.status)
+
+	SquadAuto._reportInvalidHistory(selection.warnings)
+
+	if selection.hasInactiveEntry then
+		-- FORMER_INACTIVE enables the Inactive Date display
+		self.config.status = SquadTypes.SquadStatus.FORMER_INACTIVE
 	end
 
-	if self:_isStatus(SquadTypes.SquadStatus.INACTIVE) then
-		local last, secondToLast = entries[#entries], entries[#entries - 1]
-		if secondToLast and last.type == SquadAuto.TransferType.CHANGE and last.toRole == ROLE_INACTIVE then
-			return {self:_mapToSquadPerson(secondToLast, last)}
-		end
-	end
-
-	if self:_isStatus(SquadTypes.SquadStatus.FORMER) or self:_isStatus(SquadTypes.SquadStatus.FORMER_INACTIVE) then
-		local history = {}
-
-		local joinEntry, inactiveEntry
-
-		Array.forEach(entries, function (entry)
-			if entry.type == SquadAuto.TransferType.JOIN then
-				if joinEntry then
-					mw.log('Invalid transfer history for player ' .. entry.pagename)
-					mw.logObject(entry, 'Invalid entry: Duplicate JOIN. Skipping')
-					mw.ext.TeamLiquidIntegration.add_category('SquadAuto with invalid player history')
-					return
-				end
-				joinEntry = entry
-				return
-			end
-			if not joinEntry then
-				mw.log('Invalid transfer history for player ' .. entry.pagename)
-				mw.logObject(entry, 'Invalid entry: Missing previous JOIN. Skipping')
-				mw.ext.TeamLiquidIntegration.add_category('SquadAuto with invalid player history')
-				return
-			end
-
-			if entry.type == SquadAuto.TransferType.CHANGE and entry.toRole == ROLE_INACTIVE then
-				-- FORMER_INACTIVE enables the Inactive Date display
-				self.config.status = SquadTypes.SquadStatus.FORMER_INACTIVE
-				inactiveEntry = entry
-				return
-			end
-
-			table.insert(history, self:_mapToSquadPerson(joinEntry, inactiveEntry, entry))
-			joinEntry = nil
-			inactiveEntry = nil
-
-			if entry.type == SquadAuto.TransferType.CHANGE then
-				joinEntry = entry
-			end
-		end)
-
-		return history
-	end
-
-	return {}
+	return Array.map(selection.stints, FnUtil.curry(SquadAuto._mapToSquadPerson, self))
 end
 
----Maps one or a pair of TeamHistoryEntries to a single SquadAutoPerson
+---Logs the transfers that could not be fitted into a person's history, and categorizes the page.
 ---@private
----@param joinEntry TeamHistoryEntry
----@param inactiveEntry TeamHistoryEntry | nil
----@param leaveEntry TeamHistoryEntry | nil
+---@param warnings SquadHistoryWarning[]
+function SquadAuto._reportInvalidHistory(warnings)
+	Array.forEach(warnings, function (warning)
+		mw.log('Invalid transfer history for player ' .. warning.entry.pagename)
+		mw.logObject(warning.entry, warning.reason)
+		mw.ext.TeamLiquidIntegration.add_category(INVALID_HISTORY_CATEGORY)
+	end)
+end
+
+---Maps a stint on the team to a single SquadAutoPerson
+---@private
+---@param stint SquadStint
 ---@return SquadAutoPerson
-function SquadAuto:_mapToSquadPerson(joinEntry, inactiveEntry, leaveEntry)
-	inactiveEntry = inactiveEntry or {}
-	leaveEntry = leaveEntry or {}
+function SquadAuto:_mapToSquadPerson(stint)
+	local joinEntry = stint.joinEntry
+	local inactiveEntry = stint.inactiveEntry or {}
+	local leaveEntry = stint.leaveEntry or {}
 
 	local joinReference = TransferRefs.useReferences(joinEntry.references, joinEntry.date)
 	local inactiveReference = TransferRefs.useReferences(inactiveEntry.references, inactiveEntry.date)
@@ -636,7 +399,7 @@ function SquadAuto:_mapToSquadPerson(joinEntry, inactiveEntry, leaveEntry)
 
 	-- On leave: Fetch the next team a person joined
 	if Logic.isNotEmpty(leaveEntry) and Logic.isEmpty(entry.newteam) then
-		local newTeam, newRole, newDate = SquadAuto._fetchNextTeam(joinEntry.pagename, leaveEntry.date)
+		local newTeam, newRole, newDate = SquadTransferHistory.fetchNextTeam(joinEntry.pagename, leaveEntry.date)
 		if newTeam then
 			entry.newteam = newTeam
 			entry.newteamrole = newRole
@@ -645,31 +408,6 @@ function SquadAuto:_mapToSquadPerson(joinEntry, inactiveEntry, leaveEntry)
 	end
 
 	return entry
-end
-
----Fetches the next team a person joined after a given date
----@private
----@param pagename string
----@param date string
----@return string? newTeam
----@return string? newRole
----@return string? newDate
-function SquadAuto._fetchNextTeam(pagename, date)
-	local conditions = Condition.Tree(BooleanOperator.all)
-		:add{
-			Condition.Util.anyOf(Condition.ColumnName('player'), {pagename, (string.gsub(pagename, ' ', '_'))}),
-			Condition.Node(Condition.ColumnName('date'), Comparator.ge, date),
-			Condition.Node(Condition.ColumnName('toteamtemplate'), Comparator.neq, ''),
-		}
-
-	local transfer = mw.ext.LiquipediaDB.lpdb('transfer', {
-		conditions = conditions:toString(),
-		limit = 1,
-		order = 'date asc, objectname desc',
-		query = 'toteamtemplate, role2, date'
-	})[1] or {}
-
-	return transfer.toteamtemplate, transfer.role2, transfer.date
 end
 
 ---Sorts a list of persons
