@@ -130,7 +130,6 @@ function MapFunctions.getExtraData(match, map, opponents)
 		bestof = map.bestof,
 		maptype = map.maptype,
 		firstpick = FIRST_PICK_CONVERSION[string.lower(map.firstpick or '')],
-		bans = getBans(map, #opponents),
 	}
 
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, BrawlerNames)
