@@ -11,11 +11,11 @@ Author(s): FO-nTTaX
 /*******************************************************************************
 Temporary show/hide during MW/LH Migrations
 *******************************************************************************/
-body:not( .mediawiki ) .hide-when-mediawiki {
+body:not( .mediawiki ) .hide-when-lighthouse {
 	display: none;
 }
 
-body.mediawiki .hide-when-lighthouse {
+body.mediawiki .hide-when-mediawiki {
 	display: none;
 }
 
