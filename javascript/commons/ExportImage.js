@@ -1,4 +1,4 @@
-/* global html2canvas */
+/* global snapdom */
 
 /*******************************************************************************
  * Description: Adds export functionality to Liquipedia pages, enabling users
@@ -465,38 +465,49 @@ class CanvasComposer {
 class ExportService {
 	constructor( canvasComposer ) {
 		this.canvasComposer = canvasComposer;
-		this.html2canvasLoaded = false;
+		this.snapdomLoaded = false;
 		this.activeExports = new Set();
 	}
 
-	applyCloneFixes( clonedDoc ) {
-		this.hideInfoIcons( clonedDoc );
-		this.removeContentSwitchers( clonedDoc );
-		this.removePrizepoolToggles( clonedDoc );
-		this.expandPrizepoolTables( clonedDoc );
+	// clonedRoot is the specific element being captured, not a full document, so
+	// selectors below must also check the root itself, not just its descendants.
+	queryAllIncludingSelf( clonedRoot, selector ) {
+		const matches = [ ...clonedRoot.querySelectorAll( selector ) ];
+		if ( clonedRoot.matches( selector ) ) {
+			matches.push( clonedRoot );
+		}
+		return matches;
+	}
+
+	applyCloneFixes( clonedRoot ) {
+		this.hideInfoIcons( clonedRoot );
+		this.removeContentSwitchers( clonedRoot );
+		this.removePrizepoolToggles( clonedRoot );
+		this.expandPrizepoolTables( clonedRoot );
 	}
 
 	// Hides info icons that shouldn't appear in exports
-	hideInfoIcons( clonedDoc ) {
-		const infoIcons = clonedDoc.querySelectorAll( '.brkts-match-info-icon' );
+	hideInfoIcons( clonedRoot ) {
+		const infoIcons = this.queryAllIncludingSelf( clonedRoot, '.brkts-match-info-icon' );
 		for ( const icon of infoIcons ) {
 			icon.style.opacity = '0';
 		}
 	}
 
 	// Remove toggle switches
-	removeContentSwitchers( clonedDoc ) {
-		const contentSwitches = clonedDoc.querySelectorAll( '.switch-pill-container' );
+	removeContentSwitchers( clonedRoot ) {
+		const contentSwitches = this.queryAllIncludingSelf( clonedRoot, '.switch-pill-container' );
 
 		for ( const contentSwitch of contentSwitches ) {
 			contentSwitch.remove();
 		}
 	}
 
-	removePrizepoolToggles( clonedDoc ) {
+	removePrizepoolToggles( clonedRoot ) {
 		// The legacy in-table toggle and the redesigned table's footer (now inside the
 		// captured wrapper) shouldn't appear in a static export.
-		const prizepoolToggles = clonedDoc.querySelectorAll(
+		const prizepoolToggles = this.queryAllIncludingSelf(
+			clonedRoot,
 			'.prizepooltabletoggle, .prizepool-table-wrapper .table2__footer'
 		);
 
@@ -506,8 +517,8 @@ class ExportService {
 	}
 
 	// Cut placements are hidden by `.collapsed` on the wrapper; expand so they export.
-	expandPrizepoolTables( clonedDoc ) {
-		const collapsedTables = clonedDoc.querySelectorAll( '.prizepool-table-wrapper.collapsed' );
+	expandPrizepoolTables( clonedRoot ) {
+		const collapsedTables = this.queryAllIncludingSelf( clonedRoot, '.prizepool-table-wrapper.collapsed' );
 
 		for ( const collapsedTable of collapsedTables ) {
 			collapsedTable.classList.remove( 'collapsed' );
@@ -524,7 +535,7 @@ class ExportService {
 		this.activeExports.add( exportId );
 
 		try {
-			await this.ensureHtml2CanvasLoaded();
+			await this.ensureSnapdomLoaded();
 
 			if ( mode === 'copy' ) {
 				await this.copyToClipboard( element, title );
@@ -539,24 +550,37 @@ class ExportService {
 		}
 	}
 
+	// Snapdom has no pre-capture mutation hook, so applyCloneFixes() runs against
+	// this offscreen clone instead of the live element.
+	createCaptureClone( element ) {
+		const clone = element.cloneNode( true );
+		clone.style.position = 'fixed';
+		clone.style.top = '-99999px';
+		clone.style.left = '-99999px';
+		clone.style.width = `${ element.getBoundingClientRect().width }px`;
+		document.body.appendChild( clone );
+		return clone;
+	}
+
 	async generateImageBlob( element, title ) {
 		const originalBackground = element.style.background;
 		const isDarkTheme = document.documentElement.classList.contains( 'theme--dark' );
 		const backgroundColor = this.getBackgroundColor();
 		// This ensures the scale is at least 2, but never higher than 3
 		const scale = Math.min( Math.max( window.devicePixelRatio || 1, 2 ), 3 );
+		let captureClone;
 
 		try {
 			element.style.background = backgroundColor;
 
-			const capturedCanvas = await html2canvas( element, {
+			const captureStart = performance.now();
+
+			captureClone = this.createCaptureClone( element );
+			this.applyCloneFixes( captureClone );
+
+			const capturedCanvas = await snapdom.toCanvas( captureClone, {
 				scale: scale,
-				windowWidth: 1440,
-				windowHeight: document.documentElement.scrollHeight,
-				scrollX: 0,
-				scrollY: 0,
-				backgroundColor: backgroundColor,
-				onclone: ( clonedDoc ) => this.applyCloneFixes( clonedDoc )
+				backgroundColor: backgroundColor
 			} );
 
 			if ( capturedCanvas.width === 0 || capturedCanvas.height === 0 ) {
@@ -581,6 +605,9 @@ class ExportService {
 			} );
 		} finally {
 			element.style.background = originalBackground;
+			if ( captureClone ) {
+				captureClone.remove();
+			}
 		}
 	}
 
@@ -618,14 +645,14 @@ class ExportService {
 		}, EXPORT_IMAGE_CONFIG.TIMEOUTS.URL_REVOKE_DELAY );
 	}
 
-	async ensureHtml2CanvasLoaded() {
-		if ( this.html2canvasLoaded ) {
+	async ensureSnapdomLoaded() {
+		if ( this.snapdomLoaded ) {
 			return;
 		}
 
 		return new Promise( ( resolve ) => {
-			mw.loader.using( 'html2canvas', () => {
-				this.html2canvasLoaded = true;
+			mw.loader.using( 'snapdom', () => {
+				this.snapdomLoaded = true;
 				resolve();
 			} );
 		} );
@@ -958,7 +985,7 @@ class DropdownWidget {
 
 		button.addEventListener( 'click', () => {
 			if ( menuElement.style.display === 'none' ) {
-				this.exportService.ensureHtml2CanvasLoaded();
+				this.exportService.ensureSnapdomLoaded();
 				if ( onOpen ) {
 					onOpen();
 				}
