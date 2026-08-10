@@ -21,6 +21,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local Widget = Lua.import('Module:Widget')
 
@@ -119,19 +120,6 @@ function SeriesChildFromLpdb:_makeConditions()
 
 	serieses = Array.map(serieses, prepPageName)
 
-	---@param key string
-	---@param items string[]
-	---@return ConditionTree?
-	local multiValueCondition = function(key, items)
-		if Logic.isEmpty(items) then return end
-
-		return ConditionTree(BooleanOperator.any):add(
-			Array.map(items, function(item)
-				return ConditionNode(ColumnName(key), Comparator.eq, item)
-			end)
-		)
-	end
-
 	local year = tonumber(props.year)
 
 	local tierTypes = Json.parseIfTable(props.tierType) or {props.tierType}
@@ -141,10 +129,10 @@ function SeriesChildFromLpdb:_makeConditions()
 
 
 	return ConditionTree(BooleanOperator.all):add(Array.append({},
-		multiValueCondition('seriespage', serieses),
-		multiValueCondition('liquipediatier', Json.parseIfTable(props.tier) or {props.tier}),
-		multiValueCondition('liquipediatiertype', tierTypes),
-		multiValueCondition('mode', Json.parseIfTable(props.mode) or {props.mode}),
+		ConditionUtil.anyOf('seriespage', serieses),
+		ConditionUtil.anyOf('liquipediatier', Json.parseIfTable(props.tier) or {props.tier}),
+		ConditionUtil.anyOf('liquipediatiertype', tierTypes),
+		ConditionUtil.anyOf('mode', Json.parseIfTable(props.mode) or {props.mode}),
 		year and ConditionNode(ColumnName('enddate_year'), Comparator.eq, year) or nil,
 		props.edate and ConditionNode(ColumnName('enddate'), Comparator.le, props.edate) or nil,
 		props.sdate and ConditionNode(ColumnName('startdate'), Comparator.ge, props.sdate) or nil
