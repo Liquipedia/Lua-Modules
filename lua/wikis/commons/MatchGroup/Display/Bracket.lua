@@ -410,8 +410,7 @@ function BracketDisplay.NodeHeader(props)
 	return Html.Div{
 		classes = {'brkts-round-header'},
 		css = {
-			['--header-margin'] = config.headerMargin .. 'px',
-			['--match-margin'] = config.matchMargin .. 'px',
+			margin = config.headerMargin .. 'px 0 ' .. math.max(0, config.headerMargin - config.matchMargin) .. 'px'
 		},
 		children = headers
 	}
