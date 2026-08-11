@@ -345,7 +345,7 @@ describe('opponent', function()
 				Opponent.fromMatch2Record(Config.exampleMatch2RecordTeam))
 			)
 
-			assert.is_true(Opponent.same(
+			assert.is_false(Opponent.same(
 				Opponent.readOpponentArgs{type = 'team', 'bds esport old'},
 				Opponent.readOpponentArgs{type = 'team', 'bds'}
 			))
@@ -375,13 +375,23 @@ describe('opponent', function()
 		it('same team opponents', function ()
 			TeamTemplateMock.setUp()
 
-			assert.is_true(Opponent.same(
+			assert.is_false(Opponent.same(
 				Opponent.resolve(Opponent.readOpponentArgs{
 					template = 'sk telecom t1 orig',
 					type = 'team',
 				}),
 				Opponent.resolve(Opponent.readOpponentArgs{
 					template = 't1 2019',
+					type = 'team',
+				})
+			))
+			assert.is_true(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{
+					template = 'sk telecom t1',
+					type = 'team',
+				}),
+				Opponent.resolve(Opponent.readOpponentArgs{
+					template = 't1',
 					type = 'team',
 				})
 			))
