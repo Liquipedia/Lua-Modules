@@ -107,7 +107,7 @@ function PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, lpdbPrefix)
 		objectName = objectName .. '_' .. lpdbPrefix
 	end
 	if lpdbEntry.opponenttype == Opponent.team then
-		local team = TeamTemplate.getPageNameNoRedirect(participant.opponent.template)
+		local team = TeamTemplate.getPageNameNoRedirect(lpdbEntry.opponenttemplate)
 		return objectName .. '_' .. mw.ustring.lower(team)
 	end
 	-- for non team opponents the pagename can be case sensitive
