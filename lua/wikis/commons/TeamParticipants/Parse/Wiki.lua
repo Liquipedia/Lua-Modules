@@ -202,7 +202,9 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 
 	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
 	table.insert(aliases, Opponent.toName(opponent))
-	table.insert(aliases, unresolvedTeamTemplate)
+	if unresolvedTeamTemplate then
+		table.insert(aliases, unresolvedTeamTemplate)
+	end
 
 	return {
 		opponent = opponent,
