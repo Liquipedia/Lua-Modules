@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
-local BracketLineNode = Lua.import('Module:Widget/Match/Bracket/LineNode')
 
 ---@class BracketQualifiedProps
 ---@field OpponentEntry Component<BracketOpponentEntryProps>
