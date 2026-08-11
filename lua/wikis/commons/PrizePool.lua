@@ -16,6 +16,7 @@ local Import = Lua.import('Module:PrizePool/Import')
 local BasePrizePool = Lua.import('Module:PrizePool/Base')
 local Placement = Lua.import('Module:PrizePool/Placement')
 
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Html = Lua.import('Module:Widget/Html')
@@ -106,7 +107,8 @@ function PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, lpdbPrefix)
 		objectName = objectName .. '_' .. lpdbPrefix
 	end
 	if lpdbEntry.opponenttype == Opponent.team then
-		return objectName .. '_' .. mw.ustring.lower(lpdbEntry.participant)
+		local team = TeamTemplate.getPageNameNoRedirect(participant.opponent.template)
+		return objectName .. '_' .. mw.ustring.lower(team)
 	end
 	-- for non team opponents the pagename can be case sensitive
 	-- so objectname needs to be case sensitive to avoid edge cases
