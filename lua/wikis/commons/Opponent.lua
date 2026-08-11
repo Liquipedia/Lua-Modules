@@ -243,6 +243,9 @@ end
 ---       - Same historical template (when unresolved)
 ---       - Same historical template by pagename (when resolved)
 ---       - Does not check pagename after resolving redirects
+---   - Party:
+---       - Matching sorted list of player pagenames
+---       - From input, no extra resolving of redirects
 ---@param opponent1 standardOpponent
 ---@param opponent2 standardOpponent
 ---@return boolean
