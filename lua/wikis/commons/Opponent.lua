@@ -268,8 +268,8 @@ function Opponent.same(opponent1, opponent2)
 
 		-- When both templates are resolved, use their pagename to get back to the
 		-- top-level historical template and compare
-		local opponent1Historical = TeamTemplate.getRaw(template1.pagename).historicaltemplate
-		local opponent2Historical = TeamTemplate.getRaw(template2.pagename).historicaltemplate
+		local opponent1Historical = TeamTemplate.getRaw(template1.page).historicaltemplate
+		local opponent2Historical = TeamTemplate.getRaw(template2.page).historicaltemplate
 		if Logic.isEmpty(opponent1Historical) or Logic.isEmpty(opponent2Historical) then
 			return false
 		end
