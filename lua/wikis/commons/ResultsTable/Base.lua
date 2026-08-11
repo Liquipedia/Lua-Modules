@@ -607,6 +607,7 @@ function BaseResultsTable:createTournamentCells(placement)
 			attributes = {
 				['data-sort-value'] = tournamentDisplayName
 			},
+			nowrap = false,
 			children = LinkWidget{
 				children = tournamentDisplayName,
 				link = placement.pagename,
