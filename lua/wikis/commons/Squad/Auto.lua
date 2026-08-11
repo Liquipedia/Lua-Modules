@@ -657,7 +657,7 @@ end
 function SquadAuto._fetchNextTeam(pagename, date)
 	local conditions = Condition.Tree(BooleanOperator.all)
 		:add{
-			Condition.Util.anyOf(Condition.ColumnName('player'), {pagename, string.gsub(pagename, ' ', '_')}),
+			Condition.Util.anyOf(Condition.ColumnName('player'), {pagename, (string.gsub(pagename, ' ', '_'))}),
 			Condition.Node(Condition.ColumnName('date'), Comparator.ge, date),
 			Condition.Node(Condition.ColumnName('toteamtemplate'), Comparator.neq, ''),
 		}
