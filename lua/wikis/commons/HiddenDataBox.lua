@@ -168,23 +168,13 @@ function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 		return
 	end
 
-	-- TODO: An improvement would be called TeamCard module for this
-	-- Would need a rework for the function that does it however
-	local participant = placement.opponentname
-	local participantResolved = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
-
-	local aliases = Array.map((placement.extradata or {}).opponentaliases or {}, TeamTemplate.getPageName)
-	aliases = Array.extend(aliases,
-		placement.extradata.opponentaliases or {},
-		Array.map(aliases, String.upperCaseFirst),
-		participant,
-		participant ~= participantResolved and participantResolved or nil
-	)
-	aliases = Array.unique(aliases)
+	-- TODO: Share functionality with TeamParticipants module
+	local aliases = Array.map((placement.extradata or {}).opponentaliases or {})
 
 	Table.iter.forEachPair(placement.opponentplayers or {}, function(key, value)
 		Array.forEach(aliases, function(alias)
 			Variables.varDefine(alias .. '_' .. key, value)
+			Variables.varDefine(alias:gsub(' ', '_') .. '_' .. key, value)
 		end)
 	end)
 end
