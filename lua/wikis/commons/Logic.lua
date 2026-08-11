@@ -133,9 +133,11 @@ end
 
 ---Tries to execute a function.
 ---If it fails executes a catch function
----@param try function
+---@generic T
+---@param try fun(): T
 ---@param catch function
----@return any?
+---@return T?
+---@overload fun(try: fun(), catch: function)
 function Logic.tryCatch(try, catch)
 	local ran, result = pcall(try)
 	if not ran then
