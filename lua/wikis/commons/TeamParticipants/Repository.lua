@@ -56,6 +56,7 @@ function TeamParticipantsRepository.save(participant)
 
 	local function generateObjectName()
 		local team = TeamTemplate.getPageNameNoRedirect(participant.opponent.template)
+		assert(team, "Failed to fetch template pagename")
 		local isTbd = Opponent.isTbd(participant.opponent)
 
 		if not isTbd then
