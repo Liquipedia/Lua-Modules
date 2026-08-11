@@ -393,20 +393,27 @@ function BracketDisplay.NodeHeader(props)
 		return nil
 	end
 
+	---@type VNode[]
+	local headers = {}
+	local cursorRoundIx = 1
+
+	Array.forEach(headerRow, function (cell)
+		table.insert(headers, BracketMatchHeader{
+			header = cell.header,
+			height = config.headerHeight,
+			hasBracketReset = cell.hasBrMatch,
+			skipRound = cell.roundIx - cursorRoundIx,
+		})
+		cursorRoundIx = cell.roundIx + 1
+	end)
+
 	return Html.Div{
 		classes = {'brkts-round-header'},
 		css = {
 			['--header-margin'] = config.headerMargin .. 'px',
 			['--match-margin'] = config.matchMargin .. 'px',
 		},
-		children = Array.map(headerRow, function (cell, cursorRoundIx)
-			return BracketMatchHeader{
-				header = cell.header,
-				height = config.headerHeight,
-				hasBracketReset = cell.hasBrMatch,
-				skipRound = cell.roundIx - cursorRoundIx,
-			}
-		end)
+		children = headers
 	}
 end
 
