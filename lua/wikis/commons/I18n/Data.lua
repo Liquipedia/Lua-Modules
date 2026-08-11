@@ -133,7 +133,7 @@ return {
 		['mainpage-button-players-link'] = 'Portal:Players',
 		['mainpage-button-transfers-title'] = 'Transfers',
 		['mainpage-button-transfers-link'] = 'Portal:Transfers',
-		
+
 		['mainpage-block-usefulArticles-title'] = 'Useful Articles',
 		['mainpage-block-wantToHelp-title'] = 'Want To Help?',
 		['mainpage-block-transfers-title'] = 'Transfers',
@@ -152,7 +152,7 @@ return {
 			'This wiki currently covers esports and game content, ' ..
 			'containing over ${articleCount} articles ' ..
 			'managed by ${activeUsersCount} active users.',
-		
+
 		['dota2-mainpage-hub-button'] = 'Click here to get to the ',
 		['dota2-mainpage-hub-main-title'] = 'Main Page',
 		['dota2-mainpage-hub-main-link'] = 'Main Page',
@@ -160,7 +160,7 @@ return {
 		['dota2-mainpage-hub-esports-link'] = 'Portal:Esports',
 		['dota2-mainpage-hub-game-title'] = 'Game Hub',
 		['dota2-mainpage-hub-game-link'] = 'Portal:Game',
-		
+
 		['dota2-mainpage-button-heroes-title'] = 'Heroes',
 		['dota2-mainpage-button-heroes-link'] = 'Heroes',
 		['dota2-mainpage-button-items-title'] = 'Items',
@@ -172,7 +172,7 @@ return {
 		['dota2-mainpage-button-cosmetics-link'] = 'Cosmetics',
 		['dota2-mainpage-button-updates-title'] = 'Updates',
 		['dota2-mainpage-button-updates-link'] = 'Updates',
-		
+
 		['dota2-mainpage-block-heroes-title'] = 'Heroes',
 		['dota2-mainpage-block-updates-title'] = 'Updates',
 		['dota2-mainpage-block-partnerWikis-title'] = 'Partner Wikis',
@@ -323,7 +323,7 @@ return {
 			'Эта вики содержит в себе информацию об игре и её киберспорте, ' ..
 			'насчитывая ${articleCount} статей, ' ..
 			'за которыми следят ${activeUsersCount} активных пользователей.',
-		
+
 		['dota2-mainpage-hub-button'] = 'Нажмите, чтобы открыть ',
 		['dota2-mainpage-hub-main-title'] = 'Заглавная',
 		['dota2-mainpage-hub-main-link'] = 'Заглавная страница',
@@ -331,7 +331,7 @@ return {
 		['dota2-mainpage-hub-esports-link'] = 'Портал:Киберспорт',
 		['dota2-mainpage-hub-game-title'] = 'Портал Игра',
 		['dota2-mainpage-hub-game-link'] = 'Портал:Игра',
-		
+
 		['dota2-mainpage-button-heroes-title'] = 'Герои',
 		['dota2-mainpage-button-heroes-link'] = 'Герои',
 		['dota2-mainpage-button-items-title'] = 'Предметы',
@@ -343,7 +343,7 @@ return {
 		['dota2-mainpage-button-cosmetics-link'] = 'Косметические предметы',
 		['dota2-mainpage-button-updates-title'] = 'Обновления',
 		['dota2-mainpage-button-updates-link'] = 'Обновления',
-		
+
 		['dota2-mainpage-block-heroes-title'] = 'Герои',
 		['dota2-mainpage-block-updates-title'] = 'Обновления',
 		['dota2-mainpage-block-partnerWikis-title'] = 'Вики-партнёры',
