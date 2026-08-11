@@ -161,10 +161,10 @@ function BracketDisplay.Bracket(props)
 					matchId = matchId,
 					matchesById = props.bracket.matchesById,
 				}
-				return {
+				return WidgetUtil.collect(
 					BracketDisplay.NodeHeader(nodeProps),
-					BracketDisplay.NodeBody(nodeProps),
-				}
+					BracketDisplay.NodeBody(nodeProps)
+				)
 			end)
 		}
 	}
