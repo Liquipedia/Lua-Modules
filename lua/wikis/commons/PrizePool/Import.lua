@@ -115,18 +115,13 @@ function Import._getConfig(args, placements)
 		placementsToSkip = tonumber(args.placementsToSkip),
 		matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(args)
 			or TournamentStructure.currentPageSpec(),
-		groupElimStatuses = Array.map(
-			mw.text.split(args.groupElimStatuses or DEFAULT_ELIMINATION_STATUS, ','),
-			String.trim
-		),
+		groupElimStatuses = Array.parseCommaSeparatedString(args.groupElimStatuses or DEFAULT_ELIMINATION_STATUS),
 		groupScoreDelimiter = args.groupScoreDelimiter or GROUPSCORE_DELIMITER,
 		allGroupsUseWdl = Logic.readBool(args.allGroupsUseWdl),
 		stageImportLimits = processStagesConfig('importLimit', tonumber),
 		stagePlacementsToSkip = processStagesConfig('placementsToSkip', tonumber),
 		stageImportWinners = processStagesConfig('importWinners', Logic.readBoolOrNil),
-		stageGroupElimStatuses = processStagesConfig('groupElimStatuses', function(val)
-			return Array.map(mw.text.split(val, ','), String.trim)
-		end),
+		stageGroupElimStatuses = processStagesConfig('groupElimStatuses', Array.parseCommaSeparatedString),
 		shiftPlacementsBy = tonumber(args.shiftPlacementsBy) or 0,
 	}
 end
@@ -737,7 +732,7 @@ end
 ---@param entry BasePlacementOpponent
 ---@return BasePlacementOpponent
 function Import._removeDefaultDate(entry)
-	local date = DateExt.nilIfDefaultTimestamp(entry.date)
+	local date = DateExt.nilIfDefaultTimestamp(entry.date) or DateExt.getContextualDate()
 	---as input was not integer can not get integer back
 	---@cast date -integer
 	entry.date = date

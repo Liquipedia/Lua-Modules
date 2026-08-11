@@ -42,5 +42,10 @@ return {
 				storeFromWikiCode = true,
 			},
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchdiff', 'gamediff'},
+			},
+		},
 	},
 }
