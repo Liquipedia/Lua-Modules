@@ -234,6 +234,15 @@ function Opponent.isOpponent(opponent)
 end
 
 ---Check if two opponents are the same opponent
+---Comparison based on:
+---   - Must be of same type
+---   - Same when same reference
+---   - Literal: Same (raw) name
+---   - Team:
+---       - Same (unresolved/resolved) template
+---       - Same historical template (when unresolved)
+---       - Same historical template by pagename (when resolved)
+---       - Does not check pagename after resolving redirects
 ---@param opponent1 standardOpponent
 ---@param opponent2 standardOpponent
 ---@return boolean
@@ -248,8 +257,19 @@ function Opponent.same(opponent1, opponent2)
 		if opponent1.template == opponent2.template then
 			return true
 		end
-		local opponent1Historical = TeamTemplate.getRaw(opponent1.template).historicaltemplate
-		local opponent2Historical = TeamTemplate.getRaw(opponent2.template).historicaltemplate
+
+		local template1 = TeamTemplate.getRaw(opponent1.template)
+		local template2 = TeamTemplate.getRaw(opponent2.template)
+
+		-- When both templates are unresolved, and have the same historical template (non-empty), they are same
+		if not Logic.isEmpty(template1.historicaltemplate) and template1.historicaltemplate == template2.historicaltemplate then
+			return true
+		end
+
+		-- When both templates are resolved, use their pagename to get back to the
+		-- top-level historical template and compare
+		local opponent1Historical = TeamTemplate.getRaw(template1.pagename).historicaltemplate
+		local opponent2Historical = TeamTemplate.getRaw(template2.pagename).historicaltemplate
 		if Logic.isEmpty(opponent1Historical) or Logic.isEmpty(opponent2Historical) then
 			return false
 		end
