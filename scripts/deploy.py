@@ -90,7 +90,7 @@ def build_argument_parser() -> argparse.ArgumentParser:
 
 
 def handle_renamed_files(
-    dev_environment: Optional[str], lua_files_from_args: list[pathlib.Path]
+    dev_environment: Optional[str], lua_files_from_args: list[pathlib.Path], reason: str
 ):
     if dev_environment is not None or len(lua_files_from_args) == 0:
         # Suppress move entirely for dev deploys and auto resyncs
@@ -136,7 +136,7 @@ def handle_renamed_files(
                     "to": new_wiki_page_name,
                     "noredirect": "1",
                     "token": session.token,
-                    "reason": f"Git: {get_git_deploy_reason()}",
+                    "reason": f"Git: {reason}",
                 },
             )
         print("::endgroup::")
@@ -181,7 +181,7 @@ def main():
             lua_files = parsed_args.lua_files
         git_deploy_reason = get_git_deploy_reason()
 
-    handle_renamed_files(dev_environment, parsed_args.lua_files)
+    handle_renamed_files(dev_environment, parsed_args.lua_files, git_deploy_reason)
 
     for wiki, files in itertools.groupby(sorted(lua_files), lambda path: path.parts[2]):
         all_modules_deployed &= deploy_all_files_for_wiki(
