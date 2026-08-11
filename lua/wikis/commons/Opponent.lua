@@ -262,7 +262,8 @@ function Opponent.same(opponent1, opponent2)
 		local template2 = TeamTemplate.getRaw(opponent2.template)
 
 		-- When both templates are unresolved, and have the same historical template (non-empty), they are same
-		if not Logic.isEmpty(template1.historicaltemplate) and template1.historicaltemplate == template2.historicaltemplate then
+		if not Logic.isEmpty(template1.historicaltemplate)
+				and template1.historicaltemplate == template2.historicaltemplate then
 			return true
 		end
 
