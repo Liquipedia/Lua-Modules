@@ -78,16 +78,16 @@ end
 function OpponentDisplay.InlinePlayers(props)
 	local opponent = props.opponent
 
-	local playerTexts = Array.map(opponent.players, function(player)
+	local playerNodes = Array.map(opponent.players, function(player)
 		return PlayerDisplay.InlinePlayer(Table.merge(props, {player = player}))
 	end)
 
 	if props.flip then
-		playerTexts = Array.reverse(playerTexts)
+		playerNodes = Array.reverse(playerNodes)
 	end
 
 	return Html.Span{
-		children = Array.interleave(playerTexts, ' / ')
+		children = Array.interleave(playerNodes, ' / ')
 	}
 end
 
