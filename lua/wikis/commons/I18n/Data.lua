@@ -222,7 +222,7 @@ return {
 				= '${startDate} ${startMonth} ${startYear} – ${endDate} ${endMonth} ${endYear}',
 
 		['date-range-year-month-day--month-day'] = '${startDate} ${startMonth} – ${endDate} ${endMonth} ${startYear}',
-		['date-range-year-month-day--month-unknown_day'] = '${startDate} ${startMonth} –  Б/О, ${endMonth} ${startYear}',
+		['date-range-year-month-day--month-unknown_day'] = '${startDate} ${startMonth} – Б/О, ${endMonth} ${startYear}',
 		['date-range-year-month-day--day'] = '${startDate}–${endDate} ${startMonth} ${startYear}',
 
 		-- Dates: ticker variant (hidden years) / Даты: Без отображения года
