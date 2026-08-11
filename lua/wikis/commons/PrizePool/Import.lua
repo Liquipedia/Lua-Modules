@@ -643,14 +643,18 @@ function Import:_formatGroupScore(lpdbEntry)
 end
 
 ---@param opponentData standardOpponent
----@return string
+---@return string|number
 ---@overload fun(opponentData: nil): nil
 function Import._getScore(opponentData)
 	if not opponentData then
 		return nil
 	end
 
-	return OpponentDisplay.InlineScore(opponentData)
+	if opponentData.status ~= SCORE_STATUS then
+		return opponentData.status
+	end
+
+	return tonumber(OpponentDisplay.InlineScore(opponentData)) or opponentData.score
 end
 
 ---@param lpdbEntry table
