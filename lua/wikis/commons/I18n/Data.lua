@@ -124,7 +124,24 @@ return {
 		-- Shop Merch
 		['shop-merch-support-text'] = 'Purchases through this link support Liquipedia.',
 
-		-- Dota 2 Main Page
+		-- MainPage
+		['mainpage-button-tournaments-title'] = 'Tournaments',
+		['mainpage-button-tournaments-link'] = 'Portal:Tournaments',
+		['mainpage-button-teams-title'] = 'Teams',
+		['mainpage-button-teams-link'] = 'Portal:Teams',
+		['mainpage-button-players-title'] = 'Players',
+		['mainpage-button-players-link'] = 'Portal:Players',
+		['mainpage-button-transfers-title'] = 'Transfers',
+		['mainpage-button-transfers-link'] = 'Portal:Transfers',
+		
+		['mainpage-block-usefulArticles-title'] = 'Useful Articles',
+		['mainpage-block-wantToHelp-title'] = 'Want To Help?',
+		['mainpage-block-transfers-title'] = 'Transfers',
+		['mainpage-block-matches-title'] = 'Matches',
+		['mainpage-block-tournaments-title'] = 'Tournaments',
+		['mainpage-block-rankings-title'] = 'Liquipedia Rankings',
+
+		-- dota2: MainPage
 		['dota2-mainpage-title'] = 'The Dota 2 Wiki',
 		['dota2-mainpage-metadesc'] = 'Comprehensive Dota 2 wiki with articles covering ' ..
 			'everything from heroes and items, to strategies, ' ..
@@ -135,6 +152,7 @@ return {
 			'This wiki currently covers esports and game content, ' ..
 			'containing over ${articleCount} articles ' ..
 			'managed by ${activeUsersCount} active users.',
+		
 		['dota2-mainpage-hub-button'] = 'Click here to get to the ',
 		['dota2-mainpage-hub-main-title'] = 'Main Page',
 		['dota2-mainpage-hub-main-link'] = 'Main Page',
@@ -142,15 +160,7 @@ return {
 		['dota2-mainpage-hub-esports-link'] = 'Portal:Esports',
 		['dota2-mainpage-hub-game-title'] = 'Game Hub',
 		['dota2-mainpage-hub-game-link'] = 'Portal:Game',
-		['dota2-mainpage-block-heroes-title'] = 'Heroes',
-		['dota2-mainpage-block-updates-title'] = 'Updates',
-		['dota2-mainpage-block-usefulArticles-title'] = 'Useful Articles',
-		['dota2-mainpage-block-wantToHelp-title'] = 'Want To Help?',
-		['dota2-mainpage-block-transfers-title'] = 'Transfers',
-		['dota2-mainpage-block-matches-title'] = 'Matches',
-		['dota2-mainpage-block-partnerWikis-title'] = 'Partner Wikis',
-		['dota2-mainpage-block-tournaments-title'] = 'Tournaments',
-		['dota2-mainpage-block-rankings-title'] = 'Liquipedia Rankings',
+		
 		['dota2-mainpage-button-heroes-title'] = 'Heroes',
 		['dota2-mainpage-button-heroes-link'] = 'Heroes',
 		['dota2-mainpage-button-items-title'] = 'Items',
@@ -162,14 +172,10 @@ return {
 		['dota2-mainpage-button-cosmetics-link'] = 'Cosmetics',
 		['dota2-mainpage-button-updates-title'] = 'Updates',
 		['dota2-mainpage-button-updates-link'] = 'Updates',
-		['dota2-mainpage-button-tournaments-title'] = 'Tournaments',
-		['dota2-mainpage-button-tournaments-link'] = 'Portal:Tournaments',
-		['dota2-mainpage-button-teams-title'] = 'Teams',
-		['dota2-mainpage-button-teams-link'] = 'Portal:Teams',
-		['dota2-mainpage-button-players-title'] = 'Players',
-		['dota2-mainpage-button-players-link'] = 'Portal:Players',
-		['dota2-mainpage-button-transfers-title'] = 'Transfers',
-		['dota2-mainpage-button-transfers-link'] = 'Portal:Transfers',
+		
+		['dota2-mainpage-block-heroes-title'] = 'Heroes',
+		['dota2-mainpage-block-updates-title'] = 'Updates',
+		['dota2-mainpage-block-partnerWikis-title'] = 'Partner Wikis',
 	},
 	ru = {
 		-- Match Stream / Трансляции матча
@@ -289,7 +295,24 @@ return {
 		-- Shop Merch / Мерч в магазине
 		['shop-merch-support-text'] = 'Покупки по этой ссылке поддерживают Liquipedia.',
 
-		-- Dota 2 Main Page / Заглавная Dota 2
+		-- MainPage / Заглавная страница
+		['mainpage-button-tournaments-title'] = 'Турниры',
+		['mainpage-button-tournaments-link'] = 'Портал:Турниры',
+		['mainpage-button-teams-title'] = 'Команды',
+		['mainpage-button-teams-link'] = 'Портал:Команды',
+		['mainpage-button-players-title'] = 'Игроки',
+		['mainpage-button-players-link'] = 'Портал:Игроки',
+		['mainpage-button-transfers-title'] = 'Трансферы',
+		['mainpage-button-transfers-link'] = 'Портал:Трансферы',
+
+		['mainpage-block-usefulArticles-title'] = 'Полезные статьи',
+		['mainpage-block-wantToHelp-title'] = 'Хотите помочь?',
+		['mainpage-block-transfers-title'] = 'Трансферы',
+		['mainpage-block-matches-title'] = 'Матчи',
+		['mainpage-block-tournaments-title'] = 'Турниры',
+		['mainpage-block-rankings-title'] = 'Рейтинги Liquipedia',
+
+		-- dota2: MainPage / dota2: Заглавная
 		['dota2-mainpage-title'] = 'Dota 2 Вики',
 		['dota2-mainpage-metadesc'] = 'Обширная вики по Dota 2, содержащая статьи ' ..
 			'обо всех аспектах игры: от героев, предметов и стратегий ' ..
@@ -300,6 +323,7 @@ return {
 			'Эта вики содержит в себе информацию об игре и её киберспорте, ' ..
 			'насчитывая ${articleCount} статей, ' ..
 			'за которыми следят ${activeUsersCount} активных пользователей.',
+		
 		['dota2-mainpage-hub-button'] = 'Нажмите, чтобы открыть ',
 		['dota2-mainpage-hub-main-title'] = 'Заглавная',
 		['dota2-mainpage-hub-main-link'] = 'Заглавная страница',
@@ -307,15 +331,7 @@ return {
 		['dota2-mainpage-hub-esports-link'] = 'Портал:Киберспорт',
 		['dota2-mainpage-hub-game-title'] = 'Портал Игра',
 		['dota2-mainpage-hub-game-link'] = 'Портал:Игра',
-		['dota2-mainpage-block-heroes-title'] = 'Герои',
-		['dota2-mainpage-block-updates-title'] = 'Обновления',
-		['dota2-mainpage-block-usefulArticles-title'] = 'Полезные статьи',
-		['dota2-mainpage-block-wantToHelp-title'] = 'Хотите помочь?',
-		['dota2-mainpage-block-transfers-title'] = 'Трансферы',
-		['dota2-mainpage-block-matches-title'] = 'Матчи',
-		['dota2-mainpage-block-partnerWikis-title'] = 'Вики-партнёры',
-		['dota2-mainpage-block-tournaments-title'] = 'Турниры',
-		['dota2-mainpage-block-rankings-title'] = 'Рейтинги Liquipedia',
+		
 		['dota2-mainpage-button-heroes-title'] = 'Герои',
 		['dota2-mainpage-button-heroes-link'] = 'Герои',
 		['dota2-mainpage-button-items-title'] = 'Предметы',
@@ -327,13 +343,9 @@ return {
 		['dota2-mainpage-button-cosmetics-link'] = 'Косметические предметы',
 		['dota2-mainpage-button-updates-title'] = 'Обновления',
 		['dota2-mainpage-button-updates-link'] = 'Обновления',
-		['dota2-mainpage-button-tournaments-title'] = 'Турниры',
-		['dota2-mainpage-button-tournaments-link'] = 'Портал:Турниры',
-		['dota2-mainpage-button-teams-title'] = 'Команды',
-		['dota2-mainpage-button-teams-link'] = 'Портал:Команды',
-		['dota2-mainpage-button-players-title'] = 'Игроки',
-		['dota2-mainpage-button-players-link'] = 'Портал:Игроки',
-		['dota2-mainpage-button-transfers-title'] = 'Трансферы',
-		['dota2-mainpage-button-transfers-link'] = 'Портал:Трансферы',
+		
+		['dota2-mainpage-block-heroes-title'] = 'Герои',
+		['dota2-mainpage-block-updates-title'] = 'Обновления',
+		['dota2-mainpage-block-partnerWikis-title'] = 'Вики-партнёры',
 	}
 }
