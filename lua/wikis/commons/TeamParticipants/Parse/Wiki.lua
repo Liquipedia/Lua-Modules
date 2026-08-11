@@ -134,6 +134,9 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 	local opponent
 	local warnings = {}
 
+	-- For usage in page variables
+	local unresolvedTeamTemplate
+
 	local date = DateExt.parseIsoDate(input.date)
 
 	if input.contenders then
@@ -171,6 +174,9 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 			}
 		end
 
+		local templateData = TeamTemplate.getRawOrNil() or {}
+		unresolvedTeamTemplate = templateData.historicaltemplate or templateData.templatename
+		
 		opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
 		local resolvedOptions = {
 			syncPlayer = true,
@@ -196,7 +202,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 
 	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
 	table.insert(aliases, Opponent.toName(opponent))
-	table.insert(aliases, opponent.template)
+	table.insert(aliases, unresolvedTeamTemplate)
 
 	return {
 		opponent = opponent,
