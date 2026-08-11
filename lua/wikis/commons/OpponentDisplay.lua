@@ -42,14 +42,14 @@ OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'br
 
 ---Displays an opponent as an inline element. Useful for describing opponents in prose.
 ---@param props InlineOpponentProps
----@return Html
+---@return VNode
 function OpponentDisplay.InlineOpponent(props)
 	local opponent = props.opponent
 
 	local opponentNode
 	if opponent.type == Opponent.team then
 		if props.showTbd == false and Opponent.isTbd(opponent) then
-			return mw.html.create()
+			return Html.Fragment{}
 		end
 		opponentNode = OpponentDisplay.InlineTeamContainer{
 			flip = props.flip,
@@ -64,26 +64,31 @@ function OpponentDisplay.InlineOpponent(props)
 		error('Unrecognized opponent.type ' .. opponent.type)
 	end
 
-	return mw.html.create()
-		:node(opponentNode)
-		:node(props.note and mw.html.create('sup'):addClass('note'):wikitext(props.note) or nil)
+	return Html.Fragment{children = {
+		opponentNode,
+		props.note and Html.Sup{
+			classes = {'note'},
+			children = props.note,
+		} or nil,
+	}}
 end
 
 ---@param props InlineOpponentProps
----@return Html
+---@return VNode
 function OpponentDisplay.InlinePlayers(props)
 	local opponent = props.opponent
 
-	local playerTexts = Array.map(opponent.players, function(player)
-		return tostring(PlayerDisplay.InlinePlayer(Table.merge(props, {player = player})))
+	local playerNodes = Array.map(opponent.players, function(player)
+		return PlayerDisplay.InlinePlayer(Table.merge(props, {player = player}))
 	end)
 
 	if props.flip then
-		playerTexts = Array.reverse(playerTexts)
+		playerNodes = Array.reverse(playerNodes)
 	end
 
-	return mw.html.create('span')
-		:node(table.concat(playerTexts, ' / '))
+	return Html.Span{
+		children = Array.interleave(playerNodes, ' / ')
+	}
 end
 
 ---@class BlockOpponentProps
