@@ -21,6 +21,7 @@ local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Streams = Lua.import('Module:Links/Stream')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree

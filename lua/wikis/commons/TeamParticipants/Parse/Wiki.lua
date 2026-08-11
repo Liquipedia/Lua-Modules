@@ -174,7 +174,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 			}
 		end
 
-		local templateData = TeamTemplate.getRawOrNil() or {}
+		local templateData = TeamTemplate.getRawOrNil(opponent.template) or {}
 		unresolvedTeamTemplate = templateData.historicaltemplate or templateData.templatename
 		
 		opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
