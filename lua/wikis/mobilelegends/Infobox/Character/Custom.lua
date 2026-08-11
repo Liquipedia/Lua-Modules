@@ -210,8 +210,8 @@ end
 ---@param args table
 ---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
-	lpdbData.extradata.region = args.region,
-	lpdbData.extradata.lane = args.lane,
+	lpdbData.extradata.region = args.region
+	lpdbData.extradata.lane = args.lane
 	return lpdbData
 end
 
