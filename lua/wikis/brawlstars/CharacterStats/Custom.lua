@@ -53,16 +53,9 @@ end
 ---@param opponentIndex integer
 ---@return string[]
 function BrawlStarsCharacterStats:getTeamCharacters(game, opponentIndex)
-	local players = ((game.opponents or {})[opponentIndex] or {}).players or {}
-	return Array.filter(Array.map(players, Operator.property('brawler')), String.isNotEmpty)
-end
-
----@param game CharacterStatsGame
----@param opponentIndex integer
----@return string[]
-function BrawlStarsCharacterStats:getTeamBans(game, opponentIndex)
-	local teamBans = ((game.extradata or {}).bans or {})['team' .. opponentIndex] or {}
-	return Array.filter(teamBans, String.isNotEmpty)
+	return Array.filter(Array.mapIndexes(function (characterIndex)
+		return game.extradata['team' .. opponentIndex .. 'brawler' .. characterIndex]
+	end), String.isNotEmpty)
 end
 
 ---@param game CharacterStatsGame
