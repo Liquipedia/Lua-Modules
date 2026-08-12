@@ -1088,7 +1088,12 @@ function mw.uri.localUrl(page, query)
 		{
 			__index = mw.uri,
 			__tostring = function (t)
-				return t.path .. '?' .. t.query
+				if not t.query then
+					return t.path
+				end
+				return t.path .. '?' .. (
+					type(t.query) == 'string' and t.query or mw.uri.buildQueryString(t.query)
+				)
 			end
 		}
 	)
@@ -1109,6 +1114,9 @@ function mw.uri.fullUrl(page, query)
 		{
 			__index = mw.uri,
 			__tostring = function (t)
+				if not t.query then
+					return mw.site.server .. t.path
+				end
 				return mw.site.server .. t.path .. '?' .. (
 					type(t.query) == 'string' and t.query or mw.uri.buildQueryString(t.query)
 				)
