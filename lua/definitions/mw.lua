@@ -1109,7 +1109,9 @@ function mw.uri.fullUrl(page, query)
 		{
 			__index = mw.uri,
 			__tostring = function (t)
-				return mw.site.server .. t.path .. '?' .. t.query
+				return mw.site.server .. t.path .. '?' .. (
+					type(t.query) == 'string' and t.query or mw.uri.buildQueryString(t.query)
+				)
 			end
 		}
 	)
@@ -1132,7 +1134,35 @@ function mw.uri.decode(str, enctype) end
 ---Encodes a table as a URI query string.
 ---@param query table<string, string|number|any[]|false>
 ---@return string
-function mw.uri.buildQueryString(query) end
+function mw.uri.buildQueryString(query)
+	---@param str string
+	---@return string
+	local function encode(str)
+		return (str:gsub('([^%w])', function (character)
+			if character == ' ' then
+				return '+'
+			end
+			return string.format('%%%02X', string.byte(character))
+		end))
+	end
+
+	local ret = {}
+
+	for k, v in pairs(query) do
+		if type(v) ~= 'table' then
+			v = {v}
+		end
+		for _, queryArg in ipairs(v) do
+			local argRet = {encode(k)}
+			if queryArg then
+				table.insert(argRet, encode(queryArg))
+			end
+			table.insert(ret, table.concat(argRet, '='))
+		end
+	end
+
+	return table.concat(ret, '&')
+end
 
 ---Decodes the query string `s` to a table. Optional arguments `i` and `j` may be used to specify
 ---the substring of `s` to be parsed.
