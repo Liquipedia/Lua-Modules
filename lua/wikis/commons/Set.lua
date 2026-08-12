@@ -8,7 +8,7 @@
 local Class = require('Module:Class')
 local Table = require('Module:Table')
 
----Implementation of a mathematical set.
+---Implementation of a finite set.
 ---@class Set<T>: BaseClass
 ---@operator call(T[]?): Set<T>
 ---@operator add(Set<T>): Set<T>
