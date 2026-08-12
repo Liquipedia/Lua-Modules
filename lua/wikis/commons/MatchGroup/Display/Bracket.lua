@@ -26,6 +26,7 @@ local BracketMatchHeader = Lua.import('Module:Widget/Match/Bracket/MatchHeader')
 local BracketNodeConnector = Lua.import('Module:Widget/Match/Bracket/NodeConnector')
 local BracketOpponentEntry = Lua.import('Module:Widget/Match/Bracket/OpponentEntry')
 local BracketQualified = Lua.import('Module:Widget/Match/Bracket/Qualified')
+local Builder = Lua.import('Module:Widget/Builder')
 local ErrorBoundary = Lua.import('Module:Widget/ErrorBoundary')
 local MatchInfoIcon = Lua.import('Module:Widget/Match/InfoIcon')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -605,11 +606,13 @@ function BracketDisplay.Match(props, additionalClasses, css)
 	if props.matchHasDetails(props.match) then
 		local bracketId = MatchGroupUtil.splitMatchId(props.match.matchId)
 		table.insert(children, ErrorBoundary{
-			children = props.MatchSummaryContainer{
-				classes = {'brkts-match-info-popup'},
-				bracketId = bracketId,
-				matchId = props.match.matchId,
-			},
+			children = Builder{builder = function ()
+				return props.MatchSummaryContainer{
+					classes = {'brkts-match-info-popup'},
+					bracketId = bracketId,
+					matchId = props.match.matchId,
+				}
+			end},
 			fallback = Lua.import('Module:Error/Display').ErrorDetails
 		})
 
