@@ -120,7 +120,7 @@ function MediaList._buildConditions(args)
 
 	if args.org then
 		additionalConditions:add{
-			ConditionUtil.anyOf(ColumnName('extradata_subject_organization'), {args.org, args.org:gsub(' ', '_')}),
+			ConditionUtil.anyOf(ColumnName('extradata_subject_organization'), {args.org, (args.org:gsub(' ', '_'))}),
 			MediaList._buildMultiKeyCondition(args.org, 'extradata_subject_organization', 5)
 		}
 	end
@@ -129,7 +129,7 @@ function MediaList._buildConditions(args)
 
 	if args.event then
 		additionalConditions:add(
-			ConditionUtil.anyOf(ColumnName('extradata_event_link'), {args.event, args.event:gsub(' ', '_')})
+			ConditionUtil.anyOf(ColumnName('extradata_event_link'), {args.event, (args.event:gsub(' ', '_'))})
 		)
 	end
 
@@ -149,7 +149,7 @@ function MediaList._buildMultiKeyCondition(value, prefix, limit)
 	end
 	return ConditionTree(BooleanOperator.any):add(
 		Array.mapRange(1, limit, function (index)
-			return ConditionUtil.anyOf(ColumnName(prefix .. index), {value, value:gsub(' ', '_')})
+			return ConditionUtil.anyOf(ColumnName(prefix .. index), {value, (value:gsub(' ', '_'))})
 		end)
 	)
 end

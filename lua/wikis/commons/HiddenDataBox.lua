@@ -111,7 +111,7 @@ function HiddenDataBox.run(args)
 	HiddenDataBox.addCustomVariables(args, queryResult)
 
 	return Fragment{children = WidgetUtil.collect(
-		HiddenDataBox._matchTicker(Logic.readBool(args.supressMatchTicker)),
+		HiddenDataBox._matchTicker(Logic.readBool(args.suppressMatchTicker)),
 		WarningBoxGroup{data = warnings}
 	)}
 end
@@ -181,7 +181,7 @@ end
 ---Validates the provided tier, tierType pair
 ---@param tier string|number|nil
 ---@param tierType string?
----@return integer?, string?, string[]
+---@return string?, string?, string[]
 function HiddenDataBox.validateTier(tier, tierType)
 	local warnings = {}
 

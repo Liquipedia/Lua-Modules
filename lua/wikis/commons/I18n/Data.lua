@@ -123,5 +123,229 @@ return {
 
 		-- Shop Merch
 		['shop-merch-support-text'] = 'Purchases through this link support Liquipedia.',
+
+		-- MainPage
+		['mainpage-button-tournaments-title'] = 'Tournaments',
+		['mainpage-button-tournaments-link'] = 'Portal:Tournaments',
+		['mainpage-button-teams-title'] = 'Teams',
+		['mainpage-button-teams-link'] = 'Portal:Teams',
+		['mainpage-button-players-title'] = 'Players',
+		['mainpage-button-players-link'] = 'Portal:Players',
+		['mainpage-button-transfers-title'] = 'Transfers',
+		['mainpage-button-transfers-link'] = 'Portal:Transfers',
+
+		['mainpage-block-usefulArticles-title'] = 'Useful Articles',
+		['mainpage-block-wantToHelp-title'] = 'Want To Help?',
+		['mainpage-block-transfers-title'] = 'Transfers',
+		['mainpage-block-matches-title'] = 'Matches',
+		['mainpage-block-tournaments-title'] = 'Tournaments',
+		['mainpage-block-rankings-title'] = 'Liquipedia Rankings',
+
+		-- dota2: MainPage
+		['dota2-mainpage-title'] = 'The Dota 2 Wiki',
+		['dota2-mainpage-metadesc'] = 'Comprehensive Dota 2 wiki with articles covering ' ..
+			'everything from heroes and items, to strategies, ' ..
+			'to tournaments, to competitive players, and teams.',
+		['dota2-mainpage-about-heading'] = 'About Liquipedia\'s Dota 2 Wiki',
+		['dota2-mainpage-about-body'] = 'We are the largest Dota 2 wiki that anyone can edit, ' ..
+			'maintained by fans just like you. ' ..
+			'This wiki currently covers esports and game content, ' ..
+			'containing over ${articleCount} articles ' ..
+			'managed by ${activeUsersCount} active users.',
+
+		['dota2-mainpage-hub-button'] = 'Click here to get to the ',
+		['dota2-mainpage-hub-main-title'] = 'Main Page',
+		['dota2-mainpage-hub-main-link'] = 'Main Page',
+		['dota2-mainpage-hub-esports-title'] = 'Esports Hub',
+		['dota2-mainpage-hub-esports-link'] = 'Portal:Esports',
+		['dota2-mainpage-hub-game-title'] = 'Game Hub',
+		['dota2-mainpage-hub-game-link'] = 'Portal:Game',
+
+		['dota2-mainpage-button-heroes-title'] = 'Heroes',
+		['dota2-mainpage-button-heroes-link'] = 'Heroes',
+		['dota2-mainpage-button-items-title'] = 'Items',
+		['dota2-mainpage-button-items-link'] = 'Items',
+		['dota2-mainpage-button-mechanics-title'] = 'Mechanics',
+		['dota2-mainpage-button-mechanics-link'] = 'Mechanics',
+		['dota2-mainpage-button-mechanics-category'] = 'Mechanics',
+		['dota2-mainpage-button-cosmetics-title'] = 'Cosmetics',
+		['dota2-mainpage-button-cosmetics-link'] = 'Cosmetics',
+		['dota2-mainpage-button-updates-title'] = 'Updates',
+		['dota2-mainpage-button-updates-link'] = 'Updates',
+
+		['dota2-mainpage-block-heroes-title'] = 'Heroes',
+		['dota2-mainpage-block-updates-title'] = 'Updates',
+		['dota2-mainpage-block-partnerWikis-title'] = 'Partner Wikis',
+	},
+	ru = {
+		-- Match Stream / Трансляции матча
+		['matchstream-watch-live'] = 'Смотреть',
+		['matchstream-watch-upcoming'] = 'Трансляция',
+
+		-- Match Details / Детали матча
+		['matchdetails-view-long'] = 'Детали матча',
+		['matchdetails-add-long'] = 'Дополнить',
+		['matchdetails-short'] = 'Детали',
+
+		-- Tournament Filter / Фильтр турниров
+		['tournament-ticker-no-tournaments'] = 'Не найдено турниров для выбранных фильтров!',
+
+		-- Filter Buttons / Кнопки фильтра
+		['filterbuttons-all'] = 'Все',
+		['filterbuttons-featured'] = 'Особые',
+
+		-- Dates / Даты
+		['date-unknown'] = 'Б/О',
+		['date-range-unknown'] = 'Б/О',
+
+		-- Dates: Only startYear known / Даты: Известен год начала
+		['date-range-year'] = '${startYear}',
+		['date-range-year--unknown'] = '${startYear} – Б/О',
+		['date-range-year--year'] = '${startYear}–${endYear}',
+
+		-- Dates: Only startYear, startMonth known / Даты: Известны месяц и год начала
+		['date-range-year-month'] = '${startMonth} ${startYear}',
+		['date-range-year-month--unknown'] = '${startMonth} ${startYear} – Б/О',
+		['date-range-year-month--year-unknown_month'] = '${startMonth} ${startYear} – Б/О, ${endYear}',
+		['date-range-year-month--month'] = '${startMonth} – ${endMonth} ${startYear}',
+		['date-range-year-month--year-month'] = '${startMonth} ${startYear} – ${endMonth} ${endYear}',
+
+		['date-range-year-month--unknown_month'] = '${startMonth} – Б/О, ${startYear}',
+
+		-- Dates: Full startdate known / Даты: Известна полная дата начала
+		['date-range-year-month-day'] = '${startDate} ${startMonth} ${startYear}',
+		['date-range-year-month-day--unknown'] = '${startDate} ${startMonth} ${startYear} – Б/О',
+		['date-range-year-month-day--year-unknown_month'] = '${startDate} ${startMonth} ${startYear} – Б/О, ${endYear}',
+		['date-range-year-month-day--year-month-unknown_day']
+				= '${startDate} ${startMonth} ${startYear} – Б/О, ${endMonth} ${endYear}',
+		['date-range-year-month-day--year-month-day']
+				= '${startDate} ${startMonth} ${startYear} – ${endDate} ${endMonth} ${endYear}',
+
+		['date-range-year-month-day--month-day'] = '${startDate} ${startMonth} – ${endDate} ${endMonth} ${startYear}',
+		['date-range-year-month-day--month-unknown_day'] = '${startDate} ${startMonth} – Б/О, ${endMonth} ${startYear}',
+		['date-range-year-month-day--day'] = '${startDate}–${endDate} ${startMonth} ${startYear}',
+
+		-- Dates: ticker variant (hidden years) / Даты: Без отображения года
+		-- startMonth known / Известен месяц начала
+		['date-range-month'] = '${startMonth}',
+		['date-range-month--unknown'] = '${startMonth} – Б/О',
+		['date-range-month--unknown_month'] = '${startMonth} – Б/О',
+		['date-range-month--month'] = '${startMonth} – ${endMonth}',
+
+		-- startMonth and startDay known / Известны день и месяц начала
+		['date-range-month-day'] = '${startDate} ${startMonth}',
+		['date-range-month-day--day'] = '${startDate}–${endDate} ${startMonth}',
+
+		['date-range-month-day--unknown'] = '${startDate} ${startMonth} – Б/О',
+		['date-range-month-day--unknown_month'] = '${startDate} ${startMonth} – Б/О',
+		['date-range-month-day--month-unknown_day'] = '${startDate} ${startMonth} – ${endMonth} Б/О',
+		['date-range-month-day--month-day'] = '${startMonth} ${startDate} – ${endMonth} ${endDate}',
+
+		-- HiddenDataBox warnings / Ошибки HiddenDataBox
+		['hiddendatabox-invalid-parent-warning'] = '${parent} не является турниром Liquipedia',
+		['hiddendatabox-invalid-tier-warning'] = '${tierString} - не турнир Liquipedia ${tierMode}',
+
+		-- Bracket Headers / Заголовки брэкета
+		['brkts-header-r1'] = 'Гранд-финал,Финал,ГФ',
+		['brkts-header-r2'] = 'Полуфиналы,ПолуФ,ПФ',
+		['brkts-header-r3'] = 'Четвертьфиналы,ЧетвертьФ,ЧФ',
+		['brkts-header-r4'] = 'Раунд ${round},Р${round}',
+		['brkts-header-rx'] = 'Раунд ${round},Р${round}',
+
+		['brkts-header-u1'] = 'Гранд-финал,Финал,ГФ',
+		['brkts-header-u2'] = 'Финал верхней сетки,Финал ВС,ФВС',
+		['brkts-header-u3'] = 'Полуфиналы верхней сетки,Полуфиналы ВС,ПФВС',
+		['brkts-header-u4'] = 'Четвертьфиналы верхней сетки,Четвертьфиналы ВС,ЧФВС',
+		['brkts-header-ux'] = 'Верхняя сетка Раунд ${round},ВС Раунд ${round},ВСР${round}',
+
+		['brkts-header-m1'] = 'Финал средней сетки,Финал СС,ФСС',
+		['brkts-header-m2'] = 'Полуфиналы средней сетки,Полуфиналы СС,ПФСС',
+		['brkts-header-m3'] = 'Четвертьфиналы средней сетки,Четвертьфиналы СС,ЧФСС',
+		['brkts-header-m4'] = 'Средняя сетка Раунд ${round},СС Раунд ${round},ССР${round}',
+		['brkts-header-mx'] = 'Средняя сетка Раунд ${round},СС Раунд ${round},ССР${round}',
+
+		['brkts-header-l2'] = 'Финал нижней сетки,Финал НС,ФНС',
+		['brkts-header-l3'] = 'Полуфиналы нижней сетки,Полуфиналы НС,ПФНС',
+		['brkts-header-l4'] = 'Четвертьфиналы нижней сетки,Четвертьфиналы НС,ЧФНС',
+		['brkts-header-lx'] = 'Нижняя сетка Раунд ${round},НС Раунд ${round},НСР${round}',
+
+		['brkts-header-q'] = 'Квалифицированы,Квал.,К',
+		['brkts-header-tp'] = 'Матч за 3-е место,3-е место,3-е',
+
+		-- MatchPage meta description / Мета-описание страницы MatchPage
+		['matchpage-meta-desc'] = 'Ищите детализированные результаты о ${ongoingTense} матче ${game} ' ..
+									'между ${opponent1} и ${opponent2} в ${tournamentName}${tense}.',
+		['matchpage-meta-desc-no-opponent']
+				= 'Ищите детализированные результаты о ${ongoingTense} матче ${game} в ${tournamentName}${tense}.',
+
+		-- Team Participant Card / Карточка команды-участника
+		['participants-hover-roster-label'] = 'Состав игроков',
+		['participants-notes-label'] = 'Заметки (${count})',
+
+		-- MatchSummary Map Veto
+		['matchsummary-mapveto-start'] = 'Карты в вето',
+
+		-- MatchTable
+		['matchtable-no-match-results'] = 'Этот участник ещё не играл матчи.',
+		['matchtable-no-h2h-match-results'] = 'Эти ${mode} ещё не играли матчи друг против друга.',
+
+		-- MatchTicker
+		['matchticker-upcoming-matches'] = 'Будущие матчи',
+
+		-- Shop Merch / Мерч в магазине
+		['shop-merch-support-text'] = 'Покупки по этой ссылке поддерживают Liquipedia.',
+
+		-- MainPage / Заглавная страница
+		['mainpage-button-tournaments-title'] = 'Турниры',
+		['mainpage-button-tournaments-link'] = 'Портал:Турниры',
+		['mainpage-button-teams-title'] = 'Команды',
+		['mainpage-button-teams-link'] = 'Портал:Команды',
+		['mainpage-button-players-title'] = 'Игроки',
+		['mainpage-button-players-link'] = 'Портал:Игроки',
+		['mainpage-button-transfers-title'] = 'Трансферы',
+		['mainpage-button-transfers-link'] = 'Портал:Трансферы',
+
+		['mainpage-block-usefulArticles-title'] = 'Полезные статьи',
+		['mainpage-block-wantToHelp-title'] = 'Хотите помочь?',
+		['mainpage-block-transfers-title'] = 'Трансферы',
+		['mainpage-block-matches-title'] = 'Матчи',
+		['mainpage-block-tournaments-title'] = 'Турниры',
+		['mainpage-block-rankings-title'] = 'Рейтинги Liquipedia',
+
+		-- dota2: MainPage / dota2: Заглавная
+		['dota2-mainpage-title'] = 'Dota 2 Вики',
+		['dota2-mainpage-metadesc'] = 'Обширная вики по Dota 2, содержащая статьи ' ..
+			'обо всех аспектах игры: от героев, предметов и стратегий ' ..
+			'до турниров, профессиональных игроков и команд.',
+		['dota2-mainpage-about-heading'] = 'О Dota 2 Wiki от Liquipedia',
+		['dota2-mainpage-about-body'] = 'Мы - крупнейшая вики по Dota 2, ' ..
+			'поддерживаемая такими же фанатами, как и Вы. ' ..
+			'Эта вики содержит в себе информацию об игре и её киберспорте, ' ..
+			'насчитывая ${articleCount} статей, ' ..
+			'за которыми следят ${activeUsersCount} активных пользователей.',
+
+		['dota2-mainpage-hub-button'] = 'Нажмите, чтобы открыть ',
+		['dota2-mainpage-hub-main-title'] = 'Заглавная',
+		['dota2-mainpage-hub-main-link'] = 'Заглавная страница',
+		['dota2-mainpage-hub-esports-title'] = 'Портал Киберспорт',
+		['dota2-mainpage-hub-esports-link'] = 'Портал:Киберспорт',
+		['dota2-mainpage-hub-game-title'] = 'Портал Игра',
+		['dota2-mainpage-hub-game-link'] = 'Портал:Игра',
+
+		['dota2-mainpage-button-heroes-title'] = 'Герои',
+		['dota2-mainpage-button-heroes-link'] = 'Герои',
+		['dota2-mainpage-button-items-title'] = 'Предметы',
+		['dota2-mainpage-button-items-link'] = 'Предметы',
+		['dota2-mainpage-button-mechanics-title'] = 'Механики',
+		['dota2-mainpage-button-mechanics-link'] = 'Механика',
+		['dota2-mainpage-button-mechanics-category'] = 'Механика',
+		['dota2-mainpage-button-cosmetics-title'] = 'Арсенал',
+		['dota2-mainpage-button-cosmetics-link'] = 'Косметические предметы',
+		['dota2-mainpage-button-updates-title'] = 'Обновления',
+		['dota2-mainpage-button-updates-link'] = 'Обновления',
+
+		['dota2-mainpage-block-heroes-title'] = 'Герои',
+		['dota2-mainpage-block-updates-title'] = 'Обновления',
+		['dota2-mainpage-block-partnerWikis-title'] = 'Вики-партнёры',
 	}
 }
