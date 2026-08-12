@@ -13,7 +13,7 @@ column in --csv output; keep existing names stable so the time series stays
 comparable.
 
 Usage:
-    python3 scripts/metrics/deprecated_patterns.py [--csv] [--files]
+    python3 scripts/metrics/deprecated_patterns.py [--csv] [--no-header] [--files]
 
 Intended to be run on a schedule (e.g. weekly CI job) with --csv appended to a
 time-series file, so standardization / Phoenix progress can be charted.
@@ -82,13 +82,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--csv', action='store_true', help='CSV output (for appending to a time series)')
     parser.add_argument('--files', action='store_true', help='list the files containing each pattern')
+    parser.add_argument('--header', action=argparse.BooleanOptionalAction, default=True,
+                        help='write the CSV header row (--no-header when appending '
+                             'to an existing time-series file)')
     args = parser.parse_args()
 
     totals, hits = collect()
 
     if args.csv:
         writer = csv.DictWriter(sys.stdout, fieldnames=['date', *PATTERNS])
-        writer.writeheader()
+        if args.header:
+            writer.writeheader()
         writer.writerow({'date': date.today().isoformat(), **totals})
         return
 

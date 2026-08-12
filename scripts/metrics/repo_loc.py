@@ -6,7 +6,7 @@ with commons listed separately. LOC = non-blank, non-comment-only lines;
 total physical lines and file counts are also reported.
 
 Usage:
-    python3 scripts/metrics/repo_loc.py [--csv]
+    python3 scripts/metrics/repo_loc.py [--csv] [--no-header]
 
 Intended to be run on a schedule (e.g. weekly CI job) with --csv appended to a
 time-series file, so standardization / Phoenix progress can be charted.
@@ -57,12 +57,16 @@ def collect() -> list[dict]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--csv', action='store_true', help='CSV output (for appending to a time series)')
+    parser.add_argument('--header', action=argparse.BooleanOptionalAction, default=True,
+                        help='write the CSV header row (--no-header when appending '
+                             'to an existing time-series file)')
     args = parser.parse_args()
 
     rows = collect()
     if args.csv:
         writer = csv.DictWriter(sys.stdout, fieldnames=['date', 'wiki', 'files', 'lines', 'loc'])
-        writer.writeheader()
+        if args.header:
+            writer.writeheader()
         writer.writerows(rows)
     else:
         print(f"{'wiki':<20} {'files':>6} {'lines':>9} {'loc':>9}")

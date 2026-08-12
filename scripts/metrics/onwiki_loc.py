@@ -18,10 +18,12 @@ Usage:
     WIKI_BASE_URL=https://liquipedia.net python3 scripts/metrics/onwiki_loc.py [options]
 
 Options:
-    --wikis dota2,valorant   only these wikis (default: all dirs in lua/wikis)
+    --wikis dota2,valorant   only these wikis (default: all dirs in lua/wikis,
+                             commons included — it is a wiki like any other)
     --delay 2.0              seconds between API requests (be nice to prod)
     --csv                    per-wiki summary CSV for time-series appending
     --csv-pages              per-page CSV (wiki, title, lines, loc) instead
+    --no-header              omit the CSV header row (for appending)
     --pages / --no-pages     list on-wiki-only pages under each wiki in table
                              mode (default: --pages)
     --links                  count WhatLinksHere per on-wiki page — distinct
@@ -41,21 +43,23 @@ this script is the portable version.
 
 import argparse
 import csv
-import gzip
-import json
 import re
 import sys
 import time
-import urllib.parse
-import urllib.request
 from datetime import date
 from pathlib import Path
+
+import requests
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 WIKIS_DIR = REPO_ROOT / 'lua' / 'wikis'
 MODULE_NS = 828  # Scribunto Module namespace
 
-USER_AGENT = 'LiquipediaMetrics/1.0 (standardization+phoenix tracking; engineering)'
+HEADER = {
+    'User-Agent': 'LiquipediaMetrics/1.0 (standardization+phoenix tracking; engineering)',
+    'Accept': 'application/json',
+    'Accept-Encoding': 'gzip',  # required by liquipedia.net/api-terms-of-use
+}
 
 # Segment-anchored exclusions, case-insensitive: Archive, sandbox, dev as a
 # full path segment (covers /dev/XXX too). ':' counts as a boundary so
@@ -89,21 +93,14 @@ def deployed_titles(wiki: str) -> dict[str, Path]:
 
 
 def api_query(base_url: str, wiki: str, params: dict) -> dict:
-    query = {
-        'format': 'json',
-        'formatversion': '2',
-        **params,
-    }
-    url = f'{base_url}/{wiki}/api.php?{urllib.parse.urlencode(query)}'
-    request = urllib.request.Request(url, headers={
-        'User-Agent': USER_AGENT,
-        'Accept-Encoding': 'gzip',  # required by liquipedia.net/api-terms-of-use
-    })
-    with urllib.request.urlopen(request, timeout=60) as response:
-        body = response.read()
-        if response.headers.get('Content-Encoding') == 'gzip':
-            body = gzip.decompress(body)
-        return json.loads(body)
+    response = requests.get(
+        f'{base_url}/{wiki}/api.php',
+        params={'format': 'json', 'formatversion': '2', **params},
+        headers=HEADER,
+        timeout=60,
+    )
+    response.raise_for_status()
+    return response.json()
 
 
 def fetch_modules(base_url: str, wiki: str, delay: float):
@@ -280,6 +277,9 @@ def main() -> None:
     parser.add_argument('--links-exact', action='store_true',
                         help='follow pagination for exact WhatLinksHere counts '
                              '(slower; implies --links)')
+    parser.add_argument('--header', action=argparse.BooleanOptionalAction, default=True,
+                        help='write the CSV header row (--no-header when appending '
+                             'to an existing time-series file)')
     args = parser.parse_args()
     if args.links_exact:
         args.links = True
@@ -287,10 +287,9 @@ def main() -> None:
     if args.wikis:
         wikis = [w.strip() for w in args.wikis.split(',') if w.strip()]
     else:
-        wikis = sorted(
-            d.name for d in WIKIS_DIR.iterdir()
-            if d.is_dir() and d.name != 'commons'
-        )
+        # commons included: it is a wiki like any other, with its own on-wiki
+        # Module pages that are not deployed from lua/wikis/commons.
+        wikis = sorted(d.name for d in WIKIS_DIR.iterdir() if d.is_dir())
 
     fieldnames = [
         'date', 'wiki', 'onwiki_pages', 'onwiki_lines', 'onwiki_loc',
@@ -299,10 +298,12 @@ def main() -> None:
     writer = None
     if args.csv_pages:
         writer = csv.writer(sys.stdout)
-        writer.writerow(['date', 'wiki', 'title', 'lines', 'loc'] + (['links'] if args.links else []))
+        if args.header:
+            writer.writerow(['date', 'wiki', 'title', 'lines', 'loc'] + (['links'] if args.links else []))
     elif args.csv:
         writer = csv.DictWriter(sys.stdout, fieldnames=fieldnames)
-        writer.writeheader()
+        if args.header:
+            writer.writeheader()
     else:
         print(f"{'wiki':<20} {'pages':>6} {'lines':>9} {'loc':>9}")
 
