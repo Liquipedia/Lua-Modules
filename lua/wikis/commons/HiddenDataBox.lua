@@ -210,10 +210,10 @@ function HiddenDataBox.validateTier(tier, tierType)
 	return tierValue, tierTypeValue, warnings
 end
 
----@param supressMatchTicker boolean
+---@param suppressMatchTicker boolean
 ---@return Renderable?
-function HiddenDataBox._matchTicker(supressMatchTicker)
-	if supressMatchTicker or Info.config.match2.status == 0 then
+function HiddenDataBox._matchTicker(suppressMatchTicker)
+	if suppressMatchTicker or Info.config.match2.status == 0 then
 		return nil
 	end
 
