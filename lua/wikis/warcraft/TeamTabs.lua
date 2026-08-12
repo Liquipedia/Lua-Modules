@@ -10,8 +10,6 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
-local Page = Lua.import('Module:Page')
-local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 
 local QueryLink = Lua.import('Module:Widget/QueryLink')

@@ -8,9 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Info = Lua.import('Module:Info', {loadData = true})
-local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
 
 local FORCE_UNDERSCORES = Info.config.forceUnderscores
 
