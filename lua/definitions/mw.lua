@@ -1146,7 +1146,7 @@ function mw.uri.buildQueryString(query)
 	---@param str string
 	---@return string
 	local function encode(str)
-		return (str:gsub('([^%w])', function (character)
+		return (str:gsub('([^%w_.~-])', function (character)
 			if character == ' ' then
 				return '+'
 			end
