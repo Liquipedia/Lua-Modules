@@ -34,6 +34,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field characterType string
 ---@field data CharacterStatistic[]
 ---@field includeBans boolean?
+---@field includeGlobalBans boolean?
 ---@field numGames integer
 ---@field sides string[]
 ---@field sideWins table<string, integer>
@@ -45,6 +46,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local CharacterStatsWidget = Class.new(Widget)
 CharacterStatsWidget.defaultProps = {
 	characterSize = '25x25px',
+	includeGlobalBans = false,
 	numGames = 0,
 	statspage = mw.title.getCurrentTitle().prefixedText
 }

@@ -93,7 +93,7 @@ end
 ---This is equivalent to a call to frame:callParserFunction() with function name '#tag:' .. name and with content prepended to args.
 ---@param name string
 ---@param content string
----@param args table|string
+---@param args table|string?
 ---@return string
 ---@overload fun(self, params: {name: string, content: string, args: table|string}): string
 function mw.frame:extensionTag(name, content, args) end
@@ -1080,7 +1080,23 @@ function mw.uri.new(str) end
 ---@param query string|table?
 ---@return URI
 function mw.uri.localUrl(page, query)
-	return ''
+	return setmetatable(
+		{
+			path = page,
+			query = query,
+		},
+		{
+			__index = mw.uri,
+			__tostring = function (t)
+				if not t.query then
+					return t.path
+				end
+				return t.path .. '?' .. (
+					type(t.query) == 'string' and t.query or mw.uri.buildQueryString(t.query)
+				)
+			end
+		}
+	)
 end
 
 ---Returns a URI object for the full URL for a page, with optional query string/table
@@ -1088,7 +1104,25 @@ end
 ---@param query string|table?
 ---@return URI
 function mw.uri.fullUrl(page, query)
-	return 'https://liquipedia.net/'
+	return setmetatable(
+		{
+			protocol = 'https',
+			host = 'liquipedia.net',
+			path = page,
+			query = query,
+		},
+		{
+			__index = mw.uri,
+			__tostring = function (t)
+				if not t.query then
+					return mw.site.server .. t.path
+				end
+				return mw.site.server .. t.path .. '?' .. (
+					type(t.query) == 'string' and t.query or mw.uri.buildQueryString(t.query)
+				)
+			end
+		}
+	)
 end
 
 ---@alias UriEncodeType 'QUERY'|'PATH'|'WIKI'
@@ -1108,7 +1142,38 @@ function mw.uri.decode(str, enctype) end
 ---Encodes a table as a URI query string.
 ---@param query table<string, string|number|any[]|false>
 ---@return string
-function mw.uri.buildQueryString(query) end
+function mw.uri.buildQueryString(query)
+	---@param str string|number|boolean
+	---@return string
+	local function encode(str)
+		if type(str) ~= 'string' then
+			return tostring(str)
+		end
+		return (str:gsub('([^%w_.~-])', function (character)
+			if character == ' ' then
+				return '+'
+			end
+			return string.format('%%%02X', string.byte(character))
+		end))
+	end
+
+	local ret = {}
+
+	for k, v in pairs(query) do
+		if type(v) ~= 'table' then
+			v = {v}
+		end
+		for _, queryArg in ipairs(v) do
+			local argRet = {encode(k)}
+			if queryArg then
+				table.insert(argRet, encode(queryArg))
+			end
+			table.insert(ret, table.concat(argRet, '='))
+		end
+	end
+
+	return table.concat(ret, '&')
+end
 
 ---Decodes the query string `s` to a table. Optional arguments `i` and `j` may be used to specify
 ---the substring of `s` to be parsed.

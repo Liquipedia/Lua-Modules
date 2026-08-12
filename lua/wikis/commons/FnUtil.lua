@@ -72,12 +72,14 @@ Memoized variant of the Y combinator. Useful for caching results of recursive
 functions, so that previously computed inputs are not recomputed.
 
 Example:
+```
 local fibonacci = FnUtil.memoizeY(function(x, fibonacci)
 	if x == 0 then return 0
 	elseif x == 1 then return 1
 	else return fibonacci(x - 1) + fibonacci(x - 2) end
 end)
 fibonacci(7) -- returns 13
+```
 ]]
 ---@generic T
 ---@param func fun(input: T, self: fun(input: T)):T
@@ -93,8 +95,10 @@ Lazily defines a function, by defining the function now but not constructing
 the function until it is actually used.
 
 Example:
+```
 local parser = FnUtil.lazilyDefineFunction(function() return constructParserFromSpec(spec) end)
 parser('')
+```
 ]]
 ---@generic V:fun(...):any
 ---@param getf_ fun():V

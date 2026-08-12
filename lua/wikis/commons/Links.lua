@@ -532,6 +532,10 @@ local MATCH_ICONS = {
 		icon = 'Match Info Stats.png',
 		text = 'Head-to-head statistics'
 	},
+	headtohead_lh = {
+		icon = 'Match Info Stats.png',
+		text = 'Head-to-head statistics'
+	},
 	interview = {
 		icon = 'Interview32.png',
 		text = 'Interview'
