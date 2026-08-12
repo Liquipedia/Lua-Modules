@@ -11,7 +11,6 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local BaseCharacterStats = Lua.import('Module:CharacterStats')
 local Class = Lua.import('Module:Class')
-local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 
 local CharacterStatsWidget = Lua.import('Module:Widget/CharacterStats')
