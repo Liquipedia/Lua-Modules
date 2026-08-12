@@ -168,7 +168,7 @@ function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 	end
 
 	-- TODO: Share functionality with TeamParticipants module
-	local aliases = Array.map((placement.extradata or {}).opponentaliases or {})
+	local aliases = (placement.extradata or {}).opponentaliases or {}
 
 	Table.iter.forEachPair(placement.opponentplayers or {}, function(key, value)
 		Array.forEach(aliases, function(alias)
