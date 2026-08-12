@@ -93,7 +93,7 @@ end
 ---This is equivalent to a call to frame:callParserFunction() with function name '#tag:' .. name and with content prepended to args.
 ---@param name string
 ---@param content string
----@param args table|string
+---@param args table|string?
 ---@return string
 ---@overload fun(self, params: {name: string, content: string, args: table|string}): string
 function mw.frame:extensionTag(name, content, args) end
