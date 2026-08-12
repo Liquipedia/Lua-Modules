@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Component = Lua.import('Module:Widget/Component')
 local Renderer = Lua.import('Module:Widget/Renderer')
 
----@param props {frame: Frame?, name: string?, children: Renderable|Renderable[]?}
+---@param props {frame: Frame?, name: string?, group: string?, children: Renderable|Renderable[]?}
 ---@param context Context?
 ---@return string
 local function ReferenceTag(props, context)
@@ -23,7 +23,10 @@ local function ReferenceTag(props, context)
 		of letting it be called after processing the parent component.
 		]]
 		Renderer.render(props.children, context),
-		{name = props.name}
+		{
+			name = props.name,
+			group = props.group
+		}
 	)
 end
 
