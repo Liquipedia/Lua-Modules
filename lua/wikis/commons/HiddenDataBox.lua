@@ -211,7 +211,7 @@ function HiddenDataBox.validateTier(tier, tierType)
 end
 
 ---@param supressMatchTicker boolean
----@return Widget?
+---@return Renderable?
 function HiddenDataBox._matchTicker(supressMatchTicker)
 	if supressMatchTicker or Info.config.match2.status == 0 then
 		return nil
