@@ -469,60 +469,25 @@ class ExportService {
 		this.activeExports = new Set();
 	}
 
-	// clonedRoot is the specific element being captured, not a full document, so
+	// element is the specific node being captured, not a full document, so
 	// selectors below must also check the root itself, not just its descendants.
-	queryAllIncludingSelf( clonedRoot, selector ) {
-		const matches = [ ...clonedRoot.querySelectorAll( selector ) ];
-		if ( clonedRoot.matches( selector ) ) {
-			matches.push( clonedRoot );
+	queryAllIncludingSelf( element, selector ) {
+		const matches = [ ...element.querySelectorAll( selector ) ];
+		if ( element.matches( selector ) ) {
+			matches.push( element );
 		}
 		return matches;
 	}
 
-	applyCloneFixes( clonedRoot ) {
-		this.hideInfoIcons( clonedRoot );
-		this.removeContentSwitchers( clonedRoot );
-		this.removePrizepoolToggles( clonedRoot );
-		this.expandPrizepoolTables( clonedRoot );
-	}
-
-	// Hides info icons that shouldn't appear in exports
-	hideInfoIcons( clonedRoot ) {
-		const infoIcons = this.queryAllIncludingSelf( clonedRoot, '.brkts-match-info-icon' );
-		for ( const icon of infoIcons ) {
-			icon.style.opacity = '0';
-		}
-	}
-
-	// Remove toggle switches
-	removeContentSwitchers( clonedRoot ) {
-		const contentSwitches = this.queryAllIncludingSelf( clonedRoot, '.switch-pill-container' );
-
-		for ( const contentSwitch of contentSwitches ) {
-			contentSwitch.remove();
-		}
-	}
-
-	removePrizepoolToggles( clonedRoot ) {
-		// The legacy in-table toggle and the redesigned table's footer (now inside the
-		// captured wrapper) shouldn't appear in a static export.
-		const prizepoolToggles = this.queryAllIncludingSelf(
-			clonedRoot,
-			'.prizepooltabletoggle, .prizepool-table-wrapper .table2__footer'
-		);
-
-		for ( const prizepoolToggle of prizepoolToggles ) {
-			prizepoolToggle.remove();
-		}
-	}
-
 	// Cut placements are hidden by `.collapsed` on the wrapper; expand so they export.
-	expandPrizepoolTables( clonedRoot ) {
-		const collapsedTables = this.queryAllIncludingSelf( clonedRoot, '.prizepool-table-wrapper.collapsed' );
+	expandPrizepoolTables( element ) {
+		const collapsedTables = this.queryAllIncludingSelf( element, '.prizepool-table-wrapper.collapsed' );
 
 		for ( const collapsedTable of collapsedTables ) {
 			collapsedTable.classList.remove( 'collapsed' );
 		}
+
+		return collapsedTables;
 	}
 
 	async export( element, title, mode ) {
@@ -550,35 +515,29 @@ class ExportService {
 		}
 	}
 
-	// Snapdom has no pre-capture mutation hook, so applyCloneFixes() runs against
-	// this offscreen clone instead of the live element.
-	createCaptureClone( element ) {
-		const clone = element.cloneNode( true );
-		clone.style.position = 'fixed';
-		clone.style.top = '-99999px';
-		clone.style.left = '-99999px';
-		clone.style.width = `${ element.getBoundingClientRect().width }px`;
-		document.body.appendChild( clone );
-		return clone;
-	}
-
 	async generateImageBlob( element, title ) {
 		const originalBackground = element.style.background;
 		const isDarkTheme = document.documentElement.classList.contains( 'theme--dark' );
 		const backgroundColor = this.getBackgroundColor();
 		// This ensures the scale is at least 2, but never higher than 3
 		const scale = Math.min( Math.max( window.devicePixelRatio || 1, 2 ), 3 );
-		let captureClone;
+		let expandedTables = [];
 
 		try {
 			element.style.background = backgroundColor;
+			expandedTables = this.expandPrizepoolTables( element );
 
-			captureClone = this.createCaptureClone( element );
-			this.applyCloneFixes( captureClone );
-
-			const capturedCanvas = await snapdom.toCanvas( captureClone, {
+			const capturedCanvas = await snapdom.toCanvas( element, {
 				scale: scale,
-				backgroundColor: backgroundColor
+				backgroundColor: backgroundColor,
+				exclude: [
+					'.switch-pill-container',
+					'.prizepooltabletoggle',
+					'.prizepool-table-wrapper .table2__footer'
+				],
+				excludeMode: 'remove',
+				filter: ( capturedElement ) => !capturedElement.matches( '.brkts-match-info-icon' ),
+				filterMode: 'hide'
 			} );
 
 			if ( capturedCanvas.width === 0 || capturedCanvas.height === 0 ) {
@@ -603,8 +562,8 @@ class ExportService {
 			} );
 		} finally {
 			element.style.background = originalBackground;
-			if ( captureClone ) {
-				captureClone.remove();
+			for ( const table of expandedTables ) {
+				table.classList.add( 'collapsed' );
 			}
 		}
 	}
