@@ -1080,7 +1080,18 @@ function mw.uri.new(str) end
 ---@param query string|table?
 ---@return URI
 function mw.uri.localUrl(page, query)
-	return ''
+	return setmetatable(
+		{
+			path = page,
+			query = query,
+		},
+		{
+			__index = mw.uri,
+			__tostring = function (t)
+				return t.page .. '?' .. t.query
+			end
+		}
+	)
 end
 
 ---Returns a URI object for the full URL for a page, with optional query string/table
@@ -1088,7 +1099,20 @@ end
 ---@param query string|table?
 ---@return URI
 function mw.uri.fullUrl(page, query)
-	return 'https://liquipedia.net/'
+	return setmetatable(
+		{
+			protocol = 'https',
+			host = 'liquipedia.net',
+			path = page,
+			query = query,
+		},
+		{
+			__index = mw.uri,
+			__tostring = function (t)
+				return mw.site.server .. t.page .. '?' .. t.query
+			end
+		}
+	)
 end
 
 ---@alias UriEncodeType 'QUERY'|'PATH'|'WIKI'
