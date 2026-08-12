@@ -174,13 +174,13 @@ end
 
 ---@param references table?
 ---@param date string
----@return VNode
+---@return string
 function TransferRef.useReferences(references, date)
 	local refs = Array.map(TransferRef.fromStorageData(references), function(reference)
 		return TransferRef.useReference(reference, date)
 	end)
 
-	return Html.Fragment{children = refs}
+	return tostring(Html.Fragment{children = refs})
 end
 
 ---@param reference TransferReference
