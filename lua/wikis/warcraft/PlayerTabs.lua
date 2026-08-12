@@ -15,7 +15,7 @@ local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 
-local Link = Lua.import('Module:Widget/Basic/Link')
+local QueryLink = Lua.import('Module:Widget/QueryLink')
 
 local SPECIAL_SUBPAGES = {
 	'Events',
@@ -88,20 +88,11 @@ end
 ---@param currentTab integer?
 ---@return Renderable?
 function PlayerTabs._display(player, currentTab)
-	---@param args {form: string, template: string, display: string, queryArgs: table}
-	---@return Renderable
-	local makeQueryLink = function(args)
-		return Link{
-			linktype = 'external',
-			children = args.display,
-			link = Page.makeFormQueryLink(Table.merge(args, {execute = true}))
-		}
-	end
-
 	local tabArgs = {
 		name1 = 'Overview',
 		link1 = player,
-		name2 = makeQueryLink{
+		name2 = QueryLink{
+			legacyForm = 'Player ResultsLH',
 			form = 'Player Results',
 			display = 'Results',
 			template = 'Player results',
@@ -112,7 +103,8 @@ function PlayerTabs._display(player, currentTab)
 				limit = '250',
 			},
 		},
-		name3 = makeQueryLink{
+		name3 = QueryLink{
+			legacyForm = 'Player MatchesLH',
 			form = 'Player Matches',
 			display = 'Matches',
 			template = 'Player matches',
@@ -124,8 +116,9 @@ function PlayerTabs._display(player, currentTab)
 				limit = '250',
 			},
 		},
-		name4 = makeQueryLink{
-			form = 'PlayerStats',
+		name4 = QueryLink{
+			legacyForm = 'PlayerStats',
+			form = 'PlayerStatsLH',
 			display = 'Statistics',
 			template = 'Player statistics',
 			queryArgs = {

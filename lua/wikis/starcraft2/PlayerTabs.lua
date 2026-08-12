@@ -15,7 +15,7 @@ local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 
-local Link = Lua.import('Module:Widget/Basic/Link')
+local QueryLink = Lua.import('Module:Widget/QueryLink')
 
 local SPECIAL_SUBPAGES = {
 	'Broadcasts',
@@ -82,21 +82,12 @@ end
 ---@param currentTab integer?
 ---@return Renderable?
 function PlayerTabs._display(player, currentTab)
-	---@param args {form: string, template: string, display: string, queryArgs: table}
-	---@return Renderable
-	local makeQueryLink = function(args)
-		return Link{
-			linktype = 'external',
-			children = args.display,
-			link = Page.makeFormQueryLink(Table.merge(args, {execute = true}))
-		}
-	end
-
 	local tabArgs = {
 		name1 = 'Overview',
 		link1 = player,
-		name2 = makeQueryLink{
-			form = 'Player Results',
+		name2 = QueryLink{
+			legacyForm = 'Player Results',
+			form = 'Player ResultsLH',
 			display = 'Results',
 			template = 'Player results',
 			queryArgs = {
@@ -106,8 +97,9 @@ function PlayerTabs._display(player, currentTab)
 				limit = '250',
 			},
 		},
-		name3 = makeQueryLink{
-			form = 'Player Matches',
+		name3 = QueryLink{
+			legacyForm = 'Player Matches',
+			form = 'Player MatchesLH',
 			display = 'Matches',
 			template = 'Player matches',
 			queryArgs = {
@@ -135,8 +127,9 @@ function PlayerTabs._display(player, currentTab)
 
 	-- Head to head query link
 	tabCounter = tabCounter + 1
-	tabArgs['name' .. tabCounter] = makeQueryLink{
-		form = 'Match history',
+	tabArgs['name' .. tabCounter] = QueryLink{
+		legacyForm = 'Match history',
+		form = 'H2H',
 		display = 'Head to Head',
 		template = 'Head_to_head_query',
 		queryArgs = {player = player},
@@ -144,8 +137,9 @@ function PlayerTabs._display(player, currentTab)
 
 	-- Statistics query link
 	tabCounter = tabCounter + 1
-	tabArgs['name' .. tabCounter] = makeQueryLink{
-		form = 'PlayerStats',
+	tabArgs['name' .. tabCounter] = QueryLink{
+		legacyForm = 'PlayerStats',
+		form = 'PlayerStatsLH',
 		display = 'Statistics',
 		template = 'PlayerStatistics',
 		queryArgs = {

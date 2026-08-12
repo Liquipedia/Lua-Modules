@@ -14,7 +14,7 @@ local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 
-local Link = Lua.import('Module:Widget/Basic/Link')
+local QueryLink = Lua.import('Module:Widget/QueryLink')
 
 local TOMORROW = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() + DateExt.daysToSeconds(1))
 
@@ -77,20 +77,11 @@ end
 ---@param currentTab integer?
 ---@return Widget?
 function TeamTabs._display(team, showPlayerSubTabs, currentTab)
-	---@param args {form: string, template: string, display: string, queryArgs: table}
-	---@return Widget
-	local makeQueryLink = function(args)
-		return Link{
-			linktype = 'external',
-			children = args.display,
-			link = Page.makeFormQueryLink(Table.merge(args, {execute = true}))
-		}
-	end
-
 	local tabArgs = {
 		name1 = 'Overview',
 		link1 = team,
-		name2 = makeQueryLink{
+		name2 = QueryLink{
+			legacyForm = 'Team Results',
 			form = 'Team Results',
 			display = 'Team Results',
 			template = 'Team results',
@@ -101,7 +92,8 @@ function TeamTabs._display(team, showPlayerSubTabs, currentTab)
 				limit = '250',
 			},
 		},
-		name3 = makeQueryLink{
+		name3 = QueryLink{
+			legacyForm = 'Team Matches',
 			form = 'Team Matches',
 			display = 'Team Matches',
 			template = 'Team matches',
@@ -116,7 +108,8 @@ function TeamTabs._display(team, showPlayerSubTabs, currentTab)
 	}
 
 	if showPlayerSubTabs then
-		tabArgs.name4 = makeQueryLink{
+		tabArgs.name4 = QueryLink{
+			legacyForm = 'Team Player Results',
 			form = 'Team Player Results',
 			display = 'Player Results',
 			template = 'Team player results',

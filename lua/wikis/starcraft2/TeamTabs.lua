@@ -17,7 +17,7 @@ local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
-local Link = Lua.import('Module:Widget/Basic/Link')
+local QueryLink = Lua.import('Module:Widget/QueryLink')
 
 local SPECIAL_SUBPAGES = {
 	'Transfers',
@@ -155,21 +155,12 @@ end
 ---@param currentTab integer?
 ---@return Renderable?
 function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
-	---@param args {form: string, template: string, display: string, queryArgs: table}
-	---@return Renderable
-	local makeQueryLink = function(args)
-		return Link{
-			linktype = 'external',
-			children = args.display,
-			link = Page.makeFormQueryLink(Table.merge(args, {execute = true}))
-		}
-	end
-
 	local tabArgs = {
 		name1 = 'Overview',
 		link1 = team,
-		name2 = makeQueryLink{
-			form = 'Team Results',
+		name2 = QueryLink{
+			legacyForm = 'Team Results',
+			form = 'Team ResultsLH',
 			display = 'Team Results',
 			template = 'Team results',
 			queryArgs = {
@@ -179,8 +170,9 @@ function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 				limit = '250',
 			},
 		},
-		name3 = makeQueryLink{
-			form = 'Team Matches',
+		name3 = QueryLink{
+			legacyForm = 'Team Matches',
+			form = 'Team MatchesLH',
 			display = 'Team Matches',
 			template = 'Team matches',
 			queryArgs = {
@@ -195,8 +187,9 @@ function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 
 	local tabCounter = 3
 	if showPlayerSubTabs then
-		tabArgs.name4 = makeQueryLink{
-			form = 'Team Player Results',
+		tabArgs.name4 = QueryLink{
+			legacyForm = 'Team Player Results',
+			form = 'Team Player ResultsLH',
 			display = 'Player Results',
 			template = 'Team player results',
 			queryArgs = {

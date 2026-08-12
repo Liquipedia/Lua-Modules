@@ -20,7 +20,6 @@ local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
-local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
@@ -36,6 +35,7 @@ local ConditionUtil = Condition.Util
 
 local Html = Lua.import('Module:Widget/Html')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
+local QueryLink = Lua.import('Module:Widget/QueryLink')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -414,18 +414,15 @@ function BaseResultsTable:_footer()
 	local form = self.config.queryType == QUERY_TYPES.team and 'Team Results' or 'Player Results'
 	local template = self.config.queryType == QUERY_TYPES.team and 'Team results' or 'Player results'
 
-	return LinkWidget{
-		linktype = 'external',
-		children = 'Extended list of results',
-		link = Page.makeFormQueryLink{
-			form = form,
-			display = 'Extended list of results',
-			template = template,
-			queryArgs = Table.merge({
-				team = self.config.opponent,
-				player = self.config.opponent,
-			}, self.config.queryLinkProps),
-		}
+	return QueryLink{
+		legacyForm = form,
+		form = form .. 'LH',
+		display = 'Extended list of results',
+		template = template,
+		queryArgs = Table.merge({
+			team = self.config.opponent,
+			player = self.config.opponent,
+		}, self.config.queryLinkProps),
 	}
 end
 
