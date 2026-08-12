@@ -125,6 +125,10 @@ function Set:contains(value)
 	return self.data[value] or false
 end
 
+--[[
+Returns `true` if this set contains all elements in the specified set,
+i.e., if the specified set is a subset of this set.
+]]
 ---@param set Set<T>
 ---@return boolean
 function Set:containsAll(set)
