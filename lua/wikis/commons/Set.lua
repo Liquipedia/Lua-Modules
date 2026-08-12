@@ -187,6 +187,7 @@ function Set:equals(other)
 	return self:containsAll(other)
 end
 
+---Returns the string representation of this set.
 ---@return string
 function Set:toString()
 	return '{'.. table.concat(self:toArray(), ', ') .. '}'
