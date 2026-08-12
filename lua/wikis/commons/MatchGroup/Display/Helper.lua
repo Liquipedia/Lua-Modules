@@ -29,6 +29,7 @@ local NONBREAKING_SPACE = '&nbsp;'
 
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local ReferenceTag = Lua.import('Module:Widget/ReferenceTag')
 
 ---@param node Html
 ---@param opponent standardOpponent
@@ -168,14 +169,14 @@ function DisplayHelper._createSubstituteReferences(references)
 	end
 	---@cast references -nil
 	local frame = mw.getCurrentFrame()
-	return table.concat(Array.map(references, function (reference)
+	return tostring(Html.Fragment{children = Array.map(references, function (reference)
 		local refName = Table.extract(reference, 'name')
-		return frame:extensionTag(
-			'ref',
-			Template.safeExpand(frame, 'Cite web', reference),
-			String.isNotEmpty(refName) and {name = refName} or nil
-		)
-	end))
+		return ReferenceTag{
+			frame = frame,
+			children = Template.safeExpand(frame, 'Cite web', reference),
+			name = String.nilIfEmpty(refName)
+		}
+	end)})
 end
 
 ---Creates display components for caster(s).
