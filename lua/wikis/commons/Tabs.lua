@@ -61,6 +61,28 @@ function Tabs.static(args)
 					and Link{link = tab.link, children = {Html.Fragment{children = displayChildren}}}
 					or Html.Span{children = displayChildren}
 			else
+				-- Temporary hack during MW/LH Migration
+				if tab.name == 'Head to Head' then
+					local playerOrTeam = mw.title.getCurrentTitle().rootText
+					child = Html.Span {
+						children = {
+							Html.Span {
+								classes = { 'hide-when-lighthouse' },
+								children = Link {
+									children = tab.name,
+									link = tab.link
+								}
+							},
+							Html.Span {
+								classes = { 'hide-when-mediawiki' },
+								children = Link {
+									children = tab.name,
+									link = 'Special:RunQuery/H2H?player='.. playerOrTeam .. '&team1=' .. playerOrTeam
+								}
+							},
+						}
+					}
+				end
 				child = tab.link and Link{link = tab.link, children = {name}} or Html.Span{children = {tab.name}}
 			end
 			return Html.Li{
