@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Reference
+-- page=Module:Widget/ReferenceTag
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
