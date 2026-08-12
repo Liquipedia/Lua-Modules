@@ -9,7 +9,7 @@ liquipedia.brackets = {
 	headers: {
 		init: function() {
 			liquipedia.brackets.headers.updateAll();
-			window.addEventListener( 'resize', liquipedia.bracket.headers.debounce( () => {
+			window.addEventListener( 'resize', liquipedia.brackets.headers.debounce( () => {
 				liquipedia.brackets.headers.updateAll();
 			}, 100 ) );
 		},
