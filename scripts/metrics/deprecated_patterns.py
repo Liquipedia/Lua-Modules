@@ -27,29 +27,29 @@ from datetime import date
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-WIKIS_DIR = REPO_ROOT / 'lua' / 'wikis'
+WIKIS_DIR = REPO_ROOT / "lua" / "wikis"
 
 PATTERNS: dict[str, dict] = {
-    'widget2': {
-        'description': 'class-based Widget2 implementations',
+    "widget2": {
+        "description": "class-based Widget2 implementations",
         # Class.new(Widget) and Class.new(Widget, function(self, props) ...
         # \b keeps this from matching e.g. Class.new(WidgetContext). Widgets
         # subclassing another widget are not counted -- the base class name is
         # not knowable without resolving imports, and direct extension is the
         # stable, cheap proxy.
-        'regexes': [r'Class\.new\(\s*Widget\b'],
+        "regexes": [r"Class\.new\(\s*Widget\b"],
     },
-    'scribunto_html': {
-        'description': 'Scribunto mw.html node creations',
+    "scribunto_html": {
+        "description": "Scribunto mw.html node creations",
         # A root node, a new child node, and an existing node inserted into a
         # parent. :tag( and :node( are assumed to always be mw.html calls;
         # nothing else in the codebase uses those method names.
-        'regexes': [r'mw\.html\.create\(', r':tag\(', r':node\('],
+        "regexes": [r"mw\.html\.create\(", r":tag\(", r":node\("],
     },
 }
 
 COMPILED = {
-    name: [re.compile(regex) for regex in spec['regexes']]
+    name: [re.compile(regex) for regex in spec["regexes"]]
     for name, spec in PATTERNS.items()
 }
 
@@ -57,8 +57,9 @@ COMPILED = {
 def count_file(path: Path) -> dict[str, int]:
     """Return per-pattern call-site counts for a Lua file."""
     lines = [
-        line for line in path.read_text(encoding='utf-8', errors='replace').splitlines()
-        if not line.strip().startswith('--')
+        line
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines()
+        if not line.strip().startswith("--")
     ]
     return {
         name: sum(len(regex.findall(line)) for regex in regexes for line in lines)
@@ -70,7 +71,7 @@ def collect() -> tuple[dict[str, int], dict[str, list[tuple[Path, int]]]]:
     """Return (per-pattern totals, per-pattern list of (file, count) hits)."""
     totals = dict.fromkeys(PATTERNS, 0)
     hits: dict[str, list[tuple[Path, int]]] = {name: [] for name in PATTERNS}
-    for lua_file in sorted(WIKIS_DIR.rglob('*.lua')):
+    for lua_file in sorted(WIKIS_DIR.rglob("*.lua")):
         for name, count in count_file(lua_file).items():
             if count:
                 totals[name] += count
@@ -80,20 +81,28 @@ def collect() -> tuple[dict[str, int], dict[str, list[tuple[Path, int]]]]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--csv', action='store_true', help='CSV output (for appending to a time series)')
-    parser.add_argument('--files', action='store_true', help='list the files containing each pattern')
-    parser.add_argument('--header', action=argparse.BooleanOptionalAction, default=True,
-                        help='write the CSV header row (--no-header when appending '
-                             'to an existing time-series file)')
+    parser.add_argument(
+        "--csv", action="store_true", help="CSV output (for appending to a time series)"
+    )
+    parser.add_argument(
+        "--files", action="store_true", help="list the files containing each pattern"
+    )
+    parser.add_argument(
+        "--header",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="write the CSV header row (--no-header when appending "
+        "to an existing time-series file)",
+    )
     args = parser.parse_args()
 
     totals, hits = collect()
 
     if args.csv:
-        writer = csv.DictWriter(sys.stdout, fieldnames=['date', *PATTERNS])
+        writer = csv.DictWriter(sys.stdout, fieldnames=["date", *PATTERNS])
         if args.header:
             writer.writeheader()
-        writer.writerow({'date': date.today().isoformat(), **totals})
+        writer.writerow({"date": date.today().isoformat(), **totals})
         return
 
     width = max(len(name) for name in PATTERNS)
@@ -106,10 +115,10 @@ def main() -> None:
         else:
             print(f"{name:<{width}}  {totals[name]:>6}")
     if args.files:
-        print('-' * 60)
+        print("-" * 60)
         for name in PATTERNS:
             print(f"{name:<{width}}  {totals[name]:>6}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

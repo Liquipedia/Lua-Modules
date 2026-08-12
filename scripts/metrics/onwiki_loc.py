@@ -52,13 +52,13 @@ from pathlib import Path
 import requests
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-WIKIS_DIR = REPO_ROOT / 'lua' / 'wikis'
+WIKIS_DIR = REPO_ROOT / "lua" / "wikis"
 MODULE_NS = 828  # Scribunto Module namespace
 
 HEADER = {
-    'User-Agent': 'LiquipediaMetrics/1.0 (standardization+phoenix tracking; engineering)',
-    'Accept': 'application/json',
-    'Accept-Encoding': 'gzip',  # required by liquipedia.net/api-terms-of-use
+    "User-Agent": "LiquipediaMetrics/1.0 (standardization+phoenix tracking; engineering)",
+    "Accept": "application/json",
+    "Accept-Encoding": "gzip",  # required by liquipedia.net/api-terms-of-use
 }
 
 # Segment-anchored exclusions, case-insensitive: Archive, sandbox, dev as a
@@ -67,11 +67,11 @@ HEADER = {
 # while e.g. Module:Developer is not.
 # Documentation subpages (Module:X/doc) are also excluded.
 EXCLUDE_RE = re.compile(
-    r'(^|[/:])(archive|sandbox|dev)(/|$)|/doc$',
+    r"(^|[/:])(archive|sandbox|dev)(/|$)|/doc$",
     re.IGNORECASE,
 )
 
-PAGE_HEADER_RE = re.compile(r'^--\s*page\s*=\s*(Module:.+?)\s*$', re.MULTILINE)
+PAGE_HEADER_RE = re.compile(r"^--\s*page\s*=\s*(Module:.+?)\s*$", re.MULTILINE)
 
 
 def deployed_titles(wiki: str) -> dict[str, Path]:
@@ -84,8 +84,8 @@ def deployed_titles(wiki: str) -> dict[str, Path]:
     titles: dict[str, Path] = {}
     source_dir = WIKIS_DIR / wiki
     if source_dir.is_dir():
-        for lua_file in source_dir.rglob('*.lua'):
-            head = lua_file.read_text(encoding='utf-8', errors='replace')[:500]
+        for lua_file in source_dir.rglob("*.lua"):
+            head = lua_file.read_text(encoding="utf-8", errors="replace")[:500]
             match = PAGE_HEADER_RE.search(head)
             if match:
                 titles[match.group(1)] = lua_file
@@ -94,8 +94,8 @@ def deployed_titles(wiki: str) -> dict[str, Path]:
 
 def api_query(base_url: str, wiki: str, params: dict) -> dict:
     response = requests.get(
-        f'{base_url}/{wiki}/api.php',
-        params={'format': 'json', 'formatversion': '2', **params},
+        f"{base_url}/{wiki}/api.php",
+        params={"format": "json", "formatversion": "2", **params},
         headers=HEADER,
         timeout=60,
     )
@@ -107,23 +107,27 @@ def fetch_modules(base_url: str, wiki: str, delay: float):
     """Yield (title, content) for every Module-namespace page on the wiki."""
     cont: dict = {}
     while True:
-        data = api_query(base_url, wiki, {
-            'action': 'query',
-            'generator': 'allpages',
-            'gapnamespace': str(MODULE_NS),
-            'gaplimit': '50',
-            'prop': 'revisions',
-            'rvprop': 'content',
-            'rvslots': 'main',
-            **cont,
-        })
-        for page in data.get('query', {}).get('pages', []):
-            revisions = page.get('revisions')
+        data = api_query(
+            base_url,
+            wiki,
+            {
+                "action": "query",
+                "generator": "allpages",
+                "gapnamespace": str(MODULE_NS),
+                "gaplimit": "50",
+                "prop": "revisions",
+                "rvprop": "content",
+                "rvslots": "main",
+                **cont,
+            },
+        )
+        for page in data.get("query", {}).get("pages", []):
+            revisions = page.get("revisions")
             if not revisions:
                 continue
-            content = revisions[0].get('slots', {}).get('main', {}).get('content', '')
-            yield page['title'], content
-        cont = data.get('continue')
+            content = revisions[0].get("slots", {}).get("main", {}).get("content", "")
+            yield page["title"], content
+        cont = data.get("continue")
         if not cont:
             return
         time.sleep(delay)
@@ -131,21 +135,35 @@ def fetch_modules(base_url: str, wiki: str, delay: float):
 
 def resolve_link_namespaces(base_url: str, wiki: str) -> list[int]:
     """Namespace ids that count as real usage: main, Project, Portal."""
-    data = api_query(base_url, wiki, {
-        'action': 'query',
-        'meta': 'siteinfo',
-        'siprop': 'namespaces',
-    })
+    data = api_query(
+        base_url,
+        wiki,
+        {
+            "action": "query",
+            "meta": "siteinfo",
+            "siprop": "namespaces",
+        },
+    )
     wanted = []
-    for ns in data['query']['namespaces'].values():
-        canonical = ns.get('canonical', '')
-        if ns['id'] == 0 or canonical in ('Liquipedia', 'Project', 'Portal') or ns.get('name') in ('Liquipedia', 'Project', 'Portal'):
-            wanted.append(ns['id'])
+    for ns in data["query"]["namespaces"].values():
+        canonical = ns.get("canonical", "")
+        if (
+            ns["id"] == 0
+            or canonical in ("Liquipedia", "Project", "Portal")
+            or ns.get("name") in ("Liquipedia", "Project", "Portal")
+        ):
+            wanted.append(ns["id"])
     return wanted
 
 
-def count_what_links_here(base_url: str, wiki: str, titles: list[str], ns_ids: list[int],
-                          delay: float, exhaustive: bool) -> dict[str, int]:
+def count_what_links_here(
+    base_url: str,
+    wiki: str,
+    titles: list[str],
+    ns_ids: list[int],
+    delay: float,
+    exhaustive: bool,
+) -> dict[str, int]:
     """WhatLinksHere counts per title, restricted to the given namespaces:
     distinct pages linking to or transcluding/#invoke-ing each title.
 
@@ -160,50 +178,58 @@ def count_what_links_here(base_url: str, wiki: str, titles: list[str], ns_ids: l
     often FASTER than default on lightly-linked wikis but unbounded on
     heavily-used modules.
     """
-    ns_filter = '|'.join(str(ns) for ns in ns_ids)
+    ns_filter = "|".join(str(ns) for ns in ns_ids)
     linking_pages: dict[str, set[int]] = {title: set() for title in titles}
 
     if not exhaustive:
         for title in titles:
-            data = api_query(base_url, wiki, {
-                'action': 'query',
-                'list': 'embeddedin|backlinks',
-                'eititle': title,
-                'bltitle': title,
-                'einamespace': ns_filter,
-                'blnamespace': ns_filter,
-                'eilimit': '500',
-                'bllimit': '500',
-            })
-            for list_module in ('embeddedin', 'backlinks'):
-                for entry in data.get('query', {}).get(list_module, []):
-                    linking_pages[title].add(entry['pageid'])
+            data = api_query(
+                base_url,
+                wiki,
+                {
+                    "action": "query",
+                    "list": "embeddedin|backlinks",
+                    "eititle": title,
+                    "bltitle": title,
+                    "einamespace": ns_filter,
+                    "blnamespace": ns_filter,
+                    "eilimit": "500",
+                    "bllimit": "500",
+                },
+            )
+            for list_module in ("embeddedin", "backlinks"):
+                for entry in data.get("query", {}).get(list_module, []):
+                    linking_pages[title].add(entry["pageid"])
             time.sleep(delay)
         return {title: len(pages) for title, pages in linking_pages.items()}
 
     for start in range(0, len(titles), 50):
-        chunk = titles[start:start + 50]
+        chunk = titles[start : start + 50]
         cont: dict = {}
         while True:
-            data = api_query(base_url, wiki, {
-                'action': 'query',
-                'titles': '|'.join(chunk),
-                'prop': 'linkshere|transcludedin',
-                'lhprop': 'pageid',
-                'tiprop': 'pageid',
-                'lhnamespace': ns_filter,
-                'tinamespace': ns_filter,
-                'lhlimit': '500',
-                'tilimit': '500',
-                **cont,
-            })
-            for page in data.get('query', {}).get('pages', []):
-                links = linking_pages.get(page.get('title'))
+            data = api_query(
+                base_url,
+                wiki,
+                {
+                    "action": "query",
+                    "titles": "|".join(chunk),
+                    "prop": "linkshere|transcludedin",
+                    "lhprop": "pageid",
+                    "tiprop": "pageid",
+                    "lhnamespace": ns_filter,
+                    "tinamespace": ns_filter,
+                    "lhlimit": "500",
+                    "tilimit": "500",
+                    **cont,
+                },
+            )
+            for page in data.get("query", {}).get("pages", []):
+                links = linking_pages.get(page.get("title"))
                 if links is None:
                     continue
-                for entry in page.get('linkshere', []) + page.get('transcludedin', []):
-                    links.add(entry['pageid'])
-            cont = data.get('continue')
+                for entry in page.get("linkshere", []) + page.get("transcludedin", []):
+                    links.add(entry["pageid"])
+            cont = data.get("continue")
             if not cont:
                 break
             time.sleep(delay)
@@ -213,15 +239,13 @@ def count_what_links_here(base_url: str, wiki: str, titles: list[str], ns_ids: l
 
 def count_loc(content: str) -> tuple[int, int]:
     lines = content.splitlines()
-    loc = sum(
-        1 for line in lines
-        if line.strip() and not line.strip().startswith('--')
-    )
+    loc = sum(1 for line in lines if line.strip() and not line.strip().startswith("--"))
     return len(lines), loc
 
 
-def analyze_wiki(base_url: str, wiki: str, delay: float, check_links: bool,
-                 links_exact: bool) -> tuple[dict, list]:
+def analyze_wiki(
+    base_url: str, wiki: str, delay: float, check_links: bool, links_exact: bool
+) -> tuple[dict, list]:
     """Return (summary stats, list of on-wiki-only pages).
 
     Pages are (title, lines, loc) tuples, plus a WhatLinksHere count
@@ -229,77 +253,103 @@ def analyze_wiki(base_url: str, wiki: str, delay: float, check_links: bool,
     """
     deployed = deployed_titles(wiki)
     stats = {
-        'date': date.today().isoformat(),
-        'wiki': wiki,
-        'onwiki_pages': 0,
-        'onwiki_lines': 0,
-        'onwiki_loc': 0,
-        'excluded_pages': 0,
+        "date": date.today().isoformat(),
+        "wiki": wiki,
+        "onwiki_pages": 0,
+        "onwiki_lines": 0,
+        "onwiki_loc": 0,
+        "excluded_pages": 0,
     }
     pages: list[tuple[str, int, int]] = []
     for title, content in fetch_modules(base_url, wiki, delay):
         if EXCLUDE_RE.search(title):
-            stats['excluded_pages'] += 1
+            stats["excluded_pages"] += 1
             continue
         if title in deployed:
             continue
         lines, loc = count_loc(content)
-        stats['onwiki_pages'] += 1
-        stats['onwiki_lines'] += lines
-        stats['onwiki_loc'] += loc
+        stats["onwiki_pages"] += 1
+        stats["onwiki_lines"] += lines
+        stats["onwiki_loc"] += loc
         pages.append((title, lines, loc))
     pages.sort(key=lambda page: page[2], reverse=True)
     if check_links:
         ns_ids = resolve_link_namespaces(base_url, wiki)
         link_counts = count_what_links_here(
-            base_url, wiki, [title for title, _, _ in pages], ns_ids, delay, links_exact)
-        pages = [
-            (title, lines, loc, link_counts[title])
-            for title, lines, loc in pages
-        ]
+            base_url, wiki, [title for title, _, _ in pages], ns_ids, delay, links_exact
+        )
+        pages = [(title, lines, loc, link_counts[title]) for title, lines, loc in pages]
     return stats, pages
 
 
 def main() -> None:
     import os
+
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--base-url', default=os.getenv('WIKI_BASE_URL', 'https://liquipedia.net'))
-    parser.add_argument('--wikis', help='comma-separated wiki list (default: all dirs in lua/wikis)')
-    parser.add_argument('--delay', type=float, default=2.0)
-    parser.add_argument('--csv', action='store_true', help='per-wiki summary CSV')
-    parser.add_argument('--csv-pages', action='store_true', help='per-page CSV instead of summary')
-    parser.add_argument('--pages', action=argparse.BooleanOptionalAction, default=True,
-                        help='list the on-wiki-only pages under each wiki in table mode')
-    parser.add_argument('--links', action='store_true',
-                        help='count WhatLinksHere per on-wiki page (main/Project/Portal '
-                             'namespaces only; extra API requests per page; counts cap '
-                             'at 500 per link type)')
-    parser.add_argument('--links-exact', action='store_true',
-                        help='follow pagination for exact WhatLinksHere counts '
-                             '(slower; implies --links)')
-    parser.add_argument('--header', action=argparse.BooleanOptionalAction, default=True,
-                        help='write the CSV header row (--no-header when appending '
-                             'to an existing time-series file)')
+    parser.add_argument(
+        "--base-url", default=os.getenv("WIKI_BASE_URL", "https://liquipedia.net")
+    )
+    parser.add_argument(
+        "--wikis", help="comma-separated wiki list (default: all dirs in lua/wikis)"
+    )
+    parser.add_argument("--delay", type=float, default=2.0)
+    parser.add_argument("--csv", action="store_true", help="per-wiki summary CSV")
+    parser.add_argument(
+        "--csv-pages", action="store_true", help="per-page CSV instead of summary"
+    )
+    parser.add_argument(
+        "--pages",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="list the on-wiki-only pages under each wiki in table mode",
+    )
+    parser.add_argument(
+        "--links",
+        action="store_true",
+        help="count WhatLinksHere per on-wiki page (main/Project/Portal "
+        "namespaces only; extra API requests per page; counts cap "
+        "at 500 per link type)",
+    )
+    parser.add_argument(
+        "--links-exact",
+        action="store_true",
+        help="follow pagination for exact WhatLinksHere counts "
+        "(slower; implies --links)",
+    )
+    parser.add_argument(
+        "--header",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="write the CSV header row (--no-header when appending "
+        "to an existing time-series file)",
+    )
     args = parser.parse_args()
     if args.links_exact:
         args.links = True
 
     if args.wikis:
-        wikis = [w.strip() for w in args.wikis.split(',') if w.strip()]
+        wikis = [w.strip() for w in args.wikis.split(",") if w.strip()]
     else:
         # commons included: it is a wiki like any other, with its own on-wiki
         # Module pages that are not deployed from lua/wikis/commons.
         wikis = sorted(d.name for d in WIKIS_DIR.iterdir() if d.is_dir())
 
     fieldnames = [
-        'date', 'wiki', 'onwiki_pages', 'onwiki_lines', 'onwiki_loc',
-        'excluded_pages',
+        "date",
+        "wiki",
+        "onwiki_pages",
+        "onwiki_lines",
+        "onwiki_loc",
+        "excluded_pages",
     ]
     writer = None
     if args.csv_pages:
         writer = csv.writer(sys.stdout)
         if args.header:
-            writer.writerow(['date', 'wiki', 'title', 'lines', 'loc'] + (['links'] if args.links else []))
+            writer.writerow(
+                ["date", "wiki", "title", "lines", "loc"]
+                + (["links"] if args.links else [])
+            )
     elif args.csv:
         writer = csv.DictWriter(sys.stdout, fieldnames=fieldnames)
         if args.header:
@@ -310,15 +360,17 @@ def main() -> None:
     totals = dict.fromkeys(fieldnames[2:], 0)
     for wiki in wikis:
         try:
-            stats, pages = analyze_wiki(args.base_url, wiki, args.delay, args.links, args.links_exact)
+            stats, pages = analyze_wiki(
+                args.base_url, wiki, args.delay, args.links, args.links_exact
+            )
         except Exception as error:  # keep going; one broken wiki shouldn't kill the run
-            print(f'ERROR {wiki}: {error}', file=sys.stderr)
+            print(f"ERROR {wiki}: {error}", file=sys.stderr)
             continue
         for key in totals:
             totals[key] += stats[key]
         if args.csv_pages:
             for page in pages:
-                writer.writerow([stats['date'], wiki, *page])
+                writer.writerow([stats["date"], wiki, *page])
             sys.stdout.flush()
         elif args.csv:
             writer.writerow(stats)
@@ -331,17 +383,17 @@ def main() -> None:
             if args.pages:
                 for page in pages:
                     title, lines, loc = page[:3]
-                    suffix = f', {page[3]} usages' if args.links else ''
-                    print(f'    {title}  ({loc} loc{suffix})')
+                    suffix = f", {page[3]} usages" if args.links else ""
+                    print(f"    {title}  ({loc} loc{suffix})")
         time.sleep(args.delay)
 
     if not args.csv and not args.csv_pages:
-        print('-' * 47)
+        print("-" * 47)
         print(
             f"{'TOTAL':<20} {totals['onwiki_pages']:>6} {totals['onwiki_lines']:>9} "
             f"{totals['onwiki_loc']:>9}"
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
