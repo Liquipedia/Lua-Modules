@@ -1143,9 +1143,12 @@ function mw.uri.decode(str, enctype) end
 ---@param query table<string, string|number|any[]|false>
 ---@return string
 function mw.uri.buildQueryString(query)
-	---@param str string
+	---@param str string|number|boolean
 	---@return string
 	local function encode(str)
+		if type(str) ~= 'string' then
+			return tostring(str)
+		end
 		return (str:gsub('([^%w_.~-])', function (character)
 			if character == ' ' then
 				return '+'
