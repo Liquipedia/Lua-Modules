@@ -162,7 +162,7 @@ end
 
 ---Constructs a submatch object whose properties are aggregated from that of its games.
 ---@param match StarcraftMatchGroupUtilMatch
----@param subgroup MatchGroupUtilSubgroup
+---@param subgroup StarcraftMatchGroupUtilSubmatch
 ---@return StarcraftMatchGroupUtilSubmatch
 function StarcraftMatchGroupUtil.constructSubmatch(match, subgroup)
 	local games = subgroup.games
