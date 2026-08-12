@@ -169,9 +169,12 @@ function DisplayHelper._createSubstituteReferences(references)
 	---@cast references -nil
 	local frame = mw.getCurrentFrame()
 	return table.concat(Array.map(references, function (reference)
-		return frame:extensionTag('ref', Template.safeExpand(
-			frame, 'Cite web', reference
-		))
+		local refName = Table.extract(reference, 'name')
+		return frame:extensionTag(
+			'ref',
+			Template.safeExpand(frame, 'Cite web', reference),
+			String.isNotEmpty(refName) and {name = refName} or nil
+		)
 	end))
 end
 
