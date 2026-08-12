@@ -15,12 +15,13 @@ local Iterator = {}
 Applies a function to the elements of an iterator, returning a new iterator.
 
 Example:
+```
 function square(ix, x) return ix, x * x end
 for ix, x in Iterator.map(square, ipairs({4, 5, 6})) do
 	mw.log(ix, x)
 end
--- prints
-1 16 2 25 3 36
+```
+prints `1 16 2 25 3 36`
 ]]
 function Iterator.map(f, innerNext, innerState, initialInnerElem)
 	local innerElem1 = initialInnerElem
@@ -43,6 +44,7 @@ iterator. The iterator of iterators is flattened into a single big iterator,
 which is returned.
 
 Example:
+```
 function ipairsSquares(_, x)
 	local squares = {}
 	for i = 1, x do
@@ -54,8 +56,8 @@ end
 for _, sq in Iterator.flatMap(ipairsSquares, ipairs({4, 5, 6})) do
 	mw.log(sq)
 end
--- prints
-1 4 9 16 1 4 9 16 25 1 4 9 16 25 36
+```
+prints `1 4 9 16 1 4 9 16 25 1 4 9 16 25 36`
 ]]
 function Iterator.flatMap(f, outerNext, outerState, initialOuterElem)
 	local outerElem = {initialOuterElem}
