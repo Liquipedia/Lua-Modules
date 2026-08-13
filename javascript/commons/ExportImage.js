@@ -11,7 +11,6 @@ const EXPORT_IMAGE_CONFIG = {
 		DARK: 'https://liquipedia.net/commons/images/f/ff/Liquipedia_default_darkmode_export.png',
 		LIGHT: 'https://liquipedia.net/commons/images/9/9a/Liquipedia_default_lightmode_export.png'
 	},
-	CAPTURE_WIDTH: 1440,
 	DIMENSIONS: {
 		HEADER_HEIGHT: 43,
 		FOOTER_HEIGHT: 33,
@@ -20,7 +19,6 @@ const EXPORT_IMAGE_CONFIG = {
 		LOGO_WIDTH: 22,
 		LOGO_HEIGHT: 16,
 		LOGO_OFFSET_X: 12,
-		LOGO_OFFSET_Y_ADJUST: 2,
 		TEXT_OFFSET_X: 40,
 		HEADER_TEXT_OFFSET: 16,
 		MIN_WIDTH: 300
@@ -105,373 +103,15 @@ const EXPORT_IMAGE_CONFIG = {
 };
 
 /**
- * Manages image caching and loading
- */
-class ImageCache {
-	constructor() {
-		this.cache = new Map();
-	}
-
-	async load( url, key, timeout = EXPORT_IMAGE_CONFIG.TIMEOUTS.IMAGE_LOAD ) {
-		// Return cached image if available
-		if ( this.cache.has( key ) ) {
-			return this.cache.get( key );
-		}
-
-		return new Promise( ( resolve, reject ) => {
-			const image = new Image();
-			image.crossOrigin = 'Anonymous';
-
-			const timeoutId = setTimeout( () => {
-				image.src = ''; // Cancel image load
-				reject( new Error( `Image load timeout: ${ url }` ) );
-			}, timeout );
-
-			const cleanup = () => clearTimeout( timeoutId );
-
-			image.onload = () => {
-				cleanup();
-				this.cache.set( key, image );
-				resolve( image );
-			};
-
-			image.onerror = () => {
-				cleanup();
-				reject( new Error( `Image load failed: ${ url }` ) );
-			};
-
-			image.src = url;
-		} );
-	}
-
-	clear() {
-		this.cache.clear();
-	}
-}
-
-/**
- * Handles canvas composition and rendering
- */
-class CanvasComposer {
-	constructor( imageCache ) {
-		this.imageCache = imageCache;
-		this.offscreenContext = null;
-	}
-
-	async compose( sourceCanvas, sectionTitle, isDarkTheme, scale = 1 ) {
-		const dims = this.getScaledDimensions( scale );
-		const fonts = this.getScaledFonts( scale );
-
-		const contentWidth = sourceCanvas.width + ( dims.PADDING * 2 );
-		const canvasWidth = Math.max( contentWidth, dims.MIN_WIDTH );
-
-		const headerLayout = this.calculateHeaderLayout( canvasWidth, sectionTitle, scale, fonts, dims );
-		const canvas = this.createCanvas( sourceCanvas, headerLayout.height, canvasWidth, dims );
-		const context = canvas.getContext( '2d' );
-		const theme = isDarkTheme ? EXPORT_IMAGE_CONFIG.COLORS.DARK : EXPORT_IMAGE_CONFIG.COLORS.LIGHT;
-
-		this.drawBackground( context, canvas.width, canvas.height, theme );
-		this.drawHeader( context, canvas.width, theme, headerLayout, fonts, dims );
-		this.drawContent( context, sourceCanvas, headerLayout.height, dims );
-		await this.drawFooter(
-			context, canvas.width, sourceCanvas.height, theme, isDarkTheme, headerLayout.height, fonts, dims
-		);
-
-		return canvas;
-	}
-
-	getScaledDimensions( scale ) {
-		const dims = {};
-		for ( const [ key, value ] of Object.entries( EXPORT_IMAGE_CONFIG.DIMENSIONS ) ) {
-			dims[ key ] = typeof value === 'number' ? value * scale : value;
-		}
-		return dims;
-	}
-
-	getScaledFonts( scale ) {
-		const fonts = {};
-		for ( const [ key, fontString ] of Object.entries( EXPORT_IMAGE_CONFIG.FONTS ) ) {
-			fonts[ key ] = this.scaleFontSize( fontString, scale );
-		}
-		return fonts;
-	}
-
-	scaleFontSize( fontString, scale ) {
-		return fontString.replace( /(\d+)px/, ( _match, pixels ) => {
-			const scaledPixels = parseInt( pixels ) * scale;
-			return `${ scaledPixels }px`;
-		} );
-	}
-
-	getOffscreenContext() {
-		if ( !this.offscreenContext ) {
-			const canvas = document.createElement( 'canvas' );
-			this.offscreenContext = canvas.getContext( '2d' );
-		}
-		return this.offscreenContext;
-	}
-
-	createCanvas( sourceCanvas, headerHeight, width, dims ) {
-		const canvas = document.createElement( 'canvas' );
-		canvas.width = width;
-		canvas.height = sourceCanvas.height + headerHeight + dims.FOOTER_HEIGHT + ( dims.PADDING * 4 );
-		return canvas;
-	}
-
-	drawBackground( context, width, height, theme ) {
-		context.fillStyle = theme.BACKGROUND;
-		context.fillRect( 0, 0, width, height );
-	}
-
-	drawHeader( context, canvasWidth, theme, headerLayout, fonts, dims ) {
-		// Draw header background with gradient
-		const gradient = context.createLinearGradient( dims.PADDING, 0, canvasWidth - dims.PADDING, 0 );
-		gradient.addColorStop( 0, theme.HEADER_START );
-		gradient.addColorStop( 1, theme.HEADER_END );
-
-		context.fillStyle = gradient;
-		this.drawRoundedRect(
-			context,
-			dims.PADDING,
-			dims.PADDING,
-			canvasWidth - ( dims.PADDING * 2 ),
-			headerLayout.height,
-			dims.BORDER_RADIUS
-		);
-		context.fill();
-
-		// Draw header text
-		context.fillStyle = '#ffffff';
-		context.textBaseline = 'middle';
-
-		if ( headerLayout.isStacked ) {
-			this.drawStackedHeader( context, headerLayout, fonts, dims );
-		} else {
-			this.drawHorizontalHeader( context, headerLayout, canvasWidth, fonts, dims );
-		}
-	}
-
-	drawStackedHeader( context, headerLayout, fonts, dims ) {
-		context.textAlign = 'left';
-		const lineHeight = 18 * ( dims.PADDING / 12 ); // Scale lineHeight with dims
-		const totalLines = headerLayout.mainTitleLines.length + headerLayout.sectionTitleLines.length;
-		let currentY = dims.PADDING + ( headerLayout.height - ( ( totalLines - 1 ) * lineHeight ) ) / 2;
-
-		context.font = fonts.HEADER;
-		for ( const line of headerLayout.mainTitleLines ) {
-			context.fillText( line, dims.PADDING + dims.HEADER_TEXT_OFFSET, currentY );
-			currentY += lineHeight;
-		}
-
-		context.font = fonts.SUBHEADER;
-		for ( const line of headerLayout.sectionTitleLines ) {
-			context.fillText( line, dims.PADDING + dims.HEADER_TEXT_OFFSET, currentY );
-			currentY += lineHeight;
-		}
-	}
-
-	drawHorizontalHeader( context, headerLayout, canvasWidth, fonts, dims ) {
-		const verticalCenter = dims.PADDING + ( headerLayout.height / 2 );
-
-		context.textAlign = 'left';
-		context.font = fonts.HEADER;
-		context.fillText(
-			headerLayout.mainTitleLines[ 0 ],
-			dims.PADDING + dims.HEADER_TEXT_OFFSET,
-			verticalCenter
-		);
-
-		context.textAlign = 'right';
-		context.font = fonts.SUBHEADER;
-		context.fillText(
-			headerLayout.sectionTitleLines[ 0 ],
-			canvasWidth - dims.PADDING - dims.HEADER_TEXT_OFFSET,
-			verticalCenter
-		);
-	}
-
-	drawContent( context, sourceCanvas, headerHeight, dims ) {
-		context.drawImage(
-			sourceCanvas,
-			dims.PADDING,
-			dims.PADDING + headerHeight + dims.PADDING
-		);
-	}
-
-	async drawFooter( context, canvasWidth, sourceHeight, theme, isDarkTheme, headerHeight, fonts, dims ) {
-		const footerY = dims.PADDING + headerHeight + dims.PADDING + sourceHeight + dims.PADDING;
-
-		// Draw footer background
-		const gradient = context.createLinearGradient( dims.PADDING, 0, canvasWidth - dims.PADDING, 0 );
-		gradient.addColorStop( 0, theme.FOOTER_START );
-		gradient.addColorStop( 1, theme.FOOTER_END );
-
-		context.fillStyle = gradient;
-		this.drawRoundedRect(
-			context,
-			dims.PADDING,
-			footerY,
-			canvasWidth - ( dims.PADDING * 2 ),
-			dims.FOOTER_HEIGHT,
-			dims.BORDER_RADIUS
-		);
-		context.fill();
-
-		// Draw footer text
-		context.fillStyle = theme.TEXT;
-		context.font = fonts.FOOTER;
-		context.textAlign = 'left';
-		const textY = footerY + ( dims.FOOTER_HEIGHT / 2 );
-
-		this.drawTextWithSpacing(
-			context,
-			'POWERED BY LIQUIPEDIA',
-			dims.PADDING + dims.TEXT_OFFSET_X,
-			textY,
-			EXPORT_IMAGE_CONFIG.SPACING.LETTER_SPACING * ( dims.LOGO_WIDTH / 22 )
-		);
-
-		// Draw logo (non-critical, catch errors silently)
-		try {
-			await this.drawLogo( context, footerY, isDarkTheme, dims );
-		} catch ( error ) {
-			// eslint-disable-next-line no-console
-			console.warn( 'Logo rendering failed:', error );
-		}
-	}
-
-	calculateHeaderLayout( canvasWidth, sectionTitle, scale, fonts, dims ) {
-		const availableWidth = canvasWidth - ( dims.PADDING * 2 ) - ( dims.HEADER_TEXT_OFFSET * 2 );
-		const mainTitle = mw.config.get( 'wgDisplayTitle' ) || mw.config.get( 'wgTitle' );
-
-		const context = this.getOffscreenContext();
-
-		// Measure text widths
-		context.font = fonts.HEADER;
-		const mainTitleWidth = context.measureText( mainTitle ).width;
-
-		context.font = fonts.SUBHEADER;
-		const sectionTitleWidth = context.measureText( sectionTitle ).width;
-
-		const totalTextWidth = mainTitleWidth + sectionTitleWidth + ( dims.HEADER_TEXT_OFFSET * 2 );
-		const sideBySideAvailableWidth = canvasWidth - ( dims.PADDING * 2 ) - dims.TEXT_OFFSET_X;
-
-		// Check if text fits side-by-side
-		if ( totalTextWidth <= sideBySideAvailableWidth ) {
-			return {
-				height: dims.HEADER_HEIGHT,
-				isStacked: false,
-				mainTitleLines: [ mainTitle ],
-				sectionTitleLines: [ sectionTitle ]
-			};
-		}
-
-		// Calculate stacked layout
-		const mainTitleLines = this.wrapText( context, mainTitle, availableWidth, fonts.HEADER );
-		const sectionTitleLines = this.wrapText( context, sectionTitle, availableWidth, fonts.SUBHEADER );
-
-		const lineHeight = 18 * scale;
-		const verticalPadding = 12 * scale;
-		const calculatedHeight = Math.max(
-			dims.HEADER_HEIGHT,
-			( ( mainTitleLines.length + sectionTitleLines.length ) * lineHeight ) + verticalPadding
-		);
-
-		return {
-			height: calculatedHeight,
-			isStacked: true,
-			mainTitleLines,
-			sectionTitleLines
-		};
-	}
-
-	wrapText( context, text, maxWidth, font ) {
-		context.font = font;
-		const words = text.split( ' ' );
-
-		if ( words.length === 0 ) {
-			return [];
-		}
-
-		const lines = [];
-		let currentLine = words[ 0 ];
-
-		for ( let i = 1; i < words.length; i++ ) {
-			const testLine = `${ currentLine } ${ words[ i ] }`;
-			const width = context.measureText( testLine ).width;
-
-			if ( width <= maxWidth ) {
-				currentLine = testLine;
-			} else {
-				lines.push( currentLine );
-				currentLine = words[ i ];
-			}
-		}
-		lines.push( currentLine );
-
-		return lines;
-	}
-
-	async drawLogo( context, footerY, isDarkTheme, dims ) {
-		const logoUrl = isDarkTheme ? EXPORT_IMAGE_CONFIG.LOGOS.DARK : EXPORT_IMAGE_CONFIG.LOGOS.LIGHT;
-		const cacheKey = isDarkTheme ? 'dark' : 'light';
-		const logoImage = await this.imageCache.load( logoUrl, cacheKey );
-		const logoY = footerY + ( dims.FOOTER_HEIGHT - dims.LOGO_HEIGHT ) / 2;
-
-		context.drawImage(
-			logoImage,
-			dims.PADDING + dims.LOGO_OFFSET_X,
-			logoY,
-			dims.LOGO_WIDTH,
-			dims.LOGO_HEIGHT
-		);
-	}
-
-	drawRoundedRect( context, x, y, width, height, radius ) {
-		context.beginPath();
-
-		if ( context.roundRect ) {
-			context.roundRect( x, y, width, height, radius );
-		} else {
-			this.drawRoundRectFallback( context, x, y, width, height, radius );
-		}
-
-		context.closePath();
-	}
-
-	drawRoundRectFallback( context, x, y, width, height, radius ) {
-		context.moveTo( x + radius, y );
-		context.lineTo( x + width - radius, y );
-		context.quadraticCurveTo( x + width, y, x + width, y + radius );
-		context.lineTo( x + width, y + height - radius );
-		context.quadraticCurveTo( x + width, y + height, x + width - radius, y + height );
-		context.lineTo( x + radius, y + height );
-		context.quadraticCurveTo( x, y + height, x, y + height - radius );
-		context.lineTo( x, y + radius );
-		context.quadraticCurveTo( x, y, x + radius, y );
-	}
-
-	drawTextWithSpacing( context, text, x, y, spacing ) {
-		let cursor = x;
-		for ( const character of text ) {
-			context.fillText( character, cursor, y );
-			cursor += context.measureText( character ).width + spacing;
-		}
-	}
-}
-
-/**
- * Handles export operations (canvas capture, download, clipboard)
+ * Handles export operations (DOM composition, canvas capture, download, clipboard)
  */
 class ExportService {
-	constructor( canvasComposer ) {
-		this.canvasComposer = canvasComposer;
+	constructor() {
 		this.snapdomLoaded = false;
 		this.activeExports = new Set();
 	}
 
-	// element is the specific node being captured, not a full document, so
-	// selectors below must also check the root itself, not just its descendants.
+	// element itself may match the selector, not just its descendants.
 	queryAllIncludingSelf( element, selector ) {
 		const matches = [ ...element.querySelectorAll( selector ) ];
 		if ( element.matches( selector ) ) {
@@ -491,10 +131,7 @@ class ExportService {
 		return collapsedTables;
 	}
 
-	// Rebuilds the ancestor chain above `element` as empty (shallow-cloned) shells wrapping
-	// one deep clone of the element itself. This preserves ancestor-scoped CSS — including
-	// theme rules keyed off <html class="theme--dark">, which sits above everything — without
-	// cloning any unrelated page content (ads, sidebar, embeds) sitting next to those ancestors.
+	// Shallow ancestor shells keep ancestor-scoped CSS (e.g. theme--dark) applying to the clone.
 	buildAncestorSpine( element ) {
 		const target = element.cloneNode( true );
 		let root = target;
@@ -510,69 +147,115 @@ class ExportService {
 		return { root, target };
 	}
 
-	// The sandbox document starts blank, so none of the page's stylesheets apply until
-	// copied over. Cross-origin sheets (e.g. Google Fonts) can't have their rules read
-	// directly (cssRules throws), so those are re-linked instead of inlined.
-	copyStylesheetsInto( targetDocument ) {
-		const loadPromises = [];
+	// snapdom doesn't wait for images; undecoded ones can be missing or collapse row heights.
+	async waitForImages( element, timeout = EXPORT_IMAGE_CONFIG.TIMEOUTS.IMAGE_LOAD ) {
+		const images = this.queryAllIncludingSelf( element, 'img' );
 
-		for ( const sheet of document.styleSheets ) {
-			try {
-				const style = targetDocument.createElement( 'style' );
-				style.textContent = [ ...sheet.cssRules ].map( ( rule ) => rule.cssText ).join( '\n' );
-				targetDocument.head.appendChild( style );
-				continue;
-			} catch {
-				// Cross-origin stylesheet; fall through to re-linking it below.
-			}
-
-			if ( sheet.href ) {
-				const link = targetDocument.createElement( 'link' );
-				link.rel = 'stylesheet';
-				link.href = sheet.href;
-				loadPromises.push( new Promise( ( resolve ) => {
-					link.addEventListener( 'load', resolve );
-					link.addEventListener( 'error', resolve );
-				} ) );
-				targetDocument.head.appendChild( link );
-			}
-		}
-
-		return Promise.all( loadPromises );
+		await Promise.all( images.map( ( image ) => Promise.race( [
+			image.decode ? image.decode().catch( () => {} ) : Promise.resolve(),
+			new Promise( ( resolve ) => {
+				setTimeout( resolve, timeout );
+			} )
+		] ) ) );
 	}
 
-	// Snapdom has no page-simulation equivalent to html2canvas's windowWidth, so this builds
-	// one: a hidden iframe pinned to CAPTURE_WIDTH gives the clone its own real viewport, so
-	// `@media` rules (e.g. Brackets.scss's mobile --match-width override) resolve the same way
-	// regardless of the exporting user's actual window size. Only the ancestor spine above
-	// `element` is cloned into it, not the rest of the page, so this stays cheap and avoids
-	// re-fetching ads/trackers.
-	async createCaptureSandbox( element ) {
-		const iframe = document.createElement( 'iframe' );
-		iframe.style.position = 'fixed';
-		iframe.style.top = '-99999px';
-		iframe.style.left = '-99999px';
-		iframe.style.width = `${ EXPORT_IMAGE_CONFIG.CAPTURE_WIDTH }px`;
-		iframe.style.height = '2000px';
-		iframe.style.border = '0';
-		document.body.appendChild( iframe );
+	createLogoImage( isDarkTheme ) {
+		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+		const logo = document.createElement( 'img' );
 
-		const iframeDocument = iframe.contentDocument;
-		const base = iframeDocument.createElement( 'base' );
-		base.href = document.baseURI;
-		iframeDocument.head.appendChild( base );
+		logo.crossOrigin = 'anonymous';
+		logo.src = isDarkTheme ? EXPORT_IMAGE_CONFIG.LOGOS.DARK : EXPORT_IMAGE_CONFIG.LOGOS.LIGHT;
+		logo.width = dims.LOGO_WIDTH;
+		logo.height = dims.LOGO_HEIGHT;
+		logo.style.display = 'block';
+		logo.style.flex = 'none';
 
-		const stylesheetsLoaded = this.copyStylesheetsInto( iframeDocument );
+		return logo;
+	}
 
-		const { root, target } = this.buildAncestorSpine( element );
-		iframeDocument.body.appendChild( iframeDocument.adoptNode( root ) );
+	buildHeaderElement( sectionTitle, isDarkTheme, dims ) {
+		const theme = isDarkTheme ? EXPORT_IMAGE_CONFIG.COLORS.DARK : EXPORT_IMAGE_CONFIG.COLORS.LIGHT;
 
-		await stylesheetsLoaded;
-		if ( iframeDocument.fonts && iframeDocument.fonts.ready ) {
-			await iframeDocument.fonts.ready;
-		}
+		const mainTitle = document.createElement( 'span' );
+		mainTitle.textContent = mw.config.get( 'wgDisplayTitle' ) || mw.config.get( 'wgTitle' );
+		Object.assign( mainTitle.style, { font: EXPORT_IMAGE_CONFIG.FONTS.HEADER, color: '#ffffff' } );
 
-		return { iframe, target };
+		const subTitle = document.createElement( 'span' );
+		subTitle.textContent = sectionTitle;
+		Object.assign( subTitle.style, { font: EXPORT_IMAGE_CONFIG.FONTS.SUBHEADER, color: '#ffffff' } );
+
+		const header = document.createElement( 'div' );
+		Object.assign( header.style, {
+			display: 'flex',
+			flexWrap: 'wrap',
+			alignItems: 'center',
+			justifyContent: 'space-between',
+			rowGap: '4px',
+			minHeight: `${ dims.HEADER_HEIGHT }px`,
+			padding: `4px ${ dims.HEADER_TEXT_OFFSET }px`,
+			borderRadius: `${ dims.BORDER_RADIUS }px`,
+			background: `linear-gradient(to right, ${ theme.HEADER_START }, ${ theme.HEADER_END })`,
+			boxSizing: 'border-box'
+		} );
+		header.append( mainTitle, subTitle );
+
+		return header;
+	}
+
+	buildFooterElement( isDarkTheme, dims ) {
+		const theme = isDarkTheme ? EXPORT_IMAGE_CONFIG.COLORS.DARK : EXPORT_IMAGE_CONFIG.COLORS.LIGHT;
+
+		const logo = this.createLogoImage( isDarkTheme );
+		logo.style.marginLeft = `${ dims.LOGO_OFFSET_X }px`;
+
+		const text = document.createElement( 'span' );
+		text.textContent = 'POWERED BY LIQUIPEDIA';
+		Object.assign( text.style, {
+			font: EXPORT_IMAGE_CONFIG.FONTS.FOOTER,
+			color: theme.TEXT,
+			letterSpacing: `${ EXPORT_IMAGE_CONFIG.SPACING.LETTER_SPACING }px`,
+			marginLeft: `${ dims.TEXT_OFFSET_X - dims.LOGO_OFFSET_X - dims.LOGO_WIDTH }px`
+		} );
+
+		const footer = document.createElement( 'div' );
+		Object.assign( footer.style, {
+			display: 'flex',
+			alignItems: 'center',
+			height: `${ dims.FOOTER_HEIGHT }px`,
+			borderRadius: `${ dims.BORDER_RADIUS }px`,
+			background: `linear-gradient(to right, ${ theme.FOOTER_START }, ${ theme.FOOTER_END })`,
+			boxSizing: 'border-box'
+		} );
+		footer.append( logo, text );
+
+		return footer;
+	}
+
+	wrapWithHeaderFooter( target, sectionTitle, isDarkTheme ) {
+		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+		const theme = isDarkTheme ? EXPORT_IMAGE_CONFIG.COLORS.DARK : EXPORT_IMAGE_CONFIG.COLORS.LIGHT;
+
+		const wrapper = document.createElement( 'div' );
+		Object.assign( wrapper.style, {
+			display: 'flex',
+			flexDirection: 'column',
+			gap: `${ dims.PADDING }px`,
+			padding: `${ dims.PADDING }px`,
+			width: 'fit-content',
+			minWidth: `${ dims.MIN_WIDTH }px`,
+			background: theme.BACKGROUND,
+			boxSizing: 'border-box'
+		} );
+
+		target.style.alignSelf = 'flex-start';
+
+		wrapper.append(
+			this.buildHeaderElement( sectionTitle, isDarkTheme, dims ),
+			target,
+			this.buildFooterElement( isDarkTheme, dims )
+		);
+
+		return wrapper;
 	}
 
 	async export( element, title, mode ) {
@@ -603,24 +286,36 @@ class ExportService {
 	async generateImageBlob( element, title ) {
 		const isDarkTheme = document.documentElement.classList.contains( 'theme--dark' );
 		const backgroundColor = this.getBackgroundColor();
+		const frameBackground = isDarkTheme ?
+			EXPORT_IMAGE_CONFIG.COLORS.DARK.BACKGROUND :
+			EXPORT_IMAGE_CONFIG.COLORS.LIGHT.BACKGROUND;
 		// This ensures the scale is at least 2, but never higher than 3
 		const scale = Math.min( Math.max( window.devicePixelRatio || 1, 2 ), 3 );
 
-		let sandboxIframe;
+		const { root, target } = this.buildAncestorSpine( element );
+
+		// Mutates the clone, not the live page, so nothing needs restoring afterwards.
+		target.style.background = backgroundColor;
+		this.expandPrizepoolTables( target );
+
+		const wrapper = this.wrapWithHeaderFooter( target, title, isDarkTheme );
+
+		root.style.position = 'fixed';
+		root.style.top = '-99999px';
+		root.style.left = '-99999px';
+		document.body.appendChild( root );
 
 		try {
-			const sandbox = await this.createCaptureSandbox( element );
-			sandboxIframe = sandbox.iframe;
-			const target = sandbox.target;
+			if ( document.fonts && document.fonts.ready ) {
+				await document.fonts.ready;
+			}
+			await this.waitForImages( wrapper );
 
-			// These mutate the sandboxed clone, not the live page, so there's nothing to
-			// restore afterwards — removing the iframe discards them along with it.
-			target.style.background = backgroundColor;
-			this.expandPrizepoolTables( target );
-
-			const capturedCanvas = await snapdom.toCanvas( target, {
+			const capturedCanvas = await snapdom.toCanvas( wrapper, {
 				scale: scale,
-				backgroundColor: backgroundColor,
+				backgroundColor: frameBackground,
+				reconcile: true,
+				fast: false,
 				exclude: [
 					'.switch-pill-container',
 					'.prizepooltabletoggle',
@@ -635,15 +330,8 @@ class ExportService {
 				throw new Error( 'Canvas capture resulted in zero dimensions' );
 			}
 
-			const composedCanvas = await this.canvasComposer.compose(
-				capturedCanvas,
-				title,
-				isDarkTheme,
-				scale
-			);
-
 			return new Promise( ( resolve, reject ) => {
-				composedCanvas.toBlob( ( blob ) => {
+				capturedCanvas.toBlob( ( blob ) => {
 					if ( blob ) {
 						resolve( blob );
 					} else {
@@ -652,9 +340,7 @@ class ExportService {
 				}, 'image/png' );
 			} );
 		} finally {
-			if ( sandboxIframe ) {
-				sandboxIframe.remove();
-			}
+			root.remove();
 		}
 	}
 
@@ -1313,9 +999,7 @@ class ZoomManager {
  */
 class ExportImageModule {
 	constructor() {
-		this.imageCache = new ImageCache();
-		this.canvasComposer = new CanvasComposer( this.imageCache );
-		this.exportService = new ExportService( this.canvasComposer );
+		this.exportService = new ExportService();
 		this.zoomManager = new ZoomManager();
 		this.dropdownWidget = new DropdownWidget( this.exportService, this.zoomManager );
 	}
@@ -1344,7 +1028,6 @@ class ExportImageModule {
 	}
 
 	cleanup() {
-		this.imageCache.clear();
 		const dropdowns = document.querySelectorAll( '.dropdown-widget' );
 		for ( const dropdown of dropdowns ) {
 			this.dropdownWidget.cleanup( dropdown );
