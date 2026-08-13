@@ -24,7 +24,7 @@ local Div = Html.Div
 local Span = Html.Span
 
 ---@alias GroupTableProps {
----id: string?
+---id: string?,
 ---bracket: string,
 ---width: string?,
 ---done: boolean|string?,
@@ -37,8 +37,8 @@ local Span = Html.Span
 
 ---Reads the qualified slots from a bracket
 ---@param matchGroupId string
----@return qualified standardOpponent[]
----@return finished boolean
+---@return standardOpponent[] qualified
+---@return boolean finished
 local function fetchQualified(matchGroupId)
 	local function hasNoByeOpponent(opponents)
 		return not Array.any(opponents, function(opp) return (opp.name or ''):lower() == 'bye' end)
