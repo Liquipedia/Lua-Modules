@@ -22,7 +22,7 @@ local Span = Html.Span
 ---@alias GroupTableProps {
 ---bracket: string,
 ---width: string?,
----done: boolean|string?
+---done: boolean|string?,
 ---collapsed: boolean|string?,
 ---title: string?,
 ---group: string,
