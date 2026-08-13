@@ -52,6 +52,7 @@ local PLACEMENT_CLASSES = {
 	['q'] = 'placement-win',
 	['w'] = 'placement-win',
 	['l'] = 'placement-lose',
+	['d'] = 'placement-draw',
 	['dq'] = 'placement-disqualified',
 	['dnf'] = 'placement-dnp',
 	['dns'] = 'placement-dnp',

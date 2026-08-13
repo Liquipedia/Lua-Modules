@@ -319,7 +319,7 @@ function Placement:getBackground()
 	return PlacementInfo.getBgClass{placement = self:getSpecialStatus() or self.placeStart}
 end
 
----Returns the placement-badge color class for top-3 placements, else nil.
+---Returns the placement-badge color class for top-3 placements and supported special statuses, else nil.
 ---Colored by the top of the range (placeStart).
 ---@return string?
 function Placement:getBadgeClass()

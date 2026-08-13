@@ -373,6 +373,19 @@ share the `prizepooltable` class.
 		&.placement-disqualified {
 			background-color: var( --prizepool-place-dq-accent );
 		}
+
+		&.placement-draw,
+		&.placement-dnp {
+			color: var( --clr-secondary-25 );
+
+			.theme--light & {
+				text-shadow: 0 1px 1px rgba( 255, 255, 255, 0.5 );
+			}
+
+			.theme--dark & {
+				color: var( --clr-secondary-100 );
+			}
+		}
 	}
 
 	&.prizepooltable-placement {
