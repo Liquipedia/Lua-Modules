@@ -51,6 +51,8 @@ SpellCard.defaultProps = {
 ---@param props table
 ---@return VNode
 function SpellCard.render(props)
+	local dataDisplay = SpellCard._renderData(props)
+
 	return TableWidgets.Table{
 		css = {['margin-bottom'] = '0.5rem'},
 		columns = {
@@ -68,7 +70,7 @@ function SpellCard.render(props)
 				}
 			},
 			TableWidgets.TableBody{
-				children = {
+				children = WidgetUtil.collect(
 					TableWidgets.Row{
 						children = {
 							TableWidgets.Cell{
@@ -84,10 +86,10 @@ function SpellCard.render(props)
 							},
 						},
 					},
-					TableWidgets.Row{
-						children = TableWidgets.Cell{colspan = 2, children = SpellCard._renderData(props)},
-					},
-				}
+					dataDisplay and TableWidgets.Row{
+						children = TableWidgets.Cell{colspan = 2, children = dataDisplay},
+					} or nil
+				)
 			}
 		}
 	}
@@ -95,7 +97,7 @@ end
 
 ---@private
 ---@param props table
----@return VNode
+---@return VNode?
 function SpellCard._renderData(props)
 	---@param info {base: string, text: string}
 	---@return VNode?
@@ -104,11 +106,8 @@ function SpellCard._renderData(props)
 		local items = Array.mapIndexes(function(index)
 			return props[base .. index] or index == 1 and props[base] or nil
 		end)
-
 		if Logic.isEmpty(items) then return end
-
 		items = Array.interleave(items, Html.Br{})
-
 		return Html.Div{
 			css = {padding = '0.125rem 0.5rem'},
 			children = WidgetUtil.collect(
@@ -119,6 +118,9 @@ function SpellCard._renderData(props)
 		}
 	end
 
+	local cells = Array.filter(Array.map(ITEM_DISPLAY, makeCell), Logic.isNotEmpty)
+	if Logic.isEmpty(cells) then return nil end
+
 	return Html.Div{
 		css = {
 			width = '100%',
@@ -128,7 +130,7 @@ function SpellCard._renderData(props)
 			['flex-wrap'] = 'wrap',
 			['align-content'] = 'stretch',
 		},
-		children = Array.map(ITEM_DISPLAY, makeCell),
+		children = cells,
 	}
 end
 
