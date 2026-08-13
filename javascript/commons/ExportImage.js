@@ -11,6 +11,7 @@ const EXPORT_IMAGE_CONFIG = {
 		DARK: 'https://liquipedia.net/commons/images/f/ff/Liquipedia_default_darkmode_export.png',
 		LIGHT: 'https://liquipedia.net/commons/images/9/9a/Liquipedia_default_lightmode_export.png'
 	},
+	CAPTURE_WIDTH: 1440,
 	DIMENSIONS: {
 		HEADER_HEIGHT: 43,
 		FOOTER_HEIGHT: 33,
@@ -490,6 +491,90 @@ class ExportService {
 		return collapsedTables;
 	}
 
+	// Rebuilds the ancestor chain above `element` as empty (shallow-cloned) shells wrapping
+	// one deep clone of the element itself. This preserves ancestor-scoped CSS — including
+	// theme rules keyed off <html class="theme--dark">, which sits above everything — without
+	// cloning any unrelated page content (ads, sidebar, embeds) sitting next to those ancestors.
+	buildAncestorSpine( element ) {
+		const target = element.cloneNode( true );
+		let root = target;
+		let ancestor = element.parentElement;
+
+		while ( ancestor ) {
+			const shallowClone = ancestor.cloneNode( false );
+			shallowClone.appendChild( root );
+			root = shallowClone;
+			ancestor = ancestor.parentElement;
+		}
+
+		return { root, target };
+	}
+
+	// The sandbox document starts blank, so none of the page's stylesheets apply until
+	// copied over. Cross-origin sheets (e.g. Google Fonts) can't have their rules read
+	// directly (cssRules throws), so those are re-linked instead of inlined.
+	copyStylesheetsInto( targetDocument ) {
+		const loadPromises = [];
+
+		for ( const sheet of document.styleSheets ) {
+			try {
+				const style = targetDocument.createElement( 'style' );
+				style.textContent = [ ...sheet.cssRules ].map( ( rule ) => rule.cssText ).join( '\n' );
+				targetDocument.head.appendChild( style );
+				continue;
+			} catch {
+				// Cross-origin stylesheet; fall through to re-linking it below.
+			}
+
+			if ( sheet.href ) {
+				const link = targetDocument.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.href = sheet.href;
+				loadPromises.push( new Promise( ( resolve ) => {
+					link.addEventListener( 'load', resolve );
+					link.addEventListener( 'error', resolve );
+				} ) );
+				targetDocument.head.appendChild( link );
+			}
+		}
+
+		return Promise.all( loadPromises );
+	}
+
+	// Snapdom has no page-simulation equivalent to html2canvas's windowWidth, so this builds
+	// one: a hidden iframe pinned to CAPTURE_WIDTH gives the clone its own real viewport, so
+	// `@media` rules (e.g. Brackets.scss's mobile --match-width override) resolve the same way
+	// regardless of the exporting user's actual window size. Only the ancestor spine above
+	// `element` is cloned into it, not the rest of the page, so this stays cheap and avoids
+	// re-fetching ads/trackers.
+	async createCaptureSandbox( element ) {
+		const iframe = document.createElement( 'iframe' );
+		iframe.style.position = 'fixed';
+		iframe.style.top = '-99999px';
+		iframe.style.left = '-99999px';
+		iframe.style.width = `${ EXPORT_IMAGE_CONFIG.CAPTURE_WIDTH }px`;
+		iframe.style.height = '2000px';
+		iframe.style.border = '0';
+		document.body.appendChild( iframe );
+
+		const iframeDocument = iframe.contentDocument;
+		const base = iframeDocument.createElement( 'base' );
+		base.href = document.baseURI;
+		iframeDocument.head.appendChild( base );
+
+		const stylesheetsLoaded = this.copyStylesheetsInto( iframeDocument );
+
+		const { root, target } = this.buildAncestorSpine( element );
+		iframeDocument.body.appendChild( iframeDocument.adoptNode( root ) );
+
+		await stylesheetsLoaded;
+		if ( iframeDocument.fonts && iframeDocument.fonts.ready ) {
+			await iframeDocument.fonts.ready;
+		}
+
+		return { iframe, target };
+	}
+
 	async export( element, title, mode ) {
 		// Prevent concurrent exports
 		if ( this.activeExports.size > 0 ) {
@@ -516,18 +601,24 @@ class ExportService {
 	}
 
 	async generateImageBlob( element, title ) {
-		const originalBackground = element.style.background;
 		const isDarkTheme = document.documentElement.classList.contains( 'theme--dark' );
 		const backgroundColor = this.getBackgroundColor();
 		// This ensures the scale is at least 2, but never higher than 3
 		const scale = Math.min( Math.max( window.devicePixelRatio || 1, 2 ), 3 );
-		let expandedTables = [];
+
+		let sandboxIframe;
 
 		try {
-			element.style.background = backgroundColor;
-			expandedTables = this.expandPrizepoolTables( element );
+			const sandbox = await this.createCaptureSandbox( element );
+			sandboxIframe = sandbox.iframe;
+			const target = sandbox.target;
 
-			const capturedCanvas = await snapdom.toCanvas( element, {
+			// These mutate the sandboxed clone, not the live page, so there's nothing to
+			// restore afterwards — removing the iframe discards them along with it.
+			target.style.background = backgroundColor;
+			this.expandPrizepoolTables( target );
+
+			const capturedCanvas = await snapdom.toCanvas( target, {
 				scale: scale,
 				backgroundColor: backgroundColor,
 				exclude: [
@@ -561,9 +652,8 @@ class ExportService {
 				}, 'image/png' );
 			} );
 		} finally {
-			element.style.background = originalBackground;
-			for ( const table of expandedTables ) {
-				table.classList.add( 'collapsed' );
+			if ( sandboxIframe ) {
+				sandboxIframe.remove();
 			}
 		}
 	}
