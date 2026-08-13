@@ -23,7 +23,7 @@ local B = Html.B
 local Div = Html.Div
 local Span = Html.Span
 
----@alias GroupTableProps {
+---@alias GroupToggleProps {
 ---id: string?,
 ---bracket: string,
 ---width: string?,
@@ -105,7 +105,7 @@ local function parseWinners(props)
 end
 
 
----@param props GroupTableProps
+---@param props GroupToggleProps
 ---@return VNode?
 local function GroupToggle(props)
 	local title = (props.title or 'Group') .. ' ' .. props.group .. ': '
