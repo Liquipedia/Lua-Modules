@@ -78,7 +78,7 @@ end
 
 
 ---@param props GroupToggleProps
----@return standardOpponent[] qualified
+---@return standardOpponent[] winners
 ---@return boolean finished
 local function parseWinners(props)
 	local winners = {}
