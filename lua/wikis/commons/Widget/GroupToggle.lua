@@ -87,7 +87,7 @@ local function parseWinners(props)
 	if props.id then
 		winners, finished = fetchQualified(props.id)
 	end
-	
+
 	for _, winner in Table.iter.pairsByPrefix(props, 'win') do
 		-- Gracefully handle wikicode input for winX params (i.e. {{Player}})
 		local opponent = Logic.tryCatch(
@@ -114,7 +114,7 @@ local function GroupToggle(props)
 
 	winners = Array.map(winners, function(winner)
 		return tostring(B{
-			children = Opponent.isOpponent(winner) 
+			children = Opponent.isOpponent(winner)
 				and OpponentDisplay.InlineOpponent{opponent = winner}
 				or winner
 		})
