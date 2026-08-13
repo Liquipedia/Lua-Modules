@@ -7,8 +7,8 @@
 
 local Lua = require('Module:Lua')
 
-local Logic = require('Module:Logic')
-local Table = require('Module:Table')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local Component = Lua.import('Module:Widget/Component')
 
