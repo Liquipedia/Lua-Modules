@@ -78,8 +78,8 @@ end
 
 
 ---@param props GroupToggleProps
----@return qualified standardOpponent[]
----@return finished boolean
+---@return standardOpponent[] qualified
+---@return boolean finished
 local function parseWinners(props)
 	local winners = {}
 	local finished = Logic.readBool(props.collapsed) or Logic.readBool(props.done)
