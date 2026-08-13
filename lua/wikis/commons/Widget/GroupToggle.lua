@@ -20,13 +20,13 @@ local Div = Html.Div
 local Span = Html.Span
 
 ---@alias GroupTableProps {
----   bracket: string,
----   width: string?,
----   done: boolean|string?
----   collapsed: boolean|string?,
----   title: string?,
----   group: string
----   win1: string?
+---bracket: string,
+---width: string?,
+---done: boolean|string?
+---collapsed: boolean|string?,
+---title: string?,
+---group: string,
+---win1: string?,
 ---}
 
 ---@param props GroupTableProps
