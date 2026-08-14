@@ -132,19 +132,85 @@ class ExportService {
 	}
 
 	// Shallow ancestor shells keep ancestor-scoped CSS (e.g. theme--dark) applying to the clone.
-	buildAncestorSpine( element ) {
-		const target = element.cloneNode( true );
-		let root = target;
+	// `content` sits at the bottom of the spine, so it has to be fully assembled before this
+	// runs: the returned root is the only node attached to the document, and anything left
+	// outside it is detached and lays out at zero size.
+	buildAncestorSpine( element, content ) {
+		let root = content;
+		let descendant = element;
 		let ancestor = element.parentElement;
 
 		while ( ancestor ) {
 			const shallowClone = ancestor.cloneNode( false );
 			shallowClone.appendChild( root );
+			this.carrySwitchState( ancestor, descendant, shallowClone );
 			root = shallowClone;
+			descendant = ancestor;
 			ancestor = ancestor.parentElement;
 		}
 
-		return { root, target };
+		return root;
+	}
+
+	// Switch state is read by CSS with `:has()` scoped to an ancestor — e.g. the participants
+	// "Compact view" toggle via `.team-participant:has( .switch-toggle-active[...] )` — but the
+	// toggles themselves sit in sibling controls the shallow shells drop, so those rules stop
+	// matching and the clone exports in its default state. Re-add them under the same shell so
+	// the scoping still resolves; `:has()` matches regardless of `display`, and these live
+	// outside the captured wrapper, so they never reach the image.
+	carrySwitchState( ancestor, descendant, shallowClone ) {
+		const switchElements = ancestor.querySelectorAll( '.switch-toggle, .switch-pill' );
+
+		for ( const switchElement of switchElements ) {
+			// Anything inside `descendant` is already carried by the level below.
+			if ( descendant.contains( switchElement ) ) {
+				continue;
+			}
+
+			const switchClone = switchElement.cloneNode( true );
+			switchClone.style.display = 'none';
+			shallowClone.appendChild( switchClone );
+		}
+	}
+
+	// Brackets.scss forces `--match-width: var( --match-width-mobile ) !important` under 768px,
+	// so a bracket exported from a phone renders at the cramped mobile width instead of the
+	// desktop one baked into the markup as `style="--match-width:190px"`. A stylesheet
+	// `!important` only loses to another `!important` of equal-or-higher specificity, and an
+	// inline declaration outranks any selector — so re-declaring the clone's own existing value
+	// as `!important` restores the desktop width without rebuilding the page in a sandboxed
+	// viewport (which previously broke unrelated `:has()`-driven toggles when their stylesheets
+	// were re-applied fresh at a forced width).
+	normalizeBracketWidth( element ) {
+		const brackets = this.queryAllIncludingSelf( element, '.brkts-bracket' );
+
+		for ( const bracket of brackets ) {
+			const desktopWidth = bracket.style.getPropertyValue( '--match-width' );
+			if ( desktopWidth ) {
+				bracket.style.setProperty( '--match-width', desktopWidth, 'important' );
+			}
+		}
+	}
+
+	// The capture root is `position: fixed` with no explicit width (needed to move it offscreen
+	// without affecting page layout), so it — and every plain block-level ancestor shell below
+	// it — sizes to shrink-to-fit. Per the CSS Grid spec, `repeat( auto-fill/auto-fit, ... )`
+	// collapses to a single track whenever the grid container has no definite size, which is why
+	// clones of e.g. `.team-participant__grid` always render as one column regardless of device
+	// or viewport, even though the live grid (laid out in normal document flow, where it has a
+	// definite width) shows several. Copying each live grid's already-resolved column list onto
+	// the corresponding clone sidesteps the recompute rather than fighting it.
+	preserveGridLayout( liveRoot, clonedRoot ) {
+		const liveNodes = this.queryAllIncludingSelf( liveRoot, '*' );
+		const clonedNodes = this.queryAllIncludingSelf( clonedRoot, '*' );
+
+		liveNodes.forEach( ( liveNode, index ) => {
+			const display = window.getComputedStyle( liveNode ).display;
+			if ( display === 'grid' || display === 'inline-grid' ) {
+				clonedNodes[ index ].style.gridTemplateColumns =
+					window.getComputedStyle( liveNode ).gridTemplateColumns;
+			}
+		} );
 	}
 
 	// snapdom doesn't wait for images; undecoded ones can be missing or collapse row heights.
@@ -292,13 +358,21 @@ class ExportService {
 		// This ensures the scale is at least 2, but never higher than 3
 		const scale = Math.min( Math.max( window.devicePixelRatio || 1, 2 ), 3 );
 
-		const { root, target } = this.buildAncestorSpine( element );
+		const target = element.cloneNode( true );
+
+		// Must run before the clone is detached/repositioned, while `element` is still the
+		// correctly-laid-out live reference to copy resolved grid columns from.
+		this.preserveGridLayout( element, target );
 
 		// Mutates the clone, not the live page, so nothing needs restoring afterwards.
 		target.style.background = backgroundColor;
 		this.expandPrizepoolTables( target );
+		this.normalizeBracketWidth( target );
 
+		// The wrapper is what gets captured, so the spine has to be built around it —
+		// wrapWithHeaderFooter() moves `target` inside, leaving it orphaned otherwise.
 		const wrapper = this.wrapWithHeaderFooter( target, title, isDarkTheme );
+		const root = this.buildAncestorSpine( element, wrapper );
 
 		root.style.position = 'fixed';
 		root.style.top = '-99999px';
