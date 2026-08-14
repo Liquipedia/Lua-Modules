@@ -55,11 +55,11 @@ end
 ---@param props HorizontallistProps
 ---@return VNode
 function HorizontallistDisplay.BracketContainer(props)
-	return HorizontallistDisplay.Bracket({
+	return HorizontallistDisplay.Bracket{
 		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId),
 		bracketId = props.bracketId,
 		config = props.config,
-	})
+	}
 end
 
 ---Display component for a tournament bracket.
