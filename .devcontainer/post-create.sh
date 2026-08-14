@@ -4,12 +4,12 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 echo "==> Installing npm dependencies"
-# node_modules is a named volume, which docker creates owned by root. Recursive
+# these are named volumes, which docker creates owned by root. Recursive
 # because a volume that outlives a rebuild keeps whatever uid wrote it, and the
 # user we run as has not always had the same one: fixing only the mount point
 # leaves npm unable to rename anything inside it
-sudo mkdir -p node_modules
-sudo chown -R "$(id -u):$(id -g)" node_modules
+sudo mkdir -p node_modules ~/.mitmproxy
+sudo chown -R "$(id -u):$(id -g)" node_modules ~/.mitmproxy
 npm install
 
 echo "==> Installing python dependencies"
