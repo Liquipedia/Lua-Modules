@@ -183,7 +183,7 @@ function HorizontallistDisplay.computeHeaders(sortedBracket)
 	)
 
 	-- Suffix when there multiple matches with the same header, in order to make a distinction between them
-	headers = Array.map(headers, function(headerGroup)
+	return Array.flatMap(headers, function(headerGroup)
 		if #headerGroup == 1 then
 			local header = headerGroup[1].inheritedHeader or 'Match'
 			return DisplayHelper.expandHeader(header)[1]
@@ -193,8 +193,6 @@ function HorizontallistDisplay.computeHeaders(sortedBracket)
 			return DisplayHelper.expandHeader(header)[1] .. ' #' .. index
 		end)
 	end)
-
-	return Array.flatten(headers)
 end
 
 --- Display component for the headers of a node in the bracket tree.
