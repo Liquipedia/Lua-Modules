@@ -25,7 +25,7 @@ local StandingsParseLpdb = {}
 
 ---@class StandingsImportOptions
 ---@field exclusive boolean? # If set, only matches where every opponent is part of the standings are imported
----@field importOpponents boolean? # If set, opponents not listed manually are added to the standings
+---@field importOpponents boolean? # If set, opponents not listed manually still count as part of the standings
 
 ---@param rounds {roundNumber: integer, matches: string[]}[]
 ---@param scoreMapper fun(opponent: match2opponent): number|nil

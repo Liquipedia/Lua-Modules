@@ -49,7 +49,8 @@ function StandingsTable.fromTemplate(frame)
 	local importScoreFromMatches = Logic.nilOr(Logic.readBoolOrNil(args.import), true)
 	local importOpponentFromMatches = Logic.nilOr(Logic.readBoolOrNil(args.importopponents), importScoreFromMatches)
 	--- Exclusive standings only count matches where all opponents are part of the standings,
-	--- non-exclusive (the default) count matches where at least one opponent is part of the standings.
+	--- non-exclusive (the default) counts matches where at least one opponent is part of the standings.
+	--- Note that this is the reverse of the legacy GroupTableLeague default, on purpose.
 	local exclusiveOpponents = Logic.readBool(args.exclusive)
 
 	local parsedData = StandingsParseWiki.parseWikiInput(args)
