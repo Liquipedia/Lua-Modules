@@ -25,8 +25,9 @@ local StageWinningsCalculation = {}
 ---startValue: number, valuePerWin: number, valueByScore: table<string, number>?,
 ---pointsStart: number, pointsPerWin: number, pointsByScore: table<string, number>?,
 ---points2Start: number, points2PerWin: number, points2ByScore: table<string, number>?, hideWinnings: boolean}
----@return {opponent: standardOpponent, matchWins: integer, matchLosses: integer, matchDraws: integer, gameWins: integer,
----gameLosses: integer, winnings: number, scoreDetails: table<string, integer>, points: number, points2: number}[]
+---@return {opponent: standardOpponent, matchWins: integer, matchLosses: integer, matchDraws: integer,
+---gameWins: integer, gameLosses: integer, winnings: number, scoreDetails: table<string, integer>,
+---points: number, points2: number}[]
 function StageWinningsCalculation.run(props)
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = StageWinningsCalculation._buildConditions(props),
