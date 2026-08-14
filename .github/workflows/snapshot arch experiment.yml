@@ -1,0 +1,161 @@
+name: Snapshot Architecture Experiment
+
+# Diagnostic, not part of the normal checks. Answers two questions about the
+# visual snapshots:
+#   1. Does CPU architecture alone change the rendering?
+#   2. Do deterministic Chromium flags remove that difference?
+# Delete this workflow once the questions are answered.
+
+on: [pull_request, workflow_dispatch]
+
+jobs:
+  render:
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, arm64]
+        flags: ['off', 'on']
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+
+    runs-on: ${{ matrix.runner }}
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Fix repository permission issue
+        run: git config --system --add safe.directory $GITHUB_WORKSPACE
+
+      - name: Prepare for build
+        run: apt-get update && apt-get install -y -q gcc make unzip
+
+      - name: Setup lua
+        uses: Liquipedia/gh-actions-lua@7615c1c345af98bd9898fa5b53c488c5f58246cf
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        with:
+          luaVersion: '5.1'
+
+      - name: Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+
+      - name: Setup luarocks
+        uses: leafo/gh-actions-luarocks@v6
+
+      - name: Setup dependencies
+        run: |
+          npm install
+          luarocks install --lua-version=5.1 busted
+
+      - name: Add deterministic rendering flags
+        if: matrix.flags == 'on'
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          p = pathlib.Path('lua/snapshot.mjs')
+          s = p.read_text()
+          old = "\t\targs: ['--disable-web-security']\n"
+          new = """\t\targs: [
+          \t\t\t'--disable-web-security',
+          \t\t\t'--disable-skia-runtime-opts',
+          \t\t\t'--font-render-hinting=none',
+          \t\t\t'--disable-font-subpixel-positioning',
+          \t\t\t'--disable-lcd-text',
+          \t\t\t'--force-color-profile=srgb',
+          \t\t\t'--force-device-scale-factor=1',
+          \t\t\t'--disable-gpu'
+          \t\t]
+          """
+          assert old in s, 'launch args not found as expected'
+          p.write_text(s.replace(old, new))
+          PY
+          sed -n '28,42p' lua/snapshot.mjs
+
+      - name: Render snapshots
+        run: npm run lua-test
+        env:
+          UPDATE_SNAPSHOTS: true
+
+      - name: Report against committed snapshots
+        run: |
+          echo "### ${{ matrix.arch }}, flags ${{ matrix.flags }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Differ from committed: $(git status --porcelain lua/spec/snapshots | wc -l) of $(ls lua/spec/snapshots/*.png | wc -l)" >> $GITHUB_STEP_SUMMARY
+          git status --porcelain lua/spec/snapshots | sed 's|.*snapshots/|- |' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: snapshots-${{ matrix.arch }}-flags-${{ matrix.flags }}
+          path: lua/spec/snapshots/*.png
+
+  compare:
+    needs: render
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+
+      - name: Setup dependencies
+        run: npm install
+
+      - name: Download all renders
+        uses: actions/download-artifact@v8
+        with:
+          path: renders
+
+      - name: Compare architectures
+        run: |
+          cat > compare.mjs <<'EOF'
+          import { PNG } from 'pngjs';
+          import pixelmatch from 'pixelmatch';
+          import fs from 'fs';
+
+          const pairs = [
+          	[ 'flags off', 'renders/snapshots-amd64-flags-off', 'renders/snapshots-arm64-flags-off' ],
+          	[ 'flags on', 'renders/snapshots-amd64-flags-on', 'renders/snapshots-arm64-flags-on' ]
+          ];
+
+          let out = '## Architecture comparison\n\n';
+          for ( const [ label, a, b ] of pairs ) {
+          	if ( !fs.existsSync( a ) || !fs.existsSync( b ) ) {
+          		out += `### ${ label }\n\nMissing renders, cannot compare.\n\n`;
+          		continue;
+          	}
+          	const files = fs.readdirSync( a ).filter( ( f ) => f.endsWith( '.png' ) );
+          	const rows = [];
+          	for ( const f of files ) {
+          		const bytesEqual = Buffer.compare( fs.readFileSync( `${ a }/${ f }` ), fs.readFileSync( `${ b }/${ f }` ) ) === 0;
+          		if ( bytesEqual ) {
+          			continue;
+          		}
+          		const x = PNG.sync.read( fs.readFileSync( `${ a }/${ f }` ) );
+          		const y = PNG.sync.read( fs.readFileSync( `${ b }/${ f }` ) );
+          		const strict = pixelmatch( x.data, y.data, null, x.width, x.height, { threshold: 0 } );
+          		const loose = pixelmatch( x.data, y.data, null, x.width, x.height, { threshold: 0.1 } );
+          		rows.push( `| ${ f } | ${ strict } | ${ loose } |` );
+          	}
+          	out += `### ${ label }\n\n${ files.length - rows.length } of ${ files.length } identical byte-for-byte across architectures.\n\n`;
+          	if ( rows.length ) {
+          		out += '| file | differing px (threshold 0) | differing px (threshold 0.1) |\n|---|---|---|\n' + rows.join( '\n' ) + '\n\n';
+          	}
+          }
+          fs.appendFileSync( process.env.GITHUB_STEP_SUMMARY, out );
+          console.log( out );
+          EOF
+          node compare.mjs
