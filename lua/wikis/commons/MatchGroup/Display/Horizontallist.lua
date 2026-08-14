@@ -180,7 +180,7 @@ function HorizontallistDisplay.computeHeaders(sortedBracket)
 		Operator.property('inheritedHeader')
 	)
 
-	-- Suffix when there multiple matches with the same header, in order to make a distiction between them
+	-- Suffix when there multiple matches with the same header, in order to make a distinction between them
 	headers = Array.map(headers, function(headerGroup)
 		if #headerGroup == 1 then
 			local header = headerGroup[1].inheritedHeader or 'Match'
