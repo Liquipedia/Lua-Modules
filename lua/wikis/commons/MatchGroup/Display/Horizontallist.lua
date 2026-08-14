@@ -11,13 +11,14 @@ local Array = Lua.import('Module:Array')
 local Date = Lua.import('Module:Date/Ext')
 local DisplayUtil = Lua.import('Module:DisplayUtil')
 local FnUtil = Lua.import('Module:FnUtil')
-local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
+
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 local HorizontallistDisplay = {propTypes = {}, types = {}}
 
@@ -205,7 +206,7 @@ function HorizontallistDisplay.NodeHeader(props)
 	end
 
 	local iconData = PHASE_ICONS[props.status] or {}
-	local icon = Icon.makeIcon{
+	local icon = IconFa{
 		iconName = iconData.iconName,
 		color = iconData.color,
 		additionalClasses = {'navigation-tabs__list-item-icon'}
