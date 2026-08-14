@@ -122,7 +122,7 @@ end
 ---@param manualOpponents StandingTableOpponentData[]
 function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMapper, maxRounds, manualOpponents)
 	local match2 = MatchGroupUtil.matchFromRecord(match)
-	Array.forEach(match2.opponents, function(opponent, index)
+	Array.forEach(match2.opponents, function(opponent)
 		---Find matching opponent
 		local opponentToUse = Array.find(manualOpponents, function(manualOpponent)
 			return Array.any(manualOpponent.aliases, function (alias)
