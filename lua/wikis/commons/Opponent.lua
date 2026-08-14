@@ -428,6 +428,10 @@ end
 Converts a opponent to a name. The name is the same as the one used in the
 match2opponent.name field.
 
+Warning: Do not use this to check whether two opponents are the same (use Opponent.same instead)!
+         There are edge cases with one-off subteams that share the same page (after redirect),
+		 which in the context of a tournament are not same, but resolve to the same name here.
+
 Returns nil if the team template does not exist.
 ]]
 ---@param opponent standardOpponent
