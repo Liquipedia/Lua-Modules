@@ -27,8 +27,25 @@
 			"source": "lua-modules-node-modules",
 			"target": "${containerWorkspaceFolder}/node_modules",
 			"type": "volume"
+		},
+		// Keeps the mitmproxy CA across rebuilds, so the certificate only has
+		// to be trusted in the browser once
+		{
+			"source": "lua-modules-mitmproxy",
+			"target": "/home/vscode/.mitmproxy",
+			"type": "volume"
 		}
 	],
+	// mitmproxy, for serving locally built CSS/JS into the live wiki
+	"forwardPorts": [
+		8080
+	],
+	"portsAttributes": {
+		"8080": {
+			"label": "mitmproxy",
+			"onAutoForward": "silent"
+		}
+	},
 	"containerEnv": {
 		"PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright"
 	},

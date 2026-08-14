@@ -4,8 +4,8 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 echo "==> Installing npm dependencies"
-# node_modules is a named volume, which docker creates owned by root
-sudo chown "$(id -u):$(id -g)" node_modules
+# these are named volumes, which docker creates owned by root
+sudo chown "$(id -u):$(id -g)" node_modules ~/.mitmproxy
 npm install
 
 echo "==> Installing python dependencies"
