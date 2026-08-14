@@ -35,11 +35,11 @@ function SingleGameDisplay.SingleGameContainer(props)
 
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId)
 	return match
-		and SingleGameDisplay.SingleGame({
+		and SingleGameDisplay.SingleGame{
 			config = props.config,
 			match = match,
 			gameIdx = props.gameIdx,
-		})
+		}
 		or mw.html.create()
 end
 
