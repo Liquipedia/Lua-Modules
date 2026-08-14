@@ -12,7 +12,7 @@ local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local SquadController = Lua.import('Module:Features/Squad/Controller')
-local SquadParser = Lua.import('Module:Features/Squad/Lib/Parser')
+local SquadParser = Lua.import('Module:Features/Squad/Lib/Parse')
 
 local CustomSquad = {}
 
