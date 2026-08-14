@@ -125,7 +125,7 @@ function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMappe
 	Array.forEach(match2.opponents, function(opponent)
 		---Find matching opponent
 		local opponentToUse = Array.find(manualOpponents, function(manualOpponent)
-			return Array.any(manualOpponent.aliases, function (alias)
+			return Array.any(manualOpponent.aliases or {}, function(alias)
 				return Opponent.same(opponent, alias)
 			end)
 		end)
