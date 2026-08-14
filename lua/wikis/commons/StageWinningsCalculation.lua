@@ -25,7 +25,7 @@ local StageWinningsCalculation = {}
 ---startValue: number, valuePerWin: number, valueByScore: table<string, number>?,
 ---pointsStart: number, pointsPerWin: number, pointsByScore: table<string, number>?,
 ---points2Start: number, points2PerWin: number, points2ByScore: table<string, number>?, hideWinnings: boolean}
----@return {opponent: standardOpponent, matchWins: integer, matchLosses: integer, gameWins: integer,
+---@return {opponent: standardOpponent, matchWins: integer, matchLosses: integer, matchDraws: integer, gameWins: integer,
 ---gameLosses: integer, winnings: number, scoreDetails: table<string, integer>, points: number, points2: number}[]
 function StageWinningsCalculation.run(props)
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
@@ -51,6 +51,7 @@ function StageWinningsCalculation.run(props)
 				scoreDetails = {},
 				matchWins = 0,
 				matchLosses = 0,
+				matchDraws = 0,
 				gameWins = 0,
 				gameLosses = 0,
 				winnings = 0,
@@ -60,28 +61,34 @@ function StageWinningsCalculation.run(props)
 		end)
 
 		local winnerId = tonumber(match.winner)
-		if winnerId ~= 1 and winnerId ~= 2 then return end
-		local loserId = 3 - winnerId
 
-		local winner = match.opponents[winnerId]
-		local loser = match.opponents[loserId]
+		local opponent1 = match.opponents[1]
+		local opponent2 = match.opponents[2]
 
-		local winnerScore = OpponentDisplay.InlineScore(winner)
-		local loserScore = OpponentDisplay.InlineScore(loser)
+		local opponent1Score = OpponentDisplay.InlineScore(opponent1)
+		local opponent2Score = OpponentDisplay.InlineScore(opponent2)
 
-		local score = winnerScore .. '-' .. loserScore
-		local reversedScore = loserScore .. '-' .. winnerScore
+		local score = opponent1Score .. '-' .. opponent2Score
+		local reversedScore = opponent2Score .. '-' .. opponent1Score
 
-		byName[winner.name].scoreDetails[score] = (byName[winner.name].scoreDetails[score] or 0) + 1
-		byName[loser.name].scoreDetails[reversedScore] = (byName[loser.name].scoreDetails[reversedScore] or 0) + 1
+		byName[opponent1.name].scoreDetails[score] = (byName[opponent1.name].scoreDetails[score] or 0) + 1
+		byName[opponent2.name].scoreDetails[reversedScore] = (byName[opponent2.name].scoreDetails[reversedScore] or 0) + 1
 
-		byName[winner.name].matchWins = byName[winner.name].matchWins + 1
-		byName[loser.name].matchLosses = byName[loser.name].matchLosses + 1
+		if winnerId == 1 then
+			byName[opponent1.name].matchWins = byName[opponent1.name].matchWins + 1
+			byName[opponent2.name].matchLosses = byName[opponent2.name].matchLosses + 1
+		else if winnerId == 2 then
+			byName[opponent2.name].matchWins = byName[opponent2.name].matchWins + 1
+			byName[opponent1.name].matchLosses = byName[opponent1.name].matchLosses + 1
+		else
+			byName[opponent1.name].matchDraws = byName[opponent1.name].matchDraws + 1
+			byName[opponent2.name].matchDraws = byName[opponent2.name].matchDraws + 1
+		end
 
-		byName[winner.name].gameWins = byName[winner.name].gameWins + (tonumber(winner.score) or 0)
-		byName[loser.name].gameLosses = byName[loser.name].gameLosses + (tonumber(winner.score) or 0)
-		byName[winner.name].gameLosses = byName[winner.name].gameLosses + (tonumber(loser.score) or 0)
-		byName[loser.name].gameWins = byName[loser.name].gameWins + (tonumber(loser.score) or 0)
+		byName[opponent1.name].gameWins = byName[opponent1.name].gameWins + (tonumber(opponent1.score) or 0)
+		byName[opponent2.name].gameLosses = byName[opponent2.name].gameLosses + (tonumber(opponent1.score) or 0)
+		byName[opponent1.name].gameLosses = byName[opponent1.name].gameLosses + (tonumber(opponent2.score) or 0)
+		byName[opponent2.name].gameWins = byName[opponent2.name].gameWins + (tonumber(opponent2.score) or 0)
 	end)
 
 	local opponents = Array.extractValues(byName)
