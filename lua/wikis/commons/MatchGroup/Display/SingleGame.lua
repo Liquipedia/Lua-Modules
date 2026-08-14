@@ -36,13 +36,16 @@ function SingleGameDisplay.SingleGameContainer(props)
 	assert(props.gameIdx, 'Missing gameIdx')
 
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId)
-	return match
-		and SingleGameDisplay.SingleGame{
-			config = props.config,
-			match = match,
-			gameIdx = props.gameIdx,
-		}
-		or Html.Fragment{}
+
+	if not match then
+		return Html.Fragment{}
+	end
+
+	return SingleGameDisplay.SingleGame{
+		config = props.config,
+		match = match,
+		gameIdx = props.gameIdx,
+	}
 end
 
 ---Display component for a singleGame. Match & Game data is specified in the input.
