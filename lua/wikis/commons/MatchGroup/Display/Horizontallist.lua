@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Date = Lua.import('Module:Date/Ext')
-local DisplayUtil = Lua.import('Module:DisplayUtil')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
@@ -19,6 +18,8 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local Html = Lua.import('Module:Widget/Html')
+local Builder = Lua.import('Module:Widget/Builder')
+local ErrorBoundary = Lua.import('Module:Widget/ErrorBoundary')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 local HorizontallistDisplay = {propTypes = {}, types = {}}
@@ -52,7 +53,7 @@ end
 ---Display component for a tournament bracket. The bracket is specified by ID.
 ---The component fetches the match data from LPDB or page variables.
 ---@param props HorizontallistProps
----@return Html
+---@return VNode
 function HorizontallistDisplay.BracketContainer(props)
 	return HorizontallistDisplay.Bracket({
 		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId),
@@ -64,7 +65,7 @@ end
 ---Display component for a tournament bracket.
 ---Match data is specified in the input.
 ---@param props HorizontallistBracket
----@return Html
+---@return VNode
 function HorizontallistDisplay.Bracket(props)
 	local config = {
 		MatchSummaryContainer = DisplayHelper.DefaultFfaMatchSummaryContainer,
@@ -89,30 +90,42 @@ function HorizontallistDisplay.Bracket(props)
 		list:node(HorizontallistDisplay.NodeHeader(nodeProps))
 	end
 
-	local bracketNode = mw.html.create('div')
-			:addClass('navigation-tabs')
+	local bracketNode = Html.Div{
+		classes = {
+			'navigation-tabs',
 			-- Do not show the tabs if there is only one match
-			:addClass(#sortedBracket == 1 and 'is--hidden' or nil)
-			:attr('data-js-battle-royale', 'navigation')
-			:attr('role', 'tabpanel')
-			:node(list)
+			#sortedBracket == 1 and 'is--hidden' or nil,
+		},
+		attributes = {
+			['data-js-battle-royale'] = 'navigation',
+			role = 'tabpanel',
+		},
+		children = list,
+	}
 
-	local matchNode = mw.html.create('div'):addClass('navigation-content-container')
-	for matchIndex, match in ipairs(sortedBracket) do
-		local matchProps = {
-			MatchSummaryContainer = config.MatchSummaryContainer,
-			matchId = match[1],
-			index = matchIndex,
+	local matchNode = Html.Div{
+		classes = {'navigation-content-container'},
+		children = Array.map(sortedBracket, function (match, matchIndex)
+			local matchProps = {
+				MatchSummaryContainer = config.MatchSummaryContainer,
+				matchId = match[1],
+				index = matchIndex,
+			}
+			return HorizontallistDisplay.Match(matchProps)
+		end)
+	}
+
+	 return Html.Div{
+		classes = {'brkts-br-wrapper', 'battle-royale'},
+		attributes = {
+			['data-js-battle-royale-id'] = props.bracketId,
+			['data-js-battle-royale-init-tab'] = selectedMatchIdx - 1, -- Convert to 0-index
+		},
+		children = {
+			bracketNode,
+			matchNode,
 		}
-		matchNode:node(HorizontallistDisplay.Match(matchProps))
-	end
-
-	return mw.html.create('div')
-			:addClass('brkts-br-wrapper battle-royale')
-			:attr('data-js-battle-royale-id', props.bracketId)
-			:attr('data-js-battle-royale-init-tab', selectedMatchIdx - 1) -- Convert to 0-index
-			:node(bracketNode)
-			:node(matchNode)
+	 }
 end
 
 ---@param bracketId string
@@ -229,20 +242,25 @@ end
 
 ---Display component for a match
 ---@param props {matchId: string, index: integer, MatchSummaryContainer: function}
----@return Html
+---@return VNode
 function HorizontallistDisplay.Match(props)
-	local matchNode = mw.html.create('div')
-			:addClass('navigation-content')
-			:attr('data-js-battle-royale-content-id', 'navigationContent' .. props.index)
-
 	local bracketId = MatchGroupUtil.splitMatchId(props.matchId)
-	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
-		bracketId = bracketId,
-		matchId = props.matchId,
-	}, Lua.import('Module:Error/Display').ErrorDetails)
-	matchNode:node(matchSummaryNode)
 
-	return matchNode
+	return Html.Div{
+		classes = {'navigation-content'},
+		attributes = {
+			['data-js-battle-royale-content-id'] = 'navigationContent' .. props.index,
+		},
+		children = ErrorBoundary{
+			children = Builder{builder = function ()
+				return props.MatchSummaryContainer{
+					bracketId = bracketId,
+					matchId = props.matchId,
+				}
+			end},
+			fallback = Lua.import('Module:Error/Display').ErrorDetails
+		}
+	}
 end
 
 return HorizontallistDisplay
