@@ -30,9 +30,43 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 		args: ['--disable-web-security']
 	});
 	const page = await browser.newPage({ viewport: VIEWPORT });
+
+	// The template pulls stylesheets and fonts over the network. If one of them
+	// does not arrive the page still renders, just unstyled, and we would
+	// happily screenshot that and treat it as the truth. Collect anything that
+	// failed so we can bail out instead.
+	// Keyed by url, because a bad response is usually followed by an aborted
+	// request for the same thing and reporting it twice is just noise
+	const missingResources = new Map();
+	const isRequired = (resourceType) => ['stylesheet', 'script', 'font'].includes(resourceType);
+	const recordMissing = (url, reason) => {
+		if (!missingResources.has(url)) {
+			missingResources.set(url, reason);
+		}
+	};
+
+	page.on('requestfailed', (request) => {
+		if (isRequired(request.resourceType())) {
+			const failure = request.failure();
+			recordMissing(request.url(), failure ? failure.errorText : 'request failed');
+		}
+	});
+	page.on('response', (response) => {
+		// 3xx is fine, the redirect target gets its own response event
+		if (isRequired(response.request().resourceType()) && response.status() >= 400) {
+			recordMissing(response.url(), `HTTP ${response.status()}`);
+		}
+	});
+
 	await page.goto(`file://${htmlPath}`, {waitUntil: "networkidle"});
 	const newScreenshotBuffer = await page.screenshot({ animations: 'disabled' });
 	await browser.close();
+
+	if (missingResources.size > 0) {
+		console.error(`Error: '${testName}' rendered without resources it needs, refusing to use the result.`);
+		missingResources.forEach((reason, url) => console.error(`  - ${url} (${reason})`));
+		process.exit(1);
+	}
 
 	if (shouldUpdate || !existsSync(referencePath)) {
 		// Update snapshot, either forced or previous snapshot doesn't exist yet
