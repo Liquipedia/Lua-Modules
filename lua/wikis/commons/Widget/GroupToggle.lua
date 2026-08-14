@@ -33,15 +33,13 @@ local Span = Html.Span
 ---group: string,
 ---win1: string?,
 ---}
-
-
 ---Reads the qualified slots from a bracket
 ---@param matchGroupId string
 ---@return standardOpponent[] qualified
 ---@return boolean finished
 local function fetchQualified(matchGroupId)
 	local function hasNoByeOpponent(opponents)
-		return not Array.any(opponents, function(opp) return (opp.name or ''):lower() == 'bye' end)
+		return not Array.any(opponents, Opponent.isBye)
 	end
 
 	local bracket = MatchGroupUtil.fetchMatchGroup(matchGroupId)
