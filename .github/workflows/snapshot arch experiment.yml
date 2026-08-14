@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         arch: [amd64, arm64]
-        flags: ['off', 'on']
+        flags: ['off', 'skia', 'font']
         include:
           - arch: amd64
             runner: ubuntu-latest
@@ -55,29 +55,29 @@ jobs:
           npm install
           luarocks install --lua-version=5.1 busted
 
-      - name: Add deterministic rendering flags
-        if: matrix.flags == 'on'
+      - name: Add rendering flags
+        if: matrix.flags != 'off'
+        env:
+          FLAG_SET: ${{ matrix.flags }}
         run: |
           python3 - <<'PY'
-          import pathlib
+          import os, pathlib
+          sets = {
+              'skia': ['--disable-skia-runtime-opts'],
+              'font': ['--font-render-hinting=none',
+                       '--disable-font-subpixel-positioning',
+                       '--disable-lcd-text'],
+          }
+          flags = ['--disable-web-security'] + sets[os.environ['FLAG_SET']]
           p = pathlib.Path('lua/snapshot.mjs')
           s = p.read_text()
           old = "\t\targs: ['--disable-web-security']\n"
-          new = """\t\targs: [
-          \t\t\t'--disable-web-security',
-          \t\t\t'--disable-skia-runtime-opts',
-          \t\t\t'--font-render-hinting=none',
-          \t\t\t'--disable-font-subpixel-positioning',
-          \t\t\t'--disable-lcd-text',
-          \t\t\t'--force-color-profile=srgb',
-          \t\t\t'--force-device-scale-factor=1',
-          \t\t\t'--disable-gpu'
-          \t\t]
-          """
+          items = ",\n".join("\t\t\t'%s'" % f for f in flags)
+          new = "\t\targs: [\n%s\n\t\t]\n" % items
           assert old in s, 'launch args not found as expected'
           p.write_text(s.replace(old, new))
           PY
-          sed -n '28,42p' lua/snapshot.mjs
+          sed -n '28,40p' lua/snapshot.mjs
 
       - name: Render snapshots
         run: npm run lua-test
@@ -126,10 +126,11 @@ jobs:
           import pixelmatch from 'pixelmatch';
           import fs from 'fs';
 
-          const pairs = [
-          	[ 'flags off', 'renders/snapshots-amd64-flags-off', 'renders/snapshots-arm64-flags-off' ],
-          	[ 'flags on', 'renders/snapshots-amd64-flags-on', 'renders/snapshots-arm64-flags-on' ]
-          ];
+          const pairs = [ 'off', 'skia', 'font' ].map( ( v ) => [
+          	`flags: ${ v }`,
+          	`renders/snapshots-amd64-flags-${ v }`,
+          	`renders/snapshots-arm64-flags-${ v }`
+          ] );
 
           let out = '## Architecture comparison\n\n';
           for ( const [ label, a, b ] of pairs ) {
