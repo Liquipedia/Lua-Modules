@@ -70,25 +70,9 @@ function HorizontallistDisplay.Bracket(props)
 	local config = {
 		MatchSummaryContainer = DisplayHelper.DefaultFfaMatchSummaryContainer,
 	}
-	local list = mw.html.create('ul'):addClass('navigation-tabs__list'):attr('role', 'tablist')
 
 	local sortedBracket = HorizontallistDisplay._sortMatches(props.bracket)
 	local selectedMatchIdx = HorizontallistDisplay.findMatchClosestInTime(props.bracketId, sortedBracket)
-
-	for index, header in ipairs(HorizontallistDisplay.computeHeaders(sortedBracket)) do
-		local attachedMatch = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, sortedBracket[index][1])
-		local _, matchId = MatchGroupUtil.splitMatchId(attachedMatch.matchId)
-		---@cast matchId -nil
-		--- If it's a matchList, then matchId is valid as is (also is numeric), otherwise we need to convert it to a key
-		local matchKey = Logic.isNumeric(matchId) and matchId or MatchGroupUtil.matchIdToKey(matchId)
-		local nodeProps = {
-			header = header,
-			index = index,
-			status = MatchGroupUtil.computeMatchPhase(attachedMatch),
-			matchId = matchKey,
-		}
-		list:node(HorizontallistDisplay.NodeHeader(nodeProps))
-	end
 
 	local bracketNode = Html.Div{
 		classes = {
@@ -100,7 +84,23 @@ function HorizontallistDisplay.Bracket(props)
 			['data-js-battle-royale'] = 'navigation',
 			role = 'tabpanel',
 		},
-		children = list,
+		children = Html.Ul{
+			classes = {'navigation-tabs__list'},
+			attributes = {role = 'tablist'},
+			children = Array.map(HorizontallistDisplay.computeHeaders(sortedBracket), function (header, index)
+				local attachedMatch = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, sortedBracket[index][1])
+				local _, matchId = MatchGroupUtil.splitMatchId(attachedMatch.matchId)
+				---@cast matchId -nil
+				--- If it's a matchList, then matchId is valid as is (also is numeric), otherwise we need to convert it to a key
+				local matchKey = Logic.isNumeric(matchId) and matchId or MatchGroupUtil.matchIdToKey(matchId)
+				return HorizontallistDisplay.NodeHeader{
+					header = header,
+					index = index,
+					status = MatchGroupUtil.computeMatchPhase(attachedMatch),
+					matchId = matchKey,
+				}
+			end)
+		},
 	}
 
 	local matchNode = Html.Div{
@@ -210,7 +210,7 @@ end
 
 --- Display component for the headers of a node in the bracket tree.
 --- Draws a row of headers for the match, everything to the left of it, and for the qualification spots.
----@param props {index: integer, header: string, status: 'upcoming'|'live'|'finished'|nil, matchId: string}
+---@param props {index: integer, header: string, status: 'upcoming'|'ongoing'|'finished', matchId: string}
 ---@return VNode?
 function HorizontallistDisplay.NodeHeader(props)
 	if not props.header then
