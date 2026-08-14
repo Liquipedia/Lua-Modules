@@ -77,7 +77,7 @@ function StageWinningsCalculation.run(props)
 		if winnerId == 1 then
 			byName[opponent1.name].matchWins = byName[opponent1.name].matchWins + 1
 			byName[opponent2.name].matchLosses = byName[opponent2.name].matchLosses + 1
-		else if winnerId == 2 then
+		elseif winnerId == 2 then
 			byName[opponent2.name].matchWins = byName[opponent2.name].matchWins + 1
 			byName[opponent1.name].matchLosses = byName[opponent1.name].matchLosses + 1
 		else
