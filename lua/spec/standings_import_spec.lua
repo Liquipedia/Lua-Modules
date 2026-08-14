@@ -216,7 +216,7 @@ describe('Standings import from matches', function()
 
 	it('applies aliases correctly', function()
 		stubMatchQuery{
-			match2Record{matchId = 'M1', finished = false, opponents = {
+			match2Record{matchId = 'M1', finished = true, opponents = {
 				{template = 'team liquid 2023', name = 'Team Liquid', score = 1, placement = 1},
 				{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 2},
 			}},
