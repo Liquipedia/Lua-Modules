@@ -18,6 +18,7 @@ local Table = Lua.import('Module:Table')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
+local Html = Lua.import('Module:Widget/Html')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 local HorizontallistDisplay = {propTypes = {}, types = {}}
@@ -199,7 +200,7 @@ end
 --- Display component for the headers of a node in the bracket tree.
 --- Draws a row of headers for the match, everything to the left of it, and for the qualification spots.
 ---@param props {index: integer, header: string, status: 'upcoming'|'live'|'finished'|nil, matchId: string}
----@return Html?
+---@return VNode?
 function HorizontallistDisplay.NodeHeader(props)
 	if not props.header then
 		return nil
@@ -212,15 +213,20 @@ function HorizontallistDisplay.NodeHeader(props)
 		additionalClasses = {'navigation-tabs__list-item-icon'}
 	}
 
-	return mw.html.create('li')
-			:node(icon)
-			:addClass('navigation-tabs__list-item')
-			:attr('data-target-id', 'navigationContent' .. props.index)
-			:attr('role', 'tab')
-			:attr('tabindex', '0')
-			:attr('data-js-battle-royale', 'navigation-tab')
-			:attr('data-js-battle-royale-matchid', props.matchId)
-			:wikitext(props.header)
+	return Html.Li{
+		classes = {'navigation-tabs__list-item'},
+		attributes = {
+			['data-target-id'] = 'navigationContent' .. props.index,
+			role = 'tab',
+			tabindex = '0',
+			['data-js-battle-royale'] = 'navigation-tab',
+			['data-js-battle-royale-matchid'] = props.matchId,
+		},
+		children = {
+			icon,
+			props.header,
+		}
+	}
 end
 
 ---Display component for a match
