@@ -31,7 +31,7 @@ local PHASE_ICONS = {
 }
 
 ---@class HorizontallistConfig
----@field MatchSummaryContainer function
+---@field MatchSummaryContainer fun(props: table): Renderable?
 
 ---@class HorizontallistConfigOptions
 
@@ -241,7 +241,7 @@ function HorizontallistDisplay.NodeHeader(props)
 end
 
 ---Display component for a match
----@param props {matchId: string, index: integer, MatchSummaryContainer: function}
+---@param props {matchId: string, index: integer, MatchSummaryContainer: fun(props: table): Renderable?}
 ---@return VNode
 function HorizontallistDisplay.Match(props)
 	local bracketId = MatchGroupUtil.splitMatchId(props.matchId)
