@@ -57,10 +57,11 @@ end
 ---@param icon string
 ---@param iconDark string?
 ---@param text string
+---@param class string?
 ---@return MatchSummaryFooter
-function Footer:addLink(link, icon, iconDark, text)
+function Footer:addLink(link, icon, iconDark, text, class)
 	table.insert(self.elements, Image.display(icon, iconDark, {
-		link = link, size = '32px', caption = text, alt = link
+		link = link, size = '32px', caption = text, alt = link, class = class
 	}))
 	return self
 end
@@ -78,7 +79,14 @@ function Footer:addLinks(links)
 				self:addLink(gameLink, currentLinkData.icon, currentLinkData.iconDark, newText)
 			end
 		else
-			self:addLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text)
+			-- Temporary during MW/LH Migrations
+			local class
+			if linkType == 'headtohead_lh' then
+				class = 'hide-when-mediawiki'
+			elseif linkType == 'headtohead' then
+				class = 'hide-when-lighthouse'
+			end
+			self:addLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text, class)
 		end
 	end
 

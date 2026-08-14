@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Squad/Controller
+-- page=Module:Features/Squad/Controller
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -12,7 +12,7 @@ local Arguments = Lua.import('Module:Arguments')
 local Context = Lua.import('Module:Widget/ComponentContext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Info = Lua.import('Module:Info', {loadData = true})
-local SquadUtils = Lua.import('Module:Squad/Utils')
+local SquadUtils = Lua.import('Module:Features/Squad/Utils')
 local Table = Lua.import('Module:Table')
 
 local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')

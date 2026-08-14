@@ -12,6 +12,7 @@ local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
+local Math = Lua.import('Module:MathUtil')
 local Page = Lua.import('Module:Page')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local String = Lua.import('Module:StringUtils')
@@ -715,6 +716,31 @@ function Opponent.toLegacyParticipantData(opponent, options)
 		participantlink = Opponent.toName(opponent),
 		participanttemplate = opponent.template,
 	}
+end
+
+---@param opponent standardOpponent
+---@param postfix string?
+---@return string
+function Opponent.getScoreValue(opponent, postfix)
+	postfix = postfix or ''
+	local status = opponent['status' .. postfix]
+
+	if status ~= 'S' then
+		return status or ''
+	end
+
+	local score = opponent['score' .. postfix]
+	local scoreDisplay = opponent['scoreDisplay' .. postfix]
+
+	if score == 0 and Opponent.isTbd(opponent) then
+		return ''
+	elseif score == -1 then
+		return ''
+	elseif scoreDisplay ~= nil then
+		return tostring(Math.round(scoreDisplay, 2))
+	else
+		return tostring(Math.round(score, 2))
+	end
 end
 
 return Opponent

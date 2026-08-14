@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Squad/Utils
+-- page=Module:Features/Squad/Utils
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -20,56 +20,9 @@ local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Lpdb = Lua.import('Module:Lpdb')
 local Faction = Lua.import('Module:Faction')
 local TransferRefs = Lua.import('Module:Transfer/References')
+local SquadTypes = Lua.import('Module:Features/Squad/Types')
 
 local SquadUtils = {}
-
----@enum SquadStatus
-SquadUtils.SquadStatus = {
-	ACTIVE = 0,
-	INACTIVE = 1,
-	FORMER = 2,
-	FORMER_INACTIVE = 3,
-}
-
----@type {string: SquadStatus}
-SquadUtils.StatusToSquadStatus = {
-	active = SquadUtils.SquadStatus.ACTIVE,
-	inactive = SquadUtils.SquadStatus.INACTIVE,
-	former = SquadUtils.SquadStatus.FORMER,
-}
-
----@type {SquadStatus: string}
-SquadUtils.SquadStatusToStorageValue = {
-	[SquadUtils.SquadStatus.ACTIVE] = 'active',
-	[SquadUtils.SquadStatus.INACTIVE] = 'inactive',
-	[SquadUtils.SquadStatus.FORMER] = 'former',
-	[SquadUtils.SquadStatus.FORMER_INACTIVE] = 'former',
-}
-
----@enum SquadType
-SquadUtils.SquadType = {
-	PLAYER = 0,
-	STAFF = 1,
-}
-
----@type {string: SquadType}
-SquadUtils.TypeToSquadType = {
-	player = SquadUtils.SquadType.PLAYER,
-	staff = SquadUtils.SquadType.STAFF,
-}
-
----@type {SquadType: string}
-SquadUtils.SquadTypeToStorageValue = {
-	[SquadUtils.SquadType.PLAYER] = 'player',
-	[SquadUtils.SquadType.STAFF] = 'staff',
-}
-
-SquadUtils.specialTeamsTemplateMapping = {
-	retired = 'Team/retired',
-	inactive = 'Team/inactive',
-	['passed away'] = 'Team/passed away',
-	military = 'Team/military',
-}
 
 ---@param status string?
 ---@return SquadStatus?
@@ -77,7 +30,7 @@ function SquadUtils.statusToSquadStatus(status)
 	if not status then
 		return
 	end
-	return SquadUtils.StatusToSquadStatus[status:lower()]
+	return SquadTypes.StatusToSquadStatus[status:lower()]
 end
 
 ---@param args table
@@ -95,8 +48,6 @@ function SquadUtils.anyInactive(players)
 		return Logic.isNotEmpty(player.inactivedate)
 	end)
 end
-
----@alias SquadWrapper {players: table[], squadType: SquadType, squadStatus: SquadStatus, title: string?, args: table}
 
 ---@param players table[]
 ---@param squadType SquadType
@@ -119,11 +70,11 @@ end
 function SquadUtils.readWrapperArgs(args)
 	local players = SquadUtils.parsePlayers(args)
 
-	local squadType = SquadUtils.TypeToSquadType[args.type] or SquadUtils.SquadType.PLAYER
-	local squadStatus = SquadUtils.statusToSquadStatus(args.status) or SquadUtils.SquadStatus.ACTIVE
+	local squadType = SquadTypes.TypeToSquadType[args.type] or SquadTypes.SquadType.PLAYER
+	local squadStatus = SquadUtils.statusToSquadStatus(args.status) or SquadTypes.SquadStatus.ACTIVE
 
-	if squadStatus == SquadUtils.SquadStatus.FORMER and SquadUtils.anyInactive(players) then
-		squadStatus = SquadUtils.SquadStatus.FORMER_INACTIVE
+	if squadStatus == SquadTypes.SquadStatus.FORMER and SquadUtils.anyInactive(players) then
+		squadStatus = SquadTypes.SquadStatus.FORMER_INACTIVE
 	end
 
 	return SquadUtils.createWrapperData(players, squadType, squadStatus, args.title, args)
@@ -145,7 +96,7 @@ function SquadUtils.convertAutoParameters(player)
 	newPlayer.link = String.nilIfEmpty(player.page)
 	newPlayer.role = player.thisTeam.role
 	newPlayer.position = player.thisTeam.position
-	newPlayer.team = player.thisTeam.role == 'Loan' and player.oldTeam.team
+	newPlayer.team = player.thisTeam.role == 'Loan' and player.oldTeam.team or nil
 
 	newPlayer.newteam = player.newTeam.team
 	newPlayer.newteamrole = player.newTeam.role
@@ -153,35 +104,6 @@ function SquadUtils.convertAutoParameters(player)
 
 	return newPlayer
 end
-
----@class SquadPersonArgs
----@field name string? Real name
----@field id string? Display name
----@field link string? Page name
----@field flag string?
----@field position string?
----@field role string?
----@field captain string? Truthy, only when role is empty
----@field igl string? Truthy, alternative to captain
----@field newteam string? as team template
----@field newteamrole string?
----@field newrole string? -- Alternative to newteamrole
----@field joindate string? including reference
----@field leavedate string? including reference
----@field inactivedate string? including reference
----@field status SquadStatus?
----@field type SquadType?
----@field team string? as loanedto
----@field teamrole string? as loanedtorole
----@field newteamdate string?
----@field faction string?
----@field race string?
----@field activeteam string?
----@field activeteamrole string?
----@field game game?
----@field joindateref table<string, string>?
----@field leavedateref table<string, string>?
----@field inactivedateref table<string, string>?
 
 ---@param args SquadPersonArgs
 ---@return ModelRow
@@ -220,8 +142,8 @@ function SquadUtils.readSquadPersonArgs(args)
 		inactivedate = ReferenceCleaner.clean{input = args.inactivedate},
 		inactivedateref = args.inactivedateref,
 
-		status = SquadUtils.SquadStatusToStorageValue[args.status],
-		type = SquadUtils.SquadTypeToStorageValue[args.type],
+		status = SquadTypes.SquadStatusToStorageValue[args.status],
+		type = SquadTypes.SquadTypeToStorageValue[args.type],
 
 		extradata = {
 			loanedto = args.team,
@@ -235,7 +157,7 @@ function SquadUtils.readSquadPersonArgs(args)
 	}
 
 	if Info.config.squads.hasSpecialTeam and not person.newteam and args.newteam then
-		person.extradata.newteamspecial = SquadUtils.specialTeamsTemplateMapping[args.newteam]
+		person.extradata.newteamspecial = SquadTypes.specialTeamsTemplateMapping[args.newteam]
 	end
 
 	if person.joindate ~= args.joindate then
@@ -262,10 +184,10 @@ end
 ---@param squadStatus SquadStatus
 ---@return table<string, boolean>
 function SquadUtils.analyzeColumnVisibility(players, squadStatus)
-	local isInactive = squadStatus == SquadUtils.SquadStatus.INACTIVE
-		or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE
-	local isFormer = squadStatus == SquadUtils.SquadStatus.FORMER
-		or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE
+	local isInactive = squadStatus == SquadTypes.SquadStatus.INACTIVE
+		or squadStatus == SquadTypes.SquadStatus.FORMER_INACTIVE
+	local isFormer = squadStatus == SquadTypes.SquadStatus.FORMER
+		or squadStatus == SquadTypes.SquadStatus.FORMER_INACTIVE
 
 	return {
 		teamIcon = Array.any(players, function(p)
