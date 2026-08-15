@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
 local Image = Lua.import('Module:Image')
 local Logic = Lua.import('Module:Logic')
@@ -34,89 +33,11 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 ---@field createHeader? fun(match: MatchGroupUtilMatch, options: {teamStyle: teamStyle?}?): Renderable
 ---@field createBody? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 ---@field createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
----@field addToFooter? fun(match: MatchGroupUtilMatch, footer: MatchSummaryFooter): MatchSummaryFooter
+---@field createFooter? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 ---@field createMatch? fun(matchData: MatchGroupUtilMatch): VNode?
 
----@class MatchSummaryFooter: BaseClass
----@operator call: MatchSummaryFooter
----@field elements Renderable[]
-local Footer = Class.new(
-	function(self)
-		self.elements = {}
-	end
-)
-
----@param element Renderable|nil
----@return self
-function Footer:addElement(element)
-	table.insert(self.elements, element)
-	return self
-end
-
----@param link string
----@param icon string
----@param iconDark string?
----@param text string
----@param class string?
----@return MatchSummaryFooter
-function Footer:addLink(link, icon, iconDark, text, class)
-	table.insert(self.elements, Image.display(icon, iconDark, {
-		link = link, size = '32px', caption = text, alt = link, class = class
-	}))
-	return self
-end
-
----@param links table<string, string|table>
----@return self
-function Footer:addLinks(links)
-	local processLink = function(linkType, link)
-		local currentLinkData = Links.getMatchIconData(linkType)
-		if not currentLinkData then
-			mw.log('Unknown link: ' .. linkType)
-		elseif type(link) == 'table' then
-			for gameIdx, gameLink in Table.iter.spairs(link) do
-				local newText = currentLinkData.text .. ' on Game ' .. gameIdx
-				self:addLink(gameLink, currentLinkData.icon, currentLinkData.iconDark, newText)
-			end
-		else
-			-- Temporary during MW/LH Migrations
-			local class
-			if linkType == 'headtohead_lh' then
-				class = 'hide-when-mediawiki'
-			elseif linkType == 'headtohead' then
-				class = 'hide-when-lighthouse'
-			end
-			self:addLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text, class)
-		end
-	end
-
-	local processedLinks = {}
-	Array.forEach(MATCH_LINK_PRIORITY, function(linkType)
-		for linkKey, link in Table.iter.pairsByPrefix(links, linkType, {requireIndex = false}) do
-			processLink(linkKey, link)
-			processedLinks[linkKey] = true
-		end
-	end)
-
-	for linkKey, link in Table.iter.spairs(links) do
-		-- Handle links not already processed via priority list
-		if not processedLinks[linkKey] then
-			processLink(linkKey, link)
-		end
-	end
-
-	return self
-end
-
----@return VNode
-function Footer:create()
-	return MatchSummaryWidgets.Footer{children = self.elements}
-end
-
 ---@class MatchSummary
-local MatchSummary = {
-	Footer = Footer,
-}
+local MatchSummary = {}
 
 ---Default header function
 ---@param match MatchGroupUtilMatch
@@ -151,35 +72,93 @@ function MatchSummary.createDefaultBody(match, createGame)
 end
 
 ---Default footer function
----@param match table
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function MatchSummary.createDefaultFooter(match, footer)
-	return MatchSummary.addVodsToFooter(match, footer):addLinks(match.links)
+---@param match MatchGroupUtilMatch
+---@return Renderable
+function MatchSummary.createDefaultFooter(match)
+	return MatchSummaryWidgets.Footer{children = {
+		MatchSummary.makeVodDisplay(match.vod, match.games),
+		MatchSummary.makeLinksDisplay(match.links),
+	}}
 end
 
----Creates a match footer with vods if vods are set
----@param match table
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function MatchSummary.addVodsToFooter(match, footer)
-	if match.vod then
-		footer:addElement(VodLink.display{
-			vod = match.vod,
+---@param matchVod string?
+---@param games MatchGroupUtilGame[]
+---@return Renderable
+function MatchSummary.makeVodDisplay(matchVod, games)
+	local vods = {}
+	if matchVod then
+		table.insert(vods, VodLink.display{
+			vod = matchVod,
 		})
 	end
 
-	Array.forEach(match.games, function(game, gameIndex)
+	Array.forEach(games, function(game, gameIndex)
 		if not game.vod then
 			return
 		end
-		footer:addElement(VodLink.display{
+		table.insert(vods, VodLink.display{
 			gamenum = gameIndex,
 			vod = game.vod,
 		})
 	end)
 
-	return footer
+	return vods
+end
+
+---@param icon string
+---@param iconDark string?
+---@param link string
+---@param text string?
+---@param class string?
+---@return string?
+function MatchSummary.makeLinkDisplay(icon, iconDark, link, text, class)
+	return Image.display(icon, iconDark, {
+		link = link, size = '32px', caption = text, alt = link, class = class
+	})
+end
+
+---@param links table<string, string|table>
+---@return Renderable
+function MatchSummary.makeLinksDisplay(links)
+	local linkDisplays = {}
+
+	local processLink = function(linkType, link)
+		local currentLinkData = Links.getMatchIconData(linkType)
+		if not currentLinkData then
+			mw.log('Unknown link: ' .. linkType)
+		elseif type(link) == 'table' then
+			for gameIdx, gameLink in Table.iter.spairs(link) do
+				local newText = currentLinkData.text .. ' on Game ' .. gameIdx
+				table.insert(linkDisplays, MatchSummary.makeLinkDisplay(gameLink, currentLinkData.icon, currentLinkData.iconDark, newText))
+			end
+		else
+			-- Temporary during MW/LH Migrations
+			local class
+			if linkType == 'headtohead_lh' then
+				class = 'hide-when-mediawiki'
+			elseif linkType == 'headtohead' then
+				class = 'hide-when-lighthouse'
+			end
+			table.insert(linkDisplays, MatchSummary.makeLinkDisplay(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text, class))
+		end
+	end
+
+	local processedLinks = {}
+	Array.forEach(MATCH_LINK_PRIORITY, function(linkType)
+		for linkKey, link in Table.iter.pairsByPrefix(links, linkType, {requireIndex = false}) do
+			processLink(linkKey, link)
+			processedLinks[linkKey] = true
+		end
+	end)
+
+	for linkKey, link in Table.iter.spairs(links) do
+		-- Handle links not already processed via priority list
+		if not processedLinks[linkKey] then
+			processLink(linkKey, link)
+		end
+	end
+
+	return linkDisplays
 end
 
 ---Default createMatch function for usage in Custom MatchSummary
@@ -194,7 +173,7 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 
 	local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
 	local createBody = CustomMatchSummary.createBody or MatchSummary.createDefaultBody
-	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.createDefaultFooter
+	local createFooter = CustomMatchSummary.createFooter or MatchSummary.createDefaultFooter
 
 	return Html.Fragment{children = WidgetUtil.collect(
 		createHeader(matchData, options),
@@ -212,7 +191,7 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 						}
 					}
 				},
-				createFooter(matchData, MatchSummary.Footer()):create()
+				createFooter(matchData)
 			)
 		},
 		MatchButtonBar{match = matchData, showVods = false, variant = 'primary'} -- Vods are in the footer currently

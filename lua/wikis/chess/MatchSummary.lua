@@ -50,24 +50,14 @@ local KING_ICONS = {
 }
 
 ---@param args table
----@return Widget
+---@return VNode
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
----@param match table
----@param createGame fun(date: string, game: table, gameIndex: integer): Widget
----@return Widget[]
-function CustomMatchSummary.createBody(match, createGame)
-	return WidgetUtil.collect(
-		Array.map(match.games, createGame),
-		CustomMatchSummary._linksTable(match)
-	)
-end
-
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return MatchSummaryRow
+---@return VNode
 function CustomMatchSummary.createGame(game, gameIndex)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
@@ -108,7 +98,7 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return Widget
+---@return VNode
 function CustomMatchSummary._getCenterContent(game, gameIndex)
 	return Div{
 		children = {
@@ -128,7 +118,7 @@ function CustomMatchSummary._getCenterContent(game, gameIndex)
 end
 
 ---@param gameOpponent table
----@return Widget
+---@return VNode
 function CustomMatchSummary._getSideIcon(gameOpponent)
 	return Div{
 		classes = {'brkts-popup-spaced'},
@@ -137,7 +127,7 @@ function CustomMatchSummary._getSideIcon(gameOpponent)
 end
 
 ---@param game MatchGroupUtilGame
----@return Widget?
+---@return VNode?
 function CustomMatchSummary._getHeader(game)
 	return String.isNotEmpty(game.header) and {
 		Div{
@@ -151,43 +141,58 @@ function CustomMatchSummary._getHeader(game)
 	} or nil
 end
 
----@param match any
----@return Widget?
-function CustomMatchSummary._linksTable(match)
-	if Logic.isDeepEmpty(match.links) then
-		return
-	end
-
-	local rows = Array.map(match.games, function(game, gameIndex)
-		local links = Table.mapValues(match.links, function(link)
-			if type(link) ~= 'table' then return nil end
-			return Table.extract(link, gameIndex)
+---@param match MatchGroupUtilMatch
+---@return VNode[]
+function CustomMatchSummary.createFooter(match)
+	local gameLinks = Array.map(match.games, function(game, gameIndex)
+		local linksForThisGame = {}
+		Table.iter.forEachPair(match.links, function(linkType, link)
+			if type(link) ~= 'table' then
+				return
+			end
+			linksForThisGame[linkType] = link[gameIndex]
 		end)
-		local vod = Table.extract(game, 'vod')
-		if not vod and Logic.isDeepEmpty(links) then return end
+		if not game.vod and Logic.isEmpty(linksForThisGame) then
+			return
+		end
 
-		local linksFooter = MatchSummary.Footer()
-		MatchSummary.addVodsToFooter({vod = vod, games = {}}, linksFooter)
-		linksFooter:addLinks(links)
+		local vods = MatchSummary.makeVodDisplay(game.vod, {})
+		local links = MatchSummary.makeLinksDisplay(linksForThisGame)
 
 		return Tr{children = {
 			Td{children = {'Game ', gameIndex}},
-			Td{classes = {'brkts-popup-spaced', 'vodlink'}, children = Array.map(linksFooter.elements, tostring)}
+			Td{classes = {'brkts-popup-spaced', 'vodlink'}, children = Array.extend(vods, links)}
 		}}
 	end)
 
-	if Logic.isEmpty(rows) then
-		return
+	local matchLinks = {}
+	if match.vod then
+		table.insert(matchLinks, MatchSummary.makeVodDisplay(match.vod, {}))
 	end
+	local rawLinksForMatch = {}
+	Table.iter.forEachPair(match.links, function(linkType, link)
+		if type(link) ~= 'string' then
+			return
+		end
+		rawLinksForMatch[linkType] = link
+	end)
 
-	return Collapsible{
-		tableClasses = {'wikitable-striped'},
-		header = Tr{children = {
-			Th{css = {width = '20%'}},
-			Th{css = {width = '80%'}, children = {'Additional Links'}},
-		}},
-		children = rows,
-	}
+	matchLinks = Array.extend(matchLinks, MatchSummary.makeLinksDisplay(rawLinksForMatch))
+
+	-- TODO Early return
+	return WidgetUtil.collect(
+		Logic.isNotEmpty(gameLinks) and MatchSummaryWidgets.Footer{children = {
+			Collapsible{
+				tableClasses = {'wikitable-striped'},
+				header = Tr{children = {
+					Th{css = {width = '20%'}},
+					Th{css = {width = '80%'}, children = {'Additional Links'}},
+				}},
+				children = gameLinks,
+			}
+		}} or nil,
+		Logic.isNotEmpty(matchLinks) and MatchSummaryWidgets.Footer{children = matchLinks} or nil
+	)
 end
 
 return CustomMatchSummary
