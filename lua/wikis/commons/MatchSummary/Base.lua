@@ -35,7 +35,7 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 ---@field createBody? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 ---@field createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
 ---@field addToFooter? fun(match: MatchGroupUtilMatch, footer: MatchSummaryFooter): MatchSummaryFooter
----@field createMatch? fun(matchData: MatchGroupUtilMatch): MatchSummaryMatch
+---@field createMatch? fun(matchData: MatchGroupUtilMatch): VNode?
 
 ---@class MatchSummaryFooter: BaseClass
 ---@operator call: MatchSummaryFooter
@@ -113,63 +113,9 @@ function Footer:create()
 	return MatchSummaryWidgets.Footer{children = self.elements}
 end
 
----@class MatchSummaryMatch: BaseClass
----@operator call: MatchSummaryMatch
----@field headerElement Renderable?
----@field bodyElement Renderable|Renderable[]?
----@field commentElement Renderable|Renderable[]?
----@field footerElement VNode?
----@field buttonElement Renderable?
-local Match = Class.new()
-
----@param header Renderable
----@return self
-function Match:header(header)
-	self.headerElement = header
-	return self
-end
-
----@param body Renderable|Renderable[]
----@return self
-function Match:body(body)
-	self.bodyElement = body
-	return self
-end
-
----@param comment Renderable
----@return self
-function Match:comment(comment)
-	self.commentElement = comment
-	return self
-end
-
----@param footer MatchSummaryFooter
----@return self
-function Match:footer(footer)
-	self.footerElement = footer:create()
-	return self
-end
-
----@param button Renderable
----@return self
-function Match:button(button)
-	self.buttonElement = button
-	return self
-end
-
----@return VNode
-function Match:create()
-	return Html.Fragment{children = WidgetUtil.collect(
-		self.headerElement,
-		MatchSummaryWidgets.Body{children = WidgetUtil.collect(self.bodyElement, self.commentElement, self.footerElement)},
-		self.buttonElement
-	)}
-end
-
 ---@class MatchSummary
 local MatchSummary = {
 	Footer = Footer,
-	Match = Match,
 }
 
 ---Default header function
@@ -240,41 +186,37 @@ end
 ---@param matchData MatchGroupUtilMatch?
 ---@param CustomMatchSummary CustomMatchSummaryInterface
 ---@param options {teamStyle: teamStyle?, noScore: boolean?}?
----@return MatchSummaryMatch?
+---@return VNode?
 function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	if not matchData then
 		return
 	end
 
-	local match = Match()
-
 	local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
-	match:header(createHeader(matchData, options))
-
 	local createBody = CustomMatchSummary.createBody or MatchSummary.createDefaultBody
-	match:body(createBody(matchData, CustomMatchSummary.createGame))
-
-	local substituteComment = DisplayHelper.createSubstitutesComment(matchData)
-
-	match:comment(Html.Fragment{
-		children = {
-			MatchSummaryWidgets.Casters{casters = matchData.extradata.casters},
-			MatchSummaryWidgets.MatchComment{
-				children = WidgetUtil.collect(
-					matchData.comment,
-					substituteComment
-				)
-			}
-		}
-	})
-
 	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.createDefaultFooter
-	match:footer(createFooter(matchData, MatchSummary.Footer()))
 
-	--- Vods are currently part of the footer, so we don't need them here
-	match:button(MatchButtonBar{match = matchData, showVods = false, variant = 'primary'})
-
-	return match
+	return Html.Fragment{children = WidgetUtil.collect(
+		createHeader(matchData, options),
+		MatchSummaryWidgets.Body{
+			children = WidgetUtil.collect(
+				createBody(matchData, CustomMatchSummary.createGame),
+				Html.Fragment{
+					children = {
+						MatchSummaryWidgets.Casters{casters = matchData.extradata.casters},
+						MatchSummaryWidgets.MatchComment{
+							children = WidgetUtil.collect(
+								matchData.comment,
+								DisplayHelper.createSubstitutesComment(matchData)
+							)
+						}
+					}
+				},
+				createFooter(matchData, MatchSummary.Footer()):create()
+			)
+		},
+		MatchButtonBar{match = matchData, showVods = false, variant = 'primary'} -- Vods are in the footer currently
+	)}
 end
 
 ---Default getByMatchId function for usage in Custom MatchSummary
