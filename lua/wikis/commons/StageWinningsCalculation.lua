@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local FnUtil = Lua.import('Module:FnUtil')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
@@ -95,7 +94,8 @@ function StageWinningsCalculation.run(props)
 		local reversedScore = opponent2Score .. '-' .. opponent1Score
 
 		opponents[opponent1.globalIndex].scoreDetails[score] = (opponents[opponent1.globalIndex].scoreDetails[score] or 0) + 1
-		opponents[opponent2.globalIndex].scoreDetails[reversedScore] = (opponents[opponent2.globalIndex].scoreDetails[reversedScore] or 0) + 1
+		opponents[opponent2.globalIndex].scoreDetails[reversedScore]
+			= (opponents[opponent2.globalIndex].scoreDetails[reversedScore] or 0) + 1
 
 		if winnerId == 1 then
 			opponents[opponent1.globalIndex].matchWins = opponents[opponent1.globalIndex].matchWins + 1
@@ -108,10 +108,14 @@ function StageWinningsCalculation.run(props)
 			opponents[opponent2.globalIndex].matchDraws = opponents[opponent2.globalIndex].matchDraws + 1
 		end
 
-		opponents[opponent1.globalIndex].gameWins = opponents[opponent1.globalIndex].gameWins + (tonumber(opponent1.score) or 0)
-		opponents[opponent2.globalIndex].gameLosses = opponents[opponent2.globalIndex].gameLosses + (tonumber(opponent1.score) or 0)
-		opponents[opponent1.globalIndex].gameLosses = opponents[opponent1.globalIndex].gameLosses + (tonumber(opponent2.score) or 0)
-		opponents[opponent2.globalIndex].gameWins = opponents[opponent2.globalIndex].gameWins + (tonumber(opponent2.score) or 0)
+		opponents[opponent1.globalIndex].gameWins
+			= opponents[opponent1.globalIndex].gameWins + (tonumber(opponent1.score) or 0)
+		opponents[opponent2.globalIndex].gameLosses
+			= opponents[opponent2.globalIndex].gameLosses + (tonumber(opponent1.score) or 0)
+		opponents[opponent1.globalIndex].gameLosses
+			= opponents[opponent1.globalIndex].gameLosses + (tonumber(opponent2.score) or 0)
+		opponents[opponent2.globalIndex].gameWins
+			= opponents[opponent2.globalIndex].gameWins + (tonumber(opponent2.score) or 0)
 	end)
 
 	Array.forEach(opponents, function(opponent)
