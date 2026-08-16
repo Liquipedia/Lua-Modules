@@ -16,23 +16,20 @@ local String = Lua.import('Module:StringUtils')
 
 local CharacterStatsWidget = Lua.import('Module:Widget/CharacterStats')
 
----@class BrawlStarsCharacterStats: CharacterStats
----@operator call(table): BrawlStarsCharacterStats
-local BrawlStarsCharacterStats = Class.new(BaseCharacterStats)
+local BrawlStarsCharacterStats = {}
 
 ---@return string[]
-function BrawlStarsCharacterStats:getSides()
+function BaseCharacterStats.getSides()
 	return {}
 end
 
 ---@param frame Frame
----@return Widget
+---@return Renderable
 function BrawlStarsCharacterStats.run(frame)
 	local args = Arguments.getArgs(frame)
-	local stats = BrawlStarsCharacterStats(args)
 
-	local games = stats:queryGames()
-	local processedData = stats:processGames(games)
+	local games = BaseCharacterStats.queryGames(args)
+	local processedData = BaseCharacterStats.processGames(games)
 	return CharacterStatsWidget{
 		characterType = 'Brawler',
 		data = processedData.characterData,
@@ -41,7 +38,7 @@ function BrawlStarsCharacterStats.run(frame)
 		end),
 		includeGlobalBans = true,
 		numGames = #games,
-		sides = stats:getSides(),
+		sides = BaseCharacterStats.getSides(),
 		sideWins = processedData.overall.wins,
 		statspage = args.statspage
 	}
@@ -52,7 +49,7 @@ end
 ---@param game CharacterStatsGame
 ---@param opponentIndex integer
 ---@return string[]
-function BrawlStarsCharacterStats:getTeamCharacters(game, opponentIndex)
+function BaseCharacterStats.getTeamCharacters(game, opponentIndex)
 	local players = ((game.opponents or {})[opponentIndex] or {}).players or {}
 	return Array.filter(Array.map(players, Operator.property('brawler')), String.isNotEmpty)
 end
@@ -60,15 +57,7 @@ end
 ---@param game CharacterStatsGame
 ---@param opponentIndex integer
 ---@return string[]
-function BrawlStarsCharacterStats:getTeamBans(game, opponentIndex)
-	local teamBans = ((game.extradata or {}).bans or {})['team' .. opponentIndex] or {}
-	return Array.filter(teamBans, String.isNotEmpty)
-end
-
----@param game CharacterStatsGame
----@param opponentIndex integer
----@return string[]
-function BrawlStarsCharacterStats:getTeamGlobalBans(game, opponentIndex)
+function BaseCharacterStats.getTeamGlobalBans(game, opponentIndex)
 	local teamGlobalBans = (game.globalBans or {})['team' .. opponentIndex] or {}
 	return Array.filter(teamGlobalBans, String.isNotEmpty)
 end

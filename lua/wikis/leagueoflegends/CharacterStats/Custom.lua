@@ -14,12 +14,10 @@ local Class = Lua.import('Module:Class')
 
 local CharacterStatsWidget = Lua.import('Module:Widget/CharacterStats')
 
----@class LoLCharacterStats: CharacterStats
----@operator call(table): LoLCharacterStats
-local LoLCharacterStats = Class.new(BaseCharacterStats)
+local LoLCharacterStats = {}
 
 ---@return string[]
-function LoLCharacterStats:getSides()
+function BaseCharacterStats.getSides()
 	return {'blue', 'red'}
 end
 
@@ -27,10 +25,9 @@ end
 ---@return Widget
 function LoLCharacterStats.run(frame)
 	local args = Arguments.getArgs(frame)
-	local stats = LoLCharacterStats(args)
 
-	local games = stats:queryGames()
-	local processedData = stats:processGames(games)
+	local games = BaseCharacterStats.queryGames(args)
+	local processedData = BaseCharacterStats.processGames(games)
 	return CharacterStatsWidget{
 		characterType = 'Champion',
 		data = processedData.characterData,
@@ -38,7 +35,7 @@ function LoLCharacterStats.run(frame)
 			return data.bans > 0
 		end),
 		numGames = #games,
-		sides = stats:getSides(),
+		sides = BaseCharacterStats.getSides(),
 		sideWins = processedData.overall.wins,
 		statspage = args.statspage
 	}

@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
-local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
@@ -18,7 +17,6 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
-local Widget = Lua.import('Module:Widget')
 local Html = Lua.import('Module:Widget/Html')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local Dialog = Lua.import('Module:Widget/Basic/Dialog')
@@ -26,13 +24,8 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class CharacterStatsTable: Widget
----@operator call(CharacterStatsWidgetProps): CharacterStatsTable
----@field props CharacterStatsWidgetProps
-local CharacterStatsTable = Class.new(Widget)
-
 ---@return Widget?
-function CharacterStatsTable:render()
+local function CharacterStatsTable(props)
 	local data = self.props.data
 	if Logic.isEmpty(data) then
 		return
