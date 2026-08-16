@@ -46,6 +46,7 @@ function CharacterStatsTable:render()
 			['text-align'] = 'center',
 		},
 		sortable = true,
+		columns = {{}},
 		children = WidgetUtil.collect(
 			TableWidgets.TableHeader{
 				children = self:_buildHeaderRow()
@@ -85,6 +86,7 @@ function CharacterStatsTable:_buildHeaderRow()
 			} or nil,
 			TableWidgets.CellHeader{
 				rowspan = 2,
+				unsortable = true,
 				children = 'Details'
 			}
 		)},
