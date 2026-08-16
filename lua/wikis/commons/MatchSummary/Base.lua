@@ -30,11 +30,9 @@ local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {load
 local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 
 ---@class CustomMatchSummaryInterface
----@field createHeader? fun(match: MatchGroupUtilMatch, options: {teamStyle: teamStyle?}?): Renderable
 ---@field createBody? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 ---@field createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
 ---@field createFooter? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
----@field createMatch? fun(matchData: MatchGroupUtilMatch): VNode?
 
 ---@class MatchSummary
 local MatchSummary = {}
@@ -43,7 +41,7 @@ local MatchSummary = {}
 ---@param match MatchGroupUtilMatch
 ---@param options {teamStyle: teamStyle?}?
 ---@return VNode
-function MatchSummary.createDefaultHeader(match, options)
+function MatchSummary.createHeader(match, options)
 	options = options or {}
 
 	return Html.Fragment{
@@ -176,12 +174,11 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 		return
 	end
 
-	local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
 	local createBody = CustomMatchSummary.createBody or MatchSummary.createDefaultBody
 	local createFooter = CustomMatchSummary.createFooter or MatchSummary.createDefaultFooter
 
 	return Html.Fragment{children = WidgetUtil.collect(
-		createHeader(matchData, options),
+		MatchSummary.createHeader(matchData, options),
 		MatchSummaryWidgets.Body{
 			children = WidgetUtil.collect(
 				createBody(matchData, CustomMatchSummary.createGame),
@@ -230,7 +227,7 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	return MatchSummaryWidgets.Container{
 		classes = args.classes,
 		width = width,
-		createMatch = CustomMatchSummary.createMatch or function(matchData)
+		createMatch = function(matchData)
 			return MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 		end,
 		match = match,
