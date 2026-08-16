@@ -28,13 +28,13 @@ local DEFAULT_CARD = 'default'
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return Renderable[]
 function CustomMatchSummary.createBody(match)
 	local isTeamGame = Array.any(match.opponents, function(opponent) return opponent.type == Opponent.team end)
 	local games
@@ -55,7 +55,7 @@ end
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@param date string
----@return Widget
+---@return Renderable
 function CustomMatchSummary._createGame(game, gameIndex, date)
 	local cardData = Array.map(game.opponents, function(opponent)
 		return Array.map(opponent.players or {}, function(player)
@@ -91,7 +91,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return Renderable[]
 function CustomMatchSummary._createTeamMatchBody(match)
 	local _, subMatches = Array.groupBy(match.games, Operator.property('subgroup'))
 	subMatches = Array.map(subMatches, function(subMatch)
@@ -179,7 +179,7 @@ end
 ---@param subMatchIndex integer
 ---@param subMatch table
 ---@param extradata table
----@return Widget
+---@return Renderable
 function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, extradata)
 	-- Add submatch header
 	local header
@@ -203,7 +203,7 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 		:css('text-align', 'right')
 		:css('width', '40%')
 		:node(OpponentDisplay.BlockPlayers{
-			opponent = {players = players[1]},
+			opponent = {players = players[1], type = 'solo', extradata = {}},
 			overflow = 'ellipsis',
 			showLink = true,
 			flip = true,
@@ -230,7 +230,7 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 		:css('text-align', 'left')
 		:css('width', '40%')
 		:node(OpponentDisplay.BlockPlayers{
-			opponent = {players = players[2]},
+			opponent = {players = players[2], type = 'solo', extradata = {}},
 			overflow = 'ellipsis',
 			showLink = true,
 			flip = false,

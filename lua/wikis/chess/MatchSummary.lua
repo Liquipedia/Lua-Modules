@@ -50,14 +50,14 @@ local KING_ICONS = {
 }
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
 ---@param match table
 ---@param createGame fun(date: string, game: table, gameIndex: integer): Widget
----@return Widget[]
+---@return Renderable[]
 function CustomMatchSummary.createBody(match, createGame)
 	return WidgetUtil.collect(
 		Array.map(match.games, createGame),
@@ -67,7 +67,7 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return MatchSummaryRow
+---@return Renderable
 function CustomMatchSummary.createGame(game, gameIndex)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
@@ -108,7 +108,7 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return Widget
+---@return Renderable
 function CustomMatchSummary._getCenterContent(game, gameIndex)
 	return Div{
 		children = {
@@ -128,7 +128,7 @@ function CustomMatchSummary._getCenterContent(game, gameIndex)
 end
 
 ---@param gameOpponent table
----@return Widget
+---@return Renderable
 function CustomMatchSummary._getSideIcon(gameOpponent)
 	return Div{
 		classes = {'brkts-popup-spaced'},
@@ -137,7 +137,7 @@ function CustomMatchSummary._getSideIcon(gameOpponent)
 end
 
 ---@param game MatchGroupUtilGame
----@return Widget?
+---@return Renderable?
 function CustomMatchSummary._getHeader(game)
 	return String.isNotEmpty(game.header) and {
 		Div{
@@ -152,7 +152,7 @@ function CustomMatchSummary._getHeader(game)
 end
 
 ---@param match any
----@return Widget?
+---@return Renderable?
 function CustomMatchSummary._linksTable(match)
 	if Logic.isDeepEmpty(match.links) then
 		return
@@ -168,6 +168,7 @@ function CustomMatchSummary._linksTable(match)
 
 		local linksFooter = MatchSummary.Footer()
 		MatchSummary.addVodsToFooter({vod = vod, games = {}}, linksFooter)
+---@diagnostic disable-next-line: param-type-mismatch GETTING FIX IN ANOTHER PR
 		linksFooter:addLinks(links)
 
 		return Tr{children = {

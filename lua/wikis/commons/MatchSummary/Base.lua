@@ -33,7 +33,7 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 ---@class CustomMatchSummaryInterface
 ---@field createHeader? fun(match: MatchGroupUtilMatch, options: {teamStyle: teamStyle?}?): Renderable
 ---@field createBody? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
----@field createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
+---@field createGame? fun(game: table, gameIndex: integer): Renderable|Renderable[]
 ---@field addToFooter? fun(match: MatchGroupUtilMatch, footer: MatchSummaryFooter): MatchSummaryFooter
 ---@field createMatch? fun(matchData: MatchGroupUtilMatch): MatchSummaryMatch
 
@@ -194,11 +194,11 @@ end
 
 -- Default body function
 ---@param match MatchGroupUtilMatch
----@param createGame fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
+---@param createGame fun(game: table, gameIndex: integer): Renderable|Renderable[]
 ---@return Renderable[]
 function MatchSummary.createDefaultBody(match, createGame)
 	return WidgetUtil.collect(
-		Array.map(match.games, FnUtil.curry(createGame, match.date)),
+		Array.map(match.games, createGame),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
 	)
@@ -285,7 +285,7 @@ end
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(
 		(type(CustomMatchSummary.createBody) == 'function' or type(CustomMatchSummary.createGame) == 'function'),
-		'createBody(match) or createGame(date, game, gameIndex) must be implemented in Module:MatchSummary'
+		'createBody(match) or createGame(game, gameIndex) must be implemented in Module:MatchSummary'
 	)
 
 	options = options or {}
