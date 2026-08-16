@@ -10,10 +10,11 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local BaseCharacterStats = Lua.import('Module:CharacterStats')
-local Class = Lua.import('Module:Class')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 
+---@class BrawlStarsCharacterStats: CharacterStats
+---@operator call(table): BrawlStarsCharacterStats
 local CharacterStatsWidget = Lua.import('Module:Widget/CharacterStats')
 
 local BrawlStarsCharacterStats = {}
@@ -27,7 +28,6 @@ end
 ---@return Renderable
 function BrawlStarsCharacterStats.run(frame)
 	local args = Arguments.getArgs(frame)
-
 	local games = BaseCharacterStats.queryGames(args)
 	local processedData = BaseCharacterStats.processGames(games)
 	return CharacterStatsWidget{
