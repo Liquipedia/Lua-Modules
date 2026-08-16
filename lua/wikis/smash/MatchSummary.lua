@@ -22,7 +22,7 @@ local PlayerDisplay = Lua.import('Module:Player/Display')
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {
 		width = '350px',
@@ -40,18 +40,16 @@ function CustomMatchSummary.isTeam(match)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
-function CustomMatchSummary.createBody(match)
-	local games = Array.map(match.games, function(game)
-		return CustomMatchSummary._createStandardGame(game, {
-			opponents = match.opponents,
-			game = match.game,
-			teamMode = CustomMatchSummary.isTeam(match),
-		})
-	end)
-
+---@return Renderable[]
+function CustomMatchSummary.createGames(match)
 	return WidgetUtil.collect(
-		games
+		Array.map(match.games, function(game)
+			return CustomMatchSummary._createStandardGame(game, {
+				opponents = match.opponents,
+				game = match.game,
+				teamMode = CustomMatchSummary.isTeam(match),
+			})
+		end)
 	)
 end
 
@@ -67,7 +65,7 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param props {game: string?, teamMode: boolean, opponents: table[]}
----@return Widget?
+---@return Renderable?
 function CustomMatchSummary._createStandardGame(game, props)
 	if not game or Logic.isDeepEmpty(game.opponents) then
 		return
@@ -101,7 +99,7 @@ end
 ---@param game string?
 ---@param reverse boolean?
 ---@param displayPlayerNames boolean
----@return Html
+---@return Renderable
 function CustomMatchSummary._createCharacterDisplay(players, game, reverse, displayPlayerNames)
 	local CharacterIcons = Lua.import('Module:CharacterIcons/' .. (game or ''), {loadData = true})
 	local wrapper = mw.html.create('div'):css{
