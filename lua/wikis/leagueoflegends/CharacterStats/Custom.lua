@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local BaseCharacterStats = Lua.import('Module:CharacterStats')
-local Class = Lua.import('Module:Class')
 
 local CharacterStatsWidget = Lua.import('Module:Widget/CharacterStats')
 
