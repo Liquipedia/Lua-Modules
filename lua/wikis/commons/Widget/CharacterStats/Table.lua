@@ -48,14 +48,14 @@ local function CharacterStatsTable(props)
 		columns = {{}},
 		children = WidgetUtil.collect(
 			TableWidgets.TableHeader{
-				children = CharacterStatsTable._buildHeaderRow(props)
+				children = Helpers._buildHeaderRow(props)
 			},
 			TableWidgets.TableBody{
 				children = WidgetUtil.collect(
 					Array.map(data, function (dataEntry, dataIndex)
-						return CharacterStatsTable._buildCharacterRow(props, dataEntry, dataIndex)
+						return Helpers._buildCharacterRow(props, dataEntry, dataIndex)
 					end),
-					CharacterStatsTable._buildFooterRow(props)
+					Helpers._buildFooterRow(props)
 				)
 			}
 		)
@@ -65,7 +65,7 @@ end
 ---@private
 ---@param props table
 ---@return Renderable
-function CharacterStatsTable._buildHeaderRow(props)
+function Helpers._buildHeaderRow(props)
 	return {
 		TableWidgets.Row{children = WidgetUtil.collect(
 			TableWidgets.CellHeader{colspan = 2},
@@ -128,7 +128,7 @@ end
 ---@param characterData CharacterStatistic
 ---@param characterIndex integer
 ---@return Renderable
-function CharacterStatsTable._buildCharacterRow(props, characterData, characterIndex)
+function Helpers._buildCharacterRow(props, characterData, characterIndex)
 	return TableWidgets.Row{
 		classes = {'character-stats-row'},
 		children = WidgetUtil.collect(
@@ -146,10 +146,10 @@ function CharacterStatsTable._buildCharacterRow(props, characterData, characterI
 			},
 			TableWidgets.Cell{children = characterData.total.win},
 			TableWidgets.Cell{children = characterData.total.loss},
-			TableWidgets.Cell{children = CharacterStatsTable._calculatePercentage(
+			TableWidgets.Cell{children = Helpers._calculatePercentage(
 				characterData.total.win, characterData.total.pick
 			)},
-			TableWidgets.Cell{children = CharacterStatsTable._calculatePercentage(
+			TableWidgets.Cell{children = Helpers._calculatePercentage(
 				characterData.total.pick, props.numGames
 			)},
 			Array.flatMap(props.sides, function (side)
@@ -161,7 +161,7 @@ function CharacterStatsTable._buildCharacterRow(props, characterData, characterI
 					},
 					TableWidgets.Cell{children = characterData.side[side].win},
 					TableWidgets.Cell{children = characterData.side[side].loss},
-					TableWidgets.Cell{children = CharacterStatsTable._calculatePercentage(characterData.side[side].win, picks)}
+					TableWidgets.Cell{children = Helpers._calculatePercentage(characterData.side[side].win, picks)}
 				}
 			end),
 			props.includeBans and WidgetUtil.collect(
@@ -169,15 +169,15 @@ function CharacterStatsTable._buildCharacterRow(props, characterData, characterI
 					TableWidgets.Cell{children = characterData.bans + characterData.globalBans},
 					TableWidgets.Cell{children = characterData.bans},
 					TableWidgets.Cell{children = characterData.globalBans},
-					TableWidgets.Cell{children = CharacterStatsTable._calculatePercentage(
+					TableWidgets.Cell{children = Helpers._calculatePercentage(
 						characterData.bans + characterData.globalBans, props.numGames
 					)},
 				} or {
 					TableWidgets.Cell{children = characterData.bans},
-					TableWidgets.Cell{children = CharacterStatsTable._calculatePercentage(characterData.bans, props.numGames)},
+					TableWidgets.Cell{children = Helpers._calculatePercentage(characterData.bans, props.numGames)},
 				},
 				TableWidgets.Cell{children = characterData.total.pick + characterData.bans + characterData.globalBans},
-				TableWidgets.Cell{children = CharacterStatsTable._calculatePercentage(
+				TableWidgets.Cell{children = Helpers._calculatePercentage(
 					characterData.total.pick + characterData.bans, props.numGames
 				)}
 			) or nil,
@@ -195,9 +195,9 @@ function CharacterStatsTable._buildCharacterRow(props, characterData, characterI
 				children = Html.Div{
 					classes = {'character-stats-popup-info'},
 					children = {
-						CharacterStatsTable._buildPlayedByTeamTable(characterData.playedBy),
-						CharacterStatsTable._buildPlayedTable(props, 'with', characterData.playedWith),
-						CharacterStatsTable._buildPlayedTable(props, 'against', characterData.playedVs)
+						Helpers._buildPlayedByTeamTable(characterData.playedBy),
+						Helpers._buildPlayedTable(props, 'with', characterData.playedWith),
+						Helpers._buildPlayedTable(props, 'against', characterData.playedVs)
 					}
 				}
 			}}
@@ -218,11 +218,11 @@ local function characterAppearanceStatsComparator(a, b)
 end
 
 ---@param data table<string, CharacterAppearanceStats>
-function CharacterStatsTable._buildPlayedByTeamTable(data)
+function Helpers._buildPlayedByTeamTable(data)
 	local sortedTeamData = Array.sortBy(
 		Table.entries(data), Operator.property(2), characterAppearanceStatsComparator
 	)
-	return CharacterStatsTable._buildDetailsTable{
+	return Helpers._buildDetailsTable{
 		title = 'Played by Teams',
 		entryType = 'Team',
 		entries = Array.map(Array.sub(Array.reverse(sortedTeamData), 1, 5), function (teamData, index)
@@ -236,7 +236,7 @@ function CharacterStatsTable._buildPlayedByTeamTable(data)
 				teamData[2].pick,
 				teamData[2].win,
 				teamData[2].loss,
-				CharacterStatsTable._calculatePercentage(teamData[2].win, teamData[2].pick)
+				Helpers._calculatePercentage(teamData[2].win, teamData[2].pick)
 			}
 		end)
 	}
@@ -246,11 +246,11 @@ end
 ---@param playedType string
 ---@param data table<string, CharacterAppearanceStats>
 ---@diagnostic disable-next-line: inject-field
-function CharacterStatsTable._buildPlayedTable(props, playedType, data)
+function Helpers._buildPlayedTable(props, playedType, data)
 	local sortedCharacterData = Array.sortBy(
 		Table.entries(data), Operator.property(2), characterAppearanceStatsComparator
 	)
-	return CharacterStatsTable._buildDetailsTable{
+	return Helpers._buildDetailsTable{
 		title = 'Played ' .. playedType,
 		entryType = String.upperCaseFirst(props.characterType),
 		entries = Array.map(Array.sub(Array.reverse(sortedCharacterData), 1, 5), function (characterData, index)
@@ -264,7 +264,7 @@ function CharacterStatsTable._buildPlayedTable(props, playedType, data)
 				characterData[2].pick,
 				characterData[2].win,
 				characterData[2].loss,
-				CharacterStatsTable._calculatePercentage(characterData[2].win, characterData[2].pick)
+				Helpers._calculatePercentage(characterData[2].win, characterData[2].pick)
 			}
 		end)
 	}
@@ -273,7 +273,7 @@ end
 ---@private
 ---@param props table
 ---@return Renderable
-function CharacterStatsTable._buildDetailsTable(props)
+function Helpers._buildDetailsTable(props)
 	return TableWidgets.Table{
 		sortable = true,
 		children = WidgetUtil.collect(
@@ -309,7 +309,7 @@ end
 ---@private
 ---@param props table
 ---@return Renderable[]
-function CharacterStatsTable._buildFooterRow(props)
+function Helpers._buildFooterRow(props)
 	return WidgetUtil.collect(
 		TableWidgets.Row{children = WidgetUtil.collect(
 			TableWidgets.CellHeader{
@@ -333,7 +333,7 @@ function CharacterStatsTable._buildFooterRow(props)
 					children = {
 						sideWin .. ' W - ' .. sideLoss .. ' L',
 						' ',
-						'(' .. CharacterStatsTable._calculatePercentage(sideWin, props.numGames) .. ')'
+						'(' .. Helpers._calculatePercentage(sideWin, props.numGames) .. ')'
 					}
 				}
 			end),
@@ -357,7 +357,7 @@ end
 ---@param count integer
 ---@param total integer
 ---@return string
-function CharacterStatsTable._calculatePercentage(count, total)
+function Helpers._calculatePercentage(count, total)
 	if total == 0 then
 		return '-'
 	end

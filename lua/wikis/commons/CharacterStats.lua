@@ -241,6 +241,7 @@ function CharacterStats.processGames(games)
 	}
 end
 
+---@private
 ---@param stats table<string, CharacterStatistic>
 ---@param character string
 ---@return CharacterStatistic

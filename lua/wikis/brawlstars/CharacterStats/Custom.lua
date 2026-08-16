@@ -34,7 +34,7 @@ end
 ---@return Renderable
 function BrawlStarsCharacterStats.run(frame)
 	local args = Arguments.getArgs(frame)
-	local games = BaseCharacterStats.queryGames()
+	local games = BaseCharacterStats.queryGames(args)
 	local processedData = BaseCharacterStats.processGames(games)
 	return CharacterStatsWidget{
 		characterType = 'Brawler',
@@ -56,7 +56,7 @@ end
 ---@param game CharacterStatsGame
 ---@param opponentIndex integer
 ---@return string[]
-function BrawlStarsCharacterStats.getTeamCharacters(game, opponentIndex)
+function BaseCharacterStats.getTeamCharacters(game, opponentIndex)
 	local players = ((game.opponents or {})[opponentIndex] or {}).players or {}
 	return Array.filter(Array.map(players, Operator.property('brawler')), String.isNotEmpty)
 end
@@ -64,7 +64,7 @@ end
 ---@param game CharacterStatsGame
 ---@param opponentIndex integer
 ---@return string[]
-function BrawlStarsCharacterStats.getTeamGlobalBans(game, opponentIndex)
+function BaseCharacterStats.getTeamGlobalBans(game, opponentIndex)
 	local teamGlobalBans = (game.globalBans or {})['team' .. opponentIndex] or {}
 	return Array.filter(teamGlobalBans, String.isNotEmpty)
 end

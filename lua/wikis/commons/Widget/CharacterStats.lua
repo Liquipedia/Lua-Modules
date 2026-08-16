@@ -28,6 +28,8 @@ local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local Helpers = {}
+
 ---@class CharacterStatsData
 ---@field name string
 ---@field bans integer
@@ -62,10 +64,10 @@ local function CharacterStatsWidget(props)
 	return WidgetUtil.collect(
 		CharacterStatsTable(props),
 		showExtraStats and WidgetUtil.collect(
-			CharacterStatsWidget._displayUnpickedCharacters(props),
+			Helpers._displayUnpickedCharacters(props),
 			props.includeBans and {
-				CharacterStatsWidget._displayUnbannedCharacters(props),
-				CharacterStatsWidget._displayUnpickedAndUnbannedCharacters(props),
+				Helpers._displayUnbannedCharacters(props),
+				Helpers._displayUnpickedAndUnbannedCharacters(props),
 			}
 		) or nil
 	)
@@ -74,7 +76,7 @@ end
 ---@private
 ---@param props CharacterStatsWidgetProps
 ---@return Renderable?
-function CharacterStatsWidget._displayUnpickedCharacters(props)
+function Helpers._displayUnpickedCharacters(props)
 	---@type string[]
 	local playedCharacters = Array.map(
 		Array.filter(props.data, function (dataEntry)
@@ -84,13 +86,13 @@ function CharacterStatsWidget._displayUnpickedCharacters(props)
 		Operator.property('name')
 	)
 
-	return CharacterStatsWidget._buildUnchosenCharactersTable('Unpicked', playedCharacters, props)
+	return Helpers._buildUnchosenCharactersTable('Unpicked', playedCharacters, props)
 end
 
 ---@private
 ---@param props CharacterStatsWidgetProps
 ---@return Renderable?
-function CharacterStatsWidget._displayUnbannedCharacters(props)
+function Helpers._displayUnbannedCharacters(props)
 	---@type string[]
 	local bannedCharacters = Array.map(
 		Array.filter(props.data, function (dataEntry)
@@ -100,13 +102,13 @@ function CharacterStatsWidget._displayUnbannedCharacters(props)
 		Operator.property('name')
 	)
 
-	return CharacterStatsWidget._buildUnchosenCharactersTable('Unbanned', bannedCharacters, props)
+	return Helpers._buildUnchosenCharactersTable('Unbanned', bannedCharacters, props)
 end
 
 ---@private
 ---@param props CharacterStatsWidgetProps
 ---@return Renderable?
-function CharacterStatsWidget._displayUnpickedAndUnbannedCharacters(props)
+function Helpers._displayUnpickedAndUnbannedCharacters(props)
 	---@type string[]
 	local playedCharacters = Array.map(
 		Array.filter(props.data, function (dataEntry)
@@ -116,7 +118,7 @@ function CharacterStatsWidget._displayUnpickedAndUnbannedCharacters(props)
 		Operator.property('name')
 	)
 
-	return CharacterStatsWidget._buildUnchosenCharactersTable('Unpicked & Unbanned', playedCharacters, props)
+	return Helpers._buildUnchosenCharactersTable('Unpicked & Unbanned', playedCharacters, props)
 end
 
 ---@private
@@ -124,7 +126,7 @@ end
 ---@param excludedCharacters string[]
 ---@param props CharacterStatsWidgetProps
 ---@return Renderable?
-function CharacterStatsWidget._buildUnchosenCharactersTable(titlePrefix, excludedCharacters, props)
+function Helpers._buildUnchosenCharactersTable(titlePrefix, excludedCharacters, props)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('date'), Comparator.le, DateExt.getContextualDateOrNow()),
 		ConditionUtil.noneOf(ColumnName('name'), excludedCharacters)
