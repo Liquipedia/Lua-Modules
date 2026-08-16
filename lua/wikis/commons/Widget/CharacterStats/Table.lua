@@ -21,9 +21,9 @@ local Table = Lua.import('Module:Table')
 local Widget = Lua.import('Module:Widget')
 local Html = Lua.import('Module:Widget/Html')
 local Button = Lua.import('Module:Widget/Basic/Button')
-local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local Dialog = Lua.import('Module:Widget/Basic/Dialog')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class CharacterStatsTable: Widget
@@ -40,78 +40,82 @@ function CharacterStatsTable:render()
 	if self.props.statspage ~= mw.title.getCurrentTitle().prefixedText then
 		data = Array.sub(data, 1, 5)
 	end
-	return DataTable{
-		classes = {'table-striped'},
-		tableCss = {
+	return TableWidgets.Table{
+		css = {
 			margin = 0,
 			['text-align'] = 'center',
 		},
+		sortable = true,
 		children = WidgetUtil.collect(
-			self:_buildHeaderRow(),
-			Array.map(data, function (dataEntry, dataIndex)
-				return self:_buildCharacterRow(dataEntry, dataIndex)
-			end),
-			self:_buildFooterRow()
-		),
-		sortable = true
+			TableWidgets.TableHeader{
+				children = self:_buildHeaderRow()
+			},
+			TableWidgets.TableBody{
+				children = WidgetUtil.collect(
+					Array.map(data, function (dataEntry, dataIndex)
+						return self:_buildCharacterRow(dataEntry, dataIndex)
+					end),
+					self:_buildFooterRow()
+				)
+			}
+		)
 	}
 end
 
 ---@private
----@return Widget
+---@return Widget[]
 function CharacterStatsTable:_buildHeaderRow()
 	return {
-		Html.Tr{children = WidgetUtil.collect(
-			Html.Th{attributes = {colspan = 2}},
-			Html.Th{attributes = {colspan = 5}, children = 'Picks'},
+		TableWidgets.Row{children = WidgetUtil.collect(
+			TableWidgets.CellHeader{colspan = 2},
+			TableWidgets.CellHeader{colspan = 5, children = 'Picks'},
 			Array.map(self.props.sides, function (side)
-				return Html.Th{attributes = {colspan = 4}, children = String.upperCaseFirst(side)}
+				return TableWidgets.CellHeader{colspan = 4, children = String.upperCaseFirst(side)}
 			end),
 			self.props.includeBans and {
-				Html.Th{
-					attributes = {colspan = self.props.includeGlobalBans and 4 or 2},
+				TableWidgets.CellHeader{
+					colspan = self.props.includeGlobalBans and 4 or 2,
 					children = 'Bans'
 				},
-				Html.Th{
-					attributes = {colspan = 2},
+				TableWidgets.CellHeader{
+					colspan = 2,
 					css = {['white-space'] = 'nowrap'},
 					children = 'Picks & Bans'
 				},
 			} or nil,
-			Html.Th{
-				attributes = {rowspan = 2},
-				classes = {'unsortable'},
+			TableWidgets.CellHeader{
+				rowspan = 2,
 				children = 'Details'
 			}
 		)},
-		Html.Tr{children = WidgetUtil.collect(
-			Html.Th{},
-			Html.Th{children = String.upperCaseFirst(self.props.characterType)},
-			Html.Th{children = '∑'},
-			Html.Th{children = 'W'},
-			Html.Th{children = 'L'},
-			Html.Th{children = 'WR'},
-			Html.Th{children = '%T'},
+		TableWidgets.Row{children = WidgetUtil.collect(
+			TableWidgets.CellHeader{},
+			TableWidgets.CellHeader{children = String.upperCaseFirst(self.props.characterType)},
+			TableWidgets.CellHeader{children = '∑'},
+			TableWidgets.CellHeader{children = 'W'},
+			TableWidgets.CellHeader{children = 'L'},
+			TableWidgets.CellHeader{children = 'WR'},
+			TableWidgets.CellHeader{children = '%T'},
 			Array.flatMap(self.props.sides, function (_)
 				return {
-					Html.Th{children = '∑'},
-					Html.Th{children = 'W'},
-					Html.Th{children = 'L'},
-					Html.Th{children = 'WR'},
+					TableWidgets.CellHeader{children = '∑'},
+					TableWidgets.CellHeader{children = 'W'},
+					TableWidgets.CellHeader{children = 'L'},
+					TableWidgets.CellHeader{children = 'WR'},
 				}
 			end),
 			self.props.includeBans and WidgetUtil.collect(
 				self.props.includeGlobalBans and {
-					Html.Th{children = '∑'},
-					Html.Th{children = Html.Abbr{title = 'Ban', children = 'B'}},
-					Html.Th{children = Html.Abbr{title = 'Global Ban', children = 'GB'}},
-					Html.Th{children = '%T'},
+					TableWidgets.CellHeader{children = '∑'},
+					TableWidgets.CellHeader{children = Html.Abbr{title = 'Ban', children = 'B'}},
+					TableWidgets.CellHeader{children = Html.Abbr{title = 'Global Ban', children = 'GB'}},
+					TableWidgets.CellHeader{children = '%T'},
 				} or {
-					Html.Th{children = '∑'},
-					Html.Th{children = '%T'},
+					TableWidgets.CellHeader{children = '∑'},
+					TableWidgets.CellHeader{children = '%T'},
 				},
-				Html.Th{children = '∑'},
-				Html.Th{children = '%T'}
+				TableWidgets.CellHeader{children = '∑'},
+				TableWidgets.CellHeader{children = '%T'}
 			) or nil
 		)}
 	}
@@ -122,59 +126,59 @@ end
 ---@param characterIndex integer
 ---@return Widget
 function CharacterStatsTable:_buildCharacterRow(characterData, characterIndex)
-	return Html.Tr{
+	return TableWidgets.Row{
 		classes = {'character-stats-row'},
 		children = WidgetUtil.collect(
-			Html.Td{children = characterIndex},
-			Html.Td{
+			TableWidgets.Cell{children = characterIndex},
+			TableWidgets.Cell{
 				css = {
 					['text-align'] = 'left',
 					['white-space'] = 'nowrap'
 				},
 				children = CharacterIcon.Icon{character = characterData.name, size = self.props.characterSize, addTextLink = true}
 			},
-			Html.Td{
+			TableWidgets.Cell{
 				css = {['font-weight'] = 'bolder'},
 				children = characterData.total.pick
 			},
-			Html.Td{children = characterData.total.win},
-			Html.Td{children = characterData.total.loss},
-			Html.Td{children = CharacterStatsTable._calculatePercentage(
+			TableWidgets.Cell{children = characterData.total.win},
+			TableWidgets.Cell{children = characterData.total.loss},
+			TableWidgets.Cell{children = CharacterStatsTable._calculatePercentage(
 				characterData.total.win, characterData.total.pick
 			)},
-			Html.Td{children = CharacterStatsTable._calculatePercentage(
+			TableWidgets.Cell{children = CharacterStatsTable._calculatePercentage(
 				characterData.total.pick, self.props.numGames
 			)},
 			Array.flatMap(self.props.sides, function (side)
 				local picks = characterData.side[side].win + characterData.side[side].loss
 				return {
-					Html.Td{
+					TableWidgets.Cell{
 						css = {['font-weight'] = 'bolder'},
 						children = picks
 					},
-					Html.Td{children = characterData.side[side].win},
-					Html.Td{children = characterData.side[side].loss},
-					Html.Td{children = CharacterStatsTable._calculatePercentage(characterData.side[side].win, picks)}
+					TableWidgets.Cell{children = characterData.side[side].win},
+					TableWidgets.Cell{children = characterData.side[side].loss},
+					TableWidgets.Cell{children = CharacterStatsTable._calculatePercentage(characterData.side[side].win, picks)}
 				}
 			end),
 			self.props.includeBans and WidgetUtil.collect(
 				self.props.includeGlobalBans and {
-					Html.Td{children = characterData.bans + characterData.globalBans},
-					Html.Td{children = characterData.bans},
-					Html.Td{children = characterData.globalBans},
-					Html.Td{children = CharacterStatsTable._calculatePercentage(
+					TableWidgets.Cell{children = characterData.bans + characterData.globalBans},
+					TableWidgets.Cell{children = characterData.bans},
+					TableWidgets.Cell{children = characterData.globalBans},
+					TableWidgets.Cell{children = CharacterStatsTable._calculatePercentage(
 						characterData.bans + characterData.globalBans, self.props.numGames
 					)},
 				} or {
-					Html.Td{children = characterData.bans},
-					Html.Td{children = CharacterStatsTable._calculatePercentage(characterData.bans, self.props.numGames)},
+					TableWidgets.Cell{children = characterData.bans},
+					TableWidgets.Cell{children = CharacterStatsTable._calculatePercentage(characterData.bans, self.props.numGames)},
 				},
-				Html.Td{children = characterData.total.pick + characterData.bans + characterData.globalBans},
-				Html.Td{children = CharacterStatsTable._calculatePercentage(
+				TableWidgets.Cell{children = characterData.total.pick + characterData.bans + characterData.globalBans},
+				TableWidgets.Cell{children = CharacterStatsTable._calculatePercentage(
 					characterData.total.pick + characterData.bans, self.props.numGames
 				)}
 			) or nil,
-			Html.Td{children = Dialog{
+			TableWidgets.Cell{children = Dialog{
 				trigger = Button{
 					children = 'Show',
 					variant = 'secondary',
@@ -264,45 +268,50 @@ end
 ---@param props table
 ---@return Widget
 function CharacterStatsTable._buildDetailsTable(props)
-	return Html.Div{children = Html.Table{
-		classes = {'wikitable', 'wikitable-striped', 'sortable'},
-		css = {width = '100%'},
+	return TableWidgets.Table{
+		sortable = true,
 		children = WidgetUtil.collect(
-			Logic.isNotEmpty(props.title) and Html.Tr{
-				children = Html.Th{
-					attributes = {colspan = 6},
-					children = props.title
-				}
-			} or nil,
-			Html.Tr{children = {
-				Html.Th{},
-				Html.Th{children = props.entryType},
-				Html.Th{children = '∑'},
-				Html.Th{children = 'W'},
-				Html.Th{children = 'L'},
-				Html.Th{children = 'WR'}
-			}},
-			Array.map(props.entries, function (entry)
-				return Html.Tr{children = Array.map(entry, function (data)
-					return Html.Td{children = data}
-				end)}
-			end)
+			TableWidgets.TableHeader{
+				children = WidgetUtil.collect(
+					Logic.isNotEmpty(props.title) and TableWidgets.Row{
+						children = TableWidgets.CellHeader{
+							colspan = 6,
+							children = props.title
+						}
+					} or nil,
+					TableWidgets.Row{children = {
+						TableWidgets.CellHeader{},
+						TableWidgets.CellHeader{children = props.entryType},
+						TableWidgets.CellHeader{children = '∑'},
+						TableWidgets.CellHeader{children = 'W'},
+						TableWidgets.CellHeader{children = 'L'},
+						TableWidgets.CellHeader{children = 'WR'}
+					}}
+				)
+			},
+			TableWidgets.TableBody{
+				children = Array.map(props.entries, function (entry)
+					return TableWidgets.Row{children = Array.map(entry, function (data)
+						return TableWidgets.Cell{children = data}
+					end)}
+				end)
+			}
 		)
-	}}
+	}
 end
 
 ---@private
----@return Widget
+---@return Widget[]
 function CharacterStatsTable:_buildFooterRow()
 	return WidgetUtil.collect(
-		Html.Tr{children = WidgetUtil.collect(
-			Html.Th{
+		TableWidgets.Row{children = WidgetUtil.collect(
+			TableWidgets.CellHeader{
 				classes = {'sortbottom'},
-				attributes = {colspan = 2}
+				colspan = 2
 			},
-			Html.Th{
+			TableWidgets.CellHeader{
 				classes = {'sortbottom'},
-				attributes = {colspan = 5},
+				colspan = 5,
 				children = {
 					self.props.numGames,
 					' games played'
@@ -311,9 +320,9 @@ function CharacterStatsTable:_buildFooterRow()
 			Array.map(self.props.sides, function (side)
 				local sideWin = self.props.sideWins[side]
 				local sideLoss = self.props.numGames - sideWin
-				return Html.Th{
+				return TableWidgets.CellHeader{
 					classes = {'sortbottom', 'wikitable--' .. side .. '-bg'},
-					attributes = {colspan = 4},
+					colspan = 4,
 					children = {
 						sideWin .. ' W - ' .. sideLoss .. ' L',
 						' ',
@@ -321,14 +330,14 @@ function CharacterStatsTable:_buildFooterRow()
 					}
 				}
 			end),
-			Html.Th{
+			TableWidgets.CellHeader{
 				classes = {'sortbottom'},
-				attributes = {colspan = self.props.includeBans and (self.props.includeGlobalBans and 7 or 5) or 1}
+				colspan = self.props.includeBans and (self.props.includeGlobalBans and 7 or 5) or 1
 			}
 		)},
-		self.props.statspage ~= mw.title.getCurrentTitle().prefixedText and Html.Tr{
-			children = Html.Th{
-				attributes = {colspan = 22},
+		self.props.statspage ~= mw.title.getCurrentTitle().prefixedText and TableWidgets.Row{
+			children = TableWidgets.CellHeader{
+				colspan = 22,
 				children = Link{
 					link = self.props.statspage,
 					children = Html.Small{children = 'Click here for complete statistics table'}

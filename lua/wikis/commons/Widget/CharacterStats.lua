@@ -24,9 +24,9 @@ local ConditionUtil = Condition.Util
 
 local Widget = Lua.import('Module:Widget')
 local CharacterStatsTable = Lua.import('Module:Widget/CharacterStats/Table')
-local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local Html = Lua.import('Module:Widget/Html')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class CharacterStatsWidgetProps
@@ -127,22 +127,33 @@ function CharacterStatsWidget:_buildUnchosenCharactersTable(titlePrefix, exclude
 	if Logic.isEmpty(characters) then
 		return
 	end
-	return DataTable{
-		children = {
-			Html.Tr{children = Html.Th{
-				children = {titlePrefix .. ' ' .. self.props.characterType, ' ', Html.I{children = {'(', #characters, ')'}}
-			}}},
-			Html.Tr{children = Html.Td{
-				children = Array.map(characters, function (character)
-					return IconImage{
-						imageLight = character.iconLight,
-						imageDark = character.iconDark,
-						link = character.pageName,
-						size = self.props.characterSize,
+	return TableWidgets.Table{
+		columns = {{}},
+		children = WidgetUtil.collect(
+			TableWidgets.TableHeader{
+				children = TableWidgets.Row{
+					children = TableWidgets.CellHeader{
+						align = 'center',
+						children = {titlePrefix .. ' ' .. self.props.characterType, ' ', Html.I{children = {'(', #characters, ')'}}}
 					}
-				end)
-			}}
-		}
+				}
+			},
+			TableWidgets.TableBody{
+				children = TableWidgets.Row{
+					children = TableWidgets.Cell{
+						css = {['white-space'] = 'normal'}, -- so it will wrap
+						children = Array.map(characters, function (character)
+							return IconImage{
+								imageLight = character.iconLight,
+								imageDark = character.iconDark,
+								link = character.pageName,
+								size = self.props.characterSize,
+							}
+						end)
+					}
+				}
+			}
+		)
 	}
 end
 
