@@ -27,11 +27,10 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 end
 
----@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@return Renderable?
-function CustomMatchSummary.createGame(date, game, gameIndex)
+function CustomMatchSummary.createGame(game, gameIndex)
 	local extradata = game.extradata or {}
 
 	-- TODO: Change to use participant data
@@ -58,7 +57,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 				flipped = false,
 				characters = characterData[1],
 				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team1side or ''),
-				date = date,
+				date = game.date,
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			MatchSummaryWidgets.GameCenter{children = score or ('Game ' .. gameIndex)},
@@ -67,7 +66,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 				flipped = true,
 				characters = characterData[2],
 				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team2side or ''),
-				date = date,
+				date = game.date,
 			},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)

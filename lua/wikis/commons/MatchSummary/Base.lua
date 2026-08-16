@@ -32,7 +32,7 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 ---@class CustomMatchSummaryInterface
 ---@field createBody? fun(match: MatchGroupUtilMatch): Renderable|Renderable[] @deprecated
 ---@field createGames? fun(match: MatchGroupUtilMatch): Renderable|Renderable[] @deprecated (but better than createBody)
----@field createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[] @deprecated
+---@field createGame? fun(game: table, gameIndex: integer): Renderable|Renderable[] @deprecated
 ---@field GameRow? Component<MatchSummaryGameRowProps>
 ---@field createFooter? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 
@@ -97,9 +97,8 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 		end
 	elseif createGames then
 		nodes = createGames(match)
-	else
-		---@diagnostic disable-next-line: param-type-mismatch fixed in another PR
-		nodes = Array.map(match.games, FnUtil.curry(createGame, match.date))
+	elseif createGame then
+		nodes = Array.map(match.games, createGame)
 	end
 
 	return WidgetUtil.collect(

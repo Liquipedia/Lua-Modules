@@ -28,7 +28,7 @@ end
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@return Renderable?
-function CustomMatchSummary.createGame(date, game, gameIndex)
+function CustomMatchSummary.createGame(game, gameIndex)
 	local extradata = game.extradata or {}
 
 	-- TODO: Change to use participant data
