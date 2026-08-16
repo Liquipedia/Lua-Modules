@@ -25,6 +25,8 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local Helpers = {}
+
 ---@class CharacterAppearanceStats
 ---@field pick integer
 ---@field win integer
