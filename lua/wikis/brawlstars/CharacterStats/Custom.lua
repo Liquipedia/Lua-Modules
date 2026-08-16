@@ -13,13 +13,19 @@ local BaseCharacterStats = Lua.import('Module:CharacterStats')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 
----@class BrawlStarsCharacterStats: CharacterStats
----@operator call(table): BrawlStarsCharacterStats
 local CharacterStatsWidget = Lua.import('Module:Widget/CharacterStats')
 
+---@class CharacterStatsGame
+---@field opponents table
+---@field globalBans table
+
+---@class CharacterStatsData
+
+---@class BrawlStarsCharacterStats
 local BrawlStarsCharacterStats = {}
 
 ---@return string[]
+---@diagnostic disable-next-line: duplicate-set-field
 function BaseCharacterStats.getSides()
 	return {}
 end
@@ -28,12 +34,13 @@ end
 ---@return Renderable
 function BrawlStarsCharacterStats.run(frame)
 	local args = Arguments.getArgs(frame)
-	local games = BaseCharacterStats.queryGames(args)
+	local games = BaseCharacterStats.queryGames()
 	local processedData = BaseCharacterStats.processGames(games)
 	return CharacterStatsWidget{
 		characterType = 'Brawler',
 		data = processedData.characterData,
 		includeBans = Array.any(processedData.characterData, function (data)
+			---@cast data CharacterStatsData
 			return data.bans > 0
 		end),
 		includeGlobalBans = true,
@@ -49,7 +56,7 @@ end
 ---@param game CharacterStatsGame
 ---@param opponentIndex integer
 ---@return string[]
-function BaseCharacterStats.getTeamCharacters(game, opponentIndex)
+function BrawlStarsCharacterStats.getTeamCharacters(game, opponentIndex)
 	local players = ((game.opponents or {})[opponentIndex] or {}).players or {}
 	return Array.filter(Array.map(players, Operator.property('brawler')), String.isNotEmpty)
 end
@@ -57,7 +64,7 @@ end
 ---@param game CharacterStatsGame
 ---@param opponentIndex integer
 ---@return string[]
-function BaseCharacterStats.getTeamGlobalBans(game, opponentIndex)
+function BrawlStarsCharacterStats.getTeamGlobalBans(game, opponentIndex)
 	local teamGlobalBans = (game.globalBans or {})['team' .. opponentIndex] or {}
 	return Array.filter(teamGlobalBans, String.isNotEmpty)
 end

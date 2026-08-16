@@ -24,9 +24,30 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
+---@class CharacterStatsGame
+---@field extradata table
+---@field matchOpponents any[]
+---@field winner integer
+
+---@class CharacterStatisticRecord
+---@field pick integer
+---@field win integer
+---@field loss integer
+
+---@class CharacterStatistic
+---@field name string
+---@field side table<string, CharacterStatisticRecord>
+---@field total CharacterStatisticRecord
+---@field bans integer
+---@field globalBans integer
+---@field playedWith table<string, CharacterStatisticRecord>
+---@field playedVs table<string, CharacterStatisticRecord>
+---@field playedBy table<string, CharacterStatisticRecord>
+
 local CharacterStats = {}
 
 ---@protected
+---@param props table
 ---@return ConditionTree
 function CharacterStats.buildConditions(props)
 	local matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(props) or TournamentStructure.currentPageSpec()
@@ -43,6 +64,7 @@ function CharacterStats.buildConditions(props)
 	return conditions
 end
 
+---@param props table
 ---@return CharacterStatsGame[]
 function CharacterStats.queryGames(props)
 	local matchIds = MatchGroupUtil.fetchMatchIds{
@@ -219,7 +241,6 @@ function CharacterStats.processGames(games)
 	}
 end
 
----@private
 ---@param stats table<string, CharacterStatistic>
 ---@param character string
 ---@return CharacterStatistic
