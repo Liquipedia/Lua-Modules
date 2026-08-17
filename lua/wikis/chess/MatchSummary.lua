@@ -46,28 +46,22 @@ local KING_ICONS = {
 	},
 }
 
----@class ChessCustomMatchSummary: CustomMatchSummaryInterface
-local CustomMatchSummary = {}
+
 
 ---@class ChessMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
 local GameRowComponentProps = {}
 
 local ChessMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
+---@class ChessCustomMatchSummary: CustomMatchSummaryInterface
+local CustomMatchSummary = {
+	GameRow = ChessMatchSummaryGameRow,
+}
+
 ---@param args table
 ---@return VNode
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
-end
-
----@param match MatchGroupUtilMatch
----@return Renderable
-function CustomMatchSummary.createGames(match)
-	return MatchSummaryWidgets.GamesContainer{
-		children = Array.map(match.games, function (game, gameIndex)
-			return ChessMatchSummaryGameRow{game = game, gameIndex = gameIndex}
-		end)
-	}
 end
 
 ---@param props MatchSummaryGameRowProps
