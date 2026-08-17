@@ -23,8 +23,10 @@ local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 local Variables = Lua.import('Module:Variables')
 
-local PlayerAutoTeamNavBox = Lua.import('Module:Widget/NavBox/AutoTeam/Player')
+local AmBox = Lua.import('Module:Widget/ArticleMessageBox')
 local Html = Lua.import('Module:Widget/Html')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local PlayerAutoTeamNavBox = Lua.import('Module:Widget/NavBox/AutoTeam/Player')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -42,7 +44,7 @@ local DEFAULT_MAX_PLAYERS_PER_PLACEMENT = Info.config.defaultMaxPlayersPerPlacem
 local EmptyPersonPagePreview = Class.new(Widget)
 EmptyPersonPagePreview.defaultProps = {pageName = mw.title.getCurrentTitle().prefixedText}
 
----@return Widget?
+---@return VNode?
 function EmptyPersonPagePreview:render()
 	if not Namespace.isMain() then
 		return
@@ -60,6 +62,16 @@ function EmptyPersonPagePreview:render()
 
 	return Html.Div{
 		children = WidgetUtil.collect(
+			AmBox{
+				image = 'Liquipedia logo.png',
+				imageSize = '60px',
+				tesxt = {
+					'You are currently viewing an automatically generated preview page. ',
+					'In future, a page may be created for the topic if it meets the ',
+					Link{link = 'Liquipedia:Notability_Guidelines', children = 'notability requirements'},
+					'.',
+				}
+			},
 			infobox,
 			Html.H2{children = {'Overview'}},
 			self:_results(),
@@ -71,7 +83,7 @@ function EmptyPersonPagePreview:render()
 end
 
 ---@private
----@return Widget?
+---@return Renderable?
 function EmptyPersonPagePreview:_infobox()
 	local infoboxArgsFromSquadInfo = self:_backfillInformationFromSquadInfo()
 
@@ -98,7 +110,7 @@ function EmptyPersonPagePreview:_infobox()
 end
 
 ---@private
----@return Widget[]
+---@return Renderable[]
 function EmptyPersonPagePreview:_matches()
 	return {
 		Html.H3{children = 'Most Recent Matches'},
@@ -112,9 +124,9 @@ function EmptyPersonPagePreview:_matches()
 end
 
 ---@private
----@return (Widget|Html)[]
+---@return (Renderable|Html)[]
 function EmptyPersonPagePreview:_results()
-	---@type table<string, string|boolean|Widget>
+	---@type table<string, boolean|Renderable>
 	local tabArgs = {
 		suppressHeader = true,
 		name1 = 'Achievements',
