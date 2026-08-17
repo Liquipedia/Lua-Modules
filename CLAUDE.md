@@ -2,35 +2,39 @@
 
 ## Running repository commands
 
-The toolchain lives in the devcontainer, not on the host: Lua 5.1, busted,
-luacheck, lua-language-server, ruff, and the Playwright browsers the visual
-snapshot tests need. Run repository commands there so results match CI.
+The toolchain can be installed natively or come from the devcontainer, and both
+are supported — see Setup in the README. Use whichever the machine already has
+rather than assuming one; a native setup is common on Linux, while the
+devcontainer saves a fight with Lua 5.1 on macOS.
 
-When the shell is already inside the container, which you can tell from the
-workspace being under `/workspaces/`, run commands directly:
+Check before running rather than guessing: `command -v busted luacheck ruff`,
+and `lua -v`, which needs to report 5.1. Anything newer is unsupported here, so
+its results do not mean much.
+
+With a native toolchain, or from a shell already inside the devcontainer, which
+you can tell from the workspace being under `/workspaces/`, run commands
+directly:
 
 ```
 npm run lua-test
 ```
 
-From the host, go through the devcontainer CLI, starting the container first if
-it is not already up:
+From the host with only the devcontainer set up, go through its CLI, starting
+the container first if it is not already up:
 
 ```
 npx --yes @devcontainers/cli up --workspace-folder .
 npx --yes @devcontainers/cli exec --workspace-folder . npm run lua-test
 ```
 
-If Docker is not running, or the devcontainer is not set up, fall back to the
-host toolchain. Two conditions on that:
+If neither is available, say so instead of skipping a check or calling it
+passed. Installing the Lua tools natively is `luarocks install --lua-version=5.1
+busted`, and the same for `luacheck`; the devcontainer route needs Docker
+running.
 
-- Check the tool is actually installed first, `command -v busted`, rather than
-  discovering it from a confusing error. If it is missing, say so instead of
-  skipping the check or calling it passed. Installing the Lua ones is
-  `luarocks install --lua-version=5.1 busted` and the same for `luacheck`.
-- Say which environment a result came from. A host may have a different Lua
-  version or an older ruff, so a host result is weaker evidence about CI than a
-  container one, and whoever reads the result should know which they got.
+Say which of the two produced a result when it is not obvious. A native setup
+can differ from CI in Lua patch version or ruff version, and whoever reads the
+result should know which they got.
 
 ## Commands
 
