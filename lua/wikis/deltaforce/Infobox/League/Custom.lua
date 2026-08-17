@@ -53,8 +53,9 @@ function CustomLeague.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+
+ ---@param widgets Renderable[]
+ ---@return Renderable[]?
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
@@ -87,7 +88,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param args table
----@return string?
+---@return Renderable[]?
 function CustomLeague:_createPatchCell(args)
 	if String.isEmpty(args.patch) then
 		return nil
