@@ -75,9 +75,9 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 
 	local nodes
 	if GameRow then
-		-- TODO: Move to parse from lpdb step
-		local sets = MatchGroupUtil.groupBySubgroup(match)
+		local sets = match.submatches
 
+		-- With one set for all matches, or one game per set, it's redundant to show set level info.
 		if #sets > 1 and #sets < #match.games then
 			nodes = Array.map(sets, function(set)
 				return MatchSummaryWidgets.GamesContainer{
@@ -255,7 +255,7 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 			type(CustomMatchSummary.createGames) == 'function' or
 			CustomMatchSummary.GameRow
 		),
-		'One of createBody or createGame or createGames must be implemented in Module:MatchSummary'
+		'One of createBody or createGame or createGames or GameRow must be implemented in Module:MatchSummary'
 	)
 
 	options = options or {}
