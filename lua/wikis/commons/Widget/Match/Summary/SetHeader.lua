@@ -62,7 +62,7 @@ local function MatchSetHeader(props)
 	end
 
 	return Div{
-		classes = {'match-info-header'},
+		classes = {'brkts-popup-body-grid-header-center'},
 		children = {
 			Div{
 				children = {
