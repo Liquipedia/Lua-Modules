@@ -49,13 +49,10 @@ local function ArticleMessageBox(props)
 	return Html.Div{
 		classes = WidgetUtil.collect(
 			'ambox-wrapper',
-			'ambox',
-			'wiki-bordercolor-dark',
-			'wiki-backgroundcolor-light',
-			props.classes
+			'ambox'
 		),
 		children = WidgetTable.Table{
-			classes = {'inherit-bg'},
+			tableClasses = WidgetUtil.collect('wiki-backgroundcolor-light', props.classes),
 			children = {
 				WidgetTable.TableBody{children = {WidgetTable.Row{children = WidgetUtil.collect(
 					image,
