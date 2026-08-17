@@ -77,7 +77,7 @@ end
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	return {
-		header = map.header,
+		comment = map.comment or map.header,
 		eco = Eco.sanitise(map.eco),
 	}
 end

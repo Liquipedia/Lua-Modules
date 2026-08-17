@@ -5,8 +5,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local CustomMatchSummary = {}
-
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
@@ -14,7 +12,6 @@ local Eco = Lua.import('Module:ChessOpenings')
 local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local Collapsible = Lua.import('Module:Widget/Match/Summary/Collapsible')
@@ -49,64 +46,40 @@ local KING_ICONS = {
 	},
 }
 
+---@class ChessCustomMatchSummary: CustomMatchSummaryInterface
+local CustomMatchSummary = {}
+
+---@class ChessMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {}
+
+local ChessMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
+
 ---@param args table
 ---@return VNode
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
----@param date string
----@param game MatchGroupUtilGame
----@param gameIndex integer
----@return VNode
-function CustomMatchSummary.createGame(date, game, gameIndex)
-	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-body-game'},
-		children = WidgetUtil.collect(
-			-- Header
-			CustomMatchSummary._getHeader(game),
-
-			-- Player 1
-			MatchSummaryWidgets.GameCenter{
-				css = {flex = 1},
-				children = {
-					CustomMatchSummary._getSideIcon(game.opponents[1]),
-					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-					MatchSummaryWidgets.GameTeamWrapper{flipped = false},
-				},
-			},
-
-			-- Center
-			MatchSummaryWidgets.GameCenter{
-				children = CustomMatchSummary._getCenterContent(game, gameIndex),
-			},
-
-			-- Player 2
-			MatchSummaryWidgets.GameCenter{
-				css = {flex = 1},
-				children = {
-					MatchSummaryWidgets.GameTeamWrapper{flipped = true},
-					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-					CustomMatchSummary._getSideIcon(game.opponents[2]),
-				},
-			},
-
-			-- Comment
-			MatchSummaryWidgets.GameComment{children = game.comment}
-		)
+---@param match MatchGroupUtilMatch
+---@return Renderable
+function CustomMatchSummary.createGames(match)
+	return MatchSummaryWidgets.GamesContainer{
+		children = Array.map(match.games, function (game, gameIndex)
+			return ChessMatchSummaryGameRow{game = game, gameIndex = gameIndex}
+		end)
 	}
 end
 
----@param game MatchGroupUtilGame
----@param gameIndex integer
----@return VNode
-function CustomMatchSummary._getCenterContent(game, gameIndex)
+---@param props MatchSummaryGameRowProps
+---@return Renderable?
+function GameRowComponentProps.createGameOverview(props)
+	local game = props.game
 	return Div{
 		children = {
 			Span{
 				classes = {'brkts-popup-spaced'},
 				children = {
-					'Game ' .. gameIndex,
+					'Game ' .. props.gameIndex,
 					tonumber(game.length) and (' - ' .. game.length .. ' moves') or '',
 				},
 			},
@@ -118,28 +91,16 @@ function CustomMatchSummary._getCenterContent(game, gameIndex)
 	}
 end
 
----@param gameOpponent table
+---@param props MatchSummaryGameRowProps
+---@param opponentIndex integer
 ---@return VNode
-function CustomMatchSummary._getSideIcon(gameOpponent)
-	return Div{
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
+	local game = props.game
+	return  Div{
 		classes = {'brkts-popup-spaced'},
-		children = KING_ICONS[gameOpponent.color],
+		---@diagnostic disable-next-line: undefined-field
+		children = KING_ICONS[game.opponents[opponentIndex].color],
 	}
-end
-
----@param game MatchGroupUtilGame
----@return VNode?
-function CustomMatchSummary._getHeader(game)
-	return String.isNotEmpty(game.header) and {
-		Div{
-			children = game.header,
-			css = {
-				['font-weight'] = 'bold',
-				margin = 'auto'
-			}
-		},
-		MatchSummaryWidgets.Break{}
-	} or nil
 end
 
 ---@param match MatchGroupUtilMatch
