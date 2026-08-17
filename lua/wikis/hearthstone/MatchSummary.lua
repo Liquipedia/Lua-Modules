@@ -85,6 +85,7 @@ function CustomMatchSummary.TeamSubMatchOpponentRow(submatch)
 		opponent.players = players
 	end)
 
+---@diagnostic disable-next-line: missing-fields
 	return MatchSummary.createHeader({opponents = opponents})
 end
 
