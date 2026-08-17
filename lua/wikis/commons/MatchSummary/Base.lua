@@ -122,6 +122,11 @@ end
 function MatchSummary.makeLinksDisplay(links)
 	local linkDisplays = {}
 
+	local makeAndSaveLink = function(link, icon, iconDark, text, class)
+		local display = MatchSummary.makeLinkDisplay(link, icon, iconDark, text, class)
+		table.insert(linkDisplays, display)
+	end
+
 	local processLink = function(linkType, link)
 		local currentLinkData = Links.getMatchIconData(linkType)
 		if not currentLinkData then
@@ -129,8 +134,7 @@ function MatchSummary.makeLinksDisplay(links)
 		elseif type(link) == 'table' then
 			for gameIdx, gameLink in Table.iter.spairs(link) do
 				local newText = currentLinkData.text .. ' on Game ' .. gameIdx
-				local display = MatchSummary.makeLinkDisplay(gameLink, currentLinkData.icon, currentLinkData.iconDark, newText)
-				table.insert(linkDisplays, display)
+				makeAndSaveLink(gameLink, currentLinkData.icon, currentLinkData.iconDark, newText)
 			end
 		else
 			-- Temporary during MW/LH Migrations
@@ -140,8 +144,7 @@ function MatchSummary.makeLinksDisplay(links)
 			elseif linkType == 'headtohead' then
 				class = 'hide-when-lighthouse'
 			end
-			local display = MatchSummary.makeLinkDisplay(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text, class)
-			table.insert(linkDisplays, display)
+			makeAndSaveLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text, class)
 		end
 	end
 
