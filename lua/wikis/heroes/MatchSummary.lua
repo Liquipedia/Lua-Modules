@@ -14,6 +14,8 @@ local Logic = Lua.import('Module:Logic')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 local MAX_NUM_BANS = 3
 local NUM_CHAMPIONS_PICK = 5
 local STATUS_NOT_PLAYED = 'notplayed'
@@ -35,20 +37,25 @@ local HeroesMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(
 ---@param args table
 ---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '480px', maxBans = MAX_NUM_BANS})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '480px'})
 end
 
----@param match MatchGroupUtilMatch
----@return VNode[]
-function CustomMatchSummary.createGames(match)
-	return MatchSummaryWidgets.GamesContainer{
-		children = Array.map(match.games, function (game, gameIndex)
-			if game.status == STATUS_NOT_PLAYED or (Logic.isEmpty(game.length) and Logic.isEmpty(game.winner)) then
-				return
-			end
-			return HeroesMatchSummaryGameRow{game = game, gameIndex = gameIndex}
-		end)
-	}
+function CustomMatchSummary.createBody(match)
+	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
+
+	return WidgetUtil.collect(
+		MatchSummaryWidgets.GamesContainer{
+			children = Array.map(match.games, function (game, gameIndex)
+				if game.status == STATUS_NOT_PLAYED or (Logic.isEmpty(game.length) and Logic.isEmpty(game.winner)) then
+					return
+				end
+				return HeroesMatchSummaryGameRow{game = game, gameIndex = gameIndex}
+			end)
+		},
+		MatchSummaryWidgets.Mvp(match.extradata.mvp),
+		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {emptyMapDisplay = FP}))
+	)
 end
 
 ---@param props MatchSummaryGameRowProps
