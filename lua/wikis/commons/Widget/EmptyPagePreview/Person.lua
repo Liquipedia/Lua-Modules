@@ -224,17 +224,17 @@ function Helpers._backfillInformationFromPlacements(person)
 	end
 
 	Array.forEach(Array.reverse(placements), function(placement)
-		local person = getPerson(placement.opponentplayers)
-		if not person then
+		local personData = getPerson(placement.opponentplayers)
+		if not personData then
 			return
 		end
 
-		local id = Logic.nilIfEmpty(person.displayName)
+		local id = Logic.nilIfEmpty(personData.displayName)
 		table.insert(infoboxArgs.idsArray, id)
 		Table.mergeInto(infoboxArgs, {
 			id = id,
-			country = person.flag,
-			faction = person.faction,
+			country = personData.flag,
+			faction = personData.faction,
 		})
 	end)
 
