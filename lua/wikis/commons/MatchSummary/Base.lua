@@ -82,7 +82,7 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 			nodes = Array.map(sets, function(set)
 				return MatchSummaryWidgets.GamesContainer{
 					gamesSectionName = set.header or ('Set ' .. set.subgroup),
-					gamesSectionResult = 'TODO', -- TODO: Create Widget for it
+					gamesSectionResult = MatchSummaryWidgets.SetHeader{set = set},
 					children = Array.map(set.games, function(game, gameIndex)
 						return GameRow{game = game, gameIndex = gameIndex}
 					end)
