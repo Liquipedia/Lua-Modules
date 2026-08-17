@@ -74,7 +74,7 @@ local EmptyTeamPagePreview = function(props)
 			AmBox{
 				image = 'Liquipedia logo.png',
 				imageSize = '60px',
-				tesxt = {
+				text = {
 					'You are currently viewing an automatically generated preview page. ',
 					'In future, a page may be created for the topic if it meets the ',
 					Link{link = 'Liquipedia:Notability_Guidelines', children = 'notability requirements'},
