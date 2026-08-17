@@ -216,8 +216,12 @@ end
 ---@return VNode
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(
-		(type(CustomMatchSummary.createBody) == 'function' or type(CustomMatchSummary.createGame) == 'function'),
-		'createBody(match) or createGame(date, game, gameIndex) must be implemented in Module:MatchSummary'
+		(
+			type(CustomMatchSummary.createBody) == 'function' or
+			type(CustomMatchSummary.createGame) == 'function' or
+			type(CustomMatchSummary.createGames) == 'function'
+		),
+		'createBody or createGame or createGames must be implemented in Module:MatchSummary'
 	)
 
 	options = options or {}
