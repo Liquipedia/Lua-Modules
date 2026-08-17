@@ -46,7 +46,6 @@ local Helpers = {}
 ---@field sideWins table<string, integer>
 ---@field statspage string
 
----@class CharacterStatsWidget
 local defaultProps = {
 	characterSize = '25x25px',
 	includeGlobalBans = false,
@@ -54,6 +53,7 @@ local defaultProps = {
 	statspage = mw.title.getCurrentTitle().prefixedText
 }
 
+---@param props CharacterStatsWidgetProps
 ---@return Renderable[]?
 local function CharacterStatsWidget(props)
 	local data = props.data
