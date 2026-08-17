@@ -95,3 +95,40 @@ jobs:
           echo "| | Files | Errors |" >> $GITHUB_STEP_SUMMARY
           echo "|-|-------|----------|" >> $GITHUB_STEP_SUMMARY
           echo "| LuaLS check | $(find lua -name '*.lua' | wc -l) | $(cat luals-check | grep 'Warning' | wc -l) |" >> $GITHUB_STEP_SUMMARY
+
+  lua-annotations:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # need the base commit to compare against
+
+      - name: Setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+
+      - name: Add base commit worktree
+        if: github.event_name == 'pull_request'
+        run: |
+          # HEAD is the PR merge commit, so its first parent is the base branch
+          # tip and the delta covers only this PR's own changes. Not
+          # pull_request.base.sha: that is the fork point, so it drifts behind as
+          # the base branch advances and the delta then also reports commits from
+          # everyone else that got merged in.
+          if git rev-parse --verify -q HEAD^2 >/dev/null; then
+            git worktree add ../base "$(git rev-parse HEAD^1)"
+          else
+            echo "::warning::HEAD is not a merge commit; deltas will be omitted"
+          fi
+
+      - name: Report annotation coverage
+        run: |
+          # The base tree is measured with *this* PR's script, so the delta
+          # reflects the code change rather than a change to how we measure.
+          if [ -d ../base ]; then
+            set -- --base ../base/lua/wikis/commons
+          fi
+          python3 scripts/annotation_coverage.py "$@" | tee -a "$GITHUB_STEP_SUMMARY"
