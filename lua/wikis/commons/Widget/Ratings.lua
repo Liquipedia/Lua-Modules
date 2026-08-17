@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local RatingsList = Lua.import('Module:Widget/Ratings/List')
+local ErrorBoundary = Lua.import('Module:Widget/ErrorBoundary')
 
 local defaultProps = {
 	teamLimit = 20,
@@ -26,11 +27,16 @@ local function Ratings(props)
 			class = 'ranking-table__wrapper',
 		},
 		children = {
-			RatingsList {
-				teamLimit = props.teamLimit,
-				storageType = props.storageType,
-				showGraph = props.showGraph,
-				isSmallerVersion = props.isSmallerVersion,
+			ErrorBoundary {
+				children = {
+					RatingsList {
+						teamLimit = props.teamLimit,
+						storageType = props.storageType,
+						showGraph = props.showGraph,
+						isSmallerVersion = props.isSmallerVersion,
+					},
+				},
+				fallback = Html.Div{children = 'Error loading ratings'},
 			},
 		},
 	}
