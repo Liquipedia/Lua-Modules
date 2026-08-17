@@ -352,7 +352,7 @@ function Helpers._buildFooterRow(props)
 					children = Html.Small{children = 'Click here for complete statistics table'}
 				}
 			}
-		}
+		} or nil
 	)
 end
 
