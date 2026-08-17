@@ -12,7 +12,9 @@ local Arguments = Lua.import('Module:Arguments')
 local Context = Lua.import('Module:Widget/ComponentContext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Info = Lua.import('Module:Info', {loadData = true})
-local SquadUtils = Lua.import('Module:Features/Squad/Utils')
+local SquadParser = Lua.import('Module:Features/Squad/Lib/Parse')
+local SquadColumnAnalyser = Lua.import('Module:Features/Squad/Lib/Columns')
+local SquadStore = Lua.import('Module:Features/Squad/Api/Store')
 local Table = Lua.import('Module:Table')
 
 local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
@@ -29,7 +31,7 @@ local SquadController = {}
 ---@return Component
 function SquadController.execute(squadData, adjustLpdb)
 	local squadPlayers = Array.map(squadData.players, function(player)
-		return SquadUtils.readSquadPersonArgs(Table.merge(
+		return SquadParser.readSquadPersonArgs(Table.merge(
 			player,
 			{status = squadData.squadStatus, type = squadData.squadType}
 		))
@@ -39,13 +41,11 @@ function SquadController.execute(squadData, adjustLpdb)
 		Array.forEach(squadPlayers, FnUtil.curry(adjustLpdb, squadData))
 	end
 
-	Array.forEach(squadPlayers, function (squadPlayer)
-		squadPlayer:save()
-	end)
+	Array.forEach(squadPlayers, SquadStore.storeSquadPerson)
 
 	local squadTable = Context.Provider{
 		def = SquadContexts.ColumnVisibility,
-		value = SquadUtils.analyzeColumnVisibility(squadPlayers, squadData.squadStatus),
+		value = SquadColumnAnalyser.analyzeColumnVisibility(squadPlayers, squadData.squadStatus),
 		children = {
 			SquadDisplay{
 				status = squadData.squadStatus,
@@ -79,7 +79,7 @@ function SquadController.run(frame, adjustLpdb)
 	end
 
 	local args = Arguments.getArgs(frame)
-	local squadData = SquadUtils.readWrapperArgs(args)
+	local squadData = SquadParser.readWrapperArgs(args)
 	return SquadController.execute(squadData, adjustLpdb)
 end
 
@@ -91,9 +91,9 @@ end
 function SquadController.runAuto(players, squadStatus, squadType, customTitle, adjustLpdb)
 	-- Temporary until all wikis have enabled the new version of automated squads
 	if not Info.config.squads.standardizedAuto then
-		players = Array.map(players, SquadUtils.convertAutoParameters)
+		players = Array.map(players, SquadParser.convertAutoParameters)
 	end
-	local squadData = SquadUtils.createWrapperData(players, squadType, squadStatus, customTitle)
+	local squadData = SquadParser.createWrapperData(players, squadType, squadStatus, customTitle)
 	return SquadController.execute(squadData, adjustLpdb)
 end
 
