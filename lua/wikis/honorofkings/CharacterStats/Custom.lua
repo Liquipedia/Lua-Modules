@@ -10,13 +10,16 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local BaseCharacterStats = Lua.import('Module:CharacterStats')
+local Class = Lua.import('Module:Class')
 
 local CharacterStatsWidget = Lua.import('Module:Widget/CharacterStats')
 
-local HoKCharacterStats = {}
+---@class HoKCharacterStats: CharacterStats
+---@operator call(table): HoKCharacterStats
+local HoKCharacterStats = Class.new(BaseCharacterStats)
 
 ---@return string[]
-function BaseCharacterStats.getSides()
+function HoKCharacterStats:getSides()
 	return {'blue', 'red'}
 end
 
@@ -24,9 +27,10 @@ end
 ---@return Widget
 function HoKCharacterStats.run(frame)
 	local args = Arguments.getArgs(frame)
+	local stats = HoKCharacterStats(args)
 
-	local games = BaseCharacterStats.queryGames(args)
-	local processedData = BaseCharacterStats.processGames(games)
+	local games = stats:queryGames()
+	local processedData = stats:processGames(games)
 	return CharacterStatsWidget{
 		characterType = 'Hero',
 		data = processedData.characterData,
@@ -34,7 +38,7 @@ function HoKCharacterStats.run(frame)
 			return data.bans > 0
 		end),
 		numGames = #games,
-		sides = BaseCharacterStats.getSides(),
+		sides = stats:getSides(),
 		sideWins = processedData.overall.wins,
 		statspage = args.statspage
 	}

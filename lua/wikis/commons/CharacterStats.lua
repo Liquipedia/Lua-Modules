@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Operator = Lua.import('Module:Operator')
@@ -24,51 +25,56 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
----@class CharacterStatsGame
----@field extradata table
----@field matchOpponents any[]
----@field winner integer
+---@class CharacterStatsGame: MatchGroupUtilGame
+---@field matchOpponents standardOpponent[]
+---@field globalBans table<string, table<string, string>>?
 
----@class CharacterStatisticRecord
----@field pick integer
----@field win integer
----@field loss integer
+---@alias CharacterAppearanceStats {pick: integer, win: integer, loss: integer}
 
 ---@class CharacterStatistic
 ---@field name string
----@field side table<string, CharacterStatisticRecord>
----@field total CharacterStatisticRecord
+---@field side table<string, {win: integer, loss: integer}> key is side
+---@field total CharacterAppearanceStats
 ---@field bans integer
 ---@field globalBans integer
----@field playedWith table<string, CharacterStatisticRecord>
----@field playedVs table<string, CharacterStatisticRecord>
----@field playedBy table<string, CharacterStatisticRecord>
+---@field playedWith table<string, CharacterAppearanceStats> key is character name
+---@field playedVs table<string, CharacterAppearanceStats> key is character name
+---@field playedBy table<string, CharacterAppearanceStats> key is opponent name
 
-local CharacterStats = {}
+---@class CharacterStats
+---@operator call(table): CharacterStats
+---@field protected args table
+---@field protected matchGroupsSpec MatchGroupsSpec
+local CharacterStats = Class.new(
+	---@param self self
+	---@param args table
+	function (self, args)
+		self.args = args
+		self.matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(args) or TournamentStructure.currentPageSpec()
+	end
+)
 
 ---@protected
----@param props table
 ---@return ConditionTree
-function CharacterStats.buildConditions(props)
-	local matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(props) or TournamentStructure.currentPageSpec()
+function CharacterStats:buildConditions()
+	local args = self.args
 	local conditions = ConditionTree(BooleanOperator.all):add{
-		TournamentStructure.getMatch2Filter(matchGroupsSpec),
-		ConditionUtil.anyOf(ColumnName('liquipediatier'), Array.parseCommaSeparatedString(props.tier))
+		TournamentStructure.getMatch2Filter(self.matchGroupsSpec),
+		ConditionUtil.anyOf(ColumnName('liquipediatier'), Array.parseCommaSeparatedString(self.args.tier))
 	}
-	if props.sdate then
-		conditions:add(ConditionNode(ColumnName('date'), Comparator.ge, props.sdate))
+	if args.sdate then
+		conditions:add(ConditionNode(ColumnName('date'), Comparator.ge, args.sdate))
 	end
-	if props.edate then
-		conditions:add(ConditionNode(ColumnName('date'), Comparator.le, props.edate))
+	if args.edate then
+		conditions:add(ConditionNode(ColumnName('date'), Comparator.le, args.edate))
 	end
 	return conditions
 end
 
----@param props table
 ---@return CharacterStatsGame[]
-function CharacterStats.queryGames(props)
+function CharacterStats:queryGames()
 	local matchIds = MatchGroupUtil.fetchMatchIds{
-		conditions = tostring(CharacterStats.buildConditions(props)),
+		conditions = tostring(self:buildConditions()),
 		limit = 5000,
 	}
 	if Logic.isEmpty(matchIds) then
@@ -120,7 +126,7 @@ end
 ---@param game CharacterStatsGame
 ---@param opponentIndex integer
 ---@return string[]
-function CharacterStats.getTeamCharacters(game, opponentIndex)
+function CharacterStats:getTeamCharacters(game, opponentIndex)
 	return Array.filter(Array.mapIndexes(function (characterIndex)
 		return game.extradata['team' .. opponentIndex .. 'champion' .. characterIndex]
 	end), String.isNotEmpty)
@@ -129,7 +135,7 @@ end
 ---@param game CharacterStatsGame
 ---@param opponentIndex integer
 ---@return string[]
-function CharacterStats.getTeamBans(game, opponentIndex)
+function CharacterStats:getTeamBans(game, opponentIndex)
 	return Array.filter(Array.mapIndexes(function (characterIndex)
 		return game.extradata['team' .. opponentIndex .. 'ban' .. characterIndex]
 	end), String.isNotEmpty)
@@ -138,44 +144,44 @@ end
 ---@param game CharacterStatsGame
 ---@param opponentIndex integer
 ---@return string[]
-function CharacterStats.getTeamGlobalBans(game, opponentIndex)
+function CharacterStats:getTeamGlobalBans(game, opponentIndex)
 	return {}
 end
 
 ---@param game CharacterStatsGame
 ---@param opponentIndex integer
 ---@return string?
-function CharacterStats.getTeamSide(game, opponentIndex)
+function CharacterStats:getTeamSide(game, opponentIndex)
 	return String.nilIfEmpty(game.extradata['team' .. opponentIndex .. 'side'])
 end
 
 ---@return string[]
-function CharacterStats.getSides()
+function CharacterStats:getSides()
 	error('CharacterStats:getSides() cannot be called directly and must be overridden.')
 end
 
 ---@param games CharacterStatsGame[]
 ---@return {characterData: CharacterStatistic[], overall: {games: integer, wins: table<string, integer>}}
-function CharacterStats.processGames(games)
+function CharacterStats:processGames(games)
 	---@type table<string, CharacterStatistic>
 	local stats = {}
 
 	local overallData = {
 		games = #games,
-		wins = Table.map(CharacterStats.getSides(), function (key, value)
+		wins = Table.map(self:getSides(), function (key, value)
 			return value, 0
 		end)
 	}
 
 	Array.forEach(games, function (game)
 		local teamsCharacters = {
-			CharacterStats.getTeamCharacters(game, 1),
-			CharacterStats.getTeamCharacters(game, 2)
+			self:getTeamCharacters(game, 1),
+			self:getTeamCharacters(game, 2)
 		}
 		Array.forEach(game.matchOpponents, function (opponent, opponentIndex)
 			local opponentName = Opponent.toName(opponent)
 			local isWinner = game.winner == opponentIndex
-			local side = CharacterStats.getTeamSide(game, opponentIndex)
+			local side = self:getTeamSide(game, opponentIndex)
 			local sideKey = isWinner and 'win' or 'loss'
 
 			if isWinner and Logic.isNotEmpty(side) then
@@ -186,7 +192,7 @@ function CharacterStats.processGames(games)
 			local characters = teamsCharacters[opponentIndex]
 
 			Array.forEach(characters, function (character, characterIndex)
-				local characterStats = CharacterStats._getCharacterStatTable(stats, character)
+				local characterStats = self:_getCharacterStatTable(stats, character)
 				if not characterStats.playedBy[opponentName] then
 					characterStats.playedBy[opponentName] = {pick = 0, win = 0, loss = 0}
 				end
@@ -223,13 +229,13 @@ function CharacterStats.processGames(games)
 				end)
 			end)
 
-			Array.forEach(CharacterStats.getTeamBans(game, opponentIndex), function (ban)
-				local characterStats = CharacterStats._getCharacterStatTable(stats, ban)
+			Array.forEach(self:getTeamBans(game, opponentIndex), function (ban)
+				local characterStats = self:_getCharacterStatTable(stats, ban)
 				characterStats.bans = characterStats.bans + 1
 			end)
 
-			Array.forEach(CharacterStats.getTeamGlobalBans(game, opponentIndex), function (ban)
-				local characterStats = CharacterStats._getCharacterStatTable(stats, ban)
+			Array.forEach(self:getTeamGlobalBans(game, opponentIndex), function (ban)
+				local characterStats = self:_getCharacterStatTable(stats, ban)
 				characterStats.globalBans = characterStats.globalBans + 1
 			end)
 		end)
@@ -245,11 +251,11 @@ end
 ---@param stats table<string, CharacterStatistic>
 ---@param character string
 ---@return CharacterStatistic
-function CharacterStats._getCharacterStatTable(stats, character)
+function CharacterStats:_getCharacterStatTable(stats, character)
 	if not stats[character] then
 		stats[character] = {
 			name = character,
-			side = Table.map(CharacterStats.getSides(), function (key, value)
+			side = Table.map(self:getSides(), function (key, value)
 				return value, {win = 0, loss = 0}
 			end),
 			total = {pick = 0, win = 0, loss = 0},
