@@ -71,14 +71,30 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 
 	local createGames = CustomMatchSummary.createGames
 	local createGame = CustomMatchSummary.createGame
+	local GameRow = CustomMatchSummary.GameRow
 
 	local nodes
-	if CustomMatchSummary.GameRow then
-		nodes = MatchSummaryWidgets.GamesContainer{
-			children = Array.map(match.games, function(game, gameIndex)
-				return CustomMatchSummary.GameRow{game = game, gameIndex = gameIndex}
+	if GameRow then
+		-- TODO: Move to parse from lpdb step
+		local sets = MatchGroupUtil.groupBySubgroup(match)
+
+		if #sets > 1 and #sets < #match.games then
+			nodes = Array.map(sets, function(set)
+				return MatchSummaryWidgets.GamesContainer{
+					gamesSectionName = set.header or ('Set ' .. set.subgroup),
+					gamesSectionResult = 'TODO', -- TODO: Create Widget for it
+					children = Array.map(set.games, function(game, gameIndex)
+						return GameRow{game = game, gameIndex = gameIndex}
+					end)
+				}
 			end)
-		}
+		else
+			nodes = MatchSummaryWidgets.GamesContainer{
+				children = Array.map(match.games, function(game, gameIndex)
+					return GameRow{game = game, gameIndex = gameIndex}
+				end)
+			}
+		end
 	elseif createGames then
 		nodes = createGames(match)
 	else

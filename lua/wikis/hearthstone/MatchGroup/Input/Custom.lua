@@ -30,9 +30,7 @@ local MatchFunctions = {
 }
 
 ---@class HearthstoneMapParser: MapParserInterface
-local MapFunctions = {
-	ADD_SUB_GROUP = true,
-}
+local MapFunctions = {}
 
 ---@class HearthstoneFfaMatchParser: FfaMatchParserInterface
 local FfaMatchFunctions = {
