@@ -30,7 +30,6 @@ local SquadAuto = Lua.import('Module:SquadAuto') -- to be replaced by #5523
 local SquadCustom = Lua.import('Module:Features/Squad/Custom')
 local SquadTypes = Lua.import('Module:Features/Squad/Types')
 
-local AmBox = Lua.import('Module:Widget/ArticleMessageBox')
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -71,16 +70,6 @@ local EmptyTeamPagePreview = function(props)
 
 	return Html.Div{
 		children = WidgetUtil.collect(
-			AmBox{
-				image = 'Liquipedia logo.png',
-				imageSize = '60px',
-				text = {
-					'You are currently viewing an automatically generated preview page. ',
-					'In future, a page may be created for the topic if it meets the ',
-					Link{link = 'Liquipedia:Notability_Guidelines', children = 'notability requirements'},
-					'.',
-				}
-			},
 			Html.H2{children = {'Overview'}},
 			Helpers._infobox(props, team, teams),
 			rosterFromLastPlacement and Helpers._rosterFromLastPlacement(teams, team) or Helpers._rosterFromTransfers(team),

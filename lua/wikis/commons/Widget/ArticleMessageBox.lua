@@ -22,9 +22,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@return VNode?
 local function ArticleMessageBox(props)
 	local text = props.text
-	if Logic.isEmpty(text) then
-		return
-	end
+	assert(Logic.isNotEmpty(text), 'Missing text input for Ambox')
 	---@cast text -nil
 
 	local image

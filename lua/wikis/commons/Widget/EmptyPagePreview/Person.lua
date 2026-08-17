@@ -22,10 +22,8 @@ local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 local Variables = Lua.import('Module:Variables')
 
-local AmBox = Lua.import('Module:Widget/ArticleMessageBox')
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
-local Link = Lua.import('Module:Widget/Basic/Link')
 local PlayerAutoTeamNavBox = Lua.import('Module:Widget/NavBox/AutoTeam/Player')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -59,16 +57,6 @@ local EmptyPersonPagePreview = function(props)
 
 	return Html.Div{
 		children = WidgetUtil.collect(
-			AmBox{
-				image = 'Liquipedia logo.png',
-				imageSize = '60px',
-				text = {
-					'You are currently viewing an automatically generated preview page. ',
-					'In future, a page may be created for the topic if it meets the ',
-					Link{link = 'Liquipedia:Notability_Guidelines', children = 'notability requirements'},
-					'.',
-				}
-			},
 			infobox,
 			Html.H2{children = {'Overview'}},
 			Helpers._results(person),
