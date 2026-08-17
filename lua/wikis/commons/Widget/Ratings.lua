@@ -36,7 +36,9 @@ local function Ratings(props)
 						isSmallerVersion = props.isSmallerVersion,
 					},
 				},
-				fallback = Html.Div{children = 'Error loading ratings'},
+				fallback = function()
+					return Html.Div{children = 'Error loading ratings'}
+				end,
 			},
 		},
 	}
