@@ -168,7 +168,7 @@ function CustomMatchSummary.createFooter(match)
 
 	local matchLinks = {}
 	if match.vod then
-		table.insert(matchLinks, MatchSummary.makeVodDisplay(match.vod, {}))
+		matchLinks = Array.extend(matchLinks, MatchSummary.makeVodDisplay(match.vod, {}))
 	end
 	local rawLinksForMatch = {}
 	Table.iter.forEachPair(match.links, function(linkType, link)

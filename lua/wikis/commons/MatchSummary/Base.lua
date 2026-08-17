@@ -75,15 +75,15 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return Renderable
 function MatchSummary.createDefaultFooter(match)
-	return MatchSummaryWidgets.Footer{children = {
+	return MatchSummaryWidgets.Footer{children = WidgetUtil.collect(
 		MatchSummary.makeVodDisplay(match.vod, match.games),
-		MatchSummary.makeLinksDisplay(match.links),
-	}}
+		MatchSummary.makeLinksDisplay(match.links)
+	)}
 end
 
 ---@param matchVod string?
 ---@param games MatchGroupUtilGame[]
----@return Renderable
+---@return Renderable[]
 function MatchSummary.makeVodDisplay(matchVod, games)
 	local vods = {}
 	if matchVod then
@@ -118,7 +118,7 @@ function MatchSummary.makeLinkDisplay(link, icon, iconDark, text, class)
 end
 
 ---@param links table<string, string|table>
----@return Renderable
+---@return Renderable[]
 function MatchSummary.makeLinksDisplay(links)
 	local linkDisplays = {}
 
