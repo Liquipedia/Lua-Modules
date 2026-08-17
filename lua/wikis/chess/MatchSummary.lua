@@ -55,10 +55,11 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
+---@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@return VNode
-function CustomMatchSummary.createGame(game, gameIndex)
+function CustomMatchSummary.createGame(date, game, gameIndex)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		children = WidgetUtil.collect(
@@ -179,7 +180,6 @@ function CustomMatchSummary.createFooter(match)
 
 	matchLinks = Array.extend(matchLinks, MatchSummary.makeLinksDisplay(rawLinksForMatch))
 
-	-- TODO Early return
 	return WidgetUtil.collect(
 		Logic.isNotEmpty(gameLinks) and MatchSummaryWidgets.Footer{children = {
 			Collapsible{

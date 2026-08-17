@@ -105,13 +105,13 @@ function MatchSummary.makeVodDisplay(matchVod, games)
 	return vods
 end
 
+---@param link string
 ---@param icon string
 ---@param iconDark string?
----@param link string
----@param text string?
+---@param text string
 ---@param class string?
 ---@return string?
-function MatchSummary.makeLinkDisplay(icon, iconDark, link, text, class)
+function MatchSummary.makeLinkDisplay(link, icon, iconDark, text, class)
 	return Image.display(icon, iconDark, {
 		link = link, size = '32px', caption = text, alt = link, class = class
 	})
