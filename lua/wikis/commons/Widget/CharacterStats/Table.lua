@@ -32,6 +32,7 @@ local Helpers = {}
 ---@field win integer
 ---@field loss integer
 
+---@param props CharacterStatsWidgetProps
 ---@return Renderable?
 local function CharacterStatsTable(props)
 	local data = props.data
