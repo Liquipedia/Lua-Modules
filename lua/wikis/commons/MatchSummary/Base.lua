@@ -129,7 +129,8 @@ function MatchSummary.makeLinksDisplay(links)
 		elseif type(link) == 'table' then
 			for gameIdx, gameLink in Table.iter.spairs(link) do
 				local newText = currentLinkData.text .. ' on Game ' .. gameIdx
-				table.insert(linkDisplays, MatchSummary.makeLinkDisplay(gameLink, currentLinkData.icon, currentLinkData.iconDark, newText))
+				local display = MatchSummary.makeLinkDisplay(gameLink, currentLinkData.icon, currentLinkData.iconDark, newText)
+				table.insert(linkDisplays, display)
 			end
 		else
 			-- Temporary during MW/LH Migrations
@@ -139,7 +140,8 @@ function MatchSummary.makeLinksDisplay(links)
 			elseif linkType == 'headtohead' then
 				class = 'hide-when-lighthouse'
 			end
-			table.insert(linkDisplays, MatchSummary.makeLinkDisplay(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text, class))
+			local display = MatchSummary.makeLinkDisplay(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text, class)
+			table.insert(linkDisplays, display)
 		end
 	end
 
