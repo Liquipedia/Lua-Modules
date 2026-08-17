@@ -38,7 +38,7 @@ local Helpers = {}
 ---@class CharacterStatsWidgetProps
 ---@field characterSize string
 ---@field characterType string
----@field data CharacterStatsData[]
+---@field data CharacterStatistic[]
 ---@field includeBans boolean?
 ---@field includeGlobalBans boolean?
 ---@field numGames integer
