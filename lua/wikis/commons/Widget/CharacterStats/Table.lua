@@ -66,7 +66,7 @@ local function CharacterStatsTable(props)
 end
 
 ---@private
----@param props table
+---@param props CharacterStatsWidgetProps
 ---@return Renderable
 function Helpers._buildHeaderRow(props)
 	return {
@@ -127,7 +127,7 @@ function Helpers._buildHeaderRow(props)
 end
 
 ---@private
----@param props table
+---@param props CharacterStatsWidgetProps
 ---@param characterData CharacterStatistic
 ---@param characterIndex integer
 ---@return Renderable
@@ -245,10 +245,9 @@ function Helpers._buildPlayedByTeamTable(data)
 	}
 end
 
----@param props table
+---@param props CharacterStatsWidgetProps
 ---@param playedType string
 ---@param data table<string, CharacterAppearanceStats>
----@diagnostic disable-next-line: inject-field
 function Helpers._buildPlayedTable(props, playedType, data)
 	local sortedCharacterData = Array.sortBy(
 		Table.entries(data), Operator.property(2), characterAppearanceStatsComparator
