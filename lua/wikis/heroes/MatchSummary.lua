@@ -40,6 +40,8 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '480px'})
 end
 
+---@param match MatchGroupUtilMatch
+---@return VNode[]
 function CustomMatchSummary.createBody(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
