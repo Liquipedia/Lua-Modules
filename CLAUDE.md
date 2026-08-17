@@ -21,10 +21,16 @@ npx --yes @devcontainers/cli up --workspace-folder .
 npx --yes @devcontainers/cli exec --workspace-folder . npm run lua-test
 ```
 
-This needs Docker running. If Docker is not available, say so rather than
-falling back to whatever is installed on the host — a host may have a different
-Lua version, or no busted at all, and a result from it does not tell you what CI
-will do.
+If Docker is not running, or the devcontainer is not set up, fall back to the
+host toolchain. Two conditions on that:
+
+- Check the tool is actually installed first, `command -v busted`, rather than
+  discovering it from a confusing error. If it is missing, say so instead of
+  skipping the check or calling it passed. Installing the Lua ones is
+  `luarocks install --lua-version=5.1 busted` and the same for `luacheck`.
+- Say which environment a result came from. A host may have a different Lua
+  version or an older ruff, so a host result is weaker evidence about CI than a
+  container one, and whoever reads the result should know which they got.
 
 ## Commands
 
