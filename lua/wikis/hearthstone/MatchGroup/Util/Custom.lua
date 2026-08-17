@@ -54,7 +54,7 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 
 	-- Compute submatches
 	match.submatches = Array.map(
-		MatchGroupUtil.groupBySubgroup(match),
+		match.submatches,
 		FnUtil.curry(CustomMatchGroupUtil.constructSubmatch, match)
 	)
 
@@ -82,6 +82,7 @@ end
 function CustomMatchGroupUtil.constructSubmatch(match, subgroup)
 	local games = subgroup.games
 	local firstGame = games[1]
+	---@type HearthstoneMatchGroupUtilSubmatch
 	local opponents = Table.deepCopy(firstGame.opponents)
 	local isSubmatch = string.find(firstGame.map or '', '^[sS]ubmatch %d+$')
 	if isSubmatch then

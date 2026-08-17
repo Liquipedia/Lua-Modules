@@ -46,8 +46,6 @@ local KING_ICONS = {
 	},
 }
 
-
-
 ---@class ChessMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
 local GameRowComponentProps = {}
 
