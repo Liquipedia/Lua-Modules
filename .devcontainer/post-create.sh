@@ -13,7 +13,10 @@ pip install --no-cache-dir -r requirements.txt
 
 if [ ! -f .env ]; then
 	echo "==> Creating .env from .env.example (fill in your bot credentials before deploying)"
-	cp .env.example .env
+	# Nobody chose these settings, we generated them, so start in dry-run and
+	# leave turning off DRY_RUN as a deliberate act
+	sed 's/^DRY_RUN=.*/DRY_RUN=1/' .env.example > .env
+	echo "    DRY_RUN=1 is set, deploys are simulated until you change it"
 fi
 
 echo "==> Done. Try: npm run lua-test"
