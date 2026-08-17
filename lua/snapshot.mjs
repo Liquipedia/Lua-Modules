@@ -35,8 +35,6 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 	// does not arrive the page still renders, just unstyled, and we would
 	// happily screenshot that and treat it as the truth. Collect anything that
 	// failed so we can bail out instead.
-	// Keyed by url, because a bad response is usually followed by an aborted
-	// request for the same thing and reporting it twice is just noise
 	const missingResources = new Map();
 	const isRequired = (resourceType) => ['stylesheet', 'script', 'font'].includes(resourceType);
 	const recordMissing = (url, reason) => {
