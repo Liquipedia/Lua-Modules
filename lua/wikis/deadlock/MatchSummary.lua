@@ -35,7 +35,8 @@ local DeadlockMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(
 ---@param args table
 ---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '480px', teamStyle = 'bracket', maxBans = MAX_NUM_BANS})
+	local options = {width = '480px', teamStyle = 'bracket', maxBans = MAX_NUM_BANS}
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 end
 
 ---@param match MatchGroupUtilMatch

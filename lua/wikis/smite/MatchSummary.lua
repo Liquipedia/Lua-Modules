@@ -21,7 +21,8 @@ local NUM_GODS_PICK = 5
 ---@param args table
 ---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', teamStyle = 'bracket', maxBans = MAX_NUM_BANS})
+	local options = {width = '400px', teamStyle = 'bracket', maxBans = MAX_NUM_BANS}
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 end
 
 ---@param date string
