@@ -27,8 +27,9 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local DisplayHelper = {}
 local NONBREAKING_SPACE = '&nbsp;'
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local ReferenceTag = Lua.import('Module:Widget/ReferenceTag')
 
 ---@param node Html
 ---@param opponent standardOpponent
@@ -40,6 +41,22 @@ function DisplayHelper.addOpponentHighlight(node, opponent)
 	return node
 		:addClass('brkts-opponent-hover')
 		:attr('aria-label', Opponent.toName(opponent))
+end
+
+---@param props HtmlNodeProps
+---@param opponent standardOpponent
+---@return HtmlNodeProps
+function DisplayHelper.addOpponentHighlightToProps(props, opponent)
+	if Opponent.isTbd(opponent) then
+		return props
+	end
+	props.classes = props.classes or {}
+	table.insert(props.classes, 'brkts-opponent-hover')
+
+	props.attributes = props.attributes or {}
+	props.attributes['aria-label'] = Opponent.toName(opponent)
+
+	return props
 end
 
 -- Expands a header code by making a RPC call.
@@ -152,11 +169,14 @@ function DisplayHelper._createSubstituteReferences(references)
 	end
 	---@cast references -nil
 	local frame = mw.getCurrentFrame()
-	return table.concat(Array.map(references, function (reference)
-		return frame:extensionTag('ref', Template.safeExpand(
-			frame, 'Cite web', reference
-		))
-	end))
+	return tostring(Html.Fragment{children = Array.map(references, function (reference)
+		local refName = Table.extract(reference, 'name')
+		return ReferenceTag{
+			frame = frame,
+			children = Template.safeExpand(frame, 'Cite web', reference),
+			name = String.nilIfEmpty(refName)
+		}
+	end)})
 end
 
 ---Creates display components for caster(s).
@@ -173,7 +193,7 @@ function DisplayHelper.createCastersDisplay(casters)
 			return casterLink
 		end
 
-		return HtmlWidgets.Fragment{children = {
+		return Html.Fragment{children = {
 			Flags.Icon{flag = caster.flag},
 			NONBREAKING_SPACE,
 			casterLink,
@@ -267,7 +287,7 @@ in a different props.MatchSummaryContainer in the Bracket and Matchlist
 components.
 ]]
 ---@param props table
----@return Widget
+---@return Renderable
 function DisplayHelper.DefaultMatchSummaryContainer(props)
 	local MatchSummaryModule = Lua.import('Module:MatchSummary')
 
@@ -277,7 +297,7 @@ function DisplayHelper.DefaultMatchSummaryContainer(props)
 end
 
 ---@param props table
----@return Widget
+---@return Renderable
 function DisplayHelper.DefaultFfaMatchSummaryContainer(props)
 	local MatchSummaryModule = Lua.import('Module:MatchSummary/Ffa')
 
@@ -287,7 +307,7 @@ function DisplayHelper.DefaultFfaMatchSummaryContainer(props)
 end
 
 ---@param props table
----@return Html
+---@return Renderable
 function DisplayHelper.DefaultGameSummaryContainer(props)
 	local GameSummaryModule = Lua.import('Module:GameSummary')
 
@@ -300,7 +320,7 @@ function DisplayHelper.DefaultGameSummaryContainer(props)
 end
 
 ---@param props table
----@return Html
+---@return Renderable
 function DisplayHelper.DefaultMatchPageContainer(props)
 	local MatchPageModule = Lua.import('Module:MatchPage')
 

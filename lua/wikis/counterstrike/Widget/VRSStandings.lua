@@ -16,7 +16,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Icon = Lua.import('Module:Icon')
@@ -94,18 +94,18 @@ local function buildTitle(settings)
 	elseif settings.filterType == 'country' then
 		titleName = settings.filterDisplayName or 'Country'
 	end
-	return HtmlWidgets.Div{
+	return Html.Div{
 		children = {
-			HtmlWidgets.Div{
+			Html.Div{
 				children = {
-					HtmlWidgets.B{children = 'Unofficial ' .. titleName .. ' VRS'},
-					HtmlWidgets.Span{children = 'Last updated: ' .. settings.updated}
+					Html.B{children = 'Unofficial ' .. titleName .. ' VRS'},
+					Html.Span{children = 'Last updated: ' .. settings.updated}
 				},
 				classes = {'ranking-table__top-row-text'}
 			},
-			HtmlWidgets.Div{
+			Html.Div{
 				children = {
-					HtmlWidgets.Span{children = 'Data by Liquipedia'},
+					Html.Span{children = 'Data by Liquipedia'},
 				},
 				classes = {'ranking-table__top-row-logo-container'}
 			}
@@ -120,7 +120,7 @@ local function buildFooter()
 		link = FOOTER_LINK,
 		linktype = 'internal',
 		children = {
-			HtmlWidgets.Div{
+			Html.Div{
 				children = {'See Rankings Page', Icon.makeIcon{iconName = 'goto'}},
 				classes = {'ranking-table__footer-button'},
 			}
@@ -149,7 +149,7 @@ function VRSStandings._row(standing, mainpage)
 		not standing.globalPlace and TableWidgets.Cell{children = extradata.region or ''} or nil,
 		not mainpage and TableWidgets.Cell{
 			children = Array.map(standing.opponent.players, function(player)
-				return HtmlWidgets.Div{
+				return Html.Div{
 					css = {display = 'inline-block', width = '160px'},
 					children = PlayerDisplay.BlockPlayer({player = player})
 				}
@@ -165,7 +165,7 @@ function VRSStandings:render()
 	local standings, settings = VRSStandingsData.getStandings(self.props)
 
 	if #standings == 0 then
-		return HtmlWidgets.Div{
+		return Html.Div{
 			children = 'No teams found for the selected filter.',
 			css = {['font-weight'] = 'bold', padding = '0.75rem'}
 		}

@@ -11,7 +11,9 @@ const TABLE2_CONFIG = {
 	},
 	CLASSES: {
 		EVEN: 'table2__row--even',
-		HEAD: 'table2__row--head'
+		HEAD: 'table2__row--head',
+		GROUP_JOINED_ABOVE: 'table2__row--group-joined-above',
+		GROUP_JOINED_BELOW: 'table2__row--group-joined-below'
 	}
 };
 
@@ -61,7 +63,8 @@ class Table2Striper {
 				return;
 			}
 
-			if ( groupRemaining === 0 ) {
+			const isGroupStart = groupRemaining === 0;
+			if ( isGroupStart ) {
 				isEven = !isEven;
 				this.groupCounter++;
 			}
@@ -73,6 +76,11 @@ class Table2Striper {
 			row.dataset.groupId = this.groupCounter;
 
 			groupRemaining--;
+
+			// Flag which group neighbours a row touches, so the shared edge's padding
+			// can be collapsed and the group reads as one block.
+			row.classList.toggle( TABLE2_CONFIG.CLASSES.GROUP_JOINED_ABOVE, !isGroupStart );
+			row.classList.toggle( TABLE2_CONFIG.CLASSES.GROUP_JOINED_BELOW, groupRemaining > 0 );
 		} );
 	}
 

@@ -310,7 +310,7 @@ local PREFIXES = {
 		team = 'https://stratz.com/teams/'
 	},
 	stream = {''},
-	telegram = {'https://t.me/'},
+	telegram = {'https://telegram.me/'},
 	tespa = {match = 'https://web.archive.org/web/compete.tespa.org/tournament/'},
 	tetrio = {
 		'',
@@ -529,6 +529,10 @@ local MATCH_ICONS = {
 		text = 'Match page on Halo Data Hive'
 	},
 	headtohead = {
+		icon = 'Match Info Stats.png',
+		text = 'Head-to-head statistics'
+	},
+	headtohead_lh = {
 		icon = 'Match Info Stats.png',
 		text = 'Head-to-head statistics'
 	},

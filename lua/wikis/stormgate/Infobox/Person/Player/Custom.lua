@@ -102,17 +102,18 @@ function CustomPlayer:_getActiveCasterYears()
 		limit = 5000,
 	})
 
+	---@type Set<integer>
 	local years = Set{}
 	Array.forEach(queryData,
 		---@param item broadcasters
 		---@return number?
-		function(item) years:add(tonumber(item.year_date)) end
+		function(item) years:add(tonumber(item.year_date) --[[@as integer]]) end
 	)
 
 	return YearsActive.displayYears(years:toArray())
 end
 
----@return Html?
+---@return Renderable?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) then
 		return MatchTicker.recent({player = self.pagename})

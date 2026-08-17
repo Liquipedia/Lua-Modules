@@ -141,3 +141,23 @@ Author(s): hjpalpha
 		background: var( --clr-forest-20, #d1ffcc ) !important;
 	}
 }
+
+/*******************************************************************************
+Template(s): Race icons on the Warcraft wiki
+Author(s): FO-nTTaX
+*******************************************************************************/
+.wiki-warcraft .race-icon-small img {
+	width: 19px;
+	height: 19px;
+}
+
+/*******************************************************************************
+Template(s): Player Faction Icons
+Author(s): salle
+*******************************************************************************/
+.faction img {
+	width: 18px;
+	height: 18px;
+	vertical-align: middle;
+	image-rendering: -webkit-optimize-contrast;
+}

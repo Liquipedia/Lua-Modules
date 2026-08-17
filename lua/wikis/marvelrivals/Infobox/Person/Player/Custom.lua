@@ -24,6 +24,7 @@ local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournam
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local SIZE_HERO = '25x25px'
 local MAX_NUMBER_OF_SIGNATURE_HEROES = 3
@@ -89,7 +90,7 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return Widget?
+---@return Renderable?
 function CustomPlayer:createBottomContent()
 	if String.isEmpty(self.args.team) or not self:shouldStoreData(self.args) then
 		return
@@ -98,10 +99,10 @@ function CustomPlayer:createBottomContent()
 	local teamPage = TeamTemplate.getPageName(self.args.team)
 	---@cast teamPage -nil
 
-	return Html.Fragment{children = {
+	return Html.Fragment{children = WidgetUtil.collect(
 		MatchTicker.player{recentLimit = 3},
 		UpcomingTournaments.team{name = teamPage}
-	}}
+	)}
 end
 
 return CustomPlayer

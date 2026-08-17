@@ -9,10 +9,13 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local FeatureFlag = Lua.import('Module:FeatureFlag')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
+local TypeUtil = Lua.import('Module:TypeUtil')
 local Variables = Lua.import('Module:Variables')
 
 local Lpdb = {}
@@ -103,9 +106,9 @@ end
 
 --- LPDB Object-Relational Mapping
 
----@alias ModelColumnData {name: string, fieldType: string|any, default: any}
+---@alias ModelColumnData {name: string, fieldType: TypeUtilType, default: any}
 
----@class Model
+---@class Model: BaseClass
 ---@field tableName string
 ---@field tableColumns ModelColumnData[]
 local Model = Class.new(function(self, name, columns)
@@ -113,7 +116,7 @@ local Model = Class.new(function(self, name, columns)
 	self.tableColumns = columns
 end)
 
----@class ModelRow
+---@class ModelRow: BaseClass
 ---@field private tableName string
 ---@field private tableColumns ModelColumnData[]
 ---@field private fields table<string, any>
@@ -140,7 +143,14 @@ function ModelRow:_validateField(columnData)
 	if not self.fields[columnData.name] then
 		error(self.tableName .. ' expects ' .. columnData.name .. ' to be set')
 	end
-	-- TODO: Verify types (at least when running tests)
+
+	local typeCheckFeature = FeatureFlag.get('force_type_check')
+	if not typeCheckFeature then
+		return
+	end
+	TypeUtil.assertValue(
+		self.fields[columnData.name], columnData.fieldType, {name = self.tableName .. '.' .. columnData.name}
+	)
 end
 
 ---@private
@@ -230,10 +240,10 @@ Lpdb.Match2 = Model('match2', {
 	{name = 'section', fieldType = 'string', default = ''},
 	{name = 'game', fieldType = 'string', default = ''},
 	{name = 'patch', fieldType = 'string', default = ''},
-	{name = 'date', fieldType = 'string', default = 0},
+	{name = 'date', fieldType = TypeUtil.union('string', 'integer'), default = 0},
 	{name = 'dateexact', fieldType = 'number', default = 0},
-	{name = 'stream', fieldType = 'struct', default = {}},
-	{name = 'links', fieldType = 'struct', default = {}},
+	{name = 'stream', fieldType = 'table', default = {}},
+	{name = 'links', fieldType = 'table', default = {}},
 	{name = 'bestof', fieldType = 'number', default = 0},
 	{name = 'vod', fieldType = 'string', default = ''},
 	{name = 'tournament', fieldType = 'string', default = ''},
@@ -243,11 +253,11 @@ Lpdb.Match2 = Model('match2', {
 	{name = 'series', fieldType = 'string', default = ''},
 	{name = 'icon', fieldType = 'string', default = ''},
 	{name = 'icondark', fieldType = 'string', default = ''},
-	{name = 'liquipediatier', fieldType = 'string|number', default = ''},
+	{name = 'liquipediatier', fieldType = TypeUtil.union('string', 'number'), default = ''},
 	{name = 'liquipediatiertype', fieldType = 'string', default = ''},
 	{name = 'publishertier', fieldType = 'string', default = ''},
-	{name = 'extradata', fieldType = 'struct', default = {}},
-	{name = 'match2bracketdata', fieldType = 'struct', default = {}},
+	{name = 'extradata', fieldType = 'table', default = {}},
+	{name = 'match2bracketdata', fieldType = 'table', default = {}},
 	{name = 'match2opponents', fieldType = 'array', default = {}},
 	{name = 'match2games', fieldType = 'array', default = {}},
 })
@@ -260,7 +270,7 @@ Lpdb.Placement = Model('placement', {
 	{name = 'parent', fieldType = 'pagename', default = ''},
 	{name = 'shortname', fieldType = 'string', default = ''},
 	{name = 'startdate', fieldType = 'string', default = 0},
-	{name = 'date', fieldType = 'string', default = 0},
+	{name = 'date', fieldType = TypeUtil.union('string', 'integer'), default = 0},
 	{name = 'placement', fieldType = 'string', default = ''},
 	{name = 'prizemoney', fieldType = 'number', default = 0},
 	{name = 'individualprizemoney', fieldType = 'number', default = 0},
@@ -268,21 +278,21 @@ Lpdb.Placement = Model('placement', {
 	{name = 'weight', fieldType = 'number', default = 0},
 	{name = 'mode', fieldType = 'string', default = ''},
 	{name = 'type', fieldType = 'string', default = ''},
-	{name = 'liquipediatier', fieldType = 'string|number', default = ''},
+	{name = 'liquipediatier', fieldType = TypeUtil.union('string', 'number'), default = ''},
 	{name = 'liquipediatiertype', fieldType = 'string', default = ''},
 	{name = 'publishertier', fieldType = 'string', default = ''},
 	{name = 'icon', fieldType = 'string', default = ''},
 	{name = 'icondark', fieldType = 'string', default = ''},
 	{name = 'game', fieldType = 'string', default = ''},
-	{name = 'lastvsdata', fieldType = 'struct', default = {}},
+	{name = 'lastvsdata', fieldType = 'table', default = {}},
 	{name = 'opponentname', fieldType = 'string', default = ''},
 	{name = 'opponenttemplate', fieldType = 'string', default = ''},
-	{name = 'opponenttype', fieldType = 'string', default = ''},
-	{name = 'opponentplayers', fieldType = 'struct', default = {}},
+	{name = 'opponenttype', fieldType = Opponent.types.OpponentType, default = ''},
+	{name = 'opponentplayers', fieldType = 'table', default = {}},
 	{name = 'qualifier', fieldType = 'string', default = ''},
-	{name = 'qualifierpage', fieldType = 'string', default = ''},
+	{name = 'qualifierpage', fieldType = 'pagename?', default = ''},
 	{name = 'qualifierurl', fieldType = 'string', default = ''},
-	{name = 'extradata', fieldType = 'struct', default = {}},
+	{name = 'extradata', fieldType = 'table', default = {}},
 })
 
 ---@class SquadPlayerModel:Model
@@ -308,7 +318,7 @@ Lpdb.SquadPlayer = Model('squadplayer', {
 	{name = 'joindate', fieldType = 'string', default = ''},
 	{name = 'leavedate', fieldType = 'string', default = ''},
 	{name = 'inactivedate', fieldType = 'string', default = ''},
-	{name = 'extradata', fieldType = 'struct', default = {}},
+	{name = 'extradata', fieldType = 'table', default = {}},
 })
 
 ---@class DataPoint:Model
@@ -320,7 +330,7 @@ Lpdb.DataPoint = Model('datapoint', {
 	{name = 'image', fieldType = 'string', default = ''},
 	{name = 'imagedark', fieldType = 'string', default = ''},
 	{name = 'date', fieldType = 'string', default = 0},
-	{name = 'extradata', fieldType = 'struct', default = {}},
+	{name = 'extradata', fieldType = 'table', default = {}},
 })
 
 return Lpdb

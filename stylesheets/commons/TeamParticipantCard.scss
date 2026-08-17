@@ -73,6 +73,17 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 	}
 }
 
+// `auto-fill` collapses to one column inside a shrink-to-fit wikitable cell (indefinite width).
+// Flex-wrap with no shrink lets the cell size to the cards, so they sit side by side when they fit.
+table .team-participant__grid {
+	display: flex;
+	flex-wrap: wrap;
+
+	> * {
+		flex: 1 0 $participant-card-min-width;
+	}
+}
+
 .team-participant-card {
 	display: flex;
 	flex-direction: column;

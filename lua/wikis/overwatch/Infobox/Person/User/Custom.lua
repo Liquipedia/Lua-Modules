@@ -24,8 +24,12 @@ local Center = Widgets.Center
 local SIZE_HERO = '25x25px'
 
 ---@class OverwatchInfoboxUser: InfoboxUser
+---@operator call(Frame): OverwatchInfoboxUser
 local CustomUser = Class.new(User)
 
+---@class OverwatchInfoboxUserWidgetInjector: WidgetInjector
+---@operator call(OverwatchInfoboxUser): OverwatchInfoboxUserWidgetInjector
+---@field caller OverwatchInfoboxUser
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -77,7 +81,7 @@ function CustomUser:addCustomCells(widgets)
 
 	if not String.isEmpty(args['fav-team-1']) then
 		table.insert(widgets, Title{children = 'Favorite teams'})
-		table.insert(widgets, Center{children = {self:_getFavouriteTeams()}})
+		table.insert(widgets, Center{children = self:_getFavouriteTeams()})
 	end
 
 	if not String.isEmpty(args.s1high) then

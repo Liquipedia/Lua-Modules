@@ -14,8 +14,7 @@ local Html = Lua.import('Module:Widget/Html')
 local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
----@class Table2CellProps
----@field children? Renderable|Renderable[]
+---@class Table2CellProps: HtmlNodeProps
 ---@field align ('left'|'right'|'center')?
 ---@field shrink (string|number|boolean)?
 ---@field nowrap (string|number|boolean)?
@@ -25,9 +24,6 @@ local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 ---@field colspan integer|string?
 ---@field rowspan integer|string?
 ---@field columnIndex integer|string?
----@field classes string[]?
----@field css {[string]: string|number|nil}?
----@field attributes {[string]: any}?
 
 ---@param props Table2CellProps
 ---@return Renderable
@@ -43,7 +39,7 @@ local function Table2Cell(props, context)
 				props.align,
 				props.nowrap,
 				props.shrink,
-				props.attributes
+				ColumnUtil.buildAttributes(props)
 			),
 			classes = props.classes,
 			children = children,

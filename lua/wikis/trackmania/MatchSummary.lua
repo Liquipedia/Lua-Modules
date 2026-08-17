@@ -7,7 +7,7 @@
 
 local Lua = require('Module:Lua')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -52,7 +52,7 @@ end
 ---@param hoverText string|number|nil
 ---@return Html
 function CustomMatchSummary._iconDisplay(icon, hoverText)
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'brkts-popup-spaced'},
 		attributes = {title = hoverText},
 		children = {icon},

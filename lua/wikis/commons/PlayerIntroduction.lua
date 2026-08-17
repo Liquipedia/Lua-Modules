@@ -16,6 +16,7 @@ local Flags = Lua.import('Module:Flags')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Roles = Lua.import('Module:Roles')
 
@@ -607,7 +608,7 @@ end
 function PlayerIntroduction._displayTeam(team, date)
 	team = team:gsub('_', ' ')
 
-	local rawTeam = mw.ext.TeamTemplate.raw(team, date)
+	local rawTeam = TeamTemplate.getRawOrNil(team, date)
 	if rawTeam then
 		return ' [[' .. rawTeam.page .. '|' .. rawTeam.name .. ']]'
 	end

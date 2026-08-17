@@ -76,6 +76,18 @@ local KEYSTONES = Table.map({
 	return value, true
 end)
 
+local ROLES = Array.map(
+	Array.sortBy(Array.unique(Array.extractValues(InGameRoles)), Operator.property('sortOrder')),
+	Operator.property('display')
+)
+
+local SIDE_COLORS = {
+	-- clr-cinnabar-40
+	red = '#b81414',
+	-- clr-sapphire-40
+	blue = '#0d71bf',
+}
+
 local DEFAULT_ITEM = 'EmptyIcon'
 local LOADOUT_ICON_SIZE = '64px'
 local ITEMS_TO_SHOW = 6
@@ -580,7 +592,7 @@ end
 ---@param game LoLMatchPageGame
 ---@return VNode[]
 function MatchPage:_renderPlayersPerformance(game)
-	return {
+	return WidgetUtil.collect(
 		Html.H3{children = 'Player Performance'},
 		Div{
 			classes = {'match-bm-players-wrapper'},
@@ -588,8 +600,9 @@ function MatchPage:_renderPlayersPerformance(game)
 				self:_renderTeamPerformance(game, 1),
 				self:_renderTeamPerformance(game, 2)
 			}
-		}
-	}
+		},
+		self:_renderDamageDealt(game)
+	)
 end
 
 ---@private
@@ -742,6 +755,54 @@ function MatchPage._buildPlayerLoadout(player)
 			Div{
 				classes = {'match-bm-players-player-loadout-items'},
 				children = Array.map(player.items, MatchPage._generateItemImage)
+			}
+		}
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@return VNode[]?
+function MatchPage:_renderDamageDealt(game)
+	if not game.finished or Array.any(game.teams, function (team)
+		return Logic.isDeepEmpty(team.players)
+	end) then
+		return
+	end
+	return {
+		Html.H4{children = 'Damage Dealt'},
+		Html.Div{
+			classes = {'table-responsive'},
+			css = {
+				width = '100%'
+			},
+			children = mw.ext.Charts.chart{
+				size = {
+					width = 640,
+					height = 480
+				},
+				tooltip = {
+					trigger = 'axis'
+				},
+				xAxis = {
+					data = ROLES,
+					type = 'category',
+				},
+				yAxis = {
+					name = 'Damage dealt',
+					type = 'value',
+				},
+				series = Array.map(game.teams, function (team)
+					return {
+						type = 'bar',
+						data = Array.map(team.players, function (player)
+							return player.damagedone
+						end),
+						itemStyle = {
+							color = SIDE_COLORS[team.side]
+						}
+					}
+				end),
 			}
 		}
 	}

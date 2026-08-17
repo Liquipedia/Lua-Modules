@@ -256,10 +256,10 @@ function MatchPage:_renderGameOverview(game)
 					},
 					Div{
 						classes = {'match-bm-lol-game-summary-team'},
-						children = {
+						children = WidgetUtil.collect(
 							self.opponents[2].iconDisplay,
-							makeTeamHalvesDisplay(team2),
-						}
+							makeTeamHalvesDisplay(team2)
+						)
 					},
 				}
 			}

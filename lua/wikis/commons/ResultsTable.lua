@@ -15,7 +15,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local Placement = Lua.import('Module:Placement')
 local Table = Lua.import('Module:Table')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -68,7 +68,7 @@ function ResultsTable:buildHeader()
 		TableWidgets.CellHeader{children = 'Tier'},
 		self.config.showType and TableWidgets.CellHeader{children = 'Type'} or nil,
 		self.config.displayGameIcons and TableWidgets.CellHeader{
-			children = HtmlWidgets.Abbr{children = 'G.', title = 'Game'}
+			children = Html.Abbr{children = 'G.', title = 'Game'}
 		} or nil,
 		TableWidgets.CellHeader{
 			colspan = 2,

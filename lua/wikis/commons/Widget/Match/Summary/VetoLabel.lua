@@ -12,7 +12,9 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Label = Lua.import('Module:Widget/Basic/Label')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@enum VetoTypes
+---@alias VetoTypes 'ban'|'pick'|'decider'|'defaultban'|'protect'
+
+---@type table<VetoTypes, string>
 local VetoTypes = {
 	ban = 'BAN',
 	pick = 'PICK',

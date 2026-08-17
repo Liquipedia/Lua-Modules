@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -22,20 +21,22 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@class CounterstrikeCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class CounterstrikeMatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): CounterstrikeMatchSummaryGameRow
-local CounterstrikeMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+---@class CounterstrikeMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
+	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay,
+}
+
+local CounterstrikeMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
 ---@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
+---@return Renderable
+function CustomMatchSummary.createFooter(match)
 	local vods = {}
 	local secondVods = {}
 	if Logic.isNotEmpty(match.links.vod2) then
@@ -51,11 +52,11 @@ function CustomMatchSummary.addToFooter(match, footer)
 		end
 	end
 
-	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) or not Logic.isEmpty(match.vod) then
+	if Table.isNotEmpty(vods) or Table.isNotEmpty(match.links) or Logic.isNotEmpty(match.vod) then
 		return CustomMatchSummary._createFooter(match, vods, secondVods)
 	end
 
-	return footer
+	return MatchSummary.createDefaultFooter(match)
 end
 
 ---@param match MatchGroupUtilMatch
@@ -85,10 +86,9 @@ end
 ---@param match MatchGroupUtilMatch
 ---@param vods table<integer, string>
 ---@param secondVods table<integer, table>
----@return MatchSummaryFooter
+---@return Renderable
 function CustomMatchSummary._createFooter(match, vods, secondVods)
-	local footer = MatchSummary.Footer()
-
+	local elements = {}
 	local separator = '<b>·</b>'
 
 	local function addFooterLink(icon, iconDark, url, label, index)
@@ -99,7 +99,7 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 			label = label .. ' for Game ' .. index
 		end
 
-		footer:addLink(url, icon, iconDark, label)
+		table.insert(elements, MatchSummary.makeLinkDisplay(url, icon, iconDark, label))
 	end
 
 	local function addVodLink(gamenum, vod, part)
@@ -113,7 +113,7 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 					htext = 'Watch VOD (part ' .. part .. ')'
 				end
 			end
-			footer:addElement(VodLink.display{
+			table.insert(elements, VodLink.display{
 				gamenum = gamenum,
 				vod = vod,
 				htext = htext
@@ -125,8 +125,8 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 	if Table.isNotEmpty(secondVods[0]) then
 		addVodLink(nil, match.vod, 1)
 		Array.forEach(secondVods[0], function(vodlink, vodindex)
-				addVodLink(nil, vodlink, vodindex + 1)
-			end)
+			addVodLink(nil, vodlink, vodindex + 1)
+		end)
 	else
 		addVodLink(nil, match.vod, nil)
 	end
@@ -143,12 +143,12 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 		end
 	end
 
-	if Table.isNotEmpty(match.links) then
-		if Logic.isNotEmpty(vods) or match.vod then
-			footer:addElement(separator)
-		end
-	else
-		return footer
+	if Table.isEmpty(match.links) then
+		return MatchSummaryWidgets.Footer{children = elements}
+	end
+
+	if Table.isNotEmpty(elements) then
+		table.insert(elements, separator)
 	end
 
 	--- Platforms is used to keep the order of the links in footer
@@ -158,52 +158,50 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 	local insertDotNext = false
 	local iconsInserted = 0
 
-	for _, platform in ipairs(platforms) do
-		if Logic.isNotEmpty(platform) then
-			local link = links[platform.name]
-			if link then
-				if insertDotNext then
-					insertDotNext = false
-					iconsInserted = 0
-					footer:addElement(separator)
-				end
+	Array.forEach(platforms, function(platform)
+		if Logic.isEmpty(platform) then
+			insertDotNext = iconsInserted > 0 and true or false
+			return
+		end
+		local link = links[platform.name]
+		if not link then
+			return
+		end
 
-				local icon = platform.icon
-				local iconDark = platform.iconDark
-				local label = platform.label
-				local addGameLabel = platform.isMapStats and match.bestof and match.bestof > 1
+		if insertDotNext then
+			insertDotNext = false
+			iconsInserted = 0
+			table.insert(elements, separator)
+		end
 
-				for _, val in ipairs(link) do
-					addFooterLink(icon, iconDark, val[1], label, addGameLabel and val[2] or 0)
-					iconsInserted = iconsInserted + 1
-				end
+		local icon = platform.icon
+		local iconDark = platform.iconDark
+		local label = platform.label
+		local addGameLabel = platform.isMapStats and match.bestof and match.bestof > 1
 
-				if platform.stats then
-					for _, site in ipairs(platform.stats) do
-						if links[site] then
-							footer:addElement(separator)
-							break
-						end
-					end
+		Array.forEach(link, function(val)
+			addFooterLink(icon, iconDark, val[1], label, addGameLabel and val[2] or 0)
+			iconsInserted = iconsInserted + 1
+		end)
+
+		if platform.stats then
+			for _, site in ipairs(platform.stats) do
+				if links[site] then
+					table.insert(elements, separator)
+					break
 				end
 			end
-		else
-			insertDotNext = iconsInserted > 0 and true or false
 		end
-	end
+	end)
 
-	return footer
+	return MatchSummaryWidgets.Footer{children = elements}
 end
 
----@return string
-function CounterstrikeMatchSummaryGameRow:createGameOverview()
-	return self:mapDisplay()
-end
-
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Widget
-function CounterstrikeMatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	local game = self.props.game
+---@return VNode
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
+	local game = props.game
 
 	local sides = game.extradata['t' .. opponentIndex .. 'sides']
 	local halfs = game.extradata['t' .. opponentIndex .. 'halfs']
@@ -212,7 +210,7 @@ function CounterstrikeMatchSummaryGameRow:createGameOpponentView(opponentIndex)
 	end)
 
 	return MatchSummaryWidgets.DetailedScore{
-		score = self:scoreDisplay(opponentIndex),
+		score = MatchSummaryWidgets.GameRow.scoreDisplay(game, opponentIndex),
 		partialScores = scores,
 	}
 end
