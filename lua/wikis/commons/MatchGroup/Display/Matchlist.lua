@@ -30,20 +30,20 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local MatchlistDisplay = {propTypes = {}, types = {}}
 
 ---@class MatchlistConfigOptions
----@field MatchSummaryContainer function?
+---@field MatchSummaryContainer? fun(props: table): Renderable
 ---@field Opponent Component<MatchListOpponentProps>?
 ---@field Score Component<MatchListScoreProps>?
 ---@field attached boolean?
 ---@field collapsed boolean?
----@field matchHasDetails function?
+---@field matchHasDetails? fun(match: MatchGroupUtilMatch): boolean
 ---@field width number?
 
 ---@class MatchlistDisplayMatchProps
----@field MatchSummaryContainer function
+---@field MatchSummaryContainer? fun(props: table): Renderable
 ---@field Opponent Component<MatchListOpponentProps>
 ---@field Score Component<MatchListScoreProps>
 ---@field match MatchGroupUtilMatch
----@field matchHasDetails function
+---@field matchHasDetails fun(match: MatchGroupUtilMatch): boolean
 
 ---@param args table
 ---@return table
