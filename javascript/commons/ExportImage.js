@@ -349,14 +349,23 @@ class ExportService {
 		}
 	}
 
+	// On WebKit (every iOS browser), snapdom renders shadowed content at native size then resamples it up to avoid corrupting box/text-shadow, which softens the result — so exports need to detect it and compensate.
+	isSafariBrowser() {
+		const ua = navigator.userAgent;
+		return /safari/i.test( ua ) && !/chrome|android|crios|fxios|edg/i.test( ua );
+	}
+
 	async generateImageBlob( element, title ) {
 		const isDarkTheme = document.documentElement.classList.contains( 'theme--dark' );
 		const backgroundColor = this.getBackgroundColor();
 		const frameBackground = isDarkTheme ?
 			EXPORT_IMAGE_CONFIG.COLORS.DARK.BACKGROUND :
 			EXPORT_IMAGE_CONFIG.COLORS.LIGHT.BACKGROUND;
-		// This ensures the scale is at least 2, but never higher than 3
-		const scale = Math.min( Math.max( window.devicePixelRatio || 1, 2 ), 3 );
+		const dpr = window.devicePixelRatio || 1;
+		// Safari gets a higher ceiling to oversample past its shadow-safe resample blur (see isSafariBrowser()); everyone else keeps the original, size-conscious 2-3x range.
+		const scale = this.isSafariBrowser() ?
+			Math.min( Math.max( dpr, 3 ), 4 ) :
+			Math.min( Math.max( dpr, 2 ), 3 );
 
 		const target = element.cloneNode( true );
 
