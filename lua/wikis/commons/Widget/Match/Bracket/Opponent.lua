@@ -24,7 +24,7 @@ local function BracketOpponent(props)
 		opponent = opponent,
 		overflow = 'ellipsis',
 		showLink = false,
-		showTbd = props.showTbd,
+		showTbd = opponent.type == Opponent.literal or props.showTbd,
 		teamStyle = props.forceShortName and 'short' or 'dynamic',
 	}
 end
