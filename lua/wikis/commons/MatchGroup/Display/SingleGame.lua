@@ -77,7 +77,7 @@ function SingleGameDisplay.Game(props)
 				gameIdx = props.gameIdx,
 			}
 		end},
-		fallback = Lua.import('Module:Error/Display').ErrorList
+		fallback = Lua.import('Module:Error/Display').ErrorDetails
 	}
 end
 
