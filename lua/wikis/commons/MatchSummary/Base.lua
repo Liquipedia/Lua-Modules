@@ -60,8 +60,8 @@ end
 
 -- Default body function
 ---@param match MatchGroupUtilMatch
----@param createGames fun(match: MatchGroupUtilMatch): Renderable|Renderable[]?
----@param createGame fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
+---@param createGames? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]?
+---@param createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
 ---@param options {maxBans: integer?}?
 ---@return Renderable[]
 function MatchSummary.createDefaultBody(match, createGames, createGame, options)
@@ -70,6 +70,8 @@ function MatchSummary.createDefaultBody(match, createGames, createGame, options)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, options.maxBans or 0)
 
 	return WidgetUtil.collect(
+		--- we assume that createGames and createGame are mutually exclusive, so we can safely call one or the other
+		---@diagnostic disable-next-line: param-type-mismatch
 		createGames and createGames(match) or Array.map(match.games, FnUtil.curry(createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
@@ -221,7 +223,7 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 			type(CustomMatchSummary.createGame) == 'function' or
 			type(CustomMatchSummary.createGames) == 'function'
 		),
-		'createBody or createGame or createGames must be implemented in Module:MatchSummary'
+		'One of createBody or createGame or createGames must be implemented in Module:MatchSummary'
 	)
 
 	options = options or {}

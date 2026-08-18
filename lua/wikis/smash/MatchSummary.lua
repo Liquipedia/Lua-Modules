@@ -42,15 +42,13 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return Renderable[]
 function CustomMatchSummary.createGames(match)
-	return WidgetUtil.collect(
-		Array.map(match.games, function(game)
-			return CustomMatchSummary._createStandardGame(game, {
-				opponents = match.opponents,
-				game = match.game,
-				teamMode = CustomMatchSummary.isTeam(match),
-			})
-		end)
-	)
+	return Array.map(match.games, function(game)
+		return CustomMatchSummary._createStandardGame(game, {
+			opponents = match.opponents,
+			game = match.game,
+			teamMode = CustomMatchSummary.isTeam(match),
+		})
+	end)
 end
 
 ---@param game MatchGroupUtilGame

@@ -34,7 +34,7 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return VNode[]
+---@return VNode
 function CustomMatchSummary.createGames(match)
 	---@param game MatchGroupUtilGame
 	---@return boolean
