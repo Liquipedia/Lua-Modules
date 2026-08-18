@@ -387,6 +387,7 @@ class ExportService {
 
 			const capturedCanvas = await snapdom.toCanvas( wrapper, {
 				scale: scale,
+				dpr: 1,
 				backgroundColor: frameBackground,
 				reconcile: true,
 				fast: false,
