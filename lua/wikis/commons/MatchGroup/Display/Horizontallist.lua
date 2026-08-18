@@ -33,19 +33,15 @@ local PHASE_ICONS = {
 ---@class HorizontallistConfig
 ---@field MatchSummaryContainer fun(props: table): Renderable?
 
----@class HorizontallistConfigOptions
-
 ---@class HorizontallistProps
 ---@field bracketId string
----@field config HorizontallistConfigOptions?
+---@field config HorizontallistConfig?
 
----@class HorizontallistBracket
+---@class HorizontallistBracketProps: HorizontallistProps
 ---@field bracket MatchGroupUtilMatchGroup
----@field config HorizontallistConfigOptions?
----@field bracketId string
 
 ---@param args table
----@return HorizontallistConfigOptions
+---@return HorizontallistConfig
 function HorizontallistDisplay.configFromArgs(args)
 	return {}
 end
@@ -64,12 +60,15 @@ end
 
 ---Display component for a tournament bracket.
 ---Match data is specified in the input.
----@param props HorizontallistBracket
+---@param props HorizontallistBracketProps
 ---@return VNode
 function HorizontallistDisplay.Bracket(props)
-	local config = {
-		MatchSummaryContainer = DisplayHelper.DefaultFfaMatchSummaryContainer,
-	}
+	local config = setmetatable(
+		props.config or {},
+		{
+			__index = {MatchSummaryContainer = DisplayHelper.DefaultFfaMatchSummaryContainer}
+		}
+	)
 
 	local sortedBracket = HorizontallistDisplay._sortMatches(props.bracket)
 	local selectedMatchIdx = HorizontallistDisplay.findMatchClosestInTime(props.bracketId, sortedBracket)
