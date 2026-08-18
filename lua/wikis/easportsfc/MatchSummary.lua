@@ -23,13 +23,13 @@ local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return Renderable[]
 function CustomMatchSummary.createBody(match)
 	local hasSubMatches = Logic.readBool((match.extradata or {}).hassubmatches)
 
@@ -46,7 +46,7 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
+---@return Renderable
 function CustomMatchSummary._createGame(game)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
@@ -63,7 +63,7 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param match MatchGroupUtilMatch
----@return MatchSummaryRow
+---@return Renderable
 function CustomMatchSummary._createSubMatch(game, match)
 	local players = CustomMatchSummary._extractPlayersFromGame(game, match)
 
@@ -110,7 +110,7 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
----@return string
+---@return string?
 function CustomMatchSummary._subMatchPenaltyScore(game, opponentIndex)
 	local scores = (game.extradata or {}).penaltyscores
 
@@ -137,7 +137,7 @@ function CustomMatchSummary._players(players, opponentIndex, winner)
 		:css('text-align', flip and 'right' or 'left')
 		:css('width', '35%')
 		:node(OpponentDisplay.BlockPlayers{
-			opponent = {players = players},
+			opponent = {players = players, type = 'solo', extradata = {}},
 			overflow = 'ellipsis',
 			showLink = true,
 		})

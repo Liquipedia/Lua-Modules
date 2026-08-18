@@ -20,13 +20,13 @@ local MAX_NUM_BANS = 5
 local NUM_CHAMPIONS_PICK = 5
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px'})
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return Renderable[]
 function CustomMatchSummary.createBody(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
@@ -39,7 +39,7 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return MatchSummaryRow?
+---@return Renderable?
 function CustomMatchSummary._createGame(game, gameIndex)
 	local extradata = game.extradata or {}
 
