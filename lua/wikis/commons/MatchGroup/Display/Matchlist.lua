@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
-local DisplayUtil = Lua.import('Module:DisplayUtil')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
@@ -18,6 +17,8 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
+local Builder = Lua.import('Module:Widget/Builder')
+local ErrorBoundary = Lua.import('Module:Widget/ErrorBoundary')
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local MatchInfoIcon = Lua.import('Module:Widget/Match/InfoIcon')
 local MatchListHeader = Lua.import('Module:Widget/Match/List/Header')
@@ -136,11 +137,16 @@ function MatchlistDisplay.Match(props)
 	if props.matchHasDetails(match) then
 		matchInfoIconNode = MatchInfoIcon{}
 		local bracketId = MatchGroupUtil.splitMatchId(props.match.matchId)
-		matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
-			classes = {'brkts-match-info-popup'},
-			bracketId = bracketId,
-			matchId = props.match.matchId,
-		}, Lua.import('Module:Error/Display').ErrorDetails)
+		matchSummaryNode = ErrorBoundary{
+			children = Builder{builder = function ()
+				return props.MatchSummaryContainer{
+					classes = {'brkts-match-info-popup'},
+					bracketId = bracketId,
+					matchId = props.match.matchId,
+				}
+			end},
+			fallback = Lua.import('Module:Error/Display').ErrorDetails
+		}
 	else
 		matchInfoIconNode = Html.Div{
 			classes = {'brkts-matchlist-placeholder-cell'}
