@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local DisplayUtil = Lua.import('Module:DisplayUtil')
 local Logic = Lua.import('Module:Logic')
-local Math = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
 local TypeUtil = Lua.import('Module:TypeUtil')
 
@@ -250,34 +249,14 @@ end
 ---@param opponent standardOpponent
 ---@return string
 function OpponentDisplay.InlineScore(opponent)
-	if opponent.status == 'S' then
-		if opponent.score == 0 and Opponent.isTbd(opponent) then
-			return ''
-		elseif opponent.score == -1 then
-			return ''
-		elseif opponent.scoreDisplay ~= nil then
-			return tostring(Math.round(opponent.scoreDisplay, 2))
-		else
-			return tostring(Math.round(opponent.score, 2))
-		end
-	else
-		return opponent.status or ''
-	end
+	return Opponent.getScoreValue(opponent)
 end
 
 ---Displays the second score or status of the opponent, as a string.
 ---@param opponent standardOpponent
 ---@return string
 function OpponentDisplay.InlineScore2(opponent)
-	if opponent.status2 == 'S' then
-		if opponent.score2 == 0 and Opponent.isTbd(opponent) then
-			return ''
-		else
-			return opponent.score2 ~= -1 and tostring(opponent.score2) or ''
-		end
-	else
-		return opponent.status2 or ''
-	end
+	return Opponent.getScoreValue(opponent, '2')
 end
 
 return OpponentDisplay

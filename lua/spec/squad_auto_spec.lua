@@ -106,7 +106,7 @@ local function runAuto(args, fixtures)
 
 	local ok, htmlOrError = pcall(function()
 		-- an empty squad table returns no value at all, so it cannot be passed straight to tostring
-		local display = require('Module:Squad/Auto').run(require('Module:Table').merge({team = TEAM}, args))
+		local display = require('Module:Features/Squad/Auto').run(require('Module:Table').merge({team = TEAM}, args))
 		return tostring(display)
 	end)
 
@@ -604,7 +604,7 @@ insulate('Squad/Auto on a wiki without the standardized auto squad', function()
 	teardown(function() SetActiveWiki() end)
 
 	it('hands over to the legacy module', function()
-		local SquadAuto = require('Module:Squad/Auto')
+		local SquadAuto = require('Module:Features/Squad/Auto')
 		-- Module:SquadAuto is a per wiki legacy module that does not exist here, so importing it fails
 		assert.has_error(function()
 			SquadAuto.run{team = 'MOUZ', status = 'former', type = 'player'}

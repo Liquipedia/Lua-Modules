@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Squad/Custom
+-- page=Module:Features/Squad/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -9,15 +9,15 @@ local Lua = require('Module:Lua')
 
 local Logic = Lua.import('Module:Logic')
 
-local Squad = Lua.import('Module:Squad/Controller')
-local SquadUtils = Lua.import('Module:Squad/Utils')
+local Squad = Lua.import('Module:Features/Squad/Controller')
+local SquadTypes = Lua.import('Module:Features/Squad/Types')
 
 local CustomSquad = {}
 
 ---@param squadData SquadWrapper
 ---@param squadPlayer ModelRow
 local function adjustLpdb(squadData, squadPlayer)
-	if squadData.squadStatus ~= SquadUtils.SquadStatus.ACTIVE then
+	if squadData.squadStatus ~= SquadTypes.SquadStatus.ACTIVE then
 		return
 	end
 	local isMain = Logic.readBool(squadData.args.main) or Logic.isEmpty(squadData.args.squad)
