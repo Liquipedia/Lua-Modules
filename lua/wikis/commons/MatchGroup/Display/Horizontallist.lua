@@ -124,7 +124,7 @@ function HorizontallistDisplay.Bracket(props)
 			bracketNode,
 			matchNode,
 		}
-	 }
+	}
 end
 
 ---@param bracketId string
