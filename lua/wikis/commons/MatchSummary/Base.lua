@@ -75,7 +75,7 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 
 	local nodes
 	if GameRow then
-		local sets = match.submatches
+		local sets = match.submatches or {}
 
 		-- With one set for all matches, or one game per set, it's redundant to show set level info.
 		if #sets > 1 and #sets < #match.games then
