@@ -18,15 +18,10 @@ local Div = Html.Div
 
 local WinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLossIndicator')
 
----@class MatchSetHeaderProps
----@field set MatchGroupUtilSubgroup
-local MatchHeader = {}
-
--- TODO: Move logic elsewhere
-
----@param props MatchSetHeaderProps
+---@param props {set: MatchGroupUtilSubgroup}
 ---@return VNode?
 local function MatchSetHeader(props)
+	-- TODO: Move logic elsewhere in the future
 	local set = props.set
 	if not set then
 		return nil
