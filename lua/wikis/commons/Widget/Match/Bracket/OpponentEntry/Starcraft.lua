@@ -26,4 +26,4 @@ local function StarcraftBracketOpponentEntry(props)
 	return BracketOpponentEntry(props)
 end
 
-return Component.component(StarcraftBracketOpponentEntry, {showTbd = false})
+return Component.component(StarcraftBracketOpponentEntry, {showTbd = true})
