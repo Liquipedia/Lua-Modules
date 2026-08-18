@@ -59,6 +59,6 @@ end
 return Component.component(
 	BracketOpponentEntry,
 	{
-		showTbd = false
+		showTbd = true
 	}
 )
