@@ -11,7 +11,6 @@ local Opponent = Lua.import('Module:Opponent/Starcraft')
 
 local Component = Lua.import('Module:Widget/Component')
 local BracketOpponentEntry = Lua.import('Module:Widget/Match/Bracket/OpponentEntry')
-local StarcraftBracketOpponent = Lua.import('Module:Widget/Match/Bracket/Opponent/Starcraft')
 
 ---@class StarcraftBracketOpponentEntryProps: BracketOpponentEntryProps
 ---@field opponent StarcraftStandardOpponent
