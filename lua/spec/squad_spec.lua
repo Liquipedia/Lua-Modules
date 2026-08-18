@@ -66,7 +66,7 @@ code does today, not necessarily what it ought to do.
 insulate('Squad/Utils', function()
 	describe('status parsing', function()
 		it('maps the storable statuses case insensitively', function()
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			local SquadTypes = require('Module:Features/Squad/Types')
 			assert.are_equal(SquadTypes.SquadStatus.ACTIVE, SquadUtils.statusToSquadStatus('active'))
 			assert.are_equal(SquadTypes.SquadStatus.INACTIVE, SquadUtils.statusToSquadStatus('INACTIVE'))
@@ -74,7 +74,7 @@ insulate('Squad/Utils', function()
 		end)
 
 		it('returns nil for nil and for unknown statuses', function()
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			assert.is_nil(SquadUtils.statusToSquadStatus(nil))
 			assert.is_nil(SquadUtils.statusToSquadStatus('retired'))
 			-- FORMER_INACTIVE is derived, never parsed from input
@@ -101,7 +101,7 @@ insulate('Squad/Utils', function()
 
 	describe('parsePlayers', function()
 		it('reads the numbered arguments and stops at the first gap', function()
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			local players = SquadUtils.parsePlayers{
 				{id = 'One'},
 				{id = 'Two'},
@@ -114,25 +114,25 @@ insulate('Squad/Utils', function()
 		end)
 
 		it('parses json encoded rows', function()
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			local players = SquadUtils.parsePlayers{'{"id":"Baz","flag":"se"}'}
 			assert.are_same({{id = 'Baz', flag = 'se'}}, players)
 		end)
 
 		it('returns an empty list when there are no rows', function()
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			assert.are_same({}, SquadUtils.parsePlayers{status = 'active'})
 		end)
 	end)
 
 	describe('anyInactive', function()
 		it('is true as soon as one player has an inactive date', function()
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			assert.is_true(SquadUtils.anyInactive{{}, {inactivedate = '2022-03-03'}})
 		end)
 
 		it('treats empty strings as no inactive date', function()
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			assert.is_false(SquadUtils.anyInactive{{inactivedate = ''}, {}})
 			assert.is_false(SquadUtils.anyInactive{})
 		end)
@@ -140,7 +140,7 @@ insulate('Squad/Utils', function()
 
 	describe('readWrapperArgs', function()
 		it('defaults to an active player squad', function()
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			local SquadTypes = require('Module:Features/Squad/Types')
 			local wrapper = SquadUtils.readWrapperArgs{{id = 'Baz'}}
 			assert.are_equal(SquadTypes.SquadType.PLAYER, wrapper.squadType)
@@ -150,7 +150,7 @@ insulate('Squad/Utils', function()
 		end)
 
 		it('keeps the raw args around for custom modules', function()
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			local SquadTypes = require('Module:Features/Squad/Types')
 			local args = {{id = 'Baz'}, status = 'former', type = 'staff', title = 'Former Staff'}
 			local wrapper = SquadUtils.readWrapperArgs(args)
@@ -162,7 +162,7 @@ insulate('Squad/Utils', function()
 
 		it('upgrades former to former inactive when any row has an inactive date', function()
 			local SquadTypes = require('Module:Features/Squad/Types')
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			local wrapper = SquadUtils.readWrapperArgs{
 				status = 'former',
 				{id = 'Baz'},
@@ -173,7 +173,7 @@ insulate('Squad/Utils', function()
 
 		it('does not upgrade active squads that have inactive dates', function()
 			local SquadTypes = require('Module:Features/Squad/Types')
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			local wrapper = SquadUtils.readWrapperArgs{
 				status = 'active',
 				{id = 'Qux', inactivedate = '2022-03-03'},
@@ -182,7 +182,7 @@ insulate('Squad/Utils', function()
 		end)
 
 		it('falls back to the defaults for unknown status and type', function()
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			local SquadTypes = require('Module:Features/Squad/Types')
 			local wrapper = SquadUtils.readWrapperArgs{status = 'retired', type = 'organization'}
 			assert.are_equal(SquadTypes.SquadType.PLAYER, wrapper.squadType)
@@ -192,7 +192,7 @@ insulate('Squad/Utils', function()
 
 	describe('createWrapperData', function()
 		it('defaults args to an empty table', function()
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			local SquadTypes = require('Module:Features/Squad/Types')
 			local wrapper = SquadUtils.createWrapperData({}, SquadTypes.SquadType.STAFF, SquadTypes.SquadStatus.FORMER)
 			assert.are_same({}, wrapper.args)
@@ -209,7 +209,7 @@ insulate('Squad/Utils', function()
 		---@return string objectName
 		---@return table fields
 		local function store(args)
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			local SquadTypes = require('Module:Features/Squad/Types')
 			local objectName, fields
 			local storeStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer', function(name, row)
@@ -230,13 +230,13 @@ insulate('Squad/Utils', function()
 		after_each(TeamTemplateMock.tearDown)
 
 		it('requires an id or a name', function()
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			assert.has_error(function() SquadUtils.readSquadPersonArgs{flag = 'se'} end, 'id or name is required')
 			assert.has_error(function() SquadUtils.readSquadPersonArgs{id = '', name = ''} end, 'id or name is required')
 		end)
 
 		it('cannot be stored without a status', function()
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			local storeStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer')
 			local ok, err = pcall(function() SquadUtils.readSquadPersonArgs{id = 'Baz'}:save() end)
 			storeStub:revert()
@@ -397,7 +397,7 @@ insulate('Squad/Utils', function()
 		---@param status SquadStatus
 		---@return table<string, boolean>
 		local function analyze(players, status)
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Columns')
 			return SquadUtils.analyzeColumnVisibility(players, status)
 		end
 
@@ -491,7 +491,7 @@ insulate('Squad/Utils', function()
 
 	describe('convertAutoParameters', function()
 		it('maps the legacy auto squad shape onto squad person args', function()
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			local converted = SquadUtils.convertAutoParameters{
 				id = 'Baz',
 				page = 'Baz (player)',
@@ -514,7 +514,7 @@ insulate('Squad/Utils', function()
 		end)
 
 		it('prefers the display dates when they are given', function()
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			local converted = SquadUtils.convertAutoParameters{
 				id = 'Baz',
 				joindate = '2022-01-01',
@@ -530,7 +530,7 @@ insulate('Squad/Utils', function()
 		end)
 
 		it('only carries the old team over for loans', function()
-			local SquadUtils = require('Module:Features/Squad/Utils')
+			local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 			local loaned = SquadUtils.convertAutoParameters{
 				id = 'Baz',
 				joindate = '2022-01-01',
@@ -573,7 +573,7 @@ insulate('Squad/Utils on starcraft2', function()
 	---@param args table
 	---@return table fields
 	local function store(args)
-		local SquadUtils = require('Module:Features/Squad/Utils')
+		local SquadUtils = require('Module:Features/Squad/Lib/Parse')
 		local SquadTypes = require('Module:Features/Squad/Types')
 		local fields
 		local storeStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer', function(_, row)
