@@ -82,7 +82,7 @@ end
 function CustomMatchGroupUtil.constructSubmatch(match, subgroup)
 	local games = subgroup.games
 	local firstGame = games[1]
-	---@type HearthstoneMatchGroupUtilSubmatch
+	---@type HearthstoneMatchGroupUtilGameOpponent[]
 	local opponents = Table.deepCopy(firstGame.opponents)
 	local isSubmatch = string.find(firstGame.map or '', '^[sS]ubmatch %d+$')
 	if isSubmatch then

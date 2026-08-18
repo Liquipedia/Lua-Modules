@@ -153,7 +153,7 @@ end
 function CustomMatchGroupUtil.constructSubmatch(match, subgroup)
 	local games = subgroup.games
 	local firstGame = games[1]
-	---@type WarcraftMatchGroupUtilGameOpponent
+	---@type WarcraftMatchGroupUtilGameOpponent[]
 	local opponents = Table.deepCopy(firstGame.opponents)
 	local isSubmatch = String.startsWith(firstGame.map or '', 'Submatch')
 	if isSubmatch then
