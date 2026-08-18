@@ -1,7 +1,6 @@
 ---
 -- @Liquipedia
 -- page=Module:Widget/ArticleMessageBox
-
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
