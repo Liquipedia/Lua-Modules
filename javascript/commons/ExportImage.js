@@ -213,6 +213,14 @@ class ExportService {
 		} );
 	}
 
+	// A `grid-template-columns: subgrid` root (e.g. `.brkts-matchlist-collapse-area`) loses its tracks once buildAncestorSpine() reparents it under a plain flex wrapper, so bake the live parent's resolved pixel tracks onto the clone to make it self-contained.
+	resolveSubgridRoot( element, target ) {
+		if ( window.getComputedStyle( element ).gridTemplateColumns.startsWith( 'subgrid' ) ) {
+			target.style.display = 'grid';
+			target.style.gridTemplateColumns = window.getComputedStyle( element.parentElement ).gridTemplateColumns;
+		}
+	}
+
 	// snapdom doesn't wait for images; undecoded ones can be missing or collapse row heights.
 	async waitForImages( element, timeout = EXPORT_IMAGE_CONFIG.TIMEOUTS.IMAGE_LOAD ) {
 		const images = this.queryAllIncludingSelf( element, 'img' );
@@ -372,6 +380,7 @@ class ExportService {
 		// Must run before the clone is detached/repositioned, while `element` is still the
 		// correctly-laid-out live reference to copy resolved grid columns from.
 		this.preserveGridLayout( element, target );
+		this.resolveSubgridRoot( element, target );
 
 		// Mutates the clone, not the live page, so nothing needs restoring afterwards.
 		target.style.background = backgroundColor;
