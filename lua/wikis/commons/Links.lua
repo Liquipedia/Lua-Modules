@@ -154,6 +154,11 @@ local PREFIXES = {
 		player = 'https://fpschallenge.eu/user/',
 		team = 'https://fpschallenge.eu/team/',
 	},
+	fragnet = {
+		'https://arena.fragnet.net/en/tournament/',
+		player = 'https://arena.fragnet.net/en/profile/',
+		team = 'https://arena.fragnet.net/en/team/',
+	},
 	geoguessr = {'https://www.geoguessr.com/'},
 	gol = {match = 'https://gol.gg/game/stats/'},
 	gosugamers = {''},
