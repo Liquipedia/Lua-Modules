@@ -9,8 +9,8 @@ local Lua = require('Module:Lua')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
-local RatingsList = Lua.import('Module:Widget/Ratings/List')
 local ErrorBoundary = Lua.import('Module:Widget/ErrorBoundary')
+local RatingsList = Lua.import('Module:Widget/Ratings/List')
 
 local defaultProps = {
 	teamLimit = 20,
