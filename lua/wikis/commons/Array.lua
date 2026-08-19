@@ -5,6 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Set = require('Module:Set')
 local String = require('Module:StringUtils')
@@ -789,6 +790,18 @@ function Array.interleave(elements, x)
 		table.insert(ret, elements[i])
 	end
 	return ret
+end
+
+---@param inputString string?
+---@return string[]
+---@nodiscard
+function Array.parseMultiSelect(inputString)
+	local parsed = Json.parseIfTable(inputString) or Array.parseCommaSeparatedString(inputString)
+
+	-- validate it actually is an array
+	assert(Array.isArray(parsed), '"inputString" could not be parsed to an array')
+
+	return parsed
 end
 
 return Array
