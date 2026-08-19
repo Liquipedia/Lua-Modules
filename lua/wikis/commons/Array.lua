@@ -793,10 +793,11 @@ function Array.interleave(elements, x)
 end
 
 ---@param inputString string?
+---@param sep string?
 ---@return string[]
 ---@nodiscard
-function Array.parseMultiSelect(inputString)
-	local parsed = Json.parseIfTable(inputString) or Array.parseCommaSeparatedString(inputString)
+function Array.parseMultiSelect(inputString, sep)
+	local parsed = Json.parseIfTable(inputString) or Array.parseCommaSeparatedString(inputString, sep)
 
 	-- validate it actually is an array
 	assert(Array.isArray(parsed), '"inputString" could not be parsed to an array')
