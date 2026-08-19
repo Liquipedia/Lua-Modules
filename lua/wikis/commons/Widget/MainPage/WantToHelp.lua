@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Page = Lua.import('Module:Page')
 local Variables = Lua.import('Module:Variables')
+local I18n = Lua.import('Module:I18n')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 
@@ -56,7 +57,7 @@ local function getWikiType()
 	if Info.wikiName == 'formula1' then
 		return 'F1'
 	end
-	return 'esports'
+	return Info.name
 end
 
 ---@param content Renderable|Renderable[]?
@@ -73,16 +74,19 @@ local function WantToHelp()
 	return {
 		Div{
 			css = {['padding-bottom'] = '0.7em'},
-			children = 'Create your free account and join the community to start making a difference by ' ..
-					'sharing your knowledge and insights with fellow ' .. getWikiType() ..
-					' fans!'
+			children = I18n.translate(
+				'wantToHelp-mainText',
+				{
+					wikiType = getWikiType(),
+				}
+			)
 		},
 		buildFontAwesomeList(
 			GREEN_CHECK_CIRCLE,
 			{
-				{'Join our community and grow the scene(s) you care about.'},
-				{'Be a hero for fans worldwide by keeping the site updated.'},
-				{'Develop valuable skills in research, writing, and collaboration.'},
+				{I18n.translate('wantToHelp-checkA')},
+				{I18n.translate('wantToHelp-checkB')},
+				{I18n.translate('wantToHelp-checkC')},
 			},
 			{
 				margin = '0 0 0 2.5rem',
@@ -101,39 +105,39 @@ local function WantToHelp()
 					link = 'https://tl.net/mytlnet/register?utm_source=Liquipedia&utm_medium=Website' ..
 						'&utm_campaign=Want+to+Help+' .. mw.uri.encode(mw.site.siteName) .. '&utm_id=Want+to+Help',
 					linktype = 'external',
-					title = 'Click here to create an account',
+					title = I18n.translate('wantToHelp-button-create-tooltip'),
 					variant = 'secondary',
 					children = {
 						IconFa{iconName = 'createaccount'},
-						' Create Account'
+						I18n.translate('wantToHelp-button-create-title')
 					}
 				}),
 				showWhenLoggedOut(Button{
-					link = 'Special:UserLogin',
-					title = 'Click here to log in',
+					link = I18n.translate('wantToHelp-button-logIn-link'),
+					title = I18n.translate('wantToHelp-button-logIn-tooltip'),
 					variant = 'secondary',
 					children = {
 						IconFa{iconName = 'login'},
-						' Log In'
+						I18n.translate('wantToHelp-button-logIn-title')
 					}
 				}),
 				Button{
 					link = 'https://discord.gg/liquipedia',
 					linktype = 'external',
-					title = 'Click here to join our discord server',
+					title = I18n.translate('wantToHelp-button-discord-tooltip'),
 					variant = 'secondary',
 					children = {
 						IconFa{iconName = 'discord'},
-						' Join Our Discord'
+						I18n.translate('wantToHelp-button-discord-title')
 					}
 				},
-				Page.exists('Help:Contents') and Button{
-					link = 'Help:Contents',
-					title = 'Click Here to Read our Help Articles',
+				Page.exists(I18n.translate('wantToHelp-helpArticles-link')) and Button{
+					link = I18n.translate('wantToHelp-helpArticles-link'),
+					title = I18n.translate('wantToHelp-helpArticles-tooltip'),
 					variant = 'secondary',
 					children = {
 						IconFa{iconName = 'helparticles'},
-						' Help Articles'
+						I18n.translate('wantToHelp-helpArticles-title')
 					}
 				} or nil
 			)
@@ -149,14 +153,14 @@ local function WantToHelp()
 			children = {'\n', WantToHelpList{}}
 		},
 		Html.Br{},
-		'In total there are ',
+		I18n.translate('wantToHelp-articleCount-preLink'),
 		Builder{builder = function () -- need the builder so the var is available when accessing it
 			return Link{
 				link = 'Liquipedia:Want to help/All',
-				children = {Variables.varDefault('total_number_of_todos', 0) .. ' pages'}
+				children = {Variables.varDefault('total_number_of_todos', 0) .. I18n.translate('wantToHelp-articleCount-pages')}
 			}
 		end},
-		' listed needing help.'
+		I18n.translate('wantToHelp-articleCount-postLink')
 	}
 end
 
