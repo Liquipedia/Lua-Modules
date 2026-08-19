@@ -36,9 +36,16 @@
 			"type": "volume"
 		}
 	],
-	// mitmproxy, for serving locally built CSS/JS into the live wiki
+	// mitmproxy, for serving locally built CSS/JS into the live wiki.
+	// forwardPorts is the editor side tunnel, appPort is what publishes the port
+	// for anyone driving the container from the CLI instead. Bound to loopback
+	// on purpose: publishing on every interface would leave an open forward
+	// proxy reachable from the local network.
 	"forwardPorts": [
 		8080
+	],
+	"appPort": [
+		"127.0.0.1:8080:8080"
 	],
 	"portsAttributes": {
 		"8080": {

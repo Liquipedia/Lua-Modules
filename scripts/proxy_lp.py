@@ -23,26 +23,31 @@ class LiquipediaMapper:
             self.__serve_local_js_resource(flow)
 
     def __serve_local_css_resource(self, flow: http.HTTPFlow):
-        with open("lua/output/css/main.css", "rb") as f:
-            flow.response = http.Response.make(
-                HTTPStatus.OK,
-                f.read(),
-                {"Content-Type": "text/css; charset=utf-8"},
-            )
-            flow.response.headers["Via"] = (
-                f"{flow.response.http_version} LiquipediaMapper"
-            )
+        self.__serve_local_file(
+            flow, "lua/output/css/main.css", "text/css; charset=utf-8"
+        )
 
     def __serve_local_js_resource(self, flow: http.HTTPFlow):
-        with open("lua/output/js/main.js", "rb") as f:
-            flow.response = http.Response.make(
-                HTTPStatus.OK,
-                f.read(),
-                {"Content-Type": "text/javascript; charset=utf-8"},
-            )
-            flow.response.headers["Via"] = (
-                f"{flow.response.http_version} LiquipediaMapper"
-            )
+        self.__serve_local_file(
+            flow, "lua/output/js/main.js", "text/javascript; charset=utf-8"
+        )
+
+    def __serve_local_file(self, flow: http.HTTPFlow, path: str, content_type: str):
+        try:
+            with open(path, "rb") as f:
+                body = f.read()
+        except OSError as error:
+            # Leaving this unsaid means the request goes upstream, the page looks
+            # untouched and nothing explains why
+            print(f"LiquipediaMapper: {error}. Run npm run build first.")
+            return
+
+        flow.response = http.Response.make(
+            HTTPStatus.OK,
+            body,
+            {"Content-Type": content_type},
+        )
+        flow.response.headers["Via"] = f"{flow.response.http_version} LiquipediaMapper"
 
 
 async def main():
