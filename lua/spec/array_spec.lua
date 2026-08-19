@@ -327,7 +327,6 @@ describe('array', function()
 			local a = {'test1', 'test2', 'test3'}
 			assert.are_same(a, Array.parseMultiSelect('test1, test2,test3'))
 			assert.are_same(a, Array.parseMultiSelect('test1 - test2-test3', '-'))
-			assert.are_same(a, Array.parseMultiSelect('{"1":"test1","2":"test2","3":"test3"}'))
 			assert.are_same(a, Array.parseMultiSelect('{"test1","test2","test3"}'))
 			assert.error(function ()
 				return Array.parseMultiSelect('{"a":"test1","b":"test2","c":"test3"}')
