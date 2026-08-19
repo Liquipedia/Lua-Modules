@@ -140,7 +140,7 @@ return {
 		['mainpage-block-matches-title'] = 'Matches',
 		['mainpage-block-tournaments-title'] = 'Tournaments',
 		['mainpage-block-rankings-title'] = 'Liquipedia Rankings',
-		
+
 		-- Widget: MainPage/WantToHelp
 		['wantToHelp-mainText'] = 'Create your free account ' ..
 					'and join the community to start making a difference by ' ..
@@ -333,7 +333,7 @@ return {
 		['mainpage-block-matches-title'] = 'Матчи',
 		['mainpage-block-tournaments-title'] = 'Турниры',
 		['mainpage-block-rankings-title'] = 'Рейтинги Liquipedia',
-		
+
 		-- Widget: MainPage/WantToHelp
 		['wantToHelp-mainText'] = 'Создайте учётную запись ' ..
 					'и присоединитесь к сообществу редакторов, ' ..
@@ -352,7 +352,7 @@ return {
 		['wantToHelp-button-discord-title'] = ' Наш Discord',
 		['wantToHelp-helpArticles-tooltip'] = 'Нажмите, чтобы просмотреть полезные статьи.',
 		['wantToHelp-helpArticles-title'] = ' Полезные статьи',
-		['wantToHelp-helpArticles-title'] = 'Справка:Содержимое',
+		['wantToHelp-helpArticles-link'] = 'Справка:Содержимое',
 		['wantToHelp-articleCount-preLink'] = 'Всего ',
 		['wantToHelp-articleCount-pages'] = ' статей',
 		['wantToHelp-articleCount-postLink'] = ' нуждаются в помощи.',
