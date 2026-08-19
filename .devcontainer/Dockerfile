@@ -63,3 +63,14 @@ ENV PATH=/opt/venv/bin:${PATH}
 RUN python3 -m venv "${VIRTUAL_ENV}" \
 	&& pip install --no-cache-dir --upgrade pip \
 	&& chmod -R a+rwX "${VIRTUAL_ENV}"
+
+# Runs before the features do, which is where the user we run as gets created.
+# Noble ships `ubuntu` on uid 1000 and this image adds `pwuser` on 1001, which
+# pushes that user to 1002 and stops the CLI renumbering it to match the host,
+# leaving the bind mount unwritable on linux. Docker Desktop hides this by
+# fudging bind mount ownership. /ms-playwright is root owned and world readable,
+# so moving pwuser costs nothing, and it is renumbered rather than left on 1001
+# so hosts with that uid work too.
+RUN userdel -r ubuntu 2>/dev/null || true \
+	&& usermod -u 60001 pwuser 2>/dev/null || true \
+	&& groupmod -g 60001 pwuser 2>/dev/null || true
