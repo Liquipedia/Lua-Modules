@@ -11,7 +11,7 @@ local Component = Lua.import('Module:Widget/Component')
 local Renderer = Lua.import('Module:Widget/Renderer')
 
 --[[
-Widget component that is roughly equivalent to <ref> tags in MediaWiki.
+Widget component that is roughly equivalent to `<ref>` tags in MediaWiki.
 
 For example, the following Lua code snippet:
 
