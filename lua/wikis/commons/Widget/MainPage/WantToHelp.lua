@@ -53,7 +53,7 @@ local function buildFontAwesomeList(icon, entries, listCss)
 end
 
 ---@return string
-local function getWikiType()
+local function getWikiName()
 	if Info.wikiName == 'formula1' then
 		return 'F1'
 	end
@@ -77,7 +77,7 @@ local function WantToHelp()
 			children = I18n.translate(
 				'wantToHelp-mainText',
 				{
-					wikiType = getWikiType(),
+					wikiType = getWikiName(),
 				}
 			)
 		},
