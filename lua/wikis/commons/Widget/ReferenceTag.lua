@@ -40,7 +40,7 @@ local function ReferenceTag(props, context)
 		'ref',
 		--[[
 		Because Frame:extensionTag expects string argument for content, we cannot directly
-		pass children in its raw form. Thus, we manually call Renderer.render here instead
+		pass children in their raw form. Thus, we manually call Renderer.render here instead
 		of letting it be called after processing the parent component.
 		]]
 		Renderer.render(props.children, context),
