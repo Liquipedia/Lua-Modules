@@ -11,6 +11,10 @@ npm install
 echo "==> Installing python dependencies"
 pip install --no-cache-dir -r requirements.txt
 
+echo "==> Building css and js"
+# The proxy serves these, and without them it silently passes requests through
+npm run build
+
 if [ ! -f .env ]; then
 	echo "==> Creating .env from .env.example (fill in your bot credentials before deploying)"
 	# Nobody chose these settings, we generated them, so start in dry-run and
