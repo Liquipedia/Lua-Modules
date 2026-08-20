@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Namespace = Lua.import('Module:Namespace')
+local Logic = Lua.import('Module:Logic')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local AmBox = Lua.import('Module:Widget/ArticleMessageBox')
@@ -42,9 +43,14 @@ local EmptyPagePreview = function(props)
 		}
 	end
 
+	local personPagePreview = tostring(EmptyPersonPagePreview(props))
+	if Logic.isEmpty(personPagePreview) then
+		return
+	end
+
 	return {
 		previewWarning,
-		EmptyPersonPagePreview(props)
+		personPagePreview
 	}
 end
 
