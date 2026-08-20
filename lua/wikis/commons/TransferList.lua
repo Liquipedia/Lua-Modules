@@ -77,7 +77,7 @@ local TransferList = Class.new(
 )
 
 ---@param frame Frame
----@return Widget?
+---@return VNode?
 function TransferList.run(frame)
 	local args = Arguments.getArgs(frame)
 	return TransferList(args):fetch():create()
@@ -301,7 +301,7 @@ function TransferList:_buildTeamConditions(toTeam, fromTeam)
 	return self.teamConditions
 end
 
----@return Widget?
+---@return VNode?
 function TransferList:create()
 	local config = self.config
 	if Logic.isDeepEmpty(self.groupedTransfers) then

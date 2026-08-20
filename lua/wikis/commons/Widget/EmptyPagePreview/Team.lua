@@ -28,8 +28,8 @@ local Infobox = Lua.requireIfExists('Module:Infobox/Team/Custom')
 local MatchTable = Lua.import('Module:MatchTable/Custom')
 local ResultsTable = Lua.import('Module:ResultsTable/Custom')
 local SquadAuto = Lua.import('Module:SquadAuto') -- to be replaced by #5523
-local SquadCustom = Lua.import('Module:Squad/Custom')
-local SquadUtils = Lua.import('Module:Squad/Utils')
+local SquadCustom = Lua.import('Module:Features/Squad/Custom')
+local SquadTypes = Lua.import('Module:Features/Squad/Types')
 
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -365,14 +365,14 @@ function EmptyTeamPagePreview:_rosterFromLastPlacement()
 	return WidgetUtil.collect(
 		Html.H3{children = 'Most Recent Roster'},
 		hasFormer and Html.H4{children = 'Active'} or nil,
-		SquadCustom.runAuto(activePlayers, SquadUtils.SquadStatus.ACTIVE, SquadUtils.SquadType.PLAYER),
+		SquadCustom.runAuto(activePlayers, SquadTypes.SquadStatus.ACTIVE, SquadTypes.SquadType.PLAYER),
 		hasFormer and {
 			Html.H4{children = 'Former'},
-			SquadCustom.runAuto(formerPlayers, SquadUtils.SquadStatus.FORMER, SquadUtils.SquadType.PLAYER),
+			SquadCustom.runAuto(formerPlayers, SquadTypes.SquadStatus.FORMER, SquadTypes.SquadType.PLAYER),
 		} or nil,
 		hasCoaches and {
 			Html.H3{children = 'Active Organization'},
-			SquadCustom.runAuto(activeCoaches, SquadUtils.SquadStatus.ACTIVE, SquadUtils.SquadType.STAFF),
+			SquadCustom.runAuto(activeCoaches, SquadTypes.SquadStatus.ACTIVE, SquadTypes.SquadType.STAFF),
 		} or nil
 	)
 end
