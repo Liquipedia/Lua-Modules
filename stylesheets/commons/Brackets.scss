@@ -809,6 +809,10 @@ div.brkts-popup-body-element-thumbs {
 	justify-content: center;
 	gap: 4px;
 	text-align: center;
+
+	.brkts-popup-footer & {
+		flex-wrap: wrap;
+	}
 }
 
 .brkts-popup-winloss-icon {
