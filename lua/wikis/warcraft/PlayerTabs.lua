@@ -93,7 +93,7 @@ function PlayerTabs._display(player, currentTab)
 		link1 = player,
 		name2 = QueryLink{
 			legacyForm = 'Player ResultsLH',
-			form = 'Player Results',
+			form = 'Player Results/LH',
 			display = 'Results',
 			template = 'Player results',
 			queryArgs = {
@@ -105,7 +105,7 @@ function PlayerTabs._display(player, currentTab)
 		},
 		name3 = QueryLink{
 			legacyForm = 'Player MatchesLH',
-			form = 'Player Matches',
+			form = 'Player Matches/LH',
 			display = 'Matches',
 			template = 'Player matches',
 			queryArgs = {
@@ -118,7 +118,7 @@ function PlayerTabs._display(player, currentTab)
 		},
 		name4 = QueryLink{
 			legacyForm = 'PlayerStats',
-			form = 'PlayerStatsLH',
+			form = 'PlayerStats/LH',
 			display = 'Statistics',
 			template = 'Player statistics',
 			queryArgs = {

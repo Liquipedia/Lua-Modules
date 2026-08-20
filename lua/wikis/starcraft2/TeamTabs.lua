@@ -160,7 +160,7 @@ function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 		link1 = team,
 		name2 = QueryLink{
 			legacyForm = 'Team Results',
-			form = 'Team ResultsLH',
+			form = 'Team Results/LH',
 			display = 'Team Results',
 			template = 'Team results',
 			queryArgs = {
@@ -172,7 +172,7 @@ function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 		},
 		name3 = QueryLink{
 			legacyForm = 'Team Matches',
-			form = 'Team MatchesLH',
+			form = 'Team Matches/LH',
 			display = 'Team Matches',
 			template = 'Team matches',
 			queryArgs = {
@@ -189,7 +189,7 @@ function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 	if showPlayerSubTabs then
 		tabArgs.name4 = QueryLink{
 			legacyForm = 'Team Player Results',
-			form = 'Team Player ResultsLH',
+			form = 'Team Player Results/LH',
 			display = 'Player Results',
 			template = 'Team player results',
 			queryArgs = {
