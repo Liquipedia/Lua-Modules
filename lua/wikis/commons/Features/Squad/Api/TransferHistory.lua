@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Condition = Lua.import('Module:Condition')
 local Json = Lua.import('Module:Json')
-local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 
