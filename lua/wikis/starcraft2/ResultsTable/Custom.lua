@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
+local DateExt = Lua.import('Module:Date/Ext')
 local DivTable = Lua.import('Module:DivTable')
 local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
@@ -26,15 +27,21 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]'
 local DEFAULT_EVENT_ICON = ''
 local TBD = 'TBD'
+local TOMORROW = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() + DateExt.daysToSeconds(1))
 
 local CustomResultsTable = {}
 
 -- Template entry point
 ---@param frame Frame
----@return Widget?
+---@return Renderable?
 function CustomResultsTable.results(frame)
 	local args = Arguments.getArgs(frame)
 	args.useIndivPrize = true
+	args.queryLinkProps = {
+		tier = '1,2,3',
+		limit = 250,
+		edate = TOMORROW,
+	}
 
 	if Logic.readBool(args.awards) then
 		return CustomResultsTable.awards(args)
@@ -54,7 +61,7 @@ end
 
 -- Template entry point for awards
 ---@param frame Frame
----@return Widget?
+---@return Renderable?
 function CustomResultsTable.awards(frame)
 	local args = Arguments.getArgs(frame)
 	args.useIndivPrize = true
@@ -203,7 +210,7 @@ end
 ---@param args table
 ---@param prefix string
 ---@param side number
----@return Widget
+---@return Renderable
 function CustomResultsTable._opponentDisplay(args, prefix, side)
 	local players = {CustomResultsTable._buildPlayerStruct(args, prefix .. 'p' .. side)}
 
@@ -224,6 +231,7 @@ function CustomResultsTable._opponentDisplay(args, prefix, side)
 		opponent = {
 			type = CustomResultsTable._getOpponentType(#players),
 			players = players,
+			isArchon = false,
 			extradata = {},
 		},
 	}

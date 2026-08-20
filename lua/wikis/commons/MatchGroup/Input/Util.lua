@@ -1092,7 +1092,7 @@ end
 ---@field getExtraData? fun(match: table, games: table[], opponents: MGIParsedOpponent[]): table?
 ---@field adjustOpponent? fun(opponent: MGIParsedOpponent, opponentIndex: integer)
 ---@field getLinks? fun(match: table, games: table[]): table
----@field getHeadToHeadLink? fun(match: table, opponents: MGIParsedOpponent[]): string?
+---@field getHeadToHeadLink? fun(match: table, opponents: MGIParsedOpponent[]): string?, string?
 ---@field getPatch? fun(match: table, games: table[]): string?
 ---@field readDate? readDateFunction
 ---@field getMode? fun(opponents: table[]): string
@@ -1115,7 +1115,7 @@ end
 --- - getExtraData(match, games, opponents): table?
 --- - adjustOpponent(opponent, opponentIndex)
 --- - getLinks(match, games): table?
---- - getHeadToHeadLink(match, opponents): string?
+--- - getHeadToHeadLink(match, opponents): string?, string?
 --- - getPatch(match, games): string?
 --- - readDate(match): table
 --- - getMode(opponents): string?
@@ -1160,7 +1160,9 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 
 	match.links = Parser.getLinks and Parser.getLinks(match, games) or MatchGroupInputUtil.getLinks(match)
 	if Parser.getHeadToHeadLink then
-		match.links.headtohead = Parser.getHeadToHeadLink(match, opponents)
+		local h2hLinkMediawiki, h2hLinkLighthouse = Parser.getHeadToHeadLink(match, opponents)
+		match.links.headtohead = h2hLinkMediawiki
+		match.links.headtohead_lh = h2hLinkLighthouse
 	end
 
 	local autoScoreFunction = (Parser.calculateMatchScore and MatchGroupInputUtil.canUseAutoScore(match, games))

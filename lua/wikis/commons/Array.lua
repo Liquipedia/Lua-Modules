@@ -6,14 +6,15 @@
 --
 
 local Logic = require('Module:Logic')
+local Set = require('Module:Set')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 --
 -- Array functions. Arrays are tables with numeric indexes that does not
--- have gaps. Functions in Array use ipairs() to iterate over tables.
+-- have gaps. Functions in Array use `ipairs()` to iterate over tables.
 --
--- For functions using pairs() instead of ipairs(), use Module:Table.
+-- For functions using `pairs()` instead of `ipairs()`, use Module:Table.
 --
 local Array = {}
 
@@ -39,7 +40,7 @@ function Array.isArray(tbl)
 	return type(tbl) == 'table' and Table.size(tbl) == #tbl
 end
 
--- Creates a copy of an array with the same elements.
+-- Creates a shallow copy of the supplied array.
 ---@generic T
 ---@param tbl T[]
 ---@return T[]
@@ -103,9 +104,11 @@ end
 Returns a subarray given by its indexes.
 
 Examples:
+```
 Array.sub({3, 5, 7, 11}, 2) = {5, 7, 11};
 Array.sub({3, 5, 7, 11}, 2, 3) = {5, 7};
 Array.sub({3, 5, 7, 11}, -2, -1) = {7, 11}
+```
 ]]
 ---@generic T
 ---@param tbl T[]
@@ -144,8 +147,10 @@ end
 Filters an array based on a predicate.
 
 Example:
+```
 Array.filter({1, 2, 3}, function(x) return x % 2 == 1 end)
 -- returns {1, 3}
+```
 ]]
 ---@generic T
 ---@param tbl T[]
@@ -235,7 +240,7 @@ function Array.any(tbl, predicate)
 	return false
 end
 
----Finds the first element in an array satisfying a predicate. Returns nil if no element satisfies the predicate.
+---Finds the first element in an array satisfying a predicate. Returns `nil` if no element satisfies the predicate.
 ---@generic T
 ---@param tbl T[]
 ---@param predicate fun(element?: T, index?: integer): boolean
@@ -258,9 +263,11 @@ is a table whose keys are the transformed values and whose values are the
 groups.
 
 Example:
+```
 Array.groupBy({2, 3, 5, 7, 11, 13}, function(x) return x % 4 end)
 -- returns {{2}, {3, 7, 11}, {5, 13}},
 -- {1 = {5, 13}, 2 = {2}, 3 = {3, 7, 11}}
+```
 ]]
 ---@generic T, K
 ---@param tbl T[]
@@ -295,8 +302,10 @@ The optional equals parameter specifies the equality relation of the
 transformed elements.
 
 Example:
+```
 Array.groupAdjacentBy({2, 3, 5, 7, 14, 16}, function(x) return x % 2 end)
 -- returns {{2}, {3, 5, 7}, {14, 16}}
+```
 ]]
 ---@generic V, T
 ---@param array V[]
@@ -365,6 +374,7 @@ the first element, and subsequent tie-breakers in the remaining elements.
 The optional third argument specifies a custom comparator for the transformed elements.
 
 Examples:
+```
 Array.sortBy({-3, -1, 2, 4}, function(x) return x * x end)
 -- returns {-1, 2, -3, 4}
 
@@ -378,7 +388,7 @@ Array.sortBy({
 --	{first='Louis', last='Armstrong'},
 --	{first='Neil', last='Armstrong'},
 -- }
-
+```
 ]]
 ---@generic T, V
 ---@param tbl T[]
@@ -420,8 +430,10 @@ end
 Returns an array with elements append to the end. Does not mutate the inputs.
 
 Example:
+```
 Array.append({2, 3}, 5, 7, 11)
 -- returns {2, 3, 5, 7, 11}
+```
 ]]
 ---@generic T
 ---@param tbl T[]
@@ -452,11 +464,13 @@ Returns an array with elements from one or more arrays append to the end. Does
 not mutate the inputs.
 
 Example:
+```
 Array.extend({2, 3}, {5, 7, 11}, {13})
 -- returns {2, 3, 5, 7, 11, 13}
 
 Array.extend({2, 3}, 5, 7, nil, {11, 13})
 -- returns {2, 3, 5, 7, 11, 13}
+```
 ]]
 ---@generic T
 ---@param tbl T[]|T
@@ -490,11 +504,13 @@ function Array.extendWith(tbl, ...)
 end
 
 --[[
-Returns the array {funct(1), funct(2), funct(3), ...}. Stops before the first nil value returned by funct.
+Returns the array `{funct(1), funct(2), funct(3), ...}`. Stops before the first `nil` value returned by `funct`.
 
 Example:
+```
 Array.mapIndexes(function(x) return x < 5 and x * x or nil end)
 -- returns {1, 4, 9, 16}
+```
 ]]
 ---@generic T
 ---@param funct fun(index: integer): T?
@@ -512,7 +528,7 @@ function Array.mapIndexes(funct)
 	return arr
 end
 
----Returns the array {from, from + 1, from + 2, ..., to}.
+---Returns the array `{from, from + 1, from + 2, ..., to}`.
 ---@param from integer
 ---@param to integer
 ---@return integer[]
@@ -578,9 +594,10 @@ end
 Applies a function to each element in an array.
 
 Example:
-
+```
 Array.forEach({4, 6, 8}, mw.log)
 -- Prints 4 1 6 2 8 3
+```
 ]]
 ---@generic T
 ---@param elements T[]
@@ -593,16 +610,16 @@ end
 
 --[[
 Reduces an array using the specified binary operation. Computes
-operator(... operator(operator(operator(initialValue, array[1]), array[2]), array[3]), ... array[#array])
+`operator(... operator(operator(operator(initialValue, array[1]), array[2]), array[3]), ... array[#array])`
 
-If initialValue is not provided then the operator(initialValue, array[1]) step is skipped, and
-operator(array[1], array[2]) becomes the first step.
+If `initialValue` is not provided then the `operator(initialValue, array[1])` step is skipped, and
+`operator(array[1], array[2])` becomes the first step.
 
 Example:
-
-local function pow(x, y) return x ^ y end
-Array.reduce({2, 3, 5}, pow)
+```
+Array.reduce({2, 3, 5}, math.pow)
 -- Returns 32768
+```
 ]]
 ---@generic T, V
 ---@param array T[]
@@ -624,7 +641,7 @@ function Array.reduce(array, operator, initialValue)
 	return aggregate
 end
 
----Computes the maximum element in an array according to a scoring function. Returns nil if the array is empty.
+---Computes the maximum element in an array according to a scoring function. Returns `nil` if the array is empty.
 ---@generic T, V
 ---@param array T[]
 ---@param funct fun(item: T): V
@@ -645,7 +662,7 @@ function Array.maxBy(array, funct, compare)
 	return max
 end
 
----Computes the maximum element in an array. Returns nil if the array is empty.
+---Computes the maximum element in an array. Returns `nil` if the array is empty.
 ---@generic T
 ---@param array T[]
 ---@param compare? fun(maxScore: T, score: T): boolean
@@ -655,7 +672,7 @@ function Array.max(array, compare)
 	return Array.maxBy(array, function(x) return x end, compare)
 end
 
----Computes the minimum element in an array according to a scoring function. Returns nil if the array is empty.
+---Computes the minimum element in an array according to a scoring function. Returns `nil` if the array is empty.
 ---@generic T, V
 ---@param array T[]
 ---@param funct fun(item: T): V
@@ -676,7 +693,7 @@ function Array.minBy(array, funct, compare)
 	return min
 end
 
----Computes the minimum element in an array. Returns nil if the array is empty.
+---Computes the minimum element in an array. Returns `nil` if the array is empty.
 ---@generic T
 ---@param array T[]
 ---@param compare? fun(score: T, minScore: T): boolean
@@ -691,9 +708,10 @@ Finds the index of the element in an array satisfying a predicate. Returns 0
 if no element satisfies the predicate.
 
 Example:
-
+```
 Array.indexOf({3, 5, 4, 6, 7}, function(x) return x % 2 == 0 end)
 -- returns 3
+```
 ]]
 ---@generic V
 ---@param array V[]
@@ -712,22 +730,25 @@ end
 --[[
 Returns distinct/unique elements of an array.
 
-Example:
+Unlike `Set:toArray()`, the order of elements is preserved in the returned array.
 
+Example:
+```
 Array.unique({4, 5, 4, 3})
 -- Returns {4, 5, 3}
+```
 ]]
 ---@generic V
 ---@param elements V[]
 ---@return V[]
 ---@nodiscard
 function Array.unique(elements)
-	local elementCache = {}
+	local elementCache = Set()
 	local uniqueElements = {}
 	for _, element in ipairs(elements) do
-		if elementCache[element] == nil then
+		if not elementCache:contains(element) then
 			table.insert(uniqueElements, element)
-			elementCache[element] = true
+			elementCache:add(element)
 		end
 	end
 	return uniqueElements
@@ -738,8 +759,10 @@ Parses a comma-separated string into an array.
 An empty string input returns an empty array.
 
 Example:
+```
 Array.parseCommaSeparatedString('a, b, c, d')
 -- Returns {'a', 'b', 'c', 'd'}
+```
 ]]
 ---@param inputString string?
 ---@param sep string?
@@ -752,7 +775,9 @@ function Array.parseCommaSeparatedString(inputString, sep)
 end
 
 ---Interleaves an array with elements
+---```
 ---Array.interleave({4, 5, 4, 3}, 1) -- {4, 1, 5, 1, 4, 1, 3}
+---```
 ---@generic V, T
 ---@param elements V[]
 ---@param x T

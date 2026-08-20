@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Squad/Auto
+-- page=Module:Features/Squad/Auto
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -26,8 +26,8 @@ local Tabs = Lua.import('Module:Tabs')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TransferRefs = Lua.import('Module:Transfer/References')
 
-local SquadUtils = Lua.import('Module:Squad/Utils')
-local SquadCustom = Lua.import('Module:Squad/Custom')
+local SquadTypes = Lua.import('Module:Features/Squad/Types')
+local SquadCustom = Lua.import('Module:Features/Squad/Custom')
 
 local BooleanOperator = Condition.BooleanOperator
 local Comparator = Condition.Comparator
@@ -96,9 +96,9 @@ function SquadAuto.run(frame)
 		local OldSquadAuto = Lua.import('Module:SquadAuto')
 		local args = Arguments.getArgs(frame)
 
-		local type = SquadUtils.TypeToSquadType[(args.type or ''):lower()]
+		local type = SquadTypes.TypeToSquadType[(args.type or ''):lower()]
 		-- Old module needs special type argument
-		if type == SquadUtils.SquadType.STAFF then
+		if type == SquadTypes.SquadType.STAFF then
 			args.type = 'Organization_' .. args.status
 		else
 			args.type = 'Player_' .. args.status
@@ -125,8 +125,8 @@ end
 ---@private
 function SquadAuto:_parseConfig()
 	local args = self.args
-	local type = SquadUtils.TypeToSquadType[(args.type or ''):lower()]
-	local status = SquadUtils.StatusToSquadStatus[(args.status or ''):lower()]
+	local type = SquadTypes.TypeToSquadType[(args.type or ''):lower()]
+	local status = SquadTypes.StatusToSquadStatus[(args.status or ''):lower()]
 	self.config = {
 		team = args.team or mw.title.getCurrentTitle().text,
 		type = type,
@@ -137,8 +137,8 @@ function SquadAuto:_parseConfig()
 	self.manualPlayers, self.enrichmentInfo = self:_readManualRowInput()
 
 	-- Override default 'Former Squad' title
-	if status == SquadUtils.SquadStatus.FORMER
-			and type == SquadUtils.SquadType.PLAYER
+	if status == SquadTypes.SquadStatus.FORMER
+			and type == SquadTypes.SquadType.PLAYER
 			and not self.config.title then
 		self.config.title = 'Former Players'
 	end
@@ -152,17 +152,17 @@ function SquadAuto:_parseConfig()
 end
 
 ---@param entries SquadAutoPerson[]
----@return Widget|Html|string?
+---@return Renderable?
 function SquadAuto:display(entries)
 	if Logic.isEmpty(entries) then
 		return
 	end
 
-	if self:_isStatus(SquadUtils.SquadStatus.FORMER) or self:_isStatus(SquadUtils.SquadStatus.FORMER_INACTIVE) then
+	if self:_isStatus(SquadTypes.SquadStatus.FORMER) or self:_isStatus(SquadTypes.SquadStatus.FORMER_INACTIVE) then
 		return self:displayTabs(entries)
 	end
 
-	local useRankSort = self:_isStatus(SquadUtils.SquadStatus.ACTIVE)
+	local useRankSort = self:_isStatus(SquadTypes.SquadStatus.ACTIVE)
 	entries = SquadAuto._sortEntries(entries, useRankSort)
 
 	return SquadCustom.runAuto(entries, self.config.status, self.config.type, self.config.title)
@@ -170,7 +170,7 @@ end
 
 ---@private
 ---@param entries SquadAutoPerson[]
----@return Widget|Html|string?
+---@return Renderable?
 function SquadAuto:displayTabs(entries)
 	local _, groupedEntries = Array.groupBy(
 		entries,
@@ -191,7 +191,7 @@ function SquadAuto:displayTabs(entries)
 		)
 	end
 
-	---@type table<string, integer|boolean|Widget>
+	---@type table<string, integer|boolean|Renderable>
 	local tabs = {
 		This = tabCount,
 		removeEmptyTabs = true
@@ -475,7 +475,7 @@ function SquadAuto:_selectEntries()
 		---@param entry SquadAutoPerson
 		---@return boolean
 		function(entry)
-			if self:_isStatus(SquadUtils.SquadStatus.INACTIVE) then
+			if self:_isStatus(SquadTypes.SquadStatus.INACTIVE) then
 				-- For SquadStatus.INACTIVE the entries are already preselected
 				-- and won't have the role set to Inactive.
 				-- This also matches manual Squad, where status is inactive and role can e.g. be "On Loan"
@@ -504,7 +504,7 @@ end
 ---@return SquadAutoPerson[]
 function SquadAuto:_selectHistoryEntries(entries)
 	-- Select entries to match status
-	if self:_isStatus(SquadUtils.SquadStatus.ACTIVE) then
+	if self:_isStatus(SquadTypes.SquadStatus.ACTIVE) then
 		-- Only most recent transfer is relevant
 		local last = entries[#entries]
 		if (last.type == SquadAuto.TransferType.CHANGE or last.type == SquadAuto.TransferType.JOIN)
@@ -514,14 +514,14 @@ function SquadAuto:_selectHistoryEntries(entries)
 		end
 	end
 
-	if self:_isStatus(SquadUtils.SquadStatus.INACTIVE) then
+	if self:_isStatus(SquadTypes.SquadStatus.INACTIVE) then
 		local last, secondToLast = entries[#entries], entries[#entries - 1]
 		if secondToLast and last.type == SquadAuto.TransferType.CHANGE and last.toRole == ROLE_INACTIVE then
 			return {self:_mapToSquadPerson(secondToLast, last)}
 		end
 	end
 
-	if self:_isStatus(SquadUtils.SquadStatus.FORMER) or self:_isStatus(SquadUtils.SquadStatus.FORMER_INACTIVE) then
+	if self:_isStatus(SquadTypes.SquadStatus.FORMER) or self:_isStatus(SquadTypes.SquadStatus.FORMER_INACTIVE) then
 		local history = {}
 
 		local joinEntry, inactiveEntry
@@ -546,7 +546,7 @@ function SquadAuto:_selectHistoryEntries(entries)
 
 			if entry.type == SquadAuto.TransferType.CHANGE and entry.toRole == ROLE_INACTIVE then
 				-- FORMER_INACTIVE enables the Inactive Date display
-				self.config.status = SquadUtils.SquadStatus.FORMER_INACTIVE
+				self.config.status = SquadTypes.SquadStatus.FORMER_INACTIVE
 				inactiveEntry = entry
 				return
 			end
@@ -657,7 +657,7 @@ end
 function SquadAuto._fetchNextTeam(pagename, date)
 	local conditions = Condition.Tree(BooleanOperator.all)
 		:add{
-			Condition.Util.anyOf(Condition.ColumnName('player'), {pagename, string.gsub(pagename, ' ', '_')}),
+			Condition.Util.anyOf(Condition.ColumnName('player'), {pagename, (string.gsub(pagename, ' ', '_'))}),
 			Condition.Node(Condition.ColumnName('date'), Comparator.ge, date),
 			Condition.Node(Condition.ColumnName('toteamtemplate'), Comparator.neq, ''),
 		}
@@ -693,7 +693,7 @@ end
 ---Whether the current table is for staff
 ---@return boolean
 function SquadAuto:_isStaffTable()
-	return self.config.type == SquadUtils.SquadType.STAFF
+	return self.config.type == SquadTypes.SquadType.STAFF
 end
 
 ---Whether the current table is for a specific status

@@ -20,7 +20,7 @@ local Html = Lua.import('Module:Widget/Html')
 ---@return VNode
 local function SmashBracketScoreContainer(props)
 	local opponent = props.opponent
-	if opponent.placement2 or opponent.type ~= Opponent.solo then
+	if opponent.score2 or opponent.placement2 or opponent.type ~= Opponent.solo then
 		return BracketScoreContainer(props)
 	end
 

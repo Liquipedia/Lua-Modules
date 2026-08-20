@@ -720,7 +720,7 @@ function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 end
 
 ---@param args table
----@return table
+---@return standardOpponent
 function MatchGroupUtil.createOpponent(args)
 	return {
 		extradata = args.extradata or {},

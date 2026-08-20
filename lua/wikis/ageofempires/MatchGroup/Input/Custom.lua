@@ -181,7 +181,7 @@ end
 
 ---@param match table
 ---@param opponents table[]
----@return string?
+---@return string?, string?
 function MatchFunctions.getHeadToHeadLink(match, opponents)
 	if opponents[1].type ~= Opponent.solo or opponents[2].type ~= Opponent.solo then
 		return
@@ -199,7 +199,14 @@ function MatchFunctions.getHeadToHeadLink(match, opponents)
 
 	return tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
 		'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' ..player1 ..
-		'&Head_to_head_query%5Bopponent%5D=' .. player2 .. '&wpRunQuery=Run+query'
+		'&Head_to_head_query%5Bopponent%5D=' .. player2 .. '&wpRunQuery=Run+query',
+		tostring(mw.uri.fullUrl(
+			'Special:RunQuery/H2H',
+			{
+				['player'] = player1,
+				['opponent'] = player2,
+			}
+		))
 end
 
 ---@param map table

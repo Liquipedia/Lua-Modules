@@ -68,7 +68,10 @@ function CharacterStatsTable:_buildHeaderRow()
 				return Html.Th{attributes = {colspan = 4}, children = String.upperCaseFirst(side)}
 			end),
 			self.props.includeBans and {
-				Html.Th{attributes = {colspan = 2}, children = 'Bans'},
+				Html.Th{
+					attributes = {colspan = self.props.includeGlobalBans and 4 or 2},
+					children = 'Bans'
+				},
 				Html.Th{
 					attributes = {colspan = 2},
 					css = {['white-space'] = 'nowrap'},
@@ -89,7 +92,7 @@ function CharacterStatsTable:_buildHeaderRow()
 			Html.Th{children = 'L'},
 			Html.Th{children = 'WR'},
 			Html.Th{children = '%T'},
-			Array.flatMap(Array.range(1, 2), function (_)
+			Array.flatMap(self.props.sides, function (_)
 				return {
 					Html.Th{children = '∑'},
 					Html.Th{children = 'W'},
@@ -97,12 +100,19 @@ function CharacterStatsTable:_buildHeaderRow()
 					Html.Th{children = 'WR'},
 				}
 			end),
-			self.props.includeBans and {
+			self.props.includeBans and WidgetUtil.collect(
+				self.props.includeGlobalBans and {
+					Html.Th{children = '∑'},
+					Html.Th{children = Html.Abbr{title = 'Ban', children = 'B'}},
+					Html.Th{children = Html.Abbr{title = 'Global Ban', children = 'GB'}},
+					Html.Th{children = '%T'},
+				} or {
+					Html.Th{children = '∑'},
+					Html.Th{children = '%T'},
+				},
 				Html.Th{children = '∑'},
-				Html.Th{children = '%T'},
-				Html.Th{children = '∑'},
-				Html.Th{children = '%T'},
-			} or nil
+				Html.Th{children = '%T'}
+			) or nil
 		)}
 	}
 end
@@ -147,14 +157,23 @@ function CharacterStatsTable:_buildCharacterRow(characterData, characterIndex)
 					Html.Td{children = CharacterStatsTable._calculatePercentage(characterData.side[side].win, picks)}
 				}
 			end),
-			self.props.includeBans and {
-				Html.Td{children = characterData.bans},
-				Html.Td{children = CharacterStatsTable._calculatePercentage(characterData.bans, self.props.numGames)},
-				Html.Td{children = characterData.total.pick + characterData.bans},
+			self.props.includeBans and WidgetUtil.collect(
+				self.props.includeGlobalBans and {
+					Html.Td{children = characterData.bans + characterData.globalBans},
+					Html.Td{children = characterData.bans},
+					Html.Td{children = characterData.globalBans},
+					Html.Td{children = CharacterStatsTable._calculatePercentage(
+						characterData.bans + characterData.globalBans, self.props.numGames
+					)},
+				} or {
+					Html.Td{children = characterData.bans},
+					Html.Td{children = CharacterStatsTable._calculatePercentage(characterData.bans, self.props.numGames)},
+				},
+				Html.Td{children = characterData.total.pick + characterData.bans + characterData.globalBans},
 				Html.Td{children = CharacterStatsTable._calculatePercentage(
 					characterData.total.pick + characterData.bans, self.props.numGames
 				)}
-			} or nil,
+			) or nil,
 			Html.Td{children = Dialog{
 				trigger = Button{
 					children = 'Show',
@@ -304,7 +323,7 @@ function CharacterStatsTable:_buildFooterRow()
 			end),
 			Html.Th{
 				classes = {'sortbottom'},
-				attributes = {colspan = 5}
+				attributes = {colspan = self.props.includeBans and (self.props.includeGlobalBans and 7 or 5) or 1}
 			}
 		)},
 		self.props.statspage ~= mw.title.getCurrentTitle().prefixedText and Html.Tr{
