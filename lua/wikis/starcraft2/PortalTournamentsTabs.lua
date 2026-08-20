@@ -48,7 +48,7 @@ function PortalTournamentsTabs.run()
 		tabArgs['name' .. tabCounter] = QueryLink{
 			legacyForm = 'Portal Tournaments',
 			form = 'Portal Tournaments/LH',
-			display = Tier.toName(tier),
+			display = Tier.toName(tier) --[[@as string]],
 			template = 'TournamentsList',
 			queryArgs = {
 				tier = tier,
