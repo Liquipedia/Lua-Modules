@@ -797,7 +797,11 @@ end
 ---@return string[]
 ---@nodiscard
 function Array.parseMultiSelect(inputString, sep)
-	local parsed = Json.parseIfTable(inputString) or Array.parseCommaSeparatedString(inputString, sep)
+	local parsed = Json.parseIfTable(inputString)
+
+	if not parsed then
+		return Array.parseCommaSeparatedString(inputString, sep)
+	end
 
 	-- validate it actually is an array
 	assert(Array.isArray(parsed), '"inputString" could not be parsed to an array')
