@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local DisplayUtil = Lua.import('Module:DisplayUtil')
 local Logic = Lua.import('Module:Logic')
-local Math = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
 local TypeUtil = Lua.import('Module:TypeUtil')
 
@@ -42,14 +41,14 @@ OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'br
 
 ---Displays an opponent as an inline element. Useful for describing opponents in prose.
 ---@param props InlineOpponentProps
----@return Html
+---@return VNode
 function OpponentDisplay.InlineOpponent(props)
 	local opponent = props.opponent
 
 	local opponentNode
 	if opponent.type == Opponent.team then
 		if props.showTbd == false and Opponent.isTbd(opponent) then
-			return mw.html.create()
+			return Html.Fragment{}
 		end
 		opponentNode = OpponentDisplay.InlineTeamContainer{
 			flip = props.flip,
@@ -64,26 +63,31 @@ function OpponentDisplay.InlineOpponent(props)
 		error('Unrecognized opponent.type ' .. opponent.type)
 	end
 
-	return mw.html.create()
-		:node(opponentNode)
-		:node(props.note and mw.html.create('sup'):addClass('note'):wikitext(props.note) or nil)
+	return Html.Fragment{children = {
+		opponentNode,
+		props.note and Html.Sup{
+			classes = {'note'},
+			children = props.note,
+		} or nil,
+	}}
 end
 
 ---@param props InlineOpponentProps
----@return Html
+---@return VNode
 function OpponentDisplay.InlinePlayers(props)
 	local opponent = props.opponent
 
-	local playerTexts = Array.map(opponent.players, function(player)
-		return tostring(PlayerDisplay.InlinePlayer(Table.merge(props, {player = player})))
+	local playerNodes = Array.map(opponent.players, function(player)
+		return PlayerDisplay.InlinePlayer(Table.merge(props, {player = player}))
 	end)
 
 	if props.flip then
-		playerTexts = Array.reverse(playerTexts)
+		playerNodes = Array.reverse(playerNodes)
 	end
 
-	return mw.html.create('span')
-		:node(table.concat(playerTexts, ' / '))
+	return Html.Span{
+		children = Array.interleave(playerNodes, ' / ')
+	}
 end
 
 ---@class BlockOpponentProps
@@ -245,34 +249,14 @@ end
 ---@param opponent standardOpponent
 ---@return string
 function OpponentDisplay.InlineScore(opponent)
-	if opponent.status == 'S' then
-		if opponent.score == 0 and Opponent.isTbd(opponent) then
-			return ''
-		elseif opponent.score == -1 then
-			return ''
-		elseif opponent.scoreDisplay ~= nil then
-			return tostring(Math.round(opponent.scoreDisplay, 2))
-		else
-			return tostring(Math.round(opponent.score, 2))
-		end
-	else
-		return opponent.status or ''
-	end
+	return Opponent.getScoreValue(opponent)
 end
 
 ---Displays the second score or status of the opponent, as a string.
 ---@param opponent standardOpponent
 ---@return string
 function OpponentDisplay.InlineScore2(opponent)
-	if opponent.status2 == 'S' then
-		if opponent.score2 == 0 and Opponent.isTbd(opponent) then
-			return ''
-		else
-			return opponent.score2 ~= -1 and tostring(opponent.score2) or ''
-		end
-	else
-		return opponent.status2 or ''
-	end
+	return Opponent.getScoreValue(opponent, '2')
 end
 
 return OpponentDisplay

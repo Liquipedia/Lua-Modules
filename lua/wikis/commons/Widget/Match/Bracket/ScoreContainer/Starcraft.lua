@@ -21,7 +21,7 @@ local function StarcraftBracketScoreContainer(props)
 			isWinner = opponent.placement == 1 or opponent.advances,
 			scoreText = OpponentDisplay.InlineScore(opponent),
 		},
-		opponent.placement2 and BracketScoreDisplay{
+		(opponent.score2 or opponent.placement2) and BracketScoreDisplay{
 			isWinner = opponent.placement2 == 1,
 			scoreText = OpponentDisplay.InlineScore2(opponent),
 		} or nil,

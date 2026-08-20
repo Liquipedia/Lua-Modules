@@ -17,8 +17,8 @@ local Tournament = Lua.import('Module:Tournament')
 local TournamentsTickerData = {}
 
 ---@class TournamentsTickerDataProps
----@field upcomingDays number
----@field completedDays number
+---@field upcomingDays number?
+---@field completedDays number?
 ---@field modifierTier1 number?
 ---@field modifierTier2 number?
 ---@field modifierTier3 number?

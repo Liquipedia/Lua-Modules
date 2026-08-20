@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
 local Image = Lua.import('Module:Image')
 local Logic = Lua.import('Module:Logic')
@@ -31,144 +30,18 @@ local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {load
 local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 
 ---@class CustomMatchSummaryInterface
----@field createHeader? fun(match: MatchGroupUtilMatch, options: {teamStyle: teamStyle?}?): Renderable
 ---@field createBody? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 ---@field createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
----@field addToFooter? fun(match: MatchGroupUtilMatch, footer: MatchSummaryFooter): MatchSummaryFooter
----@field createMatch? fun(matchData: MatchGroupUtilMatch): MatchSummaryMatch
-
----@class MatchSummaryFooter: BaseClass
----@operator call: MatchSummaryFooter
----@field elements Renderable[]
-local Footer = Class.new(
-	function(self)
-		self.elements = {}
-	end
-)
-
----@param element Renderable|nil
----@return self
-function Footer:addElement(element)
-	table.insert(self.elements, element)
-	return self
-end
-
----@param link string
----@param icon string
----@param iconDark string?
----@param text string
----@return MatchSummaryFooter
-function Footer:addLink(link, icon, iconDark, text)
-	table.insert(self.elements, Image.display(icon, iconDark, {
-		link = link, size = '32px', caption = text, alt = link
-	}))
-	return self
-end
-
----@param links table<string, string|table>
----@return self
-function Footer:addLinks(links)
-	local processLink = function(linkType, link)
-		local currentLinkData = Links.getMatchIconData(linkType)
-		if not currentLinkData then
-			mw.log('Unknown link: ' .. linkType)
-		elseif type(link) == 'table' then
-			for gameIdx, gameLink in Table.iter.spairs(link) do
-				local newText = currentLinkData.text .. ' on Game ' .. gameIdx
-				self:addLink(gameLink, currentLinkData.icon, currentLinkData.iconDark, newText)
-			end
-		else
-			self:addLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text)
-		end
-	end
-
-	local processedLinks = {}
-	Array.forEach(MATCH_LINK_PRIORITY, function(linkType)
-		for linkKey, link in Table.iter.pairsByPrefix(links, linkType, {requireIndex = false}) do
-			processLink(linkKey, link)
-			processedLinks[linkKey] = true
-		end
-	end)
-
-	for linkKey, link in Table.iter.spairs(links) do
-		-- Handle links not already processed via priority list
-		if not processedLinks[linkKey] then
-			processLink(linkKey, link)
-		end
-	end
-
-	return self
-end
-
----@return VNode
-function Footer:create()
-	return MatchSummaryWidgets.Footer{children = self.elements}
-end
-
----@class MatchSummaryMatch: BaseClass
----@operator call: MatchSummaryMatch
----@field headerElement Renderable?
----@field bodyElement Renderable|Renderable[]?
----@field commentElement Renderable|Renderable[]?
----@field footerElement VNode?
----@field buttonElement Renderable?
-local Match = Class.new()
-
----@param header Renderable
----@return self
-function Match:header(header)
-	self.headerElement = header
-	return self
-end
-
----@param body Renderable|Renderable[]
----@return self
-function Match:body(body)
-	self.bodyElement = body
-	return self
-end
-
----@param comment Renderable
----@return self
-function Match:comment(comment)
-	self.commentElement = comment
-	return self
-end
-
----@param footer MatchSummaryFooter
----@return self
-function Match:footer(footer)
-	self.footerElement = footer:create()
-	return self
-end
-
----@param button Renderable
----@return self
-function Match:button(button)
-	self.buttonElement = button
-	return self
-end
-
----@return VNode
-function Match:create()
-	return Html.Fragment{children = WidgetUtil.collect(
-		self.headerElement,
-		MatchSummaryWidgets.Body{children = WidgetUtil.collect(self.bodyElement, self.commentElement, self.footerElement)},
-		self.buttonElement
-	)}
-end
+---@field createFooter? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 
 ---@class MatchSummary
-local MatchSummary = {
-	Footer = Footer,
-	Match = Match,
-}
+local MatchSummary = {}
 
 ---Default header function
 ---@param match MatchGroupUtilMatch
 ---@param options {teamStyle: teamStyle?}?
 ---@return VNode
-function MatchSummary.createDefaultHeader(match, options)
+function MatchSummary.createHeader(match, options)
 	options = options or {}
 
 	return Html.Fragment{
@@ -197,76 +70,134 @@ function MatchSummary.createDefaultBody(match, createGame)
 end
 
 ---Default footer function
----@param match table
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function MatchSummary.createDefaultFooter(match, footer)
-	return MatchSummary.addVodsToFooter(match, footer):addLinks(match.links)
+---@param match MatchGroupUtilMatch
+---@return Renderable
+function MatchSummary.createDefaultFooter(match)
+	return MatchSummaryWidgets.Footer{children = WidgetUtil.collect(
+		MatchSummary.makeVodDisplay(match.vod, match.games),
+		MatchSummary.makeLinksDisplay(match.links)
+	)}
 end
 
----Creates a match footer with vods if vods are set
----@param match table
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function MatchSummary.addVodsToFooter(match, footer)
-	if match.vod then
-		footer:addElement(VodLink.display{
-			vod = match.vod,
+---@param matchVod string?
+---@param games MatchGroupUtilGame[]
+---@return Renderable[]
+function MatchSummary.makeVodDisplay(matchVod, games)
+	local vods = {}
+	if matchVod then
+		table.insert(vods, VodLink.display{
+			vod = matchVod,
 		})
 	end
 
-	Array.forEach(match.games, function(game, gameIndex)
+	Array.forEach(games, function(game, gameIndex)
 		if not game.vod then
 			return
 		end
-		footer:addElement(VodLink.display{
+		table.insert(vods, VodLink.display{
 			gamenum = gameIndex,
 			vod = game.vod,
 		})
 	end)
 
-	return footer
+	return vods
+end
+
+---@param link string
+---@param icon string
+---@param iconDark string?
+---@param text string
+---@param class string?
+---@return string?
+function MatchSummary.makeLinkDisplay(link, icon, iconDark, text, class)
+	return Image.display(icon, iconDark, {
+		link = link, size = '32px', caption = text, alt = link, class = class
+	})
+end
+
+---@param links table<string, string|table>
+---@return Renderable[]
+function MatchSummary.makeLinksDisplay(links)
+	local linkDisplays = {}
+
+	local makeAndSaveLink = function(link, icon, iconDark, text, class)
+		local display = MatchSummary.makeLinkDisplay(link, icon, iconDark, text, class)
+		table.insert(linkDisplays, display)
+	end
+
+	local processLink = function(linkType, link)
+		local currentLinkData = Links.getMatchIconData(linkType)
+		if not currentLinkData then
+			mw.log('Unknown link: ' .. linkType)
+		elseif type(link) == 'table' then
+			for gameIdx, gameLink in Table.iter.spairs(link) do
+				local newText = currentLinkData.text .. ' on Game ' .. gameIdx
+				makeAndSaveLink(gameLink, currentLinkData.icon, currentLinkData.iconDark, newText)
+			end
+		else
+			-- Temporary during MW/LH Migrations
+			local class
+			if linkType == 'headtohead_lh' then
+				class = 'hide-when-mediawiki'
+			elseif linkType == 'headtohead' then
+				class = 'hide-when-lighthouse'
+			end
+			makeAndSaveLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text, class)
+		end
+	end
+
+	local processedLinks = {}
+	Array.forEach(MATCH_LINK_PRIORITY, function(linkType)
+		for linkKey, link in Table.iter.pairsByPrefix(links, linkType, {requireIndex = false}) do
+			processLink(linkKey, link)
+			processedLinks[linkKey] = true
+		end
+	end)
+
+	for linkKey, link in Table.iter.spairs(links) do
+		-- Handle links not already processed via priority list
+		if not processedLinks[linkKey] then
+			processLink(linkKey, link)
+		end
+	end
+
+	return linkDisplays
 end
 
 ---Default createMatch function for usage in Custom MatchSummary
 ---@param matchData MatchGroupUtilMatch?
 ---@param CustomMatchSummary CustomMatchSummaryInterface
 ---@param options {teamStyle: teamStyle?, noScore: boolean?}?
----@return MatchSummaryMatch?
+---@return VNode?
 function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	if not matchData then
 		return
 	end
 
-	local match = Match()
-
-	local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
-	match:header(createHeader(matchData, options))
-
 	local createBody = CustomMatchSummary.createBody or MatchSummary.createDefaultBody
-	match:body(createBody(matchData, CustomMatchSummary.createGame))
+	local createFooter = CustomMatchSummary.createFooter or MatchSummary.createDefaultFooter
 
-	local substituteComment = DisplayHelper.createSubstitutesComment(matchData)
-
-	match:comment(Html.Fragment{
-		children = {
-			MatchSummaryWidgets.Casters{casters = matchData.extradata.casters},
-			MatchSummaryWidgets.MatchComment{
-				children = WidgetUtil.collect(
-					matchData.comment,
-					substituteComment
-				)
-			}
-		}
-	})
-
-	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.createDefaultFooter
-	match:footer(createFooter(matchData, MatchSummary.Footer()))
-
-	--- Vods are currently part of the footer, so we don't need them here
-	match:button(MatchButtonBar{match = matchData, showVods = false, variant = 'primary'})
-
-	return match
+	return Html.Fragment{children = WidgetUtil.collect(
+		MatchSummary.createHeader(matchData, options),
+		MatchSummaryWidgets.Body{
+			children = WidgetUtil.collect(
+				createBody(matchData, CustomMatchSummary.createGame),
+				Html.Fragment{
+					children = {
+						MatchSummaryWidgets.Casters{casters = matchData.extradata.casters},
+						MatchSummaryWidgets.MatchComment{
+							children = WidgetUtil.collect(
+								matchData.comment,
+								DisplayHelper.createSubstitutesComment(matchData)
+							)
+						}
+					}
+				},
+				createFooter(matchData)
+			)
+		},
+		MatchButtonBar{match = matchData, showVods = false, variant = 'primary'} -- Vods are in the footer currently
+	)}
 end
 
 ---Default getByMatchId function for usage in Custom MatchSummary
@@ -296,7 +227,7 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	return MatchSummaryWidgets.Container{
 		classes = args.classes,
 		width = width,
-		createMatch = CustomMatchSummary.createMatch or function(matchData)
+		createMatch = function(matchData)
 			return MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 		end,
 		match = match,

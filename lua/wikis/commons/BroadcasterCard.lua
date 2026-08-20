@@ -27,6 +27,7 @@ local Weight = Lua.requireIfExists('Module:BroadCasterWeight')
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local ListWidgets = Lua.import('Module:Widget/List')
+local ReferenceTag = Lua.import('Module:Widget/ReferenceTag')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local TBD = 'TBD'
@@ -132,7 +133,13 @@ function BroadcasterCard.create(frame)
 
 	return ListWidgets.Unordered{children = {WidgetUtil.collect(
 		Html.B{children = title},
-		String.isNotEmpty(args.ref) and (' ' .. frame:extensionTag('ref', args.ref)) or nil,
+		String.isNotEmpty(args.ref) and {
+			' ',
+			ReferenceTag{
+				frame = frame,
+				children = args.ref,
+			}
+		} or nil,
 		ListWidgets.Unordered{
 			children = BroadcasterCard._displayCasters(casters, config)
 		}

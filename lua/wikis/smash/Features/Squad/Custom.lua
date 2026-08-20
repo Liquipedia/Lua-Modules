@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Squad/Custom
+-- page=Module:Features/Squad/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Context = Lua.import('Module:Widget/ComponentContext')
 local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
-local SquadController = Lua.import('Module:Squad/Controller')
+local SquadController = Lua.import('Module:Features/Squad/Controller')
 
 local CustomSquad = {}
 
