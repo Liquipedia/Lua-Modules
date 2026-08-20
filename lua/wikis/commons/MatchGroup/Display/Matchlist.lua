@@ -39,7 +39,7 @@ local MatchlistDisplay = {propTypes = {}, types = {}}
 ---@field width number?
 
 ---@class MatchlistDisplayMatchProps
----@field MatchSummaryContainer? fun(props: table): Renderable
+---@field MatchSummaryContainer fun(props: table): Renderable
 ---@field Opponent Component<MatchListOpponentProps>
 ---@field Score Component<MatchListScoreProps>
 ---@field match MatchGroupUtilMatch
