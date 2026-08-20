@@ -13,7 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local Tabs = Lua.import('Module:Tabs')
 local Tier = Lua.import('Module:Tier/Custom')
 
-local Link = Lua.import('Module:Widget/Basic/Link')
+local QueryLink = Lua.import('Module:Widget/QueryLink')
 
 local NOW = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() + DateExt.daysToSeconds(1))
 local PAST = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() - DateExt.daysToSeconds(183))
@@ -45,21 +45,20 @@ function PortalTournamentsTabs.run()
 
 		local isNotMisc = (tonumber(tier) ~= -1)
 
-		tabArgs['name' .. tabCounter] = Link{
-			linktype = 'external',
-			children = Tier.toName(tier),
-			link = tostring(mw.uri.fullUrl(
-				'Special:RunQuery/Portal Tournaments',
-				{
-					['TournamentsList[tier]'] = tier,
-					['TournamentsList[game]'] = 'lotv',
-					['TournamentsList[noLis]'] = 'true',
-					['TournamentsList[excludeTiertype1]'] = isNotMisc and 'Qualifier' or nil,
-					['TournamentsList[excludeTiertype2]'] = isNotMisc and 'Charity' or nil,
-					['TournamentsList[enddate]'] = NOW,
-					['TournamentsList[startdate]'] = isNotMisc and PAST or nil,
-				}
-			)) .. '&_run'
+		tabArgs['name' .. tabCounter] = QueryLink{
+			legacyForm = 'Portal Tournaments',
+			form = 'Portal Tournaments/LH',
+			display = Tier.toName(tier),
+			template = 'TournamentsList',
+			queryArgs = {
+				tier = tier,
+				game = 'lotv',
+				noLis = 'true',
+				excludeTiertype1 = isNotMisc and 'Qualifier' or nil,
+				excludeTiertype2 = isNotMisc and 'Charity' or nil,
+				enddate = NOW,
+				startdate = isNotMisc and PAST or nil,
+			},
 		}
 	end)
 
