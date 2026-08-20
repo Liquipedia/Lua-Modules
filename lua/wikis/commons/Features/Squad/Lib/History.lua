@@ -237,6 +237,9 @@ function SquadHistory.selectStints(entries, squadStatus)
 	if squadStatus == SquadTypes.SquadStatus.ACTIVE then
 		-- Only most recent transfer is relevant
 		local last = entries[#entries]
+		if not last then
+ 			return nothing
+ 		end
 		if (last.type == TransferType.CHANGE or last.type == TransferType.JOIN)
 				and last.toRole ~= ROLE_INACTIVE then
 			-- When the last transfer is a leave transfer, or the role is inactive, the person wouldn't be active

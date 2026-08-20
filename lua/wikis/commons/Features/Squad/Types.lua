@@ -42,11 +42,11 @@
 ---@field displayname string
 ---@field flag string
 ---@field date string
----@field dateDisplay string
+---@field dateDisplay string?
 ---@field type TransferType
 ---@field references table<string, string>
 ---@field wholeTeam boolean
----@field position string
+---@field position string?
 ---@field fromTeam string?
 ---@field fromRole string?
 ---@field toTeam string?

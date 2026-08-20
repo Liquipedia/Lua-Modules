@@ -56,8 +56,8 @@ function SquadTransferHistory.forTeam(team, teams)
 
 	---@type table<string, TeamHistoryEntry[]>
 	local cached = Json.parseIfTable(pageVars:get(teamHistoryKey)) or {}
-	if Logic.isNotEmpty(cached) then
-		return cached
+	if not cached then
+		return {}
 	end
 
 	local records = {}
@@ -88,7 +88,7 @@ end
 function SquadTransferHistory.fetchNextTeam(pagename, date)
 	local conditions = Condition.Tree(BooleanOperator.all)
 		:add{
-			Condition.Util.anyOf(Condition.ColumnName('player'), {pagename, string.gsub(pagename, ' ', '_')}),
+			Condition.Util.anyOf(Condition.ColumnName('player'), {pagename, (string.gsub(pagename, ' ', '_'))}),
 			Condition.Node(Condition.ColumnName('date'), Comparator.ge, date),
 			Condition.Node(Condition.ColumnName('toteamtemplate'), Comparator.neq, ''),
 		}

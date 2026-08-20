@@ -425,9 +425,8 @@ describe('Squad history', function()
 		end)
 
 		it('errors on an empty history for an active squad', function()
-			-- fromTransfers can produce an empty history for someone whose transfers were all skipped,
-			-- and the active branch reads the last entry without checking that there is one
-			assert.has_error(function() SquadHistory.selectStints({}, SquadStatus.ACTIVE) end)
+			-- fromTransfers can produce an empty history for someone whose transfers were all skipped
+			assert.are_same({}, SquadHistory.selectStints({}, SquadStatus.ACTIVE).stints)
 		end)
 	end)
 end)
