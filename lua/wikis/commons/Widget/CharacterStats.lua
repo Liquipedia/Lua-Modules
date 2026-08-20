@@ -68,7 +68,7 @@ local function CharacterStatsWidget(props)
 			props.includeBans and {
 				Helpers._displayUnbannedCharacters(props),
 				Helpers._displayUnpickedAndUnbannedCharacters(props),
-			}
+			} or nil
 		) or nil
 	)
 end
