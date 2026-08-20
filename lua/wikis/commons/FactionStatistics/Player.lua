@@ -161,7 +161,7 @@ function PlayerStatistics:_getMatchConditions()
 	local tiers = Array.map(Array.parseCommaSeparatedString(args.tiers), Tier.toIdentifier)
 	tiers = Logic.emptyOr(tiers, DEFAULT_TIERS) --[[@as integer[] ]]
 
-	local tierTypes = Array.parseCommaSeparatedString(args.tiers or '!Qualifier')
+	local tierTypes = Array.parseCommaSeparatedString(args.tierTypes or '!Qualifier')
 	tierTypes = Array.map(tierTypes, function(tierType)
 		return tierType == DEFAULT_TIER_TYPE and '' or tierType
 	end)
