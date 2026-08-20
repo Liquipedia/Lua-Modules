@@ -28,7 +28,7 @@ local function QueryLink(props)
 	-- legacy is only needed until lighthouse is fully ready
 	---@return Renderable
 	local makeLegacyQueryLink = function()
-		local form = assert(Logic.isNotEmpty(props.legacyForm), 'Missing legacyForm input when building query link')
+		local form = assert(Logic.nilIfEmpty(props.legacyForm), 'Missing legacyForm input when building query link')
 		local prefix = assert(Logic.nilIfEmpty(props.template), 'Missing template input when building query link')
 
 		local queryArgs = Table.map(props.queryArgs or {}, function(key, item)
@@ -52,7 +52,7 @@ local function QueryLink(props)
 
 	---@return Renderable
 	local makeLighthouseQueryLink = function()
-		local form = assert(Logic.isNotEmpty(props.form), 'Missing form input when building query link')
+		local form = assert(Logic.nilIfEmpty(props.form), 'Missing form input when building query link')
 
 		local link = tostring(mw.uri.fullUrl(
 			'Special:RunQuery/' .. form,
