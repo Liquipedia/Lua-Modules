@@ -424,7 +424,7 @@ describe('Squad history', function()
 			assert.are_same({}, SquadHistory.selectStints({}, SquadStatus.INACTIVE).stints)
 		end)
 
-		it('errors on an empty history for an active squad', function()
+		it('does not error on an empty history for an active squad', function()
 			-- fromTransfers can produce an empty history for someone whose transfers were all skipped
 			assert.are_same({}, SquadHistory.selectStints({}, SquadStatus.ACTIVE).stints)
 		end)

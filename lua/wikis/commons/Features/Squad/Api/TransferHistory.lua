@@ -54,10 +54,10 @@ end
 function SquadTransferHistory.forTeam(team, teams)
 	local teamHistoryKey = team .. '_all_transfers'
 
-	---@type table<string, TeamHistoryEntry[]>
-	local cached = Json.parseIfTable(pageVars:get(teamHistoryKey)) or {}
-	if not cached then
-		return {}
+	---@type table<string, TeamHistoryEntry[]>?
+	local cached = Json.parseIfTable(pageVars:get(teamHistoryKey))
+	if cached then
+		return cached
 	end
 
 	local records = {}
