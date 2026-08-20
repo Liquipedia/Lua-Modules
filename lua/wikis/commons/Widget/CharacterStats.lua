@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Character = Lua.import('Module:Character')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
@@ -22,12 +21,19 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local Widget = Lua.import('Module:Widget')
 local CharacterStatsTable = Lua.import('Module:Widget/CharacterStats/Table')
-local DataTable = Lua.import('Module:Widget/Basic/DataTable')
+local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
+
+local Helpers = {}
+
+---@class CharacterStatsData
+---@field name string
+---@field bans integer
+---@field total table<string, integer>
 
 ---@class CharacterStatsWidgetProps
 ---@field characterSize string
@@ -40,83 +46,87 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field sideWins table<string, integer>
 ---@field statspage string
 
----@class CharacterStatsWidget: Widget
----@operator call(CharacterStatsWidgetProps): CharacterStatsWidget
----@field props CharacterStatsWidgetProps
-local CharacterStatsWidget = Class.new(Widget)
-CharacterStatsWidget.defaultProps = {
+local defaultProps = {
 	characterSize = '25x25px',
 	includeGlobalBans = false,
 	numGames = 0,
 	statspage = mw.title.getCurrentTitle().prefixedText
 }
 
----@return Widget[]?
-function CharacterStatsWidget:render()
-	local data = self.props.data
+---@param props CharacterStatsWidgetProps
+---@return Renderable[]?
+local function CharacterStatsWidget(props)
+	local data = props.data
 	if Logic.isEmpty(data) then
 		return
 	end
-	local showExtraStats = self.props.statspage == mw.title.getCurrentTitle().prefixedText
+	local showExtraStats = props.statspage == mw.title.getCurrentTitle().prefixedText
 	return WidgetUtil.collect(
-		CharacterStatsTable(self.props),
+		CharacterStatsTable(props),
 		showExtraStats and WidgetUtil.collect(
-			self:_displayUnpickedCharacters(),
-			self.props.includeBans and {
-				self:_displayUnbannedCharacters(),
-				self:_displayUnpickedAndUnbannedCharacters(),
-			}
+			Helpers._displayUnpickedCharacters(props),
+			props.includeBans and {
+				Helpers._displayUnbannedCharacters(props),
+				Helpers._displayUnpickedAndUnbannedCharacters(props),
+			} or nil
 		) or nil
 	)
 end
 
 ---@private
----@return Widget?
-function CharacterStatsWidget:_displayUnpickedCharacters()
+---@param props CharacterStatsWidgetProps
+---@return Renderable?
+function Helpers._displayUnpickedCharacters(props)
 	---@type string[]
 	local playedCharacters = Array.map(
-		Array.filter(self.props.data, function (dataEntry)
+		Array.filter(props.data, function (dataEntry)
+			---@cast dataEntry CharacterStatsData
 			return dataEntry.total.pick > 0
 		end),
 		Operator.property('name')
 	)
 
-	return self:_buildUnchosenCharactersTable('Unpicked', playedCharacters)
+	return Helpers._buildUnchosenCharactersTable('Unpicked', playedCharacters, props)
 end
 
 ---@private
----@return Widget?
-function CharacterStatsWidget:_displayUnbannedCharacters()
+---@param props CharacterStatsWidgetProps
+---@return Renderable?
+function Helpers._displayUnbannedCharacters(props)
 	---@type string[]
 	local bannedCharacters = Array.map(
-		Array.filter(self.props.data, function (dataEntry)
+		Array.filter(props.data, function (dataEntry)
+			---@cast dataEntry CharacterStatsData
 			return dataEntry.bans > 0
 		end),
 		Operator.property('name')
 	)
 
-	return self:_buildUnchosenCharactersTable('Unbanned', bannedCharacters)
+	return Helpers._buildUnchosenCharactersTable('Unbanned', bannedCharacters, props)
 end
 
 ---@private
----@return Widget?
-function CharacterStatsWidget:_displayUnpickedAndUnbannedCharacters()
+---@param props CharacterStatsWidgetProps
+---@return Renderable?
+function Helpers._displayUnpickedAndUnbannedCharacters(props)
 	---@type string[]
 	local playedCharacters = Array.map(
-		Array.filter(self.props.data, function (dataEntry)
+		Array.filter(props.data, function (dataEntry)
+			---@cast dataEntry CharacterStatsData
 			return dataEntry.total.pick > 0 or dataEntry.bans > 0
 		end),
 		Operator.property('name')
 	)
 
-	return self:_buildUnchosenCharactersTable('Unpicked & Unbanned', playedCharacters)
+	return Helpers._buildUnchosenCharactersTable('Unpicked & Unbanned', playedCharacters, props)
 end
 
 ---@private
 ---@param titlePrefix string
 ---@param excludedCharacters string[]
----@return Widget?
-function CharacterStatsWidget:_buildUnchosenCharactersTable(titlePrefix, excludedCharacters)
+---@param props CharacterStatsWidgetProps
+---@return Renderable?
+function Helpers._buildUnchosenCharactersTable(titlePrefix, excludedCharacters, props)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('date'), Comparator.le, DateExt.getContextualDateOrNow()),
 		ConditionUtil.noneOf(ColumnName('name'), excludedCharacters)
@@ -127,23 +137,34 @@ function CharacterStatsWidget:_buildUnchosenCharactersTable(titlePrefix, exclude
 	if Logic.isEmpty(characters) then
 		return
 	end
-	return DataTable{
-		children = {
-			Html.Tr{children = Html.Th{
-				children = {titlePrefix .. ' ' .. self.props.characterType, ' ', Html.I{children = {'(', #characters, ')'}}
-			}}},
-			Html.Tr{children = Html.Td{
-				children = Array.map(characters, function (character)
-					return IconImage{
-						imageLight = character.iconLight,
-						imageDark = character.iconDark,
-						link = character.pageName,
-						size = self.props.characterSize,
+	return TableWidgets.Table{
+		columns = {{}},
+		children = WidgetUtil.collect(
+			TableWidgets.TableHeader{
+				children = TableWidgets.Row{
+					children = TableWidgets.CellHeader{
+						align = 'center',
+						children = {titlePrefix .. ' ' .. props.characterType, ' ', Html.I{children = {'(', #characters, ')'}}}
 					}
-				end)
-			}}
-		}
+				}
+			},
+			TableWidgets.TableBody{
+				children = TableWidgets.Row{
+					children = TableWidgets.Cell{
+						css = {['white-space'] = 'normal'}, -- so it will wrap
+						children = Array.map(characters, function (character)
+							return IconImage{
+								imageLight = character.iconLight,
+								imageDark = character.iconDark,
+								link = character.pageName,
+								size = props.characterSize,
+							}
+						end)
+					}
+				}
+			}
+		)
 	}
 end
 
-return CharacterStatsWidget
+return Component.component(CharacterStatsWidget, defaultProps)
