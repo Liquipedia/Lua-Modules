@@ -9,15 +9,18 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Date = Lua.import('Module:Date/Ext')
-local DisplayUtil = Lua.import('Module:DisplayUtil')
 local FnUtil = Lua.import('Module:FnUtil')
-local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
+
+local Html = Lua.import('Module:Widget/Html')
+local Builder = Lua.import('Module:Widget/Builder')
+local ErrorBoundary = Lua.import('Module:Widget/ErrorBoundary')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 local HorizontallistDisplay = {propTypes = {}, types = {}}
 
@@ -28,21 +31,17 @@ local PHASE_ICONS = {
 }
 
 ---@class HorizontallistConfig
----@field MatchSummaryContainer function
-
----@class HorizontallistConfigOptions
+---@field MatchSummaryContainer fun(props: table): Renderable?
 
 ---@class HorizontallistProps
 ---@field bracketId string
----@field config HorizontallistConfigOptions?
+---@field config HorizontallistConfig?
 
----@class HorizontallistBracket
+---@class HorizontallistBracketProps: HorizontallistProps
 ---@field bracket MatchGroupUtilMatchGroup
----@field config HorizontallistConfigOptions?
----@field bracketId string
 
 ---@param args table
----@return HorizontallistConfigOptions
+---@return HorizontallistConfig
 function HorizontallistDisplay.configFromArgs(args)
 	return {}
 end
@@ -50,67 +49,82 @@ end
 ---Display component for a tournament bracket. The bracket is specified by ID.
 ---The component fetches the match data from LPDB or page variables.
 ---@param props HorizontallistProps
----@return Html
+---@return VNode
 function HorizontallistDisplay.BracketContainer(props)
-	return HorizontallistDisplay.Bracket({
+	return HorizontallistDisplay.Bracket{
 		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId),
 		bracketId = props.bracketId,
 		config = props.config,
-	})
+	}
 end
 
 ---Display component for a tournament bracket.
 ---Match data is specified in the input.
----@param props HorizontallistBracket
----@return Html
+---@param props HorizontallistBracketProps
+---@return VNode
 function HorizontallistDisplay.Bracket(props)
-	local config = {
-		MatchSummaryContainer = DisplayHelper.DefaultFfaMatchSummaryContainer,
-	}
-	local list = mw.html.create('ul'):addClass('navigation-tabs__list'):attr('role', 'tablist')
+	local config = setmetatable(
+		props.config or {},
+		{
+			__index = {MatchSummaryContainer = DisplayHelper.DefaultFfaMatchSummaryContainer}
+		}
+	)
 
 	local sortedBracket = HorizontallistDisplay._sortMatches(props.bracket)
 	local selectedMatchIdx = HorizontallistDisplay.findMatchClosestInTime(props.bracketId, sortedBracket)
 
-	for index, header in ipairs(HorizontallistDisplay.computeHeaders(sortedBracket)) do
-		local attachedMatch = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, sortedBracket[index][1])
-		local _, matchId = MatchGroupUtil.splitMatchId(attachedMatch.matchId)
-		---@cast matchId -nil
-		--- If it's a matchList, then matchId is valid as is (also is numeric), otherwise we need to convert it to a key
-		local matchKey = Logic.isNumeric(matchId) and matchId or MatchGroupUtil.matchIdToKey(matchId)
-		local nodeProps = {
-			header = header,
-			index = index,
-			status = MatchGroupUtil.computeMatchPhase(attachedMatch),
-			matchId = matchKey,
-		}
-		list:node(HorizontallistDisplay.NodeHeader(nodeProps))
-	end
-
-	local bracketNode = mw.html.create('div')
-			:addClass('navigation-tabs')
+	local bracketNode = Html.Div{
+		classes = {
+			'navigation-tabs',
 			-- Do not show the tabs if there is only one match
-			:addClass(#sortedBracket == 1 and 'is--hidden' or nil)
-			:attr('data-js-battle-royale', 'navigation')
-			:attr('role', 'tabpanel')
-			:node(list)
+			#sortedBracket == 1 and 'is--hidden' or nil,
+		},
+		attributes = {
+			['data-js-battle-royale'] = 'navigation',
+			role = 'tabpanel',
+		},
+		children = Html.Ul{
+			classes = {'navigation-tabs__list'},
+			attributes = {role = 'tablist'},
+			children = Array.map(HorizontallistDisplay.computeHeaders(sortedBracket), function (header, index)
+				local attachedMatch = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, sortedBracket[index][1])
+				local _, matchId = MatchGroupUtil.splitMatchId(attachedMatch.matchId)
+				---@cast matchId -nil
+				--- If it's a matchList, then matchId is valid as is (also is numeric), otherwise we need to convert it to a key
+				local matchKey = Logic.isNumeric(matchId) and matchId or MatchGroupUtil.matchIdToKey(matchId)
+				return HorizontallistDisplay.NodeHeader{
+					header = header,
+					index = index,
+					status = MatchGroupUtil.computeMatchPhase(attachedMatch),
+					matchId = matchKey,
+				}
+			end)
+		},
+	}
 
-	local matchNode = mw.html.create('div'):addClass('navigation-content-container')
-	for matchIndex, match in ipairs(sortedBracket) do
-		local matchProps = {
-			MatchSummaryContainer = config.MatchSummaryContainer,
-			matchId = match[1],
-			index = matchIndex,
+	local matchNode = Html.Div{
+		classes = {'navigation-content-container'},
+		children = Array.map(sortedBracket, function (match, matchIndex)
+			local matchProps = {
+				MatchSummaryContainer = config.MatchSummaryContainer,
+				matchId = match[1],
+				index = matchIndex,
+			}
+			return HorizontallistDisplay.Match(matchProps)
+		end)
+	}
+
+	 return Html.Div{
+		classes = {'brkts-br-wrapper', 'battle-royale'},
+		attributes = {
+			['data-js-battle-royale-id'] = props.bracketId,
+			['data-js-battle-royale-init-tab'] = selectedMatchIdx - 1, -- Convert to 0-index
+		},
+		children = {
+			bracketNode,
+			matchNode,
 		}
-		matchNode:node(HorizontallistDisplay.Match(matchProps))
-	end
-
-	return mw.html.create('div')
-			:addClass('brkts-br-wrapper battle-royale')
-			:attr('data-js-battle-royale-id', props.bracketId)
-			:attr('data-js-battle-royale-init-tab', selectedMatchIdx - 1) -- Convert to 0-index
-			:node(bracketNode)
-			:node(matchNode)
+	}
 end
 
 ---@param bracketId string
@@ -180,8 +194,8 @@ function HorizontallistDisplay.computeHeaders(sortedBracket)
 		Operator.property('inheritedHeader')
 	)
 
-	-- Suffix when there multiple matches with the same header, in order to make a distiction between them
-	headers = Array.map(headers, function(headerGroup)
+	-- Suffix when there multiple matches with the same header, in order to make a distinction between them
+	return Array.flatMap(headers, function(headerGroup)
 		if #headerGroup == 1 then
 			local header = headerGroup[1].inheritedHeader or 'Match'
 			return DisplayHelper.expandHeader(header)[1]
@@ -191,53 +205,61 @@ function HorizontallistDisplay.computeHeaders(sortedBracket)
 			return DisplayHelper.expandHeader(header)[1] .. ' #' .. index
 		end)
 	end)
-
-	return Array.flatten(headers)
 end
 
 --- Display component for the headers of a node in the bracket tree.
 --- Draws a row of headers for the match, everything to the left of it, and for the qualification spots.
----@param props {index: integer, header: string, status: 'upcoming'|'live'|'finished'|nil, matchId: string}
----@return Html?
+---@param props {index: integer, header: string, status: 'upcoming'|'ongoing'|'finished', matchId: string}
+---@return VNode?
 function HorizontallistDisplay.NodeHeader(props)
 	if not props.header then
 		return nil
 	end
 
 	local iconData = PHASE_ICONS[props.status] or {}
-	local icon = Icon.makeIcon{
+	local icon = IconFa{
 		iconName = iconData.iconName,
 		color = iconData.color,
 		additionalClasses = {'navigation-tabs__list-item-icon'}
 	}
 
-	return mw.html.create('li')
-			:node(icon)
-			:addClass('navigation-tabs__list-item')
-			:attr('data-target-id', 'navigationContent' .. props.index)
-			:attr('role', 'tab')
-			:attr('tabindex', '0')
-			:attr('data-js-battle-royale', 'navigation-tab')
-			:attr('data-js-battle-royale-matchid', props.matchId)
-			:wikitext(props.header)
+	return Html.Li{
+		classes = {'navigation-tabs__list-item'},
+		attributes = {
+			['data-target-id'] = 'navigationContent' .. props.index,
+			role = 'tab',
+			tabindex = '0',
+			['data-js-battle-royale'] = 'navigation-tab',
+			['data-js-battle-royale-matchid'] = props.matchId,
+		},
+		children = {
+			icon,
+			props.header,
+		}
+	}
 end
 
 ---Display component for a match
----@param props {matchId: string, index: integer, MatchSummaryContainer: function}
----@return Html
+---@param props {matchId: string, index: integer, MatchSummaryContainer: fun(props: table): Renderable?}
+---@return VNode
 function HorizontallistDisplay.Match(props)
-	local matchNode = mw.html.create('div')
-			:addClass('navigation-content')
-			:attr('data-js-battle-royale-content-id', 'navigationContent' .. props.index)
-
 	local bracketId = MatchGroupUtil.splitMatchId(props.matchId)
-	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
-		bracketId = bracketId,
-		matchId = props.matchId,
-	}, Lua.import('Module:Error/Display').ErrorDetails)
-	matchNode:node(matchSummaryNode)
 
-	return matchNode
+	return Html.Div{
+		classes = {'navigation-content'},
+		attributes = {
+			['data-js-battle-royale-content-id'] = 'navigationContent' .. props.index,
+		},
+		children = ErrorBoundary{
+			children = Builder{builder = function ()
+				return props.MatchSummaryContainer{
+					bracketId = bracketId,
+					matchId = props.matchId,
+				}
+			end},
+			fallback = Lua.import('Module:Error/Display').ErrorDetails
+		}
+	}
 end
 
 return HorizontallistDisplay
