@@ -135,7 +135,7 @@ end
 
 ---@param child {name: string?, mobileName: string?, child: Widget}
 ---@param childIndex integer
----@return WidgetHtml
+---@return Renderable
 function NavBoxChild:_toRow(child, childIndex)
 	return Tr{
 		children = WidgetUtil.collect(
@@ -161,7 +161,7 @@ end
 
 ---@param childIndex integer
 ---@param isLeft boolean
----@return Widget?
+---@return Renderable?
 function NavBoxChild:_makeImage(childIndex, isLeft)
 	local props = self.props
 
