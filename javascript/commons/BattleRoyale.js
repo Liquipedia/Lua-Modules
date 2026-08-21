@@ -378,7 +378,7 @@ liquipedia.battleRoyale = {
 		const games = Object.keys( this.battleRoyaleMap[ battleRoyaleId ].gamePanels[ matchContentId ] ).length - 1;
 		let wikitext = '';
 		for ( let i = 1; i <= games; i++ ) {
-			wikitext += `{{ShowSingleGame|id=${ battleRoyaleId }|matchid=${ matchId }|gameidx=${ i }|dev=${ dev }}`;
+			wikitext += `{{ShowSingleGame|id=${ battleRoyaleId }|matchid=${ matchId }|gameidx=${ i }|dev=${ dev }}}`;
 		}
 
 		const element =
