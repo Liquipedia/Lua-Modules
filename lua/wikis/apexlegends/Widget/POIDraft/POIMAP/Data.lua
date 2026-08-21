@@ -82,16 +82,21 @@ local MAPS_DATA = {
 	WorldsEdge = {
 		name = "World's Edge",
 		image = {
-			{ file = 'World_Edge_S17.png' }
+			{ file = 'Apex legends World Edge S30 map.webp', startDate = '2026-08-04' },
+			{ file = 'World_Edge_S17.png', endDate = '2026-08-04' }
 		},
 		width = 800,
 		mobileWidth = 365,
 		pois = {
-			{ name = 'Big Maude', x = 0.762, y = 0.696, mobileName = 'Big Maude' },
-			{ name = 'Climatizer', x = 0.702, y = 0.146, mobileName = 'Climatizer', startDate = '2025-02-03' },
+			{ name = 'Big Maude', x = 0.345, y = 0.457, mobileName = 'Big Maude' },
+			{
+				name = 'Climatizer', x = 0.702, y = 0.146, mobileName = 'Climatizer',
+				startDate = '2025-02-03', endDate = '2026-08-04'
+			},
 			{ name = 'Climatizer East', x = 0.772, y = 0.236, mobileName = 'Climatizer East', endDate = '2025-04-30' },
 			{ name = 'Climatizer West', x = 0.672, y = 0.126, mobileName = 'Climatizer West', endDate = '2025-04-30' },
 			{ name = 'Countdown', x = 0.302, y = 0.336, mobileName = 'Countdown' },
+			{ name = 'East Village', x = 0.752, y = 0.173, mobileName = 'East Village', startDate = '2026-08-04' },
 			{
 				name = 'Fragment', x = 0.642, y = 0.476, mobileName = 'Fragment',
 				hideIfAny = {'Fragment East team', 'Fragment West team'}
@@ -104,24 +109,27 @@ local MAPS_DATA = {
 				name = 'Fragment West', x = 0.492, y = 0.456, mobileName = 'Fragment W.',
 				hideIfAllMissing = {'Fragment East team', 'Fragment West team'}
 			},
-			{ name = 'The Geyser', x = 0.762, y = 0.596, mobileName = 'The Geyser' },
 			{ name = 'Harvester', x = 0.442, y = 0.616, mobileName = 'Harvester' },
-			{ name = 'Landslide', x = 0.340, y = 0.456, mobileName = 'Landslide' },
-			{ name = 'Lava Fissure', x = 0.148, y = 0.400, mobileName = 'Lava Fissure' },
-			{ name = 'Lava Siphon', x = 0.542, y = 0.726, mobileName = 'Lava Siphon' },
+			{ name = 'Landslide', x = 0.340, y = 0.456, mobileName = 'Landslide', endDate = '2026-08-04' },
 			{ name = 'Launch Site', x = 0.522, y = 0.896, mobileName = 'Launch<br>Site' },
+			{ name = 'Lava Fissure', x = 0.148, y = 0.400, mobileName = 'Lava Fissure' },
+			{ name = 'Lava Siphon', x = 0.542, y = 0.726, mobileName = 'Lava Siphon', endDate = '2026-08-04' },
 			{ name = 'Mirage A Trois', x = 0.149, y = 0.510, mobileName = 'Mirage A Trois' },
 			{ name = 'Monument', x = 0.492, y = 0.386, mobileName = 'Monument' },
 			{ name = 'Overlook', x = 0.822, y = 0.396, mobileName = 'Overlook' },
 			{ name = 'Skyhook East', x = 0.388, y = 0.166, mobileName = 'Skyhook East' },
 			{ name = 'Skyhook West', x = 0.200, y = 0.236, mobileName = 'Skyhook West' },
+			{ name = 'Sorting Factory', x = 0.574, y = 0.755, mobileName = 'Sorting<br>Factory', startDate = '2026-08-04' },
 			{ name = 'Stacks', x = 0.712, y = 0.826, mobileName = 'Stacks' },
 			{ name = 'Staging', x = 0.222, y = 0.596, mobileName = 'Staging' },
-			{ name = 'Survey Camp', x = 0.477, y = 0.231, mobileName = 'Survey Camp' },
+			{ name = 'Survey Camp', x = 0.477, y = 0.231, mobileName = 'Survey Camp', endDate = '2026-08-04' },
 			{ name = 'The Dome', x = 0.725, y = 0.930, mobileName = 'The Dome' },
 			{ name = 'The Epicenter', x = 0.622, y = 0.296, mobileName = 'The Epicenter' },
-			{ name = 'The Tree', x = 0.392, y = 0.826, mobileName = 'The Tree' },
-			{ name = 'Thermal Station', x = 0.222, y = 0.756, mobileName = 'Thermal Station' }
+			{ name = 'The Geyser', x = 0.762, y = 0.596, mobileName = 'The Geyser' },
+			{ name = 'The Tree', x = 0.392, y = 0.826, mobileName = 'The Tree', endDate = '2026-08-04' },
+			{ name = 'Thermal Station', x = 0.222, y = 0.756, mobileName = 'Thermal Station' },
+			{ name = 'Tree Settlement', x = 0.408, y = 0.823, mobileName = 'Tree<br>Settlement', startDate = '2026-08-04' },
+			{ name = 'War Camp', x = 0.560, y = 0.200, mobileName = 'War Camp', startDate = '2026-08-04' }
 		}
 	},
 	EDistrict = {
@@ -153,6 +161,45 @@ local MAPS_DATA = {
 			{ name = 'Uptown', x = 0.682, y = 0.476, mobileName = 'Uptown', startDate = '2025-02-03' },
 			{ name = 'Vibe Isle', x = 0.682, y = 0.476, mobileName = 'Vibe Isle', endDate = '2025-02-03' },
 			{ name = 'Viaduct', x = 0.342, y = 0.776, mobileName = 'Viaduct' }
+		}
+	},
+	BrokenMoon = {
+		name = 'Broken Moon',
+		image = {
+			{ file = 'Broken Moon S25.png' }
+		},
+		width = 800,
+		mobileWidth = 365,
+		pois = {
+			{ name = 'Alpha Base', x = 0.570, y = 0.160, mobileName = 'Alpha Base' },
+			{ name = 'Atmostation', x = 0.640, y = 0.870, mobileName = 'Atmostation' },
+			{ name = 'Bionomics', x = 0.880, y = 0.760, mobileName = 'Bionomics' },
+			{ name = 'Breaker Wharf', x = 0.800, y = 0.180, mobileName = 'Breaker Wharf' },
+			{ name = 'Cliff Side', x = 0.540, y = 0.410, mobileName = 'Cliff Side' },
+			{ name = 'Cultivation', x = 0.400, y = 0.770, mobileName = 'Cultivation' },
+			{ name = 'Dry Gulch', x = 0.160, y = 0.400, mobileName = 'Dry Gulch' },
+			{ name = 'Eternal Gardens', x = 0.830, y = 0.360, mobileName = 'Eternal Gardens' },
+			{
+				name = 'Experimental Labs', x = 0.130, y = 0.720,
+				mobileName = 'Experimental Labs'
+			},
+			{ name = 'Hazmat Tunnel', x = 0.580, y = 0.580, mobileName = 'Hazmat Tunnel' },
+			{
+				name = 'Production Yard', x = 0.100, y = 0.540,
+				mobileName = 'Production Yard'
+			},
+			{
+				name = 'Quarantine Zone', x = 0.400, y = 0.560,
+				mobileName = 'Quarantine Zone'
+			},
+			{ name = 'Solar Pods', x = 0.310, y = 0.870, mobileName = 'Solar Pods' },
+			{ name = 'Space Port', x = 0.150, y = 0.270, mobileName = 'Space Port' },
+			{ name = 'Stasis Array', x = 0.640, y = 0.340, mobileName = 'Stasis Array' },
+			{ name = 'Terraformer', x = 0.720, y = 0.640, mobileName = 'Terraformer' },
+			{ name = 'The Core', x = 0.360, y = 0.280, mobileName = 'The Core' },
+			{ name = 'The Divide', x = 0.920, y = 0.540, mobileName = 'The Divide' },
+			{ name = 'The Foundry', x = 0.170, y = 0.870, mobileName = 'The Foundry' },
+			{ name = 'Underpass', x = 0.250, y = 0.610, mobileName = 'Underpass' }
 		}
 	},
 	Olympus = {
