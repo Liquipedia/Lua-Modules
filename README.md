@@ -17,6 +17,14 @@ If you want to contribute you may do that in any way you wish. We use the follow
 
 Clone the repository. This requires [git](https://git-scm.com/downloads) to be installed on your system.
 
+##### Devcontainer (any platform)
+
+The repository ships a [devcontainer](https://containers.dev/) that has everything preinstalled: Lua 5.1, LuaRocks, busted, luacheck, lua-language-server, Node, Python with ruff, and the Playwright browsers used for the visual snapshot tests. It is built on the same Playwright image CI uses, so the visual snapshot tests render the same way they do in CI. (On Apple Silicon a couple of snapshots come out a few pixels off CI's — well under the comparison threshold, but one more reason to leave snapshot updates to CI as described below.)
+
+Open the repository in VS Code and pick *Dev Containers: Reopen in Container* (requires Docker and the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension), or run `devcontainer up --workspace-folder .` with the [devcontainer CLI](https://github.com/devcontainers/cli). `npm install`, `pip install -r requirements.txt` and creating `.env` from `.env.example` are done for you on first start.
+
+If you prefer a native setup, follow the platform instructions below instead.
+
 ##### Windows
 
 Recommended to use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install). Then follow the Unix instructions.
