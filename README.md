@@ -25,6 +25,18 @@ Open the repository in VS Code and pick *Dev Containers: Reopen in Container* (r
 
 If you prefer a native setup, follow the platform instructions below instead.
 
+###### Previewing CSS and JS changes on the live wiki
+
+The container also ships [mitmproxy](https://mitmproxy.org/) and the dependencies for `scripts/proxy_lp.py`, which serves your locally built `lua/output/css/main.css` and `lua/output/js/main.js` in place of the ones liquipedia.net would load. See the [wiki page](https://github.com/Liquipedia/Lua-Modules/wiki/Local-Development-Setup-for-CSS-and-JS) for the full background; inside the container the setup is:
+
+1. Run `npm run build`, so there is something to serve. The container does this on first start, but the proxy has nothing to substitute until it has run, and it will tell you so rather than quietly serving you the real files.
+2. Start the proxy with `python scripts/proxy_lp.py` from the repository root, or via the *Launch proxy* task in `.vscode/tasks.json`. It listens on port 8080, published to `127.0.0.1:8080` on your host.
+3. Point your browser at that proxy. A switcher extension such as Proxy SwitchyOmega (HTTP, `127.0.0.1`, port `8080`) makes it easy to toggle on and off; a system-wide proxy setting works too.
+4. With the proxy enabled, open <http://mitm.it> and install the certificate for your browser, so it will trust the intercepted HTTPS responses. The CA is kept in a volume, so this is only needed once, not after every rebuild.
+5. Edit `.scss` or `.js`, run `npm run build` again, then hard refresh the wiki page (Ctrl+Shift+R / Cmd+Shift+R).
+
+Turn the proxy off in your browser when you are done — while it is enabled, every request goes through the container.
+
 ##### Windows
 
 Recommended to use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install). Then follow the Unix instructions.
