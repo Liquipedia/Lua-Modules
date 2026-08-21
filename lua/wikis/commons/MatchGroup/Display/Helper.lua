@@ -351,4 +351,30 @@ DisplayHelper.getGlobalConfig = FnUtil.memoize(function()
 	return config
 end)
 
+---Merges a grand finals match with results of its bracket reset match.
+---@param match table
+---@param bracketResetMatch table
+---@return table
+function DisplayHelper.mergeBracketResetMatch(match, bracketResetMatch)
+	local mergedMatch = Table.merge(match, {
+		opponents = {},
+		games = Table.copy(match.games),
+	})
+
+	for ix, opponent in ipairs(match.opponents) do
+		local resetOpponent = bracketResetMatch.opponents[ix]
+		mergedMatch.opponents[ix] = Table.merge(opponent, {
+			score2 = resetOpponent.score,
+			status2 = resetOpponent.status,
+			placement2 = resetOpponent.placement,
+		})
+	end
+
+	for _, game in ipairs(bracketResetMatch.games) do
+		table.insert(mergedMatch.games, game)
+	end
+
+	return mergedMatch
+end
+
 return DisplayHelper
