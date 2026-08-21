@@ -1046,7 +1046,7 @@ end
 
 --- Creates an empty table cell
 ---@param align ('left'|'right'|'center')?
----@return Renderable
+---@return VNode<Table2CellProps>
 function BasePrizePool._emptyCell(align)
 	return TableCell{children = {DASH}, align = align}
 end
