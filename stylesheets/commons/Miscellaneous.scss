@@ -1967,7 +1967,7 @@ Custom summary boxes above tables
 	border-radius: 0.5rem;
 	padding: 0.75rem 0.5rem;
 	text-align: center;
-	background-color: #ffffff;
+	background-color: var( --clr-surface-1, #ffffff );
 	box-shadow: 0 0.125rem 0.25rem rgba( 0, 0, 0, 0.05 );
 	transition: transform 0.2s ease, box-shadow 0.2s ease;
 
