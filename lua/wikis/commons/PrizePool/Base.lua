@@ -667,7 +667,7 @@ function BasePrizePool:_shouldDisplayPrizeSummary()
 end
 
 ---@param isAward boolean?
----@return Widget
+---@return VNode
 function BasePrizePool:build(isAward)
 	local prizePoolTable = self:_buildTable(isAward)
 
@@ -717,7 +717,7 @@ function BasePrizePool:_getCurrencies()
 	return currencies
 end
 
----@param cell Widget
+---@param cell VNode<Table2CellProps>
 ---@param prize BasePrizePoolPrize
 function BasePrizePool:_tagCurrencyColumn(cell, prize)
 	if not self.currencyToggleIndices then
@@ -733,7 +733,7 @@ function BasePrizePool:_tagCurrencyColumn(cell, prize)
 end
 
 ---@param isAward boolean?
----@return Widget
+---@return VNode
 function BasePrizePool:_buildTable(isAward)
 	local currencies = self:_getCurrencies()
 	self.currencyToggleIndices = nil
