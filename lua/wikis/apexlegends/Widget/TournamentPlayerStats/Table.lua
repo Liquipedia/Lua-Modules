@@ -36,19 +36,19 @@ TournamentPlayerStatsTable.defaultProps = {
 
 ---@type TournamentPlayerStatsTableColumn[]
 local COLUMNS = {
-	{key = 'games', label = 'GP'},
-	{key = 'kills', label = 'K'},
-	{key = 'assists', label = 'A'},
-	{key = 'knocks', label = 'Knocks'},
-	{key = 'damage', label = 'Dmg dealt'},
-	{key = 'damageTaken', label = 'Dmg taken'},
-	{key = 'damageDiff', label = 'Dmg diff'},
+	{ key = 'games',       label = 'GP' },
+	{ key = 'kills',       label = 'K' },
+	{ key = 'assists',     label = 'A' },
+	{ key = 'knocks',      label = 'Knocks' },
+	{ key = 'damage',      label = 'Dmg dealt' },
+	{ key = 'damageTaken', label = 'Dmg taken' },
+	{ key = 'damageDiff',  label = 'Dmg diff' },
 }
 
 ---@param value number
 ---@return string
 local function formatNumber(value)
-	return MathUtil.formatRounded{value = value, precision = 0}
+	return MathUtil.formatRounded { value = value, precision = 0 }
 end
 
 ---@param key string
@@ -78,7 +78,7 @@ local function renderTeam(player)
 		return '-'
 	end
 
-	return OpponentDisplay.InlineTeamContainer{
+	return OpponentDisplay.InlineTeamContainer {
 		template = team,
 		style = 'icon',
 	}
@@ -87,7 +87,7 @@ end
 ---@param player TournamentPlayerStats.Player
 ---@return Renderable
 local function renderPlayer(player)
-	return PlayerDisplay.InlinePlayer{
+	return PlayerDisplay.InlinePlayer {
 		player = player,
 	}
 end
@@ -103,8 +103,8 @@ local function renderStat(key, player)
 		return text
 	end
 
-	return Html.Span{
-		classes = {value > 0 and 'forest-green-text' or 'cinnabar-text'},
+	return Html.Span {
+		classes = { value > 0 and 'forest-green-text' or 'cinnabar-text' },
 		children = text,
 	}
 end
@@ -123,15 +123,15 @@ local function summaryCard(title, player, stat)
 		return nil
 	end
 
-	return Html.Div{
-		classes = {'stats-summary-card'},
+	return Html.Div {
+		classes = { 'stats-summary-card' },
 		children = {
-			Html.Div{
-				classes = {'stats-summary-card__subtitle'},
+			Html.Div {
+				classes = { 'stats-summary-card__subtitle' },
 				children = title,
 			},
-			Html.Div{
-				classes = {'stats-summary-card__title'},
+			Html.Div {
+				classes = { 'stats-summary-card__title' },
 				children = (player.displayName or player.pageName or '-') .. ' (' .. formatNumber(value) .. ')',
 			},
 		},
@@ -146,21 +146,21 @@ local function summaryCards(players)
 	end
 
 	local topKills = Array.maxBy(players, function(player)
-		return {player.kills or 0, player.assists or 0, player.damage or 0}
+		return { player.kills or 0, player.assists or 0, player.damage or 0 }
 	end)
 	local topAssists = Array.maxBy(players, function(player)
-		return {player.assists or 0, player.kills or 0, player.damage or 0}
+		return { player.assists or 0, player.kills or 0, player.damage or 0 }
 	end)
 	local topKnocks = Array.maxBy(players, function(player)
-		return {player.knocks or 0, player.kills or 0, player.damage or 0}
+		return { player.knocks or 0, player.kills or 0, player.damage or 0 }
 	end)
 	local topDamage = Array.maxBy(players, function(player)
-		return {player.damage or 0, player.kills or 0, player.assists or 0}
+		return { player.damage or 0, player.kills or 0, player.assists or 0 }
 	end)
 
-	return Html.Div{
-		classes = {'stats-summary-cards'},
-		css = {['margin-bottom'] = '16px'},
+	return Html.Div {
+		classes = { 'stats-summary-cards' },
+		css = { ['margin-bottom'] = '16px' },
 		children = WidgetUtil.collect(
 			summaryCard('Top Killer', topKills, 'kills'),
 			summaryCard('Top Assists', topAssists, 'assists'),
@@ -174,19 +174,19 @@ end
 ---@return fun(player: TournamentPlayerStats.Player): Renderable
 local function buildRow(activeColumns)
 	return function(player)
-		return TableWidgets.Row{children = WidgetUtil.collect(
-			TableWidgets.Cell{children = renderTeam(player)},
-			TableWidgets.Cell{
-				attributes = {['data-sort-value'] = player.pageName or player.displayName},
+		return TableWidgets.Row { children = WidgetUtil.collect(
+			TableWidgets.Cell { children = renderTeam(player) },
+			TableWidgets.Cell {
+				attributes = { ['data-sort-value'] = player.pageName or player.displayName },
 				children = renderPlayer(player),
 			},
 			Array.map(activeColumns, function(column)
-				return TableWidgets.Cell{
-					attributes = {['data-sort-value'] = player[column.key] or -1},
+				return TableWidgets.Cell {
+					attributes = { ['data-sort-value'] = player[column.key] or -1 },
 					children = renderStat(column.key, player),
 				}
 			end)
-		)}
+		) }
 	end
 end
 
@@ -203,18 +203,18 @@ function TournamentPlayerStatsTable:render()
 		end)
 	end)
 
-	return Html.Div{
+	return Html.Div {
 		css = {
 			display = 'inline-block',
 			['max-width'] = '100%',
 		},
 		children = {
 			summaryCards(players),
-			TableWidgets.Table{
+			TableWidgets.Table {
 				sortable = true,
 				columns = WidgetUtil.collect(
-					{align = 'center'},
-					{align = 'left'},
+					{ align = 'center' },
+					{ align = 'left' },
 					Array.map(activeColumns, function()
 						return {
 							align = 'right',
@@ -223,16 +223,16 @@ function TournamentPlayerStatsTable:render()
 					end)
 				),
 				children = {
-					TableWidgets.TableHeader{children = {
-						TableWidgets.Row{children = WidgetUtil.collect(
-							TableWidgets.CellHeader{children = 'Team'},
-							TableWidgets.CellHeader{children = 'Player'},
+					TableWidgets.TableHeader { children = {
+						TableWidgets.Row { children = WidgetUtil.collect(
+							TableWidgets.CellHeader { children = 'Team' },
+							TableWidgets.CellHeader { children = 'Player' },
 							Array.map(activeColumns, function(column)
-								return TableWidgets.CellHeader{children = column.label}
+								return TableWidgets.CellHeader { children = column.label }
 							end)
-						)}
-					}},
-					TableWidgets.TableBody{children = Array.map(players, buildRow(activeColumns))},
+						) }
+					} },
+					TableWidgets.TableBody { children = Array.map(players, buildRow(activeColumns)) },
 				},
 			},
 		},

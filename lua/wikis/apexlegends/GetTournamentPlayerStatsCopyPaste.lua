@@ -69,7 +69,7 @@ end
 ---@param statFields string[]
 ---@return string
 local function makePlayerRow(statFields)
-	local parts = {'{{Json|name='}
+	local parts = { '{{Json|name=' }
 
 	for _, field in ipairs(statFields) do
 		table.insert(parts, field .. '=')
@@ -81,8 +81,8 @@ end
 ---@param display string
 ---@return Renderable
 function CopyPaste._generateCopyPaste(display)
-	return HtmlWidgets.Pre{
-		classes = {'selectall'},
+	return HtmlWidgets.Pre {
+		classes = { 'selectall' },
 		children = mw.text.nowiki(display),
 	}
 end

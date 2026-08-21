@@ -161,7 +161,7 @@ end
 ---@return table?
 local function fetchById(id)
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add{
+		:add {
 			ConditionNode(ColumnName('type'), Comparator.eq, DATAPOINT_TYPE),
 			ConditionNode(ColumnName('name'), Comparator.eq, id),
 		}
@@ -187,7 +187,7 @@ local function buildPlacementIndex(tournamentPage)
 	end
 
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add{
+		:add {
 			ConditionNode(ColumnName('pagename'), Comparator.eq, title.text:gsub(' ', '_')),
 			title.namespace ~= 0 and ConditionNode(ColumnName('namespace'), Comparator.eq, title.namespace) or nil,
 		}

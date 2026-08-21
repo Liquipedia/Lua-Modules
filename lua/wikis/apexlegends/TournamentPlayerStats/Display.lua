@@ -22,7 +22,7 @@ function TournamentPlayerStatsDisplay.fromTemplate(frame)
 		return nil
 	end
 
-	return PlayerStatsTable{players = players}
+	return PlayerStatsTable { players = players }
 end
 
 return TournamentPlayerStatsDisplay

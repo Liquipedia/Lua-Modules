@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Info = Lua.import('Module:Info', {loadData = true})
+local Info = Lua.import('Module:Info', { loadData = true })
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local MathUtil = Lua.import('Module:MathUtil')
@@ -39,7 +39,7 @@ local Span = HtmlWidgets.Span
 local I = HtmlWidgets.I
 local Abbr = HtmlWidgets.Abbr
 
-local DEFAULT_PLAYER_COUNT = Table.getByPathOrNil(Info, {'config', 'participants', 'defaultPlayerNumber'}) or 3
+local DEFAULT_PLAYER_COUNT = Table.getByPathOrNil(Info, { 'config', 'participants', 'defaultPlayerNumber' }) or 3
 
 local PLAYER_INPUT = {
 	MOUSE_KEYBOARD = 'Mouse & Keyboard',
@@ -55,19 +55,19 @@ local TEAM_INPUT = {
 local PLAYER_INPUT_ICON_DATA = {
 	[PLAYER_INPUT.MOUSE_KEYBOARD] = {
 		title = PLAYER_INPUT.MOUSE_KEYBOARD,
-		iconClasses = {'fas', 'fa-mouse'},
+		iconClasses = { 'fas', 'fa-mouse' },
 	},
 	[PLAYER_INPUT.CONTROLLER] = {
 		title = PLAYER_INPUT.CONTROLLER,
-		iconClasses = {'fas', 'fa-gamepad-alt'},
+		iconClasses = { 'fas', 'fa-gamepad-alt' },
 	},
 	[PLAYER_INPUT.HYBRID] = {
 		title = PLAYER_INPUT.HYBRID,
-		iconClasses = {'fas', 'fa-keyboard'},
+		iconClasses = { 'fas', 'fa-keyboard' },
 	},
 	[PLAYER_INPUT.UNKNOWN] = {
 		title = PLAYER_INPUT.UNKNOWN,
-		iconClasses = {'fas', 'fa-question-circle'},
+		iconClasses = { 'fas', 'fa-question-circle' },
 	},
 }
 
@@ -130,7 +130,7 @@ function TournamentInputStats:_readTournamentPageNames(args)
 	if Logic.isEmpty(tournamentPageNames) then
 		local currentPage = Page.pageifyLink(mw.title.getCurrentTitle().prefixedText)
 		if currentPage then
-			return {currentPage}
+			return { currentPage }
 		else
 			return {}
 		end
@@ -157,7 +157,7 @@ end
 ---@return string
 function TournamentInputStats:_buildPlacementConditions()
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add{
+		:add {
 			ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual'),
 			ConditionUtil.anyOf(ColumnName('pagename'), self.tournamentPageNames),
 		}
@@ -216,7 +216,7 @@ function TournamentInputStats:_fetchLpdbInputs(players)
 		if playerRecord then
 			self:_storeLpdbInput(
 				playerRecord.pagename,
-				Table.getByPathOrNil(playerRecord, {'extradata', 'input'})
+				Table.getByPathOrNil(playerRecord, { 'extradata', 'input' })
 			)
 		end
 	end)
@@ -370,11 +370,11 @@ end
 function TournamentInputStats:_buildInputIcon(input)
 	local data = PLAYER_INPUT_ICON_DATA[input] or PLAYER_INPUT_ICON_DATA[PLAYER_INPUT.UNKNOWN]
 
-	return Abbr{
-		attributes = {title = data and data.title or input},
-		children = I{
-			classes = data and data.iconClasses or {'fas', 'fa-question-circle'},
-			attributes = {['aria-hidden'] = 'true'},
+	return Abbr {
+		attributes = { title = data and data.title or input },
+		children = I {
+			classes = data and data.iconClasses or { 'fas', 'fa-question-circle' },
+			attributes = { ['aria-hidden'] = 'true' },
 		}
 	}
 end
@@ -387,7 +387,7 @@ function TournamentInputStats:_buildTeamDisplay(row)
 		return tostring(row.opponentName or '-')
 	end
 
-	return OpponentDisplay.InlineTeamContainer{
+	return OpponentDisplay.InlineTeamContainer {
 		template = row.opponentTemplate,
 		style = 'short',
 	}
@@ -398,7 +398,7 @@ end
 ---@return table
 function TournamentInputStats:_buildPlayersDisplay(row)
 	return Array.interleave(Array.map(row.playerEntries, function(entry)
-		return PlayerDisplay.InlinePlayer{
+		return PlayerDisplay.InlinePlayer {
 			player = entry.player,
 			showFlag = false,
 		}
@@ -419,15 +419,15 @@ end
 ---@param value integer
 ---@return Renderable
 function TournamentInputStats:_buildSummaryBox(label, value)
-	return Div{
-		classes = {'stats-summary-card'},
+	return Div {
+		classes = { 'stats-summary-card' },
 		children = {
-			Div{
-				classes = {'stats-summary-card__subtitle'},
+			Div {
+				classes = { 'stats-summary-card__subtitle' },
 				children = label,
 			},
-			Div{
-				classes = {'stats-summary-card__title'},
+			Div {
+				classes = { 'stats-summary-card__title' },
 				children = self:_formatCountWithPercentage(value),
 			},
 		}
@@ -437,8 +437,8 @@ end
 ---@private
 ---@return Renderable
 function TournamentInputStats:_buildSummaryBoxes()
-	return Div{
-		classes = {'stats-summary-cards'},
+	return Div {
+		classes = { 'stats-summary-cards' },
 		css = {
 			['margin-bottom'] = '16px',
 		},
@@ -446,11 +446,11 @@ function TournamentInputStats:_buildSummaryBoxes()
 			self:_buildSummaryBox('Mouse & Keyboard Players', self.playerCounts[PLAYER_INPUT.MOUSE_KEYBOARD] or 0),
 			self:_buildSummaryBox('Controller Players', self.playerCounts[PLAYER_INPUT.CONTROLLER] or 0),
 			(self.playerCounts[PLAYER_INPUT.HYBRID] or 0) > 0
-				and self:_buildSummaryBox('Hybrid Players', self.playerCounts[PLAYER_INPUT.HYBRID] or 0)
-				or nil,
+			and self:_buildSummaryBox('Hybrid Players', self.playerCounts[PLAYER_INPUT.HYBRID] or 0)
+			or nil,
 			(self.playerCounts[PLAYER_INPUT.UNKNOWN] or 0) > 0
-				and self:_buildSummaryBox('Unknown', self.playerCounts[PLAYER_INPUT.UNKNOWN] or 0)
-				or nil
+			and self:_buildSummaryBox('Unknown', self.playerCounts[PLAYER_INPUT.UNKNOWN] or 0)
+			or nil
 		)
 	}
 end
@@ -459,8 +459,8 @@ end
 ---@param summaryValue string
 ---@return Renderable
 function TournamentInputStats:_buildSummaryBadge(summaryValue)
-	return Span{
-		classes = {self:_getSummaryBadgeClass(summaryValue)},
+	return Span {
+		classes = { self:_getSummaryBadgeClass(summaryValue) },
 		css = {
 			display = 'inline-block',
 			padding = '4px 14px',
@@ -479,8 +479,8 @@ function TournamentInputStats:_buildEmptyStateRow()
 		return nil
 	end
 
-	return TableWidgets.Row{
-		children = TableWidgets.Cell{
+	return TableWidgets.Row {
+		children = TableWidgets.Cell {
 			colspan = 4,
 			css = {
 				['font-style'] = 'italic',
@@ -495,21 +495,21 @@ end
 ---@return Renderable
 function TournamentInputStats:build()
 	local rows = Array.map(self.teamRows, function(row)
-		return TableWidgets.Row{
+		return TableWidgets.Row {
 			children = {
-				TableWidgets.Cell{
-					attributes = {['data-sort-value'] = row.opponentName or ''},
+				TableWidgets.Cell {
+					attributes = { ['data-sort-value'] = row.opponentName or '' },
 					children = self:_buildTeamDisplay(row),
 				},
-				TableWidgets.Cell{
+				TableWidgets.Cell {
 					nowrap = false,
 					children = self:_buildPlayersDisplay(row),
 				},
-				TableWidgets.Cell{
+				TableWidgets.Cell {
 					align = 'center',
 					children = self:_buildInputsDisplay(row),
 				},
-				TableWidgets.Cell{
+				TableWidgets.Cell {
 					align = 'center',
 					children = self:_buildSummaryBadge(row.teamInput),
 				},
@@ -517,28 +517,28 @@ function TournamentInputStats:build()
 		}
 	end)
 
-	local tableWidget = TableWidgets.Table{
+	local tableWidget = TableWidgets.Table {
 		sortable = true,
 		columns = {
-			{align = 'left'},
-			{align = 'left'},
-			{align = 'center'},
-			{align = 'center'},
+			{ align = 'left' },
+			{ align = 'left' },
+			{ align = 'center' },
+			{ align = 'center' },
 		},
 		children = {
-			TableWidgets.TableHeader{
+			TableWidgets.TableHeader {
 				children = {
-					TableWidgets.Row{
+					TableWidgets.Row {
 						children = {
-							TableWidgets.CellHeader{children = 'Team'},
-							TableWidgets.CellHeader{children = 'Players'},
-							TableWidgets.CellHeader{children = 'Inputs'},
-							TableWidgets.CellHeader{children = 'Team input'},
+							TableWidgets.CellHeader { children = 'Team' },
+							TableWidgets.CellHeader { children = 'Players' },
+							TableWidgets.CellHeader { children = 'Inputs' },
+							TableWidgets.CellHeader { children = 'Team input' },
 						}
 					}
 				}
 			},
-			TableWidgets.TableBody{
+			TableWidgets.TableBody {
 				children = WidgetUtil.collect(
 					self:_buildEmptyStateRow(),
 					rows
@@ -547,7 +547,7 @@ function TournamentInputStats:build()
 		}
 	}
 
-	return Div{
+	return Div {
 		css = {
 			display = 'inline-block',
 			['max-width'] = '100%',
