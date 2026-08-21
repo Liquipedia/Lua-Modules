@@ -24,7 +24,7 @@ local Abbr = HtmlWidgets.Abbr
 local I = HtmlWidgets.I
 
 ---@type table<string, PoiMapData>
-local MAPS_DATA = Lua.import('Module:Widget/POIDraft/POIMap/Data', {loadData = true})
+local MAPS_DATA = Lua.import('Module:Widget/POIDraft/POIMap/Data', { loadData = true })
 
 ---@class WidgetPoiDraftProps
 ---@field map string
@@ -57,29 +57,29 @@ function PoiDraft:render()
 		return nil
 	end
 
-	return TableWidgets.Table{
+	return TableWidgets.Table {
 		striped = true,
 		columns = {
-			{shrink = true, align = 'center'},
-			{shrink = true, align = 'center'},
-			{align = 'left'},
-			{align = 'left'},
+			{ shrink = true, align = 'center' },
+			{ shrink = true, align = 'center' },
+			{ align = 'left' },
+			{ align = 'left' },
 		},
 		children = {
-			TableWidgets.TableHeader{
+			TableWidgets.TableHeader {
 				children = {
-					TableWidgets.Row{
+					TableWidgets.Row {
 						children = {
-							TableWidgets.CellHeader{
-								children = Abbr{
+							TableWidgets.CellHeader {
+								children = Abbr {
 									title = 'First Choice Priority Pick',
 									children = '1st',
 								},
 							},
-							TableWidgets.CellHeader{children = 'Pick'},
-							TableWidgets.CellHeader{children = 'Team'},
-							TableWidgets.CellHeader{
-								children = Abbr{
+							TableWidgets.CellHeader { children = 'Pick' },
+							TableWidgets.CellHeader { children = 'Team' },
+							TableWidgets.CellHeader {
+								children = Abbr {
 									title = 'Point of Interest',
 									children = 'POI',
 								},
@@ -88,7 +88,7 @@ function PoiDraft:render()
 					},
 				},
 			},
-			TableWidgets.TableBody{
+			TableWidgets.TableBody {
 				children = rows,
 			},
 		},
@@ -110,24 +110,24 @@ function PoiDraft:_row(poiName, contextDate)
 	---@cast team string
 
 	local isFirstPick = tostring(props[poiName .. ' rotation']) == '1'
-	local priorityIcon = isFirstPick and I{
-		classes = {'fas', 'fa-check', 'forest-green-text'},
+	local priorityIcon = isFirstPick and I {
+		classes = { 'fas', 'fa-check', 'forest-green-text' },
 	} or nil
 
-	return TableWidgets.Row{
-		classes = {'brkts-opponent-hover'},
-		attributes = {['aria-label'] = team},
+	return TableWidgets.Row {
+		classes = { 'brkts-opponent-hover' },
+		attributes = { ['aria-label'] = team },
 		children = {
-			TableWidgets.Cell{children = priorityIcon},
-			TableWidgets.Cell{children = Ordinal.toOrdinal(props[poiName .. ' seed'])},
-			TableWidgets.Cell{
-				children = Team{
+			TableWidgets.Cell { children = priorityIcon },
+			TableWidgets.Cell { children = Ordinal.toOrdinal(props[poiName .. ' seed']) },
+			TableWidgets.Cell {
+				children = Team {
 					style = 'short',
 					name = team,
 					date = contextDate,
 				},
 			},
-			TableWidgets.Cell{children = poiName},
+			TableWidgets.Cell { children = poiName },
 		},
 	}
 end

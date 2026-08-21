@@ -49,18 +49,18 @@ function PoiLabel:render()
 		classes = {
 			'brkts-opponent-hover',
 			tostring(props.draftArgs[poi.name .. ' rotation']) == '1'
-				and 'poi-label-rotation-one'
-				or 'poi-label-rotation-two',
+			and 'poi-label-rotation-one'
+			or 'poi-label-rotation-two',
 		}
 	else
 		content = self:_renderPoiNameNode(displayName)
-		classes = {'brkts-opponent-hover', 'poi-label-rotation-two'}
+		classes = { 'brkts-opponent-hover', 'poi-label-rotation-two' }
 	end
 
 	local x = props.isMobile and (poi.mobileX or poi.x) or poi.x
 	local y = props.isMobile and (poi.mobileY or poi.y) or poi.y
 
-	return Div{
+	return Div {
 		css = {
 			position = 'absolute',
 			left = tostring(math.floor(x * props.scale)) .. 'px',
@@ -69,9 +69,9 @@ function PoiLabel:render()
 			['text-align'] = 'center',
 		},
 		children = {
-			Div{
+			Div {
 				classes = classes,
-				attributes = teamName and {['aria-label'] = teamName} or nil,
+				attributes = teamName and { ['aria-label'] = teamName } or nil,
 				css = {
 					['font-weight'] = 'bold',
 					['line-height'] = '1',
@@ -95,7 +95,7 @@ function PoiLabel:_renderPickedLabel(displayName, teamName, seed)
 	local seedNode = Logic.isNotEmpty(seed) and ('#' .. Ordinal.toOrdinal(seed)) or nil
 
 	return WidgetUtil.collect(
-		Div{
+		Div {
 			css = {
 				display = 'flex',
 				['align-items'] = 'center',
@@ -104,7 +104,7 @@ function PoiLabel:_renderPickedLabel(displayName, teamName, seed)
 			},
 			children = WidgetUtil.collect(
 				seedNode,
-				TeamDisplay{
+				TeamDisplay {
 					name = teamName,
 					style = 'short',
 					date = self.props.date,
@@ -119,8 +119,8 @@ end
 ---@param displayName string
 ---@return Renderable
 function PoiLabel:_renderPoiNameNode(displayName)
-	return Span{
-		css = {['font-size'] = '10pt'},
+	return Span {
+		css = { ['font-size'] = '10pt' },
 		children = displayName,
 	}
 end

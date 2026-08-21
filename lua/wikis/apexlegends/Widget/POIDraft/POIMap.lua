@@ -23,7 +23,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html')
 local Div = HtmlWidgets.Div
 
 ---@type table<string, PoiMapData>
-local MAPS_DATA = Lua.import('Module:Widget/POIDraft/POIMap/Data', {loadData = true})
+local MAPS_DATA = Lua.import('Module:Widget/POIDraft/POIMap/Data', { loadData = true })
 
 ---@class PoiMapProps
 ---@field map string
@@ -140,26 +140,26 @@ function PoiMap:render()
 		return nil
 	end
 
-	return TableWidgets.Table{
+	return TableWidgets.Table {
 		columns = {
-			{align = 'center'},
+			{ align = 'center' },
 		},
 		children = {
-			TableWidgets.TableHeader{
+			TableWidgets.TableHeader {
 				children = {
-					TableWidgets.Row{
+					TableWidgets.Row {
 						children = {
-							TableWidgets.CellHeader{children = mapData.name},
+							TableWidgets.CellHeader { children = mapData.name },
 						},
 					},
 				},
 			},
-			TableWidgets.TableBody{
+			TableWidgets.TableBody {
 				children = {
-					TableWidgets.Row{
+					TableWidgets.Row {
 						children = {
-							TableWidgets.Cell{
-								css = {padding = 0},
+							TableWidgets.Cell {
+								css = { padding = 0 },
 								children = WidgetUtil.collect(
 									self:_renderMapContainer(mapData, currentImage, false, contextDate),
 									self:_renderMapContainer(mapData, currentImage, true, contextDate)
@@ -183,7 +183,7 @@ function PoiMap:_renderMapContainer(mapData, currentImage, isMobile, contextDate
 	local width = isMobile and mapData.mobileWidth or mapData.width
 	local poisToRender = self:_getPoisToRender(mapData, contextDate)
 
-	return Div{
+	return Div {
 		classes = {
 			isMobile and 'mobile-only' or 'mobile-hide',
 			'nounderlines',
@@ -196,9 +196,9 @@ function PoiMap:_renderMapContainer(mapData, currentImage, isMobile, contextDate
 			margin = 'auto',
 		},
 		children = WidgetUtil.collect(
-			Div{
+			Div {
 				children = {
-					Image{
+					Image {
 						imageLight = currentImage,
 						size = tostring(width) .. 'px',
 						alt = mapData.name,
@@ -206,7 +206,7 @@ function PoiMap:_renderMapContainer(mapData, currentImage, isMobile, contextDate
 				},
 			},
 			Array.map(poisToRender, function(poiData)
-				return PoiLabel{
+				return PoiLabel {
 					poiData = poiData,
 					draftArgs = self.props,
 					date = contextDate,
