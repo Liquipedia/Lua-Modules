@@ -1,0 +1,51 @@
+{
+	"name": "Liquipedia Lua-Modules",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": "."
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"installZsh": true,
+			"installOhMyZsh": false,
+			"username": "vscode",
+			"userUid": "automatic",
+			"userGid": "automatic",
+			"upgradePackages": false
+		},
+		"ghcr.io/devcontainers/features/git:1": {
+			"version": "os-provided"
+		},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
+	},
+	"remoteUser": "vscode",
+	// node_modules lives in a container-only volume so the Linux binaries
+	// installed in here (sass, playwright, ...) do not overwrite the ones a
+	// native host setup installed for macOS/Windows, and vice versa.
+	"mounts": [
+		{
+			"source": "lua-modules-node-modules",
+			"target": "${containerWorkspaceFolder}/node_modules",
+			"type": "volume"
+		}
+	],
+	"containerEnv": {
+		"PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright"
+	},
+	"postCreateCommand": "bash .devcontainer/post-create.sh",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"sumneko.lua",
+				"stylelint.vscode-stylelint",
+				"dbaeumer.vscode-eslint",
+				"ms-python.python",
+				"charliermarsh.ruff"
+			],
+			"settings": {
+				"python.defaultInterpreterPath": "/opt/venv/bin/python",
+				"terminal.integrated.defaultProfile.linux": "zsh"
+			}
+		}
+	}
+}

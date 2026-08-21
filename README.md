@@ -17,6 +17,14 @@ If you want to contribute you may do that in any way you wish. We use the follow
 
 Clone the repository. This requires [git](https://git-scm.com/downloads) to be installed on your system.
 
+##### Devcontainer (any platform)
+
+The repository ships a [devcontainer](https://containers.dev/) that has everything preinstalled: Lua 5.1, LuaRocks, busted, luacheck, lua-language-server, Node, Python with ruff, and the Playwright browsers used for the visual snapshot tests. It is built on the same Playwright image CI uses, so the visual snapshot tests render the same way they do in CI. (On Apple Silicon a couple of snapshots come out a few pixels off CI's — well under the comparison threshold, but one more reason to leave snapshot updates to CI as described below.)
+
+Open the repository in VS Code and pick *Dev Containers: Reopen in Container* (requires Docker and the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension), or run `devcontainer up --workspace-folder .` with the [devcontainer CLI](https://github.com/devcontainers/cli). `npm install`, `pip install -r requirements.txt` and creating `.env` from `.env.example` are done for you on first start.
+
+If you prefer a native setup, follow the platform instructions below instead.
+
 ##### Windows
 
 Recommended to use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install). Then follow the Unix instructions.
@@ -144,11 +152,57 @@ Trusted contributers may be given the privilege of directly branching within the
 
 ### Testing your branch
 
+Deploying your branch to a dev environment publishes your modules to sandbox pages (suffixed with `/dev/<name>`) on the wiki, so you can render and test them without touching the live pages.
+
+#### Via a GitHub Action
+
 To test your changes in action, you can run the GitHub Action called "Personal Deploy" defined in `.github/workflows/deploy test.yml`. You can do it either through the GitHub interface or with the GitHub CLI tools:
 `gh workflow run 'deploy test.yml' -r <BRANCH NAME> -f luadevenv=<DEV-ENV-NAME>`
 
 To check the workflow progress from the CLI, you can run:
 `gh run list --workflow="deploy test.yml"`
+
+#### From your machine
+
+You can also run the deploy script locally. This works from any editor — the repo ships a Visual Studio Code integration, and every other editor can call the same script directly.
+
+**One-time setup:**
+
+1. Install the Python dependencies: `pip install -r requirements.txt`
+2. Copy `.env.example` to `.env` and fill in your bot account credentials. `.env` is git-ignored — never commit it.
+
+```
+WIKI_BASE_URL=https://liquipedia.net
+WIKI_UA_EMAIL=you@example.com
+WIKI_USER=YourBotAccount@BotName
+WIKI_PASSWORD=YourBotPassword
+DRY_RUN=0
+```
+
+**Running it:**
+
+```bash
+# Deploy specific files
+python scripts/deploy.py lua/wikis/commons/SomeModule.lua [more files...]
+
+# Deploy every file changed on your branch under lua/wikis/
+python scripts/deploy.py
+```
+
+The behaviour is driven by environment variables (set them in `.env` or per-invocation):
+
+| Variable | Purpose |
+| --- | --- |
+| `LUA_DEV_ENV_NAME` | Sandbox suffix, e.g. `/dev/myenv`. Appended to every deployed page name. **Set this for all dev testing** — without it, deploys go to the live module pages. Also required to enable the no-argument "all changed files" mode. |
+| `LUA_DEV_BASE_REF` | Ref that the no-argument mode diffs against to find changed files. Defaults to `main`. |
+| `DRY_RUN` | Set to `1` to run the full flow without writing to the wiki. |
+| `WIKI_USER` / `WIKI_PASSWORD` / `WIKI_BASE_URL` / `WIKI_UA_EMAIL` | Bot credentials and target wiki (see setup above). |
+
+> **Note:** running `python scripts/deploy.py` with no arguments **and** no `LUA_DEV_ENV_NAME` triggers a full re-sync of every module to the live wiki — this is the automated weekly-resync path and is not what you want for testing a branch.
+
+**Visual Studio Code:** the repo includes tasks in `.vscode/tasks.json` — run *Tasks: Run Task* and pick **Deploy current file** or **Deploy all changed file**. Both prompt for the dev environment name and the base ref.
+
+**Other editors:** bind a command to `python scripts/deploy.py` with the environment above. For example, a Neovim mapping can shell out to `python scripts/deploy.py <file>` with `LUA_DEV_ENV_NAME=/dev/<name>` set on the job's environment.
 
 ## Support
 

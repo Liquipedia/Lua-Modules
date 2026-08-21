@@ -261,6 +261,8 @@ NavBoxChild
 Next_match
 Opponent
 OpponentPlayer
+ParticipantSection
+ParticipantTable
 Patches_calendar
 Patches_list
 Person

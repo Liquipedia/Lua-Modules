@@ -9,7 +9,7 @@ local Lua = require('Module:Lua')
 local Component = Lua.import('Module:Widget/Component')
 local Context = Lua.import('Module:Widget/ComponentContext')
 
-local SquadUtils = Lua.import('Module:Squad/Utils')
+local SquadTypes = Lua.import('Module:Features/Squad/Types')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
@@ -25,8 +25,8 @@ local function SquadHeader(props, context)
 		return visibility == nil or visibility[col] == nil or visibility[col] == true
 	end
 
-	local isInactive = status == SquadUtils.SquadStatus.INACTIVE or status == SquadUtils.SquadStatus.FORMER_INACTIVE
-	local isFormer = status == SquadUtils.SquadStatus.FORMER or status == SquadUtils.SquadStatus.FORMER_INACTIVE
+	local isInactive = status == SquadTypes.SquadStatus.INACTIVE or status == SquadTypes.SquadStatus.FORMER_INACTIVE
+	local isFormer = status == SquadTypes.SquadStatus.FORMER or status == SquadTypes.SquadStatus.FORMER_INACTIVE
 
 	local name = show('name') and TableWidgets.CellHeader{children = {Context.read(
 		context,
@@ -59,7 +59,7 @@ end
 return Component.component(
 	SquadHeader,
 	{
-		status = SquadUtils.SquadStatus.ACTIVE,
-		type = SquadUtils.SquadType.PLAYER,
+		status = SquadTypes.SquadStatus.ACTIVE,
+		type = SquadTypes.SquadType.PLAYER,
 	}
 )
