@@ -7,7 +7,8 @@
 
 local Lua = require('Module:Lua')
 
-local OpponentDisplay = Lua.import('Module:OpponentDisplay')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Component = Lua.import('Module:Widget/Component')
 
@@ -24,7 +25,7 @@ local function BracketOpponent(props)
 		opponent = opponent,
 		overflow = 'ellipsis',
 		showLink = false,
-		showTbd = props.showTbd,
+		showTbd = opponent.type == Opponent.literal or props.showTbd,
 		teamStyle = props.forceShortName and 'short' or 'dynamic',
 	}
 end
