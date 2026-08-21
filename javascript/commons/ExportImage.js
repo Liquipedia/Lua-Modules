@@ -37,6 +37,12 @@ const EXPORT_IMAGE_CONFIG = {
 		IMAGE_LOAD: 5000,
 		URL_REVOKE_DELAY: 100
 	},
+	// Capture always runs inside an iframe of this width so media queries resolve against a
+	// fixed desktop viewport regardless of the visitor's actual window size.
+	CAPTURE_IFRAME_WIDTH: 1440,
+	// DEBUG: show the capture iframe as an overlay, gated behind a "Capture" button, so its
+	// content can be inspected before snapdom runs. Set to false (or delete this line) when done.
+	DEBUG_PREVIEW: true,
 	COLORS: {
 		DARK: {
 			BACKGROUND: '#121212',
@@ -120,12 +126,22 @@ class ExportService {
 		return matches;
 	}
 
-	// Cut placements are hidden by `.collapsed` on the wrapper; expand so they export.
+	// Cut placements are hidden by `.collapsed` on the wrapper; expand so they export. The
+	// "place X to Y" toggle footer has to come out of the DOM outright, not just off the
+	// snapdom exclude list — exclude/remove only keeps a node out of the painted canvas, it
+	// doesn't collapse the box the node still reserves, so leaving it in left a toggle-sized
+	// gap under the last row.
 	expandPrizepoolTables( element ) {
 		const collapsedTables = this.queryAllIncludingSelf( element, '.prizepool-table-wrapper.collapsed' );
 
 		for ( const collapsedTable of collapsedTables ) {
 			collapsedTable.classList.remove( 'collapsed' );
+		}
+
+		const toggleFooters = this.queryAllIncludingSelf( element, '.prizepool-table-wrapper .table2__footer' );
+
+		for ( const toggleFooter of toggleFooters ) {
+			toggleFooter.remove();
 		}
 
 		return collapsedTables;
@@ -192,25 +208,37 @@ class ExportService {
 		}
 	}
 
-	// The capture root is `position: fixed` with no explicit width (needed to move it offscreen
-	// without affecting page layout), so it — and every plain block-level ancestor shell below
-	// it — sizes to shrink-to-fit. Per the CSS Grid spec, `repeat( auto-fill/auto-fit, ... )`
-	// collapses to a single track whenever the grid container has no definite size, which is why
-	// clones of e.g. `.team-participant__grid` always render as one column regardless of device
-	// or viewport, even though the live grid (laid out in normal document flow, where it has a
-	// definite width) shows several. Copying each live grid's already-resolved column list onto
-	// the corresponding clone sidesteps the recompute rather than fighting it.
-	preserveGridLayout( liveRoot, clonedRoot ) {
-		const liveNodes = this.queryAllIncludingSelf( liveRoot, '*' );
-		const clonedNodes = this.queryAllIncludingSelf( clonedRoot, '*' );
+	// wrapWithHeaderFooter() deliberately sizes the wrapper as `width: fit-content` so small
+	// content (a table, a bracket) keeps a snug header/footer — but that leaves any grid inside
+	// with no definite width in its own axis, and per the CSS Grid spec, `repeat( auto-fill/
+	// auto-fit, ... )` collapses to a single track whenever the grid container has no definite
+	// size. That's why clones of e.g. `.team-participant__grid` render as one column. Forcing an
+	// explicit reference width lets auto-fill/auto-fit resolve properly; this must run once the
+	// clone is inside the capture iframe, so the desktop CSS (not a real mobile viewport's
+	// media queries) is what's active when it resolves.
+	// A grid with a fixed track template (`.brkts-matchlist`'s 5 columns, a `.generic-label`'s
+	// `1fr auto 1fr`) always reports that many resolved tracks regardless of container width, so
+	// forcing the reference width onto it just stretches those tracks into blank space or, for
+	// small inline badges, blows the element up to iframe width. Only a genuinely collapsed
+	// auto-fill/auto-fit grid resolves to a *single* pixel-length track — that single-track
+	// shape is what identifies a collapse candidate, not any particular selector, so this needs
+	// no allow-list or deny-list of known grids to stay correct as new ones are added.
+	resolveAutoFillGrids( root ) {
+		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+		const referenceWidth = EXPORT_IMAGE_CONFIG.CAPTURE_IFRAME_WIDTH - ( dims.PADDING * 2 );
 
-		liveNodes.forEach( ( liveNode, index ) => {
-			const display = window.getComputedStyle( liveNode ).display;
-			if ( display === 'grid' || display === 'inline-grid' ) {
-				clonedNodes[ index ].style.gridTemplateColumns =
-					window.getComputedStyle( liveNode ).gridTemplateColumns;
+		const gridNodes = this.queryAllIncludingSelf( root, '*' ).filter( ( node ) => {
+			const computedStyle = node.ownerDocument.defaultView.getComputedStyle( node );
+			if ( computedStyle.display !== 'grid' && computedStyle.display !== 'inline-grid' ) {
+				return false;
 			}
+			const tracks = computedStyle.gridTemplateColumns.trim().split( /\s+/ );
+			return tracks.length === 1 && tracks[ 0 ].endsWith( 'px' );
 		} );
+
+		for ( const gridNode of gridNodes ) {
+			gridNode.style.width = `${ referenceWidth }px`;
+		}
 	}
 
 	// A `grid-template-columns: subgrid` root (e.g. `.brkts-matchlist-collapse-area`) loses its tracks once buildAncestorSpine() reparents it under a plain flex wrapper, so bake the live parent's resolved pixel tracks onto the clone to make it self-contained.
@@ -358,9 +386,14 @@ class ExportService {
 	}
 
 	// On WebKit (every iOS browser), snapdom renders shadowed content at native size then resamples it up to avoid corrupting box/text-shadow, which softens the result — so exports need to detect it and compensate.
+	// `window.chrome` is excluded because Chrome DevTools' device toolbar (e.g. its "iPhone"
+	// presets) only overrides navigator.userAgent to a real Mobile Safari string — the engine
+	// underneath is still Blink, which keeps `window.chrome` — so without this check testing an
+	// export under an emulated iPhone falsely triggers the Safari branch (oversampling to a
+	// higher, size-inflating scale for a WebKit blur that Blink doesn't actually have).
 	isSafariBrowser() {
 		const ua = navigator.userAgent;
-		return /safari/i.test( ua ) && !/chrome|android|crios|fxios|edg/i.test( ua );
+		return /safari/i.test( ua ) && !/chrome|android|crios|fxios|edg/i.test( ua ) && !window.chrome;
 	}
 
 	async generateImageBlob( element, title ) {
@@ -377,9 +410,8 @@ class ExportService {
 
 		const target = element.cloneNode( true );
 
-		// Must run before the clone is detached/repositioned, while `element` is still the
-		// correctly-laid-out live reference to copy resolved grid columns from.
-		this.preserveGridLayout( element, target );
+		// Must run before the clone is detached/repositioned, while `element`'s ancestor
+		// still provides the live subgrid tracks to copy onto the clone.
 		this.resolveSubgridRoot( element, target );
 
 		// Mutates the clone, not the live page, so nothing needs restoring afterwards.
@@ -392,17 +424,9 @@ class ExportService {
 		const wrapper = this.wrapWithHeaderFooter( target, title, isDarkTheme );
 		const root = this.buildAncestorSpine( element, wrapper );
 
-		root.style.position = 'fixed';
-		root.style.top = '-99999px';
-		root.style.left = '-99999px';
-		document.body.appendChild( root );
+		const cleanupCaptureFrame = await this.prepareCaptureFrame( root, wrapper );
 
 		try {
-			if ( document.fonts && document.fonts.ready ) {
-				await document.fonts.ready;
-			}
-			await this.waitForImages( wrapper );
-
 			const capturedCanvas = await snapdom.toCanvas( wrapper, {
 				scale: scale,
 				dpr: 1,
@@ -411,8 +435,7 @@ class ExportService {
 				fast: false,
 				exclude: [
 					'.switch-pill-container',
-					'.prizepooltabletoggle',
-					'.prizepool-table-wrapper .table2__footer'
+					'.prizepooltabletoggle'
 				],
 				excludeMode: 'remove',
 				filter: ( capturedElement ) => !capturedElement.matches( '.brkts-match-info-icon' ),
@@ -433,8 +456,118 @@ class ExportService {
 				}, 'image/png' );
 			} );
 		} finally {
-			root.remove();
+			cleanupCaptureFrame();
 		}
+	}
+
+	// Runs the capture inside a fixed-width iframe rather than an off-screen div in the main
+	// document. `position: fixed` off-screen doesn't create a new viewport, so media queries
+	// on the clone still resolve against the visitor's actual (possibly mobile-width) window —
+	// an iframe of its own gets a genuine viewport sized to CAPTURE_IFRAME_WIDTH, so breakpoint
+	// CSS always resolves the same regardless of how narrow the real window is.
+	// DEBUG: when DEBUG_PREVIEW is on, the iframe is shown as an overlay with a "Capture"
+	// button, so the exact content about to be captured can be inspected before it runs.
+	async prepareCaptureFrame( root, wrapper ) {
+		const debug = EXPORT_IMAGE_CONFIG.DEBUG_PREVIEW;
+
+		const iframe = document.createElement( 'iframe' );
+		Object.assign( iframe.style, debug ? {
+			width: `${ EXPORT_IMAGE_CONFIG.CAPTURE_IFRAME_WIDTH }px`,
+			height: '80vh',
+			border: '2px solid #fff',
+			background: '#fff',
+			flex: 'none'
+		} : {
+			width: `${ EXPORT_IMAGE_CONFIG.CAPTURE_IFRAME_WIDTH }px`,
+			height: '1px',
+			border: '0',
+			position: 'fixed',
+			top: '-99999px',
+			left: '-99999px'
+		} );
+
+		const loaded = new Promise( ( resolve ) => {
+			iframe.addEventListener( 'load', resolve, { once: true } );
+		} );
+
+		let overlay = null;
+		let button = null;
+
+		if ( debug ) {
+			button = document.createElement( 'button' );
+			button.textContent = 'Capture';
+			Object.assign( button.style, {
+				padding: '8px 20px',
+				fontSize: '14px',
+				cursor: 'pointer',
+				flex: 'none'
+			} );
+
+			overlay = document.createElement( 'div' );
+			Object.assign( overlay.style, {
+				position: 'fixed',
+				inset: '0',
+				zIndex: '999999',
+				background: 'rgba(0,0,0,0.75)',
+				display: 'flex',
+				flexDirection: 'column',
+				alignItems: 'center',
+				gap: '12px',
+				padding: '24px',
+				overflow: 'auto'
+			} );
+			overlay.append( button, iframe );
+			document.body.appendChild( overlay );
+		} else {
+			document.body.appendChild( iframe );
+		}
+
+		await loaded;
+
+		const iframeDoc = iframe.contentDocument;
+
+		// Cloned <link> stylesheets fetch/parse asynchronously in the iframe's own document,
+		// so the CSS isn't necessarily active yet right after appendChild. resolveAutoFillGrids()
+		// needs the real `display: grid` computed style to find anything — running it too early
+		// finds nothing, and by the time the CSS does apply the grid is left with no explicit
+		// width, collapsing auto-fill to a single column. Wait for each clone to actually load
+		// (listener attached before insertion, so an already-cached/instant load isn't missed).
+		const styleLoadPromises = [];
+		for ( const styleNode of document.querySelectorAll( 'link[rel="stylesheet"], style' ) ) {
+			const clonedStyleNode = styleNode.cloneNode( true );
+
+			if ( clonedStyleNode.tagName === 'LINK' ) {
+				styleLoadPromises.push( Promise.race( [
+					new Promise( ( resolve ) => {
+						clonedStyleNode.addEventListener( 'load', resolve, { once: true } );
+						clonedStyleNode.addEventListener( 'error', resolve, { once: true } );
+					} ),
+					new Promise( ( resolve ) => {
+						setTimeout( resolve, EXPORT_IMAGE_CONFIG.TIMEOUTS.IMAGE_LOAD );
+					} )
+				] ) );
+			}
+
+			iframeDoc.head.appendChild( clonedStyleNode );
+		}
+		await Promise.all( styleLoadPromises );
+
+		iframeDoc.body.style.margin = '0';
+		iframeDoc.body.appendChild( root );
+		this.resolveAutoFillGrids( root );
+
+		if ( iframeDoc.fonts && iframeDoc.fonts.ready ) {
+			await iframeDoc.fonts.ready;
+		}
+		await this.waitForImages( wrapper );
+
+		if ( debug ) {
+			await new Promise( ( resolve ) => {
+				button.addEventListener( 'click', resolve, { once: true } );
+			} );
+		}
+
+		return () => ( overlay || iframe ).remove();
 	}
 
 	async copyToClipboard( element, title ) {
