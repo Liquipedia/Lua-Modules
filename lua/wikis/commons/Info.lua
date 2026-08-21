@@ -34,5 +34,10 @@ return {
 			matchPage = false,
 			status = 2,
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchdiff', 'gamediff'},
+			},
+		},
 	},
 }

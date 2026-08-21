@@ -13,6 +13,7 @@ local Icon = Lua.import('Module:Icon')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
+local Template = Lua.import('Module:Template')
 local Variables = Lua.import('Module:Variables')
 
 local Info = Lua.import('Module:Info', {loadData = true})
@@ -212,9 +213,11 @@ function TransferRef.createReference(refData, date)
 	local refType = refData.refType
 
 	if refType == WEB_TYPE then
-		local refCite = mw.getCurrentFrame():expandTemplate{
-			title = 'Cite web',
-			args = {
+		local frame = mw.getCurrentFrame()
+		local refCite = Template.safeExpand(
+			frame,
+			'Cite web',
+			{
 				url = refData.link,
 				title = refData.title or 'Transfer reference',
 				trans_title = refData.transTitle,
@@ -225,8 +228,8 @@ function TransferRef.createReference(refData, date)
 				archiveurl = refData.archiveUrl,
 				archivedate = refData.archiveDate,
 			}
-		}
-		return mw.getCurrentFrame():callParserFunction{
+		)
+		return frame:callParserFunction{
 			name = '#tag:ref',
 			args = {
 				refCite,

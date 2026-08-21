@@ -11,19 +11,19 @@ local Component = Lua.import('Module:Widget/Component')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 
-local SquadUtils = Lua.import('Module:Squad/Utils')
+local SquadTypes = Lua.import('Module:Features/Squad/Types')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 local SquadStatusToDisplay = {
-	[SquadUtils.SquadStatus.ACTIVE] = '',
-	[SquadUtils.SquadStatus.INACTIVE] = 'Inactive',
-	[SquadUtils.SquadStatus.FORMER] = 'Former',
-	[SquadUtils.SquadStatus.FORMER_INACTIVE] = 'Former',
+	[SquadTypes.SquadStatus.ACTIVE] = '',
+	[SquadTypes.SquadStatus.INACTIVE] = 'Inactive',
+	[SquadTypes.SquadStatus.FORMER] = 'Former',
+	[SquadTypes.SquadStatus.FORMER_INACTIVE] = 'Former',
 }
 
 local SquadTypeToDisplay = {
-	[SquadUtils.SquadType.PLAYER] = 'Players',
-	[SquadUtils.SquadType.STAFF] = 'Organization',
+	[SquadTypes.SquadType.PLAYER] = 'Players',
+	[SquadTypes.SquadType.STAFF] = 'Organization',
 }
 
 ---@param squadStatus SquadStatus
@@ -33,11 +33,11 @@ local SquadTypeToDisplay = {
 local function getTitle(squadStatus, title, squadType)
 	local defaultTitle
 	-- TODO: Work away this special case
-	if squadType == SquadUtils.SquadType.PLAYER and
-		(squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE) then
+	if squadType == SquadTypes.SquadType.PLAYER and
+		(squadStatus == SquadTypes.SquadStatus.FORMER or squadStatus == SquadTypes.SquadStatus.FORMER_INACTIVE) then
 
 		defaultTitle = 'Former Squad'
-	elseif squadStatus ~= SquadUtils.SquadStatus.ACTIVE then
+	elseif squadStatus ~= SquadTypes.SquadStatus.ACTIVE then
 		defaultTitle = SquadStatusToDisplay[squadStatus] .. ' ' .. SquadTypeToDisplay[squadType]
 	end
 
@@ -72,7 +72,7 @@ end
 return Component.component(
 	SquadContainer,
 	{
-		status = SquadUtils.SquadStatus.ACTIVE,
-		type = SquadUtils.SquadType.PLAYER,
+		status = SquadTypes.SquadStatus.ACTIVE,
+		type = SquadTypes.SquadType.PLAYER,
 	}
 )

@@ -162,7 +162,7 @@ end
 
 ---Constructs a submatch object whose properties are aggregated from that of its games.
 ---@param match StarcraftMatchGroupUtilMatch
----@param subgroup MatchGroupUtilSubgroup
+---@param subgroup StarcraftMatchGroupUtilSubmatch
 ---@return StarcraftMatchGroupUtilSubmatch
 function StarcraftMatchGroupUtil.constructSubmatch(match, subgroup)
 	local games = subgroup.games
@@ -221,7 +221,7 @@ end
 ---@return boolean
 function StarcraftMatchGroupUtil.matchHasDetails(match)
 	local linksWithoutH2H = Table.filterByKey(match.links, function(key)
-		return key ~= 'headtohead'
+		return key ~= 'headtohead' and key ~= 'headtohead_lh'
 	end)
 	return match.dateIsExact
 		or String.isNotEmpty(match.vod)
