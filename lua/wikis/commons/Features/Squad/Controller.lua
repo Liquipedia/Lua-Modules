@@ -17,11 +17,11 @@ local SquadColumnAnalyser = Lua.import('Module:Features/Squad/Lib/Columns')
 local SquadStore = Lua.import('Module:Features/Squad/Api/Store')
 local Table = Lua.import('Module:Table')
 
-local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
 local ErrorBoundary = Lua.import('Module:Widget/ErrorBoundary')
-local SquadDisplay = Lua.import('Module:Widget/Squad/Container')
-local SquadHeader = Lua.import('Module:Widget/Squad/Header')
-local SquadPlayerDisplay = Lua.import('Module:Widget/Squad/Player')
+local SquadContexts = Lua.import('Module:Features/Squad/Components/Contexts')
+local SquadDisplay = Lua.import('Module:Features/Squad/Components/Container')
+local SquadHeader = Lua.import('Module:Features/Squad/Components/Header')
+local SquadPlayerDisplay = Lua.import('Module:Features/Squad/Components/Player')
 local Table2 = Lua.import('Module:Widget/Table2/All')
 
 local SquadController = {}
