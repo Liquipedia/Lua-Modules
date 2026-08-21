@@ -30,7 +30,8 @@ local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {load
 local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 
 ---@class CustomMatchSummaryInterface
----@field createBody? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
+---@field createBody? fun(match: MatchGroupUtilMatch): Renderable|Renderable[] @deprecated
+---@field createGames? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 ---@field createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
 ---@field createFooter? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 
@@ -59,13 +60,22 @@ end
 
 -- Default body function
 ---@param match MatchGroupUtilMatch
----@param createGame fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
+---@param createGames? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]?
+---@param createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
+---@param options {maxBans: integer?}?
 ---@return Renderable[]
-function MatchSummary.createDefaultBody(match, createGame)
+function MatchSummary.createDefaultBody(match, createGames, createGame, options)
+	options = options or {}
+
+	local characterBansData = MatchSummary.buildCharacterBanData(match.games, options.maxBans or 0)
+
 	return WidgetUtil.collect(
-		Array.map(match.games, FnUtil.curry(createGame, match.date)),
+		--- we assume that createGames and createGame are mutually exclusive, so we can safely call one or the other
+		---@diagnostic disable-next-line: param-type-mismatch
+		createGames and createGames(match) or Array.map(match.games, FnUtil.curry(createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
+		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
 	)
 end
 
@@ -167,7 +177,7 @@ end
 ---Default createMatch function for usage in Custom MatchSummary
 ---@param matchData MatchGroupUtilMatch?
 ---@param CustomMatchSummary CustomMatchSummaryInterface
----@param options {teamStyle: teamStyle?, noScore: boolean?}?
+---@param options {teamStyle: teamStyle?, noScore: boolean?, maxBans: integer?}?
 ---@return VNode?
 function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	if not matchData then
@@ -181,7 +191,7 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 		MatchSummary.createHeader(matchData, options),
 		MatchSummaryWidgets.Body{
 			children = WidgetUtil.collect(
-				createBody(matchData, CustomMatchSummary.createGame),
+				createBody(matchData, CustomMatchSummary.createGames, CustomMatchSummary.createGame, options),
 				Html.Fragment{
 					children = {
 						MatchSummaryWidgets.Casters{casters = matchData.extradata.casters},
@@ -203,12 +213,17 @@ end
 ---Default getByMatchId function for usage in Custom MatchSummary
 ---@param CustomMatchSummary CustomMatchSummaryInterface
 ---@param args table
----@param options {teamStyle:teamStyle?, width: (fun(match: MatchGroupUtilMatch):string?)|string?, noScore:boolean?}?
+---@param options {teamStyle:teamStyle?, width: (fun(match: MatchGroupUtilMatch):string?)|string?,
+---noScore:boolean?, maxBans: integer?}?
 ---@return VNode
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(
-		(type(CustomMatchSummary.createBody) == 'function' or type(CustomMatchSummary.createGame) == 'function'),
-		'createBody(match) or createGame(date, game, gameIndex) must be implemented in Module:MatchSummary'
+		(
+			type(CustomMatchSummary.createBody) == 'function' or
+			type(CustomMatchSummary.createGame) == 'function' or
+			type(CustomMatchSummary.createGames) == 'function'
+		),
+		'One of createBody or createGame or createGames must be implemented in Module:MatchSummary'
 	)
 
 	options = options or {}
