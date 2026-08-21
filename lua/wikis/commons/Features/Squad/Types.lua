@@ -53,11 +53,23 @@
 ---@field toRole string?
 ---@field faction string?
 
---- One uninterrupted period a person spent on a team, as a set of the transfers that bound it.
+--- The transfers behind a single squad row: what put a person on the team, what took them off the
+--- active squad, and what ended their time there. A person can have several of these on one team,
+--- and `inactiveEntry` is the transfer that made them inactive, not the last one before leaving.
 ---@class (exact) SquadStint
 ---@field joinEntry TeamHistoryEntry
 ---@field inactiveEntry TeamHistoryEntry?
 ---@field leaveEntry TeamHistoryEntry?
+
+--- A transfer that could not be fitted into the history. The caller decides how to report it.
+---@class SquadHistoryWarning
+---@field reason string
+---@field entry TeamHistoryEntry
+
+---@class SquadHistorySelection
+---@field stints SquadStint[]
+---@field warnings SquadHistoryWarning[]
+---@field hasFormerInactiveEntry boolean whether a transfer took someone off the active squad
 
 local SquadTypes = {}
 

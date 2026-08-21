@@ -22,16 +22,6 @@ local ROLE_INACTIVE = SquadTypes.ROLE_INACTIVE
 --- Pure: it neither queries nor renders anything, it only reads records and returns history.
 local SquadHistory = {}
 
---- A transfer that could not be fitted into the history. The caller decides how to report it.
----@class SquadHistoryWarning
----@field reason string
----@field entry TeamHistoryEntry
-
----@class SquadHistorySelection
----@field stints SquadStint[]
----@field warnings SquadHistoryWarning[]
----@field hasInactiveEntry boolean whether a transfer took someone off the active squad
-
 ---Checks whether a given team is one of the teams the history is built for
 ---@param teams string[]
 ---@param team string?
@@ -159,7 +149,7 @@ function SquadHistory.fromTransfer(record, teams)
 end
 
 ---Groups transfer records into a team history per person.
----A person whose every transfer was irrelevant is still present, with an empty history.
+---A person whose every transfer is irrelevant to the team never enters the history at all.
 ---@param records transfer[] ordered by date ascending
 ---@param teams string[] every team template that counts as the team
 ---@return table<string, TeamHistoryEntry[]>
@@ -168,13 +158,12 @@ function SquadHistory.fromTransfers(records, teams)
 	local playersTeamHistory = {}
 
 	Array.forEach(records, function(record)
-		playersTeamHistory[record.player] = playersTeamHistory[record.player] or {}
-
 		local entry = SquadHistory.fromTransfer(record, teams)
 		if not entry then
 			return
 		end
 
+		playersTeamHistory[record.player] = playersTeamHistory[record.player] or {}
 		table.insert(playersTeamHistory[record.player], entry)
 	end)
 
@@ -188,7 +177,7 @@ end
 function SquadHistory._selectFormerStints(entries)
 	local stints = {}
 	local warnings = {}
-	local hasInactiveEntry = false
+	local hasFormerInactiveEntry = false
 
 	local joinEntry, inactiveEntry
 
@@ -207,9 +196,12 @@ function SquadHistory._selectFormerStints(entries)
 		end
 
 		if entry.type == TransferType.CHANGE and entry.toRole == ROLE_INACTIVE then
-			-- FORMER_INACTIVE enables the Inactive Date display
-			hasInactiveEntry = true
-			inactiveEntry = entry
+			-- Enable the Inactive Date display in Former Squad tables
+			hasFormerInactiveEntry = true
+			-- Keep the transfer that took them off the active squad. Further inactive transfers
+			-- before they leave are role changes made while already inactive, so they do not move
+			-- the inactive date. Becoming active again ends the row and clears this.
+			inactiveEntry = inactiveEntry or entry
 			return
 		end
 
@@ -222,28 +214,24 @@ function SquadHistory._selectFormerStints(entries)
 		end
 	end)
 
-	return {stints = stints, warnings = warnings, hasInactiveEntry = hasInactiveEntry}
+	return {stints = stints, warnings = warnings, hasFormerInactiveEntry = hasFormerInactiveEntry}
 end
 
 ---Selects the stints of one person's team history that belong in a squad table of a given status.
 ---For (in)active tables at most one stint is returned, for former tables there may be several.
----An unrecognized status selects nothing, which is how an unreadable status argument ends up.
+---Returns nothing when the history holds no row for a table of this status, which also covers an
+---unrecognized status.
 ---@param entries TeamHistoryEntry[]
 ---@param squadStatus SquadStatus?
----@return SquadHistorySelection
+---@return SquadHistorySelection?
 function SquadHistory.selectStints(entries, squadStatus)
-	local nothing = {stints = {}, warnings = {}, hasInactiveEntry = false}
-
 	if squadStatus == SquadTypes.SquadStatus.ACTIVE then
 		-- Only most recent transfer is relevant
 		local last = entries[#entries]
-		if not last then
-			return nothing
-		end
-		if (last.type == TransferType.CHANGE or last.type == TransferType.JOIN)
+		if last and (last.type == TransferType.CHANGE or last.type == TransferType.JOIN)
 				and last.toRole ~= ROLE_INACTIVE then
 			-- When the last transfer is a leave transfer, or the role is inactive, the person wouldn't be active
-			return {stints = {{joinEntry = last}}, warnings = {}, hasInactiveEntry = false}
+			return {stints = {{joinEntry = last}}, warnings = {}, hasFormerInactiveEntry = false}
 		end
 	end
 
@@ -253,7 +241,7 @@ function SquadHistory.selectStints(entries, squadStatus)
 			return {
 				stints = {{joinEntry = secondToLast, inactiveEntry = last}},
 				warnings = {},
-				hasInactiveEntry = false,
+				hasFormerInactiveEntry = false,
 			}
 		end
 	end
@@ -262,7 +250,7 @@ function SquadHistory.selectStints(entries, squadStatus)
 		return SquadHistory._selectFormerStints(entries)
 	end
 
-	return nothing
+	return nil
 end
 
 return SquadHistory

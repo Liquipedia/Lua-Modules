@@ -61,6 +61,77 @@ local function entry(props)
 	}, props or {})
 end
 
+--[[
+The transfers below are written as what happened to one person on the team, and fed through
+fromTransfers, so every case a test describes is one the real parser can actually produce.
+]]
+local Transfers = {}
+
+---@param date string
+---@param role string?
+---@return table
+function Transfers.joins(date, role)
+	return transfer{date = date, toteamtemplate = TEAM, role2 = role or ''}
+end
+
+---@param date string
+---@param fromRole string?
+---@param toRole string?
+---@return table
+function Transfers.changesRole(date, fromRole, toRole)
+	return transfer{date = date, fromteamtemplate = TEAM, toteamtemplate = TEAM,
+		role1 = fromRole or '', role2 = toRole or ''}
+end
+
+---Stops playing while still on the team. `role1` stays the playing role, which is how these are
+---recorded on the wiki and what keeps the transfer from being skipped as a no-op.
+---@param date string
+---@param playingRole string?
+---@return table
+function Transfers.stopsPlaying(date, playingRole)
+	return Transfers.changesRole(date, playingRole or 'Standin', 'Inactive')
+end
+
+---@param date string
+---@param toTeam string?
+---@return table
+function Transfers.leaves(date, toTeam)
+	return transfer{date = date, fromteamtemplate = TEAM, toteamtemplate = toTeam or ''}
+end
+
+---The team history these transfers produce for the person they concern.
+---@param ... table
+---@return TeamHistoryEntry[]
+local function historyOf(...)
+	return SquadHistory.fromTransfers({...}, TEAMS).Alice or {}
+end
+
+---The selection a squad table of this status makes, where a row is expected.
+---@param history TeamHistoryEntry[]
+---@param squadStatus SquadStatus?
+---@return SquadHistorySelection
+local function selectionFor(history, squadStatus)
+	local selection = SquadHistory.selectStints(history, squadStatus)
+	assert(selection, 'expected this history to yield a selection')
+	return selection
+end
+
+---The rows a squad table of this status would show for the given history.
+---@param history TeamHistoryEntry[]
+---@param squadStatus SquadStatus?
+---@return SquadStint[]
+local function rowsFor(history, squadStatus)
+	local selection = SquadHistory.selectStints(history, squadStatus)
+	return selection and selection.stints or {}
+end
+
+---@param historyEntry TeamHistoryEntry?
+---@return string
+local function dateOf(historyEntry)
+	assert(historyEntry, 'expected a transfer to be recorded here')
+	return historyEntry.date
+end
+
 describe('Squad history', function()
 	describe('fromTransfer', function()
 		it('reads a transfer into the team as a join', function()
@@ -231,12 +302,12 @@ describe('Squad history', function()
 			assert.are_equal('2022-01-01', history.Alice[2].date)
 		end)
 
-		it('keeps a person whose every transfer was skipped, with an empty history', function()
+		it('leaves out a person whose every transfer was skipped', function()
 			local history = SquadHistory.fromTransfers({
 				transfer{player = 'Alice', fromteamtemplate = OTHER_TEAM, toteamtemplate = OTHER_TEAM},
 			}, TEAMS)
 
-			assert.are_same({Alice = {}}, history)
+			assert.are_same({}, history)
 		end)
 
 		it('returns an empty table when there are no transfers', function()
@@ -244,189 +315,255 @@ describe('Squad history', function()
 		end)
 	end)
 
-	describe('selectStints for an active squad', function()
-		it('takes the most recent transfer when it put the person on the team', function()
-			local join = entry{type = TransferType.JOIN}
-			local selection = SquadHistory.selectStints({join}, SquadStatus.ACTIVE)
+	describe('an active squad', function()
+		it('shows someone whose latest transfer put them on the team', function()
+			local selection = selectionFor(
+				historyOf(Transfers.joins('2022-01-01', 'Standin')), SquadStatus.ACTIVE)
 
 			assert.are_equal(1, #selection.stints)
-			assert.are_equal(join, selection.stints[1].joinEntry)
-			assert.is_nil(selection.stints[1].inactiveEntry)
+			assert.are_equal('2022-01-01', dateOf(selection.stints[1].joinEntry))
+			assert.are_equal('Standin', selection.stints[1].joinEntry.toRole)
 			assert.is_nil(selection.stints[1].leaveEntry)
-			assert.is_false(selection.hasInactiveEntry)
 			assert.are_same({}, selection.warnings)
 		end)
 
-		it('takes a role change as the start of the current stint', function()
-			local join = entry{type = TransferType.JOIN, date = '2021-01-01'}
-			local roleChange = entry{type = TransferType.CHANGE, date = '2022-01-01', toRole = 'Captain'}
-			local selection = SquadHistory.selectStints({join, roleChange}, SquadStatus.ACTIVE)
+		it('dates the row from the latest role change rather than the original join', function()
+			local selection = selectionFor(historyOf(
+				Transfers.joins('2021-01-01', 'Standin'),
+				Transfers.changesRole('2022-01-01', 'Standin', 'Captain')
+			), SquadStatus.ACTIVE)
 
-			assert.are_equal(roleChange, selection.stints[1].joinEntry)
+			assert.are_equal('2022-01-01', dateOf(selection.stints[1].joinEntry))
+			assert.are_equal('Captain', selection.stints[1].joinEntry.toRole)
 		end)
 
-		it('takes nobody whose last transfer was a leave', function()
-			local selection = SquadHistory.selectStints(
-				{entry{type = TransferType.JOIN}, entry{type = TransferType.LEAVE}},
-				SquadStatus.ACTIVE
-			)
-			assert.are_same({}, selection.stints)
+		it('leaves out someone who has left the team', function()
+			assert.are_same({}, rowsFor(historyOf(
+				Transfers.joins('2021-01-01'),
+				Transfers.leaves('2022-01-01')
+			), SquadStatus.ACTIVE))
 		end)
 
-		it('takes nobody whose last transfer made them inactive', function()
-			local selection = SquadHistory.selectStints(
-				{entry{type = TransferType.JOIN}, entry{type = TransferType.CHANGE, toRole = 'Inactive'}},
-				SquadStatus.ACTIVE
-			)
-			assert.are_same({}, selection.stints)
+		it('leaves out someone who has stopped playing', function()
+			assert.are_same({}, rowsFor(historyOf(
+				Transfers.joins('2021-01-01', 'Standin'),
+				Transfers.stopsPlaying('2022-01-01')
+			), SquadStatus.ACTIVE))
 		end)
 	end)
 
-	describe('selectStints for an inactive squad', function()
-		it('pairs the transfer that made someone inactive with the one before it', function()
-			local join = entry{type = TransferType.JOIN, date = '2021-01-01'}
-			local inactive = entry{type = TransferType.CHANGE, date = '2022-01-01', toRole = 'Inactive'}
-			local selection = SquadHistory.selectStints({join, inactive}, SquadStatus.INACTIVE)
+	describe('an inactive squad', function()
+		it('shows when the person joined and when they stopped playing', function()
+			local selection = selectionFor(historyOf(
+				Transfers.joins('2021-01-01', 'Standin'),
+				Transfers.stopsPlaying('2022-01-01')
+			), SquadStatus.INACTIVE)
 
 			assert.are_equal(1, #selection.stints)
-			assert.are_equal(join, selection.stints[1].joinEntry)
-			assert.are_equal(inactive, selection.stints[1].inactiveEntry)
+			assert.are_equal('2021-01-01', dateOf(selection.stints[1].joinEntry))
+			assert.are_equal('2022-01-01', dateOf(selection.stints[1].inactiveEntry))
 			assert.is_nil(selection.stints[1].leaveEntry)
-			-- the table is already inactive, so nothing has to switch it over
-			assert.is_false(selection.hasInactiveEntry)
 		end)
 
-		it('takes nobody who is still active', function()
-			assert.are_same({}, SquadHistory.selectStints({entry{}}, SquadStatus.INACTIVE).stints)
+		it('leaves out someone who is still playing', function()
+			assert.are_same({}, rowsFor(historyOf(Transfers.joins('2021-01-01')), SquadStatus.INACTIVE))
 		end)
 
-		it('takes nobody whose inactive transfer has nothing before it', function()
-			local selection = SquadHistory.selectStints(
-				{entry{type = TransferType.CHANGE, toRole = 'Inactive'}},
-				SquadStatus.INACTIVE
-			)
-			assert.are_same({}, selection.stints)
+		it('leaves out someone who stopped playing without ever having joined', function()
+			assert.are_same({}, rowsFor(historyOf(Transfers.stopsPlaying('2022-01-01')), SquadStatus.INACTIVE))
 		end)
 
-		it('takes nobody whose last transfer was a leave', function()
-			local selection = SquadHistory.selectStints(
-				{entry{type = TransferType.JOIN}, entry{type = TransferType.LEAVE}},
-				SquadStatus.INACTIVE
-			)
-			assert.are_same({}, selection.stints)
+		it('leaves out someone who has left the team', function()
+			assert.are_same({}, rowsFor(historyOf(
+				Transfers.joins('2021-01-01'),
+				Transfers.leaves('2022-01-01')
+			), SquadStatus.INACTIVE))
 		end)
 	end)
 
-	describe('selectStints for a former squad', function()
-		it('pairs a join with the leave that follows it', function()
-			local join = entry{type = TransferType.JOIN, date = '2021-01-01'}
-			local leave = entry{type = TransferType.LEAVE, date = '2022-01-01'}
-			local selection = SquadHistory.selectStints({join, leave}, SquadStatus.FORMER)
+	describe('a former squad', function()
+		it('shows one row spanning join to leave', function()
+			local selection = selectionFor(historyOf(
+				Transfers.joins('2021-01-01'),
+				Transfers.leaves('2022-01-01')
+			), SquadStatus.FORMER)
 
 			assert.are_equal(1, #selection.stints)
-			assert.are_same({joinEntry = join, inactiveEntry = nil, leaveEntry = leave}, selection.stints[1])
-			assert.is_false(selection.hasInactiveEntry)
+			assert.are_equal('2021-01-01', dateOf(selection.stints[1].joinEntry))
+			assert.are_equal('2022-01-01', dateOf(selection.stints[1].leaveEntry))
+			assert.is_nil(selection.stints[1].inactiveEntry)
+			assert.is_false(selection.hasFormerInactiveEntry)
 		end)
 
-		it('splits a role change into two stints, the change ending one and starting the next', function()
-			local join = entry{type = TransferType.JOIN, date = '2021-01-01'}
-			local roleChange = entry{type = TransferType.CHANGE, date = '2022-01-01', toRole = 'Captain'}
-			local leave = entry{type = TransferType.LEAVE, date = '2023-01-01'}
-			local selection = SquadHistory.selectStints({join, roleChange, leave}, SquadStatus.FORMER)
+		it('gives a changed role its own row, ending the previous one', function()
+			local selection = selectionFor(historyOf(
+				Transfers.joins('2021-01-01', 'Standin'),
+				Transfers.changesRole('2022-01-01', 'Standin', 'Captain'),
+				Transfers.leaves('2023-01-01')
+			), SquadStatus.FORMER)
 
 			assert.are_equal(2, #selection.stints)
-			assert.are_equal(join, selection.stints[1].joinEntry)
-			assert.are_equal(roleChange, selection.stints[1].leaveEntry)
-			assert.are_equal(roleChange, selection.stints[2].joinEntry)
-			assert.are_equal(leave, selection.stints[2].leaveEntry)
+			assert.are_equal('2021-01-01', dateOf(selection.stints[1].joinEntry))
+			assert.are_equal('2022-01-01', dateOf(selection.stints[1].leaveEntry))
+			assert.are_equal('2022-01-01', dateOf(selection.stints[2].joinEntry))
+			assert.are_equal('2023-01-01', dateOf(selection.stints[2].leaveEntry))
 		end)
 
-		it('folds a stint that went inactive before it ended into one stint', function()
-			local join = entry{type = TransferType.JOIN, date = '2021-01-01'}
-			local inactive = entry{type = TransferType.CHANGE, date = '2022-01-01', toRole = 'Inactive'}
-			local leave = entry{type = TransferType.LEAVE, date = '2023-01-01'}
-			local selection = SquadHistory.selectStints({join, inactive, leave}, SquadStatus.FORMER)
+		it('keeps a spell that went inactive as one row, and flags the inactive column', function()
+			local selection = selectionFor(historyOf(
+				Transfers.joins('2021-01-01', 'Standin'),
+				Transfers.stopsPlaying('2022-01-01'),
+				Transfers.leaves('2023-01-01')
+			), SquadStatus.FORMER)
 
 			assert.are_equal(1, #selection.stints)
-			assert.are_same({joinEntry = join, inactiveEntry = inactive, leaveEntry = leave}, selection.stints[1])
-			-- which is what tells the caller to show the Inactive Date column
-			assert.is_true(selection.hasInactiveEntry)
+			assert.are_equal('2021-01-01', dateOf(selection.stints[1].joinEntry))
+			assert.are_equal('2022-01-01', dateOf(selection.stints[1].inactiveEntry))
+			assert.are_equal('2023-01-01', dateOf(selection.stints[1].leaveEntry))
+			assert.is_true(selection.hasFormerInactiveEntry)
 		end)
 
-		it('reports the inactive transfer even when the stint never ended', function()
-			local selection = SquadHistory.selectStints({
-				entry{type = TransferType.JOIN, date = '2021-01-01'},
-				entry{type = TransferType.CHANGE, date = '2022-01-01', toRole = 'Inactive'},
-			}, SquadStatus.FORMER)
+		it('dates an inactive spell from when the person stopped playing', function()
+			-- a second inactive transfer is a role change made while already inactive, so the date
+			-- the reader sees stays the day they stopped playing
+			local selection = selectionFor(historyOf(
+				Transfers.joins('2021-01-01', 'Standin'),
+				Transfers.stopsPlaying('2022-01-01'),
+				Transfers.stopsPlaying('2022-06-01'),
+				Transfers.leaves('2023-01-01')
+			), SquadStatus.FORMER)
+
+			assert.are_equal(1, #selection.stints)
+			assert.are_equal('2022-01-01', dateOf(selection.stints[1].inactiveEntry))
+		end)
+
+		it('dates each inactive spell separately when the person played again in between', function()
+			local selection = selectionFor(historyOf(
+				Transfers.joins('2021-01-01', 'Standin'),
+				Transfers.stopsPlaying('2021-06-01'),
+				Transfers.changesRole('2021-09-01', 'Inactive', 'Standin'),
+				Transfers.stopsPlaying('2022-01-01'),
+				Transfers.leaves('2022-06-01')
+			), SquadStatus.FORMER)
+
+			assert.are_equal(2, #selection.stints)
+			assert.are_equal('2021-06-01', dateOf(selection.stints[1].inactiveEntry))
+			assert.are_equal('2022-01-01', dateOf(selection.stints[2].inactiveEntry))
+		end)
+
+		it('flags the inactive column even when the person has not left yet', function()
+			local selection = selectionFor(historyOf(
+				Transfers.joins('2021-01-01', 'Standin'),
+				Transfers.stopsPlaying('2022-01-01')
+			), SquadStatus.FORMER)
 
 			assert.are_same({}, selection.stints)
-			assert.is_true(selection.hasInactiveEntry)
+			assert.is_true(selection.hasFormerInactiveEntry)
 		end)
 
-		it('leaves an unfinished stint out', function()
-			local selection = SquadHistory.selectStints({entry{type = TransferType.JOIN}}, SquadStatus.FORMER)
+		it('gives someone who left and rejoined a row for each spell', function()
+			local selection = selectionFor(historyOf(
+				Transfers.joins('2020-01-01'),
+				Transfers.leaves('2021-01-01'),
+				Transfers.joins('2022-01-01'),
+				Transfers.leaves('2023-01-01')
+			), SquadStatus.FORMER)
+
+			assert.are_equal(2, #selection.stints)
+			assert.are_equal('2020-01-01', dateOf(selection.stints[1].joinEntry))
+			assert.are_equal('2021-01-01', dateOf(selection.stints[1].leaveEntry))
+			assert.are_equal('2022-01-01', dateOf(selection.stints[2].joinEntry))
+			assert.are_equal('2023-01-01', dateOf(selection.stints[2].leaveEntry))
+			-- rejoining is not a duplicate join, the first spell already ended
+			assert.are_same({}, selection.warnings)
+		end)
+
+		it('does not carry an inactive spell into a later one', function()
+			local selection = selectionFor(historyOf(
+				Transfers.joins('2020-01-01', 'Standin'),
+				Transfers.stopsPlaying('2020-06-01'),
+				Transfers.leaves('2021-01-01'),
+				Transfers.joins('2022-01-01'),
+				Transfers.leaves('2023-01-01')
+			), SquadStatus.FORMER)
+
+			assert.are_equal('2020-06-01', dateOf(selection.stints[1].inactiveEntry))
+			assert.is_nil(selection.stints[2].inactiveEntry)
+		end)
+
+		it('shows nothing for someone who has not left yet', function()
+			local selection = selectionFor(
+				historyOf(Transfers.joins('2021-01-01')), SquadStatus.FORMER)
 			assert.are_same({}, selection.stints)
 			assert.are_same({}, selection.warnings)
 		end)
 
-		it('skips a duplicate join and reports it', function()
-			local duplicate = entry{type = TransferType.JOIN, date = '2021-06-01'}
-			local selection = SquadHistory.selectStints({
-				entry{type = TransferType.JOIN, date = '2021-01-01'},
-				duplicate,
-				entry{type = TransferType.LEAVE, date = '2022-01-01'},
-			}, SquadStatus.FORMER)
+		it('ignores a second join with no leave between, and flags the page', function()
+			local selection = selectionFor(historyOf(
+				Transfers.joins('2021-01-01'),
+				Transfers.joins('2021-06-01'),
+				Transfers.leaves('2022-01-01')
+			), SquadStatus.FORMER)
 
 			assert.are_equal(1, #selection.stints)
-			assert.are_equal('2021-01-01', selection.stints[1].joinEntry.date)
-			assert.are_same({{reason = 'Invalid entry: Duplicate JOIN. Skipping', entry = duplicate}},
-				selection.warnings)
+			assert.are_equal('2021-01-01', dateOf(selection.stints[1].joinEntry))
+			assert.are_equal(1, #selection.warnings)
+			assert.are_equal('Invalid entry: Duplicate JOIN. Skipping', selection.warnings[1].reason)
 		end)
 
-		it('skips a leave without a join and reports it', function()
-			local orphan = entry{type = TransferType.LEAVE, date = '2022-01-01'}
-			local selection = SquadHistory.selectStints({orphan}, SquadStatus.FORMER)
+		it('ignores a leave with no join before it, and flags the page', function()
+			local selection = selectionFor(
+				historyOf(Transfers.leaves('2022-01-01')), SquadStatus.FORMER)
 
 			assert.are_same({}, selection.stints)
-			assert.are_same({{reason = 'Invalid entry: Missing previous JOIN. Skipping', entry = orphan}},
-				selection.warnings)
+			assert.are_equal(1, #selection.warnings)
+			assert.are_equal('Invalid entry: Missing previous JOIN. Skipping', selection.warnings[1].reason)
 		end)
 
-		it('recovers after an invalid entry', function()
-			local selection = SquadHistory.selectStints({
-				entry{type = TransferType.LEAVE, date = '2020-01-01'},
-				entry{type = TransferType.JOIN, date = '2021-01-01'},
-				entry{type = TransferType.LEAVE, date = '2022-01-01'},
-			}, SquadStatus.FORMER)
+		it('still reads the rest of the history after a bad entry', function()
+			local selection = selectionFor(historyOf(
+				Transfers.leaves('2020-01-01'),
+				Transfers.joins('2021-01-01'),
+				Transfers.leaves('2022-01-01')
+			), SquadStatus.FORMER)
 
 			assert.are_equal(1, #selection.stints)
+			assert.are_equal('2021-01-01', dateOf(selection.stints[1].joinEntry))
 			assert.are_equal(1, #selection.warnings)
 		end)
 
-		it('handles a former inactive table the same way as a former one', function()
-			local join = entry{type = TransferType.JOIN, date = '2021-01-01'}
-			local leave = entry{type = TransferType.LEAVE, date = '2022-01-01'}
+		it('reads a former inactive table the same way as a former one', function()
+			local history = historyOf(Transfers.joins('2021-01-01'), Transfers.leaves('2022-01-01'))
 			assert.are_same(
-				SquadHistory.selectStints({join, leave}, SquadStatus.FORMER),
-				SquadHistory.selectStints({join, leave}, SquadStatus.FORMER_INACTIVE)
+				SquadHistory.selectStints(history, SquadStatus.FORMER),
+				SquadHistory.selectStints(history, SquadStatus.FORMER_INACTIVE)
 			)
 		end)
 	end)
 
-	describe('selectStints edge cases', function()
-		it('takes nobody for an unknown status', function()
-			local selection = SquadHistory.selectStints({entry{}}, nil)
-			assert.are_same({stints = {}, warnings = {}, hasInactiveEntry = false}, selection)
+	describe('a history that yields no row', function()
+		it('selects nothing for a status it does not recognise', function()
+			assert.is_nil(SquadHistory.selectStints({entry{}}, nil))
 		end)
 
-		it('handles an empty history for the statuses that walk it', function()
-			assert.are_same({}, SquadHistory.selectStints({}, SquadStatus.FORMER).stints)
-			assert.are_same({}, SquadHistory.selectStints({}, SquadStatus.INACTIVE).stints)
+		it('selects nothing for an empty history', function()
+			assert.is_nil(SquadHistory.selectStints({}, SquadStatus.ACTIVE))
+			assert.is_nil(SquadHistory.selectStints({}, SquadStatus.INACTIVE))
 		end)
 
-		it('does not error on an empty history for an active squad', function()
-			-- fromTransfers can produce an empty history for someone whose transfers were all skipped
-			assert.are_same({}, SquadHistory.selectStints({}, SquadStatus.ACTIVE).stints)
+		it('selects nothing when an active squad has nobody active', function()
+			assert.is_nil(SquadHistory.selectStints(historyOf(
+				Transfers.joins('2021-01-01'),
+				Transfers.leaves('2022-01-01')
+			), SquadStatus.ACTIVE))
+		end)
+
+		it('still selects a former squad with no rows, so its warnings are reported', function()
+			-- a leave with no join produces no row but must still flag the page
+			local selection = selectionFor(historyOf(Transfers.leaves('2022-01-01')), SquadStatus.FORMER)
+
+			assert.are_same({}, selection.stints)
+			assert.are_equal(1, #selection.warnings)
 		end)
 	end)
 end)

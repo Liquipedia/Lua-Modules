@@ -308,10 +308,13 @@ end
 ---@return SquadAutoPerson[]
 function SquadAuto:_selectPersons(entries)
 	local selection = SquadHistory.selectStints(entries, self.config.status)
+	if not selection then
+		return {}
+	end
 
 	SquadAuto._reportInvalidHistory(selection.warnings)
 
-	if selection.hasInactiveEntry then
+	if selection.hasFormerInactiveEntry then
 		-- FORMER_INACTIVE enables the Inactive Date display
 		self.config.status = SquadTypes.SquadStatus.FORMER_INACTIVE
 	end
