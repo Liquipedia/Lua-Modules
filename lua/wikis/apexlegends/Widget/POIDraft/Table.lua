@@ -8,35 +8,68 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Ordinal = Lua.import('Module:Ordinal')
 
-local PoiMap = Lua.import('Module:Widget/POIDraft/POIMap')
-local Team = Lua.import('Module:Widget/TeamDisplay/Block')
-local Widget = Lua.import('Module:Widget')
-
-local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local Component = Lua.import('Module:Widget/Component')
 local HtmlWidgets = Lua.import('Module:Widget/Html')
+local PoiMap = Lua.import('Module:Widget/POIDraft/POIMap')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local Team = Lua.import('Module:Widget/TeamDisplay/Block')
 
 local Abbr = HtmlWidgets.Abbr
 local I = HtmlWidgets.I
 
 ---@type table<string, PoiMapData>
-local MAPS_DATA = Lua.import('Module:Widget/POIDraft/POIMap/Data', { loadData = true })
+local MAPS_DATA = Lua.import('Module:POIDraft/POIMap/Data', { loadData = true })
+
+local Helpers = {}
 
 ---@class WidgetPoiDraftProps
 ---@field map string
 ---@field [string] any
 
----@class WidgetPoiDraft: Widget
----@operator call(WidgetPoiDraftProps): WidgetPoiDraft
-local PoiDraft = Class.new(Widget)
-
+---@private
+---@param props WidgetPoiDraftProps
+---@param poiName string
+---@param contextDate string|number
 ---@return Renderable?
-function PoiDraft:render()
-	local props = self.props
+function Helpers._row(props, poiName, contextDate)
+	local team = props[poiName .. ' team']
+
+	if Logic.isEmpty(team) then
+		return nil
+	end
+
+	---@cast team string
+
+	local isFirstPick = tostring(props[poiName .. ' rotation']) == '1'
+	local priorityIcon = isFirstPick and I {
+		classes = { 'fas', 'fa-check', 'forest-green-text' },
+	} or nil
+
+	return TableWidgets.Row {
+		classes = { 'brkts-opponent-hover' },
+		attributes = { ['aria-label'] = team },
+		children = {
+			TableWidgets.Cell { children = priorityIcon },
+			TableWidgets.Cell { children = Ordinal.toOrdinal(props[poiName .. ' seed']) },
+			TableWidgets.Cell {
+				children = Team {
+					style = 'short',
+					name = team,
+					date = contextDate,
+				},
+			},
+			TableWidgets.Cell { children = poiName },
+		},
+	}
+end
+
+---@param props WidgetPoiDraftProps
+---@return Renderable?
+local function PoiDraft(props)
 	local mapData = MAPS_DATA[props.map]
 
 	if not mapData then
@@ -47,7 +80,7 @@ function PoiDraft:render()
 
 	local rows = {}
 	Array.forEach(PoiMap.getDraftPois(mapData.pois, props, contextDate), function(poi)
-		local row = self:_row(poi.name, contextDate)
+		local row = Helpers._row(props, poi.name, contextDate)
 		if row then
 			table.insert(rows, row)
 		end
@@ -95,41 +128,4 @@ function PoiDraft:render()
 	}
 end
 
----@private
----@param poiName string
----@param contextDate string|number
----@return Renderable?
-function PoiDraft:_row(poiName, contextDate)
-	local props = self.props
-	local team = props[poiName .. ' team']
-
-	if Logic.isEmpty(team) then
-		return nil
-	end
-
-	---@cast team string
-
-	local isFirstPick = tostring(props[poiName .. ' rotation']) == '1'
-	local priorityIcon = isFirstPick and I {
-		classes = { 'fas', 'fa-check', 'forest-green-text' },
-	} or nil
-
-	return TableWidgets.Row {
-		classes = { 'brkts-opponent-hover' },
-		attributes = { ['aria-label'] = team },
-		children = {
-			TableWidgets.Cell { children = priorityIcon },
-			TableWidgets.Cell { children = Ordinal.toOrdinal(props[poiName .. ' seed']) },
-			TableWidgets.Cell {
-				children = Team {
-					style = 'short',
-					name = team,
-					date = contextDate,
-				},
-			},
-			TableWidgets.Cell { children = poiName },
-		},
-	}
-end
-
-return PoiDraft
+return Component.component(PoiDraft)
