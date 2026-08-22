@@ -7,18 +7,18 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Ordinal = Lua.import('Module:Ordinal')
 
-local TeamDisplay = Lua.import('Module:Widget/TeamDisplay/Block')
-local Widget = Lua.import('Module:Widget')
-local WidgetUtil = Lua.import('Module:Widget/Util')
-
+local Component = Lua.import('Module:Widget/Component')
 local HtmlWidgets = Lua.import('Module:Widget/Html')
+local TeamDisplay = Lua.import('Module:Widget/TeamDisplay/Block')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
+
+local Helpers = {}
 
 ---@class PoiLabelProps
 ---@field poiData PoiData
@@ -27,13 +27,53 @@ local Span = HtmlWidgets.Span
 ---@field isMobile boolean
 ---@field scale number
 
----@class PoiLabel: Widget
----@operator call(PoiLabelProps): PoiLabel
-local PoiLabel = Class.new(Widget)
+---@private
+---@param displayName string
+---@return HtmlNode
+function Helpers._renderPoiNameNode(displayName)
+	return Span {
+		css = { ['font-size'] = '10pt' },
+		children = displayName,
+	}
+end
 
----@return Renderable
-function PoiLabel:render()
-	local props = self.props
+---@private
+---@param props PoiLabelProps
+---@param displayName string
+---@param teamName string
+---@param seed string|number|nil
+---@return Renderable|Renderable[]
+function Helpers._renderPickedLabel(props, displayName, teamName, seed)
+	if props.isMobile then
+		return Helpers._renderPoiNameNode(displayName)
+	end
+
+	local seedNode = Logic.isNotEmpty(seed) and ('#' .. Ordinal.toOrdinal(seed)) or nil
+
+	return WidgetUtil.collect(
+		Div {
+			css = {
+				display = 'flex',
+				['align-items'] = 'center',
+				['justify-content'] = 'center',
+				gap = '0.25em',
+			},
+			children = WidgetUtil.collect(
+				seedNode,
+				TeamDisplay {
+					name = teamName,
+					style = 'short',
+					date = props.date,
+				}
+			),
+		},
+		Helpers._renderPoiNameNode(displayName)
+	)
+end
+
+---@param props PoiLabelProps
+---@return HtmlNode
+local function PoiLabel(props)
 	local poi = props.poiData
 	local displayName = props.isMobile and poi.mobileName or poi.name
 
@@ -45,7 +85,7 @@ function PoiLabel:render()
 	local classes
 
 	if teamName then
-		content = self:_renderPickedLabel(displayName, teamName, props.draftArgs[poi.name .. ' seed'])
+		content = Helpers._renderPickedLabel(props, displayName, teamName, props.draftArgs[poi.name .. ' seed'])
 		classes = {
 			'brkts-opponent-hover',
 			tostring(props.draftArgs[poi.name .. ' rotation']) == '1'
@@ -53,7 +93,7 @@ function PoiLabel:render()
 			or 'poi-label-rotation-two',
 		}
 	else
-		content = self:_renderPoiNameNode(displayName)
+		content = Helpers._renderPoiNameNode(displayName)
 		classes = { 'brkts-opponent-hover', 'poi-label-rotation-two' }
 	end
 
@@ -82,47 +122,4 @@ function PoiLabel:render()
 	}
 end
 
----@private
----@param displayName string
----@param teamName string
----@param seed string|number|nil
----@return Renderable|Renderable[]
-function PoiLabel:_renderPickedLabel(displayName, teamName, seed)
-	if self.props.isMobile then
-		return self:_renderPoiNameNode(displayName)
-	end
-
-	local seedNode = Logic.isNotEmpty(seed) and ('#' .. Ordinal.toOrdinal(seed)) or nil
-
-	return WidgetUtil.collect(
-		Div {
-			css = {
-				display = 'flex',
-				['align-items'] = 'center',
-				['justify-content'] = 'center',
-				gap = '0.25em',
-			},
-			children = WidgetUtil.collect(
-				seedNode,
-				TeamDisplay {
-					name = teamName,
-					style = 'short',
-					date = self.props.date,
-				}
-			),
-		},
-		self:_renderPoiNameNode(displayName)
-	)
-end
-
----@private
----@param displayName string
----@return Renderable
-function PoiLabel:_renderPoiNameNode(displayName)
-	return Span {
-		css = { ['font-size'] = '10pt' },
-		children = displayName,
-	}
-end
-
-return PoiLabel
+return Component.component(PoiLabel)
