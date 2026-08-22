@@ -8,25 +8,20 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class TournamentPlayerStatsTableProps
----@field players TournamentPlayerStats.Player[]
+---@field players TournamentPlayerStats.Player[]?
 
----@class TournamentPlayerStatsTable: Widget
----@operator call(TournamentPlayerStatsTableProps): TournamentPlayerStatsTable
-local TournamentPlayerStatsTable = Class.new(Widget)
-
-TournamentPlayerStatsTable.defaultProps = {
+local defaultProps = {
 	players = {},
 }
 
@@ -45,34 +40,36 @@ local COLUMNS = {
 	{ key = 'damageDiff',  label = 'Dmg diff' },
 }
 
+local Helpers = {}
+
 ---@param value number
 ---@return string
-local function formatNumber(value)
+function Helpers.formatNumber(value)
 	return MathUtil.formatRounded { value = value, precision = 0 }
 end
 
 ---@param key string
 ---@param value number?
 ---@return string
-local function formatStat(key, value)
+function Helpers.formatStat(key, value)
 	if value == nil then
 		return '-'
 	end
 
 	if key == 'damageDiff' then
 		if value > 0 then
-			return '+' .. formatNumber(value)
+			return '+' .. Helpers.formatNumber(value)
 		elseif value == 0 then
 			return '0'
 		end
 	end
 
-	return formatNumber(value)
+	return Helpers.formatNumber(value)
 end
 
 ---@param player TournamentPlayerStats.Player
 ---@return Renderable
-local function renderTeam(player)
+function Helpers.renderTeam(player)
 	local team = player.team
 	if not team or team == '' then
 		return '-'
@@ -86,7 +83,7 @@ end
 
 ---@param player TournamentPlayerStats.Player
 ---@return Renderable
-local function renderPlayer(player)
+function Helpers.renderPlayer(player)
 	return PlayerDisplay.InlinePlayer {
 		player = player,
 	}
@@ -95,9 +92,9 @@ end
 ---@param key string
 ---@param player TournamentPlayerStats.Player
 ---@return Renderable
-local function renderStat(key, player)
+function Helpers.renderStat(key, player)
 	local value = player[key]
-	local text = formatStat(key, value)
+	local text = Helpers.formatStat(key, value)
 
 	if key ~= 'damageDiff' or value == nil or value == 0 then
 		return text
@@ -113,7 +110,7 @@ end
 ---@param player TournamentPlayerStats.Player?
 ---@param stat string
 ---@return Renderable?
-local function summaryCard(title, player, stat)
+function Helpers.summaryCard(title, player, stat)
 	if not player then
 		return nil
 	end
@@ -132,7 +129,7 @@ local function summaryCard(title, player, stat)
 			},
 			Html.Div {
 				classes = { 'stats-summary-card__title' },
-				children = (player.displayName or player.pageName or '-') .. ' (' .. formatNumber(value) .. ')',
+				children = (player.displayName or player.pageName or '-') .. ' (' .. Helpers.formatNumber(value) .. ')',
 			},
 		},
 	}
@@ -140,7 +137,7 @@ end
 
 ---@param players TournamentPlayerStats.Player[]
 ---@return Renderable?
-local function summaryCards(players)
+function Helpers.summaryCards(players)
 	if Logic.isEmpty(players) then
 		return nil
 	end
@@ -162,37 +159,38 @@ local function summaryCards(players)
 		classes = { 'stats-summary-cards' },
 		css = { ['margin-bottom'] = '16px' },
 		children = WidgetUtil.collect(
-			summaryCard('Top Killer', topKills, 'kills'),
-			summaryCard('Top Assists', topAssists, 'assists'),
-			summaryCard('Top Damage', topDamage, 'damage'),
-			summaryCard('Top Knocks', topKnocks, 'knocks')
+			Helpers.summaryCard('Top Killer', topKills, 'kills'),
+			Helpers.summaryCard('Top Assists', topAssists, 'assists'),
+			Helpers.summaryCard('Top Damage', topDamage, 'damage'),
+			Helpers.summaryCard('Top Knocks', topKnocks, 'knocks')
 		),
 	}
 end
 
 ---@param activeColumns TournamentPlayerStatsTableColumn[]
 ---@return fun(player: TournamentPlayerStats.Player): Renderable
-local function buildRow(activeColumns)
+function Helpers.buildRow(activeColumns)
 	return function(player)
 		return TableWidgets.Row { children = WidgetUtil.collect(
-			TableWidgets.Cell { children = renderTeam(player) },
+			TableWidgets.Cell { children = Helpers.renderTeam(player) },
 			TableWidgets.Cell {
 				attributes = { ['data-sort-value'] = player.pageName or player.displayName },
-				children = renderPlayer(player),
+				children = Helpers.renderPlayer(player),
 			},
 			Array.map(activeColumns, function(column)
 				return TableWidgets.Cell {
 					attributes = { ['data-sort-value'] = player[column.key] or -1 },
-					children = renderStat(column.key, player),
+					children = Helpers.renderStat(column.key, player),
 				}
 			end)
 		) }
 	end
 end
 
+---@param props TournamentPlayerStatsTableProps
 ---@return Renderable?
-function TournamentPlayerStatsTable:render()
-	local players = self.props.players
+local function TournamentPlayerStatsTable(props)
+	local players = props.players or {}
 	if Logic.isEmpty(players) then
 		return nil
 	end
@@ -209,7 +207,7 @@ function TournamentPlayerStatsTable:render()
 			['max-width'] = '100%',
 		},
 		children = {
-			summaryCards(players),
+			Helpers.summaryCards(players),
 			TableWidgets.Table {
 				sortable = true,
 				columns = WidgetUtil.collect(
@@ -232,11 +230,11 @@ function TournamentPlayerStatsTable:render()
 							end)
 						) }
 					} },
-					TableWidgets.TableBody { children = Array.map(players, buildRow(activeColumns)) },
+					TableWidgets.TableBody { children = Array.map(players, Helpers.buildRow(activeColumns)) },
 				},
 			},
 		},
 	}
 end
 
-return TournamentPlayerStatsTable
+return Component.component(TournamentPlayerStatsTable, defaultProps)
