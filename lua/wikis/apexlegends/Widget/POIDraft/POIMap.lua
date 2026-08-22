@@ -8,30 +8,26 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 
+local Component = Lua.import('Module:Widget/Component')
+local HtmlWidgets = Lua.import('Module:Widget/Html')
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 local PoiLabel = Lua.import('Module:Widget/POIDraft/POILabel')
-local Widget = Lua.import('Module:Widget')
-local WidgetUtil = Lua.import('Module:Widget/Util')
-
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Div = HtmlWidgets.Div
 
 ---@type table<string, PoiMapData>
-local MAPS_DATA = Lua.import('Module:Widget/POIDraft/POIMap/Data', { loadData = true })
+local MAPS_DATA = Lua.import('Module:POIDraft/POIMap/Data', { loadData = true })
+
+local Helpers = {}
 
 ---@class PoiMapProps
 ---@field map string
 ---@field [string] any
-
----@class PoiMap: Widget
----@operator call(PoiMapProps): PoiMap
-local PoiMap = Class.new(Widget)
 
 ---@private
 ---@param item POIDraftDateBoundItem
@@ -57,7 +53,7 @@ end
 ---@param items T[]
 ---@param date string|number?
 ---@return T?
-function PoiMap.filterActiveItem(items, date)
+function Helpers.filterActiveItem(items, date)
 	local contextTimestamp = DateExt.readTimestampOrNil(date)
 	local defaultItem
 
@@ -76,7 +72,7 @@ end
 ---@param items T[]
 ---@param date string|number?
 ---@return T[]
-function PoiMap.filterActiveItems(items, date)
+function Helpers.filterActiveItems(items, date)
 	local contextTimestamp = DateExt.readTimestampOrNil(date)
 
 	return Array.filter(items, function(item)
@@ -88,8 +84,8 @@ end
 ---@param args table<string, any>
 ---@param date string|number?
 ---@return PoiData[]
-function PoiMap.getDraftPois(pois, args, date)
-	local activePois = PoiMap.filterActiveItems(pois, date)
+function Helpers.getDraftPois(pois, args, date)
+	local activePois = Helpers.filterActiveItems(pois, date)
 
 	return Array.filter(activePois, function(poi)
 		if poi.hideIfAny then
@@ -121,67 +117,21 @@ end
 ---@param mapData PoiMapData
 ---@param contextDate string|number
 ---@return string?
-function PoiMap:_getCurrentMapImage(mapData, contextDate)
-	local activeImage = PoiMap.filterActiveItem(mapData.image, contextDate)
+function Helpers._getCurrentMapImage(mapData, contextDate)
+	local activeImage = Helpers.filterActiveItem(mapData.image, contextDate)
 	return activeImage and activeImage.file or nil
 end
 
----@return Renderable?
-function PoiMap:render()
-	local mapData = MAPS_DATA[self.props.map]
-	if not mapData then
-		return nil
-	end
-
-	local contextDate = DateExt.getContextualDateOrNow()
-
-	local currentImage = self:_getCurrentMapImage(mapData, contextDate)
-	if not currentImage then
-		return nil
-	end
-
-	return TableWidgets.Table {
-		columns = {
-			{ align = 'center' },
-		},
-		children = {
-			TableWidgets.TableHeader {
-				children = {
-					TableWidgets.Row {
-						children = {
-							TableWidgets.CellHeader { children = mapData.name },
-						},
-					},
-				},
-			},
-			TableWidgets.TableBody {
-				children = {
-					TableWidgets.Row {
-						children = {
-							TableWidgets.Cell {
-								css = { padding = 0 },
-								children = WidgetUtil.collect(
-									self:_renderMapContainer(mapData, currentImage, false, contextDate),
-									self:_renderMapContainer(mapData, currentImage, true, contextDate)
-								),
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-end
-
 ---@private
+---@param props PoiMapProps
 ---@param mapData PoiMapData
 ---@param currentImage string
 ---@param isMobile boolean
 ---@param contextDate string|number
----@return Renderable
-function PoiMap:_renderMapContainer(mapData, currentImage, isMobile, contextDate)
+---@return HtmlNode
+function Helpers._renderMapContainer(props, mapData, currentImage, isMobile, contextDate)
 	local width = isMobile and mapData.mobileWidth or mapData.width
-	local poisToRender = self:_getPoisToRender(mapData, contextDate)
+	local poisToRender = Helpers.getDraftPois(mapData.pois, props, contextDate)
 
 	return Div {
 		classes = {
@@ -208,7 +158,7 @@ function PoiMap:_renderMapContainer(mapData, currentImage, isMobile, contextDate
 			Array.map(poisToRender, function(poiData)
 				return PoiLabel {
 					poiData = poiData,
-					draftArgs = self.props,
+					draftArgs = props,
 					date = contextDate,
 					isMobile = isMobile,
 					scale = width,
@@ -218,12 +168,57 @@ function PoiMap:_renderMapContainer(mapData, currentImage, isMobile, contextDate
 	}
 end
 
----@private
----@param mapData PoiMapData
----@param contextDate string|number
----@return PoiData[]
-function PoiMap:_getPoisToRender(mapData, contextDate)
-	return PoiMap.getDraftPois(mapData.pois, self.props, contextDate)
+---@param props PoiMapProps
+---@return Renderable?
+local function PoiMap(props)
+	local mapData = MAPS_DATA[props.map]
+	if not mapData then
+		return nil
+	end
+
+	local contextDate = DateExt.getContextualDateOrNow()
+
+	local currentImage = Helpers._getCurrentMapImage(mapData, contextDate)
+	if not currentImage then
+		return nil
+	end
+
+	return TableWidgets.Table {
+		columns = {
+			{ align = 'center' },
+		},
+		children = {
+			TableWidgets.TableHeader {
+				children = {
+					TableWidgets.Row {
+						children = {
+							TableWidgets.CellHeader { children = mapData.name },
+						},
+					},
+				},
+			},
+			TableWidgets.TableBody {
+				children = {
+					TableWidgets.Row {
+						children = {
+							TableWidgets.Cell {
+								css = { padding = 0 },
+								children = WidgetUtil.collect(
+									Helpers._renderMapContainer(props, mapData, currentImage, false, contextDate),
+									Helpers._renderMapContainer(props, mapData, currentImage, true, contextDate)
+								),
+							},
+						},
+					},
+				},
+			},
+		},
+	}
 end
 
-return PoiMap
+local PoiMapComponent = Component.component(PoiMap)
+PoiMapComponent.filterActiveItem = Helpers.filterActiveItem
+PoiMapComponent.filterActiveItems = Helpers.filterActiveItems
+PoiMapComponent.getDraftPois = Helpers.getDraftPois
+
+return PoiMapComponent
