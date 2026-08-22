@@ -216,11 +216,8 @@ local function PoiMap(props)
 	}
 end
 
----@class PoiMapComponent
----@field filterActiveItem fun(items: POIDraftDateBoundItem[], date: (string|number)?): POIDraftDateBoundItem?
----@field filterActiveItems fun(items: POIDraftDateBoundItem[], date: (string|number)?): POIDraftDateBoundItem[]
----@field getDraftPois fun(pois: PoiData[], args: table<string, any>, date: (string|number)?): PoiData[]
 local PoiMapComponent = Component.component(PoiMap)
+---@cast PoiMapComponent +table
 PoiMapComponent.filterActiveItem = Helpers.filterActiveItem
 PoiMapComponent.filterActiveItems = Helpers.filterActiveItems
 PoiMapComponent.getDraftPois = Helpers.getDraftPois
