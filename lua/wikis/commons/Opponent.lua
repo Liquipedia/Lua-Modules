@@ -711,8 +711,6 @@ function Opponent.getScoreValue(opponent, postfix)
 
 	if score == 0 and Opponent.isTbd(opponent) then
 		return ''
-	elseif score == -1 then
-		return ''
 	elseif scoreDisplay ~= nil then
 		return tostring(Math.round(scoreDisplay, 2))
 	else
