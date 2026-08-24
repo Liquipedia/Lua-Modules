@@ -35,6 +35,23 @@ jobs:
           check_name: 'Lint Report'
           annotate_only: ${{ (github.event.pull_request.head.repo.full_name != github.repository) }}
 
+  lua-import-rules:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+
+      # Fails on violations coming out of Features/ and Domain/, warns for code that has not
+      # been restructured yet. Those warnings become errors as each area is migrated.
+      - name: Check import rules
+        run: python scripts/check_lua_imports.py
+
   lua-unit-test:
     runs-on: ubuntu-latest
 

@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:MatchGroup/Util/Match
+-- page=Module:Domain/Match/Model
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -10,14 +10,13 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Date = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
-local FnUtil = Lua.import('Module:FnUtil')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
-local BracketUtil = Lua.import('Module:MatchGroup/Util/Bracket')
+local BracketUtil = Lua.import('Module:Domain/Bracket/Model')
 
 local NOW = os.time()
 
@@ -26,10 +25,144 @@ local nilIfEmpty = String.nilIfEmpty
 --[[
 The match model: reading match records into matches, opponents, games and players, and the match ids that address them.
 
-Reading a match record does mean interpreting the bracket data it carries,
-which is why this imports Module:MatchGroup/Util/Bracket.
+Reading a match record does mean interpreting the bracket data it carries, which is why this
+imports Module:Domain/Bracket/Model.
+
+Per wiki rules come from Info.config as defaults, so that any feature can read a match correctly
+without going through another feature. Every such rule is overridable by a parameter, which is what
+keeps this testable without standing a wiki up.
 ]]
+---@class standardPlayer
+---@field displayName string?
+---@field flag string?
+---@field pageName string?
+---@field team string?
+---@field extradata table?
+---@field pageIsResolved boolean?
+---@field faction string?
+---@field apiId string?
+
+---@class standardOpponent
+---@field advanceBg string?
+---@field advances boolean?
+---@field icon string?
+---@field icondark string?
+---@field name string?
+---@field placement number?
+---@field placement2 number?
+---@field players standardPlayer[]?
+---@field score number?
+---@field scoreDisplay number?
+---@field score2 number?
+---@field status string?
+---@field status2 string?
+---@field template string?
+---@field type OpponentType
+---@field team string?
+---@field extradata table
+
+---@class GameOpponent
+---@field name string?
+---@field players standardPlayer[]
+---@field template string?
+---@field type string
+
+---@alias MatchStatus 'notplayed'|''|nil
+
+---@class MatchGroupUtilGame
+---@field comment string?
+---@field date string?
+---@field dateIsExact boolean
+---@field game string?
+---@field header string?
+---@field length string|number?
+---@field map string?
+---@field mapDisplayName string?
+---@field mode string?
+---@field opponents {players: table[], score: number?, status: string?}[]
+---@field patch string?
+---@field resultType string?
+---@field scores number[]
+---@field subgroup number?
+---@field type string?
+---@field vod string?
+---@field winner integer?
+---@field status string?
+---@field walkover string?
+---@field extradata table?
+---@field timestamp number
+---@field timezoneId string?
+
+---@class MatchGroupUtilMatch
+---@field bracketData MatchGroupUtilBracketData
+---@field comment string?
+---@field date string
+---@field dateIsExact boolean
+---@field finished boolean
+---@field game string?
+---@field games MatchGroupUtilGame[]
+---@field icon string?
+---@field iconDark string?
+---@field links table
+---@field liquipediatier string? # TODO: camelCase
+---@field liquipediatiertype string? # TODO: camelCase
+---@field matchId string?
+---@field mode string?
+---@field opponents standardOpponent[]
+---@field pageName string?
+---@field parent string?
+---@field patch string?
+---@field phase 'upcoming'|'ongoing'|'finished'
+---@field publisherTier string?
+---@field resultType string?
+---@field section string?
+---@field series string?
+---@field shortname string?
+---@field status MatchStatus
+---@field stream table
+---@field tickername string?
+---@field tournament string?
+---@field type string?
+---@field vod string?
+---@field walkover string?
+---@field winner number?
+---@field extradata table?
+---@field timestamp number
+---@field timezoneId string?
+---@field bestof number?
+
+---@class MatchGroupUtilSubgroup
+---@field games MatchGroupUtilGame[]
+---@field subgroup number
+---@field header string?
+
+---@class FFAMatchGroupUtilMatch: MatchGroupUtilMatch
+---@field games FFAMatchGroupUtilGame[]
+
+---@class FFAMatchGroupUtilGame: MatchGroupUtilGame
+---@field stream table
+
+--- The per wiki rules that reading a match record depends on. Passed in rather than read from
+--- Info.config, so that the match model stays wiki agnostic and testable.
+---@class MatchReadOptions
+---@field gameScoresIfBo1 boolean? show the map score rather than the match score in a best of one
+
+--- The subset of a match or game record that is enough to work out its phase.
+---@class PartialMatchGameRecord
+---@field date string
+---@field dateexact boolean|string|nil # records carry '0'/'1'
+---@field timestamp number?
+---@field finished boolean?
+---@field winner integer?
+
 local MatchUtil = {}
+
+---The per wiki rules a match record is read under. Merged under whatever the caller passes, so
+---overriding one rule still leaves the rest at their configured values.
+---@return MatchReadOptions
+local function defaultOptions()
+	return {gameScoresIfBo1 = Info.config.match2.gameScoresIfBo1}
+end
 
 ---Parse extradata as a JSON string if read from page variables. Otherwise create a copy if fetched from lpdb.
 ---The returned extradata table can then be mutated without altering the source.
@@ -49,10 +182,14 @@ end
 ---This is the implementation used on wikis by default. Wikis may specify a different conversion by setting
 ---WikiSpecific.matchFromRecord. Refer to the starcraft2 wiki as an example.
 ---@param record match2
+---@param options MatchReadOptions? overrides the per wiki defaults
 ---@return MatchGroupUtilMatch
-function MatchUtil.matchFromRecord(record)
+function MatchUtil.matchFromRecord(record, options)
 	local extradata = parseOrCopyExtradata(record.extradata)
-	local opponents = Array.map(record.match2opponents, FnUtil.curry(MatchUtil.opponentFromRecord, record))
+	options = Table.merge(defaultOptions(), options)
+	local opponents = Array.map(record.match2opponents, function(opponentRecord, opponentIndex)
+		return MatchUtil.opponentFromRecord(record, opponentRecord, opponentIndex, options)
+	end)
 	local games = Array.map(record.match2games, function(game) return MatchUtil.gameFromRecord(game, #opponents) end)
 	local bracketData = BracketUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata))
 	if bracketData.type == 'bracket' then
@@ -108,8 +245,10 @@ end
 ---@param matchRecord match2
 ---@param record match2opponent
 ---@param opponentIndex integer
+---@param options MatchReadOptions?
 ---@return standardOpponent
-function MatchUtil.opponentFromRecord(matchRecord, record, opponentIndex)
+function MatchUtil.opponentFromRecord(matchRecord, record, opponentIndex, options)
+	options = Table.merge(defaultOptions(), options)
 	local extradata = parseOrCopyExtradata(record.extradata)
 	local score = record.score
 	local status = record.status
@@ -118,7 +257,7 @@ function MatchUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 	local hasOnlyScores = Array.all(matchRecord.match2opponents, function(opponent)
 			return opponent.status == 'S' end)
 	local scoreDisplay = nil
-	if bestof == 1 and Info.config.match2.gameScoresIfBo1 and game1 and hasOnlyScores then
+	if bestof == 1 and options.gameScoresIfBo1 and game1 and hasOnlyScores then
 		local mapOpponent = (game1.opponents or {})[opponentIndex] or {}
 		scoreDisplay = tonumber(mapOpponent.score)
 		status = mapOpponent.status

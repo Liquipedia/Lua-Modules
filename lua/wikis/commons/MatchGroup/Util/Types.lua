@@ -10,54 +10,25 @@ local Lua = require('Module:Lua')
 local TypeUtil = Lua.import('Module:TypeUtil')
 
 --[[
-The shapes of the match group model: matches, opponents, games, players, bracket data and the
-match groups that hold them.
+Deprecated. The runtime TypeUtil description of the match group model, reachable as
+MatchGroupUtil.types and extended by a couple of per wiki modules.
+
+TypeUtil is on its way out, and the shapes themselves are documented as annotations on
+Module:Domain/Match/Model and Module:Domain/Bracket/Model. Nothing new should be added here.
 ]]
 local Types = {}
-
----@class MatchGroupUtilLowerEdge
----@field lowerMatchIndex number
----@field opponentIndex number
 
 Types.LowerEdge = TypeUtil.struct({
 	lowerMatchIndex = 'number',
 	opponentIndex = 'number',
 })
----@alias AdvanceBg 'up'|'stayup'|'stay'|'staydown'|'down'
 Types.AdvanceBg = TypeUtil.literalUnion('up', 'stayup', 'stay', 'staydown', 'down')
----@class MatchGroupUtilAdvanceSpot
----@field bg AdvanceBg
----@field matchId string?
----@field type string?
 
 Types.AdvanceSpot = TypeUtil.struct({
 	bg = Types.AdvanceBg,
 	matchId = 'string?',
 	type = TypeUtil.literalUnion('advance', 'custom', 'qualify'),
 })
-
----@class MatchGroupUtilBracketBracketData
----@field coordinates MatchGroupUtilMatchCoordinates
----@field advanceSpots MatchGroupUtilAdvanceSpot[]
----@field bracketResetMatchId string?
----@field bracketType string?
----@field header string?
----@field inheritedHeader string?
----@field lowerEdges MatchGroupUtilLowerEdge[]?
----@field lowerMatchIds string[]
----@field qualLose boolean?
----@field qualLoseLiteral string?
----@field qualSkip number?
----@field qualWin boolean?
----@field qualWinLiteral string?
----@field skipRound number?
----@field thirdPlaceMatchId string?
----@field title string?
----@field type 'bracket'
----@field upperMatchId string?
----@field matchId string?
----@field matchPage string?
----@field qualifiedHeader string?
 
 Types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(Types.AdvanceSpot),
@@ -79,17 +50,6 @@ Types.BracketBracketData = TypeUtil.struct({
 	type = TypeUtil.literal('bracket'),
 	upperMatchId = 'string?',
 })
----@class MatchGroupUtilMatchCoordinates
----@field depth number
----@field depthCount number
----@field matchIndexInRound number
----@field rootIndex number
----@field roundCount number
----@field roundIndex number
----@field sectionCount number
----@field sectionIndex number
----@field semanticDepth number
----@field semanticRoundIndex number
 
 Types.MatchCoordinates = TypeUtil.struct({
 	depth = 'number',
@@ -103,13 +63,6 @@ Types.MatchCoordinates = TypeUtil.struct({
 	semanticDepth = 'number',
 	semanticRoundIndex = 'number',
 })
----@class MatchGroupUtilMatchlistBracketData
----@field header string?
----@field title string?
----@field dateHeader boolean?
----@field type 'matchlist'
----@field matchId string?
----@field matchPage string?
 
 Types.MatchlistBracketData = TypeUtil.struct({
 	header = 'string?',
@@ -117,21 +70,10 @@ Types.MatchlistBracketData = TypeUtil.struct({
 	dateHeader = 'boolean?',
 	type = TypeUtil.literal('matchlist'),
 })
----@alias MatchGroupUtilBracketData MatchGroupUtilMatchlistBracketData|MatchGroupUtilBracketBracketData
 Types.BracketData = TypeUtil.union(
 	Types.MatchlistBracketData,
 	Types.BracketBracketData
 )
-
----@class standardPlayer
----@field displayName string?
----@field flag string?
----@field pageName string?
----@field team string?
----@field extradata table?
----@field pageIsResolved boolean?
----@field faction string?
----@field apiId string?
 
 Types.Player = TypeUtil.struct({
 	displayName = 'string?',
@@ -142,25 +84,6 @@ Types.Player = TypeUtil.struct({
 	pageIsResolved = 'boolean?',
 	faction = 'string?',
 })
-
----@class standardOpponent
----@field advanceBg string?
----@field advances boolean?
----@field icon string?
----@field icondark string?
----@field name string?
----@field placement number?
----@field placement2 number?
----@field players standardPlayer[]?
----@field score number?
----@field scoreDisplay number?
----@field score2 number?
----@field status string?
----@field status2 string?
----@field template string?
----@field type OpponentType
----@field team string?
----@field extradata table
 
 Types.Opponent = TypeUtil.struct({
 	advanceBg = 'string?',
@@ -179,12 +102,6 @@ Types.Opponent = TypeUtil.struct({
 	extradata = 'table',
 })
 
----@class GameOpponent
----@field name string?
----@field players standardPlayer[]
----@field template string?
----@field type string
-
 Types.GameOpponent = TypeUtil.struct({
 	name = 'string?',
 	players = TypeUtil.optional(TypeUtil.array(Types.Player)),
@@ -192,32 +109,7 @@ Types.GameOpponent = TypeUtil.struct({
 	type = 'string',
 })
 
----@alias MatchStatus 'notplayed'|''|nil
 Types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed', ''))
-
----@class MatchGroupUtilGame
----@field comment string?
----@field date string?
----@field dateIsExact boolean
----@field game string?
----@field header string?
----@field length string|number?
----@field map string?
----@field mapDisplayName string?
----@field mode string?
----@field opponents {players: table[], score: number?, status: string?}[]
----@field patch string?
----@field resultType string?
----@field scores number[]
----@field subgroup number?
----@field type string?
----@field vod string?
----@field winner integer?
----@field status string?
----@field walkover string?
----@field extradata table?
----@field timestamp number
----@field timezoneId string?
 
 Types.Game = TypeUtil.struct({
 	comment = 'string?',
@@ -237,44 +129,6 @@ Types.Game = TypeUtil.struct({
 	winner = 'number?',
 	extradata = 'table?',
 })
-
----@class MatchGroupUtilMatch
----@field bracketData MatchGroupUtilBracketData
----@field comment string?
----@field date string
----@field dateIsExact boolean
----@field finished boolean
----@field game string?
----@field games MatchGroupUtilGame[]
----@field icon string?
----@field iconDark string?
----@field links table
----@field liquipediatier string? # TODO: camelCase
----@field liquipediatiertype string? # TODO: camelCase
----@field matchId string?
----@field mode string?
----@field opponents standardOpponent[]
----@field pageName string?
----@field parent string?
----@field patch string?
----@field phase 'upcoming'|'ongoing'|'finished'
----@field publisherTier string?
----@field resultType string?
----@field section string?
----@field series string?
----@field shortname string?
----@field status MatchStatus
----@field stream table
----@field tickername string?
----@field tournament string?
----@field type string?
----@field vod string?
----@field walkover string?
----@field winner number?
----@field extradata table?
----@field timestamp number
----@field timezoneId string?
----@field bestof number?
 
 Types.Match = TypeUtil.struct({
 	bracketData = Types.BracketData,
@@ -310,39 +164,12 @@ Types.Match = TypeUtil.struct({
 	extradata = 'table?',
 })
 
----@class MatchGroupUtilSubgroup
----@field games MatchGroupUtilGame[]
----@field subgroup number
----@field header string?
-
----@class FFAMatchGroupUtilMatch: MatchGroupUtilMatch
----@field games FFAMatchGroupUtilGame[]
-
----@class FFAMatchGroupUtilGame: MatchGroupUtilGame
----@field stream table
-
----@class MatchGroupUtilMatchlist
----@field bracketDatasById table<string, MatchGroupUtilBracketBracketData>
----@field matches MatchGroupUtilMatch[]
----@field matchesById table<string, MatchGroupUtilMatch>
----@field type 'matchlist'
-
 Types.Matchlist = TypeUtil.struct({
 	bracketDatasById = TypeUtil.table('string', Types.BracketData),
 	matches = TypeUtil.array(Types.Match),
 	matchesById = TypeUtil.table('string', Types.Match),
 	type = TypeUtil.literal('matchlist'),
 })
-
----@class MatchGroupUtilBracket
----@field bracketDatasById table<string, MatchGroupUtilBracketBracketData>
----@field coordinatesByMatchId table<string, MatchGroupUtilMatchCoordinates>
----@field matches MatchGroupUtilMatch[]
----@field matchesById table<string, MatchGroupUtilMatch>
----@field rootMatchIds string[]
----@field rounds string[][]
----@field sections string[][]
----@field type 'bracket'
 
 Types.Bracket = TypeUtil.struct({
 	bracketDatasById = TypeUtil.table('string', Types.BracketData),
@@ -355,18 +182,9 @@ Types.Bracket = TypeUtil.struct({
 	type = TypeUtil.literal('bracket'),
 })
 
----@alias MatchGroupUtilMatchGroup MatchGroupUtilBracket|MatchGroupUtilMatchlist
 Types.MatchGroup = TypeUtil.union(
 	Types.Matchlist,
 	Types.Bracket
 )
-
---- The subset of a match or game record that is enough to work out its phase.
----@class PartialMatchGameRecord
----@field date string
----@field dateexact boolean|string|nil # records carry '0'/'1'
----@field timestamp number?
----@field finished boolean?
----@field winner integer?
 
 return Types

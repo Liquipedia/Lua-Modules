@@ -87,7 +87,7 @@ function HorizontallistDisplay.Bracket(props)
 			classes = {'navigation-tabs__list'},
 			attributes = {role = 'tablist'},
 			children = Array.map(HorizontallistDisplay.computeHeaders(sortedBracket), function (header, index)
-				local attachedMatch = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, sortedBracket[index][1])
+				local attachedMatch = MatchGroupUtil.fetchMatchWithBracketReset(props.bracketId, sortedBracket[index][1])
 				local _, matchId = MatchGroupUtil.splitMatchId(attachedMatch.matchId)
 				---@cast matchId -nil
 				--- If it's a matchList, then matchId is valid as is (also is numeric), otherwise we need to convert it to a key
@@ -135,7 +135,7 @@ function HorizontallistDisplay.findMatchClosestInTime(bracketId, bracket)
 	local liveGames = {} ---@type {matchIdx: integer, distanceToNow: integer}[]
 	local otherGames = {} ---@type {matchIdx: integer, distanceToNow: integer}[]
 	for matchIdx, matchInfo in ipairs(bracket) do
-		local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchInfo[1])
+		local match = MatchGroupUtil.fetchMatchWithBracketReset(bracketId, matchInfo[1])
 		for _, game in ipairs(match.games) do
 			local tblToInsertInto = MatchGroupUtil.computeMatchPhase(game) == 'live' and liveGames or otherGames
 			local ts = Date.readTimestampOrNil(game.date)

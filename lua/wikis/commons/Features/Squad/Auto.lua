@@ -24,7 +24,7 @@ local TransferRefs = Lua.import('Module:Transfer/References')
 
 local SquadTypes = Lua.import('Module:Features/Squad/Types')
 local SquadHistory = Lua.import('Module:Features/Squad/Lib/History')
-local SquadTransferHistory = Lua.import('Module:Features/Squad/Api/TransferHistory')
+local TeamHistoryStore = Lua.import('Module:Domain/TeamHistory/Store')
 local SquadCustom = Lua.import('Module:Features/Squad/Custom')
 
 local INVALID_HISTORY_CATEGORY = 'SquadAuto with invalid player history'
@@ -78,7 +78,7 @@ end
 ---Handles all necessary steps to fetch and sort data
 function SquadAuto:build()
 	self:_parseConfig()
-	self.playersTeamHistory = SquadTransferHistory.forTeam(self.config.team, self.config.teams)
+	self.playersTeamHistory = TeamHistoryStore.forTeam(self.config.team, self.config.teams)
 	local entries = self:_selectEntries()
 	Array.forEach(entries, FnUtil.curry(SquadAuto._enrichEntry, self))
 	return entries
@@ -402,7 +402,7 @@ function SquadAuto:_mapToSquadPerson(stint)
 
 	-- On leave: Fetch the next team a person joined
 	if Logic.isNotEmpty(leaveEntry) and Logic.isEmpty(entry.newteam) then
-		local newTeam, newRole, newDate = SquadTransferHistory.fetchNextTeam(joinEntry.pagename, leaveEntry.date)
+		local newTeam, newRole, newDate = TeamHistoryStore.fetchNextTeam(joinEntry.pagename, leaveEntry.date)
 		if newTeam then
 			entry.newteam = newTeam
 			entry.newteamrole = newRole
