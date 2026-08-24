@@ -24,11 +24,10 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px', maxBans = MAX_NUM_BANS})
 end
 
----@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@return Renderable?
-function CustomMatchSummary.createGame(date, game, gameIndex)
+function CustomMatchSummary.createGame(game, gameIndex)
 	local extradata = game.extradata or {}
 
 	-- TODO: Change to use participant data

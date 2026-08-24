@@ -21,16 +21,15 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '500px', teamStyle = 'bracket'})
 end
 
----@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return Widget?
-function CustomMatchSummary.createGame(date, game, gameIndex)
+---@return Renderable?
+function CustomMatchSummary.createGame(game, gameIndex)
 	if not game.map then
 		return
 	end
@@ -39,6 +38,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		local opponent = game.opponents[opponentIndex] or {}
 		local weaponsData = Array.map(opponent.players or {}, Operator.property('weapon'))
 
+		---@type string|integer
 		local score = opponent.score
 		if score and game.mode == 'turf war' then
 			score = score .. '%'
