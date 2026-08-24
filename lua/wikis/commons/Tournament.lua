@@ -41,6 +41,7 @@ local TOURNAMENT_PHASE = {
 ---@field game string?
 ---@field publisherTier string?
 ---@field type string?
+---@field mode string?
 
 ---@class StandardTournament: StandardTournamentPartial
 ---@field startDate {year: integer, month: integer?, day: integer?, timestamp: integer?}?
@@ -129,6 +130,7 @@ Tournament.partialTournamentFromContext = FnUtil.memoize(function ()
 		game = Variables.varDefault('tournament_game'),
 		publisherTier = Variables.varDefault('tournament_publishertier'),
 		type = Variables.varDefault('tournament_type'),
+		mode = Variables.varDefault('tournament_mode'),
 	}
 end)
 
@@ -150,6 +152,7 @@ function Tournament.partialTournamentFromMatch(match)
 		game = match.game,
 		publisherTier = match.publisherTier,
 		type = match.type,
+		mode = match.mode,
 	}
 end
 
@@ -175,6 +178,7 @@ function Tournament.tournamentFromRecord(record)
 		locations = record.locations,
 		region = (record.locations or {}).region1,
 		type = record.type,
+		mode = record.mode,
 		status = record.status,
 		icon = record.icon,
 		iconDark = record.icondark,
