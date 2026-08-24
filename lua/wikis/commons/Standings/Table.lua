@@ -34,6 +34,7 @@ local StandingsTable = {}
 ---@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?,
 ---match: MatchGroupUtilMatch?, matches: MatchGroupUtilMatch[], matchId: string}[]?
 ---@field opponent standardOpponent
+---@field aliases standardOpponent[]? # Only for team opponents
 ---@field startingPoints number?
 
 ---@param frame Frame
@@ -59,7 +60,7 @@ function StandingsTable.fromTemplate(frame)
 	if importScoreFromMatches then
 		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args)
 
-		local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction)
+		local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction, opponents)
 		opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
 	end
 
