@@ -44,7 +44,7 @@ local VALID_GSL_GROUP_STYLES = {
 
 ---@param match table
 function MatchGroupInput._applyTournamentVarsToMaps(match)
-	for _, map in ipairs(MatchGroupUtil.normalizeSubtype(match, 'map')) do
+	for _, map in ipairs(MatchGroupInputUtil.normalizeSubtype(match, 'map')) do
 		Table.mergeInto(map, MatchGroupInputUtil.getTournamentContext(map, match))
 	end
 end
@@ -148,6 +148,9 @@ function MatchGroupInput.readMatchpage(bracketId, matchId, matchInput)
 	matchArgs.bracketid = bracketId
 	matchArgs.matchid = matchId
 	local match = MatchGroupInput._processMatch(matchArgs, {isMatchPage = true})
+	-- TODO: this repeats half of MatchGroupInputUtil.getStandaloneId, which builds the same
+	-- 'MATCH_<bracketid>_<matchid>' scheme. Change one and standalone match lookups silently
+	-- stop matching, so the two should share a single definition.
 	match.bracketid = 'MATCH_' .. match.bracketid
 	return {match}
 end
@@ -239,7 +242,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		bracketData.bracketreset = bracketData.bracketreset or ''
 
 		if not bracketData.loweredges then
-			local opponents = MatchGroupUtil.normalizeSubtype(match, 'opponent')
+			local opponents = MatchGroupInputUtil.normalizeSubtype(match, 'opponent')
 			bracketData.loweredges = Array.map(
 				MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #opponents),
 				MatchGroupUtil.indexTableToRecord

@@ -350,7 +350,7 @@ function MatchGroupInputUtil.readMvp(match, opponents)
 	local players = mw.text.split(match.mvp, ',')
 
 	-- parse the players to get their information
-	opponents = Logic.isNotDeepEmpty(opponents) and opponents or MatchGroupUtil.normalizeSubtype(match, 'opponent')
+	opponents = Logic.isNotDeepEmpty(opponents) and opponents or MatchGroupInputUtil.normalizeSubtype(match, 'opponent')
 	local parsedPlayers = Array.map(players, function(player, playerIndex)
 		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(player, '|')[1]):gsub(' ', '_')
 		for _, opponent in ipairs(opponents) do
@@ -1747,6 +1747,38 @@ function MatchGroupInputUtil.getMatchDate(matchParser, matchInput)
 	end
 
 	return earliestGameDateStruct
+end
+
+---Get subtypes (opponent, map) as a list
+---@param match table
+---@param type 'opponent'|'map'
+---@return any[]
+function MatchGroupInputUtil.normalizeSubtype(match, type)
+	local listNames
+	if type == 'opponent' then
+		listNames = {'match2opponents', 'opponents'}
+	elseif type == 'map' then
+		listNames = {'match2games', 'games'}
+	else
+		error('Invalid subtype: ' .. type)
+	end
+	for _, listName in ipairs(listNames) do
+		if match[listName] then
+			return match[listName]
+		end
+	end
+
+	return {}
+end
+
+---@param bracketid string?
+---@param matchid string?
+---@return string?
+function MatchGroupInputUtil.getStandaloneId(bracketid, matchid)
+	if not matchid or not bracketid then
+		return nil
+	end
+	return 'MATCH_' .. bracketid .. '_' .. matchid
 end
 
 return MatchGroupInputUtil
