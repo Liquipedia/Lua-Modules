@@ -31,8 +31,9 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 
 ---@class CustomMatchSummaryInterface
 ---@field createBody? fun(match: MatchGroupUtilMatch): Renderable|Renderable[] @deprecated
----@field createGames? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
----@field createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
+---@field createGames? fun(match: MatchGroupUtilMatch): Renderable|Renderable[] @deprecated (but better than createBody)
+---@field createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[] @deprecated
+---@field GameRow? Component<MatchSummaryGameRowProps>
 ---@field createFooter? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 
 ---@class MatchSummary
@@ -60,19 +61,49 @@ end
 
 -- Default body function
 ---@param match MatchGroupUtilMatch
----@param createGames? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]?
----@param createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
+---@param CustomMatchSummary CustomMatchSummaryInterface
 ---@param options {maxBans: integer?}?
 ---@return Renderable[]
-function MatchSummary.createDefaultBody(match, createGames, createGame, options)
+function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 	options = options or {}
 
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, options.maxBans or 0)
 
+	local createGames = CustomMatchSummary.createGames
+	local createGame = CustomMatchSummary.createGame
+	local GameRow = CustomMatchSummary.GameRow
+
+	local nodes
+	if GameRow then
+		local sets = match.submatches or {}
+
+		-- With one set for all matches, or one game per set, it's redundant to show set level info.
+		if #sets > 1 and #sets < #match.games then
+			nodes = Array.map(sets, function(set)
+				return MatchSummaryWidgets.GamesContainer{
+					gamesSectionName = set.header or ('Set ' .. set.subgroup),
+					gamesSectionResult = MatchSummaryWidgets.SetHeader{set = set},
+					children = Array.map(set.games, function(game, gameIndex)
+						return GameRow{game = game, gameIndex = gameIndex}
+					end)
+				}
+			end)
+		else
+			nodes = MatchSummaryWidgets.GamesContainer{
+				children = Array.map(match.games, function(game, gameIndex)
+					return GameRow{game = game, gameIndex = gameIndex}
+				end)
+			}
+		end
+	elseif createGames then
+		nodes = createGames(match)
+	else
+		---@diagnostic disable-next-line: param-type-mismatch fixed in another PR
+		nodes = Array.map(match.games, FnUtil.curry(createGame, match.date))
+	end
+
 	return WidgetUtil.collect(
-		--- we assume that createGames and createGame are mutually exclusive, so we can safely call one or the other
-		---@diagnostic disable-next-line: param-type-mismatch
-		createGames and createGames(match) or Array.map(match.games, FnUtil.curry(createGame, match.date)),
+		nodes,
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
@@ -191,7 +222,7 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 		MatchSummary.createHeader(matchData, options),
 		MatchSummaryWidgets.Body{
 			children = WidgetUtil.collect(
-				createBody(matchData, CustomMatchSummary.createGames, CustomMatchSummary.createGame, options),
+				createBody(matchData, CustomMatchSummary, options),
 				Html.Fragment{
 					children = {
 						MatchSummaryWidgets.Casters{casters = matchData.extradata.casters},
@@ -221,9 +252,10 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 		(
 			type(CustomMatchSummary.createBody) == 'function' or
 			type(CustomMatchSummary.createGame) == 'function' or
-			type(CustomMatchSummary.createGames) == 'function'
+			type(CustomMatchSummary.createGames) == 'function' or
+			CustomMatchSummary.GameRow
 		),
-		'One of createBody or createGame or createGames must be implemented in Module:MatchSummary'
+		'One of createBody or createGame or createGames or GameRow must be implemented in Module:MatchSummary'
 	)
 
 	options = options or {}

@@ -83,7 +83,7 @@ function TeamParticipantsRepository.save(participant)
 			parent = tournamentContext.pageName or '',
 			series = tournamentContext.series or '',
 			shortname = tournamentContext.tickerName or '',
-			mode = Variables.varDefault('tournament_mode') or '',
+			mode = tournamentContext.mode or '',
 			type = tournamentContext.type or '',
 			liquipediatier = tostring(tournamentContext.liquipediaTier or ''),
 			liquipediatiertype = tournamentContext.liquipediaTierType or '',
