@@ -22,7 +22,7 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return Renderable?
+---@return Renderable
 function CustomMatchSummary.createGame(game, gameIndex)
 	local function makeTeamSection(opponentIndex)
 		return {
