@@ -71,14 +71,30 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 
 	local createGames = CustomMatchSummary.createGames
 	local createGame = CustomMatchSummary.createGame
+	local GameRow = CustomMatchSummary.GameRow
 
 	local nodes
-	if CustomMatchSummary.GameRow then
-		nodes = MatchSummaryWidgets.GamesContainer{
-			children = Array.map(match.games, function(game, gameIndex)
-				return CustomMatchSummary.GameRow{game = game, gameIndex = gameIndex}
+	if GameRow then
+		local sets = match.submatches or {}
+
+		-- With one set for all matches, or one game per set, it's redundant to show set level info.
+		if #sets > 1 and #sets < #match.games then
+			nodes = Array.map(sets, function(set)
+				return MatchSummaryWidgets.GamesContainer{
+					gamesSectionName = set.header or ('Set ' .. set.subgroup),
+					gamesSectionResult = MatchSummaryWidgets.SetHeader{set = set},
+					children = Array.map(set.games, function(game, gameIndex)
+						return GameRow{game = game, gameIndex = gameIndex}
+					end)
+				}
 			end)
-		}
+		else
+			nodes = MatchSummaryWidgets.GamesContainer{
+				children = Array.map(match.games, function(game, gameIndex)
+					return GameRow{game = game, gameIndex = gameIndex}
+				end)
+			}
+		end
 	elseif createGames then
 		nodes = createGames(match)
 	else
@@ -239,7 +255,7 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 			type(CustomMatchSummary.createGames) == 'function' or
 			CustomMatchSummary.GameRow
 		),
-		'One of createBody or createGame or createGames must be implemented in Module:MatchSummary'
+		'One of createBody or createGame or createGames or GameRow must be implemented in Module:MatchSummary'
 	)
 
 	options = options or {}
