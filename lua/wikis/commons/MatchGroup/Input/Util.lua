@@ -1187,8 +1187,10 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 		end)
 	end
 
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
 	match.mode = Parser.getMode and Parser.getMode(opponents)
-		or Logic.emptyOr(match.mode, globalVars:get('tournament_mode'), Parser.DEFAULT_MODE)
+		or Logic.emptyOr(match.mode, tournamentContext.mode, Parser.DEFAULT_MODE)
 	if Parser.getPatch then
 		match.patch = Parser.getPatch(match, games)
 	end
@@ -1436,8 +1438,10 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 		end
 	end
 
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
 	match.mode = Parser.getMode and Parser.getMode(opponents)
-		or Logic.emptyOr(match.mode, globalVars:get('tournament_mode'), Parser.DEFAULT_MODE)
+		or Logic.emptyOr(match.mode, tournamentContext.mode, Parser.DEFAULT_MODE)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
