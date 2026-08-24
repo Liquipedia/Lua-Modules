@@ -38,7 +38,7 @@ function CustomMatchSummary.createBody(match)
 	local characterBansData = Array.extend(
 		Logic.isNotDeepEmpty(globalBans) and {globalBans.team1 or {}, globalBans.team2 or {}, label = 'Global Bans'} or nil,
 		MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
-		)
+	)
 
 	return WidgetUtil.collect(
 		Array.map(match.games, CustomMatchSummary._createMapRow),
