@@ -29,14 +29,13 @@ local MobileLegendsMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createCompo
 ---@param args table
 ---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px', teamStyle = 'hybrid'})
+	local options = {width = '420px', teamStyle = 'hybrid', maxBans = MAX_NUM_BANS}
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 end
 
 ---@param match MatchGroupUtilMatch
----@return VNode[]
-function CustomMatchSummary.createBody(match)
-	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
-
+---@return VNode
+function CustomMatchSummary.createGames(match)
 	---@param game MatchGroupUtilGame
 	---@return boolean
 	local function hasCharacterData(game)
@@ -47,17 +46,13 @@ function CustomMatchSummary.createBody(match)
 		end)
 	end
 
-	return {
-		MatchSummaryWidgets.GamesContainer{
-			children = Array.map(match.games, function (game, gameIndex)
-				if Logic.isEmpty(game.length) and Logic.isEmpty(game.winner) and not hasCharacterData(game) then
-					return
-				end
-				return MobileLegendsMatchSummaryGameRow{game = game, gameIndex = gameIndex}
-			end)
-		},
-		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
+	return MatchSummaryWidgets.GamesContainer{
+		children = Array.map(match.games, function (game, gameIndex)
+			if Logic.isEmpty(game.length) and Logic.isEmpty(game.winner) and not hasCharacterData(game) then
+				return
+			end
+			return MobileLegendsMatchSummaryGameRow{game = game, gameIndex = gameIndex}
+		end)
 	}
 end
 
