@@ -4,7 +4,9 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 echo "==> Installing npm dependencies"
-# these are named volumes, which docker creates owned by root
+# these are named volumes, which docker creates owned by root. mkdir first so
+# that a mount going missing does not take the whole script down with set -e
+sudo mkdir -p node_modules ~/.mitmproxy
 sudo chown "$(id -u):$(id -g)" node_modules ~/.mitmproxy
 npm install
 
