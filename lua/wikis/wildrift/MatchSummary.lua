@@ -24,7 +24,6 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px', maxBans = MAX_NUM_BANS})
 end
 
----@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@return Renderable?
