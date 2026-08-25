@@ -71,12 +71,12 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 	const {lightWidth, lightHeight} = pngLight;
 	const {darkWidth, darkHeight} = pngDark;
 
-	const maxWidth = Math.max(lightWidth, darkWidth);
-	const heigth = lightHeight + darkHeight;
-	const combined = new PNG({maxWidth, heigth});
+	// const maxWidth = Math.max(lightWidth, darkWidth);
+	// const heigth = lightHeight + darkHeight;
+	const combined = new PNG({lightWidth, lightHeigth});
 
 	PNG.bitblt(pngLight, combined, 0, 0, lightWidth, lightHeight, 0, 0);
-	PNG.bitblt(pngDark, combined, 0, 0, darkWidth, darkHeight, 0, lightHeight);
+	// PNG.bitblt(pngDark, combined, 0, 0, darkWidth, darkHeight, 0, lightHeight);
 
 	if (missingResources.size > 0) {
 		console.error(`Error: '${testName}' rendered without resources it needs, refusing to use the result.`);
