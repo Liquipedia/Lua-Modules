@@ -87,7 +87,7 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 	if (shouldUpdate || !existsSync(referencePath)) {
 		// Update snapshot, either forced or previous snapshot doesn't exist yet
 		mkdirSync(SNAPSHOT_DIR, { recursive: true });
-		writeFileSync(referencePath, newScreenshotBuffer);
+		writeFileSync(referencePath, PNG.sync.write(combined));
 		process.exit(0);
 	} else {
 		// Compare with existing snapshot
