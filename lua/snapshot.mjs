@@ -57,8 +57,23 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 	});
 
 	await page.goto(`file://${htmlPath}`, {waitUntil: "networkidle"});
-	const newScreenshotBuffer = await page.screenshot({ animations: 'disabled' });
+	const lightScreenshotBuffer = await page.screenshot({ animations: 'disabled' });
+
+	await page.locator('html').evaluate(element => element.classList.add('theme--dark'));
+	const darkScreenshotBuffer = await page.screenshot({ animations: 'disabled' });
+
 	await browser.close();
+
+	// Combine both screenshots into one
+	let pngLight = PNG.sync.read(lightScreenshotBuffer);
+	let pngDark = PNG.sync.read(darkScreenshotBuffer);
+
+	const {lightWidth, lightHeight} = pngLight;
+	const {darkWidth, darkHeight} = pngDark;
+	const combined = new PNG({Math.max(lightWidth, darkWidth), lightHeight + darkHeight});
+
+	pngLight.bitblt(combined, 0, 0, lightWidth, lightHeight);
+	pngLight.bitblt(combined, 0, lightHeight, darkWidth, darkHeight);
 
 	if (missingResources.size > 0) {
 		console.error(`Error: '${testName}' rendered without resources it needs, refusing to use the result.`);
@@ -74,7 +89,7 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 	} else {
 		// Compare with existing snapshot
 		const referenceImage = PNG.sync.read(readFileSync(referencePath));
-		const newImage = PNG.sync.read(newScreenshotBuffer);
+		const newImage = combined;
 		const { width, height } = referenceImage;
 
 		const diffImage = new PNG({ width, height });
@@ -95,7 +110,7 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 			mkdirSync(SNAPSHOT_DIFF_DIR, { recursive: true });
 
 			writeFileSync(join(SNAPSHOT_DIFF_DIR, `${testName}-diff.png`), PNG.sync.write(diffImage));
-			writeFileSync(join(SNAPSHOT_DIFF_DIR, `${testName}-new.png`), newScreenshotBuffer);
+			writeFileSync(join(SNAPSHOT_DIFF_DIR, `${testName}-new.png`), PNG.sync.write(combined));
 
 			process.exit(1);
 		}
