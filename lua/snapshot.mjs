@@ -78,6 +78,8 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 	PNG.bitblt(pngLight, combined, 0, 0, lightWidth, lightHeight);
 	PNG.bitblt(pngDark, combined, 0, lightHeight, darkWidth, darkHeight);
 
+	combined.pack();
+
 	if (missingResources.size > 0) {
 		console.error(`Error: '${testName}' rendered without resources it needs, refusing to use the result.`);
 		missingResources.forEach((reason, url) => console.error(`  - ${url} (${reason})`));
