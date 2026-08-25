@@ -35,9 +35,18 @@ end
 function CustomMatchSummary.createBody(match)
 	local globalBans = (match.extradata or {}).globalbans
 
+	local gameBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS) or {}
+
+	-- To make the Global Bans doesn't get count as Game 1
+	Array.forEach(gameBansData, function(banData, gameIndex)
+		if Logic.isNotDeepEmpty(banData) then
+			banData.label = 'Game&nbsp;' .. gameIndex
+		end
+	end)
+
 	local characterBansData = Array.extend(
 		Logic.isNotDeepEmpty(globalBans) and {globalBans.team1 or {}, globalBans.team2 or {}, label = 'Global Bans'} or nil,
-		MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
+		gameBansData
 	)
 
 	return WidgetUtil.collect(
