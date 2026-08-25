@@ -89,7 +89,7 @@ local function determineTranslateString(startDate, endDate, showYear)
 	end
 end
 
----@param props {startDate: string|osdateparam?, endDate: string|osdateparam?, showYear: boolean?}
+---@param props {startDate: string|DateRecord|osdateparam?, endDate: string|DateRecord|osdateparam?, showYear: boolean?}
 ---@return string
 local function DateRange(props)
 	local startDate, endDate = props.startDate, props.endDate
