@@ -75,8 +75,8 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 	const heigth = lightHeight + darkHeight;
 	const combined = new PNG({maxWidth, heigth});
 
-	pngLight.bitblt(combined, 0, 0, lightWidth, lightHeight);
-	pngLight.bitblt(combined, 0, lightHeight, darkWidth, darkHeight);
+	PNG.bitblt(pngLight, combined, 0, 0, lightWidth, lightHeight);
+	PNG.bitblt(pngDark, combined, 0, lightHeight, darkWidth, darkHeight);
 
 	if (missingResources.size > 0) {
 		console.error(`Error: '${testName}' rendered without resources it needs, refusing to use the result.`);
