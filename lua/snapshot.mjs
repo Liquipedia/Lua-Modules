@@ -70,7 +70,10 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 
 	const {lightWidth, lightHeight} = pngLight;
 	const {darkWidth, darkHeight} = pngDark;
-	const combined = new PNG({Math.max(lightWidth, darkWidth), lightHeight + darkHeight});
+
+	const maxWidth = Math.max(lightWidth, darkWidth);
+	const heigth = lightHeight + darkHeight;
+	const combined = new PNG({maxWidth, heigth});
 
 	pngLight.bitblt(combined, 0, 0, lightWidth, lightHeight);
 	pngLight.bitblt(combined, 0, lightHeight, darkWidth, darkHeight);
