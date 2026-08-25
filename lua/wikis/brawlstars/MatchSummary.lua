@@ -35,7 +35,7 @@ end
 function CustomMatchSummary.createBody(match)
 	local globalBans = (match.extradata or {}).globalbans
 
-	local gameBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS) or {}
+	local gameBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
 	-- To make the Global Bans doesn't get count as Game 1
 	Array.forEach(gameBansData, function(banData, gameIndex)
