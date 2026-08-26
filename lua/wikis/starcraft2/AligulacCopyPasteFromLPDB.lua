@@ -174,12 +174,13 @@ function AligulacCopyPasteFromLPDB._match(record)
 
 	local match = MatchGroupUtil.matchFromRecord(record)
 
-	return Array.map(match.submatches or {match}, AligulacCopyPasteFromLPDB._subMatch)
+	return Array.map(Logic.nilIfEmpty(match.submatches) or {match}, AligulacCopyPasteFromLPDB._subMatch)
 end
 
 ---@param match StarcraftMatchGroupUtilSubmatch|MatchGroupUtilMatch
 ---@return string?
 function AligulacCopyPasteFromLPDB._subMatch(match)
+	if not match.opponents then return end
 	-- remove non score matches (walkovers and the likes)
 	if Array.any(match.opponents, function(opponent) return opponent.status ~= 'S' end) then
 		return
