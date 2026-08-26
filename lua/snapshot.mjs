@@ -73,7 +73,7 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 	const {darkWidth, darkHeight} = await pngDark.metadata();
 
 	const maxWidth = Math.max(lightWidth, darkWidth);
-	const heigth = lightHeight + darkHeight;
+	const height = lightHeight + darkHeight;
 	const combined = sharp({
 		create: {
 			width: maxWidth,
