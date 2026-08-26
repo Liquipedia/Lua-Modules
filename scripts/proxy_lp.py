@@ -1,9 +1,19 @@
 import asyncio
+import logging
 
 from http import HTTPStatus
 
 from mitmproxy import http, master
-from mitmproxy.addons import default_addons, dumper, errorcheck, keepserving, readfile
+from mitmproxy.addons import (
+    default_addons,
+    dumper,
+    errorcheck,
+    keepserving,
+    readfile,
+    termlog,
+)
+
+logger = logging.getLogger(__name__)
 
 
 class LiquipediaMapper:
@@ -36,10 +46,13 @@ class LiquipediaMapper:
         try:
             with open(path, "rb") as f:
                 body = f.read()
-        except OSError as error:
+        except FileNotFoundError:
             # Leaving this unsaid means the request goes upstream, the page looks
             # untouched and nothing explains why
-            print(f"LiquipediaMapper: {error}. Run npm run build first.")
+            logger.error("%s is missing, run npm run build first", path)
+            return
+        except OSError:
+            logger.exception("could not read %s", path)
             return
 
         flow.response = http.Response.make(
@@ -56,6 +69,7 @@ async def main():
         *default_addons(),
         LiquipediaMapper(),
         dumper.Dumper(),
+        termlog.TermLog(),
         keepserving.KeepServing(),
         readfile.ReadFileStdin(),
         errorcheck.ErrorCheck(),
