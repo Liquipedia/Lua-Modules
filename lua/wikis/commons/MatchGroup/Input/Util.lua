@@ -21,6 +21,7 @@ local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Streams = Lua.import('Module:Links/Stream')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local Tournament = Lua.import('Module:Tournament')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -306,30 +307,31 @@ end
 ---@nodiscard
 function MatchGroupInputUtil.getTournamentContext(obj, parent)
 	parent = parent or {}
+	local tournamentContext = Tournament.partialTournamentFromContext()
 	local vars = {}
-	vars.game = Logic.emptyOr(obj.game, parent.game, globalVars:get('tournament_game'))
-	vars.icon = Logic.emptyOr(obj.icon, parent.icon, globalVars:get('tournament_icon'))
-	vars.icondark = Logic.emptyOr(obj.iconDark, parent.icondark, globalVars:get('tournament_icondark'))
+	vars.game = Logic.emptyOr(obj.game, parent.game, tournamentContext.game)
+	vars.icon = Logic.emptyOr(obj.icon, parent.icon, tournamentContext.icon)
+	vars.icondark = Logic.emptyOr(obj.iconDark, parent.icondark, tournamentContext.iconDark)
 	vars.liquipediatier = Logic.emptyOr(
 		obj.liquipediatier,
 		parent.liquipediatier,
-		globalVars:get('tournament_liquipediatier')
+		tournamentContext.liquipediaTier
 	)
 	vars.liquipediatiertype = Logic.emptyOr(
 		obj.liquipediatiertype,
 		parent.liquipediatiertype,
-		globalVars:get('tournament_liquipediatiertype')
+		tournamentContext.liquipediaTierType
 	)
 	vars.publishertier = Logic.emptyOr(
 		obj.publishertier,
 		parent.publishertier,
-		globalVars:get('tournament_publishertier')
+		tournamentContext.publisherTier
 	)
-	vars.series = Logic.emptyOr(obj.series, parent.series, globalVars:get('tournament_series'))
-	vars.shortname = Logic.emptyOr(obj.shortname, parent.shortname, globalVars:get('tournament_shortname'))
-	vars.tickername = Logic.emptyOr(obj.tickername, parent.tickername, globalVars:get('tournament_tickername'))
-	vars.tournament = Logic.emptyOr(obj.tournament, parent.tournament, globalVars:get('tournament_name'))
-	vars.type = Logic.emptyOr(obj.type, parent.type, globalVars:get('tournament_type'))
+	vars.series = Logic.emptyOr(obj.series, parent.series, tournamentContext.series)
+	vars.shortname = Logic.emptyOr(obj.shortname, parent.shortname, tournamentContext.shortName)
+	vars.tickername = Logic.emptyOr(obj.tickername, parent.tickername, tournamentContext.tickerName)
+	vars.tournament = Logic.emptyOr(obj.tournament, parent.tournament, tournamentContext.fullName)
+	vars.type = Logic.emptyOr(obj.type, parent.type, tournamentContext.type)
 	vars.patch = Logic.emptyOr(obj.patch, parent.patch, globalVars:get('tournament_patch'))
 	vars.date = Logic.emptyOr(obj.date, parent.date)
 	vars.mode = Logic.emptyOr(obj.mode, parent.mode)
@@ -1090,7 +1092,7 @@ end
 ---@field getExtraData? fun(match: table, games: table[], opponents: MGIParsedOpponent[]): table?
 ---@field adjustOpponent? fun(opponent: MGIParsedOpponent, opponentIndex: integer)
 ---@field getLinks? fun(match: table, games: table[]): table
----@field getHeadToHeadLink? fun(match: table, opponents: MGIParsedOpponent[]): string?
+---@field getHeadToHeadLink? fun(match: table, opponents: MGIParsedOpponent[]): string?, string?
 ---@field getPatch? fun(match: table, games: table[]): string?
 ---@field readDate? readDateFunction
 ---@field getMode? fun(opponents: table[]): string
@@ -1113,7 +1115,7 @@ end
 --- - getExtraData(match, games, opponents): table?
 --- - adjustOpponent(opponent, opponentIndex)
 --- - getLinks(match, games): table?
---- - getHeadToHeadLink(match, opponents): string?
+--- - getHeadToHeadLink(match, opponents): string?, string?
 --- - getPatch(match, games): string?
 --- - readDate(match): table
 --- - getMode(opponents): string?
@@ -1158,7 +1160,9 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 
 	match.links = Parser.getLinks and Parser.getLinks(match, games) or MatchGroupInputUtil.getLinks(match)
 	if Parser.getHeadToHeadLink then
-		match.links.headtohead = Parser.getHeadToHeadLink(match, opponents)
+		local h2hLinkMediawiki, h2hLinkLighthouse = Parser.getHeadToHeadLink(match, opponents)
+		match.links.headtohead = h2hLinkMediawiki
+		match.links.headtohead_lh = h2hLinkLighthouse
 	end
 
 	local autoScoreFunction = (Parser.calculateMatchScore and MatchGroupInputUtil.canUseAutoScore(match, games))
@@ -1183,8 +1187,10 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 		end)
 	end
 
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
 	match.mode = Parser.getMode and Parser.getMode(opponents)
-		or Logic.emptyOr(match.mode, globalVars:get('tournament_mode'), Parser.DEFAULT_MODE)
+		or Logic.emptyOr(match.mode, tournamentContext.mode, Parser.DEFAULT_MODE)
 	if Parser.getPatch then
 		match.patch = Parser.getPatch(match, games)
 	end
@@ -1217,7 +1223,6 @@ end
 ---@field getMapBestOf? fun(map: table): integer?
 ---@field computeOpponentScore? fun(props: table, autoScore?: fun(opponentIndex: integer):integer?): integer?, string?
 ---@field getGame? fun(match: table, map:table): string?
----@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
 ---@field INHERIT_MAP_DATES? boolean
 
@@ -1239,7 +1244,6 @@ end
 --- - getGame(match, map): string?
 ---
 --- Additionally, the Parser may have the following properties:
---- - ADD_SUB_GROUP boolean?
 --- - BREAK_ON_EMPTY boolean?
 ---@param match table
 ---@param opponents MGIParsedOpponent[]
@@ -1247,7 +1251,7 @@ end
 ---@return table[]
 function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 	local maps = {}
-	local subGroup = 0
+	local nextSubGroup = 1
 	local lastDate = match.date
 
 	for key, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
@@ -1266,10 +1270,8 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 
 		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
 
-		if Parser.ADD_SUB_GROUP then
-			subGroup = tonumber(map.subgroup) or (subGroup + 1)
-			map.subgroup = subGroup
-		end
+		map.subgroup = tonumber(map.subgroup) or nextSubGroup
+		nextSubGroup = map.subgroup + 1
 
 		if Parser.getMapName then
 			map.map, map.mapDisplayName = Parser.getMapName(map, mapIndex, match)
@@ -1432,8 +1434,10 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 		end
 	end
 
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
 	match.mode = Parser.getMode and Parser.getMode(opponents)
-		or Logic.emptyOr(match.mode, globalVars:get('tournament_mode'), Parser.DEFAULT_MODE)
+		or Logic.emptyOr(match.mode, tournamentContext.mode, Parser.DEFAULT_MODE)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)

@@ -36,7 +36,7 @@ local Standings = {}
 ---@field matches MatchGroupUtilMatch[]
 ---@field config {hasdraw: string, hasovertime: string, haspoints: string}
 ---@field rounds StandingsRound[]
----@field tiebreakers {id: string, title: string?}[]
+---@field additionalStats {id: string, title: string?}[]
 ---@field package record standingstable
 ---@field package entryRecords standingsentry[]
 
@@ -60,7 +60,7 @@ local Standings = {}
 ---@field positionChangeFromPreviousRound integer
 ---@field pointsChangeFromPreviousRound number
 ---@field specialStatus 'dq'|'nc'|'' # nc = non-competing (not in the round)
----@field tiebreakerValues table<string, {value: integer?, display: string?}>
+---@field additionalStatsValues table<string, {value: integer?, display: string?}>
 ---@field package record standingsentry
 
 ---Fetches a standings table from a page. Tries to read from page variables before fetching from LPDB.
@@ -131,7 +131,7 @@ function Standings.standingsFromRecord(record, entries)
 		section = record.section,
 		type = record.type,
 		config = record.config,
-		tiebreakers = record.extradata.tiebreakers,
+		additionalStats = record.extradata.additionalStats,
 		record = record,
 		entryRecords = entries,
 	}
@@ -157,7 +157,7 @@ function Standings.entryFromRecord(record)
 		pointsChangeFromPreviousRound = record.extradata.pointschange,
 		specialStatus = record.extradata.specialstatus or '',
 		positionChangeFromPreviousRound = tonumber(record.placementchange),
-		tiebreakerValues = record.extradata.tiebreakerValues or {},
+		additionalStatsValues = record.extradata.additionalStatsValues or {},
 		record = record,
 	}
 
@@ -175,9 +175,10 @@ function Standings.fetchMatches(standings)
 		return MatchGroupUtil.splitMatchId(matchid)
 	end))
 
+	local wantedMatchIds = Table.map(matchids, function(_, matchid) return matchid, true end)
 	local allMatchesFromBrackets = Array.flatMap(bracketIds, MatchGroupUtil.fetchMatches)
 	return Array.filter(allMatchesFromBrackets, function(match)
-		return Table.includes(matchids, match.matchId)
+		return wantedMatchIds[match.matchId]
 	end)
 end
 
@@ -193,10 +194,7 @@ function Standings.fetchMatch(entry)
 		return
 	end
 
-	local allMatchesFromBrackets = MatchGroupUtil.fetchMatches(bracketId)
-	return Array.filter(allMatchesFromBrackets, function(match)
-		return match.matchId == matchid
-	end)[1]
+	return MatchGroupUtil.fetchMatchGroup(bracketId).matchesById[matchid]
 end
 
 ---@param standings StandingsModel

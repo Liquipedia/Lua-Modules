@@ -17,7 +17,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
-local WidgetsHtml = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
@@ -25,9 +25,9 @@ local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local Div = WidgetsHtml.Div
-local Abbr = WidgetsHtml.Abbr
-local Hr = WidgetsHtml.Hr
+local Div = Html.Div
+local Abbr = Html.Abbr
+local Hr = Html.Hr
 
 -- table2 aliases
 local Row = TableWidgets.Row
@@ -93,7 +93,7 @@ local VRS_REGIONS = {
 ---@field ref string?
 
 ---@param frame Frame
----@return WidgetHtml
+---@return Renderable
 function ValveOperationalRequirementsTable.make(frame)
 	local args = Arguments.getArgs(frame)
 	local data = ValveOperationalRequirementsTable._getData(args)
@@ -143,7 +143,7 @@ function ValveOperationalRequirementsTable.make(frame)
 			linkType = 'github'
 		} or nil,
 		ValveOperationalRequirementsTable._makeTableRow{
-			title = WidgetsHtml.Fragment{children = {
+			title = Html.Fragment{children = {
 				'Applicable ',
 				Abbr{children = 'TOR', title = 'Tournament Operating Requirements'}
 			}},
@@ -181,12 +181,12 @@ end
 
 ---@private
 ---@param commit string|'latest'
----@return Widget
+---@return Renderable
 function ValveOperationalRequirementsTable._makeTorDisplay(commit)
 	if commit == 'latest' then
-		return WidgetsHtml.I{children = 'Latest Version'}
+		return Html.I{children = 'Latest Version'}
 	end
-	return WidgetsHtml.Code{children = commit}
+	return Html.Code{children = commit}
 end
 
 ---@private
@@ -202,15 +202,15 @@ function ValveOperationalRequirementsTable._makeVrsDisplay(vrsData)
 		vrsRegion.displayName,
 		Logic.isNotEmpty(vrsData.startingRank) and vrsData.startingRank ~= 1 and {
 			' ',
-			WidgetsHtml.I{children = {
+			Html.I{children = {
 				'(Starting at #',
 				vrsData.startingRank,
 				')'
 			}}
 		} or nil,
 		Logic.isNotEmpty(vrsData.filtering) and {
-			WidgetsHtml.Br{},
-			WidgetsHtml.I{children = {
+			Html.Br{},
+			Html.I{children = {
 				'(Filtered: ',
 				vrsData.filtering,
 				')'
@@ -221,12 +221,13 @@ end
 
 ---@private
 ---@param filePrefix string
----@param date string?
+---@param date integer?
 ---@return string
 function ValveOperationalRequirementsTable._makeVrsLink(filePrefix, date)
 	if Logic.isEmpty(date) then
 		return VRS_GITHUB_URL_BASE
 	end
+	---@cast date -nil
 	local iso = DateExt.toYmdInUtc(date)
 	local dateParams = DateExt.parseIsoDate(iso) --[[@as osdateparam]]
 	return VRS_GITHUB_URL_BASE .. String.interpolate(VRS_GITHUB_URL_TEMPLATE, {
@@ -239,7 +240,7 @@ end
 
 ---@private
 ---@param link string?
----@return IconFontawesomeWidget?
+---@return Renderable?
 function ValveOperationalRequirementsTable._makeGitHubIcon(link)
 	if Logic.isEmpty(link) then return end
 	return Link{
@@ -251,7 +252,7 @@ end
 
 ---@private
 ---@param link string?
----@return IconFontawesomeWidget?
+---@return Renderable?
 function ValveOperationalRequirementsTable._makeRefIcon(link)
 	if Logic.isEmpty(link) then return nil end
 	return Link{
@@ -262,8 +263,8 @@ function ValveOperationalRequirementsTable._makeRefIcon(link)
 end
 
 ---@private
----@param rowData {title: string|Widget[], contents: string|Widget[]?, link: string?, linkType: 'ref'|'github'}
----@return Widget
+---@param rowData {title: Renderable, contents: Renderable|Renderable[]|nil, link: string?, linkType: 'ref'|'github'}
+---@return Renderable
 function ValveOperationalRequirementsTable._makeTableRow(rowData)
 	---@return Renderable?
 	local getLink = function()

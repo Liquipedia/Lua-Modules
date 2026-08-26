@@ -19,13 +19,25 @@ local Table2CellHeader = Lua.import('Module:Widget/Table2/CellHeader')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Html = Lua.import('Module:Widget/Html')
 
----@class Table2RowProps
----@field children? Renderable|Renderable[]
+---@class Table2RowProps: HtmlNodeProps
 ---@field section 'head'|'body'|'subhead'?
----@field classes string[]?
----@field css {[string]: string|number|nil}?
----@field attributes {[string]: any}?
 ---@field highlighted (string|number|boolean)?
+
+---@param rowChildren Renderable[]
+---@return integer|nil
+local function getMaxRowspan(rowChildren)
+	local maxRowspan = Array.reduce(rowChildren, function(max, child)
+		if type(child) == 'table' and
+				---@diagnostic disable-next-line: undefined-field
+				(child.renderFn == Table2Cell.renderFn or child.renderFn == Table2CellHeader.renderFn) then
+
+			local rowspan = MathUtil.toInteger(child.props.rowspan) or 1
+			return math.max(max, math.max(rowspan, 1))
+		end
+		return max
+	end, 1)
+	return maxRowspan > 1 and maxRowspan or nil
+end
 
 ---@param props Table2RowProps
 ---@param context Context
@@ -36,7 +48,6 @@ local function Table2Row(props, context)
 
 	local section = props.section or Context.read(context, Table2Contexts.Section)
 	local headerRowKind = Context.read(context, Table2Contexts.HeaderRowKind)
-	local bodyStripe = Context.read(context, Table2Contexts.BodyStripe)
 
 	local sectionClass = 'table2__row--body'
 	if section == 'head' or section == 'subhead' then
@@ -49,15 +60,6 @@ local function Table2Row(props, context)
 			kindClass = 'table2__row--head-title'
 		elseif headerRowKind == 'columns' then
 			kindClass = 'table2__row--head-columns'
-		end
-	end
-
-	local stripeClass
-	if section == 'body' then
-		if bodyStripe == 'odd' then
-			stripeClass = 'table2__row--odd'
-		elseif bodyStripe == 'even' then
-			stripeClass = 'table2__row--even'
 		end
 	end
 
@@ -116,10 +118,18 @@ local function Table2Row(props, context)
 		end)
 	end
 
+	local attributes = props.attributes or {}
+	if section == 'body' then
+		local maxRowspan = getMaxRowspan(children)
+		if maxRowspan then
+			attributes['data-rowspan-count'] = maxRowspan
+		end
+	end
+
 	return Html.Tr{
-		classes = WidgetUtil.collect(sectionClass, kindClass, stripeClass, highlightClass, props.classes),
+		classes = WidgetUtil.collect(sectionClass, kindClass, highlightClass, props.classes),
 		css = props.css,
-		attributes = props.attributes,
+		attributes = attributes,
 		children = trChildren,
 	}
 end

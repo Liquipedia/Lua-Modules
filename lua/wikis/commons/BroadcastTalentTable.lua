@@ -34,7 +34,7 @@ local ConditionUtil = Condition.Util
 
 local Button = Lua.import('Module:Widget/Basic/Button')
 local Dialog = Lua.import('Module:Widget/Basic/Dialog')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local ListWidgets = Lua.import('Module:Widget/List')
@@ -253,9 +253,9 @@ function BroadcastTalentTable:create()
 		children = WidgetUtil.collect(
 			self:_header(),
 			-- Hidden tr that contains a td to prevent the first yearHeader from being inside thead
-			Logic.isNotEmpty(bodyElements) and HtmlWidgets.Tr{
+			Logic.isNotEmpty(bodyElements) and Html.Tr{
 				css = {display = 'none'},
-				children = HtmlWidgets.Td{}
+				children = Html.Td{}
 			} or nil,
 			TableWidgets.TableBody{children = bodyElements}
 		),
@@ -348,7 +348,7 @@ function BroadcastTalentTable:_row(broadcast)
 					children = self:_tournamentDisplayName(broadcast, tournament)
 				}
 			},
-			TableWidgets.Cell{children = Array.interleave(broadcast.positions, HtmlWidgets.Br{})},
+			TableWidgets.Cell{children = Array.interleave(broadcast.positions, Html.Br{})},
 			self.args.displayPartnerListColumn and TableWidgets.Cell{
 				children = self:_partnerList(broadcast, tournament)
 			} or nil
@@ -453,8 +453,8 @@ end
 ---@private
 ---@return Widget
 function BroadcastTalentTable:_footer()
-	return HtmlWidgets.Small{children = {
-		HtmlWidgets.Span{
+	return Html.Small{children = {
+		Html.Span{
 			classes = {'mobile-hide'},
 			css = {
 				float = 'left',
@@ -463,14 +463,14 @@ function BroadcastTalentTable:_footer()
 			},
 			children = LinkWidget{children = 'About achievements', link = self.args.aboutAchievementsLink}
 		},
-		HtmlWidgets.Span{
+		Html.Span{
 			classes = {'mobile-only'},
 			children = LinkWidget{children = 'About achievements', link = self.args.aboutAchievementsLink}
 		},
-		HtmlWidgets.Br{
+		Html.Br{
 			classes = {'mobile-only'}
 		},
-		HtmlWidgets.B{children = LinkWidget{
+		Html.B{children = LinkWidget{
 			children = 'Broadcasts from any Tournament',
 			link = self.broadcaster .. '/Broadcasts#Detailed Broadcasts'
 		}}

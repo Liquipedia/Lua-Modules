@@ -12,10 +12,10 @@ local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
+local Math = Lua.import('Module:MathUtil')
 local Page = Lua.import('Module:Page')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TypeUtil = Lua.import('Module:TypeUtil')
 
@@ -98,6 +98,10 @@ Opponent.types.Opponent = TypeUtil.union(
 	Opponent.types.TeamOpponent,
 	Opponent.types.PartyOpponent,
 	Opponent.types.LiteralOpponent
+)
+
+Opponent.types.OpponentType = TypeUtil.literalUnion(
+	Opponent.solo, Opponent.duo, Opponent.trio, Opponent.quad, Opponent.team, Opponent.literal
 )
 
 ---Checks if the provided opponent type is a party type
@@ -206,7 +210,7 @@ end
 ---@param type string
 ---@return boolean
 function Opponent.isType(type)
-	return Table.includes(Opponent.types, type)
+	return #TypeUtil.checkValue(type, Opponent.types.OpponentType) == 0
 end
 
 ---Reads an opponent type.
@@ -214,13 +218,13 @@ end
 ---@param type string
 ---@return OpponentType?
 function Opponent.readType(type)
-	return Table.includes(Opponent.types, type) and type or nil
+	return Opponent.isType(type) and type or nil
 end
 
 ---Asserts that an arbitrary value is a valid representation of an opponent
 ---@param opponent any
 function Opponent.assertOpponent(opponent)
-	assert(Opponent.isOpponent(opponent), 'Invalid opponent')
+	TypeUtil.assertValue(opponent, Opponent.types.Opponent, {name = 'Opponent'})
 end
 
 ---Validates that an arbitrary value is a valid representation of an opponent
@@ -478,6 +482,7 @@ function Opponent.readSinglePlayerArgs(args)
 		p1team = args.team or args.p1team,
 		p1faction = args.faction or args.race or args.p1race,
 		p1id = args.id or args.p1id,
+		game = args.game,
 	}, 1)
 end
 
@@ -493,7 +498,7 @@ function Opponent.readPlayerArgs(args, playerIndex)
 		pageName = Page.applyUnderScoresIfEnforced(args['p' .. playerIndex .. 'link']),
 		team = playerTeam,
 		faction = Logic.nilIfEmpty(Faction.read(args['p' .. playerIndex .. 'faction']
-			or args['p' .. playerIndex .. 'race'])),
+			or args['p' .. playerIndex .. 'race'], {game = args.game})),
 		apiId = args['p' .. playerIndex .. 'id'],
 	}
 	assert(not player.displayName:find('|'), 'Invalid character "|" in player name')
@@ -688,6 +693,29 @@ function Opponent.toLegacyParticipantData(opponent, options)
 		participantlink = Opponent.toName(opponent),
 		participanttemplate = opponent.template,
 	}
+end
+
+---@param opponent standardOpponent
+---@param postfix string?
+---@return string
+function Opponent.getScoreValue(opponent, postfix)
+	postfix = postfix or ''
+	local status = opponent['status' .. postfix]
+
+	if status ~= 'S' then
+		return status or ''
+	end
+
+	local score = opponent['score' .. postfix]
+	local scoreDisplay = opponent['scoreDisplay' .. postfix]
+
+	if score == 0 and Opponent.isTbd(opponent) then
+		return ''
+	elseif scoreDisplay ~= nil then
+		return tostring(Math.round(scoreDisplay, 2))
+	else
+		return tostring(Math.round(score, 2))
+	end
 end
 
 return Opponent

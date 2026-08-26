@@ -18,13 +18,13 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local ThisDayQuery = Lua.import('Module:ThisDay/Query')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local ListWidgets = Lua.import('Module:Widget/List')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local HEADER = HtmlWidgets.H3{children = 'Tournaments'}
+local HEADER = Html.H3{children = 'Tournaments'}
 local TODAY = os.date("*t")
 
 ---@class ThisDayTournamentParameters: ThisDayParameters
@@ -65,7 +65,7 @@ function ThisDayTournament:_generateList()
 	local display = {}
 	for year, yearData in Table.iter.spairs(byYear) do
 		Array.appendWith(display,
-			HtmlWidgets.H4{
+			Html.H4{
 				children = { year }
 			},
 			'\n',

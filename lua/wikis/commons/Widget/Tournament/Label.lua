@@ -7,10 +7,8 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
-
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 
 local DateRange = Lua.import('Module:Widget/Misc/DateRange')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -21,18 +19,14 @@ local Title = Lua.import('Module:Widget/Tournament/Title')
 ---@field tournament StandardTournament
 ---@field displayGameIcon boolean?
 
----@class TournamentsTickerLabelWidget: Widget
----@operator call(TournamentsTickerLabelProps): TournamentsTickerLabelWidget
----@field props TournamentsTickerLabelProps
-local TournamentsTickerLabelWidget = Class.new(Widget)
-
----@return Widget?
-function TournamentsTickerLabelWidget:render()
-	local tournament = self.props.tournament
+---@param props TournamentsTickerLabelProps
+---@return VNode?
+local function TournamentsTickerLabel(props)
+	local tournament = props.tournament
 	if not tournament then
 		return
 	end
-	return HtmlWidgets.Div{
+	return Html.Div{
 		css = {
 			display = 'flex',
 			gap = '5px',
@@ -41,17 +35,17 @@ function TournamentsTickerLabelWidget:render()
 		},
 		children = {
 			TierPill{tournament = tournament},
-			HtmlWidgets.Span{
+			Html.Span{
 				classes = {'tournaments-list-name'},
 				css = {
-					['padding-left'] = self.props.displayGameIcon and '50px' or '25px',
+					['padding-left'] = props.displayGameIcon and '50px' or '25px',
 				},
 				children = Title{
 					tournament = tournament,
-					displayGameIcon = self.props.displayGameIcon
+					displayGameIcon = props.displayGameIcon
 				},
 			},
-			HtmlWidgets.Small{
+			Html.Small{
 				classes = {'tournaments-list-dates'},
 				css = {
 					['flex-shrink'] = '0',
@@ -65,4 +59,4 @@ function TournamentsTickerLabelWidget:render()
 	}
 end
 
-return TournamentsTickerLabelWidget
+return Component.component(TournamentsTickerLabel)

@@ -41,6 +41,11 @@ return {
 				storeFromWikiCode = true,
 			},
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchdiff', 'gamediff'},
+			},
+		},
 		defaultMaxPlayersPerPlacement = 35,
 	},
 }

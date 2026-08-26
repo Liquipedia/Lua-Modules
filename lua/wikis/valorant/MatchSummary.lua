@@ -8,34 +8,34 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ValorantMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class ValorantMatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): ValorantMatchSummaryGameRow
-local ValorantMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+---@class ValorantMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
+	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay,
+}
+
+local ValorantMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '500px', teamStyle = 'bracket'})
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return VNode[]
 function CustomMatchSummary.createBody(match)
-	return WidgetUtil.collect(
+	return {
 		MatchSummaryWidgets.GamesContainer{
-			gridLayout = 'standard',
 			children = Array.map(match.games, function (game, gameIndex)
 				if Logic.isEmpty(game.map) then
 					return
@@ -44,23 +44,20 @@ function CustomMatchSummary.createBody(match)
 			end)
 		},
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
-	)
-end
-
----@return string
-function ValorantMatchSummaryGameRow:createGameOverview()
-	return self:mapDisplay()
+		MatchSummaryWidgets.MapVeto(
+			MatchSummary.preProcessMapVeto(match.extradata.mapveto, {useLpdb = true})
+		)
+	}
 end
 
 ---@private
+---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
 ---@return table[]
-function ValorantMatchSummaryGameRow:_makePartialScores(opponentIndex)
-	local game = self.props.game
+function GameRowComponentProps._makePartialScores(game, opponentIndex)
 	local extradata = game.extradata or {}
 	local firstSide = extradata.t1firstside or ''
-	local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
+	local oppositeSide = GameRowComponentProps._getOppositeSide(firstSide)
 	local halves = extradata['t' .. opponentIndex .. 'halfs'] or {}
 	if opponentIndex == 2 then
 		firstSide, oppositeSide = oppositeSide, firstSide
@@ -73,24 +70,25 @@ function ValorantMatchSummaryGameRow:_makePartialScores(opponentIndex)
 	}
 end
 
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Widget[]
-function ValorantMatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	local game = self.props.game
+---@return VNode[]
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
+	local game = props.game
 	local flipped = opponentIndex == 2
 	local characters = Array.map((game.opponents[opponentIndex] or {}).players or {}, Operator.property('agent'))
 	return {
 		MatchSummaryWidgets.Characters{characters = characters, flipped = flipped, hideOnMobile = true},
 		MatchSummaryWidgets.DetailedScore{
-			score = self:scoreDisplay(opponentIndex),
-			partialScores = self:_makePartialScores(opponentIndex)
+			score = MatchSummaryWidgets.GameRow.scoreDisplay(game, opponentIndex),
+			partialScores = GameRowComponentProps._makePartialScores(game, opponentIndex)
 		}
 	}
 end
 
 ---@param side string?
 ---@return string
-function CustomMatchSummary._getOppositeSide(side)
+function GameRowComponentProps._getOppositeSide(side)
 	if Logic.isEmpty(side) then
 		return ''
 	elseif side == 'atk' then

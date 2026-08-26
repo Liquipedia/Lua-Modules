@@ -23,12 +23,14 @@ local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournam
 local Widgets = Lua.import('Module:Widget/All')
 local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LeagueoflegendsInfoboxPlayer: Person
 ---@operator call(Frame): LeagueoflegendsInfoboxPlayer
 local CustomPlayer = Class.new(Player)
 
 ---@class LeagueoflegendsInfoboxPlayerWidgetInjector: WidgetInjector
+---@operator call(LeagueoflegendsInfoboxPlayer): LeagueoflegendsInfoboxPlayerWidgetInjector
 ---@field caller LeagueoflegendsInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
@@ -118,18 +120,20 @@ function CustomPlayer:adjustLPDB(lpdbData, args)
 	return lpdbData
 end
 
----@return Widget?
+---@return Renderable?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = TeamTemplate.getPageName(self.args.team)
 		---@cast teamPage -nil
+
 		return Html.Fragment{
-			children = {
-				MatchTicker.recent{team = teamPage},
-				UpcomingTournaments.team{name = teamPage},
-			}
+			children = WidgetUtil.collect(
+				MatchTicker.player{recentLimit = 3},
+				UpcomingTournaments.team{name = teamPage}
+			)
 		}
 	end
 end
+
 
 return CustomPlayer

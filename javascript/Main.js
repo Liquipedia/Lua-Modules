@@ -47,6 +47,7 @@ const jsModules = [
 	'Analytics',
 	'BattleRoyale',
 	'Bracket',
+	'Brackets',
 	'Carousel',
 	'Collapse',
 	'Commons_mainpage',
@@ -68,6 +69,7 @@ const jsModules = [
 	'Slider',
 	'SwitchButtons',
 	'Tabs',
+	'Table2',
 	'CoreEnd'
 ];
 

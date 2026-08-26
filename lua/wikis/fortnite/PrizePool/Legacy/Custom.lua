@@ -15,7 +15,7 @@ local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
-local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l', q = 'q'}
+local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l'}
 
 local CustomLegacyPrizePool = {}
 

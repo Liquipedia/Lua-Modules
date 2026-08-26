@@ -372,7 +372,7 @@ function TournamentPlayerInfo:buildTeamAgeTable()
 			['data-closetext'] = '4 to ' .. #teamTableRows
 		},
 		css = {
-			margin =  '1em 0',
+			margin = '1em 0',
 		},
 		children = WidgetUtil.collect(
 			TableWidgets.TableHeader{

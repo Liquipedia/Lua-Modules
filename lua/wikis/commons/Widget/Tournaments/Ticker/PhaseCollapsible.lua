@@ -7,43 +7,37 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
-
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local ChevronToggle = Lua.import('Module:Widget/GeneralCollapsible/ChevronToggle')
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 
 ---@class TournamentsTickerPhaseCollapsibleProps
 ---@field label string
----@field children Widget|Widget[]
+---@field children Renderable|Renderable[]
 ---@field collapsed boolean?
 
----@class TournamentsTickerPhaseCollapsible: Widget
----@operator call(TournamentsTickerPhaseCollapsibleProps): TournamentsTickerPhaseCollapsible
----@field props TournamentsTickerPhaseCollapsibleProps
-local TournamentsTickerPhaseCollapsible = Class.new(Widget)
-
----@return Widget
-function TournamentsTickerPhaseCollapsible:render()
+---@param props TournamentsTickerPhaseCollapsibleProps
+---@return VNode
+local function TournamentsTickerPhaseCollapsible(props)
 	return GeneralCollapsible{
 		classes = {'tournaments-phase-collapsible'},
-		shouldCollapse = self.props.collapsed,
-		titleWidget = HtmlWidgets.Div{
+		shouldCollapse = props.collapsed,
+		titleWidget = Html.Div{
 			classes = {'tournaments-phase-collapsible__header'},
 			attributes = {
 				['data-collapsible-click-region'] = 'true',
 			},
 			children = {
-				HtmlWidgets.Span{
+				Html.Span{
 					classes = {'tournaments-phase-collapsible__label'},
-					children = self.props.label,
+					children = props.label,
 				},
 				ChevronToggle{},
 			},
 		},
-		children = self.props.children,
+		children = props.children,
 	}
 end
 
-return TournamentsTickerPhaseCollapsible
+return Component.component(TournamentsTickerPhaseCollapsible)

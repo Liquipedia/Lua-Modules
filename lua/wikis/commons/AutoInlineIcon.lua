@@ -12,7 +12,7 @@ local Logic = Lua.import('Module:Logic')
 local InlineIconAndText = Lua.import('Module:Widget/Misc/InlineIconAndText')
 local ManualData = Lua.requireIfExists('Module:InlineIcon/ManualData', {loadData = true})
 
-local Character  = Lua.import('Module:Character')
+local Character = Lua.import('Module:Character')
 
 local AutoInlineIcon = {}
 

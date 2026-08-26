@@ -17,7 +17,7 @@ local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 local TeamService = Lua.import('Module:Service/Team')
@@ -130,13 +130,13 @@ function AutoTeamNavbox._makePersonDisplay(member)
 	end
 
 	local note = Logic.nilIfEmpty(makeNote(member.position, member.role))
-	return HtmlWidgets.Fragment{children = {
+	return Html.Fragment{children = {
 		Link{
 			link = member.pageName,
 			children = member.displayName,
 		},
 		note and '&nbsp;' or nil,
-		note and HtmlWidgets.Small{children = HtmlWidgets.I{children = '(' .. note .. ')'}} or nil,
+		note and Html.Small{children = Html.I{children = '(' .. note .. ')'}} or nil,
 	}}
 end
 

@@ -22,7 +22,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -283,7 +283,7 @@ function StageWinnings._detailedScores(scoresTable)
 		Array.map(scoreInfos, function(scoreInfo)
 			return scoreInfo.wins .. '-' .. scoreInfo.losses .. ': ' .. scoreInfo.count .. ' times'
 		end),
-		HtmlWidgets.Br{}
+		Html.Br{}
 	)
 end
 
@@ -295,7 +295,7 @@ function StageWinnings:_pointsHeader(data)
 		return
 	end
 
-	local titleText = Logic.isNotEmpty(data.titleLong) and HtmlWidgets.Abbr{
+	local titleText = Logic.isNotEmpty(data.titleLong) and Html.Abbr{
 		children = data.title, title = data.titleLong
 	} or data.title
 

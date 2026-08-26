@@ -5,8 +5,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local CustomMatchSummary = {}
-
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
@@ -14,16 +12,15 @@ local Eco = Lua.import('Module:ChessOpenings')
 local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local Collapsible = Lua.import('Module:Widget/Match/Summary/Collapsible')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
-local Span = HtmlWidgets.Span
-local Tr = HtmlWidgets.Tr
-local Th = HtmlWidgets.Th
-local Td = HtmlWidgets.Td
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
+local Span = Html.Span
+local Tr = Html.Tr
+local Th = Html.Th
+local Td = Html.Td
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -49,73 +46,32 @@ local KING_ICONS = {
 	},
 }
 
+---@class ChessMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {}
+
+local ChessMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
+
+---@class ChessCustomMatchSummary: CustomMatchSummaryInterface
+local CustomMatchSummary = {
+	GameRow = ChessMatchSummaryGameRow,
+}
+
 ---@param args table
----@return Widget
+---@return VNode
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
----@param match table
----@param createGame fun(date: string, game: table, gameIndex: integer): Widget
----@return Widget[]
-function CustomMatchSummary.createBody(match, createGame)
-	return WidgetUtil.collect(
-		Array.map(match.games, createGame),
-		CustomMatchSummary._linksTable(match)
-	)
-end
-
----@param game MatchGroupUtilGame
----@param gameIndex integer
----@return MatchSummaryRow
-function CustomMatchSummary.createGame(game, gameIndex)
-	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-body-game'},
-		children = WidgetUtil.collect(
-			-- Header
-			CustomMatchSummary._getHeader(game),
-
-			-- Player 1
-			MatchSummaryWidgets.GameCenter{
-				css = {flex = 1},
-				children = {
-					CustomMatchSummary._getSideIcon(game.opponents[1]),
-					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-					MatchSummaryWidgets.GameTeamWrapper{flipped = false},
-				},
-			},
-
-			-- Center
-			MatchSummaryWidgets.GameCenter{
-				children = CustomMatchSummary._getCenterContent(game, gameIndex),
-			},
-
-			-- Player 2
-			MatchSummaryWidgets.GameCenter{
-				css = {flex = 1},
-				children = {
-					MatchSummaryWidgets.GameTeamWrapper{flipped = true},
-					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-					CustomMatchSummary._getSideIcon(game.opponents[2]),
-				},
-			},
-
-			-- Comment
-			MatchSummaryWidgets.GameComment{children = game.comment}
-		)
-	}
-end
-
----@param game MatchGroupUtilGame
----@param gameIndex integer
----@return Widget
-function CustomMatchSummary._getCenterContent(game, gameIndex)
+---@param props MatchSummaryGameRowProps
+---@return Renderable?
+function GameRowComponentProps.createGameOverview(props)
+	local game = props.game
 	return Div{
 		children = {
 			Span{
 				classes = {'brkts-popup-spaced'},
 				children = {
-					'Game ' .. gameIndex,
+					'Game ' .. props.gameIndex,
 					tonumber(game.length) and (' - ' .. game.length .. ' moves') or '',
 				},
 			},
@@ -127,67 +83,69 @@ function CustomMatchSummary._getCenterContent(game, gameIndex)
 	}
 end
 
----@param gameOpponent table
----@return Widget
-function CustomMatchSummary._getSideIcon(gameOpponent)
-	return Div{
+---@param props MatchSummaryGameRowProps
+---@param opponentIndex integer
+---@return VNode
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
+	local game = props.game
+	return  Div{
 		classes = {'brkts-popup-spaced'},
-		children = KING_ICONS[gameOpponent.color],
+		---@diagnostic disable-next-line: undefined-field
+		children = KING_ICONS[game.opponents[opponentIndex].color],
 	}
 end
 
----@param game MatchGroupUtilGame
----@return Widget?
-function CustomMatchSummary._getHeader(game)
-	return String.isNotEmpty(game.header) and {
-		Div{
-			children = game.header,
-			css = {
-				['font-weight'] = 'bold',
-				margin = 'auto'
-			}
-		},
-		MatchSummaryWidgets.Break{}
-	} or nil
-end
-
----@param match any
----@return Widget?
-function CustomMatchSummary._linksTable(match)
-	if Logic.isDeepEmpty(match.links) then
-		return
-	end
-
-	local rows = Array.map(match.games, function(game, gameIndex)
-		local links = Table.mapValues(match.links, function(link)
-			if type(link) ~= 'table' then return nil end
-			return Table.extract(link, gameIndex)
+---@param match MatchGroupUtilMatch
+---@return VNode[]
+function CustomMatchSummary.createFooter(match)
+	local gameLinks = Array.map(match.games, function(game, gameIndex)
+		local linksForThisGame = {}
+		Table.iter.forEachPair(match.links, function(linkType, link)
+			if type(link) ~= 'table' then
+				return
+			end
+			linksForThisGame[linkType] = link[gameIndex]
 		end)
-		local vod = Table.extract(game, 'vod')
-		if not vod and Logic.isDeepEmpty(links) then return end
+		if not game.vod and Logic.isEmpty(linksForThisGame) then
+			return
+		end
 
-		local linksFooter = MatchSummary.Footer()
-		MatchSummary.addVodsToFooter({vod = vod, games = {}}, linksFooter)
-		linksFooter:addLinks(links)
+		local vods = MatchSummary.makeVodDisplay(game.vod, {})
+		local links = MatchSummary.makeLinksDisplay(linksForThisGame)
 
 		return Tr{children = {
 			Td{children = {'Game ', gameIndex}},
-			Td{classes = {'brkts-popup-spaced', 'vodlink'}, children = Array.map(linksFooter.elements, tostring)}
+			Td{classes = {'brkts-popup-spaced', 'vodlink'}, children = Array.extend(vods, links)}
 		}}
 	end)
 
-	if Logic.isEmpty(rows) then
-		return
+	local matchLinks = {}
+	if match.vod then
+		matchLinks = Array.extend(matchLinks, MatchSummary.makeVodDisplay(match.vod, {}))
 	end
+	local rawLinksForMatch = {}
+	Table.iter.forEachPair(match.links, function(linkType, link)
+		if type(link) ~= 'string' then
+			return
+		end
+		rawLinksForMatch[linkType] = link
+	end)
 
-	return Collapsible{
-		tableClasses = {'wikitable-striped'},
-		header = Tr{children = {
-			Th{css = {width = '20%'}},
-			Th{css = {width = '80%'}, children = {'Additional Links'}},
-		}},
-		children = rows,
-	}
+	matchLinks = Array.extend(matchLinks, MatchSummary.makeLinksDisplay(rawLinksForMatch))
+
+	return WidgetUtil.collect(
+		Logic.isNotEmpty(gameLinks) and MatchSummaryWidgets.Footer{children = {
+			Collapsible{
+				tableClasses = {'wikitable-striped'},
+				header = Tr{children = {
+					Th{css = {width = '20%'}},
+					Th{css = {width = '80%'}, children = {'Additional Links'}},
+				}},
+				children = gameLinks,
+			}
+		}} or nil,
+		Logic.isNotEmpty(matchLinks) and MatchSummaryWidgets.Footer{children = matchLinks} or nil
+	)
 end
 
 return CustomMatchSummary

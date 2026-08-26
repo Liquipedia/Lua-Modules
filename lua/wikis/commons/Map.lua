@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
@@ -120,7 +121,7 @@ function Map.fromRecord(record)
 		imageDark = Logic.nilIfEmpty(record.imagedark),
 		creators = creators,
 		creatorDisplayNames = creatorDisplayNames,
-		game = Table.extract(record.extradata, 'game'),
+		game = Game.toIdentifier{game = Table.extract(record.extradata, 'game'), useDefault = false},
 		gameModes = Table.extract(record.extradata, 'modes'),
 		extradata = record.extradata
 	}

@@ -15,7 +15,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
@@ -33,44 +33,40 @@ local DEFAULT_HERO = 'default'
 local CustomMatchSummary = {}
 
 ---@param args {bracketId: string, matchId: string, config: table?}
----@return Html
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px'})
 end
 
----@param match table
+---@param match StormgateMatchGroupUtilMatch
 ---@return Widget[]
 function CustomMatchSummary.createBody(match)
-	CustomMatchSummary.computeOfffactions(match)
+	CustomMatchSummary.computeOffFactions(match)
 	local hasHeroes = CustomMatchSummary.hasHeroes(match)
-	local subMatches
-	if not match.isUniformMode then
-		subMatches = match.submatches or {}
-	end
 
 	return WidgetUtil.collect(
 		Array.map(match.opponents, CustomMatchSummary.advantageOrPenalty),
-		subMatches and Array.map(subMatches, CustomMatchSummary.TeamSubmatch)
+		not match.isUniformMode and Array.map(match.submatches or {}, CustomMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {hasHeroes = hasHeroes})),
 		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
 			css = {['text-align'] = 'center'},
-			children = {HtmlWidgets.B{children = {'Vetoes'}}},
+			children = {Html.B{children = {'Vetoes'}}},
 		} or nil,
 		Array.map(match.vetoes or {}, CustomMatchSummary.Veto) or nil
 	)
 end
 
 ---@param match table
-function CustomMatchSummary.computeOfffactions(match)
+function CustomMatchSummary.computeOffFactions(match)
 	if match.isUniformMode then
-		CustomMatchSummary.computeMatchOfffactions(match)
+		CustomMatchSummary.computeMatchOffFactions(match)
 	else
-		Array.forEach(match.submatches, CustomMatchSummary.computeMatchOfffactions)
+		Array.forEach(match.submatches, CustomMatchSummary.computeMatchOffFactions)
 	end
 end
 
 ---@param match table
-function CustomMatchSummary.computeMatchOfffactions(match)
+function CustomMatchSummary.computeMatchOffFactions(match)
 	Array.forEach(match.games, function(game)
 		game.offFactions = {}
 		Array.forEach(game.opponents, function(gameOpponent, opponentIndex)
@@ -131,14 +127,14 @@ function CustomMatchSummary.Game(options, game)
 		return CustomMatchSummary.OffFactionIcons(opponent and offFactions or {})
 	end
 
-	local rowWidget = options.isPartOfSubMatch and HtmlWidgets.Div or MatchSummaryWidgets.Row
+	local rowWidget = options.isPartOfSubMatch and Html.Div or MatchSummaryWidgets.Row
 
 	return rowWidget{
 		classes = {'brkts-popup-body-game', options.isPartOfSubMatch and 'inherit-bg' or nil},
 		css = {width = options.isPartOfSubMatch and '100%' or nil},
 		children = WidgetUtil.collect(
 			game.header and {
-				HtmlWidgets.Div{css = {margin = 'auto'}, children = {game.header}},
+				Html.Div{css = {margin = 'auto'}, children = {game.header}},
 				MatchSummaryWidgets.Break{},
 			} or nil,
 			CustomMatchSummary.DisplayHeroes(game.opponents[1], {hasHeroes = options.hasHeroes}),
@@ -181,11 +177,11 @@ function CustomMatchSummary.DisplayHeroes(opponent, options)
 		end)
 	end)
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'brkts-popup-body-element-vertical-centered'},
 		css = {['flex-direction'] = 'column', ['padding-' .. (options.flipped and 'left' or 'right')] = '8px'},
 		children = Array.map(heroesPerPlayer, function(heroes)
-			return HtmlWidgets.Div{
+			return Html.Div{
 				classes = {'brkts-popup-body-element-thumbs', 'brkts-champion-icon'},
 				children = MatchSummaryWidgets.Characters{
 					flipped = options.flipped,
@@ -197,8 +193,8 @@ function CustomMatchSummary.DisplayHeroes(opponent, options)
 	}
 end
 
----@param submatch table
----@return MatchSummaryRow
+---@param submatch StormgateMatchGroupUtilSubmatch
+---@return Renderable
 function CustomMatchSummary.TeamSubmatch(submatch)
 	return MatchSummaryWidgets.Row{
 		children = WidgetUtil.collect(
@@ -225,9 +221,9 @@ function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 		}
 	end
 
-	---@param opponentIndex any
+	---@param opponentIndex integer
 	---@param additionalClasses string[]?
-	---@return Widget
+	---@return Renderable
 	local createScore = function(opponentIndex, additionalClasses)
 		return OpponentDisplay.BlockScore{
 			additionalClasses = additionalClasses,
@@ -236,18 +232,18 @@ function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 		}
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'brkts-popup-header-dev'},
 		css = {['justify-content'] = 'center', margin = 'auto'},
 		children = WidgetUtil.collect(
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'brkts-popup-header-opponent', 'brkts-popup-header-opponent-left'},
 				children = {
 					createOpponent(1),
 					createScore(1, {'brkts-popup-header-opponent-score-left'}),
 				},
 			},
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'brkts-popup-header-opponent', 'brkts-popup-header-opponent-right'},
 				children = {
 					createScore(2, {'brkts-popup-header-opponent-score-right'}),
@@ -258,7 +254,7 @@ function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 	}
 end
 
----@param submatch StarcraftMatchGroupUtilSubmatch
+---@param submatch StormgateMatchGroupUtilSubmatch
 ---@return Widget?
 function CustomMatchSummary.TeamSubMatchGames(submatch)
 	if not CustomMatchSummary._submatchHasDetails(submatch) then return nil end
@@ -267,17 +263,17 @@ function CustomMatchSummary.TeamSubMatchGames(submatch)
 		classes = {'brkts-popup-header-dev'},
 		css = {width = '100%', padding = 0},
 		tableClasses = {'inherit-bg'},
-		header = HtmlWidgets.Tr{
+		header = Html.Tr{
 			children = {
-				HtmlWidgets.Th{
+				Html.Th{
 					children = {'Submatch Details'},
 				},
 			},
 		},
 		children = Array.map(submatch.games, function(game)
-			return HtmlWidgets.Tr{
+			return Html.Tr{
 				children = {
-					HtmlWidgets.Td{
+					Html.Td{
 						children = {CustomMatchSummary.Game({hasHeroes = true, isPartOfSubMatch = true}, game)},
 					},
 				},
@@ -286,7 +282,7 @@ function CustomMatchSummary.TeamSubMatchGames(submatch)
 	}
 end
 
----@param submatch table
+---@param submatch StormgateMatchGroupUtilSubmatch
 ---@return boolean
 function CustomMatchSummary._submatchHasDetails(submatch)
 	return #submatch.games > 0 and Array.any(submatch.games, function(game)
@@ -297,7 +293,7 @@ function CustomMatchSummary._submatchHasDetails(submatch)
 end
 
 ---@param veto StarcraftMatchGroupUtilVeto
----@return MatchSummaryRow
+---@return Renderable
 function CustomMatchSummary.Veto(veto)
 	local statusIcon = function(opponentIndex)
 		return opponentIndex == veto.by and MAP_VETO_LABEL or nil
@@ -313,15 +309,15 @@ function CustomMatchSummary.Veto(veto)
 			['align-items'] = 'center',
 		},
 		children = {
-			HtmlWidgets.Div{
+			Html.Div{
 				css = {['text-align'] = 'left'},
 				children = statusIcon(1),
 			},
-			HtmlWidgets.Div{
+			Html.Div{
 				css = {['text-align'] = 'center'},
 				children = {map},
 			},
-			HtmlWidgets.Div{
+			Html.Div{
 				css = {['text-align'] = 'right'},
 				children = statusIcon(2),
 			}

@@ -13,12 +13,12 @@ local Logic = Lua.import('Module:Logic')
 local Character = Lua.import('Module:Character')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local Tr = HtmlWidgets.Tr
-local Td = HtmlWidgets.Td
+local Tr = Html.Tr
+local Td = Html.Td
 
 ---@class CharacterTableEntryParams
 ---@field name string
@@ -79,7 +79,7 @@ end
 
 ---@return Widget
 function CharacterTableEntry:_buildUpper()
-	return HtmlWidgets.Table{
+	return Html.Table{
 		classes = { self:getBackgroundClass() },
 		css = {
 			['margin-bottom'] = '2px',
@@ -111,7 +111,7 @@ end
 
 ---@return Widget
 function CharacterTableEntry:_buildLower()
-	return HtmlWidgets.Table{
+	return Html.Table{
 		classes = { self:getBackgroundClass() },
 		css = {
 			['margin-bottom'] = '10px',

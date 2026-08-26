@@ -15,13 +15,13 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
-local Span = HtmlWidgets.Span
-local Tbl = HtmlWidgets.Table
-local Tr = HtmlWidgets.Tr
-local Th = HtmlWidgets.Th
-local Td = HtmlWidgets.Td
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
+local Span = Html.Span
+local Tbl = Html.Table
+local Tr = Html.Tr
+local Th = Html.Th
+local Td = Html.Td
 
 local NavBoxTitle = Lua.import('Module:Widget/NavBox/Title')
 local Widget = Lua.import('Module:Widget')
@@ -135,7 +135,7 @@ end
 
 ---@param child {name: string?, mobileName: string?, child: Widget}
 ---@param childIndex integer
----@return WidgetHtml
+---@return Renderable
 function NavBoxChild:_toRow(child, childIndex)
 	return Tr{
 		children = WidgetUtil.collect(
@@ -161,7 +161,7 @@ end
 
 ---@param childIndex integer
 ---@param isLeft boolean
----@return Widget?
+---@return Renderable?
 function NavBoxChild:_makeImage(childIndex, isLeft)
 	local props = self.props
 

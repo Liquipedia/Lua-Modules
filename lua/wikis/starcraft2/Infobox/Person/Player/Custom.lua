@@ -147,17 +147,18 @@ function CustomPlayer:_getActiveCasterYears()
 		limit = 5000,
 	})
 
+	---@type Set<integer>
 	local years = Set{}
 	Array.forEach(queryData,
 		---@param item broadcasters
 		---@return number?
-		function(item) years:add(tonumber(item.year_date)) end
+		function(item) years:add(tonumber(item.year_date) --[[@as integer]]) end
 	)
 
 	return YearsActive.displayYears(years:toArray())
 end
 
----@return Html?
+---@return Renderable?
 function CustomPlayer:createBottomContent()
 	if self.shouldQueryData then
 		return MatchTicker.recent({
@@ -175,11 +176,13 @@ function CustomPlayer:_getMatchupData(player)
 
 	player = Page.applyUnderScoresIfEnforced(player)
 
+	---@type Set<integer>
 	local years = Set{}
 
 	---@param match match2
 	local processMatch = function(match)
 		local year = tonumber(string.sub(match.date, 1, 4))
+		---@cast year integer
 		years:add(year)
 
 		if #self.recentMatches < NUMBER_OF_RECENT_MATCHES then

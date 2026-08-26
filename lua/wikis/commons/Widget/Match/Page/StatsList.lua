@@ -38,7 +38,7 @@ function MatchPageStatsList.render(props)
 		classes = {'match-bm-team-stats-list'},
 		children = Array.map(
 			Array.filter(props.data, function (element)
-				return element.team1Value ~= nil or element.team2Value ~= nil
+				return Logic.isNotEmpty(element.team1Value) or Logic.isNotEmpty(element.team2Value)
 			end),
 			FnUtil.curry(MatchPageStatsList._renderStat, props.finished)
 		)
@@ -54,7 +54,7 @@ function MatchPageStatsList._renderStat(finished, data)
 		children = WidgetUtil.collect(
 			finished and Div{
 				classes = {'match-bm-team-stats-list-cell'},
-				children = WidgetUtil.collect(data.team1Value)
+				children = data.team1Value
 			} or nil,
 			Div{
 				classes = {'match-bm-team-stats-list-cell', 'cell--middle'},
@@ -62,7 +62,7 @@ function MatchPageStatsList._renderStat(finished, data)
 			},
 			finished and Div{
 				classes = {'match-bm-team-stats-list-cell'},
-				children = WidgetUtil.collect(data.team2Value)
+				children = data.team2Value
 			} or nil
 		)
 	}

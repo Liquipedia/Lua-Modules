@@ -102,7 +102,7 @@ end
 function CustomLeague:_computePatch(args)
 	local prefixPatch = function(patch)
 		if not patch then return end
-		return 'Patch ' .. patch:gsub(' ', '_')
+		return 'Patch ' .. patch:gsub('_', ' ')
 	end
 	self.data.patch = prefixPatch(args.patch)
 	self.data.endPatch = prefixPatch(args.epatch)

@@ -8,12 +8,10 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MAX_NUM_BANS = 5
 local NUM_CHAMPIONS_PICK = 5
@@ -21,21 +19,23 @@ local NUM_CHAMPIONS_PICK = 5
 ---@class MobileLegendsCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
----@class MobileLegendsMatchSummaryGameRow: MatchSummaryGameRow
----@operator call(MatchSummaryGameRowProps): MobileLegendsMatchSummaryGameRow
-local MobileLegendsMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+---@class MobileLegendsMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
+	createGameOverview = MatchSummaryWidgets.GameRow.lengthDisplay,
+}
+
+local MobileLegendsMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px', teamStyle = 'hybrid'})
+	local options = {width = '420px', teamStyle = 'hybrid', maxBans = MAX_NUM_BANS}
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
-function CustomMatchSummary.createBody(match)
-	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
-
+---@return VNode
+function CustomMatchSummary.createGames(match)
 	---@param game MatchGroupUtilGame
 	---@return boolean
 	local function hasCharacterData(game)
@@ -46,29 +46,20 @@ function CustomMatchSummary.createBody(match)
 		end)
 	end
 
-	return WidgetUtil.collect(
-		MatchSummaryWidgets.GamesContainer{
-			children = Array.map(match.games, function (game, gameIndex)
-				if Logic.isEmpty(game.length) and Logic.isEmpty(game.winner) and not hasCharacterData(game) then
-					return
-				end
-				return MobileLegendsMatchSummaryGameRow{game = game, gameIndex = gameIndex}
-			end)
-		},
-		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	)
+	return MatchSummaryWidgets.GamesContainer{
+		children = Array.map(match.games, function (game, gameIndex)
+			if Logic.isEmpty(game.length) and Logic.isEmpty(game.winner) and not hasCharacterData(game) then
+				return
+			end
+			return MobileLegendsMatchSummaryGameRow{game = game, gameIndex = gameIndex}
+		end)
+	}
 end
 
----@return Renderable?
-function MobileLegendsMatchSummaryGameRow:createGameOverview()
-	return self:lengthDisplay()
-end
-
+---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return Widget
-function MobileLegendsMatchSummaryGameRow:createGameOpponentView(opponentIndex)
-	local props = self.props
+---@return VNode
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local extradata = game.extradata or {}
 

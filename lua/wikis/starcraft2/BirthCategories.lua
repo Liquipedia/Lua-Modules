@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 
 local BirthCategories = {}
 
@@ -19,24 +19,24 @@ function BirthCategories.get()
 	local yearString = string.gsub(mw.title.getCurrentTitle().text, ' births', '')
 	local year = tonumber(yearString)
 
-	local row = HtmlWidgets.Div{
+	local row = Html.Div{
 		classes = {'hlist'},
 		css = {['margin-left'] = '0'},
-		children = HtmlWidgets.Ul{children = Array.map(Array.range(year - 4, year + 4), function(currentYear)
-			return HtmlWidgets.Li{
+		children = Html.Ul{children = Array.map(Array.range(year - 4, year + 4), function(currentYear)
+			return Html.Li{
 				children = Link{link = ':Category:' .. currentYear .. ' births', children = currentYear}
 			}
 		end)}
 	}
 
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = {
-			HtmlWidgets.Table{
+			Html.Table{
 				classes = {'toccolours'},
 				attributes = {align = 'right'},
-				children = HtmlWidgets.Tr{children = HtmlWidgets.Td{children = row}}
+				children = Html.Tr{children = Html.Td{children = row}}
 			},
-			HtmlWidgets.Br{},
+			Html.Br{},
 			'List of people born in ' .. year .. '.'
 		}
 	}

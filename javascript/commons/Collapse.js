@@ -23,7 +23,7 @@ liquipedia.collapse = {
 	makeDesignButton: function( collapsible, isShow ) {
 		const title = ( isShow ? 'Show' : 'Hide' );
 		const button = document.createElement( 'button' );
-		button.classList.add( 'collapseButton', 'btn', 'btn-secondary', 'btn-extrasmall' );
+		button.classList.add( 'collapseButton', 'button', 'button--secondary', 'button--extrasmall' );
 		button.classList.add( isShow ? 'collapseButtonShow' : 'collapseButtonHide' );
 		button.setAttribute( 'role', 'button' );
 		button.setAttribute( 'aria-label', title );
@@ -66,21 +66,17 @@ liquipedia.collapse = {
 	// general-collapsible is a generalization of .collapsible that works for
 	// any layout, not just tables. It requires that the collapsible
 	// component supply its own expand/collapse buttons.
-	//
-	// Note that unlike .collapsible, the button is the anchor itself, instead
-	// of a wrapper around the anchor.
 	setupGeneralCollapsibleButtons: function() {
-		// Replaces the button (usually a <span>) with <a href="#">...</a>.
+		// Replaces the element (a <div>, as the MW parser does not allow <button>)
+		// with a real <button>.
 		// For xss safety, only the child nodes and class name are copied over.
-		function replaceWithAnchor( button ) {
-			const anchor = document.createElement( 'a' );
-			button.childNodes.forEach( ( node ) => {
-				anchor.append( node );
-			} );
-			anchor.className = button.className;
-			anchor.href = '#';
-			button.parentNode.replaceChild( anchor, button );
-			return anchor;
+		function replaceWithButton( element ) {
+			const button = document.createElement( 'button' );
+			button.append( ...element.childNodes );
+			button.className = element.className;
+			button.type = 'button';
+			element.parentNode.replaceChild( button, element );
+			return button;
 		}
 
 		document.querySelectorAll( '#mw-content-text .general-collapsible' ).forEach( ( collapsible ) => {
@@ -88,18 +84,14 @@ liquipedia.collapse = {
 			const expandButton = collapsible.querySelector( '.general-collapsible-expand-button' );
 
 			if ( expandButton ) {
-				const anchor = replaceWithAnchor( expandButton );
-				anchor.addEventListener( 'click', ( event ) => {
+				replaceWithButton( expandButton ).addEventListener( 'click', () => {
 					collapsible.classList.remove( 'collapsed' );
-					event.preventDefault();
 				} );
 			}
 
 			if ( collapseButton ) {
-				const anchor = replaceWithAnchor( collapseButton );
-				anchor.addEventListener( 'click', ( event ) => {
+				replaceWithButton( collapseButton ).addEventListener( 'click', () => {
 					collapsible.classList.add( 'collapsed' );
-					event.preventDefault();
 				} );
 			}
 		} );
@@ -108,11 +100,12 @@ liquipedia.collapse = {
 		const regions = document.querySelectorAll( '[data-collapsible-click-region]' );
 
 		regions.forEach( ( region ) => {
-			// Get exclusion selector from attribute, default to 'a' (links)
+			// Get exclusion selector from attribute, default to interactive elements
+			// (links and buttons, which includes the general-collapsible toggles).
 			// Can pass empty string for "no exclusions" (everything toggles collapse)
-			const exclusionSelector = region.getAttribute( 'data-collapsible-exclude' ) || 'a';
+			const exclusionSelector = region.getAttribute( 'data-collapsible-exclude' ) || 'a, button';
 
-			region.addEventListener( 'click', ( event ) => {
+			const toggleCollapsible = ( event ) => {
 				if ( exclusionSelector ) {
 					const clickedExcluded = event.target.closest( exclusionSelector );
 
@@ -125,6 +118,27 @@ liquipedia.collapse = {
 				if ( collapsible ) {
 					event.preventDefault();
 					collapsible.classList.toggle( 'collapsed' );
+					if ( region.hasAttribute( 'aria-expanded' ) ) {
+						const isExpanded = !collapsible.classList.contains( 'collapsed' );
+						region.setAttribute( 'aria-expanded', String( isExpanded ) );
+					}
+				}
+			};
+
+			region.setAttribute( 'tabindex', '0' );
+			// role="button" makes child elements presentational, so only set it
+			// on regions without interactive children (e.g. links)
+			if ( !exclusionSelector || region.querySelector( exclusionSelector ) === null ) {
+				const collapsible = region.closest( '.general-collapsible' );
+				const isExpanded = collapsible !== null && !collapsible.classList.contains( 'collapsed' );
+				region.setAttribute( 'role', 'button' );
+				region.setAttribute( 'aria-expanded', String( isExpanded ) );
+			}
+
+			region.addEventListener( 'click', toggleCollapsible );
+			region.addEventListener( 'keydown', ( event ) => {
+				if ( event.key === 'Enter' || event.key === ' ' ) {
+					toggleCollapsible( event );
 				}
 			} );
 		} );
@@ -153,7 +167,7 @@ liquipedia.collapse = {
 				hideAllText = 'Hide all';
 			}
 			const button = document.createElement( 'button' );
-			button.classList.add( 'btn', 'btn-secondary', 'btn-small' );
+			button.classList.add( 'button', 'button--secondary', 'button--small' );
 			if ( toggleGroup.classList.contains( 'toggle-state-hide' ) ) {
 				button.innerHTML = this.makeIcon( false ) + ' ' + hideAllText;
 			} else {
@@ -198,7 +212,7 @@ liquipedia.collapse = {
 					} else {
 						box.classList.add( 'dropdown-box-visible' );
 						toggleActive = true;
-						box.querySelectorAll( '.btn' ).forEach( ( btn ) => {
+						box.querySelectorAll( '.button' ).forEach( ( btn ) => {
 							btn.addEventListener( 'click', () => {
 								dropdownButton.innerHTML = btn.textContent + ' <span class="caret"></span>';
 								box.classList.remove( 'dropdown-box-visible' );

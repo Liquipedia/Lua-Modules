@@ -16,8 +16,7 @@ local Html = Lua.import('Module:Widget/Html')
 local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
----@class Table2CellHeaderProps
----@field children? Renderable|Renderable[]
+---@class Table2CellHeaderProps: HtmlNodeProps
 ---@field section 'head'|'body'|'subhead'?
 ---@field align ('left'|'right'|'center')?
 ---@field shrink (string|number|boolean)?
@@ -27,9 +26,6 @@ local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 ---@field maxWidth string?
 ---@field unsortable (string|number|boolean)?
 ---@field sortType string?
----@field classes string[]?
----@field css {[string]: string|number|nil}?
----@field attributes {[string]: any}?
 ---@field colspan integer|string?
 ---@field rowspan integer|string?
 ---@field columnIndex integer|string?
@@ -52,7 +48,7 @@ local function Table2CellHeader(props, context)
 	-- Skip context lookups and property merging if there are no column definitions
 	if #columns == 0 then
 		local align = props.align
-		local attributes = props.attributes or {}
+		local attributes = ColumnUtil.buildAttributes(props)
 		if align == 'right' or align == 'center' then
 			attributes['data-align'] = align
 		end
