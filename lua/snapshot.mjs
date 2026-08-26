@@ -78,6 +78,7 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 		create: {
 			width: maxWidth,
 			height: height,
+			channels: 4
 		}
 	}).composite([
 		{
