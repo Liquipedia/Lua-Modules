@@ -3,7 +3,6 @@ import { resolve, join, dirname } from 'path';
 import { chromium } from 'playwright';
 import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
-import sharp from 'sharp';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -66,31 +65,16 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 	await browser.close();
 
 	// Combine both screenshots into one
-	let pngLight = sharp(lightScreenshotBuffer);
-	let pngDark = sharp(darkScreenshotBuffer);
+	let pngLight = PNG.sync.read(lightScreenshotBuffer);
+	let pngDark = PNG.sync.read(darkScreenshotBuffer);
 
-	const {lightWidth, lightHeight} = await pngLight.metadata();
-	const {darkWidth, darkHeight} = await pngDark.metadata();
+	const {width: lightWidth, height: lightHeight} = pngLight;
+	const {width: darkWidth, height: darkHeight} = pngDark;
 
-	const maxWidth = Math.max(lightWidth, darkWidth);
-	const height = lightHeight + darkHeight;
-	const combined = sharp({
-		create: {
-			width: maxWidth,
-			height: height,
-			channels: 4,
-    		background: { r: 255, g: 0, b: 0, alpha: 1 }
-		}
-	}).composite([
-		{
-			input: lightScreenshotBuffer
-		},
-		{
-			input: darkScreenshotBuffer,
-			left: 0,
-			top: lightHeight
-		}
-	])
+	const combined = new PNG({width: Math.max(lightWidth, darkWidth), height: lightHeight + darkHeight});
+
+	PNG.bitblt(pngLight, combined, 0, 0, lightWidth, lightHeight, 0, 0);
+	PNG.bitblt(pngDark, combined, 0, 0, darkWidth, darkHeight, 0, lightHeight);
 
 	if (missingResources.size > 0) {
 		console.error(`Error: '${testName}' rendered without resources it needs, refusing to use the result.`);
@@ -101,7 +85,7 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 	if (shouldUpdate || !existsSync(referencePath)) {
 		// Update snapshot, either forced or previous snapshot doesn't exist yet
 		mkdirSync(SNAPSHOT_DIR, { recursive: true });
-		writeFileSync(referencePath, await combined.toBuffer());
+		writeFileSync(referencePath, PNG.sync.write(combined));
 		process.exit(0);
 	} else {
 		// Compare with existing snapshot
@@ -112,7 +96,7 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 
 		const mismatchedPixels = pixelmatch(
 			referenceImage.data,
-			await combined.toBuffer(),
+			combined.data,
 			diffImage.data,
 			width,
 			height,
@@ -126,7 +110,7 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 			mkdirSync(SNAPSHOT_DIFF_DIR, { recursive: true });
 
 			writeFileSync(join(SNAPSHOT_DIFF_DIR, `${testName}-diff.png`), PNG.sync.write(diffImage));
-			writeFileSync(join(SNAPSHOT_DIFF_DIR, `${testName}-new.png`), await combined.toBuffer());
+			writeFileSync(join(SNAPSHOT_DIFF_DIR, `${testName}-new.png`), PNG.sync.write(combined));
 
 			process.exit(1);
 		}
