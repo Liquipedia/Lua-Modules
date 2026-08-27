@@ -30,7 +30,7 @@ local Config = Info.config.thisDay or {}
 ---@class (exact) ThisDayBirthdayRecord
 ---@field birthDate string
 ---@field player standardPlayer
----@field links table
+---@field links table<string, string?>
 
 ---@class (exact) ThisDayTournamentWinRecord
 ---@field date string
