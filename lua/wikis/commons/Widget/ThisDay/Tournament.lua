@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
@@ -16,40 +15,37 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local ThisDayQuery = Lua.import('Module:ThisDay/Query')
 
+local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local ListWidgets = Lua.import('Module:Widget/List')
 local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
-local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local HEADER = Html.H3{children = 'Tournaments'}
 local TODAY = os.date("*t")
 
----@class ThisDayTournamentParameters: ThisDayParameters
----@field hideIfEmpty boolean?
-
----@class ThisDayTournament: Widget
----@operator call(table): ThisDayTournament
----@field props ThisDayTournamentParameters
-local ThisDayTournament = Class.new(Widget)
-ThisDayTournament.defaultProps = {
-	month = TODAY.month,
-	day = TODAY.day
+local ThisDayTournament = {
+	defaultProps = {
+		month = TODAY.month,
+		day = TODAY.day
+	}
 }
 
+---@param props ThisDayParameters
 ---@return Renderable[]
-function ThisDayTournament:render()
+function ThisDayTournament.render(props)
 	return WidgetUtil.collect(
 		HEADER,
-		self:_generateList()
+		ThisDayTournament._generateList(props)
 	)
 end
 
 ---@private
+---@param props ThisDayParameters
 ---@return Renderable|Renderable[]
-function ThisDayTournament:_generateList()
-	local month = self.props.month
-	local day = self.props.day
+function ThisDayTournament._generateList(props)
+	local month = props.month
+	local day = props.day
 	assert(month, 'Month not specified')
 	assert(day, 'Day not specified')
 
@@ -89,4 +85,4 @@ function ThisDayTournament._displayWins(yearData)
 	return ListWidgets.Unordered{ children = display }
 end
 
-return ThisDayTournament
+return Component.component(ThisDayTournament.render, ThisDayTournament.defaultProps)
