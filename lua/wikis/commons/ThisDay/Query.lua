@@ -12,6 +12,7 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local Patch = Lua.import('Module:Patch')
 local Tournament = Lua.import('Module:Tournament')
 
@@ -25,6 +26,11 @@ local ColumnName = Condition.ColumnName
 
 ---@type ThisDayConfig
 local Config = Info.config.thisDay or {}
+
+---@class (exact) ThisDayBirthdayRecord
+---@field birthDate string
+---@field player standardPlayer
+---@field links table
 
 ---@class (exact) ThisDayTournamentWinRecord
 ---@field date string
@@ -40,7 +46,7 @@ local ThisDayQuery = {}
 --- Queries birthday data
 ---@param month integer
 ---@param day integer
----@return player[]
+---@return ThisDayBirthdayRecord[]
 function ThisDayQuery.birthday(month, day)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{
@@ -50,12 +56,27 @@ function ThisDayQuery.birthday(month, day)
 			ConditionNode(ColumnName('birthdate'), Comparator.neq, DateExt.defaultDate),
 		}
 
-	return mw.ext.LiquipediaDB.lpdb('player', {
-		limit = 5000,
-		conditions = conditions:toString(),
-		query = 'extradata, pagename, id, birthdate, nationality, links',
-		order = 'birthdate asc, id asc'
-	})
+	---@type ThisDayBirthdayRecord[]
+	local queriedData = {}
+
+	Lpdb.executeMassQuery(
+		'player',
+		{
+			limit = 5000,
+			conditions = tostring(conditions),
+			query = 'extradata, pagename, id, birthdate, nationality, links',
+			order = 'birthdate asc, id asc',
+		},
+		function (record)
+			table.insert(queriedData, {
+				birthDate = record.birthdate,
+				player = PlayerExt.fromLpdbPlayerRecord(record),
+				links = record.links,
+			})
+		end
+	)
+
+	return queriedData
 end
 
 --- Queries patch data

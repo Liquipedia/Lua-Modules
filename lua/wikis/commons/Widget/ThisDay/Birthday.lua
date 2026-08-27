@@ -15,8 +15,7 @@ local Logic = Lua.import('Module:Logic')
 local AgeCalculation = Lua.import('Module:AgeCalculation')
 local ThisDayQuery = Lua.import('Module:ThisDay/Query')
 
-local Opponent = Lua.import('Module:Opponent/Custom')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local Html = Lua.import('Module:Widget/Html')
 local ListWidgets = Lua.import('Module:Widget/List')
@@ -38,7 +37,7 @@ ThisDayBirthday.defaultProps = {
 	day = TODAY.day
 }
 
----@return (string|Widget)[]?
+---@return Renderable[]?
 function ThisDayBirthday:render()
 	local month = self.props.month
 	local day = self.props.day
@@ -64,33 +63,26 @@ function ThisDayBirthday:render()
 end
 
 ---@private
----@param player player
----@return (string|Html|Widget)[]
-function ThisDayBirthday:_toLine(player)
-	local playerAge = AgeCalculation.raw{birthdate = player.birthdate}
-	local opponentData = Opponent.readOpponentArgs{
-		type = Opponent.solo,
-		name = player.id,
-		flag = player.nationality,
-		link = player.pagename,
-		faction = (player.extradata or {}).faction,
-	}
+---@param record ThisDayBirthdayRecord
+---@return Renderable[]
+function ThisDayBirthday:_toLine(record)
+	local playerAge = AgeCalculation.raw{birthdate = record.birthDate}
 	local line = {
-		OpponentDisplay.InlineOpponent{opponent = opponentData},
+		PlayerDisplay.InlinePlayer{player = record.player},
 		' - ',
 		playerAge.birthDate.year .. ' (age ' .. playerAge:calculate() .. ')'
 	}
 
-	if Logic.isNotEmpty((player.links or {}).twitter) and not Logic.readBool(self.props.noTwitter) then
+	if Logic.isNotEmpty((record.links or {}).twitter) and not Logic.readBool(self.props.noTwitter) then
 		Array.appendWith(
 			line,
 			' ',
 			Html.I{
 				classes = {'lp-icon', 'lp-icon-25', 'lp-twitter', 'share-birthday'},
 				attributes = {
-					['data-url'] = player.links.twitter,
-					['data-page'] = player.pagename,
-					title = 'Send a message to ' .. player.id .. ' about their birthday!'
+					['data-url'] = record.links.twitter,
+					['data-page'] = record.player.pageName,
+					title = 'Send a message to ' .. record.player.displayName .. ' about their birthday!'
 				},
 				css = {cursor = 'pointer'}
 			}
