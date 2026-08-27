@@ -111,7 +111,7 @@ function ThisDayQuery.tournament(month, day)
 			ConditionNode(ColumnName('date_year'), Comparator.lt, DateExt.getYearOf()),
 			ConditionNode(ColumnName('placement'), Comparator.eq, 1),
 			ConditionNode(ColumnName('opponentname'), Comparator.neq, 'TBD'),
-			ConditionNode(ColumnName('prizepoolindex'), Comparator.eq, '1'),
+			ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual'),
 		}
 	conditions:add(ConditionUtil.anyOf(
 		ColumnName('liquipediatier'),
