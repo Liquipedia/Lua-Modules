@@ -37,7 +37,7 @@ ThisDayTournament.defaultProps = {
 	day = TODAY.day
 }
 
----@return Widget[]
+---@return Renderable[]
 function ThisDayTournament:render()
 	return WidgetUtil.collect(
 		HEADER,
@@ -46,7 +46,7 @@ function ThisDayTournament:render()
 end
 
 ---@private
----@return string|(string|Widget)[]
+---@return Renderable|Renderable[]
 function ThisDayTournament:_generateList()
 	local month = self.props.month
 	local day = self.props.day
