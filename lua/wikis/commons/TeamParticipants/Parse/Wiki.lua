@@ -144,7 +144,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 			table.insert(warnings, 'Invalid contenders: expected a list of non-empty strings')
 		else
 			Array.forEach(contenderNames, function(name, idx)
-				if type(name) ~= 'string' or name == '' then
+				if type(name) ~= 'string' or String.isEmpty(name) or string.lower(name) == 'tbd' then
 					table.insert(warnings, string.format('Invalid contender entry at position %d: %s', idx, tostring(name)))
 					return
 				end
