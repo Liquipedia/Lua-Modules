@@ -96,6 +96,13 @@ function ShowRoster.run(frame)
 			date = DateExt.readTimestamp(record.date),
 		}
 	end)
+
+	Array.sortInPlaceBy(rosterData, function (roster)
+		return Array.indexOf(tournaments, function (tournament)
+			return tournament == roster.qualification.tournament.pageName
+		end)
+	end)
+
 	return ParticipantsTeamCardsGroup{
 		participants = rosterData,
 		showPlayerInfo = false,
