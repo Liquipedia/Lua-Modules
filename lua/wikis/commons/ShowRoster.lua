@@ -25,7 +25,6 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ConditionUtil = Condition.Util
 
-local Html = Lua.import('Module:Widget/Html')
 local ParticipantsTeamCardsGroup = Lua.import('Module:Widget/Participants/Team/CardsGroup')
 
 local ShowRoster = {}
