@@ -595,6 +595,11 @@ function Opponent.toLpdbStruct(opponent, options)
 				nil
 			players[prefix .. 'template'] = player.team
 			players[prefix .. 'faction'] = Logic.nilIfEmpty(player.faction)
+			if player.roles then
+				Array.forEach(player.roles, function (role, roleIndex)
+					players[prefix .. 'role' .. roleIndex] = role
+				end)
+			end
 			players[prefix .. 'id'] = Logic.nilIfEmpty(player.apiId)
 		end
 		storageStruct.opponentplayers = players
@@ -668,6 +673,9 @@ function Opponent._personFromLpdbStruct(roleIndicator, players, playerIndex)
 		team = players[prefix .. 'template'] or players[prefix .. 'team'],
 		faction = Logic.nilIfEmpty(players[prefix .. 'faction']),
 		apiId = Logic.nilIfEmpty(players[prefix .. 'id']),
+		roles = Logic.nilIfEmpty(Array.mapIndexes(function (roleIndex)
+			return players[prefix .. 'role' .. roleIndex]
+		end))
 	}
 end
 
