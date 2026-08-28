@@ -225,6 +225,13 @@ return {
 		label = 'Matchpage and Stats on FASTCUP',
 		isMapStats = true
 	},
+	{
+		name = 'cispracs',
+		icon = 'Cispracs icon.png',
+		prefixLink = 'https://cispracs.ru/lobby/',
+		label = 'Matchpage and Stats on Cispracs',
+		isMapStats = true
+	},
 	{},
 	{
 		name = 'hltvlegacy',
