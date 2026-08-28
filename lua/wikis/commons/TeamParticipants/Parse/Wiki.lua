@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Placement = Lua.import('Module:Placement')
 local RoleUtil = Lua.import('Module:Role/Util')
@@ -243,6 +244,8 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 	else
 		playerType = 'player'
 	end
+
+	player.roles = Array.map(roles, Operator.property('key'))
 
 	player.extradata = {
 		roles = roles,
