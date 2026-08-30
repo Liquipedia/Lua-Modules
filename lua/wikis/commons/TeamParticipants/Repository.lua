@@ -55,7 +55,8 @@ function TeamParticipantsRepository.save(participant)
 	local lpdbDatas = TeamParticipantsRepository.getPrizepoolRecordsForTeam(participant.opponent) or {}
 
 	local function generateObjectName()
-		local team = Opponent.toName(participant.opponent)
+		local team = TeamTemplate.getPageNameNoRedirect(participant.opponent.template)
+		assert(team, "Failed to fetch template pagename")
 		local isTbd = Opponent.isTbd(participant.opponent)
 
 		if not isTbd then
@@ -151,13 +152,9 @@ end
 ---@param participant TeamParticipant
 function TeamParticipantsRepository.setPageVars(participant)
 	Array.forEach(participant.aliases or {}, function(teamTemplate)
-		local teamName = TeamTemplate.getPageName(teamTemplate)
-		if not teamName then
-			return
-		end
 		local teamPrefixes = {
-			teamName:gsub('_', ' '),
-			teamName:gsub(' ', '_'),
+			teamTemplate:gsub('_', ' '),
+			teamTemplate:gsub(' ', '_'),
 		}
 		local playerCount, staffCount = 0, 0
 		Array.forEach(participant.opponent.players or {}, function(player)

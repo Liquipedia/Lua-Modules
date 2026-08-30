@@ -21,13 +21,24 @@ local ColumnName = Condition.ColumnName
 
 local StageWinningsCalculation = {}
 
+---@alias StageWinningsOpponent {
+---opponent: standardOpponent,
+---matchWins: integer,
+---matchLosses: integer,
+---matchDraws: integer,
+---gameWins: integer,
+---gameLosses: integer,
+---winnings: number,
+---scoreDetails: table<string, integer>,
+---points: number,
+---points2: number,
+---}
+
 ---@param props {matchGroupsSpecProps: table<string, string>, startDate: integer?, endDate: integer?, mode: string,
 ---startValue: number, valuePerWin: number, valueByScore: table<string, number>?,
 ---pointsStart: number, pointsPerWin: number, pointsByScore: table<string, number>?,
 ---points2Start: number, points2PerWin: number, points2ByScore: table<string, number>?, hideWinnings: boolean}
----@return {opponent: standardOpponent, matchWins: integer, matchLosses: integer, matchDraws: integer,
----gameWins: integer, gameLosses: integer, winnings: number, scoreDetails: table<string, integer>,
----points: number, points2: number}[]
+---@return StageWinningsOpponent[]
 function StageWinningsCalculation.run(props)
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = StageWinningsCalculation._buildConditions(props),
@@ -38,27 +49,37 @@ function StageWinningsCalculation.run(props)
 		return #match.match2opponents == 2
 	end)
 
-	local byName = {}
+	---@type StageWinningsOpponent[]
+	local opponents = {}
+
+	local function getOpponentIndex(opponent)
+		return Array.find(opponents, function(entry)
+			return Opponent.same(opponent, entry.opponent)
+		end)
+	end
 
 	Array.forEach(matches, function(match)
 		match.opponents = Array.map(match.match2opponents, Opponent.fromMatch2Record)
-		Array.forEach(match.opponents, function(opponent, opponentIndex)
-			local identifier = Opponent.toName(opponent)
-			opponent.name = identifier
-			opponent.score = match.match2opponents[opponentIndex].score
-			opponent.status = match.match2opponents[opponentIndex].status
-			byName[identifier] = byName[identifier] or {
-				opponent = opponent,
-				scoreDetails = {},
-				matchWins = 0,
-				matchLosses = 0,
-				matchDraws = 0,
-				gameWins = 0,
-				gameLosses = 0,
-				winnings = 0,
-				points = 0,
-				points2 = 0,
-			}
+		Array.forEach(match.opponents, function(opponent, matchOpponentIndex)
+			opponent.score = match.match2opponents[matchOpponentIndex].score
+			opponent.status = match.match2opponents[matchOpponentIndex].status
+
+			opponent.globalIndex = getOpponentIndex(opponent)
+			if not opponent.globalIndex then
+				opponent.globalIndex = #opponents + 1
+				table.insert(opponents, {
+					opponent = opponent,
+					scoreDetails = {},
+					matchWins = 0,
+					matchLosses = 0,
+					matchDraws = 0,
+					gameWins = 0,
+					gameLosses = 0,
+					winnings = 0,
+					points = 0,
+					points2 = 0,
+				})
+			end
 		end)
 
 		local winnerId = tonumber(match.winner)
@@ -72,27 +93,30 @@ function StageWinningsCalculation.run(props)
 		local score = opponent1Score .. '-' .. opponent2Score
 		local reversedScore = opponent2Score .. '-' .. opponent1Score
 
-		byName[opponent1.name].scoreDetails[score] = (byName[opponent1.name].scoreDetails[score] or 0) + 1
-		byName[opponent2.name].scoreDetails[reversedScore] = (byName[opponent2.name].scoreDetails[reversedScore] or 0) + 1
+		opponents[opponent1.globalIndex].scoreDetails[score] = (opponents[opponent1.globalIndex].scoreDetails[score] or 0) + 1
+		opponents[opponent2.globalIndex].scoreDetails[reversedScore]
+			= (opponents[opponent2.globalIndex].scoreDetails[reversedScore] or 0) + 1
 
 		if winnerId == 1 then
-			byName[opponent1.name].matchWins = byName[opponent1.name].matchWins + 1
-			byName[opponent2.name].matchLosses = byName[opponent2.name].matchLosses + 1
+			opponents[opponent1.globalIndex].matchWins = opponents[opponent1.globalIndex].matchWins + 1
+			opponents[opponent2.globalIndex].matchLosses = opponents[opponent2.globalIndex].matchLosses + 1
 		elseif winnerId == 2 then
-			byName[opponent2.name].matchWins = byName[opponent2.name].matchWins + 1
-			byName[opponent1.name].matchLosses = byName[opponent1.name].matchLosses + 1
+			opponents[opponent2.globalIndex].matchWins = opponents[opponent2.globalIndex].matchWins + 1
+			opponents[opponent1.globalIndex].matchLosses = opponents[opponent1.globalIndex].matchLosses + 1
 		else
-			byName[opponent1.name].matchDraws = byName[opponent1.name].matchDraws + 1
-			byName[opponent2.name].matchDraws = byName[opponent2.name].matchDraws + 1
+			opponents[opponent1.globalIndex].matchDraws = opponents[opponent1.globalIndex].matchDraws + 1
+			opponents[opponent2.globalIndex].matchDraws = opponents[opponent2.globalIndex].matchDraws + 1
 		end
 
-		byName[opponent1.name].gameWins = byName[opponent1.name].gameWins + (tonumber(opponent1.score) or 0)
-		byName[opponent2.name].gameLosses = byName[opponent2.name].gameLosses + (tonumber(opponent1.score) or 0)
-		byName[opponent1.name].gameLosses = byName[opponent1.name].gameLosses + (tonumber(opponent2.score) or 0)
-		byName[opponent2.name].gameWins = byName[opponent2.name].gameWins + (tonumber(opponent2.score) or 0)
+		opponents[opponent1.globalIndex].gameWins
+			= opponents[opponent1.globalIndex].gameWins + (tonumber(opponent1.score) or 0)
+		opponents[opponent2.globalIndex].gameLosses
+			= opponents[opponent2.globalIndex].gameLosses + (tonumber(opponent1.score) or 0)
+		opponents[opponent1.globalIndex].gameLosses
+			= opponents[opponent1.globalIndex].gameLosses + (tonumber(opponent2.score) or 0)
+		opponents[opponent2.globalIndex].gameWins
+			= opponents[opponent2.globalIndex].gameWins + (tonumber(opponent2.score) or 0)
 	end)
-
-	local opponents = Array.extractValues(byName)
 
 	Array.forEach(opponents, function(opponent)
 		if props.mode == 'matchWins' then

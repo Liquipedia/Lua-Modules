@@ -21,6 +21,7 @@ local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Streams = Lua.import('Module:Links/Stream')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tournament = Lua.import('Module:Tournament')
 
 local Condition = Lua.import('Module:Condition')
@@ -240,8 +241,9 @@ function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 	if opponent.type == Opponent.team then
 		local manualPlayersInput = MatchGroupInputUtil.extractManualPlayersInput(match, opponentIndex, opponentInput)
 		substitutions = manualPlayersInput.substitutions
+		local template = TeamTemplate.getRawOrNil(opponent.template) or {}
 		opponent.players = MatchGroupInputUtil.readPlayersOfTeam(
-			Opponent.toName(opponent) or '',
+			template.historicaltemplate or template.templatename,
 			manualPlayersInput,
 			options,
 			{timestamp = match.timestamp, timezoneOffset = match.timezoneOffset}
@@ -480,12 +482,6 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 	local playerIndex = 1
 	local varPrefix = teamName .. '_p' .. playerIndex
 	local name = globalVars:get(varPrefix)
-	-- if we do not find a player for the teamName try to find them for the teamName with underscores
-	if not name then
-		teamName = teamName:gsub(' ', '_')
-		varPrefix = teamName .. '_p' .. playerIndex
-		name = globalVars:get(varPrefix)
-	end
 
 	while name do
 		if options.maxNumPlayers and (playersIndex >= options.maxNumPlayers) then break end
