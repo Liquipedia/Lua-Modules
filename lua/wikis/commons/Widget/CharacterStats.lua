@@ -36,7 +36,7 @@ local Helpers = {}
 ---@field total table<string, integer>
 
 ---@class CharacterStatsWidgetProps
----@field characterSize string
+---@field characterSize string?
 ---@field characterType string
 ---@field data CharacterStatistic[]
 ---@field includeBans boolean?
