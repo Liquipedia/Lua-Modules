@@ -278,7 +278,7 @@ end
 ---@private
 ---@param winningSide string
 ---@param winBy string
----@return Widget?
+---@return VNode?
 function MatchPage._renderRoundOutcomeIcon(winningSide, winBy)
 	local iconName = (WIN_TYPES[winBy] or {}).icon
 	if not iconName then
@@ -295,7 +295,7 @@ end
 
 ---@private
 ---@param game MatchPageGame
----@return Widget
+---@return VNode
 function MatchPage:_renderRoundsOverview(game)
 	return RoundsOverview{
 		rounds = game.extradata.rounds,
@@ -402,13 +402,13 @@ function MatchPage._findPlayerByPuuid(game, puuid)
 end
 
 ---@param ceremony string?
----@return Widget?
+---@return VNode?
 MatchPage._displayCeremony = FnUtil.memoize(function (ceremony)
 	if Logic.isEmpty(ceremony) then
 		return
 	end
 
-	---@return Widget?
+	---@return VNode?
 	local function getCeremonyIcon()
 		if ceremony == 'Clutch' then
 			return IconImage{

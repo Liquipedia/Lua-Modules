@@ -39,7 +39,7 @@ local KDA_ICON = IconFa{iconName = 'kda', hover = 'KDA'}
 local SPAN_SLASH = Html.Span{classes = {'slash'}, children = '/'}
 
 ---@param props {match: MatchGroupUtilMatch}
----@return Widget
+---@return VNode
 function MatchPage.getByMatchId(props)
 	local matchPage = MatchPage(props.match)
 
