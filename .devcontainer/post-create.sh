@@ -4,12 +4,18 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 echo "==> Installing npm dependencies"
-# node_modules is a named volume, which docker creates owned by root
-sudo chown "$(id -u):$(id -g)" node_modules
+# these are named volumes, which docker creates owned by root. mkdir first so
+# that a mount going missing does not take the whole script down with set -e
+sudo mkdir -p node_modules ~/.mitmproxy
+sudo chown "$(id -u):$(id -g)" node_modules ~/.mitmproxy
 npm install
 
 echo "==> Installing python dependencies"
 pip install --no-cache-dir -r requirements.txt
+
+echo "==> Building css and js"
+# The proxy serves these, and without them it silently passes requests through
+npm run build
 
 if [ ! -f .env ]; then
 	echo "==> Creating .env from .env.example (fill in your bot credentials before deploying)"

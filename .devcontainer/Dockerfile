@@ -8,6 +8,9 @@ FROM mcr.microsoft.com/playwright:v1.61.1-noble
 ARG LUA_VERSION=5.1.5
 ARG LUAROCKS_VERSION=3.11.1
 ARG LUALS_VERSION=3.18.2
+# Not in requirements.txt on purpose: only needed to run scripts/proxy_lp.py,
+# which is a local-development tool rather than a dependency of the repo
+ARG MITMPROXY_VERSION=12.2.3
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -62,6 +65,7 @@ ENV VIRTUAL_ENV=/opt/venv
 ENV PATH=/opt/venv/bin:${PATH}
 RUN python3 -m venv "${VIRTUAL_ENV}" \
 	&& pip install --no-cache-dir --upgrade pip \
+	&& pip install --no-cache-dir "mitmproxy==${MITMPROXY_VERSION}" \
 	&& chmod -R a+rwX "${VIRTUAL_ENV}"
 
 # Runs before the features do, which is where the user we run as gets created.
