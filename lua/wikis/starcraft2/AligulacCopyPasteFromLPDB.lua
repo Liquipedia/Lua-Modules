@@ -174,7 +174,11 @@ function AligulacCopyPasteFromLPDB._match(record)
 
 	local match = MatchGroupUtil.matchFromRecord(record)
 
-	return Array.map(Logic.nilIfEmpty(match.submatches) or {match}, AligulacCopyPasteFromLPDB._subMatch)
+	local hasValidSubmatches = Logic.isNotEmpty(match.submatches) and Array.any(match.submatches, function(subMatch)
+		return Logic.isNotEmpty(subMatch.opponents)
+	end)
+
+	return Array.map(hasValidSubmatches and match.submatches or {match}, AligulacCopyPasteFromLPDB._subMatch)
 end
 
 ---@param match StarcraftMatchGroupUtilSubmatch|MatchGroupUtilMatch
