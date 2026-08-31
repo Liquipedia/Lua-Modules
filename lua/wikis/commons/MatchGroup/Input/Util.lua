@@ -555,7 +555,9 @@ function MatchGroupInputUtil._getCasterInformation(name, flag, displayName)
 	displayName = Logic.emptyOr(displayName, globalVars:get(name .. 'dn'))
 
 	if String.isEmpty(flag) or String.isEmpty(displayName) then
-		local parent = globalVars:get('tournament_parent') or mw.title.getCurrentTitle().text
+		local tournamentContext = Tournament.partialTournamentFromContext()
+
+		local parent = tournamentContext.pageName or mw.title.getCurrentTitle().text
 		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name):gsub(' ', '_')
 		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
