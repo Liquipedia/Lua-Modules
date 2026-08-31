@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
@@ -23,7 +22,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 
 local DEFAULT_TIERTYPE = 'General'
 
@@ -42,18 +41,16 @@ local DEFAULT_TIERTYPE = 'General'
 ---@field edate string|integer|osdate?
 ---@field sdate string|integer|osdate?
 
----@class SeriesChildFromLpdb: Widget
----@field props SeriesChildFromLpdbProps
-local SeriesChildFromLpdb = Class.new(Widget)
-SeriesChildFromLpdb.defaultProps = {
-	newestFirst = true,
-	resolve = true,
+local SeriesChildFromLpdb = {
+	defaultProps = {
+		newestFirst = true,
+		resolve = true,
+	}
 }
 
+---@param props SeriesChildFromLpdbProps
 ---@return string
-function SeriesChildFromLpdb:render()
-	local props = self.props
-
+function SeriesChildFromLpdb.render(props)
 	local limit = tonumber(props.limit)
 	local offset = tonumber(props.offset)
 
@@ -79,7 +76,7 @@ function SeriesChildFromLpdb:render()
 		return true
 	end
 
-	local tournaments = Tournament.getAllTournaments(self:_makeConditions(), filterbyLimitAndOffSet)
+	local tournaments = Tournament.getAllTournaments(SeriesChildFromLpdb._makeConditions(props), filterbyLimitAndOffSet)
 
 	local elements = Array.map(tournaments, function(tournament)
 		local seriesNumber = getSeriesNumber(tournament)
@@ -103,10 +100,9 @@ function SeriesChildFromLpdb:render()
 end
 
 ---@private
+---@param props SeriesChildFromLpdbProps
 ---@return ConditionTree
-function SeriesChildFromLpdb:_makeConditions()
-	local props = self.props
-
+function SeriesChildFromLpdb._makeConditions(props)
 	---@type string[]
 	local serieses = Json.parseIfTable(props.series)
 		or Array.isArray(props.series) and props.series --[[@as string[] ]]
@@ -139,4 +135,4 @@ function SeriesChildFromLpdb:_makeConditions()
 	))
 end
 
-return SeriesChildFromLpdb
+return Component.component(SeriesChildFromLpdb.render, SeriesChildFromLpdb.defaultProps)
