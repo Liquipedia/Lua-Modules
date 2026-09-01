@@ -157,11 +157,11 @@ $infobox-padding: 10px;
 		display: table;
 		width: 100%;
 
-		&:nth-child( 2n+1 ) {
+		&:nth-child( odd ) {
 			background-color: var( --clr-surface-2, #eeeeee );
 		}
 
-		&:nth-child( 2n ) {
+		&:nth-child( even ) {
 			background-color: var( --clr-surface-1, #f5f5f5 );
 		}
 
