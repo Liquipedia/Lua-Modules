@@ -19,6 +19,17 @@
 			align-items: center;
 		}
 
+		&-cs {
+			flex-direction: column;
+			justify-content: normal;
+			align-items: normal;
+
+			@media ( max-width: 768px ) {
+				flex-direction: row;
+				justify-content: space-between;
+			}
+		}
+
 		&-logo-container {
 			height: 44px;
 			display: flex;
