@@ -44,6 +44,7 @@ return {
 		'csgo-fastcup',
 		'cs2-fastcup',
 		'fide',
+		'fragnet',
 		'gamersclub',
 		'geoguessr',
 		'halodatahive',

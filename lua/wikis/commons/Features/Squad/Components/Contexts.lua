@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Contexts/Squad
+-- page=Module:Features/Squad/Components/Contexts
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

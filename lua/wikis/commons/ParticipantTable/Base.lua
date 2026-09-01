@@ -280,7 +280,7 @@ function ParticipantTable:store()
 		parent = tournamentContext.pageName,
 		series = tournamentContext.series,
 		startdate = Variables.varDefault('tournament_startdate'),
-		mode = Variables.varDefault('tournament_mode'),
+		mode = tournamentContext.mode,
 		type = tournamentContext.type,
 		liquipediatier = tournamentContext.liquipediaTier,
 		liquipediatiertype = tournamentContext.liquipediaTierType,

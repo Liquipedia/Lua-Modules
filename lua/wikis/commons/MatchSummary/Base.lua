@@ -30,8 +30,10 @@ local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {load
 local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 
 ---@class CustomMatchSummaryInterface
----@field createBody? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
----@field createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
+---@field createBody? fun(match: MatchGroupUtilMatch): Renderable|Renderable[] @deprecated
+---@field createGames? fun(match: MatchGroupUtilMatch): Renderable|Renderable[] @deprecated (but better than createBody)
+---@field createGame? fun(game: table, gameIndex: integer): Renderable|Renderable[] @deprecated
+---@field GameRow? Component<MatchSummaryGameRowProps>
 ---@field createFooter? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 
 ---@class MatchSummary
@@ -59,13 +61,51 @@ end
 
 -- Default body function
 ---@param match MatchGroupUtilMatch
----@param createGame fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
+---@param CustomMatchSummary CustomMatchSummaryInterface
+---@param options {maxBans: integer?}?
 ---@return Renderable[]
-function MatchSummary.createDefaultBody(match, createGame)
+function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
+	options = options or {}
+
+	local characterBansData = MatchSummary.buildCharacterBanData(match.games, options.maxBans or 0)
+
+	local createGames = CustomMatchSummary.createGames
+	local createGame = CustomMatchSummary.createGame
+	local GameRow = CustomMatchSummary.GameRow
+
+	local nodes
+	if GameRow then
+		local sets = match.submatches or {}
+
+		-- With one set for all matches, or one game per set, it's redundant to show set level info.
+		if #sets > 1 and #sets < #match.games then
+			nodes = Array.map(sets, function(set)
+				return MatchSummaryWidgets.GamesContainer{
+					gamesSectionName = set.header or ('Set ' .. set.subgroup),
+					gamesSectionResult = MatchSummaryWidgets.SetHeader{set = set},
+					children = Array.map(set.games, function(game, gameIndex)
+						return GameRow{game = game, gameIndex = gameIndex}
+					end)
+				}
+			end)
+		else
+			nodes = MatchSummaryWidgets.GamesContainer{
+				children = Array.map(match.games, function(game, gameIndex)
+					return GameRow{game = game, gameIndex = gameIndex}
+				end)
+			}
+		end
+	elseif createGames then
+		nodes = createGames(match)
+	elseif createGame then
+		nodes = Array.map(match.games, createGame)
+	end
+
 	return WidgetUtil.collect(
-		Array.map(match.games, FnUtil.curry(createGame, match.date)),
+		nodes,
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
+		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
 	)
 end
 
@@ -167,7 +207,7 @@ end
 ---Default createMatch function for usage in Custom MatchSummary
 ---@param matchData MatchGroupUtilMatch?
 ---@param CustomMatchSummary CustomMatchSummaryInterface
----@param options {teamStyle: teamStyle?, noScore: boolean?}?
+---@param options {teamStyle: teamStyle?, noScore: boolean?, maxBans: integer?}?
 ---@return VNode?
 function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	if not matchData then
@@ -181,7 +221,7 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 		MatchSummary.createHeader(matchData, options),
 		MatchSummaryWidgets.Body{
 			children = WidgetUtil.collect(
-				createBody(matchData, CustomMatchSummary.createGame),
+				createBody(matchData, CustomMatchSummary, options),
 				Html.Fragment{
 					children = {
 						MatchSummaryWidgets.Casters{casters = matchData.extradata.casters},
@@ -203,12 +243,18 @@ end
 ---Default getByMatchId function for usage in Custom MatchSummary
 ---@param CustomMatchSummary CustomMatchSummaryInterface
 ---@param args table
----@param options {teamStyle:teamStyle?, width: (fun(match: MatchGroupUtilMatch):string?)|string?, noScore:boolean?}?
+---@param options {teamStyle:teamStyle?, width: (fun(match: MatchGroupUtilMatch):string?)|string?,
+---noScore:boolean?, maxBans: integer?}?
 ---@return VNode
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(
-		(type(CustomMatchSummary.createBody) == 'function' or type(CustomMatchSummary.createGame) == 'function'),
-		'createBody(match) or createGame(date, game, gameIndex) must be implemented in Module:MatchSummary'
+		(
+			type(CustomMatchSummary.createBody) == 'function' or
+			type(CustomMatchSummary.createGame) == 'function' or
+			type(CustomMatchSummary.createGames) == 'function' or
+			CustomMatchSummary.GameRow
+		),
+		'One of createBody or createGame or createGames or GameRow must be implemented in Module:MatchSummary'
 	)
 
 	options = options or {}
@@ -280,7 +326,7 @@ end
 
 ---@param games table[]
 ---@param maxNumberOfBans integer
----@return {[1]: string[], [2]: string[], start: integer?}[]
+---@return {[1]: string[], [2]: string[], start: integer?, label: string?}[]
 function MatchSummary.buildCharacterBanData(games, maxNumberOfBans)
 	return Array.map(games, function(game)
 		local extradata = game.extradata or {}

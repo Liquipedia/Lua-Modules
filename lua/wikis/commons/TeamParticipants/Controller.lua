@@ -35,7 +35,7 @@ local AUTO_IMPORTED_STAFF_ROLES = {
 local Config = Info.config.participants or {}
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function TeamParticipantsController.fromTemplate(frame)
 	local args = Arguments.getArgs(frame)
 	local parsedArgs = Json.parseStringifiedArgs(args)
