@@ -41,7 +41,7 @@ local cachedFlags = {}
 ---Retrieves the boolean value of a feature flag. If the flag has not been
 ---previously set, this returns the configured default value of the flag.
 ---@param flag string
----@return boolean
+---@return string|boolean
 function FeatureFlag.get(flag)
 	if cachedFlags[flag] == nil then
 		cachedFlags[flag] = FeatureFlag._get(flag)
@@ -50,7 +50,7 @@ function FeatureFlag.get(flag)
 end
 
 ---@param flag string
----@return boolean|string
+---@return string|boolean
 function FeatureFlag._get(flag)
 	local config = FeatureFlag.getConfig(flag)
 	return Logic.nilOr(
