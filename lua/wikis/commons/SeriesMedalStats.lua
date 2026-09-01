@@ -131,7 +131,7 @@ end
 function MedalStats:_getConditions(args)
 	local config = self:_getConditionConfig(args)
 
-	local conditions = ConditionTree(BooleanOperator.all):add{
+	local conditions = ConditionTree(BooleanOperator.all):add(Array.append({},
 		ConditionUtil.anyOf(ColumnName('placement'), self.config.columns),
 		ConditionUtil.anyOf(ColumnName('series'), config.series),
 		ConditionUtil.anyOf(ColumnName('liquipediatier'), config.tier),
@@ -139,9 +139,9 @@ function MedalStats:_getConditions(args)
 		ConditionUtil.anyOf(ColumnName('opponenttype'), config.opponentTypes),
 		ConditionNode(ColumnName('date'), Comparator.lt, (config.endDate or TODAY) .. 'T23:59:59'),
 		not config.external and ConditionNode(ColumnName('prizepoolindex'), Comparator.eq, 1) or nil,
-		config.hasNumber and ConditionNode(ColumnName('extradata_seriesnumber'), Comparator.eq, '!') or nil,
-		config.startDate and ConditionNode(ColumnName('date'), Comparator.ge, config.startDate) or nil,
-	}
+		config.hasNumber and ConditionNode(ColumnName('extradata_seriesnumber'), Comparator.neq, '') or nil,
+		config.startDate and ConditionNode(ColumnName('date'), Comparator.ge, config.startDate) or nil
+	))
 
 	return tostring(conditions) .. config.additionalConditions
 end

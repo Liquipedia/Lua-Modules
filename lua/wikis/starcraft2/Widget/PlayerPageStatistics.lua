@@ -84,7 +84,7 @@ end
 ---@param row string
 ---@param rowData table<string, {w: integer?, l: integer?}>
 ---@param columns string[]
----@return unknown
+---@return VNode
 function PlayerPageStatistics._matchupStatsRow(row, rowData, columns)
 	return TableWidgets.Row{
 		classes = {row ~= 'total' and Faction.bgClass(row) or nil},

@@ -19,12 +19,12 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local TeamPageStatistics = {}
 
----@return VNode
+---@return VNode[]
 function TeamPageStatistics.render()
-	return WidgetUtil.collect(
+	return {
 		TeamPageStatistics._earningsChart(),
-		TeamPageStatistics._medalTables()
-	)
+		TeamPageStatistics._medalTables(),
+	}
 end
 
 ---@return VNode

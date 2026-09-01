@@ -61,7 +61,7 @@ function MedalsTable.render(props)
 		} or nil,
 		columns = WidgetUtil.collect(
 			{align = 'left'}, -- tier
-			Array.map(dataColumns, function() return {align = 'right'} end)
+			Array.rep({align = 'right'}, #dataColumns)
 		),
 		children = {
 			TableWidgets.TableHeader{
