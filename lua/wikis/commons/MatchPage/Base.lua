@@ -186,29 +186,6 @@ function BaseMatchPage:getCountdownBlock()
 	}
 end
 
----@private
----@param site string
----@param link string
----@return {icon: string, iconDark: string?, link: string, text: string}?
-function BaseMatchPage._processLink(site, link)
-	return Table.mergeInto({link = link}, Links.getMatchIconData(site))
-end
-
----Creates an object array for links
----@private
----@return {icon: string, iconDark: string?, link: string, text: string}[]
-function BaseMatchPage:_parseLinks()
-	return Array.flatMap(Table.entries(self.matchData.links), function(linkData)
-		local site, link = unpack(linkData)
-		if type(link) == 'table' then
-			return Array.map(link, function(sublink)
-				return BaseMatchPage._processLink(site, sublink)
-			end)
-		end
-		return {BaseMatchPage._processLink(site, link)}
-	end)
-end
-
 ---@protected
 ---@return Renderable[]
 function BaseMatchPage:getVods()
@@ -461,7 +438,7 @@ end
 ---@return VNode
 function BaseMatchPage:footer()
 	local vods = self:getVods()
-	local parsedLinks = self:_parseLinks()
+	local matchLinks = DisplayHelper.makeLinksDisplay(self.matchData.links)
 	local patchLink = self:getPatchLink()
 
 	return Footer{
@@ -471,10 +448,10 @@ function BaseMatchPage:footer()
 				header = 'VODs',
 				children = vods
 			} or nil,
-			Logic.isNotEmpty(parsedLinks) and AdditionalSection{
+			Logic.isNotEmpty(matchLinks) and AdditionalSection{
 				header = 'Links',
 				bodyClasses = { 'vodlink' },
-				children = DisplayHelper.makeLinksDisplay(self.matchData.links)
+				children = matchLinks,
 			} or nil,
 			patchLink and AdditionalSection{
 				header = 'Patch',
