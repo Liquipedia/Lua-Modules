@@ -7,7 +7,7 @@
 
 local Lua = require('Module:Lua')
 
-local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Medals = Lua.import('Module:Medals')
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -21,6 +21,9 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ConditionUtil = Condition.Util
 
+local Html = Lua.import('Module:Widget/Html')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 local DEFAULT_TIERS = {'1', '2', '3'}
 local DEFAULT_EXCLUDED_TIER_TYPES = {'Qualifier'}
 
@@ -32,7 +35,7 @@ local PlacementStats = {}
 
 ---Entry Point: Queries placement statistics and builds a table for display of them below infoboxes
 ---@param args table
----@return Html|string
+---@return Renderable
 function PlacementStats.run(args)
 	args = args or {}
 
@@ -132,81 +135,98 @@ end
 ---Builds the display
 ---@param placementData InfoboxPlacementStatsData
 ---@param tiers string[]
----@return Html
+---@return VNode
 function PlacementStats._buildTable(placementData, tiers)
-	local display = mw.html.create('table')
-		:addClass('wikitable sortable wikitable-striped wikitable-bordered')
-		:css('text-align', 'center')
-		:node(PlacementStats._header())
+	local display = Html.Table{
+		classes = {'wikitable', 'sortable', 'wikitable-striped', 'wikitable-bordered'},
+		css = {['text-align'] = 'center'},
+		children = WidgetUtil.collect(
+			PlacementStats._header(),
+			Array.map(tiers, function (tier)
+				return PlacementStats._buildRow(placementData.tiers[tier], tier)
+			end),
+			PlacementStats._buildBottom(placementData)
+		)
+	}
 
-	for _, tier in ipairs(tiers) do
-		display:node(PlacementStats._buildRow(placementData.tiers[tier], tier))
-	end
+	local infoboxHeader = Html.Div{
+		children = Html.Div{
+			classes = {'infobox-header', 'wiki-backgroundcolor-light'},
+			children = 'Placement Summary',
+		}
+	}
 
-	display:node(PlacementStats._buildBottom(placementData))
-
-	local infoboxHeader = mw.html.create('div')
-		:tag('div')
-			:addClass('infobox-header wiki-backgroundcolor-light')
-			:wikitext('Placement Summary')
-			:done()
-
-	return mw.html.create('div')
-		:addClass('fo-nttax-infobox-wrapper')
-		:tag('div')
-			:addClass('fo-nttax-infobox wiki-bordercolor-light')
-			:node(infoboxHeader)
-			:node(display)
-			:done()
+	return Html.Div{
+		classes = {'fo-nttax-infobox-wrapper'},
+		children = Html.Div{
+			classes = {'fo-nttax-infobox', 'wiki-bordercolor-light'},
+			children = {
+				infoboxHeader,
+				display,
+			}
+		}
+	}
 end
 
 ---Builds the header
----@return Html
+---@return VNode
 function PlacementStats._header()
-	return mw.html.create('tr')
-		:tag('th'):wikitext('Tier'):css('text-align', 'left'):css('width', '100%'):done()
-		:tag('th'):node(Medals.display{medal = 1}):done()
-		:tag('th'):node(Medals.display{medal = 2}):done()
-		:tag('th'):node(Medals.display{medal = 3}):done()
-		:tag('th'):wikitext(Abbreviation.make{text = 'Top3', title = 'Total of top 3'}):done()
-		:tag('th'):wikitext('All'):done()
+	return Html.Tr{children = {
+		Html.Th{
+			children = 'Tier',
+			css = {
+				['text-align'] = 'left',
+				width = '100%',
+			}
+		},
+		Html.Th{children = Medals.display{medal = 1}},
+		Html.Th{children = Medals.display{medal = 2}},
+		Html.Th{children = Medals.display{medal = 3}},
+		Html.Th{children = Html.Abbr{children = 'Top3', title = 'Total of top 3'}},
+		Html.Th{children = 'All'},
+	}}
 end
 
 ---Builds a row
 ---@param placementData {top3: integer, all: integer, placement: {[1]: integer, [2]: integer, [3]: integer}}
 ---@param tier string
----@return Html?
+---@return VNode?
 function PlacementStats._buildRow(placementData, tier)
 	if placementData.all == 0 then
 		return
 	end
 
-	local row = mw.html.create('tr')
-		:tag('td'):css('text-align', 'left'):wikitext(Tier.display(tier, nil, {link = true})):done()
-
-	for place = 1, 3 do
-		row:tag('td'):wikitext(placementData.placement[place])
-	end
-
-	return row
-		:tag('td'):wikitext(placementData.top3):css('font-weight', 'bold'):done()
-		:tag('td'):wikitext(placementData.all):done()
+	return Html.Tr{children = WidgetUtil.collect(
+		Html.Td{
+			css = {['text-align'] = 'left'},
+			children = Tier.display(tier, nil, {link = true}),
+		},
+		Array.mapRange(1, 3, function (place)
+			return Html.Td{children = placementData.placement[place]}
+		end),
+		Html.Td{
+			children = placementData.top3,
+			css = {['font-weight'] = 'bold'},
+		},
+		Html.Td{children = placementData.all}
+	)}
 end
 
 ---Builds the bottom row
 ---@param placementData InfoboxPlacementStatsData
----@return Html
+---@return VNode
 function PlacementStats._buildBottom(placementData)
-	local row = mw.html.create('tr')
-		:tag('th'):css('text-align', 'left'):wikitext('Total'):done()
-
-	for place = 1, 3 do
-		row:tag('th'):wikitext(placementData.totals.placement[place])
-	end
-
-	return row
-		:tag('th'):wikitext(placementData.totals.top3):done()
-		:tag('th'):wikitext(placementData.totals.all):done()
+	return Html.Tr{children = WidgetUtil.collect(
+		Html.Th{
+			css = {['text-align'] = 'left'},
+			children = 'Total',
+		},
+		Array.mapRange(1, 3, function (place)
+			return Html.Th{children = placementData.totals.placement[place]}
+		end),
+		Html.Th{children = placementData.totals.top3},
+		Html.Th{children = placementData.totals.all}
+	)}
 end
 
 return Class.export(PlacementStats, {frameOnly = true, exports = {'run'}})
