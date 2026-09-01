@@ -474,13 +474,7 @@ function BaseMatchPage:footer()
 			Logic.isNotEmpty(parsedLinks) and AdditionalSection{
 				header = 'Links',
 				bodyClasses = { 'vodlink' },
-				children = Array.map(parsedLinks, function (parsedLink)
-					return Html.Span{children = IconImage{
-						imageLight = parsedLink.icon,
-						imageDark = (parsedLink.iconDark or parsedLink.icon),
-						link = parsedLink.link
-					}}
-				end)
+				children = DisplayHelper.makeLinksDisplay(self.matchData.links)
 			} or nil,
 			patchLink and AdditionalSection{
 				header = 'Patch',
