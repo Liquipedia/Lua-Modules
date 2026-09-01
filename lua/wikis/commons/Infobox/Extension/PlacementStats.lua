@@ -88,7 +88,7 @@ function PlacementStats._buildConditions(opponentType, opponent, excludedTierTyp
 		local rawOpponentTemplate = TeamTemplate.getRawOrNil(opponent) or {}
 		local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
 		if not opponentTemplate then
-			error('Missing team template for team: ' .. opponent)
+			error(TeamTemplate.noTeamMessage(opponent))
 		end
 
 		local teamTemplates = TeamTemplate.queryHistoricalNames(opponentTemplate)
