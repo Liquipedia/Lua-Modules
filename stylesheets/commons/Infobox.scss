@@ -148,9 +148,8 @@ $infobox-padding: 10px;
 	padding-bottom: $infobox-padding;
 	border-top: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
 	border-bottom: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
-	display: grid;
-	grid-row: 1fr;
-	grid-auto-flow: column;
+	display: flex;
+	flex-flow: column nowrap;
 
 	@media ( max-width: 600px ) {
 		width: 100%;
@@ -158,8 +157,7 @@ $infobox-padding: 10px;
 
 	> div {
 		display: grid;
-		grid-column: 1 / -1;
-		grid-template-columns: subgrid;
+		width: 100%;
 
 		&:nth-child( odd ) {
 			background-color: var( --clr-surface-2, #eeeeee );
@@ -177,7 +175,7 @@ $infobox-padding: 10px;
 			display: contents;
 
 			> :only-child {
-				grid-column: 1 / -1;
+				width: 100%;
 			}
 		}
 
@@ -187,52 +185,14 @@ $infobox-padding: 10px;
 			padding: 5px;
 		}
 
-		&:has( > .infobox-cell-2 ) {
-			grid-template-columns: repeat( 2, 1fr );
-		}
-
-		&:has( > .infobox-cell-3 ) {
-			grid-template-columns: 1fr 2fr;
-		}
-
-		&:has( > .infobox-cell-4 ) {
-			grid-template-columns: 1fr 3fr;
+		@for $i from 2 through 12 {
+			&:has( > .infobox-cell-#{$i} ) {
+				grid-template-columns: 1fr #{$i - 1}fr;
+			}
 		}
 
 		&:has( > .infobox-cell-4-5 ) {
 			grid-template-columns: 2fr 7fr;
-		}
-
-		&:has( > .infobox-cell-5 ) {
-			grid-template-columns: 1fr 4fr;
-		}
-
-		&:has( > .infobox-cell-6 ) {
-			grid-template-columns: 1fr 5fr;
-		}
-
-		&:has( > .infobox-cell-7 ) {
-			grid-template-columns: 1fr 6fr;
-		}
-
-		&:has( > .infobox-cell-8 ) {
-			grid-template-columns: 1fr 7fr;
-		}
-
-		&:has( > .infobox-cell-9 ) {
-			grid-template-columns: 1fr 8fr;
-		}
-
-		&:has( > .infobox-cell-10 ) {
-			grid-template-columns: 1fr 9fr;
-		}
-
-		&:has( > .infobox-cell-11 ) {
-			grid-template-columns: 1fr 10fr;
-		}
-
-		&:has( > .infobox-cell-12 ) {
-			grid-template-columns: 1fr 11fr;
 		}
 	}
 
