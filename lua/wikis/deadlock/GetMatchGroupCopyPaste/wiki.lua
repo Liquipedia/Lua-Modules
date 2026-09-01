@@ -20,7 +20,7 @@ local INDENT = WikiCopyPaste.Indent
 
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local showScore = Logic.nilOr(Logic.readBoolOrNil, bestof == 0)
-	local bans = args.bans
+	local bans = tonumber(args.bans)
 
 	local lines = Array.extend(
 		'{{Match|bestof=' .. (bestof ~= 0 and bestof or ''),
@@ -43,12 +43,11 @@ end
 ---@param bans integer
 ---@return string
 function WikiCopyPaste._getMapCode(mapIndex, bans)
-	banBool = true
+	banBool = false
 	ban1Text = ""
 	ban2Text = ""
-	if bans == 0 then
-		banBool = false
-	else
+	if bans > 0 then
+		banBool = true
 		for ban = 1, bans do
 			ban1Text = ban1Text .. "|t1b" .. ban .. "="
 			ban2Text = ban2Text .. "|t2b" .. ban .. "="
@@ -68,4 +67,3 @@ function WikiCopyPaste._getMapCode(mapIndex, bans)
 end
 
 return WikiCopyPaste
-
