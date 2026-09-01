@@ -15,6 +15,13 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tier = Lua.import('Module:Tier/Custom')
 
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ConditionUtil = Condition.Util
+
 local DEFAULT_TIERS = {'1', '2', '3'}
 local DEFAULT_EXCLUDED_TIER_TYPES = {'Qualifier'}
 
@@ -66,19 +73,17 @@ end
 ---@param opponentType string
 ---@param opponent string
 ---@param excludedTierTypes string[]
----@return string
+---@return ConditionTree
 function PlacementStats._buildConditions(opponentType, opponent, excludedTierTypes)
-	local conditions = {
-		'[[placement::!]]',
-		'[[opponenttype::' .. opponentType .. ']]'
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode('placement', Comparator.neq, ''),
+		ConditionNode('opponenttype', Comparator.eq, opponentType),
 	}
 
-	for _, excludedTierType in pairs(excludedTierTypes) do
-		table.insert(conditions, '[[liquipediatiertype::!' .. excludedTierType .. ']]')
-	end
+	conditions:add(ConditionUtil.noneOf('liquipediatiertype', excludedTierTypes))
 
 	if opponentType ~= Opponent.team then
-		table.insert(conditions, '[[opponentname::' .. opponent .. ']]')
+		conditions:add(ConditionNode('opponentname', Comparator.eq, opponent))
 	else
 		local rawOpponentTemplate = TeamTemplate.getRawOrNil(opponent) or {}
 		local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
@@ -87,26 +92,25 @@ function PlacementStats._buildConditions(opponentType, opponent, excludedTierTyp
 		end
 
 		local teamTemplates = TeamTemplate.queryHistoricalNames(opponentTemplate)
-		local opponentConditions = Array.map(teamTemplates, function(teamTemplate)
-			return '[[opponenttemplate::' .. teamTemplate .. ']]'
-		end)
-
-		table.insert(conditions, '(' .. table.concat(opponentConditions, ' OR ') .. ')')
+		conditions:add(ConditionUtil.anyOf('opponenttemplate', teamTemplates))
 	end
 
-	return table.concat(conditions, ' AND ')
+	return conditions
 end
 
 ---Fetches the placement count values for a given tier
 ---@param tier string
----@param baseConditions string
+---@param baseConditions ConditionTree
 ---@param placementData InfoboxPlacementStatsData
 function PlacementStats._fetchForTier(tier, baseConditions, placementData)
 	placementData.tiers[tier] = {top3 = 0, all = 0, placement = {}}
 
 	local queryData = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = 5000,
-		conditions = baseConditions .. ' AND [[liquipediatier::' .. tier .. ']]',
+		conditions = tostring(ConditionTree(BooleanOperator.all):add{
+			baseConditions,
+			ConditionNode('liquipediatier', Comparator.eq, tier),
+		}),
 		query = 'placement, count::placement',
 		groupby = 'placement asc'
 	})
