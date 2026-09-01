@@ -175,6 +175,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field players standardPlayer[]?
 ---@field score number?
 ---@field scoreDisplay number?
+---@field scoreDisplay2 number?
 ---@field score2 number?
 ---@field status string?
 ---@field status2 string?
@@ -922,12 +923,28 @@ function MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
 		games = Table.copy(match.games),
 	})
 
+	local bestof = tonumber(bracketResetMatch.bestof)
+	local game1 = (bracketResetMatch.games or {})[1]
+	local hasOnlyScores = Array.all(bracketResetMatch.opponents, function(opponent)
+		return opponent.status == 'S'
+	end)
+
 	for ix, opponent in ipairs(match.opponents) do
 		local resetOpponent = bracketResetMatch.opponents[ix]
+
+		local status = resetOpponent.status
+		local scoreDisplay
+		if bestof == 1 and Info.config.match2.gameScoresIfBo1 and game1 and hasOnlyScores then
+			local mapOpponent = (game1.opponents or {})[ix] or {}
+			scoreDisplay = tonumber(mapOpponent.score)
+			status = mapOpponent.status
+		end
+
 		mergedMatch.opponents[ix] = Table.merge(opponent, {
 			score2 = resetOpponent.score,
-			status2 = resetOpponent.status,
+			status2 = status,
 			placement2 = resetOpponent.placement,
+			scoreDisplay2 = scoreDisplay,
 		})
 	end
 
