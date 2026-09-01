@@ -250,7 +250,7 @@ local lpdb = {}
 ---@field chair table
 
 ---@class match:LpdbBaseData
----@field matchid unknown
+---@field matchid string
 ---@field staticid string
 ---@field opponent1 string
 ---@field opponent2 string
@@ -284,7 +284,7 @@ local lpdb = {}
 ---@field patch string
 
 ---@class game:LpdbBaseData
----@field matchid unknown
+---@field matchid string
 ---@field staticid string
 ---@field opponent1 string
 ---@field opponent2 string
