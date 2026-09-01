@@ -89,15 +89,15 @@ local function determineTranslateString(startDate, endDate, showYear)
 	end
 end
 
----@param props {startDate: string|osdateparam?, endDate: string|osdateparam?, showYear: boolean?}
+---@param props {startDate: string|DateRecord|osdateparam?, endDate: string|DateRecord|osdateparam?, showYear: boolean?}
 ---@return string
 local function DateRange(props)
 	local startDate, endDate = props.startDate, props.endDate
 	if type(startDate) ~= 'table' then
-		startDate = DateExt.parseIsoDate(startDate --[[ @as string? ]])
+		startDate = DateExt.parseDateRecord(startDate --[[ @as string? ]])
 	end
 	if type(endDate) ~= 'table' then
-		endDate = DateExt.parseIsoDate(endDate --[[ @as string? ]])
+		endDate = DateExt.parseDateRecord(endDate --[[ @as string? ]])
 	end
 
 	---@type osdateparam?
