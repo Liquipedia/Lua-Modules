@@ -11,10 +11,9 @@ local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Medals = Lua.import('Module:Medals')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tier = Lua.import('Module:Tier/Custom')
-
-local Opponent = Lua.import('Module:Opponent/Custom')
 
 local DEFAULT_TIERS = {'1', '2', '3'}
 local DEFAULT_EXCLUDED_TIER_TYPES = {'Qualifier'}
