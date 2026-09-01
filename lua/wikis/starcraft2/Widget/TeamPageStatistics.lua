@@ -15,7 +15,6 @@ local Component = Lua.import('Module:Widget/Component')
 local EarningsStatsChart = Lua.import('Module:Widget/EarningsStatsChart')
 local Html = Lua.import('Module:Widget/Html')
 local MedalsTable = Lua.import('Module:Widget/MedalsTable')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local TeamPageStatistics = {}
 
