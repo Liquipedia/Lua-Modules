@@ -322,6 +322,18 @@ describe('array', function()
 		end)
 	end)
 
+	describe('ParseMultiSelect', function()
+		it('check', function()
+			local a = {'test1', 'test2', 'test3'}
+			assert.are_same(a, Array.parseMultiSelect('test1, test2,test3'))
+			assert.are_same(a, Array.parseMultiSelect('test1 - test2-test3', '-'))
+			assert.are_same(a, Array.parseMultiSelect('["test1", "test2", "test3"]'))
+			assert.error(function ()
+				return Array.parseMultiSelect('{"a":"test1","b":"test2","c":"test3"}')
+			end)
+		end)
+	end)
+
 	describe('Interleave', function ()
 		it('works', function()
 			assert.are_same({'a', ' ', 'b', ' ', 'c'}, Array.interleave({'a', 'b', 'c'}, ' '))
