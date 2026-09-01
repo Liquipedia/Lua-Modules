@@ -22,15 +22,17 @@ local ICONS = {
 }
 local STATUS_NOT_PLAYED = 'notplayed'
 
----@class DeadlockCustomMatchSummary: CustomMatchSummaryInterface
-local CustomMatchSummary = {}
-
 ---@class DeadlockMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
 local GameRowComponentProps = {
 	createGameOverview = MatchSummaryWidgets.GameRow.lengthDisplay,
 }
 
 local DeadlockMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
+
+---@class DeadlockCustomMatchSummary: CustomMatchSummaryInterface
+local CustomMatchSummary = {
+	GameRow = DeadlockMatchSummaryGameRow,
+}
 
 ---@param args table
 ---@return Renderable
@@ -39,17 +41,10 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 end
 
----@param match MatchGroupUtilMatch
----@return VNode
-function CustomMatchSummary.createGames(match)
-	return MatchSummaryWidgets.GamesContainer{
-		children = Array.map(match.games, function (game, gameIndex)
-			if game.status == STATUS_NOT_PLAYED then
-				return
-			end
-			return DeadlockMatchSummaryGameRow{game = game, gameIndex = gameIndex}
-		end)
-	}
+---@param game MatchGroupUtilGame
+---@return boolean
+function CustomMatchSummary.gameFilter(game)
+	return game.status ~= STATUS_NOT_PLAYED
 end
 
 ---@param game MatchGroupUtilGame
