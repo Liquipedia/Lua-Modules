@@ -20,7 +20,7 @@ local INDENT = WikiCopyPaste.Indent
 
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local showScore = Logic.nilOr(Logic.readBoolOrNil, bestof == 0)
-	local bans = Logic.readBool(args.bans)
+	local bans = args.bans
 
 	local lines = Array.extend(
 		'{{Match|bestof=' .. (bestof ~= 0 and bestof or ''),
@@ -40,20 +40,32 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 end
 
 ---@param mapIndex integer
----@param bans boolean
+---@param bans integer
 ---@return string
 function WikiCopyPaste._getMapCode(mapIndex, bans)
+	banBool = true
+	ban1Text = ""
+	ban2Text = ""
+	if bans == 0 then
+		banBool = false
+	else
+		for ban = 1, bans do
+			ban1Text = ban1Text .. "|t1b" .. ban .. "="
+			ban2Text = ban2Text .. "|t2b" .. ban .. "="
+		end
+	end
 	return table.concat(Array.extend(
 		INDENT .. '|map' .. mapIndex .. '={{Map',
 		INDENT .. INDENT .. '|team1side=',
 		INDENT .. INDENT .. '|t1h1=|t1h2=|t1h3=|t1h4=|t1h5=|t1h6=',
-		bans and (INDENT .. INDENT .. '|t1b1=|t1b2=') or nil,
+		banBool and (INDENT .. INDENT .. ban1Text) or nil,
 		INDENT .. INDENT .. '|team2side=',
 		INDENT .. INDENT .. '|t2h1=|t2h2=|t2h3=|t2h4=|t2h5=|t2h6=',
-		bans and (INDENT .. INDENT .. '|t2b1=|t2b2=') or nil,
+		banBool and (INDENT .. INDENT .. ban2Text) or nil,
 		INDENT .. INDENT .. '|length=|winner=|matchid=|vod=',
 		INDENT .. '}}'
 	), '\n')
 end
 
 return WikiCopyPaste
+
