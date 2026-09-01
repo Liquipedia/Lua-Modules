@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Abbreviation = Lua.import('Module:Abbreviation')
-local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Medals = Lua.import('Module:Medals')
 local Opponent = Lua.import('Module:Opponent/Custom')
