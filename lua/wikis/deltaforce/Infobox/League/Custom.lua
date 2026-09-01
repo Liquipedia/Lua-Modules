@@ -26,6 +26,9 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local CustomLeague = Class.new(League)
 
 ---@class DeltaForceLeagueInfoboxInjector
+---@class DeltaForceLeagueInfoboxWidgetInjector: WidgetInjector
+---@field caller DeltaForceLeagueInfobox
+---@operator call(DeltaForceLeagueInfobox): DeltaForceLeagueInfoboxWidgetInjector
 local CustomInjector = Class.new(Injector)
 
 local PLATFORMS = {
