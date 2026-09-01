@@ -148,14 +148,18 @@ $infobox-padding: 10px;
 	padding-bottom: $infobox-padding;
 	border-top: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
 	border-bottom: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
+	display: grid;
+	grid-row: 1fr;
+	grid-auto-flow: column;
 
 	@media ( max-width: 600px ) {
 		width: 100%;
 	}
 
 	> div {
-		display: table;
-		width: 100%;
+		display: grid;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
 
 		&:nth-child( odd ) {
 			background-color: var( --clr-surface-2, #eeeeee );
@@ -169,60 +173,67 @@ $infobox-padding: 10px;
 			clear: both;
 		}
 
+		&:has( > :only-child ) {
+			display: contents;
+
+			> :only-child {
+				grid-column: 1 / -1;
+			}
+		}
+
 		> div {
-			width: 100%;
 			float: left;
 			height: inherit;
 			padding: 5px;
 		}
-	}
 
-	div.infobox-cell-2 {
-		width: 50%;
-	}
+		&:has( > .infobox-cell-2 ) {
+			grid-template-columns: repeat( 2, 1fr );
+		}
 
-	div.infobox-cell-3 {
-		width: calc( 100% / 3 );
-	}
+		&:has( > .infobox-cell-3 ) {
+			grid-template-columns: 1fr 2fr;
+		}
 
-	div.infobox-cell-4 {
-		width: 25%;
-	}
+		&:has( > .infobox-cell-4 ) {
+			grid-template-columns: 1fr 3fr;
+		}
 
-	div.infobox-cell-4-5 {
-		width: calc( 100% / 4.5 );
-	}
+		&:has( > .infobox-cell-4-5 ) {
+			grid-template-columns: 2fr 7fr;
+		}
 
-	div.infobox-cell-5 {
-		width: 20%;
-	}
+		&:has( > .infobox-cell-5 ) {
+			grid-template-columns: 1fr 4fr;
+		}
 
-	div.infobox-cell-6 {
-		width: calc( 100% / 6 );
-	}
+		&:has( > .infobox-cell-6 ) {
+			grid-template-columns: 1fr 5fr;
+		}
 
-	div.infobox-cell-7 {
-		width: calc( 100% / 7 );
-	}
+		&:has( > .infobox-cell-7 ) {
+			grid-template-columns: 1fr 6fr;
+		}
 
-	div.infobox-cell-8 {
-		width: 12.5%;
-	}
+		&:has( > .infobox-cell-8 ) {
+			grid-template-columns: 1fr 7fr;
+		}
 
-	div.infobox-cell-9 {
-		width: calc( 100% / 9 );
-	}
+		&:has( > .infobox-cell-9 ) {
+			grid-template-columns: 1fr 8fr;
+		}
 
-	div.infobox-cell-10 {
-		width: 10%;
-	}
+		&:has( > .infobox-cell-10 ) {
+			grid-template-columns: 1fr 9fr;
+		}
 
-	div.infobox-cell-11 {
-		width: calc( 100% / 11 );
-	}
+		&:has( > .infobox-cell-11 ) {
+			grid-template-columns: 1fr 10fr;
+		}
 
-	div.infobox-cell-12 {
-		width: calc( 100% / 12 );
+		&:has( > .infobox-cell-12 ) {
+			grid-template-columns: 1fr 11fr;
+		}
 	}
 
 	div.infobox-description {

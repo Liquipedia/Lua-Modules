@@ -82,7 +82,6 @@ end
 ---@return Widget
 function Cell._buildChildrenContainer(mappedChildren, options)
 	local widgetProps = {
-		css = {width = (100 * (options.columns - 1) / options.columns) .. '%'}, -- 66.66% for col = 3
 		children = Array.interleave(mappedChildren, options.separator)
 	}
 
