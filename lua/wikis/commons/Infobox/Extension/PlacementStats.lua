@@ -53,7 +53,7 @@ function PlacementStats.run(args)
 end
 
 ---Query the count values
----@param opponentType string
+---@param opponentType OpponentType
 ---@param opponent string
 ---@param tiers string[]
 ---@param excludedTierTypes string[]
@@ -70,7 +70,7 @@ function PlacementStats._fetchData(opponentType, opponent, tiers, excludedTierTy
 end
 
 ---Builds the base conditions for the queries
----@param opponentType string
+---@param opponentType OpponentType
 ---@param opponent string
 ---@param excludedTierTypes string[]
 ---@return ConditionTree
