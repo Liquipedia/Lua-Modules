@@ -136,15 +136,16 @@ function CustomPlayer:_addCustomCells(args)
 		and Namespace.isMain() and self:_getMatchupData() or nil
 
 	local currentYearEarnings = self.earningsPerYear[CURRENT_YEAR]
+	local currentYearEarningsDisplay
 	if currentYearEarnings then
 		currentYearEarnings = Math.round(currentYearEarnings)
-		currentYearEarnings = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
+		currentYearEarningsDisplay = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
 	end
 
 	return {
 		Cell{
 			name = 'Approx. Winnings ' .. CURRENT_YEAR,
-			children = {currentYearEarnings}
+			children = {currentYearEarningsDisplay}
 		},
 		Cell{name = 'Years active', children = {yearsActive}}
 	}

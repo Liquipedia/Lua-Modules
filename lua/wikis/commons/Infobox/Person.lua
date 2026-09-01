@@ -203,7 +203,7 @@ function Person:createInfobox()
 	return self:build(widgets, 'Person')
 end
 
----@return Widget?
+---@return Renderable?
 function Person:_createUpcomingMatches()
 	if not self:shouldStoreData(self.args) then
 		return nil
