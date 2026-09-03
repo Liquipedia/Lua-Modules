@@ -174,7 +174,7 @@ Section: Coverage Breakdown
 
 
 ---@param args table?
----@return Widget
+---@return VNode
 function StatisticsPortal.coverageStatistics(args)
 	args = args or {}
 	args.alignSide = Logic.readBool(args.alignSide)
@@ -192,7 +192,7 @@ end
 
 
 ---@param args table?
----@return Widget
+---@return Renderable
 function StatisticsPortal.coverageMatchTable(args)
 	args = args or {}
 	args.multiGame = Logic.readBool(args.multiGame)
@@ -225,7 +225,7 @@ end
 
 ---@param args table
 ---@param parameters table
----@return Widget
+---@return Renderable
 function StatisticsPortal._coverageMatchTableRow(args, parameters)
 	local isHeaderRow = Logic.readBool(args.multiGame) and not parameters.game
 	local CellComponent = isHeaderRow and TableWidgets.CellHeader or TableWidgets.Cell
@@ -254,7 +254,7 @@ end
 
 
 ---@param args table?
----@return Widget
+---@return Renderable
 function StatisticsPortal.coverageTournamentTable(args)
 	args = args or {}
 	args.multiGame = Logic.readBool(args.multiGame)
@@ -291,7 +291,7 @@ end
 
 ---@param args table
 ---@param parameters table
----@return Widget
+---@return Renderable
 function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 	local isHeaderRow = Logic.readBool(args.multiGame) and not parameters.game
 	local CellComponent = isHeaderRow and TableWidgets.CellHeader or TableWidgets.Cell
@@ -367,7 +367,7 @@ end
 
 
 ---@param args table
----@return Widget
+---@return Renderable
 function StatisticsPortal._coverageTournamentTableHeader(args)
 	local tierHeaderCells = {}
 	for headerIndex, headerValue in Tier.iterate('tiers') do
@@ -414,7 +414,7 @@ Section: Prizepool Breakdown
 
 
 ---@param args table?
----@return Widget
+---@return Renderable
 function StatisticsPortal.prizepoolBreakdown(args)
 	args = args or {}
 	args.showAverage = Logic.readBool(args.showAverage)
@@ -662,7 +662,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 end
 
 ---@param args table?
----@return Widget
+---@return Renderable
 function StatisticsPortal.earningsTable(args)
 	args = args or {}
 	args.limit = tonumber(args.limit) or 20
@@ -741,7 +741,7 @@ Section: Player Age Table Breakdown
 
 
 ---@param args table?
----@return Widget
+---@return Renderable
 function StatisticsPortal.playerAgeTable(args)
 	args = args or {}
 	args.earnings = tonumber(args.earnings) or 500
@@ -998,10 +998,10 @@ function StatisticsPortal._cacheModeEarningsData(config)
 	end
 
 	local earningsData = Table.map(Array.range(config.startYear, CURRENT_YEAR), function(_, year)
-			return year, Table.map(config.customInputs, function(_, mode)
-					return mode, 0
-				end)
+		return year, Table.map(config.customInputs, function(_, mode)
+			return mode, 0
 		end)
+	end)
 
 	local processData = function(item)
 		local year = tonumber(item.date:sub(1, 4))
@@ -1022,10 +1022,10 @@ function StatisticsPortal._cacheModeEarningsData(config)
 	Lpdb.executeMassQuery('placement', queryParameters, processData)
 
 	return Array.map(Array.extractValues(earningsData, Table.iter.spairs), function(value)
-			return Array.map(config.customInputs, function(key)
-						return value[key]
-					end)
-			end)
+		return Array.map(config.customInputs, function(key)
+			return value[key]
+		end)
+	end)
 end
 
 
@@ -1119,7 +1119,7 @@ end
 
 
 ---@param args table
----@return Widget
+---@return Renderable
 function StatisticsPortal._earningsTableHeader(args)
 	local columnText = args.opponentType == Opponent.team and 'Organization' or 'Player'
 
@@ -1145,7 +1145,7 @@ end
 ---@param earnings number
 ---@param opponentIndex number
 ---@param opponentDisplay Renderable
----@return Widget
+---@return Renderable
 function StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay)
 	return TableWidgets.Row{
 		css = {['line-height'] = '25px', ['text-align'] = 'center'},
@@ -1338,9 +1338,9 @@ function StatisticsPortal._removeCategories(categoryNames, seriesData)
 	local lastNotEmpty = 1
 
 	local isEmptyCategory = Array.map(Array.map(categoryNames, function(_, catIndex)
-			local truthValue = Array.all(Array.map(seriesData, function(_, index)
-				return seriesData[index][catIndex] end), function(value)
-					return value == 0
+		local truthValue = Array.all(Array.map(seriesData, function(_, index)
+			return seriesData[index][catIndex] end), function(value)
+				return value == 0
 				end)
 			if not truthValue then
 				lastNotEmpty = catIndex
@@ -1359,11 +1359,12 @@ function StatisticsPortal._removeCategories(categoryNames, seriesData)
 	end)
 
 	categoryNames = Array.filter(categoryNames, function(_, catIndex)
-			return Logic.readBool(isEmptyCategory[catIndex]) end)
+		return Logic.readBool(isEmptyCategory[catIndex]) end)
 
 	seriesData = Array.map(seriesData, function(_, index)
-			return Array.filter(seriesData[index], function(_, catIndex)
-					return Logic.readBool(isEmptyCategory[catIndex]) end)
+		return Array.filter(seriesData[index], function(_, catIndex)
+			return Logic.readBool(isEmptyCategory[catIndex])
+			end)
 		end)
 	return categoryNames, seriesData
 end
@@ -1460,7 +1461,7 @@ function StatisticsPortal._returnCustomYears(args)
 	local defaultYearTable = Array.range(args.startYear, CURRENT_YEAR)
 	if String.isNotEmpty(args.customYears) then
 		yearTable = Array.map(
-			StatisticsPortal._isTableOrSplitOrDefault(args.customYears),
+		StatisticsPortal._isTableOrSplitOrDefault(args.customYears),
 			function(tier)
 				return tonumber(tier)
 			end
