@@ -323,24 +323,21 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 		end
 	end
 
-	local tierTypeCells = {}
-	if #args.showTierTypes then
-		for _, tierTypeValue in ipairs(args.showTierTypes) do
-			local _, tierTypeData = Tier.raw(nil, tierTypeValue)
+	local tierTypeCells = Array.map(args.showTierTypes, function(tierTypeValue)
+		local _, tierTypeData = Tier.raw(nil, tierTypeValue)
 			if tierTypeData then
 				local count = Array.reduce(
 					Array.map(Array.extractValues(countData),
-						function(typeCounts, index)
+						function(typeCounts)
 							return Table.extract(typeCounts, tierTypeValue) or 0
 						end
 					),
 					Operator.add, 0
 				)
 				runningTally = runningTally + count
-				table.insert(tierTypeCells, CellComponent{align = 'right', children = LANG:formatNum(count)})
+				return CellComponent{align = 'right', children = LANG:formatNum(count)}
 			end
-		end
-	end
+		end)
 
 	local otherCell
 	if String.isNotEmpty(args.showOther) then
@@ -430,10 +427,10 @@ function StatisticsPortal.prizepoolBreakdown(args)
 	local function finalizeTable()
 		table.insert(tables, TableWidgets.Table{
 			caption = 'Prize Money Awarded',
-			children = WidgetUtil.collect(
+			children = {
 				TableWidgets.TableHeader{children = TableWidgets.Row{children = headerCells}},
 				TableWidgets.TableBody{children = TableWidgets.Row{children = resultCells}}
-			)
+			}
 		})
 		headerCells = {}
 		resultCells = {}
@@ -637,7 +634,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 	})
 
 	local summaryTable = TableWidgets.Table{
-		children = WidgetUtil.collect(
+		children = {
 			TableWidgets.TableHeader{children = TableWidgets.Row{
 				children = TableWidgets.CellHeader{children = 'Total prize money awarded'}
 			}},
@@ -649,7 +646,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 					)}
 				}
 			}}
-		)
+		}
 	}
 
 	table.insert(WrapperChildren, Html.Div{
@@ -727,10 +724,10 @@ function StatisticsPortal.earningsTable(args)
 	return TableWidgets.Table{
 		sortable = true,
 		css = {['margin-left'] = '0px', ['margin-right'] = 'auto', width = '100%'},
-		children = WidgetUtil.collect(
+		children = {
 			TableWidgets.TableHeader{children = StatisticsPortal._earningsTableHeader(args)},
 			TableWidgets.TableBody{children = tableRow}
-		)
+		}
 	}
 end
 
@@ -777,10 +774,10 @@ function StatisticsPortal.playerAgeTable(args)
 	local playerData = StatisticsPortal._getPlayers(args.limit, conditions:toString(), args.order)
 
 	local tableHeader = TableWidgets.Row{
-		children = WidgetUtil.collect(
+		children = {
 			TableWidgets.CellHeader{unsortable = true, children = 'ID'},
 			TableWidgets.CellHeader{children = 'Age'}
-		)
+		}
 	}
 
 	local tableRow = Array.map(playerData, function(player)
@@ -790,23 +787,23 @@ function StatisticsPortal.playerAgeTable(args)
 		local dayAge = age.yday - 1
 
 		return TableWidgets.Row{
-			children = WidgetUtil.collect(
+			children = {
 				TableWidgets.Cell{children = OpponentDisplay.BlockOpponent{
 					opponent = StatisticsPortal._toOpponent(player),
 					showPlayerTeam = true,
 				}},
 				TableWidgets.Cell{children = yearAge .. ' years, ' .. dayAge .. ' days'}
-			)
+			}
 		}
 	end)
 
 	return TableWidgets.Table{
 		sortable = true,
 		css = {['margin-left'] = '0px', ['margin-right'] = 'auto'},
-		children = WidgetUtil.collect(
+		children = {
 			TableWidgets.TableHeader{children = tableHeader},
 			TableWidgets.TableBody{children = tableRow}
-		)
+		}
 	}
 end
 
