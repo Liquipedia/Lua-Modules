@@ -183,10 +183,10 @@ function StatisticsPortal.coverageStatistics(args)
 	local boxCss = args.alignSide and {['padding-right'] = '2em'} or nil
 
 	return Html.Div{
-		children = WidgetUtil.collect(
+		children = {
 			Html.Div{classes = boxClasses, css = boxCss, children = StatisticsPortal.coverageTournamentTable(args)},
 			Html.Div{classes = boxClasses, css = boxCss, children = StatisticsPortal.coverageMatchTable(args)}
-		)
+		}
 	}
 end
 
@@ -198,7 +198,7 @@ function StatisticsPortal.coverageMatchTable(args)
 	args.multiGame = Logic.readBool(args.multiGame)
 	args.customGames = StatisticsPortal._isTableOrSplitOrDefault(args.customGames, GAMES)
 
-	local TableHeader = TableWidgets.Row{
+	local tableHeader = TableWidgets.Row{
 		children = WidgetUtil.collect(
 			args.multiGame and TableWidgets.CellHeader{children = 'Game'} or nil,
 			TableWidgets.CellHeader{children = args.matchesTitle or 'Matches'},
@@ -206,7 +206,7 @@ function StatisticsPortal.coverageMatchTable(args)
 		)
 	}
 
-	local TableRow = WidgetUtil.collect(
+	local tableRow = WidgetUtil.collect(
 		args.multiGame and Array.map(args.customGames, function(game)
 			return StatisticsPortal._coverageMatchTableRow(args, {game = game, year = args.year})
 		end) or nil,
@@ -216,8 +216,8 @@ function StatisticsPortal.coverageMatchTable(args)
 	return TableWidgets.Table{
 		caption = args.matchTableTitle or (args.alignSide and Html.Br{} or ''),
 		children = WidgetUtil.collect(
-			TableWidgets.TableHeader{children = TableHeader},
-			TableWidgets.TableBody{children = TableRow}
+			TableWidgets.TableHeader{children = tableHeader},
+			TableWidgets.TableBody{children = tableRow}
 		)
 	}
 end
@@ -265,7 +265,7 @@ function StatisticsPortal.coverageTournamentTable(args)
 	args.showTierTypes = StatisticsPortal._isTableOrSplitOrDefault(args.showTierTypes, {})
 	args.filterByStatus = Logic.readBool(args.filterByStatus) or false
 
-	local TableRow = WidgetUtil.collect(
+	local tableRow = WidgetUtil.collect(
 		args.multiGame and Array.map(args.customGames, function(game)
 			return StatisticsPortal._coverageTournamentTableRow(args, {
 				game = game,
@@ -283,7 +283,7 @@ function StatisticsPortal.coverageTournamentTable(args)
 		caption = args.tournamentTableTitle or 'Tournaments Covered',
 		children = WidgetUtil.collect(
 			TableWidgets.TableHeader{children = StatisticsPortal._coverageTournamentTableHeader(args)},
-			TableWidgets.TableBody{children = TableRow}
+			TableWidgets.TableBody{children = tableRow}
 		)
 	}
 end
@@ -653,7 +653,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 	}
 
 	table.insert(WrapperChildren, Html.Div{
-			classes = {'template-box'},
+		classes = {'template-box'},
 		css = {['padding-right'] = '1em'},
 		children = summaryTable,
 	})
@@ -702,7 +702,7 @@ function StatisticsPortal.earningsTable(args)
 
 	local opponentPlacements = StatisticsPortal._cacheOpponentPlacementData(args)
 
-	local TableRow = {}
+	local tableRow = {}
 	for opponentIndex, opponent in ipairs(opponentData) do
 		local earnings = earningsFunction(opponent)
 
@@ -720,7 +720,7 @@ function StatisticsPortal.earningsTable(args)
 			}
 		end
 		local placements = opponentPlacements[opponent.pagename] or {}
-		table.insert(TableRow,
+		table.insert(tableRow,
 			StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay))
 	end
 
@@ -729,7 +729,7 @@ function StatisticsPortal.earningsTable(args)
 		css = {['margin-left'] = '0px', ['margin-right'] = 'auto', width = '100%'},
 		children = WidgetUtil.collect(
 			TableWidgets.TableHeader{children = StatisticsPortal._earningsTableHeader(args)},
-			TableWidgets.TableBody{children = TableRow}
+			TableWidgets.TableBody{children = tableRow}
 		)
 	}
 end
@@ -776,14 +776,14 @@ function StatisticsPortal.playerAgeTable(args)
 
 	local playerData = StatisticsPortal._getPlayers(args.limit, conditions:toString(), args.order)
 
-	local TableHeader = TableWidgets.Row{
+	local tableHeader = TableWidgets.Row{
 		children = WidgetUtil.collect(
 			TableWidgets.CellHeader{unsortable = true, children = 'ID'},
 			TableWidgets.CellHeader{children = 'Age'}
 		)
 	}
 
-	local TableRow = Array.map(playerData, function(player)
+	local tableRow = Array.map(playerData, function(player)
 		local birthdate = DateExt.readTimestamp(player.birthdate) --[[@as integer]]
 		local age = os.date('*t', os.difftime(TIMESTAMP, birthdate))
 		local yearAge = age.year - 1970
@@ -804,8 +804,8 @@ function StatisticsPortal.playerAgeTable(args)
 		sortable = true,
 		css = {['margin-left'] = '0px', ['margin-right'] = 'auto'},
 		children = WidgetUtil.collect(
-			TableWidgets.TableHeader{children = TableHeader},
-			TableWidgets.TableBody{children = TableRow}
+			TableWidgets.TableHeader{children = tableHeader},
+			TableWidgets.TableBody{children = tableRow}
 		)
 	}
 end
