@@ -43,9 +43,9 @@ local ConditionUtil = Condition.Util
 local Count = Lua.import('Module:Count')
 
 local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, displayCurrencyCode = false, formatValue = true}
-local CURRENT_YEAR = tonumber(os.date('%Y')) --[[@as integer]]
-local DATE = os.date('%F') --[[@as string]]
-local TIMESTAMP = DateExt.readTimestamp(DATE) --[[@as integer]]
+local TIMESTAMP = DateExt.getCurrentTimestamp()
+local CURRENT_YEAR = DateExt.getYearOf(TIMESTAMP)
+local DATE = DateExt.toYmdInUtc(TIMESTAMP)
 local DEFAULT_ALLOWED_PLACES = {'1', '2', '3', '1-2', '1-3', '2-3', '2-4', '3-4'}
 local DEFAULT_ROUND_PRECISION = Info.defaultRoundPrecision or 2
 local LANG = mw.getContentLanguage()
@@ -1004,7 +1004,7 @@ function StatisticsPortal._cacheModeEarningsData(config)
 	end)
 
 	local processData = function(item)
-		local year = tonumber(item.date:sub(1, 4))
+		local year = DateExt.getYearOf(item.date)
 		if String.isNotEmpty(item[config.variable]) then
 			local arg = item[config.variable]
 			if earningsData[year][arg] then
@@ -1448,8 +1448,7 @@ function StatisticsPortal._isTableOrSplitOrDefault(input, default)
 	elseif String.isEmpty(input) then
 		return default or {}
 	end
-	---@cast input -nil
-	return Array.map(mw.text.split(input, ',', true), String.trim)
+	return Array.parseCommaSeparatedString(input, ',')
 end
 
 
