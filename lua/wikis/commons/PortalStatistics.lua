@@ -72,7 +72,7 @@ Section: Chart Entry Functions
 
 
 ---@param args table?
----@return Html
+---@return Renderable
 function StatisticsPortal.gameEarningsChart(args)
 	args = args or {}
 
@@ -95,7 +95,7 @@ end
 
 
 ---@param args table?
----@return Html
+---@return Renderable
 function StatisticsPortal.modeEarningsChart(args)
 	args = args or {}
 
@@ -114,7 +114,7 @@ end
 
 
 ---@param args table?
----@return Html
+---@return Renderable
 function StatisticsPortal.topEarningsChart(args)
 	args = args or {}
 	args.limit = tonumber(args.limit) or 10
@@ -904,7 +904,7 @@ end
 ---@param groupBy string
 ---@param defaultValue string
 ---@param groupValues table
----@return table
+---@return Renderable
 function StatisticsPortal._getPieChartData(args, groupBy, defaultValue, groupValues)
 	table.insert(groupValues, defaultValue)
 	defaultValue = string.lower(defaultValue or '')
@@ -1110,7 +1110,7 @@ Section: Display Functions
 ---@param args table
 ---@param parameters table
 ---@param isHeaderRow boolean
----@return Widget
+---@return Renderable
 function StatisticsPortal._returnGameCell(args, parameters, isHeaderRow)
 	local CellComponent = isHeaderRow and TableWidgets.CellHeader or TableWidgets.Cell
 	local text = (Logic.readBool(args.multiGame) and not parameters.game) and 'Total' or parameters.game
@@ -1188,7 +1188,7 @@ end
 
 ---@param config table
 ---@param chartData table
----@return Html
+---@return Renderable
 function StatisticsPortal._drawChart(config, chartData)
 	return Html.Div{
 		class = 'table-responsive',
@@ -1218,7 +1218,7 @@ end
 
 ---@param args table
 ---@param chartData table
----@return Html
+---@return Renderable
 function StatisticsPortal._drawPieChart(args, chartData)
 	return Html.Div{
 		class = 'table-responsive',
@@ -1253,7 +1253,7 @@ end
 ---@param yearSeriesData table
 ---@param nonYearCategories table
 ---@param transpose boolean?
----@return Html
+---@return Renderable
 function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategories, transpose)
 	local yearTable, defaultYearTable = StatisticsPortal._returnCustomYears(config)
 	local prevYear = config.startYear
