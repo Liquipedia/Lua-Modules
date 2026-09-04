@@ -65,6 +65,14 @@ return {
 		isMapStats = true
 	},
 	{
+		name = 'fragnet',
+		icon = 'Fragnet lightmode.png',
+		iconDark = 'Fragnet darkmode.png',
+		prefixLink = 'https://arena.fragnet.net/match/',
+		label = 'Matchpage and Stats on Fragnet Arena',
+		isMapStats = true
+	},
+	{
 		name = 'sltv',
 		icon = 'StarLadder icon.png',
 		prefixLink = 'http://csgo.starladder.tv/match/',
