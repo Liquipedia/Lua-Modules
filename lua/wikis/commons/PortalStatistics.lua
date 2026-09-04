@@ -28,6 +28,7 @@ local Tier = Lua.import('Module:Tier/Custom')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
+local Box = Lua.import('Module:Widget/Basic/Box')
 local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -44,7 +45,7 @@ local Count = Lua.import('Module:Count')
 
 local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, displayCurrencyCode = false, formatValue = true}
 local TIMESTAMP = DateExt.getCurrentTimestamp()
-local CURRENT_YEAR = DateExt.getYearOf(TIMESTAMP)
+local CURRENT_YEAR = DateExt.getYearOf()
 local DATE = DateExt.toYmdInUtc(TIMESTAMP)
 local DEFAULT_ALLOWED_PLACES = {'1', '2', '3', '1-2', '1-3', '2-3', '2-4', '3-4'}
 local DEFAULT_ROUND_PRECISION = Info.defaultRoundPrecision or 2
@@ -179,13 +180,11 @@ function StatisticsPortal.coverageStatistics(args)
 	args = args or {}
 	args.alignSide = Logic.readBool(args.alignSide)
 
-	local boxClasses = args.alignSide and {'template-box'} or nil
-	local boxCss = args.alignSide and {['padding-right'] = '2em'} or nil
-
-	return Html.Div{
+	return Box{
+		paddingRight = args.alignSide and '2em' or nil,
 		children = {
-			Html.Div{classes = boxClasses, css = boxCss, children = StatisticsPortal.coverageTournamentTable(args)},
-			Html.Div{classes = boxClasses, css = boxCss, children = StatisticsPortal.coverageMatchTable(args)}
+			StatisticsPortal.coverageTournamentTable(args),
+			StatisticsPortal.coverageMatchTable(args)
 		}
 	}
 end
@@ -215,10 +214,10 @@ function StatisticsPortal.coverageMatchTable(args)
 
 	return TableWidgets.Table{
 		caption = args.matchTableTitle or (args.alignSide and Html.Br{} or ''),
-		children = WidgetUtil.collect(
+		children = {
 			TableWidgets.TableHeader{children = tableHeader},
 			TableWidgets.TableBody{children = tableRow}
-		)
+		}
 	}
 end
 
@@ -281,10 +280,10 @@ function StatisticsPortal.coverageTournamentTable(args)
 
 	return TableWidgets.Table{
 		caption = args.tournamentTableTitle or 'Tournaments Covered',
-		children = WidgetUtil.collect(
+		children = {
 			TableWidgets.TableHeader{children = StatisticsPortal._coverageTournamentTableHeader(args)},
 			TableWidgets.TableBody{children = tableRow}
-		)
+		}
 	}
 end
 
@@ -325,16 +324,14 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 
 	local tierTypeCells = Array.map(args.showTierTypes, function(tierTypeValue)
 		local _, tierTypeData = Tier.raw(nil, tierTypeValue)
-			if tierTypeData then
-				local count = Array.reduce(
-					Array.map(Array.extractValues(countData),
-						function(typeCounts)
-							return Table.extract(typeCounts, tierTypeValue) or 0
-						end
-					),
-					Operator.add, 0
-				)
-				runningTally = runningTally + count
+		if tierTypeData then
+			local count = Array.reduce(
+				Array.map(Array.extractValues(countData), function(typeCounts)
+					return Table.extract(typeCounts, tierTypeValue) or 0
+				end),
+				Operator.add, 0
+			)
+			runningTally = runningTally + count
 				return CellComponent{align = 'right', children = LANG:formatNum(count)}
 			end
 		end)
@@ -342,11 +339,10 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 	local otherCell
 	if String.isNotEmpty(args.showOther) then
 		local countOther = Array.reduce(
-			Array.flatten(Array.map(Array.extractValues(countData),
-				function(typeCounts, index)
-					return Table.isNotEmpty(typeCounts) and Array.extractValues(typeCounts) or 0
-				end
-			)), Operator.add, 0) --[[@as number]]
+			Array.flatMap(Array.extractValues(countData), function(typeCounts)
+				return Table.isNotEmpty(typeCounts) and Array.extractValues(typeCounts) or 0
+			end
+			), Operator.add, 0) --[[@as number]]
 		runningTally = runningTally + countOther
 		otherCell = CellComponent{align = 'right', children = LANG:formatNum(countOther)}
 	end
@@ -543,7 +539,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 	args.multiGame = Logic.readBool(args.multiGame)
 	args.multiMode = Logic.readBool(args.multiMode)
 
-	local WrapperChildren = {
+	local wrapperChildren = {
 		Html.Div{
 			classes = {'template-box'},
 			css = {
@@ -564,7 +560,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 		local games = Array.map(StatisticsPortal._isTableOrSplitOrDefault(args.customGames, GAMES), function(game)
 			return Game.toIdentifier{game = game, useDefault = false} or game
 		end)
-		table.insert(WrapperChildren, Html.Div{
+		table.insert(wrapperChildren, Html.Div{
 			classes = {'template-box'},
 			css = {
 				['padding-right'] = '5em',
@@ -579,13 +575,8 @@ function StatisticsPortal.pieChartBreakdown(args)
 	end
 
 	if args.multiMode then
-		table.insert(WrapperChildren, Html.Div{
-			classes = {'template-box'},
-			css = {
-				['padding-right'] = '5em',
-				['font-size'] = '85%',
-				['text-align'] = 'center',
-			},
+		table.insert(wrapperChildren, Box{
+			paddingRight = '5em',
 			children = {
 				'Mode Breakdown',
 				StatisticsPortal._getPieChartData(
@@ -596,15 +587,14 @@ function StatisticsPortal.pieChartBreakdown(args)
 	end
 
 	if args.hideKey then
-		return Html.Div{children = WrapperChildren}
+		return Html.Div{children = wrapperChildren}
 	end
 
 	if args.detailedKey then
-		table.insert(WrapperChildren, Html.Div{
-			classes = {'template-box'},
+		table.insert(wrapperChildren, Box{
 			children = StatisticsPortal.prizepoolBreakdown(args),
 		})
-		return Html.Div{children = WrapperChildren}
+		return Html.Div{children = wrapperChildren}
 	end
 
 	local conditions = StatisticsPortal._returnBaseConditions()
@@ -649,13 +639,12 @@ function StatisticsPortal.pieChartBreakdown(args)
 		}
 	}
 
-	table.insert(WrapperChildren, Html.Div{
-		classes = {'template-box'},
-		css = {['padding-right'] = '1em'},
+	table.insert(wrapperChildren, Box{
+		paddingRight = '1em',
 		children = summaryTable,
 	})
 
-	return Html.Div{children = WrapperChildren}
+	return Html.Div{children = wrapperChildren}
 end
 
 ---@param args table?
@@ -1338,7 +1327,7 @@ function StatisticsPortal._removeCategories(categoryNames, seriesData)
 		local truthValue = Array.all(Array.map(seriesData, function(_, index)
 			return seriesData[index][catIndex] end), function(value)
 				return value == 0
-				end)
+			end)
 			if not truthValue then
 				lastNotEmpty = catIndex
 			end
@@ -1361,8 +1350,8 @@ function StatisticsPortal._removeCategories(categoryNames, seriesData)
 	seriesData = Array.map(seriesData, function(_, index)
 		return Array.filter(seriesData[index], function(_, catIndex)
 			return Logic.readBool(isEmptyCategory[catIndex])
-			end)
 		end)
+	end)
 	return categoryNames, seriesData
 end
 
@@ -1445,7 +1434,7 @@ function StatisticsPortal._isTableOrSplitOrDefault(input, default)
 	elseif String.isEmpty(input) then
 		return default or {}
 	end
-	return Array.parseCommaSeparatedString(input, ',')
+	return Array.parseCommaSeparatedString(input)
 end
 
 
@@ -1457,7 +1446,7 @@ function StatisticsPortal._returnCustomYears(args)
 	local defaultYearTable = Array.range(args.startYear, CURRENT_YEAR)
 	if String.isNotEmpty(args.customYears) then
 		yearTable = Array.map(
-		StatisticsPortal._isTableOrSplitOrDefault(args.customYears),
+			StatisticsPortal._isTableOrSplitOrDefault(args.customYears),
 			function(tier)
 				return tonumber(tier)
 			end
