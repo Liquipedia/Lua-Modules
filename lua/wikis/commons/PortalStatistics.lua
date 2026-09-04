@@ -28,6 +28,11 @@ local Tier = Lua.import('Module:Tier/Custom')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
+local Box = Lua.import('Module:Widget/Basic/Box')
+local Html = Lua.import('Module:Widget/Html')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
@@ -39,9 +44,9 @@ local ConditionUtil = Condition.Util
 local Count = Lua.import('Module:Count')
 
 local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, displayCurrencyCode = false, formatValue = true}
-local CURRENT_YEAR = tonumber(os.date('%Y')) --[[@as integer]]
-local DATE = os.date('%F') --[[@as string]]
-local TIMESTAMP = DateExt.readTimestamp(DATE) --[[@as integer]]
+local TIMESTAMP = DateExt.getCurrentTimestamp()
+local CURRENT_YEAR = DateExt.getYearOf()
+local DATE = DateExt.toYmdInUtc(TIMESTAMP)
 local DEFAULT_ALLOWED_PLACES = {'1', '2', '3', '1-2', '1-3', '2-3', '2-4', '3-4'}
 local DEFAULT_ROUND_PRECISION = Info.defaultRoundPrecision or 2
 local LANG = mw.getContentLanguage()
@@ -68,7 +73,7 @@ Section: Chart Entry Functions
 
 
 ---@param args table?
----@return Html
+---@return Renderable
 function StatisticsPortal.gameEarningsChart(args)
 	args = args or {}
 
@@ -91,7 +96,7 @@ end
 
 
 ---@param args table?
----@return Html
+---@return Renderable
 function StatisticsPortal.modeEarningsChart(args)
 	args = args or {}
 
@@ -110,7 +115,7 @@ end
 
 
 ---@param args table?
----@return Html
+---@return Renderable
 function StatisticsPortal.topEarningsChart(args)
 	args = args or {}
 	args.limit = tonumber(args.limit) or 10
@@ -170,113 +175,93 @@ Section: Coverage Breakdown
 
 
 ---@param args table?
----@return Html
+---@return VNode
 function StatisticsPortal.coverageStatistics(args)
 	args = args or {}
 	args.alignSide = Logic.readBool(args.alignSide)
 
-	local wrapper = mw.html.create('div')
-	local tournamentTable = wrapper:tag('div')
-	local matchTable = wrapper:tag('div')
+	local statsChildren = {
+		StatisticsPortal.coverageTournamentTable(args),
+		StatisticsPortal.coverageMatchTable(args)
+	}
 
 	if args.alignSide then
-		tournamentTable
-			:addClass('template-box')
-			:css('padding-right', '2em')
-		matchTable
-			:addClass('template-box')
-			:css('padding-right', '2em')
+		return Box{
+			paddingRight = '2em',
+			children = statsChildren,
+		}
+	else
+		return Html.Div{
+			children = statsChildren,
+		}
 	end
-
-	tournamentTable:node(StatisticsPortal.coverageTournamentTable(args))
-	matchTable:node(StatisticsPortal.coverageMatchTable(args))
-
-	return wrapper
 end
 
 
 ---@param args table?
----@return Html
+---@return Renderable
 function StatisticsPortal.coverageMatchTable(args)
 	args = args or {}
 	args.multiGame = Logic.readBool(args.multiGame)
 	args.customGames = StatisticsPortal._isTableOrSplitOrDefault(args.customGames, GAMES)
 
-	local matchTable = mw.html.create('table')
-		:addClass('wikitable wikitable-striped')
-
-	matchTable:tag('caption')
-		:wikitext(args.matchTableTitle or (Logic.readBool(args.alignSide) and '<br>' or ''))
-		:css('text-align', 'center')
-
-	local matchHeader = matchTable:tag('tr')
-
-	if Logic.readBool(args.multiGame) then
-		matchHeader:tag('th')
-			:wikitext('Game')
-	end
-
-	matchHeader
-		:tag('th'):wikitext(args.matchesTitle or 'Matches'):done()
-		:tag('th'):wikitext(args.gamesTitle or 'Games')
-
-	if Logic.readBool(args.multiGame) then
-		for _, game in Table.iter.spairs(args.customGames) do
-			matchTable:node(StatisticsPortal._coverageMatchTableRow(args, {
-						game = game,
-						year = args.year
-					}
-				)
-			)
-		end
-	end
-
-	matchTable:node(StatisticsPortal._coverageMatchTableRow(args, {
-				year = args.year
-			}
+	local tableHeader = TableWidgets.Row{
+		children = WidgetUtil.collect(
+			args.multiGame and TableWidgets.CellHeader{children = 'Game'} or nil,
+			TableWidgets.CellHeader{children = args.matchesTitle or 'Matches'},
+			TableWidgets.CellHeader{children = args.gamesTitle or 'Games'}
 		)
+	}
+
+	local tableRow = WidgetUtil.collect(
+		args.multiGame and Array.map(args.customGames, function(game)
+			return StatisticsPortal._coverageMatchTableRow(args, {game = game, year = args.year})
+		end) or nil,
+		StatisticsPortal._coverageMatchTableRow(args, {year = args.year})
 	)
 
-	return matchTable
+	return TableWidgets.Table{
+		caption = args.matchTableTitle or (args.alignSide and Html.Br{} or ''),
+		children = {
+			TableWidgets.TableHeader{children = tableHeader},
+			TableWidgets.TableBody{children = tableRow}
+		}
+	}
 end
 
 
 ---@param args table
 ---@param parameters table
----@return Html
+---@return Renderable
 function StatisticsPortal._coverageMatchTableRow(args, parameters)
-	local resultsRow = mw.html.create('tr')
-	local tagType = (Logic.readBool(args.multiGame) and not parameters.game) and 'th' or 'td'
-
-	if Logic.readBool(args.multiGame) then
-		resultsRow:node(StatisticsPortal._returnGameCell(args, parameters, tagType))
-	end
+	local isHeaderRow = Logic.readBool(args.multiGame) and not parameters.game
+	local CellComponent = isHeaderRow and TableWidgets.CellHeader or TableWidgets.Cell
 
 	local matchCountValue
 	local gameCountValue
 
-	if Info.config.match2.status == 2 then
+	if Info.config.match2.status == 0 then
+		---@diagnostic disable-next-line: deprecated
+		matchCountValue = Count.matches(parameters)
+		---@diagnostic disable-next-line: deprecated
+		gameCountValue = Count.games(parameters)
+	else
 		matchCountValue = Count.match2game(parameters)
 		gameCountValue = Count.match2(parameters)
-	else
-		matchCountValue = Count.matches(parameters)
-		gameCountValue = Count.games(parameters)
 	end
 
-	resultsRow:tag(tagType)
-		:wikitext(LANG:formatNum(matchCountValue))
-		:css('text-align', 'right')
-
-	resultsRow:tag(tagType)
-		:wikitext(LANG:formatNum(gameCountValue))
-		:css('text-align', 'right')
-
-	return resultsRow
+	return TableWidgets.Row{
+		children = WidgetUtil.collect(
+			Logic.readBool(args.multiGame) and StatisticsPortal._returnGameCell(args, parameters, isHeaderRow) or nil,
+			CellComponent{align = 'right', children = LANG:formatNum(matchCountValue)},
+			CellComponent{align = 'right', children = LANG:formatNum(gameCountValue)}
+		)
+	}
 end
 
 
 ---@param args table?
----@return Html
+---@return Renderable
 function StatisticsPortal.coverageTournamentTable(args)
 	args = args or {}
 	args.multiGame = Logic.readBool(args.multiGame)
@@ -287,51 +272,45 @@ function StatisticsPortal.coverageTournamentTable(args)
 	args.showTierTypes = StatisticsPortal._isTableOrSplitOrDefault(args.showTierTypes, {})
 	args.filterByStatus = Logic.readBool(args.filterByStatus) or false
 
-	local tournamentTable = mw.html.create('table')
-		:addClass('wikitable wikitable-striped')
-
-	tournamentTable:tag('caption')
-		:wikitext(args.tournamentTableTitle or 'Tournaments Covered')
-		:css('text-align', 'center')
-
-	tournamentTable:node(StatisticsPortal._coverageTournamentTableHeader(args))
-
-	if Logic.readBool(args.multiGame) then
-		for _, game in Table.iter.spairs(args.customGames) do
-			tournamentTable:node(StatisticsPortal._coverageTournamentTableRow(args, {
-						game = game,
-						year = args.year,
-						filterByStatus = args.filterByStatus
-					}
-				)
-			)
-		end
-	end
-
-	tournamentTable:node(StatisticsPortal._coverageTournamentTableRow(args, {
+	local tableRow = WidgetUtil.collect(
+		args.multiGame and Array.map(args.customGames, function(game)
+			return StatisticsPortal._coverageTournamentTableRow(args, {
+				game = game,
 				year = args.year,
 				filterByStatus = args.filterByStatus
-			}
-		)
+			})
+		end) or nil,
+		StatisticsPortal._coverageTournamentTableRow(args, {
+			year = args.year,
+			filterByStatus = args.filterByStatus
+		})
 	)
 
-	return tournamentTable
+	return TableWidgets.Table{
+		caption = args.tournamentTableTitle or 'Tournaments Covered',
+		children = {
+			TableWidgets.TableHeader{children = StatisticsPortal._coverageTournamentTableHeader(args)},
+			TableWidgets.TableBody{children = tableRow}
+		}
+	}
 end
 
 
 ---@param args table
 ---@param parameters table
----@return Html
+---@return Renderable
 function StatisticsPortal._coverageTournamentTableRow(args, parameters)
-	local resultsRow = mw.html.create('tr')
-	local tagType = (Logic.readBool(args.multiGame) and not parameters.game) and 'th' or 'td'
+	local isHeaderRow = Logic.readBool(args.multiGame) and not parameters.game
+	local CellComponent = isHeaderRow and TableWidgets.CellHeader or TableWidgets.Cell
 	local runningTally = 0
 
-	if Logic.readBool(args.multiGame) then
-		resultsRow:node(StatisticsPortal._returnGameCell(args, parameters, tagType))
-	end
+	local gameCell = Logic.readBool(args.multiGame)
+		and StatisticsPortal._returnGameCell(args, parameters, isHeaderRow)
+		or nil
 
 	local countData = Count.tournamentsByTier(parameters)
+
+	local tierCells = {}
 	for rowIndex, rowValue in Tier.iterate('tiers') do
 		if String.isNotEmpty(rowValue.value) and tonumber(rowValue.value) > 0 then
 			if not args.customTiers or Array.any(Array.extractValues(args.customTiers), function(value)
@@ -346,95 +325,88 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 					end
 				)
 				runningTally = runningTally + tournamentCount
-				resultsRow:tag(tagType)
-					:wikitext(LANG:formatNum(tournamentCount))
-					:css('text-align', 'right')
+				table.insert(tierCells, CellComponent{align = 'right', children = LANG:formatNum(tournamentCount)})
 			end
 		end
 	end
 
-	if #args.showTierTypes then
-		for _, tierTypeValue in ipairs(args.showTierTypes) do
-			local _, tierTypeData = Tier.raw(nil, tierTypeValue)
-			if tierTypeData then
-				local count = Array.reduce(
-					Array.map(Array.extractValues(countData),
-						function(typeCounts, index)
-							return Table.extract(typeCounts, tierTypeValue) or 0
-						end
-					),
-					Operator.add, 0
-				)
-				runningTally = runningTally + count
-				resultsRow:tag(tagType)
-					:wikitext(LANG:formatNum(count))
-					:css('text-align', 'right')
+	local tierTypeCells = Array.map(args.showTierTypes, function(tierTypeValue)
+		local _, tierTypeData = Tier.raw(nil, tierTypeValue)
+		if tierTypeData then
+			local count = Array.reduce(
+				Array.map(Array.extractValues(countData), function(typeCounts)
+					return Table.extract(typeCounts, tierTypeValue) or 0
+				end),
+				Operator.add, 0
+			)
+			runningTally = runningTally + count
+				return CellComponent{align = 'right', children = LANG:formatNum(count)}
 			end
-		end
-	end
+		end)
 
+	local otherCell
 	if String.isNotEmpty(args.showOther) then
 		local countOther = Array.reduce(
-			Array.flatten(Array.map(Array.extractValues(countData),
-				function(typeCounts, index)
-					return Table.isNotEmpty(typeCounts) and Array.extractValues(typeCounts) or 0
-				end
-			)), Operator.add, 0) --[[@as number]]
+			Array.flatMap(Array.extractValues(countData), function(typeCounts)
+				return Table.isNotEmpty(typeCounts) and Array.extractValues(typeCounts) or 0
+			end
+			), Operator.add, 0) --[[@as number]]
 		runningTally = runningTally + countOther
-		resultsRow:tag(tagType)
-			:wikitext(LANG:formatNum(countOther))
-			:css('text-align', 'right')
+		otherCell = CellComponent{align = 'right', children = LANG:formatNum(countOther)}
 	end
 
-	resultsRow:tag(tagType)
-		:wikitext(LANG:formatNum(runningTally))
-		:css('text-align', 'right')
-
-	return resultsRow:allDone()
+	return TableWidgets.Row{
+		children = WidgetUtil.collect(
+			gameCell,
+			tierCells,
+			tierTypeCells,
+			otherCell,
+			CellComponent{align = 'right', children = LANG:formatNum(runningTally)}
+		)
+	}
 end
 
 
 ---@param args table
----@return Html
+---@return Renderable
 function StatisticsPortal._coverageTournamentTableHeader(args)
-	local headerRow = mw.html.create('tr')
-
-	if Logic.readBool(args.multiGame) then
-		headerRow:tag('th')
-			:wikitext('Game')
-	end
-
+	local tierHeaderCells = {}
 	for headerIndex, headerValue in Tier.iterate('tiers') do
 		if String.isNotEmpty(headerValue.value) and tonumber(headerValue.value) > 0 then
 			if not args.customTiers or Array.any(Array.extractValues(args.customTiers), function(value)
 				return value == headerIndex
 			end) then
-				headerRow:tag('th')
-					:wikitext(Tier.displaySingle(headerValue, {link = true}))
+				table.insert(tierHeaderCells, TableWidgets.CellHeader{
+					children = Tier.displaySingle(headerValue, {link = true})
+				})
 			end
 		end
 	end
 
+	local tierTypeHeaderCells = {}
 	if #args.showTierTypes then
 		for _, tierTypeValue in ipairs(args.showTierTypes) do
 			local _, tierTypeData = Tier.raw(nil, tierTypeValue)
 			if tierTypeData then
-				headerRow:tag('th')
-					:wikitext(Tier.displaySingle(tierTypeData, {link = true, short = true}))
+				table.insert(tierTypeHeaderCells, TableWidgets.CellHeader{
+					children = Tier.displaySingle(tierTypeData, {link = true, short = true})
+				})
 			end
 		end
 	end
 
-	if String.isNotEmpty(args.showOther) then
-		headerRow:tag('th')
-			:wikitext(Abbreviation.make{text = 'Other',
-				title = 'Includes otherwise unlisted tournaments (e.g. with tiertypes, misc.)'})
-	end
-
-	headerRow:tag('th')
-		:wikitext('Total')
-
-	return headerRow
+	return TableWidgets.Row{
+		children = WidgetUtil.collect(
+			Logic.readBool(args.multiGame) and TableWidgets.CellHeader{children = 'Game'} or nil,
+			tierHeaderCells,
+			tierTypeHeaderCells,
+			String.isNotEmpty(args.showOther) and TableWidgets.CellHeader{
+				children = Abbreviation.make{text = 'Other',
+					title = 'Includes otherwise unlisted tournaments (e.g. with tiertypes, misc.)'}
+			} or nil,
+			TableWidgets.CellHeader{children = 'Total'}
+		)
+	}
 end
 
 --[[
@@ -443,7 +415,7 @@ Section: Prizepool Breakdown
 
 
 ---@param args table?
----@return Html
+---@return Renderable
 function StatisticsPortal.prizepoolBreakdown(args)
 	args = args or {}
 	args.showAverage = Logic.readBool(args.showAverage)
@@ -452,21 +424,21 @@ function StatisticsPortal.prizepoolBreakdown(args)
 	local yearTable, defaultYearTable = StatisticsPortal._returnCustomYears(args)
 	local rowLimit = Math.round(((Logic.readBool(args.showAverage) and 1 or 0) + 1 + Table.size(yearTable)) / 2)
 
-	local wrapper = mw.html.create('div')
+	local tables = {}
+	local headerCells = {}
+	local resultCells = {}
 
-	local prizepoolTable = wrapper:tag('div')
-		:addClass('table-responsive')
-		:tag('table')
-			:addClass('wikitable wikitable-striped')
-			:css('width', '100%')
-			:css('text-align', 'center')
-
-	prizepoolTable:tag('caption')
-		:wikitext('Prize Money Awarded')
-		:css('text-align', 'center')
-
-	local headerRow = prizepoolTable:tag('tr')
-	local resultsRow = prizepoolTable:tag('tr')
+	local function finalizeTable()
+		table.insert(tables, TableWidgets.Table{
+			caption = 'Prize Money Awarded',
+			children = {
+				TableWidgets.TableHeader{children = TableWidgets.Row{children = headerCells}},
+				TableWidgets.TableBody{children = TableWidgets.Row{children = resultCells}}
+			}
+		})
+		headerCells = {}
+		resultCells = {}
+	end
 
 	local prizepoolSum = 0
 	local prevYear = args.startYear
@@ -496,10 +468,12 @@ function StatisticsPortal.prizepoolBreakdown(args)
 		prizepoolSum = prizepoolSum + (tonumber(data[1].sum_prizepool) or 0)
 
 		if Array.any(Array.extractValues(yearTable), function(value) return value == yearValue end) then
-			headerRow:tag('th')
-				:wikitext(StatisticsPortal._returnCustomYearText(prevYear, yearValue))
-			resultsRow:tag('td')
-				:wikitext(Currency.display(US_DOLLAR, prizepoolSum or 0, CURRENCY_FORMAT_OPTIONS))
+			table.insert(headerCells, TableWidgets.CellHeader{
+				children = StatisticsPortal._returnCustomYearText(prevYear, yearValue)
+			})
+			table.insert(resultCells, TableWidgets.Cell{
+				children = Currency.display(US_DOLLAR, prizepoolSum or 0, CURRENCY_FORMAT_OPTIONS)
+			})
 			prizepoolSum = 0
 			prevYear = yearValue + 1
 			colIndex = colIndex + 1
@@ -507,17 +481,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 
 		if colIndex > rowLimit and rowLimit > 8 then
 			colIndex = 1
-			wrapper:tag('span'):wikitext('<br>')
-
-			prizepoolTable = wrapper:tag('div')
-				:addClass('table-responsive')
-				:tag('table')
-					:addClass('wikitable wikitable-striped')
-					:css('width', '100%')
-					:css('text-align', 'center')
-
-			headerRow = prizepoolTable:tag('tr')
-			resultsRow = prizepoolTable:tag('tr')
+			finalizeTable()
 		end
 	end
 
@@ -541,28 +505,39 @@ function StatisticsPortal.prizepoolBreakdown(args)
 		}
 	)
 	local totalPrizePool = tonumber(totalData[1].sum_prizepool) or 0
-	headerRow:tag('th')
-		:wikitext('Total')
-	resultsRow:tag('td')
-		:wikitext(Currency.display(US_DOLLAR, totalPrizePool, CURRENCY_FORMAT_OPTIONS))
-		:css('font-weight', 'bold')
+
+	table.insert(headerCells, TableWidgets.CellHeader{children = 'Total'})
+	table.insert(resultCells, TableWidgets.Cell{
+		children = Html.B{children = Currency.display(US_DOLLAR, totalPrizePool, CURRENCY_FORMAT_OPTIONS)}
+	})
 
 	if Logic.readBool(args.showAverage) then
-		headerRow:tag('th')
-			:tag('abbr')
-			:attr('title', 'Average Prizepool per Tournament')
-			:wikitext('AVG PPT')
-		resultsRow:tag('td')
-			:wikitext(Currency.display(US_DOLLAR, totalPrizePool / (Count.tournaments() or 1), CURRENCY_FORMAT_OPTIONS))
-			:css('font-weight', 'bold')
+		table.insert(headerCells, TableWidgets.CellHeader{
+			children = Html.Abbr{title = 'Average Prizepool per Tournament', children = 'AVG PPT'}
+		})
+		table.insert(resultCells, TableWidgets.Cell{
+			children = Html.B{children = Currency.display(
+				US_DOLLAR, totalPrizePool / (Count.tournaments() or 1), CURRENCY_FORMAT_OPTIONS
+			)}
+		})
 	end
 
-	return wrapper
+	finalizeTable()
+
+	local wrapperChildren = {}
+	for index, tableWidget in ipairs(tables) do
+		if index > 1 then
+			table.insert(wrapperChildren, Html.Br{})
+		end
+		table.insert(wrapperChildren, tableWidget)
+	end
+
+	return Html.Div{children = wrapperChildren}
 end
 
 
 ---@param args table?
----@return Html
+---@return VNode
 function StatisticsPortal.pieChartBreakdown(args)
 	args = args or {}
 	args.height = args.height or 300
@@ -572,58 +547,62 @@ function StatisticsPortal.pieChartBreakdown(args)
 	args.multiGame = Logic.readBool(args.multiGame)
 	args.multiMode = Logic.readBool(args.multiMode)
 
-	local wrapper = mw.html.create('div')
-
-	wrapper:node(mw.html.create('div')
-		:addClass('template-box')
-		:css('padding-right', '5em')
-		:css('font-size', '85%')
-		:css('text-align', 'center')
-		:wikitext('Tournament Type')
-		:node(StatisticsPortal._getPieChartData(
-			args, 'type', 'Mixed', TYPES
-		))
-	)
+	local wrapperChildren = {
+		Html.Div{
+			classes = {'template-box'},
+			css = {
+				['padding-right'] = '5em',
+				['font-size'] = '85%',
+				['text-align'] = 'center',
+			},
+			children = {
+				'Tournament Type',
+				StatisticsPortal._getPieChartData(
+					args, 'type', 'Mixed', TYPES
+				),
+			},
+		},
+	}
 
 	if args.multiGame then
 		local games = Array.map(StatisticsPortal._isTableOrSplitOrDefault(args.customGames, GAMES), function(game)
 			return Game.toIdentifier{game = game, useDefault = false} or game
 		end)
-		wrapper:node(mw.html.create('div')
-			:addClass('template-box')
-			:css('padding-right', '5em')
-			:css('font-size', '85%')
-			:css('text-align', 'center')
-			:wikitext('Game Breakdown')
-			:node(StatisticsPortal._getPieChartData(
-				args, 'game', 'Other', games
-			))
-		)
+		table.insert(wrapperChildren, Html.Div{
+			classes = {'template-box'},
+			css = {
+				['padding-right'] = '5em',
+				['font-size'] = '85%',
+				['text-align'] = 'center',
+			},
+			children = {
+				'Game Breakdown',
+				StatisticsPortal._getPieChartData(args, 'game', 'Other', games),
+			},
+		})
 	end
 
 	if args.multiMode then
-		wrapper:node(mw.html.create('div')
-			:addClass('template-box')
-			:css('padding-right', '5em')
-			:css('font-size', '85%')
-			:css('text-align', 'center')
-			:wikitext('Mode Breakdown')
-			:node(StatisticsPortal._getPieChartData(
-				args, 'mode', 'Other', StatisticsPortal._isTableOrSplitOrDefault(args.customModes, {'Team'})
-			))
-		)
+		table.insert(wrapperChildren, Box{
+			paddingRight = '5em',
+			children = {
+				'Mode Breakdown',
+				StatisticsPortal._getPieChartData(
+					args, 'mode', 'Other', StatisticsPortal._isTableOrSplitOrDefault(args.customModes, {'Team'})
+				),
+			},
+		})
 	end
 
-	if Logic.readBool(args.hideKey) then
-		return wrapper
+	if args.hideKey then
+		return Html.Div{children = wrapperChildren}
 	end
 
-	if Logic.readBool(args.detailedKey) then
-		wrapper:node(mw.html.create('div')
-			:addClass('template-box')
-			:node(StatisticsPortal.prizepoolBreakdown(args))
-		)
-		return wrapper
+	if args.detailedKey then
+		table.insert(wrapperChildren, Box{
+			children = StatisticsPortal.prizepoolBreakdown(args),
+		})
+		return Html.Div{children = wrapperChildren}
 	end
 
 	local conditions = StatisticsPortal._returnBaseConditions()
@@ -652,32 +631,32 @@ function StatisticsPortal.pieChartBreakdown(args)
 		order = 'sortdate desc',
 	})
 
-	local summaryTable = mw.html.create('table')
-		:addClass('wikitable')
-		:css('text-align', 'center')
-		:css('font-weight', 'bold')
+	local summaryTable = TableWidgets.Table{
+		children = {
+			TableWidgets.TableHeader{children = TableWidgets.Row{
+				children = TableWidgets.CellHeader{children = 'Total prize money awarded'}
+			}},
+			TableWidgets.TableBody{children = TableWidgets.Row{
+				children = TableWidgets.Cell{
+					attributes = {['data-sort-type'] = 'currency'},
+					children = Html.B{children = Currency.display(
+						US_DOLLAR, data[1].sum_prizepool or 0, CURRENCY_FORMAT_OPTIONS
+					)}
+				}
+			}}
+		}
+	}
 
-	summaryTable:tag('tr')
-		:tag('th'):wikitext('Total prize money awarded')
+	table.insert(wrapperChildren, Box{
+		paddingRight = '1em',
+		children = summaryTable,
+	})
 
-	summaryTable:tag('tr')
-		:tag('td')
-		:wikitext(Currency.display(US_DOLLAR, data[1].sum_prizepool or 0, CURRENCY_FORMAT_OPTIONS))
-		:attr('data-sort-type', 'currency')
-		:css('font-weight', 'bold')
-
-	wrapper:node(mw.html.create('div')
-		:addClass('template-box')
-		:css('padding-right', '1em')
-		:node(summaryTable)
-	)
-
-	return wrapper
+	return Html.Div{children = wrapperChildren}
 end
 
-
 ---@param args table?
----@return Html
+---@return Renderable
 function StatisticsPortal.earningsTable(args)
 	args = args or {}
 	args.limit = tonumber(args.limit) or 20
@@ -717,20 +696,13 @@ function StatisticsPortal.earningsTable(args)
 
 	local opponentPlacements = StatisticsPortal._cacheOpponentPlacementData(args)
 
-	local tbl = mw.html.create('table')
-		:addClass('wikitable wikitable-striped wikitable-bordered sortable')
-		:css('margin-left', '0px')
-		:css('margin-right', 'auto')
-		:css('width', '100%')
-
-	tbl:node(StatisticsPortal._earningsTableHeader(args))
-
+	local tableRow = {}
 	for opponentIndex, opponent in ipairs(opponentData) do
-		local opponentDisplay
 		local earnings = earningsFunction(opponent)
 
 		if opponentIndex > args.limit or earnings < args.minimumEarnings then break end
 
+		local opponentDisplay
 		if args.opponentType == Opponent.team then
 			opponentDisplay = OpponentDisplay.BlockOpponent{
 				opponent = Opponent.readOpponentArgs{template = opponent.template, type = Opponent.team},
@@ -742,10 +714,18 @@ function StatisticsPortal.earningsTable(args)
 			}
 		end
 		local placements = opponentPlacements[opponent.pagename] or {}
-		tbl:node(StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay))
+		table.insert(tableRow,
+			StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay))
 	end
 
-	return mw.html.create('div'):addClass('table-responsive'):node(tbl)
+	return TableWidgets.Table{
+		sortable = true,
+		css = {['margin-left'] = '0px', ['margin-right'] = 'auto', width = '100%'},
+		children = {
+			TableWidgets.TableHeader{children = StatisticsPortal._earningsTableHeader(args)},
+			TableWidgets.TableBody{children = tableRow}
+		}
+	}
 end
 
 
@@ -755,7 +735,7 @@ Section: Player Age Table Breakdown
 
 
 ---@param args table?
----@return Html
+---@return Renderable
 function StatisticsPortal.playerAgeTable(args)
 	args = args or {}
 	args.earnings = tonumber(args.earnings) or 500
@@ -790,32 +770,38 @@ function StatisticsPortal.playerAgeTable(args)
 
 	local playerData = StatisticsPortal._getPlayers(args.limit, conditions:toString(), args.order)
 
-	local tbl = mw.html.create('table')
-		:addClass('wikitable wikitable-striped sortable')
-		:css('margin-left', '0px')
-		:css('margin-right', 'auto')
+	local tableHeader = TableWidgets.Row{
+		children = {
+			TableWidgets.CellHeader{unsortable = true, children = 'ID'},
+			TableWidgets.CellHeader{children = 'Age'}
+		}
+	}
 
-	tbl:tag('tr')
-		:tag('th'):wikitext('ID'):addClass('unsortable'):done()
-		:tag('th'):wikitext('Age')
-
-	for _, player in ipairs(playerData) do
+	local tableRow = Array.map(playerData, function(player)
 		local birthdate = DateExt.readTimestamp(player.birthdate) --[[@as integer]]
 		local age = os.date('*t', os.difftime(TIMESTAMP, birthdate))
 		local yearAge = age.year - 1970
 		local dayAge = age.yday - 1
 
-		tbl:tag('tr')
-			:tag('td')
-				:node(OpponentDisplay.BlockOpponent{
+		return TableWidgets.Row{
+			children = {
+				TableWidgets.Cell{children = OpponentDisplay.BlockOpponent{
 					opponent = StatisticsPortal._toOpponent(player),
 					showPlayerTeam = true,
-				}):done()
-			:tag('td')
-				:wikitext(yearAge .. ' years, ' .. dayAge .. ' days')
-	end
+				}},
+				TableWidgets.Cell{children = yearAge .. ' years, ' .. dayAge .. ' days'}
+			}
+		}
+	end)
 
-	return mw.html.create('div'):addClass('table-responsive'):node(tbl)
+	return TableWidgets.Table{
+		sortable = true,
+		css = {['margin-left'] = '0px', ['margin-right'] = 'auto'},
+		children = {
+			TableWidgets.TableHeader{children = tableHeader},
+			TableWidgets.TableBody{children = tableRow}
+		}
+	}
 end
 
 
@@ -912,7 +898,7 @@ end
 ---@param groupBy string
 ---@param defaultValue string
 ---@param groupValues table
----@return table
+---@return Renderable
 function StatisticsPortal._getPieChartData(args, groupBy, defaultValue, groupValues)
 	table.insert(groupValues, defaultValue)
 	defaultValue = string.lower(defaultValue or '')
@@ -1006,13 +992,13 @@ function StatisticsPortal._cacheModeEarningsData(config)
 	end
 
 	local earningsData = Table.map(Array.range(config.startYear, CURRENT_YEAR), function(_, year)
-			return year, Table.map(config.customInputs, function(_, mode)
-					return mode, 0
-				end)
+		return year, Table.map(config.customInputs, function(_, mode)
+			return mode, 0
 		end)
+	end)
 
 	local processData = function(item)
-		local year = tonumber(item.date:sub(1, 4))
+		local year = DateExt.getYearOf(item.date)
 		if String.isNotEmpty(item[config.variable]) then
 			local arg = item[config.variable]
 			if earningsData[year][arg] then
@@ -1030,10 +1016,10 @@ function StatisticsPortal._cacheModeEarningsData(config)
 	Lpdb.executeMassQuery('placement', queryParameters, processData)
 
 	return Array.map(Array.extractValues(earningsData, Table.iter.spairs), function(value)
-			return Array.map(config.customInputs, function(key)
-						return value[key]
-					end)
-			end)
+		return Array.map(config.customInputs, function(key)
+			return value[key]
+		end)
+	end)
 end
 
 
@@ -1117,42 +1103,34 @@ Section: Display Functions
 
 ---@param args table
 ---@param parameters table
----@param tagType string
----@return Html
-function StatisticsPortal._returnGameCell(args, parameters, tagType)
-	local gameCell = mw.html.create(tagType)
-	if Logic.readBool(args.multiGame) and not parameters.game then
-		gameCell:wikitext('Total')
-	elseif Logic.readBool(args.multiGame) then
-		gameCell:wikitext(parameters.game)
-	end
-	return gameCell
+---@param isHeaderRow boolean
+---@return Renderable
+function StatisticsPortal._returnGameCell(args, parameters, isHeaderRow)
+	local CellComponent = isHeaderRow and TableWidgets.CellHeader or TableWidgets.Cell
+	local text = (Logic.readBool(args.multiGame) and not parameters.game) and 'Total' or parameters.game
+	return CellComponent{children = text}
 end
 
 
 ---@param args table
----@return Html
+---@return Renderable
 function StatisticsPortal._earningsTableHeader(args)
 	local columnText = args.opponentType == Opponent.team and 'Organization' or 'Player'
 
-	local row = mw.html.create('tr')
-		:tag('th'):wikitext('#'):addClass('unsortable'):done()
-		:tag('th'):wikitext(columnText):addClass('unsortable'):done()
-		:tag('th'):wikitext('Achievements'):css('width', '200px'):addClass('unsortable'):done()
-		:tag('th'):node(Medals.display{medal = 1}):done()
-		:tag('th'):node(Medals.display{medal = 2}):done()
-		:tag('th'):node(Medals.display{medal = 3}):done()
-
-	if Logic.readBool(args.displayShowMatches) then
-		row:tag('th'):wikitext('Show<br>Match')
-	end
-
-	row:tag('th')
-		:tag('abbr')
-		:attr('title', 'Total earnings across all games')
-		:wikitext('Earnings')
-
-	return row
+	return TableWidgets.Row{
+		children = WidgetUtil.collect(
+			TableWidgets.CellHeader{unsortable = true, children = '#'},
+			TableWidgets.CellHeader{unsortable = true, children = columnText},
+			TableWidgets.CellHeader{unsortable = true, width = '200px', children = 'Achievements'},
+			TableWidgets.CellHeader{children = Medals.display{medal = 1}},
+			TableWidgets.CellHeader{children = Medals.display{medal = 2}},
+			TableWidgets.CellHeader{children = Medals.display{medal = 3}},
+			Logic.readBool(args.displayShowMatches) and TableWidgets.CellHeader{children = 'Show<br>Match'} or nil,
+			TableWidgets.CellHeader{
+				children = Html.Abbr{title = 'Total earnings across all games', children = 'Earnings'}
+			}
+		)
+	}
 end
 
 
@@ -1160,28 +1138,22 @@ end
 ---@param placements table
 ---@param earnings number
 ---@param opponentIndex number
----@param opponentDisplay Widget|Html
----@return Html
+---@param opponentDisplay Renderable
+---@return Renderable
 function StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay)
-	local row = mw.html.create('tr')
-		:css('line-height', '25px')
-		:css('text-align', 'center')
-		:tag('td'):wikitext(opponentIndex):done()
-		:tag('td'):css('text-align', 'left'):node(opponentDisplay):done()
-		:tag('td'):wikitext(StatisticsPortal._achievementsDisplay(placements.sWinData or {})):done()
-		:tag('td'):wikitext(placements['1'] or '0'):done()
-		:tag('td'):wikitext(placements['2'] or '0'):done()
-		:tag('td'):wikitext(placements['3'] or '0'):done()
-
-	if Logic.readBool(args.displayShowMatches) then
-		row:tag('td'):wikitext(placements.showWins or 0)
-	end
-
-	row:tag('td')
-		:css('text-align', 'right')
-		:wikitext(Currency.display(US_DOLLAR, earnings, CURRENCY_FORMAT_OPTIONS))
-
-	return row
+	return TableWidgets.Row{
+		css = {['line-height'] = '25px', ['text-align'] = 'center'},
+		children = WidgetUtil.collect(
+			TableWidgets.Cell{children = opponentIndex},
+			TableWidgets.Cell{align = 'left', children = opponentDisplay},
+			TableWidgets.Cell{children = StatisticsPortal._achievementsDisplay(placements.sWinData or {})},
+			TableWidgets.Cell{children = placements['1'] or '0'},
+			TableWidgets.Cell{children = placements['2'] or '0'},
+			TableWidgets.Cell{children = placements['3'] or '0'},
+			Logic.readBool(args.displayShowMatches) and TableWidgets.Cell{children = placements.showWins or 0} or nil,
+			TableWidgets.Cell{align = 'right', children = Currency.display(US_DOLLAR, earnings, CURRENCY_FORMAT_OPTIONS)}
+		)
+	}
 end
 
 
@@ -1210,11 +1182,11 @@ end
 
 ---@param config table
 ---@param chartData table
----@return Html
+---@return Renderable
 function StatisticsPortal._drawChart(config, chartData)
-	return mw.html.create('div')
-		:addClass('table-responsive')
-		:node(mw.ext.Charts.chart({
+	return Html.Div{
+		class = 'table-responsive',
+		children = mw.ext.Charts.chart({
 			grid = {
 				left = '15%',
 				right = '12%',
@@ -1234,24 +1206,24 @@ function StatisticsPortal._drawChart(config, chartData)
 			series = chartData,
 			labels = config.labels,
 		})
-	)
+	}
 end
 
 
 ---@param args table
 ---@param chartData table
----@return Html
+---@return Renderable
 function StatisticsPortal._drawPieChart(args, chartData)
-	return mw.html.create('div')
-		:addClass('table-responsive')
-		:node(mw.ext.Charts.piechart{
+	return Html.Div{
+		class = 'table-responsive',
+		children = mw.ext.Charts.piechart{
 			size = {
 				height = args.height,
 				width = args.width
 			},
 			data = chartData
 		}
-	)
+	}
 end
 
 
@@ -1275,7 +1247,7 @@ end
 ---@param yearSeriesData table
 ---@param nonYearCategories table
 ---@param transpose boolean?
----@return Html
+---@return Renderable
 function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategories, transpose)
 	local yearTable, defaultYearTable = StatisticsPortal._returnCustomYears(config)
 	local prevYear = config.startYear
@@ -1360,10 +1332,10 @@ function StatisticsPortal._removeCategories(categoryNames, seriesData)
 	local lastNotEmpty = 1
 
 	local isEmptyCategory = Array.map(Array.map(categoryNames, function(_, catIndex)
-			local truthValue = Array.all(Array.map(seriesData, function(_, index)
-				return seriesData[index][catIndex] end), function(value)
-					return value == 0
-				end)
+		local truthValue = Array.all(Array.map(seriesData, function(_, index)
+			return seriesData[index][catIndex] end), function(value)
+				return value == 0
+			end)
 			if not truthValue then
 				lastNotEmpty = catIndex
 			end
@@ -1381,12 +1353,13 @@ function StatisticsPortal._removeCategories(categoryNames, seriesData)
 	end)
 
 	categoryNames = Array.filter(categoryNames, function(_, catIndex)
-			return Logic.readBool(isEmptyCategory[catIndex]) end)
+		return Logic.readBool(isEmptyCategory[catIndex]) end)
 
 	seriesData = Array.map(seriesData, function(_, index)
-			return Array.filter(seriesData[index], function(_, catIndex)
-					return Logic.readBool(isEmptyCategory[catIndex]) end)
+		return Array.filter(seriesData[index], function(_, catIndex)
+			return Logic.readBool(isEmptyCategory[catIndex])
 		end)
+	end)
 	return categoryNames, seriesData
 end
 
@@ -1469,8 +1442,7 @@ function StatisticsPortal._isTableOrSplitOrDefault(input, default)
 	elseif String.isEmpty(input) then
 		return default or {}
 	end
-	---@cast input -nil
-	return Array.map(mw.text.split(input, ',', true), String.trim)
+	return Array.parseCommaSeparatedString(input)
 end
 
 
