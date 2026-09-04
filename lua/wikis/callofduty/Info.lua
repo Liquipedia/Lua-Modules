@@ -291,8 +291,22 @@ return {
 				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
-		vg = {
+		mw4 = {
 			order = 20,
+			abbreviation = 'MW4',
+			name = 'Modern Warfare 4',
+			link = 'Call of Duty: Modern Warfare 4',
+			logo = {
+				darkMode = 'COD MW4 default allmode.png',
+				lightMode = 'COD MW4 default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
+			},
+		},
+		vg = {
+			order = 21,
 			abbreviation = 'VG',
 			name = 'Vanguard',
 			link = 'Call of Duty: Vanguard',
@@ -306,7 +320,7 @@ return {
 			},
 		},
 		waw = {
-			order = 21,
+			order = 22,
 			abbreviation = 'WaW',
 			name = 'World at War',
 			link = 'Call of Duty: World at War',
@@ -320,7 +334,7 @@ return {
 			},
 		},
 		wwii = {
-			order = 22,
+			order = 23,
 			abbreviation = 'WWII',
 			name = 'WWII',
 			link = 'Call of Duty: WWII',
@@ -334,7 +348,7 @@ return {
 			},
 		},
 		wz = {
-			order = 23,
+			order = 24,
 			abbreviation = 'WZ',
 			name = 'Warzone',
 			link = 'Call of Duty: Warzone',
@@ -348,7 +362,7 @@ return {
 			},
 		},
 		wzm = {
-			order = 24,
+			order = 25,
 			abbreviation = 'WZM',
 			name = 'Warzone Mobile',
 			link = 'Call of Duty: Warzone Mobile',
@@ -362,7 +376,7 @@ return {
 			},
 		},
 		online = {
-			order = 25,
+			order = 26,
 			abbreviation = 'CODOL',
 			name = 'Call of Duty Online',
 			link = 'Call of Duty Online',
