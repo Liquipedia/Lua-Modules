@@ -196,6 +196,12 @@ local factionPropsAoE2 = {
 		name = 'Cumans',
 		faction = 'cumans',
 	},
+	danes = {
+		index = 4,
+		name = 'Danes',
+		pageName = 'Danes' .. AOE2_SUFFIX,
+		faction = 'danes',
+	},
 	dravidians = {
 		index = 16,
 		name = 'Dravidians',
@@ -361,6 +367,11 @@ local factionPropsAoE2 = {
 		name = 'Saracens',
 		faction = 'saracens',
 	},
+	saxons  = {
+		index = 4,
+		name = 'saxons',
+		faction = 'saxons',
+	},
 	shu = {
 		index = 47,
 		name = 'Shu',
@@ -412,6 +423,11 @@ local factionPropsAoE2 = {
 		name = 'Turks',
 		faction = 'turks',
 	},
+	varangians  = {
+		index = 4,
+		name = 'Varangians',
+		faction = 'varangians',
+	},
 	vietnamese = {
 		index = 57,
 		name = 'Vietnamese',
@@ -458,8 +474,14 @@ local factionPropsAoE3 = {
 		pageName = 'Chinese' .. AOE3_SUFFIX,
 		faction = 'chinese',
 	},
-	dutch = {
+	danes = {
 		index = 4,
+		name = 'Danes',
+		pageName = 'Danes' .. AOE3_SUFFIX,
+		faction = 'danes',
+	},
+	dutch = {
+		index = 5,
 		name = 'Dutch',
 		faction = 'dutch',
 	},
@@ -535,6 +557,12 @@ local factionPropsAoE3 = {
 		name = 'Ottomans',
 		pageName = 'Ottomans' .. AOE3_SUFFIX,
 		faction = 'ottomans',
+	},
+	poles = {
+		index = 4,
+		name = 'Poles',
+		pageName = 'Poles' .. AOE3_SUFFIX,
+		faction = 'poles',
 	},
 	portuguese = {
 		index = 18,
@@ -684,6 +712,11 @@ local factionPropsAoE4 = {
 		name = 'Rus',
 		faction = 'rus',
 	},
+	scots = {
+		index = 4,
+		name = 'Scots',
+		faction = 'scots',
+	},
 	sengokudaimyo = {
 		index = 21,
 		name = 'Sengoku Daimyo',
@@ -693,6 +726,12 @@ local factionPropsAoE4 = {
 		index = 22,
 		name = 'Tughlaq Dynasty',
 		faction = 'tughlaqdynasty',
+	},
+	vikings  = {
+		index = 4,
+		name = 'Vikings',
+		pageName = 'Vikings' .. AOE4_SUFFIX,
+		faction = 'vikings',
 	},
 	zhuxislegacy = {
 		index = 23,
