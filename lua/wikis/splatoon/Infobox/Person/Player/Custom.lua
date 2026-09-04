@@ -22,7 +22,7 @@ local Cell = Widgets.Cell
 
 local SIZE_WEAPON = '25x25px'
 
----@class SplatoonInfoboxPlayer: Person
+---@class SplatoonInfoboxPlayer: InfoboxPerson
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
