@@ -180,13 +180,21 @@ function StatisticsPortal.coverageStatistics(args)
 	args = args or {}
 	args.alignSide = Logic.readBool(args.alignSide)
 
-	return Box{
-		paddingRight = args.alignSide and '2em' or nil,
-		children = {
-			StatisticsPortal.coverageTournamentTable(args),
-			StatisticsPortal.coverageMatchTable(args)
-		}
+	local statsChildren = {
+		StatisticsPortal.coverageTournamentTable(args),
+		StatisticsPortal.coverageMatchTable(args)
 	}
+
+	if args.alignSide then
+		return Box{
+			paddingRight = '2em',
+			children = statsChildren,
+		}
+	else
+		return Html.Div{
+			children = statsChildren,
+		}
+	end
 end
 
 
