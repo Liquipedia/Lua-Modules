@@ -9,12 +9,14 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Lpdb = Lua.import('Module:Lpdb')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 local Tier = Lua.import('Module:Tier/Custom')
+local Variables = Lua.import('Module:Variables')
 
 local Tournament = {}
 
@@ -27,16 +29,19 @@ local TOURNAMENT_PHASE = {
 
 ---@class StandardTournamentPartial
 ---@field displayName string
+---@field tickerName string?
 ---@field shortName string?
 ---@field fullName string
 ---@field pageName string
 ---@field icon string?
 ---@field iconDark string?
 ---@field series string?
----@field liquipediaTier integer|string|nil
+---@field liquipediaTier string?
 ---@field liquipediaTierType string?
 ---@field game string?
 ---@field publisherTier string?
+---@field type string?
+---@field mode string?
 
 ---@class StandardTournament: StandardTournamentPartial
 ---@field startDate {year: integer, month: integer?, day: integer?, timestamp: integer?}?
@@ -105,22 +110,49 @@ local TournamentMT = {
 	end
 }
 
+---@return StandardTournamentPartial
+Tournament.partialTournamentFromContext = FnUtil.memoize(function ()
+	local fullName = Variables.varDefault('tournament_name')
+	local parent = Variables.varDefault('tournament_parent')
+	local tickerName = Variables.varDefault('tournament_tickername')
+
+	return {
+		displayName = Logic.emptyOr(tickerName, fullName) or (parent or ''):gsub('_', ' '),
+		tickerName = tickerName,
+		shortName = Variables.varDefault('tournament_shortname'),
+		fullName = fullName,
+		pageName = parent,
+		liquipediaTier = Variables.varDefault('tournament_liquipediatier'),
+		liquipediaTierType = Variables.varDefault('tournament_liquipediatiertype'),
+		icon = Variables.varDefault('tournament_icon'),
+		iconDark = Variables.varDefault('tournament_icondark'),
+		series = Variables.varDefault('tournament_series'),
+		game = Variables.varDefault('tournament_game'),
+		publisherTier = Variables.varDefault('tournament_publishertier'),
+		type = Variables.varDefault('tournament_type'),
+		mode = Variables.varDefault('tournament_mode'),
+	}
+end)
+
 ---@param match MatchGroupUtilMatch
 ---@return StandardTournamentPartial
 function Tournament.partialTournamentFromMatch(match)
 	---@type StandardTournamentPartial
 	return {
 		displayName = Logic.emptyOr(match.tickername, match.tournament) or (match.parent or ''):gsub('_', ' '),
+		tickerName = match.tickername,
 		shortName = match.shortname,
 		fullName = match.tournament,
 		pageName = match.parent,
-		liquipediaTier = Tier.toIdentifier(match.liquipediatier),
-		liquipediaTierType = Tier.toIdentifier(match.liquipediatiertype) --[[ @as string? ]],
+		liquipediaTier = match.liquipediatier,
+		liquipediaTierType = match.liquipediatiertype,
 		icon = match.icon,
 		iconDark = match.iconDark,
 		series = match.series,
 		game = match.game,
 		publisherTier = match.publisherTier,
+		type = match.type,
+		mode = match.mode,
 	}
 end
 
@@ -134,17 +166,19 @@ function Tournament.tournamentFromRecord(record)
 
 	local tournament = {
 		displayName = Logic.emptyOr(record.tickername, record.name) or record.pagename:gsub('_', ' '),
+		tickerName = Logic.nilIfEmpty(record.tickername),
 		shortName = Logic.nilIfEmpty(record.shortname),
 		fullName = record.name,
 		pageName = record.pagename,
 		startDate = startDate,
 		endDate = endDate,
-		liquipediaTier = Tier.toIdentifier(tier),
-		liquipediaTierType = Tier.toIdentifier(tierType) --[[ @as string? ]],
+		liquipediaTier = tier,
+		liquipediaTierType = tierType,
 		publisherTier = record.publishertier,
 		locations = record.locations,
 		region = (record.locations or {}).region1,
 		type = record.type,
+		mode = record.mode,
 		status = record.status,
 		icon = record.icon,
 		iconDark = record.icondark,
@@ -229,7 +263,7 @@ function Tournament.isFeatured(record)
 	if Table.includes(curatedData.include, pagename) then
 		return true
 	end
-	if Table.includes({1, 2}, record.liquipediaTier) then
+	if Table.includes({1, 2}, Tier.toIdentifier(record.liquipediaTier)) then
 		return true
 	end
 

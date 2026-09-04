@@ -17,17 +17,20 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
+local Tournament = Lua.import('Module:Tournament')
+local TournamentStructure = Lua.import('Module:TournamentStructure')
 local Variables = Lua.import('Module:Variables')
 
-local Opponent = Lua.import('Module:Opponent/Custom')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
-
 local Import = Lua.import('Module:ParticipantTable/Import')
-local PlayerExt = Lua.import('Module:Player/Ext/Custom')
-local TournamentStructure = Lua.import('Module:TournamentStructure')
+
+local Html = Lua.import('Module:Widget/Html')
+local Entry = Lua.import('Module:Widget/Participants/Table/Entry')
+local SectionTitle = Lua.import('Module:Widget/Participants/Table/SectionTitle')
 
 local pageVars = PageVariableNamespace('ParticipantTable')
 local prizePoolVars = PageVariableNamespace('PrizePool')
@@ -54,7 +57,7 @@ local prizePoolVars = PageVariableNamespace('PrizePool')
 
 ---@class ParticipantTableSection
 ---@field config ParticipantTableConfig
----@field entries ParticipantTableEntry
+---@field entries ParticipantTableEntry[]
 
 ---@class ParticipantTableEntry
 ---@field opponent standardOpponent
@@ -65,7 +68,7 @@ local prizePoolVars = PageVariableNamespace('PrizePool')
 ---@field isResolved boolean?
 ---@field sortName string
 
----@class ParticipantTable
+---@class ParticipantTable: BaseClass
 ---@operator call(Frame): ParticipantTable
 ---@field args table
 ---@field config ParticipantTableConfig
@@ -270,19 +273,21 @@ end
 function ParticipantTable:store()
 	if self.config.noStorage then return self end
 
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
 	local lpdbTournamentData = {
-		tournament = Variables.varDefault('tournament_name'),
-		parent = Variables.varDefault('tournament_parent'),
-		series = Variables.varDefault('tournament_series'),
+		tournament = tournamentContext.fullName,
+		parent = tournamentContext.pageName,
+		series = tournamentContext.series,
 		startdate = Variables.varDefault('tournament_startdate'),
-		mode = Variables.varDefault('tournament_mode'),
-		type = Variables.varDefault('tournament_type'),
-		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
-		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
-		publishertier = Variables.varDefault('tournament_publishertier'),
-		icon = Variables.varDefault('tournament_icon'),
-		icondark = Variables.varDefault('tournament_icondark'),
-		game = Variables.varDefault('tournament_game'),
+		mode = tournamentContext.mode,
+		type = tournamentContext.type,
+		liquipediatier = tournamentContext.liquipediaTier,
+		liquipediatiertype = tournamentContext.liquipediaTierType,
+		publishertier = tournamentContext.publisherTier,
+		icon = tournamentContext.icon,
+		icondark = tournamentContext.iconDark,
+		game = tournamentContext.game,
 		prizepoolindex = tonumber(Variables.varDefault('prizepool_index')) or 0,
 	}
 
@@ -371,7 +376,6 @@ function ParticipantTable:create()
 
 	self.display = mw.html.create('div')
 		:addClass('participantTable')
-		:css('max-width', '100%!important')
 		:css('width', config.width)
 		:node(config.showTitle and
 			mw.html.create('div'):addClass('participantTable-title'):wikitext(config.title or 'Participants')
@@ -403,14 +407,14 @@ function ParticipantTable:displaySection(section)
 	local sectionNode = ParticipantTable.newSectionNode()
 
 	Array.forEach(entries, function(entry, entryIndex)
-		sectionNode:node(self:displayEntry(entry):css('width', self.config.columnWidth))
+		sectionNode:node(self:displayEntry(entry, nil, true))
 	end)
 
 	local tbdsAdded = 0
 	if section.config.count and section.config.count > sectionEntryCount then
 		Array.forEach(Array.range(sectionEntryCount + 1, section.config.count), function(index)
 			tbdsAdded = tbdsAdded + 1
-			sectionNode:node(self:tbdEntry():css('width', self.config.columnWidth))
+			sectionNode:node(self:tbdEntry(true))
 		end)
 	end
 
@@ -429,50 +433,43 @@ function ParticipantTable:tbd()
 		:wikitext('To be determined')
 end
 
----@return Html
+---@return VNode
 function ParticipantTable:empty()
-	return mw.html.create('div'):addClass('participantTable-entry participantTable-empty')
+	return Html.Div{
+		classes = {'participantTable-entry', 'participantTable-empty'}
+	}
 end
 
 ---@param section ParticipantTableSection
 ---@param amountOfEntries number
----@return Html?
+---@return VNode
 function ParticipantTable:sectionTitle(section, amountOfEntries)
-	if Logic.isEmpty(section.config.title) or section.config.title == self.config.title then
-		return
-	end
-
-	local title = mw.html.create('div'):addClass('participantTable-title'):wikitext(section.config.title)
-
-	if not section.config.showCountBySection then return title end
-
-	return title:tag('i'):wikitext(' (' .. (section.config.count or amountOfEntries) .. ')'):done()
+	return SectionTitle{tableConfig = self.config, sectionConfig = section.config, numEntries = amountOfEntries}
 end
 
----@return Html
-function ParticipantTable:tbdEntry()
-	return mw.html.create('div')
-		:addClass('participantTable-entry')
-		:node(OpponentDisplay.BlockOpponent{
-			opponent = Opponent.tbd(),
-		})
+---@param useDefaultWidth boolean?
+---@return VNode
+function ParticipantTable:tbdEntry(useDefaultWidth)
+	return Entry{
+		config = self.config,
+		opponent = Opponent.tbd(),
+		useDefaultWidth = useDefaultWidth,
+	}
 end
 
 ---@param entry ParticipantTableEntry
 ---@param additionalProps table?
----@return Html
-function ParticipantTable:displayEntry(entry, additionalProps)
-	additionalProps = additionalProps or {}
-
-	return mw.html.create('div')
-		:addClass('participantTable-entry brkts-opponent-hover')
-		:attr('aria-label', entry.name)
-		:node(OpponentDisplay.BlockOpponent(Table.merge(additionalProps, {
-			dq = entry.dq,
-			note = entry.note,
-			showPlayerTeam = self.config.showTeams,
-			opponent = entry.opponent,
-		})))
+---@param useDefaultWidth boolean?
+---@return VNode
+function ParticipantTable:displayEntry(entry, additionalProps, useDefaultWidth)
+	return Entry{
+		config = self.config,
+		dq = entry.dq,
+		note = entry.note,
+		opponent = entry.opponent,
+		additionalProps = additionalProps,
+		useDefaultWidth = useDefaultWidth,
+	}
 end
 
 ---@param entries ParticipantTableEntry[]

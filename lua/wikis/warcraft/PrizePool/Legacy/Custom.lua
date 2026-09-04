@@ -14,7 +14,7 @@ local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
-local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l', q = 'q'}
+local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l'}
 
 local CustomLegacyPrizePool = {}
 
@@ -22,7 +22,7 @@ local _cache
 local TBD = 'TBD'
 
 -- Template entry point
----@return Widget
+---@return VNode
 function CustomLegacyPrizePool.run()
 	return LegacyPrizePool.run(CustomLegacyPrizePool)
 end
@@ -145,12 +145,12 @@ function CustomLegacyPrizePool._readOpponentArgs(props)
 		if not nameInput then
 			return nil
 		end
-		nameInput = mw.text.split(nameInput, '|')
+		local nameInputArray = Array.parseCommaSeparatedString(nameInput, '|')
 
 		return {
 			type = _cache.opponentType,
-			[1] = nameInput[#nameInput],
-			link = slot[prefix .. 'link' .. opponentIndex] or slot[prefix .. opponentIndex .. 'link'] or nameInput[1],
+			[1] = nameInputArray[#nameInputArray],
+			link = slot[prefix .. 'link' .. opponentIndex] or slot[prefix .. opponentIndex .. 'link'] or nameInputArray[1],
 			flag = slot[prefix .. 'flag' .. opponentIndex] or slot[prefix .. opponentIndex .. 'flag'],
 			team = slot[prefix .. 'team' .. opponentIndex] or slot[prefix .. opponentIndex .. 'team'],
 			race = slot[prefix .. 'race' .. opponentIndex] or slot[prefix .. opponentIndex .. 'race'],

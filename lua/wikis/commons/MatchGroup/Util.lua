@@ -236,6 +236,8 @@ MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed
 ---@field winner integer?
 ---@field status string?
 ---@field extradata table?
+---@field timestamp number
+---@field timezoneId string?
 
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',
@@ -283,6 +285,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field shortname string?
 ---@field status MatchStatus
 ---@field stream table
+---@field submatches MatchGroupUtilSubgroup[]
 ---@field tickername string?
 ---@field tournament string?
 ---@field type string?
@@ -609,6 +612,7 @@ function MatchGroupUtil.matchFromRecord(record)
 	}
 
 	match.phase = MatchGroupUtil.computeMatchPhase(match)
+	match.submatches = MatchGroupUtil.groupBySubgroup(match)
 
 	return match
 end
@@ -718,7 +722,7 @@ function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 end
 
 ---@param args table
----@return table
+---@return standardOpponent
 function MatchGroupUtil.createOpponent(args)
 	return {
 		extradata = args.extradata or {},
@@ -772,6 +776,8 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 		status = nilIfEmpty(record.status),
 		scores = Json.parseIfString(record.scores) or {},
 		subgroup = tonumber(record.subgroup),
+		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
+		timezoneId = Table.extract(extradata, 'timezoneid'),
 		type = nilIfEmpty(record.type),
 		vod = nilIfEmpty(record.vod),
 		walkover = nilIfEmpty(record.walkover) and record.walkover:lower() or nil,
