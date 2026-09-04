@@ -687,8 +687,16 @@ div.brkts-popup-body-element-thumbs {
 		&:nth-of-type( even ) {
 			background-color: var( --clr-on-surface-light-primary-4 );
 
+			.brkts-popup-body-grid-row-collapsible {
+				background-color: var( --clr-secondary-100 );
+			}
+
 			.theme--dark & {
 				background-color: var( --clr-on-surface-dark-primary-4 );
+
+				.brkts-popup-body-grid-row-collapsible {
+					background-color: var( --clr-secondary-16 );
+				}
 			}
 		}
 
@@ -715,6 +723,42 @@ div.brkts-popup-body-element-thumbs {
 			> .brkts-popup-spaced:nth-last-of-type( 1 ) {
 				flex-direction: row-reverse;
 				justify-content: flex-start;
+			}
+		}
+
+		&-collapsible {
+			display: grid;
+			grid-column: 1 / -1;
+			grid-template-columns: subgrid;
+			background-color: var( --clr-on-surface-light-primary-4 );
+			border-radius: 0.5rem;
+			padding: 0.25rem;
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+			}
+
+			&-title {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				grid-column: 1 / -1;
+			}
+
+			&:not( .collapsed ) .should-collapse {
+				display: grid;
+				grid-column: 1 / -1;
+				grid-template-columns: subgrid;
+				padding: 0.25rem;
+
+				&:has( > :only-child ) {
+					display: contents;
+
+					> :only-child {
+						grid-column: 1 / -1;
+						padding: 0.25rem;
+					}
+				}
 			}
 		}
 	}
