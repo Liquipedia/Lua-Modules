@@ -122,7 +122,7 @@ function MedalStats:_getConditionConfig(args)
 		startDate = args.sdate,
 		additionalConditions = args.additionalConditions or '',
 		opponentTypes = Array.parseCommaSeparatedString(args.opponentType),
-		hasNumber = Logic.isNumeric(args.offset) or Logic.isNumeric(args.limit) or not Logic.readBool(args.noNumber),
+		hasNumber = Logic.isNumeric(args.offset) or Logic.isNumeric(args.limit),
 	}
 end
 
