@@ -12,6 +12,8 @@ local Date = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
 local I18n = Lua.import('Module:I18n')
+local Image = Lua.import('Module:Image')
+local Links = Lua.import('Module:Links')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local PlayerDisplay = Lua.import('Module:Player/Display')
@@ -25,6 +27,7 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local DisplayHelper = {}
+local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {loadData = true})
 local NONBREAKING_SPACE = '&nbsp;'
 
 local Html = Lua.import('Module:Widget/Html')
@@ -274,6 +277,67 @@ function DisplayHelper.MapScore(opponent, gameStatus)
 		return opponent.status
 	end
 	return opponent.score and tostring(opponent.score) or ''
+end
+
+---@param link string
+---@param icon string
+---@param iconDark string?
+---@param text string
+---@param class string?
+---@return string?
+function DisplayHelper.makeLinkDisplay(link, icon, iconDark, text, class)
+	return Image.display(icon, iconDark, {
+		link = link, size = '32px', caption = text, alt = link, class = class
+	})
+end
+
+---@param links table<string, string|table>
+---@return Renderable[]
+function DisplayHelper.makeLinksDisplay(links)
+	local linkDisplays = {}
+
+	local makeAndSaveLink = function(link, icon, iconDark, text, class)
+		local display = DisplayHelper.makeLinkDisplay(link, icon, iconDark, text, class)
+		table.insert(linkDisplays, display)
+	end
+
+	local processLink = function(linkType, link)
+		local currentLinkData = Links.getMatchIconData(linkType)
+		if not currentLinkData then
+			mw.log('Unknown link: ' .. linkType)
+		elseif type(link) == 'table' then
+			for gameIdx, gameLink in Table.iter.spairs(link) do
+				local newText = currentLinkData.text .. ' on Game ' .. gameIdx
+				makeAndSaveLink(gameLink, currentLinkData.icon, currentLinkData.iconDark, newText)
+			end
+		else
+			-- Temporary during MW/LH Migrations
+			local class
+			if linkType == 'headtohead_lh' then
+				class = 'hide-when-mediawiki'
+			elseif linkType == 'headtohead' then
+				class = 'hide-when-lighthouse'
+			end
+			makeAndSaveLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text, class)
+		end
+	end
+
+	local processedLinks = {}
+	Array.forEach(MATCH_LINK_PRIORITY, function(linkType)
+		for linkKey, link in Table.iter.pairsByPrefix(links, linkType, {requireIndex = false}) do
+			processLink(linkKey, link)
+			processedLinks[linkKey] = true
+		end
+	end)
+
+	for linkKey, link in Table.iter.spairs(links) do
+		-- Handle links not already processed via priority list
+		if not processedLinks[linkKey] then
+			processLink(linkKey, link)
+		end
+	end
+
+	return linkDisplays
 end
 
 --[[

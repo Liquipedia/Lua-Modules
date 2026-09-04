@@ -16,7 +16,6 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
 local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
-local Links = Lua.import('Module:Links')
 local MatchTable = Lua.import('Module:MatchTable')
 local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
@@ -184,29 +183,6 @@ function BaseMatchPage:getCountdownBlock()
 			rawdatetime = (not self.matchData.dateIsExact) or self.matchData.finished,
 		}
 	}
-end
-
----@private
----@param site string
----@param link string
----@return {icon: string, iconDark: string?, link: string, text: string}?
-function BaseMatchPage._processLink(site, link)
-	return Table.mergeInto({link = link}, Links.getMatchIconData(site))
-end
-
----Creates an object array for links
----@private
----@return {icon: string, iconDark: string?, link: string, text: string}[]
-function BaseMatchPage:_parseLinks()
-	return Array.flatMap(Table.entries(self.matchData.links), function(linkData)
-		local site, link = unpack(linkData)
-		if type(link) == 'table' then
-			return Array.map(link, function(sublink)
-				return BaseMatchPage._processLink(site, sublink)
-			end)
-		end
-		return {BaseMatchPage._processLink(site, link)}
-	end)
 end
 
 ---@protected
@@ -461,7 +437,7 @@ end
 ---@return VNode
 function BaseMatchPage:footer()
 	local vods = self:getVods()
-	local parsedLinks = self:_parseLinks()
+	local matchLinks = DisplayHelper.makeLinksDisplay(self.matchData.links)
 	local patchLink = self:getPatchLink()
 
 	return Footer{
@@ -471,16 +447,10 @@ function BaseMatchPage:footer()
 				header = 'VODs',
 				children = vods
 			} or nil,
-			Logic.isNotEmpty(parsedLinks) and AdditionalSection{
+			Logic.isNotEmpty(matchLinks) and AdditionalSection{
 				header = 'Links',
 				bodyClasses = { 'vodlink' },
-				children = Array.map(parsedLinks, function (parsedLink)
-					return Html.Span{children = IconImage{
-						imageLight = parsedLink.icon,
-						imageDark = (parsedLink.iconDark or parsedLink.icon),
-						link = parsedLink.link
-					}}
-				end)
+				children = matchLinks,
 			} or nil,
 			patchLink and AdditionalSection{
 				header = 'Patch',
