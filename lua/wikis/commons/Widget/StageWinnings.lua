@@ -48,6 +48,7 @@ local NON_BREAKING_SPACE = '&nbsp;'
 ---@field pointsPerWin number?
 ---@field points2Start number?
 ---@field points2PerWin number?
+---@field gameCountDefaultResult number?
 ---@field n-m number? # n amd m integers
 ---@field n-m_points number? # n amd m integers
 ---@field n-m_points2 number? # n amd m integers
@@ -121,6 +122,7 @@ function StageWinnings:render()
 		pointsPerWin = tonumber(props.pointsPerWin) or 0,
 		points2PerWin = tonumber(props.points2PerWin) or 0,
 		hideWinnings = Logic.readBool(props.hideWinnings),
+		gameCountDefaultResult = tonumber(props.gameCountDefaultResult) or 0,
 	}
 
 	if Logic.isNotEmpty(props.localcurrency) and Logic.readBool(props.autoexchange) then

@@ -8,8 +8,9 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent/Custom')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local Condition = Lua.import('Module:Condition')
@@ -24,7 +25,8 @@ local StageWinningsCalculation = {}
 ---@param props {matchGroupsSpecProps: table<string, string>, startDate: integer?, endDate: integer?, mode: string,
 ---startValue: number, valuePerWin: number, valueByScore: table<string, number>?,
 ---pointsStart: number, pointsPerWin: number, pointsByScore: table<string, number>?,
----points2Start: number, points2PerWin: number, points2ByScore: table<string, number>?, hideWinnings: boolean}
+---points2Start: number, points2PerWin: number, points2ByScore: table<string, number>?,
+---gameCountDefaultResult: number, hideWinnings: boolean}
 ---@return {opponent: standardOpponent, matchWins: integer, matchLosses: integer, matchDraws: integer,
 ---gameWins: integer, gameLosses: integer, winnings: number, scoreDetails: table<string, integer>,
 ---points: number, points2: number}[]
@@ -66,8 +68,8 @@ function StageWinningsCalculation.run(props)
 		local opponent1 = match.opponents[1]
 		local opponent2 = match.opponents[2]
 
-		local opponent1Score = OpponentDisplay.InlineScore(opponent1)
-		local opponent2Score = OpponentDisplay.InlineScore(opponent2)
+		local opponent1Score = Opponent.getScoreValue(opponent1)
+		local opponent2Score = Opponent.getScoreValue(opponent2)
 
 		local score = opponent1Score .. '-' .. opponent2Score
 		local reversedScore = opponent2Score .. '-' .. opponent1Score
@@ -86,10 +88,22 @@ function StageWinningsCalculation.run(props)
 			byName[opponent2.name].matchDraws = byName[opponent2.name].matchDraws + 1
 		end
 
-		byName[opponent1.name].gameWins = byName[opponent1.name].gameWins + (tonumber(opponent1.score) or 0)
-		byName[opponent2.name].gameLosses = byName[opponent2.name].gameLosses + (tonumber(opponent1.score) or 0)
-		byName[opponent1.name].gameLosses = byName[opponent1.name].gameLosses + (tonumber(opponent2.score) or 0)
-		byName[opponent2.name].gameWins = byName[opponent2.name].gameWins + (tonumber(opponent2.score) or 0)
+		local numberOfGamesForScoreValue = function(scoreValue)
+			if Logic.isNumeric(scoreValue) then
+				return tonumber(scoreValue)
+			elseif Logic.isEmpty(scoreValue) or scoreValue ~= MatchGroupInputUtil.STATUS.DEFAULT_WIN then
+				return 0
+			end
+			return props.gameCountDefaultResult
+		end
+
+		local gamesWonOpponent1 = numberOfGamesForScoreValue(opponent1Score)
+		local gamesWonOpponent2 = numberOfGamesForScoreValue(opponent2Score)
+
+		byName[opponent1.name].gameWins = byName[opponent1.name].gameWins + gamesWonOpponent1
+		byName[opponent2.name].gameLosses = byName[opponent2.name].gameLosses + gamesWonOpponent1
+		byName[opponent1.name].gameLosses = byName[opponent1.name].gameLosses + gamesWonOpponent2
+		byName[opponent2.name].gameWins = byName[opponent2.name].gameWins + gamesWonOpponent2
 	end)
 
 	local opponents = Array.extractValues(byName)
