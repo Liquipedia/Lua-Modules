@@ -369,7 +369,7 @@ local factionPropsAoE2 = {
 	},
 	saxons  = {
 		index = 48,
-		name = 'saxons',
+		name = 'Saxons',
 		faction = 'saxons',
 	},
 	shu = {
