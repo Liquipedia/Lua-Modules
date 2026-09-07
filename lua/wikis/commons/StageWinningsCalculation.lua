@@ -53,7 +53,7 @@ function StageWinningsCalculation.run(props)
 	local opponents = {}
 
 	local function getOpponentIndex(opponent)
-		return Array.find(opponents, function(entry)
+		return Array.indexOf(opponents, function(entry)
 			return Opponent.same(opponent, entry.opponent)
 		end)
 	end
@@ -65,7 +65,7 @@ function StageWinningsCalculation.run(props)
 			opponent.status = match.match2opponents[matchOpponentIndex].status
 
 			opponent.globalIndex = getOpponentIndex(opponent)
-			if not opponent.globalIndex then
+			if opponent.globalIndex == 0 then
 				opponent.globalIndex = #opponents + 1
 				table.insert(opponents, {
 					opponent = opponent,
