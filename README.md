@@ -17,29 +17,28 @@ Everything runs in a [devcontainer](https://containers.dev/). You install Docker
 
 **Linux**
 
-Docker Engine
+- Install Docker Engine with
 ```bash
 curl -fsSL https://get.docker.com | sh
 sudo usermod -aG docker "$USER"
 ```
-
-Log out and back in, or `docker` says permission denied.
+- Log out and back in, or `docker` says permission denied.
 
 **macOS**
-[Docker Desktop](https://www.docker.com/products/docker-desktop/)
-OR
+- Install using [Docker Desktop]https://www.docker.com/products/docker-desktop/
+- OR using Homebrew
 ```bash
 brew install --cask docker
 ```
 
 **Windows**
-- [WSL 2](https://learn.microsoft.com/en-us/windows/wsl/install)
-- then [Docker Desktop](https://www.docker.com/products/docker-desktop/) with the WSL 2 backend enabled.
+- Install [WSL 2](https://learn.microsoft.com/en-us/windows/wsl/install)
+- then install [Docker Desktop](https://www.docker.com/products/docker-desktop/) with the WSL 2 backend enabled.
 
 #### 2. Install VS Code
 
-1. [VS Code](https://code.visualstudio.com/download).
-2. The [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
+1. Install [VS Code](https://code.visualstudio.com/download).
+2. and the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
 
 Nothing else — recommended extensions install themselves inside the container.
 
@@ -59,11 +58,11 @@ wsl
 git clone https://github.com/Liquipedia/Lua-Modules.git ~/Lua-Modules
 ```
 
-#### 4. Open it in the container
+#### 4. Open the repo in the container
 
 1. Open the folder in VS Code. On Windows run `code ~/Lua-Modules` from inside WSL.
 2. Click **Reopen in Container** on the prompt, or press <kbd>F1</kbd> and pick *Dev Containers: Reopen in Container*.
-3. Wait for the build. It then installs dependencies, builds the CSS and JS, and creates `.env` for you.
+3. Wait for the build (~5 min first time). It then installs dependencies, builds the CSS and JS, and creates `.env` for you.
 
 #### 5. Check it works
 
