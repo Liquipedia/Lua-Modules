@@ -23,11 +23,13 @@ curl -fsSL https://get.docker.com | sh
 sudo usermod -aG docker "$USER"
 ```
 
+Log out and back in, or `docker` says permission denied.
+
 **macOS**
 [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 OR
 ```bash
-brew install --cask docker`
+brew install --cask docker
 ```
 
 **Windows**
