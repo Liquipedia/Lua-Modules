@@ -59,7 +59,7 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 	await page.goto(`file://${htmlPath}`, {waitUntil: "networkidle"});
 	const lightScreenshotBuffer = await page.screenshot({ animations: 'disabled' });
 
-	await page.locator('html').evaluate(element => element.classList.add('theme--dark'));
+	await page.locator('html').evaluate(element => {element.classList.add('theme--dark'); element.classList.remove('theme--light');});
 	const darkScreenshotBuffer = await page.screenshot({ animations: 'disabled' });
 
 	await browser.close();
