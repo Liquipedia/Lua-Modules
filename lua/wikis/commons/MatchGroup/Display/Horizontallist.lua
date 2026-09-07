@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Date = Lua.import('Module:Date/Ext')
+local FeatureFlag = Lua.import('Module:FeatureFlag')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
@@ -119,6 +120,7 @@ function HorizontallistDisplay.Bracket(props)
 		attributes = {
 			['data-js-battle-royale-id'] = props.bracketId,
 			['data-js-battle-royale-init-tab'] = selectedMatchIdx - 1, -- Convert to 0-index
+			['data-js-battle-royale-dev'] = tostring(FeatureFlag.get('dev')),
 		},
 		children = {
 			bracketNode,

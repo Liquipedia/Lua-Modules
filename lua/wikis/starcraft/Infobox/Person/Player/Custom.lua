@@ -52,10 +52,15 @@ local BOT_INFORMATION_TYPE = 'Bot'
 -- race stuff
 local AVAILABLE_RACES = Array.append(Faction.knownFactions, 'total')
 
----@class StarcraftInfoboxPlayer: Person
+---@class StarcraftInfoboxPlayer: InfoboxPerson
+---@operator call(Frame): StarcraftInfoboxPlayer
 ---@field achievements placement[]
 ---@field awardAchievements placement[]
 local CustomPlayer = Class.new(Player)
+
+---@class StarcraftInfoboxPlayerWidgetInjector: WidgetInjector
+---@operator call(StarcraftInfoboxPlayer): StarcraftInfoboxPlayerWidgetInjector
+---@field caller StarcraftInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -109,7 +114,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param args table
----@return Widget[]
+---@return VNode[]
 function CustomPlayer:_addCustomCells(args)
 	if args.informationType == BOT_INFORMATION_TYPE then
 		return {
@@ -131,15 +136,16 @@ function CustomPlayer:_addCustomCells(args)
 		and Namespace.isMain() and self:_getMatchupData() or nil
 
 	local currentYearEarnings = self.earningsPerYear[CURRENT_YEAR]
+	local currentYearEarningsDisplay
 	if currentYearEarnings then
 		currentYearEarnings = Math.round(currentYearEarnings)
-		currentYearEarnings = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
+		currentYearEarningsDisplay = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
 	end
 
 	return {
 		Cell{
 			name = 'Approx. Winnings ' .. CURRENT_YEAR,
-			children = {currentYearEarnings}
+			children = {currentYearEarningsDisplay}
 		},
 		Cell{name = 'Years active', children = {yearsActive}}
 	}

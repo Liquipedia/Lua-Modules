@@ -6,7 +6,7 @@ jobs:
   update-snapshots:
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.61.1-noble
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
 
     permissions:
       contents: write
@@ -35,7 +35,7 @@ jobs:
           luaVersion: '5.1'
 
       - name: Setup node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: lts/*
 
