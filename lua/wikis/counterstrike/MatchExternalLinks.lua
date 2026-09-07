@@ -240,14 +240,6 @@ return {
 		label = 'Matchpage and Stats on Cispracs',
 		isMapStats = true
 	},
-	{
-		name = 'fragnet',
-		icon = 'Fragnet lightmode.png',
-		iconDark = 'Fragnet darkmode.png',
-		prefixLink = 'https://arena.fragnet.net/en/match/',
-		label = 'Matchpage and Stats on Fragnet',
-		isMapStats = true
-	},
 	{},
 	{
 		name = 'hltvlegacy',
