@@ -1,8 +1,18 @@
 return {
 	configfile = '.luacov',
-	includeuntestedfiles = {'standard'},
-	include = {'standard/*'},
-	exclude = {'wikis/*'},
+	-- Report modules no spec ever loads as 0%, so coverage reflects all of commons
+	-- rather than only the files the suite happens to touch.
+	includeuntestedfiles = {'wikis/commons'},
+	include = {'wikis/commons/'},
+	exclude = {
+		'spec/',
+		'definitions/',
+		'3rd/',
+		'plugins/',
+		'test_assets/',
+		-- ScribuntoUnit testcases that run on-wiki, not under busted.
+		'wikis/commons/test/',
+	},
 	runreport = false, -- Don't work properly for some reason, have to do a manual `luacov` call afterwards
-	deletestats = true,
+	deletestats = false, -- Keep stats so the report can be regenerated / inspected after a run
 }
