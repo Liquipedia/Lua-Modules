@@ -39,12 +39,14 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 DEFAULT_ROOT = REPO_ROOT / "lua" / "wikis"
 COMMONS = "commons"
 
-EXPORTED_FUNCTION = re.compile(r"\bfunction\b")
-LOCAL_FUNCTION = re.compile(
-    r"^[ \t]*local[ \t]+(?:function|[A-Za-z_][A-Za-z0-9_]*[ \t]*=[ \t]*function)"
-)
-LOCAL_FUNCTION_NAME = re.compile(r"^[ \t]*local[ \t]+function[ \t]+([A-Za-z_]\w*)")
+# A definition is the `function` keyword followed by an optional name and `(`.
+# Matching the bare keyword would also catch prose in comments.
+FUNCTION_DEF = re.compile(r"\bfunction\b\s*[A-Za-z_][\w.:]*\s*\(|\bfunction\b\s*\(")
+# Both local forms, so a local exported via `return` is found either way.
+LOCAL_DEF = re.compile(r"^[ \t]*local[ \t]+function[ \t]+([A-Za-z_]\w*)")
+LOCAL_ASSIGN = re.compile(r"^[ \t]*local[ \t]+([A-Za-z_]\w*)[ \t]*=[ \t]*function\b")
 RETURN_STATEMENT = re.compile(r"^[ \t]*return\b")
+LINE_COMMENT = re.compile(r"--.*$")
 
 # Order is the display order; per-wiki categories first, then commons.
 CATEGORIES = ["override", "declarative", "legacy", "commons"]
@@ -54,19 +56,24 @@ def is_override_code(lines: list[str]) -> bool:
     """True when the file exposes behaviour rather than just data or config."""
     local_names = []
     returns = []
-    for line in lines:
-        if not EXPORTED_FUNCTION.search(line):
+    for raw in lines:
+        line = LINE_COMMENT.sub("", raw)
+        if not FUNCTION_DEF.search(line):
             if RETURN_STATEMENT.match(line):
                 returns.append(line)
             continue
-        if not LOCAL_FUNCTION.match(line):
+        local = LOCAL_DEF.match(line) or LOCAL_ASSIGN.match(line)
+        if not local:
             return True  # a non-local function definition
-        name = LOCAL_FUNCTION_NAME.match(line)
-        if name:
-            local_names.append(name.group(1))
+        local_names.append(local.group(1))
 
     # A local function handed out through `return` is the module's interface.
-    return any(name in line for line in returns for name in local_names)
+    # `name` not followed by `(` distinguishes handing it out (`return F`,
+    # `return wrap(F)`) from calling it to build data (`return {a = h()}`),
+    # which leaves the file declarative. Word-anchored so a short local name
+    # cannot match an unrelated identifier.
+    exported = [re.compile(rf"\b{re.escape(n)}\b\s*(?!\()") for n in local_names]
+    return any(pattern.search(line) for line in returns for pattern in exported)
 
 
 def categorise(path: Path, lines: list[str]) -> str:

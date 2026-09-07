@@ -32,6 +32,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 LUA_DIR = REPO_ROOT / "lua"
 REPORT = LUA_DIR / "luacov.report.out"
+STATS = LUA_DIR / "luacov.stats.out"
 
 TOTAL = re.compile(r"^Total\s+(\d+)\s+(\d+)\s+([\d.]+)%")
 FILE_ROW = re.compile(r"^wikis/commons/\S+\s+\d+\s+\d+\s+([\d.]+)%$")
@@ -56,11 +57,17 @@ def run(command: list[str], cwd: Path) -> None:
 
 def run_suite() -> None:
     """Run the test suite under coverage, then render the luacov report."""
+    # lua/.luacov keeps stats so a report can be regenerated, which means a
+    # stale file would be reused and report the previous run's coverage.
+    STATS.unlink(missing_ok=True)
+    REPORT.unlink(missing_ok=True)
     run(["busted", "-C", "lua", "--run=ci", "-c"], REPO_ROOT)
     run(["luacov"], LUA_DIR)
 
 
 def collect(report: Path) -> dict:
+    if not report.exists():
+        raise SystemExit(f"no report at {report}; luacov produced nothing")
     lines = report.read_text(encoding="utf-8", errors="replace").splitlines()
     total = next((TOTAL.match(line) for line in lines if TOTAL.match(line)), None)
     if total is None:
