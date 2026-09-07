@@ -9,106 +9,95 @@ Any modules added in this repository will, after a review process, be added to t
 
 ## Contributing
 
-If you want to contribute you may do that in any way you wish. We use the following steps for onboarding new developers.
-
 ### Setup
 
-#### Dependencies Installation
+Everything runs in a [devcontainer](https://containers.dev/): Lua 5.1, busted, luacheck, lua-language-server, Node, Python with ruff, and the Playwright browsers for the snapshot tests. You install Docker and VS Code, then open the repo inside the container.
 
-Clone the repository. This requires [git](https://git-scm.com/downloads) to be installed on your system.
+First build: about 4.5 GB of disk and 5–15 minutes. After that it starts in seconds.
 
-##### Devcontainer (any platform)
+#### 1. Install Docker
 
-The repository ships a [devcontainer](https://containers.dev/) that has everything preinstalled: Lua 5.1, LuaRocks, busted, luacheck, lua-language-server, Node, Python with ruff, and the Playwright browsers used for the visual snapshot tests. It is built on the same Playwright image CI uses, so the visual snapshot tests render the same way they do in CI. (On Apple Silicon a couple of snapshots come out a few pixels off CI's — well under the comparison threshold, but one more reason to leave snapshot updates to CI as described below.)
+**Linux** — Docker Engine, not Docker Desktop:
 
-Open the repository in VS Code and pick *Dev Containers: Reopen in Container* (requires Docker and the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension), or run `devcontainer up --workspace-folder .` with the [devcontainer CLI](https://github.com/devcontainers/cli). `npm install`, `pip install -r requirements.txt` and creating `.env` from `.env.example` are done for you on first start.
-
-If you prefer a native setup, follow the platform instructions below instead.
-
-###### Previewing CSS and JS changes on the live wiki
-
-The container also ships [mitmproxy](https://mitmproxy.org/) and the dependencies for `scripts/proxy_lp.py`, which serves your locally built `lua/output/css/main.css` and `lua/output/js/main.js` in place of the ones liquipedia.net would load. See the [wiki page](https://github.com/Liquipedia/Lua-Modules/wiki/Local-Development-Setup-for-CSS-and-JS) for the full background; inside the container the setup is:
-
-1. Run `npm run build`, so there is something to serve. The container does this on first start, but the proxy has nothing to substitute until it has run, and it will tell you so rather than quietly serving you the real files.
-2. Start the proxy with `python scripts/proxy_lp.py` from the repository root, or via the *Launch proxy* task in `.vscode/tasks.json`. It listens on port 8080, published to `127.0.0.1:8080` on your host, so that port has to be free when the container starts — the publish is a fixed binding rather than something the editor reassigns.
-3. Point your browser at that proxy. A switcher extension such as Proxy SwitchyOmega (HTTP, `127.0.0.1`, port `8080`) makes it easy to toggle on and off; a system-wide proxy setting works too.
-4. With the proxy enabled, open <http://mitm.it> and install the certificate for your browser, so it will trust the intercepted HTTPS responses. The CA is kept in a volume, so this is only needed once, not after every rebuild.
-5. Edit `.scss` or `.js`, run `npm run build` again, then hard refresh the wiki page (Ctrl+Shift+R / Cmd+Shift+R).
-
-Turn the proxy off in your browser when you are done — while it is enabled, every request goes through the container.
-
-##### Windows
-
-Recommended to use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install). Then follow the Unix instructions.
-
-##### Unix (Linux Ubuntu)
-
-###### Installing Lua and Luarocks
-1. Follow [these instruction](https://github.com/luarocks/luarocks/blob/main/docs/installation_instructions_for_unix.md) on installing needed development tools on your system.
-2. Instead of downloading and unpacking the latest Lua version, download lua-5.1.tar.gz from [lua.org](https://www.lua.org/ftp/) and unpack it.
-3. Follow the instructions linked above for the rest of the process.
-4. If you have done everything correctly, you should now have Lua and Luarocks installed on your system.
-
-###### Installing busted and luacheck
-1. Run `luarocks install --lua-version=5.1 busted` to install busted (used as a testing framework).
-2. Run `luarocks install --lua-version=5.1 luacheck` to install luacheck (used for linting).
-3. Make sure installed rocks are available in your path variable.
-4. Test if everything is correctly installed by running `busted -C lua` and `luacheck lua --config lua/.luacheckrc` from the root of this project. If all tests pass and all checks are OK, you're installation of busted and luacheck is complete.
-
-###### Installing npm, node and dependencies
-1. Follow the instructions [here](https://github.com/nvm-sh/nvm?tab=readme-ov-file#install--update-script) to install npm
-2. Run `nvm install node`
-3. Run `npm install`
-
-##### Mac
-
-- Install Lua. We use version 5.1. There are some 5.2 features which are available, but nothing from 5.3 onwards. Using a newer version is not recommended or supported. The lua version is restricted as we use [LuaJit](https://luajit.org/). If you're [curious](https://github.com/LuaJIT/LuaJIT/issues/929).
-  Using brew will warn you that lua 5.1 has been deprecated and installing is disabled. Can be installed by editing the file with `brew edit lua@5.1`. Remove the line that says `disable! date: "2022-07-31", because: :unmaintained`
-  Finally run `HOMEBREW_NO_INSTALL_FROM_API=1 brew install lua@5.1` which will then install it anyway.
-- Install the package manager, [LuaRocks](https://luarocks.org/) `brew install luarocks`
-- The project contains two third party dependencies, busted and luacheck. Install both through luarocks
-  - `luarocks install --lua-version=5.1 busted` <- used as a [testing framework](https://luarocks.org/modules/lunarmodules/busted)
-  - `luarocks install --lua-version=5.1 luacheck` <- for [linting](https://luarocks.org/modules/mpeterv/luacheck)
-  - Make sure the installed rocks are available in your Path variable. How to do this might depend on your choice of terminal.
-  - Test if everything works by running `busted` from the command line in your projects root folder. If the tests run and are all green you should be good to go.
-- Install an ide/texteditor of choice. The repo contains some presets for [Visual Studio Code](https://code.visualstudio.com/download).
-
-#### IDE
-
-##### Visual Studio Code
-
-We recommend VSCode. Highly recommend that you get the extension [Lua](https://marketplace.visualstudio.com/items?itemName=sumneko.lua). The repo is setup with presets for this.
-
-Eslint and Stylelint extensions are recommended if you're going to work with stylesheets or javascript.
-
-##### Intellij
-
-Highly recommend that you get the extension [SumnekoLua](https://plugins.jetbrains.com/plugin/22315-sumnekolua).
-
-Eslint and Stylelint extensions are recommended if you're going to work with stylesheets or javascript.
-
-##### Neovim
-
-1. Add [lua_ls](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#eslint) in your Neovims lsp configuration (useful tools for lua files). Installation instruction can be found [here](https://luals.github.io/#neovim-install).
-2. Add [eslint](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#eslint) in your Neovims lsp configration (useful linting for Javascript files)
-3. Add [stylelint_lsp](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#stylelint_lsp) in your Neovims lsp configuration (useful linting for scss files). Make sure to add `scss` as a filetype to get the benefits of this LSP on scss files in this project. You can also enable `autoFixOnSave` or [other settings](https://github.com/bmatcuk/stylelint-lsp?tab=readme-ov-file#settings) if you want:
-
-```lua
-require('lspconfig').stylelint_lsp.setup {
-  filetypes = {
-    'css',
-    'postcss',
-    'less',
-    'scss'
-  },
-  settings = {
-    stylelintplus = {
-      autoFixOnSave = true,
-      validateOnType = true,
-    },
-  },
-}
+```bash
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker "$USER"
 ```
+
+Log out and back in, then check with `docker run hello-world`. Per-distro instructions: [docs.docker.com/engine/install](https://docs.docker.com/engine/install/).
+
+**macOS** — [Docker Desktop](https://www.docker.com/products/docker-desktop/), or `brew install --cask docker`.
+
+Alternative without Docker Desktop's licence terms:
+
+```bash
+brew install colima docker
+colima start
+```
+
+**Windows** — [WSL 2](https://learn.microsoft.com/en-us/windows/wsl/install), then [Docker Desktop](https://www.docker.com/products/docker-desktop/) with the WSL 2 backend enabled.
+
+#### 2. Install VS Code
+
+1. [VS Code](https://code.visualstudio.com/download).
+2. The [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
+
+Nothing else — Lua, ESLint, Stylelint, Python and ruff extensions install themselves inside the container.
+
+#### 3. Clone the repo
+
+**Linux / macOS:**
+
+```bash
+git clone https://github.com/Liquipedia/Lua-Modules.git
+```
+
+**Windows** — clone inside WSL, not on the Windows drive:
+
+```bash
+wsl
+git clone https://github.com/Liquipedia/Lua-Modules.git ~/Lua-Modules
+```
+
+A clone under `/mnt/c` is slow and hits permission errors.
+
+#### 4. Open it in the container
+
+1. Open the folder in VS Code. On Windows run `code ~/Lua-Modules` from inside WSL.
+2. Click **Reopen in Container** on the prompt, or press <kbd>F1</kbd> and pick *Dev Containers: Reopen in Container*.
+3. Wait for the build. It then installs dependencies, builds the CSS and JS, and creates `.env` for you.
+
+#### 5. Check it works
+
+In the container terminal:
+
+```bash
+npm run lua-test
+```
+
+All tests should pass. You are done.
+
+#### Without VS Code
+
+```bash
+npm install -g @devcontainers/cli
+devcontainer up --workspace-folder .
+devcontainer exec --workspace-folder . npm run lua-test
+```
+
+JetBrains IDEs can also open a devcontainer directly.
+
+#### Previewing CSS and JS changes on the live wiki
+
+The container ships [mitmproxy](https://mitmproxy.org/) and `scripts/proxy_lp.py`, which serves your local `lua/output/css/main.css` and `lua/output/js/main.js` instead of the ones liquipedia.net would load. Background: [wiki page](https://github.com/Liquipedia/Lua-Modules/wiki/Local-Development-Setup-for-CSS-and-JS).
+
+1. Run `npm run build`, so there is something to serve.
+2. Start the proxy: `python scripts/proxy_lp.py` from the repo root, or the *Launch proxy* task in `.vscode/tasks.json`. It listens on `127.0.0.1:8080` on your host, so keep that port free.
+3. Point your browser at that proxy. A switcher extension such as Proxy SwitchyOmega (HTTP, `127.0.0.1`, port `8080`) makes it easy to toggle; a system proxy setting works too.
+4. With the proxy on, open <http://mitm.it> and install the certificate, so the browser trusts the intercepted HTTPS. Once only — the CA is kept in a volume.
+5. Edit `.scss` or `.js`, run `npm run build`, hard refresh (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> / <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>).
+
+Turn the proxy off when you are done — while it is on, every request goes through the container.
 
 ### Adding a module
 
@@ -138,9 +127,12 @@ The project is divided into folders based on language. Even though the project i
 
 #### Javascript & Stylesheets
 
-Run `npm run test` in the root folder.
+```bash
+npm run test:js   # jest
+npm run lint      # eslint and stylelint
+```
 
-You can run `npm run fix` for auto correctable issues to be fixed.
+`npm run lint` fixes what eslint can fix on its own.
 
 #### Lua
 
@@ -178,10 +170,7 @@ To check the workflow progress from the CLI, you can run:
 
 You can also run the deploy script locally. This works from any editor — the repo ships a Visual Studio Code integration, and every other editor can call the same script directly.
 
-**One-time setup:**
-
-1. Install the Python dependencies: `pip install -r requirements.txt`
-2. Copy `.env.example` to `.env` and fill in your bot account credentials. `.env` is git-ignored — never commit it.
+**One-time setup:** the container already installed the Python dependencies and created `.env`. Fill in your bot credentials there. It is git-ignored — never commit it. It ships with `DRY_RUN=1`, so nothing reaches the wiki until you change that.
 
 ```
 WIKI_BASE_URL=https://liquipedia.net
