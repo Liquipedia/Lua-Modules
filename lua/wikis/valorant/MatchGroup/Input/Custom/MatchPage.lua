@@ -234,14 +234,14 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 				return round.bomb_defuser
 			elseif mapResultCodes(round.round_result_code) == 'time' then
 				---@type Set<string>
-				local players = Set(map.teams[winningTeam].puuids)
+				local alivePlayersOnWinningTeam = Set(map.teams[winningTeam].puuids)
 				Array.forEach(roundKills, function (roundKill)
-					players:remove(roundKill.victim)
+					alivePlayersOnWinningTeam:remove(roundKill.victim)
 				end)
-				if players:size() ~= 1 then
+				if alivePlayersOnWinningTeam:size() ~= 1 then
 					return
 				end
-				return players:toArray()[1]
+				return alivePlayersOnWinningTeam:toArray()[1]
 			end
 			local killsFromWinningTeam = Array.filter(
 				roundKills,
