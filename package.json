@@ -39,7 +39,7 @@
 		"lint:scss:ci": "stylelint \"stylesheets/**/*.scss\" --custom-formatter @csstools/stylelint-formatter-github",
 		"test:js": "jest",
 		"compile:scss": "sass stylesheets/Main.scss lua/output/css/main.css",
-		"fetch:remote-css": "node fetch-remote-css.mjs",
+		"fetch:remote-css": "bash fetch-remote-css.sh",
 		"build:css": "npm run compile:scss",
 		"build:js": "node build-js.js",
 		"build": "npm run build:css && npm run build:js",
