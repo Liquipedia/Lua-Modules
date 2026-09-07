@@ -16,7 +16,7 @@
 		"jest-junit": "^16.0.0",
 		"jquery": "*",
 		"pixelmatch": "^7.1.0",
-		"playwright": "1.61.1",
+		"playwright": "1.63.0",
 		"pngjs": "^7.0.0",
 		"postcss-scss": "^4.x.x",
 		"sass": "^1.97.3",
