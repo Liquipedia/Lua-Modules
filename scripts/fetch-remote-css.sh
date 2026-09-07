@@ -8,7 +8,7 @@ URL='https://liquipedia.net/commons/load.php?cacheversion=cipipeline&lang=en&mod
 ORIGIN='https://liquipedia.net'
 OUTPUT='lua/output/css/lakeside.css'
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 mkdir -p "$(dirname "$OUTPUT")"
 
 # Via a temporary file, so a failed transfer cannot clobber the previous copy.
