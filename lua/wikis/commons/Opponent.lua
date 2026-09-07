@@ -480,7 +480,7 @@ function Opponent.readSinglePlayerArgs(args)
 		p1flag = args.flag or args.p1flag,
 		p1link = args.link or args.p1link,
 		p1team = args.team or args.p1team,
-		p1faction = args.faction or args.race or args.p1race,
+		p1faction = args.faction or args.race or args.p1faction or args.p1race,
 		p1id = args.id or args.p1id,
 		game = args.game,
 	}, 1)
