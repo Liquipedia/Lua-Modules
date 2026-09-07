@@ -48,9 +48,7 @@ jobs:
           luarocks install --lua-version=5.1 busted
 
       - name: Update snapshots
-        run: npm run lua-test
-        env:
-          UPDATE_SNAPSHOTS: true
+        run: npm run update-snapshots
 
       - name: Commit and push if snapshots changed
         uses: stefanzweifel/git-auto-commit-action@v7
