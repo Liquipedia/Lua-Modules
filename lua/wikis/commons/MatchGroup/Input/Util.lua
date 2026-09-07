@@ -551,7 +551,9 @@ function MatchGroupInputUtil._getCasterInformation(name, flag, displayName)
 	displayName = Logic.emptyOr(displayName, globalVars:get(name .. 'dn'))
 
 	if String.isEmpty(flag) or String.isEmpty(displayName) then
-		local parent = globalVars:get('tournament_parent') or mw.title.getCurrentTitle().text
+		local tournamentContext = Tournament.partialTournamentFromContext()
+
+		local parent = tournamentContext.pageName or mw.title.getCurrentTitle().text
 		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name):gsub(' ', '_')
 		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
@@ -1181,8 +1183,10 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 		end)
 	end
 
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
 	match.mode = Parser.getMode and Parser.getMode(opponents)
-		or Logic.emptyOr(match.mode, globalVars:get('tournament_mode'), Parser.DEFAULT_MODE)
+		or Logic.emptyOr(match.mode, tournamentContext.mode, Parser.DEFAULT_MODE)
 	if Parser.getPatch then
 		match.patch = Parser.getPatch(match, games)
 	end
@@ -1215,7 +1219,6 @@ end
 ---@field getMapBestOf? fun(map: table): integer?
 ---@field computeOpponentScore? fun(props: table, autoScore?: fun(opponentIndex: integer):integer?): integer?, string?
 ---@field getGame? fun(match: table, map:table): string?
----@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
 ---@field INHERIT_MAP_DATES? boolean
 
@@ -1237,7 +1240,6 @@ end
 --- - getGame(match, map): string?
 ---
 --- Additionally, the Parser may have the following properties:
---- - ADD_SUB_GROUP boolean?
 --- - BREAK_ON_EMPTY boolean?
 ---@param match table
 ---@param opponents MGIParsedOpponent[]
@@ -1245,7 +1247,7 @@ end
 ---@return table[]
 function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 	local maps = {}
-	local subGroup = 0
+	local nextSubGroup = 1
 	local lastDate = match.date
 
 	for key, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
@@ -1264,10 +1266,8 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 
 		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
 
-		if Parser.ADD_SUB_GROUP then
-			subGroup = tonumber(map.subgroup) or (subGroup + 1)
-			map.subgroup = subGroup
-		end
+		map.subgroup = tonumber(map.subgroup) or nextSubGroup
+		nextSubGroup = map.subgroup + 1
 
 		if Parser.getMapName then
 			map.map, map.mapDisplayName = Parser.getMapName(map, mapIndex, match)
@@ -1430,8 +1430,10 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 		end
 	end
 
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
 	match.mode = Parser.getMode and Parser.getMode(opponents)
-		or Logic.emptyOr(match.mode, globalVars:get('tournament_mode'), Parser.DEFAULT_MODE)
+		or Logic.emptyOr(match.mode, tournamentContext.mode, Parser.DEFAULT_MODE)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)

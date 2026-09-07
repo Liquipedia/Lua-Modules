@@ -12,7 +12,7 @@ local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local SquadController = Lua.import('Module:Features/Squad/Controller')
-local SquadUtils = Lua.import('Module:Features/Squad/Utils')
+local SquadParser = Lua.import('Module:Features/Squad/Lib/Parse')
 
 local CustomSquad = {}
 
@@ -20,7 +20,7 @@ local CustomSquad = {}
 ---@return Widget
 function CustomSquad.run(frame)
 	local args = Arguments.getArgs(frame)
-	local squadData = SquadUtils.readWrapperArgs(args)
+	local squadData = SquadParser.readWrapperArgs(args)
 
 	Array.forEach(squadData.players, function(player)
 		local inputId = player.id --[[@as number]]

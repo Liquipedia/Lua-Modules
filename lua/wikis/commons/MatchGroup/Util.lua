@@ -152,6 +152,7 @@ MatchGroupUtil.types.BracketData = TypeUtil.union(
 ---@field extradata table?
 ---@field pageIsResolved boolean?
 ---@field faction string?
+---@field roles string[]?
 ---@field apiId string?
 
 MatchGroupUtil.types.Player = TypeUtil.struct({
@@ -285,6 +286,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field shortname string?
 ---@field status MatchStatus
 ---@field stream table
+---@field submatches MatchGroupUtilSubgroup[]
 ---@field tickername string?
 ---@field tournament string?
 ---@field type string?
@@ -611,6 +613,7 @@ function MatchGroupUtil.matchFromRecord(record)
 	}
 
 	match.phase = MatchGroupUtil.computeMatchPhase(match)
+	match.submatches = MatchGroupUtil.groupBySubgroup(match)
 
 	return match
 end

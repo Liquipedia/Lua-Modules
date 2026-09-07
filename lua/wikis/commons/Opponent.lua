@@ -503,7 +503,7 @@ function Opponent.readSinglePlayerArgs(args)
 		p1flag = args.flag or args.p1flag,
 		p1link = args.link or args.p1link,
 		p1team = args.team or args.p1team,
-		p1faction = args.faction or args.race or args.p1race,
+		p1faction = args.faction or args.race or args.p1faction or args.p1race,
 		p1id = args.id or args.p1id,
 		game = args.game,
 	}, 1)
@@ -618,6 +618,11 @@ function Opponent.toLpdbStruct(opponent, options)
 				nil
 			players[prefix .. 'template'] = player.team
 			players[prefix .. 'faction'] = Logic.nilIfEmpty(player.faction)
+			if player.roles then
+				Array.forEach(player.roles, function (role, roleIndex)
+					players[prefix .. 'role' .. roleIndex] = role
+				end)
+			end
 			players[prefix .. 'id'] = Logic.nilIfEmpty(player.apiId)
 		end
 		storageStruct.opponentplayers = players
@@ -691,6 +696,9 @@ function Opponent._personFromLpdbStruct(roleIndicator, players, playerIndex)
 		team = players[prefix .. 'template'] or players[prefix .. 'team'],
 		faction = Logic.nilIfEmpty(players[prefix .. 'faction']),
 		apiId = Logic.nilIfEmpty(players[prefix .. 'id']),
+		roles = Logic.nilIfEmpty(Array.mapIndexes(function (roleIndex)
+			return players[prefix .. 'role' .. roleIndex]
+		end))
 	}
 end
 
@@ -733,8 +741,6 @@ function Opponent.getScoreValue(opponent, postfix)
 	local scoreDisplay = opponent['scoreDisplay' .. postfix]
 
 	if score == 0 and Opponent.isTbd(opponent) then
-		return ''
-	elseif score == -1 then
 		return ''
 	elseif scoreDisplay ~= nil then
 		return tostring(Math.round(scoreDisplay, 2))

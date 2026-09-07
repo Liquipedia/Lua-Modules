@@ -97,7 +97,6 @@ end
 ---@field showFlag boolean?
 ---@field showLink boolean?
 ---@field showPlayerTeam boolean?
----@field playerClass string?
 ---@field teamStyle teamStyle?
 ---@field dq boolean?
 ---@field note string|number|nil

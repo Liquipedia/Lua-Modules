@@ -34,11 +34,10 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
----@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@return Renderable?
-function CustomMatchSummary.createGame(date, game, gameIndex)
+function CustomMatchSummary.createGame(game, gameIndex)
 	---@param opponentIndex integer
 	---@return Renderable[]
 	local function makeTeamSection(opponentIndex)

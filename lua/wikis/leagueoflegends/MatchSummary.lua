@@ -29,25 +29,19 @@ local LoLMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameR
 ---@param args table
 ---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px'})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', maxBans = MAX_NUM_BANS})
 end
 
 ---@param match MatchGroupUtilMatch
----@return VNode[]
-function CustomMatchSummary.createBody(match)
-	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
-
-	return {
-		MatchSummaryWidgets.GamesContainer{
-			children = Array.map(match.games, function (game, gameIndex)
-				if game.status == STATUS_NOT_PLAYED then
-					return
-				end
-				return LoLMatchSummaryGameRow{game = game, gameIndex = gameIndex}
-			end)
-		},
-		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
+---@return Renderable
+function CustomMatchSummary.createGames(match)
+	return MatchSummaryWidgets.GamesContainer{
+		children = Array.map(match.games, function (game, gameIndex)
+			if game.status == STATUS_NOT_PLAYED then
+				return
+			end
+			return LoLMatchSummaryGameRow{game = game, gameIndex = gameIndex}
+		end)
 	}
 end
 

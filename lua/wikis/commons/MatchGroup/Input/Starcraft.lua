@@ -40,7 +40,6 @@ local MatchFunctions = {
 
 ---@class StarcraftMapParser: MapParserInterface
 local MapFunctions = {
-	ADD_SUB_GROUP = true,
 	BREAK_ON_EMPTY = true,
 }
 
