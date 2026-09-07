@@ -129,8 +129,6 @@ jobs:
             echo "| | Files scanned | Files with problems | Problems | In changed files |"
             echo "|-|-------|----------|----------|----------|"
             echo "| LuaLS check | $(find lua -name '*.lua' | wc -l) | $files_with | $problems | $touched |"
-            echo ""
-            echo "_LuaLS reports a slightly different problem count between runs on identical"
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
           exit $(( touched > 0 ? 1 : 0 ))
