@@ -19,7 +19,7 @@ Prints a Markdown table, optionally with deltas against a second tree. Pass
 --raw for `key=value` output instead.
 
 Usage:
-    python scripts/annotation_coverage.py [root] [--base BASE_ROOT] [--raw]
+    python scripts/metrics/annotation_coverage.py [root] [--base BASE_ROOT] [--raw]
 """
 
 import argparse
@@ -129,8 +129,6 @@ def table(head, base):
     ]
     lines = ["| Annotations (lua/wikis/commons) | |", "|-|-|"]
     lines += [f"| {label} | {value} |" for label, value in rows]
-    if base is None:
-        lines.append("| | _no baseline available; deltas omitted_ |")
     return lines
 
 
