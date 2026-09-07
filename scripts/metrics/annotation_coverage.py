@@ -1,4 +1,5 @@
-"""Measure LuaLS annotation coverage of exported functions in lua/wikis/commons.
+#!/usr/bin/env python3
+"""Metric 5: LuaLS annotation coverage of exported functions in commons.
 
 Annotations are what make commons modules statically understandable, so this
 tracks how much of the exported surface carries them.
@@ -15,24 +16,42 @@ function's own indentation, which is a heuristic: when in doubt it assumes a
 value is returned, so a function is more likely to be asked for an annotation
 than excused from one.
 
-Prints a Markdown table, optionally with deltas against a second tree. Pass
---raw for `key=value` output instead.
-
 Usage:
-    python scripts/metrics/annotation_coverage.py [root] [--base BASE_ROOT] [--raw]
+    python3 scripts/metrics/annotation_coverage.py [--csv] [--no-header]
+                                                   [--base BASE_ROOT] [root]
+
+Intended to be run on a schedule (e.g. weekly CI job) with --csv appended to a
+time-series file, so standardization / Phoenix progress can be charted.
 """
 
 import argparse
-import pathlib
+import csv
 import re
 import sys
+from datetime import date
+from pathlib import Path
+from typing import Optional
+
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+DEFAULT_ROOT = REPO_ROOT / "lua" / "wikis" / "commons"
 
 FUNCTION = re.compile(r"^(\s*)function\s+[A-Za-z_][\w.]*[.:]\w+\s*\(([^)]*)\)")
 RETURNS_VALUE = re.compile(r"\breturn\s+\S")
-DEFAULT_ROOT = "lua/wikis/commons"
+
+FIELDS = [
+    "functions",
+    "annotated",
+    "exempt",
+    "needs_annotation",
+    "unannotated",
+    "coverage_pct",
+    "params_total",
+    "params_annotated",
+    "params_pct",
+]
 
 
-def doc_block(lines, index):
+def doc_block(lines: list[str], index: int) -> str:
     """Return the contiguous comment block immediately above lines[index]."""
     block = []
     cursor = index - 1
@@ -42,7 +61,7 @@ def doc_block(lines, index):
     return "\n".join(block)
 
 
-def returns_value(lines, index, indent):
+def returns_value(lines: list[str], index: int, indent: str) -> bool:
     """Whether the function starting at lines[index] returns a value."""
     end = re.compile(rf"^{indent}end\b")
     for line in lines[index + 1 :]:
@@ -53,14 +72,14 @@ def returns_value(lines, index, indent):
     return True  # no clear end found: assume it returns, so we still ask for a tag
 
 
-def measure(root):
+def collect(root: Path) -> dict:
     functions = annotated = exempt = params_total = params_annotated = 0
 
     for path in sorted(root.rglob("*.lua")):
         # ScribuntoUnit testcases run on-wiki and are not part of the surface.
         if "test" in path.parts:
             continue
-        lines = path.read_text(encoding="utf-8", errors="replace").split("\n")
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
         for index, line in enumerate(lines):
             match = FUNCTION.match(line)
             if not match:
@@ -96,68 +115,51 @@ def measure(root):
     }
 
 
-def count_cell(value, base):
-    return f"{value}" if base is None else f"{value} ({value - base:+d})"
+def print_table(head: dict, base: Optional[dict]) -> None:
+    for field in FIELDS:
+        value = head[field]
+        cell = f"{value:.2f}%" if field.endswith("_pct") else str(value)
+        if base is not None:
+            delta = value - base[field]
+            cell += (
+                f" ({delta:+.2f} pp)" if field.endswith("_pct") else f" ({delta:+d})"
+            )
+        print(f"{field.replace('_', ' '):<20}{cell:>22}")
 
 
-def pct_cell(value, base):
-    if base is None:
-        return f"{value:.2f}%"
-    return f"{value:.2f}% ({value - base:+.2f} pp)"
+def print_csv(head: dict, header: bool) -> None:
+    writer = csv.writer(sys.stdout)
+    if header:
+        writer.writerow(["date"] + FIELDS)
+    writer.writerow([date.today().isoformat()] + [head[f] for f in FIELDS])
 
 
-def table(head, base):
-    def of(key):
-        return None if base is None else base[key]
-
-    rows = [
-        (
-            "Exported functions annotated",
-            pct_cell(head["coverage_pct"], of("coverage_pct")),
-        ),
-        (
-            "Needs annotation",
-            count_cell(head["needs_annotation"], of("needs_annotation")),
-        ),
-        ("Unannotated", count_cell(head["unannotated"], of("unannotated"))),
-        ("Exempt (no params, no return)", count_cell(head["exempt"], of("exempt"))),
-        ("Exported functions", count_cell(head["functions"], of("functions"))),
-        (
-            "Functions with all params annotated",
-            pct_cell(head["params_pct"], of("params_pct")),
-        ),
-    ]
-    lines = ["| Annotations (lua/wikis/commons) | |", "|-|-|"]
-    lines += [f"| {label} | {value} |" for label, value in rows]
-    return lines
-
-
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("root", nargs="?", type=pathlib.Path, default=DEFAULT_ROOT)
+    parser.add_argument("root", nargs="?", type=Path, default=DEFAULT_ROOT)
+    parser.add_argument("--csv", action="store_true", help="CSV for appending")
+    parser.add_argument("--no-header", action="store_true", help="omit the CSV header")
     parser.add_argument(
-        "--base", type=pathlib.Path, help="second tree to compare against"
+        "--base", type=Path, help="compare against this tree (table mode only)"
     )
-    parser.add_argument("--raw", action="store_true", help="print key=value instead")
     args = parser.parse_args()
 
     if not args.root.is_dir():
-        print(f"::error::annotation root not found: {args.root}")
+        print(f"annotation root not found: {args.root}", file=sys.stderr)
         return 1
 
-    head = measure(args.root)
-    if args.raw:
-        for key, value in head.items():
-            print(f"{key}={value}")
+    head = collect(args.root)
+    if args.csv:
+        print_csv(head, header=not args.no_header)
         return 0
 
     base = None
     if args.base:
         if args.base.is_dir():
-            base = measure(args.base)
+            base = collect(args.base)
         else:
-            print(f"::warning::base root not found, omitting deltas: {args.base}")
-    print("\n".join(table(head, base)))
+            print(f"base root not found, omitting deltas: {args.base}", file=sys.stderr)
+    print_table(head, base)
     return 0
 
 

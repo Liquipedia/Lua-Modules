@@ -1,34 +1,42 @@
-"""Measure how much per-wiki customization code lives outside lua/wikis/commons.
+#!/usr/bin/env python3
+"""Metric 4: per-wiki customization of repo-managed Lua code.
 
 Everything in this repo is standardized; what varies is how much a wiki has to
-override to get the behaviour it wants. Override code is the part that costs
-maintenance and has to be carried forward, so it is the number worth watching.
-Declarative data and config, and legacy shims, are reported separately.
+override to get the behaviour it wants. Override code is the part that carries
+maintenance cost, so it is the number worth watching. Declarative data/config
+and legacy shims are counted separately -- a wiki adding 500 lines of faction
+data is not the same event as one adding 500 lines of overrides.
 
-Classification is by file *content*, not filename -- `GetMatchGroupCopyPaste/
+Categories are decided by file *content*, not filename: `GetMatchGroupCopyPaste/
 wiki.lua`, `FilterButtons/Config.lua` and `NotabilityChecker/config.lua` all
 look declarative and are not. A file is override code when it defines a
-non-local function, or when a `local function` is exported via a `return`
-statement (the widget pattern: `local function X` ... `return wrap(X)`).
-Purely-local helpers inside an otherwise declarative file do not promote it.
+non-local function, or exports a `local function` through a `return` statement
+(the widget pattern: `local function X` ... `return wrap(X)`). Purely-local
+helpers in an otherwise declarative file do not promote it. Any path containing
+`Legacy` is counted as legacy before the content check.
 
-Shares are against the whole of lua/wikis (commons included), so "override code
-is 37% of all Lua" is answerable. Vendored code, type stubs, specs and test
-assets under lua/ are excluded from the denominator -- they are not the product.
-
-Prints a Markdown table, optionally with deltas against a second tree. Pass
---raw for `key=value` output instead.
+commons is counted too, so shares have the whole of lua/wikis as denominator
+and "override code is 37% of all Lua" is answerable. LOC matches metric 1:
+non-blank, non-comment-only lines, with total physical lines also reported.
 
 Usage:
-    python scripts/metrics/customization_metrics.py [wikis-root] [--base BASE_ROOT] [--raw]
+    python3 scripts/metrics/customization_metrics.py [--csv] [--no-header]
+                                                     [--base BASE_ROOT] [root]
+
+Intended to be run on a schedule (e.g. weekly CI job) with --csv appended to a
+time-series file, so standardization / Phoenix progress can be charted.
 """
 
 import argparse
-import pathlib
+import csv
 import re
 import sys
+from datetime import date
+from pathlib import Path
+from typing import Optional
 
-DEFAULT_ROOT = "lua/wikis"
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+DEFAULT_ROOT = REPO_ROOT / "lua" / "wikis"
 COMMONS = "commons"
 
 EXPORTED_FUNCTION = re.compile(r"\bfunction\b")
@@ -38,8 +46,11 @@ LOCAL_FUNCTION = re.compile(
 LOCAL_FUNCTION_NAME = re.compile(r"^[ \t]*local[ \t]+function[ \t]+([A-Za-z_]\w*)")
 RETURN_STATEMENT = re.compile(r"^[ \t]*return\b")
 
+# Order is the display order; per-wiki categories first, then commons.
+CATEGORIES = ["override", "declarative", "legacy", "commons"]
 
-def is_override_code(lines):
+
+def is_override_code(lines: list[str]) -> bool:
     """True when the file exposes behaviour rather than just data or config."""
     local_names = []
     returns = []
@@ -58,110 +69,116 @@ def is_override_code(lines):
     return any(name in line for line in returns for name in local_names)
 
 
-def measure(root):
-    declarative = legacy = override = commons = 0
+def categorise(path: Path, lines: list[str]) -> str:
+    if COMMONS in path.parts:
+        return "commons"
+    # Substring, not a path component: legacy lives in directories
+    # (TeamCard/Legacy/Custom.lua) *and* in filenames (Match/Legacy.lua).
+    # `"Legacy" in path.parts` would miss the latter -- 52 of 78 files.
+    if "Legacy" in path.as_posix():
+        return "legacy"
+    return "override" if is_override_code(lines) else "declarative"
+
+
+def count_file(lines: list[str]) -> tuple[int, int]:
+    """Return (physical_lines, loc) -- loc as metric 1 defines it."""
+    loc = sum(1 for line in lines if line.strip() and not line.strip().startswith("--"))
+    return len(lines), loc
+
+
+def collect(root: Path) -> list[dict]:
+    totals = {c: {"files": 0, "lines": 0, "loc": 0} for c in CATEGORIES}
 
     for path in sorted(root.rglob("*.lua")):
-        text = path.read_text(encoding="utf-8", errors="replace")
-        count = len(text.splitlines())
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+        physical, loc = count_file(lines)
+        bucket = totals[categorise(path, lines)]
+        bucket["files"] += 1
+        bucket["lines"] += physical
+        bucket["loc"] += loc
 
-        # commons is the shared implementation, not per-wiki customization. It is
-        # still counted, so shares have the whole of lua/wikis as denominator.
-        if COMMONS in path.parts:
-            commons += count
-        # Substring, not a path component: legacy lives in directories
-        # (TeamCard/Legacy/Custom.lua) *and* in filenames (Match/Legacy.lua).
-        # `"Legacy" in path.parts` would miss the latter -- 52 of 78 files,
-        # moving 6279 lines out of legacy and into override code.
-        elif "Legacy" in path.as_posix():
-            legacy += count
-        elif is_override_code(text.splitlines()):
-            override += count
-        else:
-            declarative += count
-
-    per_wiki = override + declarative + legacy
-    total = per_wiki + commons
-
-    def share(count):
-        return round(count / total * 100, 2) if total else 0.0
-
-    return {
-        "override_code": override,
-        "declarative": declarative,
-        "legacy": legacy,
-        "per_wiki_total": per_wiki,
-        "commons": commons,
-        "total": total,
-        "override_code_pct": share(override),
-        "declarative_pct": share(declarative),
-        "legacy_pct": share(legacy),
-        "per_wiki_total_pct": share(per_wiki),
-        "commons_pct": share(commons),
-    }
+    total_loc = sum(b["loc"] for b in totals.values())
+    rows = []
+    for category in CATEGORIES:
+        bucket = totals[category]
+        rows.append(
+            {
+                "category": category,
+                "files": bucket["files"],
+                "lines": bucket["lines"],
+                "loc": bucket["loc"],
+                "share": round(bucket["loc"] / total_loc * 100, 2)
+                if total_loc
+                else 0.0,
+            }
+        )
+    return rows
 
 
-def count_cell(value, base):
-    return f"{value}" if base is None else f"{value} ({value - base:+d})"
-
-
-def pct_cell(value, base):
-    if base is None:
-        return f"{value:.2f}%"
-    return f"{value:.2f}% ({value - base:+.2f} pp)"
-
-
-def table(head, base):
-    def of(key):
-        return None if base is None else base[key]
-
-    rows = [
-        ("**Override code**", "override_code", "override_code_pct"),
-        ("Declarative (data + config)", "declarative", "declarative_pct"),
-        ("Legacy", "legacy", "legacy_pct"),
-        ("Per-wiki total", "per_wiki_total", "per_wiki_total_pct"),
-        ("lua/wikis/commons (shared)", "commons", "commons_pct"),
-    ]
-    lines = [
-        "| Per-wiki customization | LOC | Share of all Lua |",
-        "|-|-|-|",
-    ]
-    for label, loc_key, pct_key in rows:
-        loc = count_cell(head[loc_key], of(loc_key))
-        pct = pct_cell(head[pct_key], of(pct_key))
-        if label.startswith("**"):
-            loc, pct = f"**{loc}**", f"**{pct}**"
-        lines.append(f"| {label} | {loc} | {pct} |")
-    lines.append(f"| All of lua/wikis | {count_cell(head['total'], of('total'))} | |")
-    return lines
-
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("root", nargs="?", type=pathlib.Path, default=DEFAULT_ROOT)
-    parser.add_argument(
-        "--base", type=pathlib.Path, help="second tree to compare against"
+def print_table(rows: list[dict], base: Optional[list[dict]]) -> None:
+    by_category = {r["category"]: r for r in base} if base else {}
+    print(f"{'category':<14}{'files':>7}{'lines':>10}{'loc':>10}{'share':>9}")
+    for row in rows:
+        share = f"{row['share']:.2f}%"
+        if row["category"] in by_category:
+            delta = row["loc"] - by_category[row["category"]]["loc"]
+            share += f" ({delta:+d} loc)"
+        print(
+            f"{row['category']:<14}{row['files']:>7}{row['lines']:>10}"
+            f"{row['loc']:>10}{share:>9}"
+        )
+    per_wiki = [r for r in rows if r["category"] != "commons"]
+    print(
+        f"{'per-wiki total':<14}{sum(r['files'] for r in per_wiki):>7}"
+        f"{sum(r['lines'] for r in per_wiki):>10}{sum(r['loc'] for r in per_wiki):>10}"
+        f"{sum(r['share'] for r in per_wiki):>8.2f}%"
     )
-    parser.add_argument("--raw", action="store_true", help="print key=value instead")
+
+
+def print_csv(rows: list[dict], header: bool) -> None:
+    writer = csv.writer(sys.stdout)
+    if header:
+        writer.writerow(["date", "category", "files", "lines", "loc", "share"])
+    today = date.today().isoformat()
+    for row in rows:
+        writer.writerow(
+            [
+                today,
+                row["category"],
+                row["files"],
+                row["lines"],
+                row["loc"],
+                row["share"],
+            ]
+        )
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("root", nargs="?", type=Path, default=DEFAULT_ROOT)
+    parser.add_argument("--csv", action="store_true", help="CSV for appending")
+    parser.add_argument("--no-header", action="store_true", help="omit the CSV header")
+    parser.add_argument(
+        "--base", type=Path, help="compare loc against this tree (table mode only)"
+    )
     args = parser.parse_args()
 
     if not args.root.is_dir():
-        print(f"::error::wikis root not found: {args.root}")
+        print(f"wikis root not found: {args.root}", file=sys.stderr)
         return 1
 
-    head = measure(args.root)
-    if args.raw:
-        for key, value in head.items():
-            print(f"{key}={value}")
+    rows = collect(args.root)
+    if args.csv:
+        print_csv(rows, header=not args.no_header)
         return 0
 
     base = None
     if args.base:
         if args.base.is_dir():
-            base = measure(args.base)
+            base = collect(args.base)
         else:
-            print(f"::warning::base root not found, omitting deltas: {args.base}")
-    print("\n".join(table(head, base)))
+            print(f"base root not found, omitting deltas: {args.base}", file=sys.stderr)
+    print_table(rows, base)
     return 0
 
 
