@@ -155,8 +155,8 @@ function BaseMatchPage:seoText()
 			ongoingTense = matchPhase == 'ongoing' and 'ongoing ' or '',
 			game = (Game.name{game = self.matchData.game}) --[[@as string]],
 			tournamentName = tournament.displayName,
-			opponent1 = Opponent.toName(self.opponents[1]),
-			opponent2 = Opponent.toName(self.opponents[2]),
+			opponent1 = ((self.opponents[1] or {}).teamTemplateData or {}).name or 'TBD',
+			opponent2 = ((self.opponents[2] or {}).teamTemplateData or {}).name or 'TBD',
 			tense = createTenseString() or ''
 		}
 	)
