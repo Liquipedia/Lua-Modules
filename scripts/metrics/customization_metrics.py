@@ -20,7 +20,7 @@ Prints a Markdown table, optionally with deltas against a second tree. Pass
 --raw for `key=value` output instead.
 
 Usage:
-    python scripts/customization_metrics.py [wikis-root] [--base BASE_ROOT] [--raw]
+    python scripts/metrics/customization_metrics.py [wikis-root] [--base BASE_ROOT] [--raw]
 """
 
 import argparse
@@ -133,8 +133,6 @@ def table(head, base):
             loc, pct = f"**{loc}**", f"**{pct}**"
         lines.append(f"| {label} | {loc} | {pct} |")
     lines.append(f"| All of lua/wikis | {count_cell(head['total'], of('total'))} | |")
-    if base is None:
-        lines.append("| | _no baseline available; deltas omitted_ | |")
     return lines
 
 
