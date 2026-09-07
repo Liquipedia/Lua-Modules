@@ -11,6 +11,10 @@ convention applies to in this codebase.
 
 A function taking no parameters and returning no value needs neither tag, so it
 is reported as exempt and left out of the ratio rather than counted against it.
+
+`params_total` / `params_annotated` count individual parameters, not functions,
+so a five-parameter signature carries five times the weight of a one-parameter
+one.
 Whether a body returns a value is decided by scanning to the `end` at the
 function's own indentation, which is a heuristic: when in doubt it assumes a
 value is returned, so a function is more likely to be asked for an annotation
@@ -94,10 +98,12 @@ def collect(root: Path) -> dict:
                 annotated += 1
             elif not params and not returns_value(lines, index, indent):
                 exempt += 1
-            if params:
-                params_total += 1
-                if block.count("@param") >= len(params):
-                    params_annotated += 1
+            # Per parameter, not per function: a five-parameter function with
+            # one tag is not as annotated as a one-parameter function with one.
+            # Clamped, since a doc block may carry more @param than the
+            # signature takes.
+            params_total += len(params)
+            params_annotated += min(block.count("@param"), len(params))
 
     needs = functions - exempt
     return {
