@@ -16,24 +16,15 @@ Everything runs in a [devcontainer](https://containers.dev/). You install Docker
 #### 1. Install Docker
 
 **Linux**
-
-- Install Docker Engine with
-```bash
-curl -fsSL https://get.docker.com | sh
-sudo usermod -aG docker "$USER"
-```
-- Log out and back in, or `docker` says permission denied.
+- Install [Docker Engine](https://docs.docker.com/engine/install/) — not Docker Desktop
+- Follow the [post-install steps](https://docs.docker.com/engine/install/linux-postinstall/), so `docker` works without sudo
 
 **macOS**
-- Install using [Docker Desktop]https://www.docker.com/products/docker-desktop/
-- OR using Homebrew
-```bash
-brew install --cask docker
-```
+- Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/)
 
 **Windows**
 - Install [WSL 2](https://learn.microsoft.com/en-us/windows/wsl/install)
-- then install [Docker Desktop](https://www.docker.com/products/docker-desktop/) with the WSL 2 backend enabled.
+- Then install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/) with the WSL 2 backend enabled
 
 #### 2. Install VS Code
 
