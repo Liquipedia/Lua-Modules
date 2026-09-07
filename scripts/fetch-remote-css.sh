@@ -10,17 +10,9 @@ OUTPUT='lua/output/css/lakeside.css'
 
 cd "$(dirname "$0")/.."
 mkdir -p "$(dirname "$OUTPUT")"
-trap 'rm -f "$OUTPUT.tmp"' EXIT
 
-# load.php occasionally answers 429 to CI's shared address, so back off and
-# retry rather than failing the run. --compressed asks for the gzipped copy,
-# which is a sixth of the traffic.
-#
 # The sed puts back the origin on fonts, logos and icons, which the bundle
 # references from the site root, as both url(/x) and url("/x"). Off the local
 # filesystem those resolve nowhere.
-curl -fsS --compressed --retry 3 --retry-max-time 60 --max-time 30 "$URL" \
-	| sed -E 's|url\((["'\'']?)/|url(\1'"$ORIGIN"'/|g' > "$OUTPUT.tmp"
-
-# Replace a previous copy only once the whole pipeline has succeeded
-mv "$OUTPUT.tmp" "$OUTPUT"
+curl -fsS --compressed --max-time 30 "$URL" \
+	| sed -E 's|url\((["'\'']?)/|url(\1'"$ORIGIN"'/|g' > "$OUTPUT"
