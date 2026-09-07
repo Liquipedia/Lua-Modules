@@ -148,20 +148,22 @@ $infobox-padding: 10px;
 	padding-bottom: $infobox-padding;
 	border-top: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
 	border-bottom: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
+	display: flex;
+	flex-flow: column nowrap;
 
 	@media ( max-width: 600px ) {
 		width: 100%;
 	}
 
 	> div {
-		display: table;
+		display: grid;
 		width: 100%;
 
-		&:nth-child( 2n+1 ) {
+		&:nth-child( odd ) {
 			background-color: var( --clr-surface-2, #eeeeee );
 		}
 
-		&:nth-child( 2n ) {
+		&:nth-child( even ) {
 			background-color: var( --clr-surface-1, #f5f5f5 );
 		}
 
@@ -169,60 +171,29 @@ $infobox-padding: 10px;
 			clear: both;
 		}
 
+		&:has( > :only-child ) {
+			display: contents;
+
+			> :only-child {
+				width: 100%;
+			}
+		}
+
 		> div {
-			width: 100%;
 			float: left;
 			height: inherit;
 			padding: 5px;
 		}
-	}
 
-	div.infobox-cell-2 {
-		width: 50%;
-	}
+		@for $i from 2 through 12 {
+			&:has( > .infobox-cell-#{$i} ) {
+				grid-template-columns: 1fr #{$i - 1}fr;
+			}
+		}
 
-	div.infobox-cell-3 {
-		width: 33.3333%;
-	}
-
-	div.infobox-cell-4 {
-		width: 25%;
-	}
-
-	div.infobox-cell-4-5 {
-		width: 22.2222%;
-	}
-
-	div.infobox-cell-5 {
-		width: 20%;
-	}
-
-	div.infobox-cell-6 {
-		width: 16.6666%;
-	}
-
-	div.infobox-cell-7 {
-		width: 14.2857%;
-	}
-
-	div.infobox-cell-8 {
-		width: 12.5%;
-	}
-
-	div.infobox-cell-9 {
-		width: 11.1111%;
-	}
-
-	div.infobox-cell-10 {
-		width: 10%;
-	}
-
-	div.infobox-cell-11 {
-		width: 9.0909%;
-	}
-
-	div.infobox-cell-12 {
-		width: 8.3333%;
+		&:has( > .infobox-cell-4-5 ) {
+			grid-template-columns: 2fr 7fr;
+		}
 	}
 
 	div.infobox-description {
