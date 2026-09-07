@@ -2,7 +2,7 @@
 # visual snapshots.yml"), so snapshots rendered in here match the ones CI
 # commits back to the branch. Keep the tag in sync with the playwright version
 # in package.json.
-FROM mcr.microsoft.com/playwright:v1.61.1-noble
+FROM mcr.microsoft.com/playwright:v1.63.0-noble
 
 # Keep these in sync with the versions used by the GitHub workflows
 ARG LUA_VERSION=5.1.5

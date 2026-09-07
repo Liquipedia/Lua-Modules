@@ -34,10 +34,11 @@ local function TournamentsTickerWidget(props)
 			['data-filter-hideable-group-fallback'] = '',
 		},
 		children = {
-			Html.Center{
+			Html.Div{
 				css = {
 					['margin'] = '1.5rem 0',
 					['font-style'] = 'italic',
+					['text-align'] = 'center',
 				},
 				children = I18n.translate('tournament-ticker-no-tournaments'),
 			}
