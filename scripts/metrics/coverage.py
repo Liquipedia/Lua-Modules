@@ -98,9 +98,17 @@ def print_csv(metrics: dict, header: bool) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--csv", action="store_true", help="CSV for appending")
-    parser.add_argument("--no-header", action="store_true", help="omit the CSV header")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--csv", action="store_true", help="CSV output (for appending to a time series)"
+    )
+    parser.add_argument(
+        "--header",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="write the CSV header row (--no-header when appending "
+        "to an existing time-series file)",
+    )
     parser.add_argument(
         "--skip-run",
         action="store_true",
@@ -116,7 +124,7 @@ def main() -> int:
 
     metrics = collect(REPORT)
     if args.csv:
-        print_csv(metrics, header=not args.no_header)
+        print_csv(metrics, header=args.header)
     else:
         print_table(metrics)
     return 0

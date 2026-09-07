@@ -135,10 +135,14 @@ def print_table(rows: list[dict], base: Optional[list[dict]]) -> None:
             f"{row['loc']:>10}{share:>9}"
         )
     per_wiki = [r for r in rows if r["category"] != "commons"]
+    per_wiki_loc = sum(r["loc"] for r in per_wiki)
+    total_loc = sum(r["loc"] for r in rows)
+    # From the loc totals, not by adding up the rounded per-category shares.
+    share = per_wiki_loc / total_loc * 100 if total_loc else 0.0
     print(
         f"{'per-wiki total':<14}{sum(r['files'] for r in per_wiki):>7}"
-        f"{sum(r['lines'] for r in per_wiki):>10}{sum(r['loc'] for r in per_wiki):>10}"
-        f"{sum(r['share'] for r in per_wiki):>8.2f}%"
+        f"{sum(r['lines'] for r in per_wiki):>10}{per_wiki_loc:>10}"
+        f"{share:>8.2f}%"
     )
 
 
@@ -161,10 +165,18 @@ def print_csv(rows: list[dict], header: bool) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("root", nargs="?", type=Path, default=DEFAULT_ROOT)
-    parser.add_argument("--csv", action="store_true", help="CSV for appending")
-    parser.add_argument("--no-header", action="store_true", help="omit the CSV header")
+    parser.add_argument(
+        "--csv", action="store_true", help="CSV output (for appending to a time series)"
+    )
+    parser.add_argument(
+        "--header",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="write the CSV header row (--no-header when appending "
+        "to an existing time-series file)",
+    )
     parser.add_argument(
         "--base", type=Path, help="compare loc against this tree (table mode only)"
     )
@@ -176,7 +188,7 @@ def main() -> int:
 
     rows = collect(args.root)
     if args.csv:
-        print_csv(rows, header=not args.no_header)
+        print_csv(rows, header=args.header)
         return 0
 
     base = None

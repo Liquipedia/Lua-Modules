@@ -135,10 +135,18 @@ def print_csv(head: dict, header: bool) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("root", nargs="?", type=Path, default=DEFAULT_ROOT)
-    parser.add_argument("--csv", action="store_true", help="CSV for appending")
-    parser.add_argument("--no-header", action="store_true", help="omit the CSV header")
+    parser.add_argument(
+        "--csv", action="store_true", help="CSV output (for appending to a time series)"
+    )
+    parser.add_argument(
+        "--header",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="write the CSV header row (--no-header when appending "
+        "to an existing time-series file)",
+    )
     parser.add_argument(
         "--base", type=Path, help="compare against this tree (table mode only)"
     )
@@ -150,7 +158,7 @@ def main() -> int:
 
     head = collect(args.root)
     if args.csv:
-        print_csv(head, header=not args.no_header)
+        print_csv(head, header=args.header)
         return 0
 
     base = None

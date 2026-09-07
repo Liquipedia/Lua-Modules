@@ -13,6 +13,6 @@ return {
 		-- ScribuntoUnit testcases that run on-wiki, not under busted.
 		'wikis/commons/test/',
 	},
-	runreport = false, -- Don't work properly for some reason, have to do a manual `luacov` call afterwards
+	runreport = false, -- Doesn't work properly for some reason, have to do a manual `luacov` call afterwards
 	deletestats = false, -- Keep stats so the report can be regenerated / inspected after a run
 }
