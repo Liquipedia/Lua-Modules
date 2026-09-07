@@ -11,38 +11,35 @@ Any modules added in this repository will, after a review process, be added to t
 
 ### Setup
 
-Everything runs in a [devcontainer](https://containers.dev/): Lua 5.1, busted, luacheck, lua-language-server, Node, Python with ruff, and the Playwright browsers for the snapshot tests. You install Docker and VS Code, then open the repo inside the container.
-
-First build: about 4.5 GB of disk and 5–15 minutes. After that it starts in seconds.
+Everything runs in a [devcontainer](https://containers.dev/). You install Docker and VS Code, then open the repo inside the container. First time it may take 5 minutes to start.
 
 #### 1. Install Docker
 
-**Linux** — Docker Engine, not Docker Desktop:
+**Linux**
 
+Docker Engine
 ```bash
 curl -fsSL https://get.docker.com | sh
 sudo usermod -aG docker "$USER"
 ```
 
-Log out and back in, then check with `docker run hello-world`. Per-distro instructions: [docs.docker.com/engine/install](https://docs.docker.com/engine/install/).
-
-**macOS** — [Docker Desktop](https://www.docker.com/products/docker-desktop/), or `brew install --cask docker`.
-
-Alternative without Docker Desktop's licence terms:
-
+**macOS**
+[Docker Desktop](https://www.docker.com/products/docker-desktop/)
+OR
 ```bash
-brew install colima docker
-colima start
+brew install --cask docker`
 ```
 
-**Windows** — [WSL 2](https://learn.microsoft.com/en-us/windows/wsl/install), then [Docker Desktop](https://www.docker.com/products/docker-desktop/) with the WSL 2 backend enabled.
+**Windows**
+- [WSL 2](https://learn.microsoft.com/en-us/windows/wsl/install)
+- then [Docker Desktop](https://www.docker.com/products/docker-desktop/) with the WSL 2 backend enabled.
 
 #### 2. Install VS Code
 
 1. [VS Code](https://code.visualstudio.com/download).
 2. The [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
 
-Nothing else — Lua, ESLint, Stylelint, Python and ruff extensions install themselves inside the container.
+Nothing else — recommended extensions install themselves inside the container.
 
 #### 3. Clone the repo
 
@@ -52,14 +49,13 @@ Nothing else — Lua, ESLint, Stylelint, Python and ruff extensions install them
 git clone https://github.com/Liquipedia/Lua-Modules.git
 ```
 
-**Windows** — clone inside WSL, not on the Windows drive:
+**Windows**
 
+Clone inside WSL, not on the Windows drive! Otherwise it will be super slow.
 ```bash
 wsl
 git clone https://github.com/Liquipedia/Lua-Modules.git ~/Lua-Modules
 ```
-
-A clone under `/mnt/c` is slow and hits permission errors.
 
 #### 4. Open it in the container
 
@@ -87,7 +83,7 @@ devcontainer exec --workspace-folder . npm run lua-test
 
 JetBrains IDEs can also open a devcontainer directly.
 
-#### Previewing CSS and JS changes on the live wiki
+### Previewing CSS and JS changes on the live wiki
 
 The container ships [mitmproxy](https://mitmproxy.org/) and `scripts/proxy_lp.py`, which serves your local `lua/output/css/main.css` and `lua/output/js/main.js` instead of the ones liquipedia.net would load. Background: [wiki page](https://github.com/Liquipedia/Lua-Modules/wiki/Local-Development-Setup-for-CSS-and-JS).
 
