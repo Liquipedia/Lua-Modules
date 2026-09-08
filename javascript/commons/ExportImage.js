@@ -1,4 +1,4 @@
-/* global html2canvas */
+/* global snapdom */
 
 /*******************************************************************************
  * Description: Adds export functionality to Liquipedia pages, enabling users
@@ -19,7 +19,6 @@ const EXPORT_IMAGE_CONFIG = {
 		LOGO_WIDTH: 22,
 		LOGO_HEIGHT: 16,
 		LOGO_OFFSET_X: 12,
-		LOGO_OFFSET_Y_ADJUST: 2,
 		TEXT_OFFSET_X: 40,
 		HEADER_TEXT_OFFSET: 16,
 		MIN_WIDTH: 300
@@ -38,6 +37,12 @@ const EXPORT_IMAGE_CONFIG = {
 		IMAGE_LOAD: 5000,
 		URL_REVOKE_DELAY: 100
 	},
+	// Capture always runs inside an iframe of this width so media queries resolve against a
+	// fixed desktop viewport regardless of the visitor's actual window size.
+	CAPTURE_IFRAME_WIDTH: 1440,
+	// DEBUG: show the capture iframe as an overlay, gated behind a "Capture" button, so its
+	// content can be inspected before snapdom runs. Set to false (or delete this line) when done.
+	DEBUG_PREVIEW: true,
 	COLORS: {
 		DARK: {
 			BACKGROUND: '#121212',
@@ -104,414 +109,255 @@ const EXPORT_IMAGE_CONFIG = {
 };
 
 /**
- * Manages image caching and loading
- */
-class ImageCache {
-	constructor() {
-		this.cache = new Map();
-	}
-
-	async load( url, key, timeout = EXPORT_IMAGE_CONFIG.TIMEOUTS.IMAGE_LOAD ) {
-		// Return cached image if available
-		if ( this.cache.has( key ) ) {
-			return this.cache.get( key );
-		}
-
-		return new Promise( ( resolve, reject ) => {
-			const image = new Image();
-			image.crossOrigin = 'Anonymous';
-
-			const timeoutId = setTimeout( () => {
-				image.src = ''; // Cancel image load
-				reject( new Error( `Image load timeout: ${ url }` ) );
-			}, timeout );
-
-			const cleanup = () => clearTimeout( timeoutId );
-
-			image.onload = () => {
-				cleanup();
-				this.cache.set( key, image );
-				resolve( image );
-			};
-
-			image.onerror = () => {
-				cleanup();
-				reject( new Error( `Image load failed: ${ url }` ) );
-			};
-
-			image.src = url;
-		} );
-	}
-
-	clear() {
-		this.cache.clear();
-	}
-}
-
-/**
- * Handles canvas composition and rendering
- */
-class CanvasComposer {
-	constructor( imageCache ) {
-		this.imageCache = imageCache;
-		this.offscreenContext = null;
-	}
-
-	async compose( sourceCanvas, sectionTitle, isDarkTheme, scale = 1 ) {
-		const dims = this.getScaledDimensions( scale );
-		const fonts = this.getScaledFonts( scale );
-
-		const contentWidth = sourceCanvas.width + ( dims.PADDING * 2 );
-		const canvasWidth = Math.max( contentWidth, dims.MIN_WIDTH );
-
-		const headerLayout = this.calculateHeaderLayout( canvasWidth, sectionTitle, scale, fonts, dims );
-		const canvas = this.createCanvas( sourceCanvas, headerLayout.height, canvasWidth, dims );
-		const context = canvas.getContext( '2d' );
-		const theme = isDarkTheme ? EXPORT_IMAGE_CONFIG.COLORS.DARK : EXPORT_IMAGE_CONFIG.COLORS.LIGHT;
-
-		this.drawBackground( context, canvas.width, canvas.height, theme );
-		this.drawHeader( context, canvas.width, theme, headerLayout, fonts, dims );
-		this.drawContent( context, sourceCanvas, headerLayout.height, dims );
-		await this.drawFooter(
-			context, canvas.width, sourceCanvas.height, theme, isDarkTheme, headerLayout.height, fonts, dims
-		);
-
-		return canvas;
-	}
-
-	getScaledDimensions( scale ) {
-		const dims = {};
-		for ( const [ key, value ] of Object.entries( EXPORT_IMAGE_CONFIG.DIMENSIONS ) ) {
-			dims[ key ] = typeof value === 'number' ? value * scale : value;
-		}
-		return dims;
-	}
-
-	getScaledFonts( scale ) {
-		const fonts = {};
-		for ( const [ key, fontString ] of Object.entries( EXPORT_IMAGE_CONFIG.FONTS ) ) {
-			fonts[ key ] = this.scaleFontSize( fontString, scale );
-		}
-		return fonts;
-	}
-
-	scaleFontSize( fontString, scale ) {
-		return fontString.replace( /(\d+)px/, ( _match, pixels ) => {
-			const scaledPixels = parseInt( pixels ) * scale;
-			return `${ scaledPixels }px`;
-		} );
-	}
-
-	getOffscreenContext() {
-		if ( !this.offscreenContext ) {
-			const canvas = document.createElement( 'canvas' );
-			this.offscreenContext = canvas.getContext( '2d' );
-		}
-		return this.offscreenContext;
-	}
-
-	createCanvas( sourceCanvas, headerHeight, width, dims ) {
-		const canvas = document.createElement( 'canvas' );
-		canvas.width = width;
-		canvas.height = sourceCanvas.height + headerHeight + dims.FOOTER_HEIGHT + ( dims.PADDING * 4 );
-		return canvas;
-	}
-
-	drawBackground( context, width, height, theme ) {
-		context.fillStyle = theme.BACKGROUND;
-		context.fillRect( 0, 0, width, height );
-	}
-
-	drawHeader( context, canvasWidth, theme, headerLayout, fonts, dims ) {
-		// Draw header background with gradient
-		const gradient = context.createLinearGradient( dims.PADDING, 0, canvasWidth - dims.PADDING, 0 );
-		gradient.addColorStop( 0, theme.HEADER_START );
-		gradient.addColorStop( 1, theme.HEADER_END );
-
-		context.fillStyle = gradient;
-		this.drawRoundedRect(
-			context,
-			dims.PADDING,
-			dims.PADDING,
-			canvasWidth - ( dims.PADDING * 2 ),
-			headerLayout.height,
-			dims.BORDER_RADIUS
-		);
-		context.fill();
-
-		// Draw header text
-		context.fillStyle = '#ffffff';
-		context.textBaseline = 'middle';
-
-		if ( headerLayout.isStacked ) {
-			this.drawStackedHeader( context, headerLayout, fonts, dims );
-		} else {
-			this.drawHorizontalHeader( context, headerLayout, canvasWidth, fonts, dims );
-		}
-	}
-
-	drawStackedHeader( context, headerLayout, fonts, dims ) {
-		context.textAlign = 'left';
-		const lineHeight = 18 * ( dims.PADDING / 12 ); // Scale lineHeight with dims
-		const totalLines = headerLayout.mainTitleLines.length + headerLayout.sectionTitleLines.length;
-		let currentY = dims.PADDING + ( headerLayout.height - ( ( totalLines - 1 ) * lineHeight ) ) / 2;
-
-		context.font = fonts.HEADER;
-		for ( const line of headerLayout.mainTitleLines ) {
-			context.fillText( line, dims.PADDING + dims.HEADER_TEXT_OFFSET, currentY );
-			currentY += lineHeight;
-		}
-
-		context.font = fonts.SUBHEADER;
-		for ( const line of headerLayout.sectionTitleLines ) {
-			context.fillText( line, dims.PADDING + dims.HEADER_TEXT_OFFSET, currentY );
-			currentY += lineHeight;
-		}
-	}
-
-	drawHorizontalHeader( context, headerLayout, canvasWidth, fonts, dims ) {
-		const verticalCenter = dims.PADDING + ( headerLayout.height / 2 );
-
-		context.textAlign = 'left';
-		context.font = fonts.HEADER;
-		context.fillText(
-			headerLayout.mainTitleLines[ 0 ],
-			dims.PADDING + dims.HEADER_TEXT_OFFSET,
-			verticalCenter
-		);
-
-		context.textAlign = 'right';
-		context.font = fonts.SUBHEADER;
-		context.fillText(
-			headerLayout.sectionTitleLines[ 0 ],
-			canvasWidth - dims.PADDING - dims.HEADER_TEXT_OFFSET,
-			verticalCenter
-		);
-	}
-
-	drawContent( context, sourceCanvas, headerHeight, dims ) {
-		context.drawImage(
-			sourceCanvas,
-			dims.PADDING,
-			dims.PADDING + headerHeight + dims.PADDING
-		);
-	}
-
-	async drawFooter( context, canvasWidth, sourceHeight, theme, isDarkTheme, headerHeight, fonts, dims ) {
-		const footerY = dims.PADDING + headerHeight + dims.PADDING + sourceHeight + dims.PADDING;
-
-		// Draw footer background
-		const gradient = context.createLinearGradient( dims.PADDING, 0, canvasWidth - dims.PADDING, 0 );
-		gradient.addColorStop( 0, theme.FOOTER_START );
-		gradient.addColorStop( 1, theme.FOOTER_END );
-
-		context.fillStyle = gradient;
-		this.drawRoundedRect(
-			context,
-			dims.PADDING,
-			footerY,
-			canvasWidth - ( dims.PADDING * 2 ),
-			dims.FOOTER_HEIGHT,
-			dims.BORDER_RADIUS
-		);
-		context.fill();
-
-		// Draw footer text
-		context.fillStyle = theme.TEXT;
-		context.font = fonts.FOOTER;
-		context.textAlign = 'left';
-		const textY = footerY + ( dims.FOOTER_HEIGHT / 2 );
-
-		this.drawTextWithSpacing(
-			context,
-			'POWERED BY LIQUIPEDIA',
-			dims.PADDING + dims.TEXT_OFFSET_X,
-			textY,
-			EXPORT_IMAGE_CONFIG.SPACING.LETTER_SPACING * ( dims.LOGO_WIDTH / 22 )
-		);
-
-		// Draw logo (non-critical, catch errors silently)
-		try {
-			await this.drawLogo( context, footerY, isDarkTheme, dims );
-		} catch ( error ) {
-			// eslint-disable-next-line no-console
-			console.warn( 'Logo rendering failed:', error );
-		}
-	}
-
-	calculateHeaderLayout( canvasWidth, sectionTitle, scale, fonts, dims ) {
-		const availableWidth = canvasWidth - ( dims.PADDING * 2 ) - ( dims.HEADER_TEXT_OFFSET * 2 );
-		const mainTitle = mw.config.get( 'wgDisplayTitle' ) || mw.config.get( 'wgTitle' );
-
-		const context = this.getOffscreenContext();
-
-		// Measure text widths
-		context.font = fonts.HEADER;
-		const mainTitleWidth = context.measureText( mainTitle ).width;
-
-		context.font = fonts.SUBHEADER;
-		const sectionTitleWidth = context.measureText( sectionTitle ).width;
-
-		const totalTextWidth = mainTitleWidth + sectionTitleWidth + ( dims.HEADER_TEXT_OFFSET * 2 );
-		const sideBySideAvailableWidth = canvasWidth - ( dims.PADDING * 2 ) - dims.TEXT_OFFSET_X;
-
-		// Check if text fits side-by-side
-		if ( totalTextWidth <= sideBySideAvailableWidth ) {
-			return {
-				height: dims.HEADER_HEIGHT,
-				isStacked: false,
-				mainTitleLines: [ mainTitle ],
-				sectionTitleLines: [ sectionTitle ]
-			};
-		}
-
-		// Calculate stacked layout
-		const mainTitleLines = this.wrapText( context, mainTitle, availableWidth, fonts.HEADER );
-		const sectionTitleLines = this.wrapText( context, sectionTitle, availableWidth, fonts.SUBHEADER );
-
-		const lineHeight = 18 * scale;
-		const verticalPadding = 12 * scale;
-		const calculatedHeight = Math.max(
-			dims.HEADER_HEIGHT,
-			( ( mainTitleLines.length + sectionTitleLines.length ) * lineHeight ) + verticalPadding
-		);
-
-		return {
-			height: calculatedHeight,
-			isStacked: true,
-			mainTitleLines,
-			sectionTitleLines
-		};
-	}
-
-	wrapText( context, text, maxWidth, font ) {
-		context.font = font;
-		const words = text.split( ' ' );
-
-		if ( words.length === 0 ) {
-			return [];
-		}
-
-		const lines = [];
-		let currentLine = words[ 0 ];
-
-		for ( let i = 1; i < words.length; i++ ) {
-			const testLine = `${ currentLine } ${ words[ i ] }`;
-			const width = context.measureText( testLine ).width;
-
-			if ( width <= maxWidth ) {
-				currentLine = testLine;
-			} else {
-				lines.push( currentLine );
-				currentLine = words[ i ];
-			}
-		}
-		lines.push( currentLine );
-
-		return lines;
-	}
-
-	async drawLogo( context, footerY, isDarkTheme, dims ) {
-		const logoUrl = isDarkTheme ? EXPORT_IMAGE_CONFIG.LOGOS.DARK : EXPORT_IMAGE_CONFIG.LOGOS.LIGHT;
-		const cacheKey = isDarkTheme ? 'dark' : 'light';
-		const logoImage = await this.imageCache.load( logoUrl, cacheKey );
-		const logoY = footerY + ( dims.FOOTER_HEIGHT - dims.LOGO_HEIGHT ) / 2;
-
-		context.drawImage(
-			logoImage,
-			dims.PADDING + dims.LOGO_OFFSET_X,
-			logoY,
-			dims.LOGO_WIDTH,
-			dims.LOGO_HEIGHT
-		);
-	}
-
-	drawRoundedRect( context, x, y, width, height, radius ) {
-		context.beginPath();
-
-		if ( context.roundRect ) {
-			context.roundRect( x, y, width, height, radius );
-		} else {
-			this.drawRoundRectFallback( context, x, y, width, height, radius );
-		}
-
-		context.closePath();
-	}
-
-	drawRoundRectFallback( context, x, y, width, height, radius ) {
-		context.moveTo( x + radius, y );
-		context.lineTo( x + width - radius, y );
-		context.quadraticCurveTo( x + width, y, x + width, y + radius );
-		context.lineTo( x + width, y + height - radius );
-		context.quadraticCurveTo( x + width, y + height, x + width - radius, y + height );
-		context.lineTo( x + radius, y + height );
-		context.quadraticCurveTo( x, y + height, x, y + height - radius );
-		context.lineTo( x, y + radius );
-		context.quadraticCurveTo( x, y, x + radius, y );
-	}
-
-	drawTextWithSpacing( context, text, x, y, spacing ) {
-		let cursor = x;
-		for ( const character of text ) {
-			context.fillText( character, cursor, y );
-			cursor += context.measureText( character ).width + spacing;
-		}
-	}
-}
-
-/**
- * Handles export operations (canvas capture, download, clipboard)
+ * Handles export operations (DOM composition, canvas capture, download, clipboard)
  */
 class ExportService {
-	constructor( canvasComposer ) {
-		this.canvasComposer = canvasComposer;
-		this.html2canvasLoaded = false;
+	constructor() {
+		this.snapdomLoaded = false;
 		this.activeExports = new Set();
 	}
 
-	applyCloneFixes( clonedDoc ) {
-		this.hideInfoIcons( clonedDoc );
-		this.removeContentSwitchers( clonedDoc );
-		this.removePrizepoolToggles( clonedDoc );
-		this.expandPrizepoolTables( clonedDoc );
-	}
-
-	// Hides info icons that shouldn't appear in exports
-	hideInfoIcons( clonedDoc ) {
-		const infoIcons = clonedDoc.querySelectorAll( '.brkts-match-info-icon' );
-		for ( const icon of infoIcons ) {
-			icon.style.opacity = '0';
+	// element itself may match the selector, not just its descendants.
+	queryAllIncludingSelf( element, selector ) {
+		const matches = [ ...element.querySelectorAll( selector ) ];
+		if ( element.matches( selector ) ) {
+			matches.push( element );
 		}
+		return matches;
 	}
 
-	// Remove toggle switches
-	removeContentSwitchers( clonedDoc ) {
-		const contentSwitches = clonedDoc.querySelectorAll( '.switch-pill-container' );
-
-		for ( const contentSwitch of contentSwitches ) {
-			contentSwitch.remove();
-		}
-	}
-
-	removePrizepoolToggles( clonedDoc ) {
-		// The legacy in-table toggle and the redesigned table's footer (now inside the
-		// captured wrapper) shouldn't appear in a static export.
-		const prizepoolToggles = clonedDoc.querySelectorAll(
-			'.prizepooltabletoggle, .prizepool-table-wrapper .table2__footer'
-		);
-
-		for ( const prizepoolToggle of prizepoolToggles ) {
-			prizepoolToggle.remove();
-		}
-	}
-
-	// Cut placements are hidden by `.collapsed` on the wrapper; expand so they export.
-	expandPrizepoolTables( clonedDoc ) {
-		const collapsedTables = clonedDoc.querySelectorAll( '.prizepool-table-wrapper.collapsed' );
+	// Cut placements are hidden by `.collapsed` on the wrapper; expand so they export. The
+	// "place X to Y" toggle footer has to come out of the DOM outright, not just off the
+	// snapdom exclude list — exclude/remove only keeps a node out of the painted canvas, it
+	// doesn't collapse the box the node still reserves, so leaving it in left a toggle-sized
+	// gap under the last row.
+	expandPrizepoolTables( element ) {
+		const collapsedTables = this.queryAllIncludingSelf( element, '.prizepool-table-wrapper.collapsed' );
 
 		for ( const collapsedTable of collapsedTables ) {
 			collapsedTable.classList.remove( 'collapsed' );
 		}
+
+		const toggleFooters = this.queryAllIncludingSelf( element, '.prizepool-table-wrapper .table2__footer' );
+
+		for ( const toggleFooter of toggleFooters ) {
+			toggleFooter.remove();
+		}
+
+		return collapsedTables;
+	}
+
+	// Shallow ancestor shells keep ancestor-scoped CSS (e.g. theme--dark) applying to the clone.
+	// `content` sits at the bottom of the spine, so it has to be fully assembled before this
+	// runs: the returned root is the only node attached to the document, and anything left
+	// outside it is detached and lays out at zero size.
+	buildAncestorSpine( element, content ) {
+		let root = content;
+		let descendant = element;
+		let ancestor = element.parentElement;
+
+		while ( ancestor ) {
+			const shallowClone = ancestor.cloneNode( false );
+			shallowClone.appendChild( root );
+			this.carrySwitchState( ancestor, descendant, shallowClone );
+			root = shallowClone;
+			descendant = ancestor;
+			ancestor = ancestor.parentElement;
+		}
+
+		return root;
+	}
+
+	// Switch state is read by CSS with `:has()` scoped to an ancestor — e.g. the participants
+	// "Compact view" toggle via `.team-participant:has( .switch-toggle-active[...] )` — but the
+	// toggles themselves sit in sibling controls the shallow shells drop, so those rules stop
+	// matching and the clone exports in its default state. Re-add them under the same shell so
+	// the scoping still resolves; `:has()` matches regardless of `display`, and these live
+	// outside the captured wrapper, so they never reach the image.
+	carrySwitchState( ancestor, descendant, shallowClone ) {
+		const switchElements = ancestor.querySelectorAll( '.switch-toggle, .switch-pill' );
+
+		for ( const switchElement of switchElements ) {
+			// Anything inside `descendant` is already carried by the level below.
+			if ( descendant.contains( switchElement ) ) {
+				continue;
+			}
+
+			const switchClone = switchElement.cloneNode( true );
+			switchClone.style.display = 'none';
+			shallowClone.appendChild( switchClone );
+		}
+	}
+
+	// Brackets.scss forces `--match-width: var( --match-width-mobile ) !important` under 768px,
+	// so a bracket exported from a phone renders at the cramped mobile width instead of the
+	// desktop one baked into the markup as `style="--match-width:190px"`. A stylesheet
+	// `!important` only loses to another `!important` of equal-or-higher specificity, and an
+	// inline declaration outranks any selector — so re-declaring the clone's own existing value
+	// as `!important` restores the desktop width without rebuilding the page in a sandboxed
+	// viewport (which previously broke unrelated `:has()`-driven toggles when their stylesheets
+	// were re-applied fresh at a forced width).
+	normalizeBracketWidth( element ) {
+		const brackets = this.queryAllIncludingSelf( element, '.brkts-bracket' );
+
+		for ( const bracket of brackets ) {
+			const desktopWidth = bracket.style.getPropertyValue( '--match-width' );
+			if ( desktopWidth ) {
+				bracket.style.setProperty( '--match-width', desktopWidth, 'important' );
+			}
+		}
+	}
+
+	// wrapWithHeaderFooter() deliberately sizes the wrapper as `width: fit-content` so small
+	// content (a table, a bracket) keeps a snug header/footer — but that leaves any grid inside
+	// with no definite width in its own axis, and per the CSS Grid spec, `repeat( auto-fill/
+	// auto-fit, ... )` collapses to a single track whenever the grid container has no definite
+	// size. That's why clones of e.g. `.team-participant__grid` render as one column. Forcing an
+	// explicit reference width lets auto-fill/auto-fit resolve properly; this must run once the
+	// clone is inside the capture iframe, so the desktop CSS (not a real mobile viewport's
+	// media queries) is what's active when it resolves.
+	// A grid with a fixed track template (`.brkts-matchlist`'s 5 columns, a `.generic-label`'s
+	// `1fr auto 1fr`) always reports that many resolved tracks regardless of container width, so
+	// forcing the reference width onto it just stretches those tracks into blank space or, for
+	// small inline badges, blows the element up to iframe width. Only a genuinely collapsed
+	// auto-fill/auto-fit grid resolves to a *single* pixel-length track — that single-track
+	// shape is what identifies a collapse candidate, not any particular selector, so this needs
+	// no allow-list or deny-list of known grids to stay correct as new ones are added.
+	resolveAutoFillGrids( root ) {
+		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+		const referenceWidth = EXPORT_IMAGE_CONFIG.CAPTURE_IFRAME_WIDTH - ( dims.PADDING * 2 );
+
+		const gridNodes = this.queryAllIncludingSelf( root, '*' ).filter( ( node ) => {
+			const computedStyle = node.ownerDocument.defaultView.getComputedStyle( node );
+			if ( computedStyle.display !== 'grid' && computedStyle.display !== 'inline-grid' ) {
+				return false;
+			}
+			const tracks = computedStyle.gridTemplateColumns.trim().split( /\s+/ );
+			return tracks.length === 1 && tracks[ 0 ].endsWith( 'px' );
+		} );
+
+		for ( const gridNode of gridNodes ) {
+			gridNode.style.width = `${ referenceWidth }px`;
+		}
+	}
+
+	// A `grid-template-columns: subgrid` root (e.g. `.brkts-matchlist-collapse-area`) loses its tracks once buildAncestorSpine() reparents it under a plain flex wrapper, so bake the live parent's resolved pixel tracks onto the clone to make it self-contained.
+	resolveSubgridRoot( element, target ) {
+		if ( window.getComputedStyle( element ).gridTemplateColumns.startsWith( 'subgrid' ) ) {
+			target.style.display = 'grid';
+			target.style.gridTemplateColumns = window.getComputedStyle( element.parentElement ).gridTemplateColumns;
+		}
+	}
+
+	// snapdom doesn't wait for images; undecoded ones can be missing or collapse row heights.
+	async waitForImages( element, timeout = EXPORT_IMAGE_CONFIG.TIMEOUTS.IMAGE_LOAD ) {
+		const images = this.queryAllIncludingSelf( element, 'img' );
+
+		await Promise.all( images.map( ( image ) => Promise.race( [
+			image.decode ? image.decode().catch( () => {} ) : Promise.resolve(),
+			new Promise( ( resolve ) => {
+				setTimeout( resolve, timeout );
+			} )
+		] ) ) );
+	}
+
+	createLogoImage( isDarkTheme ) {
+		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+		const logo = document.createElement( 'img' );
+
+		logo.crossOrigin = 'anonymous';
+		logo.src = isDarkTheme ? EXPORT_IMAGE_CONFIG.LOGOS.DARK : EXPORT_IMAGE_CONFIG.LOGOS.LIGHT;
+		logo.width = dims.LOGO_WIDTH;
+		logo.height = dims.LOGO_HEIGHT;
+		logo.style.display = 'block';
+		logo.style.flex = 'none';
+
+		return logo;
+	}
+
+	buildHeaderElement( sectionTitle, isDarkTheme, dims ) {
+		const theme = isDarkTheme ? EXPORT_IMAGE_CONFIG.COLORS.DARK : EXPORT_IMAGE_CONFIG.COLORS.LIGHT;
+
+		const mainTitle = document.createElement( 'span' );
+		mainTitle.textContent = mw.config.get( 'wgDisplayTitle' ) || mw.config.get( 'wgTitle' );
+		Object.assign( mainTitle.style, { font: EXPORT_IMAGE_CONFIG.FONTS.HEADER, color: '#ffffff' } );
+
+		const subTitle = document.createElement( 'span' );
+		subTitle.textContent = sectionTitle;
+		Object.assign( subTitle.style, { font: EXPORT_IMAGE_CONFIG.FONTS.SUBHEADER, color: '#ffffff' } );
+
+		const header = document.createElement( 'div' );
+		Object.assign( header.style, {
+			display: 'flex',
+			flexWrap: 'wrap',
+			alignItems: 'center',
+			justifyContent: 'space-between',
+			rowGap: '4px',
+			minHeight: `${ dims.HEADER_HEIGHT }px`,
+			padding: `4px ${ dims.HEADER_TEXT_OFFSET }px`,
+			borderRadius: `${ dims.BORDER_RADIUS }px`,
+			background: `linear-gradient(to right, ${ theme.HEADER_START }, ${ theme.HEADER_END })`,
+			boxSizing: 'border-box'
+		} );
+		header.append( mainTitle, subTitle );
+
+		return header;
+	}
+
+	buildFooterElement( isDarkTheme, dims ) {
+		const theme = isDarkTheme ? EXPORT_IMAGE_CONFIG.COLORS.DARK : EXPORT_IMAGE_CONFIG.COLORS.LIGHT;
+
+		const logo = this.createLogoImage( isDarkTheme );
+		logo.style.marginLeft = `${ dims.LOGO_OFFSET_X }px`;
+
+		const text = document.createElement( 'span' );
+		text.textContent = 'POWERED BY LIQUIPEDIA';
+		Object.assign( text.style, {
+			font: EXPORT_IMAGE_CONFIG.FONTS.FOOTER,
+			color: theme.TEXT,
+			letterSpacing: `${ EXPORT_IMAGE_CONFIG.SPACING.LETTER_SPACING }px`,
+			marginLeft: `${ dims.TEXT_OFFSET_X - dims.LOGO_OFFSET_X - dims.LOGO_WIDTH }px`
+		} );
+
+		const footer = document.createElement( 'div' );
+		Object.assign( footer.style, {
+			display: 'flex',
+			alignItems: 'center',
+			height: `${ dims.FOOTER_HEIGHT }px`,
+			borderRadius: `${ dims.BORDER_RADIUS }px`,
+			background: `linear-gradient(to right, ${ theme.FOOTER_START }, ${ theme.FOOTER_END })`,
+			boxSizing: 'border-box'
+		} );
+		footer.append( logo, text );
+
+		return footer;
+	}
+
+	wrapWithHeaderFooter( target, sectionTitle, isDarkTheme ) {
+		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+		const theme = isDarkTheme ? EXPORT_IMAGE_CONFIG.COLORS.DARK : EXPORT_IMAGE_CONFIG.COLORS.LIGHT;
+
+		const wrapper = document.createElement( 'div' );
+		Object.assign( wrapper.style, {
+			display: 'flex',
+			flexDirection: 'column',
+			gap: `${ dims.PADDING }px`,
+			padding: `${ dims.PADDING }px`,
+			width: 'fit-content',
+			minWidth: `${ dims.MIN_WIDTH }px`,
+			background: theme.BACKGROUND,
+			boxSizing: 'border-box'
+		} );
+
+		target.style.alignSelf = 'flex-start';
+
+		wrapper.append(
+			this.buildHeaderElement( sectionTitle, isDarkTheme, dims ),
+			target,
+			this.buildFooterElement( isDarkTheme, dims )
+		);
+
+		return wrapper;
 	}
 
 	async export( element, title, mode ) {
@@ -524,7 +370,7 @@ class ExportService {
 		this.activeExports.add( exportId );
 
 		try {
-			await this.ensureHtml2CanvasLoaded();
+			await this.ensureSnapdomLoaded();
 
 			if ( mode === 'copy' ) {
 				await this.copyToClipboard( element, title );
@@ -539,39 +385,69 @@ class ExportService {
 		}
 	}
 
+	// On WebKit (every iOS browser), snapdom renders shadowed content at native size then resamples it up to avoid corrupting box/text-shadow, which softens the result — so exports need to detect it and compensate.
+	// `window.chrome` is excluded because Chrome DevTools' device toolbar (e.g. its "iPhone"
+	// presets) only overrides navigator.userAgent to a real Mobile Safari string — the engine
+	// underneath is still Blink, which keeps `window.chrome` — so without this check testing an
+	// export under an emulated iPhone falsely triggers the Safari branch (oversampling to a
+	// higher, size-inflating scale for a WebKit blur that Blink doesn't actually have).
+	isSafariBrowser() {
+		const ua = navigator.userAgent;
+		return /safari/i.test( ua ) && !/chrome|android|crios|fxios|edg/i.test( ua ) && !window.chrome;
+	}
+
 	async generateImageBlob( element, title ) {
-		const originalBackground = element.style.background;
 		const isDarkTheme = document.documentElement.classList.contains( 'theme--dark' );
 		const backgroundColor = this.getBackgroundColor();
-		// This ensures the scale is at least 2, but never higher than 3
-		const scale = Math.min( Math.max( window.devicePixelRatio || 1, 2 ), 3 );
+		const frameBackground = isDarkTheme ?
+			EXPORT_IMAGE_CONFIG.COLORS.DARK.BACKGROUND :
+			EXPORT_IMAGE_CONFIG.COLORS.LIGHT.BACKGROUND;
+		const dpr = window.devicePixelRatio || 1;
+		// Safari gets a higher ceiling to oversample past its shadow-safe resample blur (see isSafariBrowser()); everyone else keeps the original, size-conscious 2-3x range.
+		const scale = this.isSafariBrowser() ?
+			Math.min( Math.max( dpr, 3 ), 4 ) :
+			Math.min( Math.max( dpr, 2 ), 3 );
+
+		const target = element.cloneNode( true );
+
+		// Must run before the clone is detached/repositioned, while `element`'s ancestor
+		// still provides the live subgrid tracks to copy onto the clone.
+		this.resolveSubgridRoot( element, target );
+
+		// Mutates the clone, not the live page, so nothing needs restoring afterwards.
+		target.style.background = backgroundColor;
+		this.expandPrizepoolTables( target );
+		this.normalizeBracketWidth( target );
+
+		// The wrapper is what gets captured, so the spine has to be built around it —
+		// wrapWithHeaderFooter() moves `target` inside, leaving it orphaned otherwise.
+		const wrapper = this.wrapWithHeaderFooter( target, title, isDarkTheme );
+		const root = this.buildAncestorSpine( element, wrapper );
+
+		const cleanupCaptureFrame = await this.prepareCaptureFrame( root, wrapper );
 
 		try {
-			element.style.background = backgroundColor;
-
-			const capturedCanvas = await html2canvas( element, {
+			const capturedCanvas = await snapdom.toCanvas( wrapper, {
 				scale: scale,
-				windowWidth: 1440,
-				windowHeight: document.documentElement.scrollHeight,
-				scrollX: 0,
-				scrollY: 0,
-				backgroundColor: backgroundColor,
-				onclone: ( clonedDoc ) => this.applyCloneFixes( clonedDoc )
+				dpr: 1,
+				backgroundColor: frameBackground,
+				reconcile: true,
+				fast: false,
+				exclude: [
+					'.switch-pill-container',
+					'.prizepooltabletoggle'
+				],
+				excludeMode: 'remove',
+				filter: ( capturedElement ) => !capturedElement.matches( '.brkts-match-info-icon' ),
+				filterMode: 'hide'
 			} );
 
 			if ( capturedCanvas.width === 0 || capturedCanvas.height === 0 ) {
 				throw new Error( 'Canvas capture resulted in zero dimensions' );
 			}
 
-			const composedCanvas = await this.canvasComposer.compose(
-				capturedCanvas,
-				title,
-				isDarkTheme,
-				scale
-			);
-
 			return new Promise( ( resolve, reject ) => {
-				composedCanvas.toBlob( ( blob ) => {
+				capturedCanvas.toBlob( ( blob ) => {
 					if ( blob ) {
 						resolve( blob );
 					} else {
@@ -580,8 +456,118 @@ class ExportService {
 				}, 'image/png' );
 			} );
 		} finally {
-			element.style.background = originalBackground;
+			cleanupCaptureFrame();
 		}
+	}
+
+	// Runs the capture inside a fixed-width iframe rather than an off-screen div in the main
+	// document. `position: fixed` off-screen doesn't create a new viewport, so media queries
+	// on the clone still resolve against the visitor's actual (possibly mobile-width) window —
+	// an iframe of its own gets a genuine viewport sized to CAPTURE_IFRAME_WIDTH, so breakpoint
+	// CSS always resolves the same regardless of how narrow the real window is.
+	// DEBUG: when DEBUG_PREVIEW is on, the iframe is shown as an overlay with a "Capture"
+	// button, so the exact content about to be captured can be inspected before it runs.
+	async prepareCaptureFrame( root, wrapper ) {
+		const debug = EXPORT_IMAGE_CONFIG.DEBUG_PREVIEW;
+
+		const iframe = document.createElement( 'iframe' );
+		Object.assign( iframe.style, debug ? {
+			width: `${ EXPORT_IMAGE_CONFIG.CAPTURE_IFRAME_WIDTH }px`,
+			height: '80vh',
+			border: '2px solid #fff',
+			background: '#fff',
+			flex: 'none'
+		} : {
+			width: `${ EXPORT_IMAGE_CONFIG.CAPTURE_IFRAME_WIDTH }px`,
+			height: '1px',
+			border: '0',
+			position: 'fixed',
+			top: '-99999px',
+			left: '-99999px'
+		} );
+
+		const loaded = new Promise( ( resolve ) => {
+			iframe.addEventListener( 'load', resolve, { once: true } );
+		} );
+
+		let overlay = null;
+		let button = null;
+
+		if ( debug ) {
+			button = document.createElement( 'button' );
+			button.textContent = 'Capture';
+			Object.assign( button.style, {
+				padding: '8px 20px',
+				fontSize: '14px',
+				cursor: 'pointer',
+				flex: 'none'
+			} );
+
+			overlay = document.createElement( 'div' );
+			Object.assign( overlay.style, {
+				position: 'fixed',
+				inset: '0',
+				zIndex: '999999',
+				background: 'rgba(0,0,0,0.75)',
+				display: 'flex',
+				flexDirection: 'column',
+				alignItems: 'center',
+				gap: '12px',
+				padding: '24px',
+				overflow: 'auto'
+			} );
+			overlay.append( button, iframe );
+			document.body.appendChild( overlay );
+		} else {
+			document.body.appendChild( iframe );
+		}
+
+		await loaded;
+
+		const iframeDoc = iframe.contentDocument;
+
+		// Cloned <link> stylesheets fetch/parse asynchronously in the iframe's own document,
+		// so the CSS isn't necessarily active yet right after appendChild. resolveAutoFillGrids()
+		// needs the real `display: grid` computed style to find anything — running it too early
+		// finds nothing, and by the time the CSS does apply the grid is left with no explicit
+		// width, collapsing auto-fill to a single column. Wait for each clone to actually load
+		// (listener attached before insertion, so an already-cached/instant load isn't missed).
+		const styleLoadPromises = [];
+		for ( const styleNode of document.querySelectorAll( 'link[rel="stylesheet"], style' ) ) {
+			const clonedStyleNode = styleNode.cloneNode( true );
+
+			if ( clonedStyleNode.tagName === 'LINK' ) {
+				styleLoadPromises.push( Promise.race( [
+					new Promise( ( resolve ) => {
+						clonedStyleNode.addEventListener( 'load', resolve, { once: true } );
+						clonedStyleNode.addEventListener( 'error', resolve, { once: true } );
+					} ),
+					new Promise( ( resolve ) => {
+						setTimeout( resolve, EXPORT_IMAGE_CONFIG.TIMEOUTS.IMAGE_LOAD );
+					} )
+				] ) );
+			}
+
+			iframeDoc.head.appendChild( clonedStyleNode );
+		}
+		await Promise.all( styleLoadPromises );
+
+		iframeDoc.body.style.margin = '0';
+		iframeDoc.body.appendChild( root );
+		this.resolveAutoFillGrids( root );
+
+		if ( iframeDoc.fonts && iframeDoc.fonts.ready ) {
+			await iframeDoc.fonts.ready;
+		}
+		await this.waitForImages( wrapper );
+
+		if ( debug ) {
+			await new Promise( ( resolve ) => {
+				button.addEventListener( 'click', resolve, { once: true } );
+			} );
+		}
+
+		return () => ( overlay || iframe ).remove();
 	}
 
 	async copyToClipboard( element, title ) {
@@ -618,14 +604,14 @@ class ExportService {
 		}, EXPORT_IMAGE_CONFIG.TIMEOUTS.URL_REVOKE_DELAY );
 	}
 
-	async ensureHtml2CanvasLoaded() {
-		if ( this.html2canvasLoaded ) {
+	async ensureSnapdomLoaded() {
+		if ( this.snapdomLoaded ) {
 			return;
 		}
 
 		return new Promise( ( resolve ) => {
-			mw.loader.using( 'html2canvas', () => {
-				this.html2canvasLoaded = true;
+			mw.loader.using( 'snapdom', () => {
+				this.snapdomLoaded = true;
 				resolve();
 			} );
 		} );
@@ -958,7 +944,7 @@ class DropdownWidget {
 
 		button.addEventListener( 'click', () => {
 			if ( menuElement.style.display === 'none' ) {
-				this.exportService.ensureHtml2CanvasLoaded();
+				this.exportService.ensureSnapdomLoaded();
 				if ( onOpen ) {
 					onOpen();
 				}
@@ -1239,9 +1225,7 @@ class ZoomManager {
  */
 class ExportImageModule {
 	constructor() {
-		this.imageCache = new ImageCache();
-		this.canvasComposer = new CanvasComposer( this.imageCache );
-		this.exportService = new ExportService( this.canvasComposer );
+		this.exportService = new ExportService();
 		this.zoomManager = new ZoomManager();
 		this.dropdownWidget = new DropdownWidget( this.exportService, this.zoomManager );
 	}
@@ -1270,7 +1254,6 @@ class ExportImageModule {
 	}
 
 	cleanup() {
-		this.imageCache.clear();
 		const dropdowns = document.querySelectorAll( '.dropdown-widget' );
 		for ( const dropdown of dropdowns ) {
 			this.dropdownWidget.cleanup( dropdown );
