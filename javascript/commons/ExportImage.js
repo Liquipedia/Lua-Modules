@@ -606,7 +606,7 @@ class ExportLayoutFrame {
 
 			const target = this.replaceContent( frameDocument, element );
 			options.prepareDocument( frameDocument );
-			this.pruneHiddenContent( target );
+			this.stripHiddenMedia( target );
 			target.style.background = options.backgroundColor;
 
 			await Promise.all( [
@@ -702,12 +702,15 @@ class ExportLayoutFrame {
 		return tracks;
 	}
 
-	// Prune hidden subtrees after export fixes so snapdom skips their images.
-	pruneHiddenContent( element ) {
+	// snapdom leaves hidden subtrees out of the capture but still inlines every
+	// image it can find, and a collapsed match list hides hundreds of logos.
+	// Clearing their sources buys that back without removing the nodes, which
+	// would renumber siblings and break the `:nth-child` rules the page matched.
+	stripHiddenMedia( element ) {
 		const view = element.ownerDocument.defaultView;
 		const hidden = [];
 
-		// Collect first: removing invalidates style, forcing a recalc per read.
+		// Collect first: mutating invalidates style, forcing a recalc per read.
 		const collect = ( node ) => {
 			for ( let child = node.firstElementChild; child; child = child.nextElementSibling ) {
 				if ( view.getComputedStyle( child ).display === 'none' ) {
@@ -721,7 +724,22 @@ class ExportLayoutFrame {
 		collect( element );
 
 		for ( const node of hidden ) {
-			node.remove();
+			this.clearMediaSources( node );
+		}
+	}
+
+	// Nothing inside a hidden subtree is drawn, so nothing here can be missed.
+	clearMediaSources( element ) {
+		for ( const node of [ element, ...element.querySelectorAll( '*' ) ] ) {
+			if ( node.tagName === 'IMG' || node.tagName === 'SOURCE' ) {
+				// Both, since a bare srcset still resolves through currentSrc.
+				node.removeAttribute( 'src' );
+				node.removeAttribute( 'srcset' );
+			}
+
+			if ( node.style ) {
+				node.style.backgroundImage = 'none';
+			}
 		}
 	}
 
