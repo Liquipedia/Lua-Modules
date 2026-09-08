@@ -597,26 +597,27 @@ class ExportLayoutFrame {
 		const iframe = await this.prepare();
 		const frameDocument = iframe.contentDocument;
 
-		iframe.style.height = `${ this.getLayoutHeight() }px`;
-		this.copyRootAttributes( frameDocument );
-
-		const target = this.replaceContent( frameDocument, element );
-		options.prepareDocument( frameDocument );
-		this.pruneHiddenContent( target );
-		target.style.background = options.backgroundColor;
-
-		await this.waitForFonts( frameDocument );
-
-		this.pinSubgridTracks( target );
-
-		const bounds = target.getBoundingClientRect();
-		if ( bounds.width === 0 || bounds.height === 0 ) {
-			throw new Error( 'Canvas capture resulted in zero dimensions' );
-		}
-
-		const scale = this.getEffectiveScale( bounds, options.scale );
-
+		// A run that throws part way leaves the frame just as dirty as one that
+		// finishes, so every exit recycles.
 		try {
+			iframe.style.height = `${ this.getLayoutHeight() }px`;
+			this.copyRootAttributes( frameDocument );
+
+			const target = this.replaceContent( frameDocument, element );
+			options.prepareDocument( frameDocument );
+			this.pruneHiddenContent( target );
+			target.style.background = options.backgroundColor;
+
+			await this.waitForFonts( frameDocument );
+
+			this.pinSubgridTracks( target );
+
+			const bounds = target.getBoundingClientRect();
+			if ( bounds.width === 0 || bounds.height === 0 ) {
+				throw new Error( 'Canvas capture resulted in zero dimensions' );
+			}
+
+			const scale = this.getEffectiveScale( bounds, options.scale );
 			const canvas = await snapdom.toCanvas( target, {
 				scale: scale,
 				// The fixed scale must not be multiplied by the reader's ratio.
