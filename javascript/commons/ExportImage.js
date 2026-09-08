@@ -846,6 +846,9 @@ class ExportLayoutFrame {
 	// an image still loading measures zero and can collapse the capture.
 	waitForImages( element ) {
 		const pending = Array.from( element.querySelectorAll( 'img' ), ( image ) => {
+			// Cloned lazy images may be outside the frame's viewport.
+			image.setAttribute( 'loading', 'eager' );
+
 			if ( image.complete ) {
 				return Promise.resolve();
 			}
@@ -915,10 +918,20 @@ class ExportService {
 	}
 
 	applyExportFixes( frameDocument ) {
-		this.suppressShadows( frameDocument );
+		if ( this.needsShadowSuppression() ) {
+			this.suppressShadows( frameDocument );
+		}
 		this.hideInfoIcons( frameDocument );
 		this.removeExportControls( frameDocument );
 		this.expandPrizepoolTables( frameDocument );
+	}
+
+	// Every iOS browser uses WebKit; desktop Blink also reports AppleWebKit.
+	needsShadowSuppression() {
+		const userAgent = navigator.userAgent;
+		return /AppleWebKit/i.test( userAgent ) &&
+			!/(?:Chrome|Chromium|Edg|OPR)\//i.test( userAgent ) &&
+			!/Android/i.test( userAgent );
 	}
 
 	// One pixel shadow sends Safari and iOS down snapdom's fallback path, which
