@@ -2,8 +2,8 @@
 
 /*******************************************************************************
  * Description: Adds export functionality to Liquipedia pages, enabling users
- *              to copy or download group tables, crosstables, brackets, and
- *              match lists as images.
+ *              to copy or download brackets, group tables, prize pools,
+ *              standings, participant lists and other tables as images.
  ******************************************************************************/
 
 const EXPORT_IMAGE_CONFIG = {
@@ -46,8 +46,9 @@ const EXPORT_IMAGE_CONFIG = {
 		LAYOUT_WIDTH: 1440,
 		// snapdom clamps its SVG raster to this many pixels per side.
 		MAX_RASTER_SIDE: 16384,
-		MIN_SCALE: 2,
-		MAX_SCALE: 3,
+		// Fixed so exports match on every display. Two keeps text crisp and leaves
+		// the most headroom under the raster limit.
+		SCALE: 2,
 		TARGET_ATTRIBUTE: 'data-export-target'
 	},
 	COLORS: {
@@ -115,9 +116,6 @@ const EXPORT_IMAGE_CONFIG = {
 	]
 };
 
-/**
- * Manages image caching and loading
- */
 class ImageCache {
 	constructor() {
 		this.cache = new Map();
@@ -159,9 +157,6 @@ class ImageCache {
 	}
 }
 
-/**
- * Handles canvas composition and rendering
- */
 class CanvasComposer {
 	constructor( imageCache ) {
 		this.imageCache = imageCache;
@@ -464,10 +459,9 @@ class CanvasComposer {
 }
 
 /**
- * Renders exportable content in an offscreen document of a fixed width.
- *
- * A capture reproduces whatever the browser already laid out, and a viewport
- * width cannot be changed in the live document, so an iframe provides one.
+ * Renders exportable content in an offscreen document of a fixed width. A
+ * capture reproduces the browser's existing layout, and only an iframe can
+ * give it a viewport width other than the reader's.
  */
 class ExportLayoutFrame {
 	constructor() {
@@ -476,7 +470,7 @@ class ExportLayoutFrame {
 	}
 
 	/**
-	 * Reuses pending or completed setup; called on menu open and before capture.
+	 * Builds the frame once, however many callers ask for it.
 	 *
 	 * @return {Promise<HTMLIFrameElement>}
 	 */
@@ -525,7 +519,7 @@ class ExportLayoutFrame {
 		return iframe;
 	}
 
-	// Rebuild between exports to prevent snapdom's cached image sizes affecting later captures.
+	// Rebuild between exports; snapdom's cached image sizes would corrupt the next.
 	recycle() {
 		if ( !this.iframe ) {
 			return;
@@ -536,9 +530,8 @@ class ExportLayoutFrame {
 		this.preparePromise.catch( () => this.dispose() );
 	}
 
-	// The frame needs the page's own stylesheets, since a copied computed style
-	// would carry the live viewport's media query results. Returns each copied
-	// link with whether the page itself has it loaded.
+	// Copy the page's stylesheet nodes, not computed styles, which would carry
+	// the live viewport's media query results.
 	copyStyles( frameDocument ) {
 		// The frame document has no URL, so relative paths need a base.
 		const base = frameDocument.createElement( 'base' );
@@ -560,8 +553,7 @@ class ExportLayoutFrame {
 		return copiedLinks;
 	}
 
-	// Reject errors or timeouts only for stylesheets already loaded in the page;
-	// tolerate other failures.
+	// Only fail on a stylesheet the page itself has loaded.
 	waitForStylesheets( copiedLinks ) {
 		return Promise.all( copiedLinks.map( ( { link, loadedInPage } ) => new Promise( ( resolve, reject ) => {
 			if ( link.sheet ) {
@@ -586,7 +578,7 @@ class ExportLayoutFrame {
 		} ) ) );
 	}
 
-	// Preserve the previous capture height: the live document's scroll height.
+	// Tall enough not to constrain the clone.
 	getLayoutHeight() {
 		return document.documentElement.scrollHeight;
 	}
@@ -627,11 +619,12 @@ class ExportLayoutFrame {
 		try {
 			const canvas = await snapdom.toCanvas( target, {
 				scale: scale,
-				// scale already accounts for the device pixel ratio.
+				// The fixed scale must not be multiplied by the reader's ratio.
 				dpr: 1,
-				// Embed fonts in the isolated SVG.
 				embedFonts: true,
-				cache: 'auto'
+				// Anything looser keeps stale style maps, which re-render
+				// container-constrained images at their intrinsic size.
+				cache: 'soft'
 			} );
 
 			return { canvas: canvas, scale: scale };
@@ -763,8 +756,8 @@ class ExportLayoutFrame {
 			const liveNode = liveNodes[ index ];
 			const clonedNode = clonedNodes[ index ];
 
-			// A mismatch means the two lists have drifted out of step, so the
-			// pairing is meaningless from here on, not just for this node.
+			// The lists have drifted out of step, so no later pairing can be
+			// trusted either.
 			if ( liveNode.tagName !== clonedNode.tagName ) {
 				return;
 			}
@@ -795,8 +788,7 @@ class ExportLayoutFrame {
 		}
 	}
 
-	// Theme and wiki classes live on the root, runtime custom properties in its
-	// inline style.
+	// Theme classes live on the root, runtime custom properties in its style.
 	copyRootAttributes( frameDocument ) {
 		const liveRoot = document.documentElement;
 		const frameRoot = frameDocument.documentElement;
@@ -807,7 +799,7 @@ class ExportLayoutFrame {
 		frameRoot.setAttribute( 'style', liveRoot.getAttribute( 'style' ) || '' );
 	}
 
-	// Wait for font metrics, but fall back on timeout rather than block the export.
+	// Text is measured later, but a slow font must not block the export.
 	waitForFonts( frameDocument ) {
 		if ( !frameDocument.fonts ) {
 			return Promise.resolve();
@@ -821,9 +813,8 @@ class ExportLayoutFrame {
 		] );
 	}
 
-	// Very large content would exceed the raster limit, and the chrome composed
-	// around the capture shares the budget. Losing resolution beats losing the
-	// image, so the scale drops as far as it has to.
+	// The composed chrome shares the raster budget, and losing resolution beats
+	// losing the image, so the scale drops as far as it has to.
 	getEffectiveScale( bounds, requestedScale ) {
 		const dimensions = EXPORT_IMAGE_CONFIG.DIMENSIONS;
 		const composed = ( dimensions.PADDING * 4 ) + dimensions.HEADER_HEIGHT + dimensions.FOOTER_HEIGHT;
@@ -842,9 +833,6 @@ class ExportLayoutFrame {
 	}
 }
 
-/**
- * Handles export operations (canvas capture, download, clipboard)
- */
 class ExportService {
 	constructor( canvasComposer ) {
 		this.canvasComposer = canvasComposer;
@@ -854,9 +842,20 @@ class ExportService {
 	}
 
 	applyExportFixes( frameDocument ) {
+		this.suppressShadows( frameDocument );
 		this.hideInfoIcons( frameDocument );
 		this.removeExportControls( frameDocument );
 		this.expandPrizepoolTables( frameDocument );
+	}
+
+	// One pixel shadow sends Safari and iOS down snapdom's fallback path, which
+	// rasterises at natural size and upscales, softening the whole image.
+	suppressShadows( frameDocument ) {
+		const style = frameDocument.createElement( 'style' );
+
+		style.textContent = '*, *::before, *::after { box-shadow: none !important; ' +
+			'text-shadow: none !important; }';
+		frameDocument.head.appendChild( style );
 	}
 
 	hideInfoIcons( frameDocument ) {
@@ -913,7 +912,7 @@ class ExportService {
 		const backgroundColor = this.getBackgroundColor();
 
 		const capture = await this.layoutFrame.render( element, {
-			scale: this.getScale(),
+			scale: EXPORT_IMAGE_CONFIG.CAPTURE.SCALE,
 			backgroundColor: backgroundColor,
 			prepareDocument: ( frameDocument ) => this.applyExportFixes( frameDocument )
 		} );
@@ -939,13 +938,6 @@ class ExportService {
 				}
 			}, 'image/png' );
 		} );
-	}
-
-	// At least 2 so text stays crisp, never above 3 so files stay a sane size.
-	getScale() {
-		const { MIN_SCALE, MAX_SCALE } = EXPORT_IMAGE_CONFIG.CAPTURE;
-
-		return Math.min( Math.max( window.devicePixelRatio || 1, MIN_SCALE ), MAX_SCALE );
 	}
 
 	async copyToClipboard( element, title ) {
@@ -980,8 +972,7 @@ class ExportService {
 		}, EXPORT_IMAGE_CONFIG.TIMEOUTS.URL_REVOKE_DELAY );
 	}
 
-	// Called on menu open so the setup cost lands before anyone picks an option,
-	// and again before each export as a guard.
+	// Called on menu open so setup lands before anyone picks an option.
 	prewarm() {
 		return Promise.all( [ this.ensureSnapdomLoaded(), this.layoutFrame.prepare() ] );
 	}
@@ -1034,9 +1025,6 @@ class ExportService {
 	}
 }
 
-/**
- * Utilities for finding elements and headings in the DOM
- */
 class ExportImageDOMUtils {
 	static findPreviousHeading( startElement ) {
 		const walker = document.createTreeWalker(
@@ -1155,9 +1143,6 @@ class ExportImageDOMUtils {
 	}
 }
 
-/**
- * Creates and manages dropdown UI components
- */
 class DropdownWidget {
 	constructor( exportService ) {
 		this.exportService = exportService;
@@ -1309,7 +1294,7 @@ class DropdownWidget {
 
 		button.addEventListener( 'click', () => {
 			if ( menuElement.style.display === 'none' ) {
-				// Log warmup failures; exports retry setup and report failures.
+				// Exports retry setup and report properly, so only log here.
 				this.exportService.prewarm().catch( ( error ) => {
 					// eslint-disable-next-line no-console
 					console.warn( 'Export prewarm failed:', error );
@@ -1555,9 +1540,6 @@ class DropdownWidget {
 	}
 }
 
-/**
- * Main module class that coordinates all components
- */
 class ExportImageModule {
 	constructor() {
 		this.imageCache = new ImageCache();
