@@ -47,10 +47,11 @@ const EXPORT_IMAGE_CONFIG = {
 		LAYOUT_WIDTH: 1440,
 		// snapdom clamps its SVG raster to this many pixels per side.
 		MAX_RASTER_SIDE: 16384,
-		// A wrapped title grows the header past HEADER_HEIGHT, so the raster
-		// budget reserves the tallest one it can produce: six lines of 18 plus
-		// vertical padding.
-		MAX_HEADER_HEIGHT: 120,
+		// Browsers cap total canvas area well below MAX_RASTER_SIDE squared, so
+		// a near-square export can fail on a side length that looks safe. This is
+		// the largest square Firefox will allocate, the tightest of the desktop
+		// browsers; drop it if an iOS export ever comes back blank.
+		MAX_RASTER_AREA: 11180 * 11180,
 		// Fixed so exports match on every display. Two keeps text crisp and leaves
 		// the most headroom under the raster limit.
 		SCALE: 2,
@@ -188,6 +189,18 @@ class CanvasComposer {
 		);
 
 		return canvas;
+	}
+
+	// The chrome the capture has to share the canvas with. Wrapping depends on
+	// the ratio of text width to available width, and both scale together, so
+	// measuring at scale 1 gives the same line count as the real composition.
+	measureChrome( contentWidth, sectionTitle ) {
+		const dims = this.getScaledDimensions( 1 );
+		const fonts = this.getScaledFonts( 1 );
+		const canvasWidth = Math.max( contentWidth + ( dims.PADDING * 2 ), dims.MIN_WIDTH );
+		const header = this.calculateHeaderLayout( canvasWidth, sectionTitle, 1, fonts, dims );
+
+		return ( dims.PADDING * 4 ) + header.height + dims.FOOTER_HEIGHT;
 	}
 
 	getScaledDimensions( scale ) {
@@ -596,6 +609,7 @@ class ExportLayoutFrame {
 	 * @param {number} options.scale requested raster scale
 	 * @param {string} options.backgroundColor page background
 	 * @param {Function} options.prepareDocument applies export fixes to the frame document
+	 * @param {Function} options.measureChrome composed chrome height for a content width
 	 * @return {Promise<{canvas: HTMLCanvasElement, scale: number}>}
 	 */
 	async render( element, options ) {
@@ -625,7 +639,9 @@ class ExportLayoutFrame {
 				throw new Error( 'Canvas capture resulted in zero dimensions' );
 			}
 
-			const scale = this.getEffectiveScale( bounds, options.scale );
+			const scale = this.getEffectiveScale(
+				bounds, options.scale, options.measureChrome( bounds.width )
+			);
 			const canvas = await snapdom.toCanvas( target, {
 				scale: scale,
 				// The fixed scale must not be multiplied by the reader's ratio.
@@ -863,15 +879,21 @@ class ExportLayoutFrame {
 		] );
 	}
 
-	// The composed chrome shares the raster budget, and losing resolution beats
-	// losing the image, so the scale drops as far as it has to.
-	getEffectiveScale( bounds, requestedScale ) {
+	// The chrome composed around the capture shares the canvas, so the limits
+	// apply to the finished size rather than the capture's. Losing resolution
+	// beats losing the image, so the scale drops as far as it has to.
+	getEffectiveScale( bounds, requestedScale, chromeHeight ) {
 		const dimensions = EXPORT_IMAGE_CONFIG.DIMENSIONS;
 		const capture = EXPORT_IMAGE_CONFIG.CAPTURE;
-		const composed = ( dimensions.PADDING * 4 ) + capture.MAX_HEADER_HEIGHT + dimensions.FOOTER_HEIGHT;
-		const longestSide = Math.max( bounds.width, bounds.height, 1 ) + composed;
+		const width = Math.max( bounds.width + ( dimensions.PADDING * 2 ), dimensions.MIN_WIDTH );
+		const height = Math.max( bounds.height, 1 ) + chromeHeight;
 
-		return Math.min( requestedScale, capture.MAX_RASTER_SIDE / longestSide );
+		return Math.min(
+			requestedScale,
+			capture.MAX_RASTER_SIDE / width,
+			capture.MAX_RASTER_SIDE / height,
+			Math.sqrt( capture.MAX_RASTER_AREA / ( width * height ) )
+		);
 	}
 
 	dispose() {
@@ -965,7 +987,8 @@ class ExportService {
 		const capture = await this.layoutFrame.render( element, {
 			scale: EXPORT_IMAGE_CONFIG.CAPTURE.SCALE,
 			backgroundColor: backgroundColor,
-			prepareDocument: ( frameDocument ) => this.applyExportFixes( frameDocument )
+			prepareDocument: ( frameDocument ) => this.applyExportFixes( frameDocument ),
+			measureChrome: ( contentWidth ) => this.canvasComposer.measureChrome( contentWidth, title )
 		} );
 
 		if ( capture.canvas.width === 0 || capture.canvas.height === 0 ) {
