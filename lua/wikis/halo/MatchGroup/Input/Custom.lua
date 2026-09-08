@@ -82,7 +82,7 @@ end
 
 ---@param match table
 ---@param opponents table[]
----@return string?
+---@return string?, string?
 function MatchFunctions.getHeadToHeadLink(match, opponents)
 	if
 		opponents[1].type ~= Opponent.team or
@@ -101,6 +101,10 @@ function MatchFunctions.getHeadToHeadLink(match, opponents)
 		))
 	end
 
+	local buildQueryFormLinkLighthouse = function(form, arguments)
+		return tostring(mw.uri.fullUrl('Special:RunQuery/' .. form, arguments))
+	end
+
 	local headtoheadArgs = {
 		['[team1]'] = team1,
 		['[team2]'] = team2,
@@ -111,7 +115,11 @@ function MatchFunctions.getHeadToHeadLink(match, opponents)
 		['[fromdate][year]'] = string.sub(match.date,1,4)
 	}
 
-	return buildQueryFormLink('Head2head', 'Headtohead', headtoheadArgs)
+	return buildQueryFormLink('Head2head', 'Headtohead', headtoheadArgs),
+		buildQueryFormLinkLighthouse('H2H', {
+			['team1'] = team1,
+			['team2'] = team2,
+		})
 end
 
 ---@param match table

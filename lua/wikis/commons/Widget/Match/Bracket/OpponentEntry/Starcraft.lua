@@ -11,7 +11,6 @@ local Opponent = Lua.import('Module:Opponent/Starcraft')
 
 local Component = Lua.import('Module:Widget/Component')
 local BracketOpponentEntry = Lua.import('Module:Widget/Match/Bracket/OpponentEntry')
-local StarcraftBracketOpponent = Lua.import('Module:Widget/Match/Bracket/Opponent/Starcraft')
 
 ---@class StarcraftBracketOpponentEntryProps: BracketOpponentEntryProps
 ---@field opponent StarcraftStandardOpponent
@@ -20,7 +19,6 @@ local StarcraftBracketOpponent = Lua.import('Module:Widget/Match/Bracket/Opponen
 ---@return VNode
 local function StarcraftBracketOpponentEntry(props)
 	local opponent = props.opponent
-	props.BracketOpponent = StarcraftBracketOpponent
 	props.showFactionBackground = opponent.type == Opponent.solo
 			or opponent.type == Opponent.duo and opponent.isArchon
 	return BracketOpponentEntry(props)

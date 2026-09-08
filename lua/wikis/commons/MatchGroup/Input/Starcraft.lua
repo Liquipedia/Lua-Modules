@@ -40,7 +40,6 @@ local MatchFunctions = {
 
 ---@class StarcraftMapParser: MapParserInterface
 local MapFunctions = {
-	ADD_SUB_GROUP = true,
 	BREAK_ON_EMPTY = true,
 }
 
@@ -174,7 +173,7 @@ end
 
 ---@param match table
 ---@param opponents table[]
----@return string?
+---@return string?, string?
 function MatchFunctions.getHeadToHeadLink(match, opponents)
 	local showH2H = Logic.readBool(Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead')))
 	Variables.varDefine('headtohead', tostring(showH2H))
@@ -185,12 +184,19 @@ function MatchFunctions.getHeadToHeadLink(match, opponents)
 		return
 	end
 
-	return (tostring(mw.uri.fullUrl('Special:RunQuery/Match_history'))
+	return ((tostring(mw.uri.fullUrl('Special:RunQuery/Match_history'))
 		.. '?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D='
 		.. opponents[1].match2players[1].name
 		.. '&Head_to_head_query%5Bopponent%5D='
 		.. opponents[2].match2players[1].name
-		.. '&wpRunQuery=Run+query'):gsub(' ', '_')
+		.. '&wpRunQuery=Run+query'):gsub(' ', '_')),
+		tostring(mw.uri.fullUrl(
+			'Special:RunQuery/H2H',
+			{
+				['player'] = opponents[1].match2players[1].name,
+				['opponent'] = opponents[2].match2players[1].name,
+			}
+		))
 end
 
 ---@param extradata table

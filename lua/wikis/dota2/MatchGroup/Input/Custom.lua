@@ -143,7 +143,7 @@ end
 
 ---@param match table
 ---@param opponents MGIParsedOpponent[]
----@return string?
+---@return string?, string?
 function MatchFunctions.getHeadToHeadLink(match, opponents)
 	local isTeamGame = Array.all(opponents, function(opponent)
 		return opponent.type == Opponent.team
@@ -156,6 +156,12 @@ function MatchFunctions.getHeadToHeadLink(match, opponents)
 				['Head to head query[player]'] = string.gsub(opponents[1].name, ' ', '_'),
 				['Head to head query[opponent]'] = string.gsub(opponents[2].name, ' ', '_'),
 				wpRunQuery = 'Run query'
+			}
+		)), tostring(mw.uri.fullUrl(
+			'Special:RunQuery/H2H',
+			{
+				['player'] = string.gsub(opponents[1].name, ' ', '_'),
+				['opponent'] = string.gsub(opponents[2].name, ' ', '_'),
 			}
 		))
 	end

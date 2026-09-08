@@ -138,7 +138,7 @@ function MatchGroupInput.readMatchpage(bracketId, matchId, matchInput)
 		if not tournamentPage then return end
 
 		local HiddenDataBox = Lua.import('Module:HiddenDataBox/Custom')
-		local HdbProps = Table.merge({parent = tournamentPage, supressMatchTicker = true}, matchArgs)
+		local HdbProps = Table.merge({parent = tournamentPage, suppressMatchTicker = true}, matchArgs)
 		HdbProps.date = nil
 		HiddenDataBox.run(HdbProps)
 	end

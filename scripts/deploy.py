@@ -89,6 +89,59 @@ def build_argument_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def handle_renamed_files(
+    dev_environment: Optional[str], lua_files_from_args: list[pathlib.Path], reason: str
+):
+    if dev_environment is not None or len(lua_files_from_args) == 0:
+        # Suppress move entirely for dev deploys and auto resyncs
+        return
+    renamed_output = (
+        subprocess.check_output(
+            [
+                "git",
+                "diff-tree",
+                "-r",
+                "--no-commit-id",
+                "--name-status",
+                "--diff-filter=R",
+                "-M",
+                "HEAD",
+                "lua/wikis/*",
+            ]
+        )
+        .decode()
+        .strip()
+        .splitlines()
+    )
+    if len(renamed_output) == 0:
+        return
+
+    def parse_renamed_output(line: str):
+        output = line.split("\t")
+        return pathlib.Path(output[1]), pathlib.Path(output[2])
+
+    for old_file, new_file in map(parse_renamed_output, renamed_output):
+        if old_file.parts[2] != new_file.parts[2]:
+            continue
+        print(f"::group::Moving {str(new_file)}")
+        with MediaWikiSession(old_file.parts[2]) as session:
+            old_wiki_page_name = f"Module:{'/'.join(old_file.parts[3:])[:-4]}"
+            file_content = read_file_from_path(new_file)
+            header_match = HEADER_PATTERN.match(file_content)
+            new_wiki_page_name = header_match.groupdict()["pageName"]
+            session.make_action(
+                "move",
+                data={
+                    "from": old_wiki_page_name,
+                    "to": new_wiki_page_name,
+                    "noredirect": "1",
+                    "token": session.token,
+                    "reason": f"Git: {reason}",
+                },
+            )
+        print("::endgroup::")
+
+
 def main():
     all_modules_deployed = True
     lua_files: Iterable[pathlib.Path]
@@ -127,6 +180,8 @@ def main():
         else:
             lua_files = parsed_args.lua_files
         git_deploy_reason = get_git_deploy_reason()
+
+    handle_renamed_files(dev_environment, parsed_args.lua_files, git_deploy_reason)
 
     for wiki, files in itertools.groupby(sorted(lua_files), lambda path: path.parts[2]):
         all_modules_deployed &= deploy_all_files_for_wiki(

@@ -7,6 +7,7 @@
 
 local String = {}
 
+---Returns true if `start` is a prefix of `str`.
 ---@param str string
 ---@param start string
 ---@return boolean
@@ -14,6 +15,7 @@ function String.startsWith(str, start)
 	return str:sub(1, #start) == start --str:find('^' .. start) ~= nil
 end
 
+---Returns true if `ending` is a suffix of `str`.
 ---@param str string
 ---@param ending string
 ---@return boolean
@@ -60,19 +62,21 @@ function String.trim(str)
 	return mw.text.trim(str, "\t\r\n\f \194\160")
 end
 
+---Returns `nil` if the argument is `nil` or an empty string, otherwise returns the argument string itself.
 ---@param str string?
 ---@return string?
 function String.nilIfEmpty(str)
 	return str ~= '' and str or nil
 end
 
+---Returns true if the argument is `nil` or an empty string.
 ---@param str string?
 ---@return boolean
 function String.isEmpty(str)
 	return str == nil or str == ''
 end
 
-
+---Returns true if the argument is a nonempty string.
 ---@param str string?
 ---@return boolean
 function String.isNotEmpty(str)

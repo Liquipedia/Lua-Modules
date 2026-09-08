@@ -119,7 +119,7 @@ end
 ---@param opponentInput string|table
 ---@param numberOfRounds integer
 ---@param resolveDate string|number?
----@return StandingTableOpponentData[]
+---@return StandingTableOpponentData
 function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, resolveDate)
 	local opponentData = Json.parseIfString(opponentInput)
 	local rounds = {}
@@ -144,9 +144,20 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, res
 	local opponent = Opponent.readOpponentArgs(opponentData)
 	opponent = Opponent.resolve(opponent, resolveDate, {syncPlayer = true})
 
+	local aliases
+	if opponent.type == Opponent.team then
+		aliases = {opponent}
+		Array.extendWith(aliases,
+			Array.map(Array.parseCommaSeparatedString(opponentData.aliases, ';'), function(alias)
+				return Opponent.readOpponentArgs{type = Opponent.team, template = alias}
+			end)
+		)
+	end
+
 	return {
 		rounds = rounds,
 		opponent = opponent,
+		aliases = aliases,
 		startingPoints = opponentData.startingpoints,
 	}
 end

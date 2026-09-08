@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Array = Lua.import('Module:Array')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
@@ -15,7 +14,7 @@ local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -29,14 +28,14 @@ local DEFAULT_LINK_CONFIG = {
 	playedMatches = 'Played Matches',
 }
 
----@class AutoTeamNavbox: Widget
----@operator call(table): AutoTeamNavbox
-local AutoTeamNavbox = Class.new(Widget)
-AutoTeamNavbox.defaultProps = {team = mw.title.getCurrentTitle().prefixedText}
+local AutoTeamNavbox = {
+	defaultProps = {team = mw.title.getCurrentTitle().prefixedText}
+}
 
----@return Widget?
-function AutoTeamNavbox:render()
-	local team = TeamService.getTeamByTemplate(self.props.team)
+---@param props {team: string?}
+---@return VNode?
+function AutoTeamNavbox.render(props)
+	local team = TeamService.getTeamByTemplate(props.team)
 	if not team then
 		return
 	end
@@ -122,7 +121,7 @@ function AutoTeamNavbox._makeRosterRow(members, name)
 end
 
 ---@param member table
----@return Widget
+---@return VNode
 function AutoTeamNavbox._makePersonDisplay(member)
 	local makeNote = function(position, role)
 		local content = {position, role}
@@ -140,4 +139,4 @@ function AutoTeamNavbox._makePersonDisplay(member)
 	}}
 end
 
-return AutoTeamNavbox
+return Component.component(AutoTeamNavbox.render, AutoTeamNavbox.defaultProps)

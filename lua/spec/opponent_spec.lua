@@ -387,6 +387,16 @@ describe('opponent', function()
 			))
 			assert.is_true(Opponent.same(
 				Opponent.resolve(Opponent.readOpponentArgs{
+					template = 'sk telecom t1',
+					type = 'team',
+				}),
+				Opponent.resolve(Opponent.readOpponentArgs{
+					template = 't1',
+					type = 'team',
+				})
+			))
+			assert.is_true(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{
 					template = 'team liquid orig',
 					type = 'team',
 				}),
