@@ -158,24 +158,24 @@ $infobox-padding: 10px;
 	> div {
 		display: grid;
 		width: 100%;
+		background-color: var( --infobox-row-background-color );
 
-		&:nth-child( odd ) {
-			background-color: var( --clr-surface-2, #eeeeee );
-		}
+		--infobox-row-background-color: var( --clr-surface-2, #eeeeee );
 
 		&:nth-child( even ) {
-			background-color: var( --clr-surface-1, #f5f5f5 );
+			--infobox-row-background-color: var( --clr-surface-1, #f5f5f5 );
 		}
 
 		&::after {
 			clear: both;
 		}
 
-		&:has( > :only-child ) {
+		&:where( :has( > :only-child ) ) {
 			display: contents;
 
-			> :only-child {
+			> :where( :only-child ) {
 				width: 100%;
+				background-color: var( --infobox-row-background-color );
 			}
 		}
 
