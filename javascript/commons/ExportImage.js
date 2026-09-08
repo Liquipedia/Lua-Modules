@@ -41,10 +41,8 @@ const EXPORT_IMAGE_CONFIG = {
 		FONT_READY: 5000
 	},
 	CAPTURE: {
-		// Exports are rendered in a window of this width so that they look the same
-		// on a phone as on a desktop, and stay independent of the reader's window
-		// size. Responsive layout here is driven by viewport media queries, which
-		// cannot be re-evaluated in the live document, hence the offscreen frame.
+		// Responsive layout is driven by viewport media queries, so exports are
+		// rendered in a frame of this width instead of the reader's window.
 		LAYOUT_WIDTH: 1440,
 		// snapdom clamps its SVG raster to this many pixels per side.
 		MAX_RASTER_SIDE: 16384,
@@ -126,7 +124,6 @@ class ImageCache {
 	}
 
 	async load( url, key, timeout = EXPORT_IMAGE_CONFIG.TIMEOUTS.IMAGE_LOAD ) {
-		// Return cached image if available
 		if ( this.cache.has( key ) ) {
 			return this.cache.get( key );
 		}
@@ -237,7 +234,6 @@ class CanvasComposer {
 	}
 
 	drawHeader( context, canvasWidth, theme, headerLayout, fonts, dims ) {
-		// Draw header background with gradient
 		const gradient = context.createLinearGradient( dims.PADDING, 0, canvasWidth - dims.PADDING, 0 );
 		gradient.addColorStop( 0, theme.HEADER_START );
 		gradient.addColorStop( 1, theme.HEADER_END );
@@ -253,7 +249,6 @@ class CanvasComposer {
 		);
 		context.fill();
 
-		// Draw header text
 		context.fillStyle = '#ffffff';
 		context.textBaseline = 'middle';
 
@@ -307,8 +302,7 @@ class CanvasComposer {
 		const x = dims.PADDING;
 		const y = dims.PADDING + headerHeight + dims.PADDING;
 
-		// The capture leaves uncovered pixels transparent, so paint the page
-		// background under it rather than letting the frame colour show through.
+		// Fill transparent capture pixels with the page background, not the surrounding frame.
 		if ( contentBackground ) {
 			context.fillStyle = contentBackground;
 			context.fillRect( x, y, sourceCanvas.width, sourceCanvas.height );
@@ -320,7 +314,6 @@ class CanvasComposer {
 	async drawFooter( context, canvasWidth, sourceHeight, theme, isDarkTheme, headerHeight, fonts, dims ) {
 		const footerY = dims.PADDING + headerHeight + dims.PADDING + sourceHeight + dims.PADDING;
 
-		// Draw footer background
 		const gradient = context.createLinearGradient( dims.PADDING, 0, canvasWidth - dims.PADDING, 0 );
 		gradient.addColorStop( 0, theme.FOOTER_START );
 		gradient.addColorStop( 1, theme.FOOTER_END );
@@ -336,7 +329,6 @@ class CanvasComposer {
 		);
 		context.fill();
 
-		// Draw footer text
 		context.fillStyle = theme.TEXT;
 		context.font = fonts.FOOTER;
 		context.textAlign = 'left';
@@ -350,7 +342,7 @@ class CanvasComposer {
 			EXPORT_IMAGE_CONFIG.SPACING.LETTER_SPACING * ( dims.LOGO_WIDTH / 22 )
 		);
 
-		// Draw logo (non-critical, catch errors silently)
+		// A missing logo must not prevent the export.
 		try {
 			await this.drawLogo( context, footerY, isDarkTheme, dims );
 		} catch ( error ) {
@@ -365,7 +357,6 @@ class CanvasComposer {
 
 		const context = this.getOffscreenContext();
 
-		// Measure text widths
 		context.font = fonts.HEADER;
 		const mainTitleWidth = context.measureText( mainTitle ).width;
 
@@ -375,7 +366,6 @@ class CanvasComposer {
 		const totalTextWidth = mainTitleWidth + sectionTitleWidth + ( dims.HEADER_TEXT_OFFSET * 2 );
 		const sideBySideAvailableWidth = canvasWidth - ( dims.PADDING * 2 ) - dims.TEXT_OFFSET_X;
 
-		// Check if text fits side-by-side
 		if ( totalTextWidth <= sideBySideAvailableWidth ) {
 			return {
 				height: dims.HEADER_HEIGHT,
@@ -385,7 +375,6 @@ class CanvasComposer {
 			};
 		}
 
-		// Calculate stacked layout
 		const mainTitleLines = this.wrapText( context, mainTitle, availableWidth, fonts.HEADER );
 		const sectionTitleLines = this.wrapText( context, sectionTitle, availableWidth, fonts.SUBHEADER );
 
@@ -482,11 +471,8 @@ class CanvasComposer {
 /**
  * Renders exportable content in an offscreen document of a fixed width.
  *
- * snapdom captures whatever the browser has already laid out, so the content has
- * to be laid out at export width before it is captured. A viewport width cannot
- * be changed in the live document, so an offscreen iframe provides one. Its
- * document is rebuilt after every capture (see `recycle`), which keeps the
- * stylesheet parse between exports rather than inside one.
+ * A capture reproduces whatever the browser already laid out, and a viewport
+ * width cannot be changed in the live document, so an iframe provides one.
  */
 class ExportLayoutFrame {
 	constructor() {
@@ -495,15 +481,14 @@ class ExportLayoutFrame {
 	}
 
 	/**
-	 * Builds the frame if needed. Safe to call repeatedly; used both to warm up
-	 * when the share menu opens and as a guard before each capture.
+	 * Reuses pending or completed setup; called on menu open and before capture.
 	 *
 	 * @return {Promise<HTMLIFrameElement>}
 	 */
 	prepare() {
 		if ( !this.preparePromise ) {
 			this.preparePromise = this.build().catch( ( error ) => {
-				// Start from scratch next time rather than keeping a half-built frame.
+				// Start over rather than keep a half-built frame.
 				this.dispose();
 				throw error;
 			} );
@@ -545,36 +530,22 @@ class ExportLayoutFrame {
 		return iframe;
 	}
 
-	/**
-	 * Gives the next export a document that has not been captured from before.
-	 *
-	 * snapdom keeps caches keyed to the document it read, and reusing that document
-	 * makes every capture after the first lay out CSS-constrained images at their
-	 * intrinsic size, so team logos come out oversized. Rebuilding right after a
-	 * capture puts that cost between exports rather than inside one.
-	 */
+	// Rebuild between exports to prevent snapdom's cached image sizes affecting later captures.
 	recycle() {
 		if ( !this.iframe ) {
 			return;
 		}
 
+		// Discard failed rebuilds so the next export can retry.
 		this.preparePromise = this.resetDocument( this.iframe );
-		// Nobody awaits the rebuild itself; start clean if it fails, and let the
-		// next export report the failure.
 		this.preparePromise.catch( () => this.dispose() );
 	}
 
-	/**
-	 * The frame needs the page's own stylesheets: layout, theme colours and fonts
-	 * all come from them, and a copied computed style would carry the live
-	 * viewport's media query results instead of the export width's.
-	 *
-	 * @param {Document} frameDocument
-	 * @return {Array} the copied links, and whether the page has each one loaded
-	 */
+	// The frame needs the page's own stylesheets, since a copied computed style
+	// would carry the live viewport's media query results. Returns each copied
+	// link with whether the page itself has it loaded.
 	copyStyles( frameDocument ) {
-		// The frame document has no URL of its own, so relative paths in the
-		// cloned content would not resolve without a base.
+		// The frame document has no URL, so relative paths need a base.
 		const base = frameDocument.createElement( 'base' );
 		base.href = document.baseURI;
 		frameDocument.head.appendChild( base );
@@ -594,18 +565,8 @@ class ExportLayoutFrame {
 		return copiedLinks;
 	}
 
-	/**
-	 * Holds the frame back until its stylesheets have settled.
-	 *
-	 * A stylesheet the page itself never loaded is expected to fail here too, and
-	 * the export should look like the page, so that resolves. One the page has but
-	 * the frame cannot get would silently change the layout, and one still in
-	 * flight could change it again mid-capture, so those reject and the frame is
-	 * rebuilt for the next attempt.
-	 *
-	 * @param {Array} copiedLinks from copyStyles
-	 * @return {Promise}
-	 */
+	// Reject errors or timeouts only for stylesheets already loaded in the page;
+	// tolerate other failures.
 	waitForStylesheets( copiedLinks ) {
 		return Promise.all( copiedLinks.map( ( { link, loadedInPage } ) => new Promise( ( resolve, reject ) => {
 			if ( link.sheet ) {
@@ -630,8 +591,7 @@ class ExportLayoutFrame {
 		} ) ) );
 	}
 
-	// Follows the height of the page so that viewport-relative units inside the
-	// frame resolve to the same values they do while reading it.
+	// Preserve the previous capture height: the live document's scroll height.
 	getLayoutHeight() {
 		return document.documentElement.scrollHeight;
 	}
@@ -640,8 +600,10 @@ class ExportLayoutFrame {
 	 * Captures an element as it would look at export width.
 	 *
 	 * @param {HTMLElement} element element in the live document
-	 * @param {Object} options scale, backgroundColor and a prepareDocument hook
-	 *                         that may adjust the frame before it is captured
+	 * @param {Object} options required capture settings
+	 * @param {number} options.scale requested raster scale
+	 * @param {string} options.backgroundColor page background
+	 * @param {Function} options.prepareDocument applies export fixes to the frame document
 	 * @return {Promise<{canvas: HTMLCanvasElement, scale: number}>}
 	 */
 	async render( element, options ) {
@@ -652,22 +614,10 @@ class ExportLayoutFrame {
 		this.copyRootAttributes( frameDocument );
 
 		const target = this.replaceContent( frameDocument, element );
-		if ( !target ) {
-			throw new Error( 'Could not find the element inside the export frame' );
-		}
-
-		if ( options.prepareDocument ) {
-			options.prepareDocument( frameDocument );
-		}
-
+		options.prepareDocument( frameDocument );
 		this.pruneHiddenContent( target );
+		target.style.background = options.backgroundColor;
 
-		if ( options.backgroundColor ) {
-			target.style.background = options.backgroundColor;
-		}
-
-		// Measure once the fonts the content uses have loaded, since text metrics
-		// decide the size of most of what gets exported.
 		await this.waitForFonts( frameDocument );
 
 		this.pinSubgridTracks( target );
@@ -678,38 +628,24 @@ class ExportLayoutFrame {
 		}
 
 		const scale = this.getEffectiveScale( bounds, options.scale );
-		let canvas;
 
 		try {
-			canvas = await snapdom.toCanvas( target, {
+			const canvas = await snapdom.toCanvas( target, {
 				scale: scale,
-				// snapdom multiplies scale by the device pixel ratio; the requested
-				// scale already accounts for it.
+				// scale already accounts for the device pixel ratio.
 				dpr: 1,
-				// The frame is serialised into an isolated SVG document, so the fonts
-				// it uses have to travel with it.
+				// Embed fonts in the isolated SVG.
 				embedFonts: true,
 				cache: 'auto'
 			} );
+
+			return { canvas: canvas, scale: scale };
 		} finally {
 			this.recycle();
 		}
-
-		return { canvas: canvas, scale: scale };
 	}
 
-	/**
-	 * Replaces `subgrid` on the captured element with the tracks its parent
-	 * resolved.
-	 *
-	 * A capture is re-laid out on its own, where the root has no parent grid to
-	 * take tracks from, so `subgrid` falls back to `none` and every cell drops
-	 * into a single column. Match lists are laid out exactly that way: the
-	 * collapse area is a subgrid of the five columns declared on
-	 * `.brkts-matchlist`.
-	 *
-	 * @param {HTMLElement} element root of the subtree about to be captured
-	 */
+	// Pin inherited tracks because the captured root loses its parent grid.
 	pinSubgridTracks( element ) {
 		const parent = element.parentElement;
 		if ( !parent ) {
@@ -735,8 +671,6 @@ class ExportLayoutFrame {
 				continue;
 			}
 
-			// The element covers a range of the parent's tracks, usually all of
-			// them, and inherits only those.
 			const from = Math.max( parseInt( style[ axis.start ], 10 ) || 1, 1 ) - 1;
 			const end = parseInt( style[ axis.end ], 10 );
 			const to = end > 0 ? Math.max( end - 1, from + 1 ) : tracks.length;
@@ -745,13 +679,8 @@ class ExportLayoutFrame {
 		}
 	}
 
-	/**
-	 * Splits a resolved track list into tracks, keeping line names and functional
-	 * notation intact: `[a] 10px [b c] minmax( 2px, 1fr )` gives two entries.
-	 *
-	 * @param {string} value resolved grid-template-columns or -rows
-	 * @return {string[]}
-	 */
+	// Splits a resolved track list, keeping line names and functional notation
+	// intact: `[a] 10px [b c] minmax( 2px, 1fr )` gives two entries.
 	parseTrackList( value ) {
 		if ( !value || value === 'none' || value.startsWith( 'subgrid' ) ) {
 			return [];
@@ -780,25 +709,12 @@ class ExportLayoutFrame {
 		return tracks;
 	}
 
-	/**
-	 * Drops content the browser does not paint.
-	 *
-	 * A capture reads the whole subtree, including collapsed match rows and
-	 * closed detail popups, and inlines every image it finds there. A collapsed
-	 * match list can hide hundreds of team logos behind a box a few lines tall,
-	 * which costs seconds to embed and cannot show up in the result anyway,
-	 * because `display: none` paints nothing.
-	 *
-	 * Runs after the export fixes, so anything they reveal is kept.
-	 *
-	 * @param {HTMLElement} element root of the subtree about to be captured
-	 */
+	// Prune hidden subtrees after export fixes so snapdom skips their images.
 	pruneHiddenContent( element ) {
 		const view = element.ownerDocument.defaultView;
 		const hidden = [];
 
-		// Collect before removing: a removal invalidates style, which would make
-		// every following style read recompute it.
+		// Collect first: removing invalidates style, forcing a recalc per read.
 		const collect = ( node ) => {
 			for ( let child = node.firstElementChild; child; child = child.nextElementSibling ) {
 				if ( view.getComputedStyle( child ).display === 'none' ) {
@@ -816,7 +732,6 @@ class ExportLayoutFrame {
 		}
 	}
 
-	// Copies the live body into the frame and returns the copy of `element`.
 	replaceContent( frameDocument, element ) {
 		const marker = EXPORT_IMAGE_CONFIG.CAPTURE.TARGET_ATTRIBUTE;
 
@@ -826,12 +741,11 @@ class ExportLayoutFrame {
 
 		const target = bodyClone.querySelector( `[${ marker }]` );
 		if ( !target ) {
-			return null;
+			throw new Error( 'Could not find the element inside the export frame' );
 		}
 		target.removeAttribute( marker );
 
-		// Cloned scripts never execute, but frames and embeds would load their
-		// content for nothing. Nothing exportable lives inside one.
+		// Cloned scripts never run, but frames and embeds would load for nothing.
 		for ( const node of bodyClone.querySelectorAll( 'script, noscript, iframe, object, embed' ) ) {
 			node.remove();
 		}
@@ -844,8 +758,7 @@ class ExportLayoutFrame {
 		return target;
 	}
 
-	// Cloning markup loses state that only exists in the DOM. Only the captured
-	// subtree matters, so this stays cheap.
+	// Cloning markup loses state that only exists in the DOM.
 	copyDynamicState( liveElement, clonedElement ) {
 		const selector = 'input, textarea, select, canvas';
 		const liveNodes = liveElement.querySelectorAll( selector );
@@ -862,8 +775,7 @@ class ExportLayoutFrame {
 			if ( liveNode.tagName === 'CANVAS' ) {
 				this.copyCanvas( liveNode, clonedNode );
 			} else if ( liveNode.type !== 'file' ) {
-				// A file input rejects an assigned value, and nothing else here can
-				// fail, but a throw would cost the whole export.
+				// A file input would throw on an assigned value.
 				clonedNode.value = liveNode.value;
 
 				if ( liveNode.tagName === 'INPUT' ) {
@@ -886,8 +798,8 @@ class ExportLayoutFrame {
 		}
 	}
 
-	// Theme and wiki classes live on the root element, and custom properties set at
-	// runtime live in its inline style.
+	// Theme and wiki classes live on the root, runtime custom properties in its
+	// inline style.
 	copyRootAttributes( frameDocument ) {
 		const liveRoot = document.documentElement;
 		const frameRoot = frameDocument.documentElement;
@@ -898,14 +810,7 @@ class ExportLayoutFrame {
 		frameRoot.setAttribute( 'style', liveRoot.getAttribute( 'style' ) || '' );
 	}
 
-	/**
-	 * Waits for the fonts the content uses, but not forever: a request that never
-	 * settles would otherwise leave the export spinning with no way out. Falling
-	 * back to whatever is loaded costs some text metrics, not the export.
-	 *
-	 * @param {Document} frameDocument
-	 * @return {Promise}
-	 */
+	// Wait for font metrics, but fall back on timeout rather than block the export.
 	waitForFonts( frameDocument ) {
 		if ( !frameDocument.fonts ) {
 			return Promise.resolve();
@@ -919,16 +824,9 @@ class ExportLayoutFrame {
 		] );
 	}
 
-	/**
-	 * Very large content would exceed the raster limit. Losing resolution beats
-	 * losing the image, so the scale drops as far as it needs to, and the header,
-	 * footer and padding composed around the capture have to fit in the same
-	 * budget.
-	 *
-	 * @param {DOMRect} bounds captured element's box
-	 * @param {number} requestedScale
-	 * @return {number}
-	 */
+	// Very large content would exceed the raster limit, and the chrome composed
+	// around the capture shares the budget. Losing resolution beats losing the
+	// image, so the scale drops as far as it has to.
 	getEffectiveScale( bounds, requestedScale ) {
 		const dimensions = EXPORT_IMAGE_CONFIG.DIMENSIONS;
 		const composed = ( dimensions.PADDING * 4 ) + dimensions.HEADER_HEIGHT + dimensions.FOOTER_HEIGHT;
@@ -955,17 +853,15 @@ class ExportService {
 		this.canvasComposer = canvasComposer;
 		this.layoutFrame = new ExportLayoutFrame();
 		this.snapdomPromise = null;
-		this.activeExports = new Set();
+		this.exportInProgress = false;
 	}
 
 	applyExportFixes( frameDocument ) {
 		this.hideInfoIcons( frameDocument );
-		this.removeContentSwitchers( frameDocument );
-		this.removePrizepoolToggles( frameDocument );
+		this.removeExportControls( frameDocument );
 		this.expandPrizepoolTables( frameDocument );
 	}
 
-	// Hides info icons that shouldn't appear in exports
 	hideInfoIcons( frameDocument ) {
 		const infoIcons = frameDocument.querySelectorAll( '.brkts-match-info-icon' );
 		for ( const icon of infoIcons ) {
@@ -973,24 +869,13 @@ class ExportService {
 		}
 	}
 
-	// Remove toggle switches
-	removeContentSwitchers( frameDocument ) {
-		const contentSwitches = frameDocument.querySelectorAll( '.switch-pill-container' );
-
-		for ( const contentSwitch of contentSwitches ) {
-			contentSwitch.remove();
-		}
-	}
-
-	removePrizepoolToggles( frameDocument ) {
-		// The legacy in-table toggle and the redesigned table's footer (now inside the
-		// captured wrapper) shouldn't appear in a static export.
-		const prizepoolToggles = frameDocument.querySelectorAll(
-			'.prizepooltabletoggle, .prizepool-table-wrapper .table2__footer'
+	removeExportControls( frameDocument ) {
+		const controls = frameDocument.querySelectorAll(
+			'.switch-pill-container, .prizepooltabletoggle, .prizepool-table-wrapper .table2__footer'
 		);
 
-		for ( const prizepoolToggle of prizepoolToggles ) {
-			prizepoolToggle.remove();
+		for ( const control of controls ) {
+			control.remove();
 		}
 	}
 
@@ -1004,13 +889,11 @@ class ExportService {
 	}
 
 	async export( element, title, mode ) {
-		// Prevent concurrent exports
-		if ( this.activeExports.size > 0 ) {
+		if ( this.exportInProgress ) {
 			throw new Error( 'An export is already in progress' );
 		}
 
-		const exportId = Symbol( 'export' );
-		this.activeExports.add( exportId );
+		this.exportInProgress = true;
 
 		try {
 			await this.prewarm();
@@ -1024,7 +907,7 @@ class ExportService {
 				throw new Error( `Unknown export mode: ${ mode }` );
 			}
 		} finally {
-			this.activeExports.delete( exportId );
+			this.exportInProgress = false;
 		}
 	}
 
@@ -1069,7 +952,6 @@ class ExportService {
 	}
 
 	async copyToClipboard( element, title ) {
-		// Check browser support
 		if ( !window.ClipboardItem || !navigator.clipboard || !navigator.clipboard.write ) {
 			mw.notify( 'This browser does not support copying images to the clipboard.', { type: 'error' } );
 			return;
@@ -1096,19 +978,13 @@ class ExportService {
 		link.href = url;
 		link.click();
 
-		// Clean up object URL after short delay
 		setTimeout( () => {
 			URL.revokeObjectURL( url );
 		}, EXPORT_IMAGE_CONFIG.TIMEOUTS.URL_REVOKE_DELAY );
 	}
 
-	/**
-	 * Loads the library and builds the layout frame. Called when the share menu
-	 * opens so that the setup cost lands before anyone picks an option, and again
-	 * before each export as a guard.
-	 *
-	 * @return {Promise}
-	 */
+	// Called on menu open so the setup cost lands before anyone picks an option,
+	// and again before each export as a guard.
 	prewarm() {
 		return Promise.all( [ this.ensureSnapdomLoaded(), this.layoutFrame.prepare() ] );
 	}
@@ -1116,8 +992,7 @@ class ExportService {
 	ensureSnapdomLoaded() {
 		if ( !this.snapdomPromise ) {
 			this.snapdomPromise = Promise.resolve( mw.loader.using( 'snapdom' ) ).catch( ( error ) => {
-				// Let the next export load it again instead of reusing the failure
-				// for the rest of the page's life.
+				// Let the next export retry instead of reusing the failure.
 				this.snapdomPromise = null;
 				throw error;
 			} );
@@ -1158,7 +1033,7 @@ class ExportService {
 	}
 
 	isExporting() {
-		return this.activeExports.size > 0;
+		return this.exportInProgress;
 	}
 }
 
@@ -1312,7 +1187,6 @@ class DropdownWidget {
 				return;
 			}
 
-			// Filter visible elements
 			const visibleElements = elements.filter( ( item ) => ExportImageDOMUtils.isElementVisible( item.element )
 			);
 			const hasSingleElement = visibleElements.length === 1;
@@ -1457,7 +1331,7 @@ class DropdownWidget {
 
 		button.addEventListener( 'click', () => {
 			if ( menuElement.style.display === 'none' ) {
-				// Failures are surfaced when an export is actually requested.
+				// Log warmup failures; exports retry setup and report failures.
 				this.exportService.prewarm().catch( ( error ) => {
 					// eslint-disable-next-line no-console
 					console.warn( 'Export prewarm failed:', error );
@@ -1759,12 +1633,10 @@ class ExportImageModule {
 		for ( const data of headingsToElements.values() ) {
 			let targetNode = data.headingNode;
 
-			// Use parent if it's a heading wrapper
 			if ( targetNode.parentNode && targetNode.parentNode.classList.contains( 'mw-heading' ) ) {
 				targetNode = targetNode.parentNode;
 			}
 
-			// Avoid duplicate dropdowns
 			if ( !targetNode.querySelector( '.dropdown-widget' ) ) {
 				const dropdown = this.dropdownWidget.create( data.elements, data.headingText );
 				targetNode.appendChild( dropdown );
