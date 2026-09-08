@@ -51,18 +51,6 @@ end
 
 ---@param match MatchGroupUtilMatch
 ---@return boolean
-function MatchUtil.shouldShowMatchDetails(match)
-	if match.phase == 'finished' or match.phase == 'ongoing' then
-		return true
-	elseif not match.timestamp then
-		return false
-	end
-
-	return isWithinDisplayThreshold(match.timestamp)
-end
-
----@param match MatchGroupUtilMatch
----@return boolean
 function MatchUtil.isMatchCloseToStart(match)
 	if match.phase ~= 'upcoming' then
 		return false
