@@ -18,7 +18,6 @@ local Namespace = Lua.import('Module:Namespace')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
 local Tier = Lua.import('Module:Tier/Custom')
 local Variables = Lua.import('Module:Variables')
@@ -168,23 +167,13 @@ function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 		return
 	end
 
-	-- TODO: An improvement would be called TeamCard module for this
-	-- Would need a rework for the function that does it however
-	local participant = placement.opponentname
-	local participantResolved = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
-
-	local aliases = Array.map((placement.extradata or {}).opponentaliases or {}, TeamTemplate.getPageName)
-	aliases = Array.extend(aliases,
-		placement.extradata.opponentaliases or {},
-		Array.map(aliases, String.upperCaseFirst),
-		participant,
-		participant ~= participantResolved and participantResolved or nil
-	)
-	aliases = Array.unique(aliases)
+	-- TODO: Share functionality with TeamParticipants module
+	local aliases = (placement.extradata or {}).opponentaliases or {}
 
 	Table.iter.forEachPair(placement.opponentplayers or {}, function(key, value)
 		Array.forEach(aliases, function(alias)
 			Variables.varDefine(alias .. '_' .. key, value)
+			Variables.varDefine(alias:gsub(' ', '_') .. '_' .. key, value)
 		end)
 	end)
 end
@@ -222,7 +211,7 @@ function HiddenDataBox.validateTier(tier, tierType)
 end
 
 ---@param suppressMatchTicker boolean
----@return Widget?
+---@return Renderable?
 function HiddenDataBox._matchTicker(suppressMatchTicker)
 	if suppressMatchTicker or Info.config.match2.status == 0 then
 		return nil

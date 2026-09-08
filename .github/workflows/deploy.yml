@@ -31,7 +31,7 @@ jobs:
 
       - name: Setup Python
         if: steps.res-changed-files.outputs.any_changed == 'true' || steps.lua-changed-files.outputs.any_changed == 'true'
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.14'
           cache: 'pip'

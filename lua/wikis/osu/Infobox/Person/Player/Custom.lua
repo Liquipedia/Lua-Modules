@@ -16,7 +16,7 @@ local Player = Lua.import('Module:Infobox/Person')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
----@class OsuInfoboxPlayer: Person
+---@class OsuInfoboxPlayer: InfoboxPerson
 local CustomPlayer = Class.new(Player)
 ---@class OsuPersonInfoboxInjector: WidgetInjector
 ---@field caller OsuInfoboxPlayer
