@@ -297,23 +297,6 @@ describe('array', function()
 		end)
 	end)
 
-	describe('ExtractKeys', function()
-		it('check', function()
-			local a = {k = 3, i = 1, z = 0, j = 2}
-
-			local customOrder1 = function(_, key1, key2) return key1 > key2 end
-			local customOrder2 = function(tbl, key1, key2) return tbl[key1] < tbl[key2] end
-
-			assert.are_same({'i', 'j', 'k', 'z'}, Array.extractKeys(a, Table.iter.spairs))
-			assert.are_same({'z', 'k', 'j', 'i'}, Array.extractKeys(a, Table.iter.spairs, customOrder1))
-			assert.are_same({'z', 'i', 'j', 'k'}, Array.extractKeys(a, Table.iter.spairs, customOrder2))
-
-			local extractedKeys = Array.extractKeys(a)
-			table.sort(extractedKeys)
-			assert.are_same({'i', 'j', 'k', 'z'}, extractedKeys)
-		end)
-	end)
-
 	describe('ParseCommaSeparatedString', function()
 		it('check', function()
 			local a = {'test1', 'test2', 'test3'}
