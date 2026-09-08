@@ -47,6 +47,10 @@ const EXPORT_IMAGE_CONFIG = {
 		LAYOUT_WIDTH: 1440,
 		// snapdom clamps its SVG raster to this many pixels per side.
 		MAX_RASTER_SIDE: 16384,
+		// A wrapped title grows the header past HEADER_HEIGHT, so the raster
+		// budget reserves the tallest one it can produce: six lines of 18 plus
+		// vertical padding.
+		MAX_HEADER_HEIGHT: 120,
 		// Fixed so exports match on every display. Two keeps text crisp and leaves
 		// the most headroom under the raster limit.
 		SCALE: 2,
@@ -863,10 +867,11 @@ class ExportLayoutFrame {
 	// losing the image, so the scale drops as far as it has to.
 	getEffectiveScale( bounds, requestedScale ) {
 		const dimensions = EXPORT_IMAGE_CONFIG.DIMENSIONS;
-		const composed = ( dimensions.PADDING * 4 ) + dimensions.HEADER_HEIGHT + dimensions.FOOTER_HEIGHT;
+		const capture = EXPORT_IMAGE_CONFIG.CAPTURE;
+		const composed = ( dimensions.PADDING * 4 ) + capture.MAX_HEADER_HEIGHT + dimensions.FOOTER_HEIGHT;
 		const longestSide = Math.max( bounds.width, bounds.height, 1 ) + composed;
 
-		return Math.min( requestedScale, EXPORT_IMAGE_CONFIG.CAPTURE.MAX_RASTER_SIDE / longestSide );
+		return Math.min( requestedScale, capture.MAX_RASTER_SIDE / longestSide );
 	}
 
 	dispose() {
