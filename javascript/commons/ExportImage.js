@@ -38,7 +38,8 @@ const EXPORT_IMAGE_CONFIG = {
 		IMAGE_LOAD: 5000,
 		URL_REVOKE_DELAY: 100,
 		STYLESHEET_LOAD: 10000,
-		FONT_READY: 5000
+		FONT_READY: 5000,
+		CLONED_IMAGES: 5000
 	},
 	CAPTURE: {
 		// Responsive layout is driven by viewport media queries, so exports are
@@ -608,7 +609,10 @@ class ExportLayoutFrame {
 			this.pruneHiddenContent( target );
 			target.style.background = options.backgroundColor;
 
-			await this.waitForFonts( frameDocument );
+			await Promise.all( [
+				this.waitForFonts( frameDocument ),
+				this.waitForImages( target )
+			] );
 
 			this.pinSubgridTracks( target );
 
@@ -798,6 +802,29 @@ class ExportLayoutFrame {
 		frameRoot.setAttribute( 'lang', liveRoot.lang || 'en' );
 		frameRoot.setAttribute( 'dir', liveRoot.dir || 'ltr' );
 		frameRoot.setAttribute( 'style', liveRoot.getAttribute( 'style' ) || '' );
+	}
+
+	// A logo is sized by its container with the image itself unconstrained, so
+	// an image still loading measures zero and can collapse the capture.
+	waitForImages( element ) {
+		const pending = Array.from( element.querySelectorAll( 'img' ), ( image ) => {
+			if ( image.complete ) {
+				return Promise.resolve();
+			}
+
+			// A broken image resolves too; it must not hold up the export.
+			return new Promise( ( resolve ) => {
+				image.addEventListener( 'load', resolve, { once: true } );
+				image.addEventListener( 'error', resolve, { once: true } );
+			} );
+		} );
+
+		return Promise.race( [
+			Promise.all( pending ),
+			new Promise( ( resolve ) => {
+				setTimeout( resolve, EXPORT_IMAGE_CONFIG.TIMEOUTS.CLONED_IMAGES );
+			} )
+		] );
 	}
 
 	// Text is measured later, but a slow font must not block the export.
