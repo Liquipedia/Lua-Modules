@@ -396,11 +396,6 @@ class CanvasComposer {
 	wrapText( context, text, maxWidth, font ) {
 		context.font = font;
 		const words = text.split( ' ' );
-
-		if ( words.length === 0 ) {
-			return [];
-		}
-
 		const lines = [];
 		let currentLine = words[ 0 ];
 
@@ -768,6 +763,8 @@ class ExportLayoutFrame {
 			const liveNode = liveNodes[ index ];
 			const clonedNode = clonedNodes[ index ];
 
+			// A mismatch means the two lists have drifted out of step, so the
+			// pairing is meaningless from here on, not just for this node.
 			if ( liveNode.tagName !== clonedNode.tagName ) {
 				return;
 			}
@@ -1074,6 +1071,11 @@ class ExportImageDOMUtils {
 			return false;
 		}
 
+		// `closest` walks to the root on its own, so one check covers every ancestor.
+		if ( element.parentElement?.closest( '.tabs-content > div:not(.active)' ) ) {
+			return false;
+		}
+
 		let parent = element.parentElement;
 		while ( parent && parent !== document.body ) {
 			const parentStyle = window.getComputedStyle( parent );
@@ -1085,10 +1087,6 @@ class ExportImageDOMUtils {
 			if ( parent.classList.contains( 'collapsed' ) ||
 				parent.classList.contains( 'is--collapsed' ) ||
 				parent.dataset.collapsibleState === 'collapsed' ) {
-				return false;
-			}
-
-			if ( parent.closest( '.tabs-content > div:not(.active)' ) ) {
 				return false;
 			}
 
@@ -1161,9 +1159,8 @@ class ExportImageDOMUtils {
  * Creates and manages dropdown UI components
  */
 class DropdownWidget {
-	constructor( exportService, zoomManager ) {
+	constructor( exportService ) {
 		this.exportService = exportService;
-		this.zoomManager = zoomManager;
 		this.eventCleanupFunctions = new WeakMap();
 	}
 
@@ -1179,12 +1176,6 @@ class DropdownWidget {
 
 			if ( !menuElement.contains( loadingElement ) ) {
 				menuElement.appendChild( loadingElement );
-			}
-
-			if ( this.zoomManager.hasZoomed ) {
-				const refreshItem = this.createRefreshMenuItem();
-				menuElement.insertBefore( refreshItem, loadingElement );
-				return;
 			}
 
 			const visibleElements = elements.filter( ( item ) => ExportImageDOMUtils.isElementVisible( item.element )
@@ -1241,19 +1232,6 @@ class DropdownWidget {
 		this.setupEventListeners( wrapper, menuElement, toggleButton );
 
 		return wrapper;
-	}
-
-	createRefreshMenuItem() {
-		const item = this.createElement( 'div', {
-			class: 'dropdown-widget__item',
-			tabindex: '0',
-			role: 'menuitem',
-			style: { fontWeight: 'bold' }
-		}, '<i class="fas fa-fw fa-sync-alt"></i> Refresh the page to export images' );
-
-		item.addEventListener( 'click', () => window.location.reload() );
-
-		return item;
 	}
 
 	createDisabledMenuItem( buttonText ) {
@@ -1578,40 +1556,6 @@ class DropdownWidget {
 }
 
 /**
- * Manages zoom detection
- */
-class ZoomManager {
-	constructor() {
-		this.initialZoom = this.getZoomLevel();
-		this.hasZoomed = false;
-		this.resizeTimeout = null;
-		this.setupZoomListener();
-	}
-
-	getZoomLevel() {
-		return window.devicePixelRatio || 1;
-	}
-
-	setupZoomListener() {
-		window.addEventListener( 'resize', () => {
-			clearTimeout( this.resizeTimeout );
-			this.resizeTimeout = setTimeout( () => {
-				this.handleZoomChange();
-			}, 250 );
-		} );
-	}
-
-	handleZoomChange() {
-		const newZoom = this.getZoomLevel();
-		const ZOOM_THRESHOLD = 0.01;
-
-		if ( Math.abs( newZoom - this.initialZoom ) > ZOOM_THRESHOLD ) {
-			this.hasZoomed = true;
-		}
-	}
-}
-
-/**
  * Main module class that coordinates all components
  */
 class ExportImageModule {
@@ -1619,8 +1563,7 @@ class ExportImageModule {
 		this.imageCache = new ImageCache();
 		this.canvasComposer = new CanvasComposer( this.imageCache );
 		this.exportService = new ExportService( this.canvasComposer );
-		this.zoomManager = new ZoomManager();
-		this.dropdownWidget = new DropdownWidget( this.exportService, this.zoomManager );
+		this.dropdownWidget = new DropdownWidget( this.exportService );
 	}
 
 	init() {
