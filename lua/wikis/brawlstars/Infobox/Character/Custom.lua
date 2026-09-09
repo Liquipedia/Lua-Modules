@@ -90,7 +90,7 @@ function CustomCharacter:_getEsportsStats(widgets)
 	local banPercentage = totalGames > 0 and Math.formatPercentage(bans / totalGames, 2) or 0
 
 	return Array.append(widgets,
-		Title{children = '<abbr title="Last 365 days">Esports Statistics</abbr>'},
+		Title{children = 'Esports Statistics'},
 		Cell{name = 'Win Rate', children = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. ')'}},
 		Cell{name = 'Pick Rate', children = {picks .. ' (' .. pickPercentage .. ')'}},
 		Cell{name = 'Ban Rate', children = {bans .. ' (' .. banPercentage .. ')'}}

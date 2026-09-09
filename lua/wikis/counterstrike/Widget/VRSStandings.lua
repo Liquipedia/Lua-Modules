@@ -8,13 +8,12 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local MathUtil = Lua.import('Module:MathUtil')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
+local Component = Lua.import('Module:Widget/Component')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Html = Lua.import('Module:Widget/Html')
 
@@ -25,17 +24,13 @@ local VRSStandingsData = Lua.import('Module:VRSStandingsData')
 
 local FOOTER_LINK = 'Valve_Regional_Standings'
 
----@class VRSStandings: Widget
----@operator call(table): VRSStandings
----@field props table<string|number, string>
-local VRSStandings = Class.new(Widget)
-VRSStandings.defaultProps = {
+local defaultProps = {
 	title = 'VRS Standings',
 	datapointType = 'LIVE',
 }
 
 ---@param settings VRSStandingsSettings
----@return Widget[]
+---@return VNode[]
 local function buildHeaderCells(settings)
 	local filtered = settings.filterType ~= 'none'
 	return WidgetUtil.collect(
@@ -49,7 +44,7 @@ local function buildHeaderCells(settings)
 end
 
 ---@param settings VRSStandingsSettings
----@return Widget
+---@return VNode
 local function buildHeaderRow(settings)
 	return TableWidgets.TableHeader{
 		children = {
@@ -59,7 +54,7 @@ local function buildHeaderRow(settings)
 end
 
 ---@param settings VRSStandingsSettings
----@return table[]
+---@return Table2ColumnDef[]
 local function buildColumns(settings)
 	local filtered = settings.filterType ~= 'none'
 	local columns = WidgetUtil.collect(
@@ -79,7 +74,7 @@ local function buildColumns(settings)
 end
 
 ---@param settings VRSStandingsSettings
----@return Widget
+---@return VNode
 local function buildTitle(settings)
 	local regionMap = {
 		AS = 'Asia',
@@ -114,7 +109,7 @@ local function buildTitle(settings)
 	}
 end
 
----@return Widget
+---@return VNode
 local function buildFooter()
 	return Link{
 		link = FOOTER_LINK,
@@ -128,11 +123,10 @@ local function buildFooter()
 	}
 end
 
----@private
 ---@param standing VRSStandingsStanding
 ---@param mainpage boolean
----@return Widget
-function VRSStandings._row(standing, mainpage)
+---@return VNode
+local function buildRow(standing, mainpage)
 	local extradata = standing.opponent.extradata or {}
 
 	local cells = WidgetUtil.collect(
@@ -160,9 +154,10 @@ function VRSStandings._row(standing, mainpage)
 	return TableWidgets.Row{children = cells}
 end
 
----@return Widget
-function VRSStandings:render()
-	local standings, settings = VRSStandingsData.getStandings(self.props)
+---@param props table<string|number, string>
+---@return VNode
+local function VRSStandings(props)
+	local standings, settings = VRSStandingsData.getStandings(props)
 
 	if #standings == 0 then
 		return Html.Div{
@@ -181,11 +176,11 @@ function VRSStandings:render()
 			buildHeaderRow(settings),
 			TableWidgets.TableBody{
 				children = Array.map(standings, function(entry)
-					return VRSStandings._row(entry, settings.mainpage)
+					return buildRow(entry, settings.mainpage)
 				end)
 			}
 		},
 	}
 end
 
-return VRSStandings
+return Component.component(VRSStandings, defaultProps)

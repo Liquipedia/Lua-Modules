@@ -21,6 +21,7 @@ local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Streams = Lua.import('Module:Links/Stream')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tournament = Lua.import('Module:Tournament')
 
 local Condition = Lua.import('Module:Condition')
@@ -240,8 +241,9 @@ function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 	if opponent.type == Opponent.team then
 		local manualPlayersInput = MatchGroupInputUtil.extractManualPlayersInput(match, opponentIndex, opponentInput)
 		substitutions = manualPlayersInput.substitutions
+		local template = TeamTemplate.getRawOrNil(opponent.template) or {}
 		opponent.players = MatchGroupInputUtil.readPlayersOfTeam(
-			Opponent.toName(opponent) or '',
+			template.historicaltemplate or template.templatename or '',
 			manualPlayersInput,
 			options,
 			{timestamp = match.timestamp, timezoneOffset = match.timezoneOffset}
@@ -480,12 +482,6 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 	local playerIndex = 1
 	local varPrefix = teamName .. '_p' .. playerIndex
 	local name = globalVars:get(varPrefix)
-	-- if we do not find a player for the teamName try to find them for the teamName with underscores
-	if not name then
-		teamName = teamName:gsub(' ', '_')
-		varPrefix = teamName .. '_p' .. playerIndex
-		name = globalVars:get(varPrefix)
-	end
 
 	while name do
 		if options.maxNumPlayers and (playersIndex >= options.maxNumPlayers) then break end
@@ -555,7 +551,9 @@ function MatchGroupInputUtil._getCasterInformation(name, flag, displayName)
 	displayName = Logic.emptyOr(displayName, globalVars:get(name .. 'dn'))
 
 	if String.isEmpty(flag) or String.isEmpty(displayName) then
-		local parent = globalVars:get('tournament_parent') or mw.title.getCurrentTitle().text
+		local tournamentContext = Tournament.partialTournamentFromContext()
+
+		local parent = tournamentContext.pageName or mw.title.getCurrentTitle().text
 		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name):gsub(' ', '_')
 		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
@@ -1119,7 +1117,6 @@ end
 --- - getPatch(match, games): string?
 --- - readDate(match): table
 --- - getMode(opponents): string?
---- - readOpponent(match, opponentIndex, opponentConfig): MGIParsedOpponent
 ---
 --- Additionally, the Parser may have the following properties:
 --- - DEFAULT_MODE: string
@@ -1137,9 +1134,8 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 	local dateProps = MatchGroupInputUtil.getMatchDate(Parser, matchInput)
 	Table.mergeInto(match, dateProps)
 
-	local readOpponent = Parser.readOpponent or MatchGroupInputUtil.readOpponent
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		local opponent = readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
+		local opponent = MatchGroupInputUtil.readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
 		if opponent and Parser.adjustOpponent then
 			Parser.adjustOpponent(opponent, opponentIndex)
 		end

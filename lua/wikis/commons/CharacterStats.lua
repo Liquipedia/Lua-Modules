@@ -29,7 +29,10 @@ local ConditionUtil = Condition.Util
 ---@field matchOpponents standardOpponent[]
 ---@field globalBans table<string, table<string, string>>?
 
----@alias CharacterAppearanceStats {pick: integer, win: integer, loss: integer}
+---@class CharacterAppearanceStats
+---@field pick integer
+---@field win integer
+---@field loss integer
 
 ---@class CharacterStatistic
 ---@field name string

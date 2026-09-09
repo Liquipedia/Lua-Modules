@@ -13,7 +13,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Person = Lua.import('Module:Infobox/Person')
 
----@class InfoboxUser: Person
+---@class InfoboxUser: InfoboxPerson
 ---@operator call(Frame): InfoboxUser
 local User = Class.new(Person)
 
