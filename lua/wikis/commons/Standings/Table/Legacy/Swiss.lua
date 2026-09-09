@@ -41,6 +41,7 @@ function StandingTableLegacySwiss.getStandardParameter(args)
 		finished = true,
 		exclusive = Logic.nilOr(Logic.readBoolOrNil(args.exclusive), true),
 		title = args.title,
+		placements = args.placements,
 	}
 end
 
