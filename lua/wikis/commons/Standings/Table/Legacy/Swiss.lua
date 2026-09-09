@@ -72,7 +72,7 @@ end
 ---@param args table
 ---@param roundIndex integer
 ---@param matches {id: string}[]
----@return {title: string, started: boolean, finished: boolean}
+---@return {title: string, started: boolean, finished: boolean, matches: string}
 function StandingTableLegacySwiss.parseRoundInput(args, roundIndex, matches)
 	local title = (args.roundtitle or 'Round') .. ' ' .. roundIndex
 	return {
