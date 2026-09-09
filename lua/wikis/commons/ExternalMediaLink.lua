@@ -113,7 +113,7 @@ function ExternalMediaLink._readArgs(args)
 	local extradata = {
 		translation = args.translation,
 		translator = args.translator,
-		event = tournament.displayName or args.event,
+		event = tournament.fullName or args.event,
 		event_link = tournament.pageName or Page.pageifyLink(Logic.emptyOr(args['event-link'], args.event) or ''),
 		subject_organization = args.subject_organization1, --legacy
 	}

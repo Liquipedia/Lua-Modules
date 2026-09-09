@@ -132,10 +132,12 @@ end
 ---@param conditions string
 ---@return integer[]
 function ActiveYears._getYears(conditions)
+	---@type Set<integer>
 	local years = Set{}
 	local checkYear = function(placement)
 		-- set the year in which the placement happened as true (i.e. active)
 		local year = tonumber(string.sub(placement.date, 1, 4))
+		---@cast year integer
 		years:add(year)
 	end
 	local queryParameters = {

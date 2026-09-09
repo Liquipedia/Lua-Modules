@@ -15,6 +15,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Tournament = Lua.import('Module:Tournament')
 local Variables = Lua.import('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -90,6 +91,8 @@ function StandingsStorage.table(data)
 		error('No standingsindex specified')
 	end
 
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
 	local extradata = {
 		enddate = data.enddate,
 		finished = data.finished,
@@ -106,8 +109,8 @@ function StandingsStorage.table(data)
 	}
 
 	return {
-		tournament = Variables.varDefault('tournament_name', ''),
-		parent = Variables.varDefault('tournament_parent', ''),
+		tournament = tournamentContext.fullName or '',
+		parent = tournamentContext.pageName or '',
 		standingsindex = standingsIndex,
 		title = mw.text.trim(cleanedTitle),
 		section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
@@ -130,6 +133,8 @@ function StandingsStorage.entry(entry, standingsIndex)
 		return
 	end
 
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
 	local extradata = {
 		enddate = entry.enddate,
 		roundfinished = entry.finished,
@@ -139,7 +144,7 @@ function StandingsStorage.entry(entry, standingsIndex)
 	}
 
 	local lpdbEntry = {
-		parent = Variables.varDefault('tournament_parent', ''),
+		parent = tournamentContext.pageName or '',
 		standingsindex = standingsIndexNumber,
 		placement = entry.placement or entry.rank,
 		definitestatus = entry.definitestatus or entry.bg,

@@ -328,7 +328,7 @@ liquipedia.battleRoyale = {
 
 				// Trigger countdown initialization since we have new dates
 				liquipedia.countdown.init();
-			} );
+			}, this.battleRoyaleMap[ battleRoyaleId ].dev );
 		} else {
 			this.updateGameTabDisplay( battleRoyaleId, matchContentId, gameTab );
 		}
@@ -362,7 +362,7 @@ liquipedia.battleRoyale = {
 		this.recheckNavigationStates( battleRoyaleId );
 	},
 
-	callTemplate: function( battleRoyaleId, matchId, gameId, matchContentId, callback ) {
+	callTemplate: function( battleRoyaleId, matchId, gameId, matchContentId, callback, dev ) {
 		// Create a new object for the match if it doesn't exist
 		if ( !this.isLoading[ battleRoyaleId ] ) {
 			this.isLoading[ battleRoyaleId ] = {};
@@ -378,7 +378,7 @@ liquipedia.battleRoyale = {
 		const games = Object.keys( this.battleRoyaleMap[ battleRoyaleId ].gamePanels[ matchContentId ] ).length - 1;
 		let wikitext = '';
 		for ( let i = 1; i <= games; i++ ) {
-			wikitext += `{{ShowSingleGame|id=${ battleRoyaleId }|matchid=${ matchId }|gameidx=${ i }}}`;
+			wikitext += `{{ShowSingleGame|id=${ battleRoyaleId }|matchid=${ matchId }|gameidx=${ i }|dev=${ dev }}}`;
 		}
 
 		const element =
@@ -450,7 +450,8 @@ liquipedia.battleRoyale = {
 					.querySelectorAll( '[data-js-battle-royale-content-id]' ) ),
 			gameTabs: {},
 			gamePanels: {},
-			collapsibles: []
+			collapsibles: [],
+			dev: this.battleRoyaleInstances[ battleRoyaleId ].dataset.jsBattleRoyaleDev
 		};
 
 		this.battleRoyaleMap[ battleRoyaleId ].matchContents.forEach( ( content ) => {

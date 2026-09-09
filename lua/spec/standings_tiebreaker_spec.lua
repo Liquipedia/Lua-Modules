@@ -16,7 +16,7 @@ describe('Standings Tiebreakers', function()
 			points = props.points or 0,
 			matches = props.matches or {},
 			match = props.match or {w = 0, d = 0, l = 0},
-			extradata = {tiebreakerValues = {}, tiebreakerpoints = props.tiebreakerpoints},
+			extradata = {additionalStatsValues = {}, tiebreakerpoints = props.tiebreakerpoints},
 		}
 	end
 

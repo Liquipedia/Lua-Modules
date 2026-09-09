@@ -49,7 +49,7 @@ local function StandingsFfa(props)
 			{align = 'center'},
 			Helpers._showRoundColumns(standings) and {align = 'center'} or nil,
 			{align = 'left'},
-			Array.map(standings.tiebreakers, function(tiebreaker)
+			Array.map(standings.additionalStats, function(tiebreaker)
 				if not tiebreaker.title then
 					return
 				end
@@ -127,7 +127,7 @@ function Helpers._headerRow(standings)
 			makeHeaderCell('#'),
 			Helpers._showRoundColumns(standings) and makeHeaderCell() or nil,
 			makeHeaderCell('Participant'),
-			Array.map(standings.tiebreakers, function(tiebreaker)
+			Array.map(standings.additionalStats, function(tiebreaker)
 				if not tiebreaker.title then
 					return
 				end
@@ -171,13 +171,13 @@ function Helpers._createRoundBody(standings, round)
 					teamStyle = 'hybrid',
 					showPlayerTeam = true,
 				}},
-				Array.map(standings.tiebreakers, function(tiebreaker, tiebreakerIndex)
+				Array.map(standings.additionalStats, function(tiebreaker, tiebreakerIndex)
 					if not tiebreaker.title then
 						return
 					end
 					return TableWidgets.Cell{
 						css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil},
-						children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
+						children = slot.additionalStatsValues[tiebreaker.id] and slot.additionalStatsValues[tiebreaker.id].display or ''
 					}
 				end),
 				Helpers._showRoundColumns(standings) and Array.map(standings.rounds, function (columnRound)

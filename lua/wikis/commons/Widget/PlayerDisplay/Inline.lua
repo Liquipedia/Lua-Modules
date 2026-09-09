@@ -27,7 +27,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field showTbd boolean?
 
 ---@param props InlinePlayerDisplayProps
----@return Widget
+---@return VNode
 local function InlinePlayer(props)
 	local player = props.player
 	return InlineWrapper{

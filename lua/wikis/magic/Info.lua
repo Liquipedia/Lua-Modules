@@ -60,5 +60,10 @@ return {
 		match2 = {
 			status = 2,
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchdiff', 'gamediff'},
+			},
+		},
 	},
 }

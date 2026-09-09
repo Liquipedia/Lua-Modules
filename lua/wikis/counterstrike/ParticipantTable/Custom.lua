@@ -7,21 +7,20 @@
 
 local Lua = require('Module:Lua')
 
+local Class = Lua.import('Module:Class')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
 local Variables = Lua.import('Module:Variables')
 
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
-local CustomParticipantTable = {}
+---@class CounterstrikeParticipantTable: ParticipantTable
+---@operator call(Frame): CounterstrikeParticipantTable
+local CustomParticipantTable = Class.new(ParticipantTable)
 
 ---@param frame Frame
 ---@return Html?
 function CustomParticipantTable.run(frame)
-	local participantTable = ParticipantTable(frame)
-
-	participantTable.adjustLpdbData = CustomParticipantTable.adjustLpdbData
-
-	return participantTable:read():store():create()
+	return CustomParticipantTable(frame):read():store():create()
 end
 
 ---@param lpdbData table

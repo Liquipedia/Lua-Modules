@@ -27,14 +27,19 @@ local ConditionUtil = Condition.Util
 
 ---@class CharacterStatsGame: MatchGroupUtilGame
 ---@field matchOpponents standardOpponent[]
+---@field globalBans table<string, table<string, string>>?
 
----@alias CharacterAppearanceStats {pick: integer, win: integer, loss: integer}
+---@class CharacterAppearanceStats
+---@field pick integer
+---@field win integer
+---@field loss integer
 
 ---@class CharacterStatistic
 ---@field name string
 ---@field side table<string, {win: integer, loss: integer}> key is side
 ---@field total CharacterAppearanceStats
 ---@field bans integer
+---@field globalBans integer
 ---@field playedWith table<string, CharacterAppearanceStats> key is character name
 ---@field playedVs table<string, CharacterAppearanceStats> key is character name
 ---@field playedBy table<string, CharacterAppearanceStats> key is opponent name
@@ -92,6 +97,13 @@ function CharacterStats:queryGames()
 		if #matchOpponents > 2 then
 			return
 		end
+
+		local matchRecord = mw.ext.LiquipediaDB.lpdb('match2', {
+			conditions = tostring(ConditionNode(ColumnName('match2id'), Comparator.eq, matchId)),
+			limit = 1,
+		})[1]
+		local globalBans = (matchRecord or {}).extradata and matchRecord.extradata.globalbans or nil
+
 		local games = Array.map(
 			mw.ext.LiquipediaDB.lpdb('match2game', {
 				conditions = tostring(ConditionTree(BooleanOperator.all):add{
@@ -100,10 +112,13 @@ function CharacterStats:queryGames()
 				}),
 				order = 'match2gameid asc',
 			}),
-			function (gameRecord)
+			function (gameRecord, gameIndex)
 				local game = MatchGroupUtil.gameFromRecord(gameRecord)
 				---@cast game CharacterStatsGame
 				game.matchOpponents = matchOpponents
+				if gameIndex == 1 then
+					game.globalBans = globalBans
+				end
 				return game
 			end
 		)
@@ -127,6 +142,13 @@ function CharacterStats:getTeamBans(game, opponentIndex)
 	return Array.filter(Array.mapIndexes(function (characterIndex)
 		return game.extradata['team' .. opponentIndex .. 'ban' .. characterIndex]
 	end), String.isNotEmpty)
+end
+
+---@param game CharacterStatsGame
+---@param opponentIndex integer
+---@return string[]
+function CharacterStats:getTeamGlobalBans(game, opponentIndex)
+	return {}
 end
 
 ---@param game CharacterStatsGame
@@ -214,6 +236,11 @@ function CharacterStats:processGames(games)
 				local characterStats = self:_getCharacterStatTable(stats, ban)
 				characterStats.bans = characterStats.bans + 1
 			end)
+
+			Array.forEach(self:getTeamGlobalBans(game, opponentIndex), function (ban)
+				local characterStats = self:_getCharacterStatTable(stats, ban)
+				characterStats.globalBans = characterStats.globalBans + 1
+			end)
 		end)
 	end)
 
@@ -236,6 +263,7 @@ function CharacterStats:_getCharacterStatTable(stats, character)
 			end),
 			total = {pick = 0, win = 0, loss = 0},
 			bans = 0,
+			globalBans = 0,
 			playedWith = {},
 			playedVs = {},
 			playedBy = {}

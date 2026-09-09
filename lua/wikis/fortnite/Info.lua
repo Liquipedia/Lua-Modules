@@ -47,5 +47,10 @@ return {
 		participants = {
 			defaultPlayerNumber = 3,
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchdiff', 'gamediff'},
+			},
+		},
 	},
 }

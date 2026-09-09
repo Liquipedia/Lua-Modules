@@ -42,16 +42,12 @@ end
 ---@param match WarcraftMatchGroupUtilMatch
 ---@return Widget[]
 function CustomMatchSummary.createBody(match)
-	CustomMatchSummary.computeOfffactions(match)
+	CustomMatchSummary.computeOffFactions(match)
 	local hasHeroes = CustomMatchSummary.hasHeroes(match)
-	local subMatches
-	if match.opponentMode ~= UNIFORM_MATCH then
-		subMatches = match.submatches or {}
-	end
 
 	return WidgetUtil.collect(
 		Array.map(match.opponents, CustomMatchSummary.advantageOrPenalty),
-		subMatches and Array.map(subMatches, CustomMatchSummary.TeamSubmatch)
+		match.opponentMode ~= UNIFORM_MATCH and Array.map(match.submatches or {}, CustomMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {hasHeroes = hasHeroes})),
 		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
 			css = {['text-align'] = 'center'},
@@ -62,7 +58,7 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param match table
-function CustomMatchSummary.computeOfffactions(match)
+function CustomMatchSummary.computeOffFactions(match)
 	if match.opponentMode == UNIFORM_MATCH then
 		CustomMatchSummary.computeMatchOfffactions(match)
 	else
@@ -75,7 +71,7 @@ function CustomMatchSummary.computeMatchOfffactions(match)
 	Array.forEach(match.games, function(game)
 		game.offFactions = {}
 		Array.forEach(game.opponents, function(gameOpponent, opponentIndex)
-			game.offFactions[opponentIndex] = MatchGroupUtil.computeOfffactions(
+			game.offFactions[opponentIndex] = MatchGroupUtil.computeOffFactions(
 				gameOpponent,
 				match.opponents[opponentIndex]
 			)
@@ -195,7 +191,7 @@ function CustomMatchSummary.DisplayHeroes(opponent, options)
 end
 
 ---@param submatch WarcraftMatchGroupUtilSubmatch
----@return MatchSummaryRow
+---@return Renderable
 function CustomMatchSummary.TeamSubmatch(submatch)
 	return MatchSummaryWidgets.Row{
 		children = WidgetUtil.collect(
@@ -224,7 +220,7 @@ function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 
 	---@param opponentIndex integer
 	---@param additionalClasses string[]?
-	---@return Widget
+	---@return Renderable
 	local createScore = function(opponentIndex, additionalClasses)
 		return OpponentDisplay.BlockScore{
 			additionalClasses = additionalClasses,
@@ -296,7 +292,7 @@ function CustomMatchSummary._submatchHasDetails(submatch)
 end
 
 ---@param veto StarcraftMatchGroupUtilVeto
----@return MatchSummaryRow
+---@return Renderable
 function CustomMatchSummary.Veto(veto)
 	local statusIcon = function(opponentIndex)
 		return opponentIndex == veto.by and MAP_VETO_LABEL or nil

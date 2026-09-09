@@ -34,7 +34,7 @@ end
 
 ---Template:League standings without lobby & Template:League standings without lobby ranked
 ---@param frame Frame
----@return table
+---@return Renderable
 function StandingTableLegacyFfa.withoutLobby(frame)
 	local args = Arguments.getArgs(frame)
 	local rounds = Table.map(Array.range(1, tonumber(args.rounds) or 1), function(roundIndex)
@@ -55,7 +55,7 @@ end
 
 ---Template:League_standings_with_past_results & Template:League standings without lobby custom
 ---@param frame Frame
----@return table
+---@return Renderable
 function StandingTableLegacyFfa.pastResults(frame)
 	local args = Arguments.getArgs(frame)
 	local rounds = Table.map(Array.range(1, tonumber(args.rounds) or 1), function(roundIndex)
@@ -93,7 +93,7 @@ end
 
 ---Template:league standings end & Template:league standings end2
 ---@param frame Frame
----@return table?
+---@return Renderable?
 function StandingTableLegacyFfa.templateEnd(frame)
 	local cnt = tonumber(Variables.varDefault('standings_legacy_count'))
 	if not cnt then

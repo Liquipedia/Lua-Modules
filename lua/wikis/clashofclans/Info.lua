@@ -39,5 +39,10 @@ return {
 		transfers = {
 			showTeamName = true,
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchdiff', 'gamediff'},
+			},
+		},
 	},
 }
