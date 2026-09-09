@@ -92,36 +92,20 @@ jobs:
         env:
           CHANGED_FILES: ${{ steps.lua-changed-files.outputs.all_changed_files }}
         run: |
-          # JSON rather than the pretty output: no ANSI stripping, no scraping
-          # totals out of prose, and file/line/message come out structured.
-          # Diagnosis exits non-zero when it finds anything, hence `|| true`.
           ~/.local/bin/luals/bin/lua-language-server --check ./ \
             --check_format=json --check_out_path="$PWD/luals-check.json" || true
 
-          # No problems at all is written as `[]`, not `{}`.
-          test -f luals-check.json || echo '[]' > luals-check.json
-
-          # Lines and columns are 0-based in JSON but 1-based in the annotations.
-          # Messages can span lines, which would break the workflow command.
-          jq -r --arg root "file://$PWD/" '
+          jq -r --arg root "file://$PWD/" --arg changed "$CHANGED_FILES" '
             to_entries[]
             | (.key | sub($root; "")) as $file
+            | select($file | inside($changed))
             | .value[]
-            | [$file, (.range.start.line + 1), (.range.start.character + 1),
-               .code, (.message | gsub("\n"; " "))]
-            | @tsv
-          ' luals-check.json > luals-problems.tsv
+            | (.range.start.line + 1) as $line
+            | (.range.start.character + 1) as $col
+            | "::error file=\($file),line=\($line),col=\($col)::\(.message | gsub("\n"; " ")) (\(.code))"
+          ' luals-check.json | tee output.txt
 
-          # Annotate only what this PR touched, and fail only on those. Problems
-          # elsewhere are pre-existing and not this PR's to fix.
-          changed=$(printf '%s\n' $CHANGED_FILES | sort -u)
-          touched=0
-          while IFS=$'\t' read -r file line col code message; do
-            if grep -qxF "$file" <<< "$changed"; then
-              echo "::error file=$file,line=$line,col=$col::$message ($code)"
-              touched=$((touched + 1))
-            fi
-          done < luals-problems.tsv
+          touched=$(wc -l < output.txt)
 
           problems=$(jq -r '[.[] | length] | add // 0' luals-check.json)
           files_with=$(jq -r 'length' luals-check.json)
