@@ -243,7 +243,7 @@ function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 		substitutions = manualPlayersInput.substitutions
 		local template = TeamTemplate.getRawOrNil(opponent.template) or {}
 		opponent.players = MatchGroupInputUtil.readPlayersOfTeam(
-			template.historicaltemplate or template.templatename,
+			template.historicaltemplate or template.templatename or '',
 			manualPlayersInput,
 			options,
 			{timestamp = match.timestamp, timezoneOffset = match.timezoneOffset}
