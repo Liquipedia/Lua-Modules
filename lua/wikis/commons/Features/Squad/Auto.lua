@@ -7,11 +7,8 @@
 
 local Lua = require('Module:Lua')
 
-local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
-local Info = Lua.import('Module:Info')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
@@ -24,8 +21,8 @@ local TransferRefs = Lua.import('Module:Transfer/References')
 
 local SquadTypes = Lua.import('Module:Features/Squad/Types')
 local SquadHistory = Lua.import('Module:Features/Squad/Lib/History')
-local SquadTransferHistory = Lua.import('Module:Features/Squad/Api/TransferHistory')
 local SquadCustom = Lua.import('Module:Features/Squad/Custom')
+local SquadTransferHistory = Lua.import('Module:Features/Squad/Api/TransferHistory')
 
 local INVALID_HISTORY_CATEGORY = 'SquadAuto with invalid player history'
 
@@ -35,9 +32,7 @@ local INVALID_HISTORY_CATEGORY = 'SquadAuto with invalid player history'
 ---@field manualPlayers table?
 ---@field manualTimeline table?
 ---@field playersTeamHistory table<string, TeamHistoryEntry[]>
-local SquadAuto = Class.new(nil, function (self, frame)
-	self.args = Arguments.getArgs(frame)
-end)
+local SquadAuto = {}
 
 ---@class SquadAutoConfig
 ---@field team string
@@ -50,91 +45,52 @@ end)
 ---@field roleData RoleData[]
 ---@field positionData RoleData[]
 
----Entrypoint for SquadAuto tables
----@param frame Frame|table
----@return Renderable?
-function SquadAuto.run(frame)
-	if not Info.config.squads.standardizedAuto then
-		-- Legacy mode: Call old SquadAuto
-		local OldSquadAuto = Lua.import('Module:SquadAuto')
-		local args = Arguments.getArgs(frame)
-
-		local type = SquadTypes.TypeToSquadType[(args.type or ''):lower()]
-		-- Old module needs special type argument
-		if type == SquadTypes.SquadType.STAFF then
-			args.type = 'Organization_' .. args.status
-		else
-			args.type = 'Player_' .. args.status
-		end
-
-		return OldSquadAuto[args.status](args)
-	end
-
-	local autosquad = SquadAuto(frame)
-	local entries = autosquad:build()
-	return autosquad:display(entries)
-end
-
----Handles all necessary steps to fetch and sort data
-function SquadAuto:build()
-	self:_parseConfig()
-	self.playersTeamHistory = SquadTransferHistory.forTeam(self.config.team, self.config.teams)
-	local entries = self:_selectEntries()
-	Array.forEach(entries, FnUtil.curry(SquadAuto._enrichEntry, self))
-	return entries
-end
-
 ---Parses the args into a SquadAutoConfig
----@private
-function SquadAuto:_parseConfig()
-	local args = self.args
+function SquadAuto._parseConfig(args)
 	local type = SquadTypes.TypeToSquadType[(args.type or ''):lower()]
 	local status = SquadTypes.StatusToSquadStatus[(args.status or ''):lower()]
-	self.config = {
+	local config = {
 		team = args.team or mw.title.getCurrentTitle().text,
 		type = type,
 		status = status,
 		title = args.title
 	}
 
-	self.manualPlayers, self.enrichmentInfo = self:_readManualRowInput()
-
 	-- Override default 'Former Squad' title
 	if status == SquadTypes.SquadStatus.FORMER
 			and type == SquadTypes.SquadType.PLAYER
-			and not self.config.title then
-		self.config.title = 'Former Players'
+			and not config.title then
+		config.title = 'Former Players'
 	end
 
-	local historicalTemplates = TeamTemplate.queryHistorical(self.config.team) or {}
-	self.config.teams = Array.append(Array.extractValues(historicalTemplates), TeamTemplate.resolve(self.config.team))
+	local historicalTemplates = TeamTemplate.queryHistorical(config.team) or {}
+	config.teams = Array.append(Array.extractValues(historicalTemplates), TeamTemplate.resolve(config.team))
 
-	if Logic.isEmpty(self.config.teams) then
-		error(TeamTemplate.noTeamMessage(self.config.team))
+
+	if Logic.isEmpty(config.teams) then
+		error(TeamTemplate.noTeamMessage(config.team))
 	end
+
+	return config
 end
 
 ---@param entries SquadAutoPerson[]
 ---@return Renderable?
-function SquadAuto:display(entries)
-	if Logic.isEmpty(entries) then
-		return
+function SquadAuto.display(config, entries)
+	if SquadAuto._isStatus(config, SquadTypes.SquadStatus.FORMER) or SquadAuto._isStatus(config, SquadTypes.SquadStatus.FORMER_INACTIVE) then
+		return SquadAuto.displayTabs(config, entries)
 	end
 
-	if self:_isStatus(SquadTypes.SquadStatus.FORMER) or self:_isStatus(SquadTypes.SquadStatus.FORMER_INACTIVE) then
-		return self:displayTabs(entries)
-	end
-
-	local useRankSort = self:_isStatus(SquadTypes.SquadStatus.ACTIVE)
+	local useRankSort = SquadAuto._isStatus(config, SquadTypes.SquadStatus.ACTIVE)
 	entries = SquadAuto._sortEntries(entries, useRankSort)
 
-	return SquadCustom.runAuto(entries, self.config.status, self.config.type, self.config.title)
+	return SquadCustom.runAuto(entries, config.status, config.type, config.title)
 end
 
 ---@private
 ---@param entries SquadAutoPerson[]
 ---@return Renderable?
-function SquadAuto:displayTabs(entries)
+function SquadAuto.displayTabs(config, entries)
 	local _, groupedEntries = Array.groupBy(
 		entries,
 		---@param entry SquadAutoPerson
@@ -148,9 +104,9 @@ function SquadAuto:displayTabs(entries)
 	if tabCount == 1 then
 		return SquadCustom.runAuto(
 			SquadAuto._sortEntries(entries),
-			self.config.status,
-			self.config.type,
-			self.config.title
+			config.status,
+			config.type,
+			config.title
 		)
 	end
 
@@ -165,9 +121,9 @@ function SquadAuto:displayTabs(entries)
 		tabs['name' .. idx] = year
 		tabs['content' .. idx] = SquadCustom.runAuto(
 			SquadAuto._sortEntries(group),
-			self.config.status,
-			self.config.type,
-			self.config.title
+			config.status,
+			config.type,
+			config.title
 		)
 		idx = idx + 1
 	end
@@ -175,11 +131,10 @@ function SquadAuto:displayTabs(entries)
 	return Tabs.dynamic(tabs)
 end
 
----@private
 ---@param entry SquadAutoPerson
-function SquadAuto:_enrichEntry(entry)
+function SquadAuto._enrichEntry(enrichmentInfo, entry)
 	local pagename = Page.pageifyLink(entry.link)
-	local enrichment = self.enrichmentInfo[pagename]
+	local enrichment = enrichmentInfo[pagename]
 	if enrichment then
 		Table.mergeInto(entry, enrichment)
 	end
@@ -199,15 +154,14 @@ function SquadAuto:_enrichEntry(entry)
 	--TODO: Captain from pagevar set in infobox?
 end
 
----@private
 ---@return SquadAutoPerson[] manualPersons
 ---@return table<string, SquadAutoPerson> enrichmentInfo
-function SquadAuto:_readManualRowInput()
+function SquadAuto._readManualRowInput(args, config)
 	---@type SquadAutoPerson[]
 	local persons = {}
 	local enrichmentInfo = {}
 
-	Array.forEach(self.args, function (entry)
+	Array.forEach(args, function (entry)
 		local person = Json.parseIfString(entry)
 
 		if Logic.isEmpty(person) then
@@ -217,7 +171,7 @@ function SquadAuto:_readManualRowInput()
 		local link = Page.pageifyLink(person.link or person.id or person.name)
 		assert(link, 'Missing identifier or link for SquadAutoRow ' .. entry)
 
-		if self:_isStaffTable() and Logic.isNotEmpty(person.role) then
+		if SquadAuto._isStaffTable(config) and Logic.isNotEmpty(person.role) then
 			-- Only allow manual entries for STAFF (organization) tables
 			---@type SquadAutoPerson
 			local manualPerson = {
@@ -265,22 +219,21 @@ function SquadAuto:_readManualRowInput()
 	return persons, enrichmentInfo
 end
 
----@private
 ---@return SquadAutoPerson[]
-function SquadAuto:_selectEntries()
+function SquadAuto._selectEntries(playersTeamHistory, manualPlayers, config)
 	return Array.filter(
 		Array.extend(
 			Array.flatMap(
-				Array.extractValues(self.playersTeamHistory),
-				FnUtil.curry(self._selectPersons, self)
+				Array.extractValues(playersTeamHistory),
+				FnUtil.curry(SquadAuto._selectPersons, config)
 			),
-			self.manualPlayers
+			manualPlayers
 		),
 		--- Selects the appropriate entries based on the role.
 		---@param entry SquadAutoPerson
 		---@return boolean
 		function(entry)
-			if self:_isStatus(SquadTypes.SquadStatus.INACTIVE) then
+			if SquadAuto._isStatus(config, SquadTypes.SquadStatus.INACTIVE) then
 				-- For SquadStatus.INACTIVE the entries are already preselected
 				-- and won't have the role set to Inactive.
 				-- This also matches manual Squad, where status is inactive and role can e.g. be "On Loan"
@@ -294,7 +247,7 @@ function SquadAuto:_selectEntries()
 					or role.type == RoleUtil.ROLE_TYPE.UNKNOWN -- Unknown roles are assumed to be non-player
 			end)
 
-			return self:_isStaffTable() == hasStaffRoles
+			return SquadAuto._isStaffTable(config) == hasStaffRoles
 		end
 	)
 end
@@ -304,10 +257,11 @@ end
 ---If the status is (in)active, then at most one entry will be returned
 ---If the status is former(_inactive), there might be multiple entries returned
 ---@private
+---@param config SquadAutoConfig
 ---@param entries TeamHistoryEntry[]
 ---@return SquadAutoPerson[]
-function SquadAuto:_selectPersons(entries)
-	local selection = SquadHistory.selectStints(entries, self.config.status)
+function SquadAuto._selectPersons(config, entries)
+	local selection = SquadHistory.selectStints(entries, config.status)
 	if not selection then
 		return {}
 	end
@@ -316,10 +270,10 @@ function SquadAuto:_selectPersons(entries)
 
 	if selection.hasFormerInactiveEntry then
 		-- FORMER_INACTIVE enables the Inactive Date display
-		self.config.status = SquadTypes.SquadStatus.FORMER_INACTIVE
+		config.status = SquadTypes.SquadStatus.FORMER_INACTIVE
 	end
 
-	return Array.map(selection.stints, FnUtil.curry(SquadAuto._mapToSquadPerson, self))
+	return Array.map(selection.stints, SquadAuto._mapToSquadPerson)
 end
 
 ---Logs the transfers that could not be fitted into a person's history, and categorizes the page.
@@ -337,7 +291,7 @@ end
 ---@private
 ---@param stint SquadStint
 ---@return SquadAutoPerson
-function SquadAuto:_mapToSquadPerson(stint)
+function SquadAuto._mapToSquadPerson(stint)
 	local joinEntry = stint.joinEntry
 	local inactiveEntry = stint.inactiveEntry or {}
 	local leaveEntry = stint.leaveEntry or {}
@@ -433,15 +387,15 @@ end
 
 ---Whether the current table is for staff
 ---@return boolean
-function SquadAuto:_isStaffTable()
-	return self.config.type == SquadTypes.SquadType.STAFF
+function SquadAuto._isStaffTable(config)
+	return config.type == SquadTypes.SquadType.STAFF
 end
 
 ---Whether the current table is for a specific status
 ---@param status SquadStatus
 ---@return boolean
-function SquadAuto:_isStatus(status)
-	return self.config.status == status
+function SquadAuto._isStatus(config, status)
+	return config.status == status
 end
 
 return SquadAuto
