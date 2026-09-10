@@ -27,7 +27,7 @@ function CustomCosmetic.run(frame)
 	local lore = CustomCosmetic(frame)
 	lore:setWidgetInjector(CustomInjector(lore))
 
-	return mw.html.create():node(lore:createInfobox())
+	return lore:createInfobox()
 end
 
 ---@param id string
