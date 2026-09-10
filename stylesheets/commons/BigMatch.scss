@@ -1069,6 +1069,10 @@ span.slash {
 				border-color: var( --clr-on-surface-dark-primary-8 );
 			}
 
+			&.vodlink > a {
+				display: contents;
+			}
+
 			&:has( > .match-table-wrapper ) {
 				display: contents;
 				padding: unset;
