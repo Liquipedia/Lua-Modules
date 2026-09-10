@@ -40,7 +40,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 end
 
 ---@param mapIndex integer
----@param bans integer
+---@param bans number?
 ---@return string
 function WikiCopyPaste._getMapCode(mapIndex, bans)
 	---@param opponentIndex integer
