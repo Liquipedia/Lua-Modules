@@ -55,7 +55,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return Renderable?
+---@return VNode?
 function CustomTeam:createBottomContent()
 	if not self.args.disbanded then
 		return UpcomingTournaments.team{name = self.teamTemplate.templatename}
