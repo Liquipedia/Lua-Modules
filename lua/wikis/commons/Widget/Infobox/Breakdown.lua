@@ -38,7 +38,6 @@ local function Breakdown(props)
 	end)
 	return Html.Div{
 		css = {
-			display = 'grid',
 			['grid-template-columns'] = 'repeat(' .. number .. ', 1fr)'
 		},
 		children = mappedChildren,
