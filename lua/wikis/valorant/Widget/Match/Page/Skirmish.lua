@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Match/Summary/Skirmish
+-- page=Module:Widget/Match/Page/Skirmish
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -17,7 +17,7 @@ local Div = Html.Div
 
 ---@param props ValorantSkirmishResult
 ---@return VNode?
-local function ValorantSkirmishDisplay(props)
+local function ValorantMatchPageSkirmishDisplay(props)
 	if Logic.isEmpty(props) then
 		return
 	end
@@ -87,4 +87,4 @@ local function ValorantSkirmishDisplay(props)
 	}
 end
 
-return Component.component(ValorantSkirmishDisplay)
+return Component.component(ValorantMatchPageSkirmishDisplay)
