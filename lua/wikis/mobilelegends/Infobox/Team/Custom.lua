@@ -24,7 +24,7 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
----@return Html|string
+---@return VNode?
 function CustomTeam:createBottomContent()
 	return PlacementStats.run{}
 end
