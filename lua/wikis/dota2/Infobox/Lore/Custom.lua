@@ -79,6 +79,7 @@ end
 function CustomCosmetic:getWikiCategories(args)
 	local categoryLookup = {
 		artifact = 'Lore artifacts',
+		comic = 'Comics',
 		character = 'Characters',
 		event = 'Lore events',
 		faction = 'Factions',
