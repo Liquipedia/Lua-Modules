@@ -14,14 +14,16 @@ local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 
----@param props ValorantSkirmishResult
+---@param props {skirmish: ValorantSkirmishResult?}
 ---@return VNode?
 local function ValorantMatchSummarySkirmishDisplay(props)
-	if Logic.isEmpty(props) then
+	local skirmish = props.skirmish
+	if Logic.isEmpty(skirmish) then
 		return
 	end
+	---@cast skirmish -nil
 	local players = Array.map(
-		props.players,
+		skirmish.players,
 		function (player)
 			---@type standardPlayer
 			return {
@@ -62,10 +64,10 @@ local function ValorantMatchSummarySkirmishDisplay(props)
 						},
 						children = Array.interleave(
 							Array.map(
-								props.scores,
+								skirmish.scores,
 								function (score, scoreIndex)
 									return Html.Span{
-										css = props.winner == scoreIndex and {
+										css = skirmish.winner == scoreIndex and {
 											['font-weight'] = 'bold'
 										} or nil,
 										children = score,

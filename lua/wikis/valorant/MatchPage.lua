@@ -654,7 +654,7 @@ function MatchPage:addComments()
 	end
 	---@cast skirmishData ValorantSkirmishResult
 	return {
-		SkirmishDisplay(skirmishData)
+		SkirmishDisplay{skirmish = skirmishData}
 	}
 end
 

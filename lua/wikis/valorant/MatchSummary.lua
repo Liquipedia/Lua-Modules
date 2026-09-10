@@ -65,7 +65,7 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return Renderable?
 function CustomMatchSummary.createGamesContainerFooter(match)
-	return SkirmishDisplay(match.extradata.skirmish)
+	return SkirmishDisplay{skirmish = match.extradata.skirmish}
 end
 
 ---@private
