@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
-local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 local Tournament = Lua.import('Module:Tournament')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -20,6 +19,7 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local SkirmishDisplay = Lua.import('Module:Widget/Match/Summary/Skirmish')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local SPAN_SLASH = Html.Span{classes = {'slash'}, children = '/'}
@@ -65,82 +65,7 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return Renderable?
 function CustomMatchSummary.createGamesContainerFooter(match)
-	return CustomMatchSummary._createSkirmishDisplay(match.extradata.skirmish)
-end
-
----@param skirmishData ValorantSkirmishResult
----@return VNode?
-function CustomMatchSummary._createSkirmishDisplay(skirmishData)
-	if Logic.isEmpty(skirmishData) then
-		return
-	end
-	local players = Array.map(
-		skirmishData.players,
-		function (player)
-			---@type standardPlayer
-			return {
-				displayName = player.displayname,
-				pageName = player.name,
-				flag = player.flag,
-			}
-		end
-	)
-	return Html.Div{
-		classes = {'brkts-popup-body-grid-row'},
-		children = {
-			Html.B{
-				css = {
-					['grid-column'] = '1 / -1',
-					['justify-self'] = 'center',
-				},
-				children = 'Skirmish Side Selection Result'
-			},
-			Html.Div{
-				classes = {'brkts-popup-body-grid-row-detail'},
-				children = {
-					Html.Span{
-						css = {
-							['justify-self'] = 'end',
-						},
-						children = PlayerDisplay.InlinePlayer{
-							flip = true,
-							player = players[1],
-						}
-					},
-					Html.Div{
-						css = {
-							display = 'grid',
-							['grid-template-columns'] = '1fr min-content 1fr',
-							gap = '0.25rem',
-							['justify-self'] = 'center',
-						},
-						children = Array.interleave(
-							Array.map(
-								skirmishData.scores,
-								function (score, scoreIndex)
-									return Html.Span{
-										css = skirmishData.winner == scoreIndex and {
-											['font-weight'] = 'bold'
-										} or nil,
-										children = score,
-									}
-								end
-							),
-							Html.Span{children = '&ndash;'}
-						)
-					},
-					Html.Span{
-						css = {
-							['justify-self'] = 'start',
-						},
-						children = PlayerDisplay.InlinePlayer{
-							player = players[2],
-						}
-					},
-				}
-			},
-		}
-	}
+	return SkirmishDisplay(match.extradata.skirmish)
 end
 
 ---@private
