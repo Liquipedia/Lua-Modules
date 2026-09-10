@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
@@ -76,7 +77,7 @@ function Map:createInfobox()
 
 	self:bottom(self:createBottomContent())
 
-	if Namespace.isMain() then
+	if Namespace.isMain() and Lpdb.isStorageEnabled() then
 		self:categories('Maps', unpack(self:getWikiCategories(args)))
 		self:_setLpdbData(args)
 	end
