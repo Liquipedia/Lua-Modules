@@ -19,8 +19,11 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class ValorantInfoboxTeam: InfoboxTeam
+---@operator call(Frame): ValorantInfoboxTeam
 local CustomTeam = Class.new(Team)
+
 ---@class ValorantInfoboxTeamWidgetInjector: WidgetInjector
+---@operator call(ValorantInfoboxTeam): ValorantInfoboxTeamWidgetInjector
 ---@field caller ValorantInfoboxTeam
 local CustomInjector = Class.new(Injector)
 
