@@ -196,7 +196,7 @@ function MatchFunctions.parseSkirmish(match, opponents)
 		return
 	end
 	return {
-		players = {player1, player2},
+		players = Table.deepCopy{player1, player2},
 		scores = scores,
 		winner = tonumber(skirmishData.winner) or (match.finished and (scores[1] > scores[2] and 1 or 2) or nil)
 	}
