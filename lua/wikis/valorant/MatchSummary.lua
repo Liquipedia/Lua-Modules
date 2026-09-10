@@ -45,7 +45,7 @@ function CustomMatchSummary.createBody(match)
 					end
 					return ValorantMatchSummaryGameRow{game = game, gameIndex = gameIndex}
 				end),
-				SkirmishDisplay(match.extradata.skirmish)
+				SkirmishDisplay{skirmish = match.extradata.skirmish}
 			)
 		},
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
