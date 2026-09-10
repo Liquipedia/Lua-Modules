@@ -13,7 +13,7 @@ local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
-local Div = Html.Div
+local MatchPageComment = Lua.import('Module:Widget/Match/Page/Comment')
 
 ---@param props ValorantSkirmishResult
 ---@return VNode?
@@ -32,7 +32,7 @@ local function ValorantMatchPageSkirmishDisplay(props)
 			}
 		end
 	)
-	return Div{
+	return MatchPageComment{
 		css = {
 			display = 'grid',
 			['grid-template-columns'] = '1fr min-content 1fr',
@@ -54,7 +54,7 @@ local function ValorantMatchPageSkirmishDisplay(props)
 					player = players[1],
 				}
 			},
-			Div{
+			Html.Div{
 				css = {
 					display = 'grid',
 					['grid-template-columns'] = '1fr min-content 1fr',
