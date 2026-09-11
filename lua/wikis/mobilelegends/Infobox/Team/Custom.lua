@@ -8,9 +8,8 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-
-local Team = Lua.import('Module:Infobox/Team')
 local PlacementStats = Lua.import('Module:Infobox/Extension/PlacementStats')
+local Team = Lua.import('Module:Infobox/Team')
 
 ---@class MobileLegendsInfoboxTeam: InfoboxTeam
 ---@operator call(Frame): MobileLegendsInfoboxTeam
