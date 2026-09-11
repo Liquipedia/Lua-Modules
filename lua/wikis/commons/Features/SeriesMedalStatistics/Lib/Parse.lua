@@ -55,8 +55,8 @@ function Parser._readQueryConfig(args, config)
 
 	return {
 		series = series,
-		tier = Array.parseCommaSeparatedString(args.tier or args.liquipediatier),
-		tierType = Array.parseCommaSeparatedString(args.tiertype or args.liquipediatiertype),
+		tier = Array.parseCommaSeparatedString(args.tier),
+		tierType = Array.parseCommaSeparatedString(args.tiertype),
 		startDate = DateExt.readTimestamp(args.sdate),
 		endDate = DateExt.readTimestamp(args.edate),
 		additionalConditions = args.additionalConditions or '',
