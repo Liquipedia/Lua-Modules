@@ -15,7 +15,6 @@ local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 local Table = Lua.import('Module:Table')
-local Variables = Lua.import('Module:Variables')
 
 ---@class WarcraftParticipantTableConfig: ParticipantTableConfig
 ---@field displayUnknownColumn boolean?
