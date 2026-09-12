@@ -35,10 +35,10 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Logic.readBool(args.needsWinner) and (INDENT .. '|winner=') or nil,
 		INDENT .. '|date=',
 		Logic.readBool(args.streams) and (INDENT .. '|twitch=|youtube=|vod=') or nil,
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
 		end),
-		bestof ~= 0 and Array.map(Array.range(1, bestof), WikiCopyPaste._getMapCode) or nil,
+		bestof ~= 0 and Array.mapRange(1, bestof, WikiCopyPaste._getMapCode) or nil,
 		INDENT .. '}}'
 	)
 
@@ -53,7 +53,7 @@ function WikiCopyPaste._getMapCode(mapIndex)
 	---@param limit integer
 	---@return string
 	local charsCode = function(opponentIndex, charType, limit)
-		local params = Array.map(Array.range(1, limit), function(runIndex)
+		local params = Array.mapRange(1, limit, function(runIndex)
 				return '|t' .. opponentIndex .. charType .. runIndex .. '='
 		end)
 		return table.concat(params)

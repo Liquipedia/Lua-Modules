@@ -47,7 +47,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 	local lines = {
 		'{{Match',
-		INDENT .. table.concat(Array.map(Array.range(1, opponents), function(opponentIndex)
+		INDENT .. table.concat(Array.mapRange(1, opponents, function(opponentIndex)
 			return '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode, showScore)
 		end)),
 		INDENT .. '|date= |finished=',
@@ -114,7 +114,7 @@ end
 ---@return table
 function WikiCopyPaste.getStart(template, id, modus, args)
 	args.namedMatchParams = false
-	args.headersUpTop = Logic.readBool(Logic.emptyOr(args.headersUpTop, true))
+	args.headersUpTop = Logic.nilOr(Logic.readBoolOrNil(args.headersUpTop), true)
 
 	local start = '{{' .. WikiCopyPaste.getMatchGroupTypeCopyPaste(modus, template) .. '|id=' .. id
 
