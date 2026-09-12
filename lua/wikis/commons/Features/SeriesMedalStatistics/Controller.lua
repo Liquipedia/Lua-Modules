@@ -50,7 +50,7 @@ function SeriesMedalStatistics.execute(args)
 		teams = {},
 		medalsData = {},
 	}
-	Array.forEach(placements, FnUtil.curry(FnUtil.curry(Processor.run, data), config))
+	Array.forEach(placements, FnUtil.curry(FnUtil.curry(Processor.run, config), data))
 
 	return MedalsTable{
 		medalsTableType = config.medalsTableType,

@@ -16,7 +16,7 @@ local Footer = {}
 ---@param statsType string
 ---@return VNode?
 function Footer.run(statsType)
-	if statsType == Types.statsTypes.PARTICIPANT_TEAM then
+	if statsType ~= Types.statsTypes.PARTICIPANT_TEAM then
 		return
 	end
 	return Html.Small{
