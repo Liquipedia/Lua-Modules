@@ -19,9 +19,8 @@ local Parser = {}
 ---@return SeriesMedalStatsConfig
 function Parser.readConfig(args)
 	local statsType = assert(Types.statsTypes[args.statsType], 'Invalid or unset statsType')
-	local columns = Array.extend(
-		1,
-		2,
+	local columns = Array.append(
+		{1, 2},
 		Logic.readBool(args.bronze) and Types.optionalPlacementColumns.THIRD or nil,
 		Logic.readBool(args.sf) and Types.optionalPlacementColumns.SEMIFINALIST or nil,
 		Logic.readBool(args.copper) and Types.optionalPlacementColumns.FOURTH or nil,

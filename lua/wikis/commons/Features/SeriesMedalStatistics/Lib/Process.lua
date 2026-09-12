@@ -109,7 +109,7 @@ function Processor._getIdentifierByStatsType(statsType, opponents, teams)
 		end
 	end
 	-- this case can not happen
-	error()
+	error('Invalid statsType')
 end
 
 
