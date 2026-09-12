@@ -15,7 +15,6 @@ local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 local Table = Lua.import('Module:Table')
-local Variables = Lua.import('Module:Variables')
 
 ---@class WarcraftParticipantTableConfig: ParticipantTableConfig
 ---@field displayUnknownColumn boolean?
@@ -104,15 +103,6 @@ function CustomParticipantTable:readEntry(sectionArgs, key, index, config)
 		note = opponentArgs.note,
 		opponent = opponent,
 	}
-end
-
----@param lpdbData table
----@param entry WarcraftParticipantTableEntry
----@param config WarcraftParticipantTableConfig
-function CustomParticipantTable:adjustLpdbData(lpdbData, entry, config)
-	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
-
-	lpdbData.extradata.seriesnumber = seriesNumber and string.format('%05d', seriesNumber) or nil
 end
 
 ---@return boolean
