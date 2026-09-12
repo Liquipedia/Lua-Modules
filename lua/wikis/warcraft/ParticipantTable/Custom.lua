@@ -106,15 +106,6 @@ function CustomParticipantTable:readEntry(sectionArgs, key, index, config)
 	}
 end
 
----@param lpdbData table
----@param entry WarcraftParticipantTableEntry
----@param config WarcraftParticipantTableConfig
-function CustomParticipantTable:adjustLpdbData(lpdbData, entry, config)
-	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
-
-	lpdbData.extradata.seriesnumber = seriesNumber and string.format('%05d', seriesNumber) or nil
-end
-
 ---@return boolean
 function CustomParticipantTable:isPureSolo()
 	return Array.all(self.sections, function(section) return Array.all(section.entries, function(entry)
