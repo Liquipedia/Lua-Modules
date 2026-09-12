@@ -35,9 +35,9 @@ function Processor.run(config, data, placement)
 	end
 	local cleanedPlacementValue = tonumber(placementValue) or placementValue
 
-	data[identifier] = data[identifier] or Processor._setUpPlacementData(config.columns)
-	data[identifier][cleanedPlacementValue] = data[identifier][cleanedPlacementValue] + 1
-	data[identifier].total = data[identifier].total + 1
+	data.medalsData[identifier] = data.medalsData[identifier] or Processor._setUpPlacementData(config.columns)
+	data.medalsData[identifier][cleanedPlacementValue] = data.medalsData[identifier][cleanedPlacementValue] + 1
+	data.medalsData[identifier].total = data.medalsData[identifier].total + 1
 end
 
 ---@param statsType string
