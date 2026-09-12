@@ -114,7 +114,7 @@ end
 ---@return table
 function WikiCopyPaste.getStart(template, id, modus, args)
 	args.namedMatchParams = false
-	args.headersUpTop = Logic.readBool(Logic.emptyOr(args.headersUpTop, true))
+	args.headersUpTop = Logic.nilOr(Logic.readBoolOrNil(args.headersUpTop), true)
 
 	local start = '{{' .. WikiCopyPaste.getMatchGroupTypeCopyPaste(modus, template) .. '|id=' .. id
 
