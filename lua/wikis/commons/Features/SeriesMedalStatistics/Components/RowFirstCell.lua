@@ -17,7 +17,7 @@ local RowFirstCell = {}
 
 ---@param statsType string
 ---@param opponents standardOpponent[]
----@return fun(key: string|table):(string|number|Html|VNode|Widget)?
+---@return fun(key: string):Renderable
 function RowFirstCell.run(statsType, opponents)
 	if statsType == Types.statsTypes.FACTION then
 		return function(faction)
@@ -41,6 +41,8 @@ function RowFirstCell.run(statsType, opponents)
 			}}
 		end
 	end
+	-- this case can not happen
+	error('Invalid statsType')
 end
 
 return RowFirstCell

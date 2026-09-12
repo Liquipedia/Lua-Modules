@@ -47,7 +47,6 @@ SeriesMedalStatisticsTypes.statsTypes = {
 	PARTICIPANT_TEAM = 'PARTICIPANT_TEAM',
 }
 
----@type table<SeriesMedalStatisticsTypesStatsTypes, {}>
 SeriesMedalStatisticsTypes.medalsTableTypes = {
 	FACTION =  'Faction',
 	PARTICIPANT = 'Participant',

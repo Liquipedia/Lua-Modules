@@ -34,8 +34,7 @@ end
 ---@param config SeriesMedalStatsConditionConfig
 ---@return string
 function SeriesMedalStatisticsFetchPlacements._getConditions(config)
-
-	local endDate = config.endDate or DateExt.toYmdInUtc(DateExt.getCurrentTimestamp())
+	local endDate = DateExt.toYmdInUtc(config.endDate or DateExt.getCurrentTimestamp())
 
 	local conditions = ConditionTree(BooleanOperator.all):add(Array.append({},
 		ConditionUtil.anyOf(ColumnName('placement'), config.columns),

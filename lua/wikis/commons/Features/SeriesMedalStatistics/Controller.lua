@@ -38,6 +38,7 @@ function SeriesMedalStatistics.execute(args)
 	local placements = Api.run(config.query)
 
 	if Logic.isEmpty(placements) then
+		-- tracking category to find cases where the return is empty so we can check why they are empty
 		mw.ext.TeamLiquidIntegration.add_category('Pages with empty SeriesMedalStatistic')
 		return
 	end
