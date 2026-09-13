@@ -126,6 +126,11 @@ return {
 				category = 'Maps',
 			},
 		},
+		{
+            file = 'Kaelaris and Paperthin at EWC26.jpg',
+            title = 'Statistics',
+            link = 'Portal:Statistics',
+        },
 	},
 	layouts = {
 		main = {
