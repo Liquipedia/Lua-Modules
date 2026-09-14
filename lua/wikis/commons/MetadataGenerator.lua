@@ -141,42 +141,27 @@ function MetadataGenerator._getDate(startDate, endDate)
 		return
 	end
 
-	local dateStringToStruct = function (dateString)
-		local year, month, day = dateString:match('(%d%d%d%d)-?([%d%?]?[%d%?]?)-?([%d%?][%d%?]?)$')
-		if not year then return {} end
-		return {
-			year = year,
-			month = month,
-			day = day,
-			yearExact = tonumber(year) and true,
-			monthExact = tonumber(month) and true,
-			dayExact = tonumber(day) and true,
-			timestamp = Date.readTimestamp(dateString:gsub('%?%?', '01'))
-		}
-	end
+	local startTime = Date.parseDateRecord(startDate)
+	local endTime = Date.parseDateRecord(endDate)
 
-	local currentTimestamp = os.time()
-	local startTime = dateStringToStruct(startDate)
-	local endTime = dateStringToStruct(endDate)
-
-	if not startTime.yearExact or not endTime.yearExact or not startTime.monthExact then
+	if not startTime or not endTime or not startTime.month then
 		return
 	end
 
-	local relativeTime = MetadataGenerator._getTimeRelativity(currentTimestamp, startTime, endTime)
+	local relativeTime = MetadataGenerator._getTimeRelativity(startTime, endTime)
 
 	local sFormat, eFormat = MetadataGenerator._getDateFormat(startTime, endTime)
 
 	local prefix
-	if startTime.timestamp == endTime.timestamp and endTime.dayExact then
+	if startTime.timestamp == endTime.timestamp and endTime.day then
 		prefix = 'on'
 		sFormat = '%b %d %Y'
 		eFormat = ''
-	elseif startTime.timestamp == endTime.timestamp and endTime.monthExact then
+	elseif startTime.timestamp == endTime.timestamp and endTime.month then
 		prefix = 'in'
 		sFormat = '%b %Y'
 		eFormat = ''
-	elseif not endTime.monthExact then
+	elseif not endTime.month then
 		if relativeTime == TIME_FUTURE then
 			prefix = 'starting'
 		else
@@ -196,7 +181,8 @@ function MetadataGenerator._getDate(startDate, endDate)
 	return displayDate, relativeTime
 end
 
-function MetadataGenerator._getTimeRelativity(timeNow, startTime, endTime)
+function MetadataGenerator._getTimeRelativity(startTime, endTime)
+	local timeNow = Date.getCurrentTimestamp()
 	if timeNow < startTime.timestamp then
 		return TIME_FUTURE
 	elseif timeNow < endTime.timestamp then
