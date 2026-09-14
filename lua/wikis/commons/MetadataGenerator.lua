@@ -194,9 +194,9 @@ end
 
 function MetadataGenerator._getDateFormat(startTime, endTime)
 	local formatStart, formatEnd
-	if startTime.dayExact and startTime.year == endTime.year then
+	if startTime.day and startTime.year == endTime.year then
 		formatStart = '%b %d'
-	elseif startTime.dayExact then
+	elseif startTime.day then
 		formatStart = '%b %d %Y'
 	elseif startTime.year == endTime.year then
 		formatStart = '%b'
@@ -204,9 +204,9 @@ function MetadataGenerator._getDateFormat(startTime, endTime)
 		formatStart = '%b %Y'
 	end
 
-	if endTime.dayExact and startTime.month == endTime.month then
+	if endTime.day and startTime.month == endTime.month then
 		formatEnd = '%d %Y'
-	elseif endTime.dayExact then
+	elseif endTime.day then
 		formatEnd = '%b %d %Y'
 	else
 		formatEnd = '%b %Y'
