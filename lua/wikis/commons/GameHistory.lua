@@ -102,7 +102,7 @@ end
 ---@param opponentIndex integer
 ---@return string[]
 function GameHistory:getPicks(game, opponentIndex)
-	return Array.map(Array.range(1, self.config.numPicks), function(playerIndex)
+	return Array.mapRange(1, self.config.numPicks, function(playerIndex)
 		return game.extradata[self:getCharacterKey(opponentIndex, playerIndex)]
 	end)
 end
@@ -111,7 +111,7 @@ end
 ---@param opponentIndex integer
 ---@return string[]
 function GameHistory:getBans(game, opponentIndex)
-	return Array.map(Array.range(1, self.config.numBans), function(playerIndex)
+	return Array.mapRange(1, self.config.numBans, function(playerIndex)
 		return game.extradata[self:getCharacterBanKey(opponentIndex, playerIndex)]
 	end)
 end
