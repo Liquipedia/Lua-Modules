@@ -127,10 +127,8 @@ function StormgateParticipantTable:adjustLpdbData(lpdbData, entry, config)
 		lpdbData.opponentplayers.p1faction = Faction.read('r')
 	end
 
-	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
 	local isQualified = entry.isQualified or config.isQualified
 
-	lpdbData.extradata.seriesnumber = seriesNumber and string.format('%05d', seriesNumber) or nil
 	lpdbData.extradata.isqualified = tostring(isQualified)
 
 	lpdbData.qualified = isQualified and 1 or nil
