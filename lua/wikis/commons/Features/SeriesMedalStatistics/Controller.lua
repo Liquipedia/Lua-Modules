@@ -7,12 +7,13 @@
 
 local Lua = require('Module:Lua')
 
-local Api = Lua.import('Module:Features/SeriesMedalStatistics/Api/FetchPlacements')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
-local Footer = Lua.import('Module:Features/SeriesMedalStatistics/Components/Footer')
 local Logic = Lua.import('Module:Logic')
+
+local Api = Lua.import('Module:Features/SeriesMedalStatistics/Api/FetchPlacements')
+local Footer = Lua.import('Module:Features/SeriesMedalStatistics/Components/Footer')
 local Parser = Lua.import('Module:Features/SeriesMedalStatistics/Lib/Parse')
 local Processor = Lua.import('Module:Features/SeriesMedalStatistics/Lib/Process')
 local RowFirstCell = Lua.import('Module:Features/SeriesMedalStatistics/Components/RowFirstCell')

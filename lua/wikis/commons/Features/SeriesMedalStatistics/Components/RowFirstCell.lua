@@ -17,7 +17,7 @@ local RowFirstCell = {}
 
 ---@param statsType string
 ---@param opponents standardOpponent[]
----@return fun(key: string):Renderable
+---@return fun(key: string): Renderable
 function RowFirstCell.run(statsType, opponents)
 	if statsType == Types.statsTypes.FACTION then
 		return function(faction)

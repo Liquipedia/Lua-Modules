@@ -7,6 +7,4 @@
 
 local Lua = require('Module:Lua')
 
-local Controller = Lua.import('Module:Features/SeriesMedalStatistics/Controller')
-
-return Controller
+return Lua.import('Module:Features/SeriesMedalStatistics/Controller')
