@@ -181,6 +181,9 @@ function MetadataGenerator._getDate(startDate, endDate)
 	return displayDate, relativeTime
 end
 
+---@param startTime DateRecord
+---@param endTime DateRecord
+---@return integer?
 function MetadataGenerator._getTimeRelativity(startTime, endTime)
 	local timeNow = Date.getCurrentTimestamp()
 	if timeNow < startTime.timestamp then
@@ -192,6 +195,10 @@ function MetadataGenerator._getTimeRelativity(startTime, endTime)
 	end
 end
 
+---@param startTime DateRecord
+---@param endTime DateRecord
+---@return string
+---@return string
 function MetadataGenerator._getDateFormat(startTime, endTime)
 	local formatStart, formatEnd
 	if startTime.day and startTime.year == endTime.year then
