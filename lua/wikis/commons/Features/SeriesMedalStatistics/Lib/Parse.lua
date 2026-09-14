@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
+local Page = Lua.import('Module:Page')
 local Types = Lua.import('Module:Features/SeriesMedalStatistics/Types')
 
 local Parser = {}
@@ -47,10 +48,11 @@ end
 ---@return SeriesMedalStatsConditionConfig
 function Parser._readQueryConfig(args, config)
 	local series = Array.parseCommaSeparatedString(args.series or mw.title.getCurrentTitle().prefixedText)
-	if not Logic.readBool(args.noredirect) then
-		series = Array.map(series, mw.ext.TeamLiquidIntegration.resolve_redirect)
+	if Logic.readBool(args.noredirect) then
+		series = Array.map(series, function(value) return (value:gsub(' ', '_')) end)
+	else
+		series = Array.map(series, Page.pageifyLink)
 	end
-	series = Array.map(series, function(value) return (value:gsub('_', ' ')) end)
 
 	return {
 		series = series,
