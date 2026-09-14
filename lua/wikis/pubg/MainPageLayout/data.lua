@@ -127,10 +127,10 @@ return {
 			},
 		},
 		{
-            file = 'Kaelaris and Paperthin at EWC26.jpg',
-            title = 'Statistics',
-            link = 'Portal:Statistics',
-        },
+			file = 'Kaelaris and Paperthin at EWC26.jpg',
+			title = 'Statistics',
+			link = 'Portal:Statistics',
+		},
 	},
 	layouts = {
 		main = {
