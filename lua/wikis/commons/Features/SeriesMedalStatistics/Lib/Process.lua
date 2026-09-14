@@ -43,7 +43,7 @@ end
 ---@param statsType string
 ---@param opponents table<string, standardOpponent>
 ---@param teams table<string, string>
----@return fun(placement:placement):string?
+---@return fun(placement:placement): string?
 function Processor._getIdentifierByStatsType(statsType, opponents, teams)
 	---@param teamTemplate string
 	---@return string?

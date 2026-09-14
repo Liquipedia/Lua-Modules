@@ -14,7 +14,7 @@ local SeriesMedalStatisticsTypes = {}
 ---@field startDate string?
 ---@field endDate string?
 ---@field additionalConditions string
----@field opponentTypes string[]
+---@field opponentTypes OpponentType[]
 ---@field columns string[]
 
 ---@class SeriesMedalStatsConfig
