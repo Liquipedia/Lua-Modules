@@ -136,6 +136,11 @@ function MetadataGenerator.tournament(args)
 	return output
 end
 
+---@package
+---@param startDate string?
+---@param endDate string?
+---@return string?
+---@return integer?
 function MetadataGenerator._getDate(startDate, endDate)
 	if not startDate or not endDate then
 		return
@@ -181,6 +186,7 @@ function MetadataGenerator._getDate(startDate, endDate)
 	return displayDate, relativeTime
 end
 
+---@package
 ---@param startTime DateRecord
 ---@param endTime DateRecord
 ---@return integer?
@@ -195,6 +201,7 @@ function MetadataGenerator._getTimeRelativity(startTime, endTime)
 	end
 end
 
+---@package
 ---@param startTime DateRecord
 ---@param endTime DateRecord
 ---@return string
