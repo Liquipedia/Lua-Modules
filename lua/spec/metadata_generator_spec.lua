@@ -13,7 +13,7 @@ describe('metadata generator', function()
 				' This S-Tier tournament took place from Jul 06 to 18 2021 featuring 24 teams competing' ..
 				' over a total prize pool of $1,000,000 USD.'
 
-		assert.are_same(EXPECTED_RESULT, MetadataGenerator.tournament({
+		assert.are_same(EXPECTED_RESULT, MetadataGenerator.tournament{
 			name = 'Intel Extreme Masters XVI - Cologne',
 			tickername = 'IEM Cologne 2021',
 			organizer = 'ESL',
@@ -25,6 +25,6 @@ describe('metadata generator', function()
 			country = 'Germany',
 			game = 'csgo',
 			team_number = '24',
-		}))
+		})
 	end)
 end)
