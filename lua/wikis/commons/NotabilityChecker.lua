@@ -13,8 +13,15 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Config = Lua.import('Module:NotabilityChecker/config')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local ResultsTable = Lua.import('Module:ResultsTable/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+
+local Box = Lua.import('Module:Widget/Basic/Box')
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
+local Html = Lua.import('Module:Widget/Html')
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 local NotabilityChecker = {}
 
@@ -26,11 +33,11 @@ local MAX_NUMBER_OF_PARTICIPANTS = Config.MAX_NUMBER_OF_PARTICIPANTS or Info.con
 NotabilityChecker.LOGGING = true
 
 ---@param args table
----@return string
+---@return VNode
 function NotabilityChecker.run(args)
 
 	local weight = 0
-	local output = ''
+	local output = {}
 	local isTeamResult = args.team ~= nil
 
 	if args.player1 then
@@ -46,33 +53,57 @@ function NotabilityChecker.run(args)
 		weight, output = NotabilityChecker._runForTeam(args.team)
 	end
 
-	output = output .. '===Summary===\n'
-		.. '<b>Final weight:</b> ' .. tostring(weight) .. '\n\n'
-		.. 'This means this ' .. (isTeamResult and 'team' or 'person')
+	Array.appendWith(
+		output,
+		Html.H3{children = 'Summary'},
+		Html.B{children = 'Final weight:'},
+		' ',
+		tostring(weight),
+		'\n\n',
+		'This means this ',
+		(isTeamResult and 'team' or 'person'),
+		' is '
+	)
 
 	if weight >= Config.NOTABILITY_THRESHOLD_NOTABLE then
-		output = output .. ' is <b>NOTABLE</b>\n'
+		table.insert(output, Html.B{children = 'NOTABLE'})
 	elseif weight >= Config.NOTABILITY_THRESHOLD_MIN then
-		output = output .. ' is <b>OPEN FOR DISCUSSION</b>\n'
+		table.insert(output, Html.B{children = 'OPEN FOR DISCUSSION'})
 	else
-		output = output .. ' is <b>NOT NOTABLE</b>\n'
+		table.insert(output, Html.B{children = 'NOT NOTABLE'})
 	end
 
-	return output
+	return Html.Fragment{children = output}
 end
 
 ---@private
 ---@param team string
 ---@return integer
----@return string
+---@return Renderable[]
 function NotabilityChecker._runForTeam(team)
 	team = mw.ext.TeamLiquidIntegration.resolve_redirect(team)
 	local weight = NotabilityChecker._calculateTeamNotability(team)
 
-	local output = ''
-	output = output .. '===Team Results===\n'
-	output = output .. mw.getCurrentFrame():expandTemplate{ title = 'NotabilityTeamMatchesTable', args = {title = team} }
-	output = output .. '<b>Weight:</b> ' .. tonumber(weight) .. '\n\n'
+	local output = {
+		Html.H3{children = 'Team Results'},
+		GeneralCollapsible{
+			title = {
+				'Tournaments found featuring ',
+				team,
+			},
+			children = ResultsTable.results{
+				awards = false,
+				achievements = false,
+				playerResultsOfTeam = false,
+				querytype = Opponent.team,
+				team = team,
+			}
+		},
+		'\n',
+		Html.B{children = 'Weight:'},
+		' ',
+		tonumber(weight)
+	}
 
 	return weight, output
 end
@@ -81,26 +112,58 @@ end
 ---@param team string
 ---@param people string[]
 ---@return number
----@return string
+---@return Renderable[]
 function NotabilityChecker._calculateRosterNotability(team, people)
 	local weight = 0
-	local output = ''
+	---@type Renderable[]
+	local output = {}
 	if team then
 		local teamWeight
 		teamWeight, output = NotabilityChecker._runForTeam(team)
 		weight = weight + teamWeight
 	end
 
-	output = output .. '===People Results===\n'
+	table.insert(output, Html.H3{children = 'People Results'})
 
 	local average = 0
 	for _, person in pairs(people) do
 		local personWeight = NotabilityChecker._calculatePersonNotability(person)
-		output = output .. mw.getCurrentFrame():expandTemplate{
-			title = 'NotabilityPlayerMatchesTable', args = {title = person}}
-		output = output .. '*<b>Person:</b> [[' .. person .. ']] <b>Weight:</b> ' ..
-			tonumber(personWeight) .. '\n\n'
-			average = average + tonumber(personWeight or 0)
+		Array.appendWith(
+			output,
+			GeneralCollapsible{
+				title = {
+					'Tournaments found featuring ',
+					person,
+				},
+				children = Box{children = {
+					ResultsTable.results{
+						awards = false,
+						achievements = false,
+						playerResultsOfTeam = false,
+						playerLimit = MAX_NUMBER_OF_PARTICIPANTS,
+						querytype = Opponent.solo,
+						player = person,
+					},
+					ResultsTable.results{
+						awards = false,
+						achievements = false,
+						playerResultsOfTeam = false,
+						querytype = 'coach',
+						coachLimit = Config.MAX_NUMBER_OF_COACHES,
+						coach = person,
+					},
+				}}
+			},
+			Html.B{children = 'Person:'},
+			' ',
+			Link{link = person},
+			' ',
+			Html.B{children = 'Weight:'},
+			' ',
+			tonumber(personWeight),
+			'\n\n'
+		)
+		average = average + tonumber(personWeight or 0)
 	end
 
 	average = average / Table.size(people)
