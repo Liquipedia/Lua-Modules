@@ -14,9 +14,9 @@ liquipedia.core = {
 	modules: [ ],
 	init: async function() {
 		await Promise.all(
-			liquipedia.core.modules.map( ( module ) => new Promise( ( resolve ) => {
-				resolve( liquipedia[ module ].init() );
-			} ) )
+			liquipedia.core.modules.map( async ( module ) => {
+				await liquipedia[ module ].init();
+			} )
 		);
 	}
 };
