@@ -17,6 +17,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local ResultsTable = Lua.import('Module:ResultsTable/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Custom')
 
 local Box = Lua.import('Module:Widget/Basic/Box')
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
@@ -246,7 +247,8 @@ end
 function NotabilityChecker.calculateTournament(tier, tierType, placement, date, notabilityMod, mode)
 	local dateLossModifier = NotabilityChecker._calculateDateLoss(date)
 	local notabilityModifier = NotabilityChecker._parseNotabilityMod(notabilityMod)
-	local parsedTier, parsedTierType = NotabilityChecker._parseTier(tier, tierType)
+	local parsedTier = Tier.toIdentifier(tier)
+	local parsedTierType = Tier.toIdentifier(tierType)
 
 	local weight = NotabilityChecker._calculateWeightForTournament(
 		parsedTier, parsedTierType, placement, dateLossModifier, notabilityModifier, mode
@@ -327,14 +329,6 @@ function NotabilityChecker._preparePlacement(placement)
 	end
 
 	return placement
-end
-
-function NotabilityChecker._parseTier(tier, tierType)
-	if String.isEmpty(tierType) then
-		return tonumber(tier), nil
-	end
-
-	return tonumber(tier), tierType:lower()
 end
 
 function NotabilityChecker._parseNotabilityMod(notabilityMod)
