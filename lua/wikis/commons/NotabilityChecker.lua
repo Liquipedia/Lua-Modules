@@ -220,21 +220,19 @@ function NotabilityChecker._calculateWeight(placementData)
 		return 0
 	end
 
-	local weights = {}
-
-	for _, placement in pairs(placementData) do
-		if not Logic.isEmpty(placement.placement) then
-			if NotabilityChecker.LOGGING then
-				mw.log('Tournament: ' .. placement.tournament)
-			end
-
-			local weight = NotabilityChecker.calculateTournament(
-				placement.liquipediatier, placement.liquipediatiertype, placement.placement,
-				placement.date, placement.extradata.notabilitymod, placement.mode
-			)
-			table.insert(weights, weight)
+	local weights = Array.map(placementData, function (placement)
+		if Logic.isEmpty(placement.placement) then
+			return nil
 		end
-	end
+		if NotabilityChecker.LOGGING then
+			mw.log('Tournament: ' .. placement.tournament)
+		end
+
+		return NotabilityChecker.calculateTournament(
+			placement.liquipediatier, placement.liquipediatiertype, placement.placement,
+			placement.date, placement.extradata.notabilitymod, placement.mode
+		)
+	end)
 
 	return MathUtil.sum(weights)
 end
