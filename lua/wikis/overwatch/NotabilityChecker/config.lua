@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Table = Lua.import('Module:Table')
 
+---@class OverwatchNotabilityCheckerConfig: NotabilityCheckerConfig
 local Config = {}
 
 -- These are constants, you don't need to touch them

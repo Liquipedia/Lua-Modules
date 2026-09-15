@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
-local Config = Lua.import('Module:NotabilityChecker/config')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
@@ -23,6 +22,31 @@ local Tier = Lua.import('Module:Tier/Custom')
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
+
+---@class NotabilityCheckerConfig
+---@field MAX_NUMBER_OF_PARTICIPANTS integer?
+---@field MAX_NUMBER_OF_COACHES integer
+---@field NOTABILITY_THRESHOLD_MIN number
+---@field NOTABILITY_THRESHOLD_NOTABLE number
+---@field PLACEMENT_LIMIT integer
+---@field PLACEMENT_QUERY string?
+---@field TIER_TYPE_GENERAL string
+---@field TIER_TYPE_QUALIFIER string
+---@field TIER_TYPE_WEEKLY string
+---@field TIER_TYPE_MONTHLY string
+---@field TIER_TYPE_MISC string
+---@field TIER_TYPE_SHOWMATCH string
+---@field adjustScoreForMode fun(score: number, mode: string): number
+---@field placementDropOffFunction fun(tier: string|integer, tierType: string): fun(score: number, placement: number): number
+---@field weights NotabilityCheckerWeight[]
+
+---@class NotabilityCheckerWeight
+---@field tier integer
+---@field options {dataLossIgnored: boolean?}
+---@field tiertype {name: string, points: number}[]
+
+---@type NotabilityCheckerConfig
+local Config = Lua.import('Module:NotabilityChecker/config')
 
 local NotabilityChecker = {}
 
