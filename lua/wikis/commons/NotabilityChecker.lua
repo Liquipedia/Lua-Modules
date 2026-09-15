@@ -13,6 +13,7 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Config = Lua.import('Module:NotabilityChecker/config')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local ResultsTable = Lua.import('Module:ResultsTable/Custom')
 local String = Lua.import('Module:StringUtils')
@@ -235,12 +236,7 @@ function NotabilityChecker._calculateWeight(placementData)
 		end
 	end
 
-	local finalWeight = 0
-	for _, weight in pairs(weights) do
-		finalWeight = finalWeight + weight
-	end
-
-	return finalWeight
+	return MathUtil.sum(weights)
 end
 
 function NotabilityChecker.calculateTournament(tier, tierType, placement, date, notabilityMod, mode)
