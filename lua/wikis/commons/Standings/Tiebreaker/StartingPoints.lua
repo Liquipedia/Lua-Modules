@@ -16,7 +16,7 @@ local TiebreakerStartingPoints = Class.new(TiebreakerInterface)
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
----@return integer
+---@return number
 function TiebreakerStartingPoints:valueOf(state, opponent)
 	return opponent.startingPoints or 0
 end
