@@ -12,10 +12,10 @@
 const liquipedia = { };
 liquipedia.core = {
 	modules: [ ],
-	init: async function() {
-		await Promise.all(
+	init: function() {
+		Promise.all(
 			liquipedia.core.modules.map( async ( module ) => {
-				await liquipedia[ module ].init();
+				liquipedia[ module ].init();
 			} )
 		);
 	}
