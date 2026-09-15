@@ -19,7 +19,6 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Tier = Lua.import('Module:Tier/Custom')
 
-local Box = Lua.import('Module:Widget/Basic/Box')
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -135,7 +134,7 @@ function NotabilityChecker._calculateRosterNotability(team, people)
 					'Tournaments found featuring ',
 					person,
 				},
-				children = Box{children = {
+				children = {
 					ResultsTable.results{
 						awards = false,
 						achievements = false,
@@ -152,7 +151,7 @@ function NotabilityChecker._calculateRosterNotability(team, people)
 						coachLimit = Config.MAX_NUMBER_OF_COACHES,
 						coach = person,
 					},
-				}}
+				},
 			},
 			Html.B{children = 'Person:'},
 			' ',
