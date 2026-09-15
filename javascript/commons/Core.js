@@ -12,12 +12,11 @@
 const liquipedia = { };
 liquipedia.core = {
 	modules: [ ],
-	init: function() {
-		liquipedia.core.modules.forEach( ( module ) => {
-			// Usage of setTimeout to make scripts asynchronous
-			window.setTimeout( () => {
-				liquipedia[ module ].init();
-			}, 0 );
-		} );
+	init: async function() {
+		await Promise.all(
+			liquipedia.core.modules.map( ( module ) => new Promise( ( resolve ) => {
+				resolve( liquipedia[ module ].init() );
+			} ) )
+		);
 	}
 };
