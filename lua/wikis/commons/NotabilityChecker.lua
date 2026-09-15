@@ -37,8 +37,10 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@field TIER_TYPE_MISC string
 ---@field TIER_TYPE_SHOWMATCH string
 ---@field adjustScoreForMode fun(score: number, mode: string): number
----@field placementDropOffFunction fun(tier: string|integer, tierType: string): fun(score: number, placement: number): number
+---@field placementDropOffFunction fun(tier: string|integer, tierType: string): NotabilityCheckerDropOffFunction
 ---@field weights NotabilityCheckerWeight[]
+
+---@alias NotabilityCheckerDropOffFunction fun(score: number, placement: number): number
 
 ---@class NotabilityCheckerWeight
 ---@field tier integer
