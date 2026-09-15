@@ -237,7 +237,7 @@ end
 ---Returns a Widget span for placement display in the Widget system.
 ---@param raw rawPlacement
 ---@param text string?
----@return Widget
+---@return VNode
 function Placement.renderRawInWidget(raw, text)
 	local content = raw.display .. (Logic.isNotEmpty(text) and (' ' .. text) or '')
 
