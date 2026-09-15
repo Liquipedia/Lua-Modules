@@ -19,7 +19,7 @@ local Table = Lua.import('Module:Table')
 local NotabilityChecker = {}
 
 local LANG = mw.getContentLanguage()
-local NOW = os.time()
+local NOW = DateExt.getCurrentTimestamp()
 local SECONDS_IN_YEAR = DateExt.daysToSeconds(365.2425)
 local MAX_NUMBER_OF_PARTICIPANTS = Config.MAX_NUMBER_OF_PARTICIPANTS or Info.config.defaultMaxPlayersPerPlacement or 10
 
