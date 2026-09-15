@@ -25,7 +25,6 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 
 local NotabilityChecker = {}
 
-local LANG = mw.getContentLanguage()
 local NOW = DateExt.getCurrentTimestamp()
 local SECONDS_IN_YEAR = DateExt.daysToSeconds(365.2425)
 local MAX_NUMBER_OF_PARTICIPANTS = Config.MAX_NUMBER_OF_PARTICIPANTS or Info.config.defaultMaxPlayersPerPlacement or 10
@@ -347,7 +346,7 @@ function NotabilityChecker._parseNotabilityMod(notabilityMod)
 end
 
 function NotabilityChecker._calculateDateLoss(date)
-	local timestamp = LANG:formatDate('U', date)
+	local timestamp = DateExt.readTimestamp(date)
 	local differenceSeconds = NOW - timestamp
 
 	-- If given received a date in the future, set the modifier from date to 1
