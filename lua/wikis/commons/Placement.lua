@@ -7,13 +7,14 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Html = Lua.import('Module:Widget/Html')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Ordinal = Lua.import('Module:Ordinal')
 local Table = Lua.import('Module:Table')
 
+local Html = Lua.import('Module:Widget/Html')
 local Span = Html.Span
 
 ---@class rawPlacement
@@ -116,10 +117,21 @@ local USE_BLACK_TEXT = {
 ---@param placement string|integer?
 ---@return rawPlacement
 function Placement.raw(placement)
+	if Logic.isEmpty(placement) then
+		return {
+			blackText = true,
+			display = '',
+			ordinal = {},
+			placement = {},
+			sort = CUSTOM_SORTS[''],
+		}
+	end
+	---@cast placement -nil
+
 	local raw = {}
 
-	-- Nil check on input and split placement if joint
-	raw.placement = mw.text.split(string.lower(placement or ''), '-', true)
+	-- split placement if joint
+	raw.placement = Array.parseCommaSeparatedString(string.lower(placement), '-')
 
 	-- Identify appropriate background class
 	if PLACEMENT_CLASSES[raw.placement[1]] then
@@ -140,7 +152,7 @@ function Placement.raw(placement)
 	-- Intercept non-numeric placements for sorting and ordinal creation
 	if not MathUtil.isInteger(raw.placement[1]) then
 		raw.sort = CUSTOM_SORTS[raw.placement[1]] or CUSTOM_SORTS['']
-		raw.ordinal = mw.text.split(string.upper(placement or ''), '-', true)
+		raw.ordinal = Array.parseCommaSeparatedString(string.upper(placement), '-')
 	else
 		raw.sort = raw.placement[1] .. (raw.placement[2] and ('-' .. raw.placement[2]) or '')
 		raw.ordinal = Placement._makeOrdinal(raw.placement)
@@ -225,7 +237,7 @@ end
 ---Returns a Widget span for placement display in the Widget system.
 ---@param raw rawPlacement
 ---@param text string?
----@return Widget
+---@return VNode
 function Placement.renderRawInWidget(raw, text)
 	local content = raw.display .. (Logic.isNotEmpty(text) and (' ' .. text) or '')
 
@@ -242,9 +254,13 @@ end
 
 ---Returns a Widget span for placement display in the Widget system.
 ---@param args {placement: string|integer?, text: string?}
----@return Widget
+---@return VNode|string
 function Placement.renderInWidget(args)
-	local raw = Placement.raw(args.placement or '')
+	if Logic.isEmpty(args.placement) then
+		return ''
+	end
+
+	local raw = Placement.raw(args.placement)
 
 	return Placement.renderRawInWidget(raw, args.text)
 end
