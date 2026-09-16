@@ -53,9 +53,9 @@ async function build() {
 		const concatenatedModules = await concatenateModules( moduleNames );
 		const processedMainContent = removeOriginalCode( mainJsContent );
 
-		
 		const warningMessage = "console.warn('Browser is using locally compiled JavaScript, and cannot be fully trusted to match the production counterpart.');";
 		const buildDate = `console.info('Build date: ${ new Date() }');`;
+
 		// Expose liquipedia on window so the dev proxy can detect and re-initialize modules.
 		// Core.js uses `const liquipedia` (correct for production), but `const` is not
 		// accessible as window.liquipedia, which the dev proxy requires.
