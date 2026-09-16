@@ -765,7 +765,8 @@ describe('Team Participant', function()
 					},
 				})
 
-				assert.are_equal('2024-03-15', globalVars:get('Team Liquid_p1joindate'))
+				assert.are_equal('2024-03-15', globalVars:get('team liquid_p1joindate'))
+				assert.are_equal('2024-03-15', globalVars:get('team_liquid_p1joindate'))
 				assert.is_nil(globalVars:get('Team Liquid_p1leavedate'))
 				TeamTemplateMock.tearDown()
 			end)
@@ -795,8 +796,8 @@ describe('Team Participant', function()
 					},
 				})
 
-				assert.are_equal('2024-02-01', globalVars:get('Team Liquid_p1joindate'))
-				assert.are_equal('2024-08-15', globalVars:get('Team Liquid_p1leavedate'))
+				assert.are_equal('2024-02-01', globalVars:get('team liquid_p1joindate'))
+				assert.are_equal('2024-08-15', globalVars:get('team_liquid_p1leavedate'))
 				TeamTemplateMock.tearDown()
 			end)
 		end)

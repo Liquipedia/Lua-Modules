@@ -40,7 +40,6 @@ local MatchFunctions = {
 
 ---@class StarcraftMapParser: MapParserInterface
 local MapFunctions = {
-	ADD_SUB_GROUP = true,
 	BREAK_ON_EMPTY = true,
 }
 
@@ -309,7 +308,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 			local faction = isArchon and archonFaction or Faction.read(mapInput[factionKey])
 			return {
 				faction = faction or (playerIdData.extradata or {}).faction or Faction.defaultFaction,
-				player = playerIdData.name or playerInputData.link or playerInputData.name:gsub(' ', '_'),
+				player = (playerIdData.name or playerInputData.link or playerInputData.name):gsub(' ', '_'),
 				flag = Flags.CountryName{flag = playerIdData.flag},
 				position = playerIndex,
 				isarchon = isArchon,

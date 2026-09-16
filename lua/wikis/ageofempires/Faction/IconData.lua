@@ -109,6 +109,9 @@ local byFactionAoE2 = {
 	cumans = {
 		icon = 'File:Cumans AoE2 icon.png'
 	},
+	danes = {
+		icon = 'File:Danes AoE2 icon.png'
+	},
 	dravidians = {
 		icon = 'File:Dravidians AoE2 icon.png'
 	},
@@ -202,6 +205,9 @@ local byFactionAoE2 = {
 	saracens = {
 		icon = 'File:Saracens AoE2 icon.png'
 	},
+	saxons = {
+		icon = 'File:Saxons AoE2 icon.png'
+	},
 	shu = {
 		icon = 'File:Shu AoE2 icon.png'
 	},
@@ -232,6 +238,9 @@ local byFactionAoE2 = {
 	tupi = {
 		icon = 'File:Tupi AoE2 icon.png'
 	},
+	varangians = {
+		icon = 'File:Varangians AoE2 icon.png'
+	},
 	vietnamese = {
 		icon = 'File:Vietnamese AoE2 icon.png'
 	},
@@ -258,6 +267,9 @@ local byFactionAoE3 = {
 	},
 	chinese = {
 		icon = 'File:Chinese AoE3 icon.png',
+	},
+	danes = {
+		icon = 'File:Danes AoE3 icon.png',
 	},
 	dutch = {
 		icon = 'File:Dutch AoE3 icon.png',
@@ -300,6 +312,9 @@ local byFactionAoE3 = {
 	},
 	ottomans = {
 		icon = 'File:Ottomans AoE3 icon.png',
+	},
+	poles = {
+		icon = 'File:Poles AoE3 icon.png',
 	},
 	portuguese = {
 		icon = 'File:Portuguese AoE3 icon.png',
@@ -386,11 +401,17 @@ local byFactionAoE4 = {
 	rus = {
 		icon = 'File:Rus AoE4 Icon.png',
 	},
+	scots = {
+		icon = 'File:Scots AoE4 Icon.png',
+	},
 	sengokudaimyo = {
 		icon = 'File:Sengoku AoE4 Icon.png',
 	},
 	tughlaqdynasty = {
 		icon = 'File:Tughlaq AoE4 Icon.png',
+	},
+	vikings = {
+		icon = 'File:Vikings AoE4 Icon.png',
 	},
 	zhuxislegacy = {
 		icon = 'File:Zhu Xi\'s Legacy AoE4 Icon.png',

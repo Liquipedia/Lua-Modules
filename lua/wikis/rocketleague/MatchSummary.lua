@@ -24,16 +24,15 @@ local TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
----@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return Widget?
-function CustomMatchSummary.createGame(date, game, gameIndex)
+---@return Renderable?
+function CustomMatchSummary.createGame(game, gameIndex)
 	if not game.map then
 		return
 	end

@@ -18,7 +18,7 @@ local Player = Lua.import('Module:Infobox/Person')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
----@class FightersInfoboxPlayer: Person
+---@class FightersInfoboxPlayer: InfoboxPerson
 ---@field games string[]
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)

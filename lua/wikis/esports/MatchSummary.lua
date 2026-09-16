@@ -7,10 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
-local Countdown = Lua.import('Module:Countdown')
-local DateExt = Lua.import('Module:Date/Ext')
-
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -23,32 +19,17 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
----@param match MatchGroupUtilMatch
----@return MatchSummaryBody
-function CustomMatchSummary.createBody(match)
-	local phase = MatchGroupUtil.computeMatchPhase(match)
-	local showCountdown = (not DateExt.isDefaultTimestamp(match.timestamp)) and phase ~= 'finished'
-
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = Countdown.create{
-			date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
-			finished = match.finished,
-		}} or nil,
-		Array.map(match.games, CustomMatchSummary._createMapRow)
-	)}
-end
-
 ---@param game MatchGroupUtilGame
----@return Widget?
-function CustomMatchSummary._createMapRow(game)
+---@return Renderable?
+function CustomMatchSummary.createGame(game)
 	local gamePhase = MatchGroupUtil.computeMatchPhase(game)
 
-	if gamePhase ~='finished' then
+	if gamePhase ~= 'finished' then
 		if game.extradata.link == nil then
 			return MatchSummaryWidgets.Row{
 				children = MatchSummaryWidgets.GameCenter{children = 'Voting opening soon!'}

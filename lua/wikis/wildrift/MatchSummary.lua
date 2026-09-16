@@ -9,7 +9,6 @@ local CustomMatchSummary = {}
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -20,27 +19,15 @@ local MAX_NUM_BANS = 5
 local NUM_CHAMPIONS_PICK = 5
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px'})
-end
-
----@param match MatchGroupUtilMatch
----@return Widget[]
-function CustomMatchSummary.createBody(match)
-	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
-
-	return WidgetUtil.collect(
-		Array.map(match.games, CustomMatchSummary._createGame),
-		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	)
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px', maxBans = MAX_NUM_BANS})
 end
 
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return MatchSummaryRow?
-function CustomMatchSummary._createGame(game, gameIndex)
+---@return Renderable?
+function CustomMatchSummary.createGame(game, gameIndex)
 	local extradata = game.extradata or {}
 
 	-- TODO: Change to use participant data

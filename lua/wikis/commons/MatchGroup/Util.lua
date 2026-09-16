@@ -22,8 +22,8 @@ local Types = Lua.import('Module:MatchGroup/Util/Types')
 --[[
 Fetches match records and assembles them into matchlists and brackets.
 
-The pieces it assembles from live elsewhere: the match model in Module:MatchGroup/Util/Match, the
-bracket model in Module:MatchGroup/Util/Bracket, and the shapes of both in
+The pieces it assembles from live elsewhere: the match model in Module:Domain/Match/Model, the
+bracket model in Module:Domain/Bracket/Model, and the shapes of both in
 Module:MatchGroup/Util/Types. Display related functions go in Module:MatchGroup/Display/Helper.
 
 Both models are also re-exported here, as a complete mirror: every member of either model has a

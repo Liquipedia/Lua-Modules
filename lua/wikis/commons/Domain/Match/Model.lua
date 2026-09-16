@@ -40,6 +40,7 @@ keeps this testable without standing a wiki up.
 ---@field extradata table?
 ---@field pageIsResolved boolean?
 ---@field faction string?
+---@field roles string[]?
 ---@field apiId string?
 
 ---@class standardOpponent
@@ -120,6 +121,7 @@ keeps this testable without standing a wiki up.
 ---@field shortname string?
 ---@field status MatchStatus
 ---@field stream table
+---@field submatches MatchGroupUtilSubgroup[]
 ---@field tickername string?
 ---@field tournament string?
 ---@field type string?
@@ -238,6 +240,7 @@ function MatchUtil.matchFromRecord(record, options)
 	}
 
 	match.phase = MatchUtil.computeMatchPhase(match)
+	match.submatches = MatchUtil.groupBySubgroup(match)
 
 	return match
 end

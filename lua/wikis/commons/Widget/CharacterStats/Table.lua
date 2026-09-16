@@ -27,11 +27,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Helpers = {}
 
----@class CharacterAppearanceStats
----@field pick integer
----@field win integer
----@field loss integer
-
 ---@param props CharacterStatsWidgetProps
 ---@return Renderable?
 local function CharacterStatsTable(props)

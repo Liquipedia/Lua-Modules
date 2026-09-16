@@ -168,7 +168,7 @@ end
 BracketTemplate.perfConfig = {
 	locations = {
 		'Module:Bracket/Template|*',
-		'Module:MatchGroup/Coordinates|*',
+		'Module:Domain/Bracket/Coordinates|*',
 		'Module:MatchGroup/Display/Bracket|*',
 	}
 }
