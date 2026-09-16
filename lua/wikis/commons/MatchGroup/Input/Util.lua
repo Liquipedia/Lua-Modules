@@ -1195,6 +1195,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 	match.stream = Streams.processStreams(match)
 	match.extradata = Table.merge(
 		{casters = MatchGroupInputUtil.readCasters(match, {sortCasters = Info.config.match2.sortCasters})},
+		MatchGroupInputUtil.readSetHeaders(matchInput),
 		Parser.getExtraData and Parser.getExtraData(match, games, opponents) or {}
 	)
 
@@ -1743,6 +1744,19 @@ function MatchGroupInputUtil.getMatchDate(matchParser, matchInput)
 	end
 
 	return earliestGameDateStruct
+end
+
+---Reads the headers of sets within a match.
+---@param args table<string, any>
+---@param prefix string?
+---@return table<string, string>
+function MatchGroupInputUtil.readSetHeaders(args, prefix)
+	prefix = prefix or 'set'
+	local setHeaders = Table.filterByKey(args, function(key) return key:match(prefix .. '%d+header') end)
+
+	return Table.map(setHeaders, function(key, value)
+		return 'subgroup' .. (key:sub(#prefix + 1)), value
+	end)
 end
 
 return MatchGroupInputUtil

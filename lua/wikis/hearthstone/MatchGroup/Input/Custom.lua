@@ -73,7 +73,8 @@ end
 ---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
-	return Table.filterByKey(match, function(key) return key:match('subgroup%d+header') end)
+	-- TODO: Bot away special prefix
+	return MatchGroupInputUtil.readSetHeaders(match, 'subgroup')
 end
 
 ---@param match table
