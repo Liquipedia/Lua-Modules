@@ -120,7 +120,6 @@ local SECONDS_ONE_DAY = 3600 * 24
 ---@field stats MatchTableStats
 local MatchTable = Class.new(function(self, args)
 	self.args = args or {}
-	self.args.limit = self.args.limit or 100
 	self.title = mw.title.getCurrentTitle()
 end)
 
