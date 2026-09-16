@@ -254,7 +254,7 @@ end
 
 ---Returns a Widget span for placement display in the Widget system.
 ---@param args {placement: string|integer?, text: string?}
----@return VNode|string
+---@return Renderable
 function Placement.renderInWidget(args)
 	if Logic.isEmpty(args.placement) then
 		return ''
