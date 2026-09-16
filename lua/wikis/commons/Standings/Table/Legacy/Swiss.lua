@@ -11,6 +11,7 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
 local StandingTable = Lua.import('Module:Standings/Table')
@@ -81,7 +82,7 @@ function StandingTableLegacySwiss.parseRoundInput(args, roundIndex, matches)
 		-- Legacy, so let's assume finished
 		started = true,
 		finished = true,
-		matches = table.concat(Array.map(matches or {}, function(match) return match.id end), ','),
+		matches = table.concat(Array.map(matches or {}, Operator.property('id')), ','),
 	}
 end
 
