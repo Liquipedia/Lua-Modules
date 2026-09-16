@@ -30,6 +30,7 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 ---@field createGames? fun(match: MatchGroupUtilMatch): Renderable|Renderable[] @deprecated (but better than createBody)
 ---@field createGame? fun(game: table, gameIndex: integer): Renderable|Renderable[] @deprecated
 ---@field GameRow? Component<MatchSummaryGameRowProps>
+---@field gameFilter? fun(game: MatchGroupUtilGame): boolean
 ---@field createFooter? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 
 ---@class MatchSummary
@@ -73,6 +74,8 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 	if GameRow then
 		local sets = match.submatches or {}
 
+		local gameFilterFunction = CustomMatchSummary.gameFilter or function() return true end
+
 		-- With one set for all matches, or one game per set, it's redundant to show set level info.
 		if #sets > 1 and #sets < #match.games then
 			nodes = Array.map(sets, function(set)
@@ -80,6 +83,9 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 					gamesSectionName = set.header or ('Set ' .. set.subgroup),
 					gamesSectionResult = MatchSummaryWidgets.SetHeader{set = set},
 					children = Array.map(set.games, function(game, gameIndex)
+						if not gameFilterFunction(game) then
+							return
+						end
 						return GameRow{game = game, gameIndex = gameIndex}
 					end)
 				}
@@ -87,6 +93,9 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 		else
 			nodes = MatchSummaryWidgets.GamesContainer{
 				children = Array.map(match.games, function(game, gameIndex)
+					if not gameFilterFunction(game) then
+						return
+					end
 					return GameRow{game = game, gameIndex = gameIndex}
 				end)
 			}

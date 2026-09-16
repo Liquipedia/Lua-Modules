@@ -195,8 +195,14 @@ end
 ---@param opponent standardOpponent
 ---@return boolean
 function Opponent.isBye(opponent)
-	return string.lower(opponent.name or '') == BYE
-		or string.lower(opponent.template or '') == BYE
+	if opponent.type == Opponent.team then
+		return string.lower(opponent.template or '') == BYE
+	end
+	local opponentName = opponent.name or Opponent.toName(opponent)
+	if String.isEmpty(opponentName) then
+		return false
+	end
+	return string.lower(opponentName) == BYE
 end
 
 ---Checks if a player is a TBD player
@@ -235,6 +241,18 @@ function Opponent.isOpponent(opponent)
 end
 
 ---Check if two opponents are the same opponent
+---Comparison based on:
+---   - Must be of same type
+---   - Same when same reference
+---   - Literal: Same (raw) name
+---   - Team:
+---       - Same (unresolved/resolved) template
+---       - Same historical template (when unresolved)
+---       - Same historical template by pagename (when resolved)
+---       - Does not check pagename after resolving redirects
+---   - Party:
+---       - Matching sorted list of player pagenames
+---       - From input, no extra resolving of redirects
 ---@param opponent1 standardOpponent
 ---@param opponent2 standardOpponent
 ---@return boolean
@@ -249,13 +267,20 @@ function Opponent.same(opponent1, opponent2)
 		if opponent1.template == opponent2.template then
 			return true
 		end
-		local opponent1Name = Opponent.toName(opponent1)
-		local opponent2Name = Opponent.toName(opponent2)
-		if opponent1Name == opponent2Name then
+
+		local template1 = TeamTemplate.getRaw(opponent1.template)
+		local template2 = TeamTemplate.getRaw(opponent2.template)
+
+		-- When both templates are unresolved, and have the same historical template (non-empty), they are same
+		if not Logic.isEmpty(template1.historicaltemplate)
+				and template1.historicaltemplate == template2.historicaltemplate then
 			return true
 		end
-		local opponent1Historical = TeamTemplate.getRaw(opponent1Name).historicaltemplate
-		local opponent2Historical = TeamTemplate.getRaw(opponent2Name).historicaltemplate
+
+		-- When both templates are resolved, use their pagename to get back to the
+		-- top-level historical template and compare
+		local opponent1Historical = TeamTemplate.getRaw(template1.page).historicaltemplate
+		local opponent2Historical = TeamTemplate.getRaw(template2.page).historicaltemplate
 		if Logic.isEmpty(opponent1Historical) or Logic.isEmpty(opponent2Historical) then
 			return false
 		end
@@ -409,6 +434,10 @@ end
 --[[
 Converts a opponent to a name. The name is the same as the one used in the
 match2opponent.name field.
+
+Warning: Do not use this to check whether two opponents are the same (use Opponent.same instead)!
+         There are edge cases with one-off subteams that share the same page (after redirect),
+		 which in the context of a tournament are not same, but resolve to the same name here.
 
 Returns nil if the team template does not exist.
 ]]
