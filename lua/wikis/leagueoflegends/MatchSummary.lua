@@ -7,17 +7,12 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
-
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local MAX_NUM_BANS = 5
 local NUM_HEROES_PICK = 5
 local STATUS_NOT_PLAYED = 'notplayed'
-
----@class LoLCustomMatchSummary: CustomMatchSummaryInterface
-local CustomMatchSummary = {}
 
 ---@class LoLMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
 local GameRowComponentProps = {
@@ -26,23 +21,21 @@ local GameRowComponentProps = {
 
 local LoLMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
+---@class LoLCustomMatchSummary: CustomMatchSummaryInterface
+local CustomMatchSummary = {
+	GameRow = LoLMatchSummaryGameRow,
+}
+
 ---@param args table
 ---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', maxBans = MAX_NUM_BANS})
 end
 
----@param match MatchGroupUtilMatch
----@return Renderable
-function CustomMatchSummary.createGames(match)
-	return MatchSummaryWidgets.GamesContainer{
-		children = Array.map(match.games, function (game, gameIndex)
-			if game.status == STATUS_NOT_PLAYED then
-				return
-			end
-			return LoLMatchSummaryGameRow{game = game, gameIndex = gameIndex}
-		end)
-	}
+---@param game MatchGroupUtilGame
+---@return boolean
+function CustomMatchSummary.gameFilter(game)
+	return game.status ~= STATUS_NOT_PLAYED
 end
 
 ---@param props MatchSummaryGameRowProps
