@@ -98,9 +98,7 @@ function StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 	local tiebreaker = args['temp_tie' .. teamIndex]
 	local startingPoints = args['temp_p' .. teamIndex]
 
-	return Table.merge(
-		{type = Opponent.team, team, tiebreaker = tiebreaker, startingpoints = startingPoints}
-	)
+	return {type = Opponent.team, team, tiebreaker = tiebreaker, startingpoints = startingPoints}
 end
 
 ---@param args table
@@ -120,9 +118,7 @@ function StandingTableLegacySwiss.parseTiebreaker(args)
 	local tiebreakers = {}
 	for _, value in Table.iter.pairsByPrefix(args, 'tiebreaker', {requireIndex = true}) do
 		local mappedTiebreaker = TIEBREAKER_MAPPING_TABLE[value]
-		if not mappedTiebreaker then
-			error('Unknown tiebreaker: ' .. value)
-		end
+		assert(mappedTiebreaker, 'Unknown tiebreaker: ' .. value)
 		table.insert(tiebreakers, mappedTiebreaker)
 	end
 	return tiebreakers
