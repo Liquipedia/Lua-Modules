@@ -195,8 +195,14 @@ end
 ---@param opponent standardOpponent
 ---@return boolean
 function Opponent.isBye(opponent)
-	return string.lower(opponent.name or '') == BYE
-		or string.lower(opponent.template or '') == BYE
+	if opponent.type == Opponent.team then
+		return string.lower(opponent.template or '') == BYE
+	end
+	local opponentName = opponent.name or Opponent.toName(opponent)
+	if String.isEmpty(opponentName) then
+		return false
+	end
+	return string.lower(opponentName) == BYE
 end
 
 ---Checks if a player is a TBD player
