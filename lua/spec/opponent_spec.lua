@@ -145,6 +145,10 @@ describe('opponent', function()
 			assert.is_false(Opponent.isBye(Config.filledDuo))
 			assert.is_true(Opponent.isBye(Config.byeLiteral))
 			assert.is_true(Opponent.isBye(Config.byeTeam))
+			assert.is_true(Opponent.isBye(Opponent.readOpponentArgs{
+				type = Opponent.solo,
+				[1] = 'Bye'
+			}))
 			assert.error(Opponent.isBye)
 			---intended bad input
 			---@diagnostic disable-next-line: param-type-mismatch
