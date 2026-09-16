@@ -25,7 +25,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local StarcraftLegacyPrizePool = {}
 
 local AUTOMATION_START_DATE = '2022-01-14'
-local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l', q = 'q'}
+local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l'}
 local BASE_CURRENCY_PRIZE = LegacyPrizePool.BASE_CURRENCY:lower() .. 'prize'
 
 local CACHED_DATA = {
@@ -35,7 +35,7 @@ local CACHED_DATA = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function StarcraftLegacyPrizePool.run(frame)
 	local args = Template.retrieveReturnValues('PrizePool')
 	---@type table
@@ -422,12 +422,12 @@ function StarcraftLegacyPrizePool._readOpponentArgs(props)
 		if not nameInput then
 			return nil, argsIndex
 		end
-		nameInput = mw.text.split(nameInput, '|')
+		local nameInputArray = Array.parseCommaSeparatedString(nameInput, '|')
 		return {
 			type = CACHED_DATA.defaultOpponentType,
 			isarchon = CACHED_DATA.defaultIsArchon,
-			[1] = nameInput[#nameInput],
-			link = slot[prefix .. 'link' .. opponentIndex] or slot[prefix .. opponentIndex .. 'link'] or nameInput[1],
+			[1] = nameInputArray[#nameInputArray],
+			link = slot[prefix .. 'link' .. opponentIndex] or slot[prefix .. opponentIndex .. 'link'] or nameInputArray[1],
 			flag = slot[prefix .. 'flag' .. opponentIndex] or slot[prefix .. opponentIndex .. 'flag'],
 			team = slot[prefix .. 'team' .. opponentIndex] or slot[prefix .. opponentIndex .. 'team'],
 			race = slot[prefix .. 'race' .. opponentIndex] or slot[prefix .. opponentIndex .. 'race'],
@@ -452,11 +452,11 @@ function StarcraftLegacyPrizePool._readOpponentArgs(props)
 		if not nameInput then
 			return nil, newArgsIndex
 		end
-		nameInput = mw.text.split(nameInput, '|')
+		local nameInputArray = Array.parseCommaSeparatedString(nameInput, '|')
 
-		opponentData['p' .. playerIndex] = nameInput[#nameInput]
+		opponentData['p' .. playerIndex] = nameInputArray[#nameInputArray]
 		opponentData['p' .. playerIndex .. 'link'] = slot[prefix .. 'link' .. opponentIndex .. 'p' .. playerIndex]
-			or nameInput[1]
+			or nameInputArray[1]
 		opponentData['p' .. playerIndex .. 'flag'] = slot[prefix .. 'flag' .. opponentIndex .. 'p' .. playerIndex]
 		opponentData['p' .. playerIndex .. 'team'] = slot[prefix .. 'team' .. opponentIndex .. 'p' .. playerIndex]
 		opponentData['p' .. playerIndex .. 'race'] = slot[prefix .. 'race' .. opponentIndex .. 'p' .. playerIndex]

@@ -5,6 +5,9 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['opponentaliases'] = {
+				'1upesport (german roster)'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -102,6 +105,9 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['opponentaliases'] = {
+				'bad memes'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -163,6 +169,9 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['opponentaliases'] = {
+				'bluejays sports'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -256,6 +265,9 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['opponentaliases'] = {
+				'botsofharris'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -347,6 +359,9 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['opponentaliases'] = {
+				'buteo esports'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -450,6 +465,9 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['opponentaliases'] = {
+				'comeback'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -553,6 +571,9 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['opponentaliases'] = {
+				'deus esport'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -644,6 +665,9 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['opponentaliases'] = {
+				'ewave esports'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -735,6 +759,9 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['opponentaliases'] = {
+				'mechanix esports'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -832,6 +859,9 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['opponentaliases'] = {
+				'myrisk gaming e.v.'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -923,6 +953,9 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['opponentaliases'] = {
+				'mysterious monkeys'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -1014,6 +1047,9 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['opponentaliases'] = {
+				'ouroboros'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -1123,6 +1159,9 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['opponentaliases'] = {
+				'quantum esports'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -1214,6 +1253,9 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['opponentaliases'] = {
+				's1 esports'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -1311,6 +1353,9 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['opponentaliases'] = {
+				'team synthax'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -1402,6 +1447,9 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['opponentaliases'] = {
+				'turtle esport'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -1498,6 +1546,9 @@ return {
 		['date'] = '2017-12-17 00:00:00',
 		['extradata'] = {
 			['prizepoints'] = '',
+			['opponentaliases'] = {
+				'1upesport'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -1582,6 +1633,9 @@ return {
 		['date'] = '2017-12-17 00:00:00',
 		['extradata'] = {
 			['prizepoints'] = '',
+			['opponentaliases'] = {
+				'buteo esports'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -1666,6 +1720,9 @@ return {
 		['date'] = '2018-02-26 00:00:00',
 		['extradata'] = {
 			['prizepoints'] = '',
+			['opponentaliases'] = {
+				'1nfamy/united kingdom/one'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '0/3/3',
@@ -1736,6 +1793,9 @@ return {
 		['date'] = '2018-02-26 00:00:00',
 		['extradata'] = {
 			['prizepoints'] = '',
+			['opponentaliases'] = {
+				'1upesport/one'
+			},
 		},
 		['game'] = 'siege',
 		['groupscore'] = '2/3/1',

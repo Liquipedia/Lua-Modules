@@ -9,19 +9,25 @@ local Lua = require('Module:Lua')
 
 local ActiveYears = Lua.import('Module:YearsActive')
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Math = Lua.import('Module:MathUtil')
 local PlayersSignatureLegends = Lua.import('Module:PlayersSignatureLegends')
 
 local Player = Lua.import('Module:Infobox/Person')
 
-local CURRENT_YEAR = tonumber(os.date('%Y'))
+local CURRENT_YEAR = DateExt.getYearOf()
 
 local Widgets = Lua.import('Module:Widget/All')
 local Injector = Lua.import('Module:Widget/Injector')
 local Cell = Widgets.Cell
 
----@class BrawlhallaInfoboxPlayer: Person
+---@class BrawlhallaInfoboxPlayer: InfoboxPerson
+---@operator call(Frame): BrawlhallaInfoboxPlayer
 local CustomPlayer = Class.new(Player)
+
+---@class BrawlhallaInfoboxPlayerWidgetInjector: WidgetInjector
+---@operator call(BrawlhallaInfoboxPlayer): BrawlhallaInfoboxPlayerWidgetInjector
+---@field caller BrawlhallaInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -44,13 +50,14 @@ function CustomInjector:parse(id, widgets)
 		local yearsActive = ActiveYears.display{player = caller.pagename}
 
 		local currentYearEarnings = caller.earningsPerYear[CURRENT_YEAR]
+		local currentYearEarningsDisplay
 		if currentYearEarnings then
 			currentYearEarnings = Math.round(currentYearEarnings)
-			currentYearEarnings = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
+			currentYearEarningsDisplay = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
 		end
 
 		return {
-			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, children = {currentYearEarnings}},
+			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, children = {currentYearEarningsDisplay}},
 			Cell{name = 'Years active', children = {yearsActive}},
 			Cell{name = 'Main Legends', children = {PlayersSignatureLegends.get{player = caller.pagename}}},
 		}

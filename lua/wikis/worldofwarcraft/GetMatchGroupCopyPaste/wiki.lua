@@ -24,12 +24,12 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local lines = Array.extend(
 		'{{Match',
 		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
 		INDENT .. '|date=',
 		INDENT .. '|twitch=|youtube=|vod=',
-		Array.map(Array.range(1, bestof), function(mapIndex)
+		Array.mapRange(1, bestof, function(mapIndex)
 			return WikiCopyPaste._getMapCode(mapIndex)
 		end),
 		'}}'

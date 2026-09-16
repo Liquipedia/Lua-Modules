@@ -131,6 +131,7 @@ Types.BracketData = TypeUtil.union(
 ---@field extradata table?
 ---@field pageIsResolved boolean?
 ---@field faction string?
+---@field roles string[]?
 ---@field apiId string?
 
 Types.Player = TypeUtil.struct({
@@ -265,6 +266,7 @@ Types.Game = TypeUtil.struct({
 ---@field shortname string?
 ---@field status MatchStatus
 ---@field stream table
+---@field submatches MatchGroupUtilSubgroup[]
 ---@field tickername string?
 ---@field tournament string?
 ---@field type string?

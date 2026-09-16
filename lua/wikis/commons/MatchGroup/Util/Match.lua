@@ -101,6 +101,7 @@ function MatchUtil.matchFromRecord(record)
 	}
 
 	match.phase = MatchUtil.computeMatchPhase(match)
+	match.submatches = MatchUtil.groupBySubgroup(match)
 
 	return match
 end
