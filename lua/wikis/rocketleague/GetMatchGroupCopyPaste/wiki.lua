@@ -42,10 +42,10 @@ end
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local lines = Array.extend(
 		'{{Match',
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode)
 		end),
-		Array.map(Array.range(1, bestof), WikiCopyPaste._getMapCode),
+		Array.mapRange(1, bestof, WikiCopyPaste._getMapCode),
 		INDENT .. '|finished=',
 		INDENT .. '|date=',
 		'}}',
