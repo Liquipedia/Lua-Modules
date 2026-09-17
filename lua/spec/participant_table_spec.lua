@@ -71,7 +71,7 @@ describe('Participant Table', function()
 
 			GoldenTest('participant_table', tostring(ParticipantTable(argsPlain)))
 			GoldenTest('participant_table_with_seed', tostring(ParticipantTable(argsWithSeed)))
-			GoldenTest('participant_table_with_seed', tostring(ParticipantTable(argsDuoOpponent)))
+			GoldenTest('participant_table_with_duo', tostring(ParticipantTable(argsDuoOpponent)))
 			GoldenTest('participant_table_with_section', tostring(ParticipantTable(argsWithSections)))
 			GoldenTest('participant_table_random_event', tostring(ParticipantTable(argsRandomEvent)))
 
