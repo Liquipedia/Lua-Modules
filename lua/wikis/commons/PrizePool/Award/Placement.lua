@@ -8,6 +8,8 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
@@ -27,6 +29,7 @@ local PRIZE_TYPE_POINTS = 'POINTS'
 --- @field parent AwardPrizePool
 --- @field previousTotalNumberOfParticipants integer
 --- @field currentTotalNumberOfParticipants integer
+--- @field references table[]?
 local AwardPlacement = Class.new(BasePlacement)
 
 --- @param award string Award of this slot/placement
@@ -36,6 +39,7 @@ function AwardPlacement:create(award)
 	self.count = tonumber(self.args.count)
 	self.opponents = self:parseOpponents(self.args)
 	self.count = self.count or math.max(#self.opponents, 1)
+	self.references = Logic.nilIfEmpty(Json.parseStringified(self.args.references))
 
 	return self
 end
