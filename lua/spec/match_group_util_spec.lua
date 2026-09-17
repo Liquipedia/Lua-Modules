@@ -149,9 +149,9 @@ insulate('MatchGroup/Util', function()
 		end)
 
 		it('returns the finals together with its bracket reset match', function()
+			local Json = require('Module:Json')
 			local MatchGroupUtil = require('Module:MatchGroup/Util')
 			local Variables = require('Module:Variables')
-			local Json = require('Module:Json')
 
 			local function record(matchId, bracketData)
 				return {

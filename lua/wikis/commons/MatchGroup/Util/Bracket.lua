@@ -99,10 +99,10 @@ end
 ---@return string[]
 function BracketUtil.computeLowerMatchIdsFromLegacy(data)
 	local lowerMatchIds = {}
-	if nilIfEmpty(data.toupper) then
+	if String.isNotEmpty(data.toupper) then
 		table.insert(lowerMatchIds, data.toupper)
 	end
-	if nilIfEmpty(data.tolower) then
+	if String.isNotEmpty(data.tolower) then
 		table.insert(lowerMatchIds, data.tolower)
 	end
 	return lowerMatchIds

@@ -14,12 +14,13 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local BracketUtil = Lua.import('Module:MatchGroup/Util/Bracket')
 
-local NOW = os.time()
+local NOW = Date.getCurrentTimestamp()
 
 local nilIfEmpty = String.nilIfEmpty
 
@@ -156,11 +157,11 @@ function MatchUtil.createOpponent(args)
 		score = args.score,
 		status = args.status,
 		template = args.template,
-		type = args.type or 'literal',
+		type = args.type or Opponent.literal,
 	}
 end
 
----@param record table
+---@param record match2player
 ---@return standardPlayer
 function MatchUtil.playerFromRecord(record)
 	local extradata = parseOrCopyExtradata(record.extradata)

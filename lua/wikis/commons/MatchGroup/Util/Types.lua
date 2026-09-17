@@ -80,28 +80,28 @@ Types.BracketBracketData = TypeUtil.struct({
 	upperMatchId = 'string?',
 })
 ---@class MatchGroupUtilMatchCoordinates
----@field depth number
----@field depthCount number
----@field matchIndexInRound number
----@field rootIndex number
----@field roundCount number
----@field roundIndex number
----@field sectionCount number
----@field sectionIndex number
----@field semanticDepth number
----@field semanticRoundIndex number
+---@field depth integer
+---@field depthCount integer
+---@field matchIndexInRound integer
+---@field rootIndex integer
+---@field roundCount integer
+---@field roundIndex integer
+---@field sectionCount integer
+---@field sectionIndex integer
+---@field semanticDepth integer
+---@field semanticRoundIndex integer
 
 Types.MatchCoordinates = TypeUtil.struct({
-	depth = 'number',
-	depthCount = 'number',
-	matchIndexInRound = 'number',
-	rootIndex = 'number',
-	roundCount = 'number',
-	roundIndex = 'number',
-	sectionCount = 'number',
-	sectionIndex = 'number',
-	semanticDepth = 'number',
-	semanticRoundIndex = 'number',
+	depth = 'integer',
+	depthCount = 'integer',
+	matchIndexInRound = 'integer',
+	rootIndex = 'integer',
+	roundCount = 'integer',
+	roundIndex = 'integer',
+	sectionCount = 'integer',
+	sectionIndex = 'integer',
+	semanticDepth = 'integer',
+	semanticRoundIndex = 'integer',
 })
 ---@class MatchGroupUtilMatchlistBracketData
 ---@field header string?
