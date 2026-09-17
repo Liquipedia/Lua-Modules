@@ -25,7 +25,7 @@ local SeriesMedalStatisticsFetchPlacements = {}
 function SeriesMedalStatisticsFetchPlacements.run(config)
 	return mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = SeriesMedalStatisticsFetchPlacements._getConditions(config),
-		query = 'opponentplayers, placement, extradata, date, opponentname, opponenttype, opponenttemplate',
+		query = 'opponentplayers, placement, date, opponentname, opponenttype, opponenttemplate',
 		order = 'date asc',
 		limit = 5000,
 	})

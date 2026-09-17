@@ -20,8 +20,7 @@ local SEMIFINALIST = Types.optionalPlacementColumns.SEMIFINALIST
 local Processor = {}
 
 ---@param config SeriesMedalStatsConfig
----@param data {opponents: table<string, standardOpponent>, teams: table<string, string>,
----medalsData: table<string, SeriesMedalStatsDataSet>}
+---@param data SeriesMedalStatsData
 ---@param placement any
 function Processor.run(config, data, placement)
 	local getIdentifier = Processor._getIdentifierByStatsType(config.statsType, data.opponents, data.teams)

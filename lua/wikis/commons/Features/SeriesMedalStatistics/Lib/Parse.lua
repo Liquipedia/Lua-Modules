@@ -33,8 +33,6 @@ function Parser.readConfig(args)
 		cutAfter = MathUtil.toInteger(args.cutafter) or 7,
 		columns = columns,
 		mergeIntoSemifinalists = Logic.readBool(args.mergeIntoSemifinalists),
-		offset = MathUtil.toInteger(args.offset),
-		limit = MathUtil.toInteger(args.limit),
 		medalsTableType = Types.medalsTableTypes[statsType],
 	}
 	config.query = Parser._readQueryConfig(args, config)

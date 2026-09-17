@@ -44,8 +44,7 @@ function SeriesMedalStatistics.execute(args)
 		return
 	end
 
-	---@type {opponents: table<string, standardOpponent>, teams: table<string, string>,
-	---medalsData: table<string, SeriesMedalStatsDataSet>}
+	---@type SeriesMedalStatsData
 	local data = {
 		opponents = {},
 		teams = {},
