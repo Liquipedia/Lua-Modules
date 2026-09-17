@@ -81,6 +81,7 @@ describe('Participant Table', function()
 			GoldenTest('participant_table_random_event', tostring(ParticipantTable(argsRandomEvent)))
 
 			mw.ext.LiquipediaDB.lpdb_tournament:revert()
+			---@diagnostic disable-next-line: undefined-field
 			mw.ext.LiquipediaDB.lpdb_placement:revert()
 			TeamTemplateMock.tearDown()
 			MockLpdb.tearDown()
