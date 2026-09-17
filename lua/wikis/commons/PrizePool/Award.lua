@@ -11,12 +11,15 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
 
 local BasePrizePool = Lua.import('Module:PrizePool/Base')
 local Placement = Lua.import('Module:PrizePool/Award/Placement')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
+local ReferenceTag = Lua.import('Module:Widget/ReferenceTag')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local TableCell = TableWidgets.Cell
 
@@ -50,8 +53,28 @@ end
 ---@param placement AwardPlacement
 ---@return Renderable
 function AwardPrizePool:placeOrAwardCell(placement)
+	---@return Renderable|Renderable[]
+	local function buildChildren()
+		local references = placement.references
+		if Table.isEmpty(references) then
+			return placement.award
+		end
+		---@cast references -nil
+		local frame = mw.getCurrentFrame()
+		return Array.extend(
+			placement.award,
+			Array.map(references, function (reference)
+				return ReferenceTag{
+					frame = frame,
+					name = Table.extract(reference, 'name'),
+					children = Template.safeExpand(frame, 'Cite web', reference)
+				}
+			end)
+		)
+	end
+
 	return TableCell{
-		children = {placement.award},
+		children = buildChildren(),
 		classes = {'prizepooltable-place'},
 		rowspan = #placement.opponents,
 	}
