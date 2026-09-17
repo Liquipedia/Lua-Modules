@@ -38,7 +38,7 @@ function SeriesMedalStatisticsFetchPlacements._getConditions(config)
 
 	local conditions = ConditionTree(BooleanOperator.all):add(Array.append({},
 		ConditionUtil.anyOf(ColumnName('placement'), config.columns),
-		ConditionUtil.anyOf(ColumnName('seriespage'), config.series),
+		ConditionUtil.anyOf(ColumnName('series'), config.series),
 		ConditionUtil.anyOf(ColumnName('liquipediatier'), config.tier),
 		ConditionUtil.anyOf(ColumnName('liquipediatiertype'), config.tierType),
 		ConditionUtil.anyOf(ColumnName('opponenttype'), config.opponentTypes),
