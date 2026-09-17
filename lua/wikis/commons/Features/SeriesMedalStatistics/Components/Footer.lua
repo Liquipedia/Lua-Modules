@@ -9,13 +9,13 @@ local Lua = require('Module:Lua')
 
 local Types = Lua.import('Module:Features/SeriesMedalStatistics/Types')
 
+local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 
-local Footer = {}
-
----@param statsType string
+---@param props {statsType: string}
 ---@return VNode?
-function Footer.run(statsType)
+local render = function(props)
+	local statsType = props.statsType
 	if statsType ~= Types.statsTypes.PARTICIPANT_TEAM then
 		return
 	end
@@ -30,4 +30,4 @@ function Footer.run(statsType)
 	}
 end
 
-return Footer
+return Component.component(render)

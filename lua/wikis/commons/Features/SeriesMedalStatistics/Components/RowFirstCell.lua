@@ -13,12 +13,14 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Types = Lua.import('Module:Features/SeriesMedalStatistics/Types')
 
-local RowFirstCell = {}
+local Component = Lua.import('Module:Widget/Component')
 
----@param statsType string
----@param opponents standardOpponent[]
+---@param props {statsType: string, opponents: standardOpponent[]}
 ---@return fun(key: string): Renderable
-function RowFirstCell.run(statsType, opponents)
+local render = function(props)
+	local opponents = props.opponents
+	local statsType = props.statsType
+
 	if statsType == Types.statsTypes.FACTION then
 		return function(faction)
 			---@cast faction string?
@@ -45,4 +47,4 @@ function RowFirstCell.run(statsType, opponents)
 	error('Invalid statsType')
 end
 
-return RowFirstCell
+return Component.component(render)
