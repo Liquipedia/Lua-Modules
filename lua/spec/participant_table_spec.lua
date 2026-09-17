@@ -2,10 +2,12 @@ describe('Participant Table', function()
 	local ParticipantTable = require('Module:ParticipantTable/Custom')
 
 	local Array = require('Module:Array')
+	local InfoboxLeague = require('Module:Infobox/League/Custom')
 	local Json = require('Module:Json')
 	local MockLpdb = require('Module:Mock/Lpdb')
 	local Table = require('Module:Table')
 	local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
+	local tournamentData = require('test_assets.tournaments').dummy
 
 	local argsPlain = {
 		[1] = 'Clem',
@@ -68,6 +70,9 @@ describe('Participant Table', function()
 		it('display', function()
 			MockLpdb.setUp()
 			TeamTemplateMock.setUp()
+			stub(mw.ext.LiquipediaDB, "lpdb_tournament")
+			stub(mw.ext.LiquipediaDB, "lpdb_placement")
+			InfoboxLeague.run(tournamentData)
 
 			GoldenTest('participant_table', tostring(ParticipantTable.run(argsPlain)))
 			GoldenTest('participant_table_with_seed', tostring(ParticipantTable(argsWithSeed)))
@@ -75,6 +80,8 @@ describe('Participant Table', function()
 			GoldenTest('participant_table_with_section', tostring(ParticipantTable(argsWithSections)))
 			GoldenTest('participant_table_random_event', tostring(ParticipantTable(argsRandomEvent)))
 
+			mw.ext.LiquipediaDB.lpdb_tournament:revert()
+			mw.ext.LiquipediaDB.lpdb_placement:revert()
 			TeamTemplateMock.tearDown()
 			MockLpdb.tearDown()
 		end)
