@@ -64,8 +64,6 @@ describe('Participant Table', function()
 		}
 	}
 
-	local argsRandomEvent = Table.merge(argsPlain, {is_random_event = true})
-
 	describe('participant table is correct', function()
 		it('display', function()
 			MockLpdb.setUp()
@@ -78,7 +76,6 @@ describe('Participant Table', function()
 			GoldenTest('participant_table_with_seed', tostring(ParticipantTable.run(argsWithSeed)))
 			GoldenTest('participant_table_with_duo', tostring(ParticipantTable.run(argsDuoOpponent)))
 			GoldenTest('participant_table_with_section', tostring(ParticipantTable.run(argsWithSections)))
-			GoldenTest('participant_table_random_event', tostring(ParticipantTable.run(argsRandomEvent)))
 
 			mw.ext.LiquipediaDB.lpdb_tournament:revert()
 			---@diagnostic disable-next-line: undefined-field
@@ -299,9 +296,6 @@ describe('Participant Table', function()
 			TeamTemplateMock.tearDown()
 			MockLpdb.tearDown()
 		end)
-
-		-- can not test randomEvent parsing on faction wikis with the current setup
-		-- todo after refactor to feature structure: add testcase here
 	end)
 --]]
 end)
