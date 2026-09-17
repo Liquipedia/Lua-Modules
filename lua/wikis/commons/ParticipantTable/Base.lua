@@ -162,7 +162,7 @@ function ParticipantTable:fetchSectionsArgs()
 	end
 
 	-- retrieve sectionsArgs
-	local sectionsArgs = Template.retrieveReturnValues('ParticipantTable')
+	sectionsArgs = Template.retrieveReturnValues('ParticipantTable')
 	pageVars:delete('stashArgs')
 
 	--case no sections: use whole table as first section
