@@ -56,11 +56,11 @@ function SeriesMedalStatistics.execute(args)
 		medalsTableType = config.medalsTableType,
 		dataColumns = config.columns,
 		data = data.medalsData,
-		renderRowFirstCell = RowFirstCell.run(config.statsType, data.opponents),
+		renderRowFirstCell = RowFirstCell{statsType = config.statsType, opponents = data.opponents},
 		rowSort = Sort.rowSort,
 		hideTotalRow = true,
 		cutAfter = config.cutAfter,
-		footer = Footer.run(config.statsType),
+		footer = Footer{statsType = config.statsType},
 	}
 end
 
