@@ -14,6 +14,8 @@ local Table = Lua.import('Module:Table')
 
 local StreamLinks = Lua.import('Module:Links/Stream')
 
+local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
+
 ---@class CountdownArgs
 ---@field date string?
 ---@field timestamp integer?
@@ -59,7 +61,10 @@ function Countdown.create(args)
 		local streamArgs = Table.filterByKey(args, function(key)
 			return type(key) == 'string'
 		end) --[[@as {string: string}]]
-		streams = StreamLinks.buildDisplays(StreamLinks.filterStreams(streamArgs))
+		streams = StreamsContainer{
+			buttonSize = 'xs',
+			streams = StreamLinks.filterStreams(streamArgs),
+		}
 	end
 	if streams then
 		streams = table.concat(streams, ' ')
