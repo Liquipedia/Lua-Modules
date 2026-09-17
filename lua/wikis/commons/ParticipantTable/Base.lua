@@ -384,10 +384,7 @@ function ParticipantTable:create()
 
 	if not config.display then return end
 
-	self.display = mw.html.create('div')
-		:addClass('participantTable')
-		:css('width', config.width)
-		:node(self:_createTitle())
+	self.display = self:_createBaseDisplayDiv()
 
 	Array.forEach(self.sections, function(section) self:displaySection(section) end)
 
@@ -403,12 +400,17 @@ function ParticipantTable:create()
 end
 
 ---@return Html?
-function ParticipantTable:_createTitle()
+function ParticipantTable:_createBaseDisplayDiv()
 	local titleText = self.config.title or 'Participants'
-	if not self.hasSeeds and not self.config.showTitle then
-		return
-	elseif not self.hasSeeds then
-		return mw.html.create('div'):addClass('participantTable-title'):wikitext(titleText)
+
+	if not self.hasSeeds then
+		return mw.html.create('div')
+			:addClass('participantTable')
+			:css('width', self.config.width)
+			:node(self.config.showTitle and
+				mw.html.create('div'):addClass('participantTable-title'):wikitext(titleText)
+				or nil
+			)
 	end
 
 	return ParticipantTable:_createTitleWithToogleButton(titleText, 'Seeding', 1, 2, self.config.width)
