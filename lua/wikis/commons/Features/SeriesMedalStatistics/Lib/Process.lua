@@ -111,8 +111,6 @@ function Processor._getIdentifierByStatsType(statsType, opponents, teams)
 	-- this case can not happen
 	error('Invalid statsType')
 end
-
-
 ---@param columns string[]
 ---@return SeriesMedalStatsDataSet
 function Processor._setUpPlacementData(columns)
