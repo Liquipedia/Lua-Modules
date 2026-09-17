@@ -37,7 +37,6 @@ function Parser.readConfig(args)
 	}
 	config.query = Parser._readQueryConfig(args, config)
 
-
 	return config
 end
 
@@ -46,11 +45,10 @@ end
 ---@return SeriesMedalStatsConditionConfig
 function Parser._readQueryConfig(args, config)
 	local series = Array.parseCommaSeparatedString(args.series or mw.title.getCurrentTitle().prefixedText)
-	if Logic.readBool(args.noredirect) then
-		series = Array.map(series, function(value) return (value:gsub(' ', '_')) end)
-	else
-		series = Array.map(series, Page.pageifyLink)
+	if not Logic.readBool(args.noredirect) then
+		series = Array.map(series, Page.pageifyLink) --[[@as string[] ]]
 	end
+	series = Array.map(series, function(value) return (value:gsub('_', ' ')) end)
 
 	return {
 		series = series,
