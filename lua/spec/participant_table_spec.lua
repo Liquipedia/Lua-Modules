@@ -69,7 +69,7 @@ describe('Participant Table', function()
 			MockLpdb.setUp()
 			TeamTemplateMock.setUp()
 
-			GoldenTest('participant_table', tostring(ParticipantTable(argsPlain)))
+			GoldenTest('participant_table', tostring(ParticipantTable.run(argsPlain)))
 			GoldenTest('participant_table_with_seed', tostring(ParticipantTable(argsWithSeed)))
 			GoldenTest('participant_table_with_duo', tostring(ParticipantTable(argsDuoOpponent)))
 			GoldenTest('participant_table_with_section', tostring(ParticipantTable(argsWithSections)))
