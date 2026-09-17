@@ -24,10 +24,9 @@ local LIMIT_TEAMS = 100 -- How many teams to show in the list/table
 function RatingsDisplayList.build(teamRankings)
 	local teams = Array.sub(teamRankings, 1, LIMIT_TEAMS)
 
-	local tableRow = {
+	local tableRows = {
 		TableWidgets.TableHeader{children =
 			TableWidgets.Row{
-				css = {['font-weight'] = 'bold'},
 				children = {
 					TableWidgets.CellHeader{children = '#'},
 					TableWidgets.CellHeader{children = 'Team'},
@@ -85,7 +84,7 @@ function RatingsDisplayList.build(teamRankings)
 				or (team.streak < -1 and 'group-table-rank-change-down')
 				or nil
 
-		table.insert(tableRow, TableWidgets.TableBody{children =
+		table.insert(tableRows, TableWidgets.TableBody{children =
 			TableWidgets.Row{
 				children = {
 					TableWidgets.Cell{css = {['font-weight'] = 'bold'}, children = rank},
@@ -106,7 +105,7 @@ function RatingsDisplayList.build(teamRankings)
 	end)
 	return TableWidgets.Table{
 		children = {
-			tableRow
+			tableRows
 		}
 	}
 end
