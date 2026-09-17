@@ -75,10 +75,10 @@ describe('Participant Table', function()
 			InfoboxLeague.run(tournamentData)
 
 			GoldenTest('participant_table', tostring(ParticipantTable.run(argsPlain)))
-			GoldenTest('participant_table_with_seed', tostring(ParticipantTable(argsWithSeed)))
-			GoldenTest('participant_table_with_duo', tostring(ParticipantTable(argsDuoOpponent)))
-			GoldenTest('participant_table_with_section', tostring(ParticipantTable(argsWithSections)))
-			GoldenTest('participant_table_random_event', tostring(ParticipantTable(argsRandomEvent)))
+			GoldenTest('participant_table_with_seed', tostring(ParticipantTable.run(argsWithSeed)))
+			GoldenTest('participant_table_with_duo', tostring(ParticipantTable.run(argsDuoOpponent)))
+			GoldenTest('participant_table_with_section', tostring(ParticipantTable.run(argsWithSections)))
+			GoldenTest('participant_table_random_event', tostring(ParticipantTable.run(argsRandomEvent)))
 
 			mw.ext.LiquipediaDB.lpdb_tournament:revert()
 			---@diagnostic disable-next-line: undefined-field
