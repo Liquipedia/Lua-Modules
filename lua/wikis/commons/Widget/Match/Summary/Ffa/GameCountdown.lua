@@ -7,12 +7,12 @@
 
 local Lua = require('Module:Lua')
 
-local Countdown = Lua.import('Module:Countdown')
 local Date = Lua.import('Module:Date/Ext')
 local Table = Lua.import('Module:Table')
 local VodLink = Lua.import('Module:VodLink')
 
 local Component = Lua.import('Module:Widget/Component')
+local CountdownWidget = Lua.import('Module:Widget/Countdown')
 local Html = Lua.import('Module:Widget/Html')
 
 ---@param props {game: FFAMatchGroupUtilMatch|FFAMatchGroupUtilGame?}
@@ -38,7 +38,7 @@ local function MatchSummaryFfaGameCountdown(props)
 	return Html.Div{
 		classes = {'match-countdown-block'},
 		children = {
-			Countdown.create(streamParameters),
+			CountdownWidget(streamParameters),
 			game.vod and VodLink.display{vod = game.vod} or nil,
 		},
 	}
