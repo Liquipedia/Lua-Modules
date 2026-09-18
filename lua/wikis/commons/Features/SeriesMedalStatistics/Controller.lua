@@ -19,6 +19,7 @@ local Parser = Lua.import('Module:Features/SeriesMedalStatistics/Lib/Parse')
 local Processor = Lua.import('Module:Features/SeriesMedalStatistics/Lib/Process')
 local RowFirstCell = Lua.import('Module:Features/SeriesMedalStatistics/Components/RowFirstCell')
 local Sort = Lua.import('Module:Features/SeriesMedalStatistics/Lib/Sort')
+local Types = Lua.import('Module:Features/SeriesMedalStatistics/Types')
 
 local MedalsTable = Lua.import('Module:Widget/MedalsTable')
 
@@ -69,7 +70,7 @@ function SeriesMedalStatistics.execute(args)
 		rowSort = Sort.rowSort,
 		hideTotalRow = true,
 		cutAfter = config.cutAfter,
-		footer = Footer{statsType = config.statsType},
+		footer = config.statsType == Types.statsTypes.PARTICIPANT_TEAM and Footer() or nil,
 	}
 end
 
