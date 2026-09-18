@@ -17,30 +17,32 @@ local AwardsTable = Lua.import('Module:ResultsTable/Award')
 local INVALID_TIER_DISPLAY = 'Undefined'
 local INVALID_TIER_SORT = 'ZZ'
 
-local CustomResultsTable = {}
+local CustomResultsTable = Class.new(ResultsTable)
+local CustomAwardsTable = Class.new(AwardsTable)
+local Custom = {}
+
+CustomResultsTable.tierDisplay = Custom.tierDisplay
+CustomAwardsTable.tierDisplay = Custom.tierDisplay
+
 
 -- Template entry point for results and achievements tables
 ---@param args table
----@return Widget
-function CustomResultsTable.results(args)
+---@return VNode
+function Custom.results(args)
 	args.gameIcons = true
 	args.showType = true
-	local resultsTable = ResultsTable(args)
-
-	resultsTable.tierDisplay = CustomResultsTable.tierDisplay
+	local resultsTable = CustomResultsTable(args)
 
 	return resultsTable:create():build()
 end
 
 -- Template entry point for awards tables
 ---@param args table
----@return Widget
-function CustomResultsTable.awards(args)
+---@return VNode
+function Custom.awards(args)
 	args.gameIcons = true
 	args.showType = true
-	local awardsTable = AwardsTable(args)
-
-	awardsTable.tierDisplay = CustomResultsTable.tierDisplay
+	local awardsTable = CustomAwardsTable(args)
 
 	return awardsTable:create():build()
 end
@@ -49,7 +51,7 @@ end
 ---@param placement table
 ---@return string?
 ---@return string
-function CustomResultsTable:tierDisplay(placement)
+function Custom:tierDisplay(placement)
 	local tier, tierType, options = Tier.parseFromQueryData(placement)
 	options.link = true
 	options.onlyTierTypeIfBoth = false
@@ -58,8 +60,9 @@ function CustomResultsTable:tierDisplay(placement)
 	if not Tier.isValid(tier, tierType) then
 		return INVALID_TIER_DISPLAY, INVALID_TIER_SORT
 	end
+	---@cast tier -string
 
 	return Tier.display(tier, tierType, options), Tier.toSortValue(tier, tierType)
 end
 
-return Class.export(CustomResultsTable, {exports = {'results', 'awards'}})
+return Class.export(Custom, {exports = {'results', 'awards'}})
