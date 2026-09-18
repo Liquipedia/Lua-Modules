@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local MatchTable = Lua.import('Module:MatchTable/Custom')
 local Page = Lua.import('Module:Page')
 local Tabs = Lua.import('Module:Tabs')
 local Variables = Lua.import('Module:Variables')
@@ -21,34 +22,32 @@ local PlayerAchievementsTableWrapper = {}
 ---@param frame Frame
 ---@return Renderable?
 function PlayerAchievementsTableWrapper.run(frame)
-	local awards = Json.parseIfTable(Variables.varDefault('awardAchievements'))
+	local currentPage = mw.title.getCurrentTitle().prefixedText
 
-	local hasBroadCastsSubPage = Page.exists(mw.title.getCurrentTitle().prefixedText .. '/Broadcasts')
-
-	if Logic.isEmpty(awards) and not hasBroadCastsSubPage then
-		return ResultsTable.results(frame)
-	end
-
+	---@type table<string, Renderable>
 	local tabArgs = {
 		name1 = 'Player Achievements',
-		content1 = ResultsTable.results(frame)
+		content1 = ResultsTable.results(frame),
+		name2 = 'Recent Results',
+		content2 = MatchTable.results{
+			tableMode = 'solo',
+			player = currentPage,
+			showType = true,
+			limit = 10,
+		},
 	}
 
-	local tabIndex = 1
-	if Logic.isNotEmpty(awards) then
-		frame.args.awards = 1
-		frame.args.resultsSubPage = 'Awards'
-		tabIndex = tabIndex + 1
-		tabArgs['name' .. tabIndex] = 'Awards'
-		tabArgs['content' .. tabIndex] = ResultsTable.awards(frame)
-	end
+	local tabIndex = 3
+	frame.args.awards = 1
+	frame.args.resultsSubPage = 'Awards'
+	tabArgs['name' .. tabIndex] = 'Awards'
+	tabArgs['content' .. tabIndex] = ResultsTable.awards(frame)
 
-	if hasBroadCastsSubPage then
+	if Page.exists(currentPage .. '/Broadcasts') then
 		tabIndex = tabIndex + 1
 
 		local broadcastAchievements = BroadcasterTable.run{
 			achievements = 1,
-			aboutAchievementsLink = 'Template:Broadcast talent achievements table/doc',
 			useTickerNames = true,
 		}
 

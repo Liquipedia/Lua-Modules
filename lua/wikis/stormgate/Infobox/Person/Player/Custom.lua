@@ -112,13 +112,6 @@ function CustomPlayer:_getActiveCasterYears()
 	return YearsActive.displayYears(years:toArray())
 end
 
----@return Renderable?
-function CustomPlayer:createBottomContent()
-	if self:shouldStoreData(self.args) then
-		return MatchTicker.recent({player = self.pagename})
-	end
-end
-
 ---@param categories string[]
 ---@return string[]
 function CustomPlayer:getWikiCategories(categories)

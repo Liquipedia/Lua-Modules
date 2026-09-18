@@ -42,7 +42,6 @@ local ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
 local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = Info.config.defaultMaxPlayersPerPlacement
 local MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS = 10
-local NUMBER_OF_RECENT_MATCHES = 5
 
 --race stuff
 local RACE_FIELD_AS_CATEGORY_LINK = true
@@ -57,7 +56,6 @@ local Center = Widgets.Center
 
 ---@class Starcraft2InfoboxPlayer: SC2CustomPerson
 ---@field shouldQueryData boolean
----@field recentMatches match2[]?
 ---@field stats table<string, table<string, {w: number, l: number}>>?
 ---@field years number[]?
 ---@field earnings table<integer, table<string, number>>?
@@ -157,20 +155,9 @@ function CustomPlayer:_getActiveCasterYears()
 	return YearsActive.displayYears(years:toArray())
 end
 
----@return Renderable?
-function CustomPlayer:createBottomContent()
-	if self.shouldQueryData then
-		return MatchTicker.recent({
-			player = self.pagename,
-			limit = NUMBER_OF_RECENT_MATCHES
-		})
-	end
-end
-
 ---@param player string
 function CustomPlayer:_getMatchupData(player)
 	-- set empty data tables
-	self.recentMatches = {}
 	self.stats = {total = {}}
 
 	player = Page.applyUnderScoresIfEnforced(player)
@@ -181,10 +168,6 @@ function CustomPlayer:_getMatchupData(player)
 	local processMatch = function(match)
 		local year = tonumber(string.sub(match.date, 1, 4))
 		years:add(year)
-
-		if #self.recentMatches < NUMBER_OF_RECENT_MATCHES then
-			table.insert(self.recentMatches, match)
-		end
 
 		if Array.any(match.match2opponents, function(opponent) return opponent.status and opponent.status ~= 'S' end) then
 			return
