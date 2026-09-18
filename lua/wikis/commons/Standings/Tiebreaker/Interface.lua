@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 
 ---@alias TiebreakerOpponent {opponent: standardOpponent, points: number, matches: MatchGroupUtilMatch[],
----match: {w: integer, d: integer, l:integer}, extradata: table}
+---match: {w: integer, d: integer, l:integer}, extradata: table, startingPoints: number?}
 
 ---@class StandingsTiebreaker
 ---@field context 'full'|'ml'|'h2h'

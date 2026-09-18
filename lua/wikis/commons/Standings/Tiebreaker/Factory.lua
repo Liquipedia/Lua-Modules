@@ -27,6 +27,7 @@ local NAME_TO_CLASS = {
 	gamewinrate = 'Game/WinRate',
 	roundwins = 'Game/Rounds/Wins',
 	rounddiff = 'Game/Rounds/Diff',
+	startingpoints = 'StartingPoints',
 }
 
 --- Validates and normalizes the name of a tiebreaker input.
