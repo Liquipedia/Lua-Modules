@@ -145,17 +145,28 @@ function ParticipantTable:fetchSectionsArgs()
 
 	pageVars:set('stashArgs', '1')
 
+	local sectionsArgs = Array.mapIndexes(function (index)
+		local parsed = Json.parseIfString(args[index])
+		if type(parsed) == 'table' and parsed.type == 'section' then
+			return parsed
+		end
+	end)
+
+	if Logic.isNotEmpty(sectionsArgs) then
+		return sectionsArgs
+	end
+
 	-- make sure that all sections stashArgs
 	for _, potentialSection in pairs(args) do
 		ParticipantTable._stashArgs(potentialSection)
 	end
 
 	-- retrieve sectionsArgs
-	local sectionsArgs = Template.retrieveReturnValues('ParticipantTable')
+	sectionsArgs = Template.retrieveReturnValues('ParticipantTable')
 	pageVars:delete('stashArgs')
 
 	--case no sections: use whole table as first section
-	if Table.isEmpty(sectionsArgs) then
+	if Logic.isEmpty(sectionsArgs) then
 		return {args}
 	end
 
