@@ -70,7 +70,7 @@ function SeriesMedalStatistics.execute(args)
 		rowSort = Sort.rowSort,
 		hideTotalRow = true,
 		cutAfter = config.cutAfter,
-		footer = config.statsType == Types.statsTypes.PARTICIPANT_TEAM and Footer() or nil,
+		footer = config.statsType == Types.statsTypes.PARTICIPANT_TEAM and Footer{} or nil,
 	}
 end
 
