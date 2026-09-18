@@ -88,7 +88,7 @@ function Table.filterByKey(tbl, predicate)
 	return filteredTbl
 end
 
----Return true if table is empty or nil
+---Returns true if argument is `nil` or an empty table.
 ---@param tbl table?
 ---@return boolean
 function Table.isEmpty(tbl)
@@ -104,7 +104,7 @@ function Table.isEmpty(tbl)
 	return true
 end
 
----Return true if table is neither empty nor nil
+---Returns true if table is a nonempty table.
 ---@param tbl table?
 ---@return boolean
 function Table.isNotEmpty(tbl)
@@ -235,9 +235,11 @@ Can be called with more than two tables. The additional tables are merged into
 the first table in succession. All tables except the last table may be mutated.
 
 Example:
+```
 Table.deepMergeInto({a = {x = 3, y = 4}}, {a = {y = 5}})
 
 -- Returns {a = {x = 3, y = 5}}
+```
 ]]
 ---@param target table
 ---@param ... table
@@ -265,12 +267,15 @@ function Table.deepMerge(...)
 	return Table.deepMergeInto({}, ...)
 end
 
----Applies a function to each entry in a table and places the results as entries
---in a new table.
---
---Example:
---`Table.map({a = 3, b = 4, c = 5}, function(k, v) return 2 * v, k end)`
---Returns `{6 = 'a', 8 = 'b', 10 = 'c'}`
+--[[
+Applies a function to each entry in a table and places the results as entries in a new table.
+
+Example:
+```
+Table.map({a = 3, b = 4, c = 5}, function(k, v) return 2 * v, k end)
+-- returns {6 = 'a', 8 = 'b', 10 = 'c'}
+```
+]]
 ---@generic K, V, U, T
 ---@param xTable {[K] : V}
 ---@param f fun(key?: K, value?: V): U, T
@@ -294,21 +299,23 @@ it is used.
 
 Example:
 In the template call
+```plaintext
 {{Foo
 	|A
 	|p2=B
 	|C
 	|player4=D
 }}
+```
 
-Table.mapArgumentsByPrefix(args, {'p', 'player'}, f)
-will invoke
+`Table.mapArgumentsByPrefix(args, {'p', 'player'}, f)` will invoke
 
+```
 f(1, 1)
 f('p2', 2, 'p')
 f(2, 3)
 f('player4', 4, 'player')
-
+```
 ]]
 ---@generic K, T
 ---@param args {[K] : any}
@@ -329,12 +336,13 @@ function Table.mapArgumentsByPrefix(args, prefixes, f, noInterleave)
 	return Table.mapArguments(args, indexFromKey, f, noInterleave)
 end
 
---- Extracts keys based on a passed `indexFromKey` function interleaved with numeric indexes
--- from an arguments table, and applies a transform to each key or index.
---
--- Most common use-case will be `Table.mapArgumentsByPrefix` where
--- the `indexFromKey` function retrieves keys based on a prefix.
---
+--[[
+Extracts keys based on a passed `indexFromKey` function interleaved with numeric indexes
+from an arguments table, and applies a transform to each key or index.
+
+Most common use-case will be `Table.mapArgumentsByPrefix` where
+the `indexFromKey` function retrieves keys based on a prefix.
+]]
 ---@generic K, T, I
 ---@param args {[K] : any}
 ---@param indexFromKey fun(key?: K): I?, ...
@@ -375,14 +383,16 @@ function Table.mapArguments(args, indexFromKey, f, noInterleave)
 	return entriesByIndex
 end
 
----Applies a function to each value in a table and places the results in a new
---table under the same keys.
---
---Example:
---`Table.mapValues({1, 2, 3}, function(x) return 2 * x end)`
---Returns `{2, 4, 6}`
---
---The return is not parsed correctly yet by extension, https://github.com/sumneko/lua-language-server/issues/1535
+--[[
+Applies a function to each value in a table and places the results in a new
+table under the same keys.
+
+Example:
+```
+Table.mapValues({1, 2, 3}, function(x) return 2 * x end)
+-- returns {2, 4, 6}
+```
+]]
 ---@generic K, V, T
 ---@param xTable {[K] : V}
 ---@param f fun(value?: V): T
@@ -427,13 +437,17 @@ end
 Groups entries of a table according to a grouping function.
 
 Example:
+```
 local function parity(_, x) return x % 2 end
 Table.groupBy({a = 3, b = 4, c = 5}, parity)
--- Returns
+```
+Returns
+```
 {
-	0 = {b = 4},
-	1 = {a = 3, c = 5},
+	[0] = {b = 4},
+	[1] = {a = 3, c = 5},
 }
+```
 ]]
 ---@generic K, V, T
 ---@param tbl {[K] : V}

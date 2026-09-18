@@ -30,7 +30,7 @@ local Center = Widgets.Center
 local SIZE_HERO = '25x25px'
 local MAX_NUMBER_OF_SIGNATURE_HEROES = 3
 
----@class OverwatchInfoboxPlayer: Person
+---@class OverwatchInfoboxPlayer: InfoboxPerson
 ---@operator call(Frame): OverwatchInfoboxPlayer
 local CustomPlayer = Class.new(Player)
 

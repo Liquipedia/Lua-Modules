@@ -12,7 +12,7 @@ local Class = Lua.import('Module:Class')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
----@class TetrisInfoboxPlayer: Person
+---@class TetrisInfoboxPlayer: InfoboxPerson
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 

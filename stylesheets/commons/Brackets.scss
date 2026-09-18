@@ -695,6 +695,10 @@ div.brkts-popup-body-element-thumbs {
 		> .brkts-popup-comment {
 			padding: unset;
 			grid-column: 1 / -1;
+
+			&:empty {
+				display: none;
+			}
 		}
 
 		&-detail {
@@ -729,6 +733,10 @@ div.brkts-popup-body-element-thumbs {
 			&:nth-child( 2 ) {
 				justify-content: center;
 			}
+		}
+
+		&-center {
+			display: flex;
 		}
 	}
 }
@@ -805,6 +813,14 @@ div.brkts-popup-body-element-thumbs {
 	justify-content: center;
 	gap: 4px;
 	text-align: center;
+
+	.brkts-popup-footer & {
+		flex-wrap: wrap;
+
+		> a {
+			display: contents;
+		}
+	}
 }
 
 .brkts-popup-winloss-icon {
@@ -812,10 +828,6 @@ div.brkts-popup-body-element-thumbs {
 	line-height: 17px;
 	margin-left: 1%;
 	margin-right: 1%;
-}
-
-.brkts-popup-footer .brkts-popup-spaced > a {
-	display: contents;
 }
 
 .brkts-popup-spaced.brkts-popup-spaced-map-skip > a {
@@ -1216,10 +1228,12 @@ div.brkts-popup-body-element-thumbs {
 		flex: 1 1;
 		min-width: 0;
 
-		&:has( > .team-name-dynamic ) {
+		&:has( > .team-name-dynamic ),
+		&:has( > a > .team-name-dynamic ) {
 			container: block-team-name / inline-size;
 
-			> .team-name-dynamic {
+			> .team-name-dynamic,
+			> a > .team-name-dynamic {
 				content: none;
 
 				@container block-team-name ( min-width: 15px ) and ( width < 100px ) {

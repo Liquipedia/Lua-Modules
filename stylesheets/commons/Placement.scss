@@ -51,3 +51,4 @@ Author(s): spazer, Lafungo
 @include placement-color( "stay", var( --clr-sun-40 ), var( --clr-sun-30 ) );
 @include placement-color( "down", color-mix( in srgb, #ffffff 30%, var( --clr-semantic-negative-40 ) ), var( --clr-semantic-negative-30 ) );
 @include placement-color( "dnp", var( --clr-moon-80 ), color-mix( in srgb, #000000 20%, var( --clr-moon-80 ) ) );
+@include placement-color( "disqualified", var( --position-disqualified-color ), var( --position-disqualified-color ) );

@@ -31,13 +31,14 @@ jobs:
 
       - name: Setup Python
         if: steps.res-changed-files.outputs.any_changed == 'true' || steps.lua-changed-files.outputs.any_changed == 'true'
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.14'
+          cache: 'pip'
 
       - name: Install Python Dependency
         if: steps.res-changed-files.outputs.any_changed == 'true' || steps.lua-changed-files.outputs.any_changed == 'true'
-        run: pip install requests
+        run: pip install -r requirements.txt
 
       - name: Resource Deploy
         if: steps.res-changed-files.outputs.any_changed == 'true'

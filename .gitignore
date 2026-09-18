@@ -1,4 +1,5 @@
 /.idea/
+/.claude/settings.local.json
 /cookies
 /node_modules
 /lua/output

@@ -15,7 +15,7 @@ local PrizePoolLegacy = Lua.import('Module:PrizePool/Legacy')
 local CustomLegacyPrizePool = {}
 
 -- Template entry point
----@return Widget
+---@return VNode
 function CustomLegacyPrizePool.run()
 	return PrizePoolLegacy.run(CustomLegacyPrizePool)
 end

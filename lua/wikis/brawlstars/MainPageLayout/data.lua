@@ -134,7 +134,7 @@ return {
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[type::brawler]]',
+				conditions = '[[type::character]]',
 			},
 		},
 		{

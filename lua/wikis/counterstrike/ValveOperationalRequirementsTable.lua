@@ -93,7 +93,7 @@ local VRS_REGIONS = {
 ---@field ref string?
 
 ---@param frame Frame
----@return WidgetHtml
+---@return Renderable
 function ValveOperationalRequirementsTable.make(frame)
 	local args = Arguments.getArgs(frame)
 	local data = ValveOperationalRequirementsTable._getData(args)
@@ -181,7 +181,7 @@ end
 
 ---@private
 ---@param commit string|'latest'
----@return Widget
+---@return Renderable
 function ValveOperationalRequirementsTable._makeTorDisplay(commit)
 	if commit == 'latest' then
 		return Html.I{children = 'Latest Version'}
@@ -221,12 +221,13 @@ end
 
 ---@private
 ---@param filePrefix string
----@param date string?
+---@param date integer?
 ---@return string
 function ValveOperationalRequirementsTable._makeVrsLink(filePrefix, date)
 	if Logic.isEmpty(date) then
 		return VRS_GITHUB_URL_BASE
 	end
+	---@cast date -nil
 	local iso = DateExt.toYmdInUtc(date)
 	local dateParams = DateExt.parseIsoDate(iso) --[[@as osdateparam]]
 	return VRS_GITHUB_URL_BASE .. String.interpolate(VRS_GITHUB_URL_TEMPLATE, {
@@ -239,7 +240,7 @@ end
 
 ---@private
 ---@param link string?
----@return IconFontawesomeWidget?
+---@return Renderable?
 function ValveOperationalRequirementsTable._makeGitHubIcon(link)
 	if Logic.isEmpty(link) then return end
 	return Link{
@@ -251,7 +252,7 @@ end
 
 ---@private
 ---@param link string?
----@return IconFontawesomeWidget?
+---@return Renderable?
 function ValveOperationalRequirementsTable._makeRefIcon(link)
 	if Logic.isEmpty(link) then return nil end
 	return Link{
@@ -262,8 +263,8 @@ function ValveOperationalRequirementsTable._makeRefIcon(link)
 end
 
 ---@private
----@param rowData {title: string|Widget[], contents: string|Widget[]?, link: string?, linkType: 'ref'|'github'}
----@return Widget
+---@param rowData {title: Renderable, contents: Renderable|Renderable[]|nil, link: string?, linkType: 'ref'|'github'}
+---@return Renderable
 function ValveOperationalRequirementsTable._makeTableRow(rowData)
 	---@return Renderable?
 	local getLink = function()

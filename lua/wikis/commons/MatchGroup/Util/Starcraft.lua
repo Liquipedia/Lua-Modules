@@ -82,7 +82,7 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	if match.opponentMode == 'team' then
 		-- Compute submatches
 		match.submatches = Array.map(
-			MatchGroupUtil.groupBySubgroup(match),
+			match.submatches,
 			FnUtil.curry(StarcraftMatchGroupUtil.constructSubmatch, match)
 		)
 	end
@@ -162,7 +162,7 @@ end
 
 ---Constructs a submatch object whose properties are aggregated from that of its games.
 ---@param match StarcraftMatchGroupUtilMatch
----@param subgroup MatchGroupUtilSubgroup
+---@param subgroup StarcraftMatchGroupUtilSubmatch
 ---@return StarcraftMatchGroupUtilSubmatch
 function StarcraftMatchGroupUtil.constructSubmatch(match, subgroup)
 	local games = subgroup.games
@@ -221,7 +221,7 @@ end
 ---@return boolean
 function StarcraftMatchGroupUtil.matchHasDetails(match)
 	local linksWithoutH2H = Table.filterByKey(match.links, function(key)
-		return key ~= 'headtohead'
+		return key ~= 'headtohead' and key ~= 'headtohead_lh'
 	end)
 	return match.dateIsExact
 		or String.isNotEmpty(match.vod)
@@ -258,10 +258,9 @@ end
 ---@param opponentIndex integer
 ---@return StarcraftStandardOpponent
 function StarcraftMatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
-	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	local opponent = MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex) --[[
 	@as StarcraftStandardOpponent]]
-	opponent.isArchon = Logic.readBool(extradata.isarchon)
+	opponent.isArchon = Logic.readBool(opponent.extradata.isarchon)
 
 	return opponent
 end

@@ -41,6 +41,7 @@ local TOURNAMENT_PHASE = {
 ---@field game string?
 ---@field publisherTier string?
 ---@field type string?
+---@field mode string?
 
 ---@class StandardTournament: StandardTournamentPartial
 ---@field startDate {year: integer, month: integer?, day: integer?, timestamp: integer?}?
@@ -129,6 +130,7 @@ Tournament.partialTournamentFromContext = FnUtil.memoize(function ()
 		game = Variables.varDefault('tournament_game'),
 		publisherTier = Variables.varDefault('tournament_publishertier'),
 		type = Variables.varDefault('tournament_type'),
+		mode = Variables.varDefault('tournament_mode'),
 	}
 end)
 
@@ -150,6 +152,7 @@ function Tournament.partialTournamentFromMatch(match)
 		game = match.game,
 		publisherTier = match.publisherTier,
 		type = match.type,
+		mode = match.mode,
 	}
 end
 
@@ -157,8 +160,8 @@ end
 ---@return StandardTournament
 function Tournament.tournamentFromRecord(record)
 	local extradata = record.extradata or {}
-	local startDate = Tournament.parseDateRecord(Logic.nilOr(extradata.startdatetext, record.startdate))
-	local endDate = Tournament.parseDateRecord(Logic.nilOr(extradata.enddatetext, record.sortdate, record.enddate))
+	local startDate = DateExt.parseDateRecord(Logic.nilOr(extradata.startdatetext, record.startdate))
+	local endDate = DateExt.parseDateRecord(Logic.nilOr(extradata.enddatetext, record.sortdate, record.enddate))
 	local tier, tierType, tierOptions = Tier.parseFromQueryData(record)
 
 	local tournament = {
@@ -175,6 +178,7 @@ function Tournament.tournamentFromRecord(record)
 		locations = record.locations,
 		region = (record.locations or {}).region1,
 		type = record.type,
+		mode = record.mode,
 		status = record.status,
 		icon = record.icon,
 		iconDark = record.icondark,
@@ -214,35 +218,6 @@ function Tournament.calculatePhase(tournament)
 	return TOURNAMENT_PHASE.FINISHED
 end
 
----@class DateRecord
----@field year integer
----@field month integer?
----@field day integer?
----@field timestamp integer?
-
---- This function parses fuzzy dates into a structured format.
----@param dateRecord string? # date in the format of `YYYY-MM-DD`, with `-MM-DD` optional.
----@return DateRecord?
-function Tournament.parseDateRecord(dateRecord)
-	if not dateRecord then
-		return nil
-	end
-	if dateRecord == DateExt.defaultDate then
-		return nil
-	end
-	local year, month, day = dateRecord:match('^(%d%d%d%d)%-?(%d?%d?)%-?(%d?%d?)')
-	year, month, day = tonumber(year), tonumber(month), tonumber(day)
-
-	if not year then
-		return
-	end
-
-	local dt = {year = year, month = month or 12, day = day or 31, hour = 0}
-	local timestamp = os.time(dt)
-
-	return {year = year, month = month, day = day, timestamp = timestamp}
-end
-
 --- Determines if a tournament is featured.
 ---@param record StandardTournament
 ---@return boolean
@@ -259,7 +234,7 @@ function Tournament.isFeatured(record)
 	if Table.includes(curatedData.include, pagename) then
 		return true
 	end
-	if Table.includes({1, 2}, record.liquipediaTier) then
+	if Table.includes({1, 2}, Tier.toIdentifier(record.liquipediaTier)) then
 		return true
 	end
 

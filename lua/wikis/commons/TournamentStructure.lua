@@ -362,7 +362,6 @@ function TournamentStructure._mergeGroupEntriesIntoGroup(entries, group)
 		local finished = group.extradata.finished or group.extradata.groupfinished
 		local extradata = {
 			placeRange = entry.extradata.placerange,
-			placeRangeIsExact = entry.extradata.placerangeisexact,
 			showMatchDraws = (group.config or {}).hasdraws or group.extradata.hasdraw,
 			stageName = group.extradata.stagename,
 			slotIndex = tonumber(entry.extradata.slotindex),
@@ -374,16 +373,16 @@ function TournamentStructure._mergeGroupEntriesIntoGroup(entries, group)
 		}
 
 		table.insert(transformedGroup, Table.merge(group, {
-					opponent = opponent,
-					extradata = extradata,
-					scoreboard = entry.scoreboard,
-					currentstatus = entry.currentstatus,
-					matches = group.matches,
-					placement = TournamentStructure._groupPlacement(finished, entry.extradata.slotindex, entry.placement),
-					type = group.type,
-					hasDraw = group.extradata.hasdraw,
-					hasOvertime = group.extradata.hasovertime,
-				}))
+			opponent = opponent,
+			extradata = extradata,
+			scoreboard = entry.scoreboard,
+			currentstatus = entry.currentstatus,
+			matches = group.matches,
+			placement = TournamentStructure._groupPlacement(finished, entry.extradata.slotindex, entry.placement),
+			type = group.type,
+			hasDraw = group.extradata.hasdraw,
+			hasOvertime = group.extradata.hasovertime,
+		}))
 	end
 
 	return transformedGroup

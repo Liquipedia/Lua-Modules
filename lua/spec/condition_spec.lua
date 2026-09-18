@@ -21,6 +21,17 @@ describe('LPDB Condition Builder', function()
 			)
 		end)
 
+		it('test string column name', function ()
+			local conditionNode1 = ConditionNode(
+				'date', Comparator.lessThan, '2020-03-02T00:00:00.000'
+			)
+			assert.are_equal(
+				'[[date::<2020-03-02T00:00:00.000]]',
+				conditionNode1:toString(),
+				tostring(conditionNode1)
+			)
+		end)
+
 		it('test ge', function ()
 			local conditionNode2 = ConditionNode(
 				ColumnName('date'), Comparator.greaterThanOrEqualTo, '2020-03-02T00:00:00.000'
@@ -127,7 +138,8 @@ describe('LPDB Condition Builder', function()
 
 	describe('Condition utilities test', function ()
 		it('anyOf', function ()
-			local tierColumnName = ColumnName('liquipediatier')
+			local tierColumnName = 'liquipediatier'
+			local tierColumnNameObj = ColumnName(tierColumnName)
 
 			assert.is_nil(ConditionUtil.anyOf(tierColumnName, {}))
 
@@ -137,13 +149,28 @@ describe('LPDB Condition Builder', function()
 			)
 
 			assert.are_equal(
+				'[[liquipediatier::1]] OR [[liquipediatier::2]]',
+				tostring(ConditionUtil.anyOf(tierColumnNameObj, {1, 2}))
+			)
+
+			assert.are_equal(
 				'[[liquipediatier::1]] OR [[liquipediatier::2]] OR [[liquipediatier::3]]',
 				tostring(ConditionUtil.anyOf(tierColumnName, {1, 2, 3}))
 			)
 
 			assert.are_equal(
 				'[[liquipediatier::1]] OR [[liquipediatier::2]] OR [[liquipediatier::3]]',
+				tostring(ConditionUtil.anyOf(tierColumnNameObj, {1, 2, 3}))
+			)
+
+			assert.are_equal(
+				'[[liquipediatier::1]] OR [[liquipediatier::2]] OR [[liquipediatier::3]]',
 				tostring(ConditionUtil.anyOf(tierColumnName, {1, 2, 3, 2}))
+			)
+
+			assert.are_equal(
+				'[[liquipediatier::1]] OR [[liquipediatier::2]] OR [[liquipediatier::3]]',
+				tostring(ConditionUtil.anyOf(tierColumnNameObj, {1, 2, 3, 2}))
 			)
 		end)
 

@@ -30,7 +30,7 @@ local LIMIT_HISTORIC_ENTRIES = 24 -- How many historic entries are fetched
 
 --- Entry point for the ratings display in graph display mode
 ---@param frame Frame
----@return string
+---@return Renderable
 function RatingsDisplay.graph(frame)
 	local Display = Lua.import('Module:Ratings/Display/Graph')
 	return RatingsDisplay.make(frame, Display)
@@ -38,7 +38,7 @@ end
 
 --- Entry point for the ratings display in table list display mode
 ---@param frame Frame
----@return string
+---@return Renderable
 function RatingsDisplay.list(frame)
 	local Display = Lua.import('Module:Ratings/Display/List')
 	return RatingsDisplay.make(frame, Display)
@@ -46,7 +46,7 @@ end
 
 ---@param frame Frame
 ---@param displayClass RatingsDisplayInterface
----@return string
+---@return Renderable
 function RatingsDisplay.make(frame, displayClass)
 	local args = Arguments.getArgs(frame)
 

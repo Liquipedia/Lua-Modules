@@ -57,10 +57,10 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			INDENT .. '|date=',
 			INDENT .. '|twitch='
 		} or nil,
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
-		Array.map(Array.range(1, bestof), function (mapIndex)
+		Array.mapRange(1, bestof, function (mapIndex)
 			return INDENT .. '|map' .. mapIndex .. '=' .. WikiCopyPaste._getMap(opponents, args.pickBan, args.mapBestof)
 		end),
 		'}}'
@@ -96,8 +96,8 @@ end
 function WikiCopyPaste._pickBanParams(key, numberOfOpponents)
 	local shortKey = PARAM_TO_SHORT[key]
 	local limit = LIMIT_OF_PARAM[key]
-	local display = Array.map(Array.range(1, numberOfOpponents), function (opponentIndex)
-		return INDENT .. INDENT .. table.concat(Array.map(Array.range(1, limit), function (keyIndex)
+	local display = Array.mapRange(1, numberOfOpponents, function (opponentIndex)
+		return INDENT .. INDENT .. table.concat(Array.mapRange(1, limit, function (keyIndex)
 			return '|t' .. opponentIndex .. shortKey .. keyIndex .. '='
 		end))
 	end)
