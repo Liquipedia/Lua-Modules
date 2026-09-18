@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent')
 local Table = Lua.import('Module:Table')
-local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Types = Lua.import('Module:Features/SeriesMedalStatistics/Types')
 
 local THIRD = Types.optionalPlacementColumns.THIRD
@@ -19,11 +18,12 @@ local SEMIFINALIST = Types.optionalPlacementColumns.SEMIFINALIST
 
 local Processor = {}
 
+---@param getTeamIdentifier fun(placement:placement): string?
 ---@param config SeriesMedalStatsConfig
 ---@param data SeriesMedalStatsData
----@param placement any
-function Processor.run(config, data, placement)
-	local getIdentifier = Processor._getIdentifierByStatsType(config.statsType, data.opponents, data.teams)
+---@param placement placement
+function Processor.run(getTeamIdentifier, config, data, placement)
+	local getIdentifier = Processor._getIdentifierByStatsType(config.statsType, data.opponents, getTeamIdentifier)
 	local identifier = getIdentifier(placement)
 	if Logic.isEmpty(identifier) then return end
 	---@cast identifier -nil
@@ -41,23 +41,9 @@ end
 
 ---@param statsType string
 ---@param opponents table<string, standardOpponent>
----@param teams table<string, string>
+---@param getTeamIdentifier fun(teamTemplate: string):string?
 ---@return fun(placement:placement): string?
-function Processor._getIdentifierByStatsType(statsType, opponents, teams)
-	---@param teamTemplate string
-	---@return string?
-	local resolveTeamToIdentifier = function(teamTemplate)
-		local rawData = TeamTemplate.getRawOrNil(teamTemplate)
-
-		if not rawData or not rawData.page then return end
-
-		local identifier = mw.ext.TeamLiquidIntegration.resolve_redirect(rawData.page):lower()
-
-		teams[teamTemplate] = identifier
-
-		return identifier
-	end
-
+function Processor._getIdentifierByStatsType(statsType, opponents, getTeamIdentifier)
 	if statsType == Types.statsTypes.FACTION then
 		return function(placement)
 			return (placement.opponentplayers or {}).p1faction
@@ -87,7 +73,8 @@ function Processor._getIdentifierByStatsType(statsType, opponents, teams)
 
 			teamTemplate = teamTemplate:lower():gsub('_', ' ')
 
-			local identifier = teams[teamTemplate] or resolveTeamToIdentifier(teamTemplate)
+			local identifier = getTeamIdentifier(teamTemplate)
+			if not identifier then return end
 			opponents[identifier] = Opponent.fromLpdbStruct(placement)
 
 			if Opponent.isTbd(opponents[identifier]) then return end
@@ -104,7 +91,7 @@ function Processor._getIdentifierByStatsType(statsType, opponents, teams)
 
 			teamTemplate = teamTemplate:lower():gsub('_', ' ')
 
-			return teams[teamTemplate] or resolveTeamToIdentifier(teamTemplate)
+			return getTeamIdentifier(teamTemplate)
 		end
 	end
 	-- this case can not happen

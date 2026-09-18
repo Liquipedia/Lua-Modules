@@ -14,6 +14,7 @@ local Logic = Lua.import('Module:Logic')
 
 local Api = Lua.import('Module:Features/SeriesMedalStatistics/Api/FetchPlacements')
 local Footer = Lua.import('Module:Features/SeriesMedalStatistics/Components/Footer')
+local GetTeamIdentifier = Lua.import('Module:Features/SeriesMedalStatistics/GetTeamIdentifier')
 local Parser = Lua.import('Module:Features/SeriesMedalStatistics/Lib/Parse')
 local Processor = Lua.import('Module:Features/SeriesMedalStatistics/Lib/Process')
 local RowFirstCell = Lua.import('Module:Features/SeriesMedalStatistics/Components/RowFirstCell')
@@ -47,10 +48,12 @@ function SeriesMedalStatistics.execute(args)
 	---@type SeriesMedalStatsData
 	local data = {
 		opponents = {},
-		teams = {},
 		medalsData = {},
 	}
-	Array.forEach(placements, FnUtil.curry(FnUtil.curry(Processor.run, config), data))
+	local teams = {}
+	local getTeamIdentifier = FnUtil.curry(GetTeamIdentifier.run, teams)
+	local process = FnUtil.curry(FnUtil.curry(FnUtil.curry(Processor.run, getTeamIdentifier), config), data)
+	Array.forEach(placements, process)
 
 	return MedalsTable{
 		medalsTableType = config.medalsTableType,
