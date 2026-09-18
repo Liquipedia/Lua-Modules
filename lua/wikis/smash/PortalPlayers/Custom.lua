@@ -138,7 +138,7 @@ end
 
 ---Builds the main character display
 ---@param player table
----@return VNode?
+---@return VNode[]?
 function CustomPortalPlayers._getMainCharIcons(player)
 	if String.isEmpty(player.extradata.maingame) then
 		return
