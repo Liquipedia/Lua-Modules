@@ -10,27 +10,60 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
-local Config = Lua.import('Module:NotabilityChecker/config')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local ResultsTable = Lua.import('Module:ResultsTable/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Custom')
+
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
+local Html = Lua.import('Module:Widget/Html')
+local Link = Lua.import('Module:Widget/Basic/Link')
+
+---@class NotabilityCheckerConfig
+---@field MAX_NUMBER_OF_PARTICIPANTS integer?
+---@field MAX_NUMBER_OF_COACHES integer
+---@field NOTABILITY_THRESHOLD_MIN number
+---@field NOTABILITY_THRESHOLD_NOTABLE number
+---@field PLACEMENT_LIMIT integer
+---@field PLACEMENT_QUERY string?
+---@field TIER_TYPE_GENERAL string
+---@field TIER_TYPE_QUALIFIER string
+---@field TIER_TYPE_WEEKLY string
+---@field TIER_TYPE_MONTHLY string
+---@field TIER_TYPE_MISC string
+---@field TIER_TYPE_SHOWMATCH string
+---@field adjustScoreForMode fun(score: number, mode: string): number
+---@field placementDropOffFunction fun(tier: string|integer, tierType: string): NotabilityCheckerDropOffFunction
+---@field weights NotabilityCheckerWeight[]
+
+---@alias NotabilityCheckerDropOffFunction fun(score: number, placement: number): number
+
+---@class NotabilityCheckerWeight
+---@field tier integer
+---@field options {dataLossIgnored: boolean?}
+---@field tiertype {name: string, points: number}[]
+
+---@type NotabilityCheckerConfig
+local Config = Lua.import('Module:NotabilityChecker/config')
 
 local NotabilityChecker = {}
 
-local LANG = mw.getContentLanguage()
-local NOW = os.time()
+local NOW = DateExt.getCurrentTimestamp()
 local SECONDS_IN_YEAR = DateExt.daysToSeconds(365.2425)
 local MAX_NUMBER_OF_PARTICIPANTS = Config.MAX_NUMBER_OF_PARTICIPANTS or Info.config.defaultMaxPlayersPerPlacement or 10
 
 NotabilityChecker.LOGGING = true
 
 ---@param args table
----@return string
+---@return VNode
 function NotabilityChecker.run(args)
 
 	local weight = 0
-	local output = ''
+	local output = {}
 	local isTeamResult = args.team ~= nil
 
 	if args.player1 then
@@ -46,33 +79,57 @@ function NotabilityChecker.run(args)
 		weight, output = NotabilityChecker._runForTeam(args.team)
 	end
 
-	output = output .. '===Summary===\n'
-		.. '<b>Final weight:</b> ' .. tostring(weight) .. '\n\n'
-		.. 'This means this ' .. (isTeamResult and 'team' or 'person')
+	Array.appendWith(
+		output,
+		Html.H3{children = 'Summary'},
+		Html.B{children = 'Final weight:'},
+		' ',
+		tostring(weight),
+		'\n\n',
+		'This means this ',
+		(isTeamResult and 'team' or 'person'),
+		' is '
+	)
 
 	if weight >= Config.NOTABILITY_THRESHOLD_NOTABLE then
-		output = output .. ' is <b>NOTABLE</b>\n'
+		table.insert(output, Html.B{children = 'NOTABLE'})
 	elseif weight >= Config.NOTABILITY_THRESHOLD_MIN then
-		output = output .. ' is <b>OPEN FOR DISCUSSION</b>\n'
+		table.insert(output, Html.B{children = 'OPEN FOR DISCUSSION'})
 	else
-		output = output .. ' is <b>NOT NOTABLE</b>\n'
+		table.insert(output, Html.B{children = 'NOT NOTABLE'})
 	end
 
-	return output
+	return Html.Fragment{children = output}
 end
 
 ---@private
 ---@param team string
 ---@return integer
----@return string
+---@return Renderable[]
 function NotabilityChecker._runForTeam(team)
 	team = mw.ext.TeamLiquidIntegration.resolve_redirect(team)
 	local weight = NotabilityChecker._calculateTeamNotability(team)
 
-	local output = ''
-	output = output .. '===Team Results===\n'
-	output = output .. mw.getCurrentFrame():expandTemplate{ title = 'NotabilityTeamMatchesTable', args = {title = team} }
-	output = output .. '<b>Weight:</b> ' .. tonumber(weight) .. '\n\n'
+	local output = {
+		Html.H3{children = 'Team Results'},
+		GeneralCollapsible{
+			title = {
+				'Tournaments found featuring ',
+				team,
+			},
+			children = ResultsTable.results{
+				awards = false,
+				achievements = false,
+				playerResultsOfTeam = false,
+				querytype = Opponent.team,
+				team = team,
+			}
+		},
+		'\n',
+		Html.B{children = 'Weight:'},
+		' ',
+		tonumber(weight)
+	}
 
 	return weight, output
 end
@@ -81,26 +138,58 @@ end
 ---@param team string
 ---@param people string[]
 ---@return number
----@return string
+---@return Renderable[]
 function NotabilityChecker._calculateRosterNotability(team, people)
 	local weight = 0
-	local output = ''
+	---@type Renderable[]
+	local output = {}
 	if team then
 		local teamWeight
 		teamWeight, output = NotabilityChecker._runForTeam(team)
 		weight = weight + teamWeight
 	end
 
-	output = output .. '===People Results===\n'
+	table.insert(output, Html.H3{children = 'People Results'})
 
 	local average = 0
 	for _, person in pairs(people) do
 		local personWeight = NotabilityChecker._calculatePersonNotability(person)
-		output = output .. mw.getCurrentFrame():expandTemplate{
-			title = 'NotabilityPlayerMatchesTable', args = {title = person}}
-		output = output .. '*<b>Person:</b> [[' .. person .. ']] <b>Weight:</b> ' ..
-			tonumber(personWeight) .. '\n\n'
-			average = average + tonumber(personWeight or 0)
+		Array.appendWith(
+			output,
+			GeneralCollapsible{
+				title = {
+					'Tournaments found featuring ',
+					person,
+				},
+				children = {
+					ResultsTable.results{
+						awards = false,
+						achievements = false,
+						playerResultsOfTeam = false,
+						playerLimit = MAX_NUMBER_OF_PARTICIPANTS,
+						querytype = Opponent.solo,
+						player = person,
+					},
+					ResultsTable.results{
+						awards = false,
+						achievements = false,
+						playerResultsOfTeam = false,
+						querytype = 'coach',
+						coachLimit = Config.MAX_NUMBER_OF_COACHES,
+						coach = person,
+					},
+				},
+			},
+			Html.B{children = 'Person:'},
+			' ',
+			Link{link = person},
+			' ',
+			Html.B{children = 'Weight:'},
+			' ',
+			tonumber(personWeight),
+			'\n\n'
+		)
+		average = average + tonumber(personWeight or 0)
 	end
 
 	average = average / Table.size(people)
@@ -157,34 +246,28 @@ function NotabilityChecker._calculateWeight(placementData)
 		return 0
 	end
 
-	local weights = {}
-
-	for _, placement in pairs(placementData) do
-		if not Logic.isEmpty(placement.placement) then
-			if NotabilityChecker.LOGGING then
-				mw.log('Tournament: ' .. placement.tournament)
-			end
-
-			local weight = NotabilityChecker.calculateTournament(
-				placement.liquipediatier, placement.liquipediatiertype, placement.placement,
-				placement.date, placement.extradata.notabilitymod, placement.mode
-			)
-			table.insert(weights, weight)
+	local weights = Array.map(placementData, function (placement)
+		if Logic.isEmpty(placement.placement) then
+			return nil
 		end
-	end
+		if NotabilityChecker.LOGGING then
+			mw.log('Tournament: ' .. placement.tournament)
+		end
 
-	local finalWeight = 0
-	for _, weight in pairs(weights) do
-		finalWeight = finalWeight + weight
-	end
+		return NotabilityChecker.calculateTournament(
+			placement.liquipediatier, placement.liquipediatiertype, placement.placement,
+			placement.date, placement.extradata.notabilitymod, placement.mode
+		)
+	end)
 
-	return finalWeight
+	return MathUtil.sum(weights)
 end
 
 function NotabilityChecker.calculateTournament(tier, tierType, placement, date, notabilityMod, mode)
 	local dateLossModifier = NotabilityChecker._calculateDateLoss(date)
 	local notabilityModifier = NotabilityChecker._parseNotabilityMod(notabilityMod)
-	local parsedTier, parsedTierType = NotabilityChecker._parseTier(tier, tierType)
+	local parsedTier = Tier.toIdentifier(tier)
+	local parsedTierType = Tier.toIdentifier(tierType)
 
 	local weight = NotabilityChecker._calculateWeightForTournament(
 		parsedTier, parsedTierType, placement, dateLossModifier, notabilityModifier, mode
@@ -267,14 +350,6 @@ function NotabilityChecker._preparePlacement(placement)
 	return placement
 end
 
-function NotabilityChecker._parseTier(tier, tierType)
-	if String.isEmpty(tierType) then
-		return tonumber(tier), nil
-	end
-
-	return tonumber(tier), tierType:lower()
-end
-
 function NotabilityChecker._parseNotabilityMod(notabilityMod)
 	if Logic.isEmpty(notabilityMod) or notabilityMod == 0 then
 		return 1
@@ -284,7 +359,7 @@ function NotabilityChecker._parseNotabilityMod(notabilityMod)
 end
 
 function NotabilityChecker._calculateDateLoss(date)
-	local timestamp = LANG:formatDate('U', date)
+	local timestamp = DateExt.readTimestamp(date)
 	local differenceSeconds = NOW - timestamp
 
 	-- If given received a date in the future, set the modifier from date to 1
