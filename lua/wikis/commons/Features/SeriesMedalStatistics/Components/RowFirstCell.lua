@@ -15,33 +15,24 @@ local Types = Lua.import('Module:Features/SeriesMedalStatistics/Types')
 
 local Component = Lua.import('Module:Widget/Component')
 
----@param props {statsType: string, opponents: standardOpponent[]}
----@return fun(key: string): Renderable
+---@param props {statsType: string, opponents: standardOpponent[], identifier: string}
+---@return Renderable
 local render = function(props)
 	local opponents = props.opponents
 	local statsType = props.statsType
+	local identifier = props.identifier
 
 	if statsType == Types.statsTypes.FACTION then
-		return function(faction)
-			---@cast faction string?
-			return Faction.Icon{faction = faction, showLink = false} .. ' ' .. Faction.toName(faction)
-		end
+		return Faction.Icon{faction = identifier, showLink = false} .. ' ' .. Faction.toName(identifier)
 	elseif statsType == Types.statsTypes.FLAG then
-		return function(flag)
-			---@cast flag string?
-			return Flags.Icon{flag = flag, shouldLink = false} .. ' ' .. Flags.CountryName{flag = flag}
-		end
+		return Flags.Icon{flag = identifier, shouldLink = false} .. ' ' .. Flags.CountryName{flag = identifier}
 	elseif statsType == Types.statsTypes.PARTICIPANT then
-		return function(identifier)
-			return OpponentDisplay.BlockOpponent{opponent = opponents[identifier]}
-		end
+		return OpponentDisplay.BlockOpponent{opponent = opponents[identifier]}
 	elseif statsType == Types.statsTypes.PARTICIPANT_TEAM then
-		return function(identifier)
-			return OpponentDisplay.BlockOpponent{opponent = Opponent.readOpponentArgs{
-				type = Opponent.team,
-				template = identifier,
-			}}
-		end
+		return OpponentDisplay.BlockOpponent{opponent = Opponent.readOpponentArgs{
+			type = Opponent.team,
+			template = identifier,
+		}}
 	end
 	-- this case can not happen
 	error('Invalid statsType')

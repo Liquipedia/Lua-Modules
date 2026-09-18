@@ -55,11 +55,17 @@ function SeriesMedalStatistics.execute(args)
 	local process = FnUtil.curry(FnUtil.curry(FnUtil.curry(Processor.run, getTeamIdentifier), config), data)
 	Array.forEach(placements, process)
 
+	---@param identifier string
+	---@return VNode
+	local renderRowFirstCell = function(identifier)
+		return RowFirstCell{statsType = config.statsType, opponents = data.opponents, identifier = identifier}
+	end
+
 	return MedalsTable{
 		medalsTableType = config.medalsTableType,
 		dataColumns = config.columns,
 		data = data.medalsData,
-		renderRowFirstCell = RowFirstCell{statsType = config.statsType, opponents = data.opponents},
+		renderRowFirstCell = renderRowFirstCell,
 		rowSort = Sort.rowSort,
 		hideTotalRow = true,
 		cutAfter = config.cutAfter,
