@@ -59,16 +59,16 @@ matchlist id form lives alongside the bracket ones.
 ---@field qualifiedHeader string?
 
 ---@class MatchGroupUtilMatchCoordinates
----@field depth number
----@field depthCount number
----@field matchIndexInRound number
----@field rootIndex number
----@field roundCount number
----@field roundIndex number
----@field sectionCount number
----@field sectionIndex number
----@field semanticDepth number
----@field semanticRoundIndex number
+---@field depth integer
+---@field depthCount integer
+---@field matchIndexInRound integer
+---@field rootIndex integer
+---@field roundCount integer
+---@field roundIndex integer
+---@field sectionCount integer
+---@field sectionIndex integer
+---@field semanticDepth integer
+---@field semanticRoundIndex integer
 
 ---@class MatchGroupUtilMatchlistBracketData
 ---@field header string?
@@ -173,10 +173,10 @@ end
 ---@return string[]
 function BracketUtil.computeLowerMatchIdsFromLegacy(data)
 	local lowerMatchIds = {}
-	if nilIfEmpty(data.toupper) then
+	if String.isNotEmpty(data.toupper) then
 		table.insert(lowerMatchIds, data.toupper)
 	end
-	if nilIfEmpty(data.tolower) then
+	if String.isNotEmpty(data.tolower) then
 		table.insert(lowerMatchIds, data.tolower)
 	end
 	return lowerMatchIds

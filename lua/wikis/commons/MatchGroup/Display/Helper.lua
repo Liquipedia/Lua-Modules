@@ -434,9 +434,7 @@ function DisplayHelper.mergeBracketResetMatch(match, bracketResetMatch)
 		})
 	end
 
-	for _, game in ipairs(bracketResetMatch.games) do
-		table.insert(mergedMatch.games, game)
-	end
+	Array.extendWith(mergedMatch.games, bracketResetMatch.games)
 
 	return mergedMatch
 end

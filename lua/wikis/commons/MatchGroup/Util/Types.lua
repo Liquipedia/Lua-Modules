@@ -52,16 +52,16 @@ Types.BracketBracketData = TypeUtil.struct({
 })
 
 Types.MatchCoordinates = TypeUtil.struct({
-	depth = 'number',
-	depthCount = 'number',
-	matchIndexInRound = 'number',
-	rootIndex = 'number',
-	roundCount = 'number',
-	roundIndex = 'number',
-	sectionCount = 'number',
-	sectionIndex = 'number',
-	semanticDepth = 'number',
-	semanticRoundIndex = 'number',
+	depth = 'integer',
+	depthCount = 'integer',
+	matchIndexInRound = 'integer',
+	rootIndex = 'integer',
+	roundCount = 'integer',
+	roundIndex = 'integer',
+	sectionCount = 'integer',
+	sectionIndex = 'integer',
+	semanticDepth = 'integer',
+	semanticRoundIndex = 'integer',
 })
 
 Types.MatchlistBracketData = TypeUtil.struct({

@@ -17,6 +17,7 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
+local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
@@ -67,6 +68,7 @@ local prizePoolVars = PageVariableNamespace('PrizePool')
 ---@field inputIndex integer?
 ---@field isResolved boolean?
 ---@field sortName string
+---@field seed integer?
 
 ---@class ParticipantTable: BaseClass
 ---@operator call(Frame): ParticipantTable
@@ -74,6 +76,7 @@ local prizePoolVars = PageVariableNamespace('PrizePool')
 ---@field config ParticipantTableConfig
 ---@field display Html?
 ---@field sections ParticipantTableSection[]
+---@field hasSeeds boolean
 local ParticipantTable = Class.new(
 	function(self, frame)
 		self.args = Arguments.getArgs(frame)
@@ -142,17 +145,28 @@ function ParticipantTable:fetchSectionsArgs()
 
 	pageVars:set('stashArgs', '1')
 
+	local sectionsArgs = Array.mapIndexes(function (index)
+		local parsed = Json.parseIfString(args[index])
+		if type(parsed) == 'table' and parsed.type == 'section' then
+			return parsed
+		end
+	end)
+
+	if Logic.isNotEmpty(sectionsArgs) then
+		return sectionsArgs
+	end
+
 	-- make sure that all sections stashArgs
 	for _, potentialSection in pairs(args) do
 		ParticipantTable._stashArgs(potentialSection)
 	end
 
 	-- retrieve sectionsArgs
-	local sectionsArgs = Template.retrieveReturnValues('ParticipantTable')
+	sectionsArgs = Template.retrieveReturnValues('ParticipantTable')
 	pageVars:delete('stashArgs')
 
 	--case no sections: use whole table as first section
-	if Table.isEmpty(sectionsArgs) then
+	if Logic.isEmpty(sectionsArgs) then
 		return {args}
 	end
 
@@ -247,9 +261,15 @@ function ParticipantTable:readEntry(sectionArgs, key, index, config)
 		team = valueFromArgs('team'),
 		dq = valueFromArgs('dq'),
 		note = valueFromArgs('note'),
+		seed = valueFromArgs('seed'),
 	}
 
 	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
+
+	opponentArgs.seed = tonumber(opponentArgs.seed)
+	if opponentArgs.seed then
+		self.hasSeeds = true
+	end
 
 	local opponent = Opponent.readOpponentArgs(opponentArgs)
 
@@ -266,6 +286,7 @@ function ParticipantTable:readEntry(sectionArgs, key, index, config)
 		note = opponentArgs.note,
 		opponent = opponent,
 		inputIndex = index,
+		seed = opponentArgs.seed,
 	}
 end
 
@@ -374,16 +395,92 @@ function ParticipantTable:create()
 
 	if not config.display then return end
 
-	self.display = mw.html.create('div')
-		:addClass('participantTable')
-		:css('width', config.width)
-		:node(config.showTitle and
-			mw.html.create('div'):addClass('participantTable-title'):wikitext(config.title or 'Participants')
-			or nil)
+	self.display = self:_createBaseDisplayDiv()
 
 	Array.forEach(self.sections, function(section) self:displaySection(section) end)
 
-	return self.display
+	if not self.hasSeeds then
+		return self.display
+	end
+
+	return mw.html.create('div')
+		:addClass('table-responsive toggle-area toggle-area-1')
+		:attr('data-toggle-area', 1)
+		:node(self.display)
+		:node(self:_createSeedList())
+end
+
+---@return Html?
+function ParticipantTable:_createBaseDisplayDiv()
+	local titleText = self.config.title or 'Participants'
+
+	if not self.hasSeeds then
+		return mw.html.create('div')
+			:addClass('participantTable')
+			:css('width', self.config.width)
+			:node(self.config.showTitle and
+				mw.html.create('div'):addClass('participantTable-title'):wikitext(titleText)
+				or nil
+			)
+	end
+
+	return ParticipantTable:_createTitleWithToogleButton(titleText, 'Seeding', 1, 2, self.config.width)
+end
+
+---@param titleText string
+---@param buttonText string
+---@param togglearea integer
+---@param buttonArea integer
+---@param width string
+---@return Html
+function ParticipantTable:_createTitleWithToogleButton(titleText, buttonText, togglearea, buttonArea, width)
+	local title = mw.html.create('div')
+			:addClass('participantTable')
+			:attr('data-toggle-area-content', togglearea)
+			:css('max-width', '100%!important')
+			:css('width', width)
+			:css('vertical-align', 'middle')
+			:tag('span')
+				:addClass('toggle-area-button button button--small button--primary')
+				:attr('data-toggle-area-btn', buttonArea)
+				:css('position', 'absolute')
+				:wikitext(buttonText)
+
+	return title:done()
+			:tag('div')
+				:addClass('participantTable-title')
+				:wikitext(titleText)
+				:done()
+end
+
+---@return Html
+function ParticipantTable:_createSeedList()
+	local width = tostring(50 + (self.config.showTeams and 242 or 186)) .. 'px'
+	local display = self:_createTitleWithToogleButton('Seeding', self.config.title or 'Participants', 2, 1, width)
+
+	local wrapper = mw.html.create('div')
+		:addClass('participantTable-seeding')
+
+	local entries = Array.sortBy(
+		Array.filter(Array.flatMap(self.sections, function(section)
+			return section.entries
+		end), Logic.isNotEmpty),
+		Operator.property('seed'),
+		function (a, b)
+			return a and b and a < b or false
+		end
+	)
+
+	Array.forEach(entries, function (entry)
+		wrapper
+			:tag('div')
+				:addClass('participantTable-seed')
+				:wikitext(entry.seed)
+				:done()
+			:node(self:displayEntry(entry, {oneLine = true}))
+	end)
+
+	return display:node(wrapper)
 end
 
 ---@return Html
@@ -407,7 +504,7 @@ function ParticipantTable:displaySection(section)
 	local sectionNode = ParticipantTable.newSectionNode()
 
 	Array.forEach(entries, function(entry, entryIndex)
-		sectionNode:node(self:displayEntry(entry, nil, true))
+		sectionNode:node(self:displayEntry(entry, {oneLine = true}, true))
 	end)
 
 	local tbdsAdded = 0
