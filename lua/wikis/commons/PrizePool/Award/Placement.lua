@@ -95,6 +95,13 @@ function AwardPlacement:_getLpdbData(...)
 									and Opponent.toName{template = players.p1team, type = 'team', extradata = {}}
 									or nil,
 				references = (#self.opponents > 1 and self.references ~= nil)
+					--[[
+					Directly inserting self.references to extradata fails with circular reference error from PHP
+					when there are more than 1 opponents in this award placement. To work around this issue,
+					we have to deep copy self.references.
+
+					See https://github.com/Liquipedia/Lua-Modules/pull/8110.
+					]]
 					and Table.deepCopy(self.references)
 					or self.references,
 			},
