@@ -1267,7 +1267,7 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 
 		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
 
-		map.subgroup = tonumber(map.subgroup) or nextSubGroup
+		map.subgroup = tonumber(map.set) or tonumber(map.subgroup) or nextSubGroup
 		nextSubGroup = map.subgroup + 1
 
 		if Parser.getMapName then
@@ -1751,11 +1751,20 @@ end
 ---@param prefix string?
 ---@return table<string, string>
 function MatchGroupInputUtil.readSetHeaders(args, prefix)
-	prefix = prefix or 'set'
-	local setHeaders = Table.filterByKey(args, function(key) return key:match(prefix .. '%d+header') end)
+	-- Temporary during migration from custom input to default 'set' prefix, hence code duplicate
+	if prefix then
+		local setHeaders = Table.filterByKey(args, function(key) return key:match(prefix .. '%d+header') end)
+		if Logic.isNotEmpty(setHeaders) then
+			return Table.map(setHeaders, function(key, value)
+				return 'subgroup' .. (key:sub(#prefix + 1)), value
+			end)
+		end
+	end
 
+	local defaultPrefix = 'set'
+	local setHeaders = Table.filterByKey(args, function(key) return key:match(defaultPrefix .. '%d+header') end)
 	return Table.map(setHeaders, function(key, value)
-		return 'subgroup' .. (key:sub(#prefix + 1)), value
+		return 'subgroup' .. (key:sub(#defaultPrefix + 1)), value
 	end)
 end
 
