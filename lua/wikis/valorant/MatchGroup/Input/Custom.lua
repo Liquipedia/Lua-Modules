@@ -15,7 +15,6 @@ local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local CustomMatchGroupInput = {}
 
@@ -79,7 +78,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	if not options.isMatchPage then
 		-- See if this match has a standalone match (match page), if so use the data from there
-		local standaloneMatchId = MatchGroupUtil.getStandaloneId(match.bracketid, match.matchid)
+		local standaloneMatchId = MatchGroupInputUtil.getStandaloneId(match.bracketid, match.matchid)
 		local standaloneMatch = standaloneMatchId and MatchGroupInputUtil.fetchStandaloneMatch(standaloneMatchId) or nil
 		if standaloneMatch then
 			return MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
