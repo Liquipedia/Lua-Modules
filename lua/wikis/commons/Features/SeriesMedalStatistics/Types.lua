@@ -54,7 +54,7 @@ SeriesMedalStatisticsTypes.medalsTableTypes = {
 	PARTICIPANT_TEAM = 'Team',
 }
 
----@alias SeriesMedalStatsData {opponents: table<string, standardOpponent>, teams: table<string, string>,
+---@alias SeriesMedalStatsData {opponents: table<string, standardOpponent>,
 ---medalsData: table<string, SeriesMedalStatsDataSet>}
 
 return SeriesMedalStatisticsTypes
