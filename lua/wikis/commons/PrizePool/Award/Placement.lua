@@ -94,7 +94,7 @@ function AwardPlacement:_getLpdbData(...)
 				participantteam = (opponentType == Opponent.solo and players.p1team)
 									and Opponent.toName{template = players.p1team, type = 'team', extradata = {}}
 									or nil,
-				references = self.references,
+				references = self.references and Table.deepCopy(self.references) or nil,
 			},
 			-- TODO: We need to create additional LPDB Field for Points struct (json?)
 
