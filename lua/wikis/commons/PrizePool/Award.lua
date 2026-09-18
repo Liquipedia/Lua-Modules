@@ -66,7 +66,7 @@ function AwardPrizePool:placeOrAwardCell(placement)
 			Array.map(references, function (reference)
 				return ReferenceTag{
 					frame = frame,
-					name = Table.extract(reference, 'name'),
+					name = reference.name,
 					children = Template.safeExpand(frame, 'Cite web', reference)
 				}
 			end)
