@@ -7,12 +7,9 @@
 
 local Lua = require('Module:Lua')
 
-local Json = Lua.import('Module:Json')
-local Logic = Lua.import('Module:Logic')
 local MatchTable = Lua.import('Module:MatchTable/Custom')
 local Page = Lua.import('Module:Page')
 local Tabs = Lua.import('Module:Tabs')
-local Variables = Lua.import('Module:Variables')
 
 local ResultsTable = Lua.import('Module:ResultsTable/Custom')
 local BroadcasterTable = Lua.import('Module:BroadcastTalentTable')
