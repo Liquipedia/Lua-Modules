@@ -183,7 +183,6 @@ function LegacyTeamCard.parseQualifier(rawQualifier)
 	end
 end
 
--- Port of Module:TeamCard/Qualifier (and Module:TeamCard/Storage._parseQualifier).
 ---@private
 ---@param rawQualifier string
 ---@return string?, string?, string? # (linkText, internalLink, externalLink)
