@@ -30,8 +30,8 @@ local Variables = Lua.import('Module:Variables')
 local Import = Lua.import('Module:ParticipantTable/Import')
 
 local Html = Lua.import('Module:Widget/Html')
-local Entry = Lua.import('Module:Widget/Participants/Table/Entry')
-local SectionTitle = Lua.import('Module:Widget/Participants/Table/SectionTitle')
+local Entry = Lua.import('Module:Features/ParticipantTable/Components/Entry')
+local SectionTitle = Lua.import('Module:Features/ParticipantTable/Components/SectionTitle')
 
 local pageVars = PageVariableNamespace('ParticipantTable')
 local prizePoolVars = PageVariableNamespace('PrizePool')
