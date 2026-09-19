@@ -491,9 +491,10 @@ end
 
 ---@return Html
 function ParticipantTable:tbd()
-	return mw.html.create('div')
-		:addClass('participantTable-tbd')
-		:wikitext('To be determined')
+	return Html.Div{
+		classes = {'participantTable-tbd'},
+		children = 'To be determined',
+	}
 end
 
 ---@return VNode

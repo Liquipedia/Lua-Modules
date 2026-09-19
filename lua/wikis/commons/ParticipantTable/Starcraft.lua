@@ -17,6 +17,9 @@ local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
+local FactionHeader = Lua.import('Module:Features/ParticipantTable/Components/FactionHeader')
+local FactionSection = Lua.import('Module:Features/ParticipantTable/Components/FactionSection')
+
 ---@class StarcraftParticipantTable: ParticipantTable
 ---@operator call(Frame): StarcraftParticipantTable
 ---@field config StarcraftParticipantTableConfig
@@ -172,7 +175,11 @@ function StarcraftParticipantTable:createSoloFactionTable()
 		:addClass('participantTable participantTable-faction')
 		:css('grid-template-columns', 'repeat(' .. colSpan .. ', 1fr)')
 		:css('width', (colSpan * config.soloColumnWidth) .. 'px')
-		:node(self:_displayHeader(factionColumns, factionNumbers))
+		:node(FactionHeader{
+			config = config,
+			factionColumns = factionColumns,
+			factionNumbers = factionNumbers,
+		})
 
 	Array.forEach(self.sections, function(section) self:_displaySoloFactionTableSection(section, factionColumns) end)
 
@@ -209,63 +216,17 @@ function StarcraftParticipantTable:_getFactionNumbers()
 	return factionNumbers
 end
 
----@param factionColumns table
----@param factionNumbers table
----@return Html
-function StarcraftParticipantTable:_displayHeader(factionColumns, factionNumbers)
-	local config = self.config
-	local header = mw.html.create('div'):addClass('participantTable-row')
-
-	Array.forEach(factionColumns, function(faction)
-		local parts = Array.extend(
-			config.isRandomEvent and Faction.Icon{faction = 'r'} or nil,
-			faction ~= Faction.defaultFaction and Faction.Icon{faction = faction} or nil,
-			' ' .. Faction.toName(faction),
-			config.isRandomEvent and ' Main' or nil,
-			config.showCountByFaction and " ''(" .. factionNumbers[faction .. 'Display'] .. ")''" or nil
-		)
-
-		header:tag('div')
-			:addClass('participantTable-faction-header participantTable-entry')
-			:addClass(Faction.bgClass(faction))
-			:tag('div')
-				:wikitext(table.concat(parts))
-	end)
-
-	return header
-end
-
 ---@param section StarcraftParticipantTableSection
 ---@param factionColumns table
 function StarcraftParticipantTable:_displaySoloFactionTableSection(section, factionColumns)
 	local sectionEntryCount = #Array.filter(section.entries, function(entry) return not entry.dq end)
 
-	self.display:node(self.newSectionNode():node(self:sectionTitle(section, sectionEntryCount)))
-
-	if Table.isEmpty(section.entries) then
-		self.display:node(self.newSectionNode():node(self:tbd()))
-		return
-	end
-
-	-- Group entries by faction
-	local _, byFaction = Array.groupBy(section.entries, function(entry) return entry.opponent.players[1].faction end)
-
-	-- Find the faction with the most players
-	local maxFactionLength = Array.max(
-		Array.map(factionColumns, function(faction) return #(byFaction[faction] or {}) end)
-	) or 0
-
-	Array.forEach(Array.range(1, maxFactionLength), function(rowIndex)
-		local sectionNode = self.newSectionNode()
-		Array.forEach(factionColumns, function(faction)
-			local entry = byFaction[faction] and byFaction[faction][rowIndex]
-			sectionNode:node(
-				entry and self:displayEntry(entry, {showFaction = false}) or
-				mw.html.create('div'):addClass('participantTable-entry')
-			)
-		end)
-		self.display:node(sectionNode)
-	end)
+	self.display:node(FactionSection{
+		config = self.config,
+		section = section,
+		factionColumns = factionColumns,
+		sectionEntryCount = sectionEntryCount,
+	})
 end
 
 ---@param entry StarcraftParticipantTableEntry
