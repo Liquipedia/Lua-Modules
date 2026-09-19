@@ -59,7 +59,7 @@ function SpellCard.render(props)
 			{width = '76px'},
 			{width = '372px'},
 		},
-		children = {
+		children = WidgetUtil.collect(
 			TableWidgets.TableHeader{
 				children = TableWidgets.Row{
 					children = TableWidgets.CellHeader{
@@ -91,7 +91,7 @@ function SpellCard.render(props)
 					} or nil
 				)
 			}
-		}
+		)
 	}
 end
 
