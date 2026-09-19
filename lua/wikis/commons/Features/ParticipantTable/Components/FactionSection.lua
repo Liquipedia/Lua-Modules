@@ -25,14 +25,17 @@ local makeRow = function(children)
 end
 
 ---@param props {config: StarcraftParticipantTableConfig, section: StarcraftParticipantTableSection,
----factionColumns: string[], sectionEntryCount: integer}
+---factionColumns: string[]}
 ---@return VNode[]
 local function render(props)
 	local section = props.section
+
 	local sectionTitleRow = makeRow(SectionTitle{
 		tableConfig = props.config,
-		sectionConfig = props.section.config,
-		numEntries = props.sectionEntryCount
+		sectionConfig = section.config,
+		numEntries = #Array.filter(section.entries, function(entry)
+			return not entry.dq
+		end),
 	})
 
 	if Logic.isEmpty(section.entries) then

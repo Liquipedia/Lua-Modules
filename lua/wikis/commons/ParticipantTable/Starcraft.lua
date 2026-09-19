@@ -14,11 +14,9 @@ local Faction = Lua.import('Module:Faction')
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
-local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
-local FactionHeader = Lua.import('Module:Features/ParticipantTable/Components/FactionHeader')
-local FactionSection = Lua.import('Module:Features/ParticipantTable/Components/FactionSection')
+local FactionTable = Lua.import('Module:Features/ParticipantTable/Components/FactionTable')
 
 ---@class StarcraftParticipantTable: ParticipantTable
 ---@operator call(Frame): StarcraftParticipantTable
@@ -169,23 +167,12 @@ function StarcraftParticipantTable:createSoloFactionTable()
 		table.insert(factionColumns, Faction.read('m'))
 	end
 
-	local colSpan = #factionColumns
-
-	self.display = mw.html.create('div')
-		:addClass('participantTable participantTable-faction')
-		:css('grid-template-columns', 'repeat(' .. colSpan .. ', 1fr)')
-		:css('width', (colSpan * config.soloColumnWidth) .. 'px')
-		:node(FactionHeader{
-			config = config,
-			factionColumns = factionColumns,
-			factionNumbers = factionNumbers,
-		})
-
-	Array.forEach(self.sections, function(section) self:_displaySoloFactionTableSection(section, factionColumns) end)
-
-	return mw.html.create('div')
-		:addClass('table-responsive')
-		:node(self.display)
+	return FactionTable{
+		config = self.config,
+		factionColumns = factionColumns,
+		factionNumbers = factionNumbers,
+		sections = self.sections,
+	}
 end
 
 ---@return table
@@ -214,19 +201,6 @@ function StarcraftParticipantTable:_getFactionNumbers()
 	end
 
 	return factionNumbers
-end
-
----@param section StarcraftParticipantTableSection
----@param factionColumns table
-function StarcraftParticipantTable:_displaySoloFactionTableSection(section, factionColumns)
-	local sectionEntryCount = #Array.filter(section.entries, function(entry) return not entry.dq end)
-
-	self.display:node(FactionSection{
-		config = self.config,
-		section = section,
-		factionColumns = factionColumns,
-		sectionEntryCount = sectionEntryCount,
-	})
 end
 
 ---@param entry StarcraftParticipantTableEntry
