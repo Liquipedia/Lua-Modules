@@ -19,6 +19,9 @@ local TeamTemplate = Lua.import('Module:TeamTemplate')
 local AgeCalculation = Lua.import('Module:AgeCalculation')
 local PortalPlayers = Lua.import('Module:PortalPlayers')
 
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local NON_PLAYER_HEADER = Abbreviation.make{text = 'Staff',
@@ -33,7 +36,7 @@ local BACKGROUND_CLASSES = {
 local CustomPortalPlayers = {}
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPortalPlayers.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.width = '1100px'
@@ -42,73 +45,96 @@ function CustomPortalPlayers.run(frame)
 
 	portalPlayers.header = CustomPortalPlayers.header
 	portalPlayers.row = CustomPortalPlayers.row
+	portalPlayers.columns = CustomPortalPlayers.columns
 
 	return portalPlayers:create()
 end
 
+---@return table[]
+function CustomPortalPlayers:columns()
+	return {
+		{width = '175px'},
+		{width = '200px'},
+		{width = '215px'},
+		{width = '215px'},
+		{width = '100px'},
+	}
+end
+
 ---Builds the header for the table
 ---@param args {flag: string, isPlayer: boolean?}
----@return Html
+---@return Widget
 function CustomPortalPlayers:header(args)
 	local teamText = args.isPlayer and ' Team' or ' Team and Role'
 
-	local header = mw.html.create('tr')
-		:tag('th')
-			:attr('colspan', 5)
-			:css('padding-left', '1em')
-			:wikitext(args.flag .. ' ' .. (args.isPlayer and self.playerType or NON_PLAYER_HEADER))
-			:done()
-
-	local subHeader = mw.html.create('tr')
-		:tag('th'):css('width', '175px'):wikitext(' ID'):done()
-		:tag('th'):css('width', '200px'):wikitext(' Full Name'):done()
-		:tag('th'):css('width', '215px'):wikitext(' Age'):done()
-		:tag('th'):css('width', '215px'):wikitext(teamText):done()
-		:tag('th'):css('width', '100px'):wikitext(' Links'):done()
-
-	return mw.html.create()
-		:node(header)
-		:node(subHeader)
+	return TableWidgets.TableHeader{
+		children = {
+			TableWidgets.Row{
+				children = TableWidgets.CellHeader{
+					colspan = 5,
+					css = {['padding-left'] = '1em'},
+					children = args.flag .. ' ' .. (args.isPlayer and self.playerType or NON_PLAYER_HEADER),
+				},
+			},
+			TableWidgets.Row{
+				children = {
+					TableWidgets.CellHeader{children = 'ID'},
+					TableWidgets.CellHeader{children = 'Full Name'},
+					TableWidgets.CellHeader{children = 'Age'},
+					TableWidgets.CellHeader{children = teamText},
+					TableWidgets.CellHeader{children = 'Links'},
+				},
+			},
+		},
+	}
 end
 
 ---Builds a table row
 ---@param player table
 ---@param isPlayer boolean
----@return Html
+---@return Widget
 function CustomPortalPlayers:row(player, isPlayer)
-	local row = mw.html.create('tr')
-		:addClass(BACKGROUND_CLASSES[(player.status or ''):lower()])
-
-	row:tag('td'):wikitext(' '):node(OpponentDisplay.BlockOpponent{opponent = PortalPlayers.toOpponent(player)})
-	row:tag('td')
-		:wikitext(' ' .. player.name)
-		:wikitext(self.showLocalizedName and (' (' .. player.localizedname .. ')') or nil)
-
-	row:tag('td'):node(CustomPortalPlayers._getAge(player))
-
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '') or ''
 	local teamText = TeamTemplate.exists(player.team) and tostring(OpponentDisplay.InlineTeamContainer{
 		template = player.team, displayType = 'standard'
 	}) or ''
+
 	if String.isNotEmpty(role) and String.isEmpty(teamText) then
 		teamText = role
 	elseif String.isNotEmpty(role) then
 		teamText = teamText .. ' (' .. role .. ')'
 	end
-	row:tag('td'):wikitext(' ' .. teamText)
 
 	local links = Array.extractValues(Table.map(player.links or {}, function(key, link)
 		return key, ' [' .. link .. ' ' .. Links.makeIcon(Links.removeAppendedNumber(key), 25) .. ']'
 	end) or {}, Table.iter.spairs)
 
-	row:tag('td')
-		:addClass('plainlinks')
-		:css('line-height', '25px')
-		:css('padding', '1px 2px 1px 2px')
-		:css('max-width', '112px')
-		:wikitext(table.concat(links))
-
-	return row
+	return TableWidgets.Row{
+		classes = WidgetUtil.collect(BACKGROUND_CLASSES[(player.status or ''):lower()]),
+		children = {
+			TableWidgets.Cell{
+				children = OpponentDisplay.BlockOpponent{opponent = PortalPlayers.toOpponent(player)}
+			},
+			TableWidgets.Cell{
+				nowrap = false,
+				children = WidgetUtil.collect(
+					' ' .. player.name,
+					self.showLocalizedName and (' (' .. player.localizedname .. ')') or nil
+				)
+			},
+			TableWidgets.Cell{children = CustomPortalPlayers._getAge(player)},
+			TableWidgets.Cell{nowrap = false, children = ' ' .. teamText},
+			TableWidgets.Cell{
+				nowrap = false,
+				classes = {'plainlinks'},
+				css = {
+					['line-height'] = '25px',
+					['padding'] = '1px 2px 1px 2px'
+				},
+				children = table.concat(links)
+			}
+		}
+	}
 end
 
 ---Builds the age display
