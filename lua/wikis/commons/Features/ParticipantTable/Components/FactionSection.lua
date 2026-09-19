@@ -16,7 +16,7 @@ local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Entry = Lua.import('Module:Features/ParticipantTable/Components/Entry')
-local SectionTitle = Lua.import('Module:Widget/Participants/Table/SectionTitle')
+local SectionTitle = Lua.import('Module:Features/ParticipantTable/Components/SectionTitle')
 
 ---@param children Renderable
 ---@return VNode
