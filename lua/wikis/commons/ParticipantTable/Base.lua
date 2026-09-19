@@ -37,7 +37,6 @@ local prizePoolVars = PageVariableNamespace('PrizePool')
 ---@operator call(Frame): ParticipantTable
 ---@field args table
 ---@field config ParticipantTableConfig
----@field display Html?
 ---@field sections ParticipantTableSection[]
 ---@field hasSeeds boolean
 local ParticipantTable = Class.new(
@@ -46,7 +45,7 @@ local ParticipantTable = Class.new(
 end)
 
 ---@param frame Frame
----@return Html?
+---@return VNode?
 function ParticipantTable.run(frame)
 	return ParticipantTable(frame):read():store():create()
 end
@@ -352,7 +351,7 @@ end
 function ParticipantTable:adjustLpdbData(lpdbData, entry, config)
 end
 
----@return Html?
+---@return VNode?
 function ParticipantTable:create()
 	local config = self.config
 

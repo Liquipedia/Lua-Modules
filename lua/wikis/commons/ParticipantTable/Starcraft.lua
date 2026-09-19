@@ -25,7 +25,7 @@ local FactionTable = Lua.import('Module:Features/ParticipantTable/Components/Fac
 local StarcraftParticipantTable = Class.new(ParticipantTable)
 
 ---@param frame Frame
----@return Html?
+---@return VNode?
 function StarcraftParticipantTable.run(frame)
 	return StarcraftParticipantTable(frame):read():store():create()
 end
@@ -129,7 +129,7 @@ function StarcraftParticipantTable:isPureSolo()
 	end) end)
 end
 
----@return Html?
+---@return VNode?
 function StarcraftParticipantTable:create()
 	if self:isPureSolo() and self.config.soloAsFactionTable then
 		return self:createSoloFactionTable()
@@ -137,7 +137,7 @@ function StarcraftParticipantTable:create()
 	return ParticipantTable.create(self)
 end
 
----@return Html?
+---@return VNode?
 function StarcraftParticipantTable:createSoloFactionTable()
 	local config = self.config
 
