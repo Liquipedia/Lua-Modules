@@ -23,7 +23,6 @@ local function render(props)
 	local config = props.config
 	local colSpan = #props.factionColumns
 
-	-- todo: check if we can drop the below wrapper and add the class directly here
 	local display = Html.Div{
 		classes = {'participantTable', 'participantTable-faction'},
 		css = {

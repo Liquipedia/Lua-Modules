@@ -18,7 +18,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local Entry = Lua.import('Module:Features/ParticipantTable/Components/Entry')
 local SectionTitle = Lua.import('Module:Features/ParticipantTable/Components/SectionTitle')
 
----@param children Renderable
+---@param children Renderable|Renderable[]
 ---@return VNode
 local makeRow = function(children)
 	return Html.Div{classes = {'participantTable-row'}, children = children}
@@ -76,9 +76,7 @@ local function render(props)
 	return WidgetUtil.collect(
 		sectionTitleRow,
 		Array.mapRange(1, maxFactionLength, function(rowIndex)
-			return makeRow{
-				children = Array.map(props.factionColumns, FnUtil.curry(entryCell, rowIndex))
-			}
+			return makeRow(Array.map(props.factionColumns, FnUtil.curry(entryCell, rowIndex)))
 		end)
 	)
 end
