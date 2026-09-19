@@ -109,6 +109,7 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 		opponent = opponent,
 		isQualified = Logic.nilOr(Logic.readBoolOrNil(sectionArgs[key .. 'qualified']), config.isQualified),
 		inputIndex = index,
+		seed = opponentArgs.seed,
 	}
 end
 
