@@ -362,7 +362,7 @@ function ParticipantTable:create()
 		section.entries = self.filterOnlyNotables(section.entries)
 	end)
 
-	Display{
+	return Display{
 		hasSeed = self.hasSeeds,
 		sections = self.sections,
 		config = self.config,
