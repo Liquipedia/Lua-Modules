@@ -83,6 +83,11 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 
 	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
 
+	opponentArgs.seed = tonumber(opponentArgs.seed)
+	if opponentArgs.seed then
+		self.hasSeeds = true
+	end
+
 	--unset wiki var for random events to not read players as random if prize pool already sets them as random
 	if config.isRandomEvent and opponentArgs.type == Opponent.solo then
 		Variables.varDefine(opponentArgs.name .. '_faction', '')
