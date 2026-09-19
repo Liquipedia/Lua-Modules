@@ -23,11 +23,11 @@ local makeRow = function(children)
 	return Html.Div{classes = {'participantTable-row'}, children = children}
 end
 
----@param props {config: ParticipantTableConfig, section: ParticipantTableSection, entries: ParticipantTableEntry[]}
+---@param props {config: ParticipantTableConfig, section: ParticipantTableSection}
 ---@return VNode[]
 local function render(props)
 	local section = props.section
-	local entries = props.entries
+	local entries = section.entries
 	local sectionEntryCount = #Array.filter(entries, function(entry) return not entry.dq end)
 
 	local sectionTitleRow = makeRow(SectionTitle{
@@ -36,7 +36,7 @@ local function render(props)
 		numEntries = sectionEntryCount,
 	})
 
-	if Logic.isEmpty(section.entries) then
+	if Logic.isEmpty(entries) then
 		return {
 			sectionTitleRow,
 			makeRow(Html.Div{

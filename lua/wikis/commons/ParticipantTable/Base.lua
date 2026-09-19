@@ -29,10 +29,9 @@ local Variables = Lua.import('Module:Variables')
 
 local Import = Lua.import('Module:ParticipantTable/Import')
 
-local Html = Lua.import('Module:Widget/Html')
+local Display = Lua.import('Module:Features/ParticipantTable/Components/Wrapper')
 local Entry = Lua.import('Module:Features/ParticipantTable/Components/Entry')
 local Section = Lua.import('Module:Features/ParticipantTable/Components/Section')
-local SectionTitle = Lua.import('Module:Features/ParticipantTable/Components/SectionTitle')
 
 local pageVars = PageVariableNamespace('ParticipantTable')
 local prizePoolVars = PageVariableNamespace('PrizePool')
@@ -362,117 +361,15 @@ function ParticipantTable:create()
 
 	if not config.display then return end
 
-	self.display = self:_createBaseDisplayDiv()
-
-	Array.forEach(self.sections, function(section) self:displaySection(section) end)
-
-	if not self.hasSeeds then
-		return self.display
-	end
-
-	return mw.html.create('div')
-		:addClass('table-responsive toggle-area toggle-area-1')
-		:attr('data-toggle-area', 1)
-		:node(self.display)
-		:node(self:_createSeedList())
-end
-
----@return Html?
-function ParticipantTable:_createBaseDisplayDiv()
-	local titleText = self.config.title or 'Participants'
-
-	if not self.hasSeeds then
-		return mw.html.create('div')
-			:addClass('participantTable')
-			:css('width', self.config.width)
-			:node(self.config.showTitle and
-				mw.html.create('div'):addClass('participantTable-title'):wikitext(titleText)
-				or nil
-			)
-	end
-
-	return ParticipantTable:_createTitleWithToogleButton(titleText, 'Seeding', 1, 2, self.config.width)
-end
-
----@param titleText string
----@param buttonText string
----@param togglearea integer
----@param buttonArea integer
----@param width string
----@return Html
-function ParticipantTable:_createTitleWithToogleButton(titleText, buttonText, togglearea, buttonArea, width)
-	local title = mw.html.create('div')
-			:addClass('participantTable')
-			:attr('data-toggle-area-content', togglearea)
-			:css('max-width', '100%!important')
-			:css('width', width)
-			:css('vertical-align', 'middle')
-			:tag('span')
-				:addClass('toggle-area-button button button--small button--primary')
-				:attr('data-toggle-area-btn', buttonArea)
-				:css('position', 'absolute')
-				:wikitext(buttonText)
-
-	return title:done()
-			:tag('div')
-				:addClass('participantTable-title')
-				:wikitext(titleText)
-				:done()
-end
-
----@return Html
-function ParticipantTable:_createSeedList()
-	local width = tostring(50 + (self.config.showTeams and 242 or 186)) .. 'px'
-	local display = self:_createTitleWithToogleButton('Seeding', self.config.title or 'Participants', 2, 1, width)
-
-	local wrapper = mw.html.create('div')
-		:addClass('participantTable-seeding')
-
-	local entries = Array.sortBy(
-		Array.filter(Array.flatMap(self.sections, function(section)
-			return section.entries
-		end), Logic.isNotEmpty),
-		Operator.property('seed'),
-		function (a, b)
-			return a and b and a < b or false
-		end
-	)
-
-	Array.forEach(entries, function (entry)
-		wrapper
-			:tag('div')
-				:addClass('participantTable-seed')
-				:wikitext(entry.seed)
-				:done()
-			:node(self:displayEntry(entry, {oneLine = true}))
+	Array.forEach(self.sections, function(section)
+		if not section.config.onlyNotable then return end
+		section.entries = self.filterOnlyNotables(section.entries)
 	end)
 
-	return display:node(wrapper)
-end
-
----@param section ParticipantTableSection
-function ParticipantTable:displaySection(section)
-	local entries = section.config.onlyNotable and self.filterOnlyNotables(section.entries) or section.entries
-
-	self.display:node(Section{
+	Display{
+		hasSeed = self.hasSeeds,
+		sections = self.sections,
 		config = self.config,
-		section = section,
-		entries = entries,
-	})
-end
-
----@param entry ParticipantTableEntry
----@param additionalProps table?
----@param useDefaultWidth boolean?
----@return VNode
-function ParticipantTable:displayEntry(entry, additionalProps, useDefaultWidth)
-	return Entry{
-		config = self.config,
-		dq = entry.dq,
-		note = entry.note,
-		opponent = entry.opponent,
-		additionalProps = additionalProps,
-		useDefaultWidth = useDefaultWidth,
 	}
 end
 
