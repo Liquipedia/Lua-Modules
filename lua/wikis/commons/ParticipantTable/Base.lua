@@ -31,6 +31,7 @@ local Import = Lua.import('Module:ParticipantTable/Import')
 
 local Html = Lua.import('Module:Widget/Html')
 local Entry = Lua.import('Module:Features/ParticipantTable/Components/Entry')
+local Section = Lua.import('Module:Features/ParticipantTable/Components/Section')
 local SectionTitle = Lua.import('Module:Features/ParticipantTable/Components/SectionTitle')
 
 local pageVars = PageVariableNamespace('ParticipantTable')
@@ -449,76 +450,15 @@ function ParticipantTable:_createSeedList()
 	return display:node(wrapper)
 end
 
----@return Html
-function ParticipantTable.newSectionNode()
-	return mw.html.create('div'):addClass('participantTable-row')
-end
-
 ---@param section ParticipantTableSection
 function ParticipantTable:displaySection(section)
 	local entries = section.config.onlyNotable and self.filterOnlyNotables(section.entries) or section.entries
 
-	local sectionEntryCount = #Array.filter(entries, function(entry) return not entry.dq end)
-
-	self.display:node(self.newSectionNode():node(self:sectionTitle(section, sectionEntryCount)))
-
-	if Table.isEmpty(section.entries) then
-		self.display:node(self.newSectionNode():node(self:tbd()))
-		return
-	end
-
-	local sectionNode = ParticipantTable.newSectionNode()
-
-	Array.forEach(entries, function(entry, entryIndex)
-		sectionNode:node(self:displayEntry(entry, {oneLine = true}, true))
-	end)
-
-	local tbdsAdded = 0
-	if section.config.count and section.config.count > sectionEntryCount then
-		Array.forEach(Array.range(sectionEntryCount + 1, section.config.count), function(index)
-			tbdsAdded = tbdsAdded + 1
-			sectionNode:node(self:tbdEntry(true))
-		end)
-	end
-
-	local currentColumn = (#entries + tbdsAdded) % self.config.colSpan
-	if currentColumn ~= 0 then
-		Array.forEach(Array.range(currentColumn + 1, self.config.colSpan), function() sectionNode:node(self:empty()) end)
-	end
-
-	self.display:node(sectionNode)
-end
-
----@return Html
-function ParticipantTable:tbd()
-	return Html.Div{
-		classes = {'participantTable-tbd'},
-		children = 'To be determined',
-	}
-end
-
----@return VNode
-function ParticipantTable:empty()
-	return Html.Div{
-		classes = {'participantTable-entry', 'participantTable-empty'}
-	}
-end
-
----@param section ParticipantTableSection
----@param amountOfEntries number
----@return VNode
-function ParticipantTable:sectionTitle(section, amountOfEntries)
-	return SectionTitle{tableConfig = self.config, sectionConfig = section.config, numEntries = amountOfEntries}
-end
-
----@param useDefaultWidth boolean?
----@return VNode
-function ParticipantTable:tbdEntry(useDefaultWidth)
-	return Entry{
+	self.display:node(Section{
 		config = self.config,
-		opponent = Opponent.tbd(),
-		useDefaultWidth = useDefaultWidth,
-	}
+		section = section,
+		entries = entries,
+	})
 end
 
 ---@param entry ParticipantTableEntry
