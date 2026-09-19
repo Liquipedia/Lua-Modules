@@ -18,6 +18,8 @@ local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
+local PortalPlayers = Lua.import('Module:PortalPlayers')
+
 local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -30,8 +32,6 @@ local BACKGROUND_CLASSES = {
 	banned = 'cinnabar-bg',
 	['passed away'] = 'gigas-bg',
 }
-
-local PortalPlayers = Lua.import('Module:PortalPlayers')
 
 local CustomPortalPlayers = {}
 
