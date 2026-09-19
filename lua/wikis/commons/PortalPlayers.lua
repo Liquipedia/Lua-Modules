@@ -303,16 +303,17 @@ function PortalPlayers:row(player, isPlayer)
 				children = {' ', OpponentDisplay.BlockOpponent{opponent = PortalPlayers.toOpponent(player)}},
 			},
 			TableWidgets.Cell{
-				css = {['white-space'] = 'normal'},
+				nowrap = false,
 				children = ' ' .. player.name .. (self.showLocalizedName and (' (' .. player.localizedname .. ')') or ''),
 			},
 			TableWidgets.Cell{
+				nowrap = false,
 				children = ' ' .. teamText,
 			},
 			TableWidgets.Cell{
+				nowrap = false,
 				classes = {'plainlinks'},
 				css = {
-					['white-space'] = 'normal',
 					['line-height'] = '25px',
 					['padding'] = '1px 2px 1px 2px',
 				},

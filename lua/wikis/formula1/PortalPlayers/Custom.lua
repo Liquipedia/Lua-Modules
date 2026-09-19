@@ -116,18 +116,18 @@ function CustomPortalPlayers:row(player, isPlayer)
 				children = OpponentDisplay.BlockOpponent{opponent = PortalPlayers.toOpponent(player)}
 			},
 			TableWidgets.Cell{
-				css = {['white-space'] = 'normal'},
+				nowrap = false,
 				children = WidgetUtil.collect(
 					' ' .. player.name,
 					self.showLocalizedName and (' (' .. player.localizedname .. ')') or nil
 				)
 			},
 			TableWidgets.Cell{children = CustomPortalPlayers._getAge(player)},
-			TableWidgets.Cell{children = ' ' .. teamText},
+			TableWidgets.Cell{nowrap = false, children = ' ' .. teamText},
 			TableWidgets.Cell{
+				nowrap = false,
 				classes = {'plainlinks'},
 				css = {
-					['white-space'] = 'normal',
 					['line-height'] = '25px',
 					['padding'] = '1px 2px 1px 2px'
 				},
