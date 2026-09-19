@@ -28,7 +28,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
----@class StormgateInfoboxPlayer: Person
+---@class StormgateInfoboxPlayer: InfoboxPerson
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 

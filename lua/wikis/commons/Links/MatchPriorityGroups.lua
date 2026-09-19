@@ -14,6 +14,7 @@ return {
 	'lrthread',
 	'recap',
 	'headtohead',
+	'headtohead_lh',
 
 	-- ageofempires
 	'mapdraft',

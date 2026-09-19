@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 
----@param props {css: table<string, string|number?>?}
+---@param props {css: HtmlStyleProps?}
 ---@return VNode
 local function MatchInfoIcon(props)
 	return Html.Div{

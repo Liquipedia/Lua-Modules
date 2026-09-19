@@ -734,6 +734,10 @@ div.brkts-popup-body-element-thumbs {
 				justify-content: center;
 			}
 		}
+
+		&-center {
+			display: flex;
+		}
 	}
 }
 
@@ -809,6 +813,14 @@ div.brkts-popup-body-element-thumbs {
 	justify-content: center;
 	gap: 4px;
 	text-align: center;
+
+	.brkts-popup-footer & {
+		flex-wrap: wrap;
+
+		> a {
+			display: contents;
+		}
+	}
 }
 
 .brkts-popup-winloss-icon {
@@ -816,10 +828,6 @@ div.brkts-popup-body-element-thumbs {
 	line-height: 17px;
 	margin-left: 1%;
 	margin-right: 1%;
-}
-
-.brkts-popup-footer .brkts-popup-spaced > a {
-	display: contents;
 }
 
 .brkts-popup-spaced.brkts-popup-spaced-map-skip > a {

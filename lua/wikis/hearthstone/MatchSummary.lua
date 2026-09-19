@@ -21,27 +21,22 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '350px', teamStyle = 'bracket'})
 end
 
 ---@param match HearthstoneMatchGroupUtilMatch
----@return Widget[]
+---@return Renderable[]
 function CustomMatchSummary.createBody(match)
-	local submatches
-	if match.isTeamMatch then
-		submatches = match.submatches or {}
-	end
-
 	return WidgetUtil.collect(
-		submatches and Array.map(submatches, CustomMatchSummary.TeamSubmatch)
+		match.isTeamMatch and Array.map(match.submatches or {}, CustomMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {isPartOfSubMatch = false}))
 	)
 end
 
 ---@param submatch HearthstoneMatchGroupUtilSubmatch
----@return MatchSummaryRow
+---@return Renderable
 function CustomMatchSummary.TeamSubmatch(submatch)
 	local hasDetails = CustomMatchSummary._submatchHasDetails(submatch)
 	return MatchSummaryWidgets.Row{
@@ -72,7 +67,7 @@ function CustomMatchSummary._submatchHasDetails(submatch)
 end
 
 ---@param submatch HearthstoneMatchGroupUtilSubmatch
----@return Widget
+---@return Renderable
 function CustomMatchSummary.TeamSubMatchOpponentRow(submatch)
 	local opponents = submatch.opponents or {{}, {}}
 	Array.forEach(opponents, function (opponent, opponentIndex)
@@ -85,13 +80,14 @@ function CustomMatchSummary.TeamSubMatchOpponentRow(submatch)
 		opponent.players = players
 	end)
 
-	return MatchSummary.createDefaultHeader({opponents = opponents})
+---@diagnostic disable-next-line: missing-fields
+	return MatchSummary.createHeader({opponents = opponents})
 end
 
 ---@param options {isPartOfSubMatch: boolean?}
 ---@param game MatchGroupUtilGame
 ---@param gameIndex number
----@return Widget
+---@return Renderable
 function CustomMatchSummary.Game(options, game, gameIndex)
 	local rowWidget = options.isPartOfSubMatch and Html.Div or MatchSummaryWidgets.Row
 
@@ -117,7 +113,7 @@ end
 
 ---@param opponent {players: table[], score: number?, status: string?}
 ---@param flip boolean?
----@return Widget?
+---@return Renderable?
 function CustomMatchSummary.DisplayClass(opponent, flip)
 	local player = Array.find(opponent.players or {}, function (player)
 		return Logic.isNotEmpty(player.class)

@@ -31,7 +31,7 @@ local CustomPrizePool = {}
 
 -- Template entry point
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -65,7 +65,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.weight = CustomPrizePool._weight(lpdbData, placement)
 
 	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, {
-		seriesnumber = CustomPrizePool._seriesNumber(),
 		mod = Variables.varDefault('tournament_mod'),
 	})
 
@@ -95,12 +94,6 @@ function CustomPrizePool._defaultImportLimit()
 		or nil
 end
 
----@return string
-function CustomPrizePool._seriesNumber()
-	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
-	return seriesNumber and string.format('%05d', seriesNumber) or ''
-end
-
 ---@param lpdbData placement
 ---@param placement PrizePoolPlacement
 ---@return number
@@ -118,7 +111,7 @@ function CustomPrizePool._weight(lpdbData, placement)
 	prize = prize ~= 0 and prize or DEFAULT_PRIZE_VALUE
 
 	local placementFactor = placement.placeStart or 0
-	if place == 'w' or place == 'd' or place == 'q' then
+	if place == 'w' or place == 'd' then
 		prize = 1
 		placementFactor = 1
 	end

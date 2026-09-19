@@ -10,19 +10,22 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
-local TeamTemplate = Lua.import('Module:TeamTemplate')
-
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local MedalStatsBase = Lua.import('Module:SeriesMedalStats')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
-local MedalStatsBase = Lua.import('Module:SeriesMedalStats')
+local Html = Lua.import('Module:Widget/Html')
+local MedalsTable = Lua.import('Module:Widget/MedalsTable')
 
 ---@class SeriesMedalStatsParticipantTeam: SeriesMedalStats
 ---@field teams table<string, string>
 local MedalStats = Class.new(MedalStatsBase)
 
+---@param frame Frame
+---@return VNode?
 function MedalStats.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -32,28 +35,38 @@ function MedalStats.run(frame)
 	--reduce due to having text above
 	args.cutafter = tonumber(args.cutafter) or 5
 
-	return MedalStats(args):query():create()
+	return MedalStats(args):create()
 end
 
----@return Html?
+---@return Renderable?
 function MedalStats:create()
-	if Table.isEmpty(self.rawData) then return end
+	if Logic.isEmpty(self.rawData) then return end
 
 	self:_processData()
 
-	local nameDisplay = function(identifier)
-		return OpponentDisplay.InlineTeamContainer{template = identifier}
-	end
-
-	local display = self:defaultBuild(nameDisplay, 'Team', 'Teams')
-	if not display then return end
-
-	return mw.html.create()
-		:tag('b'):wikitext('Note'):done()
-		:wikitext(': Medals won per Team shows the team that a player was<br>on when the medal was won, ')
-		:tag('b'):wikitext('not'):done()
-		:wikitext(' their current team.')
-		:node(display)
+	return MedalsTable{
+		medalsTableType = 'Participant',
+		dataColumns = self.config.columns,
+		data = self.data,
+		renderRowFirstCell = function(identifier)
+			return OpponentDisplay.BlockOpponent{opponent = Opponent.readOpponentArgs{
+				type = Opponent.team,
+				template = identifier,
+			}}
+		end,
+		rowSort = MedalStatsBase.rowSort,
+		hideTotalRow = true,
+		cutAfter = self.config.cutAfter,
+		footer = Html.Small{
+			children = {
+				'Medals won per Team shows the team that a player was',
+				Html.Br{},
+				'on when the medal was won, ',
+				Html.B{children = 'not'},
+				' their current team.',
+			}
+		},
+	}
 end
 
 function MedalStats:_processData()
@@ -73,11 +86,11 @@ function MedalStats:_processData()
 		return identifier
 	end
 
-	---@param placement SeriesMedalStatsPlacementObject
+	---@param placement placement
 	---@return string?
 	local getIdentifier = function(placement)
 		local teamTemplate = (placement.opponentplayers or {}).p1team
-		if String.isEmpty(teamTemplate) then
+		if Logic.isEmpty(teamTemplate) then
 			return
 		end
 		---@cast teamTemplate -nil
@@ -88,14 +101,8 @@ function MedalStats:_processData()
 	end
 
 	self.data = {}
-
-	Array.forEach(self.rawData, function(placement)
-		return self:processByIdentifier(getIdentifier, placement)
-	end)
-
+	Array.forEach(self.rawData, FnUtil.curry(FnUtil.curry(self.processByIdentifier, self), getIdentifier))
 	self.rawData = nil
-
-	self:sort()
 end
 
 return MedalStats

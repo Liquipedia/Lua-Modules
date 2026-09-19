@@ -8,7 +8,7 @@
 local Class = require('Module:Class')
 local Table = require('Module:Table')
 
----Implementation of a mathematical set.
+---Implementation of a finite set.
 ---@class Set<T>: BaseClass
 ---@operator call(T[]?): Set<T>
 ---@operator add(Set<T>): Set<T>
@@ -125,6 +125,10 @@ function Set:contains(value)
 	return self.data[value] or false
 end
 
+--[[
+Returns `true` if this set contains all elements in the specified set,
+i.e., if the specified set is a subset of this set.
+]]
 ---@param set Set<T>
 ---@return boolean
 function Set:containsAll(set)
@@ -183,6 +187,7 @@ function Set:equals(other)
 	return self:containsAll(other)
 end
 
+---Returns the string representation of this set.
 ---@return string
 function Set:toString()
 	return '{'.. table.concat(self:toArray(), ', ') .. '}'

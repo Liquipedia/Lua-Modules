@@ -296,6 +296,7 @@ function Config.placementDropOffFunction(tier, tierType)
 				return points
 			end
 		end
+		return 0
 	end
 end
 

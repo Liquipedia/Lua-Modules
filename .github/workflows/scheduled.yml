@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 2
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.14'
           cache: 'pip'
@@ -42,4 +42,4 @@ jobs:
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
           DEPLOY_TRIGGER: ${{ github.event_name }}
           PYTHONUNBUFFERED: 1
-        run: python3 ./scripts/deploy.py
+        run: python3 ./scripts/deploy.py -A

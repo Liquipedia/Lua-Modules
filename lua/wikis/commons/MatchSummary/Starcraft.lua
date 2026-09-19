@@ -42,14 +42,9 @@ end
 function StarcraftMatchSummary.createBody(match)
 	StarcraftMatchSummary.computeOffFactions(match)
 
-	local subMatches
-	if match.opponentMode ~= UNIFORM_MATCH then
-		subMatches = match.submatches or {}
-	end
-
 	return WidgetUtil.collect(
 		Array.map(match.opponents, StarcraftMatchSummary.advantageOrPenalty),
-		subMatches and Array.map(subMatches, StarcraftMatchSummary.TeamSubmatch)
+		match.opponentMode ~= UNIFORM_MATCH and Array.map(match.submatches or {}, StarcraftMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(StarcraftMatchSummary.Game, {})),
 		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
 			css = {['text-align'] = 'center'},
@@ -110,7 +105,7 @@ end
 
 ---@param options {noLink: boolean?, isPartOfSubMatch: boolean?}
 ---@param game StarcraftMatchGroupUtilGame
----@return MatchSummaryRow
+---@return Renderable
 function StarcraftMatchSummary.Game(options, game)
 	local noLink = options.noLink or (game.map or ''):upper() == TBD
 
@@ -207,7 +202,7 @@ function StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch)
 
 	---@param opponentIndex integer
 	---@param additionalClasses string[]?
-	---@return Widget
+	---@return Renderable
 	local createScore = function(opponentIndex, additionalClasses)
 		return OpponentDisplay.BlockScore{
 			additionalClasses = additionalClasses,
@@ -239,7 +234,7 @@ function StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch)
 end
 
 ---@param veto StarcraftMatchGroupUtilVeto
----@return MatchSummaryRow
+---@return Renderable
 function StarcraftMatchSummary.Veto(veto)
 	local statusIcon = function(opponentIndex)
 		return opponentIndex == veto.by and MAP_VETO_LABEL or nil
