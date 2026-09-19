@@ -77,6 +77,7 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 		team = valueFromArgs('team'),
 		dq = valueFromArgs('dq'),
 		note = valueFromArgs('note'),
+		seed = valueFromArgs('seed'),
 		faction = valueFromArgs('race') or valueFromArgs('faction'),
 	}
 
