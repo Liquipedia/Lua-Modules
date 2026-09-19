@@ -17,24 +17,6 @@ local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
----@class StarcraftParticipantTableConfig: ParticipantTableConfig
----@field displayUnknownColumn boolean?
----@field displayRandomColumn boolean?
----@field displayMultipleFactionColumn boolean?
----@field showCountByFaction boolean
----@field isRandomEvent boolean
----@field isQualified boolean?
----@field manualFactionCounts table<string, number?>
----@field soloColumnWidth number
----@field soloAsFactionTable boolean
-
----@class StarcraftParticipantTableEntry: ParticipantTableEntry
----@field isQualified boolean?
----@field opponent StarcraftStandardOpponent
-
----@class StarcraftParticipantTableSection: ParticipantTableSection
----@field entries StarcraftParticipantTableEntry[]
-
 ---@class StarcraftParticipantTable: ParticipantTable
 ---@operator call(Frame): StarcraftParticipantTable
 ---@field config StarcraftParticipantTableConfig
