@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Participants/Table/Entry
+-- page=Module:Features/ParticipantTable/Components/Entry
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -14,14 +14,6 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
-
----@class ParticipantsTableEntryProps
----@field opponent standardOpponent
----@field note string?
----@field dq boolean?
----@field config ParticipantTableConfig
----@field additionalProps table?
----@field useDefaultWidth boolean?
 
 ---@param props ParticipantsTableEntryProps
 ---@return VNode
