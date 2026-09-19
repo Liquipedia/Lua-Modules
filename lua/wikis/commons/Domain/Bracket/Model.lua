@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:MatchGroup/Util/Bracket
+-- page=Module:Domain/Bracket/Model
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -12,7 +12,7 @@ local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
-local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
+local MatchGroupCoordinates = Lua.import('Module:Domain/Bracket/Coordinates')
 
 local nilIfEmpty = String.nilIfEmpty
 
@@ -24,6 +24,80 @@ namespace that addresses a match within its group.
 A matchlist counts as a bracket here: it is the flat case of the same structure, which is why the
 matchlist id form lives alongside the bracket ones.
 ]]
+---@class MatchGroupUtilLowerEdge
+---@field lowerMatchIndex number
+---@field opponentIndex number
+
+---@alias AdvanceBg 'up'|'stayup'|'stay'|'staydown'|'down'
+
+---@class MatchGroupUtilAdvanceSpot
+---@field bg AdvanceBg
+---@field matchId string?
+---@field type string?
+
+---@class MatchGroupUtilBracketBracketData
+---@field coordinates MatchGroupUtilMatchCoordinates
+---@field advanceSpots MatchGroupUtilAdvanceSpot[]
+---@field bracketResetMatchId string?
+---@field bracketType string?
+---@field header string?
+---@field inheritedHeader string?
+---@field lowerEdges MatchGroupUtilLowerEdge[]?
+---@field lowerMatchIds string[]
+---@field qualLose boolean?
+---@field qualLoseLiteral string?
+---@field qualSkip number?
+---@field qualWin boolean?
+---@field qualWinLiteral string?
+---@field skipRound number?
+---@field thirdPlaceMatchId string?
+---@field title string?
+---@field type 'bracket'
+---@field upperMatchId string?
+---@field matchId string?
+---@field matchPage string?
+---@field qualifiedHeader string?
+
+---@class MatchGroupUtilMatchCoordinates
+---@field depth integer
+---@field depthCount integer
+---@field matchIndexInRound integer
+---@field rootIndex integer
+---@field roundCount integer
+---@field roundIndex integer
+---@field sectionCount integer
+---@field sectionIndex integer
+---@field semanticDepth integer
+---@field semanticRoundIndex integer
+
+---@class MatchGroupUtilMatchlistBracketData
+---@field header string?
+---@field title string?
+---@field dateHeader boolean?
+---@field type 'matchlist'
+---@field matchId string?
+---@field matchPage string?
+
+---@alias MatchGroupUtilBracketData MatchGroupUtilMatchlistBracketData|MatchGroupUtilBracketBracketData
+
+---@class MatchGroupUtilMatchlist
+---@field bracketDatasById table<string, MatchGroupUtilBracketBracketData>
+---@field matches MatchGroupUtilMatch[]
+---@field matchesById table<string, MatchGroupUtilMatch>
+---@field type 'matchlist'
+
+---@class MatchGroupUtilBracket
+---@field bracketDatasById table<string, MatchGroupUtilBracketBracketData>
+---@field coordinatesByMatchId table<string, MatchGroupUtilMatchCoordinates>
+---@field matches MatchGroupUtilMatch[]
+---@field matchesById table<string, MatchGroupUtilMatch>
+---@field rootMatchIds string[]
+---@field rounds string[][]
+---@field sections string[][]
+---@field type 'bracket'
+
+---@alias MatchGroupUtilMatchGroup MatchGroupUtilBracket|MatchGroupUtilMatchlist
+
 local BracketUtil = {}
 
 ---@param data table?
@@ -310,6 +384,14 @@ end
 ---@return string?, string?
 function BracketUtil.splitMatchId(matchId)
 	return matchId:match('^(.-)_([%w-]+)$')
+end
+
+---The match that replays this one when the lower bracket team wins the grand final.
+---@param matchesById table<string, MatchGroupUtilMatch>
+---@param bracketData MatchGroupUtilBracketData
+---@return MatchGroupUtilMatch?
+function BracketUtil.resetMatch(matchesById, bracketData)
+	return bracketData.bracketResetMatchId and matchesById[bracketData.bracketResetMatchId] or nil
 end
 
 return BracketUtil

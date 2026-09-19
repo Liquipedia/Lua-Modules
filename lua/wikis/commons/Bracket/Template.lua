@@ -14,7 +14,7 @@ local Template = Lua.import('Module:Template')
 
 local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
 local Match = Lua.import('Module:Match')
-local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
+local MatchGroupCoordinates = Lua.import('Module:Domain/Bracket/Coordinates')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Opponent = Lua.import('Module:Opponent')
 
@@ -55,7 +55,7 @@ For copy-pastable code please use <code>Special:RunQuery/BracketCopyPaste</code>
 end
 
 ---@param props {bracketId: string, config: table?}
----@return Html
+---@return Renderable
 function BracketTemplate.BracketContainer(props)
 	local matchRecords = MatchGroupUtil.fetchMatchRecords(props.bracketId)
 	Array.forEach(matchRecords, function(match)
@@ -168,7 +168,7 @@ end
 BracketTemplate.perfConfig = {
 	locations = {
 		'Module:Bracket/Template|*',
-		'Module:MatchGroup/Coordinates|*',
+		'Module:Domain/Bracket/Coordinates|*',
 		'Module:MatchGroup/Display/Bracket|*',
 	}
 }
