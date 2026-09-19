@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 
-local SeedingList = Lua.import('Module:Features/ParticipantTable/Components/SeedingList')
+local SeedingList = Lua.import('Module:Features/ParticipantTable/Components/SeedList')
 local ParticipantTable = Lua.import('Module:Features/ParticipantTable/Components/Table')
 
 ---@param props {hasSeed: boolean?, config: ParticipantTableConfig, sections: ParticipantTableSection[]}
