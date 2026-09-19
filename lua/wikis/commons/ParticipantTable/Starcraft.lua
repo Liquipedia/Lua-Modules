@@ -94,7 +94,7 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 		team = valueFromArgs('team'),
 		dq = valueFromArgs('dq'),
 		note = valueFromArgs('note'),
-		faction = valueFromArgs('race'),
+		faction = valueFromArgs('race') or valueFromArgs('faction'),
 	}
 
 	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
