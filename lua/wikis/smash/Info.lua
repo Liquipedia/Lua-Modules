@@ -98,6 +98,7 @@ return {
 		},
 		match2 = {
 			status = 1,
+			matchWidth = 190,
 		},
 		teamRosterNavbox = {
 			hideOrg = true,
