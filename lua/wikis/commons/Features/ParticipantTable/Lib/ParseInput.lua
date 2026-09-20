@@ -99,7 +99,7 @@ end
 ---@param args table
 ---@param config ParticipantTableConfig
 ---@return ParticipantTableEntry[]
-function Parser.readEntries(args, config)
+function Parser._readEntries(args, config)
 	local alreadyUsed = {}
 
 	return Table.mapArgumentsByPrefix(args, {'p', 'player'}, function(key, index)
