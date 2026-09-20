@@ -22,7 +22,7 @@ function BirthCategories.get()
 	local row = Html.Div{
 		classes = {'hlist'},
 		css = {['margin-left'] = '0'},
-		children = Html.Ul{children = Array.map(Array.range(year - 4, year + 4), function(currentYear)
+		children = Html.Ul{children = Array.mapRange(year - 4, year + 4, function(currentYear)
 			return Html.Li{
 				children = Link{link = ':Category:' .. currentYear .. ' births', children = currentYear}
 			}
