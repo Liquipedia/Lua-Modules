@@ -27,6 +27,7 @@ local TournamentStructure = Lua.import('Module:TournamentStructure')
 local Variables = Lua.import('Module:Variables')
 
 local Import = Lua.import('Module:ParticipantTable/Import')
+local Parser = Lua.import('Module:Features/ParticipantTable/Lib/ParseInput')
 
 local Display = Lua.import('Module:Features/ParticipantTable/Components/Wrapper')
 
@@ -52,46 +53,10 @@ end
 
 ---@return self
 function ParticipantTable:read()
-	self.config = self.readConfig(self.args)
+	self.config = Parser.readConfig(self.args)
 	self:readSections()
 
 	return self
-end
-
----@param args table
----@param parentConfig ParticipantTableConfig?
----@return ParticipantTableConfig
-function ParticipantTable.readConfig(args, parentConfig)
-	parentConfig = parentConfig or {}
-
-	local config = {
-		lpdbPrefix = args.lpdbPrefix or parentConfig.lpdbPrefix or Variables.varDefault('lpdbPrefix'),
-		noStorage = Logic.readBool(args.noStorage or parentConfig.noStorage or
-			Lpdb.isStorageDisabled() or not Namespace.isMain()),
-		matchGroupSpec = TournamentStructure.readMatchGroupsSpec(args),
-		syncPlayers = Logic.nilOr(Logic.readBoolOrNil(args.syncPlayers), parentConfig.syncPlayers, true),
-		showCountBySection = Logic.readBool(args.showCountBySection or parentConfig.showCountBySection),
-		count = tonumber(args.count),
-		colSpan = parentConfig.colSpan or tonumber(args.colspan) or 4,
-		onlyNotable = Logic.readBool(args.onlyNotable or parentConfig.onlyNotable),
-		resolveDate = args.date or parentConfig.resolveDate or DateExt.getContextualDate(),
-		sortPlayers = Logic.readBool(args.sortPlayers or parentConfig.sortPlayers),
-		sortOpponents = Logic.nilOr(Logic.readBoolOrNil(args.sortOpponents), parentConfig.sortOpponents, true),
-		showTeams = not Logic.readBool(args.disable_teams),
-		title = args.title,
-		importOnlyQualified = Logic.readBool(args.onlyQualified),
-		display = not Logic.readBool(args.hidden),
-		showTitle = not Logic.readBool(args.hideTitle),
-	}
-
-	config.width = parentConfig.width
-	if not config.width then
-		local columnWidth = parentConfig.columnWidth or tonumber(args.entrywidth) or config.showTeams and 212 or 156
-		config.width = (columnWidth * config.colSpan) .. 'px'
-	end
-	config.columnWidth = config.columnWidth or ((100 / config.colSpan) .. '%')
-
-	return config
 end
 
 function ParticipantTable:readSections()
@@ -144,7 +109,7 @@ end
 
 ---@param args table
 function ParticipantTable:readSection(args)
-	local config = self.readConfig(args, self.config)
+	local config = Parser.readConfig(args, self.config)
 	local section = {config = config}
 
 	local entriesByName = {}
