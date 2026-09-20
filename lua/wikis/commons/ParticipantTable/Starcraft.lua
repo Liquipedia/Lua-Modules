@@ -28,17 +28,6 @@ function StarcraftParticipantTable.run(frame)
 	return StarcraftParticipantTable(frame):read():store():create()
 end
 
----@param lpdbData table
----@param entry ParticipantTableEntry
----@param config ParticipantTableConfig
-function StarcraftParticipantTable:adjustLpdbData(lpdbData, entry, config)
-	if config.isRandomEvent then
-		lpdbData.opponentplayers.p1faction = Faction.read('r')
-	end
-
-	lpdbData.extradata.mod = Variables.varDefault('tournament_mod')
-end
-
 ---@return boolean
 function StarcraftParticipantTable:isPureSolo()
 	return Array.all(self.sections, function(section) return Array.all(section.entries, function(entry)
