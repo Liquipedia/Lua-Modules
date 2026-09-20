@@ -12,18 +12,13 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
-local Lpdb = Lua.import('Module:Lpdb')
-local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local Table = Lua.import('Module:Table')
-local Template = Lua.import('Module:Template')
 local Tournament = Lua.import('Module:Tournament')
-local TournamentStructure = Lua.import('Module:TournamentStructure')
 local Variables = Lua.import('Module:Variables')
 
 local Import = Lua.import('Module:ParticipantTable/Import')
@@ -31,7 +26,6 @@ local Parser = Lua.import('Module:Features/ParticipantTable/Lib/ParseInput')
 
 local Display = Lua.import('Module:Features/ParticipantTable/Components/Wrapper')
 
-local pageVars = PageVariableNamespace('ParticipantTable')
 local prizePoolVars = PageVariableNamespace('PrizePool')
 
 ---@class ParticipantTable: BaseClass
@@ -70,8 +64,6 @@ end
 function ParticipantTable:fetchSectionsArgs()
 	local args = self.args
 
-	pageVars:set('stashArgs', '1')
-
 	local sectionsArgs = Array.mapIndexes(function (index)
 		local parsed = Json.parseIfString(args[index])
 		if type(parsed) == 'table' and parsed.type == 'section' then
@@ -79,32 +71,12 @@ function ParticipantTable:fetchSectionsArgs()
 		end
 	end)
 
-	if Logic.isNotEmpty(sectionsArgs) then
-		return sectionsArgs
-	end
-
-	-- make sure that all sections stashArgs
-	for _, potentialSection in pairs(args) do
-		ParticipantTable._stashArgs(potentialSection)
-	end
-
-	-- retrieve sectionsArgs
-	sectionsArgs = Template.retrieveReturnValues('ParticipantTable')
-	pageVars:delete('stashArgs')
-
 	--case no sections: use whole table as first section
 	if Logic.isEmpty(sectionsArgs) then
 		return {args}
 	end
 
 	return sectionsArgs
-end
-
----access the args so it stashes
----@param potentialSection string
----@return string
-function ParticipantTable._stashArgs(potentialSection)
-	return potentialSection
 end
 
 ---@param args table
