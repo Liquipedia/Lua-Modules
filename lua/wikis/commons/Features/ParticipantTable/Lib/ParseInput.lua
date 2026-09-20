@@ -174,7 +174,6 @@ function Parser._readEntry(sectionArgs, key, index, config)
 		dq = Logic.readBool(opponentArgs.dq),
 		note = opponentArgs.note,
 		opponent = opponent,
-		inputIndex = index,
 		seed = opponentArgs.seed,
 	}
 end

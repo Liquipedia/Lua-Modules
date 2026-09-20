@@ -51,7 +51,6 @@ local Types = {}
 ---@field name string
 ---@field note string?
 ---@field dq boolean
----@field inputIndex integer?
 ---@field isResolved boolean?
 ---@field sortName string
 ---@field seed integer?
