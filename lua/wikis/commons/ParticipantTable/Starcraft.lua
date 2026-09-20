@@ -21,7 +21,7 @@ local FactionTable = Lua.import('Module:Features/ParticipantTable/Components/Fac
 ---@class StarcraftParticipantTable: ParticipantTable
 ---@operator call(Frame): StarcraftParticipantTable
 ---@field config ParticipantTableConfig
----@field sections StarcraftParticipantTableSection[]
+---@field sections ParticipantTableSection[]
 local StarcraftParticipantTable = Class.new(ParticipantTable)
 
 ---@param frame Frame
@@ -30,63 +30,8 @@ function StarcraftParticipantTable.run(frame)
 	return StarcraftParticipantTable(frame):read():store():create()
 end
 
----@param sectionArgs table
----@param key string|number
----@param index number
----@param config ParticipantTableConfig
----@return StarcraftParticipantTableEntry
-function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
-	local prefix = 'p' .. index
-	local valueFromArgs = function(postfix)
-		return sectionArgs[key .. postfix] or sectionArgs[prefix .. postfix]
-	end
-
-	--if not a json assume it is a solo opponent
-	local opponentArgs = Json.parseIfTable(sectionArgs[key]) or {
-		type = Opponent.solo,
-		name = sectionArgs[key],
-		link = valueFromArgs('link'),
-		flag = valueFromArgs('flag'),
-		team = valueFromArgs('team'),
-		dq = valueFromArgs('dq'),
-		note = valueFromArgs('note'),
-		seed = valueFromArgs('seed'),
-		faction = valueFromArgs('race') or valueFromArgs('faction'),
-	}
-
-	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
-
-	opponentArgs.seed = tonumber(opponentArgs.seed)
-	if opponentArgs.seed then
-		self.hasSeeds = true
-	end
-
-	--unset wiki var for random events to not read players as random if prize pool already sets them as random
-	if config.isRandomEvent and opponentArgs.type == Opponent.solo then
-		Variables.varDefine(opponentArgs.name .. '_faction', '')
-	end
-
-	local opponent = Opponent.readOpponentArgs(opponentArgs)
-
-	if config.sortPlayers and opponent.players then
-		table.sort(opponent.players, function (player1, player2)
-			local name1 = (player1.displayName or player1.pageName):lower()
-			local name2 = (player2.displayName or player2.pageName):lower()
-			return name1 < name2
-		end)
-	end
-
-	return {
-		dq = Logic.readBool(opponentArgs.dq),
-		note = opponentArgs.note,
-		opponent = opponent,
-		inputIndex = index,
-		seed = opponentArgs.seed,
-	}
-end
-
 ---@param lpdbData table
----@param entry StarcraftParticipantTableEntry
+---@param entry ParticipantTableEntry
 ---@param config ParticipantTableConfig
 function StarcraftParticipantTable:adjustLpdbData(lpdbData, entry, config)
 	if config.isRandomEvent then
@@ -177,7 +122,7 @@ function StarcraftParticipantTable:_getFactionNumbers()
 	return factionNumbers
 end
 
----@param entry StarcraftParticipantTableEntry
+---@param entry ParticipantTableEntry
 ---@param config ParticipantTableConfig
 function StarcraftParticipantTable:setCustomPageVariables(entry, config)
 	if config.isRandomEvent then
