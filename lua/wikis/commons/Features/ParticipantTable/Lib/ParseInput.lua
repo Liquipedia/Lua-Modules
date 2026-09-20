@@ -32,10 +32,19 @@ function Parser.readConfig(args, parentConfig)
 
 	local showTeams = not Logic.readBool(args.disable_teams)
 
+
+	local shouldStore
+	if Logic.readBool(args.noStorage) then
+		shouldStore = false
+	elseif parentConfig.storage ~= nil then
+		shouldStore = parentConfig.storage
+	else
+		shouldStore = Namespace.isMain() and not Lpdb.isStorageDisabled()
+	end
+
 	local config = {
 		lpdbPrefix = args.lpdbPrefix or parentConfig.lpdbPrefix or Variables.varDefault('lpdbPrefix'),
-		noStorage = Logic.readBool(args.noStorage or parentConfig.noStorage or
-			Lpdb.isStorageDisabled() or not Namespace.isMain()),
+		storage = shouldStore,
 		matchGroupSpec = TournamentStructure.readMatchGroupsSpec(args),
 		syncPlayers = Logic.nilOr(Logic.readBoolOrNil(args.syncPlayers), parentConfig.syncPlayers, true),
 		showCountBySection = Logic.readBool(args.showCountBySection or parentConfig.showCountBySection),
