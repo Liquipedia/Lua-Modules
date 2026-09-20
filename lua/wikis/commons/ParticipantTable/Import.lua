@@ -18,19 +18,19 @@ local TournamentStructure = Lua.import('Module:TournamentStructure')
 local ParticipantTableImport = {}
 
 ---@param config ParticipantTableConfig
----@param entriesByName table<string, ParticipantTableEntry>
+---@param entries ParticipantTableEntry[]
 ---@return ParticipantTableEntry[]
-function ParticipantTableImport.importFromMatchGroupSpec(config, entriesByName)
-	if Table.isEmpty(config.matchGroupSpec) then
-		return Array.extractValues(entriesByName)
-	end
-
+function ParticipantTableImport.importFromMatchGroupSpec(config, entries)
 	local matchRecords = ParticipantTableImport._fetchMatchRecords(config.matchGroupSpec)
 	if Table.isEmpty(matchRecords) then
-		return Array.extractValues(entriesByName)
+		return {}
 	end
+	---@type table<string, true>
+	local alreadyProcessed = Table.map(entries, function(key, entry)
+		return entry.name, true
+	end)
 	---@cast matchRecords -nil
-	return ParticipantTableImport._entriesFromMatchRecords(matchRecords, config, entriesByName)
+	return ParticipantTableImport._entriesFromMatchRecords(matchRecords, config, alreadyProcessed)
 end
 
 ---@param matchGroupSpec table
@@ -46,9 +46,10 @@ end
 
 ---@param matchRecords table[]
 ---@param config ParticipantTableConfig
----@param entriesByName table<string, ParticipantTableEntry>
+---@param alreadyProcessed table<string, true>
 ---@return ParticipantTableEntry[]
-function ParticipantTableImport._entriesFromMatchRecords(matchRecords, config, entriesByName)
+function ParticipantTableImport._entriesFromMatchRecords(matchRecords, config, alreadyProcessed)
+	local entries = {}
 	Array.forEach(matchRecords, function(matchRecord)
 		Array.forEach(matchRecord.match2opponents, function(opponentRecord, opponentIndex)
 			if not ParticipantTableImport._shouldInclude(opponentIndex, matchRecord, config.importOnlyQualified) then
@@ -56,13 +57,13 @@ function ParticipantTableImport._entriesFromMatchRecords(matchRecords, config, e
 			end
 
 			local entry = ParticipantTableImport._entryFromOpponentRecord(opponentRecord)
-			if not entry then return end
+			if not entry or alreadyProcessed[entry.name] then return end
 
-			entriesByName[entry.name] = entriesByName[entry.name] or entry
+			table.insert(entries, entry)
 		end)
 	end)
 
-	return Array.extractValues(entriesByName)
+	return entries
 end
 
 ---@param opponentIndex integer

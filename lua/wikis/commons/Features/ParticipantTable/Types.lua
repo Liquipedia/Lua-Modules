@@ -56,15 +56,4 @@ local Types = {}
 ---@field sortName string
 ---@field seed integer?
 
-
-
--- todo: resolve those with the refactoring
-
----@class StarcraftParticipantTableEntry: ParticipantTableEntry
----@field isQualified boolean?
----@field opponent StarcraftStandardOpponent
-
----@class StarcraftParticipantTableSection: ParticipantTableSection
----@field entries StarcraftParticipantTableEntry[]
-
 return Types

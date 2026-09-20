@@ -48,73 +48,27 @@ end
 ---@return self
 function ParticipantTable:read()
 	self.config = Parser.readConfig(self.args)
-	self:readSections()
+	self.sections = Parser.readSections(self.args, self.config)
+
+	Array.forEach(self.sections, function(section)
+		self:_adjustSectionWithImport(section)
+		Array.sortInPlaceBy(section.entries, function(entry)
+			return section.config.sortOpponents and entry.sortName:lower() or entry.inputIndex or -1
+		end)
+	end)
 
 	return self
 end
 
-function ParticipantTable:readSections()
-	self.sections = {}
-	Array.forEach(self:fetchSectionsArgs(), function(sectionArgs)
-		self:readSection(sectionArgs)
-	end)
-end
-
----@return table[]
-function ParticipantTable:fetchSectionsArgs()
-	local args = self.args
-
-	local sectionsArgs = Array.mapIndexes(function (index)
-		local parsed = Json.parseIfString(args[index])
-		if type(parsed) == 'table' and parsed.type == 'section' then
-			return parsed
-		end
-	end)
-
-	--case no sections: use whole table as first section
-	if Logic.isEmpty(sectionsArgs) then
-		return {args}
+function ParticipantTable:_adjustSectionWithImport(section)
+	local config = section.config
+	if Logic.isEmpty(config.matchGroupSpec) then
+		return
 	end
 
-	return sectionsArgs
-end
+	local entries = section.entries
 
----@param args table
-function ParticipantTable:readSection(args)
-	local config = Parser.readConfig(args, self.config)
-	local section = {config = config}
-
-	local entriesByName = {}
-	local tbds = {}
-	Table.mapArgumentsByPrefix(args, {'p', 'player'}, function(key, index)
-		local entry = self:readEntry(args, key, index, config)
-		entry.sortName = Opponent.toName(entry.opponent)
-
-		if entry.opponent and Opponent.isTbd(entry.opponent) then
-			entry.name = Opponent.toName(entry.opponent)
-			table.insert(tbds, entry)
-			--needed so index is increased
-			return entry
-		end
-
-		entry.opponent = Opponent.resolve(entry.opponent, config.resolveDate, {
-			syncPlayer = config.syncPlayers,
-			overwritePageVars = true,
-		})
-		entry.isResolved = true
-		entry.name = Opponent.toName(entry.opponent)
-
-		if entriesByName[entry.name] then
-			error('Duplicate Input "|' .. key .. '=' .. args[key] .. '"')
-		end
-
-		entriesByName[entry.name] = entry
-
-		--needed so index is increased
-		return entry
-	end)
-
-	section.entries = Array.map(Import.importFromMatchGroupSpec(config, entriesByName), function(entry)
+	Array.forEach(Import.importFromMatchGroupSpec(config, entries), function(entry)
 		entry.sortName = entry.sortName or Opponent.toName(entry.opponent)
 		entry.opponent = entry.isResolved and entry.opponent or Opponent.resolve(entry.opponent, config.resolveDate, {
 			syncPlayer = config.syncPlayers,
@@ -123,70 +77,13 @@ function ParticipantTable:readSection(args)
 		entry.name = entry.name or Opponent.toName(entry.opponent)
 		entry.isResolved = true
 		self:setCustomPageVariables(entry, config)
-		return entry
+		table.insert(entries, entry)
 	end)
-
-	Array.sortInPlaceBy(section.entries, function(entry)
-		return config.sortOpponents and entry.sortName:lower() or entry.inputIndex or -1
-	end)
-
-	Array.extendWith(section.entries, tbds)
-
-	table.insert(self.sections, section)
 end
 
 ---@param entry ParticipantTableEntry
 ---@param config ParticipantTableConfig
 function ParticipantTable:setCustomPageVariables(entry, config)
-end
-
----@param sectionArgs table
----@param key string|number
----@param index number
----@param config ParticipantTableConfig
----@return ParticipantTableEntry
-function ParticipantTable:readEntry(sectionArgs, key, index, config)
-	local prefix = 'p' .. index
-	local valueFromArgs = function(postfix)
-		return sectionArgs[key .. postfix] or sectionArgs[prefix .. postfix]
-	end
-
-	--if not a json assume it is a solo opponent
-	local opponentArgs = Json.parseIfTable(sectionArgs[key]) or {
-		type = Opponent.solo,
-		name = sectionArgs[key],
-		link = valueFromArgs('link'),
-		flag = valueFromArgs('flag'),
-		team = valueFromArgs('team'),
-		dq = valueFromArgs('dq'),
-		note = valueFromArgs('note'),
-		seed = valueFromArgs('seed'),
-	}
-
-	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
-
-	opponentArgs.seed = tonumber(opponentArgs.seed)
-	if opponentArgs.seed then
-		self.hasSeeds = true
-	end
-
-	local opponent = Opponent.readOpponentArgs(opponentArgs)
-
-	if config.sortPlayers and opponent.players then
-		table.sort(opponent.players, function (player1, player2)
-			local name1 = (player1.displayName or player1.pageName):lower()
-			local name2 = (player2.displayName or player2.pageName):lower()
-			return name1 < name2
-		end)
-	end
-
-	return {
-		dq = Logic.readBool(opponentArgs.dq),
-		note = opponentArgs.note,
-		opponent = opponent,
-		inputIndex = index,
-		seed = opponentArgs.seed,
-	}
 end
 
 ---@return self

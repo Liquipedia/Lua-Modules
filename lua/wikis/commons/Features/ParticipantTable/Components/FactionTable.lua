@@ -17,7 +17,7 @@ local Header = Lua.import('Module:Features/ParticipantTable/Components/FactionHe
 local Section = Lua.import('Module:Features/ParticipantTable/Components/FactionSection')
 
 ---@param props {config: ParticipantTableConfig, factionColumns: string[],
----factionNumbers: table<string, integer>, sections: StarcraftParticipantTableSection[]}
+---factionNumbers: table<string, integer>, sections: ParticipantTableSection[]}
 ---@return VNode
 local function ParticipantTableFactionTable(props)
 	local config = props.config
