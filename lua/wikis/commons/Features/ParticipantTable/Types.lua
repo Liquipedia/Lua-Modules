@@ -17,7 +17,7 @@ local Types = {}
 
 ---@class ParticipantTableConfig
 ---@field lpdbPrefix string?
----@field noStorage boolean
+---@field storage boolean
 ---@field matchGroupSpec MatchGroupsSpec?
 ---@field syncPlayers boolean
 ---@field showCountBySection boolean
