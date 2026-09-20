@@ -77,7 +77,7 @@ end
 ---@return ParticipantTableSection[]
 function Parser.readSections(args, config)
 	local sectionsArgs = Array.mapIndexes(function (index)
-		local parsed = Json.parseIfString(args[index])
+		local parsed = Json.parseIfTable(args[index])
 		if type(parsed) == 'table' and parsed.type == 'section' then
 			return parsed
 		end
@@ -88,10 +88,10 @@ function Parser.readSections(args, config)
 	end
 
 	return Array.map(sectionsArgs, function(sectionArgs)
-		local sectionConfig = Parser.readConfig(args, config)
+		local sectionConfig = Parser.readConfig(sectionArgs, config)
 		return {
 			config = sectionConfig,
-			entries = Parser._readEntries()
+			entries = Parser._readEntries(sectionArgs, sectionConfig)
 		}
 	end)
 end
