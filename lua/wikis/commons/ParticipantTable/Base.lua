@@ -21,8 +21,10 @@ local Table = Lua.import('Module:Table')
 local Tournament = Lua.import('Module:Tournament')
 local Variables = Lua.import('Module:Variables')
 
-local Import = Lua.import('Module:ParticipantTable/Import')
+local Import = Lua.import('Module:Features/ParticipantTable/Api/Import')
+local ImportParser = Lua.import('Module:Features/ParticipantTable/Lib/ParseImported')
 local Parser = Lua.import('Module:Features/ParticipantTable/Lib/ParseInput')
+local Util = Lua.import('Module:Features/ParticipantTable/Lib/Util')
 
 local Display = Lua.import('Module:Features/ParticipantTable/Components/Wrapper')
 
@@ -51,39 +53,17 @@ function ParticipantTable:read()
 	self.sections = Parser.readSections(self.args, self.config)
 
 	Array.forEach(self.sections, function(section)
-		self:_adjustSectionWithImport(section)
-		Array.sortInPlaceBy(section.entries, function(entry)
-			return section.config.sortOpponents and entry.sortName:lower() or entry.inputIndex or -1
+		local matchRecords = Import.fromMatchGroupSpec(section.config.matchGroupSpec)
+		Array.extendWith(section.entries, ImportParser.parseImported(section.config, section.entries, matchRecords))
+		Util.backFillEntries(section)
+		Util.sortOpponents(section)
+		Array.forEach(section.entries, function(entry)
+			self:setCustomPageVariables(entry, section.config)
 		end)
 	end)
-	self.hasSeeds = Array.any(self.sections, function(section)
-		return Array.any(section.entries, function(entry)
-			return entry.seed ~= nil
-		end)
-	end)
+	self.hasSeeds = Util.hasSeed(self.sections)
 
 	return self
-end
-
-function ParticipantTable:_adjustSectionWithImport(section)
-	local config = section.config
-	if Logic.isEmpty(config.matchGroupSpec) then
-		return
-	end
-
-	local entries = section.entries
-
-	Array.forEach(Import.importFromMatchGroupSpec(config, entries), function(entry)
-		entry.sortName = entry.sortName or Opponent.toName(entry.opponent)
-		entry.opponent = entry.isResolved and entry.opponent or Opponent.resolve(entry.opponent, config.resolveDate, {
-			syncPlayer = config.syncPlayers,
-			overwritePageVars = true,
-		})
-		entry.name = entry.name or Opponent.toName(entry.opponent)
-		entry.isResolved = true
-		self:setCustomPageVariables(entry, config)
-		table.insert(entries, entry)
-	end)
 end
 
 ---@param entry ParticipantTableEntry

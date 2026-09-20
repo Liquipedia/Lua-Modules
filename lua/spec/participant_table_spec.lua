@@ -196,9 +196,9 @@ describe('Participant Table', function()
 				{
 					{
 						entries = {
-							Table.merge({inputIndex = 1}, parsedBaseEntries.clem),
-							Table.merge({inputIndex = 2}, parsedBaseEntries.lambo),
-							Table.merge({inputIndex = 3}, parsedBaseEntries.showtime),
+							parsedBaseEntries.clem,
+							parsedBaseEntries.lambo,
+							parsedBaseEntries.showtime,
 						},
 					},
 				},
@@ -208,9 +208,9 @@ describe('Participant Table', function()
 				{
 					{
 						entries = {
-							Table.merge({inputIndex = 1, seed = 1}, parsedBaseEntries.clem),
-							Table.merge({inputIndex = 2, seed = 3}, parsedBaseEntries.lambo),
-							Table.merge({inputIndex = 3, seed = 2}, parsedBaseEntries.showtime),
+							Table.merge({seed = 1}, parsedBaseEntries.clem),
+							Table.merge({seed = 3}, parsedBaseEntries.lambo),
+							Table.merge({seed = 2}, parsedBaseEntries.showtime),
 						},
 					},
 				},
@@ -220,15 +220,15 @@ describe('Participant Table', function()
 				{
 					{
 						entries = {
-							Table.merge({inputIndex = 1}, parsedBaseEntries.clem),
-							Table.merge({inputIndex = 2}, parsedBaseEntries.lambo),
-							Table.merge({inputIndex = 3}, parsedBaseEntries.showtime),
+							parsedBaseEntries.clem,
+							parsedBaseEntries.lambo,
+							parsedBaseEntries.showtime,
 						},
 					},
 					{
 						entries = {
-							Table.merge({inputIndex = 2}, parsedBaseEntries.bunny),
-							Table.merge({inputIndex = 1}, parsedBaseEntries.classic),
+							parsedBaseEntries.bunny,
+							parsedBaseEntries.classic,
 						},
 					},
 				},
@@ -240,7 +240,6 @@ describe('Participant Table', function()
 							entries = {
 								{
 									dq = false,
-									inputIndex = 2,
 									isResolved = true,
 									name = 'Classic_(Kim_Doh_Woo) / ShoWTimE',
 									opponent = {
@@ -265,7 +264,6 @@ describe('Participant Table', function()
 								},
 								{
 									dq = false,
-									inputIndex = 1,
 									isResolved = true,
 									name = 'Clem / Lambo',
 									opponent = {
