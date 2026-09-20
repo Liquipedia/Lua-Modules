@@ -41,6 +41,7 @@ local Types = {}
 ---@field manualFactionCounts table<string, number?>
 ---@field factionColumnWidth number
 ---@field soloAsFactionTable boolean?
+---@field showCountByFaction boolean
 
 ---@class ParticipantTableSection
 ---@field config ParticipantTableConfig

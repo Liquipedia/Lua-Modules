@@ -1,5 +1,7 @@
 describe('Participant Table', function()
-	local ParticipantTable = require('Module:ParticipantTable/Custom')
+	-- with sc2 we can check all relevant tests, on non faction wikis incl commons we can not, hence test on sc2
+	SetActiveWiki('starcraft2')
+	local ParticipantTable = require('Module:Features/ParticipantTable/Custom')
 
 	local Array = require('Module:Array')
 	local InfoboxLeague = require('Module:Infobox/League/Custom')
@@ -72,10 +74,18 @@ describe('Participant Table', function()
 			stub(mw.ext.LiquipediaDB, "lpdb_placement")
 			InfoboxLeague.run(tournamentData)
 
-			GoldenTest('participant_table', tostring(ParticipantTable.run(argsPlain)))
-			GoldenTest('participant_table_with_seed', tostring(ParticipantTable.run(argsWithSeed)))
+			local notAsFactionTable = function(args)
+				return Table.merge(args, {soloAsFactionTable = false})
+			end
+
+			GoldenTest('participant_table', tostring(ParticipantTable.run(notAsFactionTable(argsPlain))))
+			GoldenTest('participant_faction_table', tostring(ParticipantTable.run(argsPlain)))
+			GoldenTest('participant_table_with_seed', tostring(ParticipantTable.run(notAsFactionTable(argsWithSeed))))
+			-- doesn't work yet due to it not being implemented yet
+			--GoldenTest('participant_faction_table_with_seed', tostring(ParticipantTable.run(argsWithSeed)))
 			GoldenTest('participant_table_with_duo', tostring(ParticipantTable.run(argsDuoOpponent)))
-			GoldenTest('participant_table_with_section', tostring(ParticipantTable.run(argsWithSections)))
+			GoldenTest('participant_table_with_section', tostring(ParticipantTable.run(notAsFactionTable(argsWithSections))))
+			GoldenTest('participant_faction_table_with_section', tostring(ParticipantTable.run(argsWithSections)))
 
 			mw.ext.LiquipediaDB.lpdb_tournament:revert()
 			---@diagnostic disable-next-line: undefined-field
@@ -86,17 +96,75 @@ describe('Participant Table', function()
 	end)
 
 	describe('parsed correctly', function()
+		local Controller = require('Module:Features/ParticipantTable/Controller')
+
+		it('config', function()
+			MockLpdb.setUp()
+			TeamTemplateMock.setUp()
+			local parse = function(args)
+				local config = Controller._parseAndProcess(args)
+				return config
+			end
+
+			assert.are_same(
+				{
+					storage = true,
+					syncPlayers = true,
+					showCountBySection = false,
+					colSpan = 4,
+					onlyNotable = false,
+					sortPlayers = true,
+					sortOpponents = true,
+					showTeams = true,
+					importOnlyQualified = false,
+					display = true,
+					showTitle = true,
+					soloAsFactionTable = true,
+					manualFactionCounts = {},
+					factionColumnWidth = 212,
+					showCountByFaction = false,
+					width = (212 * 4) .. 'px',
+					columnWidth = '25%',
+
+				},
+				parse(argsPlain)
+			)
+
+			assert.are_same(
+				{
+					storage = true,
+					syncPlayers = true,
+					showCountBySection = false,
+					colSpan = 4,
+					onlyNotable = false,
+					sortPlayers = true,
+					sortOpponents = true,
+					showTeams = true,
+					importOnlyQualified = false,
+					display = true,
+					showTitle = true,
+					soloAsFactionTable = false,
+					manualFactionCounts = {},
+					factionColumnWidth = 212,
+					showCountByFaction = false,
+					width = (212 * 4) .. 'px',
+					columnWidth = '25%',
+
+				},
+				parse(Table.merge(argsPlain, {soloAsFactionTable = false}))
+			)
+			TeamTemplateMock.tearDown()
+			MockLpdb.tearDown()
+		end)
+
 		it('entries', function()
 			MockLpdb.setUp()
 			TeamTemplateMock.setUp()
-
-			local BaseParticipantTable = require('Module:ParticipantTable/Base')
 			local parse = function(args)
-				local participantTable = BaseParticipantTable(args):read()
-				local sections = Array.map(participantTable.sections, function(section)
+				local _, sections = Controller._parseAndProcess(args)
+				return Array.map(sections, function(section)
 					return {entries = section.entries}
 				end)
-				return sections
 			end
 
 			local parsedBaseEntries = {
@@ -106,9 +174,11 @@ describe('Participant Table', function()
 					name = 'Clem',
 					opponent = {
 						extradata = {},
+						isArchon = false,
 						players = {
 							{
 								displayName = 'Clem',
+								faction = 't',
 								flag = 'France',
 								pageIsResolved = true,
 								pageName = 'Clem',
@@ -124,9 +194,11 @@ describe('Participant Table', function()
 					name = 'Lambo',
 					opponent = {
 						extradata = {},
+						isArchon = false,
 						players = {
 							{
 								displayName = 'Lambo',
+								faction = 'z',
 								flag = 'Germany',
 								pageIsResolved = true,
 								pageName = 'Lambo',
@@ -142,9 +214,11 @@ describe('Participant Table', function()
 					name = 'ShoWTimE',
 					opponent = {
 						extradata = {},
+						isArchon = false,
 						players = {
 							{
 								displayName = 'ShoWTimE',
+								faction = 'p',
 								flag = 'Germany',
 								pageIsResolved = true,
 								pageName = 'ShoWTimE',
@@ -160,9 +234,11 @@ describe('Participant Table', function()
 					name = 'Bunny_(Korean_player)',
 					opponent = {
 						extradata = {},
+						isArchon = false,
 						players = {
 							{
 								displayName = 'Bunny',
+								faction = 't',
 								flag = 'South Korea',
 								pageIsResolved = true,
 								pageName = 'Bunny_(Korean_player)',
@@ -178,9 +254,11 @@ describe('Participant Table', function()
 					name = 'Classic_(Kim_Doh_Woo)',
 					opponent = {
 						extradata = {},
+						isArchon = false,
 						players = {
 							{
 								displayName = 'Classic',
+								faction = 'p',
 								flag = 'South Korea',
 								pageIsResolved = true,
 								pageName = 'Classic_(Kim_Doh_Woo)',
@@ -244,15 +322,18 @@ describe('Participant Table', function()
 									name = 'Classic_(Kim_Doh_Woo) / ShoWTimE',
 									opponent = {
 										extradata = {},
+										isArchon = false,
 										players = {
 											{
 												displayName = 'Classic',
+												faction = 'p',
 												flag = 'South Korea',
 												pageIsResolved = true,
 												pageName = 'Classic_(Kim_Doh_Woo)',
 											},
 											{
 												displayName = 'ShoWTimE',
+												faction = 'p',
 												flag = 'Germany',
 												pageIsResolved = true,
 												pageName = 'ShoWTimE',
@@ -268,15 +349,18 @@ describe('Participant Table', function()
 									name = 'Clem / Lambo',
 									opponent = {
 										extradata = {},
+										isArchon = false,
 										players = {
 											{
 												displayName = 'Clem',
+												faction = 't',
 												flag = 'France',
 												pageIsResolved = true,
 												pageName = 'Clem',
 											},
 											{
 												displayName = 'Lambo',
+												faction = 'z',
 												flag = 'Germany',
 												pageIsResolved = true,
 												pageName = 'Lambo',
@@ -295,5 +379,5 @@ describe('Participant Table', function()
 			MockLpdb.tearDown()
 		end)
 	end)
---]]
+	SetActiveWiki()
 end)

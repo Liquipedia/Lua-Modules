@@ -27,7 +27,7 @@ local function ParticipantTableFactionHeader(props)
 			' ',
 			Faction.toName(faction),
 			config.isRandomEvent and ' Main' or nil,
-			config.count and " ''(" .. props.factionNumbers[faction .. 'Display'] .. ")''" or nil
+			config.showCountByFaction and " ''(" .. props.factionNumbers[faction .. 'Display'] .. ")''" or nil
 		)
 
 		return Html.Div{
