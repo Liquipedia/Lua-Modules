@@ -47,6 +47,10 @@ return {
 				swiss = {'matchdiff', 'gamediff'},
 			},
 		},
+		participants = {
+			soloAsFactionTable = true,
+			sortPlayersInTable = true,
+		},
 	},
 	defaultRoundPrecision = 0,
 }
