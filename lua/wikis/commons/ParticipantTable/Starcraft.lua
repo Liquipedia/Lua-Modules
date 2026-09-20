@@ -7,14 +7,11 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Faction = Lua.import('Module:Faction')
-local Opponent = Lua.import('Module:Opponent/Custom')
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
-local Variables = Lua.import('Module:Variables')
 
 local FactionTable = Lua.import('Module:Features/ParticipantTable/Components/FactionTable')
+local Util = Lua.import('Module:Features/ParticipantTable/Lib/Util')
 
 ---@class StarcraftParticipantTable: ParticipantTable
 ---@operator call(Frame): StarcraftParticipantTable
@@ -28,16 +25,9 @@ function StarcraftParticipantTable.run(frame)
 	return StarcraftParticipantTable(frame):read():store():create()
 end
 
----@return boolean
-function StarcraftParticipantTable:isPureSolo()
-	return Array.all(self.sections, function(section) return Array.all(section.entries, function(entry)
-		return entry.opponent.type == Opponent.solo
-	end) end)
-end
-
 ---@return VNode?
 function StarcraftParticipantTable:create()
-	if self:isPureSolo() and self.config.soloAsFactionTable then
+	if Util.shouldDisplayAsFactionTable(self.sections, self.config) then
 		return self:createSoloFactionTable()
 	end
 	return ParticipantTable.create(self)
@@ -49,29 +39,8 @@ function StarcraftParticipantTable:createSoloFactionTable()
 
 	if not config.display then return end
 
-	local factionNumbers = self:_getFactionNumbers()
-
-	local factionColumns
-	if config.displayRandomColumn or
-		not config.isRandomEvent and config.displayRandomColumn == nil and factionNumbers.rDisplay > 0 then
-
-		factionColumns = Array.copy(Faction.knownFactions)
-	else
-		factionColumns = Array.copy(Faction.coreFactions)
-	end
-
-	if config.displayUnknownColumn or
-		config.displayUnknownColumn == nil and factionNumbers[Faction.defaultFaction .. 'Display'] > 0 then
-
-		table.insert(factionColumns, Faction.defaultFaction)
-	end
-
-
-	if config.displayMultipleFactionColumn or
-		config.displayMultipleFactionColumn == nil and factionNumbers.mDisplay and factionNumbers.mDisplay > 0 then
-
-		table.insert(factionColumns, Faction.read('m'))
-	end
+	local factionNumbers = Util.getFactionNumbers(self.sections, self.config)
+	local factionColumns = Util.getFactionColumns(config, factionNumbers)
 
 	return FactionTable{
 		config = self.config,
@@ -79,42 +48,6 @@ function StarcraftParticipantTable:createSoloFactionTable()
 		factionNumbers = factionNumbers,
 		sections = self.sections,
 	}
-end
-
----@return table
-function StarcraftParticipantTable:_getFactionNumbers()
-	local calculatedNumbers = {}
-
-	Array.forEach(self.sections, function(section)
-		section.entries = section.config.onlyNotable and self.filterOnlyNotables(section.entries) or section.entries
-
-		Array.forEach(section.entries, function(entry)
-			local faction = entry.opponent.players[1].faction or Faction.defaultFaction
-			--if we have defaultFaction push it into the entry too
-			entry.opponent.players[1].faction = faction
-			calculatedNumbers[faction] = (calculatedNumbers[faction] or 0) + 1
-			if entry.dq then
-				calculatedNumbers[faction .. 'Dq'] = (calculatedNumbers[faction .. 'Dq'] or 0) + 1
-			end
-		end)
-	end)
-
-	local factionNumbers = {}
-	for _, faction in pairs(Faction.getFactions()) do
-		factionNumbers[faction] = calculatedNumbers[faction] or 0
-		factionNumbers[faction .. 'Display'] = self.config.manualFactionCounts[faction] or
-			(factionNumbers[faction] - (calculatedNumbers[faction .. 'Dq'] or 0))
-	end
-
-	return factionNumbers
-end
-
----@param entry ParticipantTableEntry
----@param config ParticipantTableConfig
-function StarcraftParticipantTable:setCustomPageVariables(entry, config)
-	if config.isRandomEvent then
-		Variables.varDefine(entry.opponent.players[1].displayName .. '_faction', Faction.read('r'))
-	end
 end
 
 return StarcraftParticipantTable

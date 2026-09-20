@@ -121,4 +121,9 @@ function Storage._objectName(lpdbData, config)
 	return 'ranking' .. lpdbPrefix .. lpdbData.prizepoolindex .. '_' .. lpdbData.opponentname
 end
 
+---@param entry ParticipantTableEntry
+function Storage.setFactionVariableAsRandom(entry)
+	Variables.varDefine(entry.opponent.players[1].displayName .. '_faction', Faction.read('r'))
+end
+
 return Storage
