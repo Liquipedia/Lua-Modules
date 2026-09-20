@@ -52,7 +52,7 @@ function WikiCopyPaste._getMap(mode)
 	local lines = Array.extend(
 		'={{Map',
 		INDENT .. INDENT .. '|map=|winner=',
-		INDENT .. INDENT .. '|o1p1={{Chars|}}|o2p1={{Chars|}}',
+		INDENT .. INDENT .. '|o1c1={{Chars|}}|o2c1={{Chars|}}',
 		INDENT .. '}}'
 	)
 	return table.concat(lines, '\n')
