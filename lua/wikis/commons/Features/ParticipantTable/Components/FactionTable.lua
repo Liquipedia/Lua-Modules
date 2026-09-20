@@ -16,7 +16,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local Header = Lua.import('Module:Features/ParticipantTable/Components/FactionHeader')
 local Section = Lua.import('Module:Features/ParticipantTable/Components/FactionSection')
 
----@param props {config: StarcraftParticipantTableConfig, factionColumns: string[],
+---@param props {config: ParticipantTableConfig, factionColumns: string[],
 ---factionNumbers: table<string, integer>, sections: StarcraftParticipantTableSection[]}
 ---@return VNode
 local function ParticipantTableFactionTable(props)
@@ -27,7 +27,7 @@ local function ParticipantTableFactionTable(props)
 		classes = {'participantTable', 'participantTable-faction'},
 		css = {
 			['grid-template-columns'] = 'repeat(' .. colSpan .. ', 1fr)',
-			width = (colSpan * config.soloColumnWidth) .. 'px',
+			width = (colSpan * config.factionColumnWidth) .. 'px',
 		},
 		children = WidgetUtil.collect(
 			Header{
