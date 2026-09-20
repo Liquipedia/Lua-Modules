@@ -255,7 +255,7 @@ function BaseResultsTable:buildBaseConditions()
 
 	if args.tier then
 		conditions:add(
-			ConditionUtil.anyOf(ColumnName('liquipediatier'), Array.parseCommaSeparatedString(args.tier))
+			ConditionUtil.anyOf(ColumnName('liquipediatier'), Array.parseMultiSelect(args.tier))
 		)
 	end
 
