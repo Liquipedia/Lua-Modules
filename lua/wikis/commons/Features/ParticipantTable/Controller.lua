@@ -27,24 +27,7 @@ local Controller = {}
 ---@return VNode?
 function Controller.execute(frame, CustomConfig)
 	local args = Arguments.getArgs(frame)
-
-	local config = Parser.readConfig(args)
-
-	local sections = Parser.readSections(args, config)
-
-	Array.forEach(sections, function(section)
-		local matchRecords = Import.fromMatchGroupSpec(section.config.matchGroupSpec)
-		Array.extendWith(section.entries, ImportParser.parseImported(section.config, section.entries, matchRecords))
-		Util.backFillEntries(section)
-		Util.sortOpponents(section)
-		Array.forEach(section.entries, function(entry)
-			if config.isRandomEvent then
-				Store.setFactionVariableAsRandom(entry)
-			end
-		end)
-	end)
-
-	Util.filterOnlyNotables(sections)
+	local config, sections = Controller._parseAndProcess(args)
 
 	if config.storage then
 		Store.run(sections, config, CustomConfig.adjustLpdbData)
@@ -71,6 +54,31 @@ function Controller.execute(frame, CustomConfig)
 		factionNumbers = factionNumbers,
 		sections = sections,
 	}
+end
+
+---@param args table
+---@return ParticipantTableConfig
+---@return ParticipantTableSection[]
+function Controller._parseAndProcess(args)
+	local config = Parser.readConfig(args)
+
+	local sections = Parser.readSections(args, config)
+
+	Array.forEach(sections, function(section)
+		local matchRecords = Import.fromMatchGroupSpec(section.config.matchGroupSpec)
+		Array.extendWith(section.entries, ImportParser.parseImported(section.config, section.entries, matchRecords))
+		Util.backFillEntries(section)
+		Util.sortOpponents(section)
+		Array.forEach(section.entries, function(entry)
+			if config.isRandomEvent then
+				Store.setFactionVariableAsRandom(entry)
+			end
+		end)
+	end)
+
+	sections = Util.filterOnlyNotables(sections)
+
+	return config, sections
 end
 
 return Controller

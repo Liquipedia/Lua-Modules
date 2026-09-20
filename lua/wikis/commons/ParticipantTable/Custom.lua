@@ -7,4 +7,4 @@
 
 local Lua = require('Module:Lua')
 
-return Lua.import('Features/ParticipantTable/Custom')
+return Lua.import('Module:Features/ParticipantTable/Custom')
