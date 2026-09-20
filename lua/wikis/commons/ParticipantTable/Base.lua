@@ -56,6 +56,11 @@ function ParticipantTable:read()
 			return section.config.sortOpponents and entry.sortName:lower() or entry.inputIndex or -1
 		end)
 	end)
+	self.hasSeeds = Array.any(self.sections, function(section)
+		return Array.any(section.entries, function(entry)
+			return entry.seed ~= nil
+		end)
+	end)
 
 	return self
 end
