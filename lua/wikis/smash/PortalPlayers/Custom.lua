@@ -153,12 +153,10 @@ function CustomPortalPlayers._getMainCharIcons(player)
 
 	local CharacterIcons = Lua.import('Module:CharacterIcons/' .. activeGame, {loadData = true})
 
-	return Array.map(mw.text.split(player.extradata['main' .. activeGame], ',', true), function(character)
-		return Html.Fragment{
-			children = {
-				(' '),
-				Characters._GetIconAndName(CharacterIcons, character, false) or ''
-			}
+	return Array.flatMap(Array.parseCommaSeparatedString(player.extradata['main' .. activeGame]), function(character)
+		return {
+			' ',
+			Characters._GetIconAndName(CharacterIcons, character, false) or ''
 		}
 	end)
 end
