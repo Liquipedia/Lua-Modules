@@ -13,7 +13,6 @@ local Operator = Lua.import('Module:Operator')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Entry = Lua.import('Module:Features/ParticipantTable/Components/Entry')
 local Title = Lua.import('Module:Features/ParticipantTable/Components/Title')
