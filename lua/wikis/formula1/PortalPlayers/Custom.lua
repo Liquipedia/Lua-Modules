@@ -63,7 +63,7 @@ end
 
 ---Builds the header for the table
 ---@param args {flag: string, isPlayer: boolean?}
----@return VNode
+---@return Widget
 function CustomPortalPlayers:header(args)
 	local teamText = args.isPlayer and ' Team' or ' Team and Role'
 
@@ -92,7 +92,7 @@ end
 ---Builds a table row
 ---@param player table
 ---@param isPlayer boolean
----@return Widget
+---@return VNode
 function CustomPortalPlayers:row(player, isPlayer)
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '') or ''
 	local teamText = TeamTemplate.exists(player.team) and tostring(OpponentDisplay.InlineTeamContainer{
