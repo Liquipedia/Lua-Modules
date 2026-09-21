@@ -14,6 +14,8 @@ local Logic = Lua.import('Module:Logic')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local Table = Lua.import('Module:Table')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+
 local Collapsible = Lua.import('Module:Widget/Match/Summary/Collapsible')
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
@@ -111,7 +113,7 @@ function CustomMatchSummary.createFooter(match)
 		end
 
 		local vods = MatchSummary.makeVodDisplay(game.vod, {})
-		local links = MatchSummary.makeLinksDisplay(linksForThisGame)
+		local links = DisplayHelper.makeLinksDisplay(linksForThisGame)
 
 		return Tr{children = {
 			Td{children = {'Game ', gameIndex}},
@@ -131,7 +133,7 @@ function CustomMatchSummary.createFooter(match)
 		rawLinksForMatch[linkType] = link
 	end)
 
-	matchLinks = Array.extend(matchLinks, MatchSummary.makeLinksDisplay(rawLinksForMatch))
+	matchLinks = Array.extend(matchLinks, DisplayHelper.makeLinksDisplay(rawLinksForMatch))
 
 	return WidgetUtil.collect(
 		Logic.isNotEmpty(gameLinks) and MatchSummaryWidgets.Footer{children = {

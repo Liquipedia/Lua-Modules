@@ -16,8 +16,9 @@ local NAME_SANITIZER = {
 
 ---Replaces a set of html entities with ansi characters.
 ---Removes all html tags and their attributes.
----@param name string?
----@return string?
+---@param name string
+---@return string
+---@overload fun(name: nil): nil
 function TextSanitizer.stripHTML(name)
 	if not name then
 		return

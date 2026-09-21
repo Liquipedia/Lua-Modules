@@ -23,7 +23,7 @@ local _opponent_type
 local TBD = 'TBD'
 
 -- Template entry point
----@return Widget
+---@return VNode
 function CustomLegacyPrizePool.run()
 	return LegacyPrizePool.run(CustomLegacyPrizePool)
 end

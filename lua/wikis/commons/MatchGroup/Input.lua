@@ -44,7 +44,7 @@ local VALID_GSL_GROUP_STYLES = {
 
 ---@param match table
 function MatchGroupInput._applyTournamentVarsToMaps(match)
-	for _, map in ipairs(MatchGroupUtil.normalizeSubtype(match, 'map')) do
+	for _, map in ipairs(MatchGroupInputUtil.normalizeSubtype(match, 'map')) do
 		Table.mergeInto(map, MatchGroupInputUtil.getTournamentContext(map, match))
 	end
 end
@@ -148,6 +148,9 @@ function MatchGroupInput.readMatchpage(bracketId, matchId, matchInput)
 	matchArgs.bracketid = bracketId
 	matchArgs.matchid = matchId
 	local match = MatchGroupInput._processMatch(matchArgs, {isMatchPage = true})
+	-- TODO: this repeats half of MatchGroupInputUtil.getStandaloneId, which builds the same
+	-- 'MATCH_<bracketid>_<matchid>' scheme. Change one and standalone match lookups silently
+	-- stop matching, so the two should share a single definition.
 	match.bracketid = 'MATCH_' .. match.bracketid
 	return {match}
 end
@@ -195,7 +198,8 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 		matchArgs.bracketid = bracketId
 		matchArgs.matchid = matchId
-		local match = Logic.wrapTryOrLog(MatchGroupInput._processMatch)(matchArgs)
+		local match = Logic.wrapTryOrLog(MatchGroupInput._processMatch)(matchArgs) or
+			{matchid = matchId, bracketid = bracketId}
 
 		-- Add more fields to bracket data
 		local bracketData = bracketDatasById[matchId]
@@ -239,7 +243,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		bracketData.bracketreset = bracketData.bracketreset or ''
 
 		if not bracketData.loweredges then
-			local opponents = MatchGroupUtil.normalizeSubtype(match, 'opponent')
+			local opponents = MatchGroupInputUtil.normalizeSubtype(match, 'opponent')
 			bracketData.loweredges = Array.map(
 				MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #opponents),
 				MatchGroupUtil.indexTableToRecord
@@ -286,6 +290,10 @@ function MatchGroupInput._fetchBracketDatas(bracketType, bracketId)
 	assert(#matches ~= 0, 'Template ' .. bracketType .. ' does not exist')
 
 	local function replaceBracketId(matchId)
+		if String.isEmpty(matchId) then
+			return nil
+		end
+		---@cast matchId -nil
 		local _, baseMatchId = MatchGroupUtil.splitMatchId(matchId)
 		return (bracketId or '') .. '_' .. baseMatchId
 	end
@@ -304,12 +312,12 @@ function MatchGroupInput._fetchBracketDatas(bracketType, bracketId)
 		bracketData.lowerMatchIds = bracketData.lowerMatchIds and shiftArrayIndex(bracketData.lowerMatchIds)
 
 		-- Rewrite bracket name of match IDs
-		bracketData.bracketreset = String.nilIfEmpty(bracketData.bracketreset) and replaceBracketId(bracketData.bracketreset)
+		bracketData.bracketreset = replaceBracketId(bracketData.bracketreset)
 		bracketData.lowerMatchIds = bracketData.lowerMatchIds and Array.map(bracketData.lowerMatchIds, replaceBracketId)
-		bracketData.thirdplace = String.nilIfEmpty(bracketData.thirdplace) and replaceBracketId(bracketData.thirdplace)
-		bracketData.tolower = String.nilIfEmpty(bracketData.tolower) and replaceBracketId(bracketData.tolower)
-		bracketData.toupper = String.nilIfEmpty(bracketData.toupper) and replaceBracketId(bracketData.toupper)
-		bracketData.upperMatchId = bracketData.upperMatchId and replaceBracketId(bracketData.upperMatchId)
+		bracketData.thirdplace = replaceBracketId(bracketData.thirdplace)
+		bracketData.tolower = replaceBracketId(bracketData.tolower)
+		bracketData.toupper = replaceBracketId(bracketData.toupper)
+		bracketData.upperMatchId = replaceBracketId(bracketData.upperMatchId)
 
 		-- Remove/convert deprecated fields
 		bracketData.lowerMatchIds = bracketData.lowerMatchIds or MatchGroupUtil.computeLowerMatchIdsFromLegacy(bracketData)

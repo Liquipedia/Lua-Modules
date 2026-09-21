@@ -36,7 +36,7 @@ local MvpTable = {}
 ---Fetches mvpData for a given set of matchGroupIds or tournaments.
 ---Displays the fetched data as a table.
 ---@param args table
----@return Widget?
+---@return VNode?
 function MvpTable.run(args)
 	args = args or {}
 	local parsedArgs = MvpTable._parseArgs(args)
@@ -100,7 +100,7 @@ end
 
 ---Builds the header of the MvpTable
 ---@param args mvpTableParsedArgs
----@return Widget
+---@return VNode
 function MvpTable._header(args)
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = Array.map(
@@ -113,7 +113,7 @@ end
 ---Builds the display for a mvp row
 ---@param args mvpTableParsedArgs
 ---@param item {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}
----@return Widget
+---@return VNode
 function MvpTable._row(args, item)
 	return TableWidgets.Row{
 		children = WidgetUtil.collect(

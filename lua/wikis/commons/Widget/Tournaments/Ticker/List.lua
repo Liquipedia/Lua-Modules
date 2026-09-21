@@ -55,8 +55,12 @@ local function TournamentsTickerList(props)
 					['data-filter-hideable-group-fallback'] = '',
 					['data-filter-effect'] = 'fade',
 				},
-				children = Html.Center{
-					css = {margin = '1.5rem 0', ['font-style'] = 'italic'},
+				children = Html.Div{
+					css = {
+						margin = '1.5rem 0',
+						['font-style'] = 'italic',
+						['text-align'] = 'center',
+					},
 					children = I18n.translate('tournament-ticker-no-tournaments'),
 				},
 			},
