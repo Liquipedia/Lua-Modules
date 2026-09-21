@@ -65,7 +65,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.weight = CustomPrizePool._weight(lpdbData, placement)
 
 	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, {
-		seriesnumber = CustomPrizePool._seriesNumber(),
 		mod = Variables.varDefault('tournament_mod'),
 	})
 
@@ -93,12 +92,6 @@ function CustomPrizePool._defaultImportLimit()
 	return tier >= 4 and 8
 		or tier == 3 and 16
 		or nil
-end
-
----@return string
-function CustomPrizePool._seriesNumber()
-	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
-	return seriesNumber and string.format('%05d', seriesNumber) or ''
 end
 
 ---@param lpdbData placement
