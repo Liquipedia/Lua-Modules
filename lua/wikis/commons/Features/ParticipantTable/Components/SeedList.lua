@@ -60,15 +60,15 @@ local function render(props)
 			['vertical-align'] = 'middle',
 			['max-width'] = '100%!important',
 		},
-		children = WidgetUtil.collect(
+		children = {
 			Title{
 				titleText = 'Seeding',
 				buttonText = props.config.title or 'Participants',
 				buttonArea = 1,
 				hasSeed = props.hasSeed,
 			},
-			display
-		)
+			display,
+		}
 	}
 end
 
