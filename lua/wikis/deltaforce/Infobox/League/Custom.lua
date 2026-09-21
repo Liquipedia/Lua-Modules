@@ -99,10 +99,11 @@ function CustomLeague:_createPatchCell(args)
 	end
 
 	return {
-		Link{link = args.patch},
-		Logic.isNotEmpty(args.epatch) and Link{link = args.epatch} or nil,
+		Link{link = 'Patch ' .. args.patch},
+		Logic.isNotEmpty(args.epatch) and Link{link = 'Patch ' .. args.epatch} or nil,
 	}
 end
+
 
 ---@param args table
 ---@return string[]
