@@ -20,7 +20,6 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local PortalPlayers = Lua.import('Module:PortalPlayers')
 
-local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
