@@ -75,7 +75,8 @@ function CustomPortalPlayers:header(args)
 					children = {
 						args.flag,
 						' ',
-						args.isPlayer and self.playerType or NON_PLAYER_HEADER,
+						args.isPlayer and self.playerType or NON_PLAYER_HEADER
+					}
 				},
 			},
 			TableWidgets.Row{
