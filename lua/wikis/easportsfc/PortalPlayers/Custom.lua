@@ -63,7 +63,7 @@ end
 
 ---Builds the header for the table
 ---@param args {flag: string, isPlayer: boolean?}
----@return Widget
+---@return VNode
 function CustomPortalPlayers:header(args)
 	local teamText = args.isPlayer and ' Team' or ' Team and Role'
 
