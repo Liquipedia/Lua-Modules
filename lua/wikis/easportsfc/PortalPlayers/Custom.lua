@@ -36,7 +36,7 @@ local BACKGROUND_CLASSES = {
 local CustomPortalPlayers = {}
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPortalPlayers.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.width = '1100px'

@@ -37,7 +37,7 @@ local CustomPortalPlayers = {}
 
 ---Entry Point. Builds the player portal
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPortalPlayers.run(frame)
 	local args = Arguments.getArgs(frame)
 

@@ -66,7 +66,7 @@ function PortalPlayers:init(args)
 end
 
 ---Create function for PortalPlayers
----@return Widget
+---@return VNode
 function PortalPlayers:create()
 	local countries = {}
 	for country, playerData in Table.iter.spairs(self:_getPlayers()) do
@@ -223,7 +223,7 @@ end
 
 ---Builds the table display for a given set of players
 ---@param args {players: table[]?, flag: string, isPlayer: boolean?}
----@return Widget?
+---@return VNode?
 function PortalPlayers:buildCountryTable(args)
 	local playerData = Table.extract(args, 'players') --[[@as table?]]
 	if Table.isEmpty(playerData) then
@@ -250,7 +250,7 @@ end
 
 ---Builds the header for the table
 ---@param args {flag: string, isPlayer: boolean?}
----@return Widget
+---@return VNode
 function PortalPlayers:header(args)
 	local teamText = args.isPlayer and ' Team' or ' Team and Role'
 
@@ -280,7 +280,7 @@ end
 ---Builds a table row
 ---@param player table
 ---@param isPlayer boolean?
----@return Widget
+---@return VNode
 function PortalPlayers:row(player, isPlayer)
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '') or ''
 	local teamText = TeamTemplate.exists(player.team) and tostring(OpponentDisplay.InlineTeamContainer{
