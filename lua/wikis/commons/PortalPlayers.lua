@@ -304,7 +304,11 @@ function PortalPlayers:row(player, isPlayer)
 			},
 			TableWidgets.Cell{
 				nowrap = false,
-				children = ' ' .. player.name .. (self.showLocalizedName and (' (' .. player.localizedname .. ')') or ''),
+				children = {
+					' ',
+					player.name,
+					self.showLocalizedName and (' (' .. player.localizedname .. ')') or ''
+				}
 			},
 			TableWidgets.Cell{
 				nowrap = false,
@@ -317,7 +321,7 @@ function PortalPlayers:row(player, isPlayer)
 					['line-height'] = '25px',
 					['padding'] = '1px 2px 1px 2px',
 				},
-				children = table.concat(links),
+				children = links,
 			},
 		},
 	}

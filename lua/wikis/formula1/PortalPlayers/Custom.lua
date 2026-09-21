@@ -73,7 +73,11 @@ function CustomPortalPlayers:header(args)
 				children = TableWidgets.CellHeader{
 					colspan = 5,
 					css = {['padding-left'] = '1em'},
-					children = args.flag .. ' ' .. (args.isPlayer and self.playerType or NON_PLAYER_HEADER),
+					children = {
+						args.flag,
+						' ',
+						args.isPlayer and self.playerType or NON_PLAYER_HEADER,
+					}
 				},
 			},
 			TableWidgets.Row{

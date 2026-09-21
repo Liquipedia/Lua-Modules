@@ -72,7 +72,10 @@ function CustomPortalPlayers:header(args)
 				children = TableWidgets.CellHeader{
 					colspan = 5,
 					css = {['padding-left'] = '1em'},
-					children = args.flag .. ' ' .. (args.isPlayer and self.playerType or NON_PLAYER_HEADER),
+					children = {
+						args.flag,
+						' ',
+						args.isPlayer and self.playerType or NON_PLAYER_HEADER,
 				},
 			},
 			TableWidgets.Row{
@@ -108,7 +111,7 @@ function CustomPortalPlayers:row(player, isPlayer)
 	end) or {}, Table.iter.spairs)
 
 	return TableWidgets.Row{
-		classes = WidgetUtil.collect(BACKGROUND_CLASSES[(player.status or ''):lower()]),
+		classes = {BACKGROUND_CLASSES[(player.status or ''):lower()]},
 		children = {
 			TableWidgets.Cell{
 				children = OpponentDisplay.BlockOpponent{opponent = PortalPlayers.toOpponent(player)}
@@ -129,7 +132,7 @@ function CustomPortalPlayers:row(player, isPlayer)
 					['line-height'] = '25px',
 					['padding'] = '1px 2px 1px 2px'
 				},
-				children = table.concat(links)
+				children = links
 			}
 		}
 	}
