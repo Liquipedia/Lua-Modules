@@ -117,7 +117,8 @@ function CustomOpponent.resolve(opponent, date, options)
 			Variables.varDefault('tournament_game') or
 			lpdbPlayer.extradata.maingame or Info.defaultGame
 
-		player.chars = Logic.nilIfEmpty(Array.parseCommaSeparatedString(lpdbPlayer.extradata['main' .. game]))
+		player.chars = Logic.nilIfEmpty(player.chars)
+			or Logic.nilIfEmpty(Array.parseCommaSeparatedString(lpdbPlayer.extradata['main' .. game]))
 		player.game = game
 	end)
 
