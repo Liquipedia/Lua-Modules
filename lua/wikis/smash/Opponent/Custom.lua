@@ -51,7 +51,7 @@ function CustomOpponent.readOpponentArgs(args)
 end
 
 ---@param opponent SmashStandardOpponent
----@param options {setPlayersInTeam: boolean?}?
+---@param options {setPlayersInTeam: boolean?, forceUnderscores: boolean?}?
 ---@return {opponentname: string, opponenttemplate: string?, opponenttype: OpponentType, opponentplayers: table?}
 function CustomOpponent.toLpdbStruct(opponent, options)
 	local storageStruct = Opponent.toLpdbStruct(opponent, options)
