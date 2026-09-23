@@ -34,6 +34,8 @@ function Util.sortOpponents(section)
 	end)
 end
 
+---@param sections ParticipantTableSection[]
+---@return boolean
 function Util.hasSeed(sections)
 	return Array.any(sections, function(section)
 		return Array.any(section.entries, function(entry)
