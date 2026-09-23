@@ -19,7 +19,7 @@ local Section = Lua.import('Module:Features/ParticipantTable/Components/FactionS
 ---@param props {config: StarcraftParticipantTableConfig, factionColumns: string[],
 ---factionNumbers: table<string, integer>, sections: StarcraftParticipantTableSection[]}
 ---@return VNode
-local function render(props)
+local function ParticipantTableFactionTable(props)
 	local config = props.config
 	local colSpan = #props.factionColumns
 
@@ -51,4 +51,4 @@ local function render(props)
 	}
 end
 
-return Component.component(render)
+return Component.component(ParticipantTableFactionTable)

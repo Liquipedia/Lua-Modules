@@ -15,7 +15,7 @@ local ParticipantTable = Lua.import('Module:Features/ParticipantTable/Components
 
 ---@param props {hasSeed: boolean?, config: ParticipantTableConfig, sections: ParticipantTableSection[]}
 ---@return VNode
-local function render(props)
+local function ParticipantTableWrapper(props)
 	local participantTable = ParticipantTable(props)
 
 	if not props.hasSeed then
@@ -32,4 +32,4 @@ local function render(props)
 	}
 end
 
-return Component.component(render)
+return Component.component(ParticipantTableWrapper)

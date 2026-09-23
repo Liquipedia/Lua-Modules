@@ -25,7 +25,7 @@ end
 
 ---@param props {config: ParticipantTableConfig, section: ParticipantTableSection}
 ---@return VNode[]
-local function render(props)
+local function ParticipantTableSection(props)
 	local section = props.section
 	local entries = section.entries
 	local sectionEntryCount = #Array.filter(entries, function(entry) return not entry.dq end)
@@ -80,4 +80,4 @@ local function render(props)
 	}
 end
 
-return Component.component(render)
+return Component.component(ParticipantTableSection)

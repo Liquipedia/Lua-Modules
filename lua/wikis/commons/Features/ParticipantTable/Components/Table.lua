@@ -19,7 +19,7 @@ local Title = Lua.import('Module:Features/ParticipantTable/Components/Title')
 
 ---@param props {hasSeed: boolean?, config: ParticipantTableConfig, sections: ParticipantTableSection[]}
 ---@return VNode
-local function render(props)
+local function ParticipantTableTable(props)
 	return Html.Div{
 		classes = {'participantTable'},
 		css = Table.merge({width = props.config.width}, props.hasSeed and {
@@ -44,4 +44,4 @@ local function render(props)
 	}
 end
 
-return Component.component(render)
+return Component.component(ParticipantTableTable)

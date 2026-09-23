@@ -27,7 +27,7 @@ end
 ---@param props {config: StarcraftParticipantTableConfig, section: StarcraftParticipantTableSection,
 ---factionColumns: string[]}
 ---@return VNode[]
-local function render(props)
+local function ParticipantTableFactionSection(props)
 	local section = props.section
 
 	local sectionTitleRow = makeRow(SectionTitle{
@@ -81,4 +81,4 @@ local function render(props)
 	)
 end
 
-return Component.component(render)
+return Component.component(ParticipantTableFactionSection)

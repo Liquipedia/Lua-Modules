@@ -19,7 +19,7 @@ local Title = Lua.import('Module:Features/ParticipantTable/Components/Title')
 
 ---@param props {hasSeed: boolean?, config: ParticipantTableConfig, sections: ParticipantTableSection[]}
 ---@return VNode[]
-local function render(props)
+local function ParticipantTableSeedList(props)
 	local width = tostring(50 + (props.config.showTeams and 242 or 186)) .. 'px'
 
 	local entries = Array.sortBy(
@@ -71,4 +71,4 @@ local function render(props)
 	}
 end
 
-return Component.component(render)
+return Component.component(ParticipantTableSeedList)

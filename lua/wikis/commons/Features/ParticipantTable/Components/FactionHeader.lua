@@ -17,7 +17,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@param props {config: StarcraftParticipantTableConfig, factionColumns: string[],
 ---factionNumbers: table<string, number>}
 ---@return VNode
-local function render(props)
+local function ParticipantTableFactionHeader(props)
 	local config = props.config
 
 	local makeFactionHeaderCell = function(faction)
@@ -42,4 +42,4 @@ local function render(props)
 	}
 end
 
-return Component.component(render)
+return Component.component(ParticipantTableFactionHeader)
