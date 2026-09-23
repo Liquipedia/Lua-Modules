@@ -172,7 +172,7 @@ function CustomMatchSummary.DisplayHeroes(opponent, options)
 	if not options.hasHeroes then return nil end
 
 	local heroesPerPlayer = Array.map(opponent.players or {}, function(player)
-		return Array.map(Array.range(1, 3), function(heroIndex)
+		return Array.mapRange(1, 3, function(heroIndex)
 			return (player.heroes or {})[heroIndex] or DEFAULT_HERO
 		end)
 	end)

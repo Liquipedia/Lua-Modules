@@ -61,7 +61,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		return Array.map(opponent.players or {}, function(player)
 			if Logic.isDeepEmpty(player) then return end
 			local playerCards = player.cards or {}
-			local cards = Array.map(Array.range(1, NUM_CARDS_PER_PLAYER), function(idx)
+			local cards = Array.mapRange(1, NUM_CARDS_PER_PLAYER, function(idx)
 				return playerCards[idx] or DEFAULT_CARD end)
 			---@cast cards table
 			cards.tower = playerCards.tower
@@ -115,7 +115,7 @@ end
 ---@param subMatchIndex integer
 function CustomMatchSummary._getSubMatchOpponentsAndPlayers(match, subMatch, subMatchIndex)
 	subMatch.players = CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, match)
-	subMatch.opponents = Array.map(Array.range(1, #subMatch.players), function(opponentIndex)
+	subMatch.opponents = Array.mapRange(1, #subMatch.players, function(opponentIndex)
 		local score, status = MatchGroupInputUtil.computeOpponentScore(
 			{opponentIndex = opponentIndex},
 			FnUtil.curry(CustomMatchSummary.computeSubMatchScore, subMatch.games)
@@ -168,7 +168,7 @@ function CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, ma
 		end)
 		local indexes = Logic.nilIfEmpty(Array.extractKeys(hash))
 		local maxIndex = indexes and math.max(unpack(Array.extractKeys(hash))) or 0
-		return Array.map(Array.range(1, maxIndex), function(playerIndex)
+		return Array.mapRange(1, maxIndex, function(playerIndex)
 			local matchPlayer = match.opponents[opponentIndex].players[playerIndex]
 			return hash[playerIndex] and (matchPlayer or hash[playerIndex]) or nil
 		end)

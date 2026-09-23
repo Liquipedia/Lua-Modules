@@ -303,7 +303,7 @@ function CustomPlayer:calculateEarnings(args)
 
 	local playerConditions = ConditionTree(BooleanOperator.any):add{
 		ConditionNode(ColumnName('opponentname'), Comparator.eq, player),
-		Array.map(Array.range(1, MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS), function (playerIndex)
+		Array.mapRange(1, MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS, function (playerIndex)
 			return ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, player)
 		end)
 	}
