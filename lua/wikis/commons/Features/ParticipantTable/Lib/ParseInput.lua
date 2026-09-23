@@ -17,6 +17,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local MathUtil = Lua.import('Module:MathUtil')
 local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local Set = Lua.import('Module:Set')
 local Table = Lua.import('Module:Table')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 local Variables = Lua.import('Module:Variables')
@@ -101,7 +102,8 @@ end
 ---@param config ParticipantTableConfig
 ---@return ParticipantTableEntry[]
 function Parser._readEntries(args, config)
-	local alreadyUsed = {}
+	---@type Set<string>
+	local alreadyUsed = Set{}
 
 	return Table.mapArgumentsByPrefix(args, {'p', 'player'}, function(key, index)
 		local entry = Parser._readEntry(args, key, index, config)
@@ -119,11 +121,11 @@ function Parser._readEntries(args, config)
 		entry.isResolved = true
 		entry.name = Opponent.toName(entry.opponent)
 
-		if alreadyUsed[entry.name] then
+		if alreadyUsed:contains(entry.name) then
 			error('Duplicate Input "|' .. key .. '=' .. args[key] .. '"')
 		end
 
-		alreadyUsed[entry.name] = true
+		alreadyUsed:add(entry.name)
 
 		return entry
 	end)

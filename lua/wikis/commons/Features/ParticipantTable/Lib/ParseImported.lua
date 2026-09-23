@@ -9,8 +9,9 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
-local Table = Lua.import('Module:Table')
+local Set = Lua.import('Module:Set')
 
 local Parser = {}
 
@@ -22,10 +23,8 @@ function Parser.parseImported(config, entries, matchRecords)
 	if Logic.isEmpty(matchRecords) then
 		return {}
 	end
-	---@type table<string, true>
-	local alreadyProcessed = Table.map(entries, function(key, entry)
-		return entry.name, true
-	end)
+	---@type Set<string>
+	local alreadyProcessed = Set(Array.map(entries, Operator.property('name')))
 	---@cast matchRecords -nil
 
 	local newEntries = {}
@@ -36,9 +35,9 @@ function Parser.parseImported(config, entries, matchRecords)
 			end
 
 			local entry = Parser._entryFromOpponentRecord(opponentRecord)
-			if not entry or alreadyProcessed[entry.name] then return end
+			if not entry or alreadyProcessed:contains(entry.name) then return end
 
-			alreadyProcessed[entry.name] = true
+			alreadyProcessed:add(entry.name)
 
 			table.insert(newEntries, entry)
 		end)
