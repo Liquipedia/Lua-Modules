@@ -177,7 +177,8 @@ function MatchFunctions.getExtraData(match, games, opponents)
 		extradata[prefix .. 'by'] = match[prefix .. 'by']
 	end
 
-	Table.mergeInto(extradata, Table.filterByKey(match, function(key) return key:match('subgroup%d+header') end))
+	-- TODO: Bot away special prefix
+	Table.mergeInto(extradata, MatchGroupInputUtil.readSetHeaders(match, 'subgroup'))
 
 	return extradata
 end
