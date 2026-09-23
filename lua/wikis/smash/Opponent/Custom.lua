@@ -51,7 +51,7 @@ function CustomOpponent.readOpponentArgs(args)
 end
 
 ---@param opponent SmashStandardOpponent
----@param options {setPlayersInTeam: boolean?}?
+---@param options {setPlayersInTeam: boolean?, forceUnderscores: boolean?}?
 ---@return {opponentname: string, opponenttemplate: string?, opponenttype: OpponentType, opponentplayers: table?}
 function CustomOpponent.toLpdbStruct(opponent, options)
 	local storageStruct = Opponent.toLpdbStruct(opponent, options)
@@ -117,7 +117,8 @@ function CustomOpponent.resolve(opponent, date, options)
 			Variables.varDefault('tournament_game') or
 			lpdbPlayer.extradata.maingame or Info.defaultGame
 
-		player.chars = Logic.nilIfEmpty(Array.parseCommaSeparatedString(lpdbPlayer.extradata['main' .. game]))
+		player.chars = Logic.emptyOr(player.chars,
+			Array.parseCommaSeparatedString(lpdbPlayer.extradata['main' .. game]))
 		player.game = game
 	end)
 
