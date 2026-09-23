@@ -14,6 +14,7 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
+local MathUtil = Lua.import('Module:MathUtil')
 local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
@@ -38,7 +39,7 @@ function Parser.readConfig(args, parentConfig)
 		syncPlayers = Logic.nilOr(Logic.readBoolOrNil(args.syncPlayers), parentConfig.syncPlayers, true),
 		showCountBySection = Logic.readBool(args.showCountBySection or parentConfig.showCountBySection),
 		count = tonumber(args.count),
-		colSpan = parentConfig.colSpan or tonumber(args.colspan) or 4,
+		colSpan = parentConfig.colSpan or MathUtil.toInteger(args.colspan) or 4,
 		onlyNotable = Logic.readBool(args.onlyNotable or parentConfig.onlyNotable),
 		resolveDate = args.date or parentConfig.resolveDate or DateExt.getContextualDate(),
 		sortPlayers = Logic.nilOr(Logic.readBoolOrNil(args.sortPlayers), Logic.readBoolOrNil(args.sortPlayers),
@@ -163,11 +164,7 @@ function Parser._readEntry(sectionArgs, key, index, config)
 	local opponent = Opponent.readOpponentArgs(opponentArgs)
 
 	if config.sortPlayers and opponent.players then
-		table.sort(opponent.players, function (player1, player2)
-			local name1 = (player1.displayName or player1.pageName):lower()
-			local name2 = (player2.displayName or player2.pageName):lower()
-			return name1 < name2
-		end)
+		Array.sortInPlaceBy(opponent.players, function(player) return (player.displayName or player.pageName):lower() end)
 	end
 
 	return {

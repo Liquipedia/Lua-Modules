@@ -60,7 +60,7 @@ end
 ---@param opponentRecord table
 ---@return ParticipantTableEntry?
 function Parser._entryFromOpponentRecord(opponentRecord)
-	local opponent = Opponent.fromMatch2Record(opponentRecord) --[[@as standardOpponent]]
+	local opponent = Opponent.fromMatch2Record(opponentRecord)
 	if Opponent.isTbd(opponent) then
 		return
 	end
