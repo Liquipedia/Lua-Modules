@@ -114,6 +114,14 @@ local ROUND_WIN_REASONS = {
 	['16'] = 'draw',
 }
 
+---Whether this map actually has stats to read.
+---Fallback
+---@param map table
+---@return boolean
+local function hasStats(map)
+	return map.nuselo ~= nil and map.teams ~= nil
+end
+
 ---Normalises into Liquipedia win types.
 ---@param endReason string|number|nil
 ---@return string?
@@ -225,7 +233,9 @@ end
 ---@param map CounterstrikeMatchPageMap|table
 ---@return fun(opponentIndex: integer): integer?
 function CustomMatchGroupInputMatchPage.calculateMapScore(map)
-	if not map.nuselo then
+	if not hasStats(map) then
+		-- No id, or an id whose data has not landed yet
+		-- default to prior
 		return NormalMapParser.calculateMapScore(map)
 	end
 	return function(opponentIndex)
@@ -329,7 +339,7 @@ end
 ---@param opponents MGIParsedOpponent[]
 ---@return table
 function CustomMatchGroupInputMatchPage.getExtraData(match, map, opponents)
-	if not map.nuselo then
+	if not hasStats(map) then
 		return NormalMapParser.getExtraData(match, map, opponents)
 	end
 	local extradata = deriveHalfScores(map)

@@ -125,6 +125,8 @@ local infoData = {
 			gameScoresIfBo1 = true,
 			gameNoun = 'map',
 			matchPage = true,
+			-- Passed template load seketlon for commons
+			matchPagePreload = 'Template:MatchPage/Preload',
 		},
 		teamRosterNavbox = {
 			links = {

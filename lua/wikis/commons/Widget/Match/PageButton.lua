@@ -62,12 +62,22 @@ local function MatchPageButton(props)
 		}
 	end
 
+	-- Preload template functionality if config set
+	-- Fallsback to previous functionality otherwise
+	local preloadPage = Info.config.match2.matchPagePreload
+	local createLink, createLinkType = link, nil
+	if Logic.isNotEmpty(preloadPage) then
+		createLink = tostring(mw.uri.fullUrl(link, {action = 'edit', preload = preloadPage}))
+		createLinkType = 'external'
+	end
+
 	return Button{
 		classes = { 'match-page-button', 'show-when-logged-in' },
 		title = 'Make match page',
 		variant = 'ghost',
 		size = 'sm',
-		link = link,
+		link = createLink,
+		linktype = createLinkType,
 		grow = true,
 		children = WidgetUtil.collect(
 			'+',

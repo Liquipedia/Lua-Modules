@@ -71,7 +71,15 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 	local mapStatsLine = buildListLine(mapStats, 2)
 
+	local generateMatchPage = Logic.readBool(args.generateMatchPage)
+
 	Array.forEach(Array.range(1, bestof), function(mapIndex)
+		if generateMatchPage then
+			Array.appendWith(lines,
+				INDENT .. '|map' .. mapIndex .. '={{Map|nuselo=|reversed=|vod=}}'
+			)
+			return
+		end
 		Array.appendWith(lines,
 			INDENT .. '|map' .. mapIndex .. '={{Map|map=' .. (mapDetails and '' or '|score1=|score2=') .. '|finished=',
 			mapDetails and (INDENT .. INDENT .. '|t1firstside=|t1t=|t1ct=|t2t=|t2ct=') or nil,
