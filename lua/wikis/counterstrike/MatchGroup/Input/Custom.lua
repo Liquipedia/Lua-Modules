@@ -19,6 +19,7 @@ local Variables = Lua.import('Module:Variables')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local FEATURED_TIERS = {1, 2}
 local MIN_EARNINGS_FOR_FEATURED = 200000
@@ -27,6 +28,7 @@ local MIN_EARNINGS_FOR_FEATURED = 200000
 local CustomMatchGroupInput = {}
 
 ---@class CounterstrikeMatchParser: MatchParserInterface
+---@field MapParser CounterstrikeNormalMapParser|CounterstrikeMatchPageMapParser?
 local MatchFunctions = {
 	DEFAULT_MODE = 'team',
 	getBestOf = MatchGroupInputUtil.getBestOf,
@@ -36,9 +38,6 @@ local MatchFunctions = {
 		applyUnderScores = true,
 	},
 }
-
----@class CounterstrikeMapParser: MapParserInterface
-local MapFunctions = {}
 
 ---@class CounterstrikeFfaMatchParser: FfaMatchParserInterface
 local FfaMatchFunctions = {
@@ -57,13 +56,99 @@ local FfaMapFunctions = {}
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
+	options = options or {}
 	local finishedInput = Logic.nilIfEmpty(match.finished) or Variables.varDefault('tournament_status')
 	match.finished = finishedInput
+
+	if not options.isMatchPage then
+		-- See if this match has a standalone match (match page), if so use the data from there
+		local standaloneMatchId = MatchGroupUtil.getStandaloneId(match.bracketid, match.matchid)
+		local standaloneMatch = standaloneMatchId
+			and MatchGroupInputUtil.fetchStandaloneMatch(standaloneMatchId) or nil
+		if standaloneMatch then
+			return MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
+		end
+	end
+
+	MatchFunctions.MapParser = options.isMatchPage
+		and Lua.import('Module:MatchGroup/Input/Custom/MatchPage')
+		or Lua.import('Module:MatchGroup/Input/Custom/Normal')
 
 	local processedMatch = MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, FfaMatchFunctions)
 	processedMatch.extradata.status = match.status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED and finishedInput or nil
 
+	if options.isMatchPage then
+		MatchFunctions.populateOpponentStats(processedMatch)
+	end
+
 	return processedMatch
+end
+
+---Aggregates each player's per-map stats into a single overall-series stat line, stashed onto player.extradata.overallStats for
+---Module:MatchPage's "Overall Statistics" tab. Only nuselo maps with data
+---contribute, a manually entered map has no per-player breakdown to fold in.
+---@param match {opponents: MGIParsedOpponent[], games: table[]}
+---@return table
+function MatchFunctions.populateOpponentStats(match)
+	Array.forEach(match.opponents, function(opponent, opponentIdx)
+		Array.forEach(opponent.match2players or {}, function(player, playerIndex)
+			player.extradata = player.extradata or {}
+			player.extradata.overallStats = MatchFunctions.calculateOverallStatsForPlayer(match.games, opponentIdx, playerIndex)
+		end)
+	end)
+	return match
+end
+
+---@param maps table[]
+---@param opponentIndex integer
+---@param playerIndex integer
+---@return table
+function MatchFunctions.calculateOverallStatsForPlayer(maps, opponentIndex, playerIndex)
+	local playedMaps = Array.filter(maps, function(map)
+		return map.status ~= MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
+	end)
+
+	local playersWithData = Array.filter(Array.map(playedMaps, function(map)
+		local opponent = map.opponents[opponentIndex]
+		return opponent and opponent.players and opponent.players[playerIndex]
+	end), Logic.isNotEmpty)
+
+	if Logic.isEmpty(playersWithData) then
+		return {}
+	end
+
+	local function sumOf(key)
+		return Array.reduce(Array.map(playersWithData, function(player) return player[key] or 0 end), Operator.add, 0)
+	end
+
+	-- Simple mean across maps that have this player's data, not rounds-weighted
+	-- Needs a change at either the API level of module in future
+	local function averageOf(key)
+		local values = Array.filter(Array.map(playersWithData, Operator.property(key)), Logic.isNotEmpty)
+		if Logic.isEmpty(values) then
+			return nil
+		end
+		return Array.reduce(values, Operator.add, 0) / #values
+	end
+
+	local firstEntry = playersWithData[1]
+
+	return {
+		player = firstEntry.player,
+		displayName = firstEntry.displayName,
+		kills = sumOf('kills'),
+		deaths = sumOf('deaths'),
+		assists = sumOf('assists'),
+		adr = averageOf('adr'),
+		hs = averageOf('hs'),
+		firstKills = sumOf('firstKills'),
+		firstDeaths = sumOf('firstDeaths'),
+		-- Add some more eventually, side kills?
+		kast = averageOf('kast'),
+		awpKills = sumOf('awpKills'),
+		tradeKills = sumOf('tradeKills'),
+		tradeDeaths = sumOf('tradeDeaths'),
+	}
 end
 
 -- "Normal" match
@@ -72,7 +157,7 @@ end
 ---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MatchFunctions.MapParser)
 end
 
 ---@param maps table[]
@@ -188,69 +273,6 @@ function MatchFunctions.getExtraData(match, games, opponents)
 		featured = MatchFunctions.isFeatured(match, opponents),
 		hidden = Logic.readBool(Variables.varDefault('match_hidden'))
 	}
-end
-
----@param match table
----@param map table
----@param opponents MGIParsedOpponent[]
----@return table
-function MapFunctions.getExtraData(match, map, opponents)
-	return MapFunctions._getHalfScores(map)
-end
-
----@param map table
----@return table
-function MapFunctions._getHalfScores(map)
-	local t1sides = {}
-	local t2sides = {}
-	local t1halfs = {}
-	local t2halfs = {}
-
-	local prefix = ''
-	local overtimes = 0
-
-	local function getOppositeSide(side)
-		return side == 'ct' and 't' or 'ct'
-	end
-
-	while true do
-		local t1Side = map[prefix .. 't1firstside']
-		if Logic.isEmpty(t1Side) or (t1Side ~= 'ct' and t1Side ~= 't') then
-			break
-		end
-		local t2Side = getOppositeSide(t1Side)
-
-		-- Iterate over two Halfs (In regular time a half is 15 rounds, after that sides switch)
-		for _ = 1, 2, 1 do
-			if(map[prefix .. 't1' .. t1Side] and map[prefix .. 't2' .. t2Side]) then
-				table.insert(t1sides, t1Side)
-				table.insert(t2sides, t2Side)
-				table.insert(t1halfs, tonumber(map[prefix .. 't1' .. t1Side]) or 0)
-				table.insert(t2halfs, tonumber(map[prefix .. 't2' .. t2Side]) or 0)
-				-- second half (sides switch)
-				t1Side, t2Side = t2Side, t1Side
-			end
-		end
-
-		overtimes = overtimes + 1
-		prefix = 'o' .. overtimes
-	end
-
-	return {
-		t1sides = t1sides,
-		t2sides = t2sides,
-		t1halfs = t1halfs,
-		t2halfs = t2halfs,
-	}
-end
-
----@param map table
----@return fun(opponentIndex: integer): integer?
-function MapFunctions.calculateMapScore(map)
-	local halfs = MapFunctions._getHalfScores(map)
-	return function(opponentIndex)
-		return Array.reduce(halfs['t' .. opponentIndex .. 'halfs'], Operator.add)
-	end
 end
 
 --- FFA Match
