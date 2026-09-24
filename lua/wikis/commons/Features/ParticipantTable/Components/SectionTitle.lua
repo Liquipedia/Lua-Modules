@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Participants/Table/SectionTitle
+-- page=Module:Features/ParticipantTable/Components/SectionTitle
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

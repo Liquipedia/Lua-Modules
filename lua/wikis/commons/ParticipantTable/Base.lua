@@ -17,7 +17,6 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
-local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
@@ -29,52 +28,15 @@ local Variables = Lua.import('Module:Variables')
 
 local Import = Lua.import('Module:ParticipantTable/Import')
 
-local Html = Lua.import('Module:Widget/Html')
-local Entry = Lua.import('Module:Widget/Participants/Table/Entry')
-local SectionTitle = Lua.import('Module:Widget/Participants/Table/SectionTitle')
+local Display = Lua.import('Module:Features/ParticipantTable/Components/Wrapper')
 
 local pageVars = PageVariableNamespace('ParticipantTable')
 local prizePoolVars = PageVariableNamespace('PrizePool')
-
----@class ParticipantTableConfig
----@field lpdbPrefix string?
----@field noStorage boolean
----@field matchGroupSpec MatchGroupsSpec?
----@field syncPlayers boolean
----@field showCountBySection boolean
----@field onlyNotable boolean
----@field count number?
----@field colSpan number
----@field resolveDate string
----@field sortPlayers boolean sort players within an opponent
----@field sortOpponents boolean
----@field showTeams boolean
----@field title string?
----@field importOnlyQualified boolean?
----@field display boolean
----@field width string
----@field columnWidth string
----@field showTitle boolean only applies for the title of the whole table
-
----@class ParticipantTableSection
----@field config ParticipantTableConfig
----@field entries ParticipantTableEntry[]
-
----@class ParticipantTableEntry
----@field opponent standardOpponent
----@field name string
----@field note string?
----@field dq boolean
----@field inputIndex integer?
----@field isResolved boolean?
----@field sortName string
----@field seed integer?
 
 ---@class ParticipantTable: BaseClass
 ---@operator call(Frame): ParticipantTable
 ---@field args table
 ---@field config ParticipantTableConfig
----@field display Html?
 ---@field sections ParticipantTableSection[]
 ---@field hasSeeds boolean
 local ParticipantTable = Class.new(
@@ -83,7 +45,7 @@ local ParticipantTable = Class.new(
 end)
 
 ---@param frame Frame
----@return Html?
+---@return VNode?
 function ParticipantTable.run(frame)
 	return ParticipantTable(frame):read():store():create()
 end
@@ -389,183 +351,21 @@ end
 function ParticipantTable:adjustLpdbData(lpdbData, entry, config)
 end
 
----@return Html?
+---@return VNode?
 function ParticipantTable:create()
 	local config = self.config
 
 	if not config.display then return end
 
-	self.display = self:_createBaseDisplayDiv()
-
-	Array.forEach(self.sections, function(section) self:displaySection(section) end)
-
-	if not self.hasSeeds then
-		return self.display
-	end
-
-	return mw.html.create('div')
-		:addClass('table-responsive toggle-area toggle-area-1')
-		:attr('data-toggle-area', 1)
-		:node(self.display)
-		:node(self:_createSeedList())
-end
-
----@return Html?
-function ParticipantTable:_createBaseDisplayDiv()
-	local titleText = self.config.title or 'Participants'
-
-	if not self.hasSeeds then
-		return mw.html.create('div')
-			:addClass('participantTable')
-			:css('width', self.config.width)
-			:node(self.config.showTitle and
-				mw.html.create('div'):addClass('participantTable-title'):wikitext(titleText)
-				or nil
-			)
-	end
-
-	return ParticipantTable:_createTitleWithToogleButton(titleText, 'Seeding', 1, 2, self.config.width)
-end
-
----@param titleText string
----@param buttonText string
----@param togglearea integer
----@param buttonArea integer
----@param width string
----@return Html
-function ParticipantTable:_createTitleWithToogleButton(titleText, buttonText, togglearea, buttonArea, width)
-	local title = mw.html.create('div')
-			:addClass('participantTable')
-			:attr('data-toggle-area-content', togglearea)
-			:css('max-width', '100%!important')
-			:css('width', width)
-			:css('vertical-align', 'middle')
-			:tag('span')
-				:addClass('toggle-area-button button button--small button--primary')
-				:attr('data-toggle-area-btn', buttonArea)
-				:css('position', 'absolute')
-				:wikitext(buttonText)
-
-	return title:done()
-			:tag('div')
-				:addClass('participantTable-title')
-				:wikitext(titleText)
-				:done()
-end
-
----@return Html
-function ParticipantTable:_createSeedList()
-	local width = tostring(50 + (self.config.showTeams and 242 or 186)) .. 'px'
-	local display = self:_createTitleWithToogleButton('Seeding', self.config.title or 'Participants', 2, 1, width)
-
-	local wrapper = mw.html.create('div')
-		:addClass('participantTable-seeding')
-
-	local entries = Array.sortBy(
-		Array.filter(Array.flatMap(self.sections, function(section)
-			return section.entries
-		end), Logic.isNotEmpty),
-		Operator.property('seed'),
-		function (a, b)
-			return a and b and a < b or false
-		end
-	)
-
-	Array.forEach(entries, function (entry)
-		wrapper
-			:tag('div')
-				:addClass('participantTable-seed')
-				:wikitext(entry.seed)
-				:done()
-			:node(self:displayEntry(entry, {oneLine = true}))
+	Array.forEach(self.sections, function(section)
+		if not section.config.onlyNotable then return end
+		section.entries = self.filterOnlyNotables(section.entries)
 	end)
 
-	return display:node(wrapper)
-end
-
----@return Html
-function ParticipantTable.newSectionNode()
-	return mw.html.create('div'):addClass('participantTable-row')
-end
-
----@param section ParticipantTableSection
-function ParticipantTable:displaySection(section)
-	local entries = section.config.onlyNotable and self.filterOnlyNotables(section.entries) or section.entries
-
-	local sectionEntryCount = #Array.filter(entries, function(entry) return not entry.dq end)
-
-	self.display:node(self.newSectionNode():node(self:sectionTitle(section, sectionEntryCount)))
-
-	if Table.isEmpty(section.entries) then
-		self.display:node(self.newSectionNode():node(self:tbd()))
-		return
-	end
-
-	local sectionNode = ParticipantTable.newSectionNode()
-
-	Array.forEach(entries, function(entry, entryIndex)
-		sectionNode:node(self:displayEntry(entry, {oneLine = true}, true))
-	end)
-
-	local tbdsAdded = 0
-	if section.config.count and section.config.count > sectionEntryCount then
-		Array.forEach(Array.range(sectionEntryCount + 1, section.config.count), function(index)
-			tbdsAdded = tbdsAdded + 1
-			sectionNode:node(self:tbdEntry(true))
-		end)
-	end
-
-	local currentColumn = (#entries + tbdsAdded) % self.config.colSpan
-	if currentColumn ~= 0 then
-		Array.forEach(Array.range(currentColumn + 1, self.config.colSpan), function() sectionNode:node(self:empty()) end)
-	end
-
-	self.display:node(sectionNode)
-end
-
----@return Html
-function ParticipantTable:tbd()
-	return mw.html.create('div')
-		:addClass('participantTable-tbd')
-		:wikitext('To be determined')
-end
-
----@return VNode
-function ParticipantTable:empty()
-	return Html.Div{
-		classes = {'participantTable-entry', 'participantTable-empty'}
-	}
-end
-
----@param section ParticipantTableSection
----@param amountOfEntries number
----@return VNode
-function ParticipantTable:sectionTitle(section, amountOfEntries)
-	return SectionTitle{tableConfig = self.config, sectionConfig = section.config, numEntries = amountOfEntries}
-end
-
----@param useDefaultWidth boolean?
----@return VNode
-function ParticipantTable:tbdEntry(useDefaultWidth)
-	return Entry{
+	return Display{
+		hasSeed = self.hasSeeds,
+		sections = self.sections,
 		config = self.config,
-		opponent = Opponent.tbd(),
-		useDefaultWidth = useDefaultWidth,
-	}
-end
-
----@param entry ParticipantTableEntry
----@param additionalProps table?
----@param useDefaultWidth boolean?
----@return VNode
-function ParticipantTable:displayEntry(entry, additionalProps, useDefaultWidth)
-	return Entry{
-		config = self.config,
-		dq = entry.dq,
-		note = entry.note,
-		opponent = entry.opponent,
-		additionalProps = additionalProps,
-		useDefaultWidth = useDefaultWidth,
 	}
 end
 
