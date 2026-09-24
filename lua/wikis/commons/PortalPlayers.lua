@@ -20,6 +20,10 @@ local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local Html = Lua.import('Module:Widget/Html')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 local DEFAULT_PLAYER_TYPE = 'Players'
 local NONBREAKING_SPACE = '&nbsp;'
 local NON_PLAYER_HEADER = Abbreviation.make{text = 'Staff', title = 'Coaches, Managers, Analysts and more'}
@@ -62,32 +66,38 @@ function PortalPlayers:init(args)
 end
 
 ---Create function for PortalPlayers
----@return Html
+---@return VNode
 function PortalPlayers:create()
-	local wrapper = mw.html.create('div'):css('overflow-x', 'auto')
-
+	local countries = {}
 	for country, playerData in Table.iter.spairs(self:_getPlayers()) do
-		local flag = Flags.Icon{flag = country, shouldLink = true}
-
-		wrapper:tag('h3')
-			:tag('span')
-				:addClass('mw-headline')
-				:attr('id', country)
-				:wikitext(flag .. NONBREAKING_SPACE .. country)
-
-		wrapper
-			:node(self:buildCountryTable{
-				players = playerData.players,
-				flag = flag,
-				isPlayer = true,
-			})
-			:node(self:buildCountryTable{
-				players = playerData.nonPlayers,
-				flag = flag,
-			})
+		table.insert(countries, {country = country, playerData = playerData})
 	end
 
-	return wrapper
+	return Html.Div{
+		css = {['overflow-x'] = 'auto'},
+		children = Array.map(countries, function(entry)
+			local flag = Flags.Icon{flag = entry.country, shouldLink = true}
+
+			return WidgetUtil.collect(
+				Html.H3{
+					children = Html.Span{
+						classes = {'mw-headline'},
+						attributes = {id = entry.country},
+						children = flag .. NONBREAKING_SPACE .. entry.country,
+					},
+				},
+				self:buildCountryTable{
+					players = entry.playerData.players,
+					flag = flag,
+					isPlayer = true,
+				},
+				self:buildCountryTable{
+					players = entry.playerData.nonPlayers,
+					flag = flag,
+				}
+			)
+		end),
+	}
 end
 
 ---Retrieves the "player" data
@@ -201,9 +211,19 @@ function PortalPlayers._groupPlayerData(players)
 	end)
 end
 
+---@return table[]
+function PortalPlayers:columns()
+	return {
+		{width = '175px'},
+		{width = '175px'},
+		{width = '250px'},
+		{width = '140px'},
+	}
+end
+
 ---Builds the table display for a given set of players
 ---@param args {players: table[]?, flag: string, isPlayer: boolean?}
----@return Html?
+---@return VNode?
 function PortalPlayers:buildCountryTable(args)
 	local playerData = Table.extract(args, 'players') --[[@as table?]]
 	if Table.isEmpty(playerData) then
@@ -213,57 +233,55 @@ function PortalPlayers:buildCountryTable(args)
 
 	local isPlayer = args.isPlayer
 
-	local tbl = mw.html.create('table')
-		:addClass('wikitable collapsible smwtable')
-		:addClass(not isPlayer and 'collapsed' or nil)
-		:css('width', self.width)
-		:css('text-align', 'left')
-		:node(self:header(args))
-
-	for _, player in ipairs(playerData) do
-		tbl:node(self:row(player, isPlayer))
-	end
-
-	return tbl
+	return TableWidgets.Table{
+		css = {width = self.width},
+		tableClasses = {'collapsible', not isPlayer and 'collapsed' or nil},
+		columns = self:columns(),
+		children = {
+			self:header(args),
+			TableWidgets.TableBody{
+				children = Array.map(playerData, function(player)
+					return self:row(player, isPlayer)
+				end),
+			},
+		},
+	}
 end
 
 ---Builds the header for the table
 ---@param args {flag: string, isPlayer: boolean?}
----@return Html
+---@return VNode
 function PortalPlayers:header(args)
 	local teamText = args.isPlayer and ' Team' or ' Team and Role'
 
-	local header = mw.html.create('tr')
-		:tag('th')
-			:attr('colspan', 4)
-			:css('padding-left', '1em')
-			:wikitext(args.flag .. ' ' .. (args.isPlayer and self.playerType or NON_PLAYER_HEADER))
-			:done()
-
-	local subHeader = mw.html.create('tr')
-		:tag('th'):css('width', '175px'):wikitext(' ID'):done()
-		:tag('th'):css('width', '175px'):wikitext(' Real Name'):done()
-		:tag('th'):css('width', '250px'):wikitext(teamText):done()
-		:tag('th'):css('width', '120px'):wikitext(' Links'):done()
-
-	return mw.html.create()
-		:node(header)
-		:node(subHeader)
+	return TableWidgets.TableHeader{
+		children = {
+			TableWidgets.Row{
+				children = TableWidgets.CellHeader{
+					colspan = 4,
+					css = {
+						['padding-left'] = '1em',
+					},
+					children = args.flag .. ' ' .. (args.isPlayer and self.playerType or NON_PLAYER_HEADER),
+				},
+			},
+			TableWidgets.Row{
+				children = {
+					TableWidgets.CellHeader{children = 'ID'},
+					TableWidgets.CellHeader{children = 'Real Name'},
+					TableWidgets.CellHeader{children = teamText},
+					TableWidgets.CellHeader{children = 'Links'},
+				},
+			},
+		},
+	}
 end
 
 ---Builds a table row
 ---@param player table
 ---@param isPlayer boolean?
----@return Html
+---@return VNode
 function PortalPlayers:row(player, isPlayer)
-	local row = mw.html.create('tr')
-		:addClass(PortalPlayers._getStatusBackground(player.status, (player.extradata or {}).banned))
-
-	row:tag('td'):wikitext(' '):node(OpponentDisplay.BlockOpponent{opponent = PortalPlayers.toOpponent(player)})
-	row:tag('td')
-		:wikitext(' ' .. player.name)
-		:wikitext(self.showLocalizedName and (' (' .. player.localizedname .. ')') or nil)
-
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '') or ''
 	local teamText = TeamTemplate.exists(player.team) and tostring(OpponentDisplay.InlineTeamContainer{
 		template = player.team, displayType = 'standard'
@@ -273,20 +291,39 @@ function PortalPlayers:row(player, isPlayer)
 	elseif String.isNotEmpty(role) then
 		teamText = teamText .. ' (' .. role .. ')'
 	end
-	row:tag('td'):wikitext(' ' .. teamText)
 
 	local links = Array.extractValues(Table.map(player.links or {}, function(key, link)
 		return key, ' [' .. link .. ' ' .. Links.makeIcon(Links.removeAppendedNumber(key), 25) .. ']'
 	end) or {}, Table.iter.spairs)
 
-	row:tag('td')
-		:addClass('plainlinks')
-		:css('line-height', '25px')
-		:css('padding', '1px 2px 1px 2px')
-		:css('max-width', '112px')
-		:wikitext(table.concat(links))
-
-	return row
+	return TableWidgets.Row{
+		classes = WidgetUtil.collect(PortalPlayers._getStatusBackground(player.status, (player.extradata or {}).banned)),
+		children = {
+			TableWidgets.Cell{
+				children = OpponentDisplay.BlockOpponent{opponent = PortalPlayers.toOpponent(player)},
+			},
+			TableWidgets.Cell{
+				nowrap = false,
+				children = {
+					player.name,
+					self.showLocalizedName and (' (' .. player.localizedname .. ')') or ''
+				}
+			},
+			TableWidgets.Cell{
+				nowrap = false,
+				children = teamText,
+			},
+			TableWidgets.Cell{
+				nowrap = false,
+				classes = {'plainlinks'},
+				css = {
+					['line-height'] = '25px',
+					['padding'] = '1px 2px 1px 2px',
+				},
+				children = links,
+			},
+		},
+	}
 end
 
 ---@param status string?
