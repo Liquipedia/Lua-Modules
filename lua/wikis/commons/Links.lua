@@ -419,6 +419,8 @@ local ALIASES = {
 	replay = {'replays'},
 	rules = {'rulebook'},
 	['start-gg'] = {'startgg', 'smashgg'},
+	['trackmania-exchange'] = {'tmx'},
+	['trackmania-io'] = {'tmio'},
 	yandexefir = {'yandex'},
 	zhanqitv = {'zhanqi'},
 }
