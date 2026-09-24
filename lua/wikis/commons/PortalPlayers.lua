@@ -235,7 +235,7 @@ function PortalPlayers:buildCountryTable(args)
 
 	return TableWidgets.Table{
 		css = {width = self.width},
-		tableClasses = {'collapsible', Logic.isEmpty(isPlayer) and 'collapsed' or nil},
+		tableClasses = {'collapsible', not isPlayer and 'collapsed' or nil},
 		columns = self:columns(),
 		children = {
 			self:header(args),
