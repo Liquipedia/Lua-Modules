@@ -6,6 +6,11 @@
 --
 
 return {
+	ABT = {
+		--Permanent year-round time zone in Alberta, Canada
+		name = 'Alberta Time',
+		offset = {-6, 0},
+	},
 	ACST = {
 		name = 'Australian Central Standard Time',
 		offset = {9, 30},
@@ -243,6 +248,11 @@ return {
 	NZST = {
 		name = 'New Zealand Standard Time',
 		offset = {12, 0},
+	},
+	PCT = {
+		--Permanent year-round time zone in British Columbia, Canada
+		name = 'Pacific Time',
+		offset = {-7, 0},
 	},
 	PDT = {
 		name = 'Pacific Daylight Time',
