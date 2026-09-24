@@ -120,12 +120,12 @@ function CustomPortalPlayers:row(player, isPlayer)
 			TableWidgets.Cell{
 				nowrap = false,
 				children = WidgetUtil.collect(
-					' ' .. player.name,
+					player.name,
 					self.showLocalizedName and (' (' .. player.localizedname .. ')') or nil
 				)
 			},
 			TableWidgets.Cell{children = CustomPortalPlayers._getMainCharIcons(player)},
-			TableWidgets.Cell{nowrap = false, children = ' ' .. teamText},
+			TableWidgets.Cell{nowrap = false, children = teamText},
 			TableWidgets.Cell{
 				nowrap = false,
 				classes = {'plainlinks'},
@@ -157,10 +157,7 @@ function CustomPortalPlayers._getMainCharIcons(player)
 	local CharacterIcons = Lua.import('Module:CharacterIcons/' .. activeGame, {loadData = true})
 
 	return Array.flatMap(Array.parseCommaSeparatedString(player.extradata['main' .. activeGame]), function(character)
-		return {
-			' ',
-			Characters._GetIconAndName(CharacterIcons, character, false) or ''
-		}
+		return Characters._GetIconAndName(CharacterIcons, character, false) or ''
 	end)
 end
 

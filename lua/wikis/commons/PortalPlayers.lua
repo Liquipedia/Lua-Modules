@@ -300,19 +300,18 @@ function PortalPlayers:row(player, isPlayer)
 		classes = WidgetUtil.collect(PortalPlayers._getStatusBackground(player.status, (player.extradata or {}).banned)),
 		children = {
 			TableWidgets.Cell{
-				children = {' ', OpponentDisplay.BlockOpponent{opponent = PortalPlayers.toOpponent(player)}},
+				children = OpponentDisplay.BlockOpponent{opponent = PortalPlayers.toOpponent(player)},
 			},
 			TableWidgets.Cell{
 				nowrap = false,
 				children = {
-					' ',
 					player.name,
 					self.showLocalizedName and (' (' .. player.localizedname .. ')') or ''
 				}
 			},
 			TableWidgets.Cell{
 				nowrap = false,
-				children = ' ' .. teamText,
+				children = teamText,
 			},
 			TableWidgets.Cell{
 				nowrap = false,
