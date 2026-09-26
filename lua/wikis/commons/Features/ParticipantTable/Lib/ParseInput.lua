@@ -32,10 +32,19 @@ function Parser.readConfig(args, parentConfig)
 
 	local showTeams = not Logic.readBool(args.disable_teams)
 
+
+	local shouldStore
+	if Logic.readBool(args.noStorage) then
+		shouldStore = false
+	elseif parentConfig.storage ~= nil then
+		shouldStore = parentConfig.storage
+	else
+		shouldStore = Namespace.isMain() and not Lpdb.isStorageDisabled()
+	end
+
 	local config = {
 		lpdbPrefix = args.lpdbPrefix or parentConfig.lpdbPrefix or Variables.varDefault('lpdbPrefix'),
-		noStorage = Logic.readBool(args.noStorage or parentConfig.noStorage or
-			Lpdb.isStorageDisabled() or not Namespace.isMain()),
+		storage = shouldStore,
 		matchGroupSpec = TournamentStructure.readMatchGroupsSpec(args),
 		syncPlayers = Logic.nilOr(Logic.readBoolOrNil(args.syncPlayers), parentConfig.syncPlayers, true),
 		showCountBySection = Logic.readBool(args.showCountBySection or parentConfig.showCountBySection),
@@ -43,7 +52,7 @@ function Parser.readConfig(args, parentConfig)
 		colSpan = parentConfig.colSpan or MathUtil.toInteger(args.colspan) or 4,
 		onlyNotable = Logic.readBool(args.onlyNotable or parentConfig.onlyNotable),
 		resolveDate = args.date or parentConfig.resolveDate or DateExt.getContextualDate(),
-		sortPlayers = Logic.nilOr(Logic.readBoolOrNil(args.sortPlayers), Logic.readBoolOrNil(args.sortPlayers),
+		sortPlayers = Logic.nilOr(Logic.readBoolOrNil(args.sortPlayers), parentConfig.sortPlayers,
 			(Info.config.participants or {}).sortPlayersInTable),
 		sortOpponents = Logic.nilOr(Logic.readBoolOrNil(args.sortOpponents), parentConfig.sortOpponents, true),
 		showTeams = showTeams,
@@ -62,6 +71,7 @@ function Parser.readConfig(args, parentConfig)
 			return faction, tonumber(args[Faction.toName(faction):lower()])
 		end),
 		factionColumnWidth = tonumber(args.entrywidth) or showTeams and 212 or 156,
+		showCountByFaction = Logic.readBool(args.count),
 	}
 
 	config.width = parentConfig.width

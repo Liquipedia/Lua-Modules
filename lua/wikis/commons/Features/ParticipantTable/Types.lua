@@ -17,7 +17,7 @@ local Types = {}
 
 ---@class ParticipantTableConfig
 ---@field lpdbPrefix string?
----@field noStorage boolean
+---@field storage boolean
 ---@field matchGroupSpec MatchGroupsSpec?
 ---@field syncPlayers boolean
 ---@field showCountBySection boolean
@@ -41,6 +41,7 @@ local Types = {}
 ---@field manualFactionCounts table<string, number?>
 ---@field factionColumnWidth number
 ---@field soloAsFactionTable boolean?
+---@field showCountByFaction boolean
 
 ---@class ParticipantTableSection
 ---@field config ParticipantTableConfig
