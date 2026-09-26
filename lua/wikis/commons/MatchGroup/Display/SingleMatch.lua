@@ -29,13 +29,13 @@ end
 ---Display component for a singleMatch. The singleMatch is specified by matchID.
 ---The component fetches the match data from LPDB or page variables.
 ---@param props {matchId: string, config: SingleMatchConfigOptions}
----@return Widget|Html
+---@return Renderable
 function SingleMatchDisplay.SingleMatchContainer(props)
 	local bracketId, _ = MatchGroupUtil.splitMatchId(props.matchId)
 
 	assert(bracketId, 'Missing or invalid matchId')
 
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId)
+	local match = MatchGroupUtil.fetchMatchWithBracketReset(bracketId, props.matchId)
 	return match
 		and SingleMatchDisplay.SingleMatch({
 			config = props.config,
@@ -46,7 +46,7 @@ end
 
 ---Display component for a singleMatch. Match data is specified in the input.
 ---@param props {config: SingleMatchConfigOptions, match: MatchGroupUtilMatch}
----@return Widget|Html
+---@return Renderable
 function SingleMatchDisplay.SingleMatch(props)
 	local propsConfig = props.config or {}
 	local MatchSummaryContainer = propsConfig.MatchSummaryContainer or DisplayHelper.DefaultMatchSummaryContainer

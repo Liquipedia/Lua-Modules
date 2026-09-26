@@ -16,6 +16,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local StringUtils = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
+local BracketUtil = Lua.import('Module:Domain/Bracket/Model')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
@@ -356,7 +357,7 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 		local coords = bracket.coordinatesByMatchId[matchId]
 		if bracketData.header then
 			local headerRow = getHeaderRow(matchId)
-			local brMatch = bracketData.bracketResetMatchId and bracket.matchesById[bracketData.bracketResetMatchId]
+			local brMatch = BracketUtil.resetMatch(bracket.matchesById, bracketData)
 			headerRow[coords.roundIndex] = {
 				hasBrMatch = brMatch and true or false,
 				header = bracketData.header,
@@ -455,8 +456,7 @@ function BracketDisplay.NodeBody(props)
 
 	-- Include results from bracketResetMatch
 	---@type MatchGroupUtilMatch?
-	local bracketResetMatch = match.bracketData.bracketResetMatchId
-		and props.matchesById[match.bracketData.bracketResetMatchId]
+	local bracketResetMatch = BracketUtil.resetMatch(props.matchesById, match.bracketData)
 	if bracketResetMatch then
 		match = Logic.wrapTryOrLog(DisplayHelper.mergeBracketResetMatch)(match, bracketResetMatch)
 	end
