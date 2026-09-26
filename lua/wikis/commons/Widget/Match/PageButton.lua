@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local I18n = Lua.import('Module:I18n')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
-local MatchUtil = Lua.import('Module:Match/Util')
 
 local Component = Lua.import('Module:Widget/Component')
 local Button = Lua.import('Module:Widget/Basic/Button')
@@ -38,8 +37,6 @@ local function MatchPageButton(props)
 		return nil
 	end
 
-	local showMatchDetails = MatchUtil.shouldShowMatchDetails(match)
-
 	-- Original Match Id must be used to link match page if it exists.
 	-- It can be different from the matchId when shortened brackets are used.
 	local matchId = match.extradata.originalmatchid or match.matchId
@@ -48,7 +45,7 @@ local function MatchPageButton(props)
 
 	if Logic.isNotEmpty(match.bracketData.matchPage) then
 		return Button{
-			classes = { 'match-page-button', (not showMatchDetails) and 'show-when-logged-in' or nil},
+			classes = {'match-page-button'},
 			title = 'View match details',
 			variant = props.buttonType,
 			size = 'sm',
