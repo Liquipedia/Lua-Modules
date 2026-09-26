@@ -17,7 +17,7 @@ local Header = Lua.import('Module:Features/ParticipantTable/Components/FactionHe
 local Section = Lua.import('Module:Features/ParticipantTable/Components/FactionSection')
 
 ---@param props {config: ParticipantTableConfig, factionColumns: string[],
----factionNumbers: table<string, integer>, sections: ParticipantTableSection[]}
+---factionNumbers: table<string, integer>, sections: ParticipantTableSection[], hasSeed: boolean?}
 ---@return VNode
 local function ParticipantTableFactionTable(props)
 	local config = props.config
@@ -25,6 +25,7 @@ local function ParticipantTableFactionTable(props)
 
 	local display = Html.Div{
 		classes = {'participantTable', 'participantTable-faction'},
+		attributes = props.hasSeed and {['data-toggle-area-content'] = 1} or nil,
 		css = {
 			['grid-template-columns'] = 'repeat(' .. colSpan .. ', 1fr)',
 			width = (colSpan * config.factionColumnWidth) .. 'px',
