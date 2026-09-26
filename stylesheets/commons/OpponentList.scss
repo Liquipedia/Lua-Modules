@@ -4,10 +4,14 @@ Author: hjpalpha
 *******************************************************************************/
 
 .participantTable {
-	border-top: 1px solid var( --table-border-color, #bbbbbb );
-	border-left: 1px solid var( --table-border-color, #bbbbbb );
+	border: 1px solid var( --clr-on-surface-light-primary-12 );
+	border-radius: 0.5rem;
 	margin-bottom: 8px;
 	overflow-x: auto;
+
+	.theme--dark & {
+		border: 1px solid var( --clr-on-surface-dark-primary-12 );
+	}
 
 	@media ( max-width: 900px ) {
 		min-width: 100% !important;
@@ -24,12 +28,19 @@ Author: hjpalpha
 
 .participantTable-title {
 	padding: 4px;
-	background-color: var( --table-header-variant-background-color, #eaecf0 );
-	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
-	border-right: 1px solid var( --table-border-color, #bbbbbb );
+	background-color: var( --clr-on-surface-light-primary-4 );
+	outline-color: var( --clr-on-surface-light-primary-12 );
+	color: var( --clr-secondary-25 );
+	border: 1px solid var( --clr-on-surface-light-primary-12 );
 	font-weight: bold;
 	width: 100%;
-	text-align: center;
+
+	.theme--dark & {
+		background-color: var( --clr-on-surface-dark-primary-8 );
+		outline-color: var( --clr-on-surface-dark-primary-12 );
+		color: var( --clr-secondary-85 );
+		border: 1px solid var( --clr-on-surface-dark-primary-12 );
+	}
 }
 
 .participantTable-row {
@@ -48,13 +59,16 @@ Author: hjpalpha
 }
 
 .participantTable-entry {
-	background-color: inherit;
-	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
-	border-right: 1px solid var( --table-border-color, #bbbbbb );
+	background-color: var( --clr-background );
+	border: 1px solid var( --clr-on-surface-light-primary-12 );
 	padding: 4px;
 	text-align: left;
 	transition: 0.5s;
 	transition-property: border-color;
+
+	.theme--dark & {
+		border: 1px solid var( --clr-on-surface-dark-primary-12 );
+	}
 
 	@media ( max-width: 900px ) {
 		&:not( .participantTable-faction ) {
@@ -110,8 +124,6 @@ Author: hjpalpha
 	}
 
 	.brkts-opponent-hover-active > & {
-		border-color: transparent;
-
 		&::after {
 			box-shadow: -1px 0 2px rgba( 0, 0, 0, 0.7 ) inset, 1px 0 2px rgba( 0, 0, 0, 0.7 ) inset, 0 -1px 2px rgba( 0, 0, 0, 0.7 ) inset, 0 1px 2px rgba( 0, 0, 0, 0.7 ) inset;
 
@@ -123,21 +135,27 @@ Author: hjpalpha
 }
 
 .participantTable-tbd {
-	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
-	border-right: 1px solid var( --table-border-color, #bbbbbb );
+	border: 1px solid var( --clr-on-surface-light-primary-12 );
 	padding: 4px;
 	font-style: italic;
 	text-align: center;
 	width: 100%;
+
+	.theme--dark & {
+		border: 1px solid var( --clr-on-surface-dark-primary-12 );
+	}
 }
 
 .participantTable-seed {
-	background-color: inherit;
-	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
-	border-right: 1px solid var( --table-border-color, #bbbbbb );
+	background-color: var( --clr-background );
+	border: 1px solid var( --clr-on-surface-light-primary-12 );
 	padding: 8px 4px 4px;
 	text-align: center;
 	width: 100%;
+
+	.theme--dark & {
+		border: 1px solid var( --clr-on-surface-dark-primary-12 );
+	}
 }
 
 .participantTable-empty {
@@ -164,102 +182,9 @@ Author: hjpalpha
 
 .participantTable-faction-header {
 	font-weight: bold;
-	text-align: center;
 }
 
-/*******************************************************************************
-Template(s): Participants Tables
-Author(s): FO-nTTaX
-*******************************************************************************/
-.participants-table-scroller {
-	overflow: auto;
-}
-
-.participants-table .participants-row .participants-cell {
-	width: 200px;
-}
-
-.participants-table-buttons {
-	display: none;
-	font-size: 200%;
-
-	&::after {
-		clear: both;
-		content: " ";
-		display: block;
-	}
-}
-
-.participants-table-button-left {
-	float: left;
-	cursor: pointer;
-}
-
-.participants-table-button-right {
-	float: right;
-	cursor: pointer;
-}
-
-.participants-table-button-left.inactive,
-.participants-table-button-right.inactive {
-	opacity: 0.5;
-	cursor: initial;
-}
-
-@media ( max-width: 600px ) {
-	.participants-table .participants-row .participants-cell {
-		min-width: 200px;
-	}
-
-	.participants-table-columns-2 .participants-row .participants-cell {
-		width: 50%;
-	}
-
-	.participants-table-columns-3 .participants-row .participants-cell {
-		width: 33%;
-	}
-
-	.participants-table-columns-4 .participants-row .participants-cell {
-		width: 25%;
-	}
-
-	.participants-table-columns-2 {
-		width: 180% !important;
-	}
-
-	.participants-table-columns-3 {
-		width: 270% !important;
-	}
-
-	.participants-table-columns-4 {
-		width: 360% !important;
-	}
-
-	.participants-table-buttons {
-		display: block;
-	}
-}
-
-/*******************************************************************************
-Template(s): Module:ParticipantTable
-Author(s): Rapture
-*******************************************************************************/
 .participanttable .team-template-image img {
 	height: 20px;
 	width: 48px;
-}
-
-@media ( max-width: 767px ) {
-	.wiki-ageofempires .participanttable .player-row {
-		display: flex;
-		flex-wrap: wrap;
-
-		> td {
-			flex: 1 0 auto;
-			width: unset !important;
-			min-width: 50%;
-			min-height: 35px;
-			border-width: 1px 1px 0 0 !important;
-		}
-	}
 }
