@@ -375,7 +375,6 @@ local PREFIXES = {
 	yandexefir = {'https://yandex.ru/efir?stream_channel='},
 	youtube = {'https://www.youtube.com/'},
 	zhangyutv = {'http://www.zhangyu.tv/'},
-	zhanqitv = {'https://www.zhanqi.tv/'},
 }
 
 PREFIXES = Table.merge(PREFIXES, CustomData.prefixes or {})
@@ -415,7 +414,6 @@ local ALIASES = {
 	rules = {'rulebook'},
 	['start-gg'] = {'startgg', 'smashgg'},
 	yandexefir = {'yandex'},
-	zhanqitv = {'zhanqi'},
 }
 
 local ICON_KEYS_TO_RENAME = {
