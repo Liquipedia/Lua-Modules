@@ -12,25 +12,22 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
-local Lpdb = Lua.import('Module:Lpdb')
-local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local Table = Lua.import('Module:Table')
-local Template = Lua.import('Module:Template')
 local Tournament = Lua.import('Module:Tournament')
-local TournamentStructure = Lua.import('Module:TournamentStructure')
 local Variables = Lua.import('Module:Variables')
 
-local Import = Lua.import('Module:ParticipantTable/Import')
+local Import = Lua.import('Module:Features/ParticipantTable/Api/Import')
+local ImportParser = Lua.import('Module:Features/ParticipantTable/Lib/ParseImported')
+local Parser = Lua.import('Module:Features/ParticipantTable/Lib/ParseInput')
+local Util = Lua.import('Module:Features/ParticipantTable/Lib/Util')
 
 local Display = Lua.import('Module:Features/ParticipantTable/Components/Wrapper')
 
-local pageVars = PageVariableNamespace('ParticipantTable')
 local prizePoolVars = PageVariableNamespace('PrizePool')
 
 ---@class ParticipantTable: BaseClass
@@ -52,204 +49,26 @@ end
 
 ---@return self
 function ParticipantTable:read()
-	self.config = self.readConfig(self.args)
-	self:readSections()
+	self.config = Parser.readConfig(self.args)
+	self.sections = Parser.readSections(self.args, self.config)
+
+	Array.forEach(self.sections, function(section)
+		local matchRecords = Import.fromMatchGroupSpec(section.config.matchGroupSpec)
+		Array.extendWith(section.entries, ImportParser.parseImported(section.config, section.entries, matchRecords))
+		Util.backFillEntries(section)
+		Util.sortOpponents(section)
+		Array.forEach(section.entries, function(entry)
+			self:setCustomPageVariables(entry, section.config)
+		end)
+	end)
+	self.hasSeeds = Util.hasSeed(self.sections)
 
 	return self
-end
-
----@param args table
----@param parentConfig ParticipantTableConfig?
----@return ParticipantTableConfig
-function ParticipantTable.readConfig(args, parentConfig)
-	parentConfig = parentConfig or {}
-
-	local config = {
-		lpdbPrefix = args.lpdbPrefix or parentConfig.lpdbPrefix or Variables.varDefault('lpdbPrefix'),
-		noStorage = Logic.readBool(args.noStorage or parentConfig.noStorage or
-			Lpdb.isStorageDisabled() or not Namespace.isMain()),
-		matchGroupSpec = TournamentStructure.readMatchGroupsSpec(args),
-		syncPlayers = Logic.nilOr(Logic.readBoolOrNil(args.syncPlayers), parentConfig.syncPlayers, true),
-		showCountBySection = Logic.readBool(args.showCountBySection or parentConfig.showCountBySection),
-		count = tonumber(args.count),
-		colSpan = parentConfig.colSpan or tonumber(args.colspan) or 4,
-		onlyNotable = Logic.readBool(args.onlyNotable or parentConfig.onlyNotable),
-		resolveDate = args.date or parentConfig.resolveDate or DateExt.getContextualDate(),
-		sortPlayers = Logic.readBool(args.sortPlayers or parentConfig.sortPlayers),
-		sortOpponents = Logic.nilOr(Logic.readBoolOrNil(args.sortOpponents), parentConfig.sortOpponents, true),
-		showTeams = not Logic.readBool(args.disable_teams),
-		title = args.title,
-		importOnlyQualified = Logic.readBool(args.onlyQualified),
-		display = not Logic.readBool(args.hidden),
-		showTitle = not Logic.readBool(args.hideTitle),
-	}
-
-	config.width = parentConfig.width
-	if not config.width then
-		local columnWidth = parentConfig.columnWidth or tonumber(args.entrywidth) or config.showTeams and 212 or 156
-		config.width = (columnWidth * config.colSpan) .. 'px'
-	end
-	config.columnWidth = config.columnWidth or ((100 / config.colSpan) .. '%')
-
-	return config
-end
-
-function ParticipantTable:readSections()
-	self.sections = {}
-	Array.forEach(self:fetchSectionsArgs(), function(sectionArgs)
-		self:readSection(sectionArgs)
-	end)
-end
-
----@return table[]
-function ParticipantTable:fetchSectionsArgs()
-	local args = self.args
-
-	pageVars:set('stashArgs', '1')
-
-	local sectionsArgs = Array.mapIndexes(function (index)
-		local parsed = Json.parseIfString(args[index])
-		if type(parsed) == 'table' and parsed.type == 'section' then
-			return parsed
-		end
-	end)
-
-	if Logic.isNotEmpty(sectionsArgs) then
-		return sectionsArgs
-	end
-
-	-- make sure that all sections stashArgs
-	for _, potentialSection in pairs(args) do
-		ParticipantTable._stashArgs(potentialSection)
-	end
-
-	-- retrieve sectionsArgs
-	sectionsArgs = Template.retrieveReturnValues('ParticipantTable')
-	pageVars:delete('stashArgs')
-
-	--case no sections: use whole table as first section
-	if Logic.isEmpty(sectionsArgs) then
-		return {args}
-	end
-
-	return sectionsArgs
-end
-
----access the args so it stashes
----@param potentialSection string
----@return string
-function ParticipantTable._stashArgs(potentialSection)
-	return potentialSection
-end
-
----@param args table
-function ParticipantTable:readSection(args)
-	local config = self.readConfig(args, self.config)
-	local section = {config = config}
-
-	local entriesByName = {}
-	local tbds = {}
-	Table.mapArgumentsByPrefix(args, {'p', 'player'}, function(key, index)
-		local entry = self:readEntry(args, key, index, config)
-		entry.sortName = Opponent.toName(entry.opponent)
-
-		if entry.opponent and Opponent.isTbd(entry.opponent) then
-			entry.name = Opponent.toName(entry.opponent)
-			table.insert(tbds, entry)
-			--needed so index is increased
-			return entry
-		end
-
-		entry.opponent = Opponent.resolve(entry.opponent, config.resolveDate, {
-			syncPlayer = config.syncPlayers,
-			overwritePageVars = true,
-		})
-		entry.isResolved = true
-		entry.name = Opponent.toName(entry.opponent)
-
-		if entriesByName[entry.name] then
-			error('Duplicate Input "|' .. key .. '=' .. args[key] .. '"')
-		end
-
-		entriesByName[entry.name] = entry
-
-		--needed so index is increased
-		return entry
-	end)
-
-	section.entries = Array.map(Import.importFromMatchGroupSpec(config, entriesByName), function(entry)
-		entry.sortName = entry.sortName or Opponent.toName(entry.opponent)
-		entry.opponent = entry.isResolved and entry.opponent or Opponent.resolve(entry.opponent, config.resolveDate, {
-			syncPlayer = config.syncPlayers,
-			overwritePageVars = true,
-		})
-		entry.name = entry.name or Opponent.toName(entry.opponent)
-		entry.isResolved = true
-		self:setCustomPageVariables(entry, config)
-		return entry
-	end)
-
-	Array.sortInPlaceBy(section.entries, function(entry)
-		return config.sortOpponents and entry.sortName:lower() or entry.inputIndex or -1
-	end)
-
-	Array.extendWith(section.entries, tbds)
-
-	table.insert(self.sections, section)
 end
 
 ---@param entry ParticipantTableEntry
 ---@param config ParticipantTableConfig
 function ParticipantTable:setCustomPageVariables(entry, config)
-end
-
----@param sectionArgs table
----@param key string|number
----@param index number
----@param config ParticipantTableConfig
----@return ParticipantTableEntry
-function ParticipantTable:readEntry(sectionArgs, key, index, config)
-	local prefix = 'p' .. index
-	local valueFromArgs = function(postfix)
-		return sectionArgs[key .. postfix] or sectionArgs[prefix .. postfix]
-	end
-
-	--if not a json assume it is a solo opponent
-	local opponentArgs = Json.parseIfTable(sectionArgs[key]) or {
-		type = Opponent.solo,
-		name = sectionArgs[key],
-		link = valueFromArgs('link'),
-		flag = valueFromArgs('flag'),
-		team = valueFromArgs('team'),
-		dq = valueFromArgs('dq'),
-		note = valueFromArgs('note'),
-		seed = valueFromArgs('seed'),
-	}
-
-	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
-
-	opponentArgs.seed = tonumber(opponentArgs.seed)
-	if opponentArgs.seed then
-		self.hasSeeds = true
-	end
-
-	local opponent = Opponent.readOpponentArgs(opponentArgs)
-
-	if config.sortPlayers and opponent.players then
-		table.sort(opponent.players, function (player1, player2)
-			local name1 = (player1.displayName or player1.pageName):lower()
-			local name2 = (player2.displayName or player2.pageName):lower()
-			return name1 < name2
-		end)
-	end
-
-	return {
-		dq = Logic.readBool(opponentArgs.dq),
-		note = opponentArgs.note,
-		opponent = opponent,
-		inputIndex = index,
-		seed = opponentArgs.seed,
-	}
 end
 
 ---@return self

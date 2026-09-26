@@ -14,7 +14,7 @@ local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@param props {config: StarcraftParticipantTableConfig, factionColumns: string[],
+---@param props {config: ParticipantTableConfig, factionColumns: string[],
 ---factionNumbers: table<string, number>}
 ---@return VNode
 local function ParticipantTableFactionHeader(props)
@@ -27,7 +27,7 @@ local function ParticipantTableFactionHeader(props)
 			' ',
 			Faction.toName(faction),
 			config.isRandomEvent and ' Main' or nil,
-			config.showCountByFaction and " ''(" .. props.factionNumbers[faction .. 'Display'] .. ")''" or nil
+			config.count and " ''(" .. props.factionNumbers[faction .. 'Display'] .. ")''" or nil
 		)
 
 		return Html.Div{

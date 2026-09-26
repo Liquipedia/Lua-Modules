@@ -24,7 +24,7 @@ local makeRow = function(children)
 	return Html.Div{classes = {'participantTable-row'}, children = children}
 end
 
----@param props {config: StarcraftParticipantTableConfig, section: StarcraftParticipantTableSection,
+---@param props {config: ParticipantTableConfig, section: ParticipantTableSection,
 ---factionColumns: string[]}
 ---@return VNode[]
 local function ParticipantTableFactionSection(props)
