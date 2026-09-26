@@ -8,8 +8,9 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent/Custom')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local Condition = Lua.import('Module:Condition')
@@ -37,7 +38,8 @@ local StageWinningsCalculation = {}
 ---@param props {matchGroupsSpecProps: table<string, string>, startDate: integer?, endDate: integer?, mode: string,
 ---startValue: number, valuePerWin: number, valueByScore: table<string, number>?,
 ---pointsStart: number, pointsPerWin: number, pointsByScore: table<string, number>?,
----points2Start: number, points2PerWin: number, points2ByScore: table<string, number>?, hideWinnings: boolean}
+---points2Start: number, points2PerWin: number, points2ByScore: table<string, number>?,
+---gameCountDefaultResult: number, hideWinnings: boolean}
 ---@return StageWinningsOpponent[]
 function StageWinningsCalculation.run(props)
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
@@ -87,8 +89,8 @@ function StageWinningsCalculation.run(props)
 		local opponent1 = match.opponents[1]
 		local opponent2 = match.opponents[2]
 
-		local opponent1Score = OpponentDisplay.InlineScore(opponent1)
-		local opponent2Score = OpponentDisplay.InlineScore(opponent2)
+		local opponent1Score = Opponent.getScoreValue(opponent1)
+		local opponent2Score = Opponent.getScoreValue(opponent2)
 
 		local score = opponent1Score .. '-' .. opponent2Score
 		local reversedScore = opponent2Score .. '-' .. opponent1Score
@@ -108,14 +110,26 @@ function StageWinningsCalculation.run(props)
 			opponents[opponent2.globalIndex].matchDraws = opponents[opponent2.globalIndex].matchDraws + 1
 		end
 
+		local numberOfGamesForScoreValue = function(scoreValue)
+			if Logic.isNumeric(scoreValue) then
+				return tonumber(scoreValue)
+			elseif Logic.isEmpty(scoreValue) or scoreValue ~= MatchGroupInputUtil.STATUS.DEFAULT_WIN then
+				return 0
+			end
+			return props.gameCountDefaultResult
+		end
+
+		local gamesWonOpponent1 = numberOfGamesForScoreValue(opponent1Score)
+		local gamesWonOpponent2 = numberOfGamesForScoreValue(opponent2Score)
+
 		opponents[opponent1.globalIndex].gameWins
-			= opponents[opponent1.globalIndex].gameWins + (tonumber(opponent1.score) or 0)
+			= opponents[opponent1.globalIndex].gameWins + gamesWonOpponent1
 		opponents[opponent2.globalIndex].gameLosses
-			= opponents[opponent2.globalIndex].gameLosses + (tonumber(opponent1.score) or 0)
+			= opponents[opponent2.globalIndex].gameLosses + gamesWonOpponent1
 		opponents[opponent1.globalIndex].gameLosses
-			= opponents[opponent1.globalIndex].gameLosses + (tonumber(opponent2.score) or 0)
+			= opponents[opponent1.globalIndex].gameLosses + gamesWonOpponent2
 		opponents[opponent2.globalIndex].gameWins
-			= opponents[opponent2.globalIndex].gameWins + (tonumber(opponent2.score) or 0)
+			= opponents[opponent2.globalIndex].gameWins + gamesWonOpponent2
 	end)
 
 	Array.forEach(opponents, function(opponent)
