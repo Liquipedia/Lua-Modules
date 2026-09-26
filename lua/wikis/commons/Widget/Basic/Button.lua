@@ -58,7 +58,7 @@ local function Button(props)
 		table.insert(cssClasses, 'button--large')
 	end
 
-	local cssTable = props.css
+	local cssTable = props.css or {}
 	if props.grow then
 		cssTable.width = '100%'
 	end
