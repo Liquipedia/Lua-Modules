@@ -559,6 +559,7 @@ function Array.mapRange(from, to, funct)
 end
 
 ---Extracts keys from a given table into an array. An order can be supplied via an iterator.
+---@deprecated Use Table.keys
 ---@generic K, V
 ---@param tbl {[K]: V}
 ---@param iterator? fun(tbl: table, ...):fun(table: table<K, V>, index?: K):K, V, ...

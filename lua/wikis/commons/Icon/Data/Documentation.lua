@@ -19,7 +19,7 @@ local IconDataDoc = {}
 
 ---@return Widget
 function IconDataDoc.generate()
-	local iconNames = Array.extractKeys(IconData)
+	local iconNames = Table.keys(IconData):toArray()
 	local _, groupedIconNames = Array.groupBy(iconNames, function(iconName)
 		return iconName:sub(1,1):upper()
 	end)
