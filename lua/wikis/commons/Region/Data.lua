@@ -91,7 +91,7 @@ return {
 	},
 	sa = {
 		region = 'South America',
-		file = 'unasur',
+		file = 'unasur hd.png',
 	},
 	americas = {
 		region = 'Americas',
