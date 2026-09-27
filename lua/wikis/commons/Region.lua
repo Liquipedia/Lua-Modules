@@ -82,6 +82,7 @@ function Region._toDisplay(regionValues, options)
 	options = options or {}
 
 	local display = ''
+	local text = regionValues.region or regionValues.input
 	if regionValues.flag then
 		display = Flag.Icon({flag = regionValues.flag, shouldLink = true})
 		if display then
@@ -89,15 +90,17 @@ function Region._toDisplay(regionValues, options)
 		else
 			display = ''
 		end
+	elseif regionValues.file and not options.linkToCategory then
+		display = '<span class="flag">[[' .. regionValues.file .. '|36x24px|' .. text ..
+			']]</span>&nbsp;'
 	elseif regionValues.file then
-		display = '<span class="flag">[[' .. regionValues.file .. '|36x24px]]</span>&nbsp;'
+		display = '<span class="flag">[[' .. regionValues.file .. '|36x24px|' .. text ..
+			'|link=Category:' .. text .. ']]</span>&nbsp;'
 	end
 
 	if not regionValues.region then
 		mw.ext.TeamLiquidIntegration.add_category(NO_ENTRY_FOUND_CATEGORY)
 	end
-
-	local text = regionValues.region or regionValues.input
 
 	if not options.linkToCategory then
 		return display .. text
