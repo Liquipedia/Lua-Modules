@@ -81,6 +81,7 @@ function SquadParse.readWrapperArgs(args)
 	return SquadParse.createWrapperData(players, squadType, squadStatus, args.title, args)
 end
 
+---@deprecated
 ---@param player table
 ---@return SquadPersonArgs
 function SquadParse.convertAutoParameters(player)
