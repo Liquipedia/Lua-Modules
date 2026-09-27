@@ -92,7 +92,7 @@ function Region._toDisplay(regionValues, options)
 		display = '<span class="flag">[[File:' .. regionValues.file .. '|36x24px|' .. text ..
 			'|link=Category:' .. text .. ']]</span>'
 	end
-	
+
 	if display then
 		display = display .. '&nbsp;'
 	else
