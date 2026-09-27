@@ -17,9 +17,10 @@ describe('region', function()
 	describe('display', function()
 		it('check', function()
 			local euFlag = Flags.Icon{flag = 'eu', shouldLink = true}
-			assert.are_equal(euFlag .. '&nbsp;[[:Category:Europe|Europe]]', Region.display{region = 'Europe', linkToCategory = true})
-			assert.are_equal('<span class="flag">[[File:unasur hd.png|36x24px|South America' ..
-				']]</span>&nbsp;South America', Region.display{region = 'sam'})
+			assert.are_equal(euFlag .. '&nbsp;[[:Category:Europe|Europe]]',
+				Region.display{region = 'Europe', linkToCategory = true})
+			assert.are_equal('<span class="flag">[[File:unasur hd.png|36x24px|South America]]</span>&nbsp;South America',
+				Region.display{region = 'sam'})
 			assert.are_equal(euFlag .. '&nbsp;Europe', Region.display{region = 'eu'})
 		end)
 	end)
