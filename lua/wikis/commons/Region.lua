@@ -90,8 +90,7 @@ function Region._toDisplay(regionValues, options)
 			display = ''
 		end
 	elseif regionValues.file then
-		display = '<span class="flag">[[' .. regionValues.file .. '|36x24px|' .. regionValues.region ..
-			'|link=Category:' .. regionValues.region .. ']]</span>&nbsp;'
+		display = '<span class="flag">[[' .. regionValues.file .. '|36x24px]]</span>&nbsp;'
 	end
 
 	if not regionValues.region then
