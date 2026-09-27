@@ -34,7 +34,7 @@ describe('region', function()
 						'|link=Category:South America]]</span>&nbsp;South America',
 					region = 'South America'
 				},
-				Region.run{region = 'South America', linkToCategory‎ = true}
+				Region.run{region = 'South America', linkToCategory = true}
 			)
 			assert.are_same({}, Region.run{})
 			assert.are_same({}, Region.run{region = ''})
