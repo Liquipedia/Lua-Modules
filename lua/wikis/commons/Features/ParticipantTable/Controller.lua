@@ -42,8 +42,8 @@ function Controller.execute(frame, CustomConfig)
 
 	local displayComponent = shouldDisplayAsFactionTable and FactionTable or ParticipantTable
 
-	local factionNumbers = Util.getFactionNumbers(sections, config)
-	local factionColumns = Util.getFactionColumns(config, factionNumbers)
+	local factionNumbers
+	local factionColumns
 	if shouldDisplayAsFactionTable then
 		factionNumbers = Util.getFactionNumbers(sections, config)
 		factionColumns = Util.getFactionColumns(config, factionNumbers)
