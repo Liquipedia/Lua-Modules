@@ -86,8 +86,7 @@ function Region._toDisplay(regionValues, options)
 	if regionValues.flag then
 		display = Flag.Icon({flag = regionValues.flag, shouldLink = options.linkToCategory})
 	elseif regionValues.file and not options.linkToCategory then
-		display = '<span class="flag">[[File:' .. regionValues.file .. '|36x24px|' .. text ..
-			']]</span>'
+		display = '<span class="flag">[[File:' .. regionValues.file .. '|36x24px|' .. text .. '|]]</span>'
 	elseif regionValues.file then
 		display = '<span class="flag">[[File:' .. regionValues.file .. '|36x24px|' .. text ..
 			'|link=Category:' .. text .. ']]</span>'
