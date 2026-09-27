@@ -84,18 +84,19 @@ function Region._toDisplay(regionValues, options)
 	local display = ''
 	local text = regionValues.region or regionValues.input
 	if regionValues.flag then
-		display = Flag.Icon({flag = regionValues.flag, shouldLink = true})
-		if display then
-			display = display .. '&nbsp;'
-		else
-			display = ''
-		end
+		display = Flag.Icon({flag = regionValues.flag, shouldLink = options.linkToCategory})
 	elseif regionValues.file and not options.linkToCategory then
-		display = '<span class="flag">[[' .. regionValues.file .. '|36x24px|' .. text ..
-			']]</span>&nbsp;'
+		display = '<span class="flag">[[File:' .. regionValues.file .. '|36x24px|' .. text ..
+			']]</span>'
 	elseif regionValues.file then
-		display = '<span class="flag">[[' .. regionValues.file .. '|36x24px|' .. text ..
-			'|link=Category:' .. text .. ']]</span>&nbsp;'
+		display = '<span class="flag">[[File:' .. regionValues.file .. '|36x24px|' .. text ..
+			'|link=Category:' .. text .. ']]</span>'
+	end
+	
+	if display then
+		display = display .. '&nbsp;'
+	else
+		display = ''
 	end
 
 	if not regionValues.region then
