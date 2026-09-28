@@ -98,11 +98,14 @@ function CustomPrizePool._weight(lpdbData, placement)
 
 	local placementFactor = (placement.placeStart + placement.placeEnd) / 2
 
-	local tierFactor = (tournamentContext.liquipediaTierType == 'Qualifier' or tournamentContext.liquipediaTierType == 'Showmatch') and 0.5
+	local isQualifierOrShowMatch = tournamentContext.liquipediaTierType == 'Qualifier'
+		or tournamentContext.liquipediaTierType == 'Showmatch'
+
+	local tierFactor = isQualifierOrShowMatch and 0.5
 		or TIER_TO_FACTOR[tonumber(tournamentContext.liquipediaTier)]
 		or 1
 
-	local baseWeight = (tournamentContext.liquipediaTierType == 'Qualifier' or tournamentContext.liquipediaTierType == 'Showmatch') and 0
+	local baseWeight = isQualifierOrShowMatch and 0
 		or TIER_TO_BASE_WEIGHT[tonumber(tournamentContext.liquipediaTier)]
 		or 10
 
