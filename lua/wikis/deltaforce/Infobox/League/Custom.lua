@@ -23,9 +23,9 @@ local Center = Widgets.Center
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class DeltaForceLeagueInfobox: InfoboxLeague
+---@operator call(Frame): DeltaForceLeagueInfobox
 local CustomLeague = Class.new(League)
 
----@class DeltaForceLeagueInfoboxInjector
 ---@class DeltaForceLeagueInfoboxWidgetInjector: WidgetInjector
 ---@field caller DeltaForceLeagueInfobox
 ---@operator call(DeltaForceLeagueInfobox): DeltaForceLeagueInfoboxWidgetInjector
@@ -91,22 +91,21 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@param args table
----@return Renderable[]?
+---@param patch string
+---@return VNode
 function CustomLeague:_createPatchCell(args)
 	if String.isEmpty(args.patch) then
 		return nil
 	end
-	local content
 
-	if String.isEmpty(args.endpatch) then
-		content = '[[Patch ' .. args.patch .. '|'.. args.patch .. ']]'
-	else
-		content = '[[Patch ' .. args.patch .. '|'.. args.patch .. ']]' .. ' &ndash; ' ..
-		'[[Patch ' .. args.endpatch .. '|'.. args.endpatch .. ']]'
+	local displayPatch = function(patch)
+		return Link{link = 'Patch ' .. patch, children = patch}
 	end
 
-	return content
+	return {
+		displayPatch(args.patch),
+		Logic.isNotEmpty(args.endpatch) and displayPatch(args.endpatch) or nil,
+	}
 end
 
 ---@param args table
