@@ -12,12 +12,12 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Links = Lua.import('Module:Links')
+local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local Table = Lua.import('Module:Table')
-local Variables = Lua.import('Module:Variables')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Html = Lua.import('Module:Widget/Html')
@@ -134,7 +134,7 @@ function MapTable:_makeMapperDisplay(mappers)
 	)
 end
 
----Creates LPDB map record for tournament_name
+---Creates an LPDB map record per map, as `map` datapoints
 ---@private
 ---@return self
 function MapTable:_createLpdbEntry()
@@ -142,40 +142,31 @@ function MapTable:_createLpdbEntry()
 		return self
 	end
 
-	-- An accumulator for maps in case of multiple uses of the module
-	local maps = Json.parseIfTable(Variables.varDefault('tournament_maps')) or {}
-	Array.extendWith(maps, Array.map(self.rows, function(row, rowIndex)
-		local mapData = {}
-
-		for _, mapper in ipairs(self.mappers[rowIndex]) do
-			mapData['author' .. mapper.index] = {
-				page = mapper.pageName and mapper.pageName:gsub(' ', '_') or '',
-				displayName = mapper.displayName,
-				flag = mapper.flag or '',
-			}
+	Array.forEach(self.rows, function(row, rowIndex)
+		local mapName = row.map
+		if Logic.isEmpty(mapName) then
+			return
 		end
 
-		mapData.map = row.map or ''
+		local extradata = {}
+		for _, mapper in ipairs(self.mappers[rowIndex]) do
+			extradata['author' .. mapper.index] =
+				mapper.pageName and mapper.pageName:gsub(' ', '_') or ''
+			extradata['author' .. mapper.index .. 'dn'] = mapper.displayName
+			extradata['author' .. mapper.index .. 'flag'] = mapper.flag or ''
+		end
 
 		local links = self.links[rowIndex]
 		if Table.isNotEmpty(links) then
-			mapData.links = links
+			extradata.links = links
 		end
 
-		return mapData
-	end))
-
-	if Table.isEmpty(maps) then
-		return self
-	end
-
-	local tournamentName = Variables.varDefault('tournament_name', mw.title.getCurrentTitle().text)
-	local tournamentMaps = Json.stringify(maps, {asArray = true})
-
-	Variables.varDefine('tournament_maps', tournamentMaps)
-	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. tournamentName, {
-		maps = tournamentMaps,
-	})
+		mw.ext.LiquipediaDB.lpdb_datapoint('map_' .. mapName, Json.stringifySubTables({
+			name = mapName,
+			type = 'map',
+			extradata = extradata,
+		}))
+	end)
 
 	return self
 end
