@@ -60,11 +60,8 @@ function MapTable.run(frame)
 
 	---@type MapTableRowArgs[]
 	local rows = Array.map(
-		Array.filter(
-			Array.mapIndexes(function(index) return args[index] end),
-			String.isNotEmpty
-		),
-		function(mapJson) return Json.parseIfString(mapJson) end
+		Array.mapIndexes(function(index) return args[index] end),
+		Json.parseIfString
 	)
 
 	local mapTable = MapTable(rows)
