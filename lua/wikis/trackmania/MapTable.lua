@@ -10,19 +10,18 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Flags = Lua.import('Module:Flags')
 local Json = Lua.import('Module:Json')
 local Links = Lua.import('Module:Links')
 local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Html = Lua.import('Module:Widget/Html')
+local InlinePlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Inline')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 -- Default variant used when building the links of a map
@@ -129,23 +128,10 @@ end
 ---@param mappers TrackmaniaMapTableMapper[]
 ---@return Renderable[]
 function MapTable:_makeMapperDisplay(mappers)
-	---@type Renderable[]
-	local children = {}
-
-	for index, mapper in ipairs(mappers) do
-		if index > 1 then
-			table.insert(children, Html.Br{})
-		end
-
-		local flagIcon = Flags.Icon{flag = mapper.flag, shouldLink = true}
-		if String.isNotEmpty(flagIcon) then
-			Array.appendWith(children, flagIcon, '&nbsp;')
-		end
-
-		table.insert(children, Link{link = mapper.pageName, children = mapper.displayName})
-	end
-
-	return children
+	return Array.interleave(
+		Array.map(mappers, function(mapper) return InlinePlayerWidget{player = mapper} end),
+		Html.Br{}
+	)
 end
 
 ---Creates LPDB map record for tournament_name
