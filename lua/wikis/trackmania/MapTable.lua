@@ -15,7 +15,7 @@ local Json = Lua.import('Module:Json')
 local Links = Lua.import('Module:Links')
 local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
-local Page = Lua.import('Module:Page')
+local Opponent = Lua.import('Module:Opponent')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -33,11 +33,8 @@ local LINK_VARIANT = 'map'
 ---@field mapper string?
 ---@field mapperflag string?
 
----@class MapTableMapper
+---@class TrackmaniaMapTableMapper: standardPlayer
 ---@field index integer
----@field displayName string
----@field page string?
----@field flag string?
 
 ---@class MapTable
 ---@operator call(MapTableRowArgs[]): MapTable
@@ -74,24 +71,26 @@ end
 ---Reads the mapper entries of a single row and resolves their links and flags
 ---@private
 ---@param row MapTableRowArgs
----@return MapTableMapper[]
+---@return TrackmaniaMapTableMapper[]
 function MapTable:_readMappers(row)
-	---@type MapTableMapper[]
+	---@type TrackmaniaMapTableMapper[]
 	local mappers = {}
 
 	for key, mapper, index in Table.iter.pairsByPrefix(row, {'mapper', 'author', 'a'}, {requireIndex = false}) do
-		local page = Page.pageifyLink(String.nilIfEmpty(row[key .. 'link']) or mapper)
-		local flag = String.nilIfEmpty(row[key .. 'flag'])
-		if not flag and page then
-			flag = PlayerExt.fetchPlayerFlag(page)
-		end
+		---@type TrackmaniaMapTableMapper
+		local player = Table.merge(
+			Opponent.readSinglePlayerArgs{
+				name = mapper,
+				link = row[key .. 'link'],
+				flag = row[key .. 'flag'],
+			},
+			{index = index}
+		)
 
-		table.insert(mappers, {
-			index = index,
-			displayName = mapper,
-			page = page,
-			flag = flag,
-		})
+		PlayerExt.populatePageName(player)
+		player.flag = player.flag or PlayerExt.fetchPlayerFlag(player.pageName)
+
+		table.insert(mappers, player)
 	end
 
 	return mappers
@@ -127,7 +126,7 @@ end
 
 ---Builds the mapper cell content for a single map
 ---@private
----@param mappers MapTableMapper[]
+---@param mappers TrackmaniaMapTableMapper[]
 ---@return Renderable[]
 function MapTable:_makeMapperDisplay(mappers)
 	---@type Renderable[]
@@ -143,7 +142,7 @@ function MapTable:_makeMapperDisplay(mappers)
 			Array.appendWith(children, flagIcon, '&nbsp;')
 		end
 
-		table.insert(children, Link{link = mapper.page, children = mapper.displayName})
+		table.insert(children, Link{link = mapper.pageName, children = mapper.displayName})
 	end
 
 	return children
@@ -164,7 +163,7 @@ function MapTable:_createLpdbEntry()
 
 		for _, mapper in ipairs(self.mappers[rowIndex]) do
 			mapData['author' .. mapper.index] = {
-				page = mapper.page or '',
+				page = mapper.pageName and mapper.pageName:gsub(' ', '_') or '',
 				displayName = mapper.displayName,
 				flag = mapper.flag or '',
 			}
