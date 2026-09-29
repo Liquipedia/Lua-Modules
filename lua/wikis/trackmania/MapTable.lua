@@ -23,7 +23,7 @@ local Variables = Lua.import('Module:Variables')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Html = Lua.import('Module:Widget/Html')
-local Table2 = Lua.import('Module:Widget/Table2/All')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 -- Default variant used when building the links of a map
 local LINK_VARIANT = 'map'
@@ -201,13 +201,13 @@ end
 ---@private
 ---@return Renderable
 function MapTable:_makeBody()
-	return Table2.TableBody{
+	return TableWidgets.TableBody{
 		children = Array.map(self.rows, function(row, index)
-			return Table2.Row{
+			return TableWidgets.Row{
 				children = {
-					Table2.Cell{children = self:_makeMapperDisplay(self.mappers[index])},
-					Table2.Cell{children = row.map},
-					Table2.Cell{
+					TableWidgets.Cell{children = self:_makeMapperDisplay(self.mappers[index])},
+					TableWidgets.Cell{children = row.map},
+					TableWidgets.Cell{
 						classes = {'plainlinks'},
 						children = self:_makeLinksDisplay(self.links[index]),
 					},
@@ -220,13 +220,13 @@ end
 ---@private
 ---@return Renderable
 function MapTable:_makeHeader()
-	return Table2.TableHeader{
+	return TableWidgets.TableHeader{
 		children = {
-			Table2.Row{
+			TableWidgets.Row{
 				children = {
-					Table2.CellHeader{children = 'Author'},
-					Table2.CellHeader{children = 'Map'},
-					Table2.CellHeader{children = 'Links'},
+					TableWidgets.CellHeader{children = 'Author'},
+					TableWidgets.CellHeader{children = 'Map'},
+					TableWidgets.CellHeader{children = 'Links'},
 				},
 			},
 		},
@@ -236,7 +236,7 @@ end
 ---@private
 ---@return Renderable
 function MapTable:_renderTable()
-	return Table2.Table{
+	return TableWidgets.Table{
 		children = {
 			self:_makeHeader(),
 			self:_makeBody(),
