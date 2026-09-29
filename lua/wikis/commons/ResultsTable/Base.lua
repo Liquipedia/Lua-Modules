@@ -471,16 +471,14 @@ function BaseResultsTable:opponentDisplay(data, options)
 
 	if not Opponent.isType(data.opponenttype) then
 		return '-'
-	elseif data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
-		return OpponentDisplay.BlockOpponent{
-			opponent = Opponent.fromLpdbStruct(data) --[[@as standardOpponent]],
-			flip = options.flip,
-		}
-	elseif self.config.displayDefaultLogoAsIs then
+	elseif data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo)
+		or self.config.displayDefaultLogoAsIs then
+
 		return OpponentDisplay.BlockOpponent{
 			opponent = Opponent.fromLpdbStruct(data) --[[@as standardOpponent]],
 			flip = options.flip,
 			teamStyle = 'icon',
+			oneLine = true,
 		}
 	end
 
