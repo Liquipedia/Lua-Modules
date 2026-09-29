@@ -348,11 +348,11 @@ local PREFIXES = {
 	tlstream = {'https://tl.net/video/streams/'},
 	tonamel = {'https://tonamel.com/competition/'},
 	toornament = {'https://play.toornament.com/tournaments/'},
-	['trackmania-exchange'] = {
+	['tmx'] = {
 		'',
 		map = 'https://trackmania.exchange/mapshow/'
 	},
-	['trackmania-io'] = {
+	['tmio'] = {
 		'https://trackmania.io/#/competitions/comp/',
 		player = 'https://trackmania.io/#/player/',
 		map = 'https://trackmania.io/#/leaderboard/'
@@ -419,8 +419,6 @@ local ALIASES = {
 	replay = {'replays'},
 	rules = {'rulebook'},
 	['start-gg'] = {'startgg', 'smashgg'},
-	['trackmania-exchange'] = {'tmx'},
-	['trackmania-io'] = {'tmio'},
 	yandexefir = {'yandex'},
 	zhanqitv = {'zhanqi'},
 }
