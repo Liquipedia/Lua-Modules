@@ -27,19 +27,19 @@ local TableWidgets = Lua.import('Module:Widget/Table2/All')
 -- Default variant used when building the links of a map
 local LINK_VARIANT = 'map'
 
----@class MapTableRowArgs: table<string, string?>
+---@class TrackmaniaMapTableRowArgs: table<string, string?>
 ---@field map string?
 ---@field mapper string?
----@field mapperflag string?
+---@field mapperFlag string?
 
 ---@class TrackmaniaMapTableMapper: standardPlayer
 ---@field index integer
 
 ---@class MapTable
----@operator call(MapTableRowArgs[]): MapTable
+---@operator call(TrackmaniaMapTableRowArgs[]): MapTable
 local MapTable = Class.new(function(self, rows) self:init(rows) end)
 
----@param rows MapTableRowArgs[]
+---@param rows TrackmaniaMapTableRowArgs[]
 ---@return self
 function MapTable:init(rows)
 	self.rows = rows or {}
@@ -54,7 +54,7 @@ end
 function MapTable.run(frame)
 	local args = Arguments.getArgs(frame)
 
-	---@type MapTableRowArgs[]
+	---@type TrackmaniaMapTableRowArgs[]
 	local rows = Array.map(
 		Array.mapIndexes(function(index) return args[index] end),
 		Json.parseIfString
@@ -69,7 +69,7 @@ end
 
 ---Reads the mapper entries of a single row and resolves their links and flags
 ---@private
----@param row MapTableRowArgs
+---@param row TrackmaniaMapTableRowArgs
 ---@return TrackmaniaMapTableMapper[]
 function MapTable:_readMappers(row)
 	---@type TrackmaniaMapTableMapper[]
