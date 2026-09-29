@@ -91,8 +91,8 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@param patch string
----@return VNode
+---@param args table
+---@return VNode?
 function CustomLeague:_createPatchCell(args)
 	if String.isEmpty(args.patch) then
 		return nil
