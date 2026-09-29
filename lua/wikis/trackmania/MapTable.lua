@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Links = Lua.import('Module:Links')
 local Logic = Lua.import('Module:Logic')
@@ -35,43 +34,12 @@ local LINK_VARIANT = 'map'
 ---@class TrackmaniaMapTableMapper: standardPlayer
 ---@field index integer
 
----@class MapTable
----@operator call(TrackmaniaMapTableRowArgs[]): MapTable
-local MapTable = Class.new(function(self, rows) self:init(rows) end)
-
----@param rows TrackmaniaMapTableRowArgs[]
----@return self
-function MapTable:init(rows)
-	self.rows = rows or {}
-	self.mappers = Array.map(self.rows, function(row) return self:_readMappers(row) end)
-	self.links = Array.map(self.rows, function(row) return self:_makeFullLinks(row) end)
-	return self
-end
-
--- Module entry point
----@param frame Frame
----@return Renderable
-function MapTable.run(frame)
-	local args = Arguments.getArgs(frame)
-
-	---@type TrackmaniaMapTableRowArgs[]
-	local rows = Array.map(
-		Array.mapIndexes(function(index) return args[index] end),
-		Json.parseIfString
-	)
-
-	local mapTable = MapTable(rows)
-	local renderedTable = mapTable:_renderTable()
-	mapTable:_createLpdbEntry()
-
-	return renderedTable
-end
+local MapTable = {}
 
 ---Reads the mapper entries of a single row and resolves their links and flags
----@private
 ---@param row TrackmaniaMapTableRowArgs
 ---@return TrackmaniaMapTableMapper[]
-function MapTable:_readMappers(row)
+local function readMappers(row)
 	---@type TrackmaniaMapTableMapper[]
 	local mappers = {}
 
@@ -99,7 +67,7 @@ end
 ---@private
 ---@param mapInput table
 ---@return {[string]: string}
-function MapTable:_makeFullLinks(mapInput)
+local function makeFullLinks(mapInput)
 	return Table.filterByKey(
 		Links.makeFullLinksForTableItems(Links.transform(mapInput), LINK_VARIANT),
 		function(_, link) return link ~= '' end
@@ -110,7 +78,7 @@ end
 ---@private
 ---@param links {[string]: string}
 ---@return Renderable[]
-function MapTable:_makeLinksDisplay(links)
+local function makeLinksDisplay(links)
 	return Array.interleave(
 		Array.extractValues(Table.map(links, function(key, link)
 			return key, Link{
@@ -127,7 +95,7 @@ end
 ---@private
 ---@param mappers TrackmaniaMapTableMapper[]
 ---@return Renderable[]
-function MapTable:_makeMapperDisplay(mappers)
+local function makeMapperDisplay(mappers)
 	return Array.interleave(
 		Array.map(mappers, function(mapper) return InlinePlayerWidget{player = mapper} end),
 		Html.Br{}
@@ -135,30 +103,31 @@ function MapTable:_makeMapperDisplay(mappers)
 end
 
 ---Creates an LPDB map record per map, as `map` datapoints
----@private
----@return self
-function MapTable:_createLpdbEntry()
+---@param rows TrackmaniaMapTableRowArgs[]
+---@param mappers TrackmaniaMapTableMapper[][]
+---@param links {[string]: string}[]
+local function createLpdbEntry(rows, mappers, links)
 	if not Namespace.isMain() or Lpdb.isStorageDisabled() then
-		return self
+		return
 	end
 
-	Array.forEach(self.rows, function(row, rowIndex)
+	Array.forEach(rows, function(row, rowIndex)
 		local mapName = row.map
 		if Logic.isEmpty(mapName) then
 			return
 		end
 
 		local extradata = {}
-		for _, mapper in ipairs(self.mappers[rowIndex]) do
+		for _, mapper in ipairs(mappers[rowIndex]) do
 			extradata['author' .. mapper.index] =
 				mapper.pageName and mapper.pageName:gsub(' ', '_') or ''
 			extradata['author' .. mapper.index .. 'dn'] = mapper.displayName
 			extradata['author' .. mapper.index .. 'flag'] = mapper.flag or ''
 		end
 
-		local links = self.links[rowIndex]
-		if Table.isNotEmpty(links) then
-			extradata.links = links
+		local rowLinks = links[rowIndex]
+		if Table.isNotEmpty(rowLinks) then
+			extradata.links = rowLinks
 		end
 
 		mw.ext.LiquipediaDB.lpdb_datapoint('map_' .. mapName, Json.stringifySubTables({
@@ -167,22 +136,22 @@ function MapTable:_createLpdbEntry()
 			extradata = extradata,
 		}))
 	end)
-
-	return self
 end
 
----@private
+---@param rows TrackmaniaMapTableRowArgs[]
+---@param mappers TrackmaniaMapTableMapper[][]
+---@param links {[string]: string}[]
 ---@return Renderable
-function MapTable:_makeBody()
+local function makeBody(rows, mappers, links)
 	return TableWidgets.TableBody{
-		children = Array.map(self.rows, function(row, index)
+		children = Array.map(rows, function(row, index)
 			return TableWidgets.Row{
 				children = {
-					TableWidgets.Cell{children = self:_makeMapperDisplay(self.mappers[index])},
+					TableWidgets.Cell{children = makeMapperDisplay(mappers[index])},
 					TableWidgets.Cell{children = row.map},
 					TableWidgets.Cell{
 						classes = {'plainlinks'},
-						children = self:_makeLinksDisplay(self.links[index]),
+						children = makeLinksDisplay(links[index]),
 					},
 				},
 			}
@@ -190,9 +159,8 @@ function MapTable:_makeBody()
 	}
 end
 
----@private
 ---@return Renderable
-function MapTable:_makeHeader()
+local function makeHeader()
 	return TableWidgets.TableHeader{
 		children = {
 			TableWidgets.Row{
@@ -206,15 +174,31 @@ function MapTable:_makeHeader()
 	}
 end
 
----@private
+-- Module entry point
+---@param frame Frame
 ---@return Renderable
-function MapTable:_renderTable()
-	return TableWidgets.Table{
+function MapTable.run(frame)
+	local args = Arguments.getArgs(frame)
+
+	---@type TrackmaniaMapTableRowArgs[]
+	local rows = Array.map(
+		Array.mapIndexes(function(index) return args[index] end),
+		Json.parseIfString
+	)
+
+	local mappers = Array.map(rows, readMappers)
+	local links = Array.map(rows, makeFullLinks)
+
+	local renderedTable = TableWidgets.Table{
 		children = {
-			self:_makeHeader(),
-			self:_makeBody(),
+			makeHeader(),
+			makeBody(rows, mappers, links),
 		},
 	}
+
+	createLpdbEntry(rows, mappers, links)
+
+	return renderedTable
 end
 
-return Class.export(MapTable, {exports = {'run'}})
+return MapTable
