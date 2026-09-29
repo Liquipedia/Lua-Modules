@@ -192,67 +192,66 @@ Config.weights = {
 ---@param tierType string
 ---@return fun(number, number): number
 function Config.placementDropOffFunction(tier, tierType)
+	return function(score, placement)
+		if (tierType == Config.TIER_TYPE_QUALIFIER
+			or tierType == Config.TIER_TYPE_MISC
+			or tierType == Config.TIER_TYPE_WEEKLY
+			or tierType == Config.TIER_TYPE_MONTHLY
+			or tierType == Config.TIER_TYPE_SHOW_MATCH) then
+				return score
+		else
+			if (tier == 1 and placement <= 3) then
+				return score
 
-		return function(score, placement)
-			if (tierType == Config.TIER_TYPE_QUALIFIER
-				or tierType == Config.TIER_TYPE_MISC
-				or tierType == Config.TIER_TYPE_WEEKLY
-				or tierType == Config.TIER_TYPE_MONTHLY
-				or tierType == Config.TIER_TYPE_SHOW_MATCH) then
-					return score
-			else
-				if (tier == 1 and placement <= 3) then
-					return score
+			elseif (tier == 1 and placement <= 8) then
+				return (score - 5)
 
-				elseif (tier == 1 and placement <= 8) then
-					return (score - 5)
+			elseif (tier == 1 and placement <= 12) then
+				return (score - 7)
 
-				elseif (tier == 1 and placement <= 12) then
-					return (score - 7)
+			elseif (tier == 1) then
+				return (score - 9)
 
-				elseif (tier == 1) then
-					return (score - 9)
+			elseif (tier == 2 and placement <= 3) then
+				return (score)
 
-				elseif (tier == 2 and placement <= 3) then
-					return (score)
+			elseif (tier == 2 and placement <= 4) then
+				return (score - 4)
 
-				elseif (tier == 2 and placement <= 4) then
-					return (score - 4)
+			elseif (tier == 2 and placement <= 8) then
+				return (score - 5)
 
-				elseif (tier == 2 and placement <= 8) then
-					return (score - 5)
+			elseif (tier == 2) then
+				return (score - 7)
 
-				elseif (tier == 2) then
-					return (score - 7)
+			elseif (tier == 3 and placement <= 3) then
+				return (score)
 
-				elseif (tier == 3 and placement <= 3) then
-					return (score)
+			elseif (tier == 3 and placement <= 4) then
+				return (score - 1)
 
-				elseif (tier == 3 and placement <= 4) then
-					return (score - 1)
+			elseif (tier == 3) then
+				return (score - 3)
 
-				elseif (tier == 3) then
-					return (score - 3)
+			elseif (tier == 4 and placement == 1) then
+				return (score)
 
-				elseif (tier == 4 and placement == 1) then
-					return (score)
+			elseif (tier == 4 and placement <= 2) then
+				return (score - 1)
 
-				elseif (tier == 4 and placement <= 2) then
-					return (score - 1)
+			elseif (tier == 4) then
+				return (score - 2)
 
-				elseif (tier == 4) then
-					return (score - 2)
+			elseif (tier == 5 and placement == 1) then
+				return (score)
 
-				elseif (tier == 5 and placement == 1) then
-					return (score)
-
-				elseif (tier == 5) then
-					return (score - 1)
-				end
+			elseif (tier == 5) then
+				return (score - 1)
 			end
-
-			return 0
 		end
+
+		return 0
+	end
 end
 
 -- Adjusts the score to compensate for the mode, you might
