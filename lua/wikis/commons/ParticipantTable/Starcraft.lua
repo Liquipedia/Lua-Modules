@@ -20,6 +20,7 @@ local Variables = Lua.import('Module:Variables')
 ---@class StarcraftParticipantTableConfig: ParticipantTableConfig
 ---@field displayUnknownColumn boolean?
 ---@field displayRandomColumn boolean?
+---@field displayMultipleFactionColumn boolean?
 ---@field showCountByFaction boolean
 ---@field isRandomEvent boolean
 ---@field isQualified boolean?
@@ -55,6 +56,7 @@ function StarcraftParticipantTable.readConfig(args, parentConfig)
 
 	config.displayUnknownColumn = Logic.readBoolOrNil(args.unknowncolumn)
 	config.displayRandomColumn = Logic.readBoolOrNil(args.randomcolumn)
+	config.displayMultipleFactionColumn = Logic.readBoolOrNil(args.multiplecolumn)
 	config.showCountByFaction = Logic.readBool(args.showCountByRace or args.count)
 	config.isRandomEvent = Logic.nilOr(Logic.readBoolOrNil(args.is_random_event), parentConfig.isRandomEvent)
 	config.isQualified = Logic.nilOr(Logic.readBoolOrNil(args.isQualified), parentConfig.isQualified)
@@ -129,10 +131,8 @@ function StarcraftParticipantTable:adjustLpdbData(lpdbData, entry, config)
 		lpdbData.opponentplayers.p1faction = Faction.read('r')
 	end
 
-	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
 	local isQualified = entry.isQualified or config.isQualified
 
-	lpdbData.extradata.seriesnumber = seriesNumber and string.format('%05d', seriesNumber) or nil
 	lpdbData.extradata.isqualified = tostring(isQualified)
 	lpdbData.extradata.mod = Variables.varDefault('tournament_mod')
 
@@ -160,11 +160,11 @@ function StarcraftParticipantTable:createSoloFactionTable()
 
 	if not config.display then return end
 
-	local factioNumbers = self:_getFactionNumbers()
+	local factionNumbers = self:_getFactionNumbers()
 
 	local factionColumns
 	if config.displayRandomColumn or
-		not config.isRandomEvent and config.displayRandomColumn == nil and factioNumbers.rDisplay > 0 then
+		not config.isRandomEvent and config.displayRandomColumn == nil and factionNumbers.rDisplay > 0 then
 
 		factionColumns = Array.copy(Faction.knownFactions)
 	else
@@ -172,9 +172,16 @@ function StarcraftParticipantTable:createSoloFactionTable()
 	end
 
 	if config.displayUnknownColumn or
-		config.displayUnknownColumn == nil and factioNumbers[Faction.defaultFaction .. 'Display'] > 0 then
+		config.displayUnknownColumn == nil and factionNumbers[Faction.defaultFaction .. 'Display'] > 0 then
 
 		table.insert(factionColumns, Faction.defaultFaction)
+	end
+
+
+	if config.displayMultipleFactionColumn or
+		config.displayMultipleFactionColumn == nil and factionNumbers.mDisplay and factionNumbers.mDisplay > 0 then
+
+		table.insert(factionColumns, Faction.read('m'))
 	end
 
 	local colSpan = #factionColumns
@@ -183,7 +190,7 @@ function StarcraftParticipantTable:createSoloFactionTable()
 		:addClass('participantTable participantTable-faction')
 		:css('grid-template-columns', 'repeat(' .. colSpan .. ', 1fr)')
 		:css('width', (colSpan * config.soloColumnWidth) .. 'px')
-		:node(self:_displayHeader(factionColumns, factioNumbers))
+		:node(self:_displayHeader(factionColumns, factionNumbers))
 
 	Array.forEach(self.sections, function(section) self:_displaySoloFactionTableSection(section, factionColumns) end)
 
@@ -221,9 +228,9 @@ function StarcraftParticipantTable:_getFactionNumbers()
 end
 
 ---@param factionColumns table
----@param factioNumbers table
+---@param factionNumbers table
 ---@return Html
-function StarcraftParticipantTable:_displayHeader(factionColumns, factioNumbers)
+function StarcraftParticipantTable:_displayHeader(factionColumns, factionNumbers)
 	local config = self.config
 	local header = mw.html.create('div'):addClass('participantTable-row')
 
@@ -233,7 +240,7 @@ function StarcraftParticipantTable:_displayHeader(factionColumns, factioNumbers)
 			faction ~= Faction.defaultFaction and Faction.Icon{faction = faction} or nil,
 			' ' .. Faction.toName(faction),
 			config.isRandomEvent and ' Main' or nil,
-			config.showCountByFaction and " ''(" .. factioNumbers[faction .. 'Display'] .. ")''" or nil
+			config.showCountByFaction and " ''(" .. factionNumbers[faction .. 'Display'] .. ")''" or nil
 		)
 
 		header:tag('div')

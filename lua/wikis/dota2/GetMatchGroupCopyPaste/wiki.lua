@@ -26,7 +26,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local lines = Array.extend(
 		'{{Match',
 		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
 		Logic.readBool(args.hasDate) and {
@@ -34,13 +34,13 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			INDENT .. '|finished=',
 			INDENT .. '|twitch='
 		} or nil,
-		Array.map(Array.range(1, bestof), function(mapIndex)
+		Array.mapRange(1, bestof, function(mapIndex)
 			return INDENT .. '|vodgame'.. mapIndex ..'='
 		end),
-		generateMatchPage and {} or Array.map(Array.range(1, bestof), function(mapIndex)
+		generateMatchPage and {} or Array.mapRange(1, bestof, function(mapIndex)
 			return INDENT .. '|matchid'.. mapIndex ..'='
 		end),
-		Array.map(Array.range(1, bestof), function(mapIndex)
+		Array.mapRange(1, bestof, function(mapIndex)
 			return WikiCopyPaste._getMapCode(mapIndex, Logic.readBool(args.bans), generateMatchPage)
 		end),
 		'}}'

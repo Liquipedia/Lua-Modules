@@ -10,15 +10,12 @@ local Lua = require('Module:Lua')
 local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
-local Image = Lua.import('Module:Image')
 local Logic = Lua.import('Module:Logic')
 local Map = Lua.import('Module:Map')
-local Table = Lua.import('Module:Table')
 local VodLink = Lua.import('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local Links = Lua.import('Module:Links')
 local Html = Lua.import('Module:Widget/Html')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchHeader = Lua.import('Module:Widget/Match/Header')
@@ -26,7 +23,6 @@ local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
 local MatchButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {loadData = true})
 local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 
 ---@class CustomMatchSummaryInterface
@@ -34,6 +30,7 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 ---@field createGames? fun(match: MatchGroupUtilMatch): Renderable|Renderable[] @deprecated (but better than createBody)
 ---@field createGame? fun(game: table, gameIndex: integer): Renderable|Renderable[] @deprecated
 ---@field GameRow? Component<MatchSummaryGameRowProps>
+---@field gameFilter? fun(game: MatchGroupUtilGame): boolean
 ---@field createFooter? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 
 ---@class MatchSummary
@@ -77,6 +74,8 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 	if GameRow then
 		local sets = match.submatches or {}
 
+		local gameFilterFunction = CustomMatchSummary.gameFilter or function() return true end
+
 		-- With one set for all matches, or one game per set, it's redundant to show set level info.
 		if #sets > 1 and #sets < #match.games then
 			nodes = Array.map(sets, function(set)
@@ -84,6 +83,9 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 					gamesSectionName = set.header or ('Set ' .. set.subgroup),
 					gamesSectionResult = MatchSummaryWidgets.SetHeader{set = set},
 					children = Array.map(set.games, function(game, gameIndex)
+						if not gameFilterFunction(game) then
+							return
+						end
 						return GameRow{game = game, gameIndex = gameIndex}
 					end)
 				}
@@ -91,6 +93,9 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 		else
 			nodes = MatchSummaryWidgets.GamesContainer{
 				children = Array.map(match.games, function(game, gameIndex)
+					if not gameFilterFunction(game) then
+						return
+					end
 					return GameRow{game = game, gameIndex = gameIndex}
 				end)
 			}
@@ -115,7 +120,7 @@ end
 function MatchSummary.createDefaultFooter(match)
 	return MatchSummaryWidgets.Footer{children = WidgetUtil.collect(
 		MatchSummary.makeVodDisplay(match.vod, match.games),
-		MatchSummary.makeLinksDisplay(match.links)
+		DisplayHelper.makeLinksDisplay(match.links)
 	)}
 end
 
@@ -141,67 +146,6 @@ function MatchSummary.makeVodDisplay(matchVod, games)
 	end)
 
 	return vods
-end
-
----@param link string
----@param icon string
----@param iconDark string?
----@param text string
----@param class string?
----@return string?
-function MatchSummary.makeLinkDisplay(link, icon, iconDark, text, class)
-	return Image.display(icon, iconDark, {
-		link = link, size = '32px', caption = text, alt = link, class = class
-	})
-end
-
----@param links table<string, string|table>
----@return Renderable[]
-function MatchSummary.makeLinksDisplay(links)
-	local linkDisplays = {}
-
-	local makeAndSaveLink = function(link, icon, iconDark, text, class)
-		local display = MatchSummary.makeLinkDisplay(link, icon, iconDark, text, class)
-		table.insert(linkDisplays, display)
-	end
-
-	local processLink = function(linkType, link)
-		local currentLinkData = Links.getMatchIconData(linkType)
-		if not currentLinkData then
-			mw.log('Unknown link: ' .. linkType)
-		elseif type(link) == 'table' then
-			for gameIdx, gameLink in Table.iter.spairs(link) do
-				local newText = currentLinkData.text .. ' on Game ' .. gameIdx
-				makeAndSaveLink(gameLink, currentLinkData.icon, currentLinkData.iconDark, newText)
-			end
-		else
-			-- Temporary during MW/LH Migrations
-			local class
-			if linkType == 'headtohead_lh' then
-				class = 'hide-when-mediawiki'
-			elseif linkType == 'headtohead' then
-				class = 'hide-when-lighthouse'
-			end
-			makeAndSaveLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text, class)
-		end
-	end
-
-	local processedLinks = {}
-	Array.forEach(MATCH_LINK_PRIORITY, function(linkType)
-		for linkKey, link in Table.iter.pairsByPrefix(links, linkType, {requireIndex = false}) do
-			processLink(linkKey, link)
-			processedLinks[linkKey] = true
-		end
-	end)
-
-	for linkKey, link in Table.iter.spairs(links) do
-		-- Handle links not already processed via priority list
-		if not processedLinks[linkKey] then
-			processLink(linkKey, link)
-		end
-	end
-
-	return linkDisplays
 end
 
 ---Default createMatch function for usage in Custom MatchSummary

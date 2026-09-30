@@ -16,7 +16,7 @@
 		"jest-junit": "^16.0.0",
 		"jquery": "*",
 		"pixelmatch": "^7.1.0",
-		"playwright": "1.61.1",
+		"playwright": "1.63.0",
 		"pngjs": "^7.0.0",
 		"postcss-scss": "^4.x.x",
 		"sass": "^1.97.3",
@@ -39,10 +39,11 @@
 		"lint:scss:ci": "stylelint \"stylesheets/**/*.scss\" --custom-formatter @csstools/stylelint-formatter-github",
 		"test:js": "jest",
 		"compile:scss": "sass stylesheets/Main.scss lua/output/css/main.css",
+		"fetch:remote-css": "bash scripts/fetch-remote-css.sh",
 		"build:css": "npm run compile:scss",
 		"build:js": "node build-js.js",
 		"build": "npm run build:css && npm run build:js",
 		"lua-test": "npm run build:css && busted -C lua",
-		"update-snapshots": "UPDATE_SNAPSHOTS=true npm run lua-test"
+		"update-snapshots": "npm run fetch:remote-css && UPDATE_SNAPSHOTS=true npm run lua-test"
 	}
 }

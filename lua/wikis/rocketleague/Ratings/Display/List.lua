@@ -12,26 +12,33 @@ local Operator = Lua.import('Module:Operator')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Template = Lua.import('Module:Template')
 
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+
 ---@class RatingsDisplayList: RatingsDisplayInterface
 local RatingsDisplayList = {}
 
 local LIMIT_TEAMS = 100 -- How many teams to show in the list/table
 
 ---@param teamRankings RatingsEntryOld[]
----@return string
+---@return Renderable
 function RatingsDisplayList.build(teamRankings)
 	local teams = Array.sub(teamRankings, 1, LIMIT_TEAMS)
 
-	local htmlTable = mw.html.create('table'):addClass('wikitable'):css('text-align', 'center')
-		:tag('tr'):css('font-weight', 'bold')
-			:tag('td'):wikitext('#'):done()
-			:tag('td'):wikitext('Team'):done()
-			:tag('td'):wikitext('Rating'):done()
-			:tag('td'):wikitext('Region'):done()
-			:tag('td'):wikitext('Played'):done()
-			:tag('td'):wikitext('Streak'):done()
-			:tag('td'):wikitext('History'):done()
-		:allDone()
+	local tableRows = {
+		TableWidgets.TableHeader{children =
+			TableWidgets.Row{
+				children = {
+					TableWidgets.CellHeader{children = '#'},
+					TableWidgets.CellHeader{children = 'Team'},
+					TableWidgets.CellHeader{children = 'Rating'},
+					TableWidgets.CellHeader{children = 'Region'},
+					TableWidgets.CellHeader{children = 'Played'},
+					TableWidgets.CellHeader{children = 'Streak'},
+					TableWidgets.CellHeader{children = 'History'}
+				}
+			}
+		}
+	}
 
 	Array.forEach(teams, function(team, rank)
 		if (team.streak == nil) or (team.rating == nil) then
@@ -77,16 +84,30 @@ function RatingsDisplayList.build(teamRankings)
 				or (team.streak < -1 and 'group-table-rank-change-down')
 				or nil
 
-		htmlTable:tag('tr')
-			:tag('td'):css('font-weight', 'bold'):wikitext(rank):done()
-			:tag('td'):css('text-align', 'left'):node(OpponentDisplay.InlineTeamContainer{template = team.name}):done()
-			:tag('td'):wikitext(math.floor(team.rating + 0.5)):done()
-			:tag('td'):wikitext(string.upper(team.region or '')):done()
-			:tag('td'):wikitext(team.matches):done()
-			:tag('td'):css('font-weight', 'bold'):addClass(streakClass):wikitext(streakText):done()
-			:tag('td'):wikitext(popup):done()
+		table.insert(tableRows, TableWidgets.TableBody{children =
+			TableWidgets.Row{
+				children = {
+					TableWidgets.Cell{css = {['font-weight'] = 'bold'}, children = rank},
+					TableWidgets.Cell{children = OpponentDisplay.InlineTeamContainer{template = team.name}},
+					TableWidgets.Cell{children = math.floor(team.rating + 0.5)},
+					TableWidgets.Cell{children = string.upper(team.region or '')},
+					TableWidgets.Cell{children = team.matches},
+					TableWidgets.Cell{
+						css = {['font-weight'] = 'bold'},
+						classes = {streakClass},
+						children = streakText
+					},
+					TableWidgets.Cell{children = popup}
+				}
+			}
+		})
+
 	end)
-	return tostring(mw.html.create('div'):addClass('table-responsive'):node(htmlTable))
+	return TableWidgets.Table{
+		children = {
+			tableRows
+		}
+	}
 end
 
 return RatingsDisplayList

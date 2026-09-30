@@ -10,36 +10,45 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
-local TeamTemplate = Lua.import('Module:TeamTemplate')
-
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local MedalStatsBase = Lua.import('Module:SeriesMedalStats')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
-local MedalStatsBase = Lua.import('Module:SeriesMedalStats')
+local MedalsTable = Lua.import('Module:Widget/MedalsTable')
 
 ---@class SeriesMedalStatsParticipant: SeriesMedalStats
 ---@field teams table<string, string>
+---@field opponents table<string, standardOpponent>
 local MedalStats = Class.new(MedalStatsBase)
 
+---@param frame Frame
+---@return VNode?
 function MedalStats.run(frame)
 	local args = Arguments.getArgs(frame)
 
-	return MedalStats(args):query():create()
+	return MedalStats(args):create()
 end
 
----@return Html?
+---@return Renderable?
 function MedalStats:create()
-	if Table.isEmpty(self.rawData) then return end
+	if Logic.isEmpty(self.rawData) then return end
 
 	self:_processData()
 
-	local nameDisplay = function(identifier)
-		return OpponentDisplay.BlockOpponent{opponent = self.opponents[identifier]}
-	end
-
-	return self:defaultBuild(nameDisplay, 'Participant', 'Participants')
+	return MedalsTable{
+		medalsTableType = 'Participant',
+		dataColumns = self.config.columns,
+		data = self.data,
+		renderRowFirstCell = function(identifier)
+			return OpponentDisplay.BlockOpponent{opponent = self.opponents[identifier]}
+		end,
+		rowSort = MedalStatsBase.rowSort,
+		hideTotalRow = true,
+		cutAfter = self.config.cutAfter,
+	}
 end
 
 function MedalStats:_processData()
@@ -60,7 +69,7 @@ function MedalStats:_processData()
 		return identifier
 	end
 
-	---@param placement SeriesMedalStatsPlacementObject
+	---@param placement placement
 	---@return string?
 	local getIdentifier = function(placement)
 		if placement.opponenttype == Opponent.literal or not placement.opponentname then return end
@@ -75,7 +84,7 @@ function MedalStats:_processData()
 		end
 
 		local teamTemplate = placement.opponentname
-		if String.isEmpty(teamTemplate) then
+		if Logic.isEmpty(teamTemplate) then
 			return
 		end
 		---@cast teamTemplate -nil
@@ -91,14 +100,8 @@ function MedalStats:_processData()
 	end
 
 	self.data = {}
-
-	Array.forEach(self.rawData, function(placement)
-		return self:processByIdentifier(getIdentifier, placement)
-	end)
-
+	Array.forEach(self.rawData, FnUtil.curry(FnUtil.curry(self.processByIdentifier, self), getIdentifier))
 	self.rawData = nil
-
-	self:sort()
 end
 
 return MedalStats

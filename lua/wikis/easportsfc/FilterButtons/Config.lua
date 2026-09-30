@@ -33,7 +33,7 @@ Config.categories = {
 	{
 		name = 'game',
 		property = 'game',
-		items = {'fc 26', 'fc mobile', 'fc online'},
+		items = {'fc 27', 'fc 26', 'fc mobile', 'fc online'},
 		expandable = true,
 		transform = function(game)
 			return Html.Fragment{

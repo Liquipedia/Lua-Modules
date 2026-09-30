@@ -28,6 +28,8 @@ local Comparator = Condition.Comparator
 local ColumnName = Condition.ColumnName
 
 local Html = Lua.import('Module:Widget/Html')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local WarningBox = Lua.import('Module:Widget/WarningBox')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
@@ -145,7 +147,15 @@ function LegacyTeamCard.run(dependency)
 	end
 
 	legacyVars:delete('wrapperOpen')
-	return Html.Fragment{children = WidgetUtil.collect(notesWidget, display)}
+	return Html.Fragment{children = WidgetUtil.collect(
+		notesWidget,
+		display,
+		WarningBox{text = {
+			'Template:TeamCard is deprecated. Use ',
+			Link{link = 'Template:TeamParticipants'},
+			' instead!',
+		}}
+	)}
 end
 
 ---@param rawQualifier string|table|nil
@@ -183,7 +193,6 @@ function LegacyTeamCard.parseQualifier(rawQualifier)
 	end
 end
 
--- Port of Module:TeamCard/Qualifier (and Module:TeamCard/Storage._parseQualifier).
 ---@private
 ---@param rawQualifier string
 ---@return string?, string?, string? # (linkText, internalLink, externalLink)

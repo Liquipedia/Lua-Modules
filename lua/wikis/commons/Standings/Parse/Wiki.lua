@@ -213,15 +213,14 @@ function StandingsParseWiki.parseTiebreakers(args, tableType)
 		if tableType == 'ffa' then
 			tiebreakers = {
 				TiebreakerFactory.validateAndNormalizeInput('points'),
-				TiebreakerFactory.validateAndNormalizeInput('manual'),
 			}
 		elseif tableType == 'swiss' then
 			tiebreakers = {
 				TiebreakerFactory.validateAndNormalizeInput('matchdiff'),
-				TiebreakerFactory.validateAndNormalizeInput('manual'),
 			}
 		end
 	end
+	table.insert(tiebreakers, TiebreakerFactory.validateAndNormalizeInput('manual'))
 	return tiebreakers
 end
 
