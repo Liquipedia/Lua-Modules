@@ -14,9 +14,9 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Opponent = Lua.import('Module:Opponent/Custom')
-local ResultsTable = Lua.import('Module:ResultsTable/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
 local Tier = Lua.import('Module:Tier/Custom')
 
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
@@ -117,13 +117,12 @@ function NotabilityChecker._runForTeam(team)
 				'Tournaments found featuring ',
 				team,
 			},
-			children = ResultsTable.results{
-				awards = false,
-				achievements = false,
-				playerResultsOfTeam = false,
-				querytype = Opponent.team,
-				team = team,
-			}
+			-- TODO: Replace with direct ResultsTable call
+			children = Template.safeExpand(
+				mw.getCurrentFrame(),
+				'NotabilityTeamMatchesTable',
+				{title = team}
+			)
 		},
 		'\n',
 		Html.B{children = 'Weight:'},
@@ -161,24 +160,12 @@ function NotabilityChecker._calculateRosterNotability(team, people)
 					'Tournaments found featuring ',
 					person,
 				},
-				children = {
-					ResultsTable.results{
-						awards = false,
-						achievements = false,
-						playerResultsOfTeam = false,
-						playerLimit = MAX_NUMBER_OF_PARTICIPANTS,
-						querytype = Opponent.solo,
-						player = person,
-					},
-					ResultsTable.results{
-						awards = false,
-						achievements = false,
-						playerResultsOfTeam = false,
-						querytype = 'coach',
-						coachLimit = Config.MAX_NUMBER_OF_COACHES,
-						coach = person,
-					},
-				},
+				-- TODO: Replace with direct ResultsTable call
+				children = Template.safeExpand(
+					mw.getCurrentFrame(),
+					'NotabilityPlayerMatchesTable',
+					{title = person}
+				)
 			},
 			Html.B{children = 'Person:'},
 			' ',
