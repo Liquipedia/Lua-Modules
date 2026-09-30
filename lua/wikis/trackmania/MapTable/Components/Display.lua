@@ -11,12 +11,11 @@ local Array = Lua.import('Module:Array')
 local Links = Lua.import('Module:Links')
 local Table = Lua.import('Module:Table')
 
+local Component = Lua.import('Module:Widget/Component')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Html = Lua.import('Module:Widget/Html')
 local InlinePlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Inline')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-
-local MapTableDisplay = {}
 
 ---Builds the mapper cell content for a single map, one mapper per line
 ---@param mappers TrackmaniaMapTableMapper[]
@@ -80,17 +79,15 @@ local function makeBody(rows, mappers, links)
 	}
 end
 
----@param rows TrackmaniaMapTableRows
----@param mappers TrackmaniaMapTableMappers
----@param links TrackmaniaMapTableLinks
----@return Renderable
-function MapTableDisplay.makeTable(rows, mappers, links)
+---@param props {rows: TrackmaniaMapTableRows, mappers: TrackmaniaMapTableMappers, links: TrackmaniaMapTableLinks}
+---@return VNode
+local MapTableDisplay = function(props)
 	return TableWidgets.Table{
 		children = {
 			makeHeader(),
-			makeBody(rows, mappers, links),
+			makeBody(props.rows, props.mappers, props.links),
 		},
 	}
 end
 
-return MapTableDisplay
+return Component.component(MapTableDisplay)
