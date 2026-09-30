@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:MapTable/Api/Mappers
+-- page=Module:Features/MapTable/Api/Mappers
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

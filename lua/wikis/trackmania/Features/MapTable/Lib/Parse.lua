@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:MapTable/Lib/Parse
+-- page=Module:Features/MapTable/Lib/Parse
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -13,7 +13,7 @@ local Links = Lua.import('Module:Links')
 local Opponent = Lua.import('Module:Opponent')
 local Table = Lua.import('Module:Table')
 
-local MapTableTypes = Lua.import('Module:MapTable/Types')
+local MapTableTypes = Lua.import('Module:Features/MapTable/Types')
 
 local MapTableParse = {}
 

@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:MapTable/Controller
+-- page=Module:Features/MapTable/Controller
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -10,10 +10,10 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 
-local MapTableMappers = Lua.import('Module:MapTable/Api/Mappers')
-local MapTableStore = Lua.import('Module:MapTable/Api/Store')
-local MapTableDisplay = Lua.import('Module:MapTable/Components/Display')
-local MapTableParse = Lua.import('Module:MapTable/Lib/Parse')
+local MapTableMappers = Lua.import('Module:Features/MapTable/Api/Mappers')
+local MapTableStore = Lua.import('Module:Features/MapTable/Api/Store')
+local MapTableDisplay = Lua.import('Module:Features/MapTable/Components/Display')
+local MapTableParse = Lua.import('Module:Features/MapTable/Lib/Parse')
 
 local MapTableController = {}
 

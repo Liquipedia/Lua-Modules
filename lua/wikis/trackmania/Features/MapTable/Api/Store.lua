@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:MapTable/Api/Store
+-- page=Module:Features/MapTable/Api/Store
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:MapTable/Types
+-- page=Module:Features/MapTable/Types
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

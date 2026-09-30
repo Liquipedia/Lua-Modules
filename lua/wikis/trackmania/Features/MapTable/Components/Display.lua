@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:MapTable/Components/Display
+-- page=Module:Features/MapTable/Components/Display
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

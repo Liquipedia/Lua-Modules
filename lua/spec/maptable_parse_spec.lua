@@ -1,6 +1,6 @@
 --- Triple Comment to Enable our LLS Plugin
 --[[
-Unit tests for the pure Lib layer of Module:MapTable.
+Unit tests for the pure Lib layer of Module:Features/MapTable.
 
 This is the payoff of splitting MapTable into layers: reading a row and deriving its links used to
 live in the same file as the LPDB writes and the redirect lookups, so they could only be reached by
@@ -8,7 +8,7 @@ running the whole table. They are pure now, so they can be tested directly, with
 
 SetActiveWiki is not a mock, it only puts wikis/trackmania on the module search path.
 
-The end to end behaviour of the same code stays covered through Module:MapTable/Controller.
+The end to end behaviour of the same code stays covered through Module:Features/MapTable/Controller.
 ]]
 
 describe('MapTable Lib', function()
@@ -16,7 +16,7 @@ describe('MapTable Lib', function()
 
 	setup(function()
 		SetActiveWiki('trackmania')
-		MapTableParse = require('Module:MapTable/Lib/Parse')
+		MapTableParse = require('Module:Features/MapTable/Lib/Parse')
 	end)
 
 	teardown(function()
