@@ -233,7 +233,7 @@ Config.weights = {
 --- a first placement should score more than a 10th placement.
 ---@param tier string|integer
 ---@param tierType string
----@return fun(number, number): number
+---@return NotabilityCheckerDropOffFunction
 function Config.placementDropOffFunction(tier, tierType)
 
 		return function(score, placement)

@@ -275,7 +275,7 @@ Config.scoreRangeQuali = {5, 3, 2, 0.5, 0.5}
 --- See also the EXTRA_DROP_OFF_TYPES and NO_POINTS_TYPES.
 ---@param tier string|integer
 ---@param tierType string
----@return fun(number, number): number
+---@return NotabilityCheckerDropOffFunction
 function Config.placementDropOffFunction(tier, tierType)
 	-- Return scoreRangeQuali or score if tiertype is not equal to general
 	if (tierType ~= nil) and (tierType:lower() ~= Config.TIER_TYPE_GENERAL) then

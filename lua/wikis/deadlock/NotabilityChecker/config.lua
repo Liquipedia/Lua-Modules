@@ -205,7 +205,7 @@ Config.weights = {
 --- See also the EXTRA_DROP_OFF_TYPES.
 ---@param tier string|integer
 ---@param tierType string
----@return fun(number, number): number
+---@return NotabilityCheckerDropOffFunction
 function Config.placementDropOffFunction(tier, tierType)
 	return function(score, placement)
 		if (tier == 1 and placement <= 4)
