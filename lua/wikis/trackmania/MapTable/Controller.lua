@@ -26,7 +26,7 @@ function MapTableController.run(frame)
 	local mappers = MapTableMappers.resolveMappers(Array.map(rows, MapTableParse.readMappers))
 	local links = Array.map(rows, MapTableParse.makeFullLinks)
 
-	local renderedTable = MapTableDisplay.makeTable(rows, mappers, links)
+	local renderedTable = MapTableDisplay{rows = rows, mappers = mappers, links = links}
 
 	MapTableStore.storeMaps(rows, mappers, links)
 
