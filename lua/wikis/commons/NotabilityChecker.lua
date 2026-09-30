@@ -18,7 +18,6 @@ local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 local Tier = Lua.import('Module:Tier/Custom')
 
-local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
@@ -111,18 +110,12 @@ function NotabilityChecker._runForTeam(team)
 
 	local output = {
 		Html.H3{children = 'Team Results'},
-		GeneralCollapsible{
-			title = {
-				'Tournaments found featuring ',
-				team,
-			},
-			-- TODO: Replace with direct ResultsTable call
-			children = Template.safeExpand(
-				mw.getCurrentFrame(),
-				'NotabilityTeamMatchesTable',
-				{title = team}
-			)
-		},
+		-- TODO: Replace with direct ResultsTable call
+		Template.safeExpand(
+			mw.getCurrentFrame(),
+			'NotabilityTeamMatchesTable',
+			{title = team}
+		),
 		'\n',
 		Html.B{children = 'Weight:'},
 		' ',
@@ -154,18 +147,12 @@ function NotabilityChecker._calculateRosterNotability(team, people)
 		local personWeight = NotabilityChecker._calculatePersonNotability(person)
 		Array.appendWith(
 			output,
-			GeneralCollapsible{
-				title = {
-					'Tournaments found featuring ',
-					person,
-				},
-				-- TODO: Replace with direct ResultsTable call
-				children = Template.safeExpand(
-					mw.getCurrentFrame(),
-					'NotabilityPlayerMatchesTable',
-					{title = person}
-				)
-			},
+			-- TODO: Replace with direct ResultsTable call
+			Template.safeExpand(
+				mw.getCurrentFrame(),
+				'NotabilityPlayerMatchesTable',
+				{title = person}
+			),
 			Html.B{children = 'Person:'},
 			' ',
 			Link{link = person},
