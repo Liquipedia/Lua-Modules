@@ -110,6 +110,7 @@ function NotabilityChecker._runForTeam(team)
 
 	local output = {
 		Html.H3{children = 'Team Results'},
+		'\n',
 		-- TODO: Replace with direct ResultsTable call
 		Template.safeExpand(
 			mw.getCurrentFrame(),
@@ -147,12 +148,14 @@ function NotabilityChecker._calculateRosterNotability(team, people)
 		local personWeight = NotabilityChecker._calculatePersonNotability(person)
 		Array.appendWith(
 			output,
+			'\n',
 			-- TODO: Replace with direct ResultsTable call
 			Template.safeExpand(
 				mw.getCurrentFrame(),
 				'NotabilityPlayerMatchesTable',
 				{title = person}
 			),
+			'\n',
 			Html.B{children = 'Person:'},
 			' ',
 			Link{link = person},
