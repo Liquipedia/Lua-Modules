@@ -125,7 +125,7 @@ function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 				if remainingLife > startingLife then
 					startingLife = remainingLife
 				end
-				return Array.map(Array.range(1, startingLife), function(pos)
+				return Array.mapRange(1, startingLife, function(pos)
 					return {name = character, status = characterStatus(startingLife, remainingLife, pos, pos == startingLife)}
 				end)
 			end)

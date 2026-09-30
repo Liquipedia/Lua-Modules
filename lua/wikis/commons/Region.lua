@@ -90,7 +90,7 @@ function Region._toDisplay(regionValues, options)
 			display = ''
 		end
 	elseif regionValues.file then
-		display = '[[File:' .. regionValues.file .. ']]&nbsp;'
+		display = '[[File:' .. regionValues.file .. '|36x24px]]&nbsp;'
 	end
 
 	if not regionValues.region then

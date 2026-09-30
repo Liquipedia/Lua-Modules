@@ -45,7 +45,7 @@ end
 ---@param args table
 ---@return table[]
 function CustomCharacter:_getStatsByLevel(args)
-	return Array.map(Array.range(1, 3), function(level)
+	return Array.mapRange(1, 3, function(level)
 		return {
 			health = args['health' .. level],
 			mana = args['mana' .. level],

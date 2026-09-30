@@ -10,19 +10,19 @@ local Lua = require('Module:Lua')
 local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
+local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
 
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
-local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 local CONTENT = {
-	theGame = {
-		heading = 'The Game',
-		body = '{{Liquipedia:The Game}}',
+	usefulArticles = {
+		heading = 'Useful Articles',
+		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
 		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
 	},
@@ -34,7 +34,10 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{rumours = false},
+		body = TransfersList{
+			limit = 10,
+			transferPage = MainPageLayoutUtil.getYearlyTransferPage(),
+		},
 		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	thisDay = {
@@ -45,14 +48,15 @@ local CONTENT = {
 	},
 	specialEvents = {
 		noPanel = true,
-		body = '{{Liquipedia:Special Event}}',
+		body = '{{Liquipedia:Special_Event}}',
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
 	},
 	filterButtons = {
 		noPanel = true,
 		body = Div{
 			css = { width = '100%', ['margin-bottom'] = '8px' },
 			children = { FilterButtonsWidget() }
-		},
+		}
 	},
 	matches = {
 		heading = 'Matches',
@@ -63,8 +67,9 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays = 100,
-			completedDays = 200,
+			upcomingDays = 30,
+			completedDays = 30,
+			variant = 'collapsible',
 		},
 		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
@@ -73,15 +78,15 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'NARAKA lightmode.png',
-		darkmode = 'NARAKA darkmode.png',
+		lightmode = 'Standoff 2 allmode.svg',
+		darkmode = 'Standoff 2 allmode.svg',
 	},
-	metadesc = 'Comprehensive NARAKA: BLADEPOINT wiki with articles covering everything from heroes, to weapons, '..
-		'to strategies, to tournaments, to competitive players and teams.',
-	title = 'NARAKA: BLADEPOINT',
+	metadesc = 'The Standoff 2 (SO2) esports wiki covering everything from players, teams and transfers, ' ..
+		'to tournaments and results, maps and game contents.',
+	title = 'Standoff 2',
 	navigation = {
 		{
-			file = 'KPL Dream Team at HoK Midseason Invitational 2024.jpg',
+			file = 'Revial_Gaming_at_EPIC_Standoff_2_Winter_Major_2023.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -90,7 +95,7 @@ return {
 			},
 		},
 		{
-			file = 'TOP Tian at the 2024 Esports World Cup.jpg',
+			file = 'CH_xZise_at_EPIC_Standoff_2_Fall_Major_2024.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -99,7 +104,7 @@ return {
 			},
 		},
 		{
-			file = 'Naraka J Cup banner.png',
+			file = 'EPIC_Standoff_2_Cosmo_Major_trophy.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -108,7 +113,7 @@ return {
 			},
 		},
 		{
-			file = 'PVX ShunMi at the ALGS Birmingham Championship.jpg',
+			file = 'Velya_and_GentlemaN_at_EPIC_Standoff_2_Summer_Major_2024.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -117,14 +122,14 @@ return {
 			},
 		},
 		{
-			file = 'Jenn_Lee_poses_with_Trophy_at_VCT_Master_Shanghai.jpg',
-			title = 'Statistics',
-			link = 'Portal:Statistics',
+			file = 'Breeze_Standoff_2_Map.jpg',
+			title = 'Maps',
+			link = 'Portal:Maps',
 		},
 		{
-			file = 'NARAKA Heroe banner.jpg',
-			title = 'Heroes',
-			link = 'Portal:Heroes',
+			file = 'Necessary_at_Standoff_2_Major_2022_autograph_session.jpg',
+			title = 'Statistics',
+			link = 'Portal:Statistics',
 		},
 	},
 	layouts = {
@@ -138,14 +143,14 @@ return {
 					},
 					{
 						mobileOrder = 3,
-						content = CONTENT.thisDay,
-					},
-					{
-						mobileOrder = 4,
 						content = CONTENT.transfers,
 					},
 					{
 						mobileOrder = 5,
+						content = CONTENT.thisDay,
+					},
+					{
+						mobileOrder = 6,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -186,11 +191,11 @@ return {
 					},
 				},
 			},
-			{
+			{ -- Bottom
 				children = {
 					{
-						mobileOrder = 6,
-						content = CONTENT.theGame,
+						mobileOrder = 5,
+						content = CONTENT.usefulArticles,
 					},
 				},
 			},
