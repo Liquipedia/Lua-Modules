@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Table = Lua.import('Module:Table')
 
+---@class OsuNotabilityCheckerConfig: NotabilityCheckerConfig
 local Config = {}
 
 

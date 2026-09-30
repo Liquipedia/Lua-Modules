@@ -4,6 +4,8 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
+
+---@class HoKNotabilityCheckerConfig: NotabilityCheckerConfig
 local Config = {}
 
 -- These are constants, you don't need to touch them

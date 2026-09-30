@@ -5,6 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+---@class MarvelRivalsNotabilityCheckerConfig: NotabilityCheckerConfig
 local Config = {}
 
 Config.TIER_TYPE_GENERAL = 'general'
