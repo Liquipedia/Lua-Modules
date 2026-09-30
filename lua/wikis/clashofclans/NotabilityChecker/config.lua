@@ -39,10 +39,6 @@ Config.weights = {
 				points = 5,
 			},
 			{
-				name = Config.TIER_TYPE_INDIVIDUAL,
-				points = 5,
-			},
-			{
 				name = Config.TIER_TYPE_MONTHLY,
 				points = 0,
 			},
@@ -76,10 +72,6 @@ Config.weights = {
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 5,
-			},
-			{
-				name = Config.TIER_TYPE_INDIVIDUAL,
 				points = 5,
 			},
 			{
@@ -119,10 +111,6 @@ Config.weights = {
 				points = 3,
 			},
 			{
-				name = Config.TIER_TYPE_INDIVIDUAL,
-				points = 0,
-			},
-			{
 				name = Config.TIER_TYPE_MONTHLY,
 				points = 0,
 			},
@@ -157,10 +145,6 @@ Config.weights = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
 				points = 1,
-			},
-			{
-				name = Config.TIER_TYPE_INDIVIDUAL,
-				points = 0,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
@@ -200,10 +184,6 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 0,
-			},
-			{
-				name = Config.TIER_TYPE_INDIVIDUAL,
 				points = 0,
 			},
 			{
