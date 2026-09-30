@@ -10,4 +10,4 @@ local Lua = require('Module:Lua')
 local MapTableController = Lua.import('Module:MapTable/Controller')
 
 --- see Module:MapTable/Controller for the entry point
-return MapTableController
+return {run = MapTableController.run}
