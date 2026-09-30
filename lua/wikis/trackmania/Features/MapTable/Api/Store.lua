@@ -22,12 +22,12 @@ local MapTableStore = {}
 ---@return table
 local function buildExtradata(mappers, links)
 	local extradata = {}
-	for _, mapper in ipairs(mappers) do
+	Array.forEach(mappers, function(mapper)
 		extradata['author' .. mapper.index] =
 			mapper.pageName and mapper.pageName:gsub(' ', '_') or ''
 		extradata['author' .. mapper.index .. 'dn'] = mapper.displayName
 		extradata['author' .. mapper.index .. 'flag'] = mapper.flag or ''
-	end
+	end)
 
 	if Table.isNotEmpty(links) then
 		extradata.links = links
