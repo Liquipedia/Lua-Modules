@@ -59,6 +59,7 @@ return {
 		},
 		participants = {
 			defaultPlayerNumber = 5,
+			mergeStaffTabIfOnlyOneStaff = true,
 		},
 		standings = {
 			alwaysShowStats = {

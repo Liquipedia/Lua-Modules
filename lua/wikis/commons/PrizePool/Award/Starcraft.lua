@@ -25,7 +25,7 @@ local IS_AWARD = true
 
 -- Template entry point
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 

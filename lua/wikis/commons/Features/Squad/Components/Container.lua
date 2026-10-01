@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Squad/Container
+-- page=Module:Features/Squad/Components/Container
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

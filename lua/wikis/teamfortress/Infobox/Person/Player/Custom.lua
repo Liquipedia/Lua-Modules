@@ -16,7 +16,7 @@ local Cell = Widgets.Cell
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
----@class TeamfortressInfoboxPlayer: Person
+---@class TeamfortressInfoboxPlayer: InfoboxPerson
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 

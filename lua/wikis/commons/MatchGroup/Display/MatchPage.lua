@@ -21,7 +21,7 @@ local MatchPageDisplay = {}
 ---Display component for a MatchPage. The MatchPage is specified by matchID.
 ---The component fetches the match data from LPDB or page variables.
 ---@param props {matchId: string, config: MatchPageConfigOptions}
----@return Html
+---@return Renderable
 function MatchPageDisplay.MatchPageContainer(props)
 	local bracketId, _ = MatchGroupUtil.splitMatchId(props.matchId)
 
@@ -38,7 +38,7 @@ end
 
 ---Display component for a singleMatch. Match data is specified in the input.
 ---@param props {config: MatchPageConfigOptions, match: MatchGroupUtilMatch}
----@return Html
+---@return Renderable
 function MatchPageDisplay.SingleMatch(props)
 	local propsConfig = props.config or {}
 	local config = {
@@ -53,7 +53,7 @@ end
 
 ---Display component for a matcch. Consists of the match page.
 ---@param props {MatchPageContainer: function, match: MatchGroupUtilMatch}
----@return Html
+---@return Renderable
 function MatchPageDisplay.Match(props)
 	local bracketId = MatchGroupUtil.splitMatchId(props.match.matchId)
 

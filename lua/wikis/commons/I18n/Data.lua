@@ -141,6 +141,28 @@ return {
 		['mainpage-block-tournaments-title'] = 'Tournaments',
 		['mainpage-block-rankings-title'] = 'Liquipedia Rankings',
 
+		-- Widget: MainPage/WantToHelp
+		['wantToHelp-mainText'] = 'Create your free account ' ..
+					'and join the community to start making a difference by ' ..
+					'sharing your knowledge and insights ' ..
+					'with fellow ${wikiType} fans!',
+		['wantToHelp-checkA'] = 'Join our community and grow the scene(s) you care about.',
+		['wantToHelp-checkB'] = 'Be a hero for fans worldwide by keeping the site updated.',
+		['wantToHelp-checkC'] = 'Develop valuable skills in research, writing, and collaboration.',
+		['wantToHelp-button-create-tooltip'] = 'Click here to create an account',
+		['wantToHelp-button-create-title'] = ' Create Account',
+		['wantToHelp-button-logIn-tooltip'] = 'Click here to log in',
+		['wantToHelp-button-logIn-title'] = ' Log In',
+		['wantToHelp-button-logIn-link'] = 'Special:UserLogin',
+		['wantToHelp-button-discord-tooltip'] = 'Click here to join our discord server',
+		['wantToHelp-button-discord-title'] = ' Join Our Discord',
+		['wantToHelp-helpArticles-tooltip'] = 'Click Here to Read our Help Articles',
+		['wantToHelp-helpArticles-title'] = ' Help Articles',
+		['wantToHelp-helpArticles-link'] = 'Help:Contents',
+		['wantToHelp-articleCount-preLink'] = 'In total there are ',
+		['wantToHelp-articleCount-pages'] = ' pages',
+		['wantToHelp-articleCount-postLink'] = ' listed needing help.',
+
 		-- dota2: MainPage
 		['dota2-mainpage-title'] = 'The Dota 2 Wiki',
 		['dota2-mainpage-metadesc'] = 'Comprehensive Dota 2 wiki with articles covering ' ..
@@ -311,6 +333,29 @@ return {
 		['mainpage-block-matches-title'] = 'Матчи',
 		['mainpage-block-tournaments-title'] = 'Турниры',
 		['mainpage-block-rankings-title'] = 'Рейтинги Liquipedia',
+
+		-- Widget: MainPage/WantToHelp
+		['wantToHelp-mainText'] = 'Создайте учётную запись ' ..
+					'и присоединитесь к сообществу редакторов, ' ..
+					'вносящих неоценимый вклад в сохранение и ' ..
+					'обновление информации о ${wikiType}!',
+		['wantToHelp-checkA'] = 'Присоединяйтесь к сообществу и ' ..
+					'улучшайте осведомлённость игроков!',
+		['wantToHelp-checkB'] = 'Будьте героем, поддерживая актуальность информации об игре!',
+		['wantToHelp-checkC'] = 'Улучшайте свои навыки исследования, письма и работы в команде!',
+		['wantToHelp-button-create-tooltip'] = 'Нажмите, чтобы зарегистрироваться.',
+		['wantToHelp-button-create-title'] = ' Создать аккаунт',
+		['wantToHelp-button-logIn-tooltip'] = 'Нажмите, чтобы войти.',
+		['wantToHelp-button-logIn-title'] = ' Войти',
+		['wantToHelp-button-logIn-link'] = 'Служебная:Вход',
+		['wantToHelp-button-discord-tooltip'] = 'Нажмите, чтобы посетить сервер в Discord.',
+		['wantToHelp-button-discord-title'] = ' Наш Discord',
+		['wantToHelp-helpArticles-tooltip'] = 'Нажмите, чтобы просмотреть полезные статьи.',
+		['wantToHelp-helpArticles-title'] = ' Полезные статьи',
+		['wantToHelp-helpArticles-link'] = 'Справка:Содержимое',
+		['wantToHelp-articleCount-preLink'] = 'Всего ',
+		['wantToHelp-articleCount-pages'] = ' статей',
+		['wantToHelp-articleCount-postLink'] = ' нуждаются в помощи.',
 
 		-- dota2: MainPage / dota2: Заглавная
 		['dota2-mainpage-title'] = 'Dota 2 Вики',

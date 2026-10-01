@@ -17,11 +17,11 @@ local SquadColumnAnalyser = Lua.import('Module:Features/Squad/Lib/Columns')
 local SquadStore = Lua.import('Module:Features/Squad/Api/Store')
 local Table = Lua.import('Module:Table')
 
-local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
 local ErrorBoundary = Lua.import('Module:Widget/ErrorBoundary')
-local SquadDisplay = Lua.import('Module:Widget/Squad/Container')
-local SquadHeader = Lua.import('Module:Widget/Squad/Header')
-local SquadPlayerDisplay = Lua.import('Module:Widget/Squad/Player')
+local SquadContexts = Lua.import('Module:Features/Squad/Components/Contexts')
+local SquadDisplay = Lua.import('Module:Features/Squad/Components/Container')
+local SquadHeader = Lua.import('Module:Features/Squad/Components/Header')
+local SquadPlayerDisplay = Lua.import('Module:Features/Squad/Components/Player')
 local Table2 = Lua.import('Module:Widget/Table2/All')
 
 local SquadController = {}
@@ -72,6 +72,7 @@ function SquadController.execute(squadData, adjustLpdb)
 end
 
 ---@param frame Frame
+---@param adjustLpdb function?
 ---@return Widget
 function SquadController.run(frame, adjustLpdb)
 	if not Info.config.squads.allowManual then
@@ -87,6 +88,7 @@ end
 ---@param squadStatus SquadStatus
 ---@param squadType SquadType
 ---@param customTitle string?
+---@param adjustLpdb function?
 ---@return Widget
 function SquadController.runAuto(players, squadStatus, squadType, customTitle, adjustLpdb)
 	-- Temporary until all wikis have enabled the new version of automated squads

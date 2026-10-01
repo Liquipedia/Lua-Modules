@@ -40,7 +40,6 @@ local MatchFunctions = {
 
 ---@class StarcraftMapParser: MapParserInterface
 local MapFunctions = {
-	ADD_SUB_GROUP = true,
 	BREAK_ON_EMPTY = true,
 }
 
@@ -165,9 +164,8 @@ function MatchFunctions.getExtraData(match, games, opponents)
 		MatchFunctions.getVeto(extradata, vetoMap, match, prefix, vetoIndex)
 	end
 
-	Array.forEach(games, function(_, subGroupIndex)
-		extradata['subgroup' .. subGroupIndex .. 'header'] = Logic.nilIfEmpty(match['submatch' .. subGroupIndex .. 'header'])
-	end)
+	-- TODO: Bot away to standard name
+	Table.mergeInto(extradata, MatchGroupInputUtil.readSetHeaders(match, 'submatch'))
 
 	return extradata
 end
@@ -309,7 +307,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 			local faction = isArchon and archonFaction or Faction.read(mapInput[factionKey])
 			return {
 				faction = faction or (playerIdData.extradata or {}).faction or Faction.defaultFaction,
-				player = playerIdData.name or playerInputData.link or playerInputData.name:gsub(' ', '_'),
+				player = (playerIdData.name or playerInputData.link or playerInputData.name):gsub(' ', '_'),
 				flag = Flags.CountryName{flag = playerIdData.flag},
 				position = playerIndex,
 				isarchon = isArchon,

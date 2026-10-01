@@ -29,13 +29,8 @@ end
 ---@param match HearthstoneMatchGroupUtilMatch
 ---@return Renderable[]
 function CustomMatchSummary.createBody(match)
-	local submatches
-	if match.isTeamMatch then
-		submatches = match.submatches or {}
-	end
-
 	return WidgetUtil.collect(
-		submatches and Array.map(submatches, CustomMatchSummary.TeamSubmatch)
+		match.isTeamMatch and Array.map(match.submatches or {}, CustomMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {isPartOfSubMatch = false}))
 	)
 end

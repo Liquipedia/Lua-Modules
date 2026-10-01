@@ -16,7 +16,7 @@ local Player = Lua.import('Module:Infobox/Person')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
----@class SimracingInfoboxPlayer: Person
+---@class SimracingInfoboxPlayer: InfoboxPerson
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 

@@ -145,6 +145,10 @@ describe('opponent', function()
 			assert.is_false(Opponent.isBye(Config.filledDuo))
 			assert.is_true(Opponent.isBye(Config.byeLiteral))
 			assert.is_true(Opponent.isBye(Config.byeTeam))
+			assert.is_true(Opponent.isBye(Opponent.readOpponentArgs{
+				type = Opponent.solo,
+				[1] = 'Bye'
+			}))
 			assert.error(Opponent.isBye)
 			---intended bad input
 			---@diagnostic disable-next-line: param-type-mismatch
@@ -382,6 +386,16 @@ describe('opponent', function()
 				}),
 				Opponent.resolve(Opponent.readOpponentArgs{
 					template = 't1 2019',
+					type = 'team',
+				})
+			))
+			assert.is_true(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{
+					template = 'sk telecom t1',
+					type = 'team',
+				}),
+				Opponent.resolve(Opponent.readOpponentArgs{
+					template = 't1',
 					type = 'team',
 				})
 			))

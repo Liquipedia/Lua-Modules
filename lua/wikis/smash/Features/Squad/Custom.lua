@@ -9,7 +9,7 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Context = Lua.import('Module:Widget/ComponentContext')
-local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
+local SquadContexts = Lua.import('Module:Features/Squad/Components/Contexts')
 local SquadController = Lua.import('Module:Features/Squad/Controller')
 
 local CustomSquad = {}

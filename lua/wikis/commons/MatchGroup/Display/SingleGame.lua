@@ -7,10 +7,12 @@
 
 local Lua = require('Module:Lua')
 
-local DisplayUtil = Lua.import('Module:DisplayUtil')
-
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
+
+local Html = Lua.import('Module:Widget/Html')
+local Builder = Lua.import('Module:Widget/Builder')
+local ErrorBoundary = Lua.import('Module:Widget/ErrorBoundary')
 
 local SingleGameDisplay = {}
 
@@ -26,7 +28,7 @@ end
 ---Display component for a single game. The single game is specified by matchID + gameIdx.
 ---The component fetches the match&game data from LPDB.
 ---@param props {matchId: string, gameIdx: integer, config: SingleGameConfigOptions}
----@return Html
+---@return VNode
 function SingleGameDisplay.SingleGameContainer(props)
 	local bracketId, _ = MatchGroupUtil.splitMatchId(props.matchId)
 
@@ -34,18 +36,21 @@ function SingleGameDisplay.SingleGameContainer(props)
 	assert(props.gameIdx, 'Missing gameIdx')
 
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId)
-	return match
-		and SingleGameDisplay.SingleGame({
-			config = props.config,
-			match = match,
-			gameIdx = props.gameIdx,
-		})
-		or mw.html.create()
+
+	if not match then
+		return Html.Fragment{}
+	end
+
+	return SingleGameDisplay.SingleGame{
+		config = props.config,
+		match = match,
+		gameIdx = props.gameIdx,
+	}
 end
 
 ---Display component for a singleGame. Match & Game data is specified in the input.
 ---@param props {config: SingleGameConfigOptions, match: MatchGroupUtilMatch, gameIdx: integer}
----@return Html
+---@return VNode
 function SingleGameDisplay.SingleGame(props)
 	local propsConfig = props.config or {}
 	local config = {
@@ -61,14 +66,19 @@ end
 
 ---Display component for a match in a single game. Consists of the game summary.
 ---@param props {GameSummaryContainer: function, match: MatchGroupUtilMatch, gameIdx: integer}
----@return Html
+---@return VNode
 function SingleGameDisplay.Game(props)
 	local bracketId = MatchGroupUtil.splitMatchId(props.match.matchId)
-	return DisplayUtil.TryPureComponent(props.GameSummaryContainer, {
-		bracketId = bracketId,
-		matchId = props.match.matchId,
-		gameIdx = props.gameIdx,
-	}, Lua.import('Module:Error/Display').ErrorList)
+	return ErrorBoundary{
+		children = Builder{builder = function ()
+			return props.GameSummaryContainer{
+				bracketId = bracketId,
+				matchId = props.match.matchId,
+				gameIdx = props.gameIdx,
+			}
+		end},
+		fallback = Lua.import('Module:Error/Display').ErrorDetails
+	}
 end
 
 return SingleGameDisplay

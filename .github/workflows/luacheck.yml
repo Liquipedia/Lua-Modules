@@ -89,9 +89,30 @@ jobs:
       - name: Check
         if: steps.lua-changed-files.outputs.any_changed == 'true'
         shell: bash
+        env:
+          CHANGED_FILES: ${{ steps.lua-changed-files.outputs.all_changed_files }}
         run: |
-          ~/.local/bin/luals/bin/lua-language-server --check ./ | tee luals-check && true
-          cat luals-check | (sed -e 's/\x1b\[[0-9;]*m//g'| sed -n 's/\(lua[^:]\+\):\([[:digit:]]*\):[[:digit:]]* \[Warning\] /::error file=\1,line=\2::/p') | (! grep -E $(echo ${{ steps.lua-changed-files.outputs.all_changed_files }} | sed -- 's/ /|/g'))
-          echo "| | Files | Errors |" >> $GITHUB_STEP_SUMMARY
-          echo "|-|-------|----------|" >> $GITHUB_STEP_SUMMARY
-          echo "| LuaLS check | $(find lua -name '*.lua' | wc -l) | $(cat luals-check | grep 'Warning' | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          ~/.local/bin/luals/bin/lua-language-server --check ./ \
+            --check_format=json --check_out_path="$PWD/luals-check.json" || true
+
+          jq -r --arg root "file://$PWD/" --arg changed "$CHANGED_FILES" '
+            to_entries[]
+            | (.key | sub($root; "")) as $file
+            | select($file | inside($changed))
+            | .value[]
+            | (.range.start.line + 1) as $line
+            | (.range.start.character + 1) as $col
+            | "::error file=\($file),line=\($line),col=\($col)::\(.message | gsub("\n"; " ")) (\(.code))"
+          ' luals-check.json | tee output.txt
+
+          touched=$(wc -l < output.txt)
+
+          problems=$(jq -r '[.[] | length] | add // 0' luals-check.json)
+          files_with=$(jq -r 'length' luals-check.json)
+          {
+            echo "| | Files scanned | Files with problems | Problems | In changed files |"
+            echo "|-|-------|----------|----------|----------|"
+            echo "| LuaLS check | $(find lua -name '*.lua' | wc -l) | $files_with | $problems | $touched |"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+          exit $(( touched > 0 ? 1 : 0 ))

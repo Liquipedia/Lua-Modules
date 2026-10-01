@@ -80,7 +80,7 @@ end
 -- an all kill achievement is if a player single handedly defeats a team in an all-kill format
 -- the input here is basically to display a very brief information about the match where the all kill was achieved
 ---@param frame Frame
----@return Html
+---@return Renderable
 function CustomResultsTable.allKillRow(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -119,7 +119,7 @@ end
 
 ---Adds an all kill match to the custom row
 ---@param args table
----@return Html
+---@return Renderable
 function CustomResultsTable._allKillMatch(args)
 	local teamName = args.team or TBD
 
@@ -233,6 +233,7 @@ function CustomResultsTable._opponentDisplay(args, prefix, side)
 			players = players,
 			isArchon = false,
 			extradata = {},
+			isArchon = false,
 		},
 	}
 end

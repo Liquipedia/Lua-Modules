@@ -15,6 +15,7 @@ local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local PrizePool = Lua.import('Module:PrizePool')
 local Table = Lua.import('Module:Table')
+local Tournament = Lua.import('Module:Tournament')
 local Variables = Lua.import('Module:Variables')
 
 ---@class Starcraft2PrizePoolLpdbInjector: LpdbInjector
@@ -31,7 +32,7 @@ local CustomPrizePool = {}
 
 -- Template entry point
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -65,7 +66,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.weight = CustomPrizePool._weight(lpdbData, placement)
 
 	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, {
-		seriesnumber = CustomPrizePool._seriesNumber(),
 		mod = Variables.varDefault('tournament_mod'),
 	})
 
@@ -95,12 +95,6 @@ function CustomPrizePool._defaultImportLimit()
 		or nil
 end
 
----@return string
-function CustomPrizePool._seriesNumber()
-	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
-	return seriesNumber and string.format('%05d', seriesNumber) or ''
-end
-
 ---@param lpdbData placement
 ---@param placement PrizePoolPlacement
 ---@return number
@@ -110,15 +104,17 @@ function CustomPrizePool._weight(lpdbData, placement)
 		return 0
 	end
 
-	local tierFactor = TIER_TO_FACTOR[tonumber(lpdbData.liquipediatier)] or 1
+	local tournamentContext = Tournament.partialTournamentFromContext()
 
-	local tierTypeFactor = lpdbData.liquipediatiertype == 'Qualifier' and 0.001 or 1
+	local tierFactor = TIER_TO_FACTOR[tonumber(tournamentContext.liquipediaTier)] or 1
+
+	local tierTypeFactor = tournamentContext.liquipediaTierType == 'Qualifier' and 0.001 or 1
 
 	local prize = tonumber(lpdbData.individualprizemoney) or 0
 	prize = prize ~= 0 and prize or DEFAULT_PRIZE_VALUE
 
 	local placementFactor = placement.placeStart or 0
-	if place == 'w' or place == 'd' or place == 'q' then
+	if place == 'w' or place == 'd' then
 		prize = 1
 		placementFactor = 1
 	end

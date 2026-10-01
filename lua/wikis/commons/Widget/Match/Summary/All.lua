@@ -29,5 +29,6 @@ Widgets.MapVeto = Lua.import('Module:Widget/Match/Summary/MapVeto')
 Widgets.MatchComment = Lua.import('Module:Widget/Match/Summary/MatchComment')
 Widgets.Mvp = Lua.import('Module:Widget/Match/Summary/Mvp')
 Widgets.Row = Lua.import('Module:Widget/Match/Summary/Row')
+Widgets.SetHeader = Lua.import('Module:Widget/Match/Summary/SetHeader')
 
 return Widgets

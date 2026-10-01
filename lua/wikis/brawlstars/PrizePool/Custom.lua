@@ -31,7 +31,7 @@ local TYPE_MODIFIER = {offline = 1, ['offline/online'] = 0.75, ['online/offline'
 
 -- Template entry point
 ---@param frame Frame
----@return Html
+---@return Renderable
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 

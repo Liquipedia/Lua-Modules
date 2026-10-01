@@ -82,7 +82,7 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	if match.opponentMode == 'team' then
 		-- Compute submatches
 		match.submatches = Array.map(
-			MatchGroupUtil.groupBySubgroup(match),
+			match.submatches,
 			FnUtil.curry(StarcraftMatchGroupUtil.constructSubmatch, match)
 		)
 	end
@@ -258,10 +258,9 @@ end
 ---@param opponentIndex integer
 ---@return StarcraftStandardOpponent
 function StarcraftMatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
-	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	local opponent = MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex) --[[
 	@as StarcraftStandardOpponent]]
-	opponent.isArchon = Logic.readBool(extradata.isarchon)
+	opponent.isArchon = Logic.readBool(opponent.extradata.isarchon)
 
 	return opponent
 end

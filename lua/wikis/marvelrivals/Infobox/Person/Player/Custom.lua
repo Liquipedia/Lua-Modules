@@ -29,7 +29,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local SIZE_HERO = '25x25px'
 local MAX_NUMBER_OF_SIGNATURE_HEROES = 3
 
----@class MarvelRivalsInfoboxPlayer: Person
+---@class MarvelRivalsInfoboxPlayer: InfoboxPerson
 ---@operator call(Frame): MarvelRivalsInfoboxPlayer
 local CustomPlayer = Class.new(Player)
 

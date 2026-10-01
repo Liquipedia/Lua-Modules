@@ -20,6 +20,7 @@ local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
+local Tournament = Lua.import('Module:Tournament')
 local Variables = Lua.import('Module:Variables')
 
 local Weight = Lua.requireIfExists('Module:BroadCasterWeight')
@@ -267,10 +268,12 @@ function BroadcasterCard.setLPDB(caster, status)
 		extradata.status = status ~= 'save' and Variables.varDefault('tournament_status') or ''
 	end
 
-	extradata.liquipediatier = Variables.varDefaultMulti('tournament_liquipediatier', '')
-	extradata.liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype')
-	extradata.publishertier = Variables.varDefault('tournament_publishertier')
-	extradata.game = Variables.varDefault('tournament_game')
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
+	extradata.liquipediatier = tournamentContext.liquipediaTier
+	extradata.liquipediatiertype = tournamentContext.liquipediaTierType
+	extradata.publishertier = tournamentContext.publisherTier
+	extradata.game = tournamentContext.game
 
 	mw.ext.LiquipediaDB.lpdb_broadcasters(
 		'broadcaster_' .. caster.id .. '_' .. caster.position:gsub(' ','_') .. smName:gsub(' ','_'),
@@ -283,7 +286,7 @@ function BroadcasterCard.setLPDB(caster, status)
 			position = caster.position,
 			weight = caster.weight,
 			date = caster.date,
-			parent = Variables.varDefault('tournament_parent'),
+			parent = tournamentContext.pageName,
 			extradata = Json.stringify(extradata)
 		}
 	)
@@ -292,9 +295,11 @@ end
 -- Calculate the wiki specific Weight for the event
 ---@return number
 function BroadcasterCard.getWeight()
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
 	local tPrizePool = Variables.varDefault('tournament_prizepoolusd') or 1
-	local tier = Variables.varDefault('tournament_liquipediatier')
-	local tierType = Variables.varDefault('tournament_liquipediatiertype')
+	local tier = tournamentContext.liquipediaTier
+	local tierType = tournamentContext.liquipediaTierType
 
 	if Weight then
 		return Weight.run(tier, tPrizePool, tierType)

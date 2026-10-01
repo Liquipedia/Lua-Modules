@@ -13,6 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 local Namespace = Lua.import('Module:Namespace')
 local PrizePool = Lua.import('Module:PrizePool')
+local Tournament = Lua.import('Module:Tournament')
 
 ---@class StormgatePrizePoolLpdbInjector: LpdbInjector
 local CustomLpdbInjector = Class.new(LpdbInjector)
@@ -28,7 +29,7 @@ local CustomPrizePool = {}
 
 -- Template entry point
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -70,15 +71,17 @@ function CustomPrizePool._weight(lpdbData, placement)
 		return 0
 	end
 
-	local tierFactor = TIER_TO_FACTOR[tonumber(lpdbData.liquipediatier)] or 1
+	local tournamentContext = Tournament.partialTournamentFromContext()
 
-	local tierTypeFactor = lpdbData.liquipediatiertype == 'Qualifier' and 0.001 or 1
+	local tierFactor = TIER_TO_FACTOR[tonumber(tournamentContext.liquipediaTier)] or 1
+
+	local tierTypeFactor = tournamentContext.liquipediaTierType == 'Qualifier' and 0.001 or 1
 
 	local prize = tonumber(lpdbData.individualprizemoney) or 0
 	prize = prize ~= 0 and prize or DEFAULT_PRIZE_VALUE
 
 	local placementFactor = placement.placeStart or 0
-	if place == 'w' or place == 'd' or place == 'q' then
+	if place == 'w' or place == 'd' then
 		prize = 1
 		placementFactor = 1
 	end

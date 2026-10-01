@@ -53,7 +53,7 @@ end
 
 ---@param match MatchGroupUtilMatch
 ---@return VNode
-function CustomMatchSummary.createBody(match)
+function CustomMatchSummary.createGames(match)
 	return MatchSummaryWidgets.GamesContainer{
 		children = Array.map(match.games, function (game, gameIndex)
 			if (not game.map) and (not game.winner) and Logic.isEmpty(game.status) and Logic.isDeepEmpty(game.opponents) then

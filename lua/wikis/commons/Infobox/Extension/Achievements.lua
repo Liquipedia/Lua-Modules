@@ -33,7 +33,7 @@ local NON_BREAKING_SPACE = '&nbsp;'
 local DEFAULT_PLAYER_LIMIT = Info.config.defaultMaxPlayersPerPlacement or 10
 local MAX_PARTY_SIZE = 4
 local DEFAULT_BASE_CONDITIONS = {
-	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Qualifier', 'Charity'}),
+	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Qualifier', 'Charity', 'Showmatch'}),
 	ConditionNode(ColumnName('liquipediatier'), Comparator.eq, 1),
 	ConditionNode(ColumnName('placement'), Comparator.eq, 1),
 }

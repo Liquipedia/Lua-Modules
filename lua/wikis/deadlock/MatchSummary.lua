@@ -22,9 +22,6 @@ local ICONS = {
 }
 local STATUS_NOT_PLAYED = 'notplayed'
 
----@class DeadlockCustomMatchSummary: CustomMatchSummaryInterface
-local CustomMatchSummary = {}
-
 ---@class DeadlockMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
 local GameRowComponentProps = {
 	createGameOverview = MatchSummaryWidgets.GameRow.lengthDisplay,
@@ -32,28 +29,22 @@ local GameRowComponentProps = {
 
 local DeadlockMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
+---@class DeadlockCustomMatchSummary: CustomMatchSummaryInterface
+local CustomMatchSummary = {
+	GameRow = DeadlockMatchSummaryGameRow,
+}
+
 ---@param args table
 ---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '480px', teamStyle = 'bracket'})
+	local options = {width = '480px', teamStyle = 'bracket', maxBans = MAX_NUM_BANS}
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 end
 
----@param match MatchGroupUtilMatch
----@return VNode[]
-function CustomMatchSummary.createBody(match)
-	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
-
-	return {
-		MatchSummaryWidgets.GamesContainer{
-			children = Array.map(match.games, function (game, gameIndex)
-				if game.status == STATUS_NOT_PLAYED then
-					return
-				end
-				return DeadlockMatchSummaryGameRow{game = game, gameIndex = gameIndex}
-			end)
-		},
-		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	}
+---@param game MatchGroupUtilGame
+---@return boolean
+function CustomMatchSummary.gameFilter(game)
+	return game.status ~= STATUS_NOT_PLAYED
 end
 
 ---@param game MatchGroupUtilGame
