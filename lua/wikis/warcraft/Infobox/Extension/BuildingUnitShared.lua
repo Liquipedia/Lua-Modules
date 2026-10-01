@@ -193,20 +193,17 @@ function CustomBuildingUnit.parseAttackInput(args, attackIndex)
 	local coolDownValue = tonumber(args['cooldown' .. postFix]) or 0
 	local coolDown = tostring(coolDownValue)
 	if backSwingPoint > 0 then
-		coolDown = Abbreviation.make{
-			text = coolDown,
-			title = 'Attack animation: ' .. (damagePoint / backSwingPoint),
-		}
+		coolDown = Abbreviation.make2(coolDown, 'Attack animation: ' .. (damagePoint / backSwingPoint))
 	end
 
 	local attackSpeedBonus = tonumber(args.attackspeed_bonus) or 0
 	if attackSpeedBonus > 0 then
 		local attackSpeedBonusPlus1 = 1 + attackSpeedBonus
 		local animation = (damagePoint / attackSpeedBonusPlus1) .. '/' .. (backSwingPoint / attackSpeedBonusPlus1)
-		coolDown = coolDown .. ' (' .. Abbreviation.make{
-			text = coolDownValue / attackSpeedBonusPlus1,
-			title = 'Attack animation: ' .. animation
-		} .. ')'
+		coolDown = coolDown .. ' (' .. Abbreviation.make2(
+			coolDownValue / attackSpeedBonusPlus1,
+			'Attack animation: ' .. animation
+		) .. ')'
 	end
 
 	local data = {

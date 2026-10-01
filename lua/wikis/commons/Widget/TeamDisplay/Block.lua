@@ -33,6 +33,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local BlockTeamWidget = {}
 
 ---@param props BlockTeamParameters
+---@return Renderable
 function BlockTeamWidget.render(props)
 	local teamTemplate = props.teamTemplate or TeamTemplate.getRawOrNil(props.name, props.date)
 
