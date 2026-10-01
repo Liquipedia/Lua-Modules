@@ -244,7 +244,7 @@ end
 
 function CustomCosmetic._getLpdbCategory(name)
 	for key, value in pairs(SpecialCategories) do
-		if string.find(key, name) then
+		if string.find(name, key) then
 			return value
 		end
 	end
