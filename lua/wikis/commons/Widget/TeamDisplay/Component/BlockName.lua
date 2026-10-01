@@ -17,7 +17,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class BlockTeamNameDisplayParameters
 ---@field additionalClasses string[]?
----@field displayName string
+---@field displayName Renderable|Renderable[]
 ---@field overflowStyle OverflowModes?
 ---@field noLink boolean?
 ---@field page string?

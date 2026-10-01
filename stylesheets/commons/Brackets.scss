@@ -1228,45 +1228,30 @@ div.brkts-popup-body-element-thumbs {
 		flex: 1 1;
 		min-width: 0;
 
-		&:has( > .team-name-dynamic ),
-		&:has( > a > .team-name-dynamic ) {
+		&.team-name-dynamic {
 			container: block-team-name / inline-size;
 
-			> .team-name-dynamic,
-			> a > .team-name-dynamic {
-				display: contents;
+			.team-shortname {
+				display: none;
 
 				@container block-team-name ( min-width: 15px ) and ( width < 100px ) {
-					> .team-shortname {
-						display: contents;
-					}
-
-					> .team-bracketname,
-					> .team-name {
-						display: none;
-					}
+					display: contents;
 				}
+			}
+
+			.team-bracketname {
+				display: none;
 
 				@container block-team-name ( min-width: 100px ) and ( width < 180px ) {
-					> .team-bracketname {
-						display: contents;
-					}
-
-					> .team-shortname,
-					> .team-name {
-						display: none;
-					}
+					display: contents;
 				}
+			}
+
+			.team-name {
+				display: none;
 
 				@container block-team-name ( min-width: 180px ) {
-					> .team-name {
-						display: contents;
-					}
-
-					> .team-shortname,
-					> .team-bracketname {
-						display: none;
-					}
+					display: contents;
 				}
 			}
 		}

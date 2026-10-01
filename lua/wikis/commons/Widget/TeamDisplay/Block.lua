@@ -78,7 +78,7 @@ function BlockTeamWidget._getNameComponent(teamTemplate, props)
 	local shortName = teamTemplate.shortname
 	local style = props.style
 
-	---@param displayName string
+	---@param displayName Renderable|Renderable[]
 	---@param overflow OverflowModes?
 	---@param additionalClasses string[]?
 	---@return VNode
@@ -105,9 +105,8 @@ function BlockTeamWidget._getNameComponent(teamTemplate, props)
 			createNameNode(shortName, 'hidden', {'visible-xs'})
 		}
 	elseif style == 'dynamic' then
-		return createNameNode(Html.Div{
-			classes = {'team-name-dynamic'},
-			children = {
+		return createNameNode(
+			{
 				Html.Div{
 					classes = {'team-shortname'},
 					children = shortName,
@@ -120,8 +119,10 @@ function BlockTeamWidget._getNameComponent(teamTemplate, props)
 					classes = {'team-name'},
 					children = name,
 				}
-			}
-		})
+			},
+			nil,
+			{'team-name-dynamic'}
+		)
 	end
 end
 
