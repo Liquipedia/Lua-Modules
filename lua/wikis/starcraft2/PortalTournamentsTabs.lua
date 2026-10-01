@@ -46,7 +46,7 @@ function PortalTournamentsTabs.run()
 		local isNotMisc = (tonumber(tier) ~= -1)
 
 		tabArgs['name' .. tabCounter] = QueryLink{
-			legacyForm = 'Portal Tournaments',
+			mediawikiForm = 'Portal Tournaments',
 			form = 'Portal Tournaments/LH',
 			display = Tier.toName(tier) --[[@as string]],
 			template = 'TournamentsList',

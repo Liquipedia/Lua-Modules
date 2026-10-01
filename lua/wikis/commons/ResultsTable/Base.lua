@@ -415,7 +415,7 @@ function BaseResultsTable:_footer()
 	local template = self.config.queryType == QUERY_TYPES.team and 'Team results' or 'Player results'
 
 	return QueryLink{
-		legacyForm = form,
+		mediawikiForm = form,
 		form = form .. 'LH',
 		display = 'Extended list of results',
 		template = template,

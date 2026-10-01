@@ -159,7 +159,7 @@ function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 		name1 = 'Overview',
 		link1 = team,
 		name2 = QueryLink{
-			legacyForm = 'Team Results',
+			mediawikiForm = 'Team Results',
 			form = 'Team Results/LH',
 			display = 'Team Results',
 			template = 'Team results',
@@ -171,7 +171,7 @@ function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 			},
 		},
 		name3 = QueryLink{
-			legacyForm = 'Team Matches',
+			mediawikiForm = 'Team Matches',
 			form = 'Team Matches/LH',
 			display = 'Team Matches',
 			template = 'Team matches',
@@ -188,7 +188,7 @@ function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 	local tabCounter = 3
 	if showPlayerSubTabs then
 		tabArgs.name4 = QueryLink{
-			legacyForm = 'Team Player Results',
+			mediawikiForm = 'Team Player Results',
 			form = 'Team Player Results/LH',
 			display = 'Player Results',
 			template = 'Team player results',

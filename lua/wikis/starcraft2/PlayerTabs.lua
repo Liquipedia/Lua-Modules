@@ -86,7 +86,7 @@ function PlayerTabs._display(player, currentTab)
 		name1 = 'Overview',
 		link1 = player,
 		name2 = QueryLink{
-			legacyForm = 'Player Results',
+			mediawikiForm = 'Player Results',
 			form = 'Player Results/LH',
 			display = 'Results',
 			template = 'Player results',
@@ -98,7 +98,7 @@ function PlayerTabs._display(player, currentTab)
 			},
 		},
 		name3 = QueryLink{
-			legacyForm = 'Player Matches',
+			mediawikiForm = 'Player Matches',
 			form = 'Player Matches/LH',
 			display = 'Matches',
 			template = 'Player matches',
@@ -128,7 +128,7 @@ function PlayerTabs._display(player, currentTab)
 	-- Head to head query link
 	tabCounter = tabCounter + 1
 	tabArgs['name' .. tabCounter] = QueryLink{
-		legacyForm = 'Match history',
+		mediawikiForm = 'Match history',
 		form = 'H2H',
 		display = 'Head to Head',
 		template = 'Head_to_head_query',
@@ -138,7 +138,7 @@ function PlayerTabs._display(player, currentTab)
 	-- Statistics query link
 	tabCounter = tabCounter + 1
 	tabArgs['name' .. tabCounter] = QueryLink{
-		legacyForm = 'PlayerStats',
+		mediawikiForm = 'PlayerStats',
 		form = 'PlayerStats/LH',
 		display = 'Statistics',
 		template = 'PlayerStatistics',
