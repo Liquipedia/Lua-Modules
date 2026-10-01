@@ -122,7 +122,7 @@ function StageWinnings:render()
 		pointsPerWin = tonumber(props.pointsPerWin) or 0,
 		points2PerWin = tonumber(props.points2PerWin) or 0,
 		hideWinnings = Logic.readBool(props.hideWinnings),
-		gameCountDefaultResult = tonumber(props.gameCountDefaultResult) or 0,
+		gameCountDefaultResult = tonumber(props.gameCountDefaultResult),
 	}
 
 	if Logic.isNotEmpty(props.localcurrency) and Logic.readBool(props.autoexchange) then

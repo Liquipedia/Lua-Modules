@@ -39,12 +39,12 @@ local StageWinningsCalculation = {}
 ---startValue: number, valuePerWin: number, valueByScore: table<string, number>?,
 ---pointsStart: number, pointsPerWin: number, pointsByScore: table<string, number>?,
 ---points2Start: number, points2PerWin: number, points2ByScore: table<string, number>?,
----gameCountDefaultResult: number, hideWinnings: boolean}
+---gameCountDefaultResult: number?, hideWinnings: boolean}
 ---@return StageWinningsOpponent[]
 function StageWinningsCalculation.run(props)
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = StageWinningsCalculation._buildConditions(props),
-		query = 'match2opponents, winner',
+		query = 'match2opponents, winner, bestof',
 		limit = 5000
 	})
 	matches = Array.filter(matches, function(match)
@@ -116,7 +116,7 @@ function StageWinningsCalculation.run(props)
 			elseif Logic.isEmpty(scoreValue) or scoreValue ~= MatchGroupInputUtil.STATUS.DEFAULT_WIN then
 				return 0
 			end
-			return props.gameCountDefaultResult
+			return props.gameCountDefaultResult or math.ceil((match.bestof or 0) / 2)
 		end
 
 		local gamesWonOpponent1 = numberOfGamesForScoreValue(opponent1Score)
