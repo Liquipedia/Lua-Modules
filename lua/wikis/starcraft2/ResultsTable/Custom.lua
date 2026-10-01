@@ -231,7 +231,6 @@ function CustomResultsTable._opponentDisplay(args, prefix, side)
 		opponent = {
 			type = CustomResultsTable._getOpponentType(#players),
 			players = players,
-			isArchon = false,
 			extradata = {},
 			isArchon = false,
 		},
