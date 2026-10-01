@@ -40,7 +40,7 @@ function MatchLegacy.convertParameters(match2)
 
 		match[prefix .. 'score'] = (tonumber(opponent.score) or 0) >= 0 and opponent.score or 0
 
-		if opponent.type == Opponent.tem then
+		if opponent.type == Opponent.team then
 			match[prefix] = String.isNotEmpty(opponent.name) and opponent.name:gsub('_', ' ') or 'TBD'
 			return
 		end

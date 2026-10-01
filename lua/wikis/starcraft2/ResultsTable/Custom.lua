@@ -31,7 +31,7 @@ local CustomResultsTable = {}
 
 -- Template entry point
 ---@param frame Frame
----@return Widget?
+---@return Renderable?
 function CustomResultsTable.results(frame)
 	local args = Arguments.getArgs(frame)
 	args.useIndivPrize = true
@@ -54,7 +54,7 @@ end
 
 -- Template entry point for awards
 ---@param frame Frame
----@return Widget?
+---@return Renderable?
 function CustomResultsTable.awards(frame)
 	local args = Arguments.getArgs(frame)
 	args.useIndivPrize = true
@@ -73,7 +73,7 @@ end
 -- an all kill achievement is if a player single handedly defeats a team in an all-kill format
 -- the input here is basically to display a very brief information about the match where the all kill was achieved
 ---@param frame Frame
----@return Html
+---@return Renderable
 function CustomResultsTable.allKillRow(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -112,7 +112,7 @@ end
 
 ---Adds an all kill match to the custom row
 ---@param args table
----@return Html
+---@return Renderable
 function CustomResultsTable._allKillMatch(args)
 	local teamName = args.team or TBD
 
@@ -203,7 +203,7 @@ end
 ---@param args table
 ---@param prefix string
 ---@param side number
----@return Widget
+---@return Renderable
 function CustomResultsTable._opponentDisplay(args, prefix, side)
 	local players = {CustomResultsTable._buildPlayerStruct(args, prefix .. 'p' .. side)}
 
@@ -225,6 +225,7 @@ function CustomResultsTable._opponentDisplay(args, prefix, side)
 			type = CustomResultsTable._getOpponentType(#players),
 			players = players,
 			extradata = {},
+			isArchon = false,
 		},
 	}
 end
