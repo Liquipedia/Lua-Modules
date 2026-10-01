@@ -107,10 +107,19 @@ function BlockTeamWidget._getNameComponent(teamTemplate, props)
 	elseif style == 'dynamic' then
 		return createNameNode(Html.Div{
 			classes = {'team-name-dynamic'},
-			attributes = {
-				['data-team-shortname'] = shortName,
-				['data-team-bracketname'] = bracketName,
-				['data-team-name'] = name,
+			children = {
+				Html.Div{
+					classes = {'team-shortname'},
+					children = shortName,
+				},
+				Html.Div{
+					classes = {'team-bracketname'},
+					children = bracketName,
+				},
+				Html.Div{
+					classes = {'team-name'},
+					children = name,
+				}
 			}
 		})
 	end

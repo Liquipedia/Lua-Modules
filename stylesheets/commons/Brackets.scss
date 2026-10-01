@@ -1234,23 +1234,38 @@ div.brkts-popup-body-element-thumbs {
 
 			> .team-name-dynamic,
 			> a > .team-name-dynamic {
-				content: none;
+				display: contents;
 
 				@container block-team-name ( min-width: 15px ) and ( width < 100px ) {
-					&::before {
-						content: attr( data-team-shortname );
+					> .team-shortname {
+						display: contents;
+					}
+
+					> .team-bracketname,
+					> .team-name {
+						display: none;
 					}
 				}
 
 				@container block-team-name ( min-width: 100px ) and ( width < 180px ) {
-					&::before {
-						content: attr( data-team-bracketname );
+					> .team-bracketname {
+						display: contents;
+					}
+
+					> .team-shortname,
+					> .team-name {
+						display: none;
 					}
 				}
 
 				@container block-team-name ( min-width: 180px ) {
-					&::before {
-						content: attr( data-team-name );
+					> .team-name {
+						display: contents;
+					}
+
+					> .team-shortname,
+					> .team-bracketname {
+						display: none;
 					}
 				}
 			}
