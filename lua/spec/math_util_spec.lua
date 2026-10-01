@@ -10,7 +10,7 @@ describe('math', function()
 			assert.is_false(MathUtil.isNaN(math.sqrt(2)))
 			assert.is_false(MathUtil.isNaN(-math.exp(1)))
 			assert.is_false(MathUtil.isNaN(-513428))
-			assert.is_false(math.huge)
+			assert.is_false(MathUtil.isNaN(math.huge))
 		end)
 
 		it('check nan', function ()
