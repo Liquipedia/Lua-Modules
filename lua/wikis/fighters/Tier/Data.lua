@@ -31,6 +31,14 @@ return {
 			link = 'Tier 3 Tournaments',
 			category = 'Tier 3 Tournaments',
 		},
+		{
+			value = '4',
+			sort = 'A4',
+			name = 'Tier 4',
+			short = '4',
+			link = 'Tier 4 Tournaments',
+			category = 'Tier 4 Tournaments',
+		},
 		[''] = {
 			value = nil,
 			sort = 'D1',
