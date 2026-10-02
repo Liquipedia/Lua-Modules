@@ -37,7 +37,7 @@ describe('Standings Tiebreakers', function()
 			})
 		end
 		return {
-			matchId = props.matchId or 'FakeMatch',
+			matchId = 'FakeMatch',
 			finished = props.finished ~= false,
 			winner = props.winner,
 			opponents = matchOpponents,
@@ -142,6 +142,15 @@ describe('Standings Tiebreakers', function()
 			-- played games only: 13+5 = 18 won rounds, (13+7)+(5+13) = 38 total
 			assert.are_equal(-2, rounddiff:valueOf({alpha}, alpha))
 			assert.are_equal('18 - 20', rounddiff:display({alpha}, alpha))
+		end)
+	end)
+
+	describe('losses', function()
+		it('sums match losses from played games', function()
+			local matchlosses = TiebreakerFactory.tiebreakerFromId('full.matchlosses')
+			local opp = opponent('Alpha', {match = {w = 3, d = 1, l = 1}})
+			assert.are_equal(-1, matchlosses:valueOf({opp}, opp))
+			assert.are_equal('1', matchlosses:display({opp}, opp))
 		end)
 	end)
 end)

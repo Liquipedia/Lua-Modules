@@ -29,6 +29,7 @@ local TIEBREAKER_MAPPING_TABLE = {
 	series = 'matchdiff',
 	diff = 'gamediff',
 	['games won'] = 'gamewins',
+	['games loss'] = 'gamelosses',
 }
 
 ---@param args table
