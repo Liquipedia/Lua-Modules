@@ -15,7 +15,6 @@ local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 
 local Entry = Lua.import('Module:Features/ParticipantTable/Components/Entry')
-local Title = Lua.import('Module:Features/ParticipantTable/Components/Title')
 
 ---@param props {hasSeed: boolean?, config: ParticipantTableConfig, sections: ParticipantTableSection[]}
 ---@return VNode[]
@@ -60,11 +59,9 @@ local function ParticipantTableSeedList(props)
 			['max-width'] = '100%!important',
 		},
 		children = {
-			Title{
-				titleText = 'Seeding',
-				buttonText = props.config.title or 'Participants',
-				buttonArea = 1,
-				hasSeed = props.hasSeed,
+			Html.Div{
+				classes = {'participantTable-title'},
+				children = 'Seeding',
 			},
 			display,
 		}
