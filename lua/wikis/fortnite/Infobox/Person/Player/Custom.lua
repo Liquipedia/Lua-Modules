@@ -21,8 +21,10 @@ local PlayerAchievements = Lua.import('Module:Infobox/Extension/Achievements')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
+local PowerRankings = Lua.import('Module:PowerRankings')
 
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
@@ -49,13 +51,13 @@ function CustomInjector:parse(id, widgets)
 		local yearsActive = ActiveYears.display{player = caller.pagename}
 
 		local currentYearEarnings = caller.earningsPerYear[CURRENT_YEAR]
+		local currentYearEarningsDisplay
 		if currentYearEarnings then
-			currentYearEarnings = Math.round(currentYearEarnings)
-			currentYearEarnings = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
+			currentYearEarningsDisplay = '$' .. mw.getContentLanguage():formatNum(Math.round(currentYearEarnings))
 		end
 
 		return {
-			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, children = {currentYearEarnings}},
+			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, children = {currentYearEarningsDisplay}},
 			Cell{name = 'Years active', children = {yearsActive}},
 			Cell{
 				name = Abbreviation.make{
@@ -63,6 +65,10 @@ function CustomInjector:parse(id, widgets)
 					title = 'Support-A-Creator Code used when purchasing Fortnite or Epic Games Store products',
 				},
 				children = {args.creatorcode}
+			},
+			Cell{
+				name = Link{link = 'Fortnite Power Rankings', children = 'Fortnite PR'},
+				children = {PowerRankings.queryForInfobox(caller.pagename, 'FTN_PR')},
 			},
 		}
 	elseif id == 'region' then return {}
