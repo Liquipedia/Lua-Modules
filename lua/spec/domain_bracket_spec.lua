@@ -4,22 +4,22 @@
 ---@diagnostic disable: missing-fields
 
 --[[
-Tests for Module:MatchGroup/Util/Bracket, the bracket model.
+Tests for Module:Domain/Bracket/Model, the bracket model.
 
 Bracket data records, topology, coordinates and the id namespace that addresses a match inside its
 match group. A matchlist counts as a bracket here, which is why the flat match id forms live with
 the bracket ones.
 ]]
 
-insulate('MatchGroup/Util/Bracket', function()
+insulate('Domain/Bracket/Model', function()
 	describe('bracketDataFromRecord', function()
 		it('returns an empty table when there is no data', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			assert.are_same({}, BracketUtil.bracketDataFromRecord(nil))
 		end)
 
 		it('reads matchlist bracket data', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			local bracketData = BracketUtil.bracketDataFromRecord{
 				type = 'matchlist',
 				header = 'Round 1',
@@ -40,12 +40,12 @@ insulate('MatchGroup/Util/Bracket', function()
 		end)
 
 		it('treats anything that is not a bracket as a matchlist', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			assert.are_equal('matchlist', BracketUtil.bracketDataFromRecord{header = 'x'}.type)
 		end)
 
 		it('reads bracket bracket data', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			local bracketData = BracketUtil.bracketDataFromRecord{
 				type = 'bracket',
 				header = 'Semifinals',
@@ -70,7 +70,7 @@ insulate('MatchGroup/Util/Bracket', function()
 		end)
 
 		it('derives the qualification flags from the advance spots', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			local bracketData = BracketUtil.bracketDataFromRecord{
 				type = 'bracket',
 				qualwin = 'true',
@@ -84,7 +84,7 @@ insulate('MatchGroup/Util/Bracket', function()
 		end)
 
 		it('reads qualskip and skipround as numbers, including the true spelling', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			local fromStrings = BracketUtil.bracketDataFromRecord{
 				type = 'bracket', qualskip = 'true', skipround = 'true',
 			}
@@ -99,7 +99,7 @@ insulate('MatchGroup/Util/Bracket', function()
 		end)
 
 		it('converts the coordinate indexes from zero based to one based', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			local bracketData = BracketUtil.bracketDataFromRecord{
 				type = 'bracket',
 				coordinates = {roundIndex = 0, sectionIndex = 1, roundCount = 3, depth = 2},
@@ -115,7 +115,7 @@ insulate('MatchGroup/Util/Bracket', function()
 
 	describe('bracketDataToRecord', function()
 		it('round trips a bracket bracket data', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			local record = BracketUtil.bracketDataToRecord{
 				type = 'bracket',
 				header = 'Semifinals',
@@ -148,7 +148,7 @@ insulate('MatchGroup/Util/Bracket', function()
 
 	describe('computeLowerMatchIdsFromLegacy', function()
 		it('reads toupper before tolower and skips empty ones', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			assert.are_same({'R02-M001', 'R02-M002'},
 				BracketUtil.computeLowerMatchIdsFromLegacy{toupper = 'R02-M001', tolower = 'R02-M002'})
 			assert.are_same({'R02-M002'},
@@ -159,7 +159,7 @@ insulate('MatchGroup/Util/Bracket', function()
 
 	describe('autoAssignLowerEdges', function()
 		it('centres the lower matches when there are fewer of them than opponents', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			assert.are_same({{lowerMatchIndex = 1, opponentIndex = 2}}, BracketUtil.autoAssignLowerEdges(1, 3))
 			assert.are_same({
 				{lowerMatchIndex = 1, opponentIndex = 1},
@@ -168,7 +168,7 @@ insulate('MatchGroup/Util/Bracket', function()
 		end)
 
 		it('hangs the excess lower matches off the last opponent', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			assert.are_same({
 				{lowerMatchIndex = 1, opponentIndex = 1},
 				{lowerMatchIndex = 2, opponentIndex = 2},
@@ -177,14 +177,14 @@ insulate('MatchGroup/Util/Bracket', function()
 		end)
 
 		it('returns nothing when there are no lower matches', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			assert.are_same({}, BracketUtil.autoAssignLowerEdges(0, 2))
 		end)
 	end)
 
 	describe('computeAdvanceSpots', function()
 		it('advances the winner to the upper match', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			assert.are_same(
 				{{bg = 'up', type = 'advance', matchId = 'R02-M001'}},
 				BracketUtil.computeAdvanceSpots{upperMatchId = 'R02-M001'}
@@ -192,7 +192,7 @@ insulate('MatchGroup/Util/Bracket', function()
 		end)
 
 		it('lets winnerto and loserto override the upper match', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			local spots = BracketUtil.computeAdvanceSpots{
 				upperMatchId = 'R02-M001',
 				winnerto = 'R02-M009',
@@ -203,7 +203,7 @@ insulate('MatchGroup/Util/Bracket', function()
 		end)
 
 		it('marks qualification spots while keeping the target match', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			local spots = BracketUtil.computeAdvanceSpots{
 				upperMatchId = 'R02-M001',
 				qualwin = 'true',
@@ -214,21 +214,21 @@ insulate('MatchGroup/Util/Bracket', function()
 		end)
 
 		it('returns nothing for a match that goes nowhere', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			assert.are_same({}, BracketUtil.computeAdvanceSpots{})
 		end)
 	end)
 
 	describe('populateAdvanceSpots', function()
 		it('does nothing for an empty bracket', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			assert.is_true(pcall(function()
 				BracketUtil.populateAdvanceSpots{matches = {}}
 			end))
 		end)
 
 		it('sends the semifinal losers to the third place match', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			local bracketDatasById = {
 				['R01-M001'] = {advanceSpots = {}},
 				['R02-M001'] = {advanceSpots = {}, lowerMatchIds = {'R01-M001'}, thirdPlaceMatchId = 'RxMTP'},
@@ -246,7 +246,7 @@ insulate('MatchGroup/Util/Bracket', function()
 		end)
 
 		it('applies the pbg overrides from extradata', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			local bracketData = {advanceSpots = {}, lowerMatchIds = {}}
 			BracketUtil.populateAdvanceSpots{
 				matches = {{extradata = {pbg1 = 'down', pbg2 = 'stay'}, bracketData = bracketData}},
@@ -260,9 +260,28 @@ insulate('MatchGroup/Util/Bracket', function()
 		end)
 	end)
 
+	describe('resetMatch', function()
+		it('finds the match that replays a grand final', function()
+			local BracketUtil = require('Module:Domain/Bracket/Model')
+			local reset = {matchId = 'R03-M001'}
+			assert.are_equal(reset, BracketUtil.resetMatch(
+				{['R03-M001'] = reset}, {bracketResetMatchId = 'R03-M001'}))
+		end)
+
+		it('finds nothing for a match that has no reset', function()
+			local BracketUtil = require('Module:Domain/Bracket/Model')
+			assert.is_nil(BracketUtil.resetMatch({['R03-M001'] = {}}, {}))
+		end)
+
+		it('finds nothing when the reset match is not in the bracket', function()
+			local BracketUtil = require('Module:Domain/Bracket/Model')
+			assert.is_nil(BracketUtil.resetMatch({}, {bracketResetMatchId = 'R03-M001'}))
+		end)
+	end)
+
 	describe('computeRootMatchIds', function()
 		it('takes the matches that have no upper match, in coordinate order', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			local rootMatchIds = BracketUtil.computeRootMatchIds{
 				['R01-M001'] = {upperMatchId = 'R02-M001'},
 				['R02-M001'] = {coordinates = {rootIndex = 2}},
@@ -272,7 +291,7 @@ insulate('MatchGroup/Util/Bracket', function()
 		end)
 
 		it('never treats a bracket reset match as a root', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			assert.are_same({'R01-M001'}, BracketUtil.computeRootMatchIds{
 				['R01-M001'] = {coordinates = {rootIndex = 1}},
 				['abcdefghij_RxMBR'] = {coordinates = {rootIndex = 2}},
@@ -282,7 +301,7 @@ insulate('MatchGroup/Util/Bracket', function()
 
 	describe('backfillUpperMatchIds', function()
 		it('points every lower match at the match above it', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			local bracketDatasById = {
 				['R01-M001'] = {lowerMatchIds = {}},
 				['R01-M002'] = {lowerMatchIds = {}},
@@ -298,7 +317,7 @@ insulate('MatchGroup/Util/Bracket', function()
 
 	describe('index table conversion', function()
 		it('shifts only the keys ending in Index', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			local coordinates = {roundIndex = 0, sectionIndex = 2, roundCount = 4, matchId = 'R01-M001'}
 			local oneBased = BracketUtil.indexTableFromRecord(coordinates)
 
@@ -309,7 +328,7 @@ insulate('MatchGroup/Util/Bracket', function()
 
 	describe('sectionIndexToString', function()
 		it('names the first, last and middle sections', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			assert.are_equal('upper', BracketUtil.sectionIndexToString(1, 3))
 			assert.are_equal('mid', BracketUtil.sectionIndexToString(2, 3))
 			assert.are_equal('lower', BracketUtil.sectionIndexToString(3, 3))
@@ -321,20 +340,20 @@ insulate('MatchGroup/Util/Bracket', function()
 	-- match ids address a match inside its match group, so they live with the bracket half
 	describe('match ids', function()
 		it('splits a match id into bracket id and base match id', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			local bracketId, baseMatchId = BracketUtil.splitMatchId('h5HXaqbSVP_R02-M002')
 			assert.are_equal('h5HXaqbSVP', bracketId)
 			assert.are_equal('R02-M002', baseMatchId)
 		end)
 
 		it('returns nothing for a match id it cannot split', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			assert.is_nil(BracketUtil.splitMatchId('R02-M002'))
 			assert.is_nil((BracketUtil.splitMatchId('')))
 		end)
 
 		it('converts between the padded and short match id forms', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			assert.are_equal('R1M3', BracketUtil.matchIdToKey('R01-M003'))
 			assert.are_equal('R12M345', BracketUtil.matchIdToKey('R12-M345'))
 			assert.are_equal('R01-M003', BracketUtil.matchIdFromKey('R1M3'))
@@ -342,7 +361,7 @@ insulate('MatchGroup/Util/Bracket', function()
 		end)
 
 		it('leaves the reset and third place placeholders alone', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			assert.are_equal('RxMBR', BracketUtil.matchIdToKey('RxMBR'))
 			assert.are_equal('RxMTP', BracketUtil.matchIdToKey('RxMTP'))
 			assert.are_equal('RxMBR', BracketUtil.matchIdFromKey('RxMBR'))
@@ -350,7 +369,7 @@ insulate('MatchGroup/Util/Bracket', function()
 		end)
 
 		it('pads a matchlist key to four digits', function()
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			assert.are_equal('0003', BracketUtil.matchIdFromKey('3'))
 		end)
 

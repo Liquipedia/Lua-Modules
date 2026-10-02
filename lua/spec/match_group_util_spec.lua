@@ -170,7 +170,7 @@ insulate('MatchGroup/Util', function()
 				record('resetbracket_RxMBR', {type = 'bracket'}),
 			})
 
-			local finals, resetMatch = MatchGroupUtil.fetchMatchForBracketDisplay(
+			local finals, resetMatch = MatchGroupUtil.fetchMatchWithBracketReset(
 				'resetbracket', 'resetbracket_R01-M001')
 
 			assert.is_truthy(finals)
@@ -194,8 +194,8 @@ insulate('MatchGroup/Util', function()
 	describe('re-exports', function()
 		it('points every match and bracket model member at its implementation', function()
 			local MatchGroupUtil = require('Module:MatchGroup/Util')
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
-			local BracketUtil = require('Module:MatchGroup/Util/Bracket')
+			local MatchUtil = require('Module:Domain/Match/Model')
+			local BracketUtil = require('Module:Domain/Bracket/Model')
 			local Types = require('Module:MatchGroup/Util/Types')
 
 			assert.are_equal(Types, MatchGroupUtil.types)

@@ -35,7 +35,7 @@ function SingleMatchDisplay.SingleMatchContainer(props)
 
 	assert(bracketId, 'Missing or invalid matchId')
 
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId)
+	local match = MatchGroupUtil.fetchMatchWithBracketReset(bracketId, props.matchId)
 	return match
 		and SingleMatchDisplay.SingleMatch({
 			config = props.config,
