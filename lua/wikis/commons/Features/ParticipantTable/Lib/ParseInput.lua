@@ -43,7 +43,7 @@ function Parser.readConfig(args, parentConfig)
 		colSpan = parentConfig.colSpan or MathUtil.toInteger(args.colspan) or 4,
 		onlyNotable = Logic.readBool(args.onlyNotable or parentConfig.onlyNotable),
 		resolveDate = args.date or parentConfig.resolveDate or DateExt.getContextualDate(),
-		sortPlayers = Logic.nilOr(Logic.readBoolOrNil(args.sortPlayers), Logic.readBoolOrNil(args.sortPlayers),
+		sortPlayers = Logic.nilOr(Logic.readBoolOrNil(args.sortPlayers), parentConfig.sortPlayers,
 			(Info.config.participants or {}).sortPlayersInTable),
 		sortOpponents = Logic.nilOr(Logic.readBoolOrNil(args.sortOpponents), parentConfig.sortOpponents, true),
 		showTeams = showTeams,
@@ -62,6 +62,8 @@ function Parser.readConfig(args, parentConfig)
 			return faction, tonumber(args[Faction.toName(faction):lower()])
 		end),
 		factionColumnWidth = tonumber(args.entrywidth) or showTeams and 212 or 156,
+		-- todo: remove the fallback after bot runs (after merge)
+		showCountByFaction = Logic.readBool(args.countByFaction or args.count),
 	}
 
 	config.width = parentConfig.width
