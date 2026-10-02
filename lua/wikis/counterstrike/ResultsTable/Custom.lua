@@ -21,10 +21,6 @@ local CustomResultsTable = Class.new(ResultsTable)
 local CustomAwardsTable = Class.new(AwardsTable)
 local Custom = {}
 
-CustomResultsTable.tierDisplay = Custom.tierDisplay
-CustomAwardsTable.tierDisplay = Custom.tierDisplay
-
-
 -- Template entry point for results and achievements tables
 ---@param args table
 ---@return VNode
@@ -64,5 +60,8 @@ function Custom:tierDisplay(placement)
 
 	return Tier.display(tier, tierType, options), Tier.toSortValue(tier, tierType)
 end
+
+CustomResultsTable.tierDisplay = Custom.tierDisplay
+CustomAwardsTable.tierDisplay = Custom.tierDisplay
 
 return Class.export(Custom, {exports = {'results', 'awards'}})
