@@ -153,7 +153,7 @@ function StandingTableLegacySwiss.mapTournamentInputToMatchesInRounds(args)
 		return {id = match.match2id, round = tonumber(string.match(roundText, 'Round%s*(%d+)'))}
 	end)
 	if Array.all(matches, function(match) return match.round == nil end) then
-		mw.ext.TeamLiquidIntegration.add_category('Pages with swiss missing matches')
+		mw.ext.TeamLiquidIntegration.add_category('Pages with missing matches in swiss table')
 	end
 	local _, matchesByRound = Array.groupBy(matches, function(match)
 		return match.round
