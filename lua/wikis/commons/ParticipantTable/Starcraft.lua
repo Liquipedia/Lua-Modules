@@ -14,26 +14,9 @@ local Faction = Lua.import('Module:Faction')
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
-local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
----@class StarcraftParticipantTableConfig: ParticipantTableConfig
----@field displayUnknownColumn boolean?
----@field displayRandomColumn boolean?
----@field displayMultipleFactionColumn boolean?
----@field showCountByFaction boolean
----@field isRandomEvent boolean
----@field isQualified boolean?
----@field manualFactionCounts table<string, number?>
----@field soloColumnWidth number
----@field soloAsFactionTable boolean
-
----@class StarcraftParticipantTableEntry: ParticipantTableEntry
----@field isQualified boolean?
----@field opponent StarcraftStandardOpponent
-
----@class StarcraftParticipantTableSection: ParticipantTableSection
----@field entries StarcraftParticipantTableEntry[]
+local FactionTable = Lua.import('Module:Features/ParticipantTable/Components/FactionTable')
 
 ---@class StarcraftParticipantTable: ParticipantTable
 ---@operator call(Frame): StarcraftParticipantTable
@@ -42,7 +25,7 @@ local Variables = Lua.import('Module:Variables')
 local StarcraftParticipantTable = Class.new(ParticipantTable)
 
 ---@param frame Frame
----@return Html?
+---@return VNode?
 function StarcraftParticipantTable.run(frame)
 	return StarcraftParticipantTable(frame):read():store():create()
 end
@@ -94,10 +77,16 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 		team = valueFromArgs('team'),
 		dq = valueFromArgs('dq'),
 		note = valueFromArgs('note'),
-		faction = valueFromArgs('race'),
+		seed = valueFromArgs('seed'),
+		faction = valueFromArgs('race') or valueFromArgs('faction'),
 	}
 
 	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
+
+	opponentArgs.seed = tonumber(opponentArgs.seed)
+	if opponentArgs.seed then
+		self.hasSeeds = true
+	end
 
 	--unset wiki var for random events to not read players as random if prize pool already sets them as random
 	if config.isRandomEvent and opponentArgs.type == Opponent.solo then
@@ -120,6 +109,7 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 		opponent = opponent,
 		isQualified = Logic.nilOr(Logic.readBoolOrNil(sectionArgs[key .. 'qualified']), config.isQualified),
 		inputIndex = index,
+		seed = opponentArgs.seed,
 	}
 end
 
@@ -146,7 +136,7 @@ function StarcraftParticipantTable:isPureSolo()
 	end) end)
 end
 
----@return Html?
+---@return VNode?
 function StarcraftParticipantTable:create()
 	if self:isPureSolo() and self.config.soloAsFactionTable then
 		return self:createSoloFactionTable()
@@ -154,7 +144,7 @@ function StarcraftParticipantTable:create()
 	return ParticipantTable.create(self)
 end
 
----@return Html?
+---@return VNode?
 function StarcraftParticipantTable:createSoloFactionTable()
 	local config = self.config
 
@@ -184,19 +174,12 @@ function StarcraftParticipantTable:createSoloFactionTable()
 		table.insert(factionColumns, Faction.read('m'))
 	end
 
-	local colSpan = #factionColumns
-
-	self.display = mw.html.create('div')
-		:addClass('participantTable participantTable-faction')
-		:css('grid-template-columns', 'repeat(' .. colSpan .. ', 1fr)')
-		:css('width', (colSpan * config.soloColumnWidth) .. 'px')
-		:node(self:_displayHeader(factionColumns, factionNumbers))
-
-	Array.forEach(self.sections, function(section) self:_displaySoloFactionTableSection(section, factionColumns) end)
-
-	return mw.html.create('div')
-		:addClass('table-responsive')
-		:node(self.display)
+	return FactionTable{
+		config = self.config,
+		factionColumns = factionColumns,
+		factionNumbers = factionNumbers,
+		sections = self.sections,
+	}
 end
 
 ---@return table
@@ -225,65 +208,6 @@ function StarcraftParticipantTable:_getFactionNumbers()
 	end
 
 	return factionNumbers
-end
-
----@param factionColumns table
----@param factionNumbers table
----@return Html
-function StarcraftParticipantTable:_displayHeader(factionColumns, factionNumbers)
-	local config = self.config
-	local header = mw.html.create('div'):addClass('participantTable-row')
-
-	Array.forEach(factionColumns, function(faction)
-		local parts = Array.extend(
-			config.isRandomEvent and Faction.Icon{faction = 'r'} or nil,
-			faction ~= Faction.defaultFaction and Faction.Icon{faction = faction} or nil,
-			' ' .. Faction.toName(faction),
-			config.isRandomEvent and ' Main' or nil,
-			config.showCountByFaction and " ''(" .. factionNumbers[faction .. 'Display'] .. ")''" or nil
-		)
-
-		header:tag('div')
-			:addClass('participantTable-faction-header participantTable-entry')
-			:addClass(Faction.bgClass(faction))
-			:tag('div')
-				:wikitext(table.concat(parts))
-	end)
-
-	return header
-end
-
----@param section StarcraftParticipantTableSection
----@param factionColumns table
-function StarcraftParticipantTable:_displaySoloFactionTableSection(section, factionColumns)
-	local sectionEntryCount = #Array.filter(section.entries, function(entry) return not entry.dq end)
-
-	self.display:node(self.newSectionNode():node(self:sectionTitle(section, sectionEntryCount)))
-
-	if Table.isEmpty(section.entries) then
-		self.display:node(self.newSectionNode():node(self:tbd()))
-		return
-	end
-
-	-- Group entries by faction
-	local _, byFaction = Array.groupBy(section.entries, function(entry) return entry.opponent.players[1].faction end)
-
-	-- Find the faction with the most players
-	local maxFactionLength = Array.max(
-		Array.map(factionColumns, function(faction) return #(byFaction[faction] or {}) end)
-	) or 0
-
-	Array.forEach(Array.range(1, maxFactionLength), function(rowIndex)
-		local sectionNode = self.newSectionNode()
-		Array.forEach(factionColumns, function(faction)
-			local entry = byFaction[faction] and byFaction[faction][rowIndex]
-			sectionNode:node(
-				entry and self:displayEntry(entry, {showFaction = false}) or
-				mw.html.create('div'):addClass('participantTable-entry')
-			)
-		end)
-		self.display:node(sectionNode)
-	end)
 end
 
 ---@param entry StarcraftParticipantTableEntry
