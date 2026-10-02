@@ -50,7 +50,7 @@ return {
 	tierTypes = {
 		monthly = {
 			value = 'Monthly',
-			sort = 'A4',
+			sort = 'A6',
 			name = 'Monthly',
 			short = 'Mon.',
 			link = 'Monthly Tournaments',
@@ -58,7 +58,7 @@ return {
 		},
 		weekly = {
 			value = 'Weekly',
-			sort = 'A5',
+			sort = 'A7',
 			name = 'Weekly',
 			short = 'Week.',
 			link = 'Weekly Tournaments',
@@ -66,7 +66,7 @@ return {
 		},
 		qualifier = {
 			value = 'Qualifier',
-			sort = 'A6',
+			sort = 'A8',
 			name = 'Qualifier',
 			short = 'Qual.',
 			link = 'Qualifier Tournaments',
@@ -74,7 +74,7 @@ return {
 		},
 		misc = {
 			value = 'Misc',
-			sort = 'A7',
+			sort = 'A9',
 			name = 'Misc',
 			short = 'Misc',
 			link = 'Miscellaneous Tournaments',
