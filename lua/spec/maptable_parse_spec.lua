@@ -1,15 +1,5 @@
 --- Triple Comment to Enable our LLS Plugin
---[[
-Unit tests for the pure Lib layer of Module:Features/MapTable.
-
-This is the payoff of splitting MapTable into layers: reading a row and deriving its links used to
-live in the same file as the LPDB writes and the redirect lookups, so they could only be reached by
-running the whole table. They are pure now, so they can be tested directly, with no I/O mocks.
-
-SetActiveWiki is not a mock, it only puts wikis/trackmania on the module search path.
-
-The end to end behaviour of the same code stays covered through Module:Features/MapTable/Controller.
-]]
+-- Pure Lib layer of Module:Features/MapTable: rows, mappers and links, no mocks
 
 describe('MapTable Lib', function()
 	local MapTableParse
