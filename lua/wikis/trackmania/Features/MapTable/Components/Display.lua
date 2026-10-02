@@ -12,9 +12,9 @@ local Links = Lua.import('Module:Links')
 local Table = Lua.import('Module:Table')
 
 local Component = Lua.import('Module:Widget/Component')
-local Link = Lua.import('Module:Widget/Basic/Link')
 local Html = Lua.import('Module:Widget/Html')
 local InlinePlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Inline')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 ---Builds the mapper cell content for a single map, one mapper per line
