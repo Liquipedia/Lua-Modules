@@ -92,7 +92,7 @@ function PlayerTabs._display(player, currentTab)
 		name1 = 'Overview',
 		link1 = player,
 		name2 = QueryLink{
-			mediawikiForm = 'Player ResultsLH',
+			mediawikiForm = 'Player Results',
 			form = 'Player Results/LH',
 			display = 'Results',
 			template = 'Player results',
@@ -104,7 +104,7 @@ function PlayerTabs._display(player, currentTab)
 			},
 		},
 		name3 = QueryLink{
-			mediawikiForm = 'Player MatchesLH',
+			mediawikiForm = 'Player Matches',
 			form = 'Player Matches/LH',
 			display = 'Matches',
 			template = 'Player matches',
