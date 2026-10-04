@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
 
 local Import = Lua.import('Module:Features/ParticipantTable/Api/Import')
 local ImportParser = Lua.import('Module:Features/ParticipantTable/Lib/ParseImported')
@@ -56,6 +57,7 @@ function Controller.execute(frame, CustomConfig)
 		displayComponent = displayComponent,
 		factionColumns = factionColumns,
 		factionNumbers = factionNumbers,
+		showSeedingFirst = Logic.readBool(args.showSeedingFirst),
 	}
 end
 

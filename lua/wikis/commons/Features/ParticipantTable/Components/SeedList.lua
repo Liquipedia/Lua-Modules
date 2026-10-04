@@ -16,7 +16,7 @@ local Html = Lua.import('Module:Widget/Html')
 
 local Entry = Lua.import('Module:Features/ParticipantTable/Components/Entry')
 
----@param props {hasSeed: boolean?, config: ParticipantTableConfig, sections: ParticipantTableSection[]}
+---@param props {config: ParticipantTableConfig, sections: ParticipantTableSection[]}
 ---@return VNode[]
 local function ParticipantTableSeedList(props)
 	local width = tostring(50 + (props.config.showTeams and 242 or 186)) .. 'px'

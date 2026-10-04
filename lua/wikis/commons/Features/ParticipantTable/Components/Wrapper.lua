@@ -14,7 +14,7 @@ local Html = Lua.import('Module:Widget/Html')
 local SeedingList = Lua.import('Module:Features/ParticipantTable/Components/SeedList')
 
 ---@param props {displayComponent: Component, config: ParticipantTableConfig, sections: ParticipantTableSection[],
----hasSeed: boolean?, factionColumns?: string[], factionNumbers?: table<string, integer>}
+---hasSeed: boolean?, factionColumns?: string[], factionNumbers?: table<string, integer>, showSeedingFirst: boolean?}
 ---@return VNode[]
 local function ParticipantTableWrapper(props)
 	---@type VNode
@@ -41,9 +41,11 @@ local function ParticipantTableWrapper(props)
 		}
 	end
 
+	local toogleArea = props.showSeedingFirst == true and 2 or 1
+
 	return Html.Div{
-		classes = {'table-responsive', 'toggle-area toggle-area-1'},
-		attributes = {['data-toggle-area'] = 1},
+		classes = {'table-responsive', 'toggle-area toggle-area-' .. toogleArea},
+		attributes = {['data-toggle-area'] = toogleArea},
 		children = {
 			makebutton(1, 2, 'Show Participants'),
 			makebutton(2, 1, 'Show Seedings'),
