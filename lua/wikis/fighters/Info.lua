@@ -271,6 +271,19 @@ return {
 				lightMode = 'Power Rangers default allmode.png',
 			},
 		},
+		breakers = {
+			abbreviation = 'Breakers',
+			name = 'Breakers',
+			link = 'Breakers',
+			logo = {
+				darkMode = 'Breakers Revenge allmode.png',
+				lightMode = 'Breakers Revenge allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Breakers Revenge allmode.png',
+				lightMode = 'Breakers Revenge allmode.png',
+			},
+		},
 		brex = {
 			abbreviation = 'BREX',
 			name = 'Bloody Roar: Extreme',
@@ -399,6 +412,32 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'DNF Duel Logo.png',
 				lightMode = 'DNF Duel Logo.png',
+			},
+		},
+		doa2 = {
+			abbreviation = 'DOA 2',
+			name = 'Dead or Alive 2',
+			link = 'Dead or Alive 2',
+			logo = {
+				darkMode = 'DoA2 allmode.png',
+				lightMode = 'DoA2 allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'DoA2 allmode.png',
+				lightMode = 'DoA2 allmode.png',
+			},
+		},
+		doa3 = {
+			abbreviation = 'DOA 3',
+			name = 'Dead or Alive 3',
+			link = 'Dead or Alive 3',
+			logo = {
+				darkMode = 'DoA3 allmode.png',
+				lightMode = 'DoA3 allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'DoA3 allmode.png',
+				lightMode = 'DoA3 allmode.png',
 			},
 		},
 		doa4 = {
@@ -558,16 +597,29 @@ return {
 			},
 		},
 		gg = {
-			abbreviation = 'gg',
+			abbreviation = 'GG',
 			name = 'Guilty Gear',
-			link = 'Guilty Gear',
+			link = 'Guilty Gear (video game)',
 			logo = {
-				darkMode = 'Guilty Gear logo.png',
-				lightMode = 'Guilty Gear logo.png',
+				darkMode = 'Guilty Gear allmode.png',
+				lightMode = 'Guilty Gear allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Guilty Gear logo.png',
-				lightMode = 'Guilty Gear logo.png',
+				darkMode = 'Guilty Gear allmode.png',
+				lightMode = 'Guilty Gear allmode.png',
+			},
+		},
+		ggx = {
+			abbreviation = 'GG X',
+			name = 'Guilty Gear X',
+			link = 'Guilty Gear X',
+			logo = {
+				darkMode = 'Guilty Gear X allmode.png',
+				lightMode = 'Guilty Gear X allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Guilty Gear X allmode.png',
+				lightMode = 'Guilty Gear X allmode.png',
 			},
 		},
 		ggxx = {
@@ -843,6 +895,19 @@ return {
 				lightMode = 'Lethal League Blaze default allmode.png',
 			},
 		},
+		kof97 = {
+			abbreviation = 'KOF97',
+			name = 'The King of Fighters 97',
+			link = 'The King of Fighters 97',
+			logo = {
+				darkMode = 'The King of Fighters 97 allmode.png',
+				lightMode = 'The King of Fighters 97 allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'The King of Fighters 97 allmode.png',
+				lightMode = 'The King of Fighters 97 allmode.png',
+			},
+		},
 		kof98 = {
 			abbreviation = 'KOF98',
 			name = 'The King of Fighters 98',
@@ -1075,6 +1140,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'Melty Blood Type Lumina Logo.png',
 				lightMode = 'Melty Blood Type Lumina Logo.png',
+			},
+		},
+		mkii = {
+			abbreviation = 'MKII',
+			name = 'Mortal Kombat II',
+			link = 'Mortal Kombat II',
+			logo = {
+				darkMode = 'Mortal Kombat II allmode.png',
+				lightMode = 'Mortal Kombat II allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Mortal Kombat II allmode.png',
+				lightMode = 'Mortal Kombat II allmode.png',
 			},
 		},
 		mk3 = {
@@ -1649,6 +1727,19 @@ return {
 				lightMode = 'SF6 Logo.png',
 			},
 		},
+		t3 = {
+			abbreviation = 'TK3',
+			name = 'Tekken 3',
+			link = 'Tekken 3',
+			logo = {
+				darkMode = 'Tekken 3 allmode.png',
+				lightMode = 'Tekken 3 allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Tekken 3 allmode.png',
+				lightMode = 'Tekken 3 allmode.png',
+			},
+		},
 		t4 = {
 			abbreviation = 'TK4',
 			name = 'Tekken 4',
@@ -1766,6 +1857,19 @@ return {
 				lightMode = 'SFxT Logo.png',
 			},
 		},
+		sfex2 = {
+			abbreviation = 'SFEX2',
+			name = 'Street Fighter EX2',
+			link = 'Street Fighter EX2',
+			logo = {
+				darkMode = 'Street Fighter EX2 allmode.png',
+				lightMode = 'Street Fighter EX2 allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Street Fighter EX2 allmode.png',
+				lightMode = 'Street Fighter EX2 allmode.png',
+			},
+		},
 		tvc = {
 			abbreviation = 'TvC',
 			name = 'Tatsunoko vs. Capcom: Ultimate All-Stars',
@@ -1805,6 +1909,19 @@ return {
 				lightMode = 'TH123 Logo.png',
 			},
 		},
+		tlb2 = {
+			abbreviation = 'TLB2',
+			name = 'The Last Blade 2',
+			link = 'The Last Blade 2',
+			logo = {
+				darkMode = 'The Last Blade 2 allmode.png',
+				lightMode = 'The Last Blade 2 allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'The Last Blade 2 allmode.png',
+				lightMode = 'The Last Blade 2 allmode.png',
+			},
+		},
 		tokon = {
 			abbreviation = 'Tokon',
 			name = 'MARVEL Tōkon: Fighting Souls',
@@ -1816,6 +1933,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'Marvel Tokon allmode.png',
 				lightMode = 'Marvel Tokon allmode.png',
+			},
+		},
+		vhun = {
+			abbreviation = 'VH',
+			name = 'Vampire Hunter',
+			link = 'Vampire Hunter',
+			logo = {
+				darkMode = 'Vampire Hunter allmode.png',
+				lightMode = 'Vampire Hunter allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Vampire Hunter allmode.png',
+				lightMode = 'Vampire Hunter allmode.png',
 			},
 		},
 		vsav = {
