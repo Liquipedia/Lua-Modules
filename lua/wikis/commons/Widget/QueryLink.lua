@@ -17,37 +17,46 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@class QueryLinkParameters
 ---@field mediawikiForm string
 ---@field form string
----@field template string
----@field display string
+---@field template string?
+---@field display Renderable
 ---@field queryArgs table?
 ---@field execute boolean?
 
 ---@param props QueryLinkParameters
----@return Widget
+---@return Renderable[]
 local function QueryLink(props)
-	-- mediawikiForm is only needed until lighthouse is fully ready
-	---@return Renderable
-	local makeMediawikiQueryLink = function()
-		local form = assert(Logic.nilIfEmpty(props.mediawikiForm), 'Missing mediawikiForm input when building query link')
-		local prefix = assert(Logic.nilIfEmpty(props.template), 'Missing template input when building query link')
-
-		local queryArgs = Table.map(props.queryArgs or {}, function(key, item)
-			return prefix .. '[' .. key .. ']', item
-		end)
-
-		local link = tostring(mw.uri.fullUrl(
-			'Special:RunQuery/' .. form,
-			queryArgs
-		)) .. (props.execute and '&_run' or '')
-
+	---@param link string
+	---@param class string
+	---@return VNode
+	local makeLinkDisplay = function(link, class)
 		return Html.Span{
-			classes = { 'hide-when-lighthouse' },
+			classes = {class},
 			children = Link{
 				linktype = 'external',
 				children = props.display,
 				link = link,
 			}
 		}
+	end
+
+	-- mediawikiForm is only needed until lighthouse is fully ready
+	---@return Renderable
+	local makeMediawikiQueryLink = function()
+		local form = assert(Logic.nilIfEmpty(props.mediawikiForm), 'Missing mediawikiForm input when building query link')
+		---@type false|string
+		local prefix = assert(Logic.nilIfEmpty(props.template) or not props.queryArgs,
+			'Missing template input when building query link')
+
+		local queryArgs = prefix and Table.map(props.queryArgs or {}, function(key, item)
+			return prefix .. '[' .. key .. ']', item
+		end) or {}
+
+		local link = tostring(mw.uri.fullUrl(
+			'Special:RunQuery/' .. form,
+			queryArgs
+		)) .. (props.execute and '&_run' or '')
+
+		return makeLinkDisplay(link, 'hide-when-lighthouse')
 	end
 
 	---@return Renderable
@@ -59,14 +68,7 @@ local function QueryLink(props)
 			props.queryArgs or {}
 		))
 
-		return Html.Span {
-			classes = { 'hide-when-mediawiki' },
-			children = Link{
-				linktype = 'external',
-				children = props.display,
-				link = link,
-			}
-		}
+		return makeLinkDisplay(link, 'hide-when-mediawiki')
 	end
 
 	return Html.Fragment{
