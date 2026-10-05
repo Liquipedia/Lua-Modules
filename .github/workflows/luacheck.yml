@@ -43,14 +43,16 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Setup python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
-          python-version: '3.x'
+          python-version: '3.14'
 
       # Fails on violations coming out of Features/ and Domain/, warns for code that has not
       # been restructured yet. Those warnings become errors as each area is migrated.
       - name: Check import rules
         run: python scripts/check_lua_imports.py
+        env:
+          PYTHONUNBUFFERED: 1
 
   lua-unit-test:
     runs-on: ubuntu-latest
