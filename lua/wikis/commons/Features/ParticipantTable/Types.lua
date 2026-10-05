@@ -34,6 +34,13 @@ local Types = {}
 ---@field width string
 ---@field columnWidth string
 ---@field showTitle boolean only applies for the title of the whole table
+---@field displayUnknownColumn boolean?
+---@field displayRandomColumn boolean?
+---@field displayMultipleFactionColumn boolean?
+---@field isRandomEvent boolean?
+---@field manualFactionCounts table<string, number?>
+---@field factionColumnWidth number
+---@field soloAsFactionTable boolean?
 
 ---@class ParticipantTableSection
 ---@field config ParticipantTableConfig
@@ -44,30 +51,8 @@ local Types = {}
 ---@field name string
 ---@field note string?
 ---@field dq boolean
----@field inputIndex integer?
 ---@field isResolved boolean?
 ---@field sortName string
 ---@field seed integer?
-
-
-
--- todo: resolve those with the refactoring
----@class StarcraftParticipantTableConfig: ParticipantTableConfig
----@field displayUnknownColumn boolean?
----@field displayRandomColumn boolean?
----@field displayMultipleFactionColumn boolean?
----@field showCountByFaction boolean
----@field isRandomEvent boolean
----@field isQualified boolean?
----@field manualFactionCounts table<string, number?>
----@field soloColumnWidth number
----@field soloAsFactionTable boolean
-
----@class StarcraftParticipantTableEntry: ParticipantTableEntry
----@field isQualified boolean?
----@field opponent StarcraftStandardOpponent
-
----@class StarcraftParticipantTableSection: ParticipantTableSection
----@field entries StarcraftParticipantTableEntry[]
 
 return Types

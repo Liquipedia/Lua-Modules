@@ -9,9 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Json = Lua.import('Module:Json')
 local Faction = Lua.import('Module:Faction')
-local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 local Variables = Lua.import('Module:Variables')
@@ -20,8 +18,8 @@ local FactionTable = Lua.import('Module:Features/ParticipantTable/Components/Fac
 
 ---@class StarcraftParticipantTable: ParticipantTable
 ---@operator call(Frame): StarcraftParticipantTable
----@field config StarcraftParticipantTableConfig
----@field sections StarcraftParticipantTableSection[]
+---@field config ParticipantTableConfig
+---@field sections ParticipantTableSection[]
 local StarcraftParticipantTable = Class.new(ParticipantTable)
 
 ---@param frame Frame
@@ -30,103 +28,15 @@ function StarcraftParticipantTable.run(frame)
 	return StarcraftParticipantTable(frame):read():store():create()
 end
 
----@param args table
----@param parentConfig StarcraftParticipantTableConfig?
----@return StarcraftParticipantTableConfig
-function StarcraftParticipantTable.readConfig(args, parentConfig)
-	local config = ParticipantTable.readConfig(args, parentConfig) --[[@as StarcraftParticipantTableConfig]]
-	parentConfig = parentConfig or {}
-
-	config.displayUnknownColumn = Logic.readBoolOrNil(args.unknowncolumn)
-	config.displayRandomColumn = Logic.readBoolOrNil(args.randomcolumn)
-	config.displayMultipleFactionColumn = Logic.readBoolOrNil(args.multiplecolumn)
-	config.showCountByFaction = Logic.readBool(args.showCountByRace or args.count)
-	config.isRandomEvent = Logic.nilOr(Logic.readBoolOrNil(args.is_random_event), parentConfig.isRandomEvent)
-	config.isQualified = Logic.nilOr(Logic.readBoolOrNil(args.isQualified), parentConfig.isQualified)
-	config.sortPlayers = true
-	--only relevant for solo case since there we need columnWidth in px since colSpan is calculated dynamically
-	config.soloColumnWidth = tonumber(args.entrywidth) or config.showTeams and 212 or 156
-
-	config.manualFactionCounts = {}
-	Array.forEach(Faction.knownFactions, function(faction)
-		config.manualFactionCounts[faction] = tonumber(args[Faction.toName(faction):lower()])
-	end)
-
-	config.soloAsFactionTable = not Logic.readBool(args.soloNotAsRaceTable)
-
-	return config
-end
-
----@param sectionArgs table
----@param key string|number
----@param index number
----@param config StarcraftParticipantTableConfig
----@return StarcraftParticipantTableEntry
-function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
-	local prefix = 'p' .. index
-	local valueFromArgs = function(postfix)
-		return sectionArgs[key .. postfix] or sectionArgs[prefix .. postfix]
-	end
-
-	--if not a json assume it is a solo opponent
-	local opponentArgs = Json.parseIfTable(sectionArgs[key]) or {
-		type = Opponent.solo,
-		name = sectionArgs[key],
-		link = valueFromArgs('link'),
-		flag = valueFromArgs('flag'),
-		team = valueFromArgs('team'),
-		dq = valueFromArgs('dq'),
-		note = valueFromArgs('note'),
-		seed = valueFromArgs('seed'),
-		faction = valueFromArgs('race') or valueFromArgs('faction'),
-	}
-
-	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
-
-	opponentArgs.seed = tonumber(opponentArgs.seed)
-	if opponentArgs.seed then
-		self.hasSeeds = true
-	end
-
-	--unset wiki var for random events to not read players as random if prize pool already sets them as random
-	if config.isRandomEvent and opponentArgs.type == Opponent.solo then
-		Variables.varDefine(opponentArgs.name .. '_faction', '')
-	end
-
-	local opponent = Opponent.readOpponentArgs(opponentArgs)
-
-	if config.sortPlayers and opponent.players then
-		table.sort(opponent.players, function (player1, player2)
-			local name1 = (player1.displayName or player1.pageName):lower()
-			local name2 = (player2.displayName or player2.pageName):lower()
-			return name1 < name2
-		end)
-	end
-
-	return {
-		dq = Logic.readBool(opponentArgs.dq),
-		note = opponentArgs.note,
-		opponent = opponent,
-		isQualified = Logic.nilOr(Logic.readBoolOrNil(sectionArgs[key .. 'qualified']), config.isQualified),
-		inputIndex = index,
-		seed = opponentArgs.seed,
-	}
-end
-
 ---@param lpdbData table
----@param entry StarcraftParticipantTableEntry
----@param config StarcraftParticipantTableConfig
+---@param entry ParticipantTableEntry
+---@param config ParticipantTableConfig
 function StarcraftParticipantTable:adjustLpdbData(lpdbData, entry, config)
 	if config.isRandomEvent then
 		lpdbData.opponentplayers.p1faction = Faction.read('r')
 	end
 
-	local isQualified = entry.isQualified or config.isQualified
-
-	lpdbData.extradata.isqualified = tostring(isQualified)
 	lpdbData.extradata.mod = Variables.varDefault('tournament_mod')
-
-	lpdbData.qualified = isQualified and 1 or nil
 end
 
 ---@return boolean
@@ -210,8 +120,8 @@ function StarcraftParticipantTable:_getFactionNumbers()
 	return factionNumbers
 end
 
----@param entry StarcraftParticipantTableEntry
----@param config StarcraftParticipantTableConfig
+---@param entry ParticipantTableEntry
+---@param config ParticipantTableConfig
 function StarcraftParticipantTable:setCustomPageVariables(entry, config)
 	if config.isRandomEvent then
 		Variables.varDefine(entry.opponent.players[1].displayName .. '_faction', Faction.read('r'))
