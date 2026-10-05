@@ -54,7 +54,6 @@ function ParticipantTable:read()
 			end
 		end)
 	end)
-	Util.filterOnlyNotables(self.sections)
 	self.hasSeeds = Util.hasSeed(self.sections)
 
 	return self
@@ -82,6 +81,8 @@ function ParticipantTable:create()
 	local config = self.config
 
 	if not config.display then return end
+
+	Util.filterOnlyNotables(self.sections)
 
 	return Display{
 		hasSeed = self.hasSeeds,
