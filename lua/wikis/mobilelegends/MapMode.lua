@@ -32,7 +32,7 @@ end
 ---@param key string?
 ---@return {display: string, link: string}?
 function MapMode.getData(key)
-	return key and Data.mode[key] or nil
+	return key and Data.mode[MapMode.getKey(key)] or nil
 end
 
 return MapMode
