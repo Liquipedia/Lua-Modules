@@ -35,6 +35,8 @@ function Controller.execute(frame, CustomConfig)
 
 	if not config.display then return end
 
+	sections = Util.filterOnlyNotables(sections)
+
 	if not Util.shouldDisplayAsFactionTable(sections, config) then
 		return Display{
 			hasSeed = Util.hasSeed(sections),
@@ -75,8 +77,6 @@ function Controller._parseAndProcess(args)
 			end
 		end)
 	end)
-
-	sections = Util.filterOnlyNotables(sections)
 
 	return config, sections
 end
