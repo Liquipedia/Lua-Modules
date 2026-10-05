@@ -20,7 +20,7 @@ function MapMode.getKey(input)
 		return
 	end
 
-	--@cast input string
+	---@cast input string
 	local lowered = string.lower(mw.text.trim(input))
 	local key = Data.aliases[lowered] or lowered
 
