@@ -108,6 +108,7 @@ end
 ---@private
 ---@param standings StandingsModel
 ---@param slot StandingsEntryModel
+---@param statsToShow {id: string, title: string?}[]
 ---@return Renderable
 function Helpers.createRow(standings, slot, statsToShow)
 	return TableWidgets.Row{

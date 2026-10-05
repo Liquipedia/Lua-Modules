@@ -46,7 +46,7 @@ function CustomTeam:defineCustomPageVariables(args)
 	Variables.varDefine('team_captain', args.captain)
 end
 
----@return Widget?
+---@return Renderable?
 function CustomTeam:createBottomContent()
 	if not self.args.disbanded then
 		return UpcomingTournaments.team{

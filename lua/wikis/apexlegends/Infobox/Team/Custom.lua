@@ -60,7 +60,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return Widget?
+---@return Renderable?
 function CustomTeam:createBottomContent()
 	return UpcomingTournaments.team{name = self.teamTemplate.templatename}
 end

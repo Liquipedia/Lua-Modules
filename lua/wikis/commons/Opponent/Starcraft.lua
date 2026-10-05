@@ -81,7 +81,7 @@ function StarcraftOpponent.fromMatch2Record(record)
 end
 
 ---@param opponent StarcraftStandardOpponent
----@param options {setPlayersInTeam: boolean?}?
+---@param options {setPlayersInTeam: boolean?, forceUnderscores: boolean?}?
 ---@return {opponentname: string, opponenttemplate: string?, opponenttype: OpponentType, opponentplayers: table?}
 function StarcraftOpponent.toLpdbStruct(opponent, options)
 	local storageStruct = Opponent.toLpdbStruct(opponent, options)

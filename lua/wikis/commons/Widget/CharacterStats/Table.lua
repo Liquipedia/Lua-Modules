@@ -216,6 +216,7 @@ local function characterAppearanceStatsComparator(a, b)
 end
 
 ---@param data table<string, CharacterAppearanceStats>
+---@return Renderable
 function Helpers._buildPlayedByTeamTable(data)
 	local sortedTeamData = Array.sortBy(
 		Table.entries(data), Operator.property(2), characterAppearanceStatsComparator
@@ -243,6 +244,7 @@ end
 ---@param props CharacterStatsWidgetProps
 ---@param playedType string
 ---@param data table<string, CharacterAppearanceStats>
+---@return Renderable
 function Helpers._buildPlayedTable(props, playedType, data)
 	local sortedCharacterData = Array.sortBy(
 		Table.entries(data), Operator.property(2), characterAppearanceStatsComparator

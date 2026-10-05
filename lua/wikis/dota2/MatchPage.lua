@@ -50,7 +50,7 @@ end
 function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
-		game.teams = Array.map(Array.range(1, 2), function(teamIdx)
+		game.teams = Array.mapRange(1, 2, function(teamIdx)
 			local team = {}
 
 			team.scoreDisplay = game.winner == teamIdx and 'win' or game.finished and 'loss' or '-'

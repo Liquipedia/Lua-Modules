@@ -133,15 +133,19 @@ return {
 				sizes = {xxl = 5, xxxl = 6},
 				children = {
 					{
-						mobileOrder = 2,
-						content = CONTENT.thisDay,
+						mobileOrder = 1,
+						content = CONTENT.specialEvents,
 					},
 					{
 						mobileOrder = 3,
-						content = CONTENT.transfers,
+						content = CONTENT.thisDay,
 					},
 					{
 						mobileOrder = 4,
+						content = CONTENT.transfers,
+					},
+					{
+						mobileOrder = 5,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -150,7 +154,7 @@ return {
 				sizes = {xxl = 7, xxxl = 6},
 				children = {
 					{
-						mobileOrder = 1,
+						mobileOrder = 2,
 						children = {
 							{
 								children = {
@@ -185,7 +189,7 @@ return {
 			{
 				children = {
 					{
-						mobileOrder = 5,
+						mobileOrder = 6,
 						content = CONTENT.theGame,
 					},
 				},

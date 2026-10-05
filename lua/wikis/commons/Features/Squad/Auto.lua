@@ -138,6 +138,7 @@ function SquadAuto:displayTabs(entries)
 	local _, groupedEntries = Array.groupBy(
 		entries,
 		---@param entry SquadAutoPerson
+		---@return string?
 		function (entry)
 			assert(entry.leavedate, "Missing leavedate for " .. (entry.id or entry.name))
 			return entry.leavedate:match('(%d%d%d%d)')

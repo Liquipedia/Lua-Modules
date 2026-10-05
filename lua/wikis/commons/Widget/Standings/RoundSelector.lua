@@ -14,6 +14,8 @@ local Html = Lua.import('Module:Widget/Html')
 local Button = Lua.import('Module:Widget/Basic/Button')
 
 ---@private
+---@param hasEnded boolean
+---@param rounds integer
 ---@return string
 local function finalRoundTitle(hasEnded, rounds)
 	if not hasEnded then

@@ -18,7 +18,7 @@ local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 local CustomParticipantTable = Class.new(ParticipantTable)
 
 ---@param frame Frame
----@return Html?
+---@return VNode?
 function CustomParticipantTable.run(frame)
 	return CustomParticipantTable(frame):read():store():create()
 end
