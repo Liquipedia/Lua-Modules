@@ -58,7 +58,7 @@ function Parser.readConfig(args, parentConfig)
 		displayRandomColumn = Logic.readBoolOrNil(args.randomcolumn),
 		displayMultipleFactionColumn = Logic.readBoolOrNil(args.multiplecolumn),
 		isRandomEvent = Logic.nilOr(Logic.readBoolOrNil(args.is_random_event), parentConfig.isRandomEvent),
-		manualFactionCounts = Table.map(Faction.knownFactions, function(key, faction)
+		manualFactionCounts = Table.map(Faction.knownFactions or {}, function(key, faction)
 			return faction, tonumber(args[Faction.toName(faction):lower()])
 		end),
 		factionColumnWidth = tonumber(args.entrywidth) or showTeams and 212 or 156,
