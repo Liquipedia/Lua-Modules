@@ -17,7 +17,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
-local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
+local MatchGroupCoordinates = Lua.import('Module:Domain/Bracket/Coordinates')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Placement = Lua.import('Module:PrizePool/Placement')
 
