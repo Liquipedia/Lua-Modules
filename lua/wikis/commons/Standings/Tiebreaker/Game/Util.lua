@@ -16,10 +16,11 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local TiebreakerGameUtil = {}
 
 ---@param opponent TiebreakerOpponent
----@return {games: integer, w: integer, l: integer, walkover: {w: integer, l: integer}?}
+---@return {games: integer, w: integer, d: integer, l: integer, walkover: {w: integer, l: integer}?}
 TiebreakerGameUtil.getGames = FnUtil.memoize(function (opponent)
 	local games = 0
 	local gameWins = 0
+	local gameDraws = 0
 	local walkoverWins = 0
 	local walkoverLosses = 0
 	Array.forEach(opponent.matches, function (match)
@@ -37,11 +38,14 @@ TiebreakerGameUtil.getGames = FnUtil.memoize(function (opponent)
 		end
 		games = games + Array.reduce(Array.map(match.opponents, Operator.property('score')), Operator.nilSafeAdd)
 		gameWins = gameWins + (match.opponents[opponentIndex].score or 0)
+		gameDraws = gameDraws + #Array.filter(match.games or {}, function (game)
+			return game.winner == 0 and game.status ~= 'notplayed'
+		end)
 	end)
 	local gameLosses = games - gameWins
 
 	return {
-		games = games, w = gameWins, l = gameLosses,
+		games = games, w = gameWins, d = gameDraws, l = gameLosses,
 		walkover = Logic.nilIfEmpty{
 			w = walkoverWins > 0 and walkoverWins or nil,
 			l = walkoverLosses > 0 and walkoverLosses or nil,
