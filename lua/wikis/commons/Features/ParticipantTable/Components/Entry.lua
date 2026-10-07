@@ -14,14 +14,13 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
-local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 ---@param props ParticipantsTableEntryProps
 ---@return VNode
 local function ParticipantsTableEntry(props)
 	---@type HtmlNodeProps
 	local entryProps = {
-		classes = {props.useDefaultWidth and 'participantTable-entry' or nil},
+		classes = {props.useDefaultWidth and 'participantTable-entry' or 'participantTable-tableEntry'},
 		css = props.useDefaultWidth and {width = props.config.columnWidth} or nil,
 		children = OpponentDisplay.BlockOpponent(Table.merge(
 			{
@@ -34,9 +33,7 @@ local function ParticipantsTableEntry(props)
 		))
 	}
 
-	local htmlElement = props.useDefaultWidth and Html.Div or TableWidgets.Cell
-
-	return htmlElement(DisplayHelper.addOpponentHighlightToProps(entryProps, props.opponent))
+	return Html.Div(DisplayHelper.addOpponentHighlightToProps(entryProps, props.opponent))
 end
 
 return Component.component(ParticipantsTableEntry)

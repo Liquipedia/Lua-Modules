@@ -138,3 +138,24 @@ Modules: Features/ParticipantTable/*
 		display: none;
 	}
 }
+
+/* specific overwrites for faction participant tables
+without this the odd/even strip makes participant table look bad
+due to even rows having the same color as `th` rows
+*/
+th.participantTable-faction-section-title {
+	background-color: var( --clr-on-surface-light-primary-8 );
+
+	.theme--dark & {
+		background-color: var( --clr-on-surface-dark-primary-8 );
+	}
+}
+
+/* move the padding from the td to the div so the hover looks better */
+td.participantTable-tableEntry:has( div.brkts-opponent-hover ) {
+	padding: 0;
+}
+
+td.participantTable-tableEntry > div.brkts-opponent-hover {
+	padding: 0.5rem 0.75rem;
+}

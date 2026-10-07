@@ -39,6 +39,8 @@ local function ParticipantTableFactionSection(props)
 		end
 
 		return TableWidgets.Row{children = TableWidgets.CellHeader{
+			-- to make it not look bad with the odd/even strip we need to adjust the color for the title rows a bit
+			classes = {'participantTable-faction-section-title'},
 			attributes = {colspan = #props.factionColumns},
 			children = {
 				sectionConfig.title,
@@ -78,16 +80,13 @@ local function ParticipantTableFactionSection(props)
 	---@return VNode
 	local entryCell = function(rowIndex, faction)
 		local entry = byFaction[faction] and byFaction[faction][rowIndex]
-		if not entry then
-			return TableWidgets.Cell{}
-		end
-		return Entry{
+		return TableWidgets.Cell{children = entry and Entry{
 			config = props.config,
 			dq = entry.dq,
 			note = entry.note,
 			opponent = entry.opponent,
 			additionalProps = {showFaction = false},
-		}
+		} or nil}
 	end
 
 	return WidgetUtil.collect(
