@@ -151,6 +151,7 @@ th.participantTable-faction-section-title {
 	}
 }
 
+/* move the padding from the td to the div so the hover looks better */
 td.participantTable-tableEntry:has( div.brkts-opponent-hover ) {
 	padding: 0;
 }
