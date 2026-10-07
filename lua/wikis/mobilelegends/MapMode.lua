@@ -6,7 +6,6 @@
 --
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 
 local Html = Lua.import('Module:Widget/Html')
