@@ -11,8 +11,6 @@ local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local MapMode = Lua.import('Module:MapMode')
 
-local Html = Lua.import('Module:Widget/Html')
-local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
@@ -69,13 +67,9 @@ function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 end
 
 ---@param props MatchSummaryGameRowProps
----@return string?
+---@return Renderable?
 function GameRowComponentProps.createAdditionalComment(props)
-	local mapMode = MapMode.getData((props.game.extradata or {}).mapmode)
-	if not mapMode then
-		return
-	end
-	return Html.B{children = Link{link = mapMode.link, children = mapMode.display}}
+	return MapMode.display((props.game.extradata or {}).mapmode)
 end
 
 return CustomMatchSummary
