@@ -126,31 +126,6 @@ describe('Standings Tiebreakers', function()
 		end)
 	end)
 
-	describe('gamedraws', function()
-		it('counts drawn games from finished non-walkover matches', function()
-			local gamedraws = TiebreakerFactory.tiebreakerFromId('full.gamedraws')
-			local alpha = opponent('Alpha', {
-				matches = {
-					makeMatch({'Alpha', 'Bravo'}, {winner = 1, scores = {1, 0}, games = {
-						{winner = 1, status = ''},
-						{winner = 0, status = ''},
-						{status = 'notplayed'},
-					}}),
-					makeMatch({'Alpha', 'Charlie'}, {winner = 0, scores = {0, 0}, games = {
-						{winner = 0, status = ''},
-						{winner = 0, status = ''},
-					}}),
-					makeMatch({'Alpha', 'Delta'}, {winner = 1, statuses = {'W', 'FF'}, games = {
-						{winner = 0, status = ''},
-					}}),
-				},
-			})
-			-- 1 draw vs Bravo + 2 vs Charlie; the walkover vs Delta is excluded
-			assert.are_equal(3, gamedraws:valueOf({alpha}, alpha))
-			assert.are_equal('Games Drawn', gamedraws:headerTitle())
-		end)
-	end)
-
 	describe('rounddiff', function()
 		it('sums round scores from played games', function()
 			local rounddiff = TiebreakerFactory.tiebreakerFromId('full.rounddiff')
