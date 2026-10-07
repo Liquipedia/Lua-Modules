@@ -60,6 +60,7 @@ local Standings = {}
 ---@field positionChangeFromPreviousRound integer
 ---@field pointsChangeFromPreviousRound number
 ---@field specialStatus 'dq'|'nc'|'' # nc = non-competing (not in the round)
+---@field disqualified boolean
 ---@field additionalStatsValues table<string, {value: integer?, display: string?}>
 ---@field package record standingsentry
 
@@ -156,6 +157,7 @@ function Standings.entryFromRecord(record)
 		matchLosses = record.scoreboard.match.l,
 		pointsChangeFromPreviousRound = record.extradata.pointschange,
 		specialStatus = record.extradata.specialstatus or '',
+		disqualified = record.extradata.disqualified == true,
 		positionChangeFromPreviousRound = tonumber(record.placementchange),
 		additionalStatsValues = record.extradata.additionalStatsValues or {},
 		record = record,

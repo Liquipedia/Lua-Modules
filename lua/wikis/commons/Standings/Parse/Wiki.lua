@@ -159,7 +159,20 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, res
 		opponent = opponent,
 		aliases = aliases,
 		startingPoints = opponentData.startingpoints,
+		disqualifiedFromRound = StandingsParseWiki.parseDisqualifiedFromRound(opponentData.dq),
 	}
+end
+
+---Reads the `dq` input of an opponent. `dq=true` means disqualified from the first round,
+---`dq=<number>` means disqualified from that round onwards.
+---@param input string|number|boolean?
+---@return integer?
+function StandingsParseWiki.parseDisqualifiedFromRound(input)
+	local fromRound = tonumber(input)
+	if fromRound then
+		return math.floor(fromRound)
+	end
+	return Logic.readBool(input) and 1 or nil
 end
 
 ---@param input string
@@ -220,6 +233,7 @@ function StandingsParseWiki.parseTiebreakers(args, tableType)
 			}
 		end
 	end
+	table.insert(tiebreakers, 1, TiebreakerFactory.validateAndNormalizeInput('disqualified'))
 	table.insert(tiebreakers, TiebreakerFactory.validateAndNormalizeInput('manual'))
 	return tiebreakers
 end

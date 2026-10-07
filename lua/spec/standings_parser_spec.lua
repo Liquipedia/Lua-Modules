@@ -190,6 +190,112 @@ describe('Standings Parser', function()
 		assert.are_same({w = 1, d = 1, l = 1}, alpha2.match)
 	end)
 
+	describe('disqualifications', function()
+		local DQ_TIEBREAKERS = {'full.disqualified', 'full.points', 'full.manual'}
+
+		it('puts a disqualified opponent last with dq statuses and a numeric placement', function()
+			local dqOpponent = makeOpponent('Alpha', {{points = 5}, {points = 5}})
+			dqOpponent.disqualifiedFromRound = 1
+			local opponents = {
+				dqOpponent,
+				makeOpponent('Bravo', {{points = 3}, {points = 0}}),
+				makeOpponent('Charlie', {{points = 1}, {points = 0}}),
+			}
+
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, opponents, BGS, nil, {}, 'ffa', DQ_TIEBREAKERS)
+
+			Array.forEach({1, 2}, function(roundIndex)
+				local alpha = findEntry(standingsTable.entries, 'Alpha', roundIndex)
+				assert.is_true(alpha.extradata.disqualified)
+				assert.are_equal(3, alpha.slotindex)
+				assert.are_equal(3, alpha.placement)
+				assert.are_equal('dq', alpha.currentstatus)
+				assert.are_equal('dq', alpha.definitestatus)
+			end)
+
+			local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
+			assert.are_equal(0, alpha2.placementchange)
+
+			local bravo2 = findEntry(standingsTable.entries, 'Bravo', 2)
+			assert.is_nil(bravo2.extradata.disqualified)
+			assert.are_equal(1, bravo2.placement)
+			assert.are_equal('up', bravo2.definitestatus)
+		end)
+
+		it('sets the definite status even when the standings are unfinished', function()
+			local rounds = {
+				{roundNumber = 1, started = true, finished = true},
+				{roundNumber = 2, started = true, finished = false},
+			}
+			local dqOpponent = makeOpponent('Alpha', {{points = 5}, {points = 5}})
+			dqOpponent.disqualifiedFromRound = 1
+			local opponents = {dqOpponent, makeOpponent('Bravo', {{points = 0}, {points = 0}})}
+
+			local standingsTable = StandingsParser.parse(rounds, opponents, BGS, nil, {}, 'ffa', DQ_TIEBREAKERS)
+
+			assert.is_false(standingsTable.finished)
+			local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
+			assert.are_equal('dq', alpha2.currentstatus)
+			assert.are_equal('dq', alpha2.definitestatus)
+			assert.are_equal(2, alpha2.placement)
+			local bravo2 = findEntry(standingsTable.entries, 'Bravo', 2)
+			assert.is_nil(bravo2.definitestatus)
+		end)
+
+		it('only disqualifies from the given round onwards', function()
+			local dqOpponent = makeOpponent('Alpha', {{points = 5}, {points = 5}})
+			dqOpponent.disqualifiedFromRound = 2
+			local opponents = {
+				dqOpponent,
+				makeOpponent('Bravo', {{points = 3}, {points = 0}}),
+				makeOpponent('Charlie', {{points = 1}, {points = 0}}),
+			}
+
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, opponents, BGS, nil, {}, 'ffa', DQ_TIEBREAKERS)
+
+			local alpha1 = findEntry(standingsTable.entries, 'Alpha', 1)
+			assert.is_nil(alpha1.extradata.disqualified)
+			assert.are_equal(1, alpha1.placement)
+			assert.are_equal('up', alpha1.currentstatus)
+
+			local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
+			assert.is_true(alpha2.extradata.disqualified)
+			assert.are_equal(3, alpha2.slotindex)
+			assert.are_equal(3, alpha2.placement)
+			assert.are_equal('dq', alpha2.currentstatus)
+			assert.are_equal('dq', alpha2.definitestatus)
+			-- The placement change stays numeric
+			assert.are_equal(-2, alpha2.placementchange)
+		end)
+
+		it('orders several disqualified opponents by the remaining tiebreakers', function()
+			local alpha = makeOpponent('Alpha', {{points = 2}, {points = 2}})
+			alpha.disqualifiedFromRound = 1
+			local bravo = makeOpponent('Bravo', {{points = 6}, {points = 6}})
+			bravo.disqualifiedFromRound = 1
+			local opponents = {
+				alpha,
+				bravo,
+				makeOpponent('Charlie', {{points = 0}, {points = 0}}),
+			}
+
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, opponents, BGS, nil, {}, 'ffa', DQ_TIEBREAKERS)
+
+			local charlie2 = findEntry(standingsTable.entries, 'Charlie', 2)
+			local bravo2 = findEntry(standingsTable.entries, 'Bravo', 2)
+			local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
+			assert.are_equal(1, charlie2.placement)
+			assert.are_equal(2, bravo2.placement)
+			assert.are_equal(3, alpha2.placement)
+			assert.are_equal('dq', bravo2.definitestatus)
+			assert.are_equal('dq', alpha2.definitestatus)
+			assert.are_equal('up', charlie2.definitestatus)
+		end)
+	end)
+
 	it('increments the standingsindex wiki variable per table', function()
 		local opponents = {makeOpponent('Alpha', {{points = 3}, {points = 0}})}
 

@@ -36,6 +36,7 @@ local StandingsTable = {}
 ---@field opponent standardOpponent
 ---@field aliases standardOpponent[]? # Only for team opponents
 ---@field startingPoints number?
+---@field disqualifiedFromRound integer? # The first round in which the opponent is disqualified
 
 ---@param frame Frame
 ---@return Renderable
