@@ -4,7 +4,6 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
-
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
@@ -13,6 +12,7 @@ local Logic = Lua.import('Module:Logic')
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Data = Lua.import('Module:MapMode/Data', {loadData = true})
 
@@ -43,14 +43,15 @@ function MapMode.display(input)
 		return
 	end
 
-	local icon = Logic.isNotEmpty(data.file) and IconImage{
-		imageLight = data.file,
+	local icon = Logic.isNotEmpty(data.imageLight) and IconImage{
+		imageLight = data.imageLight,
+		imageDark = data.imageDark,
 		link = data.link,
 		alt = data.display,
 	} or nil
 
 	return Html.B{
-		children = Array.extend(
+		children = WidgetUtil.collect(
 			icon,
 			icon and ' ' or nil,
 			Link{link = data.link, children = data.display}
@@ -59,4 +60,5 @@ function MapMode.display(input)
 end
 
 return MapMode
+
 
