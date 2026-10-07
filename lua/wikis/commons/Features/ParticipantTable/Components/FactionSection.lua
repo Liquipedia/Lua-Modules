@@ -77,16 +77,13 @@ local function ParticipantTableFactionSection(props)
 	---@return VNode
 	local entryCell = function(rowIndex, faction)
 		local entry = byFaction[faction] and byFaction[faction][rowIndex]
-		if not entry then
-			return TableWidgets.Cell{}
-		end
-		return Entry{
+		return TableWidgets.Cell{children = entry and Entry{
 			config = props.config,
 			dq = entry.dq,
 			note = entry.note,
 			opponent = entry.opponent,
 			additionalProps = {showFaction = false},
-		}
+		} or nil}
 	end
 
 	return WidgetUtil.collect(

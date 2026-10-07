@@ -53,13 +53,13 @@ local function ParticipantTableSeedList(props)
 						css = {width = '50px'},
 						children = entry.seed,
 					},
-					Entry{
+					TableWidgets.Cell{ children = Entry{
 						config = props.config,
 						dq = entry.dq,
 						note = entry.note,
 						opponent = entry.opponent,
 						additionalProps = {oneLine = true},
-					},
+					}},
 				}}
 			end)}
 		}
