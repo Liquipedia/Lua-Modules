@@ -116,7 +116,7 @@ function Parser._readEntries(args, config)
 	---@type Set<string>
 	local alreadyUsed = Set{}
 
-	return Table.mapArgumentsByPrefix(args, {'p', 'player'}, function(key, index)
+	local entries = Table.mapArgumentsByPrefix(args, {'p', 'player'}, function(key, index)
 		local entry = Parser._readEntry(args, key, index, config)
 		entry.sortName = Opponent.toName(entry.opponent)
 
@@ -140,6 +140,9 @@ function Parser._readEntries(args, config)
 
 		return entry
 	end)
+
+	-- make it an array (`Table.mapArgumentsByPrefix` may have nil gaps)
+	return Array.extractValues(entries)
 end
 
 ---@param sectionArgs table
