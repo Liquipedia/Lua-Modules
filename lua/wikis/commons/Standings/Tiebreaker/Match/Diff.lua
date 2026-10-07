@@ -30,6 +30,9 @@ end
 ---@param opponent TiebreakerOpponent
 ---@return string
 function TiebreakerMatchDiff:display(state, opponent)
+	if self:showsDraws('match') then
+		return opponent.match.w .. ' - ' .. opponent.match.d .. ' - ' .. opponent.match.l
+	end
 	return opponent.match.w .. ' - ' .. opponent.match.l
 end
 

@@ -238,6 +238,15 @@ function StandingsParseWiki.parseTiebreakers(args, tableType)
 	return tiebreakers
 end
 
+---Reads which levels draws are explicitly enabled/disabled for. Unset (nil) means auto-detect from the data.
+---@param args table
+---@return {match: boolean?}
+function StandingsParseWiki.parseDrawConfig(args)
+	return {
+		match = Logic.readBoolOrNil(args.matchdraws),
+	}
+end
+
 ---@param args table
 ---@param opponents StandingTableOpponentData[]
 ---@return table?

@@ -190,6 +190,79 @@ describe('Standings Parser', function()
 		assert.are_same({w = 1, d = 1, l = 1}, alpha2.match)
 	end)
 
+	describe('match draws', function()
+		local MATCHDIFF_TIEBREAKERS = {'full.matchdiff', 'full.manual'}
+
+		---@param drawInRoundTwo boolean
+		local function makeOpponents(drawInRoundTwo)
+			local secondRound = drawInRoundTwo
+				and {w = 0, d = 1, l = 0}
+				or {w = 0, d = 0, l = 1}
+			return {
+				{
+					opponent = literal('Alpha'),
+					rounds = {
+						{scoreboard = {points = 1, match = {w = 1, d = 0, l = 0}}, specialstatus = ''},
+						{scoreboard = {points = 0, match = secondRound}, specialstatus = ''},
+					},
+				},
+				{
+					opponent = literal('Bravo'),
+					rounds = {
+						{scoreboard = {points = 0, match = {w = 0, d = 0, l = 1}}, specialstatus = ''},
+						{scoreboard = {points = 0, match = drawInRoundTwo
+							and {w = 0, d = 1, l = 0}
+							or {w = 1, d = 0, l = 0}
+						}, specialstatus = ''},
+					},
+				},
+			}
+		end
+
+		local function display(standingsTable, name, roundIndex)
+			return findEntry(standingsTable.entries, name, roundIndex)
+				.extradata.additionalStatsValues['full.matchdiff'].display
+		end
+
+		it('shows draws in every round when any match in the table is a draw', function()
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, makeOpponents(true), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS)
+
+			assert.is_true(standingsTable.hasdraw)
+			assert.are_equal('1 - 0 - 0', display(standingsTable, 'Alpha', 1))
+			assert.are_equal('1 - 1 - 0', display(standingsTable, 'Alpha', 2))
+			assert.are_equal('0 - 0 - 1', display(standingsTable, 'Bravo', 1))
+			assert.are_equal('0 - 1 - 1', display(standingsTable, 'Bravo', 2))
+		end)
+
+		it('respects an explicit disable even if there are draws', function()
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, makeOpponents(true), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, {match = false})
+
+			assert.is_false(standingsTable.hasdraw)
+			assert.are_equal('1 - 0', display(standingsTable, 'Alpha', 1))
+			assert.are_equal('1 - 0', display(standingsTable, 'Alpha', 2))
+		end)
+
+		it('respects an explicit enable even if there are no draws', function()
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, makeOpponents(false), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, {match = true})
+
+			assert.is_true(standingsTable.hasdraw)
+			assert.are_equal('1 - 0 - 0', display(standingsTable, 'Alpha', 1))
+			assert.are_equal('1 - 0 - 1', display(standingsTable, 'Alpha', 2))
+		end)
+
+		it('hides draws when there are none and nothing is configured', function()
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, makeOpponents(false), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS)
+
+			assert.is_false(standingsTable.hasdraw)
+			assert.are_equal('1 - 0', display(standingsTable, 'Alpha', 1))
+			assert.are_equal('1 - 1', display(standingsTable, 'Alpha', 2))
+		end)
+	end)
+
 	describe('disqualifications', function()
 		local DQ_TIEBREAKERS = {'full.disqualified', 'full.points', 'full.manual'}
 
