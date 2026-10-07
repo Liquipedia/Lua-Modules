@@ -74,6 +74,8 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 					pointschange = pointsFromRound,
 					specialstatus = statusInRound,
 					tiebreakerpoints = tiebreakerPoints or 0,
+					disqualified = opponentData.disqualifiedFromRound ~= nil
+						and round.roundNumber >= opponentData.disqualifiedFromRound or nil,
 					matchid = matchId,
 					additionalStatsValues = {},
 				}
@@ -139,6 +141,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 			return opponentRound.roundindex == #rounds
 		end), bgs, 'definitestatus')
 	end
+	StandingsParser.applyDisqualifications(entries)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
 	---placement: integer?, slotindex: integer, placementchange: integer?,
 	---currentstatus: string?, definitestatus: string?}[]
@@ -246,6 +249,18 @@ end
 function StandingsParser.addStatuses(opponentEnties, bgs, field)
 	Array.forEach(opponentEnties, function(opponent)
 		opponent[field] = bgs[opponent.slotindex]
+	end)
+end
+
+---Overrides the statuses of disqualified opponents with 'dq'. A disqualification is final,
+---so the definite status is set regardless of the standings being finished or not.
+---@param opponentEntries {extradata: table, currentstatus: string?, definitestatus: string?}[]
+function StandingsParser.applyDisqualifications(opponentEntries)
+	Array.forEach(opponentEntries, function(opponent)
+		if opponent.extradata.disqualified then
+			opponent.currentstatus = 'dq'
+			opponent.definitestatus = 'dq'
+		end
 	end)
 end
 

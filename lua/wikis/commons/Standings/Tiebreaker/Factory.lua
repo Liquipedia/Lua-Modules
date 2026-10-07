@@ -13,6 +13,7 @@ local TiebreakerFactory = {}
 
 local NAME_TO_CLASS = {
 	buchholz = 'Buchholz',
+	disqualified = 'Disqualified',
 	manual = 'Manual',
 	points = 'Points',
 	matchdiff = 'Match/Diff',
@@ -25,7 +26,6 @@ local NAME_TO_CLASS = {
 	gamecount = 'Game/Count',
 	gamewins = 'Game/Wins',
 	gamelosses = 'Game/Losses',
-	gamedraws = 'Game/Draws',
 	gamewinrate = 'Game/WinRate',
 	roundwins = 'Game/Rounds/Wins',
 	roundlosses = 'Game/Rounds/Losses',

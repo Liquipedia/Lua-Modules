@@ -120,6 +120,49 @@ describe('Standings model round trip', function()
 		GoldenTest('standings_ffa', html)
 	end)
 
+	it('maps disqualifications to the model and renders them', function()
+		local rounds = {
+			{roundNumber = 1, started = true, finished = true, title = 'Day 1'},
+			{roundNumber = 2, started = true, finished = true, title = 'Day 2'},
+		}
+		local dqOpponent = makeOpponent('Alpha', {5, 5})
+		dqOpponent.disqualifiedFromRound = 2
+		local standingsTable = StandingsParser.parse(
+			rounds,
+			{dqOpponent, makeOpponent('Bravo', {1, 1}), makeOpponent('Charlie', {0, 0})},
+			{[1] = 'up'},
+			'League Standings',
+			{},
+			'ffa',
+			{'full.disqualified', 'full.points', 'full.manual'}
+		)
+		StandingsStorage.run(standingsTable, {saveVars = true})
+
+		local standings = Standings.getStandingsTable('FakePage', 0)
+		---@cast standings -nil
+
+		local round1 = standings.rounds[1].opponents
+		assert.are_same({'Alpha', 'Bravo', 'Charlie'}, Array.map(round1, function(entry) return entry.opponent.name end))
+		assert.is_false(round1[1].disqualified)
+
+		local round2 = standings.rounds[2].opponents
+		assert.are_same({'Bravo', 'Charlie', 'Alpha'}, Array.map(round2, function(entry) return entry.opponent.name end))
+		local alpha = round2[3]
+		assert.is_true(alpha.disqualified)
+		assert.are_equal(3, tonumber(alpha.placement))
+		assert.are_equal('dq', alpha.positionStatus)
+		assert.are_equal('dq', alpha.definitiveStatus)
+		assert.is_false(round2[1].disqualified)
+
+		local html = tostring(require('Module:Widget/Standings')({pageName = 'FakePage', standingsIndex = 0}))
+		-- The DQ label sits inside the participant cell, next to the opponent
+		assert.is_truthy(html:find(
+			'class="standings%-participant">.-<div class="generic%-label label%-%-placement" data%-placement%-type="dq">DQ</div>'
+		))
+		-- Points stays the bold (first visible) stat, even though the hidden disqualified tiebreaker comes first
+		assert.is_truthy(html:find('style="font-weight:bold">10<', 1, true))
+	end)
+
 	it('renders the swiss standings widget from the model', function()
 		local SwissStandings = require('Module:Widget/Standings/Swiss')
 

@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
 
 local Import = Lua.import('Module:Features/ParticipantTable/Api/Import')
 local ImportParser = Lua.import('Module:Features/ParticipantTable/Lib/ParseImported')
@@ -16,8 +17,9 @@ local Parser = Lua.import('Module:Features/ParticipantTable/Lib/ParseInput')
 local Store = Lua.import('Module:Features/ParticipantTable/Api/Storage')
 local Util = Lua.import('Module:Features/ParticipantTable/Lib/Util')
 
-local Display = Lua.import('Module:Features/ParticipantTable/Components/Wrapper')
 local FactionTable = Lua.import('Module:Features/ParticipantTable/Components/FactionTable')
+local ParticipantTable = Lua.import('Module:Features/ParticipantTable/Components/Table')
+local Wrapper = Lua.import('Module:Features/ParticipantTable/Components/Wrapper')
 
 local Controller = {}
 
@@ -37,24 +39,25 @@ function Controller.execute(frame, CustomConfig)
 
 	sections = Util.filterOnlyNotables(sections)
 
-	if not Util.shouldDisplayAsFactionTable(sections, config) then
-		return Display{
-			hasSeed = Util.hasSeed(sections),
-			sections = sections,
-			config = config,
-		}
+	local shouldDisplayAsFactionTable = Util.shouldDisplayAsFactionTable(sections, config)
+
+	local displayComponent = shouldDisplayAsFactionTable and FactionTable or ParticipantTable
+
+	local factionNumbers
+	local factionColumns
+	if shouldDisplayAsFactionTable then
+		factionNumbers = Util.getFactionNumbers(sections, config)
+		factionColumns = Util.getFactionColumns(config, factionNumbers)
 	end
 
-	local factionNumbers = Util.getFactionNumbers(sections, config)
-	local factionColumns = Util.getFactionColumns(config, factionNumbers)
-
-	-- todo: add faction wrapper that works with seeding table
-	-- for now in factionTable mode seeding table is not supported
-	return FactionTable{
+	return Wrapper{
+		hasSeed = Util.hasSeed(sections),
+		sections = sections,
 		config = config,
+		displayComponent = displayComponent,
 		factionColumns = factionColumns,
 		factionNumbers = factionNumbers,
-		sections = sections,
+		showSeedingFirst = Logic.readBool(args.showSeedingFirst),
 	}
 end
 
