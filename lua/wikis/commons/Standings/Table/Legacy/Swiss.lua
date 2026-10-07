@@ -119,7 +119,7 @@ function StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 		team,
 		tiebreaker = tiebreaker,
 		startingpoints = startingPoints,
-		disqualifiedFromRound = dq and 1 or nil
+		disqualifiedFromRound = dq
 	}
 end
 
@@ -139,7 +139,7 @@ function StandingTableLegacySwiss.parseSoloInput(args, playerIndex)
 		player,
 		tiebreaker = tiebreaker,
 		startingpoints = startingPoints,
-		disqualifiedFromRound = dq and 1 or nil
+		disqualifiedFromRound = dq
 	}
 end
 
