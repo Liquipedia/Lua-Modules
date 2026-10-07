@@ -13,16 +13,10 @@ local Logic = Lua.import('Module:Logic')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Entry = Lua.import('Module:Features/ParticipantTable/Components/Entry')
-local SectionTitle = Lua.import('Module:Features/ParticipantTable/Components/SectionTitle')
-
----@param children Renderable|Renderable[]
----@return VNode
-local makeRow = function(children)
-	return Html.Div{classes = {'participantTable-row'}, children = children}
-end
 
 ---@param props {config: ParticipantTableConfig, section: ParticipantTableSection,
 ---factionColumns: string[]}
@@ -30,21 +24,40 @@ end
 local function ParticipantTableFactionSection(props)
 	local section = props.section
 
-	local sectionTitleRow = makeRow(SectionTitle{
-		tableConfig = props.config,
-		sectionConfig = section.config,
-		numEntries = #Array.filter(section.entries, function(entry)
-			return not entry.dq
-		end),
-	})
+	---@return VNode<Table2RowProps>?
+	local makeSectionTitleRow = function()
+		local sectionConfig = section.config
+		if Logic.isEmpty(sectionConfig.title) then
+			return
+		end
+
+		local makeCount = function()
+			return #Array.filter(section.entries, function(entry)
+				return not entry.dq
+			end)
+		end
+
+		return TableWidgets.Row{children = TableWidgets.CellHeader{
+			children = {
+				sectionConfig.title,
+			sectionConfig.showCountBySection and Html.I{
+				children = {
+					' (',
+					sectionConfig.count or makeCount(),
+					')'
+				}
+			} or nil
+			},
+		}}
+	end
 
 	if Logic.isEmpty(section.entries) then
 		return {
-			sectionTitleRow,
-			makeRow(Html.Div{
-				classes = {'participantTable-tbd'},
+			makeSectionTitleRow(),
+			TableWidgets.Row{children = TableWidgets.Cell{
+				attributes = {colspan = #props.factionColumns},
 				children = 'To be determined',
-			})
+			}}
 		}
 	end
 
@@ -62,7 +75,7 @@ local function ParticipantTableFactionSection(props)
 	local entryCell = function(rowIndex, faction)
 		local entry = byFaction[faction] and byFaction[faction][rowIndex]
 		if not entry then
-			return Html.Div{classes = {'participantTable-entry'}}
+			return TableWidgets.Cell{}
 		end
 		return Entry{
 			config = props.config,
@@ -74,9 +87,9 @@ local function ParticipantTableFactionSection(props)
 	end
 
 	return WidgetUtil.collect(
-		sectionTitleRow,
+		makeSectionTitleRow(),
 		Array.mapRange(1, maxFactionLength, function(rowIndex)
-			return makeRow(Array.map(props.factionColumns, FnUtil.curry(entryCell, rowIndex)))
+			return TableWidgets.Row{children = Array.map(props.factionColumns, FnUtil.curry(entryCell, rowIndex))}
 		end)
 	)
 end
