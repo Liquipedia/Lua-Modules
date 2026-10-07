@@ -18,8 +18,11 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class ValorantMapInfobox: MapInfobox
+---@operator call(Frame): ValorantMapInfobox
 local CustomMap = Class.new(Map)
+
 ---@class ValorantMapInfoboxWidgetInjector: WidgetInjector
+---@operator call(ValorantMapInfobox): ValorantMapInfoboxWidgetInjector
 ---@field caller ValorantMapInfobox
 local CustomInjector = Class.new(Injector)
 
