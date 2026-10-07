@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 
 local Component = Lua.import('Module:Widget/Component')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Header = Lua.import('Module:Features/ParticipantTable/Components/FactionHeader')
 local Section = Lua.import('Module:Features/ParticipantTable/Components/FactionSection')
