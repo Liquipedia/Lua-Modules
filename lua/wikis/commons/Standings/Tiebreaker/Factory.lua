@@ -53,15 +53,16 @@ function TiebreakerFactory.validateAndNormalizeInput(input)
 end
 
 ---@param tiebreakerId string
+---@param options StandingsTiebreakerOptions?
 ---@return StandingsTiebreaker
-function TiebreakerFactory.tiebreakerFromId(tiebreakerId)
+function TiebreakerFactory.tiebreakerFromId(tiebreakerId, options)
 	local context, name = unpack(String.split(tiebreakerId, '%.'))
 	local tiebreakerClassName = NAME_TO_CLASS[name]
 	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(tiebreakerId))
 	---@type StandingsTiebreaker
 	local TiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. tiebreakerClassName)
 
-	return TiebreakerClass(context)
+	return TiebreakerClass(context, options)
 end
 
 return TiebreakerFactory

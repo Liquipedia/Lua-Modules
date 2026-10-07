@@ -44,6 +44,7 @@ function StandingTableLegacySwiss.getStandardParameter(args)
 		exclusive = Logic.nilOr(Logic.readBoolOrNil(args.exclusive), true),
 		title = args.title,
 		placements = args.placements,
+		matchdraws = args.ties ~= 'auto' and args.ties or nil,
 	}
 end
 
