@@ -139,6 +139,16 @@
 	}
 }
 
+.standings-ffa,
+.standings-swiss {
+	.standings-participant {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+	}
+}
+
 .standings-match-overview {
 	display: flex;
 	justify-content: space-between;
