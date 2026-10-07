@@ -260,6 +260,9 @@ describe('Standings Parser', function()
 			assert.is_false(standingsTable.hasdraw)
 			assert.are_equal('1 - 0', display(standingsTable, 'Alpha', 1))
 			assert.are_equal('1 - 1', display(standingsTable, 'Alpha', 2))
+		end)
+	end)
+
 	describe('disqualifications', function()
 		local DQ_TIEBREAKERS = {'full.disqualified', 'full.points', 'full.manual'}
 
