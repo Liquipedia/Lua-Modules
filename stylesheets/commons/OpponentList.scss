@@ -52,11 +52,6 @@ Modules: Features/ParticipantTable/*
 	}
 }
 
-.participantTable-seeding {
-	display: grid;
-	grid-template-columns: 50px 1fr;
-}
-
 .participantTable-entry {
 	background-color: var( --clr-background );
 	border: 1px solid var( --clr-on-surface-light-primary-12 );
@@ -137,18 +132,6 @@ Modules: Features/ParticipantTable/*
 	border: 1px solid var( --clr-on-surface-light-primary-12 );
 	padding: 4px;
 	font-style: italic;
-	text-align: center;
-	width: 100%;
-
-	.theme--dark & {
-		border: 1px solid var( --clr-on-surface-dark-primary-12 );
-	}
-}
-
-.participantTable-seed {
-	background-color: var( --clr-background );
-	border: 1px solid var( --clr-on-surface-light-primary-12 );
-	padding: 8px 4px 4px;
 	text-align: center;
 	width: 100%;
 
