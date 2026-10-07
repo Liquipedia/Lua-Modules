@@ -1127,6 +1127,12 @@ div.brkts-popup-body-element-thumbs {
 	}
 }
 
+.wiki-dota2,
+.wiki-dota2gameru {
+	--dota2-radiant-side-color: var( --clr-atlantis-40 );
+	--dota2-dire-side-color: var( --clr-california-40 );
+}
+
 .brkts-popup-side-color {
 	img {
 		outline: 0.125rem solid transparent;
@@ -1150,11 +1156,11 @@ div.brkts-popup-body-element-thumbs {
 	}
 
 	&--radiant img {
-		outline-color: #bcd985;
+		outline-color: var( --dota2-radiant-side-color );
 	}
 
 	&--dire img {
-		outline-color: #e79e7e;
+		outline-color: var( --dota2-dire-side-color );
 	}
 }
 
