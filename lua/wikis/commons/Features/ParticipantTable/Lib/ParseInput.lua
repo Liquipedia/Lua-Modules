@@ -70,7 +70,7 @@ function Parser.readConfig(args, parentConfig)
 		manualFactionCounts = Table.map(Faction.knownFactions or {}, function(key, faction)
 			return faction, tonumber(args[Faction.toName(faction):lower()])
 		end),
-		factionColumnWidth = tonumber(args.entrywidth) or showTeams and 212 or 156,
+		factionColumnWidth = (tonumber(args.entrywidth) or showTeams and 212 or 156) .. 'px',
 		showCountByFaction = Logic.readBool(args.countByFaction),
 	}
 

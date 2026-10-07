@@ -7,6 +7,7 @@ Modules: Features/ParticipantTable/*
 	border-radius: 0.5rem;
 	margin-bottom: 8px;
 	overflow-x: auto;
+	max-width: 100% !important;
 
 	.theme--dark & {
 		border: 1px solid var( --clr-on-surface-dark-primary-12 );
@@ -16,12 +17,8 @@ Modules: Features/ParticipantTable/*
 		min-width: 100% !important;
 	}
 
-	&:not( .participantTable-faction ) {
-		max-width: 100% !important;
-
-		@media ( max-width: 900px ) {
-			width: 100% !important;
-		}
+	@media ( max-width: 900px ) {
+		width: 100% !important;
 	}
 }
 
@@ -44,12 +41,8 @@ Modules: Features/ParticipantTable/*
 
 .participantTable-row {
 	width: 100% !important;
-
-	&:not( .participantTable-faction ) {
-		width: 100% !important;
-		display: flex;
-		flex-wrap: wrap;
-	}
+	display: flex;
+	flex-wrap: wrap;
 }
 
 .participantTable-entry {
@@ -65,12 +58,10 @@ Modules: Features/ParticipantTable/*
 	}
 
 	@media ( max-width: 900px ) {
-		&:not( .participantTable-faction ) {
-			flex: 1 0 auto;
-			width: unset !important;
-			min-width: 50%;
-			min-height: 36px;
-		}
+		flex: 1 0 auto;
+		width: unset !important;
+		min-width: 50%;
+		min-height: 36px;
 	}
 
 	&.brkts-opponent-hover-active {
@@ -146,22 +137,4 @@ Modules: Features/ParticipantTable/*
 	@media ( max-width: 900px ) {
 		display: none;
 	}
-}
-
-/* specific overwrites for faction participant tables */
-.participantTable.participantTable-faction {
-	display: inline-grid;
-}
-
-.participantTable-faction > .participantTable-row {
-	display: contents;
-
-	> .participantTable-tbd,
-	> .participantTable-title {
-		grid-column: 1 / -1;
-	}
-}
-
-.participantTable-faction-header {
-	font-weight: bold;
 }
