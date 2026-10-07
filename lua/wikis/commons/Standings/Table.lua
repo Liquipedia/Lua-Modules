@@ -29,6 +29,7 @@ local StandingsTable = {}
 ---@class Scoreboard
 ---@field points number?
 ---@field match {w: integer, d: integer, l: integer}
+---@field overtime {w: integer, l: integer}?
 
 ---@class StandingTableOpponentData
 ---@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?,
@@ -62,19 +63,22 @@ function StandingsTable.fromTemplate(frame)
 	local matches = parsedData.matches
 
 	local tiebreakers = StandingsParseWiki.parseTiebreakers(args, tableType)
+	local overtime = StandingsParseWiki.parseOvertime(args)
 
 	if importScoreFromMatches then
-		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args)
+		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args, overtime)
 
 		local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction, opponents, {
 			exclusive = exclusiveOpponents,
 			importOpponents = importOpponentFromMatches,
+			overtime = overtime,
 		})
 		opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
 	end
 
 	local standingsTable = StandingsParser.parse(
-		rounds, opponents, bgs, title, matches, tableType, tiebreakers, StandingsParseWiki.parseDrawConfig(args)
+		rounds, opponents, bgs, title, matches, tableType, tiebreakers, StandingsParseWiki.parseDrawConfig(args),
+		overtime
 	)
 
 	if tableType == 'swiss' then

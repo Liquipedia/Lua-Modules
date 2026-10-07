@@ -37,6 +37,34 @@ describe('Standings Storage', function()
 		stubLpdbStandingsTable:revert()
 	end)
 
+	describe('table', function()
+		---@param data table
+		---@return table
+		local function storeTable(data)
+			data.standingsindex = 0
+			data.type = 'swiss'
+			return StandingsStorage.table(data)
+		end
+
+		it('stores hasovertimes', function()
+			local standingsTable = storeTable{hasovertimes = true}
+			assert.is_true(standingsTable.config.hasovertimes)
+			assert.is_true(standingsTable.extradata.hasovertime)
+		end)
+
+		it('stores the legacy hasovertime input', function()
+			local standingsTable = storeTable{hasovertime = true}
+			assert.is_true(standingsTable.config.hasovertimes)
+			assert.is_true(standingsTable.extradata.hasovertime)
+		end)
+
+		it('prefers hasovertimes over hasovertime', function()
+			local standingsTable = storeTable{hasovertimes = false, hasovertime = true}
+			assert.is_false(standingsTable.config.hasovertimes)
+			assert.is_false(standingsTable.extradata.hasovertime)
+		end)
+	end)
+
 	it('storage full', function()
 		TeamTemplateMock.setUp()
 		local standingsData = require('test_assets.standings')

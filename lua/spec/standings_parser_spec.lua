@@ -742,6 +742,69 @@ describe('Standings Parser', function()
 		end)
 	end)
 
+	describe('overtime', function()
+		local MATCHDIFF_TIEBREAKERS = {'full.matchdiff', 'full.manual'}
+
+		local function makeOpponents()
+			return {
+				{
+					opponent = literal('Alpha'),
+					rounds = {
+						{scoreboard = {points = 3, match = {w = 1, d = 0, l = 0}, overtime = {w = 0, l = 0}},
+							specialstatus = ''},
+						{scoreboard = {points = 2, match = {w = 0, d = 0, l = 0}, overtime = {w = 1, l = 0}},
+							specialstatus = ''},
+					},
+				},
+				{
+					opponent = literal('Bravo'),
+					rounds = {
+						{scoreboard = {points = 0, match = {w = 0, d = 0, l = 1}, overtime = {w = 0, l = 0}},
+							specialstatus = ''},
+						{scoreboard = {points = 1, match = {w = 0, d = 0, l = 0}, overtime = {w = 0, l = 1}},
+							specialstatus = ''},
+					},
+				},
+			}
+		end
+
+		it('carries overtime across rounds', function()
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, makeOpponents(), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, nil, true)
+
+			assert.is_true(standingsTable.hasovertimes)
+			assert.are_same({w = 0, l = 0}, findEntry(standingsTable.entries, 'Alpha', 1).overtime)
+			assert.are_same({w = 1, l = 0}, findEntry(standingsTable.entries, 'Alpha', 2).overtime)
+			assert.are_same({w = 1, d = 0, l = 0}, findEntry(standingsTable.entries, 'Alpha', 2).match)
+			assert.are_same({w = 0, l = 1}, findEntry(standingsTable.entries, 'Bravo', 2).overtime)
+			assert.are_equal('1 - 1 - 0 - 0',
+				findEntry(standingsTable.entries, 'Alpha', 2).extradata.additionalStatsValues['full.matchdiff'].display)
+			assert.are_equal('0 - 0 - 1 - 1',
+				findEntry(standingsTable.entries, 'Bravo', 2).extradata.additionalStatsValues['full.matchdiff'].display)
+		end)
+
+		it('does not give entries an overtime field when disabled', function()
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, makeOpponents(), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS)
+
+			assert.is_false(standingsTable.hasovertimes)
+			Array.forEach(standingsTable.entries, function(entry)
+				assert.is_nil(entry.overtime)
+			end)
+			assert.are_equal('1 - 0',
+				findEntry(standingsTable.entries, 'Alpha', 2).extradata.additionalStatsValues['full.matchdiff'].display)
+		end)
+
+		it('places by total wins including overtime', function()
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, makeOpponents(), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, nil, true)
+
+			-- Alpha 2 wins, Bravo 2 losses
+			assert.are_equal(1, findEntry(standingsTable.entries, 'Alpha', 2).placement)
+			assert.are_equal(2, findEntry(standingsTable.entries, 'Bravo', 2).placement)
+		end)
+	end)
+
 	it('increments the standingsindex wiki variable per table', function()
 		local opponents = {makeOpponent('Alpha', {{points = 3}, {points = 0}})}
 
