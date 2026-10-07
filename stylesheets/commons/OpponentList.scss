@@ -150,3 +150,11 @@ th.participantTable-faction-section-title {
 		background-color: var( --clr-on-surface-dark-primary-8 );
 	}
 }
+
+td.participantTable-tableEntry:has( div.brkts-opponent-hover ) {
+	padding: 0;
+}
+
+td.participantTable-tableEntry > div.brkts-opponent-hover {
+	padding: 0.5rem 0.75rem;
+}
