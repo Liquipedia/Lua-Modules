@@ -32,12 +32,15 @@ local function ParticipantTableFactionHeader(props)
 
 		return TableWidgets.CellHeader{
 			classes = {Faction.bgClass(faction)},
-			css = {width = config.factionColumnWidth},
 			children = parts,
 		}
 	end
 
-	return TableWidgets.Row{children =  Array.map(props.factionColumns, makeFactionHeaderCell)}
+	return TableWidgets.TableHeader{
+		children = TableWidgets.Row{
+			children =  Array.map(props.factionColumns, makeFactionHeaderCell)
+		}
+	}
 end
 
 return Component.component(ParticipantTableFactionHeader)

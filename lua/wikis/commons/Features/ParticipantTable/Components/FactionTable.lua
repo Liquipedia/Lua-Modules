@@ -22,20 +22,23 @@ local Section = Lua.import('Module:Features/ParticipantTable/Components/FactionS
 local function ParticipantTableFactionTable(props)
 	return TableWidgets.Table{
 		attributes = props.hasSeed and {['data-toggle-area-content'] = 1} or nil,
-		children = WidgetUtil.collect(
+		columns = Array.rep({width = props.config.factionColumnWidth}, #props.factionColumns),
+		children = {
 			Header{
 				config = props.config,
 				factionColumns = props.factionColumns,
 				factionNumbers = props.factionNumbers,
 			},
-			Array.map(props.sections, function(section)
-				return Section{
-					config = props.config,
-					section = section,
-					factionColumns = props.factionColumns,
-				}
-			end)
-		)
+			TableWidgets.TableBody{
+				children = Array.flatMap(props.sections, function(section)
+					return Section{
+						config = props.config,
+						section = section,
+						factionColumns = props.factionColumns,
+					}
+				end),
+			},
+		}
 	}
 end
 

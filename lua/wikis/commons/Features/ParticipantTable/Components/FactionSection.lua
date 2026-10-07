@@ -38,15 +38,16 @@ local function ParticipantTableFactionSection(props)
 		end
 
 		return TableWidgets.Row{children = TableWidgets.CellHeader{
+			attributes = {colspan = #props.factionColumns},
 			children = {
 				sectionConfig.title,
-			sectionConfig.showCountBySection and Html.I{
-				children = {
-					' (',
-					sectionConfig.count or makeCount(),
-					')'
-				}
-			} or nil
+				sectionConfig.showCountBySection and Html.I{
+					children = {
+						' (',
+						sectionConfig.count or makeCount(),
+						')'
+					}
+				} or nil
 			},
 		}}
 	end
