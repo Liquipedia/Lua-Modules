@@ -38,6 +38,8 @@ local function ParticipantTableFactionSection(props)
 		end
 
 		return TableWidgets.Row{children = TableWidgets.CellHeader{
+			-- to make it not look bad with the odd/even strip we need to adjust the color for the title rows a bit
+			classes = {'participantTable-faction-section-title'},
 			attributes = {colspan = #props.factionColumns},
 			children = {
 				sectionConfig.title,
