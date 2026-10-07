@@ -61,6 +61,9 @@ function StandingTableLegacySwiss.classic(frame)
 
 	---@type StandingTableOpponentData[]
 	local opponents = Array.mapIndexes(function(teamIndex)
+		if args.opptype == 'solo' then
+			return StandingTableLegacySwiss.parseSoloInput(args, teamIndex)
+		end
 		return StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 	end)
 
@@ -89,18 +92,55 @@ function StandingTableLegacySwiss.parseRoundInput(args, roundIndex, matches)
 end
 
 ---@param args table
+---@param index integer
+---@return string?
+---@return string?
+---@return boolean?
+local function parseCoreInput(args, index)
+	local tiebreaker = args['temp_tie' .. index]
+	local startingPoints = args['temp_p' .. index]
+	local dq = Logic.readBoolOrNil(args['dq' .. index])
+	return tiebreaker, startingPoints, dq
+end
+
+---@param args table
 ---@param teamIndex integer
----@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, r1: string?}?
+---@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, dq: string?}?
 function StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 	local team = args['team' .. teamIndex]
 	if not team then
 		return nil
 	end
 
-	local tiebreaker = args['temp_tie' .. teamIndex]
-	local startingPoints = args['temp_p' .. teamIndex]
+	local tiebreaker, startingPoints, dq = parseCoreInput(args, teamIndex)
 
-	return {type = Opponent.team, team, tiebreaker = tiebreaker, startingpoints = startingPoints}
+	return {
+		type = Opponent.team,
+		team,
+		tiebreaker = tiebreaker,
+		startingpoints = startingPoints,
+		disqualifiedFromRound = dq and 1 or nil
+	}
+end
+
+---@param args table
+---@param playerIndex integer
+---@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, dq: string?}?
+function StandingTableLegacySwiss.parseSoloInput(args, playerIndex)
+	local player = args['player' .. playerIndex]
+	if not player then
+		return nil
+	end
+
+	local tiebreaker, startingPoints, dq = parseCoreInput(args, playerIndex)
+
+	return {
+		type = Opponent.solo,
+		player,
+		tiebreaker = tiebreaker,
+		startingpoints = startingPoints,
+		disqualifiedFromRound = dq and 1 or nil
+	}
 end
 
 ---@param args table
