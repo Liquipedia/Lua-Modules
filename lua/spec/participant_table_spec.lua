@@ -74,18 +74,26 @@ describe('Participant Table', function()
 			stub(mw.ext.LiquipediaDB, "lpdb_placement")
 			InfoboxLeague.run(tournamentData)
 
-			local notAsFactionTable = function(args)
-				return Table.merge(args, {soloAsFactionTable = false})
+			local make = function(args)
+				return tostring(ParticipantTable.run(args))
 			end
 
-			GoldenTest('participant_table', tostring(ParticipantTable.run(notAsFactionTable(argsPlain))))
-			GoldenTest('participant_faction_table', tostring(ParticipantTable.run(argsPlain)))
-			GoldenTest('participant_table_with_seed', tostring(ParticipantTable.run(notAsFactionTable(argsWithSeed))))
-			-- doesn't work yet due to it not being implemented yet
-			--GoldenTest('participant_faction_table_with_seed', tostring(ParticipantTable.run(argsWithSeed)))
-			GoldenTest('participant_table_with_duo', tostring(ParticipantTable.run(argsDuoOpponent)))
-			GoldenTest('participant_table_with_section', tostring(ParticipantTable.run(notAsFactionTable(argsWithSections))))
-			GoldenTest('participant_faction_table_with_section', tostring(ParticipantTable.run(argsWithSections)))
+			local notAsFactionTable = function(args)
+				return make(Table.merge(args, {soloAsFactionTable = false}))
+			end
+
+			local showSeedingFirst = function(args)
+				return Table.merge(args, {showSeedingFirst = true})
+			end
+
+			GoldenTest('participant_table', notAsFactionTable(argsPlain))
+			GoldenTest('participant_faction_table', make(argsPlain))
+			GoldenTest('participant_table_with_seed', notAsFactionTable(argsWithSeed))
+			GoldenTest('participant_faction_table_with_seed', make(argsWithSeed))
+			GoldenTest('participant_table_seed_list', make(showSeedingFirst(argsWithSeed)))
+			GoldenTest('participant_table_with_duo', make(argsDuoOpponent))
+			GoldenTest('participant_table_with_section', notAsFactionTable(argsWithSections))
+			GoldenTest('participant_faction_table_with_section', make(argsWithSections))
 
 			mw.ext.LiquipediaDB.lpdb_tournament:revert()
 			---@diagnostic disable-next-line: undefined-field
