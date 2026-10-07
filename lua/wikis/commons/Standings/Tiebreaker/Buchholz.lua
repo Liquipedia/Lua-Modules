@@ -14,6 +14,7 @@ local MathUtil = Lua.import('Module:MathUtil')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
+local TiebreakerMatchUtil = Lua.import('Module:Standings/Tiebreaker/Match/Util')
 
 ---@class TiebreakerBuchholz : StandingsTiebreaker
 local TiebreakerBuchholz = Class.new(TiebreakerInterface)
@@ -22,7 +23,8 @@ local TiebreakerBuchholz = Class.new(TiebreakerInterface)
 ---@param member TiebreakerOpponent
 ---@return number
 function TiebreakerBuchholz:scoreOf(member)
-	return member.match.w - member.match.l
+	local matches = TiebreakerMatchUtil.getMatches(member)
+	return matches.w - matches.l
 end
 
 ---Score of each distinct opponent faced in a finished match, in the order of the state

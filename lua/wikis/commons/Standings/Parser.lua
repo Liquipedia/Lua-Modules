@@ -25,8 +25,11 @@ local StandingsParser = {}
 ---@param standingsType StandingsTableTypes
 ---@param tiebreakerIds string[]
 ---@param drawConfig {match: boolean?}? Explicit draw toggles per level; when unset, draws are detected from the data
+---@param overtimeEnabled boolean? Whether overtime results are tracked separately from regulation results
 ---@return StandingsTableStorage
-function StandingsParser.parse(rounds, opponents, bgs, title, matches, standingsType, tiebreakerIds, drawConfig)
+function StandingsParser.parse(
+	rounds, opponents, bgs, title, matches, standingsType, tiebreakerIds, drawConfig, overtimeEnabled
+)
 	-- TODO: When all legacy (of all standing type) have been converted, the wiki variable should be updated
 	-- to follow the namespace format. Eg new name could be `standings_standingsindex`
 	local lastStandingsIndex = tonumber(Variables.varDefault('standingsindex')) or -1
@@ -40,6 +43,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		local carryData = {
 			points = opponentData.startingPoints or 0,
 			match = {w = 0, d = 0, l = 0},
+			overtime = overtimeEnabled and {w = 0, l = 0} or nil,
 		}
 		local opponentRounds = opponentData.rounds
 
@@ -58,18 +62,23 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 					carryData.match.d = carryData.match.d + thisRoundsData.scoreboard.match.d
 					carryData.match.l = carryData.match.l + thisRoundsData.scoreboard.match.l
 				end
+				if carryData.overtime and thisRoundsData.scoreboard.overtime then
+					carryData.overtime.w = carryData.overtime.w + thisRoundsData.scoreboard.overtime.w
+					carryData.overtime.l = carryData.overtime.l + thisRoundsData.scoreboard.overtime.l
+				end
 				playedMatches = thisRoundsData.matches
 				playedMatchPoints = thisRoundsData.matchPoints
 			end
 			carryData.points = carryData.points + (pointsFromRound or 0)
 			---@type {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?,
-			---match: {w: integer, d: integer, l: integer}}
+			---match: {w: integer, d: integer, l: integer}, overtime: {w: integer, l: integer}?}
 			return {
 				opponent = opponent,
 				standingsindex = standingsindex,
 				roundindex = round.roundNumber,
 				points = carryData.points,
 				match = Table.copy(carryData.match),
+				overtime = carryData.overtime and Table.copy(carryData.overtime) or nil,
 				matches = playedMatches or {},
 				matchPoints = playedMatchPoints or {},
 				startingPoints = opponentData.startingPoints,
@@ -162,7 +171,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		matches = matches,
 		roundcount = #rounds,
 		hasdraw = draws.match,
-		hasovertime = false,
+		hasovertimes = Logic.readBool(overtimeEnabled),
 		haspoints = true,
 		finished = isFinished,
 		extradata = {

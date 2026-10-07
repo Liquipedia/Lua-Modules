@@ -33,6 +33,13 @@ end
 ---@return string
 function TiebreakerGameDiff:display(state, opponent)
 	local games = TiebreakerGameUtil.getGames(opponent)
+	-- With overtime, regulation and overtime results are shown separately
+	if opponent.overtime then
+		local overtimeGames = TiebreakerGameUtil.getOvertimeGames(opponent)
+		return table.concat({
+			games.w - overtimeGames.w, overtimeGames.w, overtimeGames.l, games.l - overtimeGames.l
+		}, ' - ')
+	end
 	return games.w .. ' - ' .. games.l
 end
 

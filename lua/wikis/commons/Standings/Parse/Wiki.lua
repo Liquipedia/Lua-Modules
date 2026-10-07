@@ -23,6 +23,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local StandingsOvertime = Lua.import('Module:Standings/Overtime')
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
 local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
@@ -247,8 +248,9 @@ end
 
 ---@param tabletype StandingsTableTypes
 ---@param args table
+---@param overtime boolean? # Regulation win 3, overtime win 2, overtime loss 1, regulation loss 0
 ---@return fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number|nil
-function StandingsParseWiki.makeScoringFunction(tabletype, args)
+function StandingsParseWiki.makeScoringFunction(tabletype, args, overtime)
 	if tabletype == 'ffa' then
 		if not args['p1'] then
 			return function(opponent)
@@ -263,6 +265,18 @@ function StandingsParseWiki.makeScoringFunction(tabletype, args)
 			return scoreFromPlacement or 0
 		end
 	elseif tabletype == 'swiss' then
+		if overtime then
+			return function(opponent, match)
+				if not match.finished then
+					return nil
+				end
+				local isWinner = opponent.placement == 1
+				if StandingsOvertime.isOvertimeMatch(match) then
+					return isWinner and 2 or 1
+				end
+				return isWinner and 3 or 0
+			end
+		end
 		local points = StandingsParseWiki.parsePoints(args.points)
 		return function(opponent, match)
 			if not match.finished then
@@ -312,6 +326,17 @@ function StandingsParseWiki.parseDrawConfig(args)
 	return {
 		match = Logic.readBoolOrNil(args.matchdraws),
 	}
+end
+
+---Reads whether overtime is tracked separately from regulation. Requires an overtime config on the wiki.
+---@param args table
+---@return boolean
+function StandingsParseWiki.parseOvertime(args)
+	local overtime = Logic.readBool(args.overtime)
+	if overtime and not StandingsOvertime.regulationRounds() then
+		error('Overtime standings require `Info.config.standings.overtime.regulationRounds` to be configured')
+	end
+	return overtime
 end
 
 ---@param args table

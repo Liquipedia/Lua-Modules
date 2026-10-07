@@ -155,4 +155,75 @@ describe('Standings Tiebreaker Scope', function()
 			assert.are_same({w = 40, d = 41, l = 42}, alpha.match)
 		end)
 	end)
+
+	describe('overtime', function()
+		local Info = require('Module:Info')
+		local originalStandingsConfig
+
+		before_each(function()
+			originalStandingsConfig = Info.config.standings
+			Info.config.standings = {overtime = {regulationRounds = 12}}
+		end)
+
+		after_each(function()
+			Info.config.standings = originalStandingsConfig
+		end)
+
+		---@param names string[]
+		---@param props {id: string, winner: integer?, finished: boolean?}
+		---@param rounds integer[]
+		---@return table
+		local function makeBo1(names, props, rounds)
+			local match = makeMatch(names, props)
+			match.games = {{winner = props.winner, scores = rounds, status = ''}}
+			return match
+		end
+
+		it('tallies overtime results apart from regulation results', function()
+			local alpha = {type = 'literal', name = 'Alpha'}
+			local scoreboard = TiebreakerScope.tally(alpha, {
+				makeBo1({'Alpha', 'Bravo'}, {id = 'M1', winner = 1}, {7, 3}),
+				makeBo1({'Alpha', 'Charlie'}, {id = 'M2', winner = 1}, {8, 6}),
+				makeBo1({'Alpha', 'Delta'}, {id = 'M3', winner = 2}, {6, 8}),
+				makeBo1({'Alpha', 'Echo'}, {id = 'M4', winner = 2}, {2, 7}),
+			}, nil, true)
+
+			assert.are_same({w = 1, d = 0, l = 1}, scoreboard.match)
+			assert.are_same({w = 1, l = 1}, scoreboard.overtime)
+		end)
+
+		it('does not tally overtime when it is not enabled', function()
+			local alpha = {type = 'literal', name = 'Alpha'}
+			local scoreboard = TiebreakerScope.tally(alpha, {
+				makeBo1({'Alpha', 'Bravo'}, {id = 'M1', winner = 1}, {8, 6}),
+			}, nil)
+
+			assert.are_same({w = 1, d = 0, l = 0}, scoreboard.match)
+			assert.is_nil(scoreboard.overtime)
+		end)
+
+		it('keeps overtime results for opponents tracking overtime', function()
+			local regulation = makeBo1({'Alpha', 'Bravo'}, {id = 'M1', winner = 1}, {7, 2})
+			local overtime = makeBo1({'Alpha', 'Bravo'}, {id = 'M2', winner = 2}, {6, 8})
+			local alpha = makeOpponent('Alpha', {regulation, overtime})
+			local bravo = makeOpponent('Bravo', {regulation, overtime})
+			alpha.overtime = {w = 0, l = 1}
+			bravo.overtime = {w = 1, l = 0}
+
+			local scoped = TiebreakerScope.restrictTo{alpha, bravo}
+
+			assert.are_same({w = 1, d = 0, l = 0}, scoped[1].match)
+			assert.are_same({w = 0, l = 1}, scoped[1].overtime)
+			assert.are_same({w = 0, d = 0, l = 1}, scoped[2].match)
+			assert.are_same({w = 1, l = 0}, scoped[2].overtime)
+		end)
+
+		it('does not add overtime to opponents without it', function()
+			local match = makeBo1({'Alpha', 'Bravo'}, {id = 'M1', winner = 1}, {8, 6})
+			local scoped = TiebreakerScope.restrictTo{makeOpponent('Alpha', {match}), makeOpponent('Bravo', {match})}
+
+			assert.are_same({w = 1, d = 0, l = 0}, scoped[1].match)
+			assert.is_nil(scoped[1].overtime)
+		end)
+	end)
 end)

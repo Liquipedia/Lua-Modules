@@ -11,6 +11,8 @@ local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
+local StandingsOvertime = Lua.import('Module:Standings/Overtime')
+
 local TiebreakerScope = {}
 
 ---Result of a finished match from the point of view of one of its opponents.
@@ -24,13 +26,16 @@ end
 ---Tallies the points and the match record of an opponent over the given matches.
 ---Unfinished matches only count towards the points, not the match record.
 ---The points are nil if none of the matches gave the opponent points.
+---With overtime, results of overtime matches are tallied apart, so `match` only holds regulation results.
 ---@param opponent standardOpponent
 ---@param matches MatchGroupUtilMatch[]
 ---@param matchPoints table<string, number>?
----@return {points: number?, match: {w: integer, d: integer, l: integer}}
-function TiebreakerScope.tally(opponent, matches, matchPoints)
+---@param overtime boolean?
+---@return {points: number?, match: {w: integer, d: integer, l: integer}, overtime: {w: integer, l: integer}?}
+function TiebreakerScope.tally(opponent, matches, matchPoints, overtime)
 	local points
 	local matchRecord = {w = 0, d = 0, l = 0}
+	local overtimeRecord = overtime and {w = 0, l = 0} or nil
 	Array.forEach(matches, function(match)
 		local pointsOfMatch = (matchPoints or {})[match.matchId]
 		if pointsOfMatch then
@@ -43,9 +48,13 @@ function TiebreakerScope.tally(opponent, matches, matchPoints)
 		local matchOpponent = Array.find(match.opponents, FnUtil.curry(Opponent.same, opponent))
 		---@cast matchOpponent -nil
 		local result = TiebreakerScope.matchResult(match, matchOpponent)
+		if overtimeRecord and result ~= 'd' and StandingsOvertime.isOvertimeMatch(match) then
+			overtimeRecord[result] = overtimeRecord[result] + 1
+			return
+		end
 		matchRecord[result] = matchRecord[result] + 1
 	end)
-	return {points = points, match = matchRecord}
+	return {points = points, match = matchRecord, overtime = overtimeRecord}
 end
 
 ---Restricts the opponents to the matches played among the tied opponents only,
@@ -66,7 +75,9 @@ function TiebreakerScope.restrictTo(tiedOpponents)
 			return Array.all(match.opponents, isTied)
 		end)
 
-		local scoreboard = TiebreakerScope.tally(tiedOpponent.opponent, matches, tiedOpponent.matchPoints)
+		local scoreboard = TiebreakerScope.tally(
+			tiedOpponent.opponent, matches, tiedOpponent.matchPoints, tiedOpponent.overtime ~= nil
+		)
 
 		return {
 			opponent = tiedOpponent.opponent,
@@ -74,6 +85,7 @@ function TiebreakerScope.restrictTo(tiedOpponents)
 			matches = matches,
 			matchPoints = tiedOpponent.matchPoints,
 			match = scoreboard.match,
+			overtime = scoreboard.overtime,
 			extradata = tiedOpponent.extradata,
 		}
 	end)
