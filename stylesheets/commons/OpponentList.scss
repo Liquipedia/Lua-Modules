@@ -26,7 +26,7 @@ Modules: Features/ParticipantTable/*
 }
 
 .participantTable-title {
-	padding: 4px;
+	padding: 0.5rem 0.75rem;
 	background-color: var( --clr-on-surface-light-primary-4 );
 	outline-color: var( --clr-on-surface-light-primary-12 );
 	color: var( --clr-secondary-25 );
@@ -60,7 +60,7 @@ Modules: Features/ParticipantTable/*
 .participantTable-entry {
 	background-color: var( --clr-background );
 	border: 1px solid var( --clr-on-surface-light-primary-12 );
-	padding: 4px;
+	padding: 0.5rem 0.75rem;
 	text-align: left;
 	transition: 0.5s;
 	transition-property: border-color;
@@ -135,7 +135,7 @@ Modules: Features/ParticipantTable/*
 
 .participantTable-tbd {
 	border: 1px solid var( --clr-on-surface-light-primary-12 );
-	padding: 4px;
+	padding: 0.5rem 0.75rem;
 	font-style: italic;
 	text-align: center;
 	width: 100%;
