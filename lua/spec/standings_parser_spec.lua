@@ -369,6 +369,108 @@ describe('Standings Parser', function()
 		end)
 	end)
 
+	describe('manual definite statuses', function()
+		local THREE_ROUNDS_TWO_FINISHED = {
+			{roundNumber = 1, started = true, finished = true},
+			{roundNumber = 2, started = true, finished = true},
+			{roundNumber = 3, started = true, finished = false},
+		}
+
+		---@param definiteStatuses table<integer, string>?
+		---@return table[]
+		local function makeOpponents(definiteStatuses)
+			local alpha = makeOpponent('Alpha', {{points = 0}, {points = 0}, {points = 0}})
+			alpha.definiteStatuses = definiteStatuses
+			return {
+				alpha,
+				makeOpponent('Bravo', {{points = 3}, {points = 3}, {points = 3}}),
+				makeOpponent('Charlie', {{points = 1}, {points = 1}, {points = 1}}),
+			}
+		end
+
+		it('applies only from the given round onwards on unfinished standings', function()
+			local standingsTable = StandingsParser.parse(
+				THREE_ROUNDS_TWO_FINISHED, makeOpponents({[2] = 'down'}), BGS, nil, {}, 'ffa', TIEBREAKERS)
+
+			local alpha1 = findEntry(standingsTable.entries, 'Alpha', 1)
+			assert.are_equal('down', alpha1.currentstatus)
+			assert.is_nil(alpha1.definitestatus)
+
+			Array.forEach({2, 3}, function(roundIndex)
+				local alpha = findEntry(standingsTable.entries, 'Alpha', roundIndex)
+				assert.are_equal('down', alpha.definitestatus)
+			end)
+		end)
+
+		it('does not apply to rounds before the first given round', function()
+			local standingsTable = StandingsParser.parse(
+				THREE_ROUNDS_TWO_FINISHED, makeOpponents({[3] = 'up'}), BGS, nil, {}, 'ffa', TIEBREAKERS)
+
+			Array.forEach({1, 2}, function(roundIndex)
+				local alpha = findEntry(standingsTable.entries, 'Alpha', roundIndex)
+				assert.is_nil(alpha.definitestatus)
+				assert.are_equal('down', alpha.currentstatus)
+			end)
+			assert.are_equal('up', findEntry(standingsTable.entries, 'Alpha', 3).definitestatus)
+		end)
+
+		it('uses the status with the highest round that has been reached', function()
+			local standingsTable = StandingsParser.parse(
+				THREE_ROUNDS_TWO_FINISHED, makeOpponents({[1] = 'stayup', [3] = 'up'}),
+				BGS, nil, {}, 'ffa', TIEBREAKERS)
+
+			assert.are_equal('stayup', findEntry(standingsTable.entries, 'Alpha', 1).definitestatus)
+			assert.are_equal('stayup', findEntry(standingsTable.entries, 'Alpha', 2).definitestatus)
+			assert.are_equal('up', findEntry(standingsTable.entries, 'Alpha', 3).definitestatus)
+		end)
+
+		it('sets the current status as well', function()
+			local standingsTable = StandingsParser.parse(
+				THREE_ROUNDS_TWO_FINISHED, makeOpponents({[2] = 'up'}), BGS, nil, {}, 'ffa', TIEBREAKERS)
+
+			local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
+			assert.are_equal(3, alpha2.placement)
+			assert.are_equal('up', alpha2.currentstatus)
+			assert.are_equal('up', alpha2.definitestatus)
+		end)
+
+		it('overrides the definite status derived from the bgs on finished standings', function()
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, makeOpponents({[1] = 'stay'}), BGS, nil, {}, 'ffa', TIEBREAKERS)
+
+			local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
+			assert.are_equal('stay', alpha2.currentstatus)
+			assert.are_equal('stay', alpha2.definitestatus)
+		end)
+
+		it('is overridden by a disqualification', function()
+			local opponents = makeOpponents({[1] = 'up'})
+			opponents[1].disqualifiedFromRound = 2
+
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, opponents, BGS, nil, {}, 'ffa', {'full.disqualified', 'full.points', 'full.manual'})
+
+			local alpha1 = findEntry(standingsTable.entries, 'Alpha', 1)
+			assert.are_equal('up', alpha1.currentstatus)
+			assert.are_equal('up', alpha1.definitestatus)
+			local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
+			assert.are_equal('dq', alpha2.currentstatus)
+			assert.are_equal('dq', alpha2.definitestatus)
+		end)
+
+		it('leaves opponents without manual statuses unchanged', function()
+			local standingsTable = StandingsParser.parse(
+				THREE_ROUNDS_TWO_FINISHED, makeOpponents({[1] = 'up'}), BGS, nil, {}, 'ffa', TIEBREAKERS)
+
+			local bravo2 = findEntry(standingsTable.entries, 'Bravo', 2)
+			assert.are_equal('up', bravo2.currentstatus)
+			assert.is_nil(bravo2.definitestatus)
+			local charlie2 = findEntry(standingsTable.entries, 'Charlie', 2)
+			assert.are_equal('stay', charlie2.currentstatus)
+			assert.is_nil(charlie2.definitestatus)
+		end)
+	end)
+
 	it('increments the standingsindex wiki variable per table', function()
 		local opponents = {makeOpponent('Alpha', {{points = 3}, {points = 0}})}
 
