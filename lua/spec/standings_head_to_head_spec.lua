@@ -4,7 +4,7 @@ describe('Standings Tiebreaker HeadToHead', function()
 	local TiebreakerFactory = require('Module:Standings/Tiebreaker/Factory')
 	local Array = require('Module:Array')
 
-	local tiebreaker = TiebreakerFactory.tiebreakerFromId('h2h.matchdiff')
+	local tiebreaker = TiebreakerFactory.tiebreakerFromId('h2holdcs.matchdiff')
 
 	---@param result {[1]: string, [2]: string, draw: boolean?, unfinished: boolean?}
 	---@param index integer
@@ -180,7 +180,7 @@ describe('Standings Tiebreaker HeadToHead', function()
 	end)
 
 	it('works with other tiebreakers than the match diff', function()
-		local matchWins = TiebreakerFactory.tiebreakerFromId('h2h.matchwins')
+		local matchWins = TiebreakerFactory.tiebreakerFromId('h2holdcs.matchwins')
 		local opponents = makeOpponents({'A', 'B'}, {{'A', 'B', draw = true}})
 
 		assert.are_same({{'A', 'B'}}, namesOf(HeadToHead.resolve(opponents, matchWins)))

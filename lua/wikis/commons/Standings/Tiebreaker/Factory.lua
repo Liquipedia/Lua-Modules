@@ -60,7 +60,7 @@ function TiebreakerFactory.validateAndNormalizeInput(input)
 		context = 'full'
 	end
 	assert(
-		context == 'full' or context == 'ml' or context == 'h2h' or context == 'h2hlegacy',
+		context == 'full' or context == 'ml' or context == 'h2holdcs' or context == 'h2hlegacy',
 		'Invalid tie breaker context: ' .. context
 	)
 

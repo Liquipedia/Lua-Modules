@@ -174,7 +174,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 end
 
 ---Calculate tiebreaker values for all opponents in a round.
----Does not calculate H2H, H2H legacy or ML, only "full" tiebreaker types, as the values of the others
+---Does not calculate H2H old CS, H2H legacy or ML, only "full" tiebreaker types, as the values of the others
 ---depend on which opponents are tied.
 ---The others are resolved in resolveTieForGroup() called by determinePlacements(),
 ---and therefore do not get a value shown in the table.
@@ -256,7 +256,7 @@ local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, ti
 
 	---@type TiebreakerOpponent[][]
 	local groupsInOrder
-	if contextType == 'h2h' then
+	if contextType == 'h2holdcs' then
 		groupsInOrder = TiebreakerHeadToHead.resolve(tiedOpponents, tiebreaker)
 	else
 		groupsInOrder = groupByValue(allOpponents, tiedOpponents, tiebreaker, tiebreakerId)

@@ -19,7 +19,7 @@ local Class = Lua.import('Module:Class')
 ---@field draws table<StandingsDrawLevel, boolean>?
 
 ---@class StandingsTiebreaker
----@field context 'full'|'ml'|'h2h'|'h2hlegacy'
+---@field context 'full'|'ml'|'h2holdcs'|'h2hlegacy'
 ---@field options StandingsTiebreakerOptions
 ---@field valueOf fun(self: StandingsTiebreaker, state:TiebreakerOpponent[], opponent: TiebreakerOpponent): integer
 ---@field display fun(self: StandingsTiebreaker, state:TiebreakerOpponent[], opponent: TiebreakerOpponent): string
@@ -49,7 +49,7 @@ function StandingsTiebreaker:display(state, opponent)
 	return tostring(self:valueOf(state, opponent))
 end
 
----@return 'full'|'ml'|'h2h'|'h2hlegacy'
+---@return 'full'|'ml'|'h2holdcs'|'h2hlegacy'
 function StandingsTiebreaker:getContextType()
 	return self.context
 end

@@ -369,7 +369,7 @@ describe('Standings Parser', function()
 		end)
 	end)
 
-	describe('h2h, h2hlegacy and ml tiebreakers', function()
+	describe('h2holdcs, h2hlegacy and ml tiebreakers', function()
 		local ONE_FINISHED_ROUND = {{roundNumber = 1, started = true, finished = true}}
 
 		---@param spec {id: string, a: string, scoreA: integer, b: string, scoreB: integer, finished: boolean?}
@@ -584,7 +584,7 @@ describe('Standings Parser', function()
 			end)
 		end)
 
-		describe('h2h', function()
+		describe('h2holdcs', function()
 			-- Same ties as above: A, B, C and D are all tied on 3 points.
 			-- Pairwise B beat A, A beat C and D, B beat D, while B and C and C and D never played.
 			local MATCHES = {
@@ -599,7 +599,7 @@ describe('Standings Parser', function()
 
 			it('applies to ties of more than three opponents', function()
 				local standingsTable = parse(
-					makeOpponents(NAMES, MATCHES, POINTS), {'full.points', 'h2h.matchdiff', 'full.manual'})
+					makeOpponents(NAMES, MATCHES, POINTS), {'full.points', 'h2holdcs.matchdiff', 'full.manual'})
 
 				-- B is at least as good as everyone else, C and D are at most as good as everyone else
 				assert.are_same({'B', 'A', 'C', 'D'}, namesBySlot(standingsTable))
@@ -621,10 +621,10 @@ describe('Standings Parser', function()
 			it('continues with the next tiebreaker for the groups it splits', function()
 				local standingsTable = parse(
 					makeOpponents(NAMES, MATCHES, POINTS),
-					{'full.points', 'h2h.matchdiff', 'ml.matchwins', 'full.manual'}
+					{'full.points', 'h2holdcs.matchdiff', 'ml.matchwins', 'full.manual'}
 				)
 
-				-- C and D are still tied after h2h. Both have no wins among the tied opponents.
+				-- C and D are still tied after h2holdcs. Both have no wins among the tied opponents.
 				assert.are_same({'B', 'A', 'C', 'D'}, namesBySlot(standingsTable))
 				assert.are_equal(3, placementOf(standingsTable, 'C'))
 				assert.are_equal(3, placementOf(standingsTable, 'D'))
@@ -632,7 +632,7 @@ describe('Standings Parser', function()
 
 			it('differs from h2hlegacy for ties of three opponents', function()
 				-- A, B and C are tied. Among them A and B each beat C, and A and B drew.
-				-- For h2h the draw between A and B is ignored, so both are on top. The mini league puts B above A,
+				-- For h2holdcs the draw between A and B is ignored, so both are on top. The mini league puts B above A,
 				-- as B beat C twice.
 				local opponents = makeOpponents({'A', 'B', 'C'}, {
 					{id = 'M1', a = 'A', scoreA = 2, b = 'C', scoreB = 0},
@@ -641,10 +641,10 @@ describe('Standings Parser', function()
 					{id = 'M4', a = 'A', scoreA = 1, b = 'B', scoreB = 1},
 				}, {A = 1, B = 1, C = 1})
 
-				local h2hTable = parse(opponents, {'full.points', 'h2h.matchdiff', 'full.manual'})
-				assert.are_equal(1, placementOf(h2hTable, 'A'))
-				assert.are_equal(1, placementOf(h2hTable, 'B'))
-				assert.are_equal(3, placementOf(h2hTable, 'C'))
+				local h2holdcsTable = parse(opponents, {'full.points', 'h2holdcs.matchdiff', 'full.manual'})
+				assert.are_equal(1, placementOf(h2holdcsTable, 'A'))
+				assert.are_equal(1, placementOf(h2holdcsTable, 'B'))
+				assert.are_equal(3, placementOf(h2holdcsTable, 'C'))
 
 				local legacyTable = parse(opponents, {'full.points', 'h2hlegacy.matchdiff', 'full.manual'})
 				assert.are_equal(1, placementOf(legacyTable, 'B'))
@@ -654,16 +654,16 @@ describe('Standings Parser', function()
 
 			it('is only listed by id, without a title or values', function()
 				local standingsTable = parse(
-					makeOpponents(NAMES, MATCHES, POINTS), {'full.points', 'h2h.matchdiff', 'full.manual'})
+					makeOpponents(NAMES, MATCHES, POINTS), {'full.points', 'h2holdcs.matchdiff', 'full.manual'})
 
-				assert.are_same({id = 'h2h.matchdiff'}, Array.find(standingsTable.extradata.additionalStats, function(stat)
-					return stat.id == 'h2h.matchdiff'
+				assert.are_same({id = 'h2holdcs.matchdiff'}, Array.find(standingsTable.extradata.additionalStats, function(stat)
+					return stat.id == 'h2holdcs.matchdiff'
 				end))
-				assert.is_nil(findEntry(standingsTable.entries, 'A', 1).extradata.additionalStatsValues['h2h.matchdiff'])
+				assert.is_nil(findEntry(standingsTable.entries, 'A', 1).extradata.additionalStatsValues['h2holdcs.matchdiff'])
 			end)
 		end)
 
-		describe('successive h2h tiebreakers', function()
+		describe('successive h2holdcs tiebreakers', function()
 			-- A, B, C and D are tied on 3 points, and the matches among them follow a strict order A > B > C > D
 			local MATCHES = {
 				{id = 'M1', a = 'A', scoreA = 2, b = 'B', scoreB = 0},
@@ -678,7 +678,7 @@ describe('Standings Parser', function()
 
 			it('only splits the top and the bottom in one pass', function()
 				local standingsTable = parse(
-					makeOpponents(NAMES, MATCHES, POINTS), {'full.points', 'h2h.matchdiff', 'full.manual'})
+					makeOpponents(NAMES, MATCHES, POINTS), {'full.points', 'h2holdcs.matchdiff', 'full.manual'})
 
 				assert.are_same({'A', 'B', 'C', 'D'}, namesBySlot(standingsTable))
 				assert.are_equal(1, placementOf(standingsTable, 'A'))
@@ -690,7 +690,7 @@ describe('Standings Parser', function()
 			it('splits the middle with the same tiebreaker listed again', function()
 				local standingsTable = parse(
 					makeOpponents(NAMES, MATCHES, POINTS),
-					{'full.points', 'h2h.matchdiff', 'h2h.matchdiff', 'full.manual'}
+					{'full.points', 'h2holdcs.matchdiff', 'h2holdcs.matchdiff', 'full.manual'}
 				)
 
 				assert.are_same({'A', 'B', 'C', 'D'}, namesBySlot(standingsTable))
@@ -700,7 +700,7 @@ describe('Standings Parser', function()
 				assert.are_equal(4, placementOf(standingsTable, 'D'))
 			end)
 
-			it('continues with a different h2h tiebreaker in the middle', function()
+			it('continues with a different h2holdcs tiebreaker in the middle', function()
 				-- B and C won a match each, but C won more games among them
 				local opponents = makeOpponents(NAMES, {
 					{id = 'M1', a = 'A', scoreA = 2, b = 'B', scoreB = 0},
@@ -713,7 +713,7 @@ describe('Standings Parser', function()
 				}, POINTS)
 
 				local standingsTable = parse(
-					opponents, {'full.points', 'h2h.matchdiff', 'h2h.gamediff', 'full.manual'})
+					opponents, {'full.points', 'h2holdcs.matchdiff', 'h2holdcs.gamediff', 'full.manual'})
 
 				assert.are_same({'A', 'C', 'B', 'D'}, namesBySlot(standingsTable))
 			end)

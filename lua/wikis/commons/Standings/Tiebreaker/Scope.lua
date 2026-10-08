@@ -49,7 +49,7 @@ function TiebreakerScope.tally(opponent, matches, matchPoints)
 end
 
 ---Restricts the opponents to the matches played among the tied opponents only,
----which is the scope of the head-to-head (h2h, h2hlegacy) and mini-league (ml) tiebreakers.
+---which is the scope of the head-to-head (h2holdcs, h2hlegacy) and mini-league (ml) tiebreakers.
 ---Returns new opponents (in the same order) and never mutates the input, as tiebreakers memoize on the
 ---identity of the opponent table.
 ---@param tiedOpponents TiebreakerOpponent[]
