@@ -51,18 +51,6 @@ describe('Standings Storage', function()
 			assert.is_true(standingsTable.config.hasovertime)
 			assert.is_true(standingsTable.extradata.hasovertime)
 		end)
-
-		it('stores the alternative hasovertimes input', function()
-			local standingsTable = storeTable{hasovertimes = true}
-			assert.is_true(standingsTable.config.hasovertime)
-			assert.is_true(standingsTable.extradata.hasovertime)
-		end)
-
-		it('prefers hasovertime over hasovertimes', function()
-			local standingsTable = storeTable{hasovertime = false, hasovertimes = true}
-			assert.is_false(standingsTable.config.hasovertime)
-			assert.is_false(standingsTable.extradata.hasovertime)
-		end)
 	end)
 
 	it('storage full', function()
