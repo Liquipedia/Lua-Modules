@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Faction = Lua.import('Module:Faction')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 
@@ -49,7 +50,9 @@ local function ParticipantTableFactionSection(props)
 	end
 
 	-- Group entries by faction
-	local _, byFaction = Array.groupBy(section.entries, function(entry) return entry.opponent.players[1].faction end)
+	local _, byFaction = Array.groupBy(section.entries, function(entry)
+		return entry.opponent.players[1].faction or Faction.defaultFaction
+	end)
 
 	-- Find the faction with the most players
 	local maxFactionLength = Array.max(
