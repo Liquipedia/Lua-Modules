@@ -106,6 +106,13 @@
 			--placement-confirmed-color: var( --position-disqualified-background-color );
 		}
 	}
+
+	.standings-participant {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+	}
 }
 
 .standings-ffa-wrapper {
@@ -136,16 +143,6 @@
 		.standings-ffa-detail {
 			display: none !important;
 		}
-	}
-}
-
-.standings-ffa,
-.standings-swiss {
-	.standings-participant {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.5rem;
 	}
 }
 
