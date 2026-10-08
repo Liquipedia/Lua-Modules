@@ -90,7 +90,7 @@ end
 
 ---@param args table
 ---@param teamIndex integer
----@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, r1: string?}?
+---@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, r1bg: string?}?
 function StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 	local team = args['team' .. teamIndex]
 	if not team then
@@ -100,7 +100,15 @@ function StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 	local tiebreaker = args['temp_tie' .. teamIndex]
 	local startingPoints = args['temp_p' .. teamIndex]
 
-	return {type = Opponent.team, team, tiebreaker = tiebreaker, startingpoints = startingPoints}
+	-- Legacy `r<round>bg<team>` maps to `r<round>bg` on the opponent
+	local definiteStatuses = Table.map(Array.range(1, tonumber(args.rounds) or 1), function(roundIndex)
+		return 'r' .. roundIndex .. 'bg', args['r' .. roundIndex .. 'bg' .. teamIndex]
+	end)
+
+	return Table.merge(
+		{type = Opponent.team, team, tiebreaker = tiebreaker, startingpoints = startingPoints},
+		definiteStatuses
+	)
 end
 
 ---@param args table
