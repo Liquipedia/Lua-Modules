@@ -13,7 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
-local HeadToHead = Lua.import('Module:Standings/Tiebreaker/HeadToHead')
+local TiebreakerHeadToHead = Lua.import('Module:Standings/Tiebreaker/HeadToHead')
 local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParser = {}
@@ -257,7 +257,7 @@ local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, ti
 	---@type TiebreakerOpponent[][]
 	local groupsInOrder
 	if contextType == 'h2h' then
-		groupsInOrder = HeadToHead.resolve(tiedOpponents, tiebreaker)
+		groupsInOrder = TiebreakerHeadToHead.resolve(tiedOpponents, tiebreaker)
 	else
 		groupsInOrder = groupByValue(allOpponents, tiedOpponents, tiebreaker, tiebreakerId)
 	end
