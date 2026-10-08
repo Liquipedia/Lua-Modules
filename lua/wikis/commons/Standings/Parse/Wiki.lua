@@ -251,7 +251,7 @@ function StandingsParseWiki.parseTiebreakers(args, tableType)
 		Array.forEach(tiebreakers, function(tiebreaker)
 			assert(
 				TiebreakerFactory.parseId(tiebreaker) == 'full',
-				'Tiebreaker "' .. tiebreaker .. '" is not supported, H2H and ML tiebreakers are only defined '
+				'Tiebreaker "' .. tiebreaker .. '" is not supported, H2H, H2HLegacy and ML tiebreakers are only defined '
 					.. 'for head-to-head standings and not for ffa standings'
 			)
 		end)

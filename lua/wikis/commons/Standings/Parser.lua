@@ -13,6 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
+local HeadToHead = Lua.import('Module:Standings/Tiebreaker/HeadToHead')
 local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParser = {}
@@ -173,8 +174,9 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 end
 
 ---Calculate tiebreaker values for all opponents in a round.
----Does not calculate H2H or ML, only "full" tiebreaker types, as H2H and ML values depend on which opponents are tied.
----H2H and ML are resolved in resolveTieForGroup() called by determinePlacements(),
+---Does not calculate H2H, H2H legacy or ML, only "full" tiebreaker types, as the values of the others
+---depend on which opponents are tied.
+---The others are resolved in resolveTieForGroup() called by determinePlacements(),
 ---and therefore do not get a value shown in the table.
 ---@param opponentsInRound TiebreakerOpponent[]
 ---@param tiebreakerIds string[]
@@ -183,7 +185,7 @@ function StandingsParser.calculateAdditionalStatsValues(opponentsInRound, tiebre
 	Array.forEach(tiebreakerIds, function(tiebreakerId)
 		local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId, tiebreakerOptions)
 		local tiebreakerContextType = tiebreaker:getContextType()
-		if tiebreakerContextType == 'h2h' or tiebreakerContextType == 'ml' then
+		if tiebreakerContextType ~= 'full' then
 			return
 		end
 		Array.forEach(opponentsInRound, function(opponent)
@@ -199,30 +201,18 @@ function StandingsParser.calculateAdditionalStatsValues(opponentsInRound, tiebre
 	end)
 end
 
+---Groups the tied opponents by the value of the tiebreaker, the groups are ordered from best to worst.
 ---@param allOpponents TiebreakerOpponent[]
 ---@param tiedOpponents TiebreakerOpponent[]
----@param tiebreakerIds string[]
----@param tiebreakerIndex integer
----@param tiebreakerOptions StandingsTiebreakerOptions?
+---@param tiebreaker StandingsTiebreaker
+---@param tiebreakerId string
 ---@return TiebreakerOpponent[][]
-local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex, tiebreakerOptions)
-	local tiebreakerId = tiebreakerIds[tiebreakerIndex]
-	if not tiebreakerId then
-		return { tiedOpponents }
-	end
-	local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId, tiebreakerOptions)
-	local contextType = tiebreaker:getContextType()
-
-	-- H2H is only defined for ties between 2 or 3 opponents, for bigger ties it is skipped
-	if contextType == 'h2h' and #tiedOpponents > 3 then
-		return resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex + 1, tiebreakerOptions)
-	end
-
-	-- H2H and ML only look at the matches played among the tied opponents.
+local function groupByValue(allOpponents, tiedOpponents, tiebreaker, tiebreakerId)
+	-- ML and H2H legacy only look at the matches played among the tied opponents.
 	-- The scoped opponents are copies, the groups below keep containing the original opponents.
 	local scopedOpponentsByOpponent
 	local scopedOpponents
-	if contextType ~= 'full' then
+	if tiebreaker:getContextType() ~= 'full' then
 		scopedOpponents = TiebreakerScope.restrictTo(tiedOpponents)
 		scopedOpponentsByOpponent = {}
 		Array.forEach(tiedOpponents, function(opponent, index)
@@ -240,11 +230,39 @@ local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, ti
 		return opponent.extradata.additionalStatsValues[tiebreakerId].value
 	end)
 
-	local groupedOpponentsInOrder = Array.extractValues(groupedOpponents, Table.iter.spairs, function(_, a, b)
+	return Array.extractValues(groupedOpponents, Table.iter.spairs, function(_, a, b)
 		return a > b
 	end)
+end
 
-	return Array.flatMap(groupedOpponentsInOrder, function(group)
+---@param allOpponents TiebreakerOpponent[]
+---@param tiedOpponents TiebreakerOpponent[]
+---@param tiebreakerIds string[]
+---@param tiebreakerIndex integer
+---@param tiebreakerOptions StandingsTiebreakerOptions?
+---@return TiebreakerOpponent[][]
+local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex, tiebreakerOptions)
+	local tiebreakerId = tiebreakerIds[tiebreakerIndex]
+	if not tiebreakerId then
+		return { tiedOpponents }
+	end
+	local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId, tiebreakerOptions)
+	local contextType = tiebreaker:getContextType()
+
+	-- H2H legacy is only defined for ties between 2 or 3 opponents, for bigger ties it is skipped
+	if contextType == 'h2hlegacy' and #tiedOpponents > 3 then
+		return resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex + 1, tiebreakerOptions)
+	end
+
+	---@type TiebreakerOpponent[][]
+	local groupsInOrder
+	if contextType == 'h2h' then
+		groupsInOrder = HeadToHead.resolve(tiedOpponents, tiebreaker)
+	else
+		groupsInOrder = groupByValue(allOpponents, tiedOpponents, tiebreaker, tiebreakerId)
+	end
+
+	return Array.flatMap(groupsInOrder, function(group)
 		if #group == 1 then
 			return { group }
 		end
