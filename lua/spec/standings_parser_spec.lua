@@ -501,6 +501,15 @@ describe('Standings Parser', function()
 				assert.are_equal(2, alpha.points)
 			end)
 
+			it('breaks a tie of three opponents like ml for h2hlegacy', function()
+				local standingsTable = parse(
+					makeOpponents(NAMES, MATCHES, POINTS), {'full.points', 'h2hlegacy.matchdiff', 'full.manual'})
+
+				assert.are_same({'A', 'B', 'C'}, Array.sub(namesBySlot(standingsTable), 1, 3))
+				assert.are_equal(4, placementOf(standingsTable, 'D'))
+				assert.are_equal(4, placementOf(standingsTable, 'E'))
+			end)
+
 			it('uses ml for a tie between two opponents', function()
 				local opponents = makeOpponents({'A', 'B', 'C'}, {
 					{id = 'M1', a = 'A', scoreA = 0, b = 'B', scoreB = 2},
@@ -527,6 +536,21 @@ describe('Standings Parser', function()
 			}
 			local POINTS = {A = 3, B = 3, C = 3, D = 3}
 			local NAMES = {'A', 'B', 'C', 'D'}
+
+			it('skips h2hlegacy and continues with the next tiebreaker', function()
+				local standingsTable = parse(
+					makeOpponents(NAMES, MATCHES, POINTS),
+					{'full.points', 'h2hlegacy.matchdiff', 'ml.matchwins', 'full.manual'}
+				)
+
+				-- h2hlegacy would have split {A, B} from {C, D} and then let B (who beat A) win
+				-- over the whole group A has the most wins
+				assert.are_same({'A', 'B'}, Array.sub(namesBySlot(standingsTable), 1, 2))
+				assert.are_equal(1, placementOf(standingsTable, 'A'))
+				assert.are_equal(2, placementOf(standingsTable, 'B'))
+				assert.are_equal(3, placementOf(standingsTable, 'C'))
+				assert.are_equal(3, placementOf(standingsTable, 'D'))
+			end)
 
 			it('lets ml decide for ties of any size', function()
 				local standingsTable = parse(

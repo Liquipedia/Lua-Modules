@@ -73,16 +73,19 @@ describe('Standings Wiki Parser', function()
 			)
 		end)
 
-		it('accepts ml tiebreakers for swiss tables', function()
+		it('accepts h2hlegacy and ml tiebreakers for swiss tables', function()
 			assert.are_same(
-				{'full.disqualified', 'full.matchdiff', 'ml.gamediff', 'full.manual'},
+				{'full.disqualified', 'full.matchdiff', 'h2hlegacy.matchdiff', 'ml.gamediff', 'full.manual'},
 				StandingsParseWiki.parseTiebreakers(
-					{tiebreakers = '["matchdiff", "ml.gamediff"]'}, 'swiss'
+					{tiebreakers = '["matchdiff", "h2hlegacy.matchdiff", "ml.gamediff"]'}, 'swiss'
 				)
 			)
 		end)
 
-		it('rejects ml tiebreakers for ffa tables', function()
+		it('rejects h2hlegacy and ml tiebreakers for ffa tables', function()
+			assert.error(function()
+				StandingsParseWiki.parseTiebreakers({tiebreakers = '["points", "h2hlegacy.matchwins"]'}, 'ffa')
+			end)
 			assert.error(function()
 				StandingsParseWiki.parseTiebreakers({tiebreakers = '["ml.points"]'}, 'ffa')
 			end)

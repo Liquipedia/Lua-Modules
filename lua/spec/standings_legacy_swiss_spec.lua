@@ -4,7 +4,7 @@ describe('Standings Legacy Swiss', function()
 	local TiebreakerFactory = require('Module:Standings/Tiebreaker/Factory')
 
 	describe('tiebreakers', function()
-		it('maps the h2h and minileague tiebreakers to ml', function()
+		it('maps the h2h and minileague tiebreakers to h2hlegacy and ml', function()
 			local tiebreakers = StandingTableLegacySwiss.parseTiebreaker{
 				tiebreaker1 = 'h2h series',
 				tiebreaker2 = 'h2h games',
@@ -14,7 +14,7 @@ describe('Standings Legacy Swiss', function()
 				tiebreaker6 = 'minileague games won',
 			}
 			assert.are_same({
-				'ml.matchdiff', 'ml.gamediff', 'ml.points', 'ml.matchwinrate', 'ml.gamediff', 'ml.gamewins',
+				'h2hlegacy.matchdiff', 'h2hlegacy.gamediff', 'ml.points', 'ml.matchwinrate', 'ml.gamediff', 'ml.gamewins',
 			}, tiebreakers)
 		end)
 
