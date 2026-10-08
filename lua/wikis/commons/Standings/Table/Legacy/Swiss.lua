@@ -100,9 +100,19 @@ local function parseCoreInput(args, index)
 	return tiebreaker, startingPoints, dq
 end
 
+---Legacy `r<round>bg<index>` maps to `r<round>bg` on the opponent
+---@param args table
+---@param index integer
+---@return table<string, string>
+local function parseDefiniteStatuses(args, index)
+	return Table.map(Array.range(1, tonumber(args.rounds) or 1), function(roundIndex)
+		return 'r' .. roundIndex .. 'bg', args['r' .. roundIndex .. 'bg' .. index]
+	end)
+end
+
 ---@param args table
 ---@param teamIndex integer
----@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, dq: string?}?
+---@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, dq: string?, r1bg: string?}?
 function StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 	local team = args['team' .. teamIndex]
 	if not team then
@@ -111,18 +121,18 @@ function StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 
 	local tiebreaker, startingPoints, dq = parseCoreInput(args, teamIndex)
 
-	return {
+	return Table.merge({
 		type = Opponent.team,
 		team,
 		tiebreaker = tiebreaker,
 		startingpoints = startingPoints,
 		dq = dq,
-	}
+	}, parseDefiniteStatuses(args, teamIndex))
 end
 
 ---@param args table
 ---@param playerIndex integer
----@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, dq: string?}?
+---@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, dq: string?, r1bg: string?}?
 function StandingTableLegacySwiss.parseSoloInput(args, playerIndex)
 	local player = args['player' .. playerIndex] or args['p' .. playerIndex]
 	if not player then
@@ -131,7 +141,7 @@ function StandingTableLegacySwiss.parseSoloInput(args, playerIndex)
 
 	local tiebreaker, startingPoints, dq = parseCoreInput(args, playerIndex)
 
-	return {
+	return Table.merge({
 		type = Opponent.solo,
 		player,
 		flag = args['player' .. playerIndex .. 'flag'] or args['p' .. playerIndex .. 'flag'],
@@ -139,7 +149,7 @@ function StandingTableLegacySwiss.parseSoloInput(args, playerIndex)
 		tiebreaker = tiebreaker,
 		startingpoints = startingPoints,
 		dq = dq,
-	}
+	}, parseDefiniteStatuses(args, playerIndex))
 end
 
 ---@param args table
