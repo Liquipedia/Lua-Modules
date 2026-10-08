@@ -93,13 +93,11 @@ end
 
 ---@param args table
 ---@param index integer
----@return string?
----@return string?
----@return boolean?
+---@return string?, string?, string?
 local function parseCoreInput(args, index)
 	local tiebreaker = args['temp_tie' .. index]
 	local startingPoints = args['temp_p' .. index]
-	local dq = Logic.readBoolOrNil(args['dq' .. index])
+	local dq = args['dq' .. index]
 	return tiebreaker, startingPoints, dq
 end
 
@@ -119,7 +117,7 @@ function StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 		team,
 		tiebreaker = tiebreaker,
 		startingpoints = startingPoints,
-		disqualifiedFromRound = dq
+		dq = dq,
 	}
 end
 
@@ -141,7 +139,7 @@ function StandingTableLegacySwiss.parseSoloInput(args, playerIndex)
 		link = args['player' .. playerIndex .. 'link'] or args['p' .. playerIndex .. 'link'],
 		tiebreaker = tiebreaker,
 		startingpoints = startingPoints,
-		disqualifiedFromRound = dq
+		dq = dq,
 	}
 end
 
