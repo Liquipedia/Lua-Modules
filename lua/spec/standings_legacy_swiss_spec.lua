@@ -4,14 +4,18 @@ describe('Standings Legacy Swiss', function()
 	local TiebreakerFactory = require('Module:Standings/Tiebreaker/Factory')
 
 	describe('tiebreakers', function()
-		it('maps the minileague tiebreakers to ml', function()
+		it('maps the h2h and minileague tiebreakers to h2hlegacy and ml', function()
 			local tiebreakers = StandingTableLegacySwiss.parseTiebreaker{
-				tiebreaker1 = 'minileague points',
-				tiebreaker2 = 'minileague series%',
-				tiebreaker3 = 'minileague games',
-				tiebreaker4 = 'minileague games won',
+				tiebreaker1 = 'h2h series',
+				tiebreaker2 = 'h2h games',
+				tiebreaker3 = 'minileague points',
+				tiebreaker4 = 'minileague series%',
+				tiebreaker5 = 'minileague games',
+				tiebreaker6 = 'minileague games won',
 			}
-			assert.are_same({'ml.points', 'ml.matchwinrate', 'ml.gamediff', 'ml.gamewins'}, tiebreakers)
+			assert.are_same({
+				'h2hlegacy.matchdiff', 'h2hlegacy.gamediff', 'ml.points', 'ml.matchwinrate', 'ml.gamediff', 'ml.gamewins',
+			}, tiebreakers)
 		end)
 
 		it('only maps to valid tiebreakers', function()
@@ -22,12 +26,14 @@ describe('Standings Legacy Swiss', function()
 				tiebreaker4 = 'diff',
 				tiebreaker5 = 'games won',
 				tiebreaker6 = 'games loss',
-				tiebreaker7 = 'minileague points',
-				tiebreaker8 = 'minileague series%',
-				tiebreaker9 = 'minileague games',
-				tiebreaker10 = 'minileague games won',
+				tiebreaker7 = 'h2h series',
+				tiebreaker8 = 'h2h games',
+				tiebreaker9 = 'minileague points',
+				tiebreaker10 = 'minileague series%',
+				tiebreaker11 = 'minileague games',
+				tiebreaker12 = 'minileague games won',
 			}
-			assert.are_equal(10, #tiebreakers)
+			assert.are_equal(12, #tiebreakers)
 			-- Errors on invalid tiebreakers
 			for _, tiebreaker in ipairs(tiebreakers) do
 				TiebreakerFactory.validateAndNormalizeInput(tiebreaker)
