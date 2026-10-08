@@ -104,7 +104,7 @@ function StandingsStorage.table(data)
 
 	local config = {
 		hasdraws = data.hasdraw,
-		hasovertimes = data.hasovertime,
+		hasovertime = data.hasovertime,
 		haspoints = data.haspoints,
 	}
 

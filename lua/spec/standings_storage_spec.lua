@@ -37,6 +37,22 @@ describe('Standings Storage', function()
 		stubLpdbStandingsTable:revert()
 	end)
 
+	describe('table', function()
+		---@param data table
+		---@return table
+		local function storeTable(data)
+			data.standingsindex = 0
+			data.type = 'swiss'
+			return StandingsStorage.table(data)
+		end
+
+		it('stores hasovertime', function()
+			local standingsTable = storeTable{hasovertime = true}
+			assert.is_true(standingsTable.config.hasovertime)
+			assert.is_true(standingsTable.extradata.hasovertime)
+		end)
+	end)
+
 	it('storage full', function()
 		TeamTemplateMock.setUp()
 		local standingsData = require('test_assets.standings')
@@ -52,7 +68,7 @@ describe('Standings Storage', function()
 		StandingsStorage.run(standingsData)
 
 		assert.stub(stubLpdbStandingsTable).was.called_with('standingsTable_0', {
-			config = '{"hasdraws":false,"hasovertimes":true}',
+			config = '{"hasdraws":false,"hasovertime":true}',
 			extradata = '{"enddate":"2022-10-31","finished":false,"hasdraw":false,"hasovertime":true,"roundcount":7}',
 			matches = '[]',
 			parent = 'FakePage',

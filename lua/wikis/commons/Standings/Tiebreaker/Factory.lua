@@ -27,6 +27,7 @@ local NAME_TO_CLASS = {
 	gamewins = 'Game/Wins',
 	gamelosses = 'Game/Losses',
 	gamewinrate = 'Game/WinRate',
+	gamediffregulation = 'Game/DiffRegulation',
 	roundwins = 'Game/Rounds/Wins',
 	roundlosses = 'Game/Rounds/Losses',
 	rounddiff = 'Game/Rounds/Diff',

@@ -8,7 +8,7 @@ describe('Standings Tiebreakers', function()
 	end
 
 	---@param name string
-	---@param props {points: number?, matches: table[]?, match: table?, tiebreakerpoints: number?}?
+	---@param props {points: number?, matches: table[]?, match: table?, overtime: table?, tiebreakerpoints: number?}?
 	---@return table
 	local function opponent(name, props)
 		props = props or {}
@@ -17,6 +17,7 @@ describe('Standings Tiebreakers', function()
 			points = props.points or 0,
 			matches = props.matches or {},
 			match = props.match or {w = 0, d = 0, l = 0},
+			overtime = props.overtime,
 			extradata = {additionalStatsValues = {}, tiebreakerpoints = props.tiebreakerpoints},
 		}
 	end
@@ -131,6 +132,43 @@ describe('Standings Tiebreakers', function()
 		end)
 	end)
 
+	describe('matchdiff with overtime', function()
+		-- regulation: 2 wins, 1 loss; overtime: 1 win, 2 losses
+		local alphaProps = {match = {w = 2, d = 1, l = 1}, overtime = {w = 1, l = 2}}
+
+		it('counts overtime results as wins and losses', function()
+			local matchdiff = TiebreakerFactory.tiebreakerFromId('full.matchdiff')
+			local opp = opponent('Alpha', alphaProps)
+			assert.are_equal(0, matchdiff:valueOf({opp}, opp))
+		end)
+
+		it('displays regulation and overtime results separately', function()
+			local matchdiff = TiebreakerFactory.tiebreakerFromId('full.matchdiff')
+			local opp = opponent('Alpha', alphaProps)
+			assert.are_equal('2 - 1 - 2 - 1', matchdiff:display({opp}, opp))
+		end)
+
+		it('never displays draws', function()
+			local matchdiff = TiebreakerFactory.tiebreakerFromId('full.matchdiff', {draws = {match = true}})
+			local opp = opponent('Alpha', alphaProps)
+			assert.are_equal('2 - 1 - 2 - 1', matchdiff:display({opp}, opp))
+		end)
+
+		it('is counted by the other match tiebreakers', function()
+			local opp = opponent('Alpha', alphaProps)
+			local function tiebreaker(name)
+				return TiebreakerFactory.tiebreakerFromId('full.' .. name)
+			end
+			assert.are_equal(3, tiebreaker('matchwins'):valueOf({opp}, opp))
+			assert.are_equal(-3, tiebreaker('matchlosses'):valueOf({opp}, opp))
+			assert.are_equal('3', tiebreaker('matchlosses'):display({opp}, opp))
+			assert.are_equal(7, tiebreaker('matchcount'):valueOf({opp}, opp))
+			assert.are_equal(3 / 7, tiebreaker('matchwinrate'):valueOf({opp}, opp))
+			-- draws are unaffected
+			assert.are_equal(1, tiebreaker('matchdraws'):valueOf({opp}, opp))
+		end)
+	end)
+
 	describe('buchholz', function()
 		it('sums match diff of faced opponents from finished matches', function()
 			local buchholz = TiebreakerFactory.tiebreakerFromId('full.buchholz')
@@ -149,6 +187,18 @@ describe('Standings Tiebreakers', function()
 
 			-- Bravo (1-1 = 0) + Charlie (0-2 = -2); Delta excluded as the match is unfinished
 			assert.are_equal(-2, buchholz:valueOf(state, alpha))
+		end)
+
+		it('includes overtime results of faced opponents', function()
+			local buchholz = TiebreakerFactory.tiebreakerFromId('full.buchholz')
+			local alpha = opponent('Alpha', {
+				match = {w = 1, d = 0, l = 0},
+				matches = {makeMatch({'Alpha', 'Bravo'}, {winner = 1})},
+			})
+			local bravo = opponent('Bravo', {match = {w = 0, d = 0, l = 1}, overtime = {w = 3, l = 0}})
+
+			-- Bravo: (0 + 3) - (1 + 0)
+			assert.are_equal(2, buchholz:valueOf({alpha, bravo}, alpha))
 		end)
 	end)
 
@@ -175,6 +225,113 @@ describe('Standings Tiebreakers', function()
 				},
 			})
 			assert.are_equal(2, gamediff:valueOf({alpha}, alpha))
+		end)
+	end)
+
+	describe('games with overtime', function()
+		local Info = require('Module:Info')
+		local originalStandingsConfig
+
+		before_each(function()
+			originalStandingsConfig = Info.config.standings
+			Info.config.standings = {overtime = {regulationRounds = 12}}
+		end)
+
+		after_each(function()
+			Info.config.standings = originalStandingsConfig
+		end)
+
+		---Bo1 matches, where the match score is 1-0 in maps
+		---@param opponentName string
+		---@param otherName string
+		---@param roundScores integer[]
+		local function makeBo1(opponentName, otherName, roundScores)
+			local ownWin = roundScores[1] > roundScores[2]
+			return makeMatch({opponentName, otherName}, {
+				winner = ownWin and 1 or 2,
+				scores = ownWin and {1, 0} or {0, 1},
+				games = {{winner = ownWin and 1 or 2, status = '', scores = roundScores}},
+			})
+		end
+
+		-- Regulation: win (7-3), loss (5-7). Overtime: win (7-6), loss (6-7), loss (6-7).
+		local function makeAlpha(props)
+			props = props or {}
+			return opponent('Alpha', {
+				overtime = props.overtime,
+				matches = {
+					makeBo1('Alpha', 'Bravo', {7, 3}),
+					makeBo1('Alpha', 'Charlie', {5, 7}),
+					makeBo1('Alpha', 'Delta', {7, 6}),
+					makeBo1('Alpha', 'Echo', {6, 7}),
+					makeBo1('Alpha', 'Foxtrot', {6, 7}),
+				},
+			})
+		end
+
+		it('counts the overtime games', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			assert.are_same({w = 1, l = 2}, TiebreakerGameUtil.getOvertimeGames(makeAlpha()))
+		end)
+
+		it('ignores walkovers when counting the overtime games', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local alpha = opponent('Alpha', {
+				matches = {
+					makeMatch({'Alpha', 'Bravo'}, {winner = 1, statuses = {'S', 'FF'}, scores = {1, 0}, games = {
+						{winner = 1, status = '', scores = {7, 6}},
+					}}),
+				},
+			})
+			assert.are_same({w = 0, l = 0}, TiebreakerGameUtil.getOvertimeGames(alpha))
+		end)
+
+		it('does not change the gamediff value, but splits the display when overtime is tracked', function()
+			local gamediff = TiebreakerFactory.tiebreakerFromId('full.gamediff')
+			-- 2 map wins, 3 map losses
+			local withoutOvertime = makeAlpha()
+			assert.are_equal(-1, gamediff:valueOf({withoutOvertime}, withoutOvertime))
+			assert.are_equal('2 - 3', gamediff:display({withoutOvertime}, withoutOvertime))
+
+			local withOvertime = makeAlpha{overtime = {w = 1, l = 2}}
+			assert.are_equal(-1, gamediff:valueOf({withOvertime}, withOvertime))
+			-- regulation wins - overtime wins - overtime losses - regulation losses
+			assert.are_equal('1 - 1 - 2 - 1', gamediff:display({withOvertime}, withOvertime))
+		end)
+
+		it('gamediffregulation only counts the regulation games', function()
+			local gamediffregulation = TiebreakerFactory.tiebreakerFromId('full.gamediffregulation')
+			local alpha = makeAlpha()
+			-- Regulation: 1 win, 1 loss
+			assert.are_equal(0, gamediffregulation:valueOf({alpha}, alpha))
+			assert.are_equal('1 - 1', gamediffregulation:display({alpha}, alpha))
+			assert.are_equal('Games (Reg.)', gamediffregulation:headerTitle())
+		end)
+
+		it('gamediffregulation is not affected by overtime being tracked', function()
+			local gamediffregulation = TiebreakerFactory.tiebreakerFromId('full.gamediffregulation')
+			local alpha = makeAlpha{overtime = {w = 1, l = 2}}
+			assert.are_equal('1 - 1', gamediffregulation:display({alpha}, alpha))
+		end)
+
+		it('gamediffregulation behaves like gamediff without regulation rounds configured', function()
+			Info.config.standings = {}
+			local gamediff = TiebreakerFactory.tiebreakerFromId('full.gamediff')
+			local gamediffregulation = TiebreakerFactory.tiebreakerFromId('full.gamediffregulation')
+			local alpha = makeAlpha()
+			assert.are_equal(gamediff:valueOf({alpha}, alpha), gamediffregulation:valueOf({alpha}, alpha))
+			assert.are_equal('2 - 3', gamediffregulation:display({alpha}, alpha))
+		end)
+
+		it('gamediffregulation excludes walkover matches', function()
+			local gamediffregulation = TiebreakerFactory.tiebreakerFromId('full.gamediffregulation')
+			local alpha = opponent('Alpha', {
+				matches = {
+					makeBo1('Alpha', 'Bravo', {7, 3}),
+					makeMatch({'Alpha', 'Charlie'}, {winner = 1, statuses = {'W', 'FF'}}),
+				},
+			})
+			assert.are_equal(1, gamediffregulation:valueOf({alpha}, alpha))
 		end)
 	end)
 

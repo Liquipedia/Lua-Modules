@@ -28,6 +28,7 @@ local TIEBREAKER_MAPPING_TABLE = {
 	buchholz = 'buchholz',
 	series = 'matchdiff',
 	diff = 'gamediff',
+	['no ot diff'] = 'gamediffregulation',
 	['games won'] = 'gamewins',
 	['games loss'] = 'gamelosses',
 	['h2h series'] = 'h2hlegacy.matchdiff',
