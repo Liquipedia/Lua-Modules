@@ -29,4 +29,19 @@ describe('Standings Legacy Swiss', function()
 			assert.is_nil(opponent.r4bg)
 		end)
 	end)
+
+	describe('solo input', function()
+		it('maps r<round>bg<player> to r<round>bg on the opponent', function()
+			local args = {rounds = '5', player1 = 'Alpha', p2 = 'Bravo', r3bg1 = 'up', r4bg2 = 'down'}
+
+			local alpha = StandingTableLegacySwiss.parseSoloInput(args, 1)
+			assert.are_equal('Alpha', alpha[1])
+			assert.are_equal('up', alpha.r3bg)
+			assert.is_nil(alpha.r4bg)
+
+			local bravo = StandingTableLegacySwiss.parseSoloInput(args, 2)
+			assert.are_equal('down', bravo.r4bg)
+			assert.is_nil(bravo.r3bg)
+		end)
+	end)
 end)
