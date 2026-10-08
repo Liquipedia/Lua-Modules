@@ -13,6 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
+local TiebreakerHeadToHead = Lua.import('Module:Standings/Tiebreaker/HeadToHead')
 local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParser = {}
@@ -173,7 +174,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 end
 
 ---Calculate tiebreaker values for all opponents in a round.
----Does not calculate H2H legacy or ML, only "full" tiebreaker types, as the values of the others
+---Does not calculate H2H CS, H2H legacy or ML, only "full" tiebreaker types, as the values of the others
 ---depend on which opponents are tied.
 ---The others are resolved in resolveTieForGroup() called by determinePlacements(),
 ---and therefore do not get a value shown in the table.
@@ -200,6 +201,40 @@ function StandingsParser.calculateAdditionalStatsValues(opponentsInRound, tiebre
 	end)
 end
 
+---Groups the tied opponents by the value of the tiebreaker, the groups are ordered from best to worst.
+---@param allOpponents TiebreakerOpponent[]
+---@param tiedOpponents TiebreakerOpponent[]
+---@param tiebreaker StandingsTiebreaker
+---@param tiebreakerId string
+---@return TiebreakerOpponent[][]
+local function groupByValue(allOpponents, tiedOpponents, tiebreaker, tiebreakerId)
+	-- ML and H2H legacy only look at the matches played among the tied opponents.
+	-- The scoped opponents are copies, the groups below keep containing the original opponents.
+	local scopedOpponentsByOpponent
+	local scopedOpponents
+	if tiebreaker:getContextType() ~= 'full' then
+		scopedOpponents = TiebreakerScope.restrictTo(tiedOpponents)
+		scopedOpponentsByOpponent = {}
+		Array.forEach(tiedOpponents, function(opponent, index)
+			scopedOpponentsByOpponent[opponent] = scopedOpponents[index]
+		end)
+	end
+
+	local _, groupedOpponents = Array.groupBy(tiedOpponents, function(opponent)
+		if scopedOpponentsByOpponent then
+			return tiebreaker:valueOf(scopedOpponents, scopedOpponentsByOpponent[opponent])
+		end
+		if not opponent.extradata.additionalStatsValues[tiebreakerId] then
+			return tiebreaker:valueOf(allOpponents, opponent)
+		end
+		return opponent.extradata.additionalStatsValues[tiebreakerId].value
+	end)
+
+	return Array.extractValues(groupedOpponents, Table.iter.spairs, function(_, a, b)
+		return a > b
+	end)
+end
+
 ---@param allOpponents TiebreakerOpponent[]
 ---@param tiedOpponents TiebreakerOpponent[]
 ---@param tiebreakerIds string[]
@@ -219,33 +254,15 @@ local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, ti
 		return resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex + 1, tiebreakerOptions)
 	end
 
-	-- ML and H2H legacy only look at the matches played among the tied opponents.
-	-- The scoped opponents are copies, the groups below keep containing the original opponents.
-	local scopedOpponentsByOpponent
-	local scopedOpponents
-	if contextType ~= 'full' then
-		scopedOpponents = TiebreakerScope.restrictTo(tiedOpponents)
-		scopedOpponentsByOpponent = {}
-		Array.forEach(tiedOpponents, function(opponent, index)
-			scopedOpponentsByOpponent[opponent] = scopedOpponents[index]
-		end)
+	---@type TiebreakerOpponent[][]
+	local groupsInOrder
+	if contextType == 'h2hcs' then
+		groupsInOrder = TiebreakerHeadToHead.resolve(tiedOpponents, tiebreaker)
+	else
+		groupsInOrder = groupByValue(allOpponents, tiedOpponents, tiebreaker, tiebreakerId)
 	end
 
-	local _, groupedOpponents = Array.groupBy(tiedOpponents, function(opponent)
-		if scopedOpponentsByOpponent then
-			return tiebreaker:valueOf(scopedOpponents, scopedOpponentsByOpponent[opponent])
-		end
-		if not opponent.extradata.additionalStatsValues[tiebreakerId] then
-			return tiebreaker:valueOf(allOpponents, opponent)
-		end
-		return opponent.extradata.additionalStatsValues[tiebreakerId].value
-	end)
-
-	local groupedOpponentsInOrder = Array.extractValues(groupedOpponents, Table.iter.spairs, function(_, a, b)
-		return a > b
-	end)
-
-	return Array.flatMap(groupedOpponentsInOrder, function(group)
+	return Array.flatMap(groupsInOrder, function(group)
 		if #group == 1 then
 			return { group }
 		end
