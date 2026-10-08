@@ -93,21 +93,18 @@ function StandingsStorage.table(data)
 
 	local tournamentContext = Tournament.partialTournamentFromContext()
 
-	-- `hasovertimes` is an alternative input name, which non-repo code may still pass
-	local hasOvertime = Logic.nilOr(data.hasovertime, data.hasovertimes)
-
 	local extradata = {
 		enddate = data.enddate,
 		finished = data.finished,
 		hasdraw = data.hasdraw,
-		hasovertime = hasOvertime,
+		hasovertime = data.hasovertime,
 		roundcount = data.roundcount,
 		stagename = data.stagename or Variables.varDefault('bracket_header'),
 	}
 
 	local config = {
 		hasdraws = data.hasdraw,
-		hasovertime = hasOvertime,
+		hasovertime = data.hasovertime,
 		haspoints = data.haspoints,
 	}
 
