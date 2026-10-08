@@ -7,6 +7,7 @@ Modules: Features/ParticipantTable/*
 	border-radius: 0.5rem;
 	margin-bottom: 8px;
 	overflow-x: auto;
+	max-width: 100% !important;
 
 	.theme--dark & {
 		border: 1px solid var( --clr-on-surface-dark-primary-12 );
@@ -16,12 +17,8 @@ Modules: Features/ParticipantTable/*
 		min-width: 100% !important;
 	}
 
-	&:not( .participantTable-faction ) {
-		max-width: 100% !important;
-
-		@media ( max-width: 900px ) {
-			width: 100% !important;
-		}
+	@media ( max-width: 900px ) {
+		width: 100% !important;
 	}
 }
 
@@ -44,17 +41,8 @@ Modules: Features/ParticipantTable/*
 
 .participantTable-row {
 	width: 100% !important;
-
-	&:not( .participantTable-faction ) {
-		width: 100% !important;
-		display: flex;
-		flex-wrap: wrap;
-	}
-}
-
-.participantTable-seeding {
-	display: grid;
-	grid-template-columns: 50px 1fr;
+	display: flex;
+	flex-wrap: wrap;
 }
 
 .participantTable-entry {
@@ -70,12 +58,10 @@ Modules: Features/ParticipantTable/*
 	}
 
 	@media ( max-width: 900px ) {
-		&:not( .participantTable-faction ) {
-			flex: 1 0 auto;
-			width: unset !important;
-			min-width: 50%;
-			min-height: 36px;
-		}
+		flex: 1 0 auto;
+		width: unset !important;
+		min-width: 50%;
+		min-height: 36px;
 	}
 
 	&.brkts-opponent-hover-active {
@@ -145,18 +131,6 @@ Modules: Features/ParticipantTable/*
 	}
 }
 
-.participantTable-seed {
-	background-color: var( --clr-background );
-	border: 1px solid var( --clr-on-surface-light-primary-12 );
-	padding: 8px 4px 4px;
-	text-align: center;
-	width: 100%;
-
-	.theme--dark & {
-		border: 1px solid var( --clr-on-surface-dark-primary-12 );
-	}
-}
-
 .participantTable-empty {
 	flex: 1 0 auto;
 
@@ -165,20 +139,23 @@ Modules: Features/ParticipantTable/*
 	}
 }
 
-/* specific overwrites for faction participant tables */
-.participantTable.participantTable-faction {
-	display: inline-grid;
-}
+/* specific overwrites for faction participant tables
+without this the odd/even strip makes participant table look bad
+due to even rows having the same color as `th` rows
+*/
+th.participantTable-faction-section-title {
+	background-color: var( --clr-on-surface-light-primary-8 );
 
-.participantTable-faction > .participantTable-row {
-	display: contents;
-
-	> .participantTable-tbd,
-	> .participantTable-title {
-		grid-column: 1 / -1;
+	.theme--dark & {
+		background-color: var( --clr-on-surface-dark-primary-8 );
 	}
 }
 
-.participantTable-faction-header {
-	font-weight: bold;
+/* move the padding from the td to the div so the hover looks better */
+td.participantTable-tableEntry:has( div.brkts-opponent-hover ) {
+	padding: 0;
+}
+
+td.participantTable-tableEntry > div.brkts-opponent-hover {
+	padding: 0.5rem 0.75rem;
 }

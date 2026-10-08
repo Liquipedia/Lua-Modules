@@ -13,6 +13,7 @@ local Operator = Lua.import('Module:Operator')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 local Entry = Lua.import('Module:Features/ParticipantTable/Components/Entry')
 
@@ -21,6 +22,7 @@ local Entry = Lua.import('Module:Features/ParticipantTable/Components/Entry')
 local function ParticipantTableSeedList(props)
 	local width = tostring(50 + (props.config.showTeams and 242 or 186)) .. 'px'
 
+	---@type ParticipantTableEntry[]
 	local entries = Array.sortBy(
 		Array.filter(Array.flatMap(props.sections, function(section)
 			return section.entries
@@ -31,23 +33,36 @@ local function ParticipantTableSeedList(props)
 		end
 	)
 
-	local display = Html.Div{
-		classes = {'participantTable-seeding'},
-		children = Array.flatMap(entries, function(entry)
-			return {
-				Html.Div{
-					classes = {'participantTable-seed'},
-					children = entry.seed
-				},
-				Entry{
-					config = props.config,
-					dq = entry.dq,
-					note = entry.note,
-					opponent = entry.opponent,
-					additionalProps = {oneLine = true},
-				}
-			}
-		end)
+	local display = TableWidgets.Table{
+		css = {
+			width = width,
+			['max-width'] = '100%!important',
+		},
+		children = {
+			TableWidgets.TableHeader{children = {
+				TableWidgets.Row{children = {
+					TableWidgets.CellHeader{
+						attributes = {colspan = 2},
+						children = 'Seeding',
+					}
+				}},
+			}},
+			TableWidgets.TableBody{children = Array.map(entries, function(entry)
+				return TableWidgets.Row{children = {
+					TableWidgets.Cell{
+						css = {width = '50px'},
+						children = entry.seed,
+					},
+					TableWidgets.Cell{ children = Entry{
+						config = props.config,
+						dq = entry.dq,
+						note = entry.note,
+						opponent = entry.opponent,
+						additionalProps = {oneLine = true},
+					}},
+				}}
+			end)}
+		}
 	}
 
 	return Html.Div{
@@ -58,13 +73,7 @@ local function ParticipantTableSeedList(props)
 			['vertical-align'] = 'middle',
 			['max-width'] = '100%!important',
 		},
-		children = {
-			Html.Div{
-				classes = {'participantTable-title'},
-				children = 'Seeding',
-			},
-			display,
-		}
+		children = display,
 	}
 end
 

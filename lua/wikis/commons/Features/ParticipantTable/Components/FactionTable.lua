@@ -10,8 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 
 local Component = Lua.import('Module:Widget/Component')
-local Html = Lua.import('Module:Widget/Html')
-local WidgetUtil = Lua.import('Module:Widget/Util')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 local Header = Lua.import('Module:Features/ParticipantTable/Components/FactionHeader')
 local Section = Lua.import('Module:Features/ParticipantTable/Components/FactionSection')
@@ -20,35 +19,25 @@ local Section = Lua.import('Module:Features/ParticipantTable/Components/FactionS
 ---factionNumbers: table<string, integer>, sections: ParticipantTableSection[], hasSeed: boolean?}
 ---@return VNode
 local function ParticipantTableFactionTable(props)
-	local config = props.config
-	local colSpan = #props.factionColumns
-
-	local display = Html.Div{
-		classes = {'participantTable', 'participantTable-faction'},
+	return TableWidgets.Table{
 		attributes = props.hasSeed and {['data-toggle-area-content'] = 1} or nil,
-		css = {
-			['grid-template-columns'] = 'repeat(' .. colSpan .. ', 1fr)',
-			width = (colSpan * config.factionColumnWidth) .. 'px',
-		},
-		children = WidgetUtil.collect(
+		columns = Array.rep({width = props.config.factionColumnWidth}, #props.factionColumns),
+		children = {
 			Header{
-				config = config,
+				config = props.config,
 				factionColumns = props.factionColumns,
 				factionNumbers = props.factionNumbers,
 			},
-			Array.map(props.sections, function(section)
-				return Section{
-					config = config,
-					section = section,
-					factionColumns = props.factionColumns,
-				}
-			end)
-		)
-	}
-
-	return Html.Div{
-		classes = {'table-responsive'},
-		children = display,
+			TableWidgets.TableBody{
+				children = Array.flatMap(props.sections, function(section)
+					return Section{
+						config = props.config,
+						section = section,
+						factionColumns = props.factionColumns,
+					}
+				end),
+			},
+		}
 	}
 end
 
