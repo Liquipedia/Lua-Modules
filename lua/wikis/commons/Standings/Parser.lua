@@ -73,6 +73,9 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 				matches = playedMatches or {},
 				matchPoints = playedMatchPoints or {},
 				startingPoints = opponentData.startingPoints,
+				manualDefiniteStatus = StandingsParser.resolveManualDefiniteStatus(
+					opponentData.definiteStatuses, round.roundNumber
+				),
 				extradata = {
 					pointschange = pointsFromRound,
 					specialstatus = statusInRound,
@@ -144,6 +147,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 			return opponentRound.roundindex == #rounds
 		end), bgs, 'definitestatus')
 	end
+	StandingsParser.applyManualStatuses(entries)
 	StandingsParser.applyDisqualifications(entries)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
 	---placement: integer?, slotindex: integer, placementchange: integer?,
@@ -274,6 +278,35 @@ end
 function StandingsParser.addStatuses(opponentEnties, bgs, field)
 	Array.forEach(opponentEnties, function(opponent)
 		opponent[field] = bgs[opponent.slotindex]
+	end)
+end
+
+---Finds the manually set definite status that is in effect in a round,
+---which is the one with the highest round number that is not after the given round.
+---@param definiteStatuses table<integer, string>?
+---@param roundNumber integer
+---@return string?
+function StandingsParser.resolveManualDefiniteStatus(definiteStatuses, roundNumber)
+	if not definiteStatuses then
+		return
+	end
+	for round = roundNumber, 1, -1 do
+		if definiteStatuses[round] then
+			return definiteStatuses[round]
+		end
+	end
+end
+
+---Overrides the statuses of opponents with a manually set definite status.
+---A definite status is also the current status, so both are set.
+---@param opponentEntries {manualDefiniteStatus: string?, currentstatus: string?, definitestatus: string?}[]
+function StandingsParser.applyManualStatuses(opponentEntries)
+	Array.forEach(opponentEntries, function(opponent)
+		local manualStatus = opponent.manualDefiniteStatus
+		if manualStatus then
+			opponent.currentstatus = manualStatus
+			opponent.definitestatus = manualStatus
+		end
 	end)
 end
 

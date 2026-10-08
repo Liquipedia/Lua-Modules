@@ -160,6 +160,7 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, res
 		aliases = aliases,
 		startingPoints = opponentData.startingpoints,
 		disqualifiedFromRound = StandingsParseWiki.parseDisqualifiedFromRound(opponentData.dq),
+		definiteStatuses = StandingsParseWiki.parseDefiniteStatuses(opponentData, numberOfRounds),
 	}
 end
 
@@ -173,6 +174,19 @@ function StandingsParseWiki.parseDisqualifiedFromRound(input)
 		return math.floor(fromRound)
 	end
 	return Logic.readBool(input) and 1 or nil
+end
+
+---Reads the `r<round>bg` inputs of an opponent, e.g. `r3bg=up`. The status applies from that round onwards.
+---Rounds beyond the number of rounds and empty values are ignored.
+---@param opponentData table
+---@param numberOfRounds integer
+---@return table<integer, string>?
+function StandingsParseWiki.parseDefiniteStatuses(opponentData, numberOfRounds)
+	local statuses = {}
+	for round = 1, numberOfRounds do
+		statuses[round] = Logic.nilIfEmpty(opponentData['r' .. round .. 'bg'])
+	end
+	return Logic.nilIfEmpty(statuses)
 end
 
 ---@param input string

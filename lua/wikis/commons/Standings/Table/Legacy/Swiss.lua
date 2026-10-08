@@ -65,8 +65,10 @@ function StandingTableLegacySwiss.classic(frame)
 		return 'round' .. roundIndex, StandingTableLegacySwiss.parseRoundInput(args, roundIndex, matchesForRound[roundIndex])
 	end)
 
-	---@type StandingTableOpponentData[]
 	local opponents = Array.mapIndexes(function(teamIndex)
+		if args.opptype == 'solo' then
+			return StandingTableLegacySwiss.parseSoloInput(args, teamIndex)
+		end
 		return StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 	end)
 
@@ -95,18 +97,65 @@ function StandingTableLegacySwiss.parseRoundInput(args, roundIndex, matches)
 end
 
 ---@param args table
+---@param index integer
+---@return string?, string?, string?
+local function parseCoreInput(args, index)
+	local tiebreaker = args['temp_tie' .. index]
+	local startingPoints = args['temp_p' .. index]
+	local dq = args['dq' .. index]
+	return tiebreaker, startingPoints, dq
+end
+
+---Legacy `r<round>bg<index>` maps to `r<round>bg` on the opponent
+---@param args table
+---@param index integer
+---@return table<string, string>
+local function parseDefiniteStatuses(args, index)
+	return Table.map(Array.range(1, tonumber(args.rounds) or 1), function(roundIndex)
+		return 'r' .. roundIndex .. 'bg', args['r' .. roundIndex .. 'bg' .. index]
+	end)
+end
+
+---@param args table
 ---@param teamIndex integer
----@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, r1: string?}?
+---@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, dq: string?, r1bg: string?}?
 function StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 	local team = args['team' .. teamIndex]
 	if not team then
 		return nil
 	end
 
-	local tiebreaker = args['temp_tie' .. teamIndex]
-	local startingPoints = args['temp_p' .. teamIndex]
+	local tiebreaker, startingPoints, dq = parseCoreInput(args, teamIndex)
 
-	return {type = Opponent.team, team, tiebreaker = tiebreaker, startingpoints = startingPoints}
+	return Table.merge({
+		type = Opponent.team,
+		team,
+		tiebreaker = tiebreaker,
+		startingpoints = startingPoints,
+		dq = dq,
+	}, parseDefiniteStatuses(args, teamIndex))
+end
+
+---@param args table
+---@param playerIndex integer
+---@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, dq: string?, r1bg: string?}?
+function StandingTableLegacySwiss.parseSoloInput(args, playerIndex)
+	local player = args['player' .. playerIndex] or args['p' .. playerIndex]
+	if not player then
+		return nil
+	end
+
+	local tiebreaker, startingPoints, dq = parseCoreInput(args, playerIndex)
+
+	return Table.merge({
+		type = Opponent.solo,
+		player,
+		flag = args['player' .. playerIndex .. 'flag'] or args['p' .. playerIndex .. 'flag'],
+		link = args['player' .. playerIndex .. 'link'] or args['p' .. playerIndex .. 'link'],
+		tiebreaker = tiebreaker,
+		startingpoints = startingPoints,
+		dq = dq,
+	}, parseDefiniteStatuses(args, playerIndex))
 end
 
 ---@param args table
