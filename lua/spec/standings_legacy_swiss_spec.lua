@@ -34,8 +34,9 @@ describe('Standings Legacy Swiss', function()
 				tiebreaker12 = 'minileague games won',
 			}
 			assert.are_equal(12, #tiebreakers)
+			-- Errors on invalid tiebreakers
 			for _, tiebreaker in ipairs(tiebreakers) do
-				assert.has_no.errors(function() TiebreakerFactory.validateAndNormalizeInput(tiebreaker) end)
+				TiebreakerFactory.validateAndNormalizeInput(tiebreaker)
 			end
 		end)
 

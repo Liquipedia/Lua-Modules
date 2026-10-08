@@ -46,10 +46,9 @@ function TiebreakerScope.restrictTo(tiedOpponents)
 			if not match.finished then
 				return
 			end
+			-- The opponent is always part of its own matches
 			local matchOpponent = Array.find(match.opponents, FnUtil.curry(Opponent.same, tiedOpponent.opponent))
-			if not matchOpponent then
-				return
-			end
+			---@cast matchOpponent -nil
 			local result = TiebreakerScope.matchResult(match, matchOpponent)
 			matchRecord[result] = matchRecord[result] + 1
 		end)

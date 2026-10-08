@@ -236,7 +236,7 @@ function StandingsParseWiki.parseTiebreakers(args, tableType)
 	if tableType == 'ffa' then
 		Array.forEach(tiebreakers, function(tiebreaker)
 			assert(
-				TiebreakerFactory.tiebreakerFromId(tiebreaker):getContextType() == 'full',
+				TiebreakerFactory.parseId(tiebreaker) == 'full',
 				'Tiebreaker "' .. tiebreaker .. '" is not supported, H2H and ML tiebreakers are only defined '
 					.. 'for head-to-head standings and not for ffa standings'
 			)
