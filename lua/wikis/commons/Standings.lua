@@ -34,7 +34,7 @@ local Standings = {}
 ---@field section string?
 ---@field type 'ffa'|'swiss'|'league'
 ---@field matches MatchGroupUtilMatch[]
----@field config {hasdraws: boolean?, hasovertimes: boolean?, haspoints: boolean?}
+---@field config {hasdraws: boolean?, hasovertime: boolean?, haspoints: boolean?}
 ---@field rounds StandingsRound[]
 ---@field additionalStats {id: string, title: string?}[]
 ---@field package record standingstable

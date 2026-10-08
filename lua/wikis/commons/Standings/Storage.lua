@@ -33,7 +33,7 @@ local DISQUALIFIED = 'dq'
 ---@field matches string[]
 ---@field roundcount integer
 ---@field hasdraw boolean
----@field hasovertimes boolean
+---@field hasovertime boolean
 ---@field haspoints boolean
 ---@field finished boolean
 ---@field enddate string?
@@ -93,21 +93,21 @@ function StandingsStorage.table(data)
 
 	local tournamentContext = Tournament.partialTournamentFromContext()
 
-	-- `hasovertime` is the legacy input name, which non-repo code still passes
-	local hasOvertimes = Logic.nilOr(data.hasovertimes, data.hasovertime)
+	-- `hasovertimes` is an alternative input name, which non-repo code may still pass
+	local hasOvertime = Logic.nilOr(data.hasovertime, data.hasovertimes)
 
 	local extradata = {
 		enddate = data.enddate,
 		finished = data.finished,
 		hasdraw = data.hasdraw,
-		hasovertime = hasOvertimes,
+		hasovertime = hasOvertime,
 		roundcount = data.roundcount,
 		stagename = data.stagename or Variables.varDefault('bracket_header'),
 	}
 
 	local config = {
 		hasdraws = data.hasdraw,
-		hasovertimes = hasOvertimes,
+		hasovertime = hasOvertime,
 		haspoints = data.haspoints,
 	}
 
