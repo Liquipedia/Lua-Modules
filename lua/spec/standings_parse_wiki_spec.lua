@@ -68,9 +68,33 @@ describe('Standings Wiki Parser', function()
 				StandingsParseWiki.parseTiebreakers({}, 'swiss')
 			)
 			assert.are_same(
-				{'full.disqualified', 'full.points', 'h2h.matchwins', 'full.manual'},
-				StandingsParseWiki.parseTiebreakers({tiebreakers = '["points", "h2h.matchwins"]'}, 'ffa')
+				{'full.disqualified', 'full.matchdiff', 'h2holdcs.matchwins', 'full.manual'},
+				StandingsParseWiki.parseTiebreakers({tiebreakers = '["matchdiff", "h2holdcs.matchwins"]'}, 'swiss')
 			)
+		end)
+
+		it('accepts h2holdcs, h2hlegacy and ml tiebreakers for swiss tables', function()
+			assert.are_same(
+				{
+					'full.disqualified', 'full.matchdiff', 'h2holdcs.matchwins', 'h2hlegacy.matchdiff', 'ml.gamediff',
+					'full.manual',
+				},
+				StandingsParseWiki.parseTiebreakers(
+					{tiebreakers = '["matchdiff", "h2holdcs.matchwins", "h2hlegacy.matchdiff", "ml.gamediff"]'}, 'swiss'
+				)
+			)
+		end)
+
+		it('rejects h2holdcs, h2hlegacy and ml tiebreakers for ffa tables', function()
+			assert.error(function()
+				StandingsParseWiki.parseTiebreakers({tiebreakers = '["points", "h2holdcs.matchwins"]'}, 'ffa')
+			end)
+			assert.error(function()
+				StandingsParseWiki.parseTiebreakers({tiebreakers = '["points", "h2hlegacy.matchwins"]'}, 'ffa')
+			end)
+			assert.error(function()
+				StandingsParseWiki.parseTiebreakers({tiebreakers = '["ml.points"]'}, 'ffa')
+			end)
 		end)
 	end)
 end)

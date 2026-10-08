@@ -30,6 +30,12 @@ local TIEBREAKER_MAPPING_TABLE = {
 	diff = 'gamediff',
 	['games won'] = 'gamewins',
 	['games loss'] = 'gamelosses',
+	['h2h series'] = 'h2hlegacy.matchdiff',
+	['h2h games'] = 'h2hlegacy.gamediff',
+	['minileague points'] = 'ml.points',
+	['minileague series%'] = 'ml.matchwinrate',
+	['minileague games'] = 'ml.gamediff',
+	['minileague games won'] = 'ml.gamewins',
 }
 
 ---@param args table
