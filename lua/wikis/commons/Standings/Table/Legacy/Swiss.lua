@@ -59,7 +59,6 @@ function StandingTableLegacySwiss.classic(frame)
 		return 'round' .. roundIndex, StandingTableLegacySwiss.parseRoundInput(args, roundIndex, matchesForRound[roundIndex])
 	end)
 
-	---@type StandingTableOpponentData[]
 	local opponents = Array.mapIndexes(function(teamIndex)
 		if args.opptype == 'solo' then
 			return StandingTableLegacySwiss.parseSoloInput(args, teamIndex)
