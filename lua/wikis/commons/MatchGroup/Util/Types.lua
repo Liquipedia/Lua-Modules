@@ -108,7 +108,7 @@ Types.MatchCoordinates = TypeUtil.struct({
 ---@field title string?
 ---@field dateHeader boolean?
 ---@field type 'matchlist'
----@field matchId string?
+---@field matchIndex string?
 ---@field matchPage string?
 
 Types.MatchlistBracketData = TypeUtil.struct({
@@ -324,7 +324,7 @@ Types.Match = TypeUtil.struct({
 ---@field stream table
 
 ---@class MatchGroupUtilMatchlist
----@field bracketDatasById table<string, MatchGroupUtilBracketBracketData>
+---@field bracketDatasById table<string, MatchGroupUtilMatchlistBracketData>
 ---@field matches MatchGroupUtilMatch[]
 ---@field matchesById table<string, MatchGroupUtilMatch>
 ---@field type 'matchlist'
