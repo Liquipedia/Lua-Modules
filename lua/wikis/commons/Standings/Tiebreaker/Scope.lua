@@ -62,21 +62,28 @@ function TiebreakerScope.restrictTo(tiedOpponents)
 	end
 
 	return Array.map(tiedOpponents, function(tiedOpponent)
-		local matches = Array.filter(tiedOpponent.matches, function(match)
+		return TiebreakerScope.withMatches(tiedOpponent, Array.filter(tiedOpponent.matches, function(match)
 			return Array.all(match.opponents, isTied)
-		end)
-
-		local scoreboard = TiebreakerScope.tally(tiedOpponent.opponent, matches, tiedOpponent.matchPoints)
-
-		return {
-			opponent = tiedOpponent.opponent,
-			points = scoreboard.points or 0,
-			matches = matches,
-			matchPoints = tiedOpponent.matchPoints,
-			match = scoreboard.match,
-			extradata = tiedOpponent.extradata,
-		}
+		end))
 	end)
+end
+
+---Restricts an opponent to the given matches only.
+---Returns a new opponent and never mutates the input, as tiebreakers memoize on the identity of the opponent table.
+---@param opponent TiebreakerOpponent
+---@param matches MatchGroupUtilMatch[]
+---@return TiebreakerOpponent
+function TiebreakerScope.withMatches(opponent, matches)
+	local scoreboard = TiebreakerScope.tally(opponent.opponent, matches, opponent.matchPoints)
+
+	return {
+		opponent = opponent.opponent,
+		points = scoreboard.points or 0,
+		matches = matches,
+		matchPoints = opponent.matchPoints,
+		match = scoreboard.match,
+		extradata = opponent.extradata,
+	}
 end
 
 return TiebreakerScope

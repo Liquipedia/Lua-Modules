@@ -69,6 +69,31 @@ describe('Standings Tiebreaker HeadToHead', function()
 		assert.are_same({{'A'}, {'B', 'C'}, {'D'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
 	end)
 
+	it('only puts undefeated opponents on top and winless opponents at the bottom', function()
+		-- Round robin among the tied: A 3-1, B 2-2, C 2-2, D 1-3, E 2-2
+		local opponents = makeOpponents({'A', 'B', 'C', 'D', 'E'}, {
+			{'A', 'B'}, {'A', 'C'}, {'A', 'D'}, {'E', 'A'},
+			{'B', 'C'}, {'D', 'B'}, {'B', 'E'},
+			{'C', 'D'}, {'C', 'E'},
+			{'E', 'D'},
+		})
+
+		assert.are_same({{'A', 'B', 'C', 'D', 'E'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
+	end)
+
+	it('compares every match on its own when opponents met more than once', function()
+		-- A and B split their matches, so neither of them is undefeated or winless
+		local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'B'}, {'B', 'A'}, {'A', 'C'}, {'C', 'B'}})
+
+		assert.are_same({{'A', 'B', 'C'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
+	end)
+
+	it('counts a draw as equal when opponents met more than once', function()
+		local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'B', draw = true}, {'A', 'B'}, {'A', 'C'}, {'B', 'C'}})
+
+		assert.are_same({{'A'}, {'B'}, {'C'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
+	end)
+
 	it('leaves a cycle as one group', function()
 		local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'B'}, {'B', 'C'}, {'C', 'A'}})
 

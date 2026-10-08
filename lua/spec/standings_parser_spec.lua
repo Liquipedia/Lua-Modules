@@ -699,8 +699,8 @@ describe('Standings Parser', function()
 				assert.are_equal(4, placementOf(standingsTable, 'D'))
 			end)
 
-			it('continues with a different h2h tiebreaker in the middle', function()
-				-- B and C won a match each, but C won more games among them
+			it('continues with a different tiebreaker in the middle', function()
+				-- B and C won a match each, so h2h cannot split them, but C won more games among them
 				local opponents = makeOpponents(NAMES, {
 					{id = 'M1', a = 'A', scoreA = 2, b = 'B', scoreB = 0},
 					{id = 'M2', a = 'A', scoreA = 2, b = 'C', scoreB = 0},
@@ -712,7 +712,7 @@ describe('Standings Parser', function()
 				}, POINTS)
 
 				local standingsTable = parse(
-					opponents, {'full.points', 'h2h.matchdiff', 'h2h.gamediff', 'full.manual'})
+					opponents, {'full.points', 'h2h.matchdiff', 'h2h.gamediff', 'ml.gamediff', 'full.manual'})
 
 				assert.are_same({'A', 'C', 'B', 'D'}, namesBySlot(standingsTable))
 			end)
