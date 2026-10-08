@@ -6,14 +6,14 @@ describe('Standings Tiebreaker HeadToHead', function()
 
 	local tiebreaker = TiebreakerFactory.tiebreakerFromId('h2h.matchdiff')
 
-	---@param result {[1]: string, [2]: string, draw: boolean?}
+	---@param result {[1]: string, [2]: string, draw: boolean?, unfinished: boolean?}
 	---@param index integer
 	---@return table
 	local function makeMatch(result, index)
 		local isDraw = result.draw == true
 		return {
 			matchId = 'M' .. index,
-			finished = true,
+			finished = result.unfinished ~= true,
 			winner = isDraw and 0 or 1,
 			opponents = {
 				{type = 'literal', name = result[1], status = 'S', placement = 1},
@@ -26,7 +26,7 @@ describe('Standings Tiebreaker HeadToHead', function()
 	---Builds the opponents with the matches they played. The first name of a result won against the second,
 	---or drew if marked as such.
 	---@param names string[]
-	---@param results {[1]: string, [2]: string, draw: boolean?}[]
+	---@param results {[1]: string, [2]: string, draw: boolean?, unfinished: boolean?}[]
 	---@return table[]
 	local function makeOpponents(names, results)
 		local matches = Array.map(results, makeMatch)
@@ -69,7 +69,7 @@ describe('Standings Tiebreaker HeadToHead', function()
 		assert.are_same({{'A'}, {'B', 'C'}, {'D'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
 	end)
 
-	it('only puts undefeated opponents on top and winless opponents at the bottom', function()
+	it('only puts opponents that won every pairing on top and lost every pairing at the bottom', function()
 		-- Round robin among the tied: A 3-1, B 2-2, C 2-2, D 1-3, E 2-2
 		local opponents = makeOpponents({'A', 'B', 'C', 'D', 'E'}, {
 			{'A', 'B'}, {'A', 'C'}, {'A', 'D'}, {'E', 'A'},
@@ -81,14 +81,22 @@ describe('Standings Tiebreaker HeadToHead', function()
 		assert.are_same({{'A', 'B', 'C', 'D', 'E'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
 	end)
 
-	it('compares every match on its own when opponents met more than once', function()
-		-- A and B split their matches, so neither of them is undefeated or winless
+	it('compares the series of opponents that met more than once', function()
+		-- A won the series against B 2-1
+		local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'B'}, {'B', 'A'}, {'A', 'B'}, {'A', 'C'}, {'B', 'C'}})
+
+		assert.are_same({{'A'}, {'B'}, {'C'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
+	end)
+
+	it('does not put opponents with a split series on top or at the bottom', function()
+		-- A and B split their series 1-1
 		local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'B'}, {'B', 'A'}, {'A', 'C'}, {'C', 'B'}})
 
 		assert.are_same({{'A', 'B', 'C'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
 	end)
 
-	it('counts a draw as equal when opponents met more than once', function()
+	it('counts a draw in a series as level', function()
+		-- A won the series against B with a win and a draw
 		local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'B', draw = true}, {'A', 'B'}, {'A', 'C'}, {'B', 'C'}})
 
 		assert.are_same({{'A'}, {'B'}, {'C'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
@@ -101,28 +109,44 @@ describe('Standings Tiebreaker HeadToHead', function()
 	end)
 
 	it('puts multiple tops in one group', function()
-		local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'B', draw = true}, {'A', 'C'}, {'B', 'C'}})
+		-- A and B did not play each other
+		local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'C'}, {'B', 'C'}})
 
 		assert.are_same({{'A', 'B'}, {'C'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
 	end)
 
 	it('puts multiple bottoms in one group', function()
-		local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'B'}, {'A', 'C'}, {'B', 'C', draw = true}})
+		-- B and C did not play each other
+		local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'B'}, {'A', 'C'}})
 
 		assert.are_same({{'A'}, {'B', 'C'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
 	end)
 
-	it('counts pairs that never played as equal', function()
+	it('ignores pairs that never played', function()
 		local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'B'}})
 
-		-- C is equal to both A and B, so it is neither on top nor at the bottom
+		-- C has no pairing left, so it is neither on top nor at the bottom
 		assert.are_same({{'A'}, {'C'}, {'B'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
 	end)
 
-	it('keeps an opponent that is equal to everyone in the middle', function()
+	it('ignores pairs that have not finished a match', function()
+		local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'B'}, {'C', 'A', unfinished = true}})
+
+		assert.are_same({{'A'}, {'C'}, {'B'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
+	end)
+
+	it('does not put opponents with a level pairing on top or at the bottom', function()
+		-- A drew B, so A is not on top although it beat C
+		local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'B', draw = true}, {'A', 'C'}})
+
+		assert.are_same({{'A', 'B'}, {'C'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
+	end)
+
+	it('keeps opponents that drew everyone in the middle', function()
 		local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'B', draw = true}, {'A', 'C', draw = true}, {'B', 'C'}})
 
-		assert.are_same({{'B'}, {'A'}, {'C'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
+		-- B beat C, but drew A
+		assert.are_same({{'A', 'B', 'C'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
 	end)
 
 	it('has no effect if nobody played each other', function()
