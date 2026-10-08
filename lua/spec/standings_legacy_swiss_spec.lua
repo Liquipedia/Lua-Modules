@@ -1,6 +1,43 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('Standings Legacy Swiss', function()
 	local StandingTableLegacySwiss = require('Module:Standings/Table/Legacy/Swiss')
+	local TiebreakerFactory = require('Module:Standings/Tiebreaker/Factory')
+
+	describe('tiebreakers', function()
+		it('maps the minileague tiebreakers to ml', function()
+			local tiebreakers = StandingTableLegacySwiss.parseTiebreaker{
+				tiebreaker1 = 'minileague points',
+				tiebreaker2 = 'minileague series%',
+				tiebreaker3 = 'minileague games',
+				tiebreaker4 = 'minileague games won',
+			}
+			assert.are_same({'ml.points', 'ml.matchwinrate', 'ml.gamediff', 'ml.gamewins'}, tiebreakers)
+		end)
+
+		it('only maps to valid tiebreakers', function()
+			local tiebreakers = StandingTableLegacySwiss.parseTiebreaker{
+				tiebreaker1 = 'points',
+				tiebreaker2 = 'buchholz',
+				tiebreaker3 = 'series',
+				tiebreaker4 = 'diff',
+				tiebreaker5 = 'games won',
+				tiebreaker6 = 'games loss',
+				tiebreaker7 = 'minileague points',
+				tiebreaker8 = 'minileague series%',
+				tiebreaker9 = 'minileague games',
+				tiebreaker10 = 'minileague games won',
+			}
+			assert.are_equal(10, #tiebreakers)
+			-- Errors on invalid tiebreakers
+			for _, tiebreaker in ipairs(tiebreakers) do
+				TiebreakerFactory.validateAndNormalizeInput(tiebreaker)
+			end
+		end)
+
+		it('errors on unknown tiebreakers', function()
+			assert.error(function() StandingTableLegacySwiss.parseTiebreaker{tiebreaker1 = 'bogus'} end)
+		end)
+	end)
 
 	describe('team input', function()
 		it('maps r<round>bg<team> to r<round>bg on the opponent', function()

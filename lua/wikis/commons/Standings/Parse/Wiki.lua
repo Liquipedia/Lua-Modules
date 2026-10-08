@@ -247,6 +247,14 @@ function StandingsParseWiki.parseTiebreakers(args, tableType)
 			}
 		end
 	end
+	if tableType == 'ffa' then
+		Array.forEach(tiebreakers, function(tiebreaker)
+			assert(
+				TiebreakerFactory.parseId(tiebreaker) == 'full',
+				'Tiebreaker "' .. tiebreaker .. '" is not supported, only full tiebreakers are supported in ffa standings'
+			)
+		end)
+	end
 	table.insert(tiebreakers, 1, TiebreakerFactory.validateAndNormalizeInput('disqualified'))
 	table.insert(tiebreakers, TiebreakerFactory.validateAndNormalizeInput('manual'))
 	return tiebreakers
