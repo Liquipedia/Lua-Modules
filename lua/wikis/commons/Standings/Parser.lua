@@ -210,7 +210,7 @@ local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, ti
 	local contextType = tiebreaker:getContextType()
 
 	-- H2H is only defined for ties between 2 or 3 opponents, for bigger ties it is skipped
-	if contextType == 'h2h' and (#tiedOpponents < 2 or #tiedOpponents > 3) then
+	if contextType == 'h2h' and #tiedOpponents > 3 then
 		return resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex + 1, tiebreakerOptions)
 	end
 

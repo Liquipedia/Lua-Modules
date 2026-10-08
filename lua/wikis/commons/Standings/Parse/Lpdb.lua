@@ -92,14 +92,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 				matchPoints = Table.merge(matchPoints, roundData.matchPoints)
 				local lastMatch = roundMatches[#roundMatches]
 				return {
-					scoreboard = {
-						points = roundData.scoreboard.points,
-						match = {
-							w = roundData.scoreboard.match.w or 0,
-							l = roundData.scoreboard.match.l or 0,
-							d = roundData.scoreboard.match.d or 0,
-						},
-					},
+					scoreboard = TiebreakerScope.tally(opponentData.opponent, roundMatches, roundData.matchPoints),
 					specialstatus = roundData.specialstatus or 'nc',
 					matches = matches,
 					matchPoints = matchPoints,
@@ -117,11 +110,7 @@ function StandingsParseLpdb.newOpponent(opponentData, maxRounds)
 	return {
 		opponent = opponentData,
 		rounds = Array.mapRange(1, maxRounds, function()
-			return {
-				scoreboard = {
-					match = {w = 0, d = 0, l = 0},
-				},
-			}
+			return {}
 		end)
 	}
 end
@@ -200,22 +189,15 @@ function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMappe
 		end
 		assert(standingsOpponentData.rounds[roundNumber], 'Round number out of bounds')
 
+		-- The scoreboard of the round is tallied from these in importFromMatches
 		local opponentRoundData = standingsOpponentData.rounds[roundNumber]
-		local points = scoreMapper(opponent)
-		if points then
-			opponentRoundData.scoreboard.points = (opponentRoundData.scoreboard.points or 0) + points
-		end
 		opponentRoundData.specialstatus = ''
 		opponentRoundData.matches = Array.append(opponentRoundData.matches or {}, match2)
+		local points = scoreMapper(opponent)
 		if points then
 			opponentRoundData.matchPoints = opponentRoundData.matchPoints or {}
 			opponentRoundData.matchPoints[match2.matchId] = points
 		end
-		if not match2.finished then
-			return
-		end
-		local matchResult = TiebreakerScope.matchResult(match2, opponent)
-		opponentRoundData.scoreboard.match[matchResult] = (opponentRoundData.scoreboard.match[matchResult] or 0) + 1
 	end)
 end
 

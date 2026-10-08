@@ -51,6 +51,28 @@ describe('Standings Tiebreaker Scope', function()
 		end)
 	end)
 
+	describe('tally', function()
+		it('sums the points of all matches and the record of the finished ones', function()
+			local alpha = {type = 'literal', name = 'Alpha'}
+			local scoreboard = TiebreakerScope.tally(alpha, {
+				makeMatch({'Alpha', 'Bravo'}, {id = 'M1', winner = 1}),
+				makeMatch({'Charlie', 'Alpha'}, {id = 'M2', winner = 1}),
+				makeMatch({'Alpha', 'Delta'}, {id = 'M3', winner = 0}),
+				makeMatch({'Alpha', 'Echo'}, {id = 'M4', winner = 1, finished = false}),
+			}, {M1 = 3, M2 = 0, M3 = 1, M4 = 2})
+
+			assert.are_same({points = 6, match = {w = 1, d = 1, l = 1}}, scoreboard)
+		end)
+
+		it('has no points if no match gave points', function()
+			local alpha = {type = 'literal', name = 'Alpha'}
+			local match = makeMatch({'Alpha', 'Bravo'}, {id = 'M1', winner = 1})
+
+			assert.are_same({match = {w = 1, d = 0, l = 0}}, TiebreakerScope.tally(alpha, {match}, nil))
+			assert.are_same({match = {w = 0, d = 0, l = 0}}, TiebreakerScope.tally(alpha, {}, {}))
+		end)
+	end)
+
 	describe('restrictTo', function()
 		it('only keeps matches played among the tied opponents', function()
 			local alphaBravo = makeMatch({'Alpha', 'Bravo'}, {id = 'M1', winner = 1})
