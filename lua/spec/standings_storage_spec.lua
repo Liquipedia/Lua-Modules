@@ -46,21 +46,21 @@ describe('Standings Storage', function()
 			return StandingsStorage.table(data)
 		end
 
-		it('stores hasovertimes', function()
-			local standingsTable = storeTable{hasovertimes = true}
-			assert.is_true(standingsTable.config.hasovertimes)
-			assert.is_true(standingsTable.extradata.hasovertime)
-		end)
-
-		it('stores the legacy hasovertime input', function()
+		it('stores hasovertime', function()
 			local standingsTable = storeTable{hasovertime = true}
-			assert.is_true(standingsTable.config.hasovertimes)
+			assert.is_true(standingsTable.config.hasovertime)
 			assert.is_true(standingsTable.extradata.hasovertime)
 		end)
 
-		it('prefers hasovertimes over hasovertime', function()
-			local standingsTable = storeTable{hasovertimes = false, hasovertime = true}
-			assert.is_false(standingsTable.config.hasovertimes)
+		it('stores the alternative hasovertimes input', function()
+			local standingsTable = storeTable{hasovertimes = true}
+			assert.is_true(standingsTable.config.hasovertime)
+			assert.is_true(standingsTable.extradata.hasovertime)
+		end)
+
+		it('prefers hasovertime over hasovertimes', function()
+			local standingsTable = storeTable{hasovertime = false, hasovertimes = true}
+			assert.is_false(standingsTable.config.hasovertime)
 			assert.is_false(standingsTable.extradata.hasovertime)
 		end)
 	end)
@@ -80,7 +80,7 @@ describe('Standings Storage', function()
 		StandingsStorage.run(standingsData)
 
 		assert.stub(stubLpdbStandingsTable).was.called_with('standingsTable_0', {
-			config = '{"hasdraws":false,"hasovertimes":true}',
+			config = '{"hasdraws":false,"hasovertime":true}',
 			extradata = '{"enddate":"2022-10-31","finished":false,"hasdraw":false,"hasovertime":true,"roundcount":7}',
 			matches = '[]',
 			parent = 'FakePage',

@@ -772,7 +772,7 @@ describe('Standings Parser', function()
 			local standingsTable = StandingsParser.parse(
 				TWO_FINISHED_ROUNDS, makeOpponents(), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, nil, true)
 
-			assert.is_true(standingsTable.hasovertimes)
+			assert.is_true(standingsTable.hasovertime)
 			assert.are_same({w = 0, l = 0}, findEntry(standingsTable.entries, 'Alpha', 1).overtime)
 			assert.are_same({w = 1, l = 0}, findEntry(standingsTable.entries, 'Alpha', 2).overtime)
 			assert.are_same({w = 1, d = 0, l = 0}, findEntry(standingsTable.entries, 'Alpha', 2).match)
@@ -787,7 +787,7 @@ describe('Standings Parser', function()
 			local standingsTable = StandingsParser.parse(
 				TWO_FINISHED_ROUNDS, makeOpponents(), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS)
 
-			assert.is_false(standingsTable.hasovertimes)
+			assert.is_false(standingsTable.hasovertime)
 			Array.forEach(standingsTable.entries, function(entry)
 				assert.is_nil(entry.overtime)
 			end)

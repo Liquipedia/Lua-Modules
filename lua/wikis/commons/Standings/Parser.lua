@@ -171,7 +171,7 @@ function StandingsParser.parse(
 		matches = matches,
 		roundcount = #rounds,
 		hasdraw = draws.match,
-		hasovertimes = Logic.readBool(overtimeEnabled),
+		hasovertime = Logic.readBool(overtimeEnabled),
 		haspoints = true,
 		finished = isFinished,
 		extradata = {
