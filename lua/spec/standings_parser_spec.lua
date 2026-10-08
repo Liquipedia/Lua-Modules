@@ -593,6 +593,141 @@ describe('Standings Parser', function()
 			end)
 		end)
 
+		describe('h2hcs', function()
+			-- Same ties as above: A, B, C and D are all tied on 3 points.
+			-- Pairwise B beat A, A beat C and D, B beat D, while B and C and C and D never played.
+			local MATCHES = {
+				{id = 'M1', a = 'A', scoreA = 2, b = 'C', scoreB = 0},
+				{id = 'M2', a = 'B', scoreA = 2, b = 'D', scoreB = 0},
+				{id = 'M3', a = 'B', scoreA = 2, b = 'A', scoreB = 0},
+				{id = 'M4', a = 'A', scoreA = 2, b = 'D', scoreB = 0},
+				{id = 'M5', a = 'A', scoreA = 2, b = 'C', scoreB = 0},
+			}
+			local POINTS = {A = 3, B = 3, C = 3, D = 3}
+			local NAMES = {'A', 'B', 'C', 'D'}
+
+			it('applies to ties of more than three opponents', function()
+				local standingsTable = parse(
+					makeOpponents(NAMES, MATCHES, POINTS), {'full.points', 'h2hcs.matchdiff', 'full.manual'})
+
+				-- B is at least as good as everyone else, C and D are at most as good as everyone else
+				assert.are_same({'B', 'A', 'C', 'D'}, namesBySlot(standingsTable))
+				assert.are_equal(1, placementOf(standingsTable, 'B'))
+				assert.are_equal(2, placementOf(standingsTable, 'A'))
+				assert.are_equal(3, placementOf(standingsTable, 'C'))
+				assert.are_equal(3, placementOf(standingsTable, 'D'))
+			end)
+
+			it('is not applied by h2hlegacy for ties of more than three opponents', function()
+				local standingsTable = parse(
+					makeOpponents(NAMES, MATCHES, POINTS), {'full.points', 'h2hlegacy.matchdiff', 'full.manual'})
+
+				Array.forEach(NAMES, function(name)
+					assert.are_equal(1, placementOf(standingsTable, name))
+				end)
+			end)
+
+			it('continues with the next tiebreaker for the groups it splits', function()
+				local standingsTable = parse(
+					makeOpponents(NAMES, MATCHES, POINTS),
+					{'full.points', 'h2hcs.matchdiff', 'ml.matchwins', 'full.manual'}
+				)
+
+				-- C and D are still tied after h2hcs. Both have no wins among the tied opponents.
+				assert.are_same({'B', 'A', 'C', 'D'}, namesBySlot(standingsTable))
+				assert.are_equal(3, placementOf(standingsTable, 'C'))
+				assert.are_equal(3, placementOf(standingsTable, 'D'))
+			end)
+
+			it('differs from h2hlegacy for ties of three opponents', function()
+				-- A, B and C are tied. Among them A and B each beat C, and A and B drew.
+				-- For h2hcs the draw between A and B is ignored, so both are on top. The mini league puts B above A,
+				-- as B beat C twice.
+				local opponents = makeOpponents({'A', 'B', 'C'}, {
+					{id = 'M1', a = 'A', scoreA = 2, b = 'C', scoreB = 0},
+					{id = 'M2', a = 'B', scoreA = 2, b = 'C', scoreB = 0},
+					{id = 'M3', a = 'B', scoreA = 2, b = 'C', scoreB = 0},
+					{id = 'M4', a = 'A', scoreA = 1, b = 'B', scoreB = 1},
+				}, {A = 1, B = 1, C = 1})
+
+				local h2hcsTable = parse(opponents, {'full.points', 'h2hcs.matchdiff', 'full.manual'})
+				assert.are_equal(1, placementOf(h2hcsTable, 'A'))
+				assert.are_equal(1, placementOf(h2hcsTable, 'B'))
+				assert.are_equal(3, placementOf(h2hcsTable, 'C'))
+
+				local legacyTable = parse(opponents, {'full.points', 'h2hlegacy.matchdiff', 'full.manual'})
+				assert.are_equal(1, placementOf(legacyTable, 'B'))
+				assert.are_equal(2, placementOf(legacyTable, 'A'))
+				assert.are_equal(3, placementOf(legacyTable, 'C'))
+			end)
+
+			it('is only listed by id, without a title or values', function()
+				local standingsTable = parse(
+					makeOpponents(NAMES, MATCHES, POINTS), {'full.points', 'h2hcs.matchdiff', 'full.manual'})
+
+				assert.are_same({id = 'h2hcs.matchdiff'}, Array.find(standingsTable.extradata.additionalStats, function(stat)
+					return stat.id == 'h2hcs.matchdiff'
+				end))
+				assert.is_nil(findEntry(standingsTable.entries, 'A', 1).extradata.additionalStatsValues['h2hcs.matchdiff'])
+			end)
+		end)
+
+		describe('successive h2hcs tiebreakers', function()
+			-- A, B, C and D are tied on 3 points, and the matches among them follow a strict order A > B > C > D
+			local MATCHES = {
+				{id = 'M1', a = 'A', scoreA = 2, b = 'B', scoreB = 0},
+				{id = 'M2', a = 'A', scoreA = 2, b = 'C', scoreB = 0},
+				{id = 'M3', a = 'A', scoreA = 2, b = 'D', scoreB = 0},
+				{id = 'M4', a = 'B', scoreA = 2, b = 'C', scoreB = 0},
+				{id = 'M5', a = 'B', scoreA = 2, b = 'D', scoreB = 0},
+				{id = 'M6', a = 'C', scoreA = 2, b = 'D', scoreB = 0},
+			}
+			local POINTS = {A = 3, B = 3, C = 3, D = 3}
+			local NAMES = {'A', 'B', 'C', 'D'}
+
+			it('only splits the top and the bottom in one pass', function()
+				local standingsTable = parse(
+					makeOpponents(NAMES, MATCHES, POINTS), {'full.points', 'h2hcs.matchdiff', 'full.manual'})
+
+				assert.are_same({'A', 'B', 'C', 'D'}, namesBySlot(standingsTable))
+				assert.are_equal(1, placementOf(standingsTable, 'A'))
+				assert.are_equal(2, placementOf(standingsTable, 'B'))
+				assert.are_equal(2, placementOf(standingsTable, 'C'))
+				assert.are_equal(4, placementOf(standingsTable, 'D'))
+			end)
+
+			it('splits the middle with the same tiebreaker listed again', function()
+				local standingsTable = parse(
+					makeOpponents(NAMES, MATCHES, POINTS),
+					{'full.points', 'h2hcs.matchdiff', 'h2hcs.matchdiff', 'full.manual'}
+				)
+
+				assert.are_same({'A', 'B', 'C', 'D'}, namesBySlot(standingsTable))
+				assert.are_equal(1, placementOf(standingsTable, 'A'))
+				assert.are_equal(2, placementOf(standingsTable, 'B'))
+				assert.are_equal(3, placementOf(standingsTable, 'C'))
+				assert.are_equal(4, placementOf(standingsTable, 'D'))
+			end)
+
+			it('continues with a different h2hcs tiebreaker in the middle', function()
+				-- B and C won a match each, but C won more games among them
+				local opponents = makeOpponents(NAMES, {
+					{id = 'M1', a = 'A', scoreA = 2, b = 'B', scoreB = 0},
+					{id = 'M2', a = 'A', scoreA = 2, b = 'C', scoreB = 0},
+					{id = 'M3', a = 'A', scoreA = 2, b = 'D', scoreB = 0},
+					{id = 'M4', a = 'B', scoreA = 2, b = 'C', scoreB = 1},
+					{id = 'M5', a = 'B', scoreA = 2, b = 'D', scoreB = 0},
+					{id = 'M6', a = 'C', scoreA = 2, b = 'D', scoreB = 0},
+					{id = 'M7', a = 'C', scoreA = 2, b = 'B', scoreB = 0},
+				}, POINTS)
+
+				local standingsTable = parse(
+					opponents, {'full.points', 'h2hcs.matchdiff', 'h2hcs.gamediff', 'full.manual'})
+
+				assert.are_same({'A', 'C', 'B', 'D'}, namesBySlot(standingsTable))
+			end)
+		end)
+
 		describe('game based tiebreakers', function()
 			-- A, B and C are tied on 1 point, D has none.
 			-- Among A, B and C the game diffs are A -1, B +1, C 0, over all matches A +1, B -1, C +1.
