@@ -135,18 +135,17 @@ describe('Standings Tiebreaker HeadToHead', function()
 		assert.are_same({{'A'}, {'C'}, {'B'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
 	end)
 
-	it('does not put opponents with a level pairing on top or at the bottom', function()
-		-- A drew B, so A is not on top although it beat C
+	it('ignores pairs that only drew', function()
+		-- A drew B, but beat C
 		local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'B', draw = true}, {'A', 'C'}})
 
-		assert.are_same({{'A', 'B'}, {'C'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
+		assert.are_same({{'A'}, {'B'}, {'C'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
 	end)
 
 	it('keeps opponents that drew everyone in the middle', function()
 		local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'B', draw = true}, {'A', 'C', draw = true}, {'B', 'C'}})
 
-		-- B beat C, but drew A
-		assert.are_same({{'A', 'B', 'C'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
+		assert.are_same({{'B'}, {'A'}, {'C'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
 	end)
 
 	it('has no effect if nobody played each other', function()

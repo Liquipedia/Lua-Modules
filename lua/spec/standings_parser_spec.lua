@@ -632,7 +632,7 @@ describe('Standings Parser', function()
 
 			it('differs from h2hlegacy for ties of three opponents', function()
 				-- A, B and C are tied. Among them A and B each beat C, and A and B drew.
-				-- For h2h A and B are level, so only C is split off. The mini league puts B above A,
+				-- For h2h the draw between A and B is ignored, so both are on top. The mini league puts B above A,
 				-- as B beat C twice.
 				local opponents = makeOpponents({'A', 'B', 'C'}, {
 					{id = 'M1', a = 'A', scoreA = 2, b = 'C', scoreB = 0},
