@@ -33,6 +33,14 @@ local NAME_TO_CLASS = {
 	startingpoints = 'StartingPoints',
 }
 
+-- Tiebreakers that are not derived from the matches among tied opponents, so they only exist in the full context
+local NON_MATCH_BASED = {
+	buchholz = true,
+	manual = true,
+	disqualified = true,
+	startingpoints = true,
+}
+
 --- Validates and normalizes the name of a tiebreaker input.
 ---@param input string
 ---@return string
@@ -49,6 +57,11 @@ function TiebreakerFactory.validateAndNormalizeInput(input)
 
 	local tiebreakerClassName = NAME_TO_CLASS[name]
 	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(input))
+	assert(
+		context == 'full' or not NON_MATCH_BASED[name],
+		'Tiebreaker "' .. name .. '" cannot be used in the ' .. context .. ' context, '
+			.. 'as it is not derived from the matches among the tied opponents'
+	)
 	return table.concat({context, name}, '.')
 end
 

@@ -233,6 +233,15 @@ function StandingsParseWiki.parseTiebreakers(args, tableType)
 			}
 		end
 	end
+	if tableType == 'ffa' then
+		Array.forEach(tiebreakers, function(tiebreaker)
+			assert(
+				TiebreakerFactory.tiebreakerFromId(tiebreaker):getContextType() == 'full',
+				'Tiebreaker "' .. tiebreaker .. '" is not supported, H2H and ML tiebreakers are only defined '
+					.. 'for head-to-head standings and not for ffa standings'
+			)
+		end)
+	end
 	table.insert(tiebreakers, 1, TiebreakerFactory.validateAndNormalizeInput('disqualified'))
 	table.insert(tiebreakers, TiebreakerFactory.validateAndNormalizeInput('manual'))
 	return tiebreakers

@@ -12,6 +12,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local Table = Lua.import('Module:Table')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -20,6 +21,8 @@ local ConditionUtil = Condition.Util
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+
+local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParseLpdb = {}
 
@@ -79,12 +82,15 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 		end
 
 		local matches = {}
+		local matchPoints = {}
 
 		return {
 			opponent = opponentData.opponent,
 			rounds = Array.map(opponentData.rounds, function(roundData)
-				local match = roundData.match
-				matches = Array.append(matches, match)
+				local roundMatches = roundData.matches or {}
+				matches = Array.extend(matches, roundMatches)
+				matchPoints = Table.merge(matchPoints, roundData.matchPoints)
+				local lastMatch = roundMatches[#roundMatches]
 				return {
 					scoreboard = {
 						points = roundData.scoreboard.points,
@@ -96,7 +102,8 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 					},
 					specialstatus = roundData.specialstatus or 'nc',
 					matches = matches,
-					matchId = match and match.matchId or nil,
+					matchPoints = matchPoints,
+					matchId = lastMatch and lastMatch.matchId or nil,
 				}
 			end)
 		}
@@ -199,11 +206,15 @@ function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMappe
 			opponentRoundData.scoreboard.points = (opponentRoundData.scoreboard.points or 0) + points
 		end
 		opponentRoundData.specialstatus = ''
-		opponentRoundData.match = match2
+		opponentRoundData.matches = Array.append(opponentRoundData.matches or {}, match2)
+		if points then
+			opponentRoundData.matchPoints = opponentRoundData.matchPoints or {}
+			opponentRoundData.matchPoints[match2.matchId] = points
+		end
 		if not match2.finished then
 			return
 		end
-		local matchResult = match2.winner == 0 and 'd' or opponent.placement == 1 and 'w' or 'l'
+		local matchResult = TiebreakerScope.matchResult(match2, opponent)
 		opponentRoundData.scoreboard.match[matchResult] = (opponentRoundData.scoreboard.match[matchResult] or 0) + 1
 	end)
 end

@@ -1,6 +1,7 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('Standings Tiebreakers', function()
 	local TiebreakerFactory = require('Module:Standings/Tiebreaker/Factory')
+	local Array = require('Module:Array')
 
 	local function literal(name)
 		return {type = 'literal', name = name}
@@ -52,6 +53,20 @@ describe('Standings Tiebreakers', function()
 			assert.are_equal('full.disqualified', TiebreakerFactory.validateAndNormalizeInput('disqualified'))
 			assert.error(function() TiebreakerFactory.validateAndNormalizeInput('bogus') end)
 			assert.error(function() TiebreakerFactory.validateAndNormalizeInput('badcontext.points') end)
+		end)
+
+		it('rejects h2h and ml contexts for tiebreakers not derived from matches among tied opponents', function()
+			Array.forEach({'buchholz', 'manual', 'disqualified', 'startingpoints'}, function(name)
+				assert.are_equal('full.' .. name, TiebreakerFactory.validateAndNormalizeInput(name))
+				assert.error(function() TiebreakerFactory.validateAndNormalizeInput('h2h.' .. name) end)
+				assert.error(function() TiebreakerFactory.validateAndNormalizeInput('ml.' .. name) end)
+			end)
+		end)
+
+		it('accepts h2h and ml contexts for match based tiebreakers', function()
+			assert.are_equal('h2h.matchdiff', TiebreakerFactory.validateAndNormalizeInput('h2h.matchdiff'))
+			assert.are_equal('ml.gamediff', TiebreakerFactory.validateAndNormalizeInput('ml.gamediff'))
+			assert.are_equal('ml.points', TiebreakerFactory.validateAndNormalizeInput('ml.points'))
 		end)
 
 		it('exposes context', function()
