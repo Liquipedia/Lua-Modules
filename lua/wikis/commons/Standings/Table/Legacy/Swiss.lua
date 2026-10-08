@@ -127,7 +127,7 @@ end
 ---@param playerIndex integer
 ---@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, dq: string?}?
 function StandingTableLegacySwiss.parseSoloInput(args, playerIndex)
-	local player = args['player' .. playerIndex]
+	local player = args['player' .. playerIndex] or args['p' .. playerIndex]
 	if not player then
 		return nil
 	end
@@ -137,6 +137,8 @@ function StandingTableLegacySwiss.parseSoloInput(args, playerIndex)
 	return {
 		type = Opponent.solo,
 		player,
+		flag = args['player' .. playerIndex .. 'flag'] or args['p' .. playerIndex .. 'flag'],
+		link = args['player' .. playerIndex .. 'link'] or args['p' .. playerIndex .. 'link'],
 		tiebreaker = tiebreaker,
 		startingpoints = startingPoints,
 		disqualifiedFromRound = dq
