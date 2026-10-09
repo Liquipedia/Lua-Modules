@@ -210,7 +210,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 	return {
 		opponent = opponent,
 		qualification = qualification,
-		aliases = Array.flatMap(aliases, TeamTemplate.queryHistoricalNames),
+		aliases = Array.unique(Array.flatMap(aliases, TeamTemplate.queryHistoricalNames)),
 		notes = Array.map(input.notes or {}, function(note)
 			local text = note[1]
 			if not text then
