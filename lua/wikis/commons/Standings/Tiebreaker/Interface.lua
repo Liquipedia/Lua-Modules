@@ -10,15 +10,22 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 
 ---@alias TiebreakerOpponent {opponent: standardOpponent, points: number, matches: MatchGroupUtilMatch[],
----match: {w: integer, d: integer, l:integer}, extradata: table}
+---match: {w: integer, d: integer, l:integer}, extradata: table, startingPoints: number?}
+
+---@alias StandingsDrawLevel 'match'|'game'|'round'
+
+---@class StandingsTiebreakerOptions
+---@field draws table<StandingsDrawLevel, boolean>?
 
 ---@class StandingsTiebreaker
 ---@field context 'full'|'ml'|'h2h'
+---@field options StandingsTiebreakerOptions
 ---@field valueOf fun(self: StandingsTiebreaker, state:TiebreakerOpponent[], opponent: TiebreakerOpponent): integer
 ---@field display fun(self: StandingsTiebreaker, state:TiebreakerOpponent[], opponent: TiebreakerOpponent): string
 ---@field headerTitle fun(self: StandingsTiebreaker): string
-local StandingsTiebreaker = Class.new(function (self, context)
+local StandingsTiebreaker = Class.new(function (self, context, options)
 	self.context = context
+	self.options = options or {}
 end)
 
 ---@param state TiebreakerOpponent[]
@@ -44,6 +51,12 @@ end
 ---@return 'full'|'ml'|'h2h'
 function StandingsTiebreaker:getContextType()
 	return self.context
+end
+
+---@param level StandingsDrawLevel
+---@return boolean
+function StandingsTiebreaker:showsDraws(level)
+	return (self.options.draws or {})[level] == true
 end
 
 return StandingsTiebreaker

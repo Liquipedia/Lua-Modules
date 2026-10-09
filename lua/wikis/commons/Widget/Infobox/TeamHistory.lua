@@ -16,7 +16,6 @@ local Html = Lua.import('Module:Widget/Html')
 local Widget = Lua.import('Module:Widget')
 local Widgets = Lua.import('Module:Widget/All')
 
-local Big = Html.Big
 local Br = Html.Br
 local Div = Html.Div
 local Small = Html.Small
@@ -79,8 +78,9 @@ function TeamHistory:_getHistory()
 
 	return Div{children = {
 		Div{children = {
-			Big{
+			Div{
 				classes = {'show-when-logged-in', 'navigation-not-searchable'},
+				css = {['font-size'] = 'larger'},
 				children = {'Automated History'},
 			},
 			automatedHistory,
@@ -88,7 +88,8 @@ function TeamHistory:_getHistory()
 		Div{
 			classes = {'show-when-logged-in', 'navigation-not-searchable'},
 			children = {
-				Big{
+				Div{
+					css = {['font-size'] = 'larger'},
 					children = {'Manual History'},
 				},
 				Br{},

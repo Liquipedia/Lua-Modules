@@ -258,10 +258,9 @@ end
 ---@param opponentIndex integer
 ---@return StarcraftStandardOpponent
 function StarcraftMatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
-	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	local opponent = MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex) --[[
 	@as StarcraftStandardOpponent]]
-	opponent.isArchon = Logic.readBool(extradata.isarchon)
+	opponent.isArchon = Logic.readBool(opponent.extradata.isarchon)
 
 	return opponent
 end

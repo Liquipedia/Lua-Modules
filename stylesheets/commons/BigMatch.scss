@@ -528,11 +528,11 @@ span.slash {
 			padding: 0.25rem;
 
 			&.role--radiant {
-				background-color: var( --clr-atlantis-40 );
+				background-color: var( --dota2-radiant-side-color );
 			}
 
 			&.role--dire {
-				background-color: var( --clr-california-40 );
+				background-color: var( --dota2-dire-side-color );
 			}
 		}
 
@@ -838,13 +838,13 @@ span.slash {
 
 			&--radiant {
 				.match-bm-game-veto-overview-team-veto-row-item-text {
-					background-color: #7eac20;
+					background-color: var( --dota2-radiant-side-color );
 				}
 			}
 
 			&--dire {
 				.match-bm-game-veto-overview-team-veto-row-item-text {
-					background-color: #cc6500;
+					background-color: var( --dota2-dire-side-color );
 				}
 			}
 		}
@@ -1067,6 +1067,10 @@ span.slash {
 			.theme--dark & {
 				background-color: var( --clr-secondary-16 );
 				border-color: var( --clr-on-surface-dark-primary-8 );
+			}
+
+			&.vodlink > a {
+				display: contents;
 			}
 
 			&:has( > .match-table-wrapper ) {

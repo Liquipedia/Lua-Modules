@@ -27,11 +27,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Helpers = {}
 
----@class CharacterAppearanceStats
----@field pick integer
----@field win integer
----@field loss integer
-
 ---@param props CharacterStatsWidgetProps
 ---@return Renderable?
 local function CharacterStatsTable(props)
@@ -221,6 +216,7 @@ local function characterAppearanceStatsComparator(a, b)
 end
 
 ---@param data table<string, CharacterAppearanceStats>
+---@return Renderable
 function Helpers._buildPlayedByTeamTable(data)
 	local sortedTeamData = Array.sortBy(
 		Table.entries(data), Operator.property(2), characterAppearanceStatsComparator
@@ -248,6 +244,7 @@ end
 ---@param props CharacterStatsWidgetProps
 ---@param playedType string
 ---@param data table<string, CharacterAppearanceStats>
+---@return Renderable
 function Helpers._buildPlayedTable(props, playedType, data)
 	local sortedCharacterData = Array.sortBy(
 		Table.entries(data), Operator.property(2), characterAppearanceStatsComparator

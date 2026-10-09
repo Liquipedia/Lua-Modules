@@ -32,10 +32,10 @@ local SpecialCategories = {
 	['Mastery'] = 'Mastery',
 	['Kinetic'] = 'Kinetic',
 	['Essence'] = 'Essence',
-	['Immortal Treasure I'] = 'Immortal Treasure',
-	['Trust of the Benefactor 20'] = 'Trust of the Benefactor',
-	['Treasure of the Crimson Witness 20'] = 'Crimson Witness',
+	['Immortal Treasure'] = 'Immortal Treasure',
+	['Trust of the Benefactor'] = 'Trust of the Benefactor',
 	['Baby Roshan'] = 'Baby Roshan',
+	['Effigy Block'] = 'Effigy Block',
 }
 
 ---@class Dota2CosmeticInfobox: CosmeticInfobox
@@ -244,7 +244,7 @@ end
 
 function CustomCosmetic._getLpdbCategory(name)
 	for key, value in pairs(SpecialCategories) do
-		if string.find(key, name) then
+		if string.find(name, key) then
 			return value
 		end
 	end

@@ -266,6 +266,10 @@
 			@include banner-background( "6/6c/Starcraft2-bg.png" );
 		}
 
+		.wiki-standoff2 & {
+			@include banner-background( "a/ae/Standoff2_bg.png" );
+		}
+
 		.wiki-tft & {
 			@include banner-background( "f/f6/Tft-bg.png" );
 		}

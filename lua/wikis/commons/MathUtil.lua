@@ -11,6 +11,18 @@ local MathUtil = {}
 local ln2 = math.log(2)
 
 --[[
+Returns true if argument is NaN (not a number).
+]]
+---@param x number
+---@return boolean
+function MathUtil.isNaN(x)
+	if type(x) ~= 'number' then
+		return false
+	end
+	return x ~= x
+end
+
+--[[
 Converts the argument to an integer.
 ]]
 ---@param x any

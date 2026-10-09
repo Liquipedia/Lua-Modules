@@ -71,6 +71,7 @@ end
 
 ---@param lpdbData table
 ---@param args table
+---@return table
 function CustomHero:addToLpdb(lpdbData, args)
 	lpdbData.extradata.name = args.name
 	lpdbData.extradata.resistancebullet = args.resistancebullet

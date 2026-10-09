@@ -120,8 +120,8 @@ function Appearances:_buildConditions()
 
 	if Table.isNotEmpty(args.series) then
 		conditions:add(ConditionTree(BooleanOperator.any):add{
-			ConditionUtil.anyOf(ColumnName('seriespage'), args.series),
-			ConditionUtil.anyOf(ColumnName('series2', 'extradata'), args.series),
+			ConditionUtil.anyOf(ColumnName(1, 'serieslist'), args.series),
+			ConditionUtil.anyOf(ColumnName(2, 'serieslist'), args.series),
 		})
 	else
 		conditions:add(ConditionUtil.anyOf(ColumnName('pagename'), Array.map(args.pages, Page.pageifyLink)))

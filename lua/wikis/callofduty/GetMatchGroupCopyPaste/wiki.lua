@@ -49,10 +49,10 @@ function WikiCopyPaste.getStandardMatchCode(bestof, mode, index, opponents, args
 		Logic.readBool(args.needsWinner) and (INDENT .. '|winner=') or nil,
 		INDENT .. '|date=',
 		Logic.readBool(args.streams) and (INDENT .. '|twitch=|youtube=|vod=') or nil,
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
 		end),
-		bestof ~= 0 and Array.map(Array.range(1, bestof), function(mapIndex)
+		bestof ~= 0 and Array.mapRange(1, bestof, function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|mode=|score1=|score2=|winner=}}'
 		end) or nil,
 		INDENT .. '}}'
@@ -76,10 +76,10 @@ function WikiCopyPaste.getFfaMatchCode(bestof, mode, index, opponents, args)
 			'|p16_kill=1.2 |p17_kill=1.2 |p18_kill=1.2 |p19_kill=1.2 |p20_kill=1.2 ' ..
 			'|p21_kill=1.2 |p22_kill=1.2 |p23_kill=1.2 |p24_kill=1.2 |p25_kill=1.2 ' ..
 		INDENT .. '|twitch=|youtube=',
-		Array.map(Array.range(1, bestof), function(mapIndex)
+		Array.mapRange(1, bestof, function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|date=|finished=|vod=}}'
 		end),
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getFfaOpponent(mode, bestof)
 		end),
 		'}}'

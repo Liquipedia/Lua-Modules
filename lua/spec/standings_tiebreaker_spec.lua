@@ -37,7 +37,7 @@ describe('Standings Tiebreakers', function()
 			})
 		end
 		return {
-			matchId = props.matchId or 'FakeMatch',
+			matchId = 'FakeMatch',
 			finished = props.finished ~= false,
 			winner = props.winner,
 			opponents = matchOpponents,
@@ -49,6 +49,7 @@ describe('Standings Tiebreakers', function()
 		it('normalizes inputs', function()
 			assert.are_equal('full.points', TiebreakerFactory.validateAndNormalizeInput('points'))
 			assert.are_equal('h2h.points', TiebreakerFactory.validateAndNormalizeInput('h2h.points'))
+			assert.are_equal('full.disqualified', TiebreakerFactory.validateAndNormalizeInput('disqualified'))
 			assert.error(function() TiebreakerFactory.validateAndNormalizeInput('bogus') end)
 			assert.error(function() TiebreakerFactory.validateAndNormalizeInput('badcontext.points') end)
 		end)
@@ -70,11 +71,40 @@ describe('Standings Tiebreakers', function()
 		end)
 	end)
 
+	describe('disqualified', function()
+		it('is 0 for disqualified opponents and 1 otherwise, and has no column', function()
+			local disqualified = TiebreakerFactory.tiebreakerFromId('full.disqualified')
+			local dqOpponent = opponent('Alpha')
+			dqOpponent.extradata.disqualified = true
+			local okOpponent = opponent('Bravo')
+			okOpponent.extradata.disqualified = false
+			local untouchedOpponent = opponent('Charlie')
+
+			assert.are_equal(0, disqualified:valueOf({dqOpponent, okOpponent, untouchedOpponent}, dqOpponent))
+			assert.are_equal(1, disqualified:valueOf({dqOpponent, okOpponent, untouchedOpponent}, okOpponent))
+			assert.are_equal(1, disqualified:valueOf({dqOpponent, okOpponent, untouchedOpponent}, untouchedOpponent))
+			assert.is_nil(disqualified:headerTitle())
+		end)
+	end)
+
 	describe('matchdiff', function()
 		it('uses the match scoreboard', function()
 			local matchdiff = TiebreakerFactory.tiebreakerFromId('full.matchdiff')
 			local opp = opponent('Alpha', {match = {w = 3, d = 1, l = 1}})
 			assert.are_equal(2, matchdiff:valueOf({opp}, opp))
+			assert.are_equal('3 - 1', matchdiff:display({opp}, opp))
+		end)
+
+		it('displays draws when enabled for the match level', function()
+			local matchdiff = TiebreakerFactory.tiebreakerFromId('full.matchdiff', {draws = {match = true}})
+			local opp = opponent('Alpha', {match = {w = 3, d = 1, l = 1}})
+			assert.are_equal(2, matchdiff:valueOf({opp}, opp))
+			assert.are_equal('3 - 1 - 1', matchdiff:display({opp}, opp))
+		end)
+
+		it('does not display draws when only other levels have them enabled', function()
+			local matchdiff = TiebreakerFactory.tiebreakerFromId('full.matchdiff', {draws = {game = true}})
+			local opp = opponent('Alpha', {match = {w = 3, d = 1, l = 1}})
 			assert.are_equal('3 - 1', matchdiff:display({opp}, opp))
 		end)
 	end)
@@ -142,6 +172,15 @@ describe('Standings Tiebreakers', function()
 			-- played games only: 13+5 = 18 won rounds, (13+7)+(5+13) = 38 total
 			assert.are_equal(-2, rounddiff:valueOf({alpha}, alpha))
 			assert.are_equal('18 - 20', rounddiff:display({alpha}, alpha))
+		end)
+	end)
+
+	describe('losses', function()
+		it('sums match losses from played games', function()
+			local matchlosses = TiebreakerFactory.tiebreakerFromId('full.matchlosses')
+			local opp = opponent('Alpha', {match = {w = 3, d = 1, l = 1}})
+			assert.are_equal(-1, matchlosses:valueOf({opp}, opp))
+			assert.are_equal('1', matchlosses:display({opp}, opp))
 		end)
 	end)
 end)

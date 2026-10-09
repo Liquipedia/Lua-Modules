@@ -35,7 +35,7 @@ local CACHED_DATA = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function StarcraftLegacyPrizePool.run(frame)
 	local args = Template.retrieveReturnValues('PrizePool')
 	---@type table

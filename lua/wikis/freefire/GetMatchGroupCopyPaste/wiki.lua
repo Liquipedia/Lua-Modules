@@ -47,10 +47,10 @@ function WikiCopyPaste.getStandardMatchCode(bestof, mode, index, opponents, args
 		{INDENT .. '|date='},
 		{INDENT .. '|twitch=|youtube='},
 		{INDENT .. '|vod='},
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
-		Array.map(Array.range(1, bestof), function(mapIndex)
+		Array.mapRange(1, bestof, function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|score1=|score2=|finished=}}'
 		end),
 		'}}'
@@ -70,10 +70,10 @@ function WikiCopyPaste.getFfaMatchCode(bestof, mode, index, opponents, args)
 		'{{Match|finished=',
 		INDENT .. '|p_kill=1 |p1=12 |p2=9 |p3=8 |p4=7 |p5=6 |p6=5 |p7=4 |p8=3 |p9=2 |p10=1 |p11=0 |p12=0',
 		{INDENT .. '|twitch=|youtube='},
-		Array.map(Array.range(1, bestof), function(mapIndex)
+		Array.mapRange(1, bestof, function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. '={{Map|date=|finished=|map=|vod=}}'
 		end),
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getFfaOpponent(mode, bestof)
 		end),
 		'}}'

@@ -27,7 +27,7 @@ local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return VNode
+---@return Renderable
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	local args = player.args

@@ -49,10 +49,10 @@ function WikiCopyPaste.getStandardMatchCode(bestof, mode, index, opponents, args
 		{INDENT .. '|date='},
 		{INDENT .. '|twitch=|youtube='},
 		{INDENT .. '|vod='},
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
-		Array.map(Array.range(1, bestof), function(mapIndex)
+		Array.mapRange(1, bestof, function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|score1=|score2=|finished=}}'
 		end),
 		'}}'
@@ -81,10 +81,10 @@ function WikiCopyPaste.getFfaMatchCode(bestof, mode, index, opponents, args)
 		'{{Match|finished=',
 		INDENT .. defaultScoring,
 		{INDENT .. '|twitch=|youtube='},
-		Array.map(Array.range(1, bestof), function(mapIndex)
+		Array.mapRange(1, bestof, function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. '={{Map|date=|finished=|map=|vod=}}'
 		end),
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getFfaOpponent(mode, bestof)
 		end),
 		'}}'
@@ -97,7 +97,7 @@ end
 ---@param mapCount integer
 ---@return string
 function WikiCopyPaste.getFfaOpponent(mode, mapCount)
-	local mapScores = table.concat(Array.map(Array.range(1, mapCount), function(idx)
+	local mapScores = table.concat(Array.mapRange(1, mapCount, function(idx)
 		return '|m' .. idx .. '={{MS||}}'
 	end))
 

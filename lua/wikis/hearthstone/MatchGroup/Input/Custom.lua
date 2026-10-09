@@ -12,7 +12,6 @@ local CharacterStandardization = Lua.import('Module:CharacterStandardization', {
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
-local Table = Lua.import('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -73,7 +72,8 @@ end
 ---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
-	return Table.filterByKey(match, function(key) return key:match('subgroup%d+header') end)
+	-- TODO: Bot away special prefix
+	return MatchGroupInputUtil.readSetHeaders(match, 'subgroup')
 end
 
 ---@param match table

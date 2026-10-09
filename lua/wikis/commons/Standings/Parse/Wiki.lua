@@ -159,7 +159,34 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, res
 		opponent = opponent,
 		aliases = aliases,
 		startingPoints = opponentData.startingpoints,
+		disqualifiedFromRound = StandingsParseWiki.parseDisqualifiedFromRound(opponentData.dq),
+		definiteStatuses = StandingsParseWiki.parseDefiniteStatuses(opponentData, numberOfRounds),
 	}
+end
+
+---Reads the `dq` input of an opponent. `dq=true` means disqualified from the first round,
+---`dq=<number>` means disqualified from that round onwards.
+---@param input string|number|boolean?
+---@return integer?
+function StandingsParseWiki.parseDisqualifiedFromRound(input)
+	local fromRound = tonumber(input)
+	if fromRound then
+		return math.floor(fromRound)
+	end
+	return Logic.readBool(input) and 1 or nil
+end
+
+---Reads the `r<round>bg` inputs of an opponent, e.g. `r3bg=up`. The status applies from that round onwards.
+---Rounds beyond the number of rounds and empty values are ignored.
+---@param opponentData table
+---@param numberOfRounds integer
+---@return table<integer, string>?
+function StandingsParseWiki.parseDefiniteStatuses(opponentData, numberOfRounds)
+	local statuses = {}
+	for round = 1, numberOfRounds do
+		statuses[round] = Logic.nilIfEmpty(opponentData['r' .. round .. 'bg'])
+	end
+	return Logic.nilIfEmpty(statuses)
 end
 
 ---@param input string
@@ -213,16 +240,25 @@ function StandingsParseWiki.parseTiebreakers(args, tableType)
 		if tableType == 'ffa' then
 			tiebreakers = {
 				TiebreakerFactory.validateAndNormalizeInput('points'),
-				TiebreakerFactory.validateAndNormalizeInput('manual'),
 			}
 		elseif tableType == 'swiss' then
 			tiebreakers = {
 				TiebreakerFactory.validateAndNormalizeInput('matchdiff'),
-				TiebreakerFactory.validateAndNormalizeInput('manual'),
 			}
 		end
 	end
+	table.insert(tiebreakers, 1, TiebreakerFactory.validateAndNormalizeInput('disqualified'))
+	table.insert(tiebreakers, TiebreakerFactory.validateAndNormalizeInput('manual'))
 	return tiebreakers
+end
+
+---Reads which levels draws are explicitly enabled/disabled for. Unset (nil) means auto-detect from the data.
+---@param args table
+---@return {match: boolean?}
+function StandingsParseWiki.parseDrawConfig(args)
+	return {
+		match = Logic.readBoolOrNil(args.matchdraws),
+	}
 end
 
 ---@param args table

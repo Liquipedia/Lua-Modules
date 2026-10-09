@@ -115,6 +115,7 @@ local function roleAndPositionDisplay(squadPlayer)
 end
 
 ---@param squadPlayer ModelRow
+---@param dateProperty string
 ---@return Renderable?
 local function dateDisplay(squadPlayer, dateProperty)
 	if not squadPlayer[dateProperty] then

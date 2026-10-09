@@ -1127,6 +1127,12 @@ div.brkts-popup-body-element-thumbs {
 	}
 }
 
+.wiki-dota2,
+.wiki-dota2gameru {
+	--dota2-radiant-side-color: var( --clr-atlantis-40 );
+	--dota2-dire-side-color: var( --clr-california-40 );
+}
+
 .brkts-popup-side-color {
 	img {
 		outline: 0.125rem solid transparent;
@@ -1150,11 +1156,11 @@ div.brkts-popup-body-element-thumbs {
 	}
 
 	&--radiant img {
-		outline-color: #bcd985;
+		outline-color: var( --dota2-radiant-side-color );
 	}
 
 	&--dire img {
-		outline-color: #e79e7e;
+		outline-color: var( --dota2-dire-side-color );
 	}
 }
 
@@ -1228,30 +1234,30 @@ div.brkts-popup-body-element-thumbs {
 		flex: 1 1;
 		min-width: 0;
 
-		&:has( > .team-name-dynamic ),
-		&:has( > a > .team-name-dynamic ) {
+		&.team-name-dynamic {
 			container: block-team-name / inline-size;
 
-			> .team-name-dynamic,
-			> a > .team-name-dynamic {
-				content: none;
+			.team-shortname {
+				display: none;
 
 				@container block-team-name ( min-width: 15px ) and ( width < 100px ) {
-					&::before {
-						content: attr( data-team-shortname );
-					}
+					display: contents;
 				}
+			}
+
+			.team-bracketname {
+				display: none;
 
 				@container block-team-name ( min-width: 100px ) and ( width < 180px ) {
-					&::before {
-						content: attr( data-team-bracketname );
-					}
+					display: contents;
 				}
+			}
+
+			.team-name {
+				display: none;
 
 				@container block-team-name ( min-width: 180px ) {
-					&::before {
-						content: attr( data-team-name );
-					}
+					display: contents;
 				}
 			}
 		}

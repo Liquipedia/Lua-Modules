@@ -52,7 +52,7 @@ local CONTENT = {
 		heading = 'Tournaments',
 		body = Div{
 			children = {
-				mw.getCurrentFrame():preprocess('<tournaments />'),
+				mw.getCurrentFrame():extensionTag('tournaments'),
 				Div{
 					classes = {'mainpage-editlink'},
 					children = {

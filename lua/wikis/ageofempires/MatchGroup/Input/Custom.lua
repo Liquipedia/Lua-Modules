@@ -8,16 +8,13 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
-local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
@@ -59,64 +56,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 --- Normal 2-opponent Match
-
----@param match table
----@param opponentIndex integer
----@param options readOpponentOptions
----@return MGIParsedOpponent?
-function MatchFunctions.readOpponent(match, opponentIndex, options)
-	options = options or {}
-	local opponentInput = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex))
-	if not opponentInput then
-		return opponentIndex <= 2 and MatchGroupInputUtil.mergeRecordWithOpponent({}, Opponent.blank()) or nil
-	end
-
-	local opponent = Opponent.readOpponentArgs(opponentInput)
-	if Opponent.isBye(opponent) then
-		local byeOpponent = Opponent.blank()
-		byeOpponent.name = 'BYE'
-		return MatchGroupInputUtil.mergeRecordWithOpponent({}, byeOpponent)
-	end
-
-	---@type number|string?
-	local resolveDate = match.timestamp
-	-- If date is default date, resolve using tournament dates instead
-	-- default date indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not the default date
-	if resolveDate == DateExt.defaultTimestamp then
-		resolveDate = DateExt.getContextualDate()
-	end
-
-	Opponent.resolve(opponent, resolveDate, {syncPlayer = true})
-
-	local substitutions
-	if opponent.type == Opponent.team then
-		local manualPlayersInput = MatchGroupInputUtil.extractManualPlayersInput(match, opponentIndex, opponentInput)
-		substitutions = manualPlayersInput.substitutions
-		-- Change compared to commons MatchGroupInputUtil.readOpponent
-		local template = TeamTemplate.getRawOrNil(opponent.template) or {}
-		opponent.players = MatchGroupInputUtil.readPlayersOfTeam(
-			template.page or '',
-			manualPlayersInput,
-			options,
-			{timestamp = match.timestamp, timezoneOffset = match.timezoneOffset}
-		)
-	end
-
-	Array.forEach(opponent.players or {}, function(player)
-		player.pageName = Page.pageifyLink(player.pageName)
-	end)
-
-	local record = MatchGroupInputUtil.mergeRecordWithOpponent(opponentInput, opponent, substitutions)
-
-	-- no need to pagify non opponent names as for literals it is irrelevant
-	-- and for party opponents it comes down to pagifying player names
-	if options.pagifyTeamNames and opponent.type == Opponent.team then
-		record.name = Page.pageifyLink(record.name)
-	end
-
-	return record
-end
 
 ---@param match table
 ---@param opponents MGIParsedOpponent[]

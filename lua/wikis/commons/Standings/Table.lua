@@ -36,6 +36,8 @@ local StandingsTable = {}
 ---@field opponent standardOpponent
 ---@field aliases standardOpponent[]? # Only for team opponents
 ---@field startingPoints number?
+---@field disqualifiedFromRound integer? # The first round in which the opponent is disqualified
+---@field definiteStatuses table<integer, string>? # Manually set definite statuses, keyed by the round they apply from
 
 ---@param frame Frame
 ---@return Renderable
@@ -71,7 +73,9 @@ function StandingsTable.fromTemplate(frame)
 		opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
 	end
 
-	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
+	local standingsTable = StandingsParser.parse(
+		rounds, opponents, bgs, title, matches, tableType, tiebreakers, StandingsParseWiki.parseDrawConfig(args)
+	)
 
 	if tableType == 'swiss' then
 		standingsTable.extradata.placemapping = Logic.wrapTryOrLog(StandingsParseWiki.parsePlaceMapping)(args, opponents)

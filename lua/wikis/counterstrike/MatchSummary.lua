@@ -13,6 +13,8 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local VodLink = Lua.import('Module:VodLink')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+
 local Html = Lua.import('Module:Widget/Html')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
@@ -99,7 +101,7 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 			label = label .. ' for Game ' .. index
 		end
 
-		table.insert(elements, MatchSummary.makeLinkDisplay(url, icon, iconDark, label))
+		table.insert(elements, DisplayHelper.makeLinkDisplay(url, icon, iconDark, label))
 	end
 
 	local function addVodLink(gamenum, vod, part)

@@ -7,13 +7,8 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
-
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-
----@class LabMatchSummary: CustomMatchSummaryInterface
-local CustomMatchSummary = {}
 
 ---@class LabMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
 local GameRowComponentProps = {
@@ -22,22 +17,16 @@ local GameRowComponentProps = {
 
 local LabMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
+---@class LabMatchSummary: CustomMatchSummaryInterface
+local CustomMatchSummary = {
+	GameRow = LabMatchSummaryGameRow,
+}
+
 ---@param args table
 ---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
-
----@param match MatchGroupUtilMatch
----@return VNode
-function CustomMatchSummary.createGames(match)
-	return MatchSummaryWidgets.GamesContainer{
-		children = Array.map(match.games, function (game, gameIndex)
-			return LabMatchSummaryGameRow{game = game, gameIndex = gameIndex}
-		end)
-	}
-end
-
 
 ---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer

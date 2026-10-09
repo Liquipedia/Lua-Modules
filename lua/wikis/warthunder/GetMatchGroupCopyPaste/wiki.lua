@@ -34,10 +34,10 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		showScore and (INDENT .. '|finished=') or nil,
 		INDENT .. '|date=',
 		Logic.readBool(args.streams) and (INDENT .. '|twitch=|youtube=|vod=') or nil,
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
 		end),
-		(not showScore) and Array.map(Array.range(1, bestof), function(mapIndex)
+		(not showScore) and Array.mapRange(1, bestof, function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|score1=|score2=|winner=}}'
 		end) or nil,
 		INDENT .. '}}'
