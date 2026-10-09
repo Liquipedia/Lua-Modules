@@ -175,6 +175,26 @@ describe('Standings Tiebreakers', function()
 		end)
 	end)
 
+	describe('gamewinrate', function()
+		it('displays the game win rate', function()
+			local gamewinrate = TiebreakerFactory.tiebreakerFromId('full.gamewinrate')
+			local alpha = opponent('Alpha', {
+				matches = {
+					makeMatch({'Alpha', 'Bravo'}, {winner = 1, scores = {2, 1}}),
+					makeMatch({'Alpha', 'Charlie'}, {winner = 2, scores = {1, 2}}),
+				},
+			})
+			assert.are_equal('50.00%', gamewinrate:display({alpha}, alpha))
+		end)
+
+		it('displays a dash when no games have been played', function()
+			local gamewinrate = TiebreakerFactory.tiebreakerFromId('full.gamewinrate')
+			local alpha = opponent('Alpha')
+			assert.are_equal(0.5, gamewinrate:valueOf({alpha}, alpha))
+			assert.are_equal('-', gamewinrate:display({alpha}, alpha))
+		end)
+	end)
+
 	describe('losses', function()
 		it('sums match losses from played games', function()
 			local matchlosses = TiebreakerFactory.tiebreakerFromId('full.matchlosses')

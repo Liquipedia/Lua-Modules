@@ -34,7 +34,7 @@ end
 ---@return string
 function TiebreakerGameWinRate:display(state, opponent)
 	local games = TiebreakerGameUtil.getGames(opponent)
-	if games == 0 then
+	if games.games == 0 then
 		return '-'
 	end
 	return MathUtil.formatPercentage(self:valueOf(state, opponent), 2)
