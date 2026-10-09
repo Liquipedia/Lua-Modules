@@ -61,7 +61,7 @@ local Standings = {}
 ---@field pointsChangeFromPreviousRound number
 ---@field specialStatus 'dq'|'nc'|'' # nc = non-competing (not in the round)
 ---@field disqualified boolean
----@field additionalStatsValues table<string, {value: integer?, display: string?}>
+---@field additionalStatsValues table<string, {value: StandingsTiebreakerValue?, display: string?}>
 ---@field package record standingsentry
 
 ---Fetches a standings table from a page. Tries to read from page variables before fetching from LPDB.

@@ -624,6 +624,87 @@ describe('Standings Parser', function()
 				assert.are_same({'B', 'A', 'C'}, namesBySlot(standingsTable))
 			end)
 		end)
+
+		describe('score tiebreakers', function()
+			---@param name string
+			---@param w integer
+			---@param l integer
+			---@return table
+			local function withRecord(name, w, l)
+				return {
+					opponent = literal(name),
+					rounds = {{scoreboard = {points = 0, match = {w = w, d = 0, l = l}}, specialstatus = ''}},
+				}
+			end
+
+			it('orders by match wins, then by fewer match losses', function()
+				local standingsTable = parse({
+					withRecord('W2L0', 2, 0),
+					withRecord('W2L1', 2, 1),
+					withRecord('W3L2', 3, 2),
+					withRecord('W3L1', 3, 1),
+					withRecord('W2L1b', 2, 1),
+				}, {'full.matchscore', 'full.manual'})
+
+				-- 3-1 above 3-2 (same wins, fewer losses), 3-2 above 2-0 (more wins, matchdiff would reverse them),
+				-- 3-2 above 2-1 (more wins, matchdiff would tie them). Exact ties keep their order.
+				assert.are_same({'W3L1', 'W3L2', 'W2L0', 'W2L1', 'W2L1b'}, namesBySlot(standingsTable))
+				assert.are_equal(1, placementOf(standingsTable, 'W3L1'))
+				assert.are_equal(2, placementOf(standingsTable, 'W3L2'))
+				assert.are_equal(3, placementOf(standingsTable, 'W2L0'))
+				assert.are_equal(4, placementOf(standingsTable, 'W2L1'))
+				assert.are_equal(4, placementOf(standingsTable, 'W2L1b'))
+			end)
+
+			it('orders by game wins, then by fewer game losses', function()
+				-- A: 3-2 in games, B: 2-1 in games, the same game diff
+				local MATCHES = {
+					{id = 'M1', a = 'A', scoreA = 2, b = 'X', scoreB = 0},
+					{id = 'M2', a = 'A', scoreA = 1, b = 'Y', scoreB = 2},
+					{id = 'M3', a = 'B', scoreA = 2, b = 'Z', scoreB = 1},
+				}
+				local opponents = makeOpponents({'B', 'A'}, MATCHES, {A = 0, B = 0})
+
+				local byGameDiff = parse(opponents, {'full.points', 'full.gamediff', 'full.manual'})
+				assert.are_equal(1, placementOf(byGameDiff, 'A'))
+				assert.are_equal(1, placementOf(byGameDiff, 'B'))
+
+				local byGameScore = parse(opponents, {'full.points', 'full.gamescore', 'full.manual'})
+				assert.are_same({'A', 'B'}, namesBySlot(byGameScore))
+				assert.are_equal(2, placementOf(byGameScore, 'B'))
+			end)
+
+			describe('among tied opponents', function()
+				-- A, B and C are tied on points in a double round robin where not every match is played yet.
+				-- A beat B, C beat A twice and B beat C. Among them: C 2-1, A 1-2, B 1-1.
+				local MATCHES = {
+					{id = 'M1', a = 'A', scoreA = 2, b = 'B', scoreB = 0},
+					{id = 'M2', a = 'C', scoreA = 2, b = 'A', scoreB = 0},
+					{id = 'M3', a = 'C', scoreA = 2, b = 'A', scoreB = 1},
+					{id = 'M4', a = 'B', scoreA = 2, b = 'C', scoreB = 1},
+				}
+				local POINTS = {A = 3, B = 3, C = 3}
+				local NAMES = {'A', 'B', 'C'}
+
+				it('compares wins and losses within the same scope for ml', function()
+					local standingsTable = parse(
+						makeOpponents(NAMES, MATCHES, POINTS), {'full.points', 'ml.matchscore', 'full.manual'})
+
+					-- A and B both have 1 win among A, B and C, B has fewer losses among them
+					assert.are_same({'C', 'B', 'A'}, namesBySlot(standingsTable))
+				end)
+
+				it('differs from separate ml tiebreakers, which narrow the scope for each tiebreaker', function()
+					local standingsTable = parse(
+						makeOpponents(NAMES, MATCHES, POINTS),
+						{'full.points', 'ml.matchwins', 'ml.matchlosses', 'full.manual'}
+					)
+
+					-- ml.matchlosses only looks at the matches among A and B, which A won
+					assert.are_same({'C', 'A', 'B'}, namesBySlot(standingsTable))
+				end)
+			end)
+		end)
 	end)
 
 	describe('manual definite statuses', function()
@@ -726,6 +807,21 @@ describe('Standings Parser', function()
 			assert.are_equal('stay', charlie2.currentstatus)
 			assert.is_nil(charlie2.definitestatus)
 		end)
+	end)
+
+	it('shows tiebreakers sharing a title in one column', function()
+		local StandingsDisplayUtil = require('Module:Standings/DisplayUtil')
+		local standingsTable = StandingsParser.parse(
+			TWO_FINISHED_ROUNDS,
+			{makeOpponent('Alpha', {{points = 3}, {points = 3}})},
+			BGS, nil, {}, 'swiss',
+			{'full.matchdiff', 'full.matchscore', 'ml.matchscore', 'full.gamescore', 'full.gamediff', 'full.manual'}
+		)
+
+		-- The ml tiebreaker has no column, the others share the matches and the games column
+		---@diagnostic disable-next-line: missing-fields
+		local stats = StandingsDisplayUtil.statsToShow({additionalStats = standingsTable.extradata.additionalStats})
+		assert.are_same({'Matches', 'Games'}, Array.map(stats, function(stat) return stat.title end))
 	end)
 
 	it('increments the standingsindex wiki variable per table', function()
