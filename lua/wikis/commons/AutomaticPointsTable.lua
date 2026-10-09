@@ -40,7 +40,7 @@ local POINTS_TYPE = {
 
 ---@class AutomaticPointsTableConfig
 ---@field positionBackgrounds string[]
----@field tournaments StandardTournament[]
+---@field tournaments {tournament: StandardTournament, usePoints2: boolean}[]
 ---@field opponents AutomaticPointsTableOpponent[]
 ---@field limit number
 ---@field lpdbName string
