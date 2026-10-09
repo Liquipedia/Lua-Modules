@@ -789,7 +789,7 @@ function StatisticsPortal.playerAgeTable(args)
 				opponent = StatisticsPortal._toOpponent(player),
 				showPlayerTeam = true,
 			}},
-			TableWidgets.Cell{children = LANG:formatDuration(ageInSeconds, {'years', 'days'})}}
+			TableWidgets.Cell{children = LANG:formatDuration(ageInSeconds, {'years', 'days'})}
 		}}
 	end)
 
