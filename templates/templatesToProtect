@@ -258,6 +258,10 @@ Match
 Matchlist
 MatchPage
 MatchSection
+MedalStatsFaction
+MedalStatsFlag
+MedalStatsParticipant
+MedalStatsParticipantTeam
 NavBox
 NavBoxChild
 Next_match
