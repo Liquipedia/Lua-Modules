@@ -782,19 +782,15 @@ function StatisticsPortal.playerAgeTable(args)
 
 	local tableRow = Array.map(playerData, function(player)
 		local birthdate = DateExt.readTimestamp(player.birthdate) --[[@as integer]]
-		local age = os.date('*t', os.difftime(TIMESTAMP, birthdate))
-		local yearAge = age.year - 1970
-		local dayAge = age.yday - 1
+		local ageInSeconds = os.difftime(DateExt.getCurrentTimestamp(), birthdate)
 
-		return TableWidgets.Row{
-			children = {
-				TableWidgets.Cell{children = OpponentDisplay.BlockOpponent{
-					opponent = StatisticsPortal._toOpponent(player),
-					showPlayerTeam = true,
-				}},
-				TableWidgets.Cell{children = yearAge .. ' years, ' .. dayAge .. ' days'}
-			}
-		}
+		return TableWidgets.Row{children = {
+			TableWidgets.Cell{children = OpponentDisplay.BlockOpponent{
+				opponent = StatisticsPortal._toOpponent(player),
+				showPlayerTeam = true,
+			}},
+			TableWidgets.Cell{children = TournamentPlayerInformation:_formatAge(ageInSeconds)}
+		}}
 	end)
 
 	return TableWidgets.Table{
