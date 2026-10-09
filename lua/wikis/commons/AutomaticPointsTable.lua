@@ -47,7 +47,6 @@ local POINTS_TYPE = {
 
 ---@class AutomaticPointsTableOpponent
 ---@field opponent standardOpponent
----@field aliases string[][]
 ---@field tiebreakerPoints number
 ---@field results {type: PointsType?, amount: number?, qualified: boolean?, deduction: number?, note: string?}[]
 ---@field qualified boolean
