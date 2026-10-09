@@ -549,7 +549,6 @@ function StatisticsPortal.pieChartBreakdown(args)
 
 	local wrapperChildren = {
 		Html.Div{
-			classes = {'template-box'},
 			css = {
 				['padding-right'] = '5em',
 				['font-size'] = '85%',
