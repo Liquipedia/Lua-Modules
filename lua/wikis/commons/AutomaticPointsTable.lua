@@ -257,6 +257,9 @@ end
 ---@param opponent standardOpponent
 ---@param tournament {tournament: StandardTournament, usePoints2: boolean}
 function AutomaticPointsTable:queryPlacement(aliases, opponent, tournament)
+	if Logic.isEmpty(aliases) then
+		return
+	end
 	local conditionType = (opponent.type == Opponent.team) and 'opponenttemplate' or 'opponentname'
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('parent'), Comparator.eq, tournament.tournament.pageName),
