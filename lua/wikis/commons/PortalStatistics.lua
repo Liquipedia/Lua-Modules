@@ -24,6 +24,7 @@ local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Tier = Lua.import('Module:Tier/Custom')
+local TournamentPlayerInformation = Lua.import('Module:TournamentPlayerInformation')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
