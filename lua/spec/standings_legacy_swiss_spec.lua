@@ -14,7 +14,7 @@ describe('Standings Legacy Swiss', function()
 				tiebreaker6 = 'minileague games won',
 			}
 			assert.are_same({
-				'ml.matchdiff', 'ml.gamediff', 'ml.points', 'ml.matchwinrate', 'ml.gamediff', 'ml.gamewins',
+				'ml.matchscore', 'ml.gamediff', 'ml.points', 'ml.matchwinrate', 'ml.gamediff', 'ml.gamewins',
 			}, tiebreakers)
 		end)
 
