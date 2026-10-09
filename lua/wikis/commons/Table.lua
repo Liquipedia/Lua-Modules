@@ -515,6 +515,18 @@ function Table.uniqueKey(tbl)
 	return key0
 end
 
+---Returns the set of keys in the specified table.
+---@generic K
+---@param tbl table<K, any>
+---@return Set<K>
+function Table.keys(tbl)
+	local Set = require('Module:Set')
+
+	local keySet = Set()
+	keySet.data = Table.mapValues(tbl, function () return true end)
+	return keySet
+end
+
 ---Returns the entries of a table as an array of key value pairs. The ordering of the array is not specified.
 ---@generic K, V
 ---@param tbl {[K]: V}
