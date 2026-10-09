@@ -16,7 +16,7 @@ local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 local MatchPageDisplay = {}
 
 ---@class MatchPageConfigOptions
----@field MatchPageContainer function?
+---@field MatchPageContainer? fun(props: {match: MatchGroupUtilMatch}): Renderable
 
 ---Display component for a MatchPage. The MatchPage is specified by matchID.
 ---The component fetches the match data from LPDB or page variables.
@@ -52,7 +52,7 @@ function MatchPageDisplay.SingleMatch(props)
 end
 
 ---Display component for a matcch. Consists of the match page.
----@param props {MatchPageContainer: function, match: MatchGroupUtilMatch}
+---@param props {MatchPageContainer: (fun(props: {match: MatchGroupUtilMatch}): Renderable), match: MatchGroupUtilMatch}
 ---@return Renderable
 function MatchPageDisplay.Match(props)
 	local bracketId = MatchGroupUtil.splitMatchId(props.match.matchId)
