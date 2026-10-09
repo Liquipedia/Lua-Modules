@@ -24,7 +24,6 @@ local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Tier = Lua.import('Module:Tier/Custom')
-local TournamentPlayerInformation = Lua.import('Module:TournamentPlayerInformation')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
@@ -790,7 +789,7 @@ function StatisticsPortal.playerAgeTable(args)
 				opponent = StatisticsPortal._toOpponent(player),
 				showPlayerTeam = true,
 			}},
-			TableWidgets.Cell{children = TournamentPlayerInformation:_formatAge(ageInSeconds)}
+			TableWidgets.Cell{children = LANG:formatDuration(ageInSeconds, {'years', 'days'})}}
 		}}
 	end)
 
