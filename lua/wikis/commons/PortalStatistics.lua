@@ -246,8 +246,8 @@ function StatisticsPortal._coverageMatchTableRow(args, parameters)
 		---@diagnostic disable-next-line: deprecated
 		gameCountValue = Count.games(parameters)
 	else
-		matchCountValue = Count.match2game(parameters)
-		gameCountValue = Count.match2(parameters)
+		matchCountValue = Count.match2(parameters)
+		gameCountValue = Count.match2game(parameters)
 	end
 
 	return TableWidgets.Row{
@@ -569,7 +569,6 @@ function StatisticsPortal.pieChartBreakdown(args)
 			return Game.toIdentifier{game = game, useDefault = false} or game
 		end)
 		table.insert(wrapperChildren, Html.Div{
-			classes = {'template-box'},
 			css = {
 				['padding-right'] = '5em',
 				['font-size'] = '85%',
@@ -583,8 +582,12 @@ function StatisticsPortal.pieChartBreakdown(args)
 	end
 
 	if args.multiMode then
-		table.insert(wrapperChildren, Box{
-			paddingRight = '5em',
+		table.insert(wrapperChildren, Html.Div{
+			css = {
+ 				['padding-right'] = '5em',
+ 				['font-size'] = '85%',
+ 				['text-align'] = 'center',
+			},
 			children = {
 				'Mode Breakdown',
 				StatisticsPortal._getPieChartData(
@@ -595,14 +598,14 @@ function StatisticsPortal.pieChartBreakdown(args)
 	end
 
 	if args.hideKey then
-		return Html.Div{children = wrapperChildren}
+		return Html.Div{children = Box{children = wrapperChildren}}
 	end
 
 	if args.detailedKey then
 		table.insert(wrapperChildren, Box{
 			children = StatisticsPortal.prizepoolBreakdown(args),
 		})
-		return Html.Div{children = wrapperChildren}
+		return Html.Div{children = Box{children = wrapperChildren}}
 	end
 
 	local conditions = StatisticsPortal._returnBaseConditions()
@@ -652,7 +655,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 		children = summaryTable,
 	})
 
-	return Html.Div{children = wrapperChildren}
+	return Html.Div{children = Box{children = wrapperChildren}}
 end
 
 ---@param args table?
@@ -1121,7 +1124,7 @@ function StatisticsPortal._earningsTableHeader(args)
 		children = WidgetUtil.collect(
 			TableWidgets.CellHeader{unsortable = true, children = '#'},
 			TableWidgets.CellHeader{unsortable = true, children = columnText},
-			TableWidgets.CellHeader{unsortable = true, width = '200px', children = 'Achievements'},
+			TableWidgets.CellHeader{unsortable = true, children = 'Achievements'},
 			TableWidgets.CellHeader{children = Medals.display{medal = 1}},
 			TableWidgets.CellHeader{children = Medals.display{medal = 2}},
 			TableWidgets.CellHeader{children = Medals.display{medal = 3}},
@@ -1146,7 +1149,7 @@ function StatisticsPortal._earningsTableRow(args, placements, earnings, opponent
 		children = WidgetUtil.collect(
 			TableWidgets.Cell{children = opponentIndex},
 			TableWidgets.Cell{align = 'left', children = opponentDisplay},
-			TableWidgets.Cell{children = StatisticsPortal._achievementsDisplay(placements.sWinData or {})},
+			TableWidgets.Cell{nowrap = false, children = StatisticsPortal._achievementsDisplay(placements.sWinData or {})},
 			TableWidgets.Cell{children = placements['1'] or '0'},
 			TableWidgets.Cell{children = placements['2'] or '0'},
 			TableWidgets.Cell{children = placements['3'] or '0'},
@@ -1185,7 +1188,7 @@ end
 ---@return Renderable
 function StatisticsPortal._drawChart(config, chartData)
 	return Html.Div{
-		class = 'table-responsive',
+		classes = {'table-responsive'},
 		children = mw.ext.Charts.chart({
 			grid = {
 				left = '15%',
