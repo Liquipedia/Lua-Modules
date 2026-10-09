@@ -42,7 +42,6 @@ local POINTS_TYPE = {
 ---@field positionBackgrounds string[]
 ---@field tournaments StandardTournament[]
 ---@field opponents AutomaticPointsTableOpponent[]
----@field shouldTableBeMinified boolean
 ---@field limit number
 ---@field lpdbName string
 
@@ -106,7 +105,6 @@ function AutomaticPointsTable:parseInput(args)
 	local positionBackgrounds = self:parsePositionBackgroundData(args)
 	local tournaments = self:parseTournaments(args)
 	local opponents = self:parseOpponents(args, tournaments)
-	local minified = Logic.readBool(args.minified)
 	local limit = tonumber(args.limit) or #opponents
 	local lpdbName = args.lpdbName or mw.title.getCurrentTitle().text
 
@@ -114,7 +112,6 @@ function AutomaticPointsTable:parseInput(args)
 		positionBackgrounds = positionBackgrounds,
 		tournaments = tournaments,
 		opponents = opponents,
-		shouldTableBeMinified = minified,
 		limit = limit,
 		lpdbName = lpdbName,
 	}
