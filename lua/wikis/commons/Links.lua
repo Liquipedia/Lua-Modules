@@ -348,9 +348,14 @@ local PREFIXES = {
 	tlstream = {'https://tl.net/video/streams/'},
 	tonamel = {'https://tonamel.com/competition/'},
 	toornament = {'https://play.toornament.com/tournaments/'},
-	['trackmania-io'] = {
+	['tmx'] = {
+		'',
+		map = 'https://trackmania.exchange/mapshow/'
+	},
+	['tmio'] = {
 		'https://trackmania.io/#/competitions/comp/',
 		player = 'https://trackmania.io/#/player/',
+		map = 'https://trackmania.io/#/leaderboard/'
 	},
 	trovo = {'https://trovo.live/'},
 	twitch = {'https://www.twitch.tv/'},
