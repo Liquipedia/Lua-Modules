@@ -584,9 +584,9 @@ function StatisticsPortal.pieChartBreakdown(args)
 	if args.multiMode then
 		table.insert(wrapperChildren, Html.Div{
 			css = {
- 				['padding-right'] = '5em',
- 				['font-size'] = '85%',
- 				['text-align'] = 'center',
+				['padding-right'] = '5em',
+				['font-size'] = '85%',
+				['text-align'] = 'center',
 			},
 			children = {
 				'Mode Breakdown',
