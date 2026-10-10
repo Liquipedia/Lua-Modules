@@ -12,6 +12,7 @@ local AgentNames = Lua.import('Module:AgentNames')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
@@ -169,9 +170,8 @@ function MatchFunctions.parseSkirmish(match, opponents)
 	---@return MGIParsedPlayer?
 	local function lookupPlayer(opponentIndex)
 		local opponentPlayers = opponents[opponentIndex].match2players
-		local prefix = 't' .. opponentIndex .. 'p1'
 		local playerIndex = MatchGroupInputUtil.findPlayerId(
-			opponentPlayers, skirmishData[prefix], skirmishData[prefix .. 'link']
+			opponentPlayers, nil, Page.pageifyLink(skirmishData['t' .. opponentIndex .. 'p1'])
 		)
 		return opponentPlayers[playerIndex]
 	end
