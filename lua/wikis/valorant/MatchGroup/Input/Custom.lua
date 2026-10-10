@@ -12,7 +12,6 @@ local AgentNames = Lua.import('Module:AgentNames')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
-local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
