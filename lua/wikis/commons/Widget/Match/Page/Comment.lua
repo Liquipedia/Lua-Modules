@@ -10,12 +10,13 @@ local Lua = require('Module:Lua')
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 
----@param props {children: Renderable|Renderable[]?}
+---@param props {css: HtmlStyleProps?, children: Renderable|Renderable[]?}
 ---@return VNode
 local function MatchPageComment(props)
 	return Html.Div{
 		classes = { 'match-bm-match-additional-comment' },
-		children = props.children
+		css = props.css,
+		children = props.children,
 	}
 end
 

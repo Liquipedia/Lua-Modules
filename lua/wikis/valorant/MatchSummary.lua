@@ -14,6 +14,8 @@ local Operator = Lua.import('Module:Operator')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local SkirmishDisplay = Lua.import('Module:Widget/Match/Summary/Skirmish')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ValorantMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
@@ -36,12 +38,15 @@ end
 function CustomMatchSummary.createBody(match)
 	return {
 		MatchSummaryWidgets.GamesContainer{
-			children = Array.map(match.games, function (game, gameIndex)
-				if Logic.isEmpty(game.map) then
-					return
-				end
-				return ValorantMatchSummaryGameRow{game = game, gameIndex = gameIndex}
-			end)
+			children = WidgetUtil.collect(
+				Array.map(match.games, function (game, gameIndex)
+					if Logic.isEmpty(game.map) then
+						return
+					end
+					return ValorantMatchSummaryGameRow{game = game, gameIndex = gameIndex}
+				end),
+				SkirmishDisplay{skirmish = match.extradata.skirmish}
+			)
 		},
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.MapVeto(
