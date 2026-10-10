@@ -944,20 +944,29 @@ end
 ---@param playerLink string?
 ---@return integer?
 function MatchGroupInputUtil.findPlayerId(players, playerInput, playerLink)
-	if Logic.isEmpty(playerInput) and Logic.isEmpty(playerLink) then
+	local inputIsEmpty = String.isEmpty(playerInput)
+	local linkIsEmpty = String.isEmpty(playerLink)
+
+	if inputIsEmpty and linkIsEmpty then
 		return
 	end
 
-	local playerIndex = Array.indexOf(players, function (player)
-		return player.name == playerLink
-	end)
+	local playerIndex = 0
+
+	if not linkIsEmpty then
+		playerIndex = Array.indexOf(players, function (player)
+			return player.name == playerLink
+		end)
+	end
 	if playerIndex > 0 then
 		return playerIndex
 	end
 
-	playerIndex = Array.indexOf(players, function (player)
-		return player.displayname == playerInput
-	end)
+	if not inputIsEmpty then
+		playerIndex = Array.indexOf(players, function (player)
+			return player.displayname == playerInput
+		end)
+	end
 	if playerIndex > 0 then
 		return playerIndex
 	end
