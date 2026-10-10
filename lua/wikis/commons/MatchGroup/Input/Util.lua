@@ -948,14 +948,16 @@ function MatchGroupInputUtil.findPlayerId(players, playerInput, playerLink)
 		return
 	end
 
-	local playerLinks = Array.map(players, Operator.property('name'))
-	local playerIndex = Array.indexOf(playerLinks, FnUtil.curry(Operator.eq, playerLink))
+	local playerIndex = Array.indexOf(players, function (player)
+		return player.name == playerLink
+	end)
 	if playerIndex > 0 then
 		return playerIndex
 	end
 
-	local playerDisplayNames = Array.map(players, Operator.property('displayname'))
-	playerIndex = Array.indexOf(playerDisplayNames, FnUtil.curry(Operator.eq, playerInput))
+	playerIndex = Array.indexOf(players, function (player)
+		return player.displayname == playerInput
+	end)
 	if playerIndex > 0 then
 		return playerIndex
 	end
