@@ -166,25 +166,19 @@ function MatchFunctions.parseSkirmish(match, opponents)
 		return
 	end
 
-	---@param playerName string?
 	---@param opponentIndex integer
 	---@return MGIParsedPlayer?
-	local function lookupPlayer(playerName, opponentIndex)
-		if Logic.isEmpty(playerName) then
-			return
-		end
-		---@cast playerName -nil
-		local link = Page.pageifyLink(playerName)
-		return Array.find(
-			opponents[opponentIndex].match2players,
-			function (match2player)
-				return match2player.name == link or match2player.displayname == link or match2player.displayname == playerName
-			end
+	local function lookupPlayer(opponentIndex)
+		local opponentPlayers = opponents[opponentIndex].match2players
+		local prefix = 't' .. opponentIndex .. 'p1'
+		local playerIndex = MatchGroupInputUtil.findPlayerId(
+			opponentPlayers, skirmishData[prefix], skirmishData[prefix .. 'link']
 		)
+		return opponentPlayers[playerIndex]
 	end
 
-	local player1 = lookupPlayer(skirmishData.t1p1, 1)
-	local player2 = lookupPlayer(skirmishData.t2p1, 2)
+	local player1 = lookupPlayer(1)
+	local player2 = lookupPlayer(2)
 	if Logic.isEmpty(player1) or Logic.isEmpty(player2) then
 		return
 	end
