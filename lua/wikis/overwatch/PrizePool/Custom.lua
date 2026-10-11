@@ -27,7 +27,7 @@ local TIER_TYPE_MODIFIER = {Showmatch = 0.1,  Misc = 0.25, Qualifier = 0.001, Mo
 
 -- Template entry point
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	local prizePool = PrizePool(args):create()

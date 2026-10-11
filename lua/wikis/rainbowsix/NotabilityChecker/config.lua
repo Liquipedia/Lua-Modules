@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Table = Lua.import('Module:Table')
 
+---@class RainbowsixNotabilityCheckerConfig: NotabilityCheckerConfig
 local Config = {}
 
 -- These are constants, you don't need to touch them
@@ -213,7 +214,7 @@ Config.weights = {
 --- See also the EXTRA_DROP_OFF_TYPES.
 ---@param tier string|integer
 ---@param tierType string
----@return fun(number, number): number
+---@return NotabilityCheckerDropOffFunction
 function Config.placementDropOffFunction(tier, tierType)
 	-- notability can be found here: https://liquipedia.net/rainbowsix/Liquipedia:Qualifier_Notability_Points
 	if tierType ~= nil and Table.includes(Config.EXTRA_DROP_OFF_TYPES, tierType:lower()) then

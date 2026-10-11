@@ -244,6 +244,10 @@ table.wikitable-striped {
 	}
 }
 
+table {
+	border-collapse: collapse;
+}
+
 .panel-box table.wikitable-striped,
 .panel-box .wikitable-striped td,
 .panel-box .wikitable-striped th,

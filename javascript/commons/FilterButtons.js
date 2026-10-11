@@ -122,7 +122,7 @@ liquipedia.filterButtons = {
 				buttons: [],
 				alwaysActive: buttonsDiv.dataset.filterAlwaysActive?.split( ',' ) ?? [],
 				effectClass: 'filter-effect-' + ( buttonsDiv.dataset.filterEffect ?? this.fallbackFilterEffect ),
-				filterStates: localStorage[ filterGroup ]?.filterStates ?? {},
+				filterStates: {},
 				curated: localStorage[ filterGroup ]?.curated ?? buttonsDiv.dataset.filterDefaultCurated === 'true',
 				filterableItems: [],
 				defaultStates: {},
@@ -150,7 +150,7 @@ liquipedia.filterButtons = {
 						default:
 							filterGroupEntry.buttons[ filterOn ] = button;
 							filterGroupEntry.filterStates[ filterOn ] =
-								filterGroupEntry.filterStates[ filterOn ] ?? defaultState;
+								localStorage[ filterGroup ]?.filterStates[ filterOn ] ?? defaultState;
 							filterGroupEntry.defaultStates[ filterOn ] = defaultState;
 					}
 					buttonElement.setAttribute( 'tabindex', '0' );

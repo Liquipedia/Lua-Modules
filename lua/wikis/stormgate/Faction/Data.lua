@@ -51,7 +51,6 @@ local factionProps = {
 }
 
 return {
-	defaultGame = Info.defaultGame,
 	factionProps = {
 		[Info.defaultGame] = factionProps,
 	},

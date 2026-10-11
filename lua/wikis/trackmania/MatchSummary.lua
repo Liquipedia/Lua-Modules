@@ -7,7 +7,7 @@
 
 local Lua = require('Module:Lua')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -18,16 +18,15 @@ local OVERTIME = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
----@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return Widget?
-function CustomMatchSummary.createGame(date, game, gameIndex)
+---@return Renderable?
+function CustomMatchSummary.createGame(game, gameIndex)
 	if not game.map then
 		return
 	end
@@ -52,7 +51,7 @@ end
 ---@param hoverText string|number|nil
 ---@return Html
 function CustomMatchSummary._iconDisplay(icon, hoverText)
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'brkts-popup-spaced'},
 		attributes = {title = hoverText},
 		children = {icon},

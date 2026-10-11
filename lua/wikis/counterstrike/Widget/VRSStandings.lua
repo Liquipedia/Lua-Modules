@@ -8,15 +8,14 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local MathUtil = Lua.import('Module:MathUtil')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
+local Component = Lua.import('Module:Widget/Component')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Icon = Lua.import('Module:Icon')
@@ -25,17 +24,13 @@ local VRSStandingsData = Lua.import('Module:VRSStandingsData')
 
 local FOOTER_LINK = 'Valve_Regional_Standings'
 
----@class VRSStandings: Widget
----@operator call(table): VRSStandings
----@field props table<string|number, string>
-local VRSStandings = Class.new(Widget)
-VRSStandings.defaultProps = {
+local defaultProps = {
 	title = 'VRS Standings',
 	datapointType = 'LIVE',
 }
 
 ---@param settings VRSStandingsSettings
----@return Widget[]
+---@return VNode[]
 local function buildHeaderCells(settings)
 	local filtered = settings.filterType ~= 'none'
 	return WidgetUtil.collect(
@@ -49,7 +44,7 @@ local function buildHeaderCells(settings)
 end
 
 ---@param settings VRSStandingsSettings
----@return Widget
+---@return VNode
 local function buildHeaderRow(settings)
 	return TableWidgets.TableHeader{
 		children = {
@@ -59,7 +54,7 @@ local function buildHeaderRow(settings)
 end
 
 ---@param settings VRSStandingsSettings
----@return table[]
+---@return Table2ColumnDef[]
 local function buildColumns(settings)
 	local filtered = settings.filterType ~= 'none'
 	local columns = WidgetUtil.collect(
@@ -79,7 +74,7 @@ local function buildColumns(settings)
 end
 
 ---@param settings VRSStandingsSettings
----@return Widget
+---@return VNode
 local function buildTitle(settings)
 	local regionMap = {
 		AS = 'Asia',
@@ -94,18 +89,18 @@ local function buildTitle(settings)
 	elseif settings.filterType == 'country' then
 		titleName = settings.filterDisplayName or 'Country'
 	end
-	return HtmlWidgets.Div{
+	return Html.Div{
 		children = {
-			HtmlWidgets.Div{
+			Html.Div{
 				children = {
-					HtmlWidgets.B{children = 'Unofficial ' .. titleName .. ' VRS'},
-					HtmlWidgets.Span{children = 'Last updated: ' .. settings.updated}
+					Html.B{children = 'Unofficial ' .. titleName .. ' VRS'},
+					Html.Span{children = 'Last updated: ' .. settings.updated}
 				},
-				classes = {'ranking-table__top-row-text'}
+				classes = {'ranking-table__top-row-multiline'}
 			},
-			HtmlWidgets.Div{
+			Html.Div{
 				children = {
-					HtmlWidgets.Span{children = 'Data by Liquipedia'},
+					Html.Span{children = 'Data by Liquipedia'},
 				},
 				classes = {'ranking-table__top-row-logo-container'}
 			}
@@ -114,13 +109,13 @@ local function buildTitle(settings)
 	}
 end
 
----@return Widget
+---@return VNode
 local function buildFooter()
 	return Link{
 		link = FOOTER_LINK,
 		linktype = 'internal',
 		children = {
-			HtmlWidgets.Div{
+			Html.Div{
 				children = {'See Rankings Page', Icon.makeIcon{iconName = 'goto'}},
 				classes = {'ranking-table__footer-button'},
 			}
@@ -128,11 +123,10 @@ local function buildFooter()
 	}
 end
 
----@private
 ---@param standing VRSStandingsStanding
 ---@param mainpage boolean
----@return Widget
-function VRSStandings._row(standing, mainpage)
+---@return VNode
+local function buildRow(standing, mainpage)
 	local extradata = standing.opponent.extradata or {}
 
 	local cells = WidgetUtil.collect(
@@ -149,7 +143,7 @@ function VRSStandings._row(standing, mainpage)
 		not standing.globalPlace and TableWidgets.Cell{children = extradata.region or ''} or nil,
 		not mainpage and TableWidgets.Cell{
 			children = Array.map(standing.opponent.players, function(player)
-				return HtmlWidgets.Div{
+				return Html.Div{
 					css = {display = 'inline-block', width = '160px'},
 					children = PlayerDisplay.BlockPlayer({player = player})
 				}
@@ -160,12 +154,13 @@ function VRSStandings._row(standing, mainpage)
 	return TableWidgets.Row{children = cells}
 end
 
----@return Widget
-function VRSStandings:render()
-	local standings, settings = VRSStandingsData.getStandings(self.props)
+---@param props table<string|number, string>
+---@return VNode
+local function VRSStandings(props)
+	local standings, settings = VRSStandingsData.getStandings(props)
 
 	if #standings == 0 then
-		return HtmlWidgets.Div{
+		return Html.Div{
 			children = 'No teams found for the selected filter.',
 			css = {['font-weight'] = 'bold', padding = '0.75rem'}
 		}
@@ -181,11 +176,11 @@ function VRSStandings:render()
 			buildHeaderRow(settings),
 			TableWidgets.TableBody{
 				children = Array.map(standings, function(entry)
-					return VRSStandings._row(entry, settings.mainpage)
+					return buildRow(entry, settings.mainpage)
 				end)
 			}
 		},
 	}
 end
 
-return VRSStandings
+return Component.component(VRSStandings, defaultProps)

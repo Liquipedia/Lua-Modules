@@ -3,6 +3,7 @@ describe('match2', function()
 	local tournamentData = require('test_assets.tournaments').dummy
 	insulate('matchlist', function()
 		local Json = require('Module:Json')
+
 		before_each(function ()
 			local dataSaved, dataSavedOpponent, dataSavedPlayer, dataSavedGame = {}, {}, {}, {}
 			-- Mock the lpdb functions

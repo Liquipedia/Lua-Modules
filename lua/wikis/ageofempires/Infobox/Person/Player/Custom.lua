@@ -37,7 +37,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
----@class AgeofempiresInfoboxPlayer: Person
+---@class AgeofempiresInfoboxPlayer: InfoboxPerson
 ---@operator call(Frame): AgeofempiresInfoboxPlayer
 local CustomPlayer = Class.new(Player)
 
@@ -182,7 +182,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return Html?
+---@return Renderable?
 function CustomPlayer:createBottomContent()
 	return MatchTicker.recent{player = self.pagename}
 end

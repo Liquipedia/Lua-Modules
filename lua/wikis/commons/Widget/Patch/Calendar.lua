@@ -15,11 +15,11 @@ local Patch = Lua.import('Module:Patch')
 local Widget = Lua.import('Module:Widget')
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local S = HtmlWidgets.S
-local Td = HtmlWidgets.Td
-local Th = HtmlWidgets.Th
-local Tr = HtmlWidgets.Tr
+local Html = Lua.import('Module:Widget/Html')
+local S = Html.S
+local Td = Html.Td
+local Th = Html.Th
+local Tr = Html.Tr
 
 ---@class PatchCalendar: Widget
 ---@operator call(table):PatchCalendar

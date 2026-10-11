@@ -26,10 +26,11 @@ local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournam
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local SIZE_AGENT = '20px'
 
----@class ValorantPlayerInfobox: Person
+---@class ValorantPlayerInfobox: InfoboxPerson
 ---@operator call(Frame): ValorantPlayerInfobox
 local CustomPlayer = Class.new(Player)
 
@@ -126,17 +127,17 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return Widget?
+---@return Renderable?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = TeamTemplate.getPageName(self.args.team)
 		---@cast teamPage -nil
 
 		return Html.Fragment{
-			children = {
+			children = WidgetUtil.collect(
 				MatchTicker.player{recentLimit = 3},
 				UpcomingTournaments.team{name = teamPage}
-			}
+			)
 		}
 	end
 end

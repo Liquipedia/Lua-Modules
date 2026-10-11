@@ -13,20 +13,24 @@ local TiebreakerFactory = {}
 
 local NAME_TO_CLASS = {
 	buchholz = 'Buchholz',
+	disqualified = 'Disqualified',
 	manual = 'Manual',
 	points = 'Points',
 	matchdiff = 'Match/Diff',
 	matchcount = 'Match/Count',
 	matchwins = 'Match/Wins',
 	matchdraws = 'Match/Draws',
+	matchlosses = 'Match/Losses',
 	matchwinrate = 'Match/WinRate',
 	gamediff = 'Game/Diff',
 	gamecount = 'Game/Count',
 	gamewins = 'Game/Wins',
-	gamedraws = 'Game/Draws',
+	gamelosses = 'Game/Losses',
 	gamewinrate = 'Game/WinRate',
 	roundwins = 'Game/Rounds/Wins',
+	roundlosses = 'Game/Rounds/Losses',
 	rounddiff = 'Game/Rounds/Diff',
+	startingpoints = 'StartingPoints',
 }
 
 --- Validates and normalizes the name of a tiebreaker input.
@@ -49,15 +53,16 @@ function TiebreakerFactory.validateAndNormalizeInput(input)
 end
 
 ---@param tiebreakerId string
+---@param options StandingsTiebreakerOptions?
 ---@return StandingsTiebreaker
-function TiebreakerFactory.tiebreakerFromId(tiebreakerId)
+function TiebreakerFactory.tiebreakerFromId(tiebreakerId, options)
 	local context, name = unpack(String.split(tiebreakerId, '%.'))
 	local tiebreakerClassName = NAME_TO_CLASS[name]
 	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(tiebreakerId))
 	---@type StandingsTiebreaker
 	local TiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. tiebreakerClassName)
 
-	return TiebreakerClass(context)
+	return TiebreakerClass(context, options)
 end
 
 return TiebreakerFactory

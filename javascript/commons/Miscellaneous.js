@@ -33,9 +33,9 @@ liquipedia.teamcard = {
 				hideplayers = 'Hide Players';
 			}
 			const button = document.createElement( 'button' );
-			button.classList.add( 'btn' );
-			button.classList.add( 'btn-secondary' );
-			button.classList.add( 'btn-small' );
+			button.classList.add( 'button' );
+			button.classList.add( 'button--secondary' );
+			button.classList.add( 'button--small' );
 			button.innerHTML = showplayers;
 			button.addEventListener( 'click', () => {
 				if ( teamcardsopened ) {
@@ -67,7 +67,7 @@ liquipedia.teamcard = {
 		document.querySelectorAll( '.teamcard-former-toggle-button' ).forEach( ( wrap ) => {
 			const teamcard = wrap.closest( '.teamcard' );
 			const button = document.createElement( 'button' );
-			button.classList.add( 'btn', 'btn-secondary', 'btn-small' );
+			button.classList.add( 'button', 'button--secondary', 'button--small' );
 			let width = 156;
 			if ( typeof wrap.dataset.width !== 'undefined' ) {
 				width = parseInt( wrap.dataset.width );
@@ -118,7 +118,7 @@ liquipedia.teamcard = {
 		document.querySelectorAll( '.teamcard-subs-toggle-button' ).forEach( ( wrap ) => {
 			const teamcard = wrap.closest( '.teamcard' );
 			const button = document.createElement( 'button' );
-			button.classList.add( 'btn', 'btn-secondary', 'btn-small' );
+			button.classList.add( 'button', 'button--secondary', 'button--small' );
 			let width = 156;
 			if ( typeof wrap.dataset.width !== 'undefined' ) {
 				width = parseInt( wrap.dataset.width );
@@ -170,7 +170,7 @@ liquipedia.teamcard = {
 		document.querySelectorAll( '.teamcard-active-toggle-button' ).forEach( ( wrap ) => {
 			const teamcard = wrap.closest( '.teamcard' );
 			const button = document.createElement( 'button' );
-			button.classList.add( 'btn', 'btn-secondary', 'btn-small' );
+			button.classList.add( 'button', 'button--secondary', 'button--small' );
 			let width = 156;
 			if ( typeof wrap.dataset.width !== 'undefined' ) {
 				width = parseInt( wrap.dataset.width );
@@ -235,49 +235,6 @@ liquipedia.tournamentstable = {
 	}
 };
 liquipedia.core.modules.push( 'tournamentstable' );
-
-/*******************************************************************************
- * Template(s): Participants Tables
- * Author(s): FO-nTTaX
- ******************************************************************************/
-liquipedia.participantstable = {
-	init: function() {
-		if ( document.querySelector( '.participants-table-scroller' ) !== null ) {
-			document.querySelectorAll( '.participants-table-button-left' ).forEach( ( buttonLeft ) => {
-				buttonLeft.classList.add( 'inactive' );
-				buttonLeft.addEventListener( 'click', function() {
-					if ( window.innerWidth < 600 ) {
-						const scroller = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-scroller' );
-						scroller.scrollLeft = scroller.scrollLeft - 0.83 * window.innerWidth;
-					}
-				} );
-			} );
-			document.querySelectorAll( '.participants-table-button-right' ).forEach( ( buttonRight ) => {
-				buttonRight.addEventListener( 'click', function() {
-					if ( window.innerWidth < 600 ) {
-						const scroller = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-scroller' );
-						scroller.scrollLeft = scroller.scrollLeft + 0.83 * window.innerWidth;
-					}
-				} );
-			} );
-			document.querySelectorAll( '.participants-table-scroller' ).forEach( ( scroller ) => {
-				scroller.addEventListener( 'scroll', function() {
-					const buttonLeft = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-button-left' );
-					buttonLeft.classList.remove( 'inactive' );
-					const buttonRight = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-button-right' );
-					buttonRight.classList.remove( 'inactive' );
-					if ( this.scrollLeft === 0 ) {
-						buttonLeft.classList.add( 'inactive' );
-					}
-					if ( this.scrollLeft === this.scrollWidth - this.clientWidth ) {
-						buttonRight.classList.add( 'inactive' );
-					}
-				} );
-			} );
-		}
-	}
-};
-liquipedia.core.modules.push( 'participantstable' );
 
 /*******************************************************************************
  * Template(s): Heroes portal on the Heroes of the Storm wiki
@@ -393,6 +350,9 @@ liquipedia.togglearea = {
 	init: function() {
 		document.querySelectorAll( '.toggle-area' ).forEach( ( area ) => {
 			area.querySelectorAll( '.toggle-area-button' ).forEach( ( btn ) => {
+				if ( btn.closest( '.toggle-area' ) !== area ) {
+					return;
+				}
 				btn.addEventListener( 'click', () => {
 					area.classList.remove( 'toggle-area-' + area.dataset.toggleArea );
 					area.dataset.toggleArea = btn.dataset.toggleAreaBtn;

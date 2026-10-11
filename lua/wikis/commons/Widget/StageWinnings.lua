@@ -22,7 +22,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -48,6 +48,7 @@ local NON_BREAKING_SPACE = '&nbsp;'
 ---@field pointsPerWin number?
 ---@field points2Start number?
 ---@field points2PerWin number?
+---@field gameCountDefaultResult number?
 ---@field n-m number? # n amd m integers
 ---@field n-m_points number? # n amd m integers
 ---@field n-m_points2 number? # n amd m integers
@@ -121,6 +122,7 @@ function StageWinnings:render()
 		pointsPerWin = tonumber(props.pointsPerWin) or 0,
 		points2PerWin = tonumber(props.points2PerWin) or 0,
 		hideWinnings = Logic.readBool(props.hideWinnings),
+		gameCountDefaultResult = tonumber(props.gameCountDefaultResult),
 	}
 
 	if Logic.isNotEmpty(props.localcurrency) and Logic.readBool(props.autoexchange) then
@@ -283,7 +285,7 @@ function StageWinnings._detailedScores(scoresTable)
 		Array.map(scoreInfos, function(scoreInfo)
 			return scoreInfo.wins .. '-' .. scoreInfo.losses .. ': ' .. scoreInfo.count .. ' times'
 		end),
-		HtmlWidgets.Br{}
+		Html.Br{}
 	)
 end
 
@@ -295,7 +297,7 @@ function StageWinnings:_pointsHeader(data)
 		return
 	end
 
-	local titleText = Logic.isNotEmpty(data.titleLong) and HtmlWidgets.Abbr{
+	local titleText = Logic.isNotEmpty(data.titleLong) and Html.Abbr{
 		children = data.title, title = data.titleLong
 	} or data.title
 

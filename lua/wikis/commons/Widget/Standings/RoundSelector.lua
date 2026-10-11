@@ -10,10 +10,12 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 
 local Component = Lua.import('Module:Widget/Component')
-local HtmlWidgets = Lua.import('Module:Widget/Html')
+local Html = Lua.import('Module:Widget/Html')
 local Button = Lua.import('Module:Widget/Basic/Button')
 
 ---@private
+---@param hasEnded boolean
+---@param rounds integer
 ---@return string
 local function finalRoundTitle(hasEnded, rounds)
 	if not hasEnded then
@@ -48,7 +50,7 @@ local function RoundSelectorWidget(props)
 		}
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'dropdown-box-wrapper'},
 		css = {float = 'left'},
 		children = {
@@ -58,7 +60,7 @@ local function RoundSelectorWidget(props)
 				size = 'sm',
 				classes = {'dropdown-box-button'},
 			},
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'dropdown-box'},
 				css = {padding = '0px'},
 				children = Array.map(roundTitles, makeRoundButtons)

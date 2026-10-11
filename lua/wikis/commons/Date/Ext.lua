@@ -274,4 +274,33 @@ function DateExt.daysToSeconds(days)
 	return days * SECONDS_PER_DAY
 end
 
+---@class DateRecord
+---@field year integer
+---@field month integer?
+---@field day integer?
+---@field timestamp integer?
+
+--- This function parses fuzzy dates into a structured format.
+---@param dateRecord string? # date in the format of `YYYY-MM-DD`, with `-MM-DD` optional.
+---@return DateRecord?
+function DateExt.parseDateRecord(dateRecord)
+	if not dateRecord then
+		return nil
+	end
+	if dateRecord == DateExt.defaultDate then
+		return nil
+	end
+	local year, month, day = dateRecord:match('^(%d%d%d%d)%-?(%d?%d?)%-?(%d?%d?)')
+	year, month, day = tonumber(year), tonumber(month), tonumber(day)
+
+	if not year then
+		return
+	end
+
+	local dt = {year = year, month = month or 12, day = day or 31, hour = 0}
+	local timestamp = os.time(dt)
+
+	return {year = year, month = month, day = day, timestamp = timestamp}
+end
+
 return DateExt

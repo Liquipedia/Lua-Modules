@@ -14,6 +14,8 @@ local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Tournament = Lua.import('Module:Tournament')
 local Variables = Lua.import('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -89,6 +91,8 @@ function StandingsStorage.table(data)
 		error('No standingsindex specified')
 	end
 
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
 	local extradata = {
 		enddate = data.enddate,
 		finished = data.finished,
@@ -105,8 +109,8 @@ function StandingsStorage.table(data)
 	}
 
 	return {
-		tournament = Variables.varDefault('tournament_name', ''),
-		parent = Variables.varDefault('tournament_parent', ''),
+		tournament = tournamentContext.fullName or '',
+		parent = tournamentContext.pageName or '',
 		standingsindex = standingsIndex,
 		title = mw.text.trim(cleanedTitle),
 		section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
@@ -129,6 +133,8 @@ function StandingsStorage.entry(entry, standingsIndex)
 		return
 	end
 
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
 	local extradata = {
 		enddate = entry.enddate,
 		roundfinished = entry.finished,
@@ -138,7 +144,7 @@ function StandingsStorage.entry(entry, standingsIndex)
 	}
 
 	local lpdbEntry = {
-		parent = Variables.varDefault('tournament_parent', ''),
+		parent = tournamentContext.pageName or '',
 		standingsindex = standingsIndexNumber,
 		placement = entry.placement or entry.rank,
 		definitestatus = entry.definitestatus or entry.bg,
@@ -296,11 +302,11 @@ function StandingsStorage.fromTemplateEntry(frame)
 		local team
 
 		-- Input contains an actual team
-		if data.team and mw.ext.TeamTemplate.teamexists(data.team) then
-			team = mw.ext.TeamTemplate.raw(data.team, date)
+		if data.team and TeamTemplate.exists(data.team) then
+			team = TeamTemplate.getRaw(data.team, date)
 		-- Input is link (possiblity with icon etc), and we managed to parse it
-		elseif teamPage and mw.ext.TeamTemplate.teamexists(teamPage) then
-			team = mw.ext.TeamTemplate.raw(teamPage, date)
+		elseif teamPage and TeamTemplate.exists(teamPage) then
+			team = TeamTemplate.getRaw(teamPage, date)
 		end
 
 		opponentArgs = {type = Opponent.team}

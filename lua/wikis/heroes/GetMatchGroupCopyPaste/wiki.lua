@@ -41,15 +41,15 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			INDENT .. '|twitch=',
 		} or nil,
 		casters > 0 and {
-			INDENT .. table.concat(Array.map(Array.range(1, casters), function(casterIndex)
+			INDENT .. table.concat(Array.mapRange(1, casters, function(casterIndex)
 				return '|caster' .. casterIndex .. '='
 			end), ' ')
 		} or nil,
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
 		(veto and bestof > 0) and WikiCopyPaste._getVeto(bestof, vetoBanRounds) or nil,
-		Array.map(Array.range(1, bestof), function (mapIndex)
+		Array.mapRange(1, bestof, function (mapIndex)
 			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getMap(bans)
 		end),
 		'}}'
@@ -71,7 +71,7 @@ function WikiCopyPaste._getVeto(bestof, vetoRounds)
 		INDENT .. INDENT .. '|format=By turns',
 		INDENT .. INDENT .. '|firstpick=',
 		INDENT .. INDENT .. '|types=' .. preFilledVetoTypes,
-		Array.map(Array.range(1, vetoRounds + bestof), function (round)
+		Array.mapRange(1, vetoRounds + bestof, function (round)
 			return INDENT .. INDENT .. '|t1map' .. round .. '=|t2map' .. round .. '='
 		end),
 		INDENT .. '}}'

@@ -11,17 +11,17 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
 
 local BasePrizePool = Lua.import('Module:PrizePool/Base')
 local Placement = Lua.import('Module:PrizePool/Award/Placement')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
-local Widgets = Lua.import('Module:Widget/All')
-local Div = Widgets.Div
-local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-local TableRow = Widgets.TableRow
-local TableCell = Widgets.TableCell
+local ReferenceTag = Lua.import('Module:Widget/ReferenceTag')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local TableCell = TableWidgets.Cell
 
 --- @class AwardPrizePool: BasePrizePool
 --- @operator call(...): AwardPrizePool
@@ -49,59 +49,48 @@ function AwardPrizePool:readPlacements(args)
 	end)
 end
 
+---@protected
 ---@param placement AwardPlacement
----@return WidgetTableCell
+---@return Renderable
 function AwardPrizePool:placeOrAwardCell(placement)
-	local awardCell = TableCell{
-		children = {placement.award},
-		css = {['font-weight'] = 'bolder'},
-		classes = {'prizepooltable-place'},
-	}
-	awardCell.rowSpan = #placement.opponents
+	---@return Renderable|Renderable[]
+	local function buildChildren()
+		local references = placement.references
+		if Table.isEmpty(references) then
+			return placement.award
+		end
+		---@cast references -nil
+		local frame = mw.getCurrentFrame()
+		return Array.extend(
+			placement.award,
+			Array.map(references, function (reference)
+				return ReferenceTag{
+					frame = frame,
+					name = reference.name,
+					children = Template.safeExpand(frame, 'Cite web', reference)
+				}
+			end)
+		)
+	end
 
-	return awardCell
+	return TableCell{
+		children = buildChildren(),
+		classes = {'prizepooltable-place'},
+		rowspan = #placement.opponents,
+	}
 end
 
+---@protected
 ---@param placement AwardPlacement
 ---@return boolean
 function AwardPrizePool:applyCutAfter(placement)
-	if (placement.previousTotalNumberOfParticipants + 1) > self.options.cutafter then
-		return true
-	end
-	return false
+	return (placement.previousTotalNumberOfParticipants + 1) > self.options.cutafter
 end
 
----@param placement AwardPlacement?
----@param nextPlacement AwardPlacement
----@param rows WidgetTableRow[]
-function AwardPrizePool:applyToggleExpand(placement, nextPlacement, rows)
-	if placement ~= nil
-		and (placement.previousTotalNumberOfParticipants + 1) <= self.options.cutafter
-		and placement.currentTotalNumberOfParticipants >= self.options.cutafter
-		and placement ~= self.placements[#self.placements] then
-
-		table.insert(rows, self:_toggleExpand())
-	end
-end
-
----@return WidgetTableRow
-function AwardPrizePool:_toggleExpand()
-	local expandButton = TableCell{
-		children = Div{children = {
-			'Show more Awards&nbsp;',
-			IconFa{iconName = 'expand'},
-		}},
-		classes = {'general-collapsible-expand-button'},
-	}
-	local collapseButton = TableCell{
-		children = Div{children = {
-			'Show less Awards&nbsp;',
-			IconFa{iconName = 'collapse'},
-		}},
-		classes = {'general-collapsible-collapse-button'},
-	}
-
-	return TableRow{classes = {'ppt-toggle-expand'}, children = {expandButton, collapseButton}}
+---@protected
+---@return {opentext: string, closetext: string}?
+function AwardPrizePool:_collapseText()
+	return {opentext = 'Show more Awards', closetext = 'Show less Awards'}
 end
 
 -- Get the lpdbObjectName depending on opponenttype

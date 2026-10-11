@@ -30,7 +30,7 @@ local Center = Widgets.Center
 local SIZE_HERO = '25x25px'
 local MAX_NUMBER_OF_SIGNATURE_HEROES = 3
 
----@class OverwatchInfoboxPlayer: Person
+---@class OverwatchInfoboxPlayer: InfoboxPerson
 ---@operator call(Frame): OverwatchInfoboxPlayer
 local CustomPlayer = Class.new(Player)
 
@@ -94,13 +94,13 @@ function CustomPlayer:adjustLPDB(lpdbData, args)
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {args.country})
 
 	if String.isNotEmpty(args.team2) then
-		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(args.team2).page
+		lpdbData.extradata.team2 = TeamTemplate.getPageName(args.team2)
 	end
 
 	return lpdbData
 end
 
----@return Widget?
+---@return Renderable?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = TeamTemplate.getPageName(self.args.team)

@@ -1,0 +1,51 @@
+name: Bug report
+description: Create a report to help us improve
+type: bug
+body:
+- type: textarea
+  attributes:
+    label: Describe the bug
+    description: A clear and concise description of what the bug is.
+
+- type: textarea
+  attributes:
+    label: To Reproduce
+    description: Steps to reproduce the behavior
+    placeholder: |
+      1. Go to ...
+      2. Click on ....
+      3. Scroll down to ....
+      4. See error
+
+- type: textarea
+  attributes:
+    label: Expected Behavior
+    description: A clear and concise description of what you expected to happen.
+
+- type: input
+  attributes:
+    label: Device
+    description: Your device
+    placeholder: Desktop PC, Galaxy S26, iPhone 15
+
+- type: input
+  attributes:
+    label: OS
+    description: Your operating system
+    placeholder: Windows 11, iOS 26, Android 15
+
+- type: input
+  attributes:
+    label: Browser
+    description: Your web browser
+    placeholder: Chrome, Safari, Firefox
+
+- type: input
+  attributes:
+    label: Browser version
+    description: Version of your web browser
+
+- type: textarea
+  attributes:
+    label: Additional context
+    description: Add any other context about the problem here.

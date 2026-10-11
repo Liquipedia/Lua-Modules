@@ -12,10 +12,10 @@ local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
+local Math = Lua.import('Module:MathUtil')
 local Page = Lua.import('Module:Page')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TypeUtil = Lua.import('Module:TypeUtil')
 
@@ -98,6 +98,10 @@ Opponent.types.Opponent = TypeUtil.union(
 	Opponent.types.TeamOpponent,
 	Opponent.types.PartyOpponent,
 	Opponent.types.LiteralOpponent
+)
+
+Opponent.types.OpponentType = TypeUtil.literalUnion(
+	Opponent.solo, Opponent.duo, Opponent.trio, Opponent.quad, Opponent.team, Opponent.literal
 )
 
 ---Checks if the provided opponent type is a party type
@@ -191,8 +195,14 @@ end
 ---@param opponent standardOpponent
 ---@return boolean
 function Opponent.isBye(opponent)
-	return string.lower(opponent.name or '') == BYE
-		or string.lower(opponent.template or '') == BYE
+	if opponent.type == Opponent.team then
+		return string.lower(opponent.template or '') == BYE
+	end
+	local opponentName = opponent.name or Opponent.toName(opponent)
+	if String.isEmpty(opponentName) then
+		return false
+	end
+	return string.lower(opponentName) == BYE
 end
 
 ---Checks if a player is a TBD player
@@ -206,7 +216,7 @@ end
 ---@param type string
 ---@return boolean
 function Opponent.isType(type)
-	return Table.includes(Opponent.types, type)
+	return #TypeUtil.checkValue(type, Opponent.types.OpponentType) == 0
 end
 
 ---Reads an opponent type.
@@ -214,13 +224,13 @@ end
 ---@param type string
 ---@return OpponentType?
 function Opponent.readType(type)
-	return Table.includes(Opponent.types, type) and type or nil
+	return Opponent.isType(type) and type or nil
 end
 
 ---Asserts that an arbitrary value is a valid representation of an opponent
 ---@param opponent any
 function Opponent.assertOpponent(opponent)
-	assert(Opponent.isOpponent(opponent), 'Invalid opponent')
+	TypeUtil.assertValue(opponent, Opponent.types.Opponent, {name = 'Opponent'})
 end
 
 ---Validates that an arbitrary value is a valid representation of an opponent
@@ -231,6 +241,18 @@ function Opponent.isOpponent(opponent)
 end
 
 ---Check if two opponents are the same opponent
+---Comparison based on:
+---   - Must be of same type
+---   - Same when same reference
+---   - Literal: Same (raw) name
+---   - Team:
+---       - Same (unresolved/resolved) template
+---       - Same historical template (when unresolved)
+---       - Same historical template by pagename (when resolved)
+---       - Does not check pagename after resolving redirects
+---   - Party:
+---       - Matching sorted list of player pagenames
+---       - From input, no extra resolving of redirects
 ---@param opponent1 standardOpponent
 ---@param opponent2 standardOpponent
 ---@return boolean
@@ -245,13 +267,20 @@ function Opponent.same(opponent1, opponent2)
 		if opponent1.template == opponent2.template then
 			return true
 		end
-		local opponent1Name = Opponent.toName(opponent1)
-		local opponent2Name = Opponent.toName(opponent2)
-		if opponent1Name == opponent2Name then
+
+		local template1 = TeamTemplate.getRaw(opponent1.template)
+		local template2 = TeamTemplate.getRaw(opponent2.template)
+
+		-- When both templates are unresolved, and have the same historical template (non-empty), they are same
+		if not Logic.isEmpty(template1.historicaltemplate)
+				and template1.historicaltemplate == template2.historicaltemplate then
 			return true
 		end
-		local opponent1Historical = TeamTemplate.getRaw(opponent1Name).historicaltemplate
-		local opponent2Historical = TeamTemplate.getRaw(opponent2Name).historicaltemplate
+
+		-- When both templates are resolved, use their pagename to get back to the
+		-- top-level historical template and compare
+		local opponent1Historical = TeamTemplate.getRaw(template1.page).historicaltemplate
+		local opponent2Historical = TeamTemplate.getRaw(template2.page).historicaltemplate
 		if Logic.isEmpty(opponent1Historical) or Logic.isEmpty(opponent2Historical) then
 			return false
 		end
@@ -406,6 +435,10 @@ end
 Converts a opponent to a name. The name is the same as the one used in the
 match2opponent.name field.
 
+Warning: Do not use this to check whether two opponents are the same (use Opponent.same instead)!
+         There are edge cases with one-off subteams that share the same page (after redirect),
+		 which in the context of a tournament are not same, but resolve to the same name here.
+
 Returns nil if the team template does not exist.
 ]]
 ---@param opponent standardOpponent
@@ -476,8 +509,9 @@ function Opponent.readSinglePlayerArgs(args)
 		p1flag = args.flag or args.p1flag,
 		p1link = args.link or args.p1link,
 		p1team = args.team or args.p1team,
-		p1faction = args.faction or args.race or args.p1race,
+		p1faction = args.faction or args.race or args.p1faction or args.p1race,
 		p1id = args.id or args.p1id,
+		game = args.game,
 	}, 1)
 end
 
@@ -493,7 +527,7 @@ function Opponent.readPlayerArgs(args, playerIndex)
 		pageName = Page.applyUnderScoresIfEnforced(args['p' .. playerIndex .. 'link']),
 		team = playerTeam,
 		faction = Logic.nilIfEmpty(Faction.read(args['p' .. playerIndex .. 'faction']
-			or args['p' .. playerIndex .. 'race'])),
+			or args['p' .. playerIndex .. 'race'], {game = args.game})),
 		apiId = args['p' .. playerIndex .. 'id'],
 	}
 	assert(not player.displayName:find('|'), 'Invalid character "|" in player name')
@@ -590,6 +624,11 @@ function Opponent.toLpdbStruct(opponent, options)
 				nil
 			players[prefix .. 'template'] = player.team
 			players[prefix .. 'faction'] = Logic.nilIfEmpty(player.faction)
+			if player.roles then
+				Array.forEach(player.roles, function (role, roleIndex)
+					players[prefix .. 'role' .. roleIndex] = role
+				end)
+			end
 			players[prefix .. 'id'] = Logic.nilIfEmpty(player.apiId)
 		end
 		storageStruct.opponentplayers = players
@@ -663,6 +702,9 @@ function Opponent._personFromLpdbStruct(roleIndicator, players, playerIndex)
 		team = players[prefix .. 'template'] or players[prefix .. 'team'],
 		faction = Logic.nilIfEmpty(players[prefix .. 'faction']),
 		apiId = Logic.nilIfEmpty(players[prefix .. 'id']),
+		roles = Logic.nilIfEmpty(Array.mapIndexes(function (roleIndex)
+			return players[prefix .. 'role' .. roleIndex]
+		end))
 	}
 end
 
@@ -688,6 +730,29 @@ function Opponent.toLegacyParticipantData(opponent, options)
 		participantlink = Opponent.toName(opponent),
 		participanttemplate = opponent.template,
 	}
+end
+
+---@param opponent standardOpponent
+---@param postfix string?
+---@return string
+function Opponent.getScoreValue(opponent, postfix)
+	postfix = postfix or ''
+	local status = opponent['status' .. postfix]
+
+	if status ~= 'S' then
+		return status or ''
+	end
+
+	local score = opponent['score' .. postfix]
+	local scoreDisplay = opponent['scoreDisplay' .. postfix]
+
+	if score == 0 and Opponent.isTbd(opponent) then
+		return ''
+	elseif scoreDisplay ~= nil then
+		return tostring(Math.round(scoreDisplay, 2))
+	else
+		return tostring(Math.round(score, 2))
+	end
 end
 
 return Opponent

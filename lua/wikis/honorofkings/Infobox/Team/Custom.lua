@@ -24,6 +24,7 @@ local PlacementStats = Lua.import('Module:Infobox/Extension/PlacementStats')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Html = Lua.import('Module:Widget/Html')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local REGION_REMAPPINGS = {
 	['latin america'] = 'south america',
@@ -84,10 +85,10 @@ end
 ---@return Widget?
 function CustomTeam:createBottomContent()
 	if not self.args.disbanded then
-		return Html.Fragment{children = {
+		return Html.Fragment{children = WidgetUtil.collect(
 			UpcomingTournaments.team{name = self.teamTemplate.templatename},
 			PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}}
-		}}
+		)}
 	end
 end
 

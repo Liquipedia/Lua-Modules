@@ -39,7 +39,7 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('edate', Variables.varDefault('tournament_enddate'))
 	Variables.varDefine('date', Variables.varDefault('tournament_enddate'))
 
-	local tier = Tier.toName(Variables.varDefault('tournament_liquipediatier'))
+	local tier = Tier.toName(Variables.varDefault('tournament_liquipediatier') or '')
 	Variables.varDefine('tournament_tier', tier)
 	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername'))
 	Variables.varDefine('tournament_icon_darkmode', Variables.varDefault('tournament_icondark'))

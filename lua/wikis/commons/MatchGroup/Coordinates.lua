@@ -69,6 +69,9 @@ function MatchGroupCoordinates.computeSections(bracket)
 		if isNewSection then
 			table.insert(sections, {})
 		end
+		-- TODO: the first section only opens on a match that carries a header, so a bracket whose
+		-- root match has none errors here on sections[0] being nil. Either open a section for the
+		-- first match unconditionally, or reject the bracket with a readable message.
 		table.insert(sections[#sections], matchId)
 		sectionIxs[matchId] = #sections
 	end

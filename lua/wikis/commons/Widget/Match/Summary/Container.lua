@@ -19,7 +19,7 @@ local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 ---@class MatchSummaryContainerProps
 ---@field classes string[]?
 ---@field width string|integer?
----@field createMatch fun(matchData: MatchGroupUtilMatch): MatchSummaryMatch
+---@field createMatch fun(matchData: MatchGroupUtilMatch): VNode?
 ---@field match MatchGroupUtilMatch
 ---@field resetMatch MatchGroupUtilMatch?
 
@@ -61,10 +61,10 @@ end
 
 ---@private
 ---@param props MatchSummaryContainerProps
----@return Renderable
+---@return VNode?
 function MatchSummaryContainer._buildChildren(props)
 	if not MatchSummaryContainer._hasResetMatch(props) then
-		return props.createMatch(props.match):create()
+		return props.createMatch(props.match)
 	end
 
 	local resetMatch = props.resetMatch
@@ -75,7 +75,7 @@ function MatchSummaryContainer._buildChildren(props)
 	local function createMatchContainer(matchData)
 		return Html.Div{
 			classes = {'brkts-popup-container'},
-			children = props.createMatch(matchData):create()
+			children = props.createMatch(matchData)
 		}
 	end
 

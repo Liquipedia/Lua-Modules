@@ -27,7 +27,7 @@ local TIER_VALUE = {10, 6, 4, 2}
 
 -- Template entry point
 ---@param frame Frame
----@return Html
+---@return Renderable
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.syncPlayers = true

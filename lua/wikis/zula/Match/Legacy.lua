@@ -13,6 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
 
 local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
@@ -109,8 +110,8 @@ function MatchLegacy.convertParameters(match2)
 			if opponent.type == Opponent.team then
 				if String.isEmpty(opponent.template) then
 					match[prefix] = 'TBD'
-				elseif mw.ext.TeamTemplate.teamexists(opponent.template) then
-					match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
+				elseif TeamTemplate.exists(opponent.template) then
+					match[prefix] = TeamTemplate.getRaw(opponent.template).page
 				else
 					match[prefix] = opponent.template
 				end

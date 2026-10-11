@@ -203,10 +203,10 @@ end
 
 ---@param match CharacterGameTableMatch
 ---@param game CharacterGameTableGame
----@return Widget[]?
+---@return Renderable[]?
 function CustomCharacterGameTable:displayGame(match, game)
 	---@param children Renderable|Renderable[]?
-	---@return Table2Cell
+	---@return Renderable
 	local makeCell = function (children)
 		return TableWidgets.Cell{children = children}
 	end
@@ -216,10 +216,10 @@ function CustomCharacterGameTable:displayGame(match, game)
 	local opponent = match.opponents[indexes[1]]
 	local opponentVs = match.opponents[indexes[2]]
 
-	---@type Widget[]
+	---@type Renderable[]
 	local cells = {makeCell(LinkWidget{link = game.map})}
 
-	---@param cell Widget
+	---@param cell Renderable
 	local function addCell(cell)
 		table.insert(cells, cell)
 	end

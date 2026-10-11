@@ -7,25 +7,20 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 
 ---@class MatchCountdownProps
 ---@field match MatchGroupUtilMatch
 ---@field format ('full'|'compact')?
 
----@class MatchCountdown: Widget
----@operator call(MatchCountdownProps): MatchCountdown
----@field props MatchCountdownProps
-local MatchCountdown = Class.new(Widget)
-
----@return Widget?
-function MatchCountdown:render()
-	local match = self.props.match
+---@param props MatchCountdownProps
+---@return VNode?
+local function MatchCountdown(props)
+	local match = props.match
 	if not match then
 		return nil
 	end
@@ -34,9 +29,9 @@ function MatchCountdown:render()
 		return nil
 	end
 
-	local format = self.props.format or 'full'
+	local format = props.format
 
-	return HtmlWidgets.Span{
+	return Html.Span{
 		classes = {'match-info-countdown'},
 		children = Countdown.create{
 			rawdatetime = (not match.dateIsExact) or match.finished,
@@ -47,4 +42,4 @@ function MatchCountdown:render()
 	}
 end
 
-return MatchCountdown
+return Component.component(MatchCountdown, {format = 'full'})

@@ -22,7 +22,7 @@ local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
-local MatchTicker = Lua.import('Module:MatchTicker')
+local MatchTicker = Lua.import('Module:MatchTicker/Controller')
 local MetadataGenerator = Lua.import('Module:MetadataGenerator')
 local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
@@ -281,7 +281,7 @@ function League:_parseArgs()
 	self:customParseArguments(args)
 end
 
----@private
+---@protected
 ---@param args table
 ---@param endDate string?
 ---@return number|string?, number?, string?
@@ -345,7 +345,7 @@ function League:_getCategories(args)
 end
 
 ---@private
----@return Widget?
+---@return Renderable?
 function League:_createUpcomingMatches()
 	if not self:shouldStore(self.args) then
 		return nil
@@ -355,33 +355,22 @@ function League:_createUpcomingMatches()
 		return nil
 	end
 
-	local result = Logic.tryCatch(
+	return Logic.tryCatch(
 		function()
-			local matchTicker = MatchTicker{
+			return MatchTicker.makeMatchTicker{
 				tournament = self.pagename,
 				limit = 5,
 				upcoming = true,
 				ongoing = true,
 				hideTournament = true,
 				queryByParent = true,
+				entityStyle = true,
 			}
-			matchTicker:query()
-			return matchTicker
 		end,
 		function()
 			return nil
 		end
 	)
-
-	if not result or not result.matches or #result.matches == 0 then
-		return nil
-	end
-
-	local EntityDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
-	return EntityDisplay.Container{
-		config = result.config,
-		matches = result.matches,
-	}:create()
 end
 
 ---@param args table

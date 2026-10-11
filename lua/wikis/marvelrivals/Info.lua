@@ -38,6 +38,11 @@ return {
 		participants = {
 			defaultPlayerNumber = 6,
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchdiff', 'gamediff'},
+			},
+		},
 		defaultMaxPlayersPerPlacement = 12,
 	},
 	defaultRoundPrecision = 0,

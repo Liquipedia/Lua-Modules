@@ -132,7 +132,7 @@ describe('Tabs Module', function()
 
 	describe('Tabs._buildNavWrapper', function()
 		it('should build nav wrapper with scroll arrow buttons', function()
-			local navTabs = require('Module:Widget/Html/All').Ul{
+			local navTabs = require('Module:Widget/Html').Ul{
 				classes = {'nav', 'nav-tabs'},
 				children = {}
 			}

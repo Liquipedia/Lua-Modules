@@ -147,17 +147,18 @@ function CustomPlayer:_getActiveCasterYears()
 		limit = 5000,
 	})
 
+	---@type Set<integer>
 	local years = Set{}
 	Array.forEach(queryData,
 		---@param item broadcasters
 		---@return number?
-		function(item) years:add(tonumber(item.year_date)) end
+		function(item) years:add(tonumber(item.year_date) --[[@as integer]]) end
 	)
 
 	return YearsActive.displayYears(years:toArray())
 end
 
----@return Html?
+---@return Renderable?
 function CustomPlayer:createBottomContent()
 	if self.shouldQueryData then
 		return MatchTicker.recent({
@@ -175,11 +176,13 @@ function CustomPlayer:_getMatchupData(player)
 
 	player = Page.applyUnderScoresIfEnforced(player)
 
+	---@type Set<integer>
 	local years = Set{}
 
 	---@param match match2
 	local processMatch = function(match)
 		local year = tonumber(string.sub(match.date, 1, 4))
+		---@cast year integer
 		years:add(year)
 
 		if #self.recentMatches < NUMBER_OF_RECENT_MATCHES then
@@ -300,7 +303,7 @@ function CustomPlayer:calculateEarnings(args)
 
 	local playerConditions = ConditionTree(BooleanOperator.any):add{
 		ConditionNode(ColumnName('opponentname'), Comparator.eq, player),
-		Array.map(Array.range(1, MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS), function (playerIndex)
+		Array.mapRange(1, MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS, function (playerIndex)
 			return ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, player)
 		end)
 	}

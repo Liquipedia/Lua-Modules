@@ -22,7 +22,7 @@ local CustomPrizePool = {}
 
 -- Template entry point
 ---@param frame Frame
----@return Html
+---@return Renderable
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	local prizePool = PrizePool(args):create()

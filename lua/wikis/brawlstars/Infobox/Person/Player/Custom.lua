@@ -23,8 +23,9 @@ local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournam
 local Widgets = Lua.import('Module:Widget/All')
 local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class BrawlstarsInfoboxPlayer: Person
+---@class BrawlstarsInfoboxPlayer: InfoboxPerson
 ---@operator call(Frame): BrawlstarsInfoboxPlayer
 local CustomPlayer = Class.new(Player)
 
@@ -113,17 +114,17 @@ function CustomPlayer:adjustLPDB(lpdbData, args)
 	return lpdbData
 end
 
----@return Widget?
+---@return Renderable?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = TeamTemplate.getPageName(self.args.team)
 		---@cast teamPage -nil
 
 		return Html.Fragment{
-			children = {
+			children = WidgetUtil.collect(
 				MatchTicker.recent{team = teamPage},
 				UpcomingTournaments.team{name = teamPage}
-			}
+			)
 		}
 	end
 end

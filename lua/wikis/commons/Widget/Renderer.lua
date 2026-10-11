@@ -106,12 +106,7 @@ function Renderer.render(vNode, context)
 		---@cast vNode HtmlNode
 		local props = vNode.props
 		local tagName = renderFn
-		local tag
-		if tagName == 'fragment' then
-			tag = mw.html.create()
-		else
-			tag = mw.html.create(tagName)
-		end
+		local tag = mw.html.create(tagName)
 
 		if props.classes then
 			tag:addClass(table.concat(props.classes, ' '))

@@ -103,6 +103,7 @@ return {
 			hasPosition = false,
 			hasSpecialTeam = false,
 			allowManual = true,
+			standardizedAuto = true,
 		},
 		match2 = {
 			status = 2,
@@ -130,6 +131,11 @@ return {
 			useParent = false,
 			order = 'enddate desc, pagename desc',
 			onlyTierTypeIfBoth = false,
+		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchdiff', 'gamediff'},
+			},
 		},
 	},
 }

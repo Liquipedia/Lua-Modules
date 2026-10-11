@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 
 local Component = Lua.import('Module:Widget/Component')
-local HtmlWidgets = Lua.import('Module:Widget/Html')
+local Html = Lua.import('Module:Widget/Html')
 local Label = Lua.import('Module:Widget/Basic/Label')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -48,19 +48,19 @@ local function MatchOverviewWidget(props)
 		resultType = 'win'
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {'standings-match-overview'},
 		children = WidgetUtil.collect(
 			phase ~= 'upcoming' and Label{
 				labelScheme = 'standings-result',
 				labelType = 'result-' .. resultType,
 				children = {
-					HtmlWidgets.Span{
+					Html.Span{
 						css = resultType == 'win' and {['font-weight'] = 'bold'} or nil,
 						children = OpponentDisplay.InlineScore(leftOpponent)
 					},
-					HtmlWidgets.Span{children = ':'},
-					HtmlWidgets.Span{
+					Html.Span{children = ':'},
+					Html.Span{
 						css = resultType == 'loss' and {['font-weight'] = 'bold'} or nil,
 						children = OpponentDisplay.InlineScore(opponentToShow)
 					}

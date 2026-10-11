@@ -13,7 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -46,9 +46,9 @@ end
 ---@private
 ---@return Widget
 function W3EloRanking._buildHeader()
-	return HtmlWidgets.Tr{
+	return Html.Tr{
 		children = Array.map({'Rank', 'Player', 'Rating'}, function (header)
-			return HtmlWidgets.Th{
+			return Html.Th{
 				css = {['text-align'] = 'left'},
 				children = header
 			}
@@ -63,10 +63,10 @@ end
 function W3EloRanking._buildStandingRow(data, placement)
 	local race = string.lower(data.main_race or '')
 
-	return HtmlWidgets.Tr{
+	return Html.Tr{
 		children = {
-			HtmlWidgets.Td{children = placement},
-			HtmlWidgets.Td{
+			Html.Td{children = placement},
+			Html.Td{
 				children = PlayerDisplay.InlinePlayer{player = {
 					flag = data.country,
 					displayName = data.name,
@@ -74,7 +74,7 @@ function W3EloRanking._buildStandingRow(data, placement)
 					faction = string.sub(race, 0, 1)
 				}}
 			},
-			HtmlWidgets.Td{children = data.elo}
+			Html.Td{children = data.elo}
 		}
 	}
 end

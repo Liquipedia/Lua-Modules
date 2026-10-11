@@ -77,7 +77,7 @@ local TransferList = Class.new(
 )
 
 ---@param frame Frame
----@return Widget?
+---@return VNode?
 function TransferList.run(frame)
 	local args = Arguments.getArgs(frame)
 	return TransferList(args):fetch():create()
@@ -135,8 +135,8 @@ function TransferList:_getTeams(args)
 
 	local teamList = {}
 	Array.forEach(teams, function(team)
-		if not mw.ext.TeamTemplate.teamexists(team) then
-			mw.log('Missing team teamplate: ' .. team)
+		if not TeamTemplate.exists(team) then
+			mw.log(TeamTemplate.noTeamMessage(team))
 		end
 		Array.extendWith(teamList, TeamTemplate.queryHistoricalNames(team))
 	end)
@@ -301,7 +301,7 @@ function TransferList:_buildTeamConditions(toTeam, fromTeam)
 	return self.teamConditions
 end
 
----@return Widget?
+---@return VNode?
 function TransferList:create()
 	local config = self.config
 	if Logic.isDeepEmpty(self.groupedTransfers) then

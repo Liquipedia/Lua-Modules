@@ -8,14 +8,13 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local StreamLinks = Lua.import('Module:Links/Stream')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
 local VodsDropdownButton = Lua.import('Module:Widget/Match/VodsDropdownButton')
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
@@ -28,26 +27,23 @@ local MatchUtil = Lua.import('Module:Match/Util')
 ---@field showVods boolean?
 ---@field variant? 'primary' | 'secondary'
 
----@class MatchButtonBar: Widget
----@operator call(MatchButtonBarProps): MatchButtonBar
----@field props MatchButtonBarProps
-local MatchButtonBar = Class.new(Widget)
-MatchButtonBar.defaultProps = {
+local defaultProps = {
 	showVods = true,
 	variant = 'secondary',
 }
 
----@return Widget?
-function MatchButtonBar:render()
-	local match = self.props.match
+---@param props MatchButtonBarProps
+---@return VNode?
+local function MatchButtonBar(props)
+	local match = props.match
 	if not match then
 		return nil
 	end
 
-	local displayVods = match.phase == 'finished' and self.props.showVods
+	local displayVods = match.phase == 'finished' and props.showVods
 	local displayStreams = MatchUtil.shouldShowStreams(match)
 
-	if match.phase == 'upcoming' and self.props.variant == 'primary' then
+	if match.phase == 'upcoming' and props.variant == 'primary' then
 		displayStreams = true
 	end
 
@@ -85,12 +81,12 @@ function MatchButtonBar:render()
 	local vods = makeVodDTOs()
 	local makeDropdownForVods = displayVods and #vods > 1
 	local showInlineVods = displayVods and #vods == 1
-	local standardBar = HtmlWidgets.Div{
+	local standardBar = Html.Div{
 		classes = {'match-info-links'},
 		children = WidgetUtil.collect(
 			MatchPageButton{
 				match = match,
-				buttonType = self.props.variant,
+				buttonType = props.variant,
 				buttonText = buttonText,
 			},
 			displayStreams and StreamsContainer{
@@ -123,4 +119,4 @@ function MatchButtonBar:render()
 	}
 end
 
-return MatchButtonBar
+return Component.component(MatchButtonBar, defaultProps)

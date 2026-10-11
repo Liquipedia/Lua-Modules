@@ -26,6 +26,9 @@ local SIZE_HERO = '44x25px'
 ---@class Dota2InfoboxUser: InfoboxUser
 local CustomUser = Class.new(User)
 
+---@class Dota2InfoboxUserWidgetInjector: WidgetInjector
+---@operator call(Dota2InfoboxUser): Dota2InfoboxUserWidgetInjector
+---@field caller Dota2InfoboxUser
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -57,7 +60,7 @@ function CustomInjector:parse(id, widgets)
 		if not String.isEmpty(args['fav-team-1']) then
 			Array.appendWith(widgets,
 				Title{children = 'Favorite teams'},
-				Center{children = {self.caller:_getFavouriteTeams()}}
+				Center{children = self.caller:_getFavouriteTeams()}
 			)
 		end
 	elseif

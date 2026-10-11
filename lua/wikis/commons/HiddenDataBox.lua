@@ -13,19 +13,17 @@ local Logic = Lua.import('Module:Logic')
 local Game = Lua.import('Module:Game')
 local I18n = Lua.import('Module:I18n')
 local Info = Lua.import('Module:Info', {loadData = true})
-local MatchTicker = Lua.import('Module:MatchTicker')
-local MatchTickerEntityDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
+local MatchTicker = Lua.import('Module:MatchTicker/Controller')
 local Namespace = Lua.import('Module:Namespace')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
 local Tier = Lua.import('Module:Tier/Custom')
 local Variables = Lua.import('Module:Variables')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Fragment = HtmlWidgets.Fragment
+local Html = Lua.import('Module:Widget/Html')
+local Fragment = Html.Fragment
 local WarningBoxGroup = Lua.import('Module:Widget/WarningBox/Group')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -113,7 +111,7 @@ function HiddenDataBox.run(args)
 	HiddenDataBox.addCustomVariables(args, queryResult)
 
 	return Fragment{children = WidgetUtil.collect(
-		HiddenDataBox._matchTicker(Logic.readBool(args.supressMatchTicker)),
+		HiddenDataBox._matchTicker(Logic.readBool(args.suppressMatchTicker)),
 		WarningBoxGroup{data = warnings}
 	)}
 end
@@ -169,23 +167,13 @@ function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 		return
 	end
 
-	-- TODO: An improvement would be called TeamCard module for this
-	-- Would need a rework for the function that does it however
-	local participant = placement.opponentname
-	local participantResolved = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
-
-	local aliases = Array.map((placement.extradata or {}).opponentaliases or {}, TeamTemplate.getPageName)
-	aliases = Array.extend(aliases,
-		placement.extradata.opponentaliases or {},
-		Array.map(aliases, String.upperCaseFirst),
-		participant,
-		participant ~= participantResolved and participantResolved or nil
-	)
-	aliases = Array.unique(aliases)
+	-- TODO: Share functionality with TeamParticipants module
+	local aliases = (placement.extradata or {}).opponentaliases or {}
 
 	Table.iter.forEachPair(placement.opponentplayers or {}, function(key, value)
 		Array.forEach(aliases, function(alias)
 			Variables.varDefine(alias .. '_' .. key, value)
+			Variables.varDefine(alias:gsub(' ', '_') .. '_' .. key, value)
 		end)
 	end)
 end
@@ -193,7 +181,7 @@ end
 ---Validates the provided tier, tierType pair
 ---@param tier string|number|nil
 ---@param tierType string?
----@return integer?, string?, string[]
+---@return string?, string?, string[]
 function HiddenDataBox.validateTier(tier, tierType)
 	local warnings = {}
 
@@ -222,39 +210,29 @@ function HiddenDataBox.validateTier(tier, tierType)
 	return tierValue, tierTypeValue, warnings
 end
 
----@param supressMatchTicker boolean
----@return Widget?
-function HiddenDataBox._matchTicker(supressMatchTicker)
-	if supressMatchTicker or Info.config.match2.status == 0 then
+---@param suppressMatchTicker boolean
+---@return Renderable?
+function HiddenDataBox._matchTicker(suppressMatchTicker)
+	if suppressMatchTicker or Info.config.match2.status == 0 then
 		return nil
 	end
 
-	local result = Logic.tryCatch(
+	return Logic.tryCatch(
 		function()
-			local matchTicker = MatchTicker{
+			return MatchTicker.makeMatchTicker{
 				tournament = mw.title.getCurrentTitle().prefixedText,
 				limit = 5,
 				upcoming = true,
 				ongoing = true,
 				hideTournament = true,
 				queryByParent = false,
+				entityStyle = true,
 			}
-			matchTicker:query()
-			return matchTicker
 		end,
 		function()
 			return nil
 		end
 	)
-
-	if not result or not result.matches or #result.matches == 0 then
-		return nil
-	end
-
-	return MatchTickerEntityDisplay.Container{
-		config = result.config,
-		matches = result.matches,
-	}:create()
 end
 
 return Class.export(HiddenDataBox, {exports = {'run'}})
