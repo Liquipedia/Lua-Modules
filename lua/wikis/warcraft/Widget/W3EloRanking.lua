@@ -13,7 +13,6 @@ local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local Component = Lua.import('Module:Widget/Component')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Helpers = {}
 local defaultProps = {
@@ -31,10 +30,10 @@ local function W3EloRanking(props)
 	return TableWidgets.Table{
 		striped = true,
 		css = {width = '100%'},
-		children = WidgetUtil.collect(
+		children = {
 			TableWidgets.TableHeader{children = Helpers._buildHeader()},
 			TableWidgets.TableBody{children = Array.map(rawData, Helpers._buildStandingRow)}
-		)
+		}
 	}
 end
 
