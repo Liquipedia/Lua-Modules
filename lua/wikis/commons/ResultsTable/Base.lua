@@ -634,6 +634,9 @@ function BaseResultsTable:createTournamentCells(placement)
 			attributes = {
 				['data-sort-value'] = tournamentDisplayName
 			},
+			css = {
+				['min-width'] = '250px',
+			},
 			nowrap = false,
 			children = LinkWidget{
 				children = tournamentDisplayName,
