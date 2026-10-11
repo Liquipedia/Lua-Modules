@@ -31,12 +31,10 @@ local function W3EloRanking(props)
 	return TableWidgets.Table{
 		striped = true,
 		css = {width = '100%'},
-		children = TableWidgets.TableBody{
-			children = WidgetUtil.collect(
-				Helpers._buildHeader(),
-				Array.map(rawData, Helpers._buildStandingRow)
-			)
-		}
+		children = WidgetUtil.collect(
+			TableWidgets.TableHeader{children = Helpers._buildHeader()},
+			TableWidgets.TableBody{children = Array.map(rawData, Helpers._buildStandingRow)}
+		)
 	}
 end
 
