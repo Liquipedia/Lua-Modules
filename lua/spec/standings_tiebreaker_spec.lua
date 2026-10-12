@@ -1,6 +1,7 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('Standings Tiebreakers', function()
 	local TiebreakerFactory = require('Module:Standings/Tiebreaker/Factory')
+	local Array = require('Module:Array')
 
 	local function literal(name)
 		return {type = 'literal', name = name}
@@ -48,15 +49,28 @@ describe('Standings Tiebreakers', function()
 	describe('factory', function()
 		it('normalizes inputs', function()
 			assert.are_equal('full.points', TiebreakerFactory.validateAndNormalizeInput('points'))
-			assert.are_equal('h2h.points', TiebreakerFactory.validateAndNormalizeInput('h2h.points'))
+			assert.are_equal('ml.points', TiebreakerFactory.validateAndNormalizeInput('ml.points'))
 			assert.are_equal('full.disqualified', TiebreakerFactory.validateAndNormalizeInput('disqualified'))
 			assert.error(function() TiebreakerFactory.validateAndNormalizeInput('bogus') end)
 			assert.error(function() TiebreakerFactory.validateAndNormalizeInput('badcontext.points') end)
+			assert.error(function() TiebreakerFactory.validateAndNormalizeInput('h2h.points') end)
+		end)
+
+		it('rejects non full contexts for tiebreakers not derived from matches among tied opponents', function()
+			Array.forEach({'buchholz', 'manual', 'disqualified', 'startingpoints'}, function(name)
+				assert.are_equal('full.' .. name, TiebreakerFactory.validateAndNormalizeInput(name))
+				assert.error(function() TiebreakerFactory.validateAndNormalizeInput('ml.' .. name) end)
+			end)
+		end)
+
+		it('accepts the ml context for match based tiebreakers', function()
+			assert.are_equal('ml.matchdiff', TiebreakerFactory.validateAndNormalizeInput('ml.matchdiff'))
+			assert.are_equal('ml.gamediff', TiebreakerFactory.validateAndNormalizeInput('ml.gamediff'))
 		end)
 
 		it('exposes context', function()
 			assert.are_equal('full', TiebreakerFactory.tiebreakerFromId('full.points'):getContextType())
-			assert.are_equal('h2h', TiebreakerFactory.tiebreakerFromId('h2h.matchdiff'):getContextType())
+			assert.are_equal('ml', TiebreakerFactory.tiebreakerFromId('ml.matchdiff'):getContextType())
 		end)
 	end)
 
