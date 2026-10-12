@@ -721,6 +721,16 @@ describe('Standings Parser', function()
 					assert.are_same({'C', 'B', 'A'}, namesBySlot(standingsTable))
 				end)
 
+				it('compares wins and losses within the same scope for h2hlegacy', function()
+					local standingsTable = parse(
+						makeOpponents(NAMES, MATCHES, POINTS), {'full.points', 'h2hlegacy.matchscore', 'full.manual'})
+
+					assert.are_same({'C', 'B', 'A'}, namesBySlot(standingsTable))
+					assert.are_equal(1, placementOf(standingsTable, 'C'))
+					assert.are_equal(2, placementOf(standingsTable, 'B'))
+					assert.are_equal(3, placementOf(standingsTable, 'A'))
+				end)
+
 				it('differs from separate ml tiebreakers, which narrow the scope for each tiebreaker', function()
 					local standingsTable = parse(
 						makeOpponents(NAMES, MATCHES, POINTS),
