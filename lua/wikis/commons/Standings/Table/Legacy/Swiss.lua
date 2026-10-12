@@ -22,6 +22,8 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 local StandingTableLegacySwiss = {}
 
+local DEFAULT_ROUND_COUNT = 5
+
 local TIEBREAKER_MAPPING_TABLE = {
 	points = 'points',
 	pts = 'points',
@@ -63,7 +65,7 @@ function StandingTableLegacySwiss.classic(frame)
 	local args = Arguments.getArgs(frame)
 
 	local matchesForRound = StandingTableLegacySwiss.mapTournamentInputToMatchesInRounds(args)
-	local rounds = Table.map(Array.range(1, tonumber(args.rounds) or 5), function(roundIndex)
+	local rounds = Table.map(Array.range(1, tonumber(args.rounds) or DEFAULT_ROUND_COUNT), function(roundIndex)
 		return 'round' .. roundIndex, StandingTableLegacySwiss.parseRoundInput(args, roundIndex, matchesForRound[roundIndex])
 	end)
 
@@ -113,7 +115,7 @@ end
 ---@param index integer
 ---@return table<string, string>
 local function parseDefiniteStatuses(args, index)
-	return Table.map(Array.range(1, tonumber(args.rounds) or 1), function(roundIndex)
+	return Table.map(Array.range(1, tonumber(args.rounds) or DEFAULT_ROUND_COUNT), function(roundIndex)
 		return 'r' .. roundIndex .. 'bg', args['r' .. roundIndex .. 'bg' .. index]
 	end)
 end
