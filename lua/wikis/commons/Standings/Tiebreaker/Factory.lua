@@ -7,10 +7,15 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local String = Lua.import('Module:StringUtils')
+
+local TiebreakerComposite = Lua.import('Module:Standings/Tiebreaker/Composite')
 
 local TiebreakerFactory = {}
 
+-- A list of classes makes a composite tiebreaker, which compares the listed tiebreakers in order
+---@type table<string, string|string[]>
 local NAME_TO_CLASS = {
 	buchholz = 'Buchholz',
 	disqualified = 'Disqualified',
@@ -22,14 +27,17 @@ local NAME_TO_CLASS = {
 	matchdraws = 'Match/Draws',
 	matchlosses = 'Match/Losses',
 	matchwinrate = 'Match/WinRate',
+	matchscore = {'Match/Wins', 'Match/Losses'},
 	gamediff = 'Game/Diff',
 	gamecount = 'Game/Count',
 	gamewins = 'Game/Wins',
 	gamelosses = 'Game/Losses',
 	gamewinrate = 'Game/WinRate',
+	gamescore = {'Game/Wins', 'Game/Losses'},
 	roundwins = 'Game/Rounds/Wins',
 	roundlosses = 'Game/Rounds/Losses',
 	rounddiff = 'Game/Rounds/Diff',
+	roundscore = {'Game/Rounds/Wins', 'Game/Rounds/Losses'},
 	startingpoints = 'StartingPoints',
 }
 
@@ -81,10 +89,19 @@ function TiebreakerFactory.tiebreakerFromId(tiebreakerId, options)
 	local context, name = TiebreakerFactory.parseId(tiebreakerId)
 	local tiebreakerClassName = NAME_TO_CLASS[name]
 	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(tiebreakerId))
-	---@type StandingsTiebreaker
-	local TiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. tiebreakerClassName)
 
-	return TiebreakerClass(context, options)
+	---@param className string
+	---@return StandingsTiebreaker
+	local function build(className)
+		---@type StandingsTiebreaker
+		local TiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. className)
+		return TiebreakerClass(context, options)
+	end
+
+	if type(tiebreakerClassName) == 'table' then
+		return TiebreakerComposite(context, options, Array.map(tiebreakerClassName, build))
+	end
+	return build(tiebreakerClassName)
 end
 
 return TiebreakerFactory

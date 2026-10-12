@@ -15,13 +15,15 @@ local Class = Lua.import('Module:Class')
 
 ---@alias StandingsDrawLevel 'match'|'game'|'round'
 
+---A number, or a list of numbers that is compared lexicographically
+---@alias StandingsTiebreakerValue number|number[]
+
 ---@class StandingsTiebreakerOptions
 ---@field draws table<StandingsDrawLevel, boolean>?
 
 ---@class StandingsTiebreaker
 ---@field context 'full'|'ml'
 ---@field options StandingsTiebreakerOptions
----@field valueOf fun(self: StandingsTiebreaker, state:TiebreakerOpponent[], opponent: TiebreakerOpponent): integer
 ---@field display fun(self: StandingsTiebreaker, state:TiebreakerOpponent[], opponent: TiebreakerOpponent): string
 ---@field headerTitle fun(self: StandingsTiebreaker): string
 local StandingsTiebreaker = Class.new(function (self, context, options)
@@ -31,7 +33,7 @@ end)
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
----@return integer
+---@return StandingsTiebreakerValue
 function StandingsTiebreaker:valueOf(state, opponent)
 	error('This is an Interface')
 end
