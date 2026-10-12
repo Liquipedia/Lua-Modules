@@ -564,14 +564,7 @@ function Opponent._fromMatchRecord(record)
 	elseif Opponent.typeIsParty(record.type) then
 		return {
 			type = record.type,
-			players = Array.map(record.match2players, function(playerRecord)
-				return {
-					displayName = playerRecord.displayname,
-					flag = String.nilIfEmpty(Flags.CountryName{flag = playerRecord.flag}),
-					pageName = String.nilIfEmpty(playerRecord.name),
-					faction = Logic.nilIfEmpty(Faction.read((playerRecord.extradata or {}).faction) or Faction.defaultFaction),
-				}
-			end),
+			players = Array.map(record.match2players, Opponent._playerFromRecord),
 			extradata = {},
 		}
 	elseif record.type == Opponent.literal then
@@ -579,6 +572,31 @@ function Opponent._fromMatchRecord(record)
 
 	end
 	error("Unknown opponent type: " .. record.type)
+end
+
+---@param record match2player
+---@return standardPlayer
+function Opponent.playerFromMatch2Record(record)
+	return Opponent._playerFromRecord(record)
+end
+
+---@param record MGIParsedPlayer
+---@return standardPlayer
+function Opponent.playerFromMatchParsedPlayer(record)
+	return Opponent._playerFromRecord(record)
+end
+
+---@private
+---@param record match2player|MGIParsedPlayer
+---@return standardPlayer
+function Opponent._playerFromRecord(record)
+	---@type standardPlayer
+	return {
+		displayName = record.displayname,
+		flag = String.nilIfEmpty(Flags.CountryName{flag = record.flag}),
+		pageName = String.nilIfEmpty(record.name),
+		faction = Logic.emptyOr(Faction.read((record.extradata or {}).faction), Faction.defaultFaction),
+	}
 end
 
 ---Reads an opponent struct and builds a standings/placement lpdb struct from it
