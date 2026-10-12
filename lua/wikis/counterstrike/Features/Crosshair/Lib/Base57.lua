@@ -1,10 +1,11 @@
-local Base57 = {}
 
 local bit32 = require('bit32')
 
-
 local toByte, band, blshift, brshift = string.byte, bit32.band, bit32.lshift, bit32.rshift
-local base57chars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefhijkmnopqrstuvwxyz23456789"
+
+local Base57 = {
+    characterset = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefhijkmnopqrstuvwxyz23456789"
+}
 
 local function division(bytes)
 	local quotient = {}
@@ -33,10 +34,10 @@ function Base57.decode(s)
 	-- b57charmap will map the internal value of a char in base57 alphabet to their position - 1 in base57chars
 	-- 'A' ==> b57charmap[65] = 0
 	local b57charmap = {};
-	for i = 1, 57 do b57charmap[toByte(base57chars, i)] = i - 1  end
+	for i = 1, 57 do b57charmap[toByte(Base57.characterset, i)] = i - 1  end
 
 	-- Can't decode invalid encoded string
-	if string.find(s, "[^"..base57chars.."]") then
+	if string.find(s, "[^"..Base57.characterset.."]") then
 		return nil
 	end
 
@@ -80,10 +81,11 @@ function Base57.encode(bytes)
 	while checkAllBytesDiffZero(bytes) do
 		-- The division is made going though all bytes
 		bytes, remainder = division(bytes)
-		s = s .. base57chars:sub(remainder+1, remainder+1)
+		s = s .. Base57.characterset:sub(remainder+1, remainder+1)
 	end
 
 	return s
 end
+
 
 return Base57

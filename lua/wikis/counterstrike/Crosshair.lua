@@ -1,54 +1,12 @@
 local Crosshair = {}
 
 local bit32 = require( 'bit32' )
-local Base57 = require('Module:Base57')
+local Base57 = require('Module:Features/Crosshair/Lib/Base57')
+local Utils = require('Module:Features/Crosshair/Lib/Utils')
 local crosshairBg = require('Module:CrosshairCommons').crosshairColors
 
 
 local band, blshift, brshift = bit32.band, bit32.lshift, bit32.rshift
-
--- Converts a byte to his signed value
-local function signed(dec)
-	if dec > 127 then
-		return -1 * (band(bit32.bnot(dec),0xff)) -1
-	end
-	return dec
-end
-
--- reverts signed function
-local function unsigned(dec)
-	if dec < 0 then
-		return band(bit32.bnot(dec* -1 -1),0xff)
-	end
-	return dec
-end
-
--- 8 bit check sum its the sum of all bytes excluding the MSB and of the sum return only the LSB matter
-local function eightBitChecksum(bytes)
-	local sum = 0
-	for i = 2, #bytes do
-		sum = sum + bytes[i]
-	end
-	return bit32.extract(sum,0,8)
-end
-
-local function padStartTable(tbl, targetLength, value)
-	local tableSize = 0
-	for _ in pairs(tbl) do
-		tableSize = tableSize + 1
-	end
-	while tableSize < targetLength do
-		table.insert(tbl, 1, value)
-		tableSize = tableSize + 1
-	end
-end
-
-local function padEndString(string,targetLength,padChar)
-	while #string < targetLength do
-		string = string .. padChar
-	end
-	return string
-end
 
 local function crosshairToBytes(crosshair)
 	local bytes = {}
@@ -59,14 +17,14 @@ local function crosshairToBytes(crosshair)
 	-- this byte seem to always be 1
 	bytes[2] = 1
 
-	bytes[3] = unsigned(crosshair["cl_crosshairgap"] * 10)
+	bytes[3] = Utils.unsigned(crosshair["cl_crosshairgap"] * 10)
 	bytes[4] = band(crosshair["cl_crosshair_outlinethickness"]* 2.0, 7)
 	bytes[5] = band(crosshair["cl_crosshaircolor_r"],0xff)
 	bytes[6] = band(crosshair["cl_crosshaircolor_g"],0xff)
 	bytes[7] = band(crosshair["cl_crosshaircolor_b"],0xff)
 	bytes[8] = band(crosshair["cl_crosshairalpha"],0xff)
 	bytes[9] = band(crosshair["cl_crosshair_dynamic_splitdist"],0xff)
-	bytes[10] = unsigned(crosshair["cl_fixedcrosshairgap"] * 10)
+	bytes[10] = Utils.unsigned(crosshair["cl_fixedcrosshairgap"] * 10)
 
 	bytes[11] = band(crosshair["cl_crosshair_dynamic_splitalpha_innermod"] * 10 , 0x0F)
 	bytes[11] = blshift(bytes[11], 1) + band(crosshair["cl_crosshair_drawoutline"], 0x1)
@@ -88,7 +46,7 @@ local function crosshairToBytes(crosshair)
 	bytes[15] = band(size,0xFF) -- last bytes
 	bytes[16] = band(brshift(size,8),0x1f)
 
-	bytes[1] = eightBitChecksum(bytes)
+	bytes[1] = Utils.eightBitChecksum(bytes)
 
 	return bytes
 end
@@ -178,15 +136,15 @@ function Crosshair.decode(shareCode)
 		return
 	end
 	-- add a byte 0 to make bytes unsigned
-	padStartTable(bytes, 18, 0)
+	Utils.padStartTable(bytes, 18, 0)
 	-- now bytes contains the decoded number (big endian)
 	-- validate checksum
-	if eightBitChecksum(bytes) ~= bytes[1] then
+	if Utils.eightBitChecksum(bytes) ~= bytes[1] then
 		error("Invalid share code")
 	end
 
 	local crosshair = {
-		["cl_crosshairgap"] = signed(bytes[3]) / 10.0,
+		["cl_crosshairgap"] = Utils.signed(bytes[3]) / 10.0,
 
 		["cl_crosshair_outlinethickness"] = band(bytes[4], 7) / 2.0,
 
@@ -196,7 +154,7 @@ function Crosshair.decode(shareCode)
 		["cl_crosshairalpha"] = bytes[8],
 		["cl_crosshair_dynamic_splitdist"] = bytes[9],
 
-		["cl_fixedcrosshairgap"] = signed(bytes[10]) / 10.0,
+		["cl_fixedcrosshairgap"] = Utils.signed(bytes[10]) / 10.0,
 
 		["cl_crosshaircolor"] = band(bytes[11], 7),
 		["cl_crosshair_drawoutline"] = bit32.btest(bytes[11], 8) and  1 or 0,
@@ -228,7 +186,7 @@ function Crosshair.encode(crosshair)
 	local shareCode = Base57.encode(bytes)
 
 	if #shareCode ~= 25 then
-		shareCode = padEndString(shareCode,25,'A')
+		shareCode = Utils.padEndString(shareCode,25,'A')
 	end
 
 	return "CSGO-"..shareCode:sub(1,5).."-"..shareCode:sub(6,10).."-"..shareCode:sub(11,15).."-"..shareCode:sub(16,20).."-"..shareCode:sub(21,25)
