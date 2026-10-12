@@ -188,4 +188,21 @@ describe('Standings Tiebreaker HeadToHead', function()
 		opponents = makeOpponents({'A', 'B'}, {{'B', 'A'}})
 		assert.are_same({{'B'}, {'A'}}, namesOf(HeadToHead.resolve(opponents, matchWins)))
 	end)
+
+	describe('tiebreakers with list values', function()
+		local matchScore = TiebreakerFactory.tiebreakerFromId('h2hcs.matchscore')
+
+		it('compares the series of each pairing', function()
+			-- A won the series against B 2-1
+			local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'B'}, {'B', 'A'}, {'A', 'B'}, {'A', 'C'}, {'B', 'C'}})
+
+			assert.are_same({{'A'}, {'B'}, {'C'}}, namesOf(HeadToHead.resolve(opponents, matchScore)))
+		end)
+
+		it('does not put opponents with a split series on top or at the bottom', function()
+			local opponents = makeOpponents({'A', 'B', 'C'}, {{'A', 'B'}, {'B', 'A'}, {'A', 'C'}, {'C', 'B'}})
+
+			assert.are_same({{'A', 'B', 'C'}}, namesOf(HeadToHead.resolve(opponents, matchScore)))
+		end)
+	end)
 end)

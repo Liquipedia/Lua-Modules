@@ -36,11 +36,14 @@ function HeadToHead.resolve(tiedOpponents, tiebreaker)
 			end
 			local valueA = tiebreaker:valueOf(scopedOpponents, scopedOpponents[1])
 			local valueB = tiebreaker:valueOf(scopedOpponents, scopedOpponents[2])
+			-- Values can be lists, which are compared lexically
+			local isABetter = Array.lexicalCompareIfTable(valueB, valueA)
+			local isBBetter = Array.lexicalCompareIfTable(valueA, valueB)
 
-			isTop[indexA] = isTop[indexA] and valueA > valueB
-			isBottom[indexA] = isBottom[indexA] and valueA < valueB
-			isTop[indexB] = isTop[indexB] and valueB > valueA
-			isBottom[indexB] = isBottom[indexB] and valueB < valueA
+			isTop[indexA] = isTop[indexA] and isABetter
+			isBottom[indexA] = isBottom[indexA] and isBBetter
+			isTop[indexB] = isTop[indexB] and isBBetter
+			isBottom[indexB] = isBottom[indexB] and isABetter
 		end)
 	end)
 
