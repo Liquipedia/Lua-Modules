@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local Component = Lua.import('Module:Widget/Component')
@@ -23,17 +24,7 @@ local function ValorantMatchPageSkirmishDisplay(props)
 		return
 	end
 	---@cast skirmish -nil
-	local players = Array.map(
-		skirmish.players,
-		function (player)
-			---@type standardPlayer
-			return {
-				displayName = player.displayname,
-				pageName = player.name,
-				flag = player.flag,
-			}
-		end
-	)
+	local players = Array.map(skirmish.players, Opponent.playerFromMatchParsedPlayer)
 	return MatchPageComment{
 		css = {
 			display = 'grid',
