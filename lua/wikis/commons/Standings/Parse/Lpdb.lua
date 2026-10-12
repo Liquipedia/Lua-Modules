@@ -31,7 +31,7 @@ local StandingsParseLpdb = {}
 ---@field importOpponents boolean? # If set, opponents not listed manually still count as part of the standings
 
 ---@param rounds {roundNumber: integer, matches: string[]}[]
----@param scoreMapper fun(opponent: match2opponent): number|nil
+---@param scoreMapper fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number|nil
 ---@param manualOpponents StandingTableOpponentData[]
 ---@param options StandingsImportOptions?
 ---@return StandingTableOpponentData[]
@@ -157,7 +157,7 @@ end
 ---@param roundNumber integer
 ---@param match match2
 ---@param opponents StandingTableOpponentData[]
----@param scoreMapper fun(opponent: standardOpponent): number?
+---@param scoreMapper fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number?
 ---@param maxRounds integer
 ---@param manualOpponents StandingTableOpponentData[]
 ---@param options StandingsImportOptions?
@@ -193,7 +193,7 @@ function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMappe
 		local opponentRoundData = standingsOpponentData.rounds[roundNumber]
 		opponentRoundData.specialstatus = ''
 		opponentRoundData.matches = Array.append(opponentRoundData.matches or {}, match2)
-		local points = scoreMapper(opponent)
+		local points = scoreMapper(opponent, match2)
 		if points then
 			opponentRoundData.matchPoints = opponentRoundData.matchPoints or {}
 			opponentRoundData.matchPoints[match2.matchId] = points

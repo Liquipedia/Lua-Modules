@@ -3,6 +3,7 @@ local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 
 describe('Standings import from matches', function()
 	local StandingsParseLpdb = require('Module:Standings/Parse/Lpdb')
+	local StandingsParseWiki = require('Module:Standings/Parse/Wiki')
 	local Array = require('Module:Array')
 
 	---@param props {matchId: string, opponents: {template: string?, name: string, score: integer,
@@ -54,9 +55,7 @@ describe('Standings import from matches', function()
 		end)
 	end
 
-	local function swissScoreMapper(opponent)
-		return opponent.placement == 1 and 1 or 0
-	end
+	local swissScoreMapper = StandingsParseWiki.makeScoringFunction('swiss', {})
 
 	local function findOpponent(opponents, name)
 		return Array.find(opponents, function(opponentData)
@@ -159,6 +158,8 @@ describe('Standings import from matches', function()
 
 		local heroic = findOpponent(opponents, 'Heroic')
 		assert.are_same({w = 0, d = 1, l = 0}, heroic.rounds[1].scoreboard.match)
+		assert.are_equal(0.5, heroic.rounds[1].scoreboard.points)
+		assert.are_equal(0.5, findOpponent(opponents, 'Wolves Esports').rounds[1].scoreboard.points)
 	end)
 
 	it('counts a match in every round it is assigned to', function()
