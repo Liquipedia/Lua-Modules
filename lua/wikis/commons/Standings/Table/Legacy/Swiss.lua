@@ -63,7 +63,7 @@ function StandingTableLegacySwiss.classic(frame)
 	local args = Arguments.getArgs(frame)
 
 	local matchesForRound = StandingTableLegacySwiss.mapTournamentInputToMatchesInRounds(args)
-	local rounds = Table.map(Array.range(1, tonumber(args.rounds) or 1), function(roundIndex)
+	local rounds = Table.map(Array.range(1, tonumber(args.rounds) or 5), function(roundIndex)
 		return 'round' .. roundIndex, StandingTableLegacySwiss.parseRoundInput(args, roundIndex, matchesForRound[roundIndex])
 	end)
 
