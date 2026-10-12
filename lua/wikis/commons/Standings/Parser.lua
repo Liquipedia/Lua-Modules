@@ -220,7 +220,9 @@ local function groupByValue(allOpponents, tiedOpponents, tiebreaker, tiebreakerI
 		end)
 	end
 
-	local _, groupedOpponents = Array.groupBy(tiedOpponents, function(opponent)
+	---@param opponent TiebreakerOpponent
+	---@return StandingsTiebreakerValue
+	local function valueOf(opponent)
 		if scopedOpponentsByOpponent then
 			return tiebreaker:valueOf(scopedOpponents, scopedOpponentsByOpponent[opponent])
 		end
@@ -228,10 +230,28 @@ local function groupByValue(allOpponents, tiedOpponents, tiebreaker, tiebreakerI
 			return tiebreaker:valueOf(allOpponents, opponent)
 		end
 		return opponent.extradata.additionalStatsValues[tiebreakerId].value
+	end
+
+	-- Values can be lists, so they are matched by deep equality instead of being used as table keys
+	local valueByOpponent = {}
+	---@type StandingsTiebreakerValue[]
+	local distinctValues = {}
+	Array.forEach(tiedOpponents, function(opponent)
+		local value = valueOf(opponent)
+		valueByOpponent[opponent] = value
+		if not Array.any(distinctValues, function(distinctValue) return Logic.deepEquals(distinctValue, value) end) then
+			table.insert(distinctValues, value)
+		end
+	end)
+	table.sort(distinctValues, function(a, b)
+		return Array.lexicalCompareIfTable(b, a)
 	end)
 
-	return Array.extractValues(groupedOpponents, Table.iter.spairs, function(_, a, b)
-		return a > b
+	-- Highest value first, opponents keep their order within a group
+	return Array.map(distinctValues, function(value)
+		return Array.filter(tiedOpponents, function(opponent)
+			return Logic.deepEquals(valueByOpponent[opponent], value)
+		end)
 	end)
 end
 

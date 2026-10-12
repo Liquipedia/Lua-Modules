@@ -11,19 +11,21 @@ local Array = Lua.import('Module:Array')
 
 local StandingsDisplayUtil = {}
 
----Returns the stats that get a column, skipping untitled and duplicate ones
+---Returns the stats that get a column, skipping untitled and duplicate ones.
+---Stats with the same title share a column (e.g. all match based stats show the match record),
+---the column shows the first of them.
 ---@param standings StandingsModel
 ---@return {id: string, title: string?}[]
 function StandingsDisplayUtil.statsToShow(standings)
-	local seenStatsBefore = {}
+	local seenTitlesBefore = {}
 	return Array.filter(standings.additionalStats, function(tiebreaker)
 		if not tiebreaker.title then
 			return false
 		end
-		if seenStatsBefore[tiebreaker.id] then
+		if seenTitlesBefore[tiebreaker.title] then
 			return false
 		end
-		seenStatsBefore[tiebreaker.id] = true
+		seenTitlesBefore[tiebreaker.title] = true
 		return true
 	end)
 end
