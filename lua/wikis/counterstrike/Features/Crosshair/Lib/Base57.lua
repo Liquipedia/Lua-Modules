@@ -1,13 +1,72 @@
-
+local Lua = require('Module:Lua')
 local bit32 = require('bit32')
+
+local FnUtil = Lua.import('Module:FnUtil')
 
 local toByte, band, blshift, brshift = string.byte, bit32.band, bit32.lshift, bit32.rshift
 
 ---@class Base57
+---@field length integer
 ---@field characterset string
 local Base57 = {
+	length = 57,
     characterset = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefhijkmnopqrstuvwxyz23456789"
 }
+
+-- b57charmap will map the internal value of a char in base57 alphabet to their position - 1 in base57chars
+-- 'A' ==> b57charmap[65] = 0
+Base57.charactermap = FnUtil.memoize(function()
+	local map = {}
+	for i = 1, 57 do
+		map[toByte(Base57.characterset, i)] = i - 1
+	end
+	return map
+end)
+
+---@param bytes table
+---@return string?
+function Base57.encode(bytes)
+	local result = ''
+
+	for i = 1, #bytes do
+
+	end
+
+	return result
+end
+
+---@param bytes table
+---@param base integer
+---@param value integer
+local function addTo(bytes, base, value)
+	local carry = value
+	for i = 1, #bytes do
+		local v = bytes[i] * base + carry
+		bytes[i] = v % 256
+		carry = math.floor(v / 256)
+	end
+	while carry > 0 do
+		table.insert(bytes, carry % 256)
+		carry = math.floor(carry / 256)
+	end
+end
+
+---@param input string
+---@return table?
+function Base57.decode(input, byteLength)
+	local reversed = input:reverse()
+	local bytes = {0}
+	for i = 1, #reversed do
+		local c = reversed[i]
+		local v = Base57.charactermap()[c]
+		addTo(bytes, Base57.length, v)
+	end
+	local result = {}
+	for i = byteLength, 1, -1 do
+		result[bytelength - i + 1] = bytes[i] or 0
+	end
+	return result
+end
 
 local function division(bytes)
 	local quotient = {}
@@ -36,14 +95,11 @@ end
 ---@param s string
 ---@return table?
 function Base57.decode(s)
-	-- b57charmap will map the internal value of a char in base57 alphabet to their position - 1 in base57chars
-	-- 'A' ==> b57charmap[65] = 0
-	local b57charmap = {};
-	for i = 1, 57 do b57charmap[toByte(Base57.characterset, i)] = i - 1  end
+	local b57charmap = Base57.charactermap()
 
 	-- Can't decode invalid encoded string
 	if string.find(s, "[^"..Base57.characterset.."]") then
-		return nil
+		error("Input is not Base57-encoded")
 	end
 
 	local bytes -- decoded number as an array of bytes (big endian)
