@@ -3,6 +3,8 @@ local bit32 = require('bit32')
 
 local toByte, band, blshift, brshift = string.byte, bit32.band, bit32.lshift, bit32.rshift
 
+---@class Base57
+---@field characterset string
 local Base57 = {
     characterset = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefhijkmnopqrstuvwxyz23456789"
 }
@@ -30,6 +32,9 @@ local function checkAllBytesDiffZero(bytes)
 	return sum ~= 0
 end
 
+---Decode a Base57-encoded string
+---@param s string
+---@return table?
 function Base57.decode(s)
 	-- b57charmap will map the internal value of a char in base57 alphabet to their position - 1 in base57chars
 	-- 'A' ==> b57charmap[65] = 0
@@ -74,6 +79,9 @@ function Base57.decode(s)
 	return bytes
 end
 
+---Encode a table of bytes into a Base57-encoded string
+---@param bytes table
+---@return string
 function Base57.encode(bytes)
 	local remainder
 	local s = ""

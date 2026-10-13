@@ -1,0 +1,48 @@
+---
+-- @Liquipedia
+-- page=Module:Features/Crosshair/Types
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+--- Details from https://github.com/akiver/csgo-sharecode/blob/main/doc/code_layout.md
+
+---@class (exact) Crosshair
+---@field checksum integer
+---@field format 'legacy-v1' | 'legacy-v3' | 'legacy-v4' | 'cs2-v1'
+---@field version number
+---@field gap number
+---@field outline number?
+---@field red number
+---@field green number
+---@field blue number
+---@field alpha number
+---@field splitDistance number
+---@field followRecoil boolean
+---@field fixedCrosshairGap number
+---@field color number?
+---@field outlineEnabled boolean
+---@field innerSplitAlpha number
+---@field outerSplitAlpha number
+---@field splitSizeRatio number
+---@field thickness number
+---@field style number
+---@field centerDotEnable boolean
+---@field deployedWeaponGapEnabled boolean
+---@field alphaEnabled boolean
+---@field tStyleEnabled boolean
+---@field length number
+---@field dynamicSpreadLimit number?
+---@field screenHeight number?
+---@field scopeDotUseCrosshairColor boolean?
+---@field scopeDotScale number?
+---@field outlineRed number?
+---@field outlineGreen number?
+---@field outlineBlue number?
+---@field outlineAlpha number?
+---@field outlineMode number?
+
+
+---@class (exact) CrosshairSerializer
+---@field encode fun(crosshair: Crosshair): string?
+---@field decode fun(input: string): Crosshair?
