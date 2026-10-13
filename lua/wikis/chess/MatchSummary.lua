@@ -102,17 +102,6 @@ function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 		return kingIcon
 	end
 
-	local parsedPlayers = Array.map(gameOpponent.players, function (player)
-		if Logic.isEmpty(player) then
-			return
-		end
-		return Opponent.readSinglePlayerArgs{
-			name = player.displayName,
-			link = player.player,
-			flag = player.flag,
-		}
-	end)
-
 	return WidgetUtil.collect(
 		kingIcon,
 		Array.map(
