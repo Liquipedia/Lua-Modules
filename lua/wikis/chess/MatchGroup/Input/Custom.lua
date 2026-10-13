@@ -14,10 +14,14 @@ local Eco = Lua.import('Module:ChessOpenings')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
+
+---@class ChessMatchParser: MatchParserInterface
 local MatchFunctions = {
 	DEFAULT_MODE = 'solo',
 	getBestOf = MatchGroupInputUtil.getBestOf,
 }
+
+---@class ChessMapParser: MapParserInterface
 local MapFunctions = {}
 
 ---@param match table
