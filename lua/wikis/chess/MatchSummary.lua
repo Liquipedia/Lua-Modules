@@ -95,6 +95,13 @@ end
 function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local gameOpponent = game.opponents[opponentIndex]
+
+	---@diagnostic disable-next-line: undefined-field
+	local kingIcon = KING_ICONS[gameOpponent.color]
+	if #gameOpponent.players <= 1 then
+		return kingIcon
+	end
+
 	local parsedPlayers = Array.map(gameOpponent.players, function (player)
 		if Logic.isEmpty(player) then
 			return
@@ -106,18 +113,24 @@ function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 		}
 	end)
 
-	---@diagnostic disable-next-line: undefined-field
-	local kingIcon = KING_ICONS[gameOpponent.color]
-	if #gameOpponent.players <= 1 then
-		return kingIcon
-	end
-
 	return WidgetUtil.collect(
 		kingIcon,
-		Array.map(parsedPlayers, function (player)
-			---@cast player -nil
-			return PlayerDisplay.BlockPlayer{player = player, flip = opponentIndex == 2}
-		end)
+		Array.map(
+			gameOpponent.players,
+			function (player)
+				if Logic.isEmpty(player) then
+					return
+				end
+				return PlayerDisplay.BlockPlayer{
+					player = Opponent.readSinglePlayerArgs{
+						name = player.displayName,
+						link = player.player,
+						flag = player.flag,
+					},
+					flip = opponentIndex == 2
+				}
+			end
+		)
 	)
 end
 
