@@ -57,7 +57,7 @@ local DISQUALIFIED = 'dq'
 ---@field extradata table
 
 ---@param data table
----@param options? {saveVars?: boolean}
+---@param options? {saveVars?: boolean, storeLpdb?: boolean}
 function StandingsStorage.run(data, options)
 	if Table.isEmpty(data) then
 		return
@@ -71,7 +71,7 @@ function StandingsStorage.run(data, options)
 		return StandingsStorage.entry(entry, data.standingsindex)
 	end)
 
-	if StandingsStorage.shouldStoreLpdb() then
+	if StandingsStorage.shouldStoreLpdb() and (options or {}).storeLpdb ~= false then
 		StandingsStorage.saveLpdb(StandingsStorage.table(data), entries)
 	end
 	if options and options.saveVars then

@@ -37,6 +37,28 @@ describe('Standings Storage', function()
 		stubLpdbStandingsTable:revert()
 	end)
 
+	it('skips lpdb but keeps page variables when storeLpdb is false', function()
+		local Variables = require('Module:Variables')
+		local stubLpdb = stub(mw.ext.LiquipediaDB, "lpdb", {})
+		local stubLpdbStandingsTable = stub(mw.ext.LiquipediaDB, "lpdb_standingstable")
+		local stubLpdbStandingsEntry = stub(mw.ext.LiquipediaDB, "lpdb_standingsentry")
+
+		StandingsStorage.run({
+			standingsindex = 0,
+			title = '',
+			type = 'swiss',
+			entries = {},
+		}, {saveVars = true, storeLpdb = false})
+
+		assert.stub(stubLpdbStandingsTable).was_not.called()
+		assert.stub(stubLpdbStandingsEntry).was_not.called()
+		assert.is_not_nil(Variables.varDefault('standings2_0'))
+
+		stubLpdb:revert()
+		stubLpdbStandingsTable:revert()
+		stubLpdbStandingsEntry:revert()
+	end)
+
 	it('storage full', function()
 		TeamTemplateMock.setUp()
 		local standingsData = require('test_assets.standings')

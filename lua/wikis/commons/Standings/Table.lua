@@ -54,6 +54,7 @@ function StandingsTable.fromTemplate(frame)
 	--- non-exclusive (the default) counts matches where at least one opponent is part of the standings.
 	--- Note that this is the reverse of the legacy GroupTableLeague default, on purpose.
 	local exclusiveOpponents = Logic.readBool(args.exclusive)
+	local storeLpdb = Logic.nilOr(Logic.readBoolOrNil(args.store), true)
 
 	local parsedData = StandingsParseWiki.parseWikiInput(args)
 	local rounds = parsedData.rounds
@@ -81,7 +82,7 @@ function StandingsTable.fromTemplate(frame)
 		standingsTable.extradata.placemapping = Logic.wrapTryOrLog(StandingsParseWiki.parsePlaceMapping)(args, opponents)
 	end
 
-	StandingsStorage.run(standingsTable, {saveVars = true})
+	StandingsStorage.run(standingsTable, {saveVars = true, storeLpdb = storeLpdb})
 	return StandingsDisplay{pageName = mw.title.getCurrentTitle().text, standingsIndex = standingsTable.standingsindex}
 end
 
