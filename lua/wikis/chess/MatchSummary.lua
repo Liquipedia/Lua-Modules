@@ -116,6 +116,7 @@ function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 						link = player.player,
 						flag = player.flag,
 					},
+					overflow = 'wrap',
 					flip = opponentIndex == 2
 				}
 			end
