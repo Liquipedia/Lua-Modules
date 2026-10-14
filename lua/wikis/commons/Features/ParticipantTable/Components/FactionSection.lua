@@ -28,7 +28,7 @@ local function ParticipantTableFactionSection(props)
 	---@return VNode<Table2RowProps>?
 	local makeSectionTitleRow = function()
 		local sectionConfig = section.config
-		if Logic.isEmpty(sectionConfig.title) then
+		if Logic.isEmpty(sectionConfig.title) or sectionConfig.title == props.config.title then
 			return
 		end
 
@@ -56,13 +56,13 @@ local function ParticipantTableFactionSection(props)
 	end
 
 	if Logic.isEmpty(section.entries) then
-		return {
+		return WidgetUtil.collect(
 			makeSectionTitleRow(),
 			TableWidgets.Row{children = TableWidgets.Cell{
 				attributes = {colspan = #props.factionColumns},
 				children = 'To be determined',
 			}}
-		}
+		)
 	end
 
 	-- Group entries by faction

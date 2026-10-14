@@ -34,6 +34,7 @@ local function ParticipantTableSeedList(props)
 	)
 
 	local display = TableWidgets.Table{
+ 		columns = {{}, {}},
 		css = {
 			width = width,
 			['max-width'] = '100%!important',
