@@ -58,6 +58,23 @@ describe('Standings Legacy Next', function()
 
 	end)
 
+	describe('statuses', function()
+		it('maps dq<N> to the first round and round<R>dq<N> to that round', function()
+			local args = {dq1 = 'true', round3dq2 = 'true', round2dq3 = 'true', round4dq3 = 'true', round5dq4 = 'true'}
+			assert.are_equal(1, StandingTableLegacyNext.parseDisqualifiedFromRound(args, 1, 4))
+			assert.are_equal(3, StandingTableLegacyNext.parseDisqualifiedFromRound(args, 2, 4))
+			assert.are_equal(2, StandingTableLegacyNext.parseDisqualifiedFromRound(args, 3, 4))
+			assert.is_nil(StandingTableLegacyNext.parseDisqualifiedFromRound(args, 4, 4))
+		end)
+
+		it('maps round<R>bg<N> to r<R>bg and bg<N> to the final round', function()
+			local args = {round2bg1 = 'up', bg1 = 'stayup', round3bg2 = 'down', bg2 = 'up', round4bg3 = 'up'}
+			assert.are_same({r2bg = 'up', r3bg = 'stayup'}, StandingTableLegacyNext.parseDefiniteStatuses(args, 1, 3))
+			assert.are_same({r3bg = 'down'}, StandingTableLegacyNext.parseDefiniteStatuses(args, 2, 3))
+			assert.are_same({}, StandingTableLegacyNext.parseDefiniteStatuses(args, 3, 3))
+		end)
+	end)
+
 	describe('rounds', function()
 		local function withMatches(matches, fn)
 			local lpdbStub = stub(mw.ext.LiquipediaDB, 'lpdb', function() return matches end)

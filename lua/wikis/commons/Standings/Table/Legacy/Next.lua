@@ -92,9 +92,39 @@ function StandingTableLegacyNext.parseOpponentInput(args, key, index, prefix, ro
 	return Table.merge(opponent, {
 		tiebreaker = args['temp_tie' .. index],
 		startingpoints = args['temp_p' .. index],
-		dq = args['dq' .. index],
+		dq = StandingTableLegacyNext.parseDisqualifiedFromRound(args, index, roundCount),
 		aliases = aliases and table.concat(Array.parseCommaSeparatedString(aliases), ';') or nil,
-	})
+	}, StandingTableLegacyNext.parseDefiniteStatuses(args, index, roundCount))
+end
+
+---`dq<N>` disqualifies from the first round, `round<R>dq<N>` from round R.
+---@param args table
+---@param index integer
+---@param roundCount integer
+---@return integer?
+function StandingTableLegacyNext.parseDisqualifiedFromRound(args, index, roundCount)
+	if Logic.readBool(args['dq' .. index]) then
+		return 1
+	end
+	return Array.find(Array.range(1, roundCount), function(roundIndex)
+		return Logic.readBool(args['round' .. roundIndex .. 'dq' .. index])
+	end)
+end
+
+---`round<R>bg<N>` maps to `r<R>bg` on the opponent, `bg<N>` applies to the final round.
+---@param args table
+---@param index integer
+---@param roundCount integer
+---@return table<string, string?>
+function StandingTableLegacyNext.parseDefiniteStatuses(args, index, roundCount)
+	return Table.map(Array.range(1, roundCount), function(roundIndex)
+		---@type string?
+		local status = args['round' .. roundIndex .. 'bg' .. index]
+		if not status and roundIndex == roundCount then
+			status = args['bg' .. index]
+		end
+		return 'r' .. roundIndex .. 'bg', status
+	end)
 end
 
 ---Assigns the matches to rounds by their round index (set via `|round=` or the match section),
