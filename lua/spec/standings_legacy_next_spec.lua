@@ -179,6 +179,22 @@ describe('Standings Legacy Next', function()
 			assert.are_same({{'a'}, {'b', 'c'}}, idsByRound(matchesByRound, roundCount))
 		end)
 
+		it('puts matches in round end dates beyond the number of rounds in the final round', function()
+			local matchesByRound, roundCount = withMatches({
+				match('a', '2024-01-01 12:00:00'),
+				match('b', '2024-01-03 12:00:00'),
+			}, function()
+				return StandingTableLegacyNext.fetchMatchesByRound{
+					rounds = '1',
+					round1edate = '2024-01-01 23:59',
+					round2edate = '2024-01-03 23:59',
+				}
+			end)
+
+			assert.are_equal(1, roundCount)
+			assert.are_same({{'a', 'b'}}, idsByRound(matchesByRound, roundCount))
+		end)
+
 		it('puts all matches in a single round if none have a round index', function()
 			local matchesByRound, roundCount = withMatches({
 				match('a', '2024-01-01 12:00:00'),

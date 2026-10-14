@@ -216,7 +216,10 @@ function StandingTableLegacyNext.fetchMatchesByRound(args)
 		local roundIndex = Array.indexOf(roundEndTimes, function(endTime)
 			return match.time <= endTime
 		end)
-		return roundIndex ~= 0 and roundIndex or roundCount
+		if roundIndex == 0 or roundIndex > roundCount then
+			return roundCount
+		end
+		return roundIndex
 	end)
 
 	return matchesByRound, roundCount
