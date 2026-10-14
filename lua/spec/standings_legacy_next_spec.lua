@@ -9,14 +9,15 @@ describe('Standings Legacy Next', function()
 				p1 = 'Alpha',
 				p1flag = 'se',
 				p1link = 'Alpha (player)',
+				p1race = 'p',
 				t2 = 'bravo',
 				team3 = 'charlie',
 				opponent4 = '{"type":"literal","name":"Delta"}',
 			}, 1)
 
 			assert.are_equal(4, #opponents)
-			assert.are_same({'solo', 'Alpha', 'se', 'Alpha (player)'},
-				{opponents[1].type, opponents[1][1], opponents[1].flag, opponents[1].link})
+			assert.are_same({'solo', 'Alpha', 'se', 'Alpha (player)', 'p'},
+				{opponents[1].type, opponents[1][1], opponents[1].flag, opponents[1].link, opponents[1].faction})
 			assert.are_same({'team', 'bravo'}, {opponents[2].type, opponents[2][1]})
 			assert.are_same({'team', 'charlie'}, {opponents[3].type, opponents[3][1]})
 			assert.are_same({'literal', 'Delta'}, {opponents[4].type, opponents[4].name})

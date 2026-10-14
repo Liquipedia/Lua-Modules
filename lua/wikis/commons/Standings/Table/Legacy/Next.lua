@@ -191,7 +191,13 @@ function StandingTableLegacyNext.parseOpponentInput(args, key, index, prefix, ro
 	local opponent = Json.parseIfTable(value)
 	if not opponent then
 		if prefix == 'p' then
-			opponent = {type = Opponent.solo, value, flag = args['p' .. index .. 'flag'], link = args['p' .. index .. 'link']}
+			opponent = {
+				type = Opponent.solo,
+				value,
+				flag = args['p' .. index .. 'flag'],
+				link = args['p' .. index .. 'link'],
+				faction = args['p' .. index .. 'race'] or args['p' .. index .. 'faction'],
+			}
 		else
 			opponent = {type = Opponent.team, value}
 		end
