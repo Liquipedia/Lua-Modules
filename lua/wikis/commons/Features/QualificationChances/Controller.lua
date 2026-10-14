@@ -28,12 +28,18 @@ function Controller.showQualificationChances(frame)
 	local stages = Json.parseIfTable(args.stages)
 	local data = DataFetch.fromWikiJson(args.datapage)
 
+	local limit = tonumber(args.limit)
+
 	local teams = Array.sortBy(data.teams, FnUtil.identity, function (a, b)
 		if a.chance_pct == b.chance_pct then
 			return (a.avg_rank_value or 0) > (b.avg_rank_value or 0)
 		end
 		return a.chance_pct > b.chance_pct
 	end)
+
+	if limit then
+		teams = Array.sub(teams, 1, limit)
+	end
 
 	return TableWidgets.Table{
 		striped = true,
