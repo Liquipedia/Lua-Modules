@@ -160,7 +160,12 @@ describe('Standings overtime', function()
 		end)
 	end)
 
-	describe('legacy swiss tiebreakers', function()
+	describe('legacy swiss', function()
+		it('enables overtime from show_otp', function()
+			assert.is_true(StandingTableLegacySwiss.getStandardParameter{show_otp = 'true'}.overtime)
+			assert.is_false(StandingTableLegacySwiss.getStandardParameter{}.overtime)
+		end)
+
 		it('maps "no ot diff" to gamediffregulation', function()
 			assert.are_same({'gamediff', 'gamediffregulation'}, StandingTableLegacySwiss.parseTiebreaker{
 				tiebreaker1 = 'diff',

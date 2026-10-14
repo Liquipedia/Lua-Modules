@@ -54,6 +54,7 @@ function StandingTableLegacySwiss.getStandardParameter(args)
 		title = args.title,
 		placements = args.placements,
 		matchdraws = Logic.readBoolOrNil(args.ties),
+		overtime = Logic.readBool(args.show_otp),
 		points = StandingTableLegacySwiss.parsePoints(args),
 	}
 end
