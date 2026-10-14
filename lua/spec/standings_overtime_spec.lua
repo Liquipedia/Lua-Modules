@@ -141,6 +141,16 @@ describe('Standings overtime', function()
 			assert.is_falsy(score(scoreFunction, live, 2))
 		end)
 
+		it('gives half a regulation win for a draw with overtime', function()
+			setRegulationRounds(12)
+			local scoreFunction = StandingsParseWiki.makeScoringFunction('swiss', {}, true)
+			local draw = makeMatch{makeGame({6, 6}, {winner = 0})}
+			draw.winner = 0
+			draw.opponents[2].placement = 1
+			assert.are_equal(1.5, score(scoreFunction, draw, 1))
+			assert.are_equal(1.5, score(scoreFunction, draw, 2))
+		end)
+
 		it('gives 1/0 points without overtime', function()
 			setRegulationRounds(12)
 			local scoreFunction = StandingsParseWiki.makeScoringFunction('swiss', {})

@@ -270,6 +270,10 @@ function StandingsParseWiki.makeScoringFunction(tabletype, args, overtime)
 				if not match.finished then
 					return nil
 				end
+				-- Draws should not happen with overtime, but would be worth half a regulation win
+				if match.winner == 0 then
+					return 1.5
+				end
 				local isWinner = opponent.placement == 1
 				if StandingsOvertime.isOvertimeMatch(match) then
 					return isWinner and 2 or 1
