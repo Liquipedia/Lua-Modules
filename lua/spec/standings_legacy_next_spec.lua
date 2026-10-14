@@ -145,6 +145,14 @@ describe('Standings Legacy Next', function()
 			})
 		end)
 
+		it('maps the starcraft h2h aliases', function()
+			assert.are_same({'ml.gamediff', 'ml.gamewins', 'ml.gamelosses'}, StandingTableLegacyNext.parseTiebreakers{
+				tiebreaker1 = 'h2h diff',
+				tiebreaker2 = 'h2h games won',
+				tiebreaker3 = 'h2h games loss',
+			})
+		end)
+
 		it('maps the metric names and drops the implicit ones', function()
 			assert.are_same({'matchwins', 'ml.gamescore', 'points'}, StandingTableLegacyNext.parseTiebreakers{
 				tiebreaker1 = 'dq',
