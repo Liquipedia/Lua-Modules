@@ -57,6 +57,10 @@ describe('Standings Legacy Next', function()
 			assert.is_true(StandingTableLegacyNext.getStandardParameter({importOpponents = 'true'}, {{}}).importopponents)
 		end)
 
+		it('maps storeStanding to store', function()
+			assert.is_nil(StandingTableLegacyNext.getStandardParameter({}, {}).store)
+			assert.is_false(StandingTableLegacyNext.getStandardParameter({storeStanding = 'false'}, {}).store)
+		end)
 	end)
 
 	describe('statuses', function()

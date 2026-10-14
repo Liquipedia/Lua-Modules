@@ -80,6 +80,7 @@ end
 function StandingTableLegacyNext.getStandardParameter(args, opponents)
 	return Table.merge(StandingTableLegacySwiss.getStandardParameter(args), {
 		importopponents = Logic.nilOr(Logic.readBoolOrNil(args.importOpponents), #opponents == 0),
+		store = Logic.readBoolOrNil(args.storeStanding),
 	})
 end
 
