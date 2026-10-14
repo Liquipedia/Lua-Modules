@@ -152,10 +152,10 @@ th.participantTable-faction-section-title {
 }
 
 /* move the padding from the td to the div so the hover looks better */
-td.participantTable-tableEntry:has( div.brkts-opponent-hover ) {
+td:has( > div.participantTable-tableEntry.brkts-opponent-hover ) {
 	padding: 0;
 }
 
-td.participantTable-tableEntry > div.brkts-opponent-hover {
+td > div.participantTable-tableEntry.brkts-opponent-hover {
 	padding: 0.5rem 0.75rem;
 }
