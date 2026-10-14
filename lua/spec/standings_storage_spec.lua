@@ -38,6 +38,7 @@ describe('Standings Storage', function()
 	end)
 
 	it('skips lpdb but keeps page variables when storeLpdb is false', function()
+		local Json = require('Module:Json')
 		local Variables = require('Module:Variables')
 		local stubLpdb = stub(mw.ext.LiquipediaDB, "lpdb", {})
 		local stubLpdbStandingsTable = stub(mw.ext.LiquipediaDB, "lpdb_standingstable")
@@ -47,12 +48,15 @@ describe('Standings Storage', function()
 			standingsindex = 0,
 			title = '',
 			type = 'swiss',
-			entries = {},
+			entries = {
+				{opponent = {type = 'literal', name = 'Alpha'}, roundindex = 1, slotindex = 1, placement = 1},
+			},
 		}, {saveVars = true, storeLpdb = false})
 
 		assert.stub(stubLpdbStandingsTable).was_not.called()
 		assert.stub(stubLpdbStandingsEntry).was_not.called()
-		assert.is_not_nil(Variables.varDefault('standings2_0'))
+		local stored = Json.parse(Variables.varDefault('standings2_0'))
+		assert.are_equal(1, #stored.entries)
 
 		stubLpdb:revert()
 		stubLpdbStandingsTable:revert()
