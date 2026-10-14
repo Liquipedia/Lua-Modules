@@ -61,7 +61,14 @@ local IMPLICIT_TIEBREAKERS = {
 ---@param frame Frame
 ---@return Renderable
 function StandingTableLegacyNext.run(frame)
-	local args = Arguments.getArgs(frame)
+	return StandingTableLegacyNext.fromArgs(Arguments.getArgs(frame))
+end
+
+---@param args table
+---@param options {defaultTiebreakers: (fun(args: table): string[])?}?
+---@return Renderable
+function StandingTableLegacyNext.fromArgs(args, options)
+	options = options or {}
 
 	local matchRecords = StandingTableLegacyNext.fetchMatches(args)
 	local matchesByRound, roundCount = StandingTableLegacyNext.groupMatchesByRound(args, matchRecords)
@@ -79,7 +86,7 @@ function StandingTableLegacyNext.run(frame)
 		{bg = StandingTableLegacyNext.parseBgs(args, opponentCount)},
 		rounds,
 		opponents,
-		{tiebreakers = StandingTableLegacyNext.parseTiebreakers(args)}
+		{tiebreakers = StandingTableLegacyNext.parseTiebreakers(args, options.defaultTiebreakers)}
 	))
 end
 
@@ -247,8 +254,9 @@ function StandingTableLegacyNext.parseDefiniteStatuses(args, index, roundCount)
 end
 
 ---@param args table
+---@param defaultTiebreakers (fun(args: table): string[])?
 ---@return string[]
-function StandingTableLegacyNext.parseTiebreakers(args)
+function StandingTableLegacyNext.parseTiebreakers(args, defaultTiebreakers)
 	local tiebreakers = {}
 	for _, value in Table.iter.pairsByPrefix(args, 'tiebreaker', {requireIndex = true}) do
 		local tiebreaker = StandingTableLegacyNext.mapTiebreaker(value)
@@ -259,6 +267,12 @@ function StandingTableLegacyNext.parseTiebreakers(args)
 	if #tiebreakers > 0 then
 		return tiebreakers
 	end
+	return (defaultTiebreakers or StandingTableLegacyNext.defaultTiebreakers)(args)
+end
+
+---@param args table
+---@return string[]
+function StandingTableLegacyNext.defaultTiebreakers(args)
 	return Array.extend(
 		Logic.readBool(args.show_p) and 'points' or nil,
 		'matchscore',
