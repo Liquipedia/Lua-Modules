@@ -2,6 +2,62 @@
 describe('Standings Legacy Next', function()
 	local StandingTableLegacyNext = require('Module:Standings/Table/Legacy/Next')
 
+	describe('opponent input', function()
+		it('reads solo, team and json opponents', function()
+			local opponents = StandingTableLegacyNext.parseOpponents({
+				p1 = 'Alpha',
+				p1flag = 'se',
+				p1link = 'Alpha (player)',
+				t2 = 'bravo',
+				team3 = 'charlie',
+				opponent4 = '{"type":"literal","name":"Delta"}',
+			}, 1)
+
+			assert.are_equal(4, #opponents)
+			assert.are_same({'solo', 'Alpha', 'se', 'Alpha (player)'},
+				{opponents[1].type, opponents[1][1], opponents[1].flag, opponents[1].link})
+			assert.are_same({'team', 'bravo'}, {opponents[2].type, opponents[2][1]})
+			assert.are_same({'team', 'charlie'}, {opponents[3].type, opponents[3][1]})
+			assert.are_same({'literal', 'Delta'}, {opponents[4].type, opponents[4].name})
+		end)
+
+		it('fills gaps with unprefixed opponents', function()
+			local opponents = StandingTableLegacyNext.parseOpponents({
+				'{"type":"team","template":"alpha"}',
+				'bravo',
+				team2 = 'charlie',
+			}, 1)
+
+			assert.are_equal(3, #opponents)
+			assert.are_equal('alpha', opponents[1].template)
+			assert.are_equal('charlie', opponents[2][1])
+			assert.are_same({'team', 'bravo'}, {opponents[3].type, opponents[3][1]})
+		end)
+
+		it('reads the per opponent inputs', function()
+			local opponents = StandingTableLegacyNext.parseOpponents({
+				team1 = 'alpha',
+				team1alias = 'alpha old, alpha older',
+				temp_p1 = '3',
+				temp_tie1 = '2',
+				team2 = 'bravo',
+				alias2 = 'bravo old',
+			}, 1)
+
+			assert.are_equal('alpha old;alpha older', opponents[1].aliases)
+			assert.are_equal('3', opponents[1].startingpoints)
+			assert.are_equal('2', opponents[1].tiebreaker)
+			assert.are_equal('bravo old', opponents[2].aliases)
+		end)
+
+		it('imports opponents from matches only if none are listed', function()
+			assert.is_true(StandingTableLegacyNext.getStandardParameter({}, {}).importopponents)
+			assert.is_false(StandingTableLegacyNext.getStandardParameter({}, {{}}).importopponents)
+			assert.is_true(StandingTableLegacyNext.getStandardParameter({importOpponents = 'true'}, {{}}).importopponents)
+		end)
+
+	end)
+
 	describe('rounds', function()
 		local function withMatches(matches, fn)
 			local lpdbStub = stub(mw.ext.LiquipediaDB, 'lpdb', function() return matches end)

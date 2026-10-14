@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
@@ -19,10 +20,13 @@ local StandingTableLegacySwiss = Lua.import('Module:Standings/Table/Legacy/Swiss
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 local Condition = Lua.import('Module:Condition')
 
+local Opponent = Lua.import('Module:Opponent/Custom')
+
 ---Adaptor for the swiss tables of Module:GroupTableLeague/next
 local StandingTableLegacyNext = {}
 
 local MAX_ROUND_COUNT = 30
+local OPPONENT_PREFIXES = {'p', 't', 'team', 'opponent'}
 
 ---Common local Module:GroupTableLeague
 ---@param frame Frame
@@ -35,20 +39,62 @@ function StandingTableLegacyNext.run(frame)
 		return 'round' .. roundIndex, StandingTableLegacySwiss.parseRoundInput(args, roundIndex, matchesByRound[roundIndex])
 	end)
 
-	local opponents = Array.mapIndexes(function(teamIndex)
-		if args.opptype == 'solo' then
-			return StandingTableLegacySwiss.parseSoloInput(args, teamIndex)
-		end
-		return StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
-	end)
+	local opponents = StandingTableLegacyNext.parseOpponents(args, roundCount)
 
 	return StandingTable.fromTemplate(Table.merge(
-		StandingTableLegacySwiss.getStandardParameter(args),
+		StandingTableLegacyNext.getStandardParameter(args, opponents),
 		{bg = StandingTableLegacySwiss.parseWikiBgs(args, 'pbg')},
 		rounds,
 		opponents,
 		{tiebreakers = StandingTableLegacySwiss.parseTiebreaker(args)}
 	))
+end
+
+---@param args table
+---@param opponents table[]
+---@return table
+function StandingTableLegacyNext.getStandardParameter(args, opponents)
+	return Table.merge(StandingTableLegacySwiss.getStandardParameter(args), {
+		importopponents = Logic.nilOr(Logic.readBoolOrNil(args.importOpponents), #opponents == 0),
+	})
+end
+
+---Opponents are read from `p<N>` (solo), `t<N>`/`team<N>` (team), and `opponent<N>` or unprefixed
+---arguments (opponent JSON, team name otherwise). Unprefixed arguments fill the gaps between prefixed ones.
+---@param args table
+---@param roundCount integer
+---@return table[]
+function StandingTableLegacyNext.parseOpponents(args, roundCount)
+	return Table.mapArgumentsByPrefix(args, OPPONENT_PREFIXES, function(key, index, prefix)
+		return StandingTableLegacyNext.parseOpponentInput(args, key, index, prefix, roundCount)
+	end)
+end
+
+---@param args table
+---@param key string|integer
+---@param index integer
+---@param prefix string?
+---@param roundCount integer
+---@return table
+function StandingTableLegacyNext.parseOpponentInput(args, key, index, prefix, roundCount)
+	local value = args[key]
+	local opponent = Json.parseIfTable(value)
+	if not opponent then
+		if prefix == 'p' then
+			opponent = {type = Opponent.solo, value, flag = args['p' .. index .. 'flag'], link = args['p' .. index .. 'link']}
+		else
+			opponent = {type = Opponent.team, value}
+		end
+	end
+
+	local aliases = prefix and args[prefix .. index .. 'alias'] or args['alias' .. index]
+
+	return Table.merge(opponent, {
+		tiebreaker = args['temp_tie' .. index],
+		startingpoints = args['temp_p' .. index],
+		dq = args['dq' .. index],
+		aliases = aliases and table.concat(Array.parseCommaSeparatedString(aliases), ';') or nil,
+	})
 end
 
 ---Assigns the matches to rounds by their round index (set via `|round=` or the match section),
