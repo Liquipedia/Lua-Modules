@@ -207,7 +207,7 @@ end
 
 ---@param tabletype StandingsTableTypes
 ---@param args table
----@return fun(opponent: match2opponent): number|nil
+---@return fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number|nil
 function StandingsParseWiki.makeScoringFunction(tabletype, args)
 	if tabletype == 'ffa' then
 		if not args['p1'] then
@@ -223,7 +223,10 @@ function StandingsParseWiki.makeScoringFunction(tabletype, args)
 			return scoreFromPlacement or 0
 		end
 	elseif tabletype == 'swiss' then
-		return function(opponent)
+		return function(opponent, match)
+			if match.winner == 0 then
+				return 0.5
+			end
 			return opponent.placement == 1 and 1 or 0
 		end
 	end
