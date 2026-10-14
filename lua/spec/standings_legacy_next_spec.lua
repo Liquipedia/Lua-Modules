@@ -1,6 +1,7 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('Standings Legacy Next', function()
 	local StandingTableLegacyNext = require('Module:Standings/Table/Legacy/Next')
+	local TiebreakerFactory = require('Module:Standings/Tiebreaker/Factory')
 
 	describe('opponent input', function()
 		it('reads solo, team and json opponents', function()
@@ -72,6 +73,55 @@ describe('Standings Legacy Next', function()
 			assert.are_same({r2bg = 'up', r3bg = 'stayup'}, StandingTableLegacyNext.parseDefiniteStatuses(args, 1, 3))
 			assert.are_same({r3bg = 'down'}, StandingTableLegacyNext.parseDefiniteStatuses(args, 2, 3))
 			assert.are_same({}, StandingTableLegacyNext.parseDefiniteStatuses(args, 3, 3))
+		end)
+	end)
+
+	describe('tiebreakers', function()
+		it('maps the aliases', function()
+			assert.are_same({
+				'points', 'matchscore', 'gamediff', 'gamewins', 'gamelosses', 'ml.matchscore', 'ml.gamescore',
+				'matchdiff', 'matchwinrate', 'matchwinrate', 'matchwinrate', 'gamewinrate', 'gamewinrate', 'gamewinrate',
+			}, StandingTableLegacyNext.parseTiebreakers{
+				tiebreaker1 = 'pts',
+				tiebreaker2 = 'series',
+				tiebreaker3 = 'diff',
+				tiebreaker4 = 'games won',
+				tiebreaker5 = 'games loss',
+				tiebreaker6 = 'h2h series',
+				tiebreaker7 = 'h2h games',
+				tiebreaker8 = 'series diff',
+				tiebreaker9 = 'series%',
+				tiebreaker10 = 'series percentage',
+				tiebreaker11 = 'series-percentage',
+				tiebreaker12 = 'game%',
+				tiebreaker13 = 'game percentage',
+				tiebreaker14 = 'game-percentage',
+			})
+		end)
+
+		it('maps the metric names and drops the implicit ones', function()
+			assert.are_same({'matchwins', 'ml.gamescore', 'points'}, StandingTableLegacyNext.parseTiebreakers{
+				tiebreaker1 = 'dq',
+				tiebreaker2 = 'matchWins',
+				tiebreaker3 = 'ml.gameScore',
+				tiebreaker4 = 'points',
+				tiebreaker5 = 'finalTiebreak',
+			})
+		end)
+
+		it('defaults to the group table league tiebreakers', function()
+			local defaults = {'matchscore', 'gamediff', 'ml.matchdiff', 'ml.gamescore', 'gamewins', 'gamelosses'}
+			assert.are_same(defaults, StandingTableLegacyNext.parseTiebreakers{})
+			table.insert(defaults, 1, 'points')
+			assert.are_same(defaults, StandingTableLegacyNext.parseTiebreakers{show_p = 'true'})
+			for _, tiebreaker in ipairs(defaults) do
+				TiebreakerFactory.validateAndNormalizeInput(tiebreaker)
+			end
+		end)
+
+		it('errors on unknown tiebreakers', function()
+			assert.error(function() StandingTableLegacyNext.parseTiebreakers{tiebreaker1 = 'bogus'} end)
+			assert.error(function() StandingTableLegacyNext.parseTiebreakers{tiebreaker1 = 'h2h.matchScore'} end)
 		end)
 	end)
 

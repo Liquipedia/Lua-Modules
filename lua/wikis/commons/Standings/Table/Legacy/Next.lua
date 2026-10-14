@@ -17,6 +17,7 @@ local Table = Lua.import('Module:Table')
 
 local StandingTable = Lua.import('Module:Standings/Table')
 local StandingTableLegacySwiss = Lua.import('Module:Standings/Table/Legacy/Swiss')
+local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 local Condition = Lua.import('Module:Condition')
 
@@ -27,6 +28,29 @@ local StandingTableLegacyNext = {}
 
 local MAX_ROUND_COUNT = 30
 local OPPONENT_PREFIXES = {'p', 't', 'team', 'opponent'}
+
+local TIEBREAKER_MAPPING_TABLE = {
+	pts = 'points',
+	series = 'matchscore',
+	diff = 'gamediff',
+	['games won'] = 'gamewins',
+	['games loss'] = 'gamelosses',
+	['h2h series'] = 'ml.matchscore',
+	['h2h games'] = 'ml.gamescore',
+	['series diff'] = 'matchdiff',
+	['series%'] = 'matchwinrate',
+	['series percentage'] = 'matchwinrate',
+	['series-percentage'] = 'matchwinrate',
+	['game%'] = 'gamewinrate',
+	['game percentage'] = 'gamewinrate',
+	['game-percentage'] = 'gamewinrate',
+}
+
+-- These are always added by the standings, so they are dropped from the input
+local IMPLICIT_TIEBREAKERS = {
+	dq = true,
+	finaltiebreak = true,
+}
 
 ---Common local Module:GroupTableLeague
 ---@param frame Frame
@@ -46,7 +70,7 @@ function StandingTableLegacyNext.run(frame)
 		{bg = StandingTableLegacySwiss.parseWikiBgs(args, 'pbg')},
 		rounds,
 		opponents,
-		{tiebreakers = StandingTableLegacySwiss.parseTiebreaker(args)}
+		{tiebreakers = StandingTableLegacyNext.parseTiebreakers(args)}
 	))
 end
 
@@ -125,6 +149,44 @@ function StandingTableLegacyNext.parseDefiniteStatuses(args, index, roundCount)
 		end
 		return 'r' .. roundIndex .. 'bg', status
 	end)
+end
+
+---@param args table
+---@return string[]
+function StandingTableLegacyNext.parseTiebreakers(args)
+	local tiebreakers = {}
+	for _, value in Table.iter.pairsByPrefix(args, 'tiebreaker', {requireIndex = true}) do
+		local tiebreaker = StandingTableLegacyNext.mapTiebreaker(value)
+		if tiebreaker then
+			table.insert(tiebreakers, tiebreaker)
+		end
+	end
+	if #tiebreakers > 0 then
+		return tiebreakers
+	end
+	return Array.extend(
+		Logic.readBool(args.show_p) and 'points' or nil,
+		'matchscore',
+		'gamediff',
+		'ml.matchdiff',
+		'ml.gamescore',
+		'gamewins',
+		'gamelosses'
+	)
+end
+
+---Maps an alias or a GroupTableLeague metric name (e.g. `matchWins`, `ml.gameScore`) to a tiebreaker
+---@param input string
+---@return string?
+function StandingTableLegacyNext.mapTiebreaker(input)
+	local lowered = input:lower()
+	local tiebreaker = TIEBREAKER_MAPPING_TABLE[lowered] or lowered
+	if IMPLICIT_TIEBREAKERS[tiebreaker] then
+		return nil
+	end
+	-- Errors on unknown tiebreakers
+	TiebreakerFactory.validateAndNormalizeInput(tiebreaker)
+	return tiebreaker
 end
 
 ---Assigns the matches to rounds by their round index (set via `|round=` or the match section),
