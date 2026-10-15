@@ -15,7 +15,7 @@ local Label = Lua.import('Module:Widget/Basic/Label')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
----@param props {opponent: standardOpponent, region: string?, chance: number?, stages:number[]}
+---@param props {opponent: standardOpponent, region: string?, chance: number?, stages: number[]}
 ---@return Renderable
 local function QualificationChanceRow(props)
 	local function formatPercentage(number)
@@ -35,10 +35,10 @@ local function QualificationChanceRow(props)
 		children = WidgetUtil.collect(
 			TableWidgets.Cell{children = OpponentDisplay.BlockOpponent{opponent = props.opponent}},
 			TableWidgets.Cell{children = Label{children = props.region}},
-			TableWidgets.Cell{children =
-				shouldBoldOverall(props.chance)
-					and HtmlWidgets.B{children = formatPercentage(props.chance)}
-					or formatPercentage(props.chance)},
+			TableWidgets.Cell{
+				css = shouldBoldOverall(props.chance) and {['font-weight'] = 'bold'} or nil,
+				children = formatPercentage(props.chance),
+			},
 			Array.map(props.stages or {}, function(chance)
 				return TableWidgets.Cell{children = formatPercentage(chance)}
 			end)
@@ -46,6 +46,4 @@ local function QualificationChanceRow(props)
 	}
 end
 
-return Component.component(
-	QualificationChanceRow
-)
+return Component.component(QualificationChanceRow)

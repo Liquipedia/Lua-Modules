@@ -15,7 +15,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@param props {stages?: string[]}
 ---@return Renderable
 local function QualificationChanceHeader(props)
-
 	return TableWidgets.Row{
 		children = WidgetUtil.collect(
 			TableWidgets.CellHeader{children = {'Team'}},
@@ -28,6 +27,4 @@ local function QualificationChanceHeader(props)
 	}
 end
 
-return Component.component(
-	QualificationChanceHeader
-)
+return Component.component(QualificationChanceHeader)
