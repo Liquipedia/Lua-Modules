@@ -28,8 +28,8 @@ local TIER_VALUE = {8, 4, 2}
 ---@return VNode
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
-	args.syncPlayers = true
-	args.import = true
+	args.syncPlayers = Logic.nilOr(Logic.readBoolOrNil(args.syncPlayers), true)
+	args.import = Logic.nilOr(Logic.readBoolOrNil(arg.import), true)
 
 	local prizePool = PrizePool(args) ---@type PrizePool
 
