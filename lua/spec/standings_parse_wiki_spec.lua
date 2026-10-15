@@ -94,4 +94,117 @@ describe('Standings Wiki Parser', function()
 			end)
 		end)
 	end)
+
+	describe('points', function()
+		it('defaults to the swiss points', function()
+			assert.are_same({w = 1, d = 0.5, l = 0}, StandingsParseWiki.parsePoints(nil))
+			assert.are_same({w = 1, d = 0.5, l = 0}, StandingsParseWiki.parsePoints(''))
+		end)
+
+		it('normalizes the result keys and keeps the defaults of omitted ones', function()
+			assert.are_same({w = 3, d = 0.5, l = 0}, StandingsParseWiki.parsePoints('win=3'))
+			assert.are_same({w = 3, d = 1, l = -1}, StandingsParseWiki.parsePoints('win=3, draw=1, loss=-1'))
+		end)
+
+		it('keeps score keys as given', function()
+			assert.are_same(
+				{w = 3, d = 0.5, l = 0, ['2-0'] = 4, ['0-2'] = 1},
+				StandingsParseWiki.parsePoints('win=3, 2-0=4, 0-2=1')
+			)
+		end)
+
+		it('accepts decimals and tolerates whitespace', function()
+			assert.are_same(
+				{w = 2.5, d = 0.25, l = 0, ['1-1'] = 0.75},
+				StandingsParseWiki.parsePoints('  win = 2.5 ,draw=0.25,   1-1 =  0.75 ')
+			)
+		end)
+
+		it('ignores empty entries', function()
+			assert.are_same({w = 3, d = 1, l = 0}, StandingsParseWiki.parsePoints('win=3,, draw=1,'))
+		end)
+
+		it('errors on unknown keys, non-numeric values and malformed entries', function()
+			assert.error(function() StandingsParseWiki.parsePoints('won=3') end)
+			assert.error(function() StandingsParseWiki.parsePoints('win=three') end)
+			assert.error(function() StandingsParseWiki.parsePoints('win=') end)
+			assert.error(function() StandingsParseWiki.parsePoints('win') end)
+			assert.error(function() StandingsParseWiki.parsePoints('2-=3') end)
+			assert.error(function() StandingsParseWiki.parsePoints('a-b=3') end)
+		end)
+	end)
+
+	describe('swiss scoring function', function()
+		---@param score integer?
+		---@param placement integer
+		---@param status string?
+		local function opponent(score, placement, status)
+			return {score = score, placement = placement, status = status or 'S'}
+		end
+
+		---@param opponents table[]
+		---@param winner integer?
+		---@param finished boolean?
+		local function match(opponents, winner, finished)
+			return {opponents = opponents, winner = winner, finished = finished ~= false}
+		end
+
+		---@param pointsInput string?
+		---@param matchToScore table
+		---@return number?, number?
+		local function score(pointsInput, matchToScore)
+			local scoringFunction = StandingsParseWiki.makeScoringFunction('swiss', {points = pointsInput})
+			return scoringFunction(matchToScore.opponents[1], matchToScore),
+				scoringFunction(matchToScore.opponents[2], matchToScore)
+		end
+
+		local twoNil = match({opponent(2, 1), opponent(0, 2)}, 1)
+		local twoOne = match({opponent(2, 1), opponent(1, 2)}, 1)
+
+		it('defaults to 1 for a win, 0.5 for a draw and 0 for a loss', function()
+			assert.are_same({1, 0}, {score(nil, twoNil)})
+			assert.are_same({0.5, 0.5}, {score(nil, match({opponent(1, 1), opponent(1, 1)}, 0))})
+		end)
+
+		it('uses custom result points', function()
+			local drawn = match({opponent(1, 1), opponent(1, 1)}, 0)
+			assert.are_same({3, 0}, {score('win=3', twoNil)})
+			assert.are_same({3, -1}, {score('win=3, loss=-1', twoNil)})
+			assert.are_same({1, 1}, {score('win=3, draw=1', drawn)})
+		end)
+
+		it('replaces the result points with the points of a score', function()
+			assert.are_same({4, 0}, {score('win=3, 2-0=4', twoNil)})
+			assert.are_same({3, 0}, {score('win=3, 2-0=4', twoOne)})
+		end)
+
+		it('supports scores for the losing side', function()
+			assert.are_same({3, 1}, {score('win=3, 1-2=1', twoOne)})
+			assert.are_same({3, 0}, {score('win=3, 1-2=1', twoNil)})
+			assert.are_same({3, 0.5}, {score('win=3, 0-2=0.5', twoNil)})
+		end)
+
+		it('supports scores of draws', function()
+			assert.are_same({2, 2}, {score('1-1=2', match({opponent(1, 1), opponent(1, 1)}, 0))})
+		end)
+
+		it('gives no points for unfinished matches', function()
+			assert.is_nil(score('loss=1', match({opponent(1, 1), opponent(0, 2)}, nil, false)))
+		end)
+
+		it('falls back to the result points without a score', function()
+			local walkover = match({opponent(nil, 1, 'W'), opponent(nil, 2, 'L')}, 1)
+			assert.are_same({3, 0}, {score('win=3, 0-0=9', walkover)})
+			-- a numeric score of a non scored opponent is not trusted either
+			local forfeit = match({opponent(2, 1), opponent(0, 2, 'FF')}, 1)
+			assert.are_same({3, 0}, {score('win=3, 2-0=4', forfeit)})
+			local threeWay = match({opponent(2, 1), opponent(0, 2), opponent(0, 2)}, 1)
+			local winnerPoints = score('win=3, 2-0=4', threeWay)
+			assert.are_equal(3, winnerPoints)
+		end)
+
+		it('errors on invalid points input', function()
+			assert.error(function() StandingsParseWiki.makeScoringFunction('swiss', {points = 'win=x'}) end)
+		end)
+	end)
 end)

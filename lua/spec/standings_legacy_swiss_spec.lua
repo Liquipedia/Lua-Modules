@@ -87,4 +87,68 @@ describe('Standings Legacy Swiss', function()
 			assert.is_nil(bravo.r3bg)
 		end)
 	end)
+
+	describe('points', function()
+		it('uses the legacy defaults', function()
+			assert.are_equal('win=3, draw=1, loss=0', StandingTableLegacySwiss.parsePoints{})
+		end)
+
+		it('maps win_p, tie_p and lose_p', function()
+			assert.are_equal(
+				'win=2, draw=0.5, loss=-1',
+				StandingTableLegacySwiss.parsePoints{win_p = '2', tie_p = '0.5', lose_p = '-1'}
+			)
+		end)
+
+		it('converts additive score points to fixed points of a win', function()
+			assert.are_equal('win=3, draw=1, loss=0, 2-0=6', StandingTableLegacySwiss.parsePoints{['2-0_p'] = '3'})
+			-- compares the scores as numbers
+			assert.are_equal('win=3, draw=1, loss=0, 10-2=4', StandingTableLegacySwiss.parsePoints{['10-2_p'] = '1'})
+			assert.are_equal(
+				'win=2, draw=1, loss=0, 2-0=3.5',
+				StandingTableLegacySwiss.parsePoints{win_p = '2', ['2-0_p'] = '1.5'}
+			)
+		end)
+
+		it('converts additive score points to fixed points of a loss', function()
+			assert.are_equal('win=3, draw=1, loss=0, 0-2=1', StandingTableLegacySwiss.parsePoints{['0-2_p'] = '1'})
+			assert.are_equal(
+				'win=3, draw=1, loss=-1, 1-2=0',
+				StandingTableLegacySwiss.parsePoints{lose_p = '-1', ['1-2_p'] = '1'}
+			)
+		end)
+
+		it('converts additive score points to fixed points of a draw', function()
+			assert.are_equal(
+				'win=3, draw=2, loss=0, 1-1=3',
+				StandingTableLegacySwiss.parsePoints{tie_p = '2', ['1-1_p'] = '1'}
+			)
+		end)
+
+		it('orders the score points deterministically', function()
+			assert.are_equal(
+				'win=3, draw=1, loss=0, 0-2=0, 1-1=1, 2-0=3, 2-1=3',
+				StandingTableLegacySwiss.parsePoints{['2-1_p'] = '0', ['2-0_p'] = '0', ['1-1_p'] = '0', ['0-2_p'] = '0'}
+			)
+		end)
+
+		it('ignores unrelated arguments', function()
+			assert.are_equal(
+				'win=3, draw=1, loss=0',
+				StandingTableLegacySwiss.parsePoints{title = 'Swiss', ['2-0'] = '3', ['x-y_p'] = '3'}
+			)
+		end)
+
+		it('errors on non numeric values', function()
+			assert.error(function() StandingTableLegacySwiss.parsePoints{win_p = 'three'} end)
+			assert.error(function() StandingTableLegacySwiss.parsePoints{['2-0_p'] = 'three'} end)
+		end)
+
+		it('is passed on as the points of the standard parameters', function()
+			assert.are_equal(
+				'win=3, draw=1, loss=0, 2-0=6',
+				StandingTableLegacySwiss.getStandardParameter{['2-0_p'] = '3'}.points
+			)
+		end)
+	end)
 end)

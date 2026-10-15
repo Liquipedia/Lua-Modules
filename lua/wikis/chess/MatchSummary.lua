@@ -12,14 +12,14 @@ local Eco = Lua.import('Module:ChessOpenings')
 local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local PlayerDisplay = Lua.import('Module:Player/Display')
 
 local Collapsible = Lua.import('Module:Widget/Match/Summary/Collapsible')
 local Html = Lua.import('Module:Widget/Html')
-local Div = Html.Div
-local Span = Html.Span
 local Tr = Html.Tr
 local Th = Html.Th
 local Td = Html.Td
@@ -47,6 +47,7 @@ local KING_ICONS = {
 		size = KING_ICON_SIZE,
 	},
 }
+local STATUS_NOT_PLAYED = 'notplayed'
 
 ---@class ChessMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
 local GameRowComponentProps = {}
@@ -61,40 +62,72 @@ local CustomMatchSummary = {
 ---@param args table
 ---@return VNode
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {
+		width = function (match)
+			if Array.any(match.opponents, function (opponent)
+				return opponent.type == Opponent.team
+			end) then
+				return '550px'
+			end
+		end
+	})
+end
+
+---@param game MatchGroupUtilGame
+---@return boolean
+function CustomMatchSummary.gameFilter(game)
+	return game.status ~= STATUS_NOT_PLAYED
 end
 
 ---@param props MatchSummaryGameRowProps
----@return Renderable?
+---@return Renderable[]
 function GameRowComponentProps.createGameOverview(props)
 	local game = props.game
-	return Div{
-		children = {
-			Span{
-				classes = {'brkts-popup-spaced'},
-				children = {
-					'Game ' .. props.gameIndex,
-					tonumber(game.length) and (' - ' .. game.length .. ' moves') or '',
-				},
-			},
-			Span{
-				classes = {'brkts-popup-spaced'},
-				children = {Eco.getName(game.extradata.eco, true)},
-			},
-		},
+	return {
+		'Game ' .. props.gameIndex,
+		tonumber(game.length) and (' - ' .. game.length .. ' moves') or '',
 	}
 end
 
 ---@param props MatchSummaryGameRowProps
 ---@param opponentIndex integer
----@return VNode
+---@return Renderable|Renderable[]
 function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	local game = props.game
-	return  Div{
-		classes = {'brkts-popup-spaced'},
-		---@diagnostic disable-next-line: undefined-field
-		children = KING_ICONS[game.opponents[opponentIndex].color],
-	}
+	local gameOpponent = game.opponents[opponentIndex]
+
+	---@diagnostic disable-next-line: undefined-field
+	local kingIcon = KING_ICONS[gameOpponent.color]
+	if #gameOpponent.players <= 1 then
+		return kingIcon
+	end
+
+	return WidgetUtil.collect(
+		kingIcon,
+		Array.map(
+			gameOpponent.players,
+			function (player)
+				if Logic.isEmpty(player) then
+					return
+				end
+				return PlayerDisplay.BlockPlayer{
+					player = Opponent.readSinglePlayerArgs{
+						name = player.displayName,
+						link = player.player,
+						flag = player.flag,
+					},
+					overflow = 'wrap',
+					flip = opponentIndex == 2
+				}
+			end
+		)
+	)
+end
+
+---@param props MatchSummaryGameRowProps
+---@return string
+function GameRowComponentProps.createAdditionalComment(props)
+	return Eco.getName(props.game.extradata.eco, true)
 end
 
 ---@param match MatchGroupUtilMatch

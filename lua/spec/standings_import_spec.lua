@@ -3,6 +3,7 @@ local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 
 describe('Standings import from matches', function()
 	local StandingsParseLpdb = require('Module:Standings/Parse/Lpdb')
+	local StandingsParseWiki = require('Module:Standings/Parse/Wiki')
 	local Array = require('Module:Array')
 
 	---@param props {matchId: string, opponents: {template: string?, name: string, score: integer,
@@ -54,9 +55,7 @@ describe('Standings import from matches', function()
 		end)
 	end
 
-	local function swissScoreMapper(opponent)
-		return opponent.placement == 1 and 1 or 0
-	end
+	local swissScoreMapper = StandingsParseWiki.makeScoringFunction('swiss', {})
 
 	local function findOpponent(opponents, name)
 		return Array.find(opponents, function(opponentData)
@@ -159,6 +158,8 @@ describe('Standings import from matches', function()
 
 		local heroic = findOpponent(opponents, 'Heroic')
 		assert.are_same({w = 0, d = 1, l = 0}, heroic.rounds[1].scoreboard.match)
+		assert.are_equal(0.5, heroic.rounds[1].scoreboard.points)
+		assert.are_equal(0.5, findOpponent(opponents, 'Wolves Esports').rounds[1].scoreboard.points)
 	end)
 
 	it('counts a match in every round it is assigned to', function()
@@ -322,6 +323,28 @@ describe('Standings import from matches', function()
 
 		assert.are_equal(13, findOpponent(opponents, 'Heroic').rounds[1].scoreboard.points)
 		assert.are_equal(7, findOpponent(opponents, 'Wolves Esports').rounds[1].scoreboard.points)
+	end)
+
+	it('applies custom swiss points', function()
+		stubMatchQuery{
+			match2Record{matchId = 'M1', winner = 1, opponents = {
+				{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+				{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 2},
+			}},
+			match2Record{matchId = 'M2', winner = 1, opponents = {
+				{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+				{template = 'tt9 esports 2022', name = 'TT9 Esports', score = 1, placement = 2},
+			}},
+		}
+
+		local opponents = StandingsParseLpdb.importFromMatches({
+			{roundNumber = 1, matches = {'M1', 'M2'}},
+		}, StandingsParseWiki.makeScoringFunction('swiss', {points = 'win=3, 2-0=4'}), {}, {importOpponents = true})
+
+		-- 4 for the 2-0 win and 3 for the 2-1 win
+		assert.are_equal(7, findOpponent(opponents, 'Heroic').rounds[1].scoreboard.points)
+		assert.are_equal(0, findOpponent(opponents, 'Wolves Esports').rounds[1].scoreboard.points)
+		assert.are_equal(0, findOpponent(opponents, 'TT9 Esports').rounds[1].scoreboard.points)
 	end)
 
 	it('applies aliases correctly', function()

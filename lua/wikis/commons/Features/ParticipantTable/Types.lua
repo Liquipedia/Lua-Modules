@@ -39,7 +39,7 @@ local Types = {}
 ---@field displayMultipleFactionColumn boolean?
 ---@field isRandomEvent boolean?
 ---@field manualFactionCounts table<string, number?>
----@field factionColumnWidth number
+---@field factionColumnWidth string
 ---@field soloAsFactionTable boolean?
 ---@field showCountByFaction boolean
 

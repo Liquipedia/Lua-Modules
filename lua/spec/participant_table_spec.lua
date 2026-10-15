@@ -129,7 +129,7 @@ describe('Participant Table', function()
 					showTitle = true,
 					soloAsFactionTable = true,
 					manualFactionCounts = {},
-					factionColumnWidth = 212,
+					factionColumnWidth = '212px',
 					showCountByFaction = false,
 					width = (212 * 4) .. 'px',
 					columnWidth = '25%',
@@ -153,7 +153,7 @@ describe('Participant Table', function()
 					showTitle = true,
 					soloAsFactionTable = false,
 					manualFactionCounts = {},
-					factionColumnWidth = 212,
+					factionColumnWidth = '212px',
 					showCountByFaction = false,
 					width = (212 * 4) .. 'px',
 					columnWidth = '25%',
@@ -386,6 +386,78 @@ describe('Participant Table', function()
 			TeamTemplateMock.tearDown()
 			MockLpdb.tearDown()
 		end)
+	end)
+	it('storage', function()
+		local LpdbPlacementStub = stub(mw.ext.LiquipediaDB, 'lpdb_placement')
+		local LpdbQueryStub = stub(mw.ext.LiquipediaDB, 'lpdb', {})
+		TeamTemplateMock.setUp()
+
+		ParticipantTable.run(argsPlain)
+
+		local lpdbExpected = {
+			{
+				objectName = 'ranking0_Clem',
+				extradata = '[]',
+				icon = 'test.png',
+				icondark = 'test dark.png',
+				liquipediatier = '1',
+				liquipediatiertype = 'Qualifier',
+				mode = '1v1',
+				opponentname = 'Clem',
+				opponentplayers = '{"p1":"Clem","p1dn":"Clem","p1faction":"t","p1flag":"France"}',
+				opponenttype = 'solo',
+				parent = 'FakePage',
+				prizepoolindex = 0,
+				series = 'Test Series',
+				tournament = 'Test Tournament',
+				type = 'Offline',
+			},
+			{
+				objectName = 'ranking0_Lambo',
+				extradata = '[]',
+				icon = 'test.png',
+				icondark = 'test dark.png',
+				liquipediatier = '1',
+				liquipediatiertype = 'Qualifier',
+				mode = '1v1',
+				opponentname = 'Lambo',
+				opponentplayers = '{"p1":"Lambo","p1dn":"Lambo","p1faction":"z","p1flag":"Germany"}',
+				opponenttype = 'solo',
+				parent = 'FakePage',
+				prizepoolindex = 0,
+				series = 'Test Series',
+				tournament = 'Test Tournament',
+				type = 'Offline',
+			},
+			{
+				objectName = 'ranking0_ShoWTimE',
+				extradata = '[]',
+				icon = 'test.png',
+				icondark = 'test dark.png',
+				liquipediatier = '1',
+				liquipediatiertype = 'Qualifier',
+				mode = '1v1',
+				opponentname = 'ShoWTimE',
+				opponentplayers = '{"p1":"ShoWTimE","p1dn":"ShoWTimE","p1faction":"p","p1flag":"Germany"}',
+				opponenttype = 'solo',
+				parent = 'FakePage',
+				prizepoolindex = 0,
+				series = 'Test Series',
+				tournament = 'Test Tournament',
+				type = 'Offline',
+			},
+		}
+
+		for _, row in ipairs(lpdbExpected) do
+			local localRow = Table.deepCopy(row)
+			local objectName = localRow.objectName
+			localRow.objectName = nil
+			assert.stub(LpdbPlacementStub).was.called_with(objectName, localRow)
+		end
+
+		LpdbPlacementStub:revert()
+		LpdbQueryStub:revert()
+		TeamTemplateMock.setUp()
 	end)
 	SetActiveWiki()
 end)

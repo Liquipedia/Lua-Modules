@@ -70,9 +70,8 @@ function Parser.readConfig(args, parentConfig)
 		manualFactionCounts = Table.map(Faction.knownFactions or {}, function(key, faction)
 			return faction, tonumber(args[Faction.toName(faction):lower()])
 		end),
-		factionColumnWidth = tonumber(args.entrywidth) or showTeams and 212 or 156,
-		-- todo: remove the fallback after bot runs (after merge)
-		showCountByFaction = Logic.readBool(args.countByFaction or args.count),
+		factionColumnWidth = (tonumber(args.entrywidth) or showTeams and 212 or 156) .. 'px',
+		showCountByFaction = Logic.readBool(args.countByFaction),
 	}
 
 	config.width = parentConfig.width
