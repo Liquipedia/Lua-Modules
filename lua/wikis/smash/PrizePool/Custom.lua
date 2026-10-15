@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
 local Variables = Lua.import('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
