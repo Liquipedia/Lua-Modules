@@ -44,6 +44,7 @@ function MapMode.display(input)
 
 	local icon = Logic.isNotEmpty(data.file) and IconImage{
 		imageLight = data.file,
+		imageDark = data.fileDark,
 		link = data.link,
 		alt = data.display,
 	} or nil
