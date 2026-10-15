@@ -20,7 +20,7 @@ local Html = Lua.import('Module:Widget/Html')
 local function ParticipantsTableEntry(props)
 	---@type HtmlNodeProps
 	local entryProps = {
-		classes = {'participantTable-entry'},
+		classes = {props.useDefaultWidth and 'participantTable-entry' or 'participantTable-tableEntry'},
 		css = props.useDefaultWidth and {width = props.config.columnWidth} or nil,
 		children = OpponentDisplay.BlockOpponent(Table.merge(
 			{

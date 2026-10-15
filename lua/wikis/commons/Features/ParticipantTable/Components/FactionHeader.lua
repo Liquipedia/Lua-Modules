@@ -11,7 +11,7 @@ local Array = Lua.import('Module:Array')
 local Faction = Lua.import('Module:Faction')
 
 local Component = Lua.import('Module:Widget/Component')
-local Html = Lua.import('Module:Widget/Html')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@param props {config: ParticipantTableConfig, factionColumns: string[],
@@ -30,15 +30,16 @@ local function ParticipantTableFactionHeader(props)
 			config.showCountByFaction and " ''(" .. props.factionNumbers[faction .. 'Display'] .. ")''" or nil
 		)
 
-		return Html.Div{
-			classes = {'participantTable-faction-header', 'participantTable-entry', Faction.bgClass(faction)},
-			children = Html.Div{children = parts},
+		return TableWidgets.CellHeader{
+			classes = {Faction.bgClass(faction)},
+			children = parts,
 		}
 	end
 
-	return Html.Div{
-		classes = {'participantTable-row'},
-		children = Array.map(props.factionColumns, makeFactionHeaderCell)
+	return TableWidgets.TableHeader{
+		children = TableWidgets.Row{
+			children =  Array.map(props.factionColumns, makeFactionHeaderCell)
+		}
 	}
 end
 
