@@ -9,14 +9,17 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 
-local TiebreakerBuchholzPoints = Lua.import('Module:Standings/Tiebreaker/BuchholzPoints')
 local TiebreakerMedianBuchholz = Lua.import('Module:Standings/Tiebreaker/MedianBuchholz')
 
 ---Median-Buchholz scoring each faced opponent by its points instead of its match diff
 ---@class TiebreakerMedianBuchholzPoints : TiebreakerMedianBuchholz
 local TiebreakerMedianBuchholzPoints = Class.new(TiebreakerMedianBuchholz)
 
-TiebreakerMedianBuchholzPoints.scoreOf = TiebreakerBuchholzPoints.scoreOf
+---@param member TiebreakerOpponent
+---@return number
+function TiebreakerMedianBuchholzPoints:scoreOf(member)
+	return member.points
+end
 
 ---@return string
 function TiebreakerMedianBuchholzPoints:headerTitle()
