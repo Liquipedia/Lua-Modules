@@ -7,13 +7,13 @@
 
 local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
-local MathUtil = Lua.import('Module:MathUtil')
 local Component = Lua.import('Module:Widget/Component')
+local MathUtil = Lua.import('Module:MathUtil')
 
-local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local Label = Lua.import('Module:Widget/Basic/Label')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@param ratio number
 ---@return string
