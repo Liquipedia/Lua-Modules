@@ -117,6 +117,24 @@ describe('Standings overtime', function()
 		end)
 	end)
 
+	describe('points', function()
+		it('defaults to 3/2/1/0 with overtime', function()
+			assert.are_same({w = 3, d = 1.5, l = 0, otw = 2, otl = 1}, StandingsParseWiki.parsePoints(nil, true))
+		end)
+
+		it('reads overtime points', function()
+			assert.are_same(
+				{w = 3, d = 1.5, l = 0, otw = 2.5, otl = 0},
+				StandingsParseWiki.parsePoints('otwin=2.5, otloss=0', true)
+			)
+		end)
+
+		it('rejects overtime points without overtime', function()
+			assert.error(function() StandingsParseWiki.parsePoints('otwin=2') end)
+			assert.error(function() StandingsParseWiki.parsePoints('otloss=1') end)
+		end)
+	end)
+
 	describe('swiss scoring', function()
 		local function score(scoreFunction, match, opponentIndex)
 			return scoreFunction(match.opponents[opponentIndex], match)
@@ -151,6 +169,30 @@ describe('Standings overtime', function()
 			assert.are_equal(1.5, score(scoreFunction, draw, 2))
 		end)
 
+		it('gives custom points for overtime results', function()
+			setRegulationRounds(12)
+			local scoreFunction = StandingsParseWiki.makeScoringFunction('swiss', {
+				points = 'win=4, loss=-1, otwin=3, otloss=0.5',
+			}, true)
+			local regulation = makeMatch{makeGame{7, 3}}
+			local overtime = makeMatch{makeGame{7, 6}}
+			assert.are_equal(4, score(scoreFunction, regulation, 1))
+			assert.are_equal(-1, score(scoreFunction, regulation, 2))
+			assert.are_equal(3, score(scoreFunction, overtime, 1))
+			assert.are_equal(0.5, score(scoreFunction, overtime, 2))
+		end)
+
+		it('gives overtime points over score points', function()
+			setRegulationRounds(12)
+			local scoreFunction = StandingsParseWiki.makeScoringFunction('swiss', {points = '1-0=5, 0-1=-5'}, true)
+			local regulation = makeMatch{makeGame{7, 3}}
+			local overtime = makeMatch{makeGame{7, 6}}
+			assert.are_equal(5, score(scoreFunction, regulation, 1))
+			assert.are_equal(-5, score(scoreFunction, regulation, 2))
+			assert.are_equal(2, score(scoreFunction, overtime, 1))
+			assert.are_equal(1, score(scoreFunction, overtime, 2))
+		end)
+
 		it('gives 1/0 points without overtime', function()
 			setRegulationRounds(12)
 			local scoreFunction = StandingsParseWiki.makeScoringFunction('swiss', {})
@@ -164,6 +206,21 @@ describe('Standings overtime', function()
 		it('enables overtime from show_otp', function()
 			assert.is_true(StandingTableLegacySwiss.getStandardParameter{show_otp = 'true'}.overtime)
 			assert.is_false(StandingTableLegacySwiss.getStandardParameter{}.overtime)
+		end)
+
+		it('maps the overtime points with show_otp', function()
+			assert.are_equal(
+				'win=3, draw=1, loss=0, otwin=2, otloss=1',
+				StandingTableLegacySwiss.parsePoints{show_otp = 'true'}
+			)
+			assert.are_equal(
+				'win=3, draw=1, loss=0, otwin=2.5, otloss=0.5, 1-0=4',
+				StandingTableLegacySwiss.parsePoints{show_otp = 'true', otw_p = '2.5', otl_p = '0.5', ['1-0_p'] = '1'}
+			)
+		end)
+
+		it('ignores the overtime points without show_otp', function()
+			assert.are_equal('win=3, draw=1, loss=0', StandingTableLegacySwiss.parsePoints{otw_p = '2', otl_p = '1'})
 		end)
 
 		it('maps "no ot diff" to gamediffregulation', function()

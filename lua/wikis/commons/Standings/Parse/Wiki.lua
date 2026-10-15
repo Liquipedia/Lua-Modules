@@ -30,7 +30,9 @@ local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 local StandingsParseWiki = {}
 
 local DEFAULT_SWISS_POINTS = {w = 1, d = 0.5, l = 0}
-local RESULT_POINTS_KEYS = {win = 'w', draw = 'd', loss = 'l'}
+local DEFAULT_OVERTIME_SWISS_POINTS = {w = 3, d = 1.5, l = 0, otw = 2, otl = 1}
+local RESULT_POINTS_KEYS = {win = 'w', draw = 'd', loss = 'l', otwin = 'otw', otloss = 'otl'}
+local OVERTIME_POINTS_KEYS = {otw = true, otl = true}
 
 --[[
 {{FfaStandings|title=League Standings
@@ -212,16 +214,20 @@ end
 
 ---Reads the `points` input of swiss standings, e.g. `win=3, draw=1, loss=0, 2-0=4`.
 ---`win`, `draw` and `loss` are the points of that result and are keyed `w`, `d` and `l`.
+---With overtime, `otwin` and `otloss` are the points of an overtime result and are keyed `otw` and `otl`.
 ---`X-Y` is the fixed amount of points for an opponent scoring X against Y, replacing the points of its result.
 ---@param input string?
+---@param overtime boolean?
 ---@return table<string, number>
-function StandingsParseWiki.parsePoints(input)
-	local points = Table.copy(DEFAULT_SWISS_POINTS)
+function StandingsParseWiki.parsePoints(input, overtime)
+	local points = Table.copy(overtime and DEFAULT_OVERTIME_SWISS_POINTS or DEFAULT_SWISS_POINTS)
 	local entries = Array.filter(Array.parseCommaSeparatedString(input), Logic.isNotEmpty)
 	Array.forEach(entries, function(entry)
 		local key, value = unpack(Array.parseCommaSeparatedString(entry, '='))
 		local pointsKey = RESULT_POINTS_KEYS[key] or (key and key:match('^%d+%-%d+$') and key)
 		assert(pointsKey, 'Invalid points input: unknown key "' .. tostring(key) .. '" in "' .. entry .. '"')
+		assert(overtime or not OVERTIME_POINTS_KEYS[pointsKey],
+			'Invalid points input: "' .. entry .. '" requires overtime to be enabled')
 		points[pointsKey] = assert(tonumber(value), 'Invalid points input: "' .. entry .. '" is not a number')
 	end)
 	return points
@@ -248,7 +254,8 @@ end
 
 ---@param tabletype StandingsTableTypes
 ---@param args table
----@param overtime boolean? # Regulation win 3, overtime win 2, overtime loss 1, regulation loss 0
+---@param overtime boolean? # Overtime results get their own points, by default win 3, overtime win 2,
+---overtime loss 1, loss 0
 ---@return fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number|nil
 function StandingsParseWiki.makeScoringFunction(tabletype, args, overtime)
 	if tabletype == 'ffa' then
@@ -265,29 +272,18 @@ function StandingsParseWiki.makeScoringFunction(tabletype, args, overtime)
 			return scoreFromPlacement or 0
 		end
 	elseif tabletype == 'swiss' then
-		if overtime then
-			return function(opponent, match)
-				if not match.finished then
-					return nil
-				end
-				-- Draws should not happen with overtime, but would be worth half a regulation win
-				if match.winner == 0 then
-					return 1.5
-				end
-				local isWinner = opponent.placement == 1
-				if StandingsOvertime.isOvertimeMatch(match) then
-					return isWinner and 2 or 1
-				end
-				return isWinner and 3 or 0
-			end
-		end
-		local points = StandingsParseWiki.parsePoints(args.points)
+		local points = StandingsParseWiki.parsePoints(args.points, overtime)
 		return function(opponent, match)
 			if not match.finished then
 				return nil
 			end
-			local scoreKey = getScoreKey(match, opponent)
-			return points[scoreKey] or points[TiebreakerScope.matchResult(match, opponent)]
+			local result = TiebreakerScope.matchResult(match, opponent)
+			-- Overtime takes priority over the score, as overtime is only supported for Bo1 matches,
+			-- where the score of an overtime match does not differ from a regulation one
+			if overtime and result ~= 'd' and StandingsOvertime.isOvertimeMatch(match) then
+				return points['ot' .. result]
+			end
+			return points[getScoreKey(match, opponent)] or points[result]
 		end
 	end
 	error('Unknown table type')

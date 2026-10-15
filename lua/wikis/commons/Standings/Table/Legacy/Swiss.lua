@@ -59,9 +59,10 @@ function StandingTableLegacySwiss.getStandardParameter(args)
 	}
 end
 
----Maps the legacy `win_p`, `tie_p`, `lose_p` and `X-Y_p` to the `points` input.
----Legacy defaults to 3 points for a win, 1 for a draw and 0 for a loss, and `X-Y_p` is a bonus on top of the
----points of the result, while `X-Y` in the new input is the fixed amount of points.
+---Maps the legacy `win_p`, `tie_p`, `lose_p`, `X-Y_p` and, with `show_otp`, `otw_p` and `otl_p` to the `points` input.
+---Legacy defaults to 3 points for a win, 1 for a draw and 0 for a loss (2 and 1 for overtime wins and losses),
+---and `X-Y_p` is a bonus on top of the points of the result, while `X-Y` in the new input is the fixed amount
+---of points.
 ---@param args table
 ---@return string
 function StandingTableLegacySwiss.parsePoints(args)
@@ -96,8 +97,12 @@ function StandingTableLegacySwiss.parsePoints(args)
 		return ownScore .. '-' .. otherScore .. '=' .. (resultPoints[result] + readPoints(key, 0))
 	end)
 
+	local overtimePoints = Logic.readBool(args.show_otp)
+		and {'otwin=' .. readPoints('otw_p', 2), 'otloss=' .. readPoints('otl_p', 1)}
+		or {}
+
 	return table.concat(Array.extend(
-		{'win=' .. resultPoints.w, 'draw=' .. resultPoints.d, 'loss=' .. resultPoints.l}, scorePoints
+		{'win=' .. resultPoints.w, 'draw=' .. resultPoints.d, 'loss=' .. resultPoints.l}, overtimePoints, scorePoints
 	), ', ')
 end
 
