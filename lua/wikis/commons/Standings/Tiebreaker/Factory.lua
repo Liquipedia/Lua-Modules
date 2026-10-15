@@ -18,6 +18,9 @@ local TiebreakerFactory = {}
 ---@type table<string, string|string[]>
 local NAME_TO_CLASS = {
 	buchholz = 'Buchholz',
+	medianbuchholz = 'MedianBuchholz',
+	buchholzpoints = 'BuchholzPoints',
+	medianbuchholzpoints = 'MedianBuchholzPoints',
 	disqualified = 'Disqualified',
 	manual = 'Manual',
 	points = 'Points',
@@ -44,6 +47,9 @@ local NAME_TO_CLASS = {
 -- Tiebreakers that are not derived from the matches among tied opponents, so they only exist in the full context
 local NON_MATCH_BASED = {
 	buchholz = true,
+	medianbuchholz = true,
+	buchholzpoints = true,
+	medianbuchholzpoints = true,
 	manual = true,
 	disqualified = true,
 	startingpoints = true,

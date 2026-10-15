@@ -46,6 +46,27 @@ describe('Standings Tiebreakers', function()
 		}
 	end
 
+	---Alpha plus one opponent per score, each faced by Alpha in a finished match.
+	---The scores are the match diffs of the faced opponents, or their points with `scoreType` 'points'.
+	---Opponents with points all have a 1-0 record, so a match diff based score gives another answer.
+	---@param scores number[]
+	---@param scoreType 'matchdiff'|'points'?
+	---@return table[] state, table alpha
+	local function stateWithFacedOpponents(scores, scoreType)
+		local names = {'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot'}
+		local matches = {}
+		local others = {}
+		for index, score in ipairs(scores) do
+			table.insert(matches, makeMatch({'Alpha', names[index]}, {winner = 1}))
+			local props = scoreType == 'points'
+				and {points = score, match = {w = 1, d = 0, l = 0}}
+				or {match = {w = math.max(score, 0), d = 0, l = math.max(-score, 0)}}
+			table.insert(others, opponent(names[index], props))
+		end
+		local alpha = opponent('Alpha', {matches = matches})
+		return Array.extend({alpha}, others), alpha
+	end
+
 	describe('factory', function()
 		it('normalizes inputs', function()
 			assert.are_equal('full.points', TiebreakerFactory.validateAndNormalizeInput('points'))
@@ -57,7 +78,11 @@ describe('Standings Tiebreakers', function()
 		end)
 
 		it('rejects non full contexts for tiebreakers not derived from matches among tied opponents', function()
-			Array.forEach({'buchholz', 'manual', 'disqualified', 'startingpoints'}, function(name)
+			local names = {
+				'buchholz', 'medianbuchholz', 'buchholzpoints', 'medianbuchholzpoints',
+				'manual', 'disqualified', 'startingpoints',
+			}
+			Array.forEach(names, function(name)
 				assert.are_equal('full.' .. name, TiebreakerFactory.validateAndNormalizeInput(name))
 				assert.error(function() TiebreakerFactory.validateAndNormalizeInput('ml.' .. name) end)
 			end)
@@ -142,6 +167,106 @@ describe('Standings Tiebreakers', function()
 
 			-- Bravo (1-1 = 0) + Charlie (0-2 = -2); Delta excluded as the match is unfinished
 			assert.are_equal(-2, buchholz:valueOf(state, alpha))
+		end)
+	end)
+
+	describe('medianbuchholz', function()
+		it('drops the highest and lowest score', function()
+			local medianBuchholz = TiebreakerFactory.tiebreakerFromId('full.medianbuchholz')
+			local state, alpha = stateWithFacedOpponents({3, 1, 0, -2})
+
+			-- 3 + 1 + 0 + -2 minus the highest (3) and the lowest (-2)
+			assert.are_equal(1, medianBuchholz:valueOf(state, alpha))
+			assert.are_equal('Median-Buchholz', medianBuchholz:headerTitle())
+		end)
+
+		it('drops only one of tied extremes', function()
+			local medianBuchholz = TiebreakerFactory.tiebreakerFromId('full.medianbuchholz')
+			local state, alpha = stateWithFacedOpponents({2, 2, 0, 0})
+
+			-- 2 + 2 + 0 + 0 minus one 2 and one 0
+			assert.are_equal(2, medianBuchholz:valueOf(state, alpha))
+		end)
+
+		it('is 0 with fewer than three faced opponents', function()
+			local medianBuchholz = TiebreakerFactory.tiebreakerFromId('full.medianbuchholz')
+			local buchholz = TiebreakerFactory.tiebreakerFromId('full.buchholz')
+			local state, alpha = stateWithFacedOpponents({3, 1})
+
+			assert.are_equal(0, medianBuchholz:valueOf(state, alpha))
+			assert.are_equal(4, buchholz:valueOf(state, alpha))
+		end)
+
+		it('ignores unfinished matches', function()
+			local medianBuchholz = TiebreakerFactory.tiebreakerFromId('full.medianbuchholz')
+			local state, alpha = stateWithFacedOpponents({3, 1, 0})
+			table.insert(alpha.matches, makeMatch({'Alpha', 'Echo'}, {finished = false}))
+			table.insert(state, opponent('Echo', {match = {w = 2, d = 0, l = 0}}))
+
+			-- Counting Echo (2) would keep it as a middle score: 3 + 2 + 1 + 0 - 3 - 0 = 3
+			assert.are_equal(1, medianBuchholz:valueOf(state, alpha))
+		end)
+	end)
+
+	describe('buchholzpoints', function()
+		it('sums the points of faced opponents', function()
+			local buchholzPoints = TiebreakerFactory.tiebreakerFromId('full.buchholzpoints')
+			local buchholz = TiebreakerFactory.tiebreakerFromId('full.buchholz')
+			-- 6 represents an opponent that has starting points
+			local state, alpha = stateWithFacedOpponents({3, 2, 6}, 'points')
+
+			assert.are_equal(11, buchholzPoints:valueOf(state, alpha))
+			assert.are_equal('Buchholz (Pts)', buchholzPoints:headerTitle())
+			-- The plain buchholz still scores by match diff: 3 opponents with 1-0
+			assert.are_equal(3, buchholz:valueOf(state, alpha))
+		end)
+
+		it('ignores unfinished matches', function()
+			local buchholzPoints = TiebreakerFactory.tiebreakerFromId('full.buchholzpoints')
+			local state, alpha = stateWithFacedOpponents({3, 2, 6}, 'points')
+			table.insert(alpha.matches, makeMatch({'Alpha', 'Echo'}, {finished = false}))
+			table.insert(state, opponent('Echo', {points = 100}))
+
+			-- Counting Echo (100) would give 111
+			assert.are_equal(11, buchholzPoints:valueOf(state, alpha))
+		end)
+	end)
+
+	describe('medianbuchholzpoints', function()
+		it('drops the highest and lowest points', function()
+			local medianBuchholzPoints = TiebreakerFactory.tiebreakerFromId('full.medianbuchholzpoints')
+			local state, alpha = stateWithFacedOpponents({6, 3, 2, 0.5}, 'points')
+
+			-- 6 + 3 + 2 + 0.5 minus the highest (6) and the lowest (0.5)
+			assert.are_equal(5, medianBuchholzPoints:valueOf(state, alpha))
+			assert.are_equal('Median-Buchholz (Pts)', medianBuchholzPoints:headerTitle())
+		end)
+
+		it('drops only one of tied extremes', function()
+			local medianBuchholzPoints = TiebreakerFactory.tiebreakerFromId('full.medianbuchholzpoints')
+			local state, alpha = stateWithFacedOpponents({4, 4, 1, 1}, 'points')
+
+			-- 4 + 4 + 1 + 1 minus one 4 and one 1
+			assert.are_equal(5, medianBuchholzPoints:valueOf(state, alpha))
+		end)
+
+		it('is 0 with fewer than three faced opponents', function()
+			local medianBuchholzPoints = TiebreakerFactory.tiebreakerFromId('full.medianbuchholzpoints')
+			local buchholzPoints = TiebreakerFactory.tiebreakerFromId('full.buchholzpoints')
+			local state, alpha = stateWithFacedOpponents({3, 1}, 'points')
+
+			assert.are_equal(0, medianBuchholzPoints:valueOf(state, alpha))
+			assert.are_equal(4, buchholzPoints:valueOf(state, alpha))
+		end)
+
+		it('ignores unfinished matches', function()
+			local medianBuchholzPoints = TiebreakerFactory.tiebreakerFromId('full.medianbuchholzpoints')
+			local state, alpha = stateWithFacedOpponents({6, 3, 2}, 'points')
+			table.insert(alpha.matches, makeMatch({'Alpha', 'Echo'}, {finished = false}))
+			table.insert(state, opponent('Echo', {points = 4}))
+
+			-- Echo (4) would be a middle score if counted: 6 + 4 + 3 + 2 - 6 - 2 = 7, instead of 6 + 3 + 2 - 6 - 2 = 3
+			assert.are_equal(3, medianBuchholzPoints:valueOf(state, alpha))
 		end)
 	end)
 
