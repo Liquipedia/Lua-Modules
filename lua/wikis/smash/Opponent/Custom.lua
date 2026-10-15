@@ -24,7 +24,7 @@ local CustomOpponent = Table.deepCopy(Opponent)
 ---@field game string?
 
 ---@class SmashStandardOpponent:standardOpponent
----@field players SmashStandardPlayer[]
+---@field players? SmashStandardPlayer[]
 
 ---@param args table
 ---@return SmashStandardOpponent?
@@ -35,7 +35,7 @@ function CustomOpponent.readOpponentArgs(args)
 
 	local game = args.game or Variables.varDefault('tournament_game') or Info.defaultGame
 
-	Array.forEach(opponent.players, function (player, playerIndex)
+	Array.forEach(opponent.players or {}, function (player, playerIndex)
 		player.game = game
 
 		local stringInput = args['chars' .. playerIndex] or (playerIndex == 1 and args.chars) or nil
@@ -60,12 +60,12 @@ function CustomOpponent.toLpdbStruct(opponent, options)
 		return storageStruct
 	end
 
-	for playerIndex, player in pairs(opponent.players) do
+	for playerIndex, player in pairs(opponent.players or {}) do
 		storageStruct.opponentplayers['p' .. playerIndex .. 'chars'] = player.chars and table.concat(player.chars, ',') or nil
 	end
 
 	-- we do not have game in e.g. standingsentries, hence need to make it available in opponnetplayers
-	storageStruct.opponentplayers.game = (opponent.players[1] or {}).game
+	storageStruct.opponentplayers.game = ((opponent.players or {})[1] or {}).game
 
 	return storageStruct
 end
@@ -80,7 +80,7 @@ function CustomOpponent.fromLpdbStruct(storageStruct)
 		return opponent
 	end
 
-	for playerIndex, player in pairs(opponent.players) do
+	for playerIndex, player in pairs(opponent.players or {}) do
 		player.game = storageStruct.game
 			-- e.g. in standingsentries there is no game field
 			or storageStruct.opponentplayers.game
@@ -104,7 +104,7 @@ function CustomOpponent.resolve(opponent, date, options)
 		return opponent
 	end
 
-	Array.forEach(opponent.players, function(player)
+	Array.forEach(opponent.players or {}, function(player)
 		local lpdbPlayer = mw.ext.LiquipediaDB.lpdb('player', {
 			limit = 1,
 			conditions = '[[pagename::' .. player.pageName:gsub(' ', '_') .. ']]',
