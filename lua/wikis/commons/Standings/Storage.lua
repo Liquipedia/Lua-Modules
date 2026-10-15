@@ -71,7 +71,7 @@ function StandingsStorage.run(data, options)
 		return StandingsStorage.entry(entry, data.standingsindex)
 	end)
 
-	if StandingsStorage.shouldStoreLpdb() and (options or {}).storeLpdb ~= false then
+	if StandingsStorage.shouldStoreLpdb(options) then
 		StandingsStorage.saveLpdb(StandingsStorage.table(data), entries)
 	end
 	if options and options.saveVars then
@@ -216,9 +216,10 @@ function StandingsStorage.saveVars(standingsTable, standingsEntries)
 	end
 end
 
+---@param options? {storeLpdb?: boolean}
 ---@return boolean
-function StandingsStorage.shouldStoreLpdb()
-	return Lpdb.isStorageEnabled()
+function StandingsStorage.shouldStoreLpdb(options)
+	return Lpdb.isStorageEnabled() and (options or {}).storeLpdb ~= false
 end
 
 ---@param data table
