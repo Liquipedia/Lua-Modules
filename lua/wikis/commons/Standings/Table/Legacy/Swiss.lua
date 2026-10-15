@@ -55,7 +55,50 @@ function StandingTableLegacySwiss.getStandardParameter(args)
 		title = args.title,
 		placements = args.placements,
 		matchdraws = Logic.readBoolOrNil(args.ties),
+		points = StandingTableLegacySwiss.parsePoints(args),
 	}
+end
+
+---Maps the legacy `win_p`, `tie_p`, `lose_p` and `X-Y_p` to the `points` input.
+---Legacy defaults to 3 points for a win, 1 for a draw and 0 for a loss, and `X-Y_p` is a bonus on top of the
+---points of the result, while `X-Y` in the new input is the fixed amount of points.
+---@param args table
+---@return string
+function StandingTableLegacySwiss.parsePoints(args)
+	---@param key string
+	---@param default number
+	---@return number
+	local function readPoints(key, default)
+		if Logic.isEmpty(args[key]) then
+			return default
+		end
+		return assert(tonumber(args[key]), 'Invalid ' .. key .. ': ' .. args[key])
+	end
+
+	local resultPoints = {
+		w = readPoints('win_p', 3),
+		d = readPoints('tie_p', 1),
+		l = readPoints('lose_p', 0),
+	}
+
+	local scoreKeys = {}
+	for key in pairs(args) do
+		if tostring(key):match('^%d+%-%d+_p$') then
+			table.insert(scoreKeys, key)
+		end
+	end
+	table.sort(scoreKeys)
+
+	local scorePoints = Array.map(scoreKeys, function(key)
+		local ownScore, otherScore = key:match('^(%d+)%-(%d+)_p$')
+		local own, other = tonumber(ownScore), tonumber(otherScore)
+		local result = own > other and 'w' or own < other and 'l' or 'd'
+		return ownScore .. '-' .. otherScore .. '=' .. (resultPoints[result] + readPoints(key, 0))
+	end)
+
+	return table.concat(Array.extend(
+		{'win=' .. resultPoints.w, 'draw=' .. resultPoints.d, 'loss=' .. resultPoints.l}, scorePoints
+	), ', ')
 end
 
 ---Common local Module:SwissTableLeague

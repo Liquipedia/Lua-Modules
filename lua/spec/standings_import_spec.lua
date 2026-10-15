@@ -325,6 +325,28 @@ describe('Standings import from matches', function()
 		assert.are_equal(7, findOpponent(opponents, 'Wolves Esports').rounds[1].scoreboard.points)
 	end)
 
+	it('applies custom swiss points', function()
+		stubMatchQuery{
+			match2Record{matchId = 'M1', winner = 1, opponents = {
+				{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+				{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 2},
+			}},
+			match2Record{matchId = 'M2', winner = 1, opponents = {
+				{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+				{template = 'tt9 esports 2022', name = 'TT9 Esports', score = 1, placement = 2},
+			}},
+		}
+
+		local opponents = StandingsParseLpdb.importFromMatches({
+			{roundNumber = 1, matches = {'M1', 'M2'}},
+		}, StandingsParseWiki.makeScoringFunction('swiss', {points = 'win=3, 2-0=4'}), {}, {importOpponents = true})
+
+		-- 4 for the 2-0 win and 3 for the 2-1 win
+		assert.are_equal(7, findOpponent(opponents, 'Heroic').rounds[1].scoreboard.points)
+		assert.are_equal(0, findOpponent(opponents, 'Wolves Esports').rounds[1].scoreboard.points)
+		assert.are_equal(0, findOpponent(opponents, 'TT9 Esports').rounds[1].scoreboard.points)
+	end)
+
 	it('applies aliases correctly', function()
 		stubMatchQuery{
 			match2Record{matchId = 'M1', finished = true, opponents = {

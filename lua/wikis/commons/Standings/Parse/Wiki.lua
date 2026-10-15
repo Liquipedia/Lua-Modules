@@ -24,8 +24,12 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
+local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParseWiki = {}
+
+local DEFAULT_SWISS_POINTS = {w = 1, d = 0.5, l = 0}
+local RESULT_POINTS_KEYS = {win = 'w', draw = 'd', loss = 'l'}
 
 --[[
 {{FfaStandings|title=League Standings
@@ -205,6 +209,42 @@ function StandingsParseWiki.parseWikiBgs(input)
 	return statusParsed
 end
 
+---Reads the `points` input of swiss standings, e.g. `win=3, draw=1, loss=0, 2-0=4`.
+---`win`, `draw` and `loss` are the points of that result and are keyed `w`, `d` and `l`.
+---`X-Y` is the fixed amount of points for an opponent scoring X against Y, replacing the points of its result.
+---@param input string?
+---@return table<string, number>
+function StandingsParseWiki.parsePoints(input)
+	local points = Table.copy(DEFAULT_SWISS_POINTS)
+	local entries = Array.filter(Array.parseCommaSeparatedString(input), Logic.isNotEmpty)
+	Array.forEach(entries, function(entry)
+		local key, value = unpack(Array.parseCommaSeparatedString(entry, '='))
+		local pointsKey = RESULT_POINTS_KEYS[key] or (key and key:match('^%d+%-%d+$') and key)
+		assert(pointsKey, 'Invalid points input: unknown key "' .. tostring(key) .. '" in "' .. entry .. '"')
+		points[pointsKey] = assert(tonumber(value), 'Invalid points input: "' .. entry .. '" is not a number')
+	end)
+	return points
+end
+
+---The score of the opponent in the format of the `X-Y` points input, nil if the match has no (proper) score.
+---@param match MatchGroupUtilMatch
+---@param opponent standardOpponent
+---@return string?
+local function getScoreKey(match, opponent)
+	local opponents = match.opponents
+	if #opponents ~= 2 then
+		return nil
+	end
+	local hasScores = Array.all(opponents, function(matchOpponent)
+		return matchOpponent.status == 'S' and Logic.isNumeric(matchOpponent.score)
+	end)
+	if not hasScores then
+		return nil
+	end
+	local other = opponents[1] == opponent and opponents[2] or opponents[1]
+	return opponent.score .. '-' .. other.score
+end
+
 ---@param tabletype StandingsTableTypes
 ---@param args table
 ---@return fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number|nil
@@ -223,11 +263,13 @@ function StandingsParseWiki.makeScoringFunction(tabletype, args)
 			return scoreFromPlacement or 0
 		end
 	elseif tabletype == 'swiss' then
+		local points = StandingsParseWiki.parsePoints(args.points)
 		return function(opponent, match)
-			if match.winner == 0 then
-				return 0.5
+			if not match.finished then
+				return nil
 			end
-			return opponent.placement == 1 and 1 or 0
+			local scoreKey = getScoreKey(match, opponent)
+			return points[scoreKey] or points[TiebreakerScope.matchResult(match, opponent)]
 		end
 	end
 	error('Unknown table type')
