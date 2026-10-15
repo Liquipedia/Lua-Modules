@@ -80,6 +80,47 @@ describe('Standings Legacy Next', function()
 		end)
 	end)
 
+	describe('bgs', function()
+		it('continues a pbg until the next one, starting with up', function()
+			assert.are_equal('1-4=up,5-100=down', StandingTableLegacyNext.parseBgs({pbg5 = 'down'}, 8))
+			assert.are_equal('1=up,2-3=stayup,4-8=down,9-100=up',
+				StandingTableLegacyNext.parseBgs({pbg2 = 'stayup', pbg4 = 'down', pbg9 = 'up'}, 4))
+		end)
+
+		it('defaults to a quarter up, a quarter stayup and half down', function()
+			assert.are_equal('1-2=up,3-4=stayup,5-100=down', StandingTableLegacyNext.parseBgs({}, 8))
+			assert.are_equal('1-2=up,3-100=down', StandingTableLegacyNext.parseBgs({}, 4))
+			assert.are_equal('1=up,2-100=down', StandingTableLegacyNext.parseBgs({}, 2))
+			assert.are_equal('1-100=up', StandingTableLegacyNext.parseBgs({}, 1))
+		end)
+
+		it('produces bgs the standings can read', function()
+			local StandingsParseWiki = require('Module:Standings/Parse/Wiki')
+			local bgs = StandingsParseWiki.parseWikiBgs(StandingTableLegacyNext.parseBgs({}, 8))
+			assert.are_same({'up', 'up', 'stayup', 'stayup', 'down'}, {bgs[1], bgs[2], bgs[3], bgs[4], bgs[5]})
+			assert.are_equal('down', bgs[100])
+			assert.is_nil(bgs[101])
+		end)
+
+		it('counts the opponents of the matches when importing them', function()
+			local function opponent(name)
+				return {type = 'team', name = name}
+			end
+			local matchRecords = {
+				{match2opponents = {opponent('alpha'), opponent('bravo')}},
+				{match2opponents = {opponent('alpha'), opponent('charlie')}},
+				{match2opponents = {opponent('TBD'), opponent('')}},
+				{match2opponents = {
+					{type = 'solo', name = 'Delta', match2players = {{displayname = 'Delta'}}},
+					{type = 'solo', name = 'TBD', match2players = {{displayname = 'TBD'}}},
+				}},
+			}
+			assert.are_equal(1, StandingTableLegacyNext.countOpponents({{}}, matchRecords, false))
+			assert.are_equal(4, StandingTableLegacyNext.countOpponents({}, matchRecords, true))
+			assert.are_equal(5, StandingTableLegacyNext.countOpponents({{}, {}, {}, {}, {}}, matchRecords, true))
+		end)
+	end)
+
 	describe('tiebreakers', function()
 		it('maps the aliases', function()
 			assert.are_same({
@@ -130,13 +171,6 @@ describe('Standings Legacy Next', function()
 	end)
 
 	describe('rounds', function()
-		local function withMatches(matches, fn)
-			local lpdbStub = stub(mw.ext.LiquipediaDB, 'lpdb', function() return matches end)
-			local results = {fn()}
-			lpdbStub:revert()
-			return unpack(results)
-		end
-
 		local function match(id, date, round)
 			return {match2id = id, date = date, match2bracketdata = {groupRoundIndex = round}}
 		end
@@ -153,53 +187,49 @@ describe('Standings Legacy Next', function()
 		end
 
 		it('reads the rounds from the round index of the matches', function()
-			local matchesByRound, roundCount = withMatches({
+			local matchesByRound, roundCount = StandingTableLegacyNext.groupMatchesByRound({}, {
 				match('a', '2024-01-01 12:00:00', 1),
 				match('b', '2024-01-02 12:00:00', 2),
 				match('c', '2024-01-03 12:00:00', 3),
-			}, function() return StandingTableLegacyNext.fetchMatchesByRound{} end)
+			})
 
 			assert.are_equal(3, roundCount)
 			assert.are_same({{'a'}, {'b'}, {'c'}}, idsByRound(matchesByRound, roundCount))
 		end)
 
 		it('uses the round end dates for matches without a round index', function()
-			local matchesByRound, roundCount = withMatches({
+			local matchesByRound, roundCount = StandingTableLegacyNext.groupMatchesByRound({
+				round1edate = '2024-01-01 23:59',
+				round2edate = '2024-01-02 23:59',
+			}, {
 				match('a', '2024-01-01 12:00:00'),
 				match('b', '2024-01-02 12:00:00'),
 				match('c', '2024-01-05 12:00:00'),
-			}, function()
-				return StandingTableLegacyNext.fetchMatchesByRound{
-					round1edate = '2024-01-01 23:59',
-					round2edate = '2024-01-02 23:59',
-				}
-			end)
+			})
 
 			assert.are_equal(2, roundCount)
 			assert.are_same({{'a'}, {'b', 'c'}}, idsByRound(matchesByRound, roundCount))
 		end)
 
 		it('puts matches in round end dates beyond the number of rounds in the final round', function()
-			local matchesByRound, roundCount = withMatches({
+			local matchesByRound, roundCount = StandingTableLegacyNext.groupMatchesByRound({
+				rounds = '1',
+				round1edate = '2024-01-01 23:59',
+				round2edate = '2024-01-03 23:59',
+			}, {
 				match('a', '2024-01-01 12:00:00'),
 				match('b', '2024-01-03 12:00:00'),
-			}, function()
-				return StandingTableLegacyNext.fetchMatchesByRound{
-					rounds = '1',
-					round1edate = '2024-01-01 23:59',
-					round2edate = '2024-01-03 23:59',
-				}
-			end)
+			})
 
 			assert.are_equal(1, roundCount)
 			assert.are_same({{'a', 'b'}}, idsByRound(matchesByRound, roundCount))
 		end)
 
 		it('puts all matches in a single round if none have a round index', function()
-			local matchesByRound, roundCount = withMatches({
+			local matchesByRound, roundCount = StandingTableLegacyNext.groupMatchesByRound({}, {
 				match('a', '2024-01-01 12:00:00'),
 				match('b', '2024-01-02 12:00:00'),
-			}, function() return StandingTableLegacyNext.fetchMatchesByRound{} end)
+			})
 
 			assert.are_equal(1, roundCount)
 			assert.are_same({{'a', 'b'}}, idsByRound(matchesByRound, roundCount))

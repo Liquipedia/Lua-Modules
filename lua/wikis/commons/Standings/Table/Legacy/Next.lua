@@ -27,6 +27,8 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local StandingTableLegacyNext = {}
 
 local MAX_ROUND_COUNT = 30
+-- Bgs are set up to this slot, so the last one still applies if the opponents are undercounted
+local MAX_SLOT_COUNT = 100
 local OPPONENT_PREFIXES = {'p', 't', 'team', 'opponent'}
 
 local TIEBREAKER_MAPPING_TABLE = {
@@ -58,16 +60,20 @@ local IMPLICIT_TIEBREAKERS = {
 function StandingTableLegacyNext.run(frame)
 	local args = Arguments.getArgs(frame)
 
-	local matchesByRound, roundCount = StandingTableLegacyNext.fetchMatchesByRound(args)
+	local matchRecords = StandingTableLegacyNext.fetchMatches(args)
+	local matchesByRound, roundCount = StandingTableLegacyNext.groupMatchesByRound(args, matchRecords)
 	local rounds = Table.map(Array.range(1, roundCount), function(roundIndex)
 		return 'round' .. roundIndex, StandingTableLegacySwiss.parseRoundInput(args, roundIndex, matchesByRound[roundIndex])
 	end)
 
 	local opponents = StandingTableLegacyNext.parseOpponents(args, roundCount)
+	local opponentCount = StandingTableLegacyNext.countOpponents(
+		opponents, matchRecords, StandingTableLegacyNext.readImportOpponents(args, opponents)
+	)
 
 	return StandingTable.fromTemplate(Table.merge(
 		StandingTableLegacyNext.getStandardParameter(args, opponents),
-		{bg = StandingTableLegacySwiss.parseWikiBgs(args, 'pbg')},
+		{bg = StandingTableLegacyNext.parseBgs(args, opponentCount)},
 		rounds,
 		opponents,
 		{tiebreakers = StandingTableLegacyNext.parseTiebreakers(args)}
@@ -79,9 +85,88 @@ end
 ---@return table
 function StandingTableLegacyNext.getStandardParameter(args, opponents)
 	return Table.merge(StandingTableLegacySwiss.getStandardParameter(args), {
-		importopponents = Logic.nilOr(Logic.readBoolOrNil(args.importOpponents), #opponents == 0),
+		importopponents = StandingTableLegacyNext.readImportOpponents(args, opponents),
 		store = Logic.readBoolOrNil(args.storeStanding),
 	})
+end
+
+---@param args table
+---@param opponents table[]
+---@return boolean
+function StandingTableLegacyNext.readImportOpponents(args, opponents)
+	return Logic.nilOr(Logic.readBoolOrNil(args.importOpponents), #opponents == 0)
+end
+
+---Without imported opponents these are the listed ones,
+---otherwise the unique non-TBD opponents of the matches are counted as well.
+---@param opponents table[]
+---@param matchRecords table[]
+---@param importOpponents boolean
+---@return integer
+function StandingTableLegacyNext.countOpponents(opponents, matchRecords, importOpponents)
+	if not importOpponents then
+		return #opponents
+	end
+	local names = {}
+	Array.forEach(matchRecords, function(matchRecord)
+		Array.forEach(matchRecord.match2opponents or {}, function(opponentRecord)
+			if not StandingTableLegacyNext.opponentRecordIsTbd(opponentRecord) then
+				names[opponentRecord.name] = true
+			end
+		end)
+	end)
+	return math.max(#opponents, Table.size(names))
+end
+
+---@param opponentRecord table
+---@return boolean
+function StandingTableLegacyNext.opponentRecordIsTbd(opponentRecord)
+	if opponentRecord.type == Opponent.team then
+		return Logic.isEmpty(opponentRecord.name) or opponentRecord.name == 'TBD'
+	elseif Opponent.typeIsParty(opponentRecord.type) then
+		return Array.any(opponentRecord.match2players or {}, function(playerRecord)
+			return Logic.isEmpty(playerRecord.displayname) or playerRecord.displayname == 'TBD'
+		end)
+	end
+	return true
+end
+
+---A `pbg<N>` continues until the next one is set, with the first slot defaulting to `up`.
+---Without any `pbg<N>`, the top quarter is `up`, the next quarter `stayup` and the bottom half `down`.
+---@param args table
+---@param opponentCount integer
+---@return string
+function StandingTableLegacyNext.parseBgs(args, opponentCount)
+	local pbgs = {}
+	for slotIndex = 1, MAX_SLOT_COUNT do
+		pbgs[slotIndex] = args['pbg' .. slotIndex]
+	end
+	if Table.isEmpty(pbgs) then
+		if opponentCount > 4 then
+			pbgs[math.ceil(opponentCount / 4) + 1] = 'stayup'
+		end
+		if opponentCount > 1 then
+			pbgs[math.ceil(opponentCount / 2) + 1] = 'down'
+		end
+	end
+
+	local bg = 'up'
+	local slotBgs = Array.map(Array.range(1, MAX_SLOT_COUNT), function(slotIndex)
+		bg = pbgs[slotIndex] or bg
+		return bg
+	end)
+
+	-- Consecutive slots with the same bg are written as a range
+	local ranges = {}
+	local rangeStart = 1
+	for slotIndex, slotBg in ipairs(slotBgs) do
+		if slotBgs[slotIndex + 1] ~= slotBg then
+			local range = rangeStart == slotIndex and slotIndex or (rangeStart .. '-' .. slotIndex)
+			table.insert(ranges, range .. '=' .. slotBg)
+			rangeStart = slotIndex + 1
+		end
+	end
+	return table.concat(ranges, ',')
 end
 
 ---Opponents are read from `p<N>` (solo), `t<N>`/`team<N>` (team), and `opponent<N>` or unprefixed
@@ -193,9 +278,10 @@ end
 ---Assigns the matches to rounds by their round index (set via `|round=` or the match section),
 ---falling back to the `round<R>edate` time windows for matches without one.
 ---@param args table
+---@param matchRecords table[]
 ---@return table<integer, {id: string}[]>, integer
-function StandingTableLegacyNext.fetchMatchesByRound(args)
-	local matches = Array.map(StandingTableLegacyNext.fetchMatches(args), function(match)
+function StandingTableLegacyNext.groupMatchesByRound(args, matchRecords)
+	local matches = Array.map(matchRecords, function(match)
 		return {
 			id = match.match2id,
 			time = DateExt.readTimestamp(match.date),
@@ -262,7 +348,7 @@ function StandingTableLegacyNext.fetchMatches(args)
 
 	return mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = tostring(conditions),
-		query = 'match2id, date, match2bracketdata',
+		query = 'match2id, date, match2bracketdata, match2opponents',
 		order = 'date asc',
 		limit = 1000,
 	})
