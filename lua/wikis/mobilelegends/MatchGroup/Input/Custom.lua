@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
+local MapMode = Lua.import('Module:MapMode')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 local ChampionNames = Lua.import('Module:HeroNames', {loadData = true})
@@ -86,6 +87,7 @@ function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
 		team1side = string.lower(map.team1side or ''),
 		team2side = string.lower(map.team2side or ''),
+		mapmode = MapMode.getKey(map.mapmode),
 	}
 
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, ChampionNames)
