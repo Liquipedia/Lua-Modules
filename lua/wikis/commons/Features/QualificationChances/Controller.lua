@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
-local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
@@ -30,11 +29,8 @@ function Controller.showQualificationChances(frame)
 
 	local limit = tonumber(args.limit)
 
-	local teams = Array.sortBy(data.teams, FnUtil.identity, function (a, b)
-		if a.chance_pct == b.chance_pct then
-			return (a.avg_rank_value or 0) > (b.avg_rank_value or 0)
-		end
-		return a.chance_pct > b.chance_pct
+	local teams = Array.sortBy(data.teams, function(team)
+		return {-(team.chance_pct or 0), -(team.avg_rank_value or 0)}
 	end)
 
 	if limit then
@@ -55,7 +51,7 @@ function Controller.showQualificationChances(frame)
 						region = team.region,
 						chance = (team.chance_pct or 0) / 100,
 						stages = Array.map(stages or {}, function(stage)
-							local correctStage = Array.find(team.stages.stages, function (element)
+							local correctStage = Array.find(team.stages and team.stages.stages or {}, function (element)
 								return stage == element.name
 							end)
 							return correctStage and ((correctStage.pct or 0) / 100) or 0

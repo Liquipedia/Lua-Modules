@@ -7,36 +7,34 @@
 
 local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
+local MathUtil = Lua.import('Module:MathUtil')
 local Component = Lua.import('Module:Widget/Component')
 
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Label = Lua.import('Module:Widget/Basic/Label')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
+---@param ratio number
+---@return string
+local function formatPercentage(ratio)
+	if ratio == 0 then
+		return ''
+	elseif ratio == 1 then
+		return '99.99%'
+	end
+	return MathUtil.formatPercentage(ratio, 2)
+end
+
 ---@param props {opponent: standardOpponent, region: string?, chance: number?, stages: number[]}
 ---@return Renderable
 local function QualificationChanceRow(props)
-	local function formatPercentage(number)
-		if number == 0 then
-			return ''
-		elseif number == 1 then
-			return '99.99%'
-		end
-		return tostring(number * 100) .. '%'
-	end
-
-	local function shouldBoldOverall(chance)
-		return chance == 1
-	end
-
 	return TableWidgets.Row{
 		children = WidgetUtil.collect(
 			TableWidgets.Cell{children = OpponentDisplay.BlockOpponent{opponent = props.opponent}},
 			TableWidgets.Cell{children = Label{children = props.region}},
 			TableWidgets.Cell{
-				css = shouldBoldOverall(props.chance) and {['font-weight'] = 'bold'} or nil,
+				css = props.chance == 1 and {['font-weight'] = 'bold'} or nil,
 				children = formatPercentage(props.chance),
 			},
 			Array.map(props.stages or {}, function(chance)
