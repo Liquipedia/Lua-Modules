@@ -70,7 +70,7 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 		return Array.map(opponent.match2players, function (player, playerIndex)
 			return {
 				char = MatchGroupInputUtil.getCharacterName(
-					CharacterStandardization, map['o' .. opponent .. 'char' .. playerIndex]
+					CharacterStandardization, map['o' .. opponentIndex .. 'char' .. playerIndex]
 				),
 				player = player.name,
 			}
