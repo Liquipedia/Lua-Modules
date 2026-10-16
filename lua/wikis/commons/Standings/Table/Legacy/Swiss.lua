@@ -30,6 +30,7 @@ local TIEBREAKER_MAPPING_TABLE = {
 	buchholz = 'buchholz',
 	series = 'matchscore',
 	diff = 'gamediff',
+	['diff games'] = 'gamediff',
 	['no ot diff'] = 'gamediffregulation',
 	['games won'] = 'gamewins',
 	['games loss'] = 'gamelosses',
