@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
+local MapMode = Lua.import('Module:MapMode')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
@@ -63,6 +64,12 @@ function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 		bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata['team' .. opponentIndex .. 'side'] or ''),
 		date = game.date,
 	}
+end
+
+---@param props MatchSummaryGameRowProps
+---@return Renderable?
+function GameRowComponentProps.createAdditionalComment(props)
+	return MapMode.display((props.game.extradata or {}).mapmode)
 end
 
 return CustomMatchSummary

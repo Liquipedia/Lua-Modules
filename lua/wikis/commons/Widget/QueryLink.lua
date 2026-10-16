@@ -71,11 +71,9 @@ local function QueryLink(props)
 		return makeLinkDisplay(link, 'hide-when-mediawiki')
 	end
 
-	return Html.Fragment{
-		children = {
-			makeMediawikiQueryLink(),
-			makeLighthouseQueryLink()
-		}
+	return {
+		makeMediawikiQueryLink(),
+		makeLighthouseQueryLink(),
 	}
 end
 

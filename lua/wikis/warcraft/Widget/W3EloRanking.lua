@@ -8,65 +8,58 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
-local Widget = Lua.import('Module:Widget')
-local Html = Lua.import('Module:Widget/Html')
-local DataTable = Lua.import('Module:Widget/Basic/DataTable')
-local WidgetUtil = Lua.import('Module:Widget/Util')
+local Component = Lua.import('Module:Widget/Component')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
----@class W3EloRanking: Widget
----@operator call({count: integer?}): W3EloRanking
----@field props {count: integer?}
-local W3EloRanking = Class.new(Widget)
-W3EloRanking.defaultProps = {
+local Helpers = {}
+local defaultProps = {
 	count = 10,
 }
 
----@return Widget?
-function W3EloRanking:render()
-	local rawData = mw.ext.TeamLiquidIntegration.w3elo(self.props.count)
+---@return Renderable?
+local function W3EloRanking(props)
+	local rawData = mw.ext.TeamLiquidIntegration.w3elo(props.count)
 
 	if type(rawData) ~= 'table' then
 		return rawData
 	end
 
-	return DataTable{
-		classes = {'wikitable-striped', 'rankingtable'},
-		tableCss = {width = '100%'},
-		children = WidgetUtil.collect(
-			W3EloRanking._buildHeader(),
-			Array.map(rawData, W3EloRanking._buildStandingRow)
-		)
+	return TableWidgets.Table{
+		striped = true,
+		css = {width = '100%'},
+		children = {
+			TableWidgets.TableHeader{children = Helpers._buildHeader()},
+			TableWidgets.TableBody{children = Array.map(rawData, Helpers._buildStandingRow)}
+		}
 	}
 end
 
 ---@private
----@return Widget
-function W3EloRanking._buildHeader()
-	return Html.Tr{
-		children = Array.map({'Rank', 'Player', 'Rating'}, function (header)
-			return Html.Th{
-				css = {['text-align'] = 'left'},
-				children = header
-			}
-		end)
+---@return Renderable
+function Helpers._buildHeader()
+	return TableWidgets.Row{
+		children = {
+			TableWidgets.CellHeader{children = 'Rank'},
+			TableWidgets.CellHeader{children = 'Player'},
+			TableWidgets.CellHeader{children = 'Rating'}
+		}
 	}
 end
 
 ---@private
 ---@param data table
 ---@param placement integer
----@return Widget
-function W3EloRanking._buildStandingRow(data, placement)
+---@return Renderable
+function Helpers._buildStandingRow(data, placement)
 	local race = string.lower(data.main_race or '')
 
-	return Html.Tr{
+	return TableWidgets.Row{
 		children = {
-			Html.Td{children = placement},
-			Html.Td{
+			TableWidgets.Cell{children = placement},
+			TableWidgets.Cell{
 				children = PlayerDisplay.InlinePlayer{player = {
 					flag = data.country,
 					displayName = data.name,
@@ -74,9 +67,9 @@ function W3EloRanking._buildStandingRow(data, placement)
 					faction = string.sub(race, 0, 1)
 				}}
 			},
-			Html.Td{children = data.elo}
+			TableWidgets.Cell{children = data.elo}
 		}
 	}
 end
 
-return W3EloRanking
+return Component.component(W3EloRanking, defaultProps)

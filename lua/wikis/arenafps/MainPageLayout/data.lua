@@ -35,8 +35,8 @@ local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferQuery = false,
-			transferPage = MainPageLayoutUtil.getQuarterlyTransferPage()
+			limit = 20,
+			transferPage = MainPageLayoutUtil.getYearlyTransferPage(),
 		},
 		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},

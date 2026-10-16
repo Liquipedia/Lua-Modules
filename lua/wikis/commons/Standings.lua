@@ -34,7 +34,7 @@ local Standings = {}
 ---@field section string?
 ---@field type 'ffa'|'swiss'|'league'
 ---@field matches MatchGroupUtilMatch[]
----@field config {hasdraw: string, hasovertime: string, haspoints: string}
+---@field config {hasdraws: boolean?, hasovertime: boolean?, haspoints: boolean?}
 ---@field rounds StandingsRound[]
 ---@field additionalStats {id: string, title: string?}[]
 ---@field package record standingstable
@@ -60,7 +60,8 @@ local Standings = {}
 ---@field positionChangeFromPreviousRound integer
 ---@field pointsChangeFromPreviousRound number
 ---@field specialStatus 'dq'|'nc'|'' # nc = non-competing (not in the round)
----@field additionalStatsValues table<string, {value: integer?, display: string?}>
+---@field disqualified boolean
+---@field additionalStatsValues table<string, {value: StandingsTiebreakerValue?, display: string?}>
 ---@field package record standingsentry
 
 ---Fetches a standings table from a page. Tries to read from page variables before fetching from LPDB.
@@ -156,6 +157,7 @@ function Standings.entryFromRecord(record)
 		matchLosses = record.scoreboard.match.l,
 		pointsChangeFromPreviousRound = record.extradata.pointschange,
 		specialStatus = record.extradata.specialstatus or '',
+		disqualified = record.extradata.disqualified == true,
 		positionChangeFromPreviousRound = tonumber(record.placementchange),
 		additionalStatsValues = record.extradata.additionalStatsValues or {},
 		record = record,

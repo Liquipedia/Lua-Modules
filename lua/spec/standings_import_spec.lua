@@ -3,10 +3,13 @@ local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 
 describe('Standings import from matches', function()
 	local StandingsParseLpdb = require('Module:Standings/Parse/Lpdb')
+	local StandingsParseWiki = require('Module:Standings/Parse/Wiki')
 	local Array = require('Module:Array')
+	local Table = require('Module:Table')
 
 	---@param props {matchId: string, opponents: {template: string?, name: string, score: integer,
-	---placement: integer, type: string?}[], winner: integer?, finished: boolean?}
+	---placement: integer, type: string?}[], winner: integer?, finished: boolean?, bestof: integer?,
+	---games: {winner: integer, status: string?, scores: integer[]}[]?}
 	---@return table
 	local function match2Record(props)
 		return {
@@ -15,10 +18,12 @@ describe('Standings import from matches', function()
 			dateexact = '1',
 			finished = props.finished ~= false and '1' or '0',
 			winner = props.winner and tostring(props.winner) or '',
-			bestof = '3',
+			bestof = tostring(props.bestof or 3),
 			extradata = {},
 			match2bracketdata = {},
-			match2games = {},
+			match2games = Array.map(props.games or {}, function(game)
+				return {winner = tostring(game.winner), status = game.status or '', scores = game.scores, extradata = {}}
+			end),
 			match2opponents = Array.map(props.opponents, function(opponentSpec)
 				return {
 					type = opponentSpec.type or 'team',
@@ -54,9 +59,7 @@ describe('Standings import from matches', function()
 		end)
 	end
 
-	local function swissScoreMapper(opponent)
-		return opponent.placement == 1 and 1 or 0
-	end
+	local swissScoreMapper = StandingsParseWiki.makeScoringFunction('swiss', {})
 
 	local function findOpponent(opponents, name)
 		return Array.find(opponents, function(opponentData)
@@ -159,6 +162,8 @@ describe('Standings import from matches', function()
 
 		local heroic = findOpponent(opponents, 'Heroic')
 		assert.are_same({w = 0, d = 1, l = 0}, heroic.rounds[1].scoreboard.match)
+		assert.are_equal(0.5, heroic.rounds[1].scoreboard.points)
+		assert.are_equal(0.5, findOpponent(opponents, 'Wolves Esports').rounds[1].scoreboard.points)
 	end)
 
 	it('counts a match in every round it is assigned to', function()
@@ -177,6 +182,113 @@ describe('Standings import from matches', function()
 		local heroic = findOpponent(opponents, 'Heroic')
 		assert.are_same({w = 1, d = 0, l = 0}, heroic.rounds[1].scoreboard.match)
 		assert.are_same({w = 1, d = 0, l = 0}, heroic.rounds[2].scoreboard.match)
+	end)
+
+	it('collects every match an opponent plays in the same round', function()
+		stubMatchQuery{
+			match2Record{matchId = 'M1', winner = 1, opponents = {
+				{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+				{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 2},
+			}},
+			match2Record{matchId = 'M2', winner = 2, opponents = {
+				{template = 'heroic', name = 'Heroic', score = 1, placement = 2},
+				{template = 'wolves esports', name = 'Wolves Esports', score = 2, placement = 1},
+			}},
+			match2Record{matchId = 'M3', winner = 1, opponents = {
+				{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+				{template = 'tt9 esports 2022', name = 'TT9 Esports', score = 0, placement = 2},
+			}},
+		}
+
+		local opponents = StandingsParseLpdb.importFromMatches({
+			{roundNumber = 1, matches = {'M1', 'M2'}},
+			{roundNumber = 2, matches = {'M3'}},
+		}, swissScoreMapper, {}, {importOpponents = true})
+
+		local function matchIds(matches)
+			local ids = Array.map(matches, function(match) return match.matchId end)
+			table.sort(ids)
+			return ids
+		end
+
+		local heroic = findOpponent(opponents, 'Heroic')
+		assert.are_same({'M1', 'M2'}, matchIds(heroic.rounds[1].matches))
+		assert.are_same({w = 1, d = 0, l = 1}, heroic.rounds[1].scoreboard.match)
+		assert.are_equal(1, heroic.rounds[1].scoreboard.points)
+		assert.is_true(heroic.rounds[1].matchId == 'M1' or heroic.rounds[1].matchId == 'M2')
+		-- the matches of earlier rounds stay in the list of later rounds
+		assert.are_same({'M1', 'M2', 'M3'}, matchIds(heroic.rounds[2].matches))
+		assert.are_equal('M3', heroic.rounds[2].matchId)
+
+		local wolves = findOpponent(opponents, 'Wolves Esports')
+		assert.are_same({'M1', 'M2'}, matchIds(wolves.rounds[1].matches))
+		assert.are_same({'M1', 'M2'}, matchIds(wolves.rounds[2].matches))
+	end)
+
+	it('records the points of every match', function()
+		stubMatchQuery{
+			match2Record{matchId = 'M1', winner = 1, opponents = {
+				{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+				{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 2},
+			}},
+			match2Record{matchId = 'M2', winner = 1, opponents = {
+				{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+				{template = 'wolves esports', name = 'Wolves Esports', score = 1, placement = 2},
+			}},
+		}
+
+		local opponents = StandingsParseLpdb.importFromMatches({
+			{roundNumber = 1, matches = {'M1'}},
+			{roundNumber = 2, matches = {'M2'}},
+		}, swissScoreMapper, {}, {importOpponents = true})
+
+		local heroic = findOpponent(opponents, 'Heroic')
+		assert.are_same({M1 = 1}, heroic.rounds[1].matchPoints)
+		-- cumulative, like matches
+		assert.are_same({M1 = 1, M2 = 1}, heroic.rounds[2].matchPoints)
+
+		local wolves = findOpponent(opponents, 'Wolves Esports')
+		assert.are_same({M1 = 0}, wolves.rounds[1].matchPoints)
+		assert.are_same({M1 = 0, M2 = 0}, wolves.rounds[2].matchPoints)
+	end)
+
+	it('does not record points for matches the score mapper has no points for', function()
+		stubMatchQuery{
+			match2Record{matchId = 'M1', winner = 1, opponents = {
+				{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+				{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 2},
+			}},
+		}
+
+		local opponents = StandingsParseLpdb.importFromMatches({
+			{roundNumber = 1, matches = {'M1'}},
+		}, function(opponent)
+			return opponent.placement == 1 and 3 or nil
+		end, {}, {importOpponents = true})
+
+		assert.are_same({M1 = 3}, findOpponent(opponents, 'Heroic').rounds[1].matchPoints)
+		assert.are_same({}, findOpponent(opponents, 'Wolves Esports').rounds[1].matchPoints)
+	end)
+
+	it('keeps counting a match assigned to several rounds in every round', function()
+		stubMatchQuery{
+			match2Record{matchId = 'M1', winner = 1, opponents = {
+				{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+				{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 2},
+			}},
+		}
+
+		local opponents = StandingsParseLpdb.importFromMatches({
+			{roundNumber = 1, matches = {'M1'}},
+			{roundNumber = 2, matches = {'M1'}},
+		}, swissScoreMapper, {}, {importOpponents = true})
+
+		local heroic = findOpponent(opponents, 'Heroic')
+		assert.are_equal(1, #heroic.rounds[1].matches)
+		assert.are_equal(2, #heroic.rounds[2].matches)
+		assert.are_same({M1 = 1}, heroic.rounds[1].matchPoints)
+		assert.are_same({M1 = 1}, heroic.rounds[2].matchPoints)
+		assert.are_equal('M1', heroic.rounds[2].matchId)
 	end)
 
 	it('drops tbd opponents', function()
@@ -217,6 +329,28 @@ describe('Standings import from matches', function()
 		assert.are_equal(7, findOpponent(opponents, 'Wolves Esports').rounds[1].scoreboard.points)
 	end)
 
+	it('applies custom swiss points', function()
+		stubMatchQuery{
+			match2Record{matchId = 'M1', winner = 1, opponents = {
+				{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+				{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 2},
+			}},
+			match2Record{matchId = 'M2', winner = 1, opponents = {
+				{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+				{template = 'tt9 esports 2022', name = 'TT9 Esports', score = 1, placement = 2},
+			}},
+		}
+
+		local opponents = StandingsParseLpdb.importFromMatches({
+			{roundNumber = 1, matches = {'M1', 'M2'}},
+		}, StandingsParseWiki.makeScoringFunction('swiss', {points = 'win=3, 2-0=4'}), {}, {importOpponents = true})
+
+		-- 4 for the 2-0 win and 3 for the 2-1 win
+		assert.are_equal(7, findOpponent(opponents, 'Heroic').rounds[1].scoreboard.points)
+		assert.are_equal(0, findOpponent(opponents, 'Wolves Esports').rounds[1].scoreboard.points)
+		assert.are_equal(0, findOpponent(opponents, 'TT9 Esports').rounds[1].scoreboard.points)
+	end)
+
 	it('applies aliases correctly', function()
 		stubMatchQuery{
 			match2Record{matchId = 'M1', finished = true, opponents = {
@@ -241,6 +375,172 @@ describe('Standings import from matches', function()
 		local heroic = findOpponent(opponents, 'Heroic')
 		assert.are_same({w = 1, d = 0, l = 0}, heroic.rounds[1].scoreboard.match)
 		assert.are_equal('M1', heroic.rounds[1].matchId)
+	end)
+
+	describe('overtime', function()
+		local Info = require('Module:Info')
+		local originalStandingsConfig
+
+		local rounds = {{roundNumber = 1, matches = {'M1'}}, {roundNumber = 2, matches = {'M2'}}}
+
+		before_each(function()
+			originalStandingsConfig = Info.config.standings
+			Info.config.standings = {overtime = {regulationRounds = 12}}
+		end)
+
+		after_each(function()
+			Info.config.standings = originalStandingsConfig
+		end)
+
+		---M1 is won in regulation (7-3), M2 is won in overtime (7-6 for Wolves)
+		---@param overrides {m1: table?, m2: table?}?
+		local function stubRegulationAndOvertimeMatch(overrides)
+			overrides = overrides or {}
+			stubMatchQuery{
+				match2Record(Table.merge({matchId = 'M1', winner = 1, bestof = 1, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 1, placement = 1},
+					{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 2},
+				}, games = {{winner = 1, scores = {7, 3}}}}, overrides.m1)),
+				match2Record(Table.merge({matchId = 'M2', winner = 2, bestof = 1, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 0, placement = 2},
+					{template = 'wolves esports', name = 'Wolves Esports', score = 1, placement = 1},
+				}, games = {{winner = 2, scores = {6, 7}}}}, overrides.m2)),
+			}
+		end
+
+		it('keeps overtime results out of the match scoreboard', function()
+			stubRegulationAndOvertimeMatch()
+
+			local opponents = StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, {}, {
+				importOpponents = true,
+				overtime = true,
+			})
+
+			local heroic = findOpponent(opponents, 'Heroic')
+			assert.are_same({w = 1, d = 0, l = 0}, heroic.rounds[1].scoreboard.match)
+			assert.are_same({w = 0, l = 0}, heroic.rounds[1].scoreboard.overtime)
+			assert.are_same({w = 0, d = 0, l = 0}, heroic.rounds[2].scoreboard.match)
+			assert.are_same({w = 0, l = 1}, heroic.rounds[2].scoreboard.overtime)
+
+			local wolves = findOpponent(opponents, 'Wolves Esports')
+			assert.are_same({w = 0, d = 0, l = 1}, wolves.rounds[1].scoreboard.match)
+			assert.are_same({w = 0, l = 0}, wolves.rounds[1].scoreboard.overtime)
+			assert.are_same({w = 0, d = 0, l = 0}, wolves.rounds[2].scoreboard.match)
+			assert.are_same({w = 1, l = 0}, wolves.rounds[2].scoreboard.overtime)
+		end)
+
+		it('detects overtime from the rounds, not from the match score', function()
+			-- M2 is a Bo1 that ended 1-0 in maps, which is why the match score can not be used
+			stubRegulationAndOvertimeMatch{m2 = {games = {{winner = 2, scores = {5, 7}}}}}
+
+			local opponents = StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, {}, {
+				importOpponents = true,
+				overtime = true,
+			})
+
+			local wolves = findOpponent(opponents, 'Wolves Esports')
+			assert.are_same({w = 1, d = 0, l = 0}, wolves.rounds[2].scoreboard.match)
+			assert.are_same({w = 0, l = 0}, wolves.rounds[2].scoreboard.overtime)
+		end)
+
+		it('awards 3/2/1/0 points', function()
+			stubRegulationAndOvertimeMatch()
+
+			local opponents = StandingsParseLpdb.importFromMatches(
+				rounds, StandingsParseWiki.makeScoringFunction('swiss', {}, true), {}, {
+					importOpponents = true,
+					overtime = true,
+				}
+			)
+
+			local heroic = findOpponent(opponents, 'Heroic')
+			local wolves = findOpponent(opponents, 'Wolves Esports')
+			assert.are_equal(3, heroic.rounds[1].scoreboard.points)
+			assert.are_equal(1, heroic.rounds[2].scoreboard.points)
+			assert.are_equal(0, wolves.rounds[1].scoreboard.points)
+			assert.are_equal(2, wolves.rounds[2].scoreboard.points)
+		end)
+
+		it('awards no points for unfinished matches', function()
+			stubRegulationAndOvertimeMatch{m2 = {finished = false, winner = 0}}
+
+			local opponents = StandingsParseLpdb.importFromMatches(
+				rounds, StandingsParseWiki.makeScoringFunction('swiss', {}, true), {}, {
+					importOpponents = true,
+					overtime = true,
+				}
+			)
+
+			local heroic = findOpponent(opponents, 'Heroic')
+			local wolves = findOpponent(opponents, 'Wolves Esports')
+			assert.are_equal(0, heroic.rounds[2].scoreboard.points or 0)
+			assert.are_equal(0, wolves.rounds[2].scoreboard.points or 0)
+			assert.are_same({w = 0, l = 0}, wolves.rounds[2].scoreboard.overtime)
+		end)
+
+		it('is unchanged without overtime', function()
+			stubRegulationAndOvertimeMatch()
+
+			local opponents = StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, {}, {
+				importOpponents = true,
+			})
+
+			local heroic = findOpponent(opponents, 'Heroic')
+			assert.are_same({w = 1, d = 0, l = 0}, heroic.rounds[1].scoreboard.match)
+			assert.are_same({w = 0, d = 0, l = 1}, heroic.rounds[2].scoreboard.match)
+			assert.is_nil(heroic.rounds[1].scoreboard.overtime)
+			assert.is_nil(heroic.rounds[2].scoreboard.overtime)
+			assert.are_equal(1, heroic.rounds[1].scoreboard.points)
+			assert.are_equal(0, heroic.rounds[2].scoreboard.points)
+		end)
+
+		it('requires Bo1 matches', function()
+			stubRegulationAndOvertimeMatch{m2 = {bestof = 3}}
+
+			assert.error(function()
+				StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, {}, {
+					importOpponents = true,
+					overtime = true,
+				})
+			end)
+		end)
+
+		it('allows matches without a bestof', function()
+			stubRegulationAndOvertimeMatch{m2 = {bestof = 0}}
+
+			assert.has_no.error(function()
+				StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, {}, {
+					importOpponents = true,
+					overtime = true,
+				})
+			end)
+		end)
+
+		it('allows non-Bo1 matches without overtime', function()
+			stubRegulationAndOvertimeMatch{m2 = {bestof = 3}}
+
+			assert.has_no.error(function()
+				StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, {}, {importOpponents = true})
+			end)
+		end)
+
+		it('counts draws as regulation results', function()
+			stubMatchQuery{
+				match2Record{matchId = 'M1', winner = 0, bestof = 1, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 0, placement = 1},
+					{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 1},
+				}, games = {{winner = 0, scores = {7, 7}}}},
+			}
+
+			local opponents = StandingsParseLpdb.importFromMatches({rounds[1]}, swissScoreMapper, {}, {
+				importOpponents = true,
+				overtime = true,
+			})
+
+			local heroic = findOpponent(opponents, 'Heroic')
+			assert.are_same({w = 0, d = 1, l = 0}, heroic.rounds[1].scoreboard.match)
+			assert.are_same({w = 0, l = 0}, heroic.rounds[1].scoreboard.overtime)
+		end)
 	end)
 
 	describe('opponent based filtering', function()

@@ -22,8 +22,11 @@ local CREDS_ICON = AutoInlineIcon.display{onlyicon = true, category = 'M', looku
 local FIRE_RATE_UNIT = 'rounds/sec'
 
 ---@class ValorantWeaponInfobox: WeaponInfobox
+---@operator call(Frame): ValorantWeaponInfobox
 local CustomWeapon = Class.new(Weapon)
+
 ---@class ValorantWeaponInfoboxWidgetInjector: WidgetInjector
+---@operator call(ValorantWeaponInfobox): ValorantWeaponInfoboxWidgetInjector
 ---@field caller ValorantWeaponInfobox
 local CustomInjector = Class.new(Injector)
 

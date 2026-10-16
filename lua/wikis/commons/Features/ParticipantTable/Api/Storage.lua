@@ -49,7 +49,7 @@ function Storage.run(sections, config, adjustLpdbData)
 	---@param opponent standardOpponent
 	---@return boolean
 	local shouldNotStoreOpponent = function(section, opponent)
-		return section.config.noStorage or
+		return (not section.config.storage) or
 			opponent.type == Opponent.team or
 			Opponent.isTbd(opponent) or
 			Opponent.isEmpty(opponent)

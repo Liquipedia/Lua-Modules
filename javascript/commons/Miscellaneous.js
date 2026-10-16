@@ -237,49 +237,6 @@ liquipedia.tournamentstable = {
 liquipedia.core.modules.push( 'tournamentstable' );
 
 /*******************************************************************************
- * Template(s): Participants Tables
- * Author(s): FO-nTTaX
- ******************************************************************************/
-liquipedia.participantstable = {
-	init: function() {
-		if ( document.querySelector( '.participants-table-scroller' ) !== null ) {
-			document.querySelectorAll( '.participants-table-button-left' ).forEach( ( buttonLeft ) => {
-				buttonLeft.classList.add( 'inactive' );
-				buttonLeft.addEventListener( 'click', function() {
-					if ( window.innerWidth < 600 ) {
-						const scroller = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-scroller' );
-						scroller.scrollLeft = scroller.scrollLeft - 0.83 * window.innerWidth;
-					}
-				} );
-			} );
-			document.querySelectorAll( '.participants-table-button-right' ).forEach( ( buttonRight ) => {
-				buttonRight.addEventListener( 'click', function() {
-					if ( window.innerWidth < 600 ) {
-						const scroller = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-scroller' );
-						scroller.scrollLeft = scroller.scrollLeft + 0.83 * window.innerWidth;
-					}
-				} );
-			} );
-			document.querySelectorAll( '.participants-table-scroller' ).forEach( ( scroller ) => {
-				scroller.addEventListener( 'scroll', function() {
-					const buttonLeft = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-button-left' );
-					buttonLeft.classList.remove( 'inactive' );
-					const buttonRight = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-button-right' );
-					buttonRight.classList.remove( 'inactive' );
-					if ( this.scrollLeft === 0 ) {
-						buttonLeft.classList.add( 'inactive' );
-					}
-					if ( this.scrollLeft === this.scrollWidth - this.clientWidth ) {
-						buttonRight.classList.add( 'inactive' );
-					}
-				} );
-			} );
-		}
-	}
-};
-liquipedia.core.modules.push( 'participantstable' );
-
-/*******************************************************************************
  * Template(s): Heroes portal on the Heroes of the Storm wiki
  * Author(s): FO-nTTaX
  ******************************************************************************/

@@ -26,6 +26,20 @@ local INDENT = WikiCopyPaste.Indent
 ---@param args table
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+	if opponents > 2 then
+		return WikiCopyPaste.getFfaMatchCode(bestof, mode, index, opponents, args)
+	else
+		return WikiCopyPaste.getStandardMatchCode(bestof, mode, index, opponents, args)
+	end
+end
+
+---@param bestof integer
+---@param mode string
+---@param index integer
+---@param opponents integer
+---@param args table
+---@return string
+function WikiCopyPaste.getStandardMatchCode(bestof, mode, index, opponents, args)
 	local casters = Logic.readBool(args.casters)
 	local showScore = Logic.nilOr(Logic.readBool(args.score), bestof == 0)
 	local streams = Logic.readBool(args.streams)
@@ -44,6 +58,29 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		end) or nil,
 		Logic.readBool(args.mvp) and (INDENT .. '|mvp=') or nil,
 		INDENT .. '}}'
+	)
+
+	return table.concat(lines, '\n')
+end
+
+---@param bestof integer
+---@param mode string
+---@param index integer
+---@param opponents integer
+---@param args table
+---@return string
+function WikiCopyPaste.getFfaMatchCode(bestof, mode, index, opponents, args)
+	local lines = Array.extend(
+		'{{Match|finished=',
+		INDENT .. '|p_kill=1 |p1=12 |p2=9 |p3=7 |p4=5 |p5=4 |p6=3 |p7=3 |p8=2 |p9=2 |p10=2 ' ..
+		INDENT .. '|twitch=|youtube=',
+		Array.mapRange(1, bestof, function(mapIndex)
+			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|date=|finished=|vod=}}'
+		end),
+		Array.mapRange(1, opponents, function(opponentIndex)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getFfaOpponent(mode, bestof)
+		end),
+		'}}'
 	)
 
 	return table.concat(lines, '\n')

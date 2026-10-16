@@ -75,13 +75,13 @@ matchlist id form lives alongside the bracket ones.
 ---@field title string?
 ---@field dateHeader boolean?
 ---@field type 'matchlist'
----@field matchId string?
+---@field matchIndex string?
 ---@field matchPage string?
 
 ---@alias MatchGroupUtilBracketData MatchGroupUtilMatchlistBracketData|MatchGroupUtilBracketBracketData
 
 ---@class MatchGroupUtilMatchlist
----@field bracketDatasById table<string, MatchGroupUtilBracketBracketData>
+---@field bracketDatasById table<string, MatchGroupUtilMatchlistBracketData>
 ---@field matches MatchGroupUtilMatch[]
 ---@field matchesById table<string, MatchGroupUtilMatch>
 ---@field type 'matchlist'

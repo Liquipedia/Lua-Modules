@@ -35,6 +35,7 @@ local SpecialCategories = {
 	['Immortal Treasure'] = 'Immortal Treasure',
 	['Trust of the Benefactor'] = 'Trust of the Benefactor',
 	['Baby Roshan'] = 'Baby Roshan',
+	['Baby R\'shan'] = 'Baby Roshan',
 	['Effigy Block'] = 'Effigy Block',
 }
 

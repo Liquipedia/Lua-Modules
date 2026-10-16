@@ -115,6 +115,7 @@ return {
 			alwaysShowStats = {
 				swiss = {'matchdiff', 'rounddiff'},
 			},
+			overtime = {regulationRounds = 12},
 		},
 	},
 	defaultRoundPrecision = 0,

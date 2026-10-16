@@ -37,6 +37,48 @@ describe('Standings Storage', function()
 		stubLpdbStandingsTable:revert()
 	end)
 
+	it('skips lpdb but keeps page variables when storeLpdb is false', function()
+		local Json = require('Module:Json')
+		local Variables = require('Module:Variables')
+		local stubLpdb = stub(mw.ext.LiquipediaDB, "lpdb", {})
+		local stubLpdbStandingsTable = stub(mw.ext.LiquipediaDB, "lpdb_standingstable")
+		local stubLpdbStandingsEntry = stub(mw.ext.LiquipediaDB, "lpdb_standingsentry")
+
+		StandingsStorage.run({
+			standingsindex = 0,
+			title = '',
+			type = 'swiss',
+			entries = {
+				{opponent = {type = 'literal', name = 'Alpha'}, roundindex = 1, slotindex = 1, placement = 1},
+			},
+		}, {saveVars = true, storeLpdb = false})
+
+		assert.stub(stubLpdbStandingsTable).was_not.called()
+		assert.stub(stubLpdbStandingsEntry).was_not.called()
+		local stored = Json.parse(Variables.varDefault('standings2_0'))
+		assert.are_equal(1, #stored.entries)
+
+		stubLpdb:revert()
+		stubLpdbStandingsTable:revert()
+		stubLpdbStandingsEntry:revert()
+	end)
+
+	describe('table', function()
+		---@param data table
+		---@return table
+		local function storeTable(data)
+			data.standingsindex = 0
+			data.type = 'swiss'
+			return StandingsStorage.table(data)
+		end
+
+		it('stores hasovertime', function()
+			local standingsTable = storeTable{hasovertime = true}
+			assert.is_true(standingsTable.config.hasovertime)
+			assert.is_true(standingsTable.extradata.hasovertime)
+		end)
+	end)
+
 	it('storage full', function()
 		TeamTemplateMock.setUp()
 		local standingsData = require('test_assets.standings')
@@ -52,7 +94,7 @@ describe('Standings Storage', function()
 		StandingsStorage.run(standingsData)
 
 		assert.stub(stubLpdbStandingsTable).was.called_with('standingsTable_0', {
-			config = '{"hasdraws":false,"hasovertimes":true}',
+			config = '{"hasdraws":false,"hasovertime":true}',
 			extradata = '{"enddate":"2022-10-31","finished":false,"hasdraw":false,"hasovertime":true,"roundcount":7}',
 			matches = '[]',
 			parent = 'FakePage',

@@ -57,7 +57,7 @@ local DISQUALIFIED = 'dq'
 ---@field extradata table
 
 ---@param data table
----@param options? {saveVars?: boolean}
+---@param options? {saveVars?: boolean, storeLpdb?: boolean}
 function StandingsStorage.run(data, options)
 	if Table.isEmpty(data) then
 		return
@@ -71,7 +71,7 @@ function StandingsStorage.run(data, options)
 		return StandingsStorage.entry(entry, data.standingsindex)
 	end)
 
-	if StandingsStorage.shouldStoreLpdb() then
+	if StandingsStorage.shouldStoreLpdb(options) then
 		StandingsStorage.saveLpdb(StandingsStorage.table(data), entries)
 	end
 	if options and options.saveVars then
@@ -104,7 +104,7 @@ function StandingsStorage.table(data)
 
 	local config = {
 		hasdraws = data.hasdraw,
-		hasovertimes = data.hasovertime,
+		hasovertime = data.hasovertime,
 		haspoints = data.haspoints,
 	}
 
@@ -216,9 +216,10 @@ function StandingsStorage.saveVars(standingsTable, standingsEntries)
 	end
 end
 
+---@param options? {storeLpdb?: boolean}
 ---@return boolean
-function StandingsStorage.shouldStoreLpdb()
-	return Lpdb.isStorageEnabled()
+function StandingsStorage.shouldStoreLpdb(options)
+	return Lpdb.isStorageEnabled() and (options or {}).storeLpdb ~= false
 end
 
 ---@param data table

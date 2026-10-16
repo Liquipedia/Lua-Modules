@@ -32,10 +32,19 @@ function Parser.readConfig(args, parentConfig)
 
 	local showTeams = not Logic.readBool(args.disable_teams)
 
+
+	local shouldStore
+	if Logic.readBool(args.noStorage) then
+		shouldStore = false
+	elseif parentConfig.storage ~= nil then
+		shouldStore = parentConfig.storage
+	else
+		shouldStore = Namespace.isMain() and not Lpdb.isStorageDisabled()
+	end
+
 	local config = {
 		lpdbPrefix = args.lpdbPrefix or parentConfig.lpdbPrefix or Variables.varDefault('lpdbPrefix'),
-		noStorage = Logic.readBool(args.noStorage or parentConfig.noStorage or
-			Lpdb.isStorageDisabled() or not Namespace.isMain()),
+		storage = shouldStore,
 		matchGroupSpec = TournamentStructure.readMatchGroupsSpec(args),
 		syncPlayers = Logic.nilOr(Logic.readBoolOrNil(args.syncPlayers), parentConfig.syncPlayers, true),
 		showCountBySection = Logic.readBool(args.showCountBySection or parentConfig.showCountBySection),
@@ -61,9 +70,8 @@ function Parser.readConfig(args, parentConfig)
 		manualFactionCounts = Table.map(Faction.knownFactions or {}, function(key, faction)
 			return faction, tonumber(args[Faction.toName(faction):lower()])
 		end),
-		factionColumnWidth = tonumber(args.entrywidth) or showTeams and 212 or 156,
-		-- todo: remove the fallback after bot runs (after merge)
-		showCountByFaction = Logic.readBool(args.countByFaction or args.count),
+		factionColumnWidth = (tonumber(args.entrywidth) or showTeams and 212 or 156) .. 'px',
+		showCountByFaction = Logic.readBool(args.countByFaction),
 	}
 
 	config.width = parentConfig.width
@@ -107,7 +115,7 @@ function Parser._readEntries(args, config)
 	---@type Set<string>
 	local alreadyUsed = Set{}
 
-	return Table.mapArgumentsByPrefix(args, {'p', 'player'}, function(key, index)
+	local entries = Table.mapArgumentsByPrefix(args, {'p', 'player'}, function(key, index)
 		local entry = Parser._readEntry(args, key, index, config)
 		entry.sortName = Opponent.toName(entry.opponent)
 
@@ -131,6 +139,9 @@ function Parser._readEntries(args, config)
 
 		return entry
 	end)
+
+	-- make it an array (`Table.mapArgumentsByPrefix` may have nil gaps)
+	return Array.extractValues(entries)
 end
 
 ---@param sectionArgs table

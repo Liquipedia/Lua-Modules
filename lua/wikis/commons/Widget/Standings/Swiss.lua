@@ -14,10 +14,11 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local Component = Lua.import('Module:Widget/Component')
 local Label = Lua.import('Module:Widget/Basic/Label')
 local MatchOverview = Lua.import('Module:Widget/Standings/MatchOverview')
+local Participant = Lua.import('Module:Widget/Standings/Participant')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local StandingsDisplayUtil = Lua.import('Module:Standings/DisplayUtil')
 
 local Helpers = {}
 
@@ -30,7 +31,7 @@ local function StandingsSwiss(props)
 	end
 
 	local lastRound = standings.rounds[#standings.rounds]
-	local statsToShow = Helpers.statsColumnsToShow(standings)
+	local statsToShow = StandingsDisplayUtil.statsToShow(standings)
 
 	return TableWidgets.Table{
 		classes = {'standings-swiss'},
@@ -46,23 +47,6 @@ local function StandingsSwiss(props)
 		),
 		striped = false
 	}
-end
-
----@private
----@param standings StandingsModel
----@return {id: string, title: string?}[]
-function Helpers.statsColumnsToShow(standings)
-	local seenStatsBefore = {}
-	return Array.filter(standings.additionalStats, function(tiebreaker)
-		if not tiebreaker.title then
-			return false
-		end
-		if seenStatsBefore[tiebreaker.id] then
-			return false
-		end
-		seenStatsBefore[tiebreaker.id] = true
-		return true
-	end)
 end
 
 ---@private
@@ -121,14 +105,7 @@ function Helpers.createRow(standings, slot, statsToShow)
 					labelScheme = 'placement',
 				},
 			},
-			TableWidgets.Cell{
-				children = OpponentDisplay.BlockOpponent{
-					opponent = slot.opponent,
-					overflow = 'ellipsis',
-					teamStyle = 'hybrid',
-					showPlayerTeam = true,
-				}
-			},
+			TableWidgets.Cell{children = Participant{opponent = slot.opponent, disqualified = slot.disqualified}},
 			Array.map(statsToShow, function(tiebreaker, tiebreakerIndex)
 				return TableWidgets.Cell{
 					css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil},

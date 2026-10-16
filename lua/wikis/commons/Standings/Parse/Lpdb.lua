@@ -12,6 +12,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local Table = Lua.import('Module:Table')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -21,14 +22,17 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
+
 local StandingsParseLpdb = {}
 
 ---@class StandingsImportOptions
 ---@field exclusive boolean? # If set, only matches where every opponent is part of the standings are imported
 ---@field importOpponents boolean? # If set, opponents not listed manually still count as part of the standings
+---@field overtime boolean? # If set, results of overtime matches are tracked separately from regulation results
 
 ---@param rounds {roundNumber: integer, matches: string[]}[]
----@param scoreMapper fun(opponent: match2opponent): number|nil
+---@param scoreMapper fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number|nil
 ---@param manualOpponents StandingTableOpponentData[]
 ---@param options StandingsImportOptions?
 ---@return StandingTableOpponentData[]
@@ -79,24 +83,23 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 		end
 
 		local matches = {}
+		local matchPoints = {}
 
 		return {
 			opponent = opponentData.opponent,
 			rounds = Array.map(opponentData.rounds, function(roundData)
-				local match = roundData.match
-				matches = Array.append(matches, match)
+				local roundMatches = roundData.matches or {}
+				matches = Array.extend(matches, roundMatches)
+				matchPoints = Table.merge(matchPoints, roundData.matchPoints)
+				local lastMatch = roundMatches[#roundMatches]
 				return {
-					scoreboard = {
-						points = roundData.scoreboard.points,
-						match = {
-							w = roundData.scoreboard.match.w or 0,
-							l = roundData.scoreboard.match.l or 0,
-							d = roundData.scoreboard.match.d or 0,
-						},
-					},
+					scoreboard = TiebreakerScope.tally(
+						opponentData.opponent, roundMatches, roundData.matchPoints, options and options.overtime
+					),
 					specialstatus = roundData.specialstatus or 'nc',
 					matches = matches,
-					matchId = match and match.matchId or nil,
+					matchPoints = matchPoints,
+					matchId = lastMatch and lastMatch.matchId or nil,
 				}
 			end)
 		}
@@ -110,11 +113,7 @@ function StandingsParseLpdb.newOpponent(opponentData, maxRounds)
 	return {
 		opponent = opponentData,
 		rounds = Array.mapRange(1, maxRounds, function()
-			return {
-				scoreboard = {
-					match = {w = 0, d = 0, l = 0},
-				},
-			}
+			return {}
 		end)
 	}
 end
@@ -161,7 +160,7 @@ end
 ---@param roundNumber integer
 ---@param match match2
 ---@param opponents StandingTableOpponentData[]
----@param scoreMapper fun(opponent: standardOpponent): number?
+---@param scoreMapper fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number?
 ---@param maxRounds integer
 ---@param manualOpponents StandingTableOpponentData[]
 ---@param options StandingsImportOptions?
@@ -183,6 +182,12 @@ function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMappe
 		return
 	end
 
+	if options.overtime then
+		-- A bestof of 0 means it was not set on the match
+		assert(match2.bestof <= 1, 'Overtime standings only support Bo1 matches, but ' .. match2.matchId
+			.. ' is a Bo' .. tostring(match2.bestof))
+	end
+
 	Array.forEach(match2.opponents, function(opponent)
 		local standingsOpponentData = Array.find(opponents, function(opponentData)
 			return Opponent.same(opponentData.opponent, opponent)
@@ -193,18 +198,15 @@ function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMappe
 		end
 		assert(standingsOpponentData.rounds[roundNumber], 'Round number out of bounds')
 
+		-- The scoreboard of the round is tallied from these in importFromMatches
 		local opponentRoundData = standingsOpponentData.rounds[roundNumber]
-		local points = scoreMapper(opponent)
-		if points then
-			opponentRoundData.scoreboard.points = (opponentRoundData.scoreboard.points or 0) + points
-		end
 		opponentRoundData.specialstatus = ''
-		opponentRoundData.match = match2
-		if not match2.finished then
-			return
+		opponentRoundData.matches = Array.append(opponentRoundData.matches or {}, match2)
+		local points = scoreMapper(opponent, match2)
+		if points then
+			opponentRoundData.matchPoints = opponentRoundData.matchPoints or {}
+			opponentRoundData.matchPoints[match2.matchId] = points
 		end
-		local matchResult = match2.winner == 0 and 'd' or opponent.placement == 1 and 'w' or 'l'
-		opponentRoundData.scoreboard.match[matchResult] = (opponentRoundData.scoreboard.match[matchResult] or 0) + 1
 	end)
 end
 
