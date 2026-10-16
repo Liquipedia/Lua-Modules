@@ -124,10 +124,7 @@ end
 ---@param matchInput table
 ---@return table[]
 function MatchGroupInput.readMatchpage(bracketId, matchId, matchInput)
-	local matchArgs = {}
-	for key, value in pairs(matchInput) do
-		matchArgs[key] = Json.parseIfTable(value) or value
-	end
+	local matchArgs = Json.parseStringifiedArgs(matchInput)
 
 	local function setMatchPageContext()
 		local tournamentPage = (mw.ext.LiquipediaDB.lpdb('match2', {
