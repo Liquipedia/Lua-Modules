@@ -24,7 +24,7 @@ Config.categories = {
 			end
 		end,
 		transform = function(tier)
-			return Tier.toName(tonumber(tier))
+			return Tier.toName(tier)
 		end,
 	},
 	{

@@ -24,8 +24,12 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
+local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParseWiki = {}
+
+local DEFAULT_SWISS_POINTS = {w = 1, d = 0.5, l = 0}
+local RESULT_POINTS_KEYS = {win = 'w', draw = 'd', loss = 'l'}
 
 --[[
 {{FfaStandings|title=League Standings
@@ -119,7 +123,7 @@ end
 ---@param opponentInput string|table
 ---@param numberOfRounds integer
 ---@param resolveDate string|number?
----@return StandingTableOpponentData[]
+---@return StandingTableOpponentData
 function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, resolveDate)
 	local opponentData = Json.parseIfString(opponentInput)
 	local rounds = {}
@@ -144,11 +148,49 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, res
 	local opponent = Opponent.readOpponentArgs(opponentData)
 	opponent = Opponent.resolve(opponent, resolveDate, {syncPlayer = true})
 
+	local aliases
+	if opponent.type == Opponent.team then
+		aliases = {opponent}
+		Array.extendWith(aliases,
+			Array.map(Array.parseCommaSeparatedString(opponentData.aliases, ';'), function(alias)
+				return Opponent.readOpponentArgs{type = Opponent.team, template = alias}
+			end)
+		)
+	end
+
 	return {
 		rounds = rounds,
 		opponent = opponent,
+		aliases = aliases,
 		startingPoints = opponentData.startingpoints,
+		disqualifiedFromRound = StandingsParseWiki.parseDisqualifiedFromRound(opponentData.dq),
+		definiteStatuses = StandingsParseWiki.parseDefiniteStatuses(opponentData, numberOfRounds),
 	}
+end
+
+---Reads the `dq` input of an opponent. `dq=true` means disqualified from the first round,
+---`dq=<number>` means disqualified from that round onwards.
+---@param input string|number|boolean?
+---@return integer?
+function StandingsParseWiki.parseDisqualifiedFromRound(input)
+	local fromRound = tonumber(input)
+	if fromRound then
+		return math.floor(fromRound)
+	end
+	return Logic.readBool(input) and 1 or nil
+end
+
+---Reads the `r<round>bg` inputs of an opponent, e.g. `r3bg=up`. The status applies from that round onwards.
+---Rounds beyond the number of rounds and empty values are ignored.
+---@param opponentData table
+---@param numberOfRounds integer
+---@return table<integer, string>?
+function StandingsParseWiki.parseDefiniteStatuses(opponentData, numberOfRounds)
+	local statuses = {}
+	for round = 1, numberOfRounds do
+		statuses[round] = Logic.nilIfEmpty(opponentData['r' .. round .. 'bg'])
+	end
+	return Logic.nilIfEmpty(statuses)
 end
 
 ---@param input string
@@ -167,9 +209,45 @@ function StandingsParseWiki.parseWikiBgs(input)
 	return statusParsed
 end
 
+---Reads the `points` input of swiss standings, e.g. `win=3, draw=1, loss=0, 2-0=4`.
+---`win`, `draw` and `loss` are the points of that result and are keyed `w`, `d` and `l`.
+---`X-Y` is the fixed amount of points for an opponent scoring X against Y, replacing the points of its result.
+---@param input string?
+---@return table<string, number>
+function StandingsParseWiki.parsePoints(input)
+	local points = Table.copy(DEFAULT_SWISS_POINTS)
+	local entries = Array.filter(Array.parseCommaSeparatedString(input), Logic.isNotEmpty)
+	Array.forEach(entries, function(entry)
+		local key, value = unpack(Array.parseCommaSeparatedString(entry, '='))
+		local pointsKey = RESULT_POINTS_KEYS[key] or (key and key:match('^%d+%-%d+$') and key)
+		assert(pointsKey, 'Invalid points input: unknown key "' .. tostring(key) .. '" in "' .. entry .. '"')
+		points[pointsKey] = assert(tonumber(value), 'Invalid points input: "' .. entry .. '" is not a number')
+	end)
+	return points
+end
+
+---The score of the opponent in the format of the `X-Y` points input, nil if the match has no (proper) score.
+---@param match MatchGroupUtilMatch
+---@param opponent standardOpponent
+---@return string?
+local function getScoreKey(match, opponent)
+	local opponents = match.opponents
+	if #opponents ~= 2 then
+		return nil
+	end
+	local hasScores = Array.all(opponents, function(matchOpponent)
+		return matchOpponent.status == 'S' and Logic.isNumeric(matchOpponent.score)
+	end)
+	if not hasScores then
+		return nil
+	end
+	local other = opponents[1] == opponent and opponents[2] or opponents[1]
+	return opponent.score .. '-' .. other.score
+end
+
 ---@param tabletype StandingsTableTypes
 ---@param args table
----@return fun(opponent: match2opponent): number|nil
+---@return fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number|nil
 function StandingsParseWiki.makeScoringFunction(tabletype, args)
 	if tabletype == 'ffa' then
 		if not args['p1'] then
@@ -185,8 +263,13 @@ function StandingsParseWiki.makeScoringFunction(tabletype, args)
 			return scoreFromPlacement or 0
 		end
 	elseif tabletype == 'swiss' then
-		return function(opponent)
-			return opponent.placement == 1 and 1 or 0
+		local points = StandingsParseWiki.parsePoints(args.points)
+		return function(opponent, match)
+			if not match.finished then
+				return nil
+			end
+			local scoreKey = getScoreKey(match, opponent)
+			return points[scoreKey] or points[TiebreakerScope.matchResult(match, opponent)]
 		end
 	end
 	error('Unknown table type')
@@ -202,16 +285,33 @@ function StandingsParseWiki.parseTiebreakers(args, tableType)
 		if tableType == 'ffa' then
 			tiebreakers = {
 				TiebreakerFactory.validateAndNormalizeInput('points'),
-				TiebreakerFactory.validateAndNormalizeInput('manual'),
 			}
 		elseif tableType == 'swiss' then
 			tiebreakers = {
 				TiebreakerFactory.validateAndNormalizeInput('matchdiff'),
-				TiebreakerFactory.validateAndNormalizeInput('manual'),
 			}
 		end
 	end
+	if tableType == 'ffa' then
+		Array.forEach(tiebreakers, function(tiebreaker)
+			assert(
+				TiebreakerFactory.parseId(tiebreaker) == 'full',
+				'Tiebreaker "' .. tiebreaker .. '" is not supported, only full tiebreakers are supported in ffa standings'
+			)
+		end)
+	end
+	table.insert(tiebreakers, 1, TiebreakerFactory.validateAndNormalizeInput('disqualified'))
+	table.insert(tiebreakers, TiebreakerFactory.validateAndNormalizeInput('manual'))
 	return tiebreakers
+end
+
+---Reads which levels draws are explicitly enabled/disabled for. Unset (nil) means auto-detect from the data.
+---@param args table
+---@return {match: boolean?}
+function StandingsParseWiki.parseDrawConfig(args)
+	return {
+		match = Logic.readBoolOrNil(args.matchdraws),
+	}
 end
 
 ---@param args table

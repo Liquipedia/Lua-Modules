@@ -13,7 +13,6 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Opponent = Lua.import('Module:Opponent/Custom')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
@@ -650,7 +649,7 @@ function Import._getScore(opponentData)
 		return nil
 	end
 
-	return OpponentDisplay.InlineScore(opponentData)
+	return Opponent.getScoreValue(opponentData)
 end
 
 ---@param lpdbEntry table

@@ -28,10 +28,12 @@ Html.Aside = ComponentCore.tag('aside')
 Html.B = ComponentCore.tag('b')
 Html.Bdi = ComponentCore.tag('bdi')
 Html.Bdo = ComponentCore.tag('bdo')
+---@deprecated Use CSS font-size property instead.
 Html.Big = ComponentCore.tag('big')
 Html.Blockquote = ComponentCore.tag('blockquote')
 Html.Br = ComponentCore.tag('br')
 Html.Caption = ComponentCore.tag('caption')
+---@deprecated Use CSS text-align property instead.
 Html.Center = ComponentCore.tag('center')
 Html.Cite = ComponentCore.tag('cite')
 Html.Code = ComponentCore.tag('code')
@@ -47,6 +49,7 @@ Html.Dt = ComponentCore.tag('dt')
 Html.Em = ComponentCore.tag('em')
 Html.Figcaption = ComponentCore.tag('figcaption')
 Html.Figure = ComponentCore.tag('figure')
+---@deprecated Use CSS fonts properties instead.
 Html.Font = ComponentCore.tag('font')
 Html.Fragment = ComponentCore.component(
 	---@param props HtmlNodeProps
@@ -75,6 +78,7 @@ Html.S = ComponentCore.tag('s')
 Html.Samp = ComponentCore.tag('samp')
 Html.Small = ComponentCore.tag('small')
 Html.Span = ComponentCore.tag('span')
+---@deprecated Use Html.Del or Html.S instead.
 Html.Strike = ComponentCore.tag('strike')
 Html.Strong = ComponentCore.tag('strong')
 Html.Sub = ComponentCore.tag('sub')
@@ -87,6 +91,7 @@ Html.Th = ComponentCore.tag('th')
 Html.Thead = ComponentCore.tag('thead')
 Html.Time = ComponentCore.tag('time')
 Html.Tr = ComponentCore.tag('tr')
+---@deprecated Use Html.Code, Html.Kbd, Html.Samp or Html.Var instead.
 Html.Tt = ComponentCore.tag('tt')
 Html.U = ComponentCore.tag('u')
 Html.Ul = ComponentCore.tag('ul')

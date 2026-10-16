@@ -60,7 +60,7 @@ function UpcomingTournaments.player(args)
 		function (playerIndex)
 			return ConditionUtil.anyOf(
 				ColumnName(prefix .. playerIndex, 'opponentplayers'),
-				{args.name, args.name:gsub(' ', '_')}
+				{args.name, (args.name:gsub(' ', '_'))}
 			)
 		end
 	))

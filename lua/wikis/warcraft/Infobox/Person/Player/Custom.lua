@@ -22,7 +22,7 @@ local Cell = Widgets.Cell
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 local NON_BREAKING_SPACE = '&nbsp;'
 
----@class WarcraftInfoboxPlayer: Person
+---@class WarcraftInfoboxPlayer: InfoboxPerson
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 

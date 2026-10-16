@@ -7,13 +7,14 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Html = Lua.import('Module:Widget/Html')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Ordinal = Lua.import('Module:Ordinal')
 local Table = Lua.import('Module:Table')
 
+local Html = Lua.import('Module:Widget/Html')
 local Span = Html.Span
 
 ---@class rawPlacement
@@ -52,7 +53,8 @@ local PLACEMENT_CLASSES = {
 	['q'] = 'placement-win',
 	['w'] = 'placement-win',
 	['l'] = 'placement-lose',
-	['dq'] = 'placement-lose',
+	['d'] = 'placement-draw',
+	['dq'] = 'placement-disqualified',
 	['dnf'] = 'placement-dnp',
 	['dns'] = 'placement-dnp',
 	['dnpq'] = 'placement-dnp',
@@ -88,16 +90,16 @@ local prizepoolClasses = {
 	'background-color-first-place',
 	'background-color-second-place',
 	'background-color-third-place',
-	w = 'bg-win',
-	q = 'bg-win',
-	l = 'bg-lose',
-	dq = 'bg-dq',
-	dnq = 'bg-dq',
-	dns = 'bg-dq',
-	dnf = 'bg-dq',
-	dnp = 'bg-dq',
-	dnpq = 'bg-dq',
-	nc = 'bg-dq',
+	w = 'background-color-win-place',
+	q = 'background-color-win-place',
+	l = 'background-color-lose-place',
+	dq = 'background-color-dq-place',
+	dnq = 'background-color-dq-place',
+	dns = 'background-color-dq-place',
+	dnf = 'background-color-dq-place',
+	dnp = 'background-color-dq-place',
+	dnpq = 'background-color-dq-place',
+	nc = 'background-color-dq-place',
 }
 
 local USE_BLACK_TEXT = {
@@ -115,10 +117,21 @@ local USE_BLACK_TEXT = {
 ---@param placement string|integer?
 ---@return rawPlacement
 function Placement.raw(placement)
+	if Logic.isEmpty(placement) then
+		return {
+			blackText = true,
+			display = '',
+			ordinal = {},
+			placement = {},
+			sort = CUSTOM_SORTS[''],
+		}
+	end
+	---@cast placement -nil
+
 	local raw = {}
 
-	-- Nil check on input and split placement if joint
-	raw.placement = mw.text.split(string.lower(placement or ''), '-', true)
+	-- split placement if joint
+	raw.placement = Array.parseCommaSeparatedString(string.lower(placement), '-')
 
 	-- Identify appropriate background class
 	if PLACEMENT_CLASSES[raw.placement[1]] then
@@ -139,7 +152,7 @@ function Placement.raw(placement)
 	-- Intercept non-numeric placements for sorting and ordinal creation
 	if not MathUtil.isInteger(raw.placement[1]) then
 		raw.sort = CUSTOM_SORTS[raw.placement[1]] or CUSTOM_SORTS['']
-		raw.ordinal = mw.text.split(string.upper(placement or ''), '-', true)
+		raw.ordinal = Array.parseCommaSeparatedString(string.upper(placement), '-')
 	else
 		raw.sort = raw.placement[1] .. (raw.placement[2] and ('-' .. raw.placement[2]) or '')
 		raw.ordinal = Placement._makeOrdinal(raw.placement)
@@ -203,7 +216,7 @@ end
 
 ---Takes string place value and returns prize pool color class.
 ---May return `nil` if no color is registered.
----@param args {placement: string|number}
+---@param args {placement: string|number?}
 ---@return string?
 function Placement.getBgClass(args)
 	return prizepoolClasses[args.placement]
@@ -224,7 +237,7 @@ end
 ---Returns a Widget span for placement display in the Widget system.
 ---@param raw rawPlacement
 ---@param text string?
----@return Widget
+---@return VNode
 function Placement.renderRawInWidget(raw, text)
 	local content = raw.display .. (Logic.isNotEmpty(text) and (' ' .. text) or '')
 
@@ -241,9 +254,13 @@ end
 
 ---Returns a Widget span for placement display in the Widget system.
 ---@param args {placement: string|integer?, text: string?}
----@return Widget
+---@return Renderable
 function Placement.renderInWidget(args)
-	local raw = Placement.raw(args.placement or '')
+	if Logic.isEmpty(args.placement) then
+		return ''
+	end
+
+	local raw = Placement.raw(args.placement)
 
 	return Placement.renderRawInWidget(raw, args.text)
 end

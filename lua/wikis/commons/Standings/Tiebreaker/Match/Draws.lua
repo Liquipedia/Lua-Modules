@@ -9,21 +9,17 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 
-local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
+local TiebreakerMatchDiff = Lua.import('Module:Standings/Tiebreaker/Match/Diff')
 
----@class TiebreakerMatchDraws : StandingsTiebreaker
-local TiebreakerMatchDraws = Class.new(TiebreakerInterface)
+---Shares the column of TiebreakerMatchDiff
+---@class TiebreakerMatchDraws : TiebreakerMatchDiff
+local TiebreakerMatchDraws = Class.new(TiebreakerMatchDiff)
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
 ---@return integer
 function TiebreakerMatchDraws:valueOf(state, opponent)
 	return opponent.match.d
-end
-
----@return string
-function TiebreakerMatchDraws:headerTitle()
-	return 'Matches Drawn'
 end
 
 return TiebreakerMatchDraws

@@ -73,5 +73,9 @@ return {
 			},
 		},
 		defaultMaxPlayersPerPlacement = 20,
+		participants = {
+			soloAsFactionTable = true,
+			sortPlayersInTable = true,
+		},
 	},
 }

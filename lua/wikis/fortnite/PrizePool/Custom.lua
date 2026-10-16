@@ -24,7 +24,7 @@ local TIER_VALUE = {8, 4, 2}
 
 -- Template entry point
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.localcurrency = args.localcurrency or Variables.varDefault('tournament_currency')

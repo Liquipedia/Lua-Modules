@@ -24,7 +24,7 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
----@return Html|string
+---@return Renderable?
 function CustomTeam:createBottomContent()
 	return PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}}
 end

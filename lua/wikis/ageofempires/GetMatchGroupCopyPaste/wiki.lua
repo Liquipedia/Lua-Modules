@@ -40,11 +40,11 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		isFfa and Logic.readBool(args.hasPointsMapping)
 			and (INDENT .. WikiCopyPaste._getPointsMapping(opponents)) or nil,
 		Logic.readBool(args.casters) and (INDENT .. '|caster1= |caster2=') or nil,
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' ..
 				(isFfa and WikiCopyPaste.getFfaOpponent(mode, bestof) or WikiCopyPaste.getOpponent(mode))
 		end),
-		Array.map(Array.range(1, bestof), function(mapIndex)
+		Array.mapRange(1, bestof, function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getMap(mode, isFfa)
 		end),
 		'}}'
@@ -73,7 +73,7 @@ end
 ---@return string
 function WikiCopyPaste.getFfaOpponent(mode, mapCount)
 	local mapArgs = table.concat(
-		Array.map(Array.range(1, mapCount), function (index)
+		Array.mapRange(1, mapCount, function (index)
 			return '|m' .. index .. '={{MS||civs=}}'
 		end)
 	)
@@ -110,7 +110,7 @@ end
 ---@return string
 function WikiCopyPaste._getPointsMapping(opponents)
 	return table.concat(
-		Array.map(Array.range(1, opponents), function (index)
+		Array.mapRange(1, opponents, function (index)
 			return '|p' .. index .. '='
 		end)
 	)

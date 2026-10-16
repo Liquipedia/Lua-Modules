@@ -29,13 +29,14 @@ jobs:
 
       - name: Setup Python
         if: steps.changed-files.outputs.any_changed == 'true'
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.14'
+          cache: 'pip'
 
       - name: Install Python Dependency
         if: steps.changed-files.outputs.any_changed == 'true'
-        run: pip install requests
+        run: pip install -r requirements.txt
 
       - name: Personal Lua Deploy
         if: steps.changed-files.outputs.any_changed == 'true'

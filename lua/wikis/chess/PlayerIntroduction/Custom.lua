@@ -50,7 +50,7 @@ function CustomPlayerIntroduction:_parsePlayerInfo(args, playerInfo)
 end
 
 --- Customizes how the game is displayed.
----@return string
+---@return string?
 function CustomPlayerIntroduction:_gameDisplay()
 	local title = self.playerInfo.chessTitle
 	local game = self.playerInfo.game
@@ -63,7 +63,7 @@ function CustomPlayerIntroduction:_gameDisplay()
 end
 
 --- Customizes the player type display.
----@return string
+---@return string?
 function CustomPlayerIntroduction:typeDisplay()
 	local title = self.playerInfo.chessTitle
 

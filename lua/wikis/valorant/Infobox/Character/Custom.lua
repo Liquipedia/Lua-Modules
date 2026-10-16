@@ -19,8 +19,11 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 
 ---@class ValorantAgentInfobox: CharacterInfobox
+---@operator call(Frame): ValorantAgentInfobox
 local CustomCharacter = Class.new(Character)
+
 ---@class ValorantAgentInfoboxWidgetInjector: WidgetInjector
+---@operator call(ValorantAgentInfobox): ValorantAgentInfoboxWidgetInjector
 ---@field caller ValorantAgentInfobox
 local CustomInjector = Class.new(Injector)
 

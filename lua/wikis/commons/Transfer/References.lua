@@ -13,9 +13,13 @@ local Icon = Lua.import('Module:Icon')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
+local Template = Lua.import('Module:Template')
 local Variables = Lua.import('Module:Variables')
 
 local Info = Lua.import('Module:Info', {loadData = true})
+
+local Html = Lua.import('Module:Widget/Html')
+local ReferenceTag = Lua.import('Module:Widget/ReferenceTag')
 
 local TransferRef = {}
 
@@ -176,12 +180,12 @@ function TransferRef.useReferences(references, date)
 		return TransferRef.useReference(reference, date)
 	end)
 
-	return table.concat(refs)
+	return tostring(Html.Fragment{children = refs})
 end
 
 ---@param reference TransferReference
 ---@param date string
----@return string
+---@return Renderable
 function TransferRef.useReference(reference, date)
 	local refKey = TransferRef.createReferenceKey(reference, date)
 
@@ -191,12 +195,9 @@ function TransferRef.useReference(reference, date)
 	end
 
 	if TransferRef.isValidRefType(reference.refType) then
-		return mw.getCurrentFrame():callParserFunction{
-			name = '#tag:ref',
-			args = {
-				'',
-				name = refKey
-			}
+		return ReferenceTag{
+			children = '',
+			name = refKey,
 		}
 	end
 
@@ -212,9 +213,11 @@ function TransferRef.createReference(refData, date)
 	local refType = refData.refType
 
 	if refType == WEB_TYPE then
-		local refCite = mw.getCurrentFrame():expandTemplate{
-			title = 'Cite web',
-			args = {
+		local frame = mw.getCurrentFrame()
+		local refCite = Template.safeExpand(
+			frame,
+			'Cite web',
+			{
 				url = refData.link,
 				title = refData.title or 'Transfer reference',
 				trans_title = refData.transTitle,
@@ -225,37 +228,26 @@ function TransferRef.createReference(refData, date)
 				archiveurl = refData.archiveUrl,
 				archivedate = refData.archiveDate,
 			}
-		}
-		return mw.getCurrentFrame():callParserFunction{
-			name = '#tag:ref',
-			args = {
-				refCite,
-				name = referenceKey
-			}
+		)
+		return ReferenceTag{
+			frame = frame,
+			children = refCite,
+			name = referenceKey
 		}
 	elseif refType == TOURNAMENT_TYPE or refType == TOURNAMENT_LEAVE_TYPE then
-		return mw.getCurrentFrame():callParserFunction{
-			name = '#tag:ref',
-			args = {
-				TransferRef._getTextAndLink(refData, {linkInsideText = true}),
-				name = referenceKey
-			}
+		return ReferenceTag{
+			children = TransferRef._getTextAndLink(refData, {linkInsideText = true}),
+			name = referenceKey
 		}
 	elseif refType == INSIDE_TYPE then
-		return mw.getCurrentFrame():callParserFunction{
-			name = '#tag:ref',
-			args = {
-				TransferRef._getTextAndLink(refData, {linkInsideText = true}),
-				name = referenceKey
-			}
+		return ReferenceTag{
+			children = TransferRef._getTextAndLink(refData, {linkInsideText = true}),
+			name = referenceKey
 		}
 	elseif refType == CONTRACT_TYPE then
-		return mw.getCurrentFrame():callParserFunction{
-			name = '#tag:ref',
-			args = {
-				TransferRef._getTextAndLink(refData, {linkInsideText = true}),
-				name = referenceKey
-			}
+		return ReferenceTag{
+			children = TransferRef._getTextAndLink(refData, {linkInsideText = true}),
+			name = referenceKey
 		}
 	end
 	return ''

@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
@@ -17,37 +16,26 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local MAX_NUM_BANS = 1
 
----@class OverwatchCustomMatchSummary: CustomMatchSummaryInterface
-local CustomMatchSummary = {}
-
 ---@class OverwatchMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
 local GameRowComponentProps = {}
 
 local OverwatchMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
+---@class OverwatchCustomMatchSummary: CustomMatchSummaryInterface
+local CustomMatchSummary = {
+	GameRow = OverwatchMatchSummaryGameRow,
+}
+
 ---@param args table
 ---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {maxBans = MAX_NUM_BANS})
 end
 
----@param match MatchGroupUtilMatch
----@return VNode[]
-function CustomMatchSummary.createBody(match)
-	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
-
-	return {
-		MatchSummaryWidgets.GamesContainer{
-			children = Array.map(match.games, function (game, gameIndex)
-				if Logic.isEmpty(game.map) then
-					return
-				end
-				return OverwatchMatchSummaryGameRow{game = game, gameIndex = gameIndex}
-			end)
-		},
-		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	}
+---@param game MatchGroupUtilGame
+---@return boolean
+function CustomMatchSummary.gameFilter(game)
+	return Logic.isNotEmpty(game.map)
 end
 
 ---@param props MatchSummaryGameRowProps
@@ -63,6 +51,7 @@ function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local opponentCopy = Table.deepCopy(game.opponents[opponentIndex])
 	if opponentCopy.score and game.mode == 'Push' then
+		---@diagnostic disable-next-line: assign-type-mismatch
 		opponentCopy.score = opponentCopy.score .. 'm'
 	end
 

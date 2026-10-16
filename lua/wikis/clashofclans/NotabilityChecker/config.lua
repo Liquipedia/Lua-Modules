@@ -5,6 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+---@class ClashofClansNotabilityCheckerConfig: NotabilityCheckerConfig
 local Config = {}
 
 -- These are constants, you don't need to touch them
@@ -35,10 +36,6 @@ Config.weights = {
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 5,
-			},
-			{
-				name = Config.TIER_TYPE_INDIVIDUAL,
 				points = 5,
 			},
 			{
@@ -78,10 +75,6 @@ Config.weights = {
 				points = 5,
 			},
 			{
-				name = Config.TIER_TYPE_INDIVIDUAL,
-				points = 5,
-			},
-			{
 				name = Config.TIER_TYPE_MONTHLY,
 				points = 0,
 			},
@@ -118,10 +111,6 @@ Config.weights = {
 				points = 3,
 			},
 			{
-				name = Config.TIER_TYPE_INDIVIDUAL,
-				points = 0,
-			},
-			{
 				name = Config.TIER_TYPE_MONTHLY,
 				points = 0,
 			},
@@ -156,10 +145,6 @@ Config.weights = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
 				points = 1,
-			},
-			{
-				name = Config.TIER_TYPE_INDIVIDUAL,
-				points = 0,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
@@ -202,10 +187,6 @@ Config.weights = {
 				points = 0,
 			},
 			{
-				name = Config.TIER_TYPE_INDIVIDUAL,
-				points = 0,
-			},
-			{
 				name = Config.TIER_TYPE_WEEKLY,
 				points = 0,
 			},
@@ -233,7 +214,7 @@ Config.weights = {
 --- a first placement should score more than a 10th placement.
 ---@param tier string|integer
 ---@param tierType string
----@return fun(number, number): number
+---@return NotabilityCheckerDropOffFunction
 function Config.placementDropOffFunction(tier, tierType)
 
 		return function(score, placement)

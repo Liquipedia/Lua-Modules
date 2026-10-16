@@ -16,12 +16,13 @@ local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local Label = Lua.import('Module:Widget/Basic/Label')
 local RoundSelector = Lua.import('Module:Widget/Standings/RoundSelector')
+local Participant = Lua.import('Module:Widget/Standings/Participant')
 local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
 local Switch = Lua.import('Module:Widget/Switch')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local StandingsDisplayUtil = Lua.import('Module:Standings/DisplayUtil')
 
 local STATUS_TO_DISPLAY = {
 	dq = 'DQ',
@@ -49,10 +50,7 @@ local function StandingsFfa(props)
 			{align = 'center'},
 			Helpers._showRoundColumns(standings) and {align = 'center'} or nil,
 			{align = 'left'},
-			Array.map(standings.additionalStats, function(tiebreaker)
-				if not tiebreaker.title then
-					return
-				end
+			Array.map(StandingsDisplayUtil.statsToShow(standings), function()
 				return {align = 'center'}
 			end),
 			Helpers._showRoundColumns(standings) and Array.rep({align = 'center'}, #standings.rounds) or nil
@@ -127,10 +125,7 @@ function Helpers._headerRow(standings)
 			makeHeaderCell('#'),
 			Helpers._showRoundColumns(standings) and makeHeaderCell() or nil,
 			makeHeaderCell('Participant'),
-			Array.map(standings.additionalStats, function(tiebreaker)
-				if not tiebreaker.title then
-					return
-				end
+			Array.map(StandingsDisplayUtil.statsToShow(standings), function(tiebreaker)
 				return makeHeaderCell(tiebreaker.title)
 			end),
 			Helpers._showRoundColumns(standings) and Array.map(standings.rounds, function(round)
@@ -148,6 +143,7 @@ end
 ---@param round StandingsRound
 ---@return Renderable
 function Helpers._createRoundBody(standings, round)
+	local statsToShow = StandingsDisplayUtil.statsToShow(standings)
 	return TableWidgets.TableBody{children = Array.map(round.opponents, function (slot)
 		return TableWidgets.Row{
 			attributes = {
@@ -165,16 +161,8 @@ function Helpers._createRoundBody(standings, round)
 				Helpers._showRoundColumns(standings) and TableWidgets.Cell{
 					children = PlacementChange{change = slot.positionChangeFromPreviousRound}
 				} or nil,
-				TableWidgets.Cell{children = OpponentDisplay.BlockOpponent{
-					opponent = slot.opponent,
-					overflow = 'ellipsis',
-					teamStyle = 'hybrid',
-					showPlayerTeam = true,
-				}},
-				Array.map(standings.additionalStats, function(tiebreaker, tiebreakerIndex)
-					if not tiebreaker.title then
-						return
-					end
+				TableWidgets.Cell{children = Participant{opponent = slot.opponent, disqualified = slot.disqualified}},
+				Array.map(statsToShow, function(tiebreaker, tiebreakerIndex)
 					return TableWidgets.Cell{
 						css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil},
 						children = slot.additionalStatsValues[tiebreaker.id] and slot.additionalStatsValues[tiebreaker.id].display or ''

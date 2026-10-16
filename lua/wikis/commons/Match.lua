@@ -13,7 +13,7 @@ local FeatureFlag = Lua.import('Module:FeatureFlag')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
@@ -172,12 +172,12 @@ function Match.splitRecordsByType(match)
 		return {}
 	end
 
-	local gameRecordList = MatchGroupUtil.normalizeSubtype(match, 'map')
+	local gameRecordList = MatchGroupInputUtil.normalizeSubtype(match, 'map')
 	Match._removeLegacySubobjectRecords(match, 'map')
 	match.match2games = nil
 	match.games = nil
 
-	local opponentRecordList = MatchGroupUtil.normalizeSubtype(match, 'opponent')
+	local opponentRecordList = MatchGroupInputUtil.normalizeSubtype(match, 'opponent')
 	Match._removeLegacySubobjectRecords(match, 'opponent')
 	match.match2opponents = nil
 	match.opponents = nil

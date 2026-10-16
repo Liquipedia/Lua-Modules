@@ -44,8 +44,8 @@ local Customizable = Widgets.Customizable
 local TeamHistoryWidget = Lua.import('Module:Widget/Infobox/TeamHistory')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class Person: BasicInfobox
----@operator call(Frame): Person
+---@class InfoboxPerson: BasicInfobox
+---@operator call(Frame): InfoboxPerson
 ---@field locations string[]
 ---@field roles RoleData[]
 local Person = Class.new(BasicInfobox)
@@ -203,7 +203,7 @@ function Person:createInfobox()
 	return self:build(widgets, 'Person')
 end
 
----@return Widget?
+---@return Renderable?
 function Person:_createUpcomingMatches()
 	if not self:shouldStoreData(self.args) then
 		return nil

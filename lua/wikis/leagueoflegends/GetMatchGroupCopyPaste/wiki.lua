@@ -42,7 +42,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local lines = Array.extend(
 		'{{Match',
 		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
 		Logic.readBool(args.hasDate) and Array.extend(
@@ -52,11 +52,11 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			INDENT .. '|mvp='
 		) or nil,
 		casters > 0 and {
-			INDENT .. table.concat(Array.map(Array.range(1, casters), function(casterIndex)
+			INDENT .. table.concat(Array.mapRange(1, casters, function(casterIndex)
 				return '|caster' .. casterIndex .. '='
 			end), ' ')
 		} or nil,
-		Array.map(Array.range(1, bestof), function(mapIndex)
+		Array.mapRange(1, bestof, function(mapIndex)
 			return WikiCopyPaste._getMapCode(mapIndex, args)
 		end),
 		INDENT .. '|patch=',
@@ -85,13 +85,13 @@ function WikiCopyPaste._getMapCode(mapIndex, args)
 		INDENT .. '|map' .. mapIndex .. '={{Map',
 		INDENT .. INDENT .. '|vod=',
 		INDENT .. INDENT .. '|team1side=',
-		detailedPlayerInput and Array.map(Array.range(1, 5), function (index)
+		detailedPlayerInput and Array.mapRange(1, 5, function (index)
 			return INDENT .. INDENT .. '|t1p' .. index .. '={{Json|player= |role=' ..
 					ROLES[index] .. ' |character= |kills= |deaths= |assists=}}'
 		end) or (INDENT .. INDENT .. '|t1c1= |t1c2= |t1c3= |t1c4= |t1c5='),
 		bans and (INDENT .. INDENT .. '|t1b1= |t1b2= |t1b3= |t1b4= |t1b5=') or nil,
 		INDENT .. INDENT .. '|team2side=',
-		detailedPlayerInput and Array.map(Array.range(1, 5), function (index)
+		detailedPlayerInput and Array.mapRange(1, 5, function (index)
 			return INDENT .. INDENT .. '|t2p' .. index .. '={{Json|player= |role=' ..
 					ROLES[index] .. ' |character= |kills= |deaths= |assists=}}'
 		end) or (INDENT .. INDENT .. '|t2c1= |t2c2= |t2c3= |t2c4= |t2c5='),

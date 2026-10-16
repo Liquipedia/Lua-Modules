@@ -154,6 +154,11 @@ local PREFIXES = {
 		player = 'https://fpschallenge.eu/user/',
 		team = 'https://fpschallenge.eu/team/',
 	},
+	fragnet = {
+		'https://arena.fragnet.net/en/tournament/',
+		player = 'https://arena.fragnet.net/en/profile/',
+		team = 'https://arena.fragnet.net/en/team/',
+	},
 	geoguessr = {'https://www.geoguessr.com/'},
 	gol = {match = 'https://gol.gg/game/stats/'},
 	gosugamers = {''},
@@ -370,7 +375,6 @@ local PREFIXES = {
 	yandexefir = {'https://yandex.ru/efir?stream_channel='},
 	youtube = {'https://www.youtube.com/'},
 	zhangyutv = {'http://www.zhangyu.tv/'},
-	zhanqitv = {'https://www.zhanqi.tv/'},
 }
 
 PREFIXES = Table.merge(PREFIXES, CustomData.prefixes or {})
@@ -410,7 +414,6 @@ local ALIASES = {
 	rules = {'rulebook'},
 	['start-gg'] = {'startgg', 'smashgg'},
 	yandexefir = {'yandex'},
-	zhanqitv = {'zhanqi'},
 }
 
 local ICON_KEYS_TO_RENAME = {
@@ -529,6 +532,10 @@ local MATCH_ICONS = {
 		text = 'Match page on Halo Data Hive'
 	},
 	headtohead = {
+		icon = 'Match Info Stats.png',
+		text = 'Head-to-head statistics'
+	},
+	headtohead_lh = {
 		icon = 'Match Info Stats.png',
 		text = 'Head-to-head statistics'
 	},

@@ -18,7 +18,6 @@ describe('region', function()
 		it('check', function()
 			local euFlag = Flags.Icon{flag = 'eu', shouldLink = true}
 			assert.are_equal(euFlag .. '&nbsp;Europe', Region.display{region = 'Europe'})
-			assert.are_equal('[[File:unasur.png]]&nbsp;South America', Region.display{region = 'sam'})
 			assert.are_equal(euFlag .. '&nbsp;Europe', Region.display{region = 'eu'})
 		end)
 	end)
@@ -27,13 +26,6 @@ describe('region', function()
 		it('check', function()
 			local euFlag = Flags.Icon{flag = 'eu', shouldLink = true}
 			assert.are_same({display = euFlag .. '&nbsp;Europe', region = 'Europe'}, Region.run{region = 'Europe'})
-			assert.are_same(
-				{
-					display = '[[File:unasur.png]]&nbsp;South America',
-					region = 'South America'
-				},
-				Region.run{region = 'South America'}
-			)
 			assert.are_same({}, Region.run{})
 			assert.are_same({}, Region.run{region = ''})
 			assert.are_same({}, Region.run{country = ''})

@@ -20,6 +20,8 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local MAX_NUM_BANS = 3
+
 local CustomMatchSummary = {}
 
 ---@param args table
@@ -32,14 +34,19 @@ end
 ---@return Renderable[]
 function CustomMatchSummary.createBody(match)
 	local globalBans = (match.extradata or {}).globalbans
+
+	local gameBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
+
+	-- To make the Global Bans doesn't get count as Game 1
+	Array.forEach(gameBansData, function(banData, gameIndex)
+		if Logic.isNotDeepEmpty(banData) then
+			banData.label = 'Game&nbsp;' .. gameIndex
+		end
+	end)
+
 	local characterBansData = Array.extend(
 		Logic.isNotDeepEmpty(globalBans) and {globalBans.team1 or {}, globalBans.team2 or {}, label = 'Global Bans'} or nil,
-		Array.map(match.games, function(game, gameIndex)
-			local extradata = game.extradata or {}
-			local bans = extradata.bans or {}
-			if Logic.isDeepEmpty(bans) then return end
-			return {bans.team1 or {}, bans.team2 or {}, label = 'Game&nbsp;' .. gameIndex}
-		end)
+		gameBansData
 	)
 
 	return WidgetUtil.collect(

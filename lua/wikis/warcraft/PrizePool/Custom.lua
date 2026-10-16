@@ -28,7 +28,7 @@ local AUTOMATION_START_DATE = '2023-10-16'
 
 -- Template entry point
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -59,10 +59,6 @@ end
 ---@param opponent BasePlacementOpponent
 ---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
-	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, {
-		seriesnumber = CustomPrizePool._seriesNumber()
-	})
-
 	lpdbData.players = Table.copy(lpdbData.opponentplayers or {})
 
 	lpdbData.weight = Weight.calc(
@@ -74,12 +70,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	)
 
 	return lpdbData
-end
-
----@return string
-function CustomPrizePool._seriesNumber()
-	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
-	return seriesNumber and string.format('%05d', seriesNumber) or ''
 end
 
 return CustomPrizePool

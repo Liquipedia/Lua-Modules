@@ -94,6 +94,7 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		return Array.append(
+			{},
 			args.desc and Title{children = 'Description'} or nil,
 			Center{children = {args.desc}},
 			args.history and Title{children = 'Item History'} or nil,

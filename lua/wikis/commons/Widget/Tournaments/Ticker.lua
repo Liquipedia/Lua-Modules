@@ -7,37 +7,38 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local Sublist = Lua.import('Module:Widget/Tournaments/Ticker/Sublist')
 local TickerData = Lua.import('Module:TournamentsTicker/Data')
 
----@class TournamentsTickerWidget: Widget
----@operator call(table): TournamentsTickerWidget
-local TournamentsTickerWidget = Class.new(Widget)
-TournamentsTickerWidget.defaultProps = {
+---@class TournamentsTickerWidgetProps: TournamentsTickerDataProps
+---@field displayGameIcons boolean?
+
+local defaultProps = {
 	upcomingDays = 5,
 	completedDays = 5,
 }
 
----@return Widget
-function TournamentsTickerWidget:render()
-	local data = TickerData.get(self.props)
-	local displayGameIcons = Logic.readBool(self.props.displayGameIcons)
+---@param props TournamentsTickerWidgetProps
+---@return VNode
+local function TournamentsTickerWidget(props)
+	local data = TickerData.get(props)
+	local displayGameIcons = Logic.readBool(props.displayGameIcons)
 
 	local fallbackElement = Html.Div{
 		attributes = {
 			['data-filter-hideable-group-fallback'] = '',
 		},
 		children = {
-			Html.Center{
+			Html.Div{
 				css = {
 					['margin'] = '1.5rem 0',
 					['font-style'] = 'italic',
+					['text-align'] = 'center',
 				},
 				children = I18n.translate('tournament-ticker-no-tournaments'),
 			}
@@ -63,4 +64,4 @@ function TournamentsTickerWidget:render()
 	}
 end
 
-return TournamentsTickerWidget
+return Component.component(TournamentsTickerWidget, defaultProps)

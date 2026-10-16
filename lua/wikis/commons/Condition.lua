@@ -16,7 +16,7 @@ local Table = Lua.import('Module:Table')
 local Condition = {}
 
 -- Abstract class, node of the conditions tree
----@class AbstractConditionNode:BaseClass
+---@class AbstractConditionNode: BaseClass
 local _ConditionNode = Class.new()
 
 ---Returns the string representation of this condition node.
@@ -102,9 +102,9 @@ Comparator.ge = Comparator.greaterThanOrEqualTo
 Comparator.le = Comparator.lessThanOrEqualTo
 
 ---A condition in a ConditionTree
----@class ConditionNode:AbstractConditionNode
+---@class ConditionNode: AbstractConditionNode
 ---@operator call(...): ConditionNode
----@field name ColumnName
+---@field name string|ColumnName
 ---@field comparator lpdbComparator
 ---@field value string|number
 local ConditionNode = Class.new(_ConditionNode,
@@ -117,6 +117,7 @@ local ConditionNode = Class.new(_ConditionNode,
 
 ---@return string
 function ConditionNode:toString()
+	assert(self.name ~= nil, 'ConditionNode: nil cannot be used as a column name.')
 	assert(
 		Table.any(Comparator, function (_, value)
 			return self.comparator == value
@@ -127,7 +128,7 @@ function ConditionNode:toString()
 		return String.interpolate(
 			'[[${name}${comparator}${value}]]',
 			{
-				name = self.name:toString(),
+				name = tostring(self.name),
 				comparator = comp,
 				value = self.value
 			}
@@ -145,7 +146,7 @@ local BooleanOperator = {
 }
 
 ---Represents a column name in LPDB, including an optional super key
----@class ColumnName
+---@class ColumnName: BaseClass
 ---@operator call(...): ColumnName
 ---@field name string
 ---@field superName string?
@@ -176,10 +177,15 @@ function ColumnName:toString()
 	return self.name
 end
 
+---@return string
+function ColumnName:__tostring()
+	return self:toString()
+end
+
 local ConditionUtil = {}
 
 ---Builds "matches any of" condition from the given collection of values.
----@param column ColumnName
+---@param column string|ColumnName
 ---@param values (string|number)[]
 ---@return ConditionTree?
 function ConditionUtil.anyOf(column, values)
@@ -187,7 +193,7 @@ function ConditionUtil.anyOf(column, values)
 end
 
 ---Builds "matches none of" condition from the given collection of values.
----@param column ColumnName
+---@param column string|ColumnName
 ---@param values (string|number)[]
 ---@return ConditionTree?
 function ConditionUtil.noneOf(column, values)
@@ -195,7 +201,7 @@ function ConditionUtil.noneOf(column, values)
 end
 
 ---@package
----@param column ColumnName
+---@param column string|ColumnName
 ---@param booleanOperator lpdbBooleanOperator
 ---@param comparator lpdbComparator
 ---@param values (string|number)[]
