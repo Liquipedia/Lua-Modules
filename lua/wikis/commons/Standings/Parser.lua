@@ -173,9 +173,10 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 end
 
 ---Calculate tiebreaker values for all opponents in a round.
----Does not calculate ML, only "full" tiebreaker types, as ML values depend on which opponents are tied.
----ML is resolved in resolveTieForGroup() called by determinePlacements(),
----and therefore does not get a value shown in the table.
+---Does not calculate H2H legacy or ML, only "full" tiebreaker types, as the values of the others
+---depend on which opponents are tied.
+---The others are resolved in resolveTieForGroup() called by determinePlacements(),
+---and therefore do not get a value shown in the table.
 ---@param opponentsInRound TiebreakerOpponent[]
 ---@param tiebreakerIds string[]
 ---@param tiebreakerOptions StandingsTiebreakerOptions?
@@ -211,12 +212,18 @@ local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, ti
 		return { tiedOpponents }
 	end
 	local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId, tiebreakerOptions)
+	local contextType = tiebreaker:getContextType()
 
-	-- ML only looks at the matches played among the tied opponents.
+	-- H2H legacy is only defined for ties between 2 or 3 opponents, for bigger ties it is skipped
+	if contextType == 'h2hlegacy' and #tiedOpponents > 3 then
+		return resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex + 1, tiebreakerOptions)
+	end
+
+	-- ML and H2H legacy only look at the matches played among the tied opponents.
 	-- The scoped opponents are copies, the groups below keep containing the original opponents.
 	local scopedOpponentsByOpponent
 	local scopedOpponents
-	if tiebreaker:getContextType() ~= 'full' then
+	if contextType ~= 'full' then
 		scopedOpponents = TiebreakerScope.restrictTo(tiedOpponents)
 		scopedOpponentsByOpponent = {}
 		Array.forEach(tiedOpponents, function(opponent, index)

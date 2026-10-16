@@ -32,10 +32,8 @@ local TIEBREAKER_MAPPING_TABLE = {
 	diff = 'gamediff',
 	['games won'] = 'gamewins',
 	['games loss'] = 'gamelosses',
-	-- These will map to h2hlegacy once it exists. Until then ml is used, which only differs from it
-	-- for ties of more than 3 opponents (h2hlegacy skips those).
-	['h2h series'] = 'ml.matchscore',
-	['h2h games'] = 'ml.gamediff',
+	['h2h series'] = 'h2hlegacy.matchscore',
+	['h2h games'] = 'h2hlegacy.gamediff',
 	['minileague points'] = 'ml.points',
 	['minileague series%'] = 'ml.matchwinrate',
 	['minileague games'] = 'ml.gamediff',
