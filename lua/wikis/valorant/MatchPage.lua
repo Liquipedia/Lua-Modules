@@ -29,6 +29,7 @@ local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local PlayerStatContainer = Lua.import('Module:Widget/Match/Page/PlayerStat/Container')
 local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
+local SkirmishDisplay = Lua.import('Module:Widget/Match/Page/Skirmish')
 local Span = Html.Span
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -642,6 +643,18 @@ function MatchPage:_renderPlayerPerformance(player)
 				children = playerStats
 			}
 		}
+	}
+end
+
+---@return VNode[]?
+function MatchPage:addComments()
+	local skirmishData = self.matchData.extradata.skirmish
+	if Logic.isEmpty(skirmishData) then
+		return
+	end
+	---@cast skirmishData ValorantSkirmishResult
+	return {
+		SkirmishDisplay{skirmish = skirmishData}
 	}
 end
 
