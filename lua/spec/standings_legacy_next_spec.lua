@@ -154,8 +154,8 @@ describe('Standings Legacy Next', function()
 			})
 		end)
 
-		it('defaults to the group table league tiebreakers', function()
-			local defaults = {'matchscore', 'gamediff', 'ml.matchdiff', 'ml.gamescore', 'gamewins', 'gamelosses'}
+		it('defaults to the next style tiebreakers', function()
+			local defaults = {'matchscore', 'gamescore', 'ml.matchscore', 'ml.gamescore', 'gamewins', 'gamelosses'}
 			assert.are_same(defaults, StandingTableLegacyNext.parseTiebreakers{})
 			table.insert(defaults, 1, 'points')
 			assert.are_same(defaults, StandingTableLegacyNext.parseTiebreakers{show_p = 'true'})
