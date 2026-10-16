@@ -14,7 +14,7 @@ local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local List = Lua.import('Module:Widget/List')
 
 local FindMatchesByPlayerDisplayName = {}
 
@@ -39,7 +39,7 @@ function FindMatchesByPlayerDisplayName.run(frame)
 		limit = 5000,
 	})
 
-	return UnorderedList{
+	return List.Unordered{
 		children = Array.map(data, function(item)
 			return {
 				Link{link = item.pagename},

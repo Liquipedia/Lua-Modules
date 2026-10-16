@@ -21,7 +21,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local List = Lua.import('Module:Widget/List')
 
 local FindPlayersOnTeamFromPlacements = {}
 
@@ -64,9 +64,13 @@ function FindPlayersOnTeamFromPlacements.get(frame)
 		end)
 	end)
 
-	return UnorderedList{
+	return List.Unordered{
 		children = Array.map(Array.extractValues(players), function(player)
-			return tostring(PlayerDisplay.InlinePlayer{player = player}) .. ' - last result from: ' .. player.date
+			return {
+				PlayerDisplay.InlinePlayer{player = player},
+				' - last result from: ',
+				player.date,
+			}
 		end)
 	}
 end
