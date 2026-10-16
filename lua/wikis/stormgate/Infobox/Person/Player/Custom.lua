@@ -16,7 +16,6 @@ local Variables = Lua.import('Module:Variables')
 local YearsActive = Lua.import('Module:YearsActive')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
-local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Player = Lua.import('Module:Infobox/Person')
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
@@ -111,13 +110,6 @@ function CustomPlayer:_getActiveCasterYears()
 	)
 
 	return YearsActive.displayYears(years:toArray())
-end
-
----@return Renderable?
-function CustomPlayer:createBottomContent()
-	if self:shouldStoreData(self.args) then
-		return MatchTicker.recent({player = self.pagename})
-	end
 end
 
 ---@param categories string[]
