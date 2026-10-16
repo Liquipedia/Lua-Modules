@@ -13,6 +13,8 @@ local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
+local StandingsOvertime = Lua.import('Module:Standings/Overtime')
+
 local TiebreakerGameUtil = {}
 
 ---@param opponent TiebreakerOpponent
@@ -47,6 +49,33 @@ TiebreakerGameUtil.getGames = FnUtil.memoize(function (opponent)
 			l = walkoverLosses > 0 and walkoverLosses or nil,
 		}
 	}
+end)
+
+---Counts the games that went into overtime. Based on the played games of the matches, without walkovers.
+---@param opponent TiebreakerOpponent
+---@return {w: integer, l: integer}
+TiebreakerGameUtil.getOvertimeGames = FnUtil.memoize(function (opponent)
+	local overtimeWins = 0
+	local overtimeLosses = 0
+	Array.forEach(opponent.matches, function (match)
+		local opponentIndex = Array.indexOf(match.opponents, FnUtil.curry(Opponent.same, opponent.opponent))
+
+		if Array.any(match.opponents, function (matchOpponent)
+			return matchOpponent.status ~= 'S'
+		end) then
+			return
+		end
+
+		Array.forEach(Array.filter(match.games, StandingsOvertime.isOvertimeGame), function (game)
+			if game.winner == opponentIndex then
+				overtimeWins = overtimeWins + 1
+			else
+				overtimeLosses = overtimeLosses + 1
+			end
+		end)
+	end)
+
+	return {w = overtimeWins, l = overtimeLosses}
 end)
 
 return TiebreakerGameUtil

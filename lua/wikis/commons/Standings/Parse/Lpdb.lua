@@ -29,6 +29,7 @@ local StandingsParseLpdb = {}
 ---@class StandingsImportOptions
 ---@field exclusive boolean? # If set, only matches where every opponent is part of the standings are imported
 ---@field importOpponents boolean? # If set, opponents not listed manually still count as part of the standings
+---@field overtime boolean? # If set, results of overtime matches are tracked separately from regulation results
 
 ---@param rounds {roundNumber: integer, matches: string[]}[]
 ---@param scoreMapper fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number|nil
@@ -92,7 +93,9 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 				matchPoints = Table.merge(matchPoints, roundData.matchPoints)
 				local lastMatch = roundMatches[#roundMatches]
 				return {
-					scoreboard = TiebreakerScope.tally(opponentData.opponent, roundMatches, roundData.matchPoints),
+					scoreboard = TiebreakerScope.tally(
+						opponentData.opponent, roundMatches, roundData.matchPoints, options and options.overtime
+					),
 					specialstatus = roundData.specialstatus or 'nc',
 					matches = matches,
 					matchPoints = matchPoints,
@@ -177,6 +180,12 @@ function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMappe
 	end)
 	if not isRelevantMatch then
 		return
+	end
+
+	if options.overtime then
+		-- A bestof of 0 means it was not set on the match
+		assert(match2.bestof <= 1, 'Overtime standings only support Bo1 matches, but ' .. match2.matchId
+			.. ' is a Bo' .. tostring(match2.bestof))
 	end
 
 	Array.forEach(match2.opponents, function(opponent)
