@@ -168,9 +168,11 @@ local function parseDefiniteStatuses(args, index)
 	end)
 end
 
+---Legacy `team<index>alias` is a comma separated list of team templates
 ---@param args table
 ---@param teamIndex integer
----@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, dq: string?, r1bg: string?}?
+---@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, dq: string?,
+---aliases: string?, r1bg: string?}?
 function StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 	local team = args['team' .. teamIndex]
 	if not team then
@@ -178,6 +180,7 @@ function StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 	end
 
 	local tiebreaker, startingPoints, dq = parseCoreInput(args, teamIndex)
+	local aliases = args['team' .. teamIndex .. 'alias']
 
 	return Table.merge({
 		type = Opponent.team,
@@ -185,6 +188,7 @@ function StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 		tiebreaker = tiebreaker,
 		startingpoints = startingPoints,
 		dq = dq,
+		aliases = aliases and table.concat(Array.parseCommaSeparatedString(aliases), ';') or nil,
 	}, parseDefiniteStatuses(args, teamIndex))
 end
 

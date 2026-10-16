@@ -71,6 +71,20 @@ describe('Standings Legacy Swiss', function()
 			local opponent = StandingTableLegacySwiss.parseTeamInput({rounds = '3', team1 = 'alpha', r4bg1 = 'up'}, 1)
 			assert.is_nil(opponent.r4bg)
 		end)
+
+		it('maps team<team>alias to the aliases of the opponent', function()
+			local args = {
+				team1 = 'alpha',
+				team1alias = 'alpha old, alpha older',
+				team2 = 'bravo',
+				team2alias = 'bravo old',
+				team3 = 'charlie',
+			}
+
+			assert.are_equal('alpha old;alpha older', StandingTableLegacySwiss.parseTeamInput(args, 1).aliases)
+			assert.are_equal('bravo old', StandingTableLegacySwiss.parseTeamInput(args, 2).aliases)
+			assert.is_nil(StandingTableLegacySwiss.parseTeamInput(args, 3).aliases)
+		end)
 	end)
 
 	describe('solo input', function()
