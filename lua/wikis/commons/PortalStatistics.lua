@@ -301,7 +301,7 @@ end
 ---@param tierValue string|number|nil
 ---@return boolean
 function StatisticsPortal._isTierShown(args, tierValue)
-	local value = tonumber(tierValue)
+	local value = Tier.toNumber(tierValue)
 	if value == nil then return false end
 
 	if not args.customTiers then
@@ -342,10 +342,11 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 	for _, rowValue in Tier.iterate('tiers') do
 		if StatisticsPortal._isTierShown(args, rowValue.value) then
 			local tierKey = tostring(rowValue.value)
+			local tierNumber = Tier.toNumber(rowValue.value) --[[@as integer]]
 			local tierData = countData[tierKey] or {}
 			local tournamentCount = 0
 
-			if tonumber(rowValue.value) <= 0 then
+			if tierNumber <= 0 then
 				-- Non-positive tier (0, -1, -2, ...): count everything stored under it
 				tournamentCount = Array.reduce(
 					Array.map(Array.extractValues(tierData), function(typeCount)
@@ -354,7 +355,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 					Operator.add, 0
 				)
 				-- Misc tiertype found under other tiers belongs to the Misc tier (-1)
-				if tonumber(rowValue.value) == MISC_TIER then
+				if tierNumber == MISC_TIER then
 					tournamentCount = tournamentCount + miscFromTierType
 				end
 				-- Consumed, so it is not counted again in the "Other" column
