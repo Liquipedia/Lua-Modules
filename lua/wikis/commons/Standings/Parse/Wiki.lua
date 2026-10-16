@@ -328,6 +328,24 @@ function StandingsParseWiki.parseDrawConfig(args)
 	}
 end
 
+---Reads the `walkovergames` input, the number of games a walkover (FF, DQ, L) counts as in the game tiebreakers.
+---The winner of the walkover is credited with that many game wins, the loser with that many game losses.
+---Unset means walkovers do not count towards the games.
+---@param args table
+---@return integer?
+function StandingsParseWiki.parseWalkoverGames(args)
+	local input = args.walkovergames
+	if Logic.isEmpty(input) then
+		return nil
+	end
+	local walkoverGames = tonumber(input)
+	assert(
+		walkoverGames and walkoverGames >= 0 and walkoverGames == math.floor(walkoverGames),
+		'Invalid walkovergames input: "' .. input .. '" is not a non-negative integer'
+	)
+	return walkoverGames
+end
+
 ---Reads whether overtime is tracked separately from regulation. Requires an overtime config on the wiki.
 ---@param args table
 ---@return boolean

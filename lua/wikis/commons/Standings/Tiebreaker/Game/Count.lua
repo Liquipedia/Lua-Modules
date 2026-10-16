@@ -19,7 +19,7 @@ local TiebreakerGameCount = Class.new(TiebreakerInterface)
 ---@param opponent TiebreakerOpponent
 ---@return integer
 function TiebreakerGameCount:valueOf(state, opponent)
-	local games = TiebreakerGameUtil.getGames(opponent)
+	local games = TiebreakerGameUtil.getGames(opponent, self.options.walkoverGames)
 	return games.games
 end
 

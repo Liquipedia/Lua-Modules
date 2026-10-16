@@ -19,7 +19,7 @@ local TiebreakerGameUtil = {}
 
 ---@param opponent TiebreakerOpponent
 ---@return {games: integer, w: integer, l: integer, walkover: {w: integer, l: integer}?}
-TiebreakerGameUtil.getGames = FnUtil.memoize(function (opponent)
+local getPlayedGames = FnUtil.memoize(function (opponent)
 	local games = 0
 	local gameWins = 0
 	local walkoverWins = 0
@@ -50,6 +50,26 @@ TiebreakerGameUtil.getGames = FnUtil.memoize(function (opponent)
 		}
 	}
 end)
+
+---Games of the matches, walkovers count as `walkoverGames` games won by the winner and lost by the loser.
+---@param opponent TiebreakerOpponent
+---@param walkoverGames number? # Defaults to 0, so walkovers do not count towards the games
+---@return {games: integer, w: integer, l: integer, walkover: {w: integer, l: integer}?}
+function TiebreakerGameUtil.getGames(opponent, walkoverGames)
+	local games = getPlayedGames(opponent)
+	local walkover = games.walkover
+	if not walkover or (walkoverGames or 0) == 0 then
+		return games
+	end
+	local walkoverWins = (walkover.w or 0) * walkoverGames
+	local walkoverLosses = (walkover.l or 0) * walkoverGames
+	return {
+		games = games.games + walkoverWins + walkoverLosses,
+		w = games.w + walkoverWins,
+		l = games.l + walkoverLosses,
+		walkover = walkover,
+	}
+end
 
 ---Counts the games that went into overtime. Based on the played games of the matches, without walkovers.
 ---@param opponent TiebreakerOpponent

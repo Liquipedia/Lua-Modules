@@ -19,7 +19,7 @@ local TiebreakerGameDiff = Class.new(TiebreakerInterface)
 ---@param opponent TiebreakerOpponent
 ---@return integer
 function TiebreakerGameDiff:valueOf(state, opponent)
-	local games = TiebreakerGameUtil.getGames(opponent)
+	local games = TiebreakerGameUtil.getGames(opponent, self.options.walkoverGames)
 	return games.w - games.l
 end
 
@@ -32,7 +32,7 @@ end
 ---@param opponent TiebreakerOpponent
 ---@return string
 function TiebreakerGameDiff:display(state, opponent)
-	local games = TiebreakerGameUtil.getGames(opponent)
+	local games = TiebreakerGameUtil.getGames(opponent, self.options.walkoverGames)
 	-- With overtime, regulation and overtime results are shown separately
 	if opponent.overtime then
 		local overtimeGames = TiebreakerGameUtil.getOvertimeGames(opponent)
