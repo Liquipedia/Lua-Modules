@@ -10,37 +10,43 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local CharacterStandardization = Lua.import('Module:CharacterStandardization', {loadData = true})
 local FnUtil = Lua.import('Module:FnUtil')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local String = Lua.import('Module:StringUtils')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local Opponent = Lua.import('Module:Opponent')
 
 local CustomMatchGroupInput = {}
-local MapFunctions = {}
-CustomMatchGroupInput.getBestOf = MatchGroupInputUtil.getBestOf
-CustomMatchGroupInput.DEFAULT_NODE = 'singles'
-CustomMatchGroupInput.DATE_FALLBACKS = {
-	'tournament_enddate',
-	'tournament_startdate',
+
+---@class BrawlhallaMatchParser: MatchParserInterface
+local MatchFunctions = {
+	getBestOf = MatchGroupInputUtil.getBestOf,
+	DEFAULT_NODE = 'singles',
+	DATE_FALLBACKS = {
+		'tournament_enddate',
+		'tournament_startdate',
+	},
 }
+
+---@class BrawlhallaMapParser: MapParserInterface
+local MapFunctions = {}
 
 ---@param match table
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	return MatchGroupInputUtil.standardProcessMatch(match, CustomMatchGroupInput)
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
-function CustomMatchGroupInput.extractMaps(match, opponents)
+function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 ---@param games table[]
 ---@return table[]
-function CustomMatchGroupInput.removeUnsetMaps(games)
+function MatchFunctions.removeUnsetMaps(games)
 	return Array.filter(games, function(map)
 		return map.map ~= nil
 	end)
@@ -49,12 +55,12 @@ end
 
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
-function CustomMatchGroupInput.calculateMatchScore(maps)
+function MatchFunctions.calculateMatchScore(maps)
 	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return {players: {char: string, player: string}[]}?
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
@@ -64,7 +70,7 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	return nil
 end
 
----@param player table
+---@param player MGIParsedPlayer
 ---@param map table
 ---@param opponentIndex integer
 ---@return {players: {char: string, player: string}[]}
