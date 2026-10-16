@@ -68,13 +68,11 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 		return MapFunctions._processSoloMapData(opponent.match2players[1], map, opponentIndex)
 	elseif opponent.type == Opponent.duo then
 		return Array.map(opponent.match2players, function (player, playerIndex)
-			local scoreInput = map['o' .. opponent .. 'score' .. playerIndex]
 			return {
 				char = MatchGroupInputUtil.getCharacterName(
 					CharacterStandardization, map['o' .. opponent .. 'char' .. playerIndex]
 				),
 				player = player.name,
-				score = tonumber(scoreInput) or scoreInput
 			}
 		end)
 	end
