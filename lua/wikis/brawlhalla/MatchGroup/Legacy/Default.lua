@@ -74,7 +74,7 @@ function MatchGroupLegacyDefault:getDetails(isReset, prefix)
 
 	Table.iter.forEachPair(self.args, function (key)
 		if not tonumber(key) and String.startsWith(key, prefix) then
-			details[key:gsub(prefix, '')] = self.args[key]
+			details[key:gsub(prefix, '')] = Table.extract(self.args, key)
 		end
 	end)
 
@@ -83,13 +83,36 @@ end
 
 ---@return table
 function MatchGroupLegacyDefault:getMap()
+	if self.bracketType == Opponent.solo then
+		return {
+			['$notEmpty$'] = 'win$1$',
+			winner = 'win$1$',
+			char1 = 'p1char$1$',
+			char2 = 'p2char$1$',
+			score1 = 'p1stock$1$',
+			score2 = 'p2stock$1$',
+			map = 'stage$1$',
+			vod = 'vodgame$1$'
+		}
+	elseif self.bracketType == Opponent.duo then
+		return {
+			['$notEmpty$'] = 'win$1$',
+			winner = 'win$1$',
+			o1char1 = 't1p1char$1$',
+			o1char2 = 't1p2char$1$',
+			o2char1 = 't2p1char$1$',
+			o2char2 = 't2p2char$1$',
+			o1score1 = 't1p1stock$1$',
+			o1score2 = 't1p2stock$1$',
+			o2score1 = 't2p1stock$1$',
+			o2score2 = 't2p2stock$1$',
+			map = 'stage$1$',
+			vod = 'vodgame$1$'
+		}
+	end
 	return {
 		['$notEmpty$'] = 'win$1$',
 		winner = 'win$1$',
-		char1 = 'p1char$1$',
-		char2 = 'p2char$1$',
-		score1 = 'p1stock$1$',
-		score2 = 'p2stock$1$',
 		map = 'stage$1$',
 		vod = 'vodgame$1$'
 	}
