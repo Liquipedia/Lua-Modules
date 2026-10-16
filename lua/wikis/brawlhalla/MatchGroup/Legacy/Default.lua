@@ -33,7 +33,6 @@ end
 ---@param scoreKey string
 ---@return table
 function MatchGroupLegacyDefault:getOpponent(prefix, scoreKey)
-	mw.logObject({prefix = prefix, scoreKey = scoreKey})
 	if self.bracketType == Opponent.duo then
 		local matchPrefix = prefix:sub(1, prefix:len() - 2)
 		local opponentIndex = prefix:sub(-1, -1)
