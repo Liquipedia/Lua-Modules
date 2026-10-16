@@ -57,7 +57,8 @@ function MatchGroupLegacyDefault:handleOpponents(isReset, match1params, match)
 	Array.forEach(Array.range(1, MAX_NUMBER_OF_OPPONENTS), function (opponentIndex)
 		local opp = self:getOpponent(match1params['opp' .. opponentIndex], 'score')
 		if isReset then
-			opp.score = match1params['details'] .. 'p' .. opponentIndex .. 'score'
+			opp.score = match1params['details'] .. (self.bracketType == Opponent.solo and 'p' or 't')
+					.. opponentIndex .. 'score'
 		end
 		if Logic.isEmpty(self.args[opp['$notEmpty$']]) then return end
 
