@@ -43,6 +43,7 @@ function MatchGroupLegacyDefault:getOpponent(prefix, scoreKey)
 			p1flag = opponentPrefix .. 'p' .. '1flag',
 			p2 = opponentPrefix .. 'p' .. 2,
 			p2flag = opponentPrefix .. 'p' .. '2flag',
+			score = opponentPrefix .. scoreKey,
 			win = prefix .. 'win',
 		}
 	end
