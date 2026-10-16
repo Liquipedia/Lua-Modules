@@ -43,5 +43,10 @@ return {
 				mode = 'manualPrio',
 			},
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchdiff', 'gamediff'},
+			},
+		},
 	},
 }

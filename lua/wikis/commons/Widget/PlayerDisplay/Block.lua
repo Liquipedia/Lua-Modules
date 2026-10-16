@@ -18,7 +18,6 @@ local PlayerDisplayComponents = Lua.import('Module:Widget/PlayerDisplay/Componen
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class BlockPlayerDisplayProps: InlinePlayerDisplayProps
----@field playerClass string|string[]?
 ---@field overflow OverflowModes?
 ---@field showPlayerTeam boolean?
 ---@field note Renderable|Renderable[]?
@@ -28,12 +27,9 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local function BlockPlayer(props)
 	local player = props.player
 	local factionDisplay = PlayerDisplayComponents.faction(props)
-	local playerClasses = type(props.playerClass) == 'string' and
-		{props.playerClass} or props.playerClass --[[ @as string[]? ]]
 	local useDefault = Logic.nilOr(Logic.readBoolOrNil(props.showTbd), true) or not Opponent.playerIsTbd(player)
 	local showPlayerTeam = props.showPlayerTeam
 	return BlockWrapper{
-		classes = playerClasses,
 		flip = props.flip,
 		showPlayerTeam = showPlayerTeam,
 		children = WidgetUtil.collect(

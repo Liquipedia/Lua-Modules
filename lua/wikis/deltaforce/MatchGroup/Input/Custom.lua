@@ -9,27 +9,32 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
+local DEFAULT_BESTOF = 3
+
 local CustomMatchGroupInput = {}
 
----@class DeltaForceMatchParser: MatchParserInterface
+---@class DeltaforceMatchParser: MatchParserInterface
 local MatchFunctions = {
 	DEFAULT_MODE = 'team',
-	getBestOf = MatchGroupInputUtil.getBestOf,
 }
 
----@class DeltaForceMapParser: MapParserInterface
-local MapFunctions = {}
+---@class DeltaforceMapParser: MapParserInterface
+local MapFunctions = {
+	BREAK_ON_EMPTY = true,
+}
 
----@class DeltaForceFfaMatchParser: FfaMatchParserInterface
+---@class DeltaforceFfaMatchParser: FfaMatchParserInterface
 local FfaMatchFunctions = {
 	DEFAULT_MODE = 'team',
 }
 
----@class DeltaForceFfaMapParser: FfaMapParserInterface
+---@class DeltaforceFfaMapParser: FfaMapParserInterface
 local FfaMapFunctions = {}
 
 ---@param match table
@@ -47,10 +52,56 @@ function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
+---@param bestofInput string|integer?
+---@param games table[]
+---@return integer?
+function MatchFunctions.getBestOf(bestofInput, games)
+	local bestof = tonumber(bestofInput)
+
+	if bestof then
+		Variables.varDefine('bestof', bestof)
+		return bestof
+	end
+
+	return tonumber(Variables.varDefault('bestof')) or ((games and #games > 0) and #games) or DEFAULT_BESTOF
+end
+
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(maps)
 	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
+end
+
+---@param match table
+---@param games table[]
+---@param opponents MGIParsedOpponent[]
+---@return table
+function MatchFunctions.getExtraData(match, games, opponents)
+	return {
+		mapveto = MatchGroupInputUtil.getMapVeto(match),
+		mvp = MatchGroupInputUtil.readMvp(match, opponents),
+	}
+end
+
+ -- Parse map-side extradata (Attack/Defense) for use in MatchSummary
+---@param match table
+---@param map table
+---@param opponents MGIParsedOpponent[]
+---@return table
+function MapFunctions.getExtraData(match, map, opponents)
+	if Logic.isEmpty(map.team1side) then
+		return {}
+	end
+
+	local t1side = map.team1side:upper()
+
+	return t1side == 'ATK' and {
+		t1side = 'ATK',
+		t2side = 'DEF',
+	} or t1side == 'DEF' and {
+		t1side = 'DEF',
+		t2side = 'ATK',
+	} or error('Invalid side specified: "' .. map.team1side .. '" (expected ATK or DEF)')
 end
 
 --- FFA Match

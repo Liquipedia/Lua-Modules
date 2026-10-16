@@ -17,7 +17,12 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class RocketLeagueUnitInfobox: UnitInfobox
+---@operator call(Frame): RocketLeagueUnitInfobox
 local CustomUnit = Class.new(Unit)
+
+---@class RocketLeagueUnitInfoboxWidgetInjector: WidgetInjector
+---@operator call(RocketLeagueUnitInfobox): RocketLeagueUnitInfoboxWidgetInjector
+---@field caller RocketLeagueUnitInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame

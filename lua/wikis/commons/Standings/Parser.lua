@@ -8,9 +8,12 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Info = Lua.import('Module:Info', { loadData = true })
+local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
+local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParser = {}
 
@@ -21,8 +24,9 @@ local StandingsParser = {}
 ---@param matches string[]
 ---@param standingsType StandingsTableTypes
 ---@param tiebreakerIds string[]
+---@param drawConfig {match: boolean?}? Explicit draw toggles per level; when unset, draws are detected from the data
 ---@return StandingsTableStorage
-function StandingsParser.parse(rounds, opponents, bgs, title, matches, standingsType, tiebreakerIds)
+function StandingsParser.parse(rounds, opponents, bgs, title, matches, standingsType, tiebreakerIds, drawConfig)
 	-- TODO: When all legacy (of all standing type) have been converted, the wiki variable should be updated
 	-- to follow the namespace format. Eg new name could be `standings_standingsindex`
 	local lastStandingsIndex = tonumber(Variables.varDefault('standingsindex')) or -1
@@ -40,7 +44,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		local opponentRounds = opponentData.rounds
 
 		return Array.map(rounds, function(round)
-			local pointsFromRound, statusInRound, tiebreakerPoints, matchId, playedMatches
+			local pointsFromRound, statusInRound, tiebreakerPoints, matchId, playedMatches, playedMatchPoints
 			if opponentRounds and opponentRounds[round.roundNumber] then
 				local thisRoundsData = opponentRounds[round.roundNumber]
 				if thisRoundsData.scoreboard then
@@ -55,9 +59,11 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 					carryData.match.l = carryData.match.l + thisRoundsData.scoreboard.match.l
 				end
 				playedMatches = thisRoundsData.matches
+				playedMatchPoints = thisRoundsData.matchPoints
 			end
 			carryData.points = carryData.points + (pointsFromRound or 0)
-			---@type {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?}
+			---@type {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?,
+			---match: {w: integer, d: integer, l: integer}}
 			return {
 				opponent = opponent,
 				standingsindex = standingsindex,
@@ -65,27 +71,68 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 				points = carryData.points,
 				match = Table.copy(carryData.match),
 				matches = playedMatches or {},
+				matchPoints = playedMatchPoints or {},
+				startingPoints = opponentData.startingPoints,
+				manualDefiniteStatus = StandingsParser.resolveManualDefiniteStatus(
+					opponentData.definiteStatuses, round.roundNumber
+				),
 				extradata = {
 					pointschange = pointsFromRound,
 					specialstatus = statusInRound,
 					tiebreakerpoints = tiebreakerPoints or 0,
+					disqualified = opponentData.disqualifiedFromRound ~= nil
+						and round.roundNumber >= opponentData.disqualifiedFromRound or nil,
 					matchid = matchId,
-					tiebreakerValues = {}
+					additionalStatsValues = {},
 				}
 			}
 		end)
 	end)
 
+	-- Resolve draws once for the whole table, so that every round is displayed in the same format.
+	---@type table<StandingsDrawLevel, boolean>
+	local draws = {
+		match = Logic.nilOr(
+			(drawConfig or {}).match,
+			Array.any(entries, function(entry) return entry.match.d > 0 end)
+		),
+	}
+	---@type StandingsTiebreakerOptions
+	local tiebreakerOptions = {draws = draws}
+
+	---@param tiebreakerId string
+	---@return {id: string, title: string?}
+	local loadTiebreaker = function(tiebreakerId)
+		local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId, tiebreakerOptions)
+		local tiebreakerContextType = tiebreaker:getContextType()
+		if tiebreakerContextType ~= 'full' then
+			return {id = tiebreakerId}
+		end
+		return {
+			id = tiebreakerId,
+			title = tiebreaker:headerTitle(),
+		}
+	end
+
+	local tiebreakers = Array.map(tiebreakerIds, loadTiebreaker)
+	local alwaysStatsToLoad = ((Info.config.standings or {}).alwaysShowStats or {})[standingsType] or {}
+	alwaysStatsToLoad = Array.map(alwaysStatsToLoad, function (stat)
+		return TiebreakerFactory.validateAndNormalizeInput(stat)
+	end)
+	local alwaysStats = Array.map(alwaysStatsToLoad, loadTiebreaker)
+	local additionalStats = Array.extend(alwaysStats, tiebreakers)
+	local additionalStatsIds = Array.map(additionalStats, function(stat) return stat.id end)
+
 	Array.forEach(rounds, function(round)
-		StandingsParser.calculateTiebreakerValues(Array.filter(entries, function(opponentRound)
+		StandingsParser.calculateAdditionalStatsValues(Array.filter(entries, function(opponentRound)
 			return opponentRound.roundindex == round.roundNumber
-		end), tiebreakerIds)
+		end), additionalStatsIds, tiebreakerOptions)
 	end)
 
 	Array.forEach(rounds, function(round)
 		StandingsParser.determinePlacements(Array.filter(entries, function(opponentRound)
 			return opponentRound.roundindex == round.roundNumber
-		end), tiebreakerIds)
+		end), tiebreakerIds, tiebreakerOptions)
 	end)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer,
 	---points: number, placement: integer?, slotindex: integer}[]
@@ -100,6 +147,8 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 			return opponentRound.roundindex == #rounds
 		end), bgs, 'definitestatus')
 	end
+	StandingsParser.applyManualStatuses(entries)
+	StandingsParser.applyDisqualifications(entries)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
 	---placement: integer?, slotindex: integer, placementchange: integer?,
 	---currentstatus: string?, definitestatus: string?}[]
@@ -112,41 +161,38 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		entries = entries,
 		matches = matches,
 		roundcount = #rounds,
-		hasdraw = false,
+		hasdraw = draws.match,
 		hasovertime = false,
 		haspoints = true,
 		finished = isFinished,
 		extradata = {
 			rounds = rounds,
-			tiebreakers = Array.map(tiebreakerIds, function(tiebreakerId)
-				local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId)
-				local tiebreakerContextType = tiebreaker:getContextType()
-				if tiebreakerContextType ~= 'full' then
-					return {id = tiebreakerId}
-				end
-				return {
-					id = tiebreakerId,
-					title = tiebreaker:headerTitle(),
-				}
-			end),
-		},
+			additionalStats = additionalStats,
+		}
 	}
 end
 
 ---Calculate tiebreaker values for all opponents in a round.
----Does not calculate H2H or ML, only "full" tiebreaker types.
----H2H and ML and resolved in resolveTieForGroup() called by determinePlacements()
+---Does not calculate H2H legacy or ML, only "full" tiebreaker types, as the values of the others
+---depend on which opponents are tied.
+---The others are resolved in resolveTieForGroup() called by determinePlacements(),
+---and therefore do not get a value shown in the table.
 ---@param opponentsInRound TiebreakerOpponent[]
 ---@param tiebreakerIds string[]
-function StandingsParser.calculateTiebreakerValues(opponentsInRound, tiebreakerIds)
+---@param tiebreakerOptions StandingsTiebreakerOptions?
+function StandingsParser.calculateAdditionalStatsValues(opponentsInRound, tiebreakerIds, tiebreakerOptions)
 	Array.forEach(tiebreakerIds, function(tiebreakerId)
-		local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId)
+		local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId, tiebreakerOptions)
 		local tiebreakerContextType = tiebreaker:getContextType()
-		if tiebreakerContextType == 'h2h' or tiebreakerContextType == 'ml' then
+		if tiebreakerContextType ~= 'full' then
 			return
 		end
 		Array.forEach(opponentsInRound, function(opponent)
-			opponent.extradata.tiebreakerValues[tiebreakerId] = {
+			if opponent.extradata.additionalStatsValues[tiebreakerId] then
+				-- We have already calculated this value, no need to do it twice
+				return
+			end
+			opponent.extradata.additionalStatsValues[tiebreakerId] = {
 				value = tiebreaker:valueOf(opponentsInRound, opponent),
 				display = tiebreaker:display(opponentsInRound, opponent),
 			}
@@ -158,38 +204,81 @@ end
 ---@param tiedOpponents TiebreakerOpponent[]
 ---@param tiebreakerIds string[]
 ---@param tiebreakerIndex integer
+---@param tiebreakerOptions StandingsTiebreakerOptions?
 ---@return TiebreakerOpponent[][]
-local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex)
+local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex, tiebreakerOptions)
 	local tiebreakerId = tiebreakerIds[tiebreakerIndex]
 	if not tiebreakerId then
 		return { tiedOpponents }
 	end
-	local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId)
+	local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId, tiebreakerOptions)
+	local contextType = tiebreaker:getContextType()
 
-	local _, groupedOpponents = Array.groupBy(tiedOpponents, function(opponent)
-		if not opponent.extradata.tiebreakerValues[tiebreakerId] then
+	-- H2H legacy is only defined for ties between 2 or 3 opponents, for bigger ties it is skipped
+	if contextType == 'h2hlegacy' and #tiedOpponents > 3 then
+		return resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex + 1, tiebreakerOptions)
+	end
+
+	-- ML and H2H legacy only look at the matches played among the tied opponents.
+	-- The scoped opponents are copies, the groups below keep containing the original opponents.
+	local scopedOpponentsByOpponent
+	local scopedOpponents
+	if contextType ~= 'full' then
+		scopedOpponents = TiebreakerScope.restrictTo(tiedOpponents)
+		scopedOpponentsByOpponent = {}
+		Array.forEach(tiedOpponents, function(opponent, index)
+			scopedOpponentsByOpponent[opponent] = scopedOpponents[index]
+		end)
+	end
+
+	---@param opponent TiebreakerOpponent
+	---@return StandingsTiebreakerValue
+	local function valueOf(opponent)
+		if scopedOpponentsByOpponent then
+			return tiebreaker:valueOf(scopedOpponents, scopedOpponentsByOpponent[opponent])
+		end
+		if not opponent.extradata.additionalStatsValues[tiebreakerId] then
 			return tiebreaker:valueOf(allOpponents, opponent)
 		end
-		return opponent.extradata.tiebreakerValues[tiebreakerId].value
+		return opponent.extradata.additionalStatsValues[tiebreakerId].value
+	end
+
+	-- Values can be lists, so they are matched by deep equality instead of being used as table keys
+	local valueByOpponent = {}
+	---@type StandingsTiebreakerValue[]
+	local distinctValues = {}
+	Array.forEach(tiedOpponents, function(opponent)
+		local value = valueOf(opponent)
+		valueByOpponent[opponent] = value
+		if not Array.any(distinctValues, function(distinctValue) return Logic.deepEquals(distinctValue, value) end) then
+			table.insert(distinctValues, value)
+		end
+	end)
+	table.sort(distinctValues, function(a, b)
+		return Array.lexicalCompareIfTable(b, a)
 	end)
 
-	local groupedOpponentsInOrder = Array.extractValues(groupedOpponents, Table.iter.spairs, function(_, a, b)
-		return a > b
+	-- Highest value first, opponents keep their order within a group
+	local groupedOpponentsInOrder = Array.map(distinctValues, function(value)
+		return Array.filter(tiedOpponents, function(opponent)
+			return Logic.deepEquals(valueByOpponent[opponent], value)
+		end)
 	end)
 
 	return Array.flatMap(groupedOpponentsInOrder, function(group)
 		if #group == 1 then
 			return { group }
 		end
-		return resolveTieForGroup(allOpponents, group, tiebreakerIds, tiebreakerIndex + 1)
+		return resolveTieForGroup(allOpponents, group, tiebreakerIds, tiebreakerIndex + 1, tiebreakerOptions)
 	end)
 end
 
 ---@param opponentsInRound {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
 ---placement: integer?, slotindex: integer?, extradata: table}[]
 ---@param tiebreakerIds string[]
-function StandingsParser.determinePlacements(opponentsInRound, tiebreakerIds)
-	local opponentsAfterTie = resolveTieForGroup(opponentsInRound, opponentsInRound, tiebreakerIds, 1)
+---@param tiebreakerOptions StandingsTiebreakerOptions?
+function StandingsParser.determinePlacements(opponentsInRound, tiebreakerIds, tiebreakerOptions)
+	local opponentsAfterTie = resolveTieForGroup(opponentsInRound, opponentsInRound, tiebreakerIds, 1, tiebreakerOptions)
 	local slotIndex = 1
 	Array.forEach(opponentsAfterTie, function(opponentGroup)
 		local rank = slotIndex
@@ -210,6 +299,47 @@ end
 function StandingsParser.addStatuses(opponentEnties, bgs, field)
 	Array.forEach(opponentEnties, function(opponent)
 		opponent[field] = bgs[opponent.slotindex]
+	end)
+end
+
+---Finds the manually set definite status that is in effect in a round,
+---which is the one with the highest round number that is not after the given round.
+---@param definiteStatuses table<integer, string>?
+---@param roundNumber integer
+---@return string?
+function StandingsParser.resolveManualDefiniteStatus(definiteStatuses, roundNumber)
+	if not definiteStatuses then
+		return
+	end
+	for round = roundNumber, 1, -1 do
+		if definiteStatuses[round] then
+			return definiteStatuses[round]
+		end
+	end
+end
+
+---Overrides the statuses of opponents with a manually set definite status.
+---A definite status is also the current status, so both are set.
+---@param opponentEntries {manualDefiniteStatus: string?, currentstatus: string?, definitestatus: string?}[]
+function StandingsParser.applyManualStatuses(opponentEntries)
+	Array.forEach(opponentEntries, function(opponent)
+		local manualStatus = opponent.manualDefiniteStatus
+		if manualStatus then
+			opponent.currentstatus = manualStatus
+			opponent.definitestatus = manualStatus
+		end
+	end)
+end
+
+---Overrides the statuses of disqualified opponents with 'dq'. A disqualification is final,
+---so the definite status is set regardless of the standings being finished or not.
+---@param opponentEntries {extradata: table, currentstatus: string?, definitestatus: string?}[]
+function StandingsParser.applyDisqualifications(opponentEntries)
+	Array.forEach(opponentEntries, function(opponent)
+		if opponent.extradata.disqualified then
+			opponent.currentstatus = 'dq'
+			opponent.definitestatus = 'dq'
+		end
 	end)
 end
 

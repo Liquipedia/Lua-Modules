@@ -20,7 +20,7 @@ local Cell = Widgets.Cell
 
 local SIZE_HERO = '28x28px'
 
----@class HeroesInfoboxPlayer: Person
+---@class HeroesInfoboxPlayer: InfoboxPerson
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 

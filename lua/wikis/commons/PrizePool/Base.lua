@@ -270,7 +270,7 @@ BasePrizePool.prizeTypes = {
 		end,
 	},
 	[PRIZE_TYPE_QUALIFIES] = {
-		sortOrder = 50,
+		sortOrder = 40,
 		align = 'left',
 
 		header = 'qualifies',
@@ -324,7 +324,7 @@ BasePrizePool.prizeTypes = {
 		mergeDisplayColumns = true,
 	},
 	[PRIZE_TYPE_POINTS] = {
-		sortOrder = 40,
+		sortOrder = 50,
 		align = 'right',
 
 		header = 'points',
@@ -667,7 +667,7 @@ function BasePrizePool:_shouldDisplayPrizeSummary()
 end
 
 ---@param isAward boolean?
----@return Widget
+---@return VNode
 function BasePrizePool:build(isAward)
 	local prizePoolTable = self:_buildTable(isAward)
 
@@ -717,7 +717,7 @@ function BasePrizePool:_getCurrencies()
 	return currencies
 end
 
----@param cell Widget
+---@param cell VNode<Table2CellProps>
 ---@param prize BasePrizePoolPrize
 function BasePrizePool:_tagCurrencyColumn(cell, prize)
 	if not self.currencyToggleIndices then
@@ -733,7 +733,7 @@ function BasePrizePool:_tagCurrencyColumn(cell, prize)
 end
 
 ---@param isAward boolean?
----@return Widget
+---@return VNode
 function BasePrizePool:_buildTable(isAward)
 	local currencies = self:_getCurrencies()
 	self.currencyToggleIndices = nil
@@ -926,6 +926,7 @@ function BasePrizePool:_opponentPrizeCells(placement, opponent)
 	end)
 
 	return Array.map(prizeCells, function(cell)
+		---@cast cell -nil
 		if Logic.isNotEmpty(cell.props.children) then
 			return cell
 		end
@@ -1045,7 +1046,7 @@ end
 
 --- Creates an empty table cell
 ---@param align ('left'|'right'|'center')?
----@return Renderable
+---@return VNode<Table2CellProps>
 function BasePrizePool._emptyCell(align)
 	return TableCell{children = {DASH}, align = align}
 end
@@ -1078,20 +1079,22 @@ function BasePrizePool:storeData()
 	local prizePoolIndex = (tonumber(Variables.varDefault('prizepool_index')) or 0) + 1
 	Variables.varDefine('prizepool_index', prizePoolIndex)
 
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
 	local lpdbTournamentData = {
-		tournament = Variables.varDefault('tournament_name'),
-		parent = Variables.varDefault('tournament_parent'),
-		series = Variables.varDefault('tournament_series'),
-		shortname = Variables.varDefault('tournament_tickername'),
+		tournament = tournamentContext.fullName,
+		parent = tournamentContext.pageName,
+		series = tournamentContext.series,
+		shortname = tournamentContext.tickerName,
 		startdate = Variables.varDefault('tournament_startdate'),
-		mode = Variables.varDefault('tournament_mode'),
-		type = Variables.varDefault('tournament_type'),
-		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
-		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
-		publishertier = Variables.varDefault('tournament_publishertier'),
-		icon = Variables.varDefault('tournament_icon'),
-		icondark = Variables.varDefault('tournament_icondark'),
-		game = Variables.varDefault('tournament_game'),
+		mode = tournamentContext.mode,
+		type = tournamentContext.type,
+		liquipediatier = tostring(tournamentContext.liquipediaTier),
+		liquipediatiertype = tournamentContext.liquipediaTierType,
+		publishertier = tournamentContext.publisherTier,
+		icon = tournamentContext.icon,
+		icondark = tournamentContext.iconDark,
+		game = tournamentContext.game,
 		prizepoolindex = prizePoolIndex,
 	}
 

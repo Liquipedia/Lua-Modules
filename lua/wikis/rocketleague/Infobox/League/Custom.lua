@@ -26,8 +26,14 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 
 ---@class RocketleagueLeagueInfobox: InfoboxLeague
+---@operator call(Frame): RocketleagueLeagueInfobox
 local CustomLeague = Class.new(League)
+
+---@class RocketleagueLeagueInfoboxWidgetInjector: WidgetInjector
+---@operator call(RocketleagueLeagueInfobox): RocketleagueLeagueInfoboxWidgetInjector
+---@field caller RocketleagueLeagueInfobox
 local CustomInjector = Class.new(Injector)
+
 local NotabilityCalculator = {}
 
 local SERIES_RLCS = 'Rocket League Championship Series'

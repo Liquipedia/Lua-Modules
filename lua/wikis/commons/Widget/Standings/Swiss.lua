@@ -14,10 +14,11 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local Component = Lua.import('Module:Widget/Component')
 local Label = Lua.import('Module:Widget/Basic/Label')
 local MatchOverview = Lua.import('Module:Widget/Standings/MatchOverview')
+local Participant = Lua.import('Module:Widget/Standings/Participant')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local StandingsDisplayUtil = Lua.import('Module:Standings/DisplayUtil')
 
 local Helpers = {}
 
@@ -30,17 +31,18 @@ local function StandingsSwiss(props)
 	end
 
 	local lastRound = standings.rounds[#standings.rounds]
+	local statsToShow = StandingsDisplayUtil.statsToShow(standings)
 
 	return TableWidgets.Table{
 		classes = {'standings-swiss'},
 		title = Logic.nilIfEmpty(standings.title),
-		columns = Helpers.buildColumnDefinitions(standings),
+		columns = Helpers.buildColumnDefinitions(standings, statsToShow),
 		children = WidgetUtil.collect(
 			-- Column Header
-			Helpers.headerRow(standings),
+			Helpers.headerRow(standings, statsToShow),
 			-- Rows
 			TableWidgets.TableBody{children = Array.map(lastRound.opponents, function(slot)
-				return Helpers.createRow(standings, slot)
+				return Helpers.createRow(standings, slot, statsToShow)
 			end)}
 		),
 		striped = false
@@ -49,15 +51,13 @@ end
 
 ---@private
 ---@param standings StandingsModel
+---@param statsToShow {id: string, title: string?}[]
 ---@return table[]
-function Helpers.buildColumnDefinitions(standings)
+function Helpers.buildColumnDefinitions(standings, statsToShow)
 	return WidgetUtil.collect(
 		{align = 'left'},
 		{align = 'left'},
-		Array.map(standings.tiebreakers, function(tiebreaker)
-			if not tiebreaker.title then
-				return
-			end
+		Array.map(statsToShow, function(tiebreaker)
 			return {align = 'center'}
 		end),
 		Array.rep({align = 'center'}, #standings.rounds)
@@ -66,8 +66,9 @@ end
 
 ---@private
 ---@param standings StandingsModel
+---@param statsToShow {id: string, title: string?}[]
 ---@return Renderable
-function Helpers.headerRow(standings)
+function Helpers.headerRow(standings, statsToShow)
 	---@param text string?
 	---@return Renderable
 	local makeHeaderCell = function(text)
@@ -78,10 +79,7 @@ function Helpers.headerRow(standings)
 		TableWidgets.Row{children = WidgetUtil.collect(
 			makeHeaderCell('#'),
 			makeHeaderCell('Participant'),
-			Array.map(standings.tiebreakers, function(tiebreaker)
-				if not tiebreaker.title then
-					return
-				end
+			Array.map(statsToShow, function(tiebreaker, index)
 				return makeHeaderCell(tiebreaker.title)
 			end),
 			Array.map(standings.rounds, function(round)
@@ -94,8 +92,9 @@ end
 ---@private
 ---@param standings StandingsModel
 ---@param slot StandingsEntryModel
+---@param statsToShow {id: string, title: string?}[]
 ---@return Renderable
-function Helpers.createRow(standings, slot)
+function Helpers.createRow(standings, slot, statsToShow)
 	return TableWidgets.Row{
 		attributes = {['data-position-status'] = slot.positionStatus},
 		children = WidgetUtil.collect(
@@ -106,21 +105,11 @@ function Helpers.createRow(standings, slot)
 					labelScheme = 'placement',
 				},
 			},
-			TableWidgets.Cell{
-				children = OpponentDisplay.BlockOpponent{
-					opponent = slot.opponent,
-					overflow = 'ellipsis',
-					teamStyle = 'hybrid',
-					showPlayerTeam = true,
-				}
-			},
-			Array.map(standings.tiebreakers, function(tiebreaker, tiebreakerIndex)
-				if not tiebreaker.title then
-					return
-				end
+			TableWidgets.Cell{children = Participant{opponent = slot.opponent, disqualified = slot.disqualified}},
+			Array.map(statsToShow, function(tiebreaker, tiebreakerIndex)
 				return TableWidgets.Cell{
 					css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil},
-					children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
+					children = slot.additionalStatsValues[tiebreaker.id] and slot.additionalStatsValues[tiebreaker.id].display or ''
 				}
 			end),
 			Array.map(standings.rounds, function(columnRound)

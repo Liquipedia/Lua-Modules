@@ -45,12 +45,9 @@ end
 local function BlockCharacterPlayer(props)
 	local player = props.player
 	local charactersDisplay = getCharacters(player)
-	local playerClasses = type(props.playerClass) == 'string' and
-		{props.playerClass} or props.playerClass --[[ @as string[]? ]]
 	local useDefault = Logic.nilOr(Logic.readBoolOrNil(props.showTbd), true) or not Opponent.playerIsTbd(player)
 	local showPlayerTeam = props.showPlayerTeam
 	local block = BlockWrapper{
-		classes = playerClasses,
 		flip = props.flip,
 		showPlayerTeam = showPlayerTeam,
 		children = WidgetUtil.collect(

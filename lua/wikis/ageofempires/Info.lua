@@ -132,5 +132,10 @@ return {
 			order = 'enddate desc, pagename desc',
 			onlyTierTypeIfBoth = false,
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchdiff', 'gamediff'},
+			},
+		},
 	},
 }

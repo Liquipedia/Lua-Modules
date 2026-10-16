@@ -5,6 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+---@class BrawlStarsNotabilityCheckerConfig: NotabilityCheckerConfig
 local Config = {}
 
 -- These are constants, you don't need to touch them
@@ -194,7 +195,7 @@ Config.weights = {
 --- a first placement should score more than a 10th placement.
 ---@param tier string|integer
 ---@param tierType string
----@return fun(number, number): number
+---@return NotabilityCheckerDropOffFunction
 function Config.placementDropOffFunction(tier, tierType)
 	return function(score, placement)
 		if tierType == Config.TIER_TYPE_QUALIFIER or

@@ -20,14 +20,14 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '350px', teamStyle = 'bracket'})
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
-function CustomMatchSummary.createBody(match)
+---@return Renderable[]
+function CustomMatchSummary.createGames(match)
 	return WidgetUtil.collect(
 		CustomMatchSummary._isSolo(match) and Array.map(match.games, CustomMatchSummary._createGame) or nil
 	)
@@ -43,7 +43,7 @@ function CustomMatchSummary._isSolo(match)
 end
 
 ---@param game MatchGroupUtilGame
----@return Widget?
+---@return Renderable?
 function CustomMatchSummary._createGame(game)
 	if not game.map and not game.winner then return end
 

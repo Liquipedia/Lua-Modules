@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
+local Tournament = Lua.import('Module:Tournament')
 local Variables = Lua.import('Module:Variables')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 
@@ -25,7 +26,7 @@ local TIER_TYPE_MODIFIER = {Showmatch = 0, Misc = 0.25, Qualifier = 0.25, Monthl
 
 -- Template entry point
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.allGroupsUseWdl = true
@@ -41,12 +42,14 @@ end
 ---@param opponent BasePlacementOpponent
 ---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
-	lpdbData.publishertier = Variables.varDefault('tournament_publishertier', '')
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
+	lpdbData.publishertier = tournamentContext.publisherTier or ''
 	lpdbData.weight = CustomPrizePool.calculateWeight(
 		lpdbData.prizemoney,
-		Variables.varDefault('tournament_liquipediatier'),
+		tournamentContext.liquipediaTier,
 		placement.placeStart,
-		Variables.varDefault('tournament_liquipediatiertype'),
+		tournamentContext.liquipediaTierType,
 		HighlightConditions.tournament(lpdbData)
 	)
 

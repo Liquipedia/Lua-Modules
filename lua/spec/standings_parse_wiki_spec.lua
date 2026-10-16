@@ -1,0 +1,207 @@
+--- Triple Comment to Enable our LLS Plugin
+describe('Standings Wiki Parser', function()
+	local StandingsParseWiki = require('Module:Standings/Parse/Wiki')
+
+	describe('disqualifications', function()
+		it('reads dq input as the first round of disqualification', function()
+			assert.are_equal(1, StandingsParseWiki.parseDisqualifiedFromRound('true'))
+			assert.are_equal(1, StandingsParseWiki.parseDisqualifiedFromRound(true))
+			assert.are_equal(2, StandingsParseWiki.parseDisqualifiedFromRound('2'))
+			assert.are_equal(3, StandingsParseWiki.parseDisqualifiedFromRound(3))
+			assert.is_nil(StandingsParseWiki.parseDisqualifiedFromRound('false'))
+			assert.is_nil(StandingsParseWiki.parseDisqualifiedFromRound(''))
+			assert.is_nil(StandingsParseWiki.parseDisqualifiedFromRound(nil))
+		end)
+
+		it('stores the disqualification round on the parsed opponent', function()
+			local dqAll = StandingsParseWiki.parseWikiOpponent({type = 'literal', 'Alpha', dq = 'true'}, 2)
+			local dqFromTwo = StandingsParseWiki.parseWikiOpponent({type = 'literal', 'Bravo', dq = '2'}, 2)
+			local notDq = StandingsParseWiki.parseWikiOpponent({type = 'literal', 'Charlie'}, 2)
+
+			assert.are_equal(1, dqAll.disqualifiedFromRound)
+			assert.are_equal(2, dqFromTwo.disqualifiedFromRound)
+			assert.is_nil(notDq.disqualifiedFromRound)
+		end)
+	end)
+
+	describe('definite statuses', function()
+		it('reads r<round>bg inputs keyed by the round they apply from', function()
+			assert.are_same({[3] = 'up'}, StandingsParseWiki.parseDefiniteStatuses({r3bg = 'up'}, 5))
+			assert.are_same(
+				{[3] = 'stayup', [5] = 'up'},
+				StandingsParseWiki.parseDefiniteStatuses({r3bg = 'stayup', r5bg = 'up', r1 = '3'}, 5)
+			)
+		end)
+
+		it('ignores empty values and rounds beyond the number of rounds', function()
+			assert.are_same({[2] = 'down'}, StandingsParseWiki.parseDefiniteStatuses({r1bg = '', r2bg = 'down'}, 3))
+			assert.are_same({[1] = 'up'}, StandingsParseWiki.parseDefiniteStatuses({r1bg = 'up', r4bg = 'down'}, 3))
+		end)
+
+		it('returns nil when there are none', function()
+			assert.is_nil(StandingsParseWiki.parseDefiniteStatuses({}, 3))
+			assert.is_nil(StandingsParseWiki.parseDefiniteStatuses({r1bg = '', bg = 'up'}, 3))
+			assert.is_nil(StandingsParseWiki.parseDefiniteStatuses({r4bg = 'up'}, 3))
+		end)
+
+		it('stores the definite statuses on the parsed opponent without affecting round input', function()
+			local withStatuses = StandingsParseWiki.parseWikiOpponent(
+				{type = 'literal', 'Alpha', r1 = '3', r2 = '1', r3bg = 'up', r4bg = 'stay'}, 3)
+			local without = StandingsParseWiki.parseWikiOpponent({type = 'literal', 'Bravo', r1 = '3'}, 3)
+
+			assert.are_same({[3] = 'up'}, withStatuses.definiteStatuses)
+			assert.are_equal(3, withStatuses.rounds[1].scoreboard.points)
+			assert.are_equal(1, withStatuses.rounds[2].scoreboard.points)
+			assert.is_nil(withStatuses.rounds[3].scoreboard.points)
+			assert.is_nil(without.definiteStatuses)
+		end)
+	end)
+
+	describe('tiebreakers', function()
+		it('always puts the disqualified tiebreaker first and manual last', function()
+			assert.are_same(
+				{'full.disqualified', 'full.points', 'full.manual'},
+				StandingsParseWiki.parseTiebreakers({}, 'ffa')
+			)
+			assert.are_same(
+				{'full.disqualified', 'full.matchdiff', 'full.manual'},
+				StandingsParseWiki.parseTiebreakers({}, 'swiss')
+			)
+			assert.are_same(
+				{'full.disqualified', 'full.matchdiff', 'ml.matchwins', 'full.manual'},
+				StandingsParseWiki.parseTiebreakers({tiebreakers = '["matchdiff", "ml.matchwins"]'}, 'swiss')
+			)
+		end)
+
+		it('accepts h2hlegacy and ml tiebreakers for swiss tables', function()
+			assert.are_same(
+				{'full.disqualified', 'full.matchdiff', 'h2hlegacy.matchdiff', 'ml.gamediff', 'full.manual'},
+				StandingsParseWiki.parseTiebreakers(
+					{tiebreakers = '["matchdiff", "h2hlegacy.matchdiff", "ml.gamediff"]'}, 'swiss'
+				)
+			)
+		end)
+
+		it('rejects h2hlegacy and ml tiebreakers for ffa tables', function()
+			assert.error(function()
+				StandingsParseWiki.parseTiebreakers({tiebreakers = '["points", "h2hlegacy.matchwins"]'}, 'ffa')
+			end)
+			assert.error(function()
+				StandingsParseWiki.parseTiebreakers({tiebreakers = '["ml.points"]'}, 'ffa')
+			end)
+		end)
+	end)
+
+	describe('points', function()
+		it('defaults to the swiss points', function()
+			assert.are_same({w = 1, d = 0.5, l = 0}, StandingsParseWiki.parsePoints(nil))
+			assert.are_same({w = 1, d = 0.5, l = 0}, StandingsParseWiki.parsePoints(''))
+		end)
+
+		it('normalizes the result keys and keeps the defaults of omitted ones', function()
+			assert.are_same({w = 3, d = 0.5, l = 0}, StandingsParseWiki.parsePoints('win=3'))
+			assert.are_same({w = 3, d = 1, l = -1}, StandingsParseWiki.parsePoints('win=3, draw=1, loss=-1'))
+		end)
+
+		it('keeps score keys as given', function()
+			assert.are_same(
+				{w = 3, d = 0.5, l = 0, ['2-0'] = 4, ['0-2'] = 1},
+				StandingsParseWiki.parsePoints('win=3, 2-0=4, 0-2=1')
+			)
+		end)
+
+		it('accepts decimals and tolerates whitespace', function()
+			assert.are_same(
+				{w = 2.5, d = 0.25, l = 0, ['1-1'] = 0.75},
+				StandingsParseWiki.parsePoints('  win = 2.5 ,draw=0.25,   1-1 =  0.75 ')
+			)
+		end)
+
+		it('ignores empty entries', function()
+			assert.are_same({w = 3, d = 1, l = 0}, StandingsParseWiki.parsePoints('win=3,, draw=1,'))
+		end)
+
+		it('errors on unknown keys, non-numeric values and malformed entries', function()
+			assert.error(function() StandingsParseWiki.parsePoints('won=3') end)
+			assert.error(function() StandingsParseWiki.parsePoints('win=three') end)
+			assert.error(function() StandingsParseWiki.parsePoints('win=') end)
+			assert.error(function() StandingsParseWiki.parsePoints('win') end)
+			assert.error(function() StandingsParseWiki.parsePoints('2-=3') end)
+			assert.error(function() StandingsParseWiki.parsePoints('a-b=3') end)
+		end)
+	end)
+
+	describe('swiss scoring function', function()
+		---@param score integer?
+		---@param placement integer
+		---@param status string?
+		local function opponent(score, placement, status)
+			return {score = score, placement = placement, status = status or 'S'}
+		end
+
+		---@param opponents table[]
+		---@param winner integer?
+		---@param finished boolean?
+		local function match(opponents, winner, finished)
+			return {opponents = opponents, winner = winner, finished = finished ~= false}
+		end
+
+		---@param pointsInput string?
+		---@param matchToScore table
+		---@return number?, number?
+		local function score(pointsInput, matchToScore)
+			local scoringFunction = StandingsParseWiki.makeScoringFunction('swiss', {points = pointsInput})
+			return scoringFunction(matchToScore.opponents[1], matchToScore),
+				scoringFunction(matchToScore.opponents[2], matchToScore)
+		end
+
+		local twoNil = match({opponent(2, 1), opponent(0, 2)}, 1)
+		local twoOne = match({opponent(2, 1), opponent(1, 2)}, 1)
+
+		it('defaults to 1 for a win, 0.5 for a draw and 0 for a loss', function()
+			assert.are_same({1, 0}, {score(nil, twoNil)})
+			assert.are_same({0.5, 0.5}, {score(nil, match({opponent(1, 1), opponent(1, 1)}, 0))})
+		end)
+
+		it('uses custom result points', function()
+			local drawn = match({opponent(1, 1), opponent(1, 1)}, 0)
+			assert.are_same({3, 0}, {score('win=3', twoNil)})
+			assert.are_same({3, -1}, {score('win=3, loss=-1', twoNil)})
+			assert.are_same({1, 1}, {score('win=3, draw=1', drawn)})
+		end)
+
+		it('replaces the result points with the points of a score', function()
+			assert.are_same({4, 0}, {score('win=3, 2-0=4', twoNil)})
+			assert.are_same({3, 0}, {score('win=3, 2-0=4', twoOne)})
+		end)
+
+		it('supports scores for the losing side', function()
+			assert.are_same({3, 1}, {score('win=3, 1-2=1', twoOne)})
+			assert.are_same({3, 0}, {score('win=3, 1-2=1', twoNil)})
+			assert.are_same({3, 0.5}, {score('win=3, 0-2=0.5', twoNil)})
+		end)
+
+		it('supports scores of draws', function()
+			assert.are_same({2, 2}, {score('1-1=2', match({opponent(1, 1), opponent(1, 1)}, 0))})
+		end)
+
+		it('gives no points for unfinished matches', function()
+			assert.is_nil(score('loss=1', match({opponent(1, 1), opponent(0, 2)}, nil, false)))
+		end)
+
+		it('falls back to the result points without a score', function()
+			local walkover = match({opponent(nil, 1, 'W'), opponent(nil, 2, 'L')}, 1)
+			assert.are_same({3, 0}, {score('win=3, 0-0=9', walkover)})
+			-- a numeric score of a non scored opponent is not trusted either
+			local forfeit = match({opponent(2, 1), opponent(0, 2, 'FF')}, 1)
+			assert.are_same({3, 0}, {score('win=3, 2-0=4', forfeit)})
+			local threeWay = match({opponent(2, 1), opponent(0, 2), opponent(0, 2)}, 1)
+			local winnerPoints = score('win=3, 2-0=4', threeWay)
+			assert.are_equal(3, winnerPoints)
+		end)
+
+		it('errors on invalid points input', function()
+			assert.error(function() StandingsParseWiki.makeScoringFunction('swiss', {points = 'win=x'}) end)
+		end)
+	end)
+end)

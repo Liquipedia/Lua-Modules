@@ -71,10 +71,12 @@ function CustomActiveYears._getBroadcaster(conditions)
 end
 
 function CustomActiveYears._getYearsBroadcast(conditions)
+	---@type Set<integer>
 	local years = Set{}
 	local checkYear = function(broadcast)
 		-- set the year in which the broadcast happened as true (i.e. active)
 		local year = tonumber(string.sub(broadcast.date, 1, 4))
+		---@cast year integer
 		years:add(year)
 	end
 	local queryParameters = {

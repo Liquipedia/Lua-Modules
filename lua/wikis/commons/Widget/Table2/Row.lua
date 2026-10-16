@@ -19,12 +19,8 @@ local Table2CellHeader = Lua.import('Module:Widget/Table2/CellHeader')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Html = Lua.import('Module:Widget/Html')
 
----@class Table2RowProps
----@field children? Renderable|Renderable[]
+---@class Table2RowProps: HtmlNodeProps
 ---@field section 'head'|'body'|'subhead'?
----@field classes string[]?
----@field css {[string]: string|number|nil}?
----@field attributes {[string]: any}?
 ---@field highlighted (string|number|boolean)?
 
 ---@param rowChildren Renderable[]

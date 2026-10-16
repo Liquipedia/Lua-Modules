@@ -98,3 +98,8 @@ html:not( [ data-darkreader-scheme="dark" ] ):not( .theme--dark ) {
 #file img[ src*="darkmode" ]:hover {
 	background: url( data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAAAAAA6mKC9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAHElEQVQY02MUZoAADijNxIAG6CPAArP/x8C6AwCutQE9GsmfRAAAAABJRU5ErkJggg== ) repeat;
 }
+
+img {
+	vertical-align: middle;
+	border-style: hidden;
+}

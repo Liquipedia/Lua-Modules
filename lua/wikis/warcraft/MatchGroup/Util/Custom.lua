@@ -84,7 +84,7 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 	if match.opponentMode == TEAM_DISPLAY_MODE then
 		-- Compute submatches
 		match.submatches = Array.map(
-			MatchGroupUtil.groupBySubgroup(match),
+			match.submatches,
 			FnUtil.curry(CustomMatchGroupUtil.constructSubmatch, match)
 		)
 	end
@@ -153,6 +153,7 @@ end
 function CustomMatchGroupUtil.constructSubmatch(match, subgroup)
 	local games = subgroup.games
 	local firstGame = games[1]
+	---@type WarcraftMatchGroupUtilGameOpponent[]
 	local opponents = Table.deepCopy(firstGame.opponents)
 	local isSubmatch = String.startsWith(firstGame.map or '', 'Submatch')
 	if isSubmatch then
@@ -234,7 +235,7 @@ end
 ---@param gameOpponent WarcraftMatchGroupUtilGameOpponent
 ---@param referenceOpponent standardOpponent|WarcraftMatchGroupUtilGameOpponent
 ---@return string[]?
-function CustomMatchGroupUtil.computeOfffactions(gameOpponent, referenceOpponent)
+function CustomMatchGroupUtil.computeOffFactions(gameOpponent, referenceOpponent)
 	local gameFactions = {}
 	local hasOfffaction = false
 	for playerIndex, gamePlayer in ipairs(gameOpponent.players) do

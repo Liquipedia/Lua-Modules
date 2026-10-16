@@ -12,6 +12,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local Table = Lua.import('Module:Table')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -21,17 +22,25 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
+
 local StandingsParseLpdb = {}
 
+---@class StandingsImportOptions
+---@field exclusive boolean? # If set, only matches where every opponent is part of the standings are imported
+---@field importOpponents boolean? # If set, opponents not listed manually still count as part of the standings
+
 ---@param rounds {roundNumber: integer, matches: string[]}[]
----@param scoreMapper fun(opponent: match2opponent): number|nil
+---@param scoreMapper fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number|nil
+---@param manualOpponents StandingTableOpponentData[]
+---@param options StandingsImportOptions?
 ---@return StandingTableOpponentData[]
-function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
+function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponents, options)
 	local matchIds = Array.flatMap(rounds, function(round)
 		return round.matches
 	end)
 
-	-- No Matches in the round, cannot import
+	-- No Matches, cannot import
 	if #matchIds == 0 then
 		return {}
 	end
@@ -62,7 +71,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 		function(match2)
 			local roundNumbers = matchIdToRound[match2.match2id]
 			Array.forEach(roundNumbers, function(roundNumber)
-				StandingsParseLpdb.parseMatch(roundNumber, match2, opponents, scoreMapper, #rounds)
+				StandingsParseLpdb.parseMatch(roundNumber, match2, opponents, scoreMapper, #rounds, manualOpponents, options)
 			end)
 		end
 	)
@@ -73,24 +82,21 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 		end
 
 		local matches = {}
+		local matchPoints = {}
 
 		return {
 			opponent = opponentData.opponent,
 			rounds = Array.map(opponentData.rounds, function(roundData)
-				local match = roundData.match
-				matches = Array.append(matches, match)
+				local roundMatches = roundData.matches or {}
+				matches = Array.extend(matches, roundMatches)
+				matchPoints = Table.merge(matchPoints, roundData.matchPoints)
+				local lastMatch = roundMatches[#roundMatches]
 				return {
-					scoreboard = {
-						points = roundData.scoreboard.points,
-						match = {
-							w = roundData.scoreboard.match.w or 0,
-							l = roundData.scoreboard.match.l or 0,
-							d = roundData.scoreboard.match.d or 0,
-						},
-					},
+					scoreboard = TiebreakerScope.tally(opponentData.opponent, roundMatches, roundData.matchPoints),
 					specialstatus = roundData.specialstatus or 'nc',
 					matches = matches,
-					matchId = match and match.matchId or nil,
+					matchPoints = matchPoints,
+					matchId = lastMatch and lastMatch.matchId or nil,
 				}
 			end)
 		}
@@ -104,24 +110,76 @@ function StandingsParseLpdb.newOpponent(opponentData, maxRounds)
 	return {
 		opponent = opponentData,
 		rounds = Array.mapRange(1, maxRounds, function()
-			return {
-				scoreboard = {
-					match = {w = 0, d = 0, l = 0},
-				},
-			}
+			return {}
 		end)
 	}
+end
+
+---Renames an opponent into the manual opponent it is an alias of, if any.
+---@param opponent standardOpponent
+---@param manualOpponents StandingTableOpponentData[]
+function StandingsParseLpdb.applyAliases(opponent, manualOpponents)
+	local opponentToUse = Array.find(manualOpponents, function(manualOpponent)
+		return Array.any(manualOpponent.aliases or {}, function(alias)
+			return Opponent.same(opponent, alias)
+		end)
+	end)
+
+	if not opponentToUse or not opponentToUse.opponent then
+		return
+	end
+
+	opponent.template = opponentToUse.opponent.template
+	opponent.name = opponentToUse.opponent.name
+end
+
+---Checks whether an opponent ends up in the standings table, either because it is listed manually
+---or because it gets imported from the matches.
+---@param opponent standardOpponent
+---@param manualOpponents StandingTableOpponentData[]
+---@param importOpponents boolean?
+---@return boolean
+function StandingsParseLpdb.isPartOfStandings(opponent, manualOpponents, importOpponents)
+	local isManualOpponent = Array.any(manualOpponents, function(manualOpponent)
+		return Opponent.same(manualOpponent.opponent, opponent)
+	end)
+	if isManualOpponent then
+		return true
+	end
+	if not importOpponents then
+		return false
+	end
+
+	---Imported opponents are part of the standings too, but literal (and tbd) opponents are never imported
+	return not Opponent.isTbd(opponent)
 end
 
 ---@param roundNumber integer
 ---@param match match2
 ---@param opponents StandingTableOpponentData[]
----@param scoreMapper fun(opponent: standardOpponent): number?
+---@param scoreMapper fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number?
 ---@param maxRounds integer
-function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMapper, maxRounds)
+---@param manualOpponents StandingTableOpponentData[]
+---@param options StandingsImportOptions?
+function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMapper, maxRounds, manualOpponents, options)
+	options = options or {}
 	local match2 = MatchGroupUtil.matchFromRecord(match)
+
 	Array.forEach(match2.opponents, function(opponent)
-		---Find matching opponent
+		StandingsParseLpdb.applyAliases(opponent, manualOpponents)
+	end)
+
+	--- In exclusive mode every opponent of the match has to be part of the standings,
+	--- otherwise the match is not counted at all. In non-exclusive mode a single one is enough.
+	local opponentCheck = options.exclusive and Array.all or Array.any
+	local isRelevantMatch = opponentCheck(match2.opponents, function(opponent)
+		return StandingsParseLpdb.isPartOfStandings(opponent, manualOpponents, options.importOpponents)
+	end)
+	if not isRelevantMatch then
+		return
+	end
+
+	Array.forEach(match2.opponents, function(opponent)
 		local standingsOpponentData = Array.find(opponents, function(opponentData)
 			return Opponent.same(opponentData.opponent, opponent)
 		end)
@@ -131,18 +189,15 @@ function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMappe
 		end
 		assert(standingsOpponentData.rounds[roundNumber], 'Round number out of bounds')
 
+		-- The scoreboard of the round is tallied from these in importFromMatches
 		local opponentRoundData = standingsOpponentData.rounds[roundNumber]
-		local points = scoreMapper(opponent)
-		if points then
-			opponentRoundData.scoreboard.points = (opponentRoundData.scoreboard.points or 0) + points
-		end
 		opponentRoundData.specialstatus = ''
-		opponentRoundData.match = match2
-		if not match2.finished then
-			return
+		opponentRoundData.matches = Array.append(opponentRoundData.matches or {}, match2)
+		local points = scoreMapper(opponent, match2)
+		if points then
+			opponentRoundData.matchPoints = opponentRoundData.matchPoints or {}
+			opponentRoundData.matchPoints[match2.matchId] = points
 		end
-		local matchResult = match2.winner == 0 and 'd' or opponent.placement == 1 and 'w' or 'l'
-		opponentRoundData.scoreboard.match[matchResult] = (opponentRoundData.scoreboard.match[matchResult] or 0) + 1
 	end)
 end
 

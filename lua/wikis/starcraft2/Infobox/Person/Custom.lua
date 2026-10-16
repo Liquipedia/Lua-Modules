@@ -35,7 +35,7 @@ MILITARY_DATA.pending = MILITARY_DATA.starting
 MILITARY_DATA.started = MILITARY_DATA.ongoing
 MILITARY_DATA.ending = MILITARY_DATA.ongoing
 
----@class SC2CustomPerson: Person
+---@class SC2CustomPerson: InfoboxPerson
 local CustomPerson = Class.new(Person)
 
 ---@param args table

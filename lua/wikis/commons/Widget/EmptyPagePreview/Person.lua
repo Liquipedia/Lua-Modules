@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local BroadcasterTable = Lua.import('Module:BroadcastTalentTable')
-local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Infobox = Lua.import('Module:Infobox/Person/Player/Custom')
@@ -23,9 +22,9 @@ local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 local Variables = Lua.import('Module:Variables')
 
-local PlayerAutoTeamNavBox = Lua.import('Module:Widget/NavBox/AutoTeam/Player')
+local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
-local Widget = Lua.import('Module:Widget')
+local PlayerAutoTeamNavBox = Lua.import('Module:Widget/NavBox/AutoTeam/Player')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Condition = Lua.import('Module:Condition')
@@ -37,13 +36,11 @@ local ColumnName = Condition.ColumnName
 
 local DEFAULT_MAX_PLAYERS_PER_PLACEMENT = Info.config.defaultMaxPlayersPerPlacement or 10
 
----@class EmptyPersonPagePreview: Widget
----@operator call(table): EmptyPersonPagePreview
-local EmptyPersonPagePreview = Class.new(Widget)
-EmptyPersonPagePreview.defaultProps = {pageName = mw.title.getCurrentTitle().prefixedText}
+local Helpers = {}
 
----@return Widget?
-function EmptyPersonPagePreview:render()
+---@param props {pageName: string}
+---@return VNode?
+local EmptyPersonPagePreview = function(props)
 	if not Namespace.isMain() then
 		return
 	end
@@ -51,9 +48,9 @@ function EmptyPersonPagePreview:render()
 	--disable storage ... just to be sure ...
 	Variables.varDefine('disable_LPDB_storage', 'true')
 
-	self.person = Page.applyUnderScoresIfEnforced(self.props.pageName)
+	local person = Page.applyUnderScoresIfEnforced(props.pageName)
 
-	local infobox = self:_infobox()
+	local infobox = Helpers._infobox(person, props.pageName)
 	if not infobox then
 		return
 	end
@@ -62,8 +59,8 @@ function EmptyPersonPagePreview:render()
 		children = WidgetUtil.collect(
 			infobox,
 			Html.H2{children = {'Overview'}},
-			self:_results(),
-			self:_matches(),
+			Helpers._results(person),
+			Helpers._matches(person),
 			Html.Br{},
 			PlayerAutoTeamNavBox{}
 		),
@@ -71,9 +68,11 @@ function EmptyPersonPagePreview:render()
 end
 
 ---@private
----@return Widget?
-function EmptyPersonPagePreview:_infobox()
-	local infoboxArgsFromSquadInfo = self:_backfillInformationFromSquadInfo()
+---@param person string
+---@param pageNameInput string
+---@return Renderable?
+function Helpers._infobox(person, pageNameInput)
+	local infoboxArgsFromSquadInfo = Helpers._backfillInformationFromSquadInfo(person)
 
 	local infoboxArgs = Table.merge(
 		{
@@ -81,7 +80,7 @@ function EmptyPersonPagePreview:_infobox()
 			defaultDark = 'Infobox player NoImage darkmode.png',
 		},
 		infoboxArgsFromSquadInfo,
-		self:_backfillInformationFromPlacements()
+		Helpers._backfillInformationFromPlacements(person)
 	)
 	table.insert(infoboxArgs.idsArray, infoboxArgsFromSquadInfo.id)
 	if Logic.isEmpty(infoboxArgs.idsArray) then
@@ -92,19 +91,20 @@ function EmptyPersonPagePreview:_infobox()
 		return id ~= infoboxArgs.id
 	end)
 	infoboxArgs.ids = table.concat(infoboxArgs.idsArray, ', ')
-	infoboxArgs.id = infoboxArgs.id or self.props.pageName
+	infoboxArgs.id = infoboxArgs.id or pageNameInput
 
 	return Infobox.run(infoboxArgs)
 end
 
 ---@private
----@return Widget[]
-function EmptyPersonPagePreview:_matches()
+---@param person string
+---@return Renderable[]
+function Helpers._matches(person)
 	return {
 		Html.H3{children = 'Most Recent Matches'},
 		MatchTable.results{
 			tableMode = 'solo',
-			player = self.person,
+			player = person,
 			showType = true,
 			limit = 10,
 		}
@@ -112,14 +112,15 @@ function EmptyPersonPagePreview:_matches()
 end
 
 ---@private
----@return (Widget|Html)[]
-function EmptyPersonPagePreview:_results()
-	---@type table<string, string|boolean|Widget>
+---@param person string
+---@return (Renderable|Html)[]
+function Helpers._results(person)
+	---@type table<string, boolean|Renderable>
 	local tabArgs = {
 		suppressHeader = true,
 		name1 = 'Achievements',
 		content1 = ResultsTable.results{
-			player = self.person,
+			player = person,
 			showType = true,
 			gameIcons = true,
 			awards = false,
@@ -130,7 +131,7 @@ function EmptyPersonPagePreview:_results()
 	local index = 2
 
 	local awardsAchievements = ResultsTable.awards{
-		player = self.person,
+		player = person,
 		showType = true,
 		gameIcons = true,
 		awards = true,
@@ -144,7 +145,7 @@ function EmptyPersonPagePreview:_results()
 	end
 
 	local talentAchievements = BroadcasterTable.run{
-		broadcaster = self.person,
+		broadcaster = person,
 		achievements = true,
 		useTickerNames = true,
 	}
@@ -161,16 +162,17 @@ end
 
 --- checks the last 100 placements for the wanted data
 ---@private
+---@param person string
 ---@return table
-function EmptyPersonPagePreview:_backfillInformationFromPlacements()
+function Helpers._backfillInformationFromPlacements(person)
 	local personConditions = ConditionTree(BooleanOperator.any)
 		-- players
 		:add(Array.mapRange(1, DEFAULT_MAX_PLAYERS_PER_PLACEMENT, function(index)
-			return ConditionNode(ColumnName('p' .. index, 'opponentplayers'), Comparator.eq, self.person)
+			return ConditionNode(ColumnName('p' .. index, 'opponentplayers'), Comparator.eq, person)
 		end))
 		-- coaches (etc)
 		:add(Array.mapRange(1, 5, function(index)
-			return ConditionNode(ColumnName('c' .. index, 'opponentplayers'), Comparator.eq, self.person)
+			return ConditionNode(ColumnName('c' .. index, 'opponentplayers'), Comparator.eq, person)
 		end))
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
@@ -199,10 +201,10 @@ function EmptyPersonPagePreview:_backfillInformationFromPlacements()
 	local getPerson = function(personData)
 		local index = 1
 		while personData['p' .. index] or personData['c' .. index] do
-			if personData['p' .. index] == self.person then
+			if personData['p' .. index] == person then
 				return Opponent.playerFromLpdbStruct(personData, index)
 			end
-			if personData['c' .. index] == self.person then
+			if personData['c' .. index] == person then
 				return Opponent.staffFromLpdbStruct(personData, index)
 			end
 			index = index + 1
@@ -210,17 +212,17 @@ function EmptyPersonPagePreview:_backfillInformationFromPlacements()
 	end
 
 	Array.forEach(Array.reverse(placements), function(placement)
-		local person = getPerson(placement.opponentplayers)
-		if not person then
+		local personData = getPerson(placement.opponentplayers)
+		if not personData then
 			return
 		end
 
-		local id = Logic.nilIfEmpty(person.displayName)
+		local id = Logic.nilIfEmpty(personData.displayName)
 		table.insert(infoboxArgs.idsArray, id)
 		Table.mergeInto(infoboxArgs, {
 			id = id,
-			country = person.flag,
-			faction = person.faction,
+			country = personData.flag,
+			faction = personData.faction,
 		})
 	end)
 
@@ -228,10 +230,11 @@ function EmptyPersonPagePreview:_backfillInformationFromPlacements()
 end
 
 ---@private
+---@param person string
 ---@return table
-function EmptyPersonPagePreview:_backfillInformationFromSquadInfo()
+function Helpers._backfillInformationFromSquadInfo(person)
 	local squadEntry = mw.ext.LiquipediaDB.lpdb('squadplayer', {
-		conditions = tostring(ConditionNode(ColumnName('link'), Comparator.eq, self.person)),
+		conditions = tostring(ConditionNode(ColumnName('link'), Comparator.eq, person)),
 		query = 'name, id, nationality, leavedate, inactivedate, pagename, extradata',
 		order = 'joindate desc',
 		limit = 1,
@@ -255,4 +258,4 @@ function EmptyPersonPagePreview:_backfillInformationFromSquadInfo()
 	return infoboxArgs
 end
 
-return EmptyPersonPagePreview
+return Component.component(EmptyPersonPagePreview, {pageName = mw.title.getCurrentTitle().prefixedText})

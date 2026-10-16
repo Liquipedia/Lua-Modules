@@ -10,20 +10,30 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 
 ---@alias TiebreakerOpponent {opponent: standardOpponent, points: number, matches: MatchGroupUtilMatch[],
----match: {w: integer, d: integer, l:integer}, extradata: table}
+---matchPoints: table<string, number>?, match: {w: integer, d: integer, l:integer}, extradata: table,
+---startingPoints: number?}
+
+---@alias StandingsDrawLevel 'match'|'game'|'round'
+
+---A number, or a list of numbers that is compared lexicographically
+---@alias StandingsTiebreakerValue number|number[]
+
+---@class StandingsTiebreakerOptions
+---@field draws table<StandingsDrawLevel, boolean>?
 
 ---@class StandingsTiebreaker
----@field context 'full'|'ml'|'h2h'
----@field valueOf fun(self: StandingsTiebreaker, state:TiebreakerOpponent[], opponent: TiebreakerOpponent): integer
+---@field context 'full'|'ml'|'h2hlegacy'
+---@field options StandingsTiebreakerOptions
 ---@field display fun(self: StandingsTiebreaker, state:TiebreakerOpponent[], opponent: TiebreakerOpponent): string
 ---@field headerTitle fun(self: StandingsTiebreaker): string
-local StandingsTiebreaker = Class.new(function (self, context)
+local StandingsTiebreaker = Class.new(function (self, context, options)
 	self.context = context
+	self.options = options or {}
 end)
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
----@return integer
+---@return StandingsTiebreakerValue
 function StandingsTiebreaker:valueOf(state, opponent)
 	error('This is an Interface')
 end
@@ -41,9 +51,15 @@ function StandingsTiebreaker:display(state, opponent)
 	return tostring(self:valueOf(state, opponent))
 end
 
----@return 'full'|'ml'|'h2h'
+---@return 'full'|'ml'|'h2hlegacy'
 function StandingsTiebreaker:getContextType()
 	return self.context
+end
+
+---@param level StandingsDrawLevel
+---@return boolean
+function StandingsTiebreaker:showsDraws(level)
+	return (self.options.draws or {})[level] == true
 end
 
 return StandingsTiebreaker

@@ -30,42 +30,104 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 		args: ['--disable-web-security']
 	});
 	const page = await browser.newPage({ viewport: VIEWPORT });
+
+	// The template pulls stylesheets and fonts over the network. If one of them
+	// does not arrive the page still renders, just unstyled, and we would
+	// happily screenshot that and treat it as the truth. Collect anything that
+	// failed so we can bail out instead.
+	const missingResources = new Map();
+	const isRequired = (resourceType) => ['stylesheet', 'script', 'font'].includes(resourceType);
+	const recordMissing = (url, reason) => {
+		if (!missingResources.has(url)) {
+			missingResources.set(url, reason);
+		}
+	};
+
+	page.on('requestfailed', (request) => {
+		if (isRequired(request.resourceType())) {
+			const failure = request.failure();
+			recordMissing(request.url(), failure ? failure.errorText : 'request failed');
+		}
+	});
+	page.on('response', (response) => {
+		// 3xx is fine, the redirect target gets its own response event
+		if (isRequired(response.request().resourceType()) && response.status() >= 400) {
+			recordMissing(response.url(), `HTTP ${response.status()}`);
+		}
+	});
+
 	await page.goto(`file://${htmlPath}`, {waitUntil: "networkidle"});
-	const newScreenshotBuffer = await page.screenshot({ animations: 'disabled' });
+	const lightScreenshotBuffer = await page.screenshot({ animations: 'disabled' });
+
+	await page.locator('html').evaluate(element => {element.classList.add('theme--dark'); element.classList.remove('theme--light');});
+	const darkScreenshotBuffer = await page.screenshot({ animations: 'disabled' });
+
 	await browser.close();
 
-	if (shouldUpdate || !existsSync(referencePath)) {
-		// Update snapshot, either forced or previous snapshot doesn't exist yet
-		mkdirSync(SNAPSHOT_DIR, { recursive: true });
-		writeFileSync(referencePath, newScreenshotBuffer);
-		process.exit(0);
-	} else {
-		// Compare with existing snapshot
-		const referenceImage = PNG.sync.read(readFileSync(referencePath));
-		const newImage = PNG.sync.read(newScreenshotBuffer);
-		const { width, height } = referenceImage;
+	// Combine both screenshots into one
+	let pngLight = PNG.sync.read(lightScreenshotBuffer);
+	let pngDark = PNG.sync.read(darkScreenshotBuffer);
 
-		const diffImage = new PNG({ width, height });
+	const {width: lightWidth, height: lightHeight} = pngLight;
+	const {width: darkWidth, height: darkHeight} = pngDark;
 
-		const mismatchedPixels = pixelmatch(
-			referenceImage.data,
-			newImage.data,
-			diffImage.data,
-			width,
-			height,
-			PIXELMATCH_OPTIONS
-		);
+	const combined = new PNG({width: Math.max(lightWidth, darkWidth), height: lightHeight + darkHeight});
 
-		if (mismatchedPixels === 0) {
-			process.exit(0);
-		} else {
-			// Failure, let's save the diff and the new failed image for manual inspection
-			mkdirSync(SNAPSHOT_DIFF_DIR, { recursive: true });
+	PNG.bitblt(pngLight, combined, 0, 0, lightWidth, lightHeight, 0, 0);
+	PNG.bitblt(pngDark, combined, 0, 0, darkWidth, darkHeight, 0, lightHeight);
 
-			writeFileSync(join(SNAPSHOT_DIFF_DIR, `${testName}-diff.png`), PNG.sync.write(diffImage));
-			writeFileSync(join(SNAPSHOT_DIFF_DIR, `${testName}-new.png`), newScreenshotBuffer);
-
-			process.exit(1);
-		}
+	if (missingResources.size > 0) {
+		console.error(`Error: '${testName}' rendered without resources it needs, refusing to use the result.`);
+		missingResources.forEach((reason, url) => console.error(`  - ${url} (${reason})`));
+		process.exit(1);
 	}
+
+	const writeReference = () => {
+		mkdirSync(SNAPSHOT_DIR, { recursive: true });
+		writeFileSync(referencePath, PNG.sync.write(combined));
+	};
+
+	if (!existsSync(referencePath)) {
+		writeReference();
+		process.exit(0);
+	}
+
+	// Compare with existing snapshot
+	const referenceImage = PNG.sync.read(readFileSync(referencePath));
+	const { width, height } = referenceImage;
+	const sameSize = width === combined.width && height === combined.height;
+
+	const diffImage = new PNG({ width, height });
+
+	// pixelmatch throws on differently sized images, and a size change is a mismatch anyway
+	const mismatchedPixels = sameSize ? pixelmatch(
+		referenceImage.data,
+		combined.data,
+		diffImage.data,
+		width,
+		height,
+		PIXELMATCH_OPTIONS
+	) : Infinity;
+
+	if (mismatchedPixels === 0) {
+		// Leave the reference untouched even when updating. CI runners with different CPUs
+		// anti-alias rounded corners a shade apart, and rewriting on that noise makes the
+		// snapshots flip back and forth between PRs.
+		process.exit(0);
+	}
+
+	if (shouldUpdate) {
+		writeReference();
+		process.exit(0);
+	}
+
+	// Failure, let's save the diff and the new failed image for manual inspection
+	mkdirSync(SNAPSHOT_DIFF_DIR, { recursive: true });
+
+	if (sameSize) {
+		writeFileSync(join(SNAPSHOT_DIFF_DIR, `${testName}-diff.png`), PNG.sync.write(diffImage));
+	}
+	writeFileSync(join(SNAPSHOT_DIFF_DIR, `${testName}-new.png`), PNG.sync.write(combined));
+
+	process.exit(1);
 })();

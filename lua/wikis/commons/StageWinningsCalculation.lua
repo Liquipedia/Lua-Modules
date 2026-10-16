@@ -8,8 +8,9 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent/Custom')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local Condition = Lua.import('Module:Condition')
@@ -21,70 +22,115 @@ local ColumnName = Condition.ColumnName
 
 local StageWinningsCalculation = {}
 
+---@alias StageWinningsOpponent {
+---opponent: standardOpponent,
+---matchWins: integer,
+---matchLosses: integer,
+---matchDraws: integer,
+---gameWins: integer,
+---gameLosses: integer,
+---winnings: number,
+---scoreDetails: table<string, integer>,
+---points: number,
+---points2: number,
+---}
+
 ---@param props {matchGroupsSpecProps: table<string, string>, startDate: integer?, endDate: integer?, mode: string,
 ---startValue: number, valuePerWin: number, valueByScore: table<string, number>?,
 ---pointsStart: number, pointsPerWin: number, pointsByScore: table<string, number>?,
----points2Start: number, points2PerWin: number, points2ByScore: table<string, number>?, hideWinnings: boolean}
----@return {opponent: standardOpponent, matchWins: integer, matchLosses: integer, gameWins: integer,
----gameLosses: integer, winnings: number, scoreDetails: table<string, integer>, points: number, points2: number}[]
+---points2Start: number, points2PerWin: number, points2ByScore: table<string, number>?,
+---gameCountDefaultResult: number?, hideWinnings: boolean}
+---@return StageWinningsOpponent[]
 function StageWinningsCalculation.run(props)
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = StageWinningsCalculation._buildConditions(props),
-		query = 'match2opponents, winner',
+		query = 'match2opponents, winner, bestof',
 		limit = 5000
 	})
 	matches = Array.filter(matches, function(match)
 		return #match.match2opponents == 2
 	end)
 
-	local byName = {}
+	---@type StageWinningsOpponent[]
+	local opponents = {}
+
+	local function getOpponentIndex(opponent)
+		return Array.indexOf(opponents, function(entry)
+			return Opponent.same(opponent, entry.opponent)
+		end)
+	end
 
 	Array.forEach(matches, function(match)
 		match.opponents = Array.map(match.match2opponents, Opponent.fromMatch2Record)
-		Array.forEach(match.opponents, function(opponent, opponentIndex)
-			local identifier = Opponent.toName(opponent)
-			opponent.name = identifier
-			opponent.score = match.match2opponents[opponentIndex].score
-			opponent.status = match.match2opponents[opponentIndex].status
-			byName[identifier] = byName[identifier] or {
-				opponent = opponent,
-				scoreDetails = {},
-				matchWins = 0,
-				matchLosses = 0,
-				gameWins = 0,
-				gameLosses = 0,
-				winnings = 0,
-				points = 0,
-				points2 = 0,
-			}
+		Array.forEach(match.opponents, function(opponent, matchOpponentIndex)
+			opponent.score = match.match2opponents[matchOpponentIndex].score
+			opponent.status = match.match2opponents[matchOpponentIndex].status
+
+			opponent.globalIndex = getOpponentIndex(opponent)
+			if opponent.globalIndex == 0 then
+				opponent.globalIndex = #opponents + 1
+				table.insert(opponents, {
+					opponent = opponent,
+					scoreDetails = {},
+					matchWins = 0,
+					matchLosses = 0,
+					matchDraws = 0,
+					gameWins = 0,
+					gameLosses = 0,
+					winnings = 0,
+					points = 0,
+					points2 = 0,
+				})
+			end
 		end)
 
 		local winnerId = tonumber(match.winner)
-		if winnerId ~= 1 and winnerId ~= 2 then return end
-		local loserId = 3 - winnerId
 
-		local winner = match.opponents[winnerId]
-		local loser = match.opponents[loserId]
+		local opponent1 = match.opponents[1]
+		local opponent2 = match.opponents[2]
 
-		local winnerScore = OpponentDisplay.InlineScore(winner)
-		local loserScore = OpponentDisplay.InlineScore(loser)
+		local opponent1Score = Opponent.getScoreValue(opponent1)
+		local opponent2Score = Opponent.getScoreValue(opponent2)
 
-		local score = winnerScore .. '-' .. loserScore
-		local reversedScore = loserScore .. '-' .. winnerScore
+		local score = opponent1Score .. '-' .. opponent2Score
+		local reversedScore = opponent2Score .. '-' .. opponent1Score
 
-		byName[winner.name].scoreDetails[score] = (byName[winner.name].scoreDetails[score] or 0) + 1
-		byName[loser.name].scoreDetails[reversedScore] = (byName[loser.name].scoreDetails[reversedScore] or 0) + 1
+		opponents[opponent1.globalIndex].scoreDetails[score] = (opponents[opponent1.globalIndex].scoreDetails[score] or 0) + 1
+		opponents[opponent2.globalIndex].scoreDetails[reversedScore]
+			= (opponents[opponent2.globalIndex].scoreDetails[reversedScore] or 0) + 1
 
-		byName[winner.name].matchWins = byName[winner.name].matchWins + 1
-		byName[loser.name].matchLosses = byName[loser.name].matchLosses + 1
+		if winnerId == 1 then
+			opponents[opponent1.globalIndex].matchWins = opponents[opponent1.globalIndex].matchWins + 1
+			opponents[opponent2.globalIndex].matchLosses = opponents[opponent2.globalIndex].matchLosses + 1
+		elseif winnerId == 2 then
+			opponents[opponent2.globalIndex].matchWins = opponents[opponent2.globalIndex].matchWins + 1
+			opponents[opponent1.globalIndex].matchLosses = opponents[opponent1.globalIndex].matchLosses + 1
+		else
+			opponents[opponent1.globalIndex].matchDraws = opponents[opponent1.globalIndex].matchDraws + 1
+			opponents[opponent2.globalIndex].matchDraws = opponents[opponent2.globalIndex].matchDraws + 1
+		end
 
-		byName[winner.name].gameWins = byName[winner.name].gameWins + (tonumber(winner.score) or 0)
-		byName[loser.name].gameLosses = byName[loser.name].gameLosses + (tonumber(winner.score) or 0)
-		byName[winner.name].gameLosses = byName[winner.name].gameLosses + (tonumber(loser.score) or 0)
-		byName[loser.name].gameWins = byName[loser.name].gameWins + (tonumber(loser.score) or 0)
+		local numberOfGamesForScoreValue = function(scoreValue)
+			if Logic.isNumeric(scoreValue) then
+				return tonumber(scoreValue)
+			elseif Logic.isEmpty(scoreValue) or scoreValue ~= MatchGroupInputUtil.STATUS.DEFAULT_WIN then
+				return 0
+			end
+			return props.gameCountDefaultResult or math.ceil((match.bestof or 0) / 2)
+		end
+
+		local gamesWonOpponent1 = numberOfGamesForScoreValue(opponent1Score)
+		local gamesWonOpponent2 = numberOfGamesForScoreValue(opponent2Score)
+
+		opponents[opponent1.globalIndex].gameWins
+			= opponents[opponent1.globalIndex].gameWins + gamesWonOpponent1
+		opponents[opponent2.globalIndex].gameLosses
+			= opponents[opponent2.globalIndex].gameLosses + gamesWonOpponent1
+		opponents[opponent1.globalIndex].gameLosses
+			= opponents[opponent1.globalIndex].gameLosses + gamesWonOpponent2
+		opponents[opponent2.globalIndex].gameWins
+			= opponents[opponent2.globalIndex].gameWins + gamesWonOpponent2
 	end)
-
-	local opponents = Array.extractValues(byName)
 
 	Array.forEach(opponents, function(opponent)
 		if props.mode == 'matchWins' then

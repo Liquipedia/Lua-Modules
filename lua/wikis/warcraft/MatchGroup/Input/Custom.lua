@@ -48,7 +48,6 @@ local MatchFunctions = {
 	},
 }
 local MapFunctions = {
-	ADD_SUB_GROUP = true,
 	BREAK_ON_EMPTY = true,
 }
 local FfaMatchFunctions = {
@@ -178,14 +177,15 @@ function MatchFunctions.getExtraData(match, games, opponents)
 		extradata[prefix .. 'by'] = match[prefix .. 'by']
 	end
 
-	Table.mergeInto(extradata, Table.filterByKey(match, function(key) return key:match('subgroup%d+header') end))
+	-- TODO: Bot away special prefix
+	Table.mergeInto(extradata, MatchGroupInputUtil.readSetHeaders(match, 'subgroup'))
 
 	return extradata
 end
 
 ---@param match table
 ---@param opponents table[]
----@return string?
+---@return string?, string?
 function MatchFunctions.getHeadToHeadLink(match, opponents)
 	if #opponents ~= 2 or Array.any(opponents, function(opponent)
 		return opponent.type ~= Opponent.solo or not ((opponent.match2players or {})[1] or {}).name end)
@@ -193,12 +193,19 @@ function MatchFunctions.getHeadToHeadLink(match, opponents)
 		return
 	end
 
-	return (tostring(mw.uri.fullUrl('Special:RunQuery/Head-to-Head'))
+	return ((tostring(mw.uri.fullUrl('Special:RunQuery/Head-to-Head'))
 		.. '?pfRunQueryFormName=Head-to-Head&Head+to+head+query%5Bplayer%5D='
 		.. opponents[1].match2players[1].name
 		.. '&Head_to_head_query%5Bopponent%5D='
 		.. opponents[2].match2players[1].name
-		.. '&wpRunQuery=Run+query'):gsub(' ', '_')
+		.. '&wpRunQuery=Run+query'):gsub(' ', '_')),
+		tostring(mw.uri.fullUrl(
+			'Special:RunQuery/H2H',
+			{
+				['player'] = opponents[1].match2players[1].name,
+				['opponent'] = opponents[2].match2players[1].name,
+			}
+		))
 end
 
 ---@param game table

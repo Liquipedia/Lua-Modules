@@ -21,7 +21,7 @@ local DEFAULT_HIGHLIGHTABLE_VALUES = {
 
 --- Check arguments or queryData if the tournament should be highlighted
 ---@param data table
----@param options table
+---@param options table?
 ---@return boolean
 function HighlightConditions.tournament(data, options)
 	options = options or {}

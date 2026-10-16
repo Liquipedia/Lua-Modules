@@ -30,7 +30,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local SIZE_AGENT = '20px'
 
----@class ValorantPlayerInfobox: Person
+---@class ValorantPlayerInfobox: InfoboxPerson
 ---@operator call(Frame): ValorantPlayerInfobox
 local CustomPlayer = Class.new(Player)
 

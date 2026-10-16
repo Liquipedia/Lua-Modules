@@ -76,13 +76,22 @@ return {
 			excludeTierTypes = {'Qualifier', 'Charity'},
 			showPatches = true,
 		},
-		forceUnderscores = true, -- applies to several components
+		forceUnderscores = true,
 		infoboxPlayer = {
 			autoTeam = true,
 			automatedHistory = {
 				mode = 'manualPrio',
 				storeFromWikiCode = true,
 			},
+		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchdiff', 'gamediff'},
+			},
+		},
+		participants = {
+			soloAsFactionTable = true,
+			sortPlayersInTable = true,
 		},
 	},
 }

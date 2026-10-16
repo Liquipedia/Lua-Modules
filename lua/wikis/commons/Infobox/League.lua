@@ -281,7 +281,7 @@ function League:_parseArgs()
 	self:customParseArguments(args)
 end
 
----@private
+---@protected
 ---@param args table
 ---@param endDate string?
 ---@return number|string?, number?, string?
@@ -345,7 +345,7 @@ function League:_getCategories(args)
 end
 
 ---@private
----@return Widget?
+---@return Renderable?
 function League:_createUpcomingMatches()
 	if not self:shouldStore(self.args) then
 		return nil

@@ -28,13 +28,13 @@ local DEFAULT_CARD = 'default'
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return Renderable[]
 function CustomMatchSummary.createBody(match)
 	local isTeamGame = Array.any(match.opponents, function(opponent) return opponent.type == Opponent.team end)
 	local games
@@ -55,13 +55,13 @@ end
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@param date string
----@return Widget
+---@return Renderable
 function CustomMatchSummary._createGame(game, gameIndex, date)
 	local cardData = Array.map(game.opponents, function(opponent)
 		return Array.map(opponent.players or {}, function(player)
 			if Logic.isDeepEmpty(player) then return end
 			local playerCards = player.cards or {}
-			local cards = Array.map(Array.range(1, NUM_CARDS_PER_PLAYER), function(idx)
+			local cards = Array.mapRange(1, NUM_CARDS_PER_PLAYER, function(idx)
 				return playerCards[idx] or DEFAULT_CARD end)
 			---@cast cards table
 			cards.tower = playerCards.tower
@@ -91,7 +91,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return Renderable[]
 function CustomMatchSummary._createTeamMatchBody(match)
 	local _, subMatches = Array.groupBy(match.games, Operator.property('subgroup'))
 	subMatches = Array.map(subMatches, function(subMatch)
@@ -115,7 +115,7 @@ end
 ---@param subMatchIndex integer
 function CustomMatchSummary._getSubMatchOpponentsAndPlayers(match, subMatch, subMatchIndex)
 	subMatch.players = CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, match)
-	subMatch.opponents = Array.map(Array.range(1, #subMatch.players), function(opponentIndex)
+	subMatch.opponents = Array.mapRange(1, #subMatch.players, function(opponentIndex)
 		local score, status = MatchGroupInputUtil.computeOpponentScore(
 			{opponentIndex = opponentIndex},
 			FnUtil.curry(CustomMatchSummary.computeSubMatchScore, subMatch.games)
@@ -168,7 +168,7 @@ function CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, ma
 		end)
 		local indexes = Logic.nilIfEmpty(Array.extractKeys(hash))
 		local maxIndex = indexes and math.max(unpack(Array.extractKeys(hash))) or 0
-		return Array.map(Array.range(1, maxIndex), function(playerIndex)
+		return Array.mapRange(1, maxIndex, function(playerIndex)
 			local matchPlayer = match.opponents[opponentIndex].players[playerIndex]
 			return hash[playerIndex] and (matchPlayer or hash[playerIndex]) or nil
 		end)
@@ -179,7 +179,7 @@ end
 ---@param subMatchIndex integer
 ---@param subMatch table
 ---@param extradata table
----@return Widget
+---@return Renderable
 function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, extradata)
 	-- Add submatch header
 	local header
@@ -203,7 +203,7 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 		:css('text-align', 'right')
 		:css('width', '40%')
 		:node(OpponentDisplay.BlockPlayers{
-			opponent = {players = players[1]},
+			opponent = {players = players[1], type = 'solo', extradata = {}},
 			overflow = 'ellipsis',
 			showLink = true,
 			flip = true,
@@ -230,7 +230,7 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 		:css('text-align', 'left')
 		:css('width', '40%')
 		:node(OpponentDisplay.BlockPlayers{
-			opponent = {players = players[2]},
+			opponent = {players = players[2], type = 'solo', extradata = {}},
 			overflow = 'ellipsis',
 			showLink = true,
 			flip = false,

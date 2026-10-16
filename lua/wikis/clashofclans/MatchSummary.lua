@@ -20,7 +20,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px'})
 end
@@ -53,11 +53,10 @@ function CustomMatchSummary._time(game, opponentIndex)
 		:wikitext(Abbreviation.make{text = '(' .. os.date('%M:%S', time) .. ')', title = 'Total Time'})
 end
 
----@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return Widget?
-function CustomMatchSummary.createGame(date, game, gameIndex)
+---@return Renderable?
+function CustomMatchSummary.createGame(game, gameIndex)
 	local scores = Array.map(game.opponents, Operator.property('score'))
 	if Table.isEmpty(scores) then
 		return

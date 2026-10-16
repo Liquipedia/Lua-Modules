@@ -7,6 +7,21 @@
 
 local MathUtil = {}
 
+---Precalculated value of `ln(2)`
+local ln2 = math.log(2)
+
+--[[
+Returns true if argument is NaN (not a number).
+]]
+---@param x number
+---@return boolean
+function MathUtil.isNaN(x)
+	if type(x) ~= 'number' then
+		return false
+	end
+	return x ~= x
+end
+
 --[[
 Converts the argument to an integer.
 ]]
@@ -44,7 +59,7 @@ MathUtil.ilog2(24) -- Returns 4
 ---@param x number
 ---@return integer
 function MathUtil.ilog2(x)
-	return math.floor(math.log(x) / math.log(2))
+	return math.floor(math.log(x) / ln2)
 end
 
 --[[

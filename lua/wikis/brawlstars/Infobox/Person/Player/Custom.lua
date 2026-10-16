@@ -25,7 +25,7 @@ local Html = Lua.import('Module:Widget/Html')
 local Cell = Widgets.Cell
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class BrawlstarsInfoboxPlayer: Person
+---@class BrawlstarsInfoboxPlayer: InfoboxPerson
 ---@operator call(Frame): BrawlstarsInfoboxPlayer
 local CustomPlayer = Class.new(Player)
 

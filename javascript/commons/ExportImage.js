@@ -1,9 +1,9 @@
-/* global html2canvas */
+/* global snapdom */
 
 /*******************************************************************************
  * Description: Adds export functionality to Liquipedia pages, enabling users
- *              to copy or download group tables, crosstables, brackets, and
- *              match lists as images.
+ *              to copy or download brackets, group tables, prize pools,
+ *              standings, participant lists and other tables as images.
  ******************************************************************************/
 
 const EXPORT_IMAGE_CONFIG = {
@@ -36,7 +36,26 @@ const EXPORT_IMAGE_CONFIG = {
 	},
 	TIMEOUTS: {
 		IMAGE_LOAD: 5000,
-		URL_REVOKE_DELAY: 100
+		URL_REVOKE_DELAY: 100,
+		STYLESHEET_LOAD: 10000,
+		FONT_READY: 5000,
+		CLONED_IMAGES: 5000
+	},
+	CAPTURE: {
+		// Responsive layout is driven by viewport media queries, so exports are
+		// rendered in a frame of this width instead of the reader's window.
+		LAYOUT_WIDTH: 1440,
+		// snapdom clamps its SVG raster to this many pixels per side.
+		MAX_RASTER_SIDE: 16384,
+		// Browsers cap total canvas area well below MAX_RASTER_SIDE squared, so
+		// a near-square export can fail on a side length that looks safe. This is
+		// the largest square Firefox will allocate, the tightest of the desktop
+		// browsers; drop it if an iOS export ever comes back blank.
+		MAX_RASTER_AREA: 11180 * 11180,
+		// Fixed so exports match on every display. Two keeps text crisp and leaves
+		// the most headroom under the raster limit.
+		SCALE: 2,
+		TARGET_ATTRIBUTE: 'data-export-target'
 	},
 	COLORS: {
 		DARK: {
@@ -103,16 +122,12 @@ const EXPORT_IMAGE_CONFIG = {
 	]
 };
 
-/**
- * Manages image caching and loading
- */
 class ImageCache {
 	constructor() {
 		this.cache = new Map();
 	}
 
 	async load( url, key, timeout = EXPORT_IMAGE_CONFIG.TIMEOUTS.IMAGE_LOAD ) {
-		// Return cached image if available
 		if ( this.cache.has( key ) ) {
 			return this.cache.get( key );
 		}
@@ -148,16 +163,13 @@ class ImageCache {
 	}
 }
 
-/**
- * Handles canvas composition and rendering
- */
 class CanvasComposer {
 	constructor( imageCache ) {
 		this.imageCache = imageCache;
 		this.offscreenContext = null;
 	}
 
-	async compose( sourceCanvas, sectionTitle, isDarkTheme, scale = 1 ) {
+	async compose( sourceCanvas, sectionTitle, isDarkTheme, scale = 1, contentBackground = null ) {
 		const dims = this.getScaledDimensions( scale );
 		const fonts = this.getScaledFonts( scale );
 
@@ -171,12 +183,24 @@ class CanvasComposer {
 
 		this.drawBackground( context, canvas.width, canvas.height, theme );
 		this.drawHeader( context, canvas.width, theme, headerLayout, fonts, dims );
-		this.drawContent( context, sourceCanvas, headerLayout.height, dims );
+		this.drawContent( context, sourceCanvas, headerLayout.height, dims, contentBackground );
 		await this.drawFooter(
 			context, canvas.width, sourceCanvas.height, theme, isDarkTheme, headerLayout.height, fonts, dims
 		);
 
 		return canvas;
+	}
+
+	// The chrome the capture has to share the canvas with. Wrapping depends on
+	// the ratio of text width to available width, and both scale together, so
+	// measuring at scale 1 gives the same line count as the real composition.
+	measureChrome( contentWidth, sectionTitle ) {
+		const dims = this.getScaledDimensions( 1 );
+		const fonts = this.getScaledFonts( 1 );
+		const canvasWidth = Math.max( contentWidth + ( dims.PADDING * 2 ), dims.MIN_WIDTH );
+		const header = this.calculateHeaderLayout( canvasWidth, sectionTitle, 1, fonts, dims );
+
+		return ( dims.PADDING * 4 ) + header.height + dims.FOOTER_HEIGHT;
 	}
 
 	getScaledDimensions( scale ) {
@@ -223,7 +247,6 @@ class CanvasComposer {
 	}
 
 	drawHeader( context, canvasWidth, theme, headerLayout, fonts, dims ) {
-		// Draw header background with gradient
 		const gradient = context.createLinearGradient( dims.PADDING, 0, canvasWidth - dims.PADDING, 0 );
 		gradient.addColorStop( 0, theme.HEADER_START );
 		gradient.addColorStop( 1, theme.HEADER_END );
@@ -239,7 +262,6 @@ class CanvasComposer {
 		);
 		context.fill();
 
-		// Draw header text
 		context.fillStyle = '#ffffff';
 		context.textBaseline = 'middle';
 
@@ -289,18 +311,22 @@ class CanvasComposer {
 		);
 	}
 
-	drawContent( context, sourceCanvas, headerHeight, dims ) {
-		context.drawImage(
-			sourceCanvas,
-			dims.PADDING,
-			dims.PADDING + headerHeight + dims.PADDING
-		);
+	drawContent( context, sourceCanvas, headerHeight, dims, contentBackground ) {
+		const x = dims.PADDING;
+		const y = dims.PADDING + headerHeight + dims.PADDING;
+
+		// Fill transparent capture pixels with the page background, not the surrounding frame.
+		if ( contentBackground ) {
+			context.fillStyle = contentBackground;
+			context.fillRect( x, y, sourceCanvas.width, sourceCanvas.height );
+		}
+
+		context.drawImage( sourceCanvas, x, y );
 	}
 
 	async drawFooter( context, canvasWidth, sourceHeight, theme, isDarkTheme, headerHeight, fonts, dims ) {
 		const footerY = dims.PADDING + headerHeight + dims.PADDING + sourceHeight + dims.PADDING;
 
-		// Draw footer background
 		const gradient = context.createLinearGradient( dims.PADDING, 0, canvasWidth - dims.PADDING, 0 );
 		gradient.addColorStop( 0, theme.FOOTER_START );
 		gradient.addColorStop( 1, theme.FOOTER_END );
@@ -316,7 +342,6 @@ class CanvasComposer {
 		);
 		context.fill();
 
-		// Draw footer text
 		context.fillStyle = theme.TEXT;
 		context.font = fonts.FOOTER;
 		context.textAlign = 'left';
@@ -330,7 +355,7 @@ class CanvasComposer {
 			EXPORT_IMAGE_CONFIG.SPACING.LETTER_SPACING * ( dims.LOGO_WIDTH / 22 )
 		);
 
-		// Draw logo (non-critical, catch errors silently)
+		// A missing logo must not prevent the export.
 		try {
 			await this.drawLogo( context, footerY, isDarkTheme, dims );
 		} catch ( error ) {
@@ -345,7 +370,6 @@ class CanvasComposer {
 
 		const context = this.getOffscreenContext();
 
-		// Measure text widths
 		context.font = fonts.HEADER;
 		const mainTitleWidth = context.measureText( mainTitle ).width;
 
@@ -355,7 +379,6 @@ class CanvasComposer {
 		const totalTextWidth = mainTitleWidth + sectionTitleWidth + ( dims.HEADER_TEXT_OFFSET * 2 );
 		const sideBySideAvailableWidth = canvasWidth - ( dims.PADDING * 2 ) - dims.TEXT_OFFSET_X;
 
-		// Check if text fits side-by-side
 		if ( totalTextWidth <= sideBySideAvailableWidth ) {
 			return {
 				height: dims.HEADER_HEIGHT,
@@ -365,7 +388,6 @@ class CanvasComposer {
 			};
 		}
 
-		// Calculate stacked layout
 		const mainTitleLines = this.wrapText( context, mainTitle, availableWidth, fonts.HEADER );
 		const sectionTitleLines = this.wrapText( context, sectionTitle, availableWidth, fonts.SUBHEADER );
 
@@ -387,11 +409,6 @@ class CanvasComposer {
 	wrapText( context, text, maxWidth, font ) {
 		context.font = font;
 		const words = text.split( ' ' );
-
-		if ( words.length === 0 ) {
-			return [];
-		}
-
 		const lines = [];
 		let currentLine = words[ 0 ];
 
@@ -460,54 +477,493 @@ class CanvasComposer {
 }
 
 /**
- * Handles export operations (canvas capture, download, clipboard)
+ * Renders exportable content in an offscreen document of a fixed width. A
+ * capture reproduces the browser's existing layout, and only an iframe can
+ * give it a viewport width other than the reader's.
  */
+class ExportLayoutFrame {
+	constructor() {
+		this.iframe = null;
+		this.preparePromise = null;
+	}
+
+	/**
+	 * Builds the frame once, however many callers ask for it.
+	 *
+	 * @return {Promise<HTMLIFrameElement>}
+	 */
+	prepare() {
+		if ( !this.preparePromise ) {
+			this.preparePromise = this.build().catch( ( error ) => {
+				// Start over rather than keep a half-built frame.
+				this.dispose();
+				throw error;
+			} );
+		}
+
+		return this.preparePromise;
+	}
+
+	async build() {
+		const iframe = document.createElement( 'iframe' );
+
+		iframe.setAttribute( 'aria-hidden', 'true' );
+		iframe.setAttribute( 'tabindex', '-1' );
+		Object.assign( iframe.style, {
+			position: 'fixed',
+			top: '0',
+			left: '-20000px',
+			width: `${ EXPORT_IMAGE_CONFIG.CAPTURE.LAYOUT_WIDTH }px`,
+			height: `${ this.getLayoutHeight() }px`,
+			border: '0',
+			pointerEvents: 'none'
+		} );
+
+		document.body.appendChild( iframe );
+		this.iframe = iframe;
+
+		return this.resetDocument( iframe );
+	}
+
+	async resetDocument( iframe ) {
+		const frameDocument = iframe.contentDocument;
+
+		frameDocument.open();
+		frameDocument.write( '<!DOCTYPE html><html><head></head><body></body></html>' );
+		frameDocument.close();
+
+		await this.waitForStylesheets( this.copyStyles( frameDocument ) );
+
+		return iframe;
+	}
+
+	// Rebuild between exports; snapdom's cached image sizes would corrupt the next.
+	recycle() {
+		if ( !this.iframe ) {
+			return;
+		}
+
+		// Discard failed rebuilds so the next export can retry.
+		this.preparePromise = this.resetDocument( this.iframe );
+		this.preparePromise.catch( () => this.dispose() );
+	}
+
+	// Copy the page's stylesheet nodes, not computed styles, which would carry
+	// the live viewport's media query results.
+	copyStyles( frameDocument ) {
+		// The frame document has no URL, so relative paths need a base.
+		const base = frameDocument.createElement( 'base' );
+		base.href = document.baseURI;
+		frameDocument.head.appendChild( base );
+
+		const copiedLinks = [];
+		const styleNodes = document.querySelectorAll( 'style, link[rel~="stylesheet"]' );
+
+		for ( const styleNode of styleNodes ) {
+			const copy = frameDocument.importNode( styleNode, true );
+			frameDocument.head.appendChild( copy );
+
+			if ( copy.tagName === 'LINK' ) {
+				copiedLinks.push( { link: copy, loadedInPage: Boolean( styleNode.sheet ) } );
+			}
+		}
+
+		return copiedLinks;
+	}
+
+	// Only fail on a stylesheet the page itself has loaded.
+	waitForStylesheets( copiedLinks ) {
+		return Promise.all( copiedLinks.map( ( { link, loadedInPage } ) => new Promise( ( resolve, reject ) => {
+			if ( link.sheet ) {
+				resolve();
+				return;
+			}
+
+			let timeoutId = null;
+			const settle = ( failed ) => {
+				clearTimeout( timeoutId );
+
+				if ( failed && loadedInPage ) {
+					reject( new Error( `Export frame could not load stylesheet: ${ link.href }` ) );
+				} else {
+					resolve();
+				}
+			};
+
+			timeoutId = setTimeout( () => settle( true ), EXPORT_IMAGE_CONFIG.TIMEOUTS.STYLESHEET_LOAD );
+			link.addEventListener( 'load', () => settle( false ), { once: true } );
+			link.addEventListener( 'error', () => settle( true ), { once: true } );
+		} ) ) );
+	}
+
+	// Tall enough not to constrain the clone.
+	getLayoutHeight() {
+		return document.documentElement.scrollHeight;
+	}
+
+	/**
+	 * Captures an element as it would look at export width.
+	 *
+	 * @param {HTMLElement} element element in the live document
+	 * @param {Object} options required capture settings
+	 * @param {number} options.scale requested raster scale
+	 * @param {string} options.backgroundColor page background
+	 * @param {Function} options.prepareDocument applies export fixes to the frame document
+	 * @param {Function} options.measureChrome composed chrome height for a content width
+	 * @return {Promise<{canvas: HTMLCanvasElement, scale: number}>}
+	 */
+	async render( element, options ) {
+		const iframe = await this.prepare();
+		const frameDocument = iframe.contentDocument;
+
+		// A run that throws part way leaves the frame just as dirty as one that
+		// finishes, so every exit recycles.
+		try {
+			iframe.style.height = `${ this.getLayoutHeight() }px`;
+			this.copyRootAttributes( frameDocument );
+
+			const target = this.replaceContent( frameDocument, element );
+			options.prepareDocument( frameDocument );
+			this.stripHiddenMedia( target );
+			target.style.background = options.backgroundColor;
+
+			await Promise.all( [
+				this.waitForFonts( frameDocument ),
+				this.waitForImages( target )
+			] );
+
+			this.pinSubgridTracks( target );
+
+			const bounds = target.getBoundingClientRect();
+			if ( bounds.width === 0 || bounds.height === 0 ) {
+				throw new Error( 'Canvas capture resulted in zero dimensions' );
+			}
+
+			const scale = this.getEffectiveScale(
+				bounds, options.scale, options.measureChrome( bounds.width )
+			);
+			const canvas = await snapdom.toCanvas( target, {
+				scale: scale,
+				// The fixed scale must not be multiplied by the reader's ratio.
+				dpr: 1,
+				embedFonts: true,
+				// Anything looser keeps stale style maps, which re-render
+				// container-constrained images at their intrinsic size.
+				cache: 'soft'
+			} );
+
+			return { canvas: canvas, scale: scale };
+		} finally {
+			this.recycle();
+		}
+	}
+
+	// Pin inherited tracks because the captured root loses its parent grid.
+	pinSubgridTracks( element ) {
+		const parent = element.parentElement;
+		if ( !parent ) {
+			return;
+		}
+
+		const view = element.ownerDocument.defaultView;
+		const style = view.getComputedStyle( element );
+		const parentStyle = view.getComputedStyle( parent );
+
+		const axes = [
+			{ template: 'gridTemplateColumns', start: 'gridColumnStart', end: 'gridColumnEnd' },
+			{ template: 'gridTemplateRows', start: 'gridRowStart', end: 'gridRowEnd' }
+		];
+
+		for ( const axis of axes ) {
+			if ( !style[ axis.template ].startsWith( 'subgrid' ) ) {
+				continue;
+			}
+
+			const tracks = this.parseTrackList( parentStyle[ axis.template ] );
+			if ( !tracks.length ) {
+				continue;
+			}
+
+			const from = Math.max( parseInt( style[ axis.start ], 10 ) || 1, 1 ) - 1;
+			const end = parseInt( style[ axis.end ], 10 );
+			const to = end > 0 ? Math.max( end - 1, from + 1 ) : tracks.length;
+
+			element.style[ axis.template ] = tracks.slice( from, to ).join( ' ' );
+		}
+	}
+
+	// Splits a resolved track list, keeping line names and functional notation
+	// intact: `[a] 10px [b c] minmax( 2px, 1fr )` gives two entries.
+	parseTrackList( value ) {
+		if ( !value || value === 'none' || value.startsWith( 'subgrid' ) ) {
+			return [];
+		}
+
+		const tracks = [];
+		let pending = '';
+		let depth = 0;
+
+		for ( const token of value.split( /\s+/ ) ) {
+			pending += ( pending ? ' ' : '' ) + token;
+			depth += ( token.match( /[[(]/g ) || [] ).length;
+			depth -= ( token.match( /[\])]/g ) || [] ).length;
+
+			// A group of line names belongs to the track that follows it.
+			if ( depth === 0 && !token.endsWith( ']' ) ) {
+				tracks.push( pending );
+				pending = '';
+			}
+		}
+
+		if ( pending && tracks.length ) {
+			tracks[ tracks.length - 1 ] += ` ${ pending }`;
+		}
+
+		return tracks;
+	}
+
+	// snapdom leaves hidden subtrees out of the capture but still inlines every
+	// image it can find, and a collapsed match list hides hundreds of logos.
+	// Clearing their sources buys that back without removing the nodes, which
+	// would renumber siblings and break the `:nth-child` rules the page matched.
+	stripHiddenMedia( element ) {
+		const view = element.ownerDocument.defaultView;
+		const hidden = [];
+
+		// Collect first: mutating invalidates style, forcing a recalc per read.
+		const collect = ( node ) => {
+			for ( let child = node.firstElementChild; child; child = child.nextElementSibling ) {
+				if ( view.getComputedStyle( child ).display === 'none' ) {
+					hidden.push( child );
+				} else {
+					collect( child );
+				}
+			}
+		};
+
+		collect( element );
+
+		for ( const node of hidden ) {
+			this.clearMediaSources( node );
+		}
+	}
+
+	// Nothing inside a hidden subtree is drawn, so nothing here can be missed.
+	clearMediaSources( element ) {
+		for ( const node of [ element, ...element.querySelectorAll( '*' ) ] ) {
+			if ( node.tagName === 'IMG' || node.tagName === 'SOURCE' ) {
+				// Both, since a bare srcset still resolves through currentSrc.
+				node.removeAttribute( 'src' );
+				node.removeAttribute( 'srcset' );
+			}
+
+			if ( node.style ) {
+				node.style.backgroundImage = 'none';
+			}
+		}
+	}
+
+	replaceContent( frameDocument, element ) {
+		const marker = EXPORT_IMAGE_CONFIG.CAPTURE.TARGET_ATTRIBUTE;
+
+		element.setAttribute( marker, '' );
+		const bodyClone = document.body.cloneNode( true );
+		element.removeAttribute( marker );
+
+		const target = bodyClone.querySelector( `[${ marker }]` );
+		if ( !target ) {
+			throw new Error( 'Could not find the element inside the export frame' );
+		}
+		target.removeAttribute( marker );
+
+		// Cloned scripts never run, but frames and embeds would load for nothing.
+		for ( const node of bodyClone.querySelectorAll( 'script, noscript, iframe, object, embed' ) ) {
+			node.remove();
+		}
+
+		this.copyDynamicState( element, target );
+
+		frameDocument.adoptNode( bodyClone );
+		frameDocument.body.replaceWith( bodyClone );
+
+		return target;
+	}
+
+	// Cloning markup loses state that only exists in the DOM.
+	copyDynamicState( liveElement, clonedElement ) {
+		const selector = 'input, textarea, select, canvas';
+		const liveNodes = liveElement.querySelectorAll( selector );
+		const clonedNodes = clonedElement.querySelectorAll( selector );
+
+		for ( let index = 0; index < liveNodes.length && index < clonedNodes.length; index++ ) {
+			const liveNode = liveNodes[ index ];
+			const clonedNode = clonedNodes[ index ];
+
+			// The lists have drifted out of step, so no later pairing can be
+			// trusted either.
+			if ( liveNode.tagName !== clonedNode.tagName ) {
+				return;
+			}
+
+			if ( liveNode.tagName === 'CANVAS' ) {
+				this.copyCanvas( liveNode, clonedNode );
+			} else if ( liveNode.type !== 'file' ) {
+				// A file input would throw on an assigned value.
+				clonedNode.value = liveNode.value;
+
+				if ( liveNode.tagName === 'INPUT' ) {
+					clonedNode.checked = liveNode.checked;
+					clonedNode.indeterminate = liveNode.indeterminate;
+				}
+			}
+		}
+	}
+
+	copyCanvas( liveCanvas, clonedCanvas ) {
+		if ( liveCanvas.width === 0 || liveCanvas.height === 0 ) {
+			return;
+		}
+
+		try {
+			clonedCanvas.getContext( '2d' ).drawImage( liveCanvas, 0, 0 );
+		} catch {
+			// A tainted canvas cannot be read; leave the copy blank.
+		}
+	}
+
+	// Theme classes live on the root, runtime custom properties in its style.
+	copyRootAttributes( frameDocument ) {
+		const liveRoot = document.documentElement;
+		const frameRoot = frameDocument.documentElement;
+
+		frameRoot.className = liveRoot.className;
+		frameRoot.setAttribute( 'lang', liveRoot.lang || 'en' );
+		frameRoot.setAttribute( 'dir', liveRoot.dir || 'ltr' );
+		frameRoot.setAttribute( 'style', liveRoot.getAttribute( 'style' ) || '' );
+	}
+
+	// A logo is sized by its container with the image itself unconstrained, so
+	// an image still loading measures zero and can collapse the capture.
+	waitForImages( element ) {
+		const pending = Array.from( element.querySelectorAll( 'img' ), ( image ) => {
+			// Cloned lazy images may be outside the frame's viewport.
+			image.setAttribute( 'loading', 'eager' );
+
+			if ( image.complete ) {
+				return Promise.resolve();
+			}
+
+			// A broken image resolves too; it must not hold up the export.
+			return new Promise( ( resolve ) => {
+				image.addEventListener( 'load', resolve, { once: true } );
+				image.addEventListener( 'error', resolve, { once: true } );
+			} );
+		} );
+
+		return Promise.race( [
+			Promise.all( pending ),
+			new Promise( ( resolve ) => {
+				setTimeout( resolve, EXPORT_IMAGE_CONFIG.TIMEOUTS.CLONED_IMAGES );
+			} )
+		] );
+	}
+
+	// Text is measured later, but a slow font must not block the export.
+	waitForFonts( frameDocument ) {
+		if ( !frameDocument.fonts ) {
+			return Promise.resolve();
+		}
+
+		return Promise.race( [
+			frameDocument.fonts.ready,
+			new Promise( ( resolve ) => {
+				setTimeout( resolve, EXPORT_IMAGE_CONFIG.TIMEOUTS.FONT_READY );
+			} )
+		] );
+	}
+
+	// The chrome composed around the capture shares the canvas, so the limits
+	// apply to the finished size rather than the capture's. Losing resolution
+	// beats losing the image, so the scale drops as far as it has to.
+	getEffectiveScale( bounds, requestedScale, chromeHeight ) {
+		const dimensions = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+		const capture = EXPORT_IMAGE_CONFIG.CAPTURE;
+		const width = Math.max( bounds.width + ( dimensions.PADDING * 2 ), dimensions.MIN_WIDTH );
+		const height = Math.max( bounds.height, 1 ) + chromeHeight;
+
+		return Math.min(
+			requestedScale,
+			capture.MAX_RASTER_SIDE / width,
+			capture.MAX_RASTER_SIDE / height,
+			Math.sqrt( capture.MAX_RASTER_AREA / ( width * height ) )
+		);
+	}
+
+	dispose() {
+		if ( this.iframe ) {
+			this.iframe.remove();
+			this.iframe = null;
+		}
+
+		this.preparePromise = null;
+	}
+}
+
 class ExportService {
 	constructor( canvasComposer ) {
 		this.canvasComposer = canvasComposer;
-		this.html2canvasLoaded = false;
-		this.activeExports = new Set();
+		this.layoutFrame = new ExportLayoutFrame();
+		this.snapdomPromise = null;
+		this.exportInProgress = false;
 	}
 
-	applyCloneFixes( clonedDoc ) {
-		this.hideInfoIcons( clonedDoc );
-		this.removeContentSwitchers( clonedDoc );
-		this.removePrizepoolToggles( clonedDoc );
-		this.expandPrizepoolTables( clonedDoc );
+	applyExportFixes( frameDocument ) {
+		if ( this.needsShadowSuppression() ) {
+			this.suppressShadows( frameDocument );
+		}
+		this.hideInfoIcons( frameDocument );
+		this.removeExportControls( frameDocument );
+		this.expandPrizepoolTables( frameDocument );
 	}
 
-	// Hides info icons that shouldn't appear in exports
-	hideInfoIcons( clonedDoc ) {
-		const infoIcons = clonedDoc.querySelectorAll( '.brkts-match-info-icon' );
+	// Every iOS browser uses WebKit; desktop Blink also reports AppleWebKit.
+	needsShadowSuppression() {
+		const userAgent = navigator.userAgent;
+		return /AppleWebKit/i.test( userAgent ) &&
+			!/(?:Chrome|Chromium|Edg|OPR)\//i.test( userAgent ) &&
+			!/Android/i.test( userAgent );
+	}
+
+	// One pixel shadow sends Safari and iOS down snapdom's fallback path, which
+	// rasterises at natural size and upscales, softening the whole image.
+	suppressShadows( frameDocument ) {
+		const style = frameDocument.createElement( 'style' );
+
+		style.textContent = '*, *::before, *::after { box-shadow: none !important; ' +
+			'text-shadow: none !important; }';
+		frameDocument.head.appendChild( style );
+	}
+
+	hideInfoIcons( frameDocument ) {
+		const infoIcons = frameDocument.querySelectorAll( '.brkts-match-info-icon' );
 		for ( const icon of infoIcons ) {
 			icon.style.opacity = '0';
 		}
 	}
 
-	// Remove toggle switches
-	removeContentSwitchers( clonedDoc ) {
-		const contentSwitches = clonedDoc.querySelectorAll( '.switch-pill-container' );
-
-		for ( const contentSwitch of contentSwitches ) {
-			contentSwitch.remove();
-		}
-	}
-
-	removePrizepoolToggles( clonedDoc ) {
-		// The legacy in-table toggle and the redesigned table's footer (now inside the
-		// captured wrapper) shouldn't appear in a static export.
-		const prizepoolToggles = clonedDoc.querySelectorAll(
-			'.prizepooltabletoggle, .prizepool-table-wrapper .table2__footer'
+	removeExportControls( frameDocument ) {
+		const controls = frameDocument.querySelectorAll(
+			'.switch-pill-container, .prizepooltabletoggle, .prizepool-table-wrapper .table2__footer'
 		);
 
-		for ( const prizepoolToggle of prizepoolToggles ) {
-			prizepoolToggle.remove();
+		for ( const control of controls ) {
+			control.remove();
 		}
 	}
 
 	// Cut placements are hidden by `.collapsed` on the wrapper; expand so they export.
-	expandPrizepoolTables( clonedDoc ) {
-		const collapsedTables = clonedDoc.querySelectorAll( '.prizepool-table-wrapper.collapsed' );
+	expandPrizepoolTables( frameDocument ) {
+		const collapsedTables = frameDocument.querySelectorAll( '.prizepool-table-wrapper.collapsed' );
 
 		for ( const collapsedTable of collapsedTables ) {
 			collapsedTable.classList.remove( 'collapsed' );
@@ -515,16 +971,14 @@ class ExportService {
 	}
 
 	async export( element, title, mode ) {
-		// Prevent concurrent exports
-		if ( this.activeExports.size > 0 ) {
+		if ( this.exportInProgress ) {
 			throw new Error( 'An export is already in progress' );
 		}
 
-		const exportId = Symbol( 'export' );
-		this.activeExports.add( exportId );
+		this.exportInProgress = true;
 
 		try {
-			await this.ensureHtml2CanvasLoaded();
+			await this.prewarm();
 
 			if ( mode === 'copy' ) {
 				await this.copyToClipboard( element, title );
@@ -535,57 +989,45 @@ class ExportService {
 				throw new Error( `Unknown export mode: ${ mode }` );
 			}
 		} finally {
-			this.activeExports.delete( exportId );
+			this.exportInProgress = false;
 		}
 	}
 
 	async generateImageBlob( element, title ) {
-		const originalBackground = element.style.background;
 		const isDarkTheme = document.documentElement.classList.contains( 'theme--dark' );
 		const backgroundColor = this.getBackgroundColor();
-		// This ensures the scale is at least 2, but never higher than 3
-		const scale = Math.min( Math.max( window.devicePixelRatio || 1, 2 ), 3 );
 
-		try {
-			element.style.background = backgroundColor;
+		const capture = await this.layoutFrame.render( element, {
+			scale: EXPORT_IMAGE_CONFIG.CAPTURE.SCALE,
+			backgroundColor: backgroundColor,
+			prepareDocument: ( frameDocument ) => this.applyExportFixes( frameDocument ),
+			measureChrome: ( contentWidth ) => this.canvasComposer.measureChrome( contentWidth, title )
+		} );
 
-			const capturedCanvas = await html2canvas( element, {
-				scale: scale,
-				windowWidth: 1440,
-				windowHeight: document.documentElement.scrollHeight,
-				scrollX: 0,
-				scrollY: 0,
-				backgroundColor: backgroundColor,
-				onclone: ( clonedDoc ) => this.applyCloneFixes( clonedDoc )
-			} );
-
-			if ( capturedCanvas.width === 0 || capturedCanvas.height === 0 ) {
-				throw new Error( 'Canvas capture resulted in zero dimensions' );
-			}
-
-			const composedCanvas = await this.canvasComposer.compose(
-				capturedCanvas,
-				title,
-				isDarkTheme,
-				scale
-			);
-
-			return new Promise( ( resolve, reject ) => {
-				composedCanvas.toBlob( ( blob ) => {
-					if ( blob ) {
-						resolve( blob );
-					} else {
-						reject( new Error( 'Failed to create image blob' ) );
-					}
-				}, 'image/png' );
-			} );
-		} finally {
-			element.style.background = originalBackground;
+		if ( capture.canvas.width === 0 || capture.canvas.height === 0 ) {
+			throw new Error( 'Canvas capture resulted in zero dimensions' );
 		}
+
+		const composedCanvas = await this.canvasComposer.compose(
+			capture.canvas,
+			title,
+			isDarkTheme,
+			capture.scale,
+			backgroundColor
+		);
+
+		return new Promise( ( resolve, reject ) => {
+			composedCanvas.toBlob( ( blob ) => {
+				if ( blob ) {
+					resolve( blob );
+				} else {
+					reject( new Error( 'Failed to create image blob' ) );
+				}
+			}, 'image/png' );
+		} );
 	}
 
 	async copyToClipboard( element, title ) {
-		// Check browser support
 		if ( !window.ClipboardItem || !navigator.clipboard || !navigator.clipboard.write ) {
 			mw.notify( 'This browser does not support copying images to the clipboard.', { type: 'error' } );
 			return;
@@ -612,23 +1054,30 @@ class ExportService {
 		link.href = url;
 		link.click();
 
-		// Clean up object URL after short delay
 		setTimeout( () => {
 			URL.revokeObjectURL( url );
 		}, EXPORT_IMAGE_CONFIG.TIMEOUTS.URL_REVOKE_DELAY );
 	}
 
-	async ensureHtml2CanvasLoaded() {
-		if ( this.html2canvasLoaded ) {
-			return;
+	// Called on menu open so setup lands before anyone picks an option.
+	prewarm() {
+		return Promise.all( [ this.ensureSnapdomLoaded(), this.layoutFrame.prepare() ] );
+	}
+
+	ensureSnapdomLoaded() {
+		if ( !this.snapdomPromise ) {
+			this.snapdomPromise = Promise.resolve( mw.loader.using( 'snapdom' ) ).catch( ( error ) => {
+				// Let the next export retry instead of reusing the failure.
+				this.snapdomPromise = null;
+				throw error;
+			} );
 		}
 
-		return new Promise( ( resolve ) => {
-			mw.loader.using( 'html2canvas', () => {
-				this.html2canvasLoaded = true;
-				resolve();
-			} );
-		} );
+		return this.snapdomPromise;
+	}
+
+	dispose() {
+		this.layoutFrame.dispose();
 	}
 
 	getBackgroundColor() {
@@ -659,13 +1108,10 @@ class ExportService {
 	}
 
 	isExporting() {
-		return this.activeExports.size > 0;
+		return this.exportInProgress;
 	}
 }
 
-/**
- * Utilities for finding elements and headings in the DOM
- */
 class ExportImageDOMUtils {
 	static findPreviousHeading( startElement ) {
 		const walker = document.createTreeWalker(
@@ -700,6 +1146,11 @@ class ExportImageDOMUtils {
 			return false;
 		}
 
+		// `closest` walks to the root on its own, so one check covers every ancestor.
+		if ( element.parentElement?.closest( '.tabs-content > div:not(.active)' ) ) {
+			return false;
+		}
+
 		let parent = element.parentElement;
 		while ( parent && parent !== document.body ) {
 			const parentStyle = window.getComputedStyle( parent );
@@ -711,10 +1162,6 @@ class ExportImageDOMUtils {
 			if ( parent.classList.contains( 'collapsed' ) ||
 				parent.classList.contains( 'is--collapsed' ) ||
 				parent.dataset.collapsibleState === 'collapsed' ) {
-				return false;
-			}
-
-			if ( parent.closest( '.tabs-content > div:not(.active)' ) ) {
 				return false;
 			}
 
@@ -783,13 +1230,9 @@ class ExportImageDOMUtils {
 	}
 }
 
-/**
- * Creates and manages dropdown UI components
- */
 class DropdownWidget {
-	constructor( exportService, zoomManager ) {
+	constructor( exportService ) {
 		this.exportService = exportService;
-		this.zoomManager = zoomManager;
 		this.eventCleanupFunctions = new WeakMap();
 	}
 
@@ -807,13 +1250,6 @@ class DropdownWidget {
 				menuElement.appendChild( loadingElement );
 			}
 
-			if ( this.zoomManager.hasZoomed ) {
-				const refreshItem = this.createRefreshMenuItem();
-				menuElement.insertBefore( refreshItem, loadingElement );
-				return;
-			}
-
-			// Filter visible elements
 			const visibleElements = elements.filter( ( item ) => ExportImageDOMUtils.isElementVisible( item.element )
 			);
 			const hasSingleElement = visibleElements.length === 1;
@@ -868,19 +1304,6 @@ class DropdownWidget {
 		this.setupEventListeners( wrapper, menuElement, toggleButton );
 
 		return wrapper;
-	}
-
-	createRefreshMenuItem() {
-		const item = this.createElement( 'div', {
-			class: 'dropdown-widget__item',
-			tabindex: '0',
-			role: 'menuitem',
-			style: { fontWeight: 'bold' }
-		}, '<i class="fas fa-fw fa-sync-alt"></i> Refresh the page to export images' );
-
-		item.addEventListener( 'click', () => window.location.reload() );
-
-		return item;
 	}
 
 	createDisabledMenuItem( buttonText ) {
@@ -958,7 +1381,11 @@ class DropdownWidget {
 
 		button.addEventListener( 'click', () => {
 			if ( menuElement.style.display === 'none' ) {
-				this.exportService.ensureHtml2CanvasLoaded();
+				// Exports retry setup and report properly, so only log here.
+				this.exportService.prewarm().catch( ( error ) => {
+					// eslint-disable-next-line no-console
+					console.warn( 'Export prewarm failed:', error );
+				} );
 				if ( onOpen ) {
 					onOpen();
 				}
@@ -1200,50 +1627,12 @@ class DropdownWidget {
 	}
 }
 
-/**
- * Manages zoom detection
- */
-class ZoomManager {
-	constructor() {
-		this.initialZoom = this.getZoomLevel();
-		this.hasZoomed = false;
-		this.resizeTimeout = null;
-		this.setupZoomListener();
-	}
-
-	getZoomLevel() {
-		return window.devicePixelRatio || 1;
-	}
-
-	setupZoomListener() {
-		window.addEventListener( 'resize', () => {
-			clearTimeout( this.resizeTimeout );
-			this.resizeTimeout = setTimeout( () => {
-				this.handleZoomChange();
-			}, 250 );
-		} );
-	}
-
-	handleZoomChange() {
-		const newZoom = this.getZoomLevel();
-		const ZOOM_THRESHOLD = 0.01;
-
-		if ( Math.abs( newZoom - this.initialZoom ) > ZOOM_THRESHOLD ) {
-			this.hasZoomed = true;
-		}
-	}
-}
-
-/**
- * Main module class that coordinates all components
- */
 class ExportImageModule {
 	constructor() {
 		this.imageCache = new ImageCache();
 		this.canvasComposer = new CanvasComposer( this.imageCache );
 		this.exportService = new ExportService( this.canvasComposer );
-		this.zoomManager = new ZoomManager();
-		this.dropdownWidget = new DropdownWidget( this.exportService, this.zoomManager );
+		this.dropdownWidget = new DropdownWidget( this.exportService );
 	}
 
 	init() {
@@ -1256,12 +1645,10 @@ class ExportImageModule {
 		for ( const data of headingsToElements.values() ) {
 			let targetNode = data.headingNode;
 
-			// Use parent if it's a heading wrapper
 			if ( targetNode.parentNode && targetNode.parentNode.classList.contains( 'mw-heading' ) ) {
 				targetNode = targetNode.parentNode;
 			}
 
-			// Avoid duplicate dropdowns
 			if ( !targetNode.querySelector( '.dropdown-widget' ) ) {
 				const dropdown = this.dropdownWidget.create( data.elements, data.headingText );
 				targetNode.appendChild( dropdown );
@@ -1271,6 +1658,7 @@ class ExportImageModule {
 
 	cleanup() {
 		this.imageCache.clear();
+		this.exportService.dispose();
 		const dropdowns = document.querySelectorAll( '.dropdown-widget' );
 		for ( const dropdown of dropdowns ) {
 			this.dropdownWidget.cleanup( dropdown );
