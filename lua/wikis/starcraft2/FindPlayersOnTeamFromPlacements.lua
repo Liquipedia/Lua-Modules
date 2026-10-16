@@ -32,7 +32,7 @@ function FindPlayersOnTeamFromPlacements.get(frame)
 	assert(args.team, 'No player(s) specified')
 	local team = mw.ext.TeamLiquidIntegration.resolve_redirect(args.team)
 
-	local conditions = ConditionTree(BooleanOperator.any):add(Array.map(Array.range(1, 30), function(index)
+	local conditions = ConditionTree(BooleanOperator.any):add(Array.mapRange(1, 30, function(index)
 		return ConditionNode(ColumnName('opponentplayers_p' .. index .. 'team'), Comparator.eq, team)
 	end))
 
