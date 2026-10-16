@@ -418,6 +418,38 @@ describe('Standings Tiebreakers', function()
 			assert.are_same({w = 4, l = 1, games = 5}, {w = games.w, l = games.l, games = games.games})
 		end)
 
+		it('reads the walkover result from the status of the opponent, not the winner of the match', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local alpha = opponent('Alpha', {
+				matches = {
+					-- W without the winner set
+					makeMatch({'Alpha', 'Bravo'}, {statuses = {'W', 'FF'}}),
+					-- DQ while the winner points to Alpha
+					makeMatch({'Alpha', 'Charlie'}, {winner = 1, statuses = {'DQ', 'W'}}),
+				},
+			})
+			local games = TiebreakerGameUtil.getGames(alpha, 2)
+			assert.are_same({w = 2, l = 2, games = 4}, {w = games.w, l = games.l, games = games.games})
+		end)
+
+		it('counts a double forfeit as a walkover loss for both opponents', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local doubleForfeit = makeMatch({'Alpha', 'Bravo'}, {winner = -1, statuses = {'FF', 'FF'}})
+			Array.forEach({'Alpha', 'Bravo'}, function(name)
+				local games = TiebreakerGameUtil.getGames(opponent(name, {matches = {doubleForfeit}}), 2)
+				assert.are_same({w = 0, l = 2, games = 2}, {w = games.w, l = games.l, games = games.games})
+			end)
+		end)
+
+		it('gives no walkover result to an opponent with a score against a walkover loss', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local match = makeMatch({'Alpha', 'Bravo'}, {winner = 1, statuses = {'S', 'FF'}, scores = {1, 0}})
+			local alphaGames = TiebreakerGameUtil.getGames(opponent('Alpha', {matches = {match}}), 2)
+			local bravoGames = TiebreakerGameUtil.getGames(opponent('Bravo', {matches = {match}}), 2)
+			assert.are_same({w = 0, l = 0, games = 0}, {w = alphaGames.w, l = alphaGames.l, games = alphaGames.games})
+			assert.are_same({w = 0, l = 2, games = 2}, {w = bravoGames.w, l = bravoGames.l, games = bravoGames.games})
+		end)
+
 		it('does not change the round tiebreakers', function()
 			local alpha = opponent('Alpha', {
 				matches = {
