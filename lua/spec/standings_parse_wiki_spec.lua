@@ -64,7 +64,7 @@ describe('Standings Wiki Parser', function()
 				StandingsParseWiki.parseTiebreakers({}, 'ffa')
 			)
 			assert.are_same(
-				{'full.disqualified', 'full.matchdiff', 'full.manual'},
+				{'full.disqualified', 'full.matchscore', 'full.manual'},
 				StandingsParseWiki.parseTiebreakers({}, 'swiss')
 			)
 			assert.are_same(
