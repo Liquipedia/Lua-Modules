@@ -43,7 +43,6 @@ function MatchGroupLegacyDefault:getOpponent(prefix, scoreKey)
 			p1flag = opponentPrefix .. 'p' .. '1flag',
 			p2 = opponentPrefix .. 'p' .. 2,
 			p2flag = opponentPrefix .. 'p' .. '2flag',
-			score = opponentPrefix .. scoreKey,
 			win = prefix .. 'win',
 		}
 	end
@@ -90,8 +89,6 @@ function MatchGroupLegacyDefault:getMap()
 			winner = 'win$1$',
 			char1 = 'p1char$1$',
 			char2 = 'p2char$1$',
-			score1 = 'p1stock$1$',
-			score2 = 'p2stock$1$',
 			map = 'stage$1$',
 			vod = 'vodgame$1$'
 		}
@@ -103,10 +100,6 @@ function MatchGroupLegacyDefault:getMap()
 			o1char2 = 't1p2char$1$',
 			o2char1 = 't2p1char$1$',
 			o2char2 = 't2p2char$1$',
-			o1score1 = 't1p1stock$1$',
-			o1score2 = 't1p2stock$1$',
-			o2score1 = 't2p1stock$1$',
-			o2score2 = 't2p2stock$1$',
 			map = 'stage$1$',
 			vod = 'vodgame$1$'
 		}
