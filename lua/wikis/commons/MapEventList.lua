@@ -1,0 +1,128 @@
+---
+-- @Liquipedia
+-- page=Module:MapEventList
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
+local Json = Lua.import('Module:Json')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Logic = Lua.import('Module:Logic')
+local Tier = Lua.import('Module:Tier/Utils')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
+
+local Html = Lua.import('Module:Widget/Html')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
+local DEFAULT_TIERS = {1}
+local DEFAULT_TIER_TYPES = {'none'}
+
+local MapEventList = {}
+
+---@param frame Frame
+---@return VNode?
+function MapEventList.run(frame)
+	local args = Arguments.getArgs(frame)
+	local mapName = (args.map or mw.title.getCurrentTitle().text):gsub(' ', '_')
+
+	local tiers = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.tiers)) or DEFAULT_TIERS
+	local tierTypes = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.tierTypes)) or DEFAULT_TIER_TYPES
+	tierTypes = Array.map(tierTypes, function(tierType)
+		if tierType == 'none' then
+			return ''
+		end
+		return tierType
+	end)
+
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('maps'), Comparator.neq, ''),
+		ConditionUtil.anyOf(ColumnName('liquipediatier'), tiers),
+		ConditionUtil.anyOf(ColumnName('liquipediatiertype'), tierTypes),
+	}
+
+	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
+		conditions = tostring(conditions),
+		query = 'pagename, maps, startdate, enddate, icon, icondark, name, extradata',
+		order = 'enddate desc',
+		limit = tonumber(args.limit) or 5000,
+	})
+
+	if not data or not data[1] then
+		return
+	end
+
+	local title = args.title or WidgetUtil.collect(
+		'Played in ',
+		Array.interleave(Array.map(tiers, Tier.display), ', ')
+		' Tournaments'
+	)
+
+	return Html.Fragment{children = {
+		Html.H3{children = title},
+		TableWidgets.Table{
+			sortable = true,
+			columns = Array.rep({}, 4),
+			children = {
+				MapEventList._header(),
+				TableWidgets.TableBody{children = Array.map(data, FnUtil.curry(MapEventList._row, mapName))},
+			},
+		}
+	}}
+end
+
+---@private
+---@return VNode
+function MapEventList._header()
+	return TableWidgets.TableHeader{children = {
+		TableWidgets.Row{children = {
+			TableWidgets.CellHeader{children = {'Start date'}},
+			TableWidgets.CellHeader{children = {'End date'}},
+			TableWidgets.CellHeader{colspan = 2, children = {'Tournament'}},
+		}}
+	}}
+end
+
+---@private
+---@param mapName string
+---@param item {maps: string, pagename: string, startdate: string, enddate: string,
+---icon: string, icondark: string, name: string}
+---@return VNode?
+function MapEventList._row(mapName, item)
+	local maps = Json.parseIfTable(item.maps) or {}
+	if Logic.isEmpty(maps) then
+		return
+	end
+
+	if Array.all(maps, function(mapData)
+		return (mapData.link:gsub(' ', '_')) ~= mapName
+	end) then return end
+
+	return TableWidgets.Row{children = {
+		TableWidgets.Cell{children = item.startdate},
+		TableWidgets.Cell{children = item.enddate},
+		TableWidgets.Cell{children = LeagueIcon.display{
+			icon = item.icon,
+			iconDark = item.icondark,
+			link = item.pagename,
+			name = item.name,
+			options = {noTemplate = true},
+		}},
+		TableWidgets.Cell{children = Link{link = item.pagename, children = item.name or item.pagename:gsub('_', ' ')}},
+	}}
+end
+
+return MapEventList
