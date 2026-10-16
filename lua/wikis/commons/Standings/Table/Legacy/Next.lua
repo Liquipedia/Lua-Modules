@@ -253,8 +253,8 @@ function StandingTableLegacyNext.parseTiebreakers(args)
 	return Array.extend(
 		Logic.readBool(args.show_p) and 'points' or nil,
 		'matchscore',
-		'gamediff',
-		'ml.matchdiff',
+		'gamescore',
+		'ml.matchscore',
 		'ml.gamescore',
 		'gamewins',
 		'gamelosses'
