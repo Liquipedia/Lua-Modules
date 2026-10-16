@@ -400,6 +400,24 @@ describe('Standings Tiebreakers', function()
 			assert.are_equal('4 - 5', TiebreakerFactory.tiebreakerFromId('full.gamediff', options):display({alpha}, alpha))
 		end)
 
+		it('only counts finished matches decided by FF, DQ or L as walkovers', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local alpha = opponent('Alpha', {
+				matches = {
+					makeMatch({'Alpha', 'Bravo'}, {winner = 1, scores = {2, 1}}),
+					-- Upcoming match without statuses
+					makeMatch({'Alpha', 'Charlie'}, {finished = false, statuses = {'', ''}}),
+					-- Draw without a score
+					makeMatch({'Alpha', 'Delta'}, {winner = 0, statuses = {'D', 'D'}}),
+					-- Walkover that is not finished yet
+					makeMatch({'Alpha', 'Echo'}, {finished = false, winner = 2, statuses = {'FF', 'W'}}),
+					makeMatch({'Alpha', 'Foxtrot'}, {winner = 1, statuses = {'W', 'L'}}),
+				},
+			})
+			local games = TiebreakerGameUtil.getGames(alpha, 2)
+			assert.are_same({w = 4, l = 1, games = 5}, {w = games.w, l = games.l, games = games.games})
+		end)
+
 		it('does not change the round tiebreakers', function()
 			local alpha = opponent('Alpha', {
 				matches = {

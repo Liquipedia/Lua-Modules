@@ -17,6 +17,17 @@ local StandingsOvertime = Lua.import('Module:Standings/Overtime')
 
 local TiebreakerGameUtil = {}
 
+local WALKOVER_STATUSES = {FF = true, DQ = true, L = true}
+
+---A finished match decided by a forfeit, disqualification or walkover loss of one of its opponents.
+---@param match MatchGroupUtilMatch
+---@return boolean
+local function isWalkover(match)
+	return match.finished and Array.any(match.opponents, function (matchOpponent)
+		return WALKOVER_STATUSES[matchOpponent.status] == true
+	end)
+end
+
 ---@param opponent TiebreakerOpponent
 ---@return {games: integer, w: integer, l: integer, walkover: {w: integer, l: integer}?}
 local getPlayedGames = FnUtil.memoize(function (opponent)
@@ -27,14 +38,18 @@ local getPlayedGames = FnUtil.memoize(function (opponent)
 	Array.forEach(opponent.matches, function (match)
 		local opponentIndex = Array.indexOf(match.opponents, FnUtil.curry(Opponent.same, opponent.opponent))
 
-		if Array.any(match.opponents, function (matchOpponent)
-			return matchOpponent.status ~= 'S'
-		end) then
+		if isWalkover(match) then
 			if match.winner == opponentIndex then
 				walkoverWins = walkoverWins + 1
 			else
 				walkoverLosses = walkoverLosses + 1
 			end
+			return
+		end
+		-- Other results without a score, e.g. upcoming matches or draws without a score, have no games
+		if Array.any(match.opponents, function (matchOpponent)
+			return matchOpponent.status ~= 'S'
+		end) then
 			return
 		end
 		games = games + Array.reduce(Array.map(match.opponents, Operator.property('score')), Operator.nilSafeAdd)
