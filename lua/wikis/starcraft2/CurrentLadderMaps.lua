@@ -22,8 +22,8 @@ local ColumnName = Condition.ColumnName
 local Html = Lua.import('Module:Widget/Html')
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local List = Lua.import('Module:Widget/List')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CurrentLadderMaps = {}
@@ -101,7 +101,7 @@ function CurrentLadderMaps._mapsOverview(data)
 				children = TableWidgets.Row{
 					children = Array.map(data, function(item)
 						return TableWidgets.Cell{
-							children = UnorderedList{
+							children = List.Unordered{
 								children = Array.map(item.maps, function (map)
 									return {
 										Link{link = map.pageName, children = map.displayName},
