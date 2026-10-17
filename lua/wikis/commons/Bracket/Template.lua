@@ -14,7 +14,7 @@ local Template = Lua.import('Module:Template')
 
 local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
 local Match = Lua.import('Module:Match')
-local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
+local MatchGroupCoordinates = Lua.import('Module:Domain/Bracket/Coordinates')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Opponent = Lua.import('Module:Opponent')
 
@@ -168,7 +168,7 @@ end
 BracketTemplate.perfConfig = {
 	locations = {
 		'Module:Bracket/Template|*',
-		'Module:MatchGroup/Coordinates|*',
+		'Module:Domain/Bracket/Coordinates|*',
 		'Module:MatchGroup/Display/Bracket|*',
 	}
 }

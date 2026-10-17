@@ -4,7 +4,7 @@
 ---@diagnostic disable: missing-fields
 
 --[[
-Tests for Module:MatchGroup/Util/Match, the match model: reading match records into matches,
+Tests for Module:Domain/Match/Model, the match model: reading match records into matches,
 opponents, games and players.
 ]]
 
@@ -22,10 +22,10 @@ local function gameRecord(record)
 	return record
 end
 
-insulate('MatchGroup/Util/Match', function()
+insulate('Domain/Match/Model', function()
 	describe('matchFromRecord', function()
 		it('reads a full bracket match record', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			local match = MatchUtil.matchFromRecord(matchRecord{
 				match2id = 'abcdefghij_R01-M001',
 				bestof = '3',
@@ -60,7 +60,7 @@ insulate('MatchGroup/Util/Match', function()
 		end)
 
 		it('lifts comment, timestamp and timezone out of extradata', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			local match = MatchUtil.matchFromRecord(matchRecord{
 				date = '2022-01-05',
 				mode = 'team',
@@ -77,7 +77,7 @@ insulate('MatchGroup/Util/Match', function()
 		end)
 
 		it('fills in the defaults of a minimal record', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			local match = MatchUtil.matchFromRecord(matchRecord{
 				date = '2022-01-05',
 				mode = 'team',
@@ -98,7 +98,7 @@ insulate('MatchGroup/Util/Match', function()
 		end)
 
 		it('lower cases the walkover and blanks out empty strings', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			local match = MatchUtil.matchFromRecord(matchRecord{
 				date = '2022-01-05',
 				mode = 'team',
@@ -117,7 +117,7 @@ insulate('MatchGroup/Util/Match', function()
 		end)
 
 		it('parses json encoded links, stream and bracket data', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			local match = MatchUtil.matchFromRecord(matchRecord{
 				date = '2022-01-05',
 				mode = 'team',
@@ -134,7 +134,7 @@ insulate('MatchGroup/Util/Match', function()
 		end)
 
 		it('auto assigns lower edges for bracket matches that have none', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			local match = MatchUtil.matchFromRecord(matchRecord{
 				date = '2022-01-05',
 				mode = 'team',
@@ -159,7 +159,7 @@ insulate('MatchGroup/Util/Match', function()
 		---@param matchOverrides table?
 		---@return standardOpponent
 		local function readOpponent(opponent, matchOverrides)
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			local record = matchRecord(require('Module:Table').merge(
 				{match2opponents = {opponent}, match2games = {}},
 				matchOverrides or {}
@@ -212,7 +212,7 @@ insulate('MatchGroup/Util/Match', function()
 
 	describe('createOpponent', function()
 		it('fills in the defaults of a bare opponent', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			assert.are_same({
 				extradata = {},
 				players = {},
@@ -221,7 +221,7 @@ insulate('MatchGroup/Util/Match', function()
 		end)
 
 		it('passes the given fields through', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			local opponent = MatchUtil.createOpponent{name = 'A', score = 2, type = 'team', template = 'a'}
 			assert.are_equal('A', opponent.name)
 			assert.are_equal(2, opponent.score)
@@ -232,7 +232,7 @@ insulate('MatchGroup/Util/Match', function()
 
 	describe('playerFromRecord', function()
 		it('reads a player and pulls the team out of extradata', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			local player = MatchUtil.playerFromRecord{
 				name = 'Player_A',
 				displayname = 'pA',
@@ -248,14 +248,14 @@ insulate('MatchGroup/Util/Match', function()
 		end)
 
 		it('blanks out an empty flag', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			assert.is_nil(MatchUtil.playerFromRecord{name = 'A', flag = ''}.flag)
 		end)
 	end)
 
 	describe('gameFromRecord', function()
 		it('reads a game and lifts its display fields out of extradata', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			local game = MatchUtil.gameFromRecord(gameRecord{
 				map = 'Map1',
 				winner = '1',
@@ -290,14 +290,14 @@ insulate('MatchGroup/Util/Match', function()
 		end)
 
 		it('defaults the scores to an empty list', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			assert.are_same({}, MatchUtil.gameFromRecord(gameRecord{map = 'Map1'}, 2).scores)
 		end)
 	end)
 
 	describe('record extradata', function()
 		it('parses json encoded extradata', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			local match = MatchUtil.matchFromRecord(matchRecord{
 				date = '2022-01-05',
 				mode = 'team',
@@ -310,7 +310,7 @@ insulate('MatchGroup/Util/Match', function()
 
 		it('does not mutate the extradata of the record it was given', function()
 			-- the model lifts comment/timestamp/timezoneid out of extradata, so it has to work on a copy
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			local extradata = {comment = 'a comment', timestamp = 1641384000, keepme = 'yes'}
 			local match = MatchUtil.matchFromRecord(matchRecord{
 				date = '2022-01-05',
@@ -326,7 +326,7 @@ insulate('MatchGroup/Util/Match', function()
 		end)
 
 		it('defaults to an empty table when the record has none', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			local match = MatchUtil.matchFromRecord(matchRecord{
 				date = '2022-01-05', mode = 'team', match2opponents = {}, match2games = {},
 			})
@@ -336,7 +336,7 @@ insulate('MatchGroup/Util/Match', function()
 
 	describe('groupBySubgroup', function()
 		it('groups consecutive games with the same subgroup and takes their headers', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			local submatches = MatchUtil.groupBySubgroup{
 				extradata = {subgroup1header = 'First', subgroup2header = 'Second'},
 				games = {
@@ -355,7 +355,7 @@ insulate('MatchGroup/Util/Match', function()
 		end)
 
 		it('numbers the submatches by position, not by the subgroup value', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			local submatches = MatchUtil.groupBySubgroup{
 				extradata = {},
 				games = {{map = 'M1', subgroup = 5}, {map = 'M2', subgroup = 9}},
@@ -366,7 +366,7 @@ insulate('MatchGroup/Util/Match', function()
 		end)
 
 		it('starts a new submatch every time the subgroup changes back', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			local submatches = MatchUtil.groupBySubgroup{
 				extradata = {},
 				games = {{subgroup = 1}, {subgroup = 2}, {subgroup = 1}},
@@ -375,32 +375,32 @@ insulate('MatchGroup/Util/Match', function()
 		end)
 
 		it('returns nothing for a match without games', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			assert.are_same({}, MatchUtil.groupBySubgroup{extradata = {}, games = {}})
 		end)
 	end)
 
 	describe('computeMatchPhase', function()
 		it('is finished once there is a winner or the finished flag is set', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			assert.are_equal('finished', MatchUtil.computeMatchPhase{winner = 1, date = '2099-01-01'})
 			assert.are_equal('finished', MatchUtil.computeMatchPhase{finished = true, date = '2099-01-01'})
 		end)
 
 		it('is ongoing once an exact start time has passed', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			assert.are_equal('ongoing',
 				MatchUtil.computeMatchPhase{date = '2020-01-01 12:00:00', dateIsExact = true})
 		end)
 
 		it('is upcoming before the start time', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			assert.are_equal('upcoming',
 				MatchUtil.computeMatchPhase{date = '2099-01-01 12:00:00', dateIsExact = true})
 		end)
 
 		it('is upcoming when the date is explicitly not exact', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			assert.are_equal('upcoming',
 				MatchUtil.computeMatchPhase{date = '2020-01-01 12:00:00', dateexact = '0'})
 		end)
@@ -408,18 +408,18 @@ insulate('MatchGroup/Util/Match', function()
 		it('ignores a dateIsExact of false, because it is read with an or', function()
 			-- `match.dateIsExact or match.dateexact` turns a false into a nil, which is not the same as
 			-- an explicit false, so a past match with dateIsExact = false still counts as ongoing
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			assert.are_equal('ongoing',
 				MatchUtil.computeMatchPhase{date = '2020-01-01 12:00:00', dateIsExact = false})
 		end)
 
 		it('is upcoming when there is no usable date', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			assert.are_equal('upcoming', MatchUtil.computeMatchPhase{})
 		end)
 
 		it('accepts a raw record as well as a model, via dateexact and timestamp', function()
-			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local MatchUtil = require('Module:Domain/Match/Model')
 			assert.are_equal('ongoing',
 				MatchUtil.computeMatchPhase{dateexact = '1', timestamp = 1577880000})
 		end)
@@ -427,18 +427,15 @@ insulate('MatchGroup/Util/Match', function()
 end)
 
 --[[
-Reading map scores onto the opponent instead of the match score is per wiki configuration,
-so it needs a wiki that turns it on.
+Reading map scores onto the opponent instead of the match score is a per wiki rule, which the
+model takes as a parameter. No wiki has to be stood up to test it.
 ]]
-insulate('MatchGroup/Util/Match on a wiki with game scores in a best of one', function()
-	setup(function() SetActiveWiki('counterstrike') end)
-	teardown(function() SetActiveWiki() end)
-
+insulate('Domain/Match/Model with game scores in a best of one', function()
 	---@param record table
 	---@return standardOpponent
 	local function readFirstOpponent(record)
-		local MatchUtil = require('Module:MatchGroup/Util/Match')
-		return MatchUtil.opponentFromRecord(record, record.match2opponents[1], 1)
+		local MatchUtil = require('Module:Domain/Match/Model')
+		return MatchUtil.opponentFromRecord(record, record.match2opponents[1], 1, {gameScoresIfBo1 = true})
 	end
 
 	it('shows the map score of a best of one', function()
@@ -479,5 +476,43 @@ insulate('MatchGroup/Util/Match on a wiki with game scores in a best of one', fu
 			match2games = {{opponents = {{score = '16'}, {score = '0'}}}},
 		}
 		assert.is_nil(opponent.scoreDisplay)
+	end)
+end)
+
+--[[
+The default rules come from Info.config, which is the path production takes, so this one does need
+a wiki that turns the rule on.
+]]
+insulate('Domain/Match/Model reading the per wiki defaults', function()
+	setup(function() SetActiveWiki('counterstrike') end)
+	teardown(function() SetActiveWiki() end)
+
+	---@param options table?
+	---@return standardOpponent
+	local function readFirstOpponent(options)
+		local MatchUtil = require('Module:Domain/Match/Model')
+		local record = matchRecord{
+			bestof = '1',
+			match2opponents = {
+				{name = 'A', score = '1', status = 'S', match2players = {}},
+				{name = 'B', score = '0', status = 'S', match2players = {}},
+			},
+			match2games = {{opponents = {{score = '16', status = 'S'}, {score = '14', status = 'S'}}}},
+		}
+		return MatchUtil.opponentFromRecord(record, record.match2opponents[1], 1, options)
+	end
+
+	it('applies the configured rule when the caller passes no options', function()
+		assert.are_equal(16, readFirstOpponent().scoreDisplay)
+	end)
+
+	it('keeps the configured rule when the caller overrides nothing', function()
+		-- the options are merged under the defaults rather than replacing them, so a caller
+		-- overriding one rule does not silently lose the others
+		assert.are_equal(16, readFirstOpponent({}).scoreDisplay)
+	end)
+
+	it('lets the caller turn the rule off', function()
+		assert.is_nil(readFirstOpponent({gameScoresIfBo1 = false}).scoreDisplay)
 	end)
 end)
