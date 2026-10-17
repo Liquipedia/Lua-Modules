@@ -92,6 +92,21 @@ describe('Standings Wiki Parser', function()
 		end)
 	end)
 
+	describe('walkover games', function()
+		it('reads the walkovergames input', function()
+			assert.are_equal(2, StandingsParseWiki.parseWalkoverGames{walkovergames = '2'})
+			assert.are_equal(0, StandingsParseWiki.parseWalkoverGames{walkovergames = '0'})
+			assert.is_nil(StandingsParseWiki.parseWalkoverGames{walkovergames = ''})
+			assert.is_nil(StandingsParseWiki.parseWalkoverGames{})
+		end)
+
+		it('errors on input that is not a non-negative integer', function()
+			for _, input in ipairs({'abc', '-1', '1.5'}) do
+				assert.error(function() StandingsParseWiki.parseWalkoverGames{walkovergames = input} end)
+			end
+		end)
+	end)
+
 	describe('points', function()
 		it('defaults to the swiss points', function()
 			assert.are_same({w = 1, d = 0.5, l = 0}, StandingsParseWiki.parsePoints(nil))

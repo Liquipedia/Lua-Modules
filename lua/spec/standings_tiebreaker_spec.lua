@@ -351,6 +351,116 @@ describe('Standings Tiebreakers', function()
 		end)
 	end)
 
+	describe('games with walkover games', function()
+		local options = {walkoverGames = 2}
+
+		-- Played: 2-1 win. Walkovers: win (W-FF), loss (DQ-W), double forfeit (FF-FF, no winner).
+		local function makeAlpha()
+			return opponent('Alpha', {
+				matches = {
+					makeMatch({'Alpha', 'Bravo'}, {winner = 1, scores = {2, 1}}),
+					makeMatch({'Alpha', 'Charlie'}, {winner = 1, statuses = {'W', 'FF'}}),
+					makeMatch({'Alpha', 'Delta'}, {winner = 2, statuses = {'DQ', 'W'}}),
+					makeMatch({'Alpha', 'Echo'}, {winner = 0, statuses = {'FF', 'FF'}}),
+				},
+			})
+		end
+
+		it('credits the winner of a walkover with game wins and the loser with game losses', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local games = TiebreakerGameUtil.getGames(makeAlpha(), 2)
+			-- w: 2 + 2, l: 1 + 2 + 2
+			assert.are_equal(4, games.w)
+			assert.are_equal(5, games.l)
+			assert.are_equal(9, games.games)
+		end)
+
+		it('does not count walkovers when unset or 0', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local alpha = makeAlpha()
+			local expected = {w = 2, l = 1, games = 3}
+			Array.forEach({TiebreakerGameUtil.getGames(alpha), TiebreakerGameUtil.getGames(alpha, 0)}, function(games)
+				assert.are_same(expected, {w = games.w, l = games.l, games = games.games})
+			end)
+		end)
+
+		it('applies to the game tiebreakers', function()
+			local alpha = makeAlpha()
+			local function valueOf(name)
+				local tiebreaker = TiebreakerFactory.tiebreakerFromId('full.' .. name, options)
+				return tiebreaker:valueOf({alpha}, alpha)
+			end
+			assert.are_equal(-1, valueOf('gamediff'))
+			assert.are_equal(4, valueOf('gamewins'))
+			assert.are_equal(-5, valueOf('gamelosses'))
+			assert.are_equal(9, valueOf('gamecount'))
+			assert.are_equal(4 / 9, valueOf('gamewinrate'))
+			assert.are_same({4, -5}, valueOf('gamescore'))
+			assert.are_equal(-1, valueOf('gamediffregulation'))
+			assert.are_equal('4 - 5', TiebreakerFactory.tiebreakerFromId('full.gamediff', options):display({alpha}, alpha))
+		end)
+
+		it('only counts finished matches decided by FF, DQ or L as walkovers', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local alpha = opponent('Alpha', {
+				matches = {
+					makeMatch({'Alpha', 'Bravo'}, {winner = 1, scores = {2, 1}}),
+					-- Upcoming match without statuses
+					makeMatch({'Alpha', 'Charlie'}, {finished = false, statuses = {'', ''}}),
+					-- Draw without a score
+					makeMatch({'Alpha', 'Delta'}, {winner = 0, statuses = {'D', 'D'}}),
+					-- Walkover that is not finished yet
+					makeMatch({'Alpha', 'Echo'}, {finished = false, winner = 2, statuses = {'FF', 'W'}}),
+					makeMatch({'Alpha', 'Foxtrot'}, {winner = 1, statuses = {'W', 'L'}}),
+				},
+			})
+			local games = TiebreakerGameUtil.getGames(alpha, 2)
+			assert.are_same({w = 4, l = 1, games = 5}, {w = games.w, l = games.l, games = games.games})
+		end)
+
+		it('reads the walkover result from the status of the opponent, not the winner of the match', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local alpha = opponent('Alpha', {
+				matches = {
+					-- W without the winner set
+					makeMatch({'Alpha', 'Bravo'}, {statuses = {'W', 'FF'}}),
+					-- DQ while the winner points to Alpha
+					makeMatch({'Alpha', 'Charlie'}, {winner = 1, statuses = {'DQ', 'W'}}),
+				},
+			})
+			local games = TiebreakerGameUtil.getGames(alpha, 2)
+			assert.are_same({w = 2, l = 2, games = 4}, {w = games.w, l = games.l, games = games.games})
+		end)
+
+		it('counts a double forfeit as a walkover loss for both opponents', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local doubleForfeit = makeMatch({'Alpha', 'Bravo'}, {winner = -1, statuses = {'FF', 'FF'}})
+			Array.forEach({'Alpha', 'Bravo'}, function(name)
+				local games = TiebreakerGameUtil.getGames(opponent(name, {matches = {doubleForfeit}}), 2)
+				assert.are_same({w = 0, l = 2, games = 2}, {w = games.w, l = games.l, games = games.games})
+			end)
+		end)
+
+		it('gives no walkover result to an opponent with a score against a walkover loss', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local match = makeMatch({'Alpha', 'Bravo'}, {winner = 1, statuses = {'S', 'FF'}, scores = {1, 0}})
+			local alphaGames = TiebreakerGameUtil.getGames(opponent('Alpha', {matches = {match}}), 2)
+			local bravoGames = TiebreakerGameUtil.getGames(opponent('Bravo', {matches = {match}}), 2)
+			assert.are_same({w = 0, l = 0, games = 0}, {w = alphaGames.w, l = alphaGames.l, games = alphaGames.games})
+			assert.are_same({w = 0, l = 2, games = 2}, {w = bravoGames.w, l = bravoGames.l, games = bravoGames.games})
+		end)
+
+		it('does not change the round tiebreakers', function()
+			local alpha = opponent('Alpha', {
+				matches = {
+					makeMatch({'Alpha', 'Bravo'}, {winner = 1, statuses = {'W', 'FF'}}),
+				},
+			})
+			local rounddiff = TiebreakerFactory.tiebreakerFromId('full.rounddiff', options)
+			assert.are_equal(0, rounddiff:valueOf({alpha}, alpha))
+		end)
+	end)
+
 	describe('games with overtime', function()
 		local Info = require('Module:Info')
 		local originalStandingsConfig

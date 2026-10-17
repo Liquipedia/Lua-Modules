@@ -57,6 +57,7 @@ function StandingTableLegacySwiss.getStandardParameter(args)
 		matchdraws = Logic.readBoolOrNil(args.ties),
 		overtime = Logic.readBool(args.show_otp),
 		points = StandingTableLegacySwiss.parsePoints(args),
+		walkovergames = args.walkover_win,
 	}
 end
 

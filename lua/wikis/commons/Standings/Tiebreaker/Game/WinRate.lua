@@ -20,7 +20,7 @@ local TiebreakerGameWinRate = Class.new(TiebreakerInterface)
 ---@param opponent TiebreakerOpponent
 ---@return integer
 function TiebreakerGameWinRate:valueOf(state, opponent)
-	local games = TiebreakerGameUtil.getGames(opponent)
+	local games = TiebreakerGameUtil.getGames(opponent, self.options.walkoverGames)
 	return games.games == 0 and 0.5 or (games.w / games.games)
 end
 
@@ -33,7 +33,7 @@ end
 ---@param opponent TiebreakerOpponent
 ---@return string
 function TiebreakerGameWinRate:display(state, opponent)
-	local games = TiebreakerGameUtil.getGames(opponent)
+	local games = TiebreakerGameUtil.getGames(opponent, self.options.walkoverGames)
 	if games.games == 0 then
 		return '-'
 	end

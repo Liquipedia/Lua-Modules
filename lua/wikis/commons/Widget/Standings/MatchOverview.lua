@@ -15,6 +15,9 @@ local Label = Lua.import('Module:Widget/Basic/Label')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
+
+local RESULT_TYPES = {w = 'win', d = 'draw', l = 'loss'}
 
 ---@param props {match: MatchGroupUtilMatch, showOpponent: integer}
 ---@return Renderable?
@@ -36,17 +39,11 @@ local function MatchOverviewWidget(props)
 	end
 
 	local phase = match.phase
-	local resultType
-
-	if match.phase ~= 'finished' then
-		resultType = 'default'
-	elseif match.winner == opponentIndexToShow then
-		resultType = 'loss'
-	elseif match.winner == 0 then
-		resultType = 'draw'
-	else
-		resultType = 'win'
-	end
+	local isFinished = phase == 'finished'
+	-- The result is from the point of view of the row's opponent (left), the same as in the match record,
+	-- so a match without a winner (e.g. a double loss) is a loss and not a win
+	local resultType = isFinished and RESULT_TYPES[TiebreakerScope.matchResult(match, leftOpponent)] or 'default'
+	local shownOpponentWon = isFinished and TiebreakerScope.matchResult(match, opponentToShow) == 'w'
 
 	return Html.Div{
 		classes = {'standings-match-overview'},
@@ -61,7 +58,7 @@ local function MatchOverviewWidget(props)
 					},
 					Html.Span{children = ':'},
 					Html.Span{
-						css = resultType == 'loss' and {['font-weight'] = 'bold'} or nil,
+						css = shownOpponentWon and {['font-weight'] = 'bold'} or nil,
 						children = OpponentDisplay.InlineScore(opponentToShow)
 					}
 				}
