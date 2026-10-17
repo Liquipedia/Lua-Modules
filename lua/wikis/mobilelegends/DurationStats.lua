@@ -167,8 +167,8 @@ function DurationStats._buildRow(game)
 		return OpponentDisplay.BlockOpponent{opponent = Opponent.fromMatch2Record(opp), teamStyle = 'short'}
 	end
 
-	local sectionName = (match.section ~= 'Results' and match.section) 
-    	or match.extradata.matchsection or 'Results'
+	local sectionName = (match.section ~= 'Results' and match.section)
+		or match.extradata.matchsection or 'Results'
 
 	return TableWidgets.Row{
 		children = {
