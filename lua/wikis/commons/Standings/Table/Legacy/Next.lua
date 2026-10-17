@@ -60,6 +60,8 @@ local IMPLICIT_TIEBREAKERS = {
 function StandingTableLegacyNext.run(frame)
 	local args = Arguments.getArgs(frame)
 
+	assert(args.tiebreaker1 ~= 'finalTiebreak', 'This SwissTableLeague has to be converted manually due to using unsupported manual tiebreakers')
+
 	local matchRecords = StandingTableLegacyNext.fetchMatches(args)
 	local matchesByRound, roundCount = StandingTableLegacyNext.groupMatchesByRound(args, matchRecords)
 	local rounds = Table.map(Array.range(1, roundCount), function(roundIndex)
