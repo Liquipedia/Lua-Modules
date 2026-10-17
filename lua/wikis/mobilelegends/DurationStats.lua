@@ -119,7 +119,7 @@ end
 ---@param title string
 ---@return Widget
 function DurationStats._generateTable(games, title)
-	return TableWidgets.Table{	
+	return TableWidgets.Table{
 		sortable = true,
 		title = title,
 		columns = {
@@ -167,15 +167,13 @@ function DurationStats._buildRow(game)
 		return OpponentDisplay.BlockOpponent{opponent = Opponent.fromMatch2Record(opp), teamStyle = 'short'}
 	end
 
+	local sectionName = (match.section ~= 'Results' and match.section) 
+    	or match.extradata.matchsection or 'Results'
+
 	return TableWidgets.Row{
 		children = {
 			TableWidgets.Cell{children = DateExt.toYmdInUtc(game.date)},
-			TableWidgets.Cell{children = Link{
-				link = game.pagename,
-				children = {
-						match.section ~= 'Results' and match.section or (match.extradata.matchsection and match.extradata.matchsection) or 'Results'
-				}
-			}},
+			TableWidgets.Cell{children = Link{link = game.pagename, children = sectionName}},
 			TableWidgets.Cell{children = game.match2gameid},
 			TableWidgets.Cell{children = displayOpponent(winner)},
 			TableWidgets.Cell{children = displayOpponent(loser)},
