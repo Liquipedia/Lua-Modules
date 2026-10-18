@@ -31,7 +31,7 @@ TiebreakerRoundUtil.getRounds = FnUtil.memoize(function (opponent)
 		Array.forEach(playedGames, function (game)
 			local scores = game.scores
 			rounds = rounds + MathUtil.sum(scores)
-			roundWins = roundWins + scores[opponentIndex]
+			roundWins = roundWins + (scores[opponentIndex] or 0)
 		end)
 	end)
 	local roundLosses = rounds - roundWins
