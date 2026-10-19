@@ -36,7 +36,7 @@ local StandingsParseLpdb = {}
 ---@param manualOpponents StandingTableOpponentData[]
 ---@param options StandingsImportOptions?
 ---@return StandingTableOpponentData[]
----@return table<integer, MatchPhase[]> # Phases of all matches of a round, including the not counted ones
+---@return table<integer, MatchPhase[]>
 function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponents, options)
 	local matchIds = Array.flatMap(rounds, function(round)
 		return round.matches
@@ -82,7 +82,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 		end
 	)
 
-	-- Matches that are not stored (yet) have not been played
+	-- Matches that have been entered, but not created, are treated as upcoming
 	local matchPhasesByRound = Table.map(rounds, function(_, round)
 		return round.roundNumber, Array.map(round.matches, function(matchId)
 			return phaseByMatchId[matchId] or 'upcoming'
