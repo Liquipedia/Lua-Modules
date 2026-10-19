@@ -23,7 +23,7 @@ local DEFAULT_LIMIT = 5
 local Controller = {}
 
 ---@param frame Frame
----@return Widget
+---@return Renderable
 function Controller.run(frame)
 	local args = Arguments.getArgs(frame)
 	local limit = tonumber(args.limit) or DEFAULT_LIMIT

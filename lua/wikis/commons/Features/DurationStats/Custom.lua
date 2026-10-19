@@ -12,7 +12,7 @@ local Controller = Lua.import('Module:Features/DurationStats/Controller')
 local CustomDurationStats = {}
 
 ---@param frame Frame
----@return Widget
+---@return Renderable
 function CustomDurationStats.run(frame)
 	return Controller.run(frame)
 end

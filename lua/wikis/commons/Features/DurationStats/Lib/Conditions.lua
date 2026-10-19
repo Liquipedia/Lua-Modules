@@ -50,9 +50,12 @@ end
 
 ---A date without a time (e.g. 2026-05-10) should include the games played during that whole day.
 ---@private
----@param date string
----@return string
+---@param date string?
+---@return string?
 function Conditions._endOfDay(date)
+	if not date then
+		return nil
+	end
 	if date:match(DATE_ONLY_PATTERN) then
 		return date .. END_OF_DAY
 	end
