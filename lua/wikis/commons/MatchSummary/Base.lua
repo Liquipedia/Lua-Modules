@@ -112,7 +112,16 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 
 	if GameDetail then
 		local gamesOverview = nodes
-		local details = Array.map(match.games, GameDetail)
+		local details = Array.map(match.games, function (game, index)
+			local gameDetail = GameDetail(game, index)
+			if gameDetail == nil then
+				return nil
+			end
+			return {
+				detail = gameDetail,
+				gameIndex = index,
+			}
+		end)
 
 		if Logic.isNotEmpty(details) then
 			nodes = Html.Div{
@@ -122,11 +131,34 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 					Html.Div{
 						css = {
 							display = 'flex',
+							['justify-content'] = 'space-between',
 							['align-items'] = 'center',
+							['padding-top'] = '0.25rem',
 						},
 						children = {
-							Html.B{children = 'Game details'},
+							Html.B{
+								css = {['font-size'] = '0.875rem'},
+								children = 'Game details'
+							},
 							DropdownContainer{
+								alignRight = true,
+								variant = 'inline',
+								label = WidgetUtil.collect(
+									Html.Div{
+										attributes = {['data-toggle-area-content'] = 1},
+										children = 'Overview',
+									},
+									Array.map(details, function (detail, index)
+										---@cast detail -nil
+										return Html.Div{
+											attributes = {['data-toggle-area-content'] = index + 1},
+											children = {
+												'Game ',
+												detail.gameIndex
+											},
+										}
+									end)
+								),
 								children = WidgetUtil.collect(
 									DropdownItem{
 										classes = {'toggle-area-button'},
@@ -137,7 +169,10 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 										return DropdownItem{
 											classes = {'toggle-area-button'},
 											attributes = {['data-toggle-area-btn'] = gameIndex + 1},
-											children = 'Overview'
+											children = {
+												'Game ',
+												details[gameIndex].gameIndex
+											}
 										}
 									end)
 								)
@@ -149,9 +184,10 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 						children = gamesOverview,
 					},
 					Array.map(details, function (detail, index)
+						---@cast detail -nil
 						return Html.Div{
 							attributes = {['data-toggle-area-content'] = index + 1},
-							children = detail,
+							children = detail.detail,
 						}
 					end)
 				)
