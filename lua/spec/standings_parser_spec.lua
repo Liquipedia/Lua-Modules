@@ -39,6 +39,46 @@ describe('Standings Parser', function()
 	local BGS = {[1] = 'up', [2] = 'stay', [3] = 'down'}
 	local TIEBREAKERS = {'full.points', 'full.manual'}
 
+	describe('round status', function()
+		local function resolve(round, matchPhases)
+			local started, finished = StandingsParser.resolveRoundStatus(round, matchPhases)
+			return {started = started, finished = finished}
+		end
+
+		it('has neither started nor finished without matches', function()
+			assert.are_same({started = false, finished = false}, resolve({}, nil))
+			assert.are_same({started = false, finished = false}, resolve({}, {}))
+		end)
+
+		it('follows the phases of the matches', function()
+			assert.are_same({started = false, finished = false}, resolve({}, {'upcoming', 'upcoming'}))
+			assert.are_same({started = true, finished = false}, resolve({}, {'ongoing', 'upcoming'}))
+			assert.are_same({started = true, finished = false}, resolve({}, {'finished', 'upcoming'}))
+			assert.are_same({started = true, finished = true}, resolve({}, {'finished', 'finished'}))
+		end)
+
+		it('prefers manual input over the matches', function()
+			assert.are_same({started = true, finished = false}, resolve({finished = false}, {'finished'}))
+			assert.are_same({started = false, finished = false}, resolve({started = false}, {'ongoing'}))
+			assert.are_same({started = true, finished = false}, resolve({started = true}, {}))
+		end)
+
+		it('treats a finished round as started', function()
+			assert.are_same({started = true, finished = true}, resolve({finished = true}, {}))
+			assert.are_same({started = true, finished = true}, resolve({started = false, finished = true}, {}))
+		end)
+
+		it('stores whether the round of an entry is finished', function()
+			local standingsTable = StandingsParser.parse({
+				{roundNumber = 1, started = true, finished = true},
+				{roundNumber = 2, started = true, finished = false},
+			}, {makeOpponent('Alpha', {{points = 3}, {points = 0}})}, BGS, nil, {}, 'ffa', TIEBREAKERS)
+
+			assert.is_true(findEntry(standingsTable.entries, 'Alpha', 1).finished)
+			assert.is_false(findEntry(standingsTable.entries, 'Alpha', 2).finished)
+		end)
+	end)
+
 	it('computes points, placements, statuses and placement changes across rounds', function()
 		local opponents = {
 			makeOpponent('Alpha', {{points = 3}, {points = 0}}),
