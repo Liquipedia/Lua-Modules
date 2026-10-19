@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Component = Lua.import('Module:Widget/Component')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local FfaStandings = Lua.import('Module:Widget/Standings/Ffa')
+local GroupStandings = Lua.import('Module:Widget/Standings/Group')
 local SwissStandings = Lua.import('Module:Widget/Standings/Swiss')
 
 local Standings = Lua.import('Module:Standings')
@@ -30,6 +31,10 @@ local function StandingsWidget(props)
 		}
 	elseif standings.type == 'swiss' then
 		standingsWidget = SwissStandings{
+			standings = standings,
+		}
+	elseif standings.type == 'group' then
+		standingsWidget = GroupStandings{
 			standings = standings,
 		}
 	end

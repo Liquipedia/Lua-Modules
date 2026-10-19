@@ -263,4 +263,132 @@ describe('Standings model round trip', function()
 		assert.are_equal(1, aliasCount)
 		assert.are_equal(2, bravoCount)
 	end)
+
+	describe('group standings', function()
+		---@param name string
+		---@param results {w: integer, d: integer, l: integer}[]
+		local function makeGroupOpponent(name, results)
+			return {
+				opponent = literal(name),
+				rounds = Array.map(results, function(result)
+					return {scoreboard = {points = 3 * result.w + result.d, match = result}, specialstatus = ''}
+				end),
+			}
+		end
+
+		local WIN = {w = 1, d = 0, l = 0}
+		local DRAW = {w = 0, d = 1, l = 0}
+		local LOSS = {w = 0, d = 0, l = 1}
+		local NOT_PLAYED = {w = 0, d = 0, l = 0}
+
+		---@param rounds table[]
+		---@param opponents table[]
+		---@return string
+		local function storeAndRender(rounds, opponents)
+			local standingsTable = StandingsParser.parse(
+				rounds, opponents, {[1] = 'up', [3] = 'down'}, 'Group A', {}, 'group',
+				{'full.disqualified', 'full.points', 'full.manual'}
+			)
+			StandingsStorage.run(standingsTable, {saveVars = true})
+			return tostring(require('Module:Widget/Standings')({pageName = 'FakePage', standingsIndex = 0}))
+		end
+
+		it('renders every started round with a round selector', function()
+			local rounds = {
+				{roundNumber = 1, started = true, finished = true, title = 'Week 1'},
+				{roundNumber = 2, started = true, finished = true, title = 'Week 2'},
+				{roundNumber = 3, started = false, finished = false, title = 'Week 3'},
+			}
+			local html = storeAndRender(rounds, {
+				makeGroupOpponent('Alpha', {LOSS, WIN, NOT_PLAYED}),
+				makeGroupOpponent('Bravo', {WIN, DRAW, NOT_PLAYED}),
+				makeGroupOpponent('Charlie', {DRAW, WIN, NOT_PLAYED}),
+			})
+
+			assert.is_truthy(html:find('class="standings-round-history toggle-area toggle-area-2"', 1, true))
+			assert.is_truthy(html:find('standings-group', 1, true))
+			assert.is_truthy(html:find('Group A', 1, true))
+			-- The selector shows the round titles, the last started round is the current one
+			assert.is_truthy(html:find('>Week 1<', 1, true))
+			assert.is_truthy(html:find('>Current<', 1, true))
+			assert.is_falsy(html:find('Week 3', 1, true))
+
+			assert.is_truthy(html:find('data-toggle-area-content="1"', 1, true))
+			assert.is_truthy(html:find('data-toggle-area-content="2"', 1, true))
+			assert.is_falsy(html:find('data-toggle-area-content="3"', 1, true))
+			assert.is_truthy(html:find('standings-position-indicator', 1, true))
+
+			-- Points is the first tiebreaker, so it is bold, even though always shown stats come first
+			assert.is_truthy(html:find('style="font-weight:bold">4<', 1, true))
+
+			GoldenTest('standings_group', html)
+		end)
+
+		it('ranks by points and tracks the placement changes', function()
+			local rounds = {
+				{roundNumber = 1, started = true, finished = true, title = 'Week 1'},
+				{roundNumber = 2, started = true, finished = true, title = 'Week 2'},
+			}
+			storeAndRender(rounds, {
+				makeGroupOpponent('Alpha', {LOSS, WIN}),
+				makeGroupOpponent('Bravo', {WIN, LOSS}),
+				makeGroupOpponent('Charlie', {DRAW, WIN}),
+			})
+			local standings = Standings.getStandingsTable('FakePage', 0)
+			---@cast standings -nil
+
+			local function names(round)
+				return Array.map(standings.rounds[round].opponents, function(entry) return entry.opponent.name end)
+			end
+			assert.are_same({'Bravo', 'Charlie', 'Alpha'}, names(1))
+			assert.are_same({'Charlie', 'Alpha', 'Bravo'}, names(2))
+			local charlie = standings.rounds[2].opponents[1]
+			assert.are_equal(4, charlie.points)
+			assert.are_equal(1, charlie.positionChangeFromPreviousRound)
+		end)
+
+		it('renders a single round without a round selector or placement changes', function()
+			local html = storeAndRender({{roundNumber = 1, started = true, finished = true, title = 'Round 1'}}, {
+				makeGroupOpponent('Alpha', {WIN}),
+				makeGroupOpponent('Bravo', {LOSS}),
+			})
+			assert.is_truthy(html:find('standings-group', 1, true))
+			assert.is_falsy(html:find('standings-round-history', 1, true))
+			assert.is_falsy(html:find('data-toggle-area-content', 1, true))
+			assert.is_falsy(html:find('standings-position-indicator', 1, true))
+		end)
+
+		it('shows the opponents of the first round before any round has started', function()
+			local html = storeAndRender({
+				{roundNumber = 1, started = false, finished = false, title = 'Week 1'},
+				{roundNumber = 2, started = false, finished = false, title = 'Week 2'},
+			}, {
+				makeGroupOpponent('Alpha', {NOT_PLAYED, NOT_PLAYED}),
+				makeGroupOpponent('Bravo', {NOT_PLAYED, NOT_PLAYED}),
+			})
+			assert.is_falsy(html:find('standings-round-history', 1, true))
+			assert.is_falsy(html:find('data-toggle-area-content', 1, true))
+			assert.is_truthy(html:find('Alpha', 1, true))
+			assert.is_truthy(html:find('Bravo', 1, true))
+		end)
+
+		it('renders standings stored by the legacy GroupTableLeague', function()
+			StandingsStorage.run({
+				standingsindex = 0,
+				type = 'league',
+				entries = {
+					{opponent = literal('Alpha'), roundindex = 1, slotindex = 1, placement = 1, points = 3,
+						match = {w = 1, d = 0, l = 0}},
+					{opponent = literal('Bravo'), roundindex = 1, slotindex = 2, placement = 2, points = 0,
+						match = {w = 0, d = 0, l = 1}},
+				},
+			}, {saveVars = true})
+
+			local html = tostring(require('Module:Widget/Standings')({pageName = 'FakePage', standingsIndex = 0}))
+			assert.is_truthy(html:find('standings-group', 1, true))
+			local alphaPos = html:find('Alpha', 1, true)
+			assert.is_truthy(alphaPos)
+			assert.is_truthy(html:find('Bravo', alphaPos, true))
+		end)
+	end)
 end)
