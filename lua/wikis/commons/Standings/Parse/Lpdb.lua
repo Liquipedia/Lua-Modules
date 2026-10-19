@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
 local Lpdb = Lua.import('Module:Lpdb')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Namespace = Lua.import('Module:Namespace')
@@ -93,9 +94,9 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 				matchPoints = Table.merge(matchPoints, roundData.matchPoints)
 				local lastMatch = roundMatches[#roundMatches]
 				-- Stored as the matches fetched for display do not have aliases applied
-				local matchOpponentIndex = lastMatch and Array.indexOf(lastMatch.opponents, function(opponent)
-					return Opponent.same(opponent, opponentData.opponent)
-				end) or nil
+				local matchOpponentIndex = lastMatch
+					and Array.indexOf(lastMatch.opponents, FnUtil.curry(Opponent.same, opponentData.opponent))
+					or nil
 				return {
 					scoreboard = TiebreakerScope.tally(
 						opponentData.opponent, roundMatches, roundData.matchPoints, options and options.overtime

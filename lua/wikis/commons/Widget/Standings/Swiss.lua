@@ -119,7 +119,7 @@ function Helpers.createRow(standings, slot, statsToShow)
 				if not entry then
 					return TableWidgets.Cell{}
 				end
-				if not entry.matchOpponentIndex or not entry.match then
+				if not entry.match or not entry.matchOpponentIndex then
 					return TableWidgets.Cell{}
 				end
 
