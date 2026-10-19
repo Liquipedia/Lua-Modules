@@ -38,6 +38,7 @@ local function StandingsFfa(props)
 
 	local activeRounds = StandingsDisplayUtil.lastStartedRound(standings)
 	local statsToShow = StandingsDisplayUtil.statsToShow(standings)
+	local boldStatTitle = StandingsDisplayUtil.boldStatTitle(standings)
 
 	local standingsTable = TableWidgets.Table{
 		classes = {'standings-ffa'},
@@ -55,7 +56,7 @@ local function StandingsFfa(props)
 				if round.round > activeRounds then
 					return
 				end
-				return Helpers._createRoundBody(standings, round, statsToShow)
+				return Helpers._createRoundBody(standings, round, statsToShow, boldStatTitle)
 			end)
 		),
 		striped = false
@@ -87,7 +88,7 @@ end
 
 ---@private
 ---@param standings StandingsModel
----@param statsToShow {id: string, title: string?}[]
+---@param statsToShow StandingsAdditionalStat[]
 ---@return Renderable
 function Helpers._headerRow(standings, statsToShow)
 	return TableWidgets.TableHeader{children = {
@@ -109,9 +110,10 @@ end
 ---@private
 ---@param standings StandingsModel
 ---@param round StandingsRound
----@param statsToShow {id: string, title: string?}[]
+---@param statsToShow StandingsAdditionalStat[]
+---@param boldStatTitle string?
 ---@return Renderable
-function Helpers._createRoundBody(standings, round, statsToShow)
+function Helpers._createRoundBody(standings, round, statsToShow, boldStatTitle)
 	return TableWidgets.TableBody{children = Array.map(round.opponents, function (slot)
 		return TableWidgets.Row{
 			attributes = {
@@ -124,7 +126,7 @@ function Helpers._createRoundBody(standings, round, statsToShow)
 					children = PlacementChange{change = slot.positionChangeFromPreviousRound}
 				} or nil,
 				StandingsCells.participant(slot),
-				StandingsCells.stats(slot, statsToShow),
+				StandingsCells.stats(slot, statsToShow, boldStatTitle),
 				Helpers._showRoundColumns(standings) and Array.map(standings.rounds, function (columnRound)
 					local text
 					if columnRound.round <= round.round then

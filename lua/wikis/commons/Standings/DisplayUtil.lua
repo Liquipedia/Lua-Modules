@@ -15,7 +15,7 @@ local StandingsDisplayUtil = {}
 ---Stats with the same title share a column (e.g. all match based stats show the match record),
 ---the column shows the first of them.
 ---@param standings StandingsModel
----@return {id: string, title: string?}[]
+---@return StandingsAdditionalStat[]
 function StandingsDisplayUtil.statsToShow(standings)
 	local seenTitlesBefore = {}
 	return Array.filter(standings.additionalStats, function(tiebreaker)
@@ -28,6 +28,21 @@ function StandingsDisplayUtil.statsToShow(standings)
 		seenTitlesBefore[tiebreaker.title] = true
 		return true
 	end)
+end
+
+---The title of the column to show in bold, the column of the first tiebreaker that has one.
+---Standings stored before tiebreakers were marked show the first column in bold.
+---@param standings StandingsModel
+---@return string?
+function StandingsDisplayUtil.boldStatTitle(standings)
+	local stats = standings.additionalStats
+	if not Array.any(stats, function(stat) return stat.tiebreaker end) then
+		return (StandingsDisplayUtil.statsToShow(standings)[1] or {}).title
+	end
+	local firstTiebreakerWithColumn = Array.find(stats, function(stat)
+		return stat.tiebreaker == true and stat.title ~= nil
+	end)
+	return firstTiebreakerWithColumn and firstTiebreakerWithColumn.title or nil
 end
 
 ---The number of the last round that has started, 0 if none has.
