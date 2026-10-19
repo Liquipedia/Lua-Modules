@@ -110,90 +110,7 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 		nodes = Array.map(match.games, createGame)
 	end
 
-	if GameDetail then
-		local gamesOverview = nodes
-		local details = Array.map(match.games, function (game, index)
-			local gameDetail = GameDetail(game, index)
-			if gameDetail == nil then
-				return nil
-			end
-			return {
-				detail = gameDetail,
-				gameIndex = index,
-			}
-		end)
-
-		if Logic.isNotEmpty(details) then
-			nodes = Html.Div{
-				classes = {'toggle-area', 'toggle-area-1'},
-				attributes = {['data-toggle-area'] = 1},
-				children = WidgetUtil.collect(
-					Html.Div{
-						css = {
-							display = 'flex',
-							['justify-content'] = 'space-between',
-							['align-items'] = 'center',
-							['padding-top'] = '0.25rem',
-						},
-						children = {
-							Html.B{
-								css = {['font-size'] = '0.875rem'},
-								children = 'Game details'
-							},
-							DropdownContainer{
-								alignRight = true,
-								variant = 'inline',
-								label = WidgetUtil.collect(
-									Html.Div{
-										attributes = {['data-toggle-area-content'] = 1},
-										children = 'Overview',
-									},
-									Array.map(details, function (detail, index)
-										---@cast detail -nil
-										return Html.Div{
-											attributes = {['data-toggle-area-content'] = index + 1},
-											children = {
-												'Game ',
-												detail.gameIndex
-											},
-										}
-									end)
-								),
-								children = WidgetUtil.collect(
-									DropdownItem{
-										classes = {'toggle-area-button'},
-										attributes = {['data-toggle-area-btn'] = 1},
-										children = 'Overview'
-									},
-									Array.mapRange(1, #details, function (gameIndex)
-										return DropdownItem{
-											classes = {'toggle-area-button'},
-											attributes = {['data-toggle-area-btn'] = gameIndex + 1},
-											children = {
-												'Game ',
-												details[gameIndex].gameIndex
-											}
-										}
-									end)
-								)
-							}
-						}
-					},
-					Html.Div{
-						attributes = {['data-toggle-area-content'] = 1},
-						children = gamesOverview,
-					},
-					Array.map(details, function (detail, index)
-						---@cast detail -nil
-						return Html.Div{
-							attributes = {['data-toggle-area-content'] = index + 1},
-							children = detail.detail,
-						}
-					end)
-				)
-			}
-		end
-	end
+	nodes = MatchSummary._createBodyWithDetail(match, nodes, GameDetail)
 
 	return WidgetUtil.collect(
 		nodes,
@@ -201,6 +118,96 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
 	)
+end
+
+---@private
+---@param match MatchGroupUtilMatch
+---@param overview? Renderable|Renderable[]
+---@param gameDetail? fun(game: MatchGroupUtilGame, index: integer): Renderable?
+---@return Renderable|Renderable[]?
+function MatchSummary._createBodyWithDetail(match, overview, gameDetail)
+	if gameDetail == nil then
+		return overview
+	end
+
+	---@type VNode[]
+	local dropdownLabels = {
+		Html.Div{
+			attributes = {['data-toggle-area-content'] = 1},
+			children = 'Overview',
+		}
+	}
+	---@type VNode[]
+	local dropdownItems = {
+		DropdownItem{
+			classes = {'toggle-area-button'},
+			attributes = {['data-toggle-area-btn'] = 1},
+			children = 'Overview'
+		}
+	}
+
+	---@type VNode[]
+	local children = {
+		Html.Div{
+			attributes = {['data-toggle-area-content'] = 1},
+			children = overview,
+		},
+	}
+
+	Array.forEach(match.games, function (game, index)
+		local gameDetail = gameDetail(game, index)
+		if gameDetail == nil then
+			return
+		end
+
+		table.insert(dropdownLabels, Html.Div{
+			attributes = {['data-toggle-area-content'] = index + 1},
+			children = {'Game ', index},
+		})
+
+		table.insert(dropdownItems, DropdownItem{
+			classes = {'toggle-area-button'},
+			attributes = {['data-toggle-area-btn'] = index + 1},
+			children = {'Game ', index}
+		})
+
+		table.insert(children, Html.Div{
+			attributes = {['data-toggle-area-content'] = index + 1},
+			children = gameDetail,
+		})
+	end)
+
+	if #children == 1 then
+		return overview
+	end
+
+	return Html.Div{
+		classes = {'toggle-area', 'toggle-area-1'},
+		attributes = {['data-toggle-area'] = 1},
+		children = WidgetUtil.collect(
+			Html.Div{
+				css = {
+					display = 'flex',
+					['justify-content'] = 'space-between',
+					['align-items'] = 'center',
+					['padding-top'] = '0.25rem',
+				},
+				children = {
+					Html.B{
+						css = {['font-size'] = '0.875rem'},
+						children = 'Game details'
+					},
+					DropdownContainer{
+						alignRight = true,
+						variant = 'inline',
+						label = dropdownLabels,
+						children = dropdownItems
+					}
+				}
+			},
+			children
+		)
+	}
 end
 
 ---Default footer function
