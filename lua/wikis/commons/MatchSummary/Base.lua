@@ -16,6 +16,8 @@ local VodLink = Lua.import('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local DropdownContainer = Lua.import('Module:Widget/Basic/Dropdown/Container')
+local DropdownItem = Lua.import('Module:Widget/Basic/Dropdown/Item')
 local Html = Lua.import('Module:Widget/Html')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchHeader = Lua.import('Module:Widget/Match/Header')
@@ -30,6 +32,7 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 ---@field createGames? fun(match: MatchGroupUtilMatch): Renderable|Renderable[] @deprecated (but better than createBody)
 ---@field createGame? fun(game: table, gameIndex: integer): Renderable|Renderable[] @deprecated
 ---@field GameRow? Component<MatchSummaryGameRowProps>
+---@field GameDetail fun(game: MatchGroupUtilGame, index: integer): Renderable?
 ---@field gameFilter? fun(game: MatchGroupUtilGame): boolean
 ---@field createFooter? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 
@@ -69,6 +72,7 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 	local createGames = CustomMatchSummary.createGames
 	local createGame = CustomMatchSummary.createGame
 	local GameRow = CustomMatchSummary.GameRow
+	local GameDetail = CustomMatchSummary.GameDetail
 
 	local nodes
 	if GameRow then
@@ -104,6 +108,55 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 		nodes = createGames(match)
 	elseif createGame then
 		nodes = Array.map(match.games, createGame)
+	end
+
+	if GameDetail then
+		local gamesOverview = nodes
+		local details = Array.map(match.games, GameDetail)
+
+		if Logic.isNotEmpty(details) then
+			nodes = Html.Div{
+				classes = {'toggle-area', 'toggle-area-1'},
+				attributes = {['data-toggle-area'] = 1},
+				children = WidgetUtil.collect(
+					Html.Div{
+						css = {
+							display = 'flex',
+							['align-items'] = 'center',
+						},
+						children = {
+							Html.B{children = 'Game details'},
+							DropdownContainer{
+								children = WidgetUtil.collect(
+									DropdownItem{
+										classes = {'toggle-area-button'},
+										attributes = {['data-toggle-area-btn'] = 1},
+										children = 'Overview'
+									},
+									Array.mapRange(1, #details, function (gameIndex)
+										return DropdownItem{
+											classes = {'toggle-area-button'},
+											attributes = {['data-toggle-area-btn'] = gameIndex + 1},
+											children = 'Overview'
+										}
+									end)
+								)
+							}
+						}
+					},
+					Html.Div{
+						attributes = {['data-toggle-area-content'] = 1},
+						children = gamesOverview,
+					},
+					Array.map(details, function (detail, index)
+						return Html.Div{
+							attributes = {['data-toggle-area-content'] = index + 1},
+							children = detail,
+						}
+					end)
+				)
+			}
+		end
 	end
 
 	return WidgetUtil.collect(

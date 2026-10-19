@@ -70,18 +70,15 @@ function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	}
 end
 
----@param props MatchSummaryGameRowProps
----@return boolean
-function GameRowComponentProps.hasDetail(props)
-	return Array.any(props.game.opponents, function (gameOpponent)
-		return Logic.isNotDeepEmpty(gameOpponent.players)
-	end)
-end
-
----@param props MatchSummaryGameRowProps
----@return VNode
-function GameRowComponentProps.createGameDetail(props)
-	local game = props.game
+---@param game MatchGroupUtilGame
+---@param index integer
+---@return VNode?
+function CustomMatchSummary.GameDetail(game, index)
+	if Array.all(game.opponents, function (gameOpponent)
+		return Logic.isDeepEmpty(gameOpponent.players)
+	end) then
+		return nil
+	end
 	return Html.Div{
 		css = {
 			display = 'grid',
