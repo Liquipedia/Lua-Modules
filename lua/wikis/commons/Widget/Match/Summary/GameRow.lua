@@ -23,7 +23,6 @@ local GameWinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLoss
 ---@field createAdditionalComment? fun(props: MatchSummaryGameRowProps): string?
 ---@field createGameOpponentView fun(props: MatchSummaryGameRowProps, opponentIndex: integer): Renderable|Renderable[]?
 ---@field createGameOverview fun(props: MatchSummaryGameRowProps): Renderable|Renderable[]
----@field hasDetail? fun(props: MatchSummaryGameRowProps): boolean
 
 ---@class MatchSummaryGameRowProps
 ---@field allowWrappingInOverview boolean?
@@ -55,38 +54,36 @@ function MatchSummaryGameRow.createComponent(implProps, defaultProps)
 		return Html.Div{
 			classes = {'brkts-popup-body-grid-row'},
 			css = componentProps.css,
-			children = Array.extendWith(
-				{
-					GameWinLossIndicator{
-						opponentIndex = 1,
-						winner = componentProps.game.winner,
-					},
-					Html.Div{
-						classes = {'brkts-popup-body-grid-row-detail'},
-						children = {
-							GameCenter{
-								css = getGameOpponentViewCss(1),
-								children = createGameOpponentView(1)
-							},
-							GameCenter{
-								css = componentProps.allowWrappingInOverview and {
-									['white-space'] = 'wrap',
-								} or nil,
-								children = implProps.createGameOverview(componentProps)
-							},
-							GameCenter{
-								css = getGameOpponentViewCss(2),
-								children = createGameOpponentView(2)
-							}
+			children = {
+				GameWinLossIndicator{
+					opponentIndex = 1,
+					winner = componentProps.game.winner,
+				},
+				Html.Div{
+					classes = {'brkts-popup-body-grid-row-detail'},
+					children = {
+						GameCenter{
+							css = getGameOpponentViewCss(1),
+							children = createGameOpponentView(1)
 						},
+						GameCenter{
+							css = componentProps.allowWrappingInOverview and {
+								['white-space'] = 'wrap',
+							} or nil,
+							children = implProps.createGameOverview(componentProps)
+						},
+						GameCenter{
+							css = getGameOpponentViewCss(2),
+							children = createGameOpponentView(2)
+						}
 					},
-					GameWinLossIndicator{
-						opponentIndex = 2,
-						winner = componentProps.game.winner,
-					}
+				},
+				GameWinLossIndicator{
+					opponentIndex = 2,
+					winner = componentProps.game.winner,
 				},
 				MatchSummaryGameRow._renderGameComment(implProps, componentProps)
-			),
+			},
 		}
 	end
 
