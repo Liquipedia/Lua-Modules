@@ -258,7 +258,7 @@ Types.Game = TypeUtil.struct({
 ---@field pageName string?
 ---@field parent string?
 ---@field patch string?
----@field phase 'upcoming'|'ongoing'|'finished'
+---@field phase MatchPhase
 ---@field publisherTier string?
 ---@field resultType string?
 ---@field section string?

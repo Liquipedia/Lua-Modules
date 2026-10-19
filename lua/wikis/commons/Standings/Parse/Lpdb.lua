@@ -74,7 +74,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 		},
 		function(record)
 			local match2 = MatchGroupUtil.matchFromRecord(record)
-			phaseByMatchId[record.match2id] = MatchGroupUtil.computeMatchPhase(match2)
+			phaseByMatchId[record.match2id] = match2.phase
 			local roundNumbers = matchIdToRound[record.match2id]
 			Array.forEach(roundNumbers, function(roundNumber)
 				StandingsParseLpdb.parseMatch(roundNumber, match2, opponents, scoreMapper, #rounds, manualOpponents, options)
