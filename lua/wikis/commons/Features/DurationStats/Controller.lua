@@ -31,7 +31,7 @@ function Controller.run(frame)
 	local spec = TournamentStructure.readMatchGroupsSpec(args)
 		or Tournaments.getSpecFromTier(args)
 		or TournamentStructure.currentPageSpec()
-	local conditions = tostring(Conditions.build(spec))
+	local conditions = tostring(Conditions.build(spec, args.sdate, args.edate))
 
 	return Html.Fragment{
 		children = {
