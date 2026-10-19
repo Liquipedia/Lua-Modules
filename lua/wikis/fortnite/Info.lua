@@ -50,6 +50,7 @@ return {
 		standings = {
 			alwaysShowStats = {
 				swiss = {'matchdiff', 'gamediff'},
+				group = {'matchdiff', 'gamediff'},
 			},
 		},
 	},

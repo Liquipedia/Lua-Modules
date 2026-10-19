@@ -918,6 +918,21 @@ describe('Standings Parser', function()
 		}, standingsTable.extradata.additionalStats)
 	end)
 
+	it('always shows the configured stats of group standings', function()
+		local standingsTable = StandingsParser.parse(
+			TWO_FINISHED_ROUNDS,
+			{makeOpponent('Alpha', {{points = 3}, {points = 3}})},
+			BGS, nil, {}, 'group',
+			{'full.points', 'full.manual'}
+		)
+
+		-- The commons config always shows matchdiff and gamediff in group standings
+		assert.are_same(
+			{'full.matchdiff', 'full.gamediff', 'full.points', 'full.manual'},
+			Array.map(standingsTable.extradata.additionalStats, function(stat) return stat.id end)
+		)
+	end)
+
 	describe('overtime', function()
 		local MATCHDIFF_TIEBREAKERS = {'full.matchdiff', 'full.manual'}
 
