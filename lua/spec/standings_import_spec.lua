@@ -375,6 +375,8 @@ describe('Standings import from matches', function()
 		local heroic = findOpponent(opponents, 'Heroic')
 		assert.are_same({w = 1, d = 0, l = 0}, heroic.rounds[1].scoreboard.match)
 		assert.are_equal('M1', heroic.rounds[1].matchId)
+		assert.are_equal(1, heroic.rounds[1].matchOpponentIndex)
+		assert.are_equal(2, findOpponent(opponents, 'Wolves Esports').rounds[1].matchOpponentIndex)
 	end)
 
 	describe('overtime', function()

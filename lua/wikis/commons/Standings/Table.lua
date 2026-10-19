@@ -33,7 +33,8 @@ local StandingsTable = {}
 
 ---@class StandingTableOpponentData
 ---@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?,
----matches: MatchGroupUtilMatch[], matchPoints: table<string, number>?, matchId: string}[]?
+---matches: MatchGroupUtilMatch[], matchPoints: table<string, number>?, matchId: string,
+---matchOpponentIndex: integer?}[]?
 ---@field opponent standardOpponent
 ---@field aliases standardOpponent[]? # Only for team opponents
 ---@field startingPoints number?

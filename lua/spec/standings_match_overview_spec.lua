@@ -21,7 +21,7 @@ describe('Standings match overview widget', function()
 		end
 		return tostring(MatchOverview{
 			match = {phase = props.phase or 'finished', winner = props.winner, opponents = opponents},
-			showOpponent = 2,
+			opponentIndex = 1,
 		})
 	end
 

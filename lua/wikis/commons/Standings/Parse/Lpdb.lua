@@ -92,6 +92,10 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 				matches = Array.extend(matches, roundMatches)
 				matchPoints = Table.merge(matchPoints, roundData.matchPoints)
 				local lastMatch = roundMatches[#roundMatches]
+				-- Stored as the matches fetched for display do not have aliases applied
+				local matchOpponentIndex = lastMatch and Array.indexOf(lastMatch.opponents, function(opponent)
+					return Opponent.same(opponent, opponentData.opponent)
+				end) or nil
 				return {
 					scoreboard = TiebreakerScope.tally(
 						opponentData.opponent, roundMatches, roundData.matchPoints, options and options.overtime
@@ -100,6 +104,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 					matches = matches,
 					matchPoints = matchPoints,
 					matchId = lastMatch and lastMatch.matchId or nil,
+					matchOpponentIndex = matchOpponentIndex,
 				}
 			end)
 		}
