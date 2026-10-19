@@ -155,8 +155,8 @@ function MatchSummary._createBodyWithDetail(match, overview, gameDetail)
 	}
 
 	Array.forEach(match.games, function (game, index)
-		local gameDetail = gameDetail(game, index)
-		if gameDetail == nil then
+		local gameDetailDisplay = gameDetail(game, index)
+		if gameDetailDisplay == nil then
 			return
 		end
 
@@ -173,7 +173,7 @@ function MatchSummary._createBodyWithDetail(match, overview, gameDetail)
 
 		table.insert(children, Html.Div{
 			attributes = {['data-toggle-area-content'] = index + 1},
-			children = gameDetail,
+			children = gameDetailDisplay,
 		})
 	end)
 
