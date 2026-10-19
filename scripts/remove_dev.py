@@ -68,17 +68,17 @@ def search_and_remove(wiki: str):
                 remove_page(session, page["title"])
 
 
-def get_target_wikis() -> list[str]:
+def get_target_wikis() -> frozenset[str]:
     if WIKI_SCOPE == "commons only":
-        return ["commons"]
-    wikis = sorted(get_wikis())
+        return frozenset({"commons"})
+    wikis = get_wikis()
     if WIKI_SCOPE == "all except commons":
-        return [wiki for wiki in wikis if wiki != "commons"]
+        return wikis - {"commons"}
     return wikis
 
 
 def main():
-    for wiki in get_target_wikis():
+    for wiki in sorted(get_target_wikis()):
         search_and_remove(wiki)
     if len(remove_errors) == 0:
         exit(0)
