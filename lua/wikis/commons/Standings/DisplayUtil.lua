@@ -30,4 +30,18 @@ function StandingsDisplayUtil.statsToShow(standings)
 	end)
 end
 
+---The number of the last round that has started, 0 if none has.
+---@param standings StandingsModel
+---@return integer
+function StandingsDisplayUtil.lastStartedRound(standings)
+	local startedRounds = Array.filter(standings.rounds, function(round) return round.started end)
+	return (Array.maxBy(startedRounds, function(round) return round.round end) or {round = 0}).round
+end
+
+---@param standings StandingsModel
+---@return boolean
+function StandingsDisplayUtil.hasFutureRounds(standings)
+	return not standings.rounds[#standings.rounds].started
+end
+
 return StandingsDisplayUtil

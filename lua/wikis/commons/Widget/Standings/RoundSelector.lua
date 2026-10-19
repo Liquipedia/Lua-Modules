@@ -14,18 +14,27 @@ local Html = Lua.import('Module:Widget/Html')
 local Button = Lua.import('Module:Widget/Basic/Button')
 
 ---@private
+---@param round integer
+---@param titles string[]?
+---@return string
+local function titleOfRound(round, titles)
+	return (titles or {})[round] or ('Round ' .. tostring(round))
+end
+
+---@private
 ---@param hasEnded boolean
 ---@param rounds integer
+---@param titles string[]?
 ---@return string
-local function finalRoundTitle(hasEnded, rounds)
+local function finalRoundTitle(hasEnded, rounds, titles)
 	if not hasEnded then
 		return 'Current'
 	else
-		return 'Round ' .. tostring(rounds)
+		return titleOfRound(rounds, titles)
 	end
 end
 
----@param props {rounds: integer?, hasEnded: boolean?}
+---@param props {rounds: integer?, hasEnded: boolean?, titles: string[]?}
 ---@return Renderable?
 local function RoundSelectorWidget(props)
 	if not props.rounds or props.rounds <= 1 then
@@ -34,9 +43,9 @@ local function RoundSelectorWidget(props)
 
 	local roundTitles = Array.mapRange(1, props.rounds, function (round)
 		if round == props.rounds then
-			return finalRoundTitle(props.hasEnded, props.rounds)
+			return finalRoundTitle(props.hasEnded, props.rounds, props.titles)
 		else
-			return 'Round ' .. round
+			return titleOfRound(round, props.titles)
 		end
 	end)
 
@@ -55,7 +64,7 @@ local function RoundSelectorWidget(props)
 		css = {float = 'left'},
 		children = {
 			Button{
-				children = finalRoundTitle(props.hasEnded, props.rounds),
+				children = finalRoundTitle(props.hasEnded, props.rounds, props.titles),
 				variant = 'primary',
 				size = 'sm',
 				classes = {'dropdown-box-button'},

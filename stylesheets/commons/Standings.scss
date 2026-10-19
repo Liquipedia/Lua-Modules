@@ -115,14 +115,14 @@
 	}
 }
 
-.standings-ffa-wrapper {
+.standings-round-history {
 	width: fit-content;
 	max-width: 100%;
 	display: flex;
 	flex-flow: column nowrap;
 	gap: 0.5rem;
 
-	.standings-ffa-controls {
+	.standings-round-history-controls {
 		display: flex;
 		gap: 0.5rem;
 
@@ -138,11 +138,11 @@
 			}
 		}
 	}
+}
 
-	&:has( .switch-toggle[ data-switch-group="ffa-detailed-stats" ]:not( :is( .switch-toggle-active ) ) ) {
-		.standings-ffa-detail {
-			display: none !important;
-		}
+.standings-round-history:has( .switch-toggle[ data-switch-group="ffa-detailed-stats" ]:not( :is( .switch-toggle-active ) ) ) {
+	.standings-ffa-detail {
+		display: none !important;
 	}
 }
 
