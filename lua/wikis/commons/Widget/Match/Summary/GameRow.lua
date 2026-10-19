@@ -57,7 +57,7 @@ function MatchSummaryGameRow.createComponent(implProps, defaultProps)
 			css = componentProps.css,
 			children = Array.extendWith(
 				{
-						GameWinLossIndicator{
+					GameWinLossIndicator{
 						opponentIndex = 1,
 						winner = componentProps.game.winner,
 					},
