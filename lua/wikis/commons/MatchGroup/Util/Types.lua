@@ -196,6 +196,8 @@ Types.GameOpponent = TypeUtil.struct({
 ---@alias MatchStatus 'notplayed'|''|nil
 Types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed', ''))
 
+---@alias MatchPhase 'finished'|'ongoing'|'upcoming'
+
 ---@class MatchGroupUtilGame
 ---@field comment string?
 ---@field date string?

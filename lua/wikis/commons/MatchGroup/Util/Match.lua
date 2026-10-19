@@ -238,8 +238,6 @@ function MatchUtil.groupBySubgroup(match)
 end
 
 
----@alias MatchPhase 'finished'|'ongoing'|'upcoming'
-
 ---Determines the phase of a match based on its properties.
 ---@param match MatchGroupUtilMatch|MatchGroupUtilGame|PartialMatchGameRecord
 ---@return MatchPhase
