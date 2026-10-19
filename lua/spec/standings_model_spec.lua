@@ -128,6 +128,10 @@ describe('Standings model round trip', function()
 		assert.is_truthy(html:find('League Standings', 1, true))
 		assert.is_truthy(html:find('Day 1', 1, true))
 		assert.is_truthy(html:find('Day 2', 1, true))
+		-- The round selector shows the round titles
+		assert.is_truthy(html:find('data%-toggle%-area%-btn="1"[^>]*>Day 1<'))
+		assert.is_truthy(html:find('data%-toggle%-area%-btn="2"[^>]*>Day 2<'))
+		assert.is_falsy(html:find('Round 1', 1, true))
 
 		-- Round 2 rows in standings order: Bravo, Alpha, Charlie
 		local bravoPos = html:find('Bravo', 1, true)

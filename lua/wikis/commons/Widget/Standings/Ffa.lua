@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -72,6 +73,7 @@ local function StandingsFfa(props)
 	return RoundHistory{
 		activeRounds = shownRounds,
 		hasEnded = not StandingsDisplayUtil.hasFutureRounds(standings),
+		titles = Array.map(standings.rounds, Operator.property('title')),
 		controls = {
 			Switch{
 				switchGroup = 'ffa-detailed-stats',
