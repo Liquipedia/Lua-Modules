@@ -49,7 +49,8 @@ function StandingsParser.parse(
 		local opponentRounds = opponentData.rounds
 
 		return Array.map(rounds, function(round)
-			local pointsFromRound, statusInRound, tiebreakerPoints, matchId, playedMatches, playedMatchPoints
+			local pointsFromRound, statusInRound, tiebreakerPoints, matchId, matchOpponentIndex, playedMatches,
+				playedMatchPoints
 			if opponentRounds and opponentRounds[round.roundNumber] then
 				local thisRoundsData = opponentRounds[round.roundNumber]
 				if thisRoundsData.scoreboard then
@@ -58,6 +59,7 @@ function StandingsParser.parse(
 				statusInRound = thisRoundsData.specialstatus
 				tiebreakerPoints = thisRoundsData.tiebreakerPoints
 				matchId = thisRoundsData.matchId
+				matchOpponentIndex = thisRoundsData.matchOpponentIndex
 				if thisRoundsData.scoreboard.match then
 					carryData.match.w = carryData.match.w + thisRoundsData.scoreboard.match.w
 					carryData.match.d = carryData.match.d + thisRoundsData.scoreboard.match.d
@@ -93,6 +95,7 @@ function StandingsParser.parse(
 					disqualified = opponentData.disqualifiedFromRound ~= nil
 						and round.roundNumber >= opponentData.disqualifiedFromRound or nil,
 					matchid = matchId,
+					matchopponentindex = matchOpponentIndex,
 					additionalStatsValues = {},
 				}
 			}

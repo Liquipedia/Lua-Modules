@@ -119,21 +119,13 @@ function Helpers.createRow(standings, slot, statsToShow)
 				if not entry then
 					return TableWidgets.Cell{}
 				end
-				local match = entry.match
-				if not match then
-					return TableWidgets.Cell{}
-				end
-
-				local opposingOpponentIndex = Array.indexOf(match.opponents, function(opponent)
-					return not Opponent.same(entry.opponent, opponent)
-				end)
-				if not entry.match.opponents[opposingOpponentIndex] then
+				if not entry.match or not entry.matchOpponentIndex then
 					return TableWidgets.Cell{}
 				end
 
 				return TableWidgets.Cell{children = MatchOverview{
-					match = match,
-					showOpponent = opposingOpponentIndex,
+					match = entry.match,
+					opponentIndex = entry.matchOpponentIndex,
 				}}
 			end)
 		),

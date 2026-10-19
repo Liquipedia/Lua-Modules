@@ -203,4 +203,44 @@ describe('Standings model round trip', function()
 
 		GoldenTest('standings_swiss', html)
 	end)
+
+	it('shows the opposing opponent of a match played under an alias', function()
+		local SwissStandings = require('Module:Widget/Standings/Swiss')
+
+		local rounds = {{roundNumber = 1, started = true, finished = true, title = 'Round 1'}}
+		local opponents = {
+			{
+				opponent = literal('Alpha'),
+				rounds = {{scoreboard = {points = 1, match = {w = 1, d = 0, l = 0}}, specialstatus = '',
+					matchId = 'M1', matchOpponentIndex = 1}},
+			},
+			{
+				opponent = literal('Bravo'),
+				rounds = {{scoreboard = {points = 0, match = {w = 0, d = 0, l = 1}}, specialstatus = '',
+					matchId = 'M1', matchOpponentIndex = 2}},
+			},
+		}
+		local standingsTable = StandingsParser.parse(
+			rounds, opponents, {}, 'Swiss Stage', {}, 'swiss', {'full.matchdiff'})
+		StandingsStorage.run(standingsTable, {saveVars = true})
+
+		local standings = Standings.getStandingsTable('FakePage', 0)
+		---@cast standings -nil
+
+		-- Matches are fetched as stored, so Alpha shows up under its alias
+		local match = {phase = 'finished', winner = 1, opponents = {
+			{type = 'literal', name = 'Alpha Old', placement = 1, status = 'S', score = 2},
+			{type = 'literal', name = 'Bravo', placement = 2, status = 'S', score = 0},
+		}}
+		Array.forEach(standings.rounds[1].opponents, function(entry)
+			entry.match = match
+		end)
+
+		local html = tostring(SwissStandings{standings = standings})
+		local _, aliasCount = html:gsub('Alpha Old', '')
+		local _, bravoCount = html:gsub('Bravo', '')
+		-- Only in Bravo's row as its opponent, and Bravo is shown as Alpha's opponent
+		assert.are_equal(1, aliasCount)
+		assert.are_equal(2, bravoCount)
+	end)
 end)
