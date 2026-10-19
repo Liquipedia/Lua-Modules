@@ -140,6 +140,40 @@ describe('Standings model round trip', function()
 		GoldenTest('standings_ffa', html)
 	end)
 
+	it('shows the opponents of the first round of ffa standings before any round has started', function()
+		local rounds = {
+			{roundNumber = 1, started = false, finished = false, title = 'Day 1'},
+			{roundNumber = 2, started = false, finished = false, title = 'Day 2'},
+		}
+		local standingsTable = StandingsParser.parse(
+			rounds, {makeOpponent('Alpha', {0, 0}), makeOpponent('Bravo', {0, 0})}, {}, 'FFA', {}, 'ffa',
+			{'full.points', 'full.manual'}
+		)
+		StandingsStorage.run(standingsTable, {saveVars = true})
+
+		local html = tostring(require('Module:Widget/Standings')({pageName = 'FakePage', standingsIndex = 0}))
+		-- The round history stays for the detailed stats switch of the round columns
+		assert.is_truthy(html:find('class="standings-round-history toggle-area toggle-area-1"', 1, true))
+		assert.is_truthy(html:find('data-toggle-area-content="1"', 1, true))
+		assert.is_truthy(html:find('Alpha', 1, true))
+		assert.is_truthy(html:find('Bravo', 1, true))
+	end)
+
+	it('renders single round ffa standings without a round history', function()
+		local standingsTable = StandingsParser.parse(
+			{{roundNumber = 1, started = true, finished = true, title = 'Day 1'}},
+			{makeOpponent('Alpha', {3}), makeOpponent('Bravo', {1})}, {}, 'FFA', {}, 'ffa',
+			{'full.points', 'full.manual'}
+		)
+		StandingsStorage.run(standingsTable, {saveVars = true})
+
+		local html = tostring(require('Module:Widget/Standings')({pageName = 'FakePage', standingsIndex = 0}))
+		assert.is_truthy(html:find('standings-ffa', 1, true))
+		assert.is_falsy(html:find('standings-round-history', 1, true))
+		assert.is_falsy(html:find('data-toggle-area-content', 1, true))
+		assert.is_truthy(html:find('Alpha', 1, true))
+	end)
+
 	it('maps disqualifications to the model and renders them', function()
 		local rounds = {
 			{roundNumber = 1, started = true, finished = true, title = 'Day 1'},

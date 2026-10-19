@@ -30,8 +30,7 @@ local function StandingsGroup(props)
 		return
 	end
 
-	-- Before any round has started, the first round shows the opponents
-	local shownRounds = math.max(StandingsDisplayUtil.lastStartedRound(standings), 1)
+	local shownRounds = StandingsDisplayUtil.roundsToShow(standings)
 	local statsToShow = StandingsDisplayUtil.statsToShow(standings)
 	local boldStatTitle = StandingsDisplayUtil.boldStatTitle(standings)
 	local hasRoundHistory = shownRounds > 1

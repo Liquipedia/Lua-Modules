@@ -53,6 +53,13 @@ function StandingsDisplayUtil.lastStartedRound(standings)
 	return (Array.maxBy(startedRounds, function(round) return round.round end) or {round = 0}).round
 end
 
+---The number of rounds to display: every started round, and the first round before any has started.
+---@param standings StandingsModel
+---@return integer
+function StandingsDisplayUtil.roundsToShow(standings)
+	return math.max(StandingsDisplayUtil.lastStartedRound(standings), 1)
+end
+
 ---@param standings StandingsModel
 ---@return boolean
 function StandingsDisplayUtil.hasFutureRounds(standings)
