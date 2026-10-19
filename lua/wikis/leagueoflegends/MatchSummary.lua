@@ -79,114 +79,125 @@ function CustomMatchSummary.GameDetail(game, index)
 	end) then
 		return nil
 	end
-	return Html.Div{
-		css = {
-			display = 'grid',
-			['column-gap'] = '0.5rem',
-			['grid-template-columns'] = 'min-content 1fr 1fr min-content'
-		},
-		children = Array.map(game.opponents, function (gameOpponent, gameOpponentIndex)
-			local side = game.extradata['team' .. gameOpponentIndex .. 'side']
-			local gamePlayers = Array.sortBy(
-				Array.filter(gameOpponent.players, Logic.isNotEmpty),
-				function (gamePlayer)
-					return gamePlayer.role
-				end,
-				function (a, b)
-					return InGameRoles[a].sortOrder < InGameRoles[b].sortOrder
-				end
-			)
-			local maxDamage = Array.max(
-				Array.map(gamePlayers, Operator.property('damagedone')),
-				function (maxDamage, damage)
-					if maxDamage == nil then
-						return damage
-					elseif damage == nil then
-						return maxDamage
-					end
-					return maxDamage < damage
-				end
-			)
 
-			---@param damageDone number
-			---@return VNode?
-			local function buildDamageBar(damageDone)
-				if maxDamage == nil then
-					return
-				end
-				local damageRatio = damageDone / maxDamage
-				return Html.Div{
-					css = {
-						['grid-column'] = '1 / -1',
-						background = String.interpolate(
-							'linear-gradient(to right, ${leftBarColor} ${leftBarLength}, ' ..
-							'${rightBarColor} ${leftBarLength} ${rightBarLength})',
-							{
-								leftBarColor = gameOpponentIndex == 1 and SIDE_COLORS[side] or 'transparent',
-								leftBarLength = MathUtil.formatPercentage(
-									gameOpponentIndex == 1 and damageRatio or (1 - damageRatio)
-								),
-								rightBarColor = gameOpponentIndex == 2 and SIDE_COLORS[side] or 'transparent',
-								rightBarLength = MathUtil.formatPercentage(
-									gameOpponentIndex == 2 and damageRatio or (1 - damageRatio)
-								),
-							}
-						),
-						height = '0.25rem',
-						width = '90%'
-					}
-				}
+	---@param max number?
+	---@param value number?
+	---@return number?
+	local function nilSafeMax(max, value)
+		if max == nil then
+			return value
+		elseif value == nil then
+			return max
+		end
+		return math.max(max, value)
+	end
+
+	local maxDamage = Array.reduce(
+		Array.map(game.opponents, function (gameOpponent)
+			return Array.reduce(
+				Array.map(gameOpponent.players, Operator.property('damagedone')),
+				nilSafeMax
+			)
+		end),
+		nilSafeMax
+	)
+
+	---@param gameOpponent {players: table[], score: number?, status: string?}
+	---@param gameOpponentIndex integer
+	---@return VNode
+	local function createOpponentDetail(gameOpponent, gameOpponentIndex)
+		local side = game.extradata['team' .. gameOpponentIndex .. 'side']
+		local gamePlayers = Array.sortBy(
+			Array.filter(gameOpponent.players, Logic.isNotEmpty),
+			function (gamePlayer)
+				return gamePlayer.role
+			end,
+			function (a, b)
+				return InGameRoles[a].sortOrder < InGameRoles[b].sortOrder
 			end
+		)
 
+		---@param damageDone number
+		---@return VNode?
+		local function buildDamageBar(damageDone)
+			if maxDamage == nil then
+				return
+			end
+			local damageRatio = damageDone / maxDamage
 			return Html.Div{
 				css = {
-					display = 'grid',
-					['grid-column'] = 'span 2',
-					['grid-template-columns'] = 'subgrid',
-					['row-gap'] = '0.25rem',
-				},
-				children = Array.map(gamePlayers, function (gamePlayer)
-					local kda = {gamePlayer.kills, gamePlayer.deaths, gamePlayer.assists}
-					local stats = Array.interleave({
-						Html.Div{children = Array.interleave(kda, SPAN_SLASH)},
-						gamePlayer.damagedone and Html.Div{children = {
-							'(',
-							string.format('%.1fK', gamePlayer.damagedone / 1000),
-							')'
-						}} or nil
-					}, ' ')
-					return Html.Div{
-						css = {
-							display = 'grid',
-							['grid-column'] = '1 / -1',
-							['grid-template-columns'] = 'subgrid',
-							['justify-items'] = 'start',
-							direction = gameOpponentIndex == 2 and 'rtl' or nil,
-						},
-						children = {
-							MatchSummaryWidgets.Character{
+					background = String.interpolate(
+						'linear-gradient(to right, ${leftBarColor} ${leftBarLength}, ' ..
+						'${rightBarColor} ${leftBarLength} ${rightBarLength})',
+						{
+							leftBarColor = gameOpponentIndex == 1 and SIDE_COLORS[side] or 'transparent',
+							leftBarLength = MathUtil.formatPercentage(
+								gameOpponentIndex == 1 and damageRatio or (1 - damageRatio)
+							),
+							rightBarColor = gameOpponentIndex == 2 and SIDE_COLORS[side] or 'transparent',
+							rightBarLength = MathUtil.formatPercentage(
+								gameOpponentIndex == 2 and damageRatio or (1 - damageRatio)
+							),
+						}
+					),
+					height = '0.25rem',
+					width = '90%'
+				}
+			}
+		end
+
+		return Html.Div{
+			classes = {'brkts-popup-game-detail-player-container'},
+			children = Array.map(gamePlayers, function (gamePlayer)
+				local kda = {gamePlayer.kills, gamePlayer.deaths, gamePlayer.assists}
+				local stats = Array.interleave({
+					Html.Div{children = Array.interleave(kda, SPAN_SLASH)},
+					gamePlayer.damagedone and Html.Div{children = {
+						'(',
+						string.format('%.1fK', gamePlayer.damagedone / 1000),
+						')'
+					}} or nil
+				}, ' ')
+				return Html.Div{
+					classes = {
+						'brkts-popup-game-detail-player',
+						gameOpponentIndex == 2 and 'flipped' or nil,
+					},
+					children = {
+						Html.Div{
+							css = {
+								['align-self'] = 'center',
+								['grid-row'] = 'span 3'
+							},
+							children = MatchSummaryWidgets.Character{
 								date = game.date,
 								flipped = gameOpponentIndex == 2,
 								showName = false,
-								size = '16px',
+								size = '24px',
 								character = gamePlayer.character
+							}
+						},
+						Link{link = gamePlayer.player, children = gamePlayer.displayName},
+						Html.Div{
+							css = {
+								display = 'flex',
+								['flex-direction'] = gameOpponentIndex == 2 and 'row-reverse' or nil,
+								gap = '0.25rem',
 							},
-							Link{link = gamePlayer.player, children = gamePlayer.displayName},
-							Html.Div{
-								css = {
-									display = 'flex',
-									['flex-direction'] = gameOpponentIndex == 2 and 'row-reverse' or nil,
-									gap = '0.25rem',
-									['grid-column'] = '1 / -1',
-								},
-								children = gameOpponentIndex == 1 and stats or Array.reverse(stats)
-							},
-							buildDamageBar(gamePlayer.damagedone)
-						}
+							children = gameOpponentIndex == 1 and stats or Array.reverse(stats)
+						},
+						buildDamageBar(gamePlayer.damagedone)
 					}
-				end)
-			}
-		end)
+				}
+			end)
+		}
+	end
+
+	return MatchSummaryWidgets.GameDetail{
+		game = game,
+		gameIndex = index,
+		overview = game.length,
+		children = Array.map(game.opponents, createOpponentDetail),
 	}
 end
 

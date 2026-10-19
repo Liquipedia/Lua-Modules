@@ -741,6 +741,51 @@ div.brkts-popup-body-element-thumbs {
 	}
 }
 
+.brkts-popup-game-detail {
+	display: grid;
+	grid-template-columns: min-content 1fr 1fr min-content;
+	background-color: var( --clr-on-surface-light-primary-4 );
+	padding: 0.5rem;
+	border-radius: 0.5rem;
+	row-gap: 0.25rem;
+
+	.theme--dark & {
+		background-color: var( --clr-on-surface-dark-primary-4 );
+	}
+
+	&-header {
+		display: grid;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+		place-items: center;
+
+		&-summary {
+			grid-column: span 2;
+			font-size: 0.875rem;
+			font-weight: bold;
+		}
+	}
+
+	&-player {
+		display: grid;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+		column-gap: 0.25rem;
+		justify-items: start;
+
+		&.flipped {
+			direction: rtl;
+		}
+
+		&-container {
+			display: grid;
+			grid-column: span 2;
+			grid-template-columns: subgrid;
+			row-gap: 0.25rem;
+		}
+	}
+}
+
 .brkts-champion-icon {
 	gap: 0.125rem;
 	display: flex;
