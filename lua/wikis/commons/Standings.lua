@@ -22,6 +22,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Tournament = Lua.import('Module:Tournament')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
+local StandingsStorage = Lua.import('Module:Standings/Storage')
 
 local Standings = {}
 
@@ -32,7 +33,7 @@ local Standings = {}
 ---@field tournament StandardTournament?
 ---@field title string?
 ---@field section string?
----@field type 'ffa'|'swiss'|'league'
+---@field type StandingsTableTypes
 ---@field matches MatchGroupUtilMatch[]
 ---@field config {hasdraws: boolean?, hasovertime: boolean?, haspoints: boolean?}
 ---@field rounds StandingsRound[]
@@ -136,7 +137,7 @@ function Standings.standingsFromRecord(record, entries)
 		standingsIndex = record.standingsindex,
 		title = record.title,
 		section = record.section,
-		type = record.type,
+		type = StandingsStorage.fromStorageType(record.type),
 		config = record.config,
 		additionalStats = record.extradata.additionalStats,
 		record = record,

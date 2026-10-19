@@ -99,6 +99,26 @@ describe('Standings model round trip', function()
 		assert.are_equal(0, charlie.positionChangeFromPreviousRound)
 	end)
 
+	it('stores group standings as league and reads them back as group', function()
+		local Json = require('Module:Json')
+		local Variables = require('Module:Variables')
+
+		local rounds = {{roundNumber = 1, started = true, finished = true, title = 'Round 1'}}
+		local standingsTable = StandingsParser.parse(
+			rounds, {makeOpponent('Alpha', {3}), makeOpponent('Bravo', {0})}, {}, 'Group A', {}, 'group',
+			{'full.points', 'full.manual'}
+		)
+		assert.are_equal('group', standingsTable.type)
+		StandingsStorage.run(standingsTable, {saveVars = true})
+
+		local stored = Json.parseStringified(Variables.varDefault('standings2_0'))
+		assert.are_equal('league', stored.standings.type)
+
+		local standings = Standings.getStandingsTable('FakePage', 0)
+		---@cast standings -nil
+		assert.are_equal('group', standings.type)
+	end)
+
 	it('renders the ffa standings widget from the model', function()
 		buildAndFetchStandings() -- stores the standings into page variables
 		local StandingsDisplay = require('Module:Widget/Standings')
