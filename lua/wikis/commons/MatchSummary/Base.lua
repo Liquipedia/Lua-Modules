@@ -32,7 +32,7 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 ---@field createGames? fun(match: MatchGroupUtilMatch): Renderable|Renderable[] @deprecated (but better than createBody)
 ---@field createGame? fun(game: table, gameIndex: integer): Renderable|Renderable[] @deprecated
 ---@field GameRow? Component<MatchSummaryGameRowProps>
----@field GameDetail fun(game: MatchGroupUtilGame, index: integer): Renderable?
+---@field GameDetail? fun(game: MatchGroupUtilGame, index: integer): Renderable?
 ---@field gameFilter? fun(game: MatchGroupUtilGame): boolean
 ---@field createFooter? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 
