@@ -53,6 +53,16 @@ function MatchFunctions.calculateMatchScore(maps)
 	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
+---@param match table
+---@param games table[]
+---@param opponents MGIParsedOpponent[]
+---@return table[]
+function MatchFunctions.getExtraData(match, games, opponents)
+	return {
+		mvp = MatchGroupInputUtil.readMvp(match, opponents),
+	}
+end
+
 
 --- FFA Match
 
