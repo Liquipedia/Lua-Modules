@@ -36,12 +36,18 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 ---@field gameFilter? fun(game: MatchGroupUtilGame): boolean
 ---@field createFooter? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 
+---@class MatchSummaryOptions
+---@field teamStyle? teamStyle
+---@field width? string|fun(match: MatchGroupUtilMatch): string?
+---@field noScore? boolean
+---@field maxBans? integer
+
 ---@class MatchSummary
 local MatchSummary = {}
 
 ---Default header function
 ---@param match MatchGroupUtilMatch
----@param options {teamStyle: teamStyle?}?
+---@param options MatchSummaryOptions?
 ---@return VNode
 function MatchSummary.createHeader(match, options)
 	options = options or {}
@@ -62,7 +68,7 @@ end
 -- Default body function
 ---@param match MatchGroupUtilMatch
 ---@param CustomMatchSummary CustomMatchSummaryInterface
----@param options {maxBans: integer?}?
+---@param options MatchSummaryOptions?
 ---@return Renderable[]
 function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 	options = options or {}
@@ -241,7 +247,7 @@ end
 ---Default createMatch function for usage in Custom MatchSummary
 ---@param matchData MatchGroupUtilMatch?
 ---@param CustomMatchSummary CustomMatchSummaryInterface
----@param options {teamStyle: teamStyle?, noScore: boolean?, maxBans: integer?}?
+---@param options MatchSummaryOptions?
 ---@return VNode?
 function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	if not matchData then
@@ -277,8 +283,7 @@ end
 ---Default getByMatchId function for usage in Custom MatchSummary
 ---@param CustomMatchSummary CustomMatchSummaryInterface
 ---@param args table
----@param options {teamStyle:teamStyle?, width: (fun(match: MatchGroupUtilMatch):string?)|string?,
----noScore:boolean?, maxBans: integer?}?
+---@param options MatchSummaryOptions?
 ---@return VNode
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(
