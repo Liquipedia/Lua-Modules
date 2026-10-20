@@ -41,6 +41,7 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 ---@field width? string|fun(match: MatchGroupUtilMatch): string?
 ---@field noScore? boolean
 ---@field maxBans? integer
+---@field showDetail? fun(match: MatchGroupUtilMatch): boolean
 
 ---@class MatchSummary
 local MatchSummary = {}
@@ -116,7 +117,7 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 		nodes = Array.map(match.games, createGame)
 	end
 
-	nodes = MatchSummary._createBodyWithDetail(match, nodes, GameDetail)
+	nodes = MatchSummary._createBodyWithDetail(match, nodes, GameDetail, options)
 
 	return WidgetUtil.collect(
 		nodes,
@@ -130,9 +131,16 @@ end
 ---@param match MatchGroupUtilMatch
 ---@param overview? Renderable|Renderable[]
 ---@param gameDetail? fun(game: MatchGroupUtilGame, index: integer): Renderable?
+---@param options MatchSummaryOptions
 ---@return Renderable|Renderable[]?
-function MatchSummary._createBodyWithDetail(match, overview, gameDetail)
+function MatchSummary._createBodyWithDetail(match, overview, gameDetail, options)
 	if gameDetail == nil then
+		return overview
+	end
+
+	local showDetail = options.showDetail or function () return true end
+
+	if not showDetail(match) then
 		return overview
 	end
 

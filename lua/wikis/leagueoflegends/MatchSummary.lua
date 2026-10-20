@@ -9,9 +9,11 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local InGameRoles = Lua.import('Module:InGameRoles', {loadData = true})
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
+local Tournament = Lua.import('Module:Tournament')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
@@ -43,7 +45,21 @@ local CustomMatchSummary = {
 ---@param args table
 ---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', maxBans = MAX_NUM_BANS})
+	return MatchSummary.defaultGetByMatchId(
+		CustomMatchSummary,
+		args,
+		{
+			width = '400px',
+			maxBans = MAX_NUM_BANS,
+			showDetail = function (match)
+				local input = Logic.readBoolOrNil(args.showDetail)
+				if input ~= nil then
+					return input
+				end
+				return HighlightConditions.tournament(Tournament.partialTournamentFromMatch(match))
+			end
+		}
+	)
 end
 
 ---@param game MatchGroupUtilGame
