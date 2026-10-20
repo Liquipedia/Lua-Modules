@@ -176,10 +176,9 @@ function CustomMatchSummary._createOpponentDetail(game, gameOpponentIndex, maxDa
 					Html.Div{
 						css = {
 							display = 'flex',
-							['flex-direction'] = gameOpponentIndex == 2 and 'row-reverse' or nil,
 							gap = '0.25rem',
 						},
-						children = gameOpponentIndex == 1 and stats or Array.reverse(stats)
+						children = stats
 					},
 					buildDamageBar(gamePlayer.damagedone)
 				}
