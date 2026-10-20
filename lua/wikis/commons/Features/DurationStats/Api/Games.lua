@@ -16,7 +16,7 @@ local ColumnName = Condition.ColumnName
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
-local QUERY_STRING = 'date, pagename, match2id, match2gameid, length, winner'
+local QUERY_STRING = 'date, pagename, match2id, match2gameid, length, winner, vod'
 
 local Games = {}
 
