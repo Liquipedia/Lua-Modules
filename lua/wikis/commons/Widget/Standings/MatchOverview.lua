@@ -19,31 +19,31 @@ local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local RESULT_TYPES = {w = 'win', d = 'draw', l = 'loss'}
 
----@param props {match: MatchGroupUtilMatch, showOpponent: integer}
+---@param props {match: MatchGroupUtilMatch, opponentIndex: integer}
 ---@return Renderable?
 local function MatchOverviewWidget(props)
 	local match = props.match
-	local opponentIndexToShow = tonumber(props.showOpponent)
-	if not match or not opponentIndexToShow or #match.opponents ~= 2 then
+	local opponentIndex = tonumber(props.opponentIndex)
+	if not match or not opponentIndex or #match.opponents ~= 2 then
 		return
 	end
 
-	local opponentToShow = match.opponents[opponentIndexToShow]
-	if not opponentToShow then
+	local opponent = match.opponents[opponentIndex]
+	if not opponent then
 		return
 	end
 
-	local leftOpponent = Array.find(match.opponents, function(op) return op ~= opponentToShow end)
-	if not leftOpponent then
+	local opposingOpponent = Array.find(match.opponents, function(matchOpponent) return matchOpponent ~= opponent end)
+	if not opposingOpponent then
 		return
 	end
 
 	local phase = match.phase
 	local isFinished = phase == 'finished'
-	-- The result is from the point of view of the row's opponent (left), the same as in the match record,
+	-- The result is from the point of view of the row's opponent, the same as in the match record,
 	-- so a match without a winner (e.g. a double loss) is a loss and not a win
-	local resultType = isFinished and RESULT_TYPES[TiebreakerScope.matchResult(match, leftOpponent)] or 'default'
-	local shownOpponentWon = isFinished and TiebreakerScope.matchResult(match, opponentToShow) == 'w'
+	local resultType = isFinished and RESULT_TYPES[TiebreakerScope.matchResult(match, opponent)] or 'default'
+	local opposingOpponentWon = isFinished and TiebreakerScope.matchResult(match, opposingOpponent) == 'w'
 
 	return Html.Div{
 		classes = {'standings-match-overview'},
@@ -54,17 +54,17 @@ local function MatchOverviewWidget(props)
 				children = {
 					Html.Span{
 						css = resultType == 'win' and {['font-weight'] = 'bold'} or nil,
-						children = OpponentDisplay.InlineScore(leftOpponent)
+						children = OpponentDisplay.InlineScore(opponent)
 					},
 					Html.Span{children = ':'},
 					Html.Span{
-						css = shownOpponentWon and {['font-weight'] = 'bold'} or nil,
-						children = OpponentDisplay.InlineScore(opponentToShow)
+						css = opposingOpponentWon and {['font-weight'] = 'bold'} or nil,
+						children = OpponentDisplay.InlineScore(opposingOpponent)
 					}
 				}
 			} or nil,
 			OpponentDisplay.InlineOpponent{
-				opponent = opponentToShow,
+				opponent = opposingOpponent,
 				overflow = 'ellipsis',
 				teamStyle = 'icon',
 			}
