@@ -12,15 +12,18 @@ local InGameRoles = Lua.import('Module:InGameRoles', {loadData = true})
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
-local Operator = Lua.import('Module:Operator')
 local Tournament = Lua.import('Module:Tournament')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local Html = Lua.import('Module:Widget/Html')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local EMPTY_PLACEHOLDER = Html.Div{}
+local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local MAX_NUM_BANS = 5
 local NUM_HEROES_PICK = 5
 local SIDE_COLORS = {
@@ -29,6 +32,8 @@ local SIDE_COLORS = {
 }
 local STATUS_NOT_PLAYED = 'notplayed'
 local SPAN_SLASH = Html.Span{classes = {'slash'}, children = '/'}
+local WINNER_LEFT = IconFa{iconName = 'winner_left'}
+local WINNER_RIGHT = IconFa{iconName = 'winner_right'}
 
 ---@class LoLMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
 local GameRowComponentProps = {
@@ -107,13 +112,18 @@ function CustomMatchSummary.GameDetail(game, index)
 		-math.huge
 	)
 
+	local hasCenterColumn = maxDamage > -math.huge and #gamePlayers[1] == #gamePlayers[2] and #gamePlayers[1] == 5
+
 	return MatchSummaryWidgets.GameDetail{
+		hasCenterColumn = hasCenterColumn,
 		game = game,
 		gameIndex = index,
 		overview = game.length,
-		children = Array.mapRange(1, #game.opponents, function (opponentIndex)
-			return CustomMatchSummary._createOpponentDetail(game, gamePlayers[opponentIndex], opponentIndex, maxDamage)
-		end),
+		children = WidgetUtil.collect(
+			CustomMatchSummary._createOpponentDetail(game, gamePlayers[1], 1, maxDamage),
+			hasCenterColumn and CustomMatchSummary._createPlayerDiff(gamePlayers) or nil,
+			CustomMatchSummary._createOpponentDetail(game, gamePlayers[2], 2, maxDamage)
+		),
 	}
 end
 
@@ -168,7 +178,7 @@ function CustomMatchSummary._createOpponentDetail(game, gamePlayersOfTeam, gameO
 				Html.Div{children = Array.interleave(kda, SPAN_SLASH)},
 				gamePlayer.damagedone and Html.Div{children = {
 					'(',
-					string.format('%.1fK', gamePlayer.damagedone / 1000),
+					CustomMatchSummary._formatValue(gamePlayer.damagedone),
 					')'
 				}} or nil
 			}, ' ')
@@ -193,6 +203,49 @@ function CustomMatchSummary._createOpponentDetail(game, gamePlayersOfTeam, gameO
 					},
 					buildDamageBar(gamePlayer.damagedone)
 				}
+			}
+		end)
+	}
+end
+
+---@private
+---@param value number
+---@return number|string
+function CustomMatchSummary._formatValue(value)
+	if math.abs(value) < 1000 then
+		return value
+	end
+	return string.format('%.1fK', value / 1000)
+end
+
+---@private
+---@param diff number
+---@return VNode|VNode[]
+function CustomMatchSummary._createGoldDiffDisplay(diff)
+	if diff == 0 then
+		return Html.Div{children = '-'}
+	end
+	return {
+		diff > 0 and WINNER_LEFT or EMPTY_PLACEHOLDER,
+		Html.Div{children = CustomMatchSummary._formatValue(math.abs(diff))},
+		diff < 0 and WINNER_RIGHT or EMPTY_PLACEHOLDER,
+	}
+end
+
+---@private
+---@param players table[][]
+---@return VNode
+function CustomMatchSummary._createPlayerDiff(players)
+	return Html.Div{
+		classes = {'stat-diff'},
+		children = Array.mapRange(1, NUM_HEROES_PICK, function (index)
+			local p1Gold = (players[1][index].gold or 0)
+			local p2Gold = (players[2][index].gold or 0)
+
+			local goldDiff = p1Gold - p2Gold
+
+			return Html.Div{
+				children = CustomMatchSummary._createGoldDiffDisplay(goldDiff)
 			}
 		end)
 	}

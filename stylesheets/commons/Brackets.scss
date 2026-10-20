@@ -753,6 +753,10 @@ div.brkts-popup-body-element-thumbs {
 		background-color: var( --clr-on-surface-dark-primary-4 );
 	}
 
+	&.with-center-column {
+		grid-template-columns: min-content 2fr 1fr 2fr min-content;
+	}
+
 	&-container {
 		display: contents;
 
@@ -775,7 +779,7 @@ div.brkts-popup-body-element-thumbs {
 		place-items: center;
 
 		&-summary {
-			grid-column: span 2;
+			grid-column: 2 / -2;
 			font-size: 0.875rem;
 			font-weight: bold;
 		}
@@ -814,6 +818,27 @@ div.brkts-popup-body-element-thumbs {
 		background: linear-gradient( to right, var( --left-bar-color, transparent ) var( --left-bar-length ), var( --right-bar-color, transparent ) var( --left-bar-length ) calc( 100% - var( --left-bar-length ) ) );
 		height: 0.25rem;
 		width: 90%;
+	}
+
+	.stat-diff {
+		display: grid;
+		grid-template-columns: 1fr 2fr 1fr;
+		place-items: center;
+
+		> div {
+			display: grid;
+			grid-column: 1 / -1;
+			grid-template-columns: subgrid;
+			place-items: center;
+
+			&:has( > :only-child ) {
+				display: contents;
+
+				> :only-child {
+					grid-column: 1 / -1;
+				}
+			}
+		}
 	}
 }
 

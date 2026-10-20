@@ -14,6 +14,7 @@ local GameWinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLoss
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class GameDetailProps
+---@field hasCenterColumn boolean?
 ---@field game MatchGroupUtilGame
 ---@field gameIndex integer
 ---@field overview Renderable?
@@ -27,7 +28,10 @@ local function GameDetail(props)
 	local gameOverview = props.overview
 
 	return Div{
-		classes = {'brkts-popup-game-detail'},
+		classes = {
+			'brkts-popup-game-detail',
+			props.hasCenterColumn and 'with-center-column' or nil,
+		},
 		children = WidgetUtil.collect(
 			Div{
 				classes = {'brkts-popup-game-detail-header'},
