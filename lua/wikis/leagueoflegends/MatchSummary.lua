@@ -95,14 +95,16 @@ function CustomMatchSummary.GameDetail(game, index)
 		return nil
 	end
 
+	local gamePlayers = Array.map(game.opponents, function (gameOpponent)
+		return CustomMatchSummary._sortGamePlayersByRole(gameOpponent.players)
+	end)
+
 	local maxDamage = Array.reduce(
-		Array.map(game.opponents, function (gameOpponent)
-			return Array.reduce(
-				Array.map(gameOpponent.players, Operator.property('damagedone')),
-				MathUtil.nilSafeMax
-			)
-		end),
-		MathUtil.nilSafeMax
+		Array.flatten(gamePlayers),
+		function (aggregate, gamePlayer)
+			return MathUtil.nilSafeMax(aggregate, gamePlayer.damagedone)
+		end,
+		-math.huge
 	)
 
 	return MatchSummaryWidgets.GameDetail{
@@ -110,21 +112,17 @@ function CustomMatchSummary.GameDetail(game, index)
 		gameIndex = index,
 		overview = game.length,
 		children = Array.mapRange(1, #game.opponents, function (opponentIndex)
-			return CustomMatchSummary._createOpponentDetail(game, opponentIndex, maxDamage)
+			return CustomMatchSummary._createOpponentDetail(game, gamePlayers[opponentIndex], opponentIndex, maxDamage)
 		end),
 	}
 end
 
 ---@private
----@param game MatchGroupUtilGame
----@param gameOpponentIndex integer
----@param maxDamage number?
----@return VNode
-function CustomMatchSummary._createOpponentDetail(game, gameOpponentIndex, maxDamage)
-	local gameOpponent = game.opponents[gameOpponentIndex]
-	local side = game.extradata['team' .. gameOpponentIndex .. 'side']
-	local gamePlayers = Array.sortBy(
-		Array.filter(gameOpponent.players, Logic.isNotEmpty),
+---@param players table[]
+---@return table[]
+function CustomMatchSummary._sortGamePlayersByRole(players)
+	return Array.sortBy(
+		Array.filter(players, Logic.isNotEmpty),
 		function (gamePlayer)
 			return gamePlayer.role
 		end,
@@ -132,11 +130,21 @@ function CustomMatchSummary._createOpponentDetail(game, gameOpponentIndex, maxDa
 			return InGameRoles[a].sortOrder < InGameRoles[b].sortOrder
 		end
 	)
+end
+
+---@private
+---@param game MatchGroupUtilGame
+---@param gamePlayersOfTeam table[]
+---@param gameOpponentIndex integer
+---@param maxDamage number?
+---@return VNode
+function CustomMatchSummary._createOpponentDetail(game, gamePlayersOfTeam, gameOpponentIndex, maxDamage)
+	local side = game.extradata['team' .. gameOpponentIndex .. 'side']
 
 	---@param damageDone number
 	---@return VNode?
 	local function buildDamageBar(damageDone)
-		if damageDone == nil or maxDamage == nil then
+		if damageDone == nil or maxDamage == -math.huge then
 			return
 		end
 		local damageRatio = damageDone / maxDamage
@@ -154,7 +162,7 @@ function CustomMatchSummary._createOpponentDetail(game, gameOpponentIndex, maxDa
 
 	return Html.Div{
 		classes = {'brkts-popup-game-detail-player-container'},
-		children = Array.map(gamePlayers, function (gamePlayer)
+		children = Array.map(gamePlayersOfTeam, function (gamePlayer)
 			local kda = {gamePlayer.kills, gamePlayer.deaths, gamePlayer.assists}
 			local stats = Array.interleave({
 				Html.Div{children = Array.interleave(kda, SPAN_SLASH)},
