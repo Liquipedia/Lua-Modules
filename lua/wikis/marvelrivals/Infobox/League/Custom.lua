@@ -47,6 +47,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		Array.appendWith(widgets,
 			Cell{name = 'Platform', children = {caller:_createPlatformCell(args)}}
+			Cell{name = 'Teams', children = {args.team_number}}
 		)
 	end
 	return widgets
