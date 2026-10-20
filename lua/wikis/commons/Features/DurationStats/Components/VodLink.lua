@@ -15,8 +15,8 @@ local DurationStatsVodLink = {}
 ---Returns the VOD to show for a game: the match VOD if there is one, otherwise the game's own VOD.
 ---Returns nothing if neither has a VOD.
 ---@param entry DurationStatsEntry
----@return string? vod
----@return boolean? isGameVod true if the VOD is the game's own (not the whole match's)
+---@return string?
+---@return boolean?
 function DurationStatsVodLink.getVod(entry)
 	local matchVod = Logic.nilIfEmpty((entry.match or {}).vod)
 	if matchVod then

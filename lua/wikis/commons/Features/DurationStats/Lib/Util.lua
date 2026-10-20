@@ -20,8 +20,8 @@ end
 ---Returns the winner and the loser of a game, given the opponent index of the winner.
 ---@param match MatchGroupUtilMatch?
 ---@param gameWinner string|number|nil
----@return standardOpponent? winner
----@return standardOpponent? loser
+---@return standardOpponent?
+---@return standardOpponent?
 function Util.getWinnerAndLoser(match, gameWinner)
 	if not match then return end
 
