@@ -154,25 +154,17 @@ function CustomMatchSummary._createOpponentDetail(game, gameOpponentIndex, maxDa
 					gameOpponentIndex == 2 and 'flipped' or nil,
 				},
 				children = {
-					Html.Div{
-						css = {
-							['align-self'] = 'center',
-							['grid-row'] = 'span 3'
-						},
-						children = MatchSummaryWidgets.Character{
-							date = game.date,
-							flipped = gameOpponentIndex == 2,
-							showName = false,
-							size = '24px',
-							character = gamePlayer.character
-						}
+					MatchSummaryWidgets.Character{
+						classes = {'brkts-popup-game-detail-player-character'},
+						date = game.date,
+						flipped = gameOpponentIndex == 2,
+						showName = false,
+						size = '24px',
+						character = gamePlayer.character
 					},
 					Link{link = gamePlayer.player, children = gamePlayer.displayName},
 					Html.Div{
-						css = {
-							display = 'flex',
-							gap = '0.25rem',
-						},
+						classes = {'brkts-popup-game-detail-player-stats'},
 						children = stats
 					},
 					buildDamageBar(gamePlayer.damagedone)

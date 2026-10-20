@@ -182,19 +182,13 @@ function MatchSummary._createBodyWithDetail(match, overview, gameDetail)
 	end
 
 	return Html.Div{
-		classes = {'toggle-area', 'toggle-area-1'},
+		classes = {'brkts-popup-game-detail-container', 'toggle-area', 'toggle-area-1'},
 		attributes = {['data-toggle-area'] = 1},
 		children = WidgetUtil.collect(
 			Html.Div{
-				css = {
-					display = 'flex',
-					['justify-content'] = 'space-between',
-					['align-items'] = 'center',
-					['padding-top'] = '0.25rem',
-				},
+				classes = {'brkts-popup-game-detail-container-header'},
 				children = {
 					Html.B{
-						css = {['font-size'] = '0.875rem'},
 						children = 'Game details'
 					},
 					DropdownContainer{

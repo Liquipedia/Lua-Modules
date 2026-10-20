@@ -753,6 +753,21 @@ div.brkts-popup-body-element-thumbs {
 		background-color: var( --clr-on-surface-dark-primary-4 );
 	}
 
+	&-container {
+		display: contents;
+
+		&-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding-top: 0.25rem;
+
+			> b {
+				font-size: 0.875rem;
+			}
+		}
+	}
+
 	&-header {
 		display: grid;
 		grid-column: 1 / -1;
@@ -782,6 +797,16 @@ div.brkts-popup-body-element-thumbs {
 			grid-column: span 2;
 			grid-template-columns: subgrid;
 			row-gap: 0.25rem;
+		}
+
+		&-character {
+			align-self: center;
+			grid-row: span 3;
+		}
+
+		&-stats {
+			display: flex;
+			gap: 0.25rem;
 		}
 	}
 
