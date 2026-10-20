@@ -22,8 +22,8 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local DAMAGE_ICON = IconFa{iconName = 'damage'}
 local EMPTY_PLACEHOLDER = Html.Div{}
-local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local MAX_NUM_BANS = 5
 local NUM_HEROES_PICK = 5
 local SIDE_COLORS = {
@@ -178,6 +178,8 @@ function CustomMatchSummary._createOpponentDetail(game, gamePlayersOfTeam, gameO
 				Html.Div{children = Array.interleave(kda, SPAN_SLASH)},
 				gamePlayer.damagedone and Html.Div{children = {
 					'(',
+					DAMAGE_ICON,
+					'&nbsp;',
 					CustomMatchSummary._formatValue(gamePlayer.damagedone),
 					')'
 				}} or nil
@@ -227,7 +229,9 @@ function CustomMatchSummary._createGoldDiffDisplay(diff)
 	end
 	return {
 		diff > 0 and WINNER_LEFT or EMPTY_PLACEHOLDER,
-		Html.Div{children = CustomMatchSummary._formatValue(math.abs(diff))},
+		Html.Div{children = {
+			CustomMatchSummary._formatValue(math.abs(diff))
+		}},
 		diff < 0 and WINNER_RIGHT or EMPTY_PLACEHOLDER,
 	}
 end
