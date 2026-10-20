@@ -127,16 +127,11 @@ function CustomMatchSummary._createOpponentDetail(game, gameOpponentIndex, maxDa
 		return Html.Div{
 			classes = {'damage-bar'},
 			css = {
-				['--left-bar-color'] = gameOpponentIndex == 1 and SIDE_COLORS[side] or 'transparent',
+				['--left-bar-color'] = gameOpponentIndex == 1 and SIDE_COLORS[side] or nil,
 				['--left-bar-length'] = MathUtil.formatPercentage(
 					gameOpponentIndex == 1 and damageRatio or (1 - damageRatio)
 				),
-				['--right-bar-color'] = gameOpponentIndex == 2 and SIDE_COLORS[side] or 'transparent',
-				['--right-bar-length'] = MathUtil.formatPercentage(
-					gameOpponentIndex == 2 and damageRatio or (1 - damageRatio)
-				),
-				height = '0.25rem',
-				width = '90%'
+				['--right-bar-color'] = gameOpponentIndex == 2 and SIDE_COLORS[side] or nil,
 			}
 		}
 	end

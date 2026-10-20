@@ -784,6 +784,12 @@ div.brkts-popup-body-element-thumbs {
 			row-gap: 0.25rem;
 		}
 	}
+
+	.damage-bar {
+		background: linear-gradient( to right, var( --left-bar-color, transparent ) var( --left-bar-length ), var( --right-bar-color, transparent ) var( --left-bar-length ) calc( 100% - var( --left-bar-length ) ) );
+		height: 0.25rem;
+		width: 90%;
+	}
 }
 
 .brkts-champion-icon {
