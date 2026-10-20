@@ -120,7 +120,7 @@ function CustomMatchSummary._createOpponentDetail(game, gameOpponentIndex, maxDa
 	---@param damageDone number
 	---@return VNode?
 	local function buildDamageBar(damageDone)
-		if maxDamage == nil then
+		if damageDone == nil or maxDamage == nil then
 			return
 		end
 		local damageRatio = damageDone / maxDamage
