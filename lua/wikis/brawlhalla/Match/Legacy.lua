@@ -63,8 +63,11 @@ function MatchLegacy._convertParameters(match2)
 		Array.forEach(match2.match2games or {}, function(game)
 			local opponents = Json.parseIfString(game.opponents) or {}
 			local player = ((opponents[opponentIndex] or {}).players or {})[playerIndex]
-			if Logic.isDeepEmpty(player) then return end
-			heads:add(player.char)
+			if Logic.isDeepEmpty(player) then
+				return
+			elseif player.char then
+				heads:add(player.char)
+			end
 		end)
 		return heads:toArray()
 	end
