@@ -36,9 +36,14 @@ local Standings = {}
 ---@field matches MatchGroupUtilMatch[]
 ---@field config {hasdraws: boolean?, hasovertime: boolean?, haspoints: boolean?}
 ---@field rounds StandingsRound[]
----@field additionalStats {id: string, title: string?}[]
+---@field additionalStats StandingsAdditionalStat[]
 ---@field package record standingstable
 ---@field package entryRecords standingsentry[]
+
+---@class StandingsAdditionalStat
+---@field id string
+---@field title string? # Stats without a title get no column
+---@field tiebreaker boolean? # Whether the stat is one of the tiebreakers, otherwise it is only shown
 
 ---@class StandingsRound
 ---@field round integer
