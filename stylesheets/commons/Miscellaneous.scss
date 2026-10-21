@@ -1949,3 +1949,20 @@ body .fieldBox {
 .selflink {
 	font-weight: bold;
 }
+
+/*******************************************************************************
+Template(s): Qualification Chances
+*******************************************************************************/
+.qualification-chances-bar {
+	display: flex;
+	gap: 0.125rem;
+	width: 16rem;
+	height: 0.75rem;
+	border-radius: 0.375rem;
+	overflow: hidden;
+
+	&__segment {
+		flex-basis: 0;
+		min-width: 0.25rem;
+	}
+}
