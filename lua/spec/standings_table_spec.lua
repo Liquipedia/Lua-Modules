@@ -35,6 +35,17 @@ describe('Standings Table from template', function()
 		assert.are_equal('league', storedTable.type)
 	end)
 
+	it('applies the width to the table', function()
+		local html = tostring(StandingsTable.fromTemplate{
+			tabletype = 'group',
+			import = 'false',
+			width = '600px',
+			round1 = {started = 'true', finished = 'true'},
+			{type = 'literal', name = 'Alpha', r1 = '3'},
+		})
+		assert.is_truthy(html:find('class="table2[^"]*standings%-group"[^>]*style="width:600px"'))
+	end)
+
 	it('errors on an unknown table type', function()
 		assert.error(function()
 			StandingsTable.fromTemplate{tabletype = 'league'}

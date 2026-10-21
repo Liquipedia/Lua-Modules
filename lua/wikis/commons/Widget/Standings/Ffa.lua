@@ -29,7 +29,7 @@ local STATUS_TO_DISPLAY = {
 
 local Helpers = {}
 
----@param props {standings?: StandingsModel}
+---@param props {standings?: StandingsModel, width: number?}
 ---@return Renderable?
 local function StandingsFfa(props)
 	local standings = props.standings
@@ -45,6 +45,7 @@ local function StandingsFfa(props)
 
 	local standingsTable = TableWidgets.Table{
 		classes = {'standings-ffa'},
+		css = {width = props.width and (props.width .. 'px') or nil},
 		columns = WidgetUtil.collect(
 			{align = 'center'},
 			Helpers._showRoundColumns(standings) and {align = 'center'} or nil,

@@ -22,7 +22,7 @@ local StandingsDisplayUtil = Lua.import('Module:Standings/DisplayUtil')
 
 local Helpers = {}
 
----@param props {standings?: StandingsModel}
+---@param props {standings?: StandingsModel, width: number?}
 ---@return Renderable?
 local function StandingsGroup(props)
 	local standings = props.standings
@@ -37,6 +37,7 @@ local function StandingsGroup(props)
 
 	local standingsTable = TableWidgets.Table{
 		classes = {'standings-group'},
+		css = {width = props.width and (props.width .. 'px') or nil},
 		title = Logic.nilIfEmpty(standings.title),
 		columns = WidgetUtil.collect(
 			{align = 'center'},
