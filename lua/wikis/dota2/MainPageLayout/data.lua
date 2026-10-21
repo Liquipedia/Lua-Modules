@@ -401,17 +401,17 @@ return {
 		{
 			file = 'Morphling_Large.png',
 			title = 'Heroes',
-			link = 'Heroes',
+			link = 'Portal:Heroes',
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[type::hero]] and [[extradata_game::]]',
+				conditions = '[[type::hero]] and [[extradata_game::]] and [[extradata_name::!Spirit Bear]]',
 			},
 		},
 		{
 			file = 'Blink_Dagger Large.png',
 			title = 'Items',
-			link = 'Items',
+			link = 'Portal:Items',
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
