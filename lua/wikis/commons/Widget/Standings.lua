@@ -39,7 +39,7 @@ local function StandingsWidget(props)
 		}
 	end
 
-	assert(standingsWidget, 'This Standings Type not yet implemented')
+	assert(standingsWidget, 'Unknown Standings Type')
 
 	return AnalyticsWidget{
 		analyticsName = StringUtils.upperCaseFirst(standings.type) .. ' standings table',
