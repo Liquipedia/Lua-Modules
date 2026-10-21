@@ -37,7 +37,7 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_date', Variables.varDefault('tournament_enddate'))
 
 	Variables.varDefine('tournament_link', Variables.varDefault('tournament_parent'))
-	Variables.varDefine('tournament_region', queryResult.extradata.region)
+	Variables.varDefine('tournament_region', (queryResult.extradata or {}).region)
 	Variables.varDefine('tournament_entrants', queryResult.participantsnumber)
 	Variables.varDefine('tournament_mode', Variables.varDefault('tournament_mode', 'singles'))
 
