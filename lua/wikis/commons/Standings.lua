@@ -57,6 +57,7 @@ local Standings = {}
 ---@field positionStatus string?
 ---@field definitiveStatus string?
 ---@field match MatchGroupUtilMatch?
+---@field matchOpponentIndex integer? # Index of the opponent in `match`, needed as the match is not alias resolved
 ---@field positionChangeFromPreviousRound integer
 ---@field pointsChangeFromPreviousRound number
 ---@field specialStatus 'dq'|'nc'|'' # nc = non-competing (not in the round)
@@ -160,6 +161,7 @@ function Standings.entryFromRecord(record)
 		disqualified = record.extradata.disqualified == true,
 		positionChangeFromPreviousRound = tonumber(record.placementchange),
 		additionalStatsValues = record.extradata.additionalStatsValues or {},
+		matchOpponentIndex = tonumber(record.extradata.matchopponentindex),
 		record = record,
 	}
 

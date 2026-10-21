@@ -35,6 +35,11 @@ return {
 			status = 2,
 			matchWidth = 180,
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				mode = 'automatic'
+			}
+		},
 		participants = {
 			defaultPlayerNumber = 6,
 		},

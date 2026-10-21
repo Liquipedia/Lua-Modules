@@ -71,6 +71,8 @@ keeps this testable without standing a wiki up.
 
 ---@alias MatchStatus 'notplayed'|''|nil
 
+---@alias MatchPhase 'finished'|'ongoing'|'upcoming'
+
 ---@class MatchGroupUtilGame
 ---@field comment string?
 ---@field date string?
@@ -114,7 +116,7 @@ keeps this testable without standing a wiki up.
 ---@field pageName string?
 ---@field parent string?
 ---@field patch string?
----@field phase 'upcoming'|'ongoing'|'finished'
+---@field phase MatchPhase
 ---@field publisherTier string?
 ---@field resultType string?
 ---@field section string?
@@ -381,12 +383,9 @@ end
 
 ---Determines the phase of a match based on its properties.
 ---@param match MatchGroupUtilMatch|MatchGroupUtilGame|PartialMatchGameRecord
----@return 'finished'|'ongoing'|'upcoming'
+---@return MatchPhase
 function MatchUtil.computeMatchPhase(match)
-	-- TODO: a dateIsExact of false becomes nil here, so it is treated as unknown rather than as
-	-- inexact, and a past match with dateIsExact = false reads as ongoing instead of upcoming.
-	-- Only the record spelling (dateexact = '0') currently makes a match inexact.
-	local isExact = Logic.readBoolOrNil(match.dateIsExact or match.dateexact)
+	local isExact = Logic.readBoolOrNil(Logic.nilOr(match.dateIsExact, match.dateexact))
 	local matchStartTimestamp = match.timestamp or Date.readTimestampOrNil(match.date) or Date.defaultTimestamp
 	if match.winner or Logic.readBool(match.finished) then
 		return 'finished'

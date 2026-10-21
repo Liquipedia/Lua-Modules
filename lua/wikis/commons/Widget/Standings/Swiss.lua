@@ -12,9 +12,8 @@ local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Component = Lua.import('Module:Widget/Component')
-local Label = Lua.import('Module:Widget/Basic/Label')
 local MatchOverview = Lua.import('Module:Widget/Standings/MatchOverview')
-local Participant = Lua.import('Module:Widget/Standings/Participant')
+local StandingsCells = Lua.import('Module:Widget/Standings/Cells')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -57,9 +56,7 @@ function Helpers.buildColumnDefinitions(standings, statsToShow)
 	return WidgetUtil.collect(
 		{align = 'left'},
 		{align = 'left'},
-		Array.map(statsToShow, function(tiebreaker)
-			return {align = 'center'}
-		end),
+		StandingsCells.statColumns(statsToShow),
 		Array.rep({align = 'center'}, #standings.rounds)
 	)
 end
@@ -69,21 +66,13 @@ end
 ---@param statsToShow {id: string, title: string?}[]
 ---@return Renderable
 function Helpers.headerRow(standings, statsToShow)
-	---@param text string?
-	---@return Renderable
-	local makeHeaderCell = function(text)
-		return TableWidgets.CellHeader{children = text}
-	end
-
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
-			makeHeaderCell('#'),
-			makeHeaderCell('Participant'),
-			Array.map(statsToShow, function(tiebreaker, index)
-				return makeHeaderCell(tiebreaker.title)
-			end),
+			StandingsCells.header('#'),
+			StandingsCells.header('Participant'),
+			StandingsCells.statHeaders(statsToShow),
 			Array.map(standings.rounds, function(round)
-				return makeHeaderCell(round.title)
+				return StandingsCells.header(round.title)
 			end)
 		)}
 	}}
@@ -98,20 +87,9 @@ function Helpers.createRow(standings, slot, statsToShow)
 	return TableWidgets.Row{
 		attributes = {['data-position-status'] = slot.positionStatus},
 		children = WidgetUtil.collect(
-			TableWidgets.Cell{
-				children = Label{
-					children = slot.placement,
-					attributes = {['data-placement-type'] = Logic.nilIfEmpty(slot.definitiveStatus)},
-					labelScheme = 'placement',
-				},
-			},
-			TableWidgets.Cell{children = Participant{opponent = slot.opponent, disqualified = slot.disqualified}},
-			Array.map(statsToShow, function(tiebreaker, tiebreakerIndex)
-				return TableWidgets.Cell{
-					css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil},
-					children = slot.additionalStatsValues[tiebreaker.id] and slot.additionalStatsValues[tiebreaker.id].display or ''
-				}
-			end),
+			StandingsCells.placement(slot),
+			StandingsCells.participant(slot),
+			StandingsCells.stats(slot, statsToShow),
 			Array.map(standings.rounds, function(columnRound)
 				local entry = Array.find(columnRound.opponents, function(columnSlot)
 					return Opponent.same(columnSlot.opponent, slot.opponent)
@@ -119,21 +97,13 @@ function Helpers.createRow(standings, slot, statsToShow)
 				if not entry then
 					return TableWidgets.Cell{}
 				end
-				local match = entry.match
-				if not match then
-					return TableWidgets.Cell{}
-				end
-
-				local opposingOpponentIndex = Array.indexOf(match.opponents, function(opponent)
-					return not Opponent.same(entry.opponent, opponent)
-				end)
-				if not entry.match.opponents[opposingOpponentIndex] then
+				if not entry.match or not entry.matchOpponentIndex then
 					return TableWidgets.Cell{}
 				end
 
 				return TableWidgets.Cell{children = MatchOverview{
-					match = match,
-					showOpponent = opposingOpponentIndex,
+					match = entry.match,
+					opponentIndex = entry.matchOpponentIndex,
 				}}
 			end)
 		),

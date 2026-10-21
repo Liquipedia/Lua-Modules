@@ -26,9 +26,10 @@ local StandingsParser = {}
 ---@param tiebreakerIds string[]
 ---@param drawConfig {match: boolean?}? Explicit draw toggles per level; when unset, draws are detected from the data
 ---@param overtimeEnabled boolean? Whether overtime results are tracked separately from regulation results
+---@param walkoverGames number? Games a walkover counts as in the game tiebreakers, unset means not counted
 ---@return StandingsTableStorage
 function StandingsParser.parse(
-	rounds, opponents, bgs, title, matches, standingsType, tiebreakerIds, drawConfig, overtimeEnabled
+	rounds, opponents, bgs, title, matches, standingsType, tiebreakerIds, drawConfig, overtimeEnabled, walkoverGames
 )
 	-- TODO: When all legacy (of all standing type) have been converted, the wiki variable should be updated
 	-- to follow the namespace format. Eg new name could be `standings_standingsindex`
@@ -48,7 +49,8 @@ function StandingsParser.parse(
 		local opponentRounds = opponentData.rounds
 
 		return Array.map(rounds, function(round)
-			local pointsFromRound, statusInRound, tiebreakerPoints, matchId, playedMatches, playedMatchPoints
+			local pointsFromRound, statusInRound, tiebreakerPoints, matchId, matchOpponentIndex, playedMatches,
+				playedMatchPoints
 			if opponentRounds and opponentRounds[round.roundNumber] then
 				local thisRoundsData = opponentRounds[round.roundNumber]
 				if thisRoundsData.scoreboard then
@@ -57,6 +59,7 @@ function StandingsParser.parse(
 				statusInRound = thisRoundsData.specialstatus
 				tiebreakerPoints = thisRoundsData.tiebreakerPoints
 				matchId = thisRoundsData.matchId
+				matchOpponentIndex = thisRoundsData.matchOpponentIndex
 				if thisRoundsData.scoreboard.match then
 					carryData.match.w = carryData.match.w + thisRoundsData.scoreboard.match.w
 					carryData.match.d = carryData.match.d + thisRoundsData.scoreboard.match.d
@@ -82,6 +85,7 @@ function StandingsParser.parse(
 				matches = playedMatches or {},
 				matchPoints = playedMatchPoints or {},
 				startingPoints = opponentData.startingPoints,
+				finished = round.finished,
 				manualDefiniteStatus = StandingsParser.resolveManualDefiniteStatus(
 					opponentData.definiteStatuses, round.roundNumber
 				),
@@ -92,6 +96,7 @@ function StandingsParser.parse(
 					disqualified = opponentData.disqualifiedFromRound ~= nil
 						and round.roundNumber >= opponentData.disqualifiedFromRound or nil,
 					matchid = matchId,
+					matchopponentindex = matchOpponentIndex,
 					additionalStatsValues = {},
 				}
 			}
@@ -107,7 +112,7 @@ function StandingsParser.parse(
 		),
 	}
 	---@type StandingsTiebreakerOptions
-	local tiebreakerOptions = {draws = draws}
+	local tiebreakerOptions = {draws = draws, walkoverGames = walkoverGames}
 
 	---@param tiebreakerId string
 	---@return {id: string, title: string?}
@@ -179,6 +184,26 @@ function StandingsParser.parse(
 			additionalStats = additionalStats,
 		}
 	}
+end
+
+---Resolves whether a round has started and finished. Manual input takes priority, otherwise it follows
+---the phases of all matches in the round. A round without matches has neither started nor finished.
+---@param round {started: boolean?, finished: boolean?}
+---@param matchPhases MatchPhase[]?
+---@return boolean started
+---@return boolean finished
+function StandingsParser.resolveRoundStatus(round, matchPhases)
+	local phases = matchPhases or {}
+	local hasMatches = #phases > 0
+	local finished = Logic.nilOr(
+		round.finished,
+		hasMatches and Array.all(phases, function(phase) return phase == 'finished' end)
+	)
+	local started = finished or Logic.nilOr(
+		round.started,
+		Array.any(phases, function(phase) return phase ~= 'upcoming' end)
+	)
+	return started, finished
 end
 
 ---Calculate tiebreaker values for all opponents in a round.

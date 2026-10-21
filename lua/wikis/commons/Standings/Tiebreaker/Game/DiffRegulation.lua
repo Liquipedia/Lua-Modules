@@ -17,9 +17,10 @@ local TiebreakerGameDiffRegulation = Class.new(TiebreakerInterface)
 
 ---Games won and lost, not counting the games that went into overtime.
 ---@param opponent TiebreakerOpponent
+---@param walkoverGames number?
 ---@return {w: integer, l: integer}
-local function getRegulationGames(opponent)
-	local games = TiebreakerGameUtil.getGames(opponent)
+local function getRegulationGames(opponent, walkoverGames)
+	local games = TiebreakerGameUtil.getGames(opponent, walkoverGames)
 	local overtimeGames = TiebreakerGameUtil.getOvertimeGames(opponent)
 	return {w = games.w - overtimeGames.w, l = games.l - overtimeGames.l}
 end
@@ -28,7 +29,7 @@ end
 ---@param opponent TiebreakerOpponent
 ---@return integer
 function TiebreakerGameDiffRegulation:valueOf(state, opponent)
-	local games = getRegulationGames(opponent)
+	local games = getRegulationGames(opponent, self.options.walkoverGames)
 	return games.w - games.l
 end
 
@@ -41,7 +42,7 @@ end
 ---@param opponent TiebreakerOpponent
 ---@return string
 function TiebreakerGameDiffRegulation:display(state, opponent)
-	local games = getRegulationGames(opponent)
+	local games = getRegulationGames(opponent, self.options.walkoverGames)
 	return games.w .. ' - ' .. games.l
 end
 

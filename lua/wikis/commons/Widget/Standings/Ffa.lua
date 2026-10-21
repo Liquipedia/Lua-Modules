@@ -8,16 +8,13 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Component = Lua.import('Module:Widget/Component')
-local Html = Lua.import('Module:Widget/Html')
-local Label = Lua.import('Module:Widget/Basic/Label')
-local RoundSelector = Lua.import('Module:Widget/Standings/RoundSelector')
-local Participant = Lua.import('Module:Widget/Standings/Participant')
 local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
+local RoundHistory = Lua.import('Module:Widget/Standings/RoundHistory')
+local StandingsCells = Lua.import('Module:Widget/Standings/Cells')
 local Switch = Lua.import('Module:Widget/Switch')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
@@ -39,10 +36,8 @@ local function StandingsFfa(props)
 		return
 	end
 
-	local activeRounds = (Array.maxBy(
-		Array.filter(standings.rounds, function(round) return round.started end),
-		function (round) return round.round end
-	) or {round = 0}).round
+	local activeRounds = StandingsDisplayUtil.lastStartedRound(standings)
+	local statsToShow = StandingsDisplayUtil.statsToShow(standings)
 
 	local standingsTable = TableWidgets.Table{
 		classes = {'standings-ffa'},
@@ -50,19 +45,17 @@ local function StandingsFfa(props)
 			{align = 'center'},
 			Helpers._showRoundColumns(standings) and {align = 'center'} or nil,
 			{align = 'left'},
-			Array.map(StandingsDisplayUtil.statsToShow(standings), function()
-				return {align = 'center'}
-			end),
+			StandingsCells.statColumns(statsToShow),
 			Helpers._showRoundColumns(standings) and Array.rep({align = 'center'}, #standings.rounds) or nil
 		),
 		title = String.nilIfEmpty(standings.title),
 		children = WidgetUtil.collect(
-			Helpers._headerRow(standings),
+			Helpers._headerRow(standings, statsToShow),
 			Array.map(standings.rounds, function (round)
 				if round.round > activeRounds then
 					return
 				end
-				return Helpers._createRoundBody(standings, round)
+				return Helpers._createRoundBody(standings, round, statsToShow)
 			end)
 		),
 		striped = false
@@ -72,35 +65,17 @@ local function StandingsFfa(props)
 		return standingsTable
 	end
 
-	local hasFutureRounds = Helpers._hasFutureRounds(standings)
-
-	return Html.Div{
-		classes = {'standings-ffa-wrapper', 'toggle-area', 'toggle-area-' .. activeRounds},
-		attributes = {['data-toggle-area'] = activeRounds},
-		children = WidgetUtil.collect(
-			activeRounds > 0 and Html.Div{
-				classes = {'standings-ffa-controls'},
-				children = {
-					RoundSelector{
-						rounds = activeRounds,
-						hasEnded = not hasFutureRounds,
-					},
-					Switch{
-						switchGroup = 'ffa-detailed-stats',
-						label = 'Detailed stats',
-					}
-				}
-			} or nil,
-			standingsTable
-		)
+	return RoundHistory{
+		activeRounds = activeRounds,
+		hasEnded = not StandingsDisplayUtil.hasFutureRounds(standings),
+		controls = {
+			Switch{
+				switchGroup = 'ffa-detailed-stats',
+				label = 'Detailed stats',
+			},
+		},
+		children = standingsTable,
 	}
-end
-
----@private
----@param standings StandingsModel
----@return boolean
-function Helpers._hasFutureRounds(standings)
-	return not standings.rounds[#standings.rounds].started
 end
 
 ---@private
@@ -112,22 +87,15 @@ end
 
 ---@private
 ---@param standings StandingsModel
+---@param statsToShow {id: string, title: string?}[]
 ---@return Renderable
-function Helpers._headerRow(standings)
-	---@param text string?
-	---@return Renderable
-	local makeHeaderCell = function(text)
-		return TableWidgets.CellHeader{children = text}
-	end
-
+function Helpers._headerRow(standings, statsToShow)
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
-			makeHeaderCell('#'),
-			Helpers._showRoundColumns(standings) and makeHeaderCell() or nil,
-			makeHeaderCell('Participant'),
-			Array.map(StandingsDisplayUtil.statsToShow(standings), function(tiebreaker)
-				return makeHeaderCell(tiebreaker.title)
-			end),
+			StandingsCells.header('#'),
+			Helpers._showRoundColumns(standings) and StandingsCells.header() or nil,
+			StandingsCells.header('Participant'),
+			StandingsCells.statHeaders(statsToShow),
 			Helpers._showRoundColumns(standings) and Array.map(standings.rounds, function(round)
 				return TableWidgets.CellHeader{
 					classes = {'standings-ffa-detail'},
@@ -141,9 +109,9 @@ end
 ---@private
 ---@param standings StandingsModel
 ---@param round StandingsRound
+---@param statsToShow {id: string, title: string?}[]
 ---@return Renderable
-function Helpers._createRoundBody(standings, round)
-	local statsToShow = StandingsDisplayUtil.statsToShow(standings)
+function Helpers._createRoundBody(standings, round, statsToShow)
 	return TableWidgets.TableBody{children = Array.map(round.opponents, function (slot)
 		return TableWidgets.Row{
 			attributes = {
@@ -151,23 +119,12 @@ function Helpers._createRoundBody(standings, round)
 				['data-toggle-area-content'] = round.round,
 			},
 			children = WidgetUtil.collect(
-				TableWidgets.Cell{children = Label{
-					children = slot.placement,
-					attributes = {
-						['data-placement-type'] = Logic.nilIfEmpty(slot.definitiveStatus)
-					},
-					labelScheme = 'placement',
-				}},
+				StandingsCells.placement(slot),
 				Helpers._showRoundColumns(standings) and TableWidgets.Cell{
 					children = PlacementChange{change = slot.positionChangeFromPreviousRound}
 				} or nil,
-				TableWidgets.Cell{children = Participant{opponent = slot.opponent, disqualified = slot.disqualified}},
-				Array.map(statsToShow, function(tiebreaker, tiebreakerIndex)
-					return TableWidgets.Cell{
-						css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil},
-						children = slot.additionalStatsValues[tiebreaker.id] and slot.additionalStatsValues[tiebreaker.id].display or ''
-					}
-				end),
+				StandingsCells.participant(slot),
+				StandingsCells.stats(slot, statsToShow),
 				Helpers._showRoundColumns(standings) and Array.map(standings.rounds, function (columnRound)
 					local text
 					if columnRound.round <= round.round then

@@ -33,7 +33,8 @@ local StandingsTable = {}
 
 ---@class StandingTableOpponentData
 ---@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?,
----matches: MatchGroupUtilMatch[], matchPoints: table<string, number>?, matchId: string}[]?
+---matches: MatchGroupUtilMatch[], matchPoints: table<string, number>?, matchId: string,
+---matchOpponentIndex: integer?}[]?
 ---@field opponent standardOpponent
 ---@field aliases standardOpponent[]? # Only for team opponents
 ---@field startingPoints number?
@@ -66,20 +67,29 @@ function StandingsTable.fromTemplate(frame)
 	local tiebreakers = StandingsParseWiki.parseTiebreakers(args, tableType)
 	local overtime = StandingsParseWiki.parseOvertime(args)
 
+	---@type table<integer, MatchPhase[]>
+	local matchPhasesByRound = {}
 	if importScoreFromMatches then
 		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args, overtime)
 
-		local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction, opponents, {
-			exclusive = exclusiveOpponents,
-			importOpponents = importOpponentFromMatches,
-			overtime = overtime,
-		})
+		local importedOpponents
+		importedOpponents, matchPhasesByRound = StandingsParseLpdb.importFromMatches(
+			rounds, automaticScoreFunction, opponents, {
+				exclusive = exclusiveOpponents,
+				importOpponents = importOpponentFromMatches,
+				overtime = overtime,
+			}
+		)
 		opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
 	end
 
+	Array.forEach(rounds, function(round)
+		round.started, round.finished = StandingsParser.resolveRoundStatus(round, matchPhasesByRound[round.roundNumber])
+	end)
+
 	local standingsTable = StandingsParser.parse(
 		rounds, opponents, bgs, title, matches, tableType, tiebreakers, StandingsParseWiki.parseDrawConfig(args),
-		overtime
+		overtime, StandingsParseWiki.parseWalkoverGames(args)
 	)
 
 	if tableType == 'swiss' then

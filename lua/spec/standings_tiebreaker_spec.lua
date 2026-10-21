@@ -8,7 +8,8 @@ describe('Standings Tiebreakers', function()
 	end
 
 	---@param name string
-	---@param props {points: number?, matches: table[]?, match: table?, overtime: table?, tiebreakerpoints: number?}?
+	---@param props {points: number?, matches: table[]?, matchPoints: table<string, number>?, match: table?,
+	---overtime: table?, tiebreakerpoints: number?}?
 	---@return table
 	local function opponent(name, props)
 		props = props or {}
@@ -16,6 +17,7 @@ describe('Standings Tiebreakers', function()
 			opponent = literal(name),
 			points = props.points or 0,
 			matches = props.matches or {},
+			matchPoints = props.matchPoints,
 			match = props.match or {w = 0, d = 0, l = 0},
 			overtime = props.overtime,
 			extradata = {additionalStatsValues = {}, tiebreakerpoints = props.tiebreakerpoints},
@@ -23,7 +25,8 @@ describe('Standings Tiebreakers', function()
 	end
 
 	---@param opponentNames string[]
-	---@param props {finished: boolean?, winner: integer?, games: table[]?, statuses: string[]?, scores: integer[]?}?
+	---@param props {matchId: string?, finished: boolean?, winner: integer?, games: table[]?, statuses: string[]?,
+	---scores: integer[]?}?
 	---@return table
 	local function makeMatch(opponentNames, props)
 		props = props or {}
@@ -39,7 +42,7 @@ describe('Standings Tiebreakers', function()
 			})
 		end
 		return {
-			matchId = 'FakeMatch',
+			matchId = props.matchId or 'FakeMatch',
 			finished = props.finished ~= false,
 			winner = props.winner,
 			opponents = matchOpponents,
@@ -81,7 +84,7 @@ describe('Standings Tiebreakers', function()
 
 		it('rejects non full contexts for tiebreakers not derived from matches among tied opponents', function()
 			local names = {
-				'buchholz', 'medianbuchholz', 'buchholzpoints', 'medianbuchholzpoints',
+				'buchholz', 'medianbuchholz', 'buchholzpoints', 'medianbuchholzpoints', 'sonnebornberger',
 				'manual', 'disqualified', 'startingpoints',
 			}
 			Array.forEach(names, function(name)
@@ -325,6 +328,117 @@ describe('Standings Tiebreakers', function()
 		end)
 	end)
 
+	describe('sonnebornberger', function()
+		---Round robin with default swiss points (win 1, draw 0.5, loss 0),
+		---where Alpha and Bravo are tied on everything but Sonneborn-Berger
+		---@return table[] state, table alpha, table bravo
+		local function roundRobin()
+			local alphaBravo = makeMatch({'Alpha', 'Bravo'}, {matchId = 'AB'})
+			local alphaCharlie = makeMatch({'Alpha', 'Charlie'}, {matchId = 'AC'})
+			local alphaDelta = makeMatch({'Alpha', 'Delta'}, {matchId = 'AD'})
+			local bravoCharlie = makeMatch({'Bravo', 'Charlie'}, {matchId = 'BC'})
+			local bravoDelta = makeMatch({'Bravo', 'Delta'}, {matchId = 'BD'})
+			local charlieDelta = makeMatch({'Charlie', 'Delta'}, {matchId = 'CD'})
+			local alpha = opponent('Alpha', {
+				points = 2, match = {w = 1, d = 2, l = 0}, matches = {alphaBravo, alphaCharlie, alphaDelta},
+				matchPoints = {AB = 0.5, AC = 1, AD = 0.5},
+			})
+			local bravo = opponent('Bravo', {
+				points = 2, match = {w = 1, d = 2, l = 0}, matches = {alphaBravo, bravoCharlie, bravoDelta},
+				matchPoints = {AB = 0.5, BC = 0.5, BD = 1},
+			})
+			local charlie = opponent('Charlie', {
+				points = 1.5, match = {w = 1, d = 1, l = 1}, matches = {alphaCharlie, bravoCharlie, charlieDelta},
+				matchPoints = {AC = 0, BC = 0.5, CD = 1},
+			})
+			local delta = opponent('Delta', {
+				points = 0.5, match = {w = 0, d = 1, l = 2}, matches = {alphaDelta, bravoDelta, charlieDelta},
+				matchPoints = {AD = 0.5, BD = 0, CD = 0},
+			})
+			return {alpha, bravo, charlie, delta}, alpha, bravo
+		end
+
+		it('weighs the points of faced opponents by the points gained against them', function()
+			local sonnebornBerger = TiebreakerFactory.tiebreakerFromId('full.sonnebornberger')
+			local state, alpha, bravo = roundRobin()
+
+			-- Bravo (2) * 0.5 + Charlie (1.5) * 1 + Delta (0.5) * 0.5
+			assert.are_equal(2.75, sonnebornBerger:valueOf(state, alpha))
+			-- Alpha (2) * 0.5 + Charlie (1.5) * 0.5 + Delta (0.5) * 1
+			assert.are_equal(2.25, sonnebornBerger:valueOf(state, bravo))
+			assert.are_equal('2.75', sonnebornBerger:display(state, alpha))
+			assert.are_equal('Sonneborn-Berger', sonnebornBerger:headerTitle())
+		end)
+
+		it('splits a tie that buchholz cannot split', function()
+			local buchholzPoints = TiebreakerFactory.tiebreakerFromId('full.buchholzpoints')
+			local state, alpha, bravo = roundRobin()
+
+			assert.are_equal(4, buchholzPoints:valueOf(state, alpha))
+			assert.are_equal(4, buchholzPoints:valueOf(state, bravo))
+		end)
+
+		it('uses custom points such as overtime results', function()
+			local sonnebornBerger = TiebreakerFactory.tiebreakerFromId('full.sonnebornberger')
+			local alpha = opponent('Alpha', {
+				matches = {
+					makeMatch({'Alpha', 'Bravo'}, {matchId = 'AB'}),
+					makeMatch({'Alpha', 'Charlie'}, {matchId = 'AC'}),
+				},
+				-- Overtime win against Bravo, overtime loss against Charlie
+				matchPoints = {AB = 2, AC = 1},
+			})
+			local state = {alpha, opponent('Bravo', {points = 6}), opponent('Charlie', {points = 4})}
+
+			assert.are_equal(16, sonnebornBerger:valueOf(state, alpha))
+		end)
+
+		it('counts every match against the same opponent', function()
+			local sonnebornBerger = TiebreakerFactory.tiebreakerFromId('full.sonnebornberger')
+			local buchholzPoints = TiebreakerFactory.tiebreakerFromId('full.buchholzpoints')
+			local alpha = opponent('Alpha', {
+				matches = {
+					makeMatch({'Alpha', 'Bravo'}, {matchId = 'M1'}),
+					makeMatch({'Bravo', 'Alpha'}, {matchId = 'M2'}),
+					makeMatch({'Alpha', 'Bravo'}, {matchId = 'M3'}),
+				},
+				matchPoints = {M1 = 1, M2 = 1, M3 = 0},
+			})
+			local state = {alpha, opponent('Bravo', {points = 3})}
+
+			-- Two wins against Bravo (3), the loss adds nothing
+			assert.are_equal(6, sonnebornBerger:valueOf(state, alpha))
+			-- Buchholz counts Bravo once
+			assert.are_equal(3, buchholzPoints:valueOf(state, alpha))
+		end)
+
+		it('ignores unfinished matches and opponents outside of the standings', function()
+			local sonnebornBerger = TiebreakerFactory.tiebreakerFromId('full.sonnebornberger')
+			local alpha = opponent('Alpha', {
+				matches = {
+					makeMatch({'Alpha', 'Bravo'}, {matchId = 'AB'}),
+					makeMatch({'Alpha', 'Charlie'}, {matchId = 'AC', finished = false}),
+					makeMatch({'Alpha', 'Outsider'}, {matchId = 'AO'}),
+				},
+				matchPoints = {AB = 1, AC = 1, AO = 1},
+			})
+			local state = {alpha, opponent('Bravo', {points = 2}), opponent('Charlie', {points = 5})}
+
+			assert.are_equal(2, sonnebornBerger:valueOf(state, alpha))
+		end)
+
+		it('ignores matches without exactly two opponents', function()
+			local sonnebornBerger = TiebreakerFactory.tiebreakerFromId('full.sonnebornberger')
+			local alpha = opponent('Alpha', {
+				matches = {makeMatch({'Alpha', 'Bravo', 'Charlie'}, {matchId = 'ABC'})},
+				matchPoints = {ABC = 1},
+			})
+			local state = {alpha, opponent('Bravo', {points = 2}), opponent('Charlie', {points = 5})}
+
+			assert.are_equal(0, sonnebornBerger:valueOf(state, alpha))
+		end)
+	end)
+
 	describe('gamediff', function()
 		it('sums game scores of finished non-walkover matches', function()
 			local gamediff = TiebreakerFactory.tiebreakerFromId('full.gamediff')
@@ -348,6 +462,116 @@ describe('Standings Tiebreakers', function()
 				},
 			})
 			assert.are_equal(2, gamediff:valueOf({alpha}, alpha))
+		end)
+	end)
+
+	describe('games with walkover games', function()
+		local options = {walkoverGames = 2}
+
+		-- Played: 2-1 win. Walkovers: win (W-FF), loss (DQ-W), double forfeit (FF-FF, no winner).
+		local function makeAlpha()
+			return opponent('Alpha', {
+				matches = {
+					makeMatch({'Alpha', 'Bravo'}, {winner = 1, scores = {2, 1}}),
+					makeMatch({'Alpha', 'Charlie'}, {winner = 1, statuses = {'W', 'FF'}}),
+					makeMatch({'Alpha', 'Delta'}, {winner = 2, statuses = {'DQ', 'W'}}),
+					makeMatch({'Alpha', 'Echo'}, {winner = 0, statuses = {'FF', 'FF'}}),
+				},
+			})
+		end
+
+		it('credits the winner of a walkover with game wins and the loser with game losses', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local games = TiebreakerGameUtil.getGames(makeAlpha(), 2)
+			-- w: 2 + 2, l: 1 + 2 + 2
+			assert.are_equal(4, games.w)
+			assert.are_equal(5, games.l)
+			assert.are_equal(9, games.games)
+		end)
+
+		it('does not count walkovers when unset or 0', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local alpha = makeAlpha()
+			local expected = {w = 2, l = 1, games = 3}
+			Array.forEach({TiebreakerGameUtil.getGames(alpha), TiebreakerGameUtil.getGames(alpha, 0)}, function(games)
+				assert.are_same(expected, {w = games.w, l = games.l, games = games.games})
+			end)
+		end)
+
+		it('applies to the game tiebreakers', function()
+			local alpha = makeAlpha()
+			local function valueOf(name)
+				local tiebreaker = TiebreakerFactory.tiebreakerFromId('full.' .. name, options)
+				return tiebreaker:valueOf({alpha}, alpha)
+			end
+			assert.are_equal(-1, valueOf('gamediff'))
+			assert.are_equal(4, valueOf('gamewins'))
+			assert.are_equal(-5, valueOf('gamelosses'))
+			assert.are_equal(9, valueOf('gamecount'))
+			assert.are_equal(4 / 9, valueOf('gamewinrate'))
+			assert.are_same({4, -5}, valueOf('gamescore'))
+			assert.are_equal(-1, valueOf('gamediffregulation'))
+			assert.are_equal('4 - 5', TiebreakerFactory.tiebreakerFromId('full.gamediff', options):display({alpha}, alpha))
+		end)
+
+		it('only counts finished matches decided by FF, DQ or L as walkovers', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local alpha = opponent('Alpha', {
+				matches = {
+					makeMatch({'Alpha', 'Bravo'}, {winner = 1, scores = {2, 1}}),
+					-- Upcoming match without statuses
+					makeMatch({'Alpha', 'Charlie'}, {finished = false, statuses = {'', ''}}),
+					-- Draw without a score
+					makeMatch({'Alpha', 'Delta'}, {winner = 0, statuses = {'D', 'D'}}),
+					-- Walkover that is not finished yet
+					makeMatch({'Alpha', 'Echo'}, {finished = false, winner = 2, statuses = {'FF', 'W'}}),
+					makeMatch({'Alpha', 'Foxtrot'}, {winner = 1, statuses = {'W', 'L'}}),
+				},
+			})
+			local games = TiebreakerGameUtil.getGames(alpha, 2)
+			assert.are_same({w = 4, l = 1, games = 5}, {w = games.w, l = games.l, games = games.games})
+		end)
+
+		it('reads the walkover result from the status of the opponent, not the winner of the match', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local alpha = opponent('Alpha', {
+				matches = {
+					-- W without the winner set
+					makeMatch({'Alpha', 'Bravo'}, {statuses = {'W', 'FF'}}),
+					-- DQ while the winner points to Alpha
+					makeMatch({'Alpha', 'Charlie'}, {winner = 1, statuses = {'DQ', 'W'}}),
+				},
+			})
+			local games = TiebreakerGameUtil.getGames(alpha, 2)
+			assert.are_same({w = 2, l = 2, games = 4}, {w = games.w, l = games.l, games = games.games})
+		end)
+
+		it('counts a double forfeit as a walkover loss for both opponents', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local doubleForfeit = makeMatch({'Alpha', 'Bravo'}, {winner = -1, statuses = {'FF', 'FF'}})
+			Array.forEach({'Alpha', 'Bravo'}, function(name)
+				local games = TiebreakerGameUtil.getGames(opponent(name, {matches = {doubleForfeit}}), 2)
+				assert.are_same({w = 0, l = 2, games = 2}, {w = games.w, l = games.l, games = games.games})
+			end)
+		end)
+
+		it('gives no walkover result to an opponent with a score against a walkover loss', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local match = makeMatch({'Alpha', 'Bravo'}, {winner = 1, statuses = {'S', 'FF'}, scores = {1, 0}})
+			local alphaGames = TiebreakerGameUtil.getGames(opponent('Alpha', {matches = {match}}), 2)
+			local bravoGames = TiebreakerGameUtil.getGames(opponent('Bravo', {matches = {match}}), 2)
+			assert.are_same({w = 0, l = 0, games = 0}, {w = alphaGames.w, l = alphaGames.l, games = alphaGames.games})
+			assert.are_same({w = 0, l = 2, games = 2}, {w = bravoGames.w, l = bravoGames.l, games = bravoGames.games})
+		end)
+
+		it('does not change the round tiebreakers', function()
+			local alpha = opponent('Alpha', {
+				matches = {
+					makeMatch({'Alpha', 'Bravo'}, {winner = 1, statuses = {'W', 'FF'}}),
+				},
+			})
+			local rounddiff = TiebreakerFactory.tiebreakerFromId('full.rounddiff', options)
+			assert.are_equal(0, rounddiff:valueOf({alpha}, alpha))
 		end)
 	end)
 
