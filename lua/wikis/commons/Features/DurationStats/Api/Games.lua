@@ -14,6 +14,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local Lpdb = Lua.import('Module:Lpdb')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local QUERY_STRING = 'date, pagename, match2id, match2gameid, length, winner, vod'
@@ -26,12 +27,18 @@ local Games = {}
 ---@param order string
 ---@return match2game[]
 function Games.fetch(conditions, limit, order)
-	return mw.ext.LiquipediaDB.lpdb('match2game', {
-		limit = limit,
+	---@type match2game[]
+	local games = {}
+
+	Lpdb.executeMassQuery('match2game', {
 		query = QUERY_STRING,
 		conditions = conditions,
 		order = order,
-	})
+	}, function(game)
+		table.insert(games, game)
+	end, limit)
+
+	return games
 end
 
 ---Fetches the match a game belongs to as a standard match.

@@ -9,7 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
-local Operator = Lua.import('Module:Operator')
+local Lpdb = Lua.import('Module:Lpdb')
 local Tier = Lua.import('Module:Tier/Utils')
 
 local Condition = Lua.import('Module:Condition')
@@ -18,8 +18,6 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
-
-local MATCH_QUERY_LIMIT = 5000
 
 local Tournaments = {}
 
@@ -34,15 +32,18 @@ function Tournaments.getSpecFromTier(args)
 		args.edate and ConditionNode(ColumnName('date'), Comparator.le, args.edate) or nil
 	))
 
-	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
-		limit = MATCH_QUERY_LIMIT,
+	---@type string[]
+	local tournaments = {}
+
+	Lpdb.executeMassQuery('match2', {
 		query = 'pagename',
 		conditions = tostring(conditions),
 		order = 'pagename asc',
 		groupby = 'pagename asc'
-	})
+	}, function(match)
+		table.insert(tournaments, match.pagename)
+	end)
 
-	local tournaments = Array.map(matches, Operator.property('pagename'))
 	if Logic.isEmpty(tournaments) then return end
 
 	return {matchGroupIds = {}, pageNames = {tournaments}}

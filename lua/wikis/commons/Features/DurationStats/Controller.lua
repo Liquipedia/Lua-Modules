@@ -14,6 +14,7 @@ local TournamentStructure = Lua.import('Module:TournamentStructure')
 local Games = Lua.import('Module:Features/DurationStats/Api/Games')
 local Tournaments = Lua.import('Module:Features/DurationStats/Api/Tournaments')
 local Conditions = Lua.import('Module:Features/DurationStats/Lib/Conditions')
+local Util = Lua.import('Module:Features/DurationStats/Lib/Util')
 
 local Html = Lua.import('Module:Widget/Html')
 local DurationStatsTable = Lua.import('Module:Features/DurationStats/Components/Table')
@@ -55,7 +56,15 @@ end
 ---@return DurationStatsEntry[]
 function Controller._fetchEntries(conditions, limit, order)
 	return Array.map(Games.fetch(conditions, limit, order), function(game)
-		return {game = game, match = Games.fetchMatch(game.match2id)}
+		local match = Games.fetchMatch(game.match2id)
+		local winner, loser = Util.getWinnerAndLoser(match, game.winner)
+		return {
+			game = game,
+			match = match,
+			stageName = Util.getStageName(match),
+			winner = winner,
+			loser = loser,
+		}
 	end)
 end
 
