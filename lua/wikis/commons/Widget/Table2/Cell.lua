@@ -43,6 +43,7 @@ local function Table2Cell(props, context)
 				ColumnUtil.buildAttributes(props)
 			),
 			classes = props.classes,
+			css = ColumnUtil.buildCss(props.width, props.minWidth, props.maxWidth, props.css),
 			children = children,
 		}
 	end
