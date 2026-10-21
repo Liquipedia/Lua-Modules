@@ -24,7 +24,9 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 local StandingsTable = {}
 
----@alias StandingsTableTypes 'ffa'|'swiss'
+---@alias StandingsTableTypes 'ffa'|'swiss'|'group'
+
+local TABLE_TYPES = {ffa = true, swiss = true, group = true}
 
 ---@class Scoreboard
 ---@field points number?
@@ -46,7 +48,7 @@ local StandingsTable = {}
 function StandingsTable.fromTemplate(frame)
 	local args = Arguments.getArgs(frame)
 	local tableType = args.tabletype
-	if tableType ~= 'ffa' and tableType ~= 'swiss' then
+	if not TABLE_TYPES[tableType] then
 		error('Unknown Standing Table Type')
 	end
 	local title = args.title
