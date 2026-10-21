@@ -139,7 +139,6 @@ function Standings.standingsFromRecord(record, entries)
 		section = record.section,
 		type = StandingsStorage.fromStorageType(record.type),
 		config = record.config,
-		-- Missing in standings stored by the legacy GroupTableLeague
 		additionalStats = record.extradata.additionalStats or {},
 		record = record,
 		entryRecords = entries,
