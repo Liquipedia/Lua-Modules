@@ -48,12 +48,12 @@ local OVERTIME_POINTS_KEYS = {otw = true, otl = true}
 ]]
 
 ---@param args table
----@return {rounds: {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}[],
+---@return {rounds: {roundNumber: integer, started: boolean?, finished: boolean?, title: string?, matches: string[]}[],
 ---opponents: StandingTableOpponentData[],
 ---bgs: table<integer, string>,
 ---matches: string[]}
 function StandingsParseWiki.parseWikiInput(args)
-	---@type {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}[]
+	---@type {roundNumber: integer, started: boolean?, finished: boolean?, title: string?, matches: string[]}[]
 	local rounds = {}
 	for _, roundData, roundIndex in Table.iter.pairsByPrefix(args, 'round', {requireIndex = true}) do
 		table.insert(rounds, StandingsParseWiki.parseWikiRound(roundData, roundIndex))
@@ -85,7 +85,7 @@ end
 
 ---@param roundInput string|table
 ---@param roundIndex integer
----@return {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}
+---@return {roundNumber: integer, started: boolean?, finished: boolean?, title: string?, matches: string[]}
 function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 	local roundData = Json.parseIfString(roundInput)
 	local matches = Array.parseCommaSeparatedString(roundData.matches)
@@ -110,14 +110,8 @@ function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 	end
 	return {
 		roundNumber = roundIndex,
-		started = Logic.nilOr(
-			Logic.readBoolOrNil(roundData.started),
-			not DateExt.isDefaultTimestamp(startDate) and startDate <= DateExt.getCurrentTimestamp()
-		),
-		finished = Logic.nilOr(
-			Logic.readBoolOrNil(roundData.finished),
-			not DateExt.isDefaultTimestamp(endDate) and endDate <= DateExt.getCurrentTimestamp()
-		),
+		started = Logic.readBoolOrNil(roundData.started),
+		finished = Logic.readBoolOrNil(roundData.finished),
 		title = roundData.title,
 		matches = Array.unique(matches),
 	}

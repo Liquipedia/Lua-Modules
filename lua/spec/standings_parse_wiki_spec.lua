@@ -2,6 +2,20 @@
 describe('Standings Wiki Parser', function()
 	local StandingsParseWiki = require('Module:Standings/Parse/Wiki')
 
+	describe('rounds', function()
+		it('reads the manual started and finished input', function()
+			local round = StandingsParseWiki.parseWikiRound({started = 'true', finished = 'false'}, 1)
+			assert.is_true(round.started)
+			assert.is_false(round.finished)
+		end)
+
+		it('leaves the status unset without manual input, regardless of the dates', function()
+			local round = StandingsParseWiki.parseWikiRound({sdate = '2020-01-01', edate = '2020-01-02'}, 1)
+			assert.is_nil(round.started)
+			assert.is_nil(round.finished)
+		end)
+	end)
+
 	describe('disqualifications', function()
 		it('reads dq input as the first round of disqualification', function()
 			assert.are_equal(1, StandingsParseWiki.parseDisqualifiedFromRound('true'))

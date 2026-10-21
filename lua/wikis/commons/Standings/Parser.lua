@@ -85,6 +85,7 @@ function StandingsParser.parse(
 				matches = playedMatches or {},
 				matchPoints = playedMatchPoints or {},
 				startingPoints = opponentData.startingPoints,
+				finished = round.finished,
 				manualDefiniteStatus = StandingsParser.resolveManualDefiniteStatus(
 					opponentData.definiteStatuses, round.roundNumber
 				),
@@ -183,6 +184,26 @@ function StandingsParser.parse(
 			additionalStats = additionalStats,
 		}
 	}
+end
+
+---Resolves whether a round has started and finished. Manual input takes priority, otherwise it follows
+---the phases of all matches in the round. A round without matches has neither started nor finished.
+---@param round {started: boolean?, finished: boolean?}
+---@param matchPhases MatchPhase[]?
+---@return boolean started
+---@return boolean finished
+function StandingsParser.resolveRoundStatus(round, matchPhases)
+	local phases = matchPhases or {}
+	local hasMatches = #phases > 0
+	local finished = Logic.nilOr(
+		round.finished,
+		hasMatches and Array.all(phases, function(phase) return phase == 'finished' end)
+	)
+	local started = finished or Logic.nilOr(
+		round.started,
+		Array.any(phases, function(phase) return phase ~= 'upcoming' end)
+	)
+	return started, finished
 end
 
 ---Calculate tiebreaker values for all opponents in a round.
