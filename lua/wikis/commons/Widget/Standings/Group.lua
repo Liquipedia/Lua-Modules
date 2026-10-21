@@ -89,7 +89,7 @@ end
 ---@param round StandingsRound
 ---@param statsToShow StandingsAdditionalStat[]
 ---@param boldStatTitle string?
----@param hasRoundHistory boolean # Rows are only marked with their round inside the round history
+---@param hasRoundHistory boolean
 ---@return Renderable
 function Helpers.createRoundBody(standings, round, statsToShow, boldStatTitle, hasRoundHistory)
 	return TableWidgets.TableBody{children = Array.map(round.opponents, function(slot)

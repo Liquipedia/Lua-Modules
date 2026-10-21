@@ -30,7 +30,6 @@ describe('Standings Table from template', function()
 		assert.is_truthy(html:find('standings-group', 1, true))
 		assert.is_truthy(html:find('Group A', 1, true))
 		assert.is_truthy(html:find('>Week 1<', 1, true))
-		-- Stored with the type of the legacy GroupTableLeague
 		---@diagnostic disable-next-line: undefined-field
 		local storedTable = mw.ext.LiquipediaDB.lpdb_standingstable.calls[1].vals[2]
 		assert.are_equal('league', storedTable.type)

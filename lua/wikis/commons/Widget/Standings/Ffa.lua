@@ -40,8 +40,7 @@ local function StandingsFfa(props)
 	local shownRounds = StandingsDisplayUtil.roundsToShow(standings)
 	local statsToShow = StandingsDisplayUtil.statsToShow(standings)
 	local boldStatTitle = StandingsDisplayUtil.boldStatTitle(standings)
-	-- Besides switching rounds, the round history holds the switch for the round columns,
-	-- so it is needed as soon as there is more than one round, even if only one is shown
+	-- Also holds the round columns switch, so needed as soon as there is more than one round
 	local hasRoundHistory = Helpers._showRoundColumns(standings)
 
 	local standingsTable = TableWidgets.Table{
@@ -117,7 +116,7 @@ end
 ---@param round StandingsRound
 ---@param statsToShow StandingsAdditionalStat[]
 ---@param boldStatTitle string?
----@param hasRoundHistory boolean # Rows are only marked with their round inside the round history
+---@param hasRoundHistory boolean
 ---@return Renderable
 function Helpers._createRoundBody(standings, round, statsToShow, boldStatTitle, hasRoundHistory)
 	return TableWidgets.TableBody{children = Array.map(round.opponents, function (slot)
