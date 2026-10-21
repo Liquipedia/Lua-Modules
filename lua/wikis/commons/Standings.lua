@@ -139,7 +139,7 @@ function Standings.standingsFromRecord(record, entries)
 		section = record.section,
 		type = StandingsStorage.fromStorageType(record.type),
 		config = record.config,
-		additionalStats = record.extradata.additionalStats or {},
+		additionalStats = record.extradata.additionalStats,
 		record = record,
 		entryRecords = entries,
 	}
@@ -233,7 +233,7 @@ end
 ---@param standings StandingsModel
 ---@return StandingsRound[]
 function Standings.makeRounds(standings)
-	local roundsData = standings.record.extradata.rounds or {}
+	local record = standings.record
 	local standingsEntries = standings.entryRecords
 
 	local roundCount = Array.maxBy(Array.map(standingsEntries, function(entry)
@@ -247,9 +247,9 @@ function Standings.makeRounds(standings)
 		return {
 			round = roundIndex,
 			opponents = opponents,
-			finished = (roundsData[roundIndex] or {}).finished or false,
-			started = (roundsData[roundIndex] or {}).started or false,
-			title = (roundsData[roundIndex] or {}).title or ('Round ' .. roundIndex),
+			finished = (record.extradata.rounds[roundIndex] or {}).finished or false,
+			started = (record.extradata.rounds[roundIndex] or {}).started or false,
+			title = (record.extradata.rounds[roundIndex] or {}).title or ('Round ' .. roundIndex),
 		}
 	end)
 end

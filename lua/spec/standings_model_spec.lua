@@ -409,24 +409,5 @@ describe('Standings model round trip', function()
 			assert.is_truthy(html:find('Alpha', 1, true))
 			assert.is_truthy(html:find('Bravo', 1, true))
 		end)
-
-		it('renders standings stored by the legacy GroupTableLeague', function()
-			StandingsStorage.run({
-				standingsindex = 0,
-				type = 'league',
-				entries = {
-					{opponent = literal('Alpha'), roundindex = 1, slotindex = 1, placement = 1, points = 3,
-						match = {w = 1, d = 0, l = 0}},
-					{opponent = literal('Bravo'), roundindex = 1, slotindex = 2, placement = 2, points = 0,
-						match = {w = 0, d = 0, l = 1}},
-				},
-			}, {saveVars = true})
-
-			local html = tostring(require('Module:Widget/Standings')({pageName = 'FakePage', standingsIndex = 0}))
-			assert.is_truthy(html:find('standings-group', 1, true))
-			local alphaPos = html:find('Alpha', 1, true)
-			assert.is_truthy(alphaPos)
-			assert.is_truthy(html:find('Bravo', alphaPos, true))
-		end)
 	end)
 end)

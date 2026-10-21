@@ -31,15 +31,10 @@ function StandingsDisplayUtil.statsToShow(standings)
 end
 
 ---The title of the column to show in bold, the column of the first tiebreaker that has one.
----Standings stored before tiebreakers were marked show the first column in bold.
 ---@param standings StandingsModel
 ---@return string?
 function StandingsDisplayUtil.boldStatTitle(standings)
-	local stats = standings.additionalStats
-	if not Array.any(stats, function(stat) return stat.tiebreaker end) then
-		return (StandingsDisplayUtil.statsToShow(standings)[1] or {}).title
-	end
-	local firstTiebreakerWithColumn = Array.find(stats, function(stat)
+	local firstTiebreakerWithColumn = Array.find(standings.additionalStats, function(stat)
 		return stat.tiebreaker == true and stat.title ~= nil
 	end)
 	return firstTiebreakerWithColumn and firstTiebreakerWithColumn.title or nil

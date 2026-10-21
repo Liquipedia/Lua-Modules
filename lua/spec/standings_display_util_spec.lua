@@ -67,14 +67,5 @@ describe('Standings display util', function()
 			}
 			assert.is_nil(StandingsDisplayUtil.boldStatTitle(standings))
 		end)
-
-		it('is the first column for standings stored before tiebreakers were marked', function()
-			local standings = makeStandings{
-				{id = 'full.disqualified'},
-				{id = 'full.matchdiff', title = 'Matches'},
-				{id = 'full.points', title = 'Points'},
-			}
-			assert.are_equal('Matches', StandingsDisplayUtil.boldStatTitle(standings))
-		end)
 	end)
 end)
