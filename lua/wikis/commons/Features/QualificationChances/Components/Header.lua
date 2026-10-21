@@ -19,7 +19,7 @@ local function QualificationChanceHeader(props)
 		children = WidgetUtil.collect(
 			TableWidgets.CellHeader{children = {'Team'}},
 			TableWidgets.CellHeader{children = {'Region'}},
-			TableWidgets.CellHeader{children = {'Overall chance to qualify'}},
+			TableWidgets.CellHeader{colspan = 2, children = {'Overall chance to qualify'}},
 			Array.map(props.stages or {}, function(stage)
 				return TableWidgets.CellHeader{children = {stage}}
 			end)
