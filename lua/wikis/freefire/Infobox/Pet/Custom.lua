@@ -47,7 +47,7 @@ function CustomInjector:parse(id, widgets)
 			Array.appendWith(widgets,
 				Title{children = 'Special Ability'},
 				Cell{name = 'Legend Type', children = {args.ability}},
-				Cell{name = 'Skill Mode', children = {args.type or args.mode}}
+				Cell{name = 'Skill Mode', children = {args.mode}}
 			)
 		end
 	end
@@ -68,7 +68,7 @@ function CustomPet:addToLpdb(lpdbData, args)
 	lpdbData.type = 'pet'
 	lpdbData.extradata.species = args.species
 	lpdbData.extradata.ability = args.ability
-	lpdbData.extradata.mode = args.type or args.mode
+	lpdbData.extradata.mode = args.mode
 
 	return lpdbData
 end
