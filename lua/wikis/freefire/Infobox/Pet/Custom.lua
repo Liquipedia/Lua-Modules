@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 
 local Character = Lua.import('Module:Infobox/Character')
@@ -62,24 +61,16 @@ function CustomPet:getWikiCategories(args)
 	return {'Pets'}
 end
 
+---@param lpdbData table
 ---@param args table
-function CustomPet:setLpdbData(args)
-	local lpdbData = {
-		name = self.name,
-		image = args.image,
-		imagedark = args.imagedark or args.imagedarkmode,
-		type = 'pet',
-		date = args.releasedate,
-		extradata = {
-			species = args.species,
-			ability = args.ability,
-			mode = args.type or args.mode,
-		},
-	}
+---@return table
+function CustomPet:addToLpdb(lpdbData, args)
+	lpdbData.type = 'pet'
+	lpdbData.extradata.species = args.species
+	lpdbData.extradata.ability = args.ability
+	lpdbData.extradata.mode = args.type or args.mode
 
-	lpdbData = self:addToLpdb(lpdbData, args)
-
-	mw.ext.LiquipediaDB.lpdb_datapoint('pet_' .. self.name, Json.stringifySubTables(lpdbData))
+	return lpdbData
 end
 
 return CustomPet
