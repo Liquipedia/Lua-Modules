@@ -123,14 +123,12 @@ function StandingsStorage.table(data)
 	}
 end
 
----The type a standings table is stored as, which differs from the table type for some types
 ---@param tableType string
 ---@return string
 function StandingsStorage.toStorageType(tableType)
 	return STORAGE_TYPE[tableType] or tableType
 end
 
----The table type of a stored standings table, the reverse of toStorageType
 ---@param storedType string
 ---@return string
 function StandingsStorage.fromStorageType(storedType)

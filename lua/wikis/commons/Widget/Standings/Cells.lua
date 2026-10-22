@@ -14,7 +14,6 @@ local Label = Lua.import('Module:Widget/Basic/Label')
 local Participant = Lua.import('Module:Widget/Standings/Participant')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
----The cells shared by the standings displays: rank, participant and the stats columns.
 local StandingsCells = {}
 
 ---@param text string?
@@ -57,7 +56,7 @@ end
 
 ---@param slot StandingsEntryModel
 ---@param statsToShow StandingsAdditionalStat[]
----@param boldStatTitle string? # The title of the column shown in bold
+---@param boldStatTitle string?
 ---@return Renderable[]
 function StandingsCells.stats(slot, statsToShow, boldStatTitle)
 	return Array.map(statsToShow, function(stat)

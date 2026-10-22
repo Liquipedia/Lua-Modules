@@ -128,7 +128,6 @@ function StandingsParser.parse(
 		}
 	end
 
-	-- Marked, so that the display can tell them apart from the stats that are only shown
 	local tiebreakers = Array.map(tiebreakerIds, function(tiebreakerId)
 		return Table.merge(loadTiebreaker(tiebreakerId), {tiebreaker = true})
 	end)

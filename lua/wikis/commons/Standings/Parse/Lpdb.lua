@@ -105,7 +105,6 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 				matches = Array.extend(matches, roundMatches)
 				matchPoints = Table.merge(matchPoints, roundData.matchPoints)
 				local lastMatch = roundMatches[#roundMatches]
-				-- Stored as the matches fetched for display do not have aliases applied
 				local matchOpponentIndex = lastMatch
 					and Array.indexOf(lastMatch.opponents, FnUtil.curry(Opponent.same, opponentData.opponent))
 					or nil
