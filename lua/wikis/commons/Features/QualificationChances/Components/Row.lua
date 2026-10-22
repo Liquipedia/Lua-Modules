@@ -33,7 +33,11 @@ local function QualificationChanceRow(props)
 	return TableWidgets.Row{
 		children = WidgetUtil.collect(
 			TableWidgets.Cell{children = OpponentDisplay.BlockOpponent{opponent = props.opponent}},
-			TableWidgets.Cell{children = Label{children = props.region}},
+			TableWidgets.Cell{children = Label{
+				labelScheme = 'region',
+				attributes = {['data-region'] = props.region and props.region:lower() or nil},
+				children = props.region,
+			}},
 			TableWidgets.Cell{
 				css = props.chance == 1 and {['font-weight'] = 'bold'} or nil,
 				children = formatPercentage(props.chance),

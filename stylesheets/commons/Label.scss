@@ -217,6 +217,23 @@
 		}
 	}
 
+	&.label--region {
+		&[ data-region="eu" ] {
+			color: var( --clr-secondary-100 );
+			background-color: #4a7fc1;
+		}
+
+		&[ data-region="am" ] {
+			color: var( --clr-secondary-25 );
+			background-color: #e8c547;
+		}
+
+		&[ data-region="as" ] {
+			color: var( --clr-secondary-100 );
+			background-color: #5b8c3e;
+		}
+	}
+
 	&.label--standings-result {
 		display: grid;
 		grid-template-columns: 1fr auto 1fr;
