@@ -701,6 +701,35 @@ describe('Standings Tiebreakers', function()
 		end)
 	end)
 
+	describe('roundwinrate', function()
+		it('is the share of rounds won in played games', function()
+			local roundwinrate = TiebreakerFactory.tiebreakerFromId('full.roundwinrate')
+			local alpha = opponent('Alpha', {
+				matches = {
+					makeMatch({'Alpha', 'Bravo'}, {winner = 1, games = {
+						{winner = 1, status = '', scores = {13, 7}},
+						{winner = 2, status = '', scores = {7, 13}},
+						{winner = 1, status = 'notplayed', scores = {}},
+					}}),
+				},
+			})
+			-- 20 of 40 rounds won
+			assert.are_equal(0.5, roundwinrate:valueOf({alpha}, alpha))
+			assert.are_equal('50.00%', roundwinrate:display({alpha}, alpha))
+		end)
+
+		it('displays a dash when no rounds have been played', function()
+			local roundwinrate = TiebreakerFactory.tiebreakerFromId('full.roundwinrate')
+			local alpha = opponent('Alpha')
+			assert.are_equal(0.5, roundwinrate:valueOf({alpha}, alpha))
+			assert.are_equal('-', roundwinrate:display({alpha}, alpha))
+		end)
+
+		it('can be used in the head-to-head context', function()
+			assert.are_equal('ml.roundwinrate', TiebreakerFactory.validateAndNormalizeInput('ml.roundwinrate'))
+		end)
+	end)
+
 	describe('gamewinrate', function()
 		it('displays the game win rate', function()
 			local gamewinrate = TiebreakerFactory.tiebreakerFromId('full.gamewinrate')
