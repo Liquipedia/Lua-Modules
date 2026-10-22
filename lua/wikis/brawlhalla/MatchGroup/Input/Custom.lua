@@ -100,17 +100,8 @@ end
 function MapFunctions.calculateMapScore(map)
 	local winner = tonumber(map.winner)
 	return function(opponentIndex)
-		if map['o' .. opponentIndex .. 'score' .. 1] then
-			local sum = tonumber(map['o' .. opponentIndex .. 'score' .. 1])
-			for i = 2, math.huge do
-				local score = tonumber(map['o' .. opponentIndex .. 'score' .. i])
-				if score == nil then
-					return sum
-				end
-				sum = sum + score
-			end
-		elseif not winner then
-			-- TODO Better to check if map has started, rather than finished, for a more correct handling
+		-- TODO Better to check if map has started, rather than finished, for a more correct handling
+		if not winner then
 			return
 		end
 		return winner == opponentIndex and 1 or 0
