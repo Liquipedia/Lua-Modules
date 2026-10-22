@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 
+local TiebreakerMatchUtil = Lua.import('Module:Standings/Tiebreaker/Match/Util')
 local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local HeadToHead = {}
@@ -30,7 +31,8 @@ function HeadToHead.resolve(tiedOpponents, tiebreaker)
 	Array.forEach(tiedOpponents, function(_, indexA)
 		Array.forEach(Array.range(indexA + 1, #tiedOpponents), function(indexB)
 			local scopedOpponents = TiebreakerScope.restrictTo{tiedOpponents[indexA], tiedOpponents[indexB]}
-			local matchRecord = scopedOpponents[1].match
+			-- Includes overtime results, which are tallied apart from regulation results
+			local matchRecord = TiebreakerMatchUtil.getMatches(scopedOpponents[1])
 			if matchRecord.w + matchRecord.l == 0 then
 				return
 			end

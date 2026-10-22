@@ -189,6 +189,31 @@ describe('Standings Tiebreaker HeadToHead', function()
 		assert.are_same({{'B'}, {'A'}}, namesOf(HeadToHead.resolve(opponents, matchWins)))
 	end)
 
+	describe('overtime', function()
+		local Info = require('Module:Info')
+		local originalStandingsConfig
+
+		before_each(function()
+			originalStandingsConfig = Info.config.standings
+			Info.config.standings = {overtime = {regulationRounds = 12}}
+		end)
+
+		after_each(function()
+			Info.config.standings = originalStandingsConfig
+		end)
+
+		it('counts a pairing decided in overtime', function()
+			local opponents = makeOpponents({'A', 'B'}, {{'A', 'B'}})
+			Array.forEach(opponents, function(opponent)
+				opponent.overtime = {w = 0, l = 0}
+				-- 8-6 in rounds is beyond the 12 regulation rounds
+				opponent.matches[1].games = {{winner = 1, scores = {8, 6}, status = ''}}
+			end)
+
+			assert.are_same({{'A'}, {'B'}}, namesOf(HeadToHead.resolve(opponents, tiebreaker)))
+		end)
+	end)
+
 	describe('tiebreakers with list values', function()
 		local matchScore = TiebreakerFactory.tiebreakerFromId('h2hcs.matchscore')
 
