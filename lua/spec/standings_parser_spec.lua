@@ -39,6 +39,46 @@ describe('Standings Parser', function()
 	local BGS = {[1] = 'up', [2] = 'stay', [3] = 'down'}
 	local TIEBREAKERS = {'full.points', 'full.manual'}
 
+	describe('round status', function()
+		local function resolve(round, matchPhases)
+			local started, finished = StandingsParser.resolveRoundStatus(round, matchPhases)
+			return {started = started, finished = finished}
+		end
+
+		it('has neither started nor finished without matches', function()
+			assert.are_same({started = false, finished = false}, resolve({}, nil))
+			assert.are_same({started = false, finished = false}, resolve({}, {}))
+		end)
+
+		it('follows the phases of the matches', function()
+			assert.are_same({started = false, finished = false}, resolve({}, {'upcoming', 'upcoming'}))
+			assert.are_same({started = true, finished = false}, resolve({}, {'ongoing', 'upcoming'}))
+			assert.are_same({started = true, finished = false}, resolve({}, {'finished', 'upcoming'}))
+			assert.are_same({started = true, finished = true}, resolve({}, {'finished', 'finished'}))
+		end)
+
+		it('prefers manual input over the matches', function()
+			assert.are_same({started = true, finished = false}, resolve({finished = false}, {'finished'}))
+			assert.are_same({started = false, finished = false}, resolve({started = false}, {'ongoing'}))
+			assert.are_same({started = true, finished = false}, resolve({started = true}, {}))
+		end)
+
+		it('treats a finished round as started', function()
+			assert.are_same({started = true, finished = true}, resolve({finished = true}, {}))
+			assert.are_same({started = true, finished = true}, resolve({started = false, finished = true}, {}))
+		end)
+
+		it('stores whether the round of an entry is finished', function()
+			local standingsTable = StandingsParser.parse({
+				{roundNumber = 1, started = true, finished = true},
+				{roundNumber = 2, started = true, finished = false},
+			}, {makeOpponent('Alpha', {{points = 3}, {points = 0}})}, BGS, nil, {}, 'ffa', TIEBREAKERS)
+
+			assert.is_true(findEntry(standingsTable.entries, 'Alpha', 1).finished)
+			assert.is_false(findEntry(standingsTable.entries, 'Alpha', 2).finished)
+		end)
+	end)
+
 	it('computes points, placements, statuses and placement changes across rounds', function()
 		local opponents = {
 			makeOpponent('Alpha', {{points = 3}, {points = 0}}),
@@ -56,8 +96,8 @@ describe('Standings Parser', function()
 		assert.is_true(standingsTable.finished)
 		assert.are_equal(6, #standingsTable.entries)
 		assert.are_same({
-			{id = 'full.points', title = 'Points'},
-			{id = 'full.manual'},
+			{id = 'full.points', title = 'Points', tiebreaker = true},
+			{id = 'full.manual', tiebreaker = true},
 		}, standingsTable.extradata.additionalStats)
 
 		-- Round 1: Alpha and Bravo are fully tied at 3 points (shared placement),
@@ -490,7 +530,7 @@ describe('Standings Parser', function()
 				local standingsTable = parse(opponents, {'full.points', 'ml.matchdiff', 'full.manual'})
 
 				-- ml tiebreakers are only listed by id, without a title
-				assert.are_same({id = 'ml.matchdiff'}, Array.find(
+				assert.are_same({id = 'ml.matchdiff', tiebreaker = true}, Array.find(
 					standingsTable.extradata.additionalStats,
 					function(stat) return stat.id == 'ml.matchdiff' end
 				))
@@ -668,9 +708,10 @@ describe('Standings Parser', function()
 				local standingsTable = parse(
 					makeOpponents(NAMES, MATCHES, POINTS), {'full.points', 'h2hcs.matchdiff', 'full.manual'})
 
-				assert.are_same({id = 'h2hcs.matchdiff'}, Array.find(standingsTable.extradata.additionalStats, function(stat)
-					return stat.id == 'h2hcs.matchdiff'
-				end))
+				assert.are_same({id = 'h2hcs.matchdiff', tiebreaker = true}, Array.find(
+					standingsTable.extradata.additionalStats,
+					function(stat) return stat.id == 'h2hcs.matchdiff' end
+				))
 				assert.is_nil(findEntry(standingsTable.entries, 'A', 1).extradata.additionalStatsValues['h2hcs.matchdiff'])
 			end)
 		end)
@@ -994,6 +1035,101 @@ describe('Standings Parser', function()
 		---@diagnostic disable-next-line: missing-fields
 		local stats = StandingsDisplayUtil.statsToShow({additionalStats = standingsTable.extradata.additionalStats})
 		assert.are_same({'Matches', 'Games'}, Array.map(stats, function(stat) return stat.title end))
+	end)
+
+	it('marks the tiebreakers, but not the stats that are always shown', function()
+		local standingsTable = StandingsParser.parse(
+			TWO_FINISHED_ROUNDS,
+			{makeOpponent('Alpha', {{points = 3}, {points = 3}})},
+			BGS, nil, {}, 'swiss',
+			{'full.points', 'full.manual'}
+		)
+
+		-- The commons config always shows matchdiff and gamediff in swiss standings
+		assert.are_same({
+			{id = 'full.matchdiff', title = 'Matches'},
+			{id = 'full.gamediff', title = 'Games'},
+			{id = 'full.points', title = 'Points', tiebreaker = true},
+			{id = 'full.manual', tiebreaker = true},
+		}, standingsTable.extradata.additionalStats)
+	end)
+
+	it('always shows the configured stats of group standings', function()
+		local standingsTable = StandingsParser.parse(
+			TWO_FINISHED_ROUNDS,
+			{makeOpponent('Alpha', {{points = 3}, {points = 3}})},
+			BGS, nil, {}, 'group',
+			{'full.points', 'full.manual'}
+		)
+
+		-- The commons config always shows matchdiff and gamediff in group standings
+		assert.are_same(
+			{'full.matchdiff', 'full.gamediff', 'full.points', 'full.manual'},
+			Array.map(standingsTable.extradata.additionalStats, function(stat) return stat.id end)
+		)
+	end)
+
+	describe('overtime', function()
+		local MATCHDIFF_TIEBREAKERS = {'full.matchdiff', 'full.manual'}
+
+		local function makeOpponents()
+			return {
+				{
+					opponent = literal('Alpha'),
+					rounds = {
+						{scoreboard = {points = 3, match = {w = 1, d = 0, l = 0}, overtime = {w = 0, l = 0}},
+							specialstatus = ''},
+						{scoreboard = {points = 2, match = {w = 0, d = 0, l = 0}, overtime = {w = 1, l = 0}},
+							specialstatus = ''},
+					},
+				},
+				{
+					opponent = literal('Bravo'),
+					rounds = {
+						{scoreboard = {points = 0, match = {w = 0, d = 0, l = 1}, overtime = {w = 0, l = 0}},
+							specialstatus = ''},
+						{scoreboard = {points = 1, match = {w = 0, d = 0, l = 0}, overtime = {w = 0, l = 1}},
+							specialstatus = ''},
+					},
+				},
+			}
+		end
+
+		it('carries overtime across rounds', function()
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, makeOpponents(), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, nil, true)
+
+			assert.is_true(standingsTable.hasovertime)
+			assert.are_same({w = 0, l = 0}, findEntry(standingsTable.entries, 'Alpha', 1).overtime)
+			assert.are_same({w = 1, l = 0}, findEntry(standingsTable.entries, 'Alpha', 2).overtime)
+			assert.are_same({w = 1, d = 0, l = 0}, findEntry(standingsTable.entries, 'Alpha', 2).match)
+			assert.are_same({w = 0, l = 1}, findEntry(standingsTable.entries, 'Bravo', 2).overtime)
+			assert.are_equal('1 - 1 - 0 - 0',
+				findEntry(standingsTable.entries, 'Alpha', 2).extradata.additionalStatsValues['full.matchdiff'].display)
+			assert.are_equal('0 - 0 - 1 - 1',
+				findEntry(standingsTable.entries, 'Bravo', 2).extradata.additionalStatsValues['full.matchdiff'].display)
+		end)
+
+		it('does not give entries an overtime field when disabled', function()
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, makeOpponents(), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS)
+
+			assert.is_false(standingsTable.hasovertime)
+			Array.forEach(standingsTable.entries, function(entry)
+				assert.is_nil(entry.overtime)
+			end)
+			assert.are_equal('1 - 0',
+				findEntry(standingsTable.entries, 'Alpha', 2).extradata.additionalStatsValues['full.matchdiff'].display)
+		end)
+
+		it('places by total wins including overtime', function()
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, makeOpponents(), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, nil, true)
+
+			-- Alpha 2 wins, Bravo 2 losses
+			assert.are_equal(1, findEntry(standingsTable.entries, 'Alpha', 2).placement)
+			assert.are_equal(2, findEntry(standingsTable.entries, 'Bravo', 2).placement)
+		end)
 	end)
 
 	it('increments the standingsindex wiki variable per table', function()

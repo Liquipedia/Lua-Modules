@@ -30,6 +30,8 @@ local TIEBREAKER_MAPPING_TABLE = {
 	buchholz = 'buchholz',
 	series = 'matchscore',
 	diff = 'gamediff',
+	['diff games'] = 'gamediff',
+	['no ot diff'] = 'gamediffregulation',
 	['games won'] = 'gamewins',
 	['games loss'] = 'gamelosses',
 	['h2h series'] = 'h2hlegacy.matchscore',
@@ -53,13 +55,16 @@ function StandingTableLegacySwiss.getStandardParameter(args)
 		title = args.title,
 		placements = args.placements,
 		matchdraws = Logic.readBoolOrNil(args.ties),
+		overtime = Logic.readBool(args.show_otp),
 		points = StandingTableLegacySwiss.parsePoints(args),
+		walkovergames = args.walkover_win,
 	}
 end
 
----Maps the legacy `win_p`, `tie_p`, `lose_p` and `X-Y_p` to the `points` input.
----Legacy defaults to 3 points for a win, 1 for a draw and 0 for a loss, and `X-Y_p` is a bonus on top of the
----points of the result, while `X-Y` in the new input is the fixed amount of points.
+---Maps the legacy `win_p`, `tie_p`, `lose_p`, `X-Y_p` and, with `show_otp`, `otw_p` and `otl_p` to the `points` input.
+---Legacy defaults to 3 points for a win, 1 for a draw and 0 for a loss (2 and 1 for overtime wins and losses),
+---and `X-Y_p` is a bonus on top of the points of the result, while `X-Y` in the new input is the fixed amount
+---of points.
 ---@param args table
 ---@return string
 function StandingTableLegacySwiss.parsePoints(args)
@@ -94,8 +99,12 @@ function StandingTableLegacySwiss.parsePoints(args)
 		return ownScore .. '-' .. otherScore .. '=' .. (resultPoints[result] + readPoints(key, 0))
 	end)
 
+	local overtimePoints = Logic.readBool(args.show_otp)
+		and {'otwin=' .. readPoints('otw_p', 2), 'otloss=' .. readPoints('otl_p', 1)}
+		or {}
+
 	return table.concat(Array.extend(
-		{'win=' .. resultPoints.w, 'draw=' .. resultPoints.d, 'loss=' .. resultPoints.l}, scorePoints
+		{'win=' .. resultPoints.w, 'draw=' .. resultPoints.d, 'loss=' .. resultPoints.l}, overtimePoints, scorePoints
 	), ', ')
 end
 
@@ -161,9 +170,11 @@ local function parseDefiniteStatuses(args, index)
 	end)
 end
 
+---Legacy `team<index>alias` is a comma separated list of team templates
 ---@param args table
 ---@param teamIndex integer
----@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, dq: string?, r1bg: string?}?
+---@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, dq: string?,
+---aliases: string?, r1bg: string?}?
 function StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 	local team = args['team' .. teamIndex]
 	if not team then
@@ -171,6 +182,7 @@ function StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 	end
 
 	local tiebreaker, startingPoints, dq = parseCoreInput(args, teamIndex)
+	local aliases = args['team' .. teamIndex .. 'alias']
 
 	return Table.merge({
 		type = Opponent.team,
@@ -178,6 +190,7 @@ function StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 		tiebreaker = tiebreaker,
 		startingpoints = startingPoints,
 		dq = dq,
+		aliases = aliases and table.concat(Array.parseCommaSeparatedString(aliases), ';') or nil,
 	}, parseDefiniteStatuses(args, teamIndex))
 end
 

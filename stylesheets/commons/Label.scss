@@ -113,15 +113,17 @@
 		color: var( --placement-text-color );
 		background-color: var( --placement-solid-color );
 
-		--placement-text-color: var( --clr-secondary-100 );
+		--placement-text-color: var( --clr-secondary-25 );
+
+		.theme--dark & {
+			--placement-text-color: var( --clr-secondary-90 );
+		}
 
 		&:not( [ data-placement-type ] ) {
 			--placement-solid-color: var( --clr-on-surface-light-primary-4 );
-			--placement-text-color: var( --clr-secondary-25 );
 
 			.theme--dark & {
 				--placement-solid-color: var( --clr-on-surface-dark-primary-8 );
-				--placement-text-color: var( --clr-secondary-90 );
 			}
 		}
 
@@ -176,34 +178,59 @@
 
 		&[ data-placement-type="byeup" ] {
 			--placement-solid-color: var( --position-byeup-color );
+			--placement-text-color: var( --clr-secondary-100 );
 		}
 
 		&[ data-placement-type="seedup" ] {
 			--placement-solid-color: var( --position-seedup-color );
+			--placement-text-color: var( --clr-secondary-100 );
 		}
 
 		&[ data-placement-type="up" ] {
 			--placement-solid-color: var( --position-up-color );
+			--placement-text-color: var( --clr-secondary-100 );
 		}
 
 		&[ data-placement-type="stayup" ] {
 			--placement-solid-color: var( --position-stayup-color );
+			--placement-text-color: var( --clr-secondary-100 );
 		}
 
 		&[ data-placement-type="stay" ] {
 			--placement-solid-color: var( --position-stay-color );
+			--placement-text-color: var( --clr-secondary-100 );
 		}
 
 		&[ data-placement-type="staydown" ] {
 			--placement-solid-color: var( --position-staydown-color );
+			--placement-text-color: var( --clr-secondary-100 );
 		}
 
 		&[ data-placement-type="down" ] {
 			--placement-solid-color: var( --position-down-color );
+			--placement-text-color: var( --clr-secondary-100 );
 		}
 
 		&[ data-placement-type="dq" ] {
 			--placement-solid-color: var( --position-disqualified-color );
+			--placement-text-color: var( --clr-secondary-100 );
+		}
+	}
+
+	&.label--region {
+		&[ data-region="eu" ] {
+			color: var( --clr-secondary-100 );
+			background-color: #4a7fc1;
+		}
+
+		&[ data-region="am" ] {
+			color: var( --clr-secondary-25 );
+			background-color: #e8c547;
+		}
+
+		&[ data-region="as" ] {
+			color: var( --clr-secondary-100 );
+			background-color: #5b8c3e;
 		}
 	}
 

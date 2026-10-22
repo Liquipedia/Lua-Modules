@@ -196,6 +196,8 @@ Types.GameOpponent = TypeUtil.struct({
 ---@alias MatchStatus 'notplayed'|''|nil
 Types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed', ''))
 
+---@alias MatchPhase 'finished'|'ongoing'|'upcoming'
+
 ---@class MatchGroupUtilGame
 ---@field comment string?
 ---@field date string?
@@ -258,7 +260,7 @@ Types.Game = TypeUtil.struct({
 ---@field pageName string?
 ---@field parent string?
 ---@field patch string?
----@field phase 'upcoming'|'ongoing'|'finished'
+---@field phase MatchPhase
 ---@field publisherTier string?
 ---@field resultType string?
 ---@field section string?

@@ -22,6 +22,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Tournament = Lua.import('Module:Tournament')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
+local StandingsStorage = Lua.import('Module:Standings/Storage')
 
 local Standings = {}
 
@@ -32,13 +33,18 @@ local Standings = {}
 ---@field tournament StandardTournament?
 ---@field title string?
 ---@field section string?
----@field type 'ffa'|'swiss'|'league'
+---@field type StandingsTableTypes
 ---@field matches MatchGroupUtilMatch[]
----@field config {hasdraw: string, hasovertime: string, haspoints: string}
+---@field config {hasdraws: boolean?, hasovertime: boolean?, haspoints: boolean?}
 ---@field rounds StandingsRound[]
----@field additionalStats {id: string, title: string?}[]
+---@field additionalStats StandingsAdditionalStat[]
 ---@field package record standingstable
 ---@field package entryRecords standingsentry[]
+
+---@class StandingsAdditionalStat
+---@field id string
+---@field title string? # Stats without a title get no column
+---@field tiebreaker boolean? # Whether the stat is one of the tiebreakers, otherwise it is only shown
 
 ---@class StandingsRound
 ---@field round integer
@@ -57,6 +63,7 @@ local Standings = {}
 ---@field positionStatus string?
 ---@field definitiveStatus string?
 ---@field match MatchGroupUtilMatch?
+---@field matchOpponentIndex integer? # Index of the opponent in `match`, needed as the match is not alias resolved
 ---@field positionChangeFromPreviousRound integer
 ---@field pointsChangeFromPreviousRound number
 ---@field specialStatus 'dq'|'nc'|'' # nc = non-competing (not in the round)
@@ -130,7 +137,7 @@ function Standings.standingsFromRecord(record, entries)
 		standingsIndex = record.standingsindex,
 		title = record.title,
 		section = record.section,
-		type = record.type,
+		type = StandingsStorage.fromStorageType(record.type),
 		config = record.config,
 		additionalStats = record.extradata.additionalStats,
 		record = record,
@@ -160,6 +167,7 @@ function Standings.entryFromRecord(record)
 		disqualified = record.extradata.disqualified == true,
 		positionChangeFromPreviousRound = tonumber(record.placementchange),
 		additionalStatsValues = record.extradata.additionalStatsValues or {},
+		matchOpponentIndex = tonumber(record.extradata.matchopponentindex),
 		record = record,
 	}
 

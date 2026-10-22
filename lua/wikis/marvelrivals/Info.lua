@@ -35,12 +35,18 @@ return {
 			status = 2,
 			matchWidth = 180,
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				mode = 'automatic'
+			}
+		},
 		participants = {
 			defaultPlayerNumber = 6,
 		},
 		standings = {
 			alwaysShowStats = {
 				swiss = {'matchdiff', 'gamediff'},
+				group = {'matchdiff', 'gamediff'},
 			},
 		},
 		defaultMaxPlayersPerPlacement = 12,

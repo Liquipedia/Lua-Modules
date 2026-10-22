@@ -24,15 +24,19 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 local StandingsTable = {}
 
----@alias StandingsTableTypes 'ffa'|'swiss'
+---@alias StandingsTableTypes 'ffa'|'swiss'|'group'
+
+local TABLE_TYPES = {ffa = true, swiss = true, group = true}
 
 ---@class Scoreboard
 ---@field points number?
 ---@field match {w: integer, d: integer, l: integer}
+---@field overtime {w: integer, l: integer}?
 
 ---@class StandingTableOpponentData
 ---@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?,
----matches: MatchGroupUtilMatch[], matchPoints: table<string, number>?, matchId: string}[]?
+---matches: MatchGroupUtilMatch[], matchPoints: table<string, number>?, matchId: string,
+---matchOpponentIndex: integer?}[]?
 ---@field opponent standardOpponent
 ---@field aliases standardOpponent[]? # Only for team opponents
 ---@field startingPoints number?
@@ -44,7 +48,7 @@ local StandingsTable = {}
 function StandingsTable.fromTemplate(frame)
 	local args = Arguments.getArgs(frame)
 	local tableType = args.tabletype
-	if tableType ~= 'ffa' and tableType ~= 'swiss' then
+	if not TABLE_TYPES[tableType] then
 		error('Unknown Standing Table Type')
 	end
 	local title = args.title
@@ -63,19 +67,31 @@ function StandingsTable.fromTemplate(frame)
 	local matches = parsedData.matches
 
 	local tiebreakers = StandingsParseWiki.parseTiebreakers(args, tableType)
+	local overtime = StandingsParseWiki.parseOvertime(args)
 
+	---@type table<integer, MatchPhase[]>
+	local matchPhasesByRound = {}
 	if importScoreFromMatches then
-		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args)
+		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args, overtime)
 
-		local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction, opponents, {
-			exclusive = exclusiveOpponents,
-			importOpponents = importOpponentFromMatches,
-		})
+		local importedOpponents
+		importedOpponents, matchPhasesByRound = StandingsParseLpdb.importFromMatches(
+			rounds, automaticScoreFunction, opponents, {
+				exclusive = exclusiveOpponents,
+				importOpponents = importOpponentFromMatches,
+				overtime = overtime,
+			}
+		)
 		opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
 	end
 
+	Array.forEach(rounds, function(round)
+		round.started, round.finished = StandingsParser.resolveRoundStatus(round, matchPhasesByRound[round.roundNumber])
+	end)
+
 	local standingsTable = StandingsParser.parse(
-		rounds, opponents, bgs, title, matches, tableType, tiebreakers, StandingsParseWiki.parseDrawConfig(args)
+		rounds, opponents, bgs, title, matches, tableType, tiebreakers, StandingsParseWiki.parseDrawConfig(args),
+		overtime, StandingsParseWiki.parseWalkoverGames(args)
 	)
 
 	if tableType == 'swiss' then

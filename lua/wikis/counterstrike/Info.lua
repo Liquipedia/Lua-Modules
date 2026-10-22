@@ -144,6 +144,7 @@ local infoData = {
 		standings = {
 			alwaysShowStats = {
 				swiss = {'matchdiff', 'rounddiff'},
+				group = {'matchdiff', 'rounddiff'},
 			},
 		},
 	},

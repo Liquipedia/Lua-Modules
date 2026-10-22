@@ -114,7 +114,9 @@ return {
 		standings = {
 			alwaysShowStats = {
 				swiss = {'matchdiff', 'rounddiff'},
+				group = {'matchdiff', 'rounddiff'},
 			},
+			overtime = {regulationRounds = 12},
 		},
 	},
 	defaultRoundPrecision = 0,

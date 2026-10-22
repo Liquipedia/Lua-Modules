@@ -9,18 +9,29 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local MathUtil = Lua.import('Module:MathUtil')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
+local TiebreakerMatchUtil = Lua.import('Module:Standings/Tiebreaker/Match/Util')
 
 ---@class TiebreakerBuchholz : StandingsTiebreaker
 local TiebreakerBuchholz = Class.new(TiebreakerInterface)
 
+---The score of a faced opponent
+---@param member TiebreakerOpponent
+---@return number
+function TiebreakerBuchholz:scoreOf(member)
+	local matches = TiebreakerMatchUtil.getMatches(member)
+	return matches.w - matches.l
+end
+
+---Score of each distinct opponent faced in a finished match, in the order of the state
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
----@return integer
-function TiebreakerBuchholz:valueOf(state, opponent)
+---@return number[]
+function TiebreakerBuchholz:opponentScores(state, opponent)
 	local enemies = Array.flatMap(opponent.matches, function(match)
 		if not match.finished then
 			return {}
@@ -30,17 +41,22 @@ function TiebreakerBuchholz:valueOf(state, opponent)
 		end)
 	end)
 
-	return Array.reduce(state, function(score, groupMember)
-		local isEnemy = Array.any(enemies, function(enemy)
+	local enemyMembers = Array.filter(state, function(groupMember)
+		return Array.any(enemies, function(enemy)
 			return Opponent.same(enemy, groupMember.opponent)
 		end)
+	end)
 
-		if not isEnemy then
-			return score
-		end
+	return Array.map(enemyMembers, function(member)
+		return self:scoreOf(member)
+	end)
+end
 
-		return score + groupMember.match.w - groupMember.match.l
-	end, 0)
+---@param state TiebreakerOpponent[]
+---@param opponent TiebreakerOpponent
+---@return number
+function TiebreakerBuchholz:valueOf(state, opponent)
+	return MathUtil.sum(self:opponentScores(state, opponent))
 end
 
 ---@return string

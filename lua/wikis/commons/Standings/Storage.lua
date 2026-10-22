@@ -24,11 +24,13 @@ local StandingsStorage = {}
 local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
 local SCOREBOARD_FALLBACK = {w = 0, d = 0, l = 0}
 local DISQUALIFIED = 'dq'
+-- TODO: Store as 'group' instead of 'league'
+local STORAGE_TYPE = {group = 'league'}
 
 ---@class StandingsTableStorage
 ---@field standingsindex integer
 ---@field title string?
----@field type 'ffa'|'swiss'|'league'
+---@field type StandingsTableTypes
 ---@field entries StandingEntriesStorage[]
 ---@field matches string[]
 ---@field roundcount integer
@@ -104,7 +106,7 @@ function StandingsStorage.table(data)
 
 	local config = {
 		hasdraws = data.hasdraw,
-		hasovertimes = data.hasovertime,
+		hasovertime = data.hasovertime,
 		haspoints = data.haspoints,
 	}
 
@@ -114,11 +116,23 @@ function StandingsStorage.table(data)
 		standingsindex = standingsIndex,
 		title = mw.text.trim(cleanedTitle),
 		section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
-		type = data.type,
+		type = StandingsStorage.toStorageType(data.type),
 		matches = Json.stringify(data.matches or {}, {asArray = true}),
 		config = config,
 		extradata = Table.merge(extradata, data.extradata),
 	}
+end
+
+---@param tableType string
+---@return string
+function StandingsStorage.toStorageType(tableType)
+	return STORAGE_TYPE[tableType] or tableType
+end
+
+---@param storedType string
+---@return string
+function StandingsStorage.fromStorageType(storedType)
+	return Table.getKeyOfValue(STORAGE_TYPE, storedType) or storedType
 end
 
 ---@param entry table

@@ -66,6 +66,7 @@ local function Table2CellHeader(props, context)
 
 		return Html.Th{
 			attributes = attributes,
+			css = ColumnUtil.buildCss(props.width, props.minWidth, props.maxWidth, props.css),
 			children = children,
 		}
 	end

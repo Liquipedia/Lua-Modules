@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 
 local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
+local TiebreakerMatchUtil = Lua.import('Module:Standings/Tiebreaker/Match/Util')
 
 ---@class TiebreakerMatchCount : StandingsTiebreaker
 local TiebreakerMatchCount = Class.new(TiebreakerInterface)
@@ -18,7 +19,8 @@ local TiebreakerMatchCount = Class.new(TiebreakerInterface)
 ---@param opponent TiebreakerOpponent
 ---@return integer
 function TiebreakerMatchCount:valueOf(state, opponent)
-	return opponent.match.w + opponent.match.l + opponent.match.d
+	local matches = TiebreakerMatchUtil.getMatches(opponent)
+	return matches.w + matches.l + matches.d
 end
 
 ---@return string
