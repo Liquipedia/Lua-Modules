@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
@@ -69,7 +70,7 @@ end
 ---@param lpdbData table
 ---@param args table
 ---@return table
-function CustomPet:addToLpdb(lpdbData, args)
+function CustomCharacter:addToLpdb(lpdbData, args)
 	if args.informationType ~= PET then
 		return lpdbData
 	end
