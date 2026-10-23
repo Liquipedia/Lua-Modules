@@ -171,7 +171,7 @@ end
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	local extradata = {
-		nonstandard = Logic.readBool(args.nonstandard),
+		nonstandard = Logic.readBool(match.nonstandard),
 	}
 
 	for prefix, mapVeto in Table.iter.pairsByPrefix(match, 'veto') do
