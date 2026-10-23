@@ -49,6 +49,7 @@ Faction.types.FactionProps = TypeUtil.struct{
 	faction = Faction.types.Faction,
 }
 
+---@return boolean
 function Faction.wikiHasFactions()
 	return Data.factions ~= nil
 end
