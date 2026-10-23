@@ -30,6 +30,7 @@ local VARIANT_CONFIG = {
 }
 
 ---@class DropdownContainerWidgetParameters
+---@field alignRight boolean?
 ---@field children Renderable|Renderable[]
 ---@field variant 'form'|'inline'?
 ---@field classes string[]?
@@ -37,6 +38,7 @@ local VARIANT_CONFIG = {
 ---@field label Renderable|Renderable[]?
 
 local defaultProps = {
+	alignRight = false,
 	variant = 'form',
 }
 
@@ -84,6 +86,7 @@ local function DropdownContainer(props)
 			Div{
 				classes = {'dropdown-widget__menu'},
 				attributes = {['aria-hidden'] = 'true'},
+				css = props.alignRight and {right = 0} or nil,
 				children = props.children
 			}
 		}

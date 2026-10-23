@@ -1,6 +1,16 @@
 /*******************************************************************************
  * Template(s): Dropdown
  ******************************************************************************/
+
+class DropdownEvent extends CustomEvent {
+	/**
+	 * @param {string} eventType
+	 */
+	constructor( eventType ) {
+		super( `dropdown:${ eventType }`, { bubbles: true } );
+	}
+}
+
 liquipedia.dropdown = {
 	isInitialized: false,
 
@@ -28,14 +38,13 @@ liquipedia.dropdown = {
 			return;
 		}
 
-		const eventPrefix = isOpen ? 'dropdown:beforeopen' : 'dropdown:beforeclose';
-		dropdownWidget.dispatchEvent( new CustomEvent( eventPrefix, { bubbles: true } ) );
+		dropdownWidget.dispatchEvent( new DropdownEvent( isOpen ? 'beforeopen' : 'beforeclose' ) );
 
 		menu.classList.toggle( 'show', isOpen );
 		toggle.setAttribute( 'aria-expanded', String( isOpen ) );
 		menu.setAttribute( 'aria-hidden', String( !isOpen ) );
 
-		dropdownWidget.dispatchEvent( new CustomEvent( isOpen ? 'dropdown:open' : 'dropdown:close', { bubbles: true } ) );
+		dropdownWidget.dispatchEvent( new DropdownEvent( isOpen ? 'open' : 'close' ) );
 
 		if ( !isOpen && options.focusToggle ) {
 			toggle.focus();
@@ -83,16 +92,20 @@ liquipedia.dropdown = {
 
 		this.isInitialized = true;
 
+		// Listen in the capture phase so dropdowns keep working inside containers
+		// that stop click propagation (e.g. bracket match popups, which call
+		// stopPropagation() to avoid being closed by their own document handler).
+		// Propagation is intentionally not stopped here: in the capture phase that
+		// would prevent the click from ever reaching the toggle or its ancestors.
 		document.addEventListener( 'click', ( e ) => {
-			const toggle = e.target.closest( '[data-dropdown-toggle]' );
+			const toggle = e.target.closest?.( '[data-dropdown-toggle]' ) ?? null;
 			if ( toggle ) {
-				e.stopPropagation();
 				this.toggleDropdown( this.getDropdownWidget( toggle ) );
 				return;
 			}
 
 			this.closeAllDropdowns();
-		} );
+		}, { capture: true } );
 
 		document.addEventListener( 'keydown', ( event ) => {
 			const toggle = event.target.closest?.( '[data-dropdown-toggle]' ) ?? null;

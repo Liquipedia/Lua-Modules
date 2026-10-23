@@ -37,6 +37,7 @@ local StandingsParseLpdb = {}
 ---@param manualOpponents StandingTableOpponentData[]
 ---@param options StandingsImportOptions?
 ---@return StandingTableOpponentData[]
+---@return table<integer, MatchPhase[]>
 function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponents, options)
 	local matchIds = Array.flatMap(rounds, function(round)
 		return round.matches
@@ -44,7 +45,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 
 	-- No Matches, cannot import
 	if #matchIds == 0 then
-		return {}
+		return {}, {}
 	end
 
 	local matchIdToRound = {}
@@ -65,20 +66,31 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 
 	---@type StandingTableOpponentData[]
 	local opponents = {}
+	---@type table<string, MatchPhase>
+	local phaseByMatchId = {}
 	Lpdb.executeMassQuery(
 		'match2',
 		{
 			conditions = tostring(conditions),
 		},
-		function(match2)
-			local roundNumbers = matchIdToRound[match2.match2id]
+		function(record)
+			local match2 = MatchGroupUtil.matchFromRecord(record)
+			phaseByMatchId[record.match2id] = match2.phase
+			local roundNumbers = matchIdToRound[record.match2id]
 			Array.forEach(roundNumbers, function(roundNumber)
 				StandingsParseLpdb.parseMatch(roundNumber, match2, opponents, scoreMapper, #rounds, manualOpponents, options)
 			end)
 		end
 	)
 
-	return Array.map(opponents, function(opponentData)
+	-- Matches that have been entered, but not created, are treated as upcoming
+	local matchPhasesByRound = Table.map(rounds, function(_, round)
+		return round.roundNumber, Array.map(round.matches, function(matchId)
+			return phaseByMatchId[matchId] or 'upcoming'
+		end)
+	end)
+
+	local importedOpponents = Array.map(opponents, function(opponentData)
 		if Opponent.isTbd(opponentData.opponent) then
 			return
 		end
@@ -93,7 +105,6 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 				matches = Array.extend(matches, roundMatches)
 				matchPoints = Table.merge(matchPoints, roundData.matchPoints)
 				local lastMatch = roundMatches[#roundMatches]
-				-- Stored as the matches fetched for display do not have aliases applied
 				local matchOpponentIndex = lastMatch
 					and Array.indexOf(lastMatch.opponents, FnUtil.curry(Opponent.same, opponentData.opponent))
 					or nil
@@ -110,6 +121,8 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 			end)
 		}
 	end)
+
+	return importedOpponents, matchPhasesByRound
 end
 
 ---@param opponentData standardOpponent
@@ -164,15 +177,14 @@ function StandingsParseLpdb.isPartOfStandings(opponent, manualOpponents, importO
 end
 
 ---@param roundNumber integer
----@param match match2
+---@param match2 MatchGroupUtilMatch
 ---@param opponents StandingTableOpponentData[]
 ---@param scoreMapper fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number?
 ---@param maxRounds integer
 ---@param manualOpponents StandingTableOpponentData[]
 ---@param options StandingsImportOptions?
-function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMapper, maxRounds, manualOpponents, options)
+function StandingsParseLpdb.parseMatch(roundNumber, match2, opponents, scoreMapper, maxRounds, manualOpponents, options)
 	options = options or {}
-	local match2 = MatchGroupUtil.matchFromRecord(match)
 
 	Array.forEach(match2.opponents, function(opponent)
 		StandingsParseLpdb.applyAliases(opponent, manualOpponents)

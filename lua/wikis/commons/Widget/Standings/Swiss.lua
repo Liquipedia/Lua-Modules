@@ -12,9 +12,8 @@ local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Component = Lua.import('Module:Widget/Component')
-local Label = Lua.import('Module:Widget/Basic/Label')
 local MatchOverview = Lua.import('Module:Widget/Standings/MatchOverview')
-local Participant = Lua.import('Module:Widget/Standings/Participant')
+local StandingsCells = Lua.import('Module:Widget/Standings/Cells')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -22,7 +21,7 @@ local StandingsDisplayUtil = Lua.import('Module:Standings/DisplayUtil')
 
 local Helpers = {}
 
----@param props {standings?: StandingsModel}
+---@param props {standings?: StandingsModel, width: number?}
 ---@return Renderable?
 local function StandingsSwiss(props)
 	local standings = props.standings
@@ -32,9 +31,11 @@ local function StandingsSwiss(props)
 
 	local lastRound = standings.rounds[#standings.rounds]
 	local statsToShow = StandingsDisplayUtil.statsToShow(standings)
+	local boldStatTitle = StandingsDisplayUtil.boldStatTitle(standings)
 
 	return TableWidgets.Table{
 		classes = {'standings-swiss'},
+		css = {width = props.width and (props.width .. 'px') or nil},
 		title = Logic.nilIfEmpty(standings.title),
 		columns = Helpers.buildColumnDefinitions(standings, statsToShow),
 		children = WidgetUtil.collect(
@@ -42,7 +43,7 @@ local function StandingsSwiss(props)
 			Helpers.headerRow(standings, statsToShow),
 			-- Rows
 			TableWidgets.TableBody{children = Array.map(lastRound.opponents, function(slot)
-				return Helpers.createRow(standings, slot, statsToShow)
+				return Helpers.createRow(standings, slot, statsToShow, boldStatTitle)
 			end)}
 		),
 		striped = false
@@ -51,39 +52,29 @@ end
 
 ---@private
 ---@param standings StandingsModel
----@param statsToShow {id: string, title: string?}[]
+---@param statsToShow StandingsAdditionalStat[]
 ---@return table[]
 function Helpers.buildColumnDefinitions(standings, statsToShow)
 	return WidgetUtil.collect(
 		{align = 'left'},
 		{align = 'left'},
-		Array.map(statsToShow, function(tiebreaker)
-			return {align = 'center'}
-		end),
+		StandingsCells.statColumns(statsToShow),
 		Array.rep({align = 'center'}, #standings.rounds)
 	)
 end
 
 ---@private
 ---@param standings StandingsModel
----@param statsToShow {id: string, title: string?}[]
+---@param statsToShow StandingsAdditionalStat[]
 ---@return Renderable
 function Helpers.headerRow(standings, statsToShow)
-	---@param text string?
-	---@return Renderable
-	local makeHeaderCell = function(text)
-		return TableWidgets.CellHeader{children = text}
-	end
-
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
-			makeHeaderCell('#'),
-			makeHeaderCell('Participant'),
-			Array.map(statsToShow, function(tiebreaker, index)
-				return makeHeaderCell(tiebreaker.title)
-			end),
+			StandingsCells.header('#'),
+			StandingsCells.header('Participant'),
+			StandingsCells.statHeaders(statsToShow),
 			Array.map(standings.rounds, function(round)
-				return makeHeaderCell(round.title)
+				return StandingsCells.header(round.title)
 			end)
 		)}
 	}}
@@ -92,26 +83,16 @@ end
 ---@private
 ---@param standings StandingsModel
 ---@param slot StandingsEntryModel
----@param statsToShow {id: string, title: string?}[]
+---@param statsToShow StandingsAdditionalStat[]
+---@param boldStatTitle string?
 ---@return Renderable
-function Helpers.createRow(standings, slot, statsToShow)
+function Helpers.createRow(standings, slot, statsToShow, boldStatTitle)
 	return TableWidgets.Row{
 		attributes = {['data-position-status'] = slot.positionStatus},
 		children = WidgetUtil.collect(
-			TableWidgets.Cell{
-				children = Label{
-					children = slot.placement,
-					attributes = {['data-placement-type'] = Logic.nilIfEmpty(slot.definitiveStatus)},
-					labelScheme = 'placement',
-				},
-			},
-			TableWidgets.Cell{children = Participant{opponent = slot.opponent, disqualified = slot.disqualified}},
-			Array.map(statsToShow, function(tiebreaker, tiebreakerIndex)
-				return TableWidgets.Cell{
-					css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil},
-					children = slot.additionalStatsValues[tiebreaker.id] and slot.additionalStatsValues[tiebreaker.id].display or ''
-				}
-			end),
+			StandingsCells.placement(slot),
+			StandingsCells.participant(slot),
+			StandingsCells.stats(slot, statsToShow, boldStatTitle),
 			Array.map(standings.rounds, function(columnRound)
 				local entry = Array.find(columnRound.opponents, function(columnSlot)
 					return Opponent.same(columnSlot.opponent, slot.opponent)

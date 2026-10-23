@@ -2,6 +2,20 @@
 describe('Standings Wiki Parser', function()
 	local StandingsParseWiki = require('Module:Standings/Parse/Wiki')
 
+	describe('rounds', function()
+		it('reads the manual started and finished input', function()
+			local round = StandingsParseWiki.parseWikiRound({started = 'true', finished = 'false'}, 1)
+			assert.is_true(round.started)
+			assert.is_false(round.finished)
+		end)
+
+		it('leaves the status unset without manual input, regardless of the dates', function()
+			local round = StandingsParseWiki.parseWikiRound({sdate = '2020-01-01', edate = '2020-01-02'}, 1)
+			assert.is_nil(round.started)
+			assert.is_nil(round.finished)
+		end)
+	end)
+
 	describe('disqualifications', function()
 		it('reads dq input as the first round of disqualification', function()
 			assert.are_equal(1, StandingsParseWiki.parseDisqualifiedFromRound('true'))
@@ -73,6 +87,22 @@ describe('Standings Wiki Parser', function()
 			)
 		end)
 
+		it('defaults to points for group tables', function()
+			assert.are_same(
+				{'full.disqualified', 'full.points', 'full.manual'},
+				StandingsParseWiki.parseTiebreakers({}, 'group')
+			)
+		end)
+
+		it('accepts h2hlegacy and ml tiebreakers for group tables', function()
+			assert.are_same(
+				{'full.disqualified', 'full.points', 'h2hlegacy.matchdiff', 'ml.gamediff', 'full.manual'},
+				StandingsParseWiki.parseTiebreakers(
+					{tiebreakers = '["points", "h2hlegacy.matchdiff", "ml.gamediff"]'}, 'group'
+				)
+			)
+		end)
+
 		it('accepts h2hlegacy and ml tiebreakers for swiss tables', function()
 			assert.are_same(
 				{'full.disqualified', 'full.matchdiff', 'h2hlegacy.matchdiff', 'ml.gamediff', 'full.manual'},
@@ -107,10 +137,32 @@ describe('Standings Wiki Parser', function()
 		end)
 	end)
 
+	describe('width', function()
+		it('reads the width input in px', function()
+			assert.are_equal(600, StandingsParseWiki.parseWidth{width = '600'})
+			assert.are_equal(600, StandingsParseWiki.parseWidth{width = '600px'})
+			assert.is_nil(StandingsParseWiki.parseWidth{width = ''})
+			assert.is_nil(StandingsParseWiki.parseWidth{})
+			assert.is_nil(StandingsParseWiki.parseWidth{width = '50%'})
+		end)
+	end)
+
 	describe('points', function()
 		it('defaults to the swiss points', function()
 			assert.are_same({w = 1, d = 0.5, l = 0}, StandingsParseWiki.parsePoints(nil))
 			assert.are_same({w = 1, d = 0.5, l = 0}, StandingsParseWiki.parsePoints(''))
+		end)
+
+		it('defaults to 3 for a win, 1 for a draw and 0 for a loss in group tables', function()
+			assert.are_same({w = 3, d = 1, l = 0}, StandingsParseWiki.parsePoints(nil, false, 'group'))
+			assert.are_same({w = 3, d = 0, l = 0}, StandingsParseWiki.parsePoints('draw=0', false, 'group'))
+		end)
+
+		it('uses the overtime defaults with overtime in group tables', function()
+			assert.are_same(
+				{w = 3, d = 1.5, l = 0, otw = 2, otl = 1},
+				StandingsParseWiki.parsePoints(nil, true, 'group')
+			)
 		end)
 
 		it('normalizes the result keys and keeps the defaults of omitted ones', function()
@@ -217,6 +269,20 @@ describe('Standings Wiki Parser', function()
 
 		it('errors on invalid points input', function()
 			assert.error(function() StandingsParseWiki.makeScoringFunction('swiss', {points = 'win=x'}) end)
+		end)
+
+		it('scores group matches with the group default points', function()
+			local scoringFunction = StandingsParseWiki.makeScoringFunction('group', {})
+			assert.are_equal(3, scoringFunction(twoNil.opponents[1], twoNil))
+			assert.are_equal(0, scoringFunction(twoNil.opponents[2], twoNil))
+			local drawn = match({opponent(1, 1), opponent(1, 1)}, 0)
+			assert.are_equal(1, scoringFunction(drawn.opponents[1], drawn))
+		end)
+
+		it('scores group matches with custom points', function()
+			local scoringFunction = StandingsParseWiki.makeScoringFunction('group', {points = 'win=2, 2-1=1'})
+			assert.are_equal(2, scoringFunction(twoNil.opponents[1], twoNil))
+			assert.are_equal(1, scoringFunction(twoOne.opponents[1], twoOne))
 		end)
 	end)
 end)

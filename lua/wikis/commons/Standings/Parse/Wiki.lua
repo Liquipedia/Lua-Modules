@@ -29,8 +29,11 @@ local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParseWiki = {}
 
-local DEFAULT_SWISS_POINTS = {w = 1, d = 0.5, l = 0}
-local DEFAULT_OVERTIME_SWISS_POINTS = {w = 3, d = 1.5, l = 0, otw = 2, otl = 1}
+local DEFAULT_POINTS = {
+	swiss = {w = 1, d = 0.5, l = 0},
+	group = {w = 3, d = 1, l = 0},
+}
+local DEFAULT_OVERTIME_POINTS = {w = 3, d = 1.5, l = 0, otw = 2, otl = 1}
 local RESULT_POINTS_KEYS = {win = 'w', draw = 'd', loss = 'l', otwin = 'otw', otloss = 'otl'}
 local OVERTIME_POINTS_KEYS = {otw = true, otl = true}
 
@@ -48,12 +51,12 @@ local OVERTIME_POINTS_KEYS = {otw = true, otl = true}
 ]]
 
 ---@param args table
----@return {rounds: {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}[],
+---@return {rounds: {roundNumber: integer, started: boolean?, finished: boolean?, title: string?, matches: string[]}[],
 ---opponents: StandingTableOpponentData[],
 ---bgs: table<integer, string>,
 ---matches: string[]}
 function StandingsParseWiki.parseWikiInput(args)
-	---@type {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}[]
+	---@type {roundNumber: integer, started: boolean?, finished: boolean?, title: string?, matches: string[]}[]
 	local rounds = {}
 	for _, roundData, roundIndex in Table.iter.pairsByPrefix(args, 'round', {requireIndex = true}) do
 		table.insert(rounds, StandingsParseWiki.parseWikiRound(roundData, roundIndex))
@@ -85,7 +88,7 @@ end
 
 ---@param roundInput string|table
 ---@param roundIndex integer
----@return {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}
+---@return {roundNumber: integer, started: boolean?, finished: boolean?, title: string?, matches: string[]}
 function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 	local roundData = Json.parseIfString(roundInput)
 	local matches = Array.parseCommaSeparatedString(roundData.matches)
@@ -110,14 +113,8 @@ function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 	end
 	return {
 		roundNumber = roundIndex,
-		started = Logic.nilOr(
-			Logic.readBoolOrNil(roundData.started),
-			not DateExt.isDefaultTimestamp(startDate) and startDate <= DateExt.getCurrentTimestamp()
-		),
-		finished = Logic.nilOr(
-			Logic.readBoolOrNil(roundData.finished),
-			not DateExt.isDefaultTimestamp(endDate) and endDate <= DateExt.getCurrentTimestamp()
-		),
+		started = Logic.readBoolOrNil(roundData.started),
+		finished = Logic.readBoolOrNil(roundData.finished),
 		title = roundData.title,
 		matches = Array.unique(matches),
 	}
@@ -212,15 +209,16 @@ function StandingsParseWiki.parseWikiBgs(input)
 	return statusParsed
 end
 
----Reads the `points` input of swiss standings, e.g. `win=3, draw=1, loss=0, 2-0=4`.
+---Reads the `points` input of swiss and group standings, e.g. `win=3, draw=1, loss=0, 2-0=4`.
 ---`win`, `draw` and `loss` are the points of that result and are keyed `w`, `d` and `l`.
 ---With overtime, `otwin` and `otloss` are the points of an overtime result and are keyed `otw` and `otl`.
 ---`X-Y` is the fixed amount of points for an opponent scoring X against Y, replacing the points of its result.
 ---@param input string?
 ---@param overtime boolean?
+---@param tableType 'swiss'|'group'|nil # Picks the default points, swiss if unset
 ---@return table<string, number>
-function StandingsParseWiki.parsePoints(input, overtime)
-	local points = Table.copy(overtime and DEFAULT_OVERTIME_SWISS_POINTS or DEFAULT_SWISS_POINTS)
+function StandingsParseWiki.parsePoints(input, overtime, tableType)
+	local points = Table.copy(overtime and DEFAULT_OVERTIME_POINTS or DEFAULT_POINTS[tableType or 'swiss'])
 	local entries = Array.filter(Array.parseCommaSeparatedString(input), Logic.isNotEmpty)
 	Array.forEach(entries, function(entry)
 		local key, value = unpack(Array.parseCommaSeparatedString(entry, '='))
@@ -271,8 +269,9 @@ function StandingsParseWiki.makeScoringFunction(tabletype, args, overtime)
 			local scoreFromPlacement = tonumber(args['p' .. opponent.placement])
 			return scoreFromPlacement or 0
 		end
-	elseif tabletype == 'swiss' then
-		local points = StandingsParseWiki.parsePoints(args.points, overtime)
+	elseif tabletype == 'swiss' or tabletype == 'group' then
+		---@cast tabletype 'swiss'|'group'
+		local points = StandingsParseWiki.parsePoints(args.points, overtime, tabletype)
 		return function(opponent, match)
 			if not match.finished then
 				return nil
@@ -296,7 +295,7 @@ function StandingsParseWiki.parseTiebreakers(args, tableType)
 	local tiebreakerInput = Json.parseIfString(args.tiebreakers) or {}
 	local tiebreakers = Array.map(tiebreakerInput, TiebreakerFactory.validateAndNormalizeInput)
 	if #tiebreakers == 0 then
-		if tableType == 'ffa' then
+		if tableType == 'ffa' or tableType == 'group' then
 			tiebreakers = {
 				TiebreakerFactory.validateAndNormalizeInput('points'),
 			}
@@ -344,6 +343,13 @@ function StandingsParseWiki.parseWalkoverGames(args)
 		'Invalid walkovergames input: "' .. input .. '" is not a non-negative integer'
 	)
 	return walkoverGames
+end
+
+---Reads the `width` input in px, e.g. `600` or `600px`, the same as the width of a matchlist.
+---@param args table
+---@return number?
+function StandingsParseWiki.parseWidth(args)
+	return tonumber((string.gsub(args.width or '', 'px', '')))
 end
 
 ---Reads whether overtime is tracked separately from regulation. Requires an overtime config on the wiki.

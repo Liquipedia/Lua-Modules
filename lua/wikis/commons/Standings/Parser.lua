@@ -85,6 +85,7 @@ function StandingsParser.parse(
 				matches = playedMatches or {},
 				matchPoints = playedMatchPoints or {},
 				startingPoints = opponentData.startingPoints,
+				finished = round.finished,
 				manualDefiniteStatus = StandingsParser.resolveManualDefiniteStatus(
 					opponentData.definiteStatuses, round.roundNumber
 				),
@@ -114,7 +115,7 @@ function StandingsParser.parse(
 	local tiebreakerOptions = {draws = draws, walkoverGames = walkoverGames}
 
 	---@param tiebreakerId string
-	---@return {id: string, title: string?}
+	---@return StandingsAdditionalStat
 	local loadTiebreaker = function(tiebreakerId)
 		local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId, tiebreakerOptions)
 		local tiebreakerContextType = tiebreaker:getContextType()
@@ -127,7 +128,9 @@ function StandingsParser.parse(
 		}
 	end
 
-	local tiebreakers = Array.map(tiebreakerIds, loadTiebreaker)
+	local tiebreakers = Array.map(tiebreakerIds, function(tiebreakerId)
+		return Table.merge(loadTiebreaker(tiebreakerId), {tiebreaker = true})
+	end)
 	local alwaysStatsToLoad = ((Info.config.standings or {}).alwaysShowStats or {})[standingsType] or {}
 	alwaysStatsToLoad = Array.map(alwaysStatsToLoad, function (stat)
 		return TiebreakerFactory.validateAndNormalizeInput(stat)
@@ -183,6 +186,26 @@ function StandingsParser.parse(
 			additionalStats = additionalStats,
 		}
 	}
+end
+
+---Resolves whether a round has started and finished. Manual input takes priority, otherwise it follows
+---the phases of all matches in the round. A round without matches has neither started nor finished.
+---@param round {started: boolean?, finished: boolean?}
+---@param matchPhases MatchPhase[]?
+---@return boolean started
+---@return boolean finished
+function StandingsParser.resolveRoundStatus(round, matchPhases)
+	local phases = matchPhases or {}
+	local hasMatches = #phases > 0
+	local finished = Logic.nilOr(
+		round.finished,
+		hasMatches and Array.all(phases, function(phase) return phase == 'finished' end)
+	)
+	local started = finished or Logic.nilOr(
+		round.started,
+		Array.any(phases, function(phase) return phase ~= 'upcoming' end)
+	)
+	return started, finished
 end
 
 ---Calculate tiebreaker values for all opponents in a round.

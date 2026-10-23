@@ -99,6 +99,7 @@ end)
 ---@param date string|number|osdate?
 ---@return string?
 function PlayerExt.fetchPlayerFaction(resolvedPageName, date)
+	if not Faction.wikiHasFactions() then return nil end
 	local lpdbPlayer = PlayerExt.fetchPlayer(resolvedPageName)
 	if lpdbPlayer and lpdbPlayer.factionHistory then
 		local timestamp = DateExt.readTimestamp(date or DateExt.getContextualDateOrNow())

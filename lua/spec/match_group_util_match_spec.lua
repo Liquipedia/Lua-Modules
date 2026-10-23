@@ -405,11 +405,9 @@ insulate('MatchGroup/Util/Match', function()
 				MatchUtil.computeMatchPhase{date = '2020-01-01 12:00:00', dateexact = '0'})
 		end)
 
-		it('ignores a dateIsExact of false, because it is read with an or', function()
-			-- `match.dateIsExact or match.dateexact` turns a false into a nil, which is not the same as
-			-- an explicit false, so a past match with dateIsExact = false still counts as ongoing
+		it('is upcoming when the date of a model is explicitly not exact', function()
 			local MatchUtil = require('Module:MatchGroup/Util/Match')
-			assert.are_equal('ongoing',
+			assert.are_equal('upcoming',
 				MatchUtil.computeMatchPhase{date = '2020-01-01 12:00:00', dateIsExact = false})
 		end)
 

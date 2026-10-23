@@ -9,13 +9,13 @@ describe('Standings import from matches', function()
 
 	---@param props {matchId: string, opponents: {template: string?, name: string, score: integer,
 	---placement: integer, type: string?}[], winner: integer?, finished: boolean?, bestof: integer?,
-	---games: {winner: integer, status: string?, scores: integer[]}[]?}
+	---games: {winner: integer, status: string?, scores: integer[]}[]?, date: string?, dateExact: boolean?}
 	---@return table
 	local function match2Record(props)
 		return {
 			match2id = props.matchId,
-			date = '2024-01-05',
-			dateexact = '1',
+			date = props.date or '2024-01-05',
+			dateexact = props.dateExact ~= false and '1' or '0',
 			finished = props.finished ~= false and '1' or '0',
 			winner = props.winner and tostring(props.winner) or '',
 			bestof = tostring(props.bestof or 3),
@@ -83,6 +83,93 @@ describe('Standings import from matches', function()
 			{{roundNumber = 1, matches = {}}}, swissScoreMapper, {}, {importOpponents = true}
 		)
 		assert.are_same({}, opponents)
+	end)
+
+	describe('match phases', function()
+		local function sorted(phases)
+			return Array.sortBy(phases, function(phase) return phase end)
+		end
+
+		it('returns the phases of the matches of each round', function()
+			stubMatchQuery{
+				match2Record{matchId = 'M1', winner = 1, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+					{template = 'tt9 esports 2022', name = 'TT9 Esports', score = 0, placement = 2},
+				}},
+				match2Record{matchId = 'M2', finished = false, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 1, placement = 1},
+					{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 2},
+				}},
+				match2Record{matchId = 'M3', finished = false, date = '2099-01-01', opponents = {
+					{template = 'heroic', name = 'Heroic', score = 0, placement = 1},
+					{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 2},
+				}},
+			}
+
+			local _, matchPhasesByRound = StandingsParseLpdb.importFromMatches({
+				{roundNumber = 1, matches = {'M1', 'M2'}},
+				{roundNumber = 2, matches = {'M3'}},
+				{roundNumber = 3, matches = {}},
+			}, swissScoreMapper, {}, {importOpponents = true})
+
+			assert.are_same({'finished', 'ongoing'}, sorted(matchPhasesByRound[1]))
+			assert.are_same({'upcoming'}, matchPhasesByRound[2])
+			assert.are_same({}, matchPhasesByRound[3])
+		end)
+
+		it('treats matches that are not stored as upcoming', function()
+			stubMatchQuery{
+				match2Record{matchId = 'M1', winner = 1, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+					{template = 'tt9 esports 2022', name = 'TT9 Esports', score = 0, placement = 2},
+				}},
+			}
+
+			local _, matchPhasesByRound = StandingsParseLpdb.importFromMatches({
+				{roundNumber = 1, matches = {'M1', 'M2'}},
+			}, swissScoreMapper, {}, {importOpponents = true})
+
+			assert.are_same({'finished', 'upcoming'}, sorted(matchPhasesByRound[1]))
+		end)
+
+		it('treats unplayed matches with a past inexact date as upcoming', function()
+			stubMatchQuery{
+				match2Record{matchId = 'M1', finished = false, dateExact = false, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 0, placement = 1},
+					{template = 'tt9 esports 2022', name = 'TT9 Esports', score = 0, placement = 2},
+				}},
+			}
+
+			local _, matchPhasesByRound = StandingsParseLpdb.importFromMatches({
+				{roundNumber = 1, matches = {'M1'}},
+			}, swissScoreMapper, {}, {importOpponents = true})
+
+			assert.are_same({'upcoming'}, matchPhasesByRound[1])
+		end)
+
+		it('includes matches that do not count towards the standings', function()
+			stubMatchQuery{
+				match2Record{matchId = 'M1', finished = false, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 0, placement = 1},
+					{type = 'literal', name = 'Qualifier Winner', score = 0, placement = 2},
+				}},
+			}
+
+			local opponents, matchPhasesByRound = StandingsParseLpdb.importFromMatches({
+				{roundNumber = 1, matches = {'M1'}},
+			}, swissScoreMapper, {}, {exclusive = true, importOpponents = true})
+
+			assert.are_same({}, opponents)
+			assert.are_same({'ongoing'}, matchPhasesByRound[1])
+		end)
+
+		it('returns no phases without matches', function()
+			stubMatchQuery{}
+			local _, matchPhasesByRound = StandingsParseLpdb.importFromMatches(
+				{{roundNumber = 1, matches = {}}}, swissScoreMapper, {}, {importOpponents = true}
+			)
+			assert.are_same({}, matchPhasesByRound)
+		end)
 	end)
 
 	it('builds opponents with per round scoreboards and accumulated matches', function()
