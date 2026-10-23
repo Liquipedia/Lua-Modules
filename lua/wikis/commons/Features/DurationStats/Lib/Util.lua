@@ -7,8 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-
 local DEFAULT_STAGE = 'Results'
 
 local Util = {}
