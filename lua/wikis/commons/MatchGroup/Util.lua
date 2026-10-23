@@ -9,23 +9,21 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
-local Json = Lua.import('Module:Json')
-local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
-local Variables = Lua.import('Module:Variables')
 
-local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
+local MatchGroupCoordinates = Lua.import('Module:Domain/Bracket/Coordinates')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
-local BracketUtil = Lua.import('Module:MatchGroup/Util/Bracket')
-local MatchUtil = Lua.import('Module:MatchGroup/Util/Match')
+local BracketUtil = Lua.import('Module:Domain/Bracket/Model')
+local MatchStore = Lua.import('Module:Domain/Match/Store')
+local MatchUtil = Lua.import('Module:Domain/Match/Model')
 local Types = Lua.import('Module:MatchGroup/Util/Types')
 
 --[[
 Fetches match records and assembles them into matchlists and brackets.
 
-The pieces it assembles from live elsewhere: the match model in Module:MatchGroup/Util/Match, the
-bracket model in Module:MatchGroup/Util/Bracket, and the shapes of both in
+The pieces it assembles from live elsewhere: the match model in Module:Domain/Match/Model, the
+bracket model in Module:Domain/Bracket/Model, and the shapes of both in
 Module:MatchGroup/Util/Types. Display related functions go in Module:MatchGroup/Display/Helper.
 
 Both models are also re-exported here, as a complete mirror: every member of either model has a
@@ -38,7 +36,11 @@ over, and nothing that is not a model member should be added to it.
 ---@class MatchGroupUtil
 local MatchGroupUtil = {types = Types}
 
---- Re-exported from Module:MatchGroup/Util/Match. Prefer importing that module directly.
+--- Re-exported from Module:Domain/Match/Store. Prefer importing that module directly.
+MatchGroupUtil.fetchMatchIds = MatchStore.fetchMatchIds
+MatchGroupUtil.fetchMatchRecords = MatchStore.fetchMatchRecords
+
+--- Re-exported from Module:Domain/Match/Model. Prefer importing that module directly.
 MatchGroupUtil.matchFromRecord = MatchUtil.matchFromRecord
 MatchGroupUtil.opponentFromRecord = MatchUtil.opponentFromRecord
 MatchGroupUtil.createOpponent = MatchUtil.createOpponent
@@ -47,7 +49,7 @@ MatchGroupUtil.gameFromRecord = MatchUtil.gameFromRecord
 MatchGroupUtil.groupBySubgroup = MatchUtil.groupBySubgroup
 MatchGroupUtil.computeMatchPhase = MatchUtil.computeMatchPhase
 
---- Re-exported from Module:MatchGroup/Util/Bracket. Prefer importing that module directly.
+--- Re-exported from Module:Domain/Bracket/Model. Prefer importing that module directly.
 MatchGroupUtil.splitMatchId = BracketUtil.splitMatchId
 MatchGroupUtil.matchIdToKey = BracketUtil.matchIdToKey
 MatchGroupUtil.matchIdFromKey = BracketUtil.matchIdFromKey
@@ -57,45 +59,13 @@ MatchGroupUtil.computeLowerMatchIdsFromLegacy = BracketUtil.computeLowerMatchIds
 MatchGroupUtil.autoAssignLowerEdges = BracketUtil.autoAssignLowerEdges
 MatchGroupUtil.computeAdvanceSpots = BracketUtil.computeAdvanceSpots
 MatchGroupUtil.populateAdvanceSpots = BracketUtil.populateAdvanceSpots
+MatchGroupUtil.resetMatch = BracketUtil.resetMatch
 MatchGroupUtil.computeRootMatchIds = BracketUtil.computeRootMatchIds
 MatchGroupUtil.backfillUpperMatchIds = BracketUtil.backfillUpperMatchIds
 MatchGroupUtil.backfillCoordinates = BracketUtil.backfillCoordinates
 MatchGroupUtil.indexTableFromRecord = BracketUtil.indexTableFromRecord
 MatchGroupUtil.indexTableToRecord = BracketUtil.indexTableToRecord
 MatchGroupUtil.sectionIndexToString = BracketUtil.sectionIndexToString
-
----Fetches all match ids of matches that satisfy the supplied condition
----@param props {conditions: string|AbstractConditionNode, limit: string|integer?, order: string?}
----@return string[]
-function MatchGroupUtil.fetchMatchIds(props)
-	---@type string[]
-	return Array.map(mw.ext.LiquipediaDB.lpdb('match2', {
-		limit = tonumber(props.limit) or 1000,
-		query = 'match2id',
-		conditions = tostring(props.conditions),
-		order = props.order
-	}), Operator.property('match2id'))
-end
-
----Fetches all matches in a matchlist or bracket. Tries to read from page variables before fetching from LPDB.
----Returns a list of records ordered lexicographically by matchId.
----@param bracketId string
----@return table[]
-function MatchGroupUtil.fetchMatchRecords(bracketId)
-	local varData = Variables.varDefault('match2bracket_' .. bracketId)
-	if varData then
-		return (Json.parse(varData))
-	end
-
-	return mw.ext.LiquipediaDB.lpdb(
-		'match2',
-		{
-			conditions = '([[namespace::0]] or [[namespace::>0]]) AND [[match2bracketid::' .. bracketId .. ']]',
-			order = 'match2id ASC',
-			limit = 5000,
-		}
-	)
-end
 
 MatchGroupUtil.fetchMatchGroup = FnUtil.memoize(function(bracketId)
 	local matchRecords = MatchGroupUtil.fetchMatchRecords(bracketId)
@@ -176,18 +146,16 @@ function MatchGroupUtil.fetchMatches(bracketId)
 	return MatchGroupUtil.fetchMatchGroup(bracketId).matches
 end
 
----Returns a match struct for use in a bracket display or match summary popup. The bracket display and match summary
----popup expects that the finals match also include results from the bracket reset match.
+---Returns a match together with its bracket reset match, if it has one. Callers that display the
+---pair as a single match merge them with Module:MatchGroup/Display/Helper.mergeBracketResetMatch.
 ---@param bracketId string
 ---@param matchId string
 ---@return MatchGroupUtilMatch, MatchGroupUtilMatch?
-function MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId)
+function MatchGroupUtil.fetchMatchWithBracketReset(bracketId, matchId)
 	local bracket = MatchGroupUtil.fetchMatchGroup(bracketId)
 	local match = bracket.matchesById[matchId]
 
-	local bracketResetMatch = match
-		and match.bracketData.bracketResetMatchId
-		and bracket.matchesById[match.bracketData.bracketResetMatchId]
+	local bracketResetMatch = match and BracketUtil.resetMatch(bracket.matchesById, match.bracketData)
 
 	return match, bracketResetMatch
 end
