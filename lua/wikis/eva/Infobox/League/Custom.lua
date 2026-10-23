@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local PageLink = Lua.import('Module:Page')
-local Link = Lua.import('Module:Widget/Basic/Link')
 local String = Lua.import('Module:StringUtils')
 local Logic = Lua.import('Module:Logic')
 
