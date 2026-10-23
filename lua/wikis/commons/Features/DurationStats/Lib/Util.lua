@@ -5,6 +5,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
+
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+
 local DEFAULT_STAGE = 'Results'
 
 local Util = {}
@@ -13,11 +17,13 @@ local Util = {}
 ---@return string
 function Util.getStageName(match)
 	if not match then return DEFAULT_STAGE end
+
+	local inheritedHeader = match.bracketData and match.bracketData.inheritedHeader
+
 	return (match.section ~= DEFAULT_STAGE and match.section)
-		or match.extradata.matchsection or DEFAULT_STAGE
+		or match.extradata.matchsection or inheritedHeader
 end
 
----Returns the winner and the loser of a game, given the opponent index of the winner.
 ---@param match MatchGroupUtilMatch?
 ---@param gameWinner string|number|nil
 ---@return standardOpponent?
