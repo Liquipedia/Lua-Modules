@@ -9,7 +9,9 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local PageLink = Lua.import('Module:Page')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local String = Lua.import('Module:StringUtils')
 local Logic = Lua.import('Module:Logic')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -17,6 +19,8 @@ local League = Lua.import('Module:Infobox/League')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 ---@class EvaLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -43,8 +47,18 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Players', children = {args.player_number}},
 			Cell{name = 'Teams', children = {args.team_number}}
     )
-end
-return widgets
+	elseif id == 'customcontent' then
+		if String.isNotEmpty(args.map1) then
+			local maps = Array.map(caller:getAllArgsForBase(args, 'map'), function(map)
+				return PageLink.makeInternalLink(map)
+			end)
+			Array.appendWith(widgets,
+				Logic.isNotEmpty(maps) and table.insert(widgets, Title{children = 'Maps'}) or nil,
+				Center{children = table.concat(maps, '&nbsp;• ')}
+		)
+		end
+	end
+	return widgets
 end
 
 ---@param content Html|string|number|nil
