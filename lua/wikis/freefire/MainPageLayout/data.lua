@@ -149,7 +149,7 @@ return {
 			link = 'Portal:Pets',
 			count = {
 				method = 'CATEGORY',
-				category = 'Pets',
+				category = 'Pet',
 			},
 		},
 		{
