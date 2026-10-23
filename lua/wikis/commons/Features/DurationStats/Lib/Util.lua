@@ -5,8 +5,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Lua = require('Module:Lua')
-
 local DEFAULT_STAGE = 'Results'
 
 local Util = {}
