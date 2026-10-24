@@ -123,6 +123,7 @@ function StandingsTable.parse(args, tableType)
 		walkoverGames = StandingsParseWiki.parseWalkoverGames(args),
 		walkoverRounds = StandingsParseWiki.parseWalkoverRounds(args),
 		tiebreakerReset = tiebreakerReset,
+		alwaysShowStatsOverWrite = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.alwaysShowStatsOverWrite)),
 	})
 
 	if tableType == 'swiss' then
