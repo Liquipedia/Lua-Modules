@@ -135,6 +135,18 @@ function DateExt.toYmdInUtc(dateOrTimestamp)
 	return DateExt.formatTimestamp('Y-m-d', DateExt.readTimestamp(dateOrTimestamp) or '')
 end
 
+--- Extends a date string without a time of day (`YYYY-MM-DD`) to the last second of that day.
+--- Useful for an inclusive upper bound when comparing against datetimes, e.g. in LPDB conditions.
+--- A date that already has a time of day (or is not a full date) is returned unchanged.
+---@param date string?
+---@return string?
+function DateExt.toEndOfDay(date)
+	if date and date:match('^%d%d%d%d%-%d%d%-%d%d$') then
+		return date .. ' 23:59:59'
+	end
+	return date
+end
+
 ---@param dateString string|integer|osdate|osdateparam
 ---@return boolean
 function DateExt.isDefaultTimestamp(dateString)

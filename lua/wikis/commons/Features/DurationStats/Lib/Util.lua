@@ -28,7 +28,11 @@ function Util.getWinnerAndLoser(match, gameWinner)
 	if not match then return end
 
 	local winnerIndex = tonumber(gameWinner) or 0
-	return match.opponents[winnerIndex], match.opponents[3 - winnerIndex]
+	local winner = match.opponents[winnerIndex]
+	-- "the" loser only exists in a match between exactly two opponents
+	local loser = #match.opponents == 2 and match.opponents[3 - winnerIndex] or nil
+
+	return winner, loser
 end
 
 return Util

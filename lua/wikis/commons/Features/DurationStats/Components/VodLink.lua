@@ -37,7 +37,7 @@ function DurationStatsVodLink.display(entry)
 	if not vod then return end
 
 	-- a match VOD covers the whole match, so only a game's own VOD is labelled with its game number
-	return VodLink.display{vod = vod, gamenum = isGameVod and entry.game.match2gameid or nil}
+	return VodLink.display{vod = vod, gamenum = isGameVod and entry.gameId or nil}
 end
 
 return DurationStatsVodLink

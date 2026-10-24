@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local Games = Lua.import('Module:Features/DurationStats/Api/Games')
@@ -55,11 +56,14 @@ end
 ---@param order string
 ---@return DurationStatsEntry[]
 function Controller._fetchEntries(conditions, limit, order)
-	return Array.map(Games.fetch(conditions, limit, order), function(game)
-		local match = Games.fetchMatch(game.match2id)
+	return Array.map(Games.fetch(conditions, limit, order), function(record)
+		local game = MatchGroupUtil.gameFromRecord(record)
+		local match = Games.fetchMatch(record.match2id)
 		local winner, loser = Util.getWinnerAndLoser(match, game.winner)
 		return {
 			game = game,
+			pageName = record.pagename,
+			gameId = record.match2gameid,
 			match = match,
 			stageName = Util.getStageName(match),
 			winner = winner,

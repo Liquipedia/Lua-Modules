@@ -34,8 +34,8 @@ local function DurationStatsRow(props)
 	return TableWidgets.Row{
 		children = WidgetUtil.collect(
 			TableWidgets.Cell{children = DateExt.toYmdInUtc(game.date)},
-			TableWidgets.Cell{children = Link{link = game.pagename, children = entry.stageName}},
-			TableWidgets.Cell{children = game.match2gameid},
+			TableWidgets.Cell{children = Link{link = entry.pageName, children = entry.stageName}},
+			TableWidgets.Cell{children = entry.gameId},
 			TableWidgets.Cell{children = displayOpponent(entry.winner)},
 			TableWidgets.Cell{children = displayOpponent(entry.loser)},
 			TableWidgets.Cell{children = game.length},
