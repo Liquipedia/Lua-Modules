@@ -12,7 +12,7 @@ local Types = {}
 ---@class DurationStatsEntry
 ---@field game MatchGroupUtilGame
 ---@field pageName string
----@field gameId string
+---@field gameId integer?
 ---@field match MatchGroupUtilMatch?
 ---@field stageName string
 ---@field winner standardOpponent?

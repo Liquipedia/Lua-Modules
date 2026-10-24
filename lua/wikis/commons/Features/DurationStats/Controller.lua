@@ -63,7 +63,7 @@ function Controller._fetchEntries(conditions, limit, order)
 		return {
 			game = game,
 			pageName = record.pagename,
-			gameId = record.match2gameid,
+			gameId = tonumber(record.match2gameid),
 			match = match,
 			stageName = Util.getStageName(match),
 			winner = winner,
