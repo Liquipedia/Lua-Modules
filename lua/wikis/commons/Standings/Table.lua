@@ -89,9 +89,11 @@ function StandingsTable.fromTemplate(frame)
 		round.started, round.finished = StandingsParser.resolveRoundStatus(round, matchPhasesByRound[round.roundNumber])
 	end)
 
+	local alwaysShowStatsOverWrite = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.alwaysShowStatsOverWrite))
+
 	local standingsTable = StandingsParser.parse(
 		rounds, opponents, bgs, title, matches, tableType, tiebreakers, StandingsParseWiki.parseDrawConfig(args),
-		overtime, StandingsParseWiki.parseWalkoverGames(args)
+		overtime, StandingsParseWiki.parseWalkoverGames(args), alwaysShowStatsOverWrite
 	)
 
 	if tableType == 'swiss' then
