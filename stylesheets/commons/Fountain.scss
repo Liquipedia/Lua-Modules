@@ -326,6 +326,19 @@ a.cf {
 	border-image: linear-gradient( -45deg, #fc9303, #899499 73% ) 1;
 }
 
+@keyframes abilityDowntime {
+	0%,
+	25%,
+	50% {
+		height: 0;
+	}
+
+	75%,
+	100% {
+		height: 100%;
+	}
+}
+
 .target_downtime1 {
 	width: 5.375rem; // 86px
 	height: 5.375rem; //86px
@@ -341,18 +354,51 @@ a.cf {
 	animation: abilityDowntime 2.5s linear infinite;
 }
 
-@keyframes abilityDowntime {
-	0%,
-	25%,
-	50% {
-		height: 0;
+@keyframes spellbar-drain {
+	from { clip-path: inset( 0 0 0 0 ); }
+	to   { clip-path: inset( 0 100% 0 0 ); }
+} // Right to left. The fill is clipped, so the gradient does not squeeze. This is for hpmp cost.
+
+.spellbar {
+	&_track {
+		height: 0.5rem; // 8px
+		box-sizing: border-box;
+		margin-top: 0.1875rem; // 3px
+		background: #111111;
+		border: 0.0625rem solid var( --clr-moon-base ); // #000000
+		border-radius: 0.125rem; // 2px
+		overflow: hidden;
 	}
 
-	75%,
-	100% {
+	&_track + &_track {
+		margin-top: 0.125rem; // 2px
+	}
+
+	&_fill {
 		height: 100%;
 	}
-}
+
+	&_hp {
+		background: linear-gradient( to right, #286323, #387f28, #4a9e2e, #59b832, #6ad537, #72e33a, #7af03c );
+	}
+
+	&_mp {
+		background: linear-gradient( to right, #1056db, #2171e1, #318ae7, #41a3ec, #4fbbf1, #5ed3f6, #73f5fe );
+	}
+
+	&_drain {
+		animation-name: spellbar-drain;
+		animation-timing-function: linear;
+		animation-iteration-count: infinite;
+		animation-duration: 5s; // can be overridden per spell by "mp alt duration" / "hp alt duration"
+	}
+} // mimics the hp and mp cost per interval.
+
+@media (prefers-reduced-motion: reduce) {
+	.spellbar_drain {
+		animation: none;
+	}
+} // end spellbar styles.
 
 /* Spellcard Item-cooldown Sharing */
 .item_cdshare {
