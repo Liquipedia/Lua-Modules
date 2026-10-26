@@ -65,13 +65,4 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@param content Html|string|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
-	return span
-end
-
 return CustomLeague
