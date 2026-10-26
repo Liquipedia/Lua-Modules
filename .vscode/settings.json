@@ -21,5 +21,6 @@
 		"**/wikis/*/*/*/*/*.lua": "${dirname(-4)}: ${dirname(-5)}/${dirname(-6)}/${dirname}/${filename}",
 		"**/wikis/*/*/*/*/*/*.lua": "${dirname(-4)}: ${dirname(-5)}/${dirname(-6)}/${dirname(-7)}/${dirname}/${filename}",
 		"**/*.lua": "${dirname}: ${filename}"
-	}
+	},
+	"compile-hero.disable-compile-files-on-did-save-code": false
 }

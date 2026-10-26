@@ -1,0 +1,1638 @@
+@charset "UTF-8";
+/* Temporary: Hide Errors from logged out users */
+.logged-out .scribunto-error {
+  display: none;
+}
+
+.txtshd {
+  text-shadow: 0.0625em 0.0625em 0.125em var(--clr-moon-base);
+}
+
+.healthbar {
+  background: linear-gradient(to right, #286323, #7af03c);
+  color: #ffffff;
+  text-shadow: 0.0625rem 0.0625rem 0.125rem var(--clr-moon-base);
+  font-weight: bold;
+}
+
+.manabar {
+  background: linear-gradient(to right, #1056db, #73f5fe);
+  color: #ffffff;
+  text-shadow: 0.0625rem 0.0625rem 0.125rem var(--clr-moon-base);
+  font-weight: bold;
+}
+
+.primaryAttribute_str {
+  background: var(--clr-semantic-negative-40);
+}
+.primaryAttribute_agi {
+  background: var(--clr-semantic-positive-30);
+}
+.primaryAttribute_int {
+  background: var(--clr-sapphire-base);
+}
+.primaryAttribute_uni {
+  background: var(--clr-semantic-negative-40);
+}
+
+.infobox-tooltip {
+  border-width: 0.1875rem 0.0625rem 0.0625rem 0.0625rem;
+  border-style: solid;
+  text-align: center;
+  font-size: 70%;
+  font-weight: bold;
+}
+.infobox-tooltip:hover {
+  background-color: rgba(255, 215, 0, 0.5);
+}
+
+.infobox_itm-title {
+  cursor: default;
+  font-size: 90%;
+  font-weight: bold;
+  color: #e2e2e6;
+  margin: -0.25em 0 0.125em 0;
+}
+
+.infobox_itm-icon {
+  margin: 0.125em 0 0.125em 0;
+  display: flex;
+  justify-content: center;
+  width: 18.75em;
+  max-height: 5.25em;
+}
+
+.infobox_itm-neg {
+  color: var(--clr-semantic-negative-base);
+}
+
+.infobox_itm-type_neutral1 {
+  background-color: var(--clr-moon-40);
+  font-weight: bold;
+  color: #e2e2e6;
+}
+.infobox_itm-type_neutral2 {
+  background-color: var(--clr-forest-40);
+  font-weight: bold;
+  color: #e2e2e6;
+}
+.infobox_itm-type_neutral3 {
+  background-color: var(--clr-gigas-base);
+  font-weight: bold;
+  color: #e2e2e6;
+}
+.infobox_itm-type_neutral4 {
+  background-color: var(--clr-vividviolet-40);
+  font-weight: bold;
+  color: #e2e2e6;
+}
+.infobox_itm-type_neutral5 {
+  background-color: var(--clr-semantic-copper-40);
+  font-weight: bold;
+  color: #e2e2e6;
+}
+.infobox_itm-type_accessories {
+  background-color: var(--clr-forest-base);
+  font-weight: bold;
+  color: #e2e2e6;
+}
+.infobox_itm-type_armor, .infobox_itm-type_consumables {
+  background-color: var(--clr-california-40);
+  font-weight: bold;
+  color: #e2e2e6;
+}
+.infobox_itm-type_artifacts {
+  background-color: var(--clr-redviolet-20);
+  font-weight: bold;
+  color: #e2e2e6;
+}
+.infobox_itm-type_attributes {
+  background-color: var(--clr-moon-base);
+  font-weight: bold;
+  color: #ffe845;
+}
+.infobox_itm-type_collectible, .infobox_itm-type_roshan, .infobox_itm-type_tormentor {
+  background-color: var(--clr-elm-40);
+  font-weight: bold;
+  color: #e2e2e6;
+}
+.infobox_itm-type_equipment, .infobox_itm-type_weapons {
+  background-color: var(--clr-semantic-positive-30);
+  font-weight: bold;
+  color: #e2e2e6;
+}
+.infobox_itm-type_magical {
+  background-color: var(--clr-primary-base);
+  font-weight: bold;
+  color: #e2e2e6;
+}
+.infobox_itm-type_miscellaneous, .infobox_itm-type_support {
+  background-color: var(--clr-primary-40);
+  font-weight: bold;
+  color: #e2e2e6;
+}
+.infobox_itm-type_removed, .infobox_itm-type_unreleased {
+  background-color: var(--clr-redviolet-40);
+  font-weight: bold;
+  color: #e2e2e6;
+}
+.infobox_itm-type_stock {
+  background-color: var(--clr-primary-base);
+  color: #e2e2e6;
+}
+
+/* Infobox Cosmetic */
+.infobox-cosmetic-tradeable,
+.infobox-cosmetic-marketable {
+  background: radial-gradient(50% 50% at 50% 50%, #03386f 0%, #030d1a 100%);
+  font-weight: bold;
+  color: #4898ed;
+}
+
+.infobox-cosmetic-deletable {
+  background: radial-gradient(50% 50% at 50% 50%, #262a30 0%, var(--clr-moon-base) 100%);
+  font-weight: bold;
+  color: #747b82;
+}
+
+/* Text Colors */
+.text-color-gold {
+  color: #daa520;
+}
+
+a.cf {
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0.0625rem 0.0625rem 0.125rem var(--clr-moon-base);
+}
+
+.target_passive,
+.target_aura {
+  border: 0;
+}
+
+.target_no,
+.target_unit,
+.target_area,
+.target_ground,
+.target_point {
+  border-top: 0.375rem solid #899499;
+  border-bottom: 0.375rem solid #212f3d;
+  border-right: 0.375rem solid #595959;
+  border-left: 0.375rem solid #a7a7a7;
+}
+
+.target_toggle {
+  border: 0.375rem solid #fc9303;
+}
+
+.target_altcast {
+  outline: 0.25rem solid #f5f5f5;
+  outline-offset: -0.375rem;
+  border-top: 0.375rem solid #899499;
+  border-bottom: 0.375rem solid #212f3d;
+  border-right: 0.375rem solid #595959;
+  border-left: 0.375rem solid #a7a7a7;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(1turn);
+  }
+}
+.target_autocast {
+  width: 5rem;
+  height: 5rem;
+  padding: 0.375rem;
+}
+
+.target_autocast1 {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0.1875rem;
+}
+
+.target_autocast1,
+.target_autocast {
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+  outline: 0.0625rem solid #333333;
+  outline-offset: -0.25rem;
+}
+.target_autocast1::before,
+.target_autocast::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  left: -50%;
+  top: -50%;
+  width: 200%;
+  height: 200%;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-image: linear-gradient(var(--clr-moon-base), #fbb300);
+  animation: rotate 1.2s cubic-bezier(0.46, 0.03, 0.52, 0.96) infinite;
+}
+.target_autocast1::after,
+.target_autocast::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 0.375rem;
+  top: 0.375rem;
+  width: calc( 100% - 0.75rem );
+  height: calc( 100% - 0.7rem );
+  border-radius: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.target_autocast-off {
+  border: 0.375rem ridge #899499;
+}
+
+.target_aam {
+  border: 0.375rem solid #999999;
+  border-image: linear-gradient(-45deg, #fc9303, #899499 73%) 1;
+}
+
+.target_no1,
+.target_unit1,
+.target_area1,
+.target_ground1,
+.target_point1 {
+  border-width: 0.1875rem;
+  border-style: solid;
+  border-color: #899499 #595959 #212f3d #a7a7a7;
+}
+
+.target_toggle1 {
+  border: 0.1875rem solid #fc9303;
+}
+
+.target_altcast1 {
+  outline: 0.125rem solid #f5f5f5;
+  outline-offset: -0.1875rem;
+  border-width: 0.1875rem;
+  border-style: solid;
+  border-color: #899499 #595959 #212f3d #a7a7a7;
+}
+
+.target_autocast-off1 {
+  border: 0.1875rem ridge #899499;
+}
+
+.target_aam1 {
+  border: 0.1875rem solid #999999;
+  border-image: linear-gradient(-45deg, #fc9303, #899499 73%) 1;
+}
+
+@keyframes abilityDowntime {
+  0%, 25%, 50% {
+    height: 0;
+  }
+  75%, 100% {
+    height: 100%;
+  }
+}
+.target_downtime1 {
+  width: 5.375rem;
+  height: 5.375rem;
+  border: 0;
+}
+
+.target_downtime1::before,
+.item_cdshare::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Replaces top: 0; left: 0; right: 0; bottom: 0; */
+  background: rgba(117, 117, 117, 0.55);
+  animation: abilityDowntime 2.5s linear infinite;
+}
+
+@keyframes hpmpbar-drain {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    clip-path: inset(0 100% 0 0);
+  }
+}
+/* Right to left. The fill is clipped, so the gradient does not squeeze. */
+.hpmpbar_track {
+  height: 0.5rem;
+  /* 8px */
+  box-sizing: border-box;
+  margin-top: 0.1875rem;
+  /* 3px */
+  background: #111111;
+  border: 0.0625rem solid var(--clr-moon-base);
+  /* #000000 */
+  border-radius: 0.125rem;
+  /* 2px */
+  overflow: hidden;
+}
+
+.hpmpbar_track + .hpmpbar_track {
+  margin-top: 0.125rem;
+  /* 2px */
+}
+
+.hpmpbar_fill {
+  height: 100%;
+}
+
+.hpmpbar_hp {
+  background: linear-gradient(to right, #286323, #387f28, #4a9e2e, #59b832, #6ad537, #72e33a, #7af03c);
+}
+
+.hpmpbar_mp {
+  background: linear-gradient(to right, #1056db, #2171e1, #318ae7, #41a3ec, #4fbbf1, #5ed3f6, #73f5fe);
+}
+
+.hpmpbar_drain {
+  animation-name: hpmpbar-drain;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-duration: 5s;
+  /* overridden per spell by "mp alt duration" / "hp alt duration" */
+}
+
+/* mimics the hp and mp cost per interval. */
+@media (prefers-reduced-motion: reduce) {
+  .hpmpbar_drain {
+    animation: none;
+  }
+}
+/* end hpmpbar styles. */
+/* Spellcard Item-cooldown Sharing */
+.item_cdshare {
+  width: 5.5rem;
+  height: 4rem;
+  border: 0;
+}
+
+.spelltad {
+  display: inline-block;
+  font-size: 90%;
+  vertical-align: top;
+  width: 13%;
+  text-align: right;
+}
+.spelltad-ru {
+  width: 20%;
+}
+
+.spelltad_value {
+  flex: 1 0 auto;
+  display: inline-block;
+  padding-left: 0.3125rem;
+  font-size: 90%;
+  vertical-align: top;
+}
+
+.spelldesc {
+  border-top: 0.0625rem solid #333333;
+}
+.spelldesc:hover {
+  border-top: 0.0625rem solid #999999;
+}
+
+.spellagh {
+  font-weight: bold;
+  color: #a885ff;
+  text-shadow: 0.0625rem 0.0625rem 0.125rem var(--clr-moon-base);
+}
+
+.spelltrait_value {
+  vertical-align: middle;
+  font-size: 95%;
+  min-height: 1.4375rem;
+  height: auto;
+  width: 100%;
+  max-width: 28.125rem;
+}
+
+.spellcost_icon {
+  vertical-align: text-top;
+  text-align: center;
+  width: 1.5625rem;
+  height: 1.5625rem;
+}
+.spellcost_value {
+  font-size: 90%;
+  vertical-align: text-top;
+  padding: 0 0.0625rem;
+}
+
+.spelltype_mpcost, .spelltype_hpcost {
+  border-top: 0.25rem double;
+  display: inline-block;
+  width: 100%;
+  max-width: 28.125rem;
+}
+.spelltype_mpcost {
+  border-top-color: #3590e8;
+}
+.spelltype_hpcost {
+  border-top-color: #55b231;
+}
+.spelltype_sublink {
+  border-top: 0.0625rem solid #333333;
+  width: 100%;
+  max-width: 28.125rem;
+}
+
+.spelllore {
+  display: inline-block;
+  text-align: center;
+  background-color: #282828c4;
+  padding: 0.125rem;
+  font-size: 85%;
+  font-style: italic;
+  color: #e2e2e2;
+  outline: 0.0625rem solid rgba(226, 226, 226, 0.2);
+  width: 100%;
+  max-width: 28.125rem;
+}
+
+.spellintern {
+  cursor: default;
+  padding: 0.1875rem;
+  font-size: 80%;
+  border: 0.0625rem solid #7681968c;
+}
+.spellintern:hover {
+  border: 0.0625rem solid #768196;
+}
+
+.iconrotate {
+  transition: all 6s;
+}
+.iconrotate:hover {
+  transform: rotate(1080deg);
+}
+
+.spellvalueTable {
+  display: table;
+}
+
+.i-row,
+.spellvalueTableRow {
+  display: table-row;
+}
+
+.spellvalueTableCell {
+  display: table-cell;
+  text-align: center;
+  padding: 0.1875rem;
+  border-bottom: 1px solid;
+  height: 35px;
+}
+
+.spellunit_link, .spellunit_topage {
+  color: #e2e2e6;
+  text-shadow: 0.0625rem 0.0625rem 0.125rem var(--clr-moon-base);
+  font-weight: bold;
+}
+.spellunit_topage:hover {
+  color: #daa520;
+}
+.spellunit_mp, .spellunit_hp {
+  display: flex;
+  max-width: 8rem;
+  height: 1.3125rem;
+  padding: 0.125rem;
+  border-bottom: 0.0625rem solid #333333;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 80%;
+  text-shadow: 0.7px 0.7px 1.2px var(--clr-moon-base);
+  text-align: center;
+}
+.spellunit_hp {
+  background: linear-gradient(to right, #286323, #7af03c);
+}
+.spellunit_mp {
+  background: linear-gradient(to right, #1056db, #73f5fe);
+}
+.spellunit_cellt {
+  display: table-cell;
+  width: 1.875rem;
+  height: 1.3125rem;
+  text-align: right;
+}
+.spellunit_cellv {
+  display: table-cell;
+  padding-left: 0.5rem;
+  width: 12.5rem;
+  height: 1.3125rem;
+  text-align: left;
+}
+
+.craft_base {
+  background-color: #93000d2e;
+  font-size: 15px;
+  padding: 5px;
+}
+.craft_title {
+  font-size: 85%;
+  border-bottom: 1px solid #333333;
+}
+.craft_icon {
+  position: relative;
+  flex-shrink: 0;
+}
+.craft_overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.invokeCard {
+  font-size: 85%;
+  width: 6.25rem;
+  height: 6.25rem;
+  margin: 0.3125rem;
+  border: 0.0625rem solid rgba(51, 51, 51, 0.5);
+  background-color: rgba(51, 51, 51, 0.5);
+}
+.invokeCard:hover {
+  border: 0.0625rem solid #f7f7f7;
+}
+
+.invokePad {
+  padding: 0.25rem;
+}
+
+.facetBox {
+  background: rgba(35, 46, 52, 0.25);
+  padding: 0.3125rem;
+  border: 0.0625rem solid #505050;
+  color: var(--clr-on-background);
+  transition: 0.35s;
+}
+.facetBox:hover {
+  border: 0.0625rem solid var(--clr-elm-10);
+}
+.theme--dark .facetBox:hover {
+  border: 0.0625rem solid var(--clr-moon-90);
+}
+.facetCell {
+  background-color: #9fa1a3;
+  padding-top: 5px;
+}
+.theme--dark .facetCell {
+  background-color: #2c2f33;
+}
+.facetTitle {
+  cursor: help;
+}
+.facetLink {
+  font-weight: bold;
+  color: var(--clr-moon-base);
+  text-shadow: 0.0625rem 0.0625rem 0.125rem var(--clr-moon-30);
+}
+.facetLinkTitle, .theme--dark .facetLink {
+  color: #e2e2e6;
+  text-shadow: 0.0625rem 0.0625rem 0.125rem var(--clr-moon-base);
+}
+.facetDesc {
+  border-top: 0.125rem solid #505050;
+  padding-top: 0.3125rem;
+}
+.facetDesc:hover {
+  border-top: 0.125rem solid var(--clr-moon-80);
+}
+.facetShadow {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.7);
+  text-align: left;
+  margin-top: 0;
+  margin-bottom: 0.3125rem;
+  padding: 0.3125rem;
+  border: 0.0625rem solid #505050;
+  width: 100%;
+}
+.theme--dark .facetShadow {
+  background: rgba(18, 26, 33, 0.7);
+}
+
+/* Aghcard-related */
+.aghupgBody {
+  display: inline-block;
+  max-width: 28.75rem;
+  width: 100%;
+  font-size: 90%;
+  background: rgba(212, 216, 222, 0.75);
+  text-align: left;
+  padding-left: 0.3125rem;
+  padding-right: 0.3125rem;
+  padding-top: 0.3125rem;
+  border: 0.0625rem solid #505050;
+  color: var(--clr-on-background);
+}
+.theme--dark .aghupgBody {
+  background: rgba(35, 46, 52, 0.75);
+}
+.aghupgTitle {
+  font-weight: bold;
+  color: #5b37b7;
+  text-shadow: 0.0625rem 0.0625rem 0.125rem var(--clr-gigas-80);
+  flex-grow: 1;
+}
+.theme--dark .aghupgTitle {
+  color: #a885ff;
+  text-shadow: 0.0625rem 0.0625rem 0.125rem var(--clr-moon-base);
+}
+.aghupgNew {
+  text-align: center;
+  border-radius: 0.1875rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background-color: #1c2e50;
+  text-shadow: 0.0625rem 0.0625rem 0.125rem var(--clr-moon-base);
+  border: 0.125rem solid #505050;
+  padding-left: 0.125rem;
+  padding-right: 0.125rem;
+}
+.aghupgShadow {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.7);
+  text-align: left;
+  margin-top: 0;
+  margin-bottom: 0.3125rem;
+  padding: 0.3125rem;
+  border: 0.0625rem solid #505050;
+  width: 100%;
+}
+.theme--dark .aghupgShadow {
+  background: rgba(18, 26, 33, 0.7);
+}
+.aghupgShadow:hover {
+  background-color: #8eb9e5;
+  transition: 0.15s;
+}
+.theme--dark .aghupgShadow:hover {
+  background-color: #090d11;
+}
+.aghupgDesc {
+  vertical-align: top;
+  padding: 0;
+}
+
+/* HeroGameplay-related */
+.gameplay_ {
+  color: #227722;
+  font-weight: bold;
+}
+.gameplay__agh {
+  color: #a50f79;
+  font-weight: bold;
+}
+.gameplay__shd {
+  color: #4b69ff;
+  font-weight: bold;
+}
+.gameplay__tal {
+  color: #cf6a32;
+  font-weight: bold;
+}
+.gameplay__talbutton {
+  color: #f3e494;
+}
+.gameplay__talbutton:hover {
+  text-shadow: 0.0625rem 0.0625rem 0.5rem #ff751b, -0.0625rem -0.0625rem 0.5rem #ff751b;
+  cursor: default;
+}
+.gameplay__tallvl {
+  max-width: 28.125rem;
+  color: #f3e494;
+  text-shadow: 0.0625rem 0.0625rem 0.5rem transparent, -0.0625rem -0.0625rem 0.5rem transparent;
+  border-left: 0.125rem solid #131313;
+  border-right: 0.125rem solid #131313;
+}
+.gameplay__tallvl:hover {
+  text-shadow: 0.0625rem 0.0625rem 0.5rem #ff751b, -0.0625rem -0.0625rem 0.5rem #ff751b;
+  cursor: default;
+  border-left: 0.125rem solid #f3e494;
+  border-right: 0.125rem solid #f3e494;
+}
+.gameplay__taldesc {
+  color: #e2e2e6;
+  display: table-cell;
+  min-width: 12.5rem;
+  text-shadow: initial;
+  font-weight: initial;
+}
+.gameplay__taldesc:hover {
+  color: #e2e2e6;
+  text-shadow: initial;
+  font-weight: initial;
+}
+
+/* these two styles are same for the talent level hover glow */
+div.gameplay_nav {
+  display: block;
+  font-size: 1.5rem;
+}
+div.gameplay_nav ul {
+  margin: 0 !important;
+}
+div.gameplay_nav ul li {
+  list-style: none;
+  display: inline-block;
+  padding: 0.3125rem;
+  position: relative;
+  text-decoration: none;
+  text-align: center;
+}
+div.gameplay_nav ul li:hover {
+  background-color: rgba(78, 85, 87, 0.5);
+}
+div.gameplay_nav ul li ul {
+  opacity: 0;
+  position: absolute;
+  padding-left: 0;
+  left: 0;
+  display: inline-block;
+}
+
+div.gameplay_nav ul li:hover > ul,
+div.gameplay_nav ul li ul:hover {
+  opacity: 1;
+  display: block;
+  min-width: 28.125rem;
+  padding: 0.3125rem;
+  box-shadow: 0 0.1875rem 0.3125rem -0.0625rem rgba(88, 88, 88, 0.5);
+  background-color: #131313;
+  color: #e2e2e6;
+  font-size: 0.8125rem;
+}
+
+div.gameplay_nav ul li ul li {
+  clear: both;
+  width: 100%;
+  text-align: center;
+  padding: 0.3125rem;
+  border-style: hidden;
+}
+
+.treeview ul {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.treeview li {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  list-style-image: none;
+}
+.treeview li::after {
+  display: block;
+  content: "";
+  clear: both;
+}
+.treeview li li {
+  /* @noflip */
+  padding-left: 1.3125rem;
+  text-indent: 0.3em;
+}
+.treeview li li:last-child {
+  background-position: 0 -5971px;
+}
+
+/* first line here deals with new situation after RemexHTML switch,
+* where emptyline cause the first child to become the 2nd child. Such a mess
+*/
+.treeview li.emptyline > ul > .mw-empty-elt:first-child + .emptyline,
+.treeview li.emptyline > ul > li:first-child {
+  background-position: 0 0.5625rem;
+}
+
+/***************************
+* Used by [[Template:Key press]] *
+****************************/
+.key {
+  display: inline-block;
+  white-space: nowrap;
+}
+.key kbd {
+  padding: 0.1em 0.6em 0.1em 0.6em;
+  margin-right: 0.125rem;
+  font-size: 85%;
+  font-family: inherit;
+  font-style: normal;
+  border-radius: 0.4em;
+}
+
+.keys {
+  border: 0.0625rem solid #111111;
+  box-shadow: 0 0.2em rgba(0, 0, 0, 0.5);
+  background-color: #505459;
+  background-image: linear-gradient(to bottom, #505459, #282828);
+  color: #eeeeee;
+}
+
+/******************************
+* End Template:Key press coloration *
+*******************************/
+/* Recent Changes */
+.mw-rcfilters-ui-changesListWrapperWidget {
+  right: 3.125rem;
+}
+.mw-rcfilters-ui-changesListWrapperWidget h4 {
+  padding-left: 3.125rem;
+}
+.mw-rcfilters-ui-changesListWrapperWidget-previousChangesIndicator {
+  margin-left: 3.125rem;
+}
+
+.cosm-inf-setname {
+  background-color: var(--table-green-background-color);
+}
+
+.updatetablehead {
+  display: flex;
+  border-top: 0.0625rem solid #aaaaaa;
+  border-right: 0.0625rem solid #aaaaaa;
+  border-left: 0.0625rem solid #aaaaaa;
+  text-align: center;
+  font-weight: bold;
+}
+
+.updatetablebody {
+  overflow-x: auto;
+  border: 0.0625rem solid #aaaaaa;
+  border-top: 0;
+}
+
+.updatetablehead #patch,
+.updatetablehead #version,
+.updatetablehead #date,
+.updatetablebody #patch,
+.updatetablebody #version {
+  flex: 0 0 7.5rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+.updatetablebody #date {
+  max-width: 6.25rem;
+  text-align: center;
+  font-size: 85%;
+}
+
+.updatetablehead #description,
+.updatetablebody #description {
+  flex: 1 1 auto;
+}
+
+.updatetablebody #description {
+  padding: 0.25rem 0;
+}
+
+.updatetablebody #entry {
+  display: flex;
+  align-items: center;
+  border-top: 0.0625rem solid #aaaaaa;
+}
+
+.updatetablebody ul {
+  margin: 0 0 0 1.6em;
+}
+
+/* Template:GameVersionTableElement */
+.gvt-el-significant {
+  background-color: var(--publisher-premier-highlight-background-color, #ffffcc);
+}
+
+/* Template:Talent table el */
+.tte-right-tal-slot {
+  height: 2.5rem;
+  padding: 0;
+  border-bottom: solid 0.125rem var(--clr-moon-base);
+  background: #eff5ff;
+}
+
+/* Item Grid Styling on [[Item Grid]] */
+ul.shopnav {
+  margin: 0;
+  list-style: none;
+}
+ul.shopnav li {
+  margin: 0.25rem;
+  box-shadow: 0 0 0.0625rem 0.125rem #008000;
+}
+
+/* Item List Styling on [[Items]] */
+div.itemlist {
+  display: flex;
+  flex-wrap: wrap;
+  font-weight: 500;
+}
+div.itemlist > div {
+  flex-basis: 25rem;
+  padding: 0.1875rem 0;
+}
+
+/* Hero Infostrip */
+div.infostripe {
+  display: flex;
+  overflow: hidden;
+  align-items: stretch;
+  justify-content: center;
+  color: #ffffff;
+  vertical-align: top;
+  text-align: center;
+  text-shadow: 0 0 0.3125rem var(--clr-moon-base);
+  font-size: 1.25rem;
+}
+div.infostripe a,
+div.infostripe a:link,
+div.infostripe a:visited,
+div.infostripe a:hover,
+div.infostripe a:active {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.gradient_gameplay {
+  background: linear-gradient(15deg, #b24343 0%, #c65c49 17%, #bf7f4e 62%, #a8413e 100%);
+}
+.gradient_cosmetics {
+  background: linear-gradient(15deg, #4a4a4a 0%, #699f9f 17%, #abd8d6 62%, #4a4a4a 100%);
+}
+.gradient_audio {
+  background: linear-gradient(15deg, #17542b 0%, #01a476 17%, #4db974 62%, #17542b 100%);
+}
+.gradient_history {
+  background: linear-gradient(15deg, #b4720f 0%, #bcb902 17%, #d4d85c 62%, #b4720f 100%);
+}
+
+div.infostripe div {
+  margin: 0 -0.125rem;
+  padding: 0.9375rem 1.5625rem 0.625rem;
+  border-right: 0.25rem solid rgba(75, 75, 75, 0.5);
+  border-left: 0.25rem solid rgba(75, 75, 75, 0.5);
+}
+
+.vercheck_,
+.vercheck_no {
+  filter: grayscale(90%);
+}
+
+div.heroentry {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  margin: 0.0625rem;
+  width: 6.875rem;
+  height: 3.875rem;
+}
+div.heroentry div {
+  position: absolute;
+}
+
+div.heroentrytext {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin: 0.0625rem 0.125rem;
+  width: 6.625rem;
+  height: 3.75rem;
+  color: #ffffff;
+  text-align: center;
+  text-shadow: -0.0625rem 0 0.2em var(--clr-moon-base), 0 0.0625rem 0.2em var(--clr-moon-base), 0.0625rem 0 0.2em var(--clr-moon-base), 0 -0.0625rem 0.2em var(--clr-moon-base);
+  font-size: 0.6875rem;
+  line-height: 0.9375rem;
+  pointer-events: none;
+}
+
+/* Main Page styling */
+.mp-content-table {
+  /* Main border color */
+  margin: 0.5em 0;
+  width: 100%;
+  /* Body background color */
+  border: 0.0625rem solid #b44335;
+  background: #fefeff;
+}
+
+.mp-content-header {
+  padding: 0.5em 0;
+  /* Header background color */
+  border: 0;
+  border-bottom: 0.0625rem solid #b44335;
+  background: #b44335;
+  color: #ffffff;
+  font-size: 140%;
+  /* Main border color		*/
+}
+
+.mp-content-body {
+  padding: 0.5em;
+}
+
+/* Don't wordwrap top links on main page */
+.mp-content-table ul > li a.external.text,
+.mp-content-table ul > li > b > a {
+  white-space: nowrap;
+}
+
+.mp-content-header-alt,
+.mp-title-gradient {
+  background: #b44335;
+  color: #ffffff;
+}
+
+.mp-content-header-alt {
+  margin: -0.5em -0.5em 0;
+  padding: 0.5em 0.75em 0.5em 0.5em;
+  border: 0;
+  border-bottom: 0.0625rem solid #b44335;
+  color: #ffffff;
+  /* Main border color		*/
+  text-align: left;
+  font-weight: bold;
+  font-size: 140%;
+}
+
+/* Auto-size main page index icons */
+.mp-index-icon {
+  min-width: 4rem;
+  max-width: 8rem;
+  width: 100%;
+  /* Image sizes. Re-produce larger? */
+  height: auto;
+}
+
+/* The main page banner */
+.giant-banner {
+  margin-bottom: 1.25rem;
+}
+
+.giant-banner img {
+  object-fit: cover;
+  object-position: center;
+  width: 100%;
+  height: 100%;
+}
+
+#mw-js-message,
+.usermessage {
+  margin-bottom: 2.4375rem !important;
+}
+
+#mp-layout {
+  display: flex;
+  flex-direction: row;
+}
+
+#mp-layout #mp-left {
+  flex: 1 1 auto;
+  margin-right: 1em;
+}
+
+#mp-layout #mp-right {
+  flex: 0 0 31.25rem;
+}
+
+#mp-layout .mp-block {
+  margin-bottom: 1em;
+  padding: 1em;
+  border: solid 0.0625rem #660000;
+}
+
+#mp-layout .mp-block#battle-pass {
+  padding: 0;
+  border: 0;
+  background: var(--clr-moon-base);
+  text-align: center;
+}
+
+#mp-layout .mp-heading {
+  height: 3.125rem;
+  border-bottom: solid 0.0625rem #cccccc;
+  text-align: center;
+  font-weight: bold;
+  font-size: 170%;
+}
+
+#mp-layout #heroes .mp-content {
+  text-align: center;
+}
+
+.useful-articles-layout {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.useful-articles-layout > div {
+  flex: 0 0 33%;
+  max-width: 33%;
+  word-wrap: break-word;
+  min-width: 160px;
+}
+
+.useful-articles-layout > div > div:first-child {
+  text-align: center;
+  font-weight: bold;
+}
+
+/* End Main Page style */
+/* Sidebar */
+div#bodyContent2 {
+  margin-right: 20rem;
+  min-height: 57.5rem;
+  width: auto;
+  font-size: 0.8em;
+  line-height: 1.5em;
+}
+
+/* Fixing vector/main-ltr.css putting a white background on the Quotation template */
+table.quotation {
+  background: transparent !important;
+}
+
+/* Client-side image scaling */
+.images40pxwidth img {
+  width: 2.5rem;
+  height: auto;
+}
+
+/* Cosmetic label styles [[Template:Cosmetic]] */
+.cosmetic-label {
+  display: inline-block;
+  margin: 0.4375rem 0.3125rem 0;
+  vertical-align: top;
+  text-align: center;
+  line-height: normal;
+}
+.cosmetic-label > div {
+  margin-bottom: 0.3125rem;
+}
+
+/* Skill list styles [[Template:SkillListRich]] */
+div.skilllist {
+  width: 100%;
+}
+div.skilllist-title {
+  border: 0.0625rem solid #aaaaaa;
+  background-color: #ffaea3;
+  color: var(--clr-moon-base);
+  text-align: center;
+  font-weight: bold;
+  font-size: 100%;
+}
+div.skilllist ul {
+  display: flex;
+  overflow: hidden;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+}
+
+li.skilllist-lite,
+li.skilllist-rich {
+  display: inline-block;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.1875rem;
+  border: 0.0625rem solid #aaaaaa;
+  list-style: none;
+  vertical-align: top;
+  text-align: left;
+}
+
+li.skilllist-lite {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 110%;
+}
+
+div.skilllist-rich-head {
+  padding: 0.1875rem 0.3125rem;
+  border-bottom: 0.0625rem solid var(--clr-moon-base);
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 110%;
+}
+div.skilllist-rich-image {
+  display: inline-block;
+  width: 4rem;
+  vertical-align: top;
+}
+div.skilllist-rich-desc {
+  display: inline-block;
+  padding: 0.1875rem 0.3125rem;
+  max-width: calc( 100% - 74px );
+  vertical-align: top;
+}
+
+div.skilllist li.skilllist-lite a,
+div.skilllist li.skilllist-lite a:link,
+div.skilllist li.skilllist-lite a:visited,
+div.skilllist li.skilllist-lite a:hover,
+div.skilllist li.skilllist-lite a:active,
+li.skilllist-rich div.skilllist-rich-head a,
+li.skilllist-rich div.skilllist-rich-head a:link,
+li.skilllist-rich div.skilllist-rich-head a:visited,
+li.skilllist-rich div.skilllist-rich-head a:hover,
+li.skilllist-rich div.skilllist-rich-head a:active {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+/***************************
+* Desktop Specific Styles *
+***************************/
+/* Skill list styles [[Template:SkillListRich]] */
+div.skilllist-col1 ul li {
+  flex: 1 0 100%;
+  width: 100%;
+}
+
+div.skilllist-col2 ul li {
+  flex: 1 0 50%;
+  width: 50%;
+}
+
+div.skilllist-col3 ul li {
+  flex: 1 0 calc( 100%/3 );
+  width: calc( 100%/3 );
+}
+
+div.skilllist-col4 ul li {
+  flex: 1 0 25%;
+  width: 25%;
+}
+
+div.skilllist-col5 ul li {
+  flex: 1 0 20%;
+  width: 20%;
+}
+
+/******************************************
+* Custom Context Menu for Audio Download *
+*******************************************/
+#context-menu {
+  position: absolute;
+  display: none;
+}
+
+#context-menu ul,
+#context-menu li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: #ffaea3;
+}
+
+#context-menu {
+  border: solid 0.0625rem #cccccc;
+}
+
+#context-menu li {
+  border-bottom: solid 0.0625rem #cccccc;
+}
+#context-menu li:last-child {
+  border: 0;
+}
+
+#context-menu li a {
+  display: block;
+  padding: 0.125rem 0.3125rem;
+  text-decoration: none;
+  color: var(--clr-moon-base);
+  font-family: sans-serif;
+  font-size: 0.875em;
+}
+#context-menu li a:hover {
+  background: #b44335;
+  color: #ffffff;
+}
+
+.ability-description {
+  display: block;
+  float: right;
+  width: 19.5rem;
+}
+.ability-description.adItemOrRune {
+  width: 28.125rem;
+}
+
+.aml50 {
+  margin-left: 3.125rem;
+}
+
+.talsymbolbg {
+  display: inline-block;
+  vertical-align: top;
+  background-color: #151515;
+  box-shadow: 0.0625rem 0.0625rem 0.0625rem var(--clr-moon-base);
+  border-width: 0.0625rem;
+  border-radius: 50%;
+  padding: 0 0;
+  margin: 0 0;
+  overflow: hidden;
+}
+
+/* Import fonts */
+@font-face {
+  font-family: "Radiance";
+  src: url(https://steamcdn-a.akamaihd.net/apps/underlords/fonts/Radiance-Regular.woff) format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Radiance";
+  src: url(https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-bold.woff) format("woff");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Radiance";
+  src: url(https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-black.woff) format("woff");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Radiance";
+  src: url(https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-semibold.woff) format("woff");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Reaver";
+  src: url(https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular.woff) format("woff"), url(https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular.ttf) format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Reaver";
+  src: url(https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-SemiBold.woff) format("woff"), url(https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-SemiBold.ttf) format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Reaver";
+  src: url(https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Bold.woff) format("woff"), url(https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-Bold.ttf) format("truetype");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Reaver";
+  src: url(https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Black.woff) format("woff"), url(https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-Black.ttf) format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+/*
+* === Ability template ===
+*/
+.ability-background {
+  flex: 0 1 28.75rem;
+  margin-right: 0.9375rem;
+  vertical-align: top;
+}
+
+/*
+* === Relics ===
+*/
+.relics {
+  width: 8.75rem;
+  margin: 0.3125rem;
+  border: 0.0625rem solid #111111;
+  font-size: 80%;
+}
+
+/*
+* === GENERAL STYLES ===
+*/
+/*
+* Horizontal list ( .hlist ) styles
+*/
+.hlist ul {
+  margin: 0;
+}
+
+.hlist li {
+  display: inline;
+  margin: 0;
+  white-space: nowrap;
+  /* Generate interpuncts */
+}
+.hlist li::after {
+  content: " ·";
+  font-weight: bold;
+}
+.hlist li:last-child::after {
+  content: none;
+}
+
+/* Display nested lists inline */
+.hlist ul ul {
+  display: inline;
+  /* Add parens around nested lists */
+}
+.hlist ul ul::before {
+  content: "( ";
+}
+.hlist ul ul::after {
+  content: " )";
+}
+
+/*
+* Webm autoloop spacing fix
+*/
+.autoloop,
+.loop {
+  display: block;
+}
+
+td .autoloop,
+td .loop {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: unset;
+  max-width: 50rem !important;
+}
+
+/*
+* Pixel-art images
+*/
+img.pixelart {
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -o-crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  -ms-interpolation-mode: nearest-neighbor;
+}
+
+/* Image links ( [[Template:Ability ID]], [[Template:Hero ID]], ... ) */
+.image-link {
+  white-space: nowrap;
+}
+
+/*
+* Animatrion styles ( [[Template:Animate]] )
+*/
+.animated > *:not(.animated-active),
+.animated-paused > *:not(.animated-active),
+.animated > .animated-subframe > *:not(.animated-active),
+.animated-paused > .animated-subframe > *:not(.animated-active) {
+  display: none;
+}
+
+/*
+* Cosmetic Item infobox styles ( [[Template:Cosmetic item infobox]] )
+*/
+.buynow_wrapper {
+  height: 1.5rem;
+}
+.buynow_wrapper > a {
+  width: 100%;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.buynow_button {
+  display: block;
+  padding-left: 1.875rem;
+  height: 1.5rem;
+  background: linear-gradient(0deg, #000000 0%, #666666 100%);
+  color: #ffffff;
+  text-align: left;
+  text-decoration: none;
+  font-size: 90%;
+  line-height: 1.5rem;
+}
+.buynow_button:hover {
+  background: linear-gradient(0deg, #000000 0%, #999999 100%);
+}
+
+.buynow_store::before,
+.buynow_market::before {
+  position: absolute;
+  margin-left: -1.9375rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  content: "";
+  pointer-events: none;
+}
+
+html.theme--dark .patch-layout {
+  border: 0.0625rem solid #555555;
+}
+
+.patch-layout {
+  width: 100%;
+  border: 0.0625rem solid #aaaaaa;
+  border-collapse: unset;
+  text-align: center;
+}
+
+.patch-layout-last {
+  background: #b2d7e9;
+}
+html.theme--dark .patch-layout-last {
+  background: #202d78;
+}
+
+.patch-layout-all {
+  width: 27%;
+  background: #dee8ed;
+}
+html.theme--dark .patch-layout-all {
+  background: #313c7e;
+}
+
+.patch-layout-background {
+  background-color: #fdfaf8;
+  border: 0.0625rem solid #aaaaaa;
+  margin: 0.75em 0;
+  padding: 0.75em 1em 1em 1em;
+}
+html.theme--dark .patch-layout-background {
+  background-color: rgba(41, 41, 41, 0.7);
+  border: 0.0625rem solid #555555;
+}
+
+/*
+* Event Currency Colors
+*/
+.bp2020 {
+  color: #f0b000;
+}
+
+.bp2019 {
+  color: #8c1bcd;
+}
+
+.bp2018 {
+  color: #3ec415;
+}
+
+.bp2017 {
+  color: #08d8d8;
+}
+
+.bp2016 {
+  color: #e60000;
+}
+
+.dotaplus {
+  color: #d37708;
+}
+
+a.ext-audiobutton {
+  /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
+  font-family: "Font Awesome 5 Pro";
+}
+a.ext-audiobutton[data-state=play]::before {
+  content: "" !important;
+}
+.theme--light a.ext-audiobutton[data-state=play]::before {
+  color: #131313;
+}
+.theme--dark a.ext-audiobutton[data-state=play]::before {
+  color: #e2e2e6;
+}
+a.ext-audiobutton[data-state=pause]::before {
+  content: "" !important;
+}
+a.ext-audiobutton[data-state=error]::before {
+  color: #91663d;
+  content: "" !important;
+}
+a.ext-audiobutton::before {
+  display: inline-block;
+  width: 1em;
+  vertical-align: middle;
+}
+
+.wiki-dota2gameru blockquote.quote::before {
+  top: -2.5rem;
+}
+.wiki-dota2gameru blockquote.quote::after {
+  top: -2.5rem;
+  bottom: 0;
+}
