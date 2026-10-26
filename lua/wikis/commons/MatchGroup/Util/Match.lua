@@ -246,7 +246,6 @@ function MatchUtil.computeMatchPhase(match)
 		return 'finished'
 	end
 
-	-- Checked before reading the date, as parsing a date calls into MediaWiki
 	local isExact = Logic.readBoolOrNil(Logic.nilOr(match.dateIsExact, match.dateexact))
 	if isExact == false then
 		return 'upcoming'
