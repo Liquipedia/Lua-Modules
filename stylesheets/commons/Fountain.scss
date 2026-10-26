@@ -358,11 +358,12 @@ a.cf {
 	from {
 		clip-path: inset( 0 0 0 0 );
 	}
+
 	to {
 		clip-path: inset( 0 100% 0 0 );
 	}
 } /* Right to left. The fill is clipped, so the gradient does not squeeze. */
- 
+
 .hpmpbar_track {
 	height: 0.5rem; /* 8px */
 	box-sizing: border-box;
@@ -372,30 +373,30 @@ a.cf {
 	border-radius: 0.125rem; /* 2px */
 	overflow: hidden;
 }
- 
+
 .hpmpbar_track + .hpmpbar_track {
 	margin-top: 0.125rem; /* 2px */
 }
- 
+
 .hpmpbar_fill {
 	height: 100%;
 }
- 
+
 .hpmpbar_hp {
 	background: linear-gradient( to right, #286323, #387f28, #4a9e2e, #59b832, #6ad537, #72e33a, #7af03c );
 }
- 
+
 .hpmpbar_mp {
 	background: linear-gradient( to right, #1056db, #2171e1, #318ae7, #41a3ec, #4fbbf1, #5ed3f6, #73f5fe );
 }
- 
+
 .hpmpbar_drain {
 	animation-name: hpmpbar-drain;
 	animation-timing-function: linear;
 	animation-iteration-count: infinite;
 	animation-duration: 5s; /* overridden per spell by "mp alt duration" / "hp alt duration" */
 } /* mimics the hp and mp cost per interval. */
- 
+
 @media ( prefers-reduced-motion: reduce ) {
 	.hpmpbar_drain {
 		animation: none;
