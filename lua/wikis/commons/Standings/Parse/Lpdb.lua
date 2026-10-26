@@ -68,6 +68,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 	local opponents = {}
 	---@type table<string, MatchPhase>
 	local phaseByMatchId = {}
+	local lookupOpponent = StandingsParseLpdb.makeOpponentLookup(manualOpponents, options and options.importOpponents)
 	Lpdb.executeMassQuery(
 		'match2',
 		{
@@ -76,10 +77,9 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 		function(record)
 			local match2 = MatchGroupUtil.matchFromRecord(record)
 			phaseByMatchId[record.match2id] = match2.phase
-			local roundNumbers = matchIdToRound[record.match2id]
-			Array.forEach(roundNumbers, function(roundNumber)
-				StandingsParseLpdb.parseMatch(roundNumber, match2, opponents, scoreMapper, #rounds, manualOpponents, options)
-			end)
+			StandingsParseLpdb.parseMatch(
+				matchIdToRound[record.match2id], match2, opponents, scoreMapper, #rounds, lookupOpponent, options
+			)
 		end
 	)
 
@@ -137,22 +137,71 @@ function StandingsParseLpdb.newOpponent(opponentData, maxRounds)
 	}
 end
 
----Renames an opponent into the manual opponent it is an alias of, if any.
+---@class StandingsImportOpponentLookup
+---@field alias standardOpponent? # The manual opponent the opponent is an alias of
+---@field isPartOfStandings boolean
+---@field opponentData StandingTableOpponentData? # Set once the opponent is part of a counted match
+
+---Builds a cache key for an opponent, opponents with the same key are the same opponent.
+---Ignores opponents that are only TBD by name, as valid opponents never are.
+---Different keys can still be the same opponent (e.g. two templates sharing a historical template),
+---those are matched by `Opponent.same` when the opponent is first looked up.
+---@param opponent standardOpponent
+---@return string
+function StandingsParseLpdb.opponentKey(opponent)
+	if opponent.type == Opponent.team then
+		return opponent.type .. '|' .. (opponent.template or '')
+	end
+	return opponent.type .. '|' .. (Opponent.isTbd(opponent) and 'tbd|' or '') .. (Opponent.toName(opponent) or '')
+end
+
+---Returns a function that renames an opponent into the manual opponent it is an alias of, if any,
+---and looks up how it relates to the standings.
+---Opponents repeat across matches, so the lookup is cached per distinct opponent.
+---@param manualOpponents StandingTableOpponentData[]
+---@param importOpponents boolean?
+---@return fun(opponent: standardOpponent): StandingsImportOpponentLookup
+function StandingsParseLpdb.makeOpponentLookup(manualOpponents, importOpponents)
+	---@type table<string, StandingsImportOpponentLookup>
+	local lookupByKey = {}
+
+	return function(opponent)
+		-- The key has to be taken before the alias renames the opponent
+		local key = StandingsParseLpdb.opponentKey(opponent)
+		if not lookupByKey[key] then
+			local alias = StandingsParseLpdb.findAlias(opponent, manualOpponents)
+			lookupByKey[key] = {
+				alias = alias,
+				-- An alias is a manual opponent, so it is always part of the standings
+				isPartOfStandings = alias ~= nil
+					or StandingsParseLpdb.isPartOfStandings(opponent, manualOpponents, importOpponents),
+			}
+		end
+
+		local lookup = lookupByKey[key]
+		if lookup.alias then
+			opponent.template = lookup.alias.template
+			opponent.name = lookup.alias.name
+		end
+		return lookup
+	end
+end
+
+---Finds the manual opponent an opponent is an alias of, if any.
+---Aliases are only supported for team opponents.
 ---@param opponent standardOpponent
 ---@param manualOpponents StandingTableOpponentData[]
-function StandingsParseLpdb.applyAliases(opponent, manualOpponents)
+---@return standardOpponent?
+function StandingsParseLpdb.findAlias(opponent, manualOpponents)
+	if opponent.type ~= Opponent.team then
+		return
+	end
 	local opponentToUse = Array.find(manualOpponents, function(manualOpponent)
 		return Array.any(manualOpponent.aliases or {}, function(alias)
 			return Opponent.same(opponent, alias)
 		end)
 	end)
-
-	if not opponentToUse or not opponentToUse.opponent then
-		return
-	end
-
-	opponent.template = opponentToUse.opponent.template
-	opponent.name = opponentToUse.opponent.name
+	return opponentToUse and opponentToUse.opponent or nil
 end
 
 ---Checks whether an opponent ends up in the standings table, either because it is listed manually
@@ -176,25 +225,23 @@ function StandingsParseLpdb.isPartOfStandings(opponent, manualOpponents, importO
 	return not Opponent.isTbd(opponent)
 end
 
----@param roundNumber integer
+---@param roundNumbers integer[]
 ---@param match2 MatchGroupUtilMatch
 ---@param opponents StandingTableOpponentData[]
 ---@param scoreMapper fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number?
 ---@param maxRounds integer
----@param manualOpponents StandingTableOpponentData[]
+---@param lookupOpponent fun(opponent: standardOpponent): StandingsImportOpponentLookup
 ---@param options StandingsImportOptions?
-function StandingsParseLpdb.parseMatch(roundNumber, match2, opponents, scoreMapper, maxRounds, manualOpponents, options)
+function StandingsParseLpdb.parseMatch(roundNumbers, match2, opponents, scoreMapper, maxRounds, lookupOpponent, options)
 	options = options or {}
 
-	Array.forEach(match2.opponents, function(opponent)
-		StandingsParseLpdb.applyAliases(opponent, manualOpponents)
-	end)
+	local lookups = Array.map(match2.opponents, lookupOpponent)
 
 	--- In exclusive mode every opponent of the match has to be part of the standings,
 	--- otherwise the match is not counted at all. In non-exclusive mode a single one is enough.
 	local opponentCheck = options.exclusive and Array.all or Array.any
-	local isRelevantMatch = opponentCheck(match2.opponents, function(opponent)
-		return StandingsParseLpdb.isPartOfStandings(opponent, manualOpponents, options.importOpponents)
+	local isRelevantMatch = opponentCheck(lookups, function(lookup)
+		return lookup.isPartOfStandings
 	end)
 	if not isRelevantMatch then
 		return
@@ -206,25 +253,28 @@ function StandingsParseLpdb.parseMatch(roundNumber, match2, opponents, scoreMapp
 			.. ' is a Bo' .. tostring(match2.bestof))
 	end
 
-	Array.forEach(match2.opponents, function(opponent)
-		local standingsOpponentData = Array.find(opponents, function(opponentData)
+	Array.forEach(match2.opponents, function(opponent, opponentIndex)
+		local lookup = lookups[opponentIndex]
+		lookup.opponentData = lookup.opponentData or Array.find(opponents, function(opponentData)
 			return Opponent.same(opponentData.opponent, opponent)
 		end)
-		if not standingsOpponentData then
-			standingsOpponentData = StandingsParseLpdb.newOpponent(opponent, maxRounds)
-			table.insert(opponents, standingsOpponentData)
+		if not lookup.opponentData then
+			lookup.opponentData = StandingsParseLpdb.newOpponent(opponent, maxRounds)
+			table.insert(opponents, lookup.opponentData)
 		end
-		assert(standingsOpponentData.rounds[roundNumber], 'Round number out of bounds')
 
-		-- The scoreboard of the round is tallied from these in importFromMatches
-		local opponentRoundData = standingsOpponentData.rounds[roundNumber]
-		opponentRoundData.specialstatus = ''
-		opponentRoundData.matches = Array.append(opponentRoundData.matches or {}, match2)
 		local points = scoreMapper(opponent, match2)
-		if points then
-			opponentRoundData.matchPoints = opponentRoundData.matchPoints or {}
-			opponentRoundData.matchPoints[match2.matchId] = points
-		end
+		Array.forEach(roundNumbers, function(roundNumber)
+			-- The scoreboard of the round is tallied from these in importFromMatches
+			local opponentRoundData = assert(lookup.opponentData.rounds[roundNumber], 'Round number out of bounds')
+			opponentRoundData.specialstatus = ''
+			opponentRoundData.matches = opponentRoundData.matches or {}
+			table.insert(opponentRoundData.matches, match2)
+			if points then
+				opponentRoundData.matchPoints = opponentRoundData.matchPoints or {}
+				opponentRoundData.matchPoints[match2.matchId] = points
+			end
+		end)
 	end)
 end
 
