@@ -59,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 			Array.appendWith(widgets,
 				Logic.isNotEmpty(maps) and table.insert(widgets, Title{children = 'Maps'}) or nil,
 				Center{children = table.concat(maps, '&nbsp;• ')}
-		)
+			)
 		end
 	end
 	return widgets
