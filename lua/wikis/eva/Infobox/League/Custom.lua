@@ -22,7 +22,12 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 
 ---@class EvaLeagueInfobox: InfoboxLeague
+---@operator call(Frame): EvaLeagueInfobox
 local CustomLeague = Class.new(League)
+
+---@class EvaLeagueInfoboxWidgetInjector: WidgetInjector
+---@operator call(EvaLeagueInfobox): EvaLeagueInfoboxWidgetInjector
+---@field caller EvaLeagueInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
