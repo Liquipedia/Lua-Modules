@@ -99,7 +99,11 @@ function StandingsTable.fromTemplate(frame)
 	end
 
 	StandingsStorage.run(standingsTable, {saveVars = true, storeLpdb = storeLpdb})
-	return StandingsDisplay{pageName = mw.title.getCurrentTitle().text, standingsIndex = standingsTable.standingsindex}
+	return StandingsDisplay{
+		pageName = mw.title.getCurrentTitle().text,
+		standingsIndex = standingsTable.standingsindex,
+		width = StandingsParseWiki.parseWidth(args),
+	}
 end
 
 ---@param manualOpponents StandingTableOpponentData[]

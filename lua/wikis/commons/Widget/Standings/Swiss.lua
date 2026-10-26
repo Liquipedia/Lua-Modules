@@ -21,7 +21,7 @@ local StandingsDisplayUtil = Lua.import('Module:Standings/DisplayUtil')
 
 local Helpers = {}
 
----@param props {standings?: StandingsModel}
+---@param props {standings?: StandingsModel, width: number?}
 ---@return Renderable?
 local function StandingsSwiss(props)
 	local standings = props.standings
@@ -35,6 +35,7 @@ local function StandingsSwiss(props)
 
 	return TableWidgets.Table{
 		classes = {'standings-swiss'},
+		css = {width = props.width and (props.width .. 'px') or nil},
 		title = Logic.nilIfEmpty(standings.title),
 		columns = Helpers.buildColumnDefinitions(standings, statsToShow),
 		children = WidgetUtil.collect(

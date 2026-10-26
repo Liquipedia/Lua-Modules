@@ -360,6 +360,13 @@ function StandingsParseWiki.parseWalkoverRounds(args)
 	return readNonNegativeInteger(args, 'walkoverrounds')
 end
 
+---Reads the `width` input in px, e.g. `600` or `600px`, the same as the width of a matchlist.
+---@param args table
+---@return number?
+function StandingsParseWiki.parseWidth(args)
+	return tonumber((string.gsub(args.width or '', 'px', '')))
+end
+
 ---Reads whether overtime is tracked separately from regulation. Requires an overtime config on the wiki.
 ---@param args table
 ---@return boolean

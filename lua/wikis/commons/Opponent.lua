@@ -298,6 +298,10 @@ function Opponent.same(opponent1, opponent2)
 		return (player.pageName:gsub(' ', '_'))
 	end
 
+	if opponent1.type == Opponent.solo then
+		return getPageName(opponent1.players[1] or {}) == getPageName(opponent2.players[1] or {})
+	end
+
 	return Array.equals(
 		Array.sortBy(
 			Array.map(opponent1.players, getPageName), FnUtil.identity
