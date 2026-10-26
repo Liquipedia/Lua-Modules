@@ -17,6 +17,12 @@ local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParser = {}
 
+---@class StandingsParserOptions
+---@field drawConfig {match: boolean?}? Explicit draw toggles per level; when unset, draws are detected from the data
+---@field overtime boolean? Whether overtime results are tracked separately from regulation results
+---@field walkoverGames integer? Games a walkover counts as in the game tiebreakers, unset means not counted
+---@field walkoverRounds integer? Rounds a walkover map counts as in the round tiebreakers, unset means not counted
+
 ---@param rounds {roundNumber: integer, started: boolean, finished:boolean, title: string?}[]
 ---@param opponents StandingTableOpponentData[]
 ---@param bgs table<integer, string>
@@ -24,15 +30,10 @@ local StandingsParser = {}
 ---@param matches string[]
 ---@param standingsType StandingsTableTypes
 ---@param tiebreakerIds string[]
----@param drawConfig {match: boolean?}? Explicit draw toggles per level; when unset, draws are detected from the data
----@param overtimeEnabled boolean? Whether overtime results are tracked separately from regulation results
----@param walkoverGames number? Games a walkover counts as in the game tiebreakers, unset means not counted
----@param walkoverRounds number? Rounds a walkover map counts as in the round tiebreakers, unset means not counted
+---@param options StandingsParserOptions?
 ---@return StandingsTableStorage
-function StandingsParser.parse(
-	rounds, opponents, bgs, title, matches, standingsType, tiebreakerIds, drawConfig, overtimeEnabled, walkoverGames,
-	walkoverRounds
-)
+function StandingsParser.parse(rounds, opponents, bgs, title, matches, standingsType, tiebreakerIds, options)
+	options = options or {}
 	-- TODO: When all legacy (of all standing type) have been converted, the wiki variable should be updated
 	-- to follow the namespace format. Eg new name could be `standings_standingsindex`
 	local lastStandingsIndex = tonumber(Variables.varDefault('standingsindex')) or -1
@@ -46,7 +47,7 @@ function StandingsParser.parse(
 		local carryData = {
 			points = opponentData.startingPoints or 0,
 			match = {w = 0, d = 0, l = 0},
-			overtime = overtimeEnabled and {w = 0, l = 0} or nil,
+			overtime = options.overtime and {w = 0, l = 0} or nil,
 		}
 		local opponentRounds = opponentData.rounds
 
@@ -109,12 +110,16 @@ function StandingsParser.parse(
 	---@type table<StandingsDrawLevel, boolean>
 	local draws = {
 		match = Logic.nilOr(
-			(drawConfig or {}).match,
+			(options.drawConfig or {}).match,
 			Array.any(entries, function(entry) return entry.match.d > 0 end)
 		),
 	}
 	---@type StandingsTiebreakerOptions
-	local tiebreakerOptions = {draws = draws, walkoverGames = walkoverGames, walkoverRounds = walkoverRounds}
+	local tiebreakerOptions = {
+		draws = draws,
+		walkoverGames = options.walkoverGames,
+		walkoverRounds = options.walkoverRounds,
+	}
 
 	---@param tiebreakerId string
 	---@return StandingsAdditionalStat
@@ -180,7 +185,7 @@ function StandingsParser.parse(
 		matches = matches,
 		roundcount = #rounds,
 		hasdraw = draws.match,
-		hasovertime = Logic.readBool(overtimeEnabled),
+		hasovertime = Logic.readBool(options.overtime),
 		haspoints = true,
 		finished = isFinished,
 		extradata = {
