@@ -355,11 +355,11 @@ a.cf {
 }
 
 @keyframes hpmpbar-drain {
-	from { 
-		clip-path: inset( 0 0 0 0 ); 
+	from {
+		clip-path: inset( 0 0 0 0 );
 	}
-	to { 
-		clip-path: inset( 0 100% 0 0 ); 
+	to {
+		clip-path: inset( 0 100% 0 0 );
 	}
 } /* Right to left. The fill is clipped, so the gradient does not squeeze. */
  
