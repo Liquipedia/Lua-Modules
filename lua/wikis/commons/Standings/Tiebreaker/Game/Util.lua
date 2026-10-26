@@ -20,6 +20,17 @@ local TiebreakerGameUtil = {}
 local WALKOVER_WIN_STATUS = 'W'
 local WALKOVER_LOSS_STATUSES = {FF = true, DQ = true, L = true}
 
+---Walkover result of an opponent of a match or game, a W status is a win and FF, DQ and L are losses.
+---@param status string?
+---@return 'w'|'l'|nil
+function TiebreakerGameUtil.getWalkoverResult(status)
+	if status == WALKOVER_WIN_STATUS then
+		return 'w'
+	elseif WALKOVER_LOSS_STATUSES[status] then
+		return 'l'
+	end
+end
+
 ---@param opponent TiebreakerOpponent
 ---@return {games: integer, w: integer, l: integer, walkover: {w: integer, l: integer}?}
 local getPlayedGames = FnUtil.memoize(function (opponent)
@@ -30,12 +41,11 @@ local getPlayedGames = FnUtil.memoize(function (opponent)
 	Array.forEach(opponent.matches, function (match)
 		local opponentIndex = Array.indexOf(match.opponents, FnUtil.curry(Opponent.same, opponent.opponent))
 
-		-- Walkovers are read from the status of the opponent itself, W is a win and FF, DQ and L are losses
-		local status = match.opponents[opponentIndex].status
-		if match.finished and status == WALKOVER_WIN_STATUS then
+		local walkover = match.finished and TiebreakerGameUtil.getWalkoverResult(match.opponents[opponentIndex].status)
+		if walkover == 'w' then
 			walkoverWins = walkoverWins + 1
 			return
-		elseif match.finished and WALKOVER_LOSS_STATUSES[status] then
+		elseif walkover == 'l' then
 			walkoverLosses = walkoverLosses + 1
 			return
 		end

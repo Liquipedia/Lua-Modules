@@ -137,6 +137,21 @@ describe('Standings Wiki Parser', function()
 		end)
 	end)
 
+	describe('walkover rounds', function()
+		it('reads the walkoverrounds input', function()
+			assert.are_equal(13, StandingsParseWiki.parseWalkoverRounds{walkoverrounds = '13'})
+			assert.are_equal(0, StandingsParseWiki.parseWalkoverRounds{walkoverrounds = '0'})
+			assert.is_nil(StandingsParseWiki.parseWalkoverRounds{walkoverrounds = ''})
+			assert.is_nil(StandingsParseWiki.parseWalkoverRounds{})
+		end)
+
+		it('errors on input that is not a non-negative integer', function()
+			for _, input in ipairs({'abc', '-1', '1.5'}) do
+				assert.error(function() StandingsParseWiki.parseWalkoverRounds{walkoverrounds = input} end)
+			end
+		end)
+	end)
+
 	describe('points', function()
 		it('defaults to the swiss points', function()
 			assert.are_same({w = 1, d = 0.5, l = 0}, StandingsParseWiki.parsePoints(nil))

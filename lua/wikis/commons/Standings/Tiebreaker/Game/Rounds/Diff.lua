@@ -19,7 +19,9 @@ local TiebreakerRoundDiff = Class.new(TiebreakerInterface)
 ---@param opponent TiebreakerOpponent
 ---@return integer
 function TiebreakerRoundDiff:valueOf(state, opponent)
-	local rounds = TiebreakerRoundUtil.getRounds(opponent)
+	local rounds = TiebreakerRoundUtil.getRounds(
+		opponent, self.options.walkoverRounds, self.options.walkoverGames
+	)
 	return rounds.w - rounds.l
 end
 
@@ -32,7 +34,9 @@ end
 ---@param opponent TiebreakerOpponent
 ---@return string
 function TiebreakerRoundDiff:display(state, opponent)
-	local rounds = TiebreakerRoundUtil.getRounds(opponent)
+	local rounds = TiebreakerRoundUtil.getRounds(
+		opponent, self.options.walkoverRounds, self.options.walkoverGames
+	)
 	return rounds.w .. ' - ' .. rounds.l
 end
 

@@ -27,9 +27,11 @@ local StandingsParser = {}
 ---@param drawConfig {match: boolean?}? Explicit draw toggles per level; when unset, draws are detected from the data
 ---@param overtimeEnabled boolean? Whether overtime results are tracked separately from regulation results
 ---@param walkoverGames number? Games a walkover counts as in the game tiebreakers, unset means not counted
+---@param walkoverRounds number? Rounds a walkover map counts as in the round tiebreakers, unset means not counted
 ---@return StandingsTableStorage
 function StandingsParser.parse(
-	rounds, opponents, bgs, title, matches, standingsType, tiebreakerIds, drawConfig, overtimeEnabled, walkoverGames
+	rounds, opponents, bgs, title, matches, standingsType, tiebreakerIds, drawConfig, overtimeEnabled, walkoverGames,
+	walkoverRounds
 )
 	-- TODO: When all legacy (of all standing type) have been converted, the wiki variable should be updated
 	-- to follow the namespace format. Eg new name could be `standings_standingsindex`
@@ -112,7 +114,7 @@ function StandingsParser.parse(
 		),
 	}
 	---@type StandingsTiebreakerOptions
-	local tiebreakerOptions = {draws = draws, walkoverGames = walkoverGames}
+	local tiebreakerOptions = {draws = draws, walkoverGames = walkoverGames, walkoverRounds = walkoverRounds}
 
 	---@param tiebreakerId string
 	---@return StandingsAdditionalStat

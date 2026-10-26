@@ -327,22 +327,37 @@ function StandingsParseWiki.parseDrawConfig(args)
 	}
 end
 
+---@param args table
+---@param key string
+---@return integer?
+local function readNonNegativeInteger(args, key)
+	local input = args[key]
+	if Logic.isEmpty(input) then
+		return nil
+	end
+	local value = tonumber(input)
+	assert(
+		value and value >= 0 and value == math.floor(value),
+		'Invalid ' .. key .. ' input: "' .. input .. '" is not a non-negative integer'
+	)
+	return value
+end
+
 ---Reads the `walkovergames` input, the number of games a walkover (FF, DQ, L) counts as in the game tiebreakers.
 ---The winner of the walkover is credited with that many game wins, the loser with that many game losses.
 ---Unset means walkovers do not count towards the games.
 ---@param args table
 ---@return integer?
 function StandingsParseWiki.parseWalkoverGames(args)
-	local input = args.walkovergames
-	if Logic.isEmpty(input) then
-		return nil
-	end
-	local walkoverGames = tonumber(input)
-	assert(
-		walkoverGames and walkoverGames >= 0 and walkoverGames == math.floor(walkoverGames),
-		'Invalid walkovergames input: "' .. input .. '" is not a non-negative integer'
-	)
-	return walkoverGames
+	return readNonNegativeInteger(args, 'walkovergames')
+end
+
+---Reads the `walkoverrounds` input, the number of rounds a walkover (FF, DQ, L) of a map counts as in the round
+---tiebreakers. Unset means walkovers do not count towards the rounds.
+---@param args table
+---@return integer?
+function StandingsParseWiki.parseWalkoverRounds(args)
+	return readNonNegativeInteger(args, 'walkoverrounds')
 end
 
 ---Reads whether overtime is tracked separately from regulation. Requires an overtime config on the wiki.

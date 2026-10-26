@@ -91,7 +91,7 @@ function StandingsTable.fromTemplate(frame)
 
 	local standingsTable = StandingsParser.parse(
 		rounds, opponents, bgs, title, matches, tableType, tiebreakers, StandingsParseWiki.parseDrawConfig(args),
-		overtime, StandingsParseWiki.parseWalkoverGames(args)
+		overtime, StandingsParseWiki.parseWalkoverGames(args), StandingsParseWiki.parseWalkoverRounds(args)
 	)
 
 	if tableType == 'swiss' then
