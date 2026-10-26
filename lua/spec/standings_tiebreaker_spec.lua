@@ -762,6 +762,14 @@ describe('Standings Tiebreakers', function()
 			assert.are_same({rounds = 26, w = 0, l = 26}, TiebreakerRoundUtil.getRounds(bravo, 13))
 		end)
 
+		it('counts the maps needed to win an even best-of', function()
+			local TiebreakerRoundUtil = require('Module:Standings/Tiebreaker/Game/Rounds/Util')
+			local match = makeMatch({'Alpha', 'Bravo'}, {winner = 1, statuses = {'W', 'FF'}})
+			match.bestof = 2
+			local alpha = opponent('Alpha', {matches = {match}})
+			assert.are_same({rounds = 26, w = 26, l = 0}, TiebreakerRoundUtil.getRounds(alpha, 13))
+		end)
+
 		it('counts a walkover of the match as walkovergames maps when set', function()
 			local TiebreakerRoundUtil = require('Module:Standings/Tiebreaker/Game/Rounds/Util')
 			local match = makeMatch({'Alpha', 'Bravo'}, {winner = 1, statuses = {'W', 'FF'}})

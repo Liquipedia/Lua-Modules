@@ -34,7 +34,7 @@ local getPlayedRounds = FnUtil.memoize(function (opponent)
 			and TiebreakerGameUtil.getWalkoverResult(match.opponents[opponentIndex].status)
 		if matchWalkover then
 			walkoverMatches[matchWalkover] = walkoverMatches[matchWalkover] + 1
-			local maps = math.max(math.ceil((match.bestof or 0) / 2), 1)
+			local maps = math.floor((match.bestof or 0) / 2) + 1
 			walkoverMatchMaps[matchWalkover] = walkoverMatchMaps[matchWalkover] + maps
 		end
 
