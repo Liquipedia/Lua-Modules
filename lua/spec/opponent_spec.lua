@@ -463,6 +463,57 @@ describe('opponent', function()
 
 			TeamTemplateMock.tearDown()
 		end)
+
+		describe('solo', function ()
+			local function solo(...)
+				return {type = Opponent.solo, players = {...}}
+			end
+			local function player(pageName, displayName)
+				return {pageName = pageName, displayName = displayName or pageName}
+			end
+			local tbdPlayer = {displayName = 'TBD'}
+
+			it('same page', function ()
+				assert.is_true(Opponent.same(solo(player('Faker')), solo(player('Faker'))))
+				assert.is_true(Opponent.same(solo(player('Faker', 'faker')), solo(player('Faker', 'FAKER'))))
+			end)
+
+			it('spaces and underscores', function ()
+				assert.is_true(Opponent.same(solo(player('A Bai')), solo(player('A_Bai'))))
+				assert.is_true(Opponent.same(solo(player('A_Bai')), solo(player('A Bai'))))
+			end)
+
+			it('different pages', function ()
+				assert.is_false(Opponent.same(solo(player('Faker')), solo(player('Deft'))))
+				assert.is_false(Opponent.same(solo(player('Faker', 'Deft')), solo(player('Deft', 'Deft'))))
+			end)
+
+			it('tbd players', function ()
+				assert.is_false(Opponent.same(solo(tbdPlayer), solo(player('Faker'))))
+				assert.is_false(Opponent.same(solo(player('Faker')), solo(tbdPlayer)))
+				assert.is_false(Opponent.same(solo(player('Faker')), solo({pageName = 'Faker'})))
+				assert.is_true(Opponent.same(solo(tbdPlayer), solo(tbdPlayer)))
+				assert.is_true(Opponent.same(solo(tbdPlayer), solo({displayName = ''})))
+				assert.is_true(Opponent.same(solo(player('Faker', 'tbd')), solo(player('Deft', 'TBD'))))
+			end)
+
+			it('mismatched player counts', function ()
+				assert.is_false(Opponent.same(solo(player('Faker')), solo()))
+				assert.is_false(Opponent.same(solo(), solo(player('Faker'))))
+				assert.is_true(Opponent.same(solo(tbdPlayer), solo()))
+				assert.is_true(Opponent.same(solo(), solo()))
+				assert.is_true(Opponent.same(solo(), solo(tbdPlayer)))
+			end)
+
+			it('non-tbd player without page name', function ()
+				assert.has_error(function ()
+					Opponent.same(solo(player('Faker')), solo({displayName = 'Faker'}))
+				end)
+				assert.has_error(function ()
+					Opponent.same(solo({displayName = 'Faker'}), solo(tbdPlayer))
+				end)
+			end)
+		end)
 	end)
 
 	--not testing `resolve` due to missing team templates and lpdb data

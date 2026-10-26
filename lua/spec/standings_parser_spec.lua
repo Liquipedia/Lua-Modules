@@ -277,7 +277,8 @@ describe('Standings Parser', function()
 
 		it('respects an explicit disable even if there are draws', function()
 			local standingsTable = StandingsParser.parse(
-				TWO_FINISHED_ROUNDS, makeOpponents(true), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, {match = false})
+				TWO_FINISHED_ROUNDS, makeOpponents(true), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS,
+				{drawConfig = {match = false}})
 
 			assert.is_false(standingsTable.hasdraw)
 			assert.are_equal('1 - 0', display(standingsTable, 'Alpha', 1))
@@ -286,7 +287,8 @@ describe('Standings Parser', function()
 
 		it('respects an explicit enable even if there are no draws', function()
 			local standingsTable = StandingsParser.parse(
-				TWO_FINISHED_ROUNDS, makeOpponents(false), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, {match = true})
+				TWO_FINISHED_ROUNDS, makeOpponents(false), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS,
+				{drawConfig = {match = true}})
 
 			assert.is_true(standingsTable.hasdraw)
 			assert.are_equal('1 - 0 - 0', display(standingsTable, 'Alpha', 1))
@@ -961,7 +963,7 @@ describe('Standings Parser', function()
 
 		it('carries overtime across rounds', function()
 			local standingsTable = StandingsParser.parse(
-				TWO_FINISHED_ROUNDS, makeOpponents(), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, nil, true)
+				TWO_FINISHED_ROUNDS, makeOpponents(), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, {overtime = true})
 
 			assert.is_true(standingsTable.hasovertime)
 			assert.are_same({w = 0, l = 0}, findEntry(standingsTable.entries, 'Alpha', 1).overtime)
@@ -988,7 +990,7 @@ describe('Standings Parser', function()
 
 		it('places by total wins including overtime', function()
 			local standingsTable = StandingsParser.parse(
-				TWO_FINISHED_ROUNDS, makeOpponents(), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, nil, true)
+				TWO_FINISHED_ROUNDS, makeOpponents(), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, {overtime = true})
 
 			-- Alpha 2 wins, Bravo 2 losses
 			assert.are_equal(1, findEntry(standingsTable.entries, 'Alpha', 2).placement)

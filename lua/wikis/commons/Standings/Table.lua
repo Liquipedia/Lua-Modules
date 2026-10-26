@@ -89,10 +89,11 @@ function StandingsTable.fromTemplate(frame)
 		round.started, round.finished = StandingsParser.resolveRoundStatus(round, matchPhasesByRound[round.roundNumber])
 	end)
 
-	local standingsTable = StandingsParser.parse(
-		rounds, opponents, bgs, title, matches, tableType, tiebreakers, StandingsParseWiki.parseDrawConfig(args),
-		overtime, StandingsParseWiki.parseWalkoverGames(args)
-	)
+	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType, tiebreakers, {
+		drawConfig = StandingsParseWiki.parseDrawConfig(args),
+		overtime = overtime,
+		walkoverGames = StandingsParseWiki.parseWalkoverGames(args),
+	})
 
 	if tableType == 'swiss' then
 		standingsTable.extradata.placemapping = Logic.wrapTryOrLog(StandingsParseWiki.parsePlaceMapping)(args, opponents)

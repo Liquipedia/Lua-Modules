@@ -242,15 +242,20 @@ end
 ---@param match MatchGroupUtilMatch|MatchGroupUtilGame|PartialMatchGameRecord
 ---@return MatchPhase
 function MatchUtil.computeMatchPhase(match)
-	local isExact = Logic.readBoolOrNil(Logic.nilOr(match.dateIsExact, match.dateexact))
-	local matchStartTimestamp = match.timestamp or Date.readTimestampOrNil(match.date) or Date.defaultTimestamp
 	if match.winner or Logic.readBool(match.finished) then
 		return 'finished'
-	elseif isExact ~= false and matchStartTimestamp ~= Date.defaultTimestamp and matchStartTimestamp <= NOW then
-		return 'ongoing'
-	else
+	end
+
+	local isExact = Logic.readBoolOrNil(Logic.nilOr(match.dateIsExact, match.dateexact))
+	if isExact == false then
 		return 'upcoming'
 	end
+
+	local matchStartTimestamp = match.timestamp or Date.readTimestampOrNil(match.date) or Date.defaultTimestamp
+	if matchStartTimestamp ~= Date.defaultTimestamp and matchStartTimestamp <= NOW then
+		return 'ongoing'
+	end
+	return 'upcoming'
 end
 
 return MatchUtil
