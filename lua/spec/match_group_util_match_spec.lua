@@ -387,10 +387,65 @@ insulate('MatchGroup/Util/Match', function()
 			assert.are_equal('finished', MatchUtil.computeMatchPhase{finished = true, date = '2099-01-01'})
 		end)
 
+		it('is finished regardless of the date', function()
+			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			assert.are_equal('finished', MatchUtil.computeMatchPhase{winner = 2})
+			assert.are_equal('finished', MatchUtil.computeMatchPhase{finished = '1'})
+			assert.are_equal('finished',
+				MatchUtil.computeMatchPhase{winner = 1, date = '2020-01-01 12:00:00', dateexact = '0'})
+			assert.are_equal('finished',
+				MatchUtil.computeMatchPhase{finished = true, timestamp = 1577880000, dateIsExact = true})
+		end)
+
+		it('is finished on a winner even without the finished flag', function()
+			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			assert.are_equal('finished',
+				MatchUtil.computeMatchPhase{winner = 1, finished = false, date = '2020-01-01 12:00:00'})
+		end)
+
+		it('does not parse the date of a finished match', function()
+			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local formatDateSpy = spy.on(mw.language, 'formatDate')
+			MatchUtil.computeMatchPhase{winner = 1, date = '2020-01-01 12:00:00', dateIsExact = true}
+			MatchUtil.computeMatchPhase{finished = '1', date = '2099-01-01 12:00:00'}
+			assert.spy(formatDateSpy).was_not_called()
+			formatDateSpy:revert()
+		end)
+
+		it('does not parse the date when it is explicitly not exact', function()
+			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local formatDateSpy = spy.on(mw.language, 'formatDate')
+			MatchUtil.computeMatchPhase{date = '2020-01-01 12:00:00', dateexact = '0'}
+			assert.spy(formatDateSpy).was_not_called()
+			formatDateSpy:revert()
+		end)
+
+		it('parses the date of a match that is not finished', function()
+			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			local formatDateSpy = spy.on(mw.language, 'formatDate')
+			MatchUtil.computeMatchPhase{date = '2020-01-01 12:00:00', dateIsExact = true}
+			assert.spy(formatDateSpy).was_called()
+			formatDateSpy:revert()
+		end)
+
 		it('is ongoing once an exact start time has passed', function()
 			local MatchUtil = require('Module:MatchGroup/Util/Match')
 			assert.are_equal('ongoing',
 				MatchUtil.computeMatchPhase{date = '2020-01-01 12:00:00', dateIsExact = true})
+		end)
+
+		it('is ongoing when the finished flag is explicitly off', function()
+			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			assert.are_equal('ongoing',
+				MatchUtil.computeMatchPhase{finished = false, date = '2020-01-01 12:00:00', dateIsExact = true})
+			assert.are_equal('ongoing',
+				MatchUtil.computeMatchPhase{finished = '0', date = '2020-01-01 12:00:00', dateexact = '1'})
+		end)
+
+		it('treats a date without an exactness flag as exact', function()
+			local MatchUtil = require('Module:MatchGroup/Util/Match')
+			assert.are_equal('ongoing', MatchUtil.computeMatchPhase{date = '2020-01-01 12:00:00'})
+			assert.are_equal('upcoming', MatchUtil.computeMatchPhase{date = '2099-01-01 12:00:00'})
 		end)
 
 		it('is upcoming before the start time', function()
