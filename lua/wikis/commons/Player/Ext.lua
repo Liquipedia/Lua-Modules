@@ -358,15 +358,23 @@ function PlayerExt.syncTeam(pageName, template, options)
 		entry.isResolved = true
 	end
 
-	if options.savePageVar ~= false and entry
-		and (entry and entry.template) ~= (pageVarEntry and pageVarEntry.template) then
+	---@return table
+	local function getWikiVar()
+		if not entry then
+			-- return this so that we do not query for these cases further down on the page
+			return {timeless = {isTimeless = true}}
+		end
 		if entry.isTimeless then
 			history.timeless = entry
 		else
 			table.insert(history, entry)
 			Array.sortInPlaceBy(history, function(e) return e.joinDate end)
 		end
-		playerVars:set(pageName .. '.teamHistory', Json.stringify(history))
+		return history
+	end
+
+	if options.savePageVar ~= false and ((pageVarEntry or {}).template ~= (entry or {}).template or not pageVarEntry) then
+		playerVars:set(pageName .. '.teamHistory', Json.stringify(getWikiVar()))
 	end
 
 	if not entry then
