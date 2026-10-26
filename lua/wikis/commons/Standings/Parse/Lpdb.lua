@@ -27,10 +27,13 @@ local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParseLpdb = {}
 
+local MATCH_COLUMNS = {'match2id', 'match2opponents', 'bestof', 'date', 'dateexact', 'extradata', 'finished', 'winner'}
+
 ---@class StandingsImportOptions
 ---@field exclusive boolean? # If set, only matches where every opponent is part of the standings are imported
 ---@field importOpponents boolean? # If set, opponents not listed manually still count as part of the standings
 ---@field overtime boolean? # If set, results of overtime matches are tracked separately from regulation results
+---@field includeGames boolean? # If set, the games of the matches are imported as well (always with overtime)
 
 ---@param rounds {roundNumber: integer, matches: string[]}[]
 ---@param scoreMapper fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number|nil
@@ -69,12 +72,15 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 	---@type table<string, MatchPhase>
 	local phaseByMatchId = {}
 	local lookupOpponent = StandingsParseLpdb.makeOpponentLookup(manualOpponents, options and options.importOpponents)
+	local includeGames = options and (options.includeGames or options.overtime)
 	Lpdb.executeMassQuery(
 		'match2',
 		{
 			conditions = tostring(conditions),
+			query = table.concat(Array.append(MATCH_COLUMNS, includeGames and 'match2games' or nil), ', '),
 		},
 		function(record)
+			record.match2games = record.match2games or {}
 			local match2 = MatchGroupUtil.matchFromRecord(record)
 			phaseByMatchId[record.match2id] = match2.phase
 			StandingsParseLpdb.parseMatch(

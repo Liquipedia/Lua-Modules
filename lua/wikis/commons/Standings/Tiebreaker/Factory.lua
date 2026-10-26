@@ -63,6 +63,16 @@ local NON_MATCH_BASED = {
 	startingpoints = true,
 }
 
+-- Tiebreakers that read the games of the matches
+local READS_GAMES = {
+	gamediffregulation = true,
+	roundwins = true,
+	roundlosses = true,
+	rounddiff = true,
+	roundwinrate = true,
+	roundscore = true,
+}
+
 --- Splits a tiebreaker id into its context and name.
 --- Input without a context (e.g. `points`) only has a first part, which then is the name.
 ---@param tiebreakerId string
@@ -94,6 +104,13 @@ function TiebreakerFactory.validateAndNormalizeInput(input)
 			.. 'as it is not derived from the matches among the tied opponents'
 	)
 	return table.concat({context, name}, '.')
+end
+
+---@param tiebreakerId string
+---@return boolean
+function TiebreakerFactory.readsGames(tiebreakerId)
+	local _, name = TiebreakerFactory.parseId(tiebreakerId)
+	return READS_GAMES[name] == true
 end
 
 ---@param tiebreakerId string

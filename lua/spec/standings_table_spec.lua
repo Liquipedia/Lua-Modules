@@ -46,6 +46,41 @@ describe('Standings Table from template', function()
 		assert.is_truthy(html:find('class="table2[^"]*standings%-group"[^>]*style="width:600px"'))
 	end)
 
+	describe('imported match columns', function()
+		local function queriesGames(args)
+			StandingsTable.fromTemplate(args)
+			---@diagnostic disable-next-line: undefined-field
+			local matchQuery = mw.ext.LiquipediaDB.lpdb.calls[1]
+			assert.are_equal('match2', matchQuery.vals[1])
+			return matchQuery.vals[2].query:find('match2games', 1, true) ~= nil
+		end
+
+		it('leaves out the games when no tiebreaker reads them', function()
+			assert.is_false(queriesGames{
+				tabletype = 'swiss',
+				round1 = {matches = 'M1'},
+				tiebreakers = '["points", "gamediff", "buchholz"]',
+			})
+		end)
+
+		it('includes the games for a tiebreaker that reads them', function()
+			assert.is_true(queriesGames{
+				tabletype = 'swiss',
+				round1 = {matches = 'M1'},
+				tiebreakers = '["points", "rounddiff"]',
+			})
+		end)
+
+		it('includes the games with overtime', function()
+			local Info = require('Module:Info')
+			local originalStandingsConfig = Info.config.standings
+			Info.config.standings = {overtime = {regulationRounds = 12}}
+			local includesGames = queriesGames{tabletype = 'swiss', round1 = {matches = 'M1'}, overtime = 'true'}
+			Info.config.standings = originalStandingsConfig
+			assert.is_true(includesGames)
+		end)
+	end)
+
 	it('errors on an unknown table type', function()
 		assert.error(function()
 			StandingsTable.fromTemplate{tabletype = 'league'}

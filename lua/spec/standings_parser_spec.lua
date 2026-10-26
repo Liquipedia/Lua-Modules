@@ -39,6 +39,44 @@ describe('Standings Parser', function()
 	local BGS = {[1] = 'up', [2] = 'stay', [3] = 'down'}
 	local TIEBREAKERS = {'full.points', 'full.manual'}
 
+	describe('games needed', function()
+		local Info = require('Module:Info')
+		local originalStandingsConfig, originalMatch2Config
+
+		before_each(function()
+			originalStandingsConfig = Info.config.standings
+			originalMatch2Config = Info.config.match2
+			Info.config.standings = {alwaysShowStats = {swiss = {'matchdiff', 'gamediff'}}}
+			Info.config.match2 = {}
+		end)
+
+		after_each(function()
+			Info.config.standings = originalStandingsConfig
+			Info.config.match2 = originalMatch2Config
+		end)
+
+		it('are not needed for stats that only read the matches', function()
+			assert.is_false(StandingsParser.needsGames('swiss', {'full.points', 'ml.gamediff', 'full.buchholz'}))
+		end)
+
+		it('are needed for a tiebreaker that reads the games', function()
+			assert.is_true(StandingsParser.needsGames('swiss', {'full.points', 'ml.rounddiff'}))
+			assert.is_true(StandingsParser.needsGames('swiss', {'full.roundscore'}))
+			assert.is_true(StandingsParser.needsGames('swiss', {'full.gamediffregulation'}))
+		end)
+
+		it('are needed for an always shown stat that reads the games', function()
+			Info.config.standings = {alwaysShowStats = {swiss = {'matchdiff', 'rounddiff'}}}
+			assert.is_true(StandingsParser.needsGames('swiss', {'full.points'}))
+			assert.is_false(StandingsParser.needsGames('group', {'full.points'}))
+		end)
+
+		it('are always needed when Bo1 scores are taken from the game', function()
+			Info.config.match2 = {gameScoresIfBo1 = true}
+			assert.is_true(StandingsParser.needsGames('swiss', {'full.points'}))
+		end)
+	end)
+
 	describe('round status', function()
 		local function resolve(round, matchPhases)
 			local started, finished = StandingsParser.resolveRoundStatus(round, matchPhases)

@@ -133,11 +133,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 	local tiebreakers = Array.map(tiebreakerIds, function(tiebreakerId)
 		return Table.merge(loadTiebreaker(tiebreakerId), {tiebreaker = true})
 	end)
-	local alwaysStatsToLoad = ((Info.config.standings or {}).alwaysShowStats or {})[standingsType] or {}
-	alwaysStatsToLoad = Array.map(alwaysStatsToLoad, function (stat)
-		return TiebreakerFactory.validateAndNormalizeInput(stat)
-	end)
-	local alwaysStats = Array.map(alwaysStatsToLoad, loadTiebreaker)
+	local alwaysStats = Array.map(StandingsParser.alwaysShownStatIds(standingsType), loadTiebreaker)
 	local additionalStats = Array.extend(alwaysStats, tiebreakers)
 	local additionalStatsIds = Array.map(additionalStats, function(stat) return stat.id end)
 
@@ -188,6 +184,30 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 			additionalStats = additionalStats,
 		}
 	}
+end
+
+---@param standingsType StandingsTableTypes
+---@return string[]
+function StandingsParser.alwaysShownStatIds(standingsType)
+	local stats = ((Info.config.standings or {}).alwaysShowStats or {})[standingsType] or {}
+	return Array.map(stats, function(stat)
+		return TiebreakerFactory.validateAndNormalizeInput(stat)
+	end)
+end
+
+---With `gameScoresIfBo1`, the status of the opponents of a Bo1 match is taken from its first game. That status is
+---read by the scoring and by the game stats, so the games are always needed then.
+---@param standingsType StandingsTableTypes
+---@param tiebreakerIds string[]
+---@return boolean
+function StandingsParser.needsGames(standingsType, tiebreakerIds)
+	if Info.config.match2.gameScoresIfBo1 then
+		return true
+	end
+	return Array.any(
+		Array.extend(StandingsParser.alwaysShownStatIds(standingsType), tiebreakerIds),
+		TiebreakerFactory.readsGames
+	)
 end
 
 ---Resolves whether a round has started and finished. Manual input takes priority, otherwise it follows
