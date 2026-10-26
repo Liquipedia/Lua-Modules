@@ -137,6 +137,46 @@ describe('Standings Wiki Parser', function()
 		end)
 	end)
 
+	describe('player teams', function()
+		local Info = require('Module:Info')
+		local PlayerExt = require('Module:Player/Ext/Custom')
+		local originalStandingsConfig, syncPlayerStub, syncTeamStub
+
+		before_each(function()
+			originalStandingsConfig = Info.config.standings
+			syncPlayerStub = stub(PlayerExt, 'syncPlayer')
+			syncTeamStub = stub(PlayerExt, 'syncTeam')
+		end)
+
+		after_each(function()
+			Info.config.standings = originalStandingsConfig
+			syncPlayerStub:revert()
+			syncTeamStub:revert()
+		end)
+
+		it('does not sync player teams by default', function()
+			Info.config.standings = {}
+			assert.is_false(StandingsParseWiki.parseSyncPlayerTeam{})
+
+			StandingsParseWiki.parseWikiInput{{type = 'solo', 'Alpha', link = 'Alpha', r1 = '3'}}
+			assert.stub(syncTeamStub).was_not.called()
+		end)
+
+		it('syncs player teams with the syncPlayerTeam input', function()
+			Info.config.standings = {}
+			assert.is_true(StandingsParseWiki.parseSyncPlayerTeam{syncPlayerTeam = 'true'})
+
+			StandingsParseWiki.parseWikiInput{{type = 'solo', 'Alpha', link = 'Alpha', r1 = '3'}, syncPlayerTeam = 'true'}
+			assert.stub(syncTeamStub).was.called(1)
+		end)
+
+		it('uses the wiki config as default, which the input overrides', function()
+			Info.config.standings = {syncPlayerTeam = true}
+			assert.is_true(StandingsParseWiki.parseSyncPlayerTeam{})
+			assert.is_false(StandingsParseWiki.parseSyncPlayerTeam{syncPlayerTeam = 'false'})
+		end)
+	end)
+
 	describe('width', function()
 		it('reads the width input in px', function()
 			assert.are_equal(600, StandingsParseWiki.parseWidth{width = '600'})

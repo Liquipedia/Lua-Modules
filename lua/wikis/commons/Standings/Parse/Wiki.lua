@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
@@ -67,10 +68,11 @@ function StandingsParseWiki.parseWikiInput(args)
 	end
 
 	local date = DateExt.readTimestamp(args.date) or DateExt.getContextualDateOrNow()
+	local syncPlayerTeam = StandingsParseWiki.parseSyncPlayerTeam(args)
 
 	---@type StandingTableOpponentData[]
 	local opponents = Array.map(args, function (opponentData)
-		return StandingsParseWiki.parseWikiOpponent(opponentData, #rounds, date)
+		return StandingsParseWiki.parseWikiOpponent(opponentData, #rounds, date, syncPlayerTeam)
 	end)
 
 	local wrapperMatches = Array.parseCommaSeparatedString(args.matches)
@@ -123,8 +125,9 @@ end
 ---@param opponentInput string|table
 ---@param numberOfRounds integer
 ---@param resolveDate string|number?
+---@param syncPlayerTeam boolean?
 ---@return StandingTableOpponentData
-function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, resolveDate)
+function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, resolveDate, syncPlayerTeam)
 	local opponentData = Json.parseIfString(opponentInput)
 	local rounds = {}
 	for i = 1, numberOfRounds do
@@ -146,7 +149,7 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, res
 	end
 
 	local opponent = Opponent.readOpponentArgs(opponentData)
-	opponent = Opponent.resolve(opponent, resolveDate, {syncPlayer = true})
+	opponent = Opponent.resolve(opponent, resolveDate, {syncPlayer = true, syncPlayerTeam = syncPlayerTeam or false})
 
 	local aliases
 	if opponent.type == Opponent.team then
@@ -166,6 +169,19 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, res
 		disqualifiedFromRound = StandingsParseWiki.parseDisqualifiedFromRound(opponentData.dq),
 		definiteStatuses = StandingsParseWiki.parseDefiniteStatuses(opponentData, numberOfRounds),
 	}
+end
+
+---Reads whether the teams of the players are fetched from page variables or LPDB.
+---Off by default, as it does an LPDB query per player that is repeated in every table on the page
+---when the player has no team on that date.
+---@param args table
+---@return boolean
+function StandingsParseWiki.parseSyncPlayerTeam(args)
+	return Logic.nilOr(
+		Logic.readBoolOrNil(args.syncPlayerTeam),
+		(Info.config.standings or {}).syncPlayerTeam,
+		false
+	)
 end
 
 ---Reads the `dq` input of an opponent. `dq=true` means disqualified from the first round,
