@@ -10,6 +10,7 @@ local Array = Lua.import('Module:Array')
 local Component = Lua.import('Module:Widget/Component')
 local MathUtil = Lua.import('Module:MathUtil')
 
+local ChanceBar = Lua.import('Module:Features/QualificationChances/Components/ChanceBar')
 local Label = Lua.import('Module:Widget/Basic/Label')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
@@ -26,18 +27,23 @@ local function formatPercentage(ratio)
 	return MathUtil.formatPercentage(ratio, 2)
 end
 
----@param props {opponent: standardOpponent, region: string?, chance: number?, stages: number[]}
+---@param props {opponent: standardOpponent, region: string?, chance: number, stages: number[]}
 ---@return Renderable
 local function QualificationChanceRow(props)
 	return TableWidgets.Row{
 		children = WidgetUtil.collect(
 			TableWidgets.Cell{children = OpponentDisplay.BlockOpponent{opponent = props.opponent}},
-			TableWidgets.Cell{children = Label{children = props.region}},
+			TableWidgets.Cell{children = Label{
+				labelScheme = 'region',
+				attributes = {['data-region'] = props.region and props.region:lower() or nil},
+				children = props.region,
+			}},
 			TableWidgets.Cell{
 				css = props.chance == 1 and {['font-weight'] = 'bold'} or nil,
 				children = formatPercentage(props.chance),
 			},
-			Array.map(props.stages or {}, function(chance)
+			TableWidgets.Cell{children = ChanceBar{chance = props.chance, stages = props.stages}},
+			Array.map(props.stages, function(chance)
 				return TableWidgets.Cell{children = formatPercentage(chance)}
 			end)
 		)

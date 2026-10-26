@@ -115,7 +115,7 @@ function StandingsParser.parse(
 	local tiebreakerOptions = {draws = draws, walkoverGames = walkoverGames}
 
 	---@param tiebreakerId string
-	---@return {id: string, title: string?}
+	---@return StandingsAdditionalStat
 	local loadTiebreaker = function(tiebreakerId)
 		local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId, tiebreakerOptions)
 		local tiebreakerContextType = tiebreaker:getContextType()
@@ -128,7 +128,9 @@ function StandingsParser.parse(
 		}
 	end
 
-	local tiebreakers = Array.map(tiebreakerIds, loadTiebreaker)
+	local tiebreakers = Array.map(tiebreakerIds, function(tiebreakerId)
+		return Table.merge(loadTiebreaker(tiebreakerId), {tiebreaker = true})
+	end)
 	local alwaysStatsToLoad = ((Info.config.standings or {}).alwaysShowStats or {})[standingsType] or {}
 	alwaysStatsToLoad = Array.map(alwaysStatsToLoad, function (stat)
 		return TiebreakerFactory.validateAndNormalizeInput(stat)

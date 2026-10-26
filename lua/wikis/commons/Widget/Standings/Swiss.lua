@@ -21,7 +21,7 @@ local StandingsDisplayUtil = Lua.import('Module:Standings/DisplayUtil')
 
 local Helpers = {}
 
----@param props {standings?: StandingsModel}
+---@param props {standings?: StandingsModel, width: number?}
 ---@return Renderable?
 local function StandingsSwiss(props)
 	local standings = props.standings
@@ -31,9 +31,11 @@ local function StandingsSwiss(props)
 
 	local lastRound = standings.rounds[#standings.rounds]
 	local statsToShow = StandingsDisplayUtil.statsToShow(standings)
+	local boldStatTitle = StandingsDisplayUtil.boldStatTitle(standings)
 
 	return TableWidgets.Table{
 		classes = {'standings-swiss'},
+		css = {width = props.width and (props.width .. 'px') or nil},
 		title = Logic.nilIfEmpty(standings.title),
 		columns = Helpers.buildColumnDefinitions(standings, statsToShow),
 		children = WidgetUtil.collect(
@@ -41,7 +43,7 @@ local function StandingsSwiss(props)
 			Helpers.headerRow(standings, statsToShow),
 			-- Rows
 			TableWidgets.TableBody{children = Array.map(lastRound.opponents, function(slot)
-				return Helpers.createRow(standings, slot, statsToShow)
+				return Helpers.createRow(standings, slot, statsToShow, boldStatTitle)
 			end)}
 		),
 		striped = false
@@ -50,7 +52,7 @@ end
 
 ---@private
 ---@param standings StandingsModel
----@param statsToShow {id: string, title: string?}[]
+---@param statsToShow StandingsAdditionalStat[]
 ---@return table[]
 function Helpers.buildColumnDefinitions(standings, statsToShow)
 	return WidgetUtil.collect(
@@ -63,7 +65,7 @@ end
 
 ---@private
 ---@param standings StandingsModel
----@param statsToShow {id: string, title: string?}[]
+---@param statsToShow StandingsAdditionalStat[]
 ---@return Renderable
 function Helpers.headerRow(standings, statsToShow)
 	return TableWidgets.TableHeader{children = {
@@ -81,15 +83,16 @@ end
 ---@private
 ---@param standings StandingsModel
 ---@param slot StandingsEntryModel
----@param statsToShow {id: string, title: string?}[]
+---@param statsToShow StandingsAdditionalStat[]
+---@param boldStatTitle string?
 ---@return Renderable
-function Helpers.createRow(standings, slot, statsToShow)
+function Helpers.createRow(standings, slot, statsToShow, boldStatTitle)
 	return TableWidgets.Row{
 		attributes = {['data-position-status'] = slot.positionStatus},
 		children = WidgetUtil.collect(
 			StandingsCells.placement(slot),
 			StandingsCells.participant(slot),
-			StandingsCells.stats(slot, statsToShow),
+			StandingsCells.stats(slot, statsToShow, boldStatTitle),
 			Array.map(standings.rounds, function(columnRound)
 				local entry = Array.find(columnRound.opponents, function(columnSlot)
 					return Opponent.same(columnSlot.opponent, slot.opponent)

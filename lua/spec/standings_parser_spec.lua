@@ -96,8 +96,8 @@ describe('Standings Parser', function()
 		assert.is_true(standingsTable.finished)
 		assert.are_equal(6, #standingsTable.entries)
 		assert.are_same({
-			{id = 'full.points', title = 'Points'},
-			{id = 'full.manual'},
+			{id = 'full.points', title = 'Points', tiebreaker = true},
+			{id = 'full.manual', tiebreaker = true},
 		}, standingsTable.extradata.additionalStats)
 
 		-- Round 1: Alpha and Bravo are fully tied at 3 points (shared placement),
@@ -530,7 +530,7 @@ describe('Standings Parser', function()
 				local standingsTable = parse(opponents, {'full.points', 'ml.matchdiff', 'full.manual'})
 
 				-- ml tiebreakers are only listed by id, without a title
-				assert.are_same({id = 'ml.matchdiff'}, Array.find(
+				assert.are_same({id = 'ml.matchdiff', tiebreaker = true}, Array.find(
 					standingsTable.extradata.additionalStats,
 					function(stat) return stat.id == 'ml.matchdiff' end
 				))
@@ -899,6 +899,38 @@ describe('Standings Parser', function()
 		---@diagnostic disable-next-line: missing-fields
 		local stats = StandingsDisplayUtil.statsToShow({additionalStats = standingsTable.extradata.additionalStats})
 		assert.are_same({'Matches', 'Games'}, Array.map(stats, function(stat) return stat.title end))
+	end)
+
+	it('marks the tiebreakers, but not the stats that are always shown', function()
+		local standingsTable = StandingsParser.parse(
+			TWO_FINISHED_ROUNDS,
+			{makeOpponent('Alpha', {{points = 3}, {points = 3}})},
+			BGS, nil, {}, 'swiss',
+			{'full.points', 'full.manual'}
+		)
+
+		-- The commons config always shows matchdiff and gamediff in swiss standings
+		assert.are_same({
+			{id = 'full.matchdiff', title = 'Matches'},
+			{id = 'full.gamediff', title = 'Games'},
+			{id = 'full.points', title = 'Points', tiebreaker = true},
+			{id = 'full.manual', tiebreaker = true},
+		}, standingsTable.extradata.additionalStats)
+	end)
+
+	it('always shows the configured stats of group standings', function()
+		local standingsTable = StandingsParser.parse(
+			TWO_FINISHED_ROUNDS,
+			{makeOpponent('Alpha', {{points = 3}, {points = 3}})},
+			BGS, nil, {}, 'group',
+			{'full.points', 'full.manual'}
+		)
+
+		-- The commons config always shows matchdiff and gamediff in group standings
+		assert.are_same(
+			{'full.matchdiff', 'full.gamediff', 'full.points', 'full.manual'},
+			Array.map(standingsTable.extradata.additionalStats, function(stat) return stat.id end)
+		)
 	end)
 
 	describe('overtime', function()

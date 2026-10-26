@@ -372,45 +372,4 @@
 			}
 		}
 	}
-
-	form.searchbox {
-		display: flex;
-
-		@media ( max-width: 767px ) {
-			margin-top: 1.5rem;
-			width: 100%;
-		}
-
-		@media ( min-width: 768px ) {
-			margin-top: 0;
-		}
-
-		// needed higher specificity to override the default input styles
-		input.searchbox-text:not( .search-input ):not( .oo-ui-inputWidget-input ) {
-			min-height: 2.75rem;
-			border-radius: 0.5rem;
-			box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
-			border: 0.0625rem solid rgba( 0, 0, 0, 0.12 );
-
-			@media ( max-width: 767px ) {
-				flex-grow: 1;
-			}
-
-			@media ( min-width: 768px ) {
-				width: 25rem;
-			}
-
-			.theme--dark & {
-				background-color: #ffffff;
-				color: var( --clr-secondary-7 );
-			}
-		}
-
-		button.searchbox-button {
-			min-height: 2.75rem;
-			margin-left: 0.5rem;
-			padding: 0 1rem;
-			border: 0;
-		}
-	}
 }

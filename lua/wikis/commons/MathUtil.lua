@@ -50,6 +50,21 @@ function MathUtil.isInteger(x)
 end
 
 --[[
+A `nil`-safe version of `math.max`
+]]
+---@param max number?
+---@param value number?
+---@return number?
+function MathUtil.nilSafeMax(max, value)
+	if max == nil then
+		return value
+	elseif value == nil then
+		return max
+	end
+	return math.max(max, value)
+end
+
+--[[
 Returns the base 2 log of the input number, rounded down.
 
 Example:

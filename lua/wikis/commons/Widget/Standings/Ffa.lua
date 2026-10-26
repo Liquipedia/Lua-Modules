@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -28,7 +29,7 @@ local STATUS_TO_DISPLAY = {
 
 local Helpers = {}
 
----@param props {standings?: StandingsModel}
+---@param props {standings?: StandingsModel, width: number?}
 ---@return Renderable?
 local function StandingsFfa(props)
 	local standings = props.standings
@@ -36,11 +37,15 @@ local function StandingsFfa(props)
 		return
 	end
 
-	local activeRounds = StandingsDisplayUtil.lastStartedRound(standings)
+	local shownRounds = StandingsDisplayUtil.roundsToShow(standings)
 	local statsToShow = StandingsDisplayUtil.statsToShow(standings)
+	local boldStatTitle = StandingsDisplayUtil.boldStatTitle(standings)
+	-- Also holds the round columns switch, so needed as soon as there is more than one round
+	local hasRoundHistory = Helpers._showRoundColumns(standings)
 
 	local standingsTable = TableWidgets.Table{
 		classes = {'standings-ffa'},
+		css = {width = props.width and (props.width .. 'px') or nil},
 		columns = WidgetUtil.collect(
 			{align = 'center'},
 			Helpers._showRoundColumns(standings) and {align = 'center'} or nil,
@@ -52,22 +57,23 @@ local function StandingsFfa(props)
 		children = WidgetUtil.collect(
 			Helpers._headerRow(standings, statsToShow),
 			Array.map(standings.rounds, function (round)
-				if round.round > activeRounds then
+				if round.round > shownRounds then
 					return
 				end
-				return Helpers._createRoundBody(standings, round, statsToShow)
+				return Helpers._createRoundBody(standings, round, statsToShow, boldStatTitle, hasRoundHistory)
 			end)
 		),
 		striped = false
 	}
 
-	if activeRounds == 0 then
+	if not hasRoundHistory then
 		return standingsTable
 	end
 
 	return RoundHistory{
-		activeRounds = activeRounds,
+		activeRounds = shownRounds,
 		hasEnded = not StandingsDisplayUtil.hasFutureRounds(standings),
+		titles = Array.map(standings.rounds, Operator.property('title')),
 		controls = {
 			Switch{
 				switchGroup = 'ffa-detailed-stats',
@@ -87,7 +93,7 @@ end
 
 ---@private
 ---@param standings StandingsModel
----@param statsToShow {id: string, title: string?}[]
+---@param statsToShow StandingsAdditionalStat[]
 ---@return Renderable
 function Helpers._headerRow(standings, statsToShow)
 	return TableWidgets.TableHeader{children = {
@@ -109,14 +115,16 @@ end
 ---@private
 ---@param standings StandingsModel
 ---@param round StandingsRound
----@param statsToShow {id: string, title: string?}[]
+---@param statsToShow StandingsAdditionalStat[]
+---@param boldStatTitle string?
+---@param hasRoundHistory boolean
 ---@return Renderable
-function Helpers._createRoundBody(standings, round, statsToShow)
+function Helpers._createRoundBody(standings, round, statsToShow, boldStatTitle, hasRoundHistory)
 	return TableWidgets.TableBody{children = Array.map(round.opponents, function (slot)
 		return TableWidgets.Row{
 			attributes = {
 				['data-position-status'] = slot.positionStatus,
-				['data-toggle-area-content'] = round.round,
+				['data-toggle-area-content'] = hasRoundHistory and round.round or nil,
 			},
 			children = WidgetUtil.collect(
 				StandingsCells.placement(slot),
@@ -124,7 +132,7 @@ function Helpers._createRoundBody(standings, round, statsToShow)
 					children = PlacementChange{change = slot.positionChangeFromPreviousRound}
 				} or nil,
 				StandingsCells.participant(slot),
-				StandingsCells.stats(slot, statsToShow),
+				StandingsCells.stats(slot, statsToShow, boldStatTitle),
 				Helpers._showRoundColumns(standings) and Array.map(standings.rounds, function (columnRound)
 					local text
 					if columnRound.round <= round.round then

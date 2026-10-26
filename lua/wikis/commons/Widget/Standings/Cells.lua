@@ -14,7 +14,6 @@ local Label = Lua.import('Module:Widget/Basic/Label')
 local Participant = Lua.import('Module:Widget/Standings/Participant')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
----The cells shared by the standings displays: rank, participant and the stats columns.
 local StandingsCells = {}
 
 ---@param text string?
@@ -23,7 +22,7 @@ function StandingsCells.header(text)
 	return TableWidgets.CellHeader{children = text}
 end
 
----@param statsToShow {id: string, title: string?}[]
+---@param statsToShow StandingsAdditionalStat[]
 ---@return table[]
 function StandingsCells.statColumns(statsToShow)
 	return Array.map(statsToShow, function()
@@ -31,7 +30,7 @@ function StandingsCells.statColumns(statsToShow)
 	end)
 end
 
----@param statsToShow {id: string, title: string?}[]
+---@param statsToShow StandingsAdditionalStat[]
 ---@return Renderable[]
 function StandingsCells.statHeaders(statsToShow)
 	return Array.map(statsToShow, function(stat)
@@ -56,13 +55,14 @@ function StandingsCells.participant(slot)
 end
 
 ---@param slot StandingsEntryModel
----@param statsToShow {id: string, title: string?}[]
+---@param statsToShow StandingsAdditionalStat[]
+---@param boldStatTitle string?
 ---@return Renderable[]
-function StandingsCells.stats(slot, statsToShow)
-	return Array.map(statsToShow, function(stat, statIndex)
+function StandingsCells.stats(slot, statsToShow, boldStatTitle)
+	return Array.map(statsToShow, function(stat)
 		local statValue = slot.additionalStatsValues[stat.id]
 		return TableWidgets.Cell{
-			css = {['font-weight'] = statIndex == 1 and 'bold' or nil},
+			css = {['font-weight'] = stat.title == boldStatTitle and 'bold' or nil},
 			children = statValue and statValue.display or '',
 		}
 	end)
