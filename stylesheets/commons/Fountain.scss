@@ -374,7 +374,7 @@ a.cf {
 		border-radius: 0.125rem; // 2px
 		overflow: hidden;
 
-	& + & {
+		& + & {
 			margin-top: 0.125rem; // 2px
 		}
 		}
