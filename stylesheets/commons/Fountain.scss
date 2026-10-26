@@ -355,52 +355,52 @@ a.cf {
 }
 
 @keyframes hpmpbar-drain {
-    from {
-        clip-path: inset( 0 0 0 0 );
-    }
+	from {
+		clip-path: inset( 0 0 0 0 );
+	}
 
-    to {
-        clip-path: inset( 0 100% 0 0 );
-    }
+	to {
+		clip-path: inset( 0 100% 0 0 );
+	}
 } // Right to left. The fill is clipped, so the gradient does not squeeze.
 
 .hpmpbar {
-    &_track {
-        height: 0.5rem; // 8px
-        box-sizing: border-box;
-        margin-top: 0.1875rem; // 3px
-        background: #131313;
-        border: 0.0625rem solid var( --clr-moon-base ); // #000000
-        border-radius: 0.125rem; // 2px
-        overflow: hidden;
+	&_track {
+		height: 0.5rem; // 8px
+		box-sizing: border-box;
+		margin-top: 0.1875rem; // 3px
+		background: #131313;
+		border: 0.0625rem solid var( --clr-moon-base ); // #000000
+		border-radius: 0.125rem; // 2px
+		overflow: hidden;
 
-        & + & {
-            margin-top: 0.125rem; // 2px
-        }
-    }
+	& + & {
+		margin-top: 0.125rem; // 2px
+		}
+	}
 
-    &_fill {
-        height: 100%;
-    }
+	&_fill {
+		height: 100%;
+	}
 
-    &_hp {
-        background: linear-gradient( to right, #286323, #387f28, #4a9e2e, #59b832, #6ad537, #72e33a, #7af03c );
-    }
+	&_hp {
+		background: linear-gradient( to right, #286323, #387f28, #4a9e2e, #59b832, #6ad537, #72e33a, #7af03c );
+	}
 
-    &_mp {
-        background: linear-gradient( to right, #1056db, #2171e1, #318ae7, #41a3ec, #4fbbf1, #5ed3f6, #73f5fe );
-    }
+	&_mp {
+		background: linear-gradient( to right, #1056db, #2171e1, #318ae7, #41a3ec, #4fbbf1, #5ed3f6, #73f5fe );
+	}
 
-    &_drain {
-        animation-name: hpmpbar-drain;
-        animation-timing-function: linear;
-        animation-iteration-count: infinite;
-        animation-duration: 5s; // overridden per spell by "mp alt duration" / "hp alt duration"
+	&_drain {
+		animation-name: hpmpbar-drain;
+		animation-timing-function: linear;
+		animation-iteration-count: infinite;
+		animation-duration: 5s; // overridden per spell by "mp alt duration" / "hp alt duration"
 
-        @media ( prefers-reduced-motion: reduce ) {
-            animation: none;
-        }
-    } // mimics the hp and mp cost per interval.
+		@media ( prefers-reduced-motion: reduce ) {
+			animation: none;
+		}
+	} // mimics the hp and mp cost per interval.
 } // end hpmpbar styles.
 
 /* Spellcard Item-cooldown Sharing */
