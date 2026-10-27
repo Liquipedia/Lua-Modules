@@ -33,6 +33,8 @@ local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local InputParser = Lua.import('Module:Features/TournamentAppearances/Lib/Parse')
+
 local TournamentAppearancesHeader = Lua.import('Module:Features/TournamentAppearances/Components/Header')
 local TournamentAppearancesRow = Lua.import('Module:Features/TournamentAppearances/Components/Row')
 
@@ -57,42 +59,14 @@ function Appearances:init(frame)
 
 	self.plainArgs = args
 
-	assert(
-		args.series or args.pages or args.conditions,
-		'Either "series", "pages" or "conditions" input has to be specified'
-	)
-
-	self.config = {
-		showPlacementInsteadOfTeam = Logic.readBool(args.showPlacementInsteadOfTeam),
-		limit = tonumber(args.limit),
-		isFormQuery = Logic.readBool(args.query),
-		restrictToPlayersParticipatingIn = args.playerspage,
-		restrictToFirstPrizePool = Logic.readBool(args.restrictToFirstPrizePool),
-		player = Logic.nilOr(Logic.readBoolOrNil(args.player), true),
-		staff = Logic.readBool(args.staff),
-	}
-
-	assert(self.config.player or self.config.staff, 'Invalid config: at least one of |player= or |staff= must be true')
-
-	self.args = {
-		conditions = args.conditions,
-		tierTypes = Logic.emptyOr(Array.parseCommaSeparatedString(args.tierTypes), DEFAULT_TIERTYPES),
-		tiers = Array.parseCommaSeparatedString(args.tiers),
-		startDate = Logic.nilIfEmpty(args.sdate),
-		endDate = Logic.nilIfEmpty(args.edate),
-		pages = Array.parseCommaSeparatedString(args.pages),
-		series = args.series and Array.map(
-			Array.extractValues(Table.filterByKey(args, function(key) return key:find('^series%d-$') end)),
-			Page.pageifyLink
-		) or nil,
-	}
+	self.config = InputParser.readConfig(args)
 
 	return self
 end
 
 ---@return self
 function Appearances:create()
-	self.tournaments = Array.reverse(Tournament.getAllTournaments(self.args.conditions or self:_buildConditions()))
+	self.tournaments = Array.reverse(Tournament.getAllTournaments(self.config.conditions or self:_buildConditions()))
 
 	if Table.isEmpty(self.tournaments) then
 		return self
@@ -107,7 +81,7 @@ end
 ---@private
 ---@return ConditionTree
 function Appearances:_buildConditions()
-	local args = self.args
+	local args = self.config
 
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('enddate'), Comparator.gt, DateExt.defaultDate)}
@@ -281,7 +255,7 @@ function Appearances:_buildQueryLink()
 	end
 	local queryTable = {
 		['PTA[series]'] = self.plainArgs.series or '',
-		['PTA[pages]'] = table.concat(self.args.pages, ','),
+		['PTA[pages]'] = table.concat(self.config.pages, ','),
 		['PTA[tiers]'] = self.plainArgs.tiers,
 		['PTA[limit]'] = self.plainArgs.limit or '',
 		['PTA[playerspage]'] = self.plainArgs.playerspage or '',

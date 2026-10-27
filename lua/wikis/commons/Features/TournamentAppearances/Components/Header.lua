@@ -14,7 +14,7 @@ local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@param props {tournaments: StandardTournament[], config: table}
+---@param props {tournaments: StandardTournament[], config: TournamentAppearancesConfig}
 ---todo: add proper type for config
 ---@return VNode
 local TournamentAppearancesHeader = function(props)
