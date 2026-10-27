@@ -70,7 +70,7 @@ function Controller.showQualificationChances(frame)
 					regions:toArray(),
 					function (region)
 						return Switch{
-							switchGroup = 'qualification-' .. region .. '-chances',
+							switchGroup = 'qualification-' .. region:lower() .. '-chances',
 							defaultActive = true,
 							label = {
 								'Show',
