@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Set = Lua.import('Module:Set')
@@ -67,7 +68,7 @@ function Controller.showQualificationChances(frame)
 			Html.Div{
 				classes = {'qualification-chances-toggle-container'},
 				children = Array.map(
-					regions:toArray(),
+					Array.sortBy(regions:toArray(), FnUtil.identity),
 					function (region)
 						return Switch{
 							switchGroup = 'qualification-' .. region:lower() .. '-chances',
