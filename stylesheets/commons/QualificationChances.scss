@@ -43,4 +43,18 @@ Template(s): Qualification Chances
 			min-width: 0.25rem;
 		}
 	}
+
+	tr {
+		position: relative;
+
+		&:not( :last-child ):not( .table2__row--head ) {
+			box-shadow: inset 0 -1px var( --border-color );
+
+			--border-color: var( --clr-on-surface-light-primary-8 );
+
+			.theme--dark & {
+				--border-color: var( --clr-on-surface-dark-primary-8 );
+			}
+		}
+	}
 }

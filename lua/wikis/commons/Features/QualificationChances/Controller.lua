@@ -86,7 +86,7 @@ function Controller.showQualificationChances(frame)
 				),
 			},
 			TableWidgets.Table{
-				striped = true,
+				striped = false,
 				variant = 'themed',
 				children = {
 					TableWidgets.TableHeader{
