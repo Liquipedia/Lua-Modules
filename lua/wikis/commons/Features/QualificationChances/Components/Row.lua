@@ -32,7 +32,7 @@ end
 local function QualificationChanceRow(props)
 	return TableWidgets.Row{
 		attributes = props.region and {
-			['data-region'] = props.region:lower(),
+			['data-qualification-region'] = props.region:lower(),
 		} or nil,
 		children = WidgetUtil.collect(
 			TableWidgets.Cell{children = OpponentDisplay.BlockOpponent{opponent = props.opponent}},

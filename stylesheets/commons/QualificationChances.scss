@@ -9,7 +9,7 @@ Template(s): Qualification Chances
 
 @mixin suppress-region($region) {
 	.qualification-chances:has( .switch-toggle[ data-switch-group="qualification-#{ $region }-chances" ]:not( :is( .switch-toggle-active ) ) ) {
-		[ data-region=#{ $region }] {
+		[ data-qualification-region=#{ $region }] {
 			display: none !important;
 		}
 	}
