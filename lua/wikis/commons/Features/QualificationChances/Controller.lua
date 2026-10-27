@@ -13,6 +13,9 @@ local Json = Lua.import('Module:Json')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Set = Lua.import('Module:Set')
 
+local Html = Lua.import('Module:Widget/Html')
+local Label = Lua.import('Module:Widget/Basic/Label')
+local Switch = Lua.import('Module:Widget/Switch')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local Header = Lua.import('Module:Features/QualificationChances/Components/Header')
 local Row = Lua.import('Module:Features/QualificationChances/Components/Row')
@@ -58,17 +61,43 @@ function Controller.showQualificationChances(frame)
 		}
 	end)
 
-	return TableWidgets.Table{
-		striped = true,
-		variant = 'themed',
+	return Html.Div{
+		classes = {'qualification-chances'},
 		children = {
-			TableWidgets.TableHeader{
-				children = Header{stages = stages},
+			Html.Div{
+				classes = {'qualification-chances-toggle-container'},
+				children = Array.map(
+					regions:toArray(),
+					function (region)
+						return Switch{
+							switchGroup = 'qualification-' .. region .. '-chances',
+							defaultActive = true,
+							label = {
+								'Show',
+								'&nbsp;',
+								Label{
+									labelScheme = 'region',
+									attributes = {['data-region'] = region:lower() or nil},
+									children = region,
+								}
+							},
+						}
+					end
+				),
 			},
-			TableWidgets.TableBody{
-				children = rows,
-			},
-		},
+			TableWidgets.Table{
+				striped = true,
+				variant = 'themed',
+				children = {
+					TableWidgets.TableHeader{
+						children = Header{stages = stages},
+					},
+					TableWidgets.TableBody{
+						children = rows,
+					},
+				},
+			}
+		}
 	}
 end
 

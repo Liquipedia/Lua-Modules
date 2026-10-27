@@ -7,16 +7,34 @@ Template(s): Qualification Chances
 	--qualification-region-as-color: #5b8c3e;
 }
 
-.qualification-chances-bar {
-	display: flex;
-	gap: 0.125rem;
-	width: 16rem;
-	height: 0.75rem;
-	border-radius: 0.375rem;
-	overflow: hidden;
+@mixin suppress-region($region) {
+	.qualification-chances:has( .switch-toggle[ data-switch-group="qualification-#{ $region }-chances" ]:not( :is( .switch-toggle-active ) ) ) {
+		[ data-region=#{ $region }] {
+			display: none !important;
+		}
+	}
+}
 
-	&__segment {
-		flex-basis: 0;
-		min-width: 0.25rem;
+@include suppress-region("eu");
+@include suppress-region("na");
+@include suppress-region("as");
+
+.qualification-chances {
+	&-toggle-container {
+		display: flex;
+	}
+
+	&-bar {
+		display: flex;
+		gap: 0.125rem;
+		width: 16rem;
+		height: 0.75rem;
+		border-radius: 0.375rem;
+		overflow: hidden;
+
+		&__segment {
+			flex-basis: 0;
+			min-width: 0.25rem;
+		}
 	}
 }
