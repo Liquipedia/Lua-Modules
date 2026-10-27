@@ -38,6 +38,8 @@ local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local TournamentAppearancesRow = Lua.import('Module:Features/TournamentAppearances/Components/Row')
+
 local DEFAULT_TIERTYPES = {'General', 'School', ''}
 local FORM_NAME = 'Player tournament appearances'
 
@@ -274,38 +276,11 @@ end
 ---@param playerIndex integer
 ---@return Html
 function Appearances:_row(playerIndex)
-	local player = self.players[playerIndex]
-
-	return TableWidgets.Row{children = WidgetUtil.collect(
-		TableWidgets.Cell{children = Flags.Icon{flag = player.flag}},
-		TableWidgets.Cell{children = PlayerDisplay.InlinePlayer{
-			player = player, showFlag = false
-		}},
-		TableWidgets.Cell{children = player.extradata.appearances},
-		Array.map(self.tournaments, function (tournament)
-			local result = player.extradata.results[tournament.pageName] or {}
-			if self.config.showPlacementInsteadOfTeam then
-				local rawPlacement = Placement.raw(result.placement or '')
-				return TableWidgets.Cell{
-					attributes = {
-						['data-sort-value'] = rawPlacement.sort
-					},
-					classes = {rawPlacement.backgroundClass},
-					children = Placement.renderInWidget{placement = result.placement}
-				}
-			elseif Logic.isNotEmpty(result) then
-				return TableWidgets.Cell{
-					align = 'center',
-					classes = tonumber(result.placement) == 1 and {'tournament-highlighted-bg'} or nil,
-					attributes = {['data-sort-value'] = result.team},
-					children = result.team and OpponentDisplay.InlineTeamContainer{
-						template = result.team, date = result.date, style = 'icon'
-					} or nil
-				}
-			end
-			return TableWidgets.Cell{}
-		end)
-	)}
+	return TournamentAppearancesRow{
+		tournaments = self.tournaments,
+		player = self.players[playerIndex],
+		config = self.config
+	}
 end
 
 ---@private
