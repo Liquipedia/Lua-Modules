@@ -11,6 +11,7 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Json = Lua.import('Module:Json')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local Set = Lua.import('Module:Set')
 
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local Header = Lua.import('Module:Features/QualificationChances/Components/Header')
@@ -37,6 +38,26 @@ function Controller.showQualificationChances(frame)
 		teams = Array.sub(teams, 1, limit)
 	end
 
+	---@type Set<string>
+	local regions = Set{}
+
+	local rows = Array.map(teams, function (team)
+		if team.region then
+			regions:add(team.region)
+		end
+		return Row{
+			opponent = Opponent.readOpponentArgs{type = Opponent.team, template = team.team_id},
+			region = team.region,
+			chance = (team.chance_pct or 0) / 100,
+			stages = Array.map(stages or {}, function(stage)
+				local correctStage = Array.find(team.stages and team.stages.stages or {}, function (element)
+					return stage == element.name
+				end)
+				return correctStage and ((correctStage.pct or 0) / 100) or 0
+			end)
+		}
+	end)
+
 	return TableWidgets.Table{
 		striped = true,
 		variant = 'themed',
@@ -45,19 +66,7 @@ function Controller.showQualificationChances(frame)
 				children = Header{stages = stages},
 			},
 			TableWidgets.TableBody{
-				children = Array.map(teams, function (team)
-					return Row{
-						opponent = Opponent.readOpponentArgs{type = Opponent.team, template = team.team_id},
-						region = team.region,
-						chance = (team.chance_pct or 0) / 100,
-						stages = Array.map(stages or {}, function(stage)
-							local correctStage = Array.find(team.stages and team.stages.stages or {}, function (element)
-								return stage == element.name
-							end)
-							return correctStage and ((correctStage.pct or 0) / 100) or 0
-						end)
-					}
-				end),
+				children = rows,
 			},
 		},
 	}
