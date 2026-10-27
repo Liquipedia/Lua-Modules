@@ -12,16 +12,13 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Condition = Lua.import('Module:Condition')
 local DateExt = Lua.import('Module:Date/Ext')
-local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Page = Lua.import('Module:Page')
 local Placement = Lua.import('Module:Placement')
-local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 local Table = Lua.import('Module:Table')
 local Tournament = Lua.import('Module:Tournament')
 
@@ -32,12 +29,11 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local Html = Lua.import('Module:Widget/Html')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local TournamentAppearancesHeader = Lua.import('Module:Features/TournamentAppearances/Components/Header')
 local TournamentAppearancesRow = Lua.import('Module:Features/TournamentAppearances/Components/Row')
 
 local DEFAULT_TIERTYPES = {'General', 'School', ''}
@@ -256,25 +252,17 @@ function Appearances:build()
 end
 
 ---@private
----@return Widget
+---@return VNode
 function Appearances:_header()
-	return TableWidgets.TableHeader{children = {
-		TableWidgets.Row{children = WidgetUtil.collect(
-			TableWidgets.CellHeader{},
-			TableWidgets.CellHeader{children = 'Player'},
-			TableWidgets.CellHeader{children = Html.Abbr{children = 'TA.', title = 'Total appearances'}},
-			Array.map(self.tournaments, function (tournament)
-				return TableWidgets.CellHeader{children = TournamentTitle{
-					tournament = tournament, useShortName = true
-				}}
-			end)
-		)}
-	}}
+	return TournamentAppearancesHeader{
+		tournaments = self.tournaments,
+		config = self.config,
+	}
 end
 
 ---@private
 ---@param playerIndex integer
----@return Html
+---@return VNode
 function Appearances:_row(playerIndex)
 	return TournamentAppearancesRow{
 		tournaments = self.tournaments,
