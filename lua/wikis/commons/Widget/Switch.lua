@@ -21,7 +21,7 @@ local SwitchSyncLevel = {
 }
 
 ---@class SwitchParameters
----@field label string
+---@field label Renderable|Renderable[]
 ---@field switchGroup string
 ---@field storeValue boolean?
 ---@field defaultActive boolean?
