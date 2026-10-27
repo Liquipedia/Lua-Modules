@@ -11,7 +11,6 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Condition = Lua.import('Module:Condition')
-local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -38,7 +37,6 @@ local InputParser = Lua.import('Module:Features/TournamentAppearances/Lib/Parse'
 local TournamentAppearancesHeader = Lua.import('Module:Features/TournamentAppearances/Components/Header')
 local TournamentAppearancesRow = Lua.import('Module:Features/TournamentAppearances/Components/Row')
 
-local DEFAULT_TIERTYPES = {'General', 'School', ''}
 local FORM_NAME = 'Player tournament appearances'
 
 ---@class PlayerTournamentAppearances: BaseClass
@@ -66,7 +64,7 @@ end
 
 ---@return self
 function Appearances:create()
-	self.tournaments = Array.reverse(Tournament.getAllTournaments(self.config.conditions or self:_buildConditions()))
+	self.tournaments = Array.reverse(Tournament.getAllTournaments(InputParser.readTournamentConditionInputs(self.config)))
 
 	if Table.isEmpty(self.tournaments) then
 		return self
@@ -76,38 +74,6 @@ function Appearances:create()
 	self.players = self:_fetchPlayers(pageNames)
 
 	return self
-end
-
----@private
----@return ConditionTree
-function Appearances:_buildConditions()
-	local args = self.config
-
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('enddate'), Comparator.gt, DateExt.defaultDate)}
-
-	conditions:add(ConditionUtil.anyOf(ColumnName('status'), {'finished', ''}))
-	conditions:add(ConditionUtil.anyOf(ColumnName('liquipediatier'), args.tiers))
-	conditions:add(ConditionUtil.anyOf(ColumnName('liquipediatiertype'), args.tierTypes))
-
-	if Table.isNotEmpty(args.series) then
-		conditions:add(ConditionTree(BooleanOperator.any):add{
-			ConditionUtil.anyOf(ColumnName(1, 'serieslist'), args.series),
-			ConditionUtil.anyOf(ColumnName(2, 'serieslist'), args.series),
-		})
-	else
-		conditions:add(ConditionUtil.anyOf(ColumnName('pagename'), Array.map(args.pages, Page.pageifyLink)))
-	end
-
-	if args.startDate then
-		conditions:add(ConditionNode(ColumnName('startdate'), Comparator.ge, args.startDate))
-	end
-
-	if args.endDate then
-		conditions:add(ConditionNode(ColumnName('enddate'), Comparator.le, args.endDate))
-	end
-
-	return conditions
 end
 
 ---@private
