@@ -63,6 +63,8 @@ local GAMES = Array.map(Array.extractValues(Info.games, Table.iter.spairs), func
 end)
 local DEFAULT_TIERTYPES = {'', 'Weekly', 'Monthly'}
 local MINIMUM_EARNINGS = 1000
+local MISC_TIER = -1
+local MISC_TIERTYPE = 'Misc'
 
 
 local StatisticsPortal = {}
@@ -295,6 +297,22 @@ function StatisticsPortal.coverageTournamentTable(args)
 	}
 end
 
+---@param args table
+---@param tierValue string|number|nil
+---@return boolean
+function StatisticsPortal._isTierShown(args, tierValue)
+	local value = Tier.toNumber(tierValue)
+	if value == nil then return false end
+
+	if not args.customTiers then
+		return value > 0
+	end
+
+	return Array.any(args.customTiers, function(customTier)
+		return customTier == value
+	end)
+end
+
 
 ---@param args table
 ---@param parameters table
@@ -310,23 +328,46 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 
 	local countData = Count.tournamentsByTier(parameters)
 
+	local miscFromTierType = 0
+	if StatisticsPortal._isTierShown(args, MISC_TIER) then
+		miscFromTierType = Array.reduce(
+			Array.map(Array.extractValues(countData), function(typeCounts)
+				return tonumber(Table.extract(typeCounts, MISC_TIERTYPE)) or 0
+			end),
+			Operator.add, 0
+		)
+	end
+
 	local tierCells = {}
-	for rowIndex, rowValue in Tier.iterate('tiers') do
-		if String.isNotEmpty(rowValue.value) and tonumber(rowValue.value) > 0 then
-			if not args.customTiers or Array.any(Array.extractValues(args.customTiers), function(value)
-				return value == rowIndex
-			end) then
-				local tierData = countData[rowValue.value] or {}
-				local tournamentCount = 0
-				Array.forEach(args.includeTierTypes,
-					function(tiertype, _)
-						local typeCount = tonumber(Table.extract(tierData, tiertype)) or 0
-						tournamentCount = tournamentCount + typeCount
-					end
+	for _, rowValue in Tier.iterate('tiers') do
+		if StatisticsPortal._isTierShown(args, rowValue.value) then
+			local tierKey = tostring(rowValue.value)
+			local tierNumber = Tier.toNumber(rowValue.value) --[[@as integer]]
+			local tierData = countData[tierKey] or {}
+			local tournamentCount = 0
+
+			if tierNumber <= 0 then
+				-- Non-positive tier (0, -1, -2, ...): count everything stored under it
+				tournamentCount = Array.reduce(
+					Array.map(Array.extractValues(tierData), function(typeCount)
+						return tonumber(typeCount) or 0
+					end),
+					Operator.add, 0
 				)
-				runningTally = runningTally + tournamentCount
-				table.insert(tierCells, CellComponent{align = 'right', children = LANG:formatNum(tournamentCount)})
+				-- Misc tiertype found under other tiers belongs to the Misc tier (-1)
+				if tierNumber == MISC_TIER then
+					tournamentCount = tournamentCount + miscFromTierType
+				end
+				-- Consumed, so it is not counted again in the "Other" column
+				countData[tierKey] = nil
+			else
+				Array.forEach(args.includeTierTypes, function(tiertype)
+					tournamentCount = tournamentCount + (tonumber(Table.extract(tierData, tiertype)) or 0)
+				end)
 			end
+
+			runningTally = runningTally + tournamentCount
+			table.insert(tierCells, CellComponent{align = 'right', children = LANG:formatNum(tournamentCount)})
 		end
 	end
 
@@ -335,22 +376,27 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 		if tierTypeData then
 			local count = Array.reduce(
 				Array.map(Array.extractValues(countData), function(typeCounts)
-					return Table.extract(typeCounts, tierTypeValue) or 0
+					return tonumber(Table.extract(typeCounts, tierTypeValue)) or 0
 				end),
 				Operator.add, 0
 			)
 			runningTally = runningTally + count
-				return CellComponent{align = 'right', children = LANG:formatNum(count)}
-			end
-		end)
+			return CellComponent{align = 'right', children = LANG:formatNum(count)}
+		end
+	end)
 
 	local otherCell
 	if String.isNotEmpty(args.showOther) then
+		-- Whatever is left over after the columns above took their share
 		local countOther = Array.reduce(
-			Array.flatMap(Array.extractValues(countData), function(typeCounts)
-				return Table.isNotEmpty(typeCounts) and Array.extractValues(typeCounts) or 0
-			end
-			), Operator.add, 0) --[[@as number]]
+			Array.map(
+				Array.flatMap(Array.extractValues(countData), function(typeCounts)
+					return Array.extractValues(typeCounts)
+				end),
+				function(typeCount) return tonumber(typeCount) or 0 end
+			),
+			Operator.add, 0
+		)
 		runningTally = runningTally + countOther
 		otherCell = CellComponent{align = 'right', children = LANG:formatNum(countOther)}
 	end
@@ -371,27 +417,21 @@ end
 ---@return Renderable
 function StatisticsPortal._coverageTournamentTableHeader(args)
 	local tierHeaderCells = {}
-	for headerIndex, headerValue in Tier.iterate('tiers') do
-		if String.isNotEmpty(headerValue.value) and tonumber(headerValue.value) > 0 then
-			if not args.customTiers or Array.any(Array.extractValues(args.customTiers), function(value)
-				return value == headerIndex
-			end) then
-				table.insert(tierHeaderCells, TableWidgets.CellHeader{
-					children = Tier.displaySingle(headerValue, {link = true})
-				})
-			end
+	for _, headerValue in Tier.iterate('tiers') do
+		if StatisticsPortal._isTierShown(args, headerValue.value) then
+			table.insert(tierHeaderCells, TableWidgets.CellHeader{
+				children = Tier.displaySingle(headerValue, {link = true})
+			})
 		end
 	end
 
 	local tierTypeHeaderCells = {}
-	if #args.showTierTypes then
-		for _, tierTypeValue in ipairs(args.showTierTypes) do
-			local _, tierTypeData = Tier.raw(nil, tierTypeValue)
-			if tierTypeData then
-				table.insert(tierTypeHeaderCells, TableWidgets.CellHeader{
-					children = Tier.displaySingle(tierTypeData, {link = true, short = true})
-				})
-			end
+	for _, tierTypeValue in ipairs(args.showTierTypes) do
+		local _, tierTypeData = Tier.raw(nil, tierTypeValue)
+		if tierTypeData then
+			table.insert(tierTypeHeaderCells, TableWidgets.CellHeader{
+				children = Tier.displaySingle(tierTypeData, {link = true, short = true})
+			})
 		end
 	end
 
