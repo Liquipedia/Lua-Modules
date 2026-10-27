@@ -20,8 +20,14 @@ Template(s): Qualification Chances
 @include suppress-region("as");
 
 .qualification-chances {
+	display: flex;
+	width: fit-content;
+	flex-flow: column nowrap;
+	gap: 0.5rem;
+
 	&-toggle-container {
 		display: flex;
+		gap: 0.5rem;
 	}
 
 	&-bar {
