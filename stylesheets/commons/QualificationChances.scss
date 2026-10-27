@@ -1,6 +1,12 @@
 /*******************************************************************************
 Template(s): Qualification Chances
 *******************************************************************************/
+:root {
+	--qualification-region-eu-color: #4a7fc1;
+	--qualification-region-am-color: #e8c547;
+	--qualification-region-as-color: #5b8c3e;
+}
+
 .qualification-chances-bar {
 	display: flex;
 	gap: 0.125rem;
