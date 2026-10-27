@@ -25,4 +25,5 @@
 return {
 	DEFAULT_TIERTYPES = {'General', 'School', ''},
 	FORM_NAME = 'Player tournament appearances',
+	NO_RESULTS_MESSAGE = 'No results found.',
 }

@@ -7,12 +7,10 @@
 
 local Lua = require('Module:Lua')
 
-local Controller = Lua.import('Module:Features/ParticipantTable/Controller')
-
-local CustomConfig = {}
+local Controller = Lua.import('Module:Features/TournamentAppearances/Controller')
 
 return {
 	run = function(frame)
-		return Controller.execute(frame, CustomConfig)
+		return Controller.execute(frame)
 	end
 }
