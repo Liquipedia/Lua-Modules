@@ -75,7 +75,7 @@ function MatchGroupLegacyDefault:getDetails(isReset, prefix)
 
 	Table.iter.forEachPair(self.args, function (key)
 		if not tonumber(key) and String.startsWith(key, prefix) then
-			details[key:gsub(prefix, '')] = Table.extract(self.args, key)
+			details[key:gsub(prefix, '')] = self.args[key]
 		end
 	end)
 
