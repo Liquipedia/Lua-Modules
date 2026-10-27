@@ -44,7 +44,6 @@ local PlayerExt = {globalVars = globalVars}
 
 ---@class PlayerExtSyncTeamOptions
 ---@field date string|number|osdate?
----@field useTimeless boolean?
 ---@field fetchPlayer boolean?
 ---@field savePageVar boolean?
 
@@ -314,8 +313,6 @@ options.fetchPlayer: Whether to look up lpdb records of the player page. Enabled
 by default.
 options.savePageVar: Whether to save results to page variables. Enabled by
 default.
-options.useTimeless: Whether to use the template passed to a previous call of
-PlayerExt.syncTeam. Enabled by default.
 ]]
 ---@param pageName string
 ---@param template string?
@@ -331,7 +328,7 @@ function PlayerExt.syncTeam(pageName, template, options)
 
 	local historyVar = playerVars:get(pageName .. '.teamHistory')
 	local history = historyVar and Json.parse(historyVar) or {}
-	local pageVarEntry = options.useTimeless ~= false and history.timeless
+	local pageVarEntry = history.timeless
 		or Array.find(history, function(entry) return entry.joinDate <= date and date < entry.leaveDate end)
 
 	local timelessEntry = template and {
@@ -386,7 +383,7 @@ end
 ---Same as PlayerExt.syncTeam, except it does not save the player's team to page variables.
 ---@param pageName string
 ---@param template string?
----@param options {date: string?, useTimeless: boolean, fetchPlayer: boolean}
+---@param options {date: string?, fetchPlayer: boolean}
 ---@return string?
 function PlayerExt.populateTeam(pageName, template, options)
 	return PlayerExt.syncTeam(pageName, template, Table.merge(options, {savePageVar = false}))
