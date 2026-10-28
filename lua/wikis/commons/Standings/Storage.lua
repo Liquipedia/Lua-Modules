@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -67,8 +68,10 @@ function StandingsStorage.run(data, options)
 		Array.map(data.entries, function (entry) return tonumber (entry.roundindex) end),
 		math.max)
 
+	-- An opponent has an entry for every round, all with the same opponent struct
+	local toLpdbStruct = FnUtil.memoize(Opponent.toLpdbStruct)
 	local entries = Array.map(data.entries, function (entry)
-		return StandingsStorage.entry(entry, data.standingsindex)
+		return StandingsStorage.entry(entry, data.standingsindex, toLpdbStruct)
 	end)
 
 	local storeLpdb = StandingsStorage.shouldStoreLpdb(options)
@@ -142,8 +145,9 @@ end
 
 ---@param entry table
 ---@param standingsIndex number
+---@param toLpdbStruct? fun(opponent: standardOpponent): table
 ---@return table?
-function StandingsStorage.entry(entry, standingsIndex)
+function StandingsStorage.entry(entry, standingsIndex, toLpdbStruct)
 	local roundIndex = tonumber(entry.roundindex)
 	local slotIndex = tonumber(entry.slotindex)
 	local standingsIndexNumber = tonumber(standingsIndex)
@@ -180,7 +184,7 @@ function StandingsStorage.entry(entry, standingsIndex)
 		roundindex = roundIndex,
 		slotindex = slotIndex,
 		extradata = extradata,
-	}, Opponent.toLpdbStruct(entry.opponent))
+	}, (toLpdbStruct or Opponent.toLpdbStruct)(entry.opponent))
 
 	lpdbEntry.currentstatus = lpdbEntry.currentstatus or lpdbEntry.definitestatus
 
