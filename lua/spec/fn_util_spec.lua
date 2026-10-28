@@ -1,5 +1,4 @@
 --- Triple Comment to Enable our LLS Plugin
--- The specs run on plain Lua, where the garbage collector can be triggered
 -- luacheck: read globals collectgarbage
 describe('function utils', function()
 	local FnUtil = require('Module:FnUtil')
@@ -42,11 +41,11 @@ describe('function utils', function()
 		end)
 
 		it('releases the result once the table input is garbage collected', function()
-			-- The result must not reference the input, as that would keep the input alive
+			-- A result referencing its input would keep the input alive
 			local wrap = FnUtil.memoize(function(x) return {} end)
 			local inputs = {input = {}}
 			local results = setmetatable({}, {__mode = 'v'})
-			-- Called from a function of its own, so no stack slot of the test keeps the input alive
+			-- Own function, so no stack slot keeps the input alive
 			local function memoizeInput()
 				results.result = wrap(inputs.input)
 			end
@@ -55,7 +54,7 @@ describe('function utils', function()
 			collectgarbage('collect')
 			assert.is_true(results.result ~= nil)
 			inputs.input = nil
-			-- Lua 5.1 drops the entry of a collected key in one cycle and frees its value in the next
+			-- Lua 5.1 frees the value one cycle after the key
 			collectgarbage('collect')
 			collectgarbage('collect')
 			assert.is_true(results.result == nil)
@@ -118,7 +117,7 @@ describe('function utils', function()
 			local pair = FnUtil.memoize2(function(x, y) return {} end)
 			local inputs = {first = {}, second = {}, third = {}}
 			local results = setmetatable({}, {__mode = 'v'})
-			-- Called from a function of its own, so no stack slot of the test keeps the inputs alive
+			-- Own function, so no stack slot keeps the inputs alive
 			local function memoizeInputs()
 				results.firstGone = pair(inputs.first, 'y')
 				results.secondGone = pair('x', inputs.second)
@@ -127,7 +126,7 @@ describe('function utils', function()
 			memoizeInputs()
 
 			inputs.first, inputs.second = nil, nil
-			-- Lua 5.1 drops the entry of a collected key in one cycle and frees its value in the next
+			-- Lua 5.1 frees the value one cycle after the key
 			collectgarbage('collect')
 			collectgarbage('collect')
 			assert.is_true(results.firstGone == nil)

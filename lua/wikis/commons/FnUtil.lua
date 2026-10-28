@@ -15,16 +15,14 @@ local FnUtil = {}
 
 local WEAK_KEYS = {__mode = 'k'}
 
----Creates a cache table whose entries are dropped once their key is garbage collected.
----Only table and function keys are ever collected, so other keys stay cached for good.
----A value that references its own key keeps that key alive, as Lua 5.1 has no ephemeron tables.
+---Cache that drops entries once their key is garbage collected.
+---A value referencing its own key keeps it alive (no ephemerons in Lua 5.1).
 ---@return table
 local function weakKeyedCache()
 	return setmetatable({}, WEAK_KEYS)
 end
 
 ---Creates a memoized copy of a 0 or 1 param function.
----Results for a table input are released once that table is garbage collected.
 ---@generic T:memoizableFunction
 ---@param func T
 ---@return T
@@ -51,7 +49,6 @@ function FnUtil.memoize(func)
 end
 
 ---Creates a memoized copy of a 2 param function.
----Results for a table input are released once that table is garbage collected.
 ---@generic T:memoizableFunction2
 ---@param func T
 ---@return T
