@@ -172,6 +172,19 @@ describe('Components/Renderer', function()
 			mw.ustring.codepoint = codepoint
 		end)
 
+		it('leaves strip markers to mw.html', function()
+			-- mw.html of the tests does not restore strip markers, so only which builder is used can be checked
+			local marker = '\127\'"`UNIQ--ref-00000001-QINU`"\'\127'
+			local create = spy.on(mw.html, 'create')
+			Renderer.render(Html.Span{attributes = {title = 'plain'}, classes = {'plain'}, css = {color = 'red'}})
+			assert.spy(create).was.called(0)
+			Renderer.render(Html.Span{attributes = {title = 'a' .. marker}})
+			Renderer.render(Html.Span{classes = {'a', marker}})
+			Renderer.render(Html.Span{css = {content = marker}})
+			assert.spy(create).was.called(3)
+			create:revert()
+		end)
+
 		it('class and style attributes', function()
 			assertSameAsMwHtml('div', {classes = {'foo'}, attributes = {class = 'bar'}})
 			assertSameAsMwHtml('div', {css = {color = 'red'}, attributes = {style = 'width:1px'}})

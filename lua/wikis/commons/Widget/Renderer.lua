@@ -45,18 +45,28 @@ local CLOSING_TAGS = setmetatable({}, {__index = function(closingTags, tagName)
 	return closingTags[tagName]
 end})
 
+-- Strip markers always contain this character, mw.html keeps them intact when it encodes a value
+local STRIP_MARKER_CHARACTER = '\127'
+
 ---@param value string|number
 ---@return string
 local function htmlEncode(value)
 	return (string.gsub(value, '[<>&"]', HTML_ENCODE_MAP))
 end
 
----Whether mw.html would output the css name or value unchanged
+---@param value string|number
+---@return boolean
+local function hasStripMarker(value)
+	return type(value) == 'string' and value:find(STRIP_MARKER_CHARACTER, 1, true) ~= nil
+end
+
+---Whether mw.html would output the css name or value unchanged.
+---The strip marker character (\127) is excluded, so those values are left to mw.html as well.
 ---@param value any
 ---@return boolean
 local function isPlainCssValue(value)
 	local valueType = type(value)
-	return valueType == 'number' or valueType == 'string' and not value:find('[^\32-\57\60-\127]')
+	return valueType == 'number' or valueType == 'string' and not value:find('[^\32-\57\60-\126]')
 end
 
 ---Whether mw.html would accept the attribute and output it as is
@@ -68,12 +78,13 @@ local function isPlainAttribute(name, value)
 	return type(name) == 'string'
 		and name ~= 'class' and name ~= 'style'
 		and (valueType == 'string' or valueType == 'number')
+		and not hasStripMarker(value)
 		and name:match('^[a-zA-Z_:][a-zA-Z0-9_.:-]*$') ~= nil
 end
 
 ---Builds the opening tag the same way mw.html does, without creating an mw.html object for every tag.
----Returns nil for input that mw.html treats specially (class or style attributes, css that has to be encoded)
----or rejects, which is then left to mw.html.
+---Returns nil for input that mw.html treats specially (class or style attributes, css that has to be encoded,
+---strip markers) or rejects, which is then left to mw.html.
 ---@param tagName string
 ---@param props {classes?: string[], css?: table, attributes?: table}
 ---@return string?
@@ -83,7 +94,11 @@ local function buildOpeningTag(tagName, props)
 	end
 	local parts = {'<', tagName}
 	if props.classes then
-		parts[#parts + 1] = ' class="' .. htmlEncode(table.concat(props.classes, ' ')) .. '"'
+		local classes = table.concat(props.classes, ' ')
+		if hasStripMarker(classes) then
+			return
+		end
+		parts[#parts + 1] = ' class="' .. htmlEncode(classes) .. '"'
 	end
 	for name, value in pairs(props.attributes or {}) do
 		if not isPlainAttribute(name, value) then
