@@ -85,7 +85,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 				return
 			end
 			record.match2games = record.match2games or {}
-			local match2 = MatchGroupUtil.matchFromRecord(record)
+			local match2 = StandingsParseLpdb.slimMatch(MatchGroupUtil.matchFromRecord(record))
 			phaseByMatchId[record.match2id] = match2.phase
 			StandingsParseLpdb.parseMatch(
 				matchIdToRound[record.match2id], match2, opponents, scoreMapper, #rounds, lookupOpponent, options
@@ -131,6 +131,41 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 	end)
 
 	return importedOpponents, matchPhasesByRound
+end
+
+---Keeps only what the standings read from a match, as the matches are held until the standings are stored.
+---Teams are identified by their template, so their players are left out.
+---@param match MatchGroupUtilMatch
+---@return MatchGroupUtilMatch
+function StandingsParseLpdb.slimMatch(match)
+	return {
+		matchId = match.matchId,
+		finished = match.finished,
+		winner = match.winner,
+		bestof = match.bestof,
+		phase = match.phase,
+		opponents = Array.map(match.opponents, function(opponent)
+			return {
+				type = opponent.type,
+				name = opponent.name,
+				template = opponent.template,
+				players = opponent.type == Opponent.team and {} or opponent.players,
+				score = opponent.score,
+				status = opponent.status,
+				placement = opponent.placement,
+			}
+		end),
+		games = Array.map(match.games, function(game)
+			return {
+				winner = game.winner,
+				status = game.status,
+				scores = game.scores,
+				opponents = Array.map(game.opponents or {}, function(gameOpponent)
+					return {status = gameOpponent.status}
+				end),
+			}
+		end),
+	}
 end
 
 ---Builds the condition for fetching the matches. LPDB gets slow on a condition with many match ids
