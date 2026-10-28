@@ -49,12 +49,14 @@ describe('Standings import from matches', function()
 			if tableName ~= 'match2' then
 				return {}
 			end
-			-- return the records the conditions ask for, mimicking the LPDB matchid filter
+			-- return the records the conditions ask for, mimicking the LPDB match id and bracket id filters
 			-- and leaving out the columns that are not queried
 			local columns = parameters.query and Array.parseCommaSeparatedString(parameters.query)
 			local found = {}
 			for matchId, record in pairs(recordsById) do
-				if parameters.conditions:find(matchId, 1, true) then
+				local bracketId = matchId:match('^(.-)_[%w-]+$')
+				if parameters.conditions:find('[[match2id::' .. matchId .. ']]', 1, true)
+					or bracketId and parameters.conditions:find('[[match2bracketid::' .. bracketId .. ']]', 1, true) then
 					table.insert(found, columns and Table.map(columns, function(_, column)
 						return column, record[column]
 					end) or record)
@@ -88,6 +90,40 @@ describe('Standings import from matches', function()
 			{{roundNumber = 1, matches = {}}}, swissScoreMapper, {}, {importOpponents = true}
 		)
 		assert.are_same({}, opponents)
+	end)
+
+	describe('match condition', function()
+		it('filters by match group and only lists match ids without one', function()
+			stubMatchQuery{}
+			local condition = tostring(StandingsParseLpdb.matchIdsCondition{
+				'abc_R01-M001', 'abc_R01-M002', 'def_ghi_0001', 'M1',
+			})
+			assert.are_equal(
+				'([[match2bracketid::abc]] OR [[match2bracketid::def_ghi]]) OR ([[match2id::M1]])',
+				condition
+			)
+		end)
+
+		it('skips matches of the match group that are not part of a round', function()
+			stubMatchQuery{
+				match2Record{matchId = 'abc_R01-M001', winner = 1, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+					{template = 'tt9 esports 2022', name = 'TT9 Esports', score = 0, placement = 2},
+				}},
+				match2Record{matchId = 'abc_R01-M002', winner = 1, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+					{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 2},
+				}},
+			}
+
+			local opponents = StandingsParseLpdb.importFromMatches(
+				{{roundNumber = 1, matches = {'abc_R01-M001'}}}, swissScoreMapper, {}, {importOpponents = true}
+			)
+
+			assert.are_equal(2, #opponents)
+			assert.is_nil(findOpponent(opponents, 'Wolves Esports'))
+			assert.are_equal(1, #findOpponent(opponents, 'Heroic').rounds[1].matches)
+		end)
 	end)
 
 	describe('match phases', function()
