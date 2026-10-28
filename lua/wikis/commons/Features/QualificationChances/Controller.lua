@@ -9,6 +9,8 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local Countdown = Lua.import('Module:Countdown')
+local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -31,6 +33,8 @@ function Controller.showQualificationChances(frame)
 
 	local stages = Json.parseIfTable(args.stages)
 	local data = DataFetch.fromWikiJson(args.datapage)
+
+	local createdAtTimestamp = DateExt.readTimestamp((data.run or {}).createdAt)
 
 	local limit = tonumber(args.limit)
 
@@ -97,6 +101,14 @@ function Controller.showQualificationChances(frame)
 						children = rows,
 					},
 				},
+				footer = createdAtTimestamp and {
+					'Last updated: ',
+					Countdown.create{
+						date = DateExt.toCountdownArg(createdAtTimestamp),
+						timestamp = createdAtTimestamp,
+						rawdatetime = true,
+					},
+				} or nil,
 			}
 		}
 	}
