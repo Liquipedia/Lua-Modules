@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
@@ -20,12 +19,56 @@ local INHERITABLE_PROPS = {
 	'sortType', 'unsortable',
 }
 
+-- The inheritable props each column definition sets, so cells only check those
+local inheritedPropsByColumn = setmetatable({}, {__mode = 'k'})
+
+---@param columnDef table
+---@return string[]
+local function getInheritedProps(columnDef)
+	local inheritedProps = inheritedPropsByColumn[columnDef]
+	if not inheritedProps then
+		inheritedProps = {}
+		for _, prop in ipairs(INHERITABLE_PROPS) do
+			if columnDef[prop] ~= nil then
+				table.insert(inheritedProps, prop)
+			end
+		end
+		inheritedPropsByColumn[columnDef] = inheritedProps
+	end
+	return inheritedProps
+end
+
+---Logic.readBool, without the string comparisons for the common unset and boolean values
+---@param value (string|number|boolean)?
+---@return boolean
+local function readBool(value)
+	if value == nil or value == false then
+		return false
+	elseif value == true then
+		return true
+	end
+	return Logic.readBool(value)
+end
+
+---Converts a value to an integer, like MathUtil.toInteger
+---Integers and nil, the common cases for cell props, skip the string parsing
+---@param value any
+---@return integer?
+function ColumnUtil.toInteger(value)
+	if value == nil then
+		return nil
+	elseif type(value) == 'number' and value % 1 == 0 then
+		return value
+	end
+	return MathUtil.toInteger(value)
+end
+
 ---Gets the column index for this cell
 ---@param columnIndexProp integer|string? - explicit column index from props
 ---@param columnIndexContext integer|string? - implicit column index from context
 ---@return integer
 function ColumnUtil.getColumnIndex(columnIndexProp, columnIndexContext)
-	local index = MathUtil.toInteger(columnIndexProp) or MathUtil.toInteger(columnIndexContext)
+	local index = ColumnUtil.toInteger(columnIndexProp) or ColumnUtil.toInteger(columnIndexContext)
 	return index or 1
 end
 
@@ -39,11 +82,11 @@ function ColumnUtil.mergeProps(cellProps, columnDef)
 		return
 	end
 
-	Array.forEach(INHERITABLE_PROPS, function(prop)
+	for _, prop in ipairs(getInheritedProps(columnDef)) do
 		if cellProps[prop] == nil and columnDef[prop] ~= nil then
 			cellProps[prop] = columnDef[prop]
 		end
-	end)
+	end
 
 	if columnDef.css then
 		cellProps.css = Table.merge(columnDef.css, cellProps.css or {})
@@ -61,10 +104,10 @@ end
 ---@param minWidth string?
 ---@param maxWidth string?
 ---@param existingCss table?
----@return table css
+---@return table? css
 function ColumnUtil.buildCss(width, minWidth, maxWidth, existingCss)
 	if not width and not minWidth and not maxWidth then
-		return existingCss or {}
+		return existingCss
 	end
 
 	return Table.merge(existingCss or {}, {
@@ -87,11 +130,11 @@ function ColumnUtil.buildCellAttributes(align, nowrap, shrink, existingAttribute
 		attrs['data-align'] = align
 	end
 
-	if Logic.readBool(nowrap) then
+	if readBool(nowrap) then
 		attrs['data-nowrap'] = ''
 	end
 
-	if Logic.readBool(shrink) then
+	if readBool(shrink) then
 		attrs['data-shrink'] = ''
 	end
 
@@ -106,11 +149,11 @@ function ColumnUtil.buildAttributes(mergedProps, additionalAttributeBuilders)
 	local attributes = mergedProps.attributes or {}
 
 	if mergedProps.colspan then
-		attributes.colspan = MathUtil.toInteger(mergedProps.colspan) or mergedProps.colspan
+		attributes.colspan = ColumnUtil.toInteger(mergedProps.colspan) or mergedProps.colspan
 	end
 
 	if mergedProps.rowspan then
-		attributes.rowspan = MathUtil.toInteger(mergedProps.rowspan) or mergedProps.rowspan
+		attributes.rowspan = ColumnUtil.toInteger(mergedProps.rowspan) or mergedProps.rowspan
 	end
 
 	if additionalAttributeBuilders then
