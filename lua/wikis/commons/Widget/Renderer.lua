@@ -7,20 +7,142 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local ErrorDisplay = Lua.import('Module:Error/Display')
 local Logic = Lua.import('Module:Logic')
 local Types = Lua.import('Module:Widget/Types')
 
 local Renderer = {}
 
+-- Same as in mw.html
+local SELF_CLOSING_TAGS = {
+	area = true,
+	base = true,
+	br = true,
+	col = true,
+	command = true,
+	embed = true,
+	hr = true,
+	img = true,
+	input = true,
+	keygen = true,
+	link = true,
+	meta = true,
+	param = true,
+	source = true,
+	track = true,
+	wbr = true,
+}
+
+local HTML_ENCODE_MAP = {
+	['>'] = '&gt;',
+	['<'] = '&lt;',
+	['&'] = '&amp;',
+	['"'] = '&quot;',
+}
+
+local CLOSING_TAGS = setmetatable({}, {__index = function(closingTags, tagName)
+	closingTags[tagName] = '</' .. tagName .. '>'
+	return closingTags[tagName]
+end})
+
+---@param value string|number
+---@return string
+local function htmlEncode(value)
+	return (string.gsub(value, '[<>&"]', HTML_ENCODE_MAP))
+end
+
+---Whether mw.html would output the css name or value unchanged
+---@param value any
+---@return boolean
+local function isPlainCssValue(value)
+	local valueType = type(value)
+	return valueType == 'number' or valueType == 'string' and not value:find('[^\32-\57\60-\127]')
+end
+
+---Whether mw.html would accept the attribute and output it as is
+---@param name any
+---@param value any
+---@return boolean
+local function isPlainAttribute(name, value)
+	local valueType = type(value)
+	return type(name) == 'string'
+		and name ~= 'class' and name ~= 'style'
+		and (valueType == 'string' or valueType == 'number')
+		and name:match('^[a-zA-Z_:][a-zA-Z0-9_.:-]*$') ~= nil
+end
+
+---Builds the opening tag the same way mw.html does, without creating an mw.html object for every tag.
+---Returns nil for input that mw.html treats specially (class or style attributes, css that has to be encoded)
+---or rejects, which is then left to mw.html.
+---@param tagName string
+---@param props {classes?: string[], css?: table, attributes?: table}
+---@return string?
+local function buildOpeningTag(tagName, props)
+	if not tagName:match('^[a-zA-Z0-9]+$') then
+		return
+	end
+	local parts = {'<', tagName}
+	if props.classes then
+		parts[#parts + 1] = ' class="' .. htmlEncode(table.concat(props.classes, ' ')) .. '"'
+	end
+	for name, value in pairs(props.attributes or {}) do
+		if not isPlainAttribute(name, value) then
+			return
+		end
+		parts[#parts + 1] = ' ' .. name .. '="' .. htmlEncode(value) .. '"'
+	end
+	if props.css and next(props.css) ~= nil then
+		local styles = {}
+		for name, value in pairs(props.css) do
+			if not isPlainCssValue(name) or not isPlainCssValue(value) then
+				return
+			end
+			styles[#styles + 1] = htmlEncode(name .. ':' .. value)
+		end
+		parts[#parts + 1] = ' style="' .. table.concat(styles, ';') .. '"'
+	end
+	parts[#parts + 1] = SELF_CLOSING_TAGS[tagName] and ' />' or '>'
+	return table.concat(parts)
+end
+
+---Builds the opening tag with mw.html, by building the tag without children and cutting off its closing tag.
+---@param tagName string
+---@param props {classes?: string[], css?: table, attributes?: table}
+---@return string
+local function buildOpeningTagWithMwHtml(tagName, props)
+	local tag = mw.html.create(tagName)
+
+	if props.classes then
+		tag:addClass(table.concat(props.classes, ' '))
+	end
+	if props.css then tag:css(props.css) end
+	if props.attributes then tag:attr(props.attributes) end
+
+	local emptyTag = tostring(tag)
+	if SELF_CLOSING_TAGS[tagName] then
+		return emptyTag
+	end
+	return emptyTag:sub(1, -#CLOSING_TAGS[tagName] - 1)
+end
+
 --- Renders a Virtual Node (VNode) into a string
 ---@param vNode Renderable|Renderable[]|nil
 ---@param context Context?
 ---@return string
 function Renderer.render(vNode, context)
+	local buffer = {}
+	Renderer._renderInto(vNode, context, buffer)
+	return table.concat(buffer)
+end
+
+--- Renders a Virtual Node (VNode) into the buffer.
+--- All html ends up in a single buffer, instead of being concatenated again on every level of the tree.
+---@param vNode Renderable|Renderable[]|nil
+---@param context Context?
+---@param buffer string[]
+function Renderer._renderInto(vNode, context, buffer)
 	if not vNode then
-		return ''
+		return
 	end
 
 	local vNodeType = type(vNode)
@@ -28,17 +150,18 @@ function Renderer.render(vNode, context)
 	-- Handle Arrays
 	-- For performance reasons we do a heuristic check for array-like tables
 	if vNodeType == 'table' and vNode[1] then
-		local output = Array.map(vNode, function(child)
-			return Renderer.render(child, context)
-		end)
-		return table.concat(output)
+		for _, child in ipairs(vNode) do
+			Renderer._renderInto(child, context, buffer)
+		end
+		return
 	end
 
 	---@cast vNode Renderable
 
 	-- Handle Primitives (Strings/Numbers)
 	if vNodeType == 'string' or vNodeType == 'number' then
-		return tostring(vNode)
+		buffer[#buffer + 1] = tostring(vNode)
+		return
 	end
 
 	if vNodeType ~= 'table' then
@@ -48,7 +171,7 @@ function Renderer.render(vNode, context)
 
 	-- Empty Table
 	if next(vNode) == nil then
-		return ''
+		return
 	end
 
 	local renderFn = vNode.renderFn
@@ -56,7 +179,8 @@ function Renderer.render(vNode, context)
 	-- Backward Compatibility (with Widgets and mw.html)
 	if not renderFn then
 		if vNode.__tostring or vNode._build then
-			return tostring(vNode)
+			buffer[#buffer + 1] = tostring(vNode)
+			return
 		end
 		mw.log('ERROR! Bad renderable:' .. mw.dumpObject(vNode))
 		error('Invalid Table passed as Renderable')
@@ -76,14 +200,16 @@ function Renderer.render(vNode, context)
 				value = vNode.props.value,
 			}
 		}
-		return Renderer.render(vNode.props.children, newContext)
+		Renderer._renderInto(vNode.props.children, newContext, buffer)
+		return
 	end
 
 	-- Handle Error Boundaries
+	-- The children get a buffer of their own, so that nothing of them is output when they error
 	if renderFn == Types.ERROR_BOUNDARY then
 		---@cast vNode ErrorBoundaryNode
 		local props = vNode.props
-		return Logic.tryOrElseLog(
+		buffer[#buffer + 1] = Logic.tryOrElseLog(
 			function ()
 				return Renderer.render(props.children, context)
 			end,
@@ -99,36 +225,34 @@ function Renderer.render(vNode, context)
 				return error
 			end
 		)
+		return
 	end
 
 	-- Handle HTML Tags
 	if type(renderFn) == 'string' then
 		---@cast vNode HtmlNode
 		local props = vNode.props
-		local tagName = renderFn
-		local tag = mw.html.create(tagName)
-
-		if props.classes then
-			tag:addClass(table.concat(props.classes, ' '))
-		end
-		if props.css then tag:css(props.css) end
-		if props.attributes then tag:attr(props.attributes) end
-
-		if props.children then
-			local childContent = Renderer.render(props.children, context)
-			if childContent ~= '' then
-				tag:node(childContent)
+		buffer[#buffer + 1] = buildOpeningTag(renderFn, props) or buildOpeningTagWithMwHtml(renderFn, props)
+		if SELF_CLOSING_TAGS[renderFn] then
+			-- Like mw.html, children are only allowed when they render to nothing
+			local childBuffer = {}
+			Renderer._renderInto(props.children, context, childBuffer)
+			if table.concat(childBuffer) ~= '' then
+				error('self-closing tags can\'t have child nodes')
 			end
+			return
 		end
-
-		return tostring(tag)
+		Renderer._renderInto(props.children, context, buffer)
+		buffer[#buffer + 1] = CLOSING_TAGS[renderFn]
+		return
 	end
 
 	-- Handle Functional Components
 	if type(renderFn) == 'function' then
 		-- Execute the function with props and the current context pointer
 		local result = renderFn(vNode.props, context)
-		return Renderer.render(result, context)
+		Renderer._renderInto(result, context, buffer)
+		return
 	end
 
 	mw.logObject(renderFn, 'Invalid renderFn')

@@ -118,6 +118,84 @@ describe('Components/Renderer', function()
 			assert.are.equal('<p>built</p>', Renderer.render(Widget2HtmlP{children = {'built'}}))
 		end)
 	end)
+
+	describe('HTML tags match mw.html', function()
+		local Table = require('Module:Table')
+
+		---@param tagName string
+		---@param props table
+		---@param children string?
+		---@return string
+		local function buildWithMwHtml(tagName, props, children)
+			local tag = mw.html.create(tagName)
+			if props.classes then
+				tag:addClass(table.concat(props.classes, ' '))
+			end
+			if props.css then tag:css(props.css) end
+			if props.attributes then tag:attr(props.attributes) end
+			if children then tag:node(children) end
+			return tostring(tag)
+		end
+
+		---@param tagName string
+		---@param props table
+		local function assertSameAsMwHtml(tagName, props)
+			local vNode = {renderFn = tagName, props = Table.merge(props, {children = {'child'}})}
+			assert.are.equal(buildWithMwHtml(tagName, props, 'child'), Renderer.render(vNode))
+		end
+
+		it('classes, attributes and css', function()
+			assertSameAsMwHtml('div', {
+				classes = {'foo', 'bar'},
+				attributes = {id = 'my-id', ['data-count'] = 3, ['aria-label'] = 'Label'},
+				css = {color = 'red', ['font-weight'] = 'bold', width = 100},
+			})
+		end)
+
+		it('empty classes and css', function()
+			assertSameAsMwHtml('span', {classes = {}, css = {}})
+		end)
+
+		it('escapes classes, attribute values and css', function()
+			assertSameAsMwHtml('div', {
+				classes = {'a"b'},
+				attributes = {title = '<b>"Tom" & Jerry</b>'},
+				css = {['background-image'] = 'url(a&b.png)'},
+			})
+		end)
+
+		it('css that has to be encoded', function()
+			-- mw.html encodes by codepoint, which is not mocked
+			local codepoint = mw.ustring.codepoint
+			mw.ustring.codepoint = string.byte
+			assertSameAsMwHtml('div', {css = {color = 'red;display:none', content = '"\n"'}})
+			mw.ustring.codepoint = codepoint
+		end)
+
+		it('class and style attributes', function()
+			assertSameAsMwHtml('div', {classes = {'foo'}, attributes = {class = 'bar'}})
+			assertSameAsMwHtml('div', {css = {color = 'red'}, attributes = {style = 'width:1px'}})
+		end)
+
+		it('self closing tags only allow children that render to nothing', function()
+			local rendered = false
+			local EmptyChild = ComponentCore.component(function()
+				rendered = true
+				return ''
+			end)
+			assert.are.equal('<br class="foo" />', Renderer.render(Html.Br{classes = {'foo'}, children = {EmptyChild{}}}))
+			assert.is_true(rendered)
+			assert.error(function()
+				Renderer.render(Html.Br{children = {'child'}})
+			end)
+		end)
+
+		it('errors on invalid attribute names like mw.html', function()
+			assert.error(function()
+				Renderer.render(Html.Div{attributes = {['bad name'] = 'x'}})
+			end)
+		end)
+	end)
 end)
 
 describe('Components/Component', function()
