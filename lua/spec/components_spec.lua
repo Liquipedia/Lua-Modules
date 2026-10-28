@@ -165,7 +165,7 @@ describe('Components/Renderer', function()
 		end)
 
 		it('css that has to be encoded', function()
-			-- mw.html encodes by codepoint, which is not mocked
+			-- codepoint is not mocked
 			local codepoint = mw.ustring.codepoint
 			mw.ustring.codepoint = string.byte
 			assertSameAsMwHtml('div', {css = {color = 'red;display:none', content = '"\n"'}})
@@ -173,7 +173,7 @@ describe('Components/Renderer', function()
 		end)
 
 		it('leaves strip markers to mw.html', function()
-			-- mw.html of the tests does not restore strip markers, so only which builder is used can be checked
+			-- The test mw.html does not restore markers, so check which builder is used
 			local marker = '\127\'"`UNIQ--ref-00000001-QINU`"\'\127'
 			local create = spy.on(mw.html, 'create')
 			Renderer.render(Html.Span{attributes = {title = 'plain'}, classes = {'plain'}, css = {color = 'red'}})

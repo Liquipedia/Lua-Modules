@@ -45,7 +45,7 @@ local CLOSING_TAGS = setmetatable({}, {__index = function(closingTags, tagName)
 	return closingTags[tagName]
 end})
 
--- Strip markers always contain this character, mw.html keeps them intact when it encodes a value
+-- Strip markers contain this character
 local STRIP_MARKER_CHARACTER = '\127'
 
 ---@param value string|number
@@ -60,8 +60,7 @@ local function hasStripMarker(value)
 	return type(value) == 'string' and value:find(STRIP_MARKER_CHARACTER, 1, true) ~= nil
 end
 
----Whether mw.html would output the css name or value unchanged.
----The strip marker character (\127) is excluded, so those values are left to mw.html as well.
+---Whether mw.html outputs the css name or value unchanged (strip markers excluded)
 ---@param value any
 ---@return boolean
 local function isPlainCssValue(value)
@@ -69,7 +68,7 @@ local function isPlainCssValue(value)
 	return valueType == 'number' or valueType == 'string' and not value:find('[^\32-\57\60-\126]')
 end
 
----Whether mw.html would accept the attribute and output it as is
+---Whether mw.html outputs the attribute unchanged
 ---@param name any
 ---@param value any
 ---@return boolean
@@ -82,9 +81,7 @@ local function isPlainAttribute(name, value)
 		and name:match('^[a-zA-Z_:][a-zA-Z0-9_.:-]*$') ~= nil
 end
 
----Builds the opening tag the same way mw.html does, without creating an mw.html object for every tag.
----Returns nil for input that mw.html treats specially (class or style attributes, css that has to be encoded,
----strip markers) or rejects, which is then left to mw.html.
+---Builds the opening tag like mw.html does. Returns nil for input that needs mw.html.
 ---@param tagName string
 ---@param props {classes?: string[], css?: table, attributes?: table}
 ---@return string?
@@ -120,7 +117,7 @@ local function buildOpeningTag(tagName, props)
 	return table.concat(parts)
 end
 
----Builds the opening tag with mw.html, by building the tag without children and cutting off its closing tag.
+---Builds the opening tag with mw.html.
 ---@param tagName string
 ---@param props {classes?: string[], css?: table, attributes?: table}
 ---@return string
@@ -150,8 +147,7 @@ function Renderer.render(vNode, context)
 	return table.concat(buffer)
 end
 
---- Renders a Virtual Node (VNode) into the buffer.
---- All html ends up in a single buffer, instead of being concatenated again on every level of the tree.
+--- Renders a Virtual Node (VNode) into the buffer
 ---@param vNode Renderable|Renderable[]|nil
 ---@param context Context?
 ---@param buffer string[]
@@ -220,7 +216,7 @@ function Renderer._renderInto(vNode, context, buffer)
 	end
 
 	-- Handle Error Boundaries
-	-- The children get a buffer of their own, so that nothing of them is output when they error
+	-- Own buffer, so a failing subtree outputs nothing
 	if renderFn == Types.ERROR_BOUNDARY then
 		---@cast vNode ErrorBoundaryNode
 		local props = vNode.props
@@ -249,7 +245,7 @@ function Renderer._renderInto(vNode, context, buffer)
 		local props = vNode.props
 		buffer[#buffer + 1] = buildOpeningTag(renderFn, props) or buildOpeningTagWithMwHtml(renderFn, props)
 		if SELF_CLOSING_TAGS[renderFn] then
-			-- Like mw.html, children are only allowed when they render to nothing
+			-- mw.html only allows children that render to nothing
 			local childBuffer = {}
 			Renderer._renderInto(props.children, context, childBuffer)
 			if table.concat(childBuffer) ~= '' then
