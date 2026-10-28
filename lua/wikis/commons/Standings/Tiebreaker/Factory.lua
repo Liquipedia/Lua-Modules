@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Set = Lua.import('Module:Set')
 local String = Lua.import('Module:StringUtils')
 
 local TiebreakerComposite = Lua.import('Module:Standings/Tiebreaker/Composite')
@@ -50,27 +51,27 @@ local NAME_TO_CLASS = {
 }
 
 -- Tiebreakers that are not derived from the matches among tied opponents, so they only exist in the full context
-local NON_MATCH_BASED = {
-	buchholz = true,
-	medianbuchholz = true,
-	buchholzcutone = true,
-	buchholzpoints = true,
-	medianbuchholzpoints = true,
-	buchholzcutonepoints = true,
-	sonnebornberger = true,
-	manual = true,
-	disqualified = true,
-	startingpoints = true,
+local NON_MATCH_BASED = Set{
+	'buchholz',
+	'medianbuchholz',
+	'buchholzcutone',
+	'buchholzpoints',
+	'medianbuchholzpoints',
+	'buchholzcutonepoints',
+	'sonnebornberger',
+	'manual',
+	'disqualified',
+	'startingpoints',
 }
 
 -- Tiebreakers that read the games of the matches
-local READS_GAMES = {
-	gamediffregulation = true,
-	roundwins = true,
-	roundlosses = true,
-	rounddiff = true,
-	roundwinrate = true,
-	roundscore = true,
+local READS_GAMES = Set{
+	'gamediffregulation',
+	'roundwins',
+	'roundlosses',
+	'rounddiff',
+	'roundwinrate',
+	'roundscore',
 }
 
 --- Splits a tiebreaker id into its context and name.
@@ -99,7 +100,7 @@ function TiebreakerFactory.validateAndNormalizeInput(input)
 	local tiebreakerClassName = NAME_TO_CLASS[name]
 	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(input))
 	assert(
-		context == 'full' or not NON_MATCH_BASED[name],
+		context == 'full' or not NON_MATCH_BASED:contains(name),
 		'Tiebreaker "' .. name .. '" cannot be used in the ' .. context .. ' context, '
 			.. 'as it is not derived from the matches among the tied opponents'
 	)
@@ -110,7 +111,7 @@ end
 ---@return boolean
 function TiebreakerFactory.readsGames(tiebreakerId)
 	local _, name = TiebreakerFactory.parseId(tiebreakerId)
-	return READS_GAMES[name] == true
+	return READS_GAMES:contains(name)
 end
 
 ---@param tiebreakerId string
