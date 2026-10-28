@@ -51,7 +51,7 @@ describe('Standings import from matches', function()
 			end
 			-- return the records the conditions ask for, mimicking the LPDB matchid filter
 			-- and leaving out the columns that are not queried
-			local columns = parameters.query and Array.map(mw.text.split(parameters.query, ','), mw.text.trim)
+			local columns = parameters.query and Array.parseCommaSeparatedString(parameters.query)
 			local found = {}
 			for matchId, record in pairs(recordsById) do
 				if parameters.conditions:find(matchId, 1, true) then
@@ -494,7 +494,7 @@ describe('Standings import from matches', function()
 		local function queriedColumns()
 			---@diagnostic disable-next-line: undefined-field
 			local query = mw.ext.LiquipediaDB.lpdb.calls[1].vals[2].query
-			return Array.map(mw.text.split(query, ','), mw.text.trim)
+			return Array.parseCommaSeparatedString(query)
 		end
 
 		it('leaves out the games unless asked for', function()
