@@ -30,10 +30,10 @@ local function isScored(gameOpponents)
 	return true
 end
 
+local getPlayedRounds
 ---@param opponent TiebreakerOpponent
 ---@return {rounds: integer, w: integer, l: integer, walkoverMaps: {w: integer, l: integer},
 ---walkoverMatches: {w: integer, l: integer}, walkoverMatchMaps: {w: integer, l: integer}}
-local getPlayedRounds
 getPlayedRounds = FnUtil.memoize(function (opponent)
 	local previousRound, firstMatchIndex = TiebreakerGameUtil.continuedRound(opponent)
 	local previous = previousRound and getPlayedRounds(previousRound)

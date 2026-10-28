@@ -60,9 +60,9 @@ function TiebreakerGameUtil.continuedRound(opponent)
 	return previousRound, #previousRound.matches + 1
 end
 
+local getPlayedGames
 ---@param opponent TiebreakerOpponent
 ---@return {games: integer, w: integer, l: integer, walkover: {w: integer, l: integer}?}
-local getPlayedGames
 getPlayedGames = FnUtil.memoize(function (opponent)
 	local previousRound, firstMatchIndex = TiebreakerGameUtil.continuedRound(opponent)
 	local previous = previousRound and getPlayedGames(previousRound) or {games = 0, w = 0}
