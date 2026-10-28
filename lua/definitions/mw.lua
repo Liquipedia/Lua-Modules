@@ -1010,7 +1010,27 @@ function mw.ustring.gsub(s, pattern, repl, n) end
 ---Returns true if the string is valid UTF-8, false if not.
 ---@param s string|number
 ---@return boolean
-function mw.ustring.isutf8(s) end
+function mw.ustring.isutf8(s)
+	s = tostring(s)
+	local index = 1
+	while index <= #s do
+		local byte = string.byte(s, index)
+		local length = byte < 0x80 and 1 or byte >= 0xC2 and byte <= 0xDF and 2
+			or byte >= 0xE0 and byte <= 0xEF and 3 or byte >= 0xF0 and byte <= 0xF4 and 4
+		if not length then
+			return false
+		end
+		-- The fake does not reject overlong three and four byte sequences or surrogates
+		for continuation = index + 1, index + length - 1 do
+			local continuationByte = string.byte(s, continuation)
+			if not continuationByte or continuationByte < 0x80 or continuationByte > 0xBF then
+				return false
+			end
+		end
+		index = index + length
+	end
+	return true
+end
 
 ---Returns the length of the string in codepoints, or nil if the string is not valid UTF-8.
 ---@see string.len

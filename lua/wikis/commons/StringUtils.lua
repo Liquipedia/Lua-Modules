@@ -44,6 +44,49 @@ function String.split(inputstr, sep)
 	end
 end
 
+---Whether a Ustring pattern only consists of ASCII characters that match themselves.
+---A quantifier on its own (e.g. `-`) has nothing to quantify and matches itself.
+---@param pattern string
+---@param plain boolean?
+---@return boolean
+local function isLiteralAscii(pattern, plain)
+	if pattern == '' or string.find(pattern, '[\128-\255]') then
+		return false
+	elseif plain == true then
+		return true
+	end
+	return not plain and (not string.find(pattern, '[%^%$%(%)%%%.%[%]%*%+%-%?]')
+		or string.find(pattern, '^[%*%+%-%?]$') ~= nil)
+end
+
+---Splits a string at a separator, with the same results as `mw.text.split`, including empty items.
+---`mw.text.split` makes PHP callbacks in Scribunto, two per item. A separator of ASCII characters that are matched
+---literally gives the same split with the string library, as ASCII bytes never occur within a multi-byte character.
+---Other separators, and text that is not valid UTF-8, still go through `mw.text.split`.
+---@param text string
+---@param pattern string # A Ustring pattern, or a literal string if `plain` is true
+---@param plain boolean?
+---@return string[]
+function String.splitText(text, pattern, plain)
+	if type(text) ~= 'string' or not isLiteralAscii(pattern, plain)
+		or string.find(text, '[\128-\255]') and not mw.ustring.isutf8(text) then
+		return mw.text.split(text, pattern, plain)
+	end
+	-- A plain find is faster than `string.gmatch` with `(.-)`, which tries the separator at every position
+	local items = {}
+	local start = 1
+	while true do
+		local sepStart, sepEnd = string.find(text, pattern, start, true)
+		if not sepStart then
+			break
+		end
+		table.insert(items, string.sub(text, start, sepStart - 1))
+		start = sepEnd + 1
+	end
+	table.insert(items, string.sub(text, start))
+	return items
+end
+
 --- need to escape `.()[]+-%` with % for 'match'
 ---@param str string
 ---@param match string

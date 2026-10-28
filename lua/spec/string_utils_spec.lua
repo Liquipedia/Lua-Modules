@@ -32,6 +32,64 @@ describe('logic', function()
 		end)
 	end)
 
+	describe('splitText', function()
+		it('keeps empty items', function()
+			assert.are_same({''}, String.splitText('', ','))
+			assert.are_same({'abc'}, String.splitText('abc', ','))
+			assert.are_same({'', ''}, String.splitText(',', ','))
+			assert.are_same({'a', '', 'b', ''}, String.splitText('a,,b,', ','))
+			assert.are_same({'a ', ' b'}, String.splitText('a , b', ','))
+		end)
+
+		it('splits at multi-character, quantifier and plain separators', function()
+			assert.are_same({'a', 'b;c'}, String.splitText('a;;b;c', ';;'))
+			assert.are_same({'1', '2', '3'}, String.splitText('1-2-3', '-'))
+			assert.are_same({'a', 'b'}, String.splitText('a*b', '*'))
+			assert.are_same({'a', 'b'}, String.splitText('a.b', '.', true))
+			assert.are_same({'a', 'b'}, String.splitText('a%b', '%', true))
+			assert.are_same({'2024-01-05 ', 'abbr>EDT', '/abbr>'}, String.splitText('2024-01-05 <abbr>EDT</abbr>', '<', true))
+		end)
+
+		it('splits UTF-8 text', function()
+			assert.are_same({'Åsa', 'à', '日本', '\194\160'}, String.splitText('Åsa|à|日本|\194\160', '|'))
+		end)
+
+		it('matches mw.text.split', function()
+			local alphabet = {' ', ',', '-', ';', '|', 'a', '\194\160', 'à'}
+			local inputs = {''}
+			for _ = 1, 4 do
+				local longer = {}
+				for _, input in ipairs(inputs) do
+					for _, character in ipairs(alphabet) do
+						table.insert(longer, input .. character)
+					end
+				end
+				inputs = longer
+			end
+			for _, sep in ipairs{',', '-', ';;', '|'} do
+				for _, plain in ipairs{false, true} do
+					for _, input in ipairs(inputs) do
+						assert.are_same(mw.text.split(input, sep, plain), String.splitText(input, sep, plain))
+					end
+				end
+			end
+		end)
+
+		it('leaves patterns and text that is not valid UTF-8 to mw.text.split', function()
+			local splitSpy = spy.on(mw.text, 'split')
+			String.splitText('a,b', ',')
+			String.splitText('Åsa,b', ',')
+			String.splitText('a.b', '.', true)
+			assert.spy(splitSpy).was.called(0)
+			assert.are_same({'a', 'b'}, String.splitText('a1b', '%d'))
+			String.splitText('a.b', '.')
+			String.splitText('a,\255', ',')
+			String.splitText('a—b', '—')
+			assert.spy(splitSpy).was.called(4)
+			splitSpy:revert()
+		end)
+	end)
+
 	describe('trim', function()
 		it('check', function()
 			assert.are_equal('', String.trim(''))
