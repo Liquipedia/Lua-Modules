@@ -28,6 +28,23 @@ local OpponentDisplay = {propTypes = {}, types = {}}
 OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid', 'icon', 'dynamic')
 ---@alias teamStyle 'standard'|'short'|'bracket'|'hybrid'|'icon'|'dynamic'
 
+local VALID_TEAM_STYLES = {
+	standard = true,
+	short = true,
+	bracket = true,
+	hybrid = true,
+	icon = true,
+	dynamic = true,
+}
+
+---Asserts that the style is a team style
+---@param style any
+local function assertTeamStyle(style)
+	if not VALID_TEAM_STYLES[style] then
+		error('Invalid team style: ' .. tostring(style))
+	end
+end
+
 ---@class InlineOpponentProps
 ---@field flip boolean?
 ---@field opponent standardOpponent
@@ -114,7 +131,10 @@ function OpponentDisplay.BlockOpponent(props)
 	local opponent = props.opponent
 	opponent.extradata = opponent.extradata or {}
 	-- Default TBDs to not show links
-	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
+	local showLink = props.showLink
+	if showLink == nil then
+		showLink = not Opponent.isTbd(opponent)
+	end
 
 	if opponent.type == Opponent.team then
 		if props.showTbd == false and Opponent.isTbd(opponent) then
@@ -175,7 +195,7 @@ end
 ---@return VNode
 function OpponentDisplay.InlineTeamContainer(props)
 	local style = props.style or 'standard'
-	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
+	assertTeamStyle(style)
 	assert(style ~= 'dynamic', 'style=dynamic is not supported inline')
 	assert(style ~= 'bracket' or not props.flip, 'Flipped style=bracket is not supported')
 	return TeamInline{name = props.template, date = props.date, flip = props.flip, displayType = style}
@@ -190,7 +210,7 @@ its layout context, and not of the team name. The team is specified by template.
 ---@return VNode
 function OpponentDisplay.BlockTeamContainer(props)
 	local style = props.style or 'standard'
-	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
+	assertTeamStyle(style)
 	return BlockTeam{
 		name = props.template,
 		flip = props.flip,
