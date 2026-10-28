@@ -51,6 +51,7 @@ local NAME_TO_CLASS = {
 }
 
 -- Tiebreakers that are not derived from the matches among tied opponents, so they only exist in the full context
+---@type Set<string>
 local NON_MATCH_BASED = Set{
 	'buchholz',
 	'medianbuchholz',
@@ -65,6 +66,7 @@ local NON_MATCH_BASED = Set{
 }
 
 -- Tiebreakers that read the games of the matches
+---@type Set<string>
 local READS_GAMES = Set{
 	'gamediffregulation',
 	'roundwins',
@@ -111,7 +113,7 @@ end
 ---@return boolean
 function TiebreakerFactory.readsGames(tiebreakerId)
 	local _, name = TiebreakerFactory.parseId(tiebreakerId)
-	return READS_GAMES:contains(name)
+	return name ~= nil and READS_GAMES:contains(name)
 end
 
 ---@param tiebreakerId string
