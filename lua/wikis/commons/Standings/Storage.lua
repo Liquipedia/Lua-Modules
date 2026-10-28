@@ -73,11 +73,18 @@ function StandingsStorage.run(data, options)
 		return StandingsStorage.entry(entry, data.standingsindex)
 	end)
 
-	if StandingsStorage.shouldStoreLpdb(options) then
-		StandingsStorage.saveLpdb(StandingsStorage.table(data), entries)
+	local storeLpdb = StandingsStorage.shouldStoreLpdb(options)
+	local saveVars = options and options.saveVars
+	if not storeLpdb and not saveVars then
+		return
 	end
-	if options and options.saveVars then
-		StandingsStorage.saveVars(StandingsStorage.table(data), entries)
+
+	local standingsTable = StandingsStorage.table(data)
+	if storeLpdb then
+		StandingsStorage.saveLpdb(standingsTable, entries)
+	end
+	if saveVars then
+		StandingsStorage.saveVars(standingsTable, entries)
 	end
 end
 
