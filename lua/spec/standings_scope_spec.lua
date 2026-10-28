@@ -51,6 +51,26 @@ describe('Standings Tiebreaker Scope', function()
 		end)
 	end)
 
+	describe('opponentIndex', function()
+		it('finds the opponent by sameness, not by identity', function()
+			local match = makeMatch({'Alpha', 'Bravo'}, {id = 'M1', winner = 1})
+			assert.are_equal(1, TiebreakerScope.opponentIndex(match, {type = 'literal', name = 'Alpha'}))
+			assert.are_equal(2, TiebreakerScope.opponentIndex(match, {type = 'literal', name = 'Bravo'}))
+		end)
+
+		it('is 0 for an opponent that is not part of the match', function()
+			local match = makeMatch({'Alpha', 'Bravo'}, {id = 'M1', winner = 1})
+			assert.are_equal(0, TiebreakerScope.opponentIndex(match, {type = 'literal', name = 'Charlie'}))
+		end)
+
+		it('gives the same answer when asked again', function()
+			local match = makeMatch({'Alpha', 'Bravo'}, {id = 'M1', winner = 1})
+			local bravo = {type = 'literal', name = 'Bravo'}
+			assert.are_equal(2, TiebreakerScope.opponentIndex(match, bravo))
+			assert.are_equal(2, TiebreakerScope.opponentIndex(match, bravo))
+		end)
+	end)
+
 	describe('tally', function()
 		it('sums the points of all matches and the record of the finished ones', function()
 			local alpha = {type = 'literal', name = 'Alpha'}

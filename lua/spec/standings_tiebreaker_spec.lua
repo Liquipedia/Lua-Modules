@@ -465,6 +465,50 @@ describe('Standings Tiebreakers', function()
 		end)
 	end)
 
+	describe('game stats over rounds', function()
+		local options = {walkoverGames = 2, walkoverRounds = 13}
+
+		local function makeMatches()
+			return {
+				played = makeMatch({'Alpha', 'Bravo'}, {winner = 1, scores = {2, 1}, games = {
+					{winner = 1, status = '', scores = {13, 7}},
+					{winner = 2, status = '', scores = {5, 13}},
+					{winner = 1, status = '', scores = {13, 11}},
+				}}),
+				walkover = makeMatch({'Charlie', 'Alpha'}, {winner = 2, statuses = {'FF', 'W'}}),
+				upcoming = makeMatch({'Alpha', 'Delta'}, {finished = false, statuses = {'', ''}}),
+			}
+		end
+
+		---Like the rounds of the standings, every round has the matches of the rounds before it
+		---@return table[]
+		local function makeRounds()
+			local matches = makeMatches()
+			return {
+				opponent('Alpha', {matches = {matches.played}}),
+				opponent('Alpha', {matches = {matches.played, matches.walkover}}),
+				opponent('Alpha', {matches = {matches.played, matches.walkover, matches.upcoming}}),
+			}
+		end
+
+		---@param name string
+		---@param rounds table[]
+		---@return string[]
+		local function displays(name, rounds)
+			local tiebreaker = TiebreakerFactory.tiebreakerFromId('full.' .. name, options)
+			return Array.map(rounds, function(round)
+				return tiebreaker:display(rounds, round)
+			end)
+		end
+
+		it('counts each round of an opponent from its own matches when the rounds share matches', function()
+			local rounds = makeRounds()
+			assert.are_same({'2 - 1', '4 - 1', '4 - 1'}, displays('gamediff', rounds))
+			-- 2 maps of 13 rounds for the walkover
+			assert.are_same({'31 - 31', '57 - 31', '57 - 31'}, displays('rounddiff', rounds))
+		end)
+	end)
+
 	describe('games with walkover games', function()
 		local options = {walkoverGames = 2}
 

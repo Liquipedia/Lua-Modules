@@ -7,13 +7,11 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
-local Operator = Lua.import('Module:Operator')
-local Opponent = Lua.import('Module:Opponent/Custom')
 
 local StandingsOvertime = Lua.import('Module:Standings/Overtime')
+local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local TiebreakerGameUtil = {}
 
@@ -31,6 +29,19 @@ function TiebreakerGameUtil.getWalkoverResult(status)
 	end
 end
 
+---Whether all opponents of the match have a score, otherwise the match has no games,
+---e.g. upcoming matches or draws without a score.
+---@param match MatchGroupUtilMatch
+---@return boolean
+local function isScored(match)
+	for _, matchOpponent in ipairs(match.opponents) do
+		if matchOpponent.status ~= 'S' then
+			return false
+		end
+	end
+	return true
+end
+
 ---@param opponent TiebreakerOpponent
 ---@return {games: integer, w: integer, l: integer, walkover: {w: integer, l: integer}?}
 local getPlayedGames = FnUtil.memoize(function (opponent)
@@ -38,26 +49,20 @@ local getPlayedGames = FnUtil.memoize(function (opponent)
 	local gameWins = 0
 	local walkoverWins = 0
 	local walkoverLosses = 0
-	Array.forEach(opponent.matches, function (match)
-		local opponentIndex = Array.indexOf(match.opponents, FnUtil.curry(Opponent.same, opponent.opponent))
-
-		local walkover = match.finished and TiebreakerGameUtil.getWalkoverResult(match.opponents[opponentIndex].status)
+	for _, match in ipairs(opponent.matches) do
+		local matchOpponent = match.opponents[TiebreakerScope.opponentIndex(match, opponent.opponent)]
+		local walkover = match.finished and TiebreakerGameUtil.getWalkoverResult(matchOpponent.status)
 		if walkover == 'w' then
 			walkoverWins = walkoverWins + 1
-			return
 		elseif walkover == 'l' then
 			walkoverLosses = walkoverLosses + 1
-			return
+		elseif isScored(match) then
+			for _, scoredOpponent in ipairs(match.opponents) do
+				games = games + (scoredOpponent.score or 0)
+			end
+			gameWins = gameWins + (matchOpponent.score or 0)
 		end
-		-- Other results without a score, e.g. upcoming matches or draws without a score, have no games
-		if Array.any(match.opponents, function (matchOpponent)
-			return matchOpponent.status ~= 'S'
-		end) then
-			return
-		end
-		games = games + Array.reduce(Array.map(match.opponents, Operator.property('score')), Operator.nilSafeAdd)
-		gameWins = gameWins + (match.opponents[opponentIndex].score or 0)
-	end)
+	end
 	local gameLosses = games - gameWins
 
 	return {
@@ -95,23 +100,20 @@ end
 TiebreakerGameUtil.getOvertimeGames = FnUtil.memoize(function (opponent)
 	local overtimeWins = 0
 	local overtimeLosses = 0
-	Array.forEach(opponent.matches, function (match)
-		local opponentIndex = Array.indexOf(match.opponents, FnUtil.curry(Opponent.same, opponent.opponent))
-
-		if Array.any(match.opponents, function (matchOpponent)
-			return matchOpponent.status ~= 'S'
-		end) then
-			return
-		end
-
-		Array.forEach(Array.filter(match.games, StandingsOvertime.isOvertimeGame), function (game)
-			if game.winner == opponentIndex then
-				overtimeWins = overtimeWins + 1
-			else
-				overtimeLosses = overtimeLosses + 1
+	for _, match in ipairs(opponent.matches) do
+		if isScored(match) then
+			local opponentIndex = TiebreakerScope.opponentIndex(match, opponent.opponent)
+			for _, game in ipairs(match.games) do
+				if StandingsOvertime.isOvertimeGame(game) then
+					if game.winner == opponentIndex then
+						overtimeWins = overtimeWins + 1
+					else
+						overtimeLosses = overtimeLosses + 1
+					end
+				end
 			end
-		end)
-	end)
+		end
+	end
 
 	return {w = overtimeWins, l = overtimeLosses}
 end)
