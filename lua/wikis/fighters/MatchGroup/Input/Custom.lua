@@ -11,7 +11,7 @@ local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
-local Variables = Lua.import('Module:Variables')
+local Tournament = Lua.import('Module:Tournament')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
@@ -75,7 +75,8 @@ end
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
-	local game = Game.toIdentifier{game = Variables.varDefault('tournament_game')}
+	local tournamentContext = Tournament.partialTournamentFromContext()
+	local game = Game.toIdentifier{game = tournamentContext.game}
 	local CharacterStandardizationData = Lua.import('Module:CharacterStandardization/' .. game, {loadData = true})
 
 	local players = Array.mapIndexes(function(playerIndex)
