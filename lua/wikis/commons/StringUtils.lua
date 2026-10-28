@@ -57,6 +57,16 @@ end
 ---@param str string
 ---@return string
 function String.trim(str)
+	-- `mw.text.trim` with a charset is a `mw.ustring.gsub`, which is a PHP callback in Scribunto.
+	-- ASCII strings cannot contain the non-breaking space, so they are trimmed with the string library instead.
+	if type(str) == 'string' and not string.find(str, '[\128-\255]') then
+		local first = string.find(str, '[^\t\r\n\f ]')
+		if not first then
+			return ''
+		end
+		-- `^` anchors at `first`, `.*` backtracks from the end to the last character to keep
+		return (string.match(str, '^.*[^\t\r\n\f ]', first))
+	end
 	-- `\t\r\n\f ` is the default charset
 	-- `\194\160` is the non-breaking space (&nsbp;)
 	return mw.text.trim(str, "\t\r\n\f \194\160")

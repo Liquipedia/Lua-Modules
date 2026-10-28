@@ -737,8 +737,27 @@ function mw.text.tag(name, attrs, content) end
 ---@param charset string?
 ---@return string
 function mw.text.trim(s, charset)
-	-- TODO: UTF8 support in fake
-	return string.match(s, '^()%s*$') and '' or string.match(s, '^%s*(.*%S)')
+	if not charset then
+		return string.match(s, '^()%s*$') and '' or string.match(s, '^%s*(.*%S)')
+	end
+	-- Scribunto matches the charset per UTF-8 character. The fake only supports literal characters, no ranges or classes.
+	local utf8Character = '.[\128-\191]*'
+	local trimmed = {}
+	for character in string.gmatch(charset, utf8Character) do
+		trimmed[character] = true
+	end
+	local characters = {}
+	for character in string.gmatch(s, utf8Character) do
+		table.insert(characters, character)
+	end
+	local first, last = 1, #characters
+	while first <= last and trimmed[characters[first]] do
+		first = first + 1
+	end
+	while last >= first and trimmed[characters[last]] do
+		last = last - 1
+	end
+	return table.concat(characters, '', first, last)
 end
 
 ---Truncates text to the specified length in code points, adding ellipsis if truncation was performed. If length is positive, the end of the string will be truncated; if negative, the beginning will be removed

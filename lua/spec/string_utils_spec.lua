@@ -40,6 +40,45 @@ describe('logic', function()
 			assert.are_equal('hello world', String.trim('hello world '))
 			assert.are_equal('hello world', String.trim(' hello world '))
 		end)
+
+		it('trims tabs, new lines, carriage returns and form feeds, but not vertical tabs', function()
+			assert.are_equal('a \t\n b', String.trim('\t\r\n\f a \t\n b \f\n\r\t'))
+			assert.are_equal('', String.trim(' \t\r\n\f '))
+			assert.are_equal('\va\v', String.trim(' \va\v '))
+			assert.are_equal('a\0', String.trim(' a\0 '))
+		end)
+
+		it('trims non-breaking spaces', function()
+			local nbsp = '\194\160'
+			assert.are_equal('a', String.trim(nbsp .. 'a' .. nbsp))
+			assert.are_equal('a' .. nbsp .. 'b', String.trim(' ' .. nbsp .. ' a' .. nbsp .. 'b ' .. nbsp .. ' '))
+			assert.are_equal('', String.trim(nbsp .. ' ' .. nbsp))
+		end)
+
+		it('keeps other characters that share a byte with the non-breaking space', function()
+			-- à is \195\160, ¡ is \194\161
+			assert.are_equal('à', String.trim(' à '))
+			assert.are_equal('¡a¡', String.trim('¡a¡'))
+			assert.are_equal('Åsa Öberg', String.trim('\194\160Åsa Öberg\t'))
+			assert.are_equal('日本', String.trim('  日本  '))
+		end)
+
+		it('matches mw.text.trim on ASCII strings', function()
+			local alphabet = {'', ' ', '\t', '\n', '\v', 'a', '\0'}
+			local inputs = {''}
+			for _ = 1, 4 do
+				local longer = {}
+				for _, input in ipairs(inputs) do
+					for _, character in ipairs(alphabet) do
+						table.insert(longer, input .. character)
+					end
+				end
+				inputs = longer
+			end
+			for _, input in ipairs(inputs) do
+				assert.are_equal(mw.text.trim(input, '\t\r\n\f \194\160'), String.trim(input))
+			end
+		end)
 	end)
 
 	describe('nil if empty', function()
