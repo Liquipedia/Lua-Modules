@@ -80,6 +80,7 @@ function StandingsTable.fromTemplate(frame)
 				exclusive = exclusiveOpponents,
 				importOpponents = importOpponentFromMatches,
 				overtime = overtime,
+				includeGames = StandingsParser.needsGames(tableType, tiebreakers),
 			}
 		)
 		opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
