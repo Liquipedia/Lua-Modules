@@ -56,20 +56,16 @@
 			--placement-row-color: var( --position-disqualified-color );
 		}
 
-		&:has( > :first-child > .label--placement[ data-placement-type ] ) {
-			> :not( .standings-swiss-match ) {
-				background-color: var( --placement-confirmed-color );
-				box-shadow: inset 0 -1px var( --border-color );
-			}
+		&:has( > :first-child > .label--placement[ data-placement-type ] ) > :not( .standings-swiss-match ) {
+			background-color: var( --placement-confirmed-color );
+			box-shadow: inset 0 -1px var( --border-color );
+		}
 
-			&:hover {
-				> :not( .standings-swiss-match ) {
-					background-color: hsl( from var( --placement-confirmed-color ) h s calc( l * 0.9 ) );
+		&:has( > :first-child > .label--placement[ data-placement-type ] ):hover > :not( .standings-swiss-match ) {
+			background-color: hsl( from var( --placement-confirmed-color ) h s calc( l * 0.9 ) );
 
-					.theme--dark & {
-						background-color: hsl( from var( --placement-confirmed-color ) h s calc( l * 1.25 ) );
-					}
-				}
+			.theme--dark & {
+				background-color: hsl( from var( --placement-confirmed-color ) h s calc( l * 1.25 ) );
 			}
 		}
 
