@@ -64,7 +64,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('namespace'), Comparator.neq, Namespace.matchNamespaceId()),
-		ConditionUtil.anyOf(ColumnName('match2id'), matchIds),
+		StandingsParseLpdb.matchIdsCondition(matchIds),
 	}
 
 	---@type StandingTableOpponentData[]
@@ -80,6 +80,10 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 			query = table.concat(Array.append(MATCH_COLUMNS, includeGames and 'match2games' or nil), ', '),
 		},
 		function(record)
+			-- The match groups can hold matches that are not part of any round
+			if not matchIdToRound[record.match2id] then
+				return
+			end
 			record.match2games = record.match2games or {}
 			local match2 = MatchGroupUtil.matchFromRecord(record)
 			phaseByMatchId[record.match2id] = match2.phase
@@ -129,6 +133,23 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 	end)
 
 	return importedOpponents, matchPhasesByRound
+end
+
+---Builds the condition for fetching the matches. LPDB gets slow on a condition with many match ids
+---(seconds for a few hundred), so the matches are fetched by their match group instead.
+---@param matchIds string[]
+---@return ConditionTree
+function StandingsParseLpdb.matchIdsCondition(matchIds)
+	local bracketIds = {}
+	local unsplitMatchIds = {}
+	Array.forEach(matchIds, function(matchId)
+		local bracketId = MatchGroupUtil.splitMatchId(matchId)
+		table.insert(bracketId and bracketIds or unsplitMatchIds, bracketId or matchId)
+	end)
+	-- Added one by one, as either is nil without values
+	return ConditionTree(BooleanOperator.any)
+		:add(ConditionUtil.anyOf(ColumnName('match2bracketid'), bracketIds))
+		:add(ConditionUtil.anyOf(ColumnName('match2id'), unsplitMatchIds))
 end
 
 ---@param opponentData standardOpponent
