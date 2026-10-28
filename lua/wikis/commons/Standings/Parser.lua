@@ -21,6 +21,7 @@ local StandingsParser = {}
 ---@field drawConfig {match: boolean?}? Explicit draw toggles per level; when unset, draws are detected from the data
 ---@field overtime boolean? Whether overtime results are tracked separately from regulation results
 ---@field walkoverGames integer? Games a walkover counts as in the game tiebreakers, unset means not counted
+---@field walkoverRounds integer? Rounds a walkover map counts as in the round tiebreakers, unset means not counted
 ---@field tiebreakerReset boolean? Whether groups split by a tiebreaker start over from the first tiebreaker
 
 ---@param rounds {roundNumber: integer, started: boolean, finished:boolean, title: string?}[]
@@ -115,7 +116,11 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		),
 	}
 	---@type StandingsTiebreakerOptions
-	local tiebreakerOptions = {draws = draws, walkoverGames = options.walkoverGames}
+	local tiebreakerOptions = {
+		draws = draws,
+		walkoverGames = options.walkoverGames,
+		walkoverRounds = options.walkoverRounds,
+	}
 
 	---@param tiebreakerId string
 	---@return StandingsAdditionalStat
