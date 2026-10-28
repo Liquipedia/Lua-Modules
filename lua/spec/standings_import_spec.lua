@@ -507,6 +507,61 @@ describe('Standings import from matches', function()
 		assert.are_equal(2, findOpponent(opponents, 'Wolves Esports').rounds[1].matchOpponentIndex)
 	end)
 
+	describe('slim matches', function()
+		it('keeps only what the standings read', function()
+			stubMatchQuery{}
+			local soloPlayers = {{pageName = 'Solo', displayName = 'Solo', flag = 'se'}}
+			---@diagnostic disable-next-line: missing-fields
+			local slim = StandingsParseLpdb.slimMatch{
+				matchId = 'M1', finished = true, winner = 1, bestof = 3, phase = 'finished',
+				date = '2024-01-05', extradata = {mvp = 'Solo'}, stream = {twitch = 'channel'},
+				opponents = {
+					{type = 'team', template = 'heroic', name = 'Heroic', score = 2, status = 'S', placement = 1,
+						players = {{pageName = 'Player'}}, extradata = {}},
+					---@diagnostic disable-next-line: missing-fields
+					{type = 'solo', name = 'Solo', score = 1, status = 'S', placement = 2, players = soloPlayers},
+				},
+				games = {
+					---@diagnostic disable-next-line: missing-fields
+					{winner = 1, status = '', scores = {13, 7}, map = 'Inferno', extradata = {comment = ''},
+						opponents = {{status = 'S', players = {{kills = 20}}}, {status = 'S'}}},
+				},
+			}
+
+			assert.are_same({
+				matchId = 'M1', finished = true, winner = 1, bestof = 3, phase = 'finished',
+				opponents = {
+					{type = 'team', template = 'heroic', name = 'Heroic', score = 2, status = 'S', placement = 1,
+						players = {}},
+					{type = 'solo', name = 'Solo', score = 1, status = 'S', placement = 2, players = soloPlayers},
+				},
+				games = {
+					{winner = 1, status = '', scores = {13, 7}, opponents = {{status = 'S'}, {status = 'S'}}},
+				},
+			}, slim)
+			-- party players identify the opponent and are stored, so they are kept as they are
+			assert.are_equal(soloPlayers, slim.opponents[2].players)
+		end)
+
+		it('imports slim matches', function()
+			stubMatchQuery{
+				match2Record{matchId = 'M1', winner = 1, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+					{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 2},
+				}},
+			}
+
+			local opponents = StandingsParseLpdb.importFromMatches(
+				{{roundNumber = 1, matches = {'M1'}}}, swissScoreMapper, {}, {importOpponents = true}
+			)
+
+			local match = findOpponent(opponents, 'Heroic').rounds[1].matches[1]
+			assert.are_equal('M1', match.matchId)
+			assert.is_nil(match.extradata)
+			assert.is_nil(match.opponents[1].extradata)
+		end)
+	end)
+
 	describe('queried columns', function()
 		local rounds = {{roundNumber = 1, matches = {'M1'}}, {roundNumber = 2, matches = {'M2', 'M3'}}}
 
