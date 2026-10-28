@@ -19,25 +19,6 @@ local INHERITABLE_PROPS = {
 	'sortType', 'unsortable',
 }
 
--- The inheritable props each column definition sets, so cells only check those
-local inheritedPropsByColumn = setmetatable({}, {__mode = 'k'})
-
----@param columnDef table
----@return string[]
-local function getInheritedProps(columnDef)
-	local inheritedProps = inheritedPropsByColumn[columnDef]
-	if not inheritedProps then
-		inheritedProps = {}
-		for _, prop in ipairs(INHERITABLE_PROPS) do
-			if columnDef[prop] ~= nil then
-				table.insert(inheritedProps, prop)
-			end
-		end
-		inheritedPropsByColumn[columnDef] = inheritedProps
-	end
-	return inheritedProps
-end
-
 ---Gets the column index for this cell
 ---@param columnIndexProp integer|string? - explicit column index from props
 ---@param columnIndexContext integer|string? - implicit column index from context
@@ -57,7 +38,7 @@ function ColumnUtil.mergeProps(cellProps, columnDef)
 		return
 	end
 
-	for _, prop in ipairs(getInheritedProps(columnDef)) do
+	for _, prop in ipairs(INHERITABLE_PROPS) do
 		if cellProps[prop] == nil and columnDef[prop] ~= nil then
 			cellProps[prop] = columnDef[prop]
 		end
