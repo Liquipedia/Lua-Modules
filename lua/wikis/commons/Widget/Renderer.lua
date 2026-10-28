@@ -13,7 +13,7 @@ local Types = Lua.import('Module:Widget/Types')
 
 local Renderer = {}
 
--- Same as in mw.html
+-- Tags that can not have children
 local SELF_CLOSING_TAGS = {
 	area = true,
 	base = true,
@@ -95,13 +95,13 @@ local function buildOpeningTag(tagName, props)
 		if hasStripMarker(classes) then
 			return
 		end
-		parts[#parts + 1] = ' class="' .. htmlEncode(classes) .. '"'
+		table.insert(parts, ' class="' .. htmlEncode(classes) .. '"')
 	end
 	for name, value in pairs(props.attributes or {}) do
 		if not isPlainAttribute(name, value) then
 			return
 		end
-		parts[#parts + 1] = ' ' .. name .. '="' .. htmlEncode(value) .. '"'
+		table.insert(parts, ' ' .. name .. '="' .. htmlEncode(value) .. '"')
 	end
 	if props.css and next(props.css) ~= nil then
 		local styles = {}
@@ -109,11 +109,11 @@ local function buildOpeningTag(tagName, props)
 			if not isPlainCssValue(name) or not isPlainCssValue(value) then
 				return
 			end
-			styles[#styles + 1] = htmlEncode(name .. ':' .. value)
+			table.insert(styles, htmlEncode(name .. ':' .. value))
 		end
-		parts[#parts + 1] = ' style="' .. table.concat(styles, ';') .. '"'
+		table.insert(parts, ' style="' .. table.concat(styles, ';') .. '"')
 	end
-	parts[#parts + 1] = SELF_CLOSING_TAGS[tagName] and ' />' or '>'
+	table.insert(parts, SELF_CLOSING_TAGS[tagName] and ' />' or '>')
 	return table.concat(parts)
 end
 
@@ -148,6 +148,7 @@ function Renderer.render(vNode, context)
 end
 
 --- Renders a Virtual Node (VNode) into the buffer
+---@package
 ---@param vNode Renderable|Renderable[]|nil
 ---@param context Context?
 ---@param buffer string[]
@@ -171,7 +172,7 @@ function Renderer._renderInto(vNode, context, buffer)
 
 	-- Handle Primitives (Strings/Numbers)
 	if vNodeType == 'string' or vNodeType == 'number' then
-		buffer[#buffer + 1] = tostring(vNode)
+		table.insert(buffer, tostring(vNode))
 		return
 	end
 
@@ -190,7 +191,7 @@ function Renderer._renderInto(vNode, context, buffer)
 	-- Backward Compatibility (with Widgets and mw.html)
 	if not renderFn then
 		if vNode.__tostring or vNode._build then
-			buffer[#buffer + 1] = tostring(vNode)
+			table.insert(buffer, tostring(vNode))
 			return
 		end
 		mw.log('ERROR! Bad renderable:' .. mw.dumpObject(vNode))
@@ -220,7 +221,7 @@ function Renderer._renderInto(vNode, context, buffer)
 	if renderFn == Types.ERROR_BOUNDARY then
 		---@cast vNode ErrorBoundaryNode
 		local props = vNode.props
-		buffer[#buffer + 1] = Logic.tryOrElseLog(
+		table.insert(buffer, Logic.tryOrElseLog(
 			function ()
 				return Renderer.render(props.children, context)
 			end,
@@ -235,7 +236,7 @@ function Renderer._renderInto(vNode, context, buffer)
 				error.header = 'Error occurred in building:'
 				return error
 			end
-		)
+		))
 		return
 	end
 
@@ -243,18 +244,12 @@ function Renderer._renderInto(vNode, context, buffer)
 	if type(renderFn) == 'string' then
 		---@cast vNode HtmlNode
 		local props = vNode.props
-		buffer[#buffer + 1] = buildOpeningTag(renderFn, props) or buildOpeningTagWithMwHtml(renderFn, props)
+		table.insert(buffer, buildOpeningTag(renderFn, props) or buildOpeningTagWithMwHtml(renderFn, props))
 		if SELF_CLOSING_TAGS[renderFn] then
-			-- mw.html only allows children that render to nothing
-			local childBuffer = {}
-			Renderer._renderInto(props.children, context, childBuffer)
-			if table.concat(childBuffer) ~= '' then
-				error('self-closing tags can\'t have child nodes')
-			end
 			return
 		end
 		Renderer._renderInto(props.children, context, buffer)
-		buffer[#buffer + 1] = CLOSING_TAGS[renderFn]
+		table.insert(buffer, CLOSING_TAGS[renderFn])
 		return
 	end
 

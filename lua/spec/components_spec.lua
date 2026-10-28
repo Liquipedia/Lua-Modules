@@ -119,7 +119,7 @@ describe('Components/Renderer', function()
 		end)
 	end)
 
-	describe('HTML tags match mw.html', function()
+	describe('HTML tags', function()
 		local Table = require('Module:Table')
 
 		---@param tagName string
@@ -190,20 +190,11 @@ describe('Components/Renderer', function()
 			assertSameAsMwHtml('div', {css = {color = 'red'}, attributes = {style = 'width:1px'}})
 		end)
 
-		it('self closing tags only allow children that render to nothing', function()
-			local rendered = false
-			local EmptyChild = ComponentCore.component(function()
-				rendered = true
-				return ''
-			end)
-			assert.are.equal('<br class="foo" />', Renderer.render(Html.Br{classes = {'foo'}, children = {EmptyChild{}}}))
-			assert.is_true(rendered)
-			assert.error(function()
-				Renderer.render(Html.Br{children = {'child'}})
-			end)
+		it('self closing tags leave out their children', function()
+			assert.are.equal('<br class="foo" />', Renderer.render(Html.Br{classes = {'foo'}, children = {'child'}}))
 		end)
 
-		it('errors on invalid attribute names like mw.html', function()
+		it('errors on invalid attribute names', function()
 			assert.error(function()
 				Renderer.render(Html.Div{attributes = {['bad name'] = 'x'}})
 			end)
