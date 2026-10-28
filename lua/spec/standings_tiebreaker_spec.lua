@@ -701,6 +701,128 @@ describe('Standings Tiebreakers', function()
 		end)
 	end)
 
+	describe('rounds with walkover rounds', function()
+		local options = {walkoverRounds = 13}
+
+		-- Played: 13-7 game win. Walkovers: win (W-FF), loss (DQ-W), double forfeit (FF-FF, no winner).
+		local function makeAlpha()
+			return opponent('Alpha', {
+				matches = {
+					makeMatch({'Alpha', 'Bravo'}, {winner = 1, scores = {1, 0}, games = {
+						{winner = 1, status = '', scores = {13, 7}},
+					}}),
+					makeMatch({'Alpha', 'Charlie'}, {winner = 1, statuses = {'W', 'FF'}}),
+					makeMatch({'Alpha', 'Delta'}, {winner = 2, statuses = {'DQ', 'W'}}),
+					makeMatch({'Alpha', 'Echo'}, {winner = 0, statuses = {'FF', 'FF'}}),
+				},
+			})
+		end
+
+		it('credits the winner of a walkover with round wins and the loser with round losses', function()
+			local TiebreakerRoundUtil = require('Module:Standings/Tiebreaker/Game/Rounds/Util')
+			-- w: 13 + 13, l: 7 + 13 + 13
+			assert.are_same({rounds = 59, w = 26, l = 33}, TiebreakerRoundUtil.getRounds(makeAlpha(), 13))
+		end)
+
+		it('does not count walkovers when unset or 0', function()
+			local TiebreakerRoundUtil = require('Module:Standings/Tiebreaker/Game/Rounds/Util')
+			local alpha = makeAlpha()
+			local expected = {rounds = 20, w = 13, l = 7}
+			assert.are_same(expected, TiebreakerRoundUtil.getRounds(alpha))
+			assert.are_same(expected, TiebreakerRoundUtil.getRounds(alpha, 0))
+		end)
+
+		it('applies to the round tiebreakers', function()
+			local alpha = makeAlpha()
+			local function valueOf(name)
+				local tiebreaker = TiebreakerFactory.tiebreakerFromId('full.' .. name, options)
+				return tiebreaker:valueOf({alpha}, alpha)
+			end
+			assert.are_equal(-7, valueOf('rounddiff'))
+			assert.are_equal(26, valueOf('roundwins'))
+			assert.are_equal(-33, valueOf('roundlosses'))
+			assert.are_equal(26 / 59, valueOf('roundwinrate'))
+			assert.are_same({26, -33}, valueOf('roundscore'))
+			assert.are_equal('26 - 33', TiebreakerFactory.tiebreakerFromId('full.rounddiff', options):display({alpha}, alpha))
+		end)
+
+		it('does not change the game tiebreakers', function()
+			local alpha = makeAlpha()
+			local gamediff = TiebreakerFactory.tiebreakerFromId('full.gamediff', options)
+			assert.are_equal(1, gamediff:valueOf({alpha}, alpha))
+		end)
+
+		it('counts a walkover of the match as the maps needed to win the match', function()
+			local TiebreakerRoundUtil = require('Module:Standings/Tiebreaker/Game/Rounds/Util')
+			local match = makeMatch({'Alpha', 'Bravo'}, {winner = 1, statuses = {'W', 'FF'}})
+			match.bestof = 3
+			local alpha = opponent('Alpha', {matches = {match}})
+			local bravo = opponent('Bravo', {matches = {match}})
+			assert.are_same({rounds = 26, w = 26, l = 0}, TiebreakerRoundUtil.getRounds(alpha, 13))
+			assert.are_same({rounds = 26, w = 0, l = 26}, TiebreakerRoundUtil.getRounds(bravo, 13))
+		end)
+
+		it('counts the maps needed to win an even best-of', function()
+			local TiebreakerRoundUtil = require('Module:Standings/Tiebreaker/Game/Rounds/Util')
+			local match = makeMatch({'Alpha', 'Bravo'}, {winner = 1, statuses = {'W', 'FF'}})
+			match.bestof = 2
+			local alpha = opponent('Alpha', {matches = {match}})
+			assert.are_same({rounds = 26, w = 26, l = 0}, TiebreakerRoundUtil.getRounds(alpha, 13))
+		end)
+
+		it('counts a walkover of the match as walkovergames maps when set', function()
+			local TiebreakerRoundUtil = require('Module:Standings/Tiebreaker/Game/Rounds/Util')
+			local match = makeMatch({'Alpha', 'Bravo'}, {winner = 1, statuses = {'W', 'FF'}})
+			match.bestof = 3
+			local alpha = opponent('Alpha', {matches = {match}})
+			assert.are_same({rounds = 39, w = 39, l = 0}, TiebreakerRoundUtil.getRounds(alpha, 13, 3))
+			assert.are_same({rounds = 0, w = 0, l = 0}, TiebreakerRoundUtil.getRounds(alpha, 13, 0))
+
+			local rounddiff = TiebreakerFactory.tiebreakerFromId('full.rounddiff', {walkoverRounds = 13, walkoverGames = 3})
+			assert.are_equal(39, rounddiff:valueOf({alpha}, alpha))
+		end)
+
+		---Bo3 won 2-1, with the second map a walkover won by Bravo
+		local function makeMapWalkoverMatch()
+			return makeMatch({'Alpha', 'Bravo'}, {winner = 1, scores = {2, 1}, games = {
+				{winner = 1, status = '', scores = {13, 7}, opponents = {{status = 'S'}, {status = 'S'}}},
+				{winner = 2, status = '', scores = {-1, -1}, opponents = {{status = 'FF'}, {status = 'W'}}},
+				{winner = 1, status = '', scores = {13, 11}, opponents = {{status = 'S'}, {status = 'S'}}},
+			}})
+		end
+
+		it('counts a walkover of a single map', function()
+			local TiebreakerRoundUtil = require('Module:Standings/Tiebreaker/Game/Rounds/Util')
+			local match = makeMapWalkoverMatch()
+			local alpha = opponent('Alpha', {matches = {match}})
+			local bravo = opponent('Bravo', {matches = {match}})
+			-- Alpha w: 13 + 13, l: 7 + 11 + 13
+			assert.are_same({rounds = 57, w = 26, l = 31}, TiebreakerRoundUtil.getRounds(alpha, 13))
+			assert.are_same({rounds = 57, w = 31, l = 26}, TiebreakerRoundUtil.getRounds(bravo, 13))
+		end)
+
+		it('does not use walkovergames for walkovers of a single map', function()
+			local TiebreakerRoundUtil = require('Module:Standings/Tiebreaker/Game/Rounds/Util')
+			local alpha = opponent('Alpha', {matches = {makeMapWalkoverMatch()}})
+			assert.are_same({rounds = 57, w = 26, l = 31}, TiebreakerRoundUtil.getRounds(alpha, 13, 2))
+		end)
+
+		it('does not count the scores of a walkover of a map as rounds', function()
+			local TiebreakerRoundUtil = require('Module:Standings/Tiebreaker/Game/Rounds/Util')
+			local alpha = opponent('Alpha', {matches = {makeMapWalkoverMatch()}})
+			assert.are_same({rounds = 44, w = 26, l = 18}, TiebreakerRoundUtil.getRounds(alpha))
+		end)
+
+		it('does not count walkovers of maps on top of the walkover of the match', function()
+			local TiebreakerRoundUtil = require('Module:Standings/Tiebreaker/Game/Rounds/Util')
+			local match = makeMatch({'Alpha', 'Bravo'}, {winner = 1, statuses = {'W', 'FF'}, games = {
+				{winner = 1, status = '', scores = {-1, -1}, opponents = {{status = 'W'}, {status = 'FF'}}},
+			}})
+			local alpha = opponent('Alpha', {matches = {match}})
+			assert.are_same({rounds = 13, w = 13, l = 0}, TiebreakerRoundUtil.getRounds(alpha, 13))
+		end)
+	end)
+
 	describe('roundwinrate', function()
 		it('is the share of rounds won in played games', function()
 			local roundwinrate = TiebreakerFactory.tiebreakerFromId('full.roundwinrate')

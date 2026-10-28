@@ -20,7 +20,9 @@ local TiebreakerRoundWins = Class.new(TiebreakerRoundDiff)
 ---@param opponent TiebreakerOpponent
 ---@return integer
 function TiebreakerRoundWins:valueOf(state, opponent)
-	local rounds = TiebreakerRoundUtil.getRounds(opponent)
+	local rounds = TiebreakerRoundUtil.getRounds(
+		opponent, self.options.walkoverRounds, self.options.walkoverGames
+	)
 	return rounds.w
 end
 

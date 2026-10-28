@@ -93,6 +93,7 @@ function StandingsTable.fromTemplate(frame)
 		drawConfig = StandingsParseWiki.parseDrawConfig(args),
 		overtime = overtime,
 		walkoverGames = StandingsParseWiki.parseWalkoverGames(args),
+		walkoverRounds = StandingsParseWiki.parseWalkoverRounds(args),
 	})
 
 	if tableType == 'swiss' then
