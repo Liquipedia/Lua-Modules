@@ -226,6 +226,58 @@ describe('Standings Tiebreakers', function()
 			-- Bravo: (0 + 3) - (1 + 0)
 			assert.are_equal(2, buchholz:valueOf({alpha, bravo}, alpha))
 		end)
+
+		it('scores the faced opponents of each round from that round', function()
+			local buchholz = TiebreakerFactory.tiebreakerFromId('full.buchholz')
+			local alphaBravo = makeMatch({'Alpha', 'Bravo'}, {winner = 1})
+			local alphaCharlie = makeMatch({'Alpha', 'Charlie'}, {winner = 1})
+			local alphaOpponent, bravoOpponent, charlieOpponent = literal('Alpha'), literal('Bravo'), literal('Charlie')
+
+			---@param matches table[]
+			---@param bravoRecord table
+			---@return table[] state, table alpha
+			local function round(matches, bravoRecord)
+				local alpha = opponent('Alpha', {matches = matches})
+				alpha.opponent = alphaOpponent
+				local bravo = opponent('Bravo', {match = bravoRecord})
+				bravo.opponent = bravoOpponent
+				local charlie = opponent('Charlie', {match = {w = 0, d = 0, l = 2}})
+				charlie.opponent = charlieOpponent
+				return {alpha, bravo, charlie}, alpha
+			end
+
+			-- The rounds share the matches and the standings opponents, but not the entries
+			local firstRound, alphaInFirstRound = round({alphaBravo}, {w = 0, d = 0, l = 1})
+			local secondRound, alphaInSecondRound = round({alphaBravo, alphaCharlie}, {w = 1, d = 0, l = 1})
+
+			assert.are_equal(-1, buchholz:valueOf(firstRound, alphaInFirstRound))
+			-- Bravo (1-1 = 0) + Charlie (0-2 = -2)
+			assert.are_equal(-2, buchholz:valueOf(secondRound, alphaInSecondRound))
+		end)
+	end)
+
+	describe('members', function()
+		local TiebreakerMembers = require('Module:Standings/Tiebreaker/Members')
+
+		it('finds the member of each state that a match opponent is', function()
+			local alpha, bravo = opponent('Alpha'), opponent('Bravo')
+			local nextRoundBravo = opponent('Bravo')
+			nextRoundBravo.opponent = bravo.opponent
+			local matchOpponent = literal('Bravo')
+
+			assert.are_equal(bravo, TiebreakerMembers.find({alpha, bravo}, matchOpponent))
+			assert.are_equal(nextRoundBravo, TiebreakerMembers.find({alpha, nextRoundBravo}, matchOpponent))
+		end)
+
+		it('finds nothing for opponents that are not part of the state', function()
+			local alpha, bravo = opponent('Alpha'), opponent('Bravo')
+			local matchOpponent = literal('Bravo')
+
+			assert.are_equal(bravo, TiebreakerMembers.find({alpha, bravo}, matchOpponent))
+			assert.is_nil(TiebreakerMembers.find({alpha}, matchOpponent))
+			assert.is_nil(TiebreakerMembers.find({alpha, bravo}, literal('Charlie')))
+			assert.are_equal(bravo, TiebreakerMembers.find({alpha, bravo}, matchOpponent))
+		end)
 	end)
 
 	describe('medianbuchholz', function()
