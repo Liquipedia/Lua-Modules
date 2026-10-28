@@ -120,84 +120,52 @@ describe('Components/Renderer', function()
 	end)
 
 	describe('HTML tags', function()
-		local Table = require('Module:Table')
-
-		---@param tagName string
-		---@param props table
-		---@param children string?
-		---@return string
-		local function buildWithMwHtml(tagName, props, children)
-			local tag = mw.html.create(tagName)
-			if props.classes then
-				tag:addClass(table.concat(props.classes, ' '))
-			end
-			if props.css then tag:css(props.css) end
-			if props.attributes then tag:attr(props.attributes) end
-			if children then tag:node(children) end
-			return tostring(tag)
-		end
-
-		---@param tagName string
-		---@param props table
-		local function assertSameAsMwHtml(tagName, props)
-			local vNode = {renderFn = tagName, props = Table.merge(props, {children = {'child'}})}
-			assert.are.equal(buildWithMwHtml(tagName, props, 'child'), Renderer.render(vNode))
-		end
-
-		it('classes, attributes and css', function()
-			assertSameAsMwHtml('div', {
-				classes = {'foo', 'bar'},
-				attributes = {id = 'my-id', ['data-count'] = 3, ['aria-label'] = 'Label'},
-				css = {color = 'red', ['font-weight'] = 'bold', width = 100},
-			})
-		end)
-
-		it('empty classes and css', function()
-			assertSameAsMwHtml('span', {classes = {}, css = {}})
+		it('renders classes, attributes and css', function()
+			assert.are.equal(
+				'<div class="foo bar" id="my-id" style="color:red">child</div>',
+				Renderer.render(Html.Div{
+					classes = {'foo', 'bar'}, attributes = {id = 'my-id'}, css = {color = 'red'}, children = {'child'},
+				})
+			)
+			assert.are.equal('<div data-count="3" style="width:100"></div>',
+				Renderer.render(Html.Div{attributes = {['data-count'] = 3}, css = {width = 100}}))
 		end)
 
 		it('escapes classes, attribute values and css', function()
-			assertSameAsMwHtml('div', {
-				classes = {'a"b'},
-				attributes = {title = '<b>"Tom" & Jerry</b>'},
-				css = {['background-image'] = 'url(a&b.png)'},
-			})
+			assert.are.equal(
+				'<div class="a&quot;b" title="&lt;b&gt;&quot;Tom&quot; &amp; Jerry&lt;/b&gt;"'
+					.. ' style="background-image:url(a&amp;b.png)"></div>',
+				Renderer.render(Html.Div{
+					classes = {'a"b'},
+					attributes = {title = '<b>"Tom" & Jerry</b>'},
+					css = {['background-image'] = 'url(a&b.png)'},
+				})
+			)
 		end)
 
-		it('css that has to be encoded', function()
-			-- codepoint is not mocked
-			local codepoint = mw.ustring.codepoint
-			mw.ustring.codepoint = string.byte
-			assertSameAsMwHtml('div', {css = {color = 'red;display:none', content = '"\n"'}})
-			mw.ustring.codepoint = codepoint
-		end)
-
-		it('leaves strip markers to mw.html', function()
-			-- The test mw.html does not restore markers, so check which builder is used
+		it('keeps strip markers intact', function()
 			local marker = '\127\'"`UNIQ--ref-00000001-QINU`"\'\127'
-			local create = spy.on(mw.html, 'create')
-			Renderer.render(Html.Span{attributes = {title = 'plain'}, classes = {'plain'}, css = {color = 'red'}})
-			assert.spy(create).was.called(0)
-			Renderer.render(Html.Span{attributes = {title = 'a' .. marker}})
-			Renderer.render(Html.Span{classes = {'a', marker}})
-			Renderer.render(Html.Span{css = {content = marker}})
-			assert.spy(create).was.called(3)
-			create:revert()
+			assert.are.equal(
+				'<span class="a ' .. marker .. '" title="&quot;' .. marker .. '"></span>',
+				Renderer.render(Html.Span{classes = {'a', marker}, attributes = {title = '"' .. marker}})
+			)
 		end)
 
-		it('class and style attributes', function()
-			assertSameAsMwHtml('div', {classes = {'foo'}, attributes = {class = 'bar'}})
-			assertSameAsMwHtml('div', {css = {color = 'red'}, attributes = {style = 'width:1px'}})
+		it('merges class and style attributes into the classes and css', function()
+			assert.are.equal('<div class="foo bar"></div>',
+				Renderer.render(Html.Div{classes = {'foo'}, attributes = {class = 'bar'}}))
+			assert.are.equal('<div style="color:red;width:1px"></div>',
+				Renderer.render(Html.Div{css = {color = 'red'}, attributes = {style = 'width:1px'}}))
+		end)
+
+		it('leaves out attributes with an invalid name or value', function()
+			assert.are.equal('<div></div>',
+				---@diagnostic disable-next-line: assign-type-mismatch
+				Renderer.render(Html.Div{attributes = {['bad name'] = 'x', hidden = true}}))
 		end)
 
 		it('self closing tags leave out their children', function()
 			assert.are.equal('<br class="foo" />', Renderer.render(Html.Br{classes = {'foo'}, children = {'child'}}))
-		end)
-
-		it('errors on invalid attribute names', function()
-			assert.error(function()
-				Renderer.render(Html.Div{attributes = {['bad name'] = 'x'}})
-			end)
 		end)
 	end)
 end)

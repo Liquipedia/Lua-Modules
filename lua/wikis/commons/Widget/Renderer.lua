@@ -45,96 +45,92 @@ local CLOSING_TAGS = setmetatable({}, {__index = function(closingTags, tagName)
 	return closingTags[tagName]
 end})
 
--- Strip markers contain this character
+-- Strip markers contain quotes, which have to stay unescaped for the markers to be expanded
 local STRIP_MARKER_CHARACTER = '\127'
+local ESCAPED_STRIP_MARKER_PREFIX = '\127\'&quot;`UNIQ%-'
+local STRIP_MARKER_PREFIX = '\127\'"`UNIQ-'
+local ESCAPED_STRIP_MARKER_SUFFIX = '%-QINU`&quot;\'\127'
+local STRIP_MARKER_SUFFIX = '-QINU`"\'\127'
 
+---Escapes a value for use in an attribute, keeping strip markers intact
 ---@param value string|number
 ---@return string
-local function htmlEncode(value)
-	return (string.gsub(value, '[<>&"]', HTML_ENCODE_MAP))
+local function escapeAttributeValue(value)
+	local escaped = string.gsub(value, '[<>&"]', HTML_ENCODE_MAP)
+	if not escaped:find(STRIP_MARKER_CHARACTER, 1, true) then
+		return escaped
+	end
+	return (escaped
+		:gsub(ESCAPED_STRIP_MARKER_PREFIX, STRIP_MARKER_PREFIX)
+		:gsub(ESCAPED_STRIP_MARKER_SUFFIX, STRIP_MARKER_SUFFIX))
 end
 
----@param value string|number
----@return boolean
-local function hasStripMarker(value)
-	return type(value) == 'string' and value:find(STRIP_MARKER_CHARACTER, 1, true) ~= nil
-end
-
----Whether mw.html outputs the css name or value unchanged (strip markers excluded)
 ---@param value any
 ---@return boolean
-local function isPlainCssValue(value)
+local function isStringOrNumber(value)
 	local valueType = type(value)
-	return valueType == 'number' or valueType == 'string' and not value:find('[^\32-\57\60-\126]')
+	return valueType == 'string' or valueType == 'number'
 end
 
----Whether mw.html outputs the attribute unchanged
 ---@param name any
----@param value any
 ---@return boolean
-local function isPlainAttribute(name, value)
-	local valueType = type(value)
-	return type(name) == 'string'
-		and name ~= 'class' and name ~= 'style'
-		and (valueType == 'string' or valueType == 'number')
-		and not hasStripMarker(value)
-		and name:match('^[a-zA-Z_:][a-zA-Z0-9_.:-]*$') ~= nil
+local function isValidAttributeName(name)
+	return type(name) == 'string' and name:match('^[a-zA-Z_:][a-zA-Z0-9_.:-]*$') ~= nil
 end
 
----Builds the opening tag like mw.html does. Returns nil for input that needs mw.html.
+---@param css table?
+---@param styleAttribute any
+---@return string?
+local function buildStyle(css, styleAttribute)
+	local styles
+	if css then
+		for name, value in pairs(css) do
+			if isStringOrNumber(name) and isStringOrNumber(value) then
+				styles = styles or {}
+				table.insert(styles, name .. ':' .. value)
+			end
+		end
+	end
+	if isStringOrNumber(styleAttribute) then
+		styles = styles or {}
+		table.insert(styles, styleAttribute)
+	end
+	return styles and table.concat(styles, ';') or nil
+end
+
+---Builds the opening tag. A class or style attribute is merged into the classes or css,
+---attributes with an invalid name or value are left out.
 ---@param tagName string
 ---@param props {classes?: string[], css?: table, attributes?: table}
----@return string?
+---@return string
 local function buildOpeningTag(tagName, props)
-	if not tagName:match('^[a-zA-Z0-9]+$') then
-		return
-	end
+	local attributes = props.attributes
 	local parts = {'<', tagName}
-	if props.classes then
-		local classes = table.concat(props.classes, ' ')
-		if hasStripMarker(classes) then
-			return
-		end
-		table.insert(parts, ' class="' .. htmlEncode(classes) .. '"')
+
+	local classes = props.classes and table.concat(props.classes, ' ') or nil
+	local classAttribute = attributes and attributes.class
+	if isStringOrNumber(classAttribute) then
+		classes = classes and (classes .. ' ' .. classAttribute) or classAttribute
 	end
-	for name, value in pairs(props.attributes or {}) do
-		if not isPlainAttribute(name, value) then
-			return
-		end
-		table.insert(parts, ' ' .. name .. '="' .. htmlEncode(value) .. '"')
+	if classes then
+		table.insert(parts, ' class="' .. escapeAttributeValue(classes) .. '"')
 	end
-	if props.css and next(props.css) ~= nil then
-		local styles = {}
-		for name, value in pairs(props.css) do
-			if not isPlainCssValue(name) or not isPlainCssValue(value) then
-				return
+
+	if attributes then
+		for name, value in pairs(attributes) do
+			if name ~= 'class' and name ~= 'style' and isValidAttributeName(name) and isStringOrNumber(value) then
+				table.insert(parts, ' ' .. name .. '="' .. escapeAttributeValue(value) .. '"')
 			end
-			table.insert(styles, htmlEncode(name .. ':' .. value))
 		end
-		table.insert(parts, ' style="' .. table.concat(styles, ';') .. '"')
 	end
+
+	local style = buildStyle(props.css, attributes and attributes.style)
+	if style then
+		table.insert(parts, ' style="' .. escapeAttributeValue(style) .. '"')
+	end
+
 	table.insert(parts, SELF_CLOSING_TAGS[tagName] and ' />' or '>')
 	return table.concat(parts)
-end
-
----Builds the opening tag with mw.html.
----@param tagName string
----@param props {classes?: string[], css?: table, attributes?: table}
----@return string
-local function buildOpeningTagWithMwHtml(tagName, props)
-	local tag = mw.html.create(tagName)
-
-	if props.classes then
-		tag:addClass(table.concat(props.classes, ' '))
-	end
-	if props.css then tag:css(props.css) end
-	if props.attributes then tag:attr(props.attributes) end
-
-	local emptyTag = tostring(tag)
-	if SELF_CLOSING_TAGS[tagName] then
-		return emptyTag
-	end
-	return emptyTag:sub(1, -#CLOSING_TAGS[tagName] - 1)
 end
 
 --- Renders a Virtual Node (VNode) into a string
@@ -244,7 +240,7 @@ function Renderer._renderInto(vNode, context, buffer)
 	if type(renderFn) == 'string' then
 		---@cast vNode HtmlNode
 		local props = vNode.props
-		table.insert(buffer, buildOpeningTag(renderFn, props) or buildOpeningTagWithMwHtml(renderFn, props))
+		table.insert(buffer, buildOpeningTag(renderFn, props))
 		if SELF_CLOSING_TAGS[renderFn] then
 			return
 		end
