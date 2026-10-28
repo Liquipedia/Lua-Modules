@@ -21,8 +21,6 @@ local Variables = Lua.import('Module:Variables')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local StandingsStorage = {}
-local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
-local SCOREBOARD_FALLBACK = {w = 0, d = 0, l = 0}
 local DISQUALIFIED = 'dq'
 -- TODO: Store as 'group' instead of 'league'
 local STORAGE_TYPE = {group = 'league'}
@@ -156,15 +154,15 @@ function StandingsStorage.entry(entry, standingsIndex)
 
 	local tournamentContext = Tournament.partialTournamentFromContext()
 
-	local extradata = {
+	local extradata = Table.mergeInto({
 		enddate = entry.enddate,
 		roundfinished = entry.finished,
 		placerange = entry.placerange,
 		slotindex = slotIndex,
 		matchid = entry.matchid,
-	}
+	}, entry.extradata)
 
-	local lpdbEntry = {
+	local lpdbEntry = Table.mergeInto({
 		parent = tournamentContext.pageName or '',
 		standingsindex = standingsIndexNumber,
 		placement = entry.placement or entry.rank,
@@ -181,12 +179,12 @@ function StandingsStorage.entry(entry, standingsIndex)
 		},
 		roundindex = roundIndex,
 		slotindex = slotIndex,
-		extradata = Table.merge(extradata, entry.extradata),
-	}
+		extradata = extradata,
+	}, Opponent.toLpdbStruct(entry.opponent))
 
 	lpdbEntry.currentstatus = lpdbEntry.currentstatus or lpdbEntry.definitestatus
 
-	return Table.merge(lpdbEntry, Opponent.toLpdbStruct(entry.opponent))
+	return lpdbEntry
 end
 
 ---@param standingsTable table?
@@ -247,18 +245,14 @@ end
 ---@return table
 function StandingsStorage.toScoreBoardEntry(data)
 	if Table.isEmpty(data) then
-		return Table.copy(SCOREBOARD_FALLBACK)
+		return {w = 0, d = 0, l = 0}
 	end
 
-	local filterScoreBoard = function (key, value)
-		return Table.includes(ALLOWED_SCORE_BOARD_KEYS, key)
-	end
-
-	local scoreBoard = Table.mapValues(Table.filterByKey(data, filterScoreBoard), tonumber)
+	local scoreBoard = {w = tonumber(data.w), d = tonumber(data.d), l = tonumber(data.l)}
 
 	if not scoreBoard.w or not scoreBoard.l then
 		mw.logObject(scoreBoard, 'invalid scoreBoardEntry')
-		return Table.copy(SCOREBOARD_FALLBACK)
+		return {w = 0, d = 0, l = 0}
 	end
 
 	return scoreBoard
