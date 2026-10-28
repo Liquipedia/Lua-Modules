@@ -23,7 +23,7 @@ end
 
 ---@return string
 function TiebreakerPoints:headerTitle()
-	return 'Points'
+	return 'Pts'
 end
 
 return TiebreakerPoints

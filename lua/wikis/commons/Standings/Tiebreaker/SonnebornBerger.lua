@@ -46,7 +46,7 @@ end
 
 ---@return string
 function TiebreakerSonnebornBerger:headerTitle()
-	return 'Sonneborn-Berger'
+	return 'SB'
 end
 
 return TiebreakerSonnebornBerger

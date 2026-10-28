@@ -25,23 +25,15 @@ end
 
 ---@return string
 function TiebreakerMatchDiff:headerTitle()
-	return 'Matches'
+	return 'Match Diff'
 end
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
 ---@return string
 function TiebreakerMatchDiff:display(state, opponent)
-	-- With overtime, regulation and overtime results are shown separately. This takes priority over draws.
-	if opponent.overtime then
-		return table.concat({
-			opponent.match.w, opponent.overtime.w, opponent.overtime.l, opponent.match.l
-		}, ' - ')
-	end
-	if self:showsDraws('match') then
-		return opponent.match.w .. ' - ' .. opponent.match.d .. ' - ' .. opponent.match.l
-	end
-	return opponent.match.w .. ' - ' .. opponent.match.l
+	local diff = self:valueOf(state, opponent)
+	return diff > 0 and ('+' .. diff) or tostring(diff)
 end
 
 return TiebreakerMatchDiff

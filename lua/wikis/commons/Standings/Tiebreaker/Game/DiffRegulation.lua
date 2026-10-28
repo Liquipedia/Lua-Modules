@@ -35,7 +35,7 @@ end
 
 ---@return string
 function TiebreakerGameDiffRegulation:headerTitle()
-	return 'Games (Reg.)'
+	return 'Game (R)'
 end
 
 ---@param state TiebreakerOpponent[]
