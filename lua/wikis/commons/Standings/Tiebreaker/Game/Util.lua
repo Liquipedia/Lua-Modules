@@ -42,14 +42,37 @@ local function isScored(match)
 	return true
 end
 
+---Every round of an opponent has the matches of the rounds before it, so the counts over its matches continue the
+---counts of the round before, as long as the matches of the round before are the first matches of this round.
+---@param opponent TiebreakerOpponent
+---@return TiebreakerOpponent? previousRound # The round before, if its counts can be continued
+---@return integer firstMatchIndex # Index of the first match that is not counted in the round before
+function TiebreakerGameUtil.continuedRound(opponent)
+	local previousRound = opponent.previousRound
+	if not previousRound or #previousRound.matches > #opponent.matches then
+		return nil, 1
+	end
+	for index, match in ipairs(previousRound.matches) do
+		if opponent.matches[index] ~= match then
+			return nil, 1
+		end
+	end
+	return previousRound, #previousRound.matches + 1
+end
+
 ---@param opponent TiebreakerOpponent
 ---@return {games: integer, w: integer, l: integer, walkover: {w: integer, l: integer}?}
-local getPlayedGames = FnUtil.memoize(function (opponent)
-	local games = 0
-	local gameWins = 0
-	local walkoverWins = 0
-	local walkoverLosses = 0
-	for _, match in ipairs(opponent.matches) do
+local getPlayedGames
+getPlayedGames = FnUtil.memoize(function (opponent)
+	local previousRound, firstMatchIndex = TiebreakerGameUtil.continuedRound(opponent)
+	local previous = previousRound and getPlayedGames(previousRound) or {games = 0, w = 0}
+	local previousWalkover = previous.walkover or {}
+	local games = previous.games
+	local gameWins = previous.w
+	local walkoverWins = previousWalkover.w or 0
+	local walkoverLosses = previousWalkover.l or 0
+	for index = firstMatchIndex, #opponent.matches do
+		local match = opponent.matches[index]
 		local matchOpponent = match.opponents[TiebreakerScope.opponentIndex(match, opponent.opponent)]
 		local walkover = match.finished and TiebreakerGameUtil.getWalkoverResult(matchOpponent.status)
 		if walkover == 'w' then
@@ -98,9 +121,12 @@ end
 ---@param opponent TiebreakerOpponent
 ---@return {w: integer, l: integer}
 TiebreakerGameUtil.getOvertimeGames = FnUtil.memoize(function (opponent)
-	local overtimeWins = 0
-	local overtimeLosses = 0
-	for _, match in ipairs(opponent.matches) do
+	local previousRound, firstMatchIndex = TiebreakerGameUtil.continuedRound(opponent)
+	local previous = previousRound and TiebreakerGameUtil.getOvertimeGames(previousRound) or {w = 0, l = 0}
+	local overtimeWins = previous.w
+	local overtimeLosses = previous.l
+	for index = firstMatchIndex, #opponent.matches do
+		local match = opponent.matches[index]
 		if isScored(match) then
 			local opponentIndex = TiebreakerScope.opponentIndex(match, opponent.opponent)
 			for _, game in ipairs(match.games) do

@@ -52,6 +52,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 			overtime = options.overtime and {w = 0, l = 0} or nil,
 		}
 		local opponentRounds = opponentData.rounds
+		local previousRound
 
 		return Array.map(rounds, function(round)
 			local pointsFromRound, statusInRound, tiebreakerPoints, matchId, matchOpponentIndex, playedMatches,
@@ -80,7 +81,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 			carryData.points = carryData.points + (pointsFromRound or 0)
 			---@type {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?,
 			---match: {w: integer, d: integer, l: integer}, overtime: {w: integer, l: integer}?}
-			return {
+			local entry = {
 				opponent = opponent,
 				standingsindex = standingsindex,
 				roundindex = round.roundNumber,
@@ -90,6 +91,8 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 				matches = playedMatches or {},
 				matchPoints = playedMatchPoints or {},
 				startingPoints = opponentData.startingPoints,
+				-- Lets the tiebreakers continue the counts of the round before instead of counting all matches again
+				previousRound = previousRound,
 				finished = round.finished,
 				manualDefiniteStatus = StandingsParser.resolveManualDefiniteStatus(
 					opponentData.definiteStatuses, round.roundNumber
@@ -105,6 +108,8 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 					additionalStatsValues = {},
 				}
 			}
+			previousRound = entry
+			return entry
 		end)
 	end)
 

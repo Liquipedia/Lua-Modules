@@ -11,6 +11,7 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
 
 local TiebreakerGameUtil = Lua.import('Module:Standings/Tiebreaker/Game/Util')
 local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
@@ -32,13 +33,17 @@ end
 ---@param opponent TiebreakerOpponent
 ---@return {rounds: integer, w: integer, l: integer, walkoverMaps: {w: integer, l: integer},
 ---walkoverMatches: {w: integer, l: integer}, walkoverMatchMaps: {w: integer, l: integer}}
-local getPlayedRounds = FnUtil.memoize(function (opponent)
-	local rounds = 0
-	local roundWins = 0
-	local walkoverMaps = {w = 0, l = 0}
-	local walkoverMatches = {w = 0, l = 0}
-	local walkoverMatchMaps = {w = 0, l = 0}
-	for _, match in ipairs(opponent.matches) do
+local getPlayedRounds
+getPlayedRounds = FnUtil.memoize(function (opponent)
+	local previousRound, firstMatchIndex = TiebreakerGameUtil.continuedRound(opponent)
+	local previous = previousRound and getPlayedRounds(previousRound)
+	local rounds = previous and previous.rounds or 0
+	local roundWins = previous and previous.w or 0
+	local walkoverMaps = previous and Table.copy(previous.walkoverMaps) or {w = 0, l = 0}
+	local walkoverMatches = previous and Table.copy(previous.walkoverMatches) or {w = 0, l = 0}
+	local walkoverMatchMaps = previous and Table.copy(previous.walkoverMatchMaps) or {w = 0, l = 0}
+	for index = firstMatchIndex, #opponent.matches do
+		local match = opponent.matches[index]
 		local opponentIndex = TiebreakerScope.opponentIndex(match, opponent.opponent)
 
 		local matchWalkover = match.finished
