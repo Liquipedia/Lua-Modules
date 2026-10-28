@@ -7,6 +7,18 @@
 
 local String = {}
 
+-- The charset of `String.trim`: the default charset of `mw.text.trim` and the non-breaking space (`&nbsp;`)
+local ASCII_WHITESPACE = '\t\r\n\f '
+local TRIM_CHARSET = ASCII_WHITESPACE .. '\194\160'
+local BLANK_ASCII = '^()[' .. ASCII_WHITESPACE .. ']*$'
+local TRIMMED_ASCII = '^[' .. ASCII_WHITESPACE .. ']*(.*[^' .. ASCII_WHITESPACE .. '])'
+
+---@param str string
+---@return boolean
+local function isAscii(str)
+	return not string.find(str, '[\128-\255]')
+end
+
 ---Returns true if `start` is a prefix of `str`.
 ---@param str string
 ---@param start string
@@ -50,7 +62,7 @@ end
 ---@param plain boolean?
 ---@return boolean
 local function isLiteralAscii(pattern, plain)
-	if pattern == '' or string.find(pattern, '[\128-\255]') then
+	if pattern == '' or not isAscii(pattern) then
 		return false
 	elseif plain == true then
 		return true
@@ -69,7 +81,7 @@ end
 ---@return string[]
 function String.splitText(text, pattern, plain)
 	if type(text) ~= 'string' or not isLiteralAscii(pattern, plain)
-		or string.find(text, '[\128-\255]') and not mw.ustring.isutf8(text) then
+		or not isAscii(text) and not mw.ustring.isutf8(text) then
 		return mw.text.split(text, pattern, plain)
 	end
 	-- A plain find is faster than `string.gmatch` with `(.-)`, which tries the separator at every position
@@ -102,12 +114,10 @@ end
 function String.trim(str)
 	-- `mw.text.trim` with a charset is a PHP callback in Scribunto. ASCII strings cannot contain the non-breaking space,
 	-- so they are trimmed like `mw.text.trim` without a charset, minus the vertical tab its `%s` would include.
-	if type(str) == 'string' and not string.find(str, '[\128-\255]') then
-		return string.match(str, '^()[\t\r\n\f ]*$') and '' or string.match(str, '^[\t\r\n\f ]*(.*[^\t\r\n\f ])')
+	if type(str) == 'string' and isAscii(str) then
+		return string.match(str, BLANK_ASCII) and '' or string.match(str, TRIMMED_ASCII)
 	end
-	-- `\t\r\n\f ` is the default charset
-	-- `\194\160` is the non-breaking space (&nsbp;)
-	return mw.text.trim(str, "\t\r\n\f \194\160")
+	return mw.text.trim(str, TRIM_CHARSET)
 end
 
 ---Returns `nil` if the argument is `nil` or an empty string, otherwise returns the argument string itself.

@@ -32,6 +32,25 @@ describe('logic', function()
 		end)
 	end)
 
+	---All strings of the characters of the alphabet, up to the given length
+	---@param alphabet string[]
+	---@param length integer
+	---@return string[]
+	local function allStrings(alphabet, length)
+		local strings, previous = {''}, {''}
+		for _ = 1, length do
+			local longer = {}
+			for _, prefix in ipairs(previous) do
+				for _, character in ipairs(alphabet) do
+					table.insert(longer, prefix .. character)
+					table.insert(strings, prefix .. character)
+				end
+			end
+			previous = longer
+		end
+		return strings
+	end
+
 	describe('splitText', function()
 		it('keeps empty items', function()
 			assert.are_same({''}, String.splitText('', ','))
@@ -55,17 +74,7 @@ describe('logic', function()
 		end)
 
 		it('matches mw.text.split', function()
-			local alphabet = {' ', ',', '-', ';', '|', 'a', '\194\160', 'à'}
-			local inputs = {''}
-			for _ = 1, 4 do
-				local longer = {}
-				for _, input in ipairs(inputs) do
-					for _, character in ipairs(alphabet) do
-						table.insert(longer, input .. character)
-					end
-				end
-				inputs = longer
-			end
+			local inputs = allStrings({' ', ',', '-', ';', '|', 'a', '\194\160', 'à'}, 4)
 			for _, sep in ipairs{',', '-', ';;', '|'} do
 				for _, plain in ipairs{false, true} do
 					for _, input in ipairs(inputs) do
@@ -122,18 +131,7 @@ describe('logic', function()
 		end)
 
 		it('matches mw.text.trim on ASCII strings', function()
-			local alphabet = {'', ' ', '\t', '\n', '\v', 'a', '\0'}
-			local inputs = {''}
-			for _ = 1, 4 do
-				local longer = {}
-				for _, input in ipairs(inputs) do
-					for _, character in ipairs(alphabet) do
-						table.insert(longer, input .. character)
-					end
-				end
-				inputs = longer
-			end
-			for _, input in ipairs(inputs) do
+			for _, input in ipairs(allStrings({' ', '\t', '\n', '\v', 'a', '\0'}, 4)) do
 				assert.are_equal(mw.text.trim(input, '\t\r\n\f \194\160'), String.trim(input))
 			end
 		end)

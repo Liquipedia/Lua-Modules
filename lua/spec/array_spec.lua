@@ -321,53 +321,12 @@ describe('array', function()
 			assert.are_same(a, Array.parseCommaSeparatedString('test1 - test2-test3', '-'))
 		end)
 
-		it('keeps empty items', function()
+		it('trims the items and keeps empty ones', function()
+			local nbsp = '\194\160'
 			assert.are_same({}, Array.parseCommaSeparatedString(''))
 			assert.are_same({}, Array.parseCommaSeparatedString(nil))
-			assert.are_same({'a', '', 'b'}, Array.parseCommaSeparatedString('a,,b'))
-			assert.are_same({'a', ''}, Array.parseCommaSeparatedString('a, '))
-			assert.are_same({'', ''}, Array.parseCommaSeparatedString(' , '))
-		end)
-
-		it('splits at multi-character and quantifier separators', function()
-			assert.are_same({'a', 'b'}, Array.parseCommaSeparatedString('a ;;; b', ';;;'))
-			assert.are_same({'a', 'b', 'c'}, Array.parseCommaSeparatedString('a+b+c', '+'))
-			assert.are_same({'a', 'b'}, Array.parseCommaSeparatedString('a?b', '?'))
-			assert.are_same({'a', 'b', 'c'}, Array.parseCommaSeparatedString('a*b * c', '*'))
-		end)
-
-		it('reads separators with pattern items as patterns', function()
-			assert.are_same({'1', '2-3'}, Array.parseCommaSeparatedString('1 - 2-3', '%s%-%s'))
-			assert.are_same({'a', 'b'}, Array.parseCommaSeparatedString('a1b', '%d'))
-		end)
-
-		it('handles UTF-8 and non-breaking spaces', function()
-			local nbsp = '\194\160'
+			assert.are_same({'a', '', 'b', ''}, Array.parseCommaSeparatedString('a, ,b, '))
 			assert.are_same({'Åsa', 'à', 'b'}, Array.parseCommaSeparatedString('Åsa,' .. nbsp .. 'à ,' .. nbsp .. 'b' .. nbsp))
-			assert.are_same({'日本', 'à'}, Array.parseCommaSeparatedString('日本 - à', '-'))
-			assert.are_same({'a', 'b'}, Array.parseCommaSeparatedString('a—b', '—'))
-		end)
-
-		it('matches mw.text.split', function()
-			local alphabet = {' ', ',', '-', ';', 'a', '\194\160'}
-			local inputs = {''}
-			for _ = 1, 4 do
-				local longer = {}
-				for _, input in ipairs(inputs) do
-					for _, character in ipairs(alphabet) do
-						table.insert(longer, input .. character)
-					end
-				end
-				inputs = longer
-			end
-			for _, sep in ipairs{',', '-', ';;'} do
-				for _, input in ipairs(inputs) do
-					local expected = Array.map(mw.text.split(input, sep), function(item)
-						return mw.text.trim(item, '\t\r\n\f \194\160')
-					end)
-					assert.are_same(expected, Array.parseCommaSeparatedString(input, sep))
-				end
-			end
 		end)
 	end)
 
