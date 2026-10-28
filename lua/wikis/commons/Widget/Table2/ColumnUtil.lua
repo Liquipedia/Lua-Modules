@@ -38,37 +38,12 @@ local function getInheritedProps(columnDef)
 	return inheritedProps
 end
 
----Logic.readBool, without the string comparisons for the common unset and boolean values
----@param value (string|number|boolean)?
----@return boolean
-local function readBool(value)
-	if value == nil or value == false then
-		return false
-	elseif value == true then
-		return true
-	end
-	return Logic.readBool(value)
-end
-
----Converts a value to an integer, like MathUtil.toInteger
----Integers and nil, the common cases for cell props, skip the string parsing
----@param value any
----@return integer?
-function ColumnUtil.toInteger(value)
-	if value == nil then
-		return nil
-	elseif type(value) == 'number' and value % 1 == 0 then
-		return value
-	end
-	return MathUtil.toInteger(value)
-end
-
 ---Gets the column index for this cell
 ---@param columnIndexProp integer|string? - explicit column index from props
 ---@param columnIndexContext integer|string? - implicit column index from context
 ---@return integer
 function ColumnUtil.getColumnIndex(columnIndexProp, columnIndexContext)
-	local index = ColumnUtil.toInteger(columnIndexProp) or ColumnUtil.toInteger(columnIndexContext)
+	local index = MathUtil.toInteger(columnIndexProp) or MathUtil.toInteger(columnIndexContext)
 	return index or 1
 end
 
@@ -130,11 +105,11 @@ function ColumnUtil.buildCellAttributes(align, nowrap, shrink, existingAttribute
 		attrs['data-align'] = align
 	end
 
-	if readBool(nowrap) then
+	if Logic.readBool(nowrap) then
 		attrs['data-nowrap'] = ''
 	end
 
-	if readBool(shrink) then
+	if Logic.readBool(shrink) then
 		attrs['data-shrink'] = ''
 	end
 
@@ -149,11 +124,11 @@ function ColumnUtil.buildAttributes(mergedProps, additionalAttributeBuilders)
 	local attributes = mergedProps.attributes or {}
 
 	if mergedProps.colspan then
-		attributes.colspan = ColumnUtil.toInteger(mergedProps.colspan) or mergedProps.colspan
+		attributes.colspan = MathUtil.toInteger(mergedProps.colspan) or mergedProps.colspan
 	end
 
 	if mergedProps.rowspan then
-		attributes.rowspan = ColumnUtil.toInteger(mergedProps.rowspan) or mergedProps.rowspan
+		attributes.rowspan = MathUtil.toInteger(mergedProps.rowspan) or mergedProps.rowspan
 	end
 
 	if additionalAttributeBuilders then
