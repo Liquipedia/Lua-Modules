@@ -482,6 +482,74 @@ describe('Standings Tiebreakers', function()
 		end)
 	end)
 
+	describe('game stats over rounds', function()
+		local options = {walkoverGames = 2, walkoverRounds = 13}
+
+		local function makeMatches()
+			return {
+				played = makeMatch({'Alpha', 'Bravo'}, {winner = 1, scores = {2, 1}, games = {
+					{winner = 1, status = '', scores = {13, 7}},
+					{winner = 2, status = '', scores = {5, 13}},
+					{winner = 1, status = '', scores = {13, 11}},
+				}}),
+				walkover = makeMatch({'Charlie', 'Alpha'}, {winner = 2, statuses = {'FF', 'W'}}),
+				upcoming = makeMatch({'Alpha', 'Delta'}, {finished = false, statuses = {'', ''}}),
+			}
+		end
+
+		---Like the rounds of the standings, every round has the matches of the rounds before it
+		---@param linked boolean
+		---@return table[]
+		local function makeRounds(linked)
+			local matches = makeMatches()
+			local rounds = {
+				opponent('Alpha', {matches = {matches.played}}),
+				opponent('Alpha', {matches = {matches.played, matches.walkover}}),
+				opponent('Alpha', {matches = {matches.played, matches.walkover, matches.upcoming}}),
+			}
+			if linked then
+				rounds[2].previousRound = rounds[1]
+				rounds[3].previousRound = rounds[2]
+			end
+			return rounds
+		end
+
+		---Games and rounds won and lost of each round, as `games w-l / rounds w-l`
+		---@param rounds table[]
+		---@return string[]
+		local function records(rounds)
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local TiebreakerRoundUtil = require('Module:Standings/Tiebreaker/Game/Rounds/Util')
+			return Array.map(rounds, function(round)
+				local games = TiebreakerGameUtil.getGames(round, options.walkoverGames)
+				local roundCounts = TiebreakerRoundUtil.getRounds(round, options.walkoverRounds, options.walkoverGames)
+				return games.w .. '-' .. games.l .. ' / ' .. roundCounts.w .. '-' .. roundCounts.l
+			end)
+		end
+
+		it('counts each round of an opponent from its own matches when the rounds share matches', function()
+			-- The walkover is 2 games, each of 13 rounds
+			assert.are_same({'2-1 / 31-31', '4-1 / 57-31', '4-1 / 57-31'}, records(makeRounds(false)))
+		end)
+
+		it('continues the counts of the round before', function()
+			assert.are_same({'2-1 / 31-31', '4-1 / 57-31', '4-1 / 57-31'}, records(makeRounds(true)))
+		end)
+
+		it('counts all matches when the round before has other matches', function()
+			local matches = makeMatches()
+			local previousRound = opponent('Alpha', {matches = {matches.walkover}})
+			local round = opponent('Alpha', {matches = {matches.played}})
+			round.previousRound = previousRound
+			assert.are_same({'2-1 / 31-31'}, records{round})
+
+			-- A round without matches, e.g. without data for the round
+			local emptyRound = opponent('Alpha', {matches = {}})
+			emptyRound.previousRound = round
+			assert.are_same({'0-0 / 0-0'}, records{emptyRound})
+		end)
+	end)
+
 	describe('games with walkover games', function()
 		local options = {walkoverGames = 2}
 
@@ -636,6 +704,15 @@ describe('Standings Tiebreakers', function()
 		it('counts the overtime games', function()
 			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
 			assert.are_same({w = 1, l = 2}, TiebreakerGameUtil.getOvertimeGames(makeAlpha()))
+		end)
+
+		it('continues the overtime games of the round before', function()
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local alpha = makeAlpha()
+			local previousRound = opponent('Alpha', {matches = Array.sub(alpha.matches, 1, 3)})
+			alpha.previousRound = previousRound
+			assert.are_same({w = 1, l = 0}, TiebreakerGameUtil.getOvertimeGames(previousRound))
+			assert.are_same({w = 1, l = 2}, TiebreakerGameUtil.getOvertimeGames(alpha))
 		end)
 
 		it('ignores walkovers when counting the overtime games', function()

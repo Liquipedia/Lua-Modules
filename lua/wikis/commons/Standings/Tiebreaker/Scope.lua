@@ -15,6 +15,28 @@ local StandingsOvertime = Lua.import('Module:Standings/Overtime')
 
 local TiebreakerScope = {}
 
+---Comparing different opponents can take team template lookups, and every round of the standings compares the
+---same match opponents again, so the comparisons are cached.
+---@param matchOpponent standardOpponent
+---@param opponent standardOpponent
+---@return boolean
+local isSameOpponent = FnUtil.memoize2(function(matchOpponent, opponent)
+	return Opponent.same(opponent, matchOpponent)
+end)
+
+---Index of the opponent in the match, 0 if it is not part of it.
+---@param match MatchGroupUtilMatch
+---@param opponent standardOpponent
+---@return integer
+function TiebreakerScope.opponentIndex(match, opponent)
+	for index, matchOpponent in ipairs(match.opponents) do
+		if isSameOpponent(matchOpponent, opponent) then
+			return index
+		end
+	end
+	return 0
+end
+
 ---Result of a finished match from the point of view of one of its opponents.
 ---@param match MatchGroupUtilMatch
 ---@param matchOpponent standardOpponent
@@ -45,8 +67,7 @@ function TiebreakerScope.tally(opponent, matches, matchPoints, overtime)
 			return
 		end
 		-- The opponent is always part of its own matches
-		local matchOpponent = Array.find(match.opponents, FnUtil.curry(Opponent.same, opponent))
-		---@cast matchOpponent -nil
+		local matchOpponent = match.opponents[TiebreakerScope.opponentIndex(match, opponent)]
 		local result = TiebreakerScope.matchResult(match, matchOpponent)
 		if overtimeRecord and result ~= 'd' and StandingsOvertime.isOvertimeMatch(match) then
 			overtimeRecord[result] = overtimeRecord[result] + 1
@@ -64,16 +85,40 @@ end
 ---@param tiedOpponents TiebreakerOpponent[]
 ---@return TiebreakerOpponent[]
 function TiebreakerScope.restrictTo(tiedOpponents)
-	local isTied = function(matchOpponent)
-		return Array.any(tiedOpponents, function(tiedOpponent)
-			return Opponent.same(tiedOpponent.opponent, matchOpponent)
-		end)
+	-- A match is in the matches of each of its opponents, so its opponents are looked up more than once
+	---@type table<standardOpponent, boolean>
+	local isTiedByMatchOpponent = {}
+
+	---@param matchOpponent standardOpponent
+	---@return boolean
+	local function isTied(matchOpponent)
+		if isTiedByMatchOpponent[matchOpponent] ~= nil then
+			return isTiedByMatchOpponent[matchOpponent]
+		end
+		local tied = false
+		for _, tiedOpponent in ipairs(tiedOpponents) do
+			if isSameOpponent(matchOpponent, tiedOpponent.opponent) then
+				tied = true
+				break
+			end
+		end
+		isTiedByMatchOpponent[matchOpponent] = tied
+		return tied
+	end
+
+	---@param match MatchGroupUtilMatch
+	---@return boolean
+	local function isAmongTied(match)
+		for _, matchOpponent in ipairs(match.opponents) do
+			if not isTied(matchOpponent) then
+				return false
+			end
+		end
+		return true
 	end
 
 	return Array.map(tiedOpponents, function(tiedOpponent)
-		local matches = Array.filter(tiedOpponent.matches, function(match)
-			return Array.all(match.opponents, isTied)
-		end)
+		local matches = Array.filter(tiedOpponent.matches, isAmongTied)
 
 		local scoreboard = TiebreakerScope.tally(
 			tiedOpponent.opponent, matches, tiedOpponent.matchPoints, tiedOpponent.overtime ~= nil

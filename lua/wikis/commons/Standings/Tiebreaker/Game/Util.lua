@@ -7,13 +7,8 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
-local FnUtil = Lua.import('Module:FnUtil')
-local Logic = Lua.import('Module:Logic')
-local Operator = Lua.import('Module:Operator')
-local Opponent = Lua.import('Module:Opponent/Custom')
-
 local StandingsOvertime = Lua.import('Module:Standings/Overtime')
+local TiebreakerMatchCounter = Lua.import('Module:Standings/Tiebreaker/MatchCounter')
 
 local TiebreakerGameUtil = {}
 
@@ -31,89 +26,66 @@ function TiebreakerGameUtil.getWalkoverResult(status)
 	end
 end
 
----@param opponent TiebreakerOpponent
----@return {games: integer, w: integer, l: integer, walkover: {w: integer, l: integer}?}
-local getPlayedGames = FnUtil.memoize(function (opponent)
-	local games = 0
-	local gameWins = 0
-	local walkoverWins = 0
-	local walkoverLosses = 0
-	Array.forEach(opponent.matches, function (match)
-		local opponentIndex = Array.indexOf(match.opponents, FnUtil.curry(Opponent.same, opponent.opponent))
-
-		local walkover = match.finished and TiebreakerGameUtil.getWalkoverResult(match.opponents[opponentIndex].status)
-		if walkover == 'w' then
-			walkoverWins = walkoverWins + 1
-			return
-		elseif walkover == 'l' then
-			walkoverLosses = walkoverLosses + 1
-			return
+---Whether all opponents of the match have a score, otherwise the match has no games,
+---e.g. upcoming matches or draws without a score.
+---@param match MatchGroupUtilMatch
+---@return boolean
+local function isScored(match)
+	for _, matchOpponent in ipairs(match.opponents) do
+		if matchOpponent.status ~= 'S' then
+			return false
 		end
-		-- Other results without a score, e.g. upcoming matches or draws without a score, have no games
-		if Array.any(match.opponents, function (matchOpponent)
-			return matchOpponent.status ~= 'S'
-		end) then
-			return
-		end
-		games = games + Array.reduce(Array.map(match.opponents, Operator.property('score')), Operator.nilSafeAdd)
-		gameWins = gameWins + (match.opponents[opponentIndex].score or 0)
-	end)
-	local gameLosses = games - gameWins
+	end
+	return true
+end
 
-	return {
-		games = games, w = gameWins, l = gameLosses,
-		walkover = Logic.nilIfEmpty{
-			w = walkoverWins > 0 and walkoverWins or nil,
-			l = walkoverLosses > 0 and walkoverLosses or nil,
-		}
-	}
-end)
+---@type fun(opponent: TiebreakerOpponent): {games: integer, w: integer, walkover: {w: integer, l: integer}}
+local countPlayedGames = TiebreakerMatchCounter.create(
+	{games = 0, w = 0, walkover = {w = 0, l = 0}},
+	function (counts, match, opponentIndex)
+		local matchOpponent = match.opponents[opponentIndex]
+		local walkover = match.finished and TiebreakerGameUtil.getWalkoverResult(matchOpponent.status)
+		if walkover then
+			counts.walkover[walkover] = counts.walkover[walkover] + 1
+		elseif isScored(match) then
+			for _, scoredOpponent in ipairs(match.opponents) do
+				counts.games = counts.games + (scoredOpponent.score or 0)
+			end
+			counts.w = counts.w + (matchOpponent.score or 0)
+		end
+	end
+)
 
 ---Games of the matches, walkovers count as `walkoverGames` games won by the winner and lost by the loser.
 ---@param opponent TiebreakerOpponent
 ---@param walkoverGames number? # Defaults to 0, so walkovers do not count towards the games
----@return {games: integer, w: integer, l: integer, walkover: {w: integer, l: integer}?}
+---@return {games: integer, w: integer, l: integer}
 function TiebreakerGameUtil.getGames(opponent, walkoverGames)
-	local games = getPlayedGames(opponent)
-	local walkover = games.walkover
-	if not walkover or (walkoverGames or 0) == 0 then
-		return games
-	end
-	local walkoverWins = (walkover.w or 0) * walkoverGames
-	local walkoverLosses = (walkover.l or 0) * walkoverGames
+	local counts = countPlayedGames(opponent)
+	local walkoverWins = counts.walkover.w * (walkoverGames or 0)
+	local walkoverLosses = counts.walkover.l * (walkoverGames or 0)
 	return {
-		games = games.games + walkoverWins + walkoverLosses,
-		w = games.w + walkoverWins,
-		l = games.l + walkoverLosses,
-		walkover = walkover,
+		games = counts.games + walkoverWins + walkoverLosses,
+		w = counts.w + walkoverWins,
+		l = counts.games - counts.w + walkoverLosses,
 	}
 end
 
 ---Counts the games that went into overtime. Based on the played games of the matches, without walkovers.
----@param opponent TiebreakerOpponent
----@return {w: integer, l: integer}
-TiebreakerGameUtil.getOvertimeGames = FnUtil.memoize(function (opponent)
-	local overtimeWins = 0
-	local overtimeLosses = 0
-	Array.forEach(opponent.matches, function (match)
-		local opponentIndex = Array.indexOf(match.opponents, FnUtil.curry(Opponent.same, opponent.opponent))
-
-		if Array.any(match.opponents, function (matchOpponent)
-			return matchOpponent.status ~= 'S'
-		end) then
+---@type fun(opponent: TiebreakerOpponent): {w: integer, l: integer}
+TiebreakerGameUtil.getOvertimeGames = TiebreakerMatchCounter.create(
+	{w = 0, l = 0},
+	function (counts, match, opponentIndex)
+		if not isScored(match) then
 			return
 		end
-
-		Array.forEach(Array.filter(match.games, StandingsOvertime.isOvertimeGame), function (game)
-			if game.winner == opponentIndex then
-				overtimeWins = overtimeWins + 1
-			else
-				overtimeLosses = overtimeLosses + 1
+		for _, game in ipairs(match.games) do
+			if StandingsOvertime.isOvertimeGame(game) then
+				local result = game.winner == opponentIndex and 'w' or 'l'
+				counts[result] = counts[result] + 1
 			end
-		end)
-	end)
-
-	return {w = overtimeWins, l = overtimeLosses}
-end)
+		end
+	end
+)
 
 return TiebreakerGameUtil
