@@ -95,7 +95,7 @@ function Helpers.createRow(standings, slot, statsToShow, boldStatTitle)
 		children = WidgetUtil.collect(
 			StandingsCells.placement(slot),
 			StandingsDisplayUtil.showPlacementChange(standings) and TableWidgets.Cell{
-				children = PlacementChange{change = slot.positionChangeFromPreviousRound}
+				children = PlacementChange{change = Helpers.placementChange(standings, slot)}
 			} or nil,
 			StandingsCells.participant(slot),
 			StandingsCells.stats(slot, statsToShow, boldStatTitle),
@@ -117,6 +117,20 @@ function Helpers.createRow(standings, slot, statsToShow, boldStatTitle)
 			end)
 		),
 	}
+end
+
+---The placement change in the latest started round.
+---Rounds that haven't started carry the standings forward, so their change is always 0.
+---@private
+---@param standings StandingsModel
+---@param slot StandingsEntryModel
+---@return integer?
+function Helpers.placementChange(standings, slot)
+	local latestRound = standings.rounds[StandingsDisplayUtil.roundsToShow(standings)]
+	local entry = Array.find(latestRound.opponents, function(roundSlot)
+		return Opponent.same(roundSlot.opponent, slot.opponent)
+	end)
+	return entry and entry.positionChangeFromPreviousRound or nil
 end
 
 return Component.component(StandingsSwiss)

@@ -262,6 +262,47 @@ describe('Standings model round trip', function()
 		GoldenTest('standings_swiss', html)
 	end)
 
+	it('shows the swiss placement change of the latest started round', function()
+		local SwissStandings = require('Module:Widget/Standings/Swiss')
+
+		local rounds = {
+			{roundNumber = 1, started = true, finished = true, title = 'Round 1'},
+			{roundNumber = 2, started = true, finished = true, title = 'Round 2'},
+			{roundNumber = 3, started = false, finished = false, title = 'Round 3'},
+		}
+		-- Bravo leads after round 1, Alpha overtakes it in round 2, round 3 has not started
+		local opponents = {
+			{
+				opponent = literal('Alpha'),
+				rounds = {
+					{scoreboard = {points = 0, match = {w = 0, d = 0, l = 1}}, specialstatus = ''},
+					{scoreboard = {points = 2, match = {w = 2, d = 0, l = 0}}, specialstatus = ''},
+				},
+			},
+			{
+				opponent = literal('Bravo'),
+				rounds = {
+					{scoreboard = {points = 1, match = {w = 1, d = 0, l = 0}}, specialstatus = ''},
+					{scoreboard = {points = 0, match = {w = 0, d = 0, l = 1}}, specialstatus = ''},
+				},
+			},
+		}
+		local standingsTable = StandingsParser.parse(
+			rounds, opponents, {}, 'Swiss Stage', {}, 'swiss', {'full.matchdiff'})
+		StandingsStorage.run(standingsTable, {saveVars = true})
+
+		local standings = Standings.getStandingsTable('FakePage', 0)
+		---@cast standings -nil
+
+		-- The unstarted round carries the standings forward, so its change is 0
+		assert.are_equal(0, standings.rounds[3].opponents[1].positionChangeFromPreviousRound)
+
+		local html = tostring(SwissStandings{standings = standings})
+		assert.is_truthy(html:find('movement-up', 1, true))
+		assert.is_truthy(html:find('movement-down', 1, true))
+		assert.is_falsy(html:find('movement-neutral', 1, true))
+	end)
+
 	it('shows the opposing opponent of a match played under an alias', function()
 		local SwissStandings = require('Module:Widget/Standings/Swiss')
 
