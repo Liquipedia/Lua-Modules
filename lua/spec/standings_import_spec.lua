@@ -5,6 +5,7 @@ describe('Standings import from matches', function()
 	local StandingsParseLpdb = require('Module:Standings/Parse/Lpdb')
 	local StandingsParseWiki = require('Module:Standings/Parse/Wiki')
 	local Array = require('Module:Array')
+	local Operator = require('Module:Operator')
 	local Table = require('Module:Table')
 
 	---@param props {matchId: string, opponents: {template: string?, name: string, score: integer,
@@ -48,11 +49,17 @@ describe('Standings import from matches', function()
 			if tableName ~= 'match2' then
 				return {}
 			end
-			-- return the records the conditions ask for, mimicking the LPDB matchid filter
+			-- return the records the conditions ask for, mimicking the LPDB match id and bracket id filters
+			-- and leaving out the columns that are not queried
+			local columns = parameters.query and Array.parseCommaSeparatedString(parameters.query)
 			local found = {}
 			for matchId, record in pairs(recordsById) do
-				if parameters.conditions:find(matchId, 1, true) then
-					table.insert(found, record)
+				local bracketId = matchId:match('^(.-)_[%w-]+$')
+				if parameters.conditions:find('[[match2id::' .. matchId .. ']]', 1, true)
+					or bracketId and parameters.conditions:find('[[match2bracketid::' .. bracketId .. ']]', 1, true) then
+					table.insert(found, columns and Table.map(columns, function(_, column)
+						return column, record[column]
+					end) or record)
 				end
 			end
 			return found
@@ -83,6 +90,40 @@ describe('Standings import from matches', function()
 			{{roundNumber = 1, matches = {}}}, swissScoreMapper, {}, {importOpponents = true}
 		)
 		assert.are_same({}, opponents)
+	end)
+
+	describe('match condition', function()
+		it('filters by match group and only lists match ids without one', function()
+			stubMatchQuery{}
+			local condition = tostring(StandingsParseLpdb.matchIdsCondition{
+				'abc_R01-M001', 'abc_R01-M002', 'def_ghi_0001', 'M1',
+			})
+			assert.are_equal(
+				'([[match2bracketid::abc]] OR [[match2bracketid::def_ghi]]) OR ([[match2id::M1]])',
+				condition
+			)
+		end)
+
+		it('skips matches of the match group that are not part of a round', function()
+			stubMatchQuery{
+				match2Record{matchId = 'abc_R01-M001', winner = 1, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+					{template = 'tt9 esports 2022', name = 'TT9 Esports', score = 0, placement = 2},
+				}},
+				match2Record{matchId = 'abc_R01-M002', winner = 1, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+					{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 2},
+				}},
+			}
+
+			local opponents = StandingsParseLpdb.importFromMatches(
+				{{roundNumber = 1, matches = {'abc_R01-M001'}}}, swissScoreMapper, {}, {importOpponents = true}
+			)
+
+			assert.are_equal(2, #opponents)
+			assert.is_nil(findOpponent(opponents, 'Wolves Esports'))
+			assert.are_equal(1, #findOpponent(opponents, 'Heroic').rounds[1].matches)
+		end)
 	end)
 
 	describe('match phases', function()
@@ -466,6 +507,74 @@ describe('Standings import from matches', function()
 		assert.are_equal(2, findOpponent(opponents, 'Wolves Esports').rounds[1].matchOpponentIndex)
 	end)
 
+	describe('queried columns', function()
+		local rounds = {{roundNumber = 1, matches = {'M1'}}, {roundNumber = 2, matches = {'M2', 'M3'}}}
+
+		local function stubMatchesWithGames()
+			stubMatchQuery{
+				match2Record{matchId = 'M1', winner = 1, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 2, placement = 1},
+					{template = 'wolves esports', name = 'Wolves Esports', score = 1, placement = 2},
+				}, games = {{winner = 1, scores = {13, 5}}, {winner = 2, scores = {9, 13}}, {winner = 1, scores = {13, 11}}}},
+				match2Record{matchId = 'M2', winner = 2, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 0, placement = 2},
+					{template = 'tt9 esports 2022', name = 'TT9 Esports', score = 2, placement = 1},
+				}, games = {{winner = 2, scores = {3, 13}}, {winner = 2, scores = {10, 13}}}},
+				match2Record{matchId = 'M3', finished = false, date = '2099-01-01', opponents = {
+					{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 1},
+					{template = 'tt9 esports 2022', name = 'TT9 Esports', score = 0, placement = 2},
+				}},
+			}
+		end
+
+		local function queriedColumns()
+			---@diagnostic disable-next-line: undefined-field
+			local query = mw.ext.LiquipediaDB.lpdb.calls[1].vals[2].query
+			return Array.parseCommaSeparatedString(query)
+		end
+
+		it('leaves out the games unless asked for', function()
+			stubMatchesWithGames()
+			StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, {}, {importOpponents = true})
+			local columns = queriedColumns()
+			assert.is_true(Table.includes(columns, 'match2opponents'))
+			assert.is_false(Table.includes(columns, 'match2games'))
+			assert.is_false(Table.includes(columns, 'match2bracketdata'))
+		end)
+
+		it('includes the games when asked for', function()
+			stubMatchesWithGames()
+			StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, {}, {importOpponents = true, includeGames = true})
+			assert.is_true(Table.includes(queriedColumns(), 'match2games'))
+		end)
+
+		it('imports the same results with and without games', function()
+			stubMatchesWithGames()
+
+			local function importResults(includeGames)
+				local opponents, matchPhasesByRound = StandingsParseLpdb.importFromMatches(
+					rounds, swissScoreMapper, {}, {importOpponents = true, includeGames = includeGames}
+				)
+				return {
+					phases = matchPhasesByRound,
+					opponents = Array.map(opponents, function(opponentData)
+						return {
+							opponent = opponentData.opponent,
+							rounds = Array.map(opponentData.rounds, function(roundData)
+								return Table.merge(roundData, {matches = Array.map(roundData.matches, Operator.property('matchId'))})
+							end),
+						}
+					end),
+				}
+			end
+
+			local withGames = importResults(true)
+			local withoutGames = importResults(false)
+			assert.are_equal(3, #withGames.opponents)
+			assert.are_same(withGames, withoutGames)
+		end)
+	end)
+
 	describe('overtime', function()
 		local Info = require('Module:Info')
 		local originalStandingsConfig
@@ -496,6 +605,14 @@ describe('Standings import from matches', function()
 				}, games = {{winner = 2, scores = {6, 7}}}}, overrides.m2)),
 			}
 		end
+
+		it('includes the games in the query', function()
+			stubRegulationAndOvertimeMatch()
+			StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, {}, {importOpponents = true, overtime = true})
+			---@diagnostic disable-next-line: undefined-field
+			local query = mw.ext.LiquipediaDB.lpdb.calls[1].vals[2].query
+			assert.is_truthy(query:find('match2games', 1, true))
+		end)
 
 		it('keeps overtime results out of the match scoreboard', function()
 			stubRegulationAndOvertimeMatch()

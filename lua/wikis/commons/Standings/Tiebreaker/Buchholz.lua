@@ -61,7 +61,7 @@ end
 
 ---@return string
 function TiebreakerBuchholz:headerTitle()
-	return 'Buchholz'
+	return 'BH'
 end
 
 return TiebreakerBuchholz

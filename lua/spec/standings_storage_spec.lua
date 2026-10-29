@@ -63,6 +63,26 @@ describe('Standings Storage', function()
 		stubLpdbStandingsEntry:revert()
 	end)
 
+	it('stores a party opponent with an entry per round in page variables', function()
+		local Json = require('Module:Json')
+		local Variables = require('Module:Variables')
+		local opponent = {type = 'solo', players = {{pageName = 'Alpha', displayName = 'Alpha'}}}
+
+		StandingsStorage.run({
+			standingsindex = 0,
+			title = '',
+			type = 'swiss',
+			entries = {
+				{opponent = opponent, roundindex = 1, slotindex = 1, placement = 1},
+				{opponent = opponent, roundindex = 2, slotindex = 1, placement = 1},
+			},
+		}, {saveVars = true, storeLpdb = false})
+
+		local stored = Json.parse(Variables.varDefault('standings2_0'))
+		assert.are_equal(2, #stored.entries)
+		assert.are_equal('Alpha', stored.entries[2].opponentplayers.p1)
+	end)
+
 	describe('table', function()
 		---@param data table
 		---@return table

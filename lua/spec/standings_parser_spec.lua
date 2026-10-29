@@ -39,6 +39,44 @@ describe('Standings Parser', function()
 	local BGS = {[1] = 'up', [2] = 'stay', [3] = 'down'}
 	local TIEBREAKERS = {'full.points', 'full.manual'}
 
+	describe('games needed', function()
+		local Info = require('Module:Info')
+		local originalStandingsConfig, originalMatch2Config
+
+		before_each(function()
+			originalStandingsConfig = Info.config.standings
+			originalMatch2Config = Info.config.match2
+			Info.config.standings = {alwaysShowStats = {swiss = {'matchdiff', 'gamediff'}}}
+			Info.config.match2 = {}
+		end)
+
+		after_each(function()
+			Info.config.standings = originalStandingsConfig
+			Info.config.match2 = originalMatch2Config
+		end)
+
+		it('are not needed for stats that only read the matches', function()
+			assert.is_false(StandingsParser.needsGames('swiss', {'full.points', 'ml.gamediff', 'full.buchholz'}))
+		end)
+
+		it('are needed for a tiebreaker that reads the games', function()
+			assert.is_true(StandingsParser.needsGames('swiss', {'full.points', 'ml.rounddiff'}))
+			assert.is_true(StandingsParser.needsGames('swiss', {'full.roundscore'}))
+			assert.is_true(StandingsParser.needsGames('swiss', {'full.gamediffregulation'}))
+		end)
+
+		it('are needed for an always shown stat that reads the games', function()
+			Info.config.standings = {alwaysShowStats = {swiss = {'matchdiff', 'rounddiff'}}}
+			assert.is_true(StandingsParser.needsGames('swiss', {'full.points'}))
+			assert.is_false(StandingsParser.needsGames('group', {'full.points'}))
+		end)
+
+		it('are always needed when Bo1 scores are taken from the game', function()
+			Info.config.match2 = {gameScoresIfBo1 = true}
+			assert.is_true(StandingsParser.needsGames('swiss', {'full.points'}))
+		end)
+	end)
+
 	describe('round status', function()
 		local function resolve(round, matchPhases)
 			local started, finished = StandingsParser.resolveRoundStatus(round, matchPhases)
@@ -96,7 +134,7 @@ describe('Standings Parser', function()
 		assert.is_true(standingsTable.finished)
 		assert.are_equal(6, #standingsTable.entries)
 		assert.are_same({
-			{id = 'full.points', title = 'Points', tiebreaker = true},
+			{id = 'full.points', title = 'Pts', tiebreaker = true},
 			{id = 'full.manual', tiebreaker = true},
 		}, standingsTable.extradata.additionalStats)
 
@@ -259,9 +297,10 @@ describe('Standings Parser', function()
 			}
 		end
 
+		-- The match record is shown by matchscore, which the commons config always shows in swiss standings
 		local function display(standingsTable, name, roundIndex)
 			return findEntry(standingsTable.entries, name, roundIndex)
-				.extradata.additionalStatsValues['full.matchdiff'].display
+				.extradata.additionalStatsValues['full.matchscore'].display
 		end
 
 		it('shows draws in every round when any match in the table is a draw', function()
@@ -277,7 +316,8 @@ describe('Standings Parser', function()
 
 		it('respects an explicit disable even if there are draws', function()
 			local standingsTable = StandingsParser.parse(
-				TWO_FINISHED_ROUNDS, makeOpponents(true), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, {match = false})
+				TWO_FINISHED_ROUNDS, makeOpponents(true), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS,
+				{drawConfig = {match = false}})
 
 			assert.is_false(standingsTable.hasdraw)
 			assert.are_equal('1 - 0', display(standingsTable, 'Alpha', 1))
@@ -286,7 +326,8 @@ describe('Standings Parser', function()
 
 		it('respects an explicit enable even if there are no draws', function()
 			local standingsTable = StandingsParser.parse(
-				TWO_FINISHED_ROUNDS, makeOpponents(false), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, {match = true})
+				TWO_FINISHED_ROUNDS, makeOpponents(false), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS,
+				{drawConfig = {match = true}})
 
 			assert.is_true(standingsTable.hasdraw)
 			assert.are_equal('1 - 0 - 0', display(standingsTable, 'Alpha', 1))
@@ -892,13 +933,28 @@ describe('Standings Parser', function()
 			TWO_FINISHED_ROUNDS,
 			{makeOpponent('Alpha', {{points = 3}, {points = 3}})},
 			BGS, nil, {}, 'swiss',
-			{'full.matchdiff', 'full.matchscore', 'ml.matchscore', 'full.gamescore', 'full.gamediff', 'full.manual'}
+			{'full.matchwins', 'full.matchscore', 'ml.matchscore', 'full.gamescore', 'full.gamelosses', 'full.manual'}
 		)
 
-		-- The ml tiebreaker has no column, the others share the matches and the games column
+		-- The ml tiebreaker has no column, the others share the match and the game column
 		---@diagnostic disable-next-line: missing-fields
 		local stats = StandingsDisplayUtil.statsToShow({additionalStats = standingsTable.extradata.additionalStats})
-		assert.are_same({'Matches', 'Games'}, Array.map(stats, function(stat) return stat.title end))
+		assert.are_same({'Match', 'Game'}, Array.map(stats, function(stat) return stat.title end))
+	end)
+
+	it('shows the diff tiebreakers in their own columns', function()
+		local StandingsDisplayUtil = require('Module:Standings/DisplayUtil')
+		local standingsTable = StandingsParser.parse(
+			TWO_FINISHED_ROUNDS,
+			{makeOpponent('Alpha', {{points = 3}, {points = 3}})},
+			BGS, nil, {}, 'swiss',
+			{'full.matchdiff', 'full.gamediff', 'full.manual'}
+		)
+
+		-- The match and game record are always shown in swiss standings, next to the diff columns
+		---@diagnostic disable-next-line: missing-fields
+		local stats = StandingsDisplayUtil.statsToShow({additionalStats = standingsTable.extradata.additionalStats})
+		assert.are_same({'Match', 'Game', 'MD', 'GD'}, Array.map(stats, function(stat) return stat.title end))
 	end)
 
 	it('marks the tiebreakers, but not the stats that are always shown', function()
@@ -909,11 +965,11 @@ describe('Standings Parser', function()
 			{'full.points', 'full.manual'}
 		)
 
-		-- The commons config always shows matchdiff and gamediff in swiss standings
+		-- The commons config always shows matchscore and gamescore in swiss standings
 		assert.are_same({
-			{id = 'full.matchdiff', title = 'Matches'},
-			{id = 'full.gamediff', title = 'Games'},
-			{id = 'full.points', title = 'Points', tiebreaker = true},
+			{id = 'full.matchscore', title = 'Match'},
+			{id = 'full.gamescore', title = 'Game'},
+			{id = 'full.points', title = 'Pts', tiebreaker = true},
 			{id = 'full.manual', tiebreaker = true},
 		}, standingsTable.extradata.additionalStats)
 	end)
@@ -926,9 +982,9 @@ describe('Standings Parser', function()
 			{'full.points', 'full.manual'}
 		)
 
-		-- The commons config always shows matchdiff and gamediff in group standings
+		-- The commons config always shows matchscore and gamescore in group standings
 		assert.are_same(
-			{'full.matchdiff', 'full.gamediff', 'full.points', 'full.manual'},
+			{'full.matchscore', 'full.gamescore', 'full.points', 'full.manual'},
 			Array.map(standingsTable.extradata.additionalStats, function(stat) return stat.id end)
 		)
 	end)
@@ -961,7 +1017,7 @@ describe('Standings Parser', function()
 
 		it('carries overtime across rounds', function()
 			local standingsTable = StandingsParser.parse(
-				TWO_FINISHED_ROUNDS, makeOpponents(), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, nil, true)
+				TWO_FINISHED_ROUNDS, makeOpponents(), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, {overtime = true})
 
 			assert.is_true(standingsTable.hasovertime)
 			assert.are_same({w = 0, l = 0}, findEntry(standingsTable.entries, 'Alpha', 1).overtime)
@@ -969,9 +1025,9 @@ describe('Standings Parser', function()
 			assert.are_same({w = 1, d = 0, l = 0}, findEntry(standingsTable.entries, 'Alpha', 2).match)
 			assert.are_same({w = 0, l = 1}, findEntry(standingsTable.entries, 'Bravo', 2).overtime)
 			assert.are_equal('1 - 1 - 0 - 0',
-				findEntry(standingsTable.entries, 'Alpha', 2).extradata.additionalStatsValues['full.matchdiff'].display)
+				findEntry(standingsTable.entries, 'Alpha', 2).extradata.additionalStatsValues['full.matchscore'].display)
 			assert.are_equal('0 - 0 - 1 - 1',
-				findEntry(standingsTable.entries, 'Bravo', 2).extradata.additionalStatsValues['full.matchdiff'].display)
+				findEntry(standingsTable.entries, 'Bravo', 2).extradata.additionalStatsValues['full.matchscore'].display)
 		end)
 
 		it('does not give entries an overtime field when disabled', function()
@@ -983,12 +1039,12 @@ describe('Standings Parser', function()
 				assert.is_nil(entry.overtime)
 			end)
 			assert.are_equal('1 - 0',
-				findEntry(standingsTable.entries, 'Alpha', 2).extradata.additionalStatsValues['full.matchdiff'].display)
+				findEntry(standingsTable.entries, 'Alpha', 2).extradata.additionalStatsValues['full.matchscore'].display)
 		end)
 
 		it('places by total wins including overtime', function()
 			local standingsTable = StandingsParser.parse(
-				TWO_FINISHED_ROUNDS, makeOpponents(), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, nil, true)
+				TWO_FINISHED_ROUNDS, makeOpponents(), BGS, nil, {}, 'swiss', MATCHDIFF_TIEBREAKERS, {overtime = true})
 
 			-- Alpha 2 wins, Bravo 2 losses
 			assert.are_equal(1, findEntry(standingsTable.entries, 'Alpha', 2).placement)

@@ -7,15 +7,12 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
+local Set = Lua.import('Module:Set')
 local String = Lua.import('Module:StringUtils')
-
-local TiebreakerComposite = Lua.import('Module:Standings/Tiebreaker/Composite')
 
 local TiebreakerFactory = {}
 
--- A list of classes makes a composite tiebreaker, which compares the listed tiebreakers in order
----@type table<string, string|string[]>
+---@type table<string, string>
 local NAME_TO_CLASS = {
 	buchholz = 'Buchholz',
 	medianbuchholz = 'MedianBuchholz',
@@ -33,34 +30,46 @@ local NAME_TO_CLASS = {
 	matchdraws = 'Match/Draws',
 	matchlosses = 'Match/Losses',
 	matchwinrate = 'Match/WinRate',
-	matchscore = {'Match/Wins', 'Match/Losses'},
+	matchscore = 'Match/Score',
 	gamediff = 'Game/Diff',
 	gamecount = 'Game/Count',
 	gamewins = 'Game/Wins',
 	gamelosses = 'Game/Losses',
 	gamewinrate = 'Game/WinRate',
-	gamescore = {'Game/Wins', 'Game/Losses'},
+	gamescore = 'Game/Score',
 	gamediffregulation = 'Game/DiffRegulation',
 	roundwins = 'Game/Rounds/Wins',
 	roundlosses = 'Game/Rounds/Losses',
 	rounddiff = 'Game/Rounds/Diff',
 	roundwinrate = 'Game/Rounds/WinRate',
-	roundscore = {'Game/Rounds/Wins', 'Game/Rounds/Losses'},
+	roundscore = 'Game/Rounds/Score',
 	startingpoints = 'StartingPoints',
 }
 
 -- Tiebreakers that are not derived from the matches among tied opponents, so they only exist in the full context
-local NON_MATCH_BASED = {
-	buchholz = true,
-	medianbuchholz = true,
-	buchholzcutone = true,
-	buchholzpoints = true,
-	medianbuchholzpoints = true,
-	buchholzcutonepoints = true,
-	sonnebornberger = true,
-	manual = true,
-	disqualified = true,
-	startingpoints = true,
+---@type Set<string>
+local NON_MATCH_BASED = Set{
+	'buchholz',
+	'medianbuchholz',
+	'buchholzcutone',
+	'buchholzpoints',
+	'medianbuchholzpoints',
+	'buchholzcutonepoints',
+	'sonnebornberger',
+	'manual',
+	'disqualified',
+	'startingpoints',
+}
+
+-- Tiebreakers that read the games of the matches
+---@type Set<string>
+local READS_GAMES = Set{
+	'gamediffregulation',
+	'roundwins',
+	'roundlosses',
+	'rounddiff',
+	'roundwinrate',
+	'roundscore',
 }
 
 --- Splits a tiebreaker id into its context and name.
@@ -89,11 +98,18 @@ function TiebreakerFactory.validateAndNormalizeInput(input)
 	local tiebreakerClassName = NAME_TO_CLASS[name]
 	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(input))
 	assert(
-		context == 'full' or not NON_MATCH_BASED[name],
+		context == 'full' or not NON_MATCH_BASED:contains(name),
 		'Tiebreaker "' .. name .. '" cannot be used in the ' .. context .. ' context, '
 			.. 'as it is not derived from the matches among the tied opponents'
 	)
 	return table.concat({context, name}, '.')
+end
+
+---@param tiebreakerId string
+---@return boolean
+function TiebreakerFactory.readsGames(tiebreakerId)
+	local _, name = TiebreakerFactory.parseId(tiebreakerId)
+	return name ~= nil and READS_GAMES:contains(name)
 end
 
 ---@param tiebreakerId string
@@ -104,18 +120,9 @@ function TiebreakerFactory.tiebreakerFromId(tiebreakerId, options)
 	local tiebreakerClassName = NAME_TO_CLASS[name]
 	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(tiebreakerId))
 
-	---@param className string
-	---@return StandingsTiebreaker
-	local function build(className)
-		---@type StandingsTiebreaker
-		local TiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. className)
-		return TiebreakerClass(context, options)
-	end
-
-	if type(tiebreakerClassName) == 'table' then
-		return TiebreakerComposite(context, options, Array.map(tiebreakerClassName, build))
-	end
-	return build(tiebreakerClassName)
+	---@type StandingsTiebreaker
+	local TiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. tiebreakerClassName)
+	return TiebreakerClass(context, options)
 end
 
 return TiebreakerFactory

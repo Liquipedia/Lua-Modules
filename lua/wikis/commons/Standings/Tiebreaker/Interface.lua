@@ -22,6 +22,7 @@ local Class = Lua.import('Module:Class')
 ---@class StandingsTiebreakerOptions
 ---@field draws table<StandingsDrawLevel, boolean>?
 ---@field walkoverGames number? # Games a walkover counts as, won by the winner and lost by the loser
+---@field walkoverRounds number? # Rounds a walkover of a map counts as, won by the winner and lost by the loser
 
 ---@class StandingsTiebreaker
 ---@field context 'full'|'ml'|'h2hlegacy'

@@ -27,7 +27,7 @@ end
 
 ---@return string
 function TiebreakerMatchWinRate:headerTitle()
-	return 'Match Win %'
+	return 'Win%'
 end
 
 ---@param state TiebreakerOpponent[]

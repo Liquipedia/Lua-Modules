@@ -20,20 +20,24 @@ local TiebreakerRoundWinRate = Class.new(TiebreakerInterface)
 ---@param opponent TiebreakerOpponent
 ---@return number
 function TiebreakerRoundWinRate:valueOf(state, opponent)
-	local rounds = TiebreakerRoundUtil.getRounds(opponent)
+	local rounds = TiebreakerRoundUtil.getRounds(
+		opponent, self.options.walkoverRounds, self.options.walkoverGames
+	)
 	return rounds.rounds == 0 and 0.5 or (rounds.w / rounds.rounds)
 end
 
 ---@return string
 function TiebreakerRoundWinRate:headerTitle()
-	return 'Round Win %'
+	return 'Rnd%'
 end
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
 ---@return string
 function TiebreakerRoundWinRate:display(state, opponent)
-	local rounds = TiebreakerRoundUtil.getRounds(opponent)
+	local rounds = TiebreakerRoundUtil.getRounds(
+		opponent, self.options.walkoverRounds, self.options.walkoverGames
+	)
 	if rounds.rounds == 0 then
 		return '-'
 	end

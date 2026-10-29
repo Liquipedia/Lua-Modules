@@ -17,6 +17,12 @@ local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParser = {}
 
+---@class StandingsParserOptions
+---@field drawConfig {match: boolean?}? Explicit draw toggles per level; when unset, draws are detected from the data
+---@field overtime boolean? Whether overtime results are tracked separately from regulation results
+---@field walkoverGames integer? Games a walkover counts as in the game tiebreakers, unset means not counted
+---@field walkoverRounds integer? Rounds a walkover map counts as in the round tiebreakers, unset means not counted
+
 ---@param rounds {roundNumber: integer, started: boolean, finished:boolean, title: string?}[]
 ---@param opponents StandingTableOpponentData[]
 ---@param bgs table<integer, string>
@@ -24,13 +30,10 @@ local StandingsParser = {}
 ---@param matches string[]
 ---@param standingsType StandingsTableTypes
 ---@param tiebreakerIds string[]
----@param drawConfig {match: boolean?}? Explicit draw toggles per level; when unset, draws are detected from the data
----@param overtimeEnabled boolean? Whether overtime results are tracked separately from regulation results
----@param walkoverGames number? Games a walkover counts as in the game tiebreakers, unset means not counted
+---@param options StandingsParserOptions?
 ---@return StandingsTableStorage
-function StandingsParser.parse(
-	rounds, opponents, bgs, title, matches, standingsType, tiebreakerIds, drawConfig, overtimeEnabled, walkoverGames
-)
+function StandingsParser.parse(rounds, opponents, bgs, title, matches, standingsType, tiebreakerIds, options)
+	options = options or {}
 	-- TODO: When all legacy (of all standing type) have been converted, the wiki variable should be updated
 	-- to follow the namespace format. Eg new name could be `standings_standingsindex`
 	local lastStandingsIndex = tonumber(Variables.varDefault('standingsindex')) or -1
@@ -44,7 +47,7 @@ function StandingsParser.parse(
 		local carryData = {
 			points = opponentData.startingPoints or 0,
 			match = {w = 0, d = 0, l = 0},
-			overtime = overtimeEnabled and {w = 0, l = 0} or nil,
+			overtime = options.overtime and {w = 0, l = 0} or nil,
 		}
 		local opponentRounds = opponentData.rounds
 
@@ -107,12 +110,16 @@ function StandingsParser.parse(
 	---@type table<StandingsDrawLevel, boolean>
 	local draws = {
 		match = Logic.nilOr(
-			(drawConfig or {}).match,
+			(options.drawConfig or {}).match,
 			Array.any(entries, function(entry) return entry.match.d > 0 end)
 		),
 	}
 	---@type StandingsTiebreakerOptions
-	local tiebreakerOptions = {draws = draws, walkoverGames = walkoverGames}
+	local tiebreakerOptions = {
+		draws = draws,
+		walkoverGames = options.walkoverGames,
+		walkoverRounds = options.walkoverRounds,
+	}
 
 	---@param tiebreakerId string
 	---@return StandingsAdditionalStat
@@ -131,11 +138,7 @@ function StandingsParser.parse(
 	local tiebreakers = Array.map(tiebreakerIds, function(tiebreakerId)
 		return Table.merge(loadTiebreaker(tiebreakerId), {tiebreaker = true})
 	end)
-	local alwaysStatsToLoad = ((Info.config.standings or {}).alwaysShowStats or {})[standingsType] or {}
-	alwaysStatsToLoad = Array.map(alwaysStatsToLoad, function (stat)
-		return TiebreakerFactory.validateAndNormalizeInput(stat)
-	end)
-	local alwaysStats = Array.map(alwaysStatsToLoad, loadTiebreaker)
+	local alwaysStats = Array.map(StandingsParser.alwaysShownStatIds(standingsType), loadTiebreaker)
 	local additionalStats = Array.extend(alwaysStats, tiebreakers)
 	local additionalStatsIds = Array.map(additionalStats, function(stat) return stat.id end)
 
@@ -178,7 +181,7 @@ function StandingsParser.parse(
 		matches = matches,
 		roundcount = #rounds,
 		hasdraw = draws.match,
-		hasovertime = Logic.readBool(overtimeEnabled),
+		hasovertime = Logic.readBool(options.overtime),
 		haspoints = true,
 		finished = isFinished,
 		extradata = {
@@ -186,6 +189,30 @@ function StandingsParser.parse(
 			additionalStats = additionalStats,
 		}
 	}
+end
+
+---@param standingsType StandingsTableTypes
+---@return string[]
+function StandingsParser.alwaysShownStatIds(standingsType)
+	local stats = ((Info.config.standings or {}).alwaysShowStats or {})[standingsType] or {}
+	return Array.map(stats, function(stat)
+		return TiebreakerFactory.validateAndNormalizeInput(stat)
+	end)
+end
+
+---With `gameScoresIfBo1`, the status of the opponents of a Bo1 match is taken from its first game. That status is
+---read by the scoring and by the game stats, so the games are always needed then.
+---@param standingsType StandingsTableTypes
+---@param tiebreakerIds string[]
+---@return boolean
+function StandingsParser.needsGames(standingsType, tiebreakerIds)
+	if Info.config.match2.gameScoresIfBo1 then
+		return true
+	end
+	return Array.any(
+		Array.extend(StandingsParser.alwaysShownStatIds(standingsType), tiebreakerIds),
+		TiebreakerFactory.readsGames
+	)
 end
 
 ---Resolves whether a round has started and finished. Manual input takes priority, otherwise it follows

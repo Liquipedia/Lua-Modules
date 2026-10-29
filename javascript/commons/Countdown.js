@@ -7,7 +7,7 @@ liquipedia.countdown = {
 	timeoutFunctions: null,
 	timerObjectNodes: null,
 	lastCountdownId: null,
-	init: function () {
+	init: async function () {
 		// // Cancels last countdown loop if it exists to prevent multiple countdowns running at the same time
 		if ( liquipedia.countdown.timeoutFunctions && liquipedia.countdown.lastCountdownId ) {
 			liquipedia.countdown.timeoutFunctions.clear( liquipedia.countdown.lastCountdownId );
@@ -15,52 +15,50 @@ liquipedia.countdown = {
 
 		liquipedia.countdown.timerObjectNodes = document.querySelectorAll( '.timer-object' );
 		if ( liquipedia.countdown.timerObjectNodes.length > 0 ) {
-			mw.loader.using( 'user.options', () => {
-				liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
-					const dateObject = liquipedia.countdown.parseTimerObjectNodeToDateObj( timerObjectNode );
-					const format = timerObjectNode.dataset.format || 'full';
-					let dateChild;
-					if ( timerObjectNode.firstChild instanceof HTMLSpanElement ) {
-						dateChild = timerObjectNode.firstChild;
+			await mw.loader.using( 'user.options' );
+			liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
+				const dateObject = liquipedia.countdown.parseTimerObjectNodeToDateObj( timerObjectNode );
+				const format = timerObjectNode.dataset.format || 'full';
+				let dateChild;
+				if ( timerObjectNode.firstChild instanceof HTMLSpanElement ) {
+					dateChild = timerObjectNode.firstChild;
+				} else {
+					dateChild = document.createElement( 'span' );
+					if (
+						mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' ) ||
+						typeof dateObject !== 'object'
+					) {
+						dateChild.innerHTML = timerObjectNode.innerHTML;
 					} else {
-						dateChild = document.createElement( 'span' );
-						if (
-							mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' ) ||
-							typeof dateObject !== 'object'
-						) {
-							dateChild.innerHTML = timerObjectNode.innerHTML;
-						} else {
-							dateChild.innerHTML = liquipedia.countdown.getCorrectTimeZoneString( dateObject, format );
-						}
-						dateChild.classList.add( 'timer-object-date' );
+						dateChild.innerHTML = liquipedia.countdown.getCorrectTimeZoneString( dateObject, format );
 					}
-					timerObjectNode.innerHTML = '';
-					timerObjectNode.appendChild( dateChild );
-					let separatorChild;
-					if ( typeof timerObjectNode.dataset.separator !== 'undefined' ) {
-						separatorChild = document.createElement( 'span' );
-						separatorChild.innerText = timerObjectNode.dataset.separator;
-						separatorChild.classList.add( 'timer-object-separator' );
-					} else {
-						separatorChild = document.createElement( 'br' );
-						separatorChild.classList.add( 'timer-object-separator' );
-					}
-					timerObjectNode.appendChild( separatorChild );
-					const countdownChild = document.createElement( 'span' );
-					countdownChild.classList.add( 'timer-object-countdown' );
-					timerObjectNode.appendChild( countdownChild );
-				} );
-
-				liquipedia.countdown.setupCountdownsIfSwitchToggleExists();
-
-				// Only run when the window is actually in the front,
-				// not in background tabs (on browsers that support it)
-				mw.loader.using( 'mediawiki.visibleTimeout' ).then( ( require ) => {
-					liquipedia.countdown.timeoutFunctions = require( 'mediawiki.visibleTimeout' );
-					liquipedia.countdown.runCountdown();
-				} );
+					dateChild.classList.add( 'timer-object-date' );
+				}
+				timerObjectNode.innerHTML = '';
+				timerObjectNode.appendChild( dateChild );
+				let separatorChild;
+				if ( typeof timerObjectNode.dataset.separator !== 'undefined' ) {
+					separatorChild = document.createElement( 'span' );
+					separatorChild.innerText = timerObjectNode.dataset.separator;
+					separatorChild.classList.add( 'timer-object-separator' );
+				} else {
+					separatorChild = document.createElement( 'br' );
+					separatorChild.classList.add( 'timer-object-separator' );
+				}
+				timerObjectNode.appendChild( separatorChild );
+				const countdownChild = document.createElement( 'span' );
+				countdownChild.classList.add( 'timer-object-countdown' );
+				timerObjectNode.appendChild( countdownChild );
 			} );
-		}
+
+			await liquipedia.countdown.setupCountdownsIfSwitchToggleExists();
+
+			// Only run when the window is actually in the front,
+			// not in background tabs (on browsers that support it)
+			const moduleRequire = await mw.loader.using( 'mediawiki.visibleTimeout' );
+			liquipedia.countdown.timeoutFunctions = moduleRequire( 'mediawiki.visibleTimeout' );
+			liquipedia.countdown.runCountdown();
+		};
 	},
 	setupCountdownsIfSwitchToggleExists: async function () {
 		const switchToggleGroup = await liquipedia.switchButtons.getSwitchGroup( 'countdown' );
