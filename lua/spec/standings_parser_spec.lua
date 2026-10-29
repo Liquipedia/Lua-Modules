@@ -13,6 +13,10 @@ describe('Standings Parser', function()
 	---@param startingPoints number?
 	---@return table
 	local function makeOpponent(name, roundsSpec, startingPoints)
+		local adjustments = {}
+		Array.forEach(roundsSpec, function(roundSpec, roundIndex)
+			adjustments[roundIndex] = roundSpec.tiebreaker and {tiebreaker = roundSpec.tiebreaker} or nil
+		end)
 		return {
 			opponent = literal(name),
 			startingPoints = startingPoints,
@@ -20,9 +24,9 @@ describe('Standings Parser', function()
 				return {
 					scoreboard = {points = roundSpec.points},
 					specialstatus = roundSpec.status or '',
-					tiebreakerPoints = roundSpec.tiebreaker,
 				}
 			end),
+			adjustments = adjustments,
 		}
 	end
 
@@ -266,6 +270,80 @@ describe('Standings Parser', function()
 		local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
 		assert.are_same({w = 1, d = 0, l = 0}, alpha1.match)
 		assert.are_same({w = 1, d = 1, l = 1}, alpha2.match)
+	end)
+
+	describe('manual adjustments', function()
+		local function makeAdjustedOpponent(name, adjustments)
+			local opponentData = makeOpponent(name, {{points = 3}, {points = 0}})
+			opponentData.adjustments = adjustments
+			return opponentData
+		end
+
+		it('apply from the round they are set in and add up across rounds', function()
+			local opponents = {
+				makeAdjustedOpponent('Alpha', {
+					[1] = {points = 2, match = {w = 1}, game = {w = 2, d = 1}, round = {l = 3}},
+					[2] = {points = -1, tiebreaker = 2, match = {l = 1}, game = {l = 1}, round = {w = 5}},
+				}),
+				makeOpponent('Bravo', {{points = 0}, {points = 0}}),
+			}
+
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, opponents, BGS, nil, {}, 'ffa', TIEBREAKERS)
+
+			local alpha1 = findEntry(standingsTable.entries, 'Alpha', 1)
+			assert.are_equal(5, alpha1.points)
+			assert.are_equal(5, alpha1.extradata.pointschange)
+			assert.are_equal(0, alpha1.extradata.tiebreakerpoints)
+			assert.are_same({w = 1, d = 0, l = 0}, alpha1.match)
+			assert.are_same({w = 2, d = 1, l = 0}, alpha1.gameAdjustment)
+			assert.are_same({w = 0, l = 3}, alpha1.roundAdjustment)
+
+			local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
+			assert.are_equal(4, alpha2.points)
+			assert.are_equal(-1, alpha2.extradata.pointschange)
+			assert.are_equal(2, alpha2.extradata.tiebreakerpoints)
+			assert.are_equal(2, alpha2.extradata.additionalStatsValues['full.manual'].value)
+			assert.are_same({w = 1, d = 0, l = 1}, alpha2.match)
+			assert.are_same({w = 2, d = 1, l = 1}, alpha2.gameAdjustment)
+			assert.are_same({w = 5, l = 3}, alpha2.roundAdjustment)
+		end)
+
+		it('add to the imported match record', function()
+			local alpha = {
+				opponent = literal('Alpha'),
+				rounds = {
+					{scoreboard = {points = 3, match = {w = 1, d = 0, l = 0}}, specialstatus = ''},
+					{scoreboard = {points = 0, match = {w = 0, d = 0, l = 1}}, specialstatus = ''},
+				},
+				adjustments = {[2] = {match = {w = 2, l = -1}}},
+			}
+
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, {alpha}, BGS, nil, {}, 'ffa', TIEBREAKERS)
+
+			assert.are_same({w = 1, d = 0, l = 0}, findEntry(standingsTable.entries, 'Alpha', 1).match)
+			assert.are_same({w = 3, d = 0, l = 0}, findEntry(standingsTable.entries, 'Alpha', 2).match)
+		end)
+
+		it('turn on draws for the whole table with a draw adjustment', function()
+			local opponents = {
+				makeAdjustedOpponent('Alpha', {[2] = {match = {d = 1}, game = {d = 1}}}),
+				makeOpponent('Bravo', {{points = 0}, {points = 0}}),
+			}
+
+			local standingsTable = StandingsParser.parse(
+				TWO_FINISHED_ROUNDS, opponents, BGS, nil, {}, 'ffa', {'full.matchscore', 'full.gamescore', 'full.manual'})
+
+			local function display(name, roundIndex, id)
+				return findEntry(standingsTable.entries, name, roundIndex).extradata.additionalStatsValues[id].display
+			end
+			assert.is_true(standingsTable.hasdraw)
+			assert.are_equal('0 - 0 - 0', display('Alpha', 1, 'full.matchscore'))
+			assert.are_equal('0 - 1 - 0', display('Alpha', 2, 'full.matchscore'))
+			assert.are_equal('0 - 0 - 0', display('Bravo', 2, 'full.gamescore'))
+			assert.are_equal('0 - 1 - 0', display('Alpha', 2, 'full.gamescore'))
+		end)
 	end)
 
 	describe('match draws', function()

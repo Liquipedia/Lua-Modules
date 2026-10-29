@@ -71,6 +71,49 @@ describe('Standings Wiki Parser', function()
 		end)
 	end)
 
+	describe('adjustments', function()
+		it('reads unprefixed inputs into the final round and r<round> inputs into their round', function()
+			assert.are_same({
+				[2] = {game = {l = 2}},
+				[3] = {points = -1.5, tiebreaker = 1, match = {w = 1, d = 1}, round = {w = 3}},
+			}, StandingsParseWiki.parseAdjustments({
+				matchwins = '1', r3matchdraws = '1', r2gamelosses = '2', r3points = '-1.5', tiebreaker = '1', roundwins = '3',
+			}, 3))
+			assert.are_same(
+				{[1] = {match = {l = 1}}, [2] = {game = {w = 1, d = -1}, round = {l = 4}}},
+				StandingsParseWiki.parseAdjustments(
+					{r1matchlosses = '1', r2gamewins = '1', gamedraws = '-1', r2roundlosses = '4'}, 2
+				)
+			)
+		end)
+
+		it('prefers the input of the final round over an unprefixed input', function()
+			assert.are_same(
+				{[3] = {game = {d = 2}}},
+				StandingsParseWiki.parseAdjustments({gamedraws = '1', r3gamedraws = '2'}, 3)
+			)
+		end)
+
+		it('ignores empty values and rounds beyond the number of rounds', function()
+			assert.is_nil(StandingsParseWiki.parseAdjustments({}, 3))
+			assert.is_nil(StandingsParseWiki.parseAdjustments({matchlosses = '', r4matchwins = '1', r1 = '3'}, 3))
+		end)
+
+		it('ignores values that are not numbers', function()
+			assert.is_nil(StandingsParseWiki.parseAdjustments({points = 'abc', r1matchwins = 'x'}, 1))
+		end)
+
+		it('stores the adjustments on the parsed opponent without affecting round input', function()
+			local alpha = StandingsParseWiki.parseWikiOpponent(
+				{type = 'literal', 'Alpha', r1 = '3', r1points = '2', tiebreaker = '1'}, 2)
+			local bravo = StandingsParseWiki.parseWikiOpponent({type = 'literal', 'Bravo', r1 = '3'}, 2)
+
+			assert.are_equal(3, alpha.rounds[1].scoreboard.points)
+			assert.are_same({[1] = {points = 2}, [2] = {tiebreaker = 1}}, alpha.adjustments)
+			assert.is_nil(bravo.adjustments)
+		end)
+	end)
+
 	describe('tiebreakers', function()
 		it('always puts the disqualified tiebreaker first and manual last', function()
 			assert.are_same(
