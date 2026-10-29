@@ -245,7 +245,7 @@ describe('Standings model round trip', function()
 			},
 		}
 		local standingsTable = StandingsParser.parse(
-			rounds, opponents, {}, 'Swiss Stage', {}, 'swiss', {'full.matchdiff', 'full.manual'})
+			rounds, opponents, {[1] = 'up', [2] = 'down'}, 'Swiss Stage', {}, 'swiss', {'full.matchdiff', 'full.manual'})
 		StandingsStorage.run(standingsTable, {saveVars = true})
 
 		local standings = Standings.getStandingsTable('FakePage', 0)

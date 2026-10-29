@@ -13,6 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Component = Lua.import('Module:Widget/Component')
 local MatchOverview = Lua.import('Module:Widget/Standings/MatchOverview')
+local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
 local StandingsCells = Lua.import('Module:Widget/Standings/Cells')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
@@ -57,6 +58,7 @@ end
 function Helpers.buildColumnDefinitions(standings, statsToShow)
 	return WidgetUtil.collect(
 		{align = 'left'},
+		StandingsDisplayUtil.showPlacementChange(standings) and {align = 'center'} or nil,
 		StandingsCells.participantColumn(),
 		StandingsCells.statColumns(statsToShow),
 		Array.rep({align = 'center'}, #standings.rounds)
@@ -71,6 +73,7 @@ function Helpers.headerRow(standings, statsToShow)
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
 			StandingsCells.header('#'),
+			StandingsDisplayUtil.showPlacementChange(standings) and StandingsCells.header() or nil,
 			StandingsCells.header('Participant'),
 			StandingsCells.statHeaders(statsToShow),
 			Array.map(standings.rounds, function(round)
@@ -91,6 +94,9 @@ function Helpers.createRow(standings, slot, statsToShow, boldStatTitle)
 		attributes = {['data-position-status'] = slot.positionStatus},
 		children = WidgetUtil.collect(
 			StandingsCells.placement(slot),
+			StandingsDisplayUtil.showPlacementChange(standings) and TableWidgets.Cell{
+				children = PlacementChange{change = slot.positionChangeFromPreviousRound}
+			} or nil,
 			StandingsCells.participant(slot),
 			StandingsCells.stats(slot, statsToShow, boldStatTitle),
 			Array.map(standings.rounds, function(columnRound)
