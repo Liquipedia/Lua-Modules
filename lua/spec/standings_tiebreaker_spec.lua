@@ -514,27 +514,26 @@ describe('Standings Tiebreakers', function()
 			return rounds
 		end
 
-		---@param name string
+		---Games and rounds won and lost of each round, as `games w-l / rounds w-l`
 		---@param rounds table[]
 		---@return string[]
-		local function displays(name, rounds)
-			local tiebreaker = TiebreakerFactory.tiebreakerFromId('full.' .. name, options)
+		local function records(rounds)
+			local TiebreakerGameUtil = require('Module:Standings/Tiebreaker/Game/Util')
+			local TiebreakerRoundUtil = require('Module:Standings/Tiebreaker/Game/Rounds/Util')
 			return Array.map(rounds, function(round)
-				return tiebreaker:display(rounds, round)
+				local games = TiebreakerGameUtil.getGames(round, options.walkoverGames)
+				local roundCounts = TiebreakerRoundUtil.getRounds(round, options.walkoverRounds, options.walkoverGames)
+				return games.w .. '-' .. games.l .. ' / ' .. roundCounts.w .. '-' .. roundCounts.l
 			end)
 		end
 
 		it('counts each round of an opponent from its own matches when the rounds share matches', function()
-			local rounds = makeRounds(false)
-			assert.are_same({'2 - 1', '4 - 1', '4 - 1'}, displays('gamediff', rounds))
-			-- 2 maps of 13 rounds for the walkover
-			assert.are_same({'31 - 31', '57 - 31', '57 - 31'}, displays('rounddiff', rounds))
+			-- The walkover is 2 games, each of 13 rounds
+			assert.are_same({'2-1 / 31-31', '4-1 / 57-31', '4-1 / 57-31'}, records(makeRounds(false)))
 		end)
 
 		it('continues the counts of the round before', function()
-			local rounds = makeRounds(true)
-			assert.are_same({'2 - 1', '4 - 1', '4 - 1'}, displays('gamediff', rounds))
-			assert.are_same({'31 - 31', '57 - 31', '57 - 31'}, displays('rounddiff', rounds))
+			assert.are_same({'2-1 / 31-31', '4-1 / 57-31', '4-1 / 57-31'}, records(makeRounds(true)))
 		end)
 
 		it('counts all matches when the round before has other matches', function()
@@ -542,14 +541,12 @@ describe('Standings Tiebreakers', function()
 			local previousRound = opponent('Alpha', {matches = {matches.walkover}})
 			local round = opponent('Alpha', {matches = {matches.played}})
 			round.previousRound = previousRound
-			assert.are_same({'2 - 1'}, displays('gamediff', {round}))
-			assert.are_same({'31 - 31'}, displays('rounddiff', {round}))
+			assert.are_same({'2-1 / 31-31'}, records{round})
 
 			-- A round without matches, e.g. without data for the round
 			local emptyRound = opponent('Alpha', {matches = {}})
 			emptyRound.previousRound = round
-			assert.are_same({'0 - 0'}, displays('gamediff', {emptyRound}))
-			assert.are_same({'0 - 0'}, displays('rounddiff', {emptyRound}))
+			assert.are_same({'0-0 / 0-0'}, records{emptyRound})
 		end)
 	end)
 
