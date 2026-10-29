@@ -204,7 +204,7 @@ function StandingTableLegacyNext.parseOpponentInput(args, key, index, prefix, ro
 
 	return Table.merge(opponent, {
 		tiebreaker = args['temp_tie' .. index],
-		startingpoints = args['temp_p' .. index],
+		r1points = args['temp_p' .. index],
 		dq = StandingTableLegacyNext.parseDisqualifiedFromRound(args, index, roundCount),
 		aliases = aliases and table.concat(Array.parseCommaSeparatedString(aliases), ';') or nil,
 	}, StandingTableLegacyNext.parseDefiniteStatuses(args, index, roundCount))
