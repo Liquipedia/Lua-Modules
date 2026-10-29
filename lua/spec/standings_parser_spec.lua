@@ -954,7 +954,7 @@ describe('Standings Parser', function()
 		-- The match and game record are always shown in swiss standings, next to the diff columns
 		---@diagnostic disable-next-line: missing-fields
 		local stats = StandingsDisplayUtil.statsToShow({additionalStats = standingsTable.extradata.additionalStats})
-		assert.are_same({'Match', 'Game', 'Match Diff', 'Game Diff'}, Array.map(stats, function(stat) return stat.title end))
+		assert.are_same({'Match', 'Game', 'MD', 'GD'}, Array.map(stats, function(stat) return stat.title end))
 	end)
 
 	it('marks the tiebreakers, but not the stats that are always shown', function()

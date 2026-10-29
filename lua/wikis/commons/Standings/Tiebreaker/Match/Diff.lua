@@ -25,7 +25,7 @@ end
 
 ---@return string
 function TiebreakerMatchDiff:headerTitle()
-	return 'Match Diff'
+	return 'MD'
 end
 
 ---@param state TiebreakerOpponent[]

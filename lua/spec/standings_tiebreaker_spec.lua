@@ -141,7 +141,7 @@ describe('Standings Tiebreakers', function()
 			local opp = opponent('Alpha', {match = {w = 3, d = 1, l = 1}})
 			assert.are_equal(2, matchdiff:valueOf({opp}, opp))
 			assert.are_equal('+2', matchdiff:display({opp}, opp))
-			assert.are_equal('Match Diff', matchdiff:headerTitle())
+			assert.are_equal('MD', matchdiff:headerTitle())
 		end)
 
 		it('displays the difference with its sign', function()
