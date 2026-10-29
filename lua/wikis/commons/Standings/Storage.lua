@@ -68,8 +68,17 @@ function StandingsStorage.run(data, options)
 		Array.map(data.entries, function (entry) return tonumber (entry.roundindex) end),
 		math.max)
 
-	-- An opponent has an entry for every round, all with the same opponent struct
-	local toLpdbStruct = FnUtil.memoize(Opponent.toLpdbStruct)
+	-- An opponent has an entry for every round, all with the same opponent struct.
+	-- saveVars passes all entries to PHP at once, and Scribunto refuses a table that shows up in there
+	-- more than once, so each entry gets its own copy of the players.
+	local opponentStruct = FnUtil.memoize(Opponent.toLpdbStruct)
+	local toLpdbStruct = function(opponent)
+		local struct = opponentStruct(opponent)
+		if not struct.opponentplayers then
+			return struct
+		end
+		return Table.merge(struct, {opponentplayers = Table.copy(struct.opponentplayers)})
+	end
 	local entries = Array.map(data.entries, function (entry)
 		return StandingsStorage.entry(entry, data.standingsindex, toLpdbStruct)
 	end)
