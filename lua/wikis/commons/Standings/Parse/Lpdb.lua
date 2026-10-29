@@ -106,26 +106,23 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 		end
 
 		local matches = {}
-		-- Points are only looked up by match id, so all rounds can share a single table
-		local matchPoints = {}
 
 		return {
 			opponent = opponentData.opponent,
+			matchPoints = opponentData.matchPoints,
 			rounds = Array.map(opponentData.rounds, function(roundData)
 				local roundMatches = roundData.matches or {}
 				matches = Array.extend(matches, roundMatches)
-				Table.mergeInto(matchPoints, roundData.matchPoints)
 				local lastMatch = roundMatches[#roundMatches]
 				local matchOpponentIndex = lastMatch
 					and Array.indexOf(lastMatch.opponents, FnUtil.curry(Opponent.same, opponentData.opponent))
 					or nil
 				return {
 					scoreboard = TiebreakerScope.tally(
-						opponentData.opponent, roundMatches, roundData.matchPoints, options and options.overtime
+						opponentData.opponent, roundMatches, opponentData.matchPoints, options and options.overtime
 					),
 					specialstatus = roundData.specialstatus or 'nc',
 					matches = matches,
-					matchPoints = matchPoints,
 					matchId = lastMatch and lastMatch.matchId or nil,
 					matchOpponentIndex = matchOpponentIndex,
 				}
@@ -159,6 +156,7 @@ end
 function StandingsParseLpdb.newOpponent(opponentData, maxRounds)
 	return {
 		opponent = opponentData,
+		matchPoints = {},
 		rounds = Array.mapRange(1, maxRounds, function()
 			return {}
 		end)
@@ -291,17 +289,13 @@ function StandingsParseLpdb.parseMatch(roundNumbers, match2, opponents, scoreMap
 			table.insert(opponents, lookup.opponentData)
 		end
 
-		local points = scoreMapper(opponent, match2)
+		lookup.opponentData.matchPoints[match2.matchId] = scoreMapper(opponent, match2)
 		Array.forEach(roundNumbers, function(roundNumber)
 			-- The scoreboard of the round is tallied from these in importFromMatches
 			local opponentRoundData = assert(lookup.opponentData.rounds[roundNumber], 'Round number out of bounds')
 			opponentRoundData.specialstatus = ''
 			opponentRoundData.matches = opponentRoundData.matches or {}
 			table.insert(opponentRoundData.matches, match2)
-			if points then
-				opponentRoundData.matchPoints = opponentRoundData.matchPoints or {}
-				opponentRoundData.matchPoints[match2.matchId] = points
-			end
 		end)
 	end)
 end

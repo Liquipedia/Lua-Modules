@@ -501,11 +501,11 @@ describe('Standings Parser', function()
 				end)
 				return {
 					opponent = literal(name),
+					matchPoints = matchPoints,
 					rounds = {{
 						scoreboard = {points = (points or {})[name] or totalPoints, match = matchRecord},
 						specialstatus = '',
 						matches = matches,
-						matchPoints = matchPoints,
 					}},
 				}
 			end)

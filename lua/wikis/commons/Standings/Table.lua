@@ -35,9 +35,9 @@ local TABLE_TYPES = {ffa = true, swiss = true, group = true}
 
 ---@class StandingTableOpponentData
 ---@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?,
----matches: MatchGroupUtilMatch[], matchPoints: table<string, number>?, matchId: string,
----matchOpponentIndex: integer?}[]?
+---matches: MatchGroupUtilMatch[], matchId: string, matchOpponentIndex: integer?}[]?
 ---@field opponent standardOpponent
+---@field matchPoints table<string, number>? # The points of each imported match, keyed by match id
 ---@field aliases standardOpponent[]? # Only for team opponents
 ---@field startingPoints number?
 ---@field disqualifiedFromRound integer? # The first round in which the opponent is disqualified

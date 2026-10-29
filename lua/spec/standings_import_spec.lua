@@ -370,13 +370,8 @@ describe('Standings import from matches', function()
 			{roundNumber = 2, matches = {'M2'}},
 		}, swissScoreMapper, {}, {importOpponents = true})
 
-		local heroic = findOpponent(opponents, 'Heroic')
-		assert.are_same({M1 = 1, M2 = 1}, heroic.rounds[2].matchPoints)
-		assert.are_equal(heroic.rounds[1].matchPoints, heroic.rounds[2].matchPoints)
-
-		local wolves = findOpponent(opponents, 'Wolves Esports')
-		assert.are_same({M1 = 0, M2 = 0}, wolves.rounds[2].matchPoints)
-		assert.are_equal(wolves.rounds[1].matchPoints, wolves.rounds[2].matchPoints)
+		assert.are_same({M1 = 1, M2 = 1}, findOpponent(opponents, 'Heroic').matchPoints)
+		assert.are_same({M1 = 0, M2 = 0}, findOpponent(opponents, 'Wolves Esports').matchPoints)
 	end)
 
 	it('does not record points for matches the score mapper has no points for', function()
@@ -393,8 +388,8 @@ describe('Standings import from matches', function()
 			return opponent.placement == 1 and 3 or nil
 		end, {}, {importOpponents = true})
 
-		assert.are_same({M1 = 3}, findOpponent(opponents, 'Heroic').rounds[1].matchPoints)
-		assert.are_same({}, findOpponent(opponents, 'Wolves Esports').rounds[1].matchPoints)
+		assert.are_same({M1 = 3}, findOpponent(opponents, 'Heroic').matchPoints)
+		assert.are_same({}, findOpponent(opponents, 'Wolves Esports').matchPoints)
 	end)
 
 	it('keeps counting a match assigned to several rounds in every round', function()
@@ -413,8 +408,9 @@ describe('Standings import from matches', function()
 		local heroic = findOpponent(opponents, 'Heroic')
 		assert.are_equal(1, #heroic.rounds[1].matches)
 		assert.are_equal(2, #heroic.rounds[2].matches)
-		assert.are_same({M1 = 1}, heroic.rounds[1].matchPoints)
-		assert.are_same({M1 = 1}, heroic.rounds[2].matchPoints)
+		assert.are_same({M1 = 1}, heroic.matchPoints)
+		assert.are_equal(1, heroic.rounds[1].scoreboard.points)
+		assert.are_equal(1, heroic.rounds[2].scoreboard.points)
 		assert.are_equal('M1', heroic.rounds[2].matchId)
 	end)
 
@@ -559,6 +555,7 @@ describe('Standings import from matches', function()
 					opponents = Array.map(opponents, function(opponentData)
 						return {
 							opponent = opponentData.opponent,
+							matchPoints = opponentData.matchPoints,
 							rounds = Array.map(opponentData.rounds, function(roundData)
 								return Table.merge(roundData, {matches = Array.map(roundData.matches, Operator.property('matchId'))})
 							end),

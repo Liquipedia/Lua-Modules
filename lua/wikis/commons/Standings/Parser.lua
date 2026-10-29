@@ -52,8 +52,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		local opponentRounds = opponentData.rounds
 
 		return Array.map(rounds, function(round)
-			local pointsFromRound, statusInRound, tiebreakerPoints, matchId, matchOpponentIndex, playedMatches,
-				playedMatchPoints
+			local pointsFromRound, statusInRound, tiebreakerPoints, matchId, matchOpponentIndex, playedMatches
 			if opponentRounds and opponentRounds[round.roundNumber] then
 				local thisRoundsData = opponentRounds[round.roundNumber]
 				if thisRoundsData.scoreboard then
@@ -73,7 +72,6 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 					carryData.overtime.l = carryData.overtime.l + thisRoundsData.scoreboard.overtime.l
 				end
 				playedMatches = thisRoundsData.matches
-				playedMatchPoints = thisRoundsData.matchPoints
 			end
 			carryData.points = carryData.points + (pointsFromRound or 0)
 			---@type {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?,
@@ -86,7 +84,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 				match = Table.copy(carryData.match),
 				overtime = carryData.overtime and Table.copy(carryData.overtime) or nil,
 				matches = playedMatches or {},
-				matchPoints = playedMatchPoints or {},
+				matchPoints = opponentData.matchPoints or {},
 				startingPoints = opponentData.startingPoints,
 				finished = round.finished,
 				manualDefiniteStatus = StandingsParser.resolveManualDefiniteStatus(
