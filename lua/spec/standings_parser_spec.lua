@@ -577,7 +577,7 @@ describe('Standings Parser', function()
 				local alpha = findEntry(standingsTable.entries, 'A', 1)
 				assert.is_nil(alpha.extradata.additionalStatsValues['ml.matchdiff'])
 				assert.are_same({w = 2, d = 0, l = 2}, alpha.match)
-				assert.are_equal(4, #alpha.matches)
+				assert.are_equal(4, #opponents[1].rounds[1].matches)
 				assert.are_equal(2, alpha.points)
 			end)
 
