@@ -32,7 +32,7 @@ end
 
 ---@return string
 function TiebreakerMedianBuchholz:headerTitle()
-	return 'Median-Buchholz'
+	return 'BH-M'
 end
 
 return TiebreakerMedianBuchholz

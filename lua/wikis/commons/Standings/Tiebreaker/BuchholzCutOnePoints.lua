@@ -23,7 +23,7 @@ end
 
 ---@return string
 function TiebreakerBuchholzCutOnePoints:headerTitle()
-	return 'Buchholz Cut 1 (Pts)'
+	return 'BH-C'
 end
 
 return TiebreakerBuchholzCutOnePoints

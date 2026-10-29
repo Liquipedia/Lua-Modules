@@ -28,7 +28,7 @@ end
 
 ---@return string
 function TiebreakerRoundWinRate:headerTitle()
-	return 'Round Win %'
+	return 'Rnd%'
 end
 
 ---@param state TiebreakerOpponent[]
