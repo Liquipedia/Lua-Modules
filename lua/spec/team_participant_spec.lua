@@ -58,6 +58,14 @@ describe('Team Participant', function()
 						},
 						players = {},
 					},
+					{
+						'mouz',
+						qualification = {
+							method = 'signup',
+							text = 'High seed',
+						},
+						players = {},
+					},
 				}),
 				[[<style>.collapsed > .should-collapse { display: block !important; }</style>]]
 			)
