@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -21,8 +22,6 @@ local Variables = Lua.import('Module:Variables')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local StandingsStorage = {}
-local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
-local SCOREBOARD_FALLBACK = {w = 0, d = 0, l = 0}
 local DISQUALIFIED = 'dq'
 -- TODO: Store as 'group' instead of 'league'
 local STORAGE_TYPE = {group = 'league'}
@@ -69,15 +68,24 @@ function StandingsStorage.run(data, options)
 		Array.map(data.entries, function (entry) return tonumber (entry.roundindex) end),
 		math.max)
 
+	-- An opponent has an entry for every round, all with the same opponent struct
+	local toLpdbStruct = FnUtil.memoize(Opponent.toLpdbStruct)
 	local entries = Array.map(data.entries, function (entry)
-		return StandingsStorage.entry(entry, data.standingsindex)
+		return StandingsStorage.entry(entry, data.standingsindex, toLpdbStruct)
 	end)
 
-	if StandingsStorage.shouldStoreLpdb(options) then
-		StandingsStorage.saveLpdb(StandingsStorage.table(data), entries)
+	local storeLpdb = StandingsStorage.shouldStoreLpdb(options)
+	local saveVars = options and options.saveVars
+	if not storeLpdb and not saveVars then
+		return
 	end
-	if options and options.saveVars then
-		StandingsStorage.saveVars(StandingsStorage.table(data), entries)
+
+	local standingsTable = StandingsStorage.table(data)
+	if storeLpdb then
+		StandingsStorage.saveLpdb(standingsTable, entries)
+	end
+	if saveVars then
+		StandingsStorage.saveVars(standingsTable, entries)
 	end
 end
 
@@ -137,8 +145,9 @@ end
 
 ---@param entry table
 ---@param standingsIndex number
+---@param toLpdbStruct? fun(opponent: standardOpponent): table
 ---@return table?
-function StandingsStorage.entry(entry, standingsIndex)
+function StandingsStorage.entry(entry, standingsIndex, toLpdbStruct)
 	local roundIndex = tonumber(entry.roundindex)
 	local slotIndex = tonumber(entry.slotindex)
 	local standingsIndexNumber = tonumber(standingsIndex)
@@ -149,15 +158,15 @@ function StandingsStorage.entry(entry, standingsIndex)
 
 	local tournamentContext = Tournament.partialTournamentFromContext()
 
-	local extradata = {
+	local extradata = Table.mergeInto({
 		enddate = entry.enddate,
 		roundfinished = entry.finished,
 		placerange = entry.placerange,
 		slotindex = slotIndex,
 		matchid = entry.matchid,
-	}
+	}, entry.extradata)
 
-	local lpdbEntry = {
+	local lpdbEntry = Table.mergeInto({
 		parent = tournamentContext.pageName or '',
 		standingsindex = standingsIndexNumber,
 		placement = entry.placement or entry.rank,
@@ -174,12 +183,12 @@ function StandingsStorage.entry(entry, standingsIndex)
 		},
 		roundindex = roundIndex,
 		slotindex = slotIndex,
-		extradata = Table.merge(extradata, entry.extradata),
-	}
+		extradata = extradata,
+	}, (toLpdbStruct or Opponent.toLpdbStruct)(entry.opponent))
 
 	lpdbEntry.currentstatus = lpdbEntry.currentstatus or lpdbEntry.definitestatus
 
-	return Table.merge(lpdbEntry, Opponent.toLpdbStruct(entry.opponent))
+	return lpdbEntry
 end
 
 ---@param standingsTable table?
@@ -240,18 +249,14 @@ end
 ---@return table
 function StandingsStorage.toScoreBoardEntry(data)
 	if Table.isEmpty(data) then
-		return Table.copy(SCOREBOARD_FALLBACK)
+		return {w = 0, d = 0, l = 0}
 	end
 
-	local filterScoreBoard = function (key, value)
-		return Table.includes(ALLOWED_SCORE_BOARD_KEYS, key)
-	end
-
-	local scoreBoard = Table.mapValues(Table.filterByKey(data, filterScoreBoard), tonumber)
+	local scoreBoard = {w = tonumber(data.w), d = tonumber(data.d), l = tonumber(data.l)}
 
 	if not scoreBoard.w or not scoreBoard.l then
 		mw.logObject(scoreBoard, 'invalid scoreBoardEntry')
-		return Table.copy(SCOREBOARD_FALLBACK)
+		return {w = 0, d = 0, l = 0}
 	end
 
 	return scoreBoard
