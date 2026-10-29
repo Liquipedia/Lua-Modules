@@ -42,7 +42,7 @@ local function StandingsGroup(props)
 		columns = WidgetUtil.collect(
 			{align = 'center'},
 			Helpers.showPlacementChange(standings) and {align = 'center'} or nil,
-			{align = 'left'},
+			StandingsCells.participantColumn(),
 			StandingsCells.statColumns(statsToShow)
 		),
 		children = WidgetUtil.collect(

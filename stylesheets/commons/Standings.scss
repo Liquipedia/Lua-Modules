@@ -1,6 +1,18 @@
 .standings-ffa,
 .standings-swiss,
 .standings-group {
+	.table2__table :is( td, th ) {
+		padding-inline: 0.25rem;
+
+		&:first-child {
+			padding-left: 0.625rem;
+		}
+
+		&:last-child {
+			padding-right: 0.5rem;
+		}
+	}
+
 	tr[ data-position-status ] {
 		position: relative;
 
@@ -20,7 +32,7 @@
 			left: 0;
 			top: 0;
 			bottom: 0;
-			width: 0.25rem;
+			width: 0.375rem;
 			background-color: var( --placement-row-color );
 		}
 

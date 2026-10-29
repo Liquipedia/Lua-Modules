@@ -57,7 +57,7 @@ end
 function Helpers.buildColumnDefinitions(standings, statsToShow)
 	return WidgetUtil.collect(
 		{align = 'left'},
-		{align = 'left'},
+		StandingsCells.participantColumn(),
 		StandingsCells.statColumns(statsToShow),
 		Array.rep({align = 'center'}, #standings.rounds)
 	)

@@ -49,7 +49,7 @@ local function StandingsFfa(props)
 		columns = WidgetUtil.collect(
 			{align = 'center'},
 			Helpers._showRoundColumns(standings) and {align = 'center'} or nil,
-			{align = 'left'},
+			StandingsCells.participantColumn(),
 			StandingsCells.statColumns(statsToShow),
 			Helpers._showRoundColumns(standings) and Array.rep({align = 'center'}, #standings.rounds) or nil
 		),
