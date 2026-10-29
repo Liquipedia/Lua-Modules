@@ -97,17 +97,17 @@ function Helpers.createRow(standings, slot, statsToShow, boldStatTitle)
 				local entry = Array.find(columnRound.opponents, function(columnSlot)
 					return Opponent.same(columnSlot.opponent, slot.opponent)
 				end)
-				if not entry then
-					return TableWidgets.Cell{}
-				end
-				if not entry.match or not entry.matchOpponentIndex then
-					return TableWidgets.Cell{}
+				if not entry or not entry.match or not entry.matchOpponentIndex then
+					return TableWidgets.Cell{classes = {'standings-swiss-match'}}
 				end
 
-				return TableWidgets.Cell{children = MatchOverview{
-					match = entry.match,
-					opponentIndex = entry.matchOpponentIndex,
-				}}
+				return TableWidgets.Cell{
+					classes = {'standings-swiss-match'},
+					children = MatchOverview{
+						match = entry.match,
+						opponentIndex = entry.matchOpponentIndex,
+					},
+				}
 			end)
 		),
 	}

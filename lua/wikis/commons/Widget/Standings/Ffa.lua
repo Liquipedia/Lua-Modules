@@ -60,7 +60,13 @@ local function StandingsFfa(props)
 				if round.round > shownRounds then
 					return
 				end
-				return Helpers._createRoundBody(standings, round, statsToShow, boldStatTitle, hasRoundHistory)
+				return Helpers._RoundBody{
+					standings = standings,
+					round = round,
+					statsToShow = statsToShow,
+					boldStatTitle = boldStatTitle,
+					hasRoundHistory = hasRoundHistory,
+				}
 			end)
 		),
 		striped = false
@@ -113,18 +119,18 @@ function Helpers._headerRow(standings, statsToShow)
 end
 
 ---@private
----@param standings StandingsModel
----@param round StandingsRound
----@param statsToShow StandingsAdditionalStat[]
----@param boldStatTitle string?
----@param hasRoundHistory boolean
+---A component, so the rows of a round are only built once the round is rendered
+---@param props {standings: StandingsModel, round: StandingsRound, statsToShow: StandingsAdditionalStat[],
+---boldStatTitle: string?, hasRoundHistory: boolean}
 ---@return Renderable
-function Helpers._createRoundBody(standings, round, statsToShow, boldStatTitle, hasRoundHistory)
+Helpers._RoundBody = Component.component(function(props)
+	local standings = props.standings
+	local round = props.round
 	return TableWidgets.TableBody{children = Array.map(round.opponents, function (slot)
 		return TableWidgets.Row{
 			attributes = {
 				['data-position-status'] = slot.positionStatus,
-				['data-toggle-area-content'] = hasRoundHistory and round.round or nil,
+				['data-toggle-area-content'] = props.hasRoundHistory and round.round or nil,
 			},
 			children = WidgetUtil.collect(
 				StandingsCells.placement(slot),
@@ -132,7 +138,7 @@ function Helpers._createRoundBody(standings, round, statsToShow, boldStatTitle, 
 					children = PlacementChange{change = slot.positionChangeFromPreviousRound}
 				} or nil,
 				StandingsCells.participant(slot),
-				StandingsCells.stats(slot, statsToShow, boldStatTitle),
+				StandingsCells.stats(slot, props.statsToShow, props.boldStatTitle),
 				Helpers._showRoundColumns(standings) and Array.map(standings.rounds, function (columnRound)
 					local text
 					if columnRound.round <= round.round then
@@ -156,6 +162,6 @@ function Helpers._createRoundBody(standings, round, statsToShow, boldStatTitle, 
 			)
 		}
 	end)}
-end
+end)
 
 return Component.component(StandingsFfa)

@@ -7,16 +7,12 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Set = Lua.import('Module:Set')
 local String = Lua.import('Module:StringUtils')
 
-local TiebreakerComposite = Lua.import('Module:Standings/Tiebreaker/Composite')
-
 local TiebreakerFactory = {}
 
--- A list of classes makes a composite tiebreaker, which compares the listed tiebreakers in order
----@type table<string, string|string[]>
+---@type table<string, string>
 local NAME_TO_CLASS = {
 	buchholz = 'Buchholz',
 	medianbuchholz = 'MedianBuchholz',
@@ -34,19 +30,19 @@ local NAME_TO_CLASS = {
 	matchdraws = 'Match/Draws',
 	matchlosses = 'Match/Losses',
 	matchwinrate = 'Match/WinRate',
-	matchscore = {'Match/Wins', 'Match/Losses'},
+	matchscore = 'Match/Score',
 	gamediff = 'Game/Diff',
 	gamecount = 'Game/Count',
 	gamewins = 'Game/Wins',
 	gamelosses = 'Game/Losses',
 	gamewinrate = 'Game/WinRate',
-	gamescore = {'Game/Wins', 'Game/Losses'},
+	gamescore = 'Game/Score',
 	gamediffregulation = 'Game/DiffRegulation',
 	roundwins = 'Game/Rounds/Wins',
 	roundlosses = 'Game/Rounds/Losses',
 	rounddiff = 'Game/Rounds/Diff',
 	roundwinrate = 'Game/Rounds/WinRate',
-	roundscore = {'Game/Rounds/Wins', 'Game/Rounds/Losses'},
+	roundscore = 'Game/Rounds/Score',
 	startingpoints = 'StartingPoints',
 }
 
@@ -124,18 +120,9 @@ function TiebreakerFactory.tiebreakerFromId(tiebreakerId, options)
 	local tiebreakerClassName = NAME_TO_CLASS[name]
 	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(tiebreakerId))
 
-	---@param className string
-	---@return StandingsTiebreaker
-	local function build(className)
-		---@type StandingsTiebreaker
-		local TiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. className)
-		return TiebreakerClass(context, options)
-	end
-
-	if type(tiebreakerClassName) == 'table' then
-		return TiebreakerComposite(context, options, Array.map(tiebreakerClassName, build))
-	end
-	return build(tiebreakerClassName)
+	---@type StandingsTiebreaker
+	local TiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. tiebreakerClassName)
+	return TiebreakerClass(context, options)
 end
 
 return TiebreakerFactory

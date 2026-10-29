@@ -61,7 +61,7 @@ describe('Standings model round trip', function()
 		assert.are_equal('League Standings', standings.title)
 		assert.are_equal(0, standings.standingsIndex)
 		assert.are_equal('full.points', standings.additionalStats[1].id)
-		assert.are_equal('Points', standings.additionalStats[1].title)
+		assert.are_equal('Pts', standings.additionalStats[1].title)
 
 		assert.are_equal(2, #standings.rounds)
 		assert.are_equal('Day 1', standings.rounds[1].title)
