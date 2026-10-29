@@ -34,6 +34,10 @@ end
 ---@param opponent TiebreakerOpponent
 ---@return string
 function TiebreakerMatchWinRate:display(state, opponent)
+	local matches = TiebreakerMatchUtil.getMatches(opponent)
+	if matches.w + matches.l + matches.d == 0 then
+		return '-'
+	end
 	return MathUtil.formatPercentage(self:valueOf(state, opponent), 2)
 end
 
