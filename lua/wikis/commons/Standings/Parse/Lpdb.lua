@@ -106,6 +106,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 		end
 
 		local matches = {}
+		-- Points are only looked up by match id, so all rounds can share a single table
 		local matchPoints = {}
 
 		return {
@@ -113,7 +114,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 			rounds = Array.map(opponentData.rounds, function(roundData)
 				local roundMatches = roundData.matches or {}
 				matches = Array.extend(matches, roundMatches)
-				matchPoints = Table.merge(matchPoints, roundData.matchPoints)
+				Table.mergeInto(matchPoints, roundData.matchPoints)
 				local lastMatch = roundMatches[#roundMatches]
 				local matchOpponentIndex = lastMatch
 					and Array.indexOf(lastMatch.opponents, FnUtil.curry(Opponent.same, opponentData.opponent))

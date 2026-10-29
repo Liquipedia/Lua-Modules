@@ -371,13 +371,12 @@ describe('Standings import from matches', function()
 		}, swissScoreMapper, {}, {importOpponents = true})
 
 		local heroic = findOpponent(opponents, 'Heroic')
-		assert.are_same({M1 = 1}, heroic.rounds[1].matchPoints)
-		-- cumulative, like matches
 		assert.are_same({M1 = 1, M2 = 1}, heroic.rounds[2].matchPoints)
+		assert.are_equal(heroic.rounds[1].matchPoints, heroic.rounds[2].matchPoints)
 
 		local wolves = findOpponent(opponents, 'Wolves Esports')
-		assert.are_same({M1 = 0}, wolves.rounds[1].matchPoints)
 		assert.are_same({M1 = 0, M2 = 0}, wolves.rounds[2].matchPoints)
+		assert.are_equal(wolves.rounds[1].matchPoints, wolves.rounds[2].matchPoints)
 	end)
 
 	it('does not record points for matches the score mapper has no points for', function()
