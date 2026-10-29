@@ -87,8 +87,8 @@ ComponentCore.ComponentMT = {
 
 		-- Apply DefaultProps via lightweight metatable
 		-- Only shallow default props allowed, or empty tables
-		if self.defaultProps then
-			setmetatable(props, { __index = self.defaultProps })
+		if self.defaultPropsMT then
+			setmetatable(props, self.defaultPropsMT)
 		end
 
 		if isSingleNode(props.children) then
@@ -111,7 +111,9 @@ function ComponentCore.component(renderFunction, defaultProps)
 	---@diagnostic disable-next-line: return-type-mismatch
 	return setmetatable({
 		renderFn = renderFunction,
-		defaultProps = defaultProps
+		defaultProps = defaultProps,
+		-- Shared by all calls, so a call does not allocate a metatable
+		defaultPropsMT = defaultProps and { __index = defaultProps },
 	}, ComponentCore.ComponentMT)
 end
 
