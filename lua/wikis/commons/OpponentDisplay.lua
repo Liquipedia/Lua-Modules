@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local DisplayUtil = Lua.import('Module:DisplayUtil')
 local Logic = Lua.import('Module:Logic')
+local Set = Lua.import('Module:Set')
 local Table = Lua.import('Module:Table')
 local TypeUtil = Lua.import('Module:TypeUtil')
 
@@ -28,21 +29,12 @@ local OpponentDisplay = {propTypes = {}, types = {}}
 OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid', 'icon', 'dynamic')
 ---@alias teamStyle 'standard'|'short'|'bracket'|'hybrid'|'icon'|'dynamic'
 
-local VALID_TEAM_STYLES = {
-	standard = true,
-	short = true,
-	bracket = true,
-	hybrid = true,
-	icon = true,
-	dynamic = true,
-}
+local VALID_TEAM_STYLES = Set{'standard', 'short', 'bracket', 'hybrid', 'icon', 'dynamic'}
 
 ---Asserts that the style is a team style
 ---@param style any
 local function assertTeamStyle(style)
-	if not VALID_TEAM_STYLES[style] then
-		error('Invalid team style: ' .. tostring(style))
-	end
+	assert(VALID_TEAM_STYLES:contains(style), 'Invalid team style: ' .. tostring(style))
 end
 
 ---@class InlineOpponentProps
