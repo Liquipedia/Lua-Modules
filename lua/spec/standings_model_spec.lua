@@ -18,9 +18,16 @@ describe('Standings model round trip', function()
 		}
 	end
 
-	---Parses a standings table and stores it to page variables (as Standings/Table does),
-	---then reads the model back through Standings.getStandingsTable
-	local function buildAndFetchStandings()
+	---Stores a parsed standings table and builds the model from the stored records, as Standings/Table does
+	---@param standingsTable table
+	---@return StandingsModel
+	local function storeAndBuild(standingsTable)
+		local record, entries = StandingsStorage.run(standingsTable)
+		---@cast record -nil
+		return Standings.standingsFromRecord(record, entries)
+	end
+
+	local function buildStandings()
 		local rounds = {
 			{roundNumber = 1, started = true, finished = true, title = 'Day 1'},
 			{roundNumber = 2, started = true, finished = true, title = 'Day 2'},
@@ -32,9 +39,7 @@ describe('Standings model round trip', function()
 		}
 		local standingsTable = StandingsParser.parse(
 			rounds, opponents, {[1] = 'up', [3] = 'down'}, 'League Standings', {}, 'ffa', {'full.points', 'full.manual'})
-		StandingsStorage.run(standingsTable, {saveVars = true})
-
-		return Standings.getStandingsTable('FakePage', 0)
+		return storeAndBuild(standingsTable)
 	end
 
 	before_each(function()
@@ -52,11 +57,9 @@ describe('Standings model round trip', function()
 		mw.ext.LiquipediaDB.lpdb_standingsentry:revert()
 	end)
 
-	it('reads the stored standings back from page variables', function()
-		local standings = buildAndFetchStandings()
+	it('builds the model from the stored records', function()
+		local standings = buildStandings()
 
-		assert.is_not_nil(standings)
-		---@cast standings -nil
 		assert.are_equal('ffa', standings.type)
 		assert.are_equal('League Standings', standings.title)
 		assert.are_equal(0, standings.standingsIndex)
@@ -71,8 +74,7 @@ describe('Standings model round trip', function()
 	end)
 
 	it('exposes entries ordered by position with model fields mapped', function()
-		local standings = buildAndFetchStandings()
-		---@cast standings -nil
+		local standings = buildStandings()
 
 		-- Round 2 totals: Bravo 5, Alpha 3, Charlie 1
 		local round2 = standings.rounds[2].opponents
@@ -100,29 +102,23 @@ describe('Standings model round trip', function()
 	end)
 
 	it('stores group standings as league and reads them back as group', function()
-		local Json = require('Module:Json')
-		local Variables = require('Module:Variables')
-
 		local rounds = {{roundNumber = 1, started = true, finished = true, title = 'Round 1'}}
 		local standingsTable = StandingsParser.parse(
 			rounds, {makeOpponent('Alpha', {3}), makeOpponent('Bravo', {0})}, {}, 'Group A', {}, 'group',
 			{'full.points', 'full.manual'}
 		)
 		assert.are_equal('group', standingsTable.type)
-		StandingsStorage.run(standingsTable, {saveVars = true})
+		local record, entries = StandingsStorage.run(standingsTable)
+		---@cast record -nil
+		assert.are_equal('league', record.type)
 
-		local stored = Json.parseStringified(Variables.varDefault('standings2_0'))
-		assert.are_equal('league', stored.standings.type)
-
-		local standings = Standings.getStandingsTable('FakePage', 0)
-		---@cast standings -nil
+		local standings = Standings.standingsFromRecord(record, entries)
 		assert.are_equal('group', standings.type)
 	end)
 
 	it('renders the ffa standings widget from the model', function()
-		buildAndFetchStandings() -- stores the standings into page variables
 		local StandingsDisplay = require('Module:Widget/Standings')
-		local html = tostring(StandingsDisplay{pageName = 'FakePage', standingsIndex = 0})
+		local html = tostring(StandingsDisplay{standings = buildStandings()})
 
 		assert.is_truthy(html:find('standings-ffa', 1, true))
 		assert.is_truthy(html:find('League Standings', 1, true))
@@ -153,9 +149,7 @@ describe('Standings model round trip', function()
 			rounds, {makeOpponent('Alpha', {0, 0}), makeOpponent('Bravo', {0, 0})}, {}, 'FFA', {}, 'ffa',
 			{'full.points', 'full.manual'}
 		)
-		StandingsStorage.run(standingsTable, {saveVars = true})
-
-		local html = tostring(require('Module:Widget/Standings')({pageName = 'FakePage', standingsIndex = 0}))
+		local html = tostring(require('Module:Widget/Standings')({standings = storeAndBuild(standingsTable)}))
 		-- The round history stays for the detailed stats switch of the round columns
 		assert.is_truthy(html:find('class="standings-round-history toggle-area toggle-area-1"', 1, true))
 		assert.is_truthy(html:find('data-toggle-area-content="1"', 1, true))
@@ -169,9 +163,7 @@ describe('Standings model round trip', function()
 			{makeOpponent('Alpha', {3}), makeOpponent('Bravo', {1})}, {}, 'FFA', {}, 'ffa',
 			{'full.points', 'full.manual'}
 		)
-		StandingsStorage.run(standingsTable, {saveVars = true})
-
-		local html = tostring(require('Module:Widget/Standings')({pageName = 'FakePage', standingsIndex = 0}))
+		local html = tostring(require('Module:Widget/Standings')({standings = storeAndBuild(standingsTable)}))
 		assert.is_truthy(html:find('standings-ffa', 1, true))
 		assert.is_falsy(html:find('standings-round-history', 1, true))
 		assert.is_falsy(html:find('data-toggle-area-content', 1, true))
@@ -194,10 +186,7 @@ describe('Standings model round trip', function()
 			'ffa',
 			{'full.disqualified', 'full.points', 'full.manual'}
 		)
-		StandingsStorage.run(standingsTable, {saveVars = true})
-
-		local standings = Standings.getStandingsTable('FakePage', 0)
-		---@cast standings -nil
+		local standings = storeAndBuild(standingsTable)
 
 		local round1 = standings.rounds[1].opponents
 		assert.are_same({'Alpha', 'Bravo', 'Charlie'}, Array.map(round1, function(entry) return entry.opponent.name end))
@@ -212,7 +201,7 @@ describe('Standings model round trip', function()
 		assert.are_equal('dq', alpha.definitiveStatus)
 		assert.is_false(round2[1].disqualified)
 
-		local html = tostring(require('Module:Widget/Standings')({pageName = 'FakePage', standingsIndex = 0}))
+		local html = tostring(require('Module:Widget/Standings')({standings = standings}))
 		-- The DQ label sits inside the participant cell, next to the opponent
 		assert.is_truthy(html:find(
 			'class="standings%-participant">.-<div class="generic%-label label%-%-placement" data%-placement%-type="dq">DQ</div>'
@@ -246,10 +235,7 @@ describe('Standings model round trip', function()
 		}
 		local standingsTable = StandingsParser.parse(
 			rounds, opponents, {[1] = 'up', [2] = 'down'}, 'Swiss Stage', {}, 'swiss', {'full.matchdiff', 'full.manual'})
-		StandingsStorage.run(standingsTable, {saveVars = true})
-
-		local standings = Standings.getStandingsTable('FakePage', 0)
-		assert.is_not_nil(standings)
+		local standings = storeAndBuild(standingsTable)
 
 		local html = tostring(SwissStandings{standings = standings})
 		assert.is_truthy(html:find('standings-swiss', 1, true))
@@ -289,10 +275,7 @@ describe('Standings model round trip', function()
 		}
 		local standingsTable = StandingsParser.parse(
 			rounds, opponents, {}, 'Swiss Stage', {}, 'swiss', {'full.matchdiff'})
-		StandingsStorage.run(standingsTable, {saveVars = true})
-
-		local standings = Standings.getStandingsTable('FakePage', 0)
-		---@cast standings -nil
+		local standings = storeAndBuild(standingsTable)
 
 		-- The unstarted round carries the standings forward, so its change is 0
 		assert.are_equal(0, standings.rounds[3].opponents[1].positionChangeFromPreviousRound)
@@ -321,10 +304,7 @@ describe('Standings model round trip', function()
 		}
 		local standingsTable = StandingsParser.parse(
 			rounds, opponents, {}, 'Swiss Stage', {}, 'swiss', {'full.matchdiff'})
-		StandingsStorage.run(standingsTable, {saveVars = true})
-
-		local standings = Standings.getStandingsTable('FakePage', 0)
-		---@cast standings -nil
+		local standings = storeAndBuild(standingsTable)
 
 		-- Matches are fetched as stored, so Alpha shows up under its alias
 		local match = {phase = 'finished', winner = 1, opponents = {
@@ -362,14 +342,14 @@ describe('Standings model round trip', function()
 
 		---@param rounds table[]
 		---@param opponents table[]
-		---@return string
+		---@return string, StandingsModel
 		local function storeAndRender(rounds, opponents)
 			local standingsTable = StandingsParser.parse(
 				rounds, opponents, {[1] = 'up', [3] = 'down'}, 'Group A', {}, 'group',
 				{'full.disqualified', 'full.points', 'full.manual'}
 			)
-			StandingsStorage.run(standingsTable, {saveVars = true})
-			return tostring(require('Module:Widget/Standings')({pageName = 'FakePage', standingsIndex = 0}))
+			local standings = storeAndBuild(standingsTable)
+			return tostring(require('Module:Widget/Standings')({standings = standings})), standings
 		end
 
 		it('renders every started round with a round selector', function()
@@ -408,13 +388,11 @@ describe('Standings model round trip', function()
 				{roundNumber = 1, started = true, finished = true, title = 'Week 1'},
 				{roundNumber = 2, started = true, finished = true, title = 'Week 2'},
 			}
-			storeAndRender(rounds, {
+			local _, standings = storeAndRender(rounds, {
 				makeGroupOpponent('Alpha', {LOSS, WIN}),
 				makeGroupOpponent('Bravo', {WIN, LOSS}),
 				makeGroupOpponent('Charlie', {DRAW, WIN}),
 			})
-			local standings = Standings.getStandingsTable('FakePage', 0)
-			---@cast standings -nil
 
 			local function names(round)
 				return Array.map(standings.rounds[round].opponents, function(entry) return entry.opponent.name end)
