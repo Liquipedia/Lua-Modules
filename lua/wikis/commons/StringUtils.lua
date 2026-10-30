@@ -7,9 +7,8 @@
 
 local String = {}
 
--- The charset of `String.trim`: the default charset of `mw.text.trim` and the non-breaking space (`&nbsp;`)
 local ASCII_WHITESPACE = '\t\r\n\f '
-local TRIM_CHARSET = ASCII_WHITESPACE .. '\194\160'
+local TRIM_CHARSET = ASCII_WHITESPACE .. '\194\160' -- and the non-breaking space
 local BLANK_ASCII = '^()[' .. ASCII_WHITESPACE .. ']*$'
 local TRIMMED_ASCII = '^[' .. ASCII_WHITESPACE .. ']*(.*[^' .. ASCII_WHITESPACE .. '])'
 
@@ -56,8 +55,7 @@ function String.split(inputstr, sep)
 	end
 end
 
----Whether a Ustring pattern only consists of ASCII characters that match themselves.
----A quantifier on its own (e.g. `-`) has nothing to quantify and matches itself.
+---Whether a pattern only consists of ASCII characters that match themselves, e.g. `,`, `;;` or a lone `-`.
 ---@param pattern string
 ---@param plain boolean?
 ---@return boolean
@@ -71,10 +69,7 @@ local function isLiteralAscii(pattern, plain)
 		or string.find(pattern, '^[%*%+%-%?]$') ~= nil)
 end
 
----Splits a string at a separator, with the same results as `mw.text.split`, including empty items.
----`mw.text.split` makes PHP callbacks in Scribunto, two per item. A separator of ASCII characters that are matched
----literally gives the same split with the string library, as ASCII bytes never occur within a multi-byte character.
----Other separators, and text that is not valid UTF-8, still go through `mw.text.split`.
+---Same as `mw.text.split`, without its PHP callbacks (two per item) for a separator of literal ASCII characters.
 ---@param text string
 ---@param pattern string # A Ustring pattern, or a literal string if `plain` is true
 ---@param plain boolean?
@@ -84,7 +79,6 @@ function String.splitText(text, pattern, plain)
 		or not isAscii(text) and not mw.ustring.isutf8(text) then
 		return mw.text.split(text, pattern, plain)
 	end
-	-- A plain find is faster than `string.gmatch` with `(.-)`, which tries the separator at every position
 	local items = {}
 	local start = 1
 	while true do
@@ -112,8 +106,7 @@ end
 ---@param str string
 ---@return string
 function String.trim(str)
-	-- `mw.text.trim` with a charset is a PHP callback in Scribunto. ASCII strings cannot contain the non-breaking space,
-	-- so they are trimmed like `mw.text.trim` without a charset, minus the vertical tab its `%s` would include.
+	-- Avoids the PHP callback of `mw.text.trim` with a charset; ASCII strings cannot contain the non-breaking space
 	if type(str) == 'string' and isAscii(str) then
 		return string.match(str, BLANK_ASCII) and '' or string.match(str, TRIMMED_ASCII)
 	end

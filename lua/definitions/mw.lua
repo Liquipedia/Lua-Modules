@@ -740,7 +740,7 @@ function mw.text.trim(s, charset)
 	if not charset then
 		return string.match(s, '^()%s*$') and '' or string.match(s, '^%s*(.*%S)')
 	end
-	-- Scribunto matches the charset per UTF-8 character. The fake only supports literal characters, no ranges or classes.
+	-- Only literal characters in the charset, no ranges or classes
 	local utf8Character = '.[\128-\191]*'
 	local trimmed = {}
 	for character in string.gmatch(charset, utf8Character) do
@@ -1020,7 +1020,7 @@ function mw.ustring.isutf8(s)
 		if not length then
 			return false
 		end
-		-- The fake does not reject overlong three and four byte sequences or surrogates
+		-- Overlong sequences and surrogates are not rejected
 		for continuation = index + 1, index + length - 1 do
 			local continuationByte = string.byte(s, continuation)
 			if not continuationByte or continuationByte < 0x80 or continuationByte > 0xBF then
