@@ -1,5 +1,6 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('Standings Table from template', function()
+	local Array = require('Module:Array')
 	local StandingsTable = require('Module:Standings/Table')
 
 	before_each(function()
@@ -85,6 +86,40 @@ describe('Standings Table from template', function()
 		assert.error(function()
 			StandingsTable.fromTemplate{tabletype = 'league'}
 		end)
+	end)
+
+	it('shows the imported matches of swiss standings without fetching them again', function()
+		local MatchGroupUtil = require('Module:MatchGroup/Util')
+		local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
+		local function match2Record(matchId, firstTemplate, secondTemplate)
+			return {match2id = matchId, match2bracketid = 'abc', date = '2024-01-05', dateexact = '1', finished = '1',
+				winner = '1', bestof = '3', extradata = {}, match2bracketdata = {}, match2games = {},
+				match2opponents = Array.map({firstTemplate, secondTemplate}, function(template, index)
+					return {type = 'team', template = template, score = 2 - 2 * (index - 1), status = 'S',
+						placement = index, extradata = {}, match2players = {}}
+				end)}
+		end
+		TeamTemplateMock.setUp()
+		---@diagnostic disable-next-line: undefined-field
+		mw.ext.LiquipediaDB.lpdb:revert()
+		stub(mw.ext.LiquipediaDB, 'lpdb', function(tableName)
+			return tableName == 'match2' and {
+				match2Record('abc_R01-M001', 'heroic', 'tt9 esports 2022'),
+				match2Record('abc_R01-M002', 'wolves esports', 'team liquid'),
+			} or {}
+		end)
+		local fetchMatchGroup = spy.on(MatchGroupUtil, 'fetchMatchGroup')
+
+		local html = tostring(StandingsTable.fromTemplate{
+			tabletype = 'swiss',
+			round1 = {matches = 'abc_R01-M001,abc_R01-M002'},
+		})
+		TeamTemplateMock.tearDown()
+		fetchMatchGroup:revert()
+
+		local _, overviewCount = html:gsub('standings%-match%-overview', '')
+		assert.are_equal(4, overviewCount)
+		assert.spy(fetchMatchGroup).was_not_called()
 	end)
 
 	describe('tiebreaker reset', function()

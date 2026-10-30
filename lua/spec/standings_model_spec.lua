@@ -323,6 +323,29 @@ describe('Standings model round trip', function()
 		assert.are_equal(2, bravoCount)
 	end)
 
+	it('uses the known matches and fetches the others', function()
+		local MatchGroupUtil = require('Module:MatchGroup/Util')
+		local knownMatch, fetchedMatch = {matchId = 'abc_0001'}, {matchId = 'abc_0002'}
+		stub(MatchGroupUtil, 'fetchMatchGroup', {matchesById = {abc_0002 = fetchedMatch}})
+
+		local function makeSwissOpponent(name, matchId)
+			return {opponent = literal(name), rounds = {{scoreboard = {points = 0}, specialstatus = '',
+				matchId = matchId, matchOpponentIndex = 1}}}
+		end
+		local record, entries = StandingsStorage.run(StandingsParser.parse(
+			{{roundNumber = 1, started = true, finished = true, title = 'Round 1'}},
+			{makeSwissOpponent('Alpha', 'abc_0001'), makeSwissOpponent('Bravo', 'abc_0002')},
+			{}, 'Swiss Stage', {}, 'swiss', {'full.points'}
+		))
+		---@cast record -nil
+		local standings = Standings.standingsFromRecord(record, entries, {abc_0001 = knownMatch})
+		local matches = Array.map(standings.rounds[1].opponents, function(entry) return entry.match end)
+		---@diagnostic disable-next-line: undefined-field
+		MatchGroupUtil.fetchMatchGroup:revert()
+
+		assert.are_same({knownMatch, fetchedMatch}, matches)
+	end)
+
 	describe('group standings', function()
 		---@param name string
 		---@param results {w: integer, d: integer, l: integer}[]

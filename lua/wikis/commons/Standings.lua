@@ -39,6 +39,7 @@ local Standings = {}
 ---@field additionalStats StandingsAdditionalStat[]
 ---@field package record standingstable
 ---@field package entryRecords standingsentry[]
+---@field package knownMatchesById table<string, MatchGroupUtilMatch>?
 
 ---@class StandingsAdditionalStat
 ---@field id string
@@ -117,8 +118,9 @@ local StandingsEntryMT = {
 
 ---@param record standingstable
 ---@param entries standingsentry[]?
+---@param knownMatchesById table<string, MatchGroupUtilMatch>? # Matches already loaded, used instead of fetching
 ---@return StandingsModel
-function Standings.standingsFromRecord(record, entries)
+function Standings.standingsFromRecord(record, entries, knownMatchesById)
 	local standings = {
 		namespace = record.namespace,
 		pageName = record.pagename,
@@ -130,6 +132,7 @@ function Standings.standingsFromRecord(record, entries)
 		additionalStats = record.extradata.additionalStats,
 		record = record,
 		entryRecords = entries,
+		knownMatchesById = knownMatchesById,
 	}
 
 	-- Some properties are derived from other properties and we can calculate them when accessed.
@@ -139,8 +142,9 @@ function Standings.standingsFromRecord(record, entries)
 end
 
 ---@param record standingsentry
+---@param knownMatchesById table<string, MatchGroupUtilMatch>? # The match is fetched when it is not in here
 ---@return StandingsEntryModel
-function Standings.entryFromRecord(record)
+function Standings.entryFromRecord(record, knownMatchesById)
 	local entry = {
 		opponent = Opponent.fromLpdbStruct(record),
 		placement = record.placement,
@@ -156,6 +160,7 @@ function Standings.entryFromRecord(record)
 		positionChangeFromPreviousRound = tonumber(record.placementchange),
 		additionalStatsValues = record.extradata.additionalStatsValues or {},
 		matchOpponentIndex = tonumber(record.extradata.matchopponentindex),
+		match = knownMatchesById and knownMatchesById[record.extradata.matchid or ''],
 		record = record,
 	}
 
@@ -231,7 +236,9 @@ function Standings.makeRounds(standings)
 		local roundEntries = Array.filter(standingsEntries, function(entry)
 			return tonumber(entry.roundindex) == roundIndex
 		end)
-		local opponents = Array.sortBy(Array.map(roundEntries, Standings.entryFromRecord), Operator.property('position'))
+		local opponents = Array.sortBy(Array.map(roundEntries, function(entryRecord)
+			return Standings.entryFromRecord(entryRecord, standings.knownMatchesById)
+		end), Operator.property('position'))
 		return {
 			round = roundIndex,
 			opponents = opponents,

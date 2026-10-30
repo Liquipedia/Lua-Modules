@@ -62,13 +62,13 @@ function StandingsTable.fromTemplate(frame)
 	end
 	local storeLpdb = Logic.nilOr(Logic.readBoolOrNil(args.store), true)
 
-	-- Parsed separately so the imported matches are released before storage
-	local standingsTable = StandingsTable.parse(args, tableType)
+	-- Parsed separately so the imported matches are released before storage, except the ones the display shows
+	local standingsTable, matchesById = StandingsTable.parse(args, tableType)
 
 	local record, entries = StandingsStorage.run(standingsTable, {storeLpdb = storeLpdb})
 	---@cast record -nil
 	return StandingsDisplay{
-		standings = Standings.standingsFromRecord(record, entries),
+		standings = Standings.standingsFromRecord(record, entries, matchesById),
 		width = StandingsParseWiki.parseWidth(args),
 	}
 end
@@ -76,6 +76,7 @@ end
 ---@param args table
 ---@param tableType StandingsTableTypes
 ---@return StandingsTableStorage
+---@return table<string, MatchGroupUtilMatch>? # The imported matches, only for swiss as only its display shows them
 function StandingsTable.parse(args, tableType)
 	local title = args.title
 	local importScoreFromMatches = Logic.nilOr(Logic.readBoolOrNil(args.import), true)
@@ -98,6 +99,8 @@ function StandingsTable.parse(args, tableType)
 
 	---@type table<integer, MatchPhase[]>
 	local matchPhasesByRound = {}
+	---@type table<string, MatchGroupUtilMatch>?
+	local matchesById
 	if importScoreFromMatches then
 		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args, overtime)
 
@@ -111,6 +114,9 @@ function StandingsTable.parse(args, tableType)
 			}
 		)
 		opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
+		if tableType == 'swiss' then
+			matchesById = StandingsTable.matchesById(importedOpponents)
+		end
 	end
 
 	Array.forEach(rounds, function(round)
@@ -129,7 +135,21 @@ function StandingsTable.parse(args, tableType)
 		standingsTable.extradata.placemapping = Logic.wrapTryOrLog(StandingsParseWiki.parsePlaceMapping)(args, opponents)
 	end
 
-	return standingsTable
+	return standingsTable, matchesById
+end
+
+---@param opponents StandingTableOpponentData[]
+---@return table<string, MatchGroupUtilMatch>
+function StandingsTable.matchesById(opponents)
+	local matchesById = {}
+	Array.forEach(opponents, function(opponentData)
+		Array.forEach(opponentData.rounds or {}, function(round)
+			Array.forEach(round.matches or {}, function(match)
+				matchesById[match.matchId] = match
+			end)
+		end)
+	end)
+	return matchesById
 end
 
 ---@param manualOpponents StandingTableOpponentData[]
