@@ -176,7 +176,8 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 
 	StandingsParser.setPlacementChange(entries)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer,
-	---points: number, placement: integer?, slotindex: integer, placementchange: integer?}[]
+	---points: number, placement: integer?, slotindex: integer, placementchange: integer?,
+	---matches: MatchGroupUtilMatch[]?, matchPoints: table<string, number>?}[]
 
 	StandingsParser.addStatuses(entries, bgs, 'currentstatus')
 	if isFinished then
@@ -186,6 +187,11 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 	end
 	StandingsParser.applyManualStatuses(entries)
 	StandingsParser.applyDisqualifications(entries)
+	-- Only the tiebreakers need the matches
+	Array.forEach(entries, function(entry)
+		entry.matches = nil
+		entry.matchPoints = nil
+	end)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
 	---placement: integer?, slotindex: integer, placementchange: integer?,
 	---currentstatus: string?, definitestatus: string?}[]
