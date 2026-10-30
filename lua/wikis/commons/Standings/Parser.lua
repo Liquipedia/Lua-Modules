@@ -22,6 +22,7 @@ local StandingsParser = {}
 ---@field overtime boolean? Whether overtime results are tracked separately from regulation results
 ---@field walkoverGames integer? Games a walkover counts as in the game tiebreakers, unset means not counted
 ---@field walkoverRounds integer? Rounds a walkover map counts as in the round tiebreakers, unset means not counted
+---@field tiebreakerReset boolean? Whether groups split by a tiebreaker start over from the first tiebreaker
 
 ---@param rounds {roundNumber: integer, started: boolean, finished:boolean, title: string?}[]
 ---@param opponents StandingTableOpponentData[]
@@ -149,7 +150,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 	Array.forEach(rounds, function(round)
 		StandingsParser.determinePlacements(Array.filter(entries, function(opponentRound)
 			return opponentRound.roundindex == round.roundNumber
-		end), tiebreakerIds, tiebreakerOptions)
+		end), tiebreakerIds, tiebreakerOptions, options.tiebreakerReset)
 	end)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer,
 	---points: number, placement: integer?, slotindex: integer}[]
@@ -266,8 +267,11 @@ end
 ---@param tiebreakerIds string[]
 ---@param tiebreakerIndex integer
 ---@param tiebreakerOptions StandingsTiebreakerOptions?
+---@param tiebreakerReset boolean? Whether groups split by a tiebreaker start over from the first tiebreaker
 ---@return TiebreakerOpponent[][]
-local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex, tiebreakerOptions)
+local function resolveTieForGroup(
+	allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex, tiebreakerOptions, tiebreakerReset
+)
 	local tiebreakerId = tiebreakerIds[tiebreakerIndex]
 	if not tiebreakerId then
 		return { tiedOpponents }
@@ -277,7 +281,9 @@ local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, ti
 
 	-- H2H legacy is only defined for ties between 2 or 3 opponents, for bigger ties it is skipped
 	if contextType == 'h2hlegacy' and #tiedOpponents > 3 then
-		return resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex + 1, tiebreakerOptions)
+		return resolveTieForGroup(
+			allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex + 1, tiebreakerOptions, tiebreakerReset
+		)
 	end
 
 	-- ML and H2H legacy only look at the matches played among the tied opponents.
@@ -326,11 +332,17 @@ local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, ti
 		end)
 	end)
 
+	-- With tiebreaker reset, the groups this tiebreaker splits start over from the first tiebreaker.
+	-- A reset only happens for a strictly smaller group, which guarantees termination.
+	local nextTiebreakerIndex = (tiebreakerReset and #groupedOpponentsInOrder > 1) and 1 or tiebreakerIndex + 1
+
 	return Array.flatMap(groupedOpponentsInOrder, function(group)
 		if #group == 1 then
 			return { group }
 		end
-		return resolveTieForGroup(allOpponents, group, tiebreakerIds, tiebreakerIndex + 1, tiebreakerOptions)
+		return resolveTieForGroup(
+			allOpponents, group, tiebreakerIds, nextTiebreakerIndex, tiebreakerOptions, tiebreakerReset
+		)
 	end)
 end
 
@@ -338,8 +350,11 @@ end
 ---placement: integer?, slotindex: integer?, extradata: table}[]
 ---@param tiebreakerIds string[]
 ---@param tiebreakerOptions StandingsTiebreakerOptions?
-function StandingsParser.determinePlacements(opponentsInRound, tiebreakerIds, tiebreakerOptions)
-	local opponentsAfterTie = resolveTieForGroup(opponentsInRound, opponentsInRound, tiebreakerIds, 1, tiebreakerOptions)
+---@param tiebreakerReset boolean? Whether groups split by a tiebreaker start over from the first tiebreaker
+function StandingsParser.determinePlacements(opponentsInRound, tiebreakerIds, tiebreakerOptions, tiebreakerReset)
+	local opponentsAfterTie = resolveTieForGroup(
+		opponentsInRound, opponentsInRound, tiebreakerIds, 1, tiebreakerOptions, tiebreakerReset
+	)
 	local slotIndex = 1
 	Array.forEach(opponentsAfterTie, function(opponentGroup)
 		local rank = slotIndex

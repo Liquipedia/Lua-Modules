@@ -59,6 +59,8 @@ function StandingsTable.fromTemplate(frame)
 	--- Note that this is the reverse of the legacy GroupTableLeague default, on purpose.
 	local exclusiveOpponents = Logic.readBool(args.exclusive)
 	local storeLpdb = Logic.nilOr(Logic.readBoolOrNil(args.store), true)
+	--- With tiebreaker reset, opponents split by a tiebreaker are compared again starting from the first tiebreaker.
+	local tiebreakerReset = Logic.readBool(args.tiebreakerreset)
 
 	local parsedData = StandingsParseWiki.parseWikiInput(args)
 	local rounds = parsedData.rounds
@@ -95,6 +97,7 @@ function StandingsTable.fromTemplate(frame)
 		overtime = overtime,
 		walkoverGames = StandingsParseWiki.parseWalkoverGames(args),
 		walkoverRounds = StandingsParseWiki.parseWalkoverRounds(args),
+		tiebreakerReset = tiebreakerReset,
 	})
 
 	if tableType == 'swiss' then
