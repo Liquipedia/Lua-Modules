@@ -1504,7 +1504,7 @@ mw.ext.valorantdb = {}
 ---@field round_results valorantMatchApiRound[]
 
 ---@param matchId string
----@return valorantMatchData
+---@return valorantMatchData|{error: string}
 function mw.ext.valorantdb.getMatchDetails(matchId) end
 
 return mw
