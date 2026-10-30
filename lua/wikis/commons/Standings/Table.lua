@@ -33,8 +33,15 @@ local TABLE_TYPES = {ffa = true, swiss = true, group = true}
 ---@field match {w: integer, d: integer, l: integer}
 ---@field overtime {w: integer, l: integer}?
 
+---@class StandingsAdjustment
+---@field points number?
+---@field tiebreaker number?
+---@field match {w: integer?, d: integer?, l: integer?}?
+---@field game {w: integer?, d: integer?, l: integer?}?
+---@field round {w: integer?, l: integer?}?
+
 ---@class StandingTableOpponentData
----@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?,
+---@field rounds {specialstatus: string, scoreboard: Scoreboard?,
 ---matches: MatchGroupUtilMatch[], matchId: string, matchOpponentIndex: integer?}[]?
 ---@field opponent standardOpponent
 ---@field matchPoints table<string, number>? # The points of each imported match, keyed by match id
@@ -42,6 +49,7 @@ local TABLE_TYPES = {ffa = true, swiss = true, group = true}
 ---@field startingPoints number?
 ---@field disqualifiedFromRound integer? # The first round in which the opponent is disqualified
 ---@field definiteStatuses table<integer, string>? # Manually set definite statuses, keyed by the round they apply from
+---@field adjustments table<integer, StandingsAdjustment>? # Keyed by the round they apply from
 
 ---@param frame Frame
 ---@return Renderable

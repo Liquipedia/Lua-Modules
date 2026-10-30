@@ -24,6 +24,14 @@ local StandingsParser = {}
 ---@field walkoverRounds integer? Rounds a walkover map counts as in the round tiebreakers, unset means not counted
 ---@field tiebreakerReset boolean? Whether groups split by a tiebreaker start over from the first tiebreaker
 
+---@param carried table
+---@param record table?
+local function addRecord(carried, record)
+	for key, value in pairs(record or {}) do
+		carried[key] = carried[key] + value
+	end
+end
+
 ---@param rounds {roundNumber: integer, started: boolean, finished:boolean, title: string?}[]
 ---@param opponents StandingTableOpponentData[]
 ---@param bgs table<integer, string>
@@ -47,36 +55,43 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		local opponent = opponentData.opponent
 		local carryData = {
 			points = opponentData.startingPoints or 0,
+			tiebreakerPoints = 0,
 			match = {w = 0, d = 0, l = 0},
 			overtime = options.overtime and {w = 0, l = 0} or nil,
+			gameAdjustment = {w = 0, d = 0, l = 0},
+			roundAdjustment = {w = 0, l = 0},
 		}
 		local opponentRounds = opponentData.rounds
+		local adjustments = opponentData.adjustments or {}
 
 		return Array.map(rounds, function(round)
-			local pointsFromRound, statusInRound, tiebreakerPoints, matchId, matchOpponentIndex, playedMatches
+			local pointsFromRound, statusInRound, matchId, matchOpponentIndex, playedMatches
 			if opponentRounds and opponentRounds[round.roundNumber] then
 				local thisRoundsData = opponentRounds[round.roundNumber]
 				if thisRoundsData.scoreboard then
 					pointsFromRound = thisRoundsData.scoreboard.points
 				end
 				statusInRound = thisRoundsData.specialstatus
-				tiebreakerPoints = thisRoundsData.tiebreakerPoints
 				matchId = thisRoundsData.matchId
 				matchOpponentIndex = thisRoundsData.matchOpponentIndex
-				if thisRoundsData.scoreboard.match then
-					carryData.match.w = carryData.match.w + thisRoundsData.scoreboard.match.w
-					carryData.match.d = carryData.match.d + thisRoundsData.scoreboard.match.d
-					carryData.match.l = carryData.match.l + thisRoundsData.scoreboard.match.l
-				end
-				if carryData.overtime and thisRoundsData.scoreboard.overtime then
-					carryData.overtime.w = carryData.overtime.w + thisRoundsData.scoreboard.overtime.w
-					carryData.overtime.l = carryData.overtime.l + thisRoundsData.scoreboard.overtime.l
+				addRecord(carryData.match, thisRoundsData.scoreboard.match)
+				if carryData.overtime then
+					addRecord(carryData.overtime, thisRoundsData.scoreboard.overtime)
 				end
 				playedMatches = thisRoundsData.matches
 			end
+			local adjustment = adjustments[round.roundNumber] or {}
+			if adjustment.points then
+				pointsFromRound = (pointsFromRound or 0) + adjustment.points
+			end
+			addRecord(carryData.match, adjustment.match)
+			addRecord(carryData.gameAdjustment, adjustment.game)
+			addRecord(carryData.roundAdjustment, adjustment.round)
+			carryData.tiebreakerPoints = carryData.tiebreakerPoints + (adjustment.tiebreaker or 0)
 			carryData.points = carryData.points + (pointsFromRound or 0)
 			---@type {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?,
-			---match: {w: integer, d: integer, l: integer}, overtime: {w: integer, l: integer}?}
+			---match: {w: integer, d: integer, l: integer}, overtime: {w: integer, l: integer}?,
+			---gameAdjustment: {w: integer, d: integer, l: integer}, roundAdjustment: {w: integer, l: integer}}
 			return {
 				opponent = opponent,
 				standingsindex = standingsindex,
@@ -84,6 +99,8 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 				points = carryData.points,
 				match = Table.copy(carryData.match),
 				overtime = carryData.overtime and Table.copy(carryData.overtime) or nil,
+				gameAdjustment = Table.copy(carryData.gameAdjustment),
+				roundAdjustment = Table.copy(carryData.roundAdjustment),
 				matches = playedMatches or {},
 				matchPoints = opponentData.matchPoints or {},
 				startingPoints = opponentData.startingPoints,
@@ -94,7 +111,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 				extradata = {
 					pointschange = pointsFromRound,
 					specialstatus = statusInRound,
-					tiebreakerpoints = tiebreakerPoints or 0,
+					tiebreakerpoints = carryData.tiebreakerPoints,
 					disqualified = opponentData.disqualifiedFromRound ~= nil
 						and round.roundNumber >= opponentData.disqualifiedFromRound or nil,
 					matchid = matchId,
@@ -112,6 +129,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 			(options.drawConfig or {}).match,
 			Array.any(entries, function(entry) return entry.match.d > 0 end)
 		),
+		game = Array.any(entries, function(entry) return entry.gameAdjustment.d ~= 0 end),
 	}
 	---@type StandingsTiebreakerOptions
 	local tiebreakerOptions = {

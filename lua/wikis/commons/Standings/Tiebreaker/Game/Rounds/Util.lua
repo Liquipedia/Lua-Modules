@@ -79,12 +79,13 @@ function TiebreakerRoundUtil.getRounds(opponent, walkoverRounds, walkoverGames)
 			or rounds.walkoverMatchMaps[result]
 		return (rounds.walkoverMaps[result] + matchMaps) * (walkoverRounds or 0)
 	end
-	local walkoverWins = walkoverRoundsOf('w')
-	local walkoverLosses = walkoverRoundsOf('l')
+	local adjustment = opponent.roundAdjustment or {}
+	local wins = rounds.w + walkoverRoundsOf('w') + (adjustment.w or 0)
+	local losses = rounds.l + walkoverRoundsOf('l') + (adjustment.l or 0)
 	return {
-		rounds = rounds.rounds + walkoverWins + walkoverLosses,
-		w = rounds.w + walkoverWins,
-		l = rounds.l + walkoverLosses,
+		rounds = wins + losses,
+		w = wins,
+		l = losses,
 	}
 end
 

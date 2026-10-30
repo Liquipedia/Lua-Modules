@@ -9,7 +9,7 @@ describe('Standings Tiebreakers', function()
 
 	---@param name string
 	---@param props {points: number?, matches: table[]?, matchPoints: table<string, number>?, match: table?,
-	---overtime: table?, tiebreakerpoints: number?}?
+	---overtime: table?, tiebreakerpoints: number?, gameAdjustment: table?, roundAdjustment: table?}?
 	---@return table
 	local function opponent(name, props)
 		props = props or {}
@@ -20,6 +20,8 @@ describe('Standings Tiebreakers', function()
 			matchPoints = props.matchPoints,
 			match = props.match or {w = 0, d = 0, l = 0},
 			overtime = props.overtime,
+			gameAdjustment = props.gameAdjustment,
+			roundAdjustment = props.roundAdjustment,
 			extradata = {additionalStatsValues = {}, tiebreakerpoints = props.tiebreakerpoints},
 		}
 	end
@@ -839,6 +841,76 @@ describe('Standings Tiebreakers', function()
 			}})
 			local alpha = opponent('Alpha', {matches = {match}})
 			assert.are_same({rounds = 13, w = 13, l = 0}, TiebreakerRoundUtil.getRounds(alpha, 13))
+		end)
+	end)
+
+	describe('manual adjustments', function()
+		local TiebreakerScope = require('Module:Standings/Tiebreaker/Scope')
+
+		local function makeMatches()
+			return {
+				makeMatch({'Alpha', 'Bravo'}, {winner = 1, scores = {2, 1}, games = {
+					{winner = 1, status = '', scores = {13, 7}},
+					{winner = 2, status = '', scores = {5, 13}},
+					{winner = 1, status = '', scores = {13, 11}},
+				}}),
+			}
+		end
+
+		local function valueOf(id, opp, options)
+			return TiebreakerFactory.tiebreakerFromId(id, options):valueOf({opp}, opp)
+		end
+
+		local function display(id, opp, options)
+			return TiebreakerFactory.tiebreakerFromId(id, options):display({opp}, opp)
+		end
+
+		it('add to the games of the matches', function()
+			local alpha = opponent('Alpha', {matches = makeMatches(), gameAdjustment = {w = 1, d = 1, l = 2}})
+			-- played 2-1, adjusted by +1 win, +1 draw and +2 losses
+			assert.are_equal(3, valueOf('full.gamewins', alpha))
+			assert.are_equal(-3, valueOf('full.gamelosses', alpha))
+			assert.are_equal(0, valueOf('full.gamediff', alpha))
+			assert.are_equal(7, valueOf('full.gamecount', alpha))
+			assert.are_same({3, -3}, valueOf('full.gamescore', alpha))
+			assert.are_equal(3 / 7, valueOf('full.gamewinrate', alpha))
+			assert.are_equal(0, valueOf('full.gamediffregulation', alpha))
+			assert.are_equal('3 - 3', display('full.gamescore', alpha))
+			assert.are_equal('3 - 1 - 3', display('full.gamescore', alpha, {draws = {game = true}}))
+		end)
+
+		it('add to the games of walkovers', function()
+			local alpha = opponent('Alpha', {
+				matches = {makeMatch({'Alpha', 'Bravo'}, {winner = 1, statuses = {'W', 'FF'}})},
+				gameAdjustment = {w = 0, d = 0, l = 1},
+			})
+			assert.are_same({2, -1}, valueOf('full.gamescore', alpha, {walkoverGames = 2}))
+		end)
+
+		it('add to the rounds of the games', function()
+			local alpha = opponent('Alpha', {matches = makeMatches(), roundAdjustment = {w = 2, l = -1}})
+			-- played 31-31
+			assert.are_same({33, -30}, valueOf('full.roundscore', alpha))
+			assert.are_equal(3, valueOf('full.rounddiff', alpha))
+			assert.are_equal(33 / 63, valueOf('full.roundwinrate', alpha))
+			assert.are_equal('33 - 30', display('full.roundscore', alpha))
+		end)
+
+		it('are not part of the matches among tied opponents', function()
+			local matches = makeMatches()
+			local alpha = opponent('Alpha', {
+				matches = matches,
+				gameAdjustment = {w = 5, d = 0, l = 0},
+				roundAdjustment = {w = 10, l = 0},
+			})
+			local bravo = opponent('Bravo', {matches = matches})
+
+			local scoped = TiebreakerScope.restrictTo{alpha, bravo}
+			local gamediff = TiebreakerFactory.tiebreakerFromId('h2hlegacy.gamediff')
+			assert.is_nil(scoped[1].gameAdjustment)
+			assert.is_nil(scoped[1].roundAdjustment)
+			assert.are_equal(1, gamediff:valueOf(scoped, scoped[1]))
+			assert.are_equal(6, valueOf('full.gamediff', alpha))
 		end)
 	end)
 
