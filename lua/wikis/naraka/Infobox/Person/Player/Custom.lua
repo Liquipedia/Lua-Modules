@@ -7,30 +7,42 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
-local CharacterIcon = Lua.import('Module:CharacterIcon')
-local CharacterNames = Lua.import('Module:CharacterNames', {loadData = true})
 local Class = Lua.import('Module:Class')
+local Math = Lua.import('Module:MathUtil')
 local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
-local TeamTemplate = Lua.import('Module:TeamTemplate')
 
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
-local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
+
+-- Condition query dependencies
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
-local SIZE_HERO = '25x25px'
+local CURRENT_YEAR = tonumber(os.date('%Y'))
+
+-- S-Tier tournament champion filter conditions
+local S_TIER_CONDITIONS = {
+	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Showmatch', 'Qualifier'}),
+	ConditionNode(ColumnName('liquipediatier'), Comparator.eq, 1),
+	ConditionNode(ColumnName('placement'), Comparator.eq, 1),
+}
+
+-- A-Tier tournament champion filter conditions
+local A_TIER_CONDITIONS = {
+	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Showmatch', 'Qualifier'}),
+	ConditionNode(ColumnName('liquipediatier'), Comparator.eq, 2),
+	ConditionNode(ColumnName('placement'), Comparator.eq, 1),
+}
 
 ---@class NarakaInfoboxPlayer: InfoboxPerson
----@operator call(Frame): NarakaInfoboxPlayer
 local CustomPlayer = Class.new(Player)
-
----@class NarakaInfoboxPlayerWidgetInjector: WidgetInjector
----@operator call(NarakaInfoboxPlayer): NarakaInfoboxPlayerWidgetInjector
----@field caller NarakaInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -39,6 +51,43 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
+	local args = player.args
+
+	-- Automatic achievements: display S-Tier and A-Tier separately
+	local sTierIcons = Achievements.player{
+		noTemplate = true,
+		baseConditions = S_TIER_CONDITIONS,
+	}
+	local aTierIcons = Achievements.player{
+		noTemplate = true,
+		baseConditions = A_TIER_CONDITIONS,
+	}
+
+	local achievementSections = {}
+
+	-- Tier label on left, icons keep centered
+	local function renderTierRow(label, icons)
+		return '<div style="position:relative;width:100%;;padding:6px 10px;box-sizing:border-box;text-align:center;">' ..
+			'<span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:1.2em;font-weight:700;color:#000;white-space:nowrap;">' .. label .. '</span>' ..
+			'<span style="display:inline-block;">' .. icons .. '</span>' ..
+			'</div>'
+	end
+
+	if String.isNotEmpty(sTierIcons) then
+		table.insert(achievementSections, renderTierRow('S-Tier', sTierIcons))
+	end
+
+	if String.isNotEmpty(aTierIcons) then
+		table.insert(achievementSections, renderTierRow('A-Tier', aTierIcons))
+	end
+
+	args.achievements = table.concat(achievementSections, '')
+
+	-- Uppercase first letter in status
+	if args.status then
+		args.status = mw.getContentLanguage():ucfirst(args.status)
+	end
+
 	return player:createInfobox()
 end
 
@@ -46,24 +95,14 @@ end
 ---@param widgets Renderable[]
 ---@return Renderable[]
 function CustomInjector:parse(id, widgets)
-	local caller = self.caller
-	local args = caller.args
+	local args = self.caller.args
 
 	if id == 'custom' then
-		local heroIcons = Array.map(caller:getAllArgsForBase(args, 'hero'), function(hero, _)
-			return CharacterIcon.Icon{character = CharacterNames[hero:lower()], size = SIZE_HERO}
-		end)
+		local currentYearEarnings = self.caller.earningsPerYear[CURRENT_YEAR] or 0
+		if currentYearEarnings == 0 then return widgets end
+		local currentYearEarningsDisplay = '$' .. mw.getContentLanguage():formatNum(Math.round(currentYearEarnings))
 
-		return {
-			Cell{
-				name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
-				children = {table.concat(heroIcons, '&nbsp;')},
-			}
-		}
-	elseif id == 'region' then
-		return {}
-	elseif id == 'history' then
-		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
+		table.insert(widgets, Cell{name = 'Approx. Earnings '.. CURRENT_YEAR, children = {currentYearEarningsDisplay}})
 	end
 
 	return widgets
@@ -74,29 +113,7 @@ end
 ---@param personType string
 ---@return table
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	for _, hero, heroIndex in Table.iter.pairsByPrefix(args, 'hero', {requireIndex = false}) do
-		lpdbData.extradata['signatureHero' .. heroIndex] = CharacterNames[hero:lower()]
-	end
-
-	if String.isNotEmpty(args.team2) then
-		lpdbData.extradata.team2 = TeamTemplate.getPageName(args.team2)
-	end
-
 	return lpdbData
-end
-
----@return VNode?
-function CustomPlayer:createBottomContent()
-	if not self:shouldStoreData(self.args) or String.isEmpty(self.args.team) then
-		return
-	end
-
-	local teamPage = TeamTemplate.getPageName(self.args.team)
-	if not teamPage then
-		return
-	end
-
-	return UpcomingTournaments.team{name = teamPage}
 end
 
 return CustomPlayer
