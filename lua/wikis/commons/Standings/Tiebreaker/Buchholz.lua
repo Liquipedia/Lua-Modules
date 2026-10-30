@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local MathUtil = Lua.import('Module:MathUtil')
 
@@ -33,24 +34,25 @@ function TiebreakerBuchholz:opponentScores(state, opponent)
 	local selfMember = TiebreakerMembers.find(state, opponent.opponent)
 	---@type table<TiebreakerOpponent, true>
 	local isFaced = {}
-	for _, match in ipairs(opponent.matches) do
-		if match.finished then
-			for _, matchOpponent in ipairs(match.opponents) do
-				local member = TiebreakerMembers.find(state, matchOpponent)
-				if member and member ~= selfMember then
-					isFaced[member] = true
-				end
+	Array.forEach(opponent.matches, function(match)
+		if not match.finished then
+			return
+		end
+		Array.forEach(match.opponents, function(matchOpponent)
+			local member = TiebreakerMembers.find(state, matchOpponent)
+			if not member or member == selfMember then
+				return
 			end
-		end
-	end
+			isFaced[member] = true
+		end)
+	end)
 
-	local scores = {}
-	for _, member in ipairs(state) do
-		if isFaced[member] then
-			table.insert(scores, self:scoreOf(member))
-		end
-	end
-	return scores
+	local facedMembers = Array.filter(state, function(member)
+		return isFaced[member] == true
+	end)
+	return Array.map(facedMembers, function(member)
+		return self:scoreOf(member)
+	end)
 end
 
 ---@param state TiebreakerOpponent[]

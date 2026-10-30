@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Table = Lua.import('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
@@ -27,10 +28,9 @@ local membersByState = setmetatable({}, {__mode = 'k'})
 function TiebreakerMembers.find(state, matchOpponent)
 	local membersByOpponent = membersByState[state]
 	if not membersByOpponent then
-		membersByOpponent = {}
-		for _, member in ipairs(state) do
-			membersByOpponent[member.opponent] = member
-		end
+		membersByOpponent = Table.map(state, function(_, member)
+			return member.opponent, member
+		end)
 		membersByState[state] = membersByOpponent
 	end
 

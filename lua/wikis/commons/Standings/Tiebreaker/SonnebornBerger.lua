@@ -27,14 +27,15 @@ function TiebreakerSonnebornBerger:valueOf(state, opponent)
 		if not match.finished or #match.opponents ~= 2 then
 			return 0
 		end
-		for _, matchOpponent in ipairs(match.opponents) do
-			local member = TiebreakerMembers.find(state, matchOpponent)
-			if member ~= selfMember then
-				-- Opponents outside of the standings have no points
-				return member and ((opponent.matchPoints or {})[match.matchId] or 0) * member.points or 0
-			end
+		local enemy = Array.find(match.opponents, function(matchOpponent)
+			return TiebreakerMembers.find(state, matchOpponent) ~= selfMember
+		end)
+		local enemyMember = enemy and TiebreakerMembers.find(state, enemy)
+		-- Opponents outside of the standings have no points
+		if not enemyMember then
+			return 0
 		end
-		return 0
+		return ((opponent.matchPoints or {})[match.matchId] or 0) * enemyMember.points
 	end))
 end
 
