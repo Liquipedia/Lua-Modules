@@ -35,9 +35,9 @@ local TABLE_TYPES = {ffa = true, swiss = true, group = true}
 
 ---@class StandingTableOpponentData
 ---@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?,
----matches: MatchGroupUtilMatch[], matchPoints: table<string, number>?, matchId: string,
----matchOpponentIndex: integer?}[]?
+---matches: MatchGroupUtilMatch[], matchId: string, matchOpponentIndex: integer?}[]?
 ---@field opponent standardOpponent
+---@field matchPoints table<string, number>? # The points of each imported match, keyed by match id
 ---@field aliases standardOpponent[]? # Only for team opponents
 ---@field startingPoints number?
 ---@field disqualifiedFromRound integer? # The first round in which the opponent is disqualified
@@ -75,6 +75,8 @@ function StandingsTable.parse(args, tableType)
 	--- non-exclusive (the default) counts matches where at least one opponent is part of the standings.
 	--- Note that this is the reverse of the legacy GroupTableLeague default, on purpose.
 	local exclusiveOpponents = Logic.readBool(args.exclusive)
+	--- With tiebreaker reset, opponents split by a tiebreaker are compared again starting from the first tiebreaker.
+	local tiebreakerReset = Logic.readBool(args.tiebreakerreset)
 
 	local parsedData = StandingsParseWiki.parseWikiInput(args)
 	local rounds = parsedData.rounds
@@ -111,6 +113,7 @@ function StandingsTable.parse(args, tableType)
 		overtime = overtime,
 		walkoverGames = StandingsParseWiki.parseWalkoverGames(args),
 		walkoverRounds = StandingsParseWiki.parseWalkoverRounds(args),
+		tiebreakerReset = tiebreakerReset,
 	})
 
 	if tableType == 'swiss' then

@@ -48,8 +48,8 @@ local function StandingsFfa(props)
 		css = {width = props.width and (props.width .. 'px') or nil},
 		columns = WidgetUtil.collect(
 			{align = 'center'},
-			Helpers._showRoundColumns(standings) and {align = 'center'} or nil,
-			{align = 'left'},
+			StandingsDisplayUtil.showPlacementChange(standings) and {align = 'center'} or nil,
+			StandingsCells.participantColumn(),
 			StandingsCells.statColumns(statsToShow),
 			Helpers._showRoundColumns(standings) and Array.rep({align = 'center'}, #standings.rounds) or nil
 		),
@@ -105,7 +105,7 @@ function Helpers._headerRow(standings, statsToShow)
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
 			StandingsCells.header('#'),
-			Helpers._showRoundColumns(standings) and StandingsCells.header() or nil,
+			StandingsDisplayUtil.showPlacementChange(standings) and StandingsCells.header() or nil,
 			StandingsCells.header('Participant'),
 			StandingsCells.statHeaders(statsToShow),
 			Helpers._showRoundColumns(standings) and Array.map(standings.rounds, function(round)
@@ -134,7 +134,7 @@ Helpers._RoundBody = Component.component(function(props)
 			},
 			children = WidgetUtil.collect(
 				StandingsCells.placement(slot),
-				Helpers._showRoundColumns(standings) and TableWidgets.Cell{
+				StandingsDisplayUtil.showPlacementChange(standings) and TableWidgets.Cell{
 					children = PlacementChange{change = slot.positionChangeFromPreviousRound}
 				} or nil,
 				StandingsCells.participant(slot),
