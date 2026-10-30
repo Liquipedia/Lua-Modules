@@ -581,6 +581,16 @@ describe('Standings Parser', function()
 				assert.are_equal(2, alpha.points)
 			end)
 
+			it('releases the matches of the entries once the tiebreakers are done', function()
+				local standingsTable = parse(
+					makeOpponents(NAMES, MATCHES, POINTS), {'full.points', 'ml.matchdiff', 'full.manual'})
+
+				Array.forEach(standingsTable.entries, function(entry)
+					assert.is_nil(entry.matches)
+					assert.is_nil(entry.matchPoints)
+				end)
+			end)
+
 			it('breaks a tie of three opponents like ml for h2hlegacy', function()
 				local standingsTable = parse(
 					makeOpponents(NAMES, MATCHES, POINTS), {'full.points', 'h2hlegacy.matchdiff', 'full.manual'})
