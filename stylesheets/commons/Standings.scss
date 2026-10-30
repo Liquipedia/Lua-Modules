@@ -119,6 +119,14 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.5rem;
+
+		> :first-child {
+			min-width: 0;
+		}
+
+		> .generic-label {
+			flex-shrink: 0;
+		}
 	}
 }
 
