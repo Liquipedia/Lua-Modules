@@ -53,7 +53,7 @@ function StandingsTable.fromTemplate(frame)
 	end
 	local storeLpdb = Logic.nilOr(Logic.readBoolOrNil(args.store), true)
 
-	-- Parsed in a function of its own, so the imported matches can be collected before the entries are stored
+	-- Parsed separately so the imported matches are released before storage
 	local standingsTable = StandingsTable.parse(args, tableType)
 
 	StandingsStorage.run(standingsTable, {saveVars = true, storeLpdb = storeLpdb})

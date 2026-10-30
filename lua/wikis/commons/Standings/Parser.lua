@@ -168,7 +168,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 	end
 	StandingsParser.applyManualStatuses(entries)
 	StandingsParser.applyDisqualifications(entries)
-	-- The matches are only needed for the tiebreakers, release them before the entries are stored
+	-- Only the tiebreakers need the matches
 	Array.forEach(entries, function(entry)
 		entry.matches = nil
 		entry.matchPoints = nil
