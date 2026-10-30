@@ -65,11 +65,11 @@ function CustomPlayer.run(frame)
 
 	local achievementSections = {}
 
-	-- Helper: renders a centered tier row with full-width header background
+	-- Tier label on left, icons keep centered
 	local function renderTierRow(label, icons)
-		return '<div style="clear:both;width:100%;margin:0;padding:0;box-sizing:border-box;overflow:hidden;">' ..
-			'<div style="background:#F1F4FA;width:100%;display:block;text-align:center;padding:6px 10px;font-size:1.2em;font-weight:700;color:#000;box-sizing:border-box;margin:0;border-radius:0;clear:both;">' .. label .. '</div>' ..
-			'<div style="width:100%;display:block;text-align:center;padding:8px 10px;box-sizing:border-box;margin:0;clear:both;">' .. icons .. '</div>' ..
+		return '<div style="position:relative;width:100%;;padding:6px 10px;box-sizing:border-box;text-align:center;">' ..
+			'<span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:1.2em;font-weight:700;color:#000;white-space:nowrap;">' .. label .. '</span>' ..
+			'<span style="display:inline-block;">' .. icons .. '</span>' ..
 			'</div>'
 	end
 
