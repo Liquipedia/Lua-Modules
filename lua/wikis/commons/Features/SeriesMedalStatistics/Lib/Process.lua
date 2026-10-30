@@ -1,0 +1,108 @@
+---
+-- @Liquipedia
+-- page=Module:Features/SeriesMedalStatistics/Lib/Process
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+
+local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent')
+local Table = Lua.import('Module:Table')
+local Types = Lua.import('Module:Features/SeriesMedalStatistics/Types')
+
+local THIRD = Types.optionalPlacementColumns.THIRD
+local FOURTH = Types.optionalPlacementColumns.FOURTH
+local SEMIFINALIST = Types.optionalPlacementColumns.SEMIFINALIST
+
+local Processor = {}
+
+---@param getTeamIdentifier fun(placement:placement): string?
+---@param config SeriesMedalStatsConfig
+---@param data SeriesMedalStatsData
+---@param placement placement
+function Processor.run(getTeamIdentifier, config, data, placement)
+	local getIdentifier = Processor._getIdentifierByStatsType(config.statsType, data.opponents, getTeamIdentifier)
+	local identifier = getIdentifier(placement)
+	if Logic.isEmpty(identifier) then return end
+	---@cast identifier -nil
+
+	local placementValue = placement.placement
+	if config.mergeIntoSemifinalists and (placementValue == THIRD or placementValue == FOURTH) then
+		placementValue = SEMIFINALIST
+	end
+	local cleanedPlacementValue = tonumber(placementValue) or placementValue
+
+	data.medalsData[identifier] = data.medalsData[identifier] or Processor._setUpPlacementData(config.columns)
+	data.medalsData[identifier][cleanedPlacementValue] = data.medalsData[identifier][cleanedPlacementValue] + 1
+	data.medalsData[identifier].total = data.medalsData[identifier].total + 1
+end
+
+---@param statsType string
+---@param opponents table<string, standardOpponent>
+---@param getTeamIdentifier fun(teamTemplate: string):string?
+---@return fun(placement:placement): string?
+function Processor._getIdentifierByStatsType(statsType, opponents, getTeamIdentifier)
+	if statsType == Types.statsTypes.FACTION then
+		return function(placement)
+			return (placement.opponentplayers or {}).p1faction
+		end
+	elseif statsType == Types.statsTypes.FLAG then
+		return function(placement)
+			return (placement.opponentplayers or {}).p1flag
+		end
+	elseif statsType == Types.statsTypes.PARTICIPANT then
+		return function(placement)
+			if placement.opponenttype == Opponent.literal or not placement.opponentname then return end
+
+			if placement.opponenttype ~= Opponent.team then
+				local identifier = placement.opponentname
+				opponents[identifier] = Opponent.fromLpdbStruct(placement)
+
+				if Opponent.isTbd(opponents[identifier]) then return end
+
+				return identifier
+			end
+
+			local teamTemplate = placement.opponentname
+			if Logic.isEmpty(teamTemplate) then
+				return
+			end
+			---@cast teamTemplate -nil
+
+			teamTemplate = teamTemplate:lower():gsub('_', ' ')
+
+			local identifier = getTeamIdentifier(teamTemplate)
+			if not identifier then return end
+			opponents[identifier] = Opponent.fromLpdbStruct(placement)
+
+			if Opponent.isTbd(opponents[identifier]) then return end
+
+			return identifier
+		end
+	elseif statsType == Types.statsTypes.PARTICIPANT_TEAM then
+		return function(placement)
+			local teamTemplate = (placement.opponentplayers or {}).p1team
+			if Logic.isEmpty(teamTemplate) then
+				return
+			end
+			---@cast teamTemplate -nil
+
+			teamTemplate = teamTemplate:lower():gsub('_', ' ')
+
+			return getTeamIdentifier(teamTemplate)
+		end
+	end
+	-- this case can not happen
+	error('Invalid statsType')
+end
+---@param columns string[]
+---@return SeriesMedalStatsDataSet
+function Processor._setUpPlacementData(columns)
+	return Table.map(columns, function(key, col)
+		return col, 0
+	end)
+end
+
+return Processor
