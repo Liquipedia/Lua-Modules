@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
-local Table = Lua.import('Module:Table')
 
 local Types = Lua.import('Module:Features/TournamentAppearances/Types')
 
@@ -38,7 +37,7 @@ function ParseInput.readConfig(args)
 		startDate = Logic.nilIfEmpty(args.sdate),
 		endDate = Logic.nilIfEmpty(args.edate),
 		pages = Array.parseCommaSeparatedString(args.pages),
-		series = Array.parseCommaSeparatedString(args.series),
+		series = Array.map(Array.parseCommaSeparatedString(args.series), Page.pageifyLink),
 	}
 
 	-- todo: add option for opponent case
