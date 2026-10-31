@@ -42,7 +42,6 @@ local buildFooter = function(config)
 end
 
 ---@param props {tournaments: StandardTournament[], config: TournamentAppearancesConfig, players: standardPlayer[]}
----todo: fix type for players
 ---@return VNode
 local TournamentAppearancesTable = function(props)
 	local numberOfPlayers = #props.players
@@ -56,7 +55,7 @@ local TournamentAppearancesTable = function(props)
 			},
 			TableWidgets.TableBody{
 				children = Array.mapRange(1, limit, function(playerIndex)
-					TournamentAppearancesRow{
+					return TournamentAppearancesRow{
 						tournaments = props.tournaments,
 						player = props.players[playerIndex],
 						config = props.config

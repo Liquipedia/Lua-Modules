@@ -14,7 +14,10 @@ local Placement = Lua.import('Module:Placement')
 
 local ParseQueried = {}
 
-function ParseQueried.fromPlacement(players, config, placement)
+---@param config TournamentAppearancesConfig
+---@param players standardPlayer[]
+---@param placement placement
+function ParseQueried.fromPlacement(config, players, placement)
 	local opponent = Opponent.fromLpdbStruct(placement)
 	-- todo: support opponent case
 
