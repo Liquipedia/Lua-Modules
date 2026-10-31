@@ -16,7 +16,6 @@ local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
-local Page = Lua.import('Module:Page')
 local Placement = Lua.import('Module:Placement')
 local Table = Lua.import('Module:Table')
 local Tournament = Lua.import('Module:Tournament')
@@ -28,16 +27,9 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local LinkWidget = Lua.import('Module:Widget/Basic/Link')
-local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
-
 local InputParser = Lua.import('Module:Features/TournamentAppearances/Lib/Parse')
 
-local TournamentAppearancesHeader = Lua.import('Module:Features/TournamentAppearances/Components/Header')
-local TournamentAppearancesRow = Lua.import('Module:Features/TournamentAppearances/Components/Row')
-
-local FORM_NAME = 'Player tournament appearances'
+local TournamentAppearancesTable = Lua.import('Module:Features/TournamentAppearances/Components/Table')
 
 ---@class PlayerTournamentAppearances: BaseClass
 ---@operator call(Frame): PlayerTournamentAppearances
@@ -177,63 +169,10 @@ end
 function Appearances:build()
 	if not self.players then return 'No results found.' end
 
-	local limit = math.min(self.config.limit or #self.players, #self.players)
-
-	return TableWidgets.Table{
-		sortable = true,
-		children = WidgetUtil.collect(
-			self:_header(),
-			TableWidgets.TableBody{
-				children = Array.mapRange(1, limit, FnUtil.curry(Appearances._row, self))
-			}
-		),
-		footer = self:_buildQueryLink()
-	}
-end
-
----@private
----@return VNode
-function Appearances:_header()
-	return TournamentAppearancesHeader{
+	return TournamentAppearancesTable{
 		tournaments = self.tournaments,
+		players = self.players,
 		config = self.config,
-	}
-end
-
----@private
----@param playerIndex integer
----@return VNode
-function Appearances:_row(playerIndex)
-	return TournamentAppearancesRow{
-		tournaments = self.tournaments,
-		player = self.players[playerIndex],
-		config = self.config
-	}
-end
-
----@private
----@return Widget?
-function Appearances:_buildQueryLink()
-	if not self.config.restrictToPlayersParticipatingIn or self.config.isFormQuery then
-		return
-	elseif not Page.exists('Form:' .. FORM_NAME) then
-		return
-	end
-	local queryTable = {
-		['PTA[series]'] = self.plainArgs.series or '',
-		['PTA[pages]'] = table.concat(self.config.pages, ','),
-		['PTA[tiers]'] = self.plainArgs.tiers,
-		['PTA[limit]'] = self.plainArgs.limit or '',
-		['PTA[playerspage]'] = self.plainArgs.playerspage or '',
-		['PTA[query]'] = 'true',
-		pfRunQueryFormName = FORM_NAME,
-		wpRunQuery = 'Run query',
-	}
-
-	return LinkWidget{
-		link = tostring(mw.uri.fullUrl('Special:RunQuery/' .. FORM_NAME, queryTable)),
-		children = 'Click here to modify this table',
-		linktype = 'external',
 	}
 end
 
