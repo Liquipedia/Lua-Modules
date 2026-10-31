@@ -24,6 +24,7 @@ local StandingsParser = {}
 ---@field walkoverGames integer? Games a walkover counts as in the game tiebreakers, unset means not counted
 ---@field walkoverRounds integer? Rounds a walkover map counts as in the round tiebreakers, unset means not counted
 ---@field tiebreakerReset boolean? Whether groups split by a tiebreaker start over from the first tiebreaker
+---@field alwaysShowStatsOverWrite string[]?
 
 ---@param carried table
 ---@param record table?
@@ -156,7 +157,9 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 	local tiebreakers = Array.map(tiebreakerIds, function(tiebreakerId)
 		return Table.merge(loadTiebreaker(tiebreakerId), {tiebreaker = true})
 	end)
-	local alwaysStats = Array.map(StandingsParser.alwaysShownStatIds(standingsType), loadTiebreaker)
+	local alwaysStatsToLoad = options.alwaysShowStatsOverWrite
+		or StandingsParser.alwaysShownStatIds(standingsType) or {}
+	local alwaysStats = Array.map(alwaysStatsToLoad, loadTiebreaker)
 	local additionalStats = Array.extend(alwaysStats, tiebreakers)
 	local additionalStatsIds = Array.map(additionalStats, function(stat) return stat.id end)
 
