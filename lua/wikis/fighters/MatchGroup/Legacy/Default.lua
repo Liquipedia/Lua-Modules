@@ -53,14 +53,32 @@ function MatchGroupLegacyDefault:getDetails(isReset, prefix)
 	local details = MatchGroupLegacy.getDetails(self, false, prefix)
 
 	Table.iter.forEachPair(self.args, function (key)
-		if not tonumber(key) and String.startsWith(key, prefix) then
-			if String.contains(key, 'p1char') or String.contains(key, 'p2char') then
-				details[key:gsub(prefix, '')] = Json.stringify(Array.parseCommaSeparatedString(self.args[key]))
+		if not tonumber(key) and String.startsWith(key, prefix) and not Logic.isNumeric(key:sub(prefix:len() + 1, prefix:len() + 1)) then
+			local newKey = key:gsub(prefix, '')
+			if newKey == 'win' then
+				return
+			elseif String.contains(key, 'p1char') or String.contains(key, 'p2char') then
+				details[newKey] = Json.stringify(Array.parseCommaSeparatedString(self.args[key]))
 			else
-				details[key:gsub(prefix, '')] = self.args[key]
+				details[newKey] = self.args[key]
 			end
 		end
 	end)
+
+	return self:_filterOpponentDetails(details)
+end
+
+---@private
+---@param details table
+function MatchGroupLegacyDefault:_filterOpponentDetails(details)
+	for i = 1, 2 do
+		local prefix = 'p' .. i
+		local opponentArgs = self:getOpponent(prefix, 'score')
+
+		for _, opponentKey in pairs(opponentArgs) do
+			details[opponentKey] = nil
+		end
+	end
 
 	return details
 end
