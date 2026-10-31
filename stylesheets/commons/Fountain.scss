@@ -438,16 +438,16 @@ a.cf {
 	}
 
 	&_titleBox {
-		border-bottom: 0.0625rem solid #333;
+		border-bottom: 0.0625rem solid #333333;
 		margin-bottom: 0.3125rem;
-		background: linear-gradient(-90deg, #2F4F35 -20%, #333 -20%, #333 -20%, #2F4F35) 90%;
+		background: linear-gradient(-90deg, #2f4f35 -20%, #333333 -20%, #333333 -20%, #2f4f35) 90%;
 		padding: 0.1875rem;
 	} // this is used along with facetBox.
 
 	&_title {
 		font-weight: bold;
-		text-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.8);
-		color: #E2E2E6;
+		text-shadow: 0 0.125rem 0.25rem rgba( 0, 0, 0, 0.8 );
+		color: #e2e2e6;
 		font-size: 85%;
 	}
 
@@ -456,7 +456,7 @@ a.cf {
 	}
 
 	&_cell {
-		background-color: rgba(77, 116, 85, 0.8);
+		background-color: rgba( 77, 116, 85, 0.8 );
 		display: flex;
 		flex-direction: row;
 		align-items: center;
@@ -502,7 +502,7 @@ a.cf {
 	}
 
 	&_iconBracket {
-		color: #FFF;
+		color: #ffffff;
 		display: inline-flex;
 		align-items: center;
 	}
