@@ -46,13 +46,11 @@ end
 ---@return Renderable
 local function makeHeader()
 	return TableWidgets.TableHeader{
-		children = {
-			TableWidgets.Row{
-				children = {
-					TableWidgets.CellHeader{children = 'Author'},
-					TableWidgets.CellHeader{children = 'Map'},
-					TableWidgets.CellHeader{children = 'Links'},
-				},
+		children = TableWidgets.Row{
+			children = {
+				TableWidgets.CellHeader{children = 'Author'},
+				TableWidgets.CellHeader{children = 'Map'},
+				TableWidgets.CellHeader{children = 'Links'},
 			},
 		},
 	}
