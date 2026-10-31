@@ -130,6 +130,13 @@
 	}
 }
 
+.standings-group {
+	@media ( max-width: 435px ) {
+		width: 100% !important;
+		max-width: 100% !important;
+	}
+}
+
 .standings-round-history {
 	width: fit-content;
 	max-width: 100%;
