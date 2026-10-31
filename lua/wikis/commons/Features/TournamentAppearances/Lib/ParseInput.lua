@@ -28,7 +28,7 @@ function ParseInput.readConfig(args)
 		showPlacementInsteadOfTeam = Logic.readBool(args.showPlacementInsteadOfTeam),
 		limit = tonumber(args.limit),
 		isFormQuery = Logic.readBool(args.query),
-		restrictToPlayersParticipatingIn = args.playerspage,
+		restrictToPlayersParticipatingIn = args.restrictToPlayersParticipatingIn,
 		restrictToFirstPrizePool = Logic.readBool(args.restrictToFirstPrizePool),
 		player = Logic.nilOr(Logic.readBoolOrNil(args.player), true),
 		staff = Logic.readBool(args.staff),
@@ -38,10 +38,7 @@ function ParseInput.readConfig(args)
 		startDate = Logic.nilIfEmpty(args.sdate),
 		endDate = Logic.nilIfEmpty(args.edate),
 		pages = Array.parseCommaSeparatedString(args.pages),
-		series = args.series and Array.map(
-			Array.extractValues(Table.filterByKey(args, function(key) return key:find('^series%d-$') end)),
-			Page.pageifyLink
-		) or nil,
+		series = Array.parseCommaSeparatedString(args.series),
 	}
 
 	-- todo: add option for opponent case

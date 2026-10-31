@@ -19,7 +19,7 @@
 ---@field startDate string|integer?
 ---@field endDate string|integer?
 ---@field pages string[]
----@field series string[]?
+---@field series string[]
 ---todo: add stuff for opponent case
 
 return {
