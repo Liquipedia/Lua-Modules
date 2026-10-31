@@ -7,6 +7,17 @@
 
 local String = {}
 
+local ASCII_WHITESPACE = '\t\r\n\f '
+local TRIM_CHARSET = ASCII_WHITESPACE .. '\194\160' -- and the non-breaking space
+local BLANK_ASCII = '^()[' .. ASCII_WHITESPACE .. ']*$'
+local TRIMMED_ASCII = '^[' .. ASCII_WHITESPACE .. ']*(.*[^' .. ASCII_WHITESPACE .. '])'
+
+---@param str string
+---@return boolean
+local function isAscii(str)
+	return not string.find(str, '[\128-\255]')
+end
+
 ---Returns true if `start` is a prefix of `str`.
 ---@param str string
 ---@param start string
@@ -44,6 +55,44 @@ function String.split(inputstr, sep)
 	end
 end
 
+---Whether a pattern only consists of ASCII characters that match themselves, e.g. `,`, `;;` or a lone `-`.
+---@param pattern string
+---@param plain boolean?
+---@return boolean
+local function isLiteralAscii(pattern, plain)
+	if pattern == '' or not isAscii(pattern) then
+		return false
+	elseif plain == true then
+		return true
+	end
+	return not plain and (not string.find(pattern, '[%^%$%(%)%%%.%[%]%*%+%-%?]')
+		or string.find(pattern, '^[%*%+%-%?]$') ~= nil)
+end
+
+---Same as `mw.text.split`, without its PHP callbacks (two per item) for a separator of literal ASCII characters.
+---@param text string
+---@param pattern string # A Ustring pattern, or a literal string if `plain` is true
+---@param plain boolean?
+---@return string[]
+function String.splitText(text, pattern, plain)
+	if type(text) ~= 'string' or not isLiteralAscii(pattern, plain)
+		or not isAscii(text) and not mw.ustring.isutf8(text) then
+		return mw.text.split(text, pattern, plain)
+	end
+	local items = {}
+	local start = 1
+	while true do
+		local sepStart, sepEnd = string.find(text, pattern, start, true)
+		if not sepStart then
+			break
+		end
+		table.insert(items, string.sub(text, start, sepStart - 1))
+		start = sepEnd + 1
+	end
+	table.insert(items, string.sub(text, start))
+	return items
+end
+
 --- need to escape `.()[]+-%` with % for 'match'
 ---@param str string
 ---@param match string
@@ -57,9 +106,11 @@ end
 ---@param str string
 ---@return string
 function String.trim(str)
-	-- `\t\r\n\f ` is the default charset
-	-- `\194\160` is the non-breaking space (&nsbp;)
-	return mw.text.trim(str, "\t\r\n\f \194\160")
+	-- Avoids the PHP callback of `mw.text.trim` with a charset; ASCII strings cannot contain the non-breaking space
+	if type(str) == 'string' and isAscii(str) then
+		return string.match(str, BLANK_ASCII) and '' or string.match(str, TRIMMED_ASCII)
+	end
+	return mw.text.trim(str, TRIM_CHARSET)
 end
 
 ---Returns `nil` if the argument is `nil` or an empty string, otherwise returns the argument string itself.

@@ -32,6 +32,73 @@ describe('logic', function()
 		end)
 	end)
 
+	---All strings of the characters of the alphabet, up to the given length
+	---@param alphabet string[]
+	---@param length integer
+	---@return string[]
+	local function allStrings(alphabet, length)
+		local strings, previous = {''}, {''}
+		for _ = 1, length do
+			local longer = {}
+			for _, prefix in ipairs(previous) do
+				for _, character in ipairs(alphabet) do
+					table.insert(longer, prefix .. character)
+					table.insert(strings, prefix .. character)
+				end
+			end
+			previous = longer
+		end
+		return strings
+	end
+
+	describe('splitText', function()
+		it('keeps empty items', function()
+			assert.are_same({''}, String.splitText('', ','))
+			assert.are_same({'abc'}, String.splitText('abc', ','))
+			assert.are_same({'', ''}, String.splitText(',', ','))
+			assert.are_same({'a', '', 'b', ''}, String.splitText('a,,b,', ','))
+			assert.are_same({'a ', ' b'}, String.splitText('a , b', ','))
+		end)
+
+		it('splits at multi-character, quantifier and plain separators', function()
+			assert.are_same({'a', 'b;c'}, String.splitText('a;;b;c', ';;'))
+			assert.are_same({'1', '2', '3'}, String.splitText('1-2-3', '-'))
+			assert.are_same({'a', 'b'}, String.splitText('a*b', '*'))
+			assert.are_same({'a', 'b'}, String.splitText('a.b', '.', true))
+			assert.are_same({'a', 'b'}, String.splitText('a%b', '%', true))
+			assert.are_same({'2024-01-05 ', 'abbr>EDT', '/abbr>'}, String.splitText('2024-01-05 <abbr>EDT</abbr>', '<', true))
+		end)
+
+		it('splits UTF-8 text', function()
+			assert.are_same({'Åsa', 'à', '日本', '\194\160'}, String.splitText('Åsa|à|日本|\194\160', '|'))
+		end)
+
+		it('matches mw.text.split', function()
+			local inputs = allStrings({' ', ',', '-', ';', '|', 'a', '\194\160', 'à'}, 4)
+			for _, sep in ipairs{',', '-', ';;', '|'} do
+				for _, plain in ipairs{false, true} do
+					for _, input in ipairs(inputs) do
+						assert.are_same(mw.text.split(input, sep, plain), String.splitText(input, sep, plain))
+					end
+				end
+			end
+		end)
+
+		it('leaves patterns and text that is not valid UTF-8 to mw.text.split', function()
+			local splitSpy = spy.on(mw.text, 'split')
+			String.splitText('a,b', ',')
+			String.splitText('Åsa,b', ',')
+			String.splitText('a.b', '.', true)
+			assert.spy(splitSpy).was.called(0)
+			assert.are_same({'a', 'b'}, String.splitText('a1b', '%d'))
+			String.splitText('a.b', '.')
+			String.splitText('a,\255', ',')
+			String.splitText('a—b', '—')
+			assert.spy(splitSpy).was.called(4)
+			splitSpy:revert()
+		end)
+	end)
+
 	describe('trim', function()
 		it('check', function()
 			assert.are_equal('', String.trim(''))
@@ -39,6 +106,34 @@ describe('logic', function()
 			assert.are_equal('hello world', String.trim(' hello world'))
 			assert.are_equal('hello world', String.trim('hello world '))
 			assert.are_equal('hello world', String.trim(' hello world '))
+		end)
+
+		it('trims tabs, new lines, carriage returns and form feeds, but not vertical tabs', function()
+			assert.are_equal('a \t\n b', String.trim('\t\r\n\f a \t\n b \f\n\r\t'))
+			assert.are_equal('', String.trim(' \t\r\n\f '))
+			assert.are_equal('\va\v', String.trim(' \va\v '))
+			assert.are_equal('a\0', String.trim(' a\0 '))
+		end)
+
+		it('trims non-breaking spaces', function()
+			local nbsp = '\194\160'
+			assert.are_equal('a', String.trim(nbsp .. 'a' .. nbsp))
+			assert.are_equal('a' .. nbsp .. 'b', String.trim(' ' .. nbsp .. ' a' .. nbsp .. 'b ' .. nbsp .. ' '))
+			assert.are_equal('', String.trim(nbsp .. ' ' .. nbsp))
+		end)
+
+		it('keeps other characters that share a byte with the non-breaking space', function()
+			-- à is \195\160, ¡ is \194\161
+			assert.are_equal('à', String.trim(' à '))
+			assert.are_equal('¡a¡', String.trim('¡a¡'))
+			assert.are_equal('Åsa Öberg', String.trim('\194\160Åsa Öberg\t'))
+			assert.are_equal('日本', String.trim('  日本  '))
+		end)
+
+		it('matches mw.text.trim on ASCII strings', function()
+			for _, input in ipairs(allStrings({' ', '\t', '\n', '\v', 'a', '\0'}, 4)) do
+				assert.are_equal(mw.text.trim(input, '\t\r\n\f \194\160'), String.trim(input))
+			end
 		end)
 	end)
 
