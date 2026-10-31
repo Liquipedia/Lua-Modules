@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local String = Lua.import('Module:StringUtils')
 local Json = Lua.import('Module:Json')
 local Links = Lua.import('Module:Links')
 local Opponent = Lua.import('Module:Opponent')
@@ -57,7 +58,7 @@ end
 function MapTableParse.makeFullLinks(mapInput)
 	return Table.filterByKey(
 		Links.makeFullLinksForTableItems(Links.transform(mapInput), MapTableTypes.LINK_VARIANT),
-		function(_, link) return link ~= '' end
+		function(_, link) return String.isNotEmpty(link) end
 	)
 end
 
