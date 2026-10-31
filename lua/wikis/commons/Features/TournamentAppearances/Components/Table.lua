@@ -41,7 +41,7 @@ local buildFooter = function(config)
 	}
 end
 
----@param props {tournaments: StandardTournament[], config: TournamentAppearancesConfig, players: aaa}
+---@param props {tournaments: StandardTournament[], config: TournamentAppearancesConfig, players: standardPlayer[]}
 ---todo: fix type for players
 ---@return VNode
 local TournamentAppearancesTable = function(props)
