@@ -9,11 +9,11 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Links = Lua.import('Module:Links')
+local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 local Table = Lua.import('Module:Table')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
-local InlinePlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Inline')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
@@ -22,7 +22,7 @@ local TableWidgets = Lua.import('Module:Widget/Table2/All')
 ---@return Renderable[]
 local function makeMapperDisplay(mappers)
 	return Array.interleave(
-		Array.map(mappers, function(mapper) return InlinePlayerWidget{player = mapper} end),
+		Array.map(mappers, function(mapper) return PlayerDisplay.InlinePlayer{player = mapper} end),
 		Html.Br{}
 	)
 end
