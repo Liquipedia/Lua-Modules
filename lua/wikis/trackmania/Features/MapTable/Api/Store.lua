@@ -43,16 +43,14 @@ local function buildExtradata(mappers, links)
 end
 
 ---Creates an LPDB map record per map, as `map` datapoints
----@param rows TrackmaniaMapTableRows
----@param mappers TrackmaniaMapTableMappers
----@param links TrackmaniaMapTableLinks
-function MapTableStore.storeMaps(rows, mappers, links)
+---@param maps TrackmaniaMapTableMaps
+function MapTableStore.storeMaps(maps)
 	if not Namespace.isMain() or Lpdb.isStorageDisabled() then
 		return
 	end
 
-	Array.forEach(rows, function(row, rowIndex)
-		local mapName = row.map
+	Array.forEach(maps, function(map)
+		local mapName = map.name
 		if Logic.isEmpty(mapName) then
 			return
 		end
@@ -60,7 +58,7 @@ function MapTableStore.storeMaps(rows, mappers, links)
 		mw.ext.LiquipediaDB.lpdb_datapoint('map_' .. mapName, Json.stringifySubTables({
 			name = mapName,
 			type = 'map',
-			extradata = buildExtradata(mappers[rowIndex], links[rowIndex]),
+			extradata = buildExtradata(map.mappers, map.links),
 		}))
 	end)
 end

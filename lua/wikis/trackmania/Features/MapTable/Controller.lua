@@ -22,13 +22,14 @@ local MapTableController = {}
 function MapTableController.run(frame)
 	local args = Arguments.getArgs(frame)
 
-	local rows = MapTableParse.readRows(args)
-	local mappers = MapTableMappers.resolveMappers(Array.map(rows, MapTableParse.readMappers))
-	local links = Array.map(rows, MapTableParse.makeFullLinks)
+	local maps = MapTableParse.readMaps(args)
+	Array.forEach(maps, function(map)
+		map.mappers = MapTableMappers.resolveMappers(map.mappers)
+	end)
 
-	local renderedTable = MapTableDisplay{rows = rows, mappers = mappers, links = links}
+	local renderedTable = MapTableDisplay{maps = maps}
 
-	MapTableStore.storeMaps(rows, mappers, links)
+	MapTableStore.storeMaps(maps)
 
 	return renderedTable
 end

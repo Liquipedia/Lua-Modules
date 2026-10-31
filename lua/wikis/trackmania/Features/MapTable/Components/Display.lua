@@ -56,20 +56,18 @@ local function makeHeader()
 	}
 end
 
----@param rows TrackmaniaMapTableRows
----@param mappers TrackmaniaMapTableMappers
----@param links TrackmaniaMapTableLinks
+---@param maps TrackmaniaMapTableMaps
 ---@return Renderable
-local function makeBody(rows, mappers, links)
+local function makeBody(maps)
 	return TableWidgets.TableBody{
-		children = Array.map(rows, function(row, index)
+		children = Array.map(maps, function(map)
 			return TableWidgets.Row{
 				children = {
-					TableWidgets.Cell{children = makeMapperDisplay(mappers[index])},
-					TableWidgets.Cell{children = row.map},
+					TableWidgets.Cell{children = makeMapperDisplay(map.mappers)},
+					TableWidgets.Cell{children = map.name},
 					TableWidgets.Cell{
 						classes = {'plainlinks'},
-						children = makeLinksDisplay(links[index]),
+						children = makeLinksDisplay(map.links),
 					},
 				},
 			}
@@ -77,13 +75,13 @@ local function makeBody(rows, mappers, links)
 	}
 end
 
----@param props {rows: TrackmaniaMapTableRows, mappers: TrackmaniaMapTableMappers, links: TrackmaniaMapTableLinks}
+---@param props {maps: TrackmaniaMapTableMaps}
 ---@return VNode
 local MapTableDisplay = function(props)
 	return TableWidgets.Table{
 		children = {
 			makeHeader(),
-			makeBody(props.rows, props.mappers, props.links),
+			makeBody(props.maps),
 		},
 	}
 end

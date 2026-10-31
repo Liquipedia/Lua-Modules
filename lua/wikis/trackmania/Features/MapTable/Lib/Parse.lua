@@ -28,6 +28,24 @@ function MapTableParse.readRows(args)
 	)
 end
 
+---Reads every map: its name, mappers and links. Rows without a map name are skipped
+---@param args table
+---@return TrackmaniaMapTableMaps
+function MapTableParse.readMaps(args)
+	return Array.map(
+		Array.filter(MapTableParse.readRows(args), function(row)
+			return String.isNotEmpty(row.map)
+		end),
+		function(row)
+			return {
+				name = row.map,
+				mappers = MapTableParse.readMappers(row),
+				links = MapTableParse.makeFullLinks(row),
+			}
+		end
+	)
+end
+
 ---Reads the mapper entries of a single row
 ---@param row TrackmaniaMapTableRowArgs
 ---@return TrackmaniaMapTableMapper[]

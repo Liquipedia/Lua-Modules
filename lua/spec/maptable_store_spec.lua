@@ -16,11 +16,10 @@ describe('MapTable Storage', function()
 	it('stores one datapoint per map, named after the map', function()
 		local stubLpdb = stub(mw.ext.LiquipediaDB, 'lpdb_datapoint')
 
-		MapTableStore.storeMaps(
-			{{map = 'Stadium'}, {map = 'Desert'}},
-			{{}, {}},
-			{{}, {}}
-		)
+		MapTableStore.storeMaps({
+			{name = 'Stadium', mappers = {}, links = {}},
+			{name = 'Desert', mappers = {}, links = {}},
+		})
 
 		assert.stub(stubLpdb).was.called(2)
 		assert.stub(stubLpdb).was.called_with('map_Stadium', {name = 'Stadium', type = 'map', extradata = '[]'})
@@ -32,14 +31,16 @@ describe('MapTable Storage', function()
 	it('stores the mappers and the links in the extradata', function()
 		local stubLpdb = stub(mw.ext.LiquipediaDB, 'lpdb_datapoint')
 
-		MapTableStore.storeMaps(
-			{{map = 'Stadium'}},
-			{{
-				{index = 1, displayName = 'Player One', pageName = 'Player One', flag = 'Sweden'},
-				{index = 2, displayName = 'Player Two'},
-			}},
-			{{twitch = 'https://www.twitch.tv/channel'}}
-		)
+		MapTableStore.storeMaps({
+			{
+				name = 'Stadium',
+				mappers = {
+					{index = 1, displayName = 'Player One', pageName = 'Player One', flag = 'Sweden'},
+					{index = 2, displayName = 'Player Two'},
+				},
+				links = {twitch = 'https://www.twitch.tv/channel'},
+			},
+		})
 
 		assert.stub(stubLpdb).was.called_with('map_Stadium', {
 			name = 'Stadium',
@@ -55,7 +56,7 @@ describe('MapTable Storage', function()
 	it('stores nothing for a row without a map', function()
 		local stubLpdb = stub(mw.ext.LiquipediaDB, 'lpdb_datapoint')
 
-		MapTableStore.storeMaps({{map = ''}}, {{}}, {{}})
+		MapTableStore.storeMaps({{name = '', mappers = {}, links = {}}})
 
 		assert.stub(stubLpdb).was.called(0)
 
@@ -66,7 +67,7 @@ describe('MapTable Storage', function()
 		local stubLpdb = stub(mw.ext.LiquipediaDB, 'lpdb_datapoint')
 		mw.ext.VariablesLua.vardefine('disable_LPDB_storage', '1')
 
-		MapTableStore.storeMaps({{map = 'Stadium'}}, {{}}, {{}})
+		MapTableStore.storeMaps({{name = 'Stadium', mappers = {}, links = {}}})
 
 		assert.stub(stubLpdb).was.called(0)
 

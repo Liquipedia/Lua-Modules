@@ -23,12 +23,10 @@ local function resolveMapper(mapper)
 end
 
 ---Resolves every mapper, keeping the order they were read
----@param mappers TrackmaniaMapTableMappers
----@return TrackmaniaMapTableMappers
+---@param mappers TrackmaniaMapTableMapper[]
+---@return TrackmaniaMapTableMapper[]
 function MapTableMappers.resolveMappers(mappers)
-	return Array.map(mappers, function(rowMappers)
-		return Array.map(rowMappers, resolveMapper)
-	end)
+	return Array.map(mappers, resolveMapper)
 end
 
 return MapTableMappers

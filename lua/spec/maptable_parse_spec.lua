@@ -66,6 +66,33 @@ describe('MapTable Lib', function()
 		end)
 	end)
 
+	describe('readMaps', function()
+		it('builds maps with their mappers and links', function()
+			local maps = MapTableParse.readMaps{
+				[1] = '{"map":"Stadium","mapper1":"Player One","twitch":"channel"}',
+				[2] = '{"map":"Desert"}',
+			}
+
+			assert.are_equal(2, #maps)
+			assert.are_equal('Stadium', maps[1].name)
+			assert.are_equal(1, #maps[1].mappers)
+			assert.are_equal('Player One', maps[1].mappers[1].displayName)
+			assert.are_equal('https://www.twitch.tv/channel', maps[1].links.twitch)
+			assert.are_equal('Desert', maps[2].name)
+			assert.are_equal(0, #maps[2].mappers)
+		end)
+
+		it('reads no maps from empty args', function()
+			assert.are_equal(0, #MapTableParse.readMaps{})
+		end)
+
+		it('skips rows without a map name', function()
+			local maps = MapTableParse.readMaps{[1] = '{"mapper1":"Player One"}'}
+
+			assert.are_equal(0, #maps)
+		end)
+	end)
+
 	describe('makeFullLinks', function()
 		it('builds full links for the row', function()
 			local links = MapTableParse.makeFullLinks{twitch = 'channel'}

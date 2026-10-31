@@ -15,12 +15,14 @@ describe('MapTable Display', function()
 
 	it('renders the header, the map, the mapper and the links', function()
 		local html = tostring(MapTableDisplay{
-			rows = {{map = 'Stadium'}},
-			mappers = {{
-				{index = 1, displayName = 'Player One', pageName = 'Player One', flag = 'de'},
-				{index = 2, displayName = 'Player Two', pageName = 'Player Two', flag = 'cn'},
+			maps = {{
+				name = 'Stadium',
+				mappers = {
+					{index = 1, displayName = 'Player One', pageName = 'Player One', flag = 'de'},
+					{index = 2, displayName = 'Player Two', pageName = 'Player Two', flag = 'cn'},
+				},
+				links = {twitch = 'https://www.twitch.tv/channel'},
 			}},
-			links = {{twitch = 'https://www.twitch.tv/channel'}},
 		})
 
 		assert.is_truthy(html:find('Author', 1, true))
@@ -37,9 +39,11 @@ describe('MapTable Display', function()
 
 	it('renders a row without a mapper or a link', function()
 		local html = tostring(MapTableDisplay{
-			rows = {{map = 'Coast'}},
-			mappers = {{}},
-			links = {{}},
+			maps = {{
+				name = 'Coast',
+				mappers = {},
+				links = {},
+			}},
 		})
 
 		assert.is_truthy(html:find('Coast', 1, true))
@@ -50,16 +54,16 @@ describe('MapTable Display', function()
 
 	it('renders the map as a snapshot', function()
 		GoldenTest('maptable_display', tostring(MapTableDisplay{
-			rows = {{map = 'Stadium'}},
-			mappers = {{
-				{index = 1, displayName = 'Player One', pageName = 'Player One', flag = 'de'},
-				{index = 2, displayName = 'Player Two', pageName = 'Player Two', flag = 'cn'},
-			}},
-			links = {
-				{
+			maps = {{
+				name = 'Stadium',
+				mappers = {
+					{index = 1, displayName = 'Player One', pageName = 'Player One', flag = 'de'},
+					{index = 2, displayName = 'Player Two', pageName = 'Player Two', flag = 'cn'},
+				},
+				links = {
 					twitch = 'https://www.twitch.tv/channel',
 				},
-			},
+			}},
 		}))
 	end)
 end)

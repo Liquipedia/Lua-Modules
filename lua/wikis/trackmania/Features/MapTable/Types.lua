@@ -18,11 +18,14 @@
 ---The map rows, in the order they were given
 ---@alias TrackmaniaMapTableRows TrackmaniaMapTableRowArgs[]
 
----The mappers of every row, indexed the same way as the rows
----@alias TrackmaniaMapTableMappers TrackmaniaMapTableMapper[][]
+---A parsed map: name of the map, mappers and links
+---@class TrackmaniaMapTableMap
+---@field name string
+---@field mappers TrackmaniaMapTableMapper[]
+---@field links {[string]: string}
 
----The full links of every row, indexed the same way as the rows
----@alias TrackmaniaMapTableLinks {[string]: string}[]
+---The maps, in the order they were given
+---@alias TrackmaniaMapTableMaps TrackmaniaMapTableMap[]
 
 local MapTableTypes = {}
 
