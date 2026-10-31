@@ -20,6 +20,17 @@ local TiebreakerGameUtil = {}
 local WALKOVER_WIN_STATUS = 'W'
 local WALKOVER_LOSS_STATUSES = {FF = true, DQ = true, L = true}
 
+---Walkover result of an opponent of a match or game, a W status is a win and FF, DQ and L are losses.
+---@param status string?
+---@return 'w'|'l'|nil
+function TiebreakerGameUtil.getWalkoverResult(status)
+	if status == WALKOVER_WIN_STATUS then
+		return 'w'
+	elseif WALKOVER_LOSS_STATUSES[status] then
+		return 'l'
+	end
+end
+
 ---@param opponent TiebreakerOpponent
 ---@return {games: integer, w: integer, l: integer, walkover: {w: integer, l: integer}?}
 local getPlayedGames = FnUtil.memoize(function (opponent)
@@ -30,12 +41,11 @@ local getPlayedGames = FnUtil.memoize(function (opponent)
 	Array.forEach(opponent.matches, function (match)
 		local opponentIndex = Array.indexOf(match.opponents, FnUtil.curry(Opponent.same, opponent.opponent))
 
-		-- Walkovers are read from the status of the opponent itself, W is a win and FF, DQ and L are losses
-		local status = match.opponents[opponentIndex].status
-		if match.finished and status == WALKOVER_WIN_STATUS then
+		local walkover = match.finished and TiebreakerGameUtil.getWalkoverResult(match.opponents[opponentIndex].status)
+		if walkover == 'w' then
 			walkoverWins = walkoverWins + 1
 			return
-		elseif match.finished and WALKOVER_LOSS_STATUSES[status] then
+		elseif walkover == 'l' then
 			walkoverLosses = walkoverLosses + 1
 			return
 		end
@@ -62,20 +72,20 @@ end)
 ---Games of the matches, walkovers count as `walkoverGames` games won by the winner and lost by the loser.
 ---@param opponent TiebreakerOpponent
 ---@param walkoverGames number? # Defaults to 0, so walkovers do not count towards the games
----@return {games: integer, w: integer, l: integer, walkover: {w: integer, l: integer}?}
+---@return {games: integer, w: integer, d: integer, l: integer, walkover: {w: integer, l: integer}?}
 function TiebreakerGameUtil.getGames(opponent, walkoverGames)
 	local games = getPlayedGames(opponent)
-	local walkover = games.walkover
-	if not walkover or (walkoverGames or 0) == 0 then
-		return games
-	end
-	local walkoverWins = (walkover.w or 0) * walkoverGames
-	local walkoverLosses = (walkover.l or 0) * walkoverGames
+	local walkover = games.walkover or {}
+	local adjustment = opponent.gameAdjustment or {}
+	local wins = games.w + (walkover.w or 0) * (walkoverGames or 0) + (adjustment.w or 0)
+	local draws = adjustment.d or 0
+	local losses = games.l + (walkover.l or 0) * (walkoverGames or 0) + (adjustment.l or 0)
 	return {
-		games = games.games + walkoverWins + walkoverLosses,
-		w = games.w + walkoverWins,
-		l = games.l + walkoverLosses,
-		walkover = walkover,
+		games = wins + draws + losses,
+		w = wins,
+		d = draws,
+		l = losses,
+		walkover = games.walkover,
 	}
 end
 

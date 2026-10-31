@@ -18,6 +18,7 @@ local StandingsParseLpdb = Lua.import('Module:Standings/Parse/Lpdb')
 local StandingsParser = Lua.import('Module:Standings/Parser')
 local StandingsStorage = Lua.import('Module:Standings/Storage')
 
+local Standings = Lua.import('Module:Standings')
 local StandingsDisplay = Lua.import('Module:Widget/Standings')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -33,15 +34,23 @@ local TABLE_TYPES = {ffa = true, swiss = true, group = true}
 ---@field match {w: integer, d: integer, l: integer}
 ---@field overtime {w: integer, l: integer}?
 
+---@class StandingsAdjustment
+---@field points number?
+---@field tiebreaker number?
+---@field match {w: integer?, d: integer?, l: integer?}?
+---@field game {w: integer?, d: integer?, l: integer?}?
+---@field round {w: integer?, l: integer?}?
+
 ---@class StandingTableOpponentData
----@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?,
----matches: MatchGroupUtilMatch[], matchPoints: table<string, number>?, matchId: string,
----matchOpponentIndex: integer?}[]?
+---@field rounds {specialstatus: string, scoreboard: Scoreboard?,
+---matches: MatchGroupUtilMatch[], matchId: string, matchOpponentIndex: integer?}[]?
 ---@field opponent standardOpponent
+---@field matchPoints table<string, number>? # The points of each imported match, keyed by match id
 ---@field aliases standardOpponent[]? # Only for team opponents
 ---@field startingPoints number?
 ---@field disqualifiedFromRound integer? # The first round in which the opponent is disqualified
 ---@field definiteStatuses table<integer, string>? # Manually set definite statuses, keyed by the round they apply from
+---@field adjustments table<integer, StandingsAdjustment>? # Keyed by the round they apply from
 
 ---@param frame Frame
 ---@return Renderable
@@ -51,6 +60,23 @@ function StandingsTable.fromTemplate(frame)
 	if not TABLE_TYPES[tableType] then
 		error('Unknown Standing Table Type')
 	end
+	local storeLpdb = Logic.nilOr(Logic.readBoolOrNil(args.store), true)
+
+	-- Parsed separately so the imported matches are released before storage
+	local standingsTable = StandingsTable.parse(args, tableType)
+
+	local record, entries = StandingsStorage.run(standingsTable, {storeLpdb = storeLpdb})
+	---@cast record -nil
+	return StandingsDisplay{
+		standings = Standings.standingsFromRecord(record, entries),
+		width = StandingsParseWiki.parseWidth(args),
+	}
+end
+
+---@param args table
+---@param tableType StandingsTableTypes
+---@return StandingsTableStorage
+function StandingsTable.parse(args, tableType)
 	local title = args.title
 	local importScoreFromMatches = Logic.nilOr(Logic.readBoolOrNil(args.import), true)
 	local importOpponentFromMatches = Logic.nilOr(Logic.readBoolOrNil(args.importopponents), importScoreFromMatches)
@@ -58,7 +84,8 @@ function StandingsTable.fromTemplate(frame)
 	--- non-exclusive (the default) counts matches where at least one opponent is part of the standings.
 	--- Note that this is the reverse of the legacy GroupTableLeague default, on purpose.
 	local exclusiveOpponents = Logic.readBool(args.exclusive)
-	local storeLpdb = Logic.nilOr(Logic.readBoolOrNil(args.store), true)
+	--- With tiebreaker reset, opponents split by a tiebreaker are compared again starting from the first tiebreaker.
+	local tiebreakerReset = Logic.readBool(args.tiebreakerreset)
 
 	local parsedData = StandingsParseWiki.parseWikiInput(args)
 	local rounds = parsedData.rounds
@@ -80,6 +107,7 @@ function StandingsTable.fromTemplate(frame)
 				exclusive = exclusiveOpponents,
 				importOpponents = importOpponentFromMatches,
 				overtime = overtime,
+				includeGames = StandingsParser.needsGames(tableType, tiebreakers),
 			}
 		)
 		opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
@@ -93,18 +121,15 @@ function StandingsTable.fromTemplate(frame)
 		drawConfig = StandingsParseWiki.parseDrawConfig(args),
 		overtime = overtime,
 		walkoverGames = StandingsParseWiki.parseWalkoverGames(args),
+		walkoverRounds = StandingsParseWiki.parseWalkoverRounds(args),
+		tiebreakerReset = tiebreakerReset,
 	})
 
 	if tableType == 'swiss' then
 		standingsTable.extradata.placemapping = Logic.wrapTryOrLog(StandingsParseWiki.parsePlaceMapping)(args, opponents)
 	end
 
-	StandingsStorage.run(standingsTable, {saveVars = true, storeLpdb = storeLpdb})
-	return StandingsDisplay{
-		pageName = mw.title.getCurrentTitle().text,
-		standingsIndex = standingsTable.standingsindex,
-		width = StandingsParseWiki.parseWidth(args),
-	}
+	return standingsTable
 end
 
 ---@param manualOpponents StandingTableOpponentData[]

@@ -32,7 +32,7 @@ end
 
 ---@return string
 function TiebreakerBuchholzCutOne:headerTitle()
-	return 'Buchholz Cut 1'
+	return 'BH-C'
 end
 
 return TiebreakerBuchholzCutOne

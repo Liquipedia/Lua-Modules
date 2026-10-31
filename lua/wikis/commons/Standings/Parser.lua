@@ -13,6 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
+local TiebreakerHeadToHead = Lua.import('Module:Standings/Tiebreaker/HeadToHead')
 local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParser = {}
@@ -21,6 +22,16 @@ local StandingsParser = {}
 ---@field drawConfig {match: boolean?}? Explicit draw toggles per level; when unset, draws are detected from the data
 ---@field overtime boolean? Whether overtime results are tracked separately from regulation results
 ---@field walkoverGames integer? Games a walkover counts as in the game tiebreakers, unset means not counted
+---@field walkoverRounds integer? Rounds a walkover map counts as in the round tiebreakers, unset means not counted
+---@field tiebreakerReset boolean? Whether groups split by a tiebreaker start over from the first tiebreaker
+
+---@param carried table
+---@param record table?
+local function addRecord(carried, record)
+	for key, value in pairs(record or {}) do
+		carried[key] = carried[key] + value
+	end
+end
 
 ---@param rounds {roundNumber: integer, started: boolean, finished:boolean, title: string?}[]
 ---@param opponents StandingTableOpponentData[]
@@ -45,38 +56,43 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		local opponent = opponentData.opponent
 		local carryData = {
 			points = opponentData.startingPoints or 0,
+			tiebreakerPoints = 0,
 			match = {w = 0, d = 0, l = 0},
 			overtime = options.overtime and {w = 0, l = 0} or nil,
+			gameAdjustment = {w = 0, d = 0, l = 0},
+			roundAdjustment = {w = 0, l = 0},
 		}
 		local opponentRounds = opponentData.rounds
+		local adjustments = opponentData.adjustments or {}
 
 		return Array.map(rounds, function(round)
-			local pointsFromRound, statusInRound, tiebreakerPoints, matchId, matchOpponentIndex, playedMatches,
-				playedMatchPoints
+			local pointsFromRound, statusInRound, matchId, matchOpponentIndex, playedMatches
 			if opponentRounds and opponentRounds[round.roundNumber] then
 				local thisRoundsData = opponentRounds[round.roundNumber]
 				if thisRoundsData.scoreboard then
 					pointsFromRound = thisRoundsData.scoreboard.points
 				end
 				statusInRound = thisRoundsData.specialstatus
-				tiebreakerPoints = thisRoundsData.tiebreakerPoints
 				matchId = thisRoundsData.matchId
 				matchOpponentIndex = thisRoundsData.matchOpponentIndex
-				if thisRoundsData.scoreboard.match then
-					carryData.match.w = carryData.match.w + thisRoundsData.scoreboard.match.w
-					carryData.match.d = carryData.match.d + thisRoundsData.scoreboard.match.d
-					carryData.match.l = carryData.match.l + thisRoundsData.scoreboard.match.l
-				end
-				if carryData.overtime and thisRoundsData.scoreboard.overtime then
-					carryData.overtime.w = carryData.overtime.w + thisRoundsData.scoreboard.overtime.w
-					carryData.overtime.l = carryData.overtime.l + thisRoundsData.scoreboard.overtime.l
+				addRecord(carryData.match, thisRoundsData.scoreboard.match)
+				if carryData.overtime then
+					addRecord(carryData.overtime, thisRoundsData.scoreboard.overtime)
 				end
 				playedMatches = thisRoundsData.matches
-				playedMatchPoints = thisRoundsData.matchPoints
 			end
+			local adjustment = adjustments[round.roundNumber] or {}
+			if adjustment.points then
+				pointsFromRound = (pointsFromRound or 0) + adjustment.points
+			end
+			addRecord(carryData.match, adjustment.match)
+			addRecord(carryData.gameAdjustment, adjustment.game)
+			addRecord(carryData.roundAdjustment, adjustment.round)
+			carryData.tiebreakerPoints = carryData.tiebreakerPoints + (adjustment.tiebreaker or 0)
 			carryData.points = carryData.points + (pointsFromRound or 0)
 			---@type {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?,
-			---match: {w: integer, d: integer, l: integer}, overtime: {w: integer, l: integer}?}
+			---match: {w: integer, d: integer, l: integer}, overtime: {w: integer, l: integer}?,
+			---gameAdjustment: {w: integer, d: integer, l: integer}, roundAdjustment: {w: integer, l: integer}}
 			return {
 				opponent = opponent,
 				standingsindex = standingsindex,
@@ -84,8 +100,10 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 				points = carryData.points,
 				match = Table.copy(carryData.match),
 				overtime = carryData.overtime and Table.copy(carryData.overtime) or nil,
+				gameAdjustment = Table.copy(carryData.gameAdjustment),
+				roundAdjustment = Table.copy(carryData.roundAdjustment),
 				matches = playedMatches or {},
-				matchPoints = playedMatchPoints or {},
+				matchPoints = opponentData.matchPoints or {},
 				startingPoints = opponentData.startingPoints,
 				finished = round.finished,
 				manualDefiniteStatus = StandingsParser.resolveManualDefiniteStatus(
@@ -94,7 +112,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 				extradata = {
 					pointschange = pointsFromRound,
 					specialstatus = statusInRound,
-					tiebreakerpoints = tiebreakerPoints or 0,
+					tiebreakerpoints = carryData.tiebreakerPoints,
 					disqualified = opponentData.disqualifiedFromRound ~= nil
 						and round.roundNumber >= opponentData.disqualifiedFromRound or nil,
 					matchid = matchId,
@@ -112,9 +130,14 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 			(options.drawConfig or {}).match,
 			Array.any(entries, function(entry) return entry.match.d > 0 end)
 		),
+		game = Array.any(entries, function(entry) return entry.gameAdjustment.d ~= 0 end),
 	}
 	---@type StandingsTiebreakerOptions
-	local tiebreakerOptions = {draws = draws, walkoverGames = options.walkoverGames}
+	local tiebreakerOptions = {
+		draws = draws,
+		walkoverGames = options.walkoverGames,
+		walkoverRounds = options.walkoverRounds,
+	}
 
 	---@param tiebreakerId string
 	---@return StandingsAdditionalStat
@@ -133,11 +156,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 	local tiebreakers = Array.map(tiebreakerIds, function(tiebreakerId)
 		return Table.merge(loadTiebreaker(tiebreakerId), {tiebreaker = true})
 	end)
-	local alwaysStatsToLoad = ((Info.config.standings or {}).alwaysShowStats or {})[standingsType] or {}
-	alwaysStatsToLoad = Array.map(alwaysStatsToLoad, function (stat)
-		return TiebreakerFactory.validateAndNormalizeInput(stat)
-	end)
-	local alwaysStats = Array.map(alwaysStatsToLoad, loadTiebreaker)
+	local alwaysStats = Array.map(StandingsParser.alwaysShownStatIds(standingsType), loadTiebreaker)
 	local additionalStats = Array.extend(alwaysStats, tiebreakers)
 	local additionalStatsIds = Array.map(additionalStats, function(stat) return stat.id end)
 
@@ -150,14 +169,15 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 	Array.forEach(rounds, function(round)
 		StandingsParser.determinePlacements(Array.filter(entries, function(opponentRound)
 			return opponentRound.roundindex == round.roundNumber
-		end), tiebreakerIds, tiebreakerOptions)
+		end), tiebreakerIds, tiebreakerOptions, options.tiebreakerReset)
 	end)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer,
 	---points: number, placement: integer?, slotindex: integer}[]
 
 	StandingsParser.setPlacementChange(entries)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer,
-	---points: number, placement: integer?, slotindex: integer, placementchange: integer?}[]
+	---points: number, placement: integer?, slotindex: integer, placementchange: integer?,
+	---matches: MatchGroupUtilMatch[]?, matchPoints: table<string, number>?}[]
 
 	StandingsParser.addStatuses(entries, bgs, 'currentstatus')
 	if isFinished then
@@ -167,6 +187,11 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 	end
 	StandingsParser.applyManualStatuses(entries)
 	StandingsParser.applyDisqualifications(entries)
+	-- Only the tiebreakers need the matches
+	Array.forEach(entries, function(entry)
+		entry.matches = nil
+		entry.matchPoints = nil
+	end)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
 	---placement: integer?, slotindex: integer, placementchange: integer?,
 	---currentstatus: string?, definitestatus: string?}[]
@@ -190,6 +215,30 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 	}
 end
 
+---@param standingsType StandingsTableTypes
+---@return string[]
+function StandingsParser.alwaysShownStatIds(standingsType)
+	local stats = ((Info.config.standings or {}).alwaysShowStats or {})[standingsType] or {}
+	return Array.map(stats, function(stat)
+		return TiebreakerFactory.validateAndNormalizeInput(stat)
+	end)
+end
+
+---With `gameScoresIfBo1`, the status of the opponents of a Bo1 match is taken from its first game. That status is
+---read by the scoring and by the game stats, so the games are always needed then.
+---@param standingsType StandingsTableTypes
+---@param tiebreakerIds string[]
+---@return boolean
+function StandingsParser.needsGames(standingsType, tiebreakerIds)
+	if Info.config.match2.gameScoresIfBo1 then
+		return true
+	end
+	return Array.any(
+		Array.extend(StandingsParser.alwaysShownStatIds(standingsType), tiebreakerIds),
+		TiebreakerFactory.readsGames
+	)
+end
+
 ---Resolves whether a round has started and finished. Manual input takes priority, otherwise it follows
 ---the phases of all matches in the round. A round without matches has neither started nor finished.
 ---@param round {started: boolean?, finished: boolean?}
@@ -211,7 +260,7 @@ function StandingsParser.resolveRoundStatus(round, matchPhases)
 end
 
 ---Calculate tiebreaker values for all opponents in a round.
----Does not calculate H2H legacy or ML, only "full" tiebreaker types, as the values of the others
+---Does not calculate H2H CS, H2H legacy or ML, only "full" tiebreaker types, as the values of the others
 ---depend on which opponents are tied.
 ---The others are resolved in resolveTieForGroup() called by determinePlacements(),
 ---and therefore do not get a value shown in the table.
@@ -238,30 +287,18 @@ function StandingsParser.calculateAdditionalStatsValues(opponentsInRound, tiebre
 	end)
 end
 
+---Groups the tied opponents by the value of the tiebreaker, the groups are ordered from best to worst.
 ---@param allOpponents TiebreakerOpponent[]
 ---@param tiedOpponents TiebreakerOpponent[]
----@param tiebreakerIds string[]
----@param tiebreakerIndex integer
----@param tiebreakerOptions StandingsTiebreakerOptions?
+---@param tiebreaker StandingsTiebreaker
+---@param tiebreakerId string
 ---@return TiebreakerOpponent[][]
-local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex, tiebreakerOptions)
-	local tiebreakerId = tiebreakerIds[tiebreakerIndex]
-	if not tiebreakerId then
-		return { tiedOpponents }
-	end
-	local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId, tiebreakerOptions)
-	local contextType = tiebreaker:getContextType()
-
-	-- H2H legacy is only defined for ties between 2 or 3 opponents, for bigger ties it is skipped
-	if contextType == 'h2hlegacy' and #tiedOpponents > 3 then
-		return resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex + 1, tiebreakerOptions)
-	end
-
+local function groupByValue(allOpponents, tiedOpponents, tiebreaker, tiebreakerId)
 	-- ML and H2H legacy only look at the matches played among the tied opponents.
 	-- The scoped opponents are copies, the groups below keep containing the original opponents.
 	local scopedOpponentsByOpponent
 	local scopedOpponents
-	if contextType ~= 'full' then
+	if tiebreaker:getContextType() ~= 'full' then
 		scopedOpponents = TiebreakerScope.restrictTo(tiedOpponents)
 		scopedOpponentsByOpponent = {}
 		Array.forEach(tiedOpponents, function(opponent, index)
@@ -297,17 +334,56 @@ local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, ti
 	end)
 
 	-- Highest value first, opponents keep their order within a group
-	local groupedOpponentsInOrder = Array.map(distinctValues, function(value)
+	return Array.map(distinctValues, function(value)
 		return Array.filter(tiedOpponents, function(opponent)
 			return Logic.deepEquals(valueByOpponent[opponent], value)
 		end)
 	end)
+end
 
-	return Array.flatMap(groupedOpponentsInOrder, function(group)
+---@param allOpponents TiebreakerOpponent[]
+---@param tiedOpponents TiebreakerOpponent[]
+---@param tiebreakerIds string[]
+---@param tiebreakerIndex integer
+---@param tiebreakerOptions StandingsTiebreakerOptions?
+---@param tiebreakerReset boolean? Whether groups split by a tiebreaker start over from the first tiebreaker
+---@return TiebreakerOpponent[][]
+local function resolveTieForGroup(
+	allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex, tiebreakerOptions, tiebreakerReset
+)
+	local tiebreakerId = tiebreakerIds[tiebreakerIndex]
+	if not tiebreakerId then
+		return { tiedOpponents }
+	end
+	local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId, tiebreakerOptions)
+	local contextType = tiebreaker:getContextType()
+
+	-- H2H legacy is only defined for ties between 2 or 3 opponents, for bigger ties it is skipped
+	if contextType == 'h2hlegacy' and #tiedOpponents > 3 then
+		return resolveTieForGroup(
+			allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex + 1, tiebreakerOptions, tiebreakerReset
+		)
+	end
+
+	---@type TiebreakerOpponent[][]
+	local groupsInOrder
+	if contextType == 'h2hcs' then
+		groupsInOrder = TiebreakerHeadToHead.resolve(tiedOpponents, tiebreaker)
+	else
+		groupsInOrder = groupByValue(allOpponents, tiedOpponents, tiebreaker, tiebreakerId)
+	end
+
+	-- With tiebreaker reset, the groups this tiebreaker splits start over from the first tiebreaker.
+	-- A reset only happens for a strictly smaller group, which guarantees termination.
+	local nextTiebreakerIndex = (tiebreakerReset and #groupsInOrder > 1) and 1 or tiebreakerIndex + 1
+
+	return Array.flatMap(groupsInOrder, function(group)
 		if #group == 1 then
 			return { group }
 		end
-		return resolveTieForGroup(allOpponents, group, tiebreakerIds, tiebreakerIndex + 1, tiebreakerOptions)
+		return resolveTieForGroup(
+			allOpponents, group, tiebreakerIds, nextTiebreakerIndex, tiebreakerOptions, tiebreakerReset
+		)
 	end)
 end
 
@@ -315,8 +391,11 @@ end
 ---placement: integer?, slotindex: integer?, extradata: table}[]
 ---@param tiebreakerIds string[]
 ---@param tiebreakerOptions StandingsTiebreakerOptions?
-function StandingsParser.determinePlacements(opponentsInRound, tiebreakerIds, tiebreakerOptions)
-	local opponentsAfterTie = resolveTieForGroup(opponentsInRound, opponentsInRound, tiebreakerIds, 1, tiebreakerOptions)
+---@param tiebreakerReset boolean? Whether groups split by a tiebreaker start over from the first tiebreaker
+function StandingsParser.determinePlacements(opponentsInRound, tiebreakerIds, tiebreakerOptions, tiebreakerReset)
+	local opponentsAfterTie = resolveTieForGroup(
+		opponentsInRound, opponentsInRound, tiebreakerIds, 1, tiebreakerOptions, tiebreakerReset
+	)
 	local slotIndex = 1
 	Array.forEach(opponentsAfterTie, function(opponentGroup)
 		local rank = slotIndex

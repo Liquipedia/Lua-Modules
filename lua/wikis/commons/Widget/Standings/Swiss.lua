@@ -13,6 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Component = Lua.import('Module:Widget/Component')
 local MatchOverview = Lua.import('Module:Widget/Standings/MatchOverview')
+local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
 local StandingsCells = Lua.import('Module:Widget/Standings/Cells')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
@@ -57,7 +58,8 @@ end
 function Helpers.buildColumnDefinitions(standings, statsToShow)
 	return WidgetUtil.collect(
 		{align = 'left'},
-		{align = 'left'},
+		StandingsDisplayUtil.showPlacementChange(standings) and {align = 'center'} or nil,
+		StandingsCells.participantColumn(),
 		StandingsCells.statColumns(statsToShow),
 		Array.rep({align = 'center'}, #standings.rounds)
 	)
@@ -71,6 +73,7 @@ function Helpers.headerRow(standings, statsToShow)
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
 			StandingsCells.header('#'),
+			StandingsDisplayUtil.showPlacementChange(standings) and StandingsCells.header() or nil,
 			StandingsCells.header('Participant'),
 			StandingsCells.statHeaders(statsToShow),
 			Array.map(standings.rounds, function(round)
@@ -91,26 +94,43 @@ function Helpers.createRow(standings, slot, statsToShow, boldStatTitle)
 		attributes = {['data-position-status'] = slot.positionStatus},
 		children = WidgetUtil.collect(
 			StandingsCells.placement(slot),
+			StandingsDisplayUtil.showPlacementChange(standings) and TableWidgets.Cell{
+				children = PlacementChange{change = Helpers.placementChange(standings, slot)}
+			} or nil,
 			StandingsCells.participant(slot),
 			StandingsCells.stats(slot, statsToShow, boldStatTitle),
 			Array.map(standings.rounds, function(columnRound)
 				local entry = Array.find(columnRound.opponents, function(columnSlot)
 					return Opponent.same(columnSlot.opponent, slot.opponent)
 				end)
-				if not entry then
-					return TableWidgets.Cell{}
-				end
-				if not entry.match or not entry.matchOpponentIndex then
-					return TableWidgets.Cell{}
+				if not entry or not entry.match or not entry.matchOpponentIndex then
+					return TableWidgets.Cell{classes = {'standings-swiss-match'}}
 				end
 
-				return TableWidgets.Cell{children = MatchOverview{
-					match = entry.match,
-					opponentIndex = entry.matchOpponentIndex,
-				}}
+				return TableWidgets.Cell{
+					classes = {'standings-swiss-match'},
+					children = MatchOverview{
+						match = entry.match,
+						opponentIndex = entry.matchOpponentIndex,
+					},
+				}
 			end)
 		),
 	}
+end
+
+---The placement change in the latest started round.
+---Rounds that haven't started carry the standings forward, so their change is always 0.
+---@private
+---@param standings StandingsModel
+---@param slot StandingsEntryModel
+---@return integer?
+function Helpers.placementChange(standings, slot)
+	local latestRound = standings.rounds[StandingsDisplayUtil.roundsToShow(standings)]
+	local entry = Array.find(latestRound.opponents, function(roundSlot)
+		return Opponent.same(roundSlot.opponent, slot.opponent)
+	end)
+	return entry and entry.positionChangeFromPreviousRound or nil
 end
 
 return Component.component(StandingsSwiss)

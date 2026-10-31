@@ -11,10 +11,9 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local MathUtil = Lua.import('Module:MathUtil')
 
-local Opponent = Lua.import('Module:Opponent/Custom')
-
 local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
 local TiebreakerMatchUtil = Lua.import('Module:Standings/Tiebreaker/Match/Util')
+local TiebreakerMembers = Lua.import('Module:Standings/Tiebreaker/Members')
 
 ---@class TiebreakerBuchholz : StandingsTiebreaker
 local TiebreakerBuchholz = Class.new(TiebreakerInterface)
@@ -32,22 +31,26 @@ end
 ---@param opponent TiebreakerOpponent
 ---@return number[]
 function TiebreakerBuchholz:opponentScores(state, opponent)
-	local enemies = Array.flatMap(opponent.matches, function(match)
+	local selfMember = TiebreakerMembers.find(state, opponent.opponent)
+	---@type table<TiebreakerOpponent, true>
+	local isFaced = {}
+	Array.forEach(opponent.matches, function(match)
 		if not match.finished then
-			return {}
+			return
 		end
-		return Array.filter(match.opponents, function (opp)
-			return not Opponent.same(opp, opponent.opponent)
+		Array.forEach(match.opponents, function(matchOpponent)
+			local member = TiebreakerMembers.find(state, matchOpponent)
+			if not member or member == selfMember then
+				return
+			end
+			isFaced[member] = true
 		end)
 	end)
 
-	local enemyMembers = Array.filter(state, function(groupMember)
-		return Array.any(enemies, function(enemy)
-			return Opponent.same(enemy, groupMember.opponent)
-		end)
+	local facedMembers = Array.filter(state, function(member)
+		return isFaced[member] == true
 	end)
-
-	return Array.map(enemyMembers, function(member)
+	return Array.map(facedMembers, function(member)
 		return self:scoreOf(member)
 	end)
 end
@@ -61,7 +64,7 @@ end
 
 ---@return string
 function TiebreakerBuchholz:headerTitle()
-	return 'Buchholz'
+	return 'BH'
 end
 
 return TiebreakerBuchholz

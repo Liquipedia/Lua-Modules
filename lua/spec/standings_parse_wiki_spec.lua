@@ -71,6 +71,49 @@ describe('Standings Wiki Parser', function()
 		end)
 	end)
 
+	describe('adjustments', function()
+		it('reads unprefixed inputs into the final round and r<round> inputs into their round', function()
+			assert.are_same({
+				[2] = {game = {l = 2}},
+				[3] = {points = -1.5, tiebreaker = 1, match = {w = 1, d = 1}, round = {w = 3}},
+			}, StandingsParseWiki.parseAdjustments({
+				matchwins = '1', r3matchdraws = '1', r2gamelosses = '2', r3points = '-1.5', tiebreaker = '1', roundwins = '3',
+			}, 3))
+			assert.are_same(
+				{[1] = {match = {l = 1}}, [2] = {game = {w = 1, d = -1}, round = {l = 4}}},
+				StandingsParseWiki.parseAdjustments(
+					{r1matchlosses = '1', r2gamewins = '1', gamedraws = '-1', r2roundlosses = '4'}, 2
+				)
+			)
+		end)
+
+		it('prefers the input of the final round over an unprefixed input', function()
+			assert.are_same(
+				{[3] = {game = {d = 2}}},
+				StandingsParseWiki.parseAdjustments({gamedraws = '1', r3gamedraws = '2'}, 3)
+			)
+		end)
+
+		it('ignores empty values and rounds beyond the number of rounds', function()
+			assert.is_nil(StandingsParseWiki.parseAdjustments({}, 3))
+			assert.is_nil(StandingsParseWiki.parseAdjustments({matchlosses = '', r4matchwins = '1', r1 = '3'}, 3))
+		end)
+
+		it('ignores values that are not numbers', function()
+			assert.is_nil(StandingsParseWiki.parseAdjustments({points = 'abc', r1matchwins = 'x'}, 1))
+		end)
+
+		it('stores the adjustments on the parsed opponent without affecting round input', function()
+			local alpha = StandingsParseWiki.parseWikiOpponent(
+				{type = 'literal', 'Alpha', r1 = '3', r1points = '2', tiebreaker = '1'}, 2)
+			local bravo = StandingsParseWiki.parseWikiOpponent({type = 'literal', 'Bravo', r1 = '3'}, 2)
+
+			assert.are_equal(3, alpha.rounds[1].scoreboard.points)
+			assert.are_same({[1] = {points = 2}, [2] = {tiebreaker = 1}}, alpha.adjustments)
+			assert.is_nil(bravo.adjustments)
+		end)
+	end)
+
 	describe('tiebreakers', function()
 		it('always puts the disqualified tiebreaker first and manual last', function()
 			assert.are_same(
@@ -94,25 +137,28 @@ describe('Standings Wiki Parser', function()
 			)
 		end)
 
-		it('accepts h2hlegacy and ml tiebreakers for group tables', function()
+		it('accepts h2hcs, h2hlegacy and ml tiebreakers for group tables', function()
 			assert.are_same(
-				{'full.disqualified', 'full.points', 'h2hlegacy.matchdiff', 'ml.gamediff', 'full.manual'},
+				{'full.disqualified', 'full.points', 'h2hcs.matchdiff', 'h2hlegacy.matchdiff', 'ml.gamediff', 'full.manual'},
 				StandingsParseWiki.parseTiebreakers(
-					{tiebreakers = '["points", "h2hlegacy.matchdiff", "ml.gamediff"]'}, 'group'
+					{tiebreakers = '["points", "h2hcs.matchdiff", "h2hlegacy.matchdiff", "ml.gamediff"]'}, 'group'
 				)
 			)
 		end)
 
-		it('accepts h2hlegacy and ml tiebreakers for swiss tables', function()
+		it('accepts h2hcs, h2hlegacy and ml tiebreakers for swiss tables', function()
 			assert.are_same(
-				{'full.disqualified', 'full.matchdiff', 'h2hlegacy.matchdiff', 'ml.gamediff', 'full.manual'},
+				{'full.disqualified', 'full.matchdiff', 'h2hcs.matchwins', 'h2hlegacy.matchdiff', 'ml.gamediff', 'full.manual'},
 				StandingsParseWiki.parseTiebreakers(
-					{tiebreakers = '["matchdiff", "h2hlegacy.matchdiff", "ml.gamediff"]'}, 'swiss'
+					{tiebreakers = '["matchdiff", "h2hcs.matchwins", "h2hlegacy.matchdiff", "ml.gamediff"]'}, 'swiss'
 				)
 			)
 		end)
 
-		it('rejects h2hlegacy and ml tiebreakers for ffa tables', function()
+		it('rejects h2hcs, h2hlegacy and ml tiebreakers for ffa tables', function()
+			assert.error(function()
+				StandingsParseWiki.parseTiebreakers({tiebreakers = '["points", "h2hcs.matchwins"]'}, 'ffa')
+			end)
 			assert.error(function()
 				StandingsParseWiki.parseTiebreakers({tiebreakers = '["points", "h2hlegacy.matchwins"]'}, 'ffa')
 			end)
@@ -133,6 +179,21 @@ describe('Standings Wiki Parser', function()
 		it('errors on input that is not a non-negative integer', function()
 			for _, input in ipairs({'abc', '-1', '1.5'}) do
 				assert.error(function() StandingsParseWiki.parseWalkoverGames{walkovergames = input} end)
+			end
+		end)
+	end)
+
+	describe('walkover rounds', function()
+		it('reads the walkoverrounds input', function()
+			assert.are_equal(13, StandingsParseWiki.parseWalkoverRounds{walkoverrounds = '13'})
+			assert.are_equal(0, StandingsParseWiki.parseWalkoverRounds{walkoverrounds = '0'})
+			assert.is_nil(StandingsParseWiki.parseWalkoverRounds{walkoverrounds = ''})
+			assert.is_nil(StandingsParseWiki.parseWalkoverRounds{})
+		end)
+
+		it('errors on input that is not a non-negative integer', function()
+			for _, input in ipairs({'abc', '-1', '1.5'}) do
+				assert.error(function() StandingsParseWiki.parseWalkoverRounds{walkoverrounds = input} end)
 			end
 		end)
 	end)

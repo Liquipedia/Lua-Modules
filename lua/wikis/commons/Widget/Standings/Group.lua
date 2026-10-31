@@ -41,14 +41,20 @@ local function StandingsGroup(props)
 		title = Logic.nilIfEmpty(standings.title),
 		columns = WidgetUtil.collect(
 			{align = 'center'},
-			Helpers.showPlacementChange(standings) and {align = 'center'} or nil,
-			{align = 'left'},
+			StandingsDisplayUtil.showPlacementChange(standings) and {align = 'center'} or nil,
+			StandingsCells.participantColumn(),
 			StandingsCells.statColumns(statsToShow)
 		),
 		children = WidgetUtil.collect(
 			Helpers.headerRow(standings, statsToShow),
 			Array.map(Array.sub(standings.rounds, 1, shownRounds), function(round)
-				return Helpers.createRoundBody(standings, round, statsToShow, boldStatTitle, hasRoundHistory)
+				return Helpers.RoundBody{
+					standings = standings,
+					round = round,
+					statsToShow = statsToShow,
+					boldStatTitle = boldStatTitle,
+					hasRoundHistory = hasRoundHistory,
+				}
 			end)
 		),
 		striped = false,
@@ -67,48 +73,42 @@ local function StandingsGroup(props)
 end
 
 ---@param standings StandingsModel
----@return boolean
-function Helpers.showPlacementChange(standings)
-	return #standings.rounds > 1
-end
-
----@param standings StandingsModel
 ---@param statsToShow StandingsAdditionalStat[]
 ---@return Renderable
 function Helpers.headerRow(standings, statsToShow)
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
 			StandingsCells.header('#'),
-			Helpers.showPlacementChange(standings) and StandingsCells.header() or nil,
+			StandingsDisplayUtil.showPlacementChange(standings) and StandingsCells.header() or nil,
 			StandingsCells.header('Participant'),
 			StandingsCells.statHeaders(statsToShow)
 		)}
 	}}
 end
 
----@param standings StandingsModel
----@param round StandingsRound
----@param statsToShow StandingsAdditionalStat[]
----@param boldStatTitle string?
----@param hasRoundHistory boolean
+---A component, so the rows of a round are only built once the round is rendered
+---@param props {standings: StandingsModel, round: StandingsRound, statsToShow: StandingsAdditionalStat[],
+---boldStatTitle: string?, hasRoundHistory: boolean}
 ---@return Renderable
-function Helpers.createRoundBody(standings, round, statsToShow, boldStatTitle, hasRoundHistory)
+Helpers.RoundBody = Component.component(function(props)
+	local standings = props.standings
+	local round = props.round
 	return TableWidgets.TableBody{children = Array.map(round.opponents, function(slot)
 		return TableWidgets.Row{
 			attributes = {
 				['data-position-status'] = slot.positionStatus,
-				['data-toggle-area-content'] = hasRoundHistory and round.round or nil,
+				['data-toggle-area-content'] = props.hasRoundHistory and round.round or nil,
 			},
 			children = WidgetUtil.collect(
 				StandingsCells.placement(slot),
-				Helpers.showPlacementChange(standings) and TableWidgets.Cell{
+				StandingsDisplayUtil.showPlacementChange(standings) and TableWidgets.Cell{
 					children = PlacementChange{change = slot.positionChangeFromPreviousRound}
 				} or nil,
 				StandingsCells.participant(slot),
-				StandingsCells.stats(slot, statsToShow, boldStatTitle)
+				StandingsCells.stats(slot, props.statsToShow, props.boldStatTitle)
 			),
 		}
 	end)}
-end
+end)
 
 return Component.component(StandingsGroup)

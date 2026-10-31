@@ -142,7 +142,7 @@ end
 
 ---@param args table
 ---@param teamIndex integer
----@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, r1: string?}?
+---@return {type: OpponentType, [1]: string, tiebreaker: string?, r1points: string?, r1: string?}?
 function StandingTableLegacyFfa.parseTeamInput(args, teamIndex)
 	local team = args['team' .. teamIndex] or args['p' .. teamIndex .. 'team']
 	if not team then
@@ -155,16 +155,16 @@ function StandingTableLegacyFfa.parseTeamInput(args, teamIndex)
 	end)
 
 	local tiebreaker = args['tiebreaker' .. teamIndex] or args['p' .. teamIndex .. 'temp_tie']
-	local startingPoints = args['changes' .. teamIndex] or args['p' .. teamIndex .. 'changes']
+	local points = args['changes' .. teamIndex] or args['p' .. teamIndex .. 'changes']
 
 	return Table.merge(
-		{type = Opponent.team, team, tiebreaker = tiebreaker, startingpoints = startingPoints},
+		{type = Opponent.team, team, tiebreaker = tiebreaker, r1points = points},
 		rounds
 	)
 end
 
 ---@param args table
----@return {type: OpponentType, [1]: string, startingpoints: string?, r1: string?}?
+---@return {type: OpponentType, [1]: string, r1points: number?, r1: string?}?
 function StandingTableLegacyFfa.parseTeamInputManualSlots(args)
 	if not args then
 		return nil
@@ -175,10 +175,10 @@ function StandingTableLegacyFfa.parseTeamInputManualSlots(args)
 		return 'r' .. roundIndex, data[2]
 	end)
 
-	local startingPoints = -(tonumber(args.penalty) or 0)
+	local penalty = tonumber(args.penalty)
 
 	return Table.merge(
-		{type = Opponent.team, args.team, startingpoints = startingPoints},
+		{type = Opponent.team, args.team, r1points = penalty and -penalty or nil},
 		rounds
 	)
 end

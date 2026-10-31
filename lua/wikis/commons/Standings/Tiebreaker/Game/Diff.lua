@@ -25,22 +25,15 @@ end
 
 ---@return string
 function TiebreakerGameDiff:headerTitle()
-	return 'Games'
+	return 'GD'
 end
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
 ---@return string
 function TiebreakerGameDiff:display(state, opponent)
-	local games = TiebreakerGameUtil.getGames(opponent, self.options.walkoverGames)
-	-- With overtime, regulation and overtime results are shown separately
-	if opponent.overtime then
-		local overtimeGames = TiebreakerGameUtil.getOvertimeGames(opponent)
-		return table.concat({
-			games.w - overtimeGames.w, overtimeGames.w, overtimeGames.l, games.l - overtimeGames.l
-		}, ' - ')
-	end
-	return games.w .. ' - ' .. games.l
+	local diff = self:valueOf(state, opponent)
+	return diff > 0 and ('+' .. diff) or tostring(diff)
 end
 
 return TiebreakerGameDiff

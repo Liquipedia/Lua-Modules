@@ -23,7 +23,7 @@ end
 
 ---@return string
 function TiebreakerMedianBuchholzPoints:headerTitle()
-	return 'Median-Buchholz (Pts)'
+	return 'BH-M'
 end
 
 return TiebreakerMedianBuchholzPoints
