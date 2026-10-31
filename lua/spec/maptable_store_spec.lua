@@ -45,7 +45,7 @@ describe('MapTable Storage', function()
 			name = 'Stadium',
 			type = 'map',
 			extradata = '{"author1":"Player_One","author1dn":"Player One","author1flag":"Sweden",'
-				.. '"author2":"","author2dn":"Player Two","author2flag":"",'
+				.. '"author2dn":"Player Two",'
 				.. '"links":{"twitch":"https://www.twitch.tv/channel"}}',
 		})
 

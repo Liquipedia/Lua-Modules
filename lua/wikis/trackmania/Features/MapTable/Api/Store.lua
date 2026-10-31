@@ -12,6 +12,7 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local MapTableStore = {}
@@ -23,10 +24,15 @@ local MapTableStore = {}
 local function buildExtradata(mappers, links)
 	local extradata = {}
 	Array.forEach(mappers, function(mapper)
-		extradata['author' .. mapper.index] =
-			mapper.pageName and mapper.pageName:gsub(' ', '_') or ''
 		extradata['author' .. mapper.index .. 'dn'] = mapper.displayName
-		extradata['author' .. mapper.index .. 'flag'] = mapper.flag or ''
+
+		local pageName = mapper.pageName and mapper.pageName:gsub(' ', '_')
+		if String.isNotEmpty(pageName) then
+			extradata['author' .. mapper.index] = pageName
+		end
+		if String.isNotEmpty(mapper.flag) then
+			extradata['author' .. mapper.index .. 'flag'] = mapper.flag
+		end
 	end)
 
 	if Table.isNotEmpty(links) then
