@@ -109,7 +109,6 @@ function StandingTableLegacyGroup.getStandardParameter(args, opponents)
 		tabletype = 'group',
 		title = args.title or mw.title.getCurrentTitle().text,
 		importopponents = #opponents == 0,
-		width = args.width,
 	})
 end
 
