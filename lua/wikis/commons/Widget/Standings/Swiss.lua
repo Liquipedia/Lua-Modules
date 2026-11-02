@@ -113,18 +113,4 @@ function Helpers.createRow(standings, slot, statsToShow, boldStatTitle)
 	}
 end
 
----The placement change in the latest started round.
----Rounds that haven't started carry the standings forward, so their change is always 0.
----@private
----@param standings StandingsModel
----@param slot StandingsEntryModel
----@return integer?
-function Helpers.placementChange(standings, slot)
-	local latestRound = standings.rounds[StandingsDisplayUtil.roundsToShow(standings)]
-	local entry = Array.find(latestRound.opponents, function(roundSlot)
-		return Opponent.same(roundSlot.opponent, slot.opponent)
-	end)
-	return entry and entry.positionChangeFromPreviousRound or nil
-end
-
 return Component.component(StandingsSwiss)
