@@ -80,7 +80,10 @@ local function SwitchWidget(props)
 					Div{classes = {'switch-toggle-slider'}},
 				},
 			},
-			Div{children = label},
+			Div{
+				classes = {'switch-toggle-label'},
+				children = label,
+			},
 		},
 	}
 
