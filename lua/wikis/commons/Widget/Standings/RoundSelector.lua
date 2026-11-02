@@ -58,6 +58,7 @@ local function RoundSelectorWidget(props)
 	end
 
 	return DropdownContainer{
+		updateLabel = true,
 		label = roundTitles[#roundTitles],
 		children = Array.map(roundTitles, makeRoundButtons),
 	}

@@ -107,6 +107,18 @@ liquipedia.dropdown = {
 			this.closeAllDropdowns();
 		}, { capture: true } );
 
+		document.querySelectorAll( '.dropdown-widget[ data-update-label="true" ]' ).forEach( ( dropdown ) => {
+			const label = dropdown.querySelector( ' .dropdown-widget__label ' );
+			if ( label === null ) {
+				return;
+			}
+			dropdown.querySelectorAll( 'dropdown-widget__item' ).forEach( ( dropdownItem ) => {
+				dropdownItem.addEventListener( 'click', () => {
+					label.innerHTML = dropdownItem.innerHTML;
+				} );
+			} );
+		} );
+
 		document.addEventListener( 'keydown', ( event ) => {
 			const toggle = event.target.closest?.( '[data-dropdown-toggle]' ) ?? null;
 
