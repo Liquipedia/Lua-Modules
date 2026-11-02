@@ -129,22 +129,21 @@ liquipedia.analytics = {
 	},
 
 	waitForProcessedConsent: function ( frequency, maxRetries ) {
-		return new Promise((resolve, reject) => {
+		return new Promise( ( resolve, reject ) => {
 			let attempts = 0;
 
-			const timer = setInterval(() => {
+			const timer = setInterval( () => {
 				attempts++;
 
-				if (window.consent === true || window.consent === false) {
-					clearInterval(timer);
-					resolve(window.consent);
+				if ( window.consent === true || window.consent === false ) {
+					clearInterval( timer );
+					resolve( window.consent );
+				} else if ( attempts >= maxRetries ) {
+					clearInterval( timer );
+					reject( new Error( 'Max retries reached' ) );
 				}
-				else if (attempts >= maxRetries) {
-					clearInterval(timer);
-					reject(new Error(`Max retries reached`));
-				}
-			}, frequency);
-		});
+			}, frequency );
+		} );
 	},
 
 	track: async function( eventName, properties ) {
@@ -155,7 +154,7 @@ liquipedia.analytics = {
 
 		// make sure the consent handler has been initialized
 		try {
-			const consent = await this.waitForProcessedConsent(300, 100);
+			const consent = await this.waitForProcessedConsent( 300, 100 );
 			if ( !consent ) {
 				return;
 			}
