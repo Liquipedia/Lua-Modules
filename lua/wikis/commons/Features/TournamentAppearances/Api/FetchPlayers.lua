@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Condition = Lua.import('Module:Condition')
 local Lpdb = Lua.import('Module:Lpdb')
 
