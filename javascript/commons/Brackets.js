@@ -5,6 +5,7 @@
 liquipedia.brackets = {
 	init: function() {
 		liquipedia.brackets.headers.init();
+		liquipedia.brackets.attachedMatchList.init();
 	},
 	headers: {
 		init: function() {
@@ -44,6 +45,19 @@ liquipedia.brackets = {
 					}
 					element.removeChild( textNode );
 				}
+			} );
+		}
+	},
+
+	attachedMatchList: {
+		init: function() {
+			document.querySelectorAll(
+				'[data-analytics-name]:has( > .standings-group ) + .brkts-matchlist'
+			).forEach( ( matchlist ) => {
+				const standings = matchlist.previousElementSibling.firstElementChild;
+				new ResizeObserver( ( [ entry ] ) => {
+					matchlist.style.width = entry.borderBoxSize[ 0 ].inlineSize + 'px';
+				} ).observe( standings );
 			} );
 		}
 	}
