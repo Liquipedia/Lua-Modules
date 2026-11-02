@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Condition = Lua.import('Module:Condition')
-local FnUtil = Lua.import('Module:FnUtil')
 local Lpdb = Lua.import('Module:Lpdb')
 
 local ConditionTree = Condition.Tree
@@ -22,20 +21,14 @@ local ConditionUtil = Condition.Util
 local FetchPlayers = {}
 
 ---@param props {pageNames: string[], config: TournamentAppearancesConfig,
----parsePlayersFromPlacement: fun(players: table<string, standardPlayer>, placement: placement)}
----@return standardPlayer[]
+---parseFromPlacement: fun(placement: placement)}
 function FetchPlayers.run(props)
-	---@type table<string, standardPlayer>
-	local players = {}
-
 	Lpdb.executeMassQuery('placement', {
 		conditions = FetchPlayers._buildConditions(props.pageNames, props.config),
 		limit = 1000,
 		order = 'date asc',
 		query = 'opponentplayers, opponenttype, opponentname, parent, date, placement, opponenttemplate',
-	}, FnUtil.curry(props.parsePlayersFromPlacement, players))
-
-	return Array.extractValues(players)
+	}, props.parseFromPlacement)
 end
 
 ---@param pageNames string[]

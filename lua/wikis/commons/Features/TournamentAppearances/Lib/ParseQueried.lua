@@ -15,7 +15,7 @@ local Placement = Lua.import('Module:Placement')
 local ParseQueried = {}
 
 ---@param config TournamentAppearancesConfig
----@param players standardPlayer[]
+---@param players table<string, standardPlayer>
 ---@param placement placement
 function ParseQueried.fromPlacement(config, players, placement)
 	local opponent = Opponent.fromLpdbStruct(placement)

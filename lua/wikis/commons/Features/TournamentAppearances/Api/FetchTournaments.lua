@@ -24,7 +24,7 @@ local ConditionUtil = Condition.Util
 local FetchTournaments = {}
 
 ---@param config TournamentAppearancesConfig
----@return standardPlayer[]
+---@return StandardTournament[]
 function FetchTournaments.run(config)
 	return Tournament.getAllTournaments(FetchTournaments._buildConditions(config))
 end

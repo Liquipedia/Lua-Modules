@@ -36,11 +36,14 @@ function Controller.execute(frame)
 	end
 
 	-- todo: support opponent case
-	local players = FetchPlayers.run{
+	---@type table<string, standardPlayer>
+	local playersTable = {}
+	FetchPlayers.run{
 		pageNames = Array.map(tournaments, Operator.property('pageName')),
 		config = config,
-		parsePlayersFromPlacement = FnUtil.curry(ParseQueried.fromPlacement, config),
+		parseFromPlacement = function(placement) ParseQueried.fromPlacement(config, playersTable, placement) end,
 	}
+	local players = Array.extractValues(playersTable)
 
 	if Logic.isEmpty(players) then
 		return Types.NO_RESULTS_MESSAGE
