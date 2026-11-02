@@ -10,8 +10,8 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 
 local Component = Lua.import('Module:Widget/Component')
-local Html = Lua.import('Module:Widget/Html')
-local Button = Lua.import('Module:Widget/Basic/Button')
+local DropdownContainer = Lua.import('Module:Widget/Basic/Dropdown/Container')
+local DropdownItem = Lua.import('Module:Widget/Basic/Dropdown/Item')
 
 ---@private
 ---@param round integer
@@ -50,31 +50,16 @@ local function RoundSelectorWidget(props)
 	end)
 
 	local function makeRoundButtons(roundTitle, roundIndex)
-		return Button{
+		return DropdownItem{
 			children = roundTitle,
-			variant = 'primary',
-			size = 'sm',
 			classes = {'toggle-area-button'},
 			attributes = {['data-toggle-area-btn'] = roundIndex},
 		}
 	end
 
-	return Html.Div{
-		classes = {'dropdown-box-wrapper'},
-		css = {float = 'left'},
-		children = {
-			Button{
-				children = finalRoundTitle(props.hasEnded, props.rounds, props.titles),
-				variant = 'primary',
-				size = 'sm',
-				classes = {'dropdown-box-button'},
-			},
-			Html.Div{
-				classes = {'dropdown-box'},
-				css = {padding = '0px'},
-				children = Array.map(roundTitles, makeRoundButtons)
-			},
-		}
+	return DropdownContainer{
+		label = roundTitles[#roundTitles],
+		children = Array.map(roundTitles, makeRoundButtons),
 	}
 end
 
