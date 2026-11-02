@@ -13,7 +13,9 @@ local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
+local TiebreakerGameUtil = Lua.import('Module:Standings/Tiebreaker/Game/Util')
 local TiebreakerHeadToHead = Lua.import('Module:Standings/Tiebreaker/HeadToHead')
+local TiebreakerMatchUtil = Lua.import('Module:Standings/Tiebreaker/Match/Util')
 local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParser = {}
@@ -31,6 +33,23 @@ local function addRecord(carried, record)
 	for key, value in pairs(record or {}) do
 		carried[key] = carried[key] + value
 	end
+end
+
+---Whether the game stats repeat the match stats: every match is a Bo1 (or Bo0) and the records are equal.
+---@param entries TiebreakerOpponent[]
+---@param walkoverGames number?
+---@return boolean
+local function gameStatsRepeatMatchStats(entries, walkoverGames)
+	local onlySingleGames = Array.all(entries, function(entry)
+		return Array.all(entry.matches, function(match)
+			return (match.bestof or 0) <= 1
+		end)
+	end)
+	return onlySingleGames and Array.all(entries, function(entry)
+		local games = TiebreakerGameUtil.getGames(entry, walkoverGames)
+		local matches = TiebreakerMatchUtil.getMatches(entry)
+		return games.w == matches.w and games.d == matches.d and games.l == matches.l
+	end)
 end
 
 ---@param rounds {roundNumber: integer, started: boolean, finished:boolean, title: string?}[]
@@ -138,6 +157,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		walkoverGames = options.walkoverGames,
 		walkoverRounds = options.walkoverRounds,
 	}
+	local gameStatsUseMatchColumns = gameStatsRepeatMatchStats(entries, options.walkoverGames)
 
 	---@param tiebreakerId string
 	---@return StandingsAdditionalStat
@@ -147,8 +167,14 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		if tiebreakerContextType ~= 'full' then
 			return {id = tiebreakerId}
 		end
+		-- Only the column changes, placements still use the game tiebreaker
+		local columnId = tiebreakerId
+		if gameStatsUseMatchColumns then
+			columnId = TiebreakerFactory.toMatchEquivalent(tiebreakerId)
+			tiebreaker = TiebreakerFactory.tiebreakerFromId(columnId, tiebreakerOptions)
+		end
 		return {
-			id = tiebreakerId,
+			id = columnId,
 			title = tiebreaker:headerTitle(),
 		}
 	end

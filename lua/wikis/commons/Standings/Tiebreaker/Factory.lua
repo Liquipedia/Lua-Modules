@@ -72,6 +72,17 @@ local READS_GAMES = Set{
 	'roundscore',
 }
 
+-- Game tiebreakers and their match counterpart
+---@type table<string, string>
+local GAME_TO_MATCH = {
+	gamescore = 'matchscore',
+	gamewins = 'matchwins',
+	gamelosses = 'matchlosses',
+	gamecount = 'matchcount',
+	gamediff = 'matchdiff',
+	gamewinrate = 'matchwinrate',
+}
+
 --- Splits a tiebreaker id into its context and name.
 --- Input without a context (e.g. `points`) only has a first part, which then is the name.
 ---@param tiebreakerId string
@@ -110,6 +121,18 @@ end
 function TiebreakerFactory.readsGames(tiebreakerId)
 	local _, name = TiebreakerFactory.parseId(tiebreakerId)
 	return name ~= nil and READS_GAMES:contains(name)
+end
+
+--- The match counterpart of a game tiebreaker, other tiebreakers are returned unchanged.
+---@param tiebreakerId string
+---@return string
+function TiebreakerFactory.toMatchEquivalent(tiebreakerId)
+	local context, name = TiebreakerFactory.parseId(tiebreakerId)
+	local matchName = name and GAME_TO_MATCH[name]
+	if not matchName then
+		return tiebreakerId
+	end
+	return table.concat({context, matchName}, '.')
 end
 
 ---@param tiebreakerId string
