@@ -269,7 +269,7 @@ function StatisticsPortal.coverageTournamentTable(args)
 	args.multiGame = Logic.readBool(args.multiGame)
 	args.customGames = StatisticsPortal._isTableOrSplitOrDefault(args.customGames, GAMES)
 	args.customTiers = StatisticsPortal._isTableOrSplitOrDefault(args.customTiers)
-	args.customTiers = args.customTiers and Array.map(args.customTiers, function(tier) return tonumber(tier) end)
+	args.customTiers = args.customTiers and Array.map(args.customTiers, Tier.toNumber)
 	args.includeTierTypes = StatisticsPortal._isTableOrSplitOrDefault(args.includeTierTypes, DEFAULT_TIERTYPES)
 	args.showTierTypes = StatisticsPortal._isTableOrSplitOrDefault(args.showTierTypes, {})
 	args.filterByStatus = Logic.readBool(args.filterByStatus) or false
@@ -297,6 +297,10 @@ function StatisticsPortal.coverageTournamentTable(args)
 	}
 end
 
+
+---Decides whether a tier column is displayed.
+---Without customTiers only positive tiers are shown (0, -1, -2, ... stay hidden).
+---With customTiers exactly the requested tiers are shown, including 0 and any negative number.
 ---@param args table
 ---@param tierValue string|number|nil
 ---@return boolean
@@ -314,6 +318,22 @@ function StatisticsPortal._isTierShown(args, tierValue)
 end
 
 
+---Looks up the tier type data (Weekly, Monthly, Qualifier, ...) by its name
+---without having to pass a tier (see Liquipedia/Lua-Modules#4357).
+---@param tierTypeValue string?
+---@return TierRawData?
+function StatisticsPortal._getTierTypeData(tierTypeValue)
+	local identifier = Tier.toIdentifier(tierTypeValue)
+	if not identifier then return end
+
+	for key, tierTypeData in Tier.iterate('tierTypes') do
+		if key == identifier then
+			return tierTypeData
+		end
+	end
+end
+
+
 ---@param args table
 ---@param parameters table
 ---@return Renderable
@@ -328,6 +348,9 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 
 	local countData = Count.tournamentsByTier(parameters)
 
+	-- Misc is stored as a tiertype ('Misc') under a normal tier on some wikis,
+	-- so pull it out of every tier before it can be counted elsewhere.
+	-- Only done when the Misc column (-1) is displayed.
 	local miscFromTierType = 0
 	if StatisticsPortal._isTierShown(args, MISC_TIER) then
 		miscFromTierType = Array.reduce(
@@ -372,7 +395,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 	end
 
 	local tierTypeCells = Array.map(args.showTierTypes, function(tierTypeValue)
-		local _, tierTypeData = Tier.raw(nil, tierTypeValue)
+		local tierTypeData = StatisticsPortal._getTierTypeData(tierTypeValue)
 		if tierTypeData then
 			local count = Array.reduce(
 				Array.map(Array.extractValues(countData), function(typeCounts)
@@ -427,7 +450,7 @@ function StatisticsPortal._coverageTournamentTableHeader(args)
 
 	local tierTypeHeaderCells = {}
 	for _, tierTypeValue in ipairs(args.showTierTypes) do
-		local _, tierTypeData = Tier.raw(nil, tierTypeValue)
+		local tierTypeData = StatisticsPortal._getTierTypeData(tierTypeValue)
 		if tierTypeData then
 			table.insert(tierTypeHeaderCells, TableWidgets.CellHeader{
 				children = Tier.displaySingle(tierTypeData, {link = true, short = true})
