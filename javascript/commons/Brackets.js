@@ -52,9 +52,9 @@ liquipedia.brackets = {
 	attachedMatchList: {
 		init: function() {
 			document.querySelectorAll(
-				'[data-analytics-name]:has( > .standings-group ) + .brkts-matchlist'
+				'[data-analytics-name]:has( .standings-group ) + .brkts-matchlist-attached'
 			).forEach( ( matchlist ) => {
-				const standings = matchlist.previousElementSibling.firstElementChild;
+				const standings = matchlist.previousElementSibling.querySelector( '.standings-group' );
 				new ResizeObserver( ( [ entry ] ) => {
 					matchlist.style.width = entry.borderBoxSize[ 0 ].inlineSize + 'px';
 				} ).observe( standings );
