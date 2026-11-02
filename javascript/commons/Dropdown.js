@@ -112,7 +112,7 @@ liquipedia.dropdown = {
 			if ( label === null ) {
 				return;
 			}
-			dropdown.querySelectorAll( 'dropdown-widget__item' ).forEach( ( dropdownItem ) => {
+			dropdown.querySelectorAll( '.dropdown-widget__item' ).forEach( ( dropdownItem ) => {
 				dropdownItem.addEventListener( 'click', () => {
 					label.innerHTML = dropdownItem.innerHTML;
 				} );
