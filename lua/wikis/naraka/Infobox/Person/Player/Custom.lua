@@ -26,7 +26,7 @@ local ConditionUtil = Condition.Util
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
-local CURRENT_YEAR = tonumber(os.date('!%Y', DateExt.getCurrentTimestamp()))
+local CURRENT_YEAR = DateExt.getYearOf()
 
 -- T1 and T2 tournament champions
 local CHAMPION_CONDITIONS = {
