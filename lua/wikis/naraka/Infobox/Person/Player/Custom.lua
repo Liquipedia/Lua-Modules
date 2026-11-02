@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Math = Lua.import('Module:MathUtil')
 local String = Lua.import('Module:StringUtils')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
@@ -25,7 +26,7 @@ local ConditionUtil = Condition.Util
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
-local CURRENT_YEAR = tonumber(os.date('%Y'))
+local CURRENT_YEAR = tonumber(os.date('!%Y', DateExt.getCurrentTimestamp()))
 
 -- T1 and T2 tournament champions
 local CHAMPION_CONDITIONS = {
@@ -35,7 +36,12 @@ local CHAMPION_CONDITIONS = {
 }
 
 ---@class NarakaInfoboxPlayer: InfoboxPerson
+---@operator call(Frame): NarakaInfoboxPlayer
 local CustomPlayer = Class.new(Player)
+
+---@class NarakaInfoboxPlayerWidgetInjector: WidgetInjector
+---@operator call(NarakaInfoboxPlayer): NarakaInfoboxPlayerWidgetInjector
+---@field caller NarakaInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
