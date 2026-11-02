@@ -421,15 +421,92 @@ a.cf {
 	&-ru {
 		width: 20%; // for dota2gameru
 	}
-} // Spellcard Target/Affect/Damage ( TAD )
 
-.spelltad_value {
-	flex: 1 0 auto;
-	display: inline-block;
-	padding-left: 0.3125rem;
-	font-size: 90%; // convert to rem
-	vertical-align: top;
-}
+	&_value {
+		flex: 1 0 auto;
+		display: inline-block;
+		padding-left: 0.3125rem;
+		font-size: 90%; // convert to rem
+		vertical-align: top;
+	} // keeping &_value for backwards compatibility
+
+	&_mainBox {
+		margin-top: 0.3125rem;
+		padding: 0.3125rem 0.3125rem 0 0.3125rem;
+		display: flex;
+		flex-direction: column;
+	}
+
+	&_titleBox {
+		border-bottom: 0.0625rem solid #333333;
+		margin-bottom: 0.3125rem;
+		background: linear-gradient( -90deg, #2f4f35 -20%, #333333 -20%, #333333 -20%, #2f4f35 ) 90%;
+		padding: 0.1875rem;
+	} // this is used along with facetBox.
+
+	&_title {
+		font-weight: bold;
+		text-shadow: 0 0.125rem 0.25rem rgba( 0, 0, 0, 0.8 );
+		color: #e2e2e6;
+		font-size: 85%;
+	}
+
+	&_titleProperties {
+		padding-left: 0.125rem;
+	}
+
+	&_cell {
+		background-color: rgba( 77, 116, 85, 0.8 );
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		text-align: left;
+		margin-top: 0;
+		margin-bottom: 0.3125rem;
+		padding: 0.3125rem;
+		border: 0.0625rem solid #505050;
+		width: 100%;
+	}
+
+	&_cellHead {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		width: 4.0625rem;
+		max-width: 4.0625rem;
+		font-weight: bold;
+		color: #ffffff;
+		font-size: 85%;
+	}
+
+	&_cellPairs {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		flex-shrink: 0;
+		box-sizing: border-box;
+	}
+
+	&_Box {
+		display: inline-flex;
+		align-items: center;
+		font-size: 85%;
+		line-height: 1.2;
+	}
+
+	&_iconBox {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	&_iconBracket {
+		color: #ffffff;
+		display: inline-flex;
+		align-items: center;
+	}
+} // Spellcard Target/Affect/Damage (TAD)
 
 .spelldesc {
 	border-top: 0.0625rem solid #333333;

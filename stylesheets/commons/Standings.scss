@@ -1,6 +1,18 @@
 .standings-ffa,
 .standings-swiss,
 .standings-group {
+	.table2__table :is( td, th ) {
+		padding-inline: 0.25rem;
+
+		&:first-child {
+			padding-left: 0.625rem;
+		}
+
+		&:last-child {
+			padding-right: 0.5rem;
+		}
+	}
+
 	tr[ data-position-status ] {
 		position: relative;
 
@@ -20,7 +32,7 @@
 			left: 0;
 			top: 0;
 			bottom: 0;
-			width: 0.25rem;
+			width: 0.375rem;
 			background-color: var( --placement-row-color );
 		}
 
@@ -107,29 +119,49 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.5rem;
+
+		> :first-child {
+			min-width: 0;
+		}
+
+		> .generic-label {
+			flex-shrink: 0;
+		}
+	}
+}
+
+.standings-group {
+	@media ( max-width: 435px ) {
+		width: 100% !important;
+		max-width: 100% !important;
 	}
 }
 
 .standings-round-history {
-	width: fit-content;
-	max-width: 100%;
-	display: flex;
-	flex-flow: column nowrap;
-	gap: 0.5rem;
+	display: contents;
+
+	@media ( max-width: 435px ) {
+		width: fit-content;
+		max-width: 100%;
+		display: flex;
+		flex-flow: column nowrap;
+		gap: 0.5rem;
+	}
 
 	.standings-round-history-controls {
-		display: flex;
-		gap: 0.5rem;
+		display: contents;
 
-		.dropdown-box {
-			&-wrapper {
-				width: fit-content;
+		@media ( width > 435px ) {
+			display: flex;
+			gap: 0.5rem;
+			padding-bottom: 0.5rem;
+
+			.dropdown-widget {
+				max-width: 16.25rem;
 			}
 
-			&-visible {
-				display: flex;
-				flex-flow: column nowrap;
-				width: 100%;
+			.switch-toggle-label {
+				text-wrap: nowrap;
 			}
 		}
 	}

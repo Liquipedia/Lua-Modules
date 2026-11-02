@@ -16,10 +16,10 @@ local SwissStandings = Lua.import('Module:Widget/Standings/Swiss')
 local Standings = Lua.import('Module:Standings')
 local StringUtils = Lua.import('Module:StringUtils')
 
----@param props {pageName: string, standingsIndex: integer?, width: number?}
+---@param props {pageName: string?, standingsIndex: integer?, standings: StandingsModel?, width: number?}
 ---@return VNode?
 local function StandingsWidget(props)
-	local standings = Standings.getStandingsTable(props.pageName, props.standingsIndex)
+	local standings = props.standings or Standings.getStandingsTable(props.pageName, props.standingsIndex)
 	if not standings then
 		return
 	end

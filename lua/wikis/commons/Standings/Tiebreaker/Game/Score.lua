@@ -41,6 +41,9 @@ function TiebreakerGameScore:display(state, opponent)
 			games.w - overtimeGames.w, overtimeGames.w, overtimeGames.l, games.l - overtimeGames.l
 		}, ' - ')
 	end
+	if self:showsDraws('game') then
+		return games.w .. ' - ' .. games.d .. ' - ' .. games.l
+	end
 	return games.w .. ' - ' .. games.l
 end
 

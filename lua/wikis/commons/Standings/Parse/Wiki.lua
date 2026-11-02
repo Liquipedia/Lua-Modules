@@ -36,6 +36,11 @@ local DEFAULT_POINTS = {
 local DEFAULT_OVERTIME_POINTS = {w = 3, d = 1.5, l = 0, otw = 2, otl = 1}
 local RESULT_POINTS_KEYS = {win = 'w', draw = 'd', loss = 'l', otwin = 'otw', otloss = 'otl'}
 local OVERTIME_POINTS_KEYS = {otw = true, otl = true}
+local ADJUSTMENT_RECORDS = {
+	match = {w = 'matchwins', d = 'matchdraws', l = 'matchlosses'},
+	game = {w = 'gamewins', d = 'gamedraws', l = 'gamelosses'},
+	round = {w = 'roundwins', l = 'roundlosses'},
+}
 
 --[[
 {{FfaStandings|title=League Standings
@@ -137,11 +142,9 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, res
 		else
 			specialStatus = input
 		end
-		local tiebreakerPoints = numberOfRounds == i and tonumber(opponentData.tiebreaker) or nil
 		table.insert(rounds, {
 			scoreboard = {points = points},
 			specialstatus = specialStatus,
-			tiebreakerPoints = tiebreakerPoints,
 		})
 	end
 
@@ -165,6 +168,7 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, res
 		startingPoints = opponentData.startingpoints,
 		disqualifiedFromRound = StandingsParseWiki.parseDisqualifiedFromRound(opponentData.dq),
 		definiteStatuses = StandingsParseWiki.parseDefiniteStatuses(opponentData, numberOfRounds),
+		adjustments = StandingsParseWiki.parseAdjustments(opponentData, numberOfRounds),
 	}
 end
 
@@ -191,6 +195,28 @@ function StandingsParseWiki.parseDefiniteStatuses(opponentData, numberOfRounds)
 		statuses[round] = Logic.nilIfEmpty(opponentData['r' .. round .. 'bg'])
 	end
 	return Logic.nilIfEmpty(statuses)
+end
+
+---Reads the manual adjustments of an opponent, keyed by the round they apply from.
+---`r<round><input>` applies from that round onwards, an unprefixed input from the final round.
+---@param opponentData table
+---@param numberOfRounds integer
+---@return table<integer, StandingsAdjustment>?
+function StandingsParseWiki.parseAdjustments(opponentData, numberOfRounds)
+	local adjustments = {}
+	for round = 1, numberOfRounds do
+		local function read(input)
+			return tonumber(opponentData['r' .. round .. input])
+				or (round == numberOfRounds and tonumber(opponentData[input]) or nil)
+		end
+		adjustments[round] = Logic.nilIfEmpty(Table.merge(
+			{points = read('points'), tiebreaker = read('tiebreaker')},
+			Table.mapValues(ADJUSTMENT_RECORDS, function(inputs)
+				return Logic.nilIfEmpty(Table.mapValues(inputs, read))
+			end)
+		))
+	end
+	return Logic.nilIfEmpty(adjustments)
 end
 
 ---@param input string

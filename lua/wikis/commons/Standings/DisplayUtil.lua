@@ -55,6 +55,13 @@ function StandingsDisplayUtil.roundsToShow(standings)
 	return math.max(StandingsDisplayUtil.lastStartedRound(standings), 1)
 end
 
+---Whether to show each participant's placement change since the previous round, only with more than one round.
+---@param standings StandingsModel
+---@return boolean
+function StandingsDisplayUtil.showPlacementChange(standings)
+	return #standings.rounds > 1
+end
+
 ---@param standings StandingsModel
 ---@return boolean
 function StandingsDisplayUtil.hasFutureRounds(standings)

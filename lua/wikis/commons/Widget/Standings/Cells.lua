@@ -16,10 +16,17 @@ local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 local StandingsCells = {}
 
+local PARTICIPANT_WIDTH = '15rem'
+
 ---@param text string?
 ---@return Renderable
 function StandingsCells.header(text)
 	return TableWidgets.CellHeader{children = text}
+end
+
+---@return table
+function StandingsCells.participantColumn()
+	return {align = 'left', width = PARTICIPANT_WIDTH, maxWidth = PARTICIPANT_WIDTH}
 end
 
 ---@param statsToShow StandingsAdditionalStat[]

@@ -37,38 +37,39 @@ describe('Standings Storage', function()
 		stubLpdbStandingsTable:revert()
 	end)
 
-	it('skips lpdb but keeps page variables when storeLpdb is false', function()
-		local Json = require('Module:Json')
-		local Variables = require('Module:Variables')
+	it('skips lpdb but still returns the records when storeLpdb is false', function()
 		local stubLpdb = stub(mw.ext.LiquipediaDB, "lpdb", {})
 		local stubLpdbStandingsTable = stub(mw.ext.LiquipediaDB, "lpdb_standingstable")
 		local stubLpdbStandingsEntry = stub(mw.ext.LiquipediaDB, "lpdb_standingsentry")
 
-		StandingsStorage.run({
+		local standingsTable, entries = StandingsStorage.run({
 			standingsindex = 0,
 			title = '',
 			type = 'swiss',
 			entries = {
 				{opponent = {type = 'literal', name = 'Alpha'}, roundindex = 1, slotindex = 1, placement = 1},
 			},
-		}, {saveVars = true, storeLpdb = false})
+		}, {storeLpdb = false})
 
 		assert.stub(stubLpdbStandingsTable).was_not.called()
 		assert.stub(stubLpdbStandingsEntry).was_not.called()
-		local stored = Json.parse(Variables.varDefault('standings2_0'))
-		assert.are_equal(1, #stored.entries)
+		---@cast standingsTable -nil
+		---@cast entries -nil
+		assert.are_equal('swiss', standingsTable.type)
+		assert.are_equal(1, #entries)
 
 		stubLpdb:revert()
 		stubLpdbStandingsTable:revert()
 		stubLpdbStandingsEntry:revert()
 	end)
 
-	it('stores a party opponent with an entry per round in page variables', function()
-		local Json = require('Module:Json')
-		local Variables = require('Module:Variables')
+	it('stores a party opponent with an entry per round', function()
+		local stubLpdb = stub(mw.ext.LiquipediaDB, "lpdb", {})
+		local stubLpdbStandingsTable = stub(mw.ext.LiquipediaDB, "lpdb_standingstable")
+		local stubLpdbStandingsEntry = stub(mw.ext.LiquipediaDB, "lpdb_standingsentry")
 		local opponent = {type = 'solo', players = {{pageName = 'Alpha', displayName = 'Alpha'}}}
 
-		StandingsStorage.run({
+		local _, entries = StandingsStorage.run({
 			standingsindex = 0,
 			title = '',
 			type = 'swiss',
@@ -76,11 +77,15 @@ describe('Standings Storage', function()
 				{opponent = opponent, roundindex = 1, slotindex = 1, placement = 1},
 				{opponent = opponent, roundindex = 2, slotindex = 1, placement = 1},
 			},
-		}, {saveVars = true, storeLpdb = false})
+		})
 
-		local stored = Json.parse(Variables.varDefault('standings2_0'))
-		assert.are_equal(2, #stored.entries)
-		assert.are_equal('Alpha', stored.entries[2].opponentplayers.p1)
+		assert.stub(stubLpdbStandingsEntry).was.called(2)
+		---@cast entries -nil
+		assert.are_equal('Alpha', entries[2].opponentplayers.p1)
+
+		stubLpdb:revert()
+		stubLpdbStandingsTable:revert()
+		stubLpdbStandingsEntry:revert()
 	end)
 
 	describe('table', function()

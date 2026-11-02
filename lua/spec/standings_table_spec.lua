@@ -86,4 +86,43 @@ describe('Standings Table from template', function()
 			StandingsTable.fromTemplate{tabletype = 'league'}
 		end)
 	end)
+
+	describe('tiebreaker reset', function()
+		local StandingsParser = require('Module:Standings/Parser')
+
+		before_each(function()
+			spy.on(StandingsParser, 'parse')
+		end)
+
+		after_each(function()
+			---@diagnostic disable-next-line: undefined-field
+			StandingsParser.parse:revert()
+		end)
+
+		---@param tiebreakerReset string?
+		---@return boolean?
+		local function parsedTiebreakerReset(tiebreakerReset)
+			StandingsTable.fromTemplate{
+				tabletype = 'group',
+				import = 'false',
+				tiebreakerreset = tiebreakerReset,
+				round1 = {started = 'true', finished = 'true'},
+				{type = 'literal', name = 'Alpha', r1 = '3'},
+			}
+			---@diagnostic disable-next-line: undefined-field
+			return StandingsParser.parse.calls[1].vals[8].tiebreakerReset
+		end
+
+		it('passes the tiebreakerreset input to the parser', function()
+			assert.is_true(parsedTiebreakerReset('true'))
+		end)
+
+		it('does not reset when tiebreakerreset is disabled', function()
+			assert.is_false(parsedTiebreakerReset('false'))
+		end)
+
+		it('does not reset by default', function()
+			assert.is_false(parsedTiebreakerReset(nil))
+		end)
+	end)
 end)

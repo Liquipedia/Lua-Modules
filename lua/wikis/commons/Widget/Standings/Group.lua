@@ -41,8 +41,8 @@ local function StandingsGroup(props)
 		title = Logic.nilIfEmpty(standings.title),
 		columns = WidgetUtil.collect(
 			{align = 'center'},
-			Helpers.showPlacementChange(standings) and {align = 'center'} or nil,
-			{align = 'left'},
+			StandingsDisplayUtil.showPlacementChange(standings) and {align = 'center'} or nil,
+			StandingsCells.participantColumn(),
 			StandingsCells.statColumns(statsToShow)
 		),
 		children = WidgetUtil.collect(
@@ -73,19 +73,13 @@ local function StandingsGroup(props)
 end
 
 ---@param standings StandingsModel
----@return boolean
-function Helpers.showPlacementChange(standings)
-	return #standings.rounds > 1
-end
-
----@param standings StandingsModel
 ---@param statsToShow StandingsAdditionalStat[]
 ---@return Renderable
 function Helpers.headerRow(standings, statsToShow)
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
 			StandingsCells.header('#'),
-			Helpers.showPlacementChange(standings) and StandingsCells.header() or nil,
+			StandingsDisplayUtil.showPlacementChange(standings) and StandingsCells.header() or nil,
 			StandingsCells.header('Participant'),
 			StandingsCells.statHeaders(statsToShow)
 		)}
@@ -107,7 +101,7 @@ Helpers.RoundBody = Component.component(function(props)
 			},
 			children = WidgetUtil.collect(
 				StandingsCells.placement(slot),
-				Helpers.showPlacementChange(standings) and TableWidgets.Cell{
+				StandingsDisplayUtil.showPlacementChange(standings) and TableWidgets.Cell{
 					children = PlacementChange{change = slot.positionChangeFromPreviousRound}
 				} or nil,
 				StandingsCells.participant(slot),

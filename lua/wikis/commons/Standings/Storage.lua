@@ -58,7 +58,9 @@ local STORAGE_TYPE = {group = 'league'}
 ---@field extradata table
 
 ---@param data table
----@param options? {saveVars?: boolean, storeLpdb?: boolean}
+---@param options? {storeLpdb?: boolean}
+---@return table? standingsTable
+---@return table[]? entries
 function StandingsStorage.run(data, options)
 	if Table.isEmpty(data) then
 		return
@@ -68,34 +70,17 @@ function StandingsStorage.run(data, options)
 		Array.map(data.entries, function (entry) return tonumber (entry.roundindex) end),
 		math.max)
 
-	-- An opponent has an entry for every round, all with the same opponent struct.
-	-- saveVars passes all entries to PHP at once, and Scribunto refuses a table that shows up in there
-	-- more than once, so each entry gets its own copy of the players.
-	local opponentStruct = FnUtil.memoize(Opponent.toLpdbStruct)
-	local toLpdbStruct = function(opponent)
-		local struct = opponentStruct(opponent)
-		if not struct.opponentplayers then
-			return struct
-		end
-		return Table.merge(struct, {opponentplayers = Table.copy(struct.opponentplayers)})
-	end
+	-- An opponent has an entry for every round, all with the same opponent struct
+	local toLpdbStruct = FnUtil.memoize(Opponent.toLpdbStruct)
 	local entries = Array.map(data.entries, function (entry)
 		return StandingsStorage.entry(entry, data.standingsindex, toLpdbStruct)
 	end)
 
-	local storeLpdb = StandingsStorage.shouldStoreLpdb(options)
-	local saveVars = options and options.saveVars
-	if not storeLpdb and not saveVars then
-		return
-	end
-
 	local standingsTable = StandingsStorage.table(data)
-	if storeLpdb then
+	if StandingsStorage.shouldStoreLpdb(options) then
 		StandingsStorage.saveLpdb(standingsTable, entries)
 	end
-	if saveVars then
-		StandingsStorage.saveVars(standingsTable, entries)
-	end
+	return standingsTable, entries
 end
 
 ---@param data table
@@ -216,36 +201,6 @@ function StandingsStorage.saveLpdb(standingsTable, standingsEntries)
 			Json.stringifySubTables(entry)
 		)
 	end)
-end
-
----@param standingsTable table?
----@param standingsEntries table[]?
-function StandingsStorage.saveVars(standingsTable, standingsEntries)
-	if standingsTable then
-		-- We have a full standings here for storage, very simple
-		-- Entries may be supplied later
-		local wikiVariable = 'standings2_' .. standingsTable.standingsindex
-		Variables.varDefine(wikiVariable, Json.stringify({
-			standings = standingsTable,
-			entries = standingsEntries or {},
-		}))
-	elseif standingsEntries and standingsEntries[1] then
-		-- Entry that was supplied later on
-		local wikiVariable = 'standings2_' .. standingsEntries[1].standingsindex
-		local standings = Json.parseIfString(Variables.varDefault(wikiVariable))
-		if not standings then
-			mw.log('Could not store standings entry in wiki variables, unable to locate the standings table')
-			return
-		end
-		if not standings.entries then
-			mw.log('Could not store standings entry in wiki variables, invalid format')
-			return
-		end
-		for _, entry in ipairs(standingsEntries) do
-			table.insert(standings.entries, entry)
-		end
-		Variables.varDefine(wikiVariable, Json.stringify(standings))
-	end
 end
 
 ---@param options? {storeLpdb?: boolean}

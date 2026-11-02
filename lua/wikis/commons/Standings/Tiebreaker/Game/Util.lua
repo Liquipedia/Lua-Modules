@@ -59,15 +59,18 @@ local countPlayedGames = TiebreakerMatchCounter.create(
 ---Games of the matches, walkovers count as `walkoverGames` games won by the winner and lost by the loser.
 ---@param opponent TiebreakerOpponent
 ---@param walkoverGames number? # Defaults to 0, so walkovers do not count towards the games
----@return {games: integer, w: integer, l: integer}
+---@return {games: integer, w: integer, d: integer, l: integer}
 function TiebreakerGameUtil.getGames(opponent, walkoverGames)
 	local counts = countPlayedGames(opponent)
-	local walkoverWins = counts.walkover.w * (walkoverGames or 0)
-	local walkoverLosses = counts.walkover.l * (walkoverGames or 0)
+	local adjustment = opponent.gameAdjustment or {}
+	local wins = counts.w + counts.walkover.w * (walkoverGames or 0) + (adjustment.w or 0)
+	local draws = adjustment.d or 0
+	local losses = counts.games - counts.w + counts.walkover.l * (walkoverGames or 0) + (adjustment.l or 0)
 	return {
-		games = counts.games + walkoverWins + walkoverLosses,
-		w = counts.w + walkoverWins,
-		l = counts.games - counts.w + walkoverLosses,
+		games = wins + draws + losses,
+		w = wins,
+		d = draws,
+		l = losses,
 	}
 end
 

@@ -16,7 +16,6 @@ local Namespace = Lua.import('Module:Namespace')
 local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
-local Variables = Lua.import('Module:Variables')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Tournament = Lua.import('Module:Tournament')
@@ -69,25 +68,14 @@ local Standings = {}
 ---@field specialStatus 'dq'|'nc'|'' # nc = non-competing (not in the round)
 ---@field disqualified boolean
 ---@field additionalStatsValues table<string, {value: StandingsTiebreakerValue?, display: string?}>
----@field package record standingsentry
+---@field package matchId string?
 
----Fetches a standings table from a page. Tries to read from page variables before fetching from LPDB.
+---Fetches a standings table of a page from LPDB.
 ---@param pagename string
 ---@param standingsIndex integer #0-index'd on per page
 ---@return StandingsModel?
 function Standings.getStandingsTable(pagename, standingsIndex)
-	local pageNameInCorrectFormat = Page.pageifyLink(pagename)
-	local myPageName = string.gsub(mw.title.getCurrentTitle().text, ' ', '_')
-
-	if pageNameInCorrectFormat == myPageName then
-		local varData = Variables.varDefault('standings2_' .. standingsIndex)
-		if varData then
-			local standings = Json.parseStringified(varData)
-			return Standings.standingsFromRecord(standings.standings, standings.entries)
-		end
-	end
-
-	local namespaceName, basePageName = Page.splitPageName(pageNameInCorrectFormat)
+	local namespaceName, basePageName = Page.splitPageName(Page.pageifyLink(pagename))
 
 	local record = mw.ext.LiquipediaDB.lpdb('standingstable', {
 		conditions = tostring(Condition.Tree(Condition.BooleanOperator.all):add{
@@ -168,7 +156,7 @@ function Standings.entryFromRecord(record)
 		positionChangeFromPreviousRound = tonumber(record.placementchange),
 		additionalStatsValues = record.extradata.additionalStatsValues or {},
 		matchOpponentIndex = tonumber(record.extradata.matchopponentindex),
-		record = record,
+		matchId = record.extradata.matchid,
 	}
 
 	-- Some properties are derived from other properties and we can calculate them when accessed.
@@ -180,7 +168,7 @@ end
 ---@param standings StandingsModel
 ---@return MatchGroupUtilMatch[]
 function Standings.fetchMatches(standings)
-	local matchids = standings.record.matches or {}
+	local matchids = Json.parseIfString(standings.record.matches) or {}
 	local bracketIds = Array.unique(Array.map(matchids, function(matchid)
 		return MatchGroupUtil.splitMatchId(matchid)
 	end))
@@ -195,7 +183,7 @@ end
 ---@param entry StandingsEntryModel
 ---@return MatchGroupUtilMatch?
 function Standings.fetchMatch(entry)
-	local matchid = entry.record.extradata.matchid
+	local matchid = entry.matchId
 	if not matchid then
 		return
 	end
@@ -235,15 +223,26 @@ end
 function Standings.makeRounds(standings)
 	local record = standings.record
 	local standingsEntries = standings.entryRecords
+	-- Release each record once its entry is built
+	standings.entryRecords = {}
 
 	local roundCount = Array.maxBy(Array.map(standingsEntries, function(entry)
 		return tonumber(entry.roundindex) or 1 end), FnUtil.identity)
 
+	---@type table<integer, StandingsEntryModel[]>
+	local entriesByRound = {}
+	for index, entryRecord in ipairs(standingsEntries) do
+		local roundIndex = tonumber(entryRecord.roundindex)
+		if roundIndex then
+			entriesByRound[roundIndex] = entriesByRound[roundIndex] or {}
+			table.insert(entriesByRound[roundIndex], Standings.entryFromRecord(entryRecord))
+		end
+		standingsEntries[index] = nil
+	end
+
 	return Array.mapRange(1, roundCount or 1, function(roundIndex)
-		local roundEntries = Array.filter(standingsEntries, function(entry)
-			return tonumber(entry.roundindex) == roundIndex
-		end)
-		local opponents = Array.sortBy(Array.map(roundEntries, Standings.entryFromRecord), Operator.property('position'))
+		local opponents = entriesByRound[roundIndex] or {}
+		Array.sortInPlaceBy(opponents, Operator.property('position'))
 		return {
 			round = roundIndex,
 			opponents = opponents,

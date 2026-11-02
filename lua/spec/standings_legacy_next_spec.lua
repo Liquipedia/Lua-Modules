@@ -46,7 +46,7 @@ describe('Standings Legacy Next', function()
 			}, 1)
 
 			assert.are_equal('alpha old;alpha older', opponents[1].aliases)
-			assert.are_equal('3', opponents[1].startingpoints)
+			assert.are_equal('3', opponents[1].r1points)
 			assert.are_equal('2', opponents[1].tiebreaker)
 			assert.are_equal('bravo old', opponents[2].aliases)
 		end)
