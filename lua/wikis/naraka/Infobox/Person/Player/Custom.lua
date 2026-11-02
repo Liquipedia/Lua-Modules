@@ -69,6 +69,8 @@ end
 ---@param widgets Renderable[]
 ---@return Renderable[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
 	if id == 'custom' then
 		local currentYearEarnings = self.caller.earningsPerYear[CURRENT_YEAR] or 0
 
@@ -82,6 +84,13 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Cell{
 			name = 'Approx. Earnings ' .. CURRENT_YEAR,
 			children = {currentYearEarningsDisplay},
+		})
+	elseif id == 'region' then
+		return {}
+	elseif id == 'history' then
+		table.insert(widgets, Cell{
+			name = 'Retired',
+			children = {args.retired},
 		})
 	end
 
