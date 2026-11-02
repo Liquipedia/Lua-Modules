@@ -62,11 +62,10 @@ end
 local function isLiteralAscii(pattern, plain)
 	if pattern == '' or not isAscii(pattern) then
 		return false
-	elseif plain == true then
+	elseif plain then
 		return true
 	end
-	return not plain and (not string.find(pattern, '[%^%$%(%)%%%.%[%]%*%+%-%?]')
-		or string.find(pattern, '^[%*%+%-%?]$') ~= nil)
+	return not string.find(pattern, '[%^%$%(%)%%%.%[%]%*%+%-%?]') or string.find(pattern, '^[%*%+%-%?]$') ~= nil
 end
 
 ---Same as `mw.text.split`, without its PHP callbacks (two per item) for a separator of literal ASCII characters.
@@ -75,8 +74,7 @@ end
 ---@param plain boolean?
 ---@return string[]
 function String.splitText(text, pattern, plain)
-	if type(text) ~= 'string' or not isLiteralAscii(pattern, plain)
-		or not isAscii(text) and not mw.ustring.isutf8(text) then
+	if not isLiteralAscii(pattern, plain) or not isAscii(text) and not mw.ustring.isutf8(text) then
 		return mw.text.split(text, pattern, plain)
 	end
 	local items = {}

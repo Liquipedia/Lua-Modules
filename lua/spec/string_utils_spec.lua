@@ -73,6 +73,11 @@ describe('logic', function()
 			assert.are_same({'Åsa', 'à', '日本', '\194\160'}, String.splitText('Åsa|à|日本|\194\160', '|'))
 		end)
 
+		it('splits numbers like mw.text.split', function()
+			---@diagnostic disable-next-line: param-type-mismatch
+			assert.are_same({'1', '5'}, String.splitText(1.5, '.', true))
+		end)
+
 		it('matches mw.text.split', function()
 			local inputs = allStrings({' ', ',', '-', ';', '|', 'a', '\194\160', 'à'}, 4)
 			for _, sep in ipairs{',', '-', ';;', '|'} do
