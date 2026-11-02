@@ -41,6 +41,7 @@ local MATCH_COLUMNS = {'match2id', 'match2opponents', 'bestof', 'date', 'dateexa
 ---@param options StandingsImportOptions?
 ---@return StandingTableOpponentData[]
 ---@return table<integer, MatchPhase[]>
+---@return integer maxBestOf # Of all matches of the rounds, including those without an opponent of the standings
 function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponents, options)
 	local matchIds = Array.flatMap(rounds, function(round)
 		return round.matches
@@ -48,7 +49,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 
 	-- No Matches, cannot import
 	if #matchIds == 0 then
-		return {}, {}
+		return {}, {}, 0
 	end
 
 	local matchIdToRound = {}
@@ -71,6 +72,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 	local opponents = {}
 	---@type table<string, MatchPhase>
 	local phaseByMatchId = {}
+	local maxBestOf = 0
 	local lookupOpponent = StandingsParseLpdb.makeOpponentLookup(manualOpponents, options and options.importOpponents)
 	local includeGames = options and (options.includeGames or options.overtime)
 	Lpdb.executeMassQuery(
@@ -87,6 +89,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 			record.match2games = record.match2games or {}
 			local match2 = MatchGroupUtil.matchFromRecord(record)
 			phaseByMatchId[record.match2id] = match2.phase
+			maxBestOf = math.max(maxBestOf, match2.bestof or 0)
 			StandingsParseLpdb.parseMatch(
 				matchIdToRound[record.match2id], match2, opponents, scoreMapper, #rounds, lookupOpponent, options
 			)
@@ -130,7 +133,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 		}
 	end)
 
-	return importedOpponents, matchPhasesByRound
+	return importedOpponents, matchPhasesByRound, maxBestOf
 end
 
 ---Builds the condition for fetching the matches. LPDB gets slow on a condition with many match ids

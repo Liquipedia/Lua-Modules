@@ -26,6 +26,7 @@ local StandingsParser = {}
 ---@field walkoverGames integer? Games a walkover counts as in the game tiebreakers, unset means not counted
 ---@field walkoverRounds integer? Rounds a walkover map counts as in the round tiebreakers, unset means not counted
 ---@field tiebreakerReset boolean? Whether groups split by a tiebreaker start over from the first tiebreaker
+---@field maxBestOf integer? The highest bestof of the matches of the rounds
 
 ---@param carried table
 ---@param record table?
@@ -37,16 +38,14 @@ end
 
 ---Whether the game stats repeat the match stats: every match is a Bo1 (or Bo0) and the records are equal.
 ---@param entries TiebreakerOpponent[]
----@param walkoverGames number?
+---@param options StandingsParserOptions
 ---@return boolean
-local function gameStatsRepeatMatchStats(entries, walkoverGames)
-	local onlySingleGames = Array.all(entries, function(entry)
-		return Array.all(entry.matches, function(match)
-			return (match.bestof or 0) <= 1
-		end)
-	end)
-	return onlySingleGames and Array.all(entries, function(entry)
-		local games = TiebreakerGameUtil.getGames(entry, walkoverGames)
+local function gameStatsRepeatMatchStats(entries, options)
+	if (options.maxBestOf or 0) > 1 then
+		return false
+	end
+	return Array.all(entries, function(entry)
+		local games = TiebreakerGameUtil.getGames(entry, options.walkoverGames)
 		local matches = TiebreakerMatchUtil.getMatches(entry)
 		return games.w == matches.w and games.d == matches.d and games.l == matches.l
 	end)
@@ -157,7 +156,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		walkoverGames = options.walkoverGames,
 		walkoverRounds = options.walkoverRounds,
 	}
-	local gameStatsUseMatchColumns = gameStatsRepeatMatchStats(entries, options.walkoverGames)
+	local gameStatsUseMatchColumns = gameStatsRepeatMatchStats(entries, options)
 
 	---@param tiebreakerId string
 	---@return StandingsAdditionalStat

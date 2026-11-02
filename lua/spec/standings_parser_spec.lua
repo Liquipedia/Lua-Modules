@@ -1398,8 +1398,7 @@ describe('Standings Parser', function()
 		local ONE_FINISHED_ROUND = {{roundNumber = 1, started = true, finished = true}}
 
 		---Alpha and Bravo play each other in every match
-		---@param matchSpecs {scoreA: integer, scoreB: integer, bestof: integer?, finished: boolean?,
-		---walkover: boolean?}[]
+		---@param matchSpecs {scoreA: integer, scoreB: integer, finished: boolean?, walkover: boolean?}[]
 		---@return table[]
 		local function makeOpponents(matchSpecs)
 			local matches = Array.map(matchSpecs, function(spec, matchIndex)
@@ -1412,7 +1411,6 @@ describe('Standings Parser', function()
 				end
 				return {
 					matchId = 'M' .. matchIndex,
-					bestof = spec.bestof,
 					finished = spec.finished ~= false,
 					winner = winner,
 					opponents = {
@@ -1455,9 +1453,9 @@ describe('Standings Parser', function()
 
 		it('shows the match stats in place of the game stats when every match is a Bo1', function()
 			local standingsTable = parse(makeOpponents{
-				{scoreA = 1, scoreB = 0, bestof = 1},
-				{scoreA = 0, scoreB = 1, bestof = 1},
-			}, TIEBREAKERS_WITH_COLUMN)
+				{scoreA = 1, scoreB = 0},
+				{scoreA = 0, scoreB = 1},
+			}, TIEBREAKERS_WITH_COLUMN, {maxBestOf = 1})
 
 			assert.are_same(MATCH_COLUMNS, columnTitles(standingsTable))
 			assert.are_same(
@@ -1466,7 +1464,7 @@ describe('Standings Parser', function()
 			)
 		end)
 
-		it('treats matches without a bestof as Bo1', function()
+		it('treats an unset bestof as Bo1', function()
 			local standingsTable = parse(makeOpponents{{scoreA = 1, scoreB = 0}}, TIEBREAKERS_WITH_COLUMN)
 
 			assert.are_same(MATCH_COLUMNS, columnTitles(standingsTable))
@@ -1478,17 +1476,17 @@ describe('Standings Parser', function()
 			assert.are_same(GAME_COLUMNS, columnTitles(standingsTable))
 		end)
 
-		it('keeps the game columns while a Bo3 match is upcoming', function()
+		it('keeps the game columns when any match is a Bo3, even an upcoming one', function()
 			local standingsTable = parse(makeOpponents{
-				{scoreA = 1, scoreB = 0, bestof = 1},
-				{scoreA = 0, scoreB = 0, bestof = 3, finished = false},
-			}, TIEBREAKERS_WITH_COLUMN)
+				{scoreA = 1, scoreB = 0},
+				{scoreA = 0, scoreB = 0, finished = false},
+			}, TIEBREAKERS_WITH_COLUMN, {maxBestOf = 3})
 
 			assert.are_same(GAME_COLUMNS, columnTitles(standingsTable))
 		end)
 
 		it('keeps the game columns for a walkover that does not count as a game', function()
-			local opponents = makeOpponents{{scoreA = 1, scoreB = 0, bestof = 1, walkover = true}}
+			local opponents = makeOpponents{{scoreA = 1, scoreB = 0, walkover = true}}
 
 			assert.are_same(GAME_COLUMNS, columnTitles(parse(opponents, TIEBREAKERS_WITH_COLUMN)))
 			assert.are_same(MATCH_COLUMNS, columnTitles(parse(opponents, TIEBREAKERS_WITH_COLUMN, {walkoverGames = 1})))
@@ -1497,8 +1495,8 @@ describe('Standings Parser', function()
 		it('compares the match record including overtime', function()
 			-- Alpha won the second match in overtime
 			local opponents = makeOpponents{
-				{scoreA = 1, scoreB = 0, bestof = 1},
-				{scoreA = 1, scoreB = 0, bestof = 1},
+				{scoreA = 1, scoreB = 0},
+				{scoreA = 1, scoreB = 0},
 			}
 			opponents[1].rounds[1].scoreboard.match = {w = 1, d = 0, l = 0}
 			opponents[1].rounds[1].scoreboard.overtime = {w = 1, l = 0}
@@ -1528,8 +1526,8 @@ describe('Standings Parser', function()
 
 		it('shows a game tiebreaker in the column of its match counterpart, but places by the tiebreaker', function()
 			local opponents = makeOpponents{
-				{scoreA = 1, scoreB = 0, bestof = 1},
-				{scoreA = 1, scoreB = 0, bestof = 1},
+				{scoreA = 1, scoreB = 0},
+				{scoreA = 1, scoreB = 0},
 			}
 			-- Tied on points, so the game diff decides
 			Array.forEach(opponents, function(opponentData) opponentData.rounds[1].scoreboard.points = 0 end)
