@@ -41,7 +41,7 @@ local MATCH_COLUMNS = {'match2id', 'match2opponents', 'bestof', 'date', 'dateexa
 ---@param options StandingsImportOptions?
 ---@return StandingTableOpponentData[]
 ---@return table<integer, MatchPhase[]>
----@return integer maxBestOf # Of all matches of the rounds, including those without an opponent of the standings
+---@return integer maxBestOf # Includes matches between tbd opponents
 function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponents, options)
 	local matchIds = Array.flatMap(rounds, function(round)
 		return round.matches
