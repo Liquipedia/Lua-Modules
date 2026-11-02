@@ -145,18 +145,14 @@
 	gap: 0.5rem;
 
 	.standings-round-history-controls {
-		display: flex;
-		gap: 0.5rem;
+		display: contents;
 
-		.dropdown-box {
-			&-wrapper {
-				width: fit-content;
-			}
+		@media ( width > 435px ) {
+			display: flex;
+			gap: 0.5rem;
 
-			&-visible {
-				display: flex;
-				flex-flow: column nowrap;
-				width: 100%;
+			.dropdown-widget {
+				max-width: 16.25rem;
 			}
 		}
 	}
