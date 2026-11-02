@@ -54,7 +54,7 @@ end
 ---@private
 ---@param standings StandingsModel
 ---@param statsToShow StandingsAdditionalStat[]
----@return table[]
+---@return Table2ColumnDef[]
 function Helpers.buildColumnDefinitions(standings, statsToShow)
 	return WidgetUtil.collect(
 		{align = 'left'},
