@@ -6,6 +6,13 @@ describe('Standings Tiebreaker HeadToHead', function()
 
 	local tiebreaker = TiebreakerFactory.tiebreakerFromId('h2hcs.matchdiff')
 
+	-- One table per standings opponent, which the matches refer to like the standings import does
+	local literals = {}
+	local function literal(name)
+		literals[name] = literals[name] or {type = 'literal', name = name}
+		return literals[name]
+	end
+
 	---@param result {[1]: string, [2]: string, draw: boolean?, unfinished: boolean?}
 	---@param index integer
 	---@return table
@@ -19,6 +26,7 @@ describe('Standings Tiebreaker HeadToHead', function()
 				{type = 'literal', name = result[1], status = 'S', placement = 1},
 				{type = 'literal', name = result[2], status = 'S', placement = isDraw and 1 or 2},
 			},
+			standingsOpponents = {literal(result[1]), literal(result[2])},
 			games = {},
 		}
 	end
@@ -32,7 +40,7 @@ describe('Standings Tiebreaker HeadToHead', function()
 		local matches = Array.map(results, makeMatch)
 		return Array.map(names, function(name)
 			return {
-				opponent = {type = 'literal', name = name},
+				opponent = literal(name),
 				points = 0,
 				matches = Array.filter(matches, function(match)
 					return match.opponents[1].name == name or match.opponents[2].name == name

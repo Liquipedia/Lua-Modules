@@ -207,7 +207,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 	StandingsParser.setPlacementChange(entries)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer,
 	---points: number, placement: integer?, slotindex: integer, placementchange: integer?,
-	---matches: MatchGroupUtilMatch[]?, matchPoints: table<string, number>?}[]
+	---matches: StandingsTiebreakerMatch[]?, matchPoints: table<string, number>?}[]
 
 	StandingsParser.addStatuses(entries, bgs, 'currentstatus')
 	if isFinished then

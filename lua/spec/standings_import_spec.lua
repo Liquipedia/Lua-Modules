@@ -502,6 +502,39 @@ describe('Standings import from matches', function()
 		assert.are_equal(2, findOpponent(opponents, 'Wolves Esports').rounds[1].matchOpponentIndex)
 	end)
 
+	it('records the standings opponent of every opponent of a match', function()
+		stubMatchQuery{
+			match2Record{matchId = 'M1', winner = 1, opponents = {
+				{template = 'team liquid 2023', name = 'Team Liquid', score = 2, placement = 1},
+				{template = 'tt9 esports 2022', name = 'TT9 Esports', score = 0, placement = 2},
+			}},
+			match2Record{matchId = 'M2', winner = 1, opponents = {
+				{template = 'tt9 esports 2022', name = 'TT9 Esports', score = 2, placement = 1},
+				{template = 'heroic', name = 'Heroic', score = 1, placement = 2},
+			}},
+		}
+
+		local opponents = StandingsParseLpdb.importFromMatches({
+			{roundNumber = 1, matches = {'M1'}},
+			{roundNumber = 2, matches = {'M2'}},
+		}, swissScoreMapper, {
+			{
+				aliases = {{template = 'team liquid 2023', name = 'Team Liquid', type = 'team', extradata = {}}},
+				opponent = {template = 'heroic', name = 'Heroic', type = 'team', extradata = {}},
+			},
+		}, {importOpponents = true})
+
+		local heroic = findOpponent(opponents, 'Heroic')
+		local tt9 = findOpponent(opponents, 'TT9 Esports')
+		local matchOne, matchTwo = unpack(heroic.rounds[2].matches)
+		-- The alias Team Liquid is Heroic in the standings
+		assert.are_equal(heroic.opponent, matchOne.standingsOpponents[1])
+		assert.are_equal(tt9.opponent, matchOne.standingsOpponents[2])
+		-- Every match of an opponent refers to the same standings opponent
+		assert.are_equal(tt9.opponent, matchTwo.standingsOpponents[1])
+		assert.are_equal(heroic.opponent, matchTwo.standingsOpponents[2])
+	end)
+
 	describe('queried columns', function()
 		local rounds = {{roundNumber = 1, matches = {'M1'}}, {roundNumber = 2, matches = {'M2', 'M3'}}}
 

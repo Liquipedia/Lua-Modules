@@ -3,8 +3,11 @@ describe('Standings Tiebreakers', function()
 	local TiebreakerFactory = require('Module:Standings/Tiebreaker/Factory')
 	local Array = require('Module:Array')
 
+	-- One table per standings opponent, which the matches refer to like the standings import does
+	local literals = {}
 	local function literal(name)
-		return {type = 'literal', name = name}
+		literals[name] = literals[name] or {type = 'literal', name = name}
+		return literals[name]
 	end
 
 	---@param name string
@@ -48,6 +51,7 @@ describe('Standings Tiebreakers', function()
 			finished = props.finished ~= false,
 			winner = props.winner,
 			opponents = matchOpponents,
+			standingsOpponents = Array.map(opponentNames, literal),
 			games = props.games or {},
 		}
 	end
@@ -281,41 +285,34 @@ describe('Standings Tiebreakers', function()
 	describe('members', function()
 		local TiebreakerMembers = require('Module:Standings/Tiebreaker/Members')
 
-		it('finds the member of each state that a match opponent is', function()
+		it('finds the member of each state that a standings opponent is', function()
 			local alpha, bravo = opponent('Alpha'), opponent('Bravo')
 			local nextRoundBravo = opponent('Bravo')
-			nextRoundBravo.opponent = bravo.opponent
-			local matchOpponent = literal('Bravo')
 
-			assert.are_equal(bravo, TiebreakerMembers.find({alpha, bravo}, matchOpponent))
-			assert.are_equal(nextRoundBravo, TiebreakerMembers.find({alpha, nextRoundBravo}, matchOpponent))
+			assert.are_equal(bravo, TiebreakerMembers.find({alpha, bravo}, literal('Bravo')))
+			assert.are_equal(nextRoundBravo, TiebreakerMembers.find({alpha, nextRoundBravo}, literal('Bravo')))
 		end)
 
 		it('finds nothing for opponents that are not part of the state', function()
 			local alpha, bravo = opponent('Alpha'), opponent('Bravo')
-			local matchOpponent = literal('Bravo')
 
-			assert.are_equal(bravo, TiebreakerMembers.find({alpha, bravo}, matchOpponent))
-			assert.is_nil(TiebreakerMembers.find({alpha}, matchOpponent))
+			assert.is_nil(TiebreakerMembers.find({alpha}, literal('Bravo')))
 			assert.is_nil(TiebreakerMembers.find({alpha, bravo}, literal('Charlie')))
-			assert.are_equal(bravo, TiebreakerMembers.find({alpha, bravo}, matchOpponent))
 		end)
 
-		it('finds the index of an opponent in a match by sameness, not by identity', function()
+		it('finds the index of a standings opponent in a match', function()
 			local match = makeMatch({'Alpha', 'Bravo'})
 			assert.are_equal(1, TiebreakerMembers.opponentIndex(match, literal('Alpha')))
 			assert.are_equal(2, TiebreakerMembers.opponentIndex(match, literal('Bravo')))
-			assert.are_equal(2, TiebreakerMembers.opponentIndex(match, literal('Bravo')))
+			assert.are_equal(0, TiebreakerMembers.opponentIndex(match, literal('Charlie')))
 		end)
 
-		it('has index 0 for an opponent that is not part of the match', function()
-			assert.are_equal(0, TiebreakerMembers.opponentIndex(makeMatch({'Alpha', 'Bravo'}), literal('Charlie')))
-		end)
-
-		it('compares match opponents with standings opponents', function()
-			local bravo = literal('Bravo')
-			assert.is_true(TiebreakerMembers.isSame(literal('Bravo'), bravo))
-			assert.is_false(TiebreakerMembers.isSame(literal('Charlie'), bravo))
+		it('only knows a match by the standings opponents the import resolved it to', function()
+			-- Another standings opponent of the same team, e.g. listed twice, is not part of the match
+			local match = makeMatch({'Alpha', 'Bravo'})
+			local otherBravo = {type = 'literal', name = 'Bravo'}
+			assert.are_equal(0, TiebreakerMembers.opponentIndex(match, otherBravo))
+			assert.is_nil(TiebreakerMembers.find({opponent('Alpha'), {opponent = otherBravo}}, match.standingsOpponents[2]))
 		end)
 	end)
 

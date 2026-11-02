@@ -27,7 +27,7 @@ end
 ---The points are nil if none of the matches gave the opponent points.
 ---With overtime, results of overtime matches are tallied apart, so `match` only holds regulation results.
 ---@param opponent standardOpponent
----@param matches MatchGroupUtilMatch[]
+---@param matches StandingsTiebreakerMatch[]
 ---@param matchPoints table<string, number>?
 ---@param overtime boolean?
 ---@return {points: number?, match: {w: integer, d: integer, l: integer}, overtime: {w: integer, l: integer}?}
@@ -62,32 +62,17 @@ end
 ---@param tiedOpponents TiebreakerOpponent[]
 ---@return TiebreakerOpponent[]
 function TiebreakerScope.restrictTo(tiedOpponents)
-	-- A match is in the matches of each of its opponents, so its opponents are looked up more than once
-	---@type table<standardOpponent, boolean>
-	local isTiedByMatchOpponent = {}
-
-	---@param matchOpponent standardOpponent
-	---@return boolean
-	local function isTied(matchOpponent)
-		if isTiedByMatchOpponent[matchOpponent] ~= nil then
-			return isTiedByMatchOpponent[matchOpponent]
-		end
-		local tied = false
-		for _, tiedOpponent in ipairs(tiedOpponents) do
-			if TiebreakerMembers.isSame(matchOpponent, tiedOpponent.opponent) then
-				tied = true
-				break
-			end
-		end
-		isTiedByMatchOpponent[matchOpponent] = tied
-		return tied
+	---@type table<standardOpponent, true>
+	local isTied = {}
+	for _, tiedOpponent in ipairs(tiedOpponents) do
+		isTied[tiedOpponent.opponent] = true
 	end
 
-	---@param match MatchGroupUtilMatch
+	---@param match StandingsTiebreakerMatch
 	---@return boolean
 	local function isAmongTied(match)
-		for _, matchOpponent in ipairs(match.opponents) do
-			if not isTied(matchOpponent) then
+		for _, standingsOpponent in ipairs(match.standingsOpponents) do
+			if not isTied[standingsOpponent] then
 				return false
 			end
 		end

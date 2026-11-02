@@ -38,8 +38,8 @@ function TiebreakerBuchholz:opponentScores(state, opponent)
 		if not match.finished then
 			return
 		end
-		Array.forEach(match.opponents, function(matchOpponent)
-			local member = TiebreakerMembers.find(state, matchOpponent)
+		Array.forEach(match.standingsOpponents, function(standingsOpponent)
+			local member = TiebreakerMembers.find(state, standingsOpponent)
 			if not member or member == selfMember then
 				return
 			end

@@ -3,6 +3,13 @@ describe('Standings Tiebreaker Scope', function()
 	local TiebreakerScope = require('Module:Standings/Tiebreaker/Scope')
 	local Array = require('Module:Array')
 
+	-- One table per standings opponent, which the matches refer to like the standings import does
+	local literals = {}
+	local function literal(name)
+		literals[name] = literals[name] or {type = 'literal', name = name}
+		return literals[name]
+	end
+
 	---@param names string[]
 	---@param props {id: string, winner: integer?, finished: boolean?}
 	---@return table
@@ -19,6 +26,7 @@ describe('Standings Tiebreaker Scope', function()
 					placement = (props.winner == 0 or props.winner == index) and 1 or 2,
 				}
 			end),
+			standingsOpponents = Array.map(names, literal),
 			games = {},
 		}
 	end
@@ -29,7 +37,7 @@ describe('Standings Tiebreaker Scope', function()
 	---@return table
 	local function makeOpponent(name, matches, matchPoints)
 		return {
-			opponent = {type = 'literal', name = name},
+			opponent = literal(name),
 			points = 100,
 			startingPoints = 10,
 			matches = matches,
@@ -53,7 +61,7 @@ describe('Standings Tiebreaker Scope', function()
 
 	describe('tally', function()
 		it('sums the points of all matches and the record of the finished ones', function()
-			local alpha = {type = 'literal', name = 'Alpha'}
+			local alpha = literal('Alpha')
 			local scoreboard = TiebreakerScope.tally(alpha, {
 				makeMatch({'Alpha', 'Bravo'}, {id = 'M1', winner = 1}),
 				makeMatch({'Charlie', 'Alpha'}, {id = 'M2', winner = 1}),
@@ -65,7 +73,7 @@ describe('Standings Tiebreaker Scope', function()
 		end)
 
 		it('has no points if no match gave points', function()
-			local alpha = {type = 'literal', name = 'Alpha'}
+			local alpha = literal('Alpha')
 			local match = makeMatch({'Alpha', 'Bravo'}, {id = 'M1', winner = 1})
 
 			assert.are_same({match = {w = 1, d = 0, l = 0}}, TiebreakerScope.tally(alpha, {match}, nil))
@@ -180,7 +188,7 @@ describe('Standings Tiebreaker Scope', function()
 		end
 
 		it('tallies overtime results apart from regulation results', function()
-			local alpha = {type = 'literal', name = 'Alpha'}
+			local alpha = literal('Alpha')
 			local scoreboard = TiebreakerScope.tally(alpha, {
 				makeBo1({'Alpha', 'Bravo'}, {id = 'M1', winner = 1}, {7, 3}),
 				makeBo1({'Alpha', 'Charlie'}, {id = 'M2', winner = 1}, {8, 6}),
@@ -193,7 +201,7 @@ describe('Standings Tiebreaker Scope', function()
 		end)
 
 		it('does not tally overtime when it is not enabled', function()
-			local alpha = {type = 'literal', name = 'Alpha'}
+			local alpha = literal('Alpha')
 			local scoreboard = TiebreakerScope.tally(alpha, {
 				makeBo1({'Alpha', 'Bravo'}, {id = 'M1', winner = 1}, {8, 6}),
 			}, nil)
