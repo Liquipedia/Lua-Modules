@@ -138,11 +138,15 @@
 }
 
 .standings-round-history {
-	width: fit-content;
-	max-width: 100%;
-	display: flex;
-	flex-flow: column nowrap;
-	gap: 0.5rem;
+	display: contents;
+
+	@media ( max-width: 435px ) {
+		width: fit-content;
+		max-width: 100%;
+		display: flex;
+		flex-flow: column nowrap;
+		gap: 0.5rem;
+	}
 
 	.standings-round-history-controls {
 		display: contents;
@@ -150,9 +154,14 @@
 		@media ( width > 435px ) {
 			display: flex;
 			gap: 0.5rem;
+			padding-bottom: 0.5rem;
 
 			.dropdown-widget {
 				max-width: 16.25rem;
+			}
+
+			.switch-toggle-label {
+				text-wrap: nowrap;
 			}
 		}
 	}
