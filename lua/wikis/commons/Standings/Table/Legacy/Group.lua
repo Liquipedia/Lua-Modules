@@ -79,7 +79,7 @@ local MATCH_RESULT_POINTS = {
 function StandingTableLegacyGroup.classic(frame)
 	local args = Arguments.getArgs(frame)
 
-	local legacyRounds = StandingTableLegacyGroup.parseRounds(args, os.time())
+	local legacyRounds = StandingTableLegacyGroup.parseRounds(args, DateExt.getCurrentTimestamp())
 	local matchesByRound = StandingTableLegacyGroup.groupMatchesByRound(
 		legacyRounds, StandingTableLegacyNext.fetchMatches(args)
 	)
