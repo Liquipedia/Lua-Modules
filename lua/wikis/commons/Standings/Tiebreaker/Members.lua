@@ -8,14 +8,36 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
 local Table = Lua.import('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local TiebreakerMembers = {}
 
--- Comparing opponents can take team template lookups, and tiebreakers look up the same match opponents in every
--- round. All rounds share the standings opponents, so the standings opponent of a match opponent is remembered.
+---Whether a match opponent is the given standings opponent. Cached, as every round compares the same opponents again
+---and comparing different opponents can take team template lookups.
+---@param matchOpponent standardOpponent
+---@param opponent standardOpponent
+---@return boolean
+TiebreakerMembers.isSame = FnUtil.memoize2(function(matchOpponent, opponent)
+	return Opponent.same(opponent, matchOpponent)
+end)
+
+---Index of the opponent in the match, 0 if it is not part of it.
+---@param match MatchGroupUtilMatch
+---@param opponent standardOpponent
+---@return integer
+function TiebreakerMembers.opponentIndex(match, opponent)
+	for index, matchOpponent in ipairs(match.opponents) do
+		if TiebreakerMembers.isSame(matchOpponent, opponent) then
+			return index
+		end
+	end
+	return 0
+end
+
+-- All rounds share the standings opponents, so the standings opponent of a match opponent is remembered
 ---@type table<standardOpponent, standardOpponent>
 local standingsOpponentByMatchOpponent = setmetatable({}, {__mode = 'k'})
 ---@type table<TiebreakerOpponent[], table<standardOpponent, TiebreakerOpponent>>
@@ -40,7 +62,7 @@ function TiebreakerMembers.find(state, matchOpponent)
 	end
 
 	local member = Array.find(state, function(stateMember)
-		return Opponent.same(matchOpponent, stateMember.opponent)
+		return TiebreakerMembers.isSame(matchOpponent, stateMember.opponent)
 	end)
 	if member then
 		standingsOpponentByMatchOpponent[matchOpponent] = member.opponent

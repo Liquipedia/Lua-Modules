@@ -300,6 +300,23 @@ describe('Standings Tiebreakers', function()
 			assert.is_nil(TiebreakerMembers.find({alpha, bravo}, literal('Charlie')))
 			assert.are_equal(bravo, TiebreakerMembers.find({alpha, bravo}, matchOpponent))
 		end)
+
+		it('finds the index of an opponent in a match by sameness, not by identity', function()
+			local match = makeMatch({'Alpha', 'Bravo'})
+			assert.are_equal(1, TiebreakerMembers.opponentIndex(match, literal('Alpha')))
+			assert.are_equal(2, TiebreakerMembers.opponentIndex(match, literal('Bravo')))
+			assert.are_equal(2, TiebreakerMembers.opponentIndex(match, literal('Bravo')))
+		end)
+
+		it('has index 0 for an opponent that is not part of the match', function()
+			assert.are_equal(0, TiebreakerMembers.opponentIndex(makeMatch({'Alpha', 'Bravo'}), literal('Charlie')))
+		end)
+
+		it('compares match opponents with standings opponents', function()
+			local bravo = literal('Bravo')
+			assert.is_true(TiebreakerMembers.isSame(literal('Bravo'), bravo))
+			assert.is_false(TiebreakerMembers.isSame(literal('Charlie'), bravo))
+		end)
 	end)
 
 	describe('medianbuchholz', function()
