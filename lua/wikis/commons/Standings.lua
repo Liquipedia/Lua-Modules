@@ -68,7 +68,7 @@ local Standings = {}
 ---@field specialStatus 'dq'|'nc'|'' # nc = non-competing (not in the round)
 ---@field disqualified boolean
 ---@field additionalStatsValues table<string, {value: StandingsTiebreakerValue?, display: string?}>
----@field package record standingsentry
+---@field package matchId string?
 
 ---Fetches a standings table of a page from LPDB.
 ---@param pagename string
@@ -156,7 +156,7 @@ function Standings.entryFromRecord(record)
 		positionChangeFromPreviousRound = tonumber(record.placementchange),
 		additionalStatsValues = record.extradata.additionalStatsValues or {},
 		matchOpponentIndex = tonumber(record.extradata.matchopponentindex),
-		record = record,
+		matchId = record.extradata.matchid,
 	}
 
 	-- Some properties are derived from other properties and we can calculate them when accessed.
@@ -183,7 +183,7 @@ end
 ---@param entry StandingsEntryModel
 ---@return MatchGroupUtilMatch?
 function Standings.fetchMatch(entry)
-	local matchid = entry.record.extradata.matchid
+	local matchid = entry.matchId
 	if not matchid then
 		return
 	end
@@ -223,15 +223,26 @@ end
 function Standings.makeRounds(standings)
 	local record = standings.record
 	local standingsEntries = standings.entryRecords
+	-- Release each record once its entry is built
+	standings.entryRecords = {}
 
 	local roundCount = Array.maxBy(Array.map(standingsEntries, function(entry)
 		return tonumber(entry.roundindex) or 1 end), FnUtil.identity)
 
+	---@type table<integer, StandingsEntryModel[]>
+	local entriesByRound = {}
+	for index, entryRecord in ipairs(standingsEntries) do
+		local roundIndex = tonumber(entryRecord.roundindex)
+		if roundIndex then
+			entriesByRound[roundIndex] = entriesByRound[roundIndex] or {}
+			table.insert(entriesByRound[roundIndex], Standings.entryFromRecord(entryRecord))
+		end
+		standingsEntries[index] = nil
+	end
+
 	return Array.mapRange(1, roundCount or 1, function(roundIndex)
-		local roundEntries = Array.filter(standingsEntries, function(entry)
-			return tonumber(entry.roundindex) == roundIndex
-		end)
-		local opponents = Array.sortBy(Array.map(roundEntries, Standings.entryFromRecord), Operator.property('position'))
+		local opponents = entriesByRound[roundIndex] or {}
+		Array.sortInPlaceBy(opponents, Operator.property('position'))
 		return {
 			round = roundIndex,
 			opponents = opponents,
