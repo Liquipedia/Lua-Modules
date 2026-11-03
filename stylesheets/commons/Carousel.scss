@@ -2,10 +2,7 @@
 	position: relative;
 
 	--carousel-face-width: 3rem;
-
-	.theme--light & {
-		--carousel-fade-color-default: var( --clr-background, #ffffff );
-	}
+	--carousel-fade-color-default: var( --clr-background, #ffffff );
 
 	.theme--dark & {
 		--carousel-fade-color-default: var( --clr-background, #121212 );
