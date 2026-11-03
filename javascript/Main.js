@@ -43,6 +43,7 @@ window.mw = window.mw || {
 // List of JavaScript modules to include
 const jsModules = [
 	'UseStrict',
+	'LazilyParsedTemplate',
 	'Core',
 	'Analytics',
 	'BattleRoyale',
