@@ -54,7 +54,12 @@ function CustomPlayer.run(frame)
 
 	args.achievements = Achievements.player{
 		noTemplate = true,
-		baseConditions = CHAMPION_CONDITIONS,
+		-- T1 and T2 tournament champions
+		baseConditions = ConditionTree(BooleanOperator.all):add{
+			ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Showmatch', 'Qualifier'}),
+			ConditionUtil.anyOf(ColumnName('liquipediatier'), {1, 2}),
+			ConditionNode(ColumnName('placement'), Comparator.eq, 1),
+		},
 	}
 
 	-- Uppercase first letter in status
