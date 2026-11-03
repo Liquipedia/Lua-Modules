@@ -30,7 +30,7 @@ LegendComponent.defaultProps = {
 }
 
 ---@param props table
----@return Widget
+---@return VNode
 function LegendComponent.render(props)
 	return GeneralCollapsible{
 		shouldCollapse = Logic.readBool(props.shouldCollapse),
