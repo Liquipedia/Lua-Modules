@@ -64,12 +64,8 @@ end
 ---@private
 ---@return VNode?
 function LegendComponent._createColorSection(props)
-	local sectionData = Json.parseIfString(props.color)
-	if Logic.isEmpty(sectionData) then
-		return
-	end
 	local labels = Array.map(LABEL_COLORS, function (labelColor)
-		local labelText = sectionData[labelColor]
+		local labelText = props[labelColor]
 		if Logic.isEmpty(labelText) then
 			return
 		end
