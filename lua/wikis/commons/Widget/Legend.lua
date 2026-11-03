@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 
 local Component = Lua.import('Module:Widget/Component')
@@ -30,11 +29,10 @@ LegendComponent.defaultProps = {
 }
 
 ---@param props table
----@return Widget
+---@return VNode
 function LegendComponent.render(props)
 	return GeneralCollapsible{
 		shouldCollapse = Logic.readBool(props.shouldCollapse),
-		collapseAreaClasses = {},
 		classes = {'legend'},
 		titleWidget = LegendComponent._createHeader(props),
 		children = WidgetUtil.collect(
@@ -64,12 +62,8 @@ end
 ---@private
 ---@return VNode?
 function LegendComponent._createColorSection(props)
-	local sectionData = Json.parseIfString(props.color)
-	if Logic.isEmpty(sectionData) then
-		return
-	end
 	local labels = Array.map(LABEL_COLORS, function (labelColor)
-		local labelText = sectionData[labelColor]
+		local labelText = props[labelColor]
 		if Logic.isEmpty(labelText) then
 			return
 		end
@@ -98,11 +92,7 @@ end
 ---@private
 ---@return VNode?
 function LegendComponent._createPointsSection(props)
-	local sectionData = Json.parseIfString(props.points)
-	if not sectionData then
-		return
-	end
-	local pointsText = sectionData[1] or sectionData.points
+	local pointsText = props.points
 	if Logic.isEmpty(pointsText) then
 		return
 	end

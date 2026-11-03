@@ -36,6 +36,7 @@ local VARIANT_CONFIG = {
 ---@field classes string[]?
 ---@field prefix Renderable|Renderable[]?
 ---@field label Renderable|Renderable[]?
+---@field updateLabel boolean?
 
 local defaultProps = {
 	alignRight = false,
@@ -81,6 +82,7 @@ local function DropdownContainer(props)
 
 	return Div{
 		classes = Array.extend({'dropdown-widget', 'dropdown-widget--' .. props.variant}, props.classes),
+		attributes = props.updateLabel and {['data-update-label'] = 'true'} or nil,
 		children = {
 			toggleButton,
 			Div{

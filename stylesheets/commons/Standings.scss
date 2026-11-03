@@ -138,25 +138,30 @@
 }
 
 .standings-round-history {
-	width: fit-content;
-	max-width: 100%;
-	display: flex;
-	flex-flow: column nowrap;
-	gap: 0.5rem;
+	display: contents;
+
+	@media ( max-width: 435px ) {
+		width: fit-content;
+		max-width: 100%;
+		display: flex;
+		flex-flow: column nowrap;
+		gap: 0.5rem;
+	}
 
 	.standings-round-history-controls {
-		display: flex;
-		gap: 0.5rem;
+		display: contents;
 
-		.dropdown-box {
-			&-wrapper {
-				width: fit-content;
+		@media ( width > 435px ) {
+			display: flex;
+			gap: 0.5rem;
+			padding-bottom: 0.5rem;
+
+			.dropdown-widget {
+				max-width: 16.25rem;
 			}
 
-			&-visible {
-				display: flex;
-				flex-flow: column nowrap;
-				width: 100%;
+			.switch-toggle-label {
+				text-wrap: nowrap;
 			}
 		}
 	}
