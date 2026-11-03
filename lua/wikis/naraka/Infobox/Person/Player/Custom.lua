@@ -29,13 +29,6 @@ local Cell = Widgets.Cell
 
 local CURRENT_YEAR = tonumber(os.date('!%Y', DateExt.getCurrentTimestamp()))
 
--- T1 and T2 tournament champions
-local CHAMPION_CONDITIONS = {
-	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Showmatch', 'Qualifier'}),
-	ConditionUtil.anyOf(ColumnName('liquipediatier'), {1, 2}),
-	ConditionNode(ColumnName('placement'), Comparator.eq, 1),
-}
-
 ---@class NarakaInfoboxPlayer: InfoboxPerson
 ---@operator call(Frame): NarakaInfoboxPlayer
 local CustomPlayer = Class.new(Player)
