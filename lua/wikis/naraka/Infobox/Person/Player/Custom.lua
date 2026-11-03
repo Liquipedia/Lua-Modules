@@ -18,6 +18,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local ColumnName = Condition.ColumnName
