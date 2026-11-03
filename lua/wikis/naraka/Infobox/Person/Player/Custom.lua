@@ -8,8 +8,8 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
-local Math = Lua.import('Module:MathUtil')
 local String = Lua.import('Module:StringUtils')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
@@ -26,7 +26,7 @@ local ConditionUtil = Condition.Util
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
-local CURRENT_YEAR = DateExt.getYearOf()
+local CURRENT_YEAR = tonumber(os.date('!%Y', DateExt.getCurrentTimestamp()))
 
 -- T1 and T2 tournament champions
 local CHAMPION_CONDITIONS = {
@@ -78,8 +78,7 @@ function CustomInjector:parse(id, widgets)
 			return widgets
 		end
 
-		local currentYearEarningsDisplay =
-			'$' .. mw.getContentLanguage():formatNum(Math.round(currentYearEarnings))
+		local currentYearEarningsDisplay = '$' .. Currency.formatMoney(currentYearEarnings, 0)
 
 		table.insert(widgets, Cell{
 			name = 'Approx. Earnings ' .. CURRENT_YEAR,
@@ -99,8 +98,9 @@ end
 
 ---@param lpdbData table
 ---@param args table
+---@param personType string
 ---@return table
-function CustomPlayer:adjustLPDB(lpdbData, args)
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	if String.isNotEmpty(args.team2) then
 		lpdbData.extradata.team2 = TeamTemplate.getPageName(args.team2)
 	end
