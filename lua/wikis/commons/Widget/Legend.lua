@@ -93,11 +93,7 @@ end
 ---@private
 ---@return VNode?
 function LegendComponent._createPointsSection(props)
-	local sectionData = Json.parseIfString(props.points)
-	if not sectionData then
-		return
-	end
-	local pointsText = sectionData[1] or sectionData.points
+	local pointsText = props.points
 	if Logic.isEmpty(pointsText) then
 		return
 	end

@@ -11,7 +11,7 @@ insulate('Widget/Legend', function()
 			stay = 'Lorem ipsum stay',
 			staydown = 'Lorem ipsum staydown',
 			down = 'Lorem ipsum down',
-			points = {'Lorem ipsum points'},
+			points = 'Lorem ipsum points',
 			showMinimum = true,
 			showNumberSection = true,
 		}))
