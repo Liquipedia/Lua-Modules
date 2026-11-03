@@ -28,7 +28,7 @@ local ConditionUtil = Condition.Util
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
-local CURRENT_YEAR = tonumber(os.date('!%Y', DateExt.getCurrentTimestamp()))
+local CURRENT_YEAR = DateExt.getYearOf()
 
 ---@class NarakaInfoboxPlayer: InfoboxPerson
 ---@operator call(Frame): NarakaInfoboxPlayer
