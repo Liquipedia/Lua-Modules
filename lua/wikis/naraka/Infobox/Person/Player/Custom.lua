@@ -20,6 +20,7 @@ local Player = Lua.import('Module:Infobox/Person')
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
+local BooleanOperator = Condition.BooleanOperator
 local Comparator = Condition.Comparator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
@@ -55,11 +56,6 @@ function CustomPlayer.run(frame)
 			ConditionNode(ColumnName('placement'), Comparator.eq, 1),
 		},
 	}
-
-	-- Uppercase first letter in status
-	if args.status then
-		args.status = mw.getContentLanguage():ucfirst(args.status)
-	end
 
 	return player:createInfobox()
 end
