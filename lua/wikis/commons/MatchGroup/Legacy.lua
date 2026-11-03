@@ -594,6 +594,16 @@ function MatchGroupLegacy._generateMap(map)
 	return '{{Map' .. MatchGroupLegacy._argsToString(map) .. '}}'
 end
 
+---@param arr any[]
+---@return string
+function MatchGroupLegacy._arrayToString(arr)
+	local buffer = {'{{Json'}
+	Array.forEach(arr, function (element)
+		table.insert(buffer, type(element) == 'table' and MatchGroupLegacy._argsToString(element) or element)
+	end)
+	return table.concat(buffer, '|') .. '}}'
+end
+
 ---@param args table
 ---@return string
 function MatchGroupLegacy._argsToString(args)
@@ -613,7 +623,11 @@ function MatchGroupLegacy._argsToString(args)
 		value = Json.parseIfTable(value) or value
 		local val
 		if type(value) == 'table' and Logic.isNotEmpty(value) then
-			val = '{{Json' .. MatchGroupLegacy._argsToString(value) .. '}}'
+			if Array.isArray(value) then
+				val = MatchGroupLegacy._arrayToString(value)
+			else
+				val = '{{Json' .. MatchGroupLegacy._argsToString(value) .. '}}'
+			end
 		elseif type(value) ~= 'table' then
 			val = tostring(value)
 		end
