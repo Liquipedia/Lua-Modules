@@ -2,7 +2,7 @@
  * Template(s): MatchPage
  ******************************************************************************/
 liquipedia.matchpage = {
-	init: function() {
+	init: async function() {
 		if ( mw.config.get( 'wgUserId' ) === null ) {
 			return;
 		} else if ( mw.config.get( 'wgPostEdit' ) === null ) {
@@ -18,19 +18,19 @@ liquipedia.matchpage = {
 		if ( !bracketPage ) {
 			return;
 		}
-		mw.loader.using( [ 'mediawiki.api' ] ).then( () => {
-			const api = new mw.Api();
-			api.post( {
+		await mw.loader.using( [ 'mediawiki.api' ] );
+		const api = new mw.Api();
+		try {
+			await api.post( {
 				action: 'purge',
 				format: 'json',
 				titles: bracketPage,
 				forcelinkupdate: true
-			} ).then( () => {
-				mw.notify( 'Tournament page purged' );
-			} ).catch( () => {
-				mw.notify( 'Tournament page purge failed' );
 			} );
-		} );
+			mw.notify( 'Tournament page purged' );
+		} catch {
+			mw.notify( 'Tournament page purge failed' );
+		}
 	}
 };
 liquipedia.core.modules.push( 'matchpage' );
