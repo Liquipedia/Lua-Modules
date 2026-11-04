@@ -190,7 +190,6 @@ function MatchTable:_readOpponents(mode)
 	local inputs = self:_readOpponentInputsFromBase(base)
 
 	if Logic.isEmpty(inputs) then
-		assert(self.title.namespace == 0, 'Required ' .. base .. '= argument')
 		table.insert(inputs, self.title.rootText)
 	end
 
@@ -410,6 +409,16 @@ function MatchTable:buildAdditionalConditions()
 	getOrCondition('liquipediatier', args.tier)
 	getOrCondition('game', args.game)
 
+	local tournamentInputs = Array.extractValues(Table.filterByKey(args, function(key)
+		return key:find('^tournament%d*$') ~= nil
+	end))
+	if Logic.isEmpty(tournamentInputs) and Logic.isNotEmpty(args.tournaments) then
+		tournamentInputs = Array.parseCommaSeparatedString(args.tournaments)
+	end
+	if Logic.isNotEmpty(tournamentInputs) then
+		conditions:add(ConditionUtil.anyOf(ColumnName('pagename'), tournamentInputs))
+	end
+
 	if Logic.isNotEmpty(args.bestof) then
 		conditions:add(ConditionNode(ColumnName('bestof'), Comparator.eq, args.bestof))
 	end
@@ -495,10 +504,14 @@ function MatchTable:resultFromRecord(record)
 		indexes = {2, 1}
 		flipped = true
 		winner = winner == 2 and 1 or winner == 1 and 2 or winner
-	else
+	elseif Logic.isNotEmpty(aliases) then
 		mw.ext.TeamLiquidIntegration.add_category('MatchesTables with invalid matches')
 		mw.logObject(record)
 		return
+	else
+		-- No team/player was specified to filter by, so there is no "our side" to
+		-- resolve to. Display the match in its natural order instead of discarding it.
+		indexes = {1, 2}
 	end
 
 	local gameOpponents = Array.map(record.games, Operator.property('opponents'))
