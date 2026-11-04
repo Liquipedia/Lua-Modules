@@ -292,7 +292,7 @@ function StandingTableLegacyGroup.parseTeamInput(args, teamIndex, rounds)
 	}, parseOpponentRoundInputs(args, teamIndex, rounds))
 end
 
----Legacy `player<N>` or `p<N>`, with `flag`, `link` and `race` suffixes
+---Legacy `player<N>` or `p<N>`, with `flag` and `link` suffixes
 ---@param args table
 ---@param playerIndex integer
 ---@param rounds LegacyGroupRound[]
@@ -311,7 +311,6 @@ function StandingTableLegacyGroup.parseSoloInput(args, playerIndex, rounds)
 		player,
 		flag = read('flag'),
 		link = read('link'),
-		faction = read('race'),
 	}, parseOpponentRoundInputs(args, playerIndex, rounds))
 end
 

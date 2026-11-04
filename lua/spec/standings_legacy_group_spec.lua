@@ -158,21 +158,20 @@ describe('Standings Legacy Group', function()
 	describe('solo input', function()
 		local rounds = {{index = 1, endTime = 100}, {index = 0}}
 
-		it('reads player<N> and p<N> with their flag, link and race', function()
+		it('reads player<N> and p<N> with their flag and link', function()
 			local args = {
 				player1 = 'Alpha',
 				player1flag = 'se',
 				player1link = 'Alpha (player)',
 				p2 = 'Bravo',
 				p2flag = 'fi',
-				p2race = 'b',
 			}
 
 			local alpha = StandingTableLegacyGroup.parseSoloInput(args, 1, rounds)
 			assert.are_same({'solo', 'Alpha', 'se', 'Alpha (player)'}, {alpha.type, alpha[1], alpha.flag, alpha.link})
 
 			local bravo = StandingTableLegacyGroup.parseSoloInput(args, 2, rounds)
-			assert.are_same({'Bravo', 'fi', 'b'}, {bravo[1], bravo.flag, bravo.faction})
+			assert.are_same({'Bravo', 'fi'}, {bravo[1], bravo.flag})
 
 			assert.is_nil(StandingTableLegacyGroup.parseSoloInput(args, 3, rounds))
 		end)
