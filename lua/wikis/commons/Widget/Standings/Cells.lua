@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Logic = Lua.import('Module:Logic')
 
 local Label = Lua.import('Module:Widget/Basic/Label')
@@ -58,7 +59,11 @@ end
 ---@param slot StandingsEntryModel
 ---@return Renderable
 function StandingsCells.participant(slot)
-	return TableWidgets.Cell{children = Participant{opponent = slot.opponent, disqualified = slot.disqualified}}
+	return TableWidgets.Cell(
+		DisplayHelper.addOpponentHighlightToProps({
+			children = Participant{opponent = slot.opponent, disqualified = slot.disqualified}
+		}, slot.opponent) --[[@as Table2CellProps]]
+	)
 end
 
 ---@param slot StandingsEntryModel

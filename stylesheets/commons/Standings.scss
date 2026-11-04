@@ -128,6 +128,19 @@
 			flex-shrink: 0;
 		}
 	}
+
+	td.brkts-opponent-hover {
+		transition: 0.5s;
+		transition-property: border-color;
+
+		&-active {
+			box-shadow: -1px 0 2px rgba( 0, 0, 0, 0.7 ) inset, 1px 0 2px rgba( 0, 0, 0, 0.7 ) inset, 0 -1px 2px rgba( 0, 0, 0, 0.7 ) inset, 0 1px 2px rgba( 0, 0, 0, 0.7 ) inset !important;
+
+			.theme--dark & {
+				box-shadow: -1px 0 2px rgba( 255, 255, 255, 0.7 ) inset, 1px 0 2px rgba( 255, 255, 255, 0.7 ) inset, 0 -1px 2px rgba( 255, 255, 255, 0.7 ) inset, 0 1px 2px rgba( 255, 255, 255, 0.7 ) inset !important;
+			}
+		}
+	}
 }
 
 .standings-group {
