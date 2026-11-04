@@ -46,9 +46,10 @@ function DisplayHelper.addOpponentHighlight(node, opponent)
 		:attr('aria-label', Opponent.toName(opponent))
 end
 
----@param props HtmlNodeProps
+---@generic T: HtmlNodeProps
+---@param props T
 ---@param opponent standardOpponent
----@return HtmlNodeProps
+---@return T
 function DisplayHelper.addOpponentHighlightToProps(props, opponent)
 	if Opponent.isTbd(opponent) then
 		return props

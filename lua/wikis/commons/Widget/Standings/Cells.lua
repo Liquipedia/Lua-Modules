@@ -62,7 +62,7 @@ function StandingsCells.participant(slot)
 	return TableWidgets.Cell(
 		DisplayHelper.addOpponentHighlightToProps({
 			children = Participant{opponent = slot.opponent, disqualified = slot.disqualified}
-		}, slot.opponent) --[[@as Table2CellProps]]
+		}, slot.opponent)
 	)
 end
 
