@@ -13,11 +13,13 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local ResultsTable = Lua.import('Module:ResultsTable/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Template = Lua.import('Module:Template')
 local Tier = Lua.import('Module:Tier/Custom')
 
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
@@ -110,13 +112,20 @@ function NotabilityChecker._runForTeam(team)
 
 	local output = {
 		Html.H3{children = 'Team Results'},
-		'\n',
-		-- TODO: Replace with direct ResultsTable call
-		Template.safeExpand(
-			mw.getCurrentFrame(),
-			'NotabilityTeamMatchesTable',
-			{title = team}
-		),
+		GeneralCollapsible{
+			shouldCollapse = true,
+			title = {
+				'Tournaments found featuring ',
+				team,
+			},
+			children = ResultsTable.results{
+				awards = false,
+				achievements = false,
+				playerResultsOfTeam = false,
+				querytype = Opponent.team,
+				team = team,
+			}
+		},
 		'\n',
 		Html.B{children = 'Weight:'},
 		' ',
@@ -148,13 +157,31 @@ function NotabilityChecker._calculateRosterNotability(team, people)
 		local personWeight = NotabilityChecker._calculatePersonNotability(person)
 		Array.appendWith(
 			output,
-			'\n',
-			-- TODO: Replace with direct ResultsTable call
-			Template.safeExpand(
-				mw.getCurrentFrame(),
-				'NotabilityPlayerMatchesTable',
-				{title = person}
-			),
+			GeneralCollapsible{
+				shouldCollapse = true,
+				title = {
+					'Tournaments found featuring ',
+					person,
+				},
+				children = {
+					ResultsTable.results{
+						awards = false,
+						achievements = false,
+						playerResultsOfTeam = false,
+						playerLimit = MAX_NUMBER_OF_PARTICIPANTS,
+						querytype = Opponent.solo,
+						player = person,
+					},
+					ResultsTable.results{
+						awards = false,
+						achievements = false,
+						playerResultsOfTeam = false,
+						querytype = 'coach',
+						coachLimit = Config.MAX_NUMBER_OF_COACHES,
+						coach = person,
+					},
+				},
+			},
 			'\n',
 			Html.B{children = 'Person:'},
 			' ',
