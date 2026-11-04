@@ -87,8 +87,8 @@ describe('Standings Tiebreakers', function()
 
 		it('rejects non full contexts for tiebreakers not derived from matches among tied opponents', function()
 			local names = {
-				'buchholz', 'medianbuchholz', 'buchholzpoints', 'medianbuchholzpoints', 'sonnebornberger',
-				'manual', 'disqualified', 'startingpoints',
+				'buchholz', 'medianbuchholz', 'buchholzcutone', 'buchholzpoints', 'medianbuchholzpoints',
+				'buchholzcutonepoints', 'sonnebornberger', 'manual', 'disqualified', 'startingpoints',
 			}
 			Array.forEach(names, function(name)
 				assert.are_equal('full.' .. name, TiebreakerFactory.validateAndNormalizeInput(name))
@@ -98,12 +98,61 @@ describe('Standings Tiebreakers', function()
 			end)
 		end)
 
+		it('keeps the error messages of invalid inputs', function()
+			assert.has_error(function() TiebreakerFactory.validateAndNormalizeInput('h2h.points') end,
+				'Invalid tie breaker context: h2h')
+			assert.has_error(function() TiebreakerFactory.validateAndNormalizeInput('bogus') end,
+				'Invalid tiebreaker type: bogus')
+			assert.has_error(function() TiebreakerFactory.validateAndNormalizeInput('ml.bogus') end,
+				'Invalid tiebreaker type: ml.bogus')
+			assert.has_error(function() TiebreakerFactory.validateAndNormalizeInput('ml.buchholz') end,
+				'Tiebreaker "buchholz" cannot be used in the ml context, '
+					.. 'as it is not derived from the matches among the tied opponents')
+			assert.has_error(function() TiebreakerFactory.tiebreakerFromId('full.bogus') end,
+				'Invalid tiebreaker type: full.bogus')
+		end)
+
 		it('accepts the h2hcs, h2hlegacy and ml contexts for match based tiebreakers', function()
-			assert.are_equal('ml.matchdiff', TiebreakerFactory.validateAndNormalizeInput('ml.matchdiff'))
-			assert.are_equal('h2hlegacy.matchdiff', TiebreakerFactory.validateAndNormalizeInput('h2hlegacy.matchdiff'))
-			assert.are_equal('h2hcs.matchdiff', TiebreakerFactory.validateAndNormalizeInput('h2hcs.matchdiff'))
-			assert.are_equal('ml.gamediff', TiebreakerFactory.validateAndNormalizeInput('ml.gamediff'))
-			assert.are_equal('ml.matchscore', TiebreakerFactory.validateAndNormalizeInput('ml.matchscore'))
+			local names = {
+				'points', 'matchdiff', 'matchcount', 'matchwins', 'matchdraws', 'matchlosses', 'matchwinrate', 'matchscore',
+				'gamediff', 'gamecount', 'gamewins', 'gamelosses', 'gamewinrate', 'gamescore', 'gamediffregulation',
+				'roundwins', 'roundlosses', 'rounddiff', 'roundwinrate', 'roundscore',
+			}
+			Array.forEach(names, function(name)
+				Array.forEach({'full', 'ml', 'h2hlegacy', 'h2hcs'}, function(context)
+					local id = context .. '.' .. name
+					assert.are_equal(id, TiebreakerFactory.validateAndNormalizeInput(id))
+				end)
+			end)
+		end)
+
+		it('knows which tiebreakers read the games', function()
+			local readers = {'gamediffregulation', 'roundwins', 'roundlosses', 'rounddiff', 'roundwinrate', 'roundscore'}
+			Array.forEach(readers, function(name)
+				assert.is_true(TiebreakerFactory.readsGames('full.' .. name))
+				assert.is_true(TiebreakerFactory.readsGames('ml.' .. name))
+			end)
+			Array.forEach({'points', 'matchscore', 'gamediff', 'gamescore', 'buchholz', 'manual'}, function(name)
+				assert.is_false(TiebreakerFactory.readsGames('full.' .. name))
+			end)
+			assert.is_false(TiebreakerFactory.readsGames('full.bogus'))
+			assert.is_false(TiebreakerFactory.readsGames('roundwins'))
+		end)
+
+		it('knows which tiebreakers only depend on the record of the opponent', function()
+			local matchRecordOnly = {
+				'points', 'matchscore', 'matchwins', 'matchlosses', 'matchdiff', 'matchwinrate', 'matchcount', 'matchdraws',
+			}
+			Array.forEach(matchRecordOnly, function(name)
+				assert.is_true(TiebreakerFactory.isMatchRecordOnly('full.' .. name))
+				assert.is_false(TiebreakerFactory.isMatchRecordOnly('ml.' .. name))
+				assert.is_false(TiebreakerFactory.isMatchRecordOnly('h2hcs.' .. name))
+				assert.is_false(TiebreakerFactory.isMatchRecordOnly('h2hlegacy.' .. name))
+			end)
+			Array.forEach({'gamescore', 'gamediff', 'rounddiff', 'buchholz', 'sonnebornberger', 'manual'}, function(name)
+				assert.is_false(TiebreakerFactory.isMatchRecordOnly('full.' .. name))
+			end)
+			assert.is_false(TiebreakerFactory.isMatchRecordOnly('full.bogus'))
 		end)
 
 		it('exposes context', function()

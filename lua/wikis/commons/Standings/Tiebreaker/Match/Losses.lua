@@ -16,6 +16,8 @@ local TiebreakerMatchUtil = Lua.import('Module:Standings/Tiebreaker/Match/Util')
 ---@class TiebreakerMatchLosses : TiebreakerMatchScore
 local TiebreakerMatchLosses = Class.new(TiebreakerMatchScore)
 
+TiebreakerMatchLosses.matchRecordOnly = true
+
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
 ---@return integer
