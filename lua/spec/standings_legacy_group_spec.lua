@@ -213,9 +213,16 @@ describe('Standings Legacy Group', function()
 			assert.is_nil(walkoverRounds{})
 		end)
 
-		it('resets the tiebreakers if the wiki does', function()
-			assert.is_nil(StandingTableLegacyGroup.getStandardParameter({}, {}).tiebreakerreset)
-			assert.is_true(StandingTableLegacyGroup.getStandardParameter({}, {}, {tiebreakerReset = true}).tiebreakerreset)
+		it('resets the tiebreakers only with a h2hcs tiebreaker', function()
+			local config = StandingTableLegacyGroup.VALORANT_CONFIG
+			local function needsReset(args)
+				return StandingTableLegacyGroup.needsTiebreakerReset(StandingTableLegacyGroup.parseTiebreakers(args, config))
+			end
+			assert.is_true(needsReset{})
+			assert.is_true(needsReset{tiebreaker1 = 'series', tiebreaker2 = 'h2h series'})
+			assert.is_nil(needsReset{show_p = 'true'})
+			assert.is_nil(needsReset{tiebreaker1 = 'series', tiebreaker2 = 'h2h games', tiebreaker3 = 'diff'})
+			assert.is_nil(StandingTableLegacyGroup.needsTiebreakerReset(StandingTableLegacyGroup.parseTiebreakers{}))
 		end)
 	end)
 

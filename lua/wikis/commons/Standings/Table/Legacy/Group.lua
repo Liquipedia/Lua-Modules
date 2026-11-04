@@ -73,7 +73,6 @@ local MATCH_RESULT_POINTS = {
 ---@field tiebreakers table<string, string>? # Overrides of the tiebreaker mapping
 ---@field defaultTiebreakers string[]? # Legacy tiebreaker names
 ---@field defaultPointsTiebreakers string[]? # Legacy tiebreaker names, with `show_p`
----@field tiebreakerReset boolean?
 
 ---Valorant has its own tiebreakers, `diff` is the round difference
 ---@type LegacyGroupConfig
@@ -100,8 +99,6 @@ StandingTableLegacyGroup.VALORANT_CONFIG = {
 		'series', 'h2h series', 'h2h games', 'diff games', 'games won', 'h2h rounds', 'h2h rounds won', 'diff', 'rounds won',
 	},
 	defaultPointsTiebreakers = {'points'},
-	-- `h2h series` is applied again to the opponents it leaves tied
-	tiebreakerReset = true,
 }
 
 ---Common local Module:GroupTableLeague
@@ -135,27 +132,36 @@ function StandingTableLegacyGroup.run(args, config)
 		return StandingTableLegacyGroup.parseTeamInput(args, teamIndex, legacyRounds)
 	end)
 
+	local tiebreakers = StandingTableLegacyGroup.parseTiebreakers(args, config)
+
 	return StandingTable.fromTemplate(Table.merge(
-		StandingTableLegacyGroup.getStandardParameter(args, opponents, config),
+		StandingTableLegacyGroup.getStandardParameter(args, opponents),
 		{bg = StandingTableLegacySwiss.parseWikiBgs(args, 'pbg')},
 		rounds,
 		opponents,
-		{tiebreakers = StandingTableLegacyGroup.parseTiebreakers(args, config)}
+		{tiebreakers = tiebreakers, tiebreakerreset = StandingTableLegacyGroup.needsTiebreakerReset(tiebreakers)}
 	))
 end
 
 ---@param args table
 ---@param opponents table[]
----@param config LegacyGroupConfig?
 ---@return table
-function StandingTableLegacyGroup.getStandardParameter(args, opponents, config)
+function StandingTableLegacyGroup.getStandardParameter(args, opponents)
 	return Table.merge(StandingTableLegacySwiss.getStandardParameter(args), {
 		tabletype = 'group',
 		title = args.title or mw.title.getCurrentTitle().text,
 		importopponents = #opponents == 0,
 		walkoverrounds = StandingTableLegacyGroup.parseWalkoverRounds(args),
-		tiebreakerreset = (config or {}).tiebreakerReset,
 	})
+end
+
+---h2hcs only splits off the tops and bottoms, the reset applies it again to the opponents left tied
+---@param tiebreakers string[]
+---@return true?
+function StandingTableLegacyGroup.needsTiebreakerReset(tiebreakers)
+	return Array.any(tiebreakers, function(tiebreaker)
+		return tiebreaker:match('^h2hcs%.') ~= nil
+	end) or nil
 end
 
 ---Legacy `walkover_rounds_win` counts for the whole match, the standings per map of the `walkover_win` maps
