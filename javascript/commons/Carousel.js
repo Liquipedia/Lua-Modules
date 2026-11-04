@@ -1,46 +1,5 @@
 class LiquipediaCarousel {
 	/**
-	 * @type {LiquipediaCarousel[]}
-	 */
-	static carousels = [];
-
-	static resizeListenerAdded = false;
-
-	static refreshScheduled = false;
-
-	static scheduleRefresh() {
-		if ( LiquipediaCarousel.refreshScheduled ) {
-			return;
-		}
-		LiquipediaCarousel.refreshScheduled = true;
-		const requestFrame = window.requestAnimationFrame || ( ( cb ) => setTimeout( cb, 0 ) );
-		requestFrame( () => {
-			LiquipediaCarousel.refreshScheduled = false;
-			LiquipediaCarousel.handleResize();
-		} );
-	}
-
-	static init() {
-		const carouselElements = document.querySelectorAll( '.carousel' );
-		if ( !carouselElements.length ) {
-			return;
-		}
-
-		carouselElements.forEach( ( carousel ) => {
-			new LiquipediaCarousel( carousel ).initialize();
-		} );
-
-		if ( !LiquipediaCarousel.resizeListenerAdded ) {
-			let resizeTimeout;
-			window.addEventListener( 'resize', () => {
-				clearTimeout( resizeTimeout );
-				resizeTimeout = setTimeout( LiquipediaCarousel.handleResize, 150 );
-			} );
-			LiquipediaCarousel.resizeListenerAdded = true;
-		}
-	}
-
-	/**
 	 * @param {HTMLElement} element
 	 */
 	constructor( element ) {
@@ -90,7 +49,7 @@ class LiquipediaCarousel {
 
 		this.itemWidth = this.items[ 0 ].offsetWidth;
 
-		LiquipediaCarousel.carousels.push( this );
+		liquipedia.carousel.carousels.push( this );
 		this.updateButtonVisibility();
 
 		this.controls.left[ 0 ].addEventListener( 'click', () => this.scroll( -1 ) );
@@ -106,7 +65,7 @@ class LiquipediaCarousel {
 
 		// If the carousel is initialized while hidden (e.g. inside a collapsible or content switch),
 		// its measurements are 0. Observe size changes so it self-heals once it becomes visible.
-		const ro = new ResizeObserver( LiquipediaCarousel.scheduleRefresh );
+		const ro = new ResizeObserver( liquipedia.carousel.scheduleRefresh );
 		ro.observe( this.content );
 		this.resizeObserver = ro;
 	}
@@ -146,16 +105,57 @@ class LiquipediaCarousel {
 		toggleElements( this.controls.left, atStart );
 		toggleElements( this.controls.right, atEnd );
 	}
+}
 
-	static handleResize() {
-		LiquipediaCarousel.carousels.forEach( ( data ) => {
+liquipedia.carousel = {
+	/**
+	 * @type {LiquipediaCarousel[]}
+	 */
+	carousels: [],
+
+	resizeListenerAdded: false,
+
+	refreshScheduled: false,
+
+	scheduleRefresh: function() {
+		if ( liquipedia.carousel.refreshScheduled ) {
+			return;
+		}
+		liquipedia.carousel.refreshScheduled = true;
+		const requestFrame = window.requestAnimationFrame || ( ( cb ) => setTimeout( cb, 0 ) );
+		requestFrame( () => {
+			liquipedia.carousel.refreshScheduled = false;
+			liquipedia.carousel.handleResize();
+		} );
+	},
+
+	init: function() {
+		const carouselElements = document.querySelectorAll( '.carousel' );
+		if ( !carouselElements.length ) {
+			return;
+		}
+
+		carouselElements.forEach( ( carousel ) => {
+			new LiquipediaCarousel( carousel ).initialize();
+		} );
+
+		if ( !LiquipediaCarousel.resizeListenerAdded ) {
+			let resizeTimeout;
+			window.addEventListener( 'resize', () => {
+				clearTimeout( resizeTimeout );
+				resizeTimeout = setTimeout( liquipedia.carousel.handleResize, 150 );
+			} );
+			LiquipediaCarousel.resizeListenerAdded = true;
+		}
+	},
+
+	handleResize: function() {
+		liquipedia.carousel.carousels.forEach( ( data ) => {
 			if ( data.items.length > 0 ) {
 				data.itemWidth = data.items[ 0 ].offsetWidth;
 			}
 			data.updateButtonVisibility();
 		} );
 	}
-}
-
-liquipedia.carousel = LiquipediaCarousel;
+};
 liquipedia.core.modules.push( 'carousel' );
