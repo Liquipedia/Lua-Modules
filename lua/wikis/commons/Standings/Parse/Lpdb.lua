@@ -91,10 +91,12 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 			record.match2games = record.match2games or {}
 			local match2 = MatchGroupUtil.matchFromRecord(record)
 			phaseByMatchId[record.match2id] = match2.phase
-			maxBestOf = MathUtil.nilSafeMax(maxBestOf, match2.bestof)
-			StandingsParseLpdb.parseMatch(
+			local mayBeRelevant = StandingsParseLpdb.parseMatch(
 				matchIdToRound[record.match2id], match2, opponents, scoreMapper, #rounds, lookupOpponent, options
 			)
+			if mayBeRelevant then
+				maxBestOf = MathUtil.nilSafeMax(maxBestOf, match2.bestof)
+			end
 		end
 	)
 
@@ -171,6 +173,7 @@ end
 ---@class StandingsImportOpponentLookup
 ---@field alias standardOpponent? # The manual opponent the opponent is an alias of
 ---@field isPartOfStandings boolean
+---@field isTbd boolean
 ---@field opponentData StandingTableOpponentData? # Set once the opponent is part of a counted match
 
 ---Builds a cache key for an opponent, opponents with the same key are the same opponent.
@@ -206,6 +209,7 @@ function StandingsParseLpdb.makeOpponentLookup(manualOpponents, importOpponents)
 				-- An alias is a manual opponent, so it is always part of the standings
 				isPartOfStandings = alias ~= nil
 					or StandingsParseLpdb.isPartOfStandings(opponent, manualOpponents, importOpponents),
+				isTbd = Opponent.isTbd(opponent),
 			}
 		end
 
@@ -263,6 +267,7 @@ end
 ---@param maxRounds integer
 ---@param lookupOpponent fun(opponent: standardOpponent): StandingsImportOpponentLookup
 ---@param options StandingsImportOptions?
+---@return boolean mayBeRelevant # Whether the match counts, or may once its tbd opponents are known
 function StandingsParseLpdb.parseMatch(roundNumbers, match2, opponents, scoreMapper, maxRounds, lookupOpponent, options)
 	options = options or {}
 
@@ -275,7 +280,10 @@ function StandingsParseLpdb.parseMatch(roundNumbers, match2, opponents, scoreMap
 		return lookup.isPartOfStandings
 	end)
 	if not isRelevantMatch then
-		return
+		-- A tbd opponent may still turn out to be part of the standings
+		return opponentCheck(lookups, function(lookup)
+			return lookup.isPartOfStandings or lookup.isTbd
+		end)
 	end
 
 	if options.overtime then
@@ -303,6 +311,7 @@ function StandingsParseLpdb.parseMatch(roundNumbers, match2, opponents, scoreMap
 			table.insert(opponentRoundData.matches, match2)
 		end)
 	end)
+	return true
 end
 
 return StandingsParseLpdb
