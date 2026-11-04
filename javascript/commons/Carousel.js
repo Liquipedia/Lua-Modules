@@ -1,6 +1,120 @@
+class LiquipediaCarousel {
+	/**
+	 * @param {HTMLElement} element
+	 */
+	constructor( element ) {
+		this.carouselElement = element;
+	}
+
+	isInitialized() {
+		return this.carouselElement.dataset.carouselInitialized === 'true';
+	}
+
+	initialize() {
+		if ( this.isInitialized() ) {
+			return;
+		}
+
+		const carousel = this.carouselElement;
+
+		this.content = carousel.querySelector( '.carousel-content' );
+		this.items = carousel.querySelectorAll( '.carousel-item' );
+
+		this.controls = {
+			left: [
+				carousel.querySelector( '.carousel-button--left' ),
+				carousel.querySelector( '.carousel-fade--left' )
+			],
+			right: [
+				carousel.querySelector( '.carousel-button--right' ),
+				carousel.querySelector( '.carousel-fade--right' )
+			]
+		};
+
+		if ( !this.content || !this.items.length || !this.controls.left[ 0 ] || !this.controls.right[ 0 ] ) {
+			return;
+		}
+
+		carousel.dataset.carouselInitialized = 'true';
+
+		// Single item carousels don't need scroll tracking or button handlers
+		if ( this.items.length === 1 ) {
+			[ ...this.controls.left, ...this.controls.right ].forEach( ( element ) => {
+				if ( element ) {
+					element.style.display = 'none';
+				}
+			} );
+			return;
+		}
+
+		this.itemWidth = this.items[ 0 ].offsetWidth;
+
+		liquipedia.carousel.carousels.push( this );
+		this.updateButtonVisibility();
+
+		this.controls.left[ 0 ].addEventListener( 'click', () => this.scroll( -1 ) );
+		this.controls.right[ 0 ].addEventListener( 'click', () => this.scroll( 1 ) );
+
+		let scrollTimeout;
+		this.content.addEventListener( 'scroll', () => {
+			clearTimeout( scrollTimeout );
+			scrollTimeout = setTimeout( () => {
+				this.updateButtonVisibility();
+			}, 50 );
+		} );
+
+		// If the carousel is initialized while hidden (e.g. inside a collapsible or content switch),
+		// its measurements are 0. Observe size changes so it self-heals once it becomes visible.
+		const ro = new ResizeObserver( liquipedia.carousel.scheduleRefresh );
+		ro.observe( this.content );
+		this.resizeObserver = ro;
+	}
+
+	scroll( direction ) {
+		if ( !this.itemWidth && this.items.length > 0 ) {
+			this.itemWidth = this.items[ 0 ].offsetWidth;
+			this.updateButtonVisibility();
+		}
+		if ( !this.itemWidth ) {
+			return;
+		}
+
+		const offset = this.itemWidth * direction;
+
+		this.content.scrollBy( {
+			left: offset,
+			behavior: 'smooth'
+		} );
+	}
+
+	updateButtonVisibility() {
+		const { scrollLeft, scrollWidth, clientWidth } = this.content;
+		const maxScroll = scrollWidth - clientWidth;
+
+		const atStart = scrollLeft <= 0;
+		const atEnd = scrollLeft >= maxScroll;
+
+		const toggleElements = ( elements, shouldHide ) => {
+			elements.forEach( ( element ) => {
+				if ( element ) {
+					element.style.display = shouldHide ? 'none' : '';
+				}
+			} );
+		};
+
+		toggleElements( this.controls.left, atStart );
+		toggleElements( this.controls.right, atEnd );
+	}
+}
+
 liquipedia.carousel = {
+	/**
+	 * @type {LiquipediaCarousel[]}
+	 */
 	carousels: [],
+
 	resizeListenerAdded: false,
+
 	refreshScheduled: false,
 
 	scheduleRefresh: function() {
@@ -22,129 +136,26 @@ liquipedia.carousel = {
 		}
 
 		carouselElements.forEach( ( carousel ) => {
-			liquipedia.carousel.initCarousel( carousel );
+			new LiquipediaCarousel( carousel ).initialize();
 		} );
 
-		if ( !liquipedia.carousel.resizeListenerAdded ) {
+		if ( !LiquipediaCarousel.resizeListenerAdded ) {
 			let resizeTimeout;
 			window.addEventListener( 'resize', () => {
 				clearTimeout( resizeTimeout );
 				resizeTimeout = setTimeout( liquipedia.carousel.handleResize, 150 );
 			} );
-			liquipedia.carousel.resizeListenerAdded = true;
+			LiquipediaCarousel.resizeListenerAdded = true;
 		}
 	},
 
-	initCarousel: function( carousel ) {
-		if ( carousel.dataset.carouselInitialized === 'true' ) {
-			return;
-		}
-
-		const content = carousel.querySelector( '.carousel-content' );
-		const items = carousel.querySelectorAll( '.carousel-item' );
-
-		const controls = {
-			left: [
-				carousel.querySelector( '.carousel-button--left' ),
-				carousel.querySelector( '.carousel-fade--left' )
-			],
-			right: [
-				carousel.querySelector( '.carousel-button--right' ),
-				carousel.querySelector( '.carousel-fade--right' )
-			]
-		};
-
-		if ( !content || !items.length || !controls.left[ 0 ] || !controls.right[ 0 ] ) {
-			return;
-		}
-
-		carousel.dataset.carouselInitialized = 'true';
-
-		// Single item carousels don't need scroll tracking or button handlers
-		if ( items.length === 1 ) {
-			[ ...controls.left, ...controls.right ].forEach( ( element ) => {
-				if ( element ) {
-					element.style.display = 'none';
-				}
-			} );
-			return;
-		}
-
-		const carouselData = {
-			container: carousel,
-			content,
-			items,
-			controls,
-			itemWidth: items[ 0 ].offsetWidth
-		};
-
-		liquipedia.carousel.carousels.push( carouselData );
-		liquipedia.carousel.updateButtonVisibility( carouselData );
-
-		controls.left[ 0 ].addEventListener( 'click', () => liquipedia.carousel.scroll( carouselData, -1 ) );
-		controls.right[ 0 ].addEventListener( 'click', () => liquipedia.carousel.scroll( carouselData, 1 ) );
-
-		let scrollTimeout;
-		content.addEventListener( 'scroll', () => {
-			clearTimeout( scrollTimeout );
-			scrollTimeout = setTimeout( () => {
-				liquipedia.carousel.updateButtonVisibility( carouselData );
-			}, 50 );
-		} );
-
-		// If the carousel is initialized while hidden (e.g. inside a collapsible or content switch),
-		// its measurements are 0. Observe size changes so it self-heals once it becomes visible.
-		const ro = new ResizeObserver( () => {
-			liquipedia.carousel.scheduleRefresh();
-		} );
-		ro.observe( carouselData.content );
-		carouselData.resizeObserver = ro;
-	},
-
-	scroll: function( carouselData, direction ) {
-		if ( !carouselData.itemWidth && carouselData.items.length > 0 ) {
-			carouselData.itemWidth = carouselData.items[ 0 ].offsetWidth;
-			liquipedia.carousel.updateButtonVisibility( carouselData );
-		}
-		if ( !carouselData.itemWidth ) {
-			return;
-		}
-
-		const offset = carouselData.itemWidth * direction;
-
-		carouselData.content.scrollBy( {
-			left: offset,
-			behavior: 'smooth'
-		} );
-	},
-
-	updateButtonVisibility: function( carouselData ) {
-		const { content, controls } = carouselData;
-		const { scrollLeft, scrollWidth, clientWidth } = content;
-		const maxScroll = scrollWidth - clientWidth;
-
-		const atStart = scrollLeft <= 0;
-		const atEnd = scrollLeft >= maxScroll;
-
-		const toggleElements = ( elements, shouldHide ) => {
-			elements.forEach( ( element ) => {
-				if ( element ) {
-					element.style.display = shouldHide ? 'none' : '';
-				}
-			} );
-		};
-
-		toggleElements( controls.left, atStart );
-		toggleElements( controls.right, atEnd );
-	},
 	handleResize: function() {
 		liquipedia.carousel.carousels.forEach( ( data ) => {
 			if ( data.items.length > 0 ) {
 				data.itemWidth = data.items[ 0 ].offsetWidth;
 			}
-			liquipedia.carousel.updateButtonVisibility( data );
+			data.updateButtonVisibility();
 		} );
 	}
 };
-
 liquipedia.core.modules.push( 'carousel' );
