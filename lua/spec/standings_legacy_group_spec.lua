@@ -28,10 +28,13 @@ describe('Standings Legacy Group', function()
 				tiebreaker7 = 'games loss',
 				tiebreaker8 = 'head-to-head series',
 				tiebreaker9 = 'head to head games',
+				tiebreaker10 = 'series won',
+				tiebreaker11 = 'series loss',
+				tiebreaker12 = 'games%',
 			}
 			assert.are_same({
 				'points', 'matchscore', 'matchwinrate', 'matchdiff', 'gamediff', 'gamewins', 'gamelosses',
-				'h2hlegacy.matchscore', 'h2hlegacy.gamediff',
+				'h2hlegacy.matchscore', 'h2hlegacy.gamediff', 'matchwins', 'matchlosses', 'gamewinrate',
 			}, tiebreakers)
 			for _, tiebreaker in ipairs(tiebreakers) do
 				TiebreakerFactory.validateAndNormalizeInput(tiebreaker)
