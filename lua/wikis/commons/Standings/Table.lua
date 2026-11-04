@@ -98,11 +98,12 @@ function StandingsTable.parse(args, tableType)
 
 	---@type table<integer, MatchPhase[]>
 	local matchPhasesByRound = {}
+	local maxBestOf
 	if importScoreFromMatches then
 		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args, overtime)
 
 		local importedOpponents
-		importedOpponents, matchPhasesByRound = StandingsParseLpdb.importFromMatches(
+		importedOpponents, matchPhasesByRound, maxBestOf = StandingsParseLpdb.importFromMatches(
 			rounds, automaticScoreFunction, opponents, {
 				exclusive = exclusiveOpponents,
 				importOpponents = importOpponentFromMatches,
@@ -123,6 +124,7 @@ function StandingsTable.parse(args, tableType)
 		walkoverGames = StandingsParseWiki.parseWalkoverGames(args),
 		walkoverRounds = StandingsParseWiki.parseWalkoverRounds(args),
 		tiebreakerReset = tiebreakerReset,
+		maxBestOf = maxBestOf,
 	})
 
 	if tableType == 'swiss' then

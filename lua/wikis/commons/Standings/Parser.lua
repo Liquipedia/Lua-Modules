@@ -13,7 +13,9 @@ local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
+local TiebreakerGameUtil = Lua.import('Module:Standings/Tiebreaker/Game/Util')
 local TiebreakerHeadToHead = Lua.import('Module:Standings/Tiebreaker/HeadToHead')
+local TiebreakerMatchUtil = Lua.import('Module:Standings/Tiebreaker/Match/Util')
 local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParser = {}
@@ -24,6 +26,7 @@ local StandingsParser = {}
 ---@field walkoverGames integer? Games a walkover counts as in the game tiebreakers, unset means not counted
 ---@field walkoverRounds integer? Rounds a walkover map counts as in the round tiebreakers, unset means not counted
 ---@field tiebreakerReset boolean? Whether groups split by a tiebreaker start over from the first tiebreaker
+---@field maxBestOf number? The highest bestof of the table's matches
 
 ---@param carried table
 ---@param record table?
@@ -31,6 +34,21 @@ local function addRecord(carried, record)
 	for key, value in pairs(record or {}) do
 		carried[key] = carried[key] + value
 	end
+end
+
+---Whether the game stats repeat the match stats: every match is a Bo1 (or Bo0) and the records are equal.
+---@param entries TiebreakerOpponent[]
+---@param options StandingsParserOptions
+---@return boolean
+local function gameStatsRepeatMatchStats(entries, options)
+	if (options.maxBestOf or 0) > 1 then
+		return false
+	end
+	return Array.all(entries, function(entry)
+		local games = TiebreakerGameUtil.getGames(entry, options.walkoverGames)
+		local matches = TiebreakerMatchUtil.getMatches(entry)
+		return games.w == matches.w and games.d == matches.d and games.l == matches.l
+	end)
 end
 
 ---@param rounds {roundNumber: integer, started: boolean, finished:boolean, title: string?}[]
@@ -138,6 +156,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		walkoverGames = options.walkoverGames,
 		walkoverRounds = options.walkoverRounds,
 	}
+	local gameStatsUseMatchColumns = gameStatsRepeatMatchStats(entries, options)
 
 	---@param tiebreakerId string
 	---@return StandingsAdditionalStat
@@ -147,8 +166,14 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		if tiebreakerContextType ~= 'full' then
 			return {id = tiebreakerId}
 		end
+		-- Only the column changes, placements still use the game tiebreaker
+		local columnId = tiebreakerId
+		if gameStatsUseMatchColumns then
+			columnId = TiebreakerFactory.toMatchEquivalent(tiebreakerId)
+			tiebreaker = TiebreakerFactory.tiebreakerFromId(columnId, tiebreakerOptions)
+		end
 		return {
-			id = tiebreakerId,
+			id = columnId,
 			title = tiebreaker:headerTitle(),
 		}
 	end
