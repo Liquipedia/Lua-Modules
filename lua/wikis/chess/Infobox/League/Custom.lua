@@ -98,6 +98,12 @@ function CustomLeague:getWikiCategories(args)
 	return Array.map(CustomLeague.getRestrictions(args.restrictions), Operator.property('link'))
 end
 
+function CustomLeague:getWikiCategories(args)
+	return {
+		args.game and (Game.name{game = args.game} .. ' Tournaments') or nil,
+	}
+end
+
 ---@param lpdbData table
 ---@param args table
 ---@return table
