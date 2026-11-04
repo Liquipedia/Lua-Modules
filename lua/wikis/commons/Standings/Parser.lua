@@ -26,7 +26,7 @@ local StandingsParser = {}
 ---@field walkoverGames integer? Games a walkover counts as in the game tiebreakers, unset means not counted
 ---@field walkoverRounds integer? Rounds a walkover map counts as in the round tiebreakers, unset means not counted
 ---@field tiebreakerReset boolean? Whether groups split by a tiebreaker start over from the first tiebreaker
----@field maxBestOf integer? The highest bestof of the table's matches
+---@field maxBestOf number? The highest bestof of the table's matches
 
 ---@param carried table
 ---@param record table?

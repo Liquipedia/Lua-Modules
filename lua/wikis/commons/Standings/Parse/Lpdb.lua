@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Lpdb = Lua.import('Module:Lpdb')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MathUtil = Lua.import('Module:MathUtil')
 local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
@@ -41,7 +42,7 @@ local MATCH_COLUMNS = {'match2id', 'match2opponents', 'bestof', 'date', 'dateexa
 ---@param options StandingsImportOptions?
 ---@return StandingTableOpponentData[]
 ---@return table<integer, MatchPhase[]>
----@return integer maxBestOf # Includes matches between tbd opponents
+---@return number? maxBestOf # Includes matches between tbd opponents
 function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponents, options)
 	local matchIds = Array.flatMap(rounds, function(round)
 		return round.matches
@@ -49,7 +50,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 
 	-- No Matches, cannot import
 	if #matchIds == 0 then
-		return {}, {}, 0
+		return {}, {}
 	end
 
 	local matchIdToRound = {}
@@ -72,7 +73,8 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 	local opponents = {}
 	---@type table<string, MatchPhase>
 	local phaseByMatchId = {}
-	local maxBestOf = 0
+	---@type number?
+	local maxBestOf
 	local lookupOpponent = StandingsParseLpdb.makeOpponentLookup(manualOpponents, options and options.importOpponents)
 	local includeGames = options and (options.includeGames or options.overtime)
 	Lpdb.executeMassQuery(
@@ -89,7 +91,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 			record.match2games = record.match2games or {}
 			local match2 = MatchGroupUtil.matchFromRecord(record)
 			phaseByMatchId[record.match2id] = match2.phase
-			maxBestOf = math.max(maxBestOf, match2.bestof or 0)
+			maxBestOf = MathUtil.nilSafeMax(maxBestOf, match2.bestof)
 			StandingsParseLpdb.parseMatch(
 				matchIdToRound[record.match2id], match2, opponents, scoreMapper, #rounds, lookupOpponent, options
 			)

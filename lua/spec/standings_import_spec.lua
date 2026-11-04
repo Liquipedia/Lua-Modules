@@ -235,12 +235,12 @@ describe('Standings import from matches', function()
 			assert.are_equal(3, maxBestOf)
 		end)
 
-		it('is 0 without matches', function()
+		it('is unset without matches', function()
 			stubMatchQuery{}
 			local _, _, maxBestOf = StandingsParseLpdb.importFromMatches(
 				{{roundNumber = 1, matches = {}}}, swissScoreMapper, {}, {importOpponents = true}
 			)
-			assert.are_equal(0, maxBestOf)
+			assert.is_nil(maxBestOf)
 		end)
 	end)
 
