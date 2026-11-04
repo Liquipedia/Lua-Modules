@@ -68,6 +68,10 @@ describe('Standings import from matches', function()
 
 	local swissScoreMapper = StandingsParseWiki.makeScoringFunction('swiss', {})
 
+	local function manualOpponent(opponentName, template)
+		return {opponent = {type = 'team', template = template, name = opponentName, extradata = {}}}
+	end
+
 	local function findOpponent(opponents, name)
 		return Array.find(opponents, function(opponentData)
 			return opponentData.opponent.name == name
@@ -210,6 +214,74 @@ describe('Standings import from matches', function()
 				{{roundNumber = 1, matches = {}}}, swissScoreMapper, {}, {importOpponents = true}
 			)
 			assert.are_same({}, matchPhasesByRound)
+		end)
+	end)
+
+	describe('highest bestof', function()
+		it('includes matches between tbd opponents', function()
+			stubMatchQuery{
+				match2Record{matchId = 'M1', winner = 1, bestof = 1, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 1, placement = 1},
+					{template = 'tt9 esports 2022', name = 'TT9 Esports', score = 0, placement = 2},
+				}},
+				match2Record{matchId = 'M2', finished = false, bestof = 3, opponents = {
+					{template = 'tbd', name = 'TBD', score = 0, placement = 1},
+					{template = 'tbd', name = 'TBD', score = 0, placement = 2},
+				}},
+			}
+
+			local opponents, _, maxBestOf = StandingsParseLpdb.importFromMatches({
+				{roundNumber = 1, matches = {'M1'}},
+				{roundNumber = 2, matches = {'M2'}},
+			}, swissScoreMapper, {}, {importOpponents = true})
+
+			assert.are_equal(2, #opponents)
+			assert.are_equal(3, maxBestOf)
+		end)
+
+		it('leaves out matches that do not count towards the standings', function()
+			stubMatchQuery{
+				match2Record{matchId = 'M1', winner = 1, bestof = 1, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 1, placement = 1},
+					{template = 'tt9 esports 2022', name = 'TT9 Esports', score = 0, placement = 2},
+				}},
+				match2Record{matchId = 'M2', winner = 1, bestof = 5, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 3, placement = 1},
+					{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 2},
+				}},
+			}
+
+			local _, _, maxBestOf = StandingsParseLpdb.importFromMatches({
+				{roundNumber = 1, matches = {'M1', 'M2'}},
+			}, swissScoreMapper, {
+				manualOpponent('Heroic', 'heroic'),
+				manualOpponent('TT9 Esports', 'tt9 esports 2022'),
+			}, {exclusive = true})
+
+			assert.are_equal(1, maxBestOf)
+		end)
+
+		it('includes matches that may count once their tbd opponents are known', function()
+			stubMatchQuery{
+				match2Record{matchId = 'M1', finished = false, bestof = 3, opponents = {
+					{template = 'heroic', name = 'Heroic', score = 0, placement = 1},
+					{template = 'tbd', name = 'TBD', score = 0, placement = 2},
+				}},
+			}
+
+			local _, _, maxBestOf = StandingsParseLpdb.importFromMatches({
+				{roundNumber = 1, matches = {'M1'}},
+			}, swissScoreMapper, {manualOpponent('Heroic', 'heroic')}, {exclusive = true})
+
+			assert.are_equal(3, maxBestOf)
+		end)
+
+		it('is unset without matches', function()
+			stubMatchQuery{}
+			local _, _, maxBestOf = StandingsParseLpdb.importFromMatches(
+				{{roundNumber = 1, matches = {}}}, swissScoreMapper, {}, {importOpponents = true}
+			)
+			assert.is_nil(maxBestOf)
 		end)
 	end)
 
@@ -748,10 +820,6 @@ describe('Standings import from matches', function()
 	describe('opponent based filtering', function()
 		---@param opponentName string
 		---@param template string
-		local function manualOpponent(opponentName, template)
-			return {opponent = {type = 'team', template = template, name = opponentName, extradata = {}}}
-		end
-
 		--- M1 is between two opponents of the standings, M2 only has one of them
 		local function stubInternalAndExternalMatch()
 			stubMatchQuery{

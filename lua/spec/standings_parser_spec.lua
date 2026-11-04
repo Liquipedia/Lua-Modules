@@ -327,9 +327,11 @@ describe('Standings Parser', function()
 		end)
 
 		it('turn on draws for the whole table with a draw adjustment', function()
+			local bravo = makeOpponent('Bravo', {{points = 0}, {points = 0}})
+			bravo.adjustments = {[1] = {game = {w = 2, l = 1}}}
 			local opponents = {
 				makeAdjustedOpponent('Alpha', {[2] = {match = {d = 1}, game = {d = 1}}}),
-				makeOpponent('Bravo', {{points = 0}, {points = 0}}),
+				bravo,
 			}
 
 			local standingsTable = StandingsParser.parse(
@@ -341,7 +343,7 @@ describe('Standings Parser', function()
 			assert.is_true(standingsTable.hasdraw)
 			assert.are_equal('0 - 0 - 0', display('Alpha', 1, 'full.matchscore'))
 			assert.are_equal('0 - 1 - 0', display('Alpha', 2, 'full.matchscore'))
-			assert.are_equal('0 - 0 - 0', display('Bravo', 2, 'full.gamescore'))
+			assert.are_equal('2 - 0 - 1', display('Bravo', 2, 'full.gamescore'))
 			assert.are_equal('0 - 1 - 0', display('Alpha', 2, 'full.gamescore'))
 		end)
 	end)
@@ -1320,11 +1322,20 @@ describe('Standings Parser', function()
 		end)
 	end)
 
+	---An opponent whose game record differs from its match record
+	---@param name string
+	---@return table
+	local function makeMultiGameOpponent(name)
+		local opponentData = makeOpponent(name, {{points = 3}, {points = 3}})
+		opponentData.adjustments = {[1] = {game = {w = 2, l = 1}}}
+		return opponentData
+	end
+
 	it('shows tiebreakers sharing a title in one column', function()
 		local StandingsDisplayUtil = require('Module:Standings/DisplayUtil')
 		local standingsTable = StandingsParser.parse(
 			TWO_FINISHED_ROUNDS,
-			{makeOpponent('Alpha', {{points = 3}, {points = 3}})},
+			{makeMultiGameOpponent('Alpha')},
 			BGS, nil, {}, 'swiss',
 			{'full.matchwins', 'full.matchscore', 'ml.matchscore', 'full.gamescore', 'full.gamelosses', 'full.manual'}
 		)
@@ -1339,7 +1350,7 @@ describe('Standings Parser', function()
 		local StandingsDisplayUtil = require('Module:Standings/DisplayUtil')
 		local standingsTable = StandingsParser.parse(
 			TWO_FINISHED_ROUNDS,
-			{makeOpponent('Alpha', {{points = 3}, {points = 3}})},
+			{makeMultiGameOpponent('Alpha')},
 			BGS, nil, {}, 'swiss',
 			{'full.matchdiff', 'full.gamediff', 'full.manual'}
 		)
@@ -1353,7 +1364,7 @@ describe('Standings Parser', function()
 	it('marks the tiebreakers, but not the stats that are always shown', function()
 		local standingsTable = StandingsParser.parse(
 			TWO_FINISHED_ROUNDS,
-			{makeOpponent('Alpha', {{points = 3}, {points = 3}})},
+			{makeMultiGameOpponent('Alpha')},
 			BGS, nil, {}, 'swiss',
 			{'full.points', 'full.manual'}
 		)
@@ -1370,7 +1381,7 @@ describe('Standings Parser', function()
 	it('always shows the configured stats of group standings', function()
 		local standingsTable = StandingsParser.parse(
 			TWO_FINISHED_ROUNDS,
-			{makeOpponent('Alpha', {{points = 3}, {points = 3}})},
+			{makeMultiGameOpponent('Alpha')},
 			BGS, nil, {}, 'group',
 			{'full.points', 'full.manual'}
 		)
@@ -1380,6 +1391,156 @@ describe('Standings Parser', function()
 			{'full.matchscore', 'full.gamescore', 'full.points', 'full.manual'},
 			Array.map(standingsTable.extradata.additionalStats, function(stat) return stat.id end)
 		)
+	end)
+
+	describe('match columns for single game matches', function()
+		local StandingsDisplayUtil = require('Module:Standings/DisplayUtil')
+		local ONE_FINISHED_ROUND = {{roundNumber = 1, started = true, finished = true}}
+
+		---Alpha and Bravo play each other in every match
+		---@param matchSpecs {scoreA: integer, scoreB: integer, finished: boolean?, walkover: boolean?}[]
+		---@return table[]
+		local function makeOpponents(matchSpecs)
+			local matches = Array.map(matchSpecs, function(spec, matchIndex)
+				local winner = spec.scoreA > spec.scoreB and 1 or spec.scoreA < spec.scoreB and 2 or 0
+				local function status(opponentIndex)
+					if not spec.walkover then
+						return 'S'
+					end
+					return winner == opponentIndex and 'W' or 'FF'
+				end
+				return {
+					matchId = 'M' .. matchIndex,
+					finished = spec.finished ~= false,
+					winner = winner,
+					opponents = {
+						{type = 'literal', name = 'Alpha', score = spec.scoreA, status = status(1)},
+						{type = 'literal', name = 'Bravo', score = spec.scoreB, status = status(2)},
+					},
+					games = {},
+				}
+			end)
+			local function makeSide(name, opponentIndex)
+				local record = {w = 0, d = 0, l = 0}
+				Array.forEach(matches, function(match)
+					if match.finished then
+						local result = match.winner == 0 and 'd' or match.winner == opponentIndex and 'w' or 'l'
+						record[result] = record[result] + 1
+					end
+				end)
+				return {
+					opponent = literal(name),
+					rounds = {{scoreboard = {points = 3 * record.w, match = record}, specialstatus = '', matches = matches}},
+				}
+			end
+			return {makeSide('Alpha', 1), makeSide('Bravo', 2)}
+		end
+
+		local function parse(opponents, tiebreakers, options)
+			return StandingsParser.parse(ONE_FINISHED_ROUND, opponents, {}, nil, {}, 'swiss', tiebreakers, options)
+		end
+
+		local function columnTitles(standingsTable)
+			---@diagnostic disable-next-line: missing-fields
+			local stats = StandingsDisplayUtil.statsToShow({additionalStats = standingsTable.extradata.additionalStats})
+			return Array.map(stats, function(stat) return stat.title end)
+		end
+
+		local TIEBREAKERS_WITH_COLUMN = {'full.points', 'full.manual'}
+		-- The commons config always shows matchscore and gamescore in swiss standings
+		local GAME_COLUMNS = {'Match', 'Game', 'Pts'}
+		local MATCH_COLUMNS = {'Match', 'Pts'}
+
+		it('shows the match stats in place of the game stats when every match is a Bo1', function()
+			local standingsTable = parse(makeOpponents{
+				{scoreA = 1, scoreB = 0},
+				{scoreA = 0, scoreB = 1},
+			}, TIEBREAKERS_WITH_COLUMN, {maxBestOf = 1})
+
+			assert.are_same(MATCH_COLUMNS, columnTitles(standingsTable))
+			assert.are_same(
+				{'full.matchscore', 'full.matchscore', 'full.points', 'full.manual'},
+				Array.map(standingsTable.extradata.additionalStats, function(stat) return stat.id end)
+			)
+		end)
+
+		it('treats an unset bestof as Bo1', function()
+			local standingsTable = parse(makeOpponents{{scoreA = 1, scoreB = 0}}, TIEBREAKERS_WITH_COLUMN)
+
+			assert.are_same(MATCH_COLUMNS, columnTitles(standingsTable))
+		end)
+
+		it('keeps the game columns for a match without a bestof that had more games', function()
+			local standingsTable = parse(makeOpponents{{scoreA = 2, scoreB = 1}}, TIEBREAKERS_WITH_COLUMN)
+
+			assert.are_same(GAME_COLUMNS, columnTitles(standingsTable))
+		end)
+
+		it('keeps the game columns when any match is a Bo3, even an upcoming one', function()
+			local standingsTable = parse(makeOpponents{
+				{scoreA = 1, scoreB = 0},
+				{scoreA = 0, scoreB = 0, finished = false},
+			}, TIEBREAKERS_WITH_COLUMN, {maxBestOf = 3})
+
+			assert.are_same(GAME_COLUMNS, columnTitles(standingsTable))
+		end)
+
+		it('keeps the game columns for a walkover that does not count as a game', function()
+			local opponents = makeOpponents{{scoreA = 1, scoreB = 0, walkover = true}}
+
+			assert.are_same(GAME_COLUMNS, columnTitles(parse(opponents, TIEBREAKERS_WITH_COLUMN)))
+			assert.are_same(MATCH_COLUMNS, columnTitles(parse(opponents, TIEBREAKERS_WITH_COLUMN, {walkoverGames = 1})))
+		end)
+
+		it('compares the match record including overtime', function()
+			-- Alpha won the second match in overtime
+			local opponents = makeOpponents{
+				{scoreA = 1, scoreB = 0},
+				{scoreA = 1, scoreB = 0},
+			}
+			opponents[1].rounds[1].scoreboard.match = {w = 1, d = 0, l = 0}
+			opponents[1].rounds[1].scoreboard.overtime = {w = 1, l = 0}
+			opponents[2].rounds[1].scoreboard.match = {w = 0, d = 0, l = 1}
+			opponents[2].rounds[1].scoreboard.overtime = {w = 0, l = 1}
+
+			local standingsTable = parse(opponents, TIEBREAKERS_WITH_COLUMN, {overtime = true})
+
+			assert.are_same(MATCH_COLUMNS, columnTitles(standingsTable))
+			assert.are_equal('1 - 1 - 0 - 0',
+				findEntry(standingsTable.entries, 'Alpha', 1).extradata.additionalStatsValues['full.matchscore'].display)
+		end)
+
+		it('compares the records including manual adjustments', function()
+			local function makeAdjustedOpponent(adjustment)
+				local opponentData = makeOpponent('Alpha', {{points = 3}})
+				opponentData.adjustments = {[1] = adjustment}
+				return opponentData
+			end
+
+			local equallyAdjusted = parse({makeAdjustedOpponent{match = {w = 1}, game = {w = 1}}}, TIEBREAKERS_WITH_COLUMN)
+			assert.are_same(MATCH_COLUMNS, columnTitles(equallyAdjusted))
+
+			local gameAdjusted = parse({makeAdjustedOpponent{game = {w = 2, l = 1}}}, TIEBREAKERS_WITH_COLUMN)
+			assert.are_same(GAME_COLUMNS, columnTitles(gameAdjusted))
+		end)
+
+		it('shows a game tiebreaker in the column of its match counterpart, but places by the tiebreaker', function()
+			local opponents = makeOpponents{
+				{scoreA = 1, scoreB = 0},
+				{scoreA = 1, scoreB = 0},
+			}
+			-- Tied on points, so the game diff decides
+			Array.forEach(opponents, function(opponentData) opponentData.rounds[1].scoreboard.points = 0 end)
+			local standingsTable = parse(opponents, {'full.points', 'full.gamediff', 'full.manual'})
+
+			assert.are_same({'Match', 'Pts', 'MD'}, columnTitles(standingsTable))
+			assert.are_same(
+				{id = 'full.matchdiff', title = 'MD', tiebreaker = true},
+				standingsTable.extradata.additionalStats[4]
+			)
+			assert.are_equal(1, findEntry(standingsTable.entries, 'Alpha', 1).placement)
+			assert.are_equal(2, findEntry(standingsTable.entries, 'Bravo', 1).placement)
+		end)
 	end)
 
 	describe('overtime', function()
