@@ -1593,7 +1593,7 @@ div.skilllist-col5 ul li {
 	overflow: hidden;
 }
 
-/* Import fonts */
+/* Import fonts (disabled, will have to investigate if these are needed again)
 // Is it needed to import all these fonts? It's extra load time for the user
 @font-face {
 	font-family: "Radiance";
@@ -1657,7 +1657,7 @@ div.skilllist-col5 ul li {
 	font-weight: 800;
 	font-style: normal;
 	font-display: swap;
-}
+}*/
 
 /*
 * === Ability template ===
