@@ -1322,6 +1322,31 @@ describe('Standings Parser', function()
 		end)
 	end)
 
+	describe('manual min statuses', function()
+		local THREE_ROUNDS = {
+			{roundNumber = 1, started = true, finished = true},
+			{roundNumber = 2, started = true, finished = true},
+			{roundNumber = 3, started = true, finished = false},
+		}
+
+		it('stores the min status in effect from the given round onwards without touching the statuses', function()
+			local alpha = makeOpponent('Alpha', {{points = 0}, {points = 0}, {points = 0}})
+			alpha.minStatuses = {[2] = 'stay', [3] = 'stayup'}
+			local opponents = {alpha, makeOpponent('Bravo', {{points = 3}, {points = 3}, {points = 3}})}
+
+			local standingsTable = StandingsParser.parse(THREE_ROUNDS, opponents, BGS, nil, {}, 'ffa', TIEBREAKERS)
+
+			local alpha1 = findEntry(standingsTable.entries, 'Alpha', 1)
+			assert.is_nil(alpha1.extradata.minstatus)
+			local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
+			assert.are_equal('stay', alpha2.extradata.minstatus)
+			assert.are_equal('stay', alpha2.currentstatus)
+			assert.is_nil(alpha2.definitestatus)
+			assert.are_equal('stayup', findEntry(standingsTable.entries, 'Alpha', 3).extradata.minstatus)
+			assert.is_nil(findEntry(standingsTable.entries, 'Bravo', 3).extradata.minstatus)
+		end)
+	end)
+
 	---An opponent whose game record differs from its match record
 	---@param name string
 	---@return table

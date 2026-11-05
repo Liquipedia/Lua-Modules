@@ -126,10 +126,11 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 				matchPoints = opponentData.matchPoints or {},
 				startingPoints = opponentData.startingPoints,
 				finished = round.finished,
-				manualDefiniteStatus = StandingsParser.resolveManualDefiniteStatus(
+				manualDefiniteStatus = StandingsParser.resolveManualStatus(
 					opponentData.definiteStatuses, round.roundNumber
 				),
 				extradata = {
+					minstatus = StandingsParser.resolveManualStatus(opponentData.minStatuses, round.roundNumber),
 					pointschange = pointsFromRound,
 					specialstatus = statusInRound,
 					tiebreakerpoints = carryData.tiebreakerPoints,
@@ -486,18 +487,18 @@ function StandingsParser.addStatusesFromPlacementRange(opponentEntries, bgs)
 	end)
 end
 
----Finds the manually set definite status that is in effect in a round,
+---Finds the manually set status that is in effect in a round,
 ---which is the one with the highest round number that is not after the given round.
----@param definiteStatuses table<integer, string>?
+---@param statuses table<integer, string>?
 ---@param roundNumber integer
 ---@return string?
-function StandingsParser.resolveManualDefiniteStatus(definiteStatuses, roundNumber)
-	if not definiteStatuses then
+function StandingsParser.resolveManualStatus(statuses, roundNumber)
+	if not statuses then
 		return
 	end
 	for round = roundNumber, 1, -1 do
-		if definiteStatuses[round] then
-			return definiteStatuses[round]
+		if statuses[round] then
+			return statuses[round]
 		end
 	end
 end

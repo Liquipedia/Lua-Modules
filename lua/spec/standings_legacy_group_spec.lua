@@ -1,6 +1,8 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('Standings Legacy Group', function()
+	local Array = require('Module:Array')
 	local StandingTableLegacyGroup = require('Module:Standings/Table/Legacy/Group')
+	local Table = require('Module:Table')
 	local TiebreakerFactory = require('Module:Standings/Tiebreaker/Factory')
 
 	local NOW = 1700000000
@@ -43,6 +45,33 @@ describe('Standings Legacy Group', function()
 
 		it('errors on unknown tiebreakers', function()
 			assert.error(function() StandingTableLegacyGroup.parseTiebreakers{tiebreaker1 = 'bogus'} end)
+		end)
+
+		it('applies the tiebreakers and defaults of the wiki', function()
+			local config = {
+				tiebreakers = {diff = 'rounddiff'},
+				defaultTiebreakers = {'series', 'diff'},
+				defaultPointsTiebreakers = {'points'},
+			}
+			assert.are_same({'rounddiff', 'matchscore'},
+				StandingTableLegacyGroup.parseTiebreakers({tiebreaker1 = 'diff', tiebreaker2 = 'series'}, config))
+			assert.are_same({'matchscore', 'rounddiff'}, StandingTableLegacyGroup.parseTiebreakers({}, config))
+			assert.are_same({'points'}, StandingTableLegacyGroup.parseTiebreakers({show_p = 'true'}, config))
+		end)
+
+		it('only maps to valid tiebreakers on valorant', function()
+			local config = StandingTableLegacyGroup.VALORANT_CONFIG
+			local args = {}
+			for input in pairs(config.tiebreakers) do
+				table.insert(args, input)
+			end
+			local tiebreakers = StandingTableLegacyGroup.parseTiebreakers(
+				Table.map(args, function(index, input) return 'tiebreaker' .. index, input end), config
+			)
+			Array.extendWith(tiebreakers, StandingTableLegacyGroup.parseTiebreakers({}, config))
+			for _, tiebreaker in ipairs(tiebreakers) do
+				TiebreakerFactory.validateAndNormalizeInput(tiebreaker)
+			end
 		end)
 	end)
 
@@ -155,6 +184,35 @@ describe('Standings Legacy Group', function()
 		end)
 	end)
 
+	describe('solo input', function()
+		local rounds = {{index = 1, endTime = 100}, {index = 0}}
+
+		it('reads player<N> and p<N> with their flag and link', function()
+			local args = {
+				player1 = 'Alpha',
+				player1flag = 'se',
+				player1link = 'Alpha (player)',
+				p2 = 'Bravo',
+				p2flag = 'fi',
+			}
+
+			local alpha = StandingTableLegacyGroup.parseSoloInput(args, 1, rounds)
+			assert.are_same({'solo', 'Alpha', 'se', 'Alpha (player)'}, {alpha.type, alpha[1], alpha.flag, alpha.link})
+
+			local bravo = StandingTableLegacyGroup.parseSoloInput(args, 2, rounds)
+			assert.are_same({'Bravo', 'fi'}, {bravo[1], bravo.flag})
+
+			assert.is_nil(StandingTableLegacyGroup.parseSoloInput(args, 3, rounds))
+		end)
+
+		it('maps the round inputs of the player', function()
+			local alpha = StandingTableLegacyGroup.parseSoloInput(
+				{p1 = 'Alpha', r1bg1 = 'up', bg1 = 'proceed', r1dq1 = 'true', temp_p1 = '2'}, 1, rounds
+			)
+			assert.are_same({'up', 'proceed', 1, 2}, {alpha.r1bg, alpha.r2bg, alpha.dq, alpha.r2points})
+		end)
+	end)
+
 	describe('standard parameters', function()
 		it('imports the opponents from the matches only if none are listed', function()
 			assert.is_true(StandingTableLegacyGroup.getStandardParameter({}, {}).importopponents)
@@ -169,6 +227,34 @@ describe('Standings Legacy Group', function()
 		it('maps the legacy points', function()
 			assert.are_equal('win=3, draw=1, loss=0, 2-0=4',
 				StandingTableLegacyGroup.getStandardParameter({['2-0_p'] = '1'}, {}).points)
+		end)
+
+		it('splits the walkover rounds of the match over its maps', function()
+			local function walkoverRounds(args)
+				return StandingTableLegacyGroup.getStandardParameter(args, {}).walkoverrounds
+			end
+			assert.are_same(
+				{13, 13, 26, 6},
+				{
+					walkoverRounds{walkover_rounds_win = '26', walkover_win = '2'},
+					walkoverRounds{walkover_rounds_win = '13', walkover_win = '1'},
+					walkoverRounds{walkover_rounds_win = '26'},
+					walkoverRounds{walkover_rounds_win = '13', walkover_win = '2'},
+				}
+			)
+			assert.is_nil(walkoverRounds{})
+		end)
+
+		it('resets the tiebreakers only with a h2hcs tiebreaker', function()
+			local config = StandingTableLegacyGroup.VALORANT_CONFIG
+			local function needsReset(args)
+				return StandingTableLegacyGroup.needsTiebreakerReset(StandingTableLegacyGroup.parseTiebreakers(args, config))
+			end
+			assert.is_true(needsReset{})
+			assert.is_true(needsReset{tiebreaker1 = 'series', tiebreaker2 = 'h2h series'})
+			assert.is_nil(needsReset{show_p = 'true'})
+			assert.is_nil(needsReset{tiebreaker1 = 'series', tiebreaker2 = 'h2h games', tiebreaker3 = 'diff'})
+			assert.is_nil(StandingTableLegacyGroup.needsTiebreakerReset(StandingTableLegacyGroup.parseTiebreakers{}))
 		end)
 	end)
 
@@ -208,6 +294,22 @@ describe('Standings Legacy Group', function()
 			assert.are_equal('league', storedTable.type)
 		end)
 
+		it('renders and stores a solo group table', function()
+			StandingTableLegacyGroup.solo{
+				title = 'Group A',
+				p1 = 'Alpha',
+				p1flag = 'se',
+				player2 = 'Bravo',
+				temp_win_m2 = '1',
+			}
+			---@diagnostic disable-next-line: undefined-field
+			local entries = require('Module:Array').map(mw.ext.LiquipediaDB.lpdb_standingsentry.calls, function(call)
+				return call.vals[2]
+			end)
+			local firstEntry = require('Module:Array').find(entries, function(entry) return entry.slotindex == 1 end)
+			assert.are_same({'solo', 'Bravo'}, {firstEntry.opponenttype, firstEntry.opponentname})
+		end)
+
 		it('counts the adjustments in the standings', function()
 			StandingTableLegacyGroup.classic{
 				team1 = 'team liquid',
@@ -237,12 +339,16 @@ describe('Standings Legacy Group', function()
 				r2matchlosses = 1,
 				r2gamewins = 3,
 				r2gamelosses = 4,
+				r1roundwins = 13,
+				r2roundlosses = 26,
 			}, StandingTableLegacyGroup.parseAdjustments({
 				r1temp_win_m1 = '1',
 				temp_tie_m1 = '2',
 				temp_lose_m1 = '1',
 				temp_win_g1 = '3',
 				temp_lose_g1 = '4',
+				r1temp_win_r1 = '13',
+				temp_lose_r1 = '26',
 				tie_p = '0',
 			}, 1, rounds))
 		end)
