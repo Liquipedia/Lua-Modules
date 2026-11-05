@@ -15,6 +15,8 @@ local TiebreakerBuchholzCutOne = Lua.import('Module:Standings/Tiebreaker/Buchhol
 ---@class TiebreakerBuchholzCutOnePoints : TiebreakerBuchholzCutOne
 local TiebreakerBuchholzCutOnePoints = Class.new(TiebreakerBuchholzCutOne)
 
+TiebreakerBuchholzCutOnePoints.fullContextOnly = true
+
 ---@param member TiebreakerOpponent
 ---@return number
 function TiebreakerBuchholzCutOnePoints:scoreOf(member)

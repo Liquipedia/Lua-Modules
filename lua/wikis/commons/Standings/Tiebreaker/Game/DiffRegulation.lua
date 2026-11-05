@@ -15,6 +15,8 @@ local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
 ---@class TiebreakerGameDiffRegulation : StandingsTiebreaker
 local TiebreakerGameDiffRegulation = Class.new(TiebreakerInterface)
 
+TiebreakerGameDiffRegulation.readsGames = true
+
 ---Games won and lost, not counting the games that went into overtime.
 ---@param opponent TiebreakerOpponent
 ---@param walkoverGames number?
