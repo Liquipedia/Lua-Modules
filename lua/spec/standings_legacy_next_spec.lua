@@ -130,6 +130,11 @@ describe('Standings Legacy Next', function()
 			assert.are_equal('win=1, draw=0, loss=0, 2-0=4',
 				StandingTableLegacyNext.getStandardParameter({win_p = '1', ['2-0_p'] = '3'}, {}).points)
 		end)
+
+		it('reads X-Y_p with decimals', function()
+			assert.are_equal('win=1, draw=0.5, loss=0, 0.5-0.5=0.75',
+				StandingTableLegacyNext.getStandardParameter({win_p = '1', tie_p = '0.5', ['0.5-0.5_p'] = '0.25'}, {}).points)
+		end)
 	end)
 
 	describe('statuses', function()

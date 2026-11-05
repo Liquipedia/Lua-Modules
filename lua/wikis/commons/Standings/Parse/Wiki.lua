@@ -235,10 +235,29 @@ function StandingsParseWiki.parseWikiBgs(input)
 	return statusParsed
 end
 
+---A score as written in `X-Y` points keys, so `1.50` and `1.5` are the same
+---@param score string|number
+---@return string
+local function formatScore(score)
+	local number = tonumber(score) --[[@as number]]
+	if number == math.floor(number) then
+		return string.format('%d', number)
+	end
+	return tostring(number)
+end
+
+---@param ownScore string|number
+---@param otherScore string|number
+---@return string
+local function makeScoreKey(ownScore, otherScore)
+	return formatScore(ownScore) .. '-' .. formatScore(otherScore)
+end
+
 ---Reads the `points` input of swiss and group standings, e.g. `win=3, draw=1, loss=0, 2-0=4`.
 ---`win`, `draw` and `loss` are the points of that result and are keyed `w`, `d` and `l`.
 ---With overtime, `otwin` and `otloss` are the points of an overtime result and are keyed `otw` and `otl`.
 ---`X-Y` is the fixed amount of points for an opponent scoring X against Y, replacing the points of its result.
+---Scores may have decimals, e.g. `1.5-0.5`.
 ---@param input string?
 ---@param overtime boolean?
 ---@param tableType 'swiss'|'group'|nil # Picks the default points, swiss if unset
@@ -248,7 +267,8 @@ function StandingsParseWiki.parsePoints(input, overtime, tableType)
 	local entries = Array.filter(Array.parseCommaSeparatedString(input), Logic.isNotEmpty)
 	Array.forEach(entries, function(entry)
 		local key, value = unpack(Array.parseCommaSeparatedString(entry, '='))
-		local pointsKey = RESULT_POINTS_KEYS[key] or (key and key:match('^%d+%-%d+$') and key)
+		local ownScore, otherScore = (key or ''):match('^(%d+%.?%d*)%-(%d+%.?%d*)$')
+		local pointsKey = RESULT_POINTS_KEYS[key] or (ownScore and makeScoreKey(ownScore, otherScore))
 		assert(pointsKey, 'Invalid points input: unknown key "' .. tostring(key) .. '" in "' .. entry .. '"')
 		assert(overtime or not OVERTIME_POINTS_KEYS[pointsKey],
 			'Invalid points input: "' .. entry .. '" requires overtime to be enabled')
@@ -273,7 +293,7 @@ local function getScoreKey(match, opponent)
 		return nil
 	end
 	local other = opponents[1] == opponent and opponents[2] or opponents[1]
-	return opponent.score .. '-' .. other.score
+	return makeScoreKey(opponent.score, other.score)
 end
 
 ---@param tabletype StandingsTableTypes
