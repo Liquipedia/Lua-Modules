@@ -138,12 +138,21 @@ describe('Standings Legacy Next', function()
 	end)
 
 	describe('statuses', function()
-		it('maps dq<N> to the first round and round<R>dq<N> to that round', function()
-			local args = {dq1 = 'true', round3dq2 = 'true', round2dq3 = 'true', round4dq3 = 'true', round5dq4 = 'true'}
-			assert.are_equal(1, StandingTableLegacyNext.parseDisqualifiedFromRound(args, 1, 4))
+		it('maps dq<N> to the final round and round<R>dq<N> to that round', function()
+			local args = {
+				dq1 = 'true',
+				round3dq2 = 'true',
+				round2dq3 = 'true',
+				round4dq3 = 'true',
+				round5dq4 = 'true',
+				round2dq5 = 'true',
+				dq5 = 'true',
+			}
+			assert.are_equal(4, StandingTableLegacyNext.parseDisqualifiedFromRound(args, 1, 4))
 			assert.are_equal(3, StandingTableLegacyNext.parseDisqualifiedFromRound(args, 2, 4))
 			assert.are_equal(2, StandingTableLegacyNext.parseDisqualifiedFromRound(args, 3, 4))
 			assert.is_nil(StandingTableLegacyNext.parseDisqualifiedFromRound(args, 4, 4))
+			assert.are_equal(2, StandingTableLegacyNext.parseDisqualifiedFromRound(args, 5, 4))
 		end)
 
 		it('maps round<R>bg<N> to r<R>bg and bg<N> to the final round', function()
