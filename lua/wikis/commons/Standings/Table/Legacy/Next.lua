@@ -386,8 +386,15 @@ function StandingTableLegacyNext.groupMatchesByRound(args, matchRecords)
 	local roundEndTimes = Array.mapIndexes(function(roundIndex)
 		return DateExt.readTimestamp(args['round' .. roundIndex .. 'edate'])
 	end)
+	-- Matches after the last round end date make up one more round, as in legacy
+	local lastEndTime = roundEndTimes[#roundEndTimes]
+	local hasLaterMatches = lastEndTime ~= nil and Array.any(matches, function(match)
+		return match.time > lastEndTime
+	end)
 
-	local roundCount = StandingTableLegacyNext.computeRoundCount(args, matches, #roundEndTimes)
+	local roundCount = StandingTableLegacyNext.computeRoundCount(
+		args, matches, #roundEndTimes + (hasLaterMatches and 1 or 0)
+	)
 
 	local _, matchesByRound = Array.groupBy(matches, function(match)
 		if match.round and match.round >= 1 and match.round <= roundCount then
