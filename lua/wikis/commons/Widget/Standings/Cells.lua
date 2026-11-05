@@ -48,10 +48,13 @@ end
 ---@param slot StandingsEntryModel
 ---@return Renderable
 function StandingsCells.placement(slot)
+	local definitiveStatus = Logic.nilIfEmpty(slot.definitiveStatus)
+	local minimumStatus = not definitiveStatus and Logic.nilIfEmpty(slot.minimumStatus) or nil
 	return TableWidgets.Cell{children = Label{
 		children = slot.placement,
-		attributes = {['data-placement-type'] = Logic.nilIfEmpty(slot.definitiveStatus)},
+		attributes = {['data-placement-type'] = definitiveStatus or minimumStatus},
 		labelScheme = 'placement',
+		labelType = minimumStatus and 'placement-minimum' or nil,
 	}}
 end
 
