@@ -50,14 +50,7 @@ local TIEBREAKER_MAPPING_TABLE = {
 	['head to head games'] = 'h2hlegacy.gamediff',
 }
 
-local DEFAULT_TIEBREAKERS = {
-	'matchscore',
-	'gamediff',
-	'h2hlegacy.matchscore',
-	'h2hlegacy.gamediff',
-	'gamewins',
-	'gamelosses',
-}
+local DEFAULT_TIEBREAKERS = {'series', 'diff', 'h2h series', 'h2h games', 'games won', 'games loss'}
 
 local ADJUSTMENTS = {
 	temp_p = 'points',
@@ -67,6 +60,8 @@ local ADJUSTMENTS = {
 	temp_lose_m = 'matchlosses',
 	temp_win_g = 'gamewins',
 	temp_lose_g = 'gamelosses',
+	temp_win_r = 'roundwins',
+	temp_lose_r = 'roundlosses',
 }
 
 -- Legacy counts adjusted matches towards the points
@@ -79,10 +74,66 @@ local MATCH_RESULT_POINTS = {
 ---@alias LegacyGroupRound {index: integer, endTime: integer?}
 ---@alias LegacyGroupOpponentParser fun(args: table, index: integer, rounds: LegacyGroupRound[]): table?
 
----@param args table
----@param parseOpponentInput LegacyGroupOpponentParser
+---Adjustments for the GroupTableLeague variants of wikis
+---@class LegacyGroupConfig
+---@field tiebreakers table<string, string>? # Overrides of the tiebreaker mapping
+---@field defaultTiebreakers string[]? # Legacy tiebreaker names
+---@field defaultPointsTiebreakers string[]? # Legacy tiebreaker names, with `show_p`
+
+---Valorant has its own tiebreakers, `diff` is the round difference
+---@type LegacyGroupConfig
+StandingTableLegacyGroup.VALORANT_CONFIG = {
+	tiebreakers = {
+		diff = 'rounddiff',
+		['diff games'] = 'gamediff',
+		['rounds won'] = 'roundwins',
+		['rounds loss'] = 'roundlosses',
+		['h2h series'] = 'h2hcs.matchdiff',
+		['head-to-head series'] = 'h2hcs.matchdiff',
+		['head to head series'] = 'h2hcs.matchdiff',
+		['h2h league'] = 'ml.matchdiff',
+		['head-to-head league'] = 'ml.matchdiff',
+		['head to head league'] = 'ml.matchdiff',
+		['h2h rounds'] = 'h2hlegacy.rounddiff',
+		['head-to-head rounds'] = 'h2hlegacy.rounddiff',
+		['head to head rounds'] = 'h2hlegacy.rounddiff',
+		['h2h rounds won'] = 'h2hlegacy.roundwins',
+		['head-to-head rounds won'] = 'h2hlegacy.roundwins',
+		['head to head rounds won'] = 'h2hlegacy.roundwins',
+	},
+	defaultTiebreakers = {
+		'series', 'h2h series', 'h2h games', 'diff games', 'games won', 'h2h rounds', 'h2h rounds won', 'diff', 'rounds won',
+	},
+	defaultPointsTiebreakers = {'points'},
+}
+
+---Common local Module:GroupTableLeague
+---@param frame Frame
 ---@return Renderable
-local function run(args, parseOpponentInput)
+function StandingTableLegacyGroup.classic(frame)
+	return StandingTableLegacyGroup.run(Arguments.getArgs(frame))
+end
+
+---Module:GroupTableLeague of valorant
+---@param frame Frame
+---@return Renderable
+function StandingTableLegacyGroup.valorant(frame)
+	return StandingTableLegacyGroup.run(Arguments.getArgs(frame), StandingTableLegacyGroup.VALORANT_CONFIG)
+end
+
+---Module:GroupTableLeague/solo
+---@param frame Frame
+---@return Renderable
+function StandingTableLegacyGroup.solo(frame)
+	return StandingTableLegacyGroup.run(Arguments.getArgs(frame), nil, StandingTableLegacyGroup.parseSoloInput)
+end
+
+---@param args table
+---@param config LegacyGroupConfig?
+---@param parseOpponentInput LegacyGroupOpponentParser? # Defaults to team input
+---@return Renderable
+function StandingTableLegacyGroup.run(args, config, parseOpponentInput)
+	parseOpponentInput = parseOpponentInput or StandingTableLegacyGroup.parseTeamInput
 	local legacyRounds = StandingTableLegacyGroup.parseRounds(args, DateExt.getCurrentTimestamp())
 	local matchesByRound = StandingTableLegacyGroup.groupMatchesByRound(
 		legacyRounds, StandingTableLegacyNext.fetchMatches(args)
@@ -96,27 +147,15 @@ local function run(args, parseOpponentInput)
 		return parseOpponentInput(args, index, legacyRounds)
 	end)
 
+	local tiebreakers = StandingTableLegacyGroup.parseTiebreakers(args, config)
+
 	return StandingTable.fromTemplate(Table.merge(
 		StandingTableLegacyGroup.getStandardParameter(args, opponents),
 		{bg = StandingTableLegacySwiss.parseWikiBgs(args, 'pbg')},
 		rounds,
 		opponents,
-		{tiebreakers = StandingTableLegacyGroup.parseTiebreakers(args)}
+		{tiebreakers = tiebreakers, tiebreakerreset = StandingTableLegacyGroup.needsTiebreakerReset(tiebreakers)}
 	))
-end
-
----Common local Module:GroupTableLeague
----@param frame Frame
----@return Renderable
-function StandingTableLegacyGroup.classic(frame)
-	return run(Arguments.getArgs(frame), StandingTableLegacyGroup.parseTeamInput)
-end
-
----Module:GroupTableLeague/solo
----@param frame Frame
----@return Renderable
-function StandingTableLegacyGroup.solo(frame)
-	return run(Arguments.getArgs(frame), StandingTableLegacyGroup.parseSoloInput)
 end
 
 ---@param args table
@@ -127,7 +166,29 @@ function StandingTableLegacyGroup.getStandardParameter(args, opponents)
 		tabletype = 'group',
 		title = args.title or mw.title.getCurrentTitle().text,
 		importopponents = #opponents == 0,
+		walkoverrounds = StandingTableLegacyGroup.parseWalkoverRounds(args),
 	})
+end
+
+---h2hcs only splits off the tops and bottoms, the reset applies it again to the opponents left tied
+---@param tiebreakers string[]
+---@return true?
+function StandingTableLegacyGroup.needsTiebreakerReset(tiebreakers)
+	return Array.any(tiebreakers, function(tiebreaker)
+		return tiebreaker:match('^h2hcs%.') ~= nil
+	end) or nil
+end
+
+---Legacy `walkover_rounds_win` counts for the whole match, the standings per map of the `walkover_win` maps
+---@param args table
+---@return integer?
+function StandingTableLegacyGroup.parseWalkoverRounds(args)
+	local rounds = tonumber(args.walkover_rounds_win)
+	if not rounds then
+		return nil
+	end
+	local maps = tonumber(args.walkover_win)
+	return math.floor(rounds / ((maps and maps > 0) and maps or 1))
 end
 
 ---Reads `r<R><parameter><N>`, `round<R><parameter><N>` and `<parameter><N>`
@@ -315,18 +376,23 @@ function StandingTableLegacyGroup.parseSoloInput(args, playerIndex, rounds)
 end
 
 ---@param args table
+---@param config LegacyGroupConfig?
 ---@return string[]
-function StandingTableLegacyGroup.parseTiebreakers(args)
-	local tiebreakers = {}
+function StandingTableLegacyGroup.parseTiebreakers(args, config)
+	config = config or {}
+	local mapping = Table.merge(TIEBREAKER_MAPPING_TABLE, config.tiebreakers)
+	local inputs = {}
 	for _, value in Table.iter.pairsByPrefix(args, 'tiebreaker', {requireIndex = true}) do
-		local mappedTiebreaker = TIEBREAKER_MAPPING_TABLE[value]
-		assert(mappedTiebreaker, 'Unknown tiebreaker: ' .. value)
-		table.insert(tiebreakers, mappedTiebreaker)
+		table.insert(inputs, value)
 	end
-	if #tiebreakers > 0 then
-		return tiebreakers
+	if #inputs == 0 and Logic.readBool(args.show_p) then
+		inputs = config.defaultPointsTiebreakers or Array.extend('points', DEFAULT_TIEBREAKERS)
+	elseif #inputs == 0 then
+		inputs = config.defaultTiebreakers or DEFAULT_TIEBREAKERS
 	end
-	return Array.extend(Logic.readBool(args.show_p) and 'points' or nil, DEFAULT_TIEBREAKERS)
+	return Array.map(inputs, function(input)
+		return assert(mapping[input], 'Unknown tiebreaker: ' .. input)
+	end)
 end
 
 return StandingTableLegacyGroup

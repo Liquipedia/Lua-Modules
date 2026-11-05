@@ -14,6 +14,8 @@ local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
 ---@class TiebreakerDisqualified : StandingsTiebreaker
 local TiebreakerDisqualified = Class.new(TiebreakerInterface)
 
+TiebreakerDisqualified.fullContextOnly = true
+
 ---Disqualified opponents get the lowest value, and as tiebreakers sort descending they end up last.
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent

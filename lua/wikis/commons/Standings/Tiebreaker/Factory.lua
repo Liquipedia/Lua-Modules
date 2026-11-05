@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Set = Lua.import('Module:Set')
 local String = Lua.import('Module:StringUtils')
 
 local TiebreakerFactory = {}
@@ -46,32 +45,6 @@ local NAME_TO_CLASS = {
 	startingpoints = 'StartingPoints',
 }
 
--- Tiebreakers that are not derived from the matches among tied opponents, so they only exist in the full context
----@type Set<string>
-local NON_MATCH_BASED = Set{
-	'buchholz',
-	'medianbuchholz',
-	'buchholzcutone',
-	'buchholzpoints',
-	'medianbuchholzpoints',
-	'buchholzcutonepoints',
-	'sonnebornberger',
-	'manual',
-	'disqualified',
-	'startingpoints',
-}
-
--- Tiebreakers that read the games of the matches
----@type Set<string>
-local READS_GAMES = Set{
-	'gamediffregulation',
-	'roundwins',
-	'roundlosses',
-	'rounddiff',
-	'roundwinrate',
-	'roundscore',
-}
-
 -- Game tiebreakers and their match counterpart
 ---@type table<string, string>
 local GAME_TO_MATCH = {
@@ -82,6 +55,16 @@ local GAME_TO_MATCH = {
 	gamediff = 'matchdiff',
 	gamewinrate = 'matchwinrate',
 }
+
+---@param name string?
+---@return StandingsTiebreaker?
+local function getTiebreakerClass(name)
+	local tiebreakerClassName = name and NAME_TO_CLASS[name]
+	if not tiebreakerClassName then
+		return nil
+	end
+	return Lua.import('Module:Standings/Tiebreaker/' .. tiebreakerClassName)
+end
 
 --- Splits a tiebreaker id into its context and name.
 --- Input without a context (e.g. `points`) only has a first part, which then is the name.
@@ -106,10 +89,10 @@ function TiebreakerFactory.validateAndNormalizeInput(input)
 		'Invalid tie breaker context: ' .. context
 	)
 
-	local tiebreakerClassName = NAME_TO_CLASS[name]
-	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(input))
+	local TiebreakerClass = getTiebreakerClass(name)
+	assert(TiebreakerClass, "Invalid tiebreaker type: " .. tostring(input))
 	assert(
-		context == 'full' or not NON_MATCH_BASED:contains(name),
+		context == 'full' or not TiebreakerClass.fullContextOnly,
 		'Tiebreaker "' .. name .. '" cannot be used in the ' .. context .. ' context, '
 			.. 'as it is not derived from the matches among the tied opponents'
 	)
@@ -120,7 +103,17 @@ end
 ---@return boolean
 function TiebreakerFactory.readsGames(tiebreakerId)
 	local _, name = TiebreakerFactory.parseId(tiebreakerId)
-	return name ~= nil and READS_GAMES:contains(name)
+	local TiebreakerClass = getTiebreakerClass(name)
+	return TiebreakerClass ~= nil and TiebreakerClass.readsGames
+end
+
+--- Whether the value only depends on the match record and points of the opponent, which needs the full context.
+---@param tiebreakerId string
+---@return boolean
+function TiebreakerFactory.isMatchRecordOnly(tiebreakerId)
+	local context, name = TiebreakerFactory.parseId(tiebreakerId)
+	local TiebreakerClass = getTiebreakerClass(name)
+	return context == 'full' and TiebreakerClass ~= nil and TiebreakerClass.matchRecordOnly
 end
 
 --- The match counterpart of a game tiebreaker, other tiebreakers are returned unchanged.
@@ -140,11 +133,8 @@ end
 ---@return StandingsTiebreaker
 function TiebreakerFactory.tiebreakerFromId(tiebreakerId, options)
 	local context, name = TiebreakerFactory.parseId(tiebreakerId)
-	local tiebreakerClassName = NAME_TO_CLASS[name]
-	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(tiebreakerId))
-
-	---@type StandingsTiebreaker
-	local TiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. tiebreakerClassName)
+	local TiebreakerClass = getTiebreakerClass(name)
+	assert(TiebreakerClass, "Invalid tiebreaker type: " .. tostring(tiebreakerId))
 	return TiebreakerClass(context, options)
 end
 

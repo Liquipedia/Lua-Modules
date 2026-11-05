@@ -18,6 +18,8 @@ local TiebreakerMembers = Lua.import('Module:Standings/Tiebreaker/Members')
 ---@class TiebreakerBuchholz : StandingsTiebreaker
 local TiebreakerBuchholz = Class.new(TiebreakerInterface)
 
+TiebreakerBuchholz.fullContextOnly = true
+
 ---The score of a faced opponent
 ---@param member TiebreakerOpponent
 ---@return number
