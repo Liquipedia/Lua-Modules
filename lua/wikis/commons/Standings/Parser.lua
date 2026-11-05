@@ -21,6 +21,8 @@ local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParser = {}
 
+local DISQUALIFIED_STATUS = 'dq'
+
 ---@class StandingsParserOptions
 ---@field drawConfig {match: boolean?}? Explicit draw toggles per level; when unset, draws are detected from the data
 ---@field overtime boolean? Whether overtime results are tracked separately from regulation results
@@ -221,7 +223,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 	---matches: MatchGroupUtilMatch[]?, matchPoints: table<string, number>?}[]
 
 	StandingsParser.addStatuses(entries, bgs, 'currentstatus')
-	StandingsParser.addStatusesFromPlacementRange(entries, bgs)
+	StandingsParser.addStatusesFromPlacementRange(entries, bgs, #opponents)
 	if isFinished then
 		StandingsParser.addStatuses(Array.filter(entries, function(opponentRound)
 			return opponentRound.roundindex == #rounds
@@ -461,29 +463,48 @@ function StandingsParser.addStatuses(opponentEnties, bgs, field)
 	end)
 end
 
----Sets the definite status of opponents whose placement range has a single status.
----@param opponentEntries {placerange: StandingsPlacementRangeValue?, definitestatus: string?}[]
+---Sets the definite status of opponents whose placement range has a single status, else the min status when the
+---range rules out a later status other than dq. A manual min status takes priority.
+---@param opponentEntries {placerange: StandingsPlacementRangeValue?, definitestatus: string?, extradata: table}[]
 ---@param bgs table<integer, string>
-function StandingsParser.addStatusesFromPlacementRange(opponentEntries, bgs)
+---@param slotCount integer
+function StandingsParser.addStatusesFromPlacementRange(opponentEntries, bgs, slotCount)
+	local function hasSingleStatus(firstSlot, lastSlot)
+		return Array.all(Array.range(firstSlot, lastSlot), function(slot)
+			return bgs[slot] == bgs[firstSlot]
+		end)
+	end
+	local function hasWorseStatusAfter(slot)
+		return Array.any(Array.range(slot + 1, slotCount), function(laterSlot)
+			return bgs[laterSlot] ~= bgs[slot] and bgs[laterSlot] ~= DISQUALIFIED_STATUS
+		end)
+	end
+
 	-- Most entries share a few ranges
-	local statusByRange = {}
-	local function statusOfRange(range)
+	local statusesByRange = {}
+	local function statusesOfRange(range)
 		local key = range[1] .. '-' .. range[2]
-		if statusByRange[key] == nil then
-			local status = bgs[range[1]]
-			local hasSingleStatus = Array.all(Array.range(range[1], range[2]), function(slot)
-				return bgs[slot] == status
-			end)
-			statusByRange[key] = hasSingleStatus and status or false
+		if statusesByRange[key] then
+			return statusesByRange[key]
 		end
-		return statusByRange[key] or nil
+		local worstStatus = bgs[range[2]]
+		if hasSingleStatus(range[1], range[2]) then
+			statusesByRange[key] = {definite = worstStatus}
+		elseif hasWorseStatusAfter(range[2]) then
+			statusesByRange[key] = {minimum = worstStatus}
+		else
+			statusesByRange[key] = {}
+		end
+		return statusesByRange[key]
 	end
 
 	Array.forEach(opponentEntries, function(opponent)
 		if not opponent.placerange then
 			return
 		end
-		opponent.definitestatus = statusOfRange(opponent.placerange)
+		local statuses = statusesOfRange(opponent.placerange)
+		opponent.definitestatus = statuses.definite
+		opponent.extradata.minstatus = opponent.extradata.minstatus or statuses.minimum
 	end)
 end
 
@@ -522,8 +543,8 @@ end
 function StandingsParser.applyDisqualifications(opponentEntries)
 	Array.forEach(opponentEntries, function(opponent)
 		if opponent.extradata.disqualified then
-			opponent.currentstatus = 'dq'
-			opponent.definitestatus = 'dq'
+			opponent.currentstatus = DISQUALIFIED_STATUS
+			opponent.definitestatus = DISQUALIFIED_STATUS
 		end
 	end)
 end

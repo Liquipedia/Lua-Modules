@@ -1712,6 +1712,47 @@ describe('Standings Parser', function()
 			assert.are_equal('stay', findEntry(parse(opponents).entries, 'Alpha', 2).definitestatus)
 		end)
 
+		describe('min status', function()
+			local MIN_STATUS_BGS = {[1] = 'up', [2] = 'stay', [3] = 'stay', [4] = 'down'}
+
+			local function parseWithMinStatusBgs(opponents)
+				return StandingsParser.parse(
+					DECIDER_UPCOMING, opponents, MIN_STATUS_BGS, nil, {}, 'swiss', GSL_TIEBREAKERS, {format = GSL}
+				).entries
+			end
+
+			it('is the status of the worst placement when the range rules out a later status', function()
+				local entries = parseWithMinStatusBgs(gslOpponents(false))
+				assert.are_equal('stay', findEntry(entries, 'Alpha', 1).extradata.minstatus)
+				assert.is_nil(findEntry(entries, 'Alpha', 1).definitestatus)
+				assert.is_nil(findEntry(entries, 'Bravo', 1).extradata.minstatus)
+			end)
+
+			it('is not set with a definite status', function()
+				local entries = parseWithMinStatusBgs(gslOpponents(false))
+				assert.are_equal('up', findEntry(entries, 'Alpha', 2).definitestatus)
+				assert.is_nil(findEntry(entries, 'Alpha', 2).extradata.minstatus)
+				assert.are_equal('stay', findEntry(entries, 'Bravo', 2).definitestatus)
+			end)
+
+			it('is not set when the worst placement shares the status of the last slot', function()
+				assert.is_nil(findEntry(parse(gslOpponents(false)).entries, 'Alpha', 1).extradata.minstatus)
+			end)
+
+			it('is not set when only dq is ruled out', function()
+				local entries = StandingsParser.parse(DECIDER_UPCOMING, gslOpponents(false),
+					{[1] = 'up', [2] = 'stay', [3] = 'down', [4] = 'dq'}, nil, {}, 'swiss', GSL_TIEBREAKERS, {format = GSL}
+				).entries
+				assert.is_nil(findEntry(entries, 'Alpha', 1).extradata.minstatus)
+			end)
+
+			it('keeps a manual min status', function()
+				local opponents = gslOpponents(false)
+				opponents[1].minStatuses = {[1] = 'up'}
+				assert.are_equal('up', findEntry(parseWithMinStatusBgs(opponents), 'Alpha', 1).extradata.minstatus)
+			end)
+		end)
+
 		it('are set when the points agree with the record', function()
 			local entries = parse(gslOpponents(false), nil, POINTS_TIEBREAKERS).entries
 			assert.are_same({1, 1}, findEntry(entries, 'Alpha', 2).placerange)
