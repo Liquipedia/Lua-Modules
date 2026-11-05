@@ -48,10 +48,10 @@ end
 
 ---@generic T: HtmlNodeProps
 ---@param props T
----@param opponent standardOpponent
+---@param opponent standardOpponent?
 ---@return T
 function DisplayHelper.addOpponentHighlightToProps(props, opponent)
-	if Opponent.isTbd(opponent) then
+	if not opponent or Opponent.isTbd(opponent) then
 		return props
 	end
 	props.classes = props.classes or {}
