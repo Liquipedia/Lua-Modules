@@ -69,6 +69,32 @@ describe('Standings Wiki Parser', function()
 			assert.is_nil(withStatuses.rounds[3].scoreboard.points)
 			assert.is_nil(without.definiteStatuses)
 		end)
+
+		it('reads r<round>status as alias of r<round>bg, preferring status', function()
+			assert.are_same(
+				{[1] = 'up', [2] = 'down', [3] = 'stay'},
+				StandingsParseWiki.parseDefiniteStatuses({r1status = 'up', r2bg = 'down', r3status = 'stay', r3bg = 'up'}, 3)
+			)
+			assert.are_same({[1] = 'down'}, StandingsParseWiki.parseDefiniteStatuses({r1status = '', r1bg = 'down'}, 3))
+		end)
+	end)
+
+	describe('min statuses', function()
+		it('reads r<round>minstatus inputs keyed by the round they apply from', function()
+			assert.are_same(
+				{[2] = 'stay', [3] = 'up'},
+				StandingsParseWiki.parseMinStatuses({r2minstatus = 'stay', r3minstatus = 'up', r4minstatus = 'up'}, 3)
+			)
+			assert.is_nil(StandingsParseWiki.parseMinStatuses({r1minstatus = '', minstatus = 'up'}, 3))
+		end)
+
+		it('stores the min statuses on the parsed opponent apart from the definite statuses', function()
+			local opponent = StandingsParseWiki.parseWikiOpponent(
+				{type = 'literal', 'Alpha', r1minstatus = 'stay', r2status = 'up'}, 2)
+
+			assert.are_same({[1] = 'stay'}, opponent.minStatuses)
+			assert.are_same({[2] = 'up'}, opponent.definiteStatuses)
+		end)
 	end)
 
 	describe('adjustments', function()

@@ -168,6 +168,7 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, res
 		startingPoints = opponentData.startingpoints,
 		disqualifiedFromRound = StandingsParseWiki.parseDisqualifiedFromRound(opponentData.dq),
 		definiteStatuses = StandingsParseWiki.parseDefiniteStatuses(opponentData, numberOfRounds),
+		minStatuses = StandingsParseWiki.parseMinStatuses(opponentData, numberOfRounds),
 		adjustments = StandingsParseWiki.parseAdjustments(opponentData, numberOfRounds),
 	}
 end
@@ -184,17 +185,36 @@ function StandingsParseWiki.parseDisqualifiedFromRound(input)
 	return Logic.readBool(input) and 1 or nil
 end
 
----Reads the `r<round>bg` inputs of an opponent, e.g. `r3bg=up`. The status applies from that round onwards.
----Rounds beyond the number of rounds and empty values are ignored.
+---Reads `r<round><suffix>` inputs, each applying from that round onwards.
+---@param opponentData table
+---@param numberOfRounds integer
+---@param inputs string[] # Suffixes by priority
+---@return table<integer, string>?
+local function parseRoundStatuses(opponentData, numberOfRounds, inputs)
+	local statuses = {}
+	for round = 1, numberOfRounds do
+		local input = Array.find(inputs, function(suffix)
+			return Logic.isNotEmpty(opponentData['r' .. round .. suffix])
+		end)
+		statuses[round] = input and opponentData['r' .. round .. input] or nil
+	end
+	return Logic.nilIfEmpty(statuses)
+end
+
+---Reads `r<round>status`, with `r<round>bg` as alias.
 ---@param opponentData table
 ---@param numberOfRounds integer
 ---@return table<integer, string>?
 function StandingsParseWiki.parseDefiniteStatuses(opponentData, numberOfRounds)
-	local statuses = {}
-	for round = 1, numberOfRounds do
-		statuses[round] = Logic.nilIfEmpty(opponentData['r' .. round .. 'bg'])
-	end
-	return Logic.nilIfEmpty(statuses)
+	return parseRoundStatuses(opponentData, numberOfRounds, {'status', 'bg'})
+end
+
+---Reads `r<round>minstatus`.
+---@param opponentData table
+---@param numberOfRounds integer
+---@return table<integer, string>?
+function StandingsParseWiki.parseMinStatuses(opponentData, numberOfRounds)
+	return parseRoundStatuses(opponentData, numberOfRounds, {'minstatus'})
 end
 
 ---Reads the manual adjustments of an opponent, keyed by the round they apply from.
