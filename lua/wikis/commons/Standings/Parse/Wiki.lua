@@ -257,6 +257,59 @@ function StandingsParseWiki.parsePoints(input, overtime, tableType)
 	return points
 end
 
+local MAX_FORMAT_RESULTS = 10
+
+---@type table<string, table>
+local FORMAT_SHORTHANDS = {
+	gsl = {'swiss', adv = 2},
+	swiss = {'swiss'},
+}
+
+---@param value any
+---@return boolean
+local function isValidResultCount(value)
+	return value ~= nil and value > 0 and value <= MAX_FORMAT_RESULTS and value == math.floor(value)
+end
+
+---@type table<string, fun(data: table, input: string): StandingsFormat>
+local FORMAT_PARSERS = {
+	swiss = function(data, input)
+		local winsToAdvance = tonumber(data.adv)
+		local lossesToEliminate = Logic.isEmpty(data.elim) and winsToAdvance or tonumber(data.elim)
+		local bounds = 'an integer from 1 to ' .. MAX_FORMAT_RESULTS
+		assert(isValidResultCount(winsToAdvance), 'Invalid format input: "' .. input .. '" needs adv as ' .. bounds)
+		assert(isValidResultCount(lossesToEliminate), 'Invalid format input: "' .. input .. '" needs elim as ' .. bounds)
+		---@cast winsToAdvance -nil
+		---@cast lossesToEliminate -nil
+		return {type = 'swiss', winsToAdvance = winsToAdvance, lossesToEliminate = lossesToEliminate}
+	end,
+}
+
+---@param input string
+---@return table?
+local function parseFormatShorthand(input)
+	local adv = input:match('^swiss(%d+)$')
+	return FORMAT_SHORTHANDS[input] or (adv and {'swiss', adv = adv}) or nil
+end
+
+---Reads `format`: `gsl`, `swiss<N>` or `{{Json|swiss|adv=<N>|elim=<N>}}`, where `elim` defaults to `adv`.
+---@param args table
+---@param tableType StandingsTableTypes
+---@return StandingsFormat?
+function StandingsParseWiki.parseFormat(args, tableType)
+	local input = args.format
+	if Logic.isEmpty(input) then
+		return nil
+	end
+	local data = Json.parseIfTable(input) or parseFormatShorthand(input)
+	assert(data, 'Invalid format input: unknown format "' .. input .. '"')
+	assert(tableType ~= 'ffa', 'Invalid format input: ffa standings do not support a format')
+	local formatType = data[1] or data['1']
+	local parseFormatData = FORMAT_PARSERS[formatType]
+	assert(parseFormatData, 'Invalid format input: unknown format type "' .. tostring(formatType) .. '"')
+	return parseFormatData(data, input)
+end
+
 ---The score of the opponent in the format of the `X-Y` points input, nil if the match has no (proper) score.
 ---@param match MatchGroupUtilMatch
 ---@param opponent standardOpponent

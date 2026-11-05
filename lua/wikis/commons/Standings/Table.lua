@@ -125,6 +125,7 @@ function StandingsTable.parse(args, tableType)
 		walkoverRounds = StandingsParseWiki.parseWalkoverRounds(args),
 		tiebreakerReset = tiebreakerReset,
 		maxBestOf = maxBestOf,
+		format = StandingsParseWiki.parseFormat(args, tableType),
 	})
 
 	if tableType == 'swiss' then

@@ -12,6 +12,7 @@ local Info = Lua.import('Module:Info', { loadData = true })
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
+local StandingsPlacementRange = Lua.import('Module:Standings/PlacementRange')
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
 local TiebreakerGameUtil = Lua.import('Module:Standings/Tiebreaker/Game/Util')
 local TiebreakerHeadToHead = Lua.import('Module:Standings/Tiebreaker/HeadToHead')
@@ -27,6 +28,7 @@ local StandingsParser = {}
 ---@field walkoverRounds integer? Rounds a walkover map counts as in the round tiebreakers, unset means not counted
 ---@field tiebreakerReset boolean? Whether groups split by a tiebreaker start over from the first tiebreaker
 ---@field maxBestOf number? The highest bestof of the table's matches
+---@field format StandingsFormat? Enables the placement ranges of the opponents
 
 ---@param carried table
 ---@param record table?
@@ -196,8 +198,21 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 			return opponentRound.roundindex == round.roundNumber
 		end), tiebreakerIds, tiebreakerOptions, options.tiebreakerReset)
 	end)
+
+	local placementRangeCalculator = options.format and StandingsPlacementRange.calculator(options.format, opponents)
+	if placementRangeCalculator then
+		Array.forEach(rounds, function(round)
+			-- The final placements of a finished table are exact
+			if isFinished and round.roundNumber == #rounds then
+				return
+			end
+			StandingsPlacementRange.setRanges(placementRangeCalculator, Array.filter(entries, function(opponentRound)
+				return opponentRound.roundindex == round.roundNumber
+			end), round.roundNumber)
+		end)
+	end
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer,
-	---points: number, placement: integer?, slotindex: integer}[]
+	---points: number, placement: integer?, slotindex: integer, placerange: StandingsPlacementRangeValue?}[]
 
 	StandingsParser.setPlacementChange(entries)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer,
@@ -205,6 +220,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 	---matches: MatchGroupUtilMatch[]?, matchPoints: table<string, number>?}[]
 
 	StandingsParser.addStatuses(entries, bgs, 'currentstatus')
+	StandingsParser.addStatusesFromPlacementRange(entries, bgs)
 	if isFinished then
 		StandingsParser.addStatuses(Array.filter(entries, function(opponentRound)
 			return opponentRound.roundindex == #rounds
@@ -441,6 +457,18 @@ end
 function StandingsParser.addStatuses(opponentEnties, bgs, field)
 	Array.forEach(opponentEnties, function(opponent)
 		opponent[field] = bgs[opponent.slotindex]
+	end)
+end
+
+---Sets the definite status of opponents whose placement range has a single status.
+---@param opponentEntries {placerange: StandingsPlacementRangeValue?, definitestatus: string?}[]
+---@param bgs table<integer, string>
+function StandingsParser.addStatusesFromPlacementRange(opponentEntries, bgs)
+	Array.forEach(opponentEntries, function(opponent)
+		local range = opponent.placerange
+		if range and Array.all(Array.range(range[1], range[2]), function(slot) return bgs[slot] == bgs[range[1]] end) then
+			opponent.definitestatus = bgs[range[1]]
+		end
 	end)
 end
 
