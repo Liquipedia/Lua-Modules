@@ -303,17 +303,15 @@ function StandingTableLegacyNext.parseAdjustments(args, index, roundCount)
 	return adjustments
 end
 
----`dq<N>` disqualifies from the first round, `round<R>dq<N>` from round R.
+---`round<R>dq<N>` disqualifies from round R, `dq<N>` from the final round.
 ---@param args table
 ---@param index integer
 ---@param roundCount integer
 ---@return integer?
 function StandingTableLegacyNext.parseDisqualifiedFromRound(args, index, roundCount)
-	if Logic.readBool(args['dq' .. index]) then
-		return 1
-	end
 	return Array.find(Array.range(1, roundCount), function(roundIndex)
 		return Logic.readBool(args['round' .. roundIndex .. 'dq' .. index])
+			or (roundIndex == roundCount and Logic.readBool(args['dq' .. index]))
 	end)
 end
 
