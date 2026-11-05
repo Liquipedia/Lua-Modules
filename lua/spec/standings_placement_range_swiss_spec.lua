@@ -181,6 +181,7 @@ describe('Standings Swiss Placement Range', function()
 		end)
 
 		it('is nil for a number of opponents that does not fit the format', function()
+			assert.is_nil(StandingsSwissPlacementRange.new(GSL, opponentsData(0)))
 			assert.is_nil(StandingsSwissPlacementRange.new(GSL, opponentsData(3)))
 			assert.is_nil(StandingsSwissPlacementRange.new(SWISS, opponentsData(8)))
 		end)

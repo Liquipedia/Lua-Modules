@@ -24,8 +24,8 @@ local StandingsPlacementRange = {}
 ---roundNumber: integer): StandingsPlacementRangeValue[]?
 
 ---@type table<string, string>
-local CALCULATORS = {
-	swiss = 'Module:Standings/PlacementRange/Swiss',
+local TYPE_TO_CLASS = {
+	swiss = 'Swiss',
 }
 
 ---Nil if the opponents do not fit the format.
@@ -33,7 +33,8 @@ local CALCULATORS = {
 ---@param opponents StandingTableOpponentData[]
 ---@return StandingsPlacementRangeCalculator?
 function StandingsPlacementRange.calculator(format, opponents)
-	return Lua.import(CALCULATORS[format.type]).new(format, opponents)
+	local CalculatorClass = Lua.import('Module:Standings/PlacementRange/' .. TYPE_TO_CLASS[format.type])
+	return CalculatorClass.new(format, opponents)
 end
 
 ---Sets `placerange` on the entries of a round, unless the calculator has no ranges or a slot is out of range.

@@ -38,6 +38,9 @@ end)
 ---@param opponents StandingTableOpponentData[]
 ---@return StandingsSwissPlacementRange?
 function StandingsSwissPlacementRange.new(format, opponents)
+	if #opponents == 0 then
+		return nil
+	end
 	local finalRecordCounts = StandingsSwissPlacementRange.countFinalRecords(
 		Array.map(opponents, function() return {w = 0, l = 0} end), format
 	)
@@ -74,17 +77,24 @@ function StandingsSwissPlacementRange.countFinalRecords(records, format)
 		add(isFinal(record.w, record.l) and final or active, record.w, record.l, 1)
 	end)
 
+	-- Splits the opponents on a record into winners and losers, false for an odd number of opponents
+	local function playRecord(wins, losses)
+		local count = Table.getByPathOrNil(active, {wins, losses}) or 0
+		if count % 2 == 1 then
+			return false
+		elseif count == 0 then
+			return true
+		end
+		add(isFinal(wins + 1, losses) and final or active, wins + 1, losses, count / 2)
+		add(isFinal(wins, losses + 1) and final or active, wins, losses + 1, count / 2)
+		return true
+	end
+
 	-- Records with fewer matches feed the later ones
 	for level = 0, format.winsToAdvance + format.lossesToEliminate - 2 do
 		for wins = 0, math.min(level, format.winsToAdvance - 1) do
-			local losses = level - wins
-			local count = (active[wins] or {})[losses] or 0
-			if count % 2 == 1 then
+			if not playRecord(wins, level - wins) then
 				return nil
-			end
-			if count > 0 then
-				add(isFinal(wins + 1, losses) and final or active, wins + 1, losses, count / 2)
-				add(isFinal(wins, losses + 1) and final or active, wins, losses + 1, count / 2)
 			end
 		end
 	end
@@ -96,17 +106,21 @@ end
 ---@param format StandingsSwissFormat
 ---@return StandingsRecordRanges
 function StandingsSwissPlacementRange.rangesFromFinalRecords(finalRecordCounts, format)
-	-- Final records rank by wins, then fewer losses
 	local ranges, first = {}, 1
-	for wins = format.winsToAdvance, 0, -1 do
+	for wins = 0, format.winsToAdvance do
 		ranges[wins] = {}
-		for losses = 0, format.lossesToEliminate do
-			local count = (finalRecordCounts[wins] or {})[losses]
-			if count then
-				ranges[wins][losses] = {first, first + count - 1}
-				first = first + count
-			end
-		end
+	end
+	local function placeFinalRecord(wins, losses)
+		local count = finalRecordCounts[wins][losses]
+		ranges[wins][losses] = {first, first + count - 1}
+		first = first + count
+	end
+	-- Final records rank by wins, then fewer losses
+	for losses = 0, format.lossesToEliminate - 1 do
+		placeFinalRecord(format.winsToAdvance, losses)
+	end
+	for wins = format.winsToAdvance - 1, 0, -1 do
+		placeFinalRecord(wins, format.lossesToEliminate)
 	end
 	-- Other records reach the ranges after a win and after a loss
 	for wins = format.winsToAdvance - 1, 0, -1 do

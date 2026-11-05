@@ -466,9 +466,17 @@ end
 function StandingsParser.addStatusesFromPlacementRange(opponentEntries, bgs)
 	Array.forEach(opponentEntries, function(opponent)
 		local range = opponent.placerange
-		if range and Array.all(Array.range(range[1], range[2]), function(slot) return bgs[slot] == bgs[range[1]] end) then
-			opponent.definitestatus = bgs[range[1]]
+		if not range then
+			return
 		end
+		local status = bgs[range[1]]
+		local hasSingleStatus = Array.all(Array.range(range[1], range[2]), function(slot)
+			return bgs[slot] == status
+		end)
+		if not hasSingleStatus then
+			return
+		end
+		opponent.definitestatus = status
 	end)
 end
 
