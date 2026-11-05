@@ -72,6 +72,7 @@ local MATCH_RESULT_POINTS = {
 }
 
 ---@alias LegacyGroupRound {index: integer, endTime: integer?}
+---@alias LegacyGroupOpponentParser fun(args: table, index: integer, rounds: LegacyGroupRound[]): table?
 
 ---Adjustments for the GroupTableLeague variants of wikis
 ---@class LegacyGroupConfig
@@ -120,10 +121,19 @@ function StandingTableLegacyGroup.valorant(frame)
 	return StandingTableLegacyGroup.run(Arguments.getArgs(frame), StandingTableLegacyGroup.VALORANT_CONFIG)
 end
 
+---Module:GroupTableLeague/solo
+---@param frame Frame
+---@return Renderable
+function StandingTableLegacyGroup.solo(frame)
+	return StandingTableLegacyGroup.run(Arguments.getArgs(frame), nil, StandingTableLegacyGroup.parseSoloInput)
+end
+
 ---@param args table
 ---@param config LegacyGroupConfig?
+---@param parseOpponentInput LegacyGroupOpponentParser? # Defaults to team input
 ---@return Renderable
-function StandingTableLegacyGroup.run(args, config)
+function StandingTableLegacyGroup.run(args, config, parseOpponentInput)
+	parseOpponentInput = parseOpponentInput or StandingTableLegacyGroup.parseTeamInput
 	local legacyRounds = StandingTableLegacyGroup.parseRounds(args, DateExt.getCurrentTimestamp())
 	local matchesByRound = StandingTableLegacyGroup.groupMatchesByRound(
 		legacyRounds, StandingTableLegacyNext.fetchMatches(args)
@@ -133,8 +143,8 @@ function StandingTableLegacyGroup.run(args, config)
 		return 'round' .. roundNumber, roundInput
 	end)
 
-	local opponents = Array.mapIndexes(function(teamIndex)
-		return StandingTableLegacyGroup.parseTeamInput(args, teamIndex, legacyRounds)
+	local opponents = Array.mapIndexes(function(index)
+		return parseOpponentInput(args, index, legacyRounds)
 	end)
 
 	local tiebreakers = StandingTableLegacyGroup.parseTiebreakers(args, config)
@@ -305,6 +315,26 @@ function StandingTableLegacyGroup.parseAdjustments(args, teamIndex, rounds)
 	return adjustments
 end
 
+---The `dq`, `bg` and adjustment inputs of an opponent
+---@param args table
+---@param index integer
+---@param rounds LegacyGroupRound[]
+---@return table
+local function parseOpponentRoundInputs(args, index, rounds)
+	local dqInputs = readRoundInputs(args, 'dq', index, rounds)
+	local disqualifiedRounds = Array.filter(Array.extractKeys(dqInputs), function(roundNumber)
+		return Logic.readBool(dqInputs[roundNumber])
+	end)
+
+	return Table.merge(
+		{dq = Array.min(disqualifiedRounds)},
+		StandingTableLegacyGroup.parseAdjustments(args, index, rounds),
+		Table.map(readRoundInputs(args, 'bg', index, rounds), function(roundNumber, status)
+			return 'r' .. roundNumber .. 'bg', status
+		end)
+	)
+end
+
 ---@param args table
 ---@param teamIndex integer
 ---@param rounds LegacyGroupRound[]
@@ -316,22 +346,33 @@ function StandingTableLegacyGroup.parseTeamInput(args, teamIndex, rounds)
 	end
 
 	local aliases = args['team' .. teamIndex .. 'alias']
-	local dqInputs = readRoundInputs(args, 'dq', teamIndex, rounds)
-	local disqualifiedRounds = Array.filter(Array.extractKeys(dqInputs), function(roundNumber)
-		return Logic.readBool(dqInputs[roundNumber])
-	end)
-
 	return Table.merge({
 		type = Opponent.team,
 		team,
-		dq = Array.min(disqualifiedRounds),
 		aliases = aliases and table.concat(Array.parseCommaSeparatedString(aliases), ';') or nil,
-	},
-		StandingTableLegacyGroup.parseAdjustments(args, teamIndex, rounds),
-		Table.map(readRoundInputs(args, 'bg', teamIndex, rounds), function(roundNumber, status)
-			return 'r' .. roundNumber .. 'bg', status
-		end)
-	)
+	}, parseOpponentRoundInputs(args, teamIndex, rounds))
+end
+
+---Legacy `player<N>` or `p<N>`, with `flag` and `link` suffixes
+---@param args table
+---@param playerIndex integer
+---@param rounds LegacyGroupRound[]
+---@return table?
+function StandingTableLegacyGroup.parseSoloInput(args, playerIndex, rounds)
+	local function read(suffix)
+		return args['player' .. playerIndex .. suffix] or args['p' .. playerIndex .. suffix]
+	end
+	local player = read('')
+	if not player then
+		return nil
+	end
+
+	return Table.merge({
+		type = Opponent.solo,
+		player,
+		flag = read('flag'),
+		link = read('link'),
+	}, parseOpponentRoundInputs(args, playerIndex, rounds))
 end
 
 ---@param args table
