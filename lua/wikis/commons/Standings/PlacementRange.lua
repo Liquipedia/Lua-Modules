@@ -47,12 +47,10 @@ function StandingsPlacementRange.setRanges(calculator, entriesInRound, roundNumb
 		return
 	end
 	-- Tiebreakers that do not rank like the format can contradict the ranges
-	local slotsInRange = Array.all(Array.range(1, #entriesInRound), function(index)
-		local slot = entriesInRound[index].slotindex
-		return ranges[index][1] <= slot and slot <= ranges[index][2]
-	end)
-	if not slotsInRange then
-		return
+	for index, entry in ipairs(entriesInRound) do
+		if entry.slotindex < ranges[index][1] or entry.slotindex > ranges[index][2] then
+			return
+		end
 	end
 	Array.forEach(entriesInRound, function(entry, index)
 		entry.placerange = {ranges[index][1], ranges[index][2]}

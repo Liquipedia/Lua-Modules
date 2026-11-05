@@ -23,15 +23,28 @@ local Table = Lua.import('Module:Table')
 ---Swiss and gsl: opponents meet opponents on the same record until they advance or are eliminated
 ---@class StandingsSwissPlacementRange: StandingsPlacementRangeCalculator
 ---@field format StandingsSwissFormat
----@field opponents StandingTableOpponentData[]
 ---@field finalRecordCounts StandingsRecordCounts
 ---@field rangesByRecord StandingsRecordRanges
-local StandingsSwissPlacementRange = Class.new(function(self, format, opponents, finalRecordCounts, rangesByRecord)
+---@field firstMatchAdjustmentRound integer?
+local StandingsSwissPlacementRange = Class.new(function(self, format, finalRecordCounts, firstMatchAdjustmentRound)
 	self.format = format
-	self.opponents = opponents
 	self.finalRecordCounts = finalRecordCounts
-	self.rangesByRecord = rangesByRecord
+	self.rangesByRecord = self.rangesFromFinalRecords(finalRecordCounts, format)
+	self.firstMatchAdjustmentRound = firstMatchAdjustmentRound
 end)
+
+---@param opponents StandingTableOpponentData[]
+---@return integer?
+local function firstMatchAdjustmentRound(opponents)
+	---@type integer[]
+	local rounds = Array.flatMap(opponents, function(opponentData)
+		local adjustments = opponentData.adjustments or {}
+		return Array.filter(Array.extractKeys(adjustments), function(round)
+			return adjustments[round].match ~= nil
+		end)
+	end)
+	return Array.min(rounds)
+end
 
 ---Nil if the number of opponents does not fit the format.
 ---@param format StandingsSwissFormat
@@ -47,9 +60,7 @@ function StandingsSwissPlacementRange.new(format, opponents)
 	if not finalRecordCounts then
 		return nil
 	end
-	return StandingsSwissPlacementRange(
-		format, opponents, finalRecordCounts, StandingsSwissPlacementRange.rangesFromFinalRecords(finalRecordCounts, format)
-	)
+	return StandingsSwissPlacementRange(format, finalRecordCounts, firstMatchAdjustmentRound(opponents))
 end
 
 ---Number of opponents finishing on each record, `[wins][losses]`. Nil if the records do not fit the format.
@@ -132,16 +143,6 @@ function StandingsSwissPlacementRange.rangesFromFinalRecords(finalRecordCounts, 
 	return ranges
 end
 
----@param roundNumber integer
----@return boolean
-function StandingsSwissPlacementRange:hasMatchAdjustment(roundNumber)
-	return Array.any(self.opponents, function(opponentData)
-		return Table.any(opponentData.adjustments or {}, function(adjustmentRound, adjustment)
-			return adjustmentRound <= roundNumber and adjustment.match ~= nil
-		end)
-	end)
-end
-
 ---@param entriesInRound StandingsPlacementRangeEntry[]
 ---@param roundNumber integer
 ---@return StandingsPlacementRangeValue[]?
@@ -152,7 +153,8 @@ function StandingsSwissPlacementRange:rangesFor(entriesInRound, roundNumber)
 			and entry.overtime == nil
 			and not entry.extradata.disqualified
 	end)
-	if not isEligible or self:hasMatchAdjustment(roundNumber) then
+	local isAdjusted = self.firstMatchAdjustmentRound ~= nil and self.firstMatchAdjustmentRound <= roundNumber
+	if not isEligible or isAdjusted then
 		return nil
 	end
 	-- Rejects records that same record pairings can not produce

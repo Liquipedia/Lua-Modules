@@ -464,19 +464,25 @@ end
 ---@param opponentEntries {placerange: StandingsPlacementRangeValue?, definitestatus: string?}[]
 ---@param bgs table<integer, string>
 function StandingsParser.addStatusesFromPlacementRange(opponentEntries, bgs)
+	-- Most entries share a few ranges
+	local statusByRange = {}
+	local function statusOfRange(range)
+		local key = range[1] .. '-' .. range[2]
+		if statusByRange[key] == nil then
+			local status = bgs[range[1]]
+			local hasSingleStatus = Array.all(Array.range(range[1], range[2]), function(slot)
+				return bgs[slot] == status
+			end)
+			statusByRange[key] = hasSingleStatus and status or false
+		end
+		return statusByRange[key] or nil
+	end
+
 	Array.forEach(opponentEntries, function(opponent)
-		local range = opponent.placerange
-		if not range then
+		if not opponent.placerange then
 			return
 		end
-		local status = bgs[range[1]]
-		local hasSingleStatus = Array.all(Array.range(range[1], range[2]), function(slot)
-			return bgs[slot] == status
-		end)
-		if not hasSingleStatus then
-			return
-		end
-		opponent.definitestatus = status
+		opponent.definitestatus = statusOfRange(opponent.placerange)
 	end)
 end
 
