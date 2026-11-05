@@ -146,6 +146,7 @@ local infoData = {
 				swiss = {'matchscore', 'roundscore'},
 				group = {'matchscore', 'roundscore'},
 			},
+			overtime = {regulationRounds = 24},
 		},
 	},
 }

@@ -304,10 +304,11 @@ describe('Standings model round trip', function()
 
 		---@param rounds table[]
 		---@param opponents table[]
+		---@param bgs table<integer, string>?
 		---@return string, StandingsModel
-		local function storeAndRender(rounds, opponents)
+		local function storeAndRender(rounds, opponents, bgs)
 			local standingsTable = StandingsParser.parse(
-				rounds, opponents, {[1] = 'up', [3] = 'down'}, 'Group A', {}, 'group',
+				rounds, opponents, bgs or {[1] = 'up', [3] = 'down'}, 'Group A', {}, 'group',
 				{'full.disqualified', 'full.points', 'full.manual'}
 			)
 			local standings = storeAndBuild(standingsTable)
@@ -389,6 +390,27 @@ describe('Standings model round trip', function()
 			assert.is_falsy(html:find('data-toggle-area-content', 1, true))
 			assert.is_truthy(html:find('Alpha', 1, true))
 			assert.is_truthy(html:find('Bravo', 1, true))
+		end)
+
+		it('renders undecided, minimum and confirmed placements', function()
+			local alpha = makeGroupOpponent('Alpha', {{w = 2, d = 0, l = 0}})
+			alpha.definiteStatuses = {[1] = 'up'}
+			local bravo = makeGroupOpponent('Bravo', {{w = 1, d = 0, l = 1}})
+			bravo.minStatuses = {[1] = 'stay'}
+			local delta = makeGroupOpponent('Delta', {{w = 0, d = 0, l = 2}})
+			delta.definiteStatuses = {[1] = 'down'}
+			local html = storeAndRender({{roundNumber = 1, started = true, finished = false, title = 'Round 1'}}, {
+				alpha, bravo, makeGroupOpponent('Charlie', {{w = 0, d = 1, l = 1}}), delta,
+			}, {[1] = 'up', [2] = 'up', [3] = 'down', [4] = 'down'})
+
+			local _, minimumCount = html:gsub('data%-label%-type="placement%-minimum"', '')
+			assert.are_equal(1, minimumCount)
+			assert.is_truthy(html:find('data-placement-type="stay" data-label-type="placement-minimum"', 1, true))
+			assert.is_truthy(html:find('data-placement-type="up">1<', 1, true))
+			assert.is_truthy(html:find('data-placement-type="down">4<', 1, true))
+			assert.is_truthy(html:find('class="generic-label label--placement">3<', 1, true))
+
+			GoldenTest('standings_group_placement_status', html)
 		end)
 	end)
 end)
