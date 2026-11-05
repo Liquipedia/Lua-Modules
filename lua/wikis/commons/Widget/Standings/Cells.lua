@@ -49,11 +49,11 @@ end
 ---@param slot StandingsEntryModel
 ---@return Renderable
 function StandingsCells.placement(slot)
-	return TableWidgets.Cell{children = Label{
+	return TableWidgets.Cell(DisplayHelper.addOpponentHighlightToProps({children = Label{
 		children = slot.placement,
 		attributes = {['data-placement-type'] = Logic.nilIfEmpty(slot.definitiveStatus)},
 		labelScheme = 'placement',
-	}}
+	}}, slot.opponent))
 end
 
 ---@param slot StandingsEntryModel
@@ -73,10 +73,10 @@ end
 function StandingsCells.stats(slot, statsToShow, boldStatTitle)
 	return Array.map(statsToShow, function(stat)
 		local statValue = slot.additionalStatsValues[stat.id]
-		return TableWidgets.Cell{
+		return TableWidgets.Cell(DisplayHelper.addOpponentHighlightToProps({
 			css = {['font-weight'] = stat.title == boldStatTitle and 'bold' or nil},
 			children = statValue and statValue.display or '',
-		}
+		}, slot.opponent))
 	end)
 end
 
