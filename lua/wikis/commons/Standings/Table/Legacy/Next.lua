@@ -119,7 +119,11 @@ function StandingTableLegacyNext.getStandardParameter(args, opponents, tableType
 		store = Logic.readBoolOrNil(args.storeStanding),
 		-- Legacy has no overtime, so `show_otp` is ignored
 		overtime = false,
-		points = StandingTableLegacySwiss.parsePoints(args, StandingTableLegacyNext.readResultPoints(args), false),
+		points = StandingTableLegacySwiss.parsePoints(args, {
+			resultDefaults = StandingTableLegacyNext.readResultPoints(args),
+			overtime = false,
+			decimalScores = true,
+		}),
 	})
 end
 
