@@ -243,7 +243,7 @@ function TeamParticipantsWikiParser.parsePlayers(input)
 	return Array.map(input.players or {}, TeamParticipantsWikiParser.parsePlayer)
 end
 
---- `played` and `results` stay nil unless set; `resolvePlayerFlags` applies the defaults.
+--- `played`/`results` stay nil unless set.
 ---@param playerInput table
 ---@return standardPlayer
 function TeamParticipantsWikiParser.parsePlayer(playerInput)
@@ -274,46 +274,6 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 		leaveDate = Logic.nilIfEmpty(playerInput.leavedate),
 	}
 	return player
-end
-
---- Applies defaults to unset flags: `played` defaults to true, `results` follows `played`.
----@param player standardPlayer
-function TeamParticipantsWikiParser.resolvePlayerFlags(player)
-	local extradata = player.extradata or {}
-	player.extradata = extradata
-	extradata.results = Logic.nilOr(extradata.results, extradata.played, true)
-	extradata.played = Logic.nilOr(extradata.played, true)
-end
-
----@param opponent standardOpponent
----@param minimumPlayers number?
-function TeamParticipantsWikiParser.fillIncompleteRoster(opponent, minimumPlayers)
-	local expectedPlayerCount = minimumPlayers or
-		(Info.config.participants or {}).defaultPlayerNumber
-
-	if not expectedPlayerCount or not opponent.players then
-		return
-	end
-
-	local activePlayers = Array.filter(opponent.players, function(player)
-		return player.extradata.type == 'player' and not player.extradata.status
-	end)
-
-	local activePlayerCount = #activePlayers
-	if activePlayerCount >= expectedPlayerCount then
-		return
-	end
-
-	local tbdPlayers = TeamParticipantsWikiParser.createTBDPlayers(expectedPlayerCount - activePlayerCount)
-	Array.extendWith(opponent.players, tbdPlayers)
-end
-
----@param count number
----@return standardPlayer[]
-function TeamParticipantsWikiParser.createTBDPlayers(count)
-	return Array.mapRange(1, count, function()
-		return TeamParticipantsWikiParser.parsePlayer{'TBD'}
-	end)
 end
 
 return TeamParticipantsWikiParser

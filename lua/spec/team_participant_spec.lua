@@ -70,6 +70,7 @@ describe('Team Participant', function()
 
 	describe('TeamParticipants player parsing', function()
 		local TeamParticipantsWikiParser = require('Module:TeamParticipants/Parse/Wiki')
+		local TeamParticipantsRoster = require('Module:TeamParticipants/Roster')
 
 		describe('parsePlayer status', function()
 			it('passes status through from input', function()
@@ -239,13 +240,13 @@ describe('Team Participant', function()
 
 			describe('createTBDPlayers', function()
 				it('check', function()
-					local players = TeamParticipantsWikiParser.createTBDPlayers(3)
+					local players = TeamParticipantsRoster.createTBDPlayers(3)
 					assert.are_equal(3, #players)
 					assert.are_equal('TBD', players[1].displayName)
 					assert.are_equal('player', players[1].extradata.type)
 					assert.is_not_nil(players[1].extradata)
 
-					assert.are_equal(0, #TeamParticipantsWikiParser.createTBDPlayers(0))
+					assert.are_equal(0, #TeamParticipantsRoster.createTBDPlayers(0))
 				end)
 			end)
 
@@ -259,7 +260,7 @@ describe('Team Participant', function()
 						}
 					}
 
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent, 5)
 
 					assert.are_equal(5, #opponent.players)
 					assert.are_equal('Player1', opponent.players[1].displayName)
@@ -278,7 +279,7 @@ describe('Team Participant', function()
 						}
 					}
 
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent, 5)
 
 					assert.are_equal(5, #opponent.players)
 					assert.are_equal('Player5', opponent.players[5].displayName)
@@ -297,7 +298,7 @@ describe('Team Participant', function()
 						}
 					}
 
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent, 5)
 
 					assert.are_equal(7, #opponent.players)
 				end)
@@ -313,7 +314,7 @@ describe('Team Participant', function()
 						}
 					}
 
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent, 5)
 
 					assert.are_equal(7, #opponent.players)
 					local activePlayers = Array.filter(opponent.players, function(p)
@@ -332,7 +333,7 @@ describe('Team Participant', function()
 						}
 					}
 
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent, 5)
 
 					local activePlayers = Array.filter(opponent.players, function(p)
 						return p.extradata.type == 'player' and not p.extradata.status
@@ -346,11 +347,11 @@ describe('Team Participant', function()
 							{displayName = 'Player1', extradata = {type = 'player'}},
 						}
 					}
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent1, nil)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent1, nil)
 					assert.are_equal(1, #opponent1.players)
 
 					local opponent2 = {}
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent2, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent2, 5)
 					assert.is_nil(opponent2.players)
 				end)
 			end)
@@ -1190,6 +1191,7 @@ end)
 
 describe('Team Participants Controller', function()
 	local TeamParticipantsController = require('Module:TeamParticipants/Controller')
+	local TeamParticipantsRoster = require('Module:TeamParticipants/Roster')
 	local Array = require('Module:Array')
 	local Table = require('Module:Table')
 
@@ -1361,7 +1363,7 @@ describe('Team Participants Controller', function()
 		end)
 	end)
 
-	describe('mergeManualAndImportedPlayers', function()
+	describe('mergeImportedPlayers', function()
 		it('prepends new imported players to manual list', function()
 			local manualPlayers = {
 				{displayName = 'ManualPlayer1', pageName = 'ManualPlayer1', extradata = {type = 'player'}},
@@ -1371,7 +1373,7 @@ describe('Team Participants Controller', function()
 				{displayName = 'ImportedPlayer2', pageName = 'ImportedPlayer2', extradata = {type = 'player'}},
 			}
 
-			TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers, importedPlayers)
+			TeamParticipantsRoster.mergeImportedPlayers(manualPlayers, importedPlayers)
 
 			-- Imported players are inserted at the front, manual players keep their order at the back
 			assert.are_equal(3, #manualPlayers)
@@ -1403,7 +1405,7 @@ describe('Team Participants Controller', function()
 				},
 			}
 
-			TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers, importedPlayers)
+			TeamParticipantsRoster.mergeImportedPlayers(manualPlayers, importedPlayers)
 
 			assert.are_equal(1, #manualPlayers)
 			assert.are_equal('manual', manualPlayers[1].extradata.manualData)
@@ -1428,7 +1430,7 @@ describe('Team Participants Controller', function()
 				},
 			}
 
-			TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers, importedPlayers)
+			TeamParticipantsRoster.mergeImportedPlayers(manualPlayers, importedPlayers)
 
 			assert.are_equal(1, #manualPlayers)
 			assert.are_equal('ManualName', manualPlayers[1].displayName)
@@ -1551,6 +1553,7 @@ end)
 
 describe('Team Participants Parser', function()
 	local TeamParticipantsWikiParser = require('Module:TeamParticipants/Parse/Wiki')
+	local TeamParticipantsRoster = require('Module:TeamParticipants/Roster')
 	local tableOptions = {date = os.date('!*t') --[[@as osdateparam]]}
 	local Table = require('Module:Table')
 
@@ -1739,7 +1742,7 @@ describe('Team Participants Parser', function()
 		describe('played/results flags', function()
 			local function resolved(input)
 				local player = TeamParticipantsWikiParser.parsePlayer(input)
-				TeamParticipantsWikiParser.resolvePlayerFlags(player)
+				TeamParticipantsRoster.resolvePlayerFlags(player)
 				return player.extradata
 			end
 

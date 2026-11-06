@@ -19,6 +19,7 @@ local Table = Lua.import('Module:Table')
 
 local TeamParticipantsWikiParser = Lua.import('Module:TeamParticipants/Parse/Wiki')
 local TeamParticipantsRepository = Lua.import('Module:TeamParticipants/Repository')
+local TeamParticipantsRoster = Lua.import('Module:TeamParticipants/Roster')
 local TeamService = Lua.import('Module:Service/Team')
 
 local TeamParticipantsDisplay = Lua.import('Module:Widget/Participants/Team/CardsGroup')
@@ -70,8 +71,7 @@ function TeamParticipantsController.fromTemplate(frame)
 	}
 end
 
---- Runs the enrichment steps in order. Flags resolve last so earlier steps can tell manual input from defaults.
---- Mutates the input.
+--- Order matters: flags resolve last so earlier steps can tell manual input from defaults.
 ---@param parsedData TeamParticipantsParsedData
 function TeamParticipantsController.processParticipants(parsedData)
 	Array.forEach({
@@ -84,27 +84,16 @@ function TeamParticipantsController.processParticipants(parsedData)
 	end)
 end
 
---- Imports participants' squad members from the database if requested.
---- May mutate the input.
 ---@param parsedData TeamParticipantsParsedData
 function TeamParticipantsController.importParticipants(parsedData)
-	Array.forEach(parsedData.participants, function (participant)
-		local players = participant.opponent.players
-		-- Bad structure, this should always exist
-		if not players then
-			return
-		end
-
-		if not Logic.readBool(participant.shouldImportFromDb) then
-			return
-		end
-
+	local toImport = Array.filter(parsedData.participants, function(participant)
+		return participant.shouldImportFromDb and participant.opponent.players ~= nil
+	end)
+	Array.forEach(toImport, function(participant)
 		local importedPlayers = TeamParticipantsController.importSquadMembersFromDatabase(participant)
-		if not importedPlayers then
-			return
+		if importedPlayers then
+			TeamParticipantsRoster.mergeImportedPlayers(participant.opponent.players, importedPlayers)
 		end
-
-		TeamParticipantsController.mergeManualAndImportedPlayers(players, importedPlayers)
 	end)
 end
 
@@ -118,12 +107,7 @@ function TeamParticipantsController.importSquadMembersFromDatabase(participant)
 
 	local squad = TeamService.getSquadBetween(team, DateExt.getStartDateOrNow(), participant.date)
 	local membersToImport = Array.filter(squad, function (member)
-		if member.type == 'player' then
-			return true
-		end
-		return Array.find(AUTO_IMPORTED_STAFF_ROLES, function (role)
-			return role == member.role:lower()
-		end) ~= nil
+		return member.type == 'player' or Table.includes(AUTO_IMPORTED_STAFF_ROLES, member.role:lower())
 	end)
 
 	return Array.map(membersToImport, function (member)
@@ -145,27 +129,16 @@ function TeamParticipantsController.importSquadMembersFromDatabase(participant)
 	end)
 end
 
---- Merges players from the second parameters into the first parameter.
---- If a player exists in both lists, the two entries are deep merged, with the first parameter taking precedence.
----@param manualPlayers standardPlayer[]
----@param importedPlayers standardPlayer[]
-function TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers, importedPlayers)
-	Array.forEach(importedPlayers, function (player)
-		local indexOfManualPlayer = Array.indexOf(manualPlayers, function (p)
-			return p.pageName == player.pageName
-		end)
-
-		if indexOfManualPlayer == 0 then
-			table.insert(manualPlayers, 1, player)
-		else
-			local newPlayer = Table.deepMerge(player, manualPlayers[indexOfManualPlayer])
-			manualPlayers[indexOfManualPlayer] = newPlayer
+---@param parsedData TeamParticipantsParsedData
+function TeamParticipantsController.fillIncompleteRosters(parsedData)
+	Array.forEach(parsedData.participants, function(participant)
+		if participant.opponent.template ~= 'tbd' then
+			TeamParticipantsRoster.fillIncompleteRoster(participant.opponent, parsedData.expectedPlayerCount)
 		end
 	end)
 end
 
---- Enriches each player with join/leave dates from the transfer LPDB table.
---- Explicit dates from wiki input take precedence over auto-fetched ones.
+--- Explicit dates from wiki input take precedence over the transfer-based ones.
 ---@param parsedData TeamParticipantsParsedData
 function TeamParticipantsController.enrichPlayerDates(parsedData)
 	if not parsedData.enrichPlayerDates then
@@ -183,24 +156,11 @@ function TeamParticipantsController.enrichPlayerDates(parsedData)
 	end)
 end
 
---- Fills incomplete rosters for all participants with TBD players if needed.
---- May mutate the input.
----@param parsedData TeamParticipantsParsedData
-function TeamParticipantsController.fillIncompleteRosters(parsedData)
-	Array.forEach(parsedData.participants, function (participant)
-		if participant.opponent.template == 'tbd' then
-			return
-		end
-
-		TeamParticipantsWikiParser.fillIncompleteRoster(participant.opponent, parsedData.expectedPlayerCount)
-	end)
-end
-
 ---@param parsedData TeamParticipantsParsedData
 function TeamParticipantsController.resolvePlayerFlags(parsedData)
-	Array.forEach(parsedData.participants, function(participant)
-		Array.forEach(participant.opponent.players or {}, TeamParticipantsWikiParser.resolvePlayerFlags)
-	end)
+	Array.forEach(Array.flatMap(parsedData.participants, function(participant)
+		return participant.opponent.players or {}
+	end), TeamParticipantsRoster.resolvePlayerFlags)
 end
 
 return TeamParticipantsController
