@@ -12,6 +12,7 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
@@ -22,6 +23,8 @@ local TournamentStructure = Lua.import('Module:TournamentStructure')
 local Condition = Lua.import('Module:Condition')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
+
+local Html = Lua.import('Module:Widget/Html')
 
 ---Adaptor for the tables of Module:GroupTableLeague/next/downstream and Module:SwissTableLeague/next
 local StandingTableLegacyNext = {}
@@ -84,6 +87,99 @@ end
 ---@param tableType 'swiss'|'group'
 ---@return Renderable
 function StandingTableLegacyNext.build(args, tableType)
+	return StandingTable.fromTemplate(StandingTableLegacyNext.convertToNewArgs(args, tableType))
+end
+
+---@param frame Frame
+---@return Renderable
+function StandingTableLegacyNext.convert(frame)
+	local oldArgs = Arguments.getArgs(frame)
+	local push = Logic.readBool(oldArgs.push)
+	oldArgs.push = nil
+	local tableType = oldArgs.tableType
+	oldArgs.tableType = nil
+	assert(tableType == 'swiss' or tableType == 'group', 'Invalid or missing tableType')
+
+	local newArgs = StandingTableLegacyNext.convertToNewArgs(oldArgs, tableType)
+
+	local function itemToCode(tbl)
+		if type(tbl) == 'boolean' then
+			return tostring(tbl)
+		elseif type(tbl) ~= 'table' then
+			return tbl
+		end
+		local template = 'Json'
+		if tbl.title then
+			template = 'Round'
+		end
+		if tbl.type then
+			template = mw.getContentLanguage():ucfirst(tbl.type) .. 'Opponent'
+			tbl.type = nil
+		end
+		local jsonCode = {'{{' .. template}
+		for key, item in pairs(tbl) do
+			if Logic.isNotEmpty(item) then
+				table.insert(jsonCode, '|' .. key .. '=' .. itemToCode(item))
+			end
+		end
+		table.insert(jsonCode, '}}')
+		return table.concat(jsonCode)
+	end
+
+	---@param key string|integer
+	---@return boolean
+	local function valueIsBool(key)
+		return Logic.readBoolOrNil(newArgs[key]) ~= nil
+	end
+
+	---@param tbl table
+	---@param a string|integer
+	---@param b string|integer
+	---@return boolean
+	local function order(tbl, a, b)
+		-- push bool settings up top
+		if valueIsBool(a) and not valueIsBool(b) then
+			return true
+		elseif valueIsBool(a) and valueIsBool(b) then
+			return a < b
+		elseif valueIsBool(b) then
+			return false
+		end
+
+		-- next add opponents (have numeric keys) next
+		if MathUtil.isInteger(a) and not MathUtil.isInteger(b) then
+			return true
+		elseif MathUtil.isInteger(a) and MathUtil.isInteger(b) then
+			return a < b
+		elseif MathUtil.isInteger(b) then
+			return false
+		end
+
+		-- add the other params below opponents, sorted by key
+		-- casting to string just to be safe (should not be needed)
+		return tostring(a) < tostring(b)
+	end
+
+	local code = {}
+	for key, item in Table.iter.spairs(newArgs, order) do
+		table.insert(code, '\t|' .. key .. '=' .. itemToCode(item))
+	end
+	table.sort(code)
+
+	table.insert(code, 1, '{{SwissStandings')
+	table.insert(code, '}}')
+
+	if push then
+		return table.concat(code, '\n')
+	end
+
+	return Html.Pre{children = code}
+end
+
+---@param args table
+---@param tableType 'swiss'|'group'
+---@return table
+function StandingTableLegacyNext.convertToNewArgs(args, tableType)
 	local matchRecords = StandingTableLegacyNext.fetchMatches(args)
 	local matchesByRound, roundCount = StandingTableLegacyNext.groupMatchesByRound(args, matchRecords)
 	local rounds = Table.map(Array.range(1, roundCount), function(roundIndex)
@@ -95,7 +191,7 @@ function StandingTableLegacyNext.build(args, tableType)
 		opponents, matchRecords, StandingTableLegacyNext.readImportOpponents(args, opponents)
 	)
 
-	return StandingTable.fromTemplate(Table.merge(
+	return Table.merge(
 		StandingTableLegacyNext.getStandardParameter(args, opponents, tableType),
 		{
 			bg = StandingTableLegacyNext.parseBgs(args, opponentCount),
@@ -104,7 +200,7 @@ function StandingTableLegacyNext.build(args, tableType)
 		rounds,
 		opponents,
 		{tiebreakers = StandingTableLegacyNext.parseTiebreakers(args)}
-	))
+	)
 end
 
 ---@param args table
