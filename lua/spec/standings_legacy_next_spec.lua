@@ -109,6 +109,9 @@ describe('Standings Legacy Next', function()
 			local parameters = StandingTableLegacyNext.getStandardParameter({show_otp = 'true', otw_p = '2'}, {})
 			assert.is_false(parameters.overtime)
 			assert.are_equal('win=3, draw=1, loss=0', parameters.points)
+			assert.has_no.errors(function()
+				StandingTableLegacyNext.getStandardParameter({show_otp = 'true', otw_p = '-', otl_p = '-'}, {})
+			end)
 		end)
 	end)
 
@@ -332,6 +335,32 @@ describe('Standings Legacy Next', function()
 
 			assert.are_equal(3, roundCount)
 			assert.are_same({{'a'}, {'b'}, {'c', 'd'}}, idsByRound(matchesByRound, roundCount))
+		end)
+
+		it('keeps indexed matches after the last round end date in their round', function()
+			local matchesByRound, roundCount = StandingTableLegacyNext.groupMatchesByRound({
+				round1edate = '2024-01-01 23:59',
+				round2edate = '2024-01-02 23:59',
+			}, {
+				match('a', '2024-01-01 12:00:00', 1),
+				match('b', '2024-01-02 12:00:00', 2),
+				match('c', '2024-01-05 12:00:00', 2),
+			})
+
+			assert.are_equal(2, roundCount)
+			assert.are_same({{'a'}, {'b', 'c'}}, idsByRound(matchesByRound, roundCount))
+		end)
+
+		it('counts indexed matches after the last round end date beyond the dated rounds', function()
+			local matchesByRound, roundCount = StandingTableLegacyNext.groupMatchesByRound({
+				round1edate = '2024-01-01 23:59',
+			}, {
+				match('a', '2024-01-01 12:00:00', 1),
+				match('b', '2024-01-05 12:00:00', 2),
+			})
+
+			assert.are_equal(2, roundCount)
+			assert.are_same({{'a'}, {'b'}}, idsByRound(matchesByRound, roundCount))
 		end)
 
 		it('puts matches in round end dates beyond the number of rounds in the final round', function()
