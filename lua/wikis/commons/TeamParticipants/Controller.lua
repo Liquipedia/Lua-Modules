@@ -48,11 +48,7 @@ function TeamParticipantsController.fromTemplate(frame)
 		mw.ext.TeamLiquidIntegration.add_category('Pages with missing team templates')
 	end
 
-	TeamParticipantsController.importParticipants(parsedData)
-	TeamParticipantsController.fillIncompleteRosters(parsedData)
-	if Logic.nilOr(Logic.readBoolOrNil(parsedArgs.enrichPlayerDates), true) then
-		TeamParticipantsController.enrichPlayerDates(parsedData)
-	end
+	TeamParticipantsController.processParticipants(parsedData)
 
 	local shouldStore = Logic.readBoolOrNil(args.store) ~= false and Lpdb.isStorageEnabled()
 
@@ -74,9 +70,23 @@ function TeamParticipantsController.fromTemplate(frame)
 	}
 end
 
+--- Runs the enrichment steps in order. Flags resolve last so earlier steps can tell manual input from defaults.
+--- Mutates the input.
+---@param parsedData TeamParticipantsParsedData
+function TeamParticipantsController.processParticipants(parsedData)
+	Array.forEach({
+		TeamParticipantsController.importParticipants,
+		TeamParticipantsController.fillIncompleteRosters,
+		TeamParticipantsController.enrichPlayerDates,
+		TeamParticipantsController.resolvePlayerFlags,
+	}, function(step)
+		step(parsedData)
+	end)
+end
+
 --- Imports participants' squad members from the database if requested.
 --- May mutate the input.
----@param parsedData {participants: TeamParticipant[], expectedPlayerCount: integer?}
+---@param parsedData TeamParticipantsParsedData
 function TeamParticipantsController.importParticipants(parsedData)
 	Array.forEach(parsedData.participants, function (participant)
 		local players = participant.opponent.players
@@ -156,8 +166,11 @@ end
 
 --- Enriches each player with join/leave dates from the transfer LPDB table.
 --- Explicit dates from wiki input take precedence over auto-fetched ones.
----@param parsedData {participants: TeamParticipant[], expectedPlayerCount: integer?}
+---@param parsedData TeamParticipantsParsedData
 function TeamParticipantsController.enrichPlayerDates(parsedData)
+	if not parsedData.enrichPlayerDates then
+		return
+	end
 	Array.forEach(parsedData.participants, function(participant)
 		local players = participant.opponent.players or {}
 		local datesByPlayer = TeamParticipantsRepository.getPlayersDates(players, participant.aliases)
@@ -172,7 +185,7 @@ end
 
 --- Fills incomplete rosters for all participants with TBD players if needed.
 --- May mutate the input.
----@param parsedData {participants: TeamParticipant[], expectedPlayerCount: integer?}
+---@param parsedData TeamParticipantsParsedData
 function TeamParticipantsController.fillIncompleteRosters(parsedData)
 	Array.forEach(parsedData.participants, function (participant)
 		if participant.opponent.template == 'tbd' then
@@ -180,6 +193,13 @@ function TeamParticipantsController.fillIncompleteRosters(parsedData)
 		end
 
 		TeamParticipantsWikiParser.fillIncompleteRoster(participant.opponent, parsedData.expectedPlayerCount)
+	end)
+end
+
+---@param parsedData TeamParticipantsParsedData
+function TeamParticipantsController.resolvePlayerFlags(parsedData)
+	Array.forEach(parsedData.participants, function(participant)
+		Array.forEach(participant.opponent.players or {}, TeamParticipantsWikiParser.resolvePlayerFlags)
 	end)
 end
 

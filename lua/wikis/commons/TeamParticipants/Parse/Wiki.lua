@@ -33,19 +33,27 @@ local TeamParticipantsWikiParser = {}
 ---@alias QualificationStructure {method: QualificationMethod, type: QualificationType,
 ---page?: string, tournament?: StandardTournament, url?: string, text?: string, placement?: string}
 
+---@alias TeamParticipantsTableOptions {date: osdateparam}
+
+---@alias TeamParticipantsParsedData {participants: TeamParticipant[], expectedPlayerCount: integer?,
+---enrichPlayerDates: boolean}
+
 ---@param args table
----@return {participants: TeamParticipant[], expectedPlayerCount: integer?}
+---@return TeamParticipantsParsedData
 function TeamParticipantsWikiParser.parseWikiInput(args)
-	local date = DateExt.parseIsoDate(args.date) or DateExt.parseIsoDate(DateExt.getContextualDateOrNow())
-	local minimumPlayers = tonumber(args.minimumplayers)
+	---@type TeamParticipantsTableOptions
+	local tableOptions = {
+		date = DateExt.parseIsoDate(args.date) or DateExt.parseIsoDate(DateExt.getContextualDateOrNow()),
+	}
 
 	local participants = Array.map(args, function (input)
-		return TeamParticipantsWikiParser.parseParticipant(input, date)
+		return TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 	end)
 
 	return {
 		participants = participants,
-		expectedPlayerCount = minimumPlayers,
+		expectedPlayerCount = tonumber(args.minimumplayers),
+		enrichPlayerDates = Logic.nilOr(Logic.readBoolOrNil(args.enrichPlayerDates), true),
 	}
 end
 
@@ -128,9 +136,10 @@ end
 
 --- Parse a single participant from input
 ---@param input table
----@param defaultDate osdateparam
+---@param tableOptions TeamParticipantsTableOptions
 ---@return TeamParticipant
-function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
+function TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
+	local defaultDate = tableOptions.date
 	local potentialQualifiers = {}
 	local opponent
 	local warnings = {}
@@ -234,13 +243,12 @@ function TeamParticipantsWikiParser.parsePlayers(input)
 	return Array.map(input.players or {}, TeamParticipantsWikiParser.parsePlayer)
 end
 
+--- `played` and `results` stay nil unless set; `resolvePlayerFlags` applies the defaults.
 ---@param playerInput table
 ---@return standardPlayer
 function TeamParticipantsWikiParser.parsePlayer(playerInput)
 	local player = Opponent.readSinglePlayerArgs(playerInput)
 
-	local playedInput = Logic.readBoolOrNil(playerInput.played)
-	local resultsInput = Logic.readBoolOrNil(playerInput.results)
 	local roles = RoleUtil.readRoleArgs(playerInput.role)
 	local inputType = playerInput.type or 'player'
 	local hasStaffRoles = Array.any(roles, function(role) return role.type == RoleUtil.ROLE_TYPE.STAFF end)
@@ -259,13 +267,22 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 		trophies = tonumber(playerInput.trophies),
 		type = playerType,
 		status = playerInput.status,
-		played = Logic.nilOr(playedInput, true),
-		results = Logic.nilOr(resultsInput, playedInput, true),
+		played = Logic.readBoolOrNil(playerInput.played),
+		results = Logic.readBoolOrNil(playerInput.results),
 		number = tonumber(playerInput.number),
 		joinDate = Logic.nilIfEmpty(playerInput.joindate),
 		leaveDate = Logic.nilIfEmpty(playerInput.leavedate),
 	}
 	return player
+end
+
+--- Applies defaults to unset flags: `played` defaults to true, `results` follows `played`.
+---@param player standardPlayer
+function TeamParticipantsWikiParser.resolvePlayerFlags(player)
+	local extradata = player.extradata or {}
+	player.extradata = extradata
+	extradata.results = Logic.nilOr(extradata.results, extradata.played, true)
+	extradata.played = Logic.nilOr(extradata.played, true)
 end
 
 ---@param opponent standardOpponent
