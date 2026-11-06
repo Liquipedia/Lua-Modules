@@ -25,7 +25,8 @@ local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
 ---qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer,
----potentialQualifiers: standardOpponent[]?, warnings: string[]?, broken: boolean?, errorMessage: string?}
+---potentialQualifiers: standardOpponent[]?, warnings: string[]?, broken: boolean?, errorMessage: string?,
+---autoPlayed: boolean?}
 
 ---@alias QualificationMethod 'invite'|'qual'
 ---@alias QualificationType 'tournament'|'internal'|'external'|'other'
@@ -33,7 +34,7 @@ local TeamParticipantsWikiParser = {}
 ---@alias QualificationStructure {method: QualificationMethod, type: QualificationType,
 ---page?: string, tournament?: StandardTournament, url?: string, text?: string, placement?: string}
 
----@alias TeamParticipantsTableOptions {date: osdateparam}
+---@alias TeamParticipantsTableOptions {date: osdateparam, autoPlayed: boolean}
 
 ---@alias TeamParticipantsParsedData {participants: TeamParticipant[], expectedPlayerCount: integer?,
 ---enrichPlayerDates: boolean, sortAlphabetically: boolean}
@@ -44,6 +45,7 @@ function TeamParticipantsWikiParser.parseWikiInput(args)
 	---@type TeamParticipantsTableOptions
 	local tableOptions = {
 		date = DateExt.parseIsoDate(args.date) or DateExt.parseIsoDate(DateExt.getContextualDateOrNow()),
+		autoPlayed = Logic.readBool(args.autoplayed),
 	}
 
 	local participants = Array.map(args, function (input)
@@ -234,6 +236,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 		potentialQualifiers = potentialQualifiers,
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
+		autoPlayed = Logic.nilOr(Logic.readBoolOrNil(input.autoplayed), tableOptions.autoPlayed),
 		date = date or defaultDate,
 	}
 end
