@@ -25,26 +25,11 @@ local Table = Lua.import('Module:Table')
 ---@field format StandingsSwissFormat
 ---@field finalRecordCounts StandingsRecordCounts
 ---@field rangesByRecord StandingsRecordRanges
----@field firstMatchAdjustmentRound integer?
-local StandingsSwissPlacementRange = Class.new(function(self, format, finalRecordCounts, firstMatchAdjustmentRound)
+local StandingsSwissPlacementRange = Class.new(function(self, format, finalRecordCounts)
 	self.format = format
 	self.finalRecordCounts = finalRecordCounts
 	self.rangesByRecord = self.rangesFromFinalRecords(finalRecordCounts, format)
-	self.firstMatchAdjustmentRound = firstMatchAdjustmentRound
 end)
-
----@param opponents StandingTableOpponentData[]
----@return integer?
-local function firstMatchAdjustmentRound(opponents)
-	---@type integer[]
-	local rounds = Array.flatMap(opponents, function(opponentData)
-		local adjustments = opponentData.adjustments or {}
-		return Array.filter(Array.extractKeys(adjustments), function(round)
-			return adjustments[round].match ~= nil
-		end)
-	end)
-	return Array.min(rounds)
-end
 
 ---Nil if the number of opponents does not fit the format.
 ---@param format StandingsSwissFormat
@@ -60,7 +45,7 @@ function StandingsSwissPlacementRange.new(format, opponents)
 	if not finalRecordCounts then
 		return nil
 	end
-	return StandingsSwissPlacementRange(format, finalRecordCounts, firstMatchAdjustmentRound(opponents))
+	return StandingsSwissPlacementRange(format, finalRecordCounts)
 end
 
 ---Number of opponents finishing on each record, `[wins][losses]`. Nil if the records do not fit the format.
@@ -144,17 +129,13 @@ function StandingsSwissPlacementRange.rangesFromFinalRecords(finalRecordCounts, 
 end
 
 ---@param entriesInRound StandingsPlacementRangeEntry[]
----@param roundNumber integer
 ---@return StandingsPlacementRangeValue[]?
-function StandingsSwissPlacementRange:rangesFor(entriesInRound, roundNumber)
+function StandingsSwissPlacementRange:rangesFor(entriesInRound)
+	-- With overtime, the match record leaves out the overtime results
 	local isEligible = Array.all(entriesInRound, function(entry)
-		-- With overtime, the match record leaves out the overtime results
-		return entry.match.d == 0
-			and entry.overtime == nil
-			and not entry.extradata.disqualified
+		return entry.match.d == 0 and entry.overtime == nil
 	end)
-	local isAdjusted = self.firstMatchAdjustmentRound ~= nil and self.firstMatchAdjustmentRound <= roundNumber
-	if not isEligible or isAdjusted then
+	if not isEligible then
 		return nil
 	end
 	-- Rejects records that same record pairings can not produce
