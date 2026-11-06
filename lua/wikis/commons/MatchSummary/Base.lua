@@ -306,7 +306,7 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 
 	options = options or {}
 
-	local match, bracketResetMatch = MatchGroupUtil.fetchMatchForBracketDisplay(
+	local match, bracketResetMatch = MatchGroupUtil.fetchMatchWithBracketReset(
 		args.bracketId, args.matchId)
 
 	---@type (fun(match: MatchGroupUtilMatch):string?)|string|integer?
