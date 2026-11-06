@@ -14,6 +14,7 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local StandingTable = Lua.import('Module:Standings/Table')
@@ -69,6 +70,26 @@ local ADJUSTMENTS = {
 
 local MATCH_RESULTS = {matchwins = 'w', matchdraws = 'd', matchlosses = 'l'}
 
+local OPPONENT_TYPE_INPUT_MAPPING = {
+	['1'] = Opponent.solo,
+	['1v1'] = Opponent.solo,
+	solo = Opponent.solo,
+
+	['2'] = Opponent.duo,
+	['2v2'] = Opponent.duo,
+	duo = Opponent.duo,
+
+	['3'] = Opponent.trio,
+	['3v3'] = Opponent.trio,
+	trio = Opponent.trio,
+
+	['4'] = Opponent.quad,
+	['4v4'] = Opponent.quad,
+	quad = Opponent.quad,
+
+	team = Opponent.team,
+}
+
 ---Module:SwissTableLeague/next
 ---@param frame Frame
 ---@return Renderable
@@ -119,7 +140,11 @@ function StandingTableLegacyNext.convertFromArgs(oldArgs, options)
 		if tbl.title then
 			template = 'Round'
 		end
-		if tbl.type then
+		if tbl.type and tbl.isArchon then
+			template = 'ArchonOpponent'
+			tbl.type = nil
+			tbl.isArchon = nil
+		elseif tbl.type then
 			template = mw.getContentLanguage():ucfirst(tbl.type) .. 'Opponent'
 			tbl.type = nil
 		end
@@ -173,14 +198,19 @@ function StandingTableLegacyNext.convertFromArgs(oldArgs, options)
 	end
 	table.sort(code)
 
-	table.insert(code, 1, '{{SwissStandings')
+	if tableType == 'swiss' then
+		table.insert(code, 1, '{{SwissStandings')
+	elseif tableType == 'group' then
+		table.insert(code, 1, '{{GroupStandings')
+	end
+
 	table.insert(code, '}}')
 
 	if push then
 		return table.concat(code, '\n')
 	end
 
-	return Html.Pre{children = code}
+	return Html.Pre{children = Array.interleave(code, '\n')}
 end
 
 ---@param args table
@@ -369,9 +399,17 @@ end
 function StandingTableLegacyNext.parseOpponentInput(args, key, index, prefix, roundCount)
 	local value = args[key]
 	local opponent = Json.parseIfTable(value)
+	if not opponent and String.startsWith(value, '{{') then
+		opponent = StandingTableLegacyNext._tryToParseWikiTemplateOpponent(value)
+	end
 	if not opponent then
 		if prefix == 'p' then
-			opponent = {type = Opponent.solo, value, flag = args['p' .. index .. 'flag'], link = args['p' .. index .. 'link']}
+			opponent = {
+				type = Opponent.solo,
+				value, flag = args['p' .. index .. 'flag'],
+				link = args['p' .. index .. 'link'],
+				faction = args['p' .. index .. 'faction'] or args['p' .. index .. 'race'],
+			}
 		else
 			opponent = {type = Opponent.team, value}
 		end
@@ -386,6 +424,43 @@ function StandingTableLegacyNext.parseOpponentInput(args, key, index, prefix, ro
 		StandingTableLegacyNext.parseAdjustments(args, index, roundCount),
 		StandingTableLegacyNext.parseDefiniteStatuses(args, index, roundCount)
 	)
+end
+
+---@param input string
+---@return table?
+function StandingTableLegacyNext._tryToParseWikiTemplateOpponent(input)
+	local typeInput = string.match(input, '%{%{(%a+)Opponent%s*%|')
+	local opponentType = OPPONENT_TYPE_INPUT_MAPPING[(typeInput or ''):lower()]
+	local isArchon
+	if not opponentType and String.startsWith(input:lower(), '{{archon') then
+		opponentType = Opponent.duo
+		isArchon = true
+	end
+	-- can't parse this ...
+	if not opponentType then
+		return
+	end
+
+	local opponent = {
+		type = opponentType,
+		isArchon = isArchon,
+	}
+
+	local argsPairsString = input:gsub('^%{%{.-%|', ''):gsub('%}%}$', '')
+	local argsPairs = Array.parseCommaSeparatedString(argsPairsString, '|')
+	local unnamedCounter = 0
+	Array.forEach(argsPairs, function(argsPair)
+		local key = string.match(argsPair, '^(.-)=')
+		local value = string.match(argsPair, '^.-=(.*)$')
+		if Logic.isEmpty(key) then
+			unnamedCounter = unnamedCounter + 1
+			key = unnamedCounter
+		end
+		key = tonumber(key) or key
+		opponent[key] = value
+	end)
+
+	return opponent
 end
 
 ---Maps `round<R>temp_*<N>` to `r<R><adjustment>`. Unprefixed `temp_*<N>` adjust the final round, except
