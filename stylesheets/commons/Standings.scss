@@ -1,6 +1,3 @@
-$hover-color: rgba( 0, 0, 0, 0.7 );
-$hover-color-dark: rgba( 255, 255, 255, 0.7 );
-
 .standings-ffa,
 .standings-swiss,
 .standings-group {
@@ -137,33 +134,17 @@ $hover-color-dark: rgba( 255, 255, 255, 0.7 );
 		transition-property: border-color;
 
 		&-active {
-			box-shadow: -1px 0 2px var( --hover-color ) inset, 1px 0 2px var( --hover-color ) inset, 0 -1px 2px var( --hover-color ) inset, 0 1px 2px var( --hover-color ) inset;
-
-			.theme--dark & {
-				box-shadow: -1px 0 2px var( --hover-color-dark ) inset, 1px 0 2px var( --hover-color-dark ) inset, 0 -1px 2px var( --hover-color-dark ) inset, 0 1px 2px var( --hover-color-dark ) inset;
-			}
+			box-shadow: -1px 0 2px var( --brackets-opponent-hover-color ) inset, 1px 0 2px var( --brackets-opponent-hover-color ) inset, 0 -1px 2px var( --brackets-opponent-hover-color ) inset, 0 1px 2px var( --brackets-opponent-hover-color ) inset;
 
 			&:not( .standings-swiss-match ) {
-				box-shadow: 0 -1px var( --hover-color ) inset, 0 1px var( --hover-color ) inset;
-
-				.theme--dark & {
-					box-shadow: 0 -1px var( --hover-color-dark ) inset, 0 1px var( --hover-color-dark ) inset;
-				}
+				box-shadow: 0 -1px var( --brackets-opponent-hover-color ) inset, 0 1px var( --brackets-opponent-hover-color ) inset !important;
 
 				&:first-child {
-					box-shadow: 0 -1px var( --hover-color ) inset, 0 1px var( --hover-color ) inset, 1px 0 2px var( --hover-color ) inset;
-
-					.theme--dark & {
-						box-shadow: 0 -1px var( --hover-color-dark ) inset, 0 1px var( --hover-color-dark ) inset, 1px 0 2px var( --hover-color-dark ) inset;
-					}
+					box-shadow: 0 -1px var( --brackets-opponent-hover-color ) inset, 0 1px var( --brackets-opponent-hover-color ) inset, 1px 0 2px var( --brackets-opponent-hover-color ) inset !important;
 				}
 
 				&:nth-last-child( 1 of :not( .standings-swiss-match ) ) {
-					box-shadow: 0 -1px var( --hover-color ) inset, 0 1px var( --hover-color ) inset, -1px 0 2px var( --hover-color ) inset;
-
-					.theme--dark & {
-						box-shadow: 0 -1px var( --hover-color-dark ) inset, 0 1px var( --hover-color-dark ) inset, -1px 0 2px var( --hover-color-dark ) inset;
-					}
+					box-shadow: 0 -1px var( --brackets-opponent-hover-color ) inset, 0 1px var( --brackets-opponent-hover-color ) inset, -1px 0 2px var( --brackets-opponent-hover-color ) inset !important;
 				}
 			}
 		}
