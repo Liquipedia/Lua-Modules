@@ -85,22 +85,29 @@ end
 
 ---@param args table
 ---@param tableType 'swiss'|'group'
+---@param options? {defaultTiebreakers: (fun(args: table): string[])?}
 ---@return Renderable
-function StandingTableLegacyNext.build(args, tableType)
-	return StandingTable.fromTemplate(StandingTableLegacyNext.convertToNewArgs(args, tableType))
+function StandingTableLegacyNext.build(args, tableType, options)
+	return StandingTable.fromTemplate(StandingTableLegacyNext.convertToNewArgs(args, tableType, options))
 end
 
 ---@param frame Frame
 ---@return Renderable
 function StandingTableLegacyNext.convert(frame)
-	local oldArgs = Arguments.getArgs(frame)
+	return StandingTableLegacyNext.convertFromArgs(Arguments.getArgs(frame))
+end
+
+---@param oldArgs table
+---@param options? {defaultTiebreakers: (fun(args: table): string[])?}
+---@return Renderable
+function StandingTableLegacyNext.convertFromArgs(oldArgs, options)
 	local push = Logic.readBool(oldArgs.push)
 	oldArgs.push = nil
 	local tableType = oldArgs.tableType
 	oldArgs.tableType = nil
 	assert(tableType == 'swiss' or tableType == 'group', 'Invalid or missing tableType')
 
-	local newArgs = StandingTableLegacyNext.convertToNewArgs(oldArgs, tableType)
+	local newArgs = StandingTableLegacyNext.convertToNewArgs(oldArgs, tableType, options)
 
 	local function itemToCode(tbl)
 		if type(tbl) == 'boolean' then
@@ -178,8 +185,11 @@ end
 
 ---@param args table
 ---@param tableType 'swiss'|'group'
+---@param options? {defaultTiebreakers: (fun(args: table): string[])?}
 ---@return table
-function StandingTableLegacyNext.convertToNewArgs(args, tableType)
+function StandingTableLegacyNext.convertToNewArgs(args, tableType, options)
+	options = options or {}
+
 	local matchRecords = StandingTableLegacyNext.fetchMatches(args)
 	local matchesByRound, roundCount = StandingTableLegacyNext.groupMatchesByRound(args, matchRecords)
 	local rounds = Table.map(Array.range(1, roundCount), function(roundIndex)
@@ -199,7 +209,7 @@ function StandingTableLegacyNext.convertToNewArgs(args, tableType)
 		},
 		rounds,
 		opponents,
-		{tiebreakers = StandingTableLegacyNext.parseTiebreakers(args)}
+		{tiebreakers = StandingTableLegacyNext.parseTiebreakers(args, options.defaultTiebreakers)}
 	)
 end
 
@@ -444,8 +454,9 @@ function StandingTableLegacyNext.parseDefiniteStatuses(args, index, roundCount)
 end
 
 ---@param args table
+---@param defaultTiebreakers? (fun(args: table): string[])
 ---@return string[]
-function StandingTableLegacyNext.parseTiebreakers(args)
+function StandingTableLegacyNext.parseTiebreakers(args, defaultTiebreakers)
 	local tiebreakers = {}
 	-- special case where the group is decided by manual tiebreaker inputs
 	-- have to bypass the `mapTiebreaker` call for this special case
@@ -463,6 +474,12 @@ function StandingTableLegacyNext.parseTiebreakers(args)
 	if #tiebreakers > 0 then
 		return tiebreakers
 	end
+	return (defaultTiebreakers or StandingTableLegacyNext.defaultTiebreakers)(args)
+end
+
+---@param args table
+---@return string[]
+function StandingTableLegacyNext.defaultTiebreakers(args)
 	return Array.extend(
 		Logic.readBool(args.show_p) and 'points' or nil,
 		'matchscore',
