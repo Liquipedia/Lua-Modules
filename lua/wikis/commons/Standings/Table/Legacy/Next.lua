@@ -100,7 +100,10 @@ function StandingTableLegacyNext.build(args, tableType)
 
 	return StandingTable.fromTemplate(Table.merge(
 		StandingTableLegacyNext.getStandardParameter(args, opponents, tableType),
-		{bg = StandingTableLegacyNext.parseBgs(args, opponentCount)},
+		{
+			bg = StandingTableLegacyNext.parseBgs(args, opponentCount),
+			format = StandingTableLegacyNext.readFormat(args, opponentCount, #matchRecords),
+		},
 		rounds,
 		opponents,
 		{tiebreakers = StandingTableLegacyNext.parseTiebreakers(args)}
@@ -125,6 +128,22 @@ function StandingTableLegacyNext.getStandardParameter(args, opponents, tableType
 			decimalScores = true,
 		}),
 	})
+end
+
+---Maps `structure` to `format`, inferring it as in legacy if unset. Only GSL is supported, as legacy
+---`swiss-<N>` is classic swiss, not the esports swiss of `format=swiss<N>`.
+---@param args table
+---@param opponentCount integer
+---@param matchCount integer
+---@return string?
+function StandingTableLegacyNext.readFormat(args, opponentCount, matchCount)
+	local structure = args.structure
+	if not structure then
+		return (opponentCount == 4 and matchCount == 5) and 'gsl' or nil
+	end
+	assert(structure == 'gsl' or structure == 'other' or structure:match('swiss%-%d+')
+		or structure:match('roundRobin%-%d+'), 'Invalid structure: ' .. structure)
+	return structure == 'gsl' and 'gsl' or nil
 end
 
 ---With any of `win_p`, `tie_p` and `lose_p` set, the unset ones are 0. Without them, a win is 3 points and
