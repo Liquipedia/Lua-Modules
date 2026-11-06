@@ -1190,6 +1190,20 @@ describe('Team Participants Repository', function()
 			assert.are_same({Alpha = true}, TeamParticipantsRepository.getPlayedPlayers({'team liquid', 'team liquid 2024'}))
 		end)
 
+		it('reads sparse and string-keyed player tables', function()
+			setMatches{{
+				match2opponents = {{type = 'team', template = 'team liquid'}},
+				match2games = {
+					game({[1] = {player = 'Alpha'}, [3] = {player = 'Gamma'}}),
+					game({['2'] = {player = 'Beta'}}),
+				},
+			}}
+
+			local result = TeamParticipantsRepository.getPlayedPlayers({'team liquid'})
+
+			assert.are_same({Alpha = true, Beta = true, Gamma = true}, result)
+		end)
+
 		it('ignores unfinished and not played games', function()
 			setMatches{{
 				match2opponents = {{type = 'team', template = 'team liquid'}},

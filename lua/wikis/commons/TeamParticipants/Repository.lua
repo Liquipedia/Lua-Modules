@@ -331,7 +331,8 @@ end
 ---@return string[]
 local function getGamePlayerNames(game, opponentIndex)
 	local gameOpponent = (Json.parseIfString(game.opponents) or {})[opponentIndex] or {}
-	return Array.map(gameOpponent.players or {}, function(player)
+	-- players can be sparse or string-keyed after the JSON round trip
+	return Array.map(Array.extractValues(gameOpponent.players or {}), function(player)
 		return Logic.nilIfEmpty(player.player or player.pageName)
 	end)
 end
