@@ -112,6 +112,32 @@ describe('Standings Legacy Next', function()
 		end)
 	end)
 
+	describe('format', function()
+		it('infers gsl from 4 opponents and 5 matches', function()
+			assert.are_equal('gsl', StandingTableLegacyNext.readFormat({}, 4, 5))
+			assert.is_nil(StandingTableLegacyNext.readFormat({}, 4, 6))
+			assert.is_nil(StandingTableLegacyNext.readFormat({}, 5, 5))
+			assert.is_nil(StandingTableLegacyNext.readFormat({}, 8, 16))
+		end)
+
+		it('maps structure=gsl and ignores the other structures', function()
+			assert.are_equal('gsl', StandingTableLegacyNext.readFormat({structure = 'gsl'}, 8, 0))
+			assert.is_nil(StandingTableLegacyNext.readFormat({structure = 'other'}, 4, 5))
+			assert.is_nil(StandingTableLegacyNext.readFormat({structure = 'swiss-3'}, 4, 5))
+			assert.is_nil(StandingTableLegacyNext.readFormat({structure = 'roundRobin-2'}, 4, 5))
+		end)
+
+		it('errors on unknown structures', function()
+			assert.error(function() StandingTableLegacyNext.readFormat({structure = 'swiss'}, 4, 5) end)
+		end)
+
+		it('produces a format the standings can read', function()
+			local StandingsParseWiki = require('Module:Standings/Parse/Wiki')
+			assert.are_same({type = 'swiss', winsToAdvance = 2, lossesToEliminate = 2},
+				StandingsParseWiki.parseFormat({format = StandingTableLegacyNext.readFormat({}, 4, 5)}, 'group'))
+		end)
+	end)
+
 	describe('points', function()
 		it('defaults to 3 points for a win and 1 for a draw', function()
 			assert.are_same({w = 3, d = 1, l = 0}, StandingTableLegacyNext.readResultPoints{})
