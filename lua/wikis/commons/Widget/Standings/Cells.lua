@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Logic = Lua.import('Module:Logic')
 
 local Label = Lua.import('Module:Widget/Basic/Label')
@@ -50,18 +51,22 @@ end
 function StandingsCells.placement(slot)
 	local definitiveStatus = Logic.nilIfEmpty(slot.definitiveStatus)
 	local minimumStatus = not definitiveStatus and Logic.nilIfEmpty(slot.minimumStatus) or nil
-	return TableWidgets.Cell{children = Label{
+	return TableWidgets.Cell(DisplayHelper.addOpponentHighlightToProps({children = Label{
 		children = slot.placement,
 		attributes = {['data-placement-type'] = definitiveStatus or minimumStatus},
 		labelScheme = 'placement',
 		labelType = minimumStatus and 'placement-minimum' or nil,
-	}}
+	}}, slot.opponent))
 end
 
 ---@param slot StandingsEntryModel
 ---@return Renderable
 function StandingsCells.participant(slot)
-	return TableWidgets.Cell{children = Participant{opponent = slot.opponent, disqualified = slot.disqualified}}
+	return TableWidgets.Cell(
+		DisplayHelper.addOpponentHighlightToProps({
+			children = Participant{opponent = slot.opponent, disqualified = slot.disqualified}
+		}, slot.opponent)
+	)
 end
 
 ---@param slot StandingsEntryModel
@@ -71,10 +76,10 @@ end
 function StandingsCells.stats(slot, statsToShow, boldStatTitle)
 	return Array.map(statsToShow, function(stat)
 		local statValue = slot.additionalStatsValues[stat.id]
-		return TableWidgets.Cell{
+		return TableWidgets.Cell(DisplayHelper.addOpponentHighlightToProps({
 			css = {['font-weight'] = stat.title == boldStatTitle and 'bold' or nil},
 			children = statValue and statValue.display or '',
-		}
+		}, slot.opponent))
 	end)
 end
 

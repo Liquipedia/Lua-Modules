@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -80,6 +81,23 @@ function Helpers.headerRow(standings, statsToShow)
 	}}
 end
 
+---@param props {match: MatchGroupUtilMatch, opponentIndex: integer}
+---@return standardOpponent?
+function Helpers.getOpposingOpponent(props)
+	local match = props.match
+	local opponentIndex = tonumber(props.opponentIndex)
+	if not match or not opponentIndex or #match.opponents ~= 2 then
+		return
+	end
+
+	local opponent = match.opponents[opponentIndex]
+	if not opponent then
+		return
+	end
+
+	return Array.find(match.opponents, function(matchOpponent) return matchOpponent ~= opponent end)
+end
+
 ---@private
 ---@param standings StandingsModel
 ---@param slot StandingsEntryModel
@@ -101,13 +119,20 @@ function Helpers.createRow(standings, slot, statsToShow, boldStatTitle)
 					return TableWidgets.Cell{classes = {'standings-swiss-match'}}
 				end
 
-				return TableWidgets.Cell{
-					classes = {'standings-swiss-match'},
-					children = MatchOverview{
-						match = entry.match,
-						opponentIndex = entry.matchOpponentIndex,
-					},
+				local opposingOpponent = Helpers.getOpposingOpponent{
+					match = entry.match,
+					opponentIndex = entry.matchOpponentIndex,
 				}
+
+				return TableWidgets.Cell(
+					DisplayHelper.addOpponentHighlightToProps({
+						classes = {'standings-swiss-match'},
+						children = MatchOverview{
+							match = entry.match,
+							opponentIndex = entry.matchOpponentIndex,
+						},
+					}, opposingOpponent)
+				)
 			end)
 		),
 	}
