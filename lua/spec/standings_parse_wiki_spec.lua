@@ -285,6 +285,52 @@ describe('Standings Wiki Parser', function()
 		end)
 	end)
 
+	describe('format', function()
+		it('reads the shorthands', function()
+			assert.are_same(
+				{type = 'swiss', winsToAdvance = 2, lossesToEliminate = 2},
+				StandingsParseWiki.parseFormat({format = 'gsl'}, 'group')
+			)
+			assert.are_same(
+				{type = 'swiss', winsToAdvance = 3, lossesToEliminate = 3},
+				StandingsParseWiki.parseFormat({format = 'swiss3'}, 'swiss')
+			)
+		end)
+
+		it('reads the json input with elim defaulting to adv', function()
+			assert.are_same(
+				{type = 'swiss', winsToAdvance = 3, lossesToEliminate = 2},
+				StandingsParseWiki.parseFormat({format = '{"1":"swiss","adv":"3","elim":"2"}'}, 'swiss')
+			)
+			assert.are_same(
+				{type = 'swiss', winsToAdvance = 3, lossesToEliminate = 3},
+				StandingsParseWiki.parseFormat({format = '{"1":"swiss","adv":"3"}'}, 'swiss')
+			)
+		end)
+
+		it('is nil without input', function()
+			assert.is_nil(StandingsParseWiki.parseFormat({}, 'swiss'))
+			assert.is_nil(StandingsParseWiki.parseFormat({format = ''}, 'swiss'))
+		end)
+
+		it('errors on invalid input', function()
+			local invalid = {
+				{format = 'swiss'},
+				{format = 'swiss0'},
+				{format = 'swiss11'},
+				{format = 'roundrobin'},
+				{format = '{"1":"swiss","elim":"3"}'},
+				{format = '{"1":"swiss","adv":"1.5"}'},
+				{format = '{"1":"swiss","adv":"3","elim":"99999"}'},
+				{format = '{"1":"other","adv":"3"}'},
+			}
+			for _, args in ipairs(invalid) do
+				assert.error(function() StandingsParseWiki.parseFormat(args, 'swiss') end)
+			end
+			assert.error(function() StandingsParseWiki.parseFormat({format = 'swiss3'}, 'ffa') end)
+		end)
+	end)
+
 	describe('swiss scoring function', function()
 		---@param score integer?
 		---@param placement integer

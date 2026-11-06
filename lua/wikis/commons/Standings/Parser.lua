@@ -12,6 +12,7 @@ local Info = Lua.import('Module:Info', { loadData = true })
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
+local StandingsPlacementRange = Lua.import('Module:Standings/PlacementRange')
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
 local TiebreakerGameUtil = Lua.import('Module:Standings/Tiebreaker/Game/Util')
 local TiebreakerHeadToHead = Lua.import('Module:Standings/Tiebreaker/HeadToHead')
@@ -20,6 +21,8 @@ local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParser = {}
 
+local DISQUALIFIED_STATUS = 'dq'
+
 ---@class StandingsParserOptions
 ---@field drawConfig {match: boolean?}? Explicit draw toggles per level; when unset, draws are detected from the data
 ---@field overtime boolean? Whether overtime results are tracked separately from regulation results
@@ -27,6 +30,7 @@ local StandingsParser = {}
 ---@field walkoverRounds integer? Rounds a walkover map counts as in the round tiebreakers, unset means not counted
 ---@field tiebreakerReset boolean? Whether groups split by a tiebreaker start over from the first tiebreaker
 ---@field maxBestOf number? The highest bestof of the table's matches
+---@field format StandingsFormat? Enables the placement ranges of the opponents
 
 ---@param carried table
 ---@param record table?
@@ -197,8 +201,21 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 			return opponentRound.roundindex == round.roundNumber
 		end), tiebreakerIds, tiebreakerOptions, options.tiebreakerReset)
 	end)
+
+	local placementRangeCalculator = options.format and StandingsPlacementRange.calculator(options.format, opponents)
+	if placementRangeCalculator then
+		Array.forEach(rounds, function(round)
+			-- The final placements of a finished table are exact
+			if isFinished and round.roundNumber == #rounds then
+				return
+			end
+			StandingsPlacementRange.setRanges(placementRangeCalculator, Array.filter(entries, function(opponentRound)
+				return opponentRound.roundindex == round.roundNumber
+			end), round.roundNumber)
+		end)
+	end
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer,
-	---points: number, placement: integer?, slotindex: integer}[]
+	---points: number, placement: integer?, slotindex: integer, placerange: StandingsPlacementRangeValue?}[]
 
 	StandingsParser.setPlacementChange(entries)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer,
@@ -206,6 +223,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 	---matches: MatchGroupUtilMatch[]?, matchPoints: table<string, number>?}[]
 
 	StandingsParser.addStatuses(entries, bgs, 'currentstatus')
+	StandingsParser.addStatusesFromPlacementRange(entries, bgs, #opponents)
 	if isFinished then
 		StandingsParser.addStatuses(Array.filter(entries, function(opponentRound)
 			return opponentRound.roundindex == #rounds
@@ -445,6 +463,51 @@ function StandingsParser.addStatuses(opponentEnties, bgs, field)
 	end)
 end
 
+---Sets the definite status of opponents whose placement range has a single status, else the min status when the
+---range rules out a later status other than dq. A manual min status takes priority.
+---@param opponentEntries {placerange: StandingsPlacementRangeValue?, definitestatus: string?, extradata: table}[]
+---@param bgs table<integer, string>
+---@param slotCount integer
+function StandingsParser.addStatusesFromPlacementRange(opponentEntries, bgs, slotCount)
+	local function hasSingleStatus(firstSlot, lastSlot)
+		return Array.all(Array.range(firstSlot, lastSlot), function(slot)
+			return bgs[slot] == bgs[firstSlot]
+		end)
+	end
+	local function hasWorseStatusAfter(slot)
+		return Array.any(Array.range(slot + 1, slotCount), function(laterSlot)
+			return bgs[laterSlot] ~= bgs[slot] and bgs[laterSlot] ~= DISQUALIFIED_STATUS
+		end)
+	end
+
+	-- Most entries share a few ranges
+	local statusesByRange = {}
+	local function statusesOfRange(range)
+		local key = range[1] .. '-' .. range[2]
+		if statusesByRange[key] then
+			return statusesByRange[key]
+		end
+		local worstStatus = bgs[range[2]]
+		if hasSingleStatus(range[1], range[2]) then
+			statusesByRange[key] = {definite = worstStatus}
+		elseif hasWorseStatusAfter(range[2]) then
+			statusesByRange[key] = {minimum = worstStatus}
+		else
+			statusesByRange[key] = {}
+		end
+		return statusesByRange[key]
+	end
+
+	Array.forEach(opponentEntries, function(opponent)
+		if not opponent.placerange then
+			return
+		end
+		local statuses = statusesOfRange(opponent.placerange)
+		opponent.definitestatus = statuses.definite
+		opponent.extradata.minstatus = opponent.extradata.minstatus or statuses.minimum
+	end)
+end
+
 ---Finds the manually set status that is in effect in a round,
 ---which is the one with the highest round number that is not after the given round.
 ---@param statuses table<integer, string>?
@@ -480,8 +543,8 @@ end
 function StandingsParser.applyDisqualifications(opponentEntries)
 	Array.forEach(opponentEntries, function(opponent)
 		if opponent.extradata.disqualified then
-			opponent.currentstatus = 'dq'
-			opponent.definitestatus = 'dq'
+			opponent.currentstatus = DISQUALIFIED_STATUS
+			opponent.definitestatus = DISQUALIFIED_STATUS
 		end
 	end)
 end
