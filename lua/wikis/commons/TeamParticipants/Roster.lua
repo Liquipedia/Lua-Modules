@@ -10,6 +10,8 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 
 local TeamParticipantsWikiParser = Lua.import('Module:TeamParticipants/Parse/Wiki')
@@ -56,6 +58,39 @@ end
 function TeamParticipantsRoster.createTBDPlayers(count)
 	return Array.mapRange(1, count, function()
 		return TeamParticipantsWikiParser.parsePlayer{'TBD'}
+	end)
+end
+
+---@param player standardPlayer
+---@param played boolean
+local function setPlayed(player, played)
+	local extradata = player.extradata
+	if not extradata or extradata.type == 'staff' or extradata.played ~= nil then
+		return
+	end
+	extradata.played = played
+	if not played and extradata.results == nil then
+		extradata.results = false
+		-- keeps page vars so match lineups can still pick the player up
+		extradata.autoDnp = true
+	end
+end
+
+--- Sets unset `played` from match data; returns played pagenames missing from the roster.
+---@param players standardPlayer[]
+---@param playedPlayers table<string, boolean>
+---@return string[]
+function TeamParticipantsRoster.applyPlayed(players, playedPlayers)
+	local onRoster = {}
+	Array.forEach(players, function(player)
+		local pageName = Page.pageifyLink(player.pageName)
+		if pageName and not Opponent.playerIsTbd(player) then
+			onRoster[pageName] = true
+			setPlayed(player, playedPlayers[pageName] == true)
+		end
+	end)
+	return Array.filter(Array.extractKeys(playedPlayers, Table.iter.spairs), function(pageName)
+		return not onRoster[pageName]
 	end)
 end
 

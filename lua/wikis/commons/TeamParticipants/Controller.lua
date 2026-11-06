@@ -14,6 +14,7 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
+local Operator = Lua.import('Module:Operator')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
 
@@ -77,6 +78,7 @@ function TeamParticipantsController.processParticipants(parsedData)
 	Array.forEach({
 		TeamParticipantsController.importParticipants,
 		TeamParticipantsController.fillIncompleteRosters,
+		TeamParticipantsController.applyAutoPlayed,
 		TeamParticipantsController.enrichPlayerDates,
 		TeamParticipantsController.resolvePlayerFlags,
 	}, function(step)
@@ -135,6 +137,23 @@ function TeamParticipantsController.fillIncompleteRosters(parsedData)
 		if participant.opponent.template ~= 'tbd' then
 			TeamParticipantsRoster.fillIncompleteRoster(participant.opponent, parsedData.expectedPlayerCount)
 		end
+	end)
+end
+
+---@param parsedData TeamParticipantsParsedData
+function TeamParticipantsController.applyAutoPlayed(parsedData)
+	Array.forEach(Array.filter(parsedData.participants, Operator.property('autoPlayed')), function(participant)
+		local playedPlayers = TeamParticipantsRepository.getPlayedPlayers(participant.aliases)
+		if not playedPlayers then
+			return
+		end
+		local unlisted = TeamParticipantsRoster.applyPlayed(participant.opponent.players or {}, playedPlayers)
+		if #unlisted == 0 then
+			return
+		end
+		participant.warnings = participant.warnings or {}
+		table.insert(participant.warnings, 'Played in matches but missing from the roster: '
+			.. (table.concat(unlisted, ', '):gsub('_', ' ')))
 	end)
 end
 

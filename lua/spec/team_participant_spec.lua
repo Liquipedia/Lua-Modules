@@ -1149,6 +1149,92 @@ describe('Team Participants Repository', function()
 		end)
 	end)
 
+	describe('getPlayedPlayers', function()
+		local matchesStub
+
+		local function game(players1, players2, overrides)
+			return Table.merge({
+				winner = '1',
+				opponents = {{players = players1 or {}}, {players = players2 or {}}},
+			}, overrides or {})
+		end
+
+		local function setMatches(matches)
+			matchesStub = stub(TeamParticipantsRepository, 'getTournamentMatches', function() return matches end)
+		end
+
+		after_each(function()
+			matchesStub:revert()
+		end)
+
+		it('collects players from games of matching opponents', function()
+			setMatches{{
+				match2opponents = {{type = 'team', template = 'team liquid'}, {type = 'team', template = 'bds'}},
+				match2games = {
+					game({{player = 'Alpha'}, {}, {player = 'Gamma Ray'}}, {{player = 'Other'}}),
+					game({{pageName = 'Beta'}}),
+				},
+			}}
+
+			local result = TeamParticipantsRepository.getPlayedPlayers({'Team_Liquid'})
+
+			assert.are_same({Alpha = true, Beta = true, Gamma_Ray = true}, result)
+		end)
+
+		it('matches the opponent by alias and its own game index', function()
+			setMatches{{
+				match2opponents = {{type = 'team', template = 'bds'}, {type = 'team', template = 'team liquid 2024'}},
+				match2games = {game({{player = 'Other'}}, {{player = 'Alpha'}})},
+			}}
+
+			assert.are_same({Alpha = true}, TeamParticipantsRepository.getPlayedPlayers({'team liquid', 'team liquid 2024'}))
+		end)
+
+		it('ignores unfinished and not played games', function()
+			setMatches{{
+				match2opponents = {{type = 'team', template = 'team liquid'}},
+				match2games = {
+					game({{player = 'Alpha'}}, nil, {winner = ''}),
+					game({{player = 'Beta'}}, nil, {status = 'notplayed'}),
+				},
+			}}
+
+			assert.is_nil(TeamParticipantsRepository.getPlayedPlayers({'team liquid'}))
+		end)
+
+		it('returns nil when games have no player data', function()
+			setMatches{{
+				match2opponents = {{type = 'team', template = 'team liquid'}},
+				match2games = {game()},
+			}}
+
+			assert.is_nil(TeamParticipantsRepository.getPlayedPlayers({'team liquid'}))
+		end)
+	end)
+
+	describe('setPageVars with auto-DNP', function()
+		it('keeps auto-DNP players but drops manual results=false', function()
+			local globalVars = PageVariableNamespace()
+			TeamParticipantsRepository.setPageVars(createBasicParticipant({
+				aliases = {'autodnp team'},
+				opponent = {
+					type = 'team',
+					template = 'autodnp team',
+					players = {
+						{displayName = 'Starter', pageName = 'Starter', extradata = {type = 'player', results = true}},
+						{displayName = 'Manual', pageName = 'Manual', extradata = {type = 'player', results = false}},
+						{displayName = 'Bench', pageName = 'Bench',
+							extradata = {type = 'player', results = false, autoDnp = true}},
+					}
+				}
+			}))
+
+			assert.are_equal('Starter', globalVars:get('autodnp team_p1'))
+			assert.are_equal('Bench', globalVars:get('autodnp team_p2'))
+			assert.is_nil(globalVars:get('autodnp team_p3'))
+		end)
+	end)
+
 	describe('getPrizepoolRecordsForTeam', function()
 		insulate('filters prizepool records by opponent matching', function()
 			local TeamTemplateMock
@@ -1461,6 +1547,88 @@ describe('Team Participants Controller', function()
 		end)
 	end)
 
+	describe('applyAutoPlayed', function()
+		local TeamParticipantsRepository = require('Module:TeamParticipants/Repository')
+		local TeamParticipantsWikiParser = require('Module:TeamParticipants/Parse/Wiki')
+		local playedStub
+
+		local function player(name, extra)
+			return TeamParticipantsWikiParser.parsePlayer(Table.merge({name, link = name}, extra or {}))
+		end
+
+		local function run(players, playedPlayers, autoPlayed)
+			playedStub = stub(TeamParticipantsRepository, 'getPlayedPlayers', function() return playedPlayers end)
+			local participant = {
+				opponent = {template = 'team liquid', players = players},
+				aliases = {'team liquid'},
+				autoPlayed = autoPlayed ~= false,
+				warnings = {},
+			}
+			local parsedData = {participants = {participant}}
+			TeamParticipantsController.applyAutoPlayed(parsedData)
+			TeamParticipantsController.resolvePlayerFlags(parsedData)
+			return participant
+		end
+
+		after_each(function()
+			playedStub:revert()
+		end)
+
+		it('marks players found in games as played and others as DNP', function()
+			local participant = run({player('Alpha'), player('Bench')}, {Alpha = true})
+			local alpha, bench = participant.opponent.players[1].extradata, participant.opponent.players[2].extradata
+
+			assert.is_true(alpha.played)
+			assert.is_true(alpha.results)
+			assert.is_false(bench.played)
+			assert.is_false(bench.results)
+			assert.is_true(bench.autoDnp)
+		end)
+
+		it('keeps manual played and results', function()
+			local participant = run({
+				player('ManualPlayed', {played = true}),
+				player('ManualResults', {results = true}),
+				player('ManualNoResults', {results = false}),
+			}, {Alpha = true})
+			local players = participant.opponent.players
+
+			assert.is_true(players[1].extradata.played)
+			assert.is_false(players[2].extradata.played)
+			assert.is_true(players[2].extradata.results)
+			assert.is_false(players[3].extradata.played)
+			assert.is_nil(players[3].extradata.autoDnp)
+		end)
+
+		it('leaves staff and TBD players alone', function()
+			local participant = run({player('Coach', {type = 'staff'}), player('TBD')}, {Alpha = true})
+
+			assert.is_true(participant.opponent.players[1].extradata.played)
+			assert.is_true(participant.opponent.players[2].extradata.played)
+		end)
+
+		it('does nothing without game data', function()
+			local participant = run({player('Alpha')}, nil)
+
+			assert.is_true(participant.opponent.players[1].extradata.played)
+			assert.are_same({}, participant.warnings)
+		end)
+
+		it('does nothing when autoplayed is off', function()
+			local participant = run({player('Alpha')}, {Other = true}, false)
+
+			assert.is_true(participant.opponent.players[1].extradata.played)
+			assert.stub(playedStub).was_not.called()
+		end)
+
+		it('warns about game players missing from the roster', function()
+			local participant = run({player('Alpha'), player('Coach', {type = 'staff'})},
+				{Alpha = true, Coach = true, Zed_Two = true, Bravo = true})
+
+			assert.are_same({'Played in matches but missing from the roster: Bravo, Zed Two'}, participant.warnings)
+		end)
+	end)
+
 	insulate('fromTemplate Integration', function()
 		local TeamTemplateMock
 		local LpdbQuery
@@ -1697,6 +1865,18 @@ describe('Team Participants Parser', function()
 				assert.are_equal(2, #result.notes)
 				assert.are_equal('Valid Note', result.notes[1].text)
 				assert.are_equal('Another Valid Note', result.notes[2].text)
+			end)
+
+			it('reads autoplayed per opponent, falling back to the table default', function()
+				local off = {date = tableOptions.date, autoPlayed = false}
+				local on = {date = tableOptions.date, autoPlayed = true}
+
+				assert.is_false(TeamParticipantsWikiParser.parseParticipant(createBasicParticipantInput(), off).autoPlayed)
+				assert.is_true(TeamParticipantsWikiParser.parseParticipant(createBasicParticipantInput(), on).autoPlayed)
+				assert.is_true(TeamParticipantsWikiParser.parseParticipant(
+					createBasicParticipantInput{autoplayed = 'true'}, off).autoPlayed)
+				assert.is_false(TeamParticipantsWikiParser.parseParticipant(
+					createBasicParticipantInput{autoplayed = 'false'}, on).autoPlayed)
 			end)
 
 			it('sets shouldImportFromDb=true when import=true', function()
