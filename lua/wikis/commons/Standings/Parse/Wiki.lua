@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
@@ -285,17 +286,17 @@ local FORMAT_SHORTHANDS = {
 	swiss = {'swiss'},
 }
 
----@param value any
+---@param value integer?
 ---@return boolean
 local function isValidResultCount(value)
-	return value ~= nil and value > 0 and value <= MAX_FORMAT_RESULTS and value == math.floor(value)
+	return value ~= nil and value > 0 and value <= MAX_FORMAT_RESULTS
 end
 
 ---@type table<string, fun(data: table, input: string): StandingsFormat>
 local FORMAT_PARSERS = {
 	swiss = function(data, input)
-		local winsToAdvance = tonumber(data.adv)
-		local lossesToEliminate = Logic.isEmpty(data.elim) and winsToAdvance or tonumber(data.elim)
+		local winsToAdvance = MathUtil.toInteger(data.adv)
+		local lossesToEliminate = Logic.isEmpty(data.elim) and winsToAdvance or MathUtil.toInteger(data.elim)
 		local bounds = 'an integer from 1 to ' .. MAX_FORMAT_RESULTS
 		assert(isValidResultCount(winsToAdvance), 'Invalid format input: "' .. input .. '" needs adv as ' .. bounds)
 		assert(isValidResultCount(lossesToEliminate), 'Invalid format input: "' .. input .. '" needs elim as ' .. bounds)
