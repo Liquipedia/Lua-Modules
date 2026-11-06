@@ -12,7 +12,9 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local StandingTable = Lua.import('Module:Standings/Table')
@@ -22,6 +24,8 @@ local TournamentStructure = Lua.import('Module:TournamentStructure')
 local Condition = Lua.import('Module:Condition')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
+
+local Html = Lua.import('Module:Widget/Html')
 
 ---Adaptor for the tables of Module:GroupTableLeague/next/downstream and Module:SwissTableLeague/next
 local StandingTableLegacyNext = {}
@@ -66,6 +70,26 @@ local ADJUSTMENTS = {
 
 local MATCH_RESULTS = {matchwins = 'w', matchdraws = 'd', matchlosses = 'l'}
 
+local OPPONENT_TYPE_INPUT_MAPPING = {
+	['1'] = Opponent.solo,
+	['1v1'] = Opponent.solo,
+	solo = Opponent.solo,
+
+	['2'] = Opponent.duo,
+	['2v2'] = Opponent.duo,
+	duo = Opponent.duo,
+
+	['3'] = Opponent.trio,
+	['3v3'] = Opponent.trio,
+	trio = Opponent.trio,
+
+	['4'] = Opponent.quad,
+	['4v4'] = Opponent.quad,
+	quad = Opponent.quad,
+
+	team = Opponent.team,
+}
+
 ---Module:SwissTableLeague/next
 ---@param frame Frame
 ---@return Renderable
@@ -82,10 +106,119 @@ end
 
 ---@param args table
 ---@param tableType 'swiss'|'group'
+---@param options? {defaultTiebreakers: (fun(args: table): string[])?}
 ---@return Renderable
-function StandingTableLegacyNext.build(args, tableType)
-	assert(args.tiebreaker1 ~= 'finalTiebreak', 'This SwissTableLeague has to be converted'
-		.. ' manually due to using unsupported manual tiebreakers')
+function StandingTableLegacyNext.build(args, tableType, options)
+	return StandingTable.fromTemplate(StandingTableLegacyNext.convertToNewArgs(args, tableType, options))
+end
+
+---@param frame Frame
+---@return Renderable
+function StandingTableLegacyNext.convert(frame)
+	return StandingTableLegacyNext.convertFromArgs(Arguments.getArgs(frame))
+end
+
+---@param oldArgs table
+---@param options? {defaultTiebreakers: (fun(args: table): string[])?}
+---@return Renderable
+function StandingTableLegacyNext.convertFromArgs(oldArgs, options)
+	local push = Logic.readBool(oldArgs.push)
+	oldArgs.push = nil
+	local tableType = oldArgs.tableType
+	oldArgs.tableType = nil
+	assert(tableType == 'swiss' or tableType == 'group', 'Invalid or missing tableType')
+
+	local newArgs = StandingTableLegacyNext.convertToNewArgs(oldArgs, tableType, options)
+
+	local function itemToCode(tbl)
+		if type(tbl) == 'boolean' then
+			return tostring(tbl)
+		elseif type(tbl) ~= 'table' then
+			return tbl
+		end
+		local template = 'Json'
+		if tbl.title then
+			template = 'Round'
+		end
+		if tbl.type and tbl.isArchon then
+			template = 'ArchonOpponent'
+			tbl.type = nil
+			tbl.isArchon = nil
+		elseif tbl.type then
+			template = mw.getContentLanguage():ucfirst(tbl.type) .. 'Opponent'
+			tbl.type = nil
+		end
+		local jsonCode = {'{{' .. template}
+		for key, item in pairs(tbl) do
+			if Logic.isNotEmpty(item) then
+				table.insert(jsonCode, '|' .. key .. '=' .. itemToCode(item))
+			end
+		end
+		table.insert(jsonCode, '}}')
+		return table.concat(jsonCode)
+	end
+
+	---@param key string|integer
+	---@return boolean
+	local function valueIsBool(key)
+		return Logic.readBoolOrNil(newArgs[key]) ~= nil
+	end
+
+	---@param tbl table
+	---@param a string|integer
+	---@param b string|integer
+	---@return boolean
+	local function order(tbl, a, b)
+		-- push bool settings up top
+		if valueIsBool(a) and not valueIsBool(b) then
+			return true
+		elseif valueIsBool(a) and valueIsBool(b) then
+			return a < b
+		elseif valueIsBool(b) then
+			return false
+		end
+
+		-- next add opponents (have numeric keys) next
+		if MathUtil.isInteger(a) and not MathUtil.isInteger(b) then
+			return true
+		elseif MathUtil.isInteger(a) and MathUtil.isInteger(b) then
+			return a < b
+		elseif MathUtil.isInteger(b) then
+			return false
+		end
+
+		-- add the other params below opponents, sorted by key
+		-- casting to string just to be safe (should not be needed)
+		return tostring(a) < tostring(b)
+	end
+
+	local code = {}
+	for key, item in Table.iter.spairs(newArgs, order) do
+		table.insert(code, '\t|' .. key .. '=' .. itemToCode(item))
+	end
+	table.sort(code)
+
+	if tableType == 'swiss' then
+		table.insert(code, 1, '{{SwissStandings')
+	elseif tableType == 'group' then
+		table.insert(code, 1, '{{GroupStandings')
+	end
+
+	table.insert(code, '}}')
+
+	if push then
+		return table.concat(code, '\n')
+	end
+
+	return Html.Pre{children = Array.interleave(code, '\n')}
+end
+
+---@param args table
+---@param tableType 'swiss'|'group'
+---@param options? {defaultTiebreakers: (fun(args: table): string[])?}
+---@return table
+function StandingTableLegacyNext.convertToNewArgs(args, tableType, options)
+	options = options or {}
 
 	local matchRecords = StandingTableLegacyNext.fetchMatches(args)
 	local matchesByRound, roundCount = StandingTableLegacyNext.groupMatchesByRound(args, matchRecords)
@@ -98,7 +231,7 @@ function StandingTableLegacyNext.build(args, tableType)
 		opponents, matchRecords, StandingTableLegacyNext.readImportOpponents(args, opponents)
 	)
 
-	return StandingTable.fromTemplate(Table.merge(
+	return Table.merge(
 		StandingTableLegacyNext.getStandardParameter(args, opponents, tableType),
 		{
 			bg = StandingTableLegacyNext.parseBgs(args, opponentCount),
@@ -106,8 +239,8 @@ function StandingTableLegacyNext.build(args, tableType)
 		},
 		rounds,
 		opponents,
-		{tiebreakers = StandingTableLegacyNext.parseTiebreakers(args)}
-	))
+		{tiebreakers = StandingTableLegacyNext.parseTiebreakers(args, options.defaultTiebreakers)}
+	)
 end
 
 ---@param args table
@@ -266,9 +399,17 @@ end
 function StandingTableLegacyNext.parseOpponentInput(args, key, index, prefix, roundCount)
 	local value = args[key]
 	local opponent = Json.parseIfTable(value)
+	if not opponent and String.startsWith(value, '{{') then
+		opponent = StandingTableLegacyNext._tryToParseWikiTemplateOpponent(value)
+	end
 	if not opponent then
 		if prefix == 'p' then
-			opponent = {type = Opponent.solo, value, flag = args['p' .. index .. 'flag'], link = args['p' .. index .. 'link']}
+			opponent = {
+				type = Opponent.solo,
+				value, flag = args['p' .. index .. 'flag'],
+				link = args['p' .. index .. 'link'],
+				faction = args['p' .. index .. 'faction'] or args['p' .. index .. 'race'],
+			}
 		else
 			opponent = {type = Opponent.team, value}
 		end
@@ -283,6 +424,43 @@ function StandingTableLegacyNext.parseOpponentInput(args, key, index, prefix, ro
 		StandingTableLegacyNext.parseAdjustments(args, index, roundCount),
 		StandingTableLegacyNext.parseDefiniteStatuses(args, index, roundCount)
 	)
+end
+
+---@param input string
+---@return table?
+function StandingTableLegacyNext._tryToParseWikiTemplateOpponent(input)
+	local typeInput = string.match(input, '%{%{(%a+)Opponent%s*%|')
+	local opponentType = OPPONENT_TYPE_INPUT_MAPPING[(typeInput or ''):lower()]
+	local isArchon
+	if not opponentType and String.startsWith(input:lower(), '{{archon') then
+		opponentType = Opponent.duo
+		isArchon = true
+	end
+	-- can't parse this ...
+	if not opponentType then
+		return
+	end
+
+	local opponent = {
+		type = opponentType,
+		isArchon = isArchon,
+	}
+
+	local argsPairsString = input:gsub('^%{%{.-%|', ''):gsub('%}%}$', '')
+	local argsPairs = Array.parseCommaSeparatedString(argsPairsString, '|')
+	local unnamedCounter = 0
+	Array.forEach(argsPairs, function(argsPair)
+		local key = string.match(argsPair, '^(.-)=')
+		local value = string.match(argsPair, '^.-=(.*)$')
+		if Logic.isEmpty(key) then
+			unnamedCounter = unnamedCounter + 1
+			key = unnamedCounter
+		end
+		key = tonumber(key) or key
+		opponent[key] = value
+	end)
+
+	return opponent
 end
 
 ---Maps `round<R>temp_*<N>` to `r<R><adjustment>`. Unprefixed `temp_*<N>` adjust the final round, except
@@ -351,9 +529,17 @@ function StandingTableLegacyNext.parseDefiniteStatuses(args, index, roundCount)
 end
 
 ---@param args table
+---@param defaultTiebreakers? (fun(args: table): string[])
 ---@return string[]
-function StandingTableLegacyNext.parseTiebreakers(args)
+function StandingTableLegacyNext.parseTiebreakers(args, defaultTiebreakers)
 	local tiebreakers = {}
+	-- special case where the group is decided by manual tiebreaker inputs
+	-- have to bypass the `mapTiebreaker` call for this special case
+	if args.tiebreaker1 == 'finalTiebreak' then
+		tiebreakers = {'manual'}
+		mw.ext.TeamLiquidIntegration.add_category('GTL wrapper with first tiebreaker manual')
+	end
+
 	for _, value in Table.iter.pairsByPrefix(args, 'tiebreaker', {requireIndex = true}) do
 		local tiebreaker = StandingTableLegacyNext.mapTiebreaker(value)
 		if tiebreaker then
@@ -363,6 +549,12 @@ function StandingTableLegacyNext.parseTiebreakers(args)
 	if #tiebreakers > 0 then
 		return tiebreakers
 	end
+	return (defaultTiebreakers or StandingTableLegacyNext.defaultTiebreakers)(args)
+end
+
+---@param args table
+---@return string[]
+function StandingTableLegacyNext.defaultTiebreakers(args)
 	return Array.extend(
 		Logic.readBool(args.show_p) and 'points' or nil,
 		'matchscore',
