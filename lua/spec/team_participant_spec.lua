@@ -1497,6 +1497,18 @@ describe('Team Participants Controller', function()
 			assert.stub(LpdbPlacementStore).was_not.called()
 		end)
 
+		it('sort=alphabetical reorders the display but not the stored players', function()
+			local html = tostring(TeamParticipantsController.fromTemplate{
+				{'team liquid', players = {{'Zed'}, {'alpha'}}},
+				sort = 'alphabetical',
+				store = true,
+			})
+
+			local stored = require('Module:Json').parseIfString(LpdbPlacementStore.calls[1].vals[2].opponentplayers)
+			assert.are_equal('Zed', stored.p1)
+			assert.is_true(html:find('alpha', 1, true) < html:find('Zed', 1, true))
+		end)
+
 		it('store=true enables LPDB storage', function()
 			local args = {
 				{
@@ -1581,6 +1593,11 @@ describe('Team Participants Parser', function()
 			after_each(function()
 				TeamTemplateMock.tearDown()
 				LpdbQuery:revert()
+			end)
+
+			it('reads sort=alphabetical', function()
+				assert.is_true(TeamParticipantsWikiParser.parseWikiInput{sort = 'alphabetical'}.sortAlphabetically)
+				assert.is_false(TeamParticipantsWikiParser.parseWikiInput{}.sortAlphabetically)
 			end)
 
 			it('parses multiple participants', function()
@@ -1886,6 +1903,82 @@ describe('Team Participants Parser', function()
 					TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 				end, 'External or non-tournament qualifier must have text')
 			end)
+		end)
+	end)
+end)
+
+describe('Team Participants Roster sorting', function()
+	local TeamParticipantsRoster = require('Module:TeamParticipants/Roster')
+	local TeamTemplate = require('Module:TeamTemplate')
+	local Array = require('Module:Array')
+
+	local function player(displayName, extradata)
+		local roles = extradata and extradata.sortOrder and {{sortOrder = extradata.sortOrder}} or {}
+		return {
+			displayName = displayName,
+			extradata = {type = extradata and extradata.type or 'player', roles = roles},
+		}
+	end
+
+	local function names(list)
+		return Array.map(list, function(element) return element.displayName or element.opponent.template end)
+	end
+
+	describe('sortPlayers', function()
+		local players = {
+			player('zed', {sortOrder = 1}),
+			player('Coach', {type = 'staff'}),
+			player('TBD'),
+			player('alpha', {sortOrder = 2}),
+			player('Bravo', {sortOrder = 1}),
+		}
+
+		it('sorts by role by default, ties keep input order', function()
+			assert.are_same({'zed', 'Bravo', 'alpha', 'TBD', 'Coach'},
+				names(TeamParticipantsRoster.sortPlayers(players)))
+		end)
+
+		it('sorts case-insensitively by name, ignoring roles, TBD and staff last', function()
+			assert.are_same({'alpha', 'Bravo', 'zed', 'TBD', 'Coach'},
+				names(TeamParticipantsRoster.sortPlayers(players, true)))
+		end)
+
+		it('does not mutate the input', function()
+			TeamParticipantsRoster.sortPlayers(players, true)
+			assert.are_equal('zed', players[1].displayName)
+		end)
+	end)
+
+	describe('sortParticipants', function()
+		local getRawStub
+		local teamNames = {['team liquid'] = 'Team Liquid', bds = 'Team BDS', heroic = 'HEROIC', mouz = 'MOUZ'}
+
+		before_each(function()
+			getRawStub = stub(TeamTemplate, 'getRawOrNil', function(template)
+				return teamNames[template] and {name = teamNames[template]} or nil
+			end)
+		end)
+
+		after_each(function()
+			getRawStub:revert()
+		end)
+
+		local function participant(template, potentialQualifiers)
+			return {opponent = {type = 'team', template = template}, potentialQualifiers = potentialQualifiers or {}}
+		end
+
+		it('sorts by displayed name, TBD and contender cards last', function()
+			local sorted = TeamParticipantsRoster.sortParticipants{
+				participant('tbd'),
+				participant('team liquid'),
+				participant('tbd', {{type = 'team', template = 'mouz'}}),
+				participant('mouz'),
+				participant('heroic'),
+				participant('bds'),
+			}
+
+			assert.are_same({'heroic', 'mouz', 'bds', 'team liquid', 'tbd', 'tbd'}, names(sorted))
+			assert.are_equal(0, #sorted[5].potentialQualifiers)
 		end)
 	end)
 end)

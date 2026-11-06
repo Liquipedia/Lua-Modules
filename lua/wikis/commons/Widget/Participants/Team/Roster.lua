@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local FnUtil = Lua.import('Module:FnUtil')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local RoleUtil = Lua.import('Module:Role/Util')
@@ -93,29 +92,6 @@ end
 local function ParticipantsTeamRoster(props)
 	local participant = props.participant
 
-	-- Used for making the sorting stable
-	local sortPlayers = function(players)
-		local playerToIndex = Table.map(players, function(index, player) return player, index end)
-		local isStaff = function(player) return player.extradata.type == 'staff' end
-		return Array.sortBy(players, FnUtil.identity, function(a, b)
-			-- Staff render after players (incl. TBD placeholders) within a tab
-			local aIsStaff, bIsStaff = isStaff(a), isStaff(b)
-			if aIsStaff ~= bIsStaff then
-				return bIsStaff
-			end
-			local function getPlayerSortOrder(player)
-				local roles = player.extradata.roles or {}
-				return roles[1] and roles[1].sortOrder or math.huge
-			end
-			local orderA = getPlayerSortOrder(a)
-			local orderB = getPlayerSortOrder(b)
-			if orderA == orderB then
-				return playerToIndex[a] < playerToIndex[b]
-			end
-			return orderA < orderB
-		end)
-	end
-
 	local makePlayerWidget = function(player)
 		local playerTeam = participant.opponent.template ~= player.team and player.team or nil
 		local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
@@ -172,9 +148,10 @@ local function ParticipantsTeamRoster(props)
 
 	local tabs = Array.map(Table.entries(TAB_DATA), function(tabTuple)
 		local tabTypeEnum, tabData = tabTuple[1], tabTuple[2]
-		local tabPlayers = sortPlayers(Array.filter(players, function(player)
+		-- players arrive sorted from TeamParticipants/Roster
+		local tabPlayers = Array.filter(players, function(player)
 			return getTab(player) == tabTypeEnum
-		end))
+		end)
 
 		local groups
 		if tabTypeEnum == TAB_ENUM.FORMER then

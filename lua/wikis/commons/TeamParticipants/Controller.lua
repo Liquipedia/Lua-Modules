@@ -57,6 +57,7 @@ function TeamParticipantsController.fromTemplate(frame)
 		Array.forEach(parsedData.participants, TeamParticipantsRepository.save)
 	end
 	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
+	TeamParticipantsController.sortForDisplay(parsedData)
 
 	local showControls = not teamParticipantsVars:get('externalControlsRendered')
 
@@ -161,6 +162,18 @@ function TeamParticipantsController.resolvePlayerFlags(parsedData)
 	Array.forEach(Array.flatMap(parsedData.participants, function(participant)
 		return participant.opponent.players or {}
 	end), TeamParticipantsRoster.resolvePlayerFlags)
+end
+
+--- Runs after storage so stored and page-var player order stays as entered.
+---@param parsedData TeamParticipantsParsedData
+function TeamParticipantsController.sortForDisplay(parsedData)
+	Array.forEach(parsedData.participants, function(participant)
+		local opponent = participant.opponent
+		opponent.players = TeamParticipantsRoster.sortPlayers(opponent.players or {}, parsedData.sortAlphabetically)
+	end)
+	if parsedData.sortAlphabetically then
+		parsedData.participants = TeamParticipantsRoster.sortParticipants(parsedData.participants)
+	end
 end
 
 return TeamParticipantsController
