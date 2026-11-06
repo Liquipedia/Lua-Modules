@@ -284,6 +284,8 @@ local MAX_FORMAT_RESULTS = 10
 local FORMAT_SHORTHANDS = {
 	gsl = {'swiss', adv = 2},
 	swiss = {'swiss'},
+	srr = {'roundrobin', cycles = 1},
+	drr = {'roundrobin', cycles = 2},
 }
 
 ---A positive integer up to `max`, or `default` without input
@@ -310,6 +312,12 @@ local FORMAT_PARSERS = {
 		local lossesToEliminate = readFormatCount(data, 'elim', input, winsToAdvance, MAX_FORMAT_RESULTS)
 		return {type = 'swiss', winsToAdvance = winsToAdvance, lossesToEliminate = lossesToEliminate}
 	end,
+	roundrobin = function(data, input)
+		return {type = 'roundrobin', cycles = readFormatCount(data, 'cycles', input, 1)}
+	end,
+	classicswiss = function(data, input)
+		return {type = 'classicswiss', rounds = readFormatCount(data, 'rounds', input)}
+	end,
 }
 
 ---@param input string
@@ -319,7 +327,8 @@ local function parseFormatShorthand(input)
 	return FORMAT_SHORTHANDS[input] or (adv and {'swiss', adv = adv}) or nil
 end
 
----Reads `format`: `gsl`, `swiss<N>` or `{{Json|swiss|adv=<N>|elim=<N>}}`, where `elim` defaults to `adv`.
+---Reads `format`: `gsl`, `swiss<N>`, `srr`, `drr`, or `{{Json|<type>|...}}` with type `swiss` (`adv`, `elim`
+---defaulting to `adv`), `roundrobin` (`cycles`, defaulting to 1) or `classicswiss` (`rounds`).
 ---@param args table
 ---@param tableType StandingsTableTypes
 ---@return StandingsFormat?

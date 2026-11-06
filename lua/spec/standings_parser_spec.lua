@@ -1807,6 +1807,24 @@ describe('Standings Parser', function()
 			end)
 		end)
 
+		it('are set from the points and matches left of a round robin', function()
+			local opponents = {
+				gslOpponent('Alpha', {'w', 'w', ''}),
+				gslOpponent('Bravo', {'w', 'w', ''}),
+				gslOpponent('Charlie', {'l', 'l', ''}),
+				gslOpponent('Delta', {'l', 'l', ''}),
+			}
+			local entries = StandingsParser.parse(
+				DECIDER_UPCOMING, opponents, GSL_BGS, nil, {}, 'group', {'full.disqualified', 'full.points', 'full.manual'},
+				{format = {type = 'roundrobin', cycles = 1}, points = {w = 1, d = 0, l = 0}}
+			).entries
+			assert.are_same({1, 4}, findEntry(entries, 'Alpha', 1).placerange)
+			assert.are_same({1, 2}, findEntry(entries, 'Alpha', 2).placerange)
+			assert.are_equal('up', findEntry(entries, 'Alpha', 2).definitestatus)
+			assert.are_same({3, 4}, findEntry(entries, 'Charlie', 2).placerange)
+			assert.are_equal('down', findEntry(entries, 'Charlie', 2).definitestatus)
+		end)
+
 		it('are not set without a format', function()
 			local entries = StandingsParser.parse(
 				DECIDER_UPCOMING, gslOpponents(false), GSL_BGS, nil, {}, 'swiss', GSL_TIEBREAKERS

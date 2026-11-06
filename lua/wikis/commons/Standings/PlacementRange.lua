@@ -12,12 +12,16 @@ local Array = Lua.import('Module:Array')
 ---The best and worst final placement of the opponents of a round, calculated per format
 local StandingsPlacementRange = {}
 
----@alias StandingsFormat StandingsSwissFormat
+---@alias StandingsFormat StandingsSwissFormat|StandingsRoundRobinFormat|StandingsClassicSwissFormat
 
 ---@alias StandingsPlacementRangeValue {[1]: integer, [2]: integer}
 
 ---@alias StandingsPlacementRangeEntry {match: {w: integer, d: integer, l: integer}, overtime: table?,
 ---extradata: table, slotindex: integer, placerange: StandingsPlacementRangeValue?}
+
+---@class StandingsPlacementRangeContext
+---@field tiebreakerIds string[]
+---@field points table<string, number>? The points per result, see StandingsParseWiki.parsePoints
 
 ---@class StandingsPlacementRangeCalculator
 ---@field firstMatchAdjustmentRound integer?
@@ -26,6 +30,8 @@ local StandingsPlacementRange = {}
 ---@type table<string, string>
 local TYPE_TO_CLASS = {
 	swiss = 'Swiss',
+	roundrobin = 'RemainingMatches',
+	classicswiss = 'RemainingMatches',
 }
 
 ---@param opponents StandingTableOpponentData[]
@@ -44,10 +50,11 @@ end
 ---Nil if the opponents do not fit the format.
 ---@param format StandingsFormat
 ---@param opponents StandingTableOpponentData[]
+---@param context StandingsPlacementRangeContext?
 ---@return StandingsPlacementRangeCalculator?
-function StandingsPlacementRange.calculator(format, opponents)
+function StandingsPlacementRange.calculator(format, opponents, context)
 	local CalculatorClass = Lua.import('Module:Standings/PlacementRange/' .. TYPE_TO_CLASS[format.type])
-	local calculator = CalculatorClass.new(format, opponents)
+	local calculator = CalculatorClass.new(format, opponents, context)
 	if calculator then
 		calculator.firstMatchAdjustmentRound = firstMatchAdjustmentRound(opponents)
 	end
