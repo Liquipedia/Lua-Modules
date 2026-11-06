@@ -309,7 +309,10 @@ TeamParticipantsRepository.getTournamentMatches = FnUtil.memoize(function()
 	end
 	local matches = {}
 	Lpdb.executeMassQuery('match2', {
-		conditions = tostring(ConditionNode(ColumnName('parent'), Comparator.eq, parent)),
+		conditions = tostring(ConditionTree(BooleanOperator.all):add{
+			ConditionNode(ColumnName('parent'), Comparator.eq, parent),
+			ConditionNode(ColumnName('finished'), Comparator.eq, 1),
+		}),
 		query = 'match2opponents, match2games',
 	}, function(match)
 		table.insert(matches, match)
