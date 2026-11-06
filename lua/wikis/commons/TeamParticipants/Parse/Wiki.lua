@@ -36,7 +36,7 @@ local TeamParticipantsWikiParser = {}
 ---@alias TeamParticipantsTableOptions {date: osdateparam}
 
 ---@alias TeamParticipantsParsedData {participants: TeamParticipant[], expectedPlayerCount: integer?,
----enrichPlayerDates: boolean}
+---enrichPlayerDates: boolean, sortAlphabetically: boolean}
 
 ---@param args table
 ---@return TeamParticipantsParsedData
@@ -54,6 +54,7 @@ function TeamParticipantsWikiParser.parseWikiInput(args)
 		participants = participants,
 		expectedPlayerCount = tonumber(args.minimumplayers),
 		enrichPlayerDates = Logic.nilOr(Logic.readBoolOrNil(args.enrichPlayerDates), true),
+		sortAlphabetically = args.sort == 'alphabetical',
 	}
 end
 
