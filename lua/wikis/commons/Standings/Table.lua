@@ -119,6 +119,7 @@ function StandingsTable.parse(args, tableType)
 		round.started, round.finished = StandingsParser.resolveRoundStatus(round, matchPhasesByRound[round.roundNumber])
 	end)
 
+	local format = StandingsParseWiki.parseFormat(args, tableType)
 	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType, tiebreakers, {
 		drawConfig = StandingsParseWiki.parseDrawConfig(args),
 		overtime = overtime,
@@ -126,7 +127,9 @@ function StandingsTable.parse(args, tableType)
 		walkoverRounds = StandingsParseWiki.parseWalkoverRounds(args),
 		tiebreakerReset = tiebreakerReset,
 		maxBestOf = maxBestOf,
-		format = StandingsParseWiki.parseFormat(args, tableType),
+		format = format,
+		-- A format is never set on ffa standings
+		points = format and StandingsParseWiki.parsePoints(args.points, overtime, tableType --[[@as 'swiss'|'group']]),
 	})
 
 	if tableType == 'swiss' then

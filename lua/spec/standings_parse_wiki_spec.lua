@@ -308,6 +308,23 @@ describe('Standings Wiki Parser', function()
 			)
 		end)
 
+		it('reads round robin and classic swiss', function()
+			assert.are_same({type = 'roundrobin', cycles = 1}, StandingsParseWiki.parseFormat({format = 'srr'}, 'group'))
+			assert.are_same({type = 'roundrobin', cycles = 2}, StandingsParseWiki.parseFormat({format = 'drr'}, 'group'))
+			assert.are_same(
+				{type = 'roundrobin', cycles = 1},
+				StandingsParseWiki.parseFormat({format = '{"1":"roundrobin"}'}, 'group')
+			)
+			assert.are_same(
+				{type = 'roundrobin', cycles = 3},
+				StandingsParseWiki.parseFormat({format = '{"1":"roundrobin","cycles":"3"}'}, 'group')
+			)
+			assert.are_same(
+				{type = 'classicswiss', rounds = 7},
+				StandingsParseWiki.parseFormat({format = '{"1":"classicswiss","rounds":"7"}'}, 'swiss')
+			)
+		end)
+
 		it('is nil without input', function()
 			assert.is_nil(StandingsParseWiki.parseFormat({}, 'swiss'))
 			assert.is_nil(StandingsParseWiki.parseFormat({format = ''}, 'swiss'))
@@ -323,6 +340,10 @@ describe('Standings Wiki Parser', function()
 				{format = '{"1":"swiss","adv":"1.5"}'},
 				{format = '{"1":"swiss","adv":"3","elim":"99999"}'},
 				{format = '{"1":"other","adv":"3"}'},
+				{format = '{"1":"roundrobin","cycles":"0"}'},
+				{format = '{"1":"roundrobin","cycles":"1.5"}'},
+				{format = '{"1":"classicswiss"}'},
+				{format = '{"1":"classicswiss","rounds":"0"}'},
 			}
 			for _, args in ipairs(invalid) do
 				assert.error(function() StandingsParseWiki.parseFormat(args, 'swiss') end)
