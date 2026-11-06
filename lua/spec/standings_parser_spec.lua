@@ -1322,6 +1322,31 @@ describe('Standings Parser', function()
 		end)
 	end)
 
+	describe('manual min statuses', function()
+		local THREE_ROUNDS = {
+			{roundNumber = 1, started = true, finished = true},
+			{roundNumber = 2, started = true, finished = true},
+			{roundNumber = 3, started = true, finished = false},
+		}
+
+		it('stores the min status in effect from the given round onwards without touching the statuses', function()
+			local alpha = makeOpponent('Alpha', {{points = 0}, {points = 0}, {points = 0}})
+			alpha.minStatuses = {[2] = 'stay', [3] = 'stayup'}
+			local opponents = {alpha, makeOpponent('Bravo', {{points = 3}, {points = 3}, {points = 3}})}
+
+			local standingsTable = StandingsParser.parse(THREE_ROUNDS, opponents, BGS, nil, {}, 'ffa', TIEBREAKERS)
+
+			local alpha1 = findEntry(standingsTable.entries, 'Alpha', 1)
+			assert.is_nil(alpha1.extradata.minstatus)
+			local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
+			assert.are_equal('stay', alpha2.extradata.minstatus)
+			assert.are_equal('stay', alpha2.currentstatus)
+			assert.is_nil(alpha2.definitestatus)
+			assert.are_equal('stayup', findEntry(standingsTable.entries, 'Alpha', 3).extradata.minstatus)
+			assert.is_nil(findEntry(standingsTable.entries, 'Bravo', 3).extradata.minstatus)
+		end)
+	end)
+
 	---An opponent whose game record differs from its match record
 	---@param name string
 	---@return table
@@ -1603,6 +1628,193 @@ describe('Standings Parser', function()
 			-- Alpha 2 wins, Bravo 2 losses
 			assert.are_equal(1, findEntry(standingsTable.entries, 'Alpha', 2).placement)
 			assert.are_equal(2, findEntry(standingsTable.entries, 'Bravo', 2).placement)
+		end)
+	end)
+
+	describe('placement ranges', function()
+		local GSL = {type = 'swiss', winsToAdvance = 2, lossesToEliminate = 2}
+		local GSL_BGS = {[1] = 'up', [2] = 'up', [3] = 'down', [4] = 'down'}
+		local GSL_TIEBREAKERS = {'full.disqualified', 'full.matchscore', 'full.manual'}
+		local POINTS_TIEBREAKERS = {'full.points', 'full.gamediff'}
+
+		---@param name string
+		---@param results string[] 'w', 'l' or '' per round
+		local function gslOpponent(name, results)
+			return {
+				opponent = literal(name),
+				rounds = Array.map(results, function(result)
+					return {
+						scoreboard = {
+							points = result == 'w' and 1 or 0,
+							match = {w = result == 'w' and 1 or 0, d = 0, l = result == 'l' and 1 or 0},
+						},
+						specialstatus = '',
+					}
+				end),
+			}
+		end
+
+		---@param decider boolean Whether the decider has been played
+		local function gslOpponents(decider)
+			return {
+				gslOpponent('Alpha', {'w', 'w', ''}),
+				gslOpponent('Bravo', {'l', 'w', decider and 'l' or ''}),
+				gslOpponent('Charlie', {'w', 'l', decider and 'w' or ''}),
+				gslOpponent('Delta', {'l', 'l', ''}),
+			}
+		end
+
+		local DECIDER_UPCOMING = {
+			{roundNumber = 1, started = true, finished = true},
+			{roundNumber = 2, started = true, finished = true},
+			{roundNumber = 3, started = false, finished = false},
+		}
+
+		local function parse(opponents, rounds, tiebreakers)
+			return StandingsParser.parse(
+				rounds or DECIDER_UPCOMING, opponents, GSL_BGS, nil, {}, 'swiss', tiebreakers or GSL_TIEBREAKERS, {format = GSL}
+			)
+		end
+
+		it('sets the range and the definite status before the table is finished', function()
+			local entries = parse(gslOpponents(false)).entries
+
+			assert.are_same({1, 3}, findEntry(entries, 'Alpha', 1).placerange)
+			assert.is_nil(findEntry(entries, 'Alpha', 1).definitestatus)
+
+			assert.are_same({1, 1}, findEntry(entries, 'Alpha', 2).placerange)
+			assert.are_equal('up', findEntry(entries, 'Alpha', 2).definitestatus)
+			assert.are_same({2, 3}, findEntry(entries, 'Bravo', 2).placerange)
+			assert.is_nil(findEntry(entries, 'Bravo', 2).definitestatus)
+			assert.are_same({4, 4}, findEntry(entries, 'Delta', 2).placerange)
+			assert.are_equal('down', findEntry(entries, 'Delta', 2).definitestatus)
+
+			assert.are_equal('up', findEntry(entries, 'Alpha', 3).definitestatus)
+		end)
+
+		it('leaves the final round of a finished table to the placements', function()
+			local rounds = Array.map(DECIDER_UPCOMING, function(round)
+				return {roundNumber = round.roundNumber, started = true, finished = true}
+			end)
+			local entries = parse(gslOpponents(true), rounds).entries
+
+			assert.are_same({1, 1}, findEntry(entries, 'Alpha', 2).placerange)
+			Array.forEach({'Alpha', 'Bravo', 'Charlie', 'Delta'}, function(name)
+				assert.is_nil(findEntry(entries, name, 3).placerange)
+			end)
+			assert.are_equal('up', findEntry(entries, 'Charlie', 3).definitestatus)
+			assert.are_equal('down', findEntry(entries, 'Bravo', 3).definitestatus)
+		end)
+
+		it('keeps manual definite statuses', function()
+			local opponents = gslOpponents(false)
+			opponents[1].definiteStatuses = {[2] = 'stay'}
+			assert.are_equal('stay', findEntry(parse(opponents).entries, 'Alpha', 2).definitestatus)
+		end)
+
+		describe('min status', function()
+			local MIN_STATUS_BGS = {[1] = 'up', [2] = 'stay', [3] = 'stay', [4] = 'down'}
+
+			local function parseWithMinStatusBgs(opponents)
+				return StandingsParser.parse(
+					DECIDER_UPCOMING, opponents, MIN_STATUS_BGS, nil, {}, 'swiss', GSL_TIEBREAKERS, {format = GSL}
+				).entries
+			end
+
+			it('is the status of the worst placement when the range rules out a later status', function()
+				local entries = parseWithMinStatusBgs(gslOpponents(false))
+				assert.are_equal('stay', findEntry(entries, 'Alpha', 1).extradata.minstatus)
+				assert.is_nil(findEntry(entries, 'Alpha', 1).definitestatus)
+				assert.is_nil(findEntry(entries, 'Bravo', 1).extradata.minstatus)
+			end)
+
+			it('is not set with a definite status', function()
+				local entries = parseWithMinStatusBgs(gslOpponents(false))
+				assert.are_equal('up', findEntry(entries, 'Alpha', 2).definitestatus)
+				assert.is_nil(findEntry(entries, 'Alpha', 2).extradata.minstatus)
+				assert.are_equal('stay', findEntry(entries, 'Bravo', 2).definitestatus)
+			end)
+
+			it('is not set when the worst placement shares the status of the last slot', function()
+				assert.is_nil(findEntry(parse(gslOpponents(false)).entries, 'Alpha', 1).extradata.minstatus)
+			end)
+
+			it('is not set when only dq is ruled out', function()
+				local entries = StandingsParser.parse(DECIDER_UPCOMING, gslOpponents(false),
+					{[1] = 'up', [2] = 'stay', [3] = 'down', [4] = 'dq'}, nil, {}, 'swiss', GSL_TIEBREAKERS, {format = GSL}
+				).entries
+				assert.is_nil(findEntry(entries, 'Alpha', 1).extradata.minstatus)
+			end)
+
+			it('keeps a manual min status', function()
+				local opponents = gslOpponents(false)
+				opponents[1].minStatuses = {[1] = 'up'}
+				assert.are_equal('up', findEntry(parseWithMinStatusBgs(opponents), 'Alpha', 1).extradata.minstatus)
+			end)
+		end)
+
+		it('are set when the points agree with the record', function()
+			local entries = parse(gslOpponents(false), nil, POINTS_TIEBREAKERS).entries
+			assert.are_same({1, 1}, findEntry(entries, 'Alpha', 2).placerange)
+			assert.are_same({4, 4}, findEntry(entries, 'Delta', 2).placerange)
+		end)
+
+		it('are not set when the tiebreakers put an opponent outside its range', function()
+			local opponents = gslOpponents(false)
+			opponents[4].rounds[1].scoreboard.points = 3
+			local entries = parse(opponents, nil, POINTS_TIEBREAKERS).entries
+			assert.are_equal(1, findEntry(entries, 'Delta', 2).slotindex)
+			Array.forEach(entries, function(entry)
+				assert.is_nil(entry.placerange)
+				assert.is_nil(entry.definitestatus)
+			end)
+		end)
+
+		it('are set in a partly played round', function()
+			local opponents = {
+				gslOpponent('Alpha', {'w', 'w', ''}),
+				gslOpponent('Bravo', {'l', '', ''}),
+				gslOpponent('Charlie', {'w', 'l', ''}),
+				gslOpponent('Delta', {'l', '', ''}),
+			}
+			local rounds = Array.map(DECIDER_UPCOMING, function(round)
+				return {roundNumber = round.roundNumber, started = round.started, finished = round.roundNumber == 1}
+			end)
+			local entries = parse(opponents, rounds).entries
+			assert.are_same({1, 1}, findEntry(entries, 'Alpha', 2).placerange)
+			assert.are_same({2, 3}, findEntry(entries, 'Charlie', 2).placerange)
+			assert.are_same({2, 4}, findEntry(entries, 'Bravo', 2).placerange)
+			assert.are_same({2, 4}, findEntry(entries, 'Delta', 2).placerange)
+		end)
+
+		it('are not set from the round an opponent is disqualified', function()
+			local opponents = gslOpponents(false)
+			opponents[1].disqualifiedFromRound = 2
+			local entries = parse(opponents).entries
+			assert.are_same({1, 3}, findEntry(entries, 'Alpha', 1).placerange)
+			assert.is_nil(findEntry(entries, 'Alpha', 2).placerange)
+			assert.is_nil(findEntry(entries, 'Delta', 2).placerange)
+			assert.are_equal('dq', findEntry(entries, 'Alpha', 2).definitestatus)
+		end)
+
+		it('are not set from the round a match record is adjusted', function()
+			local opponents = gslOpponents(false)
+			opponents[1].adjustments = {[2] = {match = {w = 1}}}
+			local entries = parse(opponents).entries
+			assert.are_same({1, 3}, findEntry(entries, 'Alpha', 1).placerange)
+			Array.forEach({'Alpha', 'Bravo', 'Charlie', 'Delta'}, function(name)
+				assert.is_nil(findEntry(entries, name, 2).placerange)
+			end)
+		end)
+
+		it('are not set without a format', function()
+			local entries = StandingsParser.parse(
+				DECIDER_UPCOMING, gslOpponents(false), GSL_BGS, nil, {}, 'swiss', GSL_TIEBREAKERS
+			).entries
+			Array.forEach(entries, function(entry)
+				assert.is_nil(entry.placerange)
+				assert.is_nil(entry.definitestatus)
+			end)
 		end)
 	end)
 

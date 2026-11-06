@@ -69,6 +69,32 @@ describe('Standings Wiki Parser', function()
 			assert.is_nil(withStatuses.rounds[3].scoreboard.points)
 			assert.is_nil(without.definiteStatuses)
 		end)
+
+		it('reads r<round>status as alias of r<round>bg, preferring status', function()
+			assert.are_same(
+				{[1] = 'up', [2] = 'down', [3] = 'stay'},
+				StandingsParseWiki.parseDefiniteStatuses({r1status = 'up', r2bg = 'down', r3status = 'stay', r3bg = 'up'}, 3)
+			)
+			assert.are_same({[1] = 'down'}, StandingsParseWiki.parseDefiniteStatuses({r1status = '', r1bg = 'down'}, 3))
+		end)
+	end)
+
+	describe('min statuses', function()
+		it('reads r<round>minstatus inputs keyed by the round they apply from', function()
+			assert.are_same(
+				{[2] = 'stay', [3] = 'up'},
+				StandingsParseWiki.parseMinStatuses({r2minstatus = 'stay', r3minstatus = 'up', r4minstatus = 'up'}, 3)
+			)
+			assert.is_nil(StandingsParseWiki.parseMinStatuses({r1minstatus = '', minstatus = 'up'}, 3))
+		end)
+
+		it('stores the min statuses on the parsed opponent apart from the definite statuses', function()
+			local opponent = StandingsParseWiki.parseWikiOpponent(
+				{type = 'literal', 'Alpha', r1minstatus = 'stay', r2status = 'up'}, 2)
+
+			assert.are_same({[1] = 'stay'}, opponent.minStatuses)
+			assert.are_same({[2] = 'up'}, opponent.definiteStatuses)
+		end)
 	end)
 
 	describe('adjustments', function()
@@ -263,6 +289,52 @@ describe('Standings Wiki Parser', function()
 			assert.error(function() StandingsParseWiki.parsePoints('win') end)
 			assert.error(function() StandingsParseWiki.parsePoints('2-=3') end)
 			assert.error(function() StandingsParseWiki.parsePoints('a-b=3') end)
+		end)
+	end)
+
+	describe('format', function()
+		it('reads the shorthands', function()
+			assert.are_same(
+				{type = 'swiss', winsToAdvance = 2, lossesToEliminate = 2},
+				StandingsParseWiki.parseFormat({format = 'gsl'}, 'group')
+			)
+			assert.are_same(
+				{type = 'swiss', winsToAdvance = 3, lossesToEliminate = 3},
+				StandingsParseWiki.parseFormat({format = 'swiss3'}, 'swiss')
+			)
+		end)
+
+		it('reads the json input with elim defaulting to adv', function()
+			assert.are_same(
+				{type = 'swiss', winsToAdvance = 3, lossesToEliminate = 2},
+				StandingsParseWiki.parseFormat({format = '{"1":"swiss","adv":"3","elim":"2"}'}, 'swiss')
+			)
+			assert.are_same(
+				{type = 'swiss', winsToAdvance = 3, lossesToEliminate = 3},
+				StandingsParseWiki.parseFormat({format = '{"1":"swiss","adv":"3"}'}, 'swiss')
+			)
+		end)
+
+		it('is nil without input', function()
+			assert.is_nil(StandingsParseWiki.parseFormat({}, 'swiss'))
+			assert.is_nil(StandingsParseWiki.parseFormat({format = ''}, 'swiss'))
+		end)
+
+		it('errors on invalid input', function()
+			local invalid = {
+				{format = 'swiss'},
+				{format = 'swiss0'},
+				{format = 'swiss11'},
+				{format = 'roundrobin'},
+				{format = '{"1":"swiss","elim":"3"}'},
+				{format = '{"1":"swiss","adv":"1.5"}'},
+				{format = '{"1":"swiss","adv":"3","elim":"99999"}'},
+				{format = '{"1":"other","adv":"3"}'},
+			}
+			for _, args in ipairs(invalid) do
+				assert.error(function() StandingsParseWiki.parseFormat(args, 'swiss') end)
+			end
+			assert.error(function() StandingsParseWiki.parseFormat({format = 'swiss3'}, 'ffa') end)
 		end)
 	end)
 

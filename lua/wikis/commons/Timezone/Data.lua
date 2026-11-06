@@ -93,6 +93,10 @@ return {
 		name = 'British Summer Time',
 		offset = {1, 0},
 	},
+	BTT = {
+		name = 'Bhutan Time',
+		offset = {6, 0},
+	},
 	CAT = {
 		name = 'Central Africa Time',
 		offset = {2, 0},
