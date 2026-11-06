@@ -115,12 +115,12 @@ end
 ---@param tableType 'swiss'|'group'|nil # Defaults to swiss
 ---@return table
 function StandingTableLegacyNext.getStandardParameter(args, opponents, tableType)
-	return Table.merge(StandingTableLegacySwiss.getStandardParameter(args), {
+	-- Legacy has no overtime, so `show_otp` is ignored
+	return Table.merge(StandingTableLegacySwiss.getStandardParameter(Table.merge(args, {show_otp = false})), {
 		tabletype = tableType or 'swiss',
 		import = Logic.nilOr(Logic.readBoolOrNil(args.import), true),
 		importopponents = StandingTableLegacyNext.readImportOpponents(args, opponents),
 		store = Logic.readBoolOrNil(args.storeStanding),
-		-- Legacy has no overtime, so `show_otp` is ignored
 		overtime = false,
 		points = StandingTableLegacySwiss.parsePoints(args, {
 			resultDefaults = StandingTableLegacyNext.readResultPoints(args),
@@ -405,10 +405,10 @@ function StandingTableLegacyNext.groupMatchesByRound(args, matchRecords)
 	local roundEndTimes = Array.mapIndexes(function(roundIndex)
 		return DateExt.readTimestamp(args['round' .. roundIndex .. 'edate'])
 	end)
-	-- Matches after the last round end date make up one more round, as in legacy
+	-- Unindexed matches after the last round end date make up one more round
 	local lastEndTime = roundEndTimes[#roundEndTimes]
 	local hasLaterMatches = lastEndTime ~= nil and Array.any(matches, function(match)
-		return match.time > lastEndTime
+		return not match.round and match.time > lastEndTime
 	end)
 
 	local roundCount = StandingTableLegacyNext.computeRoundCount(
