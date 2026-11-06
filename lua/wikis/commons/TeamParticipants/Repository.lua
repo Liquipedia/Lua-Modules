@@ -320,12 +320,6 @@ TeamParticipantsRepository.getTournamentMatches = FnUtil.memoize(function()
 	return matches
 end)
 
----@param template string?
----@return string
-local function normalizeTemplate(template)
-	return ((template or ''):lower():gsub('_', ' '))
-end
-
 ---@param game match2game
 ---@return boolean
 local function isFinishedGame(game)
@@ -343,11 +337,11 @@ local function getGamePlayerNames(game, opponentIndex)
 end
 
 ---@param match match2
----@param isAlias table<string, true>
+---@param aliases string[]
 ---@return string[]
-local function getMatchPlayerNames(match, isAlias)
+local function getMatchPlayerNames(match, aliases)
 	local opponentIndex = Array.indexOf(match.match2opponents or {}, function(opponent)
-		return opponent.type == Opponent.team and isAlias[normalizeTemplate(opponent.template)]
+		return opponent.type == Opponent.team and Table.includes(aliases, opponent.template)
 	end)
 	if opponentIndex == 0 then
 		return {}
@@ -361,9 +355,8 @@ end
 ---@param aliases string[]
 ---@return table<string, boolean>?
 function TeamParticipantsRepository.getPlayedPlayers(aliases)
-	local isAlias = Table.map(aliases, function(_, alias) return normalizeTemplate(alias), true end)
 	local names = Array.flatMap(TeamParticipantsRepository.getTournamentMatches(), function(match)
-		return getMatchPlayerNames(match, isAlias)
+		return getMatchPlayerNames(match, aliases)
 	end)
 	---@type string[]
 	local pageNames = Array.map(Array.unique(names), Page.pageifyLink)

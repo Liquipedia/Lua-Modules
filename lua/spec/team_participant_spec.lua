@@ -1176,7 +1176,7 @@ describe('Team Participants Repository', function()
 				},
 			}}
 
-			local result = TeamParticipantsRepository.getPlayedPlayers({'Team_Liquid'})
+			local result = TeamParticipantsRepository.getPlayedPlayers({'team liquid'})
 
 			assert.are_same({Alpha = true, Beta = true, Gamma_Ray = true}, result)
 		end)
