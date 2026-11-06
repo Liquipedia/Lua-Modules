@@ -71,8 +71,6 @@ function StandingTableLegacyCraft._checkTiebreakerMode(args)
 	end
 
 	args.useCraftTiebreakers = true
-	-- to be able to filter them for conversion bot runs (with subst wiki vars are not available)
-	mw.ext.TeamLiquidIntegration.add_category('GTL wrapper with craft-specific default tiebreakers')
 
 	return  args
 end
@@ -83,6 +81,9 @@ function StandingTableLegacyCraft.defaultTiebreakers(args)
 	if not args.useCraftTiebreakers then
 		return StandingTableLegacyNext.defaultTiebreakers(args)
 	end
+
+	-- to be able to filter them for conversion bot runs (with subst wiki vars are not available)
+	mw.ext.TeamLiquidIntegration.add_category('GTL wrapper with craft-specific default tiebreakers')
 
 	return Array.extend(
 		Logic.readBool(args.show_p) and 'points' or nil,
