@@ -275,6 +275,13 @@ describe('Standings Wiki Parser', function()
 			assert.are_same({w = 3, d = 1, l = 0}, StandingsParseWiki.parsePoints('win=3,, draw=1,'))
 		end)
 
+		it('reads score keys with decimals in their shortest form', function()
+			assert.are_same(
+				{w = 1, d = 0.5, l = 0, ['1.5-0.5'] = 2, ['0.5-0.5'] = 0.75, ['2-0'] = 3},
+				StandingsParseWiki.parsePoints('win=1, 1.50-0.50=2, 0.5-0.5=0.75, 2.0-0=3')
+			)
+		end)
+
 		it('errors on unknown keys, non-numeric values and malformed entries', function()
 			assert.error(function() StandingsParseWiki.parsePoints('won=3') end)
 			assert.error(function() StandingsParseWiki.parsePoints('win=three') end)
@@ -373,6 +380,11 @@ describe('Standings Wiki Parser', function()
 		it('replaces the result points with the points of a score', function()
 			assert.are_same({4, 0}, {score('win=3, 2-0=4', twoNil)})
 			assert.are_same({3, 0}, {score('win=3, 2-0=4', twoOne)})
+		end)
+
+		it('matches scores with decimals', function()
+			local decimal = match({opponent('1.5', 1), opponent(0.5, 2)}, 1)
+			assert.are_same({2, 0.25}, {score('win=1, 1.50-0.50=2, 0.5-1.5=0.25', decimal)})
 		end)
 
 		it('supports scores for the losing side', function()
