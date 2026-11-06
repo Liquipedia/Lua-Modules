@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local FnUtil = Lua.import('Module:FnUtil')
 local Table = Lua.import('Module:Table')
 
-local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
+local TiebreakerMembers = Lua.import('Module:Standings/Tiebreaker/Members')
 
 ---Counts over the matches of an opponent, e.g. the games or rounds it won and lost.
 local TiebreakerMatchCounter = {}
@@ -45,7 +45,7 @@ function TiebreakerMatchCounter.create(zero, addMatch)
 		local counts = Table.deepCopy(previousRound and count(previousRound) or zero)
 		for index = firstMatchIndex, #opponent.matches do
 			local match = opponent.matches[index]
-			addMatch(counts, match, TiebreakerScope.opponentIndex(match, opponent.opponent))
+			addMatch(counts, match, TiebreakerMembers.opponentIndex(match, opponent.opponent))
 		end
 		return counts
 	end)

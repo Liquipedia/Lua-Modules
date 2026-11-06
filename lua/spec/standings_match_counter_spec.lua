@@ -2,21 +2,30 @@
 describe('Standings Tiebreaker MatchCounter', function()
 	local TiebreakerMatchCounter = require('Module:Standings/Tiebreaker/MatchCounter')
 
+	-- One table per standings opponent, which the matches refer to like the standings import does
+	local literals = {}
+	local function literal(name)
+		literals[name] = literals[name] or {type = 'literal', name = name}
+		return literals[name]
+	end
+
 	---@param names string[]
 	---@return table
 	local function makeMatch(names)
 		local opponents = {}
+		local standingsOpponents = {}
 		for _, name in ipairs(names) do
 			table.insert(opponents, {type = 'literal', name = name})
+			table.insert(standingsOpponents, literal(name))
 		end
-		return {opponents = opponents, games = {}}
+		return {opponents = opponents, standingsOpponents = standingsOpponents, games = {}}
 	end
 
 	---@param matches table[]
 	---@param previousRound table?
 	---@return table
 	local function makeRound(matches, previousRound)
-		return {opponent = {type = 'literal', name = 'Alpha'}, matches = matches, previousRound = previousRound}
+		return {opponent = literal('Alpha'), matches = matches, previousRound = previousRound}
 	end
 
 	---Counts the matches and the sum of the opponent indices, and records which matches were added

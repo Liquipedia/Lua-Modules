@@ -533,6 +533,13 @@ describe('Standings Parser', function()
 	describe('tiebreakers among tied opponents', function()
 		local ONE_FINISHED_ROUND = {{roundNumber = 1, started = true, finished = true}}
 
+		-- One table per standings opponent, which the matches refer to like the standings import does
+		local standingsOpponents = {}
+		local function standingsOpponent(name)
+			standingsOpponents[name] = standingsOpponents[name] or literal(name)
+			return standingsOpponents[name]
+		end
+
 		---@param spec {id: string, a: string, scoreA: integer, b: string, scoreB: integer, finished: boolean?}
 		---@return table
 		local function makeMatch(spec)
@@ -547,6 +554,7 @@ describe('Standings Parser', function()
 					{type = 'literal', name = spec.b, score = spec.scoreB, status = 'S',
 						placement = winner ~= 1 and 1 or 2},
 				},
+				standingsOpponents = {standingsOpponent(spec.a), standingsOpponent(spec.b)},
 				games = {},
 			}
 		end
@@ -581,7 +589,7 @@ describe('Standings Parser', function()
 					end
 				end)
 				return {
-					opponent = literal(name),
+					opponent = standingsOpponent(name),
 					matchPoints = matchPoints,
 					rounds = {{
 						scoreboard = {points = (points or {})[name] or totalPoints, match = matchRecord},

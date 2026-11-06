@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local FnUtil = Lua.import('Module:FnUtil')
 local Lpdb = Lua.import('Module:Lpdb')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local MathUtil = Lua.import('Module:MathUtil')
@@ -24,6 +23,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local TiebreakerMembers = Lua.import('Module:Standings/Tiebreaker/Members')
 local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParseLpdb = {}
@@ -122,7 +122,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 				matches = Array.extend(matches, roundMatches)
 				local lastMatch = roundMatches[#roundMatches]
 				local matchOpponentIndex = lastMatch
-					and Array.indexOf(lastMatch.opponents, FnUtil.curry(Opponent.same, opponentData.opponent))
+					and TiebreakerMembers.opponentIndex(lastMatch, opponentData.opponent)
 					or nil
 				return {
 					scoreboard = TiebreakerScope.tally(
@@ -301,6 +301,10 @@ function StandingsParseLpdb.parseMatch(roundNumbers, match2, opponents, scoreMap
 			lookup.opponentData = StandingsParseLpdb.newOpponent(opponent, maxRounds)
 			table.insert(opponents, lookup.opponentData)
 		end
+		-- The tiebreakers tell the opponents of the match apart by the standings opponent they were resolved to
+		---@cast match2 StandingsTiebreakerMatch
+		match2.standingsOpponents = match2.standingsOpponents or {}
+		match2.standingsOpponents[opponentIndex] = lookup.opponentData.opponent
 
 		lookup.opponentData.matchPoints[match2.matchId] = scoreMapper(opponent, match2)
 		Array.forEach(roundNumbers, function(roundNumber)

@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 
 ---The same opponent in the round before is `previousRound`, its matches are usually the first matches of this round.
----@alias TiebreakerOpponent {opponent: standardOpponent, points: number, matches: MatchGroupUtilMatch[],
+---@alias TiebreakerOpponent {opponent: standardOpponent, points: number, matches: StandingsTiebreakerMatch[],
 ---matchPoints: table<string, number>?, match: {w: integer, d: integer, l:integer},
 ---overtime: {w: integer, l: integer}?, extradata: table,
 ---startingPoints: number?, gameAdjustment: {w: integer, d: integer, l: integer}?,
