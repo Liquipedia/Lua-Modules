@@ -387,6 +387,7 @@ function StandingTableLegacyNext.parseTiebreakers(args)
 	-- have to bypass the `mapTiebreaker` call for this special case
 	if args.tiebreaker1 == 'finalTiebreak' then
 		tiebreakers = {'manual'}
+		mw.ext.TeamLiquidIntegration.add_category('GTL wrapper with first tiebreaker manual')
 	end
 
 	for _, value in Table.iter.pairsByPrefix(args, 'tiebreaker', {requireIndex = true}) do
