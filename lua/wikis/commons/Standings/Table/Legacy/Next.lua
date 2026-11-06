@@ -84,9 +84,6 @@ end
 ---@param tableType 'swiss'|'group'
 ---@return Renderable
 function StandingTableLegacyNext.build(args, tableType)
-	assert(args.tiebreaker1 ~= 'finalTiebreak', 'This SwissTableLeague has to be converted'
-		.. ' manually due to using unsupported manual tiebreakers')
-
 	local matchRecords = StandingTableLegacyNext.fetchMatches(args)
 	local matchesByRound, roundCount = StandingTableLegacyNext.groupMatchesByRound(args, matchRecords)
 	local rounds = Table.map(Array.range(1, roundCount), function(roundIndex)
@@ -335,6 +332,12 @@ end
 ---@return string[]
 function StandingTableLegacyNext.parseTiebreakers(args)
 	local tiebreakers = {}
+	-- special case where the group is decided by manual tiebreaker inputs
+	-- have to bypass the `mapTiebreaker` call for this special case
+	if args.tiebreaker1 == 'finalTiebreak' then
+		tiebreakers = {'manual'}
+	end
+
 	for _, value in Table.iter.pairsByPrefix(args, 'tiebreaker', {requireIndex = true}) do
 		local tiebreaker = StandingTableLegacyNext.mapTiebreaker(value)
 		if tiebreaker then
