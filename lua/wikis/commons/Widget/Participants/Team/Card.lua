@@ -25,7 +25,7 @@ local ParticipantsTeamRoster = Lua.import('Module:Widget/Participants/Team/Roste
 local PotentialQualifiers = Lua.import('Module:Widget/Participants/Team/PotentialQualifiers')
 local WarningBoxGroup = Lua.import('Module:Widget/WarningBox/Group')
 
----@param props {participant: TeamParticipant, mergeStaffTabIfOnlyOneStaff: boolean?}
+---@param props {participant: TeamParticipant, mergeStaffTabIfOnlyOneStaff: boolean?, sortAlphabetically: boolean?}
 ---@return Renderable
 local function ParticipantsTeamCard(props)
 	local participant = props.participant
@@ -48,7 +48,8 @@ local function ParticipantsTeamCard(props)
 	table.insert(content, PotentialQualifiers{participant = participant})
 	table.insert(content, ParticipantsTeamRoster{
 		participant = participant,
-		mergeStaffTabIfOnlyOneStaff = props.mergeStaffTabIfOnlyOneStaff
+		mergeStaffTabIfOnlyOneStaff = props.mergeStaffTabIfOnlyOneStaff,
+		sortAlphabetically = props.sortAlphabetically,
 	})
 
 	if participant.notes and #participant.notes > 0 then

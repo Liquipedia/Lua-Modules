@@ -13,6 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local TeamParticipantsWikiParser = Lua.import('Module:TeamParticipants/Parse/Wiki')
 
@@ -101,6 +102,62 @@ function TeamParticipantsRoster.resolvePlayerFlags(player)
 	player.extradata = extradata
 	extradata.results = Logic.nilOr(extradata.results, extradata.played, true)
 	extradata.played = Logic.nilOr(extradata.played, true)
+end
+
+--- Sorts by the key tuples from `getKey`; ties keep input order.
+---@generic T
+---@param elements T[]
+---@param getKey fun(element: T): any[]
+---@return T[]
+local function stableSortBy(elements, getKey)
+	local indexOf = Table.map(elements, function(index, element) return element, index end)
+	return Array.sortBy(elements, function(element)
+		return Array.extend(getKey(element), indexOf[element])
+	end)
+end
+
+---@param name string?
+---@return string
+local function sortName(name)
+	return mw.ustring.lower(name or '')
+end
+
+---@param player standardPlayer
+---@return number
+local function getRoleSortOrder(player)
+	local roles = player.extradata.roles or {}
+	return roles[1] and roles[1].sortOrder or math.huge
+end
+
+--- Staff after players; then by name (TBD last) if alphabetical, else by role.
+---@param players standardPlayer[]
+---@param alphabetical boolean?
+---@return standardPlayer[]
+function TeamParticipantsRoster.sortPlayers(players, alphabetical)
+	return stableSortBy(players, function(player)
+		local staffOrder = player.extradata.type == 'staff' and 1 or 0
+		if not alphabetical then
+			return {staffOrder, getRoleSortOrder(player)}
+		end
+		return {staffOrder, Opponent.playerIsTbd(player) and 1 or 0, sortName(player.displayName)}
+	end)
+end
+
+---@param participant TeamParticipant
+---@return boolean
+local function isTbdParticipant(participant)
+	return Opponent.isTbd(participant.opponent) or Logic.isNotEmpty(participant.potentialQualifiers)
+end
+
+--- By displayed team name; TBD and contender cards last.
+---@param participants TeamParticipant[]
+---@return TeamParticipant[]
+function TeamParticipantsRoster.sortParticipants(participants)
+	return stableSortBy(participants, function(participant)
+		local template = participant.opponent.template or ''
+		local teamName = (TeamTemplate.getRawOrNil(template) or {}).name or template
+		return {isTbdParticipant(participant) and 1 or 0, sortName(teamName)}
+	end)
 end
 
 return TeamParticipantsRoster

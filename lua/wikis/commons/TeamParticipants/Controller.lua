@@ -68,7 +68,8 @@ function TeamParticipantsController.fromTemplate(frame)
 		showControls = showControls,
 		mergeStaffTabIfOnlyOneStaff = Logic.nilOr(
 			Logic.readBoolOrNil(args.mergeStaffTabIfOnlyOneStaff), Logic.readBool(Config.mergeStaffTabIfOnlyOneStaff)
-		)
+		),
+		sortAlphabetically = parsedData.sortAlphabetically,
 	}
 end
 
