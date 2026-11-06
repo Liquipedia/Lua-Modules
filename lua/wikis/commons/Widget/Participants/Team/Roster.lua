@@ -14,6 +14,8 @@ local RoleUtil = Lua.import('Module:Role/Util')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
+local TeamParticipantsRoster = Lua.import('Module:TeamParticipants/Roster')
+
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
@@ -87,7 +89,7 @@ local function getRoleDisplays(player)
 	return roleLeftDisplay(), roleRightDisplay()
 end
 
----@param props {participant: TeamParticipant, mergeStaffTabIfOnlyOneStaff: boolean?}
+---@param props {participant: TeamParticipant, mergeStaffTabIfOnlyOneStaff: boolean?, sortAlphabetically: boolean?}
 ---@return Renderable
 local function ParticipantsTeamRoster(props)
 	local participant = props.participant
@@ -131,7 +133,7 @@ local function ParticipantsTeamRoster(props)
 		}
 	end
 
-	local players = participant.opponent.players or {}
+	local players = TeamParticipantsRoster.sortPlayers(participant.opponent.players or {}, props.sortAlphabetically)
 
 	-- If there's exactly one staff member, always show them in the Main tab instead of a separate
 	-- Staff tab, regardless of whether subs/formers are also present.
@@ -148,7 +150,6 @@ local function ParticipantsTeamRoster(props)
 
 	local tabs = Array.map(Table.entries(TAB_DATA), function(tabTuple)
 		local tabTypeEnum, tabData = tabTuple[1], tabTuple[2]
-		-- players arrive sorted from TeamParticipants/Roster
 		local tabPlayers = Array.filter(players, function(player)
 			return getTab(player) == tabTypeEnum
 		end)
