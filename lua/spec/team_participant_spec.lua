@@ -70,6 +70,7 @@ describe('Team Participant', function()
 
 	describe('TeamParticipants player parsing', function()
 		local TeamParticipantsWikiParser = require('Module:TeamParticipants/Parse/Wiki')
+		local TeamParticipantsRoster = require('Module:TeamParticipants/Roster')
 
 		describe('parsePlayer status', function()
 			it('passes status through from input', function()
@@ -126,7 +127,7 @@ describe('Team Participant', function()
 							placement = '3-4'
 						}
 					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
+					local result = TeamParticipantsWikiParser.parseParticipant(input, {date = date})
 					assert.are_equal('3-4', result.qualification.placement)
 				end)
 
@@ -139,7 +140,7 @@ describe('Team Participant', function()
 							placement = 3
 						}
 					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
+					local result = TeamParticipantsWikiParser.parseParticipant(input, {date = date})
 					assert.are_equal('3', result.qualification.placement)
 				end)
 
@@ -152,7 +153,7 @@ describe('Team Participant', function()
 							placement = '7'
 						}
 					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
+					local result = TeamParticipantsWikiParser.parseParticipant(input, {date = date})
 					assert.are_equal('7', result.qualification.placement)
 					assert.are_equal('qual', result.qualification.method)
 					assert.are_equal('Custom Text', result.qualification.text)
@@ -183,7 +184,7 @@ describe('Team Participant', function()
 							placement = '0'
 						}
 					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
+					local result = TeamParticipantsWikiParser.parseParticipant(input, {date = date})
 					assert.is_nil(result.qualification.placement)
 					assert.are_equal(1, #result.warnings)
 					assert.matches('Invalid placement: 0', result.warnings[1])
@@ -198,7 +199,7 @@ describe('Team Participant', function()
 							placement = 'abc'
 						}
 					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
+					local result = TeamParticipantsWikiParser.parseParticipant(input, {date = date})
 					assert.is_nil(result.qualification.placement)
 					assert.are_equal(1, #result.warnings)
 					assert.matches('Invalid placement: abc$', result.warnings[1])
@@ -213,7 +214,7 @@ describe('Team Participant', function()
 							placement = '5'
 						}
 					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
+					local result = TeamParticipantsWikiParser.parseParticipant(input, {date = date})
 					assert.are_equal('5', result.qualification.placement)
 					assert.are_equal(0, #result.warnings)
 				end)
@@ -226,7 +227,7 @@ describe('Team Participant', function()
 							text = 'Qualifier No Placement'
 						}
 					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
+					local result = TeamParticipantsWikiParser.parseParticipant(input, {date = date})
 					assert.is_nil(result.qualification.placement)
 					assert.are_equal(0, #result.warnings)
 				end)
@@ -239,13 +240,13 @@ describe('Team Participant', function()
 
 			describe('createTBDPlayers', function()
 				it('check', function()
-					local players = TeamParticipantsWikiParser.createTBDPlayers(3)
+					local players = TeamParticipantsRoster.createTBDPlayers(3)
 					assert.are_equal(3, #players)
 					assert.are_equal('TBD', players[1].displayName)
 					assert.are_equal('player', players[1].extradata.type)
 					assert.is_not_nil(players[1].extradata)
 
-					assert.are_equal(0, #TeamParticipantsWikiParser.createTBDPlayers(0))
+					assert.are_equal(0, #TeamParticipantsRoster.createTBDPlayers(0))
 				end)
 			end)
 
@@ -259,7 +260,7 @@ describe('Team Participant', function()
 						}
 					}
 
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent, 5)
 
 					assert.are_equal(5, #opponent.players)
 					assert.are_equal('Player1', opponent.players[1].displayName)
@@ -278,7 +279,7 @@ describe('Team Participant', function()
 						}
 					}
 
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent, 5)
 
 					assert.are_equal(5, #opponent.players)
 					assert.are_equal('Player5', opponent.players[5].displayName)
@@ -297,7 +298,7 @@ describe('Team Participant', function()
 						}
 					}
 
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent, 5)
 
 					assert.are_equal(7, #opponent.players)
 				end)
@@ -313,7 +314,7 @@ describe('Team Participant', function()
 						}
 					}
 
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent, 5)
 
 					assert.are_equal(7, #opponent.players)
 					local activePlayers = Array.filter(opponent.players, function(p)
@@ -332,7 +333,7 @@ describe('Team Participant', function()
 						}
 					}
 
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent, 5)
 
 					local activePlayers = Array.filter(opponent.players, function(p)
 						return p.extradata.type == 'player' and not p.extradata.status
@@ -346,11 +347,11 @@ describe('Team Participant', function()
 							{displayName = 'Player1', extradata = {type = 'player'}},
 						}
 					}
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent1, nil)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent1, nil)
 					assert.are_equal(1, #opponent1.players)
 
 					local opponent2 = {}
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent2, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent2, 5)
 					assert.is_nil(opponent2.players)
 				end)
 			end)
@@ -485,13 +486,13 @@ describe('Team Participant', function()
 				end)
 
 				it('marks the participant broken without calling Opponent.resolve', function()
-					local result = TeamParticipantsWikiParser.parseParticipant({'definitely missing'}, date)
+					local result = TeamParticipantsWikiParser.parseParticipant({'definitely missing'}, {date = date})
 					assert.is_true(result.broken)
 					assert.is_truthy(result.errorMessage)
 				end)
 
 				it('leaves valid templates untouched', function()
-					local result = TeamParticipantsWikiParser.parseParticipant({'team liquid'}, date)
+					local result = TeamParticipantsWikiParser.parseParticipant({'team liquid'}, {date = date})
 					assert.is_nil(result.broken)
 				end)
 			end)
@@ -1190,6 +1191,7 @@ end)
 
 describe('Team Participants Controller', function()
 	local TeamParticipantsController = require('Module:TeamParticipants/Controller')
+	local TeamParticipantsRoster = require('Module:TeamParticipants/Roster')
 	local Array = require('Module:Array')
 	local Table = require('Module:Table')
 
@@ -1361,7 +1363,7 @@ describe('Team Participants Controller', function()
 		end)
 	end)
 
-	describe('mergeManualAndImportedPlayers', function()
+	describe('mergeImportedPlayers', function()
 		it('prepends new imported players to manual list', function()
 			local manualPlayers = {
 				{displayName = 'ManualPlayer1', pageName = 'ManualPlayer1', extradata = {type = 'player'}},
@@ -1371,7 +1373,7 @@ describe('Team Participants Controller', function()
 				{displayName = 'ImportedPlayer2', pageName = 'ImportedPlayer2', extradata = {type = 'player'}},
 			}
 
-			TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers, importedPlayers)
+			TeamParticipantsRoster.mergeImportedPlayers(manualPlayers, importedPlayers)
 
 			-- Imported players are inserted at the front, manual players keep their order at the back
 			assert.are_equal(3, #manualPlayers)
@@ -1403,7 +1405,7 @@ describe('Team Participants Controller', function()
 				},
 			}
 
-			TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers, importedPlayers)
+			TeamParticipantsRoster.mergeImportedPlayers(manualPlayers, importedPlayers)
 
 			assert.are_equal(1, #manualPlayers)
 			assert.are_equal('manual', manualPlayers[1].extradata.manualData)
@@ -1428,7 +1430,7 @@ describe('Team Participants Controller', function()
 				},
 			}
 
-			TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers, importedPlayers)
+			TeamParticipantsRoster.mergeImportedPlayers(manualPlayers, importedPlayers)
 
 			assert.are_equal(1, #manualPlayers)
 			assert.are_equal('ManualName', manualPlayers[1].displayName)
@@ -1551,6 +1553,8 @@ end)
 
 describe('Team Participants Parser', function()
 	local TeamParticipantsWikiParser = require('Module:TeamParticipants/Parse/Wiki')
+	local TeamParticipantsRoster = require('Module:TeamParticipants/Roster')
+	local tableOptions = {date = os.date('!*t') --[[@as osdateparam]]}
 	local Table = require('Module:Table')
 
 	-- Helper to create a minimal valid participant input for testing.
@@ -1633,7 +1637,7 @@ describe('Team Participants Parser', function()
 					}
 				}
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.are_equal(2, #result.opponent.players)
 				assert.are_equal('player1', result.opponent.players[1].displayName)
@@ -1645,7 +1649,7 @@ describe('Team Participants Parser', function()
 					contenders = {'team liquid', 'bds', 'mouz'}
 				}
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.are_equal('tbd', result.opponent.template)
 				assert.are_equal(3, #result.potentialQualifiers)
@@ -1659,7 +1663,7 @@ describe('Team Participants Parser', function()
 					contenders = 'not a table'
 				}
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.are_equal(1, #result.warnings)
 				assert.matches('Invalid contenders: expected a list of non%-empty strings', result.warnings[1])
@@ -1673,7 +1677,7 @@ describe('Team Participants Parser', function()
 					}
 				})
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.is_true(result.notes[1].highlighted)
 				assert.is_false(result.notes[2].highlighted)
@@ -1688,7 +1692,7 @@ describe('Team Participants Parser', function()
 					}
 				})
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.are_equal(2, #result.notes)
 				assert.are_equal('Valid Note', result.notes[1].text)
@@ -1700,7 +1704,7 @@ describe('Team Participants Parser', function()
 					import = true,
 				})
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.is_true(result.shouldImportFromDb)
 			end)
@@ -1708,7 +1712,7 @@ describe('Team Participants Parser', function()
 			it('sets shouldImportFromDb=false by default', function()
 				local input = createBasicParticipantInput()
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.is_false(result.shouldImportFromDb)
 			end)
@@ -1734,6 +1738,44 @@ describe('Team Participants Parser', function()
 				assert.are_equal('player', subResult.extradata.type)
 			end)
 		end)
+
+		describe('played/results flags', function()
+			local function resolved(input)
+				local player = TeamParticipantsWikiParser.parsePlayer(input)
+				TeamParticipantsRoster.resolvePlayerFlags(player)
+				return player.extradata
+			end
+
+			it('leaves flags unset until resolved', function()
+				local player = TeamParticipantsWikiParser.parsePlayer({'PlayerName'})
+				assert.is_nil(player.extradata.played)
+				assert.is_nil(player.extradata.results)
+			end)
+
+			it('defaults both to true', function()
+				local extradata = resolved{'PlayerName'}
+				assert.is_true(extradata.played)
+				assert.is_true(extradata.results)
+			end)
+
+			it('results follows played', function()
+				local extradata = resolved{'PlayerName', played = false}
+				assert.is_false(extradata.played)
+				assert.is_false(extradata.results)
+			end)
+
+			it('explicit results wins over played', function()
+				local extradata = resolved{'PlayerName', played = false, results = true}
+				assert.is_false(extradata.played)
+				assert.is_true(extradata.results)
+			end)
+
+			it('results alone does not change played', function()
+				local extradata = resolved{'PlayerName', results = false}
+				assert.is_true(extradata.played)
+				assert.is_false(extradata.results)
+			end)
+		end)
 	end)
 
 	describe('Qualification Parsing', function()
@@ -1757,7 +1799,7 @@ describe('Team Participants Parser', function()
 					qualification = {method = 'invite', text = 'Direct Invite'}
 				})
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.are_equal('invite', result.qualification.method)
 			end)
@@ -1769,7 +1811,7 @@ describe('Team Participants Parser', function()
 					}
 				})
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.is_nil(result.qualification)
 			end)
@@ -1804,7 +1846,7 @@ describe('Team Participants Parser', function()
 					qualification = {method = 'qual', page = 'Test/Tournament'}
 				})
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.are_equal('tournament', result.qualification.type)
 				assert.is_table(result.qualification.tournament)
@@ -1819,7 +1861,7 @@ describe('Team Participants Parser', function()
 					qualification = {method = 'qual', url = 'https://example.com', text = 'External'}
 				})
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.are_equal('external', result.qualification.type)
 				assert.are_equal('https://example.com', result.qualification.url)
@@ -1830,7 +1872,7 @@ describe('Team Participants Parser', function()
 					qualification = {method = 'qual', text = 'Other Qualifier'}
 				})
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.are_equal('other', result.qualification.type)
 			end)
@@ -1841,7 +1883,7 @@ describe('Team Participants Parser', function()
 				})
 
 				assert.has_error(function()
-					TeamParticipantsWikiParser.parseParticipant(input, os.time())
+					TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 				end, 'External or non-tournament qualifier must have text')
 			end)
 		end)
