@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
@@ -168,6 +169,7 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, res
 		startingPoints = opponentData.startingpoints,
 		disqualifiedFromRound = StandingsParseWiki.parseDisqualifiedFromRound(opponentData.dq),
 		definiteStatuses = StandingsParseWiki.parseDefiniteStatuses(opponentData, numberOfRounds),
+		minStatuses = StandingsParseWiki.parseMinStatuses(opponentData, numberOfRounds),
 		adjustments = StandingsParseWiki.parseAdjustments(opponentData, numberOfRounds),
 	}
 end
@@ -184,17 +186,36 @@ function StandingsParseWiki.parseDisqualifiedFromRound(input)
 	return Logic.readBool(input) and 1 or nil
 end
 
----Reads the `r<round>bg` inputs of an opponent, e.g. `r3bg=up`. The status applies from that round onwards.
----Rounds beyond the number of rounds and empty values are ignored.
+---Reads `r<round><suffix>` inputs, each applying from that round onwards.
+---@param opponentData table
+---@param numberOfRounds integer
+---@param inputs string[] # Suffixes by priority
+---@return table<integer, string>?
+local function parseRoundStatuses(opponentData, numberOfRounds, inputs)
+	local statuses = {}
+	for round = 1, numberOfRounds do
+		local input = Array.find(inputs, function(suffix)
+			return Logic.isNotEmpty(opponentData['r' .. round .. suffix])
+		end)
+		statuses[round] = input and opponentData['r' .. round .. input] or nil
+	end
+	return Logic.nilIfEmpty(statuses)
+end
+
+---Reads `r<round>status`, with `r<round>bg` as alias.
 ---@param opponentData table
 ---@param numberOfRounds integer
 ---@return table<integer, string>?
 function StandingsParseWiki.parseDefiniteStatuses(opponentData, numberOfRounds)
-	local statuses = {}
-	for round = 1, numberOfRounds do
-		statuses[round] = Logic.nilIfEmpty(opponentData['r' .. round .. 'bg'])
-	end
-	return Logic.nilIfEmpty(statuses)
+	return parseRoundStatuses(opponentData, numberOfRounds, {'status', 'bg'})
+end
+
+---Reads `r<round>minstatus`.
+---@param opponentData table
+---@param numberOfRounds integer
+---@return table<integer, string>?
+function StandingsParseWiki.parseMinStatuses(opponentData, numberOfRounds)
+	return parseRoundStatuses(opponentData, numberOfRounds, {'minstatus'})
 end
 
 ---Reads the manual adjustments of an opponent, keyed by the round they apply from.
@@ -275,6 +296,59 @@ function StandingsParseWiki.parsePoints(input, overtime, tableType)
 		points[pointsKey] = assert(tonumber(value), 'Invalid points input: "' .. entry .. '" is not a number')
 	end)
 	return points
+end
+
+local MAX_FORMAT_RESULTS = 10
+
+---@type table<string, table>
+local FORMAT_SHORTHANDS = {
+	gsl = {'swiss', adv = 2},
+	swiss = {'swiss'},
+}
+
+---@param value integer?
+---@return boolean
+local function isValidResultCount(value)
+	return value ~= nil and value > 0 and value <= MAX_FORMAT_RESULTS
+end
+
+---@type table<string, fun(data: table, input: string): StandingsFormat>
+local FORMAT_PARSERS = {
+	swiss = function(data, input)
+		local winsToAdvance = MathUtil.toInteger(data.adv)
+		local lossesToEliminate = Logic.isEmpty(data.elim) and winsToAdvance or MathUtil.toInteger(data.elim)
+		local bounds = 'an integer from 1 to ' .. MAX_FORMAT_RESULTS
+		assert(isValidResultCount(winsToAdvance), 'Invalid format input: "' .. input .. '" needs adv as ' .. bounds)
+		assert(isValidResultCount(lossesToEliminate), 'Invalid format input: "' .. input .. '" needs elim as ' .. bounds)
+		---@cast winsToAdvance -nil
+		---@cast lossesToEliminate -nil
+		return {type = 'swiss', winsToAdvance = winsToAdvance, lossesToEliminate = lossesToEliminate}
+	end,
+}
+
+---@param input string
+---@return table?
+local function parseFormatShorthand(input)
+	local adv = input:match('^swiss(%d+)$')
+	return FORMAT_SHORTHANDS[input] or (adv and {'swiss', adv = adv}) or nil
+end
+
+---Reads `format`: `gsl`, `swiss<N>` or `{{Json|swiss|adv=<N>|elim=<N>}}`, where `elim` defaults to `adv`.
+---@param args table
+---@param tableType StandingsTableTypes
+---@return StandingsFormat?
+function StandingsParseWiki.parseFormat(args, tableType)
+	local input = args.format
+	if Logic.isEmpty(input) then
+		return nil
+	end
+	local data = Json.parseIfTable(input) or parseFormatShorthand(input)
+	assert(data, 'Invalid format input: unknown format "' .. input .. '"')
+	assert(tableType ~= 'ffa', 'Invalid format input: ffa standings do not support a format')
+	local formatType = data[1] or data['1']
+	local parseFormatData = FORMAT_PARSERS[formatType]
+	assert(parseFormatData, 'Invalid format input: unknown format type "' .. tostring(formatType) .. '"')
+	return parseFormatData(data, input)
 end
 
 ---The score of the opponent in the format of the `X-Y` points input, nil if the match has no (proper) score.

@@ -50,6 +50,7 @@ local TABLE_TYPES = {ffa = true, swiss = true, group = true}
 ---@field startingPoints number?
 ---@field disqualifiedFromRound integer? # The first round in which the opponent is disqualified
 ---@field definiteStatuses table<integer, string>? # Manually set definite statuses, keyed by the round they apply from
+---@field minStatuses table<integer, string>? # Keyed by the round they apply from
 ---@field adjustments table<integer, StandingsAdjustment>? # Keyed by the round they apply from
 
 ---@param frame Frame
@@ -125,6 +126,7 @@ function StandingsTable.parse(args, tableType)
 		walkoverRounds = StandingsParseWiki.parseWalkoverRounds(args),
 		tiebreakerReset = tiebreakerReset,
 		maxBestOf = maxBestOf,
+		format = StandingsParseWiki.parseFormat(args, tableType),
 	})
 
 	if tableType == 'swiss' then
