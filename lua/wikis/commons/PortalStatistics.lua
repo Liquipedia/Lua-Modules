@@ -721,6 +721,7 @@ function StatisticsPortal.earningsTable(args)
 	end
 
 	return TableWidgets.Table{
+		columns = { {}, {}, {width = '200px'}, {}, {}, {}},
 		sortable = true,
 		css = {['margin-left'] = '0px', ['margin-right'] = 'auto', width = '100%'},
 		children = {
