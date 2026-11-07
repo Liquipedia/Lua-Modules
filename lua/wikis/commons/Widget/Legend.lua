@@ -22,17 +22,57 @@ local LABEL_COLORS = {'byeup', 'seedup', 'up', 'stayup', 'stay', 'staydown', 'do
 
 local LegendComponent = {}
 
-LegendComponent.defaultProps = {
-	title = 'Legend',
-	showConfirmed = true,
-	showUndecided = true,
-}
+---@type ArgSchemaParameter[]
+LegendComponent.parameters = Array.extend(
+	{
+		{name = 'title', default = 'Legend', description = 'The title of the legend.'},
+		{
+			name = 'shouldCollapse',
+			type = 'boolean',
+			default = false,
+			description = 'Set to <code>true</code> to collapse the legend by default.',
+		},
+	},
+	Array.map(LABEL_COLORS, function(labelColor)
+		return {
+			name = labelColor,
+			description = 'Explains the {{bgcolortext|' .. labelColor .. '|' .. labelColor .. '}} color.',
+		}
+	end),
+	{
+		{name = 'points', description = 'Explains the points (<b>Pts</b>) column.'},
+		{
+			name = 'showNumberSection',
+			type = 'boolean',
+			default = false,
+			description = 'Set to <code>true</code> to explain the placement labels.',
+		},
+		{
+			name = 'showConfirmed',
+			type = 'boolean',
+			default = true,
+			description = 'Explains the label of a confirmed placement.',
+		},
+		{
+			name = 'showMinimum',
+			type = 'boolean',
+			default = false,
+			description = 'Explains the label of a reached minimum placement.',
+		},
+		{
+			name = 'showUndecided',
+			type = 'boolean',
+			default = true,
+			description = 'Explains the label of an undecided placement.',
+		},
+	}
+)
 
 ---@param props table
 ---@return VNode
 function LegendComponent.render(props)
 	return GeneralCollapsible{
-		shouldCollapse = Logic.readBool(props.shouldCollapse),
+		shouldCollapse = props.shouldCollapse,
 		classes = {'legend'},
 		titleWidget = LegendComponent._createHeader(props),
 		children = WidgetUtil.collect(
@@ -114,12 +154,12 @@ end
 ---@private
 ---@return VNode?
 function LegendComponent._createNumberSection(props)
-	if not Logic.readBool(props.showNumberSection) then
+	if not props.showNumberSection then
 		return
 	end
 
 	local labels = WidgetUtil.collect(
-		Logic.readBool(props.showConfirmed) and Html.Div{
+		props.showConfirmed and Html.Div{
 			classes = {'legend-item'},
 			children = {
 				LabelWidget{
@@ -130,7 +170,7 @@ function LegendComponent._createNumberSection(props)
 				Html.Span{children = {'Placement confirmed'}}
 			}
 		} or nil,
-		Logic.readBool(props.showMinimum) and Html.Div{
+		props.showMinimum and Html.Div{
 			classes = {'legend-item'},
 			children = {
 				LabelWidget{
@@ -141,7 +181,7 @@ function LegendComponent._createNumberSection(props)
 				Html.Span{children = {'Minimum placement reached'}}
 			}
 		} or nil,
-		Logic.readBool(props.showUndecided) and Html.Div{
+		props.showUndecided and Html.Div{
 			classes = {'legend-item'},
 			children = {
 				LabelWidget{
@@ -164,4 +204,4 @@ function LegendComponent._createNumberSection(props)
 	}
 end
 
-return Component.component(LegendComponent.render, LegendComponent.defaultProps)
+return Component.withParameters(LegendComponent.render, LegendComponent.parameters)
