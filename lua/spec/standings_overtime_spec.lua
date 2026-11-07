@@ -1,7 +1,9 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('Standings overtime', function()
+	local ArgSchema = require('Module:ArgSchema')
 	local Info = require('Module:Info')
 	local StandingsOvertime = require('Module:Standings/Overtime')
+	local StandingsParameters = require('Module:Standings/Parameters')
 	local StandingsParseWiki = require('Module:Standings/Parse/Wiki')
 	local StandingTableLegacySwiss = require('Module:Standings/Table/Legacy/Swiss')
 
@@ -102,18 +104,22 @@ describe('Standings overtime', function()
 		end)
 	end)
 
-	describe('parseOvertime', function()
+	describe('overtime input', function()
+		local function readOvertime(args)
+			return ArgSchema.read(StandingsParameters.header, args).overtime
+		end
+
 		it('reads the overtime flag', function()
 			setRegulationRounds(12)
-			assert.is_true(StandingsParseWiki.parseOvertime{overtime = 'true'})
-			assert.is_false(StandingsParseWiki.parseOvertime{overtime = 'false'})
-			assert.is_false(StandingsParseWiki.parseOvertime{})
+			assert.is_true(readOvertime{overtime = 'true'})
+			assert.is_false(readOvertime{overtime = 'false'})
+			assert.is_false(readOvertime{})
 		end)
 
 		it('errors when enabled without regulation rounds being configured', function()
 			setRegulationRounds(nil)
-			assert.error(function() StandingsParseWiki.parseOvertime{overtime = 'true'} end)
-			assert.is_false(StandingsParseWiki.parseOvertime{})
+			assert.error(function() readOvertime{overtime = 'true'} end)
+			assert.is_false(readOvertime{})
 		end)
 	end)
 

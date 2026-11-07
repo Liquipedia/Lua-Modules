@@ -7,12 +7,13 @@
 
 local Lua = require('Module:Lua')
 
-local Arguments = Lua.import('Module:Arguments')
+local ArgSchema = Lua.import('Module:ArgSchema')
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
+local StandingsParameters = Lua.import('Module:Standings/Parameters')
 local StandingsParseWiki = Lua.import('Module:Standings/Parse/Wiki')
 local StandingsParseLpdb = Lua.import('Module:Standings/Parse/Lpdb')
 local StandingsParser = Lua.import('Module:Standings/Parser')
@@ -56,52 +57,46 @@ local TABLE_TYPES = {ffa = true, swiss = true, group = true}
 ---@param frame Frame
 ---@return Renderable
 function StandingsTable.fromTemplate(frame)
-	local args = Arguments.getArgs(frame)
-	local tableType = args.tabletype
-	if not TABLE_TYPES[tableType] then
-		error('Unknown Standing Table Type')
-	end
-	local storeLpdb = Logic.nilOr(Logic.readBoolOrNil(args.store), true)
+	local values = ArgSchema.readFrame(StandingsParameters.header, frame)
 
 	-- Parsed separately so the imported matches are released before storage
-	local standingsTable = StandingsTable.parse(args, tableType)
+	local standingsTable = StandingsTable.parse(values)
 
-	local record, entries = StandingsStorage.run(standingsTable, {storeLpdb = storeLpdb})
+	local record, entries = StandingsStorage.run(standingsTable, {storeLpdb = values.store})
 	---@cast record -nil
 	return StandingsDisplay{
 		standings = Standings.standingsFromRecord(record, entries),
-		width = StandingsParseWiki.parseWidth(args),
+		width = values.width,
 	}
 end
 
----@param args table
----@param tableType StandingsTableTypes
+---@param values table # The `StandingsParameters.header`
 ---@return StandingsTableStorage
-function StandingsTable.parse(args, tableType)
-	local title = args.title
-	local importScoreFromMatches = Logic.nilOr(Logic.readBoolOrNil(args.import), true)
-	local importOpponentFromMatches = Logic.nilOr(Logic.readBoolOrNil(args.importopponents), importScoreFromMatches)
+function StandingsTable.parse(values)
+	---@type StandingsTableTypes
+	local tableType = values.tabletype
+	assert(TABLE_TYPES[tableType], 'Unknown Standing Table Type')
+	local importScoreFromMatches = values.import
+	local importOpponentFromMatches = Logic.nilOr(values.importopponents, importScoreFromMatches)
 	--- Exclusive standings only count matches where all opponents are part of the standings,
 	--- non-exclusive (the default) counts matches where at least one opponent is part of the standings.
 	--- Note that this is the reverse of the legacy GroupTableLeague default, on purpose.
-	local exclusiveOpponents = Logic.readBool(args.exclusive)
-	--- With tiebreaker reset, opponents split by a tiebreaker are compared again starting from the first tiebreaker.
-	local tiebreakerReset = Logic.readBool(args.tiebreakerreset)
+	local exclusiveOpponents = values.exclusive
+	local overtime = values.overtime
 
-	local parsedData = StandingsParseWiki.parseWikiInput(args)
+	local parsedData = StandingsParseWiki.parseWikiInput(values)
 	local rounds = parsedData.rounds
 	local opponents = parsedData.opponents
 	local bgs = parsedData.bgs
 	local matches = parsedData.matches
 
-	local tiebreakers = StandingsParseWiki.parseTiebreakers(args, tableType)
-	local overtime = StandingsParseWiki.parseOvertime(args)
+	local tiebreakers = StandingsParseWiki.parseTiebreakers(values.tiebreakers, tableType)
 
 	---@type table<integer, MatchPhase[]>
 	local matchPhasesByRound = {}
 	local maxBestOf
 	if importScoreFromMatches then
-		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args, overtime)
+		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, values, overtime)
 
 		local importedOpponents
 		importedOpponents, matchPhasesByRound, maxBestOf = StandingsParseLpdb.importFromMatches(
@@ -119,18 +114,20 @@ function StandingsTable.parse(args, tableType)
 		round.started, round.finished = StandingsParser.resolveRoundStatus(round, matchPhasesByRound[round.roundNumber])
 	end)
 
-	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType, tiebreakers, {
-		drawConfig = StandingsParseWiki.parseDrawConfig(args),
+	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, values.title, matches, tableType, tiebreakers, {
+		drawConfig = {match = values.matchdraws},
 		overtime = overtime,
-		walkoverGames = StandingsParseWiki.parseWalkoverGames(args),
-		walkoverRounds = StandingsParseWiki.parseWalkoverRounds(args),
-		tiebreakerReset = tiebreakerReset,
+		walkoverGames = values.walkovergames,
+		walkoverRounds = values.walkoverrounds,
+		tiebreakerReset = values.tiebreakerreset,
 		maxBestOf = maxBestOf,
-		format = StandingsParseWiki.parseFormat(args, tableType),
+		format = StandingsParseWiki.parseFormat(values.format, tableType),
 	})
 
 	if tableType == 'swiss' then
-		standingsTable.extradata.placemapping = Logic.wrapTryOrLog(StandingsParseWiki.parsePlaceMapping)(args, opponents)
+		standingsTable.extradata.placemapping = Logic.wrapTryOrLog(StandingsParseWiki.parsePlaceMapping)(
+			values.placements, opponents
+		)
 	end
 
 	return standingsTable
