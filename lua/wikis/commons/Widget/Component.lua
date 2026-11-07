@@ -117,6 +117,26 @@ function ComponentCore.component(renderFunction, defaultProps)
 	}, ComponentCore.ComponentMT)
 end
 
+-- Factory to create Functional Components whose props templates can give, see Module:ArgSchema.
+-- The parameter defaults are the default props, and Module:Widget/Factory reads template args through the parameters.
+---@generic P
+---@param renderFunction fun(props: P, context?: Context): Renderable|Renderable[]?
+---@param parameters ArgSchemaParameter[] -- Defaults may not be tables
+---@return Component<P>
+function ComponentCore.withParameters(renderFunction, parameters)
+	local defaultProps = {}
+	for _, parameter in ipairs(parameters) do
+		defaultProps[parameter.name] = parameter.default
+	end
+	---@diagnostic disable-next-line: return-type-mismatch
+	return setmetatable({
+		renderFn = renderFunction,
+		defaultProps = defaultProps,
+		defaultPropsMT = { __index = defaultProps },
+		parameters = parameters,
+	}, ComponentCore.ComponentMT)
+end
+
 -- Factory to create HTML tags
 ---@param tagName string
 ---@return HtmlComponent
