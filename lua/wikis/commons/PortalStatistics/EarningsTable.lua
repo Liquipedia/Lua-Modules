@@ -367,7 +367,10 @@ function StatisticsPortal._earningsTableRow(args, placements, earnings, opponent
 		children = WidgetUtil.collect(
 			TableWidgets.Cell{children = opponentIndex},
 			TableWidgets.Cell{align = 'left', children = opponentDisplay},
-			TableWidgets.Cell{nowrap = false, children = StatisticsPortal._achievementsDisplay(placements.sWinData, args.maxAchievements)},
+			TableWidgets.Cell{
+				nowrap = false,
+				children = StatisticsPortal._achievementsDisplay(placements.sWinData, args.maxAchievements)
+			},
 			TableWidgets.Cell{children = placements['1'] or '0'},
 			TableWidgets.Cell{children = placements['2'] or '0'},
 			TableWidgets.Cell{children = placements['3'] or '0'},
