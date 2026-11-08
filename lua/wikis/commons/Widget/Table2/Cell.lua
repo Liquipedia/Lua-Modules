@@ -26,6 +26,7 @@ local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 ---@field columnIndex integer|string?
 
 ---@param props Table2CellProps
+---@param context Context
 ---@return Renderable
 local function Table2Cell(props, context)
 	local children = props.children
@@ -42,6 +43,7 @@ local function Table2Cell(props, context)
 				ColumnUtil.buildAttributes(props)
 			),
 			classes = props.classes,
+			css = ColumnUtil.buildCss(props.width, props.minWidth, props.maxWidth, props.css),
 			children = children,
 		}
 	end

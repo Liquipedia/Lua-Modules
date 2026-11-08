@@ -15,6 +15,7 @@ local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local PrizePool = Lua.import('Module:PrizePool')
 local Table = Lua.import('Module:Table')
+local Tournament = Lua.import('Module:Tournament')
 local Variables = Lua.import('Module:Variables')
 
 ---@class Starcraft2PrizePoolLpdbInjector: LpdbInjector
@@ -103,9 +104,11 @@ function CustomPrizePool._weight(lpdbData, placement)
 		return 0
 	end
 
-	local tierFactor = TIER_TO_FACTOR[tonumber(lpdbData.liquipediatier)] or 1
+	local tournamentContext = Tournament.partialTournamentFromContext()
 
-	local tierTypeFactor = lpdbData.liquipediatiertype == 'Qualifier' and 0.001 or 1
+	local tierFactor = TIER_TO_FACTOR[tonumber(tournamentContext.liquipediaTier)] or 1
+
+	local tierTypeFactor = tournamentContext.liquipediaTierType == 'Qualifier' and 0.001 or 1
 
 	local prize = tonumber(lpdbData.individualprizemoney) or 0
 	prize = prize ~= 0 and prize or DEFAULT_PRIZE_VALUE

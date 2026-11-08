@@ -10,55 +10,44 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Operator = Lua.import('Module:Operator')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local Opponent = Lua.import('Module:Opponent/Custom')
+local STATUS_NOT_PLAYED = 'notplayed'
 
-local CustomMatchSummary = {}
+---@class BrawlhallaMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
+	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay,
+}
+
+local BrawlhallaMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
+
+---@class BrawlhallaCustomMatchSummary: CustomMatchSummaryInterface
+local CustomMatchSummary = {
+	GameRow = BrawlhallaMatchSummaryGameRow,
+}
 
 ---@param args table
 ---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '350px', teamStyle = 'bracket'})
-end
-
----@param match MatchGroupUtilMatch
----@return Renderable[]
-function CustomMatchSummary.createGames(match)
-	return WidgetUtil.collect(
-		CustomMatchSummary._isSolo(match) and Array.map(match.games, CustomMatchSummary._createGame) or nil
-	)
-end
-
----@param match MatchGroupUtilMatch
----@return boolean
-function CustomMatchSummary._isSolo(match)
-	if type(match.opponents[1]) ~= 'table' or type(match.opponents[2]) ~= 'table' then
-		return false
-	end
-	return match.opponents[1].type == Opponent.solo and match.opponents[2].type == Opponent.solo
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '350px'})
 end
 
 ---@param game MatchGroupUtilGame
----@return Renderable?
-function CustomMatchSummary._createGame(game)
-	if not game.map and not game.winner then return end
+---@return boolean
+function CustomMatchSummary.gameFilter(game)
+	return game.status ~= STATUS_NOT_PLAYED
+end
 
-	local team1Characters = Array.map((game.opponents[1] or {}).players or {}, Operator.property('char'))
-	local team2Characters = Array.map((game.opponents[2] or {}).players or {}, Operator.property('char'))
+---@param props MatchSummaryGameRowProps
+---@param opponentIndex integer
+---@return VNode
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
+	local gameOpponent = props.game.opponents[opponentIndex]
 
-	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-body-game'},
-		children = WidgetUtil.collect(
-			MatchSummaryWidgets.Characters{characters = team1Characters, flipped = false},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndStatus(game), css = {['flex-grow'] = 1}},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			MatchSummaryWidgets.Characters{characters = team2Characters, flipped = true}
-		)
+	return MatchSummaryWidgets.Characters{
+		characters = Array.map(gameOpponent.players, Operator.property('char')),
+		flipped = opponentIndex == 2,
 	}
 end
 

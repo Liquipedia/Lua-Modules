@@ -108,7 +108,7 @@ Types.MatchCoordinates = TypeUtil.struct({
 ---@field title string?
 ---@field dateHeader boolean?
 ---@field type 'matchlist'
----@field matchId string?
+---@field matchIndex string?
 ---@field matchPage string?
 
 Types.MatchlistBracketData = TypeUtil.struct({
@@ -196,6 +196,8 @@ Types.GameOpponent = TypeUtil.struct({
 ---@alias MatchStatus 'notplayed'|''|nil
 Types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed', ''))
 
+---@alias MatchPhase 'finished'|'ongoing'|'upcoming'
+
 ---@class MatchGroupUtilGame
 ---@field comment string?
 ---@field date string?
@@ -258,7 +260,7 @@ Types.Game = TypeUtil.struct({
 ---@field pageName string?
 ---@field parent string?
 ---@field patch string?
----@field phase 'upcoming'|'ongoing'|'finished'
+---@field phase MatchPhase
 ---@field publisherTier string?
 ---@field resultType string?
 ---@field section string?
@@ -324,7 +326,7 @@ Types.Match = TypeUtil.struct({
 ---@field stream table
 
 ---@class MatchGroupUtilMatchlist
----@field bracketDatasById table<string, MatchGroupUtilBracketBracketData>
+---@field bracketDatasById table<string, MatchGroupUtilMatchlistBracketData>
 ---@field matches MatchGroupUtilMatch[]
 ---@field matchesById table<string, MatchGroupUtilMatch>
 ---@field type 'matchlist'

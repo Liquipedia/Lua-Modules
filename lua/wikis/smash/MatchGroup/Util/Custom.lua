@@ -43,6 +43,7 @@ function SmashMatchGroupUtil.populateOpponents(match)
 		end
 
 		---@param game MatchGroupUtilGame
+		---@return {name: string}[]
 		local function getCharacters(game)
 			return (game.opponents[opponentIndex].players[1] or {}).characters or {}
 		end

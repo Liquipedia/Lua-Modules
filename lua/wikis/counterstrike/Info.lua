@@ -146,8 +146,10 @@ local infoData = {
 		},
 		standings = {
 			alwaysShowStats = {
-				swiss = {'matchdiff', 'rounddiff'},
+				swiss = {'matchscore', 'roundscore'},
+				group = {'matchscore', 'roundscore'},
 			},
+			overtime = {regulationRounds = 24},
 		},
 	},
 }

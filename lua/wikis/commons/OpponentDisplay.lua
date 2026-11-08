@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local DisplayUtil = Lua.import('Module:DisplayUtil')
 local Logic = Lua.import('Module:Logic')
+local Set = Lua.import('Module:Set')
 local Table = Lua.import('Module:Table')
 local TypeUtil = Lua.import('Module:TypeUtil')
 
@@ -27,6 +28,14 @@ local OpponentDisplay = {propTypes = {}, types = {}}
 
 OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid', 'icon', 'dynamic')
 ---@alias teamStyle 'standard'|'short'|'bracket'|'hybrid'|'icon'|'dynamic'
+
+local VALID_TEAM_STYLES = Set{'standard', 'short', 'bracket', 'hybrid', 'icon', 'dynamic'}
+
+---Asserts that the style is a team style
+---@param style any
+local function assertTeamStyle(style)
+	assert(VALID_TEAM_STYLES:contains(style), 'Invalid team style: ' .. tostring(style))
+end
 
 ---@class InlineOpponentProps
 ---@field flip boolean?
@@ -114,7 +123,10 @@ function OpponentDisplay.BlockOpponent(props)
 	local opponent = props.opponent
 	opponent.extradata = opponent.extradata or {}
 	-- Default TBDs to not show links
-	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
+	local showLink = props.showLink
+	if showLink == nil then
+		showLink = not Opponent.isTbd(opponent)
+	end
 
 	if opponent.type == Opponent.team then
 		if props.showTbd == false and Opponent.isTbd(opponent) then
@@ -128,6 +140,7 @@ function OpponentDisplay.BlockOpponent(props)
 			template = opponent.template or 'tbd',
 			additionalClasses = props.additionalClasses,
 			note = props.note,
+			dq = props.dq,
 		}
 	elseif opponent.type == Opponent.literal then
 		return OpponentDisplay.BlockLiteral{
@@ -174,7 +187,7 @@ end
 ---@return VNode
 function OpponentDisplay.InlineTeamContainer(props)
 	local style = props.style or 'standard'
-	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
+	assertTeamStyle(style)
 	assert(style ~= 'dynamic', 'style=dynamic is not supported inline')
 	assert(style ~= 'bracket' or not props.flip, 'Flipped style=bracket is not supported')
 	return TeamInline{name = props.template, date = props.date, flip = props.flip, displayType = style}
@@ -185,11 +198,11 @@ Displays a team as a block element. The width of the component is determined by
 its layout context, and not of the team name. The team is specified by template.
 ]]
 ---@param props {flip: boolean?, overflow: OverflowModes?, showLink: boolean?,
----style: teamStyle?, template: string, additionalClasses: string[]?, note: string|number?}
+---style: teamStyle?, template: string, additionalClasses: string[]?, note: string|number?, dq: boolean?}
 ---@return VNode
 function OpponentDisplay.BlockTeamContainer(props)
 	local style = props.style or 'standard'
-	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
+	assertTeamStyle(style)
 	return BlockTeam{
 		name = props.template,
 		flip = props.flip,
@@ -198,6 +211,7 @@ function OpponentDisplay.BlockTeamContainer(props)
 		noLink = not props.showLink,
 		additionalClasses = props.additionalClasses,
 		note = props.note,
+		dq = props.dq,
 	}
 end
 

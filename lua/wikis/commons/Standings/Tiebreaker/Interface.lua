@@ -10,20 +10,41 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 
 ---@alias TiebreakerOpponent {opponent: standardOpponent, points: number, matches: MatchGroupUtilMatch[],
----match: {w: integer, d: integer, l:integer}, extradata: table, startingPoints: number?}
+---matchPoints: table<string, number>?, match: {w: integer, d: integer, l:integer},
+---overtime: {w: integer, l: integer}?, extradata: table,
+---startingPoints: number?, gameAdjustment: {w: integer, d: integer, l: integer}?,
+---roundAdjustment: {w: integer, l: integer}?}
+
+---@alias StandingsDrawLevel 'match'|'game'|'round'
+
+---A number, or a list of numbers that is compared lexicographically
+---@alias StandingsTiebreakerValue number|number[]
+
+---@class StandingsTiebreakerOptions
+---@field draws table<StandingsDrawLevel, boolean>?
+---@field walkoverGames number? # Games a walkover counts as, won by the winner and lost by the loser
+---@field walkoverRounds number? # Rounds a walkover of a map counts as, won by the winner and lost by the loser
 
 ---@class StandingsTiebreaker
----@field context 'full'|'ml'|'h2h'
----@field valueOf fun(self: StandingsTiebreaker, state:TiebreakerOpponent[], opponent: TiebreakerOpponent): integer
+---@field context 'full'|'ml'|'h2hcs'|'h2hlegacy'
+---@field fullContextOnly boolean # Not derived from the matches among the tied opponents, so only usable in full
+---@field readsGames boolean # Reads the games of the matches
+---@field matchRecordOnly boolean # Depends only on the match record and points of the opponent
+---@field options StandingsTiebreakerOptions
 ---@field display fun(self: StandingsTiebreaker, state:TiebreakerOpponent[], opponent: TiebreakerOpponent): string
 ---@field headerTitle fun(self: StandingsTiebreaker): string
-local StandingsTiebreaker = Class.new(function (self, context)
+local StandingsTiebreaker = Class.new(function (self, context, options)
 	self.context = context
+	self.options = options or {}
 end)
+
+StandingsTiebreaker.fullContextOnly = false
+StandingsTiebreaker.readsGames = false
+StandingsTiebreaker.matchRecordOnly = false
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
----@return integer
+---@return StandingsTiebreakerValue
 function StandingsTiebreaker:valueOf(state, opponent)
 	error('This is an Interface')
 end
@@ -41,9 +62,15 @@ function StandingsTiebreaker:display(state, opponent)
 	return tostring(self:valueOf(state, opponent))
 end
 
----@return 'full'|'ml'|'h2h'
+---@return 'full'|'ml'|'h2hcs'|'h2hlegacy'
 function StandingsTiebreaker:getContextType()
 	return self.context
+end
+
+---@param level StandingsDrawLevel
+---@return boolean
+function StandingsTiebreaker:showsDraws(level)
+	return (self.options.draws or {})[level] == true
 end
 
 return StandingsTiebreaker

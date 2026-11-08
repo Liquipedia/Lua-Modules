@@ -741,6 +741,107 @@ div.brkts-popup-body-element-thumbs {
 	}
 }
 
+.brkts-popup-game-detail {
+	display: grid;
+	grid-template-columns: min-content 1fr 1fr min-content;
+	background-color: var( --clr-on-surface-light-primary-4 );
+	padding: 0.5rem;
+	border-radius: 0.5rem;
+	row-gap: 0.25rem;
+
+	.theme--dark & {
+		background-color: var( --clr-on-surface-dark-primary-4 );
+	}
+
+	&.with-center-column {
+		grid-template-columns: min-content 2fr 1fr 2fr min-content;
+	}
+
+	&-container {
+		display: contents;
+
+		&-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding-top: 0.25rem;
+
+			> b {
+				font-size: 0.875rem;
+			}
+		}
+	}
+
+	&-header {
+		display: grid;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+		place-items: center;
+
+		&-summary {
+			grid-column: 2 / -2;
+			font-size: 0.875rem;
+			font-weight: bold;
+		}
+	}
+
+	&-player {
+		display: grid;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+		column-gap: 0.25rem;
+		justify-items: start;
+
+		&.flipped {
+			direction: rtl;
+		}
+
+		&-container {
+			display: grid;
+			grid-column: span 2;
+			grid-template-columns: subgrid;
+			row-gap: 0.25rem;
+		}
+
+		&-character {
+			align-self: center;
+			grid-row: span 3;
+		}
+
+		&-stats {
+			display: flex;
+			gap: 0.25rem;
+		}
+	}
+
+	.damage-bar {
+		background: linear-gradient( to right, var( --left-bar-color, transparent ) var( --left-bar-length ), var( --right-bar-color, transparent ) var( --left-bar-length ) calc( 100% - var( --left-bar-length ) ) );
+		height: 0.25rem;
+		width: 90%;
+	}
+
+	.stat-diff {
+		display: grid;
+		grid-template-columns: 1fr 2fr 1fr;
+		place-items: center;
+
+		> div {
+			display: grid;
+			grid-column: 1 / -1;
+			grid-template-columns: subgrid;
+			place-items: center;
+
+			&:has( > :only-child ) {
+				display: contents;
+
+				> :only-child {
+					grid-column: 1 / -1;
+				}
+			}
+		}
+	}
+}
+
 .brkts-champion-icon {
 	gap: 0.125rem;
 	display: flex;
@@ -1127,6 +1228,12 @@ div.brkts-popup-body-element-thumbs {
 	}
 }
 
+.wiki-dota2,
+.wiki-dota2gameru {
+	--dota2-radiant-side-color: var( --clr-atlantis-40 );
+	--dota2-dire-side-color: var( --clr-california-40 );
+}
+
 .brkts-popup-side-color {
 	img {
 		outline: 0.125rem solid transparent;
@@ -1150,11 +1257,11 @@ div.brkts-popup-body-element-thumbs {
 	}
 
 	&--radiant img {
-		outline-color: #bcd985;
+		outline-color: var( --dota2-radiant-side-color );
 	}
 
 	&--dire img {
-		outline-color: #e79e7e;
+		outline-color: var( --dota2-dire-side-color );
 	}
 }
 
@@ -1228,30 +1335,30 @@ div.brkts-popup-body-element-thumbs {
 		flex: 1 1;
 		min-width: 0;
 
-		&:has( > .team-name-dynamic ),
-		&:has( > a > .team-name-dynamic ) {
+		&.team-name-dynamic {
 			container: block-team-name / inline-size;
 
-			> .team-name-dynamic,
-			> a > .team-name-dynamic {
-				content: none;
+			.team-shortname {
+				display: none;
 
 				@container block-team-name ( min-width: 15px ) and ( width < 100px ) {
-					&::before {
-						content: attr( data-team-shortname );
-					}
+					display: contents;
 				}
+			}
+
+			.team-bracketname {
+				display: none;
 
 				@container block-team-name ( min-width: 100px ) and ( width < 180px ) {
-					&::before {
-						content: attr( data-team-bracketname );
-					}
+					display: contents;
 				}
+			}
+
+			.team-name {
+				display: none;
 
 				@container block-team-name ( min-width: 180px ) {
-					&::before {
-						content: attr( data-team-name );
-					}
+					display: contents;
 				}
 			}
 		}

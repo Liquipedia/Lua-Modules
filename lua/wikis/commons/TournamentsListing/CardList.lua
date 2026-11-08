@@ -179,7 +179,7 @@ function BaseTournamentsListing:build()
 	self.cachedData = {rank = 1, prize = 0, skippedRanks = self.config.offset}
 
 	return TableWidgets.Table{
-		classes = 'tournaments-listing',
+		classes = {'tournaments-listing'},
 		columns = self:buildColumnDefinitions(),
 		children = {
 			TableWidgets.TableHeader{

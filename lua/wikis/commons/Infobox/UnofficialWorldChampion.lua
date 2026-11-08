@@ -194,7 +194,7 @@ function UnofficialWorldChampion:_parseRegionalDistribution()
 end
 
 ---@private
----@return Widget?
+---@return Renderable?
 function UnofficialWorldChampion:_createUpcomingMatches()
 	if not self:shouldStore(self.args) then
 		return nil

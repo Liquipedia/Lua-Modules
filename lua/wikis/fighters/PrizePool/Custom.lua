@@ -33,7 +33,7 @@ local TIER_VALUE = {8, 4, 2}
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.syncPlayers = true
-	args.import = true
+	args.import = Logic.nilOr(Logic.readBoolOrNil(args.import), true)
 
 	local prizePool = PrizePool(args)
 
@@ -122,8 +122,12 @@ end
 ---@param prize string|number|boolean?
 function CustomPrizePool.addPointsDatapoint(data, index, prize)
 	local opponentData = Opponent.fromLpdbStruct(data)
-	if opponentData.type ~= Opponent.solo then return
-	elseif Logic.isEmpty(prize) then return end
+	if opponentData and opponentData.type ~= Opponent.solo then
+		return
+	end
+	if Logic.isEmpty(prize) then
+		return
+	end
 	local player = opponentData.players[1]
 	local prefix = 'circuit' .. (index > 1 and index or '')
 	local pointsDataPoint = Lpdb.DataPoint:new{

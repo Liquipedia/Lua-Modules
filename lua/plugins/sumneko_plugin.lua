@@ -12,6 +12,7 @@ local IS_WINDOWS = package.config:sub(1,1) ~= '/'
 ---@param source string # The source file uri
 ---@return string[]?
 -- luacheck: push ignore
+---@diagnostic disable-next-line: global-element
 function ResolveRequire(repoRoot, name, source)
 -- luacheck: pop
 	local fileName = importFunctions.luaifyModuleName(name)

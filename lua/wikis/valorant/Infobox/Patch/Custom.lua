@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local Patch = Lua.import('Module:Infobox/Patch')
 
 ---@class ValorantPatchInfobox: PatchInfobox
+---@operator call(Frame): ValorantPatchInfobox
 local CustomPatch = Class.new(Patch)
 
 ---@param frame Frame

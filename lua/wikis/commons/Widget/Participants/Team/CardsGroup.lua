@@ -10,6 +10,8 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local ErrorDisplay = Lua.import('Module:Error/Display')
 
+local TeamParticipantsRoster = Lua.import('Module:TeamParticipants/Roster')
+
 local Component = Lua.import('Module:Widget/Component')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local Html = Lua.import('Module:Widget/Html')
@@ -24,6 +26,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field showPlayerInfo boolean
 ---@field showControls boolean
 ---@field mergeStaffTabIfOnlyOneStaff boolean|nil
+---@field sortAlphabetically boolean|nil
 
 ---@param props ParticipantsTeamCardsGroupProps
 ---@return VNode?
@@ -31,6 +34,9 @@ local function ParticipantsTeamCardsGroup(props)
 	local participants = props.participants
 	if not participants then
 		return
+	end
+	if props.sortAlphabetically then
+		participants = TeamParticipantsRoster.sortParticipants(participants)
 	end
 
 	local showControls = props.showControls
@@ -51,6 +57,7 @@ local function ParticipantsTeamCardsGroup(props)
 					return ParticipantsTeamCard{
 						participant = participant,
 						mergeStaffTabIfOnlyOneStaff = props.mergeStaffTabIfOnlyOneStaff,
+						sortAlphabetically = props.sortAlphabetically,
 					}
 				end),
 			}

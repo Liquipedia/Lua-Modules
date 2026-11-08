@@ -30,7 +30,16 @@ local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 ---@field rowspan integer|string?
 ---@field columnIndex integer|string?
 
+local ATTRIBUTE_BUILDERS = {
+	sortType = function(attrs, cellProps)
+		if cellProps.sortType then
+			attrs['data-sort-type'] = cellProps.sortType
+		end
+	end,
+}
+
 ---@param props Table2CellHeaderProps
+---@param context Context
 ---@return Renderable
 local function Table2CellHeader(props, context)
 	local children = props.children
@@ -65,6 +74,7 @@ local function Table2CellHeader(props, context)
 
 		return Html.Th{
 			attributes = attributes,
+			css = ColumnUtil.buildCss(props.width, props.minWidth, props.maxWidth, props.css),
 			children = children,
 		}
 	end
@@ -78,13 +88,7 @@ local function Table2CellHeader(props, context)
 
 	ColumnUtil.mergeProps(props, columnDef)
 
-	local attributes = ColumnUtil.buildAttributes(props, {
-		sortType = function(attrs, cellProps)
-			if cellProps.sortType then
-				attrs['data-sort-type'] = cellProps.sortType
-			end
-		end,
-	})
+	local attributes = ColumnUtil.buildAttributes(props, ATTRIBUTE_BUILDERS)
 
 	if Logic.readBool(props.unsortable) then
 		attributes.class = 'unsortable'

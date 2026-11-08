@@ -1,0 +1,86 @@
+---
+-- @Liquipedia
+-- page=Module:Widget/Standings/Cells
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local Logic = Lua.import('Module:Logic')
+
+local Label = Lua.import('Module:Widget/Basic/Label')
+local Participant = Lua.import('Module:Widget/Standings/Participant')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+
+local StandingsCells = {}
+
+local PARTICIPANT_WIDTH = '15rem'
+
+---@param text string?
+---@return Renderable
+function StandingsCells.header(text)
+	return TableWidgets.CellHeader{children = text}
+end
+
+---@return table
+function StandingsCells.participantColumn()
+	return {align = 'left', width = PARTICIPANT_WIDTH, maxWidth = PARTICIPANT_WIDTH}
+end
+
+---@param statsToShow StandingsAdditionalStat[]
+---@return table[]
+function StandingsCells.statColumns(statsToShow)
+	return Array.map(statsToShow, function()
+		return {align = 'center'}
+	end)
+end
+
+---@param statsToShow StandingsAdditionalStat[]
+---@return Renderable[]
+function StandingsCells.statHeaders(statsToShow)
+	return Array.map(statsToShow, function(stat)
+		return StandingsCells.header(stat.title)
+	end)
+end
+
+---@param slot StandingsEntryModel
+---@return Renderable
+function StandingsCells.placement(slot)
+	local definitiveStatus = Logic.nilIfEmpty(slot.definitiveStatus)
+	local minimumStatus = not definitiveStatus and Logic.nilIfEmpty(slot.minimumStatus) or nil
+	return TableWidgets.Cell(DisplayHelper.addOpponentHighlightToProps({children = Label{
+		children = slot.placement,
+		attributes = {['data-placement-type'] = definitiveStatus or minimumStatus},
+		labelScheme = 'placement',
+		labelType = minimumStatus and 'placement-minimum' or nil,
+	}}, slot.opponent))
+end
+
+---@param slot StandingsEntryModel
+---@return Renderable
+function StandingsCells.participant(slot)
+	return TableWidgets.Cell(
+		DisplayHelper.addOpponentHighlightToProps({
+			children = Participant{opponent = slot.opponent, disqualified = slot.disqualified}
+		}, slot.opponent)
+	)
+end
+
+---@param slot StandingsEntryModel
+---@param statsToShow StandingsAdditionalStat[]
+---@param boldStatTitle string?
+---@return Renderable[]
+function StandingsCells.stats(slot, statsToShow, boldStatTitle)
+	return Array.map(statsToShow, function(stat)
+		local statValue = slot.additionalStatsValues[stat.id]
+		return TableWidgets.Cell(DisplayHelper.addOpponentHighlightToProps({
+			css = {['font-weight'] = stat.title == boldStatTitle and 'bold' or nil},
+			children = statValue and statValue.display or '',
+		}, slot.opponent))
+	end)
+end
+
+return StandingsCells

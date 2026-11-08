@@ -34,7 +34,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local ExternalMediaLink = {}
 
 local MAXIMUM_VALUES = {
-	subjects = 20,
+	subjects = 30,
 	organisations = 5,
 	authors = 5,
 }

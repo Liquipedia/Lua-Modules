@@ -44,7 +44,6 @@ local PlayerExt = {globalVars = globalVars}
 
 ---@class PlayerExtSyncTeamOptions
 ---@field date string|number|osdate?
----@field useTimeless boolean?
 ---@field fetchPlayer boolean?
 ---@field savePageVar boolean?
 
@@ -99,6 +98,7 @@ end)
 ---@param date string|number|osdate?
 ---@return string?
 function PlayerExt.fetchPlayerFaction(resolvedPageName, date)
+	if not Faction.wikiHasFactions() then return nil end
 	local lpdbPlayer = PlayerExt.fetchPlayer(resolvedPageName)
 	if lpdbPlayer and lpdbPlayer.factionHistory then
 		local timestamp = DateExt.readTimestamp(date or DateExt.getContextualDateOrNow())
@@ -313,8 +313,6 @@ options.fetchPlayer: Whether to look up lpdb records of the player page. Enabled
 by default.
 options.savePageVar: Whether to save results to page variables. Enabled by
 default.
-options.useTimeless: Whether to use the template passed to a previous call of
-PlayerExt.syncTeam. Enabled by default.
 ]]
 ---@param pageName string
 ---@param template string?
@@ -330,7 +328,7 @@ function PlayerExt.syncTeam(pageName, template, options)
 
 	local historyVar = playerVars:get(pageName .. '.teamHistory')
 	local history = historyVar and Json.parse(historyVar) or {}
-	local pageVarEntry = options.useTimeless ~= false and history.timeless
+	local pageVarEntry = history.timeless
 		or Array.find(history, function(entry) return entry.joinDate <= date and date < entry.leaveDate end)
 
 	local timelessEntry = template and {
@@ -357,15 +355,23 @@ function PlayerExt.syncTeam(pageName, template, options)
 		entry.isResolved = true
 	end
 
-	if options.savePageVar ~= false and entry
-		and (entry and entry.template) ~= (pageVarEntry and pageVarEntry.template) then
+	---@return table
+	local function getWikiVar()
+		if not entry then
+			-- return this so that we do not query for these cases further down on the page
+			return {timeless = {isTimeless = true}}
+		end
 		if entry.isTimeless then
 			history.timeless = entry
 		else
 			table.insert(history, entry)
 			Array.sortInPlaceBy(history, function(e) return e.joinDate end)
 		end
-		playerVars:set(pageName .. '.teamHistory', Json.stringify(history))
+		return history
+	end
+
+	if options.savePageVar ~= false and ((pageVarEntry or {}).template ~= (entry or {}).template or not pageVarEntry) then
+		playerVars:set(pageName .. '.teamHistory', Json.stringify(getWikiVar()))
 	end
 
 	if not entry then
@@ -377,7 +383,7 @@ end
 ---Same as PlayerExt.syncTeam, except it does not save the player's team to page variables.
 ---@param pageName string
 ---@param template string?
----@param options {date: string?, useTimeless: boolean, fetchPlayer: boolean}
+---@param options {date: string?, fetchPlayer: boolean}
 ---@return string?
 function PlayerExt.populateTeam(pageName, template, options)
 	return PlayerExt.syncTeam(pageName, template, Table.merge(options, {savePageVar = false}))

@@ -8,11 +8,21 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
 local Operator = Lua.import('Module:Operator')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
+
+---@class SimRacingMatchParser: MatchParserInterface
+local MatchFunctions = {
+	DEFAULT_MODE = 'team',
+	getBestOf = MatchGroupInputUtil.getBestOf,
+}
+
+---@class SimRacingMapParser: MapParserInterface
+local MapFunctions = {}
 
 local FfaMatchFunctions = {
 	DEFAULT_MODE = 'team',
@@ -23,11 +33,29 @@ local FfaMapFunctions = {}
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	return MatchGroupInputUtil.standardProcessMatch(match, nil, FfaMatchFunctions)
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, FfaMatchFunctions)
 end
+
+--- Normal 2-opponent Match
+
+---@param match table
+---@param opponents MGIParsedOpponent[]
+---@return table[]
+function MatchFunctions.extractMaps(match, opponents)
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
+end
+
+---@param maps table[]
+---@return fun(opponentIndex: integer): integer?
+function MatchFunctions.calculateMatchScore(maps)
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
+end
+
+--- FFA Match
 
 ---@param match table
 ---@param opponents table[]
+---@param scoreSettings table
 ---@return table[]
 function FfaMatchFunctions.extractMaps(match, opponents, scoreSettings)
 	return MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, FfaMapFunctions)
