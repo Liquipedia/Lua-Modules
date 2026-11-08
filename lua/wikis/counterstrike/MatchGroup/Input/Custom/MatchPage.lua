@@ -31,7 +31,7 @@ local NormalMapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 ---@field tradeDeaths integer?
 
 ---@class MatchStatsPlayer
----@field steam_id integer
+---@field steam_id string
 ---@field name string
 ---@field team_name string
 ---@field kill_count integer
