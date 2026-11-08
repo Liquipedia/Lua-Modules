@@ -39,6 +39,7 @@ local SHOWMATCH = 'Showmatch'
 local TIER1 = '1'
 local FIRST = '1'
 local MINIMUM_EARNINGS = 1000
+local MAX_QUERY_LIMIT = 5000
 
 local StatisticsPortal = {}
 
@@ -56,39 +57,56 @@ function StatisticsPortal.earningsTable(args)
 	)
 	args.minimumEarnings = tonumber(args.minimumEarnings) or MINIMUM_EARNINGS
 
+	local hasYear = String.isNotEmpty(args.year)
 	local earningsFunction = function (a)
-		if String.isNotEmpty(args.year) then
+		if hasYear then
 			return a.earningsbyyear[tonumber(args.year)] or 0
 		else
 			return tonumber(a.earnings) or 0
 		end
 	end
 
+	-- Total earnings are a plain column, so LPDB can filter and order them and only the displayed rows are fetched.
+	-- Earnings by year are in a json field, so for a given year everything above the minimum is sorted here.
+	-- The yearly earnings can never exceed the total earnings, so filtering on the total is safe for both.
+	local queryLimit = (not hasYear) and args.limit or nil
+	local queryOrder = (not hasYear) and 'earnings desc' or nil
+	local earningsCondition = ConditionNode(ColumnName('earnings'), Comparator.ge, args.minimumEarnings)
+
 	local opponentData
 
 	if args.opponentType == Opponent.team then
-		opponentData = StatisticsPortal._getTeams()
+		opponentData = StatisticsPortal._getTeams(queryLimit, tostring(earningsCondition), queryOrder)
 	elseif args.opponentType == Opponent.solo then
 		opponentData = StatisticsPortal._getPlayers(
-			nil,
-			ConditionUtil.anyOf(
-				ColumnName('nationality'),
-				Array.map(Array.parseCommaSeparatedString(args.nationality), function (nationality)
-					return Flags.CountryName{flag = nationality}
-				end)
-			)
+			queryLimit,
+			ConditionTree(BooleanOperator.all):add{
+				earningsCondition,
+				ConditionUtil.anyOf(
+					ColumnName('nationality'),
+					Array.map(Array.parseCommaSeparatedString(args.nationality), function (nationality)
+						return Flags.CountryName{flag = nationality}
+					end)
+				)
+			},
+			queryOrder
 		)
 	end
 
 	table.sort(opponentData, function(a, b) return earningsFunction(a) > earningsFunction(b) end)
 
-	local opponentPlacements = StatisticsPortal._cacheOpponentPlacementData(args)
+	-- Only the displayed opponents are needed for the placement data
+	local displayedOpponents = {}
+	for opponentIndex, opponent in ipairs(opponentData) do
+		if opponentIndex > args.limit or earningsFunction(opponent) < args.minimumEarnings then break end
+		table.insert(displayedOpponents, opponent)
+	end
+
+	local opponentPlacements = StatisticsPortal._cacheOpponentPlacementData(args, displayedOpponents)
 
 	local tableRow = {}
-	for opponentIndex, opponent in ipairs(opponentData) do
+	for opponentIndex, opponent in ipairs(displayedOpponents) do
 		local earnings = earningsFunction(opponent)
-
-		if opponentIndex > args.limit or earnings < args.minimumEarnings then break end
 
 		local opponentDisplay
 		if args.opponentType == Opponent.team then
@@ -161,8 +179,13 @@ function StatisticsPortal._getTeams(limit, addConditions, addOrder)
 end
 
 ---@param args table
+---@param displayedOpponents table[]
 ---@return table
-function StatisticsPortal._cacheOpponentPlacementData(args)
+function StatisticsPortal._cacheOpponentPlacementData(args, displayedOpponents)
+	if Logic.isEmpty(displayedOpponents) then
+		return {}
+	end
+
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier')}
 		:add{ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0)}
@@ -179,6 +202,20 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 	end
 
 	conditions:add{placementConditions}
+
+	if args.opponentType == Opponent.team then
+		-- The data is only used for the displayed teams, so there is no need to query the placements of all others
+		local opponentConditions = ConditionTree(BooleanOperator.any)
+		for _, team in ipairs(displayedOpponents) do
+			opponentConditions:add{ConditionNode(ColumnName('opponentname'), Comparator.eq, team.pagename)}
+			local spacedName = string.gsub(team.pagename, '_', ' ')
+			if spacedName ~= team.pagename then
+				opponentConditions:add{ConditionNode(ColumnName('opponentname'), Comparator.eq, spacedName)}
+			end
+		end
+		conditions:add{opponentConditions}
+	end
+
 	local data = {}
 
 	local queryParameters = {
@@ -186,7 +223,7 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 			.. 'liquipediatier, liquipediatiertype, placement, '
 			.. 'opponentplayers, opponentname, opponenttype',
 		conditions = conditions:toString(),
-		limit = 1000,
+		limit = MAX_QUERY_LIMIT,
 		order = 'date asc',
 	}
 

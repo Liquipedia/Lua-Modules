@@ -166,20 +166,28 @@ function ChartHelper.getPlacementEarningsByYear(config)
 		end)
 	end)
 
+	local variable = config.variable
+	local processFunction = config.processFunction
+
+	-- This callback runs once for every placement of the wiki, so keep it as cheap as possible.
+	-- Parsing the date through DateExt for every row is expensive; the year is the first 4 characters of the date.
 	local processData = function(item)
-		local year = DateExt.getYearOf(item.date)
-		if String.isNotEmpty(item[config.variable]) then
-			local arg = item[config.variable]
-			if earningsData[year][arg] then
-				earningsData[year][arg] = config.processFunction(earningsData[year][arg], item, config)
-			end
+		local yearData = earningsData[tonumber(string.sub(item.date, 1, 4))]
+		local arg = item[variable]
+		if yearData and arg and arg ~= '' and yearData[arg] then
+			yearData[arg] = processFunction(yearData[arg], item, config)
 		end
+	end
+
+	local queryFields = 'opponenttype, prizemoney, individualprizemoney, date'
+	if variable ~= 'opponenttype' then
+		queryFields = queryFields .. ', ' .. variable
 	end
 
 	local queryParameters = {
 		conditions = conditions:toString(),
 		limit = MAX_QUERY_LIMIT,
-		query = 'opponenttype, prizemoney, individualprizemoney, date, game',
+		query = queryFields,
 	}
 
 	Lpdb.executeMassQuery('placement', queryParameters, processData)

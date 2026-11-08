@@ -7,26 +7,27 @@
 
 local Lua = require('Module:Lua')
 
-local GameEarningsChart = Lua.import('Module:PortalStatistics/GameEarningsChart')
-local ModeEarningsChart = Lua.import('Module:PortalStatistics/ModeEarningsChart')
-local TopEarningsChart = Lua.import('Module:PortalStatistics/TopEarningsChart')
-local CoverageStatistics = Lua.import('Module:PortalStatistics/CoverageStatistics')
-local CoverageMatchTable = Lua.import('Module:PortalStatistics/CoverageMatchTable')
-local CoverageTournamentTable = Lua.import('Module:PortalStatistics/CoverageTournamentTable')
-local PrizepoolBreakdown = Lua.import('Module:PortalStatistics/PrizepoolBreakdown')
-local PieChartBreakdown = Lua.import('Module:PortalStatistics/PieChartBreakdown')
-local EarningsTable = Lua.import('Module:PortalStatistics/EarningsTable')
-local PlayerAgeTable = Lua.import('Module:PortalStatistics/PlayerAgeTable')
+---Every `#invoke` only needs a single statistic, so the submodules are imported on demand.
+---Importing all of them up front loads (and executes the top level of) every widget, condition and display module
+---for each call, which is a big part of the memory and lua time spent on pages using this module.
+---@param moduleName string
+---@param functionName string
+---@return fun(...): any
+local function lazyExport(moduleName, functionName)
+	return function(...)
+		return Lua.import('Module:PortalStatistics/' .. moduleName)[functionName](...)
+	end
+end
 
 return {
-	gameEarningsChart = GameEarningsChart.gameEarningsChart,
-	modeEarningsChart = ModeEarningsChart.modeEarningsChart,
-	topEarningsChart = TopEarningsChart.topEarningsChart,
-	coverageStatistics = CoverageStatistics.coverageStatistics,
-	coverageMatchTable = CoverageMatchTable.coverageMatchTable,
-	coverageTournamentTable = CoverageTournamentTable.coverageTournamentTable,
-	prizepoolBreakdown = PrizepoolBreakdown.prizepoolBreakdown,
-	pieChartBreakdown = PieChartBreakdown.pieChartBreakdown,
-	earningsTable = EarningsTable.earningsTable,
-	playerAgeTable = PlayerAgeTable.playerAgeTable,
+	gameEarningsChart = lazyExport('GameEarningsChart', 'gameEarningsChart'),
+	modeEarningsChart = lazyExport('ModeEarningsChart', 'modeEarningsChart'),
+	topEarningsChart = lazyExport('TopEarningsChart', 'topEarningsChart'),
+	coverageStatistics = lazyExport('CoverageStatistics', 'coverageStatistics'),
+	coverageMatchTable = lazyExport('CoverageMatchTable', 'coverageMatchTable'),
+	coverageTournamentTable = lazyExport('CoverageTournamentTable', 'coverageTournamentTable'),
+	prizepoolBreakdown = lazyExport('PrizepoolBreakdown', 'prizepoolBreakdown'),
+	pieChartBreakdown = lazyExport('PieChartBreakdown', 'pieChartBreakdown'),
+	earningsTable = lazyExport('EarningsTable', 'earningsTable'),
+	playerAgeTable = lazyExport('PlayerAgeTable', 'playerAgeTable'),
 }

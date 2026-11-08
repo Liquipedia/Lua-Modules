@@ -13,8 +13,6 @@ local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
 local Info = Lua.import('Module:Info', {loadData = true})
-local Lpdb = Lua.import('Module:Lpdb')
-local PrizepoolBreakdown = Lua.import('Module:PortalStatistics/PrizepoolBreakdown')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -41,8 +39,6 @@ local GAMES = Array.map(Array.extractValues(Info.games, Table.iter.spairs), func
 end)
 
 local StatisticsPortal = {}
-
-StatisticsPortal.prizepoolBreakdown = PrizepoolBreakdown.prizepoolBreakdown
 
 ---@param args table?
 ---@return VNode
@@ -110,7 +106,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 
 	if args.detailedKey then
 		table.insert(wrapperChildren, Box{
-			children = StatisticsPortal.prizepoolBreakdown(args),
+			children = Lua.import('Module:PortalStatistics/PrizepoolBreakdown').prizepoolBreakdown(args),
 		})
 		return Html.Div{children = Box{children = wrapperChildren}}
 	end
@@ -195,21 +191,22 @@ function StatisticsPortal._getPieChartData(args, groupBy, defaultValue, groupVal
 
 	local function parseTournament(data)
 		local normValue = string.lower(data[groupBy] or '')
+		local prizepool = tonumber(data.sum_prizepool) or 0
 		if prizes[normValue] then
-			prizes[normValue].value = prizes[normValue].value + data.prizepool
+			prizes[normValue].value = prizes[normValue].value + prizepool
 		else
-			prizes[defaultValue].value = prizes[defaultValue].value + data.prizepool
+			prizes[defaultValue].value = prizes[defaultValue].value + prizepool
 		end
 	end
 
-	--Querying data
-	local queryParameters = {
+	-- Let LPDB sum up the prizepool per group, instead of fetching every single tournament of the wiki
+	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions = LPDBConditions:toString(),
-		query = 'prizepool, ' .. groupBy,
-	}
-
-	--Querying data
-	Lpdb.executeMassQuery('tournament', queryParameters, parseTournament)
+		query = groupBy .. ', sum::prizepool',
+		groupby = groupBy .. ' asc',
+		limit = MAX_QUERY_LIMIT,
+	})
+	Array.forEach(data, parseTournament)
 
 	Array.forEach(Array.extractValues(prizes), function(prize)
 		prize.value = math.floor(prize.value + 0.5)

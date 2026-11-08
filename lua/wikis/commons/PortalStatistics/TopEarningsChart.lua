@@ -116,14 +116,22 @@ function StatisticsPortal._getOpponentEarningsData(args, config)
 		query = queryFields,
 	}
 
-	Lpdb.executeMassQuery(opponentType, queryParameters, processData)
-
 	local earningsFunction = function (a)
 		if String.isNotEmpty(args.year) then
 			return a.earningsbyyear[tonumber(args.year)] or 0
 		else
 			return tonumber(a.earnings) or 0
 		end
+	end
+
+	if String.isEmpty(args.year) then
+		-- Total earnings are a plain column, so let LPDB do the ordering and only fetch the rows that are displayed.
+		queryParameters.order = 'earnings desc'
+		queryParameters.limit = math.min(args.limit, MAX_QUERY_LIMIT)
+		Lpdb.executeMassQuery(opponentType, queryParameters, processData, args.limit)
+	else
+		-- Earnings by year are stored in a json field, which can not be sorted by LPDB.
+		Lpdb.executeMassQuery(opponentType, queryParameters, processData)
 	end
 
 	table.sort(data, function(a, b) return earningsFunction(a) > earningsFunction(b) end)
