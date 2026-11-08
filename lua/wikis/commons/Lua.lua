@@ -197,9 +197,12 @@ function Lua.withPerfSetup(context, f)
 	return post(f())
 end
 
----Every `#invoke` only needs a single statistic, so the submodules are imported on demand.
----Importing all of them up front loads (and executes the top level of) every widget, condition and display module
----for each call, which is a big part of the memory and lua time spent on pages using this module.
+---Creates a function that imports `moduleName` only when called and forwards its arguments to `functionName` of it.
+---Useful for modules that export functions from many other modules (e.g. as `#invoke` entry points),
+---so that only the module that is actually called is imported (and its top level executed),
+---instead of every module being imported up front, which costs lua time and memory.
+---
+---Example: `return {foo = Lua.lazyExport('Module:Foo/Bar', 'foo')}`
 ---@param moduleName string
 ---@param functionName string
 ---@return fun(...): any
