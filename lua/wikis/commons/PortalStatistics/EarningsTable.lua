@@ -56,6 +56,7 @@ function StatisticsPortal.earningsTable(args)
 		DEFAULT_ALLOWED_PLACES
 	)
 	args.minimumEarnings = tonumber(args.minimumEarnings) or MINIMUM_EARNINGS
+	args.maxAchievements = tonumber(args.maxAchievements)
 
 	local hasYear = String.isNotEmpty(args.year)
 	local earningsFunction = function (a)
@@ -218,10 +219,16 @@ function StatisticsPortal._cacheOpponentPlacementData(args, displayedOpponents)
 
 	local data = {}
 
+	local queryFields = 'pagename, shortname, icon, icondark, liquipediatier, liquipediatiertype, placement, '
+	if args.opponentType == Opponent.solo then
+		queryFields = queryFields .. 'opponentplayers, opponenttype'
+	else
+		-- opponentplayers is not needed for teams and is a large field
+		queryFields = queryFields .. 'opponentname, opponenttype'
+	end
+
 	local queryParameters = {
-		query = 'pagename, shortname, icon, icondark, '
-			.. 'liquipediatier, liquipediatiertype, placement, '
-			.. 'opponentplayers, opponentname, opponenttype',
+		query = queryFields,
 		conditions = conditions:toString(),
 		limit = MAX_QUERY_LIMIT,
 		order = 'date asc',
@@ -307,7 +314,7 @@ function StatisticsPortal._earningsTableRow(args, placements, earnings, opponent
 		children = WidgetUtil.collect(
 			TableWidgets.Cell{children = opponentIndex},
 			TableWidgets.Cell{align = 'left', children = opponentDisplay},
-			TableWidgets.Cell{nowrap = false, children = StatisticsPortal._achievementsDisplay(placements.sWinData or {})},
+			TableWidgets.Cell{nowrap = false, children = StatisticsPortal._achievementsDisplay(placements.sWinData, args.maxAchievements)},
 			TableWidgets.Cell{children = placements['1'] or '0'},
 			TableWidgets.Cell{children = placements['2'] or '0'},
 			TableWidgets.Cell{children = placements['3'] or '0'},
@@ -318,25 +325,32 @@ function StatisticsPortal._earningsTableRow(args, placements, earnings, opponent
 end
 
 ---@param data table
+---@param maxAchievements integer?
 ---@return string
-function StatisticsPortal._achievementsDisplay(data)
-	local output = ''
-	if data and type(data[1]) == 'table' then
-		for _, item in ipairs(data) do
-			item.icon = string.gsub(item.icon or '', 'File:', '')
-			item.iconDark = string.gsub(item.iconDark or '', 'File:', '')
-			item.icon = Logic.emptyOr(item.icon, 'Gold.png')
-			output = output .. LeagueIcon.display{
-				icon = item.icon,
-				iconDark = item.iconDark,
-				link = item.pagename,
-				name = item.shortname,
-				options = { noTemplate = true },
-			}
-			output = output .. ' '
-		end
+function StatisticsPortal._achievementsDisplay(data, maxAchievements)
+	if not data or #data == 0 then
+		return ''
 	end
-	return output
+
+	-- Placements are queried by ascending date, so when limiting show the most recent ones
+	local firstIndex = maxAchievements and math.max(#data - maxAchievements + 1, 1) or 1
+
+	-- Collect the parts and concatenate once, appending to a string per icon copies the whole string every time
+	local output = {}
+	for index = firstIndex, #data do
+		local item = data[index]
+		local icon = string.gsub(item.icon or '', 'File:', '')
+		local iconDark = string.gsub(item.iconDark or '', 'File:', '')
+		table.insert(output, LeagueIcon.display{
+			icon = Logic.emptyOr(icon, 'Gold.png'),
+			iconDark = iconDark,
+			link = item.pagename,
+			name = item.shortname,
+			options = { noTemplate = true },
+		})
+		table.insert(output, ' ')
+	end
+	return table.concat(output)
 end
 
 ---@param player table
