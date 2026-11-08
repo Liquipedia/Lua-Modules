@@ -205,7 +205,7 @@ end
 ---@return fun(...): any
 function Lua.lazyExport(moduleName, functionName)
 	return function(...)
-		return Lua.import('Module:PortalStatistics/' .. moduleName)[functionName](...)
+		return Lua.import(moduleName)[functionName](...)
 	end
 end
 
