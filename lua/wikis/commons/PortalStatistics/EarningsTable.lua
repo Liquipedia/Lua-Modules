@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Currency = Lua.import('Module:Currency')
 local Flags = Lua.import('Module:Flags')
+local Info = Lua.import('Module:Info', {loadData = true})
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Lpdb = Lua.import('Module:Lpdb')
 local Medals = Lua.import('Module:Medals')
@@ -39,7 +40,9 @@ local SHOWMATCH = 'Showmatch'
 local TIER1 = '1'
 local FIRST = '1'
 local MINIMUM_EARNINGS = 1000
+local MAX_PLAYERS_PER_PLACEMENT = Info.config.defaultMaxPlayersPerPlacement or 10
 local MAX_QUERY_LIMIT = 5000
+local PLAYER_BATCH_SIZE = 5
 
 local StatisticsPortal = {}
 
@@ -180,13 +183,8 @@ function StatisticsPortal._getTeams(limit, addConditions, addOrder)
 end
 
 ---@param args table
----@param displayedOpponents table[]
----@return table
-function StatisticsPortal._cacheOpponentPlacementData(args, displayedOpponents)
-	if Logic.isEmpty(displayedOpponents) then
-		return {}
-	end
-
+---@return ConditionTree
+function StatisticsPortal._basePlacementConditions(args)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier')}
 		:add{ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0)}
@@ -202,10 +200,21 @@ function StatisticsPortal._cacheOpponentPlacementData(args, displayedOpponents)
 		placementConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, allowedPlacement)}
 	end
 
-	conditions:add{placementConditions}
+	return conditions:add{placementConditions}
+end
+
+---Queries the placements of the displayed opponents only, instead of all placements of the wiki.
+---@param args table
+---@param displayedOpponents table[]
+---@return table
+function StatisticsPortal._cacheOpponentPlacementData(args, displayedOpponents)
+	if Logic.isEmpty(displayedOpponents) then
+		return {}
+	end
+
+	local data = {}
 
 	if args.opponentType == Opponent.team then
-		-- The data is only used for the displayed teams, so there is no need to query the placements of all others
 		local opponentConditions = ConditionTree(BooleanOperator.any)
 		for _, team in ipairs(displayedOpponents) do
 			opponentConditions:add{ConditionNode(ColumnName('opponentname'), Comparator.eq, team.pagename)}
@@ -214,11 +223,55 @@ function StatisticsPortal._cacheOpponentPlacementData(args, displayedOpponents)
 				opponentConditions:add{ConditionNode(ColumnName('opponentname'), Comparator.eq, spacedName)}
 			end
 		end
-		conditions:add{opponentConditions}
+
+		StatisticsPortal._queryPlacements(
+			args,
+			StatisticsPortal._basePlacementConditions(args):add{opponentConditions},
+			data
+		)
+		return data
 	end
 
-	local data = {}
+	-- A placement can have many players, so the conditions for a player are one per player slot.
+	-- Query in batches to keep the conditions at a reasonable size.
+	for firstIndex = 1, #displayedOpponents, PLAYER_BATCH_SIZE do
+		local batch = Array.sub(displayedOpponents, firstIndex, firstIndex + PLAYER_BATCH_SIZE - 1)
+		local isInBatch = {}
+		local playerConditions = ConditionTree(BooleanOperator.any)
 
+		for _, player in ipairs(batch) do
+			isInBatch[player.pagename] = true
+			local pageNames = {player.pagename}
+			local spacedName = string.gsub(player.pagename, '_', ' ')
+			if spacedName ~= player.pagename then
+				table.insert(pageNames, spacedName)
+			end
+			for slot = 1, MAX_PLAYERS_PER_PLACEMENT do
+				for _, pageName in ipairs(pageNames) do
+					playerConditions:add{
+						ConditionNode(ColumnName('opponentplayers_p' .. slot), Comparator.eq, pageName)
+					}
+				end
+			end
+		end
+
+		-- Only credit the players of this batch, a placement of several players can show up in multiple batches
+		StatisticsPortal._queryPlacements(
+			args,
+			StatisticsPortal._basePlacementConditions(args):add{playerConditions},
+			data,
+			isInBatch
+		)
+	end
+
+	return data
+end
+
+---@param args table
+---@param conditions ConditionTree
+---@param data table
+---@param opponentFilter table<string, boolean>?
+function StatisticsPortal._queryPlacements(args, conditions, data, opponentFilter)
 	local queryFields = 'pagename, shortname, icon, icondark, liquipediatier, liquipediatiertype, placement, '
 	if args.opponentType == Opponent.solo then
 		queryFields = queryFields .. 'opponentplayers, opponenttype'
@@ -239,7 +292,9 @@ function StatisticsPortal._cacheOpponentPlacementData(args, displayedOpponents)
 		if args.opponentType == Opponent.solo then
 			for _, playerName in Table.iter.pairsByPrefix(item.opponentplayers or {}, 'p') do
 				local name = string.gsub(playerName or '', ' ', '_')
-				table.insert(opponentNames, name)
+				if not opponentFilter or opponentFilter[name] then
+					table.insert(opponentNames, name)
+				end
 			end
 		elseif args.opponentType == Opponent.team and item.opponenttype == Opponent.team then
 			local name = string.gsub(item.opponentname or '', ' ', '_')
@@ -250,7 +305,7 @@ function StatisticsPortal._cacheOpponentPlacementData(args, displayedOpponents)
 
 	local processData = function(item)
 		local placement = string.sub(item.placement, 1, 1)
-		for _, opponent in pairs(makeOpponentTable(item) or {}) do
+		for _, opponent in pairs(makeOpponentTable(item)) do
 			if not data[opponent] then
 				data[opponent] = {['1'] = 0, ['2'] = 0, ['3'] = 0, showWins = 0, sWinData = {}}
 			end
@@ -272,8 +327,6 @@ function StatisticsPortal._cacheOpponentPlacementData(args, displayedOpponents)
 	end
 
 	Lpdb.executeMassQuery('placement', queryParameters, processData)
-
-	return data
 end
 
 
