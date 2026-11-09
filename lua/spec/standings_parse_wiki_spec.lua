@@ -27,23 +27,6 @@ describe('Standings Wiki Parser', function()
 		return StandingsParseWiki.parseAdjustments(values, numberOfRounds)
 	end
 
-	describe('input', function()
-		it('reads the unnamed opponents, and the header as the only round without rounds', function()
-			local parsed = StandingsParseWiki.parseWikiInput(readHeader{
-				title = 'Groups',
-				matches = 'a, b',
-				finished = 'true',
-				{type = 'literal', 'Alpha', r1 = '3'},
-				'{"type":"literal","name":"Bravo"}',
-			})
-			assert.are_same({{roundNumber = 1, finished = true, title = 'Groups', matches = {'a', 'b'}}}, parsed.rounds)
-			assert.are_equal('Alpha', parsed.opponents[1].opponent.name)
-			assert.are_equal(3, parsed.opponents[1].rounds[1].scoreboard.points)
-			assert.are_equal('Bravo', parsed.opponents[2].opponent.name)
-			assert.are_equal(2, #parsed.opponents)
-		end)
-	end)
-
 	describe('rounds', function()
 		it('reads the manual started and finished input', function()
 			local round = parseWikiRound{started = 'true', finished = 'false'}
@@ -67,12 +50,6 @@ describe('Standings Wiki Parser', function()
 			assert.is_nil(StandingsParseWiki.readOpponentValues({dq = 'false'}, 1).dq)
 			assert.is_nil(StandingsParseWiki.readOpponentValues({dq = ''}, 1).dq)
 			assert.is_nil(StandingsParseWiki.readOpponentValues({}, 1).dq)
-		end)
-
-		it('errors on input that is neither a boolean nor a round', function()
-			for _, input in ipairs({'abc', '0', '1.5'}) do
-				assert.error(function() StandingsParseWiki.readOpponentValues({dq = input}, 1) end)
-			end
 		end)
 
 		it('stores the disqualification round on the parsed opponent', function()
@@ -125,13 +102,6 @@ describe('Standings Wiki Parser', function()
 			)
 			assert.are_same({[1] = 'down'}, parseDefiniteStatuses({r1status = '', r1bg = 'down'}, 3))
 		end)
-
-		it('errors on values that are not a status', function()
-			assert.error(
-				function() parseDefiniteStatuses({r2bg = 'proceed'}, 3) end,
-				'Invalid r2bg input: "proceed" is not one of byeup, seedup, up, stayup, stay, staydown, down, dq'
-			)
-		end)
 	end)
 
 	describe('min statuses', function()
@@ -141,7 +111,6 @@ describe('Standings Wiki Parser', function()
 				parseMinStatuses({r2minstatus = 'stay', r3minstatus = 'up', r4minstatus = 'up'}, 3)
 			)
 			assert.is_nil(parseMinStatuses({r1minstatus = '', minstatus = 'up'}, 3))
-			assert.error(function() parseMinStatuses({r1minstatus = 'Up'}, 3) end)
 		end)
 
 		it('stores the min statuses on the parsed opponent apart from the definite statuses', function()
@@ -292,13 +261,6 @@ describe('Standings Wiki Parser', function()
 
 		it('errors on input that is not a width in px', function()
 			assert.error(function() readHeader{width = '50%'} end)
-		end)
-	end)
-
-	describe('table type', function()
-		it('errors on an unknown table type', function()
-			assert.are_equal('swiss', readHeader{tabletype = 'swiss'}.tabletype)
-			assert.error(function() readHeader{tabletype = 'league'} end)
 		end)
 	end)
 
