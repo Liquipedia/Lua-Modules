@@ -14,11 +14,12 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
+local Table = Lua.import('Module:Table')
 
 ---Declares the parameters of a template once, for reading them and for their documentation.
 local ArgSchema = {}
 
----@alias ArgSchemaType 'string'|'boolean'|'number'|'nonNegativeInteger'|'timestamp'|'json'|'list'
+---@alias ArgSchemaType 'string'|'boolean'|'number'|'nonNegativeInteger'|'timestamp'|'json'|'list'|'enum'
 
 ---@class ArgSchemaParameter
 ---@field name string # A `{placeholder}` reads every numbered variant, e.g. `r{round}status` reads `r1status`, ...
@@ -27,6 +28,8 @@ local ArgSchema = {}
 ---@field type ArgSchemaType? # Defaults to `string`
 ---@field read (fun(input: any): any)? # Replaces the read of the type
 ---@field separator string? # Separator of a `list`, defaults to `,`
+---@field values string[]? # The values of an `enum`
+---@field templates string[]? # The templates whose output a `json` takes, linked in the documentation
 ---@field default (string|number|boolean)?
 ---@field example string? # Wikitext of a value, documented when there is no default. Unnamed parameters are
 ---documented by it, as editors write them.
@@ -37,8 +40,8 @@ local ArgSchema = {}
 ---@class ArgSchemaReadOptions
 ---@field defaultIndex integer? # The index of an alias without the placeholder
 
----@type table<ArgSchemaType, {read: fun(input: any, parameter: ArgSchemaParameter): any, expected: string?,
----absent: (fun(): any)?}>
+---@type table<ArgSchemaType, {read: fun(input: any, parameter: ArgSchemaParameter): any,
+---expected: (string|fun(parameter: ArgSchemaParameter): string)?, absent: (fun(): any)?}>
 local TYPES = {
 	string = {read = FnUtil.identity},
 	boolean = {read = Logic.readBoolOrNil, expected = 'a boolean'},
@@ -57,6 +60,14 @@ local TYPES = {
 			return Array.parseCommaSeparatedString(input, parameter.separator)
 		end,
 		absent = function() return {} end,
+	},
+	enum = {
+		read = function(input, parameter)
+			return Table.includes(parameter.values, input) and input or nil
+		end,
+		expected = function(parameter)
+			return 'one of ' .. table.concat(parameter.values, ', ')
+		end,
 	},
 }
 
@@ -91,8 +102,11 @@ local function convert(parameter, name, input)
 	end
 	local readType = TYPES[parameter.type or 'string']
 	local value = readType.read(input, parameter)
-	assert(value ~= nil or not readType.expected,
-		'Invalid ' .. name .. ' input: "' .. tostring(input) .. '" is not ' .. tostring(readType.expected))
+	local expected = readType.expected
+	if value == nil and expected then
+		error('Invalid ' .. name .. ' input: "' .. tostring(input) .. '" is not '
+			.. (type(expected) == 'function' and expected(parameter) or expected), 0)
+	end
 	return value
 end
 

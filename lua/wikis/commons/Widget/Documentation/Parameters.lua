@@ -13,6 +13,7 @@ local Logic = Lua.import('Module:Logic')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local Para = Lua.import('Module:Widget/Documentation/Para')
 
 ---@param parameter ArgSchemaParameter
@@ -37,6 +38,31 @@ local function ParameterNames(parameter)
 	return Array.flatten(Array.interleave(names, {', '}))
 end
 
+---@param prefix string
+---@param items Renderable[]
+---@return Renderable
+local function Enumeration(prefix, items)
+	return Html.Dd{children = Array.flatten{prefix, Array.interleave(items, ', '), '.'}}
+end
+
+---The values of an `enum`, or the templates whose output a `json` takes.
+---@param parameter ArgSchemaParameter
+---@return Renderable?
+local function AcceptedValues(parameter)
+	if parameter.values then
+		return Enumeration('One of ', Array.map(parameter.values, function(value)
+			return Html.Code{children = value}
+		end))
+	elseif parameter.templates then
+		return Enumeration('Takes ', Array.map(parameter.templates, function(template)
+			return Link{
+				link = 'Template:' .. template,
+				children = Html.Code{children = mw.text.nowiki('{{' .. template .. '}}')},
+			}
+		end))
+	end
+end
+
 ---Lists the parameters that apply in a context, with their descriptions.
 ---@param props {parameters: ArgSchemaParameter[], context: table}
 ---@return Renderable?
@@ -53,6 +79,7 @@ local function DocumentationParameters(props)
 				-- Descriptions use templates such as {{para}}, which the output of a module does not expand
 				frame:preprocess(ArgSchema.description(parameter, props.context)),
 			}},
+			AcceptedValues(parameter),
 		}
 	end)}
 end
