@@ -165,7 +165,11 @@ function MatchGroupLegacy.getAlt(template, bracketType)
 		elseif id == RESET_MATCH then
 			matchKey = 'r' .. roundNum .. 'm1'
 		else
-			roundNum = id:match('R%d*'):gsub('R', '')
+			local roundString, matchIndex = id:match('^R(%d+)M(%d+)$')
+			roundNum = tonumber(roundString) --[[@as integer]]
+			if string.match(bd.header or '', '^!l') then
+				lowerHeaders[roundNum] = tonumber(matchIndex)
+			end
 			if bd.bracketsection == 'upper' then
 				countMatchesInLower = 0
 				matchKey = id:lower()
@@ -177,11 +181,6 @@ function MatchGroupLegacy.getAlt(template, bracketType)
 				matchKey = 'l' .. roundNum .. 'm' .. countMatchesInLower
 			end
 		end
-
-		if string.match(bd.header or '', '^!l') then
-			lowerHeaders[roundNum or ''] = roundNum
-		end
-
 
 		match2mapping[id] = {opp1 = matchKey .. 'p1', opp2 = matchKey .. 'p2', details = matchKey}
 	end)
