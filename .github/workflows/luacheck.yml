@@ -78,7 +78,7 @@ jobs:
           files: |
             lua/wikis/**/*.lua
 
-      # API asset endpoint; github.com/.../releases/download intermittently 504s
+      # plain release download URL intermittently 504s
       - name: Setup LuaLS
         if: steps.lua-changed-files.outputs.any_changed == 'true'
         shell: bash
