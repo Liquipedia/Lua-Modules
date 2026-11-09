@@ -68,6 +68,8 @@ jobs:
 
   luals-code-style:
     runs-on: ubuntu-latest
+    env:
+      LUALS_VERSION: 3.18.2
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -78,13 +80,42 @@ jobs:
           files: |
             lua/wikis/**/*.lua
 
-      - name: Setup LuaLS
+      - name: Restore LuaLS
+        id: luals-cache
         if: steps.lua-changed-files.outputs.any_changed == 'true'
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/.local/bin/luals
+          key: luals-${{ env.LUALS_VERSION }}-linux-x64
+
+      # API asset endpoint, not github.com/.../releases/download, which intermittently 504s
+      - name: Setup LuaLS
+        if: steps.lua-changed-files.outputs.any_changed == 'true' && steps.luals-cache.outputs.cache-hit != 'true'
         env:
-          LUALS_VERSION: 3.18.2
+          GH_TOKEN: ${{ github.token }}
         run: |
+          asset="lua-language-server-$LUALS_VERSION-linux-x64.tar.gz"
+          for attempt in 1 2 3 4 5; do
+            if gh release download "$LUALS_VERSION" --repo LuaLS/lua-language-server \
+                --pattern "$asset" --dir "$RUNNER_TEMP" --clobber \
+              && tar -tzf "$RUNNER_TEMP/$asset" > /dev/null; then
+              break
+            fi
+            if [ "$attempt" -eq 5 ]; then
+              echo "::error::Failed to download $asset"
+              exit 1
+            fi
+            sleep $((attempt * 15))
+          done
           mkdir -p ~/.local/bin/luals
-          curl -L https://github.com/LuaLS/lua-language-server/releases/download/$LUALS_VERSION/lua-language-server-$LUALS_VERSION-linux-x64.tar.gz | tar -xzv -C ~/.local/bin/luals
+          tar -xzf "$RUNNER_TEMP/$asset" -C ~/.local/bin/luals
+
+      - name: Save LuaLS
+        if: steps.lua-changed-files.outputs.any_changed == 'true' && steps.luals-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/.local/bin/luals
+          key: luals-${{ env.LUALS_VERSION }}-linux-x64
 
       - name: Check
         if: steps.lua-changed-files.outputs.any_changed == 'true'
