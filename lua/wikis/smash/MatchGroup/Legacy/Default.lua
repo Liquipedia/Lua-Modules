@@ -16,6 +16,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
+local Mappings = Lua.import('Module:MatchGroup/Legacy/Mappings', {loadData = true})
 
 local MAX_NUMBER_OF_OPPONENTS = 2
 
@@ -28,6 +29,39 @@ local MatchGroupLegacyDefault = Class.new(MatchGroupLegacy)
 ---@return match2mapping
 function MatchGroupLegacyDefault.get(template, bracketType)
 	return MatchGroupLegacy.getAlt(template, bracketType)
+end
+
+---@param template string
+---@param templateOld string?
+---@return match2mapping
+function MatchGroupLegacyDefault:_get(template, templateOld)
+	local config = Mappings[templateOld]
+	-- fall back to the on-wiki mapping modules
+	if not config or config.template ~= template then
+		return MatchGroupLegacy._get(self, template, templateOld)
+	end
+
+	local mapping = MatchGroupLegacyDefault.get(config.template, self.bracketType)
+	if config.lower then
+		mapping = MatchGroupLegacy.toLowerBracket(mapping, config.roundOffset)
+	end
+	if config.resetRound then
+		mapping = MatchGroupLegacy.withReset(mapping, config.resetRound)
+	end
+	for match2key, match1key in pairs(config.matches or {}) do
+		mapping[match2key] = {details = match1key, opp1 = match1key .. 'p1', opp2 = match1key .. 'p2'}
+	end
+	for match2header, match1header in pairs(config.headers or {}) do
+		mapping[match2header] = match1header
+	end
+	return mapping
+end
+
+---@param args table
+function MatchGroupLegacyDefault._applyConfig(args)
+	local config = Mappings[args.templateOld] or {}
+	args.template = Logic.emptyOr(args.template, config.template)
+	args.type = Logic.emptyOr(args.type, config.type, Opponent.solo)
 end
 
 ---@param prefix string
@@ -123,15 +157,23 @@ end
 ---@param frame Frame
 ---@return string
 function MatchGroupLegacyDefault.run(frame)
+	MatchGroupLegacyDefault._applyConfig(frame.args)
 	return MatchGroupLegacyDefault(frame):build()
 end
 
 ---@param frame Frame
 ---@return string
 function MatchGroupLegacyDefault.runGenerate(frame)
-	frame.args.template = frame.args[1]
-	frame.args.templateOld = frame.args[2]
-	frame.args.type = frame.args.type or Opponent.solo
+	local args = frame.args
+	---@cast args -nil
+	-- |<template>|<templateOld> or |<templateOld>
+	if Logic.isNotEmpty(args[2]) then
+		args.template = args[1]
+		args.templateOld = args[2]
+	else
+		args.templateOld = Logic.emptyOr(args.templateOld, args[1])
+	end
+	MatchGroupLegacyDefault._applyConfig(args)
 
 	return MatchGroupLegacyDefault(frame):generate()
 end
