@@ -125,6 +125,13 @@ describe('Standings Wiki Parser', function()
 			)
 			assert.are_same({[1] = 'down'}, parseDefiniteStatuses({r1status = '', r1bg = 'down'}, 3))
 		end)
+
+		it('errors on values that are not a status', function()
+			assert.error(
+				function() parseDefiniteStatuses({r2bg = 'proceed'}, 3) end,
+				'Invalid r2bg input: "proceed" is not one of byeup, seedup, up, stayup, stay, staydown, down, dq'
+			)
+		end)
 	end)
 
 	describe('min statuses', function()
@@ -134,6 +141,7 @@ describe('Standings Wiki Parser', function()
 				parseMinStatuses({r2minstatus = 'stay', r3minstatus = 'up', r4minstatus = 'up'}, 3)
 			)
 			assert.is_nil(parseMinStatuses({r1minstatus = '', minstatus = 'up'}, 3))
+			assert.error(function() parseMinStatuses({r1minstatus = 'Up'}, 3) end)
 		end)
 
 		it('stores the min statuses on the parsed opponent apart from the definite statuses', function()
@@ -284,6 +292,13 @@ describe('Standings Wiki Parser', function()
 
 		it('errors on input that is not a width in px', function()
 			assert.error(function() readHeader{width = '50%'} end)
+		end)
+	end)
+
+	describe('table type', function()
+		it('errors on an unknown table type', function()
+			assert.are_equal('swiss', readHeader{tabletype = 'swiss'}.tabletype)
+			assert.error(function() readHeader{tabletype = 'league'} end)
 		end)
 	end)
 

@@ -59,6 +59,15 @@ describe('Standings documentation', function()
 		assert.is_falsy(swiss:find('tabletype', 1, true))
 	end)
 
+	it('lists the statuses and links the templates of the json parameters', function()
+		assert.is_truthy(render('opponent', 'swiss'):find(
+			'<dd>One of <code>byeup</code>, <code>seedup</code>, <code>up</code>', 1, true
+		))
+		local header = render('header', 'swiss')
+		assert.is_truthy(header:find('<dd>Takes [[Template:Json|', 1, true))
+		assert.is_truthy(header:find('[[Template:SoloOpponent|', 1, true))
+	end)
+
 	it('lists indexed parameters with their aliases', function()
 		assert.is_truthy(render('opponent', 'swiss'):find(
 			'&#124;r1points&#61;</code>, <code class="nowrap">&#124;r2points&#61;</code>, …, '

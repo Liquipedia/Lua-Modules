@@ -28,8 +28,6 @@ local StandingsTable = {}
 
 ---@alias StandingsTableTypes 'ffa'|'swiss'|'group'
 
-local TABLE_TYPES = {ffa = true, swiss = true, group = true}
-
 ---@class Scoreboard
 ---@field points number?
 ---@field match {w: integer, d: integer, l: integer}
@@ -75,7 +73,7 @@ end
 function StandingsTable.parse(values)
 	---@type StandingsTableTypes
 	local tableType = values.tabletype
-	assert(TABLE_TYPES[tableType], 'Unknown Standing Table Type')
+	assert(tableType, 'No table type given')
 	local importScoreFromMatches = values.import
 	local importOpponentFromMatches = Logic.nilOr(values.importopponents, importScoreFromMatches)
 	--- Exclusive standings only count matches where all opponents are part of the standings,

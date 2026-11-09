@@ -18,6 +18,9 @@ local StandingsOvertime = Lua.import('Module:Standings/Overtime')
 local StandingsParameters = {}
 
 local STATUSES = {'byeup', 'seedup', 'up', 'stayup', 'stay', 'staydown', 'down', 'dq'}
+local OPPONENT_TEMPLATES = {
+	'TeamOpponent', 'SoloOpponent', 'DuoOpponent', 'TrioOpponent', 'QuadOpponent', 'LiteralOpponent',
+}
 
 StandingsParameters.DEFAULT_POINTS = {
 	swiss = {w = 1, d = 0.5, l = 0},
@@ -176,15 +179,19 @@ StandingsParameters.opponent = {
 	{
 		name = 'r{round}status',
 		aliases = {'r{round}bg'},
-		description = 'Manually sets the status (one of the [[#Header|bg]] colors) of the opponent from this round '
-			.. 'onwards, overriding {{para|bg}}. Example: {{para|r3status|up}} for an opponent that has secured '
-			.. 'advancement in round 3. {{para|r3bg}} is an older name of it.',
+		type = 'enum',
+		values = STATUSES,
+		description = 'Manually sets the status of the opponent from this round onwards, overriding {{para|bg}}. '
+			.. 'Example: {{para|r3status|up}} for an opponent that has secured advancement in round 3. '
+			.. '{{para|r3bg}} is an older name of it.',
 	},
 	{
 		name = 'r{round}minstatus',
-		description = 'Sets the worst status (one of the [[#Header|bg]] colors) the opponent can still end up with, '
-			.. 'from this round onwards. Shown as a label as long as no status is set. Example: '
-			.. '{{para|r3minstatus|stay}} for an opponent that can no longer be eliminated.',
+		type = 'enum',
+		values = STATUSES,
+		description = 'Sets the worst status the opponent can still end up with, from this round onwards. Shown as a '
+			.. 'label as long as no status is set. Example: {{para|r3minstatus|stay}} for an opponent that can no '
+			.. 'longer be eliminated.',
 	},
 	adjustment('points', 'points'),
 	adjustment('tiebreaker', 'a score for the <code>manual</code> tiebreaker, where higher values are placed higher,'),
@@ -215,8 +222,10 @@ end
 StandingsParameters.header = {
 	{
 		name = 'tabletype',
+		type = 'enum',
+		values = {'swiss', 'group', 'ffa'},
 		hidden = true,
-		description = 'The type of the table, <code>swiss</code>, <code>group</code> or <code>ffa</code>.',
+		description = 'The type of the table.',
 	},
 	{
 		name = 'title',
@@ -237,6 +246,7 @@ StandingsParameters.header = {
 	{
 		name = 'tiebreakers',
 		type = 'json',
+		templates = {'Json'},
 		description = function(context)
 			local usage = byTableType(
 				'Example {{para|tiebreakers|<nowiki>{{Json|matchscore|buchholz|ml.matchdiff}}</nowiki>}}.',
@@ -374,6 +384,7 @@ StandingsParameters.header = {
 	{
 		name = 'round{round}',
 		type = 'json',
+		templates = {'Round'},
 		description = 'The rounds of the standings, as {{para|round1|<nowiki>{{Round|...}}</nowiki>}}. '
 			.. 'See [[#Round|Round]].',
 	},
@@ -386,9 +397,9 @@ StandingsParameters.header = {
 	{
 		name = '{opponent}',
 		type = 'json',
+		templates = OPPONENT_TEMPLATES,
 		example = '{{TeamOpponent|...}}',
-		description = 'One per opponent, with <code><nowiki>{{XOpponent|...}}</nowiki></code> where X is the opponent '
-			.. 'type (Team, Solo, Duo, Literal, etc.). See [[#Opponent|Opponent]].',
+		description = 'One per opponent. See [[#Opponent|Opponent]].',
 	},
 }
 
