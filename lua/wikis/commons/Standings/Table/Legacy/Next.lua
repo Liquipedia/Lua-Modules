@@ -92,7 +92,6 @@ local OPPONENT_TYPE_INPUT_MAPPING = {
 	team = Opponent.team,
 }
 
-
 ---Module:SwissTableLeague/next
 ---@param frame Frame
 ---@return Renderable
