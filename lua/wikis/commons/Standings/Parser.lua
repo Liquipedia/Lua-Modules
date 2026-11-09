@@ -31,6 +31,7 @@ local DISQUALIFIED_STATUS = 'dq'
 ---@field tiebreakerReset boolean? Whether groups split by a tiebreaker start over from the first tiebreaker
 ---@field maxBestOf number? The highest bestof of the table's matches
 ---@field format StandingsFormat? Enables the placement ranges of the opponents
+---@field points table<string, number>? The points per result, see StandingsParseWiki.parsePoints
 
 ---@param carried table
 ---@param record table?
@@ -202,7 +203,10 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		end), tiebreakerIds, tiebreakerOptions, options.tiebreakerReset)
 	end)
 
-	local placementRangeCalculator = options.format and StandingsPlacementRange.calculator(options.format, opponents)
+	local placementRangeCalculator = options.format and StandingsPlacementRange.calculator(options.format, opponents, {
+		tiebreakerIds = tiebreakerIds,
+		points = options.points,
+	})
 	if placementRangeCalculator then
 		Array.forEach(rounds, function(round)
 			-- The final placements of a finished table are exact

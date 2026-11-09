@@ -284,25 +284,39 @@ local MAX_FORMAT_RESULTS = 10
 local FORMAT_SHORTHANDS = {
 	gsl = {'swiss', adv = 2},
 	swiss = {'swiss'},
+	srr = {'roundrobin', cycles = 1},
+	drr = {'roundrobin', cycles = 2},
 }
 
----@param value integer?
----@return boolean
-local function isValidResultCount(value)
-	return value ~= nil and value > 0 and value <= MAX_FORMAT_RESULTS
+---A positive integer up to `max`, or `default` without input
+---@param data table
+---@param key string
+---@param input string
+---@param default integer?
+---@param max integer?
+---@return integer
+local function readFormatCount(data, key, input, default, max)
+	if default and Logic.isEmpty(data[key]) then
+		return default
+	end
+	local value = MathUtil.toInteger(data[key])
+	assert(value and value > 0 and value <= (max or math.huge), 'Invalid format input: "' .. input .. '" needs '
+		.. key .. ' as ' .. (max and ('an integer from 1 to ' .. max) or 'a positive integer'))
+	return value
 end
 
 ---@type table<string, fun(data: table, input: string): StandingsFormat>
 local FORMAT_PARSERS = {
 	swiss = function(data, input)
-		local winsToAdvance = MathUtil.toInteger(data.adv)
-		local lossesToEliminate = Logic.isEmpty(data.elim) and winsToAdvance or MathUtil.toInteger(data.elim)
-		local bounds = 'an integer from 1 to ' .. MAX_FORMAT_RESULTS
-		assert(isValidResultCount(winsToAdvance), 'Invalid format input: "' .. input .. '" needs adv as ' .. bounds)
-		assert(isValidResultCount(lossesToEliminate), 'Invalid format input: "' .. input .. '" needs elim as ' .. bounds)
-		---@cast winsToAdvance -nil
-		---@cast lossesToEliminate -nil
+		local winsToAdvance = readFormatCount(data, 'adv', input, nil, MAX_FORMAT_RESULTS)
+		local lossesToEliminate = readFormatCount(data, 'elim', input, winsToAdvance, MAX_FORMAT_RESULTS)
 		return {type = 'swiss', winsToAdvance = winsToAdvance, lossesToEliminate = lossesToEliminate}
+	end,
+	roundrobin = function(data, input)
+		return {type = 'roundrobin', cycles = readFormatCount(data, 'cycles', input, 1)}
+	end,
+	classicswiss = function(data, input)
+		return {type = 'classicswiss', rounds = readFormatCount(data, 'rounds', input)}
 	end,
 }
 
@@ -313,7 +327,8 @@ local function parseFormatShorthand(input)
 	return FORMAT_SHORTHANDS[input] or (adv and {'swiss', adv = adv}) or nil
 end
 
----Reads `format`: `gsl`, `swiss<N>` or `{{Json|swiss|adv=<N>|elim=<N>}}`, where `elim` defaults to `adv`.
+---Reads `format`: `gsl`, `swiss<N>`, `srr`, `drr`, or `{{Json|<type>|...}}` with type `swiss` (`adv`, `elim`
+---defaulting to `adv`), `roundrobin` (`cycles`, defaulting to 1) or `classicswiss` (`rounds`).
 ---@param args table
 ---@param tableType StandingsTableTypes
 ---@return StandingsFormat?
