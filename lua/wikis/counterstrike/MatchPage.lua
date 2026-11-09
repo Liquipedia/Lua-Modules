@@ -324,7 +324,10 @@ function MatchPage._renderPlayerPerformance(player)
 	---@type Renderable|Renderable[]
 	local nameDisplay = nameLink
 	if player.player and Logic.isNotEmpty(player.flag) then
-		nameDisplay = {Flags.Icon{flag = player.flag, shouldLink = false}, '&nbsp;', nameLink}
+		nameDisplay = Span{
+			css = {['white-space'] = 'nowrap'},
+			children = {Flags.Icon{flag = player.flag, shouldLink = false}, '&nbsp;', nameLink},
+		}
 	end
 
 	-- Rar can be both positive and negative
