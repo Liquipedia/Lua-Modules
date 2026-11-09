@@ -52,7 +52,7 @@ local StatisticsPortal = {}
 function StatisticsPortal.earningsTable(args)
 	args = args or {}
 	args.limit = tonumber(args.limit) or 20
-	args.opponentType = args.opponentType or Opponent.team
+	args.opponentType = args.opponentType == Opponent.solo and Opponent.solo or Opponent.team
 	args.displayShowMatches = Logic.readBool(args.displayShowMatches)
 	args.allowedPlacements = StatisticsPortal._isTableOrSplitOrDefault(
 		args.allowedPlacements,
@@ -140,7 +140,7 @@ end
 
 
 --[[
-Section: Player Age Table Breakdown
+Section: Query Functions
 ]]--
 
 ---@param tableName string Name of the table

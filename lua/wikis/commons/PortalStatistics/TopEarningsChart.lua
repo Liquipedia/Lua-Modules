@@ -86,8 +86,8 @@ end
 
 
 --[[
-Section: Coverage Breakdown
-]] --
+Section: Query Functions
+]]--
 
 ---@param args table
 ---@param config table

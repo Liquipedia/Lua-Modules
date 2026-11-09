@@ -228,43 +228,33 @@ function ChartHelper.drawChart(config, chartData)
 	}
 end
 
+---Removes the empty categories (all series are 0) at the start and at the end.
+---Empty categories in between are kept, so that the gaps stay visible.
 ---@param categoryNames table
 ---@param seriesData table
 ---@return table, table
 function ChartHelper.removeCategories(categoryNames, seriesData)
-	local startsEmpty = true
-	local lastNotEmpty = 1
-
-	local isEmptyCategory = Array.map(Array.map(categoryNames, function(_, catIndex)
-		local truthValue = Array.all(Array.map(seriesData, function(_, index)
-			return seriesData[index][catIndex] end), function(value)
-				return value == 0
-			end)
-			if not truthValue then
-				lastNotEmpty = catIndex
-			end
-			return truthValue
-		end),
-	function(value, index)
-		if index > lastNotEmpty then
-			return false
-		elseif startsEmpty and value == true then
-			return false
-		else
-			startsEmpty = false
-			return true
-		end
-	end)
-
-	categoryNames = Array.filter(categoryNames, function(_, catIndex)
-		return Logic.readBool(isEmptyCategory[catIndex]) end)
-
-	seriesData = Array.map(seriesData, function(_, index)
-		return Array.filter(seriesData[index], function(_, catIndex)
-			return Logic.readBool(isEmptyCategory[catIndex])
+	local function isEmptyCategory(categoryIndex)
+		return Array.all(seriesData, function(series)
+			return series[categoryIndex] == 0
 		end)
+	end
+
+	local firstIndex, lastIndex
+	for categoryIndex = 1, #categoryNames do
+		if not isEmptyCategory(categoryIndex) then
+			firstIndex = firstIndex or categoryIndex
+			lastIndex = categoryIndex
+		end
+	end
+
+	if not firstIndex then
+		return {}, Array.map(seriesData, function() return {} end)
+	end
+
+	return Array.sub(categoryNames, firstIndex, lastIndex), Array.map(seriesData, function(series)
+		return Array.sub(series, firstIndex, lastIndex)
 	end)
-	return categoryNames, seriesData
 end
 
 ---@param config table
@@ -309,19 +299,15 @@ function ChartHelper.buildChartData(config, yearSeriesData, nonYearCategories, t
 	end
 
 	for seriesIndex, series in pairs(seriesNames) do
-		if config.removeEmptySeries == true and Array.all(seriesData[seriesIndex], function(value)
-			return value == 0
-		end) then
-			mw.logObject(series .. ' is empty')
-		else
+		local isEmptySeries = Array.all(seriesData[seriesIndex], function(value) return value == 0 end)
+		if not (config.removeEmptySeries == true and isEmptySeries) then
 			table.insert(chartData, {
-					name = series,
-					type = config.chartType,
-					stack = config.stackType,
-					data = seriesData[seriesIndex],
-					emphasis = {focus = config.emphasis},
-				}
-			)
+				name = series,
+				type = config.chartType,
+				stack = config.stackType,
+				data = seriesData[seriesIndex],
+				emphasis = {focus = config.emphasis},
+			})
 		end
 	end
 

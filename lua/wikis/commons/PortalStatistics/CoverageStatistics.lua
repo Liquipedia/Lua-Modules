@@ -17,9 +17,6 @@ local Html = Lua.import('Module:Widget/Html')
 
 local StatisticsPortal = {}
 
-StatisticsPortal.coverageMatchTable = CoverageMatchTable.coverageMatchTable
-StatisticsPortal.coverageTournamentTable = CoverageTournamentTable.coverageTournamentTable
-
 ---@param args table?
 ---@return VNode
 function StatisticsPortal.coverageStatistics(args)
@@ -27,8 +24,8 @@ function StatisticsPortal.coverageStatistics(args)
 	args.alignSide = Logic.readBool(args.alignSide)
 
 	local statsChildren = {
-		StatisticsPortal.coverageTournamentTable(args),
-		StatisticsPortal.coverageMatchTable(args)
+		CoverageTournamentTable.coverageTournamentTable(args),
+		CoverageMatchTable.coverageMatchTable(args)
 	}
 
 	if args.alignSide then

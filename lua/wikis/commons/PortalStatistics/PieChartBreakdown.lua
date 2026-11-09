@@ -167,7 +167,8 @@ end
 ---@param groupValues table
 ---@return Renderable
 function StatisticsPortal._getPieChartData(args, groupBy, defaultValue, groupValues)
-	table.insert(groupValues, defaultValue)
+	-- Do not modify the passed in table, it can be a shared constant that is used by other charts on the same page
+	groupValues = Array.append(groupValues, defaultValue)
 	defaultValue = string.lower(defaultValue or '')
 
 	local prizes = {}

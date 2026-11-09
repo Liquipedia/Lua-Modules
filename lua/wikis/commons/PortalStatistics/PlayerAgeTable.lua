@@ -38,7 +38,8 @@ function StatisticsPortal.playerAgeTable(args)
 	args = args or {}
 	args.earnings = tonumber(args.earnings) or 500
 	args.limit = tonumber(args.limit) or 20
-	args.order = 'birthdate ' .. (args.order or 'desc')
+	-- Only allow a direction, as the value is used in the query
+	args.order = 'birthdate ' .. (string.lower(args.order or '') == 'asc' and 'asc' or 'desc')
 
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('birthdate'), Comparator.neq, '')}
@@ -75,9 +76,10 @@ function StatisticsPortal.playerAgeTable(args)
 		}
 	}
 
+	local currentTimestamp = DateExt.getCurrentTimestamp()
 	local tableRow = Array.map(playerData, function(player)
 		local birthdate = DateExt.readTimestamp(player.birthdate) --[[@as integer]]
-		local ageInSeconds = os.difftime(DateExt.getCurrentTimestamp(), birthdate)
+		local ageInSeconds = os.difftime(currentTimestamp, birthdate)
 
 		return TableWidgets.Row{children = {
 			TableWidgets.Cell{children = OpponentDisplay.BlockOpponent{
@@ -104,7 +106,6 @@ Section: Query Functions
 ]]--
 
 ---Executes a given LPDB query using Lpdb.executeMassQuery
-
 ---@param tableName string Name of the table
 ---@param parameters table Query parameters
 ---@return table

@@ -109,9 +109,9 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 				Operator.add, 0
 			)
 			runningTally = runningTally + count
-				return CellComponent{align = 'right', children = LANG:formatNum(count)}
-			end
-		end)
+			return CellComponent{align = 'right', children = LANG:formatNum(count)}
+		end
+	end)
 
 	local otherCell
 	if String.isNotEmpty(args.showOther) then
@@ -152,14 +152,12 @@ function StatisticsPortal._coverageTournamentTableHeader(args)
 	end
 
 	local tierTypeHeaderCells = {}
-	if #args.showTierTypes then
-		for _, tierTypeValue in ipairs(args.showTierTypes) do
-			local _, tierTypeData = Tier.raw(nil, tierTypeValue)
-			if tierTypeData then
-				table.insert(tierTypeHeaderCells, TableWidgets.CellHeader{
-					children = Tier.displaySingle(tierTypeData, {link = true, short = true})
-				})
-			end
+	for _, tierTypeValue in ipairs(args.showTierTypes) do
+		local _, tierTypeData = Tier.raw(nil, tierTypeValue)
+		if tierTypeData then
+			table.insert(tierTypeHeaderCells, TableWidgets.CellHeader{
+				children = Tier.displaySingle(tierTypeData, {link = true, short = true})
+			})
 		end
 	end
 
@@ -178,7 +176,7 @@ function StatisticsPortal._coverageTournamentTableHeader(args)
 end
 
 --[[
-Section: Prizepool Breakdown
+Section: Utility Functions
 ]]--
 
 ---@param args table
