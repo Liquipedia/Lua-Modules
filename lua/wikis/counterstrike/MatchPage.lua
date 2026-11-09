@@ -318,7 +318,20 @@ function MatchPage._renderPlayerPerformance(player)
 		and Link{link = player.player, children = player.displayName}
 		or player.displayName
 
+	-- Rar can be both positive and negative
+	local formatSigned = function(value, numberOfDecimals)
+		if not value then
+			return nil
+		end
+		local formatted = formatNumbers(value, numberOfDecimals)
+		return value > 0 and ('+' .. formatted) or formatted
+	end
+
 	local playerStats = {
+		PlayerStat{
+			title = {IconFa{iconName = 'points'}, 'Rating'},
+			data = player.rating and formatNumbers(player.rating, 2) or nil
+		},
 		PlayerStat{
 			title = {IconFa{iconName = 'kda'}, 'KDA'},
 			data = Array.interleave({player.kills, player.deaths, player.assists}, SPAN_SLASH)
@@ -328,26 +341,16 @@ function MatchPage._renderPlayerPerformance(player)
 			data = player.adr and formatNumbers(player.adr, 1) or nil
 		},
 		PlayerStat{
-			title = {IconFa{iconName = 'headshot'}, 'HS%'},
-			data = player.hs and (formatNumbers(player.hs, 1) .. '%') or nil
-		},
-		PlayerStat{
-			title = {IconFa{iconName = 'firstkill'}, 'FK / FD'},
-			data = {player.firstKills, SPAN_SLASH, player.firstDeaths}
+			title = {IconFa{iconName = 'chart'}, 'RAR'},
+			data = formatSigned(player.rar, 1)
 		},
 		PlayerStat{
 			title = {IconFa{iconName = 'kast'}, 'KAST'},
 			data = player.kast and (formatNumbers(player.kast, 1) .. '%') or nil
 		},
 		PlayerStat{
-			title = {IconFa{iconName = 'kills'}, 'AWP'},
-			data = player.awpKills
-		},
-		PlayerStat{
-			-- 'substitute' is people-arrows: the nearest thing the icon set has
-			-- to an exchange, which is what a trade is.
-			title = {IconFa{iconName = 'substitute'}, 'TK / TD'},
-			data = {player.tradeKills, SPAN_SLASH, player.tradeDeaths}
+			title = {IconFa{iconName = 'firstkill'}, 'FK / FD'},
+			data = {player.firstKills, SPAN_SLASH, player.firstDeaths}
 		},
 	}
 

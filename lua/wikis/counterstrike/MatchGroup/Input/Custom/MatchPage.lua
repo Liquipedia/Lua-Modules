@@ -18,6 +18,8 @@ local NormalMapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 ---@field player string?
 ---@field displayName string
 ---@field steamid string?
+---@field rating number? Li-rating / L-Rating
+---@field rar number? rounds above replacement
 ---@field kills integer?
 ---@field deaths integer?
 ---@field assists integer?
@@ -40,6 +42,8 @@ local NormalMapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 ---@field headshot_count integer
 ---@field kast number
 ---@field average_damage_per_round number
+---@field l_rating number?
+---@field rar number?
 ---@field first_kill_count integer
 ---@field first_death_count integer
 ---@field rounds_won integer
@@ -75,11 +79,25 @@ local CustomMatchGroupInputMatchPage = {}
 
 -- Each map's stats live on their own on-wiki page, named from the id in the
 -- map's `nuselo=` parameter (api match checksum).
--- Placeholder while the module is developed; ideally proper API
-local MATCH_STATS_PAGE_PREFIX = 'Data:Nuselo_'
+-- Placeholder while the module is developed; ideally proper API.
+-- THIS IS TEMPORARY, but I can dev create module pages as json without
+-- Needing every single page getting changed
+local MATCH_STATS_PAGE_PREFIXES = {'Module:NuseloData/', 'Data:Nuselo_'}
 
 -- Crosswalk of steamid -> Liquipedia player page name. Shared across matches.
-local STEAMID_CROSSWALK_PAGE = 'Data:Cs2SteamIdCrosswalk.json'
+local STEAMID_CROSSWALK_PAGES = {'Data:Cs2SteamIdCrosswalk.json'}
+
+---Load first item
+---@param pageNames string[]
+---@return table?, string?
+local function loadFirstJson(pageNames)
+	for _, pageName in ipairs(pageNames) do
+		local success, data = pcall(mw.loadJsonData, pageName)
+		if success and data then
+			return data, pageName
+		end
+	end
+end
 
 local CS_MAP_NAMES = {
 	de_dust2 = 'Dust II',
@@ -133,9 +151,11 @@ function CustomMatchGroupInputMatchPage.parseWinReason(endReason)
 end
 
 ---@param statsId string|number
----@return string
-function CustomMatchGroupInputMatchPage.getStatsPageName(statsId)
-	return MATCH_STATS_PAGE_PREFIX .. statsId .. '.json'
+---@return string[]
+function CustomMatchGroupInputMatchPage.getStatsPageNames(statsId)
+	return Array.map(MATCH_STATS_PAGE_PREFIXES, function(prefix)
+		return prefix .. statsId .. '.json'
+	end)
 end
 
 ---Stats for one map, or nil when the page does not exist yet.
@@ -146,10 +166,10 @@ end
 ---@param statsId string|number
 ---@return MatchStatsMap?
 function CustomMatchGroupInputMatchPage.fetchMapStats(statsId)
-	local pageName = CustomMatchGroupInputMatchPage.getStatsPageName(statsId)
-	local success, mapStats = pcall(mw.loadJsonData, pageName)
-	if not success or not mapStats then
-		mw.log('No match stats at ' .. pageName .. ' - falling back to the manually entered map')
+	local pageNames = CustomMatchGroupInputMatchPage.getStatsPageNames(statsId)
+	local mapStats = loadFirstJson(pageNames)
+	if not mapStats then
+		mw.log('No match stats at ' .. table.concat(pageNames, ' or ') .. ' - falling back to the manually entered map')
 		return nil
 	end
 	return mapStats
@@ -157,11 +177,7 @@ end
 
 ---@return table<string, string>
 function CustomMatchGroupInputMatchPage.getSteamIdCrosswalk()
-	local success, crosswalk = pcall(mw.loadJsonData, STEAMID_CROSSWALK_PAGE)
-	if not success then
-		return {}
-	end
-	return crosswalk or {}
+	return loadFirstJson(STEAMID_CROSSWALK_PAGES) or {}
 end
 
 ---Resolves a steamid to a Liquipedia player page via the crosswalk. Falls back
@@ -387,6 +403,8 @@ function CustomMatchGroupInputMatchPage.getPlayersOfMapOpponent(map, opponent, o
 				player = resolved.player,
 				displayName = resolved.displayName,
 				steamid = participant.steam_id and tostring(participant.steam_id) or nil,
+				rating = participant.l_rating,
+				rar = participant.rar,
 				kills = participant.kill_count,
 				deaths = participant.death_count,
 				assists = participant.assist_count,

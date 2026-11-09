@@ -137,6 +137,8 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, opponentIndex, play
 		displayName = firstEntry.displayName,
 		kills = sumOf('kills'),
 		deaths = sumOf('deaths'),
+		rating = averageOf('rating'),
+		rar = averageOf('rar') and sumOf('rar') or nil,
 		assists = sumOf('assists'),
 		adr = averageOf('adr'),
 		hs = averageOf('hs'),
