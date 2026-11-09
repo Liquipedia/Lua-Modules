@@ -13,32 +13,21 @@ local Logic = Lua.import('Module:Logic')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
-
----@param name string? # Nil for an unnamed parameter
----@param value (string|number|boolean)?
----@return Renderable
-local function Para(name, value)
-	-- Same markup as Template:Para
-	local text = value ~= nil and mw.text.nowiki(tostring(value)) or nil
-	return Html.Code{
-		classes = {'nowrap'},
-		children = name and {'&#124;', name, '&#61;', text} or {'&#124;', text},
-	}
-end
+local Para = Lua.import('Module:Widget/Documentation/Para')
 
 ---@param parameter ArgSchemaParameter
 ---@return Renderable[]
 local function ParameterNames(parameter)
 	if ArgSchema.isUnnamed(parameter) then
-		return {Para(nil, parameter.example)}
+		return {Para{value = parameter.example}}
 	end
 	local value = Logic.nilOr(parameter.default, parameter.example)
 	local names = Array.map(ArgSchema.displayNames(parameter), function(variants)
 		local paras = Array.map(variants, function(variant, index)
 			if index > 1 then
-				return Para(variant)
+				return Para{name = variant}
 			end
-			return Para(variant, value)
+			return Para{name = variant, value = value}
 		end)
 		if #variants > 1 then
 			table.insert(paras, '…')

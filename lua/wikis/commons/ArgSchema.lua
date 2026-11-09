@@ -13,6 +13,7 @@ local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
 
 ---Declares the parameters of a template once, for reading them and for their documentation.
 local ArgSchema = {}
@@ -44,8 +45,8 @@ local TYPES = {
 	number = {read = function(input) return tonumber(input) end, expected = 'a number'},
 	nonNegativeInteger = {
 		read = function(input)
-			local value = tonumber(input)
-			return value and value >= 0 and value == math.floor(value) and value or nil
+			local value = MathUtil.toInteger(input)
+			return value and value >= 0 and value or nil
 		end,
 		expected = 'a non-negative integer',
 	},
@@ -60,12 +61,6 @@ local TYPES = {
 }
 
 local PLACEHOLDER = '{%w+}'
-
----@param input any
----@return boolean
-local function isGiven(input)
-	return input ~= nil and input ~= ''
-end
 
 ---@param name string
 ---@return boolean
@@ -110,7 +105,7 @@ local function readIndexed(parameter, args, options)
 	Array.forEach(allNames(parameter), function(name)
 		if not isIndexed(name) then
 			local index = options.defaultIndex
-			if index and inputs[index] == nil and isGiven(args[name]) then
+			if index and inputs[index] == nil and Logic.isNotEmpty(args[name]) then
 				inputs[index] = {name = name, input = args[name]}
 			end
 			return
@@ -119,7 +114,7 @@ local function readIndexed(parameter, args, options)
 		for key, input in pairs(args) do
 			-- Unnamed parameters have number keys
 			local index = tonumber(tostring(key):match(pattern))
-			if index and inputs[index] == nil and isGiven(input) then
+			if index and inputs[index] == nil and Logic.isNotEmpty(input) then
 				inputs[index] = {name = key, input = input}
 			end
 		end
@@ -136,7 +131,7 @@ end
 ---@return any
 local function readSingle(parameter, args)
 	local name = Array.find(allNames(parameter), function(candidate)
-		return isGiven(args[candidate])
+		return Logic.isNotEmpty(args[candidate])
 	end)
 	local value
 	if name then
