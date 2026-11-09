@@ -102,7 +102,7 @@ function StandingTableLegacyNext.build(args, tableType)
 		StandingTableLegacyNext.getStandardParameter(args, opponents, tableType),
 		{
 			bg = StandingTableLegacyNext.parseBgs(args, opponentCount),
-			format = StandingTableLegacyNext.readFormat(args, opponentCount, #matchRecords),
+			format = StandingTableLegacyNext.readFormat(args, opponentCount, #matchRecords, roundCount),
 		},
 		rounds,
 		opponents,
@@ -130,20 +130,50 @@ function StandingTableLegacyNext.getStandardParameter(args, opponents, tableType
 	})
 end
 
----Maps `structure` to `format`, inferring it as in legacy if unset. Only GSL is supported, as legacy
----`swiss-<N>` is classic swiss, not the esports swiss of `format=swiss<N>`.
+---Maps `structure` to `format`, inferring it as in legacy if unset. Legacy `swiss-<N>` is classic swiss.
 ---@param args table
 ---@param opponentCount integer
 ---@param matchCount integer
+---@param roundCount integer
 ---@return string?
-function StandingTableLegacyNext.readFormat(args, opponentCount, matchCount)
+function StandingTableLegacyNext.readFormat(args, opponentCount, matchCount, roundCount)
 	local structure = args.structure
-	if not structure then
-		return (opponentCount == 4 and matchCount == 5) and 'gsl' or nil
+		or StandingTableLegacyNext.inferStructure(opponentCount, matchCount, roundCount)
+	if structure == 'gsl' then
+		return 'gsl'
+	elseif structure == 'other' then
+		return nil
 	end
-	assert(structure == 'gsl' or structure == 'other' or structure:match('swiss%-%d+')
-		or structure:match('roundRobin%-%d+'), 'Invalid structure: ' .. structure)
-	return structure == 'gsl' and 'gsl' or nil
+	local rounds = structure:match('swiss%-(%d+)')
+	if rounds then
+		return '{"1":"classicswiss","rounds":' .. rounds .. '}'
+	end
+	local cycles = structure:match('roundRobin%-(%d+)')
+	assert(cycles, 'Invalid structure: ' .. structure)
+	return '{"1":"roundrobin","cycles":' .. cycles .. '}'
+end
+
+---4 opponents with 5 matches are a GSL group, whole cycles of matches a round robin
+---and one match per pair of opponents in every round a classic swiss.
+---@param opponentCount integer
+---@param matchCount integer
+---@param roundCount integer
+---@return string
+function StandingTableLegacyNext.inferStructure(opponentCount, matchCount, roundCount)
+	if opponentCount == 4 and matchCount == 5 then
+		return 'gsl'
+	end
+	if matchCount == 0 then
+		return 'other'
+	end
+	local cycleMatchCount = opponentCount * (opponentCount - 1) / 2
+	if opponentCount >= 2 and matchCount % cycleMatchCount == 0 then
+		return 'roundRobin-' .. math.floor(matchCount / cycleMatchCount)
+	end
+	if opponentCount * roundCount == 2 * matchCount then
+		return 'swiss-' .. roundCount
+	end
+	return 'other'
 end
 
 ---With any of `win_p`, `tie_p` and `lose_p` set, the unset ones are 0. Without them, a win is 3 points and
