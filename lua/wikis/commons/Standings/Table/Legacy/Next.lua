@@ -66,6 +66,8 @@ local ADJUSTMENTS = {
 
 local MATCH_RESULTS = {matchwins = 'w', matchdraws = 'd', matchlosses = 'l'}
 
+local ROUND_ROBIN_SHORTHANDS = {'srr', 'drr'}
+
 ---Module:SwissTableLeague/next
 ---@param frame Frame
 ---@return Renderable
@@ -148,9 +150,9 @@ function StandingTableLegacyNext.readFormat(args, opponentCount, matchCount, rou
 	if rounds then
 		return '{"1":"classicswiss","rounds":' .. rounds .. '}'
 	end
-	local cycles = structure:match('roundRobin%-(%d+)')
+	local cycles = tonumber(structure:match('roundRobin%-(%d+)'))
 	assert(cycles, 'Invalid structure: ' .. structure)
-	return '{"1":"roundrobin","cycles":' .. cycles .. '}'
+	return ROUND_ROBIN_SHORTHANDS[cycles] or ('{"1":"roundrobin","cycles":' .. cycles .. '}')
 end
 
 ---4 opponents with 5 matches are a GSL group, whole cycles of matches a round robin

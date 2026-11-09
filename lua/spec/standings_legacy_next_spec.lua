@@ -128,12 +128,13 @@ describe('Standings Legacy Next', function()
 
 		it('maps the structures to formats', function()
 			assert.are_equal('gsl', StandingTableLegacyNext.readFormat({structure = 'gsl'}, 8, 0, 1))
-			assert.are_equal('{"1":"roundrobin","cycles":2}',
-				StandingTableLegacyNext.readFormat({structure = 'roundRobin-2'}, 4, 5, 1))
+			assert.are_equal('drr', StandingTableLegacyNext.readFormat({structure = 'roundRobin-2'}, 4, 5, 1))
+			assert.are_equal('{"1":"roundrobin","cycles":3}',
+				StandingTableLegacyNext.readFormat({structure = 'roundRobin-3'}, 4, 5, 1))
 			assert.are_equal('{"1":"classicswiss","rounds":3}',
 				StandingTableLegacyNext.readFormat({structure = 'swiss-3'}, 4, 5, 1))
 			assert.is_nil(StandingTableLegacyNext.readFormat({structure = 'other'}, 4, 5, 1))
-			assert.are_equal('{"1":"roundrobin","cycles":1}', StandingTableLegacyNext.readFormat({}, 4, 6, 3))
+			assert.are_equal('srr', StandingTableLegacyNext.readFormat({}, 4, 6, 3))
 			assert.is_nil(StandingTableLegacyNext.readFormat({}, 8, 10, 3))
 		end)
 
@@ -149,6 +150,7 @@ describe('Standings Legacy Next', function()
 			end
 			assert.are_same({type = 'swiss', winsToAdvance = 2, lossesToEliminate = 2}, parse(4, 5, 1))
 			assert.are_same({type = 'roundrobin', cycles = 2}, parse(6, 30, 1))
+			assert.are_same({type = 'roundrobin', cycles = 3}, parse(4, 18, 1))
 			assert.are_same({type = 'classicswiss', rounds = 3}, parse(8, 12, 3))
 		end)
 	end)
