@@ -16,8 +16,10 @@ local Game = Lua.import('Module:Game')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Math = Lua.import('Module:MathUtil')
 local Logic = Lua.import('Module:Logic')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+
+local Util = Lua.import('Module:PortalStatistics/Util')
+
 local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
@@ -30,22 +32,21 @@ local ColumnName = Condition.ColumnName
 
 local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, displayCurrencyCode = false, formatValue = true}
 local TIMESTAMP = DateExt.getCurrentTimestamp()
-local CURRENT_YEAR = DateExt.getYearOf()
 local DATE = DateExt.toYmdInUtc(TIMESTAMP)
 local MAX_QUERY_LIMIT = 5000
 local US_DOLLAR = 'USD'
 
-local StatisticsPortal = {}
+local PrizepoolBreakdown = {}
 
 
 ---@param args table?
 ---@return Renderable
-function StatisticsPortal.prizepoolBreakdown(args)
+function PrizepoolBreakdown.prizepoolBreakdown(args)
 	args = args or {}
 	args.showAverage = Logic.readBool(args.showAverage)
 	args.startYear = tonumber(args.startYear) or Info.startYear
 
-	local yearTable, defaultYearTable = StatisticsPortal._returnCustomYears(args)
+	local yearTable, defaultYearTable = Util.returnCustomYears(args)
 	local rowLimit = Math.round(((Logic.readBool(args.showAverage) and 1 or 0) + 1 + Table.size(yearTable)) / 2)
 
 	local tables = {}
@@ -69,7 +70,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 	local colIndex = 1
 
 	for _, yearValue in pairs(defaultYearTable) do
-		local conditions = StatisticsPortal._returnBaseConditions()
+		local conditions = Util.returnBaseConditions()
 
 		if args.game then
 			local gameIdentifier = Game.toIdentifier{game = args.game, useDefault = false} or args.game
@@ -93,7 +94,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 
 		if Array.any(Array.extractValues(yearTable), function(value) return value == yearValue end) then
 			table.insert(headerCells, TableWidgets.CellHeader{
-				children = StatisticsPortal._returnCustomYearText(prevYear, yearValue)
+				children = Util.returnCustomYearText(prevYear, yearValue)
 			})
 			table.insert(resultCells, TableWidgets.Cell{
 				children = Currency.display(US_DOLLAR, prizepoolSum or 0, CURRENCY_FORMAT_OPTIONS)
@@ -109,7 +110,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 		end
 	end
 
-	local conditions = StatisticsPortal._returnBaseConditions()
+	local conditions = Util.returnBaseConditions()
 
 	if args.game then
 		local gameIdentifier = Game.toIdentifier{game = args.game, useDefault = false} or args.game
@@ -159,54 +160,4 @@ function StatisticsPortal.prizepoolBreakdown(args)
 	return Html.Div{children = wrapperChildren}
 end
 
----@return ConditionTree
-function StatisticsPortal._returnBaseConditions()
-	return ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'cancelled')}
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'delayed')}
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'postponed')}
-		:add{ConditionNode(ColumnName('prizepool'), Comparator.neq, '')}
-		:add{ConditionNode(ColumnName('prizepool'), Comparator.neq, '0')}
-end
-
----@param input string|table|nil
----@param default table?
----@return table
-function StatisticsPortal._isTableOrSplitOrDefault(input, default)
-	if type(input) == 'table' then
-		return input
-	elseif String.isEmpty(input) then
-		return default or {}
-	end
-	return Array.parseCommaSeparatedString(input)
-end
-
----@param args table
----@return table, table
-function StatisticsPortal._returnCustomYears(args)
-	args.startYear = tonumber(args.startYear) or Info.startYear
-	local yearTable
-	local defaultYearTable = Array.range(args.startYear, CURRENT_YEAR)
-	if String.isNotEmpty(args.customYears) then
-		yearTable = Array.map(
-			StatisticsPortal._isTableOrSplitOrDefault(args.customYears),
-			function(tier)
-				return tonumber(tier)
-			end
-		)
-		table.insert(yearTable, CURRENT_YEAR)
-		return yearTable, defaultYearTable
-	else
-		return defaultYearTable, defaultYearTable
-	end
-end
-
----@param prevYear number
----@param yearValue number
----@return string|number
-function StatisticsPortal._returnCustomYearText(prevYear, yearValue)
-	return (prevYear == yearValue) and yearValue or
-		'\'' .. (string.sub(prevYear, 3, 4) .. '-' .. string.sub(yearValue, 3, 4))
-end
-
-return Class.export(StatisticsPortal, {exports = {'prizepoolBreakdown'}})
+return Class.export(PrizepoolBreakdown, {exports = {'prizepoolBreakdown'}})

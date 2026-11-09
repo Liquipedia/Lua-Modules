@@ -13,9 +13,10 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
 local Lpdb = Lua.import('Module:Lpdb')
 local Logic = Lua.import('Module:Logic')
-local String = Lua.import('Module:StringUtils')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+
+local PlayerData = Lua.import('Module:PortalStatistics/PlayerData')
 
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
@@ -29,12 +30,12 @@ local ConditionUtil = Condition.Util
 
 local LANG = mw.getContentLanguage()
 
-local StatisticsPortal = {}
+local PlayerAgeTable = {}
 
 
 ---@param args table?
 ---@return Renderable
-function StatisticsPortal.playerAgeTable(args)
+function PlayerAgeTable.playerAgeTable(args)
 	args = args or {}
 	args.earnings = tonumber(args.earnings) or 500
 	args.limit = tonumber(args.limit) or 20
@@ -67,7 +68,7 @@ function StatisticsPortal.playerAgeTable(args)
 		end)
 	))
 
-	local playerData = StatisticsPortal._getPlayers(args.limit, conditions:toString(), args.order)
+	local playerData = PlayerData.getPlayers(args.limit, conditions:toString(), args.order)
 
 	local tableHeader = TableWidgets.Row{
 		children = {
@@ -83,7 +84,7 @@ function StatisticsPortal.playerAgeTable(args)
 
 		return TableWidgets.Row{children = {
 			TableWidgets.Cell{children = OpponentDisplay.BlockOpponent{
-				opponent = StatisticsPortal._toOpponent(player),
+				opponent = PlayerData.toOpponent(player),
 				showPlayerTeam = true,
 			}},
 			TableWidgets.Cell{children = LANG:formatDuration(ageInSeconds, {'years', 'days'})}
@@ -105,45 +106,4 @@ end
 Section: Query Functions
 ]]--
 
----Executes a given LPDB query using Lpdb.executeMassQuery
----@param tableName string Name of the table
----@param parameters table Query parameters
----@return table
-function StatisticsPortal._massQuery(tableName, parameters)
-	local data = {}
-
-	Lpdb.executeMassQuery(tableName, parameters, function (item)
-		table.insert(data, item)
-	end, parameters.limit)
-
-	return data
-end
-
----@param limit number?
----@param addConditions string|AbstractConditionNode?
----@param addOrder string?
----@return table
-function StatisticsPortal._getPlayers(limit, addConditions, addOrder)
-	return StatisticsPortal._massQuery('player', {
-		query = 'pagename, id, nationality, earnings, birthdate, team, earningsbyyear',
-		conditions = addConditions and tostring(addConditions) or '',
-		order = addOrder,
-		limit = limit,
-	})
-end
-
----@param player table
----@return table
-function StatisticsPortal._toOpponent(player)
-	return {
-		type = Opponent.solo,
-		players = {{
-			pageName = player.pagename,
-			displayName = player.id,
-			flag = player.nationality,
-			team = String.isNotEmpty(player.team) and player.team or nil,
-		}},
-	}
-end
-
-return Class.export(StatisticsPortal, {exports = {'playerAgeTable'}})
+return Class.export(PlayerAgeTable, {exports = {'playerAgeTable'}})

@@ -15,11 +15,11 @@ local CoverageTournamentTable = Lua.import('Module:PortalStatistics/CoverageTour
 local Box = Lua.import('Module:Widget/Basic/Box')
 local Html = Lua.import('Module:Widget/Html')
 
-local StatisticsPortal = {}
+local CoverageStatistics = {}
 
 ---@param args table?
 ---@return VNode
-function StatisticsPortal.coverageStatistics(args)
+function CoverageStatistics.coverageStatistics(args)
 	args = args or {}
 	args.alignSide = Logic.readBool(args.alignSide)
 
@@ -40,4 +40,4 @@ function StatisticsPortal.coverageStatistics(args)
 	end
 end
 
-return Class.export(StatisticsPortal, {exports = {'coverageStatistics'}})
+return Class.export(CoverageStatistics, {exports = {'coverageStatistics'}})

@@ -13,11 +13,11 @@ local ChartHelper = Lua.import('Module:PortalStatistics/ChartHelper')
 
 local MODES = {'solo', 'team', 'other'}
 
-local StatisticsPortal = {}
+local ModeEarningsChart = {}
 
 ---@param args table?
 ---@return Renderable
-function StatisticsPortal.modeEarningsChart(args)
+function ModeEarningsChart.modeEarningsChart(args)
 	args = args or {}
 
 	local params = {
@@ -33,4 +33,4 @@ function StatisticsPortal.modeEarningsChart(args)
 	return ChartHelper.buildChartData(config, yearSeriesData, config.customLegend, true)
 end
 
-return Class.export(StatisticsPortal, {exports = {'modeEarningsChart'}})
+return Class.export(ModeEarningsChart, {exports = {'modeEarningsChart'}})

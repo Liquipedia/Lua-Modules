@@ -27,12 +27,12 @@ local ColumnName = Condition.ColumnName
 local CURRENT_YEAR = DateExt.getYearOf()
 local MAX_QUERY_LIMIT = 5000
 
-local StatisticsPortal = {}
+local TopEarningsChart = {}
 
 
 ---@param args table?
 ---@return Renderable
-function StatisticsPortal.topEarningsChart(args)
+function TopEarningsChart.topEarningsChart(args)
 	args = args or {}
 	args.limit = tonumber(args.limit) or 10
 	args.startYear = tonumber(args.year)
@@ -44,7 +44,7 @@ function StatisticsPortal.topEarningsChart(args)
 	}
 
 	local config = ChartHelper.getChartConfig(args, params)
-	local topEarningsList = StatisticsPortal._getOpponentEarningsData(args, config)
+	local topEarningsList = TopEarningsChart._getOpponentEarningsData(args, config)
 
 	local yearSeriesData = Array.mapRange(config.startYear, tonumber(args.year) or CURRENT_YEAR, function(year)
 		return Array.map(Array.reverse(topEarningsList), function(teamData)
@@ -92,7 +92,7 @@ Section: Query Functions
 ---@param args table
 ---@param config table
 ---@return table
-function StatisticsPortal._getOpponentEarningsData(args, config)
+function TopEarningsChart._getOpponentEarningsData(args, config)
 	local opponentType = config.opponentType == Opponent.team and 'team' or 'player'
 	local queryFields
 	if opponentType == Opponent.team then
@@ -139,4 +139,4 @@ function StatisticsPortal._getOpponentEarningsData(args, config)
 	return Array.sub(data, 1, args.limit)
 end
 
-return Class.export(StatisticsPortal, {exports = {'topEarningsChart'}})
+return Class.export(TopEarningsChart, {exports = {'topEarningsChart'}})

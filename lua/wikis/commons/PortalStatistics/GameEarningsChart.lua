@@ -10,23 +10,18 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
-local Info = Lua.import('Module:Info', {loadData = true})
-local Table = Lua.import('Module:Table')
 
 local ChartHelper = Lua.import('Module:PortalStatistics/ChartHelper')
+local Util = Lua.import('Module:PortalStatistics/Util')
 
-local GAMES = Array.map(Array.extractValues(Info.games, Table.iter.spairs), function(value)
-	return value.name
-end)
-
-local StatisticsPortal = {}
+local GameEarningsChart = {}
 
 ---@param args table?
 ---@return Renderable
-function StatisticsPortal.gameEarningsChart(args)
+function GameEarningsChart.gameEarningsChart(args)
 	args = args or {}
 
-	local games = Array.map(ChartHelper.isTableOrSplitOrDefault(args.customGames, GAMES), function(game)
+	local games = Array.map(Util.isTableOrSplitOrDefault(args.customGames, Util.GAMES), function(game)
 		return Game.toIdentifier{game = game, useDefault = false} or game
 	end)
 
@@ -43,4 +38,4 @@ function StatisticsPortal.gameEarningsChart(args)
 	return ChartHelper.buildChartData(config, yearSeriesData, config.customLegend, true)
 end
 
-return Class.export(StatisticsPortal, {exports = {'gameEarningsChart'}})
+return Class.export(GameEarningsChart, {exports = {'gameEarningsChart'}})

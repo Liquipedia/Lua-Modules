@@ -21,6 +21,9 @@ local Table = Lua.import('Module:Table')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
+local PlayerData = Lua.import('Module:PortalStatistics/PlayerData')
+local Util = Lua.import('Module:PortalStatistics/Util')
+
 local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -44,17 +47,17 @@ local MAX_PLAYERS_PER_PLACEMENT = Info.config.defaultMaxPlayersPerPlacement or 1
 local MAX_QUERY_LIMIT = 5000
 local PLAYER_BATCH_SIZE = 5
 
-local StatisticsPortal = {}
+local EarningsTable = {}
 
 
 ---@param args table?
 ---@return Renderable
-function StatisticsPortal.earningsTable(args)
+function EarningsTable.earningsTable(args)
 	args = args or {}
 	args.limit = tonumber(args.limit) or 20
 	args.opponentType = args.opponentType == Opponent.solo and Opponent.solo or Opponent.team
 	args.displayShowMatches = Logic.readBool(args.displayShowMatches)
-	args.allowedPlacements = StatisticsPortal._isTableOrSplitOrDefault(
+	args.allowedPlacements = Util.isTableOrSplitOrDefault(
 		args.allowedPlacements,
 		DEFAULT_ALLOWED_PLACES
 	)
@@ -80,9 +83,9 @@ function StatisticsPortal.earningsTable(args)
 	local opponentData
 
 	if args.opponentType == Opponent.team then
-		opponentData = StatisticsPortal._getTeams(queryLimit, tostring(earningsCondition), queryOrder)
+		opponentData = EarningsTable._getTeams(queryLimit, tostring(earningsCondition), queryOrder)
 	elseif args.opponentType == Opponent.solo then
-		opponentData = StatisticsPortal._getPlayers(
+		opponentData = PlayerData.getPlayers(
 			queryLimit,
 			ConditionTree(BooleanOperator.all):add{
 				earningsCondition,
@@ -106,7 +109,7 @@ function StatisticsPortal.earningsTable(args)
 		table.insert(displayedOpponents, opponent)
 	end
 
-	local opponentPlacements = StatisticsPortal._cacheOpponentPlacementData(args, displayedOpponents)
+	local opponentPlacements = EarningsTable._cacheOpponentPlacementData(args, displayedOpponents)
 
 	local tableRow = {}
 	for opponentIndex, opponent in ipairs(displayedOpponents) do
@@ -120,19 +123,19 @@ function StatisticsPortal.earningsTable(args)
 			}
 		else
 			opponentDisplay = OpponentDisplay.BlockOpponent{
-				opponent = StatisticsPortal._toOpponent(opponent),
+				opponent = PlayerData.toOpponent(opponent),
 			}
 		end
 		local placements = opponentPlacements[opponent.pagename] or {}
 		table.insert(tableRow,
-			StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay))
+			EarningsTable._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay))
 	end
 
 	return TableWidgets.Table{
 		sortable = true,
 		css = {['margin-left'] = '0px', ['margin-right'] = 'auto', width = '100%'},
 		children = {
-			TableWidgets.TableHeader{children = StatisticsPortal._earningsTableHeader(args)},
+			TableWidgets.TableHeader{children = EarningsTable._earningsTableHeader(args)},
 			TableWidgets.TableBody{children = tableRow}
 		}
 	}
@@ -143,38 +146,12 @@ end
 Section: Query Functions
 ]]--
 
----@param tableName string Name of the table
----@param parameters table Query parameters
----@return table
-function StatisticsPortal._massQuery(tableName, parameters)
-	local data = {}
-
-	Lpdb.executeMassQuery(tableName, parameters, function (item)
-		table.insert(data, item)
-	end, parameters.limit)
-
-	return data
-end
-
----@param limit number?
----@param addConditions string|AbstractConditionNode?
----@param addOrder string?
----@return table
-function StatisticsPortal._getPlayers(limit, addConditions, addOrder)
-	return StatisticsPortal._massQuery('player', {
-		query = 'pagename, id, nationality, earnings, birthdate, team, earningsbyyear',
-		conditions = addConditions and tostring(addConditions) or '',
-		order = addOrder,
-		limit = limit,
-	})
-end
-
 ---@param limit number?
 ---@param addConditions string?
 ---@param addOrder string?
 ---@return table
-function StatisticsPortal._getTeams(limit, addConditions, addOrder)
-	return StatisticsPortal._massQuery('team', {
+function EarningsTable._getTeams(limit, addConditions, addOrder)
+	return Util.massQuery('team', {
 		query = 'pagename, name, template, earnings, earningsbyyear',
 		conditions = addConditions or '',
 		order = addOrder,
@@ -184,7 +161,7 @@ end
 
 ---@param args table
 ---@return ConditionTree
-function StatisticsPortal._basePlacementConditions(args)
+function EarningsTable._basePlacementConditions(args)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier')}
 		:add{ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0)}
@@ -207,7 +184,7 @@ end
 ---@param args table
 ---@param displayedOpponents table[]
 ---@return table
-function StatisticsPortal._cacheOpponentPlacementData(args, displayedOpponents)
+function EarningsTable._cacheOpponentPlacementData(args, displayedOpponents)
 	if Logic.isEmpty(displayedOpponents) then
 		return {}
 	end
@@ -224,9 +201,9 @@ function StatisticsPortal._cacheOpponentPlacementData(args, displayedOpponents)
 			end
 		end
 
-		StatisticsPortal._queryPlacements(
+		EarningsTable._queryPlacements(
 			args,
-			StatisticsPortal._basePlacementConditions(args):add{opponentConditions},
+			EarningsTable._basePlacementConditions(args):add{opponentConditions},
 			data
 		)
 		return data
@@ -256,9 +233,9 @@ function StatisticsPortal._cacheOpponentPlacementData(args, displayedOpponents)
 		end
 
 		-- Only credit the players of this batch, a placement of several players can show up in multiple batches
-		StatisticsPortal._queryPlacements(
+		EarningsTable._queryPlacements(
 			args,
-			StatisticsPortal._basePlacementConditions(args):add{playerConditions},
+			EarningsTable._basePlacementConditions(args):add{playerConditions},
 			data,
 			isInBatch
 		)
@@ -271,7 +248,7 @@ end
 ---@param conditions ConditionTree
 ---@param data table
 ---@param opponentFilter table<string, boolean>?
-function StatisticsPortal._queryPlacements(args, conditions, data, opponentFilter)
+function EarningsTable._queryPlacements(args, conditions, data, opponentFilter)
 	local queryFields = 'pagename, shortname, icon, icondark, liquipediatier, liquipediatiertype, placement, '
 	if args.opponentType == Opponent.solo then
 		queryFields = queryFields .. 'opponentplayers, opponenttype'
@@ -336,7 +313,7 @@ Section: Display Functions
 
 ---@param args table
 ---@return Renderable
-function StatisticsPortal._earningsTableHeader(args)
+function EarningsTable._earningsTableHeader(args)
 	local columnText = args.opponentType == Opponent.team and 'Organization' or 'Player'
 
 	return TableWidgets.Row{
@@ -361,7 +338,7 @@ end
 ---@param opponentIndex number
 ---@param opponentDisplay Renderable
 ---@return Renderable
-function StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay)
+function EarningsTable._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay)
 	return TableWidgets.Row{
 		css = {['line-height'] = '25px', ['text-align'] = 'center'},
 		children = WidgetUtil.collect(
@@ -369,7 +346,7 @@ function StatisticsPortal._earningsTableRow(args, placements, earnings, opponent
 			TableWidgets.Cell{align = 'left', children = opponentDisplay},
 			TableWidgets.Cell{
 				nowrap = false,
-				children = StatisticsPortal._achievementsDisplay(placements.sWinData, args.maxAchievements)
+				children = EarningsTable._achievementsDisplay(placements.sWinData, args.maxAchievements)
 			},
 			TableWidgets.Cell{children = placements['1'] or '0'},
 			TableWidgets.Cell{children = placements['2'] or '0'},
@@ -383,7 +360,7 @@ end
 ---@param data table
 ---@param maxAchievements integer?
 ---@return string
-function StatisticsPortal._achievementsDisplay(data, maxAchievements)
+function EarningsTable._achievementsDisplay(data, maxAchievements)
 	if not data or #data == 0 then
 		return ''
 	end
@@ -409,30 +386,4 @@ function StatisticsPortal._achievementsDisplay(data, maxAchievements)
 	return table.concat(output)
 end
 
----@param player table
----@return table
-function StatisticsPortal._toOpponent(player)
-	return {
-		type = Opponent.solo,
-		players = {{
-			pageName = player.pagename,
-			displayName = player.id,
-			flag = player.nationality,
-			team = String.isNotEmpty(player.team) and player.team or nil,
-		}},
-	}
-end
-
----@param input string|table|nil
----@param default table?
----@return table
-function StatisticsPortal._isTableOrSplitOrDefault(input, default)
-	if type(input) == 'table' then
-		return input
-	elseif String.isEmpty(input) then
-		return default or {}
-	end
-	return Array.parseCommaSeparatedString(input)
-end
-
-return Class.export(StatisticsPortal, {exports = {'earningsTable'}})
+return Class.export(EarningsTable, {exports = {'earningsTable'}})

@@ -12,10 +12,10 @@ local Class = Lua.import('Module:Class')
 local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
-local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+
+local Util = Lua.import('Module:PortalStatistics/Util')
 
 local Box = Lua.import('Module:Widget/Basic/Box')
 local Html = Lua.import('Module:Widget/Html')
@@ -34,15 +34,12 @@ local DATE = DateExt.toYmdInUtc(TIMESTAMP)
 local MAX_QUERY_LIMIT = 5000
 local US_DOLLAR = 'USD'
 local TYPES = {'Online', 'Offline'}
-local GAMES = Array.map(Array.extractValues(Info.games, Table.iter.spairs), function(value)
-	return value.name
-end)
 
-local StatisticsPortal = {}
+local PieChartBreakdown = {}
 
 ---@param args table?
 ---@return VNode
-function StatisticsPortal.pieChartBreakdown(args)
+function PieChartBreakdown.pieChartBreakdown(args)
 	args = args or {}
 	args.height = args.height or 300
 	args.width = args.width or 400
@@ -60,7 +57,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 			},
 			children = {
 				'Tournament Type',
-				StatisticsPortal._getPieChartData(
+				PieChartBreakdown._getPieChartData(
 					args, 'type', 'Mixed', TYPES
 				),
 			},
@@ -68,7 +65,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 	}
 
 	if args.multiGame then
-		local games = Array.map(StatisticsPortal._isTableOrSplitOrDefault(args.customGames, GAMES), function(game)
+		local games = Array.map(Util.isTableOrSplitOrDefault(args.customGames, Util.GAMES), function(game)
 			return Game.toIdentifier{game = game, useDefault = false} or game
 		end)
 		table.insert(wrapperChildren, Html.Div{
@@ -79,7 +76,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 			},
 			children = {
 				'Game Breakdown',
-				StatisticsPortal._getPieChartData(args, 'game', 'Other', games),
+				PieChartBreakdown._getPieChartData(args, 'game', 'Other', games),
 			},
 		})
 	end
@@ -93,8 +90,8 @@ function StatisticsPortal.pieChartBreakdown(args)
 			},
 			children = {
 				'Mode Breakdown',
-				StatisticsPortal._getPieChartData(
-					args, 'mode', 'Other', StatisticsPortal._isTableOrSplitOrDefault(args.customModes, {'Team'})
+				PieChartBreakdown._getPieChartData(
+					args, 'mode', 'Other', Util.isTableOrSplitOrDefault(args.customModes, {'Team'})
 				),
 			},
 		})
@@ -111,7 +108,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 		return Html.Div{children = Box{children = wrapperChildren}}
 	end
 
-	local conditions = StatisticsPortal._returnBaseConditions()
+	local conditions = Util.returnBaseConditions()
 
 	if args.year then
 		conditions:add{ConditionTree(BooleanOperator.all):add{
@@ -166,7 +163,7 @@ end
 ---@param defaultValue string
 ---@param groupValues table
 ---@return Renderable
-function StatisticsPortal._getPieChartData(args, groupBy, defaultValue, groupValues)
+function PieChartBreakdown._getPieChartData(args, groupBy, defaultValue, groupValues)
 	-- Do not modify the passed in table, it can be a shared constant that is used by other charts on the same page
 	groupValues = Array.append(groupValues, defaultValue)
 	defaultValue = string.lower(defaultValue or '')
@@ -176,7 +173,7 @@ function StatisticsPortal._getPieChartData(args, groupBy, defaultValue, groupVal
 		prizes[value:lower()] = {name = value, value = 0}
 	end
 
-	local LPDBConditions = StatisticsPortal._returnBaseConditions()
+	local LPDBConditions = Util.returnBaseConditions()
 	LPDBConditions:add{ConditionNode(ColumnName('namespace'), Comparator.eq, 0)}
 
 	if args.year then
@@ -233,13 +230,13 @@ function StatisticsPortal._getPieChartData(args, groupBy, defaultValue, groupVal
 		end)
 	end
 
-	return StatisticsPortal._drawPieChart(args, chartData)
+	return PieChartBreakdown._drawPieChart(args, chartData)
 end
 
 ---@param args table
 ---@param chartData table
 ---@return Renderable
-function StatisticsPortal._drawPieChart(args, chartData)
+function PieChartBreakdown._drawPieChart(args, chartData)
 	return Html.Div{
 		class = 'table-responsive',
 		children = mw.ext.Charts.piechart{
@@ -257,26 +254,4 @@ end
 Section: Utility Functions
 ]]--
 
----@return ConditionTree
-function StatisticsPortal._returnBaseConditions()
-	return ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'cancelled')}
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'delayed')}
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'postponed')}
-		:add{ConditionNode(ColumnName('prizepool'), Comparator.neq, '')}
-		:add{ConditionNode(ColumnName('prizepool'), Comparator.neq, '0')}
-end
-
----@param input string|table|nil
----@param default table?
----@return table
-function StatisticsPortal._isTableOrSplitOrDefault(input, default)
-	if type(input) == 'table' then
-		return input
-	elseif String.isEmpty(input) then
-		return default or {}
-	end
-	return Array.parseCommaSeparatedString(input)
-end
-
-return Class.export(StatisticsPortal, {exports = {'pieChartBreakdown'}})
+return Class.export(PieChartBreakdown, {exports = {'pieChartBreakdown'}})

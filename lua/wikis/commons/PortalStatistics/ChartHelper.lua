@@ -18,6 +18,8 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
+local Util = Lua.import('Module:PortalStatistics/Util')
+
 local Html = Lua.import('Module:Widget/Html')
 
 local Condition = Lua.import('Module:Condition')
@@ -36,44 +38,6 @@ local MAX_QUERY_LIMIT = 5000
 --- Shared helpers for the earnings charts of Module:PortalStatistics
 ---@class PortalStatisticsChartHelper
 local ChartHelper = {}
-
----@param input string|table|nil
----@param default table?
----@return table
-function ChartHelper.isTableOrSplitOrDefault(input, default)
-	if type(input) == 'table' then
-		return input
-	elseif String.isEmpty(input) then
-		return default or {}
-	end
-	return Array.parseCommaSeparatedString(input)
-end
-
----@param args table
----@return table, table
-function ChartHelper.returnCustomYears(args)
-	args.startYear = tonumber(args.startYear) or Info.startYear
-	local defaultYearTable = Array.range(args.startYear, CURRENT_YEAR)
-	if String.isNotEmpty(args.customYears) then
-		local yearTable = Array.map(
-			ChartHelper.isTableOrSplitOrDefault(args.customYears),
-			function(year)
-				return tonumber(year)
-			end
-		)
-		table.insert(yearTable, CURRENT_YEAR)
-		return yearTable, defaultYearTable
-	end
-	return defaultYearTable, defaultYearTable
-end
-
----@param prevYear number
----@param yearValue number
----@return string|number
-function ChartHelper.returnCustomYearText(prevYear, yearValue)
-	return (prevYear == yearValue) and yearValue or
-		'\'' .. (string.sub(prevYear, 3, 4) .. '-' .. string.sub(yearValue, 3, 4))
-end
 
 ---@param arrays table
 ---@return table
@@ -102,7 +66,7 @@ end
 ---@return table
 function ChartHelper.getChartConfig(args, params)
 	local isForTeam = String.isNotEmpty(args.team) or Logic.readBool(args.isForTeam)
-	local customInputs = ChartHelper.isTableOrSplitOrDefault(args.customInputs, params.defaultInputs)
+	local customInputs = Util.isTableOrSplitOrDefault(args.customInputs, params.defaultInputs)
 	local opponentName
 	if isForTeam then
 		opponentName = args.team
@@ -118,7 +82,7 @@ function ChartHelper.getChartConfig(args, params)
 		axisRotate = params.axisRotate or 0,
 		emphasis = params.emphasis or 'series',
 		customInputs = customInputs,
-		customLegend = ChartHelper.isTableOrSplitOrDefault(args.customLegend, customInputs),
+		customLegend = Util.isTableOrSplitOrDefault(args.customLegend, customInputs),
 		customYears = args.customYears,
 		startYear = args.startYear or Info.startYear,
 		yearBreakdown = Logic.readBool(args.yearBreakdown),
@@ -263,7 +227,7 @@ end
 ---@param transpose boolean?
 ---@return Renderable
 function ChartHelper.buildChartData(config, yearSeriesData, nonYearCategories, transpose)
-	local yearTable, defaultYearTable = ChartHelper.returnCustomYears(config)
+	local yearTable, defaultYearTable = Util.returnCustomYears(config)
 	local prevYear = config.startYear
 
 	local yearList = {}
@@ -274,7 +238,7 @@ function ChartHelper.buildChartData(config, yearSeriesData, nonYearCategories, t
 	for yearIndex, yearValue in pairs(defaultYearTable) do
 		earningsTable = ChartHelper.addArrays({earningsTable, yearSeriesData[yearIndex]})
 		if Array.any(Array.extractValues(yearTable), function(value) return value == yearValue end) then
-			local yearText = ChartHelper.returnCustomYearText(prevYear, yearValue)
+			local yearText = Util.returnCustomYearText(prevYear, yearValue)
 			table.insert(yearList, yearText)
 			table.insert(seriesData, earningsTable)
 			prevYear = yearValue + 1

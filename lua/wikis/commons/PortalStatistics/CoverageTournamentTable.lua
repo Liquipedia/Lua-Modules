@@ -21,36 +21,35 @@ local Tier = Lua.import('Module:Tier/Custom')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local Util = Lua.import('Module:PortalStatistics/Util')
+
 local LANG = mw.getContentLanguage()
-local GAMES = Array.map(Array.extractValues(Info.games, Table.iter.spairs), function(value)
-	return value.name
-end)
 local DEFAULT_TIERTYPES = {'', 'Weekly', 'Monthly'}
 
-local StatisticsPortal = {}
+local CoverageTournamentTable = {}
 
 
 ---@param args table?
 ---@return Renderable
-function StatisticsPortal.coverageTournamentTable(args)
+function CoverageTournamentTable.coverageTournamentTable(args)
 	args = args or {}
 	args.multiGame = Logic.readBool(args.multiGame)
-	args.customGames = StatisticsPortal._isTableOrSplitOrDefault(args.customGames, GAMES)
-	args.customTiers = StatisticsPortal._isTableOrSplitOrDefault(args.customTiers)
+	args.customGames = Util.isTableOrSplitOrDefault(args.customGames, Util.GAMES)
+	args.customTiers = Util.isTableOrSplitOrDefault(args.customTiers)
 	args.customTiers = args.customTiers and Array.map(args.customTiers, function(tier) return tonumber(tier) end)
-	args.includeTierTypes = StatisticsPortal._isTableOrSplitOrDefault(args.includeTierTypes, DEFAULT_TIERTYPES)
-	args.showTierTypes = StatisticsPortal._isTableOrSplitOrDefault(args.showTierTypes, {})
+	args.includeTierTypes = Util.isTableOrSplitOrDefault(args.includeTierTypes, DEFAULT_TIERTYPES)
+	args.showTierTypes = Util.isTableOrSplitOrDefault(args.showTierTypes, {})
 	args.filterByStatus = Logic.readBool(args.filterByStatus) or false
 
 	local tableRow = WidgetUtil.collect(
 		args.multiGame and Array.map(args.customGames, function(game)
-			return StatisticsPortal._coverageTournamentTableRow(args, {
+			return CoverageTournamentTable._coverageTournamentTableRow(args, {
 				game = game,
 				year = args.year,
 				filterByStatus = args.filterByStatus
 			})
 		end) or nil,
-		StatisticsPortal._coverageTournamentTableRow(args, {
+		CoverageTournamentTable._coverageTournamentTableRow(args, {
 			year = args.year,
 			filterByStatus = args.filterByStatus
 		})
@@ -59,7 +58,7 @@ function StatisticsPortal.coverageTournamentTable(args)
 	return TableWidgets.Table{
 		caption = args.tournamentTableTitle or 'Tournaments Covered',
 		children = {
-			TableWidgets.TableHeader{children = StatisticsPortal._coverageTournamentTableHeader(args)},
+			TableWidgets.TableHeader{children = CoverageTournamentTable._coverageTournamentTableHeader(args)},
 			TableWidgets.TableBody{children = tableRow}
 		}
 	}
@@ -68,13 +67,13 @@ end
 ---@param args table
 ---@param parameters table
 ---@return Renderable
-function StatisticsPortal._coverageTournamentTableRow(args, parameters)
+function CoverageTournamentTable._coverageTournamentTableRow(args, parameters)
 	local isHeaderRow = Logic.readBool(args.multiGame) and not parameters.game
 	local CellComponent = isHeaderRow and TableWidgets.CellHeader or TableWidgets.Cell
 	local runningTally = 0
 
 	local gameCell = Logic.readBool(args.multiGame)
-		and StatisticsPortal._returnGameCell(args, parameters, isHeaderRow)
+		and Util.returnGameCell(args, parameters, isHeaderRow)
 		or nil
 
 	local countData = Count.tournamentsByTier(parameters)
@@ -137,7 +136,7 @@ end
 
 ---@param args table
 ---@return Renderable
-function StatisticsPortal._coverageTournamentTableHeader(args)
+function CoverageTournamentTable._coverageTournamentTableHeader(args)
 	local tierHeaderCells = {}
 	for headerIndex, headerValue in Tier.iterate('tiers') do
 		if String.isNotEmpty(headerValue.value) and tonumber(headerValue.value) > 0 then
@@ -179,26 +178,4 @@ end
 Section: Utility Functions
 ]]--
 
----@param args table
----@param parameters table
----@param isHeaderRow boolean
----@return Renderable
-function StatisticsPortal._returnGameCell(args, parameters, isHeaderRow)
-	local CellComponent = isHeaderRow and TableWidgets.CellHeader or TableWidgets.Cell
-	local text = (Logic.readBool(args.multiGame) and not parameters.game) and 'Total' or parameters.game
-	return CellComponent{children = text}
-end
-
----@param input string|table|nil
----@param default table?
----@return table
-function StatisticsPortal._isTableOrSplitOrDefault(input, default)
-	if type(input) == 'table' then
-		return input
-	elseif String.isEmpty(input) then
-		return default or {}
-	end
-	return Array.parseCommaSeparatedString(input)
-end
-
-return Class.export(StatisticsPortal, {exports = {'coverageTournamentTable'}})
+return Class.export(CoverageTournamentTable, {exports = {'coverageTournamentTable'}})
