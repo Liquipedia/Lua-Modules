@@ -55,9 +55,6 @@ return {
 	['8SEDoublesBracket'] = {template = 'Bracket/8', type = 'duo'},
 	['32SEDoublesBracket'] = {template = 'Bracket/16', type = 'duo'},
 	['2Qual16DEDoublesWBracket'] = {template = 'Bracket/16-2Q', type = 'duo'},
-	['1Qual-2SEBracket'] = {template = 'Bracket/2-1Q'},
-	['2Qual-64DEWBracketA'] = {template = 'Bracket/64-2Q'},
-	['4Qual-8SEBracketSmw'] = {template = 'Bracket/8-4Q'},
 	-- lower-bracket-only
 	['24DELBracketSmwA'] = {template = 'Bracket/16L4DSL2D-2Q', lower = true},
 	['2Qual-12DELBracketSmwA'] = {template = 'Bracket/8L2D-2Q', lower = true},
@@ -111,16 +108,15 @@ return {
 	['1Qual-8DELBracketSmwA'] = {template = 'Bracket/4L2DSL1D-1Q', lower = true},
 	['2Qual8DEDoublesLBracketSmw'] = {template = 'Bracket/8L2D-2Q', lower = true, type = 'duo'},
 	['48DELBracketA'] = {template = 'Bracket/32L8DSL4DSL2D-2Q', lower = true},
-	['24DELBracketA'] = {template = 'Bracket/16L8DSL2D-2Q', lower = true},
 	['64DELBracketA2'] = {template = 'Bracket/32L8DSL4DSL2D-2Q', lower = true},
+	['8Qual-48DELBracketSmwA'] = {template = 'Bracket/32L8D-8Q', lower = true},
+	['48DELBracketSmwA4'] = {template = 'Bracket/32L8D-8Q', lower = true},
 	-- grand final reset
 	['16DEBracket'] = {template = 'Bracket/16U8L4DSL2DSL1D', resetRound = 7},
 	['4DE4SSmwBracket'] = {template = 'Bracket/4U4L2DSL1D', resetRound = 5},
 	['4DEBracket'] = {template = 'Bracket/4U2L1D', resetRound = 3},
 	['4DE4SDoublesBracket'] = {template = 'Bracket/4U4L2DSL1D', resetRound = 5, type = 'duo'},
 	['8DEBracket'] = {template = 'Bracket/8U4L2DSL1D', resetRound = 5},
-	['4DE8SDoublesBracket'] = {template = 'Bracket/4U8L2DSL1D', resetRound = 6, type = 'duo'},
-	['8DEDoublesBracket'] = {template = 'Bracket/8U4L2DSL1D', resetRound = 5, type = 'duo'},
 	-- one-offs
 	['DEFinalBracket'] = {template = 'Bracket/2U2L1D', matches = {R2M1 = 'r1m1', R2M2 = 'r2m1'}, resetRound = 3},
 	['DEFinalSmwBracket'] = {template = 'Bracket/2U2L1D', matches = {R2M1 = 'r1m1', R2M2 = 'r2m1'}, resetRound = 3},
