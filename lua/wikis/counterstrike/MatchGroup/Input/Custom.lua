@@ -135,6 +135,7 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, opponentIndex, play
 	return {
 		player = firstEntry.player,
 		displayName = firstEntry.displayName,
+		flag = firstEntry.flag,
 		kills = sumOf('kills'),
 		deaths = sumOf('deaths'),
 		rating = averageOf('rating'),

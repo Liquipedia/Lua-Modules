@@ -14,6 +14,7 @@ local MathUtil = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
+local Flags = Lua.import('Module:Flags')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
@@ -101,6 +102,7 @@ function MatchPage:renderOverallStats()
 					---@cast playerData -nil
 					playerData.player = playerData.player or player.pageName
 					playerData.displayName = playerData.displayName or player.displayName
+					playerData.flag = playerData.flag or player.flag
 					return playerData
 				end)
 			end
@@ -314,9 +316,16 @@ function MatchPage._renderPlayerPerformance(player)
 
 	-- Only link the name if the steamid resolved to a known Liquipedia player
 	-- otherwise show the Mischief raw name as plain text. CRUCIAL, need to check playerId situation with _British player what not
-	local nameDisplay = player.player
+	local nameLink = player.player
 		and Link{link = player.player, children = player.displayName}
 		or player.displayName
+
+	-- Flag from a resolved crosswalk player
+	---@type Renderable|Renderable[]
+	local nameDisplay = nameLink
+	if player.player and Logic.isNotEmpty(player.flag) then
+		nameDisplay = {Flags.Icon{flag = player.flag, shouldLink = false}, '&nbsp;', nameLink}
+	end
 
 	-- Rar can be both positive and negative
 	local formatSigned = function(value, numberOfDecimals)

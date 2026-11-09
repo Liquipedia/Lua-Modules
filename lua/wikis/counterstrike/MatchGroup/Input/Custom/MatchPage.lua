@@ -18,6 +18,7 @@ local NormalMapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 ---@field player string?
 ---@field displayName string
 ---@field steamid string?
+---@field flag string?
 ---@field rating number? Li-rating / L-Rating
 ---@field rar number? rounds above replacement
 ---@field kills integer?
@@ -402,6 +403,7 @@ function CustomMatchGroupInputMatchPage.getPlayersOfMapOpponent(map, opponent, o
 			return {
 				player = resolved.player,
 				displayName = resolved.displayName,
+				flag = playerIdData.flag,
 				steamid = participant.steam_id and tostring(participant.steam_id) or nil,
 				rating = participant.l_rating,
 				rar = participant.rar,
