@@ -16,6 +16,7 @@
 		"codestyle-check": "None",
 		"name-style-check": "None"
 	},
+	"addonRepositoryPath": "$LUALS_ADDONS",
 	"workspace.library": [
 		"${addons}/busted/module/library",
 		"${addons}/luassert/module/library",
