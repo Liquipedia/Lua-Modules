@@ -83,7 +83,7 @@ jobs:
         if: steps.lua-changed-files.outputs.any_changed == 'true'
         shell: bash
         env:
-          LUALS_VERSION: 3.18.2
+          LUALS_VERSION: 3.19.2
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p ~/.local/bin/luals
