@@ -1,7 +1,7 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('Standings documentation', function()
 	local ArgSchema = require('Module:ArgSchema')
-	local StandingsDocumentation = require('Module:Standings/Documentation')
+	local ArgSchemaDocumentation = require('Module:ArgSchema/Documentation')
 	local StandingsParameters = require('Module:Standings/Parameters')
 
 	local originalPreprocess
@@ -19,13 +19,17 @@ describe('Standings documentation', function()
 	---@param tableType string
 	---@return string
 	local function render(section, tableType)
-		return tostring(StandingsDocumentation.parameters{section = section, tabletype = tableType})
+		return tostring(ArgSchemaDocumentation.parameters{
+			schema = 'Standings/Parameters',
+			section = section,
+			tabletype = tableType,
+		})
 	end
 
 	it('describes every parameter in every context', function()
 		for _, section in ipairs({'header', 'round', 'opponent'}) do
 			for _, tableType in ipairs({'swiss', 'group', 'ffa'}) do
-				local context = {tableType = tableType}
+				local context = {tabletype = tableType}
 				for _, parameter in ipairs(ArgSchema.applicable(StandingsParameters[section], context)) do
 					local description = ArgSchema.description(parameter, context)
 					assert.is_true(type(description) == 'string' and description ~= '', parameter.name)

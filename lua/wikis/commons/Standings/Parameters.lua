@@ -14,7 +14,7 @@ local Table = Lua.import('Module:Table')
 local StandingsOvertime = Lua.import('Module:Standings/Overtime')
 
 ---The template parameters of the standings tables, see Module:ArgSchema.
----Documentation contexts are `{tableType: StandingsTableTypes}`.
+---Documentation contexts are `{tabletype: StandingsTableTypes}`, see Module:ArgSchema/Documentation.
 local StandingsParameters = {}
 
 local STATUSES = {'byeup', 'seedup', 'up', 'stayup', 'stay', 'staydown', 'down', 'dq'}
@@ -32,7 +32,7 @@ StandingsParameters.DEFAULT_TIEBREAKERS = {swiss = 'matchscore', group = 'points
 local function onlyFor(...)
 	local tableTypes = {...}
 	return function(context)
-		return Array.any(tableTypes, function(tableType) return tableType == context.tableType end)
+		return Array.any(tableTypes, function(tableType) return tableType == context.tabletype end)
 	end
 end
 
@@ -43,7 +43,7 @@ end
 local function byTableType(bySwiss, byGroup, byFfa)
 	local texts = {swiss = bySwiss, group = byGroup, ffa = byFfa}
 	return function(context)
-		return texts[context.tableType] or bySwiss
+		return texts[context.tabletype] or bySwiss
 	end
 end
 
@@ -244,7 +244,7 @@ StandingsParameters.header = {
 				'Only tiebreakers over all matches can be used, not head-to-head ones.'
 			)
 			return 'The tiebreakers used in this standings, in the order they are applied. Defaults to <code>'
-				.. StandingsParameters.DEFAULT_TIEBREAKERS[context.tableType] .. '</code>. ' .. usage(context)
+				.. StandingsParameters.DEFAULT_TIEBREAKERS[context.tabletype] .. '</code>. ' .. usage(context)
 				.. ' See [[#Tiebreakers|Tiebreakers]] for the available tiebreakers.'
 		end,
 	},
@@ -252,7 +252,7 @@ StandingsParameters.header = {
 		name = 'points',
 		condition = onlyFor('swiss', 'group'),
 		description = function(context)
-			local points = StandingsParameters.DEFAULT_POINTS[context.tableType]
+			local points = StandingsParameters.DEFAULT_POINTS[context.tabletype]
 			local defaults = 'win=' .. points.w .. ', draw=' .. points.d .. ', loss=' .. points.l
 			return table.concat({
 				'Customize the amount of points received for a given outcome or score. Defaults to {{para|points|'
