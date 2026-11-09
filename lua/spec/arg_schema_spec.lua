@@ -43,6 +43,7 @@ describe('ArgSchema', function()
 		end)
 
 		it('errors on invalid inputs, naming the parameter as given', function()
+			assert.are_equal(0, ArgSchema.read({{name = 'count', type = 'nonNegativeInteger'}}, {count = '0'}).count)
 			for _, input in ipairs({'abc', '-1', '1.5'}) do
 				assert.error(function() ArgSchema.read({{name = 'count', type = 'nonNegativeInteger'}}, {count = input}) end)
 			end
