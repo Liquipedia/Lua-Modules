@@ -205,10 +205,11 @@ end
 ---Example: `return {foo = Lua.lazyExport('Module:Foo/Bar', 'foo')}`
 ---@param moduleName string
 ---@param functionName string
+---@param options {requireDevIfEnabled: boolean?, loadData: boolean?}?
 ---@return fun(...): any
-function Lua.lazyExport(moduleName, functionName)
+function Lua.lazyExport(moduleName, functionName, options)
 	return function(...)
-		return Lua.import(moduleName)[functionName](...)
+		return Lua.import(moduleName, options)[functionName](...)
 	end
 end
 
