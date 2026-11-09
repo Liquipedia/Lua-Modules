@@ -127,12 +127,13 @@ describe('Standings Legacy Next', function()
 		end)
 
 		it('maps the structures to formats', function()
+			local Json = require('Module:Json')
 			assert.are_equal('gsl', StandingTableLegacyNext.readFormat({structure = 'gsl'}, 8, 0, 1))
 			assert.are_equal('drr', StandingTableLegacyNext.readFormat({structure = 'roundRobin-2'}, 4, 5, 1))
-			assert.are_equal('{"1":"roundrobin","cycles":3}',
-				StandingTableLegacyNext.readFormat({structure = 'roundRobin-3'}, 4, 5, 1))
-			assert.are_equal('{"1":"classicswiss","rounds":3}',
-				StandingTableLegacyNext.readFormat({structure = 'swiss-3'}, 4, 5, 1))
+			assert.are_same({['1'] = 'roundrobin', cycles = 3},
+				Json.parse(StandingTableLegacyNext.readFormat({structure = 'roundRobin-3'}, 4, 5, 1)))
+			assert.are_same({['1'] = 'classicswiss', rounds = 3},
+				Json.parse(StandingTableLegacyNext.readFormat({structure = 'swiss-3'}, 4, 5, 1)))
 			assert.is_nil(StandingTableLegacyNext.readFormat({structure = 'other'}, 4, 5, 1))
 			assert.are_equal('srr', StandingTableLegacyNext.readFormat({}, 4, 6, 3))
 			assert.is_nil(StandingTableLegacyNext.readFormat({}, 8, 10, 3))

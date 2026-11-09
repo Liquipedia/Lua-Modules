@@ -148,11 +148,11 @@ function StandingTableLegacyNext.readFormat(args, opponentCount, matchCount, rou
 	end
 	local rounds = structure:match('swiss%-(%d+)')
 	if rounds then
-		return '{"1":"classicswiss","rounds":' .. rounds .. '}'
+		return Json.stringify({'classicswiss', rounds = tonumber(rounds)})
 	end
 	local cycles = tonumber(structure:match('roundRobin%-(%d+)'))
 	assert(cycles, 'Invalid structure: ' .. structure)
-	return ROUND_ROBIN_SHORTHANDS[cycles] or ('{"1":"roundrobin","cycles":' .. cycles .. '}')
+	return ROUND_ROBIN_SHORTHANDS[cycles] or Json.stringify({'roundrobin', cycles = cycles})
 end
 
 ---4 opponents with 5 matches are a GSL group, whole cycles of matches a round robin
