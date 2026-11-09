@@ -153,6 +153,13 @@ describe('Standings Legacy Swiss', function()
 			)
 		end)
 
+		it('reads score points with decimals only if enabled', function()
+			local args = {win_p = '1', tie_p = '0.5', ['1.5-0.5_p'] = '1'}
+			assert.are_equal('win=1, draw=0.5, loss=0', StandingTableLegacySwiss.parsePoints(args))
+			assert.are_equal('win=1, draw=0.5, loss=0, 1.5-0.5=2',
+				StandingTableLegacySwiss.parsePoints(args, {decimalScores = true}))
+		end)
+
 		it('errors on non numeric values', function()
 			assert.error(function() StandingTableLegacySwiss.parsePoints{win_p = 'three'} end)
 			assert.error(function() StandingTableLegacySwiss.parsePoints{['2-0_p'] = 'three'} end)

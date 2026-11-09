@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
@@ -255,10 +256,29 @@ function StandingsParseWiki.parseWikiBgs(input)
 	return statusParsed
 end
 
+---A score as written in `X-Y` points keys, so `1.50` and `1.5` are the same
+---@param score string|number
+---@return string
+local function formatScore(score)
+	local number = tonumber(score) --[[@as number]]
+	if number == math.floor(number) then
+		return string.format('%d', number)
+	end
+	return tostring(number)
+end
+
+---@param ownScore string|number
+---@param otherScore string|number
+---@return string
+local function makeScoreKey(ownScore, otherScore)
+	return formatScore(ownScore) .. '-' .. formatScore(otherScore)
+end
+
 ---Reads the `points` input of swiss and group standings, e.g. `win=3, draw=1, loss=0, 2-0=4`.
 ---`win`, `draw` and `loss` are the points of that result and are keyed `w`, `d` and `l`.
 ---With overtime, `otwin` and `otloss` are the points of an overtime result and are keyed `otw` and `otl`.
 ---`X-Y` is the fixed amount of points for an opponent scoring X against Y, replacing the points of its result.
+---Scores may have decimals, e.g. `1.5-0.5`.
 ---@param input string?
 ---@param overtime boolean?
 ---@param tableType 'swiss'|'group'|nil # Picks the default points, swiss if unset
@@ -268,13 +288,82 @@ function StandingsParseWiki.parsePoints(input, overtime, tableType)
 	local entries = Array.filter(Array.parseCommaSeparatedString(input), Logic.isNotEmpty)
 	Array.forEach(entries, function(entry)
 		local key, value = unpack(Array.parseCommaSeparatedString(entry, '='))
-		local pointsKey = RESULT_POINTS_KEYS[key] or (key and key:match('^%d+%-%d+$') and key)
+		local ownScore, otherScore = (key or ''):match('^(%d+%.?%d*)%-(%d+%.?%d*)$')
+		local pointsKey = RESULT_POINTS_KEYS[key] or (ownScore and makeScoreKey(ownScore, otherScore))
 		assert(pointsKey, 'Invalid points input: unknown key "' .. tostring(key) .. '" in "' .. entry .. '"')
 		assert(overtime or not OVERTIME_POINTS_KEYS[pointsKey],
 			'Invalid points input: "' .. entry .. '" requires overtime to be enabled')
 		points[pointsKey] = assert(tonumber(value), 'Invalid points input: "' .. entry .. '" is not a number')
 	end)
 	return points
+end
+
+local MAX_FORMAT_RESULTS = 10
+
+---@type table<string, table>
+local FORMAT_SHORTHANDS = {
+	gsl = {'swiss', adv = 2},
+	swiss = {'swiss'},
+	srr = {'roundrobin', cycles = 1},
+	drr = {'roundrobin', cycles = 2},
+}
+
+---A positive integer up to `max`, or `default` without input
+---@param data table
+---@param key string
+---@param input string
+---@param default integer?
+---@param max integer?
+---@return integer
+local function readFormatCount(data, key, input, default, max)
+	if default and Logic.isEmpty(data[key]) then
+		return default
+	end
+	local value = MathUtil.toInteger(data[key])
+	assert(value and value > 0 and value <= (max or math.huge), 'Invalid format input: "' .. input .. '" needs '
+		.. key .. ' as ' .. (max and ('an integer from 1 to ' .. max) or 'a positive integer'))
+	return value
+end
+
+---@type table<string, fun(data: table, input: string): StandingsFormat>
+local FORMAT_PARSERS = {
+	swiss = function(data, input)
+		local winsToAdvance = readFormatCount(data, 'adv', input, nil, MAX_FORMAT_RESULTS)
+		local lossesToEliminate = readFormatCount(data, 'elim', input, winsToAdvance, MAX_FORMAT_RESULTS)
+		return {type = 'swiss', winsToAdvance = winsToAdvance, lossesToEliminate = lossesToEliminate}
+	end,
+	roundrobin = function(data, input)
+		return {type = 'roundrobin', cycles = readFormatCount(data, 'cycles', input, 1)}
+	end,
+	classicswiss = function(data, input)
+		return {type = 'classicswiss', rounds = readFormatCount(data, 'rounds', input)}
+	end,
+}
+
+---@param input string
+---@return table?
+local function parseFormatShorthand(input)
+	local adv = input:match('^swiss(%d+)$')
+	return FORMAT_SHORTHANDS[input] or (adv and {'swiss', adv = adv}) or nil
+end
+
+---Reads `format`: `gsl`, `swiss<N>`, `srr`, `drr`, or `{{Json|<type>|...}}` with type `swiss` (`adv`, `elim`
+---defaulting to `adv`), `roundrobin` (`cycles`, defaulting to 1) or `classicswiss` (`rounds`).
+---@param args table
+---@param tableType StandingsTableTypes
+---@return StandingsFormat?
+function StandingsParseWiki.parseFormat(args, tableType)
+	local input = args.format
+	if Logic.isEmpty(input) then
+		return nil
+	end
+	local data = Json.parseIfTable(input) or parseFormatShorthand(input)
+	assert(data, 'Invalid format input: unknown format "' .. input .. '"')
+	assert(tableType ~= 'ffa', 'Invalid format input: ffa standings do not support a format')
+	local formatType = data[1] or data['1']
+	local parseFormatData = FORMAT_PARSERS[formatType]
+	assert(parseFormatData, 'Invalid format input: unknown format type "' .. tostring(formatType) .. '"')
+	return parseFormatData(data, input)
 end
 
 ---The score of the opponent in the format of the `X-Y` points input, nil if the match has no (proper) score.
@@ -293,7 +382,7 @@ local function getScoreKey(match, opponent)
 		return nil
 	end
 	local other = opponents[1] == opponent and opponents[2] or opponents[1]
-	return opponent.score .. '-' .. other.score
+	return makeScoreKey(opponent.score, other.score)
 end
 
 ---@param tabletype StandingsTableTypes
