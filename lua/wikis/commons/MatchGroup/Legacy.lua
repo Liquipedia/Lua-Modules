@@ -202,6 +202,45 @@ function MatchGroupLegacy.matchResetMappingFromCustom(match1params)
 	return match1params
 end
 
+---Maps upper keys (`r#m#`, `R#`) of a `getAlt` mapping to lower keys (`l#m#`, `L#`) shifted by `roundOffset`.
+---@param match2mapping match2mapping
+---@param roundOffset number?
+---@return match2mapping
+function MatchGroupLegacy.toLowerBracket(match2mapping, roundOffset)
+	roundOffset = roundOffset or 0
+	local toLower = function(key)
+		return (key:gsub('^([Rr])(%d+)', function(prefix, round)
+			return (prefix == 'R' and 'L' or 'l') .. (tonumber(round) + roundOffset)
+		end))
+	end
+
+	-- getAlt keys a third place match as the last lower round, which would duplicate the final
+	local withoutThirdPlace = Table.filterByKey(match2mapping, function(match2key)
+		return match2key ~= THIRD_PLACE_MATCH and match2key ~= THIRD_PLACE_MATCH .. 'header'
+	end)
+
+	return Table.mapValues(withoutThirdPlace, function(match1keys)
+		if type(match1keys) == 'string' then
+			return toLower(match1keys)
+		end
+		return Table.mapValues(match1keys, toLower)
+	end)
+end
+
+---Maps the reset match of a final in round `finalRound` that keeps its details in `r{finalRound}m2`.
+---@param match2mapping match2mapping
+---@param finalRound number
+---@return match2mapping
+function MatchGroupLegacy.withReset(match2mapping, finalRound)
+	local finalKey = 'r' .. finalRound .. 'm1'
+	match2mapping[RESET_MATCH] = {
+		opp1 = finalKey .. 'p1',
+		opp2 = finalKey .. 'p2',
+		details = 'r' .. finalRound .. 'm2',
+	}
+	return match2mapping
+end
+
 ---@param blueprint table
 ---@param tbl table
 ---@param delete boolean?
