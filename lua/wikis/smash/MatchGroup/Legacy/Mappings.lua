@@ -5,6 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local LOWER_128 = 'Bracket/' .. string.rep('4L2DSL1D-', 15) .. '4L2DSL1D'
+local LOWER_96 = 'Bracket/' .. string.rep('8L2DSL1D-', 7) .. '8L2DSL1D'
+
 -- keyed by match1 template name
 return {
 	-- default
@@ -112,6 +115,12 @@ return {
 	['64DELBracketA2'] = {template = 'Bracket/32L8DSL4DSL2D-2Q', lower = true},
 	['8Qual-48DELBracketSmwA'] = {template = 'Bracket/32L8D-8Q', lower = true},
 	['48DELBracketSmwA4'] = {template = 'Bracket/32L8D-8Q', lower = true},
+	['128DELBracketSmwA'] = {template = LOWER_128, lower = true},
+	['128DELBracketA'] = {template = LOWER_128, lower = true},
+	['48DELBracketSmwA2'] = {template = 'Bracket/16L4DSL2DS-16L4DSL2DS', lower = true},
+	['96DELBracketSmwA'] = {template = LOWER_96, lower = true},
+	['96DELBracketA'] = {template = LOWER_96, lower = true},
+	['8Qual-96DELBracketSmwA'] = {template = 'Bracket/64L16DSL8D-8Q', lower = true},
 	-- grand final reset
 	['16DEBracket'] = {template = 'Bracket/16U8L4DSL2DSL1D', resetRound = 7},
 	['4DE4SSmwBracket'] = {template = 'Bracket/4U4L2DSL1D', resetRound = 5},
