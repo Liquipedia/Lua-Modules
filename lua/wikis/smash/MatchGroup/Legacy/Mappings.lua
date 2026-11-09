@@ -55,6 +55,7 @@ return {
 	['8SEDoublesBracket'] = {template = 'Bracket/8', type = 'duo'},
 	['32SEDoublesBracket'] = {template = 'Bracket/16', type = 'duo'},
 	['2Qual16DEDoublesWBracket'] = {template = 'Bracket/16-2Q', type = 'duo'},
+	['2SBracketSmw'] = {template = 'Bracket/2L1D'},
 	-- lower-bracket-only
 	['24DELBracketSmwA'] = {template = 'Bracket/16L4DSL2D-2Q', lower = true},
 	['2Qual-12DELBracketSmwA'] = {template = 'Bracket/8L2D-2Q', lower = true},
