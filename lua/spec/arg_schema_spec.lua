@@ -12,7 +12,8 @@ describe('ArgSchema', function()
 				{name = 'factor', type = 'number'},
 				{name = 'items', type = 'list', separator = ';'},
 				{name = 'data', type = 'json'},
-			}, {title = 'A', enabled = 'yes', count = '3', factor = '1.5', items = 'x; y', data = '{"a":1}'})
+				{name = 'status', type = 'enum', values = {'up', 'down'}},
+			}, {title = 'A', enabled = 'yes', count = '3', factor = '1.5', items = 'x; y', data = '{"a":1}', status = 'up'})
 
 			assert.are_equal('A', values.title)
 			assert.is_true(values.enabled)
@@ -20,6 +21,7 @@ describe('ArgSchema', function()
 			assert.are_equal(1.5, values.factor)
 			assert.are_same({'x', 'y'}, values.items)
 			assert.are_same({a = 1}, values.data)
+			assert.are_equal('up', values.status)
 		end)
 
 		it('applies the default without input, but keeps a false input', function()
@@ -54,6 +56,10 @@ describe('ArgSchema', function()
 			assert.error(
 				function() ArgSchema.read({{name = 'r{round}points', type = 'number'}}, {r2points = 'x'}) end,
 				'Invalid r2points input: "x" is not a number'
+			)
+			assert.error(
+				function() ArgSchema.read({{name = 'status', type = 'enum', values = {'up', 'down'}}}, {status = 'Up'}) end,
+				'Invalid status input: "Up" is not one of up, down'
 			)
 		end)
 

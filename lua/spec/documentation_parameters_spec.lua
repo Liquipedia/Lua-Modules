@@ -43,6 +43,19 @@ describe('Widget/Documentation/Parameters', function()
 		)
 	end)
 
+	it('lists the values of an enum and the templates whose output a json takes', function()
+		assert.are_equal(
+			'<dl><dt><code class="nowrap">&#124;status&#61;</code></dt><dd>Status.</dd>'
+				.. '<dd>One of <code>up</code>, <code>down</code>.</dd></dl>',
+			render{{name = 'status', type = 'enum', values = {'up', 'down'}, description = 'Status.'}}
+		)
+		assert.are_equal(
+			'<dl><dt><code class="nowrap">&#124;tiebreakers&#61;</code></dt><dd>Tiebreakers.</dd>'
+				.. '<dd>Takes [[Template:Json|<code>&#123;&#123;Json&#125;&#125;</code>]].</dd></dl>',
+			render{{name = 'tiebreakers', type = 'json', templates = {'Json'}, description = 'Tiebreakers.'}}
+		)
+	end)
+
 	it('leaves out hidden parameters and the ones whose condition does not apply', function()
 		local parameters = {
 			{name = 'tabletype', hidden = true, description = 'Type.'},
