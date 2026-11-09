@@ -31,10 +31,10 @@ insulate('Widget/Legend', function()
 	end)
 
 	it('documents the parameters', function()
-		local WidgetFactory = require('Module:Widget/Factory')
+		local ArgSchemaDocumentation = require('Module:ArgSchema/Documentation')
 		local originalPreprocess = mw.frame.preprocess
 		mw.frame.preprocess = function(_, text) return text end
-		local documentation = tostring(WidgetFactory.documentation{widget = 'Legend'})
+		local documentation = tostring(ArgSchemaDocumentation.parameters{schema = 'Widget/Legend'})
 		mw.frame.preprocess = originalPreprocess
 		assert.is_truthy(documentation:find('&#124;showConfirmed&#61;true', 1, true))
 	end)

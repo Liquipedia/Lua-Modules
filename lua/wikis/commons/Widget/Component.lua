@@ -119,6 +119,7 @@ end
 
 -- Factory to create Functional Components whose props templates can give, see Module:ArgSchema.
 -- The parameter defaults are the default props, and Module:Widget/Factory reads template args through the parameters.
+-- Module:ArgSchema/Documentation lists them, with schema=Widget/<name>.
 ---@generic P
 ---@param renderFunction fun(props: P, context?: Context): Renderable|Renderable[]?
 ---@param parameters ArgSchemaParameter[] -- Defaults may not be tables

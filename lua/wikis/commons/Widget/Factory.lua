@@ -11,8 +11,6 @@ local ArgSchema = Lua.import('Module:ArgSchema')
 local Class = Lua.import('Module:Class')
 local Table = Lua.import('Module:Table')
 
-local DocumentationParameters = Lua.import('Module:Widget/Documentation/Parameters')
-
 local WidgetFactory = {}
 
 ---@param args {widget: string, children: Renderable|Renderable[], [any]:any}
@@ -31,14 +29,4 @@ function WidgetFactory.fromTemplate(args)
 	return WidgetClass(props)
 end
 
----Lists the parameters of a widget, see `Component.withParameters`.
----{{#invoke:Lua|invoke|module=Widget/Factory|fn=documentation|widget=Legend}}
----@param args {widget: string}
----@return Renderable?
-function WidgetFactory.documentation(args)
-	local WidgetClass = Lua.import('Module:Widget/' .. args.widget)
-	assert(WidgetClass.parameters, 'Widget "' .. args.widget .. '" does not declare its parameters')
-	return DocumentationParameters{parameters = WidgetClass.parameters, context = {}}
-end
-
-return Class.export(WidgetFactory, {exports = {'fromTemplate', 'documentation'}})
+return Class.export(WidgetFactory, {exports = {'fromTemplate'}})
