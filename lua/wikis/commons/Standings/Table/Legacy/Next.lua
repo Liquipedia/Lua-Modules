@@ -487,6 +487,7 @@ function StandingTableLegacyNext._tryToParseWikiTemplateOpponent(input)
 		if Logic.isEmpty(key) then
 			unnamedCounter = unnamedCounter + 1
 			key = unnamedCounter
+			value = argsPair
 		end
 		key = tonumber(key) or key
 		opponent[key] = value
