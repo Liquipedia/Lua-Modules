@@ -8,12 +8,19 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
+local Tournament = Lua.import('Module:Tournament')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
+local Html = Lua.import('Module:Widget/Html')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
+local SPAN_SLASH = Html.Span{classes = {'slash'}, children = '/'}
 
 ---@class ValorantMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
 local GameRowComponentProps = {
@@ -35,7 +42,14 @@ function CustomMatchSummary.getByMatchId(args)
 		args,
 		{
 			width = '500px',
-			mapVetoPreprocessOptions = {useLpdb = true}
+			mapVetoPreprocessOptions = {useLpdb = true},
+			showDetail = function (match)
+				local input = Logic.readBoolOrNil(args.showDetail)
+				if input ~= nil then
+					return input
+				end
+				return HighlightConditions.tournament(Tournament.partialTournamentFromMatch(match))
+			end,
 		}
 	)
 end
@@ -91,6 +105,82 @@ function GameRowComponentProps._getOppositeSide(side)
 		return 'def'
 	end
 	return 'atk'
+end
+
+---@param game MatchGroupUtilGame
+---@param index integer
+---@return VNode?
+function CustomMatchSummary.GameDetail(game, index)
+	if Array.all(game.opponents, function (gameOpponent)
+		return Logic.isDeepEmpty(gameOpponent.players)
+	end) then
+		return nil
+	end
+
+	local gamePlayers = Array.map(game.opponents, function (gameOpponent)
+		return CustomMatchSummary._sortGamePlayersByAcs(gameOpponent.players)
+	end)
+
+	return MatchSummaryWidgets.GameDetail{
+		game = game,
+		gameIndex = index,
+		overview = game.length,
+		children = WidgetUtil.collect(
+			CustomMatchSummary._createOpponentDetail(game, gamePlayers[1], 1),
+			CustomMatchSummary._createOpponentDetail(game, gamePlayers[2], 2)
+		),
+	}
+end
+
+---@private
+---@param players table[]
+---@return table[]
+function CustomMatchSummary._sortGamePlayersByAcs(players)
+	return Array.sortBy(
+		Array.filter(players, Logic.isNotEmpty),
+		function (gamePlayer)
+			return gamePlayer.acs
+		end,
+		function (a, b)
+			return (a or -math.huge) < (b or -math.huge)
+		end
+	)
+end
+
+---@private
+---@param game MatchGroupUtilGame
+---@param gamePlayersOfTeam table[]
+---@param gameOpponentIndex integer
+---@return VNode
+function CustomMatchSummary._createOpponentDetail(game, gamePlayersOfTeam, gameOpponentIndex)
+	return Html.Div{
+		classes = {'brkts-popup-game-detail-player-container'},
+		children = Array.map(gamePlayersOfTeam, function (gamePlayer)
+			local kda = {gamePlayer.kills, gamePlayer.deaths, gamePlayer.assists}
+			local stats = Html.Div{children = Array.interleave(kda, SPAN_SLASH)}
+			return Html.Div{
+				classes = {
+					'brkts-popup-game-detail-player',
+					gameOpponentIndex == 2 and 'flipped' or nil,
+				},
+				children = {
+					MatchSummaryWidgets.Character{
+						classes = {'brkts-popup-game-detail-player-character'},
+						date = game.date,
+						flipped = gameOpponentIndex == 2,
+						showName = false,
+						size = '24px',
+						character = gamePlayer.character
+					},
+					Link{link = gamePlayer.player, children = gamePlayer.displayName},
+					Html.Div{
+						classes = {'brkts-popup-game-detail-player-stats'},
+						children = stats
+					},
+				}
+			}
+		end)
+	}
 end
 
 return CustomMatchSummary
