@@ -53,7 +53,11 @@ function MatchGroupLegacyDefault:getDetails(isReset, prefix)
 	local details = MatchGroupLegacy.getDetails(self, false, prefix)
 
 	Table.iter.forEachPair(self.args, function (key)
-		if not tonumber(key) and String.startsWith(key, prefix) and not Logic.isNumeric(key:sub(prefix:len() + 1, prefix:len() + 1)) then
+		if (
+			not tonumber(key) and
+				String.startsWith(key, prefix) and
+				not Logic.isNumeric(key:sub(prefix:len() + 1, prefix:len() + 1))
+		) then
 			local newKey = key:gsub(prefix, '')
 			if newKey == 'win' then
 				return
