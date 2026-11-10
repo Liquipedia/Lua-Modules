@@ -204,7 +204,7 @@ end
 
 ---Maps upper keys (`r#m#`, `R#`) of a `getAlt` mapping to lower keys (`l#m#`, `L#`) shifted by `roundOffset`.
 ---@param match2mapping match2mapping
----@param roundOffset number?
+---@param roundOffset integer?
 ---@return match2mapping
 function MatchGroupLegacy.toLowerBracket(match2mapping, roundOffset)
 	roundOffset = roundOffset or 0
@@ -229,7 +229,7 @@ end
 
 ---Maps the reset match of a final in round `finalRound` that keeps its details in `r{finalRound}m2`.
 ---@param match2mapping match2mapping
----@param finalRound number
+---@param finalRound integer
 ---@return match2mapping
 function MatchGroupLegacy.withReset(match2mapping, finalRound)
 	local finalKey = 'r' .. finalRound .. 'm1'
