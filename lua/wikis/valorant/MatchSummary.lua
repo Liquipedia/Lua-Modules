@@ -15,9 +15,6 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
----@class ValorantMatchSummary: CustomMatchSummaryInterface
-local CustomMatchSummary = {}
-
 ---@class ValorantMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
 local GameRowComponentProps = {
 	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay,
@@ -25,29 +22,25 @@ local GameRowComponentProps = {
 
 local ValorantMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
+---@class ValorantMatchSummary: CustomMatchSummaryInterface
+local CustomMatchSummary = {
+	GameRow = ValorantMatchSummaryGameRow,
+}
+
 ---@param args table
 ---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '500px', teamStyle = 'bracket'})
+	return MatchSummary.defaultGetByMatchId(
+		CustomMatchSummary,
+		args,
+		{width = '500px'}
+	)
 end
 
----@param match MatchGroupUtilMatch
----@return VNode[]
-function CustomMatchSummary.createBody(match)
-	return {
-		MatchSummaryWidgets.GamesContainer{
-			children = Array.map(match.games, function (game, gameIndex)
-				if Logic.isEmpty(game.map) then
-					return
-				end
-				return ValorantMatchSummaryGameRow{game = game, gameIndex = gameIndex}
-			end)
-		},
-		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.MapVeto(
-			MatchSummary.preProcessMapVeto(match.extradata.mapveto, {useLpdb = true})
-		)
-	}
+---@param game MatchGroupUtilGame
+---@return boolean
+function CustomMatchSummary.gameFilter(game)
+	return Logic.isNotEmpty(game.map)
 end
 
 ---@private
