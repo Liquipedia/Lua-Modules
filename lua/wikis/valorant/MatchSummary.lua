@@ -33,7 +33,10 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(
 		CustomMatchSummary,
 		args,
-		{width = '500px'}
+		{
+			width = '500px',
+			mapVetoPreprocessOptions = {useLpdb = true}
+		}
 	)
 end
 
