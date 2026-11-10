@@ -36,6 +36,8 @@ local function getMovementType(change)
 end
 
 ---@private
+---@param change integer
+---@param threshold integer
 ---@return Renderable
 local function getIndicator(change, threshold)
 	if change == 0 then

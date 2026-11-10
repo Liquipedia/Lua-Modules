@@ -24,7 +24,7 @@ local CustomOpponent = Table.deepCopy(Opponent)
 ---@field game string?
 
 ---@class SmashStandardOpponent:standardOpponent
----@field players SmashStandardPlayer[]
+---@field players? SmashStandardPlayer[]
 
 ---@param args table
 ---@return SmashStandardOpponent?
@@ -32,6 +32,10 @@ function CustomOpponent.readOpponentArgs(args)
 	local opponent = Opponent.readOpponentArgs(args) --[[@as SmashStandardOpponent?]]
 
 	if not opponent or not Opponent.typeIsParty(opponent.type) then return opponent end
+
+	if not opponent.players then
+		return opponent
+	end
 
 	local game = args.game or Variables.varDefault('tournament_game') or Info.defaultGame
 
@@ -60,11 +64,15 @@ function CustomOpponent.toLpdbStruct(opponent, options)
 		return storageStruct
 	end
 
+	if not opponent.players then
+		return storageStruct
+	end
+
 	for playerIndex, player in pairs(opponent.players) do
 		storageStruct.opponentplayers['p' .. playerIndex .. 'chars'] = player.chars and table.concat(player.chars, ',') or nil
 	end
 
-	-- we do not have game in e.g. standingsentries, hence need to make it available in opponnetplayers
+	-- we do not have game in e.g. standingsentries, hence need to make it available in opponentplayers
 	storageStruct.opponentplayers.game = (opponent.players[1] or {}).game
 
 	return storageStruct
@@ -77,6 +85,10 @@ function CustomOpponent.fromLpdbStruct(storageStruct)
 	local opponent = Opponent.fromLpdbStruct(storageStruct) --[[@as SmashStandardOpponent?]]
 
 	if not opponent or not Opponent.typeIsParty(opponent.type) then
+		return opponent
+	end
+
+	if not opponent.players then
 		return opponent
 	end
 
@@ -101,6 +113,10 @@ function CustomOpponent.resolve(opponent, date, options)
 	opponent = Opponent.resolve(opponent, date, options) --[[@as SmashStandardOpponent]]
 
 	if not options or not options.syncPlayer then
+		return opponent
+	end
+
+	if not opponent.players then
 		return opponent
 	end
 

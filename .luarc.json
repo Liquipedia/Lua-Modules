@@ -16,9 +16,10 @@
 		"codestyle-check": "None",
 		"name-style-check": "None"
 	},
+	"addonRepositoryPath": "$LUALS_ADDONS",
 	"workspace.library": [
-		"${3rd}/busted/library",
-		"${3rd}/luassert/library"
+		"${addons}/busted/module/library",
+		"${addons}/luassert/module/library",
 	],
 	"workspace.ignoreDir": [
 		".vscode",

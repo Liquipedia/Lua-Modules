@@ -244,6 +244,7 @@ GetBracketCopyPaste
 GetMatchListCopyPaste
 GetSingleMatchCopyPaste
 GetMatchPageCopyPaste
+GroupStandings
 HDB
 HiddenDataBox
 HiddenSort

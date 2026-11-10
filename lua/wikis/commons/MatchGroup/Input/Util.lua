@@ -944,18 +944,29 @@ end
 ---@param playerLink string?
 ---@return integer?
 function MatchGroupInputUtil.findPlayerId(players, playerInput, playerLink)
-	if Logic.isEmpty(playerInput) and Logic.isEmpty(playerLink) then
+	local inputIsEmpty = String.isEmpty(playerInput)
+	local linkIsEmpty = String.isEmpty(playerLink)
+
+	if inputIsEmpty and linkIsEmpty then
 		return
 	end
 
-	local playerLinks = Array.map(players, Operator.property('name'))
-	local playerIndex = Array.indexOf(playerLinks, FnUtil.curry(Operator.eq, playerLink))
+	local playerIndex = 0
+
+	if not linkIsEmpty then
+		playerIndex = Array.indexOf(players, function (player)
+			return player.name == playerLink
+		end)
+	end
 	if playerIndex > 0 then
 		return playerIndex
 	end
 
-	local playerDisplayNames = Array.map(players, Operator.property('displayname'))
-	playerIndex = Array.indexOf(playerDisplayNames, FnUtil.curry(Operator.eq, playerInput))
+	if not inputIsEmpty then
+		playerIndex = Array.indexOf(players, function (player)
+			return player.displayname == playerInput
+		end)
+	end
 	if playerIndex > 0 then
 		return playerIndex
 	end

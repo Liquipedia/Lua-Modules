@@ -78,7 +78,7 @@ function MatchFunctions.adjustOpponent(opponent, opponentIndex)
 	if opponent.type ~= Opponent.team then
 		return
 	end
-	local prefix = opponent.name .. '_p'
+	local prefix = opponent.template .. '_p'
 	Array.forEach(opponent.match2players, function (player, playerIndex)
 		local publisherId = globalVars:get(prefix .. playerIndex .. 'id')
 		if Logic.isNotEmpty(publisherId) then

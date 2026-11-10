@@ -15,7 +15,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TypeUtil = Lua.import('Module:TypeUtil')
 
-local Data = Lua.import('Module:Faction/Data', {loadData = true})
+local Data = Lua.requireIfExists('Module:Faction/Data', {loadData = true}) or {}
 local IconData = Lua.requireIfExists('Module:Faction/IconData', {loadData = true})
 	or {byFaction = {}}
 
@@ -39,7 +39,7 @@ Faction.knownFactions = Data.knownFactions
 ---@type table<string, string>?
 Faction.coreFactions = Data.coreFactions
 
-Faction.types.Faction = TypeUtil.literalUnion(unpack(Array.flatten(Array.extractValues(Faction.factions))))
+Faction.types.Faction = TypeUtil.literalUnion(unpack(Array.flatten(Array.extractValues(Faction.factions or {}))))
 
 Faction.types.FactionProps = TypeUtil.struct{
 	bgClass = 'string?',
@@ -49,6 +49,10 @@ Faction.types.FactionProps = TypeUtil.struct{
 	faction = Faction.types.Faction,
 }
 
+---@return boolean
+function Faction.wikiHasFactions()
+	return Data.factions ~= nil
+end
 
 local factionsByName = FnUtil.memoize(function ()
 	return Table.mapValues(Data.factionProps, function(factionProps)
@@ -72,6 +76,7 @@ end
 ---@param options {game: string?}?
 ---@return string[]
 function Faction.getFactions(options)
+	if not Faction.wikiHasFactions() then return {} end
 	local game = Faction._parseOptions(options).game
 	return game and Data.factions[game] or {}
 end
@@ -80,6 +85,7 @@ end
 ---@param options {game: string?}?
 ---@return string[]
 function Faction.getAliases(options)
+	if not Faction.wikiHasFactions() then return {} end
 	local game = Faction._parseOptions(options).game
 	return game and Data.aliases[game] or {}
 end
@@ -89,6 +95,7 @@ end
 ---@param options {game: string?}?
 ---@return boolean
 function Faction.isValid(faction, options)
+	if not Faction.wikiHasFactions() then return false end
 	local game = Faction._parseOptions(options).game
 	return game and (Data.factionProps[game] or {})[faction] ~= nil
 end
@@ -98,6 +105,7 @@ end
 ---@param options {game: string?}?
 ---@return table?
 function Faction.getProps(faction, options)
+	if not Faction.wikiHasFactions() then return nil end
 	local game = Faction._parseOptions(options).game
 	return game and (Data.factionProps[game] or {})[faction]
 end
@@ -109,6 +117,7 @@ end
 ---@param options {game: string?, alias: boolean?}?
 ---@return string?
 function Faction.read(faction, options)
+	if not Faction.wikiHasFactions() then return nil end
 	if type(faction) ~= 'string' then
 		return nil
 	end
@@ -131,6 +140,7 @@ end
 ---@param options {game: string?, sep: string?, alias: boolean?}?
 ---@return table
 function Faction.readMultiFaction(input, options)
+	if not Faction.wikiHasFactions() then return {} end
 	if String.isEmpty(input) then
 		return {}
 	end
@@ -158,6 +168,7 @@ end
 ---@param options {game: string?}?
 ---@return string?
 function Faction.toName(faction, options)
+	if not Faction.wikiHasFactions() then return nil end
 	local factionProps = Faction.getProps(faction, options)
 	return factionProps and factionProps.name or nil
 end
@@ -192,6 +203,7 @@ local namedSizes = {
 ---@param props FactionIconProps
 ---@return string?
 function Faction.Icon(props)
+	if not Faction.wikiHasFactions() then return nil end
 	local faction = Faction.read(props.faction, {game=props.game})
 	if not faction then return end
 
@@ -224,6 +236,7 @@ end
 ---@param options {game: string?}?
 ---@return string?
 function Faction.bgClass(faction, options)
+	if not Faction.wikiHasFactions() then return nil end
 	local factionProps = Faction.getProps(faction, options)
 	return factionProps and factionProps.bgClass or nil
 end

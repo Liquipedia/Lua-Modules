@@ -21,7 +21,7 @@ local SwitchSyncLevel = {
 }
 
 ---@class SwitchParameters
----@field label string
+---@field label Renderable|Renderable[]
 ---@field switchGroup string
 ---@field storeValue boolean?
 ---@field defaultActive boolean?
@@ -80,7 +80,10 @@ local function SwitchWidget(props)
 					Div{classes = {'switch-toggle-slider'}},
 				},
 			},
-			Div{children = label},
+			Div{
+				classes = {'switch-toggle-label'},
+				children = label,
+			},
 		},
 	}
 

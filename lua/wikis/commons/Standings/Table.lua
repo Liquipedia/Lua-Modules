@@ -18,33 +18,66 @@ local StandingsParseLpdb = Lua.import('Module:Standings/Parse/Lpdb')
 local StandingsParser = Lua.import('Module:Standings/Parser')
 local StandingsStorage = Lua.import('Module:Standings/Storage')
 
+local Standings = Lua.import('Module:Standings')
 local StandingsDisplay = Lua.import('Module:Widget/Standings')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local StandingsTable = {}
 
----@alias StandingsTableTypes 'ffa'|'swiss'
+---@alias StandingsTableTypes 'ffa'|'swiss'|'group'
+
+local TABLE_TYPES = {ffa = true, swiss = true, group = true}
 
 ---@class Scoreboard
 ---@field points number?
 ---@field match {w: integer, d: integer, l: integer}
+---@field overtime {w: integer, l: integer}?
+
+---@class StandingsAdjustment
+---@field points number?
+---@field tiebreaker number?
+---@field match {w: integer?, d: integer?, l: integer?}?
+---@field game {w: integer?, d: integer?, l: integer?}?
+---@field round {w: integer?, l: integer?}?
 
 ---@class StandingTableOpponentData
----@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?,
----match: MatchGroupUtilMatch?, matches: MatchGroupUtilMatch[], matchId: string}[]?
+---@field rounds {specialstatus: string, scoreboard: Scoreboard?,
+---matches: MatchGroupUtilMatch[], matchId: string, matchOpponentIndex: integer?}[]?
 ---@field opponent standardOpponent
+---@field matchPoints table<string, number>? # The points of each imported match, keyed by match id
 ---@field aliases standardOpponent[]? # Only for team opponents
 ---@field startingPoints number?
+---@field disqualifiedFromRound integer? # The first round in which the opponent is disqualified
+---@field definiteStatuses table<integer, string>? # Manually set definite statuses, keyed by the round they apply from
+---@field minStatuses table<integer, string>? # Keyed by the round they apply from
+---@field adjustments table<integer, StandingsAdjustment>? # Keyed by the round they apply from
 
 ---@param frame Frame
 ---@return Renderable
 function StandingsTable.fromTemplate(frame)
 	local args = Arguments.getArgs(frame)
 	local tableType = args.tabletype
-	if tableType ~= 'ffa' and tableType ~= 'swiss' then
+	if not TABLE_TYPES[tableType] then
 		error('Unknown Standing Table Type')
 	end
+	local storeLpdb = Logic.nilOr(Logic.readBoolOrNil(args.store), true)
+
+	-- Parsed separately so the imported matches are released before storage
+	local standingsTable = StandingsTable.parse(args, tableType)
+
+	local record, entries = StandingsStorage.run(standingsTable, {storeLpdb = storeLpdb})
+	---@cast record -nil
+	return StandingsDisplay{
+		standings = Standings.standingsFromRecord(record, entries),
+		width = StandingsParseWiki.parseWidth(args),
+	}
+end
+
+---@param args table
+---@param tableType StandingsTableTypes
+---@return StandingsTableStorage
+function StandingsTable.parse(args, tableType)
 	local title = args.title
 	local importScoreFromMatches = Logic.nilOr(Logic.readBoolOrNil(args.import), true)
 	local importOpponentFromMatches = Logic.nilOr(Logic.readBoolOrNil(args.importopponents), importScoreFromMatches)
@@ -52,6 +85,8 @@ function StandingsTable.fromTemplate(frame)
 	--- non-exclusive (the default) counts matches where at least one opponent is part of the standings.
 	--- Note that this is the reverse of the legacy GroupTableLeague default, on purpose.
 	local exclusiveOpponents = Logic.readBool(args.exclusive)
+	--- With tiebreaker reset, opponents split by a tiebreaker are compared again starting from the first tiebreaker.
+	local tiebreakerReset = Logic.readBool(args.tiebreakerreset)
 
 	local parsedData = StandingsParseWiki.parseWikiInput(args)
 	local rounds = parsedData.rounds
@@ -60,25 +95,48 @@ function StandingsTable.fromTemplate(frame)
 	local matches = parsedData.matches
 
 	local tiebreakers = StandingsParseWiki.parseTiebreakers(args, tableType)
+	local overtime = StandingsParseWiki.parseOvertime(args)
 
+	---@type table<integer, MatchPhase[]>
+	local matchPhasesByRound = {}
+	local maxBestOf
 	if importScoreFromMatches then
-		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args)
+		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args, overtime)
 
-		local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction, opponents, {
-			exclusive = exclusiveOpponents,
-			importOpponents = importOpponentFromMatches,
-		})
+		local importedOpponents
+		importedOpponents, matchPhasesByRound, maxBestOf = StandingsParseLpdb.importFromMatches(
+			rounds, automaticScoreFunction, opponents, {
+				exclusive = exclusiveOpponents,
+				importOpponents = importOpponentFromMatches,
+				overtime = overtime,
+				includeGames = StandingsParser.needsGames(tableType, tiebreakers),
+			}
+		)
 		opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
 	end
 
-	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
+	Array.forEach(rounds, function(round)
+		round.started, round.finished = StandingsParser.resolveRoundStatus(round, matchPhasesByRound[round.roundNumber])
+	end)
+
+	local format = StandingsParseWiki.parseFormat(args, tableType)
+	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType, tiebreakers, {
+		drawConfig = StandingsParseWiki.parseDrawConfig(args),
+		overtime = overtime,
+		walkoverGames = StandingsParseWiki.parseWalkoverGames(args),
+		walkoverRounds = StandingsParseWiki.parseWalkoverRounds(args),
+		tiebreakerReset = tiebreakerReset,
+		maxBestOf = maxBestOf,
+		format = format,
+		-- A format is never set on ffa standings
+		points = format and StandingsParseWiki.parsePoints(args.points, overtime, tableType --[[@as 'swiss'|'group']]),
+	})
 
 	if tableType == 'swiss' then
 		standingsTable.extradata.placemapping = Logic.wrapTryOrLog(StandingsParseWiki.parsePlaceMapping)(args, opponents)
 	end
 
-	StandingsStorage.run(standingsTable, {saveVars = true})
-	return StandingsDisplay{pageName = mw.title.getCurrentTitle().text, standingsIndex = standingsTable.standingsindex}
+	return standingsTable
 end
 
 ---@param manualOpponents StandingTableOpponentData[]

@@ -58,6 +58,19 @@ RUN arch="$(dpkg --print-architecture)" \
 		| tar -xz -C /opt/luals \
 	&& ln -s /opt/luals/bin/lua-language-server /usr/local/bin/lua-language-server
 
+# LuaLS addons for .luarc.json, pinned to the LuaLS/LLS-Addons commits
+# Not via the addon manager: it is VS Code only, manual, and lost on rebuild
+ARG LUALS_ADDON_BUSTED=5ed85d0e016a5eb5eca097aa52905eedf1b180f1
+ARG LUALS_ADDON_LUASSERT=d3528bb679302cbfdedefabb37064515ab95f7b9
+ENV LUALS_ADDONS=/opt/luals-addons
+RUN for addon in "busted:${LUALS_ADDON_BUSTED}" "luassert:${LUALS_ADDON_LUASSERT}"; do \
+		name="${addon%%:*}" \
+		&& mkdir -p "${LUALS_ADDONS}/${name}/module" \
+		&& curl -fsSL "https://github.com/LuaCATS/${name}/archive/${addon#*:}.tar.gz" \
+			| tar -xz --strip-components=1 -C "${LUALS_ADDONS}/${name}/module" \
+		|| exit 1; \
+	done
+
 # Python lives in a venv so it is writable without fighting PEP 668. The
 # requirements themselves, ruff included, are installed by post-create.sh, so
 # that changing requirements.txt does not need an image rebuild.

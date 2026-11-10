@@ -55,7 +55,7 @@ For copy-pastable code please use <code>Special:RunQuery/BracketCopyPaste</code>
 end
 
 ---@param props {bracketId: string, config: table?}
----@return Html
+---@return Renderable
 function BracketTemplate.BracketContainer(props)
 	local matchRecords = MatchGroupUtil.fetchMatchRecords(props.bracketId)
 	Array.forEach(matchRecords, function(match)

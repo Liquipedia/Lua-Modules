@@ -18,9 +18,16 @@ describe('Standings model round trip', function()
 		}
 	end
 
-	---Parses a standings table and stores it to page variables (as Standings/Table does),
-	---then reads the model back through Standings.getStandingsTable
-	local function buildAndFetchStandings()
+	---Stores a parsed standings table and builds the model from the stored records, as Standings/Table does
+	---@param standingsTable table
+	---@return StandingsModel
+	local function storeAndBuild(standingsTable)
+		local record, entries = StandingsStorage.run(standingsTable)
+		---@cast record -nil
+		return Standings.standingsFromRecord(record, entries)
+	end
+
+	local function buildStandings()
 		local rounds = {
 			{roundNumber = 1, started = true, finished = true, title = 'Day 1'},
 			{roundNumber = 2, started = true, finished = true, title = 'Day 2'},
@@ -32,9 +39,7 @@ describe('Standings model round trip', function()
 		}
 		local standingsTable = StandingsParser.parse(
 			rounds, opponents, {[1] = 'up', [3] = 'down'}, 'League Standings', {}, 'ffa', {'full.points', 'full.manual'})
-		StandingsStorage.run(standingsTable, {saveVars = true})
-
-		return Standings.getStandingsTable('FakePage', 0)
+		return storeAndBuild(standingsTable)
 	end
 
 	before_each(function()
@@ -52,16 +57,14 @@ describe('Standings model round trip', function()
 		mw.ext.LiquipediaDB.lpdb_standingsentry:revert()
 	end)
 
-	it('reads the stored standings back from page variables', function()
-		local standings = buildAndFetchStandings()
+	it('builds the model from the stored records', function()
+		local standings = buildStandings()
 
-		assert.is_not_nil(standings)
-		---@cast standings -nil
 		assert.are_equal('ffa', standings.type)
 		assert.are_equal('League Standings', standings.title)
 		assert.are_equal(0, standings.standingsIndex)
 		assert.are_equal('full.points', standings.additionalStats[1].id)
-		assert.are_equal('Points', standings.additionalStats[1].title)
+		assert.are_equal('Pts', standings.additionalStats[1].title)
 
 		assert.are_equal(2, #standings.rounds)
 		assert.are_equal('Day 1', standings.rounds[1].title)
@@ -71,8 +74,7 @@ describe('Standings model round trip', function()
 	end)
 
 	it('exposes entries ordered by position with model fields mapped', function()
-		local standings = buildAndFetchStandings()
-		---@cast standings -nil
+		local standings = buildStandings()
 
 		-- Round 2 totals: Bravo 5, Alpha 3, Charlie 1
 		local round2 = standings.rounds[2].opponents
@@ -99,15 +101,33 @@ describe('Standings model round trip', function()
 		assert.are_equal(0, charlie.positionChangeFromPreviousRound)
 	end)
 
+	it('stores group standings as league and reads them back as group', function()
+		local rounds = {{roundNumber = 1, started = true, finished = true, title = 'Round 1'}}
+		local standingsTable = StandingsParser.parse(
+			rounds, {makeOpponent('Alpha', {3}), makeOpponent('Bravo', {0})}, {}, 'Group A', {}, 'group',
+			{'full.points', 'full.manual'}
+		)
+		assert.are_equal('group', standingsTable.type)
+		local record, entries = StandingsStorage.run(standingsTable)
+		---@cast record -nil
+		assert.are_equal('league', record.type)
+
+		local standings = Standings.standingsFromRecord(record, entries)
+		assert.are_equal('group', standings.type)
+	end)
+
 	it('renders the ffa standings widget from the model', function()
-		buildAndFetchStandings() -- stores the standings into page variables
 		local StandingsDisplay = require('Module:Widget/Standings')
-		local html = tostring(StandingsDisplay{pageName = 'FakePage', standingsIndex = 0})
+		local html = tostring(StandingsDisplay{standings = buildStandings()})
 
 		assert.is_truthy(html:find('standings-ffa', 1, true))
 		assert.is_truthy(html:find('League Standings', 1, true))
 		assert.is_truthy(html:find('Day 1', 1, true))
 		assert.is_truthy(html:find('Day 2', 1, true))
+		-- The round selector shows the round titles
+		assert.is_truthy(html:find('data%-toggle%-area%-btn="1"[^>]*>Day 1<'))
+		assert.is_truthy(html:find('data%-toggle%-area%-btn="2"[^>]*>Day 2<'))
+		assert.is_falsy(html:find('Round 1', 1, true))
 
 		-- Round 2 rows in standings order: Bravo, Alpha, Charlie
 		local bravoPos = html:find('Bravo', 1, true)
@@ -118,6 +138,76 @@ describe('Standings model round trip', function()
 		assert.is_truthy(charliePos)
 
 		GoldenTest('standings_ffa', html)
+	end)
+
+	it('shows the opponents of the first round of ffa standings before any round has started', function()
+		local rounds = {
+			{roundNumber = 1, started = false, finished = false, title = 'Day 1'},
+			{roundNumber = 2, started = false, finished = false, title = 'Day 2'},
+		}
+		local standingsTable = StandingsParser.parse(
+			rounds, {makeOpponent('Alpha', {0, 0}), makeOpponent('Bravo', {0, 0})}, {}, 'FFA', {}, 'ffa',
+			{'full.points', 'full.manual'}
+		)
+		local html = tostring(require('Module:Widget/Standings')({standings = storeAndBuild(standingsTable)}))
+		-- The round history stays for the detailed stats switch of the round columns
+		assert.is_truthy(html:find('class="standings-round-history toggle-area toggle-area-1"', 1, true))
+		assert.is_truthy(html:find('data-toggle-area-content="1"', 1, true))
+		assert.is_truthy(html:find('Alpha', 1, true))
+		assert.is_truthy(html:find('Bravo', 1, true))
+	end)
+
+	it('renders single round ffa standings without a round history', function()
+		local standingsTable = StandingsParser.parse(
+			{{roundNumber = 1, started = true, finished = true, title = 'Day 1'}},
+			{makeOpponent('Alpha', {3}), makeOpponent('Bravo', {1})}, {}, 'FFA', {}, 'ffa',
+			{'full.points', 'full.manual'}
+		)
+		local html = tostring(require('Module:Widget/Standings')({standings = storeAndBuild(standingsTable)}))
+		assert.is_truthy(html:find('standings-ffa', 1, true))
+		assert.is_falsy(html:find('standings-round-history', 1, true))
+		assert.is_falsy(html:find('data-toggle-area-content', 1, true))
+		assert.is_truthy(html:find('Alpha', 1, true))
+	end)
+
+	it('maps disqualifications to the model and renders them', function()
+		local rounds = {
+			{roundNumber = 1, started = true, finished = true, title = 'Day 1'},
+			{roundNumber = 2, started = true, finished = true, title = 'Day 2'},
+		}
+		local dqOpponent = makeOpponent('Alpha', {5, 5})
+		dqOpponent.disqualifiedFromRound = 2
+		local standingsTable = StandingsParser.parse(
+			rounds,
+			{dqOpponent, makeOpponent('Bravo', {1, 1}), makeOpponent('Charlie', {0, 0})},
+			{[1] = 'up'},
+			'League Standings',
+			{},
+			'ffa',
+			{'full.disqualified', 'full.points', 'full.manual'}
+		)
+		local standings = storeAndBuild(standingsTable)
+
+		local round1 = standings.rounds[1].opponents
+		assert.are_same({'Alpha', 'Bravo', 'Charlie'}, Array.map(round1, function(entry) return entry.opponent.name end))
+		assert.is_false(round1[1].disqualified)
+
+		local round2 = standings.rounds[2].opponents
+		assert.are_same({'Bravo', 'Charlie', 'Alpha'}, Array.map(round2, function(entry) return entry.opponent.name end))
+		local alpha = round2[3]
+		assert.is_true(alpha.disqualified)
+		assert.are_equal(3, tonumber(alpha.placement))
+		assert.are_equal('dq', alpha.positionStatus)
+		assert.are_equal('dq', alpha.definitiveStatus)
+		assert.is_false(round2[1].disqualified)
+
+		local html = tostring(require('Module:Widget/Standings')({standings = standings}))
+		-- The DQ label sits inside the participant cell, next to the opponent
+		assert.is_truthy(html:find(
+			'class="standings%-participant">.-<div class="generic%-label label%-%-placement" data%-placement%-type="dq">DQ</div>'
+		))
+		-- Points stays the bold (first visible) stat, even though the hidden disqualified tiebreaker comes first
+		assert.is_truthy(html:find('style="font-weight:bold">10<', 1, true))
 	end)
 
 	it('renders the swiss standings widget from the model', function()
@@ -144,11 +234,8 @@ describe('Standings model round trip', function()
 			},
 		}
 		local standingsTable = StandingsParser.parse(
-			rounds, opponents, {}, 'Swiss Stage', {}, 'swiss', {'full.matchdiff', 'full.manual'})
-		StandingsStorage.run(standingsTable, {saveVars = true})
-
-		local standings = Standings.getStandingsTable('FakePage', 0)
-		assert.is_not_nil(standings)
+			rounds, opponents, {[1] = 'up', [2] = 'down'}, 'Swiss Stage', {}, 'swiss', {'full.matchdiff', 'full.manual'})
+		local standings = storeAndBuild(standingsTable)
 
 		local html = tostring(SwissStandings{standings = standings})
 		assert.is_truthy(html:find('standings-swiss', 1, true))
@@ -159,5 +246,171 @@ describe('Standings model round trip', function()
 		assert.is_truthy(bravoPos)
 
 		GoldenTest('standings_swiss', html)
+	end)
+
+	it('shows the opposing opponent of a match played under an alias', function()
+		local SwissStandings = require('Module:Widget/Standings/Swiss')
+
+		local rounds = {{roundNumber = 1, started = true, finished = true, title = 'Round 1'}}
+		local opponents = {
+			{
+				opponent = literal('Alpha'),
+				rounds = {{scoreboard = {points = 1, match = {w = 1, d = 0, l = 0}}, specialstatus = '',
+					matchId = 'M1', matchOpponentIndex = 1}},
+			},
+			{
+				opponent = literal('Bravo'),
+				rounds = {{scoreboard = {points = 0, match = {w = 0, d = 0, l = 1}}, specialstatus = '',
+					matchId = 'M1', matchOpponentIndex = 2}},
+			},
+		}
+		local standingsTable = StandingsParser.parse(
+			rounds, opponents, {}, 'Swiss Stage', {}, 'swiss', {'full.matchdiff'})
+		local standings = storeAndBuild(standingsTable)
+
+		-- Matches are fetched as stored, so Alpha shows up under its alias
+		local match = {phase = 'finished', winner = 1, opponents = {
+			{type = 'literal', name = 'Alpha Old', placement = 1, status = 'S', score = 2},
+			{type = 'literal', name = 'Bravo', placement = 2, status = 'S', score = 0},
+		}}
+		Array.forEach(standings.rounds[1].opponents, function(entry)
+			entry.match = match
+		end)
+
+		local html = tostring(SwissStandings{standings = standings})
+		local _, aliasCount = html:gsub('Alpha Old', '')
+		local _, bravoCount = html:gsub('Bravo', '')
+		-- Only in Bravo's row as its opponent, and Bravo is shown as Alpha's opponent
+		assert.are_equal(1, aliasCount)
+		assert.are_equal(2, bravoCount)
+	end)
+
+	describe('group standings', function()
+		---@param name string
+		---@param results {w: integer, d: integer, l: integer}[]
+		local function makeGroupOpponent(name, results)
+			return {
+				opponent = literal(name),
+				rounds = Array.map(results, function(result)
+					return {scoreboard = {points = 3 * result.w + result.d, match = result}, specialstatus = ''}
+				end),
+			}
+		end
+
+		local WIN = {w = 1, d = 0, l = 0}
+		local DRAW = {w = 0, d = 1, l = 0}
+		local LOSS = {w = 0, d = 0, l = 1}
+		local NOT_PLAYED = {w = 0, d = 0, l = 0}
+
+		---@param rounds table[]
+		---@param opponents table[]
+		---@param bgs table<integer, string>?
+		---@return string, StandingsModel
+		local function storeAndRender(rounds, opponents, bgs)
+			local standingsTable = StandingsParser.parse(
+				rounds, opponents, bgs or {[1] = 'up', [3] = 'down'}, 'Group A', {}, 'group',
+				{'full.disqualified', 'full.points', 'full.manual'}
+			)
+			local standings = storeAndBuild(standingsTable)
+			return tostring(require('Module:Widget/Standings')({standings = standings})), standings
+		end
+
+		it('renders every started round with a round selector', function()
+			local rounds = {
+				{roundNumber = 1, started = true, finished = true, title = 'Week 1'},
+				{roundNumber = 2, started = true, finished = true, title = 'Week 2'},
+				{roundNumber = 3, started = false, finished = false, title = 'Week 3'},
+			}
+			local html = storeAndRender(rounds, {
+				makeGroupOpponent('Alpha', {LOSS, WIN, NOT_PLAYED}),
+				makeGroupOpponent('Bravo', {WIN, DRAW, NOT_PLAYED}),
+				makeGroupOpponent('Charlie', {DRAW, WIN, NOT_PLAYED}),
+			})
+
+			assert.is_truthy(html:find('class="standings-round-history toggle-area toggle-area-2"', 1, true))
+			assert.is_truthy(html:find('standings-group', 1, true))
+			assert.is_truthy(html:find('Group A', 1, true))
+			-- The selector shows the round titles, the last started round is the current one
+			assert.is_truthy(html:find('>Week 1<', 1, true))
+			assert.is_truthy(html:find('>Current<', 1, true))
+			assert.is_falsy(html:find('Week 3', 1, true))
+
+			assert.is_truthy(html:find('data-toggle-area-content="1"', 1, true))
+			assert.is_truthy(html:find('data-toggle-area-content="2"', 1, true))
+			assert.is_falsy(html:find('data-toggle-area-content="3"', 1, true))
+			assert.is_truthy(html:find('standings-position-indicator', 1, true))
+
+			-- Points is the first tiebreaker, so it is bold, even though always shown stats come first
+			assert.is_truthy(html:find('style="font-weight:bold">4<', 1, true))
+
+			GoldenTest('standings_group', html)
+		end)
+
+		it('ranks by points and tracks the placement changes', function()
+			local rounds = {
+				{roundNumber = 1, started = true, finished = true, title = 'Week 1'},
+				{roundNumber = 2, started = true, finished = true, title = 'Week 2'},
+			}
+			local _, standings = storeAndRender(rounds, {
+				makeGroupOpponent('Alpha', {LOSS, WIN}),
+				makeGroupOpponent('Bravo', {WIN, LOSS}),
+				makeGroupOpponent('Charlie', {DRAW, WIN}),
+			})
+
+			local function names(round)
+				return Array.map(standings.rounds[round].opponents, function(entry) return entry.opponent.name end)
+			end
+			assert.are_same({'Bravo', 'Charlie', 'Alpha'}, names(1))
+			assert.are_same({'Charlie', 'Alpha', 'Bravo'}, names(2))
+			local charlie = standings.rounds[2].opponents[1]
+			assert.are_equal(4, charlie.points)
+			assert.are_equal(1, charlie.positionChangeFromPreviousRound)
+		end)
+
+		it('renders a single round without a round selector or placement changes', function()
+			local html = storeAndRender({{roundNumber = 1, started = true, finished = true, title = 'Round 1'}}, {
+				makeGroupOpponent('Alpha', {WIN}),
+				makeGroupOpponent('Bravo', {LOSS}),
+			})
+			assert.is_truthy(html:find('standings-group', 1, true))
+			assert.is_falsy(html:find('standings-round-history', 1, true))
+			assert.is_falsy(html:find('data-toggle-area-content', 1, true))
+			assert.is_falsy(html:find('standings-position-indicator', 1, true))
+		end)
+
+		it('shows the opponents of the first round before any round has started', function()
+			local html = storeAndRender({
+				{roundNumber = 1, started = false, finished = false, title = 'Week 1'},
+				{roundNumber = 2, started = false, finished = false, title = 'Week 2'},
+			}, {
+				makeGroupOpponent('Alpha', {NOT_PLAYED, NOT_PLAYED}),
+				makeGroupOpponent('Bravo', {NOT_PLAYED, NOT_PLAYED}),
+			})
+			assert.is_falsy(html:find('standings-round-history', 1, true))
+			assert.is_falsy(html:find('data-toggle-area-content', 1, true))
+			assert.is_truthy(html:find('Alpha', 1, true))
+			assert.is_truthy(html:find('Bravo', 1, true))
+		end)
+
+		it('renders undecided, minimum and confirmed placements', function()
+			local alpha = makeGroupOpponent('Alpha', {{w = 2, d = 0, l = 0}})
+			alpha.definiteStatuses = {[1] = 'up'}
+			local bravo = makeGroupOpponent('Bravo', {{w = 1, d = 0, l = 1}})
+			bravo.minStatuses = {[1] = 'stay'}
+			local delta = makeGroupOpponent('Delta', {{w = 0, d = 0, l = 2}})
+			delta.definiteStatuses = {[1] = 'down'}
+			local html = storeAndRender({{roundNumber = 1, started = true, finished = false, title = 'Round 1'}}, {
+				alpha, bravo, makeGroupOpponent('Charlie', {{w = 0, d = 1, l = 1}}), delta,
+			}, {[1] = 'up', [2] = 'up', [3] = 'down', [4] = 'down'})
+
+			local _, minimumCount = html:gsub('data%-label%-type="placement%-minimum"', '')
+			assert.are_equal(1, minimumCount)
+			assert.is_truthy(html:find('data-placement-type="stay" data-label-type="placement-minimum"', 1, true))
+			assert.is_truthy(html:find('data-placement-type="up">1<', 1, true))
+			assert.is_truthy(html:find('data-placement-type="down">4<', 1, true))
+			assert.is_truthy(html:find('class="generic-label label--placement">3<', 1, true))
+
+			GoldenTest('standings_group_placement_status', html)
+		end)
 	end)
 end)

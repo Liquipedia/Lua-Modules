@@ -74,7 +74,7 @@ local function TournamentsTickerPill(props)
 			tierTypeShort and Html.Div{
 				classes = WidgetUtil.collect(
 					'tournament-badge__chip',
-					not subtle and 'chip--' .. COLOR_CLASSES[tierIdentifier] or nil
+					not subtle and 'chip--' .. ( COLOR_CLASSES[tierIdentifier] or '' ) or nil
 				),
 				children = chipText,
 			} or nil,

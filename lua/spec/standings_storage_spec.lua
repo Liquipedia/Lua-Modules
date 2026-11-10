@@ -37,6 +37,73 @@ describe('Standings Storage', function()
 		stubLpdbStandingsTable:revert()
 	end)
 
+	it('skips lpdb but still returns the records when storeLpdb is false', function()
+		local stubLpdb = stub(mw.ext.LiquipediaDB, "lpdb", {})
+		local stubLpdbStandingsTable = stub(mw.ext.LiquipediaDB, "lpdb_standingstable")
+		local stubLpdbStandingsEntry = stub(mw.ext.LiquipediaDB, "lpdb_standingsentry")
+
+		local standingsTable, entries = StandingsStorage.run({
+			standingsindex = 0,
+			title = '',
+			type = 'swiss',
+			entries = {
+				{opponent = {type = 'literal', name = 'Alpha'}, roundindex = 1, slotindex = 1, placement = 1},
+			},
+		}, {storeLpdb = false})
+
+		assert.stub(stubLpdbStandingsTable).was_not.called()
+		assert.stub(stubLpdbStandingsEntry).was_not.called()
+		---@cast standingsTable -nil
+		---@cast entries -nil
+		assert.are_equal('swiss', standingsTable.type)
+		assert.are_equal(1, #entries)
+
+		stubLpdb:revert()
+		stubLpdbStandingsTable:revert()
+		stubLpdbStandingsEntry:revert()
+	end)
+
+	it('stores a party opponent with an entry per round', function()
+		local stubLpdb = stub(mw.ext.LiquipediaDB, "lpdb", {})
+		local stubLpdbStandingsTable = stub(mw.ext.LiquipediaDB, "lpdb_standingstable")
+		local stubLpdbStandingsEntry = stub(mw.ext.LiquipediaDB, "lpdb_standingsentry")
+		local opponent = {type = 'solo', players = {{pageName = 'Alpha', displayName = 'Alpha'}}}
+
+		local _, entries = StandingsStorage.run({
+			standingsindex = 0,
+			title = '',
+			type = 'swiss',
+			entries = {
+				{opponent = opponent, roundindex = 1, slotindex = 1, placement = 1},
+				{opponent = opponent, roundindex = 2, slotindex = 1, placement = 1},
+			},
+		})
+
+		assert.stub(stubLpdbStandingsEntry).was.called(2)
+		---@cast entries -nil
+		assert.are_equal('Alpha', entries[2].opponentplayers.p1)
+
+		stubLpdb:revert()
+		stubLpdbStandingsTable:revert()
+		stubLpdbStandingsEntry:revert()
+	end)
+
+	describe('table', function()
+		---@param data table
+		---@return table
+		local function storeTable(data)
+			data.standingsindex = 0
+			data.type = 'swiss'
+			return StandingsStorage.table(data)
+		end
+
+		it('stores hasovertime', function()
+			local standingsTable = storeTable{hasovertime = true}
+			assert.is_true(standingsTable.config.hasovertime)
+			assert.is_true(standingsTable.extradata.hasovertime)
+		end)
+	end)
+
 	it('storage full', function()
 		TeamTemplateMock.setUp()
 		local standingsData = require('test_assets.standings')
@@ -52,7 +119,7 @@ describe('Standings Storage', function()
 		StandingsStorage.run(standingsData)
 
 		assert.stub(stubLpdbStandingsTable).was.called_with('standingsTable_0', {
-			config = '{"hasdraws":false,"hasovertimes":true}',
+			config = '{"hasdraws":false,"hasovertime":true}',
 			extradata = '{"enddate":"2022-10-31","finished":false,"hasdraw":false,"hasovertime":true,"roundcount":7}',
 			matches = '[]',
 			parent = 'FakePage',

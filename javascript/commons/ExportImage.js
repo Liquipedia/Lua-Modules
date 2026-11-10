@@ -102,6 +102,12 @@ const EXPORT_IMAGE_CONFIG = {
 			typeName: 'Participants'
 		},
 		{
+			selector: '.table2.standings-group',
+			targetSelector: 'table.table2__table',
+			titleSelector: '.table2__title',
+			typeName: 'Group Standings Table'
+		},
+		{
 			selector: '.table2.standings-ffa',
 			targetSelector: 'table.table2__table',
 			titleSelector: '.table2__title',

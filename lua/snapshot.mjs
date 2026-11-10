@@ -82,37 +82,52 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 		process.exit(1);
 	}
 
-	if (shouldUpdate || !existsSync(referencePath)) {
-		// Update snapshot, either forced or previous snapshot doesn't exist yet
+	const writeReference = () => {
 		mkdirSync(SNAPSHOT_DIR, { recursive: true });
 		writeFileSync(referencePath, PNG.sync.write(combined));
+	};
+
+	if (!existsSync(referencePath)) {
+		writeReference();
 		process.exit(0);
-	} else {
-		// Compare with existing snapshot
-		const referenceImage = PNG.sync.read(readFileSync(referencePath));
-		const { width, height } = referenceImage;
-
-		const diffImage = new PNG({ width, height });
-
-		const mismatchedPixels = pixelmatch(
-			referenceImage.data,
-			combined.data,
-			diffImage.data,
-			width,
-			height,
-			PIXELMATCH_OPTIONS
-		);
-
-		if (mismatchedPixels === 0) {
-			process.exit(0);
-		} else {
-			// Failure, let's save the diff and the new failed image for manual inspection
-			mkdirSync(SNAPSHOT_DIFF_DIR, { recursive: true });
-
-			writeFileSync(join(SNAPSHOT_DIFF_DIR, `${testName}-diff.png`), PNG.sync.write(diffImage));
-			writeFileSync(join(SNAPSHOT_DIFF_DIR, `${testName}-new.png`), PNG.sync.write(combined));
-
-			process.exit(1);
-		}
 	}
+
+	// Compare with existing snapshot
+	const referenceImage = PNG.sync.read(readFileSync(referencePath));
+	const { width, height } = referenceImage;
+	const sameSize = width === combined.width && height === combined.height;
+
+	const diffImage = new PNG({ width, height });
+
+	// pixelmatch throws on differently sized images, and a size change is a mismatch anyway
+	const mismatchedPixels = sameSize ? pixelmatch(
+		referenceImage.data,
+		combined.data,
+		diffImage.data,
+		width,
+		height,
+		PIXELMATCH_OPTIONS
+	) : Infinity;
+
+	if (mismatchedPixels === 0) {
+		// Leave the reference untouched even when updating. CI runners with different CPUs
+		// anti-alias rounded corners a shade apart, and rewriting on that noise makes the
+		// snapshots flip back and forth between PRs.
+		process.exit(0);
+	}
+
+	if (shouldUpdate) {
+		writeReference();
+		process.exit(0);
+	}
+
+	// Failure, let's save the diff and the new failed image for manual inspection
+	mkdirSync(SNAPSHOT_DIFF_DIR, { recursive: true });
+
+	if (sameSize) {
+		writeFileSync(join(SNAPSHOT_DIFF_DIR, `${testName}-diff.png`), PNG.sync.write(diffImage));
+	}
+	writeFileSync(join(SNAPSHOT_DIFF_DIR, `${testName}-new.png`), PNG.sync.write(combined));
+
+	process.exit(1);
 })();

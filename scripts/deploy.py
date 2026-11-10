@@ -183,7 +183,11 @@ def main():
 
     handle_renamed_files(dev_environment, parsed_args.lua_files, git_deploy_reason)
 
-    for wiki, files in itertools.groupby(sorted(lua_files), lambda path: path.parts[2]):
+    # Deploy commons first, as the other wikis depend on it
+    for wiki, files in itertools.groupby(
+        sorted(lua_files, key=lambda path: (path.parts[2] != "commons", path)),
+        lambda path: path.parts[2],
+    ):
         all_modules_deployed &= deploy_all_files_for_wiki(
             wiki, list(files), git_deploy_reason, dev_environment
         )

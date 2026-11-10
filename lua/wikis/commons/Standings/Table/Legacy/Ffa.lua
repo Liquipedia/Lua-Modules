@@ -9,9 +9,8 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
-local Json = Lua.import('Module:Json')
 local Table = Lua.import('Module:Table')
-local Variables = Lua.import('Module:Variables')
+local Template = Lua.import('Module:Template')
 
 local StandingTable = Lua.import('Module:Standings/Table')
 
@@ -76,46 +75,45 @@ end
 
 ---Template:league standings start
 ---@param frame Frame
+---@return string
 function StandingTableLegacyFfa.slotStart(frame)
 	local args = Arguments.getArgs(frame)
-	Variables.varDefine('standings_legacy_start', Json.stringify(args))
-	Variables.varDefine('standings_legacy_count', 0)
+	args.__source = 'legacy_start'
+	return Template.stashReturnValue(args, 'standings_legacy')
 end
 
 ---Template:league standings slot & Template:league standings slot2
 ---@param frame Frame
+---@return string
 function StandingTableLegacyFfa.slot(frame)
 	local args = Arguments.getArgs(frame)
-	local cnt = (tonumber(Variables.varDefault('standings_legacy_count')) or 0) + 1
-	Variables.varDefine('standings_legacy_slot_' .. cnt, Json.stringify(args))
-	Variables.varDefine('standings_legacy_count', cnt)
+	args.__source = 'legacy_slot'
+	return Template.stashReturnValue(args, 'standings_legacy')
 end
 
 ---Template:league standings end & Template:league standings end2
 ---@param frame Frame
 ---@return Renderable?
 function StandingTableLegacyFfa.templateEnd(frame)
-	local cnt = tonumber(Variables.varDefault('standings_legacy_count'))
-	if not cnt then
+	local entries = Template.retrieveReturnValues('standings_legacy')
+
+	if #entries == 0 then
 		return
 	end
-	local startArgs = Json.parseIfString(Variables.varDefault('standings_legacy_start'))
-	if not startArgs then
-		return
+
+	local startArgs = table.remove(entries, 1)
+
+	if startArgs.__source ~= 'legacy_start' then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with malformed Legacy FFA standings structure')
+		error('Invalid legacy FFA Standings setup')
 	end
-	Variables.varDefine('standings_legacy_start', nil)
-	local slots = Array.mapRange(1, cnt, function(index)
-		local data = (Json.parseIfString(Variables.varDefault('standings_legacy_slot_' .. index)))
-		Variables.varDefine('standings_legacy_slot_' .. index, nil)
-		return data
-	end)
 
 	local rounds = Table.map(Array.range(1, tonumber(startArgs.rounds) or 1), function(roundIndex)
 		return 'round' .. roundIndex, StandingTableLegacyFfa.parseRoundInput(startArgs, roundIndex)
 	end)
 
 	---@type StandingTableOpponentData[]
-	local opponents = Array.map(slots, function(slot)
+	local opponents = Array.map(entries, function(slot)
 		return StandingTableLegacyFfa.parseTeamInputManualSlots(slot)
 	end)
 
@@ -144,7 +142,7 @@ end
 
 ---@param args table
 ---@param teamIndex integer
----@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, r1: string?}?
+---@return {type: OpponentType, [1]: string, tiebreaker: string?, r1points: string?, r1: string?}?
 function StandingTableLegacyFfa.parseTeamInput(args, teamIndex)
 	local team = args['team' .. teamIndex] or args['p' .. teamIndex .. 'team']
 	if not team then
@@ -157,16 +155,16 @@ function StandingTableLegacyFfa.parseTeamInput(args, teamIndex)
 	end)
 
 	local tiebreaker = args['tiebreaker' .. teamIndex] or args['p' .. teamIndex .. 'temp_tie']
-	local startingPoints = args['changes' .. teamIndex] or args['p' .. teamIndex .. 'changes']
+	local points = args['changes' .. teamIndex] or args['p' .. teamIndex .. 'changes']
 
 	return Table.merge(
-		{type = Opponent.team, team, tiebreaker = tiebreaker, startingpoints = startingPoints},
+		{type = Opponent.team, team, tiebreaker = tiebreaker, r1points = points},
 		rounds
 	)
 end
 
 ---@param args table
----@return {type: OpponentType, [1]: string, startingpoints: string?, r1: string?}?
+---@return {type: OpponentType, [1]: string, r1points: number?, r1: string?}?
 function StandingTableLegacyFfa.parseTeamInputManualSlots(args)
 	if not args then
 		return nil
@@ -177,10 +175,10 @@ function StandingTableLegacyFfa.parseTeamInputManualSlots(args)
 		return 'r' .. roundIndex, data[2]
 	end)
 
-	local startingPoints = -(tonumber(args.penalty) or 0)
+	local penalty = tonumber(args.penalty)
 
 	return Table.merge(
-		{type = Opponent.team, args.team, startingpoints = startingPoints},
+		{type = Opponent.team, args.team, r1points = penalty and -penalty or nil},
 		rounds
 	)
 end

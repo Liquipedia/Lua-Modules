@@ -14,6 +14,7 @@ local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Info = Lua.import('Module:Info', {loadData = true})
+local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
@@ -34,6 +35,7 @@ local ConditionUtil = Condition.Util
 
 local Html = Lua.import('Module:Widget/Html')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
+local QueryLink = Lua.import('Module:Widget/QueryLink')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -95,7 +97,8 @@ function BaseResultsTable:readConfig()
 		displayDefaultLogoAsIs = Logic.readBool(args.displayDefaultLogoAsIs),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
 		useIndivPrize = Logic.readBool(args.useIndivPrize),
-		aliases = Array.parseCommaSeparatedString(args.aliases)
+		aliases = Array.parseCommaSeparatedString(args.aliases),
+		queryLinkProps = Json.parseIfString(args.queryLinkProps),
 	}
 
 	config.sort = Logic.emptyOr(
@@ -390,10 +393,36 @@ function BaseResultsTable:build()
 			} or nil,
 			TableWidgets.TableBody{children = WidgetUtil.collect(self:_buildTableBody(), self.args.manualContent)}
 		),
-		footer = self.config.onlyAchievements and LinkWidget{
+		footer = self:_footer(),
+	}
+end
+
+---@private
+---@return Renderable?
+function BaseResultsTable:_footer()
+	if not self.config.onlyAchievements then
+		return
+	end
+
+	if not self.config.queryLinkProps then
+		return LinkWidget{
 			link = self.config.opponent .. '/' .. self.config.resultsSubPage,
 			children = 'Extended list of results',
-		} or nil
+		}
+	end
+
+	local form = self.config.queryType == QUERY_TYPES.team and 'Team Results' or 'Player Results'
+	local template = self.config.queryType == QUERY_TYPES.team and 'Team results' or 'Player results'
+
+	return QueryLink{
+		mediawikiForm = form,
+		form = form .. 'LH',
+		display = 'Extended list of results',
+		template = template,
+		queryArgs = Table.merge({
+			team = self.config.opponent,
+			player = self.config.opponent,
+		}, self.config.queryLinkProps),
 	}
 end
 
@@ -471,16 +500,14 @@ function BaseResultsTable:opponentDisplay(data, options)
 
 	if not Opponent.isType(data.opponenttype) then
 		return '-'
-	elseif data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
-		return OpponentDisplay.BlockOpponent{
-			opponent = Opponent.fromLpdbStruct(data) --[[@as standardOpponent]],
-			flip = options.flip,
-		}
-	elseif self.config.displayDefaultLogoAsIs then
+	elseif data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo)
+		or self.config.displayDefaultLogoAsIs then
+
 		return OpponentDisplay.BlockOpponent{
 			opponent = Opponent.fromLpdbStruct(data) --[[@as standardOpponent]],
 			flip = options.flip,
 			teamStyle = 'icon',
+			oneLine = true,
 		}
 	end
 
@@ -562,7 +589,7 @@ end
 
 ---@protected
 ---@param placement placement
----@return Widget
+---@return Renderable
 function BaseResultsTable:createTierCell(placement)
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)
 	return TableWidgets.Cell{

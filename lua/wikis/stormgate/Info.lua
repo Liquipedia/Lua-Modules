@@ -44,8 +44,13 @@ return {
 		},
 		standings = {
 			alwaysShowStats = {
-				swiss = {'matchdiff', 'gamediff'},
+				swiss = {'matchscore', 'gamescore'},
+				group = {'matchscore', 'gamescore'},
 			},
+		},
+		participants = {
+			soloAsFactionTable = true,
+			sortPlayersInTable = true,
 		},
 	},
 	defaultRoundPrecision = 0,

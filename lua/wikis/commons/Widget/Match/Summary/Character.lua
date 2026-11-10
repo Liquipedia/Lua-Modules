@@ -19,7 +19,16 @@ local defaultProps = {
 	flipped = false,
 }
 
----@param props {character: string, date: string?, size: string?, showName: boolean?, bg: string?, flipped: boolean?}
+---@class MatchSummaryCharacterProps
+---@field classes string[]?
+---@field character string
+---@field date string?
+---@field size string?
+---@field showName boolean?
+---@field bg string?
+---@field flipped boolean?
+
+---@param props MatchSummaryCharacterProps
 ---@return VNode?
 local function MatchSummaryCharacter(props)
 	local characterIcon = CharacterIcon.Icon{
@@ -33,8 +42,8 @@ local function MatchSummaryCharacter(props)
 	end
 
 	return Div{
-		classes = {props.bg},
-		children = props.flipped and Array.reverse(children) or children
+		classes = Array.extend(props.bg, props.classes),
+		children = props.flipped and Array.reverse(children) or children,
 	}
 end
 
