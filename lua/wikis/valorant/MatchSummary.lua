@@ -13,6 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local Tournament = Lua.import('Module:Tournament')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local Html = Lua.import('Module:Widget/Html')
@@ -124,7 +125,11 @@ function CustomMatchSummary.GameDetail(game, index)
 	return MatchSummaryWidgets.GameDetail{
 		game = game,
 		gameIndex = index,
-		overview = game.length,
+		overview = Html.Fragment{children = {
+			DisplayHelper.Map(game),
+			SPAN_SLASH,
+			game.length,
+		}},
 		children = WidgetUtil.collect(
 			CustomMatchSummary._createOpponentDetail(game, gamePlayers[1], 1),
 			CustomMatchSummary._createOpponentDetail(game, gamePlayers[2], 2)
@@ -170,7 +175,7 @@ function CustomMatchSummary._createOpponentDetail(game, gamePlayersOfTeam, gameO
 						flipped = gameOpponentIndex == 2,
 						showName = false,
 						size = '24px',
-						character = gamePlayer.character
+						character = gamePlayer.agent
 					},
 					Link{link = gamePlayer.player, children = gamePlayer.displayName},
 					Html.Div{
