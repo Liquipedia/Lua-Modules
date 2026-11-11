@@ -165,7 +165,11 @@ function MatchGroupLegacy.getAlt(template, bracketType)
 		elseif id == RESET_MATCH then
 			matchKey = 'r' .. roundNum .. 'm1'
 		else
-			roundNum = id:match('R%d*'):gsub('R', '')
+			local roundString, matchIndex = id:match('^R(%d+)M(%d+)$')
+			roundNum = tonumber(roundString) --[[@as integer]]
+			if string.match(bd.header or '', '^!l') then
+				lowerHeaders[roundNum] = tonumber(matchIndex)
+			end
 			if bd.bracketsection == 'upper' then
 				countMatchesInLower = 0
 				matchKey = id:lower()
@@ -177,11 +181,6 @@ function MatchGroupLegacy.getAlt(template, bracketType)
 				matchKey = 'l' .. roundNum .. 'm' .. countMatchesInLower
 			end
 		end
-
-		if string.match(bd.header or '', '^!l') then
-			lowerHeaders[roundNum or ''] = roundNum
-		end
-
 
 		match2mapping[id] = {opp1 = matchKey .. 'p1', opp2 = matchKey .. 'p2', details = matchKey}
 	end)
@@ -201,6 +200,45 @@ end
 ---@param match1params match1Keys
 function MatchGroupLegacy.matchResetMappingFromCustom(match1params)
 	return match1params
+end
+
+---Maps upper keys (`r#m#`, `R#`) of a `getAlt` mapping to lower keys (`l#m#`, `L#`) shifted by `roundOffset`.
+---@param match2mapping match2mapping
+---@param roundOffset integer?
+---@return match2mapping
+function MatchGroupLegacy.toLowerBracket(match2mapping, roundOffset)
+	roundOffset = roundOffset or 0
+	local toLower = function(key)
+		return (key:gsub('^([Rr])(%d+)', function(prefix, round)
+			return (prefix == 'R' and 'L' or 'l') .. (tonumber(round) + roundOffset)
+		end))
+	end
+
+	-- getAlt keys a third place match as the last lower round, which would duplicate the final
+	local withoutThirdPlace = Table.filterByKey(match2mapping, function(match2key)
+		return match2key ~= THIRD_PLACE_MATCH and match2key ~= THIRD_PLACE_MATCH .. 'header'
+	end)
+
+	return Table.mapValues(withoutThirdPlace, function(match1keys)
+		if type(match1keys) == 'string' then
+			return toLower(match1keys)
+		end
+		return Table.mapValues(match1keys, toLower)
+	end)
+end
+
+---Maps the reset match of a final in round `finalRound` that keeps its details in `r{finalRound}m2`.
+---@param match2mapping match2mapping
+---@param finalRound integer
+---@return match2mapping
+function MatchGroupLegacy.withReset(match2mapping, finalRound)
+	local finalKey = 'r' .. finalRound .. 'm1'
+	match2mapping[RESET_MATCH] = {
+		opp1 = finalKey .. 'p1',
+		opp2 = finalKey .. 'p2',
+		details = 'r' .. finalRound .. 'm2',
+	}
+	return match2mapping
 end
 
 ---@param blueprint table
@@ -595,6 +633,16 @@ function MatchGroupLegacy._generateMap(map)
 	return '{{Map' .. MatchGroupLegacy._argsToString(map) .. '}}'
 end
 
+---@param arr any[]
+---@return string
+function MatchGroupLegacy._arrayToString(arr)
+	local buffer = {'{{Json'}
+	Array.forEach(arr, function (element)
+		table.insert(buffer, type(element) == 'table' and MatchGroupLegacy._argsToString(element) or element)
+	end)
+	return table.concat(buffer, '|') .. '}}'
+end
+
 ---@param args table
 ---@return string
 function MatchGroupLegacy._argsToString(args)
@@ -614,7 +662,11 @@ function MatchGroupLegacy._argsToString(args)
 		value = Json.parseIfTable(value) or value
 		local val
 		if type(value) == 'table' and Logic.isNotEmpty(value) then
-			val = '{{Json' .. MatchGroupLegacy._argsToString(value) .. '}}'
+			if Array.isArray(value) then
+				val = MatchGroupLegacy._arrayToString(value)
+			else
+				val = '{{Json' .. MatchGroupLegacy._argsToString(value) .. '}}'
+			end
 		elseif type(value) ~= 'table' then
 			val = tostring(value)
 		end
