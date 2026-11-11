@@ -52,6 +52,17 @@ local TIEBREAKER_MAPPING_TABLE = {
 	['game-percentage'] = 'gamewinrate',
 }
 
+local BG_ALIASES = {
+	u = 'up',
+	proceed = 'up',
+	win = 'up',
+	su = 'stayup',
+	s = 'stay',
+	sd = 'staydown',
+	drop = 'down',
+	d = 'down',
+}
+
 -- These are always added by the standings, so they are dropped from the input
 local IMPLICIT_TIEBREAKERS = {
 	dq = true,
@@ -381,7 +392,7 @@ end
 function StandingTableLegacyNext.parseBgs(args, opponentCount)
 	local pbgs = {}
 	for slotIndex = 1, MAX_SLOT_COUNT do
-		pbgs[slotIndex] = args['pbg' .. slotIndex]
+		pbgs[slotIndex] = StandingTableLegacyNext._aliasBg(args['pbg' .. slotIndex])
 	end
 	if Table.isEmpty(pbgs) then
 		if opponentCount > 4 then
@@ -545,6 +556,12 @@ function StandingTableLegacyNext.parseDisqualifiedFromRound(args, index, roundCo
 	end)
 end
 
+---@param input string?
+---@return string?
+function StandingTableLegacyNext._aliasBg(input)
+	return BG_ALIASES[input] or input
+end
+
 ---`round<R>bg<N>` maps to `r<R>bg` on the opponent, `bg<N>` applies to the final round.
 ---@param args table
 ---@param index integer
@@ -553,9 +570,9 @@ end
 function StandingTableLegacyNext.parseDefiniteStatuses(args, index, roundCount)
 	return Table.map(Array.range(1, roundCount), function(roundIndex)
 		---@type string?
-		local status = args['round' .. roundIndex .. 'bg' .. index]
+		local status = StandingTableLegacyNext._aliasBg(args['round' .. roundIndex .. 'bg' .. index])
 		if not status and roundIndex == roundCount then
-			status = args['bg' .. index]
+			status = StandingTableLegacyNext._aliasBg(args['bg' .. index])
 		end
 		return 'r' .. roundIndex .. 'bg', status
 	end)
