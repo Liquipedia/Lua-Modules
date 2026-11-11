@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 
@@ -134,9 +135,11 @@ Helpers._RoundBody = Component.component(function(props)
 			},
 			children = WidgetUtil.collect(
 				StandingsCells.placement(slot),
-				StandingsDisplayUtil.showPlacementChange(standings) and TableWidgets.Cell{
-					children = PlacementChange{change = slot.positionChangeFromPreviousRound}
-				} or nil,
+				StandingsDisplayUtil.showPlacementChange(standings) and TableWidgets.Cell(
+					DisplayHelper.addOpponentHighlightToProps({
+						children = PlacementChange{change = slot.positionChangeFromPreviousRound}
+					}, slot.opponent)
+				) or nil,
 				StandingsCells.participant(slot),
 				StandingsCells.stats(slot, props.statsToShow, props.boldStatTitle),
 				Helpers._showRoundColumns(standings) and Array.map(standings.rounds, function (columnRound)
