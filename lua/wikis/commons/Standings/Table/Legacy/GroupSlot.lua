@@ -146,7 +146,6 @@ function StandingTableLegacyGroupSlot.parseTable(startArgs, slots, config)
 		started = true,
 		finished = true,
 		title = startArgs.title,
-		width = startArgs.width,
 		date = DateExt.readTimestampOrNil(startArgs.edate or startArgs.date),
 		bg = table.concat(bgs, ','),
 		tiebreakers = StandingTableLegacyGroupSlot.pointsShown(startArgs, slots, config)

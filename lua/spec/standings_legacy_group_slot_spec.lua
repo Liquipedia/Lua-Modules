@@ -205,7 +205,7 @@ describe('Standings Legacy Group Slot', function()
 		end
 
 		it('renders the slots in their order with their statuses', function()
-			StandingTableLegacyGroupSlot.slotStart{'Group A', width = '400px'}
+			StandingTableLegacyGroupSlot.slotStart{'Group A'}
 			StandingTableLegacyGroupSlot.slot{team('Team Liquid'), place = '1', win_m = '1', lose_m = '2', pbg = 'u', bg = 'u'}
 			StandingTableLegacyGroupSlot.slot{team('mouz'), place = '2', win_m = '2', lose_m = '1', pbg = 'd'}
 			StandingTableLegacyGroupSlot.slot{team('heroic'), place = 'dq', win_m = '3', lose_m = '0'}
