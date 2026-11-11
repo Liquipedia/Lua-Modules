@@ -46,7 +46,7 @@ RUN luarocks install --lua-version=5.1 busted \
 	&& luarocks install --lua-version=5.1 luacheck
 
 # lua-language-server, used by the "luals-code-style" CI job and by the Lua
-# editor extension
+# editor extension. It writes meta/ and log/ at runtime, as the non-root user
 RUN arch="$(dpkg --print-architecture)" \
 	&& case "${arch}" in \
 		amd64) luals_arch=x64 ;; \
@@ -56,6 +56,8 @@ RUN arch="$(dpkg --print-architecture)" \
 	&& mkdir -p /opt/luals \
 	&& curl -fsSL "https://github.com/LuaLS/lua-language-server/releases/download/${LUALS_VERSION}/lua-language-server-${LUALS_VERSION}-linux-${luals_arch}.tar.gz" \
 		| tar -xz -C /opt/luals \
+	&& mkdir -p /opt/luals/log \
+	&& chmod -R a+rwX /opt/luals/meta /opt/luals/log \
 	&& ln -s /opt/luals/bin/lua-language-server /usr/local/bin/lua-language-server
 
 # LuaLS addons for .luarc.json, pinned to the LuaLS/LLS-Addons commits
