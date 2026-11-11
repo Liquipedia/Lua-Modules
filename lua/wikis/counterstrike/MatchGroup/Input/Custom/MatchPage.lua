@@ -21,6 +21,17 @@ local NormalMapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 ---@field flag string?
 ---@field rating number? Li-rating / L-Rating
 ---@field rar number? rounds above replacement
+---@field altSwing number? 
+---@field leverage number? 
+---@field ecoKpr number?
+---@field ecoDpr number?
+---@field ecoAdr number?
+---@field roundsPlayed integer? rounds map track
+---@field ratingT number? L-rating
+---@field ratingCt number? L-rating 
+---@field roundsT integer? rounds map track T
+---@field roundsCt integer? rounds map track CT
+---@field survival number? alive%
 ---@field kills integer?
 ---@field deaths integer?
 ---@field assists integer?
@@ -45,6 +56,14 @@ local NormalMapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 ---@field average_damage_per_round number
 ---@field l_rating number?
 ---@field rar number?
+---@field l_rating_t number?
+---@field l_rating_ct number?
+---@field alive_pm_pct number?
+---@field alt_swing_pct number?
+---@field leverage_swing_pct number?
+---@field eco_kpr number?
+---@field eco_dpr number?
+---@field eco_adr number?
 ---@field first_kill_count integer
 ---@field first_death_count integer
 ---@field rounds_won integer
@@ -66,7 +85,7 @@ local NormalMapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 ---@field end_reason string? raw enum number from the demo parser, e.g. "7" for a defuse
 
 ---@class MatchStatsMap
----@field match {map_name: string?, duration: number?}
+---@field match {map_name: string?, duration: number?, max_rounds: integer?}
 ---@field teams MatchStatsTeam[]
 ---@field rounds MatchStatsRound[]
 
@@ -114,6 +133,10 @@ local CS_MAP_NAMES = {
 }
 
 local ROUND_SIDES = {['Terrorists'] = 't', ['Counter-Terrorists'] = 'ct'}
+
+-- Default MR12 regulation OT rules
+local REGULATION_ROUNDS = 24
+local OVERTIME_HALF_ROUNDS = 3
 
 -- How a round was won, potentially export?
 --
@@ -223,6 +246,57 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	return map
 end
 
+---@param name string?
+---@return string
+local function looseName(name)
+	return mw.ustring.lower((name or ''):gsub('_', ' '))
+end
+
+---Determine fit of orientation
+---@param team MatchStatsTeam?
+---@param opponent table?
+---@return integer
+local function teamFit(team, opponent)
+	if not team or not opponent then
+		return 0
+	end
+	local roster = {}
+	Array.forEach(opponent.match2players or {}, function(player)
+		roster[looseName(player.name)] = true
+		roster[looseName(player.displayname)] = true
+	end)
+	local fit = 0
+	Array.forEach(team.players or {}, function(participant)
+		local resolved = CustomMatchGroupInputMatchPage.resolvePlayer(participant.steam_id, participant.name)
+		if (resolved.player and roster[looseName(resolved.player)]) or roster[looseName(participant.name)] then
+			fit = fit + 1
+		end
+	end)
+	local teamName = looseName(team.team_name):gsub('[^%w]', '')
+	local opponentName = looseName(opponent.name):gsub('[^%w]', '')
+	if teamName ~= '' and opponentName ~= '' and (teamName:find(opponentName, 1, true)
+		or opponentName:find(teamName, 1, true)) then
+		fit = fit + 1
+	end
+	return fit
+end
+
+---explicit `|reversed=` will flip map if required.
+---@param map CounterstrikeMatchPageMap|table
+---@param opponents table[]
+---@return CounterstrikeMatchPageMap|table
+function CustomMatchGroupInputMatchPage.orientTeams(map, opponents)
+	if not hasStats(map) or not map.teams[1] or not map.teams[2] or Logic.readBoolOrNil(map.reversed) ~= nil then
+		return map
+	end
+	local straight = teamFit(map.teams[1], opponents[1]) + teamFit(map.teams[2], opponents[2])
+	local swapped = teamFit(map.teams[1], opponents[2]) + teamFit(map.teams[2], opponents[1])
+	if swapped > straight then
+		map.teams = {map.teams[2], map.teams[1]}
+	end
+	return map
+end
+
 ---@param map CounterstrikeMatchPageMap|table
 ---@return string?, string?
 function CustomMatchGroupInputMatchPage.getMapName(map)
@@ -283,8 +357,17 @@ local function deriveHalfScores(map)
 
 	local teamAIsOpponent1 = isTeamAOpponent1(map, rounds)
 
+	-- Fixing regulation OT handling
+	local regulationRounds = tonumber(map.match and map.match.max_rounds) or REGULATION_ROUNDS
+	local function halfOf(roundNumber)
+		if roundNumber <= regulationRounds then
+			return math.ceil(roundNumber / (regulationRounds / 2))
+		end
+		return 2 + math.ceil((roundNumber - regulationRounds) / OVERTIME_HALF_ROUNDS)
+	end
+
 	local t1sides, t2sides, t1halfs, t2halfs = {}, {}, {}, {}
-	local blockT1Side, t1Wins, t2Wins = nil, 0, 0
+	local blockT1Side, blockHalf, t1Wins, t2Wins = nil, nil, 0, 0
 
 	local function flushBlock()
 		if not blockT1Side then
@@ -296,13 +379,14 @@ local function deriveHalfScores(map)
 		table.insert(t2halfs, t2Wins)
 	end
 
-	for _, round in ipairs(rounds) do
+	for roundIndex, round in ipairs(rounds) do
 		local aSide = ROUND_SIDES[round.team_a_side]
 		local t1Side = teamAIsOpponent1 and aSide or ROUND_SIDES[round.team_b_side]
+		local half = halfOf(tonumber(round.number) or roundIndex)
 
-		if t1Side ~= blockT1Side then
+		if t1Side ~= blockT1Side or half ~= blockHalf then
 			flushBlock()
-			blockT1Side, t1Wins, t2Wins = t1Side, 0, 0
+			blockT1Side, blockHalf, t1Wins, t2Wins = t1Side, half, 0, 0
 		end
 
 		local t1Won = teamAIsOpponent1 == (round.winner_letter == 'a')
@@ -374,6 +458,42 @@ local function headshotPercentage(player)
 	return (player.headshot_count or 0) / player.kill_count * 100
 end
 
+---Rounds played on map
+---@param map CounterstrikeMatchPageMap|table
+---@return integer?
+local function mapRounds(map)
+	local function roundsWon(team)
+		local firstPlayer = team and team.players and team.players[1]
+		return firstPlayer and tonumber(firstPlayer.rounds_won) or nil
+	end
+	local a, b = roundsWon(map.teams and map.teams[1]), roundsWon(map.teams and map.teams[2])
+	if not a or not b then
+		return nil
+	end
+	return a + b
+end
+
+---Rounds a team played on T and on CT, from the round timeline
+---could move to API
+---@param map CounterstrikeMatchPageMap|table
+---@param team MatchStatsTeam?
+---@return integer?, integer?
+local function sideRounds(map, team)
+	if not team or not team.team_name or not map.rounds or not map.rounds[1] then
+		return nil, nil
+	end
+	local tRounds, ctRounds = 0, 0
+	for _, round in ipairs(map.rounds) do
+		local side = ROUND_SIDES[round.team_a_name == team.team_name and round.team_a_side or round.team_b_side]
+		if side == 't' then
+			tRounds = tRounds + 1
+		elseif side == 'ct' then
+			ctRounds = ctRounds + 1
+		end
+	end
+	return tRounds, ctRounds
+end
+
 ---@param map CounterstrikeMatchPageMap|table
 ---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
@@ -381,6 +501,7 @@ end
 function CustomMatchGroupInputMatchPage.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local team = map.teams and map.teams[opponentIndex]
 	local participantList = team and team.players or {}
+	local roundsT, roundsCt = sideRounds(map, team)
 
 	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
@@ -407,6 +528,20 @@ function CustomMatchGroupInputMatchPage.getPlayersOfMapOpponent(map, opponent, o
 				steamid = participant.steam_id and tostring(participant.steam_id) or nil,
 				rating = participant.l_rating,
 				rar = participant.rar,
+				-- L-rating components
+				altSwing = participant.alt_swing_pct,
+				leverage = participant.leverage_swing_pct,
+				ecoKpr = participant.eco_kpr,
+				ecoDpr = participant.eco_dpr,
+				ecoAdr = participant.eco_adr,
+				survival = participant.alive_pm_pct,
+				-- Additional
+				roundsPlayed = mapRounds(map),
+				-- Per side, tracks
+				ratingT = participant.l_rating_t,
+				ratingCt = participant.l_rating_ct,
+				roundsT = roundsT,
+				roundsCt = roundsCt,
 				kills = participant.kill_count,
 				deaths = participant.death_count,
 				assists = participant.assist_count,

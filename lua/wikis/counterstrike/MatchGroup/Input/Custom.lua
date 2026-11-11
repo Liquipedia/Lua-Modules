@@ -159,7 +159,17 @@ end
 ---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MatchFunctions.MapParser)
+	local MapParser = MatchFunctions.MapParser
+	---@cast MapParser -nil
+	local orientTeams, getMap = MapParser.orientTeams, MapParser.getMap
+	if orientTeams and getMap then
+		MapParser = Table.merge(MapParser, {
+			getMap = function(mapInput)
+				return orientTeams(getMap(mapInput), opponents)
+			end,
+		})
+	end
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapParser)
 end
 
 ---@param maps table[]
