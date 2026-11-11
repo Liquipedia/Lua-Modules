@@ -36,9 +36,8 @@ end
 ---@return match2mapping
 function MatchGroupLegacyDefault:_get(template, templateOld)
 	local config = Mappings[templateOld]
-	-- fall back to the on-wiki mapping modules
 	if not config or config.template ~= template then
-		return MatchGroupLegacy._get(self, template, templateOld)
+		return MatchGroupLegacyDefault.get(template, self.bracketType)
 	end
 
 	local mapping = MatchGroupLegacyDefault.get(config.template, self.bracketType)

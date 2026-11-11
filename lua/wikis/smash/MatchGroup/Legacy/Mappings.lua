@@ -112,7 +112,6 @@ return {
 	['1Qual-8DELBracketSmwA'] = {template = 'Bracket/4L2DSL1D-1Q', lower = true},
 	['2Qual8DEDoublesLBracketSmw'] = {template = 'Bracket/8L2D-2Q', lower = true, type = 'duo'},
 	['48DELBracketA'] = {template = 'Bracket/32L8DSL4DSL2D-2Q', lower = true},
-	['64DELBracketA2'] = {template = 'Bracket/32L8DSL4DSL2D-2Q', lower = true},
 	['8Qual-48DELBracketSmwA'] = {template = 'Bracket/32L8D-8Q', lower = true},
 	['48DELBracketSmwA4'] = {template = 'Bracket/32L8D-8Q', lower = true},
 	['128DELBracketSmwA'] = {template = LOWER_128, lower = true},
