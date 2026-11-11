@@ -35,12 +35,12 @@ function StandingTableLegacyCraft.run(frame)
 	)
 
 	return Html.Fragment{children = {
-		display,
 		WarningBox{text = {
 			'Template:GroupTableLeague is deprecated. Use ',
 			Link{link = 'Template:GroupStandings'},
 			' instead!',
-		}}
+		}},
+		display,
 	}}
 end
 
