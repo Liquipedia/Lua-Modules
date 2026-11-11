@@ -15,6 +15,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 
+local StandingsParser = Lua.import('Module:Standings/Parser')
 local StandingTable = Lua.import('Module:Standings/Table')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -23,6 +24,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local StandingTableLegacyGroupSlot = {}
 
 local STASH = 'standings_legacy_group_slot'
+local ROUND_SCORE = 'full.roundscore'
 
 local STATUSES = {
 	u = 'up', up = 'up', proceed = 'up',
@@ -148,9 +150,28 @@ function StandingTableLegacyGroupSlot.parseTable(startArgs, slots, config)
 		title = startArgs.title,
 		date = DateExt.readTimestampOrNil(startArgs.edate or startArgs.date),
 		bg = table.concat(bgs, ','),
-		tiebreakers = StandingTableLegacyGroupSlot.pointsShown(startArgs, slots, config)
-			and {'manual', 'points'} or {'manual'},
+		tiebreakers = StandingTableLegacyGroupSlot.parseTiebreakers(startArgs, slots, config, opponents),
 	}, opponents)
+end
+
+---Tiebreakers with a title are the stat columns. Rounds come last, so they only split rows sharing a place.
+---@param startArgs table
+---@param slots table[]
+---@param config LegacyGroupSlotConfig
+---@param opponents table[]
+---@return string[]
+function StandingTableLegacyGroupSlot.parseTiebreakers(startArgs, slots, config, opponents)
+	local tiebreakers = {'manual'}
+	if StandingTableLegacyGroupSlot.pointsShown(startArgs, slots, config) then
+		table.insert(tiebreakers, 'points')
+	end
+	local hasRounds = Array.any(opponents, function(opponent)
+		return opponent.roundwins ~= nil or opponent.roundlosses ~= nil
+	end)
+	if hasRounds and not Table.includes(StandingsParser.alwaysShownStatIds('group'), ROUND_SCORE) then
+		table.insert(tiebreakers, ROUND_SCORE)
+	end
+	return tiebreakers
 end
 
 ---@param value string?
@@ -291,12 +312,43 @@ local function readFlag(input)
 	return input:match('class="flag">%[%[[Ff]ile:([%w%-]+)[ _]hd%.png')
 end
 
+---@param input string
+---@return string? link
+---@return string? name
+local function readLink(input)
+	for target, text in input:gmatch('%[%[([^%[%]|]+)|?([^%[%]]*)%]%]') do
+		if not target:find('^[Ff]ile:') then
+			return target, decodeEntities(Logic.emptyOr(text, target) --[[@as string]])
+		end
+	end
+end
+
+---@param input string
+---@param init integer?
+---@return integer?
+local function findTeamStart(input, init)
+	-- The team part of a player has no highlighting
+	local highlighted = input:find('data%-highlighting%-?class="', init)
+	local teamPart = input:find('team-template-team-part', init, true)
+	if highlighted and teamPart then
+		return math.min(highlighted, teamPart)
+	end
+	return highlighted or teamPart
+end
+
+---The start of the tag around a position
+---@param input string
+---@param position integer
+---@return integer
+local function tagStart(input, position)
+	return input:sub(1, position):match('.*()<') or position
+end
+
 ---The expanded team templates hold the name and page of the team, not its template. The page is the template.
 ---@param input string
 ---@return string?
 function StandingTableLegacyGroupSlot.findTeam(input)
-	-- The team part of a player has no highlighting
-	local teamStart = input:find('data%-highlighting%-?class="') or input:find('team-template-team-part', 1, true)
+	local teamStart = findTeamStart(input)
 	if not teamStart then
 		return
 	end
@@ -316,17 +368,13 @@ function StandingTableLegacyGroupSlot.parseOpponent(input)
 	-- Before the team, as players can have a team icon in front of them
 	local playerStart = input:find('inline-player', 1, true)
 	if playerStart then
-		local player = input:sub(playerStart)
-		local link, name
-		for target, text in player:gmatch('%[%[([^%[%]|]+)|?([^%[%]]*)%]%]') do
-			if not target:find('^[Ff]ile:') then
-				link, name = target, Logic.emptyOr(text, target)
-				break
-			end
-		end
+		-- Up to a team after the player, so an unlinked player does not take its link
+		local teamStart = findTeamStart(input, playerStart)
+		local player = input:sub(tagStart(input, playerStart), teamStart and tagStart(input, teamStart) - 1)
+		local link, name = readLink(player)
 		return {
 			type = Opponent.solo,
-			name and decodeEntities(name) or plainText(player),
+			name or plainText(player),
 			link = link,
 			flag = readFlag(player) or readFlag(input),
 			team = StandingTableLegacyGroupSlot.findTeam(input),
@@ -341,7 +389,7 @@ function StandingTableLegacyGroupSlot.parseOpponent(input)
 	local text = plainText(input)
 	local flag = readFlag(input)
 	if flag and text ~= '' then
-		return {type = Opponent.solo, text, flag = flag}
+		return {type = Opponent.solo, text, flag = flag, link = (readLink(input))}
 	end
 	return {type = Opponent.literal, name = text}
 end

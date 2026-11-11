@@ -60,6 +60,13 @@ describe('Standings Legacy Group Slot', function()
 			assert.are_same({type = 'solo', 'Hobbit', link = 'Hobbit', flag = 'au', team = 'team esper'}, opponent)
 		end)
 
+		it('does not take the link of a team after an unlinked player', function()
+			local opponent = StandingTableLegacyGroupSlot.parseOpponent('<span class="inline-player"><span class="flag">'
+				.. '[[File:au_hd.png|36x24px|Australia|link=]]</span>&nbsp;Hobbit</span> '
+				.. teamWithName('Esper', 'Team Esper'))
+			assert.are_same({type = 'solo', 'Hobbit', flag = 'au', team = 'team esper'}, opponent)
+		end)
+
 		it('reads a player without a team, and flags with a space', function()
 			local opponent = StandingTableLegacyGroupSlot.parseOpponent('<span class="inline-player"><span class="flag">'
 				.. '[[File:gb-eng hd.png|36x24px|England|link=]]</span>&nbsp;[[Rapha]]</span>')
@@ -70,6 +77,11 @@ describe('Standings Legacy Group Slot', function()
 			assert.are_same({type = 'solo', 'Dog', flag = 'us'}, StandingTableLegacyGroupSlot.parseOpponent(
 				'<span class="flag">[[File:us_hd.png|36x24px|United States|link=Category:United States]]</span> Dog'
 			))
+			assert.are_same(
+				{type = 'solo', 'Dog', flag = 'us', link = 'Dog (player)'},
+				StandingTableLegacyGroupSlot.parseOpponent('<span class="flag">'
+					.. '[[File:us_hd.png|36x24px|United States|link=Category:United States]]</span> [[Dog (player)|Dog]]')
+			)
 		end)
 
 		it('falls back to a literal of the text', function()
@@ -228,6 +240,16 @@ describe('Standings Legacy Group Slot', function()
 			StandingTableLegacyGroupSlot.slot{team('heroic'), place = '3', win_m = '0'}
 			StandingTableLegacyGroupSlot.templateEnd()
 			assert.are_same({1, 1, 3}, Array.map(storedEntries(), function(entry) return entry.placement end))
+		end)
+
+		it('shows the rounds where the wiki does not by default', function()
+			StandingTableLegacyGroupSlot.slotStart{'Group C'}
+			StandingTableLegacyGroupSlot.slot{team('Team Liquid'), place = '1', win_m = '1', win_b = '5', lose_b = '2'}
+			StandingTableLegacyGroupSlot.slot{team('mouz'), place = '2', lose_m = '1', win_b = '2', lose_b = '5'}
+			local html = tostring(StandingTableLegacyGroupSlot.templateEnd())
+			assert.is_truthy(html:find('5 - 2', 1, true))
+			assert.is_truthy(html:find('2 - 5', 1, true))
+			assert.are_same({1, 2}, Array.map(storedEntries(), function(entry) return entry.placement end))
 		end)
 
 		it('errors on slots without a start', function()
