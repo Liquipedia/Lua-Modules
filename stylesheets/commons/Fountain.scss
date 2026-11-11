@@ -515,13 +515,13 @@ a.cf {
 	}
 } // Spellcard Target/Affect/Damage (TAD)
 
-.spellslot_box {
+.spellslot-box {
 	display: flex;
 	align-items: center;
 	gap: 0.1875rem; // 3px
 } // Spellcard Spellslot
 
-.spellslot_wrapper {
+.spellslot-wrapper {
 	position: relative;
 	display: inline-flex;
 	align-items: center;
@@ -530,13 +530,13 @@ a.cf {
 	&:hover {
 		z-index: 99999;
 
-		.spellslot_tooltip {
+		.spellslot-tooltip {
 			display: block;
 		} // The entire wrapper will be the very front.
 	}
 }
 
-.spellslot_tooltip {
+.spellslot-tooltip {
 	display: none;
 	position: absolute;
 	top: calc( 100% + 0.25rem ); // 4px
