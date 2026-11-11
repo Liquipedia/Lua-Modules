@@ -7,7 +7,7 @@ FROM mcr.microsoft.com/playwright:v1.63.0-noble
 # Keep these in sync with the versions used by the GitHub workflows
 ARG LUA_VERSION=5.1.5
 ARG LUAROCKS_VERSION=3.11.1
-ARG LUALS_VERSION=3.18.2
+ARG LUALS_VERSION=3.19.2
 # Not in requirements.txt on purpose: only needed to run scripts/proxy_lp.py,
 # which is a local-development tool rather than a dependency of the repo
 ARG MITMPROXY_VERSION=12.2.3
