@@ -23,8 +23,7 @@
 	font-weight: bold;
 }
 
-.primaryAttribute,
-#primaryAttribute {
+.primaryAttribute {
 	&_str {
 		background: var( --clr-semantic-negative-40 ); // #b81414 ( Old #b9500b )
 	}
@@ -438,14 +437,14 @@ a.cf {
 		vertical-align: top;
 	} // keeping &_value for backwards compatibility
 
-	&_mainBox {
+	&_main-box {
 		margin-top: 0.3125rem;
 		padding: 0.3125rem 0.3125rem 0 0.3125rem;
 		display: flex;
 		flex-direction: column;
 	}
 
-	&_titleBox {
+	&_title-box {
 		border-bottom: 0.0625rem solid #333333;
 		margin-bottom: 0.3125rem;
 		background: linear-gradient( -90deg, #2f4f35 -20%, #333333 -20%, #333333 -20%, #2f4f35 ) 90%;
@@ -459,7 +458,7 @@ a.cf {
 		font-size: 85%;
 	}
 
-	&_titleProperties {
+	&_title-properties {
 		padding-left: 0.125rem;
 	}
 
@@ -476,7 +475,7 @@ a.cf {
 		width: 100%;
 	}
 
-	&_cellHead {
+	&_cell-head {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
@@ -487,7 +486,7 @@ a.cf {
 		font-size: 85%;
 	}
 
-	&_cellPairs {
+	&_cell-pairs {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
@@ -495,21 +494,21 @@ a.cf {
 		box-sizing: border-box;
 	}
 
-	&_Box {
+	&_box {
 		display: inline-flex;
 		align-items: center;
 		font-size: 85%;
 		line-height: 1.2;
 	}
 
-	&_iconBox {
+	&_icon-box {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
 		flex-shrink: 0;
 	}
 
-	&_iconBracket {
+	&_icon-bracket {
 		color: #ffffff;
 		display: inline-flex;
 		align-items: center;
