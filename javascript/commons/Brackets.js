@@ -52,16 +52,11 @@ liquipedia.brackets = {
 	attachedMatchList: {
 		init: function() {
 			document.querySelectorAll( '.brkts-matchlist' ).forEach( ( matchlist ) => {
-				let currentElement = matchlist;
-				let standings = currentElement.previousElementSibling.querySelector( '.standings-group' );
-				while ( currentElement ) {
+				let currentElement = matchlist.previousElementSibling;
+				while ( currentElement && currentElement.classList.contains( 'brkts-matchlist' ) ) {
 					currentElement = currentElement.previousElementSibling;
-					if ( currentElement && currentElement.classList.contains( 'brkts-matchlist' ) ) {
-						standings = currentElement.previousElementSibling.querySelector( '.standings-group' );
-					} else {
-						currentElement = null;
-					}
 				}
+				const standings = currentElement && currentElement.querySelector( '.standings-group' );
 				if ( standings ) {
 					new ResizeObserver( ( [ entry ] ) => {
 						matchlist.style.width = entry.borderBoxSize[ 0 ].inlineSize + 'px';
