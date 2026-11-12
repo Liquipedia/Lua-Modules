@@ -497,9 +497,7 @@ end
 
 local DQ_HANDLINGS = {ignore = true, autolose = true}
 
----Reads the `dqhandling` input, how the matches of a disqualified opponent count from the round it is disqualified
----in, including the matches of earlier rounds: `ignore` leaves them out, `autolose` makes them lost by DQ.
----Unset means they count as played.
+---Reads `dqhandling`, whether the matches of disqualified opponents are left out or lost from their dq round on
 ---@param args table
 ---@param tableType StandingsTableTypes
 ---@return StandingsDqHandling?

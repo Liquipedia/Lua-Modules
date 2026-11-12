@@ -47,7 +47,7 @@ local NO_WINNER = -1
 
 ---@class StandingsDisqualifications
 ---@field handling StandingsDqHandling?
----@field opponents StandingTableOpponentData[] # The opponents with a dq round, none without dq handling
+---@field opponents StandingTableOpponentData[] # Those with a dq round, none without dq handling
 ---@field scoreMapper fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number|nil
 
 ---@param rounds {roundNumber: integer, matches: string[]}[]
@@ -123,8 +123,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 		scoreMapper = scoreMapper,
 	}
 
-	-- Matches that have been entered, but not created, are treated as upcoming.
-	-- Matches of a disqualified opponent will not be played, so they are treated as finished.
+	-- Matches that have been entered, but not created, are upcoming; those of disqualified opponents are finished
 	local matchPhasesByRound = Table.map(rounds, function(_, round)
 		local isDisqualified = StandingsParseLpdb.makeDisqualifiedCheck(disqualifications, round.roundNumber)
 		return round.roundNumber, Array.map(round.matches, function(matchId)
@@ -167,7 +166,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 				if countedMatches == matches then
 					scoreboard = tally(roundMatches, opponentData.matchPoints)
 				else
-					-- A disqualification also changes the earlier matches, so the round is the difference of the totals
+					-- A disqualification also changes earlier matches, so the round is the difference of the totals
 					scoreboard = StandingsParseLpdb.subtractTally(
 						tally(countedMatches, countedMatchPoints), tally(previousMatches, previousMatchPoints)
 					)
@@ -191,7 +190,7 @@ end
 
 ---@param disqualifications StandingsDisqualifications
 ---@param roundNumber integer
----@return fun(opponent: standardOpponent): boolean # Whether the opponent is disqualified in the round
+---@return fun(opponent: standardOpponent): boolean
 function StandingsParseLpdb.makeDisqualifiedCheck(disqualifications, roundNumber)
 	return function(opponent)
 		return Array.any(disqualifications.opponents, function(opponentData)
@@ -200,9 +199,7 @@ function StandingsParseLpdb.makeDisqualifiedCheck(disqualifications, roundNumber
 	end
 end
 
----The matches of an opponent as they count in a round, with their points. From the round an opponent is
----disqualified in, its matches (also those of earlier rounds) are left out with `ignore` and lost by DQ with
----`autolose`. Returns the given tables when no match changes.
+---The matches of an opponent and their points as they count in a round, the given tables if none changes
 ---@param opponent standardOpponent
 ---@param matches MatchGroupUtilMatch[]
 ---@param matchPoints table<string, number>
@@ -212,19 +209,19 @@ end
 ---@return table<string, number> matchPoints
 function StandingsParseLpdb.applyDisqualifications(opponent, matches, matchPoints, roundNumber, disqualifications)
 	local isDisqualified = StandingsParseLpdb.makeDisqualifiedCheck(disqualifications, roundNumber)
-	local hasDisqualifiedOpponent = function(match)
+	local function hasDisqualifiedOpponent(match)
 		return Array.any(match.opponents, isDisqualified)
 	end
 	if not Array.any(matches, hasDisqualifiedOpponent) then
 		return matches, matchPoints
-	elseif disqualifications.handling == 'ignore' then
-		return Array.filter(matches, function(match) return not hasDisqualifiedOpponent(match) end), matchPoints
 	end
 
 	local roundMatchPoints = Table.copy(matchPoints)
 	local roundMatches = Array.map(matches, function(match)
 		if not hasDisqualifiedOpponent(match) then
 			return match
+		elseif disqualifications.handling == 'ignore' then
+			return nil
 		end
 		local forfeitedMatch = StandingsParseLpdb.forfeitMatch(match, isDisqualified)
 		local matchOpponent = Array.find(forfeitedMatch.opponents, FnUtil.curry(Opponent.same, opponent))
@@ -235,7 +232,7 @@ function StandingsParseLpdb.applyDisqualifications(opponent, matches, matchPoint
 	return roundMatches, roundMatchPoints
 end
 
----A finished copy of the match, lost by walkover by the disqualified opponents. The played games no longer count.
+---A finished copy of the match without its games, lost by walkover by the disqualified opponents
 ---@param match MatchGroupUtilMatch
 ---@param isDisqualified fun(opponent: standardOpponent): boolean
 ---@return MatchGroupUtilMatch
