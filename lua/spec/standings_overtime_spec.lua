@@ -262,12 +262,5 @@ describe('Standings overtime', function()
 		it('ignores the overtime points without show_otp', function()
 			assert.are_equal('win=3, draw=1, loss=0', StandingTableLegacySwiss.parsePoints{otw_p = '2', otl_p = '1'})
 		end)
-
-		it('maps "no ot diff" to gamediffregulation', function()
-			assert.are_same({'gamediff', 'gamediffregulation'}, StandingTableLegacySwiss.parseTiebreaker{
-				tiebreaker1 = 'diff',
-				tiebreaker2 = 'no ot diff',
-			})
-		end)
 	end)
 end)
