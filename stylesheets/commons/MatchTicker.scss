@@ -72,7 +72,7 @@ Template(s): MatchTicker
 		&.winner::after {
 			font-family: "Font Awesome 5 Pro";
 			content: "\f0d9"; /* Unicode for caret-left */
-			position: relative;
+			position: absolute;
 			right: 0;
 		}
 	}
