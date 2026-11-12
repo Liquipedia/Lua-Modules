@@ -35,8 +35,9 @@ local DEFAULT_POINTS = {
 	group = {w = 3, d = 1, l = 0},
 }
 local DEFAULT_OVERTIME_POINTS = {w = 3, d = 1.5, l = 0, otw = 2, otl = 1}
-local RESULT_POINTS_KEYS = {win = 'w', draw = 'd', loss = 'l', otwin = 'otw', otloss = 'otl'}
+local RESULT_POINTS_KEYS = {win = 'w', draw = 'd', loss = 'l', otwin = 'otw', otloss = 'otl', walkoverloss = 'wol'}
 local OVERTIME_POINTS_KEYS = {otw = true, otl = true}
+local WALKOVER_LOSS_STATUSES = {FF = true, DQ = true}
 local ADJUSTMENT_RECORDS = {
 	match = {w = 'matchwins', d = 'matchdraws', l = 'matchlosses'},
 	game = {w = 'gamewins', d = 'gamedraws', l = 'gamelosses'},
@@ -277,6 +278,7 @@ end
 ---Reads the `points` input of swiss and group standings, e.g. `win=3, draw=1, loss=0, 2-0=4`.
 ---`win`, `draw` and `loss` are the points of that result and are keyed `w`, `d` and `l`.
 ---With overtime, `otwin` and `otloss` are the points of an overtime result and are keyed `otw` and `otl`.
+---`walkoverloss` is the points of a loss by forfeit (FF) or disqualification (DQ), keyed `wol`, a loss if unset.
 ---`X-Y` is the fixed amount of points for an opponent scoring X against Y, replacing the points of its result.
 ---Scores may have decimals, e.g. `1.5-0.5`.
 ---@param input string?
@@ -412,6 +414,9 @@ function StandingsParseWiki.makeScoringFunction(tabletype, args, overtime)
 				return nil
 			end
 			local result = TiebreakerScope.matchResult(match, opponent)
+			if result == 'l' and points.wol and WALKOVER_LOSS_STATUSES[opponent.status] then
+				return points.wol
+			end
 			-- Overtime takes priority over the score, as overtime is only supported for Bo1 matches,
 			-- where the score of an overtime match does not differ from a regulation one
 			if overtime and result ~= 'd' and StandingsOvertime.isOvertimeMatch(match) then
