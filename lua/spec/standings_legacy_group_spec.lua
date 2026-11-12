@@ -378,4 +378,15 @@ describe('Standings Legacy Group', function()
 			assert.error(function() StandingTableLegacyGroup.parseAdjustments({temp_win_m1 = 'one'}, 1, rounds) end)
 		end)
 	end)
+
+	describe('ties', function()
+		it('turns draws on with ties=true and auto detects them otherwise', function()
+			local function matchDraws(args)
+				return StandingTableLegacyGroup.getStandardParameter(args, {}).matchdraws
+			end
+			assert.is_true(matchDraws{ties = 'true'})
+			assert.is_nil(matchDraws{ties = 'false'})
+			assert.is_nil(matchDraws{})
+		end)
+	end)
 end)

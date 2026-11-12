@@ -164,12 +164,15 @@ end
 ---@param opponents table[]
 ---@return table
 function StandingTableLegacyGroup.getStandardParameter(args, opponents)
-	return Table.merge(StandingTableLegacySwiss.getStandardParameter(args), {
+	local parameters = Table.merge(StandingTableLegacySwiss.getStandardParameter(args), {
 		tabletype = 'group',
 		title = args.title or mw.title.getCurrentTitle().text,
 		importopponents = #opponents == 0,
 		walkoverrounds = StandingTableLegacyGroup.parseWalkoverRounds(args),
 	})
+	-- Legacy turns draws on as soon as a match is drawn
+	parameters.matchdraws = Logic.readBool(args.ties) or nil
+	return parameters
 end
 
 ---h2hcs only splits off the tops and bottoms, the reset applies it again to the opponents left tied
