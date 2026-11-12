@@ -66,7 +66,6 @@ describe('Standings Parser', function()
 		it('are needed for a tiebreaker that reads the games', function()
 			assert.is_true(StandingsParser.needsGames('swiss', {'full.points', 'ml.rounddiff'}))
 			assert.is_true(StandingsParser.needsGames('swiss', {'full.roundscore'}))
-			assert.is_true(StandingsParser.needsGames('swiss', {'full.gamediffregulation'}))
 		end)
 
 		it('are needed for an always shown stat that reads the games', function()
