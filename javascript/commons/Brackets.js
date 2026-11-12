@@ -51,7 +51,9 @@ liquipedia.brackets = {
 
 	attachedMatchList: {
 		init: function() {
-			document.querySelectorAll( '.brkts-matchlist' ).forEach( ( matchlist ) => {
+			document.querySelectorAll(
+				'[data-analytics-name]:has( .standings-group ) + .brkts-matchlist, .brkts-matchlist + .brkts-matchlist'
+			).forEach( ( matchlist ) => {
 				let currentElement = matchlist.previousElementSibling;
 				while ( currentElement && currentElement.classList.contains( 'brkts-matchlist' ) ) {
 					currentElement = currentElement.previousElementSibling;
