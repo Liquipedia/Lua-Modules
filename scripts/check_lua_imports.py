@@ -27,7 +27,7 @@ from typing import NamedTuple
 
 LUA_ROOT = pathlib.Path("lua/wikis")
 IMPORT_RE = re.compile(
-    r"""(?:Lua\.import|Lua\.requireIfExists|require)\(\s*['"]Module:([^'"]+)['"]"""
+    r"""(?:Lua\.import|Lua\.requireIfExists|require|mw\.loadData)\(\s*['"]Module:([^'"]+)['"]"""
 )
 
 # Feature tiers, lowest first. Modules directly in the feature folder are entry points.
