@@ -171,9 +171,30 @@ describe('Standings Legacy Swiss', function()
 				StandingTableLegacySwiss.parsePoints(args, {decimalScores = true}))
 		end)
 
+		it('maps walkover_lose_p as a bonus on top of lose_p', function()
+			assert.are_equal(
+				'win=3, draw=1, loss=0, walkoverloss=-1',
+				StandingTableLegacySwiss.parsePoints{walkover_lose_p = '-1'}
+			)
+			assert.are_equal(
+				'win=3, draw=1, loss=-1, walkoverloss=-1.5',
+				StandingTableLegacySwiss.parsePoints{lose_p = '-1', walkover_lose_p = '-0.5'}
+			)
+			assert.are_equal(
+				'win=3, draw=1, loss=0, otwin=2, otloss=1, walkoverloss=-2, 2-0=4',
+				StandingTableLegacySwiss.parsePoints{show_otp = 'true', walkover_lose_p = '-2', ['2-0_p'] = '1'}
+			)
+		end)
+
+		it('leaves out walkover_lose_p when it is 0', function()
+			assert.are_equal('win=3, draw=1, loss=0', StandingTableLegacySwiss.parsePoints{walkover_lose_p = '0'})
+			assert.are_equal('win=3, draw=1, loss=0', StandingTableLegacySwiss.parsePoints{walkover_lose_p = ''})
+		end)
+
 		it('errors on non numeric values', function()
 			assert.error(function() StandingTableLegacySwiss.parsePoints{win_p = 'three'} end)
 			assert.error(function() StandingTableLegacySwiss.parsePoints{['2-0_p'] = 'three'} end)
+			assert.error(function() StandingTableLegacySwiss.parsePoints{walkover_lose_p = 'one'} end)
 		end)
 
 		it('is passed on as the points of the standard parameters', function()
