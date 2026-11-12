@@ -61,7 +61,7 @@ function MatchTickerCard.render(props)
 				classes = {'match-info-tournament', highlight and HIGHLIGHT_CLASS or nil},
 				children = TournamentBar{match = match},
 			},
-			MatchButtonBar{match = match, showVods = true}
+			MatchButtonBar{match = match, showVods = true, buttonSize = 'xs'}
 		}
 	}
 end

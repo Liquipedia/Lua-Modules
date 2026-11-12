@@ -53,7 +53,7 @@ local function MatchPageButton(props)
 			classes = { 'match-page-button', (not showMatchDetails) and 'show-when-logged-in' or nil},
 			title = 'View match details',
 			variant = props.buttonType,
-			size = 'sm',
+			size = props.buttonSize,
 			link = link,
 			grow = true,
 			children = WidgetUtil.collect(
@@ -68,7 +68,7 @@ local function MatchPageButton(props)
 		classes = { 'match-page-button', 'show-when-logged-in' },
 		title = 'Make match page',
 		variant = 'ghost',
-		size = 'sm',
+		size = props.buttonSize,
 		link = link,
 		grow = true,
 		children = WidgetUtil.collect(

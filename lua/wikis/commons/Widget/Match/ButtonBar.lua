@@ -89,6 +89,7 @@ local function MatchButtonBar(props)
 				match = match,
 				buttonType = props.variant,
 				buttonText = buttonText,
+				buttonSize = props.buttonSize,
 			},
 			displayStreams and StreamsContainer{
 				streams = filteredStreams,
@@ -122,6 +123,7 @@ local function MatchButtonBar(props)
 				showText = #vods < 4,
 				variant = 'dropdown',
 				grow = true,
+				buttonSize = props.buttonSize,
 			}
 		end) or nil,
 	}
