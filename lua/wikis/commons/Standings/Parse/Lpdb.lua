@@ -35,6 +35,7 @@ local MATCH_COLUMNS = {'match2id', 'match2opponents', 'bestof', 'date', 'dateexa
 ---@field importOpponents boolean? # If set, opponents not listed manually still count as part of the standings
 ---@field overtime boolean? # If set, results of overtime matches are tracked separately from regulation results
 ---@field includeGames boolean? # If set, the games of the matches are imported as well (always with overtime)
+---@field excludeDisqualified boolean? # If set, matches of disqualified opponents are left out from their dq round
 
 ---@param rounds {roundNumber: integer, matches: string[]}[]
 ---@param scoreMapper fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number|nil
@@ -174,6 +175,7 @@ end
 ---@field alias standardOpponent? # The manual opponent the opponent is an alias of
 ---@field isPartOfStandings boolean
 ---@field isTbd boolean
+---@field disqualifiedFromRound integer? # Of the manual opponent
 ---@field opponentData StandingTableOpponentData? # Set once the opponent is part of a counted match
 
 ---Builds a cache key for an opponent, opponents with the same key are the same opponent.
@@ -210,6 +212,9 @@ function StandingsParseLpdb.makeOpponentLookup(manualOpponents, importOpponents)
 				isPartOfStandings = alias ~= nil
 					or StandingsParseLpdb.isPartOfStandings(opponent, manualOpponents, importOpponents),
 				isTbd = Opponent.isTbd(opponent),
+				disqualifiedFromRound = StandingsParseLpdb.findDisqualifiedFromRound(
+					alias or opponent, manualOpponents
+				),
 			}
 		end
 
@@ -237,6 +242,16 @@ function StandingsParseLpdb.findAlias(opponent, manualOpponents)
 		end)
 	end)
 	return opponentToUse and opponentToUse.opponent or nil
+end
+
+---@param opponent standardOpponent
+---@param manualOpponents StandingTableOpponentData[]
+---@return integer?
+function StandingsParseLpdb.findDisqualifiedFromRound(opponent, manualOpponents)
+	local manualOpponent = Array.find(manualOpponents, function(manualOpponent)
+		return Opponent.same(manualOpponent.opponent, opponent)
+	end)
+	return manualOpponent and manualOpponent.disqualifiedFromRound or nil
 end
 
 ---Checks whether an opponent ends up in the standings table, either because it is listed manually
@@ -284,6 +299,17 @@ function StandingsParseLpdb.parseMatch(roundNumbers, match2, opponents, scoreMap
 		return opponentCheck(lookups, function(lookup)
 			return lookup.isPartOfStandings or lookup.isTbd
 		end)
+	end
+
+	if options.excludeDisqualified then
+		roundNumbers = Array.filter(roundNumbers, function(roundNumber)
+			return Array.all(lookups, function(lookup)
+				return (lookup.disqualifiedFromRound or math.huge) > roundNumber
+			end)
+		end)
+		if #roundNumbers == 0 then
+			return false
+		end
 	end
 
 	if options.overtime then

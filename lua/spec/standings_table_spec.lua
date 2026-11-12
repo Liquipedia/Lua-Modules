@@ -125,4 +125,38 @@ describe('Standings Table from template', function()
 			assert.is_false(parsedTiebreakerReset(nil))
 		end)
 	end)
+
+	describe('dq excludes matches', function()
+		local StandingsParseLpdb = require('Module:Standings/Parse/Lpdb')
+
+		before_each(function()
+			spy.on(StandingsParseLpdb, 'importFromMatches')
+		end)
+
+		after_each(function()
+			---@diagnostic disable-next-line: undefined-field
+			StandingsParseLpdb.importFromMatches:revert()
+		end)
+
+		---@param dqExcludesMatches string?
+		---@return boolean?
+		local function importExcludesDisqualified(dqExcludesMatches)
+			StandingsTable.fromTemplate{
+				tabletype = 'group',
+				dqexcludesmatches = dqExcludesMatches,
+				round1 = {matches = 'M1'},
+				{type = 'literal', name = 'Alpha', dq = 'true'},
+			}
+			---@diagnostic disable-next-line: undefined-field
+			return StandingsParseLpdb.importFromMatches.calls[1].vals[4].excludeDisqualified
+		end
+
+		it('passes the dqexcludesmatches input to the import', function()
+			assert.is_true(importExcludesDisqualified('true'))
+		end)
+
+		it('counts the matches of disqualified opponents by default', function()
+			assert.is_false(importExcludesDisqualified(nil))
+		end)
+	end)
 end)

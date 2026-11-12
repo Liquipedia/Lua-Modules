@@ -87,6 +87,8 @@ function StandingsTable.parse(args, tableType)
 	local exclusiveOpponents = Logic.readBool(args.exclusive)
 	--- With tiebreaker reset, opponents split by a tiebreaker are compared again starting from the first tiebreaker.
 	local tiebreakerReset = Logic.readBool(args.tiebreakerreset)
+	--- With dq excludes matches, the matches of disqualified opponents are left out from their dq round on.
+	local excludeDisqualified = Logic.readBool(args.dqexcludesmatches)
 
 	local parsedData = StandingsParseWiki.parseWikiInput(args)
 	local rounds = parsedData.rounds
@@ -107,6 +109,7 @@ function StandingsTable.parse(args, tableType)
 		importedOpponents, matchPhasesByRound, maxBestOf = StandingsParseLpdb.importFromMatches(
 			rounds, automaticScoreFunction, opponents, {
 				exclusive = exclusiveOpponents,
+				excludeDisqualified = excludeDisqualified,
 				importOpponents = importOpponentFromMatches,
 				overtime = overtime,
 				includeGames = StandingsParser.needsGames(tableType, tiebreakers),
