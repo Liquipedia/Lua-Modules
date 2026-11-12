@@ -932,10 +932,10 @@ describe('Standings import from matches', function()
 	describe('disqualified opponents', function()
 		local TiebreakerScope = require('Module:Standings/Tiebreaker/Scope')
 
-		--- Wolves Esports is disqualified from round 2, M1 is before it, M2 and M3 in it
+		--- Wolves Esports beat Heroic in round 1 (M1) and TT9 in round 2 (M2), Heroic beat TT9 in round 2 (M3)
 		local function stubDisqualificationMatches()
 			stubMatchQuery{
-				match2Record{matchId = 'M1', winner = 1, opponents = {
+				match2Record{matchId = 'M1', winner = 1, games = {{winner = 1, scores = {13, 5}}}, opponents = {
 					{template = 'wolves esports', name = 'Wolves Esports', score = 2, placement = 1},
 					{template = 'heroic', name = 'Heroic', score = 0, placement = 2},
 				}},
@@ -955,89 +955,206 @@ describe('Standings import from matches', function()
 			{roundNumber = 2, matches = {'M2', 'M3'}},
 		}
 
+		---@param disqualifiedFromRound table<string, integer>
 		local function standingsOpponents(disqualifiedFromRound)
-			local wolves = manualOpponent('Wolves Esports', 'wolves esports')
-			wolves.disqualifiedFromRound = disqualifiedFromRound
-			return {manualOpponent('Heroic', 'heroic'), wolves, manualOpponent('TT9 Esports', 'tt9 esports 2022')}
+			return Array.map({
+				manualOpponent('Heroic', 'heroic'),
+				manualOpponent('Wolves Esports', 'wolves esports'),
+				manualOpponent('TT9 Esports', 'tt9 esports 2022'),
+			}, function(opponentData)
+				opponentData.disqualifiedFromRound = disqualifiedFromRound[opponentData.opponent.name]
+				return opponentData
+			end)
+		end
+
+		local function import(dqHandling, disqualifiedFromRound)
+			return StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper,
+				standingsOpponents(disqualifiedFromRound), {dqHandling = dqHandling, includeGames = true}
+			)
 		end
 
 		local function matchIds(roundData)
 			return Array.map(roundData.matches, Operator.property('matchId'))
 		end
 
-		it('counts the matches of disqualified opponents by default', function()
+		local function scoreboards(opponentData)
+			return Array.map(opponentData.rounds, function(roundData)
+				local scoreboard = roundData.scoreboard
+				return {scoreboard.points or 0, scoreboard.match.w, scoreboard.match.l}
+			end)
+		end
+
+		it('counts the matches of disqualified opponents without dqhandling', function()
 			stubDisqualificationMatches()
 
-			local opponents = StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, standingsOpponents(2), {})
+			local opponents = import(nil, {['Wolves Esports'] = 2})
 
-			assert.are_same({w = 0, d = 0, l = 2}, findOpponent(opponents, 'TT9 Esports').rounds[2].scoreboard.match)
+			assert.are_same({{0, 0, 0}, {0, 0, 2}}, scoreboards(findOpponent(opponents, 'TT9 Esports')))
 		end)
 
-		it('leaves out the matches of disqualified opponents from their dq round', function()
-			stubDisqualificationMatches()
+		describe('ignore', function()
+			it('leaves out all matches of an opponent from its dq round', function()
+				stubDisqualificationMatches()
 
-			local opponents = StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, standingsOpponents(2), {
-				excludeDisqualified = true,
-			})
+				local opponents = import('ignore', {['Wolves Esports'] = 2})
 
-			local heroic = findOpponent(opponents, 'Heroic')
-			assert.are_same({'M1', 'M3'}, matchIds(heroic.rounds[2]))
-			assert.are_same({w = 1, d = 0, l = 0}, heroic.rounds[2].scoreboard.match)
+				local heroic = findOpponent(opponents, 'Heroic')
+				assert.are_same({'M1'}, matchIds(heroic.rounds[1]))
+				assert.are_same({'M3'}, matchIds(heroic.rounds[2]))
+				-- The round 1 loss is taken back in round 2
+				assert.are_same({{0, 0, 1}, {1, 1, -1}}, scoreboards(heroic))
 
-			local tt9 = findOpponent(opponents, 'TT9 Esports')
-			assert.are_same({'M3'}, matchIds(tt9.rounds[2]))
-			assert.are_same({w = 0, d = 0, l = 1}, tt9.rounds[2].scoreboard.match)
-			assert.is_nil(tt9.matchPoints.M2)
+				local wolves = findOpponent(opponents, 'Wolves Esports')
+				assert.are_same({}, matchIds(wolves.rounds[2]))
+				assert.are_same({{1, 1, 0}, {-1, -1, 0}}, scoreboards(wolves))
 
-			local wolves = findOpponent(opponents, 'Wolves Esports')
-			assert.are_same({w = 1, d = 0, l = 0}, wolves.rounds[1].scoreboard.match)
-			assert.are_same({'M1'}, matchIds(wolves.rounds[2]))
-			assert.are_same({w = 0, d = 0, l = 0}, wolves.rounds[2].scoreboard.match)
-			assert.are_equal('nc', wolves.rounds[2].specialstatus)
-		end)
+				assert.are_same({{0, 0, 0}, {0, 0, 1}}, scoreboards(findOpponent(opponents, 'TT9 Esports')))
+			end)
 
-		it('leaves out all matches of opponents disqualified from the first round', function()
-			stubDisqualificationMatches()
+			it('leaves out all matches of an opponent disqualified from the first round', function()
+				stubDisqualificationMatches()
 
-			local opponents = StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, standingsOpponents(1), {
-				excludeDisqualified = true,
-			})
+				local opponents = import('ignore', {['Wolves Esports'] = 1})
 
-			assert.are_same({'M3'}, matchIds(findOpponent(opponents, 'Heroic').rounds[2]))
-			assert.is_nil(findOpponent(opponents, 'Wolves Esports'))
-		end)
+				local heroic = findOpponent(opponents, 'Heroic')
+				assert.are_same({{}, {'M3'}}, Array.map(heroic.rounds, matchIds))
+				assert.are_same({{0, 0, 0}, {1, 1, 0}}, scoreboards(heroic))
+			end)
 
-		it('leaves out the matches of disqualified opponents playing under an alias', function()
-			stubDisqualificationMatches()
-			local opponents = standingsOpponents(1)
-			opponents[2].opponent = {type = 'team', template = 'team liquid', name = 'Team Liquid', extradata = {}}
-			opponents[2].aliases = {{type = 'team', template = 'wolves esports', name = 'Wolves Esports', extradata = {}}}
+			it('leaves out the matches of an opponent playing under an alias', function()
+				stubDisqualificationMatches()
+				local opponents = standingsOpponents({['Wolves Esports'] = 1})
+				opponents[2].opponent = {type = 'team', template = 'team liquid', name = 'Team Liquid', extradata = {}}
+				opponents[2].aliases = {{type = 'team', template = 'wolves esports', name = 'Wolves Esports', extradata = {}}}
 
-			local imported = StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, opponents, {
-				excludeDisqualified = true,
-			})
+				local imported = StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, opponents, {
+					dqHandling = 'ignore',
+				})
 
-			assert.are_same({'M3'}, matchIds(findOpponent(imported, 'Heroic').rounds[2]))
-		end)
+				assert.are_same({'M3'}, matchIds(findOpponent(imported, 'Heroic').rounds[2]))
+			end)
 
-		it('leaves the matches of disqualified opponents out of the head-to-head scope', function()
-			stubDisqualificationMatches()
+			it('leaves the matches out of the head-to-head scope', function()
+				stubDisqualificationMatches()
 
-			local opponents = StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, standingsOpponents(2), {
-				excludeDisqualified = true,
-			})
+				local opponents = import('ignore', {['Wolves Esports'] = 2})
 
-			local scoped = TiebreakerScope.restrictTo(Array.map({'Wolves Esports', 'TT9 Esports'}, function(name)
-				local opponentData = findOpponent(opponents, name)
-				return {
-					opponent = opponentData.opponent,
-					matches = opponentData.rounds[2].matches,
-					matchPoints = opponentData.matchPoints,
-					extradata = {},
+				local scoped = TiebreakerScope.restrictTo(Array.map({'Wolves Esports', 'TT9 Esports'}, function(name)
+					local opponentData = findOpponent(opponents, name)
+					return {
+						opponent = opponentData.opponent,
+						matches = opponentData.rounds[2].matches,
+						matchPoints = opponentData.rounds[2].matchPoints,
+						extradata = {},
+					}
+				end))
+
+				assert.are_same({{}, {}}, Array.map(scoped, Operator.property('matches')))
+			end)
+
+			it('treats the matches of a disqualified opponent as finished for the round status', function()
+				stubMatchQuery{
+					match2Record{matchId = 'M1', finished = false, opponents = {
+						{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 0},
+						{template = 'heroic', name = 'Heroic', score = 0, placement = 0},
+					}},
 				}
-			end))
 
-			assert.are_same({{}, {}}, Array.map(scoped, Operator.property('matches')))
+				local _, matchPhasesByRound = StandingsParseLpdb.importFromMatches(
+					{{roundNumber = 1, matches = {'M1'}}}, swissScoreMapper, standingsOpponents({['Wolves Esports'] = 1}),
+					{dqHandling = 'ignore'}
+				)
+
+				assert.are_same({'finished'}, matchPhasesByRound[1])
+			end)
+		end)
+
+		describe('autolose', function()
+			it('makes all matches of an opponent lost by DQ from its dq round', function()
+				stubDisqualificationMatches()
+
+				local opponents = import('autolose', {['Wolves Esports'] = 2})
+
+				local heroic = findOpponent(opponents, 'Heroic')
+				-- The round 1 loss becomes a win in round 2
+				assert.are_same({{0, 0, 1}, {2, 2, -1}}, scoreboards(heroic))
+				assert.are_same({'M1', 'M3'}, matchIds(heroic.rounds[2]))
+				assert.are_equal(0, heroic.rounds[1].matchPoints.M1)
+				assert.are_equal(1, heroic.rounds[2].matchPoints.M1)
+
+				local wolves = findOpponent(opponents, 'Wolves Esports')
+				assert.are_same({{1, 1, 0}, {-1, -1, 2}}, scoreboards(wolves))
+
+				assert.are_same({{0, 0, 0}, {1, 1, 1}}, scoreboards(findOpponent(opponents, 'TT9 Esports')))
+			end)
+
+			it('turns the matches into walkovers without their games', function()
+				stubDisqualificationMatches()
+
+				local opponents = import('autolose', {['Wolves Esports'] = 2})
+
+				local heroic = findOpponent(opponents, 'Heroic')
+				local original, forfeited = heroic.rounds[1].matches[1], heroic.rounds[2].matches[1]
+				assert.are_equal(1, #original.games)
+				assert.are_same({'DQ', 'W'}, Array.map(forfeited.opponents, Operator.property('status')))
+				assert.are_same({2, 1}, Array.map(forfeited.opponents, Operator.property('placement')))
+				assert.are_same({2, true, {}}, {forfeited.winner, forfeited.finished, forfeited.games})
+			end)
+
+			it('loses the matches between disqualified opponents for both', function()
+				stubDisqualificationMatches()
+
+				local opponents = import('autolose', {['Wolves Esports'] = 2, ['TT9 Esports'] = 2})
+
+				assert.are_same({{1, 1, 0}, {-1, -1, 2}}, scoreboards(findOpponent(opponents, 'Wolves Esports')))
+				assert.are_same({{0, 0, 0}, {0, 0, 2}}, scoreboards(findOpponent(opponents, 'TT9 Esports')))
+			end)
+
+			it('counts the upcoming matches of a disqualified opponent as won by DQ', function()
+				stubMatchQuery{
+					match2Record{matchId = 'M1', finished = false, opponents = {
+						{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 0},
+						{template = 'heroic', name = 'Heroic', score = 0, placement = 0},
+					}},
+				}
+
+				local opponents = StandingsParseLpdb.importFromMatches(
+					{{roundNumber = 1, matches = {'M1'}}}, swissScoreMapper, standingsOpponents({['Wolves Esports'] = 1}),
+					{dqHandling = 'autolose'}
+				)
+
+				assert.are_same({{1, 1, 0}}, scoreboards(findOpponent(opponents, 'Heroic')))
+			end)
+		end)
+
+		it('counts the per round totals in the standings', function()
+			stubDisqualificationMatches()
+			stub(mw.ext.LiquipediaDB, 'lpdb_standingstable')
+			stub(mw.ext.LiquipediaDB, 'lpdb_standingsentry')
+
+			local standingsTable = require('Module:Standings/Table').parse({
+				tabletype = 'group',
+				dqhandling = 'autolose',
+				round1 = {matches = 'M1'},
+				round2 = {matches = 'M2,M3'},
+				{type = 'team', template = 'heroic'},
+				{type = 'team', template = 'wolves esports', dq = '2'},
+				{type = 'team', template = 'tt9 esports 2022'},
+			}, 'group')
+
+			---@diagnostic disable-next-line: undefined-field
+			mw.ext.LiquipediaDB.lpdb_standingstable:revert()
+			---@diagnostic disable-next-line: undefined-field
+			mw.ext.LiquipediaDB.lpdb_standingsentry:revert()
+			local function totals(template)
+				return Array.map(Array.filter(standingsTable.entries, function(entry)
+					return entry.opponent.template == template
+				end), function(entry)
+					return {entry.roundindex, entry.points, entry.match.w, entry.match.l}
+				end)
+			end
+			assert.are_same({{1, 0, 0, 1}, {2, 6, 2, 0}}, totals('heroic 2024'))
+			assert.are_same({{1, 3, 1, 0}, {2, 0, 0, 2}}, totals('wolves esports'))
 		end)
 	end)
 end)

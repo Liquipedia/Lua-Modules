@@ -495,6 +495,24 @@ function StandingsParseWiki.parseWalkoverRounds(args)
 	return readNonNegativeInteger(args, 'walkoverrounds')
 end
 
+local DQ_HANDLINGS = {ignore = true, autolose = true}
+
+---Reads the `dqhandling` input, how the matches of a disqualified opponent count from the round it is disqualified
+---in, including the matches of earlier rounds: `ignore` leaves them out, `autolose` makes them lost by DQ.
+---Unset means they count as played.
+---@param args table
+---@param tableType StandingsTableTypes
+---@return StandingsDqHandling?
+function StandingsParseWiki.parseDqHandling(args, tableType)
+	local input = args.dqhandling
+	if Logic.isEmpty(input) then
+		return nil
+	end
+	assert(DQ_HANDLINGS[input], 'Invalid dqhandling input: "' .. input .. '", expected "ignore" or "autolose"')
+	assert(input ~= 'autolose' or tableType ~= 'ffa', 'Invalid dqhandling input: ffa standings do not support autolose')
+	return input
+end
+
 ---Reads the `width` input in px, e.g. `600` or `600px`, the same as the width of a matchlist.
 ---@param args table
 ---@return number?

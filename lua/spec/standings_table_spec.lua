@@ -126,7 +126,7 @@ describe('Standings Table from template', function()
 		end)
 	end)
 
-	describe('dq excludes matches', function()
+	describe('dq handling', function()
 		local StandingsParseLpdb = require('Module:Standings/Parse/Lpdb')
 
 		before_each(function()
@@ -138,25 +138,27 @@ describe('Standings Table from template', function()
 			StandingsParseLpdb.importFromMatches:revert()
 		end)
 
-		---@param dqExcludesMatches string?
-		---@return boolean?
-		local function importExcludesDisqualified(dqExcludesMatches)
+		---@param dqHandling string?
+		---@return string?
+		local function importedDqHandling(dqHandling)
 			StandingsTable.fromTemplate{
 				tabletype = 'group',
-				dqexcludesmatches = dqExcludesMatches,
+				dqhandling = dqHandling,
 				round1 = {matches = 'M1'},
 				{type = 'literal', name = 'Alpha', dq = 'true'},
 			}
 			---@diagnostic disable-next-line: undefined-field
-			return StandingsParseLpdb.importFromMatches.calls[1].vals[4].excludeDisqualified
+			local calls = StandingsParseLpdb.importFromMatches.calls
+			return calls[#calls].vals[4].dqHandling
 		end
 
-		it('passes the dqexcludesmatches input to the import', function()
-			assert.is_true(importExcludesDisqualified('true'))
+		it('passes the dqhandling input to the import', function()
+			assert.are_equal('ignore', importedDqHandling('ignore'))
+			assert.are_equal('autolose', importedDqHandling('autolose'))
 		end)
 
 		it('counts the matches of disqualified opponents by default', function()
-			assert.is_false(importExcludesDisqualified(nil))
+			assert.is_nil(importedDqHandling(nil))
 		end)
 	end)
 end)
