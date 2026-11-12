@@ -245,6 +245,12 @@ describe('Standings Legacy Group', function()
 			assert.is_nil(walkoverRounds{})
 		end)
 
+		it('maps ignoredq to leaving out the matches of disqualified teams', function()
+			assert.is_true(StandingTableLegacyGroup.getStandardParameter({ignoredq = 'true'}, {}).dqexcludesmatches)
+			assert.is_false(StandingTableLegacyGroup.getStandardParameter({ignoredq = 'false'}, {}).dqexcludesmatches)
+			assert.is_false(StandingTableLegacyGroup.getStandardParameter({}, {}).dqexcludesmatches)
+		end)
+
 		it('resets the tiebreakers only with a h2hcs tiebreaker', function()
 			local config = StandingTableLegacyGroup.VALORANT_CONFIG
 			local function needsReset(args)
