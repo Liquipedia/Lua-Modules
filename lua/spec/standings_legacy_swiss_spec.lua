@@ -211,4 +211,95 @@ describe('Standings Legacy Swiss', function()
 			assert.is_nil(StandingTableLegacySwiss.getStandardParameter{}.walkovergames)
 		end)
 	end)
+
+	describe('rainbowsix', function()
+		local config = StandingTableLegacySwiss.RAINBOWSIX_CONFIG
+
+		it('maps buchholz to the points of the opponents and no ot diff to the round diff', function()
+			local args = {tiebreaker1 = 'points', tiebreaker2 = 'buchholz', tiebreaker3 = 'no ot diff', tiebreaker4 = 'diff'}
+			assert.are_same({'points', 'buchholzpoints', 'rounddiff', 'gamediff'},
+				StandingTableLegacySwiss.parseTiebreaker(args, config))
+			assert.are_same({'points', 'buchholzpoints', 'rounddiff', 'rounddiff'},
+				StandingTableLegacySwiss.parseTiebreaker(args, config, true))
+			assert.are_same({'points', 'buchholz', 'gamediffregulation', 'gamediff'},
+				StandingTableLegacySwiss.parseTiebreaker(args))
+		end)
+
+		it('maps the game tiebreakers to rounds when every match is a Bo1', function()
+			local args = {
+				tiebreaker1 = 'diff',
+				tiebreaker2 = 'diff games',
+				tiebreaker3 = 'games won',
+				tiebreaker4 = 'games loss',
+				tiebreaker5 = 'h2h games',
+				tiebreaker6 = 'minileague games',
+				tiebreaker7 = 'minileague games won',
+				tiebreaker8 = 'series',
+			}
+			assert.are_same(
+				{'rounddiff', 'rounddiff', 'roundwins', 'roundlosses', 'h2hlegacy.roundscore', 'ml.rounddiff',
+					'ml.roundwins', 'matchscore'},
+				StandingTableLegacySwiss.parseTiebreaker(args, config, true)
+			)
+			assert.are_same(
+				{'gamediff', 'gamediff', 'gamewins', 'gamelosses', 'h2hlegacy.gamescore', 'ml.gamediff', 'ml.gamewins',
+					'matchscore'},
+				StandingTableLegacySwiss.parseTiebreaker(args, config, false)
+			)
+		end)
+
+		it('only translates the names the swiss table knows', function()
+			assert.error(function() StandingTableLegacySwiss.parseTiebreaker({tiebreaker1 = 'games%'}, config, true) end)
+			assert.error(function() StandingTableLegacySwiss.parseTiebreaker({tiebreaker1 = 'bogus'}, config) end)
+		end)
+
+		it('only maps to valid tiebreakers on rainbowsix', function()
+			local inputs = {}
+			for index, input in ipairs{'points', 'buchholz', 'series', 'diff', 'diff games', 'no ot diff', 'games won',
+				'games loss', 'h2h series', 'h2h games', 'minileague points', 'minileague series%', 'minileague games',
+				'minileague games won'} do
+				inputs['tiebreaker' .. index] = input
+			end
+			for _, isBestOfOne in ipairs{false, true} do
+				for _, tiebreaker in ipairs(StandingTableLegacySwiss.parseTiebreaker(inputs, config, isBestOfOne)) do
+					TiebreakerFactory.validateAndNormalizeInput(tiebreaker)
+				end
+			end
+		end)
+
+		it('is a Bo1 table only if every match is a Bo1', function()
+			assert.is_true(StandingTableLegacySwiss.isBestOfOne{{bestof = 1}, {bestof = '1'}})
+			assert.is_false(StandingTableLegacySwiss.isBestOfOne{{bestof = 1}, {bestof = 3}})
+			assert.is_false(StandingTableLegacySwiss.isBestOfOne{{bestof = 1}, {}})
+			assert.is_false(StandingTableLegacySwiss.isBestOfOne{})
+		end)
+
+		it('counts walkover_win as rounds on Bo1 tables', function()
+			local parameters = StandingTableLegacySwiss.getStandardParameter{walkover_win = '7'}
+			local bestOfOne = config.adjustParameters(parameters, {walkover_win = '7'}, true)
+			assert.are_same({nil, '7'}, {bestOfOne.walkovergames, bestOfOne.walkoverrounds})
+			assert.are_equal('7', parameters.walkovergames)
+			assert.are_equal(parameters, config.adjustParameters(parameters, {walkover_win = '7'}, false))
+		end)
+
+		it('passes the Bo1 mapping to the standings', function()
+			local StandingTable = require('Module:Standings/Table')
+			stub(mw.ext.LiquipediaDB, 'lpdb', {
+				{match2id = 'a', bestof = '1', extradata = {matchsection = 'Round 1'}},
+				{match2id = 'b', bestof = '1', extradata = {matchsection = 'Round 2'}},
+			})
+			stub(StandingTable, 'fromTemplate')
+			StandingTableLegacySwiss.rainbowsix{rounds = '2', team1 = 'team liquid', tiebreaker1 = 'buchholz',
+				tiebreaker2 = 'diff', walkover_win = '7'}
+			---@diagnostic disable-next-line: undefined-field
+			local input = StandingTable.fromTemplate.calls[1].vals[1]
+			---@diagnostic disable-next-line: undefined-field
+			StandingTable.fromTemplate:revert()
+			---@diagnostic disable-next-line: undefined-field
+			mw.ext.LiquipediaDB.lpdb:revert()
+			assert.are_same({'buchholzpoints', 'rounddiff'}, input.tiebreakers)
+			assert.are_same({'7', 'a', 'b'}, {input.walkoverrounds, input.round1.matches, input.round2.matches})
+			assert.is_nil(input.walkovergames)
+		end)
+	end)
 end)

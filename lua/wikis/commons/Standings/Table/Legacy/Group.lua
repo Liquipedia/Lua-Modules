@@ -81,7 +81,7 @@ local MATCH_RESULT_POINTS = {
 ---@field tiebreakers table<string, string>? # Overrides of the tiebreaker mapping
 ---@field defaultTiebreakers string[]? # Legacy tiebreaker names
 ---@field defaultPointsTiebreakers string[]? # Legacy tiebreaker names, with `show_p`
----@field bestOfOneTiebreakers table<string, string>? # Overrides of the tiebreaker mapping when every match is a Bo1
+---@field bestOfOneTiebreakers table<string, string>? # Translations of the mapped names when every match is a Bo1
 ---@field adjustParameters (fun(parameters: table, args: table, isBestOfOne: boolean): table)?
 
 ---Valorant has its own tiebreakers, `diff` is the round difference
@@ -129,20 +129,7 @@ StandingTableLegacyGroup.RAINBOWSIX_CONFIG = {
 		['minileague games'] = 'ml.gamediff',
 		['minileague games won'] = 'ml.gamewins',
 	},
-	bestOfOneTiebreakers = {
-		diff = 'rounddiff',
-		['games diff'] = 'rounddiff',
-		['games won'] = 'roundwins',
-		['games loss'] = 'roundlosses',
-		['games percentage'] = 'roundwinrate',
-		['games%'] = 'roundwinrate',
-		['games-percentage'] = 'roundwinrate',
-		['h2h games'] = 'h2hlegacy.roundscore',
-		['head-to-head games'] = 'h2hlegacy.roundscore',
-		['head to head games'] = 'h2hlegacy.roundscore',
-		['minileague games'] = 'ml.rounddiff',
-		['minileague games won'] = 'ml.roundwins',
-	},
+	bestOfOneTiebreakers = StandingTableLegacySwiss.RAINBOWSIX_BEST_OF_ONE_TIEBREAKERS,
 	adjustParameters = function(parameters, args, isBestOfOne)
 		return StandingTableLegacyGroup.adjustRainbowSixParameters(parameters, args, isBestOfOne)
 	end,
@@ -185,7 +172,7 @@ function StandingTableLegacyGroup.run(args, config, parseOpponentInput)
 	parseOpponentInput = parseOpponentInput or StandingTableLegacyGroup.parseTeamInput
 	local legacyRounds = StandingTableLegacyGroup.parseRounds(args, DateExt.getCurrentTimestamp())
 	local matchRecords = StandingTableLegacyNext.fetchMatches(args)
-	local isBestOfOne = StandingTableLegacyGroup.isBestOfOne(matchRecords)
+	local isBestOfOne = StandingTableLegacySwiss.isBestOfOne(matchRecords)
 	local matchesByRound = StandingTableLegacyGroup.groupMatchesByRound(legacyRounds, matchRecords)
 	local rounds = Table.map(legacyRounds, function(roundNumber)
 		local roundInput = StandingTableLegacyGroup.parseRoundInput(args, roundNumber, matchesByRound[roundNumber])
@@ -224,14 +211,6 @@ function StandingTableLegacyGroup.getStandardParameter(args, opponents)
 	-- Legacy turns draws on as soon as a match is drawn
 	parameters.matchdraws = Logic.readBool(args.ties) or nil
 	return parameters
-end
-
----@param matchRecords {bestof: integer|string?}[]
----@return boolean
-function StandingTableLegacyGroup.isBestOfOne(matchRecords)
-	return #matchRecords > 0 and Array.all(matchRecords, function(matchRecord)
-		return tonumber(matchRecord.bestof) == 1
-	end)
 end
 
 ---@param args table
@@ -489,9 +468,10 @@ end
 ---@return string[]
 function StandingTableLegacyGroup.parseTiebreakers(args, config, isBestOfOne)
 	config = config or {}
-	local mapping = Table.merge(
-		TIEBREAKER_MAPPING_TABLE, config.tiebreakers, isBestOfOne and config.bestOfOneTiebreakers or nil
-	)
+	local mapping = Table.merge(TIEBREAKER_MAPPING_TABLE, config.tiebreakers)
+	if isBestOfOne then
+		mapping = StandingTableLegacySwiss.translateTiebreakers(mapping, config.bestOfOneTiebreakers)
+	end
 	local inputs = {}
 	for _, value in Table.iter.pairsByPrefix(args, 'tiebreaker', {requireIndex = true}) do
 		table.insert(inputs, value)

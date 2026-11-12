@@ -45,6 +45,49 @@ local TIEBREAKER_MAPPING_TABLE = {
 	['minileague games won'] = 'ml.gamewins',
 }
 
+---@class LegacySwissConfig
+---@field tiebreakers table<string, string>? # Overrides of the tiebreaker mapping
+---@field bestOfOneTiebreakers table<string, string>? # Translations of the mapped names when every match is a Bo1
+---@field adjustParameters (fun(parameters: table, args: table, isBestOfOne: boolean): table)?
+
+---Rainbow Six legacy stores the rounds of a Bo1 as its match score, so its game tiebreakers are round tiebreakers
+---@type table<string, string>
+StandingTableLegacySwiss.RAINBOWSIX_BEST_OF_ONE_TIEBREAKERS = {
+	diff = 'rounddiff',
+	['diff games'] = 'rounddiff',
+	['games diff'] = 'rounddiff',
+	['games won'] = 'roundwins',
+	['games loss'] = 'roundlosses',
+	['games percentage'] = 'roundwinrate',
+	['games%'] = 'roundwinrate',
+	['games-percentage'] = 'roundwinrate',
+	['h2h games'] = 'h2hlegacy.roundscore',
+	['head-to-head games'] = 'h2hlegacy.roundscore',
+	['head to head games'] = 'h2hlegacy.roundscore',
+	['minileague games'] = 'ml.rounddiff',
+	['minileague games won'] = 'ml.roundwins',
+}
+
+---Rainbow Six buchholz sums the points of the opponents, and `no ot diff` is the round diff with overtime neutral
+---@type LegacySwissConfig
+StandingTableLegacySwiss.RAINBOWSIX_CONFIG = {
+	tiebreakers = {
+		buchholz = 'buchholzpoints',
+		['no ot diff'] = 'rounddiff',
+	},
+	bestOfOneTiebreakers = StandingTableLegacySwiss.RAINBOWSIX_BEST_OF_ONE_TIEBREAKERS,
+	adjustParameters = function(parameters, args, isBestOfOne)
+		if not isBestOfOne then
+			return parameters
+		end
+		-- Legacy counts `walkover_win` as rounds on Bo1
+		local adjusted = Table.copy(parameters)
+		adjusted.walkovergames = nil
+		adjusted.walkoverrounds = Logic.nilIfEmpty(args.walkover_win)
+		return adjusted
+	end,
+}
+
 ---@param args table
 ---@return table
 function StandingTableLegacySwiss.getStandardParameter(args)
@@ -121,13 +164,45 @@ function StandingTableLegacySwiss.parsePoints(args, options)
 	), ', ')
 end
 
+---@param matchRecords {bestof: integer|string?}[]
+---@return boolean
+function StandingTableLegacySwiss.isBestOfOne(matchRecords)
+	return #matchRecords > 0 and Array.all(matchRecords, function(matchRecord)
+		return tonumber(matchRecord.bestof) == 1
+	end)
+end
+
+---Replaces the mapped tiebreakers that have a translation, other names stay unknown
+---@param mapping table<string, string>
+---@param translations table<string, string>?
+---@return table<string, string>
+function StandingTableLegacySwiss.translateTiebreakers(mapping, translations)
+	return Table.map(mapping, function(input, tiebreaker)
+		return input, (translations or {})[input] or tiebreaker
+	end)
+end
+
 ---Common local Module:SwissTableLeague
 ---@param frame Frame
 ---@return Renderable
 function StandingTableLegacySwiss.classic(frame)
-	local args = Arguments.getArgs(frame)
+	return StandingTableLegacySwiss.run(Arguments.getArgs(frame))
+end
 
-	local matchesForRound = StandingTableLegacySwiss.mapTournamentInputToMatchesInRounds(args)
+---Module:SwissTableLeague of rainbowsix
+---@param frame Frame
+---@return Renderable
+function StandingTableLegacySwiss.rainbowsix(frame)
+	return StandingTableLegacySwiss.run(Arguments.getArgs(frame), StandingTableLegacySwiss.RAINBOWSIX_CONFIG)
+end
+
+---@param args table
+---@param config LegacySwissConfig?
+---@return Renderable
+function StandingTableLegacySwiss.run(args, config)
+	config = config or {}
+	local matchesForRound, matchRecords = StandingTableLegacySwiss.mapTournamentInputToMatchesInRounds(args)
+	local isBestOfOne = StandingTableLegacySwiss.isBestOfOne(matchRecords)
 	local rounds = Table.map(Array.range(1, tonumber(args.rounds) or DEFAULT_ROUND_COUNT), function(roundIndex)
 		return 'round' .. roundIndex, StandingTableLegacySwiss.parseRoundInput(args, roundIndex, matchesForRound[roundIndex])
 	end)
@@ -141,11 +216,13 @@ function StandingTableLegacySwiss.classic(frame)
 
 	local bgs = StandingTableLegacySwiss.parseWikiBgs(args, 'pbg')
 
-	local tiebreakers = StandingTableLegacySwiss.parseTiebreaker(args)
+	local tiebreakers = StandingTableLegacySwiss.parseTiebreaker(args, config, isBestOfOne)
+	local parameters = StandingTableLegacySwiss.getStandardParameter(args)
+	if config.adjustParameters then
+		parameters = config.adjustParameters(parameters, args, isBestOfOne)
+	end
 
-	return StandingTable.fromTemplate(Table.merge(
-		StandingTableLegacySwiss.getStandardParameter(args), {bg = bgs}, rounds, opponents, {tiebreakers = tiebreakers}
-	))
+	return StandingTable.fromTemplate(Table.merge(parameters, {bg = bgs}, rounds, opponents, {tiebreakers = tiebreakers}))
 end
 
 ---@param args table
@@ -241,11 +318,18 @@ function StandingTableLegacySwiss.parseWikiBgs(args, prefix)
 end
 
 ---@param args table
+---@param config LegacySwissConfig?
+---@param isBestOfOne boolean?
 ---@return string[]
-function StandingTableLegacySwiss.parseTiebreaker(args)
+function StandingTableLegacySwiss.parseTiebreaker(args, config, isBestOfOne)
+	config = config or {}
+	local mapping = Table.merge(TIEBREAKER_MAPPING_TABLE, config.tiebreakers)
+	if isBestOfOne then
+		mapping = StandingTableLegacySwiss.translateTiebreakers(mapping, config.bestOfOneTiebreakers)
+	end
 	local tiebreakers = {}
 	for _, value in Table.iter.pairsByPrefix(args, 'tiebreaker', {requireIndex = true}) do
-		local mappedTiebreaker = TIEBREAKER_MAPPING_TABLE[value]
+		local mappedTiebreaker = mapping[value]
 		assert(mappedTiebreaker, 'Unknown tiebreaker: ' .. value)
 		table.insert(tiebreakers, mappedTiebreaker)
 	end
@@ -253,7 +337,7 @@ function StandingTableLegacySwiss.parseTiebreaker(args)
 end
 
 ---@param args table
----@return table<integer, {id: string}>
+---@return table<integer, {id: string}> matchesByRound, {id: string, bestof: integer?}[] matches
 function StandingTableLegacySwiss.mapTournamentInputToMatchesInRounds(args)
 	local tournamentStructureSpec = TournamentStructure.readMatchGroupsSpec(args) or TournamentStructure.currentPageSpec()
 	local match2Filter = TournamentStructure.getMatch2Filter(tournamentStructureSpec)
@@ -270,14 +354,18 @@ function StandingTableLegacySwiss.mapTournamentInputToMatchesInRounds(args)
 	local matches = mw.ext.LiquipediaDB.lpdb('match2',
 		{
 			conditions = tostring(conditions),
-			query = 'match2id, extradata',
+			query = 'match2id, bestof, extradata',
 			limit = 1000,
 		}
 	)
 
 	matches = Array.map(matches, function(match)
 		local roundText = match.extradata.matchsection or ''
-		return {id = match.match2id, round = tonumber(string.match(roundText, 'Round%s*(%d+)'))}
+		return {
+			id = match.match2id,
+			round = tonumber(string.match(roundText, 'Round%s*(%d+)')),
+			bestof = tonumber(match.bestof),
+		}
 	end)
 	if Array.all(matches, function(match) return match.round == nil end) then
 		mw.ext.TeamLiquidIntegration.add_category('Pages with missing matches in swiss table')
@@ -285,7 +373,7 @@ function StandingTableLegacySwiss.mapTournamentInputToMatchesInRounds(args)
 	local _, matchesByRound = Array.groupBy(matches, function(match)
 		return match.round
 	end)
-	return matchesByRound
+	return matchesByRound, matches
 end
 
 return StandingTableLegacySwiss

@@ -413,7 +413,10 @@ describe('Standings Legacy Group', function()
 
 		it('only maps to valid tiebreakers on rainbowsix', function()
 			for _, isBestOfOne in ipairs{false, true} do
-				local inputs = Array.extractKeys(Table.merge(config.tiebreakers, config.bestOfOneTiebreakers))
+				local inputs = Array.filter(
+					Array.extractKeys(Table.merge(config.tiebreakers, config.bestOfOneTiebreakers)),
+					function(input) return (pcall(StandingTableLegacyGroup.parseTiebreakers, {tiebreaker1 = input}, config)) end
+				)
 				local tiebreakers = StandingTableLegacyGroup.parseTiebreakers(
 					Table.map(inputs, function(index, input) return 'tiebreaker' .. index, input end), config, isBestOfOne
 				)
@@ -455,11 +458,10 @@ describe('Standings Legacy Group', function()
 			)
 		end)
 
-		it('is a Bo1 table only if every match is a Bo1', function()
-			assert.is_true(StandingTableLegacyGroup.isBestOfOne{{bestof = 1}, {bestof = '1'}})
-			assert.is_false(StandingTableLegacyGroup.isBestOfOne{{bestof = 1}, {bestof = 3}})
-			assert.is_false(StandingTableLegacyGroup.isBestOfOne{{bestof = 1}, {}})
-			assert.is_false(StandingTableLegacyGroup.isBestOfOne{})
+		it('only translates the names the group table knows', function()
+			assert.error(function()
+				StandingTableLegacyGroup.parseTiebreakers({tiebreaker1 = 'diff games'}, config, true)
+			end)
 		end)
 
 		it('counts walkover_win as rounds on Bo1 tables', function()
