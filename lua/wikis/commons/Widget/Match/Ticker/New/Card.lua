@@ -46,7 +46,10 @@ function MatchTickerCard.render(props)
 				classes = {'match-ticker-card__opponents'},
 				children = Array.map(match.opponents, function (opponent, opponentIndex)
 					return Html.Div{
-						classes = {'match-ticker-card__opponent'},
+						classes = {
+							'match-ticker-card__opponent',
+							match.winner == opponentIndex and 'winner' or nil,
+						},
 						children = {
 							OpponentDisplay.BlockOpponent{
 								opponent = opponent,
