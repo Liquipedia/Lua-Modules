@@ -82,6 +82,7 @@ local MATCH_RESULT_POINTS = {
 ---@field defaultTiebreakers string[]? # Legacy tiebreaker names
 ---@field defaultPointsTiebreakers string[]? # Legacy tiebreaker names, with `show_p`
 ---@field bestOfOneTiebreakers table<string, string>? # Translations of the mapped names when every match is a Bo1
+---@field bestOfOneAdjustments table<string, string>? # Translations of the adjustments when every match is a Bo1
 ---@field adjustParameters (fun(parameters: table, args: table, isBestOfOne: boolean): table)?
 
 ---Valorant has its own tiebreakers, `diff` is the round difference
@@ -130,6 +131,7 @@ StandingTableLegacyGroup.RAINBOWSIX_CONFIG = {
 		['minileague games won'] = 'ml.gamewins',
 	},
 	bestOfOneTiebreakers = StandingTableLegacySwiss.RAINBOWSIX_BEST_OF_ONE_TIEBREAKERS,
+	bestOfOneAdjustments = {gamewins = 'roundwins', gamelosses = 'roundlosses'},
 	adjustParameters = function(parameters, args, isBestOfOne)
 		return StandingTableLegacyGroup.adjustRainbowSixParameters(parameters, args, isBestOfOne)
 	end,
@@ -172,7 +174,6 @@ function StandingTableLegacyGroup.run(args, config, parseOpponentInput)
 	parseOpponentInput = parseOpponentInput or StandingTableLegacyGroup.parseTeamInput
 	local legacyRounds = StandingTableLegacyGroup.parseRounds(args, DateExt.getCurrentTimestamp())
 	local matchRecords = StandingTableLegacyNext.fetchMatches(args)
-	local isBestOfOne = StandingTableLegacySwiss.isBestOfOne(matchRecords)
 	local matchesByRound = StandingTableLegacyGroup.groupMatchesByRound(legacyRounds, matchRecords)
 	local rounds = Table.map(legacyRounds, function(roundNumber)
 		local roundInput = StandingTableLegacyGroup.parseRoundInput(args, roundNumber, matchesByRound[roundNumber])
@@ -182,9 +183,19 @@ function StandingTableLegacyGroup.run(args, config, parseOpponentInput)
 	local opponents = Array.mapIndexes(function(index)
 		return parseOpponentInput(args, index, legacyRounds)
 	end)
+	local parameters = StandingTableLegacyGroup.getStandardParameter(args, opponents)
+
+	-- Only the Bo1 translation needs the format, from the matches the standings count
+	local isBestOfOne = config.bestOfOneTiebreakers ~= nil and StandingTableLegacySwiss.isBestOfOne(
+		StandingTableLegacySwiss.filterCountedMatches(matchRecords, opponents, parameters)
+	)
+	if isBestOfOne and config.bestOfOneAdjustments then
+		opponents = Array.map(opponents, function(opponent)
+			return StandingTableLegacyGroup.translateAdjustments(opponent, config.bestOfOneAdjustments)
+		end)
+	end
 
 	local tiebreakers = StandingTableLegacyGroup.parseTiebreakers(args, config, isBestOfOne)
-	local parameters = StandingTableLegacyGroup.getStandardParameter(args, opponents)
 	if config.adjustParameters then
 		parameters = config.adjustParameters(parameters, args, isBestOfOne)
 	end
@@ -255,6 +266,24 @@ function StandingTableLegacyGroup.adjustRainbowSixParameters(parameters, args, i
 		adjusted.walkoverrounds = args.walkover_win_r
 	end
 	return adjusted
+end
+
+---Moves `r<N><adjustment>` to `r<N><translation>`, added to what is there already
+---@param opponent table
+---@param translations table<string, string>
+---@return table
+function StandingTableLegacyGroup.translateAdjustments(opponent, translations)
+	local translated = Table.copy(opponent)
+	for key, value in pairs(opponent) do
+		local roundNumber, adjustment = tostring(key):match('^r(%d+)(%a+)$')
+		local target = adjustment and translations[adjustment]
+		if target then
+			local targetKey = 'r' .. roundNumber .. target
+			translated[key] = nil
+			translated[targetKey] = (translated[targetKey] or 0) + value
+		end
+	end
+	return translated
 end
 
 ---h2hcs only splits off the tops and bottoms, the reset applies it again to the opponents left tied

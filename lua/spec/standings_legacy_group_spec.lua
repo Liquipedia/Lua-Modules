@@ -510,27 +510,96 @@ describe('Standings Legacy Group', function()
 			assert.are_equal('win=3, draw=1, loss=0', parameters({maplength = '2'}, false).points)
 		end)
 
-		it('passes the Bo1 mapping to the standings', function()
+		describe('standings input', function()
 			local StandingTable = require('Module:Standings/Table')
 			local StandingTableLegacyNext = require('Module:Standings/Table/Legacy/Next')
-			stub(StandingTableLegacyNext, 'fetchMatches', {
-				{match2id = 'a', date = '2024-01-01 00:00:00', bestof = 1},
-				{match2id = 'b', date = '2024-01-02 00:00:00', bestof = 1},
-			})
-			stub(StandingTable, 'fromTemplate')
-			StandingTableLegacyGroup.rainbowsix{team1 = 'team liquid', walkover_win = '7', show_otp = 'true'}
-			---@diagnostic disable-next-line: undefined-field
-			local input = StandingTable.fromTemplate.calls[1].vals[1]
-			---@diagnostic disable-next-line: undefined-field
-			StandingTable.fromTemplate:revert()
-			---@diagnostic disable-next-line: undefined-field
-			StandingTableLegacyNext.fetchMatches:revert()
+			local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
+
+			---@param template1 string
+			---@param template2 string
+			---@param bestOf integer
+			---@return table
+			local function matchRecord(template1, template2, bestOf)
+				return {
+					match2id = template1 .. template2,
+					date = '2024-01-01 00:00:00',
+					bestof = bestOf,
+					match2opponents = {{type = 'team', template = template1}, {type = 'team', template = template2}},
+				}
+			end
+
+			---@param args table
+			---@param matchRecords table[]
+			---@return table
+			local function standingsInput(args, matchRecords)
+				stub(StandingTableLegacyNext, 'fetchMatches', matchRecords)
+				stub(StandingTable, 'fromTemplate')
+				StandingTableLegacyGroup.rainbowsix(args)
+				---@diagnostic disable-next-line: undefined-field
+				local input = StandingTable.fromTemplate.calls[1].vals[1]
+				---@diagnostic disable-next-line: undefined-field
+				StandingTable.fromTemplate:revert()
+				---@diagnostic disable-next-line: undefined-field
+				StandingTableLegacyNext.fetchMatches:revert()
+				return input
+			end
+
+			before_each(function()
+				TeamTemplateMock.setUp()
+			end)
+
+			after_each(function()
+				TeamTemplateMock.tearDown()
+			end)
+
+			it('passes the Bo1 mapping to the standings', function()
+				local input = standingsInput(
+					{team1 = 'team liquid', team2 = 'heroic', walkover_win = '7', show_otp = 'true'},
+					{matchRecord('team liquid', 'heroic', 1), matchRecord('heroic', 'team liquid', 1)}
+				)
+				assert.are_same(
+					{'matchscore', 'rounddiff', 'h2hlegacy.matchscore', 'h2hlegacy.roundscore', 'roundwins', 'roundlosses'},
+					input.tiebreakers
+				)
+				assert.are_same({true, '7'}, {input.overtime, input.walkoverrounds})
+				assert.is_nil(input.walkovergames)
+			end)
+
+			it('detects the format from the matches the standings count', function()
+				local function tiebreakers(args, records)
+					return standingsInput(Table.merge({team1 = 'team liquid', team2 = 'heroic'}, args), records).tiebreakers
+				end
+				local groupMatch = matchRecord('team liquid', 'heroic', 1)
+				local outsiderMatch = matchRecord('team liquid', 'team secret', 3)
+				local unrelatedMatch = matchRecord('team secret', 'team bds', 3)
+				local nonExclusive = {exclusive = 'false'}
+				assert.are_equal('rounddiff', tiebreakers({}, {groupMatch, outsiderMatch})[2])
+				assert.are_equal('rounddiff', tiebreakers(nonExclusive, {groupMatch, unrelatedMatch})[2])
+				assert.are_equal('gamediff', tiebreakers(nonExclusive, {groupMatch, outsiderMatch})[2])
+				assert.are_equal('gamediff', tiebreakers({}, {groupMatch, matchRecord('heroic', 'team liquid', 3)})[2])
+				assert.are_equal('rounddiff', tiebreakers({team2alias = 'team secret'}, {
+					groupMatch, matchRecord('team liquid', 'team bds', 3), matchRecord('team liquid', 'team secret', 1),
+				})[2])
+			end)
+
+			it('counts the game adjustments as rounds on Bo1 tables', function()
+				local args = {team1 = 'team liquid', team2 = 'heroic', temp_win_g1 = '7', temp_lose_g1 = '5', temp_win_r1 = '1'}
+				local bestOfOne = standingsInput(args, {matchRecord('team liquid', 'heroic', 1)})
+				assert.are_same({8, 5}, {bestOfOne[1].r1roundwins, bestOfOne[1].r1roundlosses})
+				assert.is_nil(bestOfOne[1].r1gamewins)
+				local bestOfThree = standingsInput(args, {matchRecord('team liquid', 'heroic', 3)})
+				assert.are_same({7, 5, 1}, {bestOfThree[1].r1gamewins, bestOfThree[1].r1gamelosses, bestOfThree[1].r1roundwins})
+			end)
+		end)
+
+		it('translates the adjustments of the rounds', function()
 			assert.are_same(
-				{'matchscore', 'rounddiff', 'h2hlegacy.matchscore', 'h2hlegacy.roundscore', 'roundwins', 'roundlosses'},
-				input.tiebreakers
+				{'team liquid', r1roundwins = 15, r2roundlosses = 1, r1bg = 'up', r1matchwins = 1},
+				StandingTableLegacyGroup.translateAdjustments(
+					{'team liquid', r1gamewins = 2, r1roundwins = 13, r2gamelosses = 1, r1bg = 'up', r1matchwins = 1},
+					{gamewins = 'roundwins', gamelosses = 'roundlosses'}
+				)
 			)
-			assert.are_same({true, '7', 'a,b'}, {input.overtime, input.walkoverrounds, input.round1.matches})
-			assert.is_nil(input.walkovergames)
 		end)
 	end)
 

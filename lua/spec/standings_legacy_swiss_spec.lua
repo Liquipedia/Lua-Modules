@@ -1,5 +1,6 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('Standings Legacy Swiss', function()
+	local Array = require('Module:Array')
 	local StandingTableLegacySwiss = require('Module:Standings/Table/Legacy/Swiss')
 	local TiebreakerFactory = require('Module:Standings/Tiebreaker/Factory')
 
@@ -283,24 +284,61 @@ describe('Standings Legacy Swiss', function()
 			assert.are_equal(parameters, config.adjustParameters(parameters, {walkover_win = '7'}, false))
 		end)
 
-		it('passes the Bo1 mapping to the standings', function()
+		describe('standings input', function()
 			local StandingTable = require('Module:Standings/Table')
-			stub(mw.ext.LiquipediaDB, 'lpdb', {
-				{match2id = 'a', bestof = '1', extradata = {matchsection = 'Round 1'}},
-				{match2id = 'b', bestof = '1', extradata = {matchsection = 'Round 2'}},
-			})
-			stub(StandingTable, 'fromTemplate')
-			StandingTableLegacySwiss.rainbowsix{rounds = '2', team1 = 'team liquid', tiebreaker1 = 'buchholz',
-				tiebreaker2 = 'diff', walkover_win = '7'}
-			---@diagnostic disable-next-line: undefined-field
-			local input = StandingTable.fromTemplate.calls[1].vals[1]
-			---@diagnostic disable-next-line: undefined-field
-			StandingTable.fromTemplate:revert()
-			---@diagnostic disable-next-line: undefined-field
-			mw.ext.LiquipediaDB.lpdb:revert()
-			assert.are_same({'buchholzpoints', 'rounddiff'}, input.tiebreakers)
-			assert.are_same({'7', 'a', 'b'}, {input.walkoverrounds, input.round1.matches, input.round2.matches})
-			assert.is_nil(input.walkovergames)
+			local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
+
+			---@param id string
+			---@param bestOf integer
+			---@param section string
+			---@return table
+			local function matchRecord(id, bestOf, section)
+				return {
+					match2id = id,
+					bestof = bestOf,
+					extradata = {matchsection = section},
+					match2opponents = {{type = 'team', template = 'team liquid'}, {type = 'team', template = 'heroic'}},
+				}
+			end
+
+			---@param matchRecords table[]
+			---@return table
+			local function standingsInput(matchRecords)
+				stub(mw.ext.LiquipediaDB, 'lpdb', matchRecords)
+				stub(StandingTable, 'fromTemplate')
+				StandingTableLegacySwiss.rainbowsix{rounds = '2', team1 = 'team liquid', team2 = 'heroic',
+					tiebreaker1 = 'buchholz', tiebreaker2 = 'diff', walkover_win = '7'}
+				---@diagnostic disable-next-line: undefined-field
+				local input = StandingTable.fromTemplate.calls[1].vals[1]
+				---@diagnostic disable-next-line: undefined-field
+				StandingTable.fromTemplate:revert()
+				---@diagnostic disable-next-line: undefined-field
+				mw.ext.LiquipediaDB.lpdb:revert()
+				return input
+			end
+
+			before_each(function()
+				TeamTemplateMock.setUp()
+			end)
+
+			after_each(function()
+				TeamTemplateMock.tearDown()
+			end)
+
+			it('passes the Bo1 mapping to the standings', function()
+				local input = standingsInput{matchRecord('a', 1, 'Round 1'), matchRecord('b', 1, 'Round 2')}
+				assert.are_same({'buchholzpoints', 'rounddiff'}, input.tiebreakers)
+				assert.are_same({'7', 'a', 'b'}, {input.walkoverrounds, input.round1.matches, input.round2.matches})
+				assert.is_nil(input.walkovergames)
+			end)
+
+			it('detects the format from the matches of the rounds', function()
+				local bestOfOne = {matchRecord('a', 1, 'Round 1'), matchRecord('b', 1, 'Round 2')}
+				assert.are_same({'buchholzpoints', 'rounddiff'}, standingsInput(Array.extend(bestOfOne,
+					matchRecord('c', 3, 'Round 3'), matchRecord('d', 3, 'Playoffs'))).tiebreakers)
+				assert.are_same({'buchholzpoints', 'gamediff'},
+					standingsInput(Array.extend(bestOfOne, matchRecord('c', 3, 'Round 2'))).tiebreakers)
+			end)
 		end)
 	end)
 end)

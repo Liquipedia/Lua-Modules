@@ -15,6 +15,8 @@ local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
 local StandingTable = Lua.import('Module:Standings/Table')
+local StandingsParseLpdb = Lua.import('Module:Standings/Parse/Lpdb')
+local StandingsParseWiki = Lua.import('Module:Standings/Parse/Wiki')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 local Condition = Lua.import('Module:Condition')
 
@@ -171,6 +173,25 @@ function StandingTableLegacySwiss.isBestOfOne(matchRecords)
 	end)
 end
 
+---The matches the standings count, by the opponent, alias and exclusive rules of the import
+---@param matchRecords {match2opponents: match2opponent[]?}[]
+---@param opponents table[] # Opponent inputs of the standings
+---@param parameters {exclusive: boolean?, importopponents: boolean?}
+---@return table[]
+function StandingTableLegacySwiss.filterCountedMatches(matchRecords, opponents, parameters)
+	local date = DateExt.getContextualDateOrNow()
+	local manualOpponents = Array.map(opponents, function(opponent)
+		return StandingsParseWiki.parseWikiOpponent(opponent, 0, date)
+	end)
+	local lookupOpponent = StandingsParseLpdb.makeOpponentLookup(manualOpponents, parameters.importopponents)
+	local opponentCheck = parameters.exclusive and Array.all or Array.any
+	return Array.filter(matchRecords, function(matchRecord)
+		return opponentCheck(matchRecord.match2opponents or {}, function(opponentRecord)
+			return lookupOpponent(Opponent.fromMatch2Record(opponentRecord)).isPartOfStandings
+		end)
+	end)
+end
+
 ---Replaces the mapped tiebreakers that have a translation, other names stay unknown
 ---@param mapping table<string, string>
 ---@param translations table<string, string>?
@@ -200,9 +221,9 @@ end
 ---@return Renderable
 function StandingTableLegacySwiss.run(args, config)
 	config = config or {}
-	local matchesForRound, matchRecords = StandingTableLegacySwiss.mapTournamentInputToMatchesInRounds(args)
-	local isBestOfOne = StandingTableLegacySwiss.isBestOfOne(matchRecords)
-	local rounds = Table.map(Array.range(1, tonumber(args.rounds) or DEFAULT_ROUND_COUNT), function(roundIndex)
+	local roundIndexes = Array.range(1, tonumber(args.rounds) or DEFAULT_ROUND_COUNT)
+	local matchesForRound = StandingTableLegacySwiss.mapTournamentInputToMatchesInRounds(args)
+	local rounds = Table.map(roundIndexes, function(_, roundIndex)
 		return 'round' .. roundIndex, StandingTableLegacySwiss.parseRoundInput(args, roundIndex, matchesForRound[roundIndex])
 	end)
 
@@ -215,8 +236,14 @@ function StandingTableLegacySwiss.run(args, config)
 
 	local bgs = StandingTableLegacySwiss.parseWikiBgs(args, 'pbg')
 
-	local tiebreakers = StandingTableLegacySwiss.parseTiebreaker(args, config, isBestOfOne)
 	local parameters = StandingTableLegacySwiss.getStandardParameter(args)
+	-- Only the Bo1 translation needs the format, from the matches the standings count
+	local isBestOfOne = config.bestOfOneTiebreakers ~= nil and StandingTableLegacySwiss.isBestOfOne(
+		StandingTableLegacySwiss.filterCountedMatches(Array.flatMap(roundIndexes, function(roundIndex)
+			return matchesForRound[roundIndex] or {}
+		end), opponents, parameters)
+	)
+	local tiebreakers = StandingTableLegacySwiss.parseTiebreaker(args, config, isBestOfOne)
 	if config.adjustParameters then
 		parameters = config.adjustParameters(parameters, args, isBestOfOne)
 	end
@@ -336,7 +363,7 @@ function StandingTableLegacySwiss.parseTiebreaker(args, config, isBestOfOne)
 end
 
 ---@param args table
----@return table<integer, {id: string}> matchesByRound, {id: string, bestof: integer?}[] matches
+---@return table<integer, {id: string, bestof: integer?, match2opponents: match2opponent[]?}[]>
 function StandingTableLegacySwiss.mapTournamentInputToMatchesInRounds(args)
 	local tournamentStructureSpec = TournamentStructure.readMatchGroupsSpec(args) or TournamentStructure.currentPageSpec()
 	local match2Filter = TournamentStructure.getMatch2Filter(tournamentStructureSpec)
@@ -353,7 +380,7 @@ function StandingTableLegacySwiss.mapTournamentInputToMatchesInRounds(args)
 	local matches = mw.ext.LiquipediaDB.lpdb('match2',
 		{
 			conditions = tostring(conditions),
-			query = 'match2id, bestof, extradata',
+			query = 'match2id, bestof, extradata, match2opponents',
 			limit = 1000,
 		}
 	)
@@ -364,6 +391,7 @@ function StandingTableLegacySwiss.mapTournamentInputToMatchesInRounds(args)
 			id = match.match2id,
 			round = tonumber(string.match(roundText, 'Round%s*(%d+)')),
 			bestof = tonumber(match.bestof),
+			match2opponents = match.match2opponents,
 		}
 	end)
 	if Array.all(matches, function(match) return match.round == nil end) then
@@ -372,7 +400,7 @@ function StandingTableLegacySwiss.mapTournamentInputToMatchesInRounds(args)
 	local _, matchesByRound = Array.groupBy(matches, function(match)
 		return match.round
 	end)
-	return matchesByRound, matches
+	return matchesByRound
 end
 
 return StandingTableLegacySwiss
