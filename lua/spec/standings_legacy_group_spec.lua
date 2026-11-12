@@ -379,6 +379,152 @@ describe('Standings Legacy Group', function()
 		end)
 	end)
 
+	describe('rainbowsix', function()
+		local config = StandingTableLegacyGroup.RAINBOWSIX_CONFIG
+
+		---@param args table
+		---@param isBestOfOne boolean
+		---@return table
+		local function parameters(args, isBestOfOne)
+			return StandingTableLegacyGroup.adjustRainbowSixParameters(
+				StandingTableLegacyGroup.getStandardParameter(args, {}), args, isBestOfOne
+			)
+		end
+
+		it('maps the rainbowsix tiebreakers', function()
+			assert.are_same(
+				{'gamediff', 'rounddiff', 'roundwins', 'roundlosses', 'roundwinrate', 'ml.points', 'ml.points',
+					'ml.matchwinrate', 'ml.gamediff', 'ml.gamewins'},
+				StandingTableLegacyGroup.parseTiebreakers({
+					tiebreaker1 = 'games diff',
+					tiebreaker2 = 'rdiff',
+					tiebreaker3 = 'rounds won',
+					tiebreaker4 = 'rounds loss',
+					tiebreaker5 = 'rounds%',
+					tiebreaker6 = 'minileague points',
+					tiebreaker7 = 'minileague ot points',
+					tiebreaker8 = 'minileague series%',
+					tiebreaker9 = 'minileague games',
+					tiebreaker10 = 'minileague games won',
+				}, config)
+			)
+			assert.error(function() StandingTableLegacyGroup.parseTiebreakers({tiebreaker1 = 'h2h'}, config) end)
+		end)
+
+		it('only maps to valid tiebreakers on rainbowsix', function()
+			for _, isBestOfOne in ipairs{false, true} do
+				local inputs = Array.extractKeys(Table.merge(config.tiebreakers, config.bestOfOneTiebreakers))
+				local tiebreakers = StandingTableLegacyGroup.parseTiebreakers(
+					Table.map(inputs, function(index, input) return 'tiebreaker' .. index, input end), config, isBestOfOne
+				)
+				Array.extendWith(tiebreakers, StandingTableLegacyGroup.parseTiebreakers({}, config, isBestOfOne))
+				for _, tiebreaker in ipairs(tiebreakers) do
+					TiebreakerFactory.validateAndNormalizeInput(tiebreaker)
+				end
+			end
+		end)
+
+		it('maps the game tiebreakers to rounds when every match is a Bo1', function()
+			local args = {
+				tiebreaker1 = 'diff',
+				tiebreaker2 = 'games won',
+				tiebreaker3 = 'games loss',
+				tiebreaker4 = 'games%',
+				tiebreaker5 = 'h2h games',
+				tiebreaker6 = 'minileague games',
+				tiebreaker7 = 'minileague games won',
+				tiebreaker8 = 'series',
+			}
+			assert.are_same(
+				{'rounddiff', 'roundwins', 'roundlosses', 'roundwinrate', 'h2hlegacy.roundscore', 'ml.rounddiff',
+					'ml.roundwins', 'matchscore'},
+				StandingTableLegacyGroup.parseTiebreakers(args, config, true)
+			)
+			assert.are_same(
+				{'gamediff', 'gamewins', 'gamelosses', 'gamewinrate', 'h2hlegacy.gamescore', 'ml.gamediff',
+					'ml.gamewins', 'matchscore'},
+				StandingTableLegacyGroup.parseTiebreakers(args, config, false)
+			)
+			assert.are_same(
+				{'matchscore', 'rounddiff', 'h2hlegacy.matchscore', 'h2hlegacy.roundscore', 'roundwins', 'roundlosses'},
+				StandingTableLegacyGroup.parseTiebreakers({}, config, true)
+			)
+			assert.are_same(
+				{'gamediff', 'gamewins'},
+				StandingTableLegacyGroup.parseTiebreakers({tiebreaker1 = 'diff', tiebreaker2 = 'games won'}, nil, true)
+			)
+		end)
+
+		it('is a Bo1 table only if every match is a Bo1', function()
+			assert.is_true(StandingTableLegacyGroup.isBestOfOne{{bestof = 1}, {bestof = '1'}})
+			assert.is_false(StandingTableLegacyGroup.isBestOfOne{{bestof = 1}, {bestof = 3}})
+			assert.is_false(StandingTableLegacyGroup.isBestOfOne{{bestof = 1}, {}})
+			assert.is_false(StandingTableLegacyGroup.isBestOfOne{})
+		end)
+
+		it('counts walkover_win as rounds on Bo1 tables', function()
+			local bestOfOne = parameters({walkover_win = '7'}, true)
+			assert.are_same({nil, '7'}, {bestOfOne.walkovergames, bestOfOne.walkoverrounds})
+			local bestOfThree = parameters({walkover_win = '2'}, false)
+			assert.are_same({'2', nil}, {bestOfThree.walkovergames, bestOfThree.walkoverrounds})
+		end)
+
+		it('counts walkover_win_r per walkover map', function()
+			local function walkovers(args, isBestOfOne)
+				local adjusted = parameters(args, isBestOfOne)
+				return {adjusted.walkovergames, adjusted.walkoverrounds}
+			end
+			assert.are_same({'2', '7'}, walkovers({walkover_win = '2', walkover_win_r = '7'}, false))
+			assert.are_same({'2', '7'}, walkovers({walkover_win = '2', walkover_win_r = '7', walkover_rounds_win = '26'}, false))
+			assert.are_same({'2', 13}, walkovers({walkover_win = '2', walkover_rounds_win = '26'}, false))
+			assert.are_same({nil, '7'}, walkovers({walkover_win = '1', walkover_win_r = '7'}, true))
+			assert.are_same({nil, '7'}, walkovers({walkover_win = '7', walkover_rounds_win = '7'}, true))
+		end)
+
+		it('only tracks overtime on Bo1 tables', function()
+			local bestOfOne = parameters({show_otp = 'true', otw_p = '2.5'}, true)
+			assert.is_true(bestOfOne.overtime)
+			assert.are_equal('win=3, draw=1, loss=0, otwin=2.5, otloss=1', bestOfOne.points)
+			local mixed = parameters({show_otp = 'true'}, false)
+			assert.is_false(mixed.overtime)
+			assert.are_equal('win=3, draw=1, loss=0', mixed.points)
+			assert.is_false(parameters({}, true).overtime)
+		end)
+
+		it('scores a 2-1 as overtime with maplength 2', function()
+			local adjusted = parameters({show_otp = 'true', maplength = '2'}, false)
+			assert.is_false(adjusted.overtime)
+			assert.are_equal('win=3, draw=1, loss=0, 1-2=1, 2-1=2', adjusted.points)
+			assert.are_equal('win=2, draw=1, loss=-1, 1-2=0, 2-1=4',
+				parameters({show_otp = 'true', maplength = '2', win_p = '2', lose_p = '-1', otw_p = '3', ['2-1_p'] = '1',
+					otl_p = '0'}, false).points)
+			assert.are_equal('win=3, draw=1, loss=0', parameters({maplength = '2'}, false).points)
+		end)
+
+		it('passes the Bo1 mapping to the standings', function()
+			local StandingTable = require('Module:Standings/Table')
+			local StandingTableLegacyNext = require('Module:Standings/Table/Legacy/Next')
+			stub(StandingTableLegacyNext, 'fetchMatches', {
+				{match2id = 'a', date = '2024-01-01 00:00:00', bestof = 1},
+				{match2id = 'b', date = '2024-01-02 00:00:00', bestof = 1},
+			})
+			stub(StandingTable, 'fromTemplate')
+			StandingTableLegacyGroup.rainbowsix{team1 = 'team liquid', walkover_win = '7', show_otp = 'true'}
+			---@diagnostic disable-next-line: undefined-field
+			local input = StandingTable.fromTemplate.calls[1].vals[1]
+			---@diagnostic disable-next-line: undefined-field
+			StandingTable.fromTemplate:revert()
+			---@diagnostic disable-next-line: undefined-field
+			StandingTableLegacyNext.fetchMatches:revert()
+			assert.are_same(
+				{'matchscore', 'rounddiff', 'h2hlegacy.matchscore', 'h2hlegacy.roundscore', 'roundwins', 'roundlosses'},
+				input.tiebreakers
+			)
+			assert.are_same({true, '7', 'a,b'}, {input.overtime, input.walkoverrounds, input.round1.matches})
+			assert.is_nil(input.walkovergames)
+		end)
+	end)
+
 	describe('ties', function()
 		it('turns draws on with ties=true and auto detects them otherwise', function()
 			local function matchDraws(args)

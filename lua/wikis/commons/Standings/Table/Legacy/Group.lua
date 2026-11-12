@@ -81,6 +81,8 @@ local MATCH_RESULT_POINTS = {
 ---@field tiebreakers table<string, string>? # Overrides of the tiebreaker mapping
 ---@field defaultTiebreakers string[]? # Legacy tiebreaker names
 ---@field defaultPointsTiebreakers string[]? # Legacy tiebreaker names, with `show_p`
+---@field bestOfOneTiebreakers table<string, string>? # Overrides of the tiebreaker mapping when every match is a Bo1
+---@field adjustParameters (fun(parameters: table, args: table, isBestOfOne: boolean): table)?
 
 ---Valorant has its own tiebreakers, `diff` is the round difference
 ---@type LegacyGroupConfig
@@ -109,6 +111,43 @@ StandingTableLegacyGroup.VALORANT_CONFIG = {
 	defaultPointsTiebreakers = {'points'},
 }
 
+---Rainbow Six legacy stores the rounds of a Bo1 as its match score, so its game tiebreakers are round tiebreakers
+---@type LegacyGroupConfig
+StandingTableLegacyGroup.RAINBOWSIX_CONFIG = {
+	tiebreakers = {
+		['games diff'] = 'gamediff',
+		rdiff = 'rounddiff',
+		['round diff'] = 'rounddiff',
+		['rounds won'] = 'roundwins',
+		['rounds loss'] = 'roundlosses',
+		['rounds%'] = 'roundwinrate',
+		['rounds percentage'] = 'roundwinrate',
+		['rounds-percentage'] = 'roundwinrate',
+		['minileague points'] = 'ml.points',
+		['minileague ot points'] = 'ml.points',
+		['minileague series%'] = 'ml.matchwinrate',
+		['minileague games'] = 'ml.gamediff',
+		['minileague games won'] = 'ml.gamewins',
+	},
+	bestOfOneTiebreakers = {
+		diff = 'rounddiff',
+		['games diff'] = 'rounddiff',
+		['games won'] = 'roundwins',
+		['games loss'] = 'roundlosses',
+		['games percentage'] = 'roundwinrate',
+		['games%'] = 'roundwinrate',
+		['games-percentage'] = 'roundwinrate',
+		['h2h games'] = 'h2hlegacy.roundscore',
+		['head-to-head games'] = 'h2hlegacy.roundscore',
+		['head to head games'] = 'h2hlegacy.roundscore',
+		['minileague games'] = 'ml.rounddiff',
+		['minileague games won'] = 'ml.roundwins',
+	},
+	adjustParameters = function(parameters, args, isBestOfOne)
+		return StandingTableLegacyGroup.adjustRainbowSixParameters(parameters, args, isBestOfOne)
+	end,
+}
+
 ---Common local Module:GroupTableLeague
 ---@param frame Frame
 ---@return Renderable
@@ -123,6 +162,13 @@ function StandingTableLegacyGroup.valorant(frame)
 	return StandingTableLegacyGroup.run(Arguments.getArgs(frame), StandingTableLegacyGroup.VALORANT_CONFIG)
 end
 
+---Module:GroupTableLeague of rainbowsix
+---@param frame Frame
+---@return Renderable
+function StandingTableLegacyGroup.rainbowsix(frame)
+	return StandingTableLegacyGroup.run(Arguments.getArgs(frame), StandingTableLegacyGroup.RAINBOWSIX_CONFIG)
+end
+
 ---Module:GroupTableLeague/solo
 ---@param frame Frame
 ---@return Renderable
@@ -135,11 +181,12 @@ end
 ---@param parseOpponentInput LegacyGroupOpponentParser? # Defaults to team input
 ---@return Renderable
 function StandingTableLegacyGroup.run(args, config, parseOpponentInput)
+	config = config or {}
 	parseOpponentInput = parseOpponentInput or StandingTableLegacyGroup.parseTeamInput
 	local legacyRounds = StandingTableLegacyGroup.parseRounds(args, DateExt.getCurrentTimestamp())
-	local matchesByRound = StandingTableLegacyGroup.groupMatchesByRound(
-		legacyRounds, StandingTableLegacyNext.fetchMatches(args)
-	)
+	local matchRecords = StandingTableLegacyNext.fetchMatches(args)
+	local isBestOfOne = StandingTableLegacyGroup.isBestOfOne(matchRecords)
+	local matchesByRound = StandingTableLegacyGroup.groupMatchesByRound(legacyRounds, matchRecords)
 	local rounds = Table.map(legacyRounds, function(roundNumber)
 		local roundInput = StandingTableLegacyGroup.parseRoundInput(args, roundNumber, matchesByRound[roundNumber])
 		return 'round' .. roundNumber, roundInput
@@ -149,10 +196,14 @@ function StandingTableLegacyGroup.run(args, config, parseOpponentInput)
 		return parseOpponentInput(args, index, legacyRounds)
 	end)
 
-	local tiebreakers = StandingTableLegacyGroup.parseTiebreakers(args, config)
+	local tiebreakers = StandingTableLegacyGroup.parseTiebreakers(args, config, isBestOfOne)
+	local parameters = StandingTableLegacyGroup.getStandardParameter(args, opponents)
+	if config.adjustParameters then
+		parameters = config.adjustParameters(parameters, args, isBestOfOne)
+	end
 
 	return StandingTable.fromTemplate(Table.merge(
-		StandingTableLegacyGroup.getStandardParameter(args, opponents),
+		parameters,
 		{bg = StandingTableLegacySwiss.parseWikiBgs(args, 'pbg')},
 		rounds,
 		opponents,
@@ -173,6 +224,57 @@ function StandingTableLegacyGroup.getStandardParameter(args, opponents)
 	-- Legacy turns draws on as soon as a match is drawn
 	parameters.matchdraws = Logic.readBool(args.ties) or nil
 	return parameters
+end
+
+---@param matchRecords {bestof: integer|string?}[]
+---@return boolean
+function StandingTableLegacyGroup.isBestOfOne(matchRecords)
+	return #matchRecords > 0 and Array.all(matchRecords, function(matchRecord)
+		return tonumber(matchRecord.bestof) == 1
+	end)
+end
+
+---@param args table
+---@param key string
+---@param default number
+---@return number
+local function readNumber(args, key, default)
+	if Logic.isEmpty(args[key]) then
+		return default
+	end
+	return assert(tonumber(args[key]), 'Invalid ' .. key .. ': ' .. args[key])
+end
+
+---Overtime, points and walkovers of the rainbowsix legacy inputs
+---@param parameters table
+---@param args table
+---@param isBestOfOne boolean
+---@return table
+function StandingTableLegacyGroup.adjustRainbowSixParameters(parameters, args, isBestOfOne)
+	local showOvertime = Logic.readBool(args.show_otp)
+	-- Overtime reads the rounds of the first map, legacy the match score
+	local overtime = showOvertime and isBestOfOne
+	local pointsArgs = args
+	if showOvertime and not isBestOfOne and tonumber(args.maplength) == 2 then
+		-- `maplength=2` makes a 2-1 an overtime result, its bonus swaps the result points for the overtime points
+		pointsArgs = Table.merge(args, {
+			['2-1_p'] = readNumber(args, '2-1_p', 0) + readNumber(args, 'otw_p', 2) - readNumber(args, 'win_p', 3),
+			['1-2_p'] = readNumber(args, '1-2_p', 0) + readNumber(args, 'otl_p', 1) - readNumber(args, 'lose_p', 0),
+		})
+	end
+
+	local adjusted = Table.merge(parameters, {
+		overtime = overtime,
+		points = StandingTableLegacySwiss.parsePoints(pointsArgs, {overtime = overtime}),
+	})
+	-- Legacy counts `walkover_win` as rounds on Bo1, `walkover_win_r` per walkover map
+	if isBestOfOne then
+		adjusted.walkovergames = nil
+		adjusted.walkoverrounds = Logic.emptyOr(args.walkover_win_r, args.walkover_rounds_win, args.walkover_win)
+	elseif Logic.isNotEmpty(args.walkover_win_r) then
+		adjusted.walkoverrounds = args.walkover_win_r
+	end
+	return adjusted
 end
 
 ---h2hcs only splits off the tops and bottoms, the reset applies it again to the opponents left tied
@@ -382,10 +484,13 @@ end
 
 ---@param args table
 ---@param config LegacyGroupConfig?
+---@param isBestOfOne boolean?
 ---@return string[]
-function StandingTableLegacyGroup.parseTiebreakers(args, config)
+function StandingTableLegacyGroup.parseTiebreakers(args, config, isBestOfOne)
 	config = config or {}
-	local mapping = Table.merge(TIEBREAKER_MAPPING_TABLE, config.tiebreakers)
+	local mapping = Table.merge(
+		TIEBREAKER_MAPPING_TABLE, config.tiebreakers, isBestOfOne and config.bestOfOneTiebreakers or nil
+	)
 	local inputs = {}
 	for _, value in Table.iter.pairsByPrefix(args, 'tiebreaker', {requireIndex = true}) do
 		table.insert(inputs, value)
