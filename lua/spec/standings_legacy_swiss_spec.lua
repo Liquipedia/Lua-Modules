@@ -14,8 +14,19 @@ describe('Standings Legacy Swiss', function()
 				tiebreaker6 = 'minileague games won',
 			}
 			assert.are_same({
-				'h2hlegacy.matchscore', 'h2hlegacy.gamediff', 'ml.points', 'ml.matchwinrate', 'ml.gamediff', 'ml.gamewins',
+				'h2hlegacy.matchscore', 'h2hlegacy.gamescore', 'ml.points', 'ml.matchwinrate', 'ml.gamediff', 'ml.gamewins',
 			}, tiebreakers)
+		end)
+
+		it('maps the long h2h spellings like h2h', function()
+			assert.are_same({
+				'h2hlegacy.matchscore', 'h2hlegacy.matchscore', 'h2hlegacy.gamescore', 'h2hlegacy.gamescore',
+			}, StandingTableLegacySwiss.parseTiebreaker{
+				tiebreaker1 = 'head-to-head series',
+				tiebreaker2 = 'head to head series',
+				tiebreaker3 = 'head-to-head games',
+				tiebreaker4 = 'head to head games',
+			})
 		end)
 
 		it('only maps to valid tiebreakers', function()
@@ -160,9 +171,30 @@ describe('Standings Legacy Swiss', function()
 				StandingTableLegacySwiss.parsePoints(args, {decimalScores = true}))
 		end)
 
+		it('maps walkover_lose_p as a bonus on top of lose_p', function()
+			assert.are_equal(
+				'win=3, draw=1, loss=0, walkoverloss=-1',
+				StandingTableLegacySwiss.parsePoints{walkover_lose_p = '-1'}
+			)
+			assert.are_equal(
+				'win=3, draw=1, loss=-1, walkoverloss=-1.5',
+				StandingTableLegacySwiss.parsePoints{lose_p = '-1', walkover_lose_p = '-0.5'}
+			)
+			assert.are_equal(
+				'win=3, draw=1, loss=0, otwin=2, otloss=1, walkoverloss=-2, 2-0=4',
+				StandingTableLegacySwiss.parsePoints{show_otp = 'true', walkover_lose_p = '-2', ['2-0_p'] = '1'}
+			)
+		end)
+
+		it('leaves out walkover_lose_p when it is 0', function()
+			assert.are_equal('win=3, draw=1, loss=0', StandingTableLegacySwiss.parsePoints{walkover_lose_p = '0'})
+			assert.are_equal('win=3, draw=1, loss=0', StandingTableLegacySwiss.parsePoints{walkover_lose_p = ''})
+		end)
+
 		it('errors on non numeric values', function()
 			assert.error(function() StandingTableLegacySwiss.parsePoints{win_p = 'three'} end)
 			assert.error(function() StandingTableLegacySwiss.parsePoints{['2-0_p'] = 'three'} end)
+			assert.error(function() StandingTableLegacySwiss.parsePoints{walkover_lose_p = 'one'} end)
 		end)
 
 		it('is passed on as the points of the standard parameters', function()

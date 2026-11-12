@@ -13,17 +13,27 @@ local MathUtil = Lua.import('Module:MathUtil')
 
 local StandingsOvertime = {}
 
----Number of rounds a game has in regulation, as configured per wiki.
+---@class StandingsMatch: MatchGroupUtilMatch
+---@field regulationRounds integer? # Resolved when imported, see `StandingsOvertime.regulationRounds`
+
+---Number of rounds a game has in regulation. A table input overrides the wiki config.
+---@param override integer?
 ---@return integer?
-function StandingsOvertime.regulationRounds()
-	return ((Info.config.standings or {}).overtime or {}).regulationRounds
+function StandingsOvertime.regulationRounds(override)
+	return override or ((Info.config.standings or {}).overtime or {}).regulationRounds
+end
+
+---@param match MatchGroupUtilMatch|StandingsMatch
+---@return integer?
+function StandingsOvertime.matchRegulationRounds(match)
+	return match.regulationRounds or StandingsOvertime.regulationRounds()
 end
 
 ---A game went into overtime if more rounds were played than fit into regulation.
 ---@param game MatchGroupUtilGame
+---@param regulationRounds integer?
 ---@return boolean
-function StandingsOvertime.isOvertimeGame(game)
-	local regulationRounds = StandingsOvertime.regulationRounds()
+function StandingsOvertime.isOvertimeGame(game, regulationRounds)
 	if not regulationRounds then
 		return false
 	end
@@ -36,11 +46,11 @@ function StandingsOvertime.isOvertimeGame(game)
 end
 
 ---A Bo1 match went into overtime if its game did. Overtime standings only support Bo1 matches.
----@param match MatchGroupUtilMatch
+---@param match MatchGroupUtilMatch|StandingsMatch
 ---@return boolean
 function StandingsOvertime.isOvertimeMatch(match)
 	local game = match.games[1]
-	return game ~= nil and StandingsOvertime.isOvertimeGame(game)
+	return game ~= nil and StandingsOvertime.isOvertimeGame(game, StandingsOvertime.matchRegulationRounds(match))
 end
 
 return StandingsOvertime

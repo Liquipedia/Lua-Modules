@@ -297,6 +297,17 @@ describe('Standings Wiki Parser', function()
 			)
 		end)
 
+		it('reads the points of a walkover loss with decimals', function()
+			assert.are_same(
+				{w = 3, d = 1, l = 0, wol = -0.5},
+				StandingsParseWiki.parsePoints('walkoverloss=-0.5', false, 'group')
+			)
+			assert.are_same(
+				{w = 3, d = 1.5, l = 0, otw = 2, otl = 1, wol = -1},
+				StandingsParseWiki.parsePoints('walkoverloss=-1', true, 'group')
+			)
+		end)
+
 		it('errors on unknown keys, non-numeric values and malformed entries', function()
 			assert.error(function() StandingsParseWiki.parsePoints('won=3') end)
 			assert.error(function() StandingsParseWiki.parsePoints('win=three') end)
@@ -446,6 +457,42 @@ describe('Standings Wiki Parser', function()
 			local threeWay = match({opponent(2, 1), opponent(0, 2), opponent(0, 2)}, 1)
 			local winnerPoints = score('win=3, 2-0=4', threeWay)
 			assert.are_equal(3, winnerPoints)
+		end)
+
+		describe('walkover losses', function()
+			local forfeit = match({opponent(nil, 1, 'W'), opponent(nil, 2, 'FF')}, 1)
+			local disqualified = match({opponent(nil, 1, 'W'), opponent(nil, 2, 'DQ')}, 1)
+			local doubleForfeit = match({opponent(nil, 2, 'FF'), opponent(nil, 2, 'FF')}, -1)
+
+			it('gives the walkover loss points for FF and DQ', function()
+				assert.are_same({3, -1}, {score('win=3, walkoverloss=-1', forfeit)})
+				assert.are_same({3, -0.5}, {score('win=3, walkoverloss=-0.5', disqualified)})
+			end)
+
+			it('gives both opponents the walkover loss points in a double forfeit', function()
+				assert.are_same({-2, -2}, {score('walkoverloss=-2', doubleForfeit)})
+			end)
+
+			it('gives the loss points for a walkover loss without its own points', function()
+				assert.are_same({3, -1}, {score('win=3, loss=-1', forfeit)})
+				assert.are_same({-1, -1}, {score('loss=-1', doubleForfeit)})
+			end)
+
+			it('does not count an L status as a walkover loss', function()
+				local lost = match({opponent(nil, 1, 'W'), opponent(nil, 2, 'L')}, 1)
+				assert.are_same({3, 0}, {score('win=3, walkoverloss=-1', lost)})
+			end)
+
+			it('does not affect regular losses', function()
+				assert.are_same({3, 0}, {score('win=3, walkoverloss=-1, 0-2=0', twoNil)})
+				assert.are_same({3, 1}, {score('win=3, walkoverloss=-1, 1-2=1', twoOne)})
+				assert.are_same({3, 0}, {score('win=3, walkoverloss=-1', twoNil)})
+			end)
+
+			it('takes priority over score points of a scored forfeit', function()
+				local scoredForfeit = match({opponent(2, 1), opponent(0, 2, 'FF')}, 1)
+				assert.are_same({3, -1}, {score('win=3, walkoverloss=-1, 0-2=5', scoredForfeit)})
+			end)
 		end)
 
 		it('errors on invalid points input', function()

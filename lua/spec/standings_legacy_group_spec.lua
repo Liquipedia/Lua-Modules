@@ -11,7 +11,7 @@ describe('Standings Legacy Group', function()
 	describe('tiebreakers', function()
 		it('defaults to the legacy order', function()
 			assert.are_same({
-				'matchscore', 'gamediff', 'h2hlegacy.matchscore', 'h2hlegacy.gamediff', 'gamewins', 'gamelosses',
+				'matchscore', 'gamediff', 'h2hlegacy.matchscore', 'h2hlegacy.gamescore', 'gamewins', 'gamelosses',
 			}, StandingTableLegacyGroup.parseTiebreakers{})
 		end)
 
@@ -36,7 +36,7 @@ describe('Standings Legacy Group', function()
 			}
 			assert.are_same({
 				'points', 'matchscore', 'matchwinrate', 'matchdiff', 'gamediff', 'gamewins', 'gamelosses',
-				'h2hlegacy.matchscore', 'h2hlegacy.gamediff', 'matchwins', 'matchlosses', 'gamewinrate',
+				'h2hlegacy.matchscore', 'h2hlegacy.gamescore', 'matchwins', 'matchlosses', 'gamewinrate',
 			}, tiebreakers)
 			for _, tiebreaker in ipairs(tiebreakers) do
 				TiebreakerFactory.validateAndNormalizeInput(tiebreaker)
@@ -227,6 +227,11 @@ describe('Standings Legacy Group', function()
 		it('maps the legacy points', function()
 			assert.are_equal('win=3, draw=1, loss=0, 2-0=4',
 				StandingTableLegacyGroup.getStandardParameter({['2-0_p'] = '1'}, {}).points)
+		end)
+
+		it('maps the legacy walkover loss points on top of the loss points', function()
+			assert.are_equal('win=3, draw=1, loss=-1, walkoverloss=-2',
+				StandingTableLegacyGroup.getStandardParameter({lose_p = '-1', walkover_lose_p = '-1'}, {}).points)
 		end)
 
 		it('splits the walkover rounds of the match over its maps', function()

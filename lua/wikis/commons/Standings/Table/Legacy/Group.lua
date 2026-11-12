@@ -45,9 +45,9 @@ local TIEBREAKER_MAPPING_TABLE = {
 	['h2h series'] = 'h2hlegacy.matchscore',
 	['head-to-head series'] = 'h2hlegacy.matchscore',
 	['head to head series'] = 'h2hlegacy.matchscore',
-	['h2h games'] = 'h2hlegacy.gamediff',
-	['head-to-head games'] = 'h2hlegacy.gamediff',
-	['head to head games'] = 'h2hlegacy.gamediff',
+	['h2h games'] = 'h2hlegacy.gamescore',
+	['head-to-head games'] = 'h2hlegacy.gamescore',
+	['head to head games'] = 'h2hlegacy.gamescore',
 }
 
 local DEFAULT_TIEBREAKERS = {'series', 'diff', 'h2h series', 'h2h games', 'games won', 'games loss'}
