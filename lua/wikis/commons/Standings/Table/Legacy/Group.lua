@@ -169,7 +169,6 @@ function StandingTableLegacyGroup.getStandardParameter(args, opponents)
 		title = args.title or mw.title.getCurrentTitle().text,
 		importopponents = #opponents == 0,
 		walkoverrounds = StandingTableLegacyGroup.parseWalkoverRounds(args),
-		cutafter = args.cutafter,
 	})
 end
 
