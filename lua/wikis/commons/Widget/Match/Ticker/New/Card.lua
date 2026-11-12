@@ -37,7 +37,7 @@ function MatchTickerCard.render(props)
 				classes = {'match-ticker-card__header'},
 				children = {
 					MatchCountdown{match = match, format = 'compact'},
-					match.bestof and Html.Div{
+					(match.bestof or 0) > 0 and Html.Div{
 						children = {'Bo', match.bestof}
 					} or nil
 				}
