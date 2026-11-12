@@ -41,6 +41,11 @@ Template(s): MatchTicker
 		gap: 0.25rem;
 		align-self: stretch;
 		font-size: 0.8125rem;
+
+		&:not( :has( > .winner ) ),
+		&:has( > .winner ) > .winner {
+			font-weight: bold;
+		}
 	}
 
 	&__opponent {
@@ -48,10 +53,6 @@ Template(s): MatchTicker
 		justify-content: space-between;
 		align-items: center;
 		align-self: stretch;
-
-		&.winner {
-			font-weight: bold;
-		}
 
 		.block-team {
 			:where( .team-template-image-icon ) {
