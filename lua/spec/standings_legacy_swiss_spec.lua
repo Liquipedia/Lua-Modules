@@ -18,6 +18,17 @@ describe('Standings Legacy Swiss', function()
 			}, tiebreakers)
 		end)
 
+		it('maps the long h2h spellings like h2h', function()
+			assert.are_same({
+				'h2hlegacy.matchscore', 'h2hlegacy.matchscore', 'h2hlegacy.gamescore', 'h2hlegacy.gamescore',
+			}, StandingTableLegacySwiss.parseTiebreaker{
+				tiebreaker1 = 'head-to-head series',
+				tiebreaker2 = 'head to head series',
+				tiebreaker3 = 'head-to-head games',
+				tiebreaker4 = 'head to head games',
+			})
+		end)
+
 		it('only maps to valid tiebreakers', function()
 			local tiebreakers = StandingTableLegacySwiss.parseTiebreaker{
 				tiebreaker1 = 'points',
