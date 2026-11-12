@@ -229,6 +229,11 @@ describe('Standings Legacy Group', function()
 				StandingTableLegacyGroup.getStandardParameter({['2-0_p'] = '1'}, {}).points)
 		end)
 
+		it('maps the legacy walkover loss points on top of the loss points', function()
+			assert.are_equal('win=3, draw=1, loss=-1, walkoverloss=-2',
+				StandingTableLegacyGroup.getStandardParameter({lose_p = '-1', walkover_lose_p = '-1'}, {}).points)
+		end)
+
 		it('splits the walkover rounds of the match over its maps', function()
 			local function walkoverRounds(args)
 				return StandingTableLegacyGroup.getStandardParameter(args, {}).walkoverrounds

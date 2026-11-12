@@ -61,10 +61,11 @@ function StandingTableLegacySwiss.getStandardParameter(args)
 	}
 end
 
----Maps the legacy `win_p`, `tie_p`, `lose_p`, `X-Y_p` and, with `show_otp`, `otw_p` and `otl_p` to the `points` input.
+---Maps the legacy `win_p`, `tie_p`, `lose_p`, `X-Y_p`, `walkover_lose_p` and, with `show_otp`, `otw_p` and `otl_p`
+---to the `points` input.
 ---Legacy defaults to 3 points for a win, 1 for a draw and 0 for a loss (2 and 1 for overtime wins and losses),
 ---and `X-Y_p` is a bonus on top of the points of the result, while `X-Y` in the new input is the fixed amount
----of points.
+---of points. `walkover_lose_p` is a bonus on top of `lose_p` as well.
 ---@param args table
 ---@param options {resultDefaults: {w: number, d: number, l: number}?, overtime: boolean?, decimalScores: boolean?}?
 ---`resultDefaults` defaults to 3, 1 and 0, `overtime` to `show_otp`, and `decimalScores` reads `X-Y_p` with decimals
@@ -108,8 +109,12 @@ function StandingTableLegacySwiss.parsePoints(args, options)
 		and {'otwin=' .. readPoints('otw_p', 2), 'otloss=' .. readPoints('otl_p', 1)}
 		or {}
 
+	local walkoverLossBonus = readPoints('walkover_lose_p', 0)
+	local walkoverLossPoints = walkoverLossBonus ~= 0 and {'walkoverloss=' .. (resultPoints.l + walkoverLossBonus)} or {}
+
 	return table.concat(Array.extend(
-		{'win=' .. resultPoints.w, 'draw=' .. resultPoints.d, 'loss=' .. resultPoints.l}, overtimePoints, scorePoints
+		{'win=' .. resultPoints.w, 'draw=' .. resultPoints.d, 'loss=' .. resultPoints.l},
+		overtimePoints, walkoverLossPoints, scorePoints
 	), ', ')
 end
 
