@@ -94,6 +94,7 @@ local function MatchButtonBar(props)
 			displayStreams and StreamsContainer{
 				streams = filteredStreams,
 				matchIsLive = match.phase == 'ongoing',
+				buttonSize = props.buttonSize,
 			} or nil,
 			makeDropdownForVods and VodsDropdownButton{
 				count = #vods,
