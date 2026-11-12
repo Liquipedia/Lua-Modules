@@ -1,9 +1,61 @@
 /*******************************************************************************
-Template(s): Match Ticker
-Author(s): Nadox
+Template(s): MatchTicker
 *******************************************************************************/
 
-// Backwards compatibility for previous display component
-.versus-upper {
-	line-height: 1.1;
+.match-ticker-card {
+	display: flex;
+	min-height: 7.625rem;
+	width: 15.625rem;
+	padding: 0.5rem;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.25rem;
+	align-self: stretch;
+
+	&__header {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		justify-content: space-between;
+	}
+
+	&__opponents {
+		display: flex;
+		height: 3.25rem;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.25rem;
+		align-self: stretch;
+		font-size: 0.8125rem;
+	}
+
+	&__opponent {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		align-self: stretch;
+
+		.block-team {
+			:where( .team-template-image-icon ) {
+				width: 1.5rem;
+				height: 1.5rem;
+				padding: 0.125rem;
+				justify-content: center;
+				align-items: center;
+
+				img {
+					width: 100%;
+				}
+			}
+		}
+	}
+
+	.match-info-tournament {
+		padding: 0.125rem;
+		font-style: inherit;
+	}
+
+	.match-info-links-wrapper {
+		font-size: 0.6875rem;
+	}
 }

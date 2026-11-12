@@ -31,8 +31,10 @@ function MatchTickerCard.render(props)
 	local highlightCondition = HighlightConditions.match or HighlightConditions.tournament
 	local highlight = highlightCondition(match, {onlyHighlightOnValue = props.onlyHighlightOnValue})
 	return Html.Div{
+		classes = {'match-ticker-card'},
 		children = {
 			Html.Div{
+				classes = {'match-ticker-card__header'},
 				children = {
 					MatchCountdown{match = match, format = 'compact'},
 					match.bestof and Html.Div{
@@ -41,14 +43,16 @@ function MatchTickerCard.render(props)
 				}
 			},
 			Html.Div{
+				classes = {'match-ticker-card__opponents'},
 				children = Array.map(match.opponents, function (opponent, opponentIndex)
 					return Html.Div{
+						classes = {'match-ticker-card__opponent'},
 						children = {
 							OpponentDisplay.BlockOpponent{
 								opponent = opponent,
 								teamStyle = 'dynamic',
 							},
-							Html.Div{children = opponent.scoreDisplay},
+							Html.Div{children = OpponentDisplay.InlineScore(opponent)},
 						}
 					}
 				end)

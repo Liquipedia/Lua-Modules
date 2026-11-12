@@ -21,10 +21,12 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field match MatchGroupUtilMatch
 ---@field buttonType? 'primary'|'secondary'|'ghost'
 ---@field buttonText? 'full'|'short'|'hide'
+---@field buttonSize? ButtonSize
 
 local defaultProps = {
 	buttonType = 'secondary',
 	buttonText = 'full',
+	buttonSize = 'sm',
 }
 
 ---@param props MatchPageButtonProps
