@@ -30,7 +30,7 @@ local STATUS_TO_DISPLAY = {
 
 local Helpers = {}
 
----@param props {standings?: StandingsModel, width: number?}
+---@param props {standings?: StandingsModel, width: number?, cutAfter: integer?}
 ---@return Renderable?
 local function StandingsFfa(props)
 	local standings = props.standings
@@ -43,9 +43,13 @@ local function StandingsFfa(props)
 	local boldStatTitle = StandingsDisplayUtil.boldStatTitle(standings)
 	-- Also holds the round columns switch, so needed as soon as there is more than one round
 	local hasRoundHistory = Helpers._showRoundColumns(standings)
+	local collapse = StandingsDisplayUtil.collapseProps(Array.sub(standings.rounds, 1, shownRounds), props.cutAfter)
 
 	local standingsTable = TableWidgets.Table{
 		classes = {'standings-ffa'},
+		collapseAfter = collapse.collapseAfter,
+		expandText = collapse.expandText,
+		collapseText = collapse.collapseText,
 		css = {width = props.width and (props.width .. 'px') or nil},
 		columns = WidgetUtil.collect(
 			{align = 'center'},

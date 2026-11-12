@@ -62,6 +62,19 @@ function StandingsDisplayUtil.showPlacementChange(standings)
 	return #standings.rounds > 1
 end
 
+---The Table2 collapse props, only collapsing when a rendered round has rows past `cutAfter`.
+---@param rounds StandingsRound[]
+---@param cutAfter integer?
+---@return {collapseAfter: integer?, expandText: string, collapseText: string}
+function StandingsDisplayUtil.collapseProps(rounds, cutAfter)
+	local hasCutRows = cutAfter and Array.any(rounds, function(round) return #round.opponents > cutAfter end)
+	return {
+		collapseAfter = hasCutRows and cutAfter or nil,
+		expandText = 'Show Remaining Placements',
+		collapseText = 'Hide Remaining Placements',
+	}
+end
+
 ---@param standings StandingsModel
 ---@return boolean
 function StandingsDisplayUtil.hasFutureRounds(standings)

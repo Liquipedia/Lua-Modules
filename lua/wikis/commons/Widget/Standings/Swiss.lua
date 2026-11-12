@@ -22,7 +22,7 @@ local StandingsDisplayUtil = Lua.import('Module:Standings/DisplayUtil')
 
 local Helpers = {}
 
----@param props {standings?: StandingsModel, width: number?}
+---@param props {standings?: StandingsModel, width: number?, cutAfter: integer?}
 ---@return Renderable?
 local function StandingsSwiss(props)
 	local standings = props.standings
@@ -33,9 +33,13 @@ local function StandingsSwiss(props)
 	local lastRound = standings.rounds[#standings.rounds]
 	local statsToShow = StandingsDisplayUtil.statsToShow(standings)
 	local boldStatTitle = StandingsDisplayUtil.boldStatTitle(standings)
+	local collapse = StandingsDisplayUtil.collapseProps({lastRound}, props.cutAfter)
 
 	return TableWidgets.Table{
 		classes = {'standings-swiss'},
+		collapseAfter = collapse.collapseAfter,
+		expandText = collapse.expandText,
+		collapseText = collapse.collapseText,
 		css = {width = props.width and (props.width .. 'px') or nil},
 		title = Logic.nilIfEmpty(standings.title),
 		columns = Helpers.buildColumnDefinitions(standings, statsToShow),

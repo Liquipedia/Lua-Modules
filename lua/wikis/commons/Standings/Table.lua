@@ -71,6 +71,7 @@ function StandingsTable.fromTemplate(frame)
 	return StandingsDisplay{
 		standings = Standings.standingsFromRecord(record, entries),
 		width = StandingsParseWiki.parseWidth(args),
+		cutAfter = StandingsParseWiki.parseCutAfter(args),
 	}
 end
 
