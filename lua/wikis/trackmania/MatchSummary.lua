@@ -32,16 +32,20 @@ function CustomMatchSummary.createGame(game, gameIndex)
 	end
 	local extradata = game.extradata or {}
 
+	local function makeOpponentSection(opponentIndex)
+		return {
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
+			DisplayHelper.MapScore(game.opponents[opponentIndex], game.status),
+			extradata.overtime and CustomMatchSummary._iconDisplay(OVERTIME, 'Overtime') or nil,
+		}
+	end
+
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		children = WidgetUtil.collect(
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			DisplayHelper.MapScore(game.opponents[1], game.status),
-			extradata.overtime and CustomMatchSummary._iconDisplay(OVERTIME, 'Overtime') or nil,
+			MatchSummaryWidgets.GameTeamWrapper{children = makeOpponentSection(1)},
 			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game, {noLink = true})},
-			extradata.overtime and CustomMatchSummary._iconDisplay(OVERTIME, 'Overtime') or nil,
-			DisplayHelper.MapScore(game.opponents[2], game.status),
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			MatchSummaryWidgets.GameTeamWrapper{children = makeOpponentSection(2), flipped = true},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
 	}
