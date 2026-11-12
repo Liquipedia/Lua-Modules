@@ -16,7 +16,8 @@ local SwissStandings = Lua.import('Module:Widget/Standings/Swiss')
 local Standings = Lua.import('Module:Standings')
 local StringUtils = Lua.import('Module:StringUtils')
 
----@param props {pageName: string?, standingsIndex: integer?, standings: StandingsModel?, width: number?}
+---@param props {pageName: string?, standingsIndex: integer?, standings: StandingsModel?, width: number?,
+---cutAfter: integer?}
 ---@return VNode?
 local function StandingsWidget(props)
 	local standings = props.standings or Standings.getStandingsTable(props.pageName, props.standingsIndex)
@@ -29,16 +30,19 @@ local function StandingsWidget(props)
 		standingsWidget = FfaStandings{
 			standings = standings,
 			width = props.width,
+			cutAfter = props.cutAfter,
 		}
 	elseif standings.type == 'swiss' then
 		standingsWidget = SwissStandings{
 			standings = standings,
 			width = props.width,
+			cutAfter = props.cutAfter,
 		}
 	elseif standings.type == 'group' then
 		standingsWidget = GroupStandings{
 			standings = standings,
 			width = props.width,
+			cutAfter = props.cutAfter,
 		}
 	end
 
