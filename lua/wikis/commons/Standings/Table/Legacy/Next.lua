@@ -12,7 +12,9 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local StandingTable = Lua.import('Module:Standings/Table')
@@ -23,7 +25,9 @@ local Condition = Lua.import('Module:Condition')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
----Adaptor for the swiss tables of Module:GroupTableLeague/next
+local Html = Lua.import('Module:Widget/Html')
+
+---Adaptor for the tables of Module:GroupTableLeague/next/downstream and Module:SwissTableLeague/next
 local StandingTableLegacyNext = {}
 
 local MAX_ROUND_COUNT = 30
@@ -48,20 +52,186 @@ local TIEBREAKER_MAPPING_TABLE = {
 	['game-percentage'] = 'gamewinrate',
 }
 
+local BG_ALIASES = {
+	u = 'up',
+	proceed = 'up',
+	win = 'up',
+	su = 'stayup',
+	s = 'stay',
+	sd = 'staydown',
+	drop = 'down',
+	d = 'down',
+}
+
 -- These are always added by the standings, so they are dropped from the input
 local IMPLICIT_TIEBREAKERS = {
 	dq = true,
 	finaltiebreak = true,
 }
 
----Common local Module:GroupTableLeague
+local ADJUSTMENTS = {
+	temp_p = 'points',
+	temp_tie = 'tiebreaker',
+	temp_win_m = 'matchwins',
+	temp_tie_m = 'matchdraws',
+	temp_lose_m = 'matchlosses',
+	temp_win_g = 'gamewins',
+	temp_lose_g = 'gamelosses',
+}
+
+local MATCH_RESULTS = {matchwins = 'w', matchdraws = 'd', matchlosses = 'l'}
+
+local ROUND_ROBIN_SHORTHANDS = {'srr', 'drr'}
+
+local OPPONENT_TYPE_INPUT_MAPPING = {
+	['1'] = Opponent.solo,
+	['1v1'] = Opponent.solo,
+	solo = Opponent.solo,
+
+	['2'] = Opponent.duo,
+	['2v2'] = Opponent.duo,
+	duo = Opponent.duo,
+
+	['3'] = Opponent.trio,
+	['3v3'] = Opponent.trio,
+	trio = Opponent.trio,
+
+	['4'] = Opponent.quad,
+	['4v4'] = Opponent.quad,
+	quad = Opponent.quad,
+
+	team = Opponent.team,
+}
+
+---Module:SwissTableLeague/next
 ---@param frame Frame
 ---@return Renderable
 function StandingTableLegacyNext.run(frame)
-	local args = Arguments.getArgs(frame)
+	return StandingTableLegacyNext.build(Arguments.getArgs(frame), 'swiss')
+end
 
-	assert(args.tiebreaker1 ~= 'finalTiebreak', 'This SwissTableLeague has to be converted'
-		.. ' manually due to using unsupported manual tiebreakers')
+---Module:GroupTableLeague/next/downstream
+---@param frame Frame
+---@return Renderable
+function StandingTableLegacyNext.group(frame)
+	return StandingTableLegacyNext.build(Arguments.getArgs(frame), 'group')
+end
+
+---@param args table
+---@param tableType 'swiss'|'group'
+---@param options? {defaultTiebreakers: (fun(args: table): string[])?}
+---@return Renderable
+function StandingTableLegacyNext.build(args, tableType, options)
+	return StandingTable.fromTemplate(StandingTableLegacyNext.convertToNewArgs(args, tableType, options))
+end
+
+---@param frame Frame
+---@return Renderable
+function StandingTableLegacyNext.convert(frame)
+	return StandingTableLegacyNext.convertFromArgs(Arguments.getArgs(frame))
+end
+
+---@param oldArgs table
+---@param options? {defaultTiebreakers: (fun(args: table): string[])?}
+---@return Renderable
+function StandingTableLegacyNext.convertFromArgs(oldArgs, options)
+	local push = Logic.readBool(oldArgs.push)
+	oldArgs.push = nil
+	local tableType = oldArgs.tableType
+	oldArgs.tableType = nil
+	assert(tableType == 'swiss' or tableType == 'group', 'Invalid or missing tableType')
+
+	local newArgs = StandingTableLegacyNext.convertToNewArgs(oldArgs, tableType, options)
+
+	local function itemToCode(tbl)
+		if type(tbl) == 'boolean' then
+			return tostring(tbl)
+		elseif type(tbl) ~= 'table' then
+			return tbl
+		end
+		local template = 'Json'
+		if tbl.title then
+			template = 'Round'
+		end
+		if tbl.type and tbl.isArchon then
+			template = 'ArchonOpponent'
+			tbl.type = nil
+			tbl.isArchon = nil
+		elseif tbl.type then
+			template = mw.getContentLanguage():ucfirst(tbl.type) .. 'Opponent'
+			tbl.type = nil
+		end
+		local jsonCode = {'{{' .. template}
+		for key, item in pairs(tbl) do
+			if Logic.isNotEmpty(item) then
+				table.insert(jsonCode, '|' .. key .. '=' .. itemToCode(item))
+			end
+		end
+		table.insert(jsonCode, '}}')
+		return table.concat(jsonCode)
+	end
+
+	---@param key string|integer
+	---@return boolean
+	local function valueIsBool(key)
+		return Logic.readBoolOrNil(newArgs[key]) ~= nil
+	end
+
+	---@param tbl table
+	---@param a string|integer
+	---@param b string|integer
+	---@return boolean
+	local function order(tbl, a, b)
+		-- push bool settings up top
+		if valueIsBool(a) and not valueIsBool(b) then
+			return true
+		elseif valueIsBool(a) and valueIsBool(b) then
+			return a < b
+		elseif valueIsBool(b) then
+			return false
+		end
+
+		-- next add opponents (have numeric keys) next
+		if MathUtil.isInteger(a) and not MathUtil.isInteger(b) then
+			return true
+		elseif MathUtil.isInteger(a) and MathUtil.isInteger(b) then
+			return a < b
+		elseif MathUtil.isInteger(b) then
+			return false
+		end
+
+		-- add the other params below opponents, sorted by key
+		-- casting to string just to be safe (should not be needed)
+		return tostring(a) < tostring(b)
+	end
+
+	local code = {}
+	for key, item in Table.iter.spairs(newArgs, order) do
+		table.insert(code, '\t|' .. key .. '=' .. itemToCode(item))
+	end
+	table.sort(code)
+
+	if tableType == 'swiss' then
+		table.insert(code, 1, '{{SwissStandings')
+	elseif tableType == 'group' then
+		table.insert(code, 1, '{{GroupStandings')
+	end
+
+	table.insert(code, '}}')
+
+	if push then
+		return table.concat(code, '\n')
+	end
+
+	return Html.Pre{children = Array.interleave(code, '\n')}
+end
+
+---@param args table
+---@param tableType 'swiss'|'group'
+---@param options? {defaultTiebreakers: (fun(args: table): string[])?}
+---@return table
+function StandingTableLegacyNext.convertToNewArgs(args, tableType, options)
+	options = options or {}
 
 	local matchRecords = StandingTableLegacyNext.fetchMatches(args)
 	local matchesByRound, roundCount = StandingTableLegacyNext.groupMatchesByRound(args, matchRecords)
@@ -74,23 +244,103 @@ function StandingTableLegacyNext.run(frame)
 		opponents, matchRecords, StandingTableLegacyNext.readImportOpponents(args, opponents)
 	)
 
-	return StandingTable.fromTemplate(Table.merge(
-		StandingTableLegacyNext.getStandardParameter(args, opponents),
-		{bg = StandingTableLegacyNext.parseBgs(args, opponentCount)},
+	return Table.merge(
+		StandingTableLegacyNext.getStandardParameter(args, opponents, tableType),
+		{
+			bg = StandingTableLegacyNext.parseBgs(args, opponentCount),
+			format = StandingTableLegacyNext.readFormat(args, opponentCount, #matchRecords, roundCount),
+		},
 		rounds,
 		opponents,
-		{tiebreakers = StandingTableLegacyNext.parseTiebreakers(args)}
-	))
+		{tiebreakers = StandingTableLegacyNext.parseTiebreakers(args, options.defaultTiebreakers)}
+	)
 end
 
 ---@param args table
 ---@param opponents table[]
+---@param tableType 'swiss'|'group'|nil # Defaults to swiss
 ---@return table
-function StandingTableLegacyNext.getStandardParameter(args, opponents)
-	return Table.merge(StandingTableLegacySwiss.getStandardParameter(args), {
+function StandingTableLegacyNext.getStandardParameter(args, opponents, tableType)
+	-- Legacy has no overtime, so `show_otp` is ignored
+	return Table.merge(StandingTableLegacySwiss.getStandardParameter(Table.merge(args, {show_otp = false})), {
+		tabletype = tableType or 'swiss',
+		import = Logic.nilOr(Logic.readBoolOrNil(args.import), true),
 		importopponents = StandingTableLegacyNext.readImportOpponents(args, opponents),
 		store = Logic.readBoolOrNil(args.storeStanding),
+		overtime = false,
+		points = StandingTableLegacySwiss.parsePoints(args, {
+			resultDefaults = StandingTableLegacyNext.readResultPoints(args),
+			overtime = false,
+			decimalScores = true,
+		}),
 	})
+end
+
+---Maps `structure` to `format`, inferring it as in legacy if unset. Legacy `swiss-<N>` is classic swiss.
+---@param args table
+---@param opponentCount integer
+---@param matchCount integer
+---@param roundCount integer
+---@return string?
+function StandingTableLegacyNext.readFormat(args, opponentCount, matchCount, roundCount)
+	local structure = args.structure
+		or StandingTableLegacyNext.inferStructure(opponentCount, matchCount, roundCount)
+	if structure == 'gsl' then
+		return 'gsl'
+	elseif structure == 'other' then
+		return nil
+	end
+	local rounds = structure:match('swiss%-(%d+)')
+	if rounds then
+		return Json.stringify({'classicswiss', rounds = tonumber(rounds)})
+	end
+	local cycles = tonumber(structure:match('roundRobin%-(%d+)'))
+	assert(cycles, 'Invalid structure: ' .. structure)
+	return ROUND_ROBIN_SHORTHANDS[cycles] or Json.stringify({'roundrobin', cycles = cycles})
+end
+
+---4 opponents with 5 matches are a GSL group, whole cycles of matches a round robin
+---and one match per pair of opponents in every round a classic swiss.
+---@param opponentCount integer
+---@param matchCount integer
+---@param roundCount integer
+---@return string
+function StandingTableLegacyNext.inferStructure(opponentCount, matchCount, roundCount)
+	if opponentCount == 4 and matchCount == 5 then
+		return 'gsl'
+	end
+	if matchCount == 0 then
+		return 'other'
+	end
+	local cycleMatchCount = opponentCount * (opponentCount - 1) / 2
+	if opponentCount >= 2 and matchCount % cycleMatchCount == 0 then
+		return 'roundRobin-' .. math.floor(matchCount / cycleMatchCount)
+	end
+	if opponentCount * roundCount == 2 * matchCount then
+		return 'swiss-' .. roundCount
+	end
+	return 'other'
+end
+
+---With any of `win_p`, `tie_p` and `lose_p` set, the unset ones are 0. Without them, a win is 3 points and
+---a draw 1, unless `X-Y_p` is set, then the results are worth 0 and `X-Y_p` is all the points.
+---@param args table
+---@return {w: number, d: number, l: number}
+function StandingTableLegacyNext.readResultPoints(args)
+	local function read(key)
+		local value = args[key]
+		return value and assert(tonumber(value), 'Invalid ' .. key .. ': ' .. value) or nil
+	end
+	local hasResultPoints = args.win_p or args.tie_p or args.lose_p
+	local hasScorePoints = Table.any(args, function(key)
+		return tostring(key):match('^%d+%.?%d*%-%d+%.?%d*_p$') ~= nil
+	end)
+	local default = (hasResultPoints or hasScorePoints) and 0 or nil
+	return {
+		w = read('win_p') or default or 3,
+		d = read('tie_p') or default or 1,
+		l = read('lose_p') or 0,
+	}
 end
 
 ---@param args table
@@ -142,7 +392,7 @@ end
 function StandingTableLegacyNext.parseBgs(args, opponentCount)
 	local pbgs = {}
 	for slotIndex = 1, MAX_SLOT_COUNT do
-		pbgs[slotIndex] = args['pbg' .. slotIndex]
+		pbgs[slotIndex] = StandingTableLegacyNext._aliasBg(args['pbg' .. slotIndex])
 	end
 	if Table.isEmpty(pbgs) then
 		if opponentCount > 4 then
@@ -192,9 +442,17 @@ end
 function StandingTableLegacyNext.parseOpponentInput(args, key, index, prefix, roundCount)
 	local value = args[key]
 	local opponent = Json.parseIfTable(value)
+	if not opponent and String.startsWith(value, '{{') then
+		opponent = StandingTableLegacyNext._tryToParseWikiTemplateOpponent(value)
+	end
 	if not opponent then
 		if prefix == 'p' then
-			opponent = {type = Opponent.solo, value, flag = args['p' .. index .. 'flag'], link = args['p' .. index .. 'link']}
+			opponent = {
+				type = Opponent.solo,
+				value, flag = args['p' .. index .. 'flag'],
+				link = args['p' .. index .. 'link'],
+				faction = args['p' .. index .. 'faction'] or args['p' .. index .. 'race'],
+			}
 		else
 			opponent = {type = Opponent.team, value}
 		end
@@ -203,25 +461,105 @@ function StandingTableLegacyNext.parseOpponentInput(args, key, index, prefix, ro
 	local aliases = prefix and args[prefix .. index .. 'alias'] or args['alias' .. index]
 
 	return Table.merge(opponent, {
-		tiebreaker = args['temp_tie' .. index],
-		startingpoints = args['temp_p' .. index],
 		dq = StandingTableLegacyNext.parseDisqualifiedFromRound(args, index, roundCount),
 		aliases = aliases and table.concat(Array.parseCommaSeparatedString(aliases), ';') or nil,
-	}, StandingTableLegacyNext.parseDefiniteStatuses(args, index, roundCount))
+	},
+		StandingTableLegacyNext.parseAdjustments(args, index, roundCount),
+		StandingTableLegacyNext.parseDefiniteStatuses(args, index, roundCount)
+	)
 end
 
----`dq<N>` disqualifies from the first round, `round<R>dq<N>` from round R.
+---@param input string
+---@return table?
+function StandingTableLegacyNext._tryToParseWikiTemplateOpponent(input)
+	local typeInput = string.match(input, '%{%{(%a+)Opponent%s*%|')
+	local opponentType = OPPONENT_TYPE_INPUT_MAPPING[(typeInput or ''):lower()]
+	local isArchon
+	if not opponentType and String.startsWith(input:lower(), '{{archon') then
+		opponentType = Opponent.duo
+		isArchon = true
+	end
+	-- can't parse this ...
+	if not opponentType then
+		return
+	end
+
+	local opponent = {
+		type = opponentType,
+		isArchon = isArchon,
+	}
+
+	local argsPairsString = input:gsub('^%{%{.-%|', ''):gsub('%}%}$', '')
+	local argsPairs = Array.parseCommaSeparatedString(argsPairsString, '|')
+	local unnamedCounter = 0
+	Array.forEach(argsPairs, function(argsPair)
+		local key = string.match(argsPair, '^(.-)=')
+		local value = string.match(argsPair, '^.-=(.*)$')
+		if Logic.isEmpty(key) then
+			unnamedCounter = unnamedCounter + 1
+			key = unnamedCounter
+			value = argsPair
+		end
+		key = tonumber(key) or key
+		opponent[key] = value
+	end)
+
+	return opponent
+end
+
+---Maps `round<R>temp_*<N>` to `r<R><adjustment>`. Unprefixed `temp_*<N>` adjust the final round, except
+---`temp_tie<N>`, which applies from the first. Adjusted matches count towards the points, as in legacy.
+---@param args table
+---@param index integer
+---@param roundCount integer
+---@return table<string, number>
+function StandingTableLegacyNext.parseAdjustments(args, index, roundCount)
+	local resultPoints = StandingTableLegacyNext.readResultPoints(args)
+	local adjustments = {}
+	local function add(roundIndex, adjustment, value)
+		local key = 'r' .. roundIndex .. adjustment
+		adjustments[key] = (adjustments[key] or 0) + value
+	end
+
+	for input, adjustment in pairs(ADJUSTMENTS) do
+		local keysByRound = Table.map(Array.range(1, roundCount), function(roundIndex)
+			return roundIndex, {'round' .. roundIndex .. input .. index}
+		end)
+		table.insert(keysByRound[input == 'temp_tie' and 1 or roundCount], input .. index)
+
+		for roundIndex, keys in pairs(keysByRound) do
+			Array.forEach(keys, function(key)
+				if args[key] == nil then
+					return
+				end
+				local value = assert(tonumber(args[key]), 'Invalid ' .. key .. ': ' .. args[key])
+				add(roundIndex, adjustment, value)
+				local result = MATCH_RESULTS[adjustment]
+				if result and resultPoints[result] ~= 0 then
+					add(roundIndex, 'points', value * resultPoints[result])
+				end
+			end)
+		end
+	end
+	return adjustments
+end
+
+---`round<R>dq<N>` disqualifies from round R, `dq<N>` from the final round.
 ---@param args table
 ---@param index integer
 ---@param roundCount integer
 ---@return integer?
 function StandingTableLegacyNext.parseDisqualifiedFromRound(args, index, roundCount)
-	if Logic.readBool(args['dq' .. index]) then
-		return 1
-	end
 	return Array.find(Array.range(1, roundCount), function(roundIndex)
 		return Logic.readBool(args['round' .. roundIndex .. 'dq' .. index])
+			or (roundIndex == roundCount and Logic.readBool(args['dq' .. index]))
 	end)
+end
+
+---@param input string?
+---@return string?
+function StandingTableLegacyNext._aliasBg(input)
+	return BG_ALIASES[input] or input
 end
 
 ---`round<R>bg<N>` maps to `r<R>bg` on the opponent, `bg<N>` applies to the final round.
@@ -232,18 +570,26 @@ end
 function StandingTableLegacyNext.parseDefiniteStatuses(args, index, roundCount)
 	return Table.map(Array.range(1, roundCount), function(roundIndex)
 		---@type string?
-		local status = args['round' .. roundIndex .. 'bg' .. index]
+		local status = StandingTableLegacyNext._aliasBg(args['round' .. roundIndex .. 'bg' .. index])
 		if not status and roundIndex == roundCount then
-			status = args['bg' .. index]
+			status = StandingTableLegacyNext._aliasBg(args['bg' .. index])
 		end
 		return 'r' .. roundIndex .. 'bg', status
 	end)
 end
 
 ---@param args table
+---@param defaultTiebreakers? (fun(args: table): string[])
 ---@return string[]
-function StandingTableLegacyNext.parseTiebreakers(args)
+function StandingTableLegacyNext.parseTiebreakers(args, defaultTiebreakers)
 	local tiebreakers = {}
+	-- special case where the group is decided by manual tiebreaker inputs
+	-- have to bypass the `mapTiebreaker` call for this special case
+	if args.tiebreaker1 == 'finalTiebreak' then
+		tiebreakers = {'manual'}
+		mw.ext.TeamLiquidIntegration.add_category('GTL wrapper with first tiebreaker manual')
+	end
+
 	for _, value in Table.iter.pairsByPrefix(args, 'tiebreaker', {requireIndex = true}) do
 		local tiebreaker = StandingTableLegacyNext.mapTiebreaker(value)
 		if tiebreaker then
@@ -253,6 +599,12 @@ function StandingTableLegacyNext.parseTiebreakers(args)
 	if #tiebreakers > 0 then
 		return tiebreakers
 	end
+	return (defaultTiebreakers or StandingTableLegacyNext.defaultTiebreakers)(args)
+end
+
+---@param args table
+---@return string[]
+function StandingTableLegacyNext.defaultTiebreakers(args)
 	return Array.extend(
 		Logic.readBool(args.show_p) and 'points' or nil,
 		'matchscore',
@@ -295,8 +647,15 @@ function StandingTableLegacyNext.groupMatchesByRound(args, matchRecords)
 	local roundEndTimes = Array.mapIndexes(function(roundIndex)
 		return DateExt.readTimestamp(args['round' .. roundIndex .. 'edate'])
 	end)
+	-- Unindexed matches after the last round end date make up one more round
+	local lastEndTime = roundEndTimes[#roundEndTimes]
+	local hasLaterMatches = lastEndTime ~= nil and Array.any(matches, function(match)
+		return not match.round and match.time > lastEndTime
+	end)
 
-	local roundCount = StandingTableLegacyNext.computeRoundCount(args, matches, #roundEndTimes)
+	local roundCount = StandingTableLegacyNext.computeRoundCount(
+		args, matches, #roundEndTimes + (hasLaterMatches and 1 or 0)
+	)
 
 	local _, matchesByRound = Array.groupBy(matches, function(match)
 		if match.round and match.round >= 1 and match.round <= roundCount then
@@ -314,7 +673,7 @@ function StandingTableLegacyNext.groupMatchesByRound(args, matchRecords)
 	return matchesByRound, roundCount
 end
 
----`rounds=<n>` sets the number of rounds and `rounds=false` disables reading it from the matches.
+---`rounds=<n>` sets the number of rounds and `rounds=false` (or `0`) disables reading it from the matches.
 ---Otherwise it is the highest round index of the matches.
 ---@param args table
 ---@param matches {round: integer?}[]
@@ -322,7 +681,7 @@ end
 ---@return integer
 function StandingTableLegacyNext.computeRoundCount(args, matches, inputRoundCount)
 	local roundCount = tonumber(args.rounds)
-	if roundCount then
+	if roundCount and roundCount > 0 then
 		return roundCount
 	end
 	local importedRoundCount = 0

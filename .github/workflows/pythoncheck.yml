@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
       - name: Run linter
-        uses: astral-sh/ruff-action@v4.0.0
+        uses: astral-sh/ruff-action@v4.1.0
         with:
           version-file: requirements.txt
           src: scripts/

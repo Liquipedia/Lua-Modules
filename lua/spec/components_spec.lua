@@ -118,6 +118,56 @@ describe('Components/Renderer', function()
 			assert.are.equal('<p>built</p>', Renderer.render(Widget2HtmlP{children = {'built'}}))
 		end)
 	end)
+
+	describe('HTML tags', function()
+		it('renders classes, attributes and css', function()
+			assert.are.equal(
+				'<div class="foo bar" id="my-id" style="color:red">child</div>',
+				Renderer.render(Html.Div{
+					classes = {'foo', 'bar'}, attributes = {id = 'my-id'}, css = {color = 'red'}, children = {'child'},
+				})
+			)
+			assert.are.equal('<div data-count="3" style="width:100"></div>',
+				Renderer.render(Html.Div{attributes = {['data-count'] = 3}, css = {width = 100}}))
+		end)
+
+		it('escapes classes, attribute values and css', function()
+			assert.are.equal(
+				'<div class="a&quot;b" title="&lt;b&gt;&quot;Tom&quot; &amp; Jerry&lt;/b&gt;"'
+					.. ' style="background-image:url(a&amp;b.png)"></div>',
+				Renderer.render(Html.Div{
+					classes = {'a"b'},
+					attributes = {title = '<b>"Tom" & Jerry</b>'},
+					css = {['background-image'] = 'url(a&b.png)'},
+				})
+			)
+		end)
+
+		it('keeps strip markers intact', function()
+			local marker = '\127\'"`UNIQ--ref-00000001-QINU`"\'\127'
+			assert.are.equal(
+				'<span class="a ' .. marker .. '" title="&quot;' .. marker .. '"></span>',
+				Renderer.render(Html.Span{classes = {'a', marker}, attributes = {title = '"' .. marker}})
+			)
+		end)
+
+		it('merges class and style attributes into the classes and css', function()
+			assert.are.equal('<div class="foo bar"></div>',
+				Renderer.render(Html.Div{classes = {'foo'}, attributes = {class = 'bar'}}))
+			assert.are.equal('<div style="color:red;width:1px"></div>',
+				Renderer.render(Html.Div{css = {color = 'red'}, attributes = {style = 'width:1px'}}))
+		end)
+
+		it('leaves out attributes with an invalid name or value', function()
+			assert.are.equal('<div></div>',
+				---@diagnostic disable-next-line: assign-type-mismatch
+				Renderer.render(Html.Div{attributes = {['bad name'] = 'x', hidden = true}}))
+		end)
+
+		it('self closing tags leave out their children', function()
+			assert.are.equal('<br class="foo" />', Renderer.render(Html.Br{classes = {'foo'}, children = {'child'}}))
+		end)
+	end)
 end)
 
 describe('Components/Component', function()

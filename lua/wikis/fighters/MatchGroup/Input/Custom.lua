@@ -11,44 +11,50 @@ local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
-local Variables = Lua.import('Module:Variables')
+local Tournament = Lua.import('Module:Tournament')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 
 local CustomMatchGroupInput = {}
+
+---@class FightersMatchParser: MatchParserInterface
+local MatchFunctions = {}
+
+---@class FightersMapParser: MapParserInterface
 local MapFunctions = {}
-CustomMatchGroupInput.OPPONENT_CONFIG = {
+
+MatchFunctions.OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	applyUnderScores = true,
 	maxNumPlayers = 10,
 }
-CustomMatchGroupInput.DEFAULT_MODE = 'singles'
-CustomMatchGroupInput.DATE_FALLBACKS = {
+MatchFunctions.DEFAULT_MODE = 'singles'
+MatchFunctions.DATE_FALLBACKS = {
 	'tournament_enddate',
 	'tournament_startdate',
 }
 
-CustomMatchGroupInput.getBestOf = MatchGroupInputUtil.getBestOf
+MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 
 -- called from Module:MatchGroup
 ---@param match table
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	return MatchGroupInputUtil.standardProcessMatch(match, CustomMatchGroupInput)
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
 end
 
 ---@param match table
 ---@param opponents MGIParsedOpponent[]
 ---@return table[]
-function CustomMatchGroupInput.extractMaps(match, opponents)
+function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
-function CustomMatchGroupInput.calculateMatchScore(maps)
+function MatchFunctions.calculateMatchScore(maps)
 	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
@@ -69,7 +75,8 @@ end
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
-	local game = Game.toIdentifier{game = Variables.varDefault('tournament_game')}
+	local tournamentContext = Tournament.partialTournamentFromContext()
+	local game = Game.toIdentifier{game = tournamentContext.game}
 	local CharacterStandardizationData = Lua.import('Module:CharacterStandardization/' .. game, {loadData = true})
 
 	local players = Array.mapIndexes(function(playerIndex)

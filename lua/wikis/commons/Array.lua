@@ -771,7 +771,7 @@ Array.parseCommaSeparatedString('a, b, c, d')
 function Array.parseCommaSeparatedString(inputString, sep)
 	if Logic.isEmpty(inputString) then return {} end
 	---@cast inputString -nil
-	return Array.map(mw.text.split(inputString, sep or ','), String.trim)
+	return Array.map(String.splitText(inputString, sep or ','), String.trim)
 end
 
 ---Interleaves an array with elements

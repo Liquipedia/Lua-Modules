@@ -66,8 +66,13 @@ end
 ---and `X-Y_p` is a bonus on top of the points of the result, while `X-Y` in the new input is the fixed amount
 ---of points.
 ---@param args table
+---@param options {resultDefaults: {w: number, d: number, l: number}?, overtime: boolean?, decimalScores: boolean?}?
+---`resultDefaults` defaults to 3, 1 and 0, `overtime` to `show_otp`, and `decimalScores` reads `X-Y_p` with decimals
 ---@return string
-function StandingTableLegacySwiss.parsePoints(args)
+function StandingTableLegacySwiss.parsePoints(args, options)
+	options = options or {}
+	local resultDefaults = options.resultDefaults or {w = 3, d = 1, l = 0}
+	local scorePattern = options.decimalScores and '^(%d+%.?%d*)%-(%d+%.?%d*)_p$' or '^(%d+)%-(%d+)_p$'
 	---@param key string
 	---@param default number
 	---@return number
@@ -79,27 +84,27 @@ function StandingTableLegacySwiss.parsePoints(args)
 	end
 
 	local resultPoints = {
-		w = readPoints('win_p', 3),
-		d = readPoints('tie_p', 1),
-		l = readPoints('lose_p', 0),
+		w = readPoints('win_p', resultDefaults.w),
+		d = readPoints('tie_p', resultDefaults.d),
+		l = readPoints('lose_p', resultDefaults.l),
 	}
 
 	local scoreKeys = {}
 	for key in pairs(args) do
-		if tostring(key):match('^%d+%-%d+_p$') then
+		if tostring(key):match(scorePattern) then
 			table.insert(scoreKeys, key)
 		end
 	end
 	table.sort(scoreKeys)
 
 	local scorePoints = Array.map(scoreKeys, function(key)
-		local ownScore, otherScore = key:match('^(%d+)%-(%d+)_p$')
+		local ownScore, otherScore = key:match(scorePattern)
 		local own, other = tonumber(ownScore), tonumber(otherScore)
 		local result = own > other and 'w' or own < other and 'l' or 'd'
 		return ownScore .. '-' .. otherScore .. '=' .. (resultPoints[result] + readPoints(key, 0))
 	end)
 
-	local overtimePoints = Logic.readBool(args.show_otp)
+	local overtimePoints = Logic.nilOr(options.overtime, Logic.readBool(args.show_otp))
 		and {'otwin=' .. readPoints('otw_p', 2), 'otloss=' .. readPoints('otl_p', 1)}
 		or {}
 
@@ -155,9 +160,9 @@ end
 ---@return string?, string?, string?
 local function parseCoreInput(args, index)
 	local tiebreaker = args['temp_tie' .. index]
-	local startingPoints = args['temp_p' .. index]
+	local points = args['temp_p' .. index]
 	local dq = args['dq' .. index]
-	return tiebreaker, startingPoints, dq
+	return tiebreaker, points, dq
 end
 
 ---Legacy `r<round>bg<index>` maps to `r<round>bg` on the opponent
@@ -173,7 +178,7 @@ end
 ---Legacy `team<index>alias` is a comma separated list of team templates
 ---@param args table
 ---@param teamIndex integer
----@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, dq: string?,
+---@return {type: OpponentType, [1]: string, tiebreaker: string?, r1points: string?, dq: string?,
 ---aliases: string?, r1bg: string?}?
 function StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 	local team = args['team' .. teamIndex]
@@ -181,14 +186,14 @@ function StandingTableLegacySwiss.parseTeamInput(args, teamIndex)
 		return nil
 	end
 
-	local tiebreaker, startingPoints, dq = parseCoreInput(args, teamIndex)
+	local tiebreaker, points, dq = parseCoreInput(args, teamIndex)
 	local aliases = args['team' .. teamIndex .. 'alias']
 
 	return Table.merge({
 		type = Opponent.team,
 		team,
 		tiebreaker = tiebreaker,
-		startingpoints = startingPoints,
+		r1points = points,
 		dq = dq,
 		aliases = aliases and table.concat(Array.parseCommaSeparatedString(aliases), ';') or nil,
 	}, parseDefiniteStatuses(args, teamIndex))
@@ -196,14 +201,14 @@ end
 
 ---@param args table
 ---@param playerIndex integer
----@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, dq: string?, r1bg: string?}?
+---@return {type: OpponentType, [1]: string, tiebreaker: string?, r1points: string?, dq: string?, r1bg: string?}?
 function StandingTableLegacySwiss.parseSoloInput(args, playerIndex)
 	local player = args['player' .. playerIndex] or args['p' .. playerIndex]
 	if not player then
 		return nil
 	end
 
-	local tiebreaker, startingPoints, dq = parseCoreInput(args, playerIndex)
+	local tiebreaker, points, dq = parseCoreInput(args, playerIndex)
 
 	return Table.merge({
 		type = Opponent.solo,
@@ -211,7 +216,7 @@ function StandingTableLegacySwiss.parseSoloInput(args, playerIndex)
 		flag = args['player' .. playerIndex .. 'flag'] or args['p' .. playerIndex .. 'flag'],
 		link = args['player' .. playerIndex .. 'link'] or args['p' .. playerIndex .. 'link'],
 		tiebreaker = tiebreaker,
-		startingpoints = startingPoints,
+		r1points = points,
 		dq = dq,
 	}, parseDefiniteStatuses(args, playerIndex))
 end

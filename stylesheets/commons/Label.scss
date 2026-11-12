@@ -220,17 +220,17 @@
 	&.label--region {
 		&[ data-region="eu" ] {
 			color: var( --clr-secondary-100 );
-			background-color: #4a7fc1;
+			background-color: var( --qualification-region-eu-color );
 		}
 
 		&[ data-region="am" ] {
 			color: var( --clr-secondary-25 );
-			background-color: #e8c547;
+			background-color: var( --qualification-region-am-color );
 		}
 
 		&[ data-region="as" ] {
 			color: var( --clr-secondary-100 );
-			background-color: #5b8c3e;
+			background-color: var( --qualification-region-as-color );
 		}
 	}
 

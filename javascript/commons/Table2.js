@@ -18,6 +18,9 @@ const TABLE2_CONFIG = {
 };
 
 class Table2Striper {
+	/**
+	 * @param {HTMLTableElement} table
+	 */
 	constructor( table ) {
 		this.table = table;
 		this.isSortable = table.classList.contains( 'sortable' );
@@ -36,10 +39,9 @@ class Table2Striper {
 		this.setupHoverListeners();
 	}
 
-	setupSortListener() {
-		mw.loader.using( 'jquery.tablesorter' ).then( () => {
-			$( this.table ).on( 'sortEnd.tablesorter', () => this.restripe() );
-		} );
+	async setupSortListener() {
+		await mw.loader.using( 'jquery.tablesorter' );
+		$( this.table ).on( 'sortEnd.tablesorter', () => this.restripe() );
 	}
 
 	restripe() {
@@ -129,7 +131,7 @@ class Table2Striper {
 }
 
 class Table2Module {
-	init() {
+	static init() {
 		const tables = document.querySelectorAll( TABLE2_CONFIG.SELECTORS.TABLE );
 
 		tables.forEach( ( table ) => {
@@ -138,5 +140,5 @@ class Table2Module {
 	}
 }
 
-liquipedia.table2 = new Table2Module();
+liquipedia.table2 = Table2Module;
 liquipedia.core.modules.push( 'table2' );

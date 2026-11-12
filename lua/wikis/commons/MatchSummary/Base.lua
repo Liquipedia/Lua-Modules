@@ -42,6 +42,7 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 ---@field noScore? boolean
 ---@field maxBans? integer
 ---@field showDetail? fun(match: MatchGroupUtilMatch): boolean
+---@field mapVetoPreprocessOptions {game: string?, emptyMapDisplay: string?, useLpdb: boolean?}?
 
 ---@class MatchSummary
 local MatchSummary = {}
@@ -122,7 +123,9 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 	return WidgetUtil.collect(
 		nodes,
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(
+			match.extradata.mapveto, options.mapVetoPreprocessOptions or {game = match.game}
+		)),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
 	)
 end

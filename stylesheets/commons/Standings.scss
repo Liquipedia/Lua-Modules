@@ -1,6 +1,18 @@
 .standings-ffa,
 .standings-swiss,
 .standings-group {
+	.table2__table :is( td, th ) {
+		padding-inline: 0.25rem;
+
+		&:first-child {
+			padding-left: 0.625rem;
+		}
+
+		&:last-child {
+			padding-right: 0.5rem;
+		}
+	}
+
 	tr[ data-position-status ] {
 		position: relative;
 
@@ -20,7 +32,7 @@
 			left: 0;
 			top: 0;
 			bottom: 0;
-			width: 0.25rem;
+			width: 0.375rem;
 			background-color: var( --placement-row-color );
 		}
 
@@ -56,22 +68,16 @@
 			--placement-row-color: var( --position-disqualified-color );
 		}
 
-		&:has( > :first-child > .label--placement[ data-placement-type ] ) {
-			> :nth-child( -n + 2 ),
-			&:has( > :nth-child( 2 ) > .standings-position-indicator ) > :nth-child( 3 ) {
-				background-color: var( --placement-confirmed-color );
-				box-shadow: inset 0 -1px var( --border-color );
-			}
+		&:has( > :first-child > .label--placement[ data-placement-type ]:not( [ data-label-type="placement-minimum" ] ) ) > :not( .standings-swiss-match ) {
+			background-color: var( --placement-confirmed-color );
+			box-shadow: inset 0 -1px var( --border-color );
+		}
 
-			&:hover {
-				> :nth-child( -n + 2 ),
-				&:has( > :nth-child( 2 ) > .standings-position-indicator ) > :nth-child( 3 ) {
-					background-color: hsl( from var( --placement-confirmed-color ) h s calc( l * 0.9 ) );
+		&:has( > :first-child > .label--placement[ data-placement-type ]:not( [ data-label-type="placement-minimum" ] ) ):hover > :not( .standings-swiss-match ) {
+			background-color: hsl( from var( --placement-confirmed-color ) h s calc( l * 0.9 ) );
 
-					.theme--dark & {
-						background-color: hsl( from var( --placement-confirmed-color ) h s calc( l * 1.25 ) );
-					}
-				}
+			.theme--dark & {
+				background-color: hsl( from var( --placement-confirmed-color ) h s calc( l * 1.25 ) );
 			}
 		}
 
@@ -113,29 +119,70 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.5rem;
+
+		> :first-child {
+			min-width: 0;
+		}
+
+		> .generic-label {
+			flex-shrink: 0;
+		}
+	}
+
+	td.brkts-opponent-hover {
+		transition: 0.5s;
+		transition-property: border-color;
+
+		&-active {
+			box-shadow: -1px 0 2px var( --brackets-opponent-hover-color ) inset, 1px 0 2px var( --brackets-opponent-hover-color ) inset, 0 -1px 2px var( --brackets-opponent-hover-color ) inset, 0 1px 2px var( --brackets-opponent-hover-color ) inset;
+
+			&:not( .standings-swiss-match ) {
+				box-shadow: 0 -1px var( --brackets-opponent-hover-color ) inset, 0 1px var( --brackets-opponent-hover-color ) inset !important;
+
+				&:first-child {
+					box-shadow: 0 -1px var( --brackets-opponent-hover-color ) inset, 0 1px var( --brackets-opponent-hover-color ) inset, 1px 0 2px var( --brackets-opponent-hover-color ) inset !important;
+				}
+
+				&:nth-last-child( 1 of :not( .standings-swiss-match ) ) {
+					box-shadow: 0 -1px var( --brackets-opponent-hover-color ) inset, 0 1px var( --brackets-opponent-hover-color ) inset, -1px 0 2px var( --brackets-opponent-hover-color ) inset !important;
+				}
+			}
+		}
+	}
+}
+
+.standings-group {
+	@media ( max-width: 435px ) {
+		width: 100% !important;
+		max-width: 100% !important;
 	}
 }
 
 .standings-round-history {
-	width: fit-content;
-	max-width: 100%;
-	display: flex;
-	flex-flow: column nowrap;
-	gap: 0.5rem;
+	display: contents;
+
+	@media ( max-width: 435px ) {
+		width: fit-content;
+		max-width: 100%;
+		display: flex;
+		flex-flow: column nowrap;
+		gap: 0.5rem;
+	}
 
 	.standings-round-history-controls {
-		display: flex;
-		gap: 0.5rem;
+		display: contents;
 
-		.dropdown-box {
-			&-wrapper {
-				width: fit-content;
+		@media ( width > 435px ) {
+			display: flex;
+			gap: 0.5rem;
+			padding-bottom: 0.5rem;
+
+			.dropdown-widget {
+				max-width: 16.25rem;
 			}
 
-			&-visible {
-				display: flex;
-				flex-flow: column nowrap;
-				width: 100%;
+			.switch-toggle-label {
+				text-wrap: nowrap;
 			}
 		}
 	}

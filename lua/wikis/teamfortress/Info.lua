@@ -33,14 +33,15 @@ return {
 		},
 		match2 = {
 			status = 2,
+			matchWidth = 180,
 		},
 		participants = {
 			defaultPlayerNumber = 6,
 		},
 		standings = {
 			alwaysShowStats = {
-				swiss = {'matchdiff', 'gamediff'},
-				group = {'matchdiff', 'gamediff'},
+				swiss = {'matchscore', 'gamescore'},
+				group = {'matchscore', 'gamescore'},
 			},
 		},
 	},

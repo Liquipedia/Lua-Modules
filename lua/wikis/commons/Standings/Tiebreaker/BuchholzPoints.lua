@@ -15,6 +15,8 @@ local TiebreakerBuchholz = Lua.import('Module:Standings/Tiebreaker/Buchholz')
 ---@class TiebreakerBuchholzPoints : TiebreakerBuchholz
 local TiebreakerBuchholzPoints = Class.new(TiebreakerBuchholz)
 
+TiebreakerBuchholzPoints.fullContextOnly = true
+
 ---@param member TiebreakerOpponent
 ---@return number
 function TiebreakerBuchholzPoints:scoreOf(member)
@@ -23,7 +25,7 @@ end
 
 ---@return string
 function TiebreakerBuchholzPoints:headerTitle()
-	return 'Buchholz (Pts)'
+	return 'BH'
 end
 
 return TiebreakerBuchholzPoints

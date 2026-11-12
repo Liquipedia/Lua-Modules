@@ -70,6 +70,7 @@ describe('Team Participant', function()
 
 	describe('TeamParticipants player parsing', function()
 		local TeamParticipantsWikiParser = require('Module:TeamParticipants/Parse/Wiki')
+		local TeamParticipantsRoster = require('Module:TeamParticipants/Roster')
 
 		describe('parsePlayer status', function()
 			it('passes status through from input', function()
@@ -126,7 +127,7 @@ describe('Team Participant', function()
 							placement = '3-4'
 						}
 					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
+					local result = TeamParticipantsWikiParser.parseParticipant(input, {date = date})
 					assert.are_equal('3-4', result.qualification.placement)
 				end)
 
@@ -139,7 +140,7 @@ describe('Team Participant', function()
 							placement = 3
 						}
 					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
+					local result = TeamParticipantsWikiParser.parseParticipant(input, {date = date})
 					assert.are_equal('3', result.qualification.placement)
 				end)
 
@@ -152,7 +153,7 @@ describe('Team Participant', function()
 							placement = '7'
 						}
 					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
+					local result = TeamParticipantsWikiParser.parseParticipant(input, {date = date})
 					assert.are_equal('7', result.qualification.placement)
 					assert.are_equal('qual', result.qualification.method)
 					assert.are_equal('Custom Text', result.qualification.text)
@@ -183,7 +184,7 @@ describe('Team Participant', function()
 							placement = '0'
 						}
 					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
+					local result = TeamParticipantsWikiParser.parseParticipant(input, {date = date})
 					assert.is_nil(result.qualification.placement)
 					assert.are_equal(1, #result.warnings)
 					assert.matches('Invalid placement: 0', result.warnings[1])
@@ -198,7 +199,7 @@ describe('Team Participant', function()
 							placement = 'abc'
 						}
 					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
+					local result = TeamParticipantsWikiParser.parseParticipant(input, {date = date})
 					assert.is_nil(result.qualification.placement)
 					assert.are_equal(1, #result.warnings)
 					assert.matches('Invalid placement: abc$', result.warnings[1])
@@ -213,7 +214,7 @@ describe('Team Participant', function()
 							placement = '5'
 						}
 					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
+					local result = TeamParticipantsWikiParser.parseParticipant(input, {date = date})
 					assert.are_equal('5', result.qualification.placement)
 					assert.are_equal(0, #result.warnings)
 				end)
@@ -226,7 +227,7 @@ describe('Team Participant', function()
 							text = 'Qualifier No Placement'
 						}
 					}
-					local result = TeamParticipantsWikiParser.parseParticipant(input, date)
+					local result = TeamParticipantsWikiParser.parseParticipant(input, {date = date})
 					assert.is_nil(result.qualification.placement)
 					assert.are_equal(0, #result.warnings)
 				end)
@@ -239,13 +240,13 @@ describe('Team Participant', function()
 
 			describe('createTBDPlayers', function()
 				it('check', function()
-					local players = TeamParticipantsWikiParser.createTBDPlayers(3)
+					local players = TeamParticipantsRoster.createTBDPlayers(3)
 					assert.are_equal(3, #players)
 					assert.are_equal('TBD', players[1].displayName)
 					assert.are_equal('player', players[1].extradata.type)
 					assert.is_not_nil(players[1].extradata)
 
-					assert.are_equal(0, #TeamParticipantsWikiParser.createTBDPlayers(0))
+					assert.are_equal(0, #TeamParticipantsRoster.createTBDPlayers(0))
 				end)
 			end)
 
@@ -259,7 +260,7 @@ describe('Team Participant', function()
 						}
 					}
 
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent, 5)
 
 					assert.are_equal(5, #opponent.players)
 					assert.are_equal('Player1', opponent.players[1].displayName)
@@ -278,7 +279,7 @@ describe('Team Participant', function()
 						}
 					}
 
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent, 5)
 
 					assert.are_equal(5, #opponent.players)
 					assert.are_equal('Player5', opponent.players[5].displayName)
@@ -297,7 +298,7 @@ describe('Team Participant', function()
 						}
 					}
 
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent, 5)
 
 					assert.are_equal(7, #opponent.players)
 				end)
@@ -313,7 +314,7 @@ describe('Team Participant', function()
 						}
 					}
 
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent, 5)
 
 					assert.are_equal(7, #opponent.players)
 					local activePlayers = Array.filter(opponent.players, function(p)
@@ -332,7 +333,7 @@ describe('Team Participant', function()
 						}
 					}
 
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent, 5)
 
 					local activePlayers = Array.filter(opponent.players, function(p)
 						return p.extradata.type == 'player' and not p.extradata.status
@@ -346,11 +347,11 @@ describe('Team Participant', function()
 							{displayName = 'Player1', extradata = {type = 'player'}},
 						}
 					}
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent1, nil)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent1, nil)
 					assert.are_equal(1, #opponent1.players)
 
 					local opponent2 = {}
-					TeamParticipantsWikiParser.fillIncompleteRoster(opponent2, 5)
+					TeamParticipantsRoster.fillIncompleteRoster(opponent2, 5)
 					assert.is_nil(opponent2.players)
 				end)
 			end)
@@ -485,13 +486,13 @@ describe('Team Participant', function()
 				end)
 
 				it('marks the participant broken without calling Opponent.resolve', function()
-					local result = TeamParticipantsWikiParser.parseParticipant({'definitely missing'}, date)
+					local result = TeamParticipantsWikiParser.parseParticipant({'definitely missing'}, {date = date})
 					assert.is_true(result.broken)
 					assert.is_truthy(result.errorMessage)
 				end)
 
 				it('leaves valid templates untouched', function()
-					local result = TeamParticipantsWikiParser.parseParticipant({'team liquid'}, date)
+					local result = TeamParticipantsWikiParser.parseParticipant({'team liquid'}, {date = date})
 					assert.is_nil(result.broken)
 				end)
 			end)
@@ -1148,6 +1149,106 @@ describe('Team Participants Repository', function()
 		end)
 	end)
 
+	describe('getPlayedPlayers', function()
+		local matchesStub
+
+		local function game(players1, players2, overrides)
+			return Table.merge({
+				winner = '1',
+				opponents = {{players = players1 or {}}, {players = players2 or {}}},
+			}, overrides or {})
+		end
+
+		local function setMatches(matches)
+			matchesStub = stub(TeamParticipantsRepository, 'getTournamentMatches', function() return matches end)
+		end
+
+		after_each(function()
+			matchesStub:revert()
+		end)
+
+		it('collects players from games of matching opponents', function()
+			setMatches{{
+				match2opponents = {{type = 'team', template = 'team liquid'}, {type = 'team', template = 'bds'}},
+				match2games = {
+					game({{player = 'Alpha'}, {}, {player = 'Gamma Ray'}}, {{player = 'Other'}}),
+					game({{pageName = 'Beta'}}),
+				},
+			}}
+
+			local result = TeamParticipantsRepository.getPlayedPlayers({'team liquid'})
+
+			assert.are_same({Alpha = true, Beta = true, Gamma_Ray = true}, result)
+		end)
+
+		it('matches the opponent by alias and its own game index', function()
+			setMatches{{
+				match2opponents = {{type = 'team', template = 'bds'}, {type = 'team', template = 'team liquid 2024'}},
+				match2games = {game({{player = 'Other'}}, {{player = 'Alpha'}})},
+			}}
+
+			assert.are_same({Alpha = true}, TeamParticipantsRepository.getPlayedPlayers({'team liquid', 'team liquid 2024'}))
+		end)
+
+		it('reads sparse and string-keyed player tables', function()
+			setMatches{{
+				match2opponents = {{type = 'team', template = 'team liquid'}},
+				match2games = {
+					game({[1] = {player = 'Alpha'}, [3] = {player = 'Gamma'}}),
+					game({['2'] = {player = 'Beta'}}),
+				},
+			}}
+
+			local result = TeamParticipantsRepository.getPlayedPlayers({'team liquid'})
+
+			assert.are_same({Alpha = true, Beta = true, Gamma = true}, result)
+		end)
+
+		it('ignores unfinished and not played games', function()
+			setMatches{{
+				match2opponents = {{type = 'team', template = 'team liquid'}},
+				match2games = {
+					game({{player = 'Alpha'}}, nil, {winner = ''}),
+					game({{player = 'Beta'}}, nil, {status = 'notplayed'}),
+				},
+			}}
+
+			assert.is_nil(TeamParticipantsRepository.getPlayedPlayers({'team liquid'}))
+		end)
+
+		it('returns nil when games have no player data', function()
+			setMatches{{
+				match2opponents = {{type = 'team', template = 'team liquid'}},
+				match2games = {game()},
+			}}
+
+			assert.is_nil(TeamParticipantsRepository.getPlayedPlayers({'team liquid'}))
+		end)
+	end)
+
+	describe('setPageVars with auto-DNP', function()
+		it('keeps auto-DNP players but drops manual results=false', function()
+			local globalVars = PageVariableNamespace()
+			TeamParticipantsRepository.setPageVars(createBasicParticipant({
+				aliases = {'autodnp team'},
+				opponent = {
+					type = 'team',
+					template = 'autodnp team',
+					players = {
+						{displayName = 'Starter', pageName = 'Starter', extradata = {type = 'player', results = true}},
+						{displayName = 'Manual', pageName = 'Manual', extradata = {type = 'player', results = false}},
+						{displayName = 'Bench', pageName = 'Bench',
+							extradata = {type = 'player', results = false, autoDnp = true}},
+					}
+				}
+			}))
+
+			assert.are_equal('Starter', globalVars:get('autodnp team_p1'))
+			assert.are_equal('Bench', globalVars:get('autodnp team_p2'))
+			assert.is_nil(globalVars:get('autodnp team_p3'))
+		end)
+	end)
+
 	describe('getPrizepoolRecordsForTeam', function()
 		insulate('filters prizepool records by opponent matching', function()
 			local TeamTemplateMock
@@ -1190,6 +1291,7 @@ end)
 
 describe('Team Participants Controller', function()
 	local TeamParticipantsController = require('Module:TeamParticipants/Controller')
+	local TeamParticipantsRoster = require('Module:TeamParticipants/Roster')
 	local Array = require('Module:Array')
 	local Table = require('Module:Table')
 
@@ -1361,7 +1463,7 @@ describe('Team Participants Controller', function()
 		end)
 	end)
 
-	describe('mergeManualAndImportedPlayers', function()
+	describe('mergeImportedPlayers', function()
 		it('prepends new imported players to manual list', function()
 			local manualPlayers = {
 				{displayName = 'ManualPlayer1', pageName = 'ManualPlayer1', extradata = {type = 'player'}},
@@ -1371,7 +1473,7 @@ describe('Team Participants Controller', function()
 				{displayName = 'ImportedPlayer2', pageName = 'ImportedPlayer2', extradata = {type = 'player'}},
 			}
 
-			TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers, importedPlayers)
+			TeamParticipantsRoster.mergeImportedPlayers(manualPlayers, importedPlayers)
 
 			-- Imported players are inserted at the front, manual players keep their order at the back
 			assert.are_equal(3, #manualPlayers)
@@ -1403,7 +1505,7 @@ describe('Team Participants Controller', function()
 				},
 			}
 
-			TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers, importedPlayers)
+			TeamParticipantsRoster.mergeImportedPlayers(manualPlayers, importedPlayers)
 
 			assert.are_equal(1, #manualPlayers)
 			assert.are_equal('manual', manualPlayers[1].extradata.manualData)
@@ -1428,7 +1530,7 @@ describe('Team Participants Controller', function()
 				},
 			}
 
-			TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers, importedPlayers)
+			TeamParticipantsRoster.mergeImportedPlayers(manualPlayers, importedPlayers)
 
 			assert.are_equal(1, #manualPlayers)
 			assert.are_equal('ManualName', manualPlayers[1].displayName)
@@ -1456,6 +1558,88 @@ describe('Team Participants Controller', function()
 			TeamParticipantsController.importParticipants(parsedData)
 
 			assert.are_equal(1, #parsedData.participants[1].opponent.players)
+		end)
+	end)
+
+	describe('applyAutoPlayed', function()
+		local TeamParticipantsRepository = require('Module:TeamParticipants/Repository')
+		local TeamParticipantsWikiParser = require('Module:TeamParticipants/Parse/Wiki')
+		local playedStub
+
+		local function player(name, extra)
+			return TeamParticipantsWikiParser.parsePlayer(Table.merge({name, link = name}, extra or {}))
+		end
+
+		local function run(players, playedPlayers, autoPlayed)
+			playedStub = stub(TeamParticipantsRepository, 'getPlayedPlayers', function() return playedPlayers end)
+			local participant = {
+				opponent = {template = 'team liquid', players = players},
+				aliases = {'team liquid'},
+				autoPlayed = autoPlayed ~= false,
+				warnings = {},
+			}
+			local parsedData = {participants = {participant}}
+			TeamParticipantsController.applyAutoPlayed(parsedData)
+			TeamParticipantsController.resolvePlayerFlags(parsedData)
+			return participant
+		end
+
+		after_each(function()
+			playedStub:revert()
+		end)
+
+		it('marks players found in games as played and others as DNP', function()
+			local participant = run({player('Alpha'), player('Bench')}, {Alpha = true})
+			local alpha, bench = participant.opponent.players[1].extradata, participant.opponent.players[2].extradata
+
+			assert.is_true(alpha.played)
+			assert.is_true(alpha.results)
+			assert.is_false(bench.played)
+			assert.is_false(bench.results)
+			assert.is_true(bench.autoDnp)
+		end)
+
+		it('keeps manual played and results', function()
+			local participant = run({
+				player('ManualPlayed', {played = true}),
+				player('ManualResults', {results = true}),
+				player('ManualNoResults', {results = false}),
+			}, {Alpha = true})
+			local players = participant.opponent.players
+
+			assert.is_true(players[1].extradata.played)
+			assert.is_false(players[2].extradata.played)
+			assert.is_true(players[2].extradata.results)
+			assert.is_false(players[3].extradata.played)
+			assert.is_nil(players[3].extradata.autoDnp)
+		end)
+
+		it('leaves staff and TBD players alone', function()
+			local participant = run({player('Coach', {type = 'staff'}), player('TBD')}, {Alpha = true})
+
+			assert.is_true(participant.opponent.players[1].extradata.played)
+			assert.is_true(participant.opponent.players[2].extradata.played)
+		end)
+
+		it('does nothing without game data', function()
+			local participant = run({player('Alpha')}, nil)
+
+			assert.is_true(participant.opponent.players[1].extradata.played)
+			assert.are_same({}, participant.warnings)
+		end)
+
+		it('does nothing when autoplayed is off', function()
+			local participant = run({player('Alpha')}, {Other = true}, false)
+
+			assert.is_true(participant.opponent.players[1].extradata.played)
+			assert.stub(playedStub).was_not.called()
+		end)
+
+		it('warns about game players missing from the roster', function()
+			local participant = run({player('Alpha'), player('Coach', {type = 'staff'})},
+				{Alpha = true, Coach = true, Zed_Two = true, Bravo = true})
+
+			assert.are_same({'Played in matches but missing from the roster: Bravo, Zed Two'}, participant.warnings)
 		end)
 	end)
 
@@ -1493,6 +1677,18 @@ describe('Team Participants Controller', function()
 			TeamParticipantsController.fromTemplate(args)
 
 			assert.stub(LpdbPlacementStore).was_not.called()
+		end)
+
+		it('sort=alphabetical reorders the display but not the stored players', function()
+			local html = tostring(TeamParticipantsController.fromTemplate{
+				{'team liquid', players = {{'Zed'}, {'alpha'}}},
+				sort = 'alphabetical',
+				store = true,
+			})
+
+			local stored = require('Module:Json').parseIfString(LpdbPlacementStore.calls[1].vals[2].opponentplayers)
+			assert.are_equal('Zed', stored.p1)
+			assert.is_true(html:find('alpha', 1, true) < html:find('Zed', 1, true))
 		end)
 
 		it('store=true enables LPDB storage', function()
@@ -1551,6 +1747,8 @@ end)
 
 describe('Team Participants Parser', function()
 	local TeamParticipantsWikiParser = require('Module:TeamParticipants/Parse/Wiki')
+	local TeamParticipantsRoster = require('Module:TeamParticipants/Roster')
+	local tableOptions = {date = os.date('!*t') --[[@as osdateparam]]}
 	local Table = require('Module:Table')
 
 	-- Helper to create a minimal valid participant input for testing.
@@ -1577,6 +1775,11 @@ describe('Team Participants Parser', function()
 			after_each(function()
 				TeamTemplateMock.tearDown()
 				LpdbQuery:revert()
+			end)
+
+			it('reads sort=alphabetical', function()
+				assert.is_true(TeamParticipantsWikiParser.parseWikiInput{sort = 'alphabetical'}.sortAlphabetically)
+				assert.is_false(TeamParticipantsWikiParser.parseWikiInput{}.sortAlphabetically)
 			end)
 
 			it('parses multiple participants', function()
@@ -1633,7 +1836,7 @@ describe('Team Participants Parser', function()
 					}
 				}
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.are_equal(2, #result.opponent.players)
 				assert.are_equal('player1', result.opponent.players[1].displayName)
@@ -1645,7 +1848,7 @@ describe('Team Participants Parser', function()
 					contenders = {'team liquid', 'bds', 'mouz'}
 				}
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.are_equal('tbd', result.opponent.template)
 				assert.are_equal(3, #result.potentialQualifiers)
@@ -1659,7 +1862,7 @@ describe('Team Participants Parser', function()
 					contenders = 'not a table'
 				}
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.are_equal(1, #result.warnings)
 				assert.matches('Invalid contenders: expected a list of non%-empty strings', result.warnings[1])
@@ -1673,7 +1876,7 @@ describe('Team Participants Parser', function()
 					}
 				})
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.is_true(result.notes[1].highlighted)
 				assert.is_false(result.notes[2].highlighted)
@@ -1688,11 +1891,23 @@ describe('Team Participants Parser', function()
 					}
 				})
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.are_equal(2, #result.notes)
 				assert.are_equal('Valid Note', result.notes[1].text)
 				assert.are_equal('Another Valid Note', result.notes[2].text)
+			end)
+
+			it('reads autoplayed per opponent, falling back to the table default', function()
+				local off = {date = tableOptions.date, autoPlayed = false}
+				local on = {date = tableOptions.date, autoPlayed = true}
+
+				assert.is_false(TeamParticipantsWikiParser.parseParticipant(createBasicParticipantInput(), off).autoPlayed)
+				assert.is_true(TeamParticipantsWikiParser.parseParticipant(createBasicParticipantInput(), on).autoPlayed)
+				assert.is_true(TeamParticipantsWikiParser.parseParticipant(
+					createBasicParticipantInput{autoplayed = 'true'}, off).autoPlayed)
+				assert.is_false(TeamParticipantsWikiParser.parseParticipant(
+					createBasicParticipantInput{autoplayed = 'false'}, on).autoPlayed)
 			end)
 
 			it('sets shouldImportFromDb=true when import=true', function()
@@ -1700,7 +1915,7 @@ describe('Team Participants Parser', function()
 					import = true,
 				})
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.is_true(result.shouldImportFromDb)
 			end)
@@ -1708,7 +1923,7 @@ describe('Team Participants Parser', function()
 			it('sets shouldImportFromDb=false by default', function()
 				local input = createBasicParticipantInput()
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.is_false(result.shouldImportFromDb)
 			end)
@@ -1734,6 +1949,44 @@ describe('Team Participants Parser', function()
 				assert.are_equal('player', subResult.extradata.type)
 			end)
 		end)
+
+		describe('played/results flags', function()
+			local function resolved(input)
+				local player = TeamParticipantsWikiParser.parsePlayer(input)
+				TeamParticipantsRoster.resolvePlayerFlags(player)
+				return player.extradata
+			end
+
+			it('leaves flags unset until resolved', function()
+				local player = TeamParticipantsWikiParser.parsePlayer({'PlayerName'})
+				assert.is_nil(player.extradata.played)
+				assert.is_nil(player.extradata.results)
+			end)
+
+			it('defaults both to true', function()
+				local extradata = resolved{'PlayerName'}
+				assert.is_true(extradata.played)
+				assert.is_true(extradata.results)
+			end)
+
+			it('results follows played', function()
+				local extradata = resolved{'PlayerName', played = false}
+				assert.is_false(extradata.played)
+				assert.is_false(extradata.results)
+			end)
+
+			it('explicit results wins over played', function()
+				local extradata = resolved{'PlayerName', played = false, results = true}
+				assert.is_false(extradata.played)
+				assert.is_true(extradata.results)
+			end)
+
+			it('results alone does not change played', function()
+				local extradata = resolved{'PlayerName', results = false}
+				assert.is_true(extradata.played)
+				assert.is_false(extradata.results)
+			end)
+		end)
 	end)
 
 	describe('Qualification Parsing', function()
@@ -1757,7 +2010,7 @@ describe('Team Participants Parser', function()
 					qualification = {method = 'invite', text = 'Direct Invite'}
 				})
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.are_equal('invite', result.qualification.method)
 			end)
@@ -1769,7 +2022,7 @@ describe('Team Participants Parser', function()
 					}
 				})
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.is_nil(result.qualification)
 			end)
@@ -1804,7 +2057,7 @@ describe('Team Participants Parser', function()
 					qualification = {method = 'qual', page = 'Test/Tournament'}
 				})
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.are_equal('tournament', result.qualification.type)
 				assert.is_table(result.qualification.tournament)
@@ -1819,7 +2072,7 @@ describe('Team Participants Parser', function()
 					qualification = {method = 'qual', url = 'https://example.com', text = 'External'}
 				})
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.are_equal('external', result.qualification.type)
 				assert.are_equal('https://example.com', result.qualification.url)
@@ -1830,7 +2083,7 @@ describe('Team Participants Parser', function()
 					qualification = {method = 'qual', text = 'Other Qualifier'}
 				})
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 
 				assert.are_equal('other', result.qualification.type)
 			end)
@@ -1841,9 +2094,85 @@ describe('Team Participants Parser', function()
 				})
 
 				assert.has_error(function()
-					TeamParticipantsWikiParser.parseParticipant(input, os.time())
+					TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 				end, 'External or non-tournament qualifier must have text')
 			end)
+		end)
+	end)
+end)
+
+describe('Team Participants Roster sorting', function()
+	local TeamParticipantsRoster = require('Module:TeamParticipants/Roster')
+	local TeamTemplate = require('Module:TeamTemplate')
+	local Array = require('Module:Array')
+
+	local function player(displayName, extradata)
+		local roles = extradata and extradata.sortOrder and {{sortOrder = extradata.sortOrder}} or {}
+		return {
+			displayName = displayName,
+			extradata = {type = extradata and extradata.type or 'player', roles = roles},
+		}
+	end
+
+	local function names(list)
+		return Array.map(list, function(element) return element.displayName or element.opponent.template end)
+	end
+
+	describe('sortPlayers', function()
+		local players = {
+			player('zed', {sortOrder = 1}),
+			player('Coach', {type = 'staff'}),
+			player('TBD'),
+			player('alpha', {sortOrder = 2}),
+			player('Bravo', {sortOrder = 1}),
+		}
+
+		it('sorts by role by default, ties keep input order', function()
+			assert.are_same({'zed', 'Bravo', 'alpha', 'TBD', 'Coach'},
+				names(TeamParticipantsRoster.sortPlayers(players)))
+		end)
+
+		it('sorts case-insensitively by name, ignoring roles, TBD and staff last', function()
+			assert.are_same({'alpha', 'Bravo', 'zed', 'TBD', 'Coach'},
+				names(TeamParticipantsRoster.sortPlayers(players, true)))
+		end)
+
+		it('does not mutate the input', function()
+			TeamParticipantsRoster.sortPlayers(players, true)
+			assert.are_equal('zed', players[1].displayName)
+		end)
+	end)
+
+	describe('sortParticipants', function()
+		local getRawStub
+		local teamNames = {['team liquid'] = 'Team Liquid', bds = 'Team BDS', heroic = 'HEROIC', mouz = 'MOUZ'}
+
+		before_each(function()
+			getRawStub = stub(TeamTemplate, 'getRawOrNil', function(template)
+				return teamNames[template] and {name = teamNames[template]} or nil
+			end)
+		end)
+
+		after_each(function()
+			getRawStub:revert()
+		end)
+
+		local function participant(template, potentialQualifiers)
+			return {opponent = {type = 'team', template = template}, potentialQualifiers = potentialQualifiers or {}}
+		end
+
+		it('sorts by displayed name, TBD and contender cards last', function()
+			local sorted = TeamParticipantsRoster.sortParticipants{
+				participant('tbd'),
+				participant('team liquid'),
+				participant('tbd', {{type = 'team', template = 'mouz'}}),
+				participant('mouz'),
+				participant('heroic'),
+				participant('bds'),
+			}
+
+			assert.are_same({'heroic', 'mouz', 'bds', 'team liquid', 'tbd', 'tbd'}, names(sorted))
+			assert.are_equal(0, #sorted[5].potentialQualifiers)
 		end)
 	end)
 end)

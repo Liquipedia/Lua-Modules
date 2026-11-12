@@ -12,6 +12,7 @@ local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Page = Lua.import('Module:Page')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
@@ -158,7 +159,7 @@ function TeamParticipantsRepository.setPageVars(participant)
 		}
 		local playerCount, staffCount = 0, 0
 		Array.forEach(participant.opponent.players or {}, function(player)
-			if not shouldStorePlayer(player) then
+			if not shouldStorePlayer(player) and not player.extradata.autoDnp then
 				return
 			end
 			local playerPrefix
@@ -298,6 +299,72 @@ function TeamParticipantsRepository.getPlayersDates(players, teamAliases)
 	tryBatchQuery(formerPlayers, 'inactive', 'leaveDate')
 
 	return datesByPlayer
+end
+
+---@return match2[]
+TeamParticipantsRepository.getTournamentMatches = FnUtil.memoize(function()
+	local parent = Variables.varDefault('tournament_parent')
+	if Logic.isEmpty(parent) then
+		return {}
+	end
+	local matches = {}
+	Lpdb.executeMassQuery('match2', {
+		conditions = tostring(ConditionTree(BooleanOperator.all):add{
+			ConditionNode(ColumnName('parent'), Comparator.eq, parent),
+			ConditionNode(ColumnName('finished'), Comparator.eq, 1),
+		}),
+		query = 'match2opponents, match2games',
+	}, function(match)
+		table.insert(matches, match)
+	end)
+	return matches
+end)
+
+---@param game match2game
+---@return boolean
+local function isFinishedGame(game)
+	return game.status ~= 'notplayed' and Logic.isNotEmpty(game.winner)
+end
+
+---@param game match2game
+---@param opponentIndex integer
+---@return string[]
+local function getGamePlayerNames(game, opponentIndex)
+	local gameOpponent = (Json.parseIfString(game.opponents) or {})[opponentIndex] or {}
+	-- players can be sparse or string-keyed after the JSON round trip
+	return Array.map(Array.extractValues(gameOpponent.players or {}), function(player)
+		local pageName = Logic.nilIfEmpty(player.player or player.pageName)
+		if pageName and pageName:lower() ~= 'tbd' then
+			return pageName
+		end
+	end)
+end
+
+---@param match match2
+---@param aliases string[]
+---@return string[]
+local function getMatchPlayerNames(match, aliases)
+	local opponentIndex = Array.indexOf(match.match2opponents or {}, function(opponent)
+		return opponent.type == Opponent.team and Table.includes(aliases, opponent.template)
+	end)
+	if opponentIndex == 0 then
+		return {}
+	end
+	return Array.flatMap(Array.filter(match.match2games or {}, isFinishedGame), function(game)
+		return getGamePlayerNames(game, opponentIndex)
+	end)
+end
+
+--- Pagenames of players in the team's finished games; nil if no game has player data.
+---@param aliases string[]
+---@return table<string, boolean>?
+function TeamParticipantsRepository.getPlayedPlayers(aliases)
+	local names = Array.flatMap(TeamParticipantsRepository.getTournamentMatches(), function(match)
+		return getMatchPlayerNames(match, aliases)
+	end)
+	---@type string[]
+	local pageNames = Array.map(Array.unique(names), Page.pageifyLink)
+	return Logic.nilIfEmpty(Table.map(pageNames, function(_, pageName) return pageName, true end))
 end
 
 ---@param opponent standardOpponent
