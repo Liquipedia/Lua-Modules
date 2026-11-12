@@ -105,10 +105,9 @@ TiebreakerGameUtil.getOvertimeGames = FnUtil.memoize(function (opponent)
 		end
 
 		local regulationRounds = StandingsOvertime.matchRegulationRounds(match)
-		Array.forEach(match.games, function (game)
-			if not StandingsOvertime.isOvertimeGame(game, regulationRounds) then
-				return
-			end
+		Array.forEach(Array.filter(match.games, function (game)
+			return StandingsOvertime.isOvertimeGame(game, regulationRounds)
+		end), function (game)
 			if game.winner == opponentIndex then
 				overtimeWins = overtimeWins + 1
 			else
