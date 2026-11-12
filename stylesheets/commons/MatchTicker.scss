@@ -24,6 +24,7 @@ Template(s): MatchTicker
 	font-size: 0.6875rem;
 	background: var( --match-ticker-card-background-color );
 	border-right: 1px solid var( --match-ticker-card-border-color );
+	position: relative;
 
 	&__header {
 		display: flex;
@@ -66,6 +67,13 @@ Template(s): MatchTicker
 					width: 100%;
 				}
 			}
+		}
+
+		&.winner::after {
+			font-family: "Font Awesome 5 Pro";
+			content: "\f0d9"; /* Unicode for caret-left */
+			position: relative;
+			right: 0;
 		}
 	}
 

@@ -11,6 +11,12 @@ export default {
 		"at-rule-no-unknown": null,
 		"scss/at-rule-no-unknown": true,
 		"color-hex-length": "long",
+		"font-family-no-missing-generic-family-keyword": [
+			true,
+			{
+				"ignoreFontFamilies": ["/^Font Awesome/"]
+			}
+		],
 		"unit-disallowed-list": null,
 		"declaration-property-unit-disallowed-list": {},
 		"no-descending-specificity": null,
