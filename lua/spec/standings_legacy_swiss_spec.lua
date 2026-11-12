@@ -215,14 +215,15 @@ describe('Standings Legacy Swiss', function()
 	describe('rainbowsix', function()
 		local config = StandingTableLegacySwiss.RAINBOWSIX_CONFIG
 
-		it('maps buchholz to the points of the opponents and no ot diff to the round diff', function()
-			local args = {tiebreaker1 = 'points', tiebreaker2 = 'buchholz', tiebreaker3 = 'no ot diff', tiebreaker4 = 'diff'}
-			assert.are_same({'points', 'buchholzpoints', 'rounddiff', 'gamediff'},
-				StandingTableLegacySwiss.parseTiebreaker(args, config))
-			assert.are_same({'points', 'buchholzpoints', 'rounddiff', 'rounddiff'},
+		it('maps buchholz to the points of the opponents', function()
+			local args = {tiebreaker1 = 'points', tiebreaker2 = 'buchholz', tiebreaker3 = 'diff'}
+			assert.are_same({'points', 'buchholzpoints', 'gamediff'}, StandingTableLegacySwiss.parseTiebreaker(args, config))
+			assert.are_same({'points', 'buchholzpoints', 'rounddiff'},
 				StandingTableLegacySwiss.parseTiebreaker(args, config, true))
-			assert.are_same({'points', 'buchholz', 'gamediffregulation', 'gamediff'},
-				StandingTableLegacySwiss.parseTiebreaker(args))
+			assert.are_same({'points', 'buchholz', 'gamediff'}, StandingTableLegacySwiss.parseTiebreaker(args))
+			assert.error(function()
+				StandingTableLegacySwiss.parseTiebreaker({tiebreaker1 = 'no ot diff'}, config, true)
+			end)
 		end)
 
 		it('maps the game tiebreakers to rounds when every match is a Bo1', function()
@@ -255,7 +256,7 @@ describe('Standings Legacy Swiss', function()
 
 		it('only maps to valid tiebreakers on rainbowsix', function()
 			local inputs = {}
-			for index, input in ipairs{'points', 'buchholz', 'series', 'diff', 'diff games', 'no ot diff', 'games won',
+			for index, input in ipairs{'points', 'buchholz', 'series', 'diff', 'diff games', 'games won',
 				'games loss', 'h2h series', 'h2h games', 'minileague points', 'minileague series%', 'minileague games',
 				'minileague games won'} do
 				inputs['tiebreaker' .. index] = input

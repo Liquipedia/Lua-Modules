@@ -68,12 +68,11 @@ StandingTableLegacySwiss.RAINBOWSIX_BEST_OF_ONE_TIEBREAKERS = {
 	['minileague games won'] = 'ml.roundwins',
 }
 
----Rainbow Six buchholz sums the points of the opponents, and `no ot diff` is the round diff with overtime neutral
+---Rainbow Six buchholz sums the points of the opponents
 ---@type LegacySwissConfig
 StandingTableLegacySwiss.RAINBOWSIX_CONFIG = {
 	tiebreakers = {
 		buchholz = 'buchholzpoints',
-		['no ot diff'] = 'rounddiff',
 	},
 	bestOfOneTiebreakers = StandingTableLegacySwiss.RAINBOWSIX_BEST_OF_ONE_TIEBREAKERS,
 	adjustParameters = function(parameters, args, isBestOfOne)
