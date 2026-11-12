@@ -50,16 +50,4 @@ function MatchUtil.shouldShowStreams(match)
 	return isWithinDisplayThreshold(match.timestamp)
 end
 
----@param match MatchGroupUtilMatch
----@return boolean
-function MatchUtil.isMatchCloseToStart(match)
-	if match.phase ~= 'upcoming' then
-		return false
-	elseif not match.timestamp then
-		return false
-	end
-
-	return isWithinDisplayThreshold(match.timestamp)
-end
-
 return MatchUtil
