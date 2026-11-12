@@ -167,7 +167,7 @@ function StandingTableLegacyGroup.getStandardParameter(args, opponents)
 		title = args.title or mw.title.getCurrentTitle().text,
 		importopponents = #opponents == 0,
 		walkoverrounds = StandingTableLegacyGroup.parseWalkoverRounds(args),
-		dqexcludesmatches = Logic.readBool(args.ignoredq),
+		dqhandling = Logic.readBool(args.ignoredq) and 'ignore' or nil,
 	})
 end
 
