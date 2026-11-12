@@ -491,6 +491,13 @@ describe('Standings Legacy Group', function()
 			assert.is_false(parameters({}, true).overtime)
 		end)
 
+		it('reads the regulation rounds from maplength on overtime tables', function()
+			assert.are_equal('10', parameters({show_otp = 'true', maplength = '10'}, true).regulationrounds)
+			assert.is_nil(parameters({show_otp = 'true'}, true).regulationrounds)
+			assert.is_nil(parameters({maplength = '10'}, true).regulationrounds)
+			assert.is_nil(parameters({show_otp = 'true', maplength = '10'}, false).regulationrounds)
+		end)
+
 		it('scores a 2-1 as overtime with maplength 2', function()
 			local adjusted = parameters({show_otp = 'true', maplength = '2'}, false)
 			assert.is_false(adjusted.overtime)

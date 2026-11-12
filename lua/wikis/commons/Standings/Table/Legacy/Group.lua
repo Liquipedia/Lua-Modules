@@ -265,6 +265,7 @@ function StandingTableLegacyGroup.adjustRainbowSixParameters(parameters, args, i
 
 	local adjusted = Table.merge(parameters, {
 		overtime = overtime,
+		regulationrounds = overtime and Logic.nilIfEmpty(args.maplength) or nil,
 		points = StandingTableLegacySwiss.parsePoints(pointsArgs, {overtime = overtime}),
 	})
 	-- Legacy counts `walkover_win` as rounds on Bo1, `walkover_win_r` per walkover map
