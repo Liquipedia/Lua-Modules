@@ -603,6 +603,142 @@ describe('Standings Legacy Group', function()
 		end)
 	end)
 
+	describe('counterstrike', function()
+		local config = StandingTableLegacyGroup.COUNTERSTRIKE_CONFIG
+
+		---@param args table
+		---@param isBestOfOne boolean
+		---@param games string[]?
+		---@return table
+		local function parameters(args, isBestOfOne, games)
+			return StandingTableLegacyGroup.adjustCounterStrikeParameters(
+				StandingTableLegacyGroup.getStandardParameter(args, {}), args, isBestOfOne,
+				Array.map(games or {'cs2'}, function(game) return {game = game} end)
+			)
+		end
+
+		it('maps the counterstrike tiebreakers', function()
+			assert.are_same(
+				{'rounddiff', 'gamediff', 'gamediff', 'h2hcs.matchdiff', 'ml.matchdiff', 'ml.gamescore', 'ml.gamewins',
+					'ml.rounddiff', 'ml.rounddiff', 'ml.roundwins', 'ml.rounddiffregulation', 'ml.roundwinsregulation',
+					'rounddiffregulation', 'roundwinsregulation', 'roundlossesregulation', 'buchholzpoints'},
+				StandingTableLegacyGroup.parseTiebreakers({
+					tiebreaker1 = 'diff',
+					tiebreaker2 = 'games',
+					tiebreaker3 = 'diff games',
+					tiebreaker4 = 'h2h series',
+					tiebreaker5 = 'head to head league',
+					tiebreaker6 = 'h2h games',
+					tiebreaker7 = 'h2h games won',
+					tiebreaker8 = 'h2h rounds',
+					tiebreaker9 = 'h2h diff',
+					tiebreaker10 = 'head-to-head rounds won',
+					tiebreaker11 = 'h2h regulation',
+					tiebreaker12 = 'h2h regulation won',
+					tiebreaker13 = 'diff regulation',
+					tiebreaker14 = 'rounds won regulation',
+					tiebreaker15 = 'rounds loss regulation',
+					tiebreaker16 = 'buchholz',
+				}, config)
+			)
+			assert.error(function() StandingTableLegacyGroup.parseTiebreakers({tiebreaker1 = 'h2h'}, config) end)
+		end)
+
+		it('only maps to valid tiebreakers on counterstrike', function()
+			local inputs = Array.extractKeys(config.tiebreakers)
+			local tiebreakers = StandingTableLegacyGroup.parseTiebreakers(
+				Table.map(inputs, function(index, input) return 'tiebreaker' .. index, input end), config
+			)
+			Array.extendWith(tiebreakers, StandingTableLegacyGroup.parseTiebreakers({}, config))
+			for _, tiebreaker in ipairs(tiebreakers) do
+				TiebreakerFactory.validateAndNormalizeInput(tiebreaker)
+			end
+		end)
+
+		it('uses the legacy defaults', function()
+			assert.are_same(
+				{'matchscore', 'h2hcs.matchdiff', 'ml.gamescore', 'gamediff', 'gamewins', 'ml.rounddiff', 'ml.roundwins',
+					'rounddiff', 'roundwins'},
+				StandingTableLegacyGroup.parseTiebreakers({}, config)
+			)
+			assert.are_same({'points'}, StandingTableLegacyGroup.parseTiebreakers({show_p = 'true'}, config))
+		end)
+
+		it('only tracks overtime on Bo1 tables with ot_points', function()
+			local bestOfOne = parameters({ot_points = 'true', win_p_ot = '2.5', lose_p_ot = '0.5'}, true)
+			assert.is_true(bestOfOne.overtime)
+			assert.are_equal('win=3, draw=1, loss=0, otwin=2.5, otloss=0.5', bestOfOne.points)
+			assert.are_equal('win=3, draw=1, loss=0, otwin=2, otloss=1', parameters({ot_points = 'true'}, true).points)
+			local bestOfThree = parameters({ot_points = 'true'}, false)
+			assert.is_false(bestOfThree.overtime)
+			assert.are_equal('win=3, draw=1, loss=0', bestOfThree.points)
+			assert.is_false(parameters({}, true).overtime)
+		end)
+
+		it('plays MR15 unless every match is cs2', function()
+			assert.is_nil(parameters({}, true, {'cs2', 'cs2'}).regulationrounds)
+			assert.are_equal(30, parameters({}, true, {'csgo'}).regulationrounds)
+			assert.are_equal(30, parameters({}, true, {'cs2', 'csgo'}).regulationrounds)
+			assert.is_nil(parameters({}, true, {}).regulationrounds)
+		end)
+
+		describe('standings input', function()
+			local StandingTable = require('Module:Standings/Table')
+			local StandingTableLegacyNext = require('Module:Standings/Table/Legacy/Next')
+			local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
+
+			---@param bestOf integer
+			---@param game string
+			---@return table
+			local function matchRecord(bestOf, game)
+				return {
+					match2id = 'liquidheroic',
+					date = '2024-01-01 00:00:00',
+					bestof = bestOf,
+					game = game,
+					match2opponents = {{type = 'team', template = 'team liquid'}, {type = 'team', template = 'heroic'}},
+				}
+			end
+
+			---@param args table
+			---@param matchRecords table[]
+			---@return table
+			local function standingsInput(args, matchRecords)
+				stub(StandingTableLegacyNext, 'fetchMatches', matchRecords)
+				stub(StandingTable, 'fromTemplate')
+				StandingTableLegacyGroup.counterstrike(Table.merge({team1 = 'team liquid', team2 = 'heroic'}, args))
+				---@diagnostic disable-next-line: undefined-field
+				local input = StandingTable.fromTemplate.calls[1].vals[1]
+				---@diagnostic disable-next-line: undefined-field
+				StandingTable.fromTemplate:revert()
+				---@diagnostic disable-next-line: undefined-field
+				StandingTableLegacyNext.fetchMatches:revert()
+				return input
+			end
+
+			before_each(function()
+				TeamTemplateMock.setUp()
+			end)
+
+			after_each(function()
+				TeamTemplateMock.tearDown()
+			end)
+
+			it('always resets the tiebreakers', function()
+				local input = standingsInput({tiebreaker1 = 'series', tiebreaker2 = 'diff'}, {matchRecord(3, 'cs2')})
+				assert.is_true(input.tiebreakerreset)
+			end)
+
+			it('passes overtime and the regulation rounds of the matches to the standings', function()
+				local bestOfOne = standingsInput({ot_points = 'true'}, {matchRecord(1, 'csgo')})
+				assert.are_same({true, 30}, {bestOfOne.overtime, bestOfOne.regulationrounds})
+				local bestOfThree = standingsInput({ot_points = 'true'}, {matchRecord(3, 'cs2')})
+				assert.is_false(bestOfThree.overtime)
+				assert.is_nil(bestOfThree.regulationrounds)
+			end)
+		end)
+	end)
+
 	describe('ties', function()
 		it('turns draws on with ties=true and auto detects them otherwise', function()
 			local function matchDraws(args)
