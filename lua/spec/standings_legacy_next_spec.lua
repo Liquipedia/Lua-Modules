@@ -92,6 +92,10 @@ describe('Standings Legacy Next', function()
 			assert.is_nil(StandingTableLegacyNext.getStandardParameter({}, {}).store)
 			assert.is_false(StandingTableLegacyNext.getStandardParameter({storeStanding = 'false'}, {}).store)
 		end)
+
+		it('passes cutafter through', function()
+			assert.are_equal('16', StandingTableLegacyNext.getStandardParameter({cutafter = '16'}, {}).cutafter)
+		end)
 	end)
 
 	describe('standard parameters', function()
