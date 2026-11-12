@@ -110,6 +110,7 @@ function StandingsTable.parse(args, tableType)
 				importOpponents = importOpponentFromMatches,
 				overtime = overtime,
 				includeGames = StandingsParser.needsGames(tableType, tiebreakers),
+				regulationRounds = StandingsParseWiki.parseRegulationRounds(args),
 			}
 		)
 		opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)

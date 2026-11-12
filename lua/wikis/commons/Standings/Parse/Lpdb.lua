@@ -24,6 +24,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local StandingsOvertime = Lua.import('Module:Standings/Overtime')
 local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParseLpdb = {}
@@ -35,6 +36,7 @@ local MATCH_COLUMNS = {'match2id', 'match2opponents', 'bestof', 'date', 'dateexa
 ---@field importOpponents boolean? # If set, opponents not listed manually still count as part of the standings
 ---@field overtime boolean? # If set, results of overtime matches are tracked separately from regulation results
 ---@field includeGames boolean? # If set, the games of the matches are imported as well (always with overtime)
+---@field regulationRounds integer? # Overrides the regulation rounds of the wiki config for every match
 
 ---@param rounds {roundNumber: integer, matches: string[]}[]
 ---@param scoreMapper fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number|nil
@@ -89,7 +91,8 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 				return
 			end
 			record.match2games = record.match2games or {}
-			local match2 = MatchGroupUtil.matchFromRecord(record)
+			local match2 = MatchGroupUtil.matchFromRecord(record) --[[@as StandingsMatch]]
+			match2.regulationRounds = StandingsOvertime.regulationRounds(options and options.regulationRounds)
 			phaseByMatchId[record.match2id] = match2.phase
 			local mayBeRelevant = StandingsParseLpdb.parseMatch(
 				matchIdToRound[record.match2id], match2, opponents, scoreMapper, #rounds, lookupOpponent, options

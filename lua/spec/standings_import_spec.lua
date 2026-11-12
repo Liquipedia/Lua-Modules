@@ -768,6 +768,21 @@ describe('Standings import from matches', function()
 			assert.are_equal(0, heroic.rounds[2].scoreboard.points)
 		end)
 
+		it('overrides the regulation rounds of the wiki config', function()
+			-- M1 (7-3) goes into overtime after 8 rounds
+			stubRegulationAndOvertimeMatch()
+
+			local opponents = StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, {}, {
+				importOpponents = true,
+				overtime = true,
+				regulationRounds = 8,
+			})
+
+			local heroic = findOpponent(opponents, 'Heroic')
+			assert.are_same({w = 0, d = 0, l = 0}, heroic.rounds[1].scoreboard.match)
+			assert.are_same({w = 1, l = 0}, heroic.rounds[1].scoreboard.overtime)
+		end)
+
 		it('requires Bo1 matches', function()
 			stubRegulationAndOvertimeMatch{m2 = {bestof = 3}}
 

@@ -502,13 +502,25 @@ function StandingsParseWiki.parseWidth(args)
 	return tonumber((string.gsub(args.width or '', 'px', '')))
 end
 
----Reads whether overtime is tracked separately from regulation. Requires an overtime config on the wiki.
+---Reads the `regulationrounds` input, the number of rounds a game has in regulation. More rounds is overtime.
+---Unset means the regulation rounds of the wiki config.
+---@param args table
+---@return integer?
+function StandingsParseWiki.parseRegulationRounds(args)
+	local regulationRounds = readNonNegativeInteger(args, 'regulationrounds')
+	assert(regulationRounds ~= 0, 'Invalid regulationrounds input: "0" is not a positive integer')
+	return regulationRounds
+end
+
+---Reads whether overtime is tracked separately from regulation.
+---Requires regulation rounds, from the `regulationrounds` input or the wiki config.
 ---@param args table
 ---@return boolean
 function StandingsParseWiki.parseOvertime(args)
 	local overtime = Logic.readBool(args.overtime)
-	if overtime and not StandingsOvertime.regulationRounds() then
-		error('Overtime standings require `Info.config.standings.overtime.regulationRounds` to be configured')
+	if overtime and not StandingsOvertime.regulationRounds(StandingsParseWiki.parseRegulationRounds(args)) then
+		error('Overtime standings require `regulationrounds` or '
+			.. '`Info.config.standings.overtime.regulationRounds` to be configured')
 	end
 	return overtime
 end
