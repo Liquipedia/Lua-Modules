@@ -31,7 +31,7 @@ function Storage.run(sections, config, adjustLpdbData)
 		tournament = tournamentContext.fullName,
 		parent = tournamentContext.pageName,
 		series = tournamentContext.series,
-		startdate = Variables.varDefault('tournament_startdate'),
+		startdate = tournamentContext.startdate,
 		mode = tournamentContext.mode,
 		type = tournamentContext.type,
 		liquipediatier = tournamentContext.liquipediaTier,

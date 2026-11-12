@@ -1086,7 +1086,7 @@ function BasePrizePool:storeData()
 		parent = tournamentContext.pageName,
 		series = tournamentContext.series,
 		shortname = tournamentContext.tickerName,
-		startdate = Variables.varDefault('tournament_startdate'),
+		startdate = tournamentContext.startdate,
 		mode = tournamentContext.mode,
 		type = tournamentContext.type,
 		liquipediatier = tostring(tournamentContext.liquipediaTier),
