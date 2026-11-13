@@ -20,9 +20,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 
----@class FightersCustomMatchSummary: CustomMatchSummaryInterface
-local CustomMatchSummary = {}
-
 ---@class FightersMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
 local GameRowComponentProps = {}
 
@@ -33,6 +30,11 @@ local GameRowComponentProps = {}
 
 ---@type Component<FightersMatchSummaryGameRowProps>
 local FightersMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
+
+---@class FightersCustomMatchSummary: CustomMatchSummaryInterface
+local CustomMatchSummary = {
+	GameRow = FightersMatchSummaryGameRow
+}
 
 ---@param args table
 ---@return Renderable
@@ -57,22 +59,28 @@ function CustomMatchSummary._isSolo(match)
 	end)
 end
 
+---@param game MatchGroupUtilGame
+---@return boolean
+function CustomMatchSummary.gameFilter(game)
+	return Array.any(
+		game.opponents,
+		function (gameOpponent)
+			return Logic.isNotDeepEmpty(gameOpponent.players)
+		end
+	)
+end
+
 ---@param match MatchGroupUtilMatch
----@return VNode
-function CustomMatchSummary.createGames(match)
-	return MatchSummaryWidgets.GamesContainer{
-		children = Array.map(match.games, function (game, gameIndex)
-			if Array.all(game.opponents, function(opponent) return Logic.isDeepEmpty(opponent.players) end) then
-				return
-			end
-			return FightersMatchSummaryGameRow{
-				game = game,
-				gameIndex = gameIndex,
-				gameData = match.game,
-				matchOpponents = match.opponents,
-				soloMode = CustomMatchSummary._isSolo(match),
-			}
-		end)
+---@param game MatchGroupUtilGame
+---@param gameIndex integer
+---@return FightersMatchSummaryGameRowProps
+function CustomMatchSummary.buildGameRowProps(match, game, gameIndex)
+	return {
+		game = game,
+		gameIndex = gameIndex,
+		gameData = match.game,
+		matchOpponents = match.opponents,
+		soloMode = CustomMatchSummary._isSolo(match),
 	}
 end
 
