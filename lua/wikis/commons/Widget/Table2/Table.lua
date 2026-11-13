@@ -14,6 +14,7 @@ local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Html = Lua.import('Module:Widget/Html')
+local LabeledChevronToggle = Lua.import('Module:Widget/GeneralCollapsible/LabeledChevronToggle')
 local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 
 ---@class Table2ColumnDef
@@ -39,6 +40,9 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 ---@field tableClasses string[]?
 ---@field columns Table2ColumnDef[]?
 ---@field tableAttributes {[string]: any}?
+---@field collapseAfter integer? # Collapses the rows of each body past this behind a footer toggle
+---@field expandText Renderable?
+---@field collapseText Renderable?
 
 ---@param props Table2Props
 ---@param context Context
@@ -55,7 +59,14 @@ local function Table2(props, context)
 	end
 
 	local variant = props.variant
-	local wrapperClasses = WidgetUtil.collect('table2', 'table2--' .. variant, props.classes)
+	local collapseAfter = props.collapseAfter
+	local wrapperClasses = WidgetUtil.collect(
+		'table2',
+		'table2--' .. variant,
+		props.classes,
+		collapseAfter and 'general-collapsible' or nil,
+		collapseAfter and 'collapsed' or nil
+	)
 
 	local tableClasses = WidgetUtil.collect(
 		'table2__table',
@@ -81,6 +92,17 @@ local function Table2(props, context)
 		}}
 	end
 
+	-- Always provided, so nested tables do not inherit them
+	tableChildren = {Context.Provider{
+		def = Table2Contexts.CollapseAfter,
+		value = collapseAfter,
+		children = {Context.Provider{
+			def = Table2Contexts.CollapseCounter,
+			value = nil,
+			children = tableChildren,
+		}},
+	}}
+
 	local tableAttributes = props.tableAttributes or {}
 	if not Logic.readBool(props.striped) then
 		tableAttributes['data-striped'] = 'false'
@@ -97,9 +119,18 @@ local function Table2(props, context)
 		children = {tableNode},
 	}
 
-	local footerNode = props.footer and Html.Div{
+	local collapseToggle = collapseAfter and Html.Div{
+		classes = {'table2__collapse-toggle'},
+		attributes = {['data-collapsible-click-region'] = 'true'},
+		children = LabeledChevronToggle{
+			expandText = props.expandText or 'Show more',
+			collapseText = props.collapseText or 'Show less',
+		},
+	} or nil
+
+	local footerNode = (props.footer or collapseToggle) and Html.Div{
 		classes = {'table2__footer'},
-		children = props.footer,
+		children = WidgetUtil.collect(props.footer, collapseToggle),
 	} or nil
 
 	local tableWrapperNode = Html.Div{
