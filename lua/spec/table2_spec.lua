@@ -25,8 +25,8 @@ describe('Table2', function()
 		it('collapses the rows of each body after the first ones behind a footer toggle', function()
 			local html = tostring(TableWidgets.Table{
 				collapseAfter = 2,
-				expandText = 'Show more',
-				collapseText = 'Show less',
+				expandText = 'Show all',
+				collapseText = 'Hide some',
 				children = {body{'A1', 'A2', 'A3'}, body{'B1', 'B2', 'B3', 'B4'}},
 			})
 			assert.is_truthy(html:find('class="table2 table2--generic general-collapsible collapsed"', 1, true))
@@ -35,6 +35,12 @@ describe('Table2', function()
 				'<div class="table2__footer"><div class="table2__collapse-toggle" data-collapsible-click-region="true">',
 				1, true
 			))
+			assert.is_truthy(html:find('Show all', 1, true))
+			assert.is_truthy(html:find('Hide some', 1, true))
+		end)
+
+		it('labels the toggle by default', function()
+			local html = tostring(TableWidgets.Table{collapseAfter = 1, children = {body{'A1', 'A2'}}})
 			assert.is_truthy(html:find('Show more', 1, true))
 			assert.is_truthy(html:find('Show less', 1, true))
 		end)
@@ -88,6 +94,21 @@ describe('Table2', function()
 				}}},
 			})
 			assert.are_same({}, hiddenRows(html))
+		end)
+
+		it('does not count the body rows of a nested table without a body', function()
+			local nestedTable = TableWidgets.Table{children = {
+				TableWidgets.Row{section = 'body', children = {TableWidgets.Cell{children = 'N1'}}},
+			}}
+			local html = tostring(TableWidgets.Table{
+				collapseAfter = 2,
+				children = {TableWidgets.TableBody{children = {
+					TableWidgets.Row{children = {TableWidgets.Cell{children = nestedTable}}},
+					TableWidgets.Row{children = {TableWidgets.Cell{children = 'A2'}}},
+					TableWidgets.Row{children = {TableWidgets.Cell{children = 'A3'}}},
+				}}},
+			})
+			assert.are_same({'A3'}, hiddenRows(html))
 		end)
 	end)
 end)

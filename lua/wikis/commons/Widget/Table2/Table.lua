@@ -92,11 +92,15 @@ local function Table2(props, context)
 		}}
 	end
 
-	-- Always provided, so nested tables do not inherit it
+	-- Always provided, so nested tables do not inherit them
 	tableChildren = {Context.Provider{
 		def = Table2Contexts.CollapseAfter,
 		value = collapseAfter,
-		children = tableChildren,
+		children = {Context.Provider{
+			def = Table2Contexts.CollapseCounter,
+			value = nil,
+			children = tableChildren,
+		}},
 	}}
 
 	local tableAttributes = props.tableAttributes or {}
@@ -118,7 +122,10 @@ local function Table2(props, context)
 	local collapseToggle = collapseAfter and Html.Div{
 		classes = {'table2__collapse-toggle'},
 		attributes = {['data-collapsible-click-region'] = 'true'},
-		children = LabeledChevronToggle{expandText = props.expandText, collapseText = props.collapseText},
+		children = LabeledChevronToggle{
+			expandText = props.expandText or 'Show more',
+			collapseText = props.collapseText or 'Show less',
+		},
 	} or nil
 
 	local footerNode = (props.footer or collapseToggle) and Html.Div{
