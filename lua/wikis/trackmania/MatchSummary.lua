@@ -14,9 +14,7 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 ---@class TrackmaniaMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
-local GameRowComponentProps = {
-	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay,
-}
+local GameRowComponentProps = {}
 
 local TrackmaniaMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
@@ -51,6 +49,12 @@ function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 			hover = 'Overtime',
 		} or nil,
 	}
+end
+
+---@param props MatchSummaryGameRowProps
+---@return Renderable
+function GameRowComponentProps.createGameOverview(props)
+	return MatchSummaryWidgets.GameRow.mapDisplay(props, {noLink = true})
 end
 
 return CustomMatchSummary
