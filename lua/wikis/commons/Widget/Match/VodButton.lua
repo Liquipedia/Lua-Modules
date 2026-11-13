@@ -16,7 +16,15 @@ local Button = Lua.import('Module:Widget/Basic/Button')
 local ImageIcon = Lua.import('Module:Widget/Image/Icon/Image')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
----@param props {vodLink: string, variant: string?, showText: boolean?, gameNumber: integer, grow: boolean?}
+---@class VodButtonProps
+---@field vodLink string
+---@field variant string?
+---@field showText boolean?
+---@field gameNumber integer
+---@field grow boolean?
+---@field buttonSize ButtonSize?
+
+---@param props VodButtonProps
 ---@return VNode?
 local function VodButton(props)
 	local vodLink = props.vodLink
@@ -35,7 +43,7 @@ local function VodButton(props)
 		title = VodLink.getTitle(gameNumber),
 		variant = 'secondary',
 		link = vodLink,
-		size = 'sm',
+		size = props.buttonSize,
 		grow = useGrow,
 		children = useDropdownVariant and {
 			Icon{iconName = 'vod_play', size = 'sm'},
@@ -52,4 +60,4 @@ local function VodButton(props)
 	}
 end
 
-return Component.component(VodButton)
+return Component.component(VodButton, {buttonSize = 'sm'})

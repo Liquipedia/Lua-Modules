@@ -18,7 +18,7 @@ local MatchStream = Lua.import('Module:Widget/Match/Stream')
 ---@field maxStreams integer?
 ---@field matchIsLive boolean?
 ---@field growButtons boolean?
----@field buttonSize 'xs'|'sm'|'md'|'lg'?
+---@field buttonSize ButtonSize?
 
 local defaultProps = {
 	matchIsLive = true,
