@@ -5,11 +5,13 @@ Template(s): MatchTicker
 .theme--light {
 	--match-ticker-card-background-color: var( --clr-secondary-100 );
 	--match-ticker-card-border-color: var( --clr-on-surface-light-primary-12 );
+	--match-ticker-card-divider-color: var( --clr-on-surface-light-primary-8 );
 }
 
 .theme--dark {
 	--match-ticker-card-background-color: var( --clr-secondary-16 );
 	--match-ticker-card-border-color: var( --clr-on-surface-dark-primary-12 );
+	--match-ticker-card-divider-color: var( --clr-on-surface-dark-primary-8 );
 }
 
 .match-ticker-card {
@@ -36,7 +38,7 @@ Template(s): MatchTicker
 
 	&__opponents {
 		display: flex;
-		height: 3.25rem;
+		min-height: 3.25rem;
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 0.25rem;
@@ -47,6 +49,15 @@ Template(s): MatchTicker
 		&:has( > .winner ) > .winner {
 			font-weight: bold;
 		}
+	}
+
+	&__divider {
+		align-self: stretch;
+		height: 0;
+		margin: 0;
+		border: 0;
+		border-top: 1px solid var( --match-ticker-card-divider-color );
+		background: none;
 	}
 
 	&__opponent {
@@ -66,6 +77,17 @@ Template(s): MatchTicker
 				img {
 					width: 100%;
 				}
+			}
+		}
+
+		.block-players-wrapper {
+			&:has( > :only-child ) {
+				display: contents;
+			}
+
+			&:not( :has( > :only-child ) ) {
+				display: flex;
+				flex-direction: column;
 			}
 		}
 
