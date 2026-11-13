@@ -1,5 +1,6 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('Standings Legacy Swiss', function()
+	local Array = require('Module:Array')
 	local StandingTableLegacySwiss = require('Module:Standings/Table/Legacy/Swiss')
 	local TiebreakerFactory = require('Module:Standings/Tiebreaker/Factory')
 
@@ -209,6 +210,140 @@ describe('Standings Legacy Swiss', function()
 		it('maps walkover_win to walkovergames', function()
 			assert.are_equal('2', StandingTableLegacySwiss.getStandardParameter{walkover_win = '2'}.walkovergames)
 			assert.is_nil(StandingTableLegacySwiss.getStandardParameter{}.walkovergames)
+		end)
+	end)
+
+	describe('rainbowsix', function()
+		local config = StandingTableLegacySwiss.RAINBOWSIX_CONFIG
+
+		it('maps buchholz to the points of the opponents', function()
+			local args = {tiebreaker1 = 'points', tiebreaker2 = 'buchholz', tiebreaker3 = 'diff'}
+			assert.are_same({'points', 'buchholzpoints', 'gamediff'}, StandingTableLegacySwiss.parseTiebreaker(args, config))
+			assert.are_same({'points', 'buchholzpoints', 'rounddiff'},
+				StandingTableLegacySwiss.parseTiebreaker(args, config, true))
+			assert.are_same({'points', 'buchholz', 'gamediff'}, StandingTableLegacySwiss.parseTiebreaker(args))
+			assert.error(function()
+				StandingTableLegacySwiss.parseTiebreaker({tiebreaker1 = 'no ot diff'}, config, true)
+			end)
+		end)
+
+		it('maps the game tiebreakers to rounds when every match is a Bo1', function()
+			local args = {
+				tiebreaker1 = 'diff',
+				tiebreaker2 = 'diff games',
+				tiebreaker3 = 'games won',
+				tiebreaker4 = 'games loss',
+				tiebreaker5 = 'h2h games',
+				tiebreaker6 = 'minileague games',
+				tiebreaker7 = 'minileague games won',
+				tiebreaker8 = 'series',
+			}
+			assert.are_same(
+				{'rounddiff', 'rounddiff', 'roundwins', 'roundlosses', 'h2hlegacy.roundscore', 'ml.rounddiff',
+					'ml.roundwins', 'matchscore'},
+				StandingTableLegacySwiss.parseTiebreaker(args, config, true)
+			)
+			assert.are_same(
+				{'gamediff', 'gamediff', 'gamewins', 'gamelosses', 'h2hlegacy.gamescore', 'ml.gamediff', 'ml.gamewins',
+					'matchscore'},
+				StandingTableLegacySwiss.parseTiebreaker(args, config, false)
+			)
+		end)
+
+		it('only translates the names the swiss table knows', function()
+			assert.error(function() StandingTableLegacySwiss.parseTiebreaker({tiebreaker1 = 'games%'}, config, true) end)
+			assert.error(function() StandingTableLegacySwiss.parseTiebreaker({tiebreaker1 = 'bogus'}, config) end)
+		end)
+
+		it('only maps to valid tiebreakers on rainbowsix', function()
+			local inputs = {}
+			for index, input in ipairs{'points', 'buchholz', 'series', 'diff', 'diff games', 'games won',
+				'games loss', 'h2h series', 'h2h games', 'minileague points', 'minileague series%', 'minileague games',
+				'minileague games won'} do
+				inputs['tiebreaker' .. index] = input
+			end
+			for _, isBestOfOne in ipairs{false, true} do
+				for _, tiebreaker in ipairs(StandingTableLegacySwiss.parseTiebreaker(inputs, config, isBestOfOne)) do
+					TiebreakerFactory.validateAndNormalizeInput(tiebreaker)
+				end
+			end
+		end)
+
+		it('is a Bo1 table only if every match is a Bo1', function()
+			assert.is_true(StandingTableLegacySwiss.isBestOfOne{{bestof = 1}, {bestof = '1'}})
+			assert.is_false(StandingTableLegacySwiss.isBestOfOne{{bestof = 1}, {bestof = 3}})
+			assert.is_false(StandingTableLegacySwiss.isBestOfOne{})
+		end)
+
+		it('ignores the matches without a best of, like walkovers', function()
+			assert.is_true(StandingTableLegacySwiss.isBestOfOne{{bestof = 1}, {bestof = 0}, {bestof = '0'}, {}})
+			assert.is_false(StandingTableLegacySwiss.isBestOfOne{{bestof = 0}, {}})
+			assert.is_false(StandingTableLegacySwiss.isBestOfOne{{bestof = 1}, {bestof = 0}, {bestof = 3}})
+		end)
+
+		it('counts walkover_win as rounds on Bo1 tables', function()
+			local parameters = StandingTableLegacySwiss.getStandardParameter{walkover_win = '7'}
+			local bestOfOne = config.adjustParameters(parameters, {walkover_win = '7'}, true)
+			assert.are_same({nil, '7'}, {bestOfOne.walkovergames, bestOfOne.walkoverrounds})
+			assert.are_equal('7', parameters.walkovergames)
+			assert.are_equal(parameters, config.adjustParameters(parameters, {walkover_win = '7'}, false))
+		end)
+
+		describe('standings input', function()
+			local StandingTable = require('Module:Standings/Table')
+			local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
+
+			---@param id string
+			---@param bestOf integer
+			---@param section string
+			---@return table
+			local function matchRecord(id, bestOf, section)
+				return {
+					match2id = id,
+					bestof = bestOf,
+					extradata = {matchsection = section},
+					match2opponents = {{type = 'team', template = 'team liquid'}, {type = 'team', template = 'heroic'}},
+				}
+			end
+
+			---@param matchRecords table[]
+			---@return table
+			local function standingsInput(matchRecords)
+				stub(mw.ext.LiquipediaDB, 'lpdb', matchRecords)
+				stub(StandingTable, 'fromTemplate')
+				StandingTableLegacySwiss.rainbowsix{rounds = '2', team1 = 'team liquid', team2 = 'heroic',
+					tiebreaker1 = 'buchholz', tiebreaker2 = 'diff', walkover_win = '7'}
+				---@diagnostic disable-next-line: undefined-field
+				local input = StandingTable.fromTemplate.calls[1].vals[1]
+				---@diagnostic disable-next-line: undefined-field
+				StandingTable.fromTemplate:revert()
+				---@diagnostic disable-next-line: undefined-field
+				mw.ext.LiquipediaDB.lpdb:revert()
+				return input
+			end
+
+			before_each(function()
+				TeamTemplateMock.setUp()
+			end)
+
+			after_each(function()
+				TeamTemplateMock.tearDown()
+			end)
+
+			it('passes the Bo1 mapping to the standings', function()
+				local input = standingsInput{matchRecord('a', 1, 'Round 1'), matchRecord('b', 1, 'Round 2')}
+				assert.are_same({'buchholzpoints', 'rounddiff'}, input.tiebreakers)
+				assert.are_same({'7', 'a', 'b'}, {input.walkoverrounds, input.round1.matches, input.round2.matches})
+				assert.is_nil(input.walkovergames)
+			end)
+
+			it('detects the format from the matches of the rounds', function()
+				local bestOfOne = {matchRecord('a', 1, 'Round 1'), matchRecord('b', 1, 'Round 2')}
+				assert.are_same({'buchholzpoints', 'rounddiff'}, standingsInput(Array.extend(bestOfOne,
+					matchRecord('c', 3, 'Round 3'), matchRecord('d', 3, 'Playoffs'))).tiebreakers)
+				assert.are_same({'buchholzpoints', 'gamediff'},
+					standingsInput(Array.extend(bestOfOne, matchRecord('c', 3, 'Round 2'))).tiebreakers)
+			end)
 		end)
 	end)
 end)
