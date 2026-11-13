@@ -35,7 +35,7 @@ function SingleGameDisplay.SingleGameContainer(props)
 	assert(bracketId, 'Missing or invalid matchId')
 	assert(props.gameIdx, 'Missing gameIdx')
 
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId)
+	local match = MatchGroupUtil.fetchMatchWithBracketReset(bracketId, props.matchId)
 
 	if not match then
 		return Html.Fragment{}

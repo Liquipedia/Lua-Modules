@@ -23,7 +23,7 @@ local Parser = {}
 ---@param props {bracketId: string, matchId: string}
 ---@return Renderable
 function CustomMatchSummary.getByMatchId(props)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
+	local match = MatchGroupUtil.fetchMatchWithBracketReset(props.bracketId, props.matchId)
 	---@cast match FFAMatchGroupUtilMatch
 	SummaryHelper.updateMatchOpponents(match)
 	local scoringData = SummaryHelper.createScoringData(match)

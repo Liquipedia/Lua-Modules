@@ -20,7 +20,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@return Widget
 function CustomMatchSummary.getByMatchId(props)
 	---@class FFAMatchGroupUtilMatch
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
+	local match = MatchGroupUtil.fetchMatchWithBracketReset(props.bracketId, props.matchId)
 	SummaryHelper.updateMatchOpponents(match)
 	local scoringData = SummaryHelper.createScoringData(match)
 
