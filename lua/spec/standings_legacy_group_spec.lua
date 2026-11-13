@@ -253,6 +253,11 @@ describe('Standings Legacy Group', function()
 			assert.is_nil(walkoverRounds{})
 		end)
 
+		it('passes cutafter through without the +1 of legacy with a date', function()
+			assert.are_equal('16', StandingTableLegacyGroup.getStandardParameter(
+				{cutafter = '16', date = 'June 1, 2026'}, {}).cutafter)
+		end)
+
 		it('resets the tiebreakers only with a h2hcs tiebreaker', function()
 			local config = StandingTableLegacyGroup.VALORANT_CONFIG
 			local function needsReset(args)
