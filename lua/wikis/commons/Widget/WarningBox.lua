@@ -13,7 +13,7 @@ local Component = Lua.import('Module:Widget/Component')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Html = Lua.import('Module:Widget/Html')
 
----@param props {text: Renderable|Renderable[]?}
+---@param props {text: string|number?}
 ---@return VNode?
 local function WarningBox(props)
 	local text = props.text
