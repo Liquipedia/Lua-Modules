@@ -15,6 +15,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OVERTIME = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 
+---@class TrackmaniaCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
 ---@param args table
