@@ -142,4 +142,40 @@ describe('Standings Table from template', function()
 			assert.is_false(parsedTiebreakerReset(nil))
 		end)
 	end)
+
+	describe('dq handling', function()
+		local StandingsParseLpdb = require('Module:Standings/Parse/Lpdb')
+
+		before_each(function()
+			spy.on(StandingsParseLpdb, 'importFromMatches')
+		end)
+
+		after_each(function()
+			---@diagnostic disable-next-line: undefined-field
+			StandingsParseLpdb.importFromMatches:revert()
+		end)
+
+		---@param dqHandling string?
+		---@return string?
+		local function importedDqHandling(dqHandling)
+			StandingsTable.fromTemplate{
+				tabletype = 'group',
+				dqhandling = dqHandling,
+				round1 = {matches = 'M1'},
+				{type = 'literal', name = 'Alpha', dq = 'true'},
+			}
+			---@diagnostic disable-next-line: undefined-field
+			local calls = StandingsParseLpdb.importFromMatches.calls
+			return calls[#calls].vals[4].dqHandling
+		end
+
+		it('passes the dqhandling input to the import', function()
+			assert.are_equal('ignore', importedDqHandling('ignore'))
+			assert.are_equal('autolose', importedDqHandling('autolose'))
+		end)
+
+		it('counts the matches of disqualified opponents by default', function()
+			assert.is_nil(importedDqHandling(nil))
+		end)
+	end)
 end)

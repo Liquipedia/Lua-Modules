@@ -15,6 +15,11 @@ local StandingsOvertime = Lua.import('Module:Standings/Overtime')
 
 local TiebreakerScope = {}
 
+---@class StandingsTally
+---@field points number?
+---@field match {w: integer, d: integer, l: integer}
+---@field overtime {w: integer, l: integer}?
+
 ---Result of a finished match from the point of view of one of its opponents.
 ---@param match MatchGroupUtilMatch
 ---@param matchOpponent standardOpponent
@@ -31,7 +36,7 @@ end
 ---@param matches MatchGroupUtilMatch[]
 ---@param matchPoints table<string, number>?
 ---@param overtime boolean?
----@return {points: number?, match: {w: integer, d: integer, l: integer}, overtime: {w: integer, l: integer}?}
+---@return StandingsTally
 function TiebreakerScope.tally(opponent, matches, matchPoints, overtime)
 	local points
 	local matchRecord = {w = 0, d = 0, l = 0}

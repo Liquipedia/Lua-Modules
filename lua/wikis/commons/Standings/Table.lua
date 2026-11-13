@@ -43,7 +43,8 @@ local TABLE_TYPES = {ffa = true, swiss = true, group = true}
 
 ---@class StandingTableOpponentData
 ---@field rounds {specialstatus: string, scoreboard: Scoreboard?,
----matches: MatchGroupUtilMatch[], matchId: string, matchOpponentIndex: integer?}[]?
+---matches: MatchGroupUtilMatch[], matchPoints: table<string, number>?, matchId: string,
+---matchOpponentIndex: integer?}[]?
 ---@field opponent standardOpponent
 ---@field matchPoints table<string, number>? # The points of each imported match, keyed by match id
 ---@field aliases standardOpponent[]? # Only for team opponents
@@ -107,6 +108,7 @@ function StandingsTable.parse(args, tableType)
 		importedOpponents, matchPhasesByRound, maxBestOf = StandingsParseLpdb.importFromMatches(
 			rounds, automaticScoreFunction, opponents, {
 				exclusive = exclusiveOpponents,
+				dqHandling = StandingsParseWiki.parseDqHandling(args, tableType),
 				importOpponents = importOpponentFromMatches,
 				overtime = overtime,
 				includeGames = StandingsParser.needsGames(tableType, tiebreakers),
