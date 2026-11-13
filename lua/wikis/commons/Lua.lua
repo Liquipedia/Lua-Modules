@@ -197,4 +197,20 @@ function Lua.withPerfSetup(context, f)
 	return post(f())
 end
 
+---Creates a function that imports `moduleName` only when called and forwards its arguments to `functionName` of it.
+---Useful for modules that export functions from many other modules (e.g. as `#invoke` entry points),
+---so that only the module that is actually called is imported (and its top level executed),
+---instead of every module being imported up front, which costs lua time and memory.
+---
+---Example: `return {foo = Lua.lazyExport('Module:Foo/Bar', 'foo')}`
+---@param moduleName string
+---@param functionName string
+---@param options {requireDevIfEnabled: boolean?, loadData: boolean?}?
+---@return fun(...): any
+function Lua.lazyExport(moduleName, functionName, options)
+	return function(...)
+		return Lua.import(moduleName, options)[functionName](...)
+	end
+end
+
 return Lua
