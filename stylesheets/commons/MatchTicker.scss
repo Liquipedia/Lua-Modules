@@ -38,6 +38,7 @@ Template(s): MatchTicker
 
 	&__opponents {
 		display: flex;
+		min-height: 3.25rem;
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 0.25rem;
