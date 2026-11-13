@@ -89,15 +89,14 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 
 		local gameFilterFunction = CustomMatchSummary.gameFilter or function() return true end
 		---@type fun(game: MatchGroupUtilGame, gameIndex: integer): MatchSummaryGameRowProps
-		local gameRowPropsFunction = FnUtil.curry(
-			CustomMatchSummary.buildGameRowProps or function (matchRecord, game, gameIndex)
-				return {
-					game = game,
-					gameIndex = gameIndex,
-				}
-			end,
-			match
-		)
+		local gameRowPropsFunction = CustomMatchSummary.buildGameRowProps and FnUtil.curry(
+			CustomMatchSummary.buildGameRowProps, match
+		) or function (game, gameIndex)
+			return {
+				game = game,
+				gameIndex = gameIndex,
+			}
+		end
 
 		-- With one set for all matches, or one game per set, it's redundant to show set level info.
 		if #sets > 1 and #sets < #match.games then
