@@ -20,6 +20,7 @@ local TournamentBar = Lua.import('Module:Widget/Match/TournamentBar')
 local MatchButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
 
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
+local PARTY_OPPONENTS_DIVIDER = Html.Hr{classes = {'match-ticker-card__divider'}}
 
 ---@class MatchTickerCardProps
 ---@field match MatchGroupUtilMatch
@@ -67,9 +68,7 @@ function MatchTickerCard.buildMatchOpponentsDisplay(match)
 	end)
 	return Html.Div{
 		classes = {'match-ticker-card__opponents'},
-		children = hasDivider
-			and Array.interleave(opponentsDisplay, Html.Hr{classes = {'match-ticker-card__divider'}})
-			or opponentsDisplay
+		children = hasDivider and Array.interleave(opponentsDisplay, PARTY_OPPONENTS_DIVIDER) or opponentsDisplay
 	}
 end
 
