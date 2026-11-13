@@ -165,12 +165,14 @@ function StandingTableLegacySwiss.parsePoints(args, options)
 	), ', ')
 end
 
+---Matches without maps, like most walkovers, have no best of and don't count
 ---@param matchRecords {bestof: integer|string?}[]
 ---@return boolean
 function StandingTableLegacySwiss.isBestOfOne(matchRecords)
-	return #matchRecords > 0 and Array.all(matchRecords, function(matchRecord)
-		return tonumber(matchRecord.bestof) == 1
-	end)
+	local bestOfs = Array.filter(Array.map(matchRecords, function(matchRecord)
+		return tonumber(matchRecord.bestof) or 0
+	end), function(bestOf) return bestOf > 0 end)
+	return #bestOfs > 0 and Array.all(bestOfs, function(bestOf) return bestOf == 1 end)
 end
 
 ---The matches the standings count, by the opponent, alias and exclusive rules of the import

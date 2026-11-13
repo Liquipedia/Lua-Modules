@@ -577,6 +577,7 @@ describe('Standings Legacy Group', function()
 				assert.are_equal('rounddiff', tiebreakers(nonExclusive, {groupMatch, unrelatedMatch})[2])
 				assert.are_equal('gamediff', tiebreakers(nonExclusive, {groupMatch, outsiderMatch})[2])
 				assert.are_equal('gamediff', tiebreakers({}, {groupMatch, matchRecord('heroic', 'team liquid', 3)})[2])
+				assert.are_equal('rounddiff', tiebreakers({}, {groupMatch, matchRecord('heroic', 'team liquid', 0)})[2])
 				assert.are_equal('rounddiff', tiebreakers({team2alias = 'team secret'}, {
 					groupMatch, matchRecord('team liquid', 'team bds', 3), matchRecord('team liquid', 'team secret', 1),
 				})[2])
