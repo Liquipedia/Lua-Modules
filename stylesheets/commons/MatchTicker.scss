@@ -5,11 +5,13 @@ Template(s): MatchTicker
 .theme--light {
 	--match-ticker-card-background-color: var( --clr-secondary-100 );
 	--match-ticker-card-border-color: var( --clr-on-surface-light-primary-12 );
+	--match-ticker-card-divider-color: var( --clr-on-surface-light-primary-8 );
 }
 
 .theme--dark {
 	--match-ticker-card-background-color: var( --clr-secondary-16 );
 	--match-ticker-card-border-color: var( --clr-on-surface-dark-primary-12 );
+	--match-ticker-card-divider-color: var( --clr-on-surface-dark-primary-8 );
 }
 
 .match-ticker-card {
@@ -46,6 +48,15 @@ Template(s): MatchTicker
 		&:has( > .winner ) > .winner {
 			font-weight: bold;
 		}
+	}
+
+	&__divider {
+		align-self: stretch;
+		height: 0;
+		margin: 0;
+		border: 0;
+		border-top: 1px solid var( --match-ticker-card-divider-color );
+		background: none;
 	}
 
 	&__opponent {

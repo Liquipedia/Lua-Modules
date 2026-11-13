@@ -67,7 +67,9 @@ function MatchTickerCard.buildMatchOpponentsDisplay(match)
 	end)
 	return Html.Div{
 		classes = {'match-ticker-card__opponents'},
-		children = hasDivider and Array.interleave(opponentsDisplay, Html.Hr{}) or opponentsDisplay
+		children = hasDivider
+			and Array.interleave(opponentsDisplay, Html.Hr{classes = {'match-ticker-card__divider'}})
+			or opponentsDisplay
 	}
 end
 
