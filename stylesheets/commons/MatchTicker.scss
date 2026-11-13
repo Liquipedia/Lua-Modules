@@ -68,6 +68,17 @@ Template(s): MatchTicker
 			}
 		}
 
+		.block-players-wrapper {
+			&:has( > :only-child ) {
+				display: contents;
+			}
+
+			&:not( :has( > :only-child ) ) {
+				display: flex;
+				flex-direction: column;
+			}
+		}
+
 		&.winner::after {
 			font-family: "Font Awesome 5 Pro";
 			content: "\f0d9"; /* Unicode for caret-left */
