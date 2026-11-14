@@ -1949,3 +1949,7 @@ body .fieldBox {
 .selflink {
 	font-weight: bold;
 }
+
+.generic-border {
+	border: 0.125rem solid var( --clr-border );
+}
