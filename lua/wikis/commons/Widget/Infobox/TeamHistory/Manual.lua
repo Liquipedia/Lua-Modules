@@ -7,25 +7,19 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local TeamHistoryManualExtension = Lua.import('Module:Infobox/Extension/TeamHistory/Manual')
 local TeamHistoryStoreExtension = Lua.import('Module:Infobox/Extension/TeamHistory/Store')
-local Widget = Lua.import('Module:Widget')
 
+local Component = Lua.import('Module:Widget/Component')
 local TeamHistoryDisplay = Lua.import('Module:Widget/Infobox/TeamHistory/Display')
 
----@class TeamHistoryManualWidget: Widget
----@operator call(table): TeamHistoryManualWidget
----@field props string[]|table
-local TeamHistory = Class.new(Widget)
+---@return Renderable?
+local function TeamHistory(props)
+	if Logic.isEmpty(props) then return end
+	local transferList = TeamHistoryManualExtension.parse(props)
 
----@return Widget?
-function TeamHistory:render()
-	if Logic.isEmpty(self.props) then return end
-	local transferList = TeamHistoryManualExtension.parse(self.props)
-
-	if not Logic.readBool(self.props.disableStorage) then
+	if not Logic.readBool(props.disableStorage) then
 		TeamHistoryStoreExtension.store{
 			transferList = transferList,
 			isFromWikiCode = true,
@@ -39,4 +33,4 @@ function TeamHistory:render()
 	}
 end
 
-return TeamHistory
+return Component.Component(TeamHistory)
