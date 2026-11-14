@@ -33,4 +33,4 @@ local function TeamHistory(props)
 	}
 end
 
-return Component.Component(TeamHistory)
+return Component.component(TeamHistory)

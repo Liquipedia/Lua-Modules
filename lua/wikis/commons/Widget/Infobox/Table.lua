@@ -37,6 +37,10 @@ local defaultProps = {
 local function InfoboxTableWidget(props)
 	local rows = props.rows
 	local options = props.options or {}
+	options = {
+		columns = options.columns or defaultProps.options.columns,
+		columnOptions = options.columnOptions or defaultProps.options.columnOptions,
+	}
 
 	if #rows == 0 then
 		return
