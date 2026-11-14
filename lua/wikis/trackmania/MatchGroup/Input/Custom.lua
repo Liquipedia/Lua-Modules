@@ -11,6 +11,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
@@ -61,10 +62,10 @@ function MatchFunctions.removeUnsetMaps(games)
 end
 
 ---@param opponent MGIParsedOpponent
----@param opponentIndex integer
-function MatchFunctions.adjustOpponent(opponent, opponentIndex)
+---@param _opponentIndex integer
+function MatchFunctions.adjustOpponent(opponent, _opponentIndex)
 	opponent.extradata = CustomMatchGroupInput.getOpponentExtradata(opponent)
-	local advances = Logic.readBoolOrNil(opponent.advances)
+	local advances = Logic.readBoolOrNil(Table.extract(opponent, 'advances'))
 	if advances ~= nil then
 		opponent.extradata.advances = advances
 	end
@@ -135,15 +136,15 @@ end
 --- FFA Match
 
 ---@param opponent MGIParsedOpponent
----@param opponentIndex integer
+---@param _opponentIndex integer
 ---@param match table
 function FfaMatchFunctions.adjustOpponent(opponent, _opponentIndex, match)
-	opponent.placement = tonumber(opponent.placement) or tonumber(opponent.position)
+	opponent.placement = tonumber(opponent.placement) or tonumber(Table.extract(opponent, 'position'))
 	opponent.extradata = opponent.extradata or {}
 	opponent.extradata.winners = tonumber(match.winners) or 2
 	opponent.extradata.manualPlacement = opponent.placement ~= nil
 
-	local advances = Logic.readBoolOrNil(opponent.advances)
+	local advances = Logic.readBoolOrNil(Table.extract(opponent, 'advances'))
 	if advances ~= nil then
 		opponent.extradata.advances = advances
 	end

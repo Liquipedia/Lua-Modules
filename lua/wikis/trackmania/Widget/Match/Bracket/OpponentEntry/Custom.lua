@@ -16,7 +16,7 @@ local Html = Lua.import('Module:Widget/Html')
 local ScoreContainer = Lua.import('Module:Widget/Match/Bracket/ScoreContainer/Custom')
 
 ---@class TrackmaniaBracketOpponentEntryProps: BracketOpponentEntryProps
----@field opponent StandardOpponent
+---@field opponent standardOpponent
 
 ---@param props TrackmaniaBracketOpponentEntryProps
 ---@return VNode
