@@ -9,8 +9,8 @@ local Lua = require('Module:Lua')
 
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local Winner = Lua.import('Module:MatchGroup/Util/Winner')
 
-local BracketScoreContainer = Lua.import('Module:Widget/Match/Bracket/ScoreContainer')
 local BracketScoreDisplay = Lua.import('Module:Widget/Match/Bracket/Score')
 local Component = Lua.import('Module:Widget/Component')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -21,7 +21,12 @@ local function TrackmaniaBracketScoreContainer(props)
 	local opponent = props.opponent
 	local extradata = opponent.extradata or {}
 	if not extradata.additionalScores then
-		return BracketScoreContainer(props)
+		return {
+			BracketScoreDisplay{
+				isWinner = Winner.isWinner(opponent),
+				scoreText = Winner.getScoreText(opponent),
+			},
+		}
 	end
 
 	---@param scoreIndex integer|string

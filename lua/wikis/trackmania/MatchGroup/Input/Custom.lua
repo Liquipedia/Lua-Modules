@@ -36,13 +36,13 @@ function CustomMatchGroupInput.processMatch(match, options)
 	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, FfaMatchFunctions)
 end
 
---- Up to 4-opponents
+--- FFA for 3+ opponents
 
----@param match table
+---@param _match table
 ---@param opponents MGIParsedOpponent[]
 ---@return boolean
-function MatchFunctions.switchToFfa(match, opponents)
-	return #opponents > 4
+function MatchFunctions.switchToFfa(_match, opponents)
+	return #opponents > 2
 end
 
 ---@param match table
@@ -64,6 +64,10 @@ end
 ---@param opponentIndex integer
 function MatchFunctions.adjustOpponent(opponent, opponentIndex)
 	opponent.extradata = CustomMatchGroupInput.getOpponentExtradata(opponent)
+	local advances = Logic.readBoolOrNil(opponent.advances)
+	if advances ~= nil then
+		opponent.extradata.advances = advances
+	end
 	if opponent.extradata.additionalScores then
 		opponent.score = CustomMatchGroupInput._getSetWins(opponent)
 	end
@@ -130,6 +134,32 @@ end
 
 --- FFA Match
 
+---@param opponent MGIParsedOpponent
+---@param opponentIndex integer
+---@param match table
+function FfaMatchFunctions.adjustOpponent(opponent, _opponentIndex, match)
+	opponent.placement = tonumber(opponent.placement) or tonumber(opponent.position)
+	opponent.extradata = opponent.extradata or {}
+	opponent.extradata.winners = tonumber(match.winners) or 2
+	opponent.extradata.manualPlacement = opponent.placement ~= nil
+
+	local advances = Logic.readBoolOrNil(opponent.advances)
+	if advances ~= nil then
+		opponent.extradata.advances = advances
+	end
+end
+
+---@param _match table
+---@param opponent MGIParsedOpponent
+function FfaMatchFunctions.extendOpponentIfFinished(_match, opponent)
+	if opponent.extradata.manualPlacement or opponent.score ~= nil then
+		return
+	end
+
+	opponent.placement = nil
+	opponent.extradata.bg = nil
+end
+
 ---@param match table
 ---@param opponents MGIParsedOpponent[]
 ---@param scoreSettings table
@@ -143,6 +173,13 @@ end
 ---@return fun(opponentIndex: integer): integer?
 function FfaMatchFunctions.calculateMatchScore(opponents, maps)
 	return function(opponentIndex)
+		local hasScoreData = opponents[opponentIndex].extradata.startingpoints ~= nil
+			or Array.any(maps, function(map)
+				return (map.opponents[opponentIndex] or {}).score ~= nil
+			end)
+		if not hasScoreData then
+			return nil
+		end
 		return Array.reduce(Array.map(maps, function(map)
 			return map.opponents[opponentIndex].score or 0
 		end), Operator.add, 0) + (opponents[opponentIndex].extradata.startingpoints or 0)

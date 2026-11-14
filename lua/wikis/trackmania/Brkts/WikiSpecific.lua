@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Table = Lua.import('Module:Table')
 
 local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
+local OpponentEntry = Lua.import('Module:Widget/Match/Bracket/OpponentEntry/Custom')
 
 ---@class TrackmaniaBrktsWikiSpecific: BrktsWikiSpecific
 local WikiSpecific = Table.copy(BaseWikiSpecific)
@@ -24,7 +25,16 @@ function WikiSpecific.getMatchGroupContainer(matchGroupType, maxOpponentCount)
 	end
 
 	local Bracket = Lua.import('Module:MatchGroup/Display/Bracket')
-	return Bracket.BracketContainer
+	return WikiSpecific.adjustBracketContainerConfig(Bracket.BracketContainer)
+end
+
+---@param displayContainer fun(props: {bracketId: string, config: BracketConfigOptions}): Html
+---@return fun(props: {bracketId: string, config: BracketConfigOptions}): Html
+function WikiSpecific.adjustBracketContainerConfig(displayContainer)
+	return function(props)
+		local config = Table.merge(props.config or {}, {OpponentEntry = OpponentEntry})
+		return displayContainer(Table.merge(props, {config = config}))
+	end
 end
 
 return WikiSpecific
