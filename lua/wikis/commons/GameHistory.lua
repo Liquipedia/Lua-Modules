@@ -83,6 +83,8 @@ function GameHistory:readConfig()
 		bansFilter = String.isNotEmpty(args.bans) and Array.parseCommaSeparatedString(args.bans) or nil,
 		patch = String.isNotEmpty(args.patch) and Array.parseCommaSeparatedString(args.patch) or nil,
 		publisherId = String.nilIfEmpty(args.publisherid),
+		showVod = Logic.nilOr(Logic.readBoolOrNil(args.vod), true),
+		showLength = Logic.nilOr(Logic.readBoolOrNil(args.length), true),
 	})
 
 	return self
