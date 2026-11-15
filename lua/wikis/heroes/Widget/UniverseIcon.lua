@@ -7,9 +7,7 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
-
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 
 local IMAGE_FILES = {
@@ -22,14 +20,13 @@ local IMAGE_FILES = {
 }
 IMAGE_FILES.other = IMAGE_FILES.retro
 
----@class HeroesUniverseIcon: Widget
----@operator call(table): HeroesUniverseIcon
----@field props {universe: string?}
-local UniverseIcon = Class.new(Widget)
+---@class HeroesUniverseIconProps
+---@field universe string?
 
----@return Widget?
-function UniverseIcon:render()
-	local file = IMAGE_FILES[(self.props.universe or ''):lower()]
+---@param props HeroesUniverseIconProps
+---@return VNode?
+local function UniverseIcon(props)
+	local file = IMAGE_FILES[(props.universe or ''):lower()]
 	if not file then return end
 	return Image{
 		imageLight = file,
@@ -37,4 +34,4 @@ function UniverseIcon:render()
 	}
 end
 
-return UniverseIcon
+return Component.component(UniverseIcon)
