@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -21,14 +22,14 @@ local Variables = Lua.import('Module:Variables')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local StandingsStorage = {}
-local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
-local SCOREBOARD_FALLBACK = {w = 0, d = 0, l = 0}
 local DISQUALIFIED = 'dq'
+-- TODO: Store as 'group' instead of 'league'
+local STORAGE_TYPE = {group = 'league'}
 
 ---@class StandingsTableStorage
 ---@field standingsindex integer
 ---@field title string?
----@field type 'ffa'|'swiss'|'league'
+---@field type StandingsTableTypes
 ---@field entries StandingEntriesStorage[]
 ---@field matches string[]
 ---@field roundcount integer
@@ -57,7 +58,9 @@ local DISQUALIFIED = 'dq'
 ---@field extradata table
 
 ---@param data table
----@param options? {saveVars?: boolean}
+---@param options? {storeLpdb?: boolean}
+---@return table? standingsTable
+---@return table[]? entries
 function StandingsStorage.run(data, options)
 	if Table.isEmpty(data) then
 		return
@@ -67,16 +70,17 @@ function StandingsStorage.run(data, options)
 		Array.map(data.entries, function (entry) return tonumber (entry.roundindex) end),
 		math.max)
 
+	-- An opponent has an entry for every round, all with the same opponent struct
+	local toLpdbStruct = FnUtil.memoize(Opponent.toLpdbStruct)
 	local entries = Array.map(data.entries, function (entry)
-		return StandingsStorage.entry(entry, data.standingsindex)
+		return StandingsStorage.entry(entry, data.standingsindex, toLpdbStruct)
 	end)
 
-	if StandingsStorage.shouldStoreLpdb() then
-		StandingsStorage.saveLpdb(StandingsStorage.table(data), entries)
+	local standingsTable = StandingsStorage.table(data)
+	if StandingsStorage.shouldStoreLpdb(options) then
+		StandingsStorage.saveLpdb(standingsTable, entries)
 	end
-	if options and options.saveVars then
-		StandingsStorage.saveVars(StandingsStorage.table(data), entries)
-	end
+	return standingsTable, entries
 end
 
 ---@param data table
@@ -104,7 +108,7 @@ function StandingsStorage.table(data)
 
 	local config = {
 		hasdraws = data.hasdraw,
-		hasovertimes = data.hasovertime,
+		hasovertime = data.hasovertime,
 		haspoints = data.haspoints,
 	}
 
@@ -114,17 +118,30 @@ function StandingsStorage.table(data)
 		standingsindex = standingsIndex,
 		title = mw.text.trim(cleanedTitle),
 		section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
-		type = data.type,
+		type = StandingsStorage.toStorageType(data.type),
 		matches = Json.stringify(data.matches or {}, {asArray = true}),
 		config = config,
 		extradata = Table.merge(extradata, data.extradata),
 	}
 end
 
+---@param tableType string
+---@return string
+function StandingsStorage.toStorageType(tableType)
+	return STORAGE_TYPE[tableType] or tableType
+end
+
+---@param storedType string
+---@return string
+function StandingsStorage.fromStorageType(storedType)
+	return Table.getKeyOfValue(STORAGE_TYPE, storedType) or storedType
+end
+
 ---@param entry table
 ---@param standingsIndex number
+---@param toLpdbStruct? fun(opponent: standardOpponent): table
 ---@return table?
-function StandingsStorage.entry(entry, standingsIndex)
+function StandingsStorage.entry(entry, standingsIndex, toLpdbStruct)
 	local roundIndex = tonumber(entry.roundindex)
 	local slotIndex = tonumber(entry.slotindex)
 	local standingsIndexNumber = tonumber(standingsIndex)
@@ -135,15 +152,15 @@ function StandingsStorage.entry(entry, standingsIndex)
 
 	local tournamentContext = Tournament.partialTournamentFromContext()
 
-	local extradata = {
+	local extradata = Table.mergeInto({
 		enddate = entry.enddate,
 		roundfinished = entry.finished,
 		placerange = entry.placerange,
 		slotindex = slotIndex,
 		matchid = entry.matchid,
-	}
+	}, entry.extradata)
 
-	local lpdbEntry = {
+	local lpdbEntry = Table.mergeInto({
 		parent = tournamentContext.pageName or '',
 		standingsindex = standingsIndexNumber,
 		placement = entry.placement or entry.rank,
@@ -160,12 +177,12 @@ function StandingsStorage.entry(entry, standingsIndex)
 		},
 		roundindex = roundIndex,
 		slotindex = slotIndex,
-		extradata = Table.merge(extradata, entry.extradata),
-	}
+		extradata = extradata,
+	}, (toLpdbStruct or Opponent.toLpdbStruct)(entry.opponent))
 
 	lpdbEntry.currentstatus = lpdbEntry.currentstatus or lpdbEntry.definitestatus
 
-	return Table.merge(lpdbEntry, Opponent.toLpdbStruct(entry.opponent))
+	return lpdbEntry
 end
 
 ---@param standingsTable table?
@@ -186,57 +203,24 @@ function StandingsStorage.saveLpdb(standingsTable, standingsEntries)
 	end)
 end
 
----@param standingsTable table?
----@param standingsEntries table[]?
-function StandingsStorage.saveVars(standingsTable, standingsEntries)
-	if standingsTable then
-		-- We have a full standings here for storage, very simple
-		-- Entries may be supplied later
-		local wikiVariable = 'standings2_' .. standingsTable.standingsindex
-		Variables.varDefine(wikiVariable, Json.stringify({
-			standings = standingsTable,
-			entries = standingsEntries or {},
-		}))
-	elseif standingsEntries and standingsEntries[1] then
-		-- Entry that was supplied later on
-		local wikiVariable = 'standings2_' .. standingsEntries[1].standingsindex
-		local standings = Json.parseIfString(Variables.varDefault(wikiVariable))
-		if not standings then
-			mw.log('Could not store standings entry in wiki variables, unable to locate the standings table')
-			return
-		end
-		if not standings.entries then
-			mw.log('Could not store standings entry in wiki variables, invalid format')
-			return
-		end
-		for _, entry in ipairs(standingsEntries) do
-			table.insert(standings.entries, entry)
-		end
-		Variables.varDefine(wikiVariable, Json.stringify(standings))
-	end
-end
-
+---@param options? {storeLpdb?: boolean}
 ---@return boolean
-function StandingsStorage.shouldStoreLpdb()
-	return Lpdb.isStorageEnabled()
+function StandingsStorage.shouldStoreLpdb(options)
+	return Lpdb.isStorageEnabled() and (options or {}).storeLpdb ~= false
 end
 
 ---@param data table
 ---@return table
 function StandingsStorage.toScoreBoardEntry(data)
 	if Table.isEmpty(data) then
-		return Table.copy(SCOREBOARD_FALLBACK)
+		return {w = 0, d = 0, l = 0}
 	end
 
-	local filterScoreBoard = function (key, value)
-		return Table.includes(ALLOWED_SCORE_BOARD_KEYS, key)
-	end
-
-	local scoreBoard = Table.mapValues(Table.filterByKey(data, filterScoreBoard), tonumber)
+	local scoreBoard = {w = tonumber(data.w), d = tonumber(data.d), l = tonumber(data.l)}
 
 	if not scoreBoard.w or not scoreBoard.l then
 		mw.logObject(scoreBoard, 'invalid scoreBoardEntry')
-		return Table.copy(SCOREBOARD_FALLBACK)
+		return {w = 0, d = 0, l = 0}
 	end
 
 	return scoreBoard

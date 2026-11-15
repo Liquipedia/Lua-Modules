@@ -18,7 +18,7 @@ local Span = Html.Span
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
----@param props {participant: TeamParticipant, location: 'card'|'list'}
+---@param props {participant: TeamParticipant, location: 'header'|'content'}
 ---@return VNode?
 local function ParticipantsTeamQualifierInfo(props)
 	local participant = props.participant

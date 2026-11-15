@@ -164,9 +164,8 @@ function MatchFunctions.getExtraData(match, games, opponents)
 		MatchFunctions.getVeto(extradata, vetoMap, match, prefix, vetoIndex)
 	end
 
-	Array.forEach(games, function(_, subGroupIndex)
-		extradata['subgroup' .. subGroupIndex .. 'header'] = Logic.nilIfEmpty(match['submatch' .. subGroupIndex .. 'header'])
-	end)
+	-- TODO: Bot away to standard name
+	Table.mergeInto(extradata, MatchGroupInputUtil.readSetHeaders(match, 'submatch'))
 
 	return extradata
 end

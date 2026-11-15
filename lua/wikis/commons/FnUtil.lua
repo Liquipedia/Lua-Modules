@@ -13,13 +13,22 @@ local FnUtil = {}
 ---@alias memoizableFunction fun(input: any): any
 ---@alias memoizableFunction2 fun(input: any, input2: any): any
 
+local WEAK_KEYS = {__mode = 'k'}
+
+---Cache that drops entries once their key is garbage collected.
+---A value referencing its own key keeps it alive (no ephemerons in Lua 5.1).
+---@return table
+local function weakKeyedCache()
+	return setmetatable({}, WEAK_KEYS)
+end
+
 ---Creates a memoized copy of a 0 or 1 param function.
 ---@generic T:memoizableFunction
 ---@param func T
 ---@return T
 function FnUtil.memoize(func)
-	local called = {}
-	local results = {}
+	local called = weakKeyedCache()
+	local results = weakKeyedCache()
 	local nilCalled = false
 	local nilResult
 	return function(x)
@@ -44,8 +53,8 @@ end
 ---@param func T
 ---@return T
 function FnUtil.memoize2(func)
-	local called = {}
-	local results = {}
+	local called = weakKeyedCache()
+	local results = weakKeyedCache()
 	local xNil = FnUtil.memoize(function(y) return func(nil, y) end)
 	local yNil = FnUtil.memoize(function(x) return func(x, nil) end)
 	return function(x, y)
@@ -55,8 +64,8 @@ function FnUtil.memoize2(func)
 			return xNil(y)
 		else
 			if not called[x] then
-				called[x] = {}
-				results[x] = {}
+				called[x] = weakKeyedCache()
+				results[x] = weakKeyedCache()
 			end
 			if not called[x][y] then
 				called[x][y] = true

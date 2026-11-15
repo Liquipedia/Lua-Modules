@@ -11,27 +11,35 @@ local Class = Lua.import('Module:Class')
 local MathUtil = Lua.import('Module:MathUtil')
 
 local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
+local TiebreakerMatchUtil = Lua.import('Module:Standings/Tiebreaker/Match/Util')
 
 ---@class TiebreakerMatchWinRate : StandingsTiebreaker
 local TiebreakerMatchWinRate = Class.new(TiebreakerInterface)
+
+TiebreakerMatchWinRate.matchRecordOnly = true
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
 ---@return integer
 function TiebreakerMatchWinRate:valueOf(state, opponent)
-	local matchCount = opponent.match.w + opponent.match.l + opponent.match.d
-	return matchCount ~= 0 and (opponent.match.w / matchCount) or 0.5
+	local matches = TiebreakerMatchUtil.getMatches(opponent)
+	local matchCount = matches.w + matches.l + matches.d
+	return matchCount ~= 0 and (matches.w / matchCount) or 0.5
 end
 
 ---@return string
 function TiebreakerMatchWinRate:headerTitle()
-	return 'Match Win %'
+	return 'Win%'
 end
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
 ---@return string
 function TiebreakerMatchWinRate:display(state, opponent)
+	local matches = TiebreakerMatchUtil.getMatches(opponent)
+	if matches.w + matches.l + matches.d == 0 then
+		return '-'
+	end
 	return MathUtil.formatPercentage(self:valueOf(state, opponent), 2)
 end
 

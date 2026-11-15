@@ -6,9 +6,9 @@
 --
 
 local Lua = require('Module:Lua')
-
 local Arguments = Lua.import('Module:Arguments')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local Variables = Lua.import('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -24,11 +24,11 @@ local TIER_VALUE = {8, 4, 2}
 
 -- Template entry point
 ---@param frame Frame
----@return Html
+---@return Renderable
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.syncPlayers = true
-	args.import = true
+	args.import = Logic.nilOr(Logic.readBoolOrNil(args.import), true)
 
 	local prizePool = PrizePool(args)
 

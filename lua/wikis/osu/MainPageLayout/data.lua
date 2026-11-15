@@ -114,7 +114,7 @@ return {
 			},
 		},
 		{
-			file = 'Hammer Trophy of the Six Invitational 2020.jpg',
+			file = 'MOE26 Trophy.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {

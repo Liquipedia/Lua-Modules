@@ -87,7 +87,7 @@ function CustomLegacyPrizePool.overwriteMapOpponents(slot, newData, mergeSlots)
 		return Table.merge(newData, opponentData)
 	end
 
-	local opponents = Array.map(Array.range(1, slot.opponentsInSlot), function(opponentIndex)
+	local opponents = Array.mapRange(1, slot.opponentsInSlot, function(opponentIndex)
 		return mapOpponent(opponentIndex) or {} end)
 
 	return opponents

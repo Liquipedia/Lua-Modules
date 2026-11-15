@@ -7,23 +7,24 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local VodLink = Lua.import('Module:VodLink')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local ImageIcon = Lua.import('Module:Widget/Image/Icon/Image')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Span = Html.Span
 
----@class VodsDropdownButton: Widget
----@operator call(table): VodsDropdownButton
-local VodsDropdownButton = Class.new(Widget)
+---@class VodsDropdownButtonProps
+---@field count integer?
+---@field css? HtmlStyleProps
+---@field attributes? table<string, string|number?>
 
----@return Widget?
-function VodsDropdownButton:render()
-	local vodCount = self.props.count
+---@param props VodsDropdownButtonProps
+---@return VNode?
+local function VodsDropdownButton(props)
+	local vodCount = props.count
 	if not vodCount then
 		return
 	end
@@ -59,8 +60,8 @@ function VodsDropdownButton:render()
 
 	return Span{
 		classes = {'general-collapsible-default-toggle'},
-		css = self.props.css,
-		attributes = self.props.attributes,
+		css = props.css,
+		attributes = props.attributes,
 		children = {
 			showButton,
 			hideButton,
@@ -68,4 +69,4 @@ function VodsDropdownButton:render()
 	}
 end
 
-return VodsDropdownButton
+return Component.component(VodsDropdownButton)

@@ -96,7 +96,7 @@ function MatchPage:renderOverallStats()
 	}
 
 	local overallPlayerData = {
-		teams = Array.map(Array.range(1, 2), function(teamIdx)
+		teams = Array.mapRange(1, 2, function(teamIdx)
 			local team = { players = {} }
 			local opponent = self.opponents[teamIdx]
 			if opponent and opponent.players then

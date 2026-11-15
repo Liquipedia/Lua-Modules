@@ -140,6 +140,7 @@ function Header._makeSizedImage(imageName, size, mode)
 	}
 end
 
+---@param props table
 ---@return VNode?
 function Header._createInfoboxButtons(props)
 	if not props.displayButtons then

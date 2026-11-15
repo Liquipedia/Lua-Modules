@@ -121,7 +121,7 @@ function MapFunctions.getExtraData(match, map, opponents)
 		local prefix = 't' .. opponentIndex
 		extradata[prefix .. 'bantypes'] = Table.copy(banTypes[getFirstSide(opponentIndex)] or {})
 		local maxNumberOfBans = #extradata[prefix .. 'bantypes']
-		extradata[prefix .. 'bans'] = Array.map(Array.range(1, maxNumberOfBans), function(banIndex)
+		extradata[prefix .. 'bans'] = Array.mapRange(1, maxNumberOfBans, function(banIndex)
 			return getCharacterName(map[prefix .. 'ban' .. banIndex]) or ''
 		end)
 	end)

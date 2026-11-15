@@ -11,6 +11,18 @@ local MathUtil = {}
 local ln2 = math.log(2)
 
 --[[
+Returns true if argument is NaN (not a number).
+]]
+---@param x number
+---@return boolean
+function MathUtil.isNaN(x)
+	if type(x) ~= 'number' then
+		return false
+	end
+	return x ~= x
+end
+
+--[[
 Converts the argument to an integer.
 ]]
 ---@param x any
@@ -35,6 +47,21 @@ function MathUtil.isInteger(x)
 		return false
 	end
 	return parsed == math.floor(parsed)
+end
+
+--[[
+A `nil`-safe version of `math.max`
+]]
+---@param max number?
+---@param value number?
+---@return number?
+function MathUtil.nilSafeMax(max, value)
+	if max == nil then
+		return value
+	elseif value == nil then
+		return max
+	end
+	return math.max(max, value)
 end
 
 --[[

@@ -60,6 +60,7 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	local map = mw.ext.valorantdb.getMatchDetails(mapInput.matchid)
 
 	assert(map, mapInput.matchid .. ' could not be retrieved from API.')
+	assert(not map.error, (map.error or '') .. ' (matchid=' .. mapInput.matchid .. ')')
 
 	local shouldReverse = Logic.readBool(mapInput.reversed)
 

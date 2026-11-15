@@ -9,7 +9,9 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Game = Lua.import('Module:Game')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -36,6 +38,18 @@ function CustomLeague.run(frame)
 	return league:createInfobox()
 end
 
+---Creates the cell for one of the parsed list arguments, e.g. `Mode` or `Styles`
+---@param name string
+---@param values string[]
+---@return Renderable?
+function CustomLeague:_createListCell(name, values)
+	if Logic.isEmpty(values) then
+		return nil
+	end
+
+	return Cell{name = name .. (#values > 1 and 's' or ''), children = values}
+end
+
 ---@param id string
 ---@param widgets Renderable[]
 ---@return Renderable[]
@@ -48,13 +62,19 @@ function CustomInjector:parse(id, widgets)
 			name = 'Game' .. (#games > 1 and 's' or ''),
 			children = Array.map(games,
 					function(game)
-						local info = Game.raw{game = game}
-						if not info then
+						local gameInfo = Game.raw{game = game}
+						if not gameInfo then
 							return 'Unknown game, check Module:Info.'
 						end
-						return Page.makeInternalLink(info.name, info.link)
+						return Page.makeInternalLink(gameInfo.name, gameInfo.link)
 					end)
 		})
+
+		local data = self.caller.data
+		Array.appendWith(widgets,
+			self.caller:_createListCell('Mode', data.modes),
+			self.caller:_createListCell('Style', data.styles)
+		)
 	elseif id == 'custom' then
 		Array.appendWith(widgets,
 			Cell{name = 'Number of Players', children = {args.player_number}},
@@ -78,6 +98,13 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
+	self.data.modes = Array.map(self:getAllArgsForBase(self.args, 'mode'),
+		function(input) return Info.modes[string.lower(input)] end)
+	self.data.mode = self.data.modes[1] or self.data.mode
+
+	self.data.styles = Array.map(self:getAllArgsForBase(self.args, 'style'),
+		function(input) return Info.styles[string.lower(input)] end)
+
 	self.data.publishertier = self.data.publishertier or Array.any(self:getAllArgsForBase(args, 'organizer'),
 		function(organizer)
 			return organizer:find('Nadeo', 1, true) or organizer:find('Ubisoft', 1, true)
@@ -88,12 +115,16 @@ end
 ---@return string[]
 function CustomLeague:getWikiCategories(args)
 	local categories = Array.map(self:getAllArgsForBase(args, 'game'), function(game)
-		local info = Game.raw{game = game}
+		local gameInfo = Game.raw{game = game}
 
-		return info and (info.link .. ' Competitions') or nil
+		return gameInfo and (gameInfo.link .. ' Competitions') or nil
 	end)
 
-	return Array.append(categories, self.data.publishertier and 'Ubisoft Tournaments' or nil)
+	return Array.append(categories,
+		self.data.publishertier and 'Ubisoft Tournaments' or nil,
+		Logic.isEmpty(self.data.modes) and 'Tournaments without mode' or nil,
+		Logic.isEmpty(self.data.styles) and 'Tournaments without style' or nil
+	)
 end
 
 ---@param lpdbData table
@@ -104,6 +135,14 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.extradata.circuit = args.circuit
 	lpdbData.extradata.circuittier = args.circuittier
+
+	if Logic.isNotEmpty(self.data.modes) then
+		lpdbData.extradata.modes = self.data.modes
+	end
+
+	if Logic.isNotEmpty(self.data.styles) then
+		lpdbData.extradata.styles = self.data.styles
+	end
 
 	return lpdbData
 end

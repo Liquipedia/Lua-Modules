@@ -72,6 +72,7 @@ function SquadController.execute(squadData, adjustLpdb)
 end
 
 ---@param frame Frame
+---@param adjustLpdb function?
 ---@return Widget
 function SquadController.run(frame, adjustLpdb)
 	if not Info.config.squads.allowManual then
@@ -87,6 +88,7 @@ end
 ---@param squadStatus SquadStatus
 ---@param squadType SquadType
 ---@param customTitle string?
+---@param adjustLpdb function?
 ---@return Widget
 function SquadController.runAuto(players, squadStatus, squadType, customTitle, adjustLpdb)
 	-- Temporary until all wikis have enabled the new version of automated squads

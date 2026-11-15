@@ -7,7 +7,7 @@ FROM mcr.microsoft.com/playwright:v1.63.0-noble
 # Keep these in sync with the versions used by the GitHub workflows
 ARG LUA_VERSION=5.1.5
 ARG LUAROCKS_VERSION=3.11.1
-ARG LUALS_VERSION=3.18.2
+ARG LUALS_VERSION=3.19.2
 # Not in requirements.txt on purpose: only needed to run scripts/proxy_lp.py,
 # which is a local-development tool rather than a dependency of the repo
 ARG MITMPROXY_VERSION=12.2.3
@@ -46,7 +46,7 @@ RUN luarocks install --lua-version=5.1 busted \
 	&& luarocks install --lua-version=5.1 luacheck
 
 # lua-language-server, used by the "luals-code-style" CI job and by the Lua
-# editor extension
+# editor extension. It writes meta/ and log/ at runtime, as the non-root user
 RUN arch="$(dpkg --print-architecture)" \
 	&& case "${arch}" in \
 		amd64) luals_arch=x64 ;; \
@@ -56,7 +56,22 @@ RUN arch="$(dpkg --print-architecture)" \
 	&& mkdir -p /opt/luals \
 	&& curl -fsSL "https://github.com/LuaLS/lua-language-server/releases/download/${LUALS_VERSION}/lua-language-server-${LUALS_VERSION}-linux-${luals_arch}.tar.gz" \
 		| tar -xz -C /opt/luals \
+	&& mkdir -p /opt/luals/log \
+	&& chmod -R a+rwX /opt/luals/meta /opt/luals/log \
 	&& ln -s /opt/luals/bin/lua-language-server /usr/local/bin/lua-language-server
+
+# LuaLS addons for .luarc.json, pinned to the LuaLS/LLS-Addons commits
+# Not via the addon manager: it is VS Code only, manual, and lost on rebuild
+ARG LUALS_ADDON_BUSTED=5ed85d0e016a5eb5eca097aa52905eedf1b180f1
+ARG LUALS_ADDON_LUASSERT=d3528bb679302cbfdedefabb37064515ab95f7b9
+ENV LUALS_ADDONS=/opt/luals-addons
+RUN for addon in "busted:${LUALS_ADDON_BUSTED}" "luassert:${LUALS_ADDON_LUASSERT}"; do \
+		name="${addon%%:*}" \
+		&& mkdir -p "${LUALS_ADDONS}/${name}/module" \
+		&& curl -fsSL "https://github.com/LuaCATS/${name}/archive/${addon#*:}.tar.gz" \
+			| tar -xz --strip-components=1 -C "${LUALS_ADDONS}/${name}/module" \
+		|| exit 1; \
+	done
 
 # Python lives in a venv so it is writable without fighting PEP 668. The
 # requirements themselves, ruff included, are installed by post-create.sh, so

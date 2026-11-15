@@ -9,15 +9,21 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Operator = Lua.import('Module:Operator')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local String = Lua.import('Module:StringUtils')
 
 local Eco = Lua.import('Module:ChessOpenings')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
+
+---@class ChessMatchParser: MatchParserInterface
 local MatchFunctions = {
 	DEFAULT_MODE = 'solo',
 	getBestOf = MatchGroupInputUtil.getBestOf,
 }
+
+---@class ChessMapParser: MapParserInterface
 local MapFunctions = {}
 
 ---@param match table
@@ -70,6 +76,47 @@ end
 --
 -- map related functions
 --
+
+---@param map table
+---@param opponent MGIParsedOpponent
+---@param opponentIndex integer
+---@return table[]?
+function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+	if opponent.type == Opponent.literal then
+		return
+	elseif opponent.type == Opponent.solo then
+		local player = opponent.match2players[1]
+		return {
+			{
+				player = player.name,
+				displayName = player.displayname,
+				flag = player.flag,
+			},
+		}
+	end
+	local mapPlayersInput = Array.mapIndexes(function (index)
+		local mapPlayerInput = map['t' .. opponentIndex .. 'p' .. index]
+		if String.isEmpty(mapPlayerInput) then
+			return nil
+		end
+		return {player = map['t' .. opponentIndex .. 'p' .. index]}
+	end)
+	return MatchGroupInputUtil.parseMapPlayers(
+		opponent.match2players,
+		mapPlayersInput,
+		function (playerIndex)
+			local participant = mapPlayersInput[playerIndex]
+			return participant and {name = participant.player} or nil
+		end,
+		function (playerIndex, playerIdData, playerInputData)
+			return {
+				player = playerIdData.name or playerInputData.link or playerInputData.name,
+				displayName = playerIdData.displayname or playerInputData.name,
+				flag = playerIdData.flag,
+			}
+		end
+	)
+end
 
 ---@param match table
 ---@param map table

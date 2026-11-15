@@ -8,20 +8,21 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Component = Lua.import('Module:Widget/Component')
-local Label = Lua.import('Module:Widget/Basic/Label')
 local MatchOverview = Lua.import('Module:Widget/Standings/MatchOverview')
+local StandingsCells = Lua.import('Module:Widget/Standings/Cells')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local StandingsDisplayUtil = Lua.import('Module:Standings/DisplayUtil')
 
 local Helpers = {}
 
----@param props {standings?: StandingsModel}
+---@param props {standings?: StandingsModel, width: number?}
 ---@return Renderable?
 local function StandingsSwiss(props)
 	local standings = props.standings
@@ -30,10 +31,12 @@ local function StandingsSwiss(props)
 	end
 
 	local lastRound = standings.rounds[#standings.rounds]
-	local statsToShow = Helpers.statsColumnsToShow(standings)
+	local statsToShow = StandingsDisplayUtil.statsToShow(standings)
+	local boldStatTitle = StandingsDisplayUtil.boldStatTitle(standings)
 
 	return TableWidgets.Table{
 		classes = {'standings-swiss'},
+		css = {width = props.width and (props.width .. 'px') or nil},
 		title = Logic.nilIfEmpty(standings.title),
 		columns = Helpers.buildColumnDefinitions(standings, statsToShow),
 		children = WidgetUtil.collect(
@@ -41,7 +44,7 @@ local function StandingsSwiss(props)
 			Helpers.headerRow(standings, statsToShow),
 			-- Rows
 			TableWidgets.TableBody{children = Array.map(lastRound.opponents, function(slot)
-				return Helpers.createRow(standings, slot, statsToShow)
+				return Helpers.createRow(standings, slot, statsToShow, boldStatTitle)
 			end)}
 		),
 		striped = false
@@ -50,113 +53,86 @@ end
 
 ---@private
 ---@param standings StandingsModel
----@return {id: string, title: string?}[]
-function Helpers.statsColumnsToShow(standings)
-	local seenStatsBefore = {}
-	return Array.filter(standings.additionalStats, function(tiebreaker)
-		if not tiebreaker.title then
-			return false
-		end
-		if seenStatsBefore[tiebreaker.id] then
-			return false
-		end
-		seenStatsBefore[tiebreaker.id] = true
-		return true
-	end)
-end
-
----@private
----@param standings StandingsModel
----@param statsToShow {id: string, title: string?}[]
----@return table[]
+---@param statsToShow StandingsAdditionalStat[]
+---@return Table2ColumnDef[]
 function Helpers.buildColumnDefinitions(standings, statsToShow)
 	return WidgetUtil.collect(
 		{align = 'left'},
-		{align = 'left'},
-		Array.map(statsToShow, function(tiebreaker)
-			return {align = 'center'}
-		end),
+		StandingsCells.participantColumn(),
+		StandingsCells.statColumns(statsToShow),
 		Array.rep({align = 'center'}, #standings.rounds)
 	)
 end
 
 ---@private
 ---@param standings StandingsModel
----@param statsToShow {id: string, title: string?}[]
+---@param statsToShow StandingsAdditionalStat[]
 ---@return Renderable
 function Helpers.headerRow(standings, statsToShow)
-	---@param text string?
-	---@return Renderable
-	local makeHeaderCell = function(text)
-		return TableWidgets.CellHeader{children = text}
-	end
-
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
-			makeHeaderCell('#'),
-			makeHeaderCell('Participant'),
-			Array.map(statsToShow, function(tiebreaker, index)
-				return makeHeaderCell(tiebreaker.title)
-			end),
+			StandingsCells.header('#'),
+			StandingsCells.header('Participant'),
+			StandingsCells.statHeaders(statsToShow),
 			Array.map(standings.rounds, function(round)
-				return makeHeaderCell(round.title)
+				return StandingsCells.header(round.title)
 			end)
 		)}
 	}}
 end
 
+---@param props {match: MatchGroupUtilMatch, opponentIndex: integer}
+---@return standardOpponent?
+function Helpers.getOpposingOpponent(props)
+	local match = props.match
+	local opponentIndex = tonumber(props.opponentIndex)
+	if not match or not opponentIndex or #match.opponents ~= 2 then
+		return
+	end
+
+	local opponent = match.opponents[opponentIndex]
+	if not opponent then
+		return
+	end
+
+	return Array.find(match.opponents, function(matchOpponent) return matchOpponent ~= opponent end)
+end
+
 ---@private
 ---@param standings StandingsModel
 ---@param slot StandingsEntryModel
+---@param statsToShow StandingsAdditionalStat[]
+---@param boldStatTitle string?
 ---@return Renderable
-function Helpers.createRow(standings, slot, statsToShow)
+function Helpers.createRow(standings, slot, statsToShow, boldStatTitle)
 	return TableWidgets.Row{
 		attributes = {['data-position-status'] = slot.positionStatus},
 		children = WidgetUtil.collect(
-			TableWidgets.Cell{
-				children = Label{
-					children = slot.placement,
-					attributes = {['data-placement-type'] = Logic.nilIfEmpty(slot.definitiveStatus)},
-					labelScheme = 'placement',
-				},
-			},
-			TableWidgets.Cell{
-				children = OpponentDisplay.BlockOpponent{
-					opponent = slot.opponent,
-					overflow = 'ellipsis',
-					teamStyle = 'hybrid',
-					showPlayerTeam = true,
-				}
-			},
-			Array.map(statsToShow, function(tiebreaker, tiebreakerIndex)
-				return TableWidgets.Cell{
-					css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil},
-					children = slot.additionalStatsValues[tiebreaker.id] and slot.additionalStatsValues[tiebreaker.id].display or ''
-				}
-			end),
+			StandingsCells.placement(slot),
+			StandingsCells.participant(slot),
+			StandingsCells.stats(slot, statsToShow, boldStatTitle),
 			Array.map(standings.rounds, function(columnRound)
 				local entry = Array.find(columnRound.opponents, function(columnSlot)
 					return Opponent.same(columnSlot.opponent, slot.opponent)
 				end)
-				if not entry then
-					return TableWidgets.Cell{}
-				end
-				local match = entry.match
-				if not match then
-					return TableWidgets.Cell{}
+				if not entry or not entry.match or not entry.matchOpponentIndex then
+					return TableWidgets.Cell{classes = {'standings-swiss-match'}}
 				end
 
-				local opposingOpponentIndex = Array.indexOf(match.opponents, function(opponent)
-					return not Opponent.same(entry.opponent, opponent)
-				end)
-				if not entry.match.opponents[opposingOpponentIndex] then
-					return TableWidgets.Cell{}
-				end
+				local opposingOpponent = Helpers.getOpposingOpponent{
+					match = entry.match,
+					opponentIndex = entry.matchOpponentIndex,
+				}
 
-				return TableWidgets.Cell{children = MatchOverview{
-					match = match,
-					showOpponent = opposingOpponentIndex,
-				}}
+				return TableWidgets.Cell(
+					DisplayHelper.addOpponentHighlightToProps({
+						classes = {'standings-swiss-match'},
+						children = MatchOverview{
+							match = entry.match,
+							opponentIndex = entry.matchOpponentIndex,
+						},
+					}, opposingOpponent)
+				)
 			end)
 		),
 	}

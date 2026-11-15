@@ -113,8 +113,10 @@ return {
 		},
 		standings = {
 			alwaysShowStats = {
-				swiss = {'matchdiff', 'rounddiff'},
+				swiss = {'matchscore', 'roundscore'},
+				group = {'matchscore', 'roundscore'},
 			},
+			overtime = {regulationRounds = 12},
 		},
 	},
 	defaultRoundPrecision = 0,

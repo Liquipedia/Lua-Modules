@@ -115,7 +115,7 @@ function MediaList._buildConditions(args)
 	local additionalConditions = ConditionTree(args.booleanOperator)
 
 	additionalConditions:add(Array.map(args.subjects, function (subject)
-		return MediaList._buildMultiKeyCondition(subject, 'extradata_subject', 20)
+		return MediaList._buildMultiKeyCondition(subject, 'extradata_subject', 30)
 	end))
 
 	if args.org then

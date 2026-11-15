@@ -119,7 +119,7 @@ function MatchPage:populateGames()
 				function(player)
 					if Logic.isDeepEmpty(player) then return end
 					return Table.mergeInto(player, {
-						items = Array.map(Array.range(1, ITEMS_TO_SHOW), function(idx)
+						items = Array.mapRange(1, ITEMS_TO_SHOW, function(idx)
 							return player.items[idx] or DEFAULT_ITEM
 						end),
 						runeKeystone = Array.filter(player.runes.primary.runes or {}, function(rune)

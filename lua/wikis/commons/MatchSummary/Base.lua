@@ -16,6 +16,8 @@ local VodLink = Lua.import('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local DropdownContainer = Lua.import('Module:Widget/Basic/Dropdown/Container')
+local DropdownItem = Lua.import('Module:Widget/Basic/Dropdown/Item')
 local Html = Lua.import('Module:Widget/Html')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchHeader = Lua.import('Module:Widget/Match/Header')
@@ -30,14 +32,26 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 ---@field createGames? fun(match: MatchGroupUtilMatch): Renderable|Renderable[] @deprecated (but better than createBody)
 ---@field createGame? fun(game: table, gameIndex: integer): Renderable|Renderable[] @deprecated
 ---@field GameRow? Component<MatchSummaryGameRowProps>
+---@field buildGameRowProps? fun(
+---match: MatchGroupUtilMatch, game: MatchGroupUtilGame, gameIndex: integer): T: MatchSummaryGameRowProps
+---@field GameDetail? fun(game: MatchGroupUtilGame, index: integer): Renderable?
+---@field gameFilter? fun(game: MatchGroupUtilGame): boolean
 ---@field createFooter? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
+
+---@class MatchSummaryOptions
+---@field teamStyle? teamStyle
+---@field width? string|fun(match: MatchGroupUtilMatch): string?
+---@field noScore? boolean
+---@field maxBans? integer
+---@field showDetail? fun(match: MatchGroupUtilMatch): boolean
+---@field mapVetoPreprocessOptions {game: string?, emptyMapDisplay: string?, useLpdb: boolean?}?
 
 ---@class MatchSummary
 local MatchSummary = {}
 
 ---Default header function
 ---@param match MatchGroupUtilMatch
----@param options {teamStyle: teamStyle?}?
+---@param options MatchSummaryOptions?
 ---@return VNode
 function MatchSummary.createHeader(match, options)
 	options = options or {}
@@ -58,7 +72,7 @@ end
 -- Default body function
 ---@param match MatchGroupUtilMatch
 ---@param CustomMatchSummary CustomMatchSummaryInterface
----@param options {maxBans: integer?}?
+---@param options MatchSummaryOptions?
 ---@return Renderable[]
 function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 	options = options or {}
@@ -68,10 +82,22 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 	local createGames = CustomMatchSummary.createGames
 	local createGame = CustomMatchSummary.createGame
 	local GameRow = CustomMatchSummary.GameRow
+	local GameDetail = CustomMatchSummary.GameDetail
 
 	local nodes
 	if GameRow then
 		local sets = match.submatches or {}
+
+		local gameFilterFunction = CustomMatchSummary.gameFilter or function() return true end
+		---@type fun(game: MatchGroupUtilGame, gameIndex: integer): MatchSummaryGameRowProps
+		local gameRowPropsFunction = CustomMatchSummary.buildGameRowProps and FnUtil.curry(
+			CustomMatchSummary.buildGameRowProps, match
+		) or function (game, gameIndex)
+			return {
+				game = game,
+				gameIndex = gameIndex,
+			}
+		end
 
 		-- With one set for all matches, or one game per set, it's redundant to show set level info.
 		if #sets > 1 and #sets < #match.games then
@@ -80,14 +106,20 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 					gamesSectionName = set.header or ('Set ' .. set.subgroup),
 					gamesSectionResult = MatchSummaryWidgets.SetHeader{set = set},
 					children = Array.map(set.games, function(game, gameIndex)
-						return GameRow{game = game, gameIndex = gameIndex}
+						if not gameFilterFunction(game) then
+							return
+						end
+						return GameRow(gameRowPropsFunction(game, gameIndex))
 					end)
 				}
 			end)
 		else
 			nodes = MatchSummaryWidgets.GamesContainer{
 				children = Array.map(match.games, function(game, gameIndex)
-					return GameRow{game = game, gameIndex = gameIndex}
+					if not gameFilterFunction(game) then
+						return
+					end
+					return GameRow(gameRowPropsFunction(game, gameIndex))
 				end)
 			}
 		end
@@ -97,12 +129,107 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 		nodes = Array.map(match.games, createGame)
 	end
 
+	nodes = MatchSummary._createBodyWithDetail(match, nodes, GameDetail, options)
+
 	return WidgetUtil.collect(
 		nodes,
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(
+			match.extradata.mapveto, options.mapVetoPreprocessOptions or {game = match.game}
+		)),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
 	)
+end
+
+---@private
+---@param match MatchGroupUtilMatch
+---@param overview? Renderable|Renderable[]
+---@param gameDetail? fun(game: MatchGroupUtilGame, index: integer): Renderable?
+---@param options MatchSummaryOptions
+---@return Renderable|Renderable[]?
+function MatchSummary._createBodyWithDetail(match, overview, gameDetail, options)
+	if gameDetail == nil then
+		return overview
+	end
+
+	local showDetail = options.showDetail or function () return true end
+
+	if not showDetail(match) then
+		return overview
+	end
+
+	---@type VNode[]
+	local dropdownLabels = {
+		Html.Div{
+			attributes = {['data-toggle-area-content'] = 1},
+			children = 'Overview',
+		}
+	}
+	---@type VNode[]
+	local dropdownItems = {
+		DropdownItem{
+			classes = {'toggle-area-button'},
+			attributes = {['data-toggle-area-btn'] = 1},
+			children = 'Overview'
+		}
+	}
+
+	---@type VNode[]
+	local children = {
+		Html.Div{
+			attributes = {['data-toggle-area-content'] = 1},
+			children = overview,
+		},
+	}
+
+	Array.forEach(match.games, function (game, index)
+		local gameDetailDisplay = gameDetail(game, index)
+		if gameDetailDisplay == nil then
+			return
+		end
+
+		table.insert(dropdownLabels, Html.Div{
+			attributes = {['data-toggle-area-content'] = index + 1},
+			children = {'Game ', index},
+		})
+
+		table.insert(dropdownItems, DropdownItem{
+			classes = {'toggle-area-button'},
+			attributes = {['data-toggle-area-btn'] = index + 1},
+			children = {'Game ', index}
+		})
+
+		table.insert(children, Html.Div{
+			attributes = {['data-toggle-area-content'] = index + 1},
+			children = gameDetailDisplay,
+		})
+	end)
+
+	if #children == 1 then
+		return overview
+	end
+
+	return Html.Div{
+		classes = {'brkts-popup-game-detail-container', 'toggle-area', 'toggle-area-1'},
+		attributes = {['data-toggle-area'] = 1},
+		children = WidgetUtil.collect(
+			Html.Div{
+				classes = {'brkts-popup-game-detail-container-header'},
+				children = {
+					Html.B{
+						children = 'Game details'
+					},
+					DropdownContainer{
+						alignRight = true,
+						variant = 'inline',
+						label = dropdownLabels,
+						children = dropdownItems
+					}
+				}
+			},
+			children
+		)
+	}
 end
 
 ---Default footer function
@@ -142,7 +269,7 @@ end
 ---Default createMatch function for usage in Custom MatchSummary
 ---@param matchData MatchGroupUtilMatch?
 ---@param CustomMatchSummary CustomMatchSummaryInterface
----@param options {teamStyle: teamStyle?, noScore: boolean?, maxBans: integer?}?
+---@param options MatchSummaryOptions?
 ---@return VNode?
 function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	if not matchData then
@@ -178,8 +305,7 @@ end
 ---Default getByMatchId function for usage in Custom MatchSummary
 ---@param CustomMatchSummary CustomMatchSummaryInterface
 ---@param args table
----@param options {teamStyle:teamStyle?, width: (fun(match: MatchGroupUtilMatch):string?)|string?,
----noScore:boolean?, maxBans: integer?}?
+---@param options MatchSummaryOptions?
 ---@return VNode
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(

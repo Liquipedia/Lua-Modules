@@ -27,6 +27,7 @@ local TIER_TYPE_MODIFIER = {Showmatch = 0.01, Monthly = 0.4, Weekly = 0.2, Daily
 ---@return VNode
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
+	args.allGroupsUseWdl = true
 	local prizePool = PrizePool(args):create()
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())

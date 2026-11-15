@@ -81,7 +81,7 @@ return {
 	title = 'NARAKA: BLADEPOINT',
 	navigation = {
 		{
-			file = 'KPL Dream Team at HoK Midseason Invitational 2024.jpg',
+			file = 'SR Team at J Cup 2025.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -90,7 +90,7 @@ return {
 			},
 		},
 		{
-			file = 'TOP Tian at the 2024 Esports World Cup.jpg',
+			file = 'Mike_at_the_NBPL_2024_Spring_Season.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -108,7 +108,7 @@ return {
 			},
 		},
 		{
-			file = 'PVX ShunMi at the ALGS Birmingham Championship.jpg',
+			file = 'Winner shirt at J Cup 2023.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -117,7 +117,7 @@ return {
 			},
 		},
 		{
-			file = 'Jenn_Lee_poses_with_Trophy_at_VCT_Master_Shanghai.jpg',
+			file = 'SR.Spider at EWC.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
@@ -133,15 +133,19 @@ return {
 				sizes = {xxl = 5, xxxl = 6},
 				children = {
 					{
-						mobileOrder = 2,
-						content = CONTENT.thisDay,
+						mobileOrder = 1,
+						content = CONTENT.specialEvents,
 					},
 					{
 						mobileOrder = 3,
-						content = CONTENT.transfers,
+						content = CONTENT.thisDay,
 					},
 					{
 						mobileOrder = 4,
+						content = CONTENT.transfers,
+					},
+					{
+						mobileOrder = 5,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -150,7 +154,7 @@ return {
 				sizes = {xxl = 7, xxxl = 6},
 				children = {
 					{
-						mobileOrder = 1,
+						mobileOrder = 2,
 						children = {
 							{
 								children = {
@@ -185,7 +189,7 @@ return {
 			{
 				children = {
 					{
-						mobileOrder = 5,
+						mobileOrder = 6,
 						content = CONTENT.theGame,
 					},
 				},

@@ -298,15 +298,15 @@ function CustomLeague:_getMaps()
 	for prefix, mapInput in Table.iter.pairsByPrefix(args, 'map', {strict = true}) do
 		local mode = String.isNotEmpty(args[prefix .. 'mode']) and MapMode.get({args[prefix .. 'mode']}) or nil
 
-		mapInput = mw.text.split(mapInput, '|', true)
+		local splitMap = mw.text.split(mapInput, '|', true)
 		local display, link
 
 		if String.isNotEmpty(args[prefix .. 'link']) then
 			link = args[prefix .. 'link']
-			display = mapInput[1]
+			display = splitMap[1]
 		else
-			link = mapInput[1]
-			display = mapInput[2] or mapInput[1]
+			link = splitMap[1]
+			display = splitMap[2] or splitMap[1]
 		end
 		link = mw.ext.TeamLiquidIntegration.resolve_redirect(link)
 		if link == display then

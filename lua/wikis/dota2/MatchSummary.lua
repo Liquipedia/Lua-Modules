@@ -7,17 +7,12 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
-
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local MAX_NUM_BANS = 7
 local NUM_HEROES_PICK = 5
 local STATUS_NOT_PLAYED = 'notplayed'
-
----@class Dota2CustomMatchSummary: CustomMatchSummaryInterface
-local CustomMatchSummary = {}
 
 ---@class Dota2MatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
 local GameRowComponentProps = {
@@ -26,6 +21,11 @@ local GameRowComponentProps = {
 
 local Dota2MatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
 
+---@class Dota2CustomMatchSummary: CustomMatchSummaryInterface
+local CustomMatchSummary = {
+	GameRow = Dota2MatchSummaryGameRow,
+}
+
 ---@param args table
 ---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
@@ -33,17 +33,10 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 end
 
----@param match MatchGroupUtilMatch
----@return VNode
-function CustomMatchSummary.createGames(match)
-	return MatchSummaryWidgets.GamesContainer{
-		children = Array.map(match.games, function (game, gameIndex)
-			if game.status == STATUS_NOT_PLAYED then
-				return
-			end
-			return Dota2MatchSummaryGameRow{game = game, gameIndex = gameIndex}
-		end)
-	}
+---@param game MatchGroupUtilGame
+---@return boolean
+function CustomMatchSummary.gameFilter(game)
+	return game.status ~= STATUS_NOT_PLAYED
 end
 
 ---@param props MatchSummaryGameRowProps

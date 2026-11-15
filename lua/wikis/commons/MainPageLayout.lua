@@ -31,6 +31,7 @@ local Html = Lua.import('Module:Widget/Html')
 local InMemoryOf = Lua.import('Module:Widget/MainPage/InMemoryOf')
 local NavigationCard = Lua.import('Module:Widget/MainPage/NavigationCard')
 local PanelWidget = Lua.import('Module:Widget/Panel')
+local ErrorBoundary = Lua.import('Module:Widget/ErrorBoundary')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -59,21 +60,18 @@ function MainPageLayout.make(frame)
 			Page.setDisplayTitle{frame = frame, title = WikiData.title},
 			Html.Div{
 				classes = {'header-banner'},
-				children = {
-					Html.Div{
-						classes = {'header-banner__logo'},
-						children = {
-							Html.Div{
-								classes = {'logo--light-theme'},
-								children = { Image.display(WikiData.banner.lightmode, nil, {size = 200, link = ''}) }
-							},
-							Html.Div{
-								classes = {'logo--dark-theme'},
-								children = { Image.display(WikiData.banner.darkmode, nil, {size = 200, link = ''}) }
-							}
+				children = Html.Div{
+					classes = {'header-banner__logo'},
+					children = {
+						Html.Div{
+							classes = {'logo--light-theme'},
+							children = { Image.display(WikiData.banner.lightmode, nil, {size = 200, link = ''}) }
 						},
+						Html.Div{
+							classes = {'logo--dark-theme'},
+							children = { Image.display(WikiData.banner.darkmode, nil, {size = 200, link = ''}) }
+						}
 					},
-					frame:callParserFunction('#searchbox', ''),
 				}
 			},
 			MainPageLayout._makeInMemoryOfDisplay(args),
@@ -148,9 +146,16 @@ function MainPageLayout._makeCells(cells)
 					}
 				end
 
-				table.insert(content, AnalyticsWidget{
-					analyticsName = AnalyticsMapping[item.content.boxid],
-					children = {contentElement}
+				table.insert(content, ErrorBoundary {
+					children = {
+						AnalyticsWidget{
+							analyticsName = AnalyticsMapping[item.content.boxid],
+							children = {contentElement},
+						}
+					},
+					fallback = function()
+						return Html.Div{children = 'Failed to load this element'}
+					end,
 				})
 			end
 			if item.children then

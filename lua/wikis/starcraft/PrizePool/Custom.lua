@@ -15,6 +15,7 @@ local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local PrizePool = Lua.import('Module:PrizePool')
 local Table = Lua.import('Module:Table')
+local Tournament = Lua.import('Module:Tournament')
 local Variables = Lua.import('Module:Variables')
 
 ---@class StarcraftPrizePoolLpdbInjector: LpdbInjector
@@ -68,7 +69,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.weight = CustomPrizePool._weight(lpdbData, placement)
 
 	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, {
-		seriesnumber = CustomPrizePool._seriesNumber(),
 		mod = Variables.varDefault('tournament_mod'),
 	})
 
@@ -88,26 +88,25 @@ function CustomPrizePool._overwriteObjectName(lpdbData)
 	return lpdbData.objectName
 end
 
----@return string
-function CustomPrizePool._seriesNumber()
-	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
-	return seriesNumber and string.format('%05d', seriesNumber) or ''
-end
-
 ---@param lpdbData placement
 ---@param placement PrizePoolPlacement
 ---@return number
 function CustomPrizePool._weight(lpdbData, placement)
-	local offlineFactor = lpdbData.type == 'Offline' and 1.5 or 1
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
+	local offlineFactor = tournamentContext.type == 'Offline' and 1.5 or 1
 
 	local placementFactor = (placement.placeStart + placement.placeEnd) / 2
 
-	local tierFactor = (lpdbData.liquipediatiertype == 'Qualifier' or lpdbData.liquipediatiertype == 'Showmatch') and 0.5
-		or TIER_TO_FACTOR[tonumber(lpdbData.liquipediatier)]
+	local isQualifierOrShowMatch = tournamentContext.liquipediaTierType == 'Qualifier'
+		or tournamentContext.liquipediaTierType == 'Showmatch'
+
+	local tierFactor = isQualifierOrShowMatch and 0.5
+		or TIER_TO_FACTOR[tonumber(tournamentContext.liquipediaTier)]
 		or 1
 
-	local baseWeight = (lpdbData.liquipediatiertype == 'Qualifier' or lpdbData.liquipediatiertype == 'Showmatch') and 0
-		or TIER_TO_BASE_WEIGHT[tonumber(lpdbData.liquipediatier)]
+	local baseWeight = isQualifierOrShowMatch and 0
+		or TIER_TO_BASE_WEIGHT[tonumber(tournamentContext.liquipediaTier)]
 		or 10
 
 	return offlineFactor * tierFactor * (lpdbData.individualprizemoney + baseWeight / placementFactor) / placementFactor

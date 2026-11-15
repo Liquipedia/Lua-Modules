@@ -6,10 +6,14 @@ on:
       luadevenv:
         description: 'Lua Dev Enviroment name'
         required: true
-      includecommons:
-        description: 'Include Commons'
-        type: boolean
-        default: true
+      wikis:
+        description: 'Wikis to remove the dev env from'
+        type: choice
+        options:
+          - all
+          - all except commons
+          - commons only
+        default: all
       includesubenvs:
         description: 'Include sub envs (e.g. hjp includes hjp2)'
         type: boolean
@@ -40,7 +44,7 @@ jobs:
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
           LUA_DEV_ENV_NAME: "dev/${{ github.event.inputs.luadevenv }}"
-          INCLUDE_COMMONS: ${{ github.event.inputs.includecommons }}
+          WIKI_SCOPE: ${{ github.event.inputs.wikis }}
           INCLUDE_SUB_ENVS: ${{ github.event.inputs.includesubenvs }}
           PYTHONUNBUFFERED: 1
         run: python3 ./scripts/remove_dev.py

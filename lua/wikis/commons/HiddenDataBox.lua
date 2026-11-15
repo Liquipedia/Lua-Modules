@@ -162,8 +162,13 @@ end
 ---@param date string
 function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 	if Opponent.typeIsParty(placement.opponenttype) then
+		local opponent = Opponent.fromLpdbStruct(placement)
+		-- set `'noteam'` as fallback team so that the sync doesn't try to query in `PlayerExt.syncTeam`
+		Array.forEach(opponent.players, function(player)
+			player.team = player.team or 'noteam'
+		end)
 		---Opponent.resolve with syncPlayer enabled sets wiki variables as needed
-		Opponent.resolve(Opponent.fromLpdbStruct(placement), date, {syncPlayer = true})
+		Opponent.resolve(opponent, date, {syncPlayer = true})
 		return
 	end
 

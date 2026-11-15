@@ -170,14 +170,17 @@ end
 ---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
-	local extradata = {}
+	local extradata = {
+		nonstandard = Logic.readBool(match.nonstandard),
+	}
 
 	for prefix, mapVeto in Table.iter.pairsByPrefix(match, 'veto') do
 		extradata[prefix] = (MapsData[mapVeto:lower()] or {}).name or mapVeto
 		extradata[prefix .. 'by'] = match[prefix .. 'by']
 	end
 
-	Table.mergeInto(extradata, Table.filterByKey(match, function(key) return key:match('subgroup%d+header') end))
+	-- TODO: Bot away special prefix
+	Table.mergeInto(extradata, MatchGroupInputUtil.readSetHeaders(match, 'subgroup'))
 
 	return extradata
 end

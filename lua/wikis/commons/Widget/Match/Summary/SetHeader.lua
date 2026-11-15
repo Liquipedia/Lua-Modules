@@ -41,6 +41,9 @@ local function MatchSetHeader(props)
 				scoreLeft = scoreLeft + 1
 			elseif game.winner == 2 then
 				scoreRight = scoreRight + 1
+			elseif game.winner == 0 then
+				scoreLeft = scoreLeft + 0.5
+				scoreRight = scoreRight + 0.5
 			end
 		end)
 	end

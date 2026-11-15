@@ -115,7 +115,6 @@ return {
 		'openrec',
 		'steamtv',
 		'yandexefir',
-		'zhanqitv',
 		'rooter',
 	},
 }

@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Ordinal = Lua.import('Module:Ordinal')
+local String = Lua.import('Module:StringUtils')
 local Timezone = Lua.import('Module:Timezone')
 local Variables = Lua.import('Module:Variables')
 
@@ -61,7 +62,7 @@ function DateExt.readTimestamp(dateInput)
 
 	-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
 	local tzTemplateOffset = dateInput:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
-	local datePart = (mw.text.split(dateInput, '<', true)[1])
+	local datePart = String.splitText(dateInput, '<', true)[1]
 		:gsub('-', '')
 		:gsub('T', '')
 	local timestampString = mw.getContentLanguage():formatDate('U', datePart .. (tzTemplateOffset or ''))

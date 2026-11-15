@@ -18,6 +18,7 @@ local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
 local ListWidgets = Lua.import('Module:Widget/List')
+local QueryLink = Lua.import('Module:Widget/QueryLink')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class TransfersListParameters
@@ -71,21 +72,10 @@ local function TransfersList(props)
 					children = ListWidgets.Unordered{children = WidgetUtil.collect(
 						Link { children = 'See more transfers', link = props.transferPortal },
 						Logic.readBool(props.transferQuery) and Html.Span {
-							children = {
-								Html.Span {
-									classes = { 'hide-when-lighthouse' },
-									children = Link {
-										children = 'Transfer query',
-										link = 'Special:RunQuery/Transfer history'
-									}
-								},
-								Html.Span {
-									classes = { 'hide-when-mediawiki' },
-									children = Link {
-										children = 'Transfer query',
-										link = 'Special:RunQuery/Transfer query'
-									}
-								},
+							children = QueryLink{
+								mediawikiForm = 'Transfer history',
+								form = 'Transfer query',
+								display = 'Transfer query',
 							}
 						} or nil,
 						Html.Span {

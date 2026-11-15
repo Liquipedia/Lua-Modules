@@ -352,7 +352,7 @@ function MatchGroupInputUtil.readMvp(match, opponents)
 	local players = mw.text.split(match.mvp, ',')
 
 	-- parse the players to get their information
-	opponents = Logic.isNotDeepEmpty(opponents) and opponents or MatchGroupUtil.normalizeSubtype(match, 'opponent')
+	opponents = Logic.isNotDeepEmpty(opponents) and opponents or MatchGroupInputUtil.normalizeSubtype(match, 'opponent')
 	local parsedPlayers = Array.map(players, function(player, playerIndex)
 		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(player, '|')[1]):gsub(' ', '_')
 		for _, opponent in ipairs(opponents) do
@@ -944,18 +944,29 @@ end
 ---@param playerLink string?
 ---@return integer?
 function MatchGroupInputUtil.findPlayerId(players, playerInput, playerLink)
-	if Logic.isEmpty(playerInput) and Logic.isEmpty(playerLink) then
+	local inputIsEmpty = String.isEmpty(playerInput)
+	local linkIsEmpty = String.isEmpty(playerLink)
+
+	if inputIsEmpty and linkIsEmpty then
 		return
 	end
 
-	local playerLinks = Array.map(players, Operator.property('name'))
-	local playerIndex = Array.indexOf(playerLinks, FnUtil.curry(Operator.eq, playerLink))
+	local playerIndex = 0
+
+	if not linkIsEmpty then
+		playerIndex = Array.indexOf(players, function (player)
+			return player.name == playerLink
+		end)
+	end
 	if playerIndex > 0 then
 		return playerIndex
 	end
 
-	local playerDisplayNames = Array.map(players, Operator.property('displayname'))
-	playerIndex = Array.indexOf(playerDisplayNames, FnUtil.curry(Operator.eq, playerInput))
+	if not inputIsEmpty then
+		playerIndex = Array.indexOf(players, function (player)
+			return player.displayname == playerInput
+		end)
+	end
 	if playerIndex > 0 then
 		return playerIndex
 	end
@@ -1195,6 +1206,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 	match.stream = Streams.processStreams(match)
 	match.extradata = Table.merge(
 		{casters = MatchGroupInputUtil.readCasters(match, {sortCasters = Info.config.match2.sortCasters})},
+		MatchGroupInputUtil.readSetHeaders(matchInput),
 		Parser.getExtraData and Parser.getExtraData(match, games, opponents) or {}
 	)
 
@@ -1266,7 +1278,7 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 
 		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
 
-		map.subgroup = tonumber(map.subgroup) or nextSubGroup
+		map.subgroup = tonumber(map.set) or tonumber(map.subgroup) or nextSubGroup
 		nextSubGroup = map.subgroup + 1
 
 		if Parser.getMapName then
@@ -1743,6 +1755,60 @@ function MatchGroupInputUtil.getMatchDate(matchParser, matchInput)
 	end
 
 	return earliestGameDateStruct
+end
+
+---Get subtypes (opponent, map) as a list
+---@param match table
+---@param type 'opponent'|'map'
+---@return any[]
+function MatchGroupInputUtil.normalizeSubtype(match, type)
+	local listNames
+	if type == 'opponent' then
+		listNames = {'match2opponents', 'opponents'}
+	elseif type == 'map' then
+		listNames = {'match2games', 'games'}
+	else
+		error('Invalid subtype: ' .. type)
+	end
+	for _, listName in ipairs(listNames) do
+		if match[listName] then
+			return match[listName]
+		end
+	end
+
+	return {}
+end
+
+---@param bracketid string?
+---@param matchid string?
+---@return string?
+function MatchGroupInputUtil.getStandaloneId(bracketid, matchid)
+	if not matchid or not bracketid then
+		return nil
+	end
+	return 'MATCH_' .. bracketid .. '_' .. matchid
+end
+
+---Reads the headers of sets within a match.
+---@param args table<string, any>
+---@param prefix string?
+---@return table<string, string>
+function MatchGroupInputUtil.readSetHeaders(args, prefix)
+	-- Temporary during migration from custom input to default 'set' prefix, hence code duplicate
+	if prefix then
+		local setHeaders = Table.filterByKey(args, function(key) return key:match(prefix .. '%d+header') end)
+		if Logic.isNotEmpty(setHeaders) then
+			return Table.map(setHeaders, function(key, value)
+				return 'subgroup' .. (key:sub(#prefix + 1)), value
+			end)
+		end
+	end
+
+	local defaultPrefix = 'set'
+	local setHeaders = Table.filterByKey(args, function(key) return key:match(defaultPrefix .. '%d+header') end)
+	return Table.map(setHeaders, function(key, value)
+		return 'subgroup' .. (key:sub(#defaultPrefix + 1)), value
+	end)
 end
 
 return MatchGroupInputUtil
