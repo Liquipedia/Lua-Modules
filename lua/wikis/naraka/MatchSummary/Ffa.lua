@@ -16,6 +16,34 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local function startingPoints(opponent)
+	return tonumber((opponent.extradata or {}).startingpoints) or 0
+end
+
+local function adjustMatchColumns(defaultColumns)
+	local columns = {}
+	for _, column in ipairs(defaultColumns) do
+		table.insert(columns, column)
+		if column.id == 'matchPoints' then
+			table.insert(columns, {
+				id = 'startingPoints',
+				class = 'cell--total-points',
+				show = function(match)
+					for _, opponent in ipairs(match.opponents) do
+						if startingPoints(opponent) ~= 0 then
+							return true
+						end
+					end
+					return false
+				end,
+				header = {value = 'Pre-Match Points', mobileValue = 'Pre.'},
+				row = {value = startingPoints},
+			})
+		end
+	end
+	return columns
+end
+
 ---@param props {bracketId: string, matchId: string}
 ---@return Renderable
 function CustomMatchSummary.getByMatchId(props)
@@ -33,7 +61,7 @@ function CustomMatchSummary.getByMatchId(props)
 				MatchSummaryWidgets.GamesSchedule{match = match},
 				MatchSummaryWidgets.PointsDistribution{scores = scoringData},
 				MatchSummaryWidgets.MatchInformation(match),
-				SummaryHelper.standardMatch(match)
+				SummaryHelper.standardMatch(match, {adjustMatchColumns = adjustMatchColumns})
 			)
 		}
 	}}
