@@ -149,24 +149,45 @@ end
 
 ---@return ConditionTree
 function CharacterGameTable:_buildCharacterConditions()
-	local character = self.character
+	return self:_buildCharacterListConditions(self.getCharacterKey, self.config.numPicks, {self.character})
+end
+
+---Matches ANY of `characters` in ANY slot (up to `maxNumber`) of EITHER opponent.
+---@protected
+---@param keyMaker fun(self, opponentIndex: number, playerIndex: number): string
+---@param maxNumber number
+---@param characters string[]
+---@return ConditionTree
+function CharacterGameTable:_buildCharacterListConditions(keyMaker, maxNumber, characters)
 	local characterConditions = ConditionTree(BooleanOperator.any)
 
-	---@param opponentIndex number
-	local addCondtions = function (opponentIndex)
-		Array.forEach(Array.range(1, self.config.numPicks), function (index)
-			characterConditions:add(ConditionNode(
-			ColumnName(self:getCharacterKey(opponentIndex, index), 'extradata'),
-			Comparator.eq,
-			character
-		))
+	Array.forEach({1, 2}, function (opponentIndex)
+		Array.forEach(Array.range(1, maxNumber), function (index)
+			Array.forEach(characters, function (character)
+				characterConditions:add(ConditionNode(
+					ColumnName(keyMaker(self, opponentIndex, index), 'extradata'),
+					Comparator.eq,
+					character
+				))
+			end)
 		end)
-	end
-
-	addCondtions(1)
-	addCondtions(2)
+	end)
 
 	return characterConditions
+end
+
+---@protected
+---@param game CharacterGameTableGame
+---@param opponentIndex number
+---@param keyMaker fun(self, opponentIndex: number, playerIndex: number): string
+---@param maxNumber number
+---@param characters string[]
+---@return boolean
+function CharacterGameTable:_sideHasAnyCharacter(game, opponentIndex, keyMaker, maxNumber, characters)
+	return Array.any(Array.range(1, maxNumber), function (index)
+		local value = game.extradata[keyMaker(self, opponentIndex, index)]
+		return value ~= nil and Array.any(characters, function (character) return character == value end)
+	end)
 end
 
 ---@return ConditionTree
@@ -292,9 +313,43 @@ end
 
 ---@protected
 ---@return table[]
-function CharacterGameTable:buildColumnDefinitions()
+function CharacterGameTable:buildResultColumnDefinitions()
 	local config = self.config
 	local isCharTable = self.isCharacterTable
+	return WidgetUtil.collect(
+		not isCharTable and {
+			{align = 'center'},
+			{align = 'center'}
+		} or nil,
+		{
+			align = 'center',
+			unsortable = true,
+		},
+		config.showBans and {
+			align = 'center',
+			unsortable = true
+		} or nil,
+		isCharTable and {
+			{align = 'center'},
+			{align = 'center'},
+			{align = 'center'},
+			{align = 'center'},
+		} or nil,
+		{
+			align = 'center',
+			unsortable = true,
+		},
+		config.showBans and {
+			align = 'center',
+			unsortable = true
+		} or nil
+	)
+end
+
+---@protected
+---@return table[]
+function CharacterGameTable:buildColumnDefinitions()
+	local config = self.config
 	return WidgetUtil.collect(
 		{
 			-- Date column
@@ -312,34 +367,7 @@ function CharacterGameTable:buildColumnDefinitions()
 			-- Tournament column
 			align = 'left',
 		},
-		config.showResult and WidgetUtil.collect(
-			not isCharTable and {
-				{align = 'center'},
-				{align = 'center'}
-			} or nil,
-			{
-				align = 'center',
-				unsortable = true,
-			},
-			config.showBans and {
-				align = 'center',
-				unsortable = true
-			} or nil,
-			isCharTable and {
-				{align = 'center'},
-				{align = 'center'},
-				{align = 'center'},
-				{align = 'center'},
-			} or nil,
-			{
-				align = 'center',
-				unsortable = true,
-			},
-			config.showBans and {
-				align = 'center',
-				unsortable = true
-			} or nil
-		) or nil,
+		config.showResult and self:buildResultColumnDefinitions() or nil,
 		config.showLength and {
 			align = 'right',
 		} or nil,
@@ -357,6 +385,32 @@ function CharacterGameTable:buildColumnDefinitions()
 	)
 end
 
+---@protected
+---@return Widget[]
+function CharacterGameTable:buildResultHeaderCells()
+	local config = self.config
+	local isCharTable = self.isCharacterTable
+
+	return WidgetUtil.collect(
+		not isCharTable and {
+			TableWidgets.CellHeader{unsortable = true},
+			TableWidgets.CellHeader{children = 'vs.'},
+		} or nil,
+		TableWidgets.CellHeader{children = 'Picks'},
+		config.showBans and TableWidgets.CellHeader{children = 'Bans'} or nil,
+		isCharTable and {
+			TableWidgets.CellHeader{},
+			TableWidgets.CellHeader{
+				colspan = 2,
+				children = 'Score'
+			},
+			TableWidgets.CellHeader{},
+		} or nil,
+		TableWidgets.CellHeader{children = 'vs. Picks'},
+		config.showBans and TableWidgets.CellHeader{children = 'vs. Bans'} or nil
+	)
+end
+
 ---@return Widget
 function CharacterGameTable:headerRow()
 	---@param text string?
@@ -366,7 +420,6 @@ function CharacterGameTable:headerRow()
 	end
 
 	local config = self.config
-	local isCharTable = self.isCharacterTable
 
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
@@ -376,24 +429,7 @@ function CharacterGameTable:headerRow()
 			config.displayGameIcons and makeHeaderCell() or nil,
 			config.showIcon and makeHeaderCell() or nil,
 			makeHeaderCell('Tournament'),
-			config.showResult and WidgetUtil.collect(
-				not isCharTable and {
-					TableWidgets.CellHeader{unsortable = true},
-					makeHeaderCell('vs.'),
-				} or nil,
-				makeHeaderCell('Picks'),
-				config.showBans and makeHeaderCell('Bans') or nil,
-				isCharTable and {
-					makeHeaderCell(),
-					TableWidgets.CellHeader{
-						colspan = 2,
-						children = 'Score'
-					},
-					makeHeaderCell(),
-				} or nil,
-				makeHeaderCell('vs. Picks'),
-				config.showBans and makeHeaderCell('vs. Bans') or nil
-			) or nil,
+			config.showResult and self:buildResultHeaderCells() or nil,
 			config.showLength and makeHeaderCell('Length') or nil,
 			config.showPatch and makeHeaderCell('Patch') or nil,
 			config.showVod and TableWidgets.CellHeader{
