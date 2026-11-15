@@ -39,10 +39,10 @@ end
 
 --- FFA for 3+ opponents
 
----@param _match table
+---@param match table
 ---@param opponents MGIParsedOpponent[]
 ---@return boolean
-function MatchFunctions.switchToFfa(_match, opponents)
+function MatchFunctions.switchToFfa(match, opponents)
 	return #opponents > 2
 end
 
@@ -62,8 +62,8 @@ function MatchFunctions.removeUnsetMaps(games)
 end
 
 ---@param opponent MGIParsedOpponent
----@param _opponentIndex integer
-function MatchFunctions.adjustOpponent(opponent, _opponentIndex)
+---@param opponentIndex integer
+function MatchFunctions.adjustOpponent(opponent, opponentIndex)
 	opponent.extradata = CustomMatchGroupInput.getOpponentExtradata(opponent)
 	local advances = Logic.readBoolOrNil(Table.extract(opponent, 'advances'))
 	if advances ~= nil then
@@ -136,9 +136,9 @@ end
 --- FFA Match
 
 ---@param opponent MGIParsedOpponent
----@param _opponentIndex integer
+---@param opponentIndex integer
 ---@param match table
-function FfaMatchFunctions.adjustOpponent(opponent, _opponentIndex, match)
+function FfaMatchFunctions.adjustOpponent(opponent, opponentIndex, match)
 	opponent.placement = tonumber(opponent.placement) or tonumber(Table.extract(opponent, 'position'))
 	opponent.extradata = opponent.extradata or {}
 	opponent.extradata.winners = tonumber(match.winners) or 2
@@ -150,9 +150,9 @@ function FfaMatchFunctions.adjustOpponent(opponent, _opponentIndex, match)
 	end
 end
 
----@param _match table
+---@param match table
 ---@param opponent MGIParsedOpponent
-function FfaMatchFunctions.extendOpponentIfFinished(_match, opponent)
+function FfaMatchFunctions.extendOpponentIfFinished(match, opponent)
 	if opponent.extradata.manualPlacement or opponent.score ~= nil then
 		return
 	end
