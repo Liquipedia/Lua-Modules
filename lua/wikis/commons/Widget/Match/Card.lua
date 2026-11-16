@@ -51,7 +51,7 @@ MatchCard.defaultProps = {
 	variant = 'horizontal',
 }
 
----@return Widget?
+---@return Renderable?
 function MatchCard:render()
 	local match = self.props.match
 	local gameData = self.props.gameData
@@ -97,7 +97,7 @@ end
 
 ---@param match MatchGroupUtilMatch
 ---@param gameData MatchTickerGameData?
----@return Widget
+---@return Renderable
 function MatchCard:_renderVertical(match, gameData)
 	local isFfa = #match.opponents > 2
 
