@@ -220,9 +220,9 @@ describe('Standings Legacy Next', function()
 
 		it('defaults to a quarter up, a quarter stayup and half down', function()
 			assert.are_equal('1-2=up,3-4=stayup,5-1000=down', StandingTableLegacyNext.parseBgs({}, 8))
-			assert.are_equal('1-2=up,3-100=down', StandingTableLegacyNext.parseBgs({}, 4))
-			assert.are_equal('1=up,2-100=down', StandingTableLegacyNext.parseBgs({}, 2))
-			assert.are_equal('1-100=up', StandingTableLegacyNext.parseBgs({}, 1))
+			assert.are_equal('1-2=up,3-1000=down', StandingTableLegacyNext.parseBgs({}, 4))
+			assert.are_equal('1=up,2-1000=down', StandingTableLegacyNext.parseBgs({}, 2))
+			assert.are_equal('1-1000=up', StandingTableLegacyNext.parseBgs({}, 1))
 		end)
 
 		it('produces bgs the standings can read', function()
