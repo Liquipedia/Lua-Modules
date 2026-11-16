@@ -528,14 +528,13 @@ function StandingsParser.resolveManualStatus(statuses, roundNumber)
 	end
 end
 
----Overrides the statuses of opponents with a manually set definite status.
----A definite status is also the current status, so both are set.
----@param opponentEntries {manualDefiniteStatus: string?, currentstatus: string?, definitestatus: string?}[]
+---Overrides the definite status of opponents with a manually set one.
+---The current status stays the bg of the slot.
+---@param opponentEntries {manualDefiniteStatus: string?, definitestatus: string?}[]
 function StandingsParser.applyManualStatuses(opponentEntries)
 	Array.forEach(opponentEntries, function(opponent)
 		local manualStatus = opponent.manualDefiniteStatus
 		if manualStatus then
-			opponent.currentstatus = manualStatus
 			opponent.definitestatus = manualStatus
 		end
 	end)

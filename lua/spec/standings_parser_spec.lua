@@ -1274,13 +1274,13 @@ describe('Standings Parser', function()
 			assert.are_equal('up', findEntry(standingsTable.entries, 'Alpha', 3).definitestatus)
 		end)
 
-		it('sets the current status as well', function()
+		it('keeps the current status of the slot', function()
 			local standingsTable = StandingsParser.parse(
 				THREE_ROUNDS_TWO_FINISHED, makeOpponents({[2] = 'up'}), BGS, nil, {}, 'ffa', TIEBREAKERS)
 
 			local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
 			assert.are_equal(3, alpha2.placement)
-			assert.are_equal('up', alpha2.currentstatus)
+			assert.are_equal('down', alpha2.currentstatus)
 			assert.are_equal('up', alpha2.definitestatus)
 		end)
 
@@ -1289,7 +1289,7 @@ describe('Standings Parser', function()
 				TWO_FINISHED_ROUNDS, makeOpponents({[1] = 'stay'}), BGS, nil, {}, 'ffa', TIEBREAKERS)
 
 			local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
-			assert.are_equal('stay', alpha2.currentstatus)
+			assert.are_equal('down', alpha2.currentstatus)
 			assert.are_equal('stay', alpha2.definitestatus)
 		end)
 
@@ -1301,7 +1301,7 @@ describe('Standings Parser', function()
 				TWO_FINISHED_ROUNDS, opponents, BGS, nil, {}, 'ffa', {'full.disqualified', 'full.points', 'full.manual'})
 
 			local alpha1 = findEntry(standingsTable.entries, 'Alpha', 1)
-			assert.are_equal('up', alpha1.currentstatus)
+			assert.are_equal('down', alpha1.currentstatus)
 			assert.are_equal('up', alpha1.definitestatus)
 			local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
 			assert.are_equal('dq', alpha2.currentstatus)
