@@ -115,8 +115,9 @@ function MatchTickerCardOpponents.buildFfaParticipantsPreview(match)
 				children = Array.map(iconOpponents, function (opponent)
 					return Html.Div{
 						classes = {'match-ticker-card__participant-icon'},
-						children = OpponentDisplay.InlineTeamContainer{
+						children = OpponentDisplay.BlockTeamContainer{
 							template = opponent.template,
+							showLink = false,
 							style = 'icon',
 						},
 					}
