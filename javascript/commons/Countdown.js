@@ -339,9 +339,7 @@ liquipedia.countdown = {
 		}
 		return result;
 	},
-	getCorrectTimeZoneString: function ( dateObject, format ) {
-		format = format || 'full';
-
+	getCorrectTimeZoneString: function ( dateObject, format = 'full' ) {
 		const userTime = {
 			dateObjectYear: dateObject.getFullYear(),
 			dateObjectMonth: dateObject.getMonth(),
