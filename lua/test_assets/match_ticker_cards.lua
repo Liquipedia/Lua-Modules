@@ -16,7 +16,7 @@ local TOURNAMENT = {
 local PAST_DATE = '2024-06-01 12:00:00'
 local PAST_TIMESTAMP = 1717243200
 local FUTURE_DATE = '2099-06-01 12:00:00'
-local FUTURE_TIMESTAMP = 4084430400
+local FUTURE_TIMESTAMP = 4083998400
 
 ---@param matchFields table
 ---@return match2
