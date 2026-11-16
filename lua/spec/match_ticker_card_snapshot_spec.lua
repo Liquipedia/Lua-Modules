@@ -20,7 +20,10 @@ insulate('Match Ticker Card', function()
 		local MatchRecords = require('test_assets.match_ticker_cards')
 
 		local cards = Array.map(MatchRecords, function(record)
-			return MatchTickerCard{match = MatchGroupUtil.matchFromRecord(record)}
+			return Html.Div{
+				css = {width = '15.625rem'},
+				children = MatchTickerCard{match = MatchGroupUtil.matchFromRecord(record)}
+			}
 		end)
 
 		GoldenTest('match_ticker_card', tostring(Switch{
