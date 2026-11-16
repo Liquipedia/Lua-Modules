@@ -53,7 +53,13 @@ function MatchCard:render()
 	local highlight = highlightCondition(match, {onlyHighlightOnValue = self.props.onlyHighlightOnValue})
 
 	if self.props.variant == 'vertical' then
-		return self:_renderVertical(match, gameData)
+		return MatchTickerCard{
+			match = match,
+			gameData = gameData,
+			onlyHighlightOnValue = self.props.onlyHighlightOnValue,
+			hideTournament = self.props.hideTournament,
+			displayGameIcons = self.props.displayGameIcons,
+		}
 	end
 
 	return self:_renderHorizontal(match, gameData, highlight)
@@ -82,19 +88,6 @@ function MatchCard:_renderHorizontal(match, gameData, highlight)
 			MatchHeaderFfa{match = match --[[@as FFAMatchGroupUtilMatch]]},
 			ButtonBar{match = match}
 		)
-	}
-end
-
----@param match MatchGroupUtilMatch
----@param gameData MatchTickerGameData?
----@return Renderable
-function MatchCard:_renderVertical(match, gameData)
-	return MatchTickerCard{
-		match = match,
-		gameData = gameData,
-		onlyHighlightOnValue = self.props.onlyHighlightOnValue,
-		hideTournament = self.props.hideTournament,
-		displayGameIcons = self.props.displayGameIcons,
 	}
 end
 
