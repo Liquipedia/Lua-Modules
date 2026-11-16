@@ -253,6 +253,15 @@ describe('Standings Legacy Group', function()
 			assert.is_nil(walkoverRounds{})
 		end)
 
+		it('maps ignoredq to excluding the matches of disqualified teams', function()
+			local function dqHandling(args)
+				return StandingTableLegacyGroup.getStandardParameter(args, {}).dqhandling
+			end
+			assert.are_equal('exclude', dqHandling{ignoredq = 'true'})
+			assert.is_nil(dqHandling{ignoredq = 'false'})
+			assert.is_nil(dqHandling{})
+		end)
+
 		it('maps cutafter to collapseafter without the +1 of legacy with a date', function()
 			assert.are_equal('16', StandingTableLegacyGroup.getStandardParameter(
 				{cutafter = '16', date = 'June 1, 2026'}, {}).collapseafter)
