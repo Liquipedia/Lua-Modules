@@ -11,6 +11,7 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -24,10 +25,12 @@ local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
 local CharacterGameTable = Lua.import('Module:GameTable/Character/Custom')
+local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local DEFAULT_LIMIT = 100
 local GAME_QUERY_LIMIT = 5000
 
 ---@class GameHistoryConfig: CharacterGameTableConfig
@@ -36,6 +39,7 @@ local GAME_QUERY_LIMIT = 5000
 ---@field bansFilter string[]?
 ---@field patch string[]?
 ---@field publisherId string?
+---@field matchGroupsSpec MatchGroupsSpec?
 
 ---@class GameHistory: CharacterGameTable
 ---@operator call(table): GameHistory
@@ -43,6 +47,7 @@ local GAME_QUERY_LIMIT = 5000
 local GameHistory = Class.new(CharacterGameTable, function (self)
 	local args = self.args
 	args.tableMode = Opponent.team
+	args.limit = args.limit or DEFAULT_LIMIT
 	self.isCharacterTable = false
 	self.isPickedByRequired = false
 
@@ -72,6 +77,27 @@ function GameHistory:_readOpponents(mode)
 	end)
 end
 
+---@param record MatchGroupUtilMatch
+---@return MatchTableMatchResult?
+function GameHistory:resultFromRecord(record)
+	if #record.opponents ~= 2 or Table.isNotEmpty(self.config.aliases) then
+		return CharacterGameTable.resultFromRecord(self, record)
+	end
+
+	local gameOpponents = Array.map(record.games, Operator.property('opponents'))
+
+	return {
+		opponent = record.opponents[1],
+		vs = record.opponents[2],
+		winner = record.winner,
+		flipped = false,
+		countGames = false,
+		countRounds = false,
+		gameOpponents = Array.map(gameOpponents, Operator.property(1)),
+		gameVsOpponents = Array.map(gameOpponents, Operator.property(2)),
+	}
+end
+
 ---@return self
 function GameHistory:readConfig()
 	CharacterGameTable.readConfig(self)
@@ -83,11 +109,28 @@ function GameHistory:readConfig()
 		bansFilter = String.isNotEmpty(args.bans) and Array.parseCommaSeparatedString(args.bans) or nil,
 		patch = String.isNotEmpty(args.patch) and Array.parseCommaSeparatedString(args.patch) or nil,
 		publisherId = String.nilIfEmpty(args.publisherid),
+		matchGroupsSpec = self:_readMatchGroupsSpec(),
 		showVod = Logic.nilOr(Logic.readBoolOrNil(args.vod), true),
 		showLength = Logic.nilOr(Logic.readBoolOrNil(args.length), true),
 	})
 
 	return self
+end
+
+---@private
+---@return MatchGroupsSpec?
+function GameHistory:_readMatchGroupsSpec()
+	local args = self.args
+	if String.isEmpty(args.tournaments) then
+		return TournamentStructure.readMatchGroupsSpec(args)
+	end
+
+	local tournamentArgs = {}
+	Array.forEach(Array.parseCommaSeparatedString(args.tournaments), function (tournament, index)
+		tournamentArgs['tournament' .. index] = tournament
+	end)
+
+	return TournamentStructure.readMatchGroupsSpec(tournamentArgs)
 end
 
 ---Picks/bans/patch/publisherid are per game, so they are narrowed down on match2game first,
@@ -125,6 +168,9 @@ end
 ---@return ConditionTree
 function GameHistory:buildConditions()
 	local baseConditions = CharacterGameTable.buildConditions(self)
+	if self.config.matchGroupsSpec then
+		baseConditions:add(TournamentStructure.getMatch2Filter(self.config.matchGroupsSpec))
+	end
 	local gameConditions = self:_buildGameConditions()
 	if not gameConditions then
 		return baseConditions
@@ -135,7 +181,7 @@ function GameHistory:buildConditions()
 		query = 'match2id',
 		order = 'date desc',
 		groupby = 'match2id asc',
-		limit = self.config.limit or GAME_QUERY_LIMIT,
+		limit = GAME_QUERY_LIMIT,
 	})
 
 	local matchConditions = ConditionTree(BooleanOperator.any)
