@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Match/Ticker/New/Card
+-- page=Module:Widget/Match/Ticker/Card
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
