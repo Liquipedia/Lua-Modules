@@ -41,6 +41,9 @@ local NAME_TO_CLASS = {
 	rounddiff = 'Game/Rounds/Diff',
 	roundwinrate = 'Game/Rounds/WinRate',
 	roundscore = 'Game/Rounds/Score',
+	rounddiffregulation = 'Game/Rounds/Regulation/Diff',
+	roundwinsregulation = 'Game/Rounds/Regulation/Wins',
+	roundlossesregulation = 'Game/Rounds/Regulation/Losses',
 	startingpoints = 'StartingPoints',
 }
 

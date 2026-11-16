@@ -3,6 +3,10 @@ describe('Standings Legacy Swiss', function()
 	local StandingTableLegacySwiss = require('Module:Standings/Table/Legacy/Swiss')
 	local TiebreakerFactory = require('Module:Standings/Tiebreaker/Factory')
 
+	it('maps cutafter to collapseafter', function()
+		assert.are_equal('16', StandingTableLegacySwiss.getStandardParameter{cutafter = '16'}.collapseafter)
+	end)
+
 	describe('tiebreakers', function()
 		it('maps the h2h and minileague tiebreakers to h2hlegacy and ml', function()
 			local tiebreakers = StandingTableLegacySwiss.parseTiebreaker{

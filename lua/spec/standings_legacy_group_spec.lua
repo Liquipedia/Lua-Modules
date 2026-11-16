@@ -33,10 +33,13 @@ describe('Standings Legacy Group', function()
 				tiebreaker10 = 'series won',
 				tiebreaker11 = 'series loss',
 				tiebreaker12 = 'games%',
+				tiebreaker13 = 'games',
+				tiebreaker14 = 'h2h diff',
 			}
 			assert.are_same({
 				'points', 'matchscore', 'matchwinrate', 'matchdiff', 'gamediff', 'gamewins', 'gamelosses',
-				'h2hlegacy.matchscore', 'h2hlegacy.gamescore', 'matchwins', 'matchlosses', 'gamewinrate',
+				'h2hlegacy.matchscore', 'h2hlegacy.gamescore', 'matchwins', 'matchlosses', 'gamewinrate', 'gamediff',
+				'ml.rounddiff',
 			}, tiebreakers)
 			for _, tiebreaker in ipairs(tiebreakers) do
 				TiebreakerFactory.validateAndNormalizeInput(tiebreaker)
@@ -257,6 +260,11 @@ describe('Standings Legacy Group', function()
 			assert.are_equal('exclude', dqHandling{ignoredq = 'true'})
 			assert.is_nil(dqHandling{ignoredq = 'false'})
 			assert.is_nil(dqHandling{})
+		end)
+
+		it('maps cutafter to collapseafter without the +1 of legacy with a date', function()
+			assert.are_equal('16', StandingTableLegacyGroup.getStandardParameter(
+				{cutafter = '16', date = 'June 1, 2026'}, {}).collapseafter)
 		end)
 
 		it('resets the tiebreakers only with a h2hcs tiebreaker', function()

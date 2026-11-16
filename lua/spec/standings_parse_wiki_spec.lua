@@ -251,6 +251,20 @@ describe('Standings Wiki Parser', function()
 		end)
 	end)
 
+	describe('collapseafter', function()
+		it('reads the number of rows shown before collapsing', function()
+			assert.are_equal(16, StandingsParseWiki.parseCollapseAfter{collapseafter = '16'})
+			assert.is_nil(StandingsParseWiki.parseCollapseAfter{collapseafter = ''})
+			assert.is_nil(StandingsParseWiki.parseCollapseAfter{})
+		end)
+
+		it('errors on input that is not a positive integer', function()
+			for _, input in ipairs({'abc', '-1', '1.5', '0'}) do
+				assert.error(function() StandingsParseWiki.parseCollapseAfter{collapseafter = input} end)
+			end
+		end)
+	end)
+
 	describe('points', function()
 		it('defaults to the swiss points', function()
 			assert.are_same({w = 1, d = 0.5, l = 0}, StandingsParseWiki.parsePoints(nil))

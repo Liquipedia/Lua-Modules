@@ -158,7 +158,7 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, res
 		aliases = {opponent}
 		Array.extendWith(aliases,
 			Array.map(Array.parseCommaSeparatedString(opponentData.aliases, ';'), function(alias)
-				return Opponent.readOpponentArgs{type = Opponent.team, template = alias}
+				return Opponent.resolve(Opponent.readOpponentArgs{type = Opponent.team, template = alias}, resolveDate)
 			end)
 		)
 	end
@@ -522,6 +522,15 @@ end
 ---@return number?
 function StandingsParseWiki.parseWidth(args)
 	return tonumber((string.gsub(args.width or '', 'px', '')))
+end
+
+---Reads the `collapseafter` input, the number of rows shown before the rest collapses.
+---@param args table
+---@return integer?
+function StandingsParseWiki.parseCollapseAfter(args)
+	local collapseAfter = readNonNegativeInteger(args, 'collapseafter')
+	assert(collapseAfter ~= 0, 'Invalid collapseafter input: "0" is not a positive integer')
+	return collapseAfter
 end
 
 ---Reads the `regulationrounds` input, the number of rounds a game has in regulation. More rounds is overtime.

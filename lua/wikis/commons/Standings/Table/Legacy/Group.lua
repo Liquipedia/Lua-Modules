@@ -37,6 +37,7 @@ local TIEBREAKER_MAPPING_TABLE = {
 	['series won'] = 'matchwins',
 	['series loss'] = 'matchlosses',
 	diff = 'gamediff',
+	games = 'gamediff',
 	['games won'] = 'gamewins',
 	['games loss'] = 'gamelosses',
 	['games percentage'] = 'gamewinrate',
@@ -48,6 +49,7 @@ local TIEBREAKER_MAPPING_TABLE = {
 	['h2h games'] = 'h2hlegacy.gamescore',
 	['head-to-head games'] = 'h2hlegacy.gamescore',
 	['head to head games'] = 'h2hlegacy.gamescore',
+	['h2h diff'] = 'ml.rounddiff',
 }
 
 local DEFAULT_TIEBREAKERS = {'series', 'diff', 'h2h series', 'h2h games', 'games won', 'games loss'}
