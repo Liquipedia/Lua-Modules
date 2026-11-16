@@ -32,7 +32,13 @@ insulate('Match Ticker Card', function()
 			storeValue = true,
 			defaultActive = true,
 			css = {margin = '1rem 0', ['justify-content'] = 'center'},
-			content = Html.Fragment{children = cards}
+			content = Html.Div{
+				css = {
+					display = 'flex',
+					['flex-wrap'] = 'wrap',
+				},
+				children = cards,
+			}
 		}))
 
 		TeamTemplateMock.tearDown()
