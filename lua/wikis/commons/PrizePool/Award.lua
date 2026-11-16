@@ -83,8 +83,8 @@ end
 ---@protected
 ---@param placement AwardPlacement
 ---@return boolean
-function AwardPrizePool:applyCutAfter(placement)
-	return (placement.previousTotalNumberOfParticipants + 1) > self.options.cutafter
+function AwardPrizePool:applyCollapseAfter(placement)
+	return (placement.previousTotalNumberOfParticipants + 1) > self.options.collapseAfter
 end
 
 ---@protected

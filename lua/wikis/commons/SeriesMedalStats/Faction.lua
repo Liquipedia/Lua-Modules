@@ -56,7 +56,7 @@ function MedalStats:create()
 		end,
 		rowSort = MedalStatsBase.rowSort,
 		hideTotalRow = true,
-		cutAfter = self.config.cutAfter,
+		collapseAfter = self.config.collapseAfter,
 	}
 end
 
