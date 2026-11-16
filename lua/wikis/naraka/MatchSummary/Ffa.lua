@@ -9,6 +9,7 @@ local CustomMatchSummary = {}
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local SummaryHelper = Lua.import('Module:MatchSummary/Base/Ffa')
 
@@ -16,32 +17,32 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local function startingPoints(opponent)
-	return tonumber((opponent.extradata or {}).startingpoints) or 0
-end
-
+---@param defaultColumns table[]
+---@return table[]
 local function adjustMatchColumns(defaultColumns)
-	local columns = {}
-	for _, column in ipairs(defaultColumns) do
-		table.insert(columns, column)
-		if column.id == 'matchPoints' then
-			table.insert(columns, {
+	return Array.flatMap(defaultColumns, function(column)
+		if column.id ~= 'matchPoints' then
+			return column
+		end
+		return {
+			column,
+			{
 				id = 'startingPoints',
 				class = 'cell--total-points',
 				show = function(match)
-					for _, opponent in ipairs(match.opponents) do
-						if startingPoints(opponent) ~= 0 then
-							return true
-						end
-					end
-					return false
+					return Array.any(match.opponents, function(opponent)
+						return (tonumber((opponent.extradata or {}).startingpoints) or 0) ~= 0
+					end)
 				end,
 				header = {value = 'Pre-Match Points', mobileValue = 'Pre.'},
-				row = {value = startingPoints},
-			})
-		end
-	end
-	return columns
+				row = {
+					value = function(opponent)
+						return tonumber((opponent.extradata or {}).startingpoints) or 0
+					end,
+				},
+			},
+		}
+	end)
 end
 
 ---@param props {bracketId: string, matchId: string}
