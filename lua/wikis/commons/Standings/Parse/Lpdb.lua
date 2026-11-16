@@ -45,7 +45,7 @@ local NO_WINNER = -1
 ---@field regulationRounds integer? # Overrides the regulation rounds of the wiki config for every match
 ---@field dqHandling StandingsDqHandling? # How matches of disqualified opponents count from their dq round on
 
----@alias StandingsDqHandling 'ignore'|'autolose'
+---@alias StandingsDqHandling 'exclude'|'forfeit'
 
 ---@class StandingsDisqualifications
 ---@field handling StandingsDqHandling?
@@ -223,7 +223,7 @@ function StandingsParseLpdb.applyDisqualifications(opponent, matches, matchPoint
 	local roundMatches = Array.map(matches, function(match)
 		if not hasDisqualifiedOpponent(match) then
 			return match
-		elseif disqualifications.handling == 'ignore' then
+		elseif disqualifications.handling == 'exclude' then
 			return nil
 		end
 		local forfeitedMatch = StandingsParseLpdb.forfeitMatch(match, isDisqualified)

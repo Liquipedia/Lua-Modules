@@ -250,10 +250,13 @@ describe('Standings Legacy Group', function()
 			assert.is_nil(walkoverRounds{})
 		end)
 
-		it('maps ignoredq to ignoring the matches of disqualified teams', function()
-			assert.are_equal('ignore', StandingTableLegacyGroup.getStandardParameter({ignoredq = 'true'}, {}).dqhandling)
-			assert.is_nil(StandingTableLegacyGroup.getStandardParameter({ignoredq = 'false'}, {}).dqhandling)
-			assert.is_nil(StandingTableLegacyGroup.getStandardParameter({}, {}).dqhandling)
+		it('maps ignoredq to excluding the matches of disqualified teams', function()
+			local function dqHandling(args)
+				return StandingTableLegacyGroup.getStandardParameter(args, {}).dqhandling
+			end
+			assert.are_equal('exclude', dqHandling{ignoredq = 'true'})
+			assert.is_nil(dqHandling{ignoredq = 'false'})
+			assert.is_nil(dqHandling{})
 		end)
 
 		it('resets the tiebreakers only with a h2hcs tiebreaker', function()

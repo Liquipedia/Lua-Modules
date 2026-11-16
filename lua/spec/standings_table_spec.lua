@@ -170,8 +170,8 @@ describe('Standings Table from template', function()
 		end
 
 		it('passes the dqhandling input to the import', function()
-			assert.are_equal('ignore', importedDqHandling('ignore'))
-			assert.are_equal('autolose', importedDqHandling('autolose'))
+			assert.are_equal('exclude', importedDqHandling('exclude'))
+			assert.are_equal('forfeit', importedDqHandling('forfeit'))
 		end)
 
 		it('counts the matches of disqualified opponents by default', function()

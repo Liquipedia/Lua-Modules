@@ -1007,11 +1007,11 @@ describe('Standings import from matches', function()
 			assert.are_same({{0, 0, 0}, {0, 0, 2}}, scoreboards(findOpponent(opponents, 'TT9 Esports')))
 		end)
 
-		describe('ignore', function()
+		describe('exclude', function()
 			it('leaves out all matches of an opponent from its dq round', function()
 				stubDisqualificationMatches()
 
-				local opponents = import('ignore', {['Wolves Esports'] = 2})
+				local opponents = import('exclude', {['Wolves Esports'] = 2})
 
 				local heroic = findOpponent(opponents, 'Heroic')
 				assert.are_same({'M1'}, matchIds(heroic.rounds[1]))
@@ -1029,7 +1029,7 @@ describe('Standings import from matches', function()
 			it('leaves out all matches of an opponent disqualified from the first round', function()
 				stubDisqualificationMatches()
 
-				local opponents = import('ignore', {['Wolves Esports'] = 1})
+				local opponents = import('exclude', {['Wolves Esports'] = 1})
 
 				local heroic = findOpponent(opponents, 'Heroic')
 				assert.are_same({{}, {'M3'}}, Array.map(heroic.rounds, matchIds))
@@ -1043,7 +1043,7 @@ describe('Standings import from matches', function()
 				opponents[2].aliases = {{type = 'team', template = 'wolves esports', name = 'Wolves Esports', extradata = {}}}
 
 				local imported = StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, opponents, {
-					dqHandling = 'ignore',
+					dqHandling = 'exclude',
 				})
 
 				assert.are_same({'M3'}, matchIds(findOpponent(imported, 'Heroic').rounds[2]))
@@ -1052,7 +1052,7 @@ describe('Standings import from matches', function()
 			it('leaves the matches out of the head-to-head scope', function()
 				stubDisqualificationMatches()
 
-				local opponents = import('ignore', {['Wolves Esports'] = 2})
+				local opponents = import('exclude', {['Wolves Esports'] = 2})
 
 				local scoped = TiebreakerScope.restrictTo(Array.map({'Wolves Esports', 'TT9 Esports'}, function(name)
 					local opponentData = findOpponent(opponents, name)
@@ -1077,18 +1077,18 @@ describe('Standings import from matches', function()
 
 				local _, matchPhasesByRound = StandingsParseLpdb.importFromMatches(
 					{{roundNumber = 1, matches = {'M1'}}}, swissScoreMapper, standingsOpponents({['Wolves Esports'] = 1}),
-					{dqHandling = 'ignore'}
+					{dqHandling = 'exclude'}
 				)
 
 				assert.are_same({'finished'}, matchPhasesByRound[1])
 			end)
 		end)
 
-		describe('autolose', function()
+		describe('forfeit', function()
 			it('makes all matches of an opponent lost by DQ from its dq round', function()
 				stubDisqualificationMatches()
 
-				local opponents = import('autolose', {['Wolves Esports'] = 2})
+				local opponents = import('forfeit', {['Wolves Esports'] = 2})
 
 				local heroic = findOpponent(opponents, 'Heroic')
 				-- The round 1 loss becomes a win in round 2
@@ -1106,7 +1106,7 @@ describe('Standings import from matches', function()
 			it('turns the matches into walkovers without their games', function()
 				stubDisqualificationMatches()
 
-				local opponents = import('autolose', {['Wolves Esports'] = 2})
+				local opponents = import('forfeit', {['Wolves Esports'] = 2})
 
 				local heroic = findOpponent(opponents, 'Heroic')
 				local original, forfeited = heroic.rounds[1].matches[1], heroic.rounds[2].matches[1]
@@ -1119,7 +1119,7 @@ describe('Standings import from matches', function()
 			it('loses the matches between disqualified opponents for both', function()
 				stubDisqualificationMatches()
 
-				local opponents = import('autolose', {['Wolves Esports'] = 2, ['TT9 Esports'] = 2})
+				local opponents = import('forfeit', {['Wolves Esports'] = 2, ['TT9 Esports'] = 2})
 
 				assert.are_same({{1, 1, 0}, {-1, -1, 2}}, scoreboards(findOpponent(opponents, 'Wolves Esports')))
 				assert.are_same({{0, 0, 0}, {0, 0, 2}}, scoreboards(findOpponent(opponents, 'TT9 Esports')))
@@ -1135,7 +1135,7 @@ describe('Standings import from matches', function()
 
 				local opponents = StandingsParseLpdb.importFromMatches(
 					{{roundNumber = 1, matches = {'M1'}}}, swissScoreMapper, standingsOpponents({['Wolves Esports'] = 1}),
-					{dqHandling = 'autolose'}
+					{dqHandling = 'forfeit'}
 				)
 
 				assert.are_same({{1, 1, 0}}, scoreboards(findOpponent(opponents, 'Heroic')))
@@ -1149,7 +1149,7 @@ describe('Standings import from matches', function()
 
 			local standingsTable = require('Module:Standings/Table').parse({
 				tabletype = 'group',
-				dqhandling = 'autolose',
+				dqhandling = 'forfeit',
 				round1 = {matches = 'M1'},
 				round2 = {matches = 'M2,M3'},
 				{type = 'team', template = 'heroic'},
