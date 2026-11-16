@@ -59,15 +59,6 @@ function MatchCard:render()
 		return nil
 	end
 
-	if #match.opponents <= 2 then
-		return MatchTickerCard{
-			match = match,
-			onlyHighlightOnValue = self.props.onlyHighlightOnValue,
-			hideTournament = self.props.hideTournament,
-			displayGameIcons = self.props.displayGameIcons,
-		}
-	end
-
 	local highlightCondition = HighlightConditions.match or HighlightConditions.tournament
 	local highlight = highlightCondition(match, {onlyHighlightOnValue = self.props.onlyHighlightOnValue})
 
@@ -110,9 +101,18 @@ end
 function MatchCard:_renderVertical(match, gameData)
 	local isFfa = #match.opponents > 2
 
+	if not isFfa then
+		return MatchTickerCard{
+			match = match,
+			onlyHighlightOnValue = self.props.onlyHighlightOnValue,
+			hideTournament = self.props.hideTournament,
+			displayGameIcons = self.props.displayGameIcons,
+		}
+	end
+
 	local tournamentLink = TournamentBar{
 		match = match,
-		gameData = not isFfa and gameData or nil,
+		gameData = gameData,
 		displayIcon = false,
 	}
 
@@ -132,11 +132,7 @@ function MatchCard:_renderVertical(match, gameData)
 						stageName
 					),
 				},
-			not isFfa and MatchHeader{
-				match = match,
-				variant = 'vertical'
-			} or nil,
-			isFfa and self:_renderFfaInfo(match, gameData) or nil
+			self:_renderFfaInfo(match, gameData)
 		)
 	}
 end
