@@ -41,7 +41,7 @@ local SEMIFINALIST = '3-4'
 ---@field hasNumber boolean
 
 ---@class SeriesMedalStatsConfig
----@field cutAfter number
+---@field collapseAfter number
 ---@field columns string[]
 ---@field mergeIntoSemifinalists boolean
 ---@field offset integer? only valid on craft wikis
@@ -85,7 +85,7 @@ function MedalStats:_getConfig(args)
 	)
 
 	return {
-		cutAfter = MathUtil.toInteger(args.collapseafter or args.cutafter) or 7,
+		collapseAfter = MathUtil.toInteger(args.collapseafter or args.cutafter) or 7,
 		columns = columns,
 		mergeIntoSemifinalists = Logic.readBool(args.mergeIntoSemifinalists),
 		offset = MathUtil.toInteger(args.offset),

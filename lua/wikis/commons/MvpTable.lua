@@ -24,7 +24,7 @@ local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class mvpTableParsedArgs
----@field cutafter number
+---@field collapseAfter number
 ---@field margin number
 ---@field points boolean
 ---@field title string?
@@ -57,7 +57,7 @@ function MvpTable.run(args)
 		return
 	end
 
-	local collapseText = 'place ' .. (parsedArgs.cutafter + 1) .. ' to ' .. #mvpList
+	local collapseText = 'place ' .. (parsedArgs.collapseAfter + 1) .. ' to ' .. #mvpList
 
 	return TableWidgets.Table{
 		title = String.nilIfEmpty(args.title),
@@ -70,7 +70,7 @@ function MvpTable.run(args)
 		css = {
 			['margin-top'] = parsedArgs.margin .. 'px'
 		},
-		collapseAfter = #mvpList > parsedArgs.cutafter and parsedArgs.cutafter or nil,
+		collapseAfter = #mvpList > parsedArgs.collapseAfter and parsedArgs.collapseAfter or nil,
 		expandText = collapseText,
 		collapseText = collapseText,
 		children = WidgetUtil.collect(
@@ -85,7 +85,7 @@ end
 ---@return mvpTableParsedArgs
 function MvpTable._parseArgs(args)
 	local parsedArgs = {
-		cutafter = tonumber(args.collapseafter or args.cutafter) or 5,
+		collapseAfter = tonumber(args.collapseafter or args.cutafter) or 5,
 		margin = Logic.nilOr(Logic.readBoolOrNil(args.margin), true) and 20 or 0,
 		points = Logic.readBool(args.points),
 		title = args.title,

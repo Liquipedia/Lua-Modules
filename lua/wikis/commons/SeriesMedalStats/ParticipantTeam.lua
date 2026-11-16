@@ -56,7 +56,7 @@ function MedalStats:create()
 		end,
 		rowSort = MedalStatsBase.rowSort,
 		hideTotalRow = true,
-		cutAfter = self.config.cutAfter,
+		collapseAfter = self.config.collapseAfter,
 		footer = Html.Small{
 			children = {
 				'Medals won per Team shows the team that a player was',

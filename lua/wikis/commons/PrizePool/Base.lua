@@ -100,7 +100,7 @@ BasePrizePool.config = {
 			return Logic.readBoolOrNil(args.exchangeinfo)
 		end
 	},
-	cutafter = {
+	collapseAfter = {
 		default = 4,
 		read = function(args)
 			return MathUtil.toInteger(args.collapseafter or args.cutafter)
@@ -110,11 +110,11 @@ BasePrizePool.config = {
 		default = math.huge,
 		read = function(args)
 			local hideAfter = MathUtil.toInteger(args.hideafter)
-			local cutAfter = MathUtil.toInteger(args.collapseafter or args.cutafter) or 4
+			local collapseAfter = MathUtil.toInteger(args.collapseafter or args.cutafter) or 4
 			if not hideAfter then
 				return
 			end
-			return math.max(cutAfter, hideAfter)
+			return math.max(collapseAfter, hideAfter)
 		end
 	},
 	storeLpdb = {
@@ -741,7 +741,7 @@ function BasePrizePool:_buildTable(isAward)
 	end
 
 	local collapseText = self:_collapseText()
-	local collapseAfter = collapseText and self:_rowsBeforeCut() or nil
+	local collapseAfter = collapseText and self:_rowsBeforeCollapse() or nil
 
 	local prizePoolTable = TableWidgets.Table{
 		classes = {'prizepool-table-wrapper'},
@@ -790,12 +790,12 @@ end
 ---Number of rows shown above the collapse toggle, nil when no shown placement is cut.
 ---@private
 ---@return integer?
-function BasePrizePool:_rowsBeforeCut()
+function BasePrizePool:_rowsBeforeCollapse()
 	local rows = 0
 	for _, placement in ipairs(self.placements) do
 		if self:applyHideAfter(placement) then
 			return nil
-		elseif self:applyCutAfter(placement) then
+		elseif self:applyCollapseAfter(placement) then
 			return rows
 		end
 		rows = rows + #placement.opponents
@@ -949,7 +949,7 @@ end
 ---@protected
 ---@param placement BasePlacement
 ---@return boolean
-function BasePrizePool:applyCutAfter(placement)
+function BasePrizePool:applyCollapseAfter(placement)
 	return false
 end
 

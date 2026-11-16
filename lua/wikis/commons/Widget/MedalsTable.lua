@@ -30,7 +30,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field rowSort? fun(tbl: {[K]: V}, a: K, b: K):boolean
 ---@field reducePadding boolean?
 ---@field hideTotalRow boolean?
----@field cutAfter integer?
+---@field collapseAfter integer?
 
 local DEFAULT_DATA_COLUMNS = {'1', '2', '3', '3-4', '4', 'total'}
 
@@ -49,7 +49,7 @@ function MedalsTable.render(props)
 	local dataColumns = props.dataColumns or DEFAULT_DATA_COLUMNS
 
 	local rows = MedalsTable._rows(props, dataColumns)
-	local collapseAfter = props.cutAfter and #rows > props.cutAfter and props.cutAfter or nil
+	local collapseAfter = props.collapseAfter and #rows > props.collapseAfter and props.collapseAfter or nil
 
 	return TableWidgets.Table{
 		caption = props.caption,

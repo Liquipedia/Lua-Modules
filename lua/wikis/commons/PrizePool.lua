@@ -75,8 +75,8 @@ end
 ---@protected
 ---@param placement PrizePoolPlacement
 ---@return boolean
-function PrizePool:applyCutAfter(placement)
-	return placement.placeStart > self.options.cutafter
+function PrizePool:applyCollapseAfter(placement)
+	return placement.placeStart > self.options.collapseAfter
 end
 
 ---@protected
@@ -87,7 +87,7 @@ function PrizePool:_collapseText()
 	end)
 	local lastVisible = visible[#visible]
 	local firstHidden = Array.find(visible, function(placement)
-		return placement.placeStart > self.options.cutafter
+		return placement.placeStart > self.options.collapseAfter
 	end)
 	if not firstHidden or not lastVisible then
 		return nil

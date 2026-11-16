@@ -150,11 +150,11 @@ function StageWinnings:render()
 	self.points = parsePoints('points')
 	self.points2 = parsePoints('points2')
 
-	local cutAfter = tonumber(props.collapseafter or props.cutafter) or 5
+	local collapseAfter = tonumber(props.collapseafter or props.cutafter) or 5
 
 	return TableWidgets.Table{
 		caption = props.title,
-		collapseAfter = #opponentList > cutAfter and cutAfter or nil,
+		collapseAfter = #opponentList > collapseAfter and collapseAfter or nil,
 		expandText = 'Show remaining participants',
 		collapseText = 'Hide remaining participants',
 		columns = WidgetUtil.collect(
