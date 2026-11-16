@@ -14,6 +14,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
+local MatchHeaderFfa = Lua.import('Module:Widget/Match/Header/Ffa')
 
 local PARTY_OPPONENTS_DIVIDER = Html.Hr{classes = {'match-ticker-card__divider'}}
 
@@ -72,6 +73,9 @@ end
 ---@param match FFAMatchGroupUtilMatch
 ---@return VNode
 function MatchTickerCardOpponents.buildFfaMatchOpponentsDisplay(match)
+	if match.finished then
+		return MatchHeaderFfa{match = match, teamStyle = 'dynamic'}
+	end
 	error('Not implemented')
 end
 
