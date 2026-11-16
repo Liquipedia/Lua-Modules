@@ -21,6 +21,7 @@ local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 
 ---@class MatchTickerCardProps
 ---@field match MatchGroupUtilMatch
+---@field gameData MatchTickerGameData?
 ---@field onlyHighlightOnValue string?
 ---@field displayGameIcons boolean?
 ---@field hideTournament boolean?
@@ -73,6 +74,7 @@ function MatchTickerCard.buildTournamentInfoBar(props)
 		},
 		children = TournamentBar{
 			match = match,
+			gameData = props.gameData,
 			displayGameIcon = props.displayGameIcons,
 		},
 	}

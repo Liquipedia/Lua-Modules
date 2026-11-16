@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 
@@ -19,18 +18,9 @@ local MatchHeaderFfa = Lua.import('Module:Widget/Match/Header/Ffa')
 local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
 local TournamentBar = Lua.import('Module:Widget/Match/TournamentBar')
 local ButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
-local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
-local MatchUtil = Lua.import('Module:Match/Util')
-
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
-local StreamLinks = Lua.import('Module:Links/Stream')
-local String = Lua.import('Module:StringUtils')
-local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchTickerCard = Lua.import('Module:Widget/Match/Ticker/Card')
 
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
-local MAX_VERTICAL_CARD_STREAMS = 2
 
 ---@class MatchCardProps
 ---@field match MatchGroupUtilMatch
@@ -99,128 +89,12 @@ end
 ---@param gameData MatchTickerGameData?
 ---@return Renderable
 function MatchCard:_renderVertical(match, gameData)
-	local isFfa = #match.opponents > 2
-
-	if not isFfa then
-		return MatchTickerCard{
-			match = match,
-			onlyHighlightOnValue = self.props.onlyHighlightOnValue,
-			hideTournament = self.props.hideTournament,
-			displayGameIcons = self.props.displayGameIcons,
-		}
-	end
-
-	local tournamentLink = TournamentBar{
+	return MatchTickerCard{
 		match = match,
 		gameData = gameData,
-		displayIcon = false,
-	}
-
-	local stageName = self:_renderStageName(match, 3)
-
-	return Html.Div{
-		classes = {'match-info', 'match-info--vertical'},
-		children = WidgetUtil.collect(
-			self:_renderVerticalTopRow(match),
-			self.props.hideTournament
-				and self:_renderStageName(match, 1)
-				or Html.Div{
-					classes = {'match-info-tournament'},
-					children = WidgetUtil.collect(
-						tournamentLink,
-						stageName and '-' or nil,
-						stageName
-					),
-				},
-			self:_renderFfaInfo(match, gameData)
-		)
-	}
-end
-
----@param match MatchGroupUtilMatch
----@return Widget
-function MatchCard:_renderVerticalTopRow(match)
-	return Html.Div{
-		classes = {'match-info-top-row'},
-		children = WidgetUtil.collect(
-			MatchCountdown{match = match, format = 'compact'},
-			Html.Div{
-				classes = {'match-info-stream-buttons'},
-				children = self:_renderStreamButtons(match)
-			}
-		)
-	}
-end
-
----@param match MatchGroupUtilMatch
----@return Widget?
-function MatchCard:_renderStreamButtons(match)
-	if not MatchUtil.shouldShowStreams(match) then
-		return nil
-	end
-
-	local filteredStreams = StreamLinks.filterStreams(match.stream)
-	local phase = MatchGroupUtil.computeMatchPhase(match)
-
-	return StreamsContainer{
-		streams = filteredStreams,
-		matchIsLive = phase == 'ongoing',
-		maxStreams = MAX_VERTICAL_CARD_STREAMS,
-		buttonSize = 'xs',
-	}
-end
-
----@param match MatchGroupUtilMatch
----@param variantIndex number? 1 for full name (default), 2 for medium, 3 for short
----@return Widget?
-function MatchCard:_renderStageName(match, variantIndex)
-	variantIndex = variantIndex or 1
-	local stageName
-	if match.bracketData and match.bracketData.inheritedHeader then
-		stageName = DisplayHelper.expandHeader(match.bracketData.inheritedHeader)[variantIndex]
-		if String.isEmpty(stageName) then
-			stageName = DisplayHelper.expandHeader(match.bracketData.inheritedHeader)[1]
-		end
-	else
-		stageName = match.section
-	end
-
-	if not stageName then
-		return nil
-	end
-
-	return Html.Span{
-		classes = {'match-info-stage'},
-		children = stageName
-	}
-end
-
----@param match MatchGroupUtilMatch
----@param gameData MatchTickerGameData?
----@return Widget
-function MatchCard:_renderFfaInfo(match, gameData)
-	if not gameData or not gameData.gameIds then
-		return Html.Span{
-			classes = {'match-info-ffa-info'},
-			children = 'FFA Match'
-		}
-	end
-
-	local mapIsSet = not String.isEmpty(gameData.map)
-
-	return Html.Span{
-		classes = {'match-info-ffa-info'},
-		children = WidgetUtil.collect(
-			'Game #',
-			Array.interleave(gameData.gameIds, '-'),
-			mapIsSet and {
-				' on ',
-				Link{
-					link = gameData.map,
-					children = gameData.mapDisplayName
-				}
-			} or nil
-		)
+		onlyHighlightOnValue = self.props.onlyHighlightOnValue,
+		hideTournament = self.props.hideTournament,
+		displayGameIcons = self.props.displayGameIcons,
 	}
 end
 

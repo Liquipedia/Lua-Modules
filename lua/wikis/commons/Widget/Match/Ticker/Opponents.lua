@@ -9,19 +9,22 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local MatchHeaderFfa = Lua.import('Module:Widget/Match/Header/Ffa')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local MAX_FFA_PARTICIPANT_ICONS = 5
 local PARTY_OPPONENTS_DIVIDER = Html.Hr{classes = {'match-ticker-card__divider'}}
 
 local MatchTickerCardOpponents = {}
 
 ---@param props {match: MatchGroupUtilMatch}
----@return VNode
+---@return VNode?
 function MatchTickerCardOpponents.render(props)
 	local match = props.match
 
@@ -71,12 +74,66 @@ function MatchTickerCardOpponents.buildNormalMatchOpponentDisplay(match, opponen
 end
 
 ---@param match FFAMatchGroupUtilMatch
----@return VNode
+---@return VNode?
 function MatchTickerCardOpponents.buildFfaMatchOpponentsDisplay(match)
 	if match.finished then
 		return MatchHeaderFfa{match = match, teamStyle = 'dynamic'}
 	end
-	error('Not implemented')
+	return MatchTickerCardOpponents.buildFfaParticipantsPreview(match)
+end
+
+---@param match FFAMatchGroupUtilMatch
+---@return VNode
+function MatchTickerCardOpponents.buildFfaParticipantsPreview(match)
+	local participants = Array.filter(match.opponents, function (opponent)
+		return not Opponent.isTbd(opponent)
+	end)
+	local iconOpponents = Array.sub(
+		Array.filter(participants, function (opponent)
+			return opponent.type == Opponent.team and Logic.isNotEmpty(opponent.template)
+		end),
+		1,
+		MAX_FFA_PARTICIPANT_ICONS
+	)
+	local remainingCount = #participants - #iconOpponents
+
+	return Html.Div{
+		classes = {'match-ticker-card__participants'},
+		children = WidgetUtil.collect(
+			#iconOpponents > 0 and Html.Div{
+				classes = {'match-ticker-card__participants-icons'},
+				children = Array.map(iconOpponents, function (opponent)
+					return Html.Div{
+						classes = {'match-ticker-card__participant-icon'},
+						children = OpponentDisplay.InlineTeamContainer{
+							template = opponent.template,
+							style = 'icon',
+						},
+					}
+				end)
+			} or nil,
+			remainingCount > 0 and Html.Span{
+				classes = {'match-ticker-card__participants-count'},
+				children = MatchTickerCardOpponents._getRemainingParticipantsText(
+					participants,
+					remainingCount,
+					#iconOpponents > 0
+				),
+			} or nil
+		)
+	}
+end
+
+---@param participants standardOpponent[]
+---@param remainingCount integer
+---@param hasIcons boolean
+---@return string
+function MatchTickerCardOpponents._getRemainingParticipantsText(participants, remainingCount, hasIcons)
+	local allTeams = Array.all(participants, function (opponent)
+		return opponent.type == Opponent.team
+	end)
+	local noun = allTeams and 'team' or 'participant'
+	return (hasIcons and '+ ' or '') .. remainingCount .. ' ' .. noun .. (remainingCount == 1 and '' or 's')
 end
 
 return Component.component(MatchTickerCardOpponents.render)
