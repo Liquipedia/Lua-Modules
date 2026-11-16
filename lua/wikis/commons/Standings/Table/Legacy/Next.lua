@@ -710,7 +710,7 @@ function StandingTableLegacyNext.fetchMatches(args)
 
 	return mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = tostring(conditions),
-		query = 'match2id, date, match2bracketdata, match2opponents',
+		query = 'match2id, date, bestof, match2bracketdata, match2opponents',
 		order = 'date asc',
 		limit = 1000,
 	})
