@@ -92,7 +92,7 @@ function MatchTickerCardOpponents.buildFfaParticipantsPreview(match)
 	end)
 	local iconOpponents = Array.sub(
 		Array.filter(participants, function (opponent)
-			if opponent.type ~= Opponent.team or Opponent.isTbd(opponent)then
+			if opponent.type ~= Opponent.team then
 				return false
 			end
 			local teamTemplateData = TeamTemplate.getRaw(opponent.template)
