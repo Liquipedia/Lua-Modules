@@ -63,7 +63,7 @@ function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	local game = props.game
 	local opponentCopy = Table.deepCopy(game.opponents[opponentIndex])
 	if opponentCopy.score and game.mode == 'Push' then
-		opponentCopy.score = opponentCopy.score .. 'm'
+		opponentCopy.score = string.format('%.2f', opponentCopy.score) .. 'm'
 	end
 
 	return DisplayHelper.MapScore(opponentCopy, game.status)
