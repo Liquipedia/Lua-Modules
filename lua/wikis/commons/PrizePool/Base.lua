@@ -103,14 +103,14 @@ BasePrizePool.config = {
 	cutafter = {
 		default = 4,
 		read = function(args)
-			return MathUtil.toInteger(args.cutafter)
+			return MathUtil.toInteger(args.collapseafter or args.cutafter)
 		end
 	},
 	hideafter = {
 		default = math.huge,
 		read = function(args)
 			local hideAfter = MathUtil.toInteger(args.hideafter)
-			local cutAfter = MathUtil.toInteger(args.cutafter) or 4
+			local cutAfter = MathUtil.toInteger(args.collapseafter or args.cutafter) or 4
 			if not hideAfter then
 				return
 			end

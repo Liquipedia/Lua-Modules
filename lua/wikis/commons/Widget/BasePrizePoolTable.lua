@@ -127,9 +127,9 @@ function BasePrizePoolTable:_parse()
 		currency = currency,
 		title = props.title,
 		autoExchange = Logic.nilOr(Logic.readBoolOrNil(props.autoexchange), currency ~= BASE_CURRENCY),
-		cutAfter = MathUtil.toInteger(props.cutafter),
+		cutAfter = MathUtil.toInteger(props.collapseafter or props.cutafter),
 	}
-	assert(not settings.cutAfter or settings.cutAfter > 0, 'Invalid |cutafter=')
+	assert(not settings.cutAfter or settings.cutAfter > 0, 'Invalid |collapseafter=')
 	local currencyRate = settings.autoExchange and Currency.getExchangeRate{
 		currency = currency,
 		date = DateExt.toYmdInUtc(props.edate or DateExt.getContextualDateOrNow()),

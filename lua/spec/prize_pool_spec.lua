@@ -298,7 +298,7 @@ describe('prize pool', function()
 		assert.is_nil(output:find('switch-pill', 1, true))
 	end)
 
-	describe('cutafter', function()
+	describe('collapseafter', function()
 		local cutArgs = {
 			type = {type = 'solo'},
 			import = false,
@@ -309,16 +309,23 @@ describe('prize pool', function()
 		}
 
 		it('collapses the rows of the placements after it', function()
-			local output = tostring(PrizePool(Table.merge(cutArgs, {cutafter = 2})):create():build())
+			local output = tostring(PrizePool(Table.merge(cutArgs, {collapseafter = 2})):create():build())
 			assert.is_truthy(output:find('general-collapsible collapsed', 1, true))
 			assert.are_equal(2, select(2, output:gsub('table2__row%-%-hide%-on%-collapse', '')))
 			assert.is_truthy(output:find('place 3 to 4', 1, true))
 		end)
 
 		it('does not collapse when no placement is after it', function()
-			local output = tostring(PrizePool(Table.merge(cutArgs, {cutafter = 3})):create():build())
+			local output = tostring(PrizePool(Table.merge(cutArgs, {collapseafter = 3})):create():build())
 			assert.is_nil(output:find('general-collapsible', 1, true))
 			assert.is_nil(output:find('hide-on-collapse', 1, true))
+		end)
+
+		it('still accepts cutafter, with collapseafter taking precedence', function()
+			local legacy = tostring(PrizePool(Table.merge(cutArgs, {cutafter = 2})):create():build())
+			assert.are_equal(2, select(2, legacy:gsub('table2__row%-%-hide%-on%-collapse', '')))
+			local both = tostring(PrizePool(Table.merge(cutArgs, {cutafter = 2, collapseafter = 3})):create():build())
+			assert.is_nil(both:find('hide-on-collapse', 1, true))
 		end)
 	end)
 

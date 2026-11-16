@@ -85,7 +85,7 @@ function MedalStats:_getConfig(args)
 	)
 
 	return {
-		cutAfter = MathUtil.toInteger(args.cutafter) or 7,
+		cutAfter = MathUtil.toInteger(args.collapseafter or args.cutafter) or 7,
 		columns = columns,
 		mergeIntoSemifinalists = Logic.readBool(args.mergeIntoSemifinalists),
 		offset = MathUtil.toInteger(args.offset),

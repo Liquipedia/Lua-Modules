@@ -85,7 +85,7 @@ end
 ---@return mvpTableParsedArgs
 function MvpTable._parseArgs(args)
 	local parsedArgs = {
-		cutafter = tonumber(args.cutafter) or 5,
+		cutafter = tonumber(args.collapseafter or args.cutafter) or 5,
 		margin = Logic.nilOr(Logic.readBoolOrNil(args.margin), true) and 20 or 0,
 		points = Logic.readBool(args.points),
 		title = args.title,

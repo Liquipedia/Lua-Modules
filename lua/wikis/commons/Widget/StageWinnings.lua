@@ -53,7 +53,8 @@ local NON_BREAKING_SPACE = '&nbsp;'
 ---@field n-m_points number? # n amd m integers
 ---@field n-m_points2 number? # n amd m integers
 ---@field localcurrency string?
----@field cutafter integer?
+---@field collapseafter integer?
+---@field cutafter integer? # deprecated alias of collapseafter
 ---@field title string?
 ---@field precision integer?
 ---@field autoexchange boolean
@@ -149,7 +150,7 @@ function StageWinnings:render()
 	self.points = parsePoints('points')
 	self.points2 = parsePoints('points2')
 
-	local cutAfter = tonumber(props.cutafter) or 5
+	local cutAfter = tonumber(props.collapseafter or props.cutafter) or 5
 
 	return TableWidgets.Table{
 		caption = props.title,

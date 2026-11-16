@@ -33,7 +33,7 @@ function MedalStats.run(frame)
 	args.opponentTypes = Opponent.solo
 
 	--reduce due to having text above
-	args.cutafter = tonumber(args.cutafter) or 5
+	args.collapseafter = tonumber(args.collapseafter or args.cutafter) or 5
 
 	return MedalStats(args):create()
 end
