@@ -66,7 +66,6 @@ describe('Standings Parser', function()
 		it('are needed for a tiebreaker that reads the games', function()
 			assert.is_true(StandingsParser.needsGames('swiss', {'full.points', 'ml.rounddiff'}))
 			assert.is_true(StandingsParser.needsGames('swiss', {'full.roundscore'}))
-			assert.is_true(StandingsParser.needsGames('swiss', {'full.gamediffregulation'}))
 		end)
 
 		it('are needed for an always shown stat that reads the games', function()
@@ -1275,13 +1274,13 @@ describe('Standings Parser', function()
 			assert.are_equal('up', findEntry(standingsTable.entries, 'Alpha', 3).definitestatus)
 		end)
 
-		it('sets the current status as well', function()
+		it('keeps the current status of the slot', function()
 			local standingsTable = StandingsParser.parse(
 				THREE_ROUNDS_TWO_FINISHED, makeOpponents({[2] = 'up'}), BGS, nil, {}, 'ffa', TIEBREAKERS)
 
 			local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
 			assert.are_equal(3, alpha2.placement)
-			assert.are_equal('up', alpha2.currentstatus)
+			assert.are_equal('down', alpha2.currentstatus)
 			assert.are_equal('up', alpha2.definitestatus)
 		end)
 
@@ -1290,7 +1289,7 @@ describe('Standings Parser', function()
 				TWO_FINISHED_ROUNDS, makeOpponents({[1] = 'stay'}), BGS, nil, {}, 'ffa', TIEBREAKERS)
 
 			local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
-			assert.are_equal('stay', alpha2.currentstatus)
+			assert.are_equal('down', alpha2.currentstatus)
 			assert.are_equal('stay', alpha2.definitestatus)
 		end)
 
@@ -1302,7 +1301,7 @@ describe('Standings Parser', function()
 				TWO_FINISHED_ROUNDS, opponents, BGS, nil, {}, 'ffa', {'full.disqualified', 'full.points', 'full.manual'})
 
 			local alpha1 = findEntry(standingsTable.entries, 'Alpha', 1)
-			assert.are_equal('up', alpha1.currentstatus)
+			assert.are_equal('down', alpha1.currentstatus)
 			assert.are_equal('up', alpha1.definitestatus)
 			local alpha2 = findEntry(standingsTable.entries, 'Alpha', 2)
 			assert.are_equal('dq', alpha2.currentstatus)
@@ -1805,6 +1804,24 @@ describe('Standings Parser', function()
 			Array.forEach({'Alpha', 'Bravo', 'Charlie', 'Delta'}, function(name)
 				assert.is_nil(findEntry(entries, name, 2).placerange)
 			end)
+		end)
+
+		it('are set from the points and matches left of a round robin', function()
+			local opponents = {
+				gslOpponent('Alpha', {'w', 'w', ''}),
+				gslOpponent('Bravo', {'w', 'w', ''}),
+				gslOpponent('Charlie', {'l', 'l', ''}),
+				gslOpponent('Delta', {'l', 'l', ''}),
+			}
+			local entries = StandingsParser.parse(
+				DECIDER_UPCOMING, opponents, GSL_BGS, nil, {}, 'group', {'full.disqualified', 'full.points', 'full.manual'},
+				{format = {type = 'roundrobin', cycles = 1}, points = {w = 1, d = 0, l = 0}}
+			).entries
+			assert.are_same({1, 4}, findEntry(entries, 'Alpha', 1).placerange)
+			assert.are_same({1, 2}, findEntry(entries, 'Alpha', 2).placerange)
+			assert.are_equal('up', findEntry(entries, 'Alpha', 2).definitestatus)
+			assert.are_same({3, 4}, findEntry(entries, 'Charlie', 2).placerange)
+			assert.are_equal('down', findEntry(entries, 'Charlie', 2).definitestatus)
 		end)
 
 		it('are not set without a format', function()

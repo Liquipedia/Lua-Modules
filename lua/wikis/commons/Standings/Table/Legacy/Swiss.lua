@@ -31,11 +31,14 @@ local TIEBREAKER_MAPPING_TABLE = {
 	series = 'matchscore',
 	diff = 'gamediff',
 	['diff games'] = 'gamediff',
-	['no ot diff'] = 'gamediffregulation',
 	['games won'] = 'gamewins',
 	['games loss'] = 'gamelosses',
 	['h2h series'] = 'h2hlegacy.matchscore',
-	['h2h games'] = 'h2hlegacy.gamediff',
+	['head-to-head series'] = 'h2hlegacy.matchscore',
+	['head to head series'] = 'h2hlegacy.matchscore',
+	['h2h games'] = 'h2hlegacy.gamescore',
+	['head-to-head games'] = 'h2hlegacy.gamescore',
+	['head to head games'] = 'h2hlegacy.gamescore',
 	['minileague points'] = 'ml.points',
 	['minileague series%'] = 'ml.matchwinrate',
 	['minileague games'] = 'ml.gamediff',
@@ -61,13 +64,19 @@ function StandingTableLegacySwiss.getStandardParameter(args)
 	}
 end
 
----Maps the legacy `win_p`, `tie_p`, `lose_p`, `X-Y_p` and, with `show_otp`, `otw_p` and `otl_p` to the `points` input.
+---Maps the legacy `win_p`, `tie_p`, `lose_p`, `X-Y_p`, `walkover_lose_p` and, with `show_otp`, `otw_p` and `otl_p`
+---to the `points` input.
 ---Legacy defaults to 3 points for a win, 1 for a draw and 0 for a loss (2 and 1 for overtime wins and losses),
 ---and `X-Y_p` is a bonus on top of the points of the result, while `X-Y` in the new input is the fixed amount
----of points.
+---of points. `walkover_lose_p` is a bonus on top of `lose_p` as well.
 ---@param args table
+---@param options {resultDefaults: {w: number, d: number, l: number}?, overtime: boolean?, decimalScores: boolean?}?
+---`resultDefaults` defaults to 3, 1 and 0, `overtime` to `show_otp`, and `decimalScores` reads `X-Y_p` with decimals
 ---@return string
-function StandingTableLegacySwiss.parsePoints(args)
+function StandingTableLegacySwiss.parsePoints(args, options)
+	options = options or {}
+	local resultDefaults = options.resultDefaults or {w = 3, d = 1, l = 0}
+	local scorePattern = options.decimalScores and '^(%d+%.?%d*)%-(%d+%.?%d*)_p$' or '^(%d+)%-(%d+)_p$'
 	---@param key string
 	---@param default number
 	---@return number
@@ -79,32 +88,36 @@ function StandingTableLegacySwiss.parsePoints(args)
 	end
 
 	local resultPoints = {
-		w = readPoints('win_p', 3),
-		d = readPoints('tie_p', 1),
-		l = readPoints('lose_p', 0),
+		w = readPoints('win_p', resultDefaults.w),
+		d = readPoints('tie_p', resultDefaults.d),
+		l = readPoints('lose_p', resultDefaults.l),
 	}
 
 	local scoreKeys = {}
 	for key in pairs(args) do
-		if tostring(key):match('^%d+%-%d+_p$') then
+		if tostring(key):match(scorePattern) then
 			table.insert(scoreKeys, key)
 		end
 	end
 	table.sort(scoreKeys)
 
 	local scorePoints = Array.map(scoreKeys, function(key)
-		local ownScore, otherScore = key:match('^(%d+)%-(%d+)_p$')
+		local ownScore, otherScore = key:match(scorePattern)
 		local own, other = tonumber(ownScore), tonumber(otherScore)
 		local result = own > other and 'w' or own < other and 'l' or 'd'
 		return ownScore .. '-' .. otherScore .. '=' .. (resultPoints[result] + readPoints(key, 0))
 	end)
 
-	local overtimePoints = Logic.readBool(args.show_otp)
+	local overtimePoints = Logic.nilOr(options.overtime, Logic.readBool(args.show_otp))
 		and {'otwin=' .. readPoints('otw_p', 2), 'otloss=' .. readPoints('otl_p', 1)}
 		or {}
 
+	local walkoverLossBonus = readPoints('walkover_lose_p', 0)
+	local walkoverLossPoints = walkoverLossBonus ~= 0 and {'walkoverloss=' .. (resultPoints.l + walkoverLossBonus)} or {}
+
 	return table.concat(Array.extend(
-		{'win=' .. resultPoints.w, 'draw=' .. resultPoints.d, 'loss=' .. resultPoints.l}, overtimePoints, scorePoints
+		{'win=' .. resultPoints.w, 'draw=' .. resultPoints.d, 'loss=' .. resultPoints.l},
+		overtimePoints, walkoverLossPoints, scorePoints
 	), ', ')
 end
 

@@ -79,6 +79,23 @@ describe('Standings Table from template', function()
 			Info.config.standings = originalStandingsConfig
 			assert.is_true(includesGames)
 		end)
+
+		it('includes the games with overtime from the regulationrounds input', function()
+			assert.is_true(queriesGames{
+				tabletype = 'swiss', round1 = {matches = 'M1'}, overtime = 'true', regulationrounds = '10',
+			})
+		end)
+	end)
+
+	it('passes the regulationrounds input to the import', function()
+		local StandingsParseLpdb = require('Module:Standings/Parse/Lpdb')
+		spy.on(StandingsParseLpdb, 'importFromMatches')
+		StandingsTable.fromTemplate{tabletype = 'swiss', round1 = {matches = 'M1'}, regulationrounds = '10'}
+		---@diagnostic disable-next-line: undefined-field
+		local options = StandingsParseLpdb.importFromMatches.calls[1].vals[4]
+		---@diagnostic disable-next-line: undefined-field
+		StandingsParseLpdb.importFromMatches:revert()
+		assert.are_equal(10, options.regulationRounds)
 	end)
 
 	it('errors on an unknown table type', function()

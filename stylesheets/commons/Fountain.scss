@@ -39,6 +39,13 @@
 	&_uni {
 		background: var( --clr-semantic-negative-40 ); // #732b9c ( Old 5d3fd3 )
 	}
+
+	img {
+		border: 0.125rem solid #ffffff;
+		border-radius: 50%;
+		box-sizing: border-box;
+		box-shadow: 0 0 0.25rem #ffffff;
+	} // Highlights the primary attribute.
 } // Colors the Attribute base + gain section
 
 // Tooltip for all infoboxes
@@ -430,14 +437,14 @@ a.cf {
 		vertical-align: top;
 	} // keeping &_value for backwards compatibility
 
-	&_mainBox {
+	&_main-box {
 		margin-top: 0.3125rem;
 		padding: 0.3125rem 0.3125rem 0 0.3125rem;
 		display: flex;
 		flex-direction: column;
 	}
 
-	&_titleBox {
+	&_title-box {
 		border-bottom: 0.0625rem solid #333333;
 		margin-bottom: 0.3125rem;
 		background: linear-gradient( -90deg, #2f4f35 -20%, #333333 -20%, #333333 -20%, #2f4f35 ) 90%;
@@ -451,7 +458,7 @@ a.cf {
 		font-size: 85%;
 	}
 
-	&_titleProperties {
+	&_title-properties {
 		padding-left: 0.125rem;
 	}
 
@@ -468,7 +475,7 @@ a.cf {
 		width: 100%;
 	}
 
-	&_cellHead {
+	&_cell-head {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
@@ -479,7 +486,7 @@ a.cf {
 		font-size: 85%;
 	}
 
-	&_cellPairs {
+	&_cell-pairs {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
@@ -487,26 +494,79 @@ a.cf {
 		box-sizing: border-box;
 	}
 
-	&_Box {
+	&_box {
 		display: inline-flex;
 		align-items: center;
 		font-size: 85%;
 		line-height: 1.2;
 	}
 
-	&_iconBox {
+	&_icon-box {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
 		flex-shrink: 0;
 	}
 
-	&_iconBracket {
+	&_icon-bracket {
 		color: #ffffff;
 		display: inline-flex;
 		align-items: center;
 	}
 } // Spellcard Target/Affect/Damage (TAD)
+
+.spellslot-box {
+	display: flex;
+	align-items: center;
+	gap: 0.1875rem; // 3px
+} // Spellcard Spellslot
+
+.spellslot-wrapper {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+
+	&:hover {
+		z-index: 99999;
+
+		.spellslot-tooltip {
+			display: block;
+		} // The entire wrapper will be the very front.
+	}
+}
+
+.spellslot-tooltip {
+	display: none;
+	position: absolute;
+	top: calc( 100% + 0.25rem ); // 4px
+	left: 0; // Floating icon below the slot icon, aligned to the left edge
+	transform: none;
+	z-index: 999999;
+	padding: 0.125rem; // 2px
+	background: rgba( 18, 25, 32, 0.95 );
+	border: 0.0625rem solid #465363; // 1px
+	border-radius: 0.25rem; // 4px
+	box-shadow: 0 0.25rem 0.625rem rgba( 0, 0, 0, 0.6 ); // 4px
+	line-height: 0;
+	white-space: nowrap;
+	pointer-events: auto;
+	cursor: pointer;
+
+	&::before {
+		content: "";
+		position: absolute;
+		top: -0.375rem; /* -6px */
+		left: 0;
+		width: 100%;
+		height: 0.375rem; /* 6px */
+		display: block;
+	} // Keeps hover active across the onhover gap.
+
+	&:hover {
+		display: block;
+	}
+} // Spellcard Spellslot
 
 .spelldesc {
 	border-top: 0.0625rem solid #333333;
@@ -1585,7 +1645,7 @@ div.skilllist-col5 ul li {
 	overflow: hidden;
 }
 
-/* Import fonts */
+/* Import fonts (disabled, will have to investigate if these are needed again)
 // Is it needed to import all these fonts? It's extra load time for the user
 @font-face {
 	font-family: "Radiance";
@@ -1649,7 +1709,7 @@ div.skilllist-col5 ul li {
 	font-weight: 800;
 	font-style: normal;
 	font-display: swap;
-}
+} */
 
 /*
 * === Ability template ===

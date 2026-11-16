@@ -46,9 +46,40 @@ describe('Standings Legacy Next', function()
 			}, 1)
 
 			assert.are_equal('alpha old;alpha older', opponents[1].aliases)
-			assert.are_equal('3', opponents[1].r1points)
-			assert.are_equal('2', opponents[1].tiebreaker)
+			assert.are_same({3, 2}, {opponents[1].r1points, opponents[1].r1tiebreaker})
 			assert.are_equal('bravo old', opponents[2].aliases)
+		end)
+
+		it('maps the manual adjustments to their rounds', function()
+			assert.are_same({
+				r1tiebreaker = 2,
+				r2points = 1,
+				r3points = 5,
+				r3gamewins = 4,
+			}, StandingTableLegacyNext.parseAdjustments({
+				temp_tie1 = '2',
+				round2temp_p1 = '1',
+				temp_p1 = '2',
+				round3temp_p1 = '3',
+				temp_win_g1 = '4',
+				round4temp_p1 = '9',
+				temp_p2 = '7',
+			}, 1, 3))
+		end)
+
+		it('counts the adjusted matches towards the points', function()
+			assert.are_same(
+				{r2matchwins = 2, r2matchdraws = 1, r2matchlosses = 1, r2points = 7},
+				StandingTableLegacyNext.parseAdjustments({temp_win_m1 = '2', temp_tie_m1 = '1', temp_lose_m1 = '1'}, 1, 2)
+			)
+			assert.are_same(
+				{r1matchwins = 2, r1points = 2},
+				StandingTableLegacyNext.parseAdjustments({temp_win_m1 = '2', win_p = '1'}, 1, 1)
+			)
+		end)
+
+		it('errors on non numeric adjustments', function()
+			assert.error(function() StandingTableLegacyNext.parseAdjustments({temp_win_m1 = 'two'}, 1, 1) end)
 		end)
 
 		it('imports opponents from matches only if none are listed', function()
@@ -63,13 +94,109 @@ describe('Standings Legacy Next', function()
 		end)
 	end)
 
+	describe('standard parameters', function()
+		it('is a swiss table unless it is a group table', function()
+			assert.are_equal('swiss', StandingTableLegacyNext.getStandardParameter({}, {}).tabletype)
+			assert.are_equal('group', StandingTableLegacyNext.getStandardParameter({}, {}, 'group').tabletype)
+		end)
+
+		it('imports the matches unless import is disabled', function()
+			assert.is_true(StandingTableLegacyNext.getStandardParameter({}, {}).import)
+			assert.is_false(StandingTableLegacyNext.getStandardParameter({import = 'false'}, {}).import)
+		end)
+
+		it('ignores the overtime inputs', function()
+			local parameters = StandingTableLegacyNext.getStandardParameter({show_otp = 'true', otw_p = '2'}, {})
+			assert.is_false(parameters.overtime)
+			assert.are_equal('win=3, draw=1, loss=0', parameters.points)
+			assert.has_no.errors(function()
+				StandingTableLegacyNext.getStandardParameter({show_otp = 'true', otw_p = '-', otl_p = '-'}, {})
+			end)
+		end)
+	end)
+
+	describe('format', function()
+		it('infers the structure as legacy', function()
+			assert.are_equal('gsl', StandingTableLegacyNext.inferStructure(4, 5, 1))
+			assert.are_equal('roundRobin-1', StandingTableLegacyNext.inferStructure(4, 6, 3))
+			assert.are_equal('roundRobin-2', StandingTableLegacyNext.inferStructure(6, 30, 1))
+			assert.are_equal('swiss-3', StandingTableLegacyNext.inferStructure(8, 12, 3))
+			assert.are_equal('other', StandingTableLegacyNext.inferStructure(8, 10, 3))
+			assert.are_equal('other', StandingTableLegacyNext.inferStructure(4, 0, 1))
+			assert.are_equal('other', StandingTableLegacyNext.inferStructure(0, 0, 1))
+		end)
+
+		it('maps the structures to formats', function()
+			local Json = require('Module:Json')
+			assert.are_equal('gsl', StandingTableLegacyNext.readFormat({structure = 'gsl'}, 8, 0, 1))
+			assert.are_equal('drr', StandingTableLegacyNext.readFormat({structure = 'roundRobin-2'}, 4, 5, 1))
+			assert.are_same({['1'] = 'roundrobin', cycles = 3},
+				Json.parse(StandingTableLegacyNext.readFormat({structure = 'roundRobin-3'}, 4, 5, 1)))
+			assert.are_same({['1'] = 'classicswiss', rounds = 3},
+				Json.parse(StandingTableLegacyNext.readFormat({structure = 'swiss-3'}, 4, 5, 1)))
+			assert.is_nil(StandingTableLegacyNext.readFormat({structure = 'other'}, 4, 5, 1))
+			assert.are_equal('srr', StandingTableLegacyNext.readFormat({}, 4, 6, 3))
+			assert.is_nil(StandingTableLegacyNext.readFormat({}, 8, 10, 3))
+		end)
+
+		it('errors on unknown structures', function()
+			assert.error(function() StandingTableLegacyNext.readFormat({structure = 'swiss'}, 4, 5, 1) end)
+		end)
+
+		it('produces formats the standings can read', function()
+			local StandingsParseWiki = require('Module:Standings/Parse/Wiki')
+			local function parse(opponentCount, matchCount, roundCount)
+				local format = StandingTableLegacyNext.readFormat({}, opponentCount, matchCount, roundCount)
+				return StandingsParseWiki.parseFormat({format = format}, 'group')
+			end
+			assert.are_same({type = 'swiss', winsToAdvance = 2, lossesToEliminate = 2}, parse(4, 5, 1))
+			assert.are_same({type = 'roundrobin', cycles = 2}, parse(6, 30, 1))
+			assert.are_same({type = 'roundrobin', cycles = 3}, parse(4, 18, 1))
+			assert.are_same({type = 'classicswiss', rounds = 3}, parse(8, 12, 3))
+		end)
+	end)
+
+	describe('points', function()
+		it('defaults to 3 points for a win and 1 for a draw', function()
+			assert.are_same({w = 3, d = 1, l = 0}, StandingTableLegacyNext.readResultPoints{})
+		end)
+
+		it('defaults the unset results to 0 with any of them set', function()
+			assert.are_same({w = 2, d = 0, l = 0}, StandingTableLegacyNext.readResultPoints{win_p = '2'})
+			assert.are_same({w = 0, d = 0, l = -1}, StandingTableLegacyNext.readResultPoints{lose_p = '-1'})
+		end)
+
+		it('only counts X-Y_p without win_p, tie_p and lose_p', function()
+			assert.are_same({w = 0, d = 0, l = 0}, StandingTableLegacyNext.readResultPoints{['2-0_p'] = '3'})
+			assert.are_same({w = 0, d = 0, l = 0}, StandingTableLegacyNext.readResultPoints{['0.5-0.5_p'] = '1'})
+			assert.are_equal('win=0, draw=0, loss=0, 2-0=3',
+				StandingTableLegacyNext.getStandardParameter({['2-0_p'] = '3'}, {}).points)
+			assert.are_equal('win=1, draw=0, loss=0, 2-0=4',
+				StandingTableLegacyNext.getStandardParameter({win_p = '1', ['2-0_p'] = '3'}, {}).points)
+		end)
+
+		it('reads X-Y_p with decimals', function()
+			assert.are_equal('win=1, draw=0.5, loss=0, 0.5-0.5=0.75',
+				StandingTableLegacyNext.getStandardParameter({win_p = '1', tie_p = '0.5', ['0.5-0.5_p'] = '0.25'}, {}).points)
+		end)
+	end)
+
 	describe('statuses', function()
-		it('maps dq<N> to the first round and round<R>dq<N> to that round', function()
-			local args = {dq1 = 'true', round3dq2 = 'true', round2dq3 = 'true', round4dq3 = 'true', round5dq4 = 'true'}
-			assert.are_equal(1, StandingTableLegacyNext.parseDisqualifiedFromRound(args, 1, 4))
+		it('maps dq<N> to the final round and round<R>dq<N> to that round', function()
+			local args = {
+				dq1 = 'true',
+				round3dq2 = 'true',
+				round2dq3 = 'true',
+				round4dq3 = 'true',
+				round5dq4 = 'true',
+				round2dq5 = 'true',
+				dq5 = 'true',
+			}
+			assert.are_equal(4, StandingTableLegacyNext.parseDisqualifiedFromRound(args, 1, 4))
 			assert.are_equal(3, StandingTableLegacyNext.parseDisqualifiedFromRound(args, 2, 4))
 			assert.are_equal(2, StandingTableLegacyNext.parseDisqualifiedFromRound(args, 3, 4))
 			assert.is_nil(StandingTableLegacyNext.parseDisqualifiedFromRound(args, 4, 4))
+			assert.are_equal(2, StandingTableLegacyNext.parseDisqualifiedFromRound(args, 5, 4))
 		end)
 
 		it('maps round<R>bg<N> to r<R>bg and bg<N> to the final round', function()
@@ -204,11 +331,51 @@ describe('Standings Legacy Next', function()
 			}, {
 				match('a', '2024-01-01 12:00:00'),
 				match('b', '2024-01-02 12:00:00'),
+			})
+
+			assert.are_equal(2, roundCount)
+			assert.are_same({{'a'}, {'b'}}, idsByRound(matchesByRound, roundCount))
+		end)
+
+		it('puts matches after the last round end date in a round of their own', function()
+			local matchesByRound, roundCount = StandingTableLegacyNext.groupMatchesByRound({
+				round1edate = '2024-01-01 23:59',
+				round2edate = '2024-01-02 23:59',
+			}, {
+				match('a', '2024-01-01 12:00:00'),
+				match('b', '2024-01-02 12:00:00'),
 				match('c', '2024-01-05 12:00:00'),
+				match('d', '2024-01-06 12:00:00'),
+			})
+
+			assert.are_equal(3, roundCount)
+			assert.are_same({{'a'}, {'b'}, {'c', 'd'}}, idsByRound(matchesByRound, roundCount))
+		end)
+
+		it('keeps indexed matches after the last round end date in their round', function()
+			local matchesByRound, roundCount = StandingTableLegacyNext.groupMatchesByRound({
+				round1edate = '2024-01-01 23:59',
+				round2edate = '2024-01-02 23:59',
+			}, {
+				match('a', '2024-01-01 12:00:00', 1),
+				match('b', '2024-01-02 12:00:00', 2),
+				match('c', '2024-01-05 12:00:00', 2),
 			})
 
 			assert.are_equal(2, roundCount)
 			assert.are_same({{'a'}, {'b', 'c'}}, idsByRound(matchesByRound, roundCount))
+		end)
+
+		it('counts indexed matches after the last round end date beyond the dated rounds', function()
+			local matchesByRound, roundCount = StandingTableLegacyNext.groupMatchesByRound({
+				round1edate = '2024-01-01 23:59',
+			}, {
+				match('a', '2024-01-01 12:00:00', 1),
+				match('b', '2024-01-05 12:00:00', 2),
+			})
+
+			assert.are_equal(2, roundCount)
+			assert.are_same({{'a'}, {'b'}}, idsByRound(matchesByRound, roundCount))
 		end)
 
 		it('puts matches in round end dates beyond the number of rounds in the final round', function()
@@ -241,6 +408,7 @@ describe('Standings Legacy Next', function()
 			assert.are_equal(6, StandingTableLegacyNext.computeRoundCount({rounds = '6'}, matches, 0))
 			assert.are_equal(1, StandingTableLegacyNext.computeRoundCount({rounds = 'false'}, matches, 0))
 			assert.are_equal(2, StandingTableLegacyNext.computeRoundCount({rounds = 'false'}, matches, 2))
+			assert.are_equal(1, StandingTableLegacyNext.computeRoundCount({rounds = '0'}, matches, 0))
 			assert.are_equal(5, StandingTableLegacyNext.computeRoundCount({}, matches, 5))
 		end)
 	end)

@@ -5,6 +5,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - javascript/commons/**/*.js
+      - lua/wikis/**/*.lua
+      - stylesheets/commons/**/*.scss
 
 jobs:
   deploy:

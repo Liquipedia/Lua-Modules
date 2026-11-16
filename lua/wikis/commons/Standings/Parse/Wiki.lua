@@ -35,8 +35,9 @@ local DEFAULT_POINTS = {
 	group = {w = 3, d = 1, l = 0},
 }
 local DEFAULT_OVERTIME_POINTS = {w = 3, d = 1.5, l = 0, otw = 2, otl = 1}
-local RESULT_POINTS_KEYS = {win = 'w', draw = 'd', loss = 'l', otwin = 'otw', otloss = 'otl'}
+local RESULT_POINTS_KEYS = {win = 'w', draw = 'd', loss = 'l', otwin = 'otw', otloss = 'otl', walkoverloss = 'wol'}
 local OVERTIME_POINTS_KEYS = {otw = true, otl = true}
+local WALKOVER_LOSS_STATUSES = {FF = true, DQ = true}
 local ADJUSTMENT_RECORDS = {
 	match = {w = 'matchwins', d = 'matchdraws', l = 'matchlosses'},
 	game = {w = 'gamewins', d = 'gamedraws', l = 'gamelosses'},
@@ -157,7 +158,7 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, res
 		aliases = {opponent}
 		Array.extendWith(aliases,
 			Array.map(Array.parseCommaSeparatedString(opponentData.aliases, ';'), function(alias)
-				return Opponent.readOpponentArgs{type = Opponent.team, template = alias}
+				return Opponent.resolve(Opponent.readOpponentArgs{type = Opponent.team, template = alias}, resolveDate)
 			end)
 		)
 	end
@@ -256,10 +257,30 @@ function StandingsParseWiki.parseWikiBgs(input)
 	return statusParsed
 end
 
+---A score as written in `X-Y` points keys, so `1.50` and `1.5` are the same
+---@param score string|number
+---@return string
+local function formatScore(score)
+	local number = tonumber(score) --[[@as number]]
+	if number == math.floor(number) then
+		return string.format('%d', number)
+	end
+	return tostring(number)
+end
+
+---@param ownScore string|number
+---@param otherScore string|number
+---@return string
+local function makeScoreKey(ownScore, otherScore)
+	return formatScore(ownScore) .. '-' .. formatScore(otherScore)
+end
+
 ---Reads the `points` input of swiss and group standings, e.g. `win=3, draw=1, loss=0, 2-0=4`.
 ---`win`, `draw` and `loss` are the points of that result and are keyed `w`, `d` and `l`.
 ---With overtime, `otwin` and `otloss` are the points of an overtime result and are keyed `otw` and `otl`.
+---`walkoverloss` is the points of a loss by forfeit (FF) or disqualification (DQ), keyed `wol`, a loss if unset.
 ---`X-Y` is the fixed amount of points for an opponent scoring X against Y, replacing the points of its result.
+---Scores may have decimals, e.g. `1.5-0.5`.
 ---@param input string?
 ---@param overtime boolean?
 ---@param tableType 'swiss'|'group'|nil # Picks the default points, swiss if unset
@@ -269,7 +290,8 @@ function StandingsParseWiki.parsePoints(input, overtime, tableType)
 	local entries = Array.filter(Array.parseCommaSeparatedString(input), Logic.isNotEmpty)
 	Array.forEach(entries, function(entry)
 		local key, value = unpack(Array.parseCommaSeparatedString(entry, '='))
-		local pointsKey = RESULT_POINTS_KEYS[key] or (key and key:match('^%d+%-%d+$') and key)
+		local ownScore, otherScore = (key or ''):match('^(%d+%.?%d*)%-(%d+%.?%d*)$')
+		local pointsKey = RESULT_POINTS_KEYS[key] or (ownScore and makeScoreKey(ownScore, otherScore))
 		assert(pointsKey, 'Invalid points input: unknown key "' .. tostring(key) .. '" in "' .. entry .. '"')
 		assert(overtime or not OVERTIME_POINTS_KEYS[pointsKey],
 			'Invalid points input: "' .. entry .. '" requires overtime to be enabled')
@@ -284,25 +306,39 @@ local MAX_FORMAT_RESULTS = 10
 local FORMAT_SHORTHANDS = {
 	gsl = {'swiss', adv = 2},
 	swiss = {'swiss'},
+	srr = {'roundrobin', cycles = 1},
+	drr = {'roundrobin', cycles = 2},
 }
 
----@param value integer?
----@return boolean
-local function isValidResultCount(value)
-	return value ~= nil and value > 0 and value <= MAX_FORMAT_RESULTS
+---A positive integer up to `max`, or `default` without input
+---@param data table
+---@param key string
+---@param input string
+---@param default integer?
+---@param max integer?
+---@return integer
+local function readFormatCount(data, key, input, default, max)
+	if default and Logic.isEmpty(data[key]) then
+		return default
+	end
+	local value = MathUtil.toInteger(data[key])
+	assert(value and value > 0 and value <= (max or math.huge), 'Invalid format input: "' .. input .. '" needs '
+		.. key .. ' as ' .. (max and ('an integer from 1 to ' .. max) or 'a positive integer'))
+	return value
 end
 
 ---@type table<string, fun(data: table, input: string): StandingsFormat>
 local FORMAT_PARSERS = {
 	swiss = function(data, input)
-		local winsToAdvance = MathUtil.toInteger(data.adv)
-		local lossesToEliminate = Logic.isEmpty(data.elim) and winsToAdvance or MathUtil.toInteger(data.elim)
-		local bounds = 'an integer from 1 to ' .. MAX_FORMAT_RESULTS
-		assert(isValidResultCount(winsToAdvance), 'Invalid format input: "' .. input .. '" needs adv as ' .. bounds)
-		assert(isValidResultCount(lossesToEliminate), 'Invalid format input: "' .. input .. '" needs elim as ' .. bounds)
-		---@cast winsToAdvance -nil
-		---@cast lossesToEliminate -nil
+		local winsToAdvance = readFormatCount(data, 'adv', input, nil, MAX_FORMAT_RESULTS)
+		local lossesToEliminate = readFormatCount(data, 'elim', input, winsToAdvance, MAX_FORMAT_RESULTS)
 		return {type = 'swiss', winsToAdvance = winsToAdvance, lossesToEliminate = lossesToEliminate}
+	end,
+	roundrobin = function(data, input)
+		return {type = 'roundrobin', cycles = readFormatCount(data, 'cycles', input, 1)}
+	end,
+	classicswiss = function(data, input)
+		return {type = 'classicswiss', rounds = readFormatCount(data, 'rounds', input)}
 	end,
 }
 
@@ -313,7 +349,8 @@ local function parseFormatShorthand(input)
 	return FORMAT_SHORTHANDS[input] or (adv and {'swiss', adv = adv}) or nil
 end
 
----Reads `format`: `gsl`, `swiss<N>` or `{{Json|swiss|adv=<N>|elim=<N>}}`, where `elim` defaults to `adv`.
+---Reads `format`: `gsl`, `swiss<N>`, `srr`, `drr`, or `{{Json|<type>|...}}` with type `swiss` (`adv`, `elim`
+---defaulting to `adv`), `roundrobin` (`cycles`, defaulting to 1) or `classicswiss` (`rounds`).
 ---@param args table
 ---@param tableType StandingsTableTypes
 ---@return StandingsFormat?
@@ -347,7 +384,7 @@ local function getScoreKey(match, opponent)
 		return nil
 	end
 	local other = opponents[1] == opponent and opponents[2] or opponents[1]
-	return opponent.score .. '-' .. other.score
+	return makeScoreKey(opponent.score, other.score)
 end
 
 ---@param tabletype StandingsTableTypes
@@ -377,6 +414,9 @@ function StandingsParseWiki.makeScoringFunction(tabletype, args, overtime)
 				return nil
 			end
 			local result = TiebreakerScope.matchResult(match, opponent)
+			if result == 'l' and points.wol and WALKOVER_LOSS_STATUSES[opponent.status] then
+				return points.wol
+			end
 			-- Overtime takes priority over the score, as overtime is only supported for Bo1 matches,
 			-- where the score of an overtime match does not differ from a regulation one
 			if overtime and result ~= 'd' and StandingsOvertime.isOvertimeMatch(match) then
@@ -467,13 +507,25 @@ function StandingsParseWiki.parseWidth(args)
 	return tonumber((string.gsub(args.width or '', 'px', '')))
 end
 
----Reads whether overtime is tracked separately from regulation. Requires an overtime config on the wiki.
+---Reads the `regulationrounds` input, the number of rounds a game has in regulation. More rounds is overtime.
+---Unset means the regulation rounds of the wiki config.
+---@param args table
+---@return integer?
+function StandingsParseWiki.parseRegulationRounds(args)
+	local regulationRounds = readNonNegativeInteger(args, 'regulationrounds')
+	assert(regulationRounds ~= 0, 'Invalid regulationrounds input: "0" is not a positive integer')
+	return regulationRounds
+end
+
+---Reads whether overtime is tracked separately from regulation.
+---Requires regulation rounds, from the `regulationrounds` input or the wiki config.
 ---@param args table
 ---@return boolean
 function StandingsParseWiki.parseOvertime(args)
 	local overtime = Logic.readBool(args.overtime)
-	if overtime and not StandingsOvertime.regulationRounds() then
-		error('Overtime standings require `Info.config.standings.overtime.regulationRounds` to be configured')
+	if overtime and not StandingsOvertime.regulationRounds(StandingsParseWiki.parseRegulationRounds(args)) then
+		error('Overtime standings require `regulationrounds` or '
+			.. '`Info.config.standings.overtime.regulationRounds` to be configured')
 	end
 	return overtime
 end

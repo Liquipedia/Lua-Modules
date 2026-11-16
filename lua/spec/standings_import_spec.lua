@@ -574,6 +574,35 @@ describe('Standings import from matches', function()
 		assert.are_equal(2, findOpponent(opponents, 'Wolves Esports').rounds[1].matchOpponentIndex)
 	end)
 
+	it('resolves alias input through the team template', function()
+		stubMatchQuery{
+			match2Record{matchId = 'M1', finished = true, opponents = {
+				{template = 'team liquid 2023', name = 'Team Liquid', score = 1, placement = 1},
+				{template = 'wolves esports', name = 'Wolves Esports', score = 0, placement = 2},
+			}},
+			match2Record{matchId = 'M2', finished = true, opponents = {
+				{template = 'wolves esports', name = 'Wolves Esports', score = 1, placement = 1},
+				{template = 'team bds 2021', name = 'Team BDS', score = 0, placement = 2},
+			}},
+		}
+
+		local heroic = StandingsParseWiki.parseWikiOpponent(
+			{type = 'team', 'heroic', aliases = 'Team Liquid 2023; BDS_Esport'}, 1, '2024-01-05')
+		assert.are_same(
+			{'heroic 2023', 'team liquid 2023', 'team bds 2021'},
+			Array.map(heroic.aliases, Operator.property('template'))
+		)
+
+		local opponents = StandingsParseLpdb.importFromMatches({
+			{roundNumber = 1, matches = {'M1', 'M2'}},
+		}, swissScoreMapper, {heroic, manualOpponent('Wolves Esports', 'wolves esports')})
+
+		local heroicResult = Array.find(opponents, function(opponentData)
+			return opponentData.opponent.template == 'heroic 2023'
+		end)
+		assert.are_same({w = 1, d = 0, l = 1}, heroicResult.rounds[1].scoreboard.match)
+	end)
+
 	describe('queried columns', function()
 		local rounds = {{roundNumber = 1, matches = {'M1'}}, {roundNumber = 2, matches = {'M2', 'M3'}}}
 
@@ -766,6 +795,21 @@ describe('Standings import from matches', function()
 			assert.is_nil(heroic.rounds[2].scoreboard.overtime)
 			assert.are_equal(1, heroic.rounds[1].scoreboard.points)
 			assert.are_equal(0, heroic.rounds[2].scoreboard.points)
+		end)
+
+		it('overrides the regulation rounds of the wiki config', function()
+			-- M1 (7-3) goes into overtime after 8 rounds
+			stubRegulationAndOvertimeMatch()
+
+			local opponents = StandingsParseLpdb.importFromMatches(rounds, swissScoreMapper, {}, {
+				importOpponents = true,
+				overtime = true,
+				regulationRounds = 8,
+			})
+
+			local heroic = findOpponent(opponents, 'Heroic')
+			assert.are_same({w = 0, d = 0, l = 0}, heroic.rounds[1].scoreboard.match)
+			assert.are_same({w = 1, l = 0}, heroic.rounds[1].scoreboard.overtime)
 		end)
 
 		it('requires Bo1 matches', function()

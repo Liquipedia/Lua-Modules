@@ -185,6 +185,7 @@ return {
 		match2 = {
 			status = 1,
 			sortCasters = true,
+			scoreWidth = 32,
 		},
 		infoboxPlayer = {
 			automatedHistory = {

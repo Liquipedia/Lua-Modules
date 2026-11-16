@@ -115,8 +115,9 @@ describe('Standings Tiebreakers', function()
 		it('accepts the h2hcs, h2hlegacy and ml contexts for match based tiebreakers', function()
 			local names = {
 				'points', 'matchdiff', 'matchcount', 'matchwins', 'matchdraws', 'matchlosses', 'matchwinrate', 'matchscore',
-				'gamediff', 'gamecount', 'gamewins', 'gamelosses', 'gamewinrate', 'gamescore', 'gamediffregulation',
+				'gamediff', 'gamecount', 'gamewins', 'gamelosses', 'gamewinrate', 'gamescore',
 				'roundwins', 'roundlosses', 'rounddiff', 'roundwinrate', 'roundscore',
+				'rounddiffregulation', 'roundwinsregulation', 'roundlossesregulation',
 			}
 			Array.forEach(names, function(name)
 				Array.forEach({'full', 'ml', 'h2hlegacy', 'h2hcs'}, function(context)
@@ -127,7 +128,10 @@ describe('Standings Tiebreakers', function()
 		end)
 
 		it('knows which tiebreakers read the games', function()
-			local readers = {'gamediffregulation', 'roundwins', 'roundlosses', 'rounddiff', 'roundwinrate', 'roundscore'}
+			local readers = {
+				'roundwins', 'roundlosses', 'rounddiff', 'roundwinrate', 'roundscore',
+				'rounddiffregulation', 'roundwinsregulation', 'roundlossesregulation',
+			}
 			Array.forEach(readers, function(name)
 				assert.is_true(TiebreakerFactory.readsGames('full.' .. name))
 				assert.is_true(TiebreakerFactory.readsGames('ml.' .. name))
@@ -173,7 +177,6 @@ describe('Standings Tiebreakers', function()
 		end)
 
 		it('leaves tiebreakers without a match counterpart unchanged', function()
-			assert.are_equal('full.gamediffregulation', TiebreakerFactory.toMatchEquivalent('full.gamediffregulation'))
 			assert.are_equal('full.rounddiff', TiebreakerFactory.toMatchEquivalent('full.rounddiff'))
 			assert.are_equal('full.matchdiff', TiebreakerFactory.toMatchEquivalent('full.matchdiff'))
 			assert.are_equal('full.points', TiebreakerFactory.toMatchEquivalent('full.points'))
@@ -651,7 +654,6 @@ describe('Standings Tiebreakers', function()
 			assert.are_equal(9, valueOf('gamecount'))
 			assert.are_equal(4 / 9, valueOf('gamewinrate'))
 			assert.are_same({4, -5}, valueOf('gamescore'))
-			assert.are_equal(-1, valueOf('gamediffregulation'))
 			assert.are_equal('4 - 5', TiebreakerFactory.tiebreakerFromId('full.gamescore', options):display({alpha}, alpha))
 		end)
 
@@ -788,39 +790,83 @@ describe('Standings Tiebreakers', function()
 			assert.are_equal('1 - 1 - 2 - 1', gamescore:display({withOvertime}, withOvertime))
 		end)
 
-		it('gamediffregulation only counts the regulation games', function()
-			local gamediffregulation = TiebreakerFactory.tiebreakerFromId('full.gamediffregulation')
-			local alpha = makeAlpha()
-			-- Regulation: 1 win, 1 loss
-			assert.are_equal(0, gamediffregulation:valueOf({alpha}, alpha))
-			assert.are_equal('1 - 1', gamediffregulation:display({alpha}, alpha))
-			assert.are_equal('Game (R)', gamediffregulation:headerTitle())
-		end)
+		describe('regulation rounds', function()
+			local TiebreakerRoundUtil = require('Module:Standings/Tiebreaker/Game/Rounds/Util')
 
-		it('gamediffregulation is not affected by overtime being tracked', function()
-			local gamediffregulation = TiebreakerFactory.tiebreakerFromId('full.gamediffregulation')
-			local alpha = makeAlpha{overtime = {w = 1, l = 2}}
-			assert.are_equal('1 - 1', gamediffregulation:display({alpha}, alpha))
-		end)
+			---@param id string
+			---@param opp table
+			---@param options table?
+			local function tiebreaker(id, opp, options)
+				local instance = TiebreakerFactory.tiebreakerFromId('full.' .. id, options)
+				return instance:valueOf({opp}, opp), instance:display({opp}, opp)
+			end
 
-		it('gamediffregulation behaves like gamediff without regulation rounds configured', function()
-			Info.config.standings = {}
-			local gamediff = TiebreakerFactory.tiebreakerFromId('full.gamediff')
-			local gamediffregulation = TiebreakerFactory.tiebreakerFromId('full.gamediffregulation')
-			local alpha = makeAlpha()
-			assert.are_equal(gamediff:valueOf({alpha}, alpha), gamediffregulation:valueOf({alpha}, alpha))
-			assert.are_equal('2 - 3', gamediffregulation:display({alpha}, alpha))
-		end)
+			-- Regulation: win (7-3). Overtime: win (10-8), loss (6-9), draw (8-8).
+			local function makeBravo()
+				return opponent('Bravo', {
+					matches = {
+						makeBo1('Bravo', 'Alpha', {7, 3}),
+						makeBo1('Bravo', 'Charlie', {10, 8}),
+						makeBo1('Bravo', 'Delta', {6, 9}),
+						makeMatch({'Bravo', 'Echo'}, {winner = 0, scores = {0, 0}, games = {
+							{winner = 0, status = '', scores = {8, 8}},
+						}}),
+					},
+				})
+			end
 
-		it('gamediffregulation excludes walkover matches', function()
-			local gamediffregulation = TiebreakerFactory.tiebreakerFromId('full.gamediffregulation')
-			local alpha = opponent('Alpha', {
-				matches = {
-					makeBo1('Alpha', 'Bravo', {7, 3}),
-					makeMatch({'Alpha', 'Charlie'}, {winner = 1, statuses = {'W', 'FF'}}),
-				},
-			})
-			assert.are_equal(1, gamediffregulation:valueOf({alpha}, alpha))
+			it('counts an overtime map as the narrowest regulation result', function()
+				local bravo = makeBravo()
+				-- 7-3, 10-8 as 7-6, 6-9 as 6-7, 8-8 as 6-6
+				assert.are_same({rounds = 48, w = 26, l = 22}, TiebreakerRoundUtil.getRegulationRounds(bravo))
+				assert.are_same({rounds = 59, w = 31, l = 28}, TiebreakerRoundUtil.getRounds(bravo))
+				assert.are_same({4, '+4'}, {tiebreaker('rounddiffregulation', bravo)})
+				assert.are_same({26, '26 - 22'}, {tiebreaker('roundwinsregulation', bravo)})
+				assert.are_same({-22, '26 - 22'}, {tiebreaker('roundlossesregulation', bravo)})
+			end)
+
+			it('tests each map of a match for overtime, not the match total', function()
+				local bravo = opponent('Bravo', {
+					matches = {
+						makeMatch({'Bravo', 'Alpha'}, {winner = 1, scores = {2, 1}, games = {
+							{winner = 1, status = '', scores = {7, 2}},
+							{winner = 2, status = '', scores = {5, 7}},
+							{winner = 1, status = '', scores = {7, 4}},
+						}}),
+					},
+				})
+				-- 32 rounds in the match, but no map beyond 12
+				assert.are_same({rounds = 32, w = 19, l = 13}, TiebreakerRoundUtil.getRegulationRounds(bravo))
+			end)
+
+			it('equals the rounds without regulation rounds configured', function()
+				Info.config.standings = {}
+				local bravo = makeBravo()
+				assert.are_same(TiebreakerRoundUtil.getRounds(bravo), TiebreakerRoundUtil.getRegulationRounds(bravo))
+			end)
+
+			it('counts walkovers and round adjustments like the rounds', function()
+				local bravo = opponent('Bravo', {
+					roundAdjustment = {w = 2, l = 1},
+					matches = {
+						makeBo1('Bravo', 'Alpha', {10, 8}),
+						makeMatch({'Bravo', 'Charlie'}, {winner = 1, statuses = {'W', 'FF'}}),
+					},
+				})
+				local options = {walkoverRounds = 7, walkoverGames = 1}
+				-- 10-8 as 7-6, walkover win 7-0, adjustment +2 -1
+				assert.are_same({16, '16 - 7'}, {tiebreaker('roundwinsregulation', bravo, options)})
+			end)
+
+			it('shows the regulation round tiebreakers in one column', function()
+				local bravo = makeBravo()
+				local wins = TiebreakerFactory.tiebreakerFromId('full.roundwinsregulation')
+				local losses = TiebreakerFactory.tiebreakerFromId('full.roundlossesregulation')
+				assert.are_equal('Round (R)', wins:headerTitle())
+				assert.are_equal(wins:headerTitle(), losses:headerTitle())
+				assert.are_equal(wins:display({bravo}, bravo), losses:display({bravo}, bravo))
+				assert.are_equal('RD (R)', TiebreakerFactory.tiebreakerFromId('full.rounddiffregulation'):headerTitle())
+			end)
 		end)
 	end)
 
@@ -996,7 +1042,6 @@ describe('Standings Tiebreakers', function()
 			assert.are_equal(7, valueOf('full.gamecount', alpha))
 			assert.are_same({3, -3}, valueOf('full.gamescore', alpha))
 			assert.are_equal(3 / 7, valueOf('full.gamewinrate', alpha))
-			assert.are_equal(0, valueOf('full.gamediffregulation', alpha))
 			assert.are_equal('3 - 3', display('full.gamescore', alpha))
 			assert.are_equal('3 - 1 - 3', display('full.gamescore', alpha, {draws = {game = true}}))
 		end)

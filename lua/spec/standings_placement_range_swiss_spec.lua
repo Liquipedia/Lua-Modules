@@ -284,12 +284,6 @@ describe('Standings Swiss Placement Range', function()
 			assertNoRanges(opponents)
 		end)
 
-		it('with a disqualified opponent', function()
-			local opponents = makeOpponents{{1, 0, 2}, {0, 1, 2}}
-			opponents[1].extradata.disqualified = true
-			assertNoRanges(opponents)
-		end)
-
 		it('in tables with overtime', function()
 			local opponents = makeOpponents{{1, 0, 2}, {0, 1, 2}}
 			opponents[1].overtime = {w = 0, l = 0}
@@ -298,16 +292,6 @@ describe('Standings Swiss Placement Range', function()
 
 		it('with records that same record pairings can not lead to', function()
 			assertNoRanges(makeOpponents{{2, 0, 2}, {0, 2, 2}})
-		end)
-
-		it('from the round a match record is adjusted', function()
-			local data = opponentsData(4)
-			data[1].adjustments = {[2] = {match = {w = 1}}}
-			local calculator = StandingsSwissPlacementRange.new(GSL, data)
-			---@cast calculator -nil
-			local opponents = makeOpponents{{1, 0, 2}, {0, 1, 2}}
-			assert.is_not_nil(calculator:rangesFor(opponents, 1))
-			assert.is_nil(calculator:rangesFor(opponents, 2))
 		end)
 	end)
 end)

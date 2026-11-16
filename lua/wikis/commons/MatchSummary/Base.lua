@@ -32,6 +32,8 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 ---@field createGames? fun(match: MatchGroupUtilMatch): Renderable|Renderable[] @deprecated (but better than createBody)
 ---@field createGame? fun(game: table, gameIndex: integer): Renderable|Renderable[] @deprecated
 ---@field GameRow? Component<MatchSummaryGameRowProps>
+---@field buildGameRowProps? fun(
+---match: MatchGroupUtilMatch, game: MatchGroupUtilGame, gameIndex: integer): T: MatchSummaryGameRowProps
 ---@field GameDetail? fun(game: MatchGroupUtilGame, index: integer): Renderable?
 ---@field gameFilter? fun(game: MatchGroupUtilGame): boolean
 ---@field createFooter? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
@@ -42,6 +44,7 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 ---@field noScore? boolean
 ---@field maxBans? integer
 ---@field showDetail? fun(match: MatchGroupUtilMatch): boolean
+---@field mapVetoPreprocessOptions {game: string?, emptyMapDisplay: string?, useLpdb: boolean?}?
 
 ---@class MatchSummary
 local MatchSummary = {}
@@ -86,6 +89,15 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 		local sets = match.submatches or {}
 
 		local gameFilterFunction = CustomMatchSummary.gameFilter or function() return true end
+		---@type fun(game: MatchGroupUtilGame, gameIndex: integer): MatchSummaryGameRowProps
+		local gameRowPropsFunction = CustomMatchSummary.buildGameRowProps and FnUtil.curry(
+			CustomMatchSummary.buildGameRowProps, match
+		) or function (game, gameIndex)
+			return {
+				game = game,
+				gameIndex = gameIndex,
+			}
+		end
 
 		-- With one set for all matches, or one game per set, it's redundant to show set level info.
 		if #sets > 1 and #sets < #match.games then
@@ -97,7 +109,7 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 						if not gameFilterFunction(game) then
 							return
 						end
-						return GameRow{game = game, gameIndex = gameIndex}
+						return GameRow(gameRowPropsFunction(game, gameIndex))
 					end)
 				}
 			end)
@@ -107,7 +119,7 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 					if not gameFilterFunction(game) then
 						return
 					end
-					return GameRow{game = game, gameIndex = gameIndex}
+					return GameRow(gameRowPropsFunction(game, gameIndex))
 				end)
 			}
 		end
@@ -122,7 +134,9 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 	return WidgetUtil.collect(
 		nodes,
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(
+			match.extradata.mapveto, options.mapVetoPreprocessOptions or {game = match.game}
+		)),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
 	)
 end
