@@ -267,7 +267,7 @@ liquipedia.countdown = {
 		[ 'New Zealand Daylight Time', 'NZDT' ],
 		[ 'New Zealand Standard Time', 'NZST' ],
 		[ 'Newfoundland Daylight Time', 'NDT' ],
-		[ 'Newfoundland Standard Time', 'NDT' ],
+		[ 'Newfoundland Standard Time', 'NST' ],
 		[ 'Norfolk Island Time', 'NFT' ],
 		[ 'Novosibirsk Standard Time', 'NOVST' ],
 		[ 'Omsk Standard Time', 'OMST' ],
@@ -343,18 +343,6 @@ liquipedia.countdown = {
 		format = format || 'full';
 
 		const userTime = {
-			localYear: dateObject.getFullYear(),
-			localMonth: dateObject.getMonth(),
-			localDay: dateObject.getDate(),
-			localHours: dateObject.getHours(),
-			localMinutes: dateObject.getMinutes(),
-
-			utcYear: dateObject.getUTCFullYear(),
-			utcMonth: dateObject.getUTCMonth(),
-			utcDay: dateObject.getUTCDate(),
-			utcHours: dateObject.getUTCHours(),
-			utcMinutes: dateObject.getUTCMinutes(),
-
 			dateObjectYear: dateObject.getFullYear(),
 			dateObjectMonth: dateObject.getMonth(),
 			dateObjectDay: dateObject.getDate(),
@@ -364,60 +352,19 @@ liquipedia.countdown = {
 			timeZoneName: liquipedia.countdown.getTimeZoneNameLong( dateObject )
 		};
 
-		let calculatedOffsetHours = 0;
-		const calculatedOffsetMinutes = ( userTime.localMinutes - userTime.utcMinutes );
-		let offsetMinutesAsString = '';
-		let offsetHoursWithSign = '+0';
-		let finalTimeZoneAbbr = '';
+		// getTimezoneOffset() is UTC minus local time in minutes (e.g. -330 for UTC+5:30), so negate it.
+		// Hours and minutes are derived from the total offset to keep half/quarter-hour zones correct.
+		const offsetInMinutes = -dateObject.getTimezoneOffset();
+		const absoluteOffsetInMinutes = Math.abs( offsetInMinutes );
+		const offsetSign = offsetInMinutes < 0 ? '-' : '+';
+		const offsetHoursWithSign = offsetSign + Math.floor( absoluteOffsetInMinutes / 60 );
+		const offsetMinutesStr = String( absoluteOffsetInMinutes % 60 ).padStart( 2, '0' );
+		const offsetMinutesAsString = absoluteOffsetInMinutes % 60 !== 0 ? ':' + offsetMinutesStr : '';
 
-		if ( userTime.localDay === userTime.utcDay ) {
-			calculatedOffsetHours = userTime.localHours - userTime.utcHours;
-		} else if ( userTime.localMonth === userTime.utcMonth ) {
-			// Month is same, so no problems comparing dates
-			if ( userTime.localDay > userTime.utcDay ) {
-				// +24 Hours because of the next day
-				calculatedOffsetHours = -( userTime.utcHours ) + userTime.localHours + 24;
-			} else if ( userTime.localDay < userTime.utcDay ) {
-				// -24 Hours because of the day before
-				calculatedOffsetHours = -( userTime.utcHours ) + userTime.localHours - 24;
-			}
-		} else if (
-			( userTime.localMonth > userTime.utcMonth && userTime.localYear === userTime.utcYear ) ||
-			userTime.localYear > userTime.utcYear
-		) {
-			// +24 Hours because of the next day (in next month or year)
-			calculatedOffsetHours = -( userTime.utcHours ) + userTime.localHours + 24;
-		} else if (
-			( userTime.localMonth < userTime.utcMonth && userTime.localYear === userTime.utcYear ) ||
-			userTime.localYear < userTime.utcYear
-		) {
-			// -24 Hours because of the day before (in previous month or year)
-			calculatedOffsetHours = -( userTime.utcHours ) + userTime.localHours - 24;
-		}
-
-		const calculatedOffsetInMinutes = ( calculatedOffsetHours * 60 ) + calculatedOffsetMinutes;
-
-		if ( calculatedOffsetHours > 0 ) {
-			if ( calculatedOffsetInMinutes % 60 !== 0 ) {
-				offsetMinutesAsString = ':' + Math.abs( calculatedOffsetMinutes );
-			}
-		} else if ( calculatedOffsetHours < 0 ) {
-			if ( calculatedOffsetInMinutes % 60 !== 0 ) {
-				offsetMinutesAsString = ':' + Math.abs( calculatedOffsetMinutes );
-			}
-		}
-
-		let finalTimeZoneName = 'UTC' + offsetHoursWithSign + offsetMinutesAsString;
-
-		if ( calculatedOffsetHours < 0 ) {
-			offsetHoursWithSign = '-' + Math.abs( calculatedOffsetHours );
-		} else if ( calculatedOffsetHours > 0 ) {
-			offsetHoursWithSign = '+' + Math.abs( calculatedOffsetHours );
-		}
-
+		let finalTimeZoneName;
+		let finalTimeZoneAbbr;
 		if ( !liquipedia.countdown.timeZoneAbbr.has( userTime.timeZoneName ) ) {
-			// ('0' + calculatedOffsetMinutes).slice(-2), because of the leading zero
-			finalTimeZoneName = 'UTC' + offsetHoursWithSign + ':' + ( '0' + calculatedOffsetMinutes ).slice( -2 );
+			finalTimeZoneName = 'UTC' + offsetHoursWithSign + ':' + offsetMinutesStr;
 			finalTimeZoneAbbr = 'UTC' + offsetHoursWithSign + offsetMinutesAsString;
 		} else {
 			finalTimeZoneAbbr = liquipedia.countdown.timeZoneAbbr.get( userTime.timeZoneName );
@@ -442,7 +389,6 @@ liquipedia.countdown = {
 			strLocalTime1 = `${ monthName } ${ userTime.dateObjectDay }, ${ userTime.dateObjectYear } - ${ hours }:${ minutes }`;
 		}
 
-		const offsetMinutesStr = ( '0' + calculatedOffsetMinutes ).slice( -2 );
 		const strLocalTime2 = ` <abbr data-tz="${ offsetHoursWithSign }:${ offsetMinutesStr }"`;
 		const strLocalTime3 = ` title="${ finalTimeZoneName }">${ finalTimeZoneAbbr }</abbr>`;
 		const dateObjectString = strLocalTime1 + strLocalTime2 + strLocalTime3;
