@@ -86,6 +86,8 @@ function MapFunctions.computeOpponentScore(props, autoScore)
 	return MatchGroupInputUtil.computeOpponentScore(props, autoScore)
 end
 
+local getMapByPageName = FnUtil.memoize(Map.getMapByPageName)
+
 ---@param match table
 ---@param game table
 ---@param opponents MGIParsedOpponent[]
@@ -94,7 +96,7 @@ function MapFunctions.getMapMode(match, game, opponents)
 	if Logic.isNotEmpty(game.mode) then
 		return game.mode
 	end
-	local mapData = Map.getMapByPageName(game.map)
+	local mapData = getMapByPageName(game.map)
 	return mapData and (mapData.gameModes or {})[1] or nil
 end
 
