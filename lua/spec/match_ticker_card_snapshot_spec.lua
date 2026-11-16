@@ -6,7 +6,6 @@ insulate('Match Ticker Card', function()
 
 	local Html = require('Module:Widget/Html')
 	local Switch = require('Module:Widget/Switch')
-	local MatchTickerCard = require('Module:Widget/Match/Ticker/Card')
 
 	it('snapshot', function()
 		local LoadJsonDataStub = stub(mw, 'loadJsonData', {})
@@ -14,6 +13,7 @@ insulate('Match Ticker Card', function()
 		local MakeTitleStub = stub(mw.title, 'makeTitle', function(_, title, fragment)
 			return {fullText = title .. (fragment and ('#' .. fragment) or '')}
 		end)
+		local MatchTickerCard = require('Module:Widget/Match/Ticker/Card')
 		local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 		TeamTemplateMock.setUp()
 
