@@ -234,16 +234,16 @@ describe('Standings Wiki Parser', function()
 		end)
 	end)
 
-	describe('cutafter', function()
+	describe('collapseafter', function()
 		it('reads the number of rows shown before collapsing', function()
-			assert.are_equal(16, StandingsParseWiki.parseCutAfter{cutafter = '16'})
-			assert.is_nil(StandingsParseWiki.parseCutAfter{cutafter = ''})
-			assert.is_nil(StandingsParseWiki.parseCutAfter{})
+			assert.are_equal(16, StandingsParseWiki.parseCollapseAfter{collapseafter = '16'})
+			assert.is_nil(StandingsParseWiki.parseCollapseAfter{collapseafter = ''})
+			assert.is_nil(StandingsParseWiki.parseCollapseAfter{})
 		end)
 
 		it('errors on input that is not a positive integer', function()
 			for _, input in ipairs({'abc', '-1', '1.5', '0'}) do
-				assert.error(function() StandingsParseWiki.parseCutAfter{cutafter = input} end)
+				assert.error(function() StandingsParseWiki.parseCollapseAfter{collapseafter = input} end)
 			end
 		end)
 	end)

@@ -507,13 +507,13 @@ function StandingsParseWiki.parseWidth(args)
 	return tonumber((string.gsub(args.width or '', 'px', '')))
 end
 
----Reads the `cutafter` input, the number of rows shown before the rest collapses.
+---Reads the `collapseafter` input, the number of rows shown before the rest collapses.
 ---@param args table
 ---@return integer?
-function StandingsParseWiki.parseCutAfter(args)
-	local cutAfter = readNonNegativeInteger(args, 'cutafter')
-	assert(cutAfter ~= 0, 'Invalid cutafter input: "0" is not a positive integer')
-	return cutAfter
+function StandingsParseWiki.parseCollapseAfter(args)
+	local collapseAfter = readNonNegativeInteger(args, 'collapseafter')
+	assert(collapseAfter ~= 0, 'Invalid collapseafter input: "0" is not a positive integer')
+	return collapseAfter
 end
 
 ---Reads the `regulationrounds` input, the number of rounds a game has in regulation. More rounds is overtime.

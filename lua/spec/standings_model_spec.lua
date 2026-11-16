@@ -140,8 +140,8 @@ describe('Standings model round trip', function()
 		GoldenTest('standings_ffa', html)
 	end)
 
-	it('collapses the rows of ffa standings after cutafter', function()
-		local html = tostring(require('Module:Widget/Standings'){standings = buildStandings(), cutAfter = 1})
+	it('collapses the rows of ffa standings after collapseafter', function()
+		local html = tostring(require('Module:Widget/Standings'){standings = buildStandings(), collapseAfter = 1})
 		assert.is_truthy(html:find('standings-ffa general-collapsible collapsed', 1, true))
 		local _, cutRows = html:gsub('table2__row%-%-hide%-on%-collapse', '')
 		assert.are_equal(4, cutRows)
@@ -254,7 +254,7 @@ describe('Standings model round trip', function()
 
 		GoldenTest('standings_swiss', html)
 
-		html = tostring(SwissStandings{standings = standings, cutAfter = 1})
+		html = tostring(SwissStandings{standings = standings, collapseAfter = 1})
 		assert.is_truthy(html:find('standings-swiss general-collapsible collapsed', 1, true))
 		local _, cutRows = html:gsub('table2__row%-%-hide%-on%-collapse', '')
 		assert.are_equal(1, cutRows)
@@ -317,15 +317,16 @@ describe('Standings model round trip', function()
 		---@param rounds table[]
 		---@param opponents table[]
 		---@param bgs table<integer, string>?
-		---@param cutAfter integer?
+		---@param collapseAfter integer?
 		---@return string, StandingsModel
-		local function storeAndRender(rounds, opponents, bgs, cutAfter)
+		local function storeAndRender(rounds, opponents, bgs, collapseAfter)
 			local standingsTable = StandingsParser.parse(
 				rounds, opponents, bgs or {[1] = 'up', [3] = 'down'}, 'Group A', {}, 'group',
 				{'full.disqualified', 'full.points', 'full.manual'}
 			)
 			local standings = storeAndBuild(standingsTable)
-			return tostring(require('Module:Widget/Standings')({standings = standings, cutAfter = cutAfter})), standings
+			local html = tostring(require('Module:Widget/Standings'){standings = standings, collapseAfter = collapseAfter})
+			return html, standings
 		end
 
 		it('renders every started round with a round selector', function()
@@ -359,7 +360,7 @@ describe('Standings model round trip', function()
 			GoldenTest('standings_group', html)
 		end)
 
-		it('collapses the rows after cutafter in every round of the round selector', function()
+		it('collapses the rows after collapseafter in every round of the round selector', function()
 			local html = storeAndRender({
 				{roundNumber = 1, started = true, finished = true, title = 'Week 1'},
 				{roundNumber = 2, started = true, finished = true, title = 'Week 2'},
@@ -376,7 +377,7 @@ describe('Standings model round trip', function()
 			assert.are_equal(1, select(2, html:gsub(cutRow .. '2"', '')))
 		end)
 
-		it('does not collapse when no round has rows after cutafter', function()
+		it('does not collapse when no round has rows after collapseafter', function()
 			local html = storeAndRender({{roundNumber = 1, started = true, finished = true, title = 'Round 1'}}, {
 				makeGroupOpponent('Alpha', {WIN}),
 				makeGroupOpponent('Bravo', {LOSS}),

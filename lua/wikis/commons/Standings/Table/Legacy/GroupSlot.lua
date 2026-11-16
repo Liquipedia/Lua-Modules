@@ -148,7 +148,7 @@ function StandingTableLegacyGroupSlot.parseTable(startArgs, slots, config)
 		started = true,
 		finished = true,
 		title = startArgs.title,
-		cutafter = startArgs.cutafter,
+		collapseafter = startArgs.cutafter,
 		date = DateExt.readTimestampOrNil(startArgs.edate or startArgs.date),
 		bg = table.concat(bgs, ','),
 		tiebreakers = StandingTableLegacyGroupSlot.parseTiebreakers(startArgs, slots, config, opponents),

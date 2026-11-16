@@ -28,7 +28,7 @@ function StandingTableLegacyFfa.getStandardParameter(args)
 		finished = true,
 		title = args.title,
 		matches = args.matches,
-		cutafter = args.cutafter,
+		collapseafter = args.cutafter,
 	}
 end
 

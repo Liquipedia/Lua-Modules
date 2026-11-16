@@ -3,8 +3,8 @@ describe('Standings Legacy Swiss', function()
 	local StandingTableLegacySwiss = require('Module:Standings/Table/Legacy/Swiss')
 	local TiebreakerFactory = require('Module:Standings/Tiebreaker/Factory')
 
-	it('passes cutafter through', function()
-		assert.are_equal('16', StandingTableLegacySwiss.getStandardParameter{cutafter = '16'}.cutafter)
+	it('maps cutafter to collapseafter', function()
+		assert.are_equal('16', StandingTableLegacySwiss.getStandardParameter{cutafter = '16'}.collapseafter)
 	end)
 
 	describe('tiebreakers', function()

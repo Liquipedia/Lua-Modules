@@ -93,8 +93,8 @@ describe('Standings Legacy Next', function()
 			assert.is_false(StandingTableLegacyNext.getStandardParameter({storeStanding = 'false'}, {}).store)
 		end)
 
-		it('passes cutafter through', function()
-			assert.are_equal('16', StandingTableLegacyNext.getStandardParameter({cutafter = '16'}, {}).cutafter)
+		it('maps cutafter to collapseafter', function()
+			assert.are_equal('16', StandingTableLegacyNext.getStandardParameter({cutafter = '16'}, {}).collapseafter)
 		end)
 	end)
 
