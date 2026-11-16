@@ -20,10 +20,7 @@ local IMAGE_FILES = {
 }
 IMAGE_FILES.other = IMAGE_FILES.retro
 
----@class HeroesUniverseIconProps
----@field universe string?
-
----@param props HeroesUniverseIconProps
+---@param props {universe: string?}
 ---@return VNode?
 local function UniverseIcon(props)
 	local file = IMAGE_FILES[(props.universe or ''):lower()]
