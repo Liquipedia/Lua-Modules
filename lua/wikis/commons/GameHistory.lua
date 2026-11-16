@@ -133,6 +133,28 @@ function GameHistory:_readMatchGroupsSpec()
 	return TournamentStructure.readMatchGroupsSpec(tournamentArgs)
 end
 
+---@return self
+function GameHistory:query()
+	CharacterGameTable.query(self)
+
+	local config = self.config
+	config.showLength = config.showLength and self:_anyGameHas('length')
+	config.showPatch = config.showPatch and self:_anyGameHas('patch')
+
+	return self
+end
+
+---@private
+---@param field 'length'|'patch'
+---@return boolean
+function GameHistory:_anyGameHas(field)
+	return Array.any(self.matches, function (match)
+		return Array.any(match.games, function (game)
+			return Logic.isNotEmpty(game[field])
+		end)
+	end)
+end
+
 ---Picks/bans/patch/publisherid are per game, so they are narrowed down on match2game first,
 ---and only the matches containing such a game are then queried on match2.
 ---@return ConditionTree?
