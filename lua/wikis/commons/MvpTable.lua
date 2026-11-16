@@ -57,8 +57,9 @@ function MvpTable.run(args)
 		return
 	end
 
+	local collapseText = 'place ' .. (parsedArgs.cutafter + 1) .. ' to ' .. #mvpList
+
 	return TableWidgets.Table{
-		tableClasses = {'prizepooltable', 'collapsed'},
 		title = String.nilIfEmpty(args.title),
 		attributes = {id = 'MvpTable'},
 		columns = {
@@ -69,12 +70,9 @@ function MvpTable.run(args)
 		css = {
 			['margin-top'] = parsedArgs.margin .. 'px'
 		},
-		tableAttributes = {
-			['data-opentext'] = 'place ' .. (parsedArgs.cutafter + 1) .. ' to ' .. #mvpList,
-			['data-closetext'] = 'place ' .. (parsedArgs.cutafter + 1) .. ' to ' .. #mvpList,
-			['data-cutafter'] = parsedArgs.cutafter,
-			['data-definedcutafter'] = ''
-		},
+		collapseAfter = #mvpList > parsedArgs.cutafter and parsedArgs.cutafter or nil,
+		expandText = collapseText,
+		collapseText = collapseText,
 		children = WidgetUtil.collect(
 			MvpTable._header(args),
 			TableWidgets.TableBody{children = Array.map(mvpList, FnUtil.curry(MvpTable._row, parsedArgs))}

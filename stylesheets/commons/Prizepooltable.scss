@@ -83,10 +83,10 @@ so they must stay defined even though the redesigned table no longer uses them.
 Legacy / shared prize pool table styles
 Template(s): Prize pool tables — Author(s): FO-nTTaX
 
-Still relied on by non-redesigned consumers that share the `prizepooltable`
-class and the global `bg-*` / `background-color-*-place` placement classes
-(MvpTable, SeriesMedalStats, StageWinnings, TournamentPlayerInformation,
-TournamentsListing, css-grid tables). Do not remove without auditing those.
+Still relied on by consumers that share the global `bg-*` /
+`background-color-*-place` placement classes (TournamentsListing, css-grid
+tables) and by wikicode tables with the `prizepooltable` class. Do not remove
+without auditing those.
 *******************************************************************************/
 @media ( max-width: 767px ) {
 	.prizepooltable {
@@ -118,9 +118,9 @@ table.prizepooltable.collapsed .prizepooltablehide {
 	}
 }
 
-// Legacy data-cutafter collapse (mvp / medal / winnings tables, which share the
-// `prizepooltable` class and Prizepooltable.js). The JS injects the toggle before
-// the (cutAfter + 2)-th row, so rows from (cutAfter + 3) onward are hidden.
+// Legacy data-cutafter collapse for wikicode tables with Prizepooltable.js; Lua
+// tables use the Table2 `collapseAfter`. The JS injects the toggle before the
+// (cutAfter + 2)-th row, so rows from (cutAfter + 3) onward are hidden.
 @for $i from 0 through 32 {
 	.prizepooltable.collapsed[ data-cutafter="#{$i}" ] tr:nth-child( n + #{ $i + 3 } ) {
 		display: none;

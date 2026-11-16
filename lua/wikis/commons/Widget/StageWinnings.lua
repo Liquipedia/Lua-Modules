@@ -149,14 +149,13 @@ function StageWinnings:render()
 	self.points = parsePoints('points')
 	self.points2 = parsePoints('points2')
 
+	local cutAfter = tonumber(props.cutafter) or 5
+
 	return TableWidgets.Table{
 		caption = props.title,
-		tableClasses = {'prizepooltable', 'collapsed'},
-		tableAttributes = {
-			['data-cutafter'] = (tonumber(props.cutafter) or 5),
-			['data-opentext'] = 'Show remaining participants',
-			['data-closetext'] = 'Hide remaining participants',
-		},
+		collapseAfter = #opponentList > cutAfter and cutAfter or nil,
+		expandText = 'Show remaining participants',
+		collapseText = 'Hide remaining participants',
 		columns = WidgetUtil.collect(
 			{align = 'left'},
 			(Logic.readBool(props.showMatchWL) or props.prizeMode == 'matchWins') and {align = 'center'} or nil,

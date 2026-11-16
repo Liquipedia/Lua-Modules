@@ -64,15 +64,13 @@ function BasePrizePoolTable:render()
 		)}
 	}}
 
+	local collapseAfter = settings.cutAfter and #placements > settings.cutAfter and settings.cutAfter or nil
+
 	return TableWidgets.Table{
 		caption = settings.title,
-		tableClasses = settings.cutAfter and {'prizepooltable', 'collapsed'} or nil,
-		tableAttributes = settings.cutAfter and {
-			['data-cutafter'] = settings.cutAfter,
-			['data-opentext'] = 'Show more',
-			['data-closetext'] = 'Show less',
-		} or nil,
-		sortable = not settings.cutAfter,
+		collapseAfter = collapseAfter,
+		-- Sorting would move other rows behind the cut
+		sortable = not collapseAfter,
 		columns = WidgetUtil.collect(
 			{
 				align = 'center',
