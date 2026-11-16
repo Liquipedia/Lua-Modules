@@ -41,7 +41,7 @@ MatchCard.defaultProps = {
 	variant = 'horizontal',
 }
 
----@return Renderable?
+---@return VNode?
 function MatchCard:render()
 	local match = self.props.match
 	local gameData = self.props.gameData
@@ -68,7 +68,7 @@ end
 ---@param match MatchGroupUtilMatch
 ---@param gameData MatchTickerGameData?
 ---@param highlight boolean
----@return Widget
+---@return VNode
 function MatchCard:_renderHorizontal(match, gameData, highlight)
 	local tournamentLink = TournamentBar{
 		match = match,
