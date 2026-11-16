@@ -12,7 +12,7 @@ local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy')
 local CustomLegacyAwardPrizePool = {}
 
 -- Template entry point
----@return Widget
+---@return Renderable
 function CustomLegacyAwardPrizePool.run()
 	return LegacyPrizePool.run(CustomLegacyAwardPrizePool)
 end

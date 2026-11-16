@@ -38,7 +38,7 @@ local Config = Info.config.thisDay or {}
 local ThisDay = {}
 
 ---@param args table
----@return Widget
+---@return VNode
 function ThisDay.run(args)
 	local tournaments = ThisDay.tournament(args)
 	local birthdays = ThisDay.birthday(args)
@@ -51,7 +51,7 @@ end
 
 --- Get and display birthdays that happened on a given date (falls back to today)
 ---@param args ThisDayBirthdayParameters
----@return string|Widget?
+---@return VNode
 function ThisDay.birthday(args)
 	local month, day = ThisDay._readDate(args)
 
@@ -65,7 +65,7 @@ end
 
 --- Get and display patches that happened on a given date (falls back to today)
 ---@param args ThisDayParameters
----@return Widget?
+---@return VNode?
 function ThisDay.patch(args)
 	if not Logic.readBool(Config.showPatches) then return end
 	local month, day = ThisDay._readDate(args)
@@ -79,7 +79,7 @@ end
 
 --- Get and display tournament wins that happened on a given date (falls back to today)
 ---@param args ThisDayParameters
----@return string|Widget?
+---@return VNode
 function ThisDay.tournament(args)
 	local month, day = ThisDay._readDate(args)
 
@@ -91,7 +91,7 @@ end
 
 --- Reads trivia from subpages of 'Liquipedia:This day'
 ---@param args ThisDayParameters
----@return (string|Widget)[]
+---@return Renderable[]
 function ThisDay.trivia(args)
 	local month, day = ThisDay._readDate(args)
 	local triviaText = Template.safeExpand(

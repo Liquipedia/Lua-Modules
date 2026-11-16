@@ -9,86 +9,83 @@ Any modules added in this repository will, after a review process, be added to t
 
 ## Contributing
 
-If you want to contribute you may do that in any way you wish. We use the following steps for onboarding new developers.
-
 ### Setup
 
-#### Dependencies Installation
+Everything runs in a [devcontainer](https://containers.dev/). You install Docker and VS Code, then open the repo inside the container. First time it may take 5 minutes to start.
 
-Clone the repository. This requires [git](https://git-scm.com/downloads) to be installed on your system.
+#### 1. Install Docker
 
-##### Windows
+**Linux**
+- Install [Docker Engine](https://docs.docker.com/engine/install/) — not Docker Desktop
+- Follow the [post-install steps](https://docs.docker.com/engine/install/linux-postinstall/), so `docker` works without sudo
 
-Recommended to use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install). Then follow the Unix instructions.
+**macOS**
+- Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/)
 
-##### Unix (Linux Ubuntu)
+**Windows**
+- Install [WSL 2](https://learn.microsoft.com/en-us/windows/wsl/install)
+- Then install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/) with the WSL 2 backend enabled
 
-###### Installing Lua and Luarocks
-1. Follow [these instruction](https://github.com/luarocks/luarocks/blob/main/docs/installation_instructions_for_unix.md) on installing needed development tools on your system.
-2. Instead of downloading and unpacking the latest Lua version, download lua-5.1.tar.gz from [lua.org](https://www.lua.org/ftp/) and unpack it.
-3. Follow the instructions linked above for the rest of the process.
-4. If you have done everything correctly, you should now have Lua and Luarocks installed on your system.
+#### 2. Install VS Code
 
-###### Installing busted and luacheck
-1. Run `luarocks install --lua-version=5.1 busted` to install busted (used as a testing framework).
-2. Run `luarocks install --lua-version=5.1 luacheck` to install luacheck (used for linting).
-3. Make sure installed rocks are available in your path variable.
-4. Test if everything is correctly installed by running `busted -C lua` and `luacheck lua --config lua/.luacheckrc` from the root of this project. If all tests pass and all checks are OK, you're installation of busted and luacheck is complete.
+1. Install [VS Code](https://code.visualstudio.com/download).
+2. and the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
 
-###### Installing npm, node and dependencies
-1. Follow the instructions [here](https://github.com/nvm-sh/nvm?tab=readme-ov-file#install--update-script) to install npm
-2. Run `nvm install node`
-3. Run `npm install`
+Nothing else — recommended extensions install themselves inside the container.
 
-##### Mac
+#### 3. Clone the repo
 
-- Install Lua. We use version 5.1. There are some 5.2 features which are available, but nothing from 5.3 onwards. Using a newer version is not recommended or supported. The lua version is restricted as we use [LuaJit](https://luajit.org/). If you're [curious](https://github.com/LuaJIT/LuaJIT/issues/929).
-  Using brew will warn you that lua 5.1 has been deprecated and installing is disabled. Can be installed by editing the file with `brew edit lua@5.1`. Remove the line that says `disable! date: "2022-07-31", because: :unmaintained`
-  Finally run `HOMEBREW_NO_INSTALL_FROM_API=1 brew install lua@5.1` which will then install it anyway.
-- Install the package manager, [LuaRocks](https://luarocks.org/) `brew install luarocks`
-- The project contains two third party dependencies, busted and luacheck. Install both through luarocks
-  - `luarocks install --lua-version=5.1 busted` <- used as a [testing framework](https://luarocks.org/modules/lunarmodules/busted)
-  - `luarocks install --lua-version=5.1 luacheck` <- for [linting](https://luarocks.org/modules/mpeterv/luacheck)
-  - Make sure the installed rocks are available in your Path variable. How to do this might depend on your choice of terminal.
-  - Test if everything works by running `busted` from the command line in your projects root folder. If the tests run and are all green you should be good to go.
-- Install an ide/texteditor of choice. The repo contains some presets for [Visual Studio Code](https://code.visualstudio.com/download).
+**Linux / macOS:**
 
-#### IDE
-
-##### Visual Studio Code
-
-We recommend VSCode. Highly recommend that you get the extension [Lua](https://marketplace.visualstudio.com/items?itemName=sumneko.lua). The repo is setup with presets for this.
-
-Eslint and Stylelint extensions are recommended if you're going to work with stylesheets or javascript.
-
-##### Intellij
-
-Highly recommend that you get the extension [SumnekoLua](https://plugins.jetbrains.com/plugin/22315-sumnekolua).
-
-Eslint and Stylelint extensions are recommended if you're going to work with stylesheets or javascript.
-
-##### Neovim
-
-1. Add [lua_ls](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#eslint) in your Neovims lsp configuration (useful tools for lua files). Installation instruction can be found [here](https://luals.github.io/#neovim-install).
-2. Add [eslint](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#eslint) in your Neovims lsp configration (useful linting for Javascript files)
-3. Add [stylelint_lsp](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#stylelint_lsp) in your Neovims lsp configuration (useful linting for scss files). Make sure to add `scss` as a filetype to get the benefits of this LSP on scss files in this project. You can also enable `autoFixOnSave` or [other settings](https://github.com/bmatcuk/stylelint-lsp?tab=readme-ov-file#settings) if you want:
-
-```lua
-require('lspconfig').stylelint_lsp.setup {
-  filetypes = {
-    'css',
-    'postcss',
-    'less',
-    'scss'
-  },
-  settings = {
-    stylelintplus = {
-      autoFixOnSave = true,
-      validateOnType = true,
-    },
-  },
-}
+```bash
+git clone https://github.com/Liquipedia/Lua-Modules.git
 ```
+
+**Windows**
+
+Clone inside WSL, not on the Windows drive! Otherwise it will be super slow.
+```bash
+wsl
+git clone https://github.com/Liquipedia/Lua-Modules.git ~/Lua-Modules
+```
+
+#### 4. Open the repo in the container
+
+1. Open the folder in VS Code. On Windows run `code ~/Lua-Modules` from inside WSL.
+2. Click **Reopen in Container** on the prompt, or press <kbd>F1</kbd> and pick *Dev Containers: Reopen in Container*.
+3. Wait for the build (~5 min first time). It then installs dependencies, builds the CSS and JS, and creates `.env` for you.
+
+#### 5. Check it works
+
+In the container terminal:
+
+```bash
+npm run lua-test
+```
+
+All tests should pass. You are done.
+
+#### Without VS Code
+
+```bash
+npm install -g @devcontainers/cli
+devcontainer up --workspace-folder .
+devcontainer exec --workspace-folder . npm run lua-test
+```
+
+JetBrains IDEs can also open a devcontainer directly.
+
+### Previewing CSS and JS changes on the live wiki
+
+The container ships [mitmproxy](https://mitmproxy.org/) and `scripts/proxy_lp.py`, which serves your local `lua/output/css/main.css` and `lua/output/js/main.js` instead of the ones liquipedia.net would load. Background: [wiki page](https://github.com/Liquipedia/Lua-Modules/wiki/Local-Development-Setup-for-CSS-and-JS).
+
+1. Run `npm run build`, so there is something to serve.
+2. Start the proxy: `python scripts/proxy_lp.py` from the repo root, or the *Launch proxy* task in `.vscode/tasks.json`. It listens on `127.0.0.1:8080` on your host, so keep that port free.
+3. Point your browser at that proxy. A switcher extension such as Proxy SwitchyOmega (HTTP, `127.0.0.1`, port `8080`) makes it easy to toggle; a system proxy setting works too.
+4. With the proxy on, open <http://mitm.it> and install the certificate, so the browser trusts the intercepted HTTPS. Once only — the CA is kept in a volume.
+5. Edit `.scss` or `.js`, run `npm run build`, hard refresh (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> / <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>).
+
+Turn the proxy off when you are done — while it is on, every request goes through the container.
 
 ### Adding a module
 
@@ -118,9 +115,12 @@ The project is divided into folders based on language. Even though the project i
 
 #### Javascript & Stylesheets
 
-Run `npm run test` in the root folder.
+```bash
+npm run test:js   # jest
+npm run lint      # eslint and stylelint
+```
 
-You can run `npm run fix` for auto correctable issues to be fixed.
+`npm run lint` fixes what eslint can fix on its own.
 
 #### Lua
 
@@ -144,11 +144,54 @@ Trusted contributers may be given the privilege of directly branching within the
 
 ### Testing your branch
 
+Deploying your branch to a dev environment publishes your modules to sandbox pages (suffixed with `/dev/<name>`) on the wiki, so you can render and test them without touching the live pages.
+
+#### Via a GitHub Action
+
 To test your changes in action, you can run the GitHub Action called "Personal Deploy" defined in `.github/workflows/deploy test.yml`. You can do it either through the GitHub interface or with the GitHub CLI tools:
 `gh workflow run 'deploy test.yml' -r <BRANCH NAME> -f luadevenv=<DEV-ENV-NAME>`
 
 To check the workflow progress from the CLI, you can run:
 `gh run list --workflow="deploy test.yml"`
+
+#### From your machine
+
+You can also run the deploy script locally. This works from any editor — the repo ships a Visual Studio Code integration, and every other editor can call the same script directly.
+
+**One-time setup:** the container already installed the Python dependencies and created `.env`. Fill in your bot credentials there. It is git-ignored — never commit it. It ships with `DRY_RUN=1`, so nothing reaches the wiki until you change that.
+
+```
+WIKI_BASE_URL=https://liquipedia.net
+WIKI_UA_EMAIL=you@example.com
+WIKI_USER=YourBotAccount@BotName
+WIKI_PASSWORD=YourBotPassword
+DRY_RUN=0
+```
+
+**Running it:**
+
+```bash
+# Deploy specific files
+python scripts/deploy.py lua/wikis/commons/SomeModule.lua [more files...]
+
+# Deploy every file changed on your branch under lua/wikis/
+python scripts/deploy.py
+```
+
+The behaviour is driven by environment variables (set them in `.env` or per-invocation):
+
+| Variable | Purpose |
+| --- | --- |
+| `LUA_DEV_ENV_NAME` | Sandbox suffix, e.g. `/dev/myenv`. Appended to every deployed page name. **Set this for all dev testing** — without it, deploys go to the live module pages. Also required to enable the no-argument "all changed files" mode. |
+| `LUA_DEV_BASE_REF` | Ref that the no-argument mode diffs against to find changed files. Defaults to `main`. |
+| `DRY_RUN` | Set to `1` to run the full flow without writing to the wiki. |
+| `WIKI_USER` / `WIKI_PASSWORD` / `WIKI_BASE_URL` / `WIKI_UA_EMAIL` | Bot credentials and target wiki (see setup above). |
+
+> **Note:** running `python scripts/deploy.py` with no arguments **and** no `LUA_DEV_ENV_NAME` triggers a full re-sync of every module to the live wiki — this is the automated weekly-resync path and is not what you want for testing a branch.
+
+**Visual Studio Code:** the repo includes tasks in `.vscode/tasks.json` — run *Tasks: Run Task* and pick **Deploy current file** or **Deploy all changed file**. Both prompt for the dev environment name and the base ref.
+
+**Other editors:** bind a command to `python scripts/deploy.py` with the environment above. For example, a Neovim mapping can shell out to `python scripts/deploy.py <file>` with `LUA_DEV_ENV_NAME=/dev/<name>` set on the job's environment.
 
 ## Support
 

@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
@@ -39,11 +38,11 @@ function ColumnUtil.mergeProps(cellProps, columnDef)
 		return
 	end
 
-	Array.forEach(INHERITABLE_PROPS, function(prop)
+	for _, prop in ipairs(INHERITABLE_PROPS) do
 		if cellProps[prop] == nil and columnDef[prop] ~= nil then
 			cellProps[prop] = columnDef[prop]
 		end
-	end)
+	end
 
 	if columnDef.css then
 		cellProps.css = Table.merge(columnDef.css, cellProps.css or {})
@@ -61,10 +60,10 @@ end
 ---@param minWidth string?
 ---@param maxWidth string?
 ---@param existingCss table?
----@return table css
+---@return table? css
 function ColumnUtil.buildCss(width, minWidth, maxWidth, existingCss)
 	if not width and not minWidth and not maxWidth then
-		return existingCss or {}
+		return existingCss
 	end
 
 	return Table.merge(existingCss or {}, {

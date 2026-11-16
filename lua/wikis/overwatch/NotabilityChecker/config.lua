@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Table = Lua.import('Module:Table')
 
+---@class OverwatchNotabilityCheckerConfig: NotabilityCheckerConfig
 local Config = {}
 
 -- These are constants, you don't need to touch them
@@ -218,7 +219,7 @@ Config.weights = {
 --- See also the EXTRA_DROP_OFF_TYPES.
 ---@param tier string|integer
 ---@param tierType string
----@return fun(number, number): number
+---@return NotabilityCheckerDropOffFunction
 function Config.placementDropOffFunction(tier, tierType)
 	-- R6 is currently setting 0 points for the EXTRA_DROP_OFF types
 	-- but have plans to add points for them once modnotability is added on the wiki

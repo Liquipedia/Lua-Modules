@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
+local Set = Lua.import('Module:Set')
 local Table = Lua.import('Module:Table')
 
 local MapData = mw.loadJsonData('MediaWiki:Valorantdb-maps.json')
@@ -59,6 +60,7 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	local map = mw.ext.valorantdb.getMatchDetails(mapInput.matchid)
 
 	assert(map, mapInput.matchid .. ' could not be retrieved from API.')
+	assert(not map.error, (map.error or '') .. ' (matchid=' .. mapInput.matchid .. ')')
 
 	local shouldReverse = Logic.readBool(mapInput.reversed)
 
@@ -231,6 +233,16 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 		if ceremony == 'Clutch' then
 			if Logic.isNotEmpty(round.bomb_defuser) then
 				return round.bomb_defuser
+			elseif mapResultCodes(round.round_result_code) == 'time' then
+				---@type Set<string>
+				local alivePlayersOnWinningTeam = Set(map.teams[winningTeam].puuids)
+				Array.forEach(roundKills, function (roundKill)
+					alivePlayersOnWinningTeam:remove(roundKill.victim)
+				end)
+				if alivePlayersOnWinningTeam:size() ~= 1 then
+					return
+				end
+				return alivePlayersOnWinningTeam:toArray()[1]
 			end
 			local killsFromWinningTeam = Array.filter(
 				roundKills,

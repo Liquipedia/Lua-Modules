@@ -19,21 +19,21 @@ local TiebreakerGameDiff = Class.new(TiebreakerInterface)
 ---@param opponent TiebreakerOpponent
 ---@return integer
 function TiebreakerGameDiff:valueOf(state, opponent)
-	local games = TiebreakerGameUtil.getGames(opponent)
+	local games = TiebreakerGameUtil.getGames(opponent, self.options.walkoverGames)
 	return games.w - games.l
 end
 
 ---@return string
 function TiebreakerGameDiff:headerTitle()
-	return 'Games'
+	return 'GD'
 end
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
 ---@return string
 function TiebreakerGameDiff:display(state, opponent)
-	local games = TiebreakerGameUtil.getGames(opponent)
-	return games.w .. ' - ' .. games.l
+	local diff = self:valueOf(state, opponent)
+	return diff > 0 and ('+' .. diff) or tostring(diff)
 end
 
 return TiebreakerGameDiff

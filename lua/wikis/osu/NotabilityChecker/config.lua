@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Table = Lua.import('Module:Table')
 
+---@class OsuNotabilityCheckerConfig: NotabilityCheckerConfig
 local Config = {}
 
 
@@ -266,7 +267,7 @@ Config.scoreRanges = {
 --- See also the EXTRA_DROP_OFF_TYPES and NO_POINTS_TYPES.
 ---@param tier string|integer
 ---@param tierType string
----@return fun(number, number): number
+---@return NotabilityCheckerDropOffFunction
 function Config.placementDropOffFunction(tier, tierType)
 	-- osu! is currently setting 0 points for the NO_POINTS_TYPES types
 	-- but might change in the future
@@ -300,6 +301,7 @@ function Config.placementDropOffFunction(tier, tierType)
 				return points
 			end
 		end
+		return 0
 	end
 end
 

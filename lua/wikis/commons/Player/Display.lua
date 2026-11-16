@@ -9,9 +9,11 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
+local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
+local Table = Lua.import('Module:Table')
 
 local BlockPlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Block')
 local InlinePlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Inline')
@@ -38,10 +40,12 @@ end
 ---Called from Template:InlinePlayer
 ---@param props {[1]: string, flag: string?, link: string?, race: string?, faction: string?, date: string?,
 ---novar: string|boolean?, dq: string|boolean?, flip: string|boolean?, showFlag: string|boolean?,
----showLink: string|boolean?, showRace: string|boolean?, showFaction: string|boolean?}
+---showLink: string|boolean?, showRace: string|boolean?, showFaction: string|boolean?, game: string?}
 ---@return VNode
 function PlayerDisplay.InlinePlayerByProps(props)
-	local player = Opponent.readSinglePlayerArgs(props)
+	-- needed for aoe faction lookups
+	local game = Game.toIdentifier{game = props.game}
+	local player = Opponent.readSinglePlayerArgs(Table.merge(props, {game = game}))
 
 	PlayerExt.syncPlayer(player, {
 		date = props.date,
@@ -58,6 +62,7 @@ function PlayerDisplay.InlinePlayerByProps(props)
 		showFlag = Logic.readBoolOrNil(props.showFlag),
 		showLink = Logic.readBoolOrNil(props.showLink),
 		showFaction = Logic.nilOr(Logic.readBoolOrNil(props.showRace), Logic.readBoolOrNil(props.showFaction)),
+		game = game,
 	}
 end
 

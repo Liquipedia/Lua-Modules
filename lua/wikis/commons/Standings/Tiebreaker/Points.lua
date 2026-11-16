@@ -14,6 +14,8 @@ local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
 ---@class TiebreakerPoints : StandingsTiebreaker
 local TiebreakerPoints = Class.new(TiebreakerInterface)
 
+TiebreakerPoints.matchRecordOnly = true
+
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
 ---@return integer
@@ -23,7 +25,7 @@ end
 
 ---@return string
 function TiebreakerPoints:headerTitle()
-	return 'Points'
+	return 'Pts'
 end
 
 return TiebreakerPoints

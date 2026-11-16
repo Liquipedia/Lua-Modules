@@ -44,6 +44,7 @@ return {
 		'csgo-fastcup',
 		'cs2-fastcup',
 		'fide',
+		'fragnet',
 		'gamersclub',
 		'geoguessr',
 		'halodatahive',
@@ -114,7 +115,6 @@ return {
 		'openrec',
 		'steamtv',
 		'yandexefir',
-		'zhanqitv',
 		'rooter',
 	},
 }

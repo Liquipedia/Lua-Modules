@@ -30,7 +30,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local SIZE_CHAMPION = '25x25px'
 
----@class WildriftPlayerInfobox: Person
+---@class WildriftPlayerInfobox: InfoboxPerson
 ---@operator call(Frame): WildriftPlayerInfobox
 local CustomPlayer = Class.new(Player)
 

@@ -298,7 +298,7 @@ function Team:_createLocation(location)
 			(locationDisplay or '')
 end
 
----@return Widget?
+---@return Renderable?
 function Team:_createUpcomingMatches()
 	if not self:shouldStore(self.args) then
 		return nil

@@ -54,6 +54,15 @@ $table2-cell-padding-x: 0.75rem;
 		}
 	}
 
+	&__collapse-toggle {
+		cursor: pointer;
+	}
+
+	// Only the own rows, not those of a nested table
+	&.general-collapsible.collapsed > .table2__container > .table2__table > tbody > tr.table2__row--hide-on-collapse {
+		display: none;
+	}
+
 	&__table {
 		width: 100%;
 		border-spacing: unset;

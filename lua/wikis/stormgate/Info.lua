@@ -42,6 +42,16 @@ return {
 				mode = 'automatic',
 			},
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchscore', 'gamescore'},
+				group = {'matchscore', 'gamescore'},
+			},
+		},
+		participants = {
+			soloAsFactionTable = true,
+			sortPlayersInTable = true,
+		},
 	},
 	defaultRoundPrecision = 0,
 }

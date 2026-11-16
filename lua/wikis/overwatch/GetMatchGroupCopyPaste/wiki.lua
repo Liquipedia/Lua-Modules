@@ -40,10 +40,10 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		INDENT .. '|date=',
 		streams and (INDENT .. '|twitch=|youtube=|vod=') or nil,
 		casters and (INDENT .. '|caster1=|caster2=') or nil,
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
 		end),
-		bestof ~= 0 and Array.map(Array.range(1, bestof), FnUtil.curry(WikiCopyPaste._getMapCode, hasBans)) or nil,
+		bestof ~= 0 and Array.mapRange(1, bestof, FnUtil.curry(WikiCopyPaste._getMapCode, hasBans)) or nil,
 		Logic.readBool(args.faceit) and (INDENT .. '|faceit=') or nil,
 		Logic.readBool(args.mvp) and (INDENT .. '|mvp=') or nil,
 		INDENT .. '}}'

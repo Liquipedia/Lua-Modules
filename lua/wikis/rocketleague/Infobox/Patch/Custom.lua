@@ -11,6 +11,7 @@ local Class = Lua.import('Module:Class')
 local Patch = Lua.import('Module:Infobox/Patch')
 
 ---@class RockatleaguePatchInfobox: PatchInfobox
+---@operator call(Frame): RockatleaguePatchInfobox
 local CustomPatch = Class.new(Patch)
 
 ---@param frame Frame

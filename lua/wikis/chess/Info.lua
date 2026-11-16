@@ -67,6 +67,12 @@ return {
 				mode = 'automatic',
 			},
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchscore', 'points'},
+				group = {'matchscore', 'points'},
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 }

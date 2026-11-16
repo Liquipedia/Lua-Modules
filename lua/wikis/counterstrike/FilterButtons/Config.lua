@@ -34,9 +34,9 @@ Config.categories = {
 		property = 'liquipediaTierType',
 		expandable = true,
 		load = function(category)
-			category.items = {'onlinestage', 'monthly', 'weekly', 'qualifier', 'showmatch'}
+			category.items = {'Online Stage', 'Monthly', 'Weekly', 'Qualifier', 'Showmatch'}
 		end,
-		defaultItems = {'onlinestage'},
+		defaultItems = {'Online Stage'},
 		transform = function(tiertype)
 			return select(2, Tier.toName(1, tiertype))
 		end,

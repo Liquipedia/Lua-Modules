@@ -8,22 +8,17 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Table = Lua.import('Module:Table')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 
----@class HighlightsWidget: Widget
----@operator call(table):HighlightsWidget
-local Highlights = Class.new(Widget)
-
----@return Widget?
-function Highlights:render()
-	if Table.isEmpty(self.props.children) then
+---@return Renderable?
+local function Highlights(props)
+	if Table.isEmpty(props.children) then
 		return nil
 	end
-	local listItems = Array.map(self.props.children, function(child)
+	local listItems = Array.map(props.children, function(child)
 		return Html.Li{children = {child}}
 	end)
 	return Html.Div{
@@ -33,4 +28,4 @@ function Highlights:render()
 	}
 end
 
-return Highlights
+return Component.component(Highlights)

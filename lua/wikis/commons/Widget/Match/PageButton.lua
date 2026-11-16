@@ -19,7 +19,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageButtonProps
 ---@field match MatchGroupUtilMatch
----@field buttonType? 'secondary'|'ghost'
+---@field buttonType? 'primary'|'secondary'|'ghost'
 ---@field buttonText? 'full'|'short'|'hide'
 
 local defaultProps = {

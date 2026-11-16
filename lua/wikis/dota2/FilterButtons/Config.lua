@@ -34,7 +34,7 @@ Config.categories = {
 		load = function(category)
 			category.items = {}
 			for _, tiertype in Tier.iterate('tierTypes') do
-				table.insert(category.items, Tier.toIdentifier(tiertype.value))
+				table.insert(category.items, tiertype.value)
 			end
 		end,
 		transform = function(tiertype)

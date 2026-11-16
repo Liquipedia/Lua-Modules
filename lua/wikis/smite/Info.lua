@@ -57,5 +57,11 @@ return {
 				mode = 'automatic',
 			},
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchscore', 'gamescore'},
+				group = {'matchscore', 'gamescore'},
+			},
+		},
 	},
 }

@@ -7,6 +7,7 @@ from deploy_util import (
 from mediawiki_session import MediaWikiSession, MediaWikiSessionError
 
 LUA_DEV_ENV_NAME = os.getenv("LUA_DEV_ENV_NAME")
+WIKI_SCOPE = os.getenv("WIKI_SCOPE", "all")
 
 remove_errors: list[str] = list()
 
@@ -67,10 +68,17 @@ def search_and_remove(wiki: str):
                 remove_page(session, page["title"])
 
 
+def get_target_wikis() -> frozenset[str]:
+    if WIKI_SCOPE == "commons only":
+        return frozenset({"commons"})
+    wikis = get_wikis()
+    if WIKI_SCOPE == "all except commons":
+        return wikis - {"commons"}
+    return wikis
+
+
 def main():
-    for wiki in sorted(get_wikis()):
-        if wiki == "commons" and os.getenv("INCLUDE_COMMONS") != "true":
-            continue
+    for wiki in sorted(get_target_wikis()):
         search_and_remove(wiki)
     if len(remove_errors) == 0:
         exit(0)

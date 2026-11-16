@@ -16,6 +16,7 @@ MatchUtil.STREAM_DISPLAY_THRESHOLD_SECONDS = 2 * 60 * 60
 
 ---@param matchOpponent table
 ---@param gameOpponent table
+---@return table
 function MatchUtil.enrichGameOpponentFromMatchOpponent(matchOpponent, gameOpponent)
 	local newGameOpponent = Table.deepMerge(matchOpponent, gameOpponent)
 	-- These values are only allowed to come from Game and not Match

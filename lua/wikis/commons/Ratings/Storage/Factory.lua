@@ -19,7 +19,7 @@ local Lua = require('Module:Lua')
 
 local RatingsStorageFactory = {}
 
----@param props {storageType: 'extension', id: string?}
+---@param props {storageType: 'extension'}
 ---@return RatingsDisplayGetRankings
 function RatingsStorageFactory.createGetRankings(props)
 	local storageType = props.storageType

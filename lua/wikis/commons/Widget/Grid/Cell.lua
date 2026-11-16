@@ -33,6 +33,7 @@ local GRID_DIRECTIONS = {
 	'b'
 }
 
+---@param props table
 ---@param width string
 ---@return string[]
 local function getCellClasses(props, width)

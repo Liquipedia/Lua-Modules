@@ -92,10 +92,10 @@ end
 
 ---This is equivalent to a call to frame:callParserFunction() with function name '#tag:' .. name and with content prepended to args.
 ---@param name string
----@param content string
----@param args table|string
+---@param content string?
+---@param args table|string?
 ---@return string
----@overload fun(self, params: {name: string, content: string, args: table|string}): string
+---@overload fun(self: Frame, params: {name: string, content: string, args: table|string}): string
 function mw.frame:extensionTag(name, content, args) end
 
 ---Called on the frame created by {{#invoke:}}, returns the frame for the page that called {{#invoke:}}. Called on that frame, returns nil.
@@ -737,8 +737,27 @@ function mw.text.tag(name, attrs, content) end
 ---@param charset string?
 ---@return string
 function mw.text.trim(s, charset)
-	-- TODO: UTF8 support in fake
-	return string.match(s, '^()%s*$') and '' or string.match(s, '^%s*(.*%S)')
+	if not charset then
+		return string.match(s, '^()%s*$') and '' or string.match(s, '^%s*(.*%S)')
+	end
+	-- Only literal characters in the charset, no ranges or classes
+	local utf8Character = '.[\128-\191]*'
+	local trimmed = {}
+	for character in string.gmatch(charset, utf8Character) do
+		trimmed[character] = true
+	end
+	local characters = {}
+	for character in string.gmatch(s, utf8Character) do
+		table.insert(characters, character)
+	end
+	local first, last = 1, #characters
+	while first <= last and trimmed[characters[first]] do
+		first = first + 1
+	end
+	while last >= first and trimmed[characters[last]] do
+		last = last - 1
+	end
+	return table.concat(characters, '', first, last)
 end
 
 ---Truncates text to the specified length in code points, adding ellipsis if truncation was performed. If length is positive, the end of the string will be truncated; if negative, the beginning will be removed
@@ -991,7 +1010,27 @@ function mw.ustring.gsub(s, pattern, repl, n) end
 ---Returns true if the string is valid UTF-8, false if not.
 ---@param s string|number
 ---@return boolean
-function mw.ustring.isutf8(s) end
+function mw.ustring.isutf8(s)
+	s = tostring(s)
+	local index = 1
+	while index <= #s do
+		local byte = string.byte(s, index)
+		local length = byte < 0x80 and 1 or byte >= 0xC2 and byte <= 0xDF and 2
+			or byte >= 0xE0 and byte <= 0xEF and 3 or byte >= 0xF0 and byte <= 0xF4 and 4
+		if not length then
+			return false
+		end
+		-- Overlong sequences and surrogates are not rejected
+		for continuation = index + 1, index + length - 1 do
+			local continuationByte = string.byte(s, continuation)
+			if not continuationByte or continuationByte < 0x80 or continuationByte > 0xBF then
+				return false
+			end
+		end
+		index = index + length
+	end
+	return true
+end
 
 ---Returns the length of the string in codepoints, or nil if the string is not valid UTF-8.
 ---@see string.len
@@ -1080,7 +1119,23 @@ function mw.uri.new(str) end
 ---@param query string|table?
 ---@return URI
 function mw.uri.localUrl(page, query)
-	return ''
+	return setmetatable(
+		{
+			path = page,
+			query = query,
+		},
+		{
+			__index = mw.uri,
+			__tostring = function (t)
+				if not t.query then
+					return t.path
+				end
+				return t.path .. '?' .. (
+					type(t.query) == 'string' and t.query or mw.uri.buildQueryString(t.query)
+				)
+			end
+		}
+	)
 end
 
 ---Returns a URI object for the full URL for a page, with optional query string/table
@@ -1088,7 +1143,25 @@ end
 ---@param query string|table?
 ---@return URI
 function mw.uri.fullUrl(page, query)
-	return 'https://liquipedia.net/'
+	return setmetatable(
+		{
+			protocol = 'https',
+			host = 'liquipedia.net',
+			path = page,
+			query = query,
+		},
+		{
+			__index = mw.uri,
+			__tostring = function (t)
+				if not t.query then
+					return mw.site.server .. t.path
+				end
+				return mw.site.server .. t.path .. '?' .. (
+					type(t.query) == 'string' and t.query or mw.uri.buildQueryString(t.query)
+				)
+			end
+		}
+	)
 end
 
 ---@alias UriEncodeType 'QUERY'|'PATH'|'WIKI'
@@ -1108,7 +1181,38 @@ function mw.uri.decode(str, enctype) end
 ---Encodes a table as a URI query string.
 ---@param query table<string, string|number|any[]|false>
 ---@return string
-function mw.uri.buildQueryString(query) end
+function mw.uri.buildQueryString(query)
+	---@param str string|number|boolean
+	---@return string
+	local function encode(str)
+		if type(str) ~= 'string' then
+			return tostring(str)
+		end
+		return (str:gsub('([^%w_.~-])', function (character)
+			if character == ' ' then
+				return '+'
+			end
+			return string.format('%%%02X', string.byte(character))
+		end))
+	end
+
+	local ret = {}
+
+	for k, v in pairs(query) do
+		if type(v) ~= 'table' then
+			v = {v}
+		end
+		for _, queryArg in ipairs(v) do
+			local argRet = {encode(k)}
+			if queryArg then
+				table.insert(argRet, encode(queryArg))
+			end
+			table.insert(ret, table.concat(argRet, '='))
+		end
+	end
+
+	return table.concat(ret, '&')
+end
 
 ---Decodes the query string `s` to a table. Optional arguments `i` and `j` may be used to specify
 ---the substring of `s` to be parsed.
@@ -1439,7 +1543,7 @@ mw.ext.valorantdb = {}
 ---@field round_results valorantMatchApiRound[]
 
 ---@param matchId string
----@return valorantMatchData
+---@return valorantMatchData|{error: string}
 function mw.ext.valorantdb.getMatchDetails(matchId) end
 
 return mw

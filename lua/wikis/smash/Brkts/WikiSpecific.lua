@@ -15,15 +15,6 @@ local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
 ---@class SmashBrktsWikiSpecific: BrktsWikiSpecific
 local WikiSpecific = Table.copy(BaseWikiSpecific)
 
----@param matchGroupType string
----@param maxOpponentCount integer
----@return function
-function WikiSpecific.getMatchGroupContainer(matchGroupType, maxOpponentCount)
-	return matchGroupType == 'matchlist'
-		and Lua.import('Module:MatchGroup/Display/Matchlist').MatchlistContainer
-		or Lua.import('Module:MatchGroup/Display/Bracket/Custom').BracketContainer
-end
-
 ---@param match table
 ---@return boolean
 function WikiSpecific.matchHasDetails(match)

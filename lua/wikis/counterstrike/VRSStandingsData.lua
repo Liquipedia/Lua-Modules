@@ -173,7 +173,7 @@ function VRSStandingsData._read(props)
 
 		-- unset team template input to not conflict with player args
 		data[1] = nil
-		opponent.players = Array.map(Array.range(1, 5), FnUtil.curry(Opponent.readPlayerArgs, data))
+		opponent.players = Array.mapRange(1, 5, FnUtil.curry(Opponent.readPlayerArgs, data))
 
 		opponent.extradata = opponent.extradata or {}
 		opponent.extradata.region = data.region

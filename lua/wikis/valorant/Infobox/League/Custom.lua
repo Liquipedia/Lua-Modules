@@ -26,8 +26,11 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 
 ---@class ValorantLeagueInfobox: InfoboxLeague
+---@operator call(Frame): ValorantLeagueInfobox
 local CustomLeague = Class.new(League)
+
 ---@class ValorantLeagueInfoboxWidgetInjector: WidgetInjector
+---@operator call(ValorantLeagueInfobox): ValorantLeagueInfoboxWidgetInjector
 ---@field caller ValorantLeagueInfobox
 local CustomInjector = Class.new(Injector)
 

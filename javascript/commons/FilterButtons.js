@@ -122,7 +122,7 @@ liquipedia.filterButtons = {
 				buttons: [],
 				alwaysActive: buttonsDiv.dataset.filterAlwaysActive?.split( ',' ) ?? [],
 				effectClass: 'filter-effect-' + ( buttonsDiv.dataset.filterEffect ?? this.fallbackFilterEffect ),
-				filterStates: localStorage[ filterGroup ]?.filterStates ?? {},
+				filterStates: {},
 				curated: localStorage[ filterGroup ]?.curated ?? buttonsDiv.dataset.filterDefaultCurated === 'true',
 				filterableItems: [],
 				defaultStates: {},
@@ -150,7 +150,7 @@ liquipedia.filterButtons = {
 						default:
 							filterGroupEntry.buttons[ filterOn ] = button;
 							filterGroupEntry.filterStates[ filterOn ] =
-								filterGroupEntry.filterStates[ filterOn ] ?? defaultState;
+								localStorage[ filterGroup ]?.filterStates[ filterOn ] ?? defaultState;
 							filterGroupEntry.defaultStates[ filterOn ] = defaultState;
 					}
 					buttonElement.setAttribute( 'tabindex', '0' );
@@ -348,7 +348,7 @@ liquipedia.filterButtons = {
 			filterCounter.element.innerHTML = filterCounter.count;
 		} );
 
-		this.templateExpansions.forEach( ( templateExpansion ) => {
+		Promise.all( this.templateExpansions.map( async ( templateExpansion ) => {
 			const isDefault = templateExpansion.groups.every( ( group ) => {
 				const filterGroup = this.filterGroups[ group ];
 				if ( filterGroup.curated || filterGroup.defaultCurated ) {
@@ -381,27 +381,26 @@ liquipedia.filterButtons = {
 				return;
 			}
 
-			mw.loader.using( [ 'mediawiki.api' ] ).then( () => {
-				const api = new mw.Api();
-				api.get( {
-					action: 'parse',
-					format: 'json',
-					contentmodel: 'wikitext',
-					maxage: 600,
-					smaxage: 600,
-					disablelimitreport: true,
-					uselang: 'content',
-					prop: 'text',
-					text: wikitext
-				} ).then( ( data ) => {
-					if ( data.parse?.text?.[ '*' ] ) {
-						templateExpansion.element.innerHTML = data.parse.text[ '*' ];
-						templateExpansion.cache[ wikitext ] = data.parse.text[ '*' ];
-						this.refreshScriptsAfterContentUpdate();
-					}
-				} );
+			await mw.loader.using( [ 'mediawiki.api' ] );
+
+			const api = new mw.Api();
+			const data = await api.get( {
+				action: 'parse',
+				format: 'json',
+				contentmodel: 'wikitext',
+				maxage: 600,
+				smaxage: 600,
+				disablelimitreport: true,
+				uselang: 'content',
+				prop: 'text',
+				text: wikitext
 			} );
-		} );
+			if ( data.parse?.text?.[ '*' ] ) {
+				templateExpansion.element.innerHTML = data.parse.text[ '*' ];
+				templateExpansion.cache[ wikitext ] = data.parse.text[ '*' ];
+				this.refreshScriptsAfterContentUpdate();
+			}
+		} ) );
 	},
 
 	refreshScriptsAfterContentUpdate: function() {

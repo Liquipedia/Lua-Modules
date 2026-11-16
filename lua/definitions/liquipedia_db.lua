@@ -371,10 +371,29 @@ local lpdb = {}
 ---@field displayname string
 ---@field flag string
 
+---Scribunto refuses to pass a table to PHP if any table appears in it more than once,
+---even when that isn't an actual cycle.
+---@param value any
+---@param seen table<table, true>
+local function assertNoRepeatedTables(value, seen)
+	if type(value) ~= 'table' then
+		return
+	end
+	if seen[value] then
+		error('Cannot pass circular reference to PHP')
+	end
+	seen[value] = true
+	for key, item in pairs(value) do
+		assertNoRepeatedTables(key, seen)
+		assertNoRepeatedTables(item, seen)
+	end
+end
+
 ---@param obj table
 ---@return string
 ---Encode a table to a JSON object. Errors are raised if the passed value cannot be encoded in JSON.
 function lpdb.lpdb_create_json(obj)
+	assertNoRepeatedTables(obj, {})
 	-- TODO This is not fully correct mock (should be {"1": ..., "2": ...} instead of [...,...])
 	return require('3rd.jsonlua.mock_json'):encode(obj)
 end

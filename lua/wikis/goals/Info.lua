@@ -35,5 +35,11 @@ return {
 			status = 2,
 			gameScoresIfBo1 = true,
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchscore', 'gamescore'},
+				group = {'matchscore', 'gamescore'},
+			},
+		},
 	},
 }

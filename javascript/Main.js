@@ -47,6 +47,7 @@ const jsModules = [
 	'Analytics',
 	'BattleRoyale',
 	'Bracket',
+	'Brackets',
 	'Carousel',
 	'Collapse',
 	'Commons_mainpage',

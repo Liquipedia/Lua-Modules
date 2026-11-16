@@ -101,4 +101,47 @@ describe( 'Dropdown module', () => {
 
 		expect( events ).toEqual( [ 'beforeopen', 'open', 'beforeclose', 'close' ] );
 	} );
+
+	test( 'should toggle when an ancestor stops click propagation', () => {
+		document.body.innerHTML = `<div class="brkts-popup">${ createDropdownMarkup() }</div>`;
+
+		const popup = document.querySelector( '.brkts-popup' );
+		popup.addEventListener( 'click', ( event ) => event.stopPropagation() );
+
+		const toggle = document.querySelector( '.dropdown-widget__toggle' );
+		const menu = document.querySelector( '.dropdown-widget__menu' );
+
+		toggle.dispatchEvent( new MouseEvent( 'click', { bubbles: true } ) );
+		expect( menu.classList.contains( 'show' ) ).toBe( true );
+
+		toggle.dispatchEvent( new MouseEvent( 'click', { bubbles: true } ) );
+		expect( menu.classList.contains( 'show' ) ).toBe( false );
+	} );
+
+	test( 'should still deliver toggle clicks to ancestor listeners', () => {
+		document.body.innerHTML = `<div class="wrapper">${ createDropdownMarkup() }</div>`;
+
+		let ancestorClicks = 0;
+		document.querySelector( '.wrapper' ).addEventListener( 'click', () => ancestorClicks++ );
+
+		const toggle = document.querySelector( '.dropdown-widget__toggle' );
+		toggle.dispatchEvent( new MouseEvent( 'click', { bubbles: true } ) );
+
+		expect( ancestorClicks ).toBe( 1 );
+	} );
+
+	test( 'should close an open dropdown when clicking outside, even inside a propagation-stopping container', () => {
+		document.body.innerHTML = `${ createDropdownMarkup() }<div class="stopper"><span class="target">x</span></div>`;
+
+		document.querySelector( '.stopper' ).addEventListener( 'click', ( event ) => event.stopPropagation() );
+
+		const toggle = document.querySelector( '.dropdown-widget__toggle' );
+		const menu = document.querySelector( '.dropdown-widget__menu' );
+
+		toggle.dispatchEvent( new MouseEvent( 'click', { bubbles: true } ) );
+		expect( menu.classList.contains( 'show' ) ).toBe( true );
+
+		document.querySelector( '.target' ).dispatchEvent( new MouseEvent( 'click', { bubbles: true } ) );
+		expect( menu.classList.contains( 'show' ) ).toBe( false );
+	} );
 } );
