@@ -507,6 +507,15 @@ function StandingsParseWiki.parseWidth(args)
 	return tonumber((string.gsub(args.width or '', 'px', '')))
 end
 
+---Reads the `collapseafter` input, the number of rows shown before the rest collapses.
+---@param args table
+---@return integer?
+function StandingsParseWiki.parseCollapseAfter(args)
+	local collapseAfter = readNonNegativeInteger(args, 'collapseafter')
+	assert(collapseAfter ~= 0, 'Invalid collapseafter input: "0" is not a positive integer')
+	return collapseAfter
+end
+
 ---Reads the `regulationrounds` input, the number of rounds a game has in regulation. More rounds is overtime.
 ---Unset means the regulation rounds of the wiki config.
 ---@param args table
