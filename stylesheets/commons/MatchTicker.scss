@@ -140,7 +140,7 @@ Template(s): MatchTicker
 		width: 1.75rem;
 		height: 1.75rem;
 		padding: 0.25rem;
-		justify-content: center;
+		place-content: center;
 		align-items: center;
 		flex-shrink: 0;
 		border: 1px solid var( --match-ticker-card-participant-icon-border-color );
@@ -151,10 +151,10 @@ Template(s): MatchTicker
 			margin-right: -0.375rem;
 		}
 
-		.team-template-team-icon,
-		.team-template-image-icon {
+		:where( .team-template-team-icon ),
+		:where( .team-template-image-icon ) {
 			display: flex;
-			justify-content: center;
+			place-content: center;
 			align-items: center;
 		}
 
