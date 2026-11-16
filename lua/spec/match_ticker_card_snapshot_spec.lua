@@ -1,6 +1,13 @@
 --- Triple Comment to Enable our LLS Plugin
 
 insulate('Match Ticker Card', function()
+	local Array = require('Module:Array')
+	local MatchGroupUtil = require('Module:MatchGroup/Util/Custom')
+
+	local Html = require('Module:Widget/Html')
+	local Switch = require('Module:Widget/Switch')
+	local MatchTickerCard = require('Module:Widget/Match/Ticker/Card')
+
 	it('snapshot', function()
 		local LoadJsonDataStub = stub(mw, 'loadJsonData', {})
 		local LpdbQueryStub = stub(mw.ext.LiquipediaDB, 'lpdb', {})
@@ -10,19 +17,19 @@ insulate('Match Ticker Card', function()
 		local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 		TeamTemplateMock.setUp()
 
-		local Array = require('Module:Array')
-		local Html = require('Module:Widget/Html')
-		local MatchGroupUtil = require('Module:MatchGroup/Util/Custom')
-		local MatchTickerCard = require('Module:Widget/Match/Ticker/Card')
 		local MatchRecords = require('test_assets.match_ticker_cards')
 
 		local cards = Array.map(MatchRecords, function(record)
 			return MatchTickerCard{match = MatchGroupUtil.matchFromRecord(record)}
 		end)
 
-		GoldenTest('match_ticker_card', tostring(Html.Div{
-			css = {display = 'flex', gap = '0.5rem', ['align-items'] = 'flex-start'},
-			children = cards,
+		GoldenTest('match_ticker_card', tostring(Switch{
+			label = 'Show Countdown',
+			switchGroup = 'countdown',
+			storeValue = true,
+			defaultActive = true,
+			css = {margin = '1rem 0', ['justify-content'] = 'center'},
+			content = Html.Fragment{children = cards}
 		}))
 
 		TeamTemplateMock.tearDown()
