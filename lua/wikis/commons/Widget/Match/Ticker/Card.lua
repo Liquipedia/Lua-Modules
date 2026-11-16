@@ -30,6 +30,7 @@ local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 local MatchTickerCard = {}
 
 ---@param props MatchTickerCardProps
+---@return VNode
 function MatchTickerCard.render(props)
 	local match = props.match
 
