@@ -16,12 +16,14 @@ local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Div = Html.Div
 
+---@alias ButtonSize 'xs'|'sm'|'md'|'lg'
+
 ---@class ButtonWidgetProps: HtmlNodeProps
 ---@field title string?
 ---@field link string?
 ---@field linktype 'internal'|'external'|nil
 ---@field variant 'primary'|'secondary'|'themed'|'ghost'|'destructive'|'icon'|nil
----@field size 'xs'|'sm'|'md'|'lg'|nil
+---@field size ButtonSize?
 ---@field grow boolean?
 ---@field aligncontent 'left'|'right'|nil
 

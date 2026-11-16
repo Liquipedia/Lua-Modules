@@ -27,6 +27,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local StreamLinks = Lua.import('Module:Links/Stream')
 local String = Lua.import('Module:StringUtils')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local MatchTickerCard = Lua.import('Module:Widget/Match/Ticker/Card')
 
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 local MAX_VERTICAL_CARD_STREAMS = 2
@@ -50,7 +51,7 @@ MatchCard.defaultProps = {
 	variant = 'horizontal',
 }
 
----@return Widget?
+---@return Renderable?
 function MatchCard:render()
 	local match = self.props.match
 	local gameData = self.props.gameData
@@ -88,7 +89,7 @@ function MatchCard:_renderHorizontal(match, gameData, highlight)
 				classes = {'match-info-tournament', highlight and HIGHLIGHT_CLASS or nil},
 				children = {tournamentLink},
 			} or nil,
-			MatchHeaderFfa{match = match},
+			MatchHeaderFfa{match = match --[[@as FFAMatchGroupUtilMatch]]},
 			ButtonBar{match = match}
 		)
 	}
@@ -96,13 +97,22 @@ end
 
 ---@param match MatchGroupUtilMatch
 ---@param gameData MatchTickerGameData?
----@return Widget
+---@return Renderable
 function MatchCard:_renderVertical(match, gameData)
 	local isFfa = #match.opponents > 2
 
+	if not isFfa then
+		return MatchTickerCard{
+			match = match,
+			onlyHighlightOnValue = self.props.onlyHighlightOnValue,
+			hideTournament = self.props.hideTournament,
+			displayGameIcons = self.props.displayGameIcons,
+		}
+	end
+
 	local tournamentLink = TournamentBar{
 		match = match,
-		gameData = not isFfa and gameData or nil,
+		gameData = gameData,
 		displayIcon = false,
 	}
 
@@ -122,11 +132,7 @@ function MatchCard:_renderVertical(match, gameData)
 						stageName
 					),
 				},
-			not isFfa and MatchHeader{
-				match = match,
-				variant = 'vertical'
-			} or nil,
-			isFfa and self:_renderFfaInfo(match, gameData) or nil
+			self:_renderFfaInfo(match, gameData)
 		)
 	}
 end
