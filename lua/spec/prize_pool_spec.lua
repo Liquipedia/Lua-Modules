@@ -298,6 +298,30 @@ describe('prize pool', function()
 		assert.is_nil(output:find('switch-pill', 1, true))
 	end)
 
+	describe('cutafter', function()
+		local cutArgs = {
+			type = {type = 'solo'},
+			import = false,
+			storelpdb = false,
+			[1] = {usdprize = '100', [1] = {'Rathoz'}},
+			[2] = {usdprize = '50', [1] = {'Salt'}},
+			[3] = {usdprize = '10', [1] = {'Serral'}, [2] = {'Reynor'}},
+		}
+
+		it('collapses the rows of the placements after it', function()
+			local output = tostring(PrizePool(Table.merge(cutArgs, {cutafter = 2})):create():build())
+			assert.is_truthy(output:find('general-collapsible collapsed', 1, true))
+			assert.are_equal(2, select(2, output:gsub('table2__row%-%-hide%-on%-collapse', '')))
+			assert.is_truthy(output:find('place 3 to 4', 1, true))
+		end)
+
+		it('does not collapse when no placement is after it', function()
+			local output = tostring(PrizePool(Table.merge(cutArgs, {cutafter = 3})):create():build())
+			assert.is_nil(output:find('general-collapsible', 1, true))
+			assert.is_nil(output:find('hide-on-collapse', 1, true))
+		end)
+	end)
+
 	it('stores the USD player share in placement extradata', function()
 		local Json = require('Module:Json')
 		PrizePool(clubShareUsdPoolArgs):create():build()

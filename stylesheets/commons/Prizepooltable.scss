@@ -452,11 +452,8 @@ share the `prizepooltable` class.
 	}
 }
 
-// Footer toggle for the redesigned (general-collapsible) table.
-.prizepooltable-toggle {
-	text-align: center;
-	font-weight: bold;
-	cursor: pointer;
+// Table2 collapse toggle, kept in the brand color.
+.prizepool-table-wrapper .table2__collapse-toggle {
 	color: var( --clr-brand-30, #0a558f );
 
 	.theme--dark & {
@@ -466,10 +463,6 @@ share the `prizepooltable` class.
 	a {
 		color: inherit;
 	}
-}
-
-.prizepool-table-wrapper.collapsed .ppt-hide-on-collapse {
-	display: none;
 }
 
 /*******************************************************************************
