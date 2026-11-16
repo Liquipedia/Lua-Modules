@@ -94,6 +94,10 @@ without auditing those.
 	}
 }
 
+.prizepooltabletoggle {
+	cursor: pointer;
+}
+
 table.prizepooltable:not( .collapsed ) .prizepooltableshow,
 table.prizepooltable.collapsed .prizepooltablehide {
 	display: none;
@@ -299,15 +303,6 @@ div.background-color-highlight {
 
 .prizepooltable-background-variant {
 	background-color: var( --prize-pool-variant-background-color, #f2f2f2 );
-}
-
-/*******************************************************************************
-Template: ( Standardized ) prize pool tables
-Author: Rathoz
-*******************************************************************************/
-
-.prizepooltabletoggle {
-	cursor: pointer;
 }
 
 /*******************************************************************************
