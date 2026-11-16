@@ -27,6 +27,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local StreamLinks = Lua.import('Module:Links/Stream')
 local String = Lua.import('Module:StringUtils')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local MatchTickerCard = Lua.import('Module:Widget/Match/Ticker/Card')
 
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 local MAX_VERTICAL_CARD_STREAMS = 2
@@ -56,6 +57,15 @@ function MatchCard:render()
 	local gameData = self.props.gameData
 	if not match then
 		return nil
+	end
+
+	if #match.opponents <= 2 then
+		return MatchTickerCard{
+			match = match,
+			onlyHighlightOnValue = self.props.onlyHighlightOnValue,
+			hideTournament = self.props.hideTournament,
+			displayGameIcons = self.props.displayGameIcons,
+		}
 	end
 
 	local highlightCondition = HighlightConditions.match or HighlightConditions.tournament
@@ -88,7 +98,7 @@ function MatchCard:_renderHorizontal(match, gameData, highlight)
 				classes = {'match-info-tournament', highlight and HIGHLIGHT_CLASS or nil},
 				children = {tournamentLink},
 			} or nil,
-			MatchHeaderFfa{match = match},
+			MatchHeaderFfa{match = match --[[@as FFAMatchGroupUtilMatch]]},
 			ButtonBar{match = match}
 		)
 	}

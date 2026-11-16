@@ -17,12 +17,15 @@ local Html = Lua.import('Module:Widget/Html')
 local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
 local TournamentBar = Lua.import('Module:Widget/Match/TournamentBar')
 local MatchButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 
 ---@class MatchTickerCardProps
 ---@field match MatchGroupUtilMatch
 ---@field onlyHighlightOnValue string?
+---@field displayGameIcons boolean?
+---@field hideTournament boolean?
 
 local MatchTickerCard = {}
 
@@ -32,12 +35,12 @@ function MatchTickerCard.render(props)
 
 	return Html.Div{
 		classes = {'match-ticker-card'},
-		children = {
+		children = WidgetUtil.collect(
 			MatchTickerCard.buildHeader(match),
 			MatchTickerCard.buildMatchOpponentsDisplay(match),
-			MatchTickerCard.buildTournamentInfoBar(match, props.onlyHighlightOnValue),
+			MatchTickerCard.buildTournamentInfoBar(props),
 			MatchButtonBar{match = match, showVods = true, buttonSize = 'xs'}
-		}
+		)
 	}
 end
 
@@ -84,18 +87,24 @@ function MatchTickerCard.buildMatchOpponentDisplay(match, opponent, opponentInde
 	}
 end
 
----@param match MatchGroupUtilMatch
----@param onlyHighlightOnValue string?
----@return VNode
-function MatchTickerCard.buildTournamentInfoBar(match, onlyHighlightOnValue)
+---@param props MatchTickerCardProps
+---@return VNode?
+function MatchTickerCard.buildTournamentInfoBar(props)
+	if props.hideTournament then
+		return
+	end
+	local match = props.match
 	local highlightCondition = HighlightConditions.match or HighlightConditions.tournament
-	local highlight = highlightCondition(match, {onlyHighlightOnValue = onlyHighlightOnValue})
+	local highlight = highlightCondition(match, {onlyHighlightOnValue = props.onlyHighlightOnValue})
 	return Html.Div{
 		classes = {
 			'match-info-tournament',
 			highlight and HIGHLIGHT_CLASS or nil
 		},
-		children = TournamentBar{match = match},
+		children = TournamentBar{
+			match = match,
+			displayGameIcon = props.displayGameIcons,
+		},
 	}
 end
 
