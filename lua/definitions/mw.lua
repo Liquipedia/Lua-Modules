@@ -349,6 +349,8 @@ function mw.language:formatDate(format, timestamp, localTime)
 		end
 		return time
 	end
+	-- Known issue: on Windows, os.date returns nil for timestamps before 1970-01-01, so any date before that
+	-- (e.g. DateExt.defaultDate) errors here when running the tests locally on Windows. CI runs on Linux.
 	local function localTimezoneOffset(ts)
 		local utcDt = os.date("!*t", ts)
 		local localDt = os.date("*t", ts)
