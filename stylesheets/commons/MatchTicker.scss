@@ -22,6 +22,16 @@ Template(s): MatchTicker
 	--match-ticker-card-participant-icon-border-color: var( --clr-secondary-39 );
 }
 
+/* carousel items are stretched to the tallest card, let every card fill its item */
+.match-ticker-carousel .carousel-item {
+	display: flex;
+	flex-direction: column;
+
+	> .match-ticker-card {
+		flex-grow: 1;
+	}
+}
+
 .match-ticker-card {
 	display: flex;
 	min-height: 7.625rem;
