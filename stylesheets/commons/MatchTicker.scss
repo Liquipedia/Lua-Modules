@@ -8,8 +8,8 @@ Template(s): MatchTicker
 	--match-ticker-card-divider-color: var( --clr-on-surface-light-primary-8 );
 	--match-ticker-card-primary-text-color: var( --clr-secondary-9 );
 	--match-ticker-card-secondary-text-color: var( --clr-secondary-25 );
-	--match-ticker-card-participant-icon-background-color: var( --clr-secondary-100 );
-	--match-ticker-card-participant-icon-border-color: var( --clr-secondary-90 );
+	--match-ticker-card-opponent-ffa-icon-background-color: var( --clr-secondary-100 );
+	--match-ticker-card-opponent-ffa-icon-border-color: var( --clr-secondary-90 );
 }
 
 .theme--dark {
@@ -18,8 +18,8 @@ Template(s): MatchTicker
 	--match-ticker-card-divider-color: var( --clr-on-surface-dark-primary-8 );
 	--match-ticker-card-primary-text-color: var( --clr-secondary-90 );
 	--match-ticker-card-secondary-text-color: var( --clr-secondary-90 );
-	--match-ticker-card-participant-icon-background-color: var( --clr-secondary-25 );
-	--match-ticker-card-participant-icon-border-color: var( --clr-secondary-39 );
+	--match-ticker-card-opponent-ffa-icon-background-color: var( --clr-secondary-25 );
+	--match-ticker-card-opponent-ffa-icon-border-color: var( --clr-secondary-39 );
 }
 
 /* carousel items are stretched to the tallest card, let every card fill its item */
@@ -129,7 +129,7 @@ Template(s): MatchTicker
 	}
 
 	// FFA / Battle Royale: upcoming & live
-	&__participants {
+	&__opponents-ffa {
 		display: flex;
 		padding: 0.5rem 0;
 		align-items: center;
@@ -153,7 +153,7 @@ Template(s): MatchTicker
 		}
 	}
 
-	&__participant-icon {
+	&__opponent-ffa-icon {
 		display: flex;
 		box-sizing: border-box;
 		width: 1.75rem;
@@ -162,9 +162,9 @@ Template(s): MatchTicker
 		place-content: center;
 		align-items: center;
 		flex-shrink: 0;
-		border: 1px solid var( --match-ticker-card-participant-icon-border-color );
+		border: 1px solid var( --match-ticker-card-opponent-ffa-icon-border-color );
 		border-radius: 50%;
-		background-color: var( --match-ticker-card-participant-icon-background-color );
+		background-color: var( --match-ticker-card-opponent-ffa-icon-background-color );
 
 		&:not( :last-child ) {
 			margin-right: -0.375rem;

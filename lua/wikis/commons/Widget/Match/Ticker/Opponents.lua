@@ -115,13 +115,13 @@ function MatchTickerCardOpponents.buildFfaParticipantsPreview(match)
 	local remainingCount = #participants - #iconOpponents
 
 	return Html.Div{
-		classes = {'match-ticker-card__participants'},
+		classes = {'match-ticker-card__opponents-ffa'},
 		children = WidgetUtil.collect(
 			#iconOpponents > 0 and Html.Div{
-				classes = {'match-ticker-card__participants-icons'},
+				classes = {'match-ticker-card__opponents-ffa-icons'},
 				children = Array.map(iconOpponents, function (opponent)
 					return Html.Div{
-						classes = {'match-ticker-card__participant-icon'},
+						classes = {'match-ticker-card__opponent-ffa-icon'},
 						children = OpponentDisplay.BlockTeamContainer{
 							template = opponent.template,
 							showLink = false,
@@ -131,7 +131,7 @@ function MatchTickerCardOpponents.buildFfaParticipantsPreview(match)
 				end)
 			} or nil,
 			remainingCount > 0 and Html.Span{
-				classes = {'match-ticker-card__participants-count'},
+				classes = {'match-ticker-card__opponents-ffa-count'},
 				children = MatchTickerCardOpponents._getRemainingParticipantsText(
 					participants,
 					remainingCount,
