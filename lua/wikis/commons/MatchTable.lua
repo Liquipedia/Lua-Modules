@@ -786,7 +786,7 @@ function MatchTable:matchRow(match)
 end
 
 ---@param match MatchTableMatch
----@return VNode
+---@return Widget
 function MatchTable:_displayDate(match)
 	return TableWidgets.Cell{
 		attributes = {['data-sort-value'] = match.timestamp},
@@ -806,6 +806,7 @@ function MatchTable:displayTier(match)
 	if not self.config.showTier then return end
 
 	local tier, tierType, options = Tier.parseFromQueryData(match)
+	---@cast options table
 	options.link = true
 	options.onlyTierTypeIfBoth = true
 
@@ -815,6 +816,8 @@ function MatchTable:displayTier(match)
 			children = INVALID_TIER_DISPLAY
 		}
 	end
+
+	---@cast tier -nil
 
 	return TableWidgets.Cell{
 		attributes = {['data-sort-value'] = Tier.toSortValue(tier, tierType)},
