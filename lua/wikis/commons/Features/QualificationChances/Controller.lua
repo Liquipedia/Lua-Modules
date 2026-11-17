@@ -9,13 +9,13 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
-local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Set = Lua.import('Module:Set')
 
+local CountdownWidget = Lua.import('Module:Widget/Countdown')
 local Html = Lua.import('Module:Widget/Html')
 local Label = Lua.import('Module:Widget/Basic/Label')
 local Switch = Lua.import('Module:Widget/Switch')
@@ -103,7 +103,7 @@ function Controller.showQualificationChances(frame)
 				},
 				footer = createdAtTimestamp and {
 					'Last updated: ',
-					Countdown.create{
+					CountdownWidget{
 						date = DateExt.toCountdownArg(createdAtTimestamp),
 						timestamp = createdAtTimestamp,
 						rawdatetime = true,
