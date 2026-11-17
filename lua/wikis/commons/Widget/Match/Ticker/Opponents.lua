@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
@@ -18,7 +19,7 @@ local Html = Lua.import('Module:Widget/Html')
 local MatchHeaderFfa = Lua.import('Module:Widget/Match/Header/Ffa')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local TeamTemplateDefaultImages = mw.loadJsonData('MediaWiki:Teamtemplatedefaultimages.json')
+local TeamTemplateDefaultImages = Info.games[Info.defaultGame].defaultTeamLogo
 
 local MAX_FFA_PARTICIPANT_ICONS = 5
 local PARTY_OPPONENTS_DIVIDER = Html.Hr{classes = {'match-ticker-card__divider'}}
@@ -98,8 +99,14 @@ function MatchTickerCardOpponents.buildFfaParticipantsPreview(match)
 			local teamTemplateData = TeamTemplate.getRaw(opponent.template)
 
 			return (
-				teamTemplateData.image ~= TeamTemplateDefaultImages.defaultLightImage and
-				teamTemplateData.imagedark ~= TeamTemplateDefaultImages.defaultDarkImage
+				(
+					teamTemplateData.image ~= TeamTemplateDefaultImages.lightMode or
+					teamTemplateData.image:gsub(' ', '_') ~= TeamTemplateDefaultImages.lightMode
+				) and
+				(
+					teamTemplateData.imagedark ~= TeamTemplateDefaultImages.darkMode or
+					teamTemplateData.imagedark:gsub(' ', '_') ~= TeamTemplateDefaultImages.darkMode
+				)
 			)
 		end),
 		1,
