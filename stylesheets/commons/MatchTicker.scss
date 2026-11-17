@@ -132,12 +132,18 @@ Template(s): MatchTicker
 	&__opponents-ffa {
 		display: flex;
 		padding: 0.5rem 0;
-		align-items: flex-start;
+		align-items: center;
 		gap: 0.25rem;
-		align-self: stretch;
 		font-size: 0.75rem;
 		line-height: 1.125rem;
 		flex-grow: 1;
+
+		&-container {
+			display: flex;
+			align-self: stretch;
+			flex-grow: 1;
+			align-items: flex-start;
+		}
 
 		&-icons {
 			display: flex;
