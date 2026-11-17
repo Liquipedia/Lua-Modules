@@ -786,7 +786,7 @@ function MatchTable:matchRow(match)
 end
 
 ---@param match MatchTableMatch
----@return Widget
+---@return VNode
 function MatchTable:_displayDate(match)
 	return TableWidgets.Cell{
 		attributes = {['data-sort-value'] = match.timestamp},
