@@ -21,7 +21,7 @@ local TABLE_OF_CONTENTS = '__TOC__'
 local function HorizontalContainer(props)
 	local carousel = Carousel{
 		children = props.children,
-		itemWidth = '12.5rem',
+		itemWidth = '15.625rem',
 		gap = '0.5rem',
 	}
 
