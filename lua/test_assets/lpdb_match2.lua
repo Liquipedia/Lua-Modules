@@ -1,7 +1,9 @@
 --- Triple Comment to Enable our LLS Plugin
 
---- Sample match2 records for the match ticker card snapshot.
---- The records name only the fields the ticker card reads, rather than whole records.
+--[[
+Sample match2 records originally created for the match ticker card snapshot.
+Records only include fields that are relevant to the snapshot generation.
+]]
 ---@diagnostic disable: missing-fields
 
 local TOURNAMENT = {
