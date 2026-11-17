@@ -4,7 +4,6 @@ insulate('Match Ticker Card', function()
 	local Array = require('Module:Array')
 	local MatchGroupUtil = require('Module:MatchGroup/Util/Custom')
 
-	local Html = require('Module:Widget/Html')
 	local HorizontalContainer = require('Module:Widget/Match/Ticker/HorizontalContainer')
 
 	it('snapshot', function()
