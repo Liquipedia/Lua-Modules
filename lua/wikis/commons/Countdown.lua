@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local CountdownWidget = Lua.import('Module:Widget/Countdown')
 
@@ -19,7 +20,7 @@ local Countdown = {}
 ---@param args CountdownArgs
 ---@return string
 function Countdown.create(args)
-	return tostring(CountdownWidget(args))
+	return tostring(CountdownWidget(Table.copy(args)))
 end
 
 return Class.export(Countdown, {exports = {'create'}})
