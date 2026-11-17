@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local StreamLinks = Lua.import('Module:Links/Stream')
 
@@ -74,7 +75,9 @@ function CountdownWidget.readStreams(props)
 	if Logic.readBool(props.finished) or Logic.readBool(props.nostreams) then
 		return
 	end
-	local parsedStreams = StreamLinks.filterStreams(props)
+	local parsedStreams = StreamLinks.filterStreams(Table.filterByKey(props, function(key)
+		return type(key) == 'string'
+	end) --[[@as {string: string}]])
 	if Logic.isDeepEmpty(parsedStreams) then
 		return
 	end
