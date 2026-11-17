@@ -198,7 +198,7 @@ end
 ---@return {[string]: string[]}
 function StreamLinks.filterStreams(streamsInput)
 	local hasEnglishStream = Table.any(streamsInput, function(key)
-		return key:match('_en_') or Table.includes(StreamLinks.countdownPlatformNames, key)
+		return string.match(key, '_en_') or Table.includes(StreamLinks.countdownPlatformNames, key)
 	end)
 
 	local streams = {}
