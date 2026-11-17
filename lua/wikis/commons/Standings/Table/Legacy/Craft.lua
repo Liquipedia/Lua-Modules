@@ -68,8 +68,8 @@ function StandingTableLegacyCraft.run(frame)
 		{defaultTiebreakers = StandingTableLegacyCraft.defaultTiebreakers}
 	)
 
-	if args.date then
-		local timestamp = DateExt.readTimestamp(args.date)
+	local timestamp = DateExt.readTimestampOrNil(args.date)
+	if timestamp then
 		Variables.varDefine('match_date', DateExt.formatTimestamp('Y-m-d H:i:s', timestamp))
 	end
 
@@ -126,13 +126,15 @@ function StandingTableLegacyCraft.getMatchDateVar(date)
 
 	-- workaround for date template not getting parsed with (outer) subst calls
 	local timezone = date:match('%{%{%s*[aA]bbr/(.+)%}%}')
-mw.logObject(timezone, 'timezone')
 	if Logic.isNotEmpty(timezone) then
 		local withoutTimezone = date:gsub('%{%{%s*[aA]bbr/.+%}%}', '')
 		date = withoutTimezone .. Timezone.getTimezoneString{timezone = timezone}
 	end
 
-	local timestamp = DateExt.readTimestamp(date)
+	local timestamp = DateExt.readTimestampOrNil(date)
+	if not timestamp then
+		return ''
+	end
 
 	return '{{#vardefine:match_date|' .. DateExt.formatTimestamp('Y-m-d H:i:s', timestamp) .. '}}'
 end
