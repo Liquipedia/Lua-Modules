@@ -27,7 +27,7 @@ local defaultProps = {
 }
 
 ---@param props MatchStreamsContainerProps
----@return VNode?
+---@return VNode[]?
 local function MatchStreamsContainer(props)
 	local streams = props.streams
 	if not streams then
