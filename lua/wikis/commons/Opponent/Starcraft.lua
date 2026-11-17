@@ -94,8 +94,8 @@ function StarcraftOpponent.toLpdbStruct(opponent, options)
 	return storageStruct
 end
 
----@param storageStruct table
----@return StarcraftStandardOpponent?
+---@param storageStruct placement|standingsentry
+---@return StarcraftStandardOpponent
 function StarcraftOpponent.fromLpdbStruct(storageStruct)
 	local opponent = Opponent.fromLpdbStruct(storageStruct)
 
