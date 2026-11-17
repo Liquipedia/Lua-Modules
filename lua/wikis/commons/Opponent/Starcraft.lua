@@ -97,11 +97,9 @@ end
 ---@param storageStruct table
 ---@return StarcraftStandardOpponent?
 function StarcraftOpponent.fromLpdbStruct(storageStruct)
-	local opponent = Opponent.fromLpdbStruct(storageStruct) --[[@as StarcraftStandardOpponent?]]
+	local opponent = Opponent.fromLpdbStruct(storageStruct)
 
-	if not opponent then
-		return nil
-	end
+	---@cast opponent StarcraftStandardOpponent
 
 	opponent.isArchon = (storageStruct.opponentplayers or {}).isArchon
 
