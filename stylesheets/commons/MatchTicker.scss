@@ -136,12 +136,19 @@ Template(s): MatchTicker
 		align-self: stretch;
 		font-size: 0.75rem;
 		line-height: 1.125rem;
-	}
 
-	&__participants-icons {
-		display: flex;
-		align-items: center;
-		flex-shrink: 0;
+		&-icons {
+			display: flex;
+			align-items: center;
+			flex-shrink: 0;
+		}
+
+		&-count {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			color: var( --match-ticker-card-secondary-text-color );
+		}
 	}
 
 	&__participant-icon {
@@ -175,13 +182,6 @@ Template(s): MatchTicker
 		}
 	}
 
-	&__participants-count {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		color: var( --match-ticker-card-secondary-text-color );
-	}
-
 	/* FFA / Battle Royale: completed */
 	.match-info-headerbr {
 		gap: 0;
@@ -207,16 +207,16 @@ Template(s): MatchTicker
 		padding: 0.125rem;
 		gap: 0.25rem;
 		font-style: inherit;
-	}
 
-	.match-info-tournament-wrapper {
-		min-width: 0;
-	}
+		&-wrapper {
+			min-width: 0;
+		}
 
-	.match-info-tournament-game {
-		font-size: 0.6875rem;
-		line-height: 1rem;
-		color: var( --match-ticker-card-secondary-text-color );
+		&-game {
+			font-size: 0.6875rem;
+			line-height: 1rem;
+			color: var( --match-ticker-card-secondary-text-color );
+		}
 	}
 
 	.match-info-links-wrapper {
