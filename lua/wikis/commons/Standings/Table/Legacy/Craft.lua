@@ -123,6 +123,7 @@ function StandingTableLegacyCraft.getMatchDateVar(date)
 	if Logic.isEmpty(date) then
 		return ''
 	end
+	---@cast date -nil
 
 	-- workaround for date template not getting parsed with (outer) subst calls
 	local timezone = date:match('%{%{%s*[aA]bbr/(.+)%}%}')
