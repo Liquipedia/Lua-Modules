@@ -95,6 +95,7 @@ function CountdownWidget.render(props)
 		return CountdownWidget.createWrapper(props, false)
 	end
 	return Html.Span{
+		classes = {'timer-object-wrapper'},
 		children = {
 			CountdownWidget.createWrapper(props, true),
 			StreamsContainer{
