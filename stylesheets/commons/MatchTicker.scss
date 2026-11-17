@@ -63,6 +63,7 @@ Template(s): MatchTicker
 		gap: 0.25rem;
 		align-self: stretch;
 		font-size: 0.8125rem;
+		flex-grow: 1;
 
 		&:not( :has( > .winner ) ),
 		&:has( > .winner ) > .winner {
@@ -136,6 +137,7 @@ Template(s): MatchTicker
 		align-self: stretch;
 		font-size: 0.75rem;
 		line-height: 1.125rem;
+		flex-grow: 1;
 
 		&-icons {
 			display: flex;
@@ -187,6 +189,7 @@ Template(s): MatchTicker
 		gap: 0;
 		font-size: 0.75rem;
 		line-height: 1.125rem;
+		flex-grow: 1;
 
 		&-positionholder {
 			color: var( --match-ticker-card-primary-text-color );
