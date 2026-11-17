@@ -15,7 +15,7 @@ insulate('Match Ticker Card', function()
 		local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 		TeamTemplateMock.setUp()
 
-		local MatchRecords = require('test_assets.match_ticker_cards')
+		local MatchRecords = require('test_assets.lpdb_match2')
 
 		local cards = Array.map(MatchRecords, function(record)
 			return MatchTickerCard{match = MatchGroupUtil.matchFromRecord(record)}
