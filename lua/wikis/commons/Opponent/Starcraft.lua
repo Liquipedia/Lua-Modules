@@ -13,7 +13,7 @@ local Table = Lua.import('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent')
 
----@class StrcraftCustomOpponent: Opponent
+---@class StarcraftCustomOpponent: Opponent
 local StarcraftOpponent = Table.deepCopy(Opponent)
 
 ---@class StarcraftStandardPlayer:standardPlayer
