@@ -20,7 +20,7 @@ local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 ---@field vodLink string
 ---@field variant string?
 ---@field showText boolean?
----@field gameNumber integer
+---@field gameNumber integer?
 ---@field grow boolean?
 ---@field buttonSize ButtonSize?
 
