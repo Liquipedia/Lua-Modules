@@ -96,6 +96,7 @@ function CountdownWidget.render(props)
 		parsedStreams and StreamsContainer{
 			buttonSize = 'xs',
 			streams = parsedStreams,
+			hideCtaText = true,
 		} or nil,
 	}
 end

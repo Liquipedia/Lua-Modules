@@ -15,6 +15,7 @@ local MatchStream = Lua.import('Module:Widget/Match/Stream')
 
 ---@class MatchStreamsContainerProps
 ---@field streams table
+---@field hideCtaText boolean?
 ---@field maxStreams integer?
 ---@field matchIsLive boolean?
 ---@field growButtons boolean?
@@ -55,6 +56,7 @@ local function MatchStreamsContainer(props)
 			matchIsLive = props.matchIsLive,
 			grow = props.growButtons,
 			buttonSize = props.buttonSize,
+			hideCtaText = props.hideCtaText,
 		}
 	end)
 end
