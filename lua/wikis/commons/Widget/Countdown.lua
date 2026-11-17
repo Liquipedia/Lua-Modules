@@ -85,19 +85,24 @@ function CountdownWidget.readStreams(props)
 end
 
 ---@param props CountdownWidgetProps
----@return VNode[]?
+---@return VNode?
 function CountdownWidget.render(props)
 	if Logic.isEmpty(props.date) and not props.timestamp then
 		return
 	end
 	local parsedStreams = CountdownWidget.readStreams(props)
-	return {
-		CountdownWidget.createWrapper(props, parsedStreams ~= nil),
-		parsedStreams and StreamsContainer{
-			buttonSize = 'xs',
-			streams = parsedStreams,
-			hideCtaText = true,
-		} or nil,
+	if not parsedStreams then
+		return CountdownWidget.createWrapper(props, false)
+	end
+	return Html.Span{
+		children = {
+			CountdownWidget.createWrapper(props, true),
+			StreamsContainer{
+				buttonSize = 'xs',
+				streams = parsedStreams,
+				hideCtaText = true,
+			},
+		}
 	}
 end
 
