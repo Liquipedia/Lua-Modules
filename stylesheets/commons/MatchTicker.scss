@@ -25,7 +25,8 @@ Template(s): MatchTicker
 	align-self: stretch;
 	font-size: 0.6875rem;
 	background: var( --match-ticker-card-background-color );
-	border-right: 1px solid var( --match-ticker-card-border-color );
+	// TODO: Change this to border-right; this is temporary until new ticker container is ready
+	border: 1px solid var( --match-ticker-card-border-color );
 	position: relative;
 
 	&__header {
