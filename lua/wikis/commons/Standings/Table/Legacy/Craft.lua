@@ -27,7 +27,7 @@ local StandingTableLegacyCraft = {}
 -- Tournaments starting before this date keep the GroupTableLeague default tiebreakers
 local UPDATED_DEFAULT_TIEBREAKERS_DATE = '2022-03-20'
 
--- they don't have any effect, but we should keep them, alive as arguments during conversion runs
+-- they don't have any effect, but we should keep them alive as arguments during conversion runs
 local EXTRA_ARGUMENTS = {
 	'preview',
 	'interview',
