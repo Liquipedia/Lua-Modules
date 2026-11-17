@@ -35,6 +35,7 @@ Template(s): MatchTicker
 .match-ticker-card {
 	display: flex;
 	min-width: 15.625rem;
+	height: stretch;
 	padding: 0.5rem;
 	flex-direction: column;
 	align-items: flex-start;
