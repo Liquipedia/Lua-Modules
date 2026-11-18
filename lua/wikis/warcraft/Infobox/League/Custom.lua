@@ -29,11 +29,12 @@ local League = Lua.import('Module:Infobox/League')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
 local CountdownWidget = Lua.import('Module:Widget/Countdown')
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
+local NoWrap = Widgets.NoWrap
 
 ---@class WarcraftLeagueInfobox: InfoboxLeague
 ---@operator call(Frame): WarcraftLeagueInfobox
@@ -348,9 +349,7 @@ end
 function CustomLeague:_mapsDisplay(maps)
 	return {table.concat(
 		Array.map(maps, function(mapData)
-			return tostring(self:_createNoWrappingSpan(
-				Page.makeInternalLink({}, mapData.displayname, mapData.link)
-			))
+			return tostring(NoWrap{children = Page.makeInternalLink({}, mapData.displayname, mapData.link)})
 		end),
 		'&nbsp;• '
 	)}
@@ -418,14 +417,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.patch2 = args.patch2
 
 	return lpdbData
-end
-
----@param content string|Html|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	return mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
 end
 
 ---@param args table

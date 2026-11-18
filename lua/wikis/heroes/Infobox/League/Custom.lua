@@ -15,10 +15,11 @@ local PageLink = Lua.import('Module:Page')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
+local NoWrap = Widgets.NoWrap
 
 ---@class HeroesLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -50,7 +51,7 @@ function CustomInjector:parse(id, widgets)
 		end
 	elseif id == 'customcontent' then
 		local maps = Array.map(self.caller:getAllArgsForBase(args, 'bg'), function(map)
-			return tostring(self.caller:_createNoWrappingSpan(PageLink.makeInternalLink(map)))
+			return tostring(NoWrap{children = PageLink.makeInternalLink(map)})
 		end)
 
 		if #maps > 0 then
@@ -60,15 +61,6 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	return widgets
-end
-
----@param content Html|string|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
-	return span
 end
 
 return CustomLeague

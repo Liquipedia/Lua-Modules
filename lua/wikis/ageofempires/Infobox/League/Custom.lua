@@ -25,10 +25,11 @@ local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local NoWrap = Widgets.NoWrap
 
 ---@class AgeofempiresLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -85,9 +86,7 @@ function CustomInjector:parse(id, widgets)
 
 			while not String.isEmpty(args['team' .. index]) do
 				table.insert(teams, '&nbsp;• ' ..
-					tostring(caller:_createNoWrappingSpan(
-						Page.makeInternalLink(args['team' .. index])
-					))
+					tostring(NoWrap{children = Page.makeInternalLink(args['team' .. index])})
 				)
 				index = index + 1
 			end
@@ -212,14 +211,6 @@ function CustomLeague:_concatArgs(args, base)
 	return table.concat(foundArgs, ';')
 end
 
----@param content Html|string|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	return mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
-end
-
 ---@param args table
 ---@return string[]
 function CustomLeague:_getGameVersion(args)
@@ -342,9 +333,7 @@ end
 ---@return table
 function CustomLeague:_displayMaps(maps)
 	local mapDisplay = function(map)
-		return tostring(self:_createNoWrappingSpan(
-			Page.makeInternalLink({}, (map.name or map.link) .. (map.mode or ''), map.link)
-		))
+		return tostring(NoWrap{children = Page.makeInternalLink({}, (map.name or map.link) .. (map.mode or ''), map.link)})
 	end
 
 	return {table.concat(

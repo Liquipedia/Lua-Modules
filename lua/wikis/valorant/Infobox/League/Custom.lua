@@ -20,10 +20,11 @@ local Variables = Lua.import('Module:Variables')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local NoWrap = Widgets.NoWrap
 
 ---@class ValorantLeagueInfobox: InfoboxLeague
 ---@operator call(Frame): ValorantLeagueInfobox
@@ -80,9 +81,7 @@ function CustomInjector:parse(id, widgets)
 			local maps = {}
 
 			for _, map in ipairs(self.caller:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(self.caller:_createNoWrappingSpan(
-					Page.makeInternalLink({}, map, map .. game)
-				)))
+				table.insert(maps, tostring(NoWrap{children = Page.makeInternalLink({}, map, map .. game)}))
 			end
 			table.sort(maps)
 			table.insert(widgets, Title{children = 'Maps'})
@@ -168,14 +167,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('date', self.data.endDate)
 	Variables.varDefine('sdate', self.data.startDate)
 	Variables.varDefine('edate', self.data.endDate)
-end
-
----@param content Html|string|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	return mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
 end
 
 return CustomLeague

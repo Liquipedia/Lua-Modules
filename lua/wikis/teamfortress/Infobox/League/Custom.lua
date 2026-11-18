@@ -15,10 +15,11 @@ local Variables = Lua.import('Module:Variables')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local NoWrap = Widgets.NoWrap
 
 ---@class TeamfortressLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -55,9 +56,7 @@ function CustomInjector:parse(id, widgets)
 			local maps = {}
 
 			for _, map in ipairs(self.caller:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(self.caller:_createNoWrappingSpan(
-					PageLink.makeInternalLink(map)
-				)))
+				table.insert(maps, tostring(NoWrap{children = PageLink.makeInternalLink(map)}))
 			end
 			table.insert(widgets, Title{children = 'Maps'})
 			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
@@ -92,15 +91,6 @@ function CustomLeague:getWikiCategories(args)
 	end
 
 	return categories
-end
-
----@param content Html|string|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
-	return span
 end
 
 return CustomLeague

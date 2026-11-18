@@ -22,11 +22,12 @@ local League = Lua.import('Module:Infobox/League')
 local PatchAuto = Lua.import('Module:Infobox/Extension/PatchAuto')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
+local NoWrap = Widgets.NoWrap
 
 ---@class StormgateLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -138,9 +139,7 @@ end
 function CustomLeague:_mapsDisplay(maps)
 	return table.concat(
 		Array.map(maps, function(mapData)
-			return tostring(self:_createNoWrappingSpan(
-				Page.makeInternalLink({}, mapData.displayname, mapData.link)
-			))
+			return tostring(NoWrap{children = Page.makeInternalLink({}, mapData.displayname, mapData.link)})
 		end),
 		'&nbsp;• '
 	)
@@ -182,14 +181,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = Json.stringify(args.maps)
 
 	return lpdbData
-end
-
----@param content string|Html|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	return mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
 end
 
 return CustomLeague

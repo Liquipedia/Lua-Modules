@@ -28,10 +28,11 @@ local League = Lua.import('Module:Infobox/League')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local Tier = Lua.import('Module:Tier/Custom')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local NoWrap = Widgets.NoWrap
 local IconFontawesome = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -177,9 +178,7 @@ function CustomInjector:parse(id, widgets)
 			local maps = {}
 
 			for _, map in ipairs(self.caller:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(self.caller:_createNoWrappingSpan(
-							Page.makeInternalLink({}, map, map .. game)
-						)))
+				table.insert(maps, tostring(NoWrap{children = Page.makeInternalLink({}, map, map .. game)}))
 			end
 			table.insert(widgets, Title{children = 'Maps'})
 			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
@@ -407,14 +406,6 @@ function CustomLeague:_createValveTierCell()
 			} or nil
 		)
 	end
-end
-
----@param content Html|string|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	return mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
 end
 
 return CustomLeague

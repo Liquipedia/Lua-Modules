@@ -19,10 +19,11 @@ local Variables = Lua.import('Module:Variables')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local NoWrap = Widgets.NoWrap
 
 ---@class HaloLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -118,7 +119,7 @@ function CustomLeague:_makeMapList()
 	local map1Modes = self:_getMapModes(self.args['map1modes'], date)
 
 	local foundMaps = {
-		tostring(self:_createNoWrappingSpan(map1Modes .. map1))
+		tostring(NoWrap{children = map1Modes .. map1})
 	}
 	local index = 2
 	while not String.isEmpty(self.args['map' .. index]) do
@@ -127,7 +128,7 @@ function CustomLeague:_makeMapList()
 
 		table.insert(
 			foundMaps,
-			'&nbsp;• ' .. tostring(self:_createNoWrappingSpan(currentModes .. currentMap))
+			'&nbsp;• ' .. tostring(NoWrap{children = currentModes .. currentMap})
 		)
 		index = index + 1
 	end
@@ -167,23 +168,12 @@ function CustomLeague:_makeBasedListFromArgs(base)
 	while not String.isEmpty(self.args[base .. index]) do
 		local currentArg = self.args[base .. index]
 		table.insert(foundArgs, '&nbsp;• ' ..
-			tostring(self:_createNoWrappingSpan(
-				PageLink.makeInternalLink({}, currentArg)
-			))
+			tostring(NoWrap{children = PageLink.makeInternalLink({}, currentArg)})
 		)
 		index = index + 1
 	end
 
 	return foundArgs
-end
-
----@param content Html|string|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-	span:css('white-space', 'nowrap')
-		:node(content)
-	return span
 end
 
 return CustomLeague
