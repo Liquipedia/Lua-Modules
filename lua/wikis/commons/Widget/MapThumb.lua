@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Map = Lua.import('Module:Map')
 local Page = Lua.import('Module:Page')
@@ -17,50 +16,50 @@ local Page = Lua.import('Module:Page')
 local MapData = Lua.requireIfExists('Module:MapPoolTable/Data', {loadData = true}) or {}
 
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 
 local PLACEHOLDER_IMAGE = 'MapImagePlaceholder.jpg'
 
----@class MapThumb: Widget
----@operator call(table): MapThumb
----@field props {map: string?, size: string|integer}
-local MapThumb = Class.new(Widget)
-MapThumb.defaultProps = {
+local defaultProps = {
 	size = 'x120px',
 }
 
----@return Widget?
-function MapThumb:render()
-	if Logic.isEmpty(self.props.map) then
-		return
-	end
-
-	local map = self:_getMapData()
-	assert(map, 'Invalid map "' .. self.props.map .. '"')
-
-	return Image{
-		imageLight = map.image or PLACEHOLDER_IMAGE,
-		imageDark = map.imageDark,
-		link = map.pageName,
-		size = self.props.size,
-		alt = map.displayName or map.pageName,
-	}
-end
-
+---@param mapInput string
 ---@return StandardMap?
-function MapThumb:_getMapData()
-	local map = Map.getMapByPageName(Page.pageifyLink(self.props.map))
+local function getMapData(mapInput)
+	local map = Map.getMapByPageName(Page.pageifyLink(mapInput))
 	if map then
 		return map
 	end
-	local key = self.props.map
+	local key = mapInput
 		:gsub('_', ' ')
 		:gsub('%s*LE$', '')
 		:gsub('%s*TE$', '')
 		:gsub('%s*CE$', '')
 		:gsub('%s%([mM]ap%)$', '')
 		:lower()
-	return MapData[self.props.map] or MapData[key]
+	return MapData[map] or MapData[key]
 end
 
-return MapThumb
+---@param props {map: string?, size: string|integer}
+---@return Renderable?
+local function MapThumb(props)
+	if Logic.isEmpty(props.map) then
+		return
+	end
+
+	local map = getMapData(props.map)
+	assert(map, 'Invalid map "' .. props.map .. '"')
+
+	return Image{
+		imageLight = map.image or PLACEHOLDER_IMAGE,
+		imageDark = map.imageDark,
+		link = map.pageName,
+		size = tostring(props.size),
+		alt = map.displayName or map.pageName,
+	}
+end
+
+
+
+return Component.component(MapThumb, defaultProps)

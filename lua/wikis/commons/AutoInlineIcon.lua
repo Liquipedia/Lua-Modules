@@ -60,7 +60,7 @@ function AutoInlineIcon._getDataRetrevalFunction(category)
 end
 
 ---@param data table
----@return IconWidget
+---@return Renderable
 function AutoInlineIcon._iconCreator(data)
 	if data.iconType == 'image' then
 		local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
