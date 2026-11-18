@@ -186,7 +186,6 @@ function StreamLinks.buildDisplays(streams)
 	local displays = {}
 	Array.forEach(StreamLinks.countdownPlatformNames, function(platform)
 		Array.forEach(streams[platform] or {}, function(streamValue)
-			---@diagnostic disable-next-line: deprecated
 			table.insert(displays, StreamLinks.displaySingle(platform, streamValue))
 		end)
 	end)
