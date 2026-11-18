@@ -63,6 +63,14 @@ Author(s): FO-nTTaX
 Template(s): Countdowns
 Author(s): FO-nTTaX
 *******************************************************************************/
+.timer-object-wrapper {
+	display: contents;
+
+	> div {
+		display: contents;
+	}
+}
+
 .timer-object-countdown-live {
 	color: #008000;
 	font-weight: bold;

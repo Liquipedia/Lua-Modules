@@ -20,6 +20,7 @@ local Span = Html.Span
 ---@field count integer?
 ---@field css? HtmlStyleProps
 ---@field attributes? table<string, string|number?>
+---@field buttonSize? ButtonSize
 
 ---@param props VodsDropdownButtonProps
 ---@return VNode?
@@ -40,7 +41,7 @@ local function VodsDropdownButton(props)
 				Icon{iconName = 'expand'},
 			},
 		},
-		size = 'sm',
+		size = props.buttonSize,
 		variant = 'secondary',
 	}
 	local hideButton = Button{
@@ -54,7 +55,7 @@ local function VodsDropdownButton(props)
 				Icon{iconName = 'collapse'},
 			},
 		},
-		size = 'sm',
+		size = props.buttonSize,
 		variant = 'secondary',
 	}
 
@@ -69,4 +70,4 @@ local function VodsDropdownButton(props)
 	}
 end
 
-return Component.component(VodsDropdownButton)
+return Component.component(VodsDropdownButton, {buttonSize = 'sm'})
