@@ -1,8 +1,6 @@
 /*******************************************************************************
  * Template(s): Countdowns
- * Author(s): FO-nTTaX, Machunki
  ******************************************************************************/
-
 class LiquipediaCountdown {
 	static get TIMER_HIDDEN_CLASS() {
 		return 'timer--hidden';
