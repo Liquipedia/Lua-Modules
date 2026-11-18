@@ -18,7 +18,7 @@ local AutoInlineIcon = {}
 
 ---onlyicon default false, link default true
 ---@param options {onlyicon: boolean?, link: boolean?, category: string, lookup: string}
----@return Widget
+---@return Renderable
 function AutoInlineIcon.display(options)
 	local category = options.category
 	local lookup = options.lookup
