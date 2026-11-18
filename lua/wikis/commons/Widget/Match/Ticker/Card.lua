@@ -7,7 +7,9 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
+local Logic = Lua.import('Module:Logic')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
@@ -51,10 +53,34 @@ function MatchTickerCard.buildHeader(match)
 		classes = {'match-ticker-card__header'},
 		children = {
 			MatchCountdown{match = match, format = 'compact'},
-			(match.bestof or 0) > 0 and Html.Div{
-				children = {'Bo', match.bestof}
-			} or nil
+			MatchTickerCard.buildSectionAndBestOf(match),
 		}
+	}
+end
+
+---@param match MatchGroupUtilMatch
+---@return VNode?
+function MatchTickerCard.buildSectionAndBestOf(match)
+	local function buildBestOfDisplay()
+		if not match.bestof or match.bestof == 0 then
+			return
+		end
+		return 'Bo' .. match.bestof
+	end
+	local function buildSectionDisplay()
+		if match.section == 'Results' then
+			return
+		end
+		return match.section
+	end
+
+	local children = Array.extend(buildSectionDisplay(), buildBestOfDisplay())
+	if Logic.isEmpty(children) then
+		return
+	end
+
+	return Html.Div{
+		children = Array.interleave(children, ' - ')
 	}
 end
 
