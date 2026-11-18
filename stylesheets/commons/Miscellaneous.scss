@@ -1776,6 +1776,10 @@ Author(s): Scribunto developer( s )
 	&:focus {
 		text-decoration: underline;
 	}
+
+	.logged-out & {
+		display: none !important;
+	}
 }
 
 /*******************************************************************************

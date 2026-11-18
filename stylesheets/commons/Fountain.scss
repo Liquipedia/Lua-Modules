@@ -1,8 +1,3 @@
-/* Temporary: Hide Errors from logged out users */
-.logged-out .scribunto-error {
-	display: none;
-}
-
 // Default text-shadow
 .txtshd {
 	text-shadow: 0.0625em 0.0625em 0.125em var( --clr-moon-base ); // #000000
