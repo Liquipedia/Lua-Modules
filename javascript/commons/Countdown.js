@@ -14,7 +14,11 @@ class LiquipediaCountdown {
 	/** @type {number} */
 	static lastCountdownId = null;
 
-	// Last HTML written to each countdown element, so unchanged ticks skip the DOM write
+	/**
+	 * Last HTML written to each countdown element, so unchanged ticks skip the DOM write
+	 *
+	 * @type {WeakMap<LiquipediaCountdown, string>}
+	 */
 	static renderedCountdowns = new WeakMap();
 
 	static async init() {
