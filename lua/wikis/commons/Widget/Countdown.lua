@@ -21,6 +21,7 @@ local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
 local CountdownFormat = {
 	full = 'full',
 	compact = 'compact',
+	minimal = 'minimal',
 }
 
 ---@class CountdownWidgetProps
