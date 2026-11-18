@@ -17,7 +17,7 @@ class LiquipediaCountdown {
 	/**
 	 * Last HTML written to each countdown element, so unchanged ticks skip the DOM write
 	 *
-	 * @type {WeakMap<LiquipediaCountdown, string>}
+	 * @type {WeakMap<HTMLElement, string>}
 	 */
 	static renderedCountdowns = new WeakMap();
 
@@ -167,9 +167,9 @@ class LiquipediaCountdown {
 		if ( datestr.length > 0 && this.hasStreams() ) {
 			html += ' - ';
 		}
-		if ( LiquipediaCountdown.renderedCountdowns.get( this ) !== html ) {
+		if ( LiquipediaCountdown.renderedCountdowns.get( this.timerElement ) !== html ) {
 			countdownElem.innerHTML = html;
-			LiquipediaCountdown.renderedCountdowns.set( this, html );
+			LiquipediaCountdown.renderedCountdowns.set( this.timerElement, html );
 		}
 	}
 
