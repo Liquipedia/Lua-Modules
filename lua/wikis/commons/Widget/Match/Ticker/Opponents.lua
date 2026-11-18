@@ -102,7 +102,7 @@ function MatchTickerCardOpponents.buildFfaParticipantsPreview(match)
 					teamTemplateData.imagedark,
 				},
 				function (image)
-					return Game.isDefaultTeamLogo{logo = image}
+					return not Game.isDefaultTeamLogo{logo = image}
 				end
 			)
 		end),
