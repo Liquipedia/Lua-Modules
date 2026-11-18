@@ -10,6 +10,7 @@ Author(s): FO-nTTaX
 	--infobox-header-background-color: var( --clr-wiki-theme-20 );
 }
 
+$infobox-header-background-color: var( --infobox-header-background-color, color-mix( in srgb, var( --clr-wiki-theme-primary ) 15%, transparent ) );
 $infobox-width: 336px;
 $infobox-margin: 10px;
 $infobox-padding: 10px;
@@ -43,7 +44,7 @@ $infobox-padding: 10px;
 		font-weight: bold;
 		text-align: center;
 		font-size: 155%;
-		background-color: var( --infobox-header-background-color, var( --wiki-color-light ) );
+		background-color: $infobox-header-background-color;
 
 		&-2 {
 			font-size: 130%;
@@ -129,7 +130,7 @@ $infobox-padding: 10px;
 	min-height: 292px;
 	padding-top: $infobox-padding;
 	padding-bottom: 30px;
-	border-bottom: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
+	border-bottom: 2px solid $infobox-header-background-color;
 	overflow: hidden;
 	text-align: center;
 
@@ -146,8 +147,8 @@ $infobox-padding: 10px;
 	width: $infobox-width;
 	padding-top: $infobox-padding;
 	padding-bottom: $infobox-padding;
-	border-top: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
-	border-bottom: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
+	border-top: 2px solid $infobox-header-background-color;
+	border-bottom: 2px solid $infobox-header-background-color;
 	display: flex;
 	flex-flow: column nowrap;
 
