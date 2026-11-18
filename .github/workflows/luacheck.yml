@@ -106,17 +106,19 @@ jobs:
             | .value[]
             | (.range.start.line + 1) as $line
             | (.range.start.character + 1) as $col
-            | "::error file=\($file),line=\($line),col=\($col)::\(.message | gsub("\n"; " ")) (\(.code))"
+            | (if .severity == 1 then "error" else "warning" end) as $level
+            | "::\($level) file=\($file),line=\($line),col=\($col)::\(.message | gsub("\n"; " ")) (\(.code))"
           ' luals-check.json | tee output.txt
 
           touched=$(wc -l < output.txt)
+          touched_errors=$(grep -c '^::error ' output.txt || true)
 
           problems=$(jq -r '[.[] | length] | add // 0' luals-check.json)
           files_with=$(jq -r 'length' luals-check.json)
           {
-            echo "| | Files scanned | Files with problems | Problems | In changed files |"
-            echo "|-|-------|----------|----------|----------|"
-            echo "| LuaLS check | $(find lua -name '*.lua' | wc -l) | $files_with | $problems | $touched |"
+            echo "| | Files scanned | Files with problems | Problems | In changed files | Errors in changed files |"
+            echo "|-|-------|----------|----------|----------|----------|"
+            echo "| LuaLS check | $(find lua -name '*.lua' | wc -l) | $files_with | $problems | $touched | $touched_errors |"
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
-          exit $(( touched > 0 ? 1 : 0 ))
+          exit $(( touched_errors > 0 ? 1 : 0 ))

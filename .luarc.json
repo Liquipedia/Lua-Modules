@@ -9,7 +9,22 @@
 		"?.lua"
 	],
 	"runtime.pathStrict": false,
+	"diagnostics.groupSeverity": {
+		"ambiguity": "Error",
+		"await": "Error",
+		"conventions": "Error",
+		"duplicate": "Error",
+		"global": "Error",
+		"luadoc": "Error",
+		"strict": "Error",
+		"strong": "Error",
+		"type-check": "Error",
+		"unbalanced": "Error"
+	},
 	"diagnostics.severity": {
+		"deprecated": "Warning!",
+		"lowercase-global": "Information!",
+		"undefined-env-child": "Information!",
 		"trailing-space": "Error"
 	},
 	"diagnostics.neededFileStatus": {
