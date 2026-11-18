@@ -7,24 +7,21 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
-local FnUtil = Lua.import('Module:FnUtil')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
-local Opponent = Lua.import('Module:Opponent/Custom')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
+local MatchTickerCardOpponents = Lua.import('Module:Widget/Match/Ticker/Opponents')
 local TournamentBar = Lua.import('Module:Widget/Match/TournamentBar')
 local MatchButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
-local PARTY_OPPONENTS_DIVIDER = Html.Hr{classes = {'match-ticker-card__divider'}}
 
 ---@class MatchTickerCardProps
 ---@field match MatchGroupUtilMatch
+---@field gameData MatchTickerGameData?
 ---@field onlyHighlightOnValue string?
 ---@field displayGameIcons boolean?
 ---@field hideTournament boolean?
@@ -40,7 +37,7 @@ function MatchTickerCard.render(props)
 		classes = {'match-ticker-card'},
 		children = WidgetUtil.collect(
 			MatchTickerCard.buildHeader(match),
-			MatchTickerCard.buildMatchOpponentsDisplay(match),
+			MatchTickerCardOpponents{match = match},
 			MatchTickerCard.buildTournamentInfoBar(props),
 			MatchButtonBar{match = match, showVods = true, buttonSize = 'xs'}
 		)
@@ -61,41 +58,6 @@ function MatchTickerCard.buildHeader(match)
 	}
 end
 
----@param match MatchGroupUtilMatch
----@return VNode
-function MatchTickerCard.buildMatchOpponentsDisplay(match)
-	local matchOpponents = match.opponents
-	local opponentsDisplay = Array.map(match.opponents, FnUtil.curry(MatchTickerCard.buildMatchOpponentDisplay, match))
-	local hasDivider = Array.any(matchOpponents, function (opponent)
-		local opponentType = opponent.type
-		return Opponent.typeIsParty(opponentType) and Opponent.partySize(opponentType) > 1
-	end)
-	return Html.Div{
-		classes = {'match-ticker-card__opponents'},
-		children = hasDivider and Array.interleave(opponentsDisplay, PARTY_OPPONENTS_DIVIDER) or opponentsDisplay
-	}
-end
-
----@param match MatchGroupUtilMatch
----@param opponent standardOpponent
----@param opponentIndex integer
----@return VNode
-function MatchTickerCard.buildMatchOpponentDisplay(match, opponent, opponentIndex)
-	return Html.Div{
-		classes = {
-			'match-ticker-card__opponent',
-			match.winner == opponentIndex and 'winner' or nil,
-		},
-		children = {
-			OpponentDisplay.BlockOpponent{
-				opponent = opponent,
-				teamStyle = 'dynamic',
-			},
-			Html.Div{children = OpponentDisplay.InlineScore(opponent)},
-		}
-	}
-end
-
 ---@param props MatchTickerCardProps
 ---@return VNode?
 function MatchTickerCard.buildTournamentInfoBar(props)
@@ -112,6 +74,7 @@ function MatchTickerCard.buildTournamentInfoBar(props)
 		},
 		children = TournamentBar{
 			match = match,
+			gameData = props.gameData,
 			displayGameIcon = props.displayGameIcons,
 		},
 	}

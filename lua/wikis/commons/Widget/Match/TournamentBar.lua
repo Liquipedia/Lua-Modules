@@ -88,6 +88,7 @@ local function MatchTournamentBar(props)
 					}
 				},
 				gameData and gameData.gameIds and Html.Span{
+					classes = {'match-info-tournament-game'},
 					children = WidgetUtil.collect(
 						stageName,
 						stageName and ' - ' or nil,
