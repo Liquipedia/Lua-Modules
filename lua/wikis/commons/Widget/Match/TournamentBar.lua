@@ -25,9 +25,13 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 ---@field gameData MatchTickerGameData?
 ---@field displayGameIcon boolean?
 ---@field displayIcon boolean?
+---@field displayTournamentName boolean?
+---@field displayGameData boolean?
 
 local defaultProps = {
 	displayIcon = true,
+	displayTournamentName = true,
+	displayGameData = true,
 }
 
 ---@param props MatchTournamentBarProps
@@ -67,10 +71,10 @@ local function MatchTournamentBar(props)
 				}
 			}
 		} or nil,
-		Html.Span{
+		(props.displayTournamentName or props.displayGameData) and Html.Span{
 			classes = {'match-info-tournament-wrapper'},
-			children = {
-				Html.Span{
+			children = WidgetUtil.collect(
+				props.displayTournamentName and Html.Span{
 					classes = {'match-info-tournament-name'},
 					children = {
 						Link{
@@ -86,8 +90,8 @@ local function MatchTournamentBar(props)
 							}
 						}
 					}
-				},
-				gameData and gameData.gameIds and Html.Span{
+				} or nil,
+				props.displayGameData and gameData and gameData.gameIds and Html.Span{
 					classes = {'match-info-tournament-game'},
 					children = WidgetUtil.collect(
 						stageName,
@@ -103,8 +107,8 @@ local function MatchTournamentBar(props)
 						} or nil
 					)
 				} or nil
-			}
-		}
+			)
+		} or nil
 	)
 end
 

@@ -61,10 +61,21 @@ end
 ---@param props MatchTickerCardProps
 ---@return VNode?
 function MatchTickerCard.buildTournamentInfoBar(props)
-	if props.hideTournament then
-		return
-	end
 	local match = props.match
+	if props.hideTournament then
+		if #match.opponents <= 2 then
+			return
+		end
+		return Html.Div{
+			classes = {'match-info-tournament'},
+			children = TournamentBar{
+				match = match,
+				gameData = props.gameData,
+				displayIcon = false,
+				displayTournamentName = false,
+			},
+		}
+	end
 	local highlightCondition = HighlightConditions.match or HighlightConditions.tournament
 	local highlight = highlightCondition(match, {onlyHighlightOnValue = props.onlyHighlightOnValue})
 	return Html.Div{
