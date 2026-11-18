@@ -77,7 +77,7 @@ function CountdownWidget.readStreams(props)
 	end
 	local parsedStreams = StreamLinks.filterStreams(Table.filterByKey(props, function(key)
 		return type(key) == 'string'
-	end) --[[@as {string: string}]])
+	end) --[[@as {[string]: string}]])
 	if Logic.isDeepEmpty(parsedStreams) then
 		return
 	end
