@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Count = Lua.import('Module:Count')
-local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 
@@ -20,6 +19,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local Component = Lua.import('Module:Widget/Component')
+local CountdownWidget = Lua.import('Module:Widget/Countdown')
 local Grid = Lua.import('Module:Widget/Grid')
 local Html = Lua.import('Module:Widget/Html')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
@@ -130,7 +130,7 @@ function ProjectOverview._generateOverview(props)
 			{
 				IconFa{iconName = 'lastupdated', screenReaderHidden = true},
 				' Last Update: ',
-				timestamp and Countdown.create{
+				timestamp and CountdownWidget{
 					timestamp = timestamp,
 					date = DateExt.toCountdownArg(timestamp),
 					rawdatetime = true

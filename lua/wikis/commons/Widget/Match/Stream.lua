@@ -21,13 +21,33 @@ local TLNET_STREAM = 'stream'
 ---@field platform string
 ---@field stream string
 ---@field matchIsLive boolean?
+---@field hideCtaText boolean?
 ---@field buttonSize 'xs'|'sm'|'md'|'lg'?
 ---@field grow boolean?
 
 local defaultProps = {
+	hideCtaText = false,
 	matchIsLive = true,
 	buttonSize = 'sm',
 }
+
+---@param props MatchStreamProps
+---@return VNode?
+local function buildStreamCtaText(props)
+	if props.hideCtaText then
+		return
+	end
+	local CTA_Text
+	if props.matchIsLive then
+		CTA_Text = I18n.translate('matchstream-watch-live')
+	else
+		CTA_Text = I18n.translate('matchstream-watch-upcoming')
+	end
+	return Html.Span{
+		classes = {'match-button-cta-text'},
+		children = CTA_Text,
+	}
+end
 
 ---@param props MatchStreamProps
 ---@return VNode?
@@ -50,22 +70,12 @@ local function MatchStream(props)
 		linkType = 'internal'
 	end
 
-	local CTA_Text
-	if props.matchIsLive then
-		CTA_Text = I18n.translate('matchstream-watch-live')
-	else
-		CTA_Text = I18n.translate('matchstream-watch-upcoming')
-	end
-
 	return Button{
 		linktype = linkType,
 		link = link,
 		children = {
 			Icon{iconName = platform},
-			Html.Span{
-				classes = {'match-button-cta-text'},
-				children = CTA_Text,
-			},
+			buildStreamCtaText(props),
 		},
 		variant = 'secondary',
 		size = props.buttonSize,

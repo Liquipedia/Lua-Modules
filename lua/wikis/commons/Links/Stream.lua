@@ -180,12 +180,13 @@ function StreamLinks.displaySingle(platform, streamValue)
 end
 
 ---@deprecated Widget/Match/StreamsContainer
----@param streams {string: string[]}
+---@param streams {[string]: string[]}
 ---@return string[]?
 function StreamLinks.buildDisplays(streams)
 	local displays = {}
 	Array.forEach(StreamLinks.countdownPlatformNames, function(platform)
 		Array.forEach(streams[platform] or {}, function(streamValue)
+			---@diagnostic disable-next-line: deprecated
 			table.insert(displays, StreamLinks.displaySingle(platform, streamValue))
 		end)
 	end)
@@ -193,11 +194,11 @@ function StreamLinks.buildDisplays(streams)
 end
 
 ---Filter non-english streams if english streams exists
----@param streamsInput {string: string}
----@return {string: string[]}
+---@param streamsInput {[string]: string}
+---@return {[string]: string[]}
 function StreamLinks.filterStreams(streamsInput)
 	local hasEnglishStream = Table.any(streamsInput, function(key)
-		return key:match('_en_') or Table.includes(StreamLinks.countdownPlatformNames, key)
+		return string.match(key, '_en_') or Table.includes(StreamLinks.countdownPlatformNames, key)
 	end)
 
 	local streams = {}

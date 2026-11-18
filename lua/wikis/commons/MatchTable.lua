@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
@@ -35,6 +34,7 @@ local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
+local CountdownWidget = Lua.import('Module:Widget/Countdown')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
 local Html = Lua.import('Module:Widget/Html')
@@ -786,11 +786,11 @@ function MatchTable:matchRow(match)
 end
 
 ---@param match MatchTableMatch
----@return Widget
+---@return VNode
 function MatchTable:_displayDate(match)
 	return TableWidgets.Cell{
 		attributes = {['data-sort-value'] = match.timestamp},
-		children = not DateExt.isDefaultTimestamp(match.timestamp) and Countdown.create{
+		children = not DateExt.isDefaultTimestamp(match.timestamp) and CountdownWidget{
 			finished = match.finished,
 			date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
 			rawdatetime = true,
@@ -801,11 +801,12 @@ end
 
 ---@protected
 ---@param match MatchTableMatch
----@return Widget?
+---@return VNode?
 function MatchTable:displayTier(match)
 	if not self.config.showTier then return end
 
 	local tier, tierType, options = Tier.parseFromQueryData(match)
+	---@cast options table
 	options.link = true
 	options.onlyTierTypeIfBoth = true
 
@@ -815,6 +816,8 @@ function MatchTable:displayTier(match)
 			children = INVALID_TIER_DISPLAY
 		}
 	end
+
+	---@cast tier -nil
 
 	return TableWidgets.Cell{
 		attributes = {['data-sort-value'] = Tier.toSortValue(tier, tierType)},

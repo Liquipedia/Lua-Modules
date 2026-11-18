@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local Class = Lua.import('Module:Class')
-local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
@@ -37,6 +36,7 @@ local AdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection
 local MatchPageMapVeto = Lua.import('Module:Widget/Match/Page/MapVeto')
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
+local CountdownWidget = Lua.import('Module:Widget/Countdown')
 local Div = Html.Div
 local Footer = Lua.import('Module:Widget/Match/Page/Footer')
 local Header = Lua.import('Module:Widget/Match/Page/Header')
@@ -172,16 +172,10 @@ end
 ---@return VNode?
 function BaseMatchPage:getCountdownBlock()
 	if DateExt.isDefaultTimestamp(self.matchData.timestamp) then return end
-	return Div{
-		css = {
-			display = 'block',
-			['text-align'] = 'center'
-		},
-		children = Countdown.create{
-			date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
-			finished = self.matchData.finished,
-			rawdatetime = (not self.matchData.dateIsExact) or self.matchData.finished,
-		}
+	return CountdownWidget{
+		date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
+		finished = self.matchData.finished,
+		rawdatetime = (not self.matchData.dateIsExact) or self.matchData.finished,
 	}
 end
 

@@ -89,7 +89,7 @@ local function Button(props)
 	-- Have to wrap it in an extra div to prevent the mediawiki parser from messing it up
 	return Div{
 		css = props.grow and {flex = '1'} or nil,
-		classes = props.classes or {},
+		classes = props.classes,
 		children = {
 			Link{
 				link = props.link,
