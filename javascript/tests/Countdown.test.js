@@ -19,6 +19,11 @@ let scheduledTicks = [];
 let userOptions = {};
 
 /**
+ * The countdown class, as registered on liquipedia.countdown.
+ */
+let LiquipediaCountdown;
+
+/**
  * Creates a Date that behaves as if the browser were in a time zone with the given UTC offset.
  *
  * Jest runs tests in a sandbox where assigning process.env.TZ has no effect, so the local-time
@@ -50,6 +55,10 @@ function createTimer( attributes, text = 'original text' ) {
 	timer.innerHTML = text;
 	document.body.appendChild( timer );
 	return timer;
+}
+
+function createCountdown( attributes, text ) {
+	return new LiquipediaCountdown( createTimer( attributes, text ) );
 }
 
 function runNextTick( advanceMs ) {
@@ -90,6 +99,7 @@ describe( 'Countdown module', () => {
 		};
 
 		require( '../commons/Countdown.js' );
+		LiquipediaCountdown = globalThis.liquipedia.countdown;
 	} );
 
 	beforeEach( () => {
@@ -126,9 +136,7 @@ describe( 'Countdown module', () => {
 	} );
 
 	describe( 'getCountdownStringAndClassName', () => {
-		const getResult = ( attributes ) => globalThis.liquipedia.countdown.getCountdownStringAndClassName(
-			createTimer( attributes )
-		);
+		const getResult = ( attributes ) => createCountdown( attributes ).getCountdownStringAndClassName();
 
 		test( 'counts down to a future timestamp', () => {
 			expect( getResult( { 'data-timestamp': NOW_SECONDS + 90 } ) )
@@ -157,15 +165,19 @@ describe( 'Countdown module', () => {
 		} );
 	} );
 
-	describe( 'parseTimerObjectNodeToDateObj', () => {
+	describe( 'constructor', () => {
 		test( 'converts the unix timestamp to a Date', () => {
-			const timer = createTimer( { 'data-timestamp': NOW_SECONDS } );
-			expect( globalThis.liquipedia.countdown.parseTimerObjectNodeToDateObj( timer ).getTime() ).toBe( NOW );
+			expect( createCountdown( { 'data-timestamp': NOW_SECONDS } ).parsedDate.getTime() ).toBe( NOW );
 		} );
 
-		test( 'returns false for an errored timestamp', () => {
-			const timer = createTimer( { 'data-timestamp': 'error' } );
-			expect( globalThis.liquipedia.countdown.parseTimerObjectNodeToDateObj( timer ) ).toBe( false );
+		test( 'has no date for an errored timestamp', () => {
+			expect( createCountdown( { 'data-timestamp': 'error' } ).parsedDate ).toBeNull();
+		} );
+
+		test( 'reads the format from data-format and defaults to full', () => {
+			expect( createCountdown( { 'data-timestamp': NOW_SECONDS, 'data-format': 'compact' } ).format )
+				.toBe( 'compact' );
+			expect( createCountdown( { 'data-timestamp': NOW_SECONDS } ).format ).toBe( 'full' );
 		} );
 	} );
 
@@ -192,7 +204,7 @@ describe( 'Countdown module', () => {
 				.formatToParts( date )
 				.find( ( part ) => part.type === 'timeZoneName' ).value;
 
-			expect( globalThis.liquipedia.countdown.getTimeZoneNameLong( date ) ).toBe( expected );
+			expect( createCountdown( { 'data-timestamp': NOW_SECONDS } ).getTimeZoneNameLong() ).toBe( expected );
 		} );
 	} );
 
@@ -205,11 +217,14 @@ describe( 'Countdown module', () => {
 		 * @return {string}
 		 */
 		const format = ( isoDate, offsetMinutes, timeZoneName, dateFormat ) => {
-			jest.spyOn( globalThis.liquipedia.countdown, 'getTimeZoneNameLong' ).mockReturnValue( timeZoneName );
-			return globalThis.liquipedia.countdown.getCorrectTimeZoneString(
-				zonedDate( isoDate, offsetMinutes ),
-				dateFormat
-			);
+			const attributes = { 'data-timestamp': Date.parse( isoDate ) / 1000 };
+			if ( dateFormat ) {
+				attributes[ 'data-format' ] = dateFormat;
+			}
+			const countdown = createCountdown( attributes );
+			countdown.parsedDate = zonedDate( isoDate, offsetMinutes );
+			jest.spyOn( countdown, 'getTimeZoneNameLong' ).mockReturnValue( timeZoneName );
+			return countdown.getCorrectTimeZoneString();
 		};
 
 		describe( 'whole-hour time zones', () => {
@@ -328,9 +343,8 @@ describe( 'Countdown module', () => {
 			const children = Array.from( timer.children );
 			expect( children.map( ( child ) => child.className ) )
 				.toEqual( [ 'timer-object-date', 'timer-object-separator', 'timer-object-countdown' ] );
-			expect( children[ 0 ].innerHTML ).toBe(
-				globalThis.liquipedia.countdown.getCorrectTimeZoneString( new Date( NOW + 90000 ), 'full' )
-			);
+			expect( children[ 0 ].innerHTML ).toBe( new LiquipediaCountdown( timer ).getCorrectTimeZoneString() );
+			expect( children[ 0 ].innerHTML ).toMatch( /^November \d+, 2026 - \d\d:\d\d <abbr / );
 			expect( children[ 1 ].tagName ).toBe( 'BR' );
 			expect( children[ 2 ].innerHTML ).toBe( '<span class="timer-object-countdown-time">1m 30s</span>' );
 		} );
@@ -341,8 +355,9 @@ describe( 'Countdown module', () => {
 			await globalThis.liquipedia.countdown.init();
 
 			expect( timer.querySelector( '.timer-object-date' ).innerHTML ).toBe(
-				globalThis.liquipedia.countdown.getCorrectTimeZoneString( new Date( NOW + 90000 ), 'compact' )
+				new LiquipediaCountdown( timer ).getCorrectTimeZoneString()
 			);
+			expect( timer.querySelector( '.timer-object-date' ).innerHTML ).toMatch( /^Nov \d+ - \d\d:\d\d <abbr / );
 		} );
 
 		test( 'appends a dash after the countdown when the match has streams', async () => {
@@ -392,6 +407,19 @@ describe( 'Countdown module', () => {
 			expect( timer.querySelectorAll( '.timer-object-date' ) ).toHaveLength( 1 );
 			expect( timer.querySelectorAll( '.timer-object-separator' ) ).toHaveLength( 1 );
 			expect( timer.querySelectorAll( '.timer-object-countdown' ) ).toHaveLength( 1 );
+			expect( globalThis.liquipedia.countdown.countdownObjects ).toHaveLength( 1 );
+		} );
+
+		test( 'drops countdowns whose timers were removed when run again', async () => {
+			createTimer( { 'data-timestamp': NOW_SECONDS + 90 } );
+			await globalThis.liquipedia.countdown.init();
+
+			document.body.innerHTML = '';
+			const timer = createTimer( { 'data-timestamp': NOW_SECONDS + 90 } );
+			await globalThis.liquipedia.countdown.init();
+
+			expect( globalThis.liquipedia.countdown.countdownObjects.map( ( countdown ) => countdown.timerElement ) )
+				.toEqual( [ timer ] );
 		} );
 
 		// jsdom does not implement innerText, so this only passes when the separator is set via textContent
