@@ -31,6 +31,9 @@ local function getMapData(mapInput)
 	if map then
 		return map
 	end
+	if MapData[mapInput] then
+		return MapData[mapInput]
+	end
 	local key = mapInput
 		:gsub('_', ' ')
 		:gsub('%s*LE$', '')
@@ -38,7 +41,7 @@ local function getMapData(mapInput)
 		:gsub('%s*CE$', '')
 		:gsub('%s%([mM]ap%)$', '')
 		:lower()
-	return MapData[map] or MapData[key]
+	return MapData[key]
 end
 
 ---@param props {map: string?, size: string|integer}
