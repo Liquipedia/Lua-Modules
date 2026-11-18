@@ -410,6 +410,19 @@ describe( 'Countdown module', () => {
 			expect( globalThis.liquipedia.countdown.countdownObjects ).toHaveLength( 1 );
 		} );
 
+		// The countdown element is rebuilt on every init, so text that has not changed since the last tick
+		// still has to be written into the new element
+		test( 'keeps showing the countdown when run again', async () => {
+			const liveTimer = createTimer( { 'data-timestamp': NOW_SECONDS - 60 } );
+			const upcomingTimer = createTimer( { 'data-timestamp': NOW_SECONDS + ( 3 * 86400 ) } );
+
+			await globalThis.liquipedia.countdown.init();
+			await globalThis.liquipedia.countdown.init();
+
+			expect( liveTimer.querySelector( '.timer-object-countdown' ).textContent ).toBe( 'LIVE' );
+			expect( upcomingTimer.querySelector( '.timer-object-countdown' ).textContent ).toBe( '3d 0h 0m' );
+		} );
+
 		test( 'drops countdowns whose timers were removed when run again', async () => {
 			createTimer( { 'data-timestamp': NOW_SECONDS + 90 } );
 			await globalThis.liquipedia.countdown.init();

@@ -167,9 +167,10 @@ class LiquipediaCountdown {
 		if ( datestr.length > 0 && this.hasStreams() ) {
 			html += ' - ';
 		}
-		if ( LiquipediaCountdown.renderedCountdowns.get( this.timerElement ) !== html ) {
+		// Keyed by the countdown element, as buildTimerDisplay replaces it with an empty one on every init
+		if ( LiquipediaCountdown.renderedCountdowns.get( countdownElem ) !== html ) {
 			countdownElem.innerHTML = html;
-			LiquipediaCountdown.renderedCountdowns.set( this.timerElement, html );
+			LiquipediaCountdown.renderedCountdowns.set( countdownElem, html );
 		}
 	}
 
