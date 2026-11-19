@@ -173,10 +173,26 @@ local upcomingBattleRoyale = matchRecord{
 	extradata = {timestamp = FUTURE_TIMESTAMP},
 	match2opponents = battleRoyaleOpponents(false),
 	match2games = {
-		battleRoyaleGame{date = FUTURE_DATE, timestamp = FUTURE_TIMESTAMP, map = 'Erangel'},
-		battleRoyaleGame{date = FUTURE_DATE_NEXT_HOUR, timestamp = FUTURE_TIMESTAMP_NEXT_HOUR, map = 'Rondo'},
-		battleRoyaleGame{date = FUTURE_NEXT_DAY_DATE, timestamp = FUTURE_NEXT_DAY_TIMESTAMP, map = 'Miramar'},
-		battleRoyaleGame{date = FUTURE_NEXT_DAY_NEXT_HOUR_DATE, timestamp = FUTURE_NEXT_DAY_NEXT_HOUR_TIMESTAMP, map = 'Vikendi'},
+		battleRoyaleGame{
+			date = FUTURE_DATE,
+			timestamp = FUTURE_TIMESTAMP,
+			map = 'Erangel',
+		},
+		battleRoyaleGame{
+			date = FUTURE_DATE_NEXT_HOUR,
+			timestamp = FUTURE_TIMESTAMP_NEXT_HOUR,
+			map = 'Rondo',
+		},
+		battleRoyaleGame{
+			date = FUTURE_NEXT_DAY_DATE,
+			timestamp = FUTURE_NEXT_DAY_TIMESTAMP,
+			map = 'Miramar',
+		},
+		battleRoyaleGame{
+			date = FUTURE_NEXT_DAY_NEXT_HOUR_DATE,
+			timestamp = FUTURE_NEXT_DAY_NEXT_HOUR_TIMESTAMP,
+			map = 'Vikendi',
+		},
 	},
 }
 
@@ -192,16 +208,28 @@ local completedBattleRoyale = matchRecord{
 	match2opponents = battleRoyaleOpponents(true),
 	match2games = {
 		battleRoyaleGame{
-			date = PAST_DATE, timestamp = PAST_TIMESTAMP, map = 'Erangel', placements = {2, 5, 1, 4, 3, 8, 7, 6},
+			date = PAST_DATE,
+			timestamp = PAST_TIMESTAMP,
+			map = 'Erangel',
+			placements = {2, 5, 1, 4, 3, 8, 7, 6},
 		},
 		battleRoyaleGame{
-			date = PAST_DATE_NEXT_HOUR, timestamp = PAST_NEXT_HOUR_TIMESTAMP, map = 'Miramar', placements = {2, 5, 1, 4, 3, 8, 7, 6},
+			date = PAST_DATE_NEXT_HOUR,
+			timestamp = PAST_NEXT_HOUR_TIMESTAMP,
+			map = 'Miramar',
+			placements = {2, 5, 1, 4, 3, 8, 7, 6},
 		},
 		battleRoyaleGame{
-			date = PAST_NEXT_DAY_DATE, timestamp = PAST_NEXT_DAY_TIMESTAMP, map = 'Vikendi', placements = {6, 1, 8, 3, 7, 2, 4, 5},
+			date = PAST_NEXT_DAY_DATE,
+			timestamp = PAST_NEXT_DAY_TIMESTAMP,
+			map = 'Vikendi',
+			placements = {6, 1, 8, 3, 7, 2, 4, 5},
 		},
 		battleRoyaleGame{
-			date = PAST_NEXT_DAY_NEXT_HOUR_DATE, timestamp = PAST_NEXT_DAY_NEXT_HOUR_TIMESTAMP, map = 'Rondo', placements = {6, 1, 8, 3, 7, 2, 4, 5},
+			date = PAST_NEXT_DAY_NEXT_HOUR_DATE,
+			timestamp = PAST_NEXT_DAY_NEXT_HOUR_TIMESTAMP,
+			map = 'Rondo',
+			placements = {6, 1, 8, 3, 7, 2, 4, 5},
 		},
 	},
 }
