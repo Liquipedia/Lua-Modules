@@ -79,6 +79,13 @@ JetBrains IDEs can also open a devcontainer directly.
 
 The container ships [mitmproxy](https://mitmproxy.org/) and `scripts/proxy_lp.py`, which serves your local `lua/output/css/main.css` and `lua/output/js/main.js` instead of the ones liquipedia.net would load. Background: [wiki page](https://github.com/Liquipedia/Lua-Modules/wiki/Local-Development-Setup-for-CSS-and-JS).
 
+It covers both kinds of page:
+
+- MediaWiki pages load `load.php?…&only=styles` / `only=scripts`; both are replaced by your build.
+- Lighthouse pages load `static/wikis/<wiki>/bundle.min.css` and `bundle.min.js`. The CSS bundle is replaced by `main.css`. The JS bundle starts with Lighthouse's own prelude (MediaWiki shim, jQuery), so the proxy keeps that and swaps only the Liquipedia modules after it for `main.js`.
+
+Proxied files carry a `Via: … LiquipediaMapper` response header, which is the quickest way to check in the browser's network tab that the swap happened.
+
 1. Run `npm run build`, so there is something to serve.
 2. Start the proxy: `python scripts/proxy_lp.py` from the repo root, or the *Launch proxy* task in `.vscode/tasks.json`. It listens on `127.0.0.1:8080` on your host, so keep that port free.
 3. Point your browser at that proxy. A switcher extension such as Proxy SwitchyOmega (HTTP, `127.0.0.1`, port `8080`) makes it easy to toggle; a system proxy setting works too.
