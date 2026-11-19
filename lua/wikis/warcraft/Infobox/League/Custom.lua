@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local Game = Lua.import('Module:Game')
@@ -29,6 +28,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
+local CountdownWidget = Lua.import('Module:Widget/Countdown')
 local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
@@ -334,9 +334,9 @@ function CustomLeague._displayParticipantNumber(number)
 	return number
 end
 
----@return string
+---@return VNode
 function CustomLeague:_displayStartDateTime()
-	return Countdown.create{
+	return CountdownWidget{
 		date = self.data.startTime.raw,
 		finished = self.data.isFinished,
 		rawdatetime = DateExt.getCurrentTimestamp() > DateExt.readTimestamp(self.data.startTime.raw),

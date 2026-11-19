@@ -56,10 +56,10 @@ end
 ---@param hasBans boolean
 ---@return string
 function WikiCopyPaste._getMapCode(hasBans, mapIndex)
-	if not hasBans then return INDENT .. '|map' .. mapIndex .. '={{Map|map=|mode=|score1=|score2=|winner=}}' end
+	if not hasBans then return INDENT .. '|map' .. mapIndex .. '={{Map|map=|score1=|score2=|winner=}}' end
 
 	return table.concat({
-		INDENT .. '|map' .. mapIndex .. '={{Map|map=|mode=|score1=|score2=|winner=',
+		INDENT .. '|map' .. mapIndex .. '={{Map|map=|score1=|score2=|winner=',
 		INDENT .. INDENT .. '|t1b1=|t2b1=|banstart=}}',
 	}, '\n')
 end

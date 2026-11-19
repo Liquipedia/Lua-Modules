@@ -8,27 +8,25 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Table = Lua.import('Module:Table')
-
 local UtilLinks = Lua.import('Module:Links')
-local Widget = Lua.import('Module:Widget')
+
+local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Title = Lua.import('Module:Widget/Infobox/Title')
 
----@class LinksWidget: Widget
----@operator call(table): LinksWidget
-local Links = Class.new(Widget)
-
 local PRIORITY_GROUPS = Lua.import('Module:Links/PriorityGroups', {loadData = true})
 
----@return Widget[]?
-function Links:render()
-	if Table.isEmpty(self.props.links) then
+local Helpers = {}
+
+---@param props {links: table<string, string>, variant: string?}
+---@return Renderable[]?
+local function Links(props)
+	if Table.isEmpty(props.links) then
 		return nil
 	end
-	local linkInputs = Table.copy(self.props.links)
+	local linkInputs = Table.copy(props.links)
 
 	local links = {}
 
@@ -38,13 +36,13 @@ function Links:render()
 				return
 			end
 
-			table.insert(links, self:_makeLink(key, linkInputs[key]))
+			table.insert(links, Helpers._makeLink(props, key, linkInputs[key]))
 			-- Remove link from the collection
 			linkInputs[key] = nil
 
 			local index = 2
 			while linkInputs[key .. index] ~= nil do
-				table.insert(links, self:_makeLink(key, linkInputs[key .. index]))
+				table.insert(links, Helpers._makeLink(props, key, linkInputs[key .. index]))
 				-- Remove link from the collection
 				linkInputs[key .. index] = nil
 				index = index + 1
@@ -53,7 +51,7 @@ function Links:render()
 	end
 
 	for key, value in Table.iter.spairs(linkInputs) do
-		table.insert(links, self:_makeLink(key, value))
+		table.insert(links, Helpers._makeLink(props, key, value))
 	end
 
 	return {
@@ -69,20 +67,22 @@ function Links:render()
 	}
 end
 
+---@private
+---@param props {variant: string?}
 ---@param key string
 ---@param value string?
----@return string
-function Links:_makeLink(key, value)
+---@return VNode
+function Helpers._makeLink(props, key, value)
 	key = UtilLinks.removeAppendedNumber(key)
 	return Link{
 		linktype = 'external',
 		link = UtilLinks.makeFullLink{
 			platform = key,
 			id = value,
-			variant = self.props.variant,
+			variant = props.variant,
 		},
 		children = {UtilLinks.makeIcon(key)},
 	}
 end
 
-return Links
+return Component.component(Links)

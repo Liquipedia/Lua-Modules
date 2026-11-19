@@ -53,7 +53,8 @@ local NON_BREAKING_SPACE = '&nbsp;'
 ---@field n-m_points number? # n amd m integers
 ---@field n-m_points2 number? # n amd m integers
 ---@field localcurrency string?
----@field cutafter integer?
+---@field collapseafter integer?
+---@field cutafter integer? # deprecated alias of collapseafter
 ---@field title string?
 ---@field precision integer?
 ---@field autoexchange boolean
@@ -149,14 +150,13 @@ function StageWinnings:render()
 	self.points = parsePoints('points')
 	self.points2 = parsePoints('points2')
 
+	local collapseAfter = tonumber(props.collapseafter or props.cutafter) or 5
+
 	return TableWidgets.Table{
 		caption = props.title,
-		tableClasses = {'prizepooltable', 'collapsed'},
-		tableAttributes = {
-			['data-cutafter'] = (tonumber(props.cutafter) or 5),
-			['data-opentext'] = 'Show remaining participants',
-			['data-closetext'] = 'Hide remaining participants',
-		},
+		collapseAfter = #opponentList > collapseAfter and collapseAfter or nil,
+		expandText = 'Show remaining participants',
+		collapseText = 'Hide remaining participants',
 		columns = WidgetUtil.collect(
 			{align = 'left'},
 			(Logic.readBool(props.showMatchWL) or props.prizeMode == 'matchWins') and {align = 'center'} or nil,

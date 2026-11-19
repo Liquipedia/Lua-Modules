@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Info = Lua.import('Module:Info', {loadData = true})
@@ -19,9 +18,9 @@ local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TransferRef = Lua.import('Module:Transfer/References')
 local Variables = Lua.import('Module:Variables')
-local Widget = Lua.import('Module:Widget')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
+local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local Fragment = Html.Fragment
 local Span = Html.Span
@@ -122,38 +121,44 @@ NOT_YET_IN_ROLES_DATA.organization = NOT_YET_IN_ROLES_DATA.organisation
 
 local HAS_REFS = ((Info.config.infoboxPlayer or {}).automatedHistory or {}).hasHeaderAndRefs
 
----@class TeamHistoryDisplayWidget: Widget
----@operator call(table): TeamHistoryDisplayWidget
----@field props {transferList: TransferSpan[], player: string, alwaysShowPresent: boolean?}
-local TeamHistoryDisplay = Class.new(Widget)
-TeamHistoryDisplay.defaultProps = {
-	transferList = {},
-	player = String.upperCaseFirst(mw.title.getCurrentTitle().subpageText),
+---@class TeamHistoryDisplayProps
+---@field transferList TransferSpan[]
+---@field player string?
+---@field alwaysShowPresent boolean?
+
+local TeamHistoryDisplay = {
+	defaultProps = {
+		transferList = {},
+		player = String.upperCaseFirst(mw.title.getCurrentTitle().subpageText),
+	},
 }
 
----@return Widget?
-function TeamHistoryDisplay:render()
-	if Logic.isEmpty(self.props.transferList) then return end
+---@param props TeamHistoryDisplayProps
+---@return VNode?
+function TeamHistoryDisplay.render(props)
+	if Logic.isEmpty(props.transferList) then return end
 
 	local offset = tonumber(Variables.varDefault('teamhistory_index')) or 0
-	Variables.varDefine('teamhistory_index', offset + #self.props.transferList)
+	Variables.varDefine('teamhistory_index', offset + #props.transferList)
 
 	return Tbl{
 		css = {width = '100%', ['text-align'] = 'left'},
 		children = WidgetUtil.collect(
-			HAS_REFS and offset == 0 and self:_header() or nil,
-			Array.map(self.props.transferList, FnUtil.curry(self._row, self))
+			HAS_REFS and offset == 0 and TeamHistoryDisplay._header(props.player --[[@as string]]) or nil,
+			Array.map(props.transferList, FnUtil.curry(TeamHistoryDisplay._row, props))
 		)
 	}
 end
 
----@return Widget
-function TeamHistoryDisplay:_header()
+---@private
+---@param player string
+---@return VNode
+function TeamHistoryDisplay._header(player)
 	local makeQueryFormLink = function()
 		return Link{
 			link = tostring(mw.uri.fullUrl('Special:RunQuery/Transfer history', {
 				pfRunQueryFormName = 'Transfer history',
-				['Transfer query[players]'] = self.props.player,
+				['Transfer query[players]'] = player,
 				wpRunQuery ='Run query'
 			})),
 			linktype = 'external',
@@ -184,9 +189,11 @@ function TeamHistoryDisplay:_header()
 	}}
 end
 
+---@private
+---@param props TeamHistoryDisplayProps
 ---@param transfer TransferSpan
----@return Widget
-function TeamHistoryDisplay:_row(transfer)
+---@return VNode
+function TeamHistoryDisplay._row(props, transfer)
 	local role = Logic.nilIfEmpty(transfer.role)
 	if role then
 		local splitRole = Array.parseCommaSeparatedString(role, ' ')
@@ -203,8 +210,8 @@ function TeamHistoryDisplay:_row(transfer)
 		roleLength = string.len(role) + 3
 	end
 
-	local teamText = self:_getTeamText(transfer, roleLength)
-	---@type (string|Widget)[]
+	local teamText = TeamHistoryDisplay._getTeamText(transfer, roleLength)
+	---@type Renderable[]
 	local teamDisplay = WidgetUtil.collect(
 		role == LOAN and '&#8250;&nbsp;' or nil,
 		teamText
@@ -228,7 +235,7 @@ function TeamHistoryDisplay:_row(transfer)
 		positionIcon = (POSITION_ICON_DATA[position] or POSITION_ICON_DATA['']) .. '&nbsp;'
 	end
 
-	local leaveateDisplay = self:_buildLeaveDateDisplay(transfer)
+	local leaveateDisplay = TeamHistoryDisplay._buildLeaveDateDisplay(props, transfer)
 
 	if not HAS_REFS then
 		return Tr{children = {
@@ -278,10 +285,11 @@ function TeamHistoryDisplay:_row(transfer)
 	}}
 end
 
+---@private
 ---@param transfer TransferSpan
 ---@param roleLength integer
----@return Widget|string
-function TeamHistoryDisplay:_getTeamText(transfer, roleLength)
+---@return Renderable
+function TeamHistoryDisplay._getTeamText(transfer, roleLength)
 	if Logic.isEmpty(transfer.team) and Table.includes(SPECIAL_ROLES, transfer.role) then
 		return transfer.role
 	elseif not TeamTemplate.exists(transfer.team) then
@@ -296,6 +304,7 @@ function TeamHistoryDisplay:_getTeamText(transfer, roleLength)
 	}
 end
 
+---@private
 ---@param teamData {name: string, bracketname: string, shortname: string}
 ---@param roleLength integer
 ---@return string
@@ -311,6 +320,7 @@ function TeamHistoryDisplay._getTeamDisplayName(teamData, roleLength)
 end
 
 -- earlier date for fromteam to account for rebrands
+---@private
 ---@param date string?
 ---@return string?
 function TeamHistoryDisplay._adjustDate(date)
@@ -324,12 +334,14 @@ function TeamHistoryDisplay._adjustDate(date)
 	return os.date('%Y-%m-%d', os.time(dateStruct)) --[[@as string]]
 end
 
+---@private
+---@param props TeamHistoryDisplayProps
 ---@param transfer TransferSpan
----@return string|Widget?
-function TeamHistoryDisplay:_buildLeaveDateDisplay(transfer)
+---@return Renderable?
+function TeamHistoryDisplay._buildLeaveDateDisplay(props, transfer)
 	if transfer.leaveDateDisplay then return transfer.leaveDateDisplay end
 
-	if self.props.alwaysShowPresent or not Table.includes(SPECIAL_ROLES, transfer.role) then
+	if props.alwaysShowPresent or not Table.includes(SPECIAL_ROLES, transfer.role) then
 		return Span{
 			css = {['font-weight'] = 'bold'},
 			children = {'Present'}
@@ -337,9 +349,10 @@ function TeamHistoryDisplay:_buildLeaveDateDisplay(transfer)
 	end
 end
 
+---@private
 ---@param references table[]
 ---@param date string
----@return Widget?
+---@return VNode?
 function TeamHistoryDisplay._displayRef(references, date)
 	local refs = Array.map(TransferRef.fromStorageData(references), function(reference)
 		return reference.link and TransferRef.useReference(reference, date) or nil
@@ -356,4 +369,4 @@ function TeamHistoryDisplay._displayRef(references, date)
 	)}
 end
 
-return TeamHistoryDisplay
+return Component.component(TeamHistoryDisplay.render, TeamHistoryDisplay.defaultProps)

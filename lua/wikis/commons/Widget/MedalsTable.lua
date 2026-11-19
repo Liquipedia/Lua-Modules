@@ -30,7 +30,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field rowSort? fun(tbl: {[K]: V}, a: K, b: K):boolean
 ---@field reducePadding boolean?
 ---@field hideTotalRow boolean?
----@field cutAfter integer?
+---@field collapseAfter integer?
 
 local DEFAULT_DATA_COLUMNS = {'1', '2', '3', '3-4', '4', 'total'}
 
@@ -48,17 +48,14 @@ function MedalsTable.render(props)
 	-- can not use defaultProps as the deepmerge might add unwanted columns from default into the inputted data ...
 	local dataColumns = props.dataColumns or DEFAULT_DATA_COLUMNS
 
-	local collapsed = Logic.isNotEmpty(props.cutAfter)
+	local rows = MedalsTable._rows(props, dataColumns)
+	local collapseAfter = props.collapseAfter and #rows > props.collapseAfter and props.collapseAfter or nil
 
 	return TableWidgets.Table{
 		caption = props.caption,
-		sortable = not collapsed,
-		tableClasses = collapsed and {'prizepooltable', 'collapsed'} or nil,
-		tableAttributes = collapsed and {
-			['data-opentext'] = 'Show more',
-			['data-closetext'] = 'Show less',
-			['data-cutafter'] = props.cutAfter,
-		} or nil,
+		-- Sorting would move other rows behind the cut
+		sortable = not collapseAfter,
+		collapseAfter = collapseAfter,
 		columns = WidgetUtil.collect(
 			{align = 'left'}, -- tier
 			Array.rep({align = 'right'}, #dataColumns)
@@ -75,7 +72,7 @@ function MedalsTable.render(props)
 					)
 				}
 			},
-			TableWidgets.TableBody{children = MedalsTable._rows(props, dataColumns)}
+			TableWidgets.TableBody{children = rows}
 		},
 		footer = props.footer
 	}

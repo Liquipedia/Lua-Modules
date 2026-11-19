@@ -26,6 +26,7 @@ local MatchUtil = Lua.import('Module:Match/Util')
 ---@field match MatchGroupUtilMatch
 ---@field showVods boolean?
 ---@field variant? 'primary' | 'secondary'
+---@field buttonSize ButtonSize?
 
 local defaultProps = {
 	showVods = true,
@@ -88,13 +89,22 @@ local function MatchButtonBar(props)
 				match = match,
 				buttonType = props.variant,
 				buttonText = buttonText,
+				buttonSize = props.buttonSize,
 			},
 			displayStreams and StreamsContainer{
 				streams = filteredStreams,
 				matchIsLive = match.phase == 'ongoing',
+				buttonSize = props.buttonSize,
 			} or nil,
-			makeDropdownForVods and VodsDropdownButton{count = #vods} or nil,
-			showInlineVods and VodButton{vodLink = vods[1].vod, gameNumber = vods[1].number} or nil
+			makeDropdownForVods and VodsDropdownButton{
+				count = #vods,
+				buttonSize = props.buttonSize
+			} or nil,
+			showInlineVods and VodButton{
+				vodLink = vods[1].vod,
+				gameNumber = vods[1].number,
+				buttonSize = props.buttonSize
+			} or nil
 		)
 	}
 
@@ -114,6 +124,7 @@ local function MatchButtonBar(props)
 				showText = #vods < 4,
 				variant = 'dropdown',
 				grow = true,
+				buttonSize = props.buttonSize,
 			}
 		end) or nil,
 	}

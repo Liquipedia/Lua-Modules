@@ -11,7 +11,6 @@ local AllowedServers = Lua.import('Module:Server')
 local Array = Lua.import('Module:Array')
 local PatchAuto = Lua.import('Module:Infobox/Extension/PatchAuto')
 local Class = Lua.import('Module:Class')
-local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
@@ -29,6 +28,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
+local CountdownWidget = Lua.import('Module:Widget/Countdown')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
@@ -204,7 +204,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Server', children = {caller:_getServer(args)}}
 		}
 	elseif id == 'dates' and data.startTime.display then
-		local startTime = Countdown.create{date = data.startTime.display, rawdatetime = true}
+		local startTime = CountdownWidget{date = data.startTime.display, rawdatetime = true}
 
 		if data.startDate == data.endDate then
 			return {Cell{name = 'Start Time', children = {startTime}}}

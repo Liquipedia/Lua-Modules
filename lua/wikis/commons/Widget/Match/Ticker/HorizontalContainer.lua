@@ -20,8 +20,9 @@ local TABLE_OF_CONTENTS = '__TOC__'
 ---@return Renderable
 local function HorizontalContainer(props)
 	local carousel = Carousel{
+		classes = {'match-ticker-carousel'},
 		children = props.children,
-		itemWidth = '12.5rem',
+		itemWidth = '15.625rem',
 		gap = '0.5rem',
 	}
 

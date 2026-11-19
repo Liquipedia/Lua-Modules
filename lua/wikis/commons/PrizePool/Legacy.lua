@@ -56,7 +56,7 @@ function LegacyPrizePool.run(dependency)
 	newArgs.syncPlayers = false
 
 	newArgs.prizesummary = (header.prizeinfo and not header.noprize) and true or false
-	newArgs.cutafter = header.cutafter
+	newArgs.collapseafter = header.cutafter
 	newArgs.lpdb_prefix = header.lpdb_prefix
 	newArgs.fillPlaceRange = Logic.readBool(header.fillPlaceRange) or false
 

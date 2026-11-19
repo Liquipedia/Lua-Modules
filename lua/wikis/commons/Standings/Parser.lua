@@ -89,7 +89,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		local adjustments = opponentData.adjustments or {}
 
 		return Array.map(rounds, function(round)
-			local pointsFromRound, statusInRound, matchId, matchOpponentIndex, playedMatches
+			local pointsFromRound, statusInRound, matchId, matchOpponentIndex, playedMatches, roundMatchPoints
 			if opponentRounds and opponentRounds[round.roundNumber] then
 				local thisRoundsData = opponentRounds[round.roundNumber]
 				if thisRoundsData.scoreboard then
@@ -103,6 +103,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 					addRecord(carryData.overtime, thisRoundsData.scoreboard.overtime)
 				end
 				playedMatches = thisRoundsData.matches
+				roundMatchPoints = thisRoundsData.matchPoints
 			end
 			local adjustment = adjustments[round.roundNumber] or {}
 			if adjustment.points then
@@ -126,7 +127,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 				gameAdjustment = Table.copy(carryData.gameAdjustment),
 				roundAdjustment = Table.copy(carryData.roundAdjustment),
 				matches = playedMatches or {},
-				matchPoints = opponentData.matchPoints or {},
+				matchPoints = roundMatchPoints or opponentData.matchPoints or {},
 				startingPoints = opponentData.startingPoints,
 				finished = round.finished,
 				manualDefiniteStatus = StandingsParser.resolveManualStatus(
@@ -528,14 +529,13 @@ function StandingsParser.resolveManualStatus(statuses, roundNumber)
 	end
 end
 
----Overrides the statuses of opponents with a manually set definite status.
----A definite status is also the current status, so both are set.
----@param opponentEntries {manualDefiniteStatus: string?, currentstatus: string?, definitestatus: string?}[]
+---Overrides the definite status of opponents with a manually set one.
+---The current status stays the bg of the slot.
+---@param opponentEntries {manualDefiniteStatus: string?, definitestatus: string?}[]
 function StandingsParser.applyManualStatuses(opponentEntries)
 	Array.forEach(opponentEntries, function(opponent)
 		local manualStatus = opponent.manualDefiniteStatus
 		if manualStatus then
-			opponent.currentstatus = manualStatus
 			opponent.definitestatus = manualStatus
 		end
 	end)

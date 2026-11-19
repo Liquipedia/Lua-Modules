@@ -1,66 +1,88 @@
 /*******************************************************************************
  * Template(s): Countdowns
- * Author(s): FO-nTTaX, Machunki
  ******************************************************************************/
-liquipedia.countdown = {
-	timerHiddenClass: 'timer--hidden',
-	timeoutFunctions: null,
-	timerObjectNodes: null,
-	lastCountdownId: null,
-	init: async function () {
-		// // Cancels last countdown loop if it exists to prevent multiple countdowns running at the same time
-		if ( liquipedia.countdown.timeoutFunctions && liquipedia.countdown.lastCountdownId ) {
-			liquipedia.countdown.timeoutFunctions.clear( liquipedia.countdown.lastCountdownId );
+class LiquipediaCountdown {
+	static get TIMER_HIDDEN_CLASS() {
+		return 'timer--hidden';
+	}
+
+	static timeoutFunctions;
+
+	/** @type {LiquipediaCountdown[]} */
+	static countdownObjects = [];
+
+	/** @type {number} */
+	static lastCountdownId = null;
+
+	/**
+	 * Last HTML written to each countdown element, so unchanged ticks skip the DOM write
+	 *
+	 * @type {WeakMap<HTMLElement, string>}
+	 */
+	static renderedCountdowns = new WeakMap();
+
+	static async init() {
+		// Cancels last countdown loop if it exists to prevent multiple countdowns running at the same time
+		if ( LiquipediaCountdown.timeoutFunctions && LiquipediaCountdown.lastCountdownId ) {
+			LiquipediaCountdown.timeoutFunctions.clear( LiquipediaCountdown.lastCountdownId );
+		}
+		LiquipediaCountdown.countdownObjects.length = 0;
+
+		const timerObjectNodes = document.querySelectorAll( '.timer-object' );
+		if ( timerObjectNodes.length === 0 ) {
+			return;
 		}
 
-		liquipedia.countdown.timerObjectNodes = document.querySelectorAll( '.timer-object' );
-		if ( liquipedia.countdown.timerObjectNodes.length > 0 ) {
-			await mw.loader.using( 'user.options' );
-			liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
-				const dateObject = liquipedia.countdown.parseTimerObjectNodeToDateObj( timerObjectNode );
-				const format = timerObjectNode.dataset.format || 'full';
-				let dateChild;
-				if ( timerObjectNode.firstChild instanceof HTMLSpanElement ) {
-					dateChild = timerObjectNode.firstChild;
-				} else {
-					dateChild = document.createElement( 'span' );
-					if (
-						mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' ) ||
-						typeof dateObject !== 'object'
-					) {
-						dateChild.innerHTML = timerObjectNode.innerHTML;
-					} else {
-						dateChild.innerHTML = liquipedia.countdown.getCorrectTimeZoneString( dateObject, format );
-					}
-					dateChild.classList.add( 'timer-object-date' );
-				}
-				timerObjectNode.innerHTML = '';
-				timerObjectNode.appendChild( dateChild );
-				let separatorChild;
-				if ( typeof timerObjectNode.dataset.separator !== 'undefined' ) {
-					separatorChild = document.createElement( 'span' );
-					separatorChild.innerText = timerObjectNode.dataset.separator;
-					separatorChild.classList.add( 'timer-object-separator' );
-				} else {
-					separatorChild = document.createElement( 'br' );
-					separatorChild.classList.add( 'timer-object-separator' );
-				}
-				timerObjectNode.appendChild( separatorChild );
-				const countdownChild = document.createElement( 'span' );
-				countdownChild.classList.add( 'timer-object-countdown' );
-				timerObjectNode.appendChild( countdownChild );
-			} );
+		await mw.loader.using( 'user.options' );
 
-			await liquipedia.countdown.setupCountdownsIfSwitchToggleExists();
+		timerObjectNodes.forEach( ( timerObjectNode ) => {
+			const countdownObject = new LiquipediaCountdown( timerObjectNode );
+			countdownObject.buildTimerDisplay();
+			this.countdownObjects.push( countdownObject );
+		} );
 
-			// Only run when the window is actually in the front,
-			// not in background tabs (on browsers that support it)
-			const moduleRequire = await mw.loader.using( 'mediawiki.visibleTimeout' );
-			liquipedia.countdown.timeoutFunctions = moduleRequire( 'mediawiki.visibleTimeout' );
-			liquipedia.countdown.runCountdown();
-		};
-	},
-	setupCountdownsIfSwitchToggleExists: async function () {
+		await LiquipediaCountdown.setupCountdownsIfSwitchToggleExists();
+
+		// Only run when the window is actually in the front,
+		// not in background tabs (on browsers that support it)
+		const moduleRequire = await mw.loader.using( 'mediawiki.visibleTimeout' );
+		LiquipediaCountdown.timeoutFunctions = moduleRequire( 'mediawiki.visibleTimeout' );
+		LiquipediaCountdown.runCountdown();
+	}
+
+	buildTimerDisplay() {
+		let dateChild;
+		if ( this.timerElement.firstChild instanceof HTMLSpanElement ) {
+			dateChild = this.timerElement.firstChild;
+		} else {
+			dateChild = document.createElement( 'span' );
+			if (
+				mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' ) ||
+				this.parsedDate === null
+			) {
+				dateChild.innerHTML = this.timerElement.innerHTML;
+			} else {
+				dateChild.innerHTML = this.getCorrectTimeZoneString();
+			}
+			dateChild.classList.add( 'timer-object-date' );
+		}
+		this.timerElement.innerHTML = '';
+		this.timerElement.appendChild( dateChild );
+		let separatorChild;
+		if ( this.timerElement.dataset.separator !== undefined ) {
+			separatorChild = document.createElement( 'span' );
+			separatorChild.textContent = this.timerElement.dataset.separator;
+		} else {
+			separatorChild = document.createElement( 'br' );
+		}
+		separatorChild.classList.add( 'timer-object-separator' );
+		this.timerElement.appendChild( separatorChild );
+		const countdownChild = document.createElement( 'span' );
+		countdownChild.classList.add( 'timer-object-countdown' );
+		this.timerElement.appendChild( countdownChild );
+	}
+
+	static async setupCountdownsIfSwitchToggleExists() {
 		const switchToggleGroup = await liquipedia.switchButtons.getSwitchGroup( 'countdown' );
 		if ( !switchToggleGroup || switchToggleGroup.type !== 'toggle' || switchToggleGroup.value === null ) {
 			return;
@@ -72,11 +94,12 @@ liquipedia.countdown = {
 		// Reacting state switch
 		switchToggleGroup.nodes.forEach( ( switchNode ) => {
 			switchNode.addEventListener( liquipedia.switchButtons.triggerEventName, ( event ) => {
-				liquipedia.countdown.toggleCountdowns( event.detail.data.value );
+				LiquipediaCountdown.toggleCountdowns( event.detail.data.value );
 			} );
 		} );
-	},
-	toggleCountdowns: function ( isCountdownToggled ) {
+	}
+
+	static toggleCountdowns( isCountdownToggled ) {
 		// Get all countdown toggle containers, if no container exists fall back to the body
 		let containers = document.querySelectorAll( '[data-switch-group-container="countdown"]' );
 		if ( containers.length === 0 ) {
@@ -89,36 +112,50 @@ liquipedia.countdown = {
 				const dateElement = timerObjectNode.querySelector( '.timer-object-date' );
 				const countdownElement = timerObjectNode.querySelector( '.timer-object-countdown' );
 				if ( dateElement ) {
-					dateElement.classList.toggle( this.timerHiddenClass, isCountdownToggled );
+					dateElement.classList.toggle( LiquipediaCountdown.TIMER_HIDDEN_CLASS, isCountdownToggled );
 				}
 				if ( countdownElement ) {
-					countdownElement.classList.toggle( this.timerHiddenClass, !isCountdownToggled );
+					countdownElement.classList.toggle( LiquipediaCountdown.TIMER_HIDDEN_CLASS, !isCountdownToggled );
 				}
 			} );
 		} );
-	},
-	parseTimerObjectNodeToDateObj: function ( timerObjectNode ) {
-		if ( timerObjectNode.dataset.timestamp === 'error' ) {
-			return false;
+	}
+
+	/**
+	 * @param {HTMLElement} timerElement
+	 */
+	constructor( timerElement ) {
+		this.timerElement = timerElement;
+		this.parsedDate = this.parseTimestamp();
+		this.format = timerElement.dataset.format || 'full';
+	}
+
+	/**
+	 * @return {Date?}
+	 */
+	parseTimestamp() {
+		if ( this.timerElement.dataset.timestamp === 'error' ) {
+			return null;
 		}
-		return new Date( 1000 * parseInt( timerObjectNode.dataset.timestamp ) );
-	},
-	runCountdown: function () {
-		liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
-			liquipedia.countdown.setCountdownString( timerObjectNode );
+		return new Date( 1000 * parseInt( this.timerElement.dataset.timestamp, 10 ) );
+	}
+
+	static runCountdown() {
+		LiquipediaCountdown.countdownObjects.forEach( ( countdownObject ) => {
+			countdownObject.setCountdownString();
 		} );
 
-		liquipedia.countdown.lastCountdownId = liquipedia.countdown.timeoutFunctions.set(
-			liquipedia.countdown.runCountdown,
-			1000
+		LiquipediaCountdown.lastCountdownId = LiquipediaCountdown.timeoutFunctions.set(
+			LiquipediaCountdown.runCountdown, 1000
 		);
-	},
-	setCountdownString: function ( timerObjectNode ) {
-		const countdownElem = timerObjectNode.querySelector( '.timer-object-countdown' );
+	}
+
+	setCountdownString() {
+		const countdownElem = this.timerElement.querySelector( '.timer-object-countdown' );
 		let datestr = '';
 
-		if ( timerObjectNode.dataset.timestamp !== 'error' ) {
-			const { text, className } = this.getCountdownStringAndClassName( timerObjectNode, countdownElem );
+		if ( this.timerElement.dataset.timestamp !== 'error' ) {
+			const { text, className } = this.getCountdownStringAndClassName();
 			datestr = text;
 
 			if ( className !== '' ) {
@@ -127,42 +164,53 @@ liquipedia.countdown = {
 		}
 
 		let html = `<span class="timer-object-countdown-time">${ datestr }</span>`;
-		if ( datestr.length > 0 && timerObjectNode.dataset.hasstreams === 'true' ) {
+		if ( datestr.length > 0 && this.hasStreams() ) {
 			html += ' - ';
 		}
-		countdownElem.innerHTML = html;
-	},
-	getCountdownStringAndClassName: function ( timerObjectNode ) {
+		// Keyed by the countdown element, as buildTimerDisplay replaces it with an empty one on every init
+		if ( LiquipediaCountdown.renderedCountdowns.get( countdownElem ) !== html ) {
+			countdownElem.innerHTML = html;
+			LiquipediaCountdown.renderedCountdowns.set( countdownElem, html );
+		}
+	}
+
+	hasStreams() {
+		return this.timerElement.dataset.hasstreams === 'true';
+	}
+
+	finished() {
+		return this.timerElement.dataset.finished === 'finished';
+	}
+
+	getCountdownStringAndClassName() {
 		const differenceInSeconds =
-			Math.floor( parseInt( timerObjectNode.dataset.timestamp ) - ( Date.now().valueOf() / 1000 ) );
+			Math.floor( parseInt( this.timerElement.dataset.timestamp, 10 ) - ( Date.now() / 1000 ) );
 
 		if ( differenceInSeconds > 0 ) {
 			return {
-				text: this.formatTimeDifference( differenceInSeconds ),
+				text: LiquipediaCountdown.formatTimeDifference( differenceInSeconds ),
 				className: ''
 			};
 		}
 
-		if ( differenceInSeconds <= -43200 || timerObjectNode.dataset.finished === 'finished' ) {
+		if ( differenceInSeconds <= -43200 || this.finished() ) {
 			return {
 				text: '',
 				className: ''
 			};
 		}
 
-		if ( typeof timerObjectNode.dataset.countdownEndText !== 'undefined' ) {
-			return {
-				text: timerObjectNode.dataset.countdownEndText,
-				className: 'timer-object-countdown-live'
-			};
-		}
-
 		return {
-			text: 'LIVE',
+			text: this.timerElement.dataset.countdownEndText ?? 'LIVE',
 			className: 'timer-object-countdown-live'
 		};
-	},
-	formatTimeDifference: function ( differenceInSeconds ) {
+	}
+
+	/**
+	 * @param {number} differenceInSeconds
+	 * @return {string}
+	 */
+	static formatTimeDifference( differenceInSeconds ) {
 		const weeks = Math.floor( differenceInSeconds / 604800 );
 		const days = Math.floor( ( differenceInSeconds % 604800 ) / 86400 );
 		const hours = Math.floor( ( differenceInSeconds % 86400 ) / 3600 );
@@ -180,8 +228,9 @@ liquipedia.countdown = {
 		} else {
 			return `${ seconds }s`;
 		}
-	},
-	timeZoneAbbr: new Map( [
+	}
+
+	static timeZoneAbbr = new Map( [
 		[ 'Acre Time', 'ACT' ],
 		[ 'Afghanistan Time', 'AFT' ],
 		[ 'Alaska Daylight Time', 'AKDT' ],
@@ -267,7 +316,7 @@ liquipedia.countdown = {
 		[ 'New Zealand Daylight Time', 'NZDT' ],
 		[ 'New Zealand Standard Time', 'NZST' ],
 		[ 'Newfoundland Daylight Time', 'NDT' ],
-		[ 'Newfoundland Standard Time', 'NDT' ],
+		[ 'Newfoundland Standard Time', 'NST' ],
 		[ 'Norfolk Island Time', 'NFT' ],
 		[ 'Novosibirsk Standard Time', 'NOVST' ],
 		[ 'Omsk Standard Time', 'OMST' ],
@@ -302,151 +351,91 @@ liquipedia.countdown = {
 		[ 'Western Indonesia Time', 'WIB' ],
 		[ 'Yakutsk Standard Time', 'YAKT' ],
 		[ 'Yekaterinburg Standard Time', 'YEKT' ]
-	] ),
-	getMonthNameFromMonthNumber: function ( newFutureMonth ) {
-		const monthNames = [
-			'January', 'February', 'March', 'April', 'May', 'June',
-			'July', 'August', 'September', 'October', 'November', 'December'
-		];
-		return monthNames[ newFutureMonth ];
-	},
-	getMonthNameShortFromMonthNumber: function ( newFutureMonth ) {
-		const monthNamesShort = [
-			'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-			'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-		];
-		return monthNamesShort[ newFutureMonth ];
-	},
-	getTimeZoneNameLong: function ( dateObject ) {
-		let date;
-		let result;
-		const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-		const dateTimeFormat = new Intl.DateTimeFormat( 'en', { timeZone: timeZone, timeZoneName: 'long' } );
-		if ( typeof Intl.DateTimeFormat.prototype.formatToParts === 'function' ) {
-			date = dateTimeFormat.formatToParts( dateObject );
-			date.forEach( ( element ) => {
-				if ( element.type === 'timeZoneName' ) {
-					result = element.value;
-				}
-			} );
-		} else {
-			date = dateTimeFormat.format( dateObject );
-			if ( date.includes( ',' ) ) {
-				result = date.split( ',' )[ 1 ].trim();
-			} else {
-				result = date.split( ' ' ).slice( 2 ).join( ' ' ).trim();
-			}
-		}
-		return result;
-	},
-	getCorrectTimeZoneString: function ( dateObject, format ) {
-		format = format || 'full';
+	] );
 
+	// Month numbers are 0-based (as returned by Date#getMonth). The date is pinned to UTC so the
+	// user's time zone can never shift it into an adjacent month.
+
+	/**
+	 * @param {number} newFutureMonth
+	 * @return {string}
+	 */
+	static getMonthNameFromMonthNumber( newFutureMonth ) {
+		return new Intl.DateTimeFormat( 'en', { month: 'long', timeZone: 'UTC' } )
+			.format( Date.UTC( 2000, newFutureMonth, 1 ) );
+	}
+
+	/**
+	 * @param {number} newFutureMonth
+	 * @return {string}
+	 */
+	static getMonthNameShortFromMonthNumber( newFutureMonth ) {
+		return new Intl.DateTimeFormat( 'en', { month: 'short', timeZone: 'UTC' } )
+			.format( Date.UTC( 2000, newFutureMonth, 1 ) );
+	}
+
+	/**
+	 * @return {string?}
+	 */
+	getTimeZoneNameLong() {
+		return new Intl.DateTimeFormat( 'en', { timeZoneName: 'long' } )
+			.formatToParts( this.parsedDate )
+			.find( ( part ) => part.type === 'timeZoneName' )?.value ?? null;
+	}
+
+	getCorrectTimeZoneString() {
 		const userTime = {
-			localYear: dateObject.getFullYear(),
-			localMonth: dateObject.getMonth(),
-			localDay: dateObject.getDate(),
-			localHours: dateObject.getHours(),
-			localMinutes: dateObject.getMinutes(),
+			dateObjectYear: this.parsedDate?.getFullYear(),
+			dateObjectMonth: this.parsedDate?.getMonth(),
+			dateObjectDay: this.parsedDate?.getDate(),
+			dateObjectHours: this.parsedDate?.getHours(),
+			dateObjectMinutes: this.parsedDate?.getMinutes(),
 
-			utcYear: dateObject.getUTCFullYear(),
-			utcMonth: dateObject.getUTCMonth(),
-			utcDay: dateObject.getUTCDate(),
-			utcHours: dateObject.getUTCHours(),
-			utcMinutes: dateObject.getUTCMinutes(),
-
-			dateObjectYear: dateObject.getFullYear(),
-			dateObjectMonth: dateObject.getMonth(),
-			dateObjectDay: dateObject.getDate(),
-			dateObjectHours: dateObject.getHours(),
-			dateObjectMinutes: dateObject.getMinutes(),
-
-			timeZoneName: liquipedia.countdown.getTimeZoneNameLong( dateObject )
+			timeZoneName: this.getTimeZoneNameLong()
 		};
 
-		let calculatedOffsetHours = 0;
-		const calculatedOffsetMinutes = ( userTime.localMinutes - userTime.utcMinutes );
-		let offsetMinutesAsString = '';
-		let offsetHoursWithSign = '+0';
-		let finalTimeZoneAbbr = '';
+		// getTimezoneOffset() is UTC minus local time in minutes (e.g. -330 for UTC+5:30), so negate it.
+		// Hours and minutes are derived from the total offset to keep half/quarter-hour zones correct.
+		const offsetInMinutes = -this.parsedDate?.getTimezoneOffset();
+		const absoluteOffsetInMinutes = Math.abs( offsetInMinutes );
+		const offsetSign = offsetInMinutes < 0 ? '-' : '+';
+		const offsetHoursWithSign = offsetSign + Math.floor( absoluteOffsetInMinutes / 60 );
+		const offsetMinutesStr = String( absoluteOffsetInMinutes % 60 ).padStart( 2, '0' );
+		const offsetMinutesAsString = absoluteOffsetInMinutes % 60 !== 0 ? ':' + offsetMinutesStr : '';
 
-		if ( userTime.localDay === userTime.utcDay ) {
-			calculatedOffsetHours = userTime.localHours - userTime.utcHours;
-		} else if ( userTime.localMonth === userTime.utcMonth ) {
-			// Month is same, so no problems comparing dates
-			if ( userTime.localDay > userTime.utcDay ) {
-				// +24 Hours because of the next day
-				calculatedOffsetHours = -( userTime.utcHours ) + userTime.localHours + 24;
-			} else if ( userTime.localDay < userTime.utcDay ) {
-				// -24 Hours because of the day before
-				calculatedOffsetHours = -( userTime.utcHours ) + userTime.localHours - 24;
-			}
-		} else if (
-			( userTime.localMonth > userTime.utcMonth && userTime.localYear === userTime.utcYear ) ||
-			userTime.localYear > userTime.utcYear
-		) {
-			// +24 Hours because of the next day (in next month or year)
-			calculatedOffsetHours = -( userTime.utcHours ) + userTime.localHours + 24;
-		} else if (
-			( userTime.localMonth < userTime.utcMonth && userTime.localYear === userTime.utcYear ) ||
-			userTime.localYear < userTime.utcYear
-		) {
-			// -24 Hours because of the day before (in previous month or year)
-			calculatedOffsetHours = -( userTime.utcHours ) + userTime.localHours - 24;
-		}
-
-		const calculatedOffsetInMinutes = ( calculatedOffsetHours * 60 ) + calculatedOffsetMinutes;
-
-		if ( calculatedOffsetHours > 0 ) {
-			if ( calculatedOffsetInMinutes % 60 !== 0 ) {
-				offsetMinutesAsString = ':' + Math.abs( calculatedOffsetMinutes );
-			}
-		} else if ( calculatedOffsetHours < 0 ) {
-			if ( calculatedOffsetInMinutes % 60 !== 0 ) {
-				offsetMinutesAsString = ':' + Math.abs( calculatedOffsetMinutes );
-			}
-		}
-
-		let finalTimeZoneName = 'UTC' + offsetHoursWithSign + offsetMinutesAsString;
-
-		if ( calculatedOffsetHours < 0 ) {
-			offsetHoursWithSign = '-' + Math.abs( calculatedOffsetHours );
-		} else if ( calculatedOffsetHours > 0 ) {
-			offsetHoursWithSign = '+' + Math.abs( calculatedOffsetHours );
-		}
-
-		if ( !liquipedia.countdown.timeZoneAbbr.has( userTime.timeZoneName ) ) {
-			// ('0' + calculatedOffsetMinutes).slice(-2), because of the leading zero
-			finalTimeZoneName = 'UTC' + offsetHoursWithSign + ':' + ( '0' + calculatedOffsetMinutes ).slice( -2 );
+		let finalTimeZoneName;
+		let finalTimeZoneAbbr;
+		if ( !LiquipediaCountdown.timeZoneAbbr.has( userTime.timeZoneName ) ) {
+			finalTimeZoneName = 'UTC' + offsetHoursWithSign + ':' + offsetMinutesStr;
 			finalTimeZoneAbbr = 'UTC' + offsetHoursWithSign + offsetMinutesAsString;
 		} else {
-			finalTimeZoneAbbr = liquipedia.countdown.timeZoneAbbr.get( userTime.timeZoneName );
+			finalTimeZoneAbbr = LiquipediaCountdown.timeZoneAbbr.get( userTime.timeZoneName );
 			finalTimeZoneName = userTime.timeZoneName + ' (UTC' + offsetHoursWithSign + offsetMinutesAsString + ')';
 		}
 
+		const hours = String( userTime.dateObjectHours ).padStart( 2, '0' );
+		const minutes = String( userTime.dateObjectMinutes ).padStart( 2, '0' );
+		const time = `${ hours }:${ minutes }`;
+
 		let strLocalTime1;
-		if ( format === 'compact' ) {
-			const currentYear = new Date().getFullYear();
-			const monthName = liquipedia.countdown.getMonthNameShortFromMonthNumber( userTime.dateObjectMonth );
-			const hours = ( '0' + userTime.dateObjectHours ).slice( -2 );
-			const minutes = ( '0' + userTime.dateObjectMinutes ).slice( -2 );
-			if ( currentYear === userTime.dateObjectYear ) {
-				strLocalTime1 = `${ monthName } ${ userTime.dateObjectDay } - ${ hours }:${ minutes }`;
+		if ( this.format === 'compact' ) {
+			const monthName = LiquipediaCountdown.getMonthNameShortFromMonthNumber( userTime.dateObjectMonth );
+			if ( new Date().getFullYear() === userTime.dateObjectYear ) {
+				strLocalTime1 = `${ monthName } ${ userTime.dateObjectDay } - ${ time }`;
 			} else {
-				strLocalTime1 = `${ monthName } ${ userTime.dateObjectDay }, ${ userTime.dateObjectYear } - ${ hours }:${ minutes }`;
+				strLocalTime1 = `${ monthName } ${ userTime.dateObjectDay }, ${ userTime.dateObjectYear } - ${ time }`;
 			}
 		} else {
-			const monthName = liquipedia.countdown.getMonthNameFromMonthNumber( userTime.dateObjectMonth );
-			const hours = ( '0' + userTime.dateObjectHours ).slice( -2 );
-			const minutes = ( '0' + userTime.dateObjectMinutes ).slice( -2 );
-			strLocalTime1 = `${ monthName } ${ userTime.dateObjectDay }, ${ userTime.dateObjectYear } - ${ hours }:${ minutes }`;
+			const monthName = LiquipediaCountdown.getMonthNameFromMonthNumber( userTime.dateObjectMonth );
+			strLocalTime1 = `${ monthName } ${ userTime.dateObjectDay }, ${ userTime.dateObjectYear } - ${ time }`;
 		}
 
-		const offsetMinutesStr = ( '0' + calculatedOffsetMinutes ).slice( -2 );
 		const strLocalTime2 = ` <abbr data-tz="${ offsetHoursWithSign }:${ offsetMinutesStr }"`;
 		const strLocalTime3 = ` title="${ finalTimeZoneName }">${ finalTimeZoneAbbr }</abbr>`;
 		const dateObjectString = strLocalTime1 + strLocalTime2 + strLocalTime3;
 		return dateObjectString;
 	}
-};
+}
+
+liquipedia.countdown = LiquipediaCountdown;
 liquipedia.core.modules.push( 'countdown' );

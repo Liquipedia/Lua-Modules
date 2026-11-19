@@ -81,7 +81,7 @@ return {
 	title = 'NARAKA: BLADEPOINT',
 	navigation = {
 		{
-			file = 'KPL Dream Team at HoK Midseason Invitational 2024.jpg',
+			file = 'SR Team at J Cup 2025.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -90,7 +90,7 @@ return {
 			},
 		},
 		{
-			file = 'TOP Tian at the 2024 Esports World Cup.jpg',
+			file = 'Mike_at_the_NBPL_2024_Spring_Season.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -108,7 +108,7 @@ return {
 			},
 		},
 		{
-			file = 'PVX ShunMi at the ALGS Birmingham Championship.jpg',
+			file = 'Winner shirt at J Cup 2023.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -117,7 +117,7 @@ return {
 			},
 		},
 		{
-			file = 'Jenn_Lee_poses_with_Trophy_at_VCT_Master_Shanghai.jpg',
+			file = 'SR.Spider at EWC.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},

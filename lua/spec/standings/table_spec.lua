@@ -79,6 +79,23 @@ describe('Standings Table from template', function()
 			Info.config.standings = originalStandingsConfig
 			assert.is_true(includesGames)
 		end)
+
+		it('includes the games with overtime from the regulationrounds input', function()
+			assert.is_true(queriesGames{
+				tabletype = 'swiss', round1 = {matches = 'M1'}, overtime = 'true', regulationrounds = '10',
+			})
+		end)
+	end)
+
+	it('passes the regulationrounds input to the import', function()
+		local StandingsParseLpdb = require('Module:Standings/Parse/Lpdb')
+		spy.on(StandingsParseLpdb, 'importFromMatches')
+		StandingsTable.fromTemplate{tabletype = 'swiss', round1 = {matches = 'M1'}, regulationrounds = '10'}
+		---@diagnostic disable-next-line: undefined-field
+		local options = StandingsParseLpdb.importFromMatches.calls[1].vals[4]
+		---@diagnostic disable-next-line: undefined-field
+		StandingsParseLpdb.importFromMatches:revert()
+		assert.are_equal(10, options.regulationRounds)
 	end)
 
 	it('errors on an unknown table type', function()
@@ -123,6 +140,42 @@ describe('Standings Table from template', function()
 
 		it('does not reset by default', function()
 			assert.is_false(parsedTiebreakerReset(nil))
+		end)
+	end)
+
+	describe('dq handling', function()
+		local StandingsParseLpdb = require('Module:Standings/Parse/Lpdb')
+
+		before_each(function()
+			spy.on(StandingsParseLpdb, 'importFromMatches')
+		end)
+
+		after_each(function()
+			---@diagnostic disable-next-line: undefined-field
+			StandingsParseLpdb.importFromMatches:revert()
+		end)
+
+		---@param dqHandling string?
+		---@return string?
+		local function importedDqHandling(dqHandling)
+			StandingsTable.fromTemplate{
+				tabletype = 'group',
+				dqhandling = dqHandling,
+				round1 = {matches = 'M1'},
+				{type = 'literal', name = 'Alpha', dq = 'true'},
+			}
+			---@diagnostic disable-next-line: undefined-field
+			local calls = StandingsParseLpdb.importFromMatches.calls
+			return calls[#calls].vals[4].dqHandling
+		end
+
+		it('passes the dqhandling input to the import', function()
+			assert.are_equal('exclude', importedDqHandling('exclude'))
+			assert.are_equal('forfeit', importedDqHandling('forfeit'))
+		end)
+
+		it('counts the matches of disqualified opponents by default', function()
+			assert.is_nil(importedDqHandling(nil))
 		end)
 	end)
 end)

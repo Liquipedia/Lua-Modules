@@ -36,15 +36,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, FfaMatchFunctions)
 end
 
---- Up to 4-opponents
-
----@param match table
----@param opponents MGIParsedOpponent[]
----@return boolean
-function MatchFunctions.switchToFfa(match, opponents)
-	return #opponents > 4
-end
-
 ---@param match table
 ---@param opponents MGIParsedOpponent[]
 ---@return table[]

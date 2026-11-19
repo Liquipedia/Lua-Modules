@@ -12,6 +12,7 @@ local Logic = Lua.import('Module:Logic')
 local Variables = Lua.import('Module:Variables')
 
 local CharacterNames = Lua.import('Module:CharacterNames', {loadData = true})
+local Map = Lua.import('Module:Map')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
@@ -83,6 +84,20 @@ function MapFunctions.computeOpponentScore(props, autoScore)
 	end
 
 	return MatchGroupInputUtil.computeOpponentScore(props, autoScore)
+end
+
+local getMapByPageName = FnUtil.memoize(Map.getMapByPageName)
+
+---@param match table
+---@param game table
+---@param opponents MGIParsedOpponent[]
+---@return string?
+function MapFunctions.getMapMode(match, game, opponents)
+	if Logic.isNotEmpty(game.mode) then
+		return game.mode
+	end
+	local mapData = getMapByPageName(game.map)
+	return mapData and (mapData.gameModes or {})[1] or nil
 end
 
 

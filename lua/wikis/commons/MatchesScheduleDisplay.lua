@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
@@ -28,6 +27,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local CountdownWidget = Lua.import('Module:Widget/Countdown')
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
@@ -193,7 +193,7 @@ function MatchesTable:dateDisplay(match)
 		end
 		countdownArgs.timestamp = match.timestamp
 		countdownArgs.date = DateExt.toCountdownArg(match.timestamp, match.timezoneId)
-		return createDateCell{children = Countdown.create(countdownArgs)}
+		return createDateCell{children = CountdownWidget(countdownArgs)}
 	elseif self.config.onlyShowExactDates then
 		return createDateCell{
 			css = {

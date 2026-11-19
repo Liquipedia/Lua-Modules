@@ -32,7 +32,7 @@ local StandingTableLegacyNext = {}
 
 local MAX_ROUND_COUNT = 30
 -- Bgs are set up to this slot, so the last one still applies if the opponents are undercounted
-local MAX_SLOT_COUNT = 100
+local MAX_SLOT_COUNT = 1000
 local OPPONENT_PREFIXES = {'p', 't', 'team', 'opponent'}
 
 local TIEBREAKER_MAPPING_TABLE = {
@@ -710,7 +710,7 @@ function StandingTableLegacyNext.fetchMatches(args)
 
 	return mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = tostring(conditions),
-		query = 'match2id, date, match2bracketdata, match2opponents',
+		query = 'match2id, date, bestof, game, match2bracketdata, match2opponents',
 		order = 'date asc',
 		limit = 1000,
 	})

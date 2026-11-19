@@ -36,7 +36,7 @@ local NON_BREAKING_SPACE = '&nbsp;'
 ---@field currency string
 ---@field title string
 ---@field autoExchange boolean
----@field cutAfter integer?
+---@field collapseAfter integer?
 
 ---@class BasePrizePoolTable: Widget
 ---@operator call(table): BasePrizePoolTable
@@ -64,15 +64,13 @@ function BasePrizePoolTable:render()
 		)}
 	}}
 
+	local collapseAfter = settings.collapseAfter and #placements > settings.collapseAfter and settings.collapseAfter or nil
+
 	return TableWidgets.Table{
 		caption = settings.title,
-		tableClasses = settings.cutAfter and {'prizepooltable', 'collapsed'} or nil,
-		tableAttributes = settings.cutAfter and {
-			['data-cutafter'] = settings.cutAfter,
-			['data-opentext'] = 'Show more',
-			['data-closetext'] = 'Show less',
-		} or nil,
-		sortable = not settings.cutAfter,
+		collapseAfter = collapseAfter,
+		-- Sorting would move other rows behind the cut
+		sortable = not collapseAfter,
 		columns = WidgetUtil.collect(
 			{
 				align = 'center',
@@ -129,9 +127,9 @@ function BasePrizePoolTable:_parse()
 		currency = currency,
 		title = props.title,
 		autoExchange = Logic.nilOr(Logic.readBoolOrNil(props.autoexchange), currency ~= BASE_CURRENCY),
-		cutAfter = MathUtil.toInteger(props.cutafter),
+		collapseAfter = MathUtil.toInteger(props.collapseafter or props.cutafter),
 	}
-	assert(not settings.cutAfter or settings.cutAfter > 0, 'Invalid |cutafter=')
+	assert(not settings.collapseAfter or settings.collapseAfter > 0, 'Invalid |collapseafter=')
 	local currencyRate = settings.autoExchange and Currency.getExchangeRate{
 		currency = currency,
 		date = DateExt.toYmdInUtc(props.edate or DateExt.getContextualDateOrNow()),
