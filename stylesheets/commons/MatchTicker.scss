@@ -206,7 +206,7 @@ Template(s): MatchTicker
 	}
 
 	// FFA / Battle Royale: completed
-	.match-info-headerbr {
+	&__results-ffa {
 		display: flex;
 		align-items: center;
 		flex-direction: column;
@@ -243,7 +243,7 @@ Template(s): MatchTicker
 		}
 	}
 
-	.match-info-tournament {
+	&-tournament {
 		display: flex;
 		padding: 0.125rem;
 		gap: 0.25rem;

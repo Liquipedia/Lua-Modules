@@ -52,17 +52,17 @@ function FFAMatchTickerCardOpponents.buildFfaMatchResultsDisplay(match)
 
 	local positionRows = Array.map(topThree, function(opponent, i)
 		return Div {
-			classes = { 'match-info-headerbr-positionrow' },
+			classes = { 'match-ticker-card__results-ffa-positionrow' },
 			children = {
 				Div {
-					classes = { 'match-info-headerbr-positionholder' },
+					classes = { 'match-ticker-card__results-ffa-positionholder' },
 					children = {
 						Trophy{ place = i },
 						Placement._makeOrdinal({ i })[1]
 					}
 				},
 				Div {
-					classes = { 'match-info-headerbr-opponent' },
+					classes = { 'match-ticker-card__results-ffa-opponent' },
 					children = {
 						OpponentDisplay.BlockOpponent {
 							opponent = opponent,
@@ -76,7 +76,7 @@ function FFAMatchTickerCardOpponents.buildFfaMatchResultsDisplay(match)
 	end)
 
 	return Div {
-		classes = { 'match-info-headerbr' },
+		classes = { 'match-ticker-card__results-ffa' },
 		children = positionRows
 	}
 end
