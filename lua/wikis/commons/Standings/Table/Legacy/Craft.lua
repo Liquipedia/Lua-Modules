@@ -99,7 +99,7 @@ function StandingTableLegacyCraft.convert(frame)
 
 	-- possibly push this into a template instead of setting these vars directly as wiki code...
 	---@type Renderable
-	local varCode = '{{#vardefine:matchListIsCollapsed|1}}'
+	local varCode = '{{CollapseBelowMatchlists|true}}'
 		.. StandingTableLegacyCraft.getMatchDateVar(args.date)
 	if not Logic.readBool(args.push) then
 		varCode = Html.Pre{children = varCode}
@@ -137,7 +137,7 @@ function StandingTableLegacyCraft.getMatchDateVar(date)
 		return ''
 	end
 
-	return '{{#vardefine:match_date|' .. DateExt.formatTimestamp('Y-m-d H:i:s', timestamp) .. '}}'
+	return '{{SetMatchDateVariable|date=' .. DateExt.formatTimestamp('Y-m-d H:i:s', timestamp) .. '}}'
 end
 
 ---@param args table
