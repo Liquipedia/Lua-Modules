@@ -82,6 +82,18 @@ end
 --
 
 ---@param map table
+---@return fun(opponentIndex: integer): number?
+function MapFunctions.calculateMapScore(map)
+	local winner = tonumber(map.winner)
+	return function(opponentIndex)
+		if not winner then
+			return nil
+		end
+		return winner == opponentIndex and 1 or winner == 0 and 0.5 or 0
+	end
+end
+
+---@param map table
 ---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]?

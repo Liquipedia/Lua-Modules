@@ -57,7 +57,7 @@ local MatchGroupInputUtil = {}
 ---@field template string?
 ---@field icon string?
 ---@field icondark string?
----@field score integer?
+---@field score number?
 ---@field status string?
 ---@field placement integer?
 ---@field match2players MGIParsedPlayer[]
@@ -698,9 +698,9 @@ function MatchGroupInputUtil.canUseAutoScore(match, maps)
 	return matchHasStarted or anyMapHasWinner or anyMapHasScores
 end
 
----@param props {walkover: string|integer?, winner: string|integer?, score: string|integer?, opponentIndex: integer}
----@param autoScore? fun(opponentIndex: integer): integer?
----@return integer? #SCORE
+---@param props {walkover: string|integer?, winner: string|integer?, score: string|number?, opponentIndex: integer}
+---@param autoScore? fun(opponentIndex: integer): number?
+---@return number? #SCORE
 ---@return string? #STATUS
 function MatchGroupInputUtil.computeOpponentScore(props, autoScore)
 	if props.walkover then
@@ -717,7 +717,7 @@ function MatchGroupInputUtil.computeOpponentScore(props, autoScore)
 end
 
 ---@param scoreInput string|number|nil
----@return integer? #SCORE
+---@return number? #SCORE
 ---@return string? #STATUS
 function MatchGroupInputUtil.parseScoreInput(scoreInput)
 	if Logic.isEmpty(scoreInput) then
@@ -1096,7 +1096,7 @@ end
 ---@field extractMaps fun(match: table, opponents: MGIParsedOpponent[], mapProps: any?): table[]
 ---@field getBestOf fun(bestOfInput: string|integer|nil, maps: table[]): integer?
 ---@field switchToFfa? fun(match: table, opponents: table[]): boolean
----@field calculateMatchScore? fun(maps: table[], opponents: MGIParsedOpponent[]): fun(opponentIndex: integer): integer?
+---@field calculateMatchScore? fun(maps: table[], opponents: MGIParsedOpponent[]): fun(opponentIndex: integer): number?
 ---@field removeUnsetMaps? fun(maps: table[]): table[]
 ---@field getExtraData? fun(match: table, games: table[], opponents: MGIParsedOpponent[]): table?
 ---@field adjustOpponent? fun(opponent: MGIParsedOpponent, opponentIndex: integer)
@@ -1217,7 +1217,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 end
 
 ---@class MapParserInterface
----@field calculateMapScore? fun(map: table): fun(opponentIndex: integer): integer?
+---@field calculateMapScore? fun(map: table): fun(opponentIndex: integer): number?
 ---@field getExtraData? fun(match: table, game: table, opponents: MGIParsedOpponent[]): table?
 ---@field getLength? fun(map: table): string
 ---@field getMap? fun(mapInput: table): table
@@ -1352,7 +1352,7 @@ end
 ---@class FfaMatchParserInterface
 ---@field extractMaps fun(match: table, opponents: MGIParsedOpponent[], mapProps: any?): table[]
 ---@field parseSettings? fun(match: table, opponentCount: integer): table
----@field calculateMatchScore? fun(opponents: MGIParsedOpponent[], maps: table[]): fun(opponentIndex: integer): integer?
+---@field calculateMatchScore? fun(opponents: MGIParsedOpponent[], maps: table[]): fun(opponentIndex: integer): number?
 ---@field getExtraData? fun(match: table, games: table[], opponents: MGIParsedOpponent[], settings: table): table?
 ---@field getMode? fun(opponents: MGIParsedOpponent[]): string
 ---@field readDate? readDateFunction

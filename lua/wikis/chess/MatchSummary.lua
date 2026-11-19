@@ -16,6 +16,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 
 local Collapsible = Lua.import('Module:Widget/Match/Summary/Collapsible')
@@ -59,11 +60,22 @@ local CustomMatchSummary = {
 	GameRow = ChessMatchSummaryGameRow,
 }
 
+---@param game MatchGroupUtilGame
+---@param opponentIndex integer
+---@return number
+local function calculateGameScore(game, opponentIndex)
+	local score = game.scores and tonumber(game.scores[opponentIndex])
+	if score and score >= 0 then
+		return score
+	end
+	return game.winner == opponentIndex and 1 or game.winner == 0 and 0.5 or 0
+end
+
 ---@param args table
 ---@return VNode
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {
-		useGameScores = true,
+		calculateGameScore = calculateGameScore,
 		width = function (match)
 			if Array.any(match.opponents, function (opponent)
 				return opponent.type == Opponent.team
@@ -82,78 +94,37 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
----@return string|number|nil
-local function getOpponentGameScore(game, opponentIndex)
-	local opponent = game.opponents and game.opponents[opponentIndex]
-	if opponent and opponent.status and opponent.status ~= 'S' then
-		return opponent.status
-	end
-	local score = game.scores and tonumber(game.scores[opponentIndex])
-	if score and score >= 0 then
-		return score
-	end
-	if game.winner == opponentIndex then
-		return 1
-	elseif game.winner == 0 then
-		return 0.5
-	elseif Logic.isNotEmpty(game.winner) then
-		return 0
-	end
-end
-
----@param game MatchGroupUtilGame
----@param score1 string|number
----@param score2 string|number
----@return boolean, boolean
-local function getBoldStates(game, score1, score2)
-	if game.winner == 1 then
-		return true, false
-	elseif game.winner == 2 then
-		return false, true
-	elseif game.winner == 0 then
-		return true, true
-	end
-	local num1, num2 = tonumber(score1), tonumber(score2)
-	if num1 and num2 then
-		return num1 >= num2, num2 >= num1
-	end
-	return score1 == 'W', score2 == 'W'
+---@return VNode
+local function makeGameScore(game, opponentIndex)
+	return OpponentDisplay.BlockScore{
+		isWinner = game.winner == opponentIndex or game.winner == 0,
+		scoreText = MatchSummaryWidgets.GameRow.scoreDisplay(game, opponentIndex),
+	}
 end
 
 ---@param props MatchSummaryGameRowProps
 ---@return Renderable[]
 function GameRowComponentProps.createGameOverview(props)
 	local game = props.game
-	local score1 = getOpponentGameScore(game, 1)
-	local score2 = getOpponentGameScore(game, 2)
 	local title = 'Game ' .. props.gameIndex
 		.. (tonumber(game.length) and (' - ' .. game.length .. ' moves') or '')
 
-	if not score1 and not score2 then
+	local score1 = MatchSummaryWidgets.GameRow.scoreDisplay(game, 1)
+	local score2 = MatchSummaryWidgets.GameRow.scoreDisplay(game, 2)
+	if Logic.isEmpty(score1) and Logic.isEmpty(score2) then
 		return {title}
 	end
 
-	score1 = score1 or 0
-	score2 = score2 or 0
-	local isLeftBold, isRightBold = getBoldStates(game, score1, score2)
-
 	return {
 		Html.Div{
-			css = {['text-align'] = 'center'},
 			children = {
 				Html.Div{children = title},
 				Html.Div{
-					css = {['margin-top'] = '2px'},
+					classes = {'brkts-popup-spaced'},
 					children = {
-						Html.Span{
-							css = isLeftBold and {['font-weight'] = 'bold'} or nil,
-							children = score1,
-						},
-						' : ',
-						Html.Span{
-							css = isRightBold and {['font-weight'] = 'bold'} or nil,
-							children = score2,
-						},
+						makeGameScore(game, 1),
+						':',
+						makeGameScore(game, 2),
 					},
 				},
 			},

@@ -45,7 +45,7 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 ---@field maxBans? integer
 ---@field showDetail? fun(match: MatchGroupUtilMatch): boolean
 ---@field mapVetoPreprocessOptions {game: string?, emptyMapDisplay: string?, useLpdb: boolean?}?
----@field useGameScores? boolean
+---@field calculateGameScore? fun(game: MatchGroupUtilGame, opponentIndex: integer): number
 
 ---@class MatchSummary
 local MatchSummary = {}
@@ -107,7 +107,7 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 					gamesSectionName = set.header or ('Set ' .. set.subgroup),
 					gamesSectionResult = MatchSummaryWidgets.SetHeader{
 						set = set,
-						useGameScores = options.useGameScores,
+						calculateGameScore = options.calculateGameScore,
 					},
 					children = Array.map(set.games, function(game, gameIndex)
 						if not gameFilterFunction(game) then
