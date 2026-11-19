@@ -411,12 +411,13 @@ end
 --- @return string?
 function CustomLeague:_createCircuitLink(circuitIndex)
 	local args = self.args
+	local iconDisplay = self.data['circuitIconDisplay' .. circuitIndex] --[[@as string?]]
 
 	return self:createSeriesDisplay({
 		displayManualIcons = true,
 		series = args['circuit' .. circuitIndex],
 		abbreviation = args['circuit' .. circuitIndex .. 'abbr'],
-	}, self.data['circuitIconDisplay' .. circuitIndex])
+	}, iconDisplay)
 end
 
 ---@param date string
