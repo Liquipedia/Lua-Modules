@@ -1,20 +1,9 @@
 import { defineConfig } from "eslint/config";
 import globals from "globals";
-import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
-
-const compat = new FlatCompat({
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
-});
+import wikimedia from "eslint-config-wikimedia/flat.js";
 
 export default defineConfig([{
-    extends: compat.extends(
-        "wikimedia/mediawiki",
-        "wikimedia/client/common",
-        "wikimedia/language/es2024",
-        "wikimedia/jquery",
-    ),
+    extends: wikimedia( 'mediawiki', 'client/common', 'language/es2024', 'jquery' ),
 
     files: ["javascript/**/*.js"],
 
@@ -32,6 +21,8 @@ export default defineConfig([{
     rules: {
         "space-before-function-paren": "off",
         "no-jquery/no-global-selector": "off",
+        // TODO: Remove jquery ui uses entirely then remove this override
+        "no-jquery/no-jquery-ui": "warn",
         "vars-on-top": "off",
         "one-var": "off",
         "es/no-array-from": "off",
