@@ -32,79 +32,6 @@ Template(s): MatchTicker
 	}
 }
 
-// FFA / Battle Royale header (Widget/Match/Header/Ffa), only rendered inside match ticker cards
-.match-info-headerbr {
-	display: flex;
-	align-items: center;
-	flex: 1;
-	flex-direction: column;
-	gap: 0.25rem;
-	font-size: 0.875rem;
-	line-height: 1.25rem;
-	align-self: stretch;
-
-	&-positionrow {
-		display: flex;
-		align-items: center;
-		align-self: stretch;
-		gap: 0.25rem;
-	}
-
-	&-positionholder {
-		display: flex;
-		gap: 0.25rem;
-		align-items: center;
-		width: 2.75rem;
-	}
-
-	&-opponent {
-		display: flex;
-		min-width: 0;
-	}
-}
-
-// Tournament bar (Widget/Match/TournamentBar), only rendered inside match ticker cards
-.match-info-tournament {
-	display: flex;
-	padding: 0.5rem 0.75rem;
-	gap: 0.5rem;
-	align-self: stretch;
-	border-radius: 0.5rem;
-	font-size: 0.75rem;
-	line-height: 1.125rem;
-	align-items: center;
-
-	.theme--light & {
-		background-color: #0000000a;
-	}
-
-	.theme--dark & {
-		background-color: #ffffff0a;
-	}
-
-	/**
-		Mostly duplicated from Mainpage.scss
-		tournaments-list-name span.icon-small
-		TODO: Rework this!
-	**/
-	span.league-icon-small-image,
-	span.icon-small {
-		min-height: 21px;
-		min-width: 21px;
-	}
-
-	.league-icon-small-image img,
-	.icon-small img {
-		max-height: 21px;
-		max-width: 21px;
-	}
-
-	&-wrapper {
-		display: flex;
-		flex-direction: column;
-	}
-}
-
 .match-ticker-card {
 	display: flex;
 	min-width: 15.625rem;
@@ -280,12 +207,27 @@ Template(s): MatchTicker
 
 	// FFA / Battle Royale: completed
 	.match-info-headerbr {
-		gap: 0;
-		font-size: 0.75rem;
-		line-height: 1.125rem;
-		flex-grow: 1;
+		display: flex;
+		align-items: center;
+		flex-direction: column;
+		gap: 0.25rem;
+		font-size: 0.875rem;
+		line-height: 1.25rem;
+		flex: 1;
+		align-self: stretch;
+
+		&-positionrow {
+			display: flex;
+			align-items: center;
+			align-self: stretch;
+			gap: 0.25rem;
+		}
 
 		&-positionholder {
+			display: flex;
+			gap: 0.25rem;
+			align-items: center;
+			width: 2.75rem;
 			color: var( --match-ticker-card-primary-text-color );
 
 			i {
@@ -295,17 +237,47 @@ Template(s): MatchTicker
 		}
 
 		&-opponent {
+			display: flex;
 			flex: 1;
 			min-width: 0;
 		}
 	}
 
 	.match-info-tournament {
+		display: flex;
 		padding: 0.125rem;
 		gap: 0.25rem;
 		font-style: inherit;
+		align-self: stretch;
+		border-radius: 0.5rem;
+		font-size: 0.75rem;
+		line-height: 1.125rem;
+		align-items: center;
+		background-color: var( --clr-on-surface-light-primary-4 );
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-8 );
+		}
+
+		/**
+			Mostly duplicated from Mainpage.scss
+			tournaments-list-name span.icon-small
+			TODO: Rework this!
+		**/
+		.league-icon-small-image,
+		.icon-small {
+			min-height: 21px;
+			min-width: 21px;
+
+			img {
+				max-height: 21px;
+				max-width: 21px;
+			}
+		}
 
 		&-wrapper {
+			display: flex;
+			flex-direction: column;
 			min-width: 0;
 		}
 
