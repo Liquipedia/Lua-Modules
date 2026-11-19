@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Logic = Lua.import('Module:Logic')
 
 local Component = Lua.import('Module:Widget/Component')
@@ -17,9 +16,6 @@ local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
 local MatchTickerCardOpponents = Lua.import('Module:Widget/Match/Ticker/Opponents')
 local TournamentInfo = Lua.import('Module:Widget/Match/Ticker/TournamentInfo')
 local MatchButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
-local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 
 ---@class MatchTickerCardProps
 ---@field match MatchGroupUtilMatch
@@ -37,12 +33,12 @@ function MatchTickerCard.render(props)
 
 	return Html.Div{
 		classes = {'match-ticker-card'},
-		children = WidgetUtil.collect(
+		children = {
 			MatchTickerCard.buildHeader(match),
 			MatchTickerCardOpponents{match = match},
-			MatchTickerCard.buildTournamentInfoBar(props),
+			TournamentInfo(props),
 			MatchButtonBar{match = match, showVods = true, buttonSize = 'xs'}
-		)
+		}
 	}
 end
 
@@ -81,24 +77,6 @@ function MatchTickerCard.buildSectionAndBestOf(match)
 
 	return Html.Div{
 		children = Array.interleave(children, ' - ')
-	}
-end
-
----@param props MatchTickerCardProps
----@return VNode?
-function MatchTickerCard.buildTournamentInfoBar(props)
-	if props.hideTournament then
-		return
-	end
-	local match = props.match
-	local highlightCondition = HighlightConditions.match or HighlightConditions.tournament
-	local highlight = highlightCondition(match, {onlyHighlightOnValue = props.onlyHighlightOnValue})
-	return Html.Div{
-		classes = {
-			'match-info-tournament',
-			highlight and HIGHLIGHT_CLASS or nil
-		},
-		children = TournamentInfo(props),
 	}
 end
 
