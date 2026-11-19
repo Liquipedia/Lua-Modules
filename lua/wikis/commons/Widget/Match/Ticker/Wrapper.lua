@@ -11,7 +11,7 @@ local Array = Lua.import('Module:Array')
 local Component = Lua.import('Module:Widget/Component')
 
 local Html = Lua.import('Module:Widget/Html')
-local MatchCard = Lua.import('Module:Widget/Match/Card')
+local MatchTickerCard = Lua.import('Module:Widget/Match/Ticker/Card')
 local HorizontalContainer = Lua.import('Module:Widget/Match/Ticker/HorizontalContainer')
 
 ---@param props {matches: {match: MatchGroupUtilMatch, gameData: MatchTickerGameData?}[],
@@ -35,7 +35,7 @@ local function MatchTickerWrapper(props)
 	end
 
 	local matchCards = Array.map(matches, function(match)
-		return MatchCard{
+		return MatchTickerCard{
 			match = match.match,
 			hideTournament = props.hideTournament,
 			displayGameIcons = props.displayGameIcons,

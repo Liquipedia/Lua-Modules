@@ -60,7 +60,7 @@ end
 ---@param link string
 function MatchTickerTournamentInfo.buildTournamentDisplay(tournament, link)
 	return Html.Span{
-		classes = {'match-info-tournament-name'},
+		classes = {'match-ticker-card-tournament-name'},
 		children = Link{
 			link = link,
 			children = tournament.displayName
@@ -80,7 +80,7 @@ function MatchTickerTournamentInfo.buildGameDataDisplay(match, gameData)
 		stageName = DisplayHelper.expandHeader(match.bracketData.inheritedHeader)[1]
 	end
 	return Html.Span{
-		classes = {'match-info-tournament-game'},
+		classes = {'match-ticker-card-tournament-game'},
 		children = WidgetUtil.collect(
 			stageName,
 			stageName and ' - ' or nil,
@@ -112,7 +112,7 @@ function MatchTickerTournamentInfo.render(props)
 
 	return Html.Div{
 		classes = {
-			'match-info-tournament',
+			'match-ticker-card-tournament',
 			highlight and HIGHLIGHT_CLASS or nil
 		},
 		children = WidgetUtil.collect(
@@ -120,7 +120,7 @@ function MatchTickerTournamentInfo.render(props)
 				tournament, tournamentLink, not props.hideTournament, props.displayGameIcons
 			),
 			Html.Span{
-				classes = {'match-info-tournament-wrapper'},
+				classes = {'match-ticker-card-tournament-wrapper'},
 				children = WidgetUtil.collect(
 					not props.hideTournament and MatchTickerTournamentInfo.buildTournamentDisplay(
 						tournament, tournamentLink
