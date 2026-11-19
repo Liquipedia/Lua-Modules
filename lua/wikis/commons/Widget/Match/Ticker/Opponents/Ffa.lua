@@ -28,7 +28,7 @@ local FFAMatchTickerCardOpponents = {}
 
 ---@param props {match: FFAMatchGroupUtilMatch}
 ---@return VNode?
-function FFAMatchTickerCardOpponents.buildFfaMatchOpponentsDisplay(props)
+function FFAMatchTickerCardOpponents.render(props)
 	local match = props.match
 	if match.finished then
 		return FFAMatchTickerCardOpponents.buildFfaMatchResultsDisplay(match)
