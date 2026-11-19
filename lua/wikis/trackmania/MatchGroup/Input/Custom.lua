@@ -13,7 +13,6 @@ local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local Opponent = Lua.import('Module:Opponent')
 
 local CustomMatchGroupInput = {}
 local MatchFunctions = {
@@ -85,28 +84,6 @@ function CustomMatchGroupInput._getSetWins(opponent)
 		return opponent.extradata['set' .. setIndex .. 'win'] and 1 or 0
 	end
 	return setWin(1) + setWin(2) + setWin(3)
-end
-
----@param match table
----@return boolean
-function MatchFunctions.isFeatured(match)
-	return tonumber(match.liquipediatier) == 1
-		or tonumber(match.liquipediatier) == 2
-end
-
----@param match table
----@param games table[]
----@param opponents MGIParsedOpponent[]
----@return table
-function MatchFunctions.getExtraData(match, games, opponents)
-	local opponent1 = opponents[1] or {}
-	local opponent2 = opponents[2] or {}
-
-	return {
-		isfeatured = MatchFunctions.isFeatured(match),
-		hasopponent1 = Logic.isNotEmpty(opponent1.name) and opponent1.type ~= Opponent.literal,
-		hasopponent2 = Logic.isNotEmpty(opponent2.name) and opponent2.type ~= Opponent.literal,
-	}
 end
 
 ---@param match table
