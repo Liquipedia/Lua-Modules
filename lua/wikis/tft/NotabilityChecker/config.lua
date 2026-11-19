@@ -21,7 +21,6 @@ local TIER_2_POINTS = {
 }
 
 local TIER_3_POINTS = {
-	{maxPlacement = 7, points = 2},
 	{maxPlacement = 8, points = 3},
 	{maxPlacement = 16, points = 2},
 	{maxPlacement = 32, points = 1},
@@ -70,7 +69,6 @@ return {
 			ignoreDateLoss = true,
 			points = {
 				general = {
-					{maxPlacement = 7, points = 4},
 					{maxPlacement = 8, points = 6},
 					{maxPlacement = 16, points = 4},
 					{maxPlacement = 32, points = 2},
@@ -84,7 +82,6 @@ return {
 			ignoreDateLoss = true,
 			points = {
 				general = {
-					{maxPlacement = 7, points = 2},
 					{maxPlacement = 8, points = 4},
 					{maxPlacement = 16, points = 2},
 					{maxPlacement = 32, points = 1},
@@ -95,7 +92,6 @@ return {
 			ignoreDateLoss = true,
 			points = {
 				general = {
-					{maxPlacement = 7, points = 1},
 					{maxPlacement = 8, points = 2},
 					{maxPlacement = 16, points = 1},
 				},

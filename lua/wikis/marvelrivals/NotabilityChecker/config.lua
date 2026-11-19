@@ -70,8 +70,6 @@ return {
 			points = {
 				general = {
 					{maxPlacement = 1, points = 3},
-					{maxPlacement = 2, points = 1},
-					{maxPlacement = 3, points = 3},
 					{maxPlacement = 4, points = 1},
 					{points = 0.5},
 				},

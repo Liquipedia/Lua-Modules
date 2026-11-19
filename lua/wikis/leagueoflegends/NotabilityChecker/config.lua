@@ -36,7 +36,6 @@ return {
 		[3] = {
 			points = {
 				general = {
-					{maxPlacement = 3, points = 15},
 					{maxPlacement = 4, points = 30},
 					{maxPlacement = 16, points = 15},
 				},
@@ -45,7 +44,6 @@ return {
 		[4] = {
 			points = {
 				general = {
-					{maxPlacement = 3, points = 5},
 					{maxPlacement = 4, points = 10},
 					{maxPlacement = 16, points = 5},
 				},
@@ -54,7 +52,6 @@ return {
 		[5] = {
 			points = {
 				general = {
-					{maxPlacement = 3, points = 1},
 					{maxPlacement = 4, points = 2},
 					{maxPlacement = 16, points = 1},
 				},
