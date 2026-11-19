@@ -14,15 +14,16 @@ local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 local defaultProps = {
-	matchesPortal = 'Liquipedia:Matches'
+	matchesPortal = 'Liquipedia:Matches',
+	showMatchesPortal = true,
 }
 
----@param props { matchesPortal: string?, displayGameIcons: boolean? }
+---@param props { matchesPortal: string?, displayGameIcons: boolean?, showMatchesPortal: boolean? }
 ---@return Renderable[]
-local function MatchTicker(props)
+local function MainPageMatchTicker(props)
 	return {
 		MatchTickerContainer{displayGameIcons = props.displayGameIcons},
-		Html.Div{
+		props.showMatchesPortal and Html.Div{
 			css = {
 				['white-space'] = 'nowrap',
 				display = 'block',
@@ -33,8 +34,8 @@ local function MatchTicker(props)
 				padding = '0.5rem 1rem',
 			},
 			children = { Link{ children = 'See more matches', link = props.matchesPortal} }
-		}
+		} or nil,
 	}
 end
 
-return Component.component(MatchTicker, defaultProps)
+return Component.component(MainPageMatchTicker, defaultProps)
