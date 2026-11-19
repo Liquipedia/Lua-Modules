@@ -16,9 +16,22 @@ local TOURNAMENT = {
 }
 
 local PAST_DATE = '2024-06-01 12:00:00'
+local PAST_DATE_NEXT_HOUR = '2024-06-01 13:00:00'
 local PAST_TIMESTAMP = 1717243200
+local PAST_NEXT_HOUR_TIMESTAMP = PAST_TIMESTAMP + 3600
 local FUTURE_DATE = '2099-06-01 12:00:00'
+local FUTURE_DATE_NEXT_HOUR = '2099-06-01 13:00:00'
 local FUTURE_TIMESTAMP = 4083998400
+local FUTURE_TIMESTAMP_NEXT_HOUR = FUTURE_TIMESTAMP + 3600
+-- FFA matches are usually played over multiple days, one game per day
+local PAST_NEXT_DAY_DATE = '2024-06-02 12:00:00'
+local PAST_NEXT_DAY_NEXT_HOUR_DATE = '2024-06-02 13:00:00'
+local PAST_NEXT_DAY_TIMESTAMP = 1717329600
+local PAST_NEXT_DAY_NEXT_HOUR_TIMESTAMP = PAST_NEXT_DAY_TIMESTAMP + 3600
+local FUTURE_NEXT_DAY_DATE = '2099-06-02 12:00:00'
+local FUTURE_NEXT_DAY_NEXT_HOUR_DATE = '2099-06-02 13:00:00'
+local FUTURE_NEXT_DAY_TIMESTAMP = 4084084800
+local FUTURE_NEXT_DAY_NEXT_HOUR_TIMESTAMP = FUTURE_NEXT_DAY_TIMESTAMP + 3600
 
 ---@param matchFields table
 ---@return match2
@@ -81,6 +94,27 @@ local function battleRoyaleOpponents(withPlacements)
 	return opponents
 end
 
+---@param fields {date: string, timestamp: integer, map: string, placements: integer[]?}
+---@return match2game
+local function battleRoyaleGame(fields)
+	local opponents = {}
+	local winner
+	for index = 1, #BATTLE_ROYALE_TEAMS do
+		local placement = fields.placements and fields.placements[index] or nil
+		if placement == 1 then
+			winner = tostring(index)
+		end
+		table.insert(opponents, {placement = placement})
+	end
+	return {
+		date = fields.date,
+		map = fields.map,
+		winner = winner,
+		opponents = opponents,
+		extradata = {timestamp = fields.timestamp},
+	}
+end
+
 local teamVsTeam = matchRecord{
 	match2id = 'TICKERTEST_R01-M001',
 	bestof = '3',
@@ -138,6 +172,12 @@ local upcomingBattleRoyale = matchRecord{
 	section = 'Grand Final',
 	extradata = {timestamp = FUTURE_TIMESTAMP},
 	match2opponents = battleRoyaleOpponents(false),
+	match2games = {
+		battleRoyaleGame{date = FUTURE_DATE, timestamp = FUTURE_TIMESTAMP, map = 'Erangel'},
+		battleRoyaleGame{date = FUTURE_DATE_NEXT_HOUR, timestamp = FUTURE_TIMESTAMP_NEXT_HOUR, map = 'Rondo'},
+		battleRoyaleGame{date = FUTURE_NEXT_DAY_DATE, timestamp = FUTURE_NEXT_DAY_TIMESTAMP, map = 'Miramar'},
+		battleRoyaleGame{date = FUTURE_NEXT_DAY_NEXT_HOUR_DATE, timestamp = FUTURE_NEXT_DAY_NEXT_HOUR_TIMESTAMP, map = 'Vikendi'},
+	},
 }
 
 local completedBattleRoyale = matchRecord{
@@ -150,6 +190,20 @@ local completedBattleRoyale = matchRecord{
 	section = 'Grand Final',
 	extradata = {timestamp = PAST_TIMESTAMP},
 	match2opponents = battleRoyaleOpponents(true),
+	match2games = {
+		battleRoyaleGame{
+			date = PAST_DATE, timestamp = PAST_TIMESTAMP, map = 'Erangel', placements = {2, 5, 1, 4, 3, 8, 7, 6},
+		},
+		battleRoyaleGame{
+			date = PAST_DATE_NEXT_HOUR, timestamp = PAST_NEXT_HOUR_TIMESTAMP, map = 'Miramar', placements = {2, 5, 1, 4, 3, 8, 7, 6},
+		},
+		battleRoyaleGame{
+			date = PAST_NEXT_DAY_DATE, timestamp = PAST_NEXT_DAY_TIMESTAMP, map = 'Vikendi', placements = {6, 1, 8, 3, 7, 2, 4, 5},
+		},
+		battleRoyaleGame{
+			date = PAST_NEXT_DAY_NEXT_HOUR_DATE, timestamp = PAST_NEXT_DAY_NEXT_HOUR_TIMESTAMP, map = 'Rondo', placements = {6, 1, 8, 3, 7, 2, 4, 5},
+		},
+	},
 }
 
 --- In display order.
