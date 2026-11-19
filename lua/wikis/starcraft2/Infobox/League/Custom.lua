@@ -245,14 +245,14 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param maps {link: string, displayname: string}[]
----@return string[]
+---@return Renderable[]
 function CustomLeague:_mapsDisplay(maps)
-	return {table.concat(
+	return Array.interleave(
 		Array.map(maps, function(mapData)
-			return tostring(NoWrap{children = Page.makeInternalLink({}, mapData.displayname, mapData.link)})
+			return NoWrap{children = Page.makeInternalLink({}, mapData.displayname, mapData.link)}
 		end),
 		'&nbsp;• '
-	)}
+	)
 end
 
 ---@param args table

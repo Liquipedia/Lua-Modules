@@ -50,10 +50,10 @@ function CustomInjector:parse(id, widgets)
 			local maps = {}
 
 			for _, map in ipairs(self.caller:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(NoWrap{children = Page.makeInternalLink(map)}))
+				table.insert(maps, NoWrap{children = Page.makeInternalLink(map)})
 			end
 			table.insert(widgets, Title{children = 'Maps'})
-			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Center{children = Array.interleave(maps, '&nbsp;• ')})
 		end
 	end
 

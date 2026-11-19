@@ -96,21 +96,17 @@ function CustomLeague:appendLiquipediatierDisplay(args)
 end
 
 ---@param base string
----@return string[]
+---@return Renderable[]
 function CustomLeague:_makeBasedListFromArgs(base)
-	local firstArg = self.args[base .. '1']
-	local foundArgs = {Page.makeInternalLink({}, firstArg)}
-	local index = 2
+	local foundArgs = {}
+	local index = 1
 
 	while String.isNotEmpty(self.args[base .. index]) do
-		local currentArg = self.args[base .. index]
-		table.insert(foundArgs, '&nbsp;• ' ..
-			tostring(NoWrap{children = Page.makeInternalLink({}, currentArg)})
-		)
+		table.insert(foundArgs, NoWrap{children = Page.makeInternalLink({}, self.args[base .. index])})
 		index = index + 1
 	end
 
-	return foundArgs
+	return Array.interleave(foundArgs, '&nbsp;• ')
 end
 
 ---@param args table

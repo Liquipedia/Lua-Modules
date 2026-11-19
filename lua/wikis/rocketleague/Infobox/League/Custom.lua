@@ -67,17 +67,15 @@ function CustomInjector:parse(id, widgets)
 		)
 	elseif id == 'customcontent' then
 		if not String.isEmpty(args.map1) then
-			local maps = {self.caller:_makeInternalLink(args.map1)}
-			local index = 2
+			local maps = {}
+			local index = 1
 
 			while not String.isEmpty(args['map' .. index]) do
-				table.insert(maps, '&nbsp;• ' ..
-					tostring(NoWrap{children = self.caller:_makeInternalLink(args['map' .. index])})
-				)
+				table.insert(maps, NoWrap{children = self.caller:_makeInternalLink(args['map' .. index])})
 				index = index + 1
 			end
 			table.insert(widgets, Title{children = 'Maps'})
-			table.insert(widgets, Center{children = maps})
+			table.insert(widgets, Center{children = Array.interleave(maps, '&nbsp;• ')})
 		end
 
 		if not String.isEmpty(args.team_number) then

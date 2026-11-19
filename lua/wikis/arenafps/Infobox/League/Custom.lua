@@ -77,11 +77,11 @@ function CustomInjector:parse(id, widgets)
 			local game = args.game and ('/' .. args.game) or ''
 
 			maps = Array.map(maps, function(map)
-				return tostring(NoWrap{children = PageLink.makeInternalLink({}, map, map .. game)})
+				return NoWrap{children = PageLink.makeInternalLink({}, map, map .. game)}
 			end)
 
 			table.insert(widgets, Title{children = 'Maps'})
-			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Center{children = Array.interleave(maps, '&nbsp;• ')})
 		end
 	end
 	return widgets

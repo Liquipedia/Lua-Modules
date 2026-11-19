@@ -81,17 +81,15 @@ function CustomInjector:parse(id, widgets)
 		)
 
 		if not String.isEmpty(args.team1) then
-			local teams = {Page.makeInternalLink(args.team1)}
-			local index = 2
+			local teams = {}
+			local index = 1
 
 			while not String.isEmpty(args['team' .. index]) do
-				table.insert(teams, '&nbsp;• ' ..
-					tostring(NoWrap{children = Page.makeInternalLink(args['team' .. index])})
-				)
+				table.insert(teams, NoWrap{children = Page.makeInternalLink(args['team' .. index])})
 				index = index + 1
 			end
 
-			table.insert(widgets, Center{children = teams})
+			table.insert(widgets, Center{children = Array.interleave(teams, '&nbsp;• ')})
 		end
 
 		if not String.isEmpty(args.map1) then
@@ -330,16 +328,14 @@ function CustomLeague:_checkMapInformation(name, link, game)
 end
 
 ---@param maps {link: string, name: string?, mode: string?, image: string?}[]
----@return table
+---@return Renderable[]
 function CustomLeague:_displayMaps(maps)
-	local mapDisplay = function(map)
-		return tostring(NoWrap{children = Page.makeInternalLink({}, (map.name or map.link) .. (map.mode or ''), map.link)})
-	end
-
-	return {table.concat(
-		Table.mapValues(maps, function(map) return mapDisplay(map) end),
+	return Array.interleave(
+		Array.map(maps, function(map)
+			return NoWrap{children = Page.makeInternalLink({}, (map.name or map.link) .. (map.mode or ''), map.link)}
+		end),
 		'&nbsp;• '
-	)}
+	)
 end
 
 ---@param args table

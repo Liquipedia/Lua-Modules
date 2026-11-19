@@ -81,10 +81,10 @@ function CustomInjector:parse(id, widgets)
 			local maps = {}
 
 			for _, map in ipairs(caller:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(NoWrap{children = PageLink.makeInternalLink({}, map, map .. game)}))
+				table.insert(maps, NoWrap{children = PageLink.makeInternalLink({}, map, map .. game)})
 			end
 			table.insert(widgets, Title{children = 'Maps'})
-			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Center{children = Array.interleave(maps, '&nbsp;• ')})
 		end
 	elseif id == 'liquipediatier' then
 		if caller.data.publishertier then

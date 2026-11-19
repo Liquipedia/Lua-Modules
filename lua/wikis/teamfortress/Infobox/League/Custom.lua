@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local PageLink = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
@@ -56,10 +57,10 @@ function CustomInjector:parse(id, widgets)
 			local maps = {}
 
 			for _, map in ipairs(self.caller:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(NoWrap{children = PageLink.makeInternalLink(map)}))
+				table.insert(maps, NoWrap{children = PageLink.makeInternalLink(map)})
 			end
 			table.insert(widgets, Title{children = 'Maps'})
-			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Center{children = Array.interleave(maps, '&nbsp;• ')})
 		end
 	end
 	return widgets

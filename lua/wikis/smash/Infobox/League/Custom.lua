@@ -175,19 +175,19 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		local makeStage = function(stage)
-			return tostring(NoWrap{children = stage})
+			return NoWrap{children = stage}
 		end
 
 		local singles = Array.map(league:getAllArgsForBase(args, 's_stage'), makeStage)
 		if #singles > 0 then
 			table.insert(widgets, Title{children = 'Singles Stages'})
-			table.insert(widgets, Center{children = {table.concat(singles, '&nbsp;• ')}})
+			table.insert(widgets, Center{children = Array.interleave(singles, '&nbsp;• ')})
 		end
 
 		local doubles = Array.map(league:getAllArgsForBase(args, 'd_stage'), makeStage)
 		if #doubles > 0 then
 			table.insert(widgets, Title{children = 'Doubles Stages'})
-			table.insert(widgets, Center{children = {table.concat(doubles, '&nbsp;• ')}})
+			table.insert(widgets, Center{children = Array.interleave(doubles, '&nbsp;• ')})
 		end
 	elseif id == 'dates' then
 		return {

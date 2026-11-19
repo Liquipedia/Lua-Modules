@@ -51,12 +51,12 @@ function CustomInjector:parse(id, widgets)
 		end
 	elseif id == 'customcontent' then
 		local maps = Array.map(self.caller:getAllArgsForBase(args, 'bg'), function(map)
-			return tostring(NoWrap{children = PageLink.makeInternalLink(map)})
+			return NoWrap{children = PageLink.makeInternalLink(map)}
 		end)
 
 		if #maps > 0 then
 			table.insert(widgets, Title{children = 'Battlegrounds'})
-			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Center{children = Array.interleave(maps, '&nbsp;• ')})
 		end
 	end
 

@@ -78,14 +78,13 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
 			local game = String.isNotEmpty(args.game) and ('/' .. args.game) or ''
-			local maps = {}
-
-			for _, map in ipairs(self.caller:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(NoWrap{children = Page.makeInternalLink({}, map, map .. game)}))
-			end
-			table.sort(maps)
+			local mapNames = self.caller:getAllArgsForBase(args, 'map')
+			table.sort(mapNames)
+			local maps = Array.map(mapNames, function(map)
+				return NoWrap{children = Page.makeInternalLink({}, map, map .. game)}
+			end)
 			table.insert(widgets, Title{children = 'Maps'})
-			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Center{children = Array.interleave(maps, '&nbsp;• ')})
 		end
 	elseif id == 'gamesettings' then
 		table.insert(widgets, Cell{
