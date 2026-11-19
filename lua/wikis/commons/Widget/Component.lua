@@ -108,6 +108,7 @@ ComponentCore.ComponentMT = {
 ---@param defaultProps P? -- May not contain table values
 ---@return Component<P>
 function ComponentCore.component(renderFunction, defaultProps)
+	assert(type(renderFunction) == 'function', 'renderFunction must be a function')
 	---@diagnostic disable-next-line: return-type-mismatch
 	return setmetatable({
 		renderFn = renderFunction,
