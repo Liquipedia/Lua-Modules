@@ -117,7 +117,7 @@ function MatchTickerTournamentInfo.render(props)
 		},
 		children = WidgetUtil.collect(
 			MatchTickerTournamentInfo.buildTournamentIcons(
-				tournament, tournamentLink, props.hideTournament, props.displayGameIcons
+				tournament, tournamentLink, not props.hideTournament, props.displayGameIcons
 			),
 			Html.Span{
 				classes = {'match-info-tournament-wrapper'},
