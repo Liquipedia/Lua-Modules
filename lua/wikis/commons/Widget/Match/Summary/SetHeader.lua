@@ -18,7 +18,7 @@ local Div = Html.Div
 
 local WinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLossIndicator')
 
----@param props {set: MatchGroupUtilSubgroup}
+---@param props {set: MatchGroupUtilSubgroup, useGameScores: boolean?}
 ---@return VNode?
 local function MatchSetHeader(props)
 	-- TODO: Move logic elsewhere in the future
@@ -37,7 +37,12 @@ local function MatchSetHeader(props)
 	local scoreLeft, scoreRight = 0, 0
 	if isStarted then
 		Array.forEach(set.games, function(game)
-			if game.winner == 1 then
+			local gameScore1 = props.useGameScores and game.scores and tonumber(game.scores[1])
+			local gameScore2 = props.useGameScores and game.scores and tonumber(game.scores[2])
+			if (gameScore1 and gameScore1 >= 0) or (gameScore2 and gameScore2 >= 0) then
+				scoreLeft = scoreLeft + (gameScore1 and gameScore1 >= 0 and gameScore1 or 0)
+				scoreRight = scoreRight + (gameScore2 and gameScore2 >= 0 and gameScore2 or 0)
+			elseif game.winner == 1 then
 				scoreLeft = scoreLeft + 1
 			elseif game.winner == 2 then
 				scoreRight = scoreRight + 1

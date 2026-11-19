@@ -44,10 +44,14 @@ function MatchFunctions.extractMaps(match, opponents)
 end
 
 ---@param maps table[]
----@return fun(opponentIndex: integer): integer?
+---@return fun(opponentIndex: integer): number?
 function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return Array.reduce(Array.map(maps, function(map)
+			local mapScore = map.scores and tonumber(map.scores[opponentIndex])
+			if mapScore and mapScore >= 0 then
+				return mapScore
+			end
 			return (map.winner == opponentIndex and 1 or map.winner == 0 and 0.5 or 0)
 		end), Operator.add)
 	end
