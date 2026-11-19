@@ -134,7 +134,7 @@ function MatchTickerController.parseConfig(args)
 		recent = Logic.readBool(args.recent),
 		upcoming = Logic.readBool(args.upcoming),
 		ongoing = Logic.readBool(args.ongoing),
-		onlyExact = Logic.readBool(Logic.emptyOr(args.onlyExact, true)),
+		onlyExact = Logic.nilOr(Logic.readBoolOrNil(args.onlyExact), true),
 		enteredOpponentOnLeft = hasOpponent and Logic.readBool(args.enteredOpponentOnLeft or hasOpponent),
 		showInfoForEmptyResults = Logic.readBool(args.showInfoForEmptyResults),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
