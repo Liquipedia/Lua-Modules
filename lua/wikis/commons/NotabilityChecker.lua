@@ -12,338 +12,244 @@ local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local MathUtil = Lua.import('Module:MathUtil')
-local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
-local Template = Lua.import('Module:Template')
+local Operator = Lua.import('Module:Operator')
 local Tier = Lua.import('Module:Tier/Custom')
 
+local ResultsTable = Lua.import('Module:ResultsTable/Custom')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
+
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
+---@class NotabilityCheckerPlacementPoints
+---@field maxPlacement integer? applies to all remaining placements if omitted
+---@field points number
+
+---A number is the points for first place, reduced by `placementDropOff` for lower placements.
+---A list awards fixed points per placement range; placements beyond the last range get 0.
+---@alias NotabilityCheckerTierTypePoints number|NotabilityCheckerPlacementPoints[]
+
+---@class NotabilityCheckerTierConfig
+---@field ignoreDateLoss boolean?
+---@field points table<string, NotabilityCheckerTierTypePoints> keyed by tier type identifier, `general` if none
 
 ---@class NotabilityCheckerConfig
----@field MAX_NUMBER_OF_PARTICIPANTS integer?
----@field MAX_NUMBER_OF_COACHES integer
----@field NOTABILITY_THRESHOLD_MIN number
----@field NOTABILITY_THRESHOLD_NOTABLE number
----@field PLACEMENT_LIMIT integer
----@field PLACEMENT_QUERY string?
----@field TIER_TYPE_GENERAL string
----@field TIER_TYPE_QUALIFIER string
----@field TIER_TYPE_WEEKLY string
----@field TIER_TYPE_MONTHLY string
----@field TIER_TYPE_MISC string
----@field TIER_TYPE_SHOWMATCH string
----@field adjustScoreForMode fun(score: number, mode: string): number
----@field placementDropOffFunction fun(tier: string|integer, tierType: string): NotabilityCheckerDropOffFunction
----@field weights NotabilityCheckerWeight[]
-
----@alias NotabilityCheckerDropOffFunction fun(score: number, placement: number): number
-
----@class NotabilityCheckerWeight
----@field tier integer
----@field options {dataLossIgnored: boolean?}
----@field tiertype {name: string, points: number}[]
+---@field thresholds {discussion: number, notable: number}
+---@field maxParticipants integer?
+---@field maxCoaches integer
+---@field modeMultipliers table<string, number>?
+---@field placementDropOff table<string, number>? exponent by tier type identifier, with a `default` fallback
+---@field tiers table<integer, NotabilityCheckerTierConfig>
+---@field modeTiers table<string, table<integer, NotabilityCheckerTierConfig>>? replaces `tiers` for that mode
 
 ---@type NotabilityCheckerConfig
 local Config = Lua.import('Module:NotabilityChecker/config')
 
-local NotabilityChecker = {}
-
+local GENERAL_TIER_TYPE = 'general'
 local NOW = DateExt.getCurrentTimestamp()
 local SECONDS_IN_YEAR = DateExt.daysToSeconds(365.2425)
-local MAX_NUMBER_OF_PARTICIPANTS = Config.MAX_NUMBER_OF_PARTICIPANTS or Info.config.defaultMaxPlayersPerPlacement or 10
+local MAX_NUMBER_OF_PARTICIPANTS = Config.maxParticipants or Info.config.defaultMaxPlayersPerPlacement or 10
+local FORFEIT_PLACEMENTS = {w = 1, l = 2}
 
-NotabilityChecker.LOGGING = true
+local NotabilityChecker = {}
 
 ---@param args table
 ---@return VNode
 function NotabilityChecker.run(args)
+	local team = Logic.nilIfEmpty(args.team)
+	local people = Array.mapIndexes(function(index)
+		return Logic.nilIfEmpty(args['player' .. index])
+	end)
 
-	local weight = 0
-	local output = {}
-	local isTeamResult = args.team ~= nil
+	local teamResult = team and NotabilityChecker._runForOpponent(team, 'team') or nil
+	local personResults = Array.map(people, function(person)
+		return NotabilityChecker._runForOpponent(person, 'solo')
+	end)
 
-	if args.player1 then
-		local people = {}
-		local index = 1
-		while not String.isEmpty(args['player' .. tostring(index)]) do
-			local person = args['player' .. tostring(index)]
-			table.insert(people, person)
-			index = index + 1
-		end
-		weight, output = NotabilityChecker._calculateRosterNotability(args.team, people)
-	elseif args.team then
-		weight, output = NotabilityChecker._runForTeam(args.team)
+	local weight = (teamResult and teamResult.weight or 0)
+	if #personResults > 0 then
+		weight = weight + MathUtil.sum(Array.map(personResults, Operator.property('weight'))) / #personResults
 	end
 
-	Array.appendWith(
-		output,
+	return Html.Fragment{children = WidgetUtil.collect(
+		teamResult and Html.H3{children = 'Team Results'} or nil,
+		teamResult and teamResult.display or nil,
+		#personResults > 0 and Html.H3{children = 'People Results'} or nil,
+		Array.map(personResults, Operator.property('display')),
 		Html.H3{children = 'Summary'},
-		Html.B{children = 'Final weight:'},
-		' ',
-		tostring(weight),
-		'\n\n',
-		'This means this ',
-		(isTeamResult and 'team' or 'person'),
-		' is '
-	)
-
-	if weight >= Config.NOTABILITY_THRESHOLD_NOTABLE then
-		table.insert(output, Html.B{children = 'NOTABLE'})
-	elseif weight >= Config.NOTABILITY_THRESHOLD_MIN then
-		table.insert(output, Html.B{children = 'OPEN FOR DISCUSSION'})
-	else
-		table.insert(output, Html.B{children = 'NOT NOTABLE'})
-	end
-
-	return Html.Fragment{children = output}
+		Html.P{children = {Html.B{children = 'Final weight:'}, ' ', MathUtil.round(weight, 2)}},
+		Html.P{children = {
+			'This means this ',
+			team and 'team' or 'person',
+			' is ',
+			Html.B{children = NotabilityChecker._verdict(weight)},
+		}}
+	)}
 end
 
 ---@private
----@param team string
----@return integer
----@return Renderable[]
-function NotabilityChecker._runForTeam(team)
-	team = mw.ext.TeamLiquidIntegration.resolve_redirect(team)
-	local weight = NotabilityChecker._calculateTeamNotability(team)
+---@param weight number
+---@return string
+function NotabilityChecker._verdict(weight)
+	if weight >= Config.thresholds.notable then
+		return 'NOTABLE'
+	elseif weight >= Config.thresholds.discussion then
+		return 'OPEN FOR DISCUSSION'
+	end
+	return 'NOT NOTABLE'
+end
 
-	local output = {
-		Html.H3{children = 'Team Results'},
-		'\n',
-		-- TODO: Replace with direct ResultsTable call
-		Template.safeExpand(
-			mw.getCurrentFrame(),
-			'NotabilityTeamMatchesTable',
-			{title = team}
-		),
-		'\n',
-		Html.B{children = 'Weight:'},
-		' ',
-		tonumber(weight)
+---@private
+---@param name string
+---@param queryType 'team'|'solo'
+---@return {weight: number, display: VNode}
+function NotabilityChecker._runForOpponent(name, queryType)
+	name = mw.ext.TeamLiquidIntegration.resolve_redirect(name)
+	local conditions = queryType == 'team'
+		and NotabilityChecker._buildTeamConditions(name)
+		or NotabilityChecker._buildPersonConditions(name)
+	local placements = NotabilityChecker._queryPlacements(conditions)
+	local weight = MathUtil.sum(Array.map(placements, NotabilityChecker.calculatePlacementWeight))
+
+	return {
+		weight = weight,
+		display = Html.Div{children = {
+			GeneralCollapsible{
+				title = 'Tournaments found featuring ' .. name,
+				shouldCollapse = true,
+				children = ResultsTable.results{
+					querytype = queryType,
+					team = queryType == 'team' and name or nil,
+					player = queryType == 'solo' and name or nil,
+					hideresult = true,
+					data = placements,
+				},
+			},
+			Html.P{children = {
+				Link{link = name},
+				' ',
+				Html.B{children = 'Weight:'},
+				' ',
+				MathUtil.round(weight, 2),
+			}},
+		}},
 	}
-
-	return weight, output
 end
 
 ---@private
 ---@param team string
----@param people string[]
----@return number
----@return Renderable[]
-function NotabilityChecker._calculateRosterNotability(team, people)
-	local weight = 0
-	---@type Renderable[]
-	local output = {}
-	if team then
-		local teamWeight
-		teamWeight, output = NotabilityChecker._runForTeam(team)
-		weight = weight + teamWeight
-	end
-
-	table.insert(output, Html.H3{children = 'People Results'})
-
-	local average = 0
-	for _, person in pairs(people) do
-		local personWeight = NotabilityChecker._calculatePersonNotability(person)
-		Array.appendWith(
-			output,
-			'\n',
-			-- TODO: Replace with direct ResultsTable call
-			Template.safeExpand(
-				mw.getCurrentFrame(),
-				'NotabilityPlayerMatchesTable',
-				{title = person}
-			),
-			'\n',
-			Html.B{children = 'Person:'},
-			' ',
-			Link{link = person},
-			' ',
-			Html.B{children = 'Weight:'},
-			' ',
-			tonumber(personWeight),
-			'\n\n'
-		)
-		average = average + tonumber(personWeight or 0)
-	end
-
-	average = average / Table.size(people)
-	weight = weight + average
-
-	return weight, output
-end
-
----@private
----@param team string
----@return integer
-function NotabilityChecker._calculateTeamNotability(team)
-	local data = mw.ext.LiquipediaDB.lpdb('placement', {
-		limit = Config.PLACEMENT_LIMIT,
-		conditions = '[[opponentname::' .. team .. ']]',
-		query = 'pagename, tournament, date, placement, liquipediatier, liquipediatiertype, extradata, mode',
-	})
-
-	return NotabilityChecker._calculateWeight(data)
+---@return ConditionTree
+function NotabilityChecker._buildTeamConditions(team)
+	return ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('opponentname'), Comparator.eq, team),
+	}
 end
 
 ---@private
 ---@param person string
----@return integer
-function NotabilityChecker._calculatePersonNotability(person)
-	person = mw.ext.TeamLiquidIntegration.resolve_redirect(person)
+---@return ConditionTree
+function NotabilityChecker._buildPersonConditions(person)
+	local names = Array.unique{person, (person:gsub(' ', '_'))}
+	local columns = Array.extend(
+		'opponentname',
+		Array.map(Array.range(1, MAX_NUMBER_OF_PARTICIPANTS), function(index)
+			return 'opponentplayers_p' .. index
+		end),
+		Array.map(Array.range(1, Config.maxCoaches), function(index)
+			return 'opponentplayers_c' .. index
+		end)
+	)
 
-	-- Add conditions.
-	-- We check for names with spaces, then names with underscores.
-	local conditions = {}
-	for _, name in pairs({person, (person:gsub(' ', '_'))}) do
-		table.insert(conditions, '[[opponentname::' .. name .. ']]')
-		for i = 1, MAX_NUMBER_OF_PARTICIPANTS do
-			table.insert(conditions, '[[opponentplayers_p' .. tostring(i) .. '::' .. name .. ']]')
-		end
-		for i = 1, Config.MAX_NUMBER_OF_COACHES do
-			table.insert(conditions, '[[opponentplayers_c' .. tostring(i) .. '::' .. name .. ']]')
-		end
-	end
-
-	local data = mw.ext.LiquipediaDB.lpdb('placement', {
-		limit = Config.PLACEMENT_LIMIT,
-		conditions = table.concat(conditions, ' OR '),
-		query = Config.PLACEMENT_QUERY,
-	})
-	return NotabilityChecker._calculateWeight(data)
+	return ConditionTree(BooleanOperator.any):add(Array.map(columns, function(column)
+		return ConditionUtil.anyOf(ColumnName(column), names)
+	end))
 end
 
 ---@private
----@param placementData placement[]
----@return integer
-function NotabilityChecker._calculateWeight(placementData)
-	if type(placementData) ~= 'table' or placementData[1] == nil then
-		return 0
-	end
-
-	local weights = Array.map(placementData, function (placement)
-		if Logic.isEmpty(placement.placement) then
-			return nil
-		end
-		if NotabilityChecker.LOGGING then
-			mw.log('Tournament: ' .. placement.tournament)
-		end
-
-		return NotabilityChecker.calculateTournament(
-			placement.liquipediatier, placement.liquipediatiertype, placement.placement,
-			placement.date, placement.extradata.notabilitymod, placement.mode
-		)
+---@param conditions ConditionTree
+---@return placement[]
+function NotabilityChecker._queryPlacements(conditions)
+	local placements = {}
+	Lpdb.executeMassQuery('placement', {
+		conditions = conditions:toString(),
+		order = 'date desc',
+	}, function(placement)
+		table.insert(placements, placement)
 	end)
-
-	return MathUtil.sum(weights)
+	return placements
 end
 
-function NotabilityChecker.calculateTournament(tier, tierType, placement, date, notabilityMod, mode)
-	local dateLossModifier = NotabilityChecker._calculateDateLoss(date)
-	local notabilityModifier = NotabilityChecker._parseNotabilityMod(notabilityMod)
-	local parsedTier = Tier.toIdentifier(tier)
-	local parsedTierType = Tier.toIdentifier(tierType)
-
-	local weight = NotabilityChecker._calculateWeightForTournament(
-		parsedTier, parsedTierType, placement, dateLossModifier, notabilityModifier, mode
-	)
-
-	if NotabilityChecker.LOGGING then
-		mw.log('weight: ' .. weight,
-			'mod: ' .. notabilityModifier,
-			'mode: ' .. mode
-		)
+---@param placement placement
+---@return number
+function NotabilityChecker.calculatePlacementWeight(placement)
+	local mode = (placement.mode or ''):lower()
+	local tiers = (Config.modeTiers or {})[mode] or Config.tiers
+	local tierConfig = tiers[Tier.toIdentifier(placement.liquipediatier)]
+	local placementNumber = NotabilityChecker._parsePlacement(placement.placement)
+	if not tierConfig or not placementNumber then
+		return 0
 	end
 
-	return weight
+	local tierType = tostring(Tier.toIdentifier(placement.liquipediatiertype) or GENERAL_TIER_TYPE)
+	local points = NotabilityChecker._placementPoints(tierConfig.points[tierType], tierType, placementNumber)
+	local dateLoss = tierConfig.ignoreDateLoss and 1 or NotabilityChecker._dateLoss(placement.date)
+	local notabilityMod = tonumber((placement.extradata or {}).notabilitymod) or 1
+	local modeMultiplier = (Config.modeMultipliers or {})[mode] or 1
+
+	return points * notabilityMod * modeMultiplier / dateLoss
 end
 
-function NotabilityChecker._calculateWeightForTournament(tier, tierType, placement, dateLoss, notabilityMod, mode)
-	if Logic.isEmpty(tier) then
-		return 0
+---@private
+---@param tierTypePoints NotabilityCheckerTierTypePoints?
+---@param tierType string
+---@param placement integer
+---@return number
+function NotabilityChecker._placementPoints(tierTypePoints, tierType, placement)
+	if type(tierTypePoints) == 'number' then
+		local dropOff = Config.placementDropOff or {}
+		return tierTypePoints / placement ^ (dropOff[tierType] or dropOff.default or 0)
 	end
 
-	local weightForTier = Array.find(
-		Config.weights, function(tierWeights) return tierWeights['tier'] == tier end
-		)
-
-	if not weightForTier then
-		return 0
-	end
-
-	local tierPoints = (Array.find(
-		weightForTier['tiertype'],
-		function(pointsForType)
-			return pointsForType['name'] == (tierType or Config.TIER_TYPE_GENERAL)
-		end
-	) or {}).points
-
-	if not tierPoints then
-		return 0
-	end
-
-	local placementDropOffFunction = Config.placementDropOffFunction(tier, tierType)
-
-	local placementValue = NotabilityChecker._preparePlacement(placement)
-
-	if placementValue == nil then
-		return 0
-	end
-
-	local options = weightForTier['options']
-	if options ~= nil and options['dateLossIgnored'] == true then
-		dateLoss = 1
-	end
-
-	local weight = notabilityMod * (tierPoints / dateLoss)
-	weight = Config.adjustScoreForMode(weight, mode)
-
-	return placementDropOffFunction(weight, placementValue)
+	local range = Array.find(tierTypePoints or {}, function(placementPoints)
+		return placementPoints.maxPlacement == nil or placement <= placementPoints.maxPlacement
+	end)
+	return range and range.points or 0
 end
 
-function NotabilityChecker._preparePlacement(placement)
+---Parses the upper bound of a placement, e.g. `3-4` -> 3, and treats forfeit wins/losses as 1st/2nd
+---@private
+---@param placement string?
+---@return integer?
+function NotabilityChecker._parsePlacement(placement)
 	if Logic.isEmpty(placement) then
-		return nil
+		return
 	end
-
+	---@cast placement -nil
 	placement = placement:lower()
-
-	-- Deal with forfeits
-	if placement == 'l' then
-		placement = '2'
-	elseif placement == 'w' then
-		placement = '1'
-	end
-
-	if string.find(placement, '-', 1, true) then
-		local one, _ = placement:match('([^-]+)-([^-]+)')
-		placement = tonumber(one)
-	else
-		placement = tonumber(placement)
-	end
-
-	return placement
+	return FORFEIT_PLACEMENTS[placement] or tonumber((placement:match('^([^-]+)')))
 end
 
-function NotabilityChecker._parseNotabilityMod(notabilityMod)
-	if Logic.isEmpty(notabilityMod) or notabilityMod == 0 then
-		return 1
-	end
-
-	return tonumber(notabilityMod)
-end
-
-function NotabilityChecker._calculateDateLoss(date)
-	local timestamp = DateExt.readTimestamp(date)
-	local differenceSeconds = NOW - timestamp
-
-	-- If given received a date in the future, set the modifier from date to 1
-	-- This can happen due to editor mistake on a prizepool, or due to incorrectly setup prizepool/teamcard interaction
+---Each started year since the tournament divides its weight by one more
+---@private
+---@param date string
+---@return integer
+function NotabilityChecker._dateLoss(date)
+	local differenceSeconds = NOW - (DateExt.readTimestamp(date) or NOW)
+	-- Future dates come from editor mistakes in prize pools
 	if differenceSeconds < 0 then
 		return 1
 	end
-
 	return math.floor(differenceSeconds / SECONDS_IN_YEAR) + 1
 end
 
