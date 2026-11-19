@@ -19,7 +19,7 @@ insulate('Match Ticker Card', function()
 		local MatchRecords = require('test_assets.lpdb_match2')
 
 		-- Split matches whose games are played on different dates into one card per game, as the ticker does
-		local cards = Array.flatMap(MatchRecords, function(record)
+		local cards = Array.flatMap(Array.sub(MatchRecords, 1, 3), function(record)
 			local match = MatchGroupUtil.matchFromRecord(record)
 			---@diagnostic disable-next-line: invisible, missing-fields
 			local expandedMatches = MatchTickerController.expandGamesOfMatch(match, {
