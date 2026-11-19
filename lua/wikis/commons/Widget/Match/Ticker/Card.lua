@@ -15,7 +15,7 @@ local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
 local MatchTickerCardOpponents = Lua.import('Module:Widget/Match/Ticker/Opponents')
-local TournamentBar = Lua.import('Module:Widget/Match/TournamentBar')
+local TournamentInfo = Lua.import('Module:Widget/Match/Ticker/TournamentInfo')
 local MatchButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -98,11 +98,7 @@ function MatchTickerCard.buildTournamentInfoBar(props)
 			'match-info-tournament',
 			highlight and HIGHLIGHT_CLASS or nil
 		},
-		children = TournamentBar{
-			match = match,
-			gameData = props.gameData,
-			displayGameIcon = props.displayGameIcons,
-		},
+		children = TournamentInfo(props),
 	}
 end
 
