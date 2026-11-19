@@ -264,11 +264,12 @@ function BroadcasterCard.setLPDB(caster, status)
 		extradata.showmatchname = smName
 		extradata.showmatch = 'true'
 	end
-	if Variables.varDefault('tournament_status') then
-		extradata.status = status ~= 'save' and Variables.varDefault('tournament_status') or ''
-	end
 
 	local tournamentContext = Tournament.partialTournamentFromContext()
+	if tournamentContext.status then
+		extradata.status = status ~= 'save' and tournamentContext.status or ''
+	end
+
 
 	extradata.liquipediatier = tournamentContext.liquipediaTier
 	extradata.liquipediatiertype = tournamentContext.liquipediaTierType
@@ -297,7 +298,7 @@ end
 function BroadcasterCard.getWeight()
 	local tournamentContext = Tournament.partialTournamentFromContext()
 
-	local tPrizePool = Variables.varDefault('tournament_prizepoolusd') or 1
+	local tPrizePool = tournamentContext.prizepoolusd or 1
 	local tier = tournamentContext.liquipediaTier
 	local tierType = tournamentContext.liquipediaTierType
 

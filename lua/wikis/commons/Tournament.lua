@@ -43,6 +43,9 @@ local TOURNAMENT_PHASE = {
 ---@field type string?
 ---@field mode string?
 
+---@class ContextualTournament: StandardTournamentPartial
+---@field [string] string?
+
 ---@class StandardTournament: StandardTournamentPartial
 ---@field startDate {year: integer, month: integer?, day: integer?, timestamp: integer?}?
 ---@field endDate {year: integer, month: integer?, day: integer?, timestamp: integer?}?
@@ -110,28 +113,45 @@ local TournamentMT = {
 	end
 }
 
----@return StandardTournamentPartial
-Tournament.partialTournamentFromContext = FnUtil.memoize(function ()
-	local fullName = Variables.varDefault('tournament_name')
-	local parent = Variables.varDefault('tournament_parent')
-	local tickerName = Variables.varDefault('tournament_tickername')
+---@param varName string
+---@return string?
+local getTournamentContextVariable = FnUtil.memoize(function (varName)
+	return Variables.varDefault('tournament_' .. varName)
+end)
 
-	return {
-		displayName = Logic.emptyOr(tickerName, fullName) or (parent or ''):gsub('_', ' '),
-		tickerName = tickerName,
-		shortName = Variables.varDefault('tournament_shortname'),
-		fullName = fullName,
-		pageName = parent,
-		liquipediaTier = Variables.varDefault('tournament_liquipediatier'),
-		liquipediaTierType = Variables.varDefault('tournament_liquipediatiertype'),
-		icon = Variables.varDefault('tournament_icon'),
-		iconDark = Variables.varDefault('tournament_icondark'),
-		series = Variables.varDefault('tournament_series'),
-		game = Variables.varDefault('tournament_game'),
-		publisherTier = Variables.varDefault('tournament_publishertier'),
-		type = Variables.varDefault('tournament_type'),
-		mode = Variables.varDefault('tournament_mode'),
-	}
+---@return ContextualTournament
+Tournament.partialTournamentFromContext = FnUtil.memoize(function ()
+	local fullName = getTournamentContextVariable('name')
+	local parent = getTournamentContextVariable('parent')
+	local tickerName = getTournamentContextVariable('tickername')
+
+	return setmetatable(
+		{
+			displayName = Logic.emptyOr(tickerName, fullName) or (parent or ''):gsub('_', ' '),
+			tickerName = tickerName,
+			shortName = getTournamentContextVariable('shortname'),
+			fullName = fullName,
+			pageName = parent,
+			liquipediaTier = getTournamentContextVariable('liquipediatier'),
+			liquipediaTierType = getTournamentContextVariable('liquipediatiertype'),
+			icon = getTournamentContextVariable('icon'),
+			iconDark = getTournamentContextVariable('icondark'),
+			series = getTournamentContextVariable('series'),
+			game = getTournamentContextVariable('game'),
+			publisherTier = getTournamentContextVariable('publishertier'),
+			type = getTournamentContextVariable('type'),
+			mode = getTournamentContextVariable('mode'),
+		},
+		{
+			__index = function (tbl, key)
+				local value = getTournamentContextVariable(key)
+				if value then
+					rawset(tbl, key, value)
+				end
+				return value
+			end
+		}
+	)
 end)
 
 ---@param match MatchGroupUtilMatch

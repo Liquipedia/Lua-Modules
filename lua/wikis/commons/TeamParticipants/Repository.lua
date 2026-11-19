@@ -93,8 +93,8 @@ function TeamParticipantsRepository.save(participant)
 			icon = tournamentContext.icon or '',
 			icondark = tournamentContext.iconDark or '',
 			game = tournamentContext.game or '',
-			startdate = Variables.varDefault('tournament_startdate') or '',
-			date = Variables.varDefault('tournament_enddate') or '',
+			startdate = tournamentContext.startdate or '',
+			date = tournamentContext.enddate or '',
 		}
 	end
 
