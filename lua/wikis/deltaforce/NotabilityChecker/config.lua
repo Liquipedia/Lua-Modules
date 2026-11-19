@@ -38,7 +38,6 @@ local WARFARE_TIERS = {
 ---@type NotabilityCheckerConfig
 return {
 	thresholds = {discussion = 30, notable = 30},
-	maxParticipants = 20,
 	maxCoaches = 3,
 	tiers = {
 		[1] = {

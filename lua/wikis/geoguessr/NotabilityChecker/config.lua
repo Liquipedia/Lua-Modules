@@ -8,7 +8,6 @@
 ---@type NotabilityCheckerConfig
 return {
 	thresholds = {discussion = 15, notable = 15},
-	maxParticipants = 7,
 	maxCoaches = 2,
 	tiers = {
 		[1] = {

@@ -12,7 +12,6 @@ local WIN_ONLY = {
 ---@type NotabilityCheckerConfig
 return {
 	thresholds = {discussion = 10, notable = 10},
-	maxParticipants = 10,
 	maxCoaches = 2,
 	tiers = {
 		[1] = {

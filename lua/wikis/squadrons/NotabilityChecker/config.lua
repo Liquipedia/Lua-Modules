@@ -8,7 +8,6 @@
 ---@type NotabilityCheckerConfig
 return {
 	thresholds = {discussion = 400, notable = 600},
-	maxParticipants = 10,
 	maxCoaches = 5,
 	placementDropOff = {
 		default = 1,

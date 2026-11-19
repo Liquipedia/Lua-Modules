@@ -23,7 +23,6 @@ local TIER_2_POINTS = {
 ---@type NotabilityCheckerConfig
 return {
 	thresholds = {discussion = 20, notable = 25},
-	maxParticipants = 10,
 	maxCoaches = 2,
 	tiers = {
 		[1] = {

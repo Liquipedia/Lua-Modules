@@ -46,7 +46,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class NotabilityCheckerConfig
 ---@field thresholds {discussion: number, notable: number}
----@field maxParticipants integer?
 ---@field maxCoaches integer
 ---@field modeMultipliers table<string, number>?
 ---@field placementDropOff table<string, number>? exponent by tier type identifier, with a `default` fallback
@@ -59,7 +58,7 @@ local Config = Lua.import('Module:NotabilityChecker/config')
 local GENERAL_TIER_TYPE = 'general'
 local NOW = DateExt.getCurrentTimestamp()
 local SECONDS_IN_YEAR = DateExt.daysToSeconds(365.2425)
-local MAX_NUMBER_OF_PARTICIPANTS = Config.maxParticipants or Info.config.defaultMaxPlayersPerPlacement or 10
+local MAX_NUMBER_OF_PARTICIPANTS = Info.config.defaultMaxPlayersPerPlacement or 10
 local FORFEIT_PLACEMENTS = {w = 1, l = 2}
 
 local NotabilityChecker = {}
