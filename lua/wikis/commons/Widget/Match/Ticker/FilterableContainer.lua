@@ -13,9 +13,12 @@ local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
+local Button = Lua.import('Module:Widget/Basic/Button')
 local Component = Lua.import('Module:Widget/Component')
-local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
+local ContentSwitchPill = Lua.import('Module:Widget/ContentSwitch/Pill')
 local Html = Lua.import('Module:Widget/Html')
+local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Panel = Lua.import('Module:Widget/Panel')
 local Switch = Lua.import('Module:Widget/Switch')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
 
@@ -77,51 +80,94 @@ local function MatchTickerContainer(props)
 		)
 	end
 
-	return Html.Div{
-		classes = {'match-section-header'},
-		css = {['padding-top'] = '0.75rem'},
-		children = {
-			ContentSwitch{
-				css = {margin = '0 0.75rem 0.75rem'},
+	return Panel{
+		classes = {
+			'toggle-area',
+			'toggle-area-1',
+			'carousel',
+		},
+		panelAttributes = {
+			['data-toggle-area'] = 1
+		},
+		heading = {
+			Html.Div{children = 'Matches'},
+			ContentSwitchPill{
+				switchGroup = 'matchFiler',
+				defaultActive = 1,
+				size = 'extrasmall',
+				storeValue = true,
 				tabs = {
 					{
 						label = 'Upcoming',
 						value = 'upcoming',
-						content = {
-							Switch{
-								label = 'Show Countdown',
-								switchGroup = 'countdown',
-								storeValue = true,
-								defaultActive = true,
-								css = {margin = '1rem 0', ['justify-content'] = 'center'},
-								content = Html.Div{
-									attributes = {
-										['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
-										['data-filter-groups'] = filterText,
-									},
-									children = callTemplate('upcoming'),
-								}
-							}
-						}
 					},
 					{
 						label = 'Completed',
 						value = 'completed',
-						content = {
-							Html.Div{
-								attributes = {
-									['data-filter-expansion-template'] = buildTemplateExpansionString('recent'),
-									['data-filter-groups'] = filterText,
-								},
-								children = callTemplate('recent'),
-							}
-						}
 					}
+				}
+			},
+			Html.Div{
+				attributes = {
+					['data-toggle-area-content'] = 1,
 				},
-				switchGroup = 'matchFiler',
-				defaultActive = 1,
-			}
+				classes = {'toggle-area-content-active'},
+				children = Switch{
+					label = 'Show Countdown',
+					switchGroup = 'countdown',
+					storeValue = true,
+					defaultActive = true,
+				}
+			},
+			Html.Div{children = {
+				Button{
+					classes = {'carousel-button', 'carousel-button--left'},
+					title = 'Previous',
+					size = 'xs',
+					children = Html.Span{
+						css = {display = 'inline-flex'},
+						children = IconWidget{iconName = 'previous', size = 'xs'}
+					},
+				},
+				Button{
+					classes = {'carousel-button', 'carousel-button--right'},
+					title = 'Next',
+					size = 'xs',
+					children = Html.Span{
+						css = {display = 'inline-flex'},
+						children = IconWidget{iconName = 'next', size = 'xs'}
+					},
+				}
+			}},
 		},
+		children = {
+			Html.Div{
+				attributes = {
+					['data-toggle-area-content'] = 1,
+				},
+				classes = {'toggle-area-content-active'},
+				children = Html.Div{
+					attributes = {
+						['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
+						['data-filter-groups'] = filterText,
+					},
+					children = callTemplate('upcoming'),
+				}
+			},
+			Html.Div{
+				attributes = {
+					['data-toggle-area-content'] = 2,
+				},
+				classes = {'toggle-area-content-inactive'},
+				children = Html.Div{
+					attributes = {
+						['data-filter-expansion-template'] = buildTemplateExpansionString('recent'),
+						['data-filter-groups'] = filterText,
+					},
+					children = callTemplate('recent'),
+				}
+			}
+		}
 	}
 end
 
