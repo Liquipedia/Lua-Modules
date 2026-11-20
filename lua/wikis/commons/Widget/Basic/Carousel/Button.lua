@@ -27,7 +27,10 @@ local DIRECTIONS = {
 ---@param props CarouselButtonWidgetParameters
 ---@return VNode
 local function CarouselButton(props)
-	local config = assert(DIRECTIONS[props.direction], 'CarouselButton: invalid direction "' .. tostring(props.direction) .. '"')
+	local config = assert(
+		DIRECTIONS[props.direction],
+		'CarouselButton: invalid direction "' .. tostring(props.direction) .. '"'
+	)
 
 	return Button{
 		classes = Array.extend({'carousel-button', 'carousel-button--' .. props.direction}, props.classes),
