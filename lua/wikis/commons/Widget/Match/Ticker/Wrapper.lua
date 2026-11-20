@@ -54,14 +54,15 @@ local function MatchTickerWrapper(props)
 		}
 	end
 
-	-- Bare scrollable card list; the surrounding `.carousel` (and its controls) is provided by the caller
+	-- Bare scrollable card list; the surrounding `.carousel` (and its controls) is provided by the caller.
+	-- Item widths are left to the stylesheet, so the caller can switch to a stacked list on small screens.
 	if props.variant == 'carousel' then
 		return Html.Div{
 			classes = props.wrapperClasses,
 			children = Array.extend({header}, CarouselContent{
 				classes = {'match-ticker-carousel'},
 				children = matchCards,
-				itemWidth = '15.625rem',
+				itemWidth = false,
 				gap = '0',
 			}),
 		}

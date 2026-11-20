@@ -329,6 +329,33 @@ Template(s): MatchTicker
 		line-height: 1.5rem;
 	}
 
+	// Tab pill and countdown switch: inline in the header, or a strip above the matches on small screens
+	&__navigation {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+
+		&--body {
+			flex-direction: column;
+			// The bottom border is drawn inside the strip in the design
+			padding: 1rem 1rem 0.9375rem;
+			border-bottom: 1px solid var( --clr-on-surface-light-primary-8 );
+
+			.theme--dark & {
+				border-bottom-color: var( --clr-on-surface-dark-primary-8 );
+			}
+
+			> .switch-pill-container {
+				align-self: stretch;
+			}
+
+			.switch-toggle-label {
+				font-size: 0.875rem;
+				line-height: 1.3125rem;
+			}
+		}
+	}
+
 	// Upcoming / Completed pill, light on the themed header in both themes
 	> .panel-box-heading .switch-pill-container .switch-pill.switch-pill-generic {
 		border-radius: 0.25rem;
@@ -409,8 +436,33 @@ Template(s): MatchTicker
 		overflow: hidden;
 	}
 
+	.match-ticker-carousel .carousel-item {
+		width: 15.625rem;
+	}
+
 	// Adjacent cards share a single divider
 	.match-ticker-carousel .match-ticker-card {
 		border-width: 0 1px 0 0;
+	}
+
+	// Small screens: stacked full-width cards instead of a carousel (same breakpoint as .mobile-only)
+	@media ( max-width: 600px ) {
+		.match-ticker-carousel {
+			flex-direction: column;
+			overflow-x: visible;
+			scroll-snap-type: none;
+
+			.carousel-item {
+				width: auto;
+			}
+
+			.match-ticker-card {
+				border-width: 0 0 1px;
+			}
+
+			.carousel-item:last-child .match-ticker-card {
+				border-bottom-width: 0;
+			}
+		}
 	}
 }

@@ -16,7 +16,7 @@ local Div = Html.Div
 
 ---@class CarouselContentWidgetParameters
 ---@field children Renderable[]
----@field itemWidth string?
+---@field itemWidth string|false? `false` leaves the item width to stylesheets
 ---@field gap string?
 ---@field classes string[]?
 ---@field css table?
@@ -39,7 +39,7 @@ local function CarouselContent(props)
 		children = Array.map(props.children, function(child)
 			return Div{
 				classes = {'carousel-item'},
-				css = {width = props.itemWidth},
+				css = props.itemWidth and {width = props.itemWidth} or nil,
 				children = {child},
 			}
 		end),

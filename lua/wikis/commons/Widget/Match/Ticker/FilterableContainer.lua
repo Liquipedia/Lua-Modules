@@ -140,7 +140,7 @@ local function MatchTickerContainer(props)
 						children = 'Matches',
 					},
 					Html.Div{
-						classes = {'mobile-hide'},
+						classes = {'match-ticker-filterable-container__navigation', 'mobile-hide'},
 						children = {
 							switchPill,
 							countdownSwitch,
@@ -160,8 +160,13 @@ local function MatchTickerContainer(props)
 			},
 		},
 		children = {
+			-- On small screens the tab pill and countdown switch move out of the header into their own strip
 			Html.Div{
-				classes = {'mobile-only'},
+				classes = {
+					'match-ticker-filterable-container__navigation',
+					'match-ticker-filterable-container__navigation--body',
+					'mobile-only',
+				},
 				children = {
 					switchPill,
 					countdownSwitch,
