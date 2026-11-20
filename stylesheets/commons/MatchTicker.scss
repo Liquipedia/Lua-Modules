@@ -303,7 +303,8 @@ Template(s): MatchTicker
 		justify-content: space-between;
 		flex-wrap: wrap;
 		gap: 0.5rem 0.75rem;
-		padding: 0.4375rem 1rem;
+		// The bottom border is drawn inside the 3rem header in the design
+		padding: 0.4375rem 1rem 0.375rem;
 		border-bottom: 1px solid var( --clr-on-surface-light-primary-16 );
 	}
 
@@ -391,6 +392,11 @@ Template(s): MatchTicker
 		border-radius: 0.25rem;
 		background-color: var( --match-ticker-header-control-background-color );
 		color: var( --clr-secondary-100 );
+
+		// The design uses a 1.25rem icon box; the extra-small button would shrink it to ~8px
+		i {
+			font-size: 0.875rem;
+		}
 
 		&.carousel-button--disabled {
 			cursor: default;
