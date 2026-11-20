@@ -35,7 +35,7 @@ local function MainPageMatchTicker(props)
 			},
 			children = Html.Div{
 				classes = {'mobile-only'},
-				Link{ children = 'See more matches', link = props.matchesPortal}
+				children = Link{ children = 'See more matches', link = props.matchesPortal}
 			}
 		} or nil,
 	}
