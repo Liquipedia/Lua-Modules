@@ -293,3 +293,18 @@ Template(s): MatchTicker
 		font-size: 0.6875rem;
 	}
 }
+
+.match-ticker-filterable-container {
+	> .panel-box-body {
+		display: contents;
+	}
+
+	.match-ticker-carousel {
+		:where( [ data-toggle-area-content ] ),
+		:where( [ data-filter-groups ] ),
+		.mw-parser-output,
+		.mw-parser-output > div {
+			display: contents;
+		}
+	}
+}

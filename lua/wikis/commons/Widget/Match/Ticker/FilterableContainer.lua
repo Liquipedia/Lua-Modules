@@ -85,6 +85,7 @@ local function MatchTickerContainer(props)
 			'toggle-area',
 			'toggle-area-1',
 			'carousel',
+			'match-ticker-filterable-container',
 		},
 		panelAttributes = {
 			['data-toggle-area'] = 1
@@ -140,31 +141,33 @@ local function MatchTickerContainer(props)
 				}
 			}},
 		},
-		children = {
-			Html.Div{
-				attributes = {
-					['data-toggle-area-content'] = 1,
-				},
-				classes = {'toggle-area-content-active'},
-				children = Html.Div{
+		children = Html.Div{
+			classes = {'carousel-content', 'match-ticker-carousel'},
+			css = {display = 'contents'},
+			children = {
+				Html.Div{
 					attributes = {
-						['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
-						['data-filter-groups'] = filterText,
+						['data-toggle-area-content'] = 1,
 					},
-					children = callTemplate('upcoming'),
-				}
-			},
-			Html.Div{
-				attributes = {
-					['data-toggle-area-content'] = 2,
+					children = Html.Div{
+						attributes = {
+							['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
+							['data-filter-groups'] = filterText,
+						},
+						children = callTemplate('upcoming'),
+					}
 				},
-				classes = {'toggle-area-content-inactive'},
-				children = Html.Div{
+				Html.Div{
 					attributes = {
-						['data-filter-expansion-template'] = buildTemplateExpansionString('recent'),
-						['data-filter-groups'] = filterText,
+						['data-toggle-area-content'] = 2,
 					},
-					children = callTemplate('recent'),
+					children = Html.Div{
+						attributes = {
+							['data-filter-expansion-template'] = buildTemplateExpansionString('recent'),
+							['data-filter-groups'] = filterText,
+						},
+						children = callTemplate('recent'),
+					}
 				}
 			}
 		}
