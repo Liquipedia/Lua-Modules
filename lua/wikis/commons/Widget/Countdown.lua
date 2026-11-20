@@ -48,7 +48,7 @@ local CountdownWidget = {
 function CountdownWidget.createWrapper(props, hasStreams)
 	local classes = {'timer-object'}
 	local attributes = {
-		['data-format'] = assert(CountdownFormat[props.format], 'Invalid format:' .. props.format),
+		['data-format'] = assert(CountdownFormat[props.format], 'Invalid format: ' .. props.format),
 		['data-hasstreams'] = hasStreams and 'true' or nil,
 		['data-countdown-end-text'] = props.text,
 		['data-separator'] = props.separator,
