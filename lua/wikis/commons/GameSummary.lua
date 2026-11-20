@@ -13,6 +13,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local SummaryHelper = Lua.import('Module:MatchSummary/Base/Ffa')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
+local parser = Lua.requireIfExists('Module:GameSummary/Custom')
 
 ---@param props {bracketId: string, matchId: string, gameIdx: integer}
 ---@return Html
@@ -34,7 +35,7 @@ function CustomGameSummary.getGameByMatchId(props)
 		children = {
 			MatchSummaryWidgets.GameDetails{game = game},
 			MatchSummaryWidgets.Mvp(game.extradata.mvp),
-			SummaryHelper.standardGame(game)
+			SummaryHelper.standardGame(game, parser)
 		}
 	}
 end
