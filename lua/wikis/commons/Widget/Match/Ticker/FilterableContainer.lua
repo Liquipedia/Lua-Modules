@@ -21,6 +21,8 @@ local Panel = Lua.import('Module:Widget/Panel')
 local Switch = Lua.import('Module:Widget/Switch')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
 
+---@alias MatchTickerMatchQueryType 'upcoming'|'recent'
+
 local defaultProps = {
 	limit = 10,
 	module = 'MatchTicker/Custom',
@@ -50,7 +52,7 @@ local function MatchTickerContainer(props)
 
 	local devFlag = FeatureFlag.get('dev')
 
-	---@param type 'upcoming' | 'recent'
+	---@param type MatchTickerMatchQueryType
 	---@return string
 	local function buildTemplateExpansionString(type)
 		return String.interpolate(
@@ -68,7 +70,7 @@ local function MatchTickerContainer(props)
 		)
 	end
 
-	---@param type 'upcoming' |'recent'
+	---@param type MatchTickerMatchQueryType
 	---@return Renderable
 	local function callTemplate(type)
 		local ticker = Lua.import('Module:' .. props.module)
@@ -82,7 +84,7 @@ local function MatchTickerContainer(props)
 	end
 
 	---@param tabIndex integer
-	---@param type 'upcoming' |'recent'
+	---@param type MatchTickerMatchQueryType
 	---@param attributes table<string, string>?
 	---@return VNode
 	local function buildTabContent(tabIndex, type, attributes)
