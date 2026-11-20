@@ -306,6 +306,82 @@ Template(s): MatchTicker
 		// The bottom border is drawn inside the 3rem header in the design
 		padding: 0.4375rem 1rem 0.375rem;
 		border-bottom: 1px solid var( --clr-on-surface-light-primary-16 );
+
+		// Upcoming / Completed pill, light on the themed header in both themes
+		.switch-pill-container .switch-pill.switch-pill-generic {
+			border-radius: 0.25rem;
+
+			&::after {
+				opacity: 1;
+				border-radius: 0.25rem;
+				background-color: var( --match-ticker-header-pill-background-color );
+			}
+
+			.switch-pill-option {
+				font-size: 0.75rem;
+				line-height: 1.125rem;
+				padding: 0.25rem 0.75rem;
+				border-radius: 0.25rem;
+				color: var( --clr-secondary-100 );
+
+				&.switch-pill-option-active {
+					background-color: var( --clr-secondary-100 );
+					outline: 1px solid var( --clr-on-surface-light-primary-16 );
+					outline-offset: -1px;
+					color: var( --clr-secondary-25 );
+				}
+			}
+		}
+
+		// Countdown switch on the themed header
+		.switch-toggle-container .switch-toggle {
+			&-label {
+				font-size: 0.75rem;
+				font-weight: normal;
+				line-height: 1.125rem;
+			}
+
+			.switch-toggle-slider::after {
+				opacity: 1;
+				border-radius: 1.125rem;
+				background-color: var( --clr-on-surface-light-primary-16 );
+			}
+
+			&.switch-toggle-active .switch-toggle-slider {
+				background-color: var( --clr-on-surface-light-primary-40 );
+
+				&::after {
+					background-color: transparent;
+				}
+			}
+		}
+
+		// Carousel controls live in the header instead of floating over the content
+		.carousel-button.button {
+			position: static;
+			transform: none;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 2rem;
+			height: 2rem;
+			padding: 0;
+			border: 0;
+			border-radius: 0.25rem;
+			background-color: var( --match-ticker-header-control-background-color );
+			color: var( --clr-secondary-100 );
+
+			// The design uses a 1.25rem icon box; the extra-small button would shrink it to ~8px
+			i {
+				font-size: 0.875rem;
+			}
+
+			&.carousel-button--disabled {
+				cursor: default;
+				pointer-events: none;
+				background-color: var( --match-ticker-header-control-disabled-background-color );
+			}
+		}
 	}
 
 	&__header-start,
@@ -356,112 +432,36 @@ Template(s): MatchTicker
 		}
 	}
 
-	// Upcoming / Completed pill, light on the themed header in both themes
-	> .panel-box-heading .switch-pill-container .switch-pill.switch-pill-generic {
-		border-radius: 0.25rem;
-
-		&::after {
-			opacity: 1;
-			border-radius: 0.25rem;
-			background-color: var( --match-ticker-header-pill-background-color );
-		}
-
-		.switch-pill-option {
-			font-size: 0.75rem;
-			line-height: 1.125rem;
-			padding: 0.25rem 0.75rem;
-			border-radius: 0.25rem;
-			color: var( --clr-secondary-100 );
-
-			&.switch-pill-option-active {
-				background-color: var( --clr-secondary-100 );
-				outline: 1px solid var( --clr-on-surface-light-primary-16 );
-				outline-offset: -1px;
-				color: var( --clr-secondary-25 );
-			}
-		}
-	}
-
-	// Countdown switch on the themed header
-	> .panel-box-heading .switch-toggle-container {
-		.switch-toggle-label {
-			font-size: 0.75rem;
-			font-weight: normal;
-			line-height: 1.125rem;
-		}
-
-		.switch-toggle .switch-toggle-slider::after {
-			opacity: 1;
-			border-radius: 1.125rem;
-			background-color: var( --clr-on-surface-light-primary-16 );
-		}
-
-		.switch-toggle.switch-toggle-active .switch-toggle-slider {
-			background-color: var( --clr-on-surface-light-primary-40 );
-
-			&::after {
-				background-color: transparent;
-			}
-		}
-	}
-
-	// Carousel controls live in the header instead of floating over the content
-	> .panel-box-heading .carousel-button.button {
-		position: static;
-		transform: none;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		width: 2rem;
-		height: 2rem;
-		padding: 0;
-		border: 0;
-		border-radius: 0.25rem;
-		background-color: var( --match-ticker-header-control-background-color );
-		color: var( --clr-secondary-100 );
-
-		// The design uses a 1.25rem icon box; the extra-small button would shrink it to ~8px
-		i {
-			font-size: 0.875rem;
-		}
-
-		&.carousel-button--disabled {
-			cursor: default;
-			pointer-events: none;
-			background-color: var( --match-ticker-header-control-disabled-background-color );
-		}
-	}
-
 	> .panel-box-body {
 		overflow: hidden;
 	}
 
-	.match-ticker-carousel .carousel-item {
-		width: 15.625rem;
-	}
+	.match-ticker-carousel {
+		.carousel-item {
+			width: 15.625rem;
+		}
 
-	// Adjacent cards share a single divider
-	.match-ticker-carousel .match-ticker-card {
-		border-width: 0 1px 0 0;
-	}
+		// Adjacent cards share a single divider
+		.match-ticker-card {
+			border-width: 0 1px 0 0;
+		}
 
-	// Small screens: stacked full-width cards instead of a carousel (same breakpoint as .mobile-only)
-	@media ( max-width: 600px ) {
-		.match-ticker-carousel {
+		// Small screens: stacked full-width cards instead of a carousel (same breakpoint as .mobile-only)
+		@media ( max-width: 600px ) {
 			flex-direction: column;
 			overflow-x: visible;
 			scroll-snap-type: none;
 
 			.carousel-item {
 				width: auto;
+
+				&:last-child .match-ticker-card {
+					border-bottom-width: 0;
+				}
 			}
 
 			.match-ticker-card {
 				border-width: 0 0 1px;
-			}
-
-			.carousel-item:last-child .match-ticker-card {
-				border-bottom-width: 0;
 			}
 		}
 	}
