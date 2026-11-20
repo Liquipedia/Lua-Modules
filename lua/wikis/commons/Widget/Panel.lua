@@ -18,19 +18,19 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class PanelParameters
 ---@field bodyClass string[]?
----@field bodyStyle table<string, any>?
+---@field bodyStyle HtmlStyleProps?
 ---@field boxId integer?
 ---@field children Renderable|Renderable[]
 ---@field classes string[]?
----@field heading string|Html|Widget
+---@field heading Renderable|Renderable[]
 ---@field headingAttributes table<string, any>?
----@field headingH2 string|Html|Widget?
----@field headingH3 string|Html|Widget?
+---@field headingH2 Renderable|Renderable[]?
+---@field headingH3 Renderable|Renderable[]?
 ---@field padding boolean?
 ---@field panelAttributes table<string, any>?
 
 ---@param props PanelParameters
----@return Widget
+---@return VNode
 local function Panel(props)
 	local boxId = props.boxId
 	local attributes = props.headingAttributes or {}
@@ -54,8 +54,8 @@ local function Panel(props)
 				}
 			} or nil,
 			props.heading,
-			props.headingH2 and Html.H2{children = { props.headingH2 }} or nil,
-			props.headingH3 and Html.H3{children = { props.headingH3 }} or nil
+			props.headingH2 and Html.H2{children = props.headingH2} or nil,
+			props.headingH3 and Html.H3{children = props.headingH3} or nil
 		)
 	}
 
