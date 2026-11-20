@@ -11,10 +11,8 @@ local Array = Lua.import('Module:Array')
 local PatchAuto = Lua.import('Module:Infobox/Extension/PatchAuto')
 local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
-local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
-local SeriesTotalPrize = Lua.import('Module:SeriesTotalPrize')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Tier = Lua.import('Module:Tier/Custom')
@@ -98,12 +96,7 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
-	if id == 'totalprizepool' then
-		if Logic.readBoolOrNil(args.prizepooltot) == false then return {} end
-		return {
-			Cell{name = 'Cumulative Prize Pool', children = {self.caller:_displaySeriesPrizepools()}},
-		}
-	elseif id == 'custom' then
+	if id == 'custom' then
 		Array.appendWith(widgets,
 			Cell{name = 'Game version', children = self.caller:_getGameVersion()},
 			Cell{name = 'Server', children = {args.server}},
@@ -113,21 +106,6 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	return widgets
-end
-
----@return string?
-function CustomSeries:_displaySeriesPrizepools()
-	local args = self.args
-	local seriesTotalPrizeInput = Json.parseIfString(args.prizepooltot or '{}')
-	local series = seriesTotalPrizeInput.series or args.series or self.pagename
-
-	return SeriesTotalPrize._get{
-		series = series,
-		limit = seriesTotalPrizeInput.limit or args.limit,
-		offset = seriesTotalPrizeInput.offset or args.offset,
-		external = seriesTotalPrizeInput.external or args.external,
-		onlytotal = seriesTotalPrizeInput.onlytotal or args.onlytotal,
-	}
 end
 
 ---@return Renderable[]
