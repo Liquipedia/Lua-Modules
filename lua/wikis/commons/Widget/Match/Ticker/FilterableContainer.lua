@@ -98,6 +98,27 @@ local function MatchTickerContainer(props)
 		}
 	end
 
+	local switchPill = ContentSwitchPill{
+		switchGroup = 'matchFiler',
+		defaultActive = 1,
+		variant = 'generic',
+		size = 'extrasmall',
+		storeValue = true,
+		tabs = {
+			{label = 'Upcoming', value = 'upcoming'},
+			{label = 'Completed', value = 'completed'},
+		},
+	}
+	local countdownSwitch = Html.Div{
+		attributes = {['data-toggle-area-content'] = 1},
+		children = Switch{
+			label = 'Show countdown',
+			switchGroup = 'countdown',
+			storeValue = true,
+			defaultActive = true,
+		},
+	}
+
 	return Panel{
 		classes = {
 			'match-ticker-filterable-container',
@@ -118,30 +139,20 @@ local function MatchTickerContainer(props)
 						classes = {'match-ticker-filterable-container__title'},
 						children = 'Matches',
 					},
-					ContentSwitchPill{
-						switchGroup = 'matchFiler',
-						defaultActive = 1,
-						variant = 'generic',
-						size = 'extrasmall',
-						storeValue = true,
-						tabs = {
-							{label = 'Upcoming', value = 'upcoming'},
-							{label = 'Completed', value = 'completed'},
-						},
-					},
 					Html.Div{
-						attributes = {['data-toggle-area-content'] = 1},
-						children = Switch{
-							label = 'Show countdown',
-							switchGroup = 'countdown',
-							storeValue = true,
-							defaultActive = true,
-						},
+						classes = {'mobile-hide'},
+						children = {
+							switchPill,
+							countdownSwitch,
+						}
 					},
 				},
 			},
 			Html.Div{
-				classes = {'match-ticker-filterable-container__header-end'},
+				classes = {
+					'match-ticker-filterable-container__header-end',
+					'mobile-hide',
+				},
 				children = {
 					CarouselButton{direction = 'left'},
 					CarouselButton{direction = 'right'},
@@ -149,6 +160,13 @@ local function MatchTickerContainer(props)
 			},
 		},
 		children = {
+			Html.Div{
+				classes = {'mobile-only'},
+				children = {
+					switchPill,
+					countdownSwitch,
+				}
+			},
 			-- Only the upcoming matches are affected by the countdown switch
 			buildTabContent(1, 'upcoming', {['data-switch-group-container'] = 'countdown'}),
 			buildTabContent(2, 'recent'),
