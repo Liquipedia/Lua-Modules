@@ -9,8 +9,8 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Operator = Lua.import('Module:Operator')
-
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
+local HeroPicks = Lua.import('Module:HeroPicks')
 
 local MapFunctions = {}
 local MatchFunctions = {
@@ -29,6 +29,21 @@ local CustomMatchGroupInput = {}
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	return MatchGroupInputUtil.standardProcessFfaMatch(match, MatchFunctions)
+end
+
+--
+-- map related functions
+--
+---@param _ table
+---@param map table
+function MapFunctions.getExtraData(_, map)
+	for opponentIndex, gameOpponent in ipairs(map.opponents) do
+		local picks = HeroPicks.readMapOpponent(map, opponentIndex, 3)
+		if picks then
+			gameOpponent.extradata = gameOpponent.extradata or {}
+			gameOpponent.extradata.heroes = picks
+		end
+	end
 end
 
 --
