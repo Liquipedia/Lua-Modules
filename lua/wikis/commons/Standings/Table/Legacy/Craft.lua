@@ -97,7 +97,6 @@ function StandingTableLegacyCraft.convert(frame)
 		return Table.includes(EXTRA_ARGUMENTS, baseKey)
 	end)
 
-	-- possibly push this into a template instead of setting these vars directly as wiki code...
 	---@type Renderable
 	local varCode = '{{CollapseBelowMatchlists|true}}'
 		.. StandingTableLegacyCraft.getMatchDateVar(args.date)
