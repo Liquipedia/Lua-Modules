@@ -24,6 +24,12 @@ local VRSStandingsData = Lua.import('Module:VRSStandingsData')
 
 local FOOTER_LINK = 'Valve_Regional_Standings'
 
+---@class VRSStandingsProps
+---@field shouldFetch boolean?
+---@field fetchLimit integer
+---@field mainpage boolean?
+---@field [string] string|number
+
 local defaultProps = {
 	title = 'VRS Standings',
 	datapointType = 'LIVE',
@@ -154,7 +160,7 @@ local function buildRow(standing, mainpage)
 	return TableWidgets.Row{children = cells}
 end
 
----@param props table<string|number, string>
+---@param props VRSStandingsProps
 ---@return VNode
 local function VRSStandings(props)
 	local standings, settings = VRSStandingsData.getStandings(props)
