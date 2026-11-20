@@ -418,7 +418,9 @@ class LiquipediaCountdown {
 		const time = `${ hours }:${ minutes }`;
 
 		let strLocalTime1;
-		if ( this.format === 'compact' ) {
+		if ( this.format === 'minimal' ) {
+			strLocalTime1 = time;
+		} else if ( this.format === 'compact' ) {
 			const monthName = LiquipediaCountdown.getMonthNameShortFromMonthNumber( userTime.dateObjectMonth );
 			if ( new Date().getFullYear() === userTime.dateObjectYear ) {
 				strLocalTime1 = `${ monthName } ${ userTime.dateObjectDay } - ${ time }`;
