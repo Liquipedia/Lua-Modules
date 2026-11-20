@@ -93,8 +93,8 @@ class LiquipediaCarousel {
 		LiquipediaCarousel.carousels.push( this );
 		this.updateButtonVisibility();
 
-		this.controls.left[ 0 ].addEventListener( 'click', () => this.scroll( -1 ) );
-		this.controls.right[ 0 ].addEventListener( 'click', () => this.scroll( 1 ) );
+		LiquipediaCarousel.bindActivation( this.controls.left[ 0 ], () => this.scroll( -1 ) );
+		LiquipediaCarousel.bindActivation( this.controls.right[ 0 ], () => this.scroll( 1 ) );
 
 		// Scroll events do not bubble, so listen in the capture phase.
 		// This also covers content that is inserted after initialization.
@@ -121,6 +121,50 @@ class LiquipediaCarousel {
 		const ro = new ResizeObserver( LiquipediaCarousel.scheduleRefresh );
 		ro.observe( carousel );
 		this.resizeObserver = ro;
+	}
+
+	/**
+	 * Activate a control by pointer and keyboard.
+	 * The controls are `role="button"` elements, as MediaWiki does not allow `<button>`, so Enter and Space are
+	 * handled here the way a native button does: Enter on keydown, Space on keyup (only if it was also pressed on
+	 * the control), without Space scrolling the page.
+	 *
+	 * @param {HTMLElement} element
+	 * @param {function(): void} callback
+	 */
+	static bindActivation( element, callback ) {
+		const activate = () => {
+			if ( element.getAttribute( 'aria-disabled' ) !== 'true' ) {
+				callback();
+			}
+		};
+		element.addEventListener( 'click', activate );
+
+		// Native buttons already turn Enter and Space into clicks
+		if ( element instanceof HTMLButtonElement ) {
+			return;
+		}
+
+		let spacePressed = false;
+		element.addEventListener( 'keydown', ( event ) => {
+			if ( event.key === 'Enter' ) {
+				event.preventDefault();
+				activate();
+			} else if ( event.key === ' ' ) {
+				event.preventDefault();
+				spacePressed = true;
+			}
+		} );
+		element.addEventListener( 'keyup', ( event ) => {
+			if ( event.key === ' ' && spacePressed ) {
+				event.preventDefault();
+				spacePressed = false;
+				activate();
+			}
+		} );
+		element.addEventListener( 'blur', () => {
+			spacePressed = false;
+		} );
 	}
 
 	/**
