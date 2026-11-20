@@ -106,13 +106,15 @@ end
 ---@return Renderable[]
 function GameRowComponentProps.createGameOverview(props)
 	local game = props.game
-	local title = 'Game ' .. props.gameIndex
-		.. (tonumber(game.length) and (' - ' .. game.length .. ' moves') or '')
+	local title = {
+		'Game ' .. props.gameIndex,
+		tonumber(game.length) and (' - ' .. game.length .. ' moves') or '',
+	}
 
 	local score1 = MatchSummaryWidgets.GameRow.scoreDisplay(game, 1)
 	local score2 = MatchSummaryWidgets.GameRow.scoreDisplay(game, 2)
 	if Logic.isEmpty(score1) and Logic.isEmpty(score2) then
-		return {title}
+		return title
 	end
 
 	return {
