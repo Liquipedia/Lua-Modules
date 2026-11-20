@@ -2,12 +2,16 @@
 Template(s): All Infoboxes
 Author(s): FO-nTTaX
 *******************************************************************************/
-.theme--light {
-	--infobox-header-background-color: var( --clr-wiki-primary-container );
-}
+.fo-nttax-infobox-wrapper,
+.fo-nttax-infobox-adbox,
+.fo-nttax-infobox {
+	.theme--light & {
+		--infobox-header-background-color: var( --clr-wiki-primary-container, var( --clr-wiki-theme-90 ) );
+	}
 
-.theme--dark {
-	--infobox-header-background-color: var( --clr-wiki-theme-20 );
+	.theme--dark & {
+		--infobox-header-background-color: var( --clr-wiki-theme-20 );
+	}
 }
 
 $infobox-width: 336px;
@@ -43,7 +47,7 @@ $infobox-padding: 10px;
 		font-weight: bold;
 		text-align: center;
 		font-size: 155%;
-		background-color: var( --infobox-header-background-color, var( --wiki-color-light ) );
+		background-color: var( --infobox-header-background-color );
 
 		&-2 {
 			font-size: 130%;
@@ -129,7 +133,7 @@ $infobox-padding: 10px;
 	min-height: 292px;
 	padding-top: $infobox-padding;
 	padding-bottom: 30px;
-	border-bottom: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
+	border-bottom: 2px solid var( --infobox-header-background-color );
 	overflow: hidden;
 	text-align: center;
 
@@ -146,8 +150,8 @@ $infobox-padding: 10px;
 	width: $infobox-width;
 	padding-top: $infobox-padding;
 	padding-bottom: $infobox-padding;
-	border-top: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
-	border-bottom: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
+	border-top: 2px solid var( --infobox-header-background-color );
+	border-bottom: 2px solid var( --infobox-header-background-color );
 	display: flex;
 	flex-flow: column nowrap;
 
