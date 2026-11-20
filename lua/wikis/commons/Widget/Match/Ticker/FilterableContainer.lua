@@ -13,11 +13,10 @@ local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
-local Button = Lua.import('Module:Widget/Basic/Button')
+local CarouselButton = Lua.import('Module:Widget/Basic/Carousel/Button')
 local Component = Lua.import('Module:Widget/Component')
 local ContentSwitchPill = Lua.import('Module:Widget/ContentSwitch/Pill')
 local Html = Lua.import('Module:Widget/Html')
-local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Panel = Lua.import('Module:Widget/Panel')
 local Switch = Lua.import('Module:Widget/Switch')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
@@ -44,7 +43,9 @@ local function MatchTickerContainer(props)
 
 	local matchTickerArgs = {
 		limit = props.limit,
-		displayGameIcons = props.displayGameIcons
+		displayGameIcons = props.displayGameIcons,
+		variant = 'carousel',
+		showInfoForEmptyResults = true,
 	}
 
 	local devFlag = FeatureFlag.get('dev')
@@ -80,97 +81,78 @@ local function MatchTickerContainer(props)
 		)
 	end
 
+	---@param tabIndex integer
+	---@param type 'upcoming' |'recent'
+	---@param attributes table<string, string>?
+	---@return VNode
+	local function buildTabContent(tabIndex, type, attributes)
+		return Html.Div{
+			attributes = Table.merge({['data-toggle-area-content'] = tabIndex}, attributes),
+			children = Html.Div{
+				attributes = {
+					['data-filter-expansion-template'] = buildTemplateExpansionString(type),
+					['data-filter-groups'] = filterText,
+				},
+				children = callTemplate(type),
+			},
+		}
+	end
+
 	return Panel{
 		classes = {
+			'match-ticker-filterable-container',
+			'carousel',
 			'toggle-area',
 			'toggle-area-1',
-			'carousel',
-			'match-ticker-filterable-container',
 		},
 		panelAttributes = {
-			['data-toggle-area'] = 1
+			['data-toggle-area'] = 1,
+			-- Header controls stay visible and are only greyed out at either end of the list
+			['data-carousel-controls'] = 'disable',
 		},
 		heading = {
-			Html.Div{children = 'Matches'},
-			ContentSwitchPill{
-				switchGroup = 'matchFiler',
-				defaultActive = 1,
-				size = 'extrasmall',
-				storeValue = true,
-				tabs = {
-					{
-						label = 'Upcoming',
-						value = 'upcoming',
+			Html.Div{
+				classes = {'match-ticker-filterable-container__header-start'},
+				children = {
+					Html.Span{
+						classes = {'match-ticker-filterable-container__title'},
+						children = 'Matches',
 					},
-					{
-						label = 'Completed',
-						value = 'completed',
-					}
-				}
+					ContentSwitchPill{
+						switchGroup = 'matchFiler',
+						defaultActive = 1,
+						variant = 'generic',
+						size = 'extrasmall',
+						storeValue = true,
+						tabs = {
+							{label = 'Upcoming', value = 'upcoming'},
+							{label = 'Completed', value = 'completed'},
+						},
+					},
+					Html.Div{
+						attributes = {['data-toggle-area-content'] = 1},
+						children = Switch{
+							label = 'Show countdown',
+							switchGroup = 'countdown',
+							storeValue = true,
+							defaultActive = true,
+						},
+					},
+				},
 			},
 			Html.Div{
-				attributes = {
-					['data-toggle-area-content'] = 1,
+				classes = {'match-ticker-filterable-container__header-end'},
+				children = {
+					CarouselButton{direction = 'left'},
+					CarouselButton{direction = 'right'},
 				},
-				classes = {'toggle-area-content-active'},
-				children = Switch{
-					label = 'Show Countdown',
-					switchGroup = 'countdown',
-					storeValue = true,
-					defaultActive = true,
-				}
 			},
-			Html.Div{children = {
-				Button{
-					classes = {'carousel-button', 'carousel-button--left'},
-					title = 'Previous',
-					size = 'xs',
-					children = Html.Span{
-						css = {display = 'inline-flex'},
-						children = IconWidget{iconName = 'previous', size = 'xs'}
-					},
-				},
-				Button{
-					classes = {'carousel-button', 'carousel-button--right'},
-					title = 'Next',
-					size = 'xs',
-					children = Html.Span{
-						css = {display = 'inline-flex'},
-						children = IconWidget{iconName = 'next', size = 'xs'}
-					},
-				}
-			}},
 		},
-		children = Html.Div{
-			classes = {'carousel-content', 'match-ticker-carousel'},
-			css = {display = 'contents'},
-			children = {
-				Html.Div{
-					attributes = {
-						['data-toggle-area-content'] = 1,
-					},
-					children = Html.Div{
-						attributes = {
-							['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
-							['data-filter-groups'] = filterText,
-						},
-						children = callTemplate('upcoming'),
-					}
-				},
-				Html.Div{
-					attributes = {
-						['data-toggle-area-content'] = 2,
-					},
-					children = Html.Div{
-						attributes = {
-							['data-filter-expansion-template'] = buildTemplateExpansionString('recent'),
-							['data-filter-groups'] = filterText,
-						},
-						children = callTemplate('recent'),
-					}
-				}
-			}
-		}
+		children = {
+			-- Only the upcoming matches are affected by the countdown switch
+			buildTabContent(1, 'upcoming', {['data-switch-group-container'] = 'countdown'}),
+			buildTabContent(2, 'recent'),
+		},
 	}
 end
 

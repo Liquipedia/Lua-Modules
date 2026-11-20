@@ -295,16 +295,116 @@ Template(s): MatchTicker
 }
 
 .match-ticker-filterable-container {
-	> .panel-box-body {
-		display: contents;
+	--match-ticker-header-control-background-color: var( --clr-on-surface-light-primary-16 );
+	--match-ticker-header-control-disabled-background-color: var( --clr-on-surface-light-primary-4 );
+	--match-ticker-header-pill-background-color: var( --clr-on-surface-light-primary-12 );
+
+	> .panel-box-heading {
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 0.5rem 0.75rem;
+		padding: 0.4375rem 1rem;
+		border-bottom: 1px solid var( --clr-on-surface-light-primary-16 );
 	}
 
-	.match-ticker-carousel {
-		:where( [ data-toggle-area-content ] ),
-		:where( [ data-filter-groups ] ),
-		.mw-parser-output,
-		.mw-parser-output > div {
-			display: contents;
+	&__header-start,
+	&__header-end {
+		display: flex;
+		align-items: center;
+	}
+
+	&__header-start {
+		flex-wrap: wrap;
+		gap: 0.75rem;
+	}
+
+	&__header-end {
+		gap: 0.25rem;
+		margin-left: auto;
+	}
+
+	&__title {
+		font-size: 1rem;
+		line-height: 1.5rem;
+	}
+
+	// Upcoming / Completed pill, light on the themed header in both themes
+	> .panel-box-heading .switch-pill-container .switch-pill.switch-pill-generic {
+		border-radius: 0.25rem;
+
+		&::after {
+			opacity: 1;
+			border-radius: 0.25rem;
+			background-color: var( --match-ticker-header-pill-background-color );
 		}
+
+		.switch-pill-option {
+			font-size: 0.75rem;
+			line-height: 1.125rem;
+			padding: 0.25rem 0.75rem;
+			border-radius: 0.25rem;
+			color: var( --clr-secondary-100 );
+
+			&.switch-pill-option-active {
+				background-color: var( --clr-secondary-100 );
+				outline: 1px solid var( --clr-on-surface-light-primary-16 );
+				outline-offset: -1px;
+				color: var( --clr-secondary-25 );
+			}
+		}
+	}
+
+	// Countdown switch on the themed header
+	> .panel-box-heading .switch-toggle-container {
+		.switch-toggle-label {
+			font-size: 0.75rem;
+			font-weight: normal;
+			line-height: 1.125rem;
+		}
+
+		.switch-toggle .switch-toggle-slider::after {
+			opacity: 1;
+			border-radius: 1.125rem;
+			background-color: var( --clr-on-surface-light-primary-16 );
+		}
+
+		.switch-toggle.switch-toggle-active .switch-toggle-slider {
+			background-color: var( --clr-on-surface-light-primary-40 );
+
+			&::after {
+				background-color: transparent;
+			}
+		}
+	}
+
+	// Carousel controls live in the header instead of floating over the content
+	> .panel-box-heading .carousel-button.button {
+		position: static;
+		transform: none;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 2rem;
+		height: 2rem;
+		padding: 0;
+		border: 0;
+		border-radius: 0.25rem;
+		background-color: var( --match-ticker-header-control-background-color );
+		color: var( --clr-secondary-100 );
+
+		&.carousel-button--disabled {
+			cursor: default;
+			pointer-events: none;
+			background-color: var( --match-ticker-header-control-disabled-background-color );
+		}
+	}
+
+	> .panel-box-body {
+		overflow: hidden;
+	}
+
+	// Adjacent cards share a single divider
+	.match-ticker-carousel .match-ticker-card {
+		border-width: 0 1px 0 0;
 	}
 }

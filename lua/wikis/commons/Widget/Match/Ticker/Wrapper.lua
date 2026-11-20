@@ -10,13 +10,15 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Component = Lua.import('Module:Widget/Component')
 
+local CarouselContent = Lua.import('Module:Widget/Basic/Carousel/Content')
 local Html = Lua.import('Module:Widget/Html')
 local MatchTickerCard = Lua.import('Module:Widget/Match/Ticker/Card')
 local HorizontalContainer = Lua.import('Module:Widget/Match/Ticker/HorizontalContainer')
 
 ---@param props {matches: {match: MatchGroupUtilMatch, gameData: MatchTickerGameData?}[],
 ---header: Renderable?, showInfoForEmptyResults: boolean, wrapperClasses: string[],
----hideTournament: boolean, displayGameIcons: boolean, onlyHighlightOnValue: string?, variant: 'vertical'|'horizontal'}
+---hideTournament: boolean, displayGameIcons: boolean, onlyHighlightOnValue: string?,
+---variant: 'vertical'|'horizontal'|'carousel'}
 ---@return Renderable?
 local function MatchTickerWrapper(props)
 	local matches = props.matches
@@ -49,6 +51,19 @@ local function MatchTickerWrapper(props)
 		return Html.Div{
 			classes = props.wrapperClasses,
 			children = Array.extend({header}, matchCards),
+		}
+	end
+
+	-- Bare scrollable card list; the surrounding `.carousel` (and its controls) is provided by the caller
+	if props.variant == 'carousel' then
+		return Html.Div{
+			classes = props.wrapperClasses,
+			children = Array.extend({header}, CarouselContent{
+				classes = {'match-ticker-carousel'},
+				children = matchCards,
+				itemWidth = '15.625rem',
+				gap = '0',
+			}),
 		}
 	end
 
