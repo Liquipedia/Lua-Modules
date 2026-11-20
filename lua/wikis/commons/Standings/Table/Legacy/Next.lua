@@ -132,7 +132,7 @@ function StandingTableLegacyNext.convert(frame)
 end
 
 ---@param oldArgs table
----@param options? {defaultTiebreakers: (fun(args: table): string[])?}
+---@param options? {defaultTiebreakers: (fun(args: table): string[])?, extraArgs: table?}
 ---@return Renderable
 function StandingTableLegacyNext.convertFromArgs(oldArgs, options)
 	local push = Logic.readBool(oldArgs.push)
@@ -142,6 +142,7 @@ function StandingTableLegacyNext.convertFromArgs(oldArgs, options)
 	assert(tableType == 'swiss' or tableType == 'group', 'Invalid or missing tableType')
 
 	local newArgs = StandingTableLegacyNext.convertToNewArgs(oldArgs, tableType, options)
+	Table.mergeInto(newArgs, (options or {}).extraArgs or {})
 
 	local function itemToCode(tbl)
 		if type(tbl) == 'boolean' then
