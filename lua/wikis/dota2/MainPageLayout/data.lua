@@ -146,9 +146,8 @@ local CONTENT = {
 		}
 	},
 	matches = {
-		heading = 'Matches',
+		noPanel = true,
 		body = MatchTicker{},
-		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	partnerWikis = {
@@ -180,6 +179,21 @@ local CONTENT = {
 }
 
 local LAYOUT_MAIN = {
+	{ -- Top
+		size = 12,
+		children = {
+			{
+				mobileOrder = 2,
+				noPanel = true,
+				content = CONTENT.filterButtons,
+			},
+			{
+				mobileOrder = 3,
+				noPanel = true,
+				content = CONTENT.matches,
+			},
+		},
+	},
 	{ -- Top Left
 		sizes = {xxl = 5, xxxl = 6},
 		children = {
@@ -188,11 +202,11 @@ local LAYOUT_MAIN = {
 				content = CONTENT.specialEvents,
 			},
 			{
-				mobileOrder = 3,
+				mobileOrder = 5,
 				content = CONTENT.rankings,
 			},
 			{
-				mobileOrder = 4,
+				mobileOrder = 6,
 				content = CONTENT.transfers,
 			},
 		},
@@ -201,35 +215,8 @@ local LAYOUT_MAIN = {
 		sizes = {xxl = 7, xxxl = 6},
 		children = {
 			{
-				mobileOrder = 2,
-				children = {
-					{
-						children = {
-							{
-								noPanel = true,
-								content = CONTENT.filterButtons,
-							},
-						},
-					},
-					{
-						size = 6,
-						children = {
-							{
-								noPanel = true,
-								content = CONTENT.matches,
-							},
-						},
-					},
-					{
-						size = 6,
-						children = {
-							{
-								noPanel = true,
-								content = CONTENT.tournaments,
-							},
-						},
-					},
-				},
+				mobileOrder = 4,
+				content = CONTENT.tournaments,
 			},
 		},
 	},
@@ -237,7 +224,7 @@ local LAYOUT_MAIN = {
 		sizes = {xxl = 12},
 		children = {
 			{
-				mobileOrder = 5,
+				mobileOrder = 7,
 				content = CONTENT.heroes,
 			},
 		}
@@ -246,11 +233,11 @@ local LAYOUT_MAIN = {
 		sizes = {xxl = 6},
 		children = {
 			{
-				mobileOrder = 6,
+				mobileOrder = 8,
 				content = CONTENT.wantToHelp,
 			},
 			{
-				mobileOrder = 7,
+				mobileOrder = 9,
 				content = CONTENT.updates,
 			},
 
@@ -260,7 +247,7 @@ local LAYOUT_MAIN = {
 		sizes = {xxl = 6},
 		children = {
 			{
-				mobileOrder = 8,
+				mobileOrder = 10,
 				content = CONTENT.thisDay,
 			},
 		}
@@ -269,11 +256,11 @@ local LAYOUT_MAIN = {
 		sizes = {xxl = 12},
 		children = {
 			{
-				mobileOrder = 9,
+				mobileOrder = 11,
 				content = CONTENT.usefulArticles,
 			},
 			{
-				mobileOrder = 10,
+				mobileOrder = 12,
 				content = CONTENT.partnerWikis,
 			},
 		}
@@ -281,6 +268,21 @@ local LAYOUT_MAIN = {
 }
 
 local LAYOUT_ESPORTS = {
+	{ -- Top
+		size = 12,
+		children = {
+			{
+				mobileOrder = 3,
+				noPanel = true,
+				content = CONTENT.filterButtons,
+			},
+			{
+				mobileOrder = 4,
+				noPanel = true,
+				content = CONTENT.matches,
+			},
+		},
+	},
 	{ -- Left
 		sizes = {xxl = 5, xxxl = 6},
 		children = {
@@ -293,19 +295,19 @@ local LAYOUT_ESPORTS = {
 				content = CONTENT.specialEvents,
 			},
 			{
-				mobileOrder = 5,
+				mobileOrder = 7,
 				content = CONTENT.rankings,
 			},
 			{
-				mobileOrder = 6,
+				mobileOrder = 8,
 				content = CONTENT.transfers,
 			},
 			{
-				mobileOrder = 7,
+				mobileOrder = 9,
 				content = CONTENT.thisDay,
 			},
 			{
-				mobileOrder = 8,
+				mobileOrder = 10,
 				content = CONTENT.wantToHelp,
 			},
 		}
@@ -314,38 +316,11 @@ local LAYOUT_ESPORTS = {
 		sizes = {xxl = 7, xxxl = 6},
 		children = {
 			{
-				mobileOrder = 3,
-				children = {
-					{
-						children = {
-							{
-								noPanel = true,
-								content = CONTENT.filterButtons,
-							},
-						},
-					},
-					{
-						size = 6,
-						children = {
-							{
-								noPanel = true,
-								content = CONTENT.matches,
-							},
-						},
-					},
-					{
-						size = 6,
-						children = {
-							{
-								noPanel = true,
-								content = CONTENT.tournaments,
-							},
-						},
-					},
-				},
+				mobileOrder = 5,
+				content = CONTENT.tournaments,
 			},
 			{
-				mobileOrder = 7,
+				mobileOrder = 9,
 				content = CONTENT.updates,
 			},
 		},
