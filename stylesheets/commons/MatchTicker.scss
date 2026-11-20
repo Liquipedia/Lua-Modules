@@ -437,8 +437,13 @@ Template(s): MatchTicker
 	}
 
 	.match-ticker-carousel {
+		// Keep a scroll that reaches either end on the list; only the inline axis, so the page still scrolls
+		overscroll-behavior-x: contain;
+
 		.carousel-item {
 			width: 15.625rem;
+			// No fade overlays here, so cards snap flush to the start edge
+			scroll-margin-left: 0;
 		}
 
 		// Adjacent cards share a single divider

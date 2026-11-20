@@ -151,9 +151,11 @@ class LiquipediaCarousel {
 			return;
 		}
 
+		// An explicit 'smooth' would override the reduced-motion handling in CSS
+		const prefersReducedMotion = window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
 		content.scrollBy( {
 			left: itemWidth * direction,
-			behavior: 'smooth'
+			behavior: prefersReducedMotion ? 'instant' : 'smooth'
 		} );
 	}
 
@@ -167,8 +169,28 @@ class LiquipediaCarousel {
 			atEnd = scrollLeft >= scrollWidth - clientWidth;
 		}
 
+		// Read before toggling: hiding a focused control drops focus to the document
+		const focused = document.activeElement;
 		this.toggleControls( this.controls.left, atStart );
 		this.toggleControls( this.controls.right, atEnd );
+		this.redirectFocus( focused, atStart, atEnd );
+	}
+
+	/**
+	 * Keep focus within the controls when the focused one becomes inactive at either end.
+	 *
+	 * @param {Element?} focused
+	 * @param {boolean} atStart
+	 * @param {boolean} atEnd
+	 */
+	redirectFocus( focused, atStart, atEnd ) {
+		const left = this.controls.left[ 0 ];
+		const right = this.controls.right[ 0 ];
+		if ( focused === left && atStart && !atEnd ) {
+			right.focus( { preventScroll: true } );
+		} else if ( focused === right && atEnd && !atStart ) {
+			left.focus( { preventScroll: true } );
+		}
 	}
 
 	/**
