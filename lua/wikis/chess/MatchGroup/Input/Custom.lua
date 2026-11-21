@@ -8,9 +8,11 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Eco = Lua.import('Module:ChessOpenings')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
@@ -37,17 +39,47 @@ end
 -- match related functions
 --
 ---@param match table
+---@return boolean
+local function hasCustomGameScores(match)
+	for _, mapInput in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if type(mapInput) == 'table' and (Logic.isNumeric(mapInput.score1) or Logic.isNumeric(mapInput.score2)) then
+			return true
+		end
+	end
+	return false
+end
+
+---@param map table
+---@return fun(opponentIndex: integer): number?
+local function calculateMapScore(map)
+	local winner = tonumber(map.winner)
+	return function(opponentIndex)
+		if not winner then
+			return nil
+		end
+		return winner == opponentIndex and 1 or winner == 0 and 0.5 or 0
+	end
+end
+
+---@param match table
 ---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
+	local mapParser = hasCustomGameScores(match)
+		and Table.merge(MapFunctions, {calculateMapScore = calculateMapScore})
+		or MapFunctions
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, mapParser)
 end
 
 ---@param maps table[]
----@return fun(opponentIndex: integer): integer?
+---@return fun(opponentIndex: integer): number?
 function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return Array.reduce(Array.map(maps, function(map)
+			local mapScore = map.scores and tonumber(map.scores[opponentIndex])
+			if mapScore and mapScore >= 0 then
+				return mapScore
+			end
 			return (map.winner == opponentIndex and 1 or map.winner == 0 and 0.5 or 0)
 		end), Operator.add)
 	end
