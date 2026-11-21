@@ -15,7 +15,7 @@ local Html = Lua.import('Module:Widget/Html')
 
 ---@class MatchCountdownProps
 ---@field match MatchGroupUtilMatch
----@field format ('full'|'compact')?
+---@field format CountdownFormat?
 
 ---@param props MatchCountdownProps
 ---@return VNode?
@@ -36,6 +36,7 @@ local function MatchCountdown(props)
 		children = CountdownWidget{
 			rawdatetime = (not match.dateIsExact) or match.finished,
 			date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact, format),
+			timestamp = match.dateIsExact and match.timestamp or nil,
 			finished = match.finished,
 			format = format,
 		},

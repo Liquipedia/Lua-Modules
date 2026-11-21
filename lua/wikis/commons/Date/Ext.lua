@@ -99,7 +99,7 @@ end
 ---@param dateOrTimestamp string|integer|osdate|osdateparam
 ---@param timezoneId string?
 ---@param showTime boolean? #default to true
----@param format ('full'|'compact')? #default to 'full'
+---@param format CountdownFormat? #default to 'full'
 ---@return string
 function DateExt.toCountdownArg(dateOrTimestamp, timezoneId, showTime, format)
 	local baseTimestamp = DateExt.readTimestamp(dateOrTimestamp)
@@ -110,7 +110,9 @@ function DateExt.toCountdownArg(dateOrTimestamp, timezoneId, showTime, format)
 		local timezoneString = Timezone.getTimezoneString{timezone = timezoneId or DateExt.defaultTimezone}
 
 		local dateFormat
-		if format == 'compact' then
+		if format == 'minimal' then
+			dateFormat = 'H:i'
+		elseif format == 'compact' then
 			local currentYear = DateExt.formatTimestamp('Y', DateExt.getCurrentTimestamp())
 			local dateYear = DateExt.formatTimestamp('Y', timestamp)
 			if currentYear == dateYear then

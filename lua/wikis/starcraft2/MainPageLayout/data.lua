@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local DateExt = Lua.import('Module:Date/Ext')
 local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
-local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
+local MainPageMatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local Html = Lua.import('Module:Widget/Html')
@@ -62,12 +62,11 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = MatchTickerContainer{},
+		body = MainPageMatchTicker{
+			showMatchesPortal = false,
+		},
 		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
-		panelAttributes = {
-			['data-switch-group-container'] = "countdown"
-		},
 	},
 	tournaments = {
 		heading = 'Tournaments',

@@ -266,6 +266,7 @@ class LiquipediaCountdown {
 		[ 'Central Daylight Time', 'CDT' ],
 		[ 'Central European Summer Time', 'CEST' ],
 		[ 'Central European Standard Time', 'CET' ],
+		[ 'Cook Island Time', 'CKT' ],
 		[ 'Central Standard Time', 'CT' ],
 		[ 'Chatham Standard Time', 'CHAST' ],
 		[ 'Chile Standard Time', 'CLT' ],
@@ -332,6 +333,7 @@ class LiquipediaCountdown {
 		[ 'Sakhalin Standard Time', 'SAKT' ],
 		[ 'Samara Standard Time', 'SAMT' ],
 		[ 'Singapore Standard Time', 'SGT' ],
+		[ 'Samoa Standard Time', 'SST' ],
 		[ 'Solomon Islands Time', 'SBT' ],
 		[ 'South Africa Standard Time', 'SAST' ],
 		[ 'St. Pierre & Miquelon Daylight Time', 'PMDT' ],
@@ -418,7 +420,9 @@ class LiquipediaCountdown {
 		const time = `${ hours }:${ minutes }`;
 
 		let strLocalTime1;
-		if ( this.format === 'compact' ) {
+		if ( this.format === 'minimal' ) {
+			strLocalTime1 = time;
+		} else if ( this.format === 'compact' ) {
 			const monthName = LiquipediaCountdown.getMonthNameShortFromMonthNumber( userTime.dateObjectMonth );
 			if ( new Date().getFullYear() === userTime.dateObjectYear ) {
 				strLocalTime1 = `${ monthName } ${ userTime.dateObjectDay } - ${ time }`;

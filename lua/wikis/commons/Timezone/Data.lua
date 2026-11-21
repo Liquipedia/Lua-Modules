@@ -109,6 +109,10 @@ return {
 		name = 'Central European Time',
 		offset = {1, 0},
 	},
+	CKT = {
+		name = 'Cook Island Time',
+		offset = {-10, 0},
+	},
 	COT = {
 		name = 'Colombia Time',
 		offset = {-5, 0},
@@ -294,6 +298,10 @@ return {
 	SGT = {
 		name = 'Singapore Time',
 		offset = {8, 0},
+	},
+	SST = {
+		name = 'Samoa Standard Time',
+		offset = {-11, 0},
 	},
 	THA = {
 		abbr = 'ICT',

@@ -17,6 +17,13 @@ local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
 
+---@enum CountdownFormat
+local CountdownFormat = {
+	full = 'full',
+	compact = 'compact',
+	minimal = 'minimal',
+}
+
 ---@class CountdownWidgetProps
 ---@field date string?
 ---@field timestamp integer?
@@ -26,12 +33,12 @@ local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
 ---@field nostreams boolean?
 ---@field text string?
 ---@field separator string?
----@field format ('full'|'compact')?
+---@field format CountdownFormat?
 ---@field [string] string? stream
 
 local CountdownWidget = {
 	defaultProps = {
-		format = 'full'
+		format = CountdownFormat.full
 	}
 }
 
@@ -41,7 +48,7 @@ local CountdownWidget = {
 function CountdownWidget.createWrapper(props, hasStreams)
 	local classes = {'timer-object'}
 	local attributes = {
-		['data-format'] = props.format,
+		['data-format'] = assert(CountdownFormat[props.format], 'Invalid format: ' .. props.format),
 		['data-hasstreams'] = hasStreams and 'true' or nil,
 		['data-countdown-end-text'] = props.text,
 		['data-separator'] = props.separator,
