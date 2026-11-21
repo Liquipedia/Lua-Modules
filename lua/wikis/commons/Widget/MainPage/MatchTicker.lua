@@ -33,7 +33,10 @@ local function MainPageMatchTicker(props)
 				['text-align'] = 'center',
 				padding = '0.5rem 1rem',
 			},
-			children = { Link{ children = 'See more matches', link = props.matchesPortal} }
+			children = Html.Div{
+				classes = {'mobile-only'},
+				children = Link{ children = 'See more matches', link = props.matchesPortal}
+			}
 		} or nil,
 	}
 end

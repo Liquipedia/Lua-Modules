@@ -86,7 +86,7 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@field tierTypes string[]?
 ---@field regions string[]?
 ---@field games string[]?
----@field variant 'vertical' | 'horizontal'
+---@field variant 'vertical' | 'horizontal' | 'carousel'
 ---@field featuredOnly boolean?
 ---@field displayGameIcons boolean?
 ---@field header Renderable?
@@ -153,7 +153,9 @@ function MatchTickerController.parseConfig(args)
 				end) or nil,
 		featuredOnly = Logic.readBool(args.featuredOnly),
 		displayGameIcons = Logic.readBool(args.displayGameIcons),
-		variant = Logic.readBool(args.entityStyle) and 'horizontal' or 'vertical',
+		variant = args.variant == 'carousel' and 'carousel'
+			or Logic.readBool(args.entityStyle) and 'horizontal'
+			or 'vertical',
 		header = args.header,
 	}
 
