@@ -25,10 +25,11 @@ local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local NoWrap = Widgets.NoWrap
 
 ---@class AgeofempiresLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -80,19 +81,15 @@ function CustomInjector:parse(id, widgets)
 		)
 
 		if not String.isEmpty(args.team1) then
-			local teams = {Page.makeInternalLink(args.team1)}
-			local index = 2
+			local teams = {}
+			local index = 1
 
 			while not String.isEmpty(args['team' .. index]) do
-				table.insert(teams, '&nbsp;• ' ..
-					tostring(caller:_createNoWrappingSpan(
-						Page.makeInternalLink(args['team' .. index])
-					))
-				)
+				table.insert(teams, NoWrap{children = Page.makeInternalLink(args['team' .. index])})
 				index = index + 1
 			end
 
-			table.insert(widgets, Center{children = teams})
+			table.insert(widgets, Center{children = Array.interleave(teams, '&nbsp;• ')})
 		end
 
 		if not String.isEmpty(args.map1) then
@@ -210,14 +207,6 @@ function CustomLeague:_concatArgs(args, base)
 	end
 
 	return table.concat(foundArgs, ';')
-end
-
----@param content Html|string|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	return mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
 end
 
 ---@param args table
@@ -339,18 +328,14 @@ function CustomLeague:_checkMapInformation(name, link, game)
 end
 
 ---@param maps {link: string, name: string?, mode: string?, image: string?}[]
----@return table
+---@return Renderable[]
 function CustomLeague:_displayMaps(maps)
-	local mapDisplay = function(map)
-		return tostring(self:_createNoWrappingSpan(
-			Page.makeInternalLink({}, (map.name or map.link) .. (map.mode or ''), map.link)
-		))
-	end
-
-	return {table.concat(
-		Table.mapValues(maps, function(map) return mapDisplay(map) end),
+	return Array.interleave(
+		Array.map(maps, function(map)
+			return NoWrap{children = Page.makeInternalLink({}, (map.name or map.link) .. (map.mode or ''), map.link)}
+		end),
 		'&nbsp;• '
-	)}
+	)
 end
 
 ---@param args table
