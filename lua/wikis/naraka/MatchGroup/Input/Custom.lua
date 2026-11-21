@@ -34,16 +34,17 @@ end
 --
 -- map related functions
 --
----@param _ table
+---@param match table
 ---@param map table
-function MapFunctions.getExtraData(_, map)
-	for opponentIndex, gameOpponent in ipairs(map.opponents) do
+---@param opponents table[]
+function MapFunctions.getExtraData(match, map, opponents)
+	Array.forEach(map.opponents, function(gameOpponent, opponentIndex)
 		local picks = HeroPicks.readMapOpponent(map, opponentIndex, 3)
 		if picks then
 			gameOpponent.extradata = gameOpponent.extradata or {}
 			gameOpponent.extradata.heroes = picks
 		end
-	end
+	end)
 end
 
 --
