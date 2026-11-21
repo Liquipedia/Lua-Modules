@@ -74,7 +74,7 @@ end
 ---@field categories string[]
 
 ---Runs the auto squad table and collects everything it stored, queried and rendered.
----@param args table arguments for Module:Squad/Auto
+---@param args table arguments for Module:Features/Squad/Auto
 ---@param fixtures {transfers: table[]?, person: table?, nextTeam: table?}?
 ---@return SquadAutoTestResult
 local function runAuto(args, fixtures)
