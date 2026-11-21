@@ -65,7 +65,7 @@ return {
 		'stratz',
 		'tonamel',
 		'toornament',
-		'trackmania-io',
+		'tmio',
 		'vlr',
 		'bracket',
 		'rules',
