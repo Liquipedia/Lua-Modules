@@ -77,6 +77,7 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 190,
 		},
+		defaultMaxPlayersPerPlacement = 12,
 		transfers = {
 			showTeamName = true,
 		},
