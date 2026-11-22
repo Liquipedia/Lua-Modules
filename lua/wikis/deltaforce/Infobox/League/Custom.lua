@@ -59,15 +59,17 @@ end
 ---@param widgets Renderable[]
 ---@return Renderable[]?
 function CustomInjector:parse(id, widgets)
+	local caller = self.caller
 	local args = self.caller.args
+	local data = caller.data
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Mode', children = {args.mode}},
-			Cell{name = 'Platform', children = {args.platform}}
+			Cell{name = 'Mode', children = {data.mode}},
+			Cell{name = 'Platform', children = {data.platform}}
 		)
 	elseif id == 'customcontent' then
-		local maps = self.caller:getAllArgsForBase(args, 'map')
+		local maps = caller:getAllArgsForBase(args, 'map')
 		if Logic.isEmpty(maps) then return end
 		table.sort(maps)
 		local mapDisplays = Array.map(maps, function(map)
@@ -91,12 +93,10 @@ end
 ---@param args table
 function CustomLeague:customParseArguments(args)
 	-- Normalize Mode input
-	args.mode = args.mode and MODES[string.lower(args.mode):gsub('s$', '')] or MODES.default
-	self.data.mode = string.lower(args.mode)
+	self.data.mode = MODES[string.lower(args.mode or ''):gsub('s$', '')] or MODES.default
 
 	-- Normalize Platform input
-	args.platform = args.platform and PLATFORMS[string.lower(args.platform):gsub('s$', '')] or PLATFORMS.default
-	self.data.mode = string.lower(args.platform)
+	self.data.platform = PLATFORMS[string.lower(args.platform or ''):gsub('s$', '')] or PLATFORMS.default
 
 end
 
@@ -113,13 +113,12 @@ function CustomLeague:_createPatchCell(args)
 	}
 end
 
-
 ---@param args table
 ---@return string[]
 function CustomLeague:getWikiCategories(args)
 	return {
-		args.mode .. ' Competitions',
-		args.platform .. ' Tournaments',
+		self.data.mode .. ' Competitions',
+		self.data.platform .. ' Tournaments',
 	}
 end
 
