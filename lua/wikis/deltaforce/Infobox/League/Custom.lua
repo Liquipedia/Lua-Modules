@@ -118,8 +118,8 @@ end
 ---@return string[]
 function CustomLeague:getWikiCategories(args)
 	return {
-		args.mode and (args.mode .. ' Competitions'),
-		args.platform and (args.platform .. ' Tournaments'),
+		args.mode .. ' Competitions',
+		args.platform .. ' Tournaments',
 	}
 end
 
