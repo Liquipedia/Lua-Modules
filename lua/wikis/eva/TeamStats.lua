@@ -266,6 +266,18 @@ local function headerCell(content)
 	return mw.html.create('th'):css('white-space', 'nowrap'):wikitext(content)
 end
 
+---@param parts string[]
+---@return Html?
+local function smallLine(parts)
+	if Logic.isEmpty(parts) then
+		return nil
+	end
+	return mw.html.create('div')
+		:css('font-size', '75%')
+		:css('opacity', '0.85')
+		:wikitext(table.concat(parts, ' · '))
+end
+
 ---@param mapStats TeamStatsMap?
 ---@return Html
 function TeamStats._mapCell(mapStats)
@@ -293,8 +305,11 @@ function TeamStats._mapCell(mapStats)
 	local splitTypes = Array.filter(PICK_TYPES, function(pickType)
 		return gamesPlayed(mapStats[pickType.key]) > 0
 	end)
-	local split = Array.map(splitTypes, function(pickType)
-		return pickType.short .. ' ' .. formatRecord(mapStats[pickType.key])
+	-- own / opp on one line, the decider on its own line below
+	local pickSplit, deciderSplit = {}, {}
+	Array.forEach(splitTypes, function(pickType)
+		local label = pickType.short .. ' ' .. formatRecord(mapStats[pickType.key])
+		table.insert(pickType.key == 'decider' and deciderSplit or pickSplit, label)
 	end)
 	local tooltip = Array.map(splitTypes, function(pickType)
 		return formatRecord(mapStats[pickType.key]) .. ' ' .. pickType.long
@@ -307,11 +322,8 @@ function TeamStats._mapCell(mapStats)
 			:tag('b'):wikitext(formatRecord(total)):done()
 			:tag('span'):css('font-size', '85%'):css('opacity', '0.8'):wikitext(' (' .. rate .. '%)'):done()
 			:done()
-		:tag('div')
-			:css('font-size', '75%')
-			:css('opacity', '0.85')
-			:wikitext(table.concat(split, ' · '))
-			:done()
+		:node(smallLine(pickSplit))
+		:node(smallLine(deciderSplit))
 end
 
 --- One row per team, one column per map.
