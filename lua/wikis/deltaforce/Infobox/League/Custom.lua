@@ -38,23 +38,20 @@ local PLATFORMS = {
 }
 
 local MODES = {
-	wf = 'Warfare',
 	warfare = 'Warfare',
 	operations = 'Operations',
-	op = 'Operations',
 	detonation = 'Detonation',
 	default = 'Unknown',
 }
+MODES.wf = MODES.warfare
+MODES.op = MODES.operations
 
 ---@param frame Frame
 ---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
-
-	league.args.mode = MODES[(league.args.mode or ''):lower():gsub(' ', '')] or MODES.default
-	league.args.platform = PLATFORMS[(league.args.platform or ''):lower():gsub(' ', '')] or PLATFORMS.default
-
+	
 	return league:createInfobox()
 end
 
@@ -72,10 +69,9 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		local maps = self.caller:getAllArgsForBase(args, 'map')
 		if Logic.isEmpty(maps) then return end
-		local gameSuffix = Logic.isNotEmpty(args.game) and ('/' .. args.game) or ''
 		table.sort(maps)
 		local mapDisplays = Array.map(maps, function(map)
-			return Link{link = map .. gameSuffix, children = map}
+			return Link{link = map, children = map}
 		end)
 		Array.appendWith(widgets,
 			Title{children = 'Maps'},
@@ -93,6 +89,18 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param args table
+function CustomLeague:customParseArguments(args)
+	-- Normalize Mode input
+	args.mode = args.mode and MODES[string.lower(args.mode):gsub('s$', '')] or MODES.default
+	self.data.mode = string.lower(args.mode)
+
+	-- Normalize Platform input
+	args.platform = args.platform and PLATFORMS[string.lower(args.platform):gsub('s$', '')] or PLATFORMS.default
+	self.data.mode = string.lower(args.platform)
+
+end
+
+---@param args table
 ---@return Renderable[]?
 function CustomLeague:_createPatchCell(args)
 	if String.isEmpty(args.patch) then
@@ -104,6 +112,7 @@ function CustomLeague:_createPatchCell(args)
 		Logic.isNotEmpty(args.endpatch) and Link{link = 'Patch ' .. args.endpatch} or nil,
 	}
 end
+
 
 ---@param args table
 ---@return string[]
