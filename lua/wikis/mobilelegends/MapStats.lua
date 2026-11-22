@@ -23,7 +23,6 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 local VodLink = Lua.import('Module:VodLink')
 
-local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
@@ -67,7 +66,7 @@ end
 function MapStats._getStageName(match)
 	local inheritedHeader = match.bracketData and match.bracketData.inheritedHeader
 
-	return (match.section ~= DEFAULT_STAGE and match.section)
+	return (match.section ~= 'Results' and match.section)
 		or (match.extradata or {}).matchsection
 		or inheritedHeader
 		or 'Results'
@@ -117,7 +116,7 @@ end
 ---@return MapStatsHit[]
 function MapStats._findHits(modeKey, limit)
 	local batchSize = math.min(BATCH_SIZE, math.max(limit * 3, 20))
-	
+
 	local conditions = tostring(ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('finished'), Comparator.eq, 1),
 	})
