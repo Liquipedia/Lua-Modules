@@ -51,7 +51,7 @@ MODES.op = MODES.operations
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
-	
+
 	return league:createInfobox()
 end
 
