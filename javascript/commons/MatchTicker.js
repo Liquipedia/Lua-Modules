@@ -69,7 +69,7 @@ class LiquipediaMatchTicker {
 				cardGroupElement.append( title, cardContainer );
 
 				for ( const card of cardGroup ) {
-					cardContainer.append( card.cardElement );
+					cardContainer.append( card.cardElement.parentElement );
 				}
 				groupedDisplay.push( cardGroupElement );
 			}

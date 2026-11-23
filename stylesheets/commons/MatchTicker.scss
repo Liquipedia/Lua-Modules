@@ -440,9 +440,11 @@ Template(s): MatchTicker
 		overscroll-behavior-x: contain;
 
 		.carousel-item:has( > .match-ticker-card ) {
-			width: 15.625rem;
-			// No fade overlays here, so cards snap flush to the start edge
-			scroll-margin-left: 0;
+			@media ( width > 600px ) {
+				width: 15.625rem;
+				// No fade overlays here, so cards snap flush to the start edge
+				scroll-margin-left: 0;
+			}
 		}
 
 		// Adjacent cards share a single divider
