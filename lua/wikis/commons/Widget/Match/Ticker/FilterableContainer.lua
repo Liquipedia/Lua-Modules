@@ -89,7 +89,10 @@ local function MatchTickerContainer(props)
 	---@return VNode
 	local function buildTabContent(tabIndex, type, attributes)
 		return Html.Div{
-			attributes = Table.merge({['data-toggle-area-content'] = tabIndex}, attributes),
+			attributes = Table.merge({
+				['data-toggle-area-content'] = tabIndex,
+				['data-match-ticker-type'] = type,
+			}, attributes),
 			children = Html.Div{
 				attributes = {
 					['data-filter-expansion-template'] = buildTemplateExpansionString(type),

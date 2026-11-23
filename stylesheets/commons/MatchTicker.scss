@@ -531,6 +531,14 @@ Template(s): MatchTicker
 					background-color: var( --clr-on-surface-dark-primary-12 );
 				}
 			}
+
+			// Ongoing matches are marked with a red dot instead of a date
+			&--live::before {
+				font-family: "Font Awesome 5 Pro";
+				font-size: 0.5rem;
+				content: "\f111"; /* Unicode for circle */
+				color: var( --clr-semantic-negative-40 );
+			}
 		}
 
 		&__label {

@@ -66,6 +66,14 @@ class LiquipediaMatchTickerCard {
 
 	/**
 	 * @param {Date} now
+	 * @return {boolean}
+	 */
+	hasStarted( now ) {
+		return this.parsedDate < now;
+	}
+
+	/**
+	 * @param {Date} now
 	 * @return {string}
 	 */
 	getRelativeDayLabel( now ) {
@@ -83,10 +91,17 @@ class LiquipediaMatchTickerCard {
 }
 
 class LiquipediaMatchTicker {
+	static get LIVE_GROUP_KEY() {
+		return 'live';
+	}
+
 	static async init() {
 		await mw.loader.using( 'user.options' );
 		const now = new Date();
 		document.querySelectorAll( '.match-ticker-filterable-container .match-ticker-carousel' ).forEach( ( tickerCarousel ) => {
+			// Matches in the upcoming list are not finished, so the ones that have already started are ongoing
+			const tickerType = tickerCarousel.closest( '[data-match-ticker-type]' )?.dataset.matchTickerType;
+			const isUpcoming = tickerType === 'upcoming';
 			/** @type {HTMLElement[]} */
 			const groupedDisplay = [];
 			const cards = Array.from(
@@ -98,23 +113,16 @@ class LiquipediaMatchTicker {
 				return;
 			}
 
-			const cardGroups = Map.groupBy( cards, ( card ) => card.toISODateString() );
+			const cardGroups = Map.groupBy( cards, ( card ) => isUpcoming && card.hasStarted( now ) ?
+				LiquipediaMatchTicker.LIVE_GROUP_KEY :
+				card.toISODateString()
+			);
 
-			for ( const [ date, cardGroup ] of cardGroups ) {
+			for ( const [ groupKey, cardGroup ] of cardGroups ) {
 				const cardGroupElement = document.createElement( 'div' );
 				cardGroupElement.classList.add( 'match-ticker-card-group' );
 				cardGroupElement.style.setProperty( '--match-ticker-group-columns', cardGroup.length );
-				const firstCard = cardGroup[ 0 ];
-				const label = document.createElement( 'span' );
-				label.classList.add( 'match-ticker-card-group__label' );
-				label.textContent = firstCard.getRelativeDayLabel( now );
-				const dateText = document.createElement( 'time' );
-				dateText.classList.add( 'match-ticker-card-group__date' );
-				dateText.dateTime = date;
-				dateText.textContent = firstCard.format( { month: 'short', day: 'numeric', year: 'numeric' } );
-				const title = document.createElement( 'div' );
-				title.classList.add( 'match-ticker-card-group__header' );
-				title.append( label, dateText );
+				const title = LiquipediaMatchTicker.createGroupHeader( groupKey, cardGroup[ 0 ], now );
 				const cardContainer = document.createElement( 'div' );
 				cardContainer.classList.add( 'match-ticker-card-group__body' );
 
@@ -128,6 +136,34 @@ class LiquipediaMatchTicker {
 
 			tickerCarousel.replaceChildren( ...groupedDisplay );
 		} );
+	}
+
+	/**
+	 * @param {string} groupKey
+	 * @param {LiquipediaMatchTickerCard} firstCard
+	 * @param {Date} now
+	 * @return {HTMLElement}
+	 */
+	static createGroupHeader( groupKey, firstCard, now ) {
+		const header = document.createElement( 'div' );
+		header.classList.add( 'match-ticker-card-group__header' );
+		const label = document.createElement( 'span' );
+		label.classList.add( 'match-ticker-card-group__label' );
+		header.append( label );
+
+		if ( groupKey === LiquipediaMatchTicker.LIVE_GROUP_KEY ) {
+			header.classList.add( 'match-ticker-card-group__header--live' );
+			label.textContent = 'Live now';
+			return header;
+		}
+
+		label.textContent = firstCard.getRelativeDayLabel( now );
+		const dateText = document.createElement( 'time' );
+		dateText.classList.add( 'match-ticker-card-group__date' );
+		dateText.dateTime = groupKey;
+		dateText.textContent = firstCard.format( { month: 'short', day: 'numeric', year: 'numeric' } );
+		header.append( dateText );
+		return header;
 	}
 }
 
