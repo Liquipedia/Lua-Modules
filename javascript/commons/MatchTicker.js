@@ -43,9 +43,9 @@ class LiquipediaMatchTickerCard {
 class LiquipediaMatchTicker {
 	static async init() {
 		await mw.loader.using( 'user.options' );
-		/** @type {HTMLElement[]} */
-		const groupedDisplay = [];
 		document.querySelectorAll( '.match-ticker-filterable-container .match-ticker-carousel' ).forEach( ( tickerCarousel ) => {
+			/** @type {HTMLElement[]} */
+			const groupedDisplay = [];
 			const cards = Array.from(
 				tickerCarousel.querySelectorAll( '.match-ticker-card' ),
 				( element ) => new LiquipediaMatchTickerCard( element )
