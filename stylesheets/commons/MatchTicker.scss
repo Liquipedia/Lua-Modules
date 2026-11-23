@@ -484,6 +484,10 @@ Template(s): MatchTicker
 		display: grid;
 		grid-template-columns: repeat( var( --match-ticker-group-columns ), 15.625rem );
 
+		@media ( max-width: 600px ) {
+			grid-template-columns: 1fr;
+		}
+
 		&__header {
 			width: 100%;
 			grid-column: 1 / -1;
