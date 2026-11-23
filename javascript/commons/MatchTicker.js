@@ -4,7 +4,7 @@ class LiquipediaMatchTickerCard {
 	 */
 	constructor( cardElement ) {
 		this.cardElement = cardElement;
-		this.parsedDate = new Date( 1000 * parseInt( this.cardElement.dataset.timestamp, 10 ) );
+		this.parsedDate = new Date( 1000 * parseInt( this.cardElement.dataset.matchTimestamp, 10 ) );
 	}
 
 	/**
