@@ -116,20 +116,14 @@ liquipedia.collapse = {
 			this.persistentCollapsibles.add( collapsible );
 
 			const storageKey = `collapsible-${ collapsible.dataset.collapsibleStorageKey }`;
-			try {
-				const storedState = window.localStorage.getItem( storageKey );
-				if ( storedState !== null ) {
-					collapsible.classList.toggle( 'collapsed', storedState === 'collapsed' );
-				}
-			} catch {
-				return;
+			const storedState = liquipedia.storage.get( storageKey );
+			if ( storedState !== null ) {
+				collapsible.classList.toggle( 'collapsed', storedState === 'collapsed' );
 			}
 
 			new MutationObserver( () => {
 				const state = collapsible.classList.contains( 'collapsed' ) ? 'collapsed' : 'expanded';
-				try {
-					window.localStorage.setItem( storageKey, state );
-				} catch {}
+				liquipedia.storage.set( storageKey, state );
 			} ).observe( collapsible, { attributes: true, attributeFilter: [ 'class' ] } );
 		} );
 	},

@@ -12,6 +12,7 @@ describe( 'Collapse module', () => {
 			}
 		};
 
+		require( '../commons/Storage.js' );
 		// Require the collapse module
 		require( '../commons/Collapse.js' );
 	} );
@@ -130,9 +131,10 @@ describe( 'Collapse module', () => {
 
 	describe( 'persistent collapsibles', () => {
 		const render = ( collapsed ) => {
+			const classes = collapsed ? 'general-collapsible collapsed' : 'general-collapsible';
 			document.body.innerHTML = `
 				<div id="mw-content-text">
-					<div class="general-collapsible${ collapsed ? ' collapsed' : '' }" data-collapsible-storage-key="test">
+					<div class="${ classes }" data-collapsible-storage-key="test">
 						<span class="general-collapsible-expand-button">Show</span>
 						<span class="general-collapsible-collapse-button">Hide</span>
 						<div class="should-collapse">Content</div>
