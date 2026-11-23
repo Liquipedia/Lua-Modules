@@ -1,66 +1,59 @@
 class LiquipediaMatchTickerCard {
+	#useUTC;
+
 	/**
 	 * @param {HTMLElement} cardElement
+	 * @param {boolean} useUTC whether dates are shown in UTC instead of the local timezone
 	 */
-	constructor( cardElement ) {
+	constructor( cardElement, useUTC ) {
 		this.cardElement = cardElement;
+		this.#useUTC = useUTC;
 		this.parsedDate = new Date( 1000 * parseInt( this.cardElement.dataset.matchTimestamp, 10 ) );
 	}
 
 	/**
-	 * @return {boolean}
+	 * Calendar date of the given moment, in UTC or the local timezone
+	 *
+	 * @param {Date} date
+	 * @return {{year: number, month: number, day: number}}
 	 */
-	#useUTC() {
-		return mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' );
-	}
-
-	getYear() {
-		if ( this.#useUTC() ) {
-			return this.parsedDate.getUTCFullYear();
+	#getCalendarDate( date ) {
+		if ( this.#useUTC ) {
+			return { year: date.getUTCFullYear(), month: date.getUTCMonth(), day: date.getUTCDate() };
 		}
-		return this.parsedDate.getFullYear();
-	}
-
-	getMonth() {
-		if ( this.#useUTC() ) {
-			return this.parsedDate.getUTCMonth();
-		}
-		return this.parsedDate.getMonth();
-	}
-
-	getDate() {
-		if ( this.#useUTC() ) {
-			return this.parsedDate.getUTCDate();
-		}
-		return this.parsedDate.getDate();
+		return { year: date.getFullYear(), month: date.getMonth(), day: date.getDate() };
 	}
 
 	toISODateString() {
-		return `${ String( this.getYear() ).padStart( 4, '0' ) }-${ String( this.getMonth() + 1 ).padStart( 2, '0' ) }-${ String( this.getDate() ).padStart( 2, '0' ) }`;
+		const { year, month, day } = this.#getCalendarDate( this.parsedDate );
+		return [
+			String( year ).padStart( 4, '0' ),
+			String( month + 1 ).padStart( 2, '0' ),
+			String( day ).padStart( 2, '0' )
+		].join( '-' );
 	}
 
 	/**
 	 * @param {Intl.DateTimeFormatOptions} options
 	 * @return {string}
 	 */
-	format( options ) {
+	formatDate( options ) {
 		return this.parsedDate.toLocaleDateString( 'en-US', {
 			...options,
-			timeZone: this.#useUTC() ? 'UTC' : undefined
+			timeZone: this.#useUTC ? 'UTC' : undefined
 		} );
 	}
 
 	/**
-	 * Number of calendar days from today to the match day, in the same timezone as the other getters
+	 * Number of calendar days from today to the match day
 	 *
 	 * @param {Date} now
 	 * @return {number}
 	 */
 	getDayOffset( now ) {
-		const today = this.#useUTC() ?
-			Date.UTC( now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() ) :
-			Date.UTC( now.getFullYear(), now.getMonth(), now.getDate() );
-		const matchDay = Date.UTC( this.getYear(), this.getMonth(), this.getDate() );
+		const toDayValue = ( { year, month, day } ) => Date.UTC( year, month, day );
+		const today = toDayValue( this.#getCalendarDate( now ) );
+		const matchDay = toDayValue( this.#getCalendarDate( this.parsedDate ) );
 		return Math.round( ( matchDay - today ) / 86400000 );
 	}
 
@@ -85,7 +78,7 @@ class LiquipediaMatchTickerCard {
 			case 1:
 				return 'Tomorrow';
 			default:
-				return this.format( { weekday: 'long' } );
+				return this.formatDate( { weekday: 'long' } );
 		}
 	}
 }
@@ -98,6 +91,7 @@ class LiquipediaMatchTicker {
 	static async init() {
 		await mw.loader.using( 'user.options' );
 		const now = new Date();
+		const useUTC = mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' );
 		document.querySelectorAll(
 			'.match-ticker-filterable-container .match-ticker-carousel'
 		).forEach( ( tickerCarousel ) => {
@@ -105,10 +99,10 @@ class LiquipediaMatchTicker {
 			const tickerType = tickerCarousel.closest( '[data-match-ticker-type]' )?.dataset.matchTickerType;
 			const isUpcoming = tickerType === 'upcoming';
 			/** @type {HTMLElement[]} */
-			const groupedDisplay = [];
+			const groupElements = [];
 			const cards = Array.from(
 				tickerCarousel.querySelectorAll( '.match-ticker-card' ),
-				( element ) => new LiquipediaMatchTickerCard( element )
+				( element ) => new LiquipediaMatchTickerCard( element, useUTC )
 			);
 
 			if ( cards.length === 0 ) {
@@ -124,19 +118,20 @@ class LiquipediaMatchTicker {
 				const cardGroupElement = document.createElement( 'div' );
 				cardGroupElement.classList.add( 'match-ticker-card-group' );
 				cardGroupElement.style.setProperty( '--match-ticker-group-columns', cardGroup.length );
-				const title = LiquipediaMatchTicker.createGroupHeader( groupKey, cardGroup[ 0 ], now );
+				const header = LiquipediaMatchTicker.createGroupHeader( groupKey, cardGroup[ 0 ], now );
 				const cardContainer = document.createElement( 'div' );
 				cardContainer.classList.add( 'match-ticker-card-group__body' );
 
-				cardGroupElement.append( title, cardContainer );
+				cardGroupElement.append( header, cardContainer );
 
 				for ( const card of cardGroup ) {
-					cardContainer.append( card.cardElement.parentElement );
+					// Move the carousel item, which carries the scroll snapping and width
+					cardContainer.append( card.cardElement.closest( '.carousel-item' ) );
 				}
-				groupedDisplay.push( cardGroupElement );
+				groupElements.push( cardGroupElement );
 			}
 
-			tickerCarousel.replaceChildren( ...groupedDisplay );
+			tickerCarousel.replaceChildren( ...groupElements );
 		} );
 	}
 
@@ -163,7 +158,7 @@ class LiquipediaMatchTicker {
 		const dateText = document.createElement( 'time' );
 		dateText.classList.add( 'match-ticker-card-group__date' );
 		dateText.dateTime = groupKey;
-		dateText.textContent = firstCard.format( { month: 'short', day: 'numeric', year: 'numeric' } );
+		dateText.textContent = firstCard.formatDate( { month: 'short', day: 'numeric', year: 'numeric' } );
 		header.append( dateText );
 		return header;
 	}
