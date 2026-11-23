@@ -36,7 +36,7 @@ class LiquipediaMatchTickerCard {
 	}
 
 	toISODateString() {
-		return `${ String( this.getYear() ).padStart( 4, '0' ) }-${ String( this.getMonth() + 1 ).padStart( 2, '0' ) }-${ String( this.getDate() ).padStart( 4, '0' ) }`;
+		return `${ String( this.getYear() ).padStart( 4, '0' ) }-${ String( this.getMonth() + 1 ).padStart( 2, '0' ) }-${ String( this.getDate() ).padStart( 2, '0' ) }`;
 	}
 }
 
