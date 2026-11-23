@@ -155,7 +155,7 @@ return {
 				},
 			},
 			{ -- Left
-				sizes = {xxl = 5, xxxl = 6},
+				sizes = {xxl = 6, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 5,
@@ -168,7 +168,7 @@ return {
 				}
 			},
 			{ -- Right
-				sizes = {xxl = 7, xxxl = 6},
+				sizes = {xxl = 6, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 3,
