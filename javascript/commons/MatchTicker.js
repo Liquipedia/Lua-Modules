@@ -71,7 +71,7 @@ class LiquipediaMatchTicker {
 				for ( const card of cardGroup ) {
 					cardContainer.append( card.cardElement );
 				}
-				groupedDisplay.push( cardContainer );
+				groupedDisplay.push( cardGroupElement );
 			}
 
 			tickerCarousel.replaceChildren( ...groupedDisplay );
