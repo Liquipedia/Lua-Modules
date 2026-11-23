@@ -189,12 +189,12 @@
 
 		/* Displayed as a popover, see Collapse.js */
 		&[ popover ] {
-			box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.1 );
+			box-shadow: 0 0.25rem 0.75rem var( --clr-on-surface-light-primary-8 );
 
 			.theme--dark & {
 				/* The inline background is translucent, which does not work in the top layer */
 				background-color: var( --clr-secondary-16 );
-				box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.3 );
+				box-shadow: 0 0.25rem 0.75rem rgba( --clr-on-surface-dark-primary-8 );
 			}
 		}
 	}
