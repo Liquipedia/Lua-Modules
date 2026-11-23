@@ -9,6 +9,7 @@ liquipedia.collapse = {
 				table.classList.add( 'collapsed' );
 			}
 		} );
+		liquipedia.collapse.setupPersistentCollapsibles();
 		liquipedia.collapse.setupCollapsibleButtons();
 		liquipedia.collapse.setupGeneralCollapsibleButtons();
 		liquipedia.collapse.setupClickableRegionCollapsibles();
@@ -100,6 +101,36 @@ liquipedia.collapse = {
 			newCollapseButton?.addEventListener( 'click', () => {
 				collapsible.classList.add( 'collapsed' );
 			} );
+		} );
+	},
+
+	persistentCollapsibles: new WeakSet(),
+
+	// Restores and stores the collapsed state of general-collapsibles that set data-collapsible-storage-key.
+	setupPersistentCollapsibles: function() {
+		const selector = '#mw-content-text .general-collapsible[data-collapsible-storage-key]';
+		document.querySelectorAll( selector ).forEach( ( collapsible ) => {
+			if ( this.persistentCollapsibles.has( collapsible ) ) {
+				return;
+			}
+			this.persistentCollapsibles.add( collapsible );
+
+			const storageKey = `collapsible-${ collapsible.dataset.collapsibleStorageKey }`;
+			try {
+				const storedState = window.localStorage.getItem( storageKey );
+				if ( storedState !== null ) {
+					collapsible.classList.toggle( 'collapsed', storedState === 'collapsed' );
+				}
+			} catch {
+				return;
+			}
+
+			new MutationObserver( () => {
+				const state = collapsible.classList.contains( 'collapsed' ) ? 'collapsed' : 'expanded';
+				try {
+					window.localStorage.setItem( storageKey, state );
+				} catch {}
+			} ).observe( collapsible, { attributes: true, attributeFilter: [ 'class' ] } );
 		} );
 	},
 

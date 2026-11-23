@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-const { test, expect, beforeAll, describe } = require( '@jest/globals' );
+const { test, expect, beforeAll, beforeEach, describe } = require( '@jest/globals' );
 
 describe( 'Collapse module', () => {
 	beforeAll( () => {
@@ -125,6 +125,46 @@ describe( 'Collapse module', () => {
 			expect( collapsible.classList.contains( 'collapsed' ) ).toBe( false );
 			dispatchToggle( area, 'closed' );
 			expect( collapsible.classList.contains( 'collapsed' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'persistent collapsibles', () => {
+		const render = ( collapsed ) => {
+			document.body.innerHTML = `
+				<div id="mw-content-text">
+					<div class="general-collapsible${ collapsed ? ' collapsed' : '' }" data-collapsible-storage-key="test">
+						<span class="general-collapsible-expand-button">Show</span>
+						<span class="general-collapsible-collapse-button">Hide</span>
+						<div class="should-collapse">Content</div>
+					</div>
+				</div>
+			`;
+			return document.querySelector( '.general-collapsible' );
+		};
+
+		beforeEach( () => {
+			window.localStorage.clear();
+		} );
+
+		test( 'keeps the server state when nothing is stored', () => {
+			const collapsible = render( true );
+			globalThis.liquipedia.collapse.setupPersistentCollapsibles();
+			expect( collapsible.classList.contains( 'collapsed' ) ).toBe( true );
+		} );
+
+		test( 'restores the stored state', () => {
+			window.localStorage.setItem( 'collapsible-test', 'expanded' );
+			const collapsible = render( true );
+			globalThis.liquipedia.collapse.setupPersistentCollapsibles();
+			expect( collapsible.classList.contains( 'collapsed' ) ).toBe( false );
+		} );
+
+		test( 'stores the state when toggled', async () => {
+			const collapsible = render( false );
+			globalThis.liquipedia.collapse.setupPersistentCollapsibles();
+			collapsible.classList.add( 'collapsed' );
+			await Promise.resolve();
+			expect( window.localStorage.getItem( 'collapsible-test' ) ).toBe( 'collapsed' );
 		} );
 	} );
 } );

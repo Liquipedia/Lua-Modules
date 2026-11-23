@@ -104,7 +104,7 @@ liquipedia.switchButtons = {
 		const groupName = switchGroup.name;
 		const syncLevel = switchGroup.syncLevel;
 		const localStorageKey = this.buildLocalStorageKey( groupName, syncLevel );
-		const storageValue = window.localStorage.getItem( localStorageKey );
+		const storageValue = liquipedia.storage.get( localStorageKey );
 
 		if ( storageValue === null ) {
 			return null;
@@ -121,7 +121,7 @@ liquipedia.switchButtons = {
 		const groupName = switchGroup.name;
 		const syncLevel = switchGroup.syncLevel;
 		const localStorageKey = this.buildLocalStorageKey( groupName, syncLevel );
-		window.localStorage.setItem( localStorageKey, value );
+		liquipedia.storage.set( localStorageKey, value );
 	},
 
 	getOrCreateSwitchGroup: function ( type, groupName, element, activeClassName ) {

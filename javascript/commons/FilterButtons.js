@@ -419,8 +419,7 @@ liquipedia.filterButtons = {
 	},
 
 	getLocalStorage: function() {
-		const check = window.localStorage.getItem( this.localStorageKey );
-		return check ? JSON.parse( check ) : {};
+		return liquipedia.storage.getJson( this.localStorageKey, {} );
 	},
 
 	setLocalStorage: function() {
@@ -428,7 +427,7 @@ liquipedia.filterButtons = {
 		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
 			filterGroups[ filterGroup.name ] = { filterStates: filterGroup.filterStates, curated: filterGroup.curated };
 		} );
-		window.localStorage.setItem( this.localStorageKey, JSON.stringify( filterGroups ) );
+		liquipedia.storage.setJson( this.localStorageKey, filterGroups );
 	},
 
 	/**
