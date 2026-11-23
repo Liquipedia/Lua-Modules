@@ -457,6 +457,8 @@ Template(s): MatchTicker
 				display: grid;
 				grid-template-rows: auto auto;
 				grid-auto-flow: column;
+				// Keep groups packed at the start when they do not fill the width
+				justify-content: start;
 			}
 		}
 
