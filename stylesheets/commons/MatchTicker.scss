@@ -477,4 +477,22 @@ Template(s): MatchTicker
 			}
 		}
 	}
+
+	.match-ticker-card-group {
+		display: flex;
+		flex-direction: column;
+
+		&__header {
+			width: 100%;
+		}
+
+		&__body {
+			display: grid;
+			grid-template-columns: repeat( auto-fit, 15.625rem );
+
+			@media ( max-width: 600px ) {
+				display: contents;
+			}
+		}
+	}
 }
