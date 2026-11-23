@@ -503,7 +503,6 @@ Template(s): MatchTicker
 		&__header {
 			display: flex;
 			align-items: center;
-			gap: 0.5rem;
 			grid-column: 1 / -1;
 			// The bottom border is drawn inside the 34px separator in the design
 			padding: 0.5rem 1rem 0.4375rem;
@@ -533,12 +532,23 @@ Template(s): MatchTicker
 			}
 
 			// Ongoing matches are marked with a red dot instead of a date
-			&--live::before {
+			&--live > .match-ticker-card-group__title::before {
 				font-family: "Font Awesome 5 Pro";
 				font-size: 0.5rem;
 				content: "\f111"; /* Unicode for circle */
 				color: var( --clr-semantic-negative-40 );
 			}
+		}
+
+		// Stays at the start of the list while the rest of its group is scrolled past
+		&__title {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			min-width: 0;
+			position: sticky;
+			// Same as the header's start padding, so it does not move until it reaches the edge
+			left: 1rem;
 		}
 
 		&__label {

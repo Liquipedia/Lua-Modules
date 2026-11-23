@@ -144,9 +144,13 @@ class LiquipediaMatchTicker {
 	static createGroupHeader( groupKey, firstCard, now ) {
 		const header = document.createElement( 'div' );
 		header.classList.add( 'match-ticker-card-group__header' );
+		// The header spans the whole group, so its content is wrapped to stay in view while scrolling
+		const title = document.createElement( 'div' );
+		title.classList.add( 'match-ticker-card-group__title' );
 		const label = document.createElement( 'span' );
 		label.classList.add( 'match-ticker-card-group__label' );
-		header.append( label );
+		title.append( label );
+		header.append( title );
 
 		if ( groupKey === LiquipediaMatchTicker.LIVE_GROUP_KEY ) {
 			header.classList.add( 'match-ticker-card-group__header--live' );
@@ -159,7 +163,7 @@ class LiquipediaMatchTicker {
 		dateText.classList.add( 'match-ticker-card-group__date' );
 		dateText.dateTime = groupKey;
 		dateText.textContent = firstCard.formatDate( { month: 'short', day: 'numeric', year: 'numeric' } );
-		header.append( dateText );
+		title.append( dateText );
 		return header;
 	}
 }
