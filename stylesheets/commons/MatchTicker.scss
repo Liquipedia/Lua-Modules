@@ -512,7 +512,8 @@ Template(s): MatchTicker
 		grid-template-columns: repeat( var( --match-ticker-group-columns ), 15.625rem );
 
 		@media ( max-width: 600px ) {
-			grid-template-columns: 1fr;
+			// Let long content shrink instead of widening the column past the panel
+			grid-template-columns: minmax( 0, 1fr );
 		}
 
 		&__header {
