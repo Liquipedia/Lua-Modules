@@ -28,10 +28,6 @@ local HERO_SLOT_SIZE = 24
 local HERO_SLOT_GAP = 2
 local MARTIAL_ARTS_MAP = 'martial arts showdown'
 
----@class NarakaSummaryHero
----@field page string
----@field file string
-
 ---@class NarakaSummaryOpponent
 ---@field type string?
 ---@field extradata {heroes: table<string|integer, string>?}?
@@ -39,10 +35,12 @@ local MARTIAL_ARTS_MAP = 'martial arts showdown'
 ---@class NarakaSummaryGame
 ---@field map string?
 ---@field mapDisplayName string?
+---@field date string?
 ---@field opponents NarakaSummaryOpponent[]?
 
 ---@class NarakaHeroLayout
 ---@field slotCount integer
+---@field date string?
 
 ---@class NarakaSummaryColumn
 ---@field id string
@@ -58,25 +56,28 @@ end
 
 ---@param opponent NarakaSummaryOpponent
 ---@param slot integer
----@return NarakaSummaryHero?
-local function heroAt(opponent, slot)
+---@param date string?
+---@return NarakaHeroPick?
+local function heroAt(opponent, slot, date)
 	local picks = (opponent.extradata or {}).heroes or {}
-	return HeroPicks.lookup(picks[tostring(slot)] or picks[slot])
+	return HeroPicks.lookup(picks[tostring(slot)] or picks[slot], date)
 end
 
+---@param date string?
 ---@param opponent NarakaSummaryOpponent
 ---@return boolean
-local function hasHero(opponent)
+local function hasHero(date, opponent)
 	return Array.any(Array.range(1, HERO_SLOT_COUNT), function(slot)
-		return heroAt(opponent, slot) ~= nil
+		return heroAt(opponent, slot, date) ~= nil
 	end)
 end
 
+---@param date string?
 ---@param opponent NarakaSummaryOpponent
 ---@return boolean
-local function hasAdditionalHero(opponent)
+local function hasAdditionalHero(date, opponent)
 	return Array.any(Array.range(2, HERO_SLOT_COUNT), function(slot)
-		return heroAt(opponent, slot) ~= nil
+		return heroAt(opponent, slot, date) ~= nil
 	end)
 end
 
@@ -85,7 +86,7 @@ end
 local function getHeroLayout(game)
 	local opponents = game.opponents or {}
 
-	if not Array.any(opponents, hasHero) then
+	if not Array.any(opponents, FnUtil.curry(hasHero, game.date)) then
 		return nil
 	end
 
@@ -94,10 +95,11 @@ local function getHeroLayout(game)
 		or Array.any(opponents, function(opponent)
 			return opponent.type == Opponent.team
 		end)
-		or Array.any(opponents, hasAdditionalHero)
+		or Array.any(opponents, FnUtil.curry(hasAdditionalHero, game.date))
 
 	return {
 		slotCount = useThreeSlots and HERO_SLOT_COUNT or 1,
+		date = game.date,
 	}
 end
 
@@ -121,7 +123,7 @@ end
 ---@return VNode
 local function renderHeroes(layout, opponent)
 	local icons = Array.mapRange(1, layout.slotCount, function(slot)
-		local hero = heroAt(opponent, slot)
+		local hero = heroAt(opponent, slot, layout.date)
 
 		if not hero then
 			return renderEmptyHeroSlot()
@@ -129,6 +131,7 @@ local function renderHeroes(layout, opponent)
 
 		return MatchSummaryCharacter{
 			character = hero.page,
+			date = layout.date,
 			size = HERO_IMAGE_SIZE,
 			bg = 'brkts-popup-side-color--red',
 			classes = {'brkts-popup-side-color'},
@@ -195,6 +198,7 @@ function CustomGameSummary.getGameByMatchId(props)
 	local game = match.games[props.gameIdx]
 	assert(game, 'Error Game ID ' .. tostring(props.gameIdx) .. ' not found')
 
+	game.date = game.date or match.date
 	game.stream = match.stream
 	game.extradata.settings = match.extradata.settings
 
