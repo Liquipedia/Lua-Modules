@@ -186,5 +186,16 @@
 				background-color: var( --clr-on-surface-dark-primary-8 );
 			}
 		}
+
+		/* Displayed as a popover, see Collapse.js */
+		&[ popover ] {
+			box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.1 );
+
+			.theme--dark & {
+				/* The inline background is translucent, which does not work in the top layer */
+				background-color: var( --clr-secondary-16 );
+				box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.3 );
+			}
+		}
 	}
 }

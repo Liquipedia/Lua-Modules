@@ -117,6 +117,7 @@ local function MatchButtonBar(props)
 		shouldCollapse = true,
 		collapseAreaClasses = {'match-info-vods-area'},
 		classes = {'match-info-links-wrapper'},
+		attributes = {['data-collapsible-popover'] = 'true'},
 		children = displayVods and Array.map(vods, function(vod)
 			return VodButton{
 				vodLink = vod.vod,
