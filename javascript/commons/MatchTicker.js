@@ -45,7 +45,7 @@ class LiquipediaMatchTicker {
 		await mw.loader.using( 'user.options' );
 		/** @type {HTMLElement[]} */
 		const groupedDisplay = [];
-		document.querySelectorAll( '.match-ticker-carousel' ).forEach( ( tickerCarousel ) => {
+		document.querySelectorAll( '.match-ticker-filterable-container .match-ticker-carousel' ).forEach( ( tickerCarousel ) => {
 			const cards = Array.from(
 				tickerCarousel.querySelectorAll( '.match-ticker-card' ),
 				( element ) => new LiquipediaMatchTickerCard( element )
