@@ -105,5 +105,26 @@ describe( 'Collapse module', () => {
 				expect( button.getAttribute( 'popovertarget' ) ).toBe( id );
 			} );
 		} );
+
+		test( 'sets up again after the HTML is serialized and restored', () => {
+			mockSupport( true );
+			render();
+			globalThis.liquipedia.collapse.setupGeneralCollapsibleButtons();
+
+			// FilterButtons caches innerHTML after init and restores it later
+			const container = document.getElementById( 'mw-content-text' );
+			container.innerHTML = container.innerHTML; // eslint-disable-line no-self-assign
+			globalThis.liquipedia.collapse.setupGeneralCollapsibleButtons();
+
+			const collapsible = document.querySelector( '.general-collapsible' );
+			const area = document.querySelector( '.should-collapse' );
+			document.querySelectorAll( 'button' ).forEach( ( button ) => {
+				expect( button.getAttribute( 'popovertarget' ) ).toBe( area.id );
+			} );
+			dispatchToggle( area, 'open' );
+			expect( collapsible.classList.contains( 'collapsed' ) ).toBe( false );
+			dispatchToggle( area, 'closed' );
+			expect( collapsible.classList.contains( 'collapsed' ) ).toBe( true );
+		} );
 	} );
 } );

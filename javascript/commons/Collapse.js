@@ -105,6 +105,10 @@ liquipedia.collapse = {
 
 	popoverCount: 0,
 
+	// Tracks element instances rather than using a DOM attribute as marker, as attributes survive
+	// when the HTML is serialized and restored (e.g. FilterButtons' cache) while listeners do not.
+	initializedPopovers: new WeakSet(),
+
 	supportsAnchoredPopover: function() {
 		return Object.prototype.hasOwnProperty.call( HTMLElement.prototype, 'popover' ) &&
 			CSS.supports( 'position-area: block-end' ) &&
@@ -128,8 +132,9 @@ liquipedia.collapse = {
 		}
 
 		// init() may run more than once (e.g. after FilterButtons reloads content),
-		// so the popover itself is only set up once.
-		if ( !area.hasAttribute( 'popover' ) ) {
+		// so the popover itself is only set up once per element.
+		if ( !this.initializedPopovers.has( area ) ) {
+			this.initializedPopovers.add( area );
 			const name = `general-collapsible-popover-${ ++this.popoverCount }`;
 			if ( !area.id ) {
 				area.id = name;
