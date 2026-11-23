@@ -14,6 +14,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local MathUtil = Lua.import('Module:MathUtil')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local Set = Lua.import('Module:Set')
 local Table = Lua.import('Module:Table')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
@@ -73,9 +74,6 @@ function TeamStats.run(frame)
 
 	return TeamStats.Overview{opponents = opponents}
 end
-
--- Template:TeamStats calls the module with fn=MapsPlayed
-TeamStats.MapsPlayed = TeamStats.run
 
 -- Data
 
@@ -224,15 +222,15 @@ end
 ---@param opponents table<string, EvaTeamStatsOpponent>
 ---@return string[]
 local function playedMaps(opponents)
-	local maps = {}
+	local maps = Set()
 	for _, entry in pairs(opponents) do
 		for map, mapStats in pairs(entry.maps) do
 			if gamesPlayed(mapStats.total) > 0 then
-				maps[map] = true
+				maps:add(map)
 			end
 		end
 	end
-	local sortedMaps = Array.extractKeys(maps)
+	local sortedMaps = maps:toArray()
 	table.sort(sortedMaps)
 	return sortedMaps
 end
