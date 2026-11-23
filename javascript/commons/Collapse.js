@@ -107,7 +107,6 @@ liquipedia.collapse = {
 
 	supportsAnchoredPopover: function() {
 		return Object.prototype.hasOwnProperty.call( HTMLElement.prototype, 'popover' ) &&
-			typeof CSS !== 'undefined' &&
 			CSS.supports( 'position-area: block-end' ) &&
 			CSS.supports( 'width: anchor-size(width)' );
 	},
