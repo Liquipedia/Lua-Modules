@@ -84,7 +84,7 @@ end
 ---@param opponent table?
 ---@return VNode
 local function renderHeroes(layout, opponent)
-	local icons = Array.map(Array.range(1, layout.slotCount), function(slot)
+	local icons = Array.mapRange(1, layout.slotCount, function(slot)
 		local hero = opponent and heroAt(opponent, slot)
 
 		if hero then
