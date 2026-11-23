@@ -8,9 +8,10 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Operator = Lua.import('Module:Operator')
-local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local HeroPicks = Lua.import('Module:HeroPicks')
+local Operator = Lua.import('Module:Operator')
+
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local MapFunctions = {}
 local MatchFunctions = {
@@ -19,10 +20,12 @@ local MatchFunctions = {
 		applyUnderScores = true,
 		maxNumPlayers = 4,
 	},
-	DEFAULT_MODE = 'team'
+	DEFAULT_MODE = 'team',
 }
 
 local CustomMatchGroupInput = {}
+
+local HERO_SLOT_COUNT = 3
 
 ---@param match table
 ---@param options table?
@@ -34,22 +37,28 @@ end
 --
 -- map related functions
 --
+
 ---@param match table
 ---@param map table
 ---@param opponents table[]
 function MapFunctions.getExtraData(match, map, opponents)
 	Array.forEach(map.opponents, function(gameOpponent, opponentIndex)
-		local picks = HeroPicks.readMapOpponent(map, opponentIndex, 3)
-		if picks then
-			gameOpponent.extradata = gameOpponent.extradata or {}
-			gameOpponent.extradata.heroes = picks
-		end
+		local picks = HeroPicks.readMapOpponent(
+			map,
+			opponentIndex,
+			HERO_SLOT_COUNT,
+			map.date or match.date
+		)
+
+		gameOpponent.extradata = gameOpponent.extradata or {}
+		gameOpponent.extradata.heroes = picks
 	end)
 end
 
 --
 -- match related functions
 --
+
 ---@param match table
 ---@param opponents table[]
 ---@param scoreSettings table
