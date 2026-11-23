@@ -111,9 +111,15 @@ liquipedia.collapse = {
 			CSS.supports( 'width: anchor-size(width)' );
 	},
 
-	// Turns the collapse area of a general-collapsible into a popover that is anchored below
-	// the collapsible's header. Only used when the browser natively supports both popovers and
-	// anchor positioning; otherwise the collapsible keeps expanding inline.
+	/**
+	 * Turns the collapse area of a general-collapsible into a popover that is anchored below
+	 * the collapsible's header. Only used when the browser natively supports both popovers and
+	 * anchor positioning; otherwise the collapsible keeps expanding inline.
+	 *
+	 * @param {HTMLElement} collapsible
+	 * @param {(HTMLButtonElement|null)[]} toggleButtons
+	 * @return {void}
+	 */
 	setupPopoverCollapsible: function( collapsible, toggleButtons ) {
 		const area = collapsible.querySelector( ':scope > .should-collapse' );
 		const anchor = area?.previousElementSibling;
