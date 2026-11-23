@@ -407,6 +407,7 @@ liquipedia.filterButtons = {
 		liquipedia.countdown.init();
 		liquipedia.collapse.init();
 		liquipedia.switchButtons.init();
+		liquipedia.carousel.init();
 	},
 
 	buildLocalStorageKey: function() {
