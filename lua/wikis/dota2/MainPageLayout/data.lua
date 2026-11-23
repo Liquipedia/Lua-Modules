@@ -195,7 +195,7 @@ local LAYOUT_MAIN = {
 		},
 	},
 	{ -- Top Left
-		sizes = {xxl = 5, xxxl = 6},
+		sizes = {xxl = 6, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 1,
@@ -212,7 +212,7 @@ local LAYOUT_MAIN = {
 		},
 	},
 	{ -- Top Right
-		sizes = {xxl = 7, xxxl = 6},
+		sizes = {xxl = 6, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 4,
@@ -284,7 +284,7 @@ local LAYOUT_ESPORTS = {
 		},
 	},
 	{ -- Left
-		sizes = {xxl = 5, xxxl = 6},
+		sizes = {xxl = 6, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 1,
@@ -313,7 +313,7 @@ local LAYOUT_ESPORTS = {
 		}
 	},
 	{ -- Right
-		sizes = {xxl = 7, xxxl = 6},
+		sizes = {xxl = 6, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 5,
@@ -329,7 +329,7 @@ local LAYOUT_ESPORTS = {
 
 local LAYOUT_GAME = {
 	{ -- Left
-		sizes = {xxl = 5, xxxl = 6},
+		sizes = {xxl = 6, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 1,
@@ -346,7 +346,7 @@ local LAYOUT_GAME = {
 		},
 	},
 	{ -- Right
-		sizes = {xxl = 7, xxxl = 6},
+		sizes = {xxl = 6, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 3,
