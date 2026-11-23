@@ -30,11 +30,12 @@ local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
 local CountdownWidget = Lua.import('Module:Widget/Countdown')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
+local NoWrap = Widgets.NoWrap
 
 ---@class Starcraft2LeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -244,16 +245,14 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param maps {link: string, displayname: string}[]
----@return string[]
+---@return Renderable[]
 function CustomLeague:_mapsDisplay(maps)
-	return {table.concat(
+	return Array.interleave(
 		Array.map(maps, function(mapData)
-			return tostring(self:_createNoWrappingSpan(
-				Page.makeInternalLink({}, mapData.displayname, mapData.link)
-			))
+			return NoWrap{children = Page.makeInternalLink({}, mapData.displayname, mapData.link)}
 		end),
 		'&nbsp;• '
-	)}
+	)
 end
 
 ---@param args table
@@ -396,15 +395,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.mod = self.data.mod
 
 	return lpdbData
-end
-
----@param content string|Html|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-	span:css('white-space', 'nowrap')
-		:node(content)
-	return span
 end
 
 ---@param args table
