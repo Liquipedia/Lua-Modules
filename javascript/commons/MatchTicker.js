@@ -59,7 +59,7 @@ class LiquipediaMatchTicker {
 
 			for ( const [ date, cardGroup ] of cardGroups ) {
 				const cardGroupElement = document.createElement( 'div' );
-				cardGroup.classList.add( '.match-ticker-card-group' );
+				cardGroupElement.classList.add( '.match-ticker-card-group' );
 				const title = document.createElement( 'div' );
 				title.classList.add( '.match-ticker-card-header' );
 				title.innerText = date;
