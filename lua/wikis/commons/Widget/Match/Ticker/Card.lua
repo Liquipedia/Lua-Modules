@@ -33,6 +33,7 @@ function MatchTickerCard.render(props)
 
 	return Html.Div{
 		classes = {'match-ticker-card'},
+		attributes = {['data-match-timestamp'] = match.timestamp},
 		children = {
 			MatchTickerCard.buildHeader(match),
 			MatchTickerCardOpponents{match = match},
@@ -48,7 +49,7 @@ function MatchTickerCard.buildHeader(match)
 	return Html.Div{
 		classes = {'match-ticker-card__header'},
 		children = {
-			MatchCountdown{match = match, format = 'compact'},
+			MatchCountdown{match = match, format = 'minimal'},
 			MatchTickerCard.buildSectionAndBestOf(match),
 		}
 	}
