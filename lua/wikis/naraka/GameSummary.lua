@@ -8,8 +8,9 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
 local HeroPicks = Lua.import('Module:HeroPicks')
-local Opponent = Lua.import('Module:Opponent')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local String = Lua.import('Module:StringUtils')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
@@ -22,7 +23,31 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local CustomGameSummary = {}
 
 local HERO_SLOT_COUNT = 3
+local HERO_IMAGE_SIZE = '60px'
+local HERO_SLOT_SIZE = 24
+local HERO_SLOT_GAP = 2
 local MARTIAL_ARTS_MAP = 'martial arts showdown'
+
+---@class NarakaSummaryHero
+---@field page string
+---@field file string
+
+---@class NarakaSummaryOpponent
+---@field type string?
+---@field extradata {heroes: table<string|integer, string>?}?
+
+---@class NarakaSummaryGame
+---@field map string?
+---@field mapDisplayName string?
+---@field opponents NarakaSummaryOpponent[]?
+
+---@class NarakaHeroLayout
+---@field slotCount integer
+
+---@class NarakaSummaryColumn
+---@field id string
+---@field header table?
+---@field row table?
 
 ---@param mapName string?
 ---@return boolean
@@ -31,78 +56,82 @@ local function isMartialArts(mapName)
 		and String.trim(mapName):lower():gsub('_', ' ') == MARTIAL_ARTS_MAP
 end
 
----@param opponent table
+---@param opponent NarakaSummaryOpponent
 ---@param slot integer
----@return table?
+---@return NarakaSummaryHero?
 local function heroAt(opponent, slot)
 	local picks = (opponent.extradata or {}).heroes or {}
 	return HeroPicks.lookup(picks[tostring(slot)] or picks[slot])
 end
 
----@param game table
----@return table?
+---@param opponent NarakaSummaryOpponent
+---@return boolean
+local function hasHero(opponent)
+	return Array.any(Array.range(1, HERO_SLOT_COUNT), function(slot)
+		return heroAt(opponent, slot) ~= nil
+	end)
+end
+
+---@param opponent NarakaSummaryOpponent
+---@return boolean
+local function hasAdditionalHero(opponent)
+	return Array.any(Array.range(2, HERO_SLOT_COUNT), function(slot)
+		return heroAt(opponent, slot) ~= nil
+	end)
+end
+
+---@param game NarakaSummaryGame
+---@return NarakaHeroLayout?
 local function getHeroLayout(game)
 	local opponents = game.opponents or {}
 
+	if not Array.any(opponents, hasHero) then
+		return nil
+	end
+
+	-- Preserve the existing three-slot rule.
 	local useThreeSlots = isMartialArts(game.map) or isMartialArts(game.mapDisplayName)
 		or Array.any(opponents, function(opponent)
 			return opponent.type == Opponent.team
 		end)
-
-	local placeholder
-	Array.forEach(opponents, function(opponent)
-		if placeholder then
-			return
-		end
-
-		for heroIndex = 1, HERO_SLOT_COUNT do
-			local hero = heroAt(opponent, heroIndex)
-			if hero then
-				placeholder = hero
-				return
-			end
-		end
-	end)
-
-	if not placeholder then
-		return nil
-	end
-
-	local hasMoreThan1Slot = Array.any(opponents, function(opponent)
-		return Array.any(Array.range(2, HERO_SLOT_COUNT), function(heroIndex)
-			return heroAt(opponent, heroIndex) ~= nil
-		end)
-	end)
+		or Array.any(opponents, hasAdditionalHero)
 
 	return {
-		slotCount = (useThreeSlots or hasMoreThan1Slot) and HERO_SLOT_COUNT or 1,
-		placeholder = placeholder,
+		slotCount = useThreeSlots and HERO_SLOT_COUNT or 1,
 	}
 end
 
----@param layout table
----@param opponent table?
+---@return VNode
+local function renderEmptyHeroSlot()
+	local size = HERO_SLOT_SIZE .. 'px'
+
+	return Html.Span{
+		attributes = {['aria-hidden'] = 'true'},
+		css = {
+			display = 'block',
+			width = size,
+			height = size,
+			flex = '0 0 ' .. size,
+		},
+	}
+end
+
+---@param layout NarakaHeroLayout
+---@param opponent NarakaSummaryOpponent
 ---@return VNode
 local function renderHeroes(layout, opponent)
 	local icons = Array.mapRange(1, layout.slotCount, function(slot)
-		local hero = opponent and heroAt(opponent, slot)
+		local hero = heroAt(opponent, slot)
 
-		if hero then
-			return MatchSummaryCharacter{
-				character = hero.page,
-				size = '60px',
-				bg = 'brkts-popup-side-color--red',
-				classes = {'brkts-popup-side-color'},
-			}
+		if not hero then
+			return renderEmptyHeroSlot()
 		end
 
-		return Html.Span{
-			classes = {'invisible'},
-			attributes = {['aria-hidden'] = 'true'},
-			children = MatchSummaryCharacter{
-				character = layout.placeholder.page,
-				size = '60px',
-			},
+		return MatchSummaryCharacter{
+			character = hero.page,
+			size = HERO_IMAGE_SIZE,
+			bg = 'brkts-popup-side-color--red',
+			classes = {'brkts-popup-side-color'},
 		}
 	end)
 
@@ -112,24 +141,27 @@ local function renderHeroes(layout, opponent)
 	}
 end
 
----@param layout table
+---@param layout NarakaHeroLayout
 ---@return VNode
 local function renderHeroHeader(layout)
+	local width = layout.slotCount * HERO_SLOT_SIZE
+		+ (layout.slotCount - 1) * HERO_SLOT_GAP
+
 	return Html.Div{
-		classes = {'position-relative', 'd-flex', 'align-items-center', 'justify-content-center'},
-		children = {
-			renderHeroes(layout),
-			Html.Span{
-				classes = {'position-absolute'},
-				children = 'Hero Pick',
-			},
+		css = {
+			display = 'flex',
+			['align-items'] = 'center',
+			['justify-content'] = 'center',
+			['min-width'] = width .. 'px',
+			['min-height'] = HERO_SLOT_SIZE .. 'px',
 		},
+		children = 'Hero Pick',
 	}
 end
 
----@param defaultColumns table[]
----@param game table
----@return table[]
+---@param defaultColumns NarakaSummaryColumn[]
+---@param game NarakaSummaryGame
+---@return NarakaSummaryColumn[]
 function CustomGameSummary.adjustGameStandingsColumns(defaultColumns, game)
 	local layout = getHeroLayout(game)
 	if not layout then
@@ -146,9 +178,7 @@ function CustomGameSummary.adjustGameStandingsColumns(defaultColumns, game)
 				id = 'hero',
 				header = {value = renderHeroHeader(layout)},
 				row = {
-					value = function(opponent)
-						return renderHeroes(layout, opponent)
-					end,
+					value = FnUtil.curry(renderHeroes, layout),
 				},
 			},
 			column,
@@ -157,7 +187,7 @@ function CustomGameSummary.adjustGameStandingsColumns(defaultColumns, game)
 end
 
 ---@param props {bracketId: string, matchId: string, gameIdx: integer}
----@return Html
+---@return VNode
 function CustomGameSummary.getGameByMatchId(props)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
 	---@cast match FFAMatchGroupUtilMatch
