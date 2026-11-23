@@ -8,7 +8,9 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
+local Timezone = Lua.import('Module:Timezone')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
@@ -34,7 +36,10 @@ function MatchTickerCard.render(props)
 
 	return Html.Div{
 		classes = {'match-ticker-card'},
-		attributes = {['data-match-timestamp'] = match.timestamp},
+		attributes = {
+			['data-match-timestamp'] = match.timestamp,
+			['data-match-timezone-offset'] = MatchTickerCard.getDisplayedTimezoneOffset(match),
+		},
 		children = {
 			MatchTickerCard.buildHeader(match, props.countdownFormat),
 			MatchTickerCardOpponents{match = match},
@@ -42,6 +47,17 @@ function MatchTickerCard.render(props)
 			MatchButtonBar{match = match, showVods = true, buttonSize = 'xs'}
 		}
 	}
+end
+
+---Offset in seconds from UTC of the timezone the server renders the match date in
+---@param match MatchGroupUtilMatch
+---@return integer
+function MatchTickerCard.getDisplayedTimezoneOffset(match)
+	-- Dates without a time are shown as the UTC date, see DateExt.toCountdownArg
+	if not match.dateIsExact then
+		return 0
+	end
+	return Timezone.getOffset{timezone = match.timezoneId or DateExt.defaultTimezone} or 0
 end
 
 ---@param match MatchGroupUtilMatch

@@ -1,14 +1,21 @@
 class LiquipediaMatchTickerCard {
-	#useUTC;
+	/**
+	 * Offset in milliseconds of the timezone dates are shown in, or null for the local timezone
+	 *
+	 * @type {number?}
+	 */
+	#timezoneOffset;
 
 	/**
 	 * @param {HTMLElement} cardElement
-	 * @param {boolean} useUTC whether dates are shown in UTC instead of the local timezone
+	 * @param {boolean} useMatchTimezone whether dates are shown in the timezone of the match instead of the local one
 	 * @param {boolean?} hiddenInMobile
 	 */
-	constructor( cardElement, useUTC, hiddenInMobile = false ) {
+	constructor( cardElement, useMatchTimezone, hiddenInMobile = false ) {
 		this.cardElement = cardElement;
-		this.#useUTC = useUTC;
+		this.#timezoneOffset = useMatchTimezone ?
+			1000 * ( parseInt( this.cardElement.dataset.matchTimezoneOffset, 10 ) || 0 ) :
+			null;
 		this.parsedDate = new Date( 1000 * parseInt( this.cardElement.dataset.matchTimestamp, 10 ) );
 		this.hiddenInMobile = hiddenInMobile;
 
@@ -18,14 +25,25 @@ class LiquipediaMatchTickerCard {
 	}
 
 	/**
-	 * Calendar date of the given moment, in UTC or the local timezone
+	 * Shift the given moment so that its UTC fields read as the wall-clock time in the timezone of the match
+	 *
+	 * @param {Date} date
+	 * @return {Date}
+	 */
+	#toMatchTimezone( date ) {
+		return new Date( date.getTime() + this.#timezoneOffset );
+	}
+
+	/**
+	 * Calendar date of the given moment, in the timezone of the match or the local timezone
 	 *
 	 * @param {Date} date
 	 * @return {{year: number, month: number, day: number}}
 	 */
 	#getCalendarDate( date ) {
-		if ( this.#useUTC ) {
-			return { year: date.getUTCFullYear(), month: date.getUTCMonth(), day: date.getUTCDate() };
+		if ( this.#timezoneOffset !== null ) {
+			const shifted = this.#toMatchTimezone( date );
+			return { year: shifted.getUTCFullYear(), month: shifted.getUTCMonth(), day: shifted.getUTCDate() };
 		}
 		return { year: date.getFullYear(), month: date.getMonth(), day: date.getDate() };
 	}
@@ -44,10 +62,11 @@ class LiquipediaMatchTickerCard {
 	 * @return {string}
 	 */
 	formatDate( options ) {
-		return this.parsedDate.toLocaleDateString( 'en-US', {
-			...options,
-			timeZone: this.#useUTC ? 'UTC' : undefined
-		} );
+		if ( this.#timezoneOffset === null ) {
+			return this.parsedDate.toLocaleDateString( 'en-US', options );
+		}
+		const shifted = this.#toMatchTimezone( this.parsedDate );
+		return shifted.toLocaleDateString( 'en-US', { ...options, timeZone: 'UTC' } );
 	}
 
 	/**
@@ -97,7 +116,10 @@ class LiquipediaMatchTicker {
 	static async init() {
 		await mw.loader.using( 'user.options' );
 		const now = new Date();
-		const useUTC = mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' );
+		// With timezone adjustment disabled, countdowns keep showing the date in the timezone of the match
+		const useMatchTimezone = Boolean(
+			mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' )
+		);
 		document.querySelectorAll(
 			'.match-ticker-filterable-container .match-ticker-carousel'
 		).forEach( ( tickerCarousel ) => {
@@ -108,7 +130,7 @@ class LiquipediaMatchTicker {
 			const groupElements = [];
 			const cards = Array.from(
 				tickerCarousel.querySelectorAll( '.match-ticker-card' ),
-				( element, index ) => new LiquipediaMatchTickerCard( element, useUTC, index >= 5 )
+				( element, index ) => new LiquipediaMatchTickerCard( element, useMatchTimezone, index >= 5 )
 			);
 
 			if ( cards.length === 0 ) {
