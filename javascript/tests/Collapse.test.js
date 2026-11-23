@@ -129,6 +129,33 @@ describe( 'Collapse module', () => {
 		} );
 	} );
 
+	describe( 'nested collapsibles', () => {
+		test( 'only wire up their own toggle buttons', () => {
+			document.body.innerHTML = `
+				<div id="mw-content-text">
+					<div class="general-collapsible outer">
+						<div class="header"></div>
+						<div class="should-collapse">
+							<div class="general-collapsible collapsed inner">
+								<span class="general-collapsible-expand-button">Show</span>
+								<span class="general-collapsible-collapse-button">Hide</span>
+								<div class="should-collapse">Content</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			`;
+			globalThis.liquipedia.collapse.supportsAnchoredPopover = () => false;
+			globalThis.liquipedia.collapse.setupGeneralCollapsibleButtons();
+
+			const outer = document.querySelector( '.outer' );
+			const inner = document.querySelector( '.inner' );
+			inner.querySelector( 'button.general-collapsible-collapse-button' ).click();
+			expect( outer.classList.contains( 'collapsed' ) ).toBe( false );
+			expect( inner.classList.contains( 'collapsed' ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'click region collapsibles', () => {
 		const render = () => {
 			document.body.innerHTML = `

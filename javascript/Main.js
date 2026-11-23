@@ -64,7 +64,6 @@ const jsModules = [
 	'Mainpage',
 	'MatchTicker',
 	'Miscellaneous',
-	'PanelBoxCollapsible',
 	'Prizepooltable',
 	'RankingTable',
 	'Selectall',

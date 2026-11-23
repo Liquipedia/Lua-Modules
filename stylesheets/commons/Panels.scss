@@ -9,17 +9,11 @@ Author(s): FO-nTTaX
 	border-radius: 0.5rem;
 	margin-bottom: 0.625rem;
 
-	&.is--collapsed {
-		.panel-box-heading {
-			border-radius: 0.5rem;
+	&.collapsed > .panel-box-heading {
+		border-radius: 0.5rem;
 
-			&-icon {
-				transform: rotate( 180deg );
-			}
-		}
-
-		.panel-box-collapsible-content {
-			display: none;
+		.panel-box-heading-icon {
+			transform: rotate( 180deg );
 		}
 	}
 }
