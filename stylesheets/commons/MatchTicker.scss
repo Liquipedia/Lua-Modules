@@ -501,8 +501,54 @@ Template(s): MatchTicker
 		}
 
 		&__header {
-			width: 100%;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
 			grid-column: 1 / -1;
+			// The bottom border is drawn inside the 34px separator in the design
+			padding: 0.5rem 1rem 0.4375rem;
+			border-style: solid;
+			border-width: 0 1px 1px 0;
+			border-color: var( --clr-on-surface-light-primary-8 );
+			background-color: var( --clr-on-surface-light-primary-4 );
+			font-size: 0.75rem;
+			font-weight: bold;
+			line-height: 1.125rem;
+			white-space: nowrap;
+			color: var( --clr-secondary-9 );
+
+			.theme--dark & {
+				border-color: var( --clr-on-surface-dark-primary-8 );
+				background-color: var( --clr-on-surface-dark-primary-4 );
+				color: var( --clr-secondary-100 );
+			}
+
+			// Stronger background on small screens
+			@media ( max-width: 600px ) {
+				background-color: var( --clr-on-surface-light-primary-12 );
+
+				.theme--dark & {
+					background-color: var( --clr-on-surface-dark-primary-12 );
+				}
+			}
+		}
+
+		&__label {
+			flex-shrink: 0;
+		}
+
+		&__date {
+			min-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			font-size: 0.6875rem;
+			font-weight: normal;
+			line-height: 1rem;
+			color: var( --clr-secondary-25 );
+
+			.theme--dark & {
+				color: var( --clr-secondary-80 );
+			}
 		}
 
 		&__body {
