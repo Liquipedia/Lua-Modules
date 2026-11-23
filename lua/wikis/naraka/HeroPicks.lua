@@ -7,8 +7,11 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
+local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local HEROES = Lua.import('Module:CharacterIcon/Data', {loadData = true})
 
@@ -22,7 +25,7 @@ local function normalize(value)
 	end
 
 	local id = String.trim(value):lower():gsub('[%s_%-]+', '')
-	return id ~= '' and id or nil
+	return Logic.nilIfEmpty(id)
 end
 
 local HERO_NAMES = {}
@@ -33,38 +36,30 @@ end
 ---@param value any
 ---@return {page: string, file: string}?
 function HeroPicks.lookup(value)
-	local id = normalize(value)
-	local name = id and HERO_NAMES[id]
+	local name = HERO_NAMES[normalize(value)]
 	if not name then
 		return nil
 	end
 
-	local hero = CharacterIcon.raw(name)
-	if not hero or not hero.file or hero.file == '' then
+	local heroIcon = CharacterIcon.raw(name) or {}
+	if Logic.isEmpty(heroIcon.file) then
 		return nil
 	end
 
 	return {
-		page = hero.link or hero.display or name,
-		file = hero.file,
+		page = heroIcon.link or heroIcon.display or name,
+		file = heroIcon.file,
 	}
 end
 
 ---@param map table
 ---@param opponentIndex integer
 ---@param slotCount integer
----@return table<string, string>?
+---@return table<integer, string>?
 function HeroPicks.readMapOpponent(map, opponentIndex, slotCount)
-	local picks = {}
-
-	for slot = 1, slotCount do
-		local id = normalize(map['t' .. opponentIndex .. 'h' .. slot])
-		if id then
-			picks[tostring(slot)] = id
-		end
-	end
-
-	return next(picks) and picks or nil
+	return Logic.nilIfEmpty(Table.map(Array.range(1, slotCount), function(_, heroIndex)
+		return heroIndex, normalize(map['t' .. opponentIndex .. 'h' .. heroIndex])
+	end))
 end
 
 return HeroPicks
