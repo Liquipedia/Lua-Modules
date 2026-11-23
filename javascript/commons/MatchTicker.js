@@ -18,7 +18,7 @@ class LiquipediaMatchTickerCard {
 		if ( this.#useUTC() ) {
 			return this.parsedDate.getUTCFullYear();
 		}
-		return this.parsedDate.getUTCFullYear();
+		return this.parsedDate.getFullYear();
 	}
 
 	getMonth() {
