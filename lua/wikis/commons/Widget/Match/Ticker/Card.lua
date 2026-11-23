@@ -23,6 +23,7 @@ local MatchButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
 ---@field onlyHighlightOnValue string?
 ---@field displayGameIcons boolean?
 ---@field hideTournament boolean?
+---@field countdownFormat CountdownFormat?
 
 local MatchTickerCard = {}
 
@@ -35,7 +36,7 @@ function MatchTickerCard.render(props)
 		classes = {'match-ticker-card'},
 		attributes = {['data-match-timestamp'] = match.timestamp},
 		children = {
-			MatchTickerCard.buildHeader(match),
+			MatchTickerCard.buildHeader(match, props.countdownFormat),
 			MatchTickerCardOpponents{match = match},
 			TournamentInfo(props),
 			MatchButtonBar{match = match, showVods = true, buttonSize = 'xs'}
@@ -44,12 +45,13 @@ function MatchTickerCard.render(props)
 end
 
 ---@param match MatchGroupUtilMatch
+---@param countdownFormat CountdownFormat
 ---@return VNode
-function MatchTickerCard.buildHeader(match)
+function MatchTickerCard.buildHeader(match, countdownFormat)
 	return Html.Div{
 		classes = {'match-ticker-card__header'},
 		children = {
-			MatchCountdown{match = match, format = 'minimal'},
+			MatchCountdown{match = match, format = countdownFormat},
 			MatchTickerCard.buildSectionAndBestOf(match),
 		}
 	}
@@ -81,4 +83,4 @@ function MatchTickerCard.buildSectionAndBestOf(match)
 	}
 end
 
-return Component.component(MatchTickerCard.render)
+return Component.component(MatchTickerCard.render, {countdownFormat = 'compact'})
