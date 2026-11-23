@@ -4,11 +4,17 @@ class LiquipediaMatchTickerCard {
 	/**
 	 * @param {HTMLElement} cardElement
 	 * @param {boolean} useUTC whether dates are shown in UTC instead of the local timezone
+	 * @param {boolean?} hiddenInMobile
 	 */
-	constructor( cardElement, useUTC ) {
+	constructor( cardElement, useUTC, hiddenInMobile = false ) {
 		this.cardElement = cardElement;
 		this.#useUTC = useUTC;
 		this.parsedDate = new Date( 1000 * parseInt( this.cardElement.dataset.matchTimestamp, 10 ) );
+		this.hiddenInMobile = hiddenInMobile;
+
+		if ( this.hiddenInMobile ) {
+			this.cardElement.classList.add( 'mobile-hide' );
+		}
 	}
 
 	/**
@@ -102,7 +108,7 @@ class LiquipediaMatchTicker {
 			const groupElements = [];
 			const cards = Array.from(
 				tickerCarousel.querySelectorAll( '.match-ticker-card' ),
-				( element ) => new LiquipediaMatchTickerCard( element, useUTC )
+				( element, index ) => new LiquipediaMatchTickerCard( element, useUTC, index >= 5 )
 			);
 
 			if ( cards.length === 0 ) {
@@ -118,6 +124,9 @@ class LiquipediaMatchTicker {
 				const cardGroupElement = document.createElement( 'div' );
 				cardGroupElement.classList.add( 'match-ticker-card-group' );
 				cardGroupElement.style.setProperty( '--match-ticker-group-columns', cardGroup.length );
+				if ( cardGroup[ 0 ].hiddenInMobile ) {
+					cardGroupElement.classList.add( 'mobile-hide' );
+				}
 				const header = LiquipediaMatchTicker.createGroupHeader( groupKey, cardGroup[ 0 ], now );
 				const cardContainer = document.createElement( 'div' );
 				cardContainer.classList.add( 'match-ticker-card-group__body' );
