@@ -10,6 +10,12 @@ Template(s): MatchTicker
 	--match-ticker-card-secondary-text-color: var( --clr-secondary-25 );
 	--match-ticker-card-opponent-ffa-icon-background-color: var( --clr-secondary-100 );
 	--match-ticker-card-opponent-ffa-icon-border-color: var( --clr-secondary-90 );
+	--match-ticker-card-tournament-background-color: var( --clr-on-surface-light-primary-4 );
+	--match-ticker-card-group-header-background-color: var( --clr-on-surface-light-primary-4 );
+	--match-ticker-card-group-header-small-screen-background-color: var( --clr-on-surface-light-primary-12 );
+	--match-ticker-card-group-header-text-color: var( --clr-secondary-9 );
+	--match-ticker-card-group-date-color: var( --clr-secondary-25 );
+	--match-ticker-navigation-border-color: var( --clr-on-surface-light-primary-8 );
 }
 
 .theme--dark {
@@ -20,6 +26,28 @@ Template(s): MatchTicker
 	--match-ticker-card-secondary-text-color: var( --clr-secondary-90 );
 	--match-ticker-card-opponent-ffa-icon-background-color: var( --clr-secondary-25 );
 	--match-ticker-card-opponent-ffa-icon-border-color: var( --clr-secondary-39 );
+	--match-ticker-card-tournament-background-color: var( --clr-on-surface-dark-primary-8 );
+	--match-ticker-card-group-header-background-color: var( --clr-on-surface-dark-primary-4 );
+	--match-ticker-card-group-header-small-screen-background-color: var( --clr-on-surface-dark-primary-12 );
+	--match-ticker-card-group-header-text-color: var( --clr-secondary-100 );
+	--match-ticker-card-group-date-color: var( --clr-secondary-80 );
+	--match-ticker-navigation-border-color: var( --clr-on-surface-dark-primary-8 );
+}
+
+// Colors shared by both themes
+:root {
+	--match-ticker-card-group-live-indicator-color: var( --clr-semantic-negative-40 );
+
+	// The panel heading has the wiki's theme color in both themes, so its controls stay light on it
+	--match-ticker-header-text-color: var( --clr-secondary-100 );
+	--match-ticker-header-control-background-color: var( --clr-on-surface-light-primary-16 );
+	--match-ticker-header-control-disabled-background-color: var( --clr-on-surface-light-primary-4 );
+	--match-ticker-header-pill-background-color: var( --clr-on-surface-light-primary-12 );
+	--match-ticker-header-pill-active-background-color: var( --clr-secondary-100 );
+	--match-ticker-header-pill-active-border-color: var( --clr-on-surface-light-primary-16 );
+	--match-ticker-header-pill-active-text-color: var( --clr-secondary-25 );
+	--match-ticker-header-switch-background-color: var( --clr-on-surface-light-primary-16 );
+	--match-ticker-header-switch-active-background-color: var( --clr-on-surface-light-primary-40 );
 }
 
 /* carousel items are stretched to the tallest card, let every card fill its item */
@@ -77,7 +105,6 @@ Template(s): MatchTicker
 		margin: 0;
 		border: 0;
 		border-top: 1px solid var( --match-ticker-card-divider-color );
-		background: none;
 	}
 
 	&__opponent {
@@ -253,11 +280,7 @@ Template(s): MatchTicker
 		font-size: 0.75rem;
 		line-height: 1.125rem;
 		align-items: center;
-		background-color: var( --clr-on-surface-light-primary-4 );
-
-		.theme--dark & {
-			background-color: var( --clr-on-surface-dark-primary-8 );
-		}
+		background-color: var( --match-ticker-card-tournament-background-color );
 
 		/**
 			Mostly duplicated from Mainpage.scss
@@ -295,16 +318,13 @@ Template(s): MatchTicker
 }
 
 .match-ticker-filterable-container {
-	--match-ticker-header-control-background-color: var( --clr-on-surface-light-primary-16 );
-	--match-ticker-header-control-disabled-background-color: var( --clr-on-surface-light-primary-4 );
-	--match-ticker-header-pill-background-color: var( --clr-on-surface-light-primary-12 );
-
 	> .panel-box-heading {
 		justify-content: space-between;
 		gap: 0.5rem 0.75rem;
 		// The bottom border is drawn inside the 3rem header in the design
 		padding: 0.4375rem 1rem 0.375rem;
-		border-bottom: 1px solid var( --clr-on-surface-light-primary-16 );
+		// The color comes from the wiki's border color class on the heading
+		border-bottom: 1px solid;
 
 		// Upcoming / Completed pill, light on the themed header in both themes
 		.switch-pill-container .switch-pill.switch-pill-generic {
@@ -321,13 +341,13 @@ Template(s): MatchTicker
 				line-height: 1.125rem;
 				padding: 0.25rem 0.75rem;
 				border-radius: 0.25rem;
-				color: var( --clr-secondary-100 );
+				color: var( --match-ticker-header-text-color );
 
 				&.switch-pill-option-active {
-					background-color: var( --clr-secondary-100 );
-					outline: 1px solid var( --clr-on-surface-light-primary-16 );
+					background-color: var( --match-ticker-header-pill-active-background-color );
+					outline: 1px solid var( --match-ticker-header-pill-active-border-color );
 					outline-offset: -1px;
-					color: var( --clr-secondary-25 );
+					color: var( --match-ticker-header-pill-active-text-color );
 				}
 			}
 		}
@@ -343,11 +363,11 @@ Template(s): MatchTicker
 			.switch-toggle-slider::after {
 				opacity: 1;
 				border-radius: 1.125rem;
-				background-color: var( --clr-on-surface-light-primary-16 );
+				background-color: var( --match-ticker-header-switch-background-color );
 			}
 
 			&.switch-toggle-active .switch-toggle-slider {
-				background-color: var( --clr-on-surface-light-primary-40 );
+				background-color: var( --match-ticker-header-switch-active-background-color );
 
 				&::after {
 					background-color: transparent;
@@ -368,7 +388,6 @@ Template(s): MatchTicker
 			border: 0;
 			border-radius: 0.25rem;
 			background-color: var( --match-ticker-header-control-background-color );
-			color: var( --clr-secondary-100 );
 
 			// The design uses a 1.25rem icon box; the extra-small button would shrink it to ~8px
 			i {
@@ -414,11 +433,7 @@ Template(s): MatchTicker
 			flex-direction: column;
 			// The bottom border is drawn inside the strip in the design
 			padding: 1rem 1rem 0.9375rem;
-			border-bottom: 1px solid var( --clr-on-surface-light-primary-8 );
-
-			.theme--dark & {
-				border-bottom-color: var( --clr-on-surface-dark-primary-8 );
-			}
+			border-bottom: 1px solid var( --match-ticker-navigation-border-color );
 
 			> .switch-pill-container {
 				align-self: stretch;
@@ -508,27 +523,17 @@ Template(s): MatchTicker
 			padding: 0.5rem 1rem 0.4375rem;
 			border-style: solid;
 			border-width: 0 1px 1px 0;
-			border-color: var( --clr-on-surface-light-primary-8 );
-			background-color: var( --clr-on-surface-light-primary-4 );
+			border-color: var( --match-ticker-card-divider-color );
+			background-color: var( --match-ticker-card-group-header-background-color );
 			font-size: 0.75rem;
 			font-weight: bold;
 			line-height: 1.125rem;
 			white-space: nowrap;
-			color: var( --clr-secondary-9 );
-
-			.theme--dark & {
-				border-color: var( --clr-on-surface-dark-primary-8 );
-				background-color: var( --clr-on-surface-dark-primary-4 );
-				color: var( --clr-secondary-100 );
-			}
+			color: var( --match-ticker-card-group-header-text-color );
 
 			// Stronger background on small screens
 			@media ( max-width: 600px ) {
-				background-color: var( --clr-on-surface-light-primary-12 );
-
-				.theme--dark & {
-					background-color: var( --clr-on-surface-dark-primary-12 );
-				}
+				background-color: var( --match-ticker-card-group-header-small-screen-background-color );
 			}
 
 			// Ongoing matches are marked with a red dot instead of a date
@@ -536,7 +541,7 @@ Template(s): MatchTicker
 				font-family: "Font Awesome 5 Pro";
 				font-size: 0.5rem;
 				content: "\f111"; /* Unicode for circle */
-				color: var( --clr-semantic-negative-40 );
+				color: var( --match-ticker-card-group-live-indicator-color );
 			}
 		}
 
@@ -562,11 +567,7 @@ Template(s): MatchTicker
 			font-size: 0.6875rem;
 			font-weight: normal;
 			line-height: 1rem;
-			color: var( --clr-secondary-25 );
-
-			.theme--dark & {
-				color: var( --clr-secondary-80 );
-			}
+			color: var( --match-ticker-card-group-date-color );
 		}
 
 		&__body {
