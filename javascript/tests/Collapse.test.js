@@ -129,6 +129,45 @@ describe( 'Collapse module', () => {
 		} );
 	} );
 
+	describe( 'click region collapsibles', () => {
+		const render = () => {
+			document.body.innerHTML = `
+				<div id="mw-content-text">
+					<div class="general-collapsible">
+						<div class="header" data-collapsible-click-region="true">Title</div>
+						<div class="should-collapse">Content</div>
+					</div>
+				</div>
+			`;
+			return {
+				collapsible: document.querySelector( '.general-collapsible' ),
+				region: document.querySelector( '.header' )
+			};
+		};
+
+		test( 'toggles on click and keyboard', () => {
+			const { collapsible, region } = render();
+			globalThis.liquipedia.collapse.setupClickableRegionCollapsibles();
+
+			expect( region.getAttribute( 'tabindex' ) ).toBe( '0' );
+			expect( region.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
+			region.click();
+			expect( collapsible.classList.contains( 'collapsed' ) ).toBe( true );
+			expect( region.getAttribute( 'aria-expanded' ) ).toBe( 'false' );
+			region.dispatchEvent( new KeyboardEvent( 'keydown', { key: 'Enter' } ) );
+			expect( collapsible.classList.contains( 'collapsed' ) ).toBe( false );
+		} );
+
+		test( 'toggles once when initialized again', () => {
+			const { collapsible, region } = render();
+			globalThis.liquipedia.collapse.setupClickableRegionCollapsibles();
+			globalThis.liquipedia.collapse.setupClickableRegionCollapsibles();
+
+			region.click();
+			expect( collapsible.classList.contains( 'collapsed' ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'persistent collapsibles', () => {
 		const render = ( collapsed ) => {
 			const classes = collapsed ? 'general-collapsible collapsed' : 'general-collapsible';
