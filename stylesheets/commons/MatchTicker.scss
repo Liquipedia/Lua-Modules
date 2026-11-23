@@ -481,17 +481,19 @@ Template(s): MatchTicker
 	}
 
 	.match-ticker-card-group {
-		display: flex;
-		flex-direction: column;
+		display: grid;
+		grid-template-columns: repeat( var( --match-ticker-group-columns ), 15.625rem );
 
 		&__header {
 			width: 100%;
+			grid-column: 1 / -1;
 		}
 
 		&__body {
 			display: grid;
+			grid-column: 1 / -1;
 			grid-auto-flow: column;
-			grid-template-columns: repeat( auto-fit, 15.625rem );
+			grid-template-columns: subgrid;
 
 			@media ( max-width: 600px ) {
 				display: contents;
