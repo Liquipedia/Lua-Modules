@@ -43,6 +43,8 @@ class LiquipediaMatchTickerCard {
 class LiquipediaMatchTicker {
 	static async init() {
 		await mw.loader.using( 'user.options' );
+		/** @type {HTMLElement[]} */
+		const groupedDisplay = [];
 		document.querySelectorAll( '.match-ticker-carousel' ).forEach( ( tickerCarousel ) => {
 			const cards = Array.from(
 				tickerCarousel.querySelectorAll( '.match-ticker-card' ),
@@ -53,7 +55,26 @@ class LiquipediaMatchTicker {
 				return;
 			}
 
-			const cardGroups = Object.groupBy( cards, ( card ) => card.toISODateString() );
+			const cardGroups = Map.groupBy( cards, ( card ) => card.toISODateString() );
+
+			for ( const [ date, cardGroup ] of cardGroups ) {
+				const cardGroupElement = document.createElement( 'div' );
+				cardGroup.classList.add( '.match-ticker-card-group' );
+				const title = document.createElement( 'div' );
+				title.classList.add( '.match-ticker-card-header' );
+				title.innerText = date;
+				const cardContainer = document.createElement( 'div' );
+				cardContainer.classList.add( '.match-ticker-card-header' );
+
+				cardGroupElement.append( title, cardContainer );
+
+				for ( const card of cardGroup ) {
+					cardContainer.append( card.cardElement );
+				}
+				groupedDisplay.push( cardContainer );
+			}
+
+			tickerCarousel.replaceChildren( ...groupedDisplay );
 		} );
 	}
 }
