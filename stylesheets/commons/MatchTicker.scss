@@ -452,6 +452,14 @@ Template(s): MatchTicker
 			border-width: 0 1px 0 0;
 		}
 
+		@media ( width > 600px ) {
+			&:has( > .match-ticker-card-group ) {
+				display: grid;
+				grid-template-rows: auto auto;
+				grid-auto-flow: column;
+			}
+		}
+
 		// Small screens: stacked full-width cards instead of a carousel (same breakpoint as .mobile-only)
 		@media ( max-width: 600px ) {
 			flex-direction: column;
@@ -482,6 +490,8 @@ Template(s): MatchTicker
 
 	.match-ticker-card-group {
 		display: grid;
+		grid-row: 1 / -1;
+		grid-template-rows: subgrid;
 		grid-template-columns: repeat( var( --match-ticker-group-columns ), 15.625rem );
 
 		@media ( max-width: 600px ) {
