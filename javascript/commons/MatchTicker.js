@@ -98,7 +98,9 @@ class LiquipediaMatchTicker {
 	static async init() {
 		await mw.loader.using( 'user.options' );
 		const now = new Date();
-		document.querySelectorAll( '.match-ticker-filterable-container .match-ticker-carousel' ).forEach( ( tickerCarousel ) => {
+		document.querySelectorAll(
+			'.match-ticker-filterable-container .match-ticker-carousel'
+		).forEach( ( tickerCarousel ) => {
 			// Matches in the upcoming list are not finished, so the ones that have already started are ongoing
 			const tickerType = tickerCarousel.closest( '[data-match-ticker-type]' )?.dataset.matchTickerType;
 			const isUpcoming = tickerType === 'upcoming';
