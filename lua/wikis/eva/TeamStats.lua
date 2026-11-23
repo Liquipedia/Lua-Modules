@@ -33,7 +33,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field opponentPick EvaTeamStatsRecord
 ---@field decider EvaTeamStatsRecord
 
----@class EvaTeamStatsTeam
+---@class EvaTeamStatsOpponent
 ---@field name string
 ---@field opponent standardOpponent
 ---@field maps table<string, EvaTeamStatsMap>
@@ -54,7 +54,7 @@ local MAP_SEPARATOR = '2px solid color-mix(in srgb, currentColor 45%, transparen
 local LEGEND = Html.I{children = {
 	'Each cell: wins-losses (win rate) on that map, then the split: ',
 	Html.B{children = 'own'},
-	" = on the team's own pick, ",
+	' = on their own pick, ',
 	Html.B{children = 'opp'},
 	" = on the opponent's pick, ",
 	Html.B{children = 'dec'},
@@ -65,13 +65,13 @@ local LEGEND = Html.I{children = {
 ---@return Renderable
 function TeamStats.run(frame)
 	local args = Arguments.getArgs(frame)
-	local teams = TeamStats.collect(args)
+	local opponents = TeamStats.collect(args)
 
-	if Table.isEmpty(teams) then
+	if Table.isEmpty(opponents) then
 		return Html.I{children = 'No map veto data found for this tournament.'}
 	end
 
-	return TeamStats.Overview{teams = teams}
+	return TeamStats.Overview{opponents = opponents}
 end
 
 -- Template:TeamStats calls the module with fn=MapsPlayed
@@ -90,44 +90,44 @@ local function gamesPlayed(record)
 	return record.wins + record.losses
 end
 
----@param team EvaTeamStatsTeam
+---@param entry EvaTeamStatsOpponent
 ---@param map string
 ---@return EvaTeamStatsMap
-local function getMap(team, map)
-	if not team.maps[map] then
-		team.maps[map] = {
+local function getMap(entry, map)
+	if not entry.maps[map] then
+		entry.maps[map] = {
 			total = newRecord(),
 			ownPick = newRecord(),
 			opponentPick = newRecord(),
 			decider = newRecord(),
 		}
 	end
-	return team.maps[map]
+	return entry.maps[map]
 end
 
 ---@param args table
----@return table<string, EvaTeamStatsTeam>
+---@return table<string, EvaTeamStatsOpponent>
 function TeamStats.collect(args)
 	local spec = TournamentStructure.readMatchGroupsSpec(args) or TournamentStructure.currentPageSpec()
 
-	---@type table<string, EvaTeamStatsTeam>
-	local teams = {}
+	---@type table<string, EvaTeamStatsOpponent>
+	local opponents = {}
 
 	---@param record table?
-	---@return EvaTeamStatsTeam?
-	local function getTeam(record)
+	---@return EvaTeamStatsOpponent?
+	local function getOpponent(record)
 		if not record or Logic.isEmpty(record.name) then
 			return
 		end
 		local name = record.name:gsub('_', ' ')
-		if not teams[name] then
+		if not opponents[name] then
 			local opponent = Opponent.fromMatch2Record(record)
 			if Opponent.isTbd(opponent) then
 				return
 			end
-			teams[name] = {name = name, opponent = opponent, maps = {}}
+			opponents[name] = {name = name, opponent = opponent, maps = {}}
 		end
-		return teams[name]
+		return opponents[name]
 	end
 
 	Lpdb.executeMassQuery('match2', {
@@ -142,14 +142,14 @@ function TeamStats.collect(args)
 		local pickedBy = TeamStats._getPickers(vetoes)
 
 		Array.forEach(match.match2opponents or {}, function(record, opponentIndex)
-			local team = getTeam(record)
-			if team then
-				TeamStats._addGames(team, match.match2games or {}, opponentIndex, pickedBy)
+			local entry = getOpponent(record)
+			if entry then
+				TeamStats._addGames(entry, match.match2games or {}, opponentIndex, pickedBy)
 			end
 		end)
 	end)
 
-	return teams
+	return opponents
 end
 
 --- Returns which opponent (1 or 2) picked each map of the veto.
@@ -171,11 +171,11 @@ function TeamStats._getPickers(vetoes)
 	return pickedBy
 end
 
----@param team EvaTeamStatsTeam
+---@param entry EvaTeamStatsOpponent
 ---@param games table[]
 ---@param opponentIndex integer
 ---@param pickedBy table<string, integer>
-function TeamStats._addGames(team, games, opponentIndex, pickedBy)
+function TeamStats._addGames(entry, games, opponentIndex, pickedBy)
 	Array.forEach(games, function(game)
 		local winner = tonumber(game.winner)
 		if Logic.isEmpty(game.map) or (winner ~= 1 and winner ~= 2) then
@@ -189,7 +189,7 @@ function TeamStats._addGames(team, games, opponentIndex, pickedBy)
 			pickType = picker == opponentIndex and 'ownPick' or 'opponentPick'
 		end
 
-		local mapStats = getMap(team, game.map)
+		local mapStats = getMap(entry, game.map)
 		mapStats.total[result] = mapStats.total[result] + 1
 		mapStats[pickType][result] = mapStats[pickType][result] + 1
 	end)
@@ -209,24 +209,24 @@ local function winRate(record)
 	return record.wins / gamesPlayed(record)
 end
 
----@param team EvaTeamStatsTeam
+---@param entry EvaTeamStatsOpponent
 ---@return EvaTeamStatsRecord
-local function teamTotal(team)
+local function totalRecord(entry)
 	local total = newRecord()
-	for _, mapStats in pairs(team.maps) do
+	for _, mapStats in pairs(entry.maps) do
 		total.wins = total.wins + mapStats.total.wins
 		total.losses = total.losses + mapStats.total.losses
 	end
 	return total
 end
 
---- Every map at least one team played, in alphabetical order.
----@param teams table<string, EvaTeamStatsTeam>
+--- Every map at least one opponent played, in alphabetical order.
+---@param opponents table<string, EvaTeamStatsOpponent>
 ---@return string[]
-local function playedMaps(teams)
+local function playedMaps(opponents)
 	local maps = {}
-	for _, team in pairs(teams) do
-		for map, mapStats in pairs(team.maps) do
+	for _, entry in pairs(opponents) do
+		for map, mapStats in pairs(entry.maps) do
 			if gamesPlayed(mapStats.total) > 0 then
 				maps[map] = true
 			end
@@ -295,13 +295,13 @@ function TeamStats._mapCell(mapStats)
 	}
 end
 
---- One row per team, one column per map.
----@param props {teams: table<string, EvaTeamStatsTeam>}
+--- One row per opponent, one column per map.
+---@param props {opponents: table<string, EvaTeamStatsOpponent>}
 ---@return Renderable
 local function Overview(props)
-	local teams = Array.extractValues(props.teams)
-	table.sort(teams, function(a, b)
-		local totalA, totalB = teamTotal(a), teamTotal(b)
+	local entries = Array.extractValues(props.opponents)
+	table.sort(entries, function(a, b)
+		local totalA, totalB = totalRecord(a), totalRecord(b)
 		if totalA.wins ~= totalB.wins then
 			return totalA.wins > totalB.wins
 		end
@@ -310,7 +310,7 @@ local function Overview(props)
 		end
 		return a.name < b.name
 	end)
-	local maps = playedMaps(props.teams)
+	local maps = playedMaps(props.opponents)
 
 	return TableWidgets.Table{
 		sortable = true,
@@ -323,17 +323,17 @@ local function Overview(props)
 		children = {
 			TableWidgets.TableHeader{children = {
 				TableWidgets.Row{children = WidgetUtil.collect(
-					TableWidgets.CellHeader{children = 'Team'},
+					TableWidgets.CellHeader{children = 'Opponent'},
 					Array.map(maps, function(map)
 						return TableWidgets.CellHeader{children = Link{link = map, children = map}}
 					end)
 				)},
 			}},
-			TableWidgets.TableBody{children = Array.map(teams, function(team)
+			TableWidgets.TableBody{children = Array.map(entries, function(entry)
 				return TableWidgets.Row{children = WidgetUtil.collect(
-					TableWidgets.Cell{children = OpponentDisplay.InlineOpponent{opponent = team.opponent}},
+					TableWidgets.Cell{children = OpponentDisplay.InlineOpponent{opponent = entry.opponent}},
 					Array.map(maps, function(map)
-						return TeamStats._mapCell(team.maps[map])
+						return TeamStats._mapCell(entry.maps[map])
 					end)
 				)}
 			end)},
