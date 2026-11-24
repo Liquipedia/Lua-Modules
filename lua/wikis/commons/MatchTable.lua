@@ -371,23 +371,21 @@ function MatchTable:buildDateConditions()
 	return conditions
 end
 
----@return ConditionTree
+---@return ConditionTree?
 function MatchTable:buildOpponentConditions()
 	local columnName = self.config.mode == Opponent.solo and 'player' or 'opponent'
 
-	local opponentConditions = ConditionTree(BooleanOperator.any)
-	Array.forEach(Array.extractKeys(self.config.aliases), function(alias)
-		opponentConditions:add{ConditionNode(ColumnName(columnName), Comparator.eq, alias)}
-	end)
+	local opponentConditions = ConditionUtil.anyOf(
+		columnName, Table.keys(self.config.aliases):toArray()
+	)
 
 	if Logic.isEmpty(self.config.vs) then
 		return opponentConditions
 	end
 
-	local vsConditions = ConditionTree(BooleanOperator.any)
-	Array.forEach(Array.extractKeys(self.config.vs), function(alias)
-		vsConditions:add{ConditionNode(ColumnName('opponent'), Comparator.eq, alias)}
-	end)
+	local vsConditions = ConditionUtil.anyOf(
+		'opponent', Table.keys(self.config.vs):toArray()
+	)
 
 	return ConditionTree(BooleanOperator.all)
 		:add(opponentConditions)
