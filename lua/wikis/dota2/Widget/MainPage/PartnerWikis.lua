@@ -7,41 +7,35 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
-
-local Widget = Lua.import('Module:Widget')
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local Component = Lua.import('Module:Widget/Component')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Html = Lua.import('Module:Widget/Html')
 local ListWidgets = Lua.import('Module:Widget/List')
 
----@class Dota2PartnerWikis: Widget
----@operator call(table): Dota2PartnerWikis
-local Dota2PartnerWikis = Class.new(Widget)
-
----@return Widget
-function Dota2PartnerWikis:render()
-	---@param props {image: string, link: string, caption: string, description: string}
-	---@return Widget
-	local function createCellHeader(props)
-		return Html.Th{
-			attributes = {width = '17%'},
-			children = {
-				IconImage{
-					imageLight = props.image,
-					link = props.link,
-					size = '60px',
-					caption = props.caption,
-				},
-				Html.Br{},
-				Html.Small{
-					children = Html.I{children = props.description}
-				}
+---@param props {image: string, link: string, caption: string, description: string}
+---@return VNode
+local function createCellHeader(props)
+	return Html.Th{
+		attributes = {width = '17%'},
+		children = {
+			IconImage{
+				imageLight = props.image,
+				link = props.link,
+				size = '60px',
+				caption = props.caption,
+			},
+			Html.Br{},
+			Html.Small{
+				children = Html.I{children = props.description}
 			}
 		}
-	end
+	}
+end
 
+---@return VNode
+local function Dota2PartnerWikis()
 	return DataTable{
 		classes = {'wikitable-striped'},
 		tableAttributes = {width = '100%'},
@@ -144,4 +138,4 @@ function Dota2PartnerWikis:render()
 	}
 end
 
-return Dota2PartnerWikis
+return Component.component(Dota2PartnerWikis)

@@ -92,6 +92,10 @@ describe('Standings Legacy Next', function()
 			assert.is_nil(StandingTableLegacyNext.getStandardParameter({}, {}).store)
 			assert.is_false(StandingTableLegacyNext.getStandardParameter({storeStanding = 'false'}, {}).store)
 		end)
+
+		it('maps cutafter to collapseafter', function()
+			assert.are_equal('16', StandingTableLegacyNext.getStandardParameter({cutafter = '16'}, {}).collapseafter)
+		end)
 	end)
 
 	describe('standard parameters', function()
@@ -209,24 +213,24 @@ describe('Standings Legacy Next', function()
 
 	describe('bgs', function()
 		it('continues a pbg until the next one, starting with up', function()
-			assert.are_equal('1-4=up,5-100=down', StandingTableLegacyNext.parseBgs({pbg5 = 'down'}, 8))
-			assert.are_equal('1=up,2-3=stayup,4-8=down,9-100=up',
+			assert.are_equal('1-4=up,5-1000=down', StandingTableLegacyNext.parseBgs({pbg5 = 'down'}, 8))
+			assert.are_equal('1=up,2-3=stayup,4-8=down,9-1000=up',
 				StandingTableLegacyNext.parseBgs({pbg2 = 'stayup', pbg4 = 'down', pbg9 = 'up'}, 4))
 		end)
 
 		it('defaults to a quarter up, a quarter stayup and half down', function()
-			assert.are_equal('1-2=up,3-4=stayup,5-100=down', StandingTableLegacyNext.parseBgs({}, 8))
-			assert.are_equal('1-2=up,3-100=down', StandingTableLegacyNext.parseBgs({}, 4))
-			assert.are_equal('1=up,2-100=down', StandingTableLegacyNext.parseBgs({}, 2))
-			assert.are_equal('1-100=up', StandingTableLegacyNext.parseBgs({}, 1))
+			assert.are_equal('1-2=up,3-4=stayup,5-1000=down', StandingTableLegacyNext.parseBgs({}, 8))
+			assert.are_equal('1-2=up,3-1000=down', StandingTableLegacyNext.parseBgs({}, 4))
+			assert.are_equal('1=up,2-1000=down', StandingTableLegacyNext.parseBgs({}, 2))
+			assert.are_equal('1-1000=up', StandingTableLegacyNext.parseBgs({}, 1))
 		end)
 
 		it('produces bgs the standings can read', function()
 			local StandingsParseWiki = require('Module:Standings/Parse/Wiki')
 			local bgs = StandingsParseWiki.parseWikiBgs(StandingTableLegacyNext.parseBgs({}, 8))
 			assert.are_same({'up', 'up', 'stayup', 'stayup', 'down'}, {bgs[1], bgs[2], bgs[3], bgs[4], bgs[5]})
-			assert.are_equal('down', bgs[100])
-			assert.is_nil(bgs[101])
+			assert.are_equal('down', bgs[1000])
+			assert.is_nil(bgs[1001])
 		end)
 
 		it('counts the opponents of the matches when importing them', function()

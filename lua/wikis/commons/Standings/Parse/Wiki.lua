@@ -500,11 +500,37 @@ function StandingsParseWiki.parseWalkoverRounds(args)
 	return readNonNegativeInteger(args, 'walkoverrounds')
 end
 
+local DQ_HANDLINGS = {exclude = 'exclude', forfeit = 'forfeit', ff = 'forfeit'}
+
+---Reads `dqhandling`, whether the matches of disqualified opponents are left out or lost from their dq round on
+---@param args table
+---@param tableType StandingsTableTypes
+---@return StandingsDqHandling?
+function StandingsParseWiki.parseDqHandling(args, tableType)
+	local input = args.dqhandling
+	if Logic.isEmpty(input) then
+		return nil
+	end
+	local handling = DQ_HANDLINGS[input]
+	assert(handling, 'Invalid dqhandling input: "' .. input .. '", expected "exclude", "forfeit" or "ff"')
+	assert(handling ~= 'forfeit' or tableType ~= 'ffa', 'Invalid dqhandling input: ffa standings cannot forfeit')
+	return handling
+end
+
 ---Reads the `width` input in px, e.g. `600` or `600px`, the same as the width of a matchlist.
 ---@param args table
 ---@return number?
 function StandingsParseWiki.parseWidth(args)
 	return tonumber((string.gsub(args.width or '', 'px', '')))
+end
+
+---Reads the `collapseafter` input, the number of rows shown before the rest collapses.
+---@param args table
+---@return integer?
+function StandingsParseWiki.parseCollapseAfter(args)
+	local collapseAfter = readNonNegativeInteger(args, 'collapseafter')
+	assert(collapseAfter ~= 0, 'Invalid collapseafter input: "0" is not a positive integer')
+	return collapseAfter
 end
 
 ---Reads the `regulationrounds` input, the number of rounds a game has in regulation. More rounds is overtime.

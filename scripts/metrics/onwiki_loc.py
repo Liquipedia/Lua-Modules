@@ -12,7 +12,8 @@ MediaWiki API and counts lines of code, excluding:
   * archive / sandbox / dev pages — titles matching (case-insensitive)
     ``Archive/``, ``/Archive``, ``/sandbox`` or ``/dev`` as path segments
     (segment-anchored so e.g. ``.../Developer`` is NOT excluded);
-  * documentation subpages — titles ending in ``/doc``.
+  * documentation subpages — titles ending in ``/doc``;
+  * JSON data pages — titles ending in ``.json``.
 
 Usage:
     WIKI_BASE_URL=https://liquipedia.net python3 scripts/metrics/onwiki_loc.py [options]
@@ -65,9 +66,10 @@ HEADER = {
 # full path segment (covers /dev/XXX too). ':' counts as a boundary so
 # top-level pages like Module:Archive/X and Module:Sandbox/X are excluded,
 # while e.g. Module:Developer is not.
-# Documentation subpages (Module:X/doc) are also excluded.
+# Documentation subpages (Module:X/doc) and JSON data pages (.json) are also
+# excluded.
 EXCLUDE_RE = re.compile(
-    r"(^|[/:])(archive|sandbox|dev)(/|$)|/doc$",
+    r"(^|[/:])(archive|sandbox|dev)(/|$)|/doc$|\.json$",
     re.IGNORECASE,
 )
 

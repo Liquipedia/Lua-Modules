@@ -20,8 +20,8 @@ return {
 				lightMode = 'Apex Legends default lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Apex Legends default darkmode.png',
-				lightMode = 'Apex Legends default lightmode.png',
+				darkMode = 'Apex Legends darkmode.png',
+				lightMode = 'Apex Legends lightmode.png',
 			},
 		},
 	},

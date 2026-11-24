@@ -19,10 +19,11 @@ local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local Locale = Lua.import('Module:Locale')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local NoWrap = Widgets.NoWrap
 
 local GAME_MODE = Lua.import('Module:GameMode', {loadData = true})
 local EA_ICON = '&nbsp;[[File:EA icon.png|x15px|middle|link=Electronic Arts|'
@@ -95,23 +96,17 @@ function CustomLeague:appendLiquipediatierDisplay(args)
 end
 
 ---@param base string
----@return string[]
+---@return Renderable[]
 function CustomLeague:_makeBasedListFromArgs(base)
-	local firstArg = self.args[base .. '1']
-	local foundArgs = {Page.makeInternalLink({}, firstArg)}
-	local index = 2
+	local foundArgs = {}
+	local index = 1
 
 	while String.isNotEmpty(self.args[base .. index]) do
-		local currentArg = self.args[base .. index]
-		table.insert(foundArgs, '&nbsp;• ' ..
-			tostring(self:_createNoWrappingSpan(
-				Page.makeInternalLink({}, currentArg)
-			))
-		)
+		table.insert(foundArgs, NoWrap{children = Page.makeInternalLink({}, self.args[base .. index])})
 		index = index + 1
 	end
 
-	return foundArgs
+	return Array.interleave(foundArgs, '&nbsp;• ')
 end
 
 ---@param args table
@@ -170,15 +165,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	end
 
 	return lpdbData
-end
-
----@param content Html|string|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-	span:css('white-space', 'nowrap')
-		:node(content)
-	return span
 end
 
 ---@return string?

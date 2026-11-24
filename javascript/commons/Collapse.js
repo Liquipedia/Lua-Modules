@@ -79,21 +79,82 @@ liquipedia.collapse = {
 			return button;
 		}
 
+		const supportsAnchoredPopover = this.supportsAnchoredPopover();
+
 		document.querySelectorAll( '#mw-content-text .general-collapsible' ).forEach( ( collapsible ) => {
 			const collapseButton = collapsible.querySelector( '.general-collapsible-collapse-button' );
 			const expandButton = collapsible.querySelector( '.general-collapsible-expand-button' );
 
-			if ( expandButton ) {
-				replaceWithButton( expandButton ).addEventListener( 'click', () => {
-					collapsible.classList.remove( 'collapsed' );
-				} );
+			const newExpandButton = expandButton ? replaceWithButton( expandButton ) : null;
+			const newCollapseButton = collapseButton ? replaceWithButton( collapseButton ) : null;
+
+			if ( supportsAnchoredPopover && collapsible.hasAttribute( 'data-collapsible-popover' ) ) {
+				this.setupPopoverCollapsible( collapsible, [ newExpandButton, newCollapseButton ] );
+				return;
 			}
 
-			if ( collapseButton ) {
-				replaceWithButton( collapseButton ).addEventListener( 'click', () => {
-					collapsible.classList.add( 'collapsed' );
-				} );
+			newExpandButton?.addEventListener( 'click', () => {
+				collapsible.classList.remove( 'collapsed' );
+			} );
+
+			newCollapseButton?.addEventListener( 'click', () => {
+				collapsible.classList.add( 'collapsed' );
+			} );
+		} );
+	},
+
+	popoverCount: 0,
+
+	// Tracks element instances rather than using a DOM attribute as marker, as attributes survive
+	// when the HTML is serialized and restored (e.g. FilterButtons' cache) while listeners do not.
+	initializedPopovers: new WeakSet(),
+
+	supportsAnchoredPopover: function() {
+		return Object.prototype.hasOwnProperty.call( HTMLElement.prototype, 'popover' ) &&
+			CSS.supports( 'position-area: block-end' ) &&
+			CSS.supports( 'width: anchor-size(width)' );
+	},
+
+	/**
+	 * Turns the collapse area of a general-collapsible into a popover that is anchored below
+	 * the collapsible's header. Only used when the browser natively supports both popovers and
+	 * anchor positioning; otherwise the collapsible keeps expanding inline.
+	 *
+	 * @param {HTMLElement} collapsible
+	 * @param {(HTMLButtonElement|null)[]} toggleButtons
+	 * @return {void}
+	 */
+	setupPopoverCollapsible: function( collapsible, toggleButtons ) {
+		const area = collapsible.querySelector( ':scope > .should-collapse' );
+		const anchor = area?.previousElementSibling;
+		if ( !area || !anchor ) {
+			return;
+		}
+
+		// init() may run more than once (e.g. after FilterButtons reloads content),
+		// so the popover itself is only set up once per element.
+		if ( !this.initializedPopovers.has( area ) ) {
+			this.initializedPopovers.add( area );
+			const name = `general-collapsible-popover-${ ++this.popoverCount }`;
+			if ( !area.id ) {
+				area.id = name;
 			}
+			area.setAttribute( 'popover', 'auto' );
+			anchor.style.setProperty( 'anchor-name', `--${ name }` );
+			area.style.setProperty( 'position-anchor', `--${ name }` );
+
+			// Keep the toggle buttons in sync, including when the popover is light dismissed.
+			// beforetoggle fires synchronously, so `.collapsed` never hides an open popover.
+			area.addEventListener( 'beforetoggle', ( event ) => {
+				collapsible.classList.toggle( 'collapsed', event.newState !== 'open' );
+			} );
+			collapsible.classList.add( 'collapsed' );
+		}
+
+		// Button replacement drops all attributes, so this has to be reapplied every time.
+		// Making the buttons invokers also exempts them from light dismiss.
+		toggleButtons.forEach( ( button ) => {
+			button?.setAttribute( 'popovertarget', area.id );
 		} );
 	},
 	setupClickableRegionCollapsibles: function() {

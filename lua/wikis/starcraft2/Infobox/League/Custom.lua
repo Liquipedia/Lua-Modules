@@ -11,7 +11,6 @@ local AllowedServers = Lua.import('Module:Server')
 local Array = Lua.import('Module:Array')
 local PatchAuto = Lua.import('Module:Infobox/Extension/PatchAuto')
 local Class = Lua.import('Module:Class')
-local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
@@ -29,12 +28,14 @@ local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
+local CountdownWidget = Lua.import('Module:Widget/Countdown')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
+local NoWrap = Widgets.NoWrap
 
 ---@class Starcraft2LeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -204,7 +205,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Server', children = {caller:_getServer(args)}}
 		}
 	elseif id == 'dates' and data.startTime.display then
-		local startTime = Countdown.create{date = data.startTime.display, rawdatetime = true}
+		local startTime = CountdownWidget{date = data.startTime.display, rawdatetime = true}
 
 		if data.startDate == data.endDate then
 			return {Cell{name = 'Start Time', children = {startTime}}}
@@ -244,16 +245,14 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param maps {link: string, displayname: string}[]
----@return string[]
+---@return Renderable[]
 function CustomLeague:_mapsDisplay(maps)
-	return {table.concat(
+	return Array.interleave(
 		Array.map(maps, function(mapData)
-			return tostring(self:_createNoWrappingSpan(
-				Page.makeInternalLink({}, mapData.displayname, mapData.link)
-			))
+			return NoWrap{children = Page.makeInternalLink({}, mapData.displayname, mapData.link)}
 		end),
 		'&nbsp;• '
-	)}
+	)
 end
 
 ---@param args table
@@ -396,15 +395,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.mod = self.data.mod
 
 	return lpdbData
-end
-
----@param content string|Html|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-	span:css('white-space', 'nowrap')
-		:node(content)
-	return span
 end
 
 ---@param args table

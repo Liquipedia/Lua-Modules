@@ -364,13 +364,12 @@ function TournamentPlayerInfo:buildTeamAgeTable()
 		}})
 	end
 
+	local collapseText = '4 to ' .. #teamTableRows
+
 	return TableWidgets.Table{
-		tableClasses = {'prizepooltable', 'collapsed'},
-		tableAttributes = {
-			['data-cutafter'] = 3,
-			['data-opentext'] = '4 to ' .. #teamTableRows,
-			['data-closetext'] = '4 to ' .. #teamTableRows
-		},
+		collapseAfter = #teamTableRows > 3 and 3 or nil,
+		expandText = collapseText,
+		collapseText = collapseText,
 		css = {
 			margin = '1em 0',
 		},

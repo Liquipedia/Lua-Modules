@@ -8,14 +8,12 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Table = Lua.import('Module:Table')
 
 local Component = Lua.import('Module:Widget/Component')
-local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-local Button = Lua.import('Module:Widget/Basic/Button')
+local CarouselButton = Lua.import('Module:Widget/Basic/Carousel/Button')
+local CarouselContent = Lua.import('Module:Widget/Basic/Carousel/Content')
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
-local Span = Html.Span
 
 ---@class CarouselWidgetParameters
 ---@field children Renderable[]
@@ -35,59 +33,19 @@ local function Carousel(props)
 	assert(props.children, 'Carousel: children is required')
 	assert(Array.isArray(props.children), 'Carousel: children must be an array')
 
-	local carouselCss = Table.mergeInto({
-		gap = props.gap,
-	}, props.css)
-
-	local carouselContent = Div{
-		classes = {'carousel-content'},
-		css = carouselCss,
-		children = Array.map(props.children, function(child)
-			return Div{
-				classes = {'carousel-item'},
-				css = {
-					width = props.itemWidth,
-				},
-				children = {child},
-			}
-		end),
-	}
-
-	local leftButton = Button{
-		classes = {'carousel-button', 'carousel-button--left'},
-		title = 'Previous',
-		size = 'xs',
-		children = {
-			Span{
-				css = {display = 'inline-flex'},
-				children = {IconWidget{iconName = 'previous', size = 'xs'}}
-			},
-		},
-	}
-
-	local rightButton = Button{
-		classes = {'carousel-button', 'carousel-button--right'},
-		title = 'Next',
-		size = 'xs',
-		children = {
-			Span{
-				css = {display = 'inline-flex'},
-				children = {IconWidget{iconName = 'next', size = 'xs'}}
-			},
-		},
-	}
-
-	local leftFade = Div{classes = {'carousel-fade', 'carousel-fade--left'}}
-	local rightFade = Div{classes = {'carousel-fade', 'carousel-fade--right'}}
-
 	return Div{
 		classes = Array.extendWith({'carousel'}, props.classes),
 		children = {
-			leftButton,
-			rightButton,
-			leftFade,
-			rightFade,
-			carouselContent,
+			CarouselButton{direction = 'left'},
+			CarouselButton{direction = 'right'},
+			Div{classes = {'carousel-fade', 'carousel-fade--left'}},
+			Div{classes = {'carousel-fade', 'carousel-fade--right'}},
+			CarouselContent{
+				children = props.children,
+				itemWidth = props.itemWidth,
+				gap = props.gap,
+				css = props.css,
+			},
 		},
 	}
 end

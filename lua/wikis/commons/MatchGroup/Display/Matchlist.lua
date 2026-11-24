@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
@@ -18,6 +17,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local Builder = Lua.import('Module:Widget/Builder')
+local CountdownWidget = Lua.import('Module:Widget/Countdown')
 local ErrorBoundary = Lua.import('Module:Widget/ErrorBoundary')
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local MatchInfoIcon = Lua.import('Module:Widget/Match/InfoIcon')
@@ -191,7 +191,7 @@ function MatchlistDisplay.DateHeader(match)
 	return MatchListHeader{
 		children = Html.Div{
 			css = {padding = '2px 10px'},
-			children = Countdown.create(Table.merge(match.stream, {
+			children = CountdownWidget(Table.merge(match.stream, {
 				date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
 				finished = match.finished,
 				rawdatetime = (not match.dateIsExact) or match.finished,

@@ -175,6 +175,10 @@ describe('Standings Legacy Group Slot', function()
 		end)
 	end)
 
+	it('maps cutafter to collapseafter', function()
+		assert.are_equal('16', StandingTableLegacyGroupSlot.parseTable({cutafter = '16'}, {}, CONFIG).collapseafter)
+	end)
+
 	it('maps the short legacy statuses', function()
 		assert.are_same(
 			{'up', 'stayup', 'stay', 'staydown', 'down', 'down', 'seedup'},

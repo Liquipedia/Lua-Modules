@@ -17,7 +17,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local Span = Html.Span
 
 ---@class InlineIconAndTextWidgetParameters
----@field icon IconWidget
+---@field icon Renderable
 ---@field text string?
 ---@field link string?
 ---@field flipped boolean?
