@@ -64,7 +64,11 @@ local function MatchPageButton(props)
 		}
 	end
 
-	-- Preload template functionality if config set
+	-- For cs dev state
+	if Info.config.match2.matchPageCreateButton == false then
+		return nil
+	end
+
 	-- Fallsback to previous functionality otherwise
 	local preloadPage = Info.config.match2.matchPagePreload
 	local createLink, createLinkType = link, nil

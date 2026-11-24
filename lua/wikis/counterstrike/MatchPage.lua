@@ -19,6 +19,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local Html = Lua.import('Module:Widget/Html')
+local Abbr = Html.Abbr
 local Div = Html.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -315,7 +316,8 @@ function MatchPage._renderPlayerPerformance(player)
 	end
 
 	-- Only link the name if the steamid resolved to a known Liquipedia player
-	-- otherwise show the Mischief raw name as plain text. CRUCIAL, need to check playerId situation with _British player what not
+	-- otherwise show the Mischief raw name as plain text. CRUCIAL, need to check playerId
+	-- situation with _British player what not
 	local nameLink = player.player
 		and Link{link = player.player, children = player.displayName}
 		or player.displayName
@@ -330,7 +332,7 @@ function MatchPage._renderPlayerPerformance(player)
 		}
 	end
 
-	-- Rar can be both positive and negative
+	-- MSL can be both positive and negative, this is MSL not MSL/24 or MSL3
 	local formatSigned = function(value, numberOfDecimals)
 		if not value then
 			return nil
@@ -353,8 +355,9 @@ function MatchPage._renderPlayerPerformance(player)
 			data = player.adr and formatNumbers(player.adr, 1) or nil
 		},
 		PlayerStat{
-			title = {IconFa{iconName = 'chart'}, 'RAR'},
-			data = formatSigned(player.rar, 1)
+			-- Meltdown/shutdown line, this is an integer
+			title = {IconFa{iconName = 'chart'}, Abbr{title = 'Meltdown/shutdown line', children = 'MSL'}},
+			data = formatSigned(player.msl, 0)
 		},
 		PlayerStat{
 			title = {IconFa{iconName = 'kast'}, 'KAST'},

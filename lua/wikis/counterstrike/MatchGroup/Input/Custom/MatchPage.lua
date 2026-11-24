@@ -21,17 +21,18 @@ local NormalMapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 ---@field flag string?
 ---@field rating number? Li-rating / L-Rating
 ---@field rar number? rounds above replacement
----@field altSwing number? 
----@field leverage number? 
+---@field msl integer? meltdown/shutdown line
+---@field altSwing number?
+---@field leverage number?
 ---@field ecoKpr number?
 ---@field ecoDpr number?
 ---@field ecoAdr number?
 ---@field roundsPlayed integer? rounds map track
 ---@field ratingT number? L-rating
----@field ratingCt number? L-rating 
+---@field ratingCt number? L-rating
 ---@field roundsT integer? rounds map track T
 ---@field roundsCt integer? rounds map track CT
----@field survival number? alive%
+---@field survival number?
 ---@field kills integer?
 ---@field deaths integer?
 ---@field assists integer?
@@ -41,6 +42,7 @@ local NormalMapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 ---@field firstDeaths integer?
 ---@field kast number?
 ---@field awpKills integer?
+---@field awpDeathsCarrying integer?
 ---@field tradeKills integer?
 ---@field tradeDeaths integer?
 
@@ -56,6 +58,7 @@ local NormalMapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 ---@field average_damage_per_round number
 ---@field l_rating number?
 ---@field rar number?
+---@field msl integer?
 ---@field l_rating_t number?
 ---@field l_rating_ct number?
 ---@field alive_pm_pct number?
@@ -68,6 +71,7 @@ local NormalMapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 ---@field first_death_count integer
 ---@field rounds_won integer
 ---@field awp_kills integer
+---@field awp_deaths_carrying integer? nil when the demo has no loadout data
 ---@field trade_kill_count integer
 ---@field trade_death_count integer
 
@@ -408,7 +412,7 @@ end
 ---@field winningSide 't'|'ct'
 ---@field winBy string
 
----Round-by-round side/winner breakdown 
+---Round-by-round side/winner breakdown
 ---@param map CounterstrikeMatchPageMap|table
 ---@return CounterstrikeRoundData[]?
 local function getRounds(map)
@@ -528,6 +532,7 @@ function CustomMatchGroupInputMatchPage.getPlayersOfMapOpponent(map, opponent, o
 				steamid = participant.steam_id and tostring(participant.steam_id) or nil,
 				rating = participant.l_rating,
 				rar = participant.rar,
+				msl = participant.msl,
 				-- L-rating components
 				altSwing = participant.alt_swing_pct,
 				leverage = participant.leverage_swing_pct,
@@ -551,6 +556,7 @@ function CustomMatchGroupInputMatchPage.getPlayersOfMapOpponent(map, opponent, o
 				firstDeaths = participant.first_death_count,
 				kast = participant.kast,
 				awpKills = participant.awp_kills,
+				awpDeathsCarrying = participant.awp_deaths_carrying,
 				tradeKills = participant.trade_kill_count,
 				tradeDeaths = participant.trade_death_count,
 			}

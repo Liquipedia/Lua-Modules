@@ -83,7 +83,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 	return processedMatch
 end
 
----Aggregates each player's per-map stats into a single overall-series stat line, stashed onto player.extradata.overallStats for
+---Aggregates each player's per-map stats into a single overall-series stat line,
+---stashed onto player.extradata.overallStats for
 ---Module:MatchPage's "Overall Statistics" tab. Only nuselo maps with data
 ---contribute, a manually entered map has no per-player breakdown to fold in.
 ---@param match {opponents: MGIParsedOpponent[], games: table[]}
@@ -140,6 +141,8 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, opponentIndex, play
 		deaths = sumOf('deaths'),
 		rating = averageOf('rating'),
 		rar = averageOf('rar') and sumOf('rar') or nil,
+		-- nil when in carryover
+		msl = averageOf('msl') and sumOf('msl') or nil,
 		assists = sumOf('assists'),
 		adr = averageOf('adr'),
 		hs = averageOf('hs'),
@@ -148,6 +151,8 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, opponentIndex, play
 		-- Add some more eventually, side kills?
 		kast = averageOf('kast'),
 		awpKills = sumOf('awpKills'),
+		-- nil when in carryover
+		awpDeathsCarrying = averageOf('awpDeathsCarrying') and sumOf('awpDeathsCarrying') or nil,
 		tradeKills = sumOf('tradeKills'),
 		tradeDeaths = sumOf('tradeDeaths'),
 	}
