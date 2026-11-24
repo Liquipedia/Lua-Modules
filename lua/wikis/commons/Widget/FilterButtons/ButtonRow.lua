@@ -18,22 +18,25 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class FilterButtonRowParameters
 ---@field categoryName string
+---@field filterGroupPrefix string?
 ---@field buttons FilterButton[]
 ---@field expandKey string?
 ---@field featuredByDefault boolean?
 ---@field hasFeatured boolean?
 
 local CLASS_NAME = 'filter-buttons'
+local DEFAULT_FILTER_GROUP_PREFIX = 'filterbuttons'
 
 ---@param props FilterButtonRowParameters
 ---@return VNode
 local function FilterButtonRow(props)
+	local filterGroupPrefix = props.filterGroupPrefix or DEFAULT_FILTER_GROUP_PREFIX
 	return Html.Div{
 		classes = {CLASS_NAME},
 		attributes = {
 			['data-filter'] = 'data-filter',
 			['data-filter-effect'] = 'fade',
-			['data-filter-group'] = 'filterbuttons-' .. props.categoryName,
+			['data-filter-group'] = filterGroupPrefix .. '-' .. props.categoryName,
 			['data-filter-default-curated'] = props.featuredByDefault and 'true' or nil,
 		},
 		children = WidgetUtil.collect(
@@ -52,7 +55,7 @@ local function FilterButtonRow(props)
 				attributes = {
 					['data-filter'] = 'data-filter',
 					['data-filter-effect'] ='fade',
-					['data-filter-group'] = 'tournaments-list-dropdown-' .. props.expandKey
+					['data-filter-group'] = filterGroupPrefix .. '-dropdown-' .. props.expandKey
 				},
 				children = {
 					FilterButton{

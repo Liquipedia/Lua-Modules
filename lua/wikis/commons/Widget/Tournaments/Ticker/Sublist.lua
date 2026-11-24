@@ -15,12 +15,17 @@ local Html = Lua.import('Module:Widget/Html')
 local TournamentLabel = Lua.import('Module:Widget/Tournament/Label')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
 
+local defaultProps = {
+	filterGroupPrefix = 'filterbuttons',
+}
+
 ---@class TournamentsTickerSublistProps
 ---@field title string?
 ---@field tournaments StandardTournament[]
 ---@field displayGameIcons boolean?
 ---@field createItem (fun(tournament: StandardTournament): Renderable)?
 ---@field fallback Renderable?
+---@field filterGroupPrefix string? has to match the `filterGroupPrefix` of the filter buttons controlling this list
 
 ---@param props TournamentsTickerSublistProps
 ---@return VNode?
@@ -47,7 +52,7 @@ local function TournamentsTickerSublist(props)
 			local filterValue = itemIsValid(value) and value or filterCategory.defaultItem
 			return Html.Div{
 				attributes = {
-					['data-filter-group'] = 'filterbuttons-' .. filterCategory.name,
+					['data-filter-group'] = props.filterGroupPrefix .. '-' .. filterCategory.name,
 					['data-filter-category'] = itemToPropertyValues(filterValue),
 					['data-curated'] = tournament.featured and '' or nil,
 				},
@@ -79,4 +84,4 @@ local function TournamentsTickerSublist(props)
 	}
 end
 
-return Component.component(TournamentsTickerSublist)
+return Component.component(TournamentsTickerSublist, defaultProps)

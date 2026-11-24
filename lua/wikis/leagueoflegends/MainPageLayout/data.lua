@@ -86,28 +86,27 @@ local CONTENT = {
 		body = '{{Liquipedia:Eventbox}}',
 		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
-	filterButtons = {
-		noPanel = true,
-		body = Div{
-			css = { width = '100%', ['margin-bottom'] = '8px' },
-			children = { FilterButtonsWidget() }
-		}
-	},
 	matches = {
 		noPanel = true,
-		body = MatchTicker{},
+		body = MatchTicker{filterGroupPrefix = MainPageLayoutUtil.MATCH_TICKER_FILTER_GROUP_PREFIX},
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = TournamentsTicker{
-			upcomingDays = 30,
-			completedDays = 20,
-			modifierTypeQualifier = -2,
-			modifierTier1 = 55,
-			modifierTier2 = 55,
-			modifierTier3 = 10,
-			tierColorScheme = 'top3',
+		body = {
+			Div{
+				css = { padding = '0.75rem 0.75rem 0' },
+				children = FilterButtonsWidget()
+			},
+			TournamentsTicker{
+				upcomingDays = 30,
+				completedDays = 20,
+				modifierTypeQualifier = -2,
+				modifierTier1 = 55,
+				modifierTier2 = 55,
+				modifierTier3 = 10,
+				tierColorScheme = 'top3',
+			},
 		},
 		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
@@ -211,11 +210,6 @@ return {
 			{ -- Top
 				size = 12,
 				children = {
-					{
-						mobileOrder = 3,
-						noPanel = true,
-						content = CONTENT.filterButtons,
-					},
 					{
 						mobileOrder = 4,
 						noPanel = true,

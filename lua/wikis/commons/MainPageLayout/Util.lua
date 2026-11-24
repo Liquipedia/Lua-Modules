@@ -24,6 +24,10 @@ MainPageLayoutUtil.BoxId = {
 	SPECIAL_EVENTS = 1516,
 }
 
+-- Filter group prefix for a match ticker that is filtered independently of the tournaments ticker
+-- (which uses the default filter groups)
+MainPageLayoutUtil.MATCH_TICKER_FILTER_GROUP_PREFIX = 'matchticker'
+
 ---@return string
 function MainPageLayoutUtil.getYearlyTransferPage()
 	return 'Player Transfers/' .. DateExt.getYearOf()
