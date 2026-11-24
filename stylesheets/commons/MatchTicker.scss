@@ -479,14 +479,16 @@ Template(s): MatchTicker
 	}
 
 	.match-ticker-carousel {
-		// No fade overlays to snap past
-		.carousel-item:has( > .match-ticker-card ) {
-			scroll-margin-left: 0;
-		}
+		.carousel-item {
+			// No fade overlays to snap past
+			&:has( > .match-ticker-card ) {
+				scroll-margin-left: 0;
+			}
 
-		// Next to the groups, as tall as their header and cards together
-		.carousel-item:has( > .match-ticker-show-all-card ) {
-			grid-row: 1 / -1;
+			// Next to the groups, as tall as their header and cards together
+			&:has( > .match-ticker-show-all-card ) {
+				grid-row: 1 / -1;
+			}
 		}
 
 		// Small screens: stacked full-width cards instead of a carousel (same breakpoint as .mobile-only)
