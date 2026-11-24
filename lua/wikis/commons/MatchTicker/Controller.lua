@@ -90,6 +90,7 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@field featuredOnly boolean?
 ---@field displayGameIcons boolean?
 ---@field header Renderable?
+---@field showAllLink string?
 
 ---@class MatchTickerGameData
 ---@field gameIds number[]
@@ -111,7 +112,8 @@ function MatchTickerController.makeMatchTicker(args)
 		hideTournament = config.hideTournament,
 		displayGameIcons = config.displayGameIcons,
 		onlyHighlightOnValue = config.onlyHighlightOnValue,
-		variant = config.variant
+		variant = config.variant,
+		showAllLink = config.showAllLink,
 	}
 end
 
@@ -157,6 +159,7 @@ function MatchTickerController.parseConfig(args)
 			or Logic.readBool(args.entityStyle) and 'horizontal'
 			or 'vertical',
 		header = args.header,
+		showAllLink = Logic.nilIfEmpty(args.showAllLink),
 	}
 
 	--min 1 of them has to be set; recent can not be set while any of the others is set
