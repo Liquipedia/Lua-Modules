@@ -104,8 +104,8 @@ function Team:createInfobox()
 		Cell{
 			name = 'Location',
 			children = {
-				self:_createLocation(args.location),
-				self:_createLocation(args.location2)
+				self:_createLocation(args.location, args.city),
+				self:_createLocation(args.location2, args.city2)
 			}
 		},
 		Customizable{
@@ -275,8 +275,9 @@ function Team:createRegion(region)
 end
 
 ---@param location string?
+---@param city string?
 ---@return string?
-function Team:_createLocation(location)
+function Team:_createLocation(location, city)
 	if String.isEmpty(location)then
 		return
 	end
@@ -293,9 +294,10 @@ function Team:_createLocation(location)
 		self:categories(demonym .. ' Teams')
 	end
 
+	-- Like Infobox league: flag + city if a city is set, flag + country otherwise
 	return Flags.Icon{flag = location, shouldLink = true} ..
 			'&nbsp;' ..
-			(locationDisplay or '')
+			(String.nilIfEmpty(city) or locationDisplay or '')
 end
 
 ---@return Renderable?
