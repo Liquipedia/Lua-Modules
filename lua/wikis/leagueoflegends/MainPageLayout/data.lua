@@ -91,22 +91,23 @@ local CONTENT = {
 		body = MatchTicker{filterGroupPrefix = MainPageLayoutUtil.MATCH_TICKER_FILTER_GROUP_PREFIX},
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
+	tournamentsFilter = {
+		noPanel = true,
+		body = Div{
+			css = {['margin-bottom'] = '0.5rem'},
+			children = FilterButtonsWidget()
+		},
+	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = {
-			Div{
-				css = { padding = '0.75rem 0.75rem 0' },
-				children = FilterButtonsWidget()
-			},
-			TournamentsTicker{
-				upcomingDays = 30,
-				completedDays = 20,
-				modifierTypeQualifier = -2,
-				modifierTier1 = 55,
-				modifierTier2 = 55,
-				modifierTier3 = 10,
-				tierColorScheme = 'top3',
-			},
+		body = TournamentsTicker{
+			upcomingDays = 30,
+			completedDays = 20,
+			modifierTypeQualifier = -2,
+			modifierTier1 = 55,
+			modifierTier2 = 55,
+			modifierTier3 = 10,
+			tierColorScheme = 'top3',
 		},
 		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
@@ -211,7 +212,7 @@ return {
 				size = 12,
 				children = {
 					{
-						mobileOrder = 4,
+						mobileOrder = 3,
 						noPanel = true,
 						content = CONTENT.matches,
 					},
@@ -249,6 +250,10 @@ return {
 			{ -- Right
 				sizes = {xxl = 6, xxxl = 6},
 				children = {
+					{
+						mobileOrder = 4,
+						content = CONTENT.tournamentsFilter,
+					},
 					{
 						mobileOrder = 5,
 						content = CONTENT.tournaments,
