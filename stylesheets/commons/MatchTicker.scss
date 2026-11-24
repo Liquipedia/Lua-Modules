@@ -65,8 +65,7 @@ Template(s): MatchTicker
 		font-size: 0.8125rem;
 		flex-grow: 1;
 
-		&:not( :has( > .winner ) ),
-		&:has( > .winner ) > .winner {
+		> .winner {
 			font-weight: bold;
 		}
 	}
