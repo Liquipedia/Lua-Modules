@@ -8,17 +8,23 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local WidgetFactory = {}
 
----@param args {widget: string, children: Renderable|Renderable[], [any]:any}
----@return Widget
+---@param args {widget: string, [any]: any}
+---@return Widget|VNode
 function WidgetFactory.fromTemplate(args)
-	local copiedArgs = Table.copy(args)
-	local widgetClass = Table.extract(copiedArgs, 'widget')
-	copiedArgs.children = type(copiedArgs.children) == 'table' and copiedArgs.children or {copiedArgs.children}
+	local widgetClass = Table.extract(args, 'widget')
+	assert(String.isNotEmpty(widgetClass), 'WidgetFactory: widget must be specified')
 	local WidgetClass = Lua.import('Module:Widget/' .. widgetClass)
+	local copiedArgs = Table.mapValues(args, function (arg)
+		if type(arg) == 'table' then
+			return arg
+		end
+		return tonumber(arg) or arg
+	end)
 	return WidgetClass(copiedArgs)
 end
 
