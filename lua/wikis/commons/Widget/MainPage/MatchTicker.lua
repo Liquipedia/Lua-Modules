@@ -10,10 +10,8 @@ local Lua = require('Module:Lua')
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/FilterableContainer')
 
 local Component = Lua.import('Module:Widget/Component')
-local FilterButtons = Lua.import('Module:Widget/FilterButtons')
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local defaultProps = {
 	matchesPortal = 'Liquipedia:Matches',
@@ -24,19 +22,16 @@ local defaultProps = {
 ---@field matchesPortal string?
 ---@field displayGameIcons boolean?
 ---@field showMatchesPortal boolean?
----@field filterGroupPrefix string? if set, renders its own filter buttons with this prefix
+---@field filterGroupPrefix string? if set, renders its own filter popover with this prefix
 
 ---@param props MainPageMatchTickerProps
 ---@return Renderable[]
 local function MainPageMatchTicker(props)
-	return WidgetUtil.collect(
-		props.filterGroupPrefix and Html.Div{
-			css = {width = '100%', ['margin-bottom'] = '0.5rem'},
-			children = FilterButtons{filterGroupPrefix = props.filterGroupPrefix},
-		} or nil,
+	return {
 		MatchTickerContainer{
 			displayGameIcons = props.displayGameIcons,
 			filterGroupPrefix = props.filterGroupPrefix,
+			showFilterButtons = props.filterGroupPrefix ~= nil,
 		},
 		props.showMatchesPortal and Html.Div{
 			css = {
@@ -52,8 +47,8 @@ local function MainPageMatchTicker(props)
 				classes = {'mobile-only'},
 				children = Link{ children = 'See more matches', link = props.matchesPortal}
 			}
-		} or nil
-	)
+		} or nil,
+	}
 end
 
 return Component.component(MainPageMatchTicker, defaultProps)

@@ -386,6 +386,12 @@ Template(s): MatchTicker
 			}
 		}
 
+		// Filter toggle, styled like the carousel controls next to it
+		.filter-popover {
+			--filter-popover-toggle-background-color: var( --match-ticker-header-control-background-color );
+			--filter-popover-toggle-color: var( --clr-secondary-100 );
+		}
+
 		// Carousel controls live in the header instead of floating over the content
 		.carousel-button.button {
 			position: static;

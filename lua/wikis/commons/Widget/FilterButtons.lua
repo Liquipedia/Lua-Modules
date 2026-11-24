@@ -8,8 +8,8 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local FilterButtonsUtil = Lua.import('Module:FilterButtons/Util')
 local FnUtil = Lua.import('Module:FnUtil')
-local Logic = Lua.import('Module:Logic')
 local Variables = Lua.import('Module:Variables')
 local Table = Lua.import('Module:Table')
 
@@ -27,6 +27,7 @@ local FilterButtons = {
 
 ---@class FilterButtonCategory
 ---@field name string
+---@field title string? heading of the category in the filter popover
 ---@field property string
 ---@field items string[]?
 ---@field defaultItems string[]?
@@ -44,7 +45,7 @@ local FilterButtons = {
 
 ---@class FilterButtonsProps
 ---@field categories FilterButtonCategory[]?
----@field filterGroupPrefix string? use distinct prefixes for independent button sets
+---@field filterGroupPrefix string? prefix of the filter groups; use distinct prefixes for independent button sets
 
 ---@param props FilterButtonsProps
 ---@return VNode
@@ -53,7 +54,7 @@ function FilterButtons.render(props)
 	local filterGroupPrefix = props.filterGroupPrefix
 	---@cast filterGroupPrefix -nil
 
-	Array.forEach(categories, FilterButtons._loadCategories)
+	Array.forEach(categories, FilterButtonsUtil.loadCategory)
 
 	return Div{
 		children = Array.map(categories, function (category)
@@ -65,29 +66,6 @@ function FilterButtons.render(props)
 			return FilterButtons.getButtonRow(category, filterGroupPrefix)
 		end)
 	}
-end
-
----@param category FilterButtonCategory
-function FilterButtons._loadCategories(category)
-	-- categories are shared module data mutated below; load once even if rendered multiple times
-	if category.loaded then
-		return
-	end
-
-	if category.load then
-		category.load(category)
-	end
-
-	if category.order then
-		Array.orderInPlaceBy(category.items, category.order)
-	end
-
-	local itemToPropertyValues = category.itemToPropertyValues or FnUtil.identity
-	category.defaultItems = Array.map(
-		Logic.emptyOr(category.defaultItems, category.items) --[[ @as string[] ]],
-		itemToPropertyValues
-	)
-	category.loaded = true
 end
 
 ---@param category FilterButtonCategory

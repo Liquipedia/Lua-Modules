@@ -63,6 +63,33 @@
  * </div>
  * ```
  *
+ * #### Filter popover with staged changes
+ * Filter groups can be placed in a popover, where they are shown as checkboxes and only applied once confirmed.
+ * A group with nothing checked is unrestricted, i.e. all of its filters are applied as active.
+ * ```html
+ * <div data-filter-popover>
+ *   <div data-filter-popover-toggle>Filter <span data-filter-popover-count></span></div>
+ *   <div class="filter-popover__panel">
+ *     <span data-filter-popover-category-count="group1"></span>
+ *     <span data-filter-popover-toggle-all="group1" data-label-clear="Clear" data-label-select-all="Select all"></span>
+ *     <div data-filter data-filter-staged data-filter-group="group1">
+ *       <div data-filter-on="cat1" data-filter-default="true" role="checkbox">Category 1</div>
+ *       <div data-filter-on="cat2" role="checkbox">Category 2</div>
+ *     </div>
+ *     <div data-filter-popover-action="reset">Reset</div>
+ *     <div data-filter-popover-action="cancel">Cancel</div>
+ *     <div data-filter-popover-action="apply">Apply</div>
+ *   </div>
+ * </div>
+ * ```
+ * - `data-filter-staged` (required): marks a filter group as part of a popover. Its buttons are the direct children
+ *     with `data-filter-on`; there are no 'all' or 'curated' buttons. A button is only active by default if it has
+ *     `data-filter-default="true"`.
+ * - `data-filter-popover-toggle` (required): replaced by a button opening the popover.
+ * - `data-filter-popover-count` (optional): shows the number of applied filters.
+ * - `data-filter-popover-category-count` / `data-filter-popover-toggle-all` (optional): the number of checked
+ *     filters of a group, and a control to clear or check all of them.
+ *
  * #### Filterable items counters
  * Filterable items can be counted and the value updated in a separate counter location.
  *
@@ -95,9 +122,13 @@ liquipedia.filterButtons = {
 	templateExpansions: [],
 	hideableGroups: [],
 	filterCounters: {},
+	popovers: [],
+	popoverCount: 0,
 
 	init: function() {
-		const filterButtonGroups = Array.from( document.querySelectorAll( '.filter-buttons[data-filter]' ) );
+		const filterButtonGroups = Array.from(
+			document.querySelectorAll( '.filter-buttons[data-filter], [data-filter][data-filter-staged]' )
+		);
 		if ( filterButtonGroups.length === 0 ) {
 			return;
 		}
@@ -106,6 +137,7 @@ liquipedia.filterButtons = {
 		this.generateFilterGroups( filterButtonGroups );
 		this.generateFilterableObjects();
 		this.initializeButtons();
+		this.initializePopovers();
 		this.performUpdate();
 	},
 
@@ -117,8 +149,10 @@ liquipedia.filterButtons = {
 
 		filterButtonGroups.forEach( ( buttonsDiv ) => {
 			const filterGroup = buttonsDiv.dataset.filterGroup ?? this.fallbackFilterGroup;
+			const staged = buttonsDiv.dataset.filterStaged !== undefined;
 			const filterGroupEntry = {
 				name: filterGroup,
+				staged: staged,
 				buttons: [],
 				alwaysActive: buttonsDiv.dataset.filterAlwaysActive?.split( ',' ) ?? [],
 				effectClass: 'filter-effect-' + ( buttonsDiv.dataset.filterEffect ?? this.fallbackFilterEffect ),
@@ -129,14 +163,18 @@ liquipedia.filterButtons = {
 				defaultCurated: buttonsDiv.dataset.filterDefaultCurated === 'true'
 			};
 
-			Array.from( buttonsDiv.querySelectorAll( ':scope > .filter-button' ) ).forEach(
+			const buttonSelector = staged ? ':scope > [data-filter-on]' : ':scope > .filter-button';
+			Array.from( buttonsDiv.querySelectorAll( buttonSelector ) ).forEach(
 				/** @param {HTMLElement} buttonElement */
 				( buttonElement ) => {
 					const filterOn = buttonElement.dataset.filterOn ?? '';
-					const defaultState = !(
-						buttonElement.dataset.filterDefault === 'false' ||
-							!buttonElement.classList.contains( 'filter-button--active' )
-					);
+					// Buttons of staged groups are not styled as active, so they declare their default explicitly
+					const defaultState = staged ?
+						buttonElement.dataset.filterDefault === 'true' :
+						!(
+							buttonElement.dataset.filterDefault === 'false' ||
+								!buttonElement.classList.contains( 'filter-button--active' )
+						);
 					const button = {
 						element: buttonElement,
 						filter: filterOn,
@@ -244,13 +282,12 @@ liquipedia.filterButtons = {
 		};
 
 		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
-			const buttons = Object.values( filterGroup.buttons );
-			buttons.push( filterGroup.allButton );
-			if ( filterGroup.curatedButton ) {
-				buttons.push( filterGroup.curatedButton );
+			// Buttons of staged groups are handled by their popover
+			if ( filterGroup.staged ) {
+				return;
 			}
 
-			buttons.forEach( ( button ) => {
+			this.getGroupButtons( filterGroup ).forEach( ( button ) => {
 				const buttonEventHandler = handleClick.bind( this, button, filterGroup );
 				button.element.addEventListener( 'click', buttonEventHandler );
 				button.element.addEventListener( 'keypress', buttonEventHandler );
@@ -282,7 +319,9 @@ liquipedia.filterButtons = {
 				}
 			} );
 
-			filterGroup.allButton.active = allState;
+			if ( filterGroup.allButton ) {
+				filterGroup.allButton.active = allState;
+			}
 			if ( filterGroup.curatedButton ) {
 				filterGroup.curatedButton.active = filterGroup.curated;
 			}
@@ -304,19 +343,16 @@ liquipedia.filterButtons = {
 
 	updateDOM: function() {
 		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
-			const buttons = Object.values( filterGroup.buttons );
-			buttons.push( filterGroup.allButton );
-			if ( filterGroup.curatedButton ) {
-				buttons.push( filterGroup.curatedButton );
+			// Staged groups show their pending state instead, see renderPopover()
+			if ( !filterGroup.staged ) {
+				this.getGroupButtons( filterGroup ).forEach( ( button ) => {
+					if ( button.active ) {
+						button.element.classList.add( this.activeButtonClass );
+					} else {
+						button.element.classList.remove( this.activeButtonClass );
+					}
+				} );
 			}
-
-			buttons.forEach( ( button ) => {
-				if ( button.active ) {
-					button.element.classList.add( this.activeButtonClass );
-				} else {
-					button.element.classList.remove( this.activeButtonClass );
-				}
-			} );
 
 			filterGroup.filterableItems.forEach( ( filterableItem ) => {
 				if ( filterableItem.hidden ) {
@@ -347,6 +383,8 @@ liquipedia.filterButtons = {
 		Object.values( this.filterCounters ).forEach( ( filterCounter ) => {
 			filterCounter.element.innerHTML = filterCounter.count;
 		} );
+
+		this.popovers.forEach( ( popover ) => this.renderPopoverCount( popover ) );
 
 		Promise.all( this.templateExpansions.map( async ( templateExpansion ) => {
 			const isDefault = templateExpansion.groups.every( ( group ) => {
@@ -401,6 +439,278 @@ liquipedia.filterButtons = {
 				this.refreshScriptsAfterContentUpdate();
 			}
 		} ) );
+	},
+
+	/**
+	 * @param {Object} filterGroup
+	 * @return {Object[]}
+	 */
+	getGroupButtons: function( filterGroup ) {
+		return [ ...Object.values( filterGroup.buttons ), filterGroup.allButton, filterGroup.curatedButton ]
+			.filter( ( button ) => button !== undefined );
+	},
+
+	supportsPopover: function() {
+		return Object.prototype.hasOwnProperty.call( HTMLElement.prototype, 'popover' );
+	},
+
+	supportsAnchorPositioning: function() {
+		return CSS.supports( 'position-area: block-end' );
+	},
+
+	initializePopovers: function() {
+		this.popovers = Array.from( document.querySelectorAll( '[data-filter-popover]' ) )
+			.map( ( element ) => this.createPopover( element ) )
+			.filter( ( popover ) => popover !== null );
+	},
+
+	/**
+	 * @param {HTMLElement} element
+	 * @return {Object|null}
+	 */
+	createPopover: function( element ) {
+		const panel = element.querySelector( '.filter-popover__panel' );
+		const toggleDiv = element.querySelector( '[data-filter-popover-toggle]' );
+		const groups = Array.from(
+			element.querySelectorAll( '[data-filter][data-filter-staged]' ),
+			( groupElement ) => this.filterGroups[ groupElement.dataset.filterGroup ]
+		).filter( ( group ) => group !== undefined );
+		if ( !panel || !toggleDiv || groups.length === 0 ) {
+			return null;
+		}
+
+		// The parser does not allow <button>, so the toggle is swapped in here
+		const toggle = document.createElement( 'button' );
+		toggle.type = 'button';
+		toggle.className = toggleDiv.className;
+		toggle.setAttribute( 'aria-haspopup', 'dialog' );
+		toggle.setAttribute( 'aria-expanded', 'false' );
+		toggle.append( ...toggleDiv.childNodes );
+		toggleDiv.replaceWith( toggle );
+
+		const popover = {
+			element: element,
+			panel: panel,
+			toggle: toggle,
+			groups: groups,
+			pendingStates: {},
+			isOpen: false,
+			usesPopoverApi: this.supportsPopover()
+		};
+
+		const name = 'filter-popover-' + ( ++this.popoverCount );
+		if ( !panel.id ) {
+			panel.id = name;
+		}
+		toggle.setAttribute( 'aria-controls', panel.id );
+
+		if ( popover.usesPopoverApi ) {
+			panel.setAttribute( 'popover', 'auto' );
+			// Making the toggle the invoker also exempts it from light dismiss
+			toggle.setAttribute( 'popovertarget', panel.id );
+			if ( this.supportsAnchorPositioning() ) {
+				element.classList.add( 'filter-popover--anchored' );
+				toggle.style.setProperty( 'anchor-name', '--' + name );
+				panel.style.setProperty( 'position-anchor', '--' + name );
+			}
+			// Also fires on light dismiss and escape, which discard pending changes just like cancel
+			panel.addEventListener( 'beforetoggle', ( event ) => {
+				this.onPopoverToggle( popover, event.newState === 'open' );
+			} );
+		} else {
+			element.classList.add( 'filter-popover--fallback' );
+			toggle.addEventListener( 'click', () => this.setPopoverOpen( popover, !popover.isOpen ) );
+			document.addEventListener( 'click', ( event ) => {
+				if ( popover.isOpen && !element.contains( event.target ) ) {
+					this.setPopoverOpen( popover, false );
+				}
+			} );
+			document.addEventListener( 'keydown', ( event ) => {
+				if ( popover.isOpen && event.key === 'Escape' ) {
+					this.setPopoverOpen( popover, false );
+					toggle.focus();
+				}
+			} );
+		}
+
+		const addActivationListener = ( activatable, callback ) => {
+			const handler = ( event ) => {
+				if ( event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ' ) {
+					return;
+				}
+				event.preventDefault();
+				callback();
+			};
+			activatable.addEventListener( 'click', handler );
+			activatable.addEventListener( 'keydown', handler );
+		};
+
+		groups.forEach( ( group ) => {
+			Object.values( group.buttons ).forEach( ( button ) => {
+				addActivationListener( button.element, () => {
+					const pending = popover.pendingStates[ group.name ];
+					pending[ button.filter ] = !pending[ button.filter ];
+					this.renderPopover( popover );
+				} );
+			} );
+		} );
+
+		element.querySelectorAll( '[data-filter-popover-toggle-all]' ).forEach( ( toggleAll ) => {
+			const group = this.filterGroups[ toggleAll.dataset.filterPopoverToggleAll ];
+			if ( !group ) {
+				return;
+			}
+			addActivationListener( toggleAll, () => {
+				const pending = popover.pendingStates[ group.name ];
+				const newState = this.countChecked( pending ) === 0;
+				Object.keys( pending ).forEach( ( filter ) => {
+					pending[ filter ] = newState;
+				} );
+				this.renderPopover( popover );
+			} );
+		} );
+
+		const actions = {
+			reset: () => this.resetPopover( popover ),
+			cancel: () => this.setPopoverOpen( popover, false ),
+			apply: () => this.applyPopover( popover )
+		};
+		element.querySelectorAll( '[data-filter-popover-action]' ).forEach( ( actionElement ) => {
+			const action = actions[ actionElement.dataset.filterPopoverAction ];
+			if ( action ) {
+				addActivationListener( actionElement, action );
+			}
+		} );
+
+		this.loadPendingStates( popover );
+		this.renderPopover( popover );
+		return popover;
+	},
+
+	/**
+	 * A group with every filter active is unrestricted, which the popover shows as nothing checked.
+	 *
+	 * @param {Object<string, boolean>} filterStates
+	 * @return {Object<string, boolean>}
+	 */
+	toCheckedStates: function( filterStates ) {
+		const isUnrestricted = Object.values( filterStates ).every( Boolean );
+		return Object.fromEntries(
+			Object.entries( filterStates ).map( ( [ filter, active ] ) => [ filter, !isUnrestricted && active ] )
+		);
+	},
+
+	/**
+	 * @param {Object<string, boolean>} checkedStates
+	 * @return {number}
+	 */
+	countChecked: function( checkedStates ) {
+		return Object.values( checkedStates ).filter( Boolean ).length;
+	},
+
+	loadPendingStates: function( popover ) {
+		popover.groups.forEach( ( group ) => {
+			popover.pendingStates[ group.name ] = this.toCheckedStates( group.filterStates );
+		} );
+	},
+
+	resetPopover: function( popover ) {
+		popover.groups.forEach( ( group ) => {
+			popover.pendingStates[ group.name ] = this.toCheckedStates( group.defaultStates );
+		} );
+		this.renderPopover( popover );
+	},
+
+	applyPopover: function( popover ) {
+		popover.groups.forEach( ( group ) => {
+			const pending = popover.pendingStates[ group.name ];
+			const isUnrestricted = this.countChecked( pending ) === 0;
+			Object.keys( group.filterStates ).forEach( ( filter ) => {
+				group.filterStates[ filter ] = isUnrestricted || pending[ filter ];
+			} );
+			group.curated = false;
+		} );
+		liquipedia.tracker.track( 'Filter popover applied', true );
+		this.performUpdate();
+		this.setPopoverOpen( popover, false );
+	},
+
+	/**
+	 * @param {Object} popover
+	 * @param {boolean} isOpen
+	 */
+	setPopoverOpen: function( popover, isOpen ) {
+		if ( popover.isOpen === isOpen ) {
+			return;
+		}
+		if ( popover.usesPopoverApi ) {
+			// Triggers onPopoverToggle() through the beforetoggle event
+			if ( isOpen ) {
+				popover.panel.showPopover();
+			} else {
+				popover.panel.hidePopover();
+			}
+			return;
+		}
+		this.onPopoverToggle( popover, isOpen );
+	},
+
+	/**
+	 * Pending changes are dropped whenever the popover opens or closes, so only applied changes stick.
+	 *
+	 * @param {Object} popover
+	 * @param {boolean} isOpen
+	 */
+	onPopoverToggle: function( popover, isOpen ) {
+		popover.isOpen = isOpen;
+		popover.element.classList.toggle( 'filter-popover--open', isOpen );
+		popover.toggle.setAttribute( 'aria-expanded', String( isOpen ) );
+		this.loadPendingStates( popover );
+		this.renderPopover( popover );
+	},
+
+	/**
+	 * @param {Object} popover
+	 */
+	renderPopover: function( popover ) {
+		popover.groups.forEach( ( group ) => {
+			const pending = popover.pendingStates[ group.name ];
+			Object.values( group.buttons ).forEach( ( button ) => {
+				button.element.setAttribute( 'aria-checked', String( pending[ button.filter ] ) );
+			} );
+
+			const checkedCount = this.countChecked( pending );
+			popover.element.querySelectorAll(
+				'[data-filter-popover-category-count="' + group.name + '"]'
+			).forEach( ( counter ) => {
+				counter.textContent = String( checkedCount );
+				counter.classList.toggle( 'filter-popover__category-count--empty', checkedCount === 0 );
+			} );
+			popover.element.querySelectorAll(
+				'[data-filter-popover-toggle-all="' + group.name + '"]'
+			).forEach( ( toggleAll ) => {
+				toggleAll.textContent = checkedCount > 0 ?
+					toggleAll.dataset.labelClear :
+					toggleAll.dataset.labelSelectAll;
+			} );
+		} );
+		this.renderPopoverCount( popover );
+	},
+
+	/**
+	 * Shows the number of applied (not pending) filters on the toggle.
+	 *
+	 * @param {Object} popover
+	 */
+	renderPopoverCount: function( popover ) {
+		const count = popover.groups.reduce(
+			( sum, group ) => sum + this.countChecked( this.toCheckedStates( group.filterStates ) ),
+			0
+		);
+		popover.element.querySelectorAll( '[data-filter-popover-count]' ).forEach( ( counter ) => {
+			counter.textContent = count > 0 ? ' (' + count + ')' : '';
+		} );
+		popover.toggle.classList.toggle( 'filter-popover__toggle--active', count > 0 );
 	},
 
 	refreshScriptsAfterContentUpdate: function() {

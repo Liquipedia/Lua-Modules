@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local FeatureFlag = Lua.import('Module:FeatureFlag')
+local FilterButtonsUtil = Lua.import('Module:FilterButtons/Util')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -16,9 +17,11 @@ local Table = Lua.import('Module:Table')
 local CarouselButton = Lua.import('Module:Widget/Basic/Carousel/Button')
 local Component = Lua.import('Module:Widget/Component')
 local ContentSwitchPill = Lua.import('Module:Widget/ContentSwitch/Pill')
+local FilterButtonsPopover = Lua.import('Module:Widget/FilterButtons/Popover')
 local Html = Lua.import('Module:Widget/Html')
 local Panel = Lua.import('Module:Widget/Panel')
 local Switch = Lua.import('Module:Widget/Switch')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
 
 ---@alias MatchTickerMatchQueryType 'upcoming'|'recent'
@@ -36,6 +39,8 @@ local defaultProps = {
 ---@field limit integer?
 ---@field displayGameIcons boolean?
 ---@field filterGroupPrefix string? has to match the `filterGroupPrefix` of the filter buttons controlling this ticker
+---@field showFilterButtons boolean? renders a filter popover in the header controlling this ticker;
+---requires a `filterGroupPrefix` that is not used by other filter buttons on the page
 
 ---@param props MatchTickerFilterableContainerProps
 ---@return VNode
@@ -43,6 +48,10 @@ local function MatchTickerContainer(props)
 	local function filterName(filter)
 		return props.filterGroupPrefix .. '-' .. filter
 	end
+
+	-- The default filters are only filled in once the categories are loaded, which the filter buttons might not have
+	-- done yet if they are rendered after this ticker (or as part of it)
+	Array.forEach(FilterConfig.categories, FilterButtonsUtil.loadCategory)
 
 	local filters = Array.map(FilterConfig.categories, Operator.property('name')) or {}
 	local filterText = table.concat(Array.map(filters, filterName), ',')
@@ -163,14 +172,18 @@ local function MatchTickerContainer(props)
 				},
 			},
 			Html.Div{
-				classes = {
+				classes = WidgetUtil.collect(
 					'match-ticker-filterable-container__header-end',
-					'mobile-hide',
-				},
-				children = {
-					CarouselButton{direction = 'left'},
-					CarouselButton{direction = 'right'},
-				},
+					not props.showFilterButtons and 'mobile-hide' or nil
+				),
+				children = WidgetUtil.collect(
+					props.showFilterButtons
+						and FilterButtonsPopover{filterGroupPrefix = props.filterGroupPrefix}
+						or nil,
+					-- The matches are stacked instead of scrolled on small screens
+					CarouselButton{direction = 'left', classes = {'mobile-hide'}},
+					CarouselButton{direction = 'right', classes = {'mobile-hide'}}
+				),
 			},
 		},
 		children = {
