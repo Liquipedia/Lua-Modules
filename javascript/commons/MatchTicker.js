@@ -137,12 +137,14 @@ class LiquipediaMatchTicker {
 				return;
 			}
 
-			const cardGroups = Map.groupBy( cards, ( card ) => isUpcoming && card.hasStarted( now ) ?
-				LiquipediaMatchTicker.LIVE_GROUP_KEY :
-				card.toISODateString()
+			const cardGroups = LiquipediaMatchTicker.#groupAdjacent(
+				cards,
+				( card ) => isUpcoming && card.hasStarted( now ) ?
+					LiquipediaMatchTicker.LIVE_GROUP_KEY :
+					card.toISODateString()
 			);
 
-			for ( const [ groupKey, cardGroup ] of cardGroups ) {
+			for ( const { key: groupKey, items: cardGroup } of cardGroups ) {
 				const cardGroupElement = document.createElement( 'div' );
 				cardGroupElement.classList.add( 'match-ticker-card-group' );
 				cardGroupElement.style.setProperty( '--match-ticker-group-columns', cardGroup.length );
@@ -164,6 +166,27 @@ class LiquipediaMatchTicker {
 
 			tickerCarousel.replaceChildren( ...groupElements );
 		} );
+	}
+
+	/**
+	 * Group consecutive cards sharing the same key, keeping the order of the list
+	 *
+	 * @param {LiquipediaMatchTickerCard[]} items
+	 * @param {function(LiquipediaMatchTickerCard): string} getKey
+	 * @return {{key: string, items: LiquipediaMatchTickerCard[]}[]}
+	 */
+	static #groupAdjacent( items, getKey ) {
+		const groups = [];
+		for ( const item of items ) {
+			const key = getKey( item );
+			const lastGroup = groups.at( -1 );
+			if ( lastGroup?.key === key ) {
+				lastGroup.items.push( item );
+			} else {
+				groups.push( { key, items: [ item ] } );
+			}
+		}
+		return groups;
 	}
 
 	/**
