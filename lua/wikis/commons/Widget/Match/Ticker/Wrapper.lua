@@ -43,6 +43,7 @@ local function MatchTickerWrapper(props)
 			displayGameIcons = props.displayGameIcons,
 			onlyHighlightOnValue = props.onlyHighlightOnValue,
 			variant = props.variant == 'horizontal' and 'vertical' or nil,
+			countdownFormat = props.variant == 'carousel' and 'minimal' or nil,
 			gameData = match.gameData
 		}
 	end)
