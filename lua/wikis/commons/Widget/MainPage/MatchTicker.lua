@@ -32,7 +32,7 @@ local defaultProps = {
 local function MainPageMatchTicker(props)
 	return WidgetUtil.collect(
 		props.filterGroupPrefix and Html.Div{
-			css = {width = '100%', ['margin-bottom'] = '8px'},
+			css = {width = '100%', ['margin-bottom'] = '0.5rem'},
 			children = FilterButtons{filterGroupPrefix = props.filterGroupPrefix},
 		} or nil,
 		MatchTickerContainer{
