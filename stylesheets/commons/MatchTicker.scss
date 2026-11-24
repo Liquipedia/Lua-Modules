@@ -60,6 +60,17 @@ Template(s): MatchTicker
 	}
 }
 
+@keyframes match-ticker-live-blink {
+	0%,
+	100% {
+		opacity: 1;
+	}
+
+	50% {
+		opacity: 0;
+	}
+}
+
 .match-ticker-card {
 	display: flex;
 	min-width: 15.625rem;
@@ -543,6 +554,7 @@ Template(s): MatchTicker
 				font-size: 0.5rem;
 				content: "\f111"; /* Unicode for circle */
 				color: var( --match-ticker-card-group-live-indicator-color );
+				animation: match-ticker-live-blink 2s step-end infinite;
 			}
 		}
 
