@@ -6,6 +6,7 @@ const { test, expect, beforeAll, beforeEach, afterEach, describe, jest: jestGlob
 
 describe( 'FilterButtons popover', () => {
 	let filterButtons;
+	let FilterButtonsPopover;
 	let apiGet;
 
 	beforeAll( () => {
@@ -16,7 +17,8 @@ describe( 'FilterButtons popover', () => {
 			countdown: { init: () => {} },
 			collapse: { init: () => {} },
 			switchButtons: { init: () => {} },
-			carousel: { init: () => {} }
+			carousel: { init: () => {} },
+			matchticker: { init: () => {} }
 		};
 		globalThis.mw = {
 			config: { get: ( key ) => ( key === 'wgScriptPath' ? '/test' : 'Main_Page' ) },
@@ -29,6 +31,7 @@ describe( 'FilterButtons popover', () => {
 		require( '../commons/Storage.js' );
 		require( '../commons/FilterButtons.js' );
 		filterButtons = globalThis.liquipedia.filterButtons;
+		FilterButtonsPopover = globalThis.liquipedia.filterButtonsPopover;
 	} );
 
 	const item = ( value, isDefault ) => `<div data-filter-on="${ value }" data-filter-default="${ isDefault }"
@@ -81,8 +84,8 @@ describe( 'FilterButtons popover', () => {
 		filterButtons.hideableGroups = [];
 		filterButtons.filterCounters = {};
 		filterButtons.popovers = [];
-		filterButtons.supportsPopover = () => false;
-		filterButtons.supportsAnchorPositioning = () => false;
+		FilterButtonsPopover.supportsPopover = () => false;
+		FilterButtonsPopover.supportsAnchorPositioning = () => false;
 		window.localStorage.clear();
 		apiGet.mockClear();
 	} );
@@ -237,8 +240,8 @@ describe( 'FilterButtons popover', () => {
 		};
 
 		beforeEach( () => {
-			filterButtons.supportsPopover = () => true;
-			filterButtons.supportsAnchorPositioning = () => true;
+			FilterButtonsPopover.supportsPopover = () => true;
+			FilterButtonsPopover.supportsAnchorPositioning = () => true;
 			HTMLElement.prototype.showPopover = function() {
 				dispatchToggle( this, 'open' );
 			};
