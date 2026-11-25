@@ -15,12 +15,9 @@ local CarouselContent = Lua.import('Module:Widget/Basic/Carousel/Content')
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
 
----@class CarouselWidgetParameters
----@field children Renderable[]
----@field itemWidth string?
----@field gap string?
----@field classes string[]?
----@field css table?
+---@class CarouselWidgetParameters: CarouselContentWidgetParameters
+---@field children Renderable[]?
+---@field content VNode?
 
 local defaultProps = {
 	itemWidth = '200px',
@@ -28,11 +25,25 @@ local defaultProps = {
 }
 
 ---@param props CarouselWidgetParameters
----@return HtmlNode
-local function Carousel(props)
+---@return VNode
+local function buildCarouselContent(props)
+	if props.content then
+		return props.content
+	end
 	assert(props.children, 'Carousel: children is required')
 	assert(Array.isArray(props.children), 'Carousel: children must be an array')
 
+	return CarouselContent{
+		children = props.children,
+		itemWidth = props.itemWidth,
+		gap = props.gap,
+		css = props.css,
+	}
+end
+
+---@param props CarouselWidgetParameters
+---@return HtmlNode
+local function Carousel(props)
 	return Div{
 		classes = Array.extendWith({'carousel'}, props.classes),
 		children = {
@@ -40,12 +51,7 @@ local function Carousel(props)
 			CarouselButton{direction = 'right'},
 			Div{classes = {'carousel-fade', 'carousel-fade--left'}},
 			Div{classes = {'carousel-fade', 'carousel-fade--right'}},
-			CarouselContent{
-				children = props.children,
-				itemWidth = props.itemWidth,
-				gap = props.gap,
-				css = props.css,
-			},
+			buildCarouselContent(props),
 		},
 	}
 end

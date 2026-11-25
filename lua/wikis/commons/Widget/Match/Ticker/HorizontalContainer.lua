@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Component = Lua.import('Module:Widget/Component')
 local I18n = Lua.import('Module:I18n')
 
-local CarouselButton = Lua.import('Module:Widget/Basic/Carousel/Button')
+local Carousel = Lua.import('Module:Widget/Basic/Carousel')
 local CarouselContent = Lua.import('Module:Widget/Basic/Carousel/Content')
 local Html = Lua.import('Module:Widget/Html')
 local Switch = Lua.import('Module:Widget/Switch')
@@ -40,19 +40,12 @@ local function HorizontalContainer(props)
 					},
 				},
 			},
-			Html.Div{
-				classes = {'carousel'},
-				children = {
-					CarouselButton{direction = 'left'},
-					CarouselButton{direction = 'right'},
-					Html.Div{classes = {'carousel-fade', 'carousel-fade--left'}},
-					Html.Div{classes = {'carousel-fade', 'carousel-fade--right'}},
-					CarouselContent{
-						classes = {'match-ticker-carousel'},
-						children = props.children,
-						itemWidth = false,
-						gap = '0',
-					},
+			Carousel{
+				content = CarouselContent{
+					classes = {'match-ticker-carousel'},
+					children = props.children,
+					itemWidth = false,
+					gap = '0',
 				},
 			},
 			Html.Div{

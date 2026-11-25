@@ -19,7 +19,7 @@ local Div = Html.Div
 ---@field itemWidth string|false? `false` leaves the item width to stylesheets
 ---@field gap string?
 ---@field classes string[]?
----@field css table?
+---@field css HtmlStyleProps?
 
 local defaultProps = {
 	itemWidth = '200px',
