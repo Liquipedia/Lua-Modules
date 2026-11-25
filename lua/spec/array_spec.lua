@@ -320,6 +320,14 @@ describe('array', function()
 			assert.are_same(a, Array.parseCommaSeparatedString('test1, test2,test3'))
 			assert.are_same(a, Array.parseCommaSeparatedString('test1 - test2-test3', '-'))
 		end)
+
+		it('trims the items and keeps empty ones', function()
+			local nbsp = '\194\160'
+			assert.are_same({}, Array.parseCommaSeparatedString(''))
+			assert.are_same({}, Array.parseCommaSeparatedString(nil))
+			assert.are_same({'a', '', 'b', ''}, Array.parseCommaSeparatedString('a, ,b, '))
+			assert.are_same({'Åsa', 'à', 'b'}, Array.parseCommaSeparatedString('Åsa,' .. nbsp .. 'à ,' .. nbsp .. 'b' .. nbsp))
+		end)
 	end)
 
 	describe('Interleave', function ()

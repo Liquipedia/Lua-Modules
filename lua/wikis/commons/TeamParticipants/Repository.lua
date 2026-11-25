@@ -12,10 +12,12 @@ local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Page = Lua.import('Module:Page')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Tournament = Lua.import('Module:Tournament')
 local Variables = Lua.import('Module:Variables')
 
 local Condition = Lua.import('Module:Condition')
@@ -54,7 +56,8 @@ function TeamParticipantsRepository.save(participant)
 	local lpdbDatas = TeamParticipantsRepository.getPrizepoolRecordsForTeam(participant.opponent) or {}
 
 	local function generateObjectName()
-		local team = Opponent.toName(participant.opponent)
+		local team = TeamTemplate.getPageNameNoRedirect(participant.opponent.template)
+		assert(team, "Failed to fetch template pagename")
 		local isTbd = Opponent.isTbd(participant.opponent)
 
 		if not isTbd then
@@ -74,21 +77,22 @@ function TeamParticipantsRepository.save(participant)
 	-- Use the tournament defaults if no data is provided from prizepool
 	-- TODO: Refactor in the future to have a util function deal with this, including prizepool, broadcasters, etc.
 	if not lpdbDatas[1] then
+		local tournamentContext = Tournament.partialTournamentFromContext()
 		---@diagnostic disable-next-line: missing-fields
 		lpdbDatas[1] = {
 			objectName = generateObjectName(),
-			tournament = Variables.varDefault('tournament_name') or '',
-			parent = Variables.varDefault('tournament_parent') or '',
-			series = Variables.varDefault('tournament_series') or '',
-			shortname = Variables.varDefault('tournament_tickername') or '',
-			mode = Variables.varDefault('tournament_mode') or '',
-			type = Variables.varDefault('tournament_type') or '',
-			liquipediatier = Variables.varDefault('tournament_liquipediatier') or '',
-			liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype') or '',
-			publishertier = Variables.varDefault('tournament_publishertier') or '',
-			icon = Variables.varDefault('tournament_icon') or '',
-			icondark = Variables.varDefault('tournament_icondark') or '',
-			game = Variables.varDefault('tournament_game') or '',
+			tournament = tournamentContext.fullName or '',
+			parent = tournamentContext.pageName or '',
+			series = tournamentContext.series or '',
+			shortname = tournamentContext.tickerName or '',
+			mode = tournamentContext.mode or '',
+			type = tournamentContext.type or '',
+			liquipediatier = tostring(tournamentContext.liquipediaTier or ''),
+			liquipediatiertype = tournamentContext.liquipediaTierType or '',
+			publishertier = tournamentContext.publisherTier or '',
+			icon = tournamentContext.icon or '',
+			icondark = tournamentContext.iconDark or '',
+			game = tournamentContext.game or '',
 			startdate = Variables.varDefault('tournament_startdate') or '',
 			date = Variables.varDefault('tournament_enddate') or '',
 		}
@@ -149,17 +153,13 @@ end
 ---@param participant TeamParticipant
 function TeamParticipantsRepository.setPageVars(participant)
 	Array.forEach(participant.aliases or {}, function(teamTemplate)
-		local teamName = TeamTemplate.getPageName(teamTemplate)
-		if not teamName then
-			return
-		end
 		local teamPrefixes = {
-			teamName:gsub('_', ' '),
-			teamName:gsub(' ', '_'),
+			teamTemplate:gsub('_', ' '),
+			teamTemplate:gsub(' ', '_'),
 		}
 		local playerCount, staffCount = 0, 0
 		Array.forEach(participant.opponent.players or {}, function(player)
-			if not shouldStorePlayer(player) then
+			if not shouldStorePlayer(player) and not player.extradata.autoDnp then
 				return
 			end
 			local playerPrefix
@@ -299,6 +299,72 @@ function TeamParticipantsRepository.getPlayersDates(players, teamAliases)
 	tryBatchQuery(formerPlayers, 'inactive', 'leaveDate')
 
 	return datesByPlayer
+end
+
+---@return match2[]
+TeamParticipantsRepository.getTournamentMatches = FnUtil.memoize(function()
+	local parent = Variables.varDefault('tournament_parent')
+	if Logic.isEmpty(parent) then
+		return {}
+	end
+	local matches = {}
+	Lpdb.executeMassQuery('match2', {
+		conditions = tostring(ConditionTree(BooleanOperator.all):add{
+			ConditionNode(ColumnName('parent'), Comparator.eq, parent),
+			ConditionNode(ColumnName('finished'), Comparator.eq, 1),
+		}),
+		query = 'match2opponents, match2games',
+	}, function(match)
+		table.insert(matches, match)
+	end)
+	return matches
+end)
+
+---@param game match2game
+---@return boolean
+local function isFinishedGame(game)
+	return game.status ~= 'notplayed' and Logic.isNotEmpty(game.winner)
+end
+
+---@param game match2game
+---@param opponentIndex integer
+---@return string[]
+local function getGamePlayerNames(game, opponentIndex)
+	local gameOpponent = (Json.parseIfString(game.opponents) or {})[opponentIndex] or {}
+	-- players can be sparse or string-keyed after the JSON round trip
+	return Array.map(Array.extractValues(gameOpponent.players or {}), function(player)
+		local pageName = Logic.nilIfEmpty(player.player or player.pageName)
+		if pageName and pageName:lower() ~= 'tbd' then
+			return pageName
+		end
+	end)
+end
+
+---@param match match2
+---@param aliases string[]
+---@return string[]
+local function getMatchPlayerNames(match, aliases)
+	local opponentIndex = Array.indexOf(match.match2opponents or {}, function(opponent)
+		return opponent.type == Opponent.team and Table.includes(aliases, opponent.template)
+	end)
+	if opponentIndex == 0 then
+		return {}
+	end
+	return Array.flatMap(Array.filter(match.match2games or {}, isFinishedGame), function(game)
+		return getGamePlayerNames(game, opponentIndex)
+	end)
+end
+
+--- Pagenames of players in the team's finished games; nil if no game has player data.
+---@param aliases string[]
+---@return table<string, boolean>?
+function TeamParticipantsRepository.getPlayedPlayers(aliases)
+	local names = Array.flatMap(TeamParticipantsRepository.getTournamentMatches(), function(match)
+		return getMatchPlayerNames(match, aliases)
+	end)
+	---@type string[]
+	local pageNames = Array.map(Array.unique(names), Page.pageifyLink)
+	return Logic.nilIfEmpty(Table.map(pageNames, function(_, pageName) return pageName, true end))
 end
 
 ---@param opponent standardOpponent

@@ -46,7 +46,7 @@ local BANNED = Lua.import('Module:Banned', {loadData = true})
 
 local SIZE_OPERATOR = '25x25px'
 
----@class RainbowsixInfoboxPlayer: Person
+---@class RainbowsixInfoboxPlayer: InfoboxPerson
 ---@operator call(Frame): RainbowsixInfoboxPlayer
 local CustomPlayer = Class.new(Player)
 

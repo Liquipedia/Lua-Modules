@@ -237,49 +237,6 @@ liquipedia.tournamentstable = {
 liquipedia.core.modules.push( 'tournamentstable' );
 
 /*******************************************************************************
- * Template(s): Participants Tables
- * Author(s): FO-nTTaX
- ******************************************************************************/
-liquipedia.participantstable = {
-	init: function() {
-		if ( document.querySelector( '.participants-table-scroller' ) !== null ) {
-			document.querySelectorAll( '.participants-table-button-left' ).forEach( ( buttonLeft ) => {
-				buttonLeft.classList.add( 'inactive' );
-				buttonLeft.addEventListener( 'click', function() {
-					if ( window.innerWidth < 600 ) {
-						const scroller = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-scroller' );
-						scroller.scrollLeft = scroller.scrollLeft - 0.83 * window.innerWidth;
-					}
-				} );
-			} );
-			document.querySelectorAll( '.participants-table-button-right' ).forEach( ( buttonRight ) => {
-				buttonRight.addEventListener( 'click', function() {
-					if ( window.innerWidth < 600 ) {
-						const scroller = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-scroller' );
-						scroller.scrollLeft = scroller.scrollLeft + 0.83 * window.innerWidth;
-					}
-				} );
-			} );
-			document.querySelectorAll( '.participants-table-scroller' ).forEach( ( scroller ) => {
-				scroller.addEventListener( 'scroll', function() {
-					const buttonLeft = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-button-left' );
-					buttonLeft.classList.remove( 'inactive' );
-					const buttonRight = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-button-right' );
-					buttonRight.classList.remove( 'inactive' );
-					if ( this.scrollLeft === 0 ) {
-						buttonLeft.classList.add( 'inactive' );
-					}
-					if ( this.scrollLeft === this.scrollWidth - this.clientWidth ) {
-						buttonRight.classList.add( 'inactive' );
-					}
-				} );
-			} );
-		}
-	}
-};
-liquipedia.core.modules.push( 'participantstable' );
-
-/*******************************************************************************
  * Template(s): Heroes portal on the Heroes of the Storm wiki
  * Author(s): FO-nTTaX
  ******************************************************************************/
@@ -438,37 +395,25 @@ liquipedia.console = {
 		}
 		return style;
 	},
-	error: function( text, heading ) {
-		if ( heading === null ) {
-			heading = 'Liquipedia Error';
-		}
+	error: function( text, heading = 'Liquipedia Error' ) {
 		const styles = liquipedia.console.getStyles( '#ff0000', '#ffcccc' );
 		const style = liquipedia.console.getParsedStyleString( styles );
 		// eslint-disable-next-line no-console
 		console.error( '%c' + heading + ':%c' + text, style + 'font-weight:bold;font-size:200%;', style + 'padding-top:0;font-size:150%;' );
 	},
-	info: function( text, heading ) {
-		if ( heading === null ) {
-			heading = 'Liquipedia Info';
-		}
+	info: function( text, heading = 'Liquipedia Info' ) {
 		const styles = liquipedia.console.getStyles( '#0000ff', '#ccccff' );
 		const style = liquipedia.console.getParsedStyleString( styles );
 		// eslint-disable-next-line no-console
 		console.info( '%c' + heading + ':%c' + text, style + 'font-weight:bold;font-size:200%;', style + 'padding-top:0;font-size:150%;' );
 	},
-	log: function( text, heading ) {
-		if ( heading === null ) {
-			heading = 'Liquipedia Log';
-		}
+	log: function( text, heading = 'Liquipedia Log' ) {
 		const styles = liquipedia.console.getStyles( '#042b4c', '#ffffff' );
 		const style = liquipedia.console.getParsedStyleString( styles );
 		// eslint-disable-next-line no-console
 		console.log( '%c' + heading + ':%c' + text, style + 'font-weight:bold;font-size:200%;', style + 'padding-top:0;font-size:150%;' );
 	},
-	warn: function( text, heading ) {
-		if ( heading === null ) {
-			heading = 'Liquipedia Warning';
-		}
+	warn: function( text, heading = 'Liquipedia Warning' ) {
 		const styles = liquipedia.console.getStyles( '#666600', '#ffffcc' );
 		const style = liquipedia.console.getParsedStyleString( styles );
 		// eslint-disable-next-line no-console

@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Ordinal = Lua.import('Module:Ordinal')
+local String = Lua.import('Module:StringUtils')
 local Timezone = Lua.import('Module:Timezone')
 local Variables = Lua.import('Module:Variables')
 
@@ -61,7 +62,7 @@ function DateExt.readTimestamp(dateInput)
 
 	-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
 	local tzTemplateOffset = dateInput:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
-	local datePart = (mw.text.split(dateInput, '<', true)[1])
+	local datePart = String.splitText(dateInput, '<', true)[1]
 		:gsub('-', '')
 		:gsub('T', '')
 	local timestampString = mw.getContentLanguage():formatDate('U', datePart .. (tzTemplateOffset or ''))
@@ -98,7 +99,7 @@ end
 ---@param dateOrTimestamp string|integer|osdate|osdateparam
 ---@param timezoneId string?
 ---@param showTime boolean? #default to true
----@param format ('full'|'compact')? #default to 'full'
+---@param format CountdownFormat? #default to 'full'
 ---@return string
 function DateExt.toCountdownArg(dateOrTimestamp, timezoneId, showTime, format)
 	local baseTimestamp = DateExt.readTimestamp(dateOrTimestamp)
@@ -109,7 +110,9 @@ function DateExt.toCountdownArg(dateOrTimestamp, timezoneId, showTime, format)
 		local timezoneString = Timezone.getTimezoneString{timezone = timezoneId or DateExt.defaultTimezone}
 
 		local dateFormat
-		if format == 'compact' then
+		if format == 'minimal' then
+			dateFormat = 'H:i'
+		elseif format == 'compact' then
 			local currentYear = DateExt.formatTimestamp('Y', DateExt.getCurrentTimestamp())
 			local dateYear = DateExt.formatTimestamp('Y', timestamp)
 			if currentYear == dateYear then
@@ -272,6 +275,35 @@ end
 function DateExt.daysToSeconds(days)
 	assert(days >= 0, 'Invalid number of days')
 	return days * SECONDS_PER_DAY
+end
+
+---@class DateRecord
+---@field year integer
+---@field month integer?
+---@field day integer?
+---@field timestamp integer?
+
+--- This function parses fuzzy dates into a structured format.
+---@param dateRecord string? # date in the format of `YYYY-MM-DD`, with `-MM-DD` optional.
+---@return DateRecord?
+function DateExt.parseDateRecord(dateRecord)
+	if not dateRecord then
+		return nil
+	end
+	if dateRecord == DateExt.defaultDate then
+		return nil
+	end
+	local year, month, day = dateRecord:match('^(%d%d%d%d)%-?(%d?%d?)%-?(%d?%d?)')
+	year, month, day = tonumber(year), tonumber(month), tonumber(day)
+
+	if not year then
+		return
+	end
+
+	local dt = {year = year, month = month or 12, day = day or 31, hour = 0}
+	local timestamp = os.time(dt)
+
+	return {year = year, month = month, day = day, timestamp = timestamp}
 end
 
 return DateExt

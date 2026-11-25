@@ -142,6 +142,40 @@ return {
 			},
 		},
 	},
+	modes = {
+		cup = 'Cup',
+		knockout = 'Knockout',
+		reverse = 'Reverse Cup',
+		rounds = 'Rounds',
+		teams = 'Teams',
+		timeattack = 'Time Attack',
+		tmwt = 'TMWT Duos'
+	},
+	styles = {
+		altcar = 'Altcar',
+		alt = 'Altcar',
+		backwards = 'Backwards',
+		bw = 'Backwards',
+		bobsleigh = 'Bobsleigh',
+		bob = 'Bobsleigh',
+		dirt = 'Dirt',
+		endurance = 'Endurance',
+		fastlearn = 'Fastlearn',
+		fullspeed = 'Fullspeed',
+		fs = 'Fullspeed',
+		ice = 'Ice',
+		kacky = 'Kacky',
+		lol = 'LOL',
+		mapping = 'Mapping',
+		mixed = 'Mixed',
+		mix = 'Mixed',
+		nascar = 'Nascar',
+		pathfinding = 'Pathfinding',
+		rpg = 'RPG',
+		tech = 'Tech',
+		trial = 'Trial',
+		zrt = 'ZrT'
+	},
 	config = {
 		squads = {
 			hasPosition = false,
@@ -151,10 +185,17 @@ return {
 		match2 = {
 			status = 1,
 			sortCasters = true,
+			scoreWidth = 32,
 		},
 		infoboxPlayer = {
 			automatedHistory = {
 				storeFromWikiCode = true,
+			},
+		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchscore', 'gamescore'},
+				group = {'matchscore', 'gamescore'},
 			},
 		},
 		defaultMaxPlayersPerPlacement = 20,

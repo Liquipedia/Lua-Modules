@@ -39,7 +39,7 @@ end
 
 --[[
 Stores a value that a function would otherwise return in a place to be later
-retrieved by Template.retrieveReturnValues. Used to return values across
+retrieved by `Template.retrieveReturnValues`. Used to return values across
 template boundaries.
 ]]
 ---@param value wikiVariableValue|table
@@ -54,7 +54,7 @@ function Template.stashReturnValue(value, namespace)
 	return ''
 end
 
----Retrieves all values stashed by Template.stashReturnValue.
+---Retrieves all values stashed by `Template.stashReturnValue`.
 ---@param namespace string
 ---@return table[]
 function Template.retrieveReturnValues(namespace)
@@ -72,16 +72,16 @@ function Template.retrieveReturnValues(namespace)
 end
 
 --[[
-Variant of Template.stashReturnValue suitable for use by #invoke. Stores the
+Variant of `Template.stashReturnValue` suitable for use by #invoke. Stores the
 arguments of a template call in a place to be later retrieved by
-Template.retrieveReturnValues. {{#invoke:Template|stashArgs}} has the same
-interface as {{#invoke:Json|fromArgs}}.
+`Template.retrieveReturnValues`. `{{#invoke:Template|stashArgs}}` has the same
+interface as `{{#invoke:Json|fromArgs}}`.
 
 Usage:
 
-{{#invoke:Template|stashArgs|foo=3|namespace=Magpie}}
+`{{#invoke:Template|stashArgs|foo=3|namespace=Magpie}}`
 
-will make {foo = '3'} available for retrival via Template.retrieveReturnValues('Magpie') .
+will make `{foo = '3'}` available for retrieval via `Template.retrieveReturnValues('Magpie')`.
 
 ]]
 ---@param frame Frame

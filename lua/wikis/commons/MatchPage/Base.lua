@@ -10,13 +10,11 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local Class = Lua.import('Module:Class')
-local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
 local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
-local Links = Lua.import('Module:Links')
 local MatchTable = Lua.import('Module:MatchTable')
 local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
@@ -38,6 +36,7 @@ local AdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection
 local MatchPageMapVeto = Lua.import('Module:Widget/Match/Page/MapVeto')
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
+local CountdownWidget = Lua.import('Module:Widget/Countdown')
 local Div = Html.Div
 local Footer = Lua.import('Module:Widget/Match/Page/Footer')
 local Header = Lua.import('Module:Widget/Match/Page/Header')
@@ -156,8 +155,8 @@ function BaseMatchPage:seoText()
 			ongoingTense = matchPhase == 'ongoing' and 'ongoing ' or '',
 			game = (Game.name{game = self.matchData.game}) --[[@as string]],
 			tournamentName = tournament.displayName,
-			opponent1 = Opponent.toName(self.opponents[1]),
-			opponent2 = Opponent.toName(self.opponents[2]),
+			opponent1 = ((self.opponents[1] or {}).teamTemplateData or {}).name or 'TBD',
+			opponent2 = ((self.opponents[2] or {}).teamTemplateData or {}).name or 'TBD',
 			tense = createTenseString() or ''
 		}
 	)
@@ -173,40 +172,11 @@ end
 ---@return VNode?
 function BaseMatchPage:getCountdownBlock()
 	if DateExt.isDefaultTimestamp(self.matchData.timestamp) then return end
-	return Div{
-		css = {
-			display = 'block',
-			['text-align'] = 'center'
-		},
-		children = Countdown.create{
-			date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
-			finished = self.matchData.finished,
-			rawdatetime = (not self.matchData.dateIsExact) or self.matchData.finished,
-		}
+	return CountdownWidget{
+		date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
+		finished = self.matchData.finished,
+		rawdatetime = (not self.matchData.dateIsExact) or self.matchData.finished,
 	}
-end
-
----@private
----@param site string
----@param link string
----@return {icon: string, iconDark: string?, link: string, text: string}?
-function BaseMatchPage._processLink(site, link)
-	return Table.mergeInto({link = link}, Links.getMatchIconData(site))
-end
-
----Creates an object array for links
----@private
----@return {icon: string, iconDark: string?, link: string, text: string}[]
-function BaseMatchPage:_parseLinks()
-	return Array.flatMap(Table.entries(self.matchData.links), function(linkData)
-		local site, link = unpack(linkData)
-		if type(link) == 'table' then
-			return Array.map(link, function(sublink)
-				return BaseMatchPage._processLink(site, sublink)
-			end)
-		end
-		return {BaseMatchPage._processLink(site, link)}
-	end)
 end
 
 ---@protected
@@ -461,7 +431,7 @@ end
 ---@return VNode
 function BaseMatchPage:footer()
 	local vods = self:getVods()
-	local parsedLinks = self:_parseLinks()
+	local matchLinks = DisplayHelper.makeLinksDisplay(self.matchData.links)
 	local patchLink = self:getPatchLink()
 
 	return Footer{
@@ -471,16 +441,10 @@ function BaseMatchPage:footer()
 				header = 'VODs',
 				children = vods
 			} or nil,
-			Logic.isNotEmpty(parsedLinks) and AdditionalSection{
+			Logic.isNotEmpty(matchLinks) and AdditionalSection{
 				header = 'Links',
 				bodyClasses = { 'vodlink' },
-				children = Array.map(parsedLinks, function (parsedLink)
-					return Html.Span{children = IconImage{
-						imageLight = parsedLink.icon,
-						imageDark = (parsedLink.iconDark or parsedLink.icon),
-						link = parsedLink.link
-					}}
-				end)
+				children = matchLinks,
 			} or nil,
 			patchLink and AdditionalSection{
 				header = 'Patch',

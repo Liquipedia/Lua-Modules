@@ -82,5 +82,11 @@ return {
 				mode = 'merge',
 			},
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchscore', 'gamescore'},
+				group = {'matchscore', 'gamescore'},
+			},
+		},
 	},
 }

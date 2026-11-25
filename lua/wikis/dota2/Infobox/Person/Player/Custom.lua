@@ -35,7 +35,7 @@ local BANNED = Lua.import('Module:Banned', {loadData = true})
 local SIZE_HERO = '44x25px'
 local CONVERSION_PLAYER_ID_TO_STEAM = 61197960265728
 
----@class Dota2InfoboxPlayer: Person
+---@class Dota2InfoboxPlayer: InfoboxPerson
 ---@operator call(Frame): Dota2InfoboxPlayer
 ---@field basePageName string
 local CustomPlayer = Class.new(Player)

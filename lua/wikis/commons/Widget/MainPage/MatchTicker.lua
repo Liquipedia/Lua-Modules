@@ -10,19 +10,35 @@ local Lua = require('Module:Lua')
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/FilterableContainer')
 
 local Component = Lua.import('Module:Widget/Component')
+local FilterButtons = Lua.import('Module:Widget/FilterButtons')
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local defaultProps = {
-	matchesPortal = 'Liquipedia:Matches'
+	matchesPortal = 'Liquipedia:Matches',
+	showMatchesPortal = true,
 }
 
----@param props { matchesPortal: string?, displayGameIcons: boolean? }
+---@class MainPageMatchTickerProps
+---@field matchesPortal string?
+---@field displayGameIcons boolean?
+---@field showMatchesPortal boolean?
+---@field filterGroupPrefix string? if set, renders its own filter buttons with this prefix
+
+---@param props MainPageMatchTickerProps
 ---@return Renderable[]
-local function MatchTicker(props)
-	return {
-		MatchTickerContainer{displayGameIcons = props.displayGameIcons},
-		Html.Div{
+local function MainPageMatchTicker(props)
+	return WidgetUtil.collect(
+		props.filterGroupPrefix and Html.Div{
+			css = {width = '100%', ['margin-bottom'] = '0.5rem'},
+			children = FilterButtons{filterGroupPrefix = props.filterGroupPrefix},
+		} or nil,
+		MatchTickerContainer{
+			displayGameIcons = props.displayGameIcons,
+			filterGroupPrefix = props.filterGroupPrefix,
+		},
+		props.showMatchesPortal and Html.Div{
 			css = {
 				['white-space'] = 'nowrap',
 				display = 'block',
@@ -32,9 +48,12 @@ local function MatchTicker(props)
 				['text-align'] = 'center',
 				padding = '0.5rem 1rem',
 			},
-			children = { Link{ children = 'See more matches', link = props.matchesPortal} }
-		}
-	}
+			children = Html.Div{
+				classes = {'mobile-only'},
+				children = Link{ children = 'See more matches', link = props.matchesPortal}
+			}
+		} or nil
+	)
 end
 
-return Component.component(MatchTicker, defaultProps)
+return Component.component(MainPageMatchTicker, defaultProps)

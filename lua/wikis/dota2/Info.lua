@@ -59,6 +59,13 @@ return {
 		},
 		participants = {
 			defaultPlayerNumber = 5,
+			mergeStaffTabIfOnlyOneStaff = true,
+		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchscore', 'gamescore'},
+				group = {'matchscore', 'gamescore'},
+			},
 		},
 	},
 	defaultRoundPrecision = 0,

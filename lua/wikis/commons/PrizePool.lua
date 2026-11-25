@@ -16,6 +16,7 @@ local Import = Lua.import('Module:PrizePool/Import')
 local BasePrizePool = Lua.import('Module:PrizePool/Base')
 local Placement = Lua.import('Module:PrizePool/Placement')
 
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Html = Lua.import('Module:Widget/Html')
@@ -74,8 +75,8 @@ end
 ---@protected
 ---@param placement PrizePoolPlacement
 ---@return boolean
-function PrizePool:applyCutAfter(placement)
-	return placement.placeStart > self.options.cutafter
+function PrizePool:applyCollapseAfter(placement)
+	return placement.placeStart > self.options.collapseAfter
 end
 
 ---@protected
@@ -86,7 +87,7 @@ function PrizePool:_collapseText()
 	end)
 	local lastVisible = visible[#visible]
 	local firstHidden = Array.find(visible, function(placement)
-		return placement.placeStart > self.options.cutafter
+		return placement.placeStart > self.options.collapseAfter
 	end)
 	if not firstHidden or not lastVisible then
 		return nil
@@ -106,7 +107,9 @@ function PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, lpdbPrefix)
 		objectName = objectName .. '_' .. lpdbPrefix
 	end
 	if lpdbEntry.opponenttype == Opponent.team then
-		return objectName .. '_' .. mw.ustring.lower(lpdbEntry.participant)
+		local team = TeamTemplate.getPageNameNoRedirect(lpdbEntry.opponenttemplate)
+		assert(team, "Failed to fetch template pagename")
+		return objectName .. '_' .. mw.ustring.lower(team)
 	end
 	-- for non team opponents the pagename can be case sensitive
 	-- so objectname needs to be case sensitive to avoid edge cases

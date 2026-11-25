@@ -1,0 +1,158 @@
+--- Triple Comment to Enable our LLS Plugin
+local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
+describe('Standings Storage', function()
+	local StandingsStorage = require('Module:Standings/Storage')
+	local InfoboxLeague = require('Module:Infobox/League/Custom')
+
+	it('storage of table', function()
+		local stubLpdb = stub(mw.ext.LiquipediaDB, "lpdb", {})
+		local stubLpdbTournament = stub(mw.ext.LiquipediaDB, "lpdb_tournament")
+		local stubLpdbStandingsTable = stub(mw.ext.LiquipediaDB, "lpdb_standingstable")
+
+		local tournamentDatas = require('test_assets.tournaments')
+		local tournamentData = tournamentDatas.dummy
+		InfoboxLeague.run(tournamentData)
+
+		StandingsStorage.run{
+			standingsindex = 0,
+			title = '',
+			type = 'swiss',
+			entries = {},
+		}
+
+		assert.stub(stubLpdbStandingsTable).was.called_with('standingsTable_0', {
+			config = '[]',
+			extradata = '[]',
+			matches = '[]',
+			parent = 'FakePage',
+			section = '',
+			standingsindex = 0,
+			title = '',
+			tournament = 'Test Tournament',
+			type = 'swiss',
+		})
+
+		stubLpdb:revert()
+		stubLpdbTournament:revert()
+		stubLpdbStandingsTable:revert()
+	end)
+
+	it('skips lpdb but still returns the records when storeLpdb is false', function()
+		local stubLpdb = stub(mw.ext.LiquipediaDB, "lpdb", {})
+		local stubLpdbStandingsTable = stub(mw.ext.LiquipediaDB, "lpdb_standingstable")
+		local stubLpdbStandingsEntry = stub(mw.ext.LiquipediaDB, "lpdb_standingsentry")
+
+		local standingsTable, entries = StandingsStorage.run({
+			standingsindex = 0,
+			title = '',
+			type = 'swiss',
+			entries = {
+				{opponent = {type = 'literal', name = 'Alpha'}, roundindex = 1, slotindex = 1, placement = 1},
+			},
+		}, {storeLpdb = false})
+
+		assert.stub(stubLpdbStandingsTable).was_not.called()
+		assert.stub(stubLpdbStandingsEntry).was_not.called()
+		---@cast standingsTable -nil
+		---@cast entries -nil
+		assert.are_equal('swiss', standingsTable.type)
+		assert.are_equal(1, #entries)
+
+		stubLpdb:revert()
+		stubLpdbStandingsTable:revert()
+		stubLpdbStandingsEntry:revert()
+	end)
+
+	it('stores a party opponent with an entry per round', function()
+		local stubLpdb = stub(mw.ext.LiquipediaDB, "lpdb", {})
+		local stubLpdbStandingsTable = stub(mw.ext.LiquipediaDB, "lpdb_standingstable")
+		local stubLpdbStandingsEntry = stub(mw.ext.LiquipediaDB, "lpdb_standingsentry")
+		local opponent = {type = 'solo', players = {{pageName = 'Alpha', displayName = 'Alpha'}}}
+
+		local _, entries = StandingsStorage.run({
+			standingsindex = 0,
+			title = '',
+			type = 'swiss',
+			entries = {
+				{opponent = opponent, roundindex = 1, slotindex = 1, placement = 1},
+				{opponent = opponent, roundindex = 2, slotindex = 1, placement = 1},
+			},
+		})
+
+		assert.stub(stubLpdbStandingsEntry).was.called(2)
+		---@cast entries -nil
+		assert.are_equal('Alpha', entries[2].opponentplayers.p1)
+
+		stubLpdb:revert()
+		stubLpdbStandingsTable:revert()
+		stubLpdbStandingsEntry:revert()
+	end)
+
+	describe('table', function()
+		---@param data table
+		---@return table
+		local function storeTable(data)
+			data.standingsindex = 0
+			data.type = 'swiss'
+			return StandingsStorage.table(data)
+		end
+
+		it('stores hasovertime', function()
+			local standingsTable = storeTable{hasovertime = true}
+			assert.is_true(standingsTable.config.hasovertime)
+			assert.is_true(standingsTable.extradata.hasovertime)
+		end)
+	end)
+
+	it('storage full', function()
+		TeamTemplateMock.setUp()
+		local standingsData = require('test_assets.standings')
+		local stubLpdb = stub(mw.ext.LiquipediaDB, "lpdb", {})
+		local stubLpdbTournament = stub(mw.ext.LiquipediaDB, "lpdb_tournament")
+		local stubLpdbStandingsTable = stub(mw.ext.LiquipediaDB, "lpdb_standingstable")
+		local stubLpdbStandingsEntry = stub(mw.ext.LiquipediaDB, "lpdb_standingsentry")
+
+		local tournamentDatas = require('test_assets.tournaments')
+		local tournamentData = tournamentDatas.dummy
+		InfoboxLeague.run(tournamentData)
+
+		StandingsStorage.run(standingsData)
+
+		assert.stub(stubLpdbStandingsTable).was.called_with('standingsTable_0', {
+			config = '{"hasdraws":false,"hasovertime":true}',
+			extradata = '{"enddate":"2022-10-31","finished":false,"hasdraw":false,"hasovertime":true,"roundcount":7}',
+			matches = '[]',
+			parent = 'FakePage',
+			section = '',
+			standingsindex = 0,
+			title = '',
+			tournament = 'Test Tournament',
+			type = 'league',
+		})
+
+		assert.stub(stubLpdbStandingsEntry).was.called(70)
+
+		assert.stub(stubLpdbStandingsEntry).was.called_with('standing_0_7_10', {
+			currentstatus = 'stay',
+			definitestatus = 'stay',
+			extradata = '{"slotindex":10}',
+			opponentname = 'TT9 Esports',
+			opponenttemplate = 'tt9 esports 2022',
+			opponenttype = 'team',
+			parent = 'FakePage',
+			placement = 10,
+			placementchange = 0,
+			roundindex = 7,
+			slotindex = 10,
+			scoreboard = '{"diff":-15,"game":{"d":0,"l":42,"w":27},'..
+				'"match":{"d":0,"l":0,"w":0},"overtime":{"d":0,"l":0,"w":0},"points":0}',
+			standingsindex = 0,
+		})
+
+		stubLpdb:revert()
+		stubLpdbTournament:revert()
+		stubLpdbStandingsTable:revert()
+		stubLpdbStandingsEntry:revert()
+		TeamTemplateMock.tearDown()
+	end)
+end)

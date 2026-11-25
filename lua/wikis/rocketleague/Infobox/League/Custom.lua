@@ -20,14 +20,21 @@ local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local NoWrap = Widgets.NoWrap
 
 ---@class RocketleagueLeagueInfobox: InfoboxLeague
+---@operator call(Frame): RocketleagueLeagueInfobox
 local CustomLeague = Class.new(League)
+
+---@class RocketleagueLeagueInfoboxWidgetInjector: WidgetInjector
+---@operator call(RocketleagueLeagueInfobox): RocketleagueLeagueInfoboxWidgetInjector
+---@field caller RocketleagueLeagueInfobox
 local CustomInjector = Class.new(Injector)
+
 local NotabilityCalculator = {}
 
 local SERIES_RLCS = 'Rocket League Championship Series'
@@ -60,19 +67,15 @@ function CustomInjector:parse(id, widgets)
 		)
 	elseif id == 'customcontent' then
 		if not String.isEmpty(args.map1) then
-			local maps = {self.caller:_makeInternalLink(args.map1)}
-			local index = 2
+			local maps = {}
+			local index = 1
 
 			while not String.isEmpty(args['map' .. index]) do
-				table.insert(maps, '&nbsp;• ' ..
-					tostring(self.caller:_createNoWrappingSpan(
-						self.caller:_makeInternalLink(args['map' .. index])
-					))
-				)
+				table.insert(maps, NoWrap{children = self.caller:_makeInternalLink(args['map' .. index])})
 				index = index + 1
 			end
 			table.insert(widgets, Title{children = 'Maps'})
-			table.insert(widgets, Center{children = maps})
+			table.insert(widgets, Center{children = Array.interleave(maps, '&nbsp;• ')})
 		end
 
 		if not String.isEmpty(args.team_number) then
@@ -196,15 +199,6 @@ function CustomLeague:_concatArgs(args, base)
 	return table.concat(foundArgs, ';')
 end
 
----@param content Html|string|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-	span:css('white-space', 'nowrap')
-		:node(content)
-	return span
-end
-
 ---@param content string
 ---@return string
 function CustomLeague:_makeInternalLink(content)
@@ -291,6 +285,5 @@ function NotabilityCalculator._getPlacements(pagename)
 		query = 'participant, participantflag, mode'
 	})
 end
-
 
 return CustomLeague

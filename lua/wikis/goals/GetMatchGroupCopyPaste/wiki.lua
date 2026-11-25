@@ -31,12 +31,12 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 	local lines = Array.extend({},
 		'{{Match',
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
 		INDENT .. '|date= |finished=',
 		streams and (INDENT .. '|twitch=|vod=') or nil,
-		Array.map(Array.range(1, bestof), function(mapIndex)
+		Array.mapRange(1, bestof, function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. '={{Map|score1=|score2=|finished=}}'
 		end),
 		'}}'

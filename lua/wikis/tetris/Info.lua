@@ -465,5 +465,11 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 180,
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchscore', 'gamescore'},
+				group = {'matchscore', 'gamescore'},
+			},
+		},
 	},
 }

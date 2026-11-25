@@ -30,10 +30,10 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		'{{Match|finished=',
 		INDENT .. '|p1=9 |p2=7 |p3=6 |p4=5 |p5=3 |p6=2 |p7=1 |p8=0',
 		{INDENT .. '|twitch=|youtube='},
-		Array.map(Array.range(1, bestof), function(mapIndex)
+		Array.mapRange(1, bestof, function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. '={{Map|date=|finished=|vod=}}'
 		end),
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getFfaOpponent(mode, bestof)
 		end),
 		'}}'

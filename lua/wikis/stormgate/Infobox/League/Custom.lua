@@ -22,11 +22,12 @@ local League = Lua.import('Module:Infobox/League')
 local PatchAuto = Lua.import('Module:Infobox/Extension/PatchAuto')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
+local NoWrap = Widgets.NoWrap
 
 ---@class StormgateLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -125,7 +126,7 @@ function CustomInjector:parse(id, widgets)
 		if String.isNotEmpty(args.map1) then
 			Array.appendWith(widgets,
 				Title{children = 'Maps'},
-				Center{children = {self.caller:_mapsDisplay(args.maps)}}
+				Center{children = self.caller:_mapsDisplay(args.maps)}
 			)
 		end
 	end
@@ -134,13 +135,11 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param maps {link: string, displayname: string}[]
----@return string
+---@return Renderable[]
 function CustomLeague:_mapsDisplay(maps)
-	return table.concat(
+	return Array.interleave(
 		Array.map(maps, function(mapData)
-			return tostring(self:_createNoWrappingSpan(
-				Page.makeInternalLink({}, mapData.displayname, mapData.link)
-			))
+			return NoWrap{children = Page.makeInternalLink({}, mapData.displayname, mapData.link)}
 		end),
 		'&nbsp;• '
 	)
@@ -182,14 +181,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = Json.stringify(args.maps)
 
 	return lpdbData
-end
-
----@param content string|Html|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	return mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
 end
 
 return CustomLeague

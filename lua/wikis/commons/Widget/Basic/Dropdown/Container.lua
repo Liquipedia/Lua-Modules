@@ -30,13 +30,16 @@ local VARIANT_CONFIG = {
 }
 
 ---@class DropdownContainerWidgetParameters
+---@field alignRight boolean?
 ---@field children Renderable|Renderable[]
 ---@field variant 'form'|'inline'?
 ---@field classes string[]?
 ---@field prefix Renderable|Renderable[]?
 ---@field label Renderable|Renderable[]?
+---@field updateLabel boolean?
 
 local defaultProps = {
+	alignRight = false,
 	variant = 'form',
 }
 
@@ -79,11 +82,13 @@ local function DropdownContainer(props)
 
 	return Div{
 		classes = Array.extend({'dropdown-widget', 'dropdown-widget--' .. props.variant}, props.classes),
+		attributes = props.updateLabel and {['data-update-label'] = 'true'} or nil,
 		children = {
 			toggleButton,
 			Div{
 				classes = {'dropdown-widget__menu'},
 				attributes = {['aria-hidden'] = 'true'},
+				css = props.alignRight and {right = 0} or nil,
 				children = props.children
 			}
 		}

@@ -35,10 +35,10 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		hasSubmatches and INDENT .. '|hasSubmatches=1' or nil,
 		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
 		Logic.readBool(args.hasDate) and {INDENT .. '|date=', INDENT .. '|youtube=|twitch='} or {},
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
-		Array.map(Array.range(1, bestof), function(mapIndex)
+		Array.mapRange(1, bestof, function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. '=' .. WikiCopyPaste._getMap(hasSubmatches)
 		end) or nil,
 		'}}'

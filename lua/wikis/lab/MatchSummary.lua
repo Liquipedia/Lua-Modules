@@ -7,39 +7,33 @@
 
 local Lua = require('Module:Lua')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local CustomMatchSummary = {}
+---@class LabMatchSummaryGameRowComponentProps: MatchSummaryGameRowComponentProps
+local GameRowComponentProps = {
+	createGameOverview = MatchSummaryWidgets.GameRow.mapDisplay,
+}
+
+local LabMatchSummaryGameRow = MatchSummaryWidgets.GameRow.createComponent(GameRowComponentProps)
+
+---@class LabMatchSummary: CustomMatchSummaryInterface
+local CustomMatchSummary = {
+	GameRow = LabMatchSummaryGameRow,
+}
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
----@param date string
----@param game MatchGroupUtilGame
----@param gameIndex integer
----@return Widget?
-function CustomMatchSummary.createGame(date, game, gameIndex)
-	local function makeTeamSection(opponentIndex)
-		return {
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
-			DisplayHelper.MapScore(game.opponents[opponentIndex], game.status)
-		}
-	end
-
-	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-body-game'},
-		children = WidgetUtil.collect(
-			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
-			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
-			MatchSummaryWidgets.GameComment{children = game.comment}
-		)
+---@param props MatchSummaryGameRowProps
+---@param opponentIndex integer
+---@return Renderable[]
+function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
+	return {
+		MatchSummaryWidgets.GameRow.scoreDisplay(props.game, opponentIndex)
 	}
 end
 

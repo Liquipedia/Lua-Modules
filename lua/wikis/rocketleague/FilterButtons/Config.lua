@@ -17,6 +17,7 @@ local REGION_TO_SUPERREGION = {
 	['Europe'] = 'EU',
 	['Turkey'] = 'EU',
 	['North America'] = 'NA',
+	['Central America'] = 'NA',
 	['Oceania'] = 'OCE',
 	['Latin America North'] = 'SAM',
 	['Latin America South'] = 'SAM',
@@ -26,8 +27,11 @@ local REGION_TO_SUPERREGION = {
 	['MENA'] = 'MENA',
 	['Asia'] = 'APAC',
 	['Asia-Pacific'] = 'APAC',
+	['East Asia'] = 'APAC',
+	['Japan'] = 'APAC',
 	['Africa'] = 'SSA',
 	['Other'] = 'Other',
+	['World'] = 'Other',
 }
 
 local REGIONS_IN_SUPERREGION = Table.mapValues(Table.groupBy(REGION_TO_SUPERREGION, function(region, superRegion)

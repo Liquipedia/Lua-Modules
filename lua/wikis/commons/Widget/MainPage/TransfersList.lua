@@ -18,6 +18,7 @@ local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
 local ListWidgets = Lua.import('Module:Widget/List')
+local QueryLink = Lua.import('Module:Widget/QueryLink')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class TransfersListParameters
@@ -37,7 +38,7 @@ local defaultProps = {
 }
 
 ---@param props TransfersListParameters
----@return Renderable[]
+---@return VNode[]
 local function TransfersList(props)
 	return WidgetUtil.collect(
 		TransferList{
@@ -70,13 +71,19 @@ local function TransfersList(props)
 					},
 					children = ListWidgets.Unordered{children = WidgetUtil.collect(
 						Link { children = 'See more transfers', link = props.transferPortal },
-						Logic.readBool(props.transferQuery) and Link {
-							children = 'Transfer query',
-							link = 'Special:RunQuery/Transfer history'
+						Logic.readBool(props.transferQuery) and Html.Span {
+							children = QueryLink{
+								mediawikiForm = 'Transfer history',
+								form = 'Transfer query',
+								display = 'Transfer query',
+							}
 						} or nil,
-						Link {
-							children = 'Input Form',
-							link = (Page.exists('Form:Transfer') and '' or 'lpcommons:') .. 'Special:RunQuery/Transfer'
+						Html.Span {
+							classes = { 'show-when-logged-in' },
+							children = Link {
+								children = 'Input Form',
+								link = (Page.exists('Form:Transfer') and '' or 'lpcommons:') .. 'Special:RunQuery/Transfer'
+							}
 						},
 						Logic.readBool(props.rumours) and Link { children = 'Rumours', link = 'Portal:Rumours' } or nil
 					)}

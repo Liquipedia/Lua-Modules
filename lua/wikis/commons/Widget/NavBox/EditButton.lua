@@ -7,19 +7,14 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
-
+local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local Widget = Lua.import('Module:Widget')
 
----@class NavBoxEditButton: Widget
----@operator call(table): NavBoxEditButton
-local NavBoxEditButton = Class.new(Widget)
-
----@return Widget?
-function NavBoxEditButton:render()
-	if not self.props.templateLink then return end
+---@param props {templateLink: string?}
+---@return VNode?
+local function NavBoxEditButton(props)
+	if not props.templateLink then return end
 
 	return Html.Span{
 		classes = {'navigation-not-searchable'},
@@ -27,7 +22,7 @@ function NavBoxEditButton:render()
 		children = {
 			mw.text.nowiki('['),
 			Link{
-				link = 'Special:EditPage/Template:' .. self.props.templateLink,
+				link = 'Special:EditPage/Template:' .. props.templateLink,
 				children = {'e'},
 			},
 			mw.text.nowiki(']'),
@@ -35,4 +30,4 @@ function NavBoxEditButton:render()
 	}
 end
 
-return NavBoxEditButton
+return Component.component(NavBoxEditButton)

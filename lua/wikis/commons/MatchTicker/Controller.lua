@@ -86,7 +86,7 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@field tierTypes string[]?
 ---@field regions string[]?
 ---@field games string[]?
----@field variant 'vertical' | 'horizontal'
+---@field variant 'vertical' | 'horizontal' | 'carousel'
 ---@field featuredOnly boolean?
 ---@field displayGameIcons boolean?
 ---@field header Renderable?
@@ -134,7 +134,7 @@ function MatchTickerController.parseConfig(args)
 		recent = Logic.readBool(args.recent),
 		upcoming = Logic.readBool(args.upcoming),
 		ongoing = Logic.readBool(args.ongoing),
-		onlyExact = Logic.readBool(Logic.emptyOr(args.onlyExact, true)),
+		onlyExact = Logic.nilOr(Logic.readBoolOrNil(args.onlyExact), true),
 		enteredOpponentOnLeft = hasOpponent and Logic.readBool(args.enteredOpponentOnLeft or hasOpponent),
 		showInfoForEmptyResults = Logic.readBool(args.showInfoForEmptyResults),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
@@ -153,7 +153,9 @@ function MatchTickerController.parseConfig(args)
 				end) or nil,
 		featuredOnly = Logic.readBool(args.featuredOnly),
 		displayGameIcons = Logic.readBool(args.displayGameIcons),
-		variant = Logic.readBool(args.entityStyle) and 'horizontal' or 'vertical',
+		variant = args.variant == 'carousel' and 'carousel'
+			or Logic.readBool(args.entityStyle) and 'horizontal'
+			or 'vertical',
 		header = args.header,
 	}
 
@@ -441,6 +443,8 @@ function MatchTickerController.expandGamesOfMatch(match, config)
 
 		gameMatch.winner = game.winner
 		gameMatch.date = game.date
+		gameMatch.timestamp = game.timestamp
+		gameMatch.timezoneId = game.timezoneId
 		gameMatch.vod = Logic.nilIfEmpty(game.vod) or match.vod
 		gameMatch.opponents = Array.map(match.opponents, function(opponent, opponentIndex)
 			return MatchUtil.enrichGameOpponentFromMatchOpponent(opponent, game.opponents[opponentIndex])

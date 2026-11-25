@@ -39,5 +39,11 @@ return {
 			excludeTierTypes = {'Qualifier'},
 			showPatches = true,
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchscore', 'gamescore'},
+				group = {'matchscore', 'gamescore'},
+			},
+		},
 	},
 }

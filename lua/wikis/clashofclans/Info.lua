@@ -39,5 +39,11 @@ return {
 		transfers = {
 			showTeamName = true,
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchscore', 'gamescore'},
+				group = {'matchscore', 'gamescore'},
+			},
+		},
 	},
 }

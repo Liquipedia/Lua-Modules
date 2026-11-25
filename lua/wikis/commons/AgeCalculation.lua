@@ -127,6 +127,7 @@ function Date:getEarliestPossible()
 		year = self.year or DEFAULT_DATE.year,
 		month = self.month or DEFAULT_DATE.month,
 		day = self.day or DEFAULT_DATE.day,
+		hour = 0,
 	})
 end
 
@@ -136,6 +137,7 @@ function Date:getLatestPossible()
 		year = self.year or CURRENT_YEAR,
 		month = self.month or MONTH_DECEMBER,
 		day = self.day or DEFAULT_DAYS_IN_MONTH[self.month or MONTH_DECEMBER],
+		hour = 0,
 	})
 end
 

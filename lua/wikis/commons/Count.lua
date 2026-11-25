@@ -132,7 +132,8 @@ function Count.tournamentsByTier(args)
 	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions = lpdbConditions:toString(),
 		query = 'liquipediatier, liquipediatiertype, count::objectname',
-		groupby = 'liquipediatier asc, liquipediatiertype asc'
+		groupby = 'liquipediatier asc, liquipediatiertype asc',
+		limit = 100
 	})
 
 	return Table.mapValues(

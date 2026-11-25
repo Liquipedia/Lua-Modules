@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Placement = Lua.import('Module:Placement')
 local RoleUtil = Lua.import('Module:Role/Util')
@@ -24,7 +25,8 @@ local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
 ---qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer,
----potentialQualifiers: standardOpponent[]?, warnings: string[]?, broken: boolean?, errorMessage: string?}
+---potentialQualifiers: standardOpponent[]?, warnings: string[]?, broken: boolean?, errorMessage: string?,
+---autoPlayed: boolean?}
 
 ---@alias QualificationMethod 'invite'|'qual'
 ---@alias QualificationType 'tournament'|'internal'|'external'|'other'
@@ -32,19 +34,29 @@ local TeamParticipantsWikiParser = {}
 ---@alias QualificationStructure {method: QualificationMethod, type: QualificationType,
 ---page?: string, tournament?: StandardTournament, url?: string, text?: string, placement?: string}
 
+---@alias TeamParticipantsTableOptions {date: osdateparam, autoPlayed: boolean}
+
+---@alias TeamParticipantsParsedData {participants: TeamParticipant[], expectedPlayerCount: integer?,
+---enrichPlayerDates: boolean, sortAlphabetically: boolean}
+
 ---@param args table
----@return {participants: TeamParticipant[], expectedPlayerCount: integer?}
+---@return TeamParticipantsParsedData
 function TeamParticipantsWikiParser.parseWikiInput(args)
-	local date = DateExt.parseIsoDate(args.date) or DateExt.parseIsoDate(DateExt.getContextualDateOrNow())
-	local minimumPlayers = tonumber(args.minimumplayers)
+	---@type TeamParticipantsTableOptions
+	local tableOptions = {
+		date = DateExt.parseIsoDate(args.date) or DateExt.parseIsoDate(DateExt.getContextualDateOrNow()),
+		autoPlayed = Logic.readBool(args.autoplayed),
+	}
 
 	local participants = Array.map(args, function (input)
-		return TeamParticipantsWikiParser.parseParticipant(input, date)
+		return TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
 	end)
 
 	return {
 		participants = participants,
-		expectedPlayerCount = minimumPlayers,
+		expectedPlayerCount = tonumber(args.minimumplayers),
+		enrichPlayerDates = Logic.nilOr(Logic.readBoolOrNil(args.enrichPlayerDates), true),
+		sortAlphabetically = args.sort == 'alphabetical',
 	}
 end
 
@@ -127,12 +139,16 @@ end
 
 --- Parse a single participant from input
 ---@param input table
----@param defaultDate osdateparam
+---@param tableOptions TeamParticipantsTableOptions
 ---@return TeamParticipant
-function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
+function TeamParticipantsWikiParser.parseParticipant(input, tableOptions)
+	local defaultDate = tableOptions.date
 	local potentialQualifiers = {}
 	local opponent
 	local warnings = {}
+
+	-- For usage in page variables
+	local unresolvedTeamTemplate
 
 	local date = DateExt.parseIsoDate(input.date)
 
@@ -171,6 +187,9 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 			}
 		end
 
+		local templateData = TeamTemplate.getRawOrNil(opponent.template) or {}
+		unresolvedTeamTemplate = templateData.historicaltemplate or templateData.templatename
+
 		opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
 		local resolvedOptions = {
 			syncPlayer = true,
@@ -182,10 +201,10 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 			)
 		}
 
-		local opponentName = Opponent.toName(opponent)
-		local prizePoolDate = Variables.varDefault('enddate_' .. opponentName) -- set in multiple PrizePool/Custom
-			or Variables.varDefault('enddate_' .. opponentName .. '_date') -- set in valorant/PrizePool/Custom
-			or Variables.varDefault('ranking_' .. mw.ustring.lower(opponentName) .. '_placementdate') -- set in PrizePool/Base
+		local teamTemplatePage = TeamTemplate.getPageNameNoRedirect(opponent.template)
+		local prizePoolDate = Variables.varDefault(
+			'ranking_' .. mw.ustring.lower(teamTemplatePage or '') .. '_placementdate'
+		) -- set in PrizePool/Base
 		date = date or DateExt.parseIsoDate(prizePoolDate) or defaultDate
 
 		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), resolvedOptions)
@@ -195,14 +214,15 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 	Array.extendWith(warnings, qualificationWarnings)
 
 	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
-	table.insert(aliases, Opponent.toName(opponent))
+	table.insert(aliases, opponent.template)
+	if unresolvedTeamTemplate then
+		table.insert(aliases, unresolvedTeamTemplate)
+	end
 
 	return {
 		opponent = opponent,
 		qualification = qualification,
-		aliases = Array.flatMap(aliases, function(alias)
-			return TeamTemplate.queryHistoricalNames(alias)
-		end),
+		aliases = Array.unique(Array.flatMap(aliases, TeamTemplate.queryHistoricalNames)),
 		notes = Array.map(input.notes or {}, function(note)
 			local text = note[1]
 			if not text then
@@ -216,6 +236,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		potentialQualifiers = potentialQualifiers,
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
+		autoPlayed = Logic.nilOr(Logic.readBoolOrNil(input.autoplayed), tableOptions.autoPlayed),
 		date = date or defaultDate,
 	}
 end
@@ -226,13 +247,12 @@ function TeamParticipantsWikiParser.parsePlayers(input)
 	return Array.map(input.players or {}, TeamParticipantsWikiParser.parsePlayer)
 end
 
+--- `played`/`results` stay nil unless set.
 ---@param playerInput table
 ---@return standardPlayer
 function TeamParticipantsWikiParser.parsePlayer(playerInput)
 	local player = Opponent.readSinglePlayerArgs(playerInput)
 
-	local playedInput = Logic.readBoolOrNil(playerInput.played)
-	local resultsInput = Logic.readBoolOrNil(playerInput.results)
 	local roles = RoleUtil.readRoleArgs(playerInput.role)
 	local inputType = playerInput.type or 'player'
 	local hasStaffRoles = Array.any(roles, function(role) return role.type == RoleUtil.ROLE_TYPE.STAFF end)
@@ -244,49 +264,20 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 		playerType = 'player'
 	end
 
+	player.roles = Array.map(roles, Operator.property('key'))
+
 	player.extradata = {
 		roles = roles,
 		trophies = tonumber(playerInput.trophies),
 		type = playerType,
 		status = playerInput.status,
-		played = Logic.nilOr(playedInput, true),
-		results = Logic.nilOr(resultsInput, playedInput, true),
+		played = Logic.readBoolOrNil(playerInput.played),
+		results = Logic.readBoolOrNil(playerInput.results),
 		number = tonumber(playerInput.number),
 		joinDate = Logic.nilIfEmpty(playerInput.joindate),
 		leaveDate = Logic.nilIfEmpty(playerInput.leavedate),
 	}
 	return player
-end
-
----@param opponent standardOpponent
----@param minimumPlayers number?
-function TeamParticipantsWikiParser.fillIncompleteRoster(opponent, minimumPlayers)
-	local expectedPlayerCount = minimumPlayers or
-		(Info.config.participants or {}).defaultPlayerNumber
-
-	if not expectedPlayerCount or not opponent.players then
-		return
-	end
-
-	local activePlayers = Array.filter(opponent.players, function(player)
-		return player.extradata.type == 'player' and not player.extradata.status
-	end)
-
-	local activePlayerCount = #activePlayers
-	if activePlayerCount >= expectedPlayerCount then
-		return
-	end
-
-	local tbdPlayers = TeamParticipantsWikiParser.createTBDPlayers(expectedPlayerCount - activePlayerCount)
-	Array.extendWith(opponent.players, tbdPlayers)
-end
-
----@param count number
----@return standardPlayer[]
-function TeamParticipantsWikiParser.createTBDPlayers(count)
-	return Array.mapRange(1, count, function()
-		return TeamParticipantsWikiParser.parsePlayer{'TBD'}
-	end)
 end
 
 return TeamParticipantsWikiParser

@@ -35,7 +35,7 @@ local function Infobox(props)
 		classes = {'fo-nttax-infobox-topcontent'},
 		children = props.topContent
 	}
-	local adbox = Div{classes = {'fo-nttax-infobox-adbox'}, children = {mw.getCurrentFrame():preprocess('<adbox />')}}
+	local adbox = Div{classes = {'fo-nttax-infobox-adbox'}, children = {mw.getCurrentFrame():extensionTag('adbox')}}
 	local content = Div{classes = {'fo-nttax-infobox'}, children = props.children}
 	local bottomContent = Div{children = props.bottomContent}
 

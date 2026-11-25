@@ -7,15 +7,15 @@
 
 local Lua = require('Module:Lua')
 
-local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 
 local Component = Lua.import('Module:Widget/Component')
+local CountdownWidget = Lua.import('Module:Widget/Countdown')
 local Html = Lua.import('Module:Widget/Html')
 
 ---@class MatchCountdownProps
 ---@field match MatchGroupUtilMatch
----@field format ('full'|'compact')?
+---@field format CountdownFormat?
 
 ---@param props MatchCountdownProps
 ---@return VNode?
@@ -33,9 +33,10 @@ local function MatchCountdown(props)
 
 	return Html.Span{
 		classes = {'match-info-countdown'},
-		children = Countdown.create{
+		children = CountdownWidget{
 			rawdatetime = (not match.dateIsExact) or match.finished,
 			date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact, format),
+			timestamp = match.dateIsExact and match.timestamp or nil,
 			finished = match.finished,
 			format = format,
 		},

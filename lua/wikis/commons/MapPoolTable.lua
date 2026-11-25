@@ -178,7 +178,7 @@ function MapPoolTable:_backFillMap(map)
 	end
 
 	---@param pageName any
-	---@return unknown
+	---@return StandardMapWithIcon
 	local getMapDataFromLookup = function(pageName)
 		local key = pageName
 			:gsub('_', ' ')

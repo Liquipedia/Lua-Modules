@@ -7,16 +7,14 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local TeamHistoryAuto = Lua.import('Module:Infobox/Extension/TeamHistory/Auto')
 
+local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
-local Widget = Lua.import('Module:Widget')
 local Widgets = Lua.import('Module:Widget/All')
 
-local Big = Html.Big
 local Br = Html.Br
 local Div = Html.Div
 local Small = Html.Small
@@ -30,14 +28,16 @@ local DEFAULT_MODE = 'manual'
 ---|'merge' # display both manual input and THA
 ---|'cleanup' # display THA and for logged in users manual input if present too
 
----@class TeamHistoryWidget: Widget
----@operator call(table): TeamHistoryWidget
----@field props {player: string, manualInput: string?}
-local TeamHistory = Class.new(Widget)
+---@class TeamHistoryWidgetProps
+---@field player string
+---@field manualInput Renderable?
 
----@return Widget[]
-function TeamHistory:render()
-	local teamHistory = self:_getHistory()
+local Helpers = {}
+
+---@param props TeamHistoryWidgetProps
+---@return Renderable[]
+local function TeamHistory(props)
+	local teamHistory = Helpers._getHistory(props)
 
 	if Logic.isEmpty(teamHistory) then
 		return {}
@@ -49,10 +49,12 @@ function TeamHistory:render()
 	}
 end
 
----@return Widget|string?
-function TeamHistory:_getHistory()
+---@private
+---@param props TeamHistoryWidgetProps
+---@return Renderable?
+function Helpers._getHistory(props)
 	local config = (Info.config.infoboxPlayer or {}).automatedHistory or {}
-	local manualInput = self.props.manualInput
+	local manualInput = props.manualInput
 
 	---@type automatedHistoryMode
 	local mode = config.mode or DEFAULT_MODE
@@ -60,7 +62,7 @@ function TeamHistory:_getHistory()
 		return manualInput
 	end
 
-	local automatedHistory = TeamHistoryAuto.run{player = self.props.player, store = true}
+	local automatedHistory = TeamHistoryAuto.run{player = props.player, store = true}
 
 	if Logic.isEmpty(manualInput) or (mode ~= 'cleanup' and mode ~= 'merge') then
 		return automatedHistory
@@ -79,8 +81,9 @@ function TeamHistory:_getHistory()
 
 	return Div{children = {
 		Div{children = {
-			Big{
+			Div{
 				classes = {'show-when-logged-in', 'navigation-not-searchable'},
+				css = {['font-size'] = 'larger'},
 				children = {'Automated History'},
 			},
 			automatedHistory,
@@ -88,7 +91,8 @@ function TeamHistory:_getHistory()
 		Div{
 			classes = {'show-when-logged-in', 'navigation-not-searchable'},
 			children = {
-				Big{
+				Div{
+					css = {['font-size'] = 'larger'},
 					children = {'Manual History'},
 				},
 				Br{},
@@ -101,4 +105,4 @@ function TeamHistory:_getHistory()
 	}}
 end
 
-return TeamHistory
+return Component.component(TeamHistory)

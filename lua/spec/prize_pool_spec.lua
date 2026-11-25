@@ -67,6 +67,19 @@ describe('prize pool', function()
 		[2] = {usdprize = '130,000', playershare = '100,000', [1] = {'t1'}},
 	}
 
+	local specialPrizePoolArgs = {
+		type = {type = 'solo'},
+		import = false,
+		lpdb_storage = false,
+		collapseafter = 7,
+		[1] = {dq = true},
+		[2] = {dnp = true},
+		[3] = {dnf = true},
+		[4] = {w = true},
+		[5] = {d = true},
+		[6] = {l = true},
+	}
+
 	it('parameters are correctly parsed', function()
 		local ppt = PrizePool(prizePoolArgs):create()
 
@@ -95,8 +108,8 @@ describe('prize pool', function()
 						currency = 'SEK',
 					}
 				},
-				{id = 'POINTS1', type = 'POINTS', index = 1, data = {title = 'Points', link = 'A Page'}},
 				{id = 'QUALIFIES1', type = 'QUALIFIES', index = 1, data = {title = 'A Display', link = 'A_Tournament'}},
+				{id = 'POINTS1', type = 'POINTS', index = 1, data = {title = 'Points', link = 'A Page'}},
 				{id = 'FREETEXT1', type = 'FREETEXT', index = 1, data = {title = 'A title'}},
 			},
 			ppt.prizes
@@ -107,7 +120,7 @@ describe('prize pool', function()
 				autoExchange = true,
 				currencyRatePerOpponent = false,
 				currencyRoundPrecision = 3,
-				cutafter = 4,
+				collapseAfter = 4,
 				hideafter = math.huge,
 				exchangeInfo = true,
 				fillPlaceRange = true,
@@ -199,6 +212,7 @@ describe('prize pool', function()
 			GoldenTest('prize_pool', tostring(PrizePool(prizePoolArgs):create():build()))
 			local clubShareNoStore = Table.merge(clubSharePoolArgs, {storelpdb = false})
 			GoldenTest('prize_pool_club_share', tostring(PrizePool(clubShareNoStore):create():build()))
+			GoldenTest('prize_pool_special_placements', tostring(PrizePool(specialPrizePoolArgs):create():build()))
 		end)
 
 		it('lpdb storage', function()
@@ -282,6 +296,37 @@ describe('prize pool', function()
 		singleArgs.localcurrency2 = nil
 		local output = tostring(PrizePool(singleArgs):create():build())
 		assert.is_nil(output:find('switch-pill', 1, true))
+	end)
+
+	describe('collapseafter', function()
+		local cutArgs = {
+			type = {type = 'solo'},
+			import = false,
+			storelpdb = false,
+			[1] = {usdprize = '100', [1] = {'Rathoz'}},
+			[2] = {usdprize = '50', [1] = {'Salt'}},
+			[3] = {usdprize = '10', [1] = {'Serral'}, [2] = {'Reynor'}},
+		}
+
+		it('collapses the rows of the placements after it', function()
+			local output = tostring(PrizePool(Table.merge(cutArgs, {collapseafter = 2})):create():build())
+			assert.is_truthy(output:find('general-collapsible collapsed', 1, true))
+			assert.are_equal(2, select(2, output:gsub('table2__row%-%-hide%-on%-collapse', '')))
+			assert.is_truthy(output:find('place 3 to 4', 1, true))
+		end)
+
+		it('does not collapse when no placement is after it', function()
+			local output = tostring(PrizePool(Table.merge(cutArgs, {collapseafter = 3})):create():build())
+			assert.is_nil(output:find('general-collapsible', 1, true))
+			assert.is_nil(output:find('hide-on-collapse', 1, true))
+		end)
+
+		it('still accepts cutafter, with collapseafter taking precedence', function()
+			local legacy = tostring(PrizePool(Table.merge(cutArgs, {cutafter = 2})):create():build())
+			assert.are_equal(2, select(2, legacy:gsub('table2__row%-%-hide%-on%-collapse', '')))
+			local both = tostring(PrizePool(Table.merge(cutArgs, {cutafter = 2, collapseafter = 3})):create():build())
+			assert.is_nil(both:find('hide-on-collapse', 1, true))
+		end)
 	end)
 
 	it('stores the USD player share in placement extradata', function()

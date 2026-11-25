@@ -18,7 +18,7 @@ local Logic = Lua.import('Module:Logic')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -132,15 +132,6 @@ function CustomLeague:getWikiCategories(args)
 	end
 
 	return categories
-end
-
----@param content Html|string|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
-	return span
 end
 
 return CustomLeague

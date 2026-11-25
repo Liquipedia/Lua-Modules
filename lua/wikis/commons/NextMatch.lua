@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
@@ -24,6 +23,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local CountdownWidget = Lua.import('Module:Widget/Countdown')
 local Html = Lua.import('Module:Widget/Html')
 
 local NextMatch = {}
@@ -93,11 +93,11 @@ function NextMatch.run(args)
 	if Logic.readBool(args.matchWrapper) then
 		return Html.Span{
 			classes = {'match-countdown'},
-			children = Countdown.create(countdownArgs)
+			children = CountdownWidget(countdownArgs)
 		}
 	end
 
-	return Countdown.create(countdownArgs)
+	return CountdownWidget(countdownArgs)
 end
 
 return Class.export(NextMatch, {exports = {'run'}})

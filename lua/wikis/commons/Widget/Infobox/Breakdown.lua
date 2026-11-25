@@ -20,7 +20,7 @@ local Html = Lua.import('Module:Widget/Html')
 ---@field children Renderable[]?
 
 ---@param props BreakdownProps
----@return Widget?
+---@return VNode?
 local function Breakdown(props)
 	if Logic.isEmpty(props.children) then
 		return nil
@@ -31,13 +31,15 @@ local function Breakdown(props)
 		return Html.Div{
 			children = {child},
 			classes = WidgetUtil.collect(
-				'infobox-cell-' .. number,
 				props.classes,
 				props.contentClasses['content' .. childIndex]
 			),
 		}
 	end)
 	return Html.Div{
+		css = {
+			['grid-template-columns'] = 'repeat(' .. number .. ', 1fr)'
+		},
 		children = mappedChildren,
 	}
 end

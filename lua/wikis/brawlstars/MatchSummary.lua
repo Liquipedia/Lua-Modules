@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local Logic = Lua.import('Module:Logic')
 local MapTypeIcon = Lua.import('Module:MapType')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
@@ -19,22 +20,34 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local MAX_NUM_BANS = 3
+
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', teamStyle = 'bracket'})
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return Renderable[]
 function CustomMatchSummary.createBody(match)
-	local characterBansData = Array.map(match.games, function (game)
-		local extradata = game.extradata or {}
-		local bans = extradata.bans or {}
-		return {bans.team1 or {}, bans.team2 or {}}
+	local globalBans = (match.extradata or {}).globalbans
+
+	local gameBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
+
+	-- To make the Global Bans doesn't get count as Game 1
+	Array.forEach(gameBansData, function(banData, gameIndex)
+		if Logic.isNotDeepEmpty(banData) then
+			banData.label = 'Game&nbsp;' .. gameIndex
+		end
 	end)
+
+	local characterBansData = Array.extend(
+		Logic.isNotDeepEmpty(globalBans) and {globalBans.team1 or {}, globalBans.team2 or {}, label = 'Global Bans'} or nil,
+		gameBansData
+	)
 
 	return WidgetUtil.collect(
 		Array.map(match.games, CustomMatchSummary._createMapRow),
@@ -45,7 +58,7 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
----@return Widget?
+---@return Renderable?
 function CustomMatchSummary._createMapRow(game)
 	if not game.map then
 		return
@@ -77,7 +90,7 @@ function CustomMatchSummary._createMapRow(game)
 end
 
 ---@param game MatchGroupUtilGame
----@return Widget
+---@return Renderable
 function CustomMatchSummary._getMapDisplay(game)
 	local mapDisplay = LinkWidget{link = game.map}
 

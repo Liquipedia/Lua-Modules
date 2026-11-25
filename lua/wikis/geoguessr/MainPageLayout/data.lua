@@ -58,9 +58,8 @@ local CONTENT = {
 		}
 	},
 	matches = {
-		heading = 'Matches',
+		noPanel = true,
 		body = MatchTicker{},
-		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {
@@ -133,63 +132,51 @@ return {
 	},
 	layouts = {
 		main = {
+			{ -- Top
+				size = 12,
+				children = {
+					{
+						mobileOrder = 2,
+						noPanel = true,
+						content = CONTENT.filterButtons,
+					},
+					{
+						mobileOrder = 3,
+						noPanel = true,
+						content = CONTENT.matches,
+					},
+				},
+			},
 			{ -- Left
-				sizes = {xxl = 5, xxxl = 6},
+				sizes = {xxl = 6, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
 						content = CONTENT.specialEvents,
 					},
 					{
-						mobileOrder = 3,
+						mobileOrder = 5,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 8,
 						content = CONTENT.wantToHelp,
 					},
 				}
 			},
 			{ -- Right
-				sizes = {xxl = 7, xxxl = 6},
+				sizes = {xxl = 6, xxxl = 6},
 				children = {
 					{
-						mobileOrder = 2,
-						children = {
-							{
-								children = {
-									{
-										noPanel = true,
-										content = CONTENT.filterButtons,
-									},
-								},
-							},
-							{
-								size = 6,
-								children = {
-									{
-										noPanel = true,
-										content = CONTENT.matches,
-									},
-								},
-							},
-							{
-								size = 6,
-								children = {
-									{
-										noPanel = true,
-										content = CONTENT.tournaments,
-									},
-								},
-							},
-						},
+						mobileOrder = 4,
+						content = CONTENT.tournaments,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 6,
 						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 5,
+						mobileOrder = 7,
 						content = CONTENT.usefulArticles,
 					},
 				},

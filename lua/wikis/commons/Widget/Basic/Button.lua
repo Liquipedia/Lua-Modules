@@ -16,12 +16,14 @@ local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Div = Html.Div
 
+---@alias ButtonSize 'xs'|'sm'|'md'|'lg'
+
 ---@class ButtonWidgetProps: HtmlNodeProps
 ---@field title string?
 ---@field link string?
 ---@field linktype 'internal'|'external'|nil
 ---@field variant 'primary'|'secondary'|'themed'|'ghost'|'destructive'|'icon'|nil
----@field size 'xs'|'sm'|'md'|'lg'|nil
+---@field size ButtonSize?
 ---@field grow boolean?
 ---@field aligncontent 'left'|'right'|nil
 
@@ -58,7 +60,7 @@ local function Button(props)
 		table.insert(cssClasses, 'button--large')
 	end
 
-	local cssTable = {}
+	local cssTable = props.css or {}
 	if props.grow then
 		cssTable.width = '100%'
 	end
@@ -87,7 +89,7 @@ local function Button(props)
 	-- Have to wrap it in an extra div to prevent the mediawiki parser from messing it up
 	return Div{
 		css = props.grow and {flex = '1'} or nil,
-		classes = props.classes or {},
+		classes = props.classes,
 		children = {
 			Link{
 				link = props.link,

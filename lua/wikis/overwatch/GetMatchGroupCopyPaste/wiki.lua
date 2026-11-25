@@ -40,10 +40,10 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		INDENT .. '|date=',
 		streams and (INDENT .. '|twitch=|youtube=|vod=') or nil,
 		casters and (INDENT .. '|caster1=|caster2=') or nil,
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
 		end),
-		bestof ~= 0 and Array.map(Array.range(1, bestof), FnUtil.curry(WikiCopyPaste._getMapCode, hasBans)) or nil,
+		bestof ~= 0 and Array.mapRange(1, bestof, FnUtil.curry(WikiCopyPaste._getMapCode, hasBans)) or nil,
 		Logic.readBool(args.faceit) and (INDENT .. '|faceit=') or nil,
 		Logic.readBool(args.mvp) and (INDENT .. '|mvp=') or nil,
 		INDENT .. '}}'
@@ -56,10 +56,10 @@ end
 ---@param hasBans boolean
 ---@return string
 function WikiCopyPaste._getMapCode(hasBans, mapIndex)
-	if not hasBans then return INDENT .. '|map' .. mapIndex .. '={{Map|map=|mode=|score1=|score2=|winner=}}' end
+	if not hasBans then return INDENT .. '|map' .. mapIndex .. '={{Map|map=|score1=|score2=|winner=}}' end
 
 	return table.concat({
-		INDENT .. '|map' .. mapIndex .. '={{Map|map=|mode=|score1=|score2=|winner=',
+		INDENT .. '|map' .. mapIndex .. '={{Map|map=|score1=|score2=|winner=',
 		INDENT .. INDENT .. '|t1b1=|t2b1=|banstart=}}',
 	}, '\n')
 end

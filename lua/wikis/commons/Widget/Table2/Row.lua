@@ -19,12 +19,8 @@ local Table2CellHeader = Lua.import('Module:Widget/Table2/CellHeader')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Html = Lua.import('Module:Widget/Html')
 
----@class Table2RowProps
----@field children? Renderable|Renderable[]
+---@class Table2RowProps: HtmlNodeProps
 ---@field section 'head'|'body'|'subhead'?
----@field classes string[]?
----@field css {[string]: string|number|nil}?
----@field attributes {[string]: any}?
 ---@field highlighted (string|number|boolean)?
 
 ---@param rowChildren Renderable[]
@@ -70,6 +66,13 @@ local function Table2Row(props, context)
 	local highlightClass
 	if section == 'body' and Logic.readBool(props.highlighted) then
 		highlightClass = 'table2__row--highlighted'
+	end
+
+	local collapseCounter = section == 'body' and Context.read(context, Table2Contexts.CollapseCounter) or nil
+	local hideOnCollapse = false
+	if collapseCounter then
+		collapseCounter.rows = collapseCounter.rows + 1
+		hideOnCollapse = collapseCounter.rows > collapseCounter.collapseAfter
 	end
 
 	local columns = Context.read(context, Table2Contexts.ColumnContext)
@@ -131,7 +134,13 @@ local function Table2Row(props, context)
 	end
 
 	return Html.Tr{
-		classes = WidgetUtil.collect(sectionClass, kindClass, highlightClass, props.classes),
+		classes = WidgetUtil.collect(
+			sectionClass,
+			kindClass,
+			highlightClass,
+			hideOnCollapse and 'table2__row--hide-on-collapse' or nil,
+			props.classes
+		),
 		css = props.css,
 		attributes = attributes,
 		children = trChildren,

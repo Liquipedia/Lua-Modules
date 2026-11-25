@@ -36,7 +36,6 @@ local TableRow = TableWidgets.Row
 local Div = Html.Div
 local Span = Html.Span
 local Hr = Html.Hr
-local LabeledChevronToggle = Lua.import('Module:Widget/GeneralCollapsible/LabeledChevronToggle')
 local SwitchPill = Lua.import('Module:Widget/ContentSwitch/Pill')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -101,21 +100,21 @@ BasePrizePool.config = {
 			return Logic.readBoolOrNil(args.exchangeinfo)
 		end
 	},
-	cutafter = {
+	collapseAfter = {
 		default = 4,
 		read = function(args)
-			return MathUtil.toInteger(args.cutafter)
+			return MathUtil.toInteger(args.collapseafter or args.cutafter)
 		end
 	},
 	hideafter = {
 		default = math.huge,
 		read = function(args)
 			local hideAfter = MathUtil.toInteger(args.hideafter)
-			local cutAfter = MathUtil.toInteger(args.cutafter) or 4
+			local collapseAfter = MathUtil.toInteger(args.collapseafter or args.cutafter) or 4
 			if not hideAfter then
 				return
 			end
-			return math.max(cutAfter, hideAfter)
+			return math.max(collapseAfter, hideAfter)
 		end
 	},
 	storeLpdb = {
@@ -270,7 +269,7 @@ BasePrizePool.prizeTypes = {
 		end,
 	},
 	[PRIZE_TYPE_QUALIFIES] = {
-		sortOrder = 50,
+		sortOrder = 40,
 		align = 'left',
 
 		header = 'qualifies',
@@ -324,7 +323,7 @@ BasePrizePool.prizeTypes = {
 		mergeDisplayColumns = true,
 	},
 	[PRIZE_TYPE_POINTS] = {
-		sortOrder = 40,
+		sortOrder = 50,
 		align = 'right',
 
 		header = 'points',
@@ -667,7 +666,7 @@ function BasePrizePool:_shouldDisplayPrizeSummary()
 end
 
 ---@param isAward boolean?
----@return Widget
+---@return VNode
 function BasePrizePool:build(isAward)
 	local prizePoolTable = self:_buildTable(isAward)
 
@@ -717,7 +716,7 @@ function BasePrizePool:_getCurrencies()
 	return currencies
 end
 
----@param cell Widget
+---@param cell VNode<Table2CellProps>
 ---@param prize BasePrizePoolPrize
 function BasePrizePool:_tagCurrencyColumn(cell, prize)
 	if not self.currencyToggleIndices then
@@ -733,7 +732,7 @@ function BasePrizePool:_tagCurrencyColumn(cell, prize)
 end
 
 ---@param isAward boolean?
----@return Widget
+---@return VNode
 function BasePrizePool:_buildTable(isAward)
 	local currencies = self:_getCurrencies()
 	self.currencyToggleIndices = nil
@@ -741,26 +740,21 @@ function BasePrizePool:_buildTable(isAward)
 		self.currencyToggleIndices = Table.map(currencies, function(index, code) return code, index end)
 	end
 
-	local bodyRows = self:_buildRows()
-	local hasCutRows = Array.any(self.placements, function(placement)
-		return not self:applyHideAfter(placement) and self:applyCutAfter(placement)
-	end)
-	local toggle = hasCutRows and self:_collapseToggle() or nil
+	local collapseText = self:_collapseText()
+	local collapseAfter = collapseText and self:_rowsBeforeCollapse() or nil
 
 	local prizePoolTable = TableWidgets.Table{
-		classes = WidgetUtil.collect(
-			'prizepool-table-wrapper',
-			toggle and 'general-collapsible' or nil,
-			toggle and 'collapsed' or nil
-		),
+		classes = {'prizepool-table-wrapper'},
 		tableClasses = {
 			'prizepooltable',
 			'prizepooltable-' .. (isAward and 'award' or 'placement'),
 		},
-		footer = toggle,
+		collapseAfter = collapseAfter,
+		expandText = collapseText and collapseText.opentext or nil,
+		collapseText = collapseText and collapseText.closetext or nil,
 		children = {
 			TableWidgets.TableHeader{children = {self:_buildHeader(isAward)}},
-			TableWidgets.TableBody{children = bodyRows},
+			TableWidgets.TableBody{children = self:_buildRows()},
 		},
 	}
 
@@ -793,20 +787,20 @@ function BasePrizePool:_buildTable(isAward)
 	}
 end
 
----@return Renderable?
-function BasePrizePool:_collapseToggle()
-	local collapseText = self:_collapseText()
-	if not collapseText then
-		return nil
+---Number of rows shown above the collapse toggle, nil when no shown placement is cut.
+---@private
+---@return integer?
+function BasePrizePool:_rowsBeforeCollapse()
+	local rows = 0
+	for _, placement in ipairs(self.placements) do
+		if self:applyHideAfter(placement) then
+			return nil
+		elseif self:applyCollapseAfter(placement) then
+			return rows
+		end
+		rows = rows + #placement.opponents
 	end
-	return Div{
-		classes = {'prizepooltable-toggle'},
-		attributes = {['data-collapsible-click-region'] = 'true'},
-		children = LabeledChevronToggle{
-			expandText = collapseText.opentext,
-			collapseText = collapseText.closetext,
-		},
-	}
+	return nil
 end
 
 ---@param isAward boolean?
@@ -870,7 +864,6 @@ function BasePrizePool:_buildRows()
 			end)
 		end
 
-		local isCut = self:applyCutAfter(placement)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			local opponentCell = TableCell{
 				children = {OpponentDisplay.BlockOpponent{
@@ -891,7 +884,7 @@ function BasePrizePool:_buildRows()
 					opponentCell,
 					prizeCells
 				),
-				classes = WidgetUtil.collect(backgroundClass, isCut and 'ppt-hide-on-collapse' or nil),
+				classes = {backgroundClass},
 			})
 		end)
 	end
@@ -926,6 +919,7 @@ function BasePrizePool:_opponentPrizeCells(placement, opponent)
 	end)
 
 	return Array.map(prizeCells, function(cell)
+		---@cast cell -nil
 		if Logic.isNotEmpty(cell.props.children) then
 			return cell
 		end
@@ -955,7 +949,7 @@ end
 ---@protected
 ---@param placement BasePlacement
 ---@return boolean
-function BasePrizePool:applyCutAfter(placement)
+function BasePrizePool:applyCollapseAfter(placement)
 	return false
 end
 
@@ -1045,7 +1039,7 @@ end
 
 --- Creates an empty table cell
 ---@param align ('left'|'right'|'center')?
----@return Renderable
+---@return VNode<Table2CellProps>
 function BasePrizePool._emptyCell(align)
 	return TableCell{children = {DASH}, align = align}
 end
@@ -1078,20 +1072,22 @@ function BasePrizePool:storeData()
 	local prizePoolIndex = (tonumber(Variables.varDefault('prizepool_index')) or 0) + 1
 	Variables.varDefine('prizepool_index', prizePoolIndex)
 
+	local tournamentContext = Tournament.partialTournamentFromContext()
+
 	local lpdbTournamentData = {
-		tournament = Variables.varDefault('tournament_name'),
-		parent = Variables.varDefault('tournament_parent'),
-		series = Variables.varDefault('tournament_series'),
-		shortname = Variables.varDefault('tournament_tickername'),
+		tournament = tournamentContext.fullName,
+		parent = tournamentContext.pageName,
+		series = tournamentContext.series,
+		shortname = tournamentContext.tickerName,
 		startdate = Variables.varDefault('tournament_startdate'),
-		mode = Variables.varDefault('tournament_mode'),
-		type = Variables.varDefault('tournament_type'),
-		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
-		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
-		publishertier = Variables.varDefault('tournament_publishertier'),
-		icon = Variables.varDefault('tournament_icon'),
-		icondark = Variables.varDefault('tournament_icondark'),
-		game = Variables.varDefault('tournament_game'),
+		mode = tournamentContext.mode,
+		type = tournamentContext.type,
+		liquipediatier = tostring(tournamentContext.liquipediaTier),
+		liquipediatiertype = tournamentContext.liquipediaTierType,
+		publishertier = tournamentContext.publisherTier,
+		icon = tournamentContext.icon,
+		icondark = tournamentContext.iconDark,
+		game = tournamentContext.game,
 		prizepoolindex = prizePoolIndex,
 	}
 

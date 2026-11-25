@@ -17,7 +17,6 @@ local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
@@ -56,7 +55,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	if not options.isMatchPage then
 		-- See if this match has a standalone match (match page), if so use the data from there
-		local standaloneMatchId = MatchGroupUtil.getStandaloneId(match.bracketid, match.matchid)
+		local standaloneMatchId = MatchGroupInputUtil.getStandaloneId(match.bracketid, match.matchid)
 		local standaloneMatch = standaloneMatchId and MatchGroupInputUtil.fetchStandaloneMatch(standaloneMatchId) or nil
 		if standaloneMatch then
 			return MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
@@ -79,7 +78,7 @@ function MatchFunctions.adjustOpponent(opponent, opponentIndex)
 	if opponent.type ~= Opponent.team then
 		return
 	end
-	local prefix = opponent.name .. '_p'
+	local prefix = opponent.template .. '_p'
 	Array.forEach(opponent.match2players, function (player, playerIndex)
 		local publisherId = globalVars:get(prefix .. playerIndex .. 'id')
 		if Logic.isNotEmpty(publisherId) then
@@ -143,7 +142,7 @@ end
 
 ---@param match table
 ---@param opponents MGIParsedOpponent[]
----@return string?
+---@return string?, string?
 function MatchFunctions.getHeadToHeadLink(match, opponents)
 	local isTeamGame = Array.all(opponents, function(opponent)
 		return opponent.type == Opponent.team
@@ -156,6 +155,12 @@ function MatchFunctions.getHeadToHeadLink(match, opponents)
 				['Head to head query[player]'] = string.gsub(opponents[1].name, ' ', '_'),
 				['Head to head query[opponent]'] = string.gsub(opponents[2].name, ' ', '_'),
 				wpRunQuery = 'Run query'
+			}
+		)), tostring(mw.uri.fullUrl(
+			'Special:RunQuery/H2H',
+			{
+				['player'] = string.gsub(opponents[1].name, ' ', '_'),
+				['opponent'] = string.gsub(opponents[2].name, ' ', '_'),
 			}
 		))
 	end

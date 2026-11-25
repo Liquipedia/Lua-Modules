@@ -22,7 +22,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 local LegacyPrizePool = {}
 
-local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l', q = 'q'}
+local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l'}
 
 local CACHED_DATA = {
 	next = {points = 1, qual = 1, freetext = 1},
@@ -39,7 +39,7 @@ local IS_SOLO = false
 LegacyPrizePool.BASE_CURRENCY = 'USD'
 
 ---@param dependency table<string, function>?
----@return Widget
+---@return VNode
 function LegacyPrizePool.run(dependency)
 	local args = Template.retrieveReturnValues('LegacyPrizePool')
 	---@type table
@@ -56,7 +56,7 @@ function LegacyPrizePool.run(dependency)
 	newArgs.syncPlayers = false
 
 	newArgs.prizesummary = (header.prizeinfo and not header.noprize) and true or false
-	newArgs.cutafter = header.cutafter
+	newArgs.collapseafter = header.cutafter
 	newArgs.lpdb_prefix = header.lpdb_prefix
 	newArgs.fillPlaceRange = Logic.readBool(header.fillPlaceRange) or false
 

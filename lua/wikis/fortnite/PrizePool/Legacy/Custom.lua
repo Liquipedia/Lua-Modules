@@ -15,7 +15,7 @@ local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
-local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l', q = 'q'}
+local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l'}
 
 local CustomLegacyPrizePool = {}
 
@@ -23,7 +23,7 @@ local _opponent_type
 local TBD = 'TBD'
 
 -- Template entry point
----@return Widget
+---@return VNode
 function CustomLegacyPrizePool.run()
 	return LegacyPrizePool.run(CustomLegacyPrizePool)
 end
@@ -87,7 +87,7 @@ function CustomLegacyPrizePool.overwriteMapOpponents(slot, newData, mergeSlots)
 		return Table.merge(newData, opponentData)
 	end
 
-	local opponents = Array.map(Array.range(1, slot.opponentsInSlot), function(opponentIndex)
+	local opponents = Array.mapRange(1, slot.opponentsInSlot, function(opponentIndex)
 		return mapOpponent(opponentIndex) or {} end)
 
 	return opponents

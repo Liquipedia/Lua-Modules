@@ -20,8 +20,8 @@ return {
 				lightMode = 'Apex Legends default lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Apex Legends default darkmode.png',
-				lightMode = 'Apex Legends default lightmode.png',
+				darkMode = 'Apex Legends darkmode.png',
+				lightMode = 'Apex Legends lightmode.png',
 			},
 		},
 	},
@@ -44,6 +44,12 @@ return {
 		},
 		participants = {
 			defaultPlayerNumber = 3,
+		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchscore', 'gamescore'},
+				group = {'matchscore', 'gamescore'},
+			},
 		},
 	},
 	defaultRoundPrecision = 0,
