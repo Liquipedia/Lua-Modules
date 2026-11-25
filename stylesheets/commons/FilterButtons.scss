@@ -233,7 +233,7 @@ Author(s): Elysienna, Nadox
 		border: 1px solid var( --filter-popover-border-color );
 		border-radius: 0.25rem;
 		background-color: var( --filter-popover-background-color );
-		box-shadow: 0 0 0.75rem 0 rgba( 0, 0, 0, 0.16 );
+		box-shadow: 0 0 0.75rem 0 var( --clr-on-surface-light-primary-16 );
 		color: var( --filter-popover-text-color );
 		// Do not inherit the styling of where the popover is placed in (e.g. a panel heading)
 		font-weight: normal;
@@ -285,52 +285,63 @@ Author(s): Elysienna, Nadox
 		&--multi-column {
 			width: auto;
 		}
-	}
 
-	&__category-header {
-		display: flex;
-		align-items: center;
-		gap: 0.25rem;
-		min-height: 1.5rem;
-	}
-
-	&__category-title {
-		color: var( --filter-popover-title-color );
-		font-size: 0.8125rem;
-		font-weight: bold;
-		line-height: 1.25rem;
-		white-space: nowrap;
-	}
-
-	&__category-count {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 1.25rem;
-		height: 1.25rem;
-		border-radius: 0.25rem;
-		background-color: var( --filter-popover-count-background-color );
-		color: var( --filter-popover-title-color );
-		font-size: 0.6875rem;
-		font-weight: bold;
-		line-height: 1rem;
-
-		&--empty {
-			display: none;
+		&-header {
+			display: flex;
+			align-items: center;
+			gap: 0.25rem;
+			min-height: 1.5rem;
 		}
-	}
 
-	&__category-action {
-		margin-left: auto;
-		padding-left: 0.5rem;
-		color: var( --filter-popover-link-color );
-		font-size: 0.75rem;
-		line-height: 1.125rem;
-		white-space: nowrap;
-		cursor: pointer;
+		&-title {
+			color: var( --filter-popover-title-color );
+			font-size: 0.8125rem;
+			font-weight: bold;
+			line-height: 1.25rem;
+			white-space: nowrap;
+		}
 
-		&:hover {
-			text-decoration: underline;
+		&-count {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 1.25rem;
+			height: 1.25rem;
+			border-radius: 0.25rem;
+			background-color: var( --filter-popover-count-background-color );
+			color: var( --filter-popover-title-color );
+			font-size: 0.6875rem;
+			font-weight: bold;
+			line-height: 1rem;
+
+			&--empty {
+				display: none;
+			}
+		}
+
+		&-action {
+			margin-left: auto;
+			padding-left: 0.5rem;
+			color: var( --filter-popover-link-color );
+			font-size: 0.75rem;
+			line-height: 1.125rem;
+			white-space: nowrap;
+			cursor: pointer;
+
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+
+		// Single column on small screens (same breakpoint as .mobile-only)
+		@media ( max-width: 600px ) {
+			width: 100%;
+			border-right: 0;
+			border-bottom: 1px solid var( --filter-popover-divider-color );
+
+			&:last-child {
+				border-bottom: 0;
+			}
 		}
 	}
 
@@ -353,6 +364,21 @@ Author(s): Elysienna, Nadox
 		min-height: 1.5rem;
 		cursor: pointer;
 		user-select: none;
+
+		&-label {
+			flex: 1 1 0;
+			min-width: 0;
+			overflow: hidden;
+			font-size: 0.8125rem;
+			line-height: 1.25rem;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+
+			.filter-popover__category--multi-column & {
+				flex: none;
+				width: 4rem;
+			}
+		}
 	}
 
 	&__checkbox {
@@ -383,21 +409,6 @@ Author(s): Elysienna, Nadox
 		}
 	}
 
-	&__item-label {
-		flex: 1 1 0;
-		min-width: 0;
-		overflow: hidden;
-		font-size: 0.8125rem;
-		line-height: 1.25rem;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-
-		.filter-popover__category--multi-column & {
-			flex: none;
-			width: 4rem;
-		}
-	}
-
 	&__tier-badge {
 		--filter-popover-tier-color: #757575;
 		display: inline-flex;
@@ -409,7 +420,7 @@ Author(s): Elysienna, Nadox
 		height: 1.25rem;
 		border-radius: 0.25rem;
 		background-color: var( --filter-popover-tier-color );
-		color: #ffffff;
+		color: var( --clr-secondary-100 );
 		font-size: 0.6875rem;
 		font-weight: bold;
 		line-height: 1rem;
@@ -448,52 +459,41 @@ Author(s): Elysienna, Nadox
 		gap: 0.5rem;
 		padding: 0.5rem;
 		border-top: 1px solid var( --filter-popover-divider-color );
+
+		&-end {
+			display: flex;
+			gap: 0.5rem;
+		}
 	}
 
-	&__footer-end {
-		display: flex;
-		gap: 0.5rem;
-	}
+	.filter-popover__button {
+		&.button {
+			box-sizing: border-box;
+			min-width: 2.75rem;
+			height: 2rem;
+			padding: 0.375rem 0.75rem;
+			border-radius: 0.5rem;
+			font-size: 0.875rem;
+			font-weight: bold;
+			line-height: 1.25rem;
+		}
 
-	.filter-popover__button.button {
-		box-sizing: border-box;
-		min-width: 2.75rem;
-		height: 2rem;
-		padding: 0.375rem 0.75rem;
-		border-radius: 0.5rem;
-		font-size: 0.875rem;
-		font-weight: bold;
-		line-height: 1.25rem;
-	}
+		&--reset.button {
+			border: 0;
+			background-color: transparent;
+			color: var( --filter-popover-link-color );
+		}
 
-	.filter-popover__button--reset.button {
-		border: 0;
-		background-color: transparent;
-		color: var( --filter-popover-link-color );
-	}
+		&--cancel.button {
+			border: 1px solid var( --filter-popover-cancel-border-color );
+			background-color: transparent;
+			color: var( --filter-popover-cancel-color );
+		}
 
-	.filter-popover__button--cancel.button {
-		border: 1px solid var( --filter-popover-cancel-border-color );
-		background-color: transparent;
-		color: var( --filter-popover-cancel-color );
-	}
-
-	.filter-popover__button--apply.button {
-		border: 0;
-		background-color: var( --filter-popover-checked-color );
-		color: var( --clr-secondary-100 );
-	}
-
-	// Single column on small screens (same breakpoint as .mobile-only)
-	@media ( max-width: 600px ) {
-		&__category {
-			width: 100%;
-			border-right: 0;
-			border-bottom: 1px solid var( --filter-popover-divider-color );
-
-			&:last-child {
-				border-bottom: 0;
-			}
+		&--apply.button {
+			border: 0;
+			background-color: var( --filter-popover-checked-color );
+			color: var( --clr-secondary-100 );
 		}
 	}
 }
