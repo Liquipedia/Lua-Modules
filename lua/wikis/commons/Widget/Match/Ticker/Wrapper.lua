@@ -42,8 +42,8 @@ local function MatchTickerWrapper(props)
 			hideTournament = props.hideTournament,
 			displayGameIcons = props.displayGameIcons,
 			onlyHighlightOnValue = props.onlyHighlightOnValue,
-			variant = props.variant == 'horizontal' and 'vertical' or nil,
-			countdownFormat = props.variant == 'carousel' and 'minimal' or nil,
+			-- The date is shown in the group header
+			countdownFormat = (props.variant == 'carousel' or props.variant == 'horizontal') and 'minimal' or nil,
 			gameData = match.gameData
 		}
 	end)
