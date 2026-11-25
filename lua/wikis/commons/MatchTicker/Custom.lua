@@ -24,7 +24,6 @@ local DEFAULT_FILTER_GROUP_PREFIX = 'filterbuttons'
 function CustomMatchTicker.mainPage(frame)
 	local args = Arguments.getArgs(frame)
 
-	-- filter values are passed in keyed by the name of the filter group
 	local filterGroupPrefix = args.filterGroupPrefix or DEFAULT_FILTER_GROUP_PREFIX
 	---@param filterName string
 	---@return string?
