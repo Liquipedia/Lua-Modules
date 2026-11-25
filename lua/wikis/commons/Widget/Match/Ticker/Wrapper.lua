@@ -69,10 +69,7 @@ local function MatchTickerWrapper(props)
 		}
 	end
 
-	return Html.Div{
-		classes = props.wrapperClasses,
-		children = Array.extend({header}, HorizontalContainer{children = matchCards}),
-	}
+	return HorizontalContainer{children = matchCards}
 end
 
 return Component.component(MatchTickerWrapper)
