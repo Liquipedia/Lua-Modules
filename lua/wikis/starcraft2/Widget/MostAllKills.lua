@@ -24,12 +24,7 @@ local MostAllKills = {}
 function MostAllKills.render()
 	return TableWidgets.Table{
 		sortable = false,
-		tableClasses = {'prizepooltable', 'collapsed'},
-		tableAttributes = {
-			['data-cutafter'] = 5,
-			['data-opentext'] = 'Show more',
-			['data-closetext'] = 'Show less',
-		},
+		collapseAfter = 5,
 		columns = {
 			{align = 'left'},
 			{align = 'center'},
