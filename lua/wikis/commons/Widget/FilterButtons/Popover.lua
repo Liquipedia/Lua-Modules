@@ -18,7 +18,6 @@ local Button = Lua.import('Module:Widget/Basic/Button')
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CLASS_NAME = 'filter-popover'
 -- Items are laid out in columns of at most this many rows
@@ -49,17 +48,17 @@ local defaultProps = {
 ---@param values string[]
 ---@return table<string, boolean>
 local function getInitialCheckedStates(category, values)
-	local states = Table.map(values, function(_, value)
+	local states = Table.map(values, function (_, value)
 		return value, Table.includes(category.defaultItems, value)
 	end)
-	if Array.all(values, function(value) return states[value] end) then
-		return Table.map(states, function(value) return value, false end)
+	if Array.all(values, function (value) return states[value] end) then
+		return Table.map(states, function (value) return value, false end)
 	end
 	return states
 end
 
 ---@param tier string
----@return Renderable?
+---@return VNode?
 local function TierBadge(tier)
 	local identifier = Tier.toIdentifier(tier)
 	local tierShort = Tier.toShortName(tier)
@@ -91,14 +90,14 @@ local function FilterCategory(category, filterGroupPrefix)
 	local title = category.title or DEFAULT_TITLES[category.name] or String.upperCaseFirst(category.name)
 	local isTierCategory = category.name == 'liquipediatier'
 
-	local values = Array.map(category.items, function(item)
+	local values = Array.map(category.items, function (item)
 		return itemToPropertyValues(item) or item
 	end)
 	local checkedStates = getInitialCheckedStates(category, values)
-	local checkedCount = #Array.filter(values, function(value) return checkedStates[value] end)
+	local checkedCount = #Array.filter(values, function (value) return checkedStates[value] end)
 	local columns = math.ceil(#values / MAX_ROWS)
 
-	local items = Array.map(category.items, function(item, index)
+	local items = Array.map(category.items, function (item, index)
 		local value = values[index]
 		return Html.Div{
 			classes = {CLASS_NAME .. '__item'},
@@ -108,7 +107,7 @@ local function FilterCategory(category, filterGroupPrefix)
 				role = 'checkbox',
 				['aria-checked'] = tostring(checkedStates[value]),
 			},
-			children = WidgetUtil.collect(
+			children = {
 				Html.Span{
 					classes = {CLASS_NAME .. '__checkbox'},
 					children = IconFa{iconName = 'correct', screenReaderHidden = true},
@@ -117,8 +116,8 @@ local function FilterCategory(category, filterGroupPrefix)
 					classes = {CLASS_NAME .. '__item-label'},
 					children = transformValueToText(item),
 				},
-				isTierCategory and TierBadge(item) or nil
-			),
+				isTierCategory and TierBadge(item) or nil,
+			},
 		}
 	end)
 
@@ -141,7 +140,7 @@ local function FilterCategory(category, filterGroupPrefix)
 							checkedCount == 0 and (CLASS_NAME .. '__category-count--empty') or nil,
 						},
 						attributes = {['data-filter-popover-category-count'] = groupName},
-						children = tostring(checkedCount),
+						children = checkedCount,
 					},
 					Html.Span{
 						classes = {CLASS_NAME .. '__category-action'},
@@ -158,7 +157,7 @@ local function FilterCategory(category, filterGroupPrefix)
 			},
 			Html.Div{
 				classes = {CLASS_NAME .. '__items'},
-				css = columns > 1 and {['--filter-popover-columns'] = tostring(columns)} or nil,
+				css = columns > 1 and {['--filter-popover-columns'] = columns} or nil,
 				attributes = {
 					['data-filter'] = 'data-filter',
 					['data-filter-staged'] = '',
@@ -173,15 +172,15 @@ end
 
 ---@param action 'reset'|'cancel'|'apply'
 ---@param variant 'ghost'|'secondary'|'primary'
----@param text string
----@return Renderable
-local function FooterButton(action, variant, text)
+---@param children Renderable|Renderable[]
+---@return VNode
+local function FooterButton(action, variant, children)
 	return Button{
 		classes = {CLASS_NAME .. '__button', CLASS_NAME .. '__button--' .. action},
 		variant = variant,
 		size = 'sm',
 		attributes = {['data-filter-popover-action'] = action},
-		children = text,
+		children = children,
 	}
 end
 
@@ -228,7 +227,7 @@ local function FilterButtonsPopover(props)
 				children = {
 					Html.Div{
 						classes = {CLASS_NAME .. '__categories'},
-						children = Array.map(categories, function(category)
+						children = Array.map(categories, function (category)
 							return FilterCategory(category, filterGroupPrefix)
 						end),
 					},
