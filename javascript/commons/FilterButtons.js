@@ -112,8 +112,8 @@
  */
 
 /**
- * Filter groups shown as checkboxes in a popover, see "Filter popover with staged changes" above.
- * Changes are kept as pending states and only written to the filter groups once applied.
+ * Filter groups shown as checkboxes in a popover.
+ * See "Filter popover with staged changes" above.
  */
 class FilterButtonsPopover {
 	static count = 0;
@@ -231,7 +231,7 @@ class FilterButtonsPopover {
 			this.toggle.style.setProperty( 'anchor-name', '--' + this.name );
 			this.panel.style.setProperty( 'position-anchor', '--' + this.name );
 		}
-		// Also fires on light dismiss and escape, which discard pending changes just like cancel
+		// Also fires on light dismiss and Escape
 		this.panel.addEventListener( 'beforetoggle', ( event ) => {
 			this.onToggle( event.newState === 'open' );
 		} );
@@ -293,8 +293,6 @@ class FilterButtonsPopover {
 	}
 
 	/**
-	 * Activates on click, as well as Enter and Space like a native button or checkbox.
-	 *
 	 * @param {HTMLElement} activatable
 	 * @param {function(): void} callback
 	 */

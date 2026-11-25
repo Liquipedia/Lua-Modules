@@ -49,8 +49,7 @@ local function MatchTickerContainer(props)
 		return props.filterGroupPrefix .. '-' .. filter
 	end
 
-	-- The default filters are only filled in once the categories are loaded, which the filter buttons might not have
-	-- done yet if they are rendered after this ticker (or as part of it)
+	-- Default items are only filled in once loaded, which the filter buttons might not have done yet
 	Array.forEach(FilterConfig.categories, FilterButtonsUtil.loadCategory)
 
 	local filters = Array.map(FilterConfig.categories, Operator.property('name')) or {}

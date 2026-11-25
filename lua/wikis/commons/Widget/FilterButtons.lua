@@ -45,7 +45,7 @@ local FilterButtons = {
 
 ---@class FilterButtonsProps
 ---@field categories FilterButtonCategory[]?
----@field filterGroupPrefix string? prefix of the filter groups; use distinct prefixes for independent button sets
+---@field filterGroupPrefix string? use distinct prefixes for independent button sets
 
 ---@param props FilterButtonsProps
 ---@return VNode

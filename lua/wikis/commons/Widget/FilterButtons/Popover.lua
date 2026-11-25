@@ -200,8 +200,7 @@ local function FilterButtonsPopover(props)
 		classes = {CLASS_NAME},
 		attributes = {['data-filter-popover'] = ''},
 		children = {
-			-- Replaced with a <button> by FilterButtons.js, as the parser does not allow them.
-			-- The `button` class opts out of the skin's default styling of <button> elements.
+			-- Swapped for a <button> by FilterButtons.js; the `button` class opts out of the skin's <button> styling
 			Html.Div{
 				classes = {CLASS_NAME .. '__toggle', 'button'},
 				attributes = {['data-filter-popover-toggle'] = ''},

@@ -151,7 +151,7 @@ Author(s): Elysienna, Nadox
 	}
 }
 
-/* Filter popover: filter buttons as checkboxes, applied once confirmed (see FilterButtons.js) */
+/* Filter popover (see FilterButtons.js) */
 .filter-popover {
 	--filter-popover-toggle-background-color: var( --clr-on-surface-light-primary-8 );
 	--filter-popover-toggle-color: inherit;
@@ -210,7 +210,6 @@ Author(s): Elysienna, Nadox
 			outline-offset: 0.125rem;
 		}
 
-		// The design uses a 1.25rem icon box
 		i {
 			display: inline-flex;
 			align-items: center;
@@ -221,7 +220,7 @@ Author(s): Elysienna, Nadox
 		}
 	}
 
-	// Hidden until opened, both as a native popover and in the fallback without popover support
+	// Hidden until opened, also in the fallback without popover support
 	&__panel {
 		display: none;
 		flex-direction: column;
@@ -235,7 +234,7 @@ Author(s): Elysienna, Nadox
 		background-color: var( --filter-popover-background-color );
 		box-shadow: 0 0 0.75rem 0 var( --clr-on-surface-light-primary-16 );
 		color: var( --filter-popover-text-color );
-		// Do not inherit the styling of where the popover is placed in (e.g. a panel heading)
+		// Do not inherit from the surroundings (e.g. a panel heading)
 		font-weight: normal;
 		text-align: left;
 	}
