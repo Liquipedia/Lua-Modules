@@ -7,15 +7,13 @@
 
 local Lua = require('Module:Lua')
 
-local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
-local Medals = Lua.import('Module:Medals')
-local Ordinal = Lua.import('Module:Ordinal')
 local PlacementInfo = Lua.import('Module:Placement')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
@@ -24,6 +22,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local DASH = '&#045;'
 
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
+local PRIZE_TYPE_PLAYER_SHARE = 'PLAYER_SHARE'
 local PRIZE_TYPE_POINTS = 'POINTS'
 local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 
@@ -48,7 +47,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.dq)
 		end,
 		display = function ()
-			return Abbreviation.make{text = 'DQ', title = 'Disqualified'}
+			return 'DQ'
 		end,
 		lpdb = 'DQ',
 	},
@@ -57,7 +56,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.dnf)
 		end,
 		display = function ()
-			return Abbreviation.make{text = 'DNF', title = 'Did not finish'}
+			return 'DNF'
 		end,
 		lpdb = 'DNF',
 	},
@@ -66,7 +65,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.dnp)
 		end,
 		display = function ()
-			return Abbreviation.make{text = 'DNP', title = 'Did not participate'}
+			return 'DNP'
 		end,
 		lpdb = 'DNP',
 	},
@@ -96,15 +95,6 @@ Placement.specialStatuses = {
 			return 'L'
 		end,
 		lpdb = 'L',
-	},
-	Q = {
-		active = function (args)
-			return Logic.readBool(args.q)
-		end,
-		display = function ()
-			return Abbreviation.make{text = 'Q', title = 'Qualified Automatically'}
-		end,
-		lpdb = 'Q',
 	},
 }
 
@@ -223,7 +213,7 @@ function Placement:_getLpdbData(...)
 		local opponentType = opponent.opponentData.type
 
 		if opponentType == Opponent.team then
-			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template) or {}
+			local teamTemplate = TeamTemplate.getRawOrNil(opponent.opponentData.template) or {}
 			image = teamTemplate.image
 			imageDark = teamTemplate.imagedark
 		elseif opponentType == Opponent.solo then
@@ -232,6 +222,7 @@ function Placement:_getLpdbData(...)
 		end
 
 		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_BASE_CURRENCY .. 1)) or 0
+		local playerShare = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_PLAYER_SHARE .. 1))
 		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
 		local pointsReward2 = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
 		local isQualified = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_QUALIFIES .. '1')
@@ -262,6 +253,7 @@ function Placement:_getLpdbData(...)
 				participantteam = (opponentType == Opponent.solo and players.p1team)
 									and Opponent.toName{template = players.p1team, type = 'team', extradata = {}}
 									or nil,
+				playershare = playerShare,
 			},
 			qualified = isQualified and 1 or 0
 			-- TODO: We need to create additional LPDB Fields
@@ -315,40 +307,36 @@ function Placement:_displayPlace()
 		end
 	end
 
-	local start = Ordinal.toOrdinal(self.placeStart)
 	if self.placeEnd > self.placeStart then
-		return start .. DASH .. Ordinal.toOrdinal(self.placeEnd)
+		return self.placeStart .. DASH .. self.placeEnd
 	end
 
-	return start
+	return tostring(self.placeStart)
 end
 
 ---@return string?
 function Placement:getBackground()
-	for statusName, status in pairs(Placement.specialStatuses) do
-		if status.active(self.args) then
-			return PlacementInfo.getBgClass{placement = statusName:lower()}
-		end
-	end
+	return PlacementInfo.getBgClass{placement = self:getSpecialStatus() or self.placeStart}
+end
 
-	return PlacementInfo.getBgClass{placement = self.placeStart}
+---Returns the placement-badge color class for top-3 placements and supported special statuses, else nil.
+---Colored by the top of the range (placeStart).
+---@return string?
+function Placement:getBadgeClass()
+	local specialStatus = self:getSpecialStatus()
+	if (not specialStatus) and self.placeStart > 3 then
+		return nil
+	end
+	return PlacementInfo.raw(specialStatus or self.placeStart).backgroundClass
 end
 
 ---@return string?
-function Placement:getMedal()
-	if self:hasSpecialStatus() then
-		return
+function Placement:getSpecialStatus()
+	for statusName, status in pairs(Placement.specialStatuses) do
+		if status.active(self.args) then
+			return statusName:lower()
+		end
 	end
-
-	local medal = Medals.display{medal = self:_lpdbValue()}
-	if medal then
-		return tostring(medal)
-	end
-end
-
----@return boolean
-function Placement:hasSpecialStatus()
-	return Table.any(Placement.specialStatuses, function(_, status) return status.active(self.args) end)
 end
 
 return Placement

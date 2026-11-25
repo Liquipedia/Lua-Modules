@@ -18,13 +18,16 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class ValorantMapInfobox: MapInfobox
+---@operator call(Frame): ValorantMapInfobox
 local CustomMap = Class.new(Map)
+
 ---@class ValorantMapInfoboxWidgetInjector: WidgetInjector
+---@operator call(ValorantMapInfobox): ValorantMapInfoboxWidgetInjector
 ---@field caller ValorantMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomMap.run(frame)
 	local map = CustomMap(frame)
 	map:setWidgetInjector(CustomInjector(map))
@@ -33,8 +36,8 @@ function CustomMap.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 

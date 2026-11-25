@@ -20,7 +20,7 @@ local CustomCompany = Class.new(Company)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomCompany.run(frame)
 	local company = CustomCompany(frame)
 	company:setWidgetInjector(CustomInjector(company))
@@ -29,8 +29,8 @@ function CustomCompany.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 

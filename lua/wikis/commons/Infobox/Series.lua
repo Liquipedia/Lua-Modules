@@ -40,13 +40,13 @@ local Venue = Widgets.Venue
 local Series = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Series.run(frame)
 	local series = Series(frame)
 	return series:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Series:createInfobox()
 	local args = self.args
 

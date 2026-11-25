@@ -108,5 +108,11 @@ return {
 				storeFromWikiCode = true,
 			},
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchscore', 'gamescore'},
+				group = {'matchscore', 'gamescore'},
+			},
+		},
 	},
 }

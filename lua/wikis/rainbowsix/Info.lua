@@ -111,6 +111,13 @@ return {
 			useParent = false,
 			onlyTierTypeIfBoth = false,
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchscore', 'roundscore'},
+				group = {'matchscore', 'roundscore'},
+			},
+			overtime = {regulationRounds = 12},
+		},
 	},
 	defaultRoundPrecision = 0,
 }

@@ -7,25 +7,20 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
-
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local FfaStandings = Lua.import('Module:Widget/Standings/Ffa')
+local GroupStandings = Lua.import('Module:Widget/Standings/Group')
 local SwissStandings = Lua.import('Module:Widget/Standings/Swiss')
 
 local Standings = Lua.import('Module:Standings')
 local StringUtils = Lua.import('Module:StringUtils')
 
----@class StandingsWidget: Widget
----@operator call(table): StandingsWidget
-local StandingsWidget = Class.new(Widget)
-StandingsWidget.defaultProps = {
-}
-
----@return Widget?
-function StandingsWidget:render()
-	local standings = Standings.getStandingsTable(self.props.pageName, self.props.standingsIndex)
+---@param props {pageName: string?, standingsIndex: integer?, standings: StandingsModel?, width: number?,
+---collapseAfter: integer?}
+---@return VNode?
+local function StandingsWidget(props)
+	local standings = props.standings or Standings.getStandingsTable(props.pageName, props.standingsIndex)
 	if not standings then
 		return
 	end
@@ -34,14 +29,24 @@ function StandingsWidget:render()
 	if standings.type == 'ffa' then
 		standingsWidget = FfaStandings{
 			standings = standings,
+			width = props.width,
+			collapseAfter = props.collapseAfter,
 		}
 	elseif standings.type == 'swiss' then
 		standingsWidget = SwissStandings{
 			standings = standings,
+			width = props.width,
+			collapseAfter = props.collapseAfter,
+		}
+	elseif standings.type == 'group' then
+		standingsWidget = GroupStandings{
+			standings = standings,
+			width = props.width,
+			collapseAfter = props.collapseAfter,
 		}
 	end
 
-	assert(standingsWidget, 'This Standings Type not yet implemented')
+	assert(standingsWidget, 'Unknown Standings Type')
 
 	return AnalyticsWidget{
 		analyticsName = StringUtils.upperCaseFirst(standings.type) .. ' standings table',
@@ -50,4 +55,4 @@ function StandingsWidget:render()
 
 end
 
-return StandingsWidget
+return Component.component(StandingsWidget)

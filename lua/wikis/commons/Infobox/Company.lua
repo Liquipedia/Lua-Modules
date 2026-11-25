@@ -35,13 +35,13 @@ local COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
 local LINK_VARIANT = 'company'
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Company.run(frame)
 	local company = Company(frame)
 	return company:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Company:createInfobox()
 	local args = self.args
 

@@ -8,36 +8,33 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Date = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
 local Icon = Lua.import('Module:Icon')
-local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
-
-local Widget = Lua.import('Module:Widget')
-local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
-local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Link = Lua.import('Module:Widget/Basic/Link')
-local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
 local RatingsStorageFactory = Lua.import('Module:Ratings/Storage/Factory')
 
+local Component = Lua.import('Module:Widget/Component')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+local Html = Lua.import('Module:Widget/Html')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-
----@class RatingsList: Widget
----@field _base Widget
----@operator call(table): RatingsList
-local RatingsList = Class.new(Widget)
 
 local GRAPH_VIEW_RANK = 'rank'
 local GRAPH_VIEW_POINTS = 'points'
 local GRAPH_COLOR_RANK = '#EE6666'
 local GRAPH_COLOR_POINTS = '#2F80ED'
+
+local defaultProps = {
+	teamLimit = 20,
+}
 
 ---@alias RatingsProgression {date: string, rating: number?, rank: integer?}[]
 ---@alias AxisBoundsFn fun(progression: RatingsProgression, defaultMaxY: integer): number, number
@@ -136,15 +133,15 @@ local function makeTeamChart(teamData, defaultMaxY, graphView, getAxisBounds)
 	}
 end
 
----@return Widget
-function RatingsList:render()
-	local teamLimit = tonumber(self.props.teamLimit) or self.defaultProps.teamLimit
-	local showGraph = Logic.readBool(self.props.showGraph)
-	local isSmallerVersion = Logic.readBool(self.props.isSmallerVersion)
+---@param props {teamLimit: integer?, showGraph: boolean?, isSmallerVersion: boolean?, storageType: string}
+---@return VNode
+local function RatingsList(props)
+	local teamLimit = tonumber(props.teamLimit) or defaultProps.teamLimit
+	local showGraph = Logic.readBool(props.showGraph)
+	local isSmallerVersion = Logic.readBool(props.isSmallerVersion)
 
 	local getRankings = RatingsStorageFactory.createGetRankings {
-		storageType = self.props.storageType,
-		id = self.props.id,
+		storageType = props.storageType,
 	}
 	local teams = getRankings(teamLimit)
 
@@ -161,18 +158,17 @@ function RatingsList:render()
 		{ align = 'center' },
 	}
 
-	local title = HtmlWidgets.Div {
+	local title = Html.Div {
 		children = {
-			HtmlWidgets.Div {
+			Html.Div {
 				children = {
-					HtmlWidgets.B { children = 'BETA' },
-					HtmlWidgets.Span { children = 'Last updated: ' .. formattedDate }
+					Html.Span { children = 'Last updated: ' .. formattedDate }
 				},
 				classes = { 'ranking-table__top-row-text' }
 			},
-			HtmlWidgets.Div {
+			Html.Div {
 				children = {
-					HtmlWidgets.Span { children = 'Data provided by ' },
+					Html.Span { children = 'Data provided by ' },
 					IconImage { imageLight = 'SAP_logo.svg', size = '90px' }
 				},
 				classes = { 'ranking-table__top-row-logo-container' }
@@ -197,7 +193,7 @@ function RatingsList:render()
 
 	local teamRows = Array.map(teams, function(team, index)
 		local uniqueId = index
-		local graphSwitchGroup = 'ratings-graph-view-' .. tostring(self.props.id or 'default') .. '-' .. uniqueId
+		local graphSwitchGroup = 'ratings-graph-view-' .. uniqueId
 		local changeText = (not team.change and 'NEW') or PlacementChange { change = team.change }
 
 		local rowClasses = {}
@@ -229,7 +225,7 @@ function RatingsList:render()
 					class = 'ranking-table__toggle-graph-cell',
 					['data-ranking-table-cell'] = 'graph'
 				},
-				children = HtmlWidgets.Span {
+				children = Html.Span {
 					attributes = {
 						class = 'ranking-table__toggle-graph',
 						['data-ranking-table'] = 'toggle',
@@ -254,9 +250,9 @@ function RatingsList:render()
 						colspan = '6',
 						['data-ranking-table-cell'] = 'graph'
 					},
-					children = HtmlWidgets.Div {
+					children = Html.Div {
 						children = {
-							HtmlWidgets.Div {
+							Html.Div {
 								classes = { 'ranking-table__graph-switch' },
 								children = ContentSwitch {
 									switchGroup = graphSwitchGroup,
@@ -306,7 +302,7 @@ function RatingsList:render()
 		}
 	end)
 
-	local buttonDiv = HtmlWidgets.Div {
+	local buttonDiv = Html.Div {
 		children = { 'See Rankings Page', Icon.makeIcon { iconName = 'goto' } },
 		classes = { 'ranking-table__footer-button' },
 	}
@@ -317,7 +313,7 @@ function RatingsList:render()
 		children = { buttonDiv },
 	}
 
-	return HtmlWidgets.Div {
+	return Html.Div {
 		attributes = {
 			['data-ranking-table'] = 'content',
 		},
@@ -341,4 +337,4 @@ function RatingsList:render()
 	}
 end
 
-return RatingsList
+return Component.component(RatingsList, defaultProps)

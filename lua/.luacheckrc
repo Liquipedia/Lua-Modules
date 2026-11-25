@@ -15,6 +15,7 @@ std = {
 		"package",
 		"pairs",
 		"pcall",
+		"rawequal",
 		"rawget",
 		"rawset",
 		"require",
@@ -41,4 +42,4 @@ ignore = {
 	"212" -- unused argument
 }
 
-files["lua/spec/*_spec.lua"].read_globals = {"GoldenTest", "SetActiveWiki", "allwikis"}
+files["lua/spec/**/*_spec.lua"].read_globals = {"GoldenTest", "SetActiveWiki", "allwikis"}

@@ -8,12 +8,11 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
 ---@class DialogWidgetProps
 ---@field dialogClasses? string[]
@@ -21,14 +20,9 @@ local Div = HtmlWidgets.Div
 ---@field trigger? Renderable|Renderable[]
 ---@field children? Renderable|Renderable[]
 
----@class DialogWidget: Widget
----@operator call(DialogWidgetProps): DialogWidget
----@field props DialogWidgetProps
-local DialogWidget = Class.new(Widget)
-
----@return Widget?
-function DialogWidget:render()
-	local props = self.props
+---@param props DialogWidgetProps
+---@return HtmlNode?
+local function DialogWidget(props)
 	if Logic.isEmpty(props.title) or Logic.isEmpty(props.trigger) or Logic.isEmpty(props.children) then
 		return
 	end
@@ -57,4 +51,4 @@ function DialogWidget:render()
 	}
 end
 
-return DialogWidget
+return Component.component(DialogWidget)

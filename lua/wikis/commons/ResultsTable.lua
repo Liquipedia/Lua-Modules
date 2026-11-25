@@ -15,7 +15,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local Placement = Lua.import('Module:Placement')
 local Table = Lua.import('Module:Table')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -24,7 +24,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local ResultsTable = Class.new(BaseResultsTable)
 
 ---@protected
----@return table[]
+---@return Table2ColumnDef[]
 function ResultsTable:buildColumnDefinitions()
 	return WidgetUtil.collect(
 		{
@@ -60,7 +60,7 @@ function ResultsTable:buildColumnDefinitions()
 end
 
 ---Builds the Header of the results/achievements table
----@return Widget
+---@return VNode
 function ResultsTable:buildHeader()
 	return TableWidgets.Row{children = WidgetUtil.collect(
 		TableWidgets.CellHeader{children = 'Date'},
@@ -68,7 +68,7 @@ function ResultsTable:buildHeader()
 		TableWidgets.CellHeader{children = 'Tier'},
 		self.config.showType and TableWidgets.CellHeader{children = 'Type'} or nil,
 		self.config.displayGameIcons and TableWidgets.CellHeader{
-			children = HtmlWidgets.Abbr{children = 'G.', title = 'Game'}
+			children = Html.Abbr{children = 'G.', title = 'Game'}
 		} or nil,
 		TableWidgets.CellHeader{
 			colspan = 2,
@@ -90,7 +90,7 @@ end
 
 ---Builds a placement row of the results/achievements table
 ---@param placement placement
----@return Html
+---@return VNode
 function ResultsTable:buildRow(placement)
 	return TableWidgets.Row{
 		highlighted = self:rowHighlight(placement),
@@ -128,7 +128,7 @@ end
 
 ---@private
 ---@param placement string
----@return Widget
+---@return VNode
 ResultsTable._placementToTableCell = FnUtil.memoize(function (placement)
 	local rawPlacement = Placement.raw(placement or '')
 	return TableWidgets.Cell{
@@ -141,7 +141,7 @@ end)
 
 ---@private
 ---@param placement placement
----@return Widget[]?
+---@return VNode[]?
 function ResultsTable:_buildResultCells(placement)
 	if self.config.hideResult then
 		return

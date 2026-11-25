@@ -7,22 +7,17 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-
----@class MatchSummaryGameCenter: Widget
----@operator call(table): MatchSummaryGameCenter
-local MatchSummaryGameCenter = Class.new(Widget)
-
----@return Widget?
-function MatchSummaryGameCenter:render()
-	return HtmlWidgets.Div{
+---@param props {css: HtmlStyleProps?, children: Renderable|Renderable[]?}
+---@return VNode
+local function MatchSummaryGameCenter(props)
+	return Html.Div{
 		classes = {'brkts-popup-spaced'},
-		css = self.props.css,
-		children = self.props.children,
+		css = props.css,
+		children = props.children,
 	}
 end
 
-return MatchSummaryGameCenter
+return Component.component(MatchSummaryGameCenter)

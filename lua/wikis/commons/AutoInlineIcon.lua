@@ -12,13 +12,13 @@ local Logic = Lua.import('Module:Logic')
 local InlineIconAndText = Lua.import('Module:Widget/Misc/InlineIconAndText')
 local ManualData = Lua.requireIfExists('Module:InlineIcon/ManualData', {loadData = true})
 
-local Character  = Lua.import('Module:Character')
+local Character = Lua.import('Module:Character')
 
 local AutoInlineIcon = {}
 
 ---onlyicon default false, link default true
 ---@param options {onlyicon: boolean?, link: boolean?, category: string, lookup: string}
----@return Widget
+---@return Renderable
 function AutoInlineIcon.display(options)
 	local category = options.category
 	local lookup = options.lookup
@@ -60,7 +60,7 @@ function AutoInlineIcon._getDataRetrevalFunction(category)
 end
 
 ---@param data table
----@return IconWidget
+---@return Renderable
 function AutoInlineIcon._iconCreator(data)
 	if data.iconType == 'image' then
 		local IconImage = Lua.import('Module:Widget/Image/Icon/Image')

@@ -8,10 +8,9 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 
 ---@class BoxProps
 ---@field children Renderable[]|Renderable
@@ -22,31 +21,27 @@ local Widget = Lua.import('Module:Widget')
 ---@field width string?
 ---@field height string?
 
----@class Box: Widget
----@operator call(BoxProps): Box
----@field props BoxProps
-local Box = Class.new(Widget)
-
----@return Widget|Renderable
-function Box:render()
-	local children = self.props.children
+---@param props BoxProps
+---@return Renderable
+local function Box(props)
+	local children = props.children
 	if not Array.isArray(children) then
-		return self.props.children
+		return props.children
 	end
-	---@cast children -Renderable
+	---@cast children Renderable[]
 
-	return HtmlWidgets.Div{
-		css = {['max-width'] = self.props.maxWidth},
+	return Html.Div{
+		css = {['max-width'] = props.maxWidth},
 		children = Array.map(children, function(child)
-			return HtmlWidgets.Div{
+			return Html.Div{
 				classes = {'template-box'},
 				css = {
-					['padding-left'] = self.props.paddingLeft,
-					['padding-bottom'] = self.props.paddingBottom,
-					['padding-right'] = self.props.paddingRight,
-					width = self.props.width,
-					height = self.props.height,
-					overflow = self.props.height and 'hidden' or nil,
+					['padding-left'] = props.paddingLeft,
+					['padding-bottom'] = props.paddingBottom,
+					['padding-right'] = props.paddingRight,
+					width = props.width,
+					height = props.height,
+					overflow = props.height and 'hidden' or nil,
 				},
 				children = child,
 			}
@@ -54,4 +49,4 @@ function Box:render()
 	}
 end
 
-return Box
+return Component.component(Box)

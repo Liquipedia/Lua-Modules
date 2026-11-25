@@ -10,13 +10,11 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local Class = Lua.import('Module:Class')
-local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
 local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
-local Links = Lua.import('Module:Links')
 local MatchTable = Lua.import('Module:MatchTable')
 local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
@@ -33,12 +31,13 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local AdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection')
 local MatchPageMapVeto = Lua.import('Module:Widget/Match/Page/MapVeto')
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
-local Div = HtmlWidgets.Div
+local CountdownWidget = Lua.import('Module:Widget/Countdown')
+local Div = Html.Div
 local Footer = Lua.import('Module:Widget/Match/Page/Footer')
 local Header = Lua.import('Module:Widget/Match/Page/Header')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
@@ -48,8 +47,7 @@ local VodButton = Lua.import('Module:Widget/Match/VodButton')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageMatch: MatchGroupUtilMatch
----@field parent string?
----@field patch string?
+---@field opponents MatchPageOpponent[]
 
 ---@class MatchPageGame: MatchGroupUtilGame
 ---@field finished boolean
@@ -58,7 +56,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageOpponent: standardOpponent
 ---@field opponentIndex integer
----@field iconDisplay Widget?
+---@field iconDisplay Renderable?
 ---@field teamTemplateData teamTemplateData
 ---@field seriesDots string[]
 
@@ -91,7 +89,7 @@ BaseMatchPage.NOT_PLAYED = 'notplayed'
 BaseMatchPage.NO_CHARACTER = 'default'
 
 ---@param props {match: MatchGroupUtilMatch}
----@return Widget
+---@return VNode
 function BaseMatchPage.getByMatchId(props)
 	local matchPage = BaseMatchPage(props.match)
 	return matchPage:render()
@@ -157,8 +155,8 @@ function BaseMatchPage:seoText()
 			ongoingTense = matchPhase == 'ongoing' and 'ongoing ' or '',
 			game = (Game.name{game = self.matchData.game}) --[[@as string]],
 			tournamentName = tournament.displayName,
-			opponent1 = Opponent.toName(self.opponents[1]),
-			opponent2 = Opponent.toName(self.opponents[2]),
+			opponent1 = ((self.opponents[1] or {}).teamTemplateData or {}).name or 'TBD',
+			opponent2 = ((self.opponents[2] or {}).teamTemplateData or {}).name or 'TBD',
 			tense = createTenseString() or ''
 		}
 	)
@@ -171,47 +169,18 @@ function BaseMatchPage:isBestOfOne()
 end
 
 ---@protected
----@return Widget?
+---@return VNode?
 function BaseMatchPage:getCountdownBlock()
 	if DateExt.isDefaultTimestamp(self.matchData.timestamp) then return end
-	return Div{
-		css = {
-			display = 'block',
-			['text-align'] = 'center'
-		},
-		children = Countdown.create{
-			date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
-			finished = self.matchData.finished,
-			rawdatetime = (not self.matchData.dateIsExact) or self.matchData.finished,
-		}
+	return CountdownWidget{
+		date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
+		finished = self.matchData.finished,
+		rawdatetime = (not self.matchData.dateIsExact) or self.matchData.finished,
 	}
 end
 
----@private
----@param site string
----@param link string
----@return {icon: string, iconDark: string?, link: string, text: string}?
-function BaseMatchPage._processLink(site, link)
-	return Table.mergeInto({link = link}, Links.getMatchIconData(site))
-end
-
----Creates an object array for links
----@private
----@return {icon: string, iconDark: string?, link: string, text: string}[]
-function BaseMatchPage:_parseLinks()
-	return Array.flatMap(Table.entries(self.matchData.links), function(linkData)
-		local site, link = unpack(linkData)
-		if type(link) == 'table' then
-			return Array.map(link, function(sublink)
-				return BaseMatchPage._processLink(site, sublink)
-			end)
-		end
-		return {BaseMatchPage._processLink(site, link)}
-	end)
-end
-
 ---@protected
----@return Widget[]
+---@return Renderable[]
 function BaseMatchPage:getVods()
 	---@type {vod: string, number: integer}[]
 	local gameVods = Array.map(self.games, function(game, gameIdx)
@@ -316,7 +285,7 @@ function BaseMatchPage:makeDisplayTitle()
 	return table.concat(titleParts, ' ')
 end
 
----@return Widget
+---@return VNode
 function BaseMatchPage:render()
 	Page.setDisplayTitle{title = self:makeDisplayTitle(), noReplace = true}
 
@@ -346,7 +315,7 @@ function BaseMatchPage:render()
 end
 
 ---@protected
----@return string|Html|Widget?
+---@return Renderable?
 function BaseMatchPage:renderGames()
 	local games = Array.map(Array.filter(self.games, function(game)
 		return game.status ~= BaseMatchPage.NOT_PLAYED
@@ -368,8 +337,8 @@ function BaseMatchPage:renderGames()
 		tabs = WidgetUtil.collect(
 			overallStats and {
 				label = {
-					HtmlWidgets.Span{classes = {'mobile-hide'}, children = 'Overall Statistics'},
-					HtmlWidgets.Span{classes = {'mobile-only'}, children = 'Overall'}
+					Html.Span{classes = {'mobile-hide'}, children = 'Overall Statistics'},
+					Html.Span{classes = {'mobile-only'}, children = 'Overall'}
 				},
 				content = overallStats
 			} or nil,
@@ -389,14 +358,14 @@ function BaseMatchPage:renderGames()
 end
 
 ---@protected
----@return string|Html|Widget?
+---@return Renderable?
 function BaseMatchPage:renderOverallStats()
 	return nil
 end
 
 ---@protected
 ---@param game MatchGroupUtilGame
----@return string|Html|Widget
+---@return Renderable
 function BaseMatchPage:renderGame(game)
 	error('BaseMatchPage:renderGame() cannot be called directly and must be overridden.')
 end
@@ -453,16 +422,16 @@ function BaseMatchPage:renderMapVeto()
 	end)
 
 	return {
-		HtmlWidgets.H3{children = 'Map Veto'},
+		Html.H3{children = 'Map Veto'},
 		MatchPageMapVeto{vetoRounds = mapVetoRounds},
 	}
 end
 
 ---@protected
----@return Widget
+---@return VNode
 function BaseMatchPage:footer()
 	local vods = self:getVods()
-	local parsedLinks = self:_parseLinks()
+	local matchLinks = DisplayHelper.makeLinksDisplay(self.matchData.links)
 	local patchLink = self:getPatchLink()
 
 	return Footer{
@@ -472,16 +441,10 @@ function BaseMatchPage:footer()
 				header = 'VODs',
 				children = vods
 			} or nil,
-			Logic.isNotEmpty(parsedLinks) and AdditionalSection{
+			Logic.isNotEmpty(matchLinks) and AdditionalSection{
 				header = 'Links',
 				bodyClasses = { 'vodlink' },
-				children = Array.map(parsedLinks, function (parsedLink)
-					return HtmlWidgets.Span{children = IconImage{
-						imageLight = parsedLink.icon,
-						imageDark = (parsedLink.iconDark or parsedLink.icon),
-						link = parsedLink.link
-					}}
-				end)
+				children = matchLinks,
 			} or nil,
 			patchLink and AdditionalSection{
 				header = 'Patch',
@@ -492,7 +455,7 @@ function BaseMatchPage:footer()
 end
 
 ---@protected
----@return Widget[]?
+---@return VNode[]?
 function BaseMatchPage:previousMatches()
 	if Array.all(self.opponents, Opponent.isTbd) then
 		return
@@ -501,7 +464,7 @@ function BaseMatchPage:previousMatches()
 	local headToHead = self:_buildHeadToHeadMatchTable()
 
 	return WidgetUtil.collect(
-		HtmlWidgets.H3{children = 'Match History'},
+		Html.H3{children = 'Match History'},
 		Div{
 			classes = {'match-bm-match-additional'},
 			children = WidgetUtil.collect(
@@ -531,7 +494,7 @@ end
 
 ---@private
 ---@param props table
----@return Widget
+---@return Renderable
 function BaseMatchPage:_createMatchTable(props)
 	return MatchTable(Table.mergeInto({
 		addCategory = false,
@@ -549,7 +512,7 @@ end
 
 ---@private
 ---@param opponent standardOpponent
----@return Widget?
+---@return Renderable?
 function BaseMatchPage:_buildMatchTable(opponent)
 	if not BaseMatchPage._isTeamOpponent(opponent) then
 		return
@@ -565,7 +528,7 @@ function BaseMatchPage:_buildMatchTable(opponent)
 end
 
 ---@private
----@return Widget?
+---@return Renderable?
 function BaseMatchPage:_buildHeadToHeadMatchTable()
 	if not Array.all(self.opponents, BaseMatchPage._isTeamOpponent) then
 		return
@@ -581,13 +544,13 @@ function BaseMatchPage:_buildHeadToHeadMatchTable()
 end
 
 ---@private
----@return MatchPageComment[]
+---@return VNode[]
 function BaseMatchPage:_getComments()
 	local substituteComments = DisplayHelper.createSubstitutesComment(self.matchData)
 	return WidgetUtil.collect(
 		self.matchData.comment and Comment{children = self.matchData.comment} or nil,
 		Logic.isNotEmpty(substituteComments) and Comment{
-			children = Array.interleave(substituteComments, HtmlWidgets.Br{})
+			children = Array.interleave(substituteComments, Html.Br{})
 		} or nil,
 		self:_getCasterComment(),
 		self:addComments()
@@ -595,7 +558,7 @@ function BaseMatchPage:_getComments()
 end
 
 ---@private
----@return MatchPageComment?
+---@return VNode?
 function BaseMatchPage:_getCasterComment()
 	local casters = self.matchData.extradata.casters
 	if Logic.isEmpty(casters) then return end
@@ -608,13 +571,13 @@ function BaseMatchPage:_getCasterComment()
 end
 
 ---@protected
----@return MatchPageComment[]
+---@return VNode[]
 function BaseMatchPage:addComments()
 	return {}
 end
 
 ---@protected
----@return Widget?
+---@return Renderable?
 function BaseMatchPage:getPatchLink()
 	if Logic.isEmpty(self.matchData.patch) then return end
 	return Link{ link = 'Patch ' .. self.matchData.patch }

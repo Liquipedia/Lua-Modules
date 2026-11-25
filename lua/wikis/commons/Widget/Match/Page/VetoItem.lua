@@ -7,30 +7,24 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
-
----@class MatchPageVetoItemParameters
----@field characterIcon (string|Html|Widget|nil)
+---@class MatchPageVetoItemProps
+---@field characterIcon Renderable?
 ---@field vetoNumber integer?
 
----@class MatchPageVetoItem: Widget
----@operator call(MatchPageVetoItemParameters): MatchPageVetoItem
----@field props MatchPageVetoItemParameters
-local MatchPageVetoItem = Class.new(Widget)
-
----@return Widget
-function MatchPageVetoItem:render()
-	local vetoNumber = self.props.vetoNumber
+---@param props MatchPageVetoItemProps
+---@return VNode
+local function MatchPageVetoItem(props)
+	local vetoNumber = props.vetoNumber
 	return Div{
 		classes = {'match-bm-game-veto-overview-team-veto-row-item'},
 		children = {
 			Div{
 				classes = {'match-bm-game-veto-overview-team-veto-row-item-icon'},
-				children = self.props.characterIcon
+				children = props.characterIcon
 			},
 			Div{
 				classes = {'match-bm-game-veto-overview-team-veto-row-item-text'},
@@ -40,4 +34,4 @@ function MatchPageVetoItem:render()
 	}
 end
 
-return MatchPageVetoItem
+return Component.component(MatchPageVetoItem)

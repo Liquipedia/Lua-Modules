@@ -41,6 +41,16 @@ return {
 				storeFromWikiCode = true,
 			},
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchscore', 'gamescore'},
+				group = {'matchscore', 'gamescore'},
+			},
+		},
 		defaultMaxPlayersPerPlacement = 35,
+		participants = {
+			soloAsFactionTable = true,
+			sortPlayersInTable = true,
+		},
 	},
 }

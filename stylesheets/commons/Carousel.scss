@@ -2,10 +2,7 @@
 	position: relative;
 
 	--carousel-face-width: 3rem;
-
-	.theme--light & {
-		--carousel-fade-color-default: var( --clr-background, #ffffff );
-	}
+	--carousel-fade-color-default: var( --clr-background, #ffffff );
 
 	.theme--dark & {
 		--carousel-fade-color-default: var( --clr-background, #121212 );
@@ -19,16 +16,18 @@
 		display: flex;
 		overflow-x: auto;
 		scroll-snap-type: x mandatory;
-		-webkit-overflow-scrolling: touch;
+		scroll-behavior: smooth;
 		scrollbar-width: none;
 
-		&::-webkit-scrollbar {
-			display: none;
+		@supports not ( scrollbar-width: none ) {
+			&::-webkit-scrollbar {
+				display: none;
+			}
 		}
 	}
 
 	&-item {
-		flex: 0 0 auto;
+		flex: none;
 		scroll-snap-align: start;
 		scroll-margin-left: var( --carousel-face-width );
 

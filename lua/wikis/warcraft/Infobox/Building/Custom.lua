@@ -44,7 +44,7 @@ local ADDITIONAL_BUILDING_RACES = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomBuilding.run(frame)
 	local building = CustomBuilding(frame)
 	building:setWidgetInjector(CustomInjector(building))
@@ -113,8 +113,8 @@ function CustomBuilding:addCustomCells(widgets)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then

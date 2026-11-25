@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
@@ -28,12 +27,12 @@ local Infobox = Lua.requireIfExists('Module:Infobox/Team/Custom')
 local MatchTable = Lua.import('Module:MatchTable/Custom')
 local ResultsTable = Lua.import('Module:ResultsTable/Custom')
 local SquadAuto = Lua.import('Module:SquadAuto') -- to be replaced by #5523
-local SquadCustom = Lua.import('Module:Squad/Custom')
-local SquadUtils = Lua.import('Module:Squad/Utils')
+local SquadCustom = Lua.import('Module:Features/Squad/Custom')
+local SquadTypes = Lua.import('Module:Features/Squad/Types')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Condition = Lua.import('Module:Condition')
@@ -44,53 +43,63 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
----@class EmptyTeamPagePreview: Widget
----@operator call(table): EmptyTeamPagePreview
-local EmptyTeamPagePreview = Class.new(Widget)
+---@class EmptyTeamPagePreviewProps
+---@field pageName string
+---@field rosterFromLastPlacement boolean?
+---@field doNotIncludePlayerEarnings boolean?
+---@field wiki string?
+---@field game string?
+---@field getLatestGame boolean?
 
----@return Widget?
-function EmptyTeamPagePreview:render()
+local Helpers = {}
+
+---@param props EmptyTeamPagePreviewProps
+---@return VNode?
+local EmptyTeamPagePreview = function(props)
 	if not Namespace.isMain() or not Infobox then
 		return
 	end
 
-	self.team = TeamTemplate.getPageName(self.props.pageName or mw.title.getCurrentTitle().prefixedText)
+	local team = TeamTemplate.getPageName(props.pageName)
 
-	if not self.team then return end
+	if not team then return end
 
-	self.teams = TeamTemplate.queryHistoricalNames(self.team)
+	local teams = TeamTemplate.queryHistoricalNames(team)
 
-	local rosterFromLastPlacement = Logic.readBool(self.props.rosterFromLastPlacement)
+	local rosterFromLastPlacement = Logic.readBool(props.rosterFromLastPlacement)
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		children = WidgetUtil.collect(
-			HtmlWidgets.H2{children = {'Overview'}},
-			self:_infobox(),
-			rosterFromLastPlacement and self:_rosterFromLastPlacement() or self:_rosterFromTransfers(),
-			self:_matches(),
-			self:_results(),
-			HtmlWidgets.H2{children = {'References'}}
+			Html.H2{children = {'Overview'}},
+			Helpers._infobox(props, team, teams),
+			rosterFromLastPlacement and Helpers._rosterFromLastPlacement(teams, team) or Helpers._rosterFromTransfers(team),
+			Helpers._matches(team),
+			Helpers._results(team),
+			Html.H2{children = {'References'}}
 		),
 	}
 end
 
 ---@private
----@return Widget
-function EmptyTeamPagePreview:_infobox()
-	local data = self:_getNationalitiesAndCoachesFromLastPlacement()
+---@param props EmptyTeamPagePreviewProps
+---@param team string
+---@param teams string[]
+---@return Renderable
+function Helpers._infobox(props, team, teams)
+	local data = Helpers._getNationalitiesAndCoachesFromLastPlacement(teams)
 
 	local coaches
 	if Logic.isNotEmpty(data.coaches) then
-		coaches = HtmlWidgets.Fragment{
+		coaches = Html.Fragment{
 			children = Array.interleave(Array.map(data.coaches, function(coach)
-				return HtmlWidgets.Fragment{
+				return Html.Fragment{
 					children = {
 						Flags.Icon{flag = coach.flag},
 						'&nbsp;',
 						Link{link = coach.pageName, children = {coach.displayName}},
 					}
 				}
-			end), HtmlWidgets.Br{})
+			end), Html.Br{})
 		}
 	end
 
@@ -119,14 +128,14 @@ function EmptyTeamPagePreview:_infobox()
 	end
 	location = location or 'World'
 
-	local games = self:_fetchGamesFromPlacements()
+	local games = Helpers._fetchGamesFromPlacements(teams)
 
 	local args = {
 		location = location or 'World',
-		doNotIncludePlayerEarnings = Logic.readBool(self.props.doNotIncludePlayerEarnings),
-		name = TeamTemplate.getRaw(self.team).name,
+		doNotIncludePlayerEarnings = Logic.readBool(props.doNotIncludePlayerEarnings),
+		name = TeamTemplate.getRaw(team).name,
 		coaches = coaches,
-		region = self:_determineRegionFromPlacements() or rosterRegion,
+		region = Helpers._determineRegionFromPlacements(teams) or rosterRegion,
 	}
 	-- some wikis (e.g. cs, val) will need this
 	Array.forEach(games, function(game)
@@ -139,10 +148,10 @@ function EmptyTeamPagePreview:_infobox()
 	return Infobox.run(args)
 end
 
----@param props table
+---@param props EmptyTeamPagePreviewProps
 ---@param games string[]
 ---@return string?
-function EmptyTeamPagePreview._getWiki(props, games)
+function Helpers._getWiki(props, games)
 	if Logic.isNotEmpty(props.wiki) then
 		return props.wiki
 	end
@@ -161,24 +170,26 @@ function EmptyTeamPagePreview._getWiki(props, games)
 end
 
 ---@private
+---@param teams string[]
 ---@return string[]
-function EmptyTeamPagePreview:_fetchGamesFromPlacements()
-	local placements = self:_fetchPlacements{
+function Helpers._fetchGamesFromPlacements(teams)
+	local placements = Helpers._fetchPlacements(teams, {
 		query = 'game',
 		groupBy = 'game asc',
 		additionalConditions = ConditionTree(BooleanOperator.all):add{
 			ConditionNode(ColumnName('placement'), Comparator.neq, ''),
 			ConditionUtil.noneOf(ColumnName('game'), Game.unlistedGames()),
 		}
-	}
+	})
 
 	return Array.map(placements, Operator.property('game'))
 end
 
 ---@private
+---@param teams string[]
 ---@param options {query: string?, groupBy: string?, additionalConditions: ConditionTree?, limit: integer?}?
 ---@return placement[]
-function EmptyTeamPagePreview:_fetchPlacements(options)
+function Helpers._fetchPlacements(teams, options)
 	options = options or {}
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
@@ -187,7 +198,7 @@ function EmptyTeamPagePreview:_fetchPlacements(options)
 		ConditionNode(ColumnName('opponentplayers'), Comparator.neq, '[]'),
 		ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
 		ConditionNode(ColumnName('liquipediatier'), Comparator.neq, -1),
-		ConditionUtil.anyOf(ColumnName('opponenttemplate'), self.teams)
+		ConditionUtil.anyOf(ColumnName('opponenttemplate'), teams)
 	}
 
 	return mw.ext.LiquipediaDB.lpdb('placement', {
@@ -200,11 +211,10 @@ function EmptyTeamPagePreview:_fetchPlacements(options)
 end
 
 ---@private
+---@param teams string[]
 ---@return string?
-function EmptyTeamPagePreview:_determineRegionFromPlacements()
-	local placements = self:_fetchPlacements{
-		query = 'parent'
-	}
+function Helpers._determineRegionFromPlacements(teams)
+	local placements = Helpers._fetchPlacements(teams, {query = 'parent'})
 
 	local regions = Array.map(placements, function(placement)
 		local tournament = Tournament.getTournament(placement.parent) or {}
@@ -216,30 +226,31 @@ function EmptyTeamPagePreview:_determineRegionFromPlacements()
 end
 
 ---@private
----@return Widget[]
-function EmptyTeamPagePreview:_rosterFromTransfers()
+---@param team string
+---@return Renderable[]
+function Helpers._rosterFromTransfers(team)
 	return WidgetUtil.collect(
-		HtmlWidgets.H3{children = 'Roster'},
-		HtmlWidgets.H4{children = 'Active'},
+		Html.H3{children = 'Roster'},
+		Html.H4{children = 'Active'},
 		SquadAuto.active{
-			team = self.team,
+			team = team,
 			roles = 'None,Loan,Substitute,Trial,Stand-in,Uncontracted', -- copied from commons template
 			type = 'Player_active',
 		},
-		HtmlWidgets.H4{children = 'Inactive'},
+		Html.H4{children = 'Inactive'},
 		SquadAuto.inactive{
-			team = self.team,
+			team = team,
 			type = 'Player_inactive',
 		},
-		HtmlWidgets.H4{children = 'Former'},
+		Html.H4{children = 'Former'},
 		SquadAuto.former{
-			team = self.team,
+			team = team,
 			roles = 'None,Loan,Substitute,Inactive,Trial,Stand-in,Uncontracted', -- copied from commons template
 			type = 'Player_former',
 		},
-		HtmlWidgets.H3{children = 'Active Organization'},
+		Html.H3{children = 'Active Organization'},
 		SquadAuto.active{
-			team = self.team,
+			team = team,
 			not_roles = 'None,Loan,Substitute,Inactive,Trial,Stand-in,Uncontracted', -- copied from commons template
 			type = 'Organization_active',
 			title = 'Organization',
@@ -249,26 +260,28 @@ function EmptyTeamPagePreview:_rosterFromTransfers()
 end
 
 ---@private
----@return Widget[]
-function EmptyTeamPagePreview:_matches()
+---@param team string
+---@return Renderable[]
+function Helpers._matches(team)
 	return {
-		HtmlWidgets.H3{children = 'Most Recent Matches'},
+		Html.H3{children = 'Most Recent Matches'},
 		MatchTable.results{
 			tableMode = 'team',
 			showType = true,
-			team = self.team,
+			team = team,
 			limit = 10,
 		}
 	}
 end
 
 ---@private
----@return Widget[]
-function EmptyTeamPagePreview:_results()
+---@param team string
+---@return Renderable[]
+function Helpers._results(team)
 	return {
-		HtmlWidgets.H3{children = 'Achievements'},
+		Html.H3{children = 'Achievements'},
 		ResultsTable.results{
-			team = self.team,
+			team = team,
 			showType = true,
 			gameIcons = true,
 			awards = false,
@@ -280,9 +293,10 @@ function EmptyTeamPagePreview:_results()
 end
 
 ---@private
+---@param teams string[]
 ---@return {coaches: {flag: string?, displayName: string, pageName: string}[], nationalities: table<string, integer>}
-function EmptyTeamPagePreview:_getNationalitiesAndCoachesFromLastPlacement()
-	local data = self:_getPlayersAndCoachesFromLastPlacement()
+function Helpers._getNationalitiesAndCoachesFromLastPlacement(teams)
+	local data = Helpers._getPlayersAndCoachesFromLastPlacement(teams)
 	local nationalities = {}
 
 	Array.forEach(data.players, function(player)
@@ -295,10 +309,11 @@ function EmptyTeamPagePreview:_getNationalitiesAndCoachesFromLastPlacement()
 end
 
 ---@private
+---@param teams string[]
 ---@return {coaches: {flag: string?, displayName: string, pageName: string, name: string?}[],
 ---players: {flag: string?, displayName: string, pageName: string, name: string?}[], startDate: string?}
-function EmptyTeamPagePreview:_getPlayersAndCoachesFromLastPlacement()
-	local latestResult = self:_fetchPlacements{limit = 1}[1]
+function Helpers._getPlayersAndCoachesFromLastPlacement(teams)
+	local latestResult = Helpers._fetchPlacements(teams, {limit = 1})[1]
 	if not latestResult then return {coaches = {}, players = {}} end
 
 	local parsePerson = function (prefix)
@@ -340,11 +355,13 @@ function EmptyTeamPagePreview:_getPlayersAndCoachesFromLastPlacement()
 end
 
 ---@private
----@return Widget[]
-function EmptyTeamPagePreview:_rosterFromLastPlacement()
-	local data = self:_getPlayersAndCoachesFromLastPlacement()
+---@param teams string[]
+---@param team string
+---@return Renderable[]
+function Helpers._rosterFromLastPlacement(teams, team)
+	local data = Helpers._getPlayersAndCoachesFromLastPlacement(teams)
 
-	local backFillPerson = FnUtil.curry(FnUtil.curry(EmptyTeamPagePreview._backFillForSquad, self), data.startDate)
+	local backFillPerson = FnUtil.curry(FnUtil.curry(FnUtil.curry(Helpers._backFillForSquad, teams), team), data.startDate)
 
 	local players = Array.map(data.players, backFillPerson)
 	local coaches = Array.map(data.coaches, backFillPerson)
@@ -363,27 +380,27 @@ function EmptyTeamPagePreview:_rosterFromLastPlacement()
 	local hasCoaches = Logic.isNotEmpty(activeCoaches)
 
 	return WidgetUtil.collect(
-		HtmlWidgets.H3{children = 'Most Recent Roster'},
-		hasFormer and HtmlWidgets.H4{children = 'Active'} or nil,
-		SquadCustom.runAuto(activePlayers, SquadUtils.SquadStatus.ACTIVE, SquadUtils.SquadType.PLAYER),
+		Html.H3{children = 'Most Recent Roster'},
+		hasFormer and Html.H4{children = 'Active'} or nil,
+		SquadCustom.runAuto(activePlayers, SquadTypes.SquadStatus.ACTIVE, SquadTypes.SquadType.PLAYER),
 		hasFormer and {
-			HtmlWidgets.H4{children = 'Former'},
-			SquadCustom.runAuto(formerPlayers, SquadUtils.SquadStatus.FORMER, SquadUtils.SquadType.PLAYER),
+			Html.H4{children = 'Former'},
+			SquadCustom.runAuto(formerPlayers, SquadTypes.SquadStatus.FORMER, SquadTypes.SquadType.PLAYER),
 		} or nil,
 		hasCoaches and {
-			HtmlWidgets.H3{children = 'Active Organization'},
-			SquadCustom.runAuto(activeCoaches, SquadUtils.SquadStatus.ACTIVE, SquadUtils.SquadType.STAFF),
+			Html.H3{children = 'Active Organization'},
+			SquadCustom.runAuto(activeCoaches, SquadTypes.SquadStatus.ACTIVE, SquadTypes.SquadType.STAFF),
 		} or nil
 	)
 end
 
 ---@private
+---@param teams string[]
+---@param team string
 ---@param startDate string?
 ---@param personData {flag: string?, displayName: string, pageName: string, name: string?}
 ---@return table?
-function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
-	local teams = self.teams
-
+function Helpers._backFillForSquad(teams, team, startDate, personData)
 	local pageName = personData.pageName
 	if not pageName then
 		return
@@ -442,7 +459,7 @@ function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
 		id = personData.displayName,
 		page = personData.pageName,
 		thisTeam = {
-			team = self.team,
+			team = team,
 			role = joinData.role2,
 		},
 		newTeam = {team = leaveData.toteam},
@@ -457,4 +474,4 @@ function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
 	}
 end
 
-return EmptyTeamPagePreview
+return Component.component(EmptyTeamPagePreview, {pageName = mw.title.getCurrentTitle().prefixedText})

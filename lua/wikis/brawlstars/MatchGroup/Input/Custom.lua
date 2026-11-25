@@ -42,6 +42,24 @@ MatchFunctions.DATE_FALLBACKS = {
 
 local CustomMatchGroupInput = {}
 
+---@param obj table #match or game
+---@param numberOfOpponents integer
+---@return table
+local getBans = function(obj, numberOfOpponents)
+	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, BrawlerNames)
+
+	local bans = {}
+	for opponentIndex = 1, numberOfOpponents do
+		bans['team' .. opponentIndex] = {}
+		for _, ban in Table.iter.pairsByPrefix(obj, 't' .. opponentIndex .. 'b') do
+			ban = getCharacterName(ban)
+			table.insert(bans['team' .. opponentIndex], ban)
+		end
+	end
+
+	return bans
+end
+
 ---@param match table
 ---@param options table?
 ---@return table
@@ -86,6 +104,7 @@ function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
+		globalbans = getBans(match, #opponents),
 	}
 end
 
@@ -106,23 +125,22 @@ end
 ---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
+	---@type table<string, any>
 	local extradata = {
 		bestof = map.bestof,
 		maptype = map.maptype,
-		firstpick = FIRST_PICK_CONVERSION[string.lower(map.firstpick or '')]
+		firstpick = FIRST_PICK_CONVERSION[string.lower(map.firstpick or '')],
 	}
 
-	local bans = {}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, BrawlerNames)
 	for opponentIndex = 1, #opponents do
-		bans['team' .. opponentIndex] = {}
-		for _, ban in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
-			ban = getCharacterName(ban)
-			table.insert(bans['team' .. opponentIndex], ban)
+		for _, ban, idx in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
+			extradata['team' .. opponentIndex .. 'ban' .. idx] = getCharacterName(ban)
+		end
+		for _, pick, idx in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'c') do
+			extradata['team' .. opponentIndex .. 'brawler' .. idx] = getCharacterName(pick)
 		end
 	end
-
-	extradata.bans = bans
 
 	return extradata
 end

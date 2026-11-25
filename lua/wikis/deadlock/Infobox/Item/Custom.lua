@@ -14,12 +14,12 @@ local Namespace = Lua.import('Module:Namespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Item = Lua.import('Module:Infobox/Item')
 
 local AutoInlineIcon = Lua.import('Module:AutoInlineIcon')
 
-local Widgets = Lua.import('Module:Infobox/Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -31,7 +31,7 @@ local CustomInjector = Class.new(Injector)
 local DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION = '_positiveConcatedArgsForBase'
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomItem.run(frame)
 	local item = CustomItem(frame)
 	item.args.image = item.args.image or ('Deadlock_gameasset_Item ' .. item.args.name .. '.png')
@@ -43,8 +43,8 @@ function CustomItem.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args

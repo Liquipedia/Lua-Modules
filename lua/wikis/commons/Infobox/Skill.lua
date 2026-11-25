@@ -29,13 +29,13 @@ local Customizable = Widgets.Customizable
 local Skill = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Skill.run(frame)
 	local skill = Skill(frame)
 	return skill:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Skill:createInfobox()
 	local args = self.args
 

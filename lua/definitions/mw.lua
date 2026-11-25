@@ -92,10 +92,10 @@ end
 
 ---This is equivalent to a call to frame:callParserFunction() with function name '#tag:' .. name and with content prepended to args.
 ---@param name string
----@param content string
----@param args table|string
+---@param content string?
+---@param args table|string?
 ---@return string
----@overload fun(self, params: {name: string, content: string, args: table|string}): string
+---@overload fun(self: Frame, params: {name: string, content: string, args: table|string}): string
 function mw.frame:extensionTag(name, content, args) end
 
 ---Called on the frame created by {{#invoke:}}, returns the frame for the page that called {{#invoke:}}. Called on that frame, returns nil.
@@ -159,7 +159,7 @@ mw.html = {}
 function mw.html.create(tagName, args) end
 
 ---Appends a child mw.html (builder) node to the current mw.html instance. If a nil parameter is passed, this is a no-op. A (builder) node is a string representation of an html element.
----@param builder? Html|string|number|Widget
+---@param builder? Renderable
 ---@return self
 function mw.html:node(builder) end
 
@@ -183,7 +183,7 @@ function mw.html:tag(tagName, args) end
 ---@param name string
 ---@param value string|number|nil
 ---@return self
----@overload fun(self, param: {[string]: string})
+---@overload fun(self, param: {[string]: string|number|nil})
 function mw.html:attr(name, value) end
 
 ---Get the value of a html attribute previously set using html:attr() with the given name.
@@ -349,6 +349,8 @@ function mw.language:formatDate(format, timestamp, localTime)
 		end
 		return time
 	end
+	-- Known issue: on Windows, os.date returns nil for timestamps before 1970-01-01, so any date before that
+	-- (e.g. DateExt.defaultDate) errors here when running the tests locally on Windows. CI runs on Linux.
 	local function localTimezoneOffset(ts)
 		local utcDt = os.date("!*t", ts)
 		local localDt = os.date("*t", ts)
@@ -369,100 +371,118 @@ function mw.language:formatDate(format, timestamp, localTime)
 		return { year = year, month = month or 1, day = day or 1, hour = hour or 0, min = minute, sec = second }
 	end
 
-	if format == 'U' then
-		if not timestamp then
-			return tostring(os.time(os.date("!*t") --[[@as osdateparam]]))
-		end
-		if type(timestamp) ~= 'string' then
-			return tostring(os.time(timestamp))
-		end
-		local tzHour, tzMinutes = timestamp:match('([%-%+]%d?%d):(%d%d)$')
-		local offset = 0
-		if tzHour then
-			offset = tonumber(tzHour) * 3600 + tonumber(tzMinutes) * 60
-		end
+	local MONTH_NAMES = {'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+		'October', 'November', 'December'}
+	local DAY_NAMES = {'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'}
 
-		local year, month, day, hour, minute, second = parseDateString(timestamp)
-		if not year then
-			return ''
+	-- Parses dates led by a month name, e.g. `Jun 1, 2024 - 12:00` or `June 1 12:00` (year defaults to the current one)
+	local function parseMonthNameDateString(timeString)
+		local monthName, day, rest = timeString:match('^%s*(%a+)%.?%s+(%d%d?),?(.*)$')
+		if not monthName then
+			return
 		end
-
-		local timestampBeforeOffset = ostimeWrapper(makeOsdateParam(year, month, day, hour, minute, second))
-		local ts = timestampBeforeOffset - offset
-
-		return tostring(ts + localTimezoneOffset(ts))
-	elseif format == 'c' then
-		local outFormat = '%Y-%m-%dT%H:%M:%S'
-		if not timestamp then
-			return os.date(outFormat) --[[@as string]]
-		end
-		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
-			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
-		end
-		if type(timestamp) == 'string' then
-			local year, month, day, hour, minute, second = parseDateString(timestamp)
-			if not year then
-				return ''
+		local month
+		for index, name in ipairs(MONTH_NAMES) do
+			if name:sub(1, 3):lower() == monthName:sub(1, 3):lower() then
+				month = index
 			end
-			return os.date(outFormat, ostimeWrapper(makeOsdateParam(year, month, day, hour, minute, second))) --[[@as string]]
 		end
-		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
-	elseif format == 'Y' then
-		local outFormat = '%Y'
-		if not timestamp then
-			return os.date(outFormat) --[[@as string]]
+		if not month then
+			return
 		end
-		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
-			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
-		end
-		if type(timestamp) == 'string' then
-			local year = parseDateString(timestamp)
-			return year or ''
-		end
-		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
-	elseif format == 'n' then
-		local outFormat = '%m'
-		if not timestamp then
-			return os.date(outFormat) --[[@as string]]
-		end
-		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
-			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
-		end
-		if type(timestamp) == 'string' then
-			local _, month = parseDateString(timestamp)
-			return month or ''
-		end
-		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
-	elseif format == 'd' then
-		local outFormat = '%d'
-		if not timestamp then
-			return os.date(outFormat) --[[@as string]]
-		end
-		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
-			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
-		end
-		if type(timestamp) == 'string' then
-			local _, _, day = parseDateString(timestamp)
-			return day or ''
-		end
-		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
-	elseif format == 'Y-m-d' then
-		if not timestamp then
-			return os.date('!%Y-%m-%d') --[[@as string]]
-		end
-		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
-			local seconds = tonumber(string.sub(timestamp, 2))
-			if not seconds then return '' end
-			return os.date('!%Y-%m-%d', seconds) --[[@as string]]
-		end
-		if type(timestamp) == 'string' then
-			local year, month, day = parseDateString(timestamp)
-			if not year then return '' end
-			return year .. '-' .. month .. '-' .. day
-		end
-		return os.date('!%Y-%m-%d', ostimeWrapper(timestamp)) --[[@as string]]
+		rest = rest:gsub('[%-%+]%d?%d:%d%d%s*$', '')
+		local year = rest:match('^%s*(%d%d%d%d)') or os.date('!%Y')
+		local hour, minute = rest:match('(%d%d?):(%d%d)')
+		return year, month, day, hour, minute, nil
 	end
-	return ''
+
+	-- Converts the timestamp argument to seconds since epoch, reading dates without an offset as UTC
+	local function toUtcSeconds(input)
+		if not input then
+			return os.time()
+		elseif type(input) ~= 'string' then
+			-- os.time reads date tables as local time, shift them so they are read as UTC instead
+			local ts = ostimeWrapper(input)
+			return ts + localTimezoneOffset(ts)
+		elseif string.sub(input, 1, 1) == '@' then
+			return tonumber(string.sub(input, 2))
+		end
+		local year, month, day, hour, minute, second = parseDateString(input)
+		if not year then
+			year, month, day, hour, minute, second = parseMonthNameDateString(input)
+		end
+		if not year then
+			return
+		end
+		local offset = 0
+		local tzSign, tzHour, tzMinutes = input:match('([%-%+])(%d?%d):(%d%d)$')
+		if tzSign then
+			offset = (tzSign == '-' and -1 or 1) * (tonumber(tzHour) * 3600 + tonumber(tzMinutes) * 60)
+		end
+		local ts = ostimeWrapper(makeOsdateParam(year, month, day, hour, minute, second))
+		return ts + localTimezoneOffset(ts) - offset
+	end
+
+	-- Subset of the PHP date format characters, see https://www.php.net/manual/en/datetime.format.php
+	local FORMAT_CHARACTERS = {
+		d = function(dt) return string.format('%02d', dt.day) end,
+		j = function(dt) return tostring(dt.day) end,
+		D = function(dt) return DAY_NAMES[dt.wday]:sub(1, 3) end,
+		l = function(dt) return DAY_NAMES[dt.wday] end,
+		m = function(dt) return string.format('%02d', dt.month) end,
+		n = function(dt) return tostring(dt.month) end,
+		M = function(dt) return MONTH_NAMES[dt.month]:sub(1, 3) end,
+		F = function(dt) return MONTH_NAMES[dt.month] end,
+		Y = function(dt) return tostring(dt.year) end,
+		y = function(dt) return string.format('%02d', dt.year % 100) end,
+		H = function(dt) return string.format('%02d', dt.hour) end,
+		G = function(dt) return tostring(dt.hour) end,
+		h = function(dt) return string.format('%02d', (dt.hour - 1) % 12 + 1) end,
+		g = function(dt) return tostring((dt.hour - 1) % 12 + 1) end,
+		i = function(dt) return string.format('%02d', dt.min) end,
+		s = function(dt) return string.format('%02d', dt.sec) end,
+		a = function(dt) return dt.hour < 12 and 'am' or 'pm' end,
+		A = function(dt) return dt.hour < 12 and 'AM' or 'PM' end,
+		-- output is always in UTC
+		P = function() return '+00:00' end,
+		c = function(dt)
+			return string.format('%04d-%02d-%02dT%02d:%02d:%02d+00:00', dt.year, dt.month, dt.day, dt.hour, dt.min, dt.sec)
+		end,
+	}
+
+	local function formatUtc(formatString, seconds)
+		local dt = os.date('!*t', seconds)
+		local parts = {}
+		local index = 1
+		while index <= #formatString do
+			local char = formatString:sub(index, index)
+			if char == '\\' then
+				index = index + 1
+				table.insert(parts, formatString:sub(index, index))
+			elseif char == '"' then
+				local closing = formatString:find('"', index + 1, true) or (#formatString + 1)
+				table.insert(parts, formatString:sub(index + 1, closing - 1))
+				index = closing
+			elseif FORMAT_CHARACTERS[char] then
+				table.insert(parts, FORMAT_CHARACTERS[char](dt))
+			else
+				table.insert(parts, char)
+			end
+			index = index + 1
+		end
+		return table.concat(parts)
+	end
+
+	if format == 'U' then
+		local seconds = toUtcSeconds(timestamp)
+		return seconds and tostring(seconds) or ''
+	end
+
+	local seconds = toUtcSeconds(timestamp)
+	if not seconds then
+		return ''
+	end
+	return formatUtc(format, seconds)
 end
 
 ---Breaks a duration in seconds into more human-readable units, e.g. 12345 to 3 hours, 25 minutes and 45 seconds, returning the result as a string.
@@ -737,8 +757,27 @@ function mw.text.tag(name, attrs, content) end
 ---@param charset string?
 ---@return string
 function mw.text.trim(s, charset)
-	-- TODO: UTF8 support in fake
-	return string.match(s, '^()%s*$') and '' or string.match(s, '^%s*(.*%S)')
+	if not charset then
+		return string.match(s, '^()%s*$') and '' or string.match(s, '^%s*(.*%S)')
+	end
+	-- Only literal characters in the charset, no ranges or classes
+	local utf8Character = '.[\128-\191]*'
+	local trimmed = {}
+	for character in string.gmatch(charset, utf8Character) do
+		trimmed[character] = true
+	end
+	local characters = {}
+	for character in string.gmatch(s, utf8Character) do
+		table.insert(characters, character)
+	end
+	local first, last = 1, #characters
+	while first <= last and trimmed[characters[first]] do
+		first = first + 1
+	end
+	while last >= first and trimmed[characters[last]] do
+		last = last - 1
+	end
+	return table.concat(characters, '', first, last)
 end
 
 ---Truncates text to the specified length in code points, adding ellipsis if truncation was performed. If length is positive, the end of the string will be truncated; if negative, the beginning will be removed
@@ -991,7 +1030,27 @@ function mw.ustring.gsub(s, pattern, repl, n) end
 ---Returns true if the string is valid UTF-8, false if not.
 ---@param s string|number
 ---@return boolean
-function mw.ustring.isutf8(s) end
+function mw.ustring.isutf8(s)
+	s = tostring(s)
+	local index = 1
+	while index <= #s do
+		local byte = string.byte(s, index)
+		local length = byte < 0x80 and 1 or byte >= 0xC2 and byte <= 0xDF and 2
+			or byte >= 0xE0 and byte <= 0xEF and 3 or byte >= 0xF0 and byte <= 0xF4 and 4
+		if not length then
+			return false
+		end
+		-- Overlong sequences and surrogates are not rejected
+		for continuation = index + 1, index + length - 1 do
+			local continuationByte = string.byte(s, continuation)
+			if not continuationByte or continuationByte < 0x80 or continuationByte > 0xBF then
+				return false
+			end
+		end
+		index = index + length
+	end
+	return true
+end
 
 ---Returns the length of the string in codepoints, or nil if the string is not valid UTF-8.
 ---@see string.len
@@ -1080,7 +1139,23 @@ function mw.uri.new(str) end
 ---@param query string|table?
 ---@return URI
 function mw.uri.localUrl(page, query)
-	return ''
+	return setmetatable(
+		{
+			path = page,
+			query = query,
+		},
+		{
+			__index = mw.uri,
+			__tostring = function (t)
+				if not t.query then
+					return t.path
+				end
+				return t.path .. '?' .. (
+					type(t.query) == 'string' and t.query or mw.uri.buildQueryString(t.query)
+				)
+			end
+		}
+	)
 end
 
 ---Returns a URI object for the full URL for a page, with optional query string/table
@@ -1088,7 +1163,25 @@ end
 ---@param query string|table?
 ---@return URI
 function mw.uri.fullUrl(page, query)
-	return 'https://liquipedia.net/'
+	return setmetatable(
+		{
+			protocol = 'https',
+			host = 'liquipedia.net',
+			path = page,
+			query = query,
+		},
+		{
+			__index = mw.uri,
+			__tostring = function (t)
+				if not t.query then
+					return mw.site.server .. t.path
+				end
+				return mw.site.server .. t.path .. '?' .. (
+					type(t.query) == 'string' and t.query or mw.uri.buildQueryString(t.query)
+				)
+			end
+		}
+	)
 end
 
 ---@alias UriEncodeType 'QUERY'|'PATH'|'WIKI'
@@ -1108,7 +1201,38 @@ function mw.uri.decode(str, enctype) end
 ---Encodes a table as a URI query string.
 ---@param query table<string, string|number|any[]|false>
 ---@return string
-function mw.uri.buildQueryString(query) end
+function mw.uri.buildQueryString(query)
+	---@param str string|number|boolean
+	---@return string
+	local function encode(str)
+		if type(str) ~= 'string' then
+			return tostring(str)
+		end
+		return (str:gsub('([^%w_.~-])', function (character)
+			if character == ' ' then
+				return '+'
+			end
+			return string.format('%%%02X', string.byte(character))
+		end))
+	end
+
+	local ret = {}
+
+	for k, v in pairs(query) do
+		if type(v) ~= 'table' then
+			v = {v}
+		end
+		for _, queryArg in ipairs(v) do
+			local argRet = {encode(k)}
+			if queryArg then
+				table.insert(argRet, encode(queryArg))
+			end
+			table.insert(ret, table.concat(argRet, '='))
+		end
+	end
+
+	return table.concat(ret, '&')
+end
 
 ---Decodes the query string `s` to a table. Optional arguments `i` and `j` may be used to specify
 ---the substring of `s` to be parsed.
@@ -1142,7 +1266,7 @@ mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
 mw.ext.Dota2Ranking = {}
 
 ---@alias Dota2RankingEntry {external_id: string, name: string, rating: number, rank: integer}
----@alias Dota2RankingRecord {date: string, provisional: boolean,  entries: Dota2RankingEntry[]}
+---@alias Dota2RankingRecord {date: string, provisional: boolean, entries: Dota2RankingEntry[]}
 ---@return Dota2RankingRecord[]
 function mw.ext.Dota2Ranking.get() end
 
@@ -1439,7 +1563,7 @@ mw.ext.valorantdb = {}
 ---@field round_results valorantMatchApiRound[]
 
 ---@param matchId string
----@return valorantMatchData
+---@return valorantMatchData|{error: string}
 function mw.ext.valorantdb.getMatchDetails(matchId) end
 
 return mw

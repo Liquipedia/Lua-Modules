@@ -15,6 +15,7 @@ local inGameRoles = {
 	['flex'] = {category = 'Flex', display = 'Flex', sortOrder = 6},
 }
 
+inGameRoles['jg'] = inGameRoles.jungler
 inGameRoles['jgl'] = inGameRoles.jungler
 inGameRoles['jungle'] = inGameRoles.jungler
 inGameRoles['roam'] = inGameRoles.roamer

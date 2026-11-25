@@ -22,17 +22,17 @@ local CustomCosmetic = Class.new(Lore)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomCosmetic.run(frame)
 	local lore = CustomCosmetic(frame)
 	lore:setWidgetInjector(CustomInjector(lore))
 
-	return mw.html.create():node(lore:createInfobox())
+	return lore:createInfobox()
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
@@ -79,6 +79,7 @@ end
 function CustomCosmetic:getWikiCategories(args)
 	local categoryLookup = {
 		artifact = 'Lore artifacts',
+		comic = 'Comics',
 		character = 'Characters',
 		event = 'Lore events',
 		faction = 'Factions',

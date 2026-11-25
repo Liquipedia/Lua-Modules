@@ -20,7 +20,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Cosmetic = Lua.import('Module:Infobox/Cosmetic')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Builder = Widgets.Builder
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -32,30 +32,32 @@ local SpecialCategories = {
 	['Mastery'] = 'Mastery',
 	['Kinetic'] = 'Kinetic',
 	['Essence'] = 'Essence',
-	['Immortal Treasure I'] = 'Immortal Treasure',
-	['Trust of the Benefactor 20'] = 'Trust of the Benefactor',
-	['Treasure of the Crimson Witness 20'] = 'Crimson Witness',
+	['Immortal Treasure'] = 'Immortal Treasure',
+	['Trust of the Benefactor'] = 'Trust of the Benefactor',
 	['Baby Roshan'] = 'Baby Roshan',
+	['Baby R\'shan'] = 'Baby Roshan',
+	['Effigy Block'] = 'Effigy Block',
 }
 
 ---@class Dota2CosmeticInfobox: CosmeticInfobox
+---@operator call(Frame): Dota2CosmeticInfobox
 local CustomCosmetic = Class.new(Cosmetic)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomCosmetic.run(frame)
 	local cosmetic = CustomCosmetic(frame)
 	cosmetic:setWidgetInjector(CustomInjector(cosmetic))
 	cosmetic.args.subHeader = cosmetic.args.prefab
 	cosmetic.args.imageText = 'ID: ' .. (cosmetic.args.defindex or 'N/A')
 
-	return HtmlWidgets.Fragment{children = {cosmetic:createInfobox(), cosmetic:_createIntroText()}}
+	return Html.Fragment{children = {cosmetic:createInfobox(), cosmetic:_createIntroText()}}
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
@@ -64,7 +66,7 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets,
 			Cell{
 				options = {columns = args.hero and 3 or 10, suppressColon = true},
-				name = args.hero and Template.expandTemplate(mw.getCurrentFrame(), 'Hero entry', {args.hero}) or ' ',
+				name = args.hero and Template.expandTemplate(mw.getCurrentFrame(), 'Hero entry', {args.hero, 'x'}) or ' ',
 				children = {
 					'<b>Rarity:</b> ' .. Template.safeExpand(mw.getCurrentFrame(), 'Raritylink', {args.rarity}),
 					args.slot and ('<b>Slot:</b> ' .. slotText) or nil,
@@ -243,7 +245,7 @@ end
 
 function CustomCosmetic._getLpdbCategory(name)
 	for key, value in pairs(SpecialCategories) do
-		if string.find(key, name) then
+		if string.find(name, key) then
 			return value
 		end
 	end

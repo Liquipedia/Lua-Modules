@@ -16,18 +16,23 @@ local Character = Lua.import('Module:Infobox/Character')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
 
 ---@class MarvelRivalsHeroInfobox: CharacterInfobox
+---@operator call(Frame): MarvelRivalsHeroInfobox
 local CustomHero = Class.new(Character)
+
+---@class MarvelRivalsHeroInfoboxWidgetInjector: WidgetInjector
+---@operator call(MarvelRivalsHeroInfobox): MarvelRivalsHeroInfoboxWidgetInjector
+---@field caller MarvelRivalsHeroInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param roleType 'Duelist'|'Strategist'|'Vanguard'
 ---@param displayName 'Duelist'|'Strategist'|'Vanguard'
----@return Widget
+---@return VNode
 local function createRoleDisplayWidget(roleType, displayName)
-	return HtmlWidgets.Fragment{
+	return Html.Fragment{
 		children = {
 			IconImageWidget{
 				imageLight = 'Marvel Rivals gameasset icon ' .. roleType .. ' lightmode.png',
@@ -53,7 +58,7 @@ local ROLE_LOOKUP = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomHero.run(frame)
 	local character = CustomHero(frame)
 	character:setWidgetInjector(CustomInjector(character))
@@ -64,15 +69,15 @@ function CustomHero.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'role' then
 		return {
 			Cell{
 				name = 'Role',
-				children = self.caller:_getRole(args.role) or DEFAULT_ROLE
+				children = self.caller:_getRole(args.role) or {DEFAULT_ROLE}
 			}
 		}
 	elseif id == 'custom' then
@@ -93,7 +98,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param roleInput string?
----@return (string|Widget)[]?
+---@return VNode[]?
 function CustomHero:_getRole(roleInput)
 	if type(roleInput) ~= 'string' then
 		return nil

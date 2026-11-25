@@ -12,8 +12,8 @@ local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Headlines = Lua.import('Module:Widget/MainPage/Headlines')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
@@ -57,9 +57,8 @@ local CONTENT = {
 		}
 	},
 	matches = {
-		heading = 'Matches',
+		noPanel = true,
 		body = MatchTicker{},
-		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {
@@ -137,71 +136,59 @@ return {
 	},
 	layouts = {
 		main = {
+			{ -- Top
+				size = 12,
+				children = {
+					{
+						mobileOrder = 3,
+						noPanel = true,
+						content = CONTENT.filterButtons,
+					},
+					{
+						mobileOrder = 4,
+						noPanel = true,
+						content = CONTENT.matches,
+					},
+				},
+			},
 			{ -- Left
-				sizes = {xxl = 5, xxxl = 6},
+				sizes = {xxl = 6, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 2,
 						content = CONTENT.specialEvents,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 6,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 8,
 						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 7,
+						mobileOrder = 9,
 						content = CONTENT.wantToHelp,
 					},
 				}
 			},
 			{ -- Right
-				sizes = {xxl = 7, xxxl = 6},
+				sizes = {xxl = 6, xxxl = 6},
 				children = {
 					{
-						mobileOrder = 3,
-						children = {
-							{
-								children = {
-									{
-										noPanel = true,
-										content = CONTENT.filterButtons,
-									},
-								},
-							},
-							{
-								size = 6,
-								children = {
-									{
-										noPanel = true,
-										content = CONTENT.matches,
-									},
-								},
-							},
-							{
-								size = 6,
-								children = {
-									{
-										noPanel = true,
-										content = CONTENT.tournaments,
-									},
-								},
-							},
-						},
+						mobileOrder = 5,
+						content = CONTENT.tournaments,
 					},
 				},
 			},
 			{
 				children = {
 					{
-						mobileOrder = 5,
+						mobileOrder = 7,
 						content = CONTENT.headlines,
 					},
 					{
-						mobileOrder = 8,
+						mobileOrder = 10,
 						content = CONTENT.theGame,
 					},
 				},

@@ -42,8 +42,8 @@ function CustomTeam.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
@@ -69,7 +69,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return Widget?
+---@return Renderable?
 function CustomTeam:createBottomContent()
 	if not self.args.disbanded then
 		return UpcomingTournaments.team{

@@ -12,10 +12,11 @@ local Class = Lua.import('Module:Class')
 local Character = Lua.import('Module:Infobox/Character')
 
 ---@class CustomCharacterInfobox: CharacterInfobox
+---@operator call(Frame): CustomCharacterInfobox
 local CustomCharacter = Class.new(Character)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomCharacter.run(frame)
 	return CustomCharacter(frame):createInfobox()
 end

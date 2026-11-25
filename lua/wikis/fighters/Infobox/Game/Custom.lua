@@ -26,7 +26,7 @@ local CustomGame = Class.new(Game)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomGame.run(frame)
 	local game = CustomGame(frame)
 	game:setWidgetInjector(CustomInjector(game))
@@ -35,8 +35,8 @@ function CustomGame.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then

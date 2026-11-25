@@ -33,7 +33,7 @@ local CustomInjector = Class.new(Injector)
 local CustomSeries = Class.new(Series)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomSeries.run(frame)
 	local series = CustomSeries(frame)
 	series:setWidgetInjector(CustomInjector(series))
@@ -47,8 +47,8 @@ function CustomSeries.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 

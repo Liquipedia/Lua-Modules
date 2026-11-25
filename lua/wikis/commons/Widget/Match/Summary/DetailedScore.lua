@@ -8,19 +8,20 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 
----@class MatchSummaryDetailedScore: Widget
----@operator call(table): MatchSummaryDetailedScore
-local MatchSummaryDetailedScore = Class.new(Widget)
+---@class MatchSummaryDetailedScoreProps
+---@field partialScores {style: string?, icon: Renderable?, score: Renderable?}[]
+---@field flipped boolean?
+---@field score Renderable?
 
----@return Widget
-function MatchSummaryDetailedScore:render()
-	local flipped = self.props.flipped
-	local partialScores = Array.map(self.props.partialScores or {}, function(partialScore)
+---@param props MatchSummaryDetailedScoreProps
+---@return VNode
+local function MatchSummaryDetailedScore(props)
+	local flipped = props.flipped
+	local partialScores = Array.map(props.partialScores or {}, function(partialScore)
 		local children = {partialScore.score or '', partialScore.icon}
 
 		local styles = Array.extend(
@@ -29,23 +30,23 @@ function MatchSummaryDetailedScore:render()
 			partialScore.icon and 'brkts-popup-body-detailed-score-icon' or nil
 		)
 
-		return HtmlWidgets.Span{
+		return Html.Span{
 			classes = styles,
 			children = children,
 		}
 	end)
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = {
 			'brkts-popup-body-detailed-scores-container',
 			flipped and 'flipped' or nil,
 		},
 		children = {
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'brkts-popup-body-detailed-scores-main-score'},
-				children = self.props.score
+				children = props.score
 			},
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'brkts-popup-body-detailed-scores'},
 				children = partialScores
 			}
@@ -53,4 +54,4 @@ function MatchSummaryDetailedScore:render()
 	}
 end
 
-return MatchSummaryDetailedScore
+return Component.component(MatchSummaryDetailedScore)

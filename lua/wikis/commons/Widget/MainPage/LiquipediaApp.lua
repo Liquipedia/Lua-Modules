@@ -8,14 +8,13 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -26,34 +25,30 @@ local GREEN_CHECK_CIRCLE = IconFa{
 	size = 'lg',
 }
 
----@class LiquipediaApp: Widget
----@operator call(table): LiquipediaApp
-local LiquipediaApp = Class.new(Widget)
-
----@param icon string|Html|Widget
----@param entries (string|Html|Widget|nil|(string|Html|Widget|nil)[])[][]
+---@param icon Renderable
+---@param entries (Renderable|Renderable[])[]
 ---@param listCss table<string, string?>?
----@return Widget
+---@return VNode
 local function buildFontAwesomeList(icon, entries, listCss)
-	return HtmlWidgets.Ul{
+	return Html.Ul{
 		classes = {'fa-ul'},
 		css = listCss,
 		children = Array.map(entries, function (entry)
-			return HtmlWidgets.Li{
+			return Html.Li{
 				children = WidgetUtil.collect(
-					HtmlWidgets.Span{
+					Html.Span{
 						classes = {'fa-li'},
 						children = icon
 					},
-					unpack(entry)
+					entry
 				)
 			}
 		end)
 	}
 end
 
----@return Widget[]
-function LiquipediaApp:render()
+---@return VNode[]
+local function LiquipediaApp()
 	return {
 		Div{
 			css = {
@@ -79,13 +74,13 @@ function LiquipediaApp:render()
 							' players and teams!'
 						},
 						{'Get notifications and never miss a match again.'},
-						{
+						WidgetUtil.collect(
 							'Available in ',
 							Array.interleave(Array.map({'ru', 'br', 'fr', 'es', 'cn', 'de', 'jp'}, function (country)
 								return Flags.Icon{shouldLink = false, flag = country}
 							end), ' '),
 							' and 12 more languages!'
-						},
+						),
 						{'Spoiler-free version.'},
 					},
 					{
@@ -120,4 +115,4 @@ function LiquipediaApp:render()
 	}
 end
 
-return LiquipediaApp
+return Component.component(LiquipediaApp)

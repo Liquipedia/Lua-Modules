@@ -7,55 +7,69 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local Sublist = Lua.import('Module:Widget/Tournaments/Ticker/Sublist')
 local TickerData = Lua.import('Module:TournamentsTicker/Data')
 
----@class TournamentsTickerWidget: Widget
----@operator call(table): TournamentsTickerWidget
-local TournamentsTickerWidget = Class.new(Widget)
-TournamentsTickerWidget.defaultProps = {
+---@class TournamentsTickerWidgetProps: TournamentsTickerDataProps
+---@field displayGameIcons boolean?
+---@field filterGroupPrefix string? has to match the `filterGroupPrefix` of the filter buttons controlling this ticker
+
+local defaultProps = {
 	upcomingDays = 5,
 	completedDays = 5,
 }
 
----@return Widget
-function TournamentsTickerWidget:render()
-	local data = TickerData.get(self.props)
-	local displayGameIcons = Logic.readBool(self.props.displayGameIcons)
+---@param props TournamentsTickerWidgetProps
+---@return VNode
+local function TournamentsTickerWidget(props)
+	local data = TickerData.get(props)
+	local displayGameIcons = Logic.readBool(props.displayGameIcons)
 
-	local fallbackElement = HtmlWidgets.Div{
+	---@param title string
+	---@param tournaments StandardTournament[]
+	---@return VNode
+	local function buildSublist(title, tournaments)
+		return Sublist{
+			title = title,
+			tournaments = tournaments,
+			displayGameIcons = displayGameIcons,
+			filterGroupPrefix = props.filterGroupPrefix,
+		}
+	end
+
+	local fallbackElement = Html.Div{
 		attributes = {
 			['data-filter-hideable-group-fallback'] = '',
 		},
 		children = {
-			HtmlWidgets.Center{
+			Html.Div{
 				css = {
 					['margin'] = '1.5rem 0',
 					['font-style'] = 'italic',
+					['text-align'] = 'center',
 				},
 				children = I18n.translate('tournament-ticker-no-tournaments'),
 			}
 		}
 	}
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		children = {
-			HtmlWidgets.Div{
+			Html.Div{
 				classes = {'tournaments-list'},
 				attributes = {
 					['data-filter-hideable-group'] = '',
 					['data-filter-effect'] = 'fade',
 				},
 				children = {
-					Sublist{title = 'Upcoming', tournaments = data.upcoming, displayGameIcons = displayGameIcons},
-					Sublist{title = 'Ongoing', tournaments = data.ongoing, displayGameIcons = displayGameIcons},
-					Sublist{title = 'Completed', tournaments = data.completed, displayGameIcons = displayGameIcons},
+					buildSublist('Upcoming', data.upcoming),
+					buildSublist('Ongoing', data.ongoing),
+					buildSublist('Completed', data.completed),
 					fallbackElement
 				}
 			}
@@ -63,4 +77,4 @@ function TournamentsTickerWidget:render()
 	}
 end
 
-return TournamentsTickerWidget
+return Component.component(TournamentsTickerWidget, defaultProps)

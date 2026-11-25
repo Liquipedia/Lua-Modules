@@ -143,8 +143,8 @@ local PREFIXES = {
 		player = 'https://faceitdb.com/profile/faceit/',
 	},
 	fanclub = {''},
-	['fastcup-csgo'] = {'https://csgo.fastcup.net/tournaments/'},
-	['fastcup-cs2'] = {'https://cs2.fastcup.net/tournaments/'},
+	['csgo-fastcup'] = {'https://csgo.fastcup.net/tournaments/'},
+	['cs2-fastcup'] = {'https://cs2.fastcup.net/tournaments/'},
 	fide = {
 		'https://ratings.fide.com/tournament_information.phtml?event=',
 		player = 'https://ratings.fide.com/profile/',
@@ -153,6 +153,11 @@ local PREFIXES = {
 		'https://fpschallenge.eu/tournament/',
 		player = 'https://fpschallenge.eu/user/',
 		team = 'https://fpschallenge.eu/team/',
+	},
+	fragnet = {
+		'https://arena.fragnet.net/en/tournament/',
+		player = 'https://arena.fragnet.net/en/profile/',
+		team = 'https://arena.fragnet.net/en/team/',
 	},
 	geoguessr = {'https://www.geoguessr.com/'},
 	gol = {match = 'https://gol.gg/game/stats/'},
@@ -310,7 +315,7 @@ local PREFIXES = {
 		team = 'https://stratz.com/teams/'
 	},
 	stream = {''},
-	telegram = {'https://t.me/'},
+	telegram = {'https://telegram.me/'},
 	tespa = {match = 'https://web.archive.org/web/compete.tespa.org/tournament/'},
 	tetrio = {
 		'',
@@ -352,6 +357,7 @@ local PREFIXES = {
 	twitter = {'https://twitter.com/'},
 	vidio = {'https://www.vidio.com/@'},
 	vk = {'https://www.vk.com/'},
+	['vk-video'] = {'https:// live.vkvideo.ru/'},
 	vlr = {
 		'https://www.vlr.gg/event/',
 		team = 'https://www.vlr.gg/team/',
@@ -360,11 +366,15 @@ local PREFIXES = {
 	},
 	vod = {''},
 	weibo = {'https://weibo.com/'},
+	wotidam  = {'https://worldoftanks.com/community/accounts/'},
+	wotidasia = {'https://worldoftanks.asia/en/community/accounts/'},
+	wotidcn = {'https://wotgame.cn/community/accounts/'},
+	wotideu = {'https://worldoftanks.eu/community/accounts/'},
+	wotidru = {'https://tanki.su/ru/community/accounts/'},
 	wl = {match = 'https://www.winstonslab.com/matches/match.php?id='},
 	yandexefir = {'https://yandex.ru/efir?stream_channel='},
 	youtube = {'https://www.youtube.com/'},
 	zhangyutv = {'http://www.zhangyu.tv/'},
-	zhanqitv = {'https://www.zhanqi.tv/'},
 }
 
 PREFIXES = Table.merge(PREFIXES, CustomData.prefixes or {})
@@ -379,7 +389,7 @@ local SUFFIXES = {
 	},
 	['faceit-c'] = {'/'},
 	['faceit-hub'] = {'/'},
-	gol = {match = '/page-game/'},
+	gol = {match = '/page-summary/'},
 	iccup = {'.html'},
 	lazermplink = {match = '/events'},
 	metafy = {'?utm_source=liquipedia&campaign=infoblock'},
@@ -404,7 +414,6 @@ local ALIASES = {
 	rules = {'rulebook'},
 	['start-gg'] = {'startgg', 'smashgg'},
 	yandexefir = {'yandex'},
-	zhanqitv = {'zhanqi'},
 }
 
 local ICON_KEYS_TO_RENAME = {
@@ -418,8 +427,8 @@ local ICON_KEYS_TO_RENAME = {
 	['faceit-hub'] = 'faceit',
 	['faceit-org'] = 'faceit',
 	['faceitdb'] = 'faceit',
-	['fastcup-csgo'] = 'fastcup',
-	['fastcup-cs2'] = 'fastcup',
+	['csgo-fastcup'] = 'fastcup',
+	['cs2-fastcup'] = 'fastcup',
 	matcherinolink = 'matcherino',
 	playlist = 'music',
 	privsteam = 'steam',
@@ -429,6 +438,10 @@ local ICON_KEYS_TO_RENAME = {
 	tlpdkr = 'tlpd-wol-korea',
 	tlpdsospa = 'tlpd-sospa',
 	douyin_page = 'douyin',
+	wotidam = 'wotid',
+	wotidasia = 'wotid',
+	wotideu = 'wotid',
+	wotidcn = 'wotid',
 }
 
 local MATCH_ICONS = {
@@ -519,6 +532,10 @@ local MATCH_ICONS = {
 		text = 'Match page on Halo Data Hive'
 	},
 	headtohead = {
+		icon = 'Match Info Stats.png',
+		text = 'Head-to-head statistics'
+	},
+	headtohead_lh = {
 		icon = 'Match Info Stats.png',
 		text = 'Head-to-head statistics'
 	},

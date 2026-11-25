@@ -7,30 +7,26 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local MatchSummaryBreak = Lua.import('Module:Widget/Match/Summary/Break')
 
----@class MatchSummaryGameComment: Widget
----@operator call(table): MatchSummaryGameComment
-local MatchSummaryGameComment = Class.new(Widget)
-
----@return Widget?
-function MatchSummaryGameComment:render()
-	if Logic.isEmpty(self.props.children) then
+---@param props {classes: string[]?, children: Renderable|Renderable[]?}
+---@return VNode[]?
+local function MatchSummaryGameComment(props)
+	if Logic.isEmpty(props.children) then
 		return nil
 	end
-	return HtmlWidgets.Fragment{children = {
+	return {
 		MatchSummaryBreak{},
-		HtmlWidgets.Div{
+		Html.Div{
 			css = {margin = 'auto', ['max-width'] = '100%'},
-			classes = self.props.classes,
-			children = self.props.children
+			classes = props.classes,
+			children = props.children
 		},
-	}}
+	}
 end
 
-return MatchSummaryGameComment
+return Component.component(MatchSummaryGameComment)

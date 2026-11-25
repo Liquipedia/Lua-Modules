@@ -28,13 +28,13 @@ local Customizable = Widgets.Customizable
 local Weapon = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Weapon.run(frame)
 	local weapon = Weapon(frame)
 	return weapon:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Weapon:createInfobox()
 	local args = self.args
 

@@ -18,7 +18,7 @@ local Builder = Widgets.Builder
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 local WEAPON_STYLES = {
@@ -42,11 +42,12 @@ WEAPON_STYLES[7] = WEAPON_STYLES['custom paint job']
 WEAPON_STYLES[8] = WEAPON_STYLES['patina']
 
 ---@class CounterstrikeCosmeticInfobox: CosmeticInfobox
+---@operator call(Frame): CounterstrikeCosmeticInfobox
 local CustomCosmetic = Class.new(Cosmetic)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomCosmetic.run(frame)
 	local cosmetic = CustomCosmetic(frame)
 	local args = cosmetic.args
@@ -64,8 +65,8 @@ function CustomCosmetic.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
@@ -100,7 +101,7 @@ function CustomInjector:parse(id, widgets)
 					return {Cell{name = 'Souvenir?', children = {'None'}}}
 				end
 				if string.lower(souvenir) == 'yes' or string.lower(souvenir) == 'all' then
-					return {Cell{name = 'Souvenir?', children =  {'Yes, all'}}}
+					return {Cell{name = 'Souvenir?', children = {'Yes, all'}}}
 				elseif string.lower(souvenir) == 'some' then
 					return {Cell{name = 'Souvenir?', children = {'Yes, some'}}}
 				end
@@ -122,7 +123,7 @@ function CustomCosmetic:_buyNow()
 	return Link{
 		linktype = 'external',
 		link = link,
-		children = {HtmlWidgets.Span{
+		children = {Html.Span{
 			classes = {'buynow_button', 'buynow_market'},
 			children = {'Buy Now on Market'},
 		}},

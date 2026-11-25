@@ -18,7 +18,7 @@ local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
----@class ChessInfoboxPlayer: Person
+---@class ChessInfoboxPlayer: InfoboxPerson
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -34,7 +34,7 @@ local TITLES = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -57,8 +57,8 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
@@ -74,7 +74,7 @@ function CustomInjector:parse(id, widgets)
 				Array.map(
 					titles,
 					function (title)
-						return Cell{name = title.name, content = {args['title_' .. title.code]}}
+						return Cell{name = title.name, children = {args['title_' .. title.code]}}
 					end
 				)
 			)

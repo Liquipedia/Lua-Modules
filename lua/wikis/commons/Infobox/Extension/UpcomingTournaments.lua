@@ -27,7 +27,7 @@ local UpcomingTournamentsWidget = Lua.import('Module:Widget/Infobox/UpcomingTour
 local UpcomingTournaments = {}
 
 ---@param args {name: string|string[]?, additionalConditions: AbstractConditionNode?}
----@return Widget?
+---@return VNode?
 function UpcomingTournaments.team(args)
 	args = args or {}
 	local name = args.name
@@ -47,7 +47,7 @@ function UpcomingTournaments.team(args)
 end
 
 ---@param args {name: string, prefix: string?}
----@return Widget?
+---@return VNode?
 function UpcomingTournaments.player(args)
 	if Logic.isEmpty(args.name) then
 		return
@@ -60,7 +60,7 @@ function UpcomingTournaments.player(args)
 		function (playerIndex)
 			return ConditionUtil.anyOf(
 				ColumnName(prefix .. playerIndex, 'opponentplayers'),
-				{args.name, args.name:gsub(' ', '_')}
+				{args.name, (args.name:gsub(' ', '_'))}
 			)
 		end
 	))

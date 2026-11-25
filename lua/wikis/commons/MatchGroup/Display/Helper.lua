@@ -12,11 +12,14 @@ local Date = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
 local I18n = Lua.import('Module:I18n')
+local Image = Lua.import('Module:Image')
+local Links = Lua.import('Module:Links')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Info = Lua.import('Module:Info', {loadData = true})
@@ -24,10 +27,12 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local DisplayHelper = {}
+local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {loadData = true})
 local NONBREAKING_SPACE = '&nbsp;'
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local ReferenceTag = Lua.import('Module:Widget/ReferenceTag')
 
 ---@param node Html
 ---@param opponent standardOpponent
@@ -39,6 +44,23 @@ function DisplayHelper.addOpponentHighlight(node, opponent)
 	return node
 		:addClass('brkts-opponent-hover')
 		:attr('aria-label', Opponent.toName(opponent))
+end
+
+---@generic T: HtmlNodeProps
+---@param props T
+---@param opponent standardOpponent?
+---@return T
+function DisplayHelper.addOpponentHighlightToProps(props, opponent)
+	if not opponent or Opponent.isTbd(opponent) then
+		return props
+	end
+	props.classes = props.classes or {}
+	table.insert(props.classes, 'brkts-opponent-hover')
+
+	props.attributes = props.attributes or {}
+	props.attributes['aria-label'] = Opponent.toName(opponent)
+
+	return props
 end
 
 -- Expands a header code by making a RPC call.
@@ -98,6 +120,7 @@ function DisplayHelper.createSubstitutesComment(match)
 		if Logic.isEmpty(substitutions) then
 			return
 		end
+		---@cast substitutions MatchGroupInputSubstituteInformation[]
 
 		Array.forEach(substitutions, function(substitution)
 			if Logic.isEmpty(substitution.substitute) then
@@ -131,11 +154,33 @@ function DisplayHelper.createSubstitutesComment(match)
 				table.insert(subString, string.format('due to %s', substitution.reason))
 			end
 
-			table.insert(comment, table.concat(subString, ' ') .. '.')
+			table.insert(
+				comment,
+				table.concat(subString, ' ') .. '.' .. DisplayHelper._createSubstituteReferences(substitution.references)
+			)
 		end)
 	end)
 
 	return comment
+end
+
+---@private
+---@param references table[]?
+---@return string
+function DisplayHelper._createSubstituteReferences(references)
+	if Logic.isEmpty(references) then
+		return ''
+	end
+	---@cast references -nil
+	local frame = mw.getCurrentFrame()
+	return tostring(Html.Fragment{children = Array.map(references, function (reference)
+		local refName = Table.extract(reference, 'name')
+		return ReferenceTag{
+			frame = frame,
+			children = Template.safeExpand(frame, 'Cite web', reference),
+			name = String.nilIfEmpty(refName)
+		}
+	end)})
 end
 
 ---Creates display components for caster(s).
@@ -152,7 +197,7 @@ function DisplayHelper.createCastersDisplay(casters)
 			return casterLink
 		end
 
-		return HtmlWidgets.Fragment{children = {
+		return Html.Fragment{children = {
 			Flags.Icon{flag = caster.flag},
 			NONBREAKING_SPACE,
 			casterLink,
@@ -235,6 +280,67 @@ function DisplayHelper.MapScore(opponent, gameStatus)
 	return opponent.score and tostring(opponent.score) or ''
 end
 
+---@param link string
+---@param icon string
+---@param iconDark string?
+---@param text string
+---@param class string?
+---@return string?
+function DisplayHelper.makeLinkDisplay(link, icon, iconDark, text, class)
+	return Image.display(icon, iconDark, {
+		link = link, size = '32px', caption = text, alt = link, class = class
+	})
+end
+
+---@param links table<string, string|table>
+---@return Renderable[]
+function DisplayHelper.makeLinksDisplay(links)
+	local linkDisplays = {}
+
+	local makeAndSaveLink = function(link, icon, iconDark, text, class)
+		local display = DisplayHelper.makeLinkDisplay(link, icon, iconDark, text, class)
+		table.insert(linkDisplays, display)
+	end
+
+	local processLink = function(linkType, link)
+		local currentLinkData = Links.getMatchIconData(linkType)
+		if not currentLinkData then
+			mw.log('Unknown link: ' .. linkType)
+		elseif type(link) == 'table' then
+			for gameIdx, gameLink in Table.iter.spairs(link) do
+				local newText = currentLinkData.text .. ' on Game ' .. gameIdx
+				makeAndSaveLink(gameLink, currentLinkData.icon, currentLinkData.iconDark, newText)
+			end
+		else
+			-- Temporary during MW/LH Migrations
+			local class
+			if linkType == 'headtohead_lh' then
+				class = 'hide-when-mediawiki'
+			elseif linkType == 'headtohead' then
+				class = 'hide-when-lighthouse'
+			end
+			makeAndSaveLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text, class)
+		end
+	end
+
+	local processedLinks = {}
+	Array.forEach(MATCH_LINK_PRIORITY, function(linkType)
+		for linkKey, link in Table.iter.pairsByPrefix(links, linkType, {requireIndex = false}) do
+			processLink(linkKey, link)
+			processedLinks[linkKey] = true
+		end
+	end)
+
+	for linkKey, link in Table.iter.spairs(links) do
+		-- Handle links not already processed via priority list
+		if not processedLinks[linkKey] then
+			processLink(linkKey, link)
+		end
+	end
+
+	return linkDisplays
+end
+
 --[[
 Display component showing the detailed summary of a match. The component will
 appear as a popup from the Matchlist and Bracket components. This is a
@@ -246,7 +352,7 @@ in a different props.MatchSummaryContainer in the Bracket and Matchlist
 components.
 ]]
 ---@param props table
----@return Widget
+---@return Renderable
 function DisplayHelper.DefaultMatchSummaryContainer(props)
 	local MatchSummaryModule = Lua.import('Module:MatchSummary')
 
@@ -256,7 +362,7 @@ function DisplayHelper.DefaultMatchSummaryContainer(props)
 end
 
 ---@param props table
----@return Widget
+---@return Renderable
 function DisplayHelper.DefaultFfaMatchSummaryContainer(props)
 	local MatchSummaryModule = Lua.import('Module:MatchSummary/Ffa')
 
@@ -266,7 +372,7 @@ function DisplayHelper.DefaultFfaMatchSummaryContainer(props)
 end
 
 ---@param props table
----@return Html
+---@return Renderable
 function DisplayHelper.DefaultGameSummaryContainer(props)
 	local GameSummaryModule = Lua.import('Module:GameSummary')
 
@@ -279,7 +385,7 @@ function DisplayHelper.DefaultGameSummaryContainer(props)
 end
 
 ---@param props table
----@return Html
+---@return Renderable
 function DisplayHelper.DefaultMatchPageContainer(props)
 	local MatchPageModule = Lua.import('Module:MatchPage')
 
@@ -309,5 +415,29 @@ DisplayHelper.getGlobalConfig = FnUtil.memoize(function()
 	end
 	return config
 end)
+
+---Merges a grand finals match with results of its bracket reset match.
+---@param match table
+---@param bracketResetMatch table
+---@return table
+function DisplayHelper.mergeBracketResetMatch(match, bracketResetMatch)
+	local mergedMatch = Table.merge(match, {
+		opponents = {},
+		games = Table.copy(match.games),
+	})
+
+	for ix, opponent in ipairs(match.opponents) do
+		local resetOpponent = bracketResetMatch.opponents[ix]
+		mergedMatch.opponents[ix] = Table.merge(opponent, {
+			score2 = resetOpponent.score,
+			status2 = resetOpponent.status,
+			placement2 = resetOpponent.placement,
+		})
+	end
+
+	Array.extendWith(mergedMatch.games, bracketResetMatch.games)
+
+	return mergedMatch
+end
 
 return DisplayHelper

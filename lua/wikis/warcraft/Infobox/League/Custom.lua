@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local Game = Lua.import('Module:Game')
@@ -29,11 +28,13 @@ local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
-local Widgets = Lua.import('Module:Widget/All')
+local CountdownWidget = Lua.import('Module:Widget/Countdown')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
+local NoWrap = Widgets.NoWrap
 
 ---@class WarcraftLeagueInfobox: InfoboxLeague
 ---@operator call(Frame): WarcraftLeagueInfobox
@@ -82,7 +83,7 @@ local ESL_TIERS = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -247,8 +248,8 @@ function CustomLeague:_isFinished(args)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -334,9 +335,9 @@ function CustomLeague._displayParticipantNumber(number)
 	return number
 end
 
----@return string
+---@return VNode
 function CustomLeague:_displayStartDateTime()
-	return Countdown.create{
+	return CountdownWidget{
 		date = self.data.startTime.raw,
 		finished = self.data.isFinished,
 		rawdatetime = DateExt.getCurrentTimestamp() > DateExt.readTimestamp(self.data.startTime.raw),
@@ -344,16 +345,14 @@ function CustomLeague:_displayStartDateTime()
 end
 
 ---@param maps {link: string, displayname: string}[]
----@return string[]
+---@return Renderable[]
 function CustomLeague:_mapsDisplay(maps)
-	return {table.concat(
+	return Array.interleave(
 		Array.map(maps, function(mapData)
-			return tostring(self:_createNoWrappingSpan(
-				Page.makeInternalLink({}, mapData.displayname, mapData.link)
-			))
+			return NoWrap{children = Page.makeInternalLink({}, mapData.displayname, mapData.link)}
 		end),
 		'&nbsp;• '
-	)}
+	)
 end
 
 ---@return string?
@@ -418,14 +417,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.patch2 = args.patch2
 
 	return lpdbData
-end
-
----@param content string|Html|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	return mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
 end
 
 ---@param args table

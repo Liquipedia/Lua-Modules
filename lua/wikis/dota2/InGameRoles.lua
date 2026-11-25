@@ -11,7 +11,6 @@ local inGameRoles = {
 	['mid'] = {category = 'Solo middle players', display = 'Solo Middle'},
 	['offlane'] = {category = 'Offlaners', display = 'Offlaner'},
 	['support'] = {category = 'Support players', display = 'Support'},
-	['captain'] = {category = 'Captains', display = 'Captain'},
 }
 
 inGameRoles['solo middle'] = inGameRoles.mid

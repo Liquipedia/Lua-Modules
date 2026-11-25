@@ -34,11 +34,12 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		'{{Match',
 		index == 1 and (INDENT .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
 		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
-		Logic.readBool(args.hasDate) and {INDENT .. '|date=', INDENT .. '|twitch='} or {},
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Logic.readBool(args.hasDate) and INDENT .. '|date=' or nil,
+		Logic.readBool(args.hasTwitch) and INDENT .. '|twitch=' or nil,
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
-		Array.map(Array.range(1, bestof), function(mapIndex)
+		Array.mapRange(1, bestof, function(mapIndex)
 			return WikiCopyPaste._getMapCode(mapIndex, bans, kda)
 		end),
 		'}}'

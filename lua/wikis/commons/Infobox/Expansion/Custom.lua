@@ -12,10 +12,11 @@ local Class = Lua.import('Module:Class')
 local Expansion = Lua.import('Module:Infobox/Expansion')
 
 ---@class CustomExpansionInfobox: ExpansionInfobox
+---@operator call(Frame): CustomExpansionInfobox
 local CustomExpansion = Class.new(Expansion)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomExpansion.run(frame)
 	local customExpansion = CustomExpansion(frame)
 	return customExpansion:createInfobox()

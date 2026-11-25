@@ -8,45 +8,47 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local Widget = Lua.import('Module:Widget')
-local Label = Lua.import('Module:Widget/Basic/Label')
+local Component = Lua.import('Module:Widget/Component')
 local MatchOverview = Lua.import('Module:Widget/Standings/MatchOverview')
+local StandingsCells = Lua.import('Module:Widget/Standings/Cells')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local StandingsDisplayUtil = Lua.import('Module:Standings/DisplayUtil')
 
----@class StandingsSwissWidgetProps
----@field standings StandingsModel
+local Helpers = {}
 
----@class StandingsSwissWidget: Widget
----@operator call(StandingsSwissWidgetProps): StandingsSwissWidget
----@field props StandingsSwissWidgetProps
-local StandingsSwissWidget = Class.new(Widget)
-
----@return Widget?
-function StandingsSwissWidget:render()
-	if not self.props.standings then
+---@param props {standings?: StandingsModel, width: number?, collapseAfter: integer?}
+---@return Renderable?
+local function StandingsSwiss(props)
+	local standings = props.standings
+	if not standings then
 		return
 	end
 
-	local standings = self.props.standings
 	local lastRound = standings.rounds[#standings.rounds]
+	local statsToShow = StandingsDisplayUtil.statsToShow(standings)
+	local boldStatTitle = StandingsDisplayUtil.boldStatTitle(standings)
+	local collapse = StandingsDisplayUtil.collapseProps({lastRound}, props.collapseAfter)
 
 	return TableWidgets.Table{
 		classes = {'standings-swiss'},
+		collapseAfter = collapse.collapseAfter,
+		expandText = collapse.expandText,
+		collapseText = collapse.collapseText,
+		css = {width = props.width and (props.width .. 'px') or nil},
 		title = Logic.nilIfEmpty(standings.title),
-		columns = self:_buildColumnDefinitions(),
+		columns = Helpers.buildColumnDefinitions(standings, statsToShow),
 		children = WidgetUtil.collect(
 			-- Column Header
-			self:_headerRow(),
+			Helpers.headerRow(standings, statsToShow),
 			-- Rows
 			TableWidgets.TableBody{children = Array.map(lastRound.opponents, function(slot)
-				return self:_createRow(slot)
+				return Helpers.createRow(standings, slot, statsToShow, boldStatTitle)
 			end)}
 		),
 		striped = false
@@ -54,108 +56,90 @@ function StandingsSwissWidget:render()
 end
 
 ---@private
----@return table[]
-function StandingsSwissWidget:_buildColumnDefinitions()
-	local standings = self.props.standings
+---@param standings StandingsModel
+---@param statsToShow StandingsAdditionalStat[]
+---@return Table2ColumnDef[]
+function Helpers.buildColumnDefinitions(standings, statsToShow)
 	return WidgetUtil.collect(
 		{align = 'left'},
-		{align = 'left'},
-		Array.map(standings.tiebreakers, function(tiebreaker)
-			if not tiebreaker.title then
-				return
-			end
-			return {align = 'center'}
-		end),
+		StandingsCells.participantColumn(),
+		StandingsCells.statColumns(statsToShow),
 		Array.rep({align = 'center'}, #standings.rounds)
 	)
 end
 
 ---@private
----@return Widget
-function StandingsSwissWidget:_headerRow()
-	local standings = self.props.standings
-
-	---@param text string?
-	---@return Widget
-	local makeHeaderCell = function(text)
-		return TableWidgets.CellHeader{children = text}
-	end
-
+---@param standings StandingsModel
+---@param statsToShow StandingsAdditionalStat[]
+---@return Renderable
+function Helpers.headerRow(standings, statsToShow)
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
-			makeHeaderCell('#'),
-			makeHeaderCell('Participant'),
-			Array.map(standings.tiebreakers, function(tiebreaker)
-				if not tiebreaker.title then
-					return
-				end
-				return makeHeaderCell(tiebreaker.title)
-			end),
+			StandingsCells.header('#'),
+			StandingsCells.header('Participant'),
+			StandingsCells.statHeaders(statsToShow),
 			Array.map(standings.rounds, function(round)
-				return makeHeaderCell(round.title)
+				return StandingsCells.header(round.title)
 			end)
 		)}
 	}}
 end
 
+---@param props {match: MatchGroupUtilMatch, opponentIndex: integer}
+---@return standardOpponent?
+function Helpers.getOpposingOpponent(props)
+	local match = props.match
+	local opponentIndex = tonumber(props.opponentIndex)
+	if not match or not opponentIndex or #match.opponents ~= 2 then
+		return
+	end
+
+	local opponent = match.opponents[opponentIndex]
+	if not opponent then
+		return
+	end
+
+	return Array.find(match.opponents, function(matchOpponent) return matchOpponent ~= opponent end)
+end
+
 ---@private
+---@param standings StandingsModel
 ---@param slot StandingsEntryModel
----@return Widget
-function StandingsSwissWidget:_createRow(slot)
-	local standings = self.props.standings
+---@param statsToShow StandingsAdditionalStat[]
+---@param boldStatTitle string?
+---@return Renderable
+function Helpers.createRow(standings, slot, statsToShow, boldStatTitle)
 	return TableWidgets.Row{
 		attributes = {['data-position-status'] = slot.positionStatus},
 		children = WidgetUtil.collect(
-			TableWidgets.Cell{
-				children = Label{
-					children = slot.placement,
-					attributes = {['data-placement-type'] = Logic.nilIfEmpty(slot.definitiveStatus)},
-					labelScheme = 'placement',
-				},
-			},
-			TableWidgets.Cell{
-				children = OpponentDisplay.BlockOpponent{
-					opponent = slot.opponent,
-					overflow = 'ellipsis',
-					teamStyle = 'hybrid',
-					showPlayerTeam = true,
-				}
-			},
-			Array.map(standings.tiebreakers, function(tiebreaker, tiebreakerIndex)
-				if not tiebreaker.title then
-					return
-				end
-				return TableWidgets.Cell{
-					css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil},
-					children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
-				}
-			end),
+			StandingsCells.placement(slot),
+			StandingsCells.participant(slot),
+			StandingsCells.stats(slot, statsToShow, boldStatTitle),
 			Array.map(standings.rounds, function(columnRound)
 				local entry = Array.find(columnRound.opponents, function(columnSlot)
 					return Opponent.same(columnSlot.opponent, slot.opponent)
 				end)
-				if not entry then
-					return TableWidgets.Cell{}
-				end
-				local match = entry.match
-				if not match then
-					return TableWidgets.Cell{}
+				if not entry or not entry.match or not entry.matchOpponentIndex then
+					return TableWidgets.Cell{classes = {'standings-swiss-match'}}
 				end
 
-				local opposingOpponentIndex = Array.indexOf(match.opponents, function(opponent)
-					return not Opponent.same(entry.opponent, opponent)
-				end)
-				if not entry.match.opponents[opposingOpponentIndex] then
-					return TableWidgets.Cell{}
-				end
+				local opposingOpponent = Helpers.getOpposingOpponent{
+					match = entry.match,
+					opponentIndex = entry.matchOpponentIndex,
+				}
 
-				return TableWidgets.Cell{children = MatchOverview{
-					match = match,
-					showOpponent = opposingOpponentIndex,
-				}}
+				return TableWidgets.Cell(
+					DisplayHelper.addOpponentHighlightToProps({
+						classes = {'standings-swiss-match'},
+						children = MatchOverview{
+							match = entry.match,
+							opponentIndex = entry.matchOpponentIndex,
+						},
+					}, opposingOpponent)
+				)
 			end)
 		),
 	}
 end
 
-return StandingsSwissWidget
+return Component.component(StandingsSwiss)

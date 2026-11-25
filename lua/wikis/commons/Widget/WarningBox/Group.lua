@@ -8,20 +8,15 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local WarningBox = Lua.import('Module:Widget/WarningBox')
 
----@class WarningBoxGroupWidget: Widget
----@operator call(table): WarningBoxGroupWidget
----@field props {data: (string|number)[]?}
-local WarningBoxGroupWidget = Class.new(Widget)
-
----@return Widget[]?
-function WarningBoxGroupWidget:render()
-	local data = self.props.data
+---@param props {data: (string|number)[]?}
+---@return VNode[]?
+local function WarningBoxGroup(props)
+	local data = props.data
 	if Logic.isEmpty(data) then
 		return
 	end
@@ -31,4 +26,4 @@ function WarningBoxGroupWidget:render()
 	end)
 end
 
-return WarningBoxGroupWidget
+return Component.component(WarningBoxGroup)

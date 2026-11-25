@@ -25,13 +25,13 @@ local Mission = Class.new(BasicInfobox)
 
 ---Entry point
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Mission.run(frame)
 	local mission = Mission(frame)
 	return mission:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Mission:createInfobox()
 	local args = self.args
 

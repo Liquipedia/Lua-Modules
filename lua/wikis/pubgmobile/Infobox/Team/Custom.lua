@@ -14,10 +14,11 @@ local Team = Lua.import('Module:Infobox/Team')
 local PlacementStats = Lua.import('Module:Infobox/Extension/PlacementStats')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class PubgmobileInfoboxTeam: InfoboxTeam
+---@operator call(Frame): PubgmobileInfoboxTeam
 local CustomTeam = Class.new(Team)
 
 function CustomTeam.run(frame)
@@ -26,9 +27,9 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function CustomTeam:createBottomContent()
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+	return Html.Fragment{children = WidgetUtil.collect(
 		PlacementStats.run{
 			participant = self.pagename,
 			tiers = {'1', '2', '3', '4', '5'},

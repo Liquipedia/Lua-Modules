@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
@@ -35,9 +34,10 @@ local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
+local CountdownWidget = Lua.import('Module:Widget/Countdown')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLossIndicator')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -590,7 +590,7 @@ end
 
 ---@return Widget
 function MatchTable:build()
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+	return Html.Fragment{children = WidgetUtil.collect(
 		self:displayStats(),
 		self:buildDisplay()
 	)}
@@ -786,11 +786,11 @@ function MatchTable:matchRow(match)
 end
 
 ---@param match MatchTableMatch
----@return Widget
+---@return VNode
 function MatchTable:_displayDate(match)
 	return TableWidgets.Cell{
 		attributes = {['data-sort-value'] = match.timestamp},
-		children = not DateExt.isDefaultTimestamp(match.timestamp) and Countdown.create{
+		children = not DateExt.isDefaultTimestamp(match.timestamp) and CountdownWidget{
 			finished = match.finished,
 			date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
 			rawdatetime = true,
@@ -801,11 +801,12 @@ end
 
 ---@protected
 ---@param match MatchTableMatch
----@return Widget?
+---@return VNode?
 function MatchTable:displayTier(match)
 	if not self.config.showTier then return end
 
 	local tier, tierType, options = Tier.parseFromQueryData(match)
+	---@cast options table
 	options.link = true
 	options.onlyTierTypeIfBoth = true
 
@@ -815,6 +816,8 @@ function MatchTable:displayTier(match)
 			children = INVALID_TIER_DISPLAY
 		}
 	end
+
+	---@cast tier -nil
 
 	return TableWidgets.Cell{
 		attributes = {['data-sort-value'] = Tier.toSortValue(tier, tierType)},
@@ -929,7 +932,7 @@ function MatchTable:_displayScore(match)
 			status = game1Opponent.status
 		end
 
-		return HtmlWidgets.Span{
+		return Html.Span{
 			css = {['font-weight'] = tonumber(opponent.placement) == 1 and 'bold' or nil},
 			children = status == SCORE_STATUS and (score or '&ndash;') or status,
 		}
@@ -1029,7 +1032,7 @@ function MatchTable:displayStats()
 		return 'For matches between ' .. startDate .. ' and ' .. endDate .. ':'
 	end
 
-	local titleNode = HtmlWidgets.Div{
+	local titleNode = Html.Div{
 		css = {['font-weight'] = 'bold'},
 		children = makeStatsTitle(),
 	}
@@ -1040,9 +1043,9 @@ function MatchTable:displayStats()
 		self.config.showOnlyGameStats and '' or displayScores(self.stats.rounds, 'rounds')
 	)
 
-	return HtmlWidgets.Div{children = {
+	return Html.Div{children = {
 		titleNode,
-		HtmlWidgets.Div{children = Array.interleave(stats, self.config.showOnlyGameStats and '' or ' and ')}
+		Html.Div{children = Array.interleave(stats, self.config.showOnlyGameStats and '' or ' and ')}
 	}}
 end
 

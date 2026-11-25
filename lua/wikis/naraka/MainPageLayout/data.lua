@@ -12,8 +12,8 @@ local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
@@ -55,9 +55,8 @@ local CONTENT = {
 		},
 	},
 	matches = {
-		heading = 'Matches',
+		noPanel = true,
 		body = MatchTicker{},
-		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {
@@ -81,7 +80,7 @@ return {
 	title = 'NARAKA: BLADEPOINT',
 	navigation = {
 		{
-			file = 'KPL Dream Team at HoK Midseason Invitational 2024.jpg',
+			file = 'SR Team at J Cup 2025.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -90,7 +89,7 @@ return {
 			},
 		},
 		{
-			file = 'TOP Tian at the 2024 Esports World Cup.jpg',
+			file = 'Mike_at_the_NBPL_2024_Spring_Season.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -108,7 +107,7 @@ return {
 			},
 		},
 		{
-			file = 'PVX ShunMi at the ALGS Birmingham Championship.jpg',
+			file = 'Winner shirt at J Cup 2023.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -117,7 +116,7 @@ return {
 			},
 		},
 		{
-			file = 'Jenn_Lee_poses_with_Trophy_at_VCT_Master_Shanghai.jpg',
+			file = 'SR.Spider at EWC.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
@@ -129,63 +128,55 @@ return {
 	},
 	layouts = {
 		main = {
-			{ -- Left
-				sizes = {xxl = 5, xxxl = 6},
+			{ -- Top
+				size = 12,
 				children = {
 					{
 						mobileOrder = 2,
-						content = CONTENT.thisDay,
+						noPanel = true,
+						content = CONTENT.filterButtons,
 					},
 					{
 						mobileOrder = 3,
+						noPanel = true,
+						content = CONTENT.matches,
+					},
+				},
+			},
+			{ -- Left
+				sizes = {xxl = 6, xxxl = 6},
+				children = {
+					{
+						mobileOrder = 1,
+						content = CONTENT.specialEvents,
+					},
+					{
+						mobileOrder = 5,
+						content = CONTENT.thisDay,
+					},
+					{
+						mobileOrder = 6,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 7,
 						content = CONTENT.wantToHelp,
 					},
 				}
 			},
 			{ -- Right
-				sizes = {xxl = 7, xxxl = 6},
+				sizes = {xxl = 6, xxxl = 6},
 				children = {
 					{
-						mobileOrder = 1,
-						children = {
-							{
-								children = {
-									{
-										noPanel = true,
-										content = CONTENT.filterButtons,
-									},
-								},
-							},
-							{
-								size = 6,
-								children = {
-									{
-										noPanel = true,
-										content = CONTENT.matches,
-									},
-								},
-							},
-							{
-								size = 6,
-								children = {
-									{
-										noPanel = true,
-										content = CONTENT.tournaments,
-									},
-								},
-							},
-						},
+						mobileOrder = 4,
+						content = CONTENT.tournaments,
 					},
 				},
 			},
 			{
 				children = {
 					{
-						mobileOrder = 5,
+						mobileOrder = 8,
 						content = CONTENT.theGame,
 					},
 				},

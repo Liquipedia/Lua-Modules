@@ -135,6 +135,8 @@ function VRSStandingsData._parseSettings(props)
 		error('A date must be provided when not fetching data')
 	end
 
+	local filterType = string.lower(props.filterType or 'none')
+
 	---@type VRSStandingsSettings
 	local settings = {
 		title = props.title,
@@ -147,16 +149,8 @@ function VRSStandingsData._parseSettings(props)
 		mainpage = Logic.readBool(props.mainpage),
 		datapointType = datapointType,
 		updated = updated,
-		filterType = 'none',
+		filterType = filterType,
 	}
-
-	if settings.filterRegion then
-		settings.filterType = 'region'
-	elseif settings.filterSubregion then
-		settings.filterType = 'subregion'
-	elseif settings.filterCountry and #settings.filterCountry > 0 then
-		settings.filterType = 'country'
-	end
 
 	return settings
 end
@@ -179,7 +173,7 @@ function VRSStandingsData._read(props)
 
 		-- unset team template input to not conflict with player args
 		data[1] = nil
-		opponent.players = Array.map(Array.range(1, 5), FnUtil.curry(Opponent.readPlayerArgs, data))
+		opponent.players = Array.mapRange(1, 5, FnUtil.curry(Opponent.readPlayerArgs, data))
 
 		opponent.extradata = opponent.extradata or {}
 		opponent.extradata.region = data.region

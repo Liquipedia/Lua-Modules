@@ -69,6 +69,9 @@ function MatchGroupCoordinates.computeSections(bracket)
 		if isNewSection then
 			table.insert(sections, {})
 		end
+		-- TODO: the first section only opens on a match that carries a header, so a bracket whose
+		-- root match has none errors here on sections[0] being nil. Either open a section for the
+		-- first match unconditionally, or reject the bracket with a readable message.
 		table.insert(sections[#sections], matchId)
 		sectionIxs[matchId] = #sections
 	end
@@ -319,7 +322,7 @@ function MatchGroupCoordinates.groupMatchIdsByField(bracket, fieldName)
 	local countFieldName = fieldName:gsub('Index$', 'Count')
 	local count = Table.getByPathOrNil(bracket.matches, {1, 'bracketData', 'coordinates', countFieldName}) or 0
 
-	local byField = Array.map(Array.range(1, count), function() return {} end)
+	local byField = Array.mapRange(1, count, function() return {} end)
 	for matchId in MatchGroupCoordinates.dfs(bracket) do
 		local coordinates = bracket.coordinatesByMatchId[matchId]
 		table.insert(byField[coordinates[fieldName]], matchId)
@@ -363,7 +366,7 @@ The third place match is not counted.
 function MatchGroupCoordinates.computeRawCounts(bracket)
 	local reverseRounds = Array.reverse(bracket.rounds)
 
-	local countsBySection = Array.map(Array.range(1, #bracket.sections), function(sectionIx) return 0 end)
+	local countsBySection = Array.mapRange(1, #bracket.sections, function(sectionIx) return 0 end)
 	local countsByReverseRound = {}
 	for _, round in ipairs(reverseRounds) do
 		for _, matchId in ipairs(round) do

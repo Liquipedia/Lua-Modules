@@ -23,8 +23,8 @@ class SelectAllContainer {
 
 	createSelectButton() {
 		const selectButton = document.createElement( 'button' );
-		selectButton.classList.add( 'btn' );
-		selectButton.classList.add( 'btn-secondary' );
+		selectButton.classList.add( 'button' );
+		selectButton.classList.add( 'button--secondary' );
 		selectButton.innerHTML = 'Select';
 		selectButton.addEventListener( 'click', () => this.selectElementText() );
 		return selectButton;
@@ -32,8 +32,8 @@ class SelectAllContainer {
 
 	createSelectAllButton() {
 		const selectCopyButton = document.createElement( 'button' );
-		selectCopyButton.classList.add( 'btn' );
-		selectCopyButton.classList.add( 'btn-primary' );
+		selectCopyButton.classList.add( 'button' );
+		selectCopyButton.classList.add( 'button--primary' );
 		selectCopyButton.innerHTML = 'Select and copy';
 
 		selectCopyButton.addEventListener( 'click', async () => {

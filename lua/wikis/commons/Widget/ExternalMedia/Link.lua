@@ -8,52 +8,50 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local NON_BREAKING_SPACE = '&nbsp;'
 
----@class ExternalMediaLinkDisplay: Widget
----@operator call(table): ExternalMediaLinkDisplay
----@field props {data: externalmedialink, showUsUk: boolean?}
-local ExternalMediaLinkDisplay = Class.new(Widget)
+local ExternalMediaLinkDisplay = {}
 
----@return (string|Widget)[]
-function ExternalMediaLinkDisplay:render()
-	local data = self.props.data
+---@param props {data: externalmedialink, showUsUk: boolean?}
+---@return Renderable[]
+function ExternalMediaLinkDisplay.render(props)
+	local data = props.data
 	return Array.interleave(WidgetUtil.collect(
 		data.date .. NON_BREAKING_SPACE .. '|',
-		self:_renderLanguage(),
-		self:_renderTitle(),
-		self:_renderAuthors(),
-		self:_renderPublisher(),
-		self:_renderEvent(),
-		self:_renderTranslation()
+		ExternalMediaLinkDisplay._renderLanguage(data, props.showUsUk),
+		ExternalMediaLinkDisplay._renderTitle(data),
+		ExternalMediaLinkDisplay._renderAuthors(data),
+		ExternalMediaLinkDisplay._renderPublisher(data),
+		ExternalMediaLinkDisplay._renderEvent(data),
+		ExternalMediaLinkDisplay._renderTranslation(data)
 	), NON_BREAKING_SPACE)
 end
 
 ---@private
+---@param data externalmedialink
+---@param showUsUk boolean?
 ---@return string?
-function ExternalMediaLinkDisplay:_renderLanguage()
-	local data = self.props.data
-	if Logic.isNotEmpty(data.language) and data.language ~= 'en' and (data.language ~= 'usuk' or self.props.showUsUk) then
+function ExternalMediaLinkDisplay._renderLanguage(data, showUsUk)
+	if Logic.isNotEmpty(data.language) and data.language ~= 'en' and (data.language ~= 'usuk' or showUsUk) then
 		return Flags.Icon{flag = data.language, shouldLink = false}
 	end
 end
 
 ---@private
----@return Widget|(string|Widget)[]
-function ExternalMediaLinkDisplay:_renderTitle()
-	local data = self.props.data
+---@param data externalmedialink
+---@return Renderable[]
+function ExternalMediaLinkDisplay._renderTitle(data)
 	return WidgetUtil.collect(
-		HtmlWidgets.Span{
+		Html.Span{
 			classes = {'plainlinks'},
 			css = {['font-style'] = Logic.isNotEmpty(data.title) and 'italic' or nil},
 			children = Link{
@@ -69,10 +67,9 @@ function ExternalMediaLinkDisplay:_renderTitle()
 end
 
 ---@private
+---@param data externalmedialink
 ---@return string[]?
-function ExternalMediaLinkDisplay:_renderAuthors()
-	local data = self.props.data
-
+function ExternalMediaLinkDisplay._renderAuthors(data)
 	---@type {pageName: string, displayName: string}[]
 	local authors = Array.mapIndexes(function (index)
 		return Logic.nilIfEmpty{
@@ -98,9 +95,9 @@ function ExternalMediaLinkDisplay:_renderAuthors()
 end
 
 ---@private
----@return (string|Widget)[]?
-function ExternalMediaLinkDisplay:_renderPublisher()
-	local data = self.props.data
+---@param data externalmedialink
+---@return Renderable[]?
+function ExternalMediaLinkDisplay._renderPublisher(data)
 	if Logic.isEmpty(data.publisher) then
 		return
 	end
@@ -111,9 +108,10 @@ function ExternalMediaLinkDisplay:_renderPublisher()
 end
 
 ---@private
----@return (string|Widget)[]?
-function ExternalMediaLinkDisplay:_renderEvent()
-	local extradata = (self.props.data.extradata or {})
+---@param data externalmedialink
+---@return Renderable[]?
+function ExternalMediaLinkDisplay._renderEvent(data)
+	local extradata = (data.extradata or {})
 	if Logic.isEmpty(extradata.event) then
 		return
 	end
@@ -127,9 +125,10 @@ function ExternalMediaLinkDisplay:_renderEvent()
 end
 
 ---@private
+---@param data externalmedialink
 ---@return string?
-function ExternalMediaLinkDisplay:_renderTranslation()
-	local extradata = (self.props.data.extradata or {})
+function ExternalMediaLinkDisplay._renderTranslation(data)
+	local extradata = (data.extradata or {})
 	local translation = extradata.translation
 	local translator = extradata.translator
 	if Logic.isEmpty(translation) then
@@ -143,4 +142,4 @@ function ExternalMediaLinkDisplay:_renderTranslation()
 		')'
 end
 
-return ExternalMediaLinkDisplay
+return Component.component(ExternalMediaLinkDisplay.render)

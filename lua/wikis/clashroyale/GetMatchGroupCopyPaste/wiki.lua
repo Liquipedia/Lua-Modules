@@ -42,11 +42,11 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		INDENT .. '|date=',
 		streams and (INDENT .. '|twitch=|youtube=|vod=') or nil,
 		mvps and (INDENT .. '|mvp=') or nil,
-		Array.map(Array.range(1, opponents), function(opponentIndex)
+		Array.mapRange(1, opponents, function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
 		bans and '|t1bans={{Cards|}}|t2bans={{Cards|}}' or nil,
-		Array.map(Array.range(1, bestof), FnUtil.curry(WikiCopyPaste.getMapCode, mode)),
+		Array.mapRange(1, bestof, FnUtil.curry(WikiCopyPaste.getMapCode, mode)),
 		'}}'
 	)
 

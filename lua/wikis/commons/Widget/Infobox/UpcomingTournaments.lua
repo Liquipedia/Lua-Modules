@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Tournament = Lua.import('Module:Tournament')
@@ -20,22 +19,16 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local TournamentsTickerListItem = Lua.import('Module:Widget/Tournaments/Ticker/ListItem')
 
----@class UpcomingTournamentsWidgetParameters
----@field opponentConditions AbstractConditionNode
----@field options table?
+local UpcomingTournamentsWidget = {}
 
----@class UpcomingTournamentsWidget: Widget
----@operator call(UpcomingTournamentsWidgetParameters): UpcomingTournamentsWidget
----@field props UpcomingTournamentsWidgetParameters
-local UpcomingTournamentsWidget = Class.new(Widget)
-
+---@param props {opponentConditions: AbstractConditionNode?}
 ---@return Widget
-function UpcomingTournamentsWidget:render()
+function UpcomingTournamentsWidget.render(props)
 	return Div{
 		classes = {'fo-nttax-infobox', 'wiki-bordercolor-light', 'noincludereddit'},
 		css = {['border-top'] = 'none'},
@@ -44,16 +37,17 @@ function UpcomingTournamentsWidget:render()
 				classes = {'infobox-header', 'wiki-backgroundcolor-light'},
 				children = 'Upcoming Tournaments'
 			}},
-			self:_getTournaments()
+			UpcomingTournamentsWidget._getTournaments(props.opponentConditions)
 		}
 	}
 end
 
 ---@private
----@return Widget
-function UpcomingTournamentsWidget:_getTournaments()
+---@param opponentConditions AbstractConditionNode?
+---@return VNode
+function UpcomingTournamentsWidget._getTournaments(opponentConditions)
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add(self.props.opponentConditions)
+		:add(opponentConditions)
 		:add(ConditionNode(
 			ColumnName('date'), Comparator.gt, DateExt.getCurrentTimestamp() - DateExt.daysToSeconds(1)
 		))
@@ -89,4 +83,4 @@ function UpcomingTournamentsWidget:_getTournaments()
 	}
 end
 
-return UpcomingTournamentsWidget
+return Component.component(UpcomingTournamentsWidget.render)

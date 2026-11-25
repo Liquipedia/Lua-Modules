@@ -8,17 +8,9 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-
----@class MatchSummaryFfaTrophy: Widget
----@operator call(table): MatchSummaryFfaTrophy
-local MatchSummaryFfaTrophy = Class.new(Widget)
-MatchSummaryFfaTrophy.defaultProps = {
-	additionalClasses = {},
-}
 
 local TROPHY_COLOR = {
 	'icon--gold',
@@ -27,15 +19,16 @@ local TROPHY_COLOR = {
 	'icon--copper',
 }
 
----@return Widget?
-function MatchSummaryFfaTrophy:render()
-	if not TROPHY_COLOR[self.props.place] then
-		return nil
+---@param props {place: integer, additionalClasses?: string[]}
+---@return HtmlNode?
+local function MatchSummaryFfaTrophy(props)
+	if not TROPHY_COLOR[props.place] then
+		return
 	end
 	return IconWidget{
 		iconName = 'firstplace',
-		additionalClasses = Array.extend(self.props.additionalClasses, TROPHY_COLOR[self.props.place])
+		additionalClasses = Array.extend(props.additionalClasses, TROPHY_COLOR[props.place])
 	}
 end
 
-return MatchSummaryFfaTrophy
+return Component.component(MatchSummaryFfaTrophy)

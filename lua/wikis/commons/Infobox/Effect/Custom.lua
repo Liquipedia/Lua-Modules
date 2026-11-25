@@ -12,10 +12,11 @@ local Class = Lua.import('Module:Class')
 local Effect = Lua.import('Module:Infobox/Effect')
 
 ---@class CustomEffectInfobox: EffectInfobox
+---@operator call(Frame): CustomEffectInfobox
 local CustomEffect = Class.new(Effect)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomEffect.run(frame)
 	return CustomEffect(frame):createInfobox()
 end

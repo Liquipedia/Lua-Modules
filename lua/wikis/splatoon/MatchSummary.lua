@@ -12,7 +12,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Operator = Lua.import('Module:Operator')
 local WeaponIcon = Lua.import('Module:WeaponIcon')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Widget/Html')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -21,16 +21,15 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Widget
+---@return Renderable
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '500px', teamStyle = 'bracket'})
 end
 
----@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return Widget?
-function CustomMatchSummary.createGame(date, game, gameIndex)
+---@return Renderable?
+function CustomMatchSummary.createGame(game, gameIndex)
 	if not game.map then
 		return
 	end
@@ -39,6 +38,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		local opponent = game.opponents[opponentIndex] or {}
 		local weaponsData = Array.map(opponent.players or {}, Operator.property('weapon'))
 
+		---@type string|integer
 		local score = opponent.score
 		if score and game.mode == 'turf war' then
 			score = score .. '%'
@@ -52,7 +52,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 				game = game.game
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
-			HtmlWidgets.Div{
+			Html.Div{
 				css = {['min-width'] = '24px', ['text-align'] = 'center'},
 				children = scoreDisplay,
 			}
@@ -80,7 +80,7 @@ end
 ---@return Widget
 function CustomMatchSummary._createWeaponsDisplay(props)
 	local weaponIcons = Array.map(props.data, function(weapon)
-		return HtmlWidgets.Div{
+		return Html.Div{
 			classes = {'brkts-champion-icon'},
 			children = WeaponIcon.Icon{
 				weapon = weapon,
@@ -99,7 +99,7 @@ function CustomMatchSummary._createWeaponsDisplay(props)
 		table.insert(classes, 'brkts-popup-body-element-thumbs-right')
 	end
 
-	return HtmlWidgets.Div{
+	return Html.Div{
 		classes = classes,
 		children = weaponIcons
 	}

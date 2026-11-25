@@ -8,7 +8,10 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
@@ -26,6 +29,7 @@ local PRIZE_TYPE_POINTS = 'POINTS'
 --- @field parent AwardPrizePool
 --- @field previousTotalNumberOfParticipants integer
 --- @field currentTotalNumberOfParticipants integer
+--- @field references table[]?
 local AwardPlacement = Class.new(BasePlacement)
 
 --- @param award string Award of this slot/placement
@@ -35,6 +39,7 @@ function AwardPlacement:create(award)
 	self.count = tonumber(self.args.count)
 	self.opponents = self:parseOpponents(self.args)
 	self.count = self.count or math.max(#self.opponents, 1)
+	self.references = Logic.nilIfEmpty(Json.parseStringified(self.args.references))
 
 	return self
 end
@@ -55,7 +60,7 @@ function AwardPlacement:_getLpdbData(...)
 		local opponentType = opponent.opponentData.type
 
 		if opponentType == Opponent.team then
-			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template) or {}
+			local teamTemplate = TeamTemplate.getRawOrNil(opponent.opponentData.template) or {}
 
 			participant = teamTemplate.page or ''
 			if self.parent.options.resolveRedirect then
@@ -87,8 +92,18 @@ function AwardPlacement:_getLpdbData(...)
 				prizepoints2 = tostring(pointsReward2 or ''),
 				-- legacy
 				participantteam = (opponentType == Opponent.solo and players.p1team)
-									and Opponent.toName{template = players.p1team, type = 'team'}
+									and Opponent.toName{template = players.p1team, type = 'team', extradata = {}}
 									or nil,
+				references = (#self.opponents > 1 and self.references ~= nil)
+					--[[
+					Directly inserting self.references to extradata fails with circular reference error from PHP
+					when there are more than 1 opponents in this award placement. To work around this issue,
+					we have to deep copy self.references.
+
+					See https://github.com/Liquipedia/Lua-Modules/pull/8110.
+					]]
+					and Table.deepCopy(self.references)
+					or self.references,
 			},
 			-- TODO: We need to create additional LPDB Field for Points struct (json?)
 

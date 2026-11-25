@@ -12,10 +12,11 @@ local Class = Lua.import('Module:Class')
 local Strategy = Lua.import('Module:Infobox/Strategy')
 
 ---@class CustomStrategyInfobox: StrategyInfobox
+---@operator call(Frame): CustomStrategyInfobox
 local CustomStrategy = Class.new(Strategy)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomStrategy.run(frame)
 	local customStrategy = CustomStrategy(frame)
 	return customStrategy:createInfobox()

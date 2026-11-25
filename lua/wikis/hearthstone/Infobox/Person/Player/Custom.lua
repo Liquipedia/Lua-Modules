@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local ActiveYears = Lua.import('Module:YearsActive')
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Region = Lua.import('Module:Region')
 local Math = Lua.import('Module:MathUtil')
 local String = Lua.import('Module:StringUtils')
@@ -19,14 +20,19 @@ local Player = Lua.import('Module:Infobox/Person')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
-local CURRENT_YEAR = tonumber(os.date('%Y'))
+local CURRENT_YEAR = DateExt.getYearOf()
 
----@class HearthstoneInfoboxPlayer: Person
+---@class HearthstoneInfoboxPlayer: InfoboxPerson
+---@operator call(Frame): HearthstoneInfoboxPlayer
 local CustomPlayer = Class.new(Player)
+
+---@class HearthstoneInfoboxPlayerWidgetInjector: WidgetInjector
+---@operator call(HearthstoneInfoboxPlayer): HearthstoneInfoboxPlayerWidgetInjector
+---@field caller HearthstoneInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -35,8 +41,8 @@ function CustomPlayer.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 
@@ -44,13 +50,14 @@ function CustomInjector:parse(id, widgets)
 		local yearsActive = ActiveYears.display{player = caller.pagename}
 
 		local currentYearEarnings = caller.earningsPerYear[CURRENT_YEAR]
+		local currentYearEarningsDisplay
 		if currentYearEarnings then
 			currentYearEarnings = Math.round(currentYearEarnings)
-			currentYearEarnings = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
+			currentYearEarningsDisplay = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
 		end
 
 		return {
-			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, children = {currentYearEarnings}},
+			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, children = {currentYearEarningsDisplay}},
 			Cell{name = 'Years active', children = {yearsActive}},
 		}
 	elseif id == 'region' then return {}

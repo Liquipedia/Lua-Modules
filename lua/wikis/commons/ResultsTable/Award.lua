@@ -7,10 +7,14 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local BaseResultsTable = Lua.import('Module:ResultsTable/Base')
 local Class = Lua.import('Module:Class')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
 
+local ReferenceTag = Lua.import('Module:Widget/ReferenceTag')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -19,7 +23,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local AwardsTable = Class.new(BaseResultsTable)
 
 ---@protected
----@return table[]
+---@return Table2ColumnDef[]
 function AwardsTable:buildColumnDefinitions()
 	return WidgetUtil.collect(
 		{
@@ -44,7 +48,7 @@ function AwardsTable:buildColumnDefinitions()
 end
 
 ---Builds the Header of the award table
----@return Widget
+---@return VNode
 function AwardsTable:buildHeader()
 	return TableWidgets.Row{children = WidgetUtil.collect(
 		TableWidgets.CellHeader{children = 'Date'},
@@ -64,9 +68,31 @@ function AwardsTable:buildHeader()
 	)}
 end
 
+---@private
+---@param placement placement
+---@return Renderable|Renderable[]
+function AwardsTable._createAwardCell(placement)
+	local award = placement.extradata.award
+	local references = placement.extradata.references
+	if not references then
+		return award
+	end
+	local frame = mw.getCurrentFrame()
+	return Array.extend(
+		award,
+		Array.map(references, function (reference)
+			return ReferenceTag{
+				frame = frame,
+				name = Table.extract(reference, 'name'),
+				children = Template.safeExpand(frame, 'Cite web', reference)
+			}
+		end)
+	)
+end
+
 ---Builds a row of the award table
 ---@param placement placement
----@return Widget
+---@return VNode
 function AwardsTable:buildRow(placement)
 	return TableWidgets.Row{
 		highlighted = self:rowHighlight(placement),
@@ -75,7 +101,7 @@ function AwardsTable:buildRow(placement)
 			self:createTierCell(placement),
 			self:createTypeCell(placement),
 			self:createTournamentCells(placement),
-			TableWidgets.Cell{children = placement.extradata.award},
+			TableWidgets.Cell{children = AwardsTable._createAwardCell(placement)},
 			(self.config.playerResultsOfTeam or self.config.queryType ~= Opponent.team) and TableWidgets.Cell{
 				attributes = {
 					['data-sort-value'] = placement.opponentname

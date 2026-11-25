@@ -24,12 +24,17 @@ local Cell = Widgets.Cell
 
 local SIZE_HERO = '25x25px'
 
----@class NarakaInfoboxPlayer: Person
+---@class NarakaInfoboxPlayer: InfoboxPerson
+---@operator call(Frame): NarakaInfoboxPlayer
 local CustomPlayer = Class.new(Player)
+
+---@class NarakaInfoboxPlayerWidgetInjector: WidgetInjector
+---@operator call(NarakaInfoboxPlayer): NarakaInfoboxPlayerWidgetInjector
+---@field caller NarakaInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -38,8 +43,8 @@ function CustomPlayer.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -80,7 +85,7 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return Widget?
+---@return VNode?
 function CustomPlayer:createBottomContent()
 	if not self:shouldStoreData(self.args) or String.isEmpty(self.args.team) then
 		return

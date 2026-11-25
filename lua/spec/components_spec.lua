@@ -3,7 +3,6 @@ local ComponentCore = require('Module:Widget/Component')
 local Context = require('Module:Widget/ComponentContext')
 local ErrorBoundary = require('Module:Widget/ErrorBoundary')
 local Html = require('Module:Widget/Html')
-local WidgetHtml = require('Module:Widget/Html/All')
 local Renderer = require('Module:Widget/Renderer')
 
 describe('Components/Renderer', function()
@@ -107,7 +106,66 @@ describe('Components/Renderer', function()
 		end)
 
 		it('renders widget2', function()
-			assert.are.equal('<p>built</p>', Renderer.render(WidgetHtml.P{children = {'built'}}))
+			local Class = require('Module:Class')
+			local Widget = require('Module:Widget')
+
+			local Widget2HtmlP = Class.new(Widget)
+
+			function Widget2HtmlP:render()
+				return Html.P(self.props)
+			end
+
+			assert.are.equal('<p>built</p>', Renderer.render(Widget2HtmlP{children = {'built'}}))
+		end)
+	end)
+
+	describe('HTML tags', function()
+		it('renders classes, attributes and css', function()
+			assert.are.equal(
+				'<div class="foo bar" id="my-id" style="color:red">child</div>',
+				Renderer.render(Html.Div{
+					classes = {'foo', 'bar'}, attributes = {id = 'my-id'}, css = {color = 'red'}, children = {'child'},
+				})
+			)
+			assert.are.equal('<div data-count="3" style="width:100"></div>',
+				Renderer.render(Html.Div{attributes = {['data-count'] = 3}, css = {width = 100}}))
+		end)
+
+		it('escapes classes, attribute values and css', function()
+			assert.are.equal(
+				'<div class="a&quot;b" title="&lt;b&gt;&quot;Tom&quot; &amp; Jerry&lt;/b&gt;"'
+					.. ' style="background-image:url(a&amp;b.png)"></div>',
+				Renderer.render(Html.Div{
+					classes = {'a"b'},
+					attributes = {title = '<b>"Tom" & Jerry</b>'},
+					css = {['background-image'] = 'url(a&b.png)'},
+				})
+			)
+		end)
+
+		it('keeps strip markers intact', function()
+			local marker = '\127\'"`UNIQ--ref-00000001-QINU`"\'\127'
+			assert.are.equal(
+				'<span class="a ' .. marker .. '" title="&quot;' .. marker .. '"></span>',
+				Renderer.render(Html.Span{classes = {'a', marker}, attributes = {title = '"' .. marker}})
+			)
+		end)
+
+		it('merges class and style attributes into the classes and css', function()
+			assert.are.equal('<div class="foo bar"></div>',
+				Renderer.render(Html.Div{classes = {'foo'}, attributes = {class = 'bar'}}))
+			assert.are.equal('<div style="color:red;width:1px"></div>',
+				Renderer.render(Html.Div{css = {color = 'red'}, attributes = {style = 'width:1px'}}))
+		end)
+
+		it('leaves out attributes with an invalid name or value', function()
+			assert.are.equal('<div></div>',
+				---@diagnostic disable-next-line: assign-type-mismatch
+				Renderer.render(Html.Div{attributes = {['bad name'] = 'x', hidden = true}}))
+		end)
+
+		it('self closing tags leave out their children', function()
+			assert.are.equal('<br class="foo" />', Renderer.render(Html.Br{classes = {'foo'}, children = {'child'}}))
 		end)
 	end)
 end)
@@ -242,6 +300,11 @@ describe('Components/Context', function()
 end)
 
 describe('Components/Html', function()
+	it('Html.Abbr with title property', function()
+		local abbr = Html.Abbr{children = {'Test'}, title = 'Title'}
+		assert.are.same('<abbr title="Title">Test</abbr>', tostring(abbr))
+	end)
+
 	it('Html.Div renders a div', function()
 		assert.are.equal('<div></div>', tostring(Html.Div{}))
 	end)

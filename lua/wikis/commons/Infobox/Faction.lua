@@ -24,7 +24,7 @@ local Customizable = Widgets.Customizable
 ---@operator call(Frame): FactionInfobox
 local FactionInfobox = Class.new(BasicInfobox)
 
----@return Widget
+---@return VNode
 function FactionInfobox:createInfobox()
 	local args = self.args
 

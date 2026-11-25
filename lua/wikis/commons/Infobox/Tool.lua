@@ -26,13 +26,13 @@ local Tool = Class.new(BasicInfobox)
 
 ---Entry point of tool infobox
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Tool.run(frame)
 	local tool = Tool(frame)
 	return tool:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Tool:createInfobox()
 	local args = self.args
 

@@ -8,15 +8,15 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Tournament = Lua.import('Module:Tournament')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
@@ -26,24 +26,21 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 ---@field displayGameIcon boolean?
 ---@field displayIcon boolean?
 
----@class MatchTournamentBar: Widget
----@operator call(MatchTournamentBarProps): MatchTournamentBar
----@field props MatchTournamentBarProps
-local MatchTournamentBar = Class.new(Widget)
-MatchTournamentBar.defaultProps = {
+local defaultProps = {
 	displayIcon = true,
 }
 
----@return Widget[]|nil
-function MatchTournamentBar:render()
-	local match = self.props.match
-	local gameData = self.props.gameData
+---@param props MatchTournamentBarProps
+---@return Renderable[]?
+local function MatchTournamentBar(props)
+	local match = props.match
+	local gameData = props.gameData
 	if not match then
 		return
 	end
 
 	local tournament = Tournament.partialTournamentFromMatch(match)
-	local tournamentLink = mw.title.makeTitle(0, match.pageName, match.section).fullText
+	local tournamentLink = Page.createPageName(0, match.pageName, match.section)
 
 	local stageName
 	if match.bracketData.inheritedHeader then
@@ -53,44 +50,41 @@ function MatchTournamentBar:render()
 	local mapIsSet = gameData and not String.isEmpty(gameData.map)
 
 	return WidgetUtil.collect(
-		self.props.displayIcon and self.props.displayGameIcon and Game.icon{
+		props.displayIcon and props.displayGameIcon and Game.icon{
 			game = tournament.game,
 			noLink = true,
 			spanClass = 'icon-small',
 			size = '50px',
 		} or nil,
-		self.props.displayIcon and HtmlWidgets.Span{
-			children = {
-				LeagueIcon.display{
-					icon = tournament.icon,
-					iconDark = tournament.iconDark,
-					series = tournament.series,
-					link = tournamentLink,
-					options = {noTemplate = true},
-				}
+		props.displayIcon and Html.Span{
+			children = LeagueIcon.display{
+				icon = tournament.icon,
+				iconDark = tournament.iconDark,
+				series = tournament.series,
+				link = tournamentLink,
+				options = {noTemplate = true},
 			}
 		} or nil,
-		HtmlWidgets.Span{
+		Html.Span{
 			classes = {'match-info-tournament-wrapper'},
 			children = {
-				HtmlWidgets.Span{
+				Html.Span{
 					classes = {'match-info-tournament-name'},
-					children = {
-						Link{
-							link = tournamentLink,
-							children = HtmlWidgets.Span{
-								children = (match.section ~= 'Results' and #match.opponents <= 2 and {
-									tournament.displayName,
-									' - ',
-									match.section
-								} or {
-									tournament.displayName
-								})
-							}
+					children = Link{
+						link = tournamentLink,
+						children = Html.Span{
+							children = (match.section ~= 'Results' and #match.opponents <= 2 and {
+								tournament.displayName,
+								' - ',
+								match.section
+							} or {
+								tournament.displayName
+							})
 						}
 					}
 				},
-				gameData and gameData.gameIds and HtmlWidgets.Span{
+				gameData and gameData.gameIds and Html.Span{
+					classes = {'match-info-tournament-game'},
 					children = WidgetUtil.collect(
 						stageName,
 						stageName and ' - ' or nil,
@@ -110,4 +104,4 @@ function MatchTournamentBar:render()
 	)
 end
 
-return MatchTournamentBar
+return Component.component(MatchTournamentBar, defaultProps)

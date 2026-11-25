@@ -16,10 +16,11 @@ local Variables = Lua.import('Module:Variables')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local NoWrap = Widgets.NoWrap
 
 ---@class ArenafpsLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -45,7 +46,7 @@ local MODES = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -58,8 +59,8 @@ function CustomLeague.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
@@ -76,13 +77,11 @@ function CustomInjector:parse(id, widgets)
 			local game = args.game and ('/' .. args.game) or ''
 
 			maps = Array.map(maps, function(map)
-				return tostring(self.caller:_createNoWrappingSpan(
-					PageLink.makeInternalLink({}, map, map .. game)
-				))
+				return NoWrap{children = PageLink.makeInternalLink({}, map, map .. game)}
 			end)
 
 			table.insert(widgets, Title{children = 'Maps'})
-			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Center{children = Array.interleave(maps, '&nbsp;• ')})
 		end
 	end
 	return widgets
@@ -127,15 +126,6 @@ end
 ---@return string?
 function CustomLeague:_modeLookup(mode)
 	return MODES[string.lower(mode or '')]
-end
-
----@param content Html|string|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
-	return span
 end
 
 return CustomLeague

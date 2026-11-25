@@ -39,10 +39,14 @@ function Appearances.player(args)
 
 	local queriedGames = Table.map(mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = table.concat(conditions, ' OR '),
-		query = 'game',
+		query = 'game, pagename',
 		groupby = 'game asc',
 		limit = 1000,
-	}), function(_, item) return Game.toIdentifier{game = item.game, useDefault = false}, true end)
+	}), function(_, item)
+		local game = assert(Game.toIdentifier{game = item.game, useDefault = false},
+			'Invalid game supplied on page "' .. item.pagename .. '"')
+		return game, true
+	end)
 
 	local orderedGames = Array.filter(Game.listGames{ordered = true}, function(game)
 		return queriedGames[game]

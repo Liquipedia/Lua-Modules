@@ -8,21 +8,22 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Variables = Lua.import('Module:Variables')
 local Table = Lua.import('Module:Table')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local FilterButton = Lua.import('Module:Widget/FilterButtons/Button')
 local FilterButtonRow = Lua.import('Module:Widget/FilterButtons/ButtonRow')
-local Widget = Lua.import('Module:Widget')
 
----@class FilterButtons: Widget
----@operator call(table): FilterButtons
-local FilterButtons = Class.new(Widget)
+local FilterButtons = {
+	defaultProps = {
+		filterGroupPrefix = 'filterbuttons',
+	}
+}
 
 ---@class FilterButtonCategory
 ---@field name string
@@ -32,18 +33,25 @@ local FilterButtons = Class.new(Widget)
 ---@field defaultItem string?
 ---@field itemToPropertyValues? fun(item: string): string?
 ---@field itemIsValid? fun(item: string): boolean
----@field transform? fun(item: string): string|Widget|Html|nil
+---@field transform? fun(item: string): Renderable?
 ---@field expandKey string?
 ---@field expandable boolean?
 ---@field order? fun(a: string, b: string): boolean
 ---@field load? fun(cat: FilterButtonCategory)
 ---@field hasFeatured boolean?
 ---@field featuredByDefault boolean?
+---@field loaded boolean?
 
----@return Widget
-function FilterButtons:render()
-	---@type FilterButtonCategory[]
-	local categories = self.props.categories or Lua.import('Module:FilterButtons/Config').categories
+---@class FilterButtonsProps
+---@field categories FilterButtonCategory[]?
+---@field filterGroupPrefix string? use distinct prefixes for independent button sets
+
+---@param props FilterButtonsProps
+---@return VNode
+function FilterButtons.render(props)
+	local categories = props.categories or Lua.import('Module:FilterButtons/Config').categories
+	local filterGroupPrefix = props.filterGroupPrefix
+	---@cast filterGroupPrefix -nil
 
 	Array.forEach(categories, FilterButtons._loadCategories)
 
@@ -54,13 +62,18 @@ function FilterButtons:render()
 				Table.isNotEmpty(category.items), category.name .. ': List of items is required, either input or filled during load'
 			)
 			Variables.varDefine('filterbuttons_defaults_' .. category.name, table.concat(category.defaultItems, ','))
-			return FilterButtons.getButtonRow(category)
+			return FilterButtons.getButtonRow(category, filterGroupPrefix)
 		end)
 	}
 end
 
 ---@param category FilterButtonCategory
 function FilterButtons._loadCategories(category)
+	-- categories are shared module data mutated below; load once even if rendered multiple times
+	if category.loaded then
+		return
+	end
+
 	if category.load then
 		category.load(category)
 	end
@@ -70,7 +83,11 @@ function FilterButtons._loadCategories(category)
 	end
 
 	local itemToPropertyValues = category.itemToPropertyValues or FnUtil.identity
-	category.defaultItems = Array.map(Logic.emptyOr(category.defaultItems, category.items), itemToPropertyValues)
+	category.defaultItems = Array.map(
+		Logic.emptyOr(category.defaultItems, category.items) --[[ @as string[] ]],
+		itemToPropertyValues
+	)
+	category.loaded = true
 end
 
 ---@param category FilterButtonCategory
@@ -86,14 +103,16 @@ function FilterButtons._makeButton(category, value, text)
 end
 
 ---@param category FilterButtonCategory
----@return Widget
-function FilterButtons.getButtonRow(category)
+---@param filterGroupPrefix string
+---@return VNode
+function FilterButtons.getButtonRow(category, filterGroupPrefix)
 	local transformValueToText = category.transform or FnUtil.identity
 	local itemToPropertyValues = category.itemToPropertyValues or FnUtil.identity
 	local makeButton = FnUtil.curry(FilterButtons._makeButton, category)
 
 	local buttons = FilterButtonRow{
 		categoryName = category.name,
+		filterGroupPrefix = filterGroupPrefix,
 		featuredByDefault = category.featuredByDefault,
 		hasFeatured = category.hasFeatured,
 		buttons = Array.map(category.items or {}, function (value)
@@ -108,7 +127,7 @@ function FilterButtons.getButtonRow(category)
 		return Div{
 			classes = { 'filter-category--hidden' },
 			attributes = {
-				['data-filter-group'] = 'tournaments-list-dropdown-' .. category.name,
+				['data-filter-group'] = filterGroupPrefix .. '-dropdown-' .. category.name,
 				['data-filter-category'] = 'dropdown-' .. category.name
 			},
 			children = { buttons }
@@ -118,4 +137,4 @@ function FilterButtons.getButtonRow(category)
 	return buttons
 end
 
-return FilterButtons
+return Component.component(FilterButtons.render, FilterButtons.defaultProps)

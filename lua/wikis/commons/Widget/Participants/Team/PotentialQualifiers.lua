@@ -8,20 +8,16 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 
----@class PotentialQualifiers: Widget
----@operator call(table): PotentialQualifiers
-local PotentialQualifiers = Class.new(Widget)
-
----@return Widget?
-function PotentialQualifiers:render()
-	local participant = self.props.participant
+---@param props {participant: TeamParticipant}
+---@return VNode?
+local function PotentialQualifiers(props)
+	local participant = props.participant
 	local potentialQualifiers = participant.potentialQualifiers
 
 	if not potentialQualifiers or #potentialQualifiers == 0 then
@@ -35,14 +31,11 @@ function PotentialQualifiers:render()
 		},
 		Div{
 			classes = {'team-participant-card__potential-qualifiers-list'},
-			children = Array.map(potentialQualifiers, function(qualifierOpponent, index)
+			children = Array.map(potentialQualifiers, function(qualifierOpponent)
 				return OpponentDisplay.BlockOpponent{
 					opponent = qualifierOpponent,
 					teamStyle = 'standard',
-					additionalClasses = {
-						'team-participant-card__potential-qualifiers-item',
-						(index % 2 == 1) and 'team-participant-card__potential-qualifiers-item--odd' or nil
-					}
+					additionalClasses = {'team-participant-card__potential-qualifiers-item'}
 				}
 			end)
 		}
@@ -54,4 +47,4 @@ function PotentialQualifiers:render()
 	}
 end
 
-return PotentialQualifiers
+return Component.component(PotentialQualifiers)

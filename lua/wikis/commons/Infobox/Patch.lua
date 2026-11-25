@@ -30,13 +30,13 @@ local Highlights = Widgets.Highlights
 local Patch = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function Patch.run(frame)
 	local patch = Patch(frame)
 	return patch:createInfobox()
 end
 
----@return Widget
+---@return VNode
 function Patch:createInfobox()
 	local args = self.args
 

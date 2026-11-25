@@ -9,8 +9,8 @@ local Lua = require('Module:Lua')
 
 local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
@@ -52,7 +52,7 @@ local CONTENT = {
 		heading = 'Tournaments',
 		body = Div{
 			children = {
-				mw.getCurrentFrame():preprocess('<tournaments />'),
+				mw.getCurrentFrame():extensionTag('tournaments'),
 				Div{
 					classes = {'mainpage-editlink'},
 					children = {
@@ -130,7 +130,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				sizes = {xxl = 5, xxxl = 6},
+				sizes = {xxl = 6, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
@@ -151,7 +151,7 @@ return {
 				}
 			},
 			{ -- Right
-				sizes = {xxl = 7, xxxl = 6},
+				sizes = {xxl = 6, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 2,

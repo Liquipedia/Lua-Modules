@@ -17,14 +17,14 @@ local PlacementStats = Lua.import('Module:Infobox/Extension/PlacementStats')
 local CustomTeam = Class.new(Team)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 
 	return team:createInfobox()
 end
 
----@return Html|string
+---@return Renderable?
 function CustomTeam:createBottomContent()
 	return PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}}
 end

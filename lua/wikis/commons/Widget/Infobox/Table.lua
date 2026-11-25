@@ -8,21 +8,23 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 
 ---@class InfoboxTableWidgetWidgetOptions
 ---@field columns number?
+---@field columnOptions {classes: string[]?}[]?
 ---@field makeLink boolean?
 ---@field suppressColon boolean?
----@field separator Widget|string|Html|nil
+---@field separator Renderable?
 
----@class InfoboxTableWidget: Widget
----@operator call(table):InfoboxTableWidget
-local InfoboxTableWidget = Class.new(Widget)
-InfoboxTableWidget.defaultProps = {
+---@class InfoboxTableWidgetProps
+---@field rows Renderable[][]
+---@field options InfoboxTableWidgetWidgetOptions?
+---@field classes string[]?
+
+local defaultProps = {
 	rows = {},
 	options = {
 		columns = 2,
@@ -30,21 +32,26 @@ InfoboxTableWidget.defaultProps = {
 	},
 }
 
----@return Widget?
-function InfoboxTableWidget:render()
-	local rows = self.props.rows
-	local options = self.props.options
+---@param props InfoboxTableWidgetProps
+---@return Renderable[]?
+local function InfoboxTableWidget(props)
+	local rows = props.rows
+	local options = props.options or {}
+	options = {
+		columns = options.columns or defaultProps.options.columns,
+		columnOptions = options.columnOptions or defaultProps.options.columnOptions,
+	}
 
 	if #rows == 0 then
 		return
 	end
 
 	return Array.map(rows, function(row)
-		return HtmlWidgets.Div{
-			classes = self.props.classes,
-			children = Array.map(Array.range(1, options.columns), function(columnIndex)
+		return Html.Div{
+			classes = props.classes,
+			children = Array.mapRange(1, options.columns, function(columnIndex)
 				local columnOptions = options.columnOptions[columnIndex] or {}
-				return HtmlWidgets.Div{
+				return Html.Div{
 					classes = columnOptions.classes or {},
 					children = row[columnIndex],
 				}
@@ -53,4 +60,4 @@ function InfoboxTableWidget:render()
 	end)
 end
 
-return InfoboxTableWidget
+return Component.component(InfoboxTableWidget, defaultProps)

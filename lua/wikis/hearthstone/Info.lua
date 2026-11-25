@@ -45,5 +45,11 @@ return {
 			useParent = false,
 			onlyTierTypeIfBoth = false,
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchscore', 'gamescore'},
+				group = {'matchscore', 'gamescore'},
+			},
+		},
 	},
 }

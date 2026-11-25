@@ -53,7 +53,7 @@ local CLASSES = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomItem.run(frame)
 	local item = CustomItem(frame)
 	item:setWidgetInjector(CustomInjector(item))
@@ -88,12 +88,13 @@ function CustomItem._soldFrom(soldFromInput)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		return Array.append(
+			{},
 			args.desc and Title{children = 'Description'} or nil,
 			Center{children = {args.desc}},
 			args.history and Title{children = 'Item History'} or nil,

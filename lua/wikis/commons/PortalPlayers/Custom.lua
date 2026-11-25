@@ -15,7 +15,7 @@ local CustomPortalPlayers = {}
 
 ---Entry Point. Builds the player portal
 ---@param frame Frame
----@return Html
+---@return Renderable
 function CustomPortalPlayers.run(frame)
 	local args = Arguments.getArgs(frame)
 

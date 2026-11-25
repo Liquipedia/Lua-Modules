@@ -15,17 +15,18 @@ local String = Lua.import('Module:StringUtils')
 local Injector = Lua.import('Module:Widget/Injector')
 local Weapon = Lua.import('Module:Infobox/Weapon')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
+local NoWrap = Widgets.NoWrap
 
 ---@class PubgWeaponInfobox: WeaponInfobox
 local CustomWeapon = Class.new(Weapon)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomWeapon.run(frame)
 	local weapon = CustomWeapon(frame)
 	weapon:setWidgetInjector(CustomInjector(weapon))
@@ -34,8 +35,8 @@ function CustomWeapon.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
@@ -51,23 +52,14 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		local maps = Array.map(self.caller:getAllArgsForBase(args, 'map'), function(map)
-			return tostring(CustomWeapon:_createNoWrappingSpan(PageLink.makeInternalLink({}, map)))
+			return NoWrap{children = PageLink.makeInternalLink({}, map)}
 		end)
 
 		table.insert(widgets, Title{children = 'Maps'})
-		table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
+		table.insert(widgets, Center{children = Array.interleave(maps, '&nbsp;• ')})
 	end
 
 	return widgets
-end
-
----@param content string|number|Html|nil
----@return Html
-function CustomWeapon:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
-	return span
 end
 
 return CustomWeapon

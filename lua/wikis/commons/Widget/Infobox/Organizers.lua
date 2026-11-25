@@ -7,50 +7,48 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 
-local Widget = Lua.import('Module:Widget')
-
+local Component = Lua.import('Module:Widget/Component')
 local Cell = Lua.import('Module:Widget/Infobox/Cell')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
----@class InfoboxOrganizersWidget: Widget
----@operator call(table):InfoboxOrganizersWidget
----@field args table<string, string>
-local Organizers = Class.new(Widget)
-Organizers.defaultProps = {
+local Helpers = {}
+local defaultProps = {
 	args = {},
 }
 
----@return Widget?
-function Organizers:render()
-	local args = self.props.args
-	local organizers = self:_createOrganizers(args)
+---@param props {args: table<string, string>}
+---@return Renderable[]
+local function Organizers(props)
+	local args = props.args
+	local organizers = Helpers._createOrganizers(args)
 	local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
 
 	return {Cell{name = title, children = organizers}}
 end
 
+---@private
 ---@param args table
----@return string[]
-function Organizers:_createOrganizers(args)
+---@return Renderable[]
+function Helpers._createOrganizers(args)
 	local organizers = {}
 
 	for prefix, organizer in Table.iter.pairsByPrefix(args, 'organizer', {requireIndex = false}) do
-		table.insert(organizers, Organizers._createLink(organizer, args[prefix .. '-name'], args[prefix .. '-link']))
+		table.insert(organizers, Helpers._createLink(organizer, args[prefix .. '-name'], args[prefix .. '-link']))
 	end
 
 	return organizers
 end
 
+---@private
 ---@param id string?
 ---@param name string?
 ---@param link string?
----@return Widget|string?
-function Organizers._createLink(id, name, link)
+---@return Renderable?
+function Helpers._createLink(id, name, link)
 	if Logic.isEmpty(id) then return nil end
 	---@cast id -nil
 
@@ -65,4 +63,4 @@ function Organizers._createLink(id, name, link)
 	return display
 end
 
-return Organizers
+return Component.component(Organizers, defaultProps)

@@ -7,41 +7,42 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local Array = Lua.import('Module:Array')
 local Table = Lua.import('Module:Table')
 
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
-local TableWidget = HtmlWidgets.Table
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
+local TableWidget = Html.Table
 
----@class MatchSummaryCollapsible: Widget
----@operator call(table): MatchSummaryCollapsible
-local MatchSummaryCollapsible = Class.new(Widget)
-MatchSummaryCollapsible.defaultProps = {
-	classes = {},
-	tableCss = {},
-}
+---@class MatchSummaryCollapsibleProps
+---@field classes string[]?
+---@field header Renderable
+---@field css table<string, string|number?>?
+---@field tableClasses string[]?
+---@field tableCss table<string, string|number?>?
+---@field children Renderable|Renderable[]?
 
----@return Widget
-function MatchSummaryCollapsible:render()
-	assert(self.props.header, 'No header supplied to MatchSummaryCollapsible Widget')
+---@param props MatchSummaryCollapsibleProps
+---@return VNode
+local function MatchSummaryCollapsible(props)
+	assert(props.header, 'No header supplied to MatchSummaryCollapsible Widget')
 
 	return Div{
-		classes = {'brkts-popup-mapveto', unpack(self.props.classes)},
-		css = Table.merge({width = '100%'}, self.props.css),
+		classes = Array.extend('brkts-popup-mapveto', props.classes),
+		css = Table.mergeInto({width = '100%'}, props.css),
 		children = {
 			TableWidget{
-				classes = {'collapsible', 'collapsed', unpack(self.props.tableClasses)},
-				css = self.props.tableCss,
+				classes = Array.extend('collapsible', 'collapsed', props.tableClasses),
+				css = props.tableCss,
 				children = WidgetUtil.collect(
-					self.props.header,
-					unpack(self.props.children)
+					props.header,
+					props.children
 				)
 			},
 		},
 	}
 end
 
-return MatchSummaryCollapsible
+return Component.component(MatchSummaryCollapsible)

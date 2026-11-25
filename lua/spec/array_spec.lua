@@ -141,6 +141,13 @@ describe('array', function()
 		end)
 	end)
 
+	describe('FlatMap', function()
+		it('check', function()
+			local a = {1, 1, 2, 1, 2, 3, 1, 2, 3, 4}
+			assert.are_same(a, Array.flatMap(Array.range(1, 4), function(i) return Array.range(1, i) end))
+		end)
+	end)
+
 	describe('All', function()
 		it('check', function()
 			local a = {1, 2, 3}
@@ -228,12 +235,30 @@ describe('array', function()
 				return a[prefix] ~= 'cake' and (prefix .. a[prefix]) or nil
 			end))
 		end)
+
+		it('accept \'false\' literal', function()
+			local a = Array.mapIndexes(function (index)
+				if index > 10 then
+					return
+				end
+				return index % 2 == 0
+			end)
+			assert.are_same(Array.flatten(Array.rep({false, true}, 5)), a)
+		end)
 	end)
 
 	describe('Range', function()
 		it('check', function()
 			assert.are_same({1, 2, 3}, Array.range(1, 3))
 			assert.are_same({2, 3}, Array.range(2, 3))
+		end)
+	end)
+
+	describe('mapRange', function()
+		it('check', function()
+			assert.are_same({'arg1', 'arg2', 'arg3'}, Array.mapRange(1, 3, function (index)
+				return 'arg' .. index
+			end))
 		end)
 	end)
 
@@ -295,11 +320,26 @@ describe('array', function()
 			assert.are_same(a, Array.parseCommaSeparatedString('test1, test2,test3'))
 			assert.are_same(a, Array.parseCommaSeparatedString('test1 - test2-test3', '-'))
 		end)
+
+		it('trims the items and keeps empty ones', function()
+			local nbsp = '\194\160'
+			assert.are_same({}, Array.parseCommaSeparatedString(''))
+			assert.are_same({}, Array.parseCommaSeparatedString(nil))
+			assert.are_same({'a', '', 'b', ''}, Array.parseCommaSeparatedString('a, ,b, '))
+			assert.are_same({'Åsa', 'à', 'b'}, Array.parseCommaSeparatedString('Åsa,' .. nbsp .. 'à ,' .. nbsp .. 'b' .. nbsp))
+		end)
 	end)
 
 	describe('Interleave', function ()
 		it('works', function()
 			assert.are_same({'a', ' ', 'b', ' ', 'c'}, Array.interleave({'a', 'b', 'c'}, ' '))
+			assert.are_same({'a'}, Array.interleave({'a'}, ' '))
+			assert.are_same({}, Array.interleave({}, ' '))
+		end)
+
+		it('with nested array', function ()
+			local a, b = Array.range(1, 3), math.pi
+			assert.are_same({{1, 2, 3}, ' ', b}, Array.interleave({a, b}, ' '))
 		end)
 	end)
 end)

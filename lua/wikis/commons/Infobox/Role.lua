@@ -27,7 +27,7 @@ local Customizable = Widgets.Customizable
 ---@operator call(Frame): RoleInfobox
 local Role = Class.new(BasicInfobox)
 
----@return Widget
+---@return VNode
 function Role:createInfobox()
 	local args = self.args
 

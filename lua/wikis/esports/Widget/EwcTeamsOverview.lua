@@ -8,98 +8,29 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Json = Lua.import('Module:Json')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Page = Lua.import('Module:Page')
 local Template = Lua.import('Module:Template')
 
-local DataTable = Lua.import('Module:Widget/Basic/DataTable')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local OverviewData = Lua.import('Module:EwcTeamsOverview/data')
+
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local Widget = Lua.import('Module:Widget')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
----@class EwcTeamsOverview: Widget
----@operator call(table): EwcTeamsOverview
-local EwcTeamsOverview = Class.new(Widget)
-
-local GAMES = {
-	EWC2025 = {
-		{lis = 'apex', wiki = 'apexlegends'},
-		{lis = 'cf', wiki = 'crossfire'},
-		{lis = 'chess', wiki = 'chess'},
-		{lis = 'codbo6', wiki = 'callofduty'},
-		{lis = 'codwz', wiki = 'callofduty'},
-		{lis = 'cs2', wiki = 'counterstrike'},
-		{lis = 'dota2', wiki = 'dota2'},
-		{lis = 'fc25', wiki = 'easportsfc'},
-		{lis = 'ff', wiki = 'freefire'},
-		{lis = 'ffcotw', wiki = 'fighters'},
-		{lis = 'hok', wiki = 'honorofkings'},
-		{lis = 'lol', wiki = 'leagueoflegends'},
-		{lis = 'mlbb', wiki = 'mobilelegends'},
-		{lis = 'mwi', wiki = 'mobilelegends'},
-		{lis = 'ow2', wiki = 'overwatch'},
-		{lis = 'pubg', wiki = 'pubg'},
-		{lis = 'pubgm', wiki = 'pubgmobile'},
-		{lis = 'r6s', wiki = 'rainbowsix'},
-		{lis = 'rennsport', wiki = 'simracing'},
-		{lis = 'rl', wiki = 'rocketleague'},
-		{lis = 'sc2', wiki = 'starcraft2'},
-		{lis = 'sf6', wiki = 'fighters'},
-		{lis = 't8', wiki = 'fighters'},
-		{lis = 'tft', wiki = 'tft'},
-		{lis = 'valorant', wiki = 'valorant'},
-	},
-	EWC2026 = {
-		{lis = 'apex', wiki = 'apexlegends'},
-		{lis = 'cf', wiki = 'crossfire'},
-		{lis = 'chess', wiki = 'chess'},
-		{lis = 'codbo7', wiki = 'callofduty'},
-		{lis = 'codwz', wiki = 'callofduty'},
-		{lis = 'cs2', wiki = 'counterstrike'},
-		{lis = 'dota2', wiki = 'dota2'},
-		{lis = 'fc26', wiki = 'easportsfc'},
-		{lis = 'ff', wiki = 'freefire'},
-		{lis = 'ffcotw', wiki = 'fighters'},
-		{lis = 'fortnite', wiki = 'fortnite'},
-		{lis = 'hok', wiki = 'honorofkings'},
-		{lis = 'lol', wiki = 'leagueoflegends'},
-		{lis = 'mlbb', wiki = 'mobilelegends'},
-		{lis = 'mwi', wiki = 'mobilelegends'},
-		{lis = 'ow2', wiki = 'overwatch'},
-		{lis = 'pubg', wiki = 'pubg'},
-		{lis = 'pubgm', wiki = 'pubgmobile'},
-		{lis = 'r6s', wiki = 'rainbowsix'},
-		{lis = 'rl', wiki = 'rocketleague'},
-		{lis = 'sf6', wiki = 'fighters'},
-		{lis = 't8', wiki = 'fighters'},
-		{lis = 'tft', wiki = 'tft'},
-		{lis = 'tm', wiki = 'trackmania'},
-		{lis = 'valorant', wiki = 'valorant'},
-	},
-	ENC2026 = {
-		{lis = 'apex', wiki = 'apexlegends'},
-		{lis = 'chess', wiki = 'chess'},
-		{lis = 'cs2', wiki = 'counterstrike'},
-		{lis = 'dota2', wiki = 'dota2'},
-		{lis = 'fc26', wiki = 'easportsfc'},
-		{lis = 'ffcotw', wiki = 'fighters'},
-		{lis = 'hok', wiki = 'honorofkings'},
-		{lis = 'lol', wiki = 'leagueoflegends'},
-		{lis = 'mlbb', wiki = 'mobilelegends'},
-		{lis = 'pubg', wiki = 'pubg'},
-		{lis = 'pubgm', wiki = 'pubgmobile'},
-		{lis = 'r6s', wiki = 'rainbowsix'},
-		{lis = 'rl', wiki = 'rocketleague'},
-		{lis = 'sf6', wiki = 'fighters'},
-		{lis = 'tm', wiki = 'trackmania'},
-		{lis = 'valorant', wiki = 'valorant'},
-	}
+local EWC_ICON = LeagueIcon.display{
+	icon = 'Esports World Cup icon lightmode.png',
+	iconDark = 'Esports World Cup icon darkmode.png',
+	link = 'Esports World Cup',
+	name = 'EWC'
 }
-
 local STATUSES = {
 	q = {icon = 'qualified', order = 1},
 	tbd = {icon = 'tobedetermined', order = 2},
@@ -110,6 +41,9 @@ local STATUSES = {
 local DEFAULT_ORDER_VALUE = 9
 
 local function storeClubs(clubs, gameData, season)
+	if Lpdb.isStorageDisabled() then
+		return
+	end
 	Array.forEach(clubs, function(club)
 		if not club.name or not club.teams then return end
 
@@ -138,14 +72,15 @@ local function storeClubs(clubs, gameData, season)
 
 end
 
----@return Widget
-function EwcTeamsOverview:render()
-	local season = self.props.season
-	local gameData = GAMES[season]
+---@param props table
+---@return VNode
+local function EwcTeamsOverview(props)
+	local season = props.season
+	local gameData = OverviewData[season]
 	assert(gameData, 'Invalid season: ' .. tostring(season))
-	assert(self.props.clubs, 'No clubs provided')
+	assert(props.clubs, 'No clubs provided')
 
-	local clubs = Json.parseStringified(self.props.clubs)
+	local clubs = Json.parseStringified(props.clubs)
 	storeClubs(clubs, gameData, season)
 
 	local function makeTeamCell(game, team)
@@ -157,36 +92,54 @@ function EwcTeamsOverview:render()
 		return Link{children = Icon{iconName = icon}, link = link}
 	end
 
-	return DataTable{
+	return TableWidgets.Table{
 		sortable = true,
-		tableCss = {
-			['text-align'] = 'center',
-			['font-size'] = '16px',
-		},
-		children = WidgetUtil.collect(
-			HtmlWidgets.Tr{
-				children = WidgetUtil.collect(
-					HtmlWidgets.Th{children = 'Team Name'},
-					HtmlWidgets.Th{children = ''},
-					HtmlWidgets.Th{children = HtmlWidgets.Abbr{title = 'Qualified to X/25 Tournaments', children = 'Q#'}},
-					HtmlWidgets.Th{children = HtmlWidgets.Abbr{title = 'Number of Teams', children = 'T#'}},
-					Array.map(gameData, function(game)
-						return HtmlWidgets.Th{
-							children = Template.expandTemplate(mw.getCurrentFrame(), 'LeagueIconSmall/' .. game.lis),
-						}
-					end)
-				)
+		columns = Array.extendWith(
+			{
+				{align = 'left'},
+				{align = 'center'},
 			},
-			Array.map(clubs, function(club)
-				return HtmlWidgets.Tr{
+			Array.rep({
+				align = 'right',
+				sortType = 'number',
+			}, 2),
+			Array.rep({align = 'center'}, #gameData)
+		),
+		children = {
+			TableWidgets.TableHeader{
+				children = TableWidgets.Row{
 					children = WidgetUtil.collect(
-						HtmlWidgets.Td{
-							children = mw.ext.TeamTemplate.team(club.name),
-							css = {['text-align'] = 'left', ['text-wrap'] = 'nowrap'}
+						TableWidgets.CellHeader{children = 'Team Name'},
+						TableWidgets.CellHeader{children = ''},
+						TableWidgets.CellHeader{children = Html.Abbr{
+							title = 'Qualified to X/' .. #gameData .. ' Tournaments',
+							children = 'Q#',
+						}},
+						TableWidgets.CellHeader{children = Html.Abbr{title = 'Number of Teams', children = 'T#'}},
+						Array.map(gameData, function(game)
+							return TableWidgets.CellHeader{
+								children = Template.expandTemplate(mw.getCurrentFrame(), 'LeagueIconSmall/' .. game.lis),
+							}
+						end)
+					)
+				}
+			},
+			TableWidgets.TableBody{children = Array.map(clubs, function(club)
+				return TableWidgets.Row{
+					children = WidgetUtil.collect(
+						TableWidgets.Cell{
+							children = OpponentDisplay.InlineTeamContainer{template = club.name},
 						},
-						HtmlWidgets.Td{children = club.club and Template.safeExpand(mw.getCurrentFrame(), 'LeagueIconSmall/ewc') or nil},
-						HtmlWidgets.Td{children = (club.qualified or 0) .. '/' .. #gameData},
-						HtmlWidgets.Td{children = club.teams},
+						TableWidgets.Cell{
+							children = club.club and EWC_ICON or nil
+						},
+						TableWidgets.Cell{
+							attributes = {
+								['data-sort-value'] = club.qualified or 0
+							},
+							children = (club.qualified or 0) .. '/' .. #gameData
+						},
+						TableWidgets.Cell{children = club.teams},
 						Array.map(gameData, function(game)
 							local background, sortValue, content
 							local orgInGame = club[game.lis]
@@ -203,7 +156,7 @@ function EwcTeamsOverview:render()
 								end), '&nbsp;')
 							end
 
-							return HtmlWidgets.Td{
+							return TableWidgets.Cell{
 								classes = {background},
 								attributes = {['data-sort-value'] = sortValue or DEFAULT_ORDER_VALUE},
 								children = content
@@ -211,9 +164,9 @@ function EwcTeamsOverview:render()
 						end)
 					)
 				}
-			end)
-		)
+			end)}
+		}
 	}
 end
 
-return EwcTeamsOverview
+return Component.component(EwcTeamsOverview)

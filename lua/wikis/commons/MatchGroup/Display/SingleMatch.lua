@@ -29,7 +29,7 @@ end
 ---Display component for a singleMatch. The singleMatch is specified by matchID.
 ---The component fetches the match data from LPDB or page variables.
 ---@param props {matchId: string, config: SingleMatchConfigOptions}
----@return Widget|Html
+---@return Renderable
 function SingleMatchDisplay.SingleMatchContainer(props)
 	local bracketId, _ = MatchGroupUtil.splitMatchId(props.matchId)
 
@@ -46,32 +46,21 @@ end
 
 ---Display component for a singleMatch. Match data is specified in the input.
 ---@param props {config: SingleMatchConfigOptions, match: MatchGroupUtilMatch}
----@return Widget|Html
+---@return Renderable
 function SingleMatchDisplay.SingleMatch(props)
 	local propsConfig = props.config or {}
-	local config = {
-		MatchSummaryContainer = propsConfig.MatchSummaryContainer or DisplayHelper.DefaultMatchSummaryContainer,
-		width = propsConfig.width or 400,
-	}
+	local MatchSummaryContainer = propsConfig.MatchSummaryContainer or DisplayHelper.DefaultMatchSummaryContainer
 
-	return SingleMatchDisplay.Match{
-		MatchSummaryContainer = config.MatchSummaryContainer,
-		match = props.match,
-		width = config.width,
-	}
-end
-
----Display component for a match in a singleMatch. Consists of the match summary.
----@param props {MatchSummaryContainer: function, match: MatchGroupUtilMatch, width: string|integer?}
----@return Widget|Html
-function SingleMatchDisplay.Match(props)
 	local bracketId = MatchGroupUtil.splitMatchId(props.match.matchId)
-	return DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
+	return DisplayUtil.TryPureComponent(MatchSummaryContainer, {
 		bracketId = bracketId,
 		matchId = props.match.matchId,
-		config = {showScore = true},
+		config = {
+			showScore = true,
+			width = 400,
+		},
 		classes = {'brkts-popup', 'brkts-match-info-flat'},
-		width = props.width,
+		width = propsConfig.width,
 	}, Lua.import('Module:Error/Display').ErrorList)
 end
 

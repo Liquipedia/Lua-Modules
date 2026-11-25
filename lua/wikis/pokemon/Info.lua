@@ -283,5 +283,11 @@ return {
 		participants = {
 			defaultPlayerNumber = 5,
 		},
+		standings = {
+			alwaysShowStats = {
+				swiss = {'matchscore', 'gamescore'},
+				group = {'matchscore', 'gamescore'},
+			},
+		},
 	},
 }

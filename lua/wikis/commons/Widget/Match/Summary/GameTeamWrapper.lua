@@ -7,25 +7,21 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-
----@class MatchSummaryMatchGameTeamWrapper: Widget
----@operator call(table): MatchSummaryMatchGameTeamWrapper
-local MatchSummaryMatchGameTeamWrapper = Class.new(Widget)
-MatchSummaryMatchGameTeamWrapper.defaultProps = {
+local defaultProps = {
 	flipped = false,
 }
 
----@return Widget?
-function MatchSummaryMatchGameTeamWrapper:render()
-	return HtmlWidgets.Div{
+---@param props {flipped: boolean?, children: Renderable|Renderable[]}
+---@return VNode?
+local function MatchSummaryMatchGameTeamWrapper(props)
+	return Html.Div{
 		classes = {'brkts-popup-spaced'},
-		css = {flex = 1, ['justify-content'] = 'unset', ['flex-direction'] = self.props.flipped and 'row-reverse' or 'row'},
-		children = self.props.children
+		css = {flex = 1, ['justify-content'] = 'unset', ['flex-direction'] = props.flipped and 'row-reverse' or 'row'},
+		children = props.children
 	}
 end
 
-return MatchSummaryMatchGameTeamWrapper
+return Component.component(MatchSummaryMatchGameTeamWrapper, defaultProps)

@@ -8,10 +8,8 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
-local FnUtil = Lua.import('Module:FnUtil')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
@@ -22,9 +20,9 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local BASE_CURRENCY = 'USD'
@@ -39,7 +37,7 @@ local NON_BREAKING_SPACE = '&nbsp;'
 ---@field matchGroupId3 string?
 ---@field sdate string|number|osdate|osdateparam?
 ---@field edate string|number|osdate|osdateparam?
----@field prizeMode 'matchWins'|'gameWins'|'scores'
+---@field prizeMode 'matchWins'|'gameWins'|'scores'?
 ---@field points string?
 ---@field points2 string?
 ---@field valueStart number?
@@ -48,35 +46,34 @@ local NON_BREAKING_SPACE = '&nbsp;'
 ---@field pointsPerWin number?
 ---@field points2Start number?
 ---@field points2PerWin number?
+---@field gameCountDefaultResult number?
 ---@field n-m number? # n amd m integers
 ---@field n-m_points number? # n amd m integers
 ---@field n-m_points2 number? # n amd m integers
 ---@field localcurrency string?
----@field cutafter integer?
+---@field collapseafter integer?
+---@field cutafter integer? # deprecated alias of collapseafter
 ---@field title string?
 ---@field precision integer?
----@field autoexchange boolean
+---@field autoexchange boolean?
 ---@field showMatchWL boolean?
 ---@field showGameWL boolean?
 ---@field showScore boolean?
 ---@field hideWinnings boolean?
 
----@class StageWinnings: Widget
----@operator call(table): StageWinnings
----@field props StageWinningProps
----@field points {title: string, icon: string?, iconDark: string?, link: string?, titleLong: string?}?
----@field points2 {title: string, icon: string?, iconDark: string?, link: string?, titleLong: string?}?
-local StageWinnings = Class.new(Widget)
-StageWinnings.defaultProps = {
+---@alias StageWinningsPointsData {title: string, icon: string?, iconDark: string?, link: string?, titleLong: string?}
+
+local defaultProps = {
 	autoexchange = true,
 	prizeMode = 'matchWins',
 	title = 'Group Stage Winnings'
 }
 
----@return Widget?
-function StageWinnings:render()
-	local props = self.props
+local StageWinnings = {}
 
+---@param props StageWinningProps
+---@return VNode
+local function StageWinningsWidget(props)
 	local startDate = DateExt.readTimestamp(props.sdate)
 	local endDate = DateExt.readTimestamp(props.edate)
 
@@ -121,10 +118,13 @@ function StageWinnings:render()
 		pointsPerWin = tonumber(props.pointsPerWin) or 0,
 		points2PerWin = tonumber(props.points2PerWin) or 0,
 		hideWinnings = Logic.readBool(props.hideWinnings),
+		gameCountDefaultResult = tonumber(props.gameCountDefaultResult),
 	}
 
+	---@type number?
+	local currencyRate
 	if Logic.isNotEmpty(props.localcurrency) and Logic.readBool(props.autoexchange) then
-		self.currencyRate = Currency.getExchangeRate{
+		currencyRate = Currency.getExchangeRate{
 			currency = props.localcurrency,
 			date = DateExt.toYmdInUtc(endDate or DateExt.getContextualDateOrNow()),
 			setVariables = false
@@ -132,7 +132,7 @@ function StageWinnings:render()
 	end
 
 	---@param prefix string
-	---@return {title: string, icon: string?, iconDark: string?, link: string?, titleLong: string?}?
+	---@return StageWinningsPointsData?
 	local parsePoints = function(prefix)
 		if Logic.isEmpty(props[prefix]) then
 			return
@@ -144,17 +144,16 @@ function StageWinnings:render()
 
 		return pointsData
 	end
-	self.points = parsePoints('points')
-	self.points2 = parsePoints('points2')
+	local pointsData = parsePoints('points')
+	local points2Data = parsePoints('points2')
+
+	local collapseAfter = tonumber(props.collapseafter or props.cutafter) or 5
 
 	return TableWidgets.Table{
 		caption = props.title,
-		tableClasses = {'prizepooltable', 'collapsed'},
-		tableAttributes = {
-			['data-cutafter'] = (tonumber(props.cutafter) or 5),
-			['data-opentext'] = 'Show remaining participants',
-			['data-closetext'] = 'Hide remaining participants',
-		},
+		collapseAfter = #opponentList > collapseAfter and collapseAfter or nil,
+		expandText = 'Show remaining participants',
+		collapseText = 'Hide remaining participants',
 		columns = WidgetUtil.collect(
 			{align = 'left'},
 			(Logic.readBool(props.showMatchWL) or props.prizeMode == 'matchWins') and {align = 'center'} or nil,
@@ -164,21 +163,24 @@ function StageWinnings:render()
 			(Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency))
 				and (not Logic.readBool(props.hideWinnings)) and {align = 'right'}
 				or nil,
-			Logic.isNotEmpty(self.points) and {align = 'right'} or nil,
-			Logic.isNotEmpty(self.points2) and {align = 'right'} or nil
+			Logic.isNotEmpty(pointsData) and {align = 'right'} or nil,
+			Logic.isNotEmpty(points2Data) and {align = 'right'} or nil
 		),
 		children = {
-			self:_headerRow(),
-			TableWidgets.TableBody{children = Array.map(opponentList, FnUtil.curry(self._row, self))}
+			StageWinnings._headerRow(props, pointsData, points2Data),
+			TableWidgets.TableBody{children = Array.map(opponentList, function(data)
+				return StageWinnings._row(props, currencyRate, pointsData, points2Data, data)
+			end)}
 		},
 	}
 end
 
 ---@private
----@return Widget
-function StageWinnings:_headerRow()
-	local props = self.props
-
+---@param props StageWinningProps
+---@param pointsData StageWinningsPointsData?
+---@param points2Data StageWinningsPointsData?
+---@return VNode
+function StageWinnings._headerRow(props, pointsData, points2Data)
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
 			TableWidgets.CellHeader{children = 'Participants'},
@@ -192,19 +194,21 @@ function StageWinnings:_headerRow()
 			(Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency))
 				and (not Logic.readBool(props.hideWinnings))
 				and TableWidgets.CellHeader{children = Currency.display(BASE_CURRENCY)} or nil,
-			self:_pointsHeader(self.points),
-			self:_pointsHeader(self.points2)
+			StageWinnings._pointsHeader(pointsData),
+			StageWinnings._pointsHeader(points2Data)
 		)}
 	}}
 end
 
 ---@private
+---@param props StageWinningProps
+---@param currencyRate number?
+---@param pointsData StageWinningsPointsData?
+---@param points2Data StageWinningsPointsData?
 ---@param data {opponent: standardOpponent, matchWins: integer, matchLosses: integer, gameWins: integer,
 ---gameLosses: integer, winnings: number, points: number, points2: number, scoreDetails: table<string, integer>}
----@return Widget
-function StageWinnings:_row(data)
-	local props = self.props
-
+---@return VNode
+function StageWinnings._row(props, currencyRate, pointsData, points2Data, data)
 	local currencyDisplayConfig = {
 		displaySymbol = true,
 		formatValue = true,
@@ -242,14 +246,14 @@ function StageWinnings:_row(data)
 			(Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency))
 				and (not Logic.readBool(props.hideWinnings)) and TableWidgets.Cell{children = Currency.display(
 					BASE_CURRENCY,
-					data.winnings * (self.currencyRate or 1),
+					data.winnings * (currencyRate or 1),
 					currencyDisplayConfig
 				)} or nil,
-			Logic.isNotEmpty(self.points) and TableWidgets.Cell{
+			Logic.isNotEmpty(pointsData) and TableWidgets.Cell{
 				children = Currency.formatMoney(data.points, 2, false, true),
 				['data-sort-value'] = data.points,
 			} or nil,
-			Logic.isNotEmpty(self.points2) and TableWidgets.Cell{
+			Logic.isNotEmpty(points2Data) and TableWidgets.Cell{
 				children = Currency.formatMoney(data.points2, 2, false, true),
 				['data-sort-value'] = data.points2,
 			} or nil
@@ -257,8 +261,9 @@ function StageWinnings:_row(data)
 	}
 end
 
+---@private
 ---@param scoresTable table<string, integer>
----@return (string|Widget)[]
+---@return Renderable[]
 function StageWinnings._detailedScores(scoresTable)
 	---@type {wins: integer, losses: integer, count: integer}
 	local scoreInfos = Array.extractValues(Table.map(scoresTable, function(score, count)
@@ -283,19 +288,19 @@ function StageWinnings._detailedScores(scoresTable)
 		Array.map(scoreInfos, function(scoreInfo)
 			return scoreInfo.wins .. '-' .. scoreInfo.losses .. ': ' .. scoreInfo.count .. ' times'
 		end),
-		HtmlWidgets.Br{}
+		Html.Br{}
 	)
 end
 
 ---@private
----@param data {title: string, icon: string?, iconDark: string?, link: string?, titleLong: string?}?
----@return Widget?
-function StageWinnings:_pointsHeader(data)
+---@param data StageWinningsPointsData?
+---@return VNode?
+function StageWinnings._pointsHeader(data)
 	if not data then
 		return
 	end
 
-	local titleText = Logic.isNotEmpty(data.titleLong) and HtmlWidgets.Abbr{
+	local titleText = Logic.isNotEmpty(data.titleLong) and Html.Abbr{
 		children = data.title, title = data.titleLong
 	} or data.title
 
@@ -308,4 +313,4 @@ function StageWinnings:_pointsHeader(data)
 	)}
 end
 
-return StageWinnings
+return Component.component(StageWinningsWidget, defaultProps)

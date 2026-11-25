@@ -17,10 +17,11 @@ local Variables = Lua.import('Module:Variables')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local NoWrap = Widgets.NoWrap
 
 ---@class RainbowsixLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -51,7 +52,7 @@ local UBISOFT_TIERS = {
 }
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -60,8 +61,8 @@ function CustomLeague.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
@@ -80,12 +81,10 @@ function CustomInjector:parse(id, widgets)
 			local maps = {}
 
 			for _, map in ipairs(caller:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(caller:_createNoWrappingSpan(
-					PageLink.makeInternalLink({}, map, map .. game)
-				)))
+				table.insert(maps, NoWrap{children = PageLink.makeInternalLink({}, map, map .. game)})
 			end
 			table.insert(widgets, Title{children = 'Maps'})
-			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Center{children = Array.interleave(maps, '&nbsp;• ')})
 		end
 	elseif id == 'liquipediatier' then
 		if caller.data.publishertier then
@@ -174,15 +173,6 @@ function CustomLeague:_createPlatformCell(args)
 	else
 		return nil
 	end
-end
-
----@param content Html|string|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
-	return span
 end
 
 return CustomLeague

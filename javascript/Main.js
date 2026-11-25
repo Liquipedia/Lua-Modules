@@ -47,6 +47,7 @@ const jsModules = [
 	'Analytics',
 	'BattleRoyale',
 	'Bracket',
+	'Brackets',
 	'Carousel',
 	'Collapse',
 	'Commons_mainpage',
@@ -60,6 +61,7 @@ const jsModules = [
 	'FilterButtons',
 	'Liquipedia_links',
 	'Mainpage',
+	'MatchTicker',
 	'Miscellaneous',
 	'PanelBoxCollapsible',
 	'Prizepooltable',
@@ -68,6 +70,7 @@ const jsModules = [
 	'Slider',
 	'SwitchButtons',
 	'Tabs',
+	'Table2',
 	'CoreEnd'
 ];
 

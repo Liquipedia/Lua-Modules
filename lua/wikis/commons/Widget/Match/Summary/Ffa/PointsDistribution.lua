@@ -8,23 +8,19 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
 local ContentItemContainer = Lua.import('Module:Widget/Match/Summary/Ffa/ContentItemContainer')
 local Trophy = Lua.import('Module:Widget/Match/Summary/Ffa/Trophy')
 local RankRange = Lua.import('Module:Widget/Match/Summary/Ffa/RankRange')
 
----@class MatchSummaryFfaPointsDistribution: Widget
----@operator call(table): MatchSummaryFfaPointsDistribution
-local MatchSummaryFfaPointsDistribution = Class.new(Widget)
+---@param props {scores: {rangeStart: integer?, rangeEnd: integer?, placementScore: number, killScore: number?}[]}
+---@return Renderable
+local function MatchSummaryFfaPointsDistribution(props)
+	assert(props.scores, 'No scores provided')
 
----@return Widget
-function MatchSummaryFfaPointsDistribution:render()
-	assert(self.props.scores, 'No scores provided')
-
-	local hasKillPoints = Array.any(self.props.scores, function(slot)
+	local hasKillPoints = Array.any(props.scores, function(slot)
 		return slot.killScore ~= nil
 	end)
 
@@ -33,18 +29,18 @@ function MatchSummaryFfaPointsDistribution:render()
 			return score .. ' ' .. 'point' .. (score ~= 1 and 's' or '')
 		end
 		local contentDisplay = {
-			HtmlWidgets.Span{children = suffixPoints(placementPoints)},
-			hasKillPoints and HtmlWidgets.Span{children = suffixPoints(killPoints)} or nil,
+			Html.Span{children = suffixPoints(placementPoints)},
+			hasKillPoints and Html.Span{children = suffixPoints(killPoints)} or nil,
 		}
-		return {icon = icon, title = title, content =  contentDisplay}
+		return {icon = icon, title = title, content = contentDisplay}
 	end
 
 	local header = {title = 'Placement', content = {
-		HtmlWidgets.Span{children = HtmlWidgets.B{children = 'Placement Points'}},
-		hasKillPoints and HtmlWidgets.Span{children = HtmlWidgets.B{children = 'Points per Kill'}} or nil,
+		Html.Span{children = Html.B{children = 'Placement Points'}},
+		hasKillPoints and Html.Span{children = Html.B{children = 'Points per Kill'}} or nil,
 	}}
 
-	local placementItems = Array.map(self.props.scores, function(slot)
+	local placementItems = Array.map(props.scores, function(slot)
 		local title = RankRange{rankStart = slot.rangeStart, rankEnd = slot.rangeEnd}
 		local icon = Trophy{place = slot.rangeStart}
 
@@ -59,4 +55,4 @@ function MatchSummaryFfaPointsDistribution:render()
 	}
 end
 
-return MatchSummaryFfaPointsDistribution
+return Component.component(MatchSummaryFfaPointsDistribution)

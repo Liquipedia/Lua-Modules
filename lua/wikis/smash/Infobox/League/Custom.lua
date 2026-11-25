@@ -20,11 +20,12 @@ local Variables = Lua.import('Module:Variables')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Chronology = Widgets.Chronology
 local Center = Widgets.Center
+local NoWrap = Widgets.NoWrap
 
 local BASE_CURRENCY = 'USD'
 local CURRENCY_DISPLAY_PRECISION = 0
@@ -173,16 +174,20 @@ function CustomInjector:parse(id, widgets)
 			self.caller:_createCircuitInformation(widgets, '2')
 		end
 
-		local singles = Array.map(league:getAllArgsForBase(args, 's_stage'), CustomLeague._createNoWrappingSpan)
-		if #singles > 0 then
-			table.insert(widgets, Title{children = 'Singles Stages'})
-			table.insert(widgets, Center{children = {table.concat(singles, '&nbsp;• ')}})
+		local makeStage = function(stage)
+			return NoWrap{children = stage}
 		end
 
-		local doubles = Array.map(league:getAllArgsForBase(args, 'd_stage'), CustomLeague._createNoWrappingSpan)
+		local singles = Array.map(league:getAllArgsForBase(args, 's_stage'), makeStage)
+		if #singles > 0 then
+			table.insert(widgets, Title{children = 'Singles Stages'})
+			table.insert(widgets, Center{children = Array.interleave(singles, '&nbsp;• ')})
+		end
+
+		local doubles = Array.map(league:getAllArgsForBase(args, 'd_stage'), makeStage)
 		if #doubles > 0 then
 			table.insert(widgets, Title{children = 'Doubles Stages'})
-			table.insert(widgets, Center{children = {table.concat(doubles, '&nbsp;• ')}})
+			table.insert(widgets, Center{children = Array.interleave(doubles, '&nbsp;• ')})
 		end
 	elseif id == 'dates' then
 		return {
@@ -336,15 +341,6 @@ function CustomLeague.getIconFromSeries(page)
 	return series.icon, series.icondark
 end
 
---- @param content Html|string|number|nil
---- @return string
-function CustomLeague._createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
-	return tostring(span)
-end
-
 ---@param fee string|number|nil
 ---@param participants string|number|nil
 ---@param bonus string|number|nil
@@ -415,12 +411,13 @@ end
 --- @return string?
 function CustomLeague:_createCircuitLink(circuitIndex)
 	local args = self.args
+	local iconDisplay = self.data['circuitIconDisplay' .. circuitIndex] --[[@as string?]]
 
 	return self:createSeriesDisplay({
 		displayManualIcons = true,
 		series = args['circuit' .. circuitIndex],
 		abbreviation = args['circuit' .. circuitIndex .. 'abbr'],
-	}, self.data['circuitIconDisplay' .. circuitIndex])
+	}, iconDisplay)
 end
 
 ---@param date string

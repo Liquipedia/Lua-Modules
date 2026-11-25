@@ -14,6 +14,7 @@ local Json = Lua.import('Module:Json')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
@@ -131,7 +132,7 @@ function MatchLegacy._convertParameters(match2)
 			match[prefix .. 'flag'] = player.flag
 			match.extradata[prefix .. 'name'] = player.displayname
 		elseif opponent.type == Opponent.team then
-			match[prefix] = mw.ext.TeamTemplate.raw(opponent.template).page
+			match[prefix] = TeamTemplate.getRaw(opponent.template).page
 			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			local opponentplayers = {}
 			for i, player in pairs(opponentmatch2players) do

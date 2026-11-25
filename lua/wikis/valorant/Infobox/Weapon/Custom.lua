@@ -22,13 +22,16 @@ local CREDS_ICON = AutoInlineIcon.display{onlyicon = true, category = 'M', looku
 local FIRE_RATE_UNIT = 'rounds/sec'
 
 ---@class ValorantWeaponInfobox: WeaponInfobox
+---@operator call(Frame): ValorantWeaponInfobox
 local CustomWeapon = Class.new(Weapon)
+
 ---@class ValorantWeaponInfoboxWidgetInjector: WidgetInjector
+---@operator call(ValorantWeaponInfobox): ValorantWeaponInfoboxWidgetInjector
 ---@field caller ValorantWeaponInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomWeapon.run(frame)
 	local weapon = CustomWeapon(frame)
 	local args = weapon.args
@@ -41,8 +44,8 @@ function CustomWeapon.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'price' then

@@ -7,15 +7,13 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Locale = Lua.import('Module:Locale')
 local String = Lua.import('Module:StringUtils')
 
-local Widget = Lua.import('Module:Widget')
-
+local Component = Lua.import('Module:Widget/Component')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local Center = Lua.import('Module:Widget/Infobox/Center')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
@@ -24,20 +22,15 @@ local Title = Lua.import('Module:Widget/Infobox/Title')
 local STAY22_LINK = 'https://www.stay22.com/allez/roam?aid=liquipedia&campaign=${wiki}_${page}'..
 	'&address=${address}&checkin=${checkin}&checkout=${checkout}'
 
----@class InfoboxAccommodationWidget: Widget
----@operator call(table):InfoboxAccommodationWidget
+---@class InfoboxAccommodationProps
 ---@field args table<string, string>
 ---@field startDate string?
 ---@field endDate string?
 ---@field name string?
-local Accommodation = Class.new(Widget)
-Accommodation.defaultProps = {
-	args = {},
-}
 
----@return Widget?
-function Accommodation:render()
-	local props = self.props
+---@param props InfoboxAccommodationProps
+---@return VNode[]?
+local function Accommodation(props)
 	local args = props.args
 
 	local startDate, endDate = props.startDate, props.endDate
@@ -128,4 +121,4 @@ function Accommodation:render()
 	}
 end
 
-return Accommodation
+return Component.component(Accommodation)

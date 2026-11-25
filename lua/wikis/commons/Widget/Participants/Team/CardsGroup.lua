@@ -8,38 +8,47 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
+local ErrorDisplay = Lua.import('Module:Error/Display')
 
-local Widget = Lua.import('Module:Widget')
+local TeamParticipantsRoster = Lua.import('Module:TeamParticipants/Roster')
+
+local Component = Lua.import('Module:Widget/Component')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local ParticipantsTeamCard = Lua.import('Module:Widget/Participants/Team/Card')
 local ParticipantControls = Lua.import('Module:Widget/Participants/Team/ParticipantControls')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ParticipantsTeamCardsGroupProps
 ---@field participants TeamParticipant[]|nil
+---@field brokenParticipants TeamParticipant[]|nil
 ---@field showPlayerInfo boolean
 ---@field showControls boolean
 ---@field mergeStaffTabIfOnlyOneStaff boolean|nil
+---@field sortAlphabetically boolean|nil
 
----@class ParticipantsTeamCardsGroup: Widget
----@operator call(ParticipantsTeamCardsGroupProps): ParticipantsTeamCardsGroup
----@field props ParticipantsTeamCardsGroupProps
-local ParticipantsTeamCardsGroup = Class.new(Widget)
-
----@return Widget?
-function ParticipantsTeamCardsGroup:render()
-	local participants = self.props.participants
+---@param props ParticipantsTeamCardsGroupProps
+---@return VNode?
+local function ParticipantsTeamCardsGroup(props)
+	local participants = props.participants
 	if not participants then
 		return
 	end
+	if props.sortAlphabetically then
+		participants = TeamParticipantsRoster.sortParticipants(participants)
+	end
 
-	local showControls = self.props.showControls
+	local showControls = props.showControls
+	local brokenParticipants = props.brokenParticipants or {}
+
+	local errorBoxes = Array.map(brokenParticipants, function(broken)
+		return ErrorDisplay.Box{text = broken.errorMessage}
+	end)
 
 	local children = WidgetUtil.collect(
-		showControls and ParticipantControls{showPlayerInfo = self.props.showPlayerInfo} or nil,
+		errorBoxes,
+		showControls and ParticipantControls{showPlayerInfo = props.showPlayerInfo} or nil,
 		AnalyticsWidget{
 			analyticsName = 'Team participants card',
 			children = Div{
@@ -47,6 +56,8 @@ function ParticipantsTeamCardsGroup:render()
 				children = Array.map(participants, function(participant)
 					return ParticipantsTeamCard{
 						participant = participant,
+						mergeStaffTabIfOnlyOneStaff = props.mergeStaffTabIfOnlyOneStaff,
+						sortAlphabetically = props.sortAlphabetically,
 					}
 				end),
 			}
@@ -59,4 +70,4 @@ function ParticipantsTeamCardsGroup:render()
 	}
 end
 
-return ParticipantsTeamCardsGroup
+return Component.component(ParticipantsTeamCardsGroup)

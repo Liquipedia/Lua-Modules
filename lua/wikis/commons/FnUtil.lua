@@ -11,14 +11,24 @@
 local FnUtil = {}
 
 ---@alias memoizableFunction fun(input: any): any
+---@alias memoizableFunction2 fun(input: any, input2: any): any
+
+local WEAK_KEYS = {__mode = 'k'}
+
+---Cache that drops entries once their key is garbage collected.
+---A value referencing its own key keeps it alive (no ephemerons in Lua 5.1).
+---@return table
+local function weakKeyedCache()
+	return setmetatable({}, WEAK_KEYS)
+end
 
 ---Creates a memoized copy of a 0 or 1 param function.
 ---@generic T:memoizableFunction
 ---@param func T
 ---@return T
 function FnUtil.memoize(func)
-	local called = {}
-	local results = {}
+	local called = weakKeyedCache()
+	local results = weakKeyedCache()
 	local nilCalled = false
 	local nilResult
 	return function(x)
@@ -38,17 +48,47 @@ function FnUtil.memoize(func)
 	end
 end
 
+---Creates a memoized copy of a 2 param function.
+---@generic T:memoizableFunction2
+---@param func T
+---@return T
+function FnUtil.memoize2(func)
+	local called = weakKeyedCache()
+	local results = weakKeyedCache()
+	local xNil = FnUtil.memoize(function(y) return func(nil, y) end)
+	local yNil = FnUtil.memoize(function(x) return func(x, nil) end)
+	return function(x, y)
+		if y == nil then
+			return yNil(x)
+		elseif x == nil then
+			return xNil(y)
+		else
+			if not called[x] then
+				called[x] = weakKeyedCache()
+				results[x] = weakKeyedCache()
+			end
+			if not called[x][y] then
+				called[x][y] = true
+				results[x][y] = func(x, y)
+			end
+			return results[x][y]
+		end
+	end
+end
+
 --[[
 Memoized variant of the Y combinator. Useful for caching results of recursive
 functions, so that previously computed inputs are not recomputed.
 
 Example:
+```
 local fibonacci = FnUtil.memoizeY(function(x, fibonacci)
 	if x == 0 then return 0
 	elseif x == 1 then return 1
 	else return fibonacci(x - 1) + fibonacci(x - 2) end
 end)
 fibonacci(7) -- returns 13
+```
 ]]
 ---@generic T
 ---@param func fun(input: T, self: fun(input: T)):T
@@ -64,8 +104,10 @@ Lazily defines a function, by defining the function now but not constructing
 the function until it is actually used.
 
 Example:
+```
 local parser = FnUtil.lazilyDefineFunction(function() return constructParserFromSpec(spec) end)
 parser('')
+```
 ]]
 ---@generic V:fun(...):any
 ---@param getf_ fun():V

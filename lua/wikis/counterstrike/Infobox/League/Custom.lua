@@ -28,10 +28,11 @@ local League = Lua.import('Module:Infobox/League')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local Tier = Lua.import('Module:Tier/Custom')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local NoWrap = Widgets.NoWrap
 local IconFontawesome = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -131,7 +132,7 @@ local MODE_TEAM = 'team'
 local PRIZE_POOL_ROUND_PRECISION = 2
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -160,8 +161,8 @@ function CustomLeague:customParseArguments(args)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
@@ -177,12 +178,10 @@ function CustomInjector:parse(id, widgets)
 			local maps = {}
 
 			for _, map in ipairs(self.caller:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(self.caller:_createNoWrappingSpan(
-							Page.makeInternalLink({}, map, map .. game)
-						)))
+				table.insert(maps, NoWrap{children = Page.makeInternalLink({}, map, map .. game)})
 			end
 			table.insert(widgets, Title{children = 'Maps'})
-			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Center{children = Array.interleave(maps, '&nbsp;• ')})
 		end
 	elseif id == 'liquipediatier' then
 		Array.appendWith(widgets,
@@ -193,7 +192,7 @@ function CustomInjector:parse(id, widgets)
 			},
 			Cell{
 				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox') .. ' Tier',
-				content = self.caller:_createValveTierCell(),
+				children = self.caller:_createValveTierCell(),
 				classes = {'valvepremier-highlighted'},
 				options = {separator = '&ensp;'}
 			}
@@ -407,14 +406,6 @@ function CustomLeague:_createValveTierCell()
 			} or nil
 		)
 	end
-end
-
----@param content Html|string|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	return mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
 end
 
 return CustomLeague

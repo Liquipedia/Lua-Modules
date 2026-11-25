@@ -33,7 +33,7 @@ local BLUE_MOTES_ICON = '[[File:Blue Motes icon.png|20px|Blue Motes|link=Blue Mo
 local WILD_CORES_ICON = '[[File:Wild Cores icon.png|20px|Wild Cores|link=Wild Cores]]'
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomChampion.run(frame)
 	local unit = CustomChampion(frame)
 	unit:setWidgetInjector(CustomInjector(unit))
@@ -42,8 +42,8 @@ function CustomChampion.run(frame)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'header' then

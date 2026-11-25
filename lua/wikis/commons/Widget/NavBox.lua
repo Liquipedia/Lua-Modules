@@ -8,17 +8,16 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
+local Component = Lua.import('Module:Widget/Component')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local NavBoxTitle = Lua.import('Module:Widget/NavBox/Title')
-local Widget = Lua.import('Module:Widget')
 
 local NavBoxChild = Lua.import('Module:Widget/NavBox/Child')
 
@@ -30,15 +29,11 @@ local NavBoxChild = Lua.import('Module:Widget/NavBox/Child')
 ---@field hideonmobile boolean? # from wiki input string?
 ---@field template string?
 
----@class NavBox: Widget
----@operator call(table): NavBox
----@field props NavBoxProps
-local NavBox = Class.new(Widget)
+local NavBox = {}
 
----@return Widget
-function NavBox:render()
-	local props = self.props
-
+---@param props NavBoxProps
+---@return VNode
+function NavBox.render(props)
 	-- if the NavBox is used as a child in another NavBox return the props as Json
 	if Logic.readBool(props.isChild) then
 		return Json.stringify(props)
@@ -46,7 +41,7 @@ function NavBox:render()
 
 	assert(props.child1, 'No children inputted')
 
-	local shouldCollapse = self:_determineCollapsedState(Table.extract(props, 'collapsed'))
+	local shouldCollapse = NavBox._determineCollapsedState(props)
 	local navboxPosition = Variables.varDefault('has_infobox') and 'below infobox' or 'above infobox'
 
 	local title = NavBoxTitle(Table.merge(props, {isWrapper = true}))
@@ -80,10 +75,10 @@ function NavBox:render()
 end
 
 ---@private
----@param collapsedInput string|boolean?
+---@param props NavBoxProps
 ---@return boolean
-function NavBox:_determineCollapsedState(collapsedInput)
-	collapsedInput = Logic.readBoolOrNil(collapsedInput)
+function NavBox._determineCollapsedState(props)
+	local collapsedInput = Logic.readBoolOrNil(Table.extract(props, 'collapsed'))
 
 	-- case manually inputted true
 	if collapsedInput then
@@ -104,11 +99,11 @@ function NavBox:_determineCollapsedState(collapsedInput)
 	end
 
 	return (Namespace.isMain() or Namespace.isUser())
-		and NavBox._getNumberOfChildren(self.props) > 4
+		and NavBox._getNumberOfChildren(props) > 4
 end
 
 ---@private
----@param props table
+---@param props NavBoxProps
 ---@return integer
 function NavBox._getNumberOfChildren(props)
 	local numberOfChildren = 0
@@ -135,4 +130,4 @@ function NavBox._getNumberOfChildren(props)
 	return numberOfChildren
 end
 
-return NavBox
+return Component.component(NavBox.render)

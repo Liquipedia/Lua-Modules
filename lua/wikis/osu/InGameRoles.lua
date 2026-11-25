@@ -7,7 +7,6 @@
 
 ---@type table<string, RoleBaseData>
 local inGameRoles = {
-	['igl'] = {category = 'In-game leaders', display = 'In-game leader'},
 	['player'] = {category = 'Players', display = 'Player'},
 }
 

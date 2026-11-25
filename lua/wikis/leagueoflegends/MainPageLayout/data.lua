@@ -19,8 +19,8 @@ local ColumnName = Condition.ColumnName
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local Headlines = Lua.import('Module:Widget/MainPage/Headlines')
 local LiquipediaApp = Lua.import('Module:Widget/MainPage/LiquipediaApp')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
@@ -86,18 +86,17 @@ local CONTENT = {
 		body = '{{Liquipedia:Eventbox}}',
 		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
-	filterButtons = {
+	matches = {
+		noPanel = true,
+		body = MatchTicker{filterGroupPrefix = MainPageLayoutUtil.MATCH_TICKER_FILTER_GROUP_PREFIX},
+		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
+	},
+	tournamentsFilter = {
 		noPanel = true,
 		body = Div{
-			css = { width = '100%', ['margin-bottom'] = '8px' },
-			children = { FilterButtonsWidget() }
-		}
-	},
-	matches = {
-		heading = 'Matches',
-		body = MatchTicker{},
-		padding = false,
-		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
+			css = {['margin-bottom'] = '0.5rem'},
+			children = FilterButtonsWidget()
+		},
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -164,7 +163,7 @@ return {
 			},
 		},
 		{
-			file = 'Worlds Trophy 2024.jpg',
+			file = '2025 Summoners Cup.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -173,7 +172,7 @@ return {
 			},
 		},
 		{
-			file = 'T1 Worlds24 Skins Splash Art.jpg',
+			file = 'T1 Worlds25 Skins Splash Art.jpg',
 			title = 'Champions',
 			link = 'Champions',
 			count = {
@@ -183,7 +182,7 @@ return {
 			},
 		},
 		{
-			file = 'LoL Patch 25.19 Art.jpg',
+			file = 'LoL Patch 26.11 Art.jpg',
 			title = 'Patches',
 			link = 'Patches',
 			count = {
@@ -193,7 +192,7 @@ return {
 			},
 		},
 		{
-			file = 'Worlds 2024 Finalists.jpg',
+			file = 'Worlds 2025 Finalists.jpg',
 			title = 'News',
 			link = 'Portal:News',
 			count = {
@@ -209,8 +208,18 @@ return {
 	},
 	layouts = {
 		main = {
+			{ -- Top
+				size = 12,
+				children = {
+					{
+						mobileOrder = 3,
+						noPanel = true,
+						content = CONTENT.matches,
+					},
+				},
+			},
 			{ -- Left
-				sizes = {xxl = 5, xxxl = 6},
+				sizes = {xxl = 6, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
@@ -221,71 +230,48 @@ return {
 						content = CONTENT.specialEvents,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 6,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 8,
 						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 7,
+						mobileOrder = 9,
 						content = CONTENT.wantToHelp,
 					},
 					{
-						mobileOrder = 8,
+						mobileOrder = 10,
 						content = CONTENT.liquipediaApp,
 					},
 				}
 			},
 			{ -- Right
-				sizes = {xxl = 7, xxxl = 6},
+				sizes = {xxl = 6, xxxl = 6},
 				children = {
 					{
-						mobileOrder = 3,
-						children = {
-							{
-								children = {
-									{
-										noPanel = true,
-										content = CONTENT.filterButtons,
-									},
-								},
-							},
-							{
-								size = 6,
-								children = {
-									{
-										noPanel = true,
-										content = CONTENT.matches,
-									},
-								},
-							},
-							{
-								size = 6,
-								children = {
-									{
-										noPanel = true,
-										content = CONTENT.tournaments,
-									},
-								},
-							},
-						},
+						mobileOrder = 4,
+						content = CONTENT.tournamentsFilter,
+					},
+					{
+						mobileOrder = 5,
+						content = CONTENT.tournaments,
 					},
 				},
 			},
 			{
 				children = {
 					{
-						mobileOrder = 5,
+						mobileOrder = 7,
 						content = CONTENT.headlines,
 					},
 					{
-						mobileOrder = 9,
+						mobileOrder = 11,
 						content = CONTENT.usefulArticles,
 					},
 					{
-						mobileOrder = 10,
+						mobileOrder = 12,
 						content = CONTENT.references,
 					},
 				},

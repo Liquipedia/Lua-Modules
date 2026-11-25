@@ -46,10 +46,10 @@ end
 ---@param opponentIndex integer
 ---@return table[]?
 function CustomMatchGroupInputNormal.getParticipants(map, opponentIndex)
-	return Logic.nilIfEmpty(Array.map(Array.range(1, MAX_NUM_PICKS), function (playerIndex)
+	return Logic.nilIfEmpty(Array.mapRange(1, MAX_NUM_PICKS, function (playerIndex)
 		local playerData = Json.parseIfTable(map['t' .. opponentIndex .. 'p' .. playerIndex])
 		if Logic.isEmpty(playerData) then
-			return
+			return nil
 		end
 		---@cast playerData -nil
 		if Logic.isEmpty(playerData.role) then
@@ -71,24 +71,20 @@ function CustomMatchGroupInputNormal.getChampionPicks(map, opponentIndex)
 		---@cast participants -nil
 		return Array.map(participants, Operator.property('character'))
 	end
-	local picks = {}
 	local teamPrefix = 't' .. opponentIndex
-	for playerIndex = 1, MAX_NUM_PICKS do
-		table.insert(picks, map[teamPrefix .. 'c' .. playerIndex])
-	end
-	return picks
+	return Array.mapRange(1, MAX_NUM_PICKS, function (playerIndex)
+		return map[teamPrefix .. 'c' .. playerIndex]
+	end)
 end
 
 ---@param map table
 ---@param opponentIndex integer
 ---@return string[]
 function CustomMatchGroupInputNormal.getChampionBans(map, opponentIndex)
-	local bans = {}
 	local teamPrefix = 't' .. opponentIndex
-	for playerIndex = 1, MAX_NUM_BANS do
-		table.insert(bans, map[teamPrefix .. 'b' .. playerIndex])
-	end
-	return bans
+	return Array.mapRange(1, MAX_NUM_BANS, function (playerIndex)
+		return map[teamPrefix .. 'b' .. playerIndex]
+	end)
 end
 
 ---@param map table

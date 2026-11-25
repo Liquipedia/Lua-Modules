@@ -7,18 +7,12 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local ListWidgets = Lua.import('Module:Widget/List')
 
-local ListWidget = Lua.import('Module:Widget/List')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+--[[
+DEPRECATED
 
----@class OrderedList: ListWidget
----@operator call(table): OrderedList
-local OrderedList = Class.new(ListWidget)
+Use Module:Widget/List.
+]]
 
----@return WidgetHtml
-function OrderedList:getType()
-	return HtmlWidgets.Ol
-end
-
-return OrderedList
+return ListWidgets.Ordered

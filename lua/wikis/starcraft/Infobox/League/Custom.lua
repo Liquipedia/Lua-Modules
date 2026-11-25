@@ -21,11 +21,12 @@ local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
+local NoWrap = Widgets.NoWrap
 
 ---@class StarcraftLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -36,7 +37,7 @@ local FINISHED = 'finished'
 local DEFAULT_MODE = '1v1'
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -146,8 +147,8 @@ function CustomLeague:_computeChronology(args)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
@@ -184,25 +185,14 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param maps {link: string, displayname: string}[]
----@return string[]
+---@return Renderable[]
 function CustomLeague:_mapsDisplay(maps)
-	return {table.concat(
+	return Array.interleave(
 		Array.map(maps, function(mapData)
-			return tostring(self:_createNoWrappingSpan(
-				Page.makeInternalLink({}, mapData.displayname, mapData.link)
-			))
+			return NoWrap{children = Page.makeInternalLink({}, mapData.displayname, mapData.link)}
 		end),
 		'&nbsp;• '
-	)}
-end
-
----@param content string|Html|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-	span:css('white-space', 'nowrap')
-		:node(content)
-	return span
+	)
 end
 
 ---@param args table

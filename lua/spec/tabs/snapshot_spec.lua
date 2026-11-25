@@ -1,0 +1,70 @@
+local Tabs = require('Module:Tabs')
+local Html = require('Module:Widget/Html')
+
+insulate('Tabs snapshots', function()
+	it('dynamic variants', function()
+		local arrayContent = Html.Ul{children = {
+			Html.Li{children = {'Item A1'}},
+			Html.Li{children = {'Item A2'}},
+		}}
+
+		local output = Html.Div{children = {
+			Html.Div{children = {'Dynamic Tabs Variants (Snapshot)'}},
+
+			Html.Div{children = {'Horizontal (icons)'}},
+			Tabs.dynamic{
+				variant = 'horizontal',
+				name1 = 'Overview',
+				icon1 = 'notification',
+				content1 = 'Overview content',
+				name2 = 'Results',
+				icon2 = 'results',
+				content2 = 'Results content',
+				name3 = 'Stats',
+				icon3 = 'statistics',
+				content3 = 'Stats content',
+			},
+
+			Html.Div{children = {'Vertical'}},
+			Tabs.dynamic{
+				variant = 'vertical',
+				name1 = 'Spring Split',
+				icon1 = 'calendar',
+				content1 = 'Spring content',
+				name2 = 'Summer Split',
+				icon2 = 'day',
+				content2 = 'Summer content',
+				name3 = 'Worlds',
+				icon3 = 'firstplace',
+				content3 = 'Worlds content',
+			},
+
+			Html.Div{children = {'Icon-only (with show all)'}},
+			Tabs.dynamic{
+				variant = 'icon-only',
+				name1 = 'Home',
+				icon1 = 'projecthome',
+				content1 = 'Home content',
+				name2 = 'Login',
+				icon2 = 'login',
+				content2 = 'Login content',
+				name3 = 'Profile',
+				icon3 = 'player',
+				content3 = 'Profile content',
+			},
+
+			Html.Div{children = {'Array content'}},
+			Tabs.dynamic{
+				variant = 'horizontal',
+				name1 = 'Array A',
+				icon1 = 'notification',
+				content1 = {'Intro line', arrayContent},
+				name2 = 'Array B',
+				icon2 = 'results',
+				content2 = {'Intro line', arrayContent},
+			},
+		}}
+
+		GoldenTest('tabs_dynamic_variants', tostring(output))
+	end)
+end)

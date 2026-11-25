@@ -8,51 +8,52 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
 local Box = Lua.import('Module:Widget/Basic/Box')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
-local Widget = Lua.import('Module:Widget')
+local Component = Lua.import('Module:Widget/Component')
+local ListWidgets = Lua.import('Module:Widget/List')
 
 local COLUMN_BREAK = 6
 
----@class TranslationList: Widget
----@operator call(table): TranslationList
-local TranslationList = Class.new(Widget)
+---@alias TranslationListItem {flag: string, value: string, postFix: string?}
 
----@return Widget?
-function TranslationList:render()
-	---@param item {flag: string, value: string, postFix: string?}
+local Helpers = {}
+
+---@param props table<string, string>
+---@return VNode
+local function TranslationList(props)
+	---@param item TranslationListItem
 	---@return string
 	local displayItem = function(item)
 		return Flags.Icon{flag = item.flag} .. (item.postFix or ' ') .. item.value
 	end
 
-	---@type Widget[]
-	local parts = Array.map(self:_parse(), function(group)
-		return UnorderedList{children = Array.map(group, displayItem)}
+	---@type VNode[]
+	local parts = Array.map(Helpers._parse(props), function(group)
+		return ListWidgets.Unordered{children = Array.map(group, displayItem)}
 	end)
 
 	return Box{children = parts}
 end
 
 ---@private
----@return {flag: string, value: string, postFix: string?}[][]
-function TranslationList:_parse()
-	local data = Array.map(Array.extractKeys(self.props), function(key)
+---@param props table<string, string>
+---@return TranslationListItem[][]
+function Helpers._parse(props)
+	local data = Array.map(Array.extractKeys(props), function(key)
 		if key == 'children' then
 			return
 		elseif key == 'simpliefiedChinese' or key == 'chineseSimplified' then
-			return {flag = 'cn', value = self.props[key], postFix = ' (simplified) '}
+			return {flag = 'cn', value = props[key], postFix = ' (simplified) '}
 		elseif key == 'traditionalChinese' or key == 'chineseTraditional' then
-			return {flag = 'cn', value = self.props[key], postFix = ' (traditional) '}
+			return {flag = 'cn', value = props[key], postFix = ' (traditional) '}
 		end
 		return {
 			flag = assert(Logic.nilIfEmpty(Flags.CountryCode{flag = key}), 'Unsupported parameter: ' .. key),
-			value = self.props[key],
+			value = props[key],
 		}
 	end)
 
@@ -69,4 +70,4 @@ function TranslationList:_parse()
 	return groupedData
 end
 
-return TranslationList
+return Component.component(TranslationList)

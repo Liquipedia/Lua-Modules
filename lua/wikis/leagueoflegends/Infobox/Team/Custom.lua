@@ -41,11 +41,12 @@ local REGION_REMAPPINGS = {
 local CustomTeam = Class.new(Team)
 
 ---@class LeagueoflegendsInfoboxTeamWidgetInjector: WidgetInjector
+---@operator call(LeagueoflegendsInfoboxTeam): LeagueoflegendsInfoboxTeamWidgetInjector
 ---@field caller LeagueoflegendsInfoboxTeam
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
@@ -77,14 +78,14 @@ function CustomTeam:createRegion(region)
 	return remappedRegion and self:createRegion(remappedRegion) or regionData
 end
 
----@return Widget?
+---@return VNode?
 function CustomTeam:createBottomContent()
 	return UpcomingTournaments.team{name = self.teamTemplate.templatename}
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then

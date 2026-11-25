@@ -96,7 +96,7 @@ end
 
 ---@param match table
 ---@param opponents MGIParsedOpponent[]
----@return string?
+---@return string?, string?
 function MatchFunctions.getHeadToHeadLink(match, opponents)
 	if not Logic.readBool(Logic.emptyOr(match.showh2h, Variables.varDefault('showh2h'))) or
 		opponents[1].type ~= Opponent.team or
@@ -112,6 +112,12 @@ function MatchFunctions.getHeadToHeadLink(match, opponents)
 			pfRunQueryFormName = 'Head2head',
 			['Headtohead[team1]'] = opponents[1].name,
 			['Headtohead[team2]'] = opponents[2].name,
+		}
+	)), tostring(mw.uri.fullUrl(
+		'Special:RunQuery/H2H',
+		{
+			['team1'] = opponents[1].name,
+			['team2'] = opponents[2].name,
 		}
 	))
 end

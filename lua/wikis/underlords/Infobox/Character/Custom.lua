@@ -29,7 +29,7 @@ local CustomCharacter = Class.new(Character)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Widget
+---@return VNode
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character.args.informationType = 'Hero'
@@ -45,7 +45,7 @@ end
 ---@param args table
 ---@return table[]
 function CustomCharacter:_getStatsByLevel(args)
-	return Array.map(Array.range(1, 3), function(level)
+	return Array.mapRange(1, 3, function(level)
 		return {
 			health = args['health' .. level],
 			mana = args['mana' .. level],
@@ -63,8 +63,8 @@ function CustomCharacter:_getStatsByLevel(args)
 end
 
 ---@param id string
----@param widgets Widget[]
----@return Widget[]
+---@param widgets Renderable[]
+---@return Renderable[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
