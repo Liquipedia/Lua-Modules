@@ -18,6 +18,7 @@ local Button = Lua.import('Module:Widget/Basic/Button')
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Label = Lua.import('Module:Widget/Basic/Label')
 
 local CLASS_NAME = 'filter-popover'
 -- Items are laid out in columns of at most this many rows
@@ -66,12 +67,12 @@ local function TierBadge(tier)
 		return
 	end
 	local isNumberedTier = type(identifier) == 'number' and identifier >= 1 and identifier <= 5
-	return Html.Span{
-		classes = {
-			CLASS_NAME .. '__tier-badge',
-			CLASS_NAME .. '__tier-badge--' .. (isNumberedTier and ('tier' .. identifier) or 'misc'),
+	return Label{
+		labelScheme = 'tier',
+		attributes = {
+			['data-tier'] = isNumberedTier and tostring(identifier) or 'misc',
+			['aria-hidden'] = 'true',
 		},
-		attributes = {['aria-hidden'] = 'true'},
 		children = tierShort,
 	}
 end

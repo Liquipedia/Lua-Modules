@@ -409,49 +409,6 @@ Author(s): Elysienna, Nadox
 		}
 	}
 
-	&__tier-badge {
-		--filter-popover-tier-color: #757575;
-		display: inline-flex;
-		flex-shrink: 0;
-		align-items: center;
-		justify-content: center;
-		box-sizing: border-box;
-		width: 1.25rem;
-		height: 1.25rem;
-		border-radius: 0.25rem;
-		background-color: var( --filter-popover-tier-color );
-		color: var( --clr-secondary-100 );
-		font-size: 0.6875rem;
-		font-weight: bold;
-		line-height: 1rem;
-
-		&--tier1 {
-			--filter-popover-tier-color: #ef6532;
-		}
-
-		&--tier2 {
-			--filter-popover-tier-color: #2563eb;
-		}
-
-		&--tier3 {
-			--filter-popover-tier-color: #3a3a3a;
-		}
-
-		&--tier4 {
-			--filter-popover-tier-color: #525252;
-		}
-
-		&--tier5 {
-			--filter-popover-tier-color: #757575;
-		}
-
-		&--misc {
-			border: 1px solid var( --filter-popover-tier-color );
-			background-color: transparent;
-			color: var( --filter-popover-tier-color );
-		}
-	}
-
 	&__footer {
 		display: flex;
 		align-items: center;
