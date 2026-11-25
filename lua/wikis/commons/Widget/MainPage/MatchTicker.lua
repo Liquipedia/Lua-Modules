@@ -24,8 +24,7 @@ local defaultProps = {
 ---@field matchesPortal string?
 ---@field displayGameIcons boolean?
 ---@field showMatchesPortal boolean?
----@field filterGroupPrefix string? if set, the ticker renders its own filter buttons using this filter group prefix;
----otherwise it is controlled by the default filter buttons placed elsewhere on the page
+---@field filterGroupPrefix string? if set, renders its own filter buttons with this prefix
 
 ---@param props MainPageMatchTickerProps
 ---@return Renderable[]

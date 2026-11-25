@@ -44,7 +44,7 @@ local FilterButtons = {
 
 ---@class FilterButtonsProps
 ---@field categories FilterButtonCategory[]?
----@field filterGroupPrefix string? prefix of the filter groups; use distinct prefixes for independent button sets
+---@field filterGroupPrefix string? use distinct prefixes for independent button sets
 
 ---@param props FilterButtonsProps
 ---@return VNode
@@ -69,8 +69,7 @@ end
 
 ---@param category FilterButtonCategory
 function FilterButtons._loadCategories(category)
-	-- Categories are shared module data and get mutated below, so they must only be loaded once per page
-	-- even if several sets of filter buttons are rendered
+	-- categories are shared module data mutated below; load once even if rendered multiple times
 	if category.loaded then
 		return
 	end
