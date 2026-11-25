@@ -76,10 +76,10 @@ local function TierBadge(tier)
 	}
 end
 
----@param category FilterButtonCategory
 ---@param filterGroupPrefix string
+---@param category FilterButtonCategory
 ---@return VNode
-local function FilterCategory(category, filterGroupPrefix)
+local function FilterCategory(filterGroupPrefix, category)
 	assert(
 		Table.isNotEmpty(category.items),
 		category.name .. ': List of items is required, either input or filled during load'
@@ -227,9 +227,7 @@ local function FilterButtonsPopover(props)
 				children = {
 					Html.Div{
 						classes = {CLASS_NAME .. '__categories'},
-						children = Array.map(categories, function (category)
-							return FilterCategory(category, filterGroupPrefix)
-						end),
+						children = Array.map(categories, FnUtil.curry(FilterCategory, filterGroupPrefix)),
 					},
 					Html.Div{
 						classes = {CLASS_NAME .. '__footer'},
