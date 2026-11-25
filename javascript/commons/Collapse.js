@@ -107,8 +107,10 @@ liquipedia.collapse = {
 	persistentCollapsibles: new WeakSet(),
 
 	// Restores and stores the collapsed state of general-collapsibles that set data-collapsible-storage-key.
+	// Popovers are transient and always start closed, so they are not persisted.
 	setupPersistentCollapsibles: function() {
-		const selector = '#mw-content-text .general-collapsible[data-collapsible-storage-key]';
+		const selector = '#mw-content-text .general-collapsible[data-collapsible-storage-key]' +
+			':not([data-collapsible-popover])';
 		document.querySelectorAll( selector ).forEach( ( collapsible ) => {
 			if ( this.persistentCollapsibles.has( collapsible ) ) {
 				return;

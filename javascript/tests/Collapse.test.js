@@ -161,6 +161,20 @@ describe( 'Collapse module', () => {
 			expect( collapsible.classList.contains( 'collapsed' ) ).toBe( false );
 		} );
 
+		test( 'ignores popover collapsibles', async () => {
+			window.localStorage.setItem( 'collapsible-test', 'expanded' );
+			const collapsible = render( true );
+			collapsible.setAttribute( 'data-collapsible-popover', 'true' );
+			globalThis.liquipedia.collapse.setupPersistentCollapsibles();
+			expect( collapsible.classList.contains( 'collapsed' ) ).toBe( true );
+			collapsible.classList.remove( 'collapsed' );
+			await Promise.resolve();
+			expect( window.localStorage.getItem( 'collapsible-test' ) ).toBe( 'expanded' );
+			collapsible.classList.add( 'collapsed' );
+			await Promise.resolve();
+			expect( window.localStorage.getItem( 'collapsible-test' ) ).toBe( 'expanded' );
+		} );
+
 		test( 'stores the state when toggled', async () => {
 			const collapsible = render( false );
 			globalThis.liquipedia.collapse.setupPersistentCollapsibles();
