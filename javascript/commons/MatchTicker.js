@@ -9,19 +9,13 @@ class LiquipediaMatchTickerCard {
 	/**
 	 * @param {HTMLElement} cardElement
 	 * @param {boolean} useMatchTimezone whether dates are shown in the timezone of the match instead of the local one
-	 * @param {boolean?} hiddenInMobile
 	 */
-	constructor( cardElement, useMatchTimezone, hiddenInMobile = false ) {
+	constructor( cardElement, useMatchTimezone ) {
 		this.cardElement = cardElement;
 		this.#timezoneOffset = useMatchTimezone ?
 			1000 * ( parseInt( this.cardElement.dataset.matchTimezoneOffset, 10 ) || 0 ) :
 			null;
 		this.parsedDate = new Date( 1000 * parseInt( this.cardElement.dataset.matchTimestamp, 10 ) );
-		this.hiddenInMobile = hiddenInMobile;
-
-		if ( this.hiddenInMobile ) {
-			this.cardElement.classList.add( 'mobile-hide' );
-		}
 	}
 
 	/**
@@ -130,7 +124,7 @@ class LiquipediaMatchTicker {
 			const groupElements = [];
 			const cards = Array.from(
 				tickerCarousel.querySelectorAll( '.match-ticker-card' ),
-				( element, index ) => new LiquipediaMatchTickerCard( element, useMatchTimezone, index >= 5 )
+				( element ) => new LiquipediaMatchTickerCard( element, useMatchTimezone )
 			);
 
 			if ( cards.length === 0 ) {
@@ -146,9 +140,6 @@ class LiquipediaMatchTicker {
 				const cardGroupElement = document.createElement( 'div' );
 				cardGroupElement.classList.add( 'match-ticker-card-group' );
 				cardGroupElement.style.setProperty( '--match-ticker-group-columns', cardGroup.length );
-				if ( cardGroup[ 0 ].hiddenInMobile ) {
-					cardGroupElement.classList.add( 'mobile-hide' );
-				}
 				const header = LiquipediaMatchTicker.createGroupHeader( groupKey, cardGroup[ 0 ], now );
 				const cardContainer = document.createElement( 'div' );
 				cardContainer.classList.add( 'match-ticker-card-group__body' );

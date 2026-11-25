@@ -497,16 +497,8 @@ Template(s): MatchTicker
 			.carousel-item {
 				width: auto;
 
-				&:last-child,
-				&:nth-child( 5 ) {
-					.match-ticker-card {
-						border-bottom-width: 0;
-					}
-				}
-
-				// Only the first five matches are listed
-				&:nth-child( n + 6 ) {
-					display: none;
+				&:last-child .match-ticker-card {
+					border-bottom-width: 0;
 				}
 			}
 
