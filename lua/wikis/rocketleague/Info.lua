@@ -60,6 +60,14 @@ return {
 				swiss = {'matchscore', 'gamescore'},
 				group = {'matchscore', 'gamescore'},
 			},
+			headerTitles = {
+				gamediff = {abbreviation = 'GD', text = 'Game Difference'},
+				rounddiff = {abbreviation = 'GoalD', text = 'Goal Difference'},
+				-- These three share one column, so they need the same title
+				roundscore = {abbreviation = 'Goals', text = 'Goals For - Goals Against'},
+				roundwins = {abbreviation = 'Goals', text = 'Goals For - Goals Against'},
+				roundlosses = {abbreviation = 'Goals', text = 'Goals For - Goals Against'},
+			},
 		},
 	},
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
