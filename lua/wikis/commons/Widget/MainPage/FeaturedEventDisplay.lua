@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:FeaturedEventDisplay
+-- page=Module:Widget/MainPage/FeaturedEventDisplay
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
-local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
@@ -24,6 +23,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
+local Countdown = Lua.import('Module:Widget/Countdown')
 local Html = Lua.import('Module:Widget/Html')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
@@ -37,7 +37,7 @@ local YESTERDAY = DateExt.getCurrentTimestamp() - DateExt.daysToSeconds(1)
 local MainPageSeasonEvents = {}
 
 ---@param frame Frame
----@return HtmlNode
+---@return VNode
 function MainPageSeasonEvents.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -66,14 +66,14 @@ function MainPageSeasonEvents.run(frame)
 
 	return Html.Div{
 		css = {['text-align'] = 'center'},
-		children = WidgetUtil.collect(
+		children = {
 			iconDisplay,
 			Html.Br{},
 			Link{link = pageName, children = tournamentData.displayName},
 			tournamentData.status == 'finished'
 				and MainPageSeasonEvents._winnerDisplay(tournamentData)
-				or MainPageSeasonEvents._countdown(tournamentData, args)
-		)
+				or MainPageSeasonEvents._countdown(tournamentData, args),
+		}
 	}
 end
 
@@ -93,7 +93,7 @@ end
 
 ---@private
 ---@param tournamentData StandardTournament
----@return HtmlNode[]
+---@return VNode[]
 function MainPageSeasonEvents._winnerDisplay(tournamentData)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('parent'), Comparator.eq, tournamentData.pageName),
@@ -129,7 +129,7 @@ end
 ---@private
 ---@param tournamentData StandardTournament
 ---@param args table
----@return HtmlNode[]?
+---@return VNode[]?
 function MainPageSeasonEvents._countdown(tournamentData, args)
 	local pages = Array.mapIndexes(function(index)
 		return Page.pageifyLink(args['additional_page' .. index])
@@ -158,7 +158,7 @@ function MainPageSeasonEvents._countdown(tournamentData, args)
 
 	return {
 		Html.Br{},
-		Countdown.create({date = DateExt.toCountdownArg(extradata.timestamp, extradata.timezoneid), rawcountdown = true}),
+		Countdown{date = DateExt.toCountdownArg(extradata.timestamp, extradata.timezoneid), rawcountdown = true},
 	}
 end
 
