@@ -43,7 +43,7 @@ insulate('Match Ticker Card', function()
 	end
 
 	it('upcoming snapshot', function()
-		GoldenTest('ffa_match_ticker_card_upcoming', tostring(MatchTickerWrapper{
+		GoldenTest('entity_page_ffa_match_ticker_card_upcoming', tostring(MatchTickerWrapper{
 			matches = buildTickerMatches(false),
 			variant = 'horizontal',
 		}))
