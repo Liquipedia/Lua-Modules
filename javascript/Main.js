@@ -44,6 +44,7 @@ window.mw = window.mw || {
 const jsModules = [
 	'UseStrict',
 	'Core',
+	'Storage',
 	'Analytics',
 	'BattleRoyale',
 	'Bracket',
