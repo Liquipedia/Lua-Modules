@@ -17,7 +17,7 @@ local Div = Html.Div
 
 ---@class CarouselWidgetParameters: CarouselContentWidgetParameters
 ---@field children Renderable[]?
----@field content VNode?
+---@field content VNode<CarouselContentWidgetParameters>?
 
 local defaultProps = {
 	itemWidth = '200px',
@@ -25,7 +25,7 @@ local defaultProps = {
 }
 
 ---@param props CarouselWidgetParameters
----@return VNode
+---@return VNode<CarouselContentWidgetParameters>
 local function buildCarouselContent(props)
 	if props.content then
 		return props.content
