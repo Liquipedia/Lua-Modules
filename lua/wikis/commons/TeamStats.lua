@@ -24,20 +24,20 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class EvaTeamStatsRecord
+---@class TeamStatsRecord
 ---@field wins integer
 ---@field losses integer
 
----@class EvaTeamStatsMap
----@field total EvaTeamStatsRecord
----@field ownPick EvaTeamStatsRecord
----@field opponentPick EvaTeamStatsRecord
----@field decider EvaTeamStatsRecord
+---@class TeamStatsMap
+---@field total TeamStatsRecord
+---@field ownPick TeamStatsRecord
+---@field opponentPick TeamStatsRecord
+---@field decider TeamStatsRecord
 
----@class EvaTeamStatsOpponent
+---@class TeamStatsOpponent
 ---@field name string
 ---@field opponent standardOpponent
----@field maps table<string, EvaTeamStatsMap>
+---@field maps table<string, TeamStatsMap>
 
 local TeamStats = {}
 
@@ -48,9 +48,6 @@ local PICK_TYPES = {
 	{key = 'opponentPick', short = 'opp', long = 'on opponent pick'},
 	{key = 'decider', short = 'dec', long = 'as decider'},
 }
-
--- a darker line between two maps
-local MAP_SEPARATOR = '2px solid color-mix(in srgb, currentColor 45%, transparent)'
 
 local LEGEND = Html.I{children = {
 	'Each cell: wins-losses (win rate) on that map, then the split: ',
@@ -77,20 +74,20 @@ end
 
 -- Data
 
----@return EvaTeamStatsRecord
+---@return TeamStatsRecord
 local function newRecord()
 	return {wins = 0, losses = 0}
 end
 
----@param record EvaTeamStatsRecord
+---@param record TeamStatsRecord
 ---@return integer
 local function gamesPlayed(record)
 	return record.wins + record.losses
 end
 
----@param entry EvaTeamStatsOpponent
+---@param entry TeamStatsOpponent
 ---@param map string
----@return EvaTeamStatsMap
+---@return TeamStatsMap
 local function getMap(entry, map)
 	if not entry.maps[map] then
 		entry.maps[map] = {
@@ -104,15 +101,15 @@ local function getMap(entry, map)
 end
 
 ---@param args table
----@return table<string, EvaTeamStatsOpponent>
+---@return table<string, TeamStatsOpponent>
 function TeamStats.collect(args)
 	local spec = TournamentStructure.readMatchGroupsSpec(args) or TournamentStructure.currentPageSpec()
 
-	---@type table<string, EvaTeamStatsOpponent>
+	---@type table<string, TeamStatsOpponent>
 	local opponents = {}
 
 	---@param record table?
-	---@return EvaTeamStatsOpponent?
+	---@return TeamStatsOpponent?
 	local function getOpponent(record)
 		if not record or Logic.isEmpty(record.name) then
 			return
@@ -169,7 +166,7 @@ function TeamStats._getPickers(vetoes)
 	return pickedBy
 end
 
----@param entry EvaTeamStatsOpponent
+---@param entry TeamStatsOpponent
 ---@param games table[]
 ---@param opponentIndex integer
 ---@param pickedBy table<string, integer>
@@ -195,20 +192,20 @@ end
 
 -- Display
 
----@param record EvaTeamStatsRecord
+---@param record TeamStatsRecord
 ---@return string
 local function formatRecord(record)
 	return record.wins .. '-' .. record.losses
 end
 
----@param record EvaTeamStatsRecord
+---@param record TeamStatsRecord
 ---@return number # between 0 and 1
 local function winRate(record)
 	return record.wins / gamesPlayed(record)
 end
 
----@param entry EvaTeamStatsOpponent
----@return EvaTeamStatsRecord
+---@param entry TeamStatsOpponent
+---@return TeamStatsRecord
 local function totalRecord(entry)
 	local total = newRecord()
 	for _, mapStats in pairs(entry.maps) do
@@ -219,7 +216,7 @@ local function totalRecord(entry)
 end
 
 --- Every map at least one opponent played, in alphabetical order.
----@param opponents table<string, EvaTeamStatsOpponent>
+---@param opponents table<string, TeamStatsOpponent>
 ---@return string[]
 local function playedMaps(opponents)
 	local maps = Set()
@@ -249,7 +246,7 @@ end
 
 --- One cell: wins-losses and win rate on a map, then the own / opponent / decider split.
 --- A plain Table2 cell (not wrapped in its own component), so the row applies the column settings to it.
----@param mapStats EvaTeamStatsMap?
+---@param mapStats TeamStatsMap?
 ---@return Renderable
 function TeamStats._mapCell(mapStats)
 	if not mapStats or gamesPlayed(mapStats.total) == 0 then
@@ -294,7 +291,7 @@ function TeamStats._mapCell(mapStats)
 end
 
 --- One row per opponent, one column per map.
----@param props {opponents: table<string, EvaTeamStatsOpponent>}
+---@param props {opponents: table<string, TeamStatsOpponent>}
 ---@return Renderable
 local function Overview(props)
 	local entries = Array.extractValues(props.opponents)
@@ -315,7 +312,8 @@ local function Overview(props)
 		columns = WidgetUtil.collect(
 			{align = 'left'},
 			Array.map(maps, function()
-				return {align = 'center', css = {['border-left'] = MAP_SEPARATOR}}
+				-- a darker line between two maps, see Table2.scss
+				return {align = 'center', classes = {'table2__cell--divider'}}
 			end)
 		),
 		children = {
