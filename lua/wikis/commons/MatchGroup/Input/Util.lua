@@ -334,7 +334,7 @@ function MatchGroupInputUtil.getTournamentContext(obj, parent)
 	vars.tickername = Logic.emptyOr(obj.tickername, parent.tickername, tournamentContext.tickerName)
 	vars.tournament = Logic.emptyOr(obj.tournament, parent.tournament, tournamentContext.fullName)
 	vars.type = Logic.emptyOr(obj.type, parent.type, tournamentContext.type)
-	vars.patch = Logic.emptyOr(obj.patch, parent.patch, globalVars:get('tournament_patch'))
+	vars.patch = Logic.emptyOr(obj.patch, parent.patch, tournamentContext.patch)
 	vars.date = Logic.emptyOr(obj.date, parent.date)
 	vars.mode = Logic.emptyOr(obj.mode, parent.mode)
 
