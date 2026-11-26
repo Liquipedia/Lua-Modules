@@ -44,6 +44,7 @@ function LegendComponent.render(props)
 end
 
 ---@private
+---@param props table
 ---@return VNode
 function LegendComponent._createHeader(props)
 	return Html.Div{
@@ -60,6 +61,7 @@ function LegendComponent._createHeader(props)
 end
 
 ---@private
+---@param props table
 ---@return VNode?
 function LegendComponent._createColorSection(props)
 	local labels = Array.map(LABEL_COLORS, function (labelColor)
@@ -90,6 +92,7 @@ function LegendComponent._createColorSection(props)
 end
 
 ---@private
+---@param props table
 ---@return VNode?
 function LegendComponent._createPointsSection(props)
 	local pointsText = props.points
@@ -112,6 +115,7 @@ function LegendComponent._createPointsSection(props)
 end
 
 ---@private
+---@param props table
 ---@return VNode?
 function LegendComponent._createNumberSection(props)
 	if not Logic.readBool(props.showNumberSection) then
