@@ -36,6 +36,7 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 ---match: MatchGroupUtilMatch, game: MatchGroupUtilGame, gameIndex: integer): T: MatchSummaryGameRowProps
 ---@field GameDetail? fun(game: MatchGroupUtilGame, index: integer): Renderable?
 ---@field gameFilter? fun(game: MatchGroupUtilGame): boolean
+---@field createGamesContainerFooter? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]|nil
 ---@field createFooter? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
 
 ---@class MatchSummaryOptions
@@ -114,13 +115,17 @@ function MatchSummary.createDefaultBody(match, CustomMatchSummary, options)
 				}
 			end)
 		else
+			local createGamesContainerFooter = CustomMatchSummary.createGamesContainerFooter
 			nodes = MatchSummaryWidgets.GamesContainer{
-				children = Array.map(match.games, function(game, gameIndex)
-					if not gameFilterFunction(game) then
-						return
-					end
-					return GameRow(gameRowPropsFunction(game, gameIndex))
-				end)
+				children = WidgetUtil.collect(
+					Array.map(match.games, function(game, gameIndex)
+						if not gameFilterFunction(game) then
+							return
+						end
+						return GameRow(gameRowPropsFunction(game, gameIndex))
+					end),
+					createGamesContainerFooter and createGamesContainerFooter(match) or nil
+				)
 			}
 		end
 	elseif createGames then
