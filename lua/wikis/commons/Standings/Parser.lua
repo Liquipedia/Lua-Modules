@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
 local Info = Lua.import('Module:Info', { loadData = true })
 local Logic = Lua.import('Module:Logic')
@@ -33,21 +32,6 @@ local DISQUALIFIED_STATUS = 'dq'
 ---@field maxBestOf number? The highest bestof of the table's matches
 ---@field format StandingsFormat? Enables the placement ranges of the opponents
 ---@field points table<string, number>? The points per result, see StandingsParseWiki.parsePoints
-
----The column title, a wiki can override it per tiebreaker name in Info.config.standings.headerTitles
----@param columnId string
----@param tiebreaker StandingsTiebreaker
----@return string?
-local function headerTitle(columnId, tiebreaker)
-	local _, name = TiebreakerFactory.parseId(columnId)
-	local override = ((Info.config.standings or {}).headerTitles or {})[name]
-	if type(override) == 'table' then
-		return Abbreviation.make{text = override.abbreviation, title = override.text}
-			or override.abbreviation
-			or tiebreaker:headerTitle()
-	end
-	return override or tiebreaker:headerTitle()
-end
 
 ---@param carried table
 ---@param record table?
@@ -197,7 +181,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		end
 		return {
 			id = columnId,
-			title = headerTitle(columnId, tiebreaker),
+			title = tiebreaker:headerTitle(),
 		}
 	end
 

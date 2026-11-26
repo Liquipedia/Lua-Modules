@@ -30,7 +30,7 @@ end
 
 ---@return string
 function TiebreakerRoundScore:headerTitle()
-	return 'Round'
+	return TiebreakerRoundUtil.titles().name
 end
 
 ---@param state TiebreakerOpponent[]

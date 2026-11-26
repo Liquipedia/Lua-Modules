@@ -870,6 +870,36 @@ describe('Standings Tiebreakers', function()
 		end)
 	end)
 
+	describe('round column titles', function()
+		local Info = require('Module:Info')
+		local originalStandingsConfig
+
+		local function titles()
+			return Array.map(
+				{'roundscore', 'roundwinsregulation', 'rounddiff', 'rounddiffregulation', 'roundwinrate'},
+				function(name) return TiebreakerFactory.tiebreakerFromId('full.' .. name):headerTitle() end
+			)
+		end
+
+		before_each(function()
+			originalStandingsConfig = Info.config.standings
+		end)
+
+		after_each(function()
+			Info.config.standings = originalStandingsConfig
+		end)
+
+		it('default to rounds', function()
+			Info.config.standings = {}
+			assert.are_same({'Round', 'Round (R)', 'RD', 'RD (R)', 'Rnd%'}, titles())
+		end)
+
+		it('are spelled out with the round name of the wiki', function()
+			Info.config.standings = {roundName = 'Goal'}
+			assert.are_same({'Goal', 'Goal (R)', 'Goal Diff', 'Goal Diff (R)', 'Goal%'}, titles())
+		end)
+	end)
+
 	describe('rounddiff', function()
 		it('sums round scores from played games', function()
 			local rounddiff = TiebreakerFactory.tiebreakerFromId('full.rounddiff')

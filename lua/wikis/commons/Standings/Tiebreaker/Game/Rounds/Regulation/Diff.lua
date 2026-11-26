@@ -30,7 +30,7 @@ end
 
 ---@return string
 function TiebreakerRoundDiffRegulation:headerTitle()
-	return 'RD (R)'
+	return TiebreakerRoundUtil.titles().diff .. ' (R)'
 end
 
 ---@param state TiebreakerOpponent[]

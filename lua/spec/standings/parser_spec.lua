@@ -80,50 +80,6 @@ describe('Standings Parser', function()
 		end)
 	end)
 
-	describe('header titles', function()
-		local Info = require('Module:Info')
-		local originalStandingsConfig
-
-		local function titles(tiebreakerIds)
-			local opponents = {
-				makeOpponent('Alpha', {{points = 3}, {points = 0}}),
-				makeOpponent('Bravo', {{points = 0}, {points = 3}}),
-			}
-			local standingsTable = StandingsParser.parse(
-				TWO_FINISHED_ROUNDS, opponents, BGS, nil, {}, 'ffa', tiebreakerIds)
-			return Array.map(standingsTable.extradata.additionalStats, function(stat) return stat.title or false end)
-		end
-
-		before_each(function()
-			originalStandingsConfig = Info.config.standings
-		end)
-
-		after_each(function()
-			Info.config.standings = originalStandingsConfig
-		end)
-
-		it('falls back to the tiebreaker title', function()
-			Info.config.standings = {}
-			assert.are_same({'Pts', false}, titles(TIEBREAKERS))
-		end)
-
-		it('uses a plain string override', function()
-			Info.config.standings = {headerTitles = {points = 'Points'}}
-			assert.are_same({'Points', false}, titles(TIEBREAKERS))
-		end)
-
-		it('wraps a table override in an abbreviation', function()
-			Info.config.standings = {headerTitles = {points = {abbreviation = 'P', text = 'Points'}}}
-			assert.are_same({'<abbr title="Points">P</abbr>', false}, titles(TIEBREAKERS))
-		end)
-
-		it('overrides the displayed match column of a game tiebreaker', function()
-			-- Without games the game stats repeat the match stats, so gamediff is shown as matchdiff
-			Info.config.standings = {headerTitles = {gamediff = 'Game Diff', matchdiff = 'Match Diff'}}
-			assert.are_same({'Match Diff'}, titles({'full.gamediff'}))
-		end)
-	end)
-
 	describe('round status', function()
 		local function resolve(round, matchPhases)
 			local started, finished = StandingsParser.resolveRoundStatus(round, matchPhases)
