@@ -561,7 +561,7 @@ function MatchTickerController.adjustFfaMatch(match, config)
 			)
 		end
 	)
-	if opponentIndex == 0 then
+	if opponentIndex <= 1 then
 		return
 	end
 	local opponent = table.remove(match.match.opponents, opponentIndex)
