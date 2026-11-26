@@ -51,7 +51,7 @@ insulate('Match Ticker Card', function()
 
 	it('completed snapshot', function()
 		-- Completed matches are listed in the recent tab of the main page ticker
-		GoldenTest('match_ticker_ffa_completed', tostring(Html.Div{
+		GoldenTest('match_ticker_completed', tostring(Html.Div{
 			classes = {'match-ticker-filterable-container'},
 			attributes = {['data-match-ticker-type'] = 'recent'},
 			children = MatchTickerWrapper{
