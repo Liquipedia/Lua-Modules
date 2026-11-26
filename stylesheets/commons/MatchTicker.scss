@@ -533,6 +533,8 @@ Template(s): MatchTicker
 		border: 1px solid var( --match-ticker-card-border-color );
 		border-radius: 0.5rem;
 		background-color: var( --match-ticker-card-background-color );
+		width: fit-content;
+		max-width: 100%;
 
 		.carousel-button--left {
 			left: 0.375rem;
