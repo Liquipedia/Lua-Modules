@@ -539,7 +539,7 @@ end
 ---@param match {match: FFAMatchGroupUtilMatch, gameData: MatchTickerGameData?}
 ---@param config MatchTickerConfig
 function MatchTickerController.adjustFfaMatch(match, config)
-	if not Logic.isNumeric(match.match.winner) then
+	if Logic.isNumeric(match.match.winner) then
 		return
 	end
 
