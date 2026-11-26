@@ -519,10 +519,12 @@ Template(s): MatchTicker
 		align-items: center;
 		gap: 0.5rem 1rem;
 
+		// Not the heading's text style
 		.switch-toggle-container {
 			font-size: 0.875rem;
 			font-weight: normal;
 			line-height: 1.3125rem;
+			color: var( --clr-on-background );
 		}
 	}
 
