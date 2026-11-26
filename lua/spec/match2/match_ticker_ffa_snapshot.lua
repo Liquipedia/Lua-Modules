@@ -9,9 +9,9 @@ insulate('Match Ticker Card', function()
 	local LpdbQueryStub, MakeTitleStub, TeamTemplateMock
 	local MatchTickerController, MatchTickerWrapper
 
-	before_each(function ()
+	before_each(function()
 		LpdbQueryStub = stub(mw.ext.LiquipediaDB, 'lpdb', {})
-		MakeTitleStub = stub(mw.title, 'makeTitle', function(_, title, fragment)
+		MakeTitleStub = stub(mw.title, 'makeTitle', function (_, title, fragment)
 			return {fullText = title .. (fragment and ('#' .. fragment) or '')}
 		end)
 		MatchTickerController = require('Module:MatchTicker/Controller')
@@ -20,7 +20,7 @@ insulate('Match Ticker Card', function()
 		TeamTemplateMock.setUp()
 	end)
 
-	after_each(function ()
+	after_each(function()
 		TeamTemplateMock.tearDown()
 		MakeTitleStub:revert()
 		LpdbQueryStub:revert()
@@ -29,7 +29,7 @@ insulate('Match Ticker Card', function()
 	---@param finished boolean
 	---@return {match: MatchGroupUtilMatch, gameData: MatchTickerGameData?}[]
 	local function buildTickerMatches(finished)
-		local records = Array.filter(Array.sub(require('test_assets.lpdb_match2'), 1, 3), function (record)
+		local records = Array.filter(Array.sub(require('test_assets.lpdb_match2'), 4), function (record)
 			return (record.finished == '1') == finished
 		end)
 		-- Split matches whose games are played on different dates into one card per game, as the ticker does
@@ -43,7 +43,7 @@ insulate('Match Ticker Card', function()
 	end
 
 	it('upcoming snapshot', function()
-		GoldenTest('entity_page_match_ticker_card_upcoming', tostring(MatchTickerWrapper{
+		GoldenTest('match_ticker_ffa_entity_page_upcoming', tostring(MatchTickerWrapper{
 			matches = buildTickerMatches(false),
 			variant = 'horizontal',
 		}))
@@ -51,7 +51,7 @@ insulate('Match Ticker Card', function()
 
 	it('completed snapshot', function()
 		-- Completed matches are listed in the recent tab of the main page ticker
-		GoldenTest('match_ticker_card_completed', tostring(Html.Div{
+		GoldenTest('match_ticker_ffa_completed', tostring(Html.Div{
 			classes = {'match-ticker-filterable-container'},
 			attributes = {['data-match-ticker-type'] = 'recent'},
 			children = MatchTickerWrapper{
