@@ -166,7 +166,6 @@ Author(s): Elysienna, Nadox
 	--filter-popover-checkbox-border-color: var( --clr-secondary-80 );
 	--filter-popover-checked-color: var( --clr-primary-44 );
 	--filter-popover-cancel-border-color: var( --clr-secondary-80 );
-	--filter-popover-cancel-color: var( --clr-secondary-25 );
 
 	.theme--dark & {
 		--filter-popover-toggle-background-color: var( --clr-on-surface-dark-primary-8 );
@@ -180,30 +179,17 @@ Author(s): Elysienna, Nadox
 		--filter-popover-checkbox-background-color: var( --clr-secondary-9 );
 		--filter-popover-checkbox-border-color: var( --clr-secondary-44 );
 		--filter-popover-cancel-border-color: var( --clr-on-surface-dark-primary-40 );
-		--filter-popover-cancel-color: var( --clr-secondary-90 );
 	}
 
 	// Scoped to override the skin's generic `.button` styling
 	.filter-popover__toggle.button {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.25rem;
-		box-sizing: border-box;
-		min-width: 2.75rem;
 		height: 2rem;
 		padding: 0.375rem 0.75rem;
-		border: 0;
 		border-radius: 0.25rem;
 		outline: 0;
 		background-color: var( --filter-popover-toggle-background-color );
 		color: var( --filter-popover-toggle-color );
-		font: inherit;
-		font-size: 0.875rem;
-		font-weight: bold;
-		line-height: 1.25rem;
 		white-space: nowrap;
-		cursor: pointer;
 
 		&:focus-visible {
 			outline: 0.125rem solid currentcolor;
@@ -216,7 +202,6 @@ Author(s): Elysienna, Nadox
 			justify-content: center;
 			width: 1.25rem;
 			height: 1.25rem;
-			font-size: 0.875rem;
 		}
 	}
 
@@ -224,7 +209,6 @@ Author(s): Elysienna, Nadox
 	&__panel {
 		display: none;
 		flex-direction: column;
-		box-sizing: border-box;
 		max-width: calc( 100vw - 2rem );
 		max-height: calc( 100vh - 2rem );
 		padding: 0;
@@ -272,7 +256,6 @@ Author(s): Elysienna, Nadox
 		display: flex;
 		flex-direction: column;
 		gap: 0.25rem;
-		box-sizing: border-box;
 		width: 10.75rem;
 		padding: 1rem;
 		border-right: 1px solid var( --filter-popover-divider-color );
@@ -325,7 +308,6 @@ Author(s): Elysienna, Nadox
 			font-size: 0.75rem;
 			line-height: 1.125rem;
 			white-space: nowrap;
-			cursor: pointer;
 
 			&:hover {
 				text-decoration: underline;
@@ -385,7 +367,6 @@ Author(s): Elysienna, Nadox
 		flex-shrink: 0;
 		align-items: center;
 		justify-content: center;
-		box-sizing: border-box;
 		width: 1.25rem;
 		height: 1.25rem;
 		border: 1px solid var( --filter-popover-checkbox-border-color );
@@ -424,32 +405,11 @@ Author(s): Elysienna, Nadox
 
 	.filter-popover__button {
 		&.button {
-			box-sizing: border-box;
 			min-width: 2.75rem;
-			height: 2rem;
-			padding: 0.375rem 0.75rem;
-			border-radius: 0.5rem;
-			font-size: 0.875rem;
-			font-weight: bold;
-			line-height: 1.25rem;
-		}
-
-		&--reset.button {
-			border: 0;
-			background-color: transparent;
-			color: var( --filter-popover-link-color );
 		}
 
 		&--cancel.button {
 			border: 1px solid var( --filter-popover-cancel-border-color );
-			background-color: transparent;
-			color: var( --filter-popover-cancel-color );
-		}
-
-		&--apply.button {
-			border: 0;
-			background-color: var( --filter-popover-checked-color );
-			color: var( --clr-secondary-100 );
 		}
 	}
 }
