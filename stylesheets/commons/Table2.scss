@@ -91,6 +91,14 @@ $table2-cell-padding-x: 0.75rem;
 				width: fit-content;
 				white-space: nowrap;
 			}
+
+			&.table2__cell--divider {
+				border-left: 2px solid var( --clr-on-surface-light-primary-40 );
+
+				.theme--dark & {
+					border-left-color: var( --clr-on-surface-dark-primary-40 );
+				}
+			}
 		}
 
 		thead tr,
