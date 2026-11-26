@@ -27,13 +27,21 @@ local defaultProps = {
 	limit = 10,
 	module = 'MatchTicker/Custom',
 	fn = 'mainPage',
+	filterGroupPrefix = 'filterbuttons',
 }
 
----@param props {module: string?, fn: string?, limit: integer?, displayGameIcons: boolean?}
+---@class MatchTickerFilterableContainerProps
+---@field module string?
+---@field fn string?
+---@field limit integer?
+---@field displayGameIcons boolean?
+---@field filterGroupPrefix string? has to match the `filterGroupPrefix` of the filter buttons controlling this ticker
+
+---@param props MatchTickerFilterableContainerProps
 ---@return VNode
 local function MatchTickerContainer(props)
 	local function filterName(filter)
-		return 'filterbuttons-' .. filter
+		return props.filterGroupPrefix .. '-' .. filter
 	end
 
 	local filters = Array.map(FilterConfig.categories, Operator.property('name')) or {}
@@ -48,6 +56,7 @@ local function MatchTickerContainer(props)
 		displayGameIcons = props.displayGameIcons,
 		variant = 'carousel',
 		showInfoForEmptyResults = true,
+		filterGroupPrefix = props.filterGroupPrefix,
 	}
 
 	local devFlag = FeatureFlag.get('dev')

@@ -69,6 +69,8 @@ $button-new-primary-color--dark: var( --clr-wiki-theme-30 );
 	border: 1px solid var( --clr-border, #d3d3d3 );
 	background-color: var( --table-header-background-color, #eeeeee );
 	padding: 5px 10px;
+	width: 100%;
+	text-align: left;
 }
 
 .team-portal-list .tp-rank-card .tp-team-name {

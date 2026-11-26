@@ -672,11 +672,12 @@ liquipedia.tracker = {
 			} );
 		}
 
-		if ( window.localStorage.getItem( 'LiquipediaTheme' ) === 'dark' ) {
+		const theme = liquipedia.storage.get( 'LiquipediaTheme' );
+		if ( theme === 'dark' ) {
 			liquipedia.tracker.track( 'Page view with dark theme enabled' );
-		} else if ( window.localStorage.getItem( 'LiquipediaTheme' ) === 'light' ) {
+		} else if ( theme === 'light' ) {
 			liquipedia.tracker.track( 'Page view with light theme enabled' );
-		} else if ( window.localStorage.getItem( 'LiquipediaTheme' ) === 'system' ) {
+		} else if ( theme === 'system' ) {
 			liquipedia.tracker.track( 'Page view with auto theme enabled' );
 		}
 	}
