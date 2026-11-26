@@ -4,39 +4,60 @@ insulate('Match Ticker Card', function()
 	local Array = require('Module:Array')
 	local MatchGroupUtil = require('Module:MatchGroup/Util/Custom')
 
-	local HorizontalContainer = require('Module:Widget/Match/Ticker/HorizontalContainer')
+	local Html = require('Module:Widget/Html')
 
-	it('snapshot', function()
-		local LpdbQueryStub = stub(mw.ext.LiquipediaDB, 'lpdb', {})
-		local MakeTitleStub = stub(mw.title, 'makeTitle', function(_, title, fragment)
+	local LpdbQueryStub, MakeTitleStub, TeamTemplateMock
+	local MatchTickerController, MatchTickerWrapper
+
+	before_each(function ()
+		LpdbQueryStub = stub(mw.ext.LiquipediaDB, 'lpdb', {})
+		MakeTitleStub = stub(mw.title, 'makeTitle', function(_, title, fragment)
 			return {fullText = title .. (fragment and ('#' .. fragment) or '')}
 		end)
-		local MatchTickerCard = require('Module:Widget/Match/Ticker/Card')
-		local MatchTickerController = require('Module:MatchTicker/Controller')
-		local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
+		MatchTickerController = require('Module:MatchTicker/Controller')
+		MatchTickerWrapper = require('Module:Widget/Match/Ticker/Wrapper')
+		TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 		TeamTemplateMock.setUp()
+	end)
 
-		local MatchRecords = require('test_assets.lpdb_match2')
-
-		-- Split matches whose games are played on different dates into one card per game, as the ticker does
-		local cards = Array.flatMap(Array.sub(MatchRecords, 1, 3), function(record)
-			local match = MatchGroupUtil.matchFromRecord(record)
-			---@diagnostic disable-next-line: invisible, missing-fields
-			local expandedMatches = MatchTickerController.expandGamesOfMatch(match, {
-				upcoming = not match.finished,
-				recent = match.finished,
-			})
-			return Array.map(expandedMatches, function(expandedMatch)
-				return MatchTickerCard{match = expandedMatch.match, gameData = expandedMatch.gameData}
-			end)
-		end)
-
-		GoldenTest('match_ticker_card', tostring(HorizontalContainer{
-			children = cards,
-		}))
-
+	after_each(function ()
 		TeamTemplateMock.tearDown()
 		MakeTitleStub:revert()
 		LpdbQueryStub:revert()
+	end)
+
+	---@param finished boolean
+	---@return {match: MatchGroupUtilMatch, gameData: MatchTickerGameData?}[]
+	local function buildTickerMatches(finished)
+		local records = Array.filter(Array.sub(require('test_assets.lpdb_match2'), 1, 3), function (record)
+			return (record.finished == '1') == finished
+		end)
+		-- Split matches whose games are played on different dates into one card per game, as the ticker does
+		return Array.flatMap(records, function (record)
+			---@diagnostic disable-next-line: invisible, missing-fields
+			return MatchTickerController.expandGamesOfMatch(MatchGroupUtil.matchFromRecord(record), {
+				upcoming = not finished,
+				recent = finished,
+			})
+		end)
+	end
+
+	it('upcoming snapshot', function()
+		GoldenTest('match_ticker_card_upcoming', tostring(MatchTickerWrapper{
+			matches = buildTickerMatches(false),
+			variant = 'horizontal',
+		}))
+	end)
+
+	it('completed snapshot', function()
+		-- Completed matches are listed in the recent tab of the main page ticker
+		GoldenTest('match_ticker_card_completed', tostring(Html.Div{
+			classes = {'match-ticker-filterable-container'},
+			attributes = {['data-match-ticker-type'] = 'recent'},
+			children = MatchTickerWrapper{
+				matches = buildTickerMatches(true),
+				variant = 'carousel',
+			},
+		}))
 	end)
 end)
