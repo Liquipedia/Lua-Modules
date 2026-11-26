@@ -539,6 +539,10 @@ end
 ---@param match {match: FFAMatchGroupUtilMatch, gameData: MatchTickerGameData?}
 ---@param config MatchTickerConfig
 function MatchTickerController.adjustFfaMatch(match, config)
+	if not Logic.isNumeric(match.match.winner) then
+		return
+	end
+
 	local opponentNames = Array.extendWith({config.player}, config.teamPages)
 
 	local opponentIndex = Array.indexOf(
@@ -562,9 +566,6 @@ function MatchTickerController.adjustFfaMatch(match, config)
 	end
 	local opponent = table.remove(match.match.opponents, opponentIndex)
 	table.insert(match.match.opponents, 1, opponent)
-	if tonumber(match.match.winner) == opponentIndex then
-		match.match.winner = 1
-	end
 end
 
 --- Fetches region of a tournament
