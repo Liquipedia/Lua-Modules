@@ -104,7 +104,7 @@ end
 function TeamStats.collect(args)
 	local spec = TournamentStructure.readMatchGroupsSpec(args) or TournamentStructure.currentPageSpec()
 
-		---@type TeamStatsOpponent[]
+	---@type TeamStatsOpponent[]
 	local opponents = {}
 
 	---@param record table?
@@ -218,11 +218,11 @@ local function totalRecord(entry)
 end
 
 --- Every map at least one opponent played, in alphabetical order.
----@param opponents table<string, TeamStatsOpponent>
+---@param opponents TeamStatsOpponent[]
 ---@return string[]
 local function playedMaps(opponents)
 	local maps = Set()
- ---@param opponents TeamStatsOpponent[]
+	for _, entry in ipairs(opponents) do
 		for map, mapStats in pairs(entry.maps) do
 			if gamesPlayed(mapStats.total) > 0 then
 				maps:add(map)
@@ -305,7 +305,7 @@ local function Overview(props)
 		if totalA.losses ~= totalB.losses then
 			return totalA.losses < totalB.losses
 		end
-			return Opponent.toName(a.opponent) < Opponent.toName(b.opponent)
+		return Opponent.toName(a.opponent) < Opponent.toName(b.opponent)
 	end)
 	local maps = playedMaps(props.opponents)
 
