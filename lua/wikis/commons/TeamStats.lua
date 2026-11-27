@@ -35,7 +35,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field decider TeamStatsRecord
 
 ---@class TeamStatsOpponent
----@field name string
 ---@field opponent standardOpponent
 ---@field maps table<string, TeamStatsMap>
 
@@ -101,28 +100,31 @@ local function getMap(entry, map)
 end
 
 ---@param args table
----@return table<string, TeamStatsOpponent>
+---@return TeamStatsOpponent[]
 function TeamStats.collect(args)
 	local spec = TournamentStructure.readMatchGroupsSpec(args) or TournamentStructure.currentPageSpec()
 
-	---@type table<string, TeamStatsOpponent>
+		---@type TeamStatsOpponent[]
 	local opponents = {}
 
 	---@param record table?
 	---@return TeamStatsOpponent?
 	local function getOpponent(record)
-		if not record or Logic.isEmpty(record.name) then
+		if not record then
 			return
 		end
-		local name = record.name:gsub('_', ' ')
-		if not opponents[name] then
-			local opponent = Opponent.fromMatch2Record(record)
-			if Opponent.isTbd(opponent) then
-				return
-			end
-			opponents[name] = {name = name, opponent = opponent, maps = {}}
+		local opponent = Opponent.fromMatch2Record(record)
+		if Opponent.isTbd(opponent) then
+			return
 		end
-		return opponents[name]
+		local entry = Array.find(opponents, function(existing)
+			return Opponent.same(existing.opponent, opponent)
+		end)
+		if not entry then
+			entry = {opponent = opponent, maps = {}}
+			table.insert(opponents, entry)
+		end
+		return entry
 	end
 
 	Lpdb.executeMassQuery('match2', {
@@ -220,7 +222,7 @@ end
 ---@return string[]
 local function playedMaps(opponents)
 	local maps = Set()
-	for _, entry in pairs(opponents) do
+ ---@param opponents TeamStatsOpponent[]
 		for map, mapStats in pairs(entry.maps) do
 			if gamesPlayed(mapStats.total) > 0 then
 				maps:add(map)
@@ -291,10 +293,10 @@ function TeamStats._mapCell(mapStats)
 end
 
 --- One row per opponent, one column per map.
----@param props {opponents: table<string, TeamStatsOpponent>}
+---@param props {opponents: TeamStatsOpponent[]}
 ---@return Renderable
 local function Overview(props)
-	local entries = Array.extractValues(props.opponents)
+	local entries = Array.copy(props.opponents)
 	table.sort(entries, function(a, b)
 		local totalA, totalB = totalRecord(a), totalRecord(b)
 		if totalA.wins ~= totalB.wins then
@@ -303,7 +305,7 @@ local function Overview(props)
 		if totalA.losses ~= totalB.losses then
 			return totalA.losses < totalB.losses
 		end
-		return a.name < b.name
+			return Opponent.toName(a.opponent) < Opponent.toName(b.opponent)
 	end)
 	local maps = playedMaps(props.opponents)
 
