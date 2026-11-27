@@ -5,250 +5,136 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----@class DeadlockNotabilityCheckerConfig: NotabilityCheckerConfig
-local Config = {}
-
--- These are constants, you don't need to touch them
--- unless values for liquipediatiertype change
-Config.TIER_TYPE_GENERAL = 'general'
-Config.TIER_TYPE_QUALIFIER = 'qualifier'
-Config.TIER_TYPE_WEEKLY = 'weekly'
-Config.TIER_TYPE_MONTHLY = 'monthly'
-Config.TIER_TYPE_MISC = 'misc'
-Config.TIER_TYPE_SHOW_MATCH = 'showmatch'
-Config.MAX_NUMBER_OF_PARTICIPANTS = 10
-Config.MAX_NUMBER_OF_COACHES = 2
-
--- How many placements should we retrieve from LPDB for a team/player?
-Config.PLACEMENT_LIMIT = 5000
-
--- These are the notability thresholds needed by a team/player
-Config.NOTABILITY_THRESHOLD_MIN = 20
-Config.NOTABILITY_THRESHOLD_NOTABLE = 25
-
--- These are all the liquipediatiertypes which should be extra "penalised"
--- for a lower placement, see also the placementDropOffFunction below.
--- Generally these types will award the same points for first, but then
--- quickly decrease the point rewards as the placement gets lower
-Config.EXTRA_DROP_OFF_TYPES = {
-	Config.TIER_TYPE_GENERAL,
-	Config.TIER_TYPE_MONTHLY,
-	Config.TIER_TYPE_WEEKLY,
-	Config.TIER_TYPE_QUALIFIER,
+local TIER_1_POINTS = {
+	{maxPlacement = 4, points = 1},
+	{maxPlacement = 8, points = 0.8},
+	{maxPlacement = 16, points = 0.6},
+	{maxPlacement = 32, points = 0.4},
+	{maxPlacement = 64, points = 0.2},
 }
 
--- Weights used for tournaments
-Config.weights = {
-	{
-		tier = 1,
-		options = {
-			dateLossIgnored = true,
-		},
-		tiertype = {
-			{
-				name = Config.TIER_TYPE_GENERAL,
-				points = 25,
-			},
-			{
-				name = Config.TIER_TYPE_MONTHLY,
-				points = 15,
-			},
-			{
-				name = Config.TIER_TYPE_WEEKLY,
-				points = 10,
-			},
-			{
-				name = Config.TIER_TYPE_QUALIFIER,
-				points = 1,
-			},
-			{
-				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 1,
-			},
-			{
-				name = Config.TIER_TYPE_MISC,
-				points = 0,
-			},
-		},
-	},
-	{
-		tier = 2,
-		options = {
-			dateLossIgnored = false,
-		},
-		tiertype = {
-			{
-				name = Config.TIER_TYPE_GENERAL,
-				points = 15,
-			},
-			{
-				name = Config.TIER_TYPE_MONTHLY,
-				points = 10,
-			},
-			{
-				name = Config.TIER_TYPE_WEEKLY,
-				points = 5,
-			},
-			{
-				name = Config.TIER_TYPE_QUALIFIER,
-				points = 1,
-			},
-			{
-				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 1,
-			},
-			{
-				name = Config.TIER_TYPE_MISC,
-				points = 0,
+local TIER_2_POINTS = {
+	{maxPlacement = 2, points = 1},
+	{maxPlacement = 4, points = 0.8},
+	{maxPlacement = 8, points = 0.6},
+	{maxPlacement = 16, points = 0.3},
+}
+
+---@type NotabilityCheckerConfig
+return {
+	thresholds = {discussion = 20, notable = 25},
+	maxCoaches = 2,
+	tiers = {
+		[1] = {
+			ignoreDateLoss = true,
+			points = {
+				general = {
+					{maxPlacement = 4, points = 25},
+					{maxPlacement = 8, points = 20},
+					{maxPlacement = 16, points = 15},
+					{maxPlacement = 32, points = 10},
+					{maxPlacement = 64, points = 5},
+				},
+				monthly = {
+					{maxPlacement = 4, points = 15},
+					{maxPlacement = 8, points = 12},
+					{maxPlacement = 16, points = 9},
+					{maxPlacement = 32, points = 6},
+					{maxPlacement = 64, points = 3},
+				},
+				weekly = {
+					{maxPlacement = 4, points = 10},
+					{maxPlacement = 8, points = 8},
+					{maxPlacement = 16, points = 6},
+					{maxPlacement = 32, points = 4},
+					{maxPlacement = 64, points = 2},
+				},
+				qualifier = TIER_1_POINTS,
+				showmatch = TIER_1_POINTS,
 			},
 		},
-	},
-	{
-		tier = 3,
-		options = {
-			dateLossIgnored = false,
-		},
-		tiertype = {
-			{
-				name = Config.TIER_TYPE_GENERAL,
-				points = 10,
-			},
-			{
-				name = Config.TIER_TYPE_MONTHLY,
-				points = 5,
-			},
-			{
-				name = Config.TIER_TYPE_WEEKLY,
-				points = 2,
-			},
-			{
-				name = Config.TIER_TYPE_QUALIFIER,
-				points = 1,
-			},
-			{
-				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0,
-			},
-			{
-				name = Config.TIER_TYPE_MISC,
-				points = 0,
+		[2] = {
+			points = {
+				general = {
+					{maxPlacement = 2, points = 15},
+					{maxPlacement = 4, points = 12},
+					{maxPlacement = 8, points = 9},
+					{maxPlacement = 16, points = 4.5},
+				},
+				monthly = {
+					{maxPlacement = 2, points = 10},
+					{maxPlacement = 4, points = 8},
+					{maxPlacement = 8, points = 6},
+					{maxPlacement = 16, points = 3},
+				},
+				weekly = {
+					{maxPlacement = 2, points = 5},
+					{maxPlacement = 4, points = 4},
+					{maxPlacement = 8, points = 3},
+					{maxPlacement = 16, points = 1.5},
+				},
+				qualifier = TIER_2_POINTS,
+				showmatch = TIER_2_POINTS,
 			},
 		},
-	},
-	{
-		tier = 4,
-		options = {
-			dateLossIgnored = false,
-		},
-		tiertype = {
-			{
-				name = Config.TIER_TYPE_GENERAL,
-				points = 5,
-			},
-			{
-				name = Config.TIER_TYPE_MONTHLY,
-				points = 2,
-			},
-			{
-				name = Config.TIER_TYPE_WEEKLY,
-				points = 1
-			},
-			{
-				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
-			},
-			{
-				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0,
-			},
-			{
-				name = Config.TIER_TYPE_MISC,
-				points = 0,
+		[3] = {
+			points = {
+				general = {
+					{maxPlacement = 1, points = 10},
+					{maxPlacement = 2, points = 8},
+					{maxPlacement = 4, points = 5},
+					{maxPlacement = 8, points = 2},
+				},
+				monthly = {
+					{maxPlacement = 1, points = 5},
+					{maxPlacement = 2, points = 4},
+					{maxPlacement = 4, points = 2.5},
+					{maxPlacement = 8, points = 1},
+				},
+				weekly = {
+					{maxPlacement = 1, points = 2},
+					{maxPlacement = 2, points = 1.6},
+					{maxPlacement = 4, points = 1},
+					{maxPlacement = 8, points = 0.4},
+				},
+				qualifier = {
+					{maxPlacement = 1, points = 1},
+					{maxPlacement = 2, points = 0.8},
+					{maxPlacement = 4, points = 0.5},
+					{maxPlacement = 8, points = 0.2},
+				},
 			},
 		},
-	},
-	{
-		tier = 5,
-		options = {
-			dateLossIgnored = false,
+		[4] = {
+			points = {
+				general = {
+					{maxPlacement = 1, points = 5},
+					{maxPlacement = 2, points = 2.5},
+					{maxPlacement = 4, points = 1},
+				},
+				monthly = {
+					{maxPlacement = 1, points = 2},
+					{maxPlacement = 2, points = 1},
+					{maxPlacement = 4, points = 0.4},
+				},
+				weekly = {
+					{maxPlacement = 1, points = 1},
+					{maxPlacement = 2, points = 0.5},
+					{maxPlacement = 4, points = 0.2},
+				},
+			},
 		},
-		tiertype = {
-			{
-				name = Config.TIER_TYPE_GENERAL,
-				points = 2,
-			},
-			{
-				name = Config.TIER_TYPE_MONTHLY,
-				points = 1,
-			},
-			{
-				name = Config.TIER_TYPE_WEEKLY,
-				points = 0,
-			},
-			{
-				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
-			},
-			{
-				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0,
-			},
-			{
-				name = Config.TIER_TYPE_MISC,
-				points = 0,
+		[5] = {
+			points = {
+				general = {
+					{maxPlacement = 1, points = 2},
+					{maxPlacement = 2, points = 1},
+				},
+				monthly = {
+					{maxPlacement = 1, points = 1},
+					{maxPlacement = 2, points = 0.5},
+				},
 			},
 		},
 	},
 }
-
---- This function adjusts the score for the placement, e.g.
---- a first placement should score more than a 10th placement.
---- See also the EXTRA_DROP_OFF_TYPES.
----@param tier string|integer
----@param tierType string
----@return NotabilityCheckerDropOffFunction
-function Config.placementDropOffFunction(tier, tierType)
-	return function(score, placement)
-		if (tier == 1 and placement <= 4)
-			or (tier == 2 and placement <= 2)
-			or (tier == 3 and placement == 1)
-			or (tier == 4 and placement == 1)
-			or (tier == 5 and placement == 1)
-		then
-			return score
-		elseif (tier == 1 and placement <= 8)
-			or (tier == 2 and placement <= 4)
-			or (tier == 3 and placement <= 2)
-		then
-			return (score * 0.8)
-		elseif (tier == 1 and placement <= 16)
-			or (tier == 2 and placement <= 8)
-		then
-			return (score * 0.6)
-		elseif (tier == 3 and placement <= 4)
-			or (tier == 4 and placement <= 2)
-			or (tier == 5 and placement <= 2)
-		then
-			return (score * 0.5)
-		elseif (tier == 1 and placement <= 32) then
-			return (score * 0.4)
-		elseif (tier == 2 and placement <= 16) then
-			return (score * 0.3)
-		elseif (tier == 1 and placement <= 64)
-			or (tier == 3 and placement <= 8)
-			or (tier == 4 and placement <= 4)
-		then
-			return (score * 0.2)
-		else
-			return 0
-		end
-	end
-end
-
--- Adjusts the score to compensate for the mode, you might
--- want to decrease the points given for a certain mode
-function Config.adjustScoreForMode(score, mode)
-	return score
-end
-
-return Config
