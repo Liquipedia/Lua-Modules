@@ -150,6 +150,9 @@ describe( 'Collapse module', () => {
 
 			const outer = document.querySelector( '.outer' );
 			const inner = document.querySelector( '.inner' );
+			inner.querySelector( 'button.general-collapsible-expand-button' ).click();
+			expect( outer.classList.contains( 'collapsed' ) ).toBe( false );
+			expect( inner.classList.contains( 'collapsed' ) ).toBe( false );
 			inner.querySelector( 'button.general-collapsible-collapse-button' ).click();
 			expect( outer.classList.contains( 'collapsed' ) ).toBe( false );
 			expect( inner.classList.contains( 'collapsed' ) ).toBe( true );
