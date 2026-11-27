@@ -155,8 +155,10 @@ class LiquipediaMatchTicker {
 			}
 
 			// Items without a match, like the link to all matches, stay after the groups
-			const otherItems = Array.from( tickerCarousel.children )
-				.filter( ( item ) => !item.querySelector( '.match-ticker-card' ) );
+			const otherItems = Array.from( tickerCarousel.children ).filter(
+				( item ) => item.classList.contains( 'carousel-item' ) &&
+							!item.querySelector( '.match-ticker-card' )
+			);
 			tickerCarousel.replaceChildren( ...groupElements, ...otherItems );
 		} );
 	}
