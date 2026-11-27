@@ -45,21 +45,6 @@ local FilterButtonsPopover = {
 	}
 }
 
----Mirrors the display logic in FilterButtons.js: a category with everything selected is unrestricted
----and shown with nothing checked
----@param category FilterButtonCategory
----@param values string[]
----@return table<string, boolean>
-function FilterButtonsPopover.getInitialCheckedStates(category, values)
-	local states = Table.map(values, function (_, value)
-		return value, Table.includes(category.defaultItems, value)
-	end)
-	if Array.all(values, function (value) return states[value] end) then
-		return Table.map(states, function (value) return value, false end)
-	end
-	return states
-end
-
 ---@param tier string
 ---@return VNode?
 function FilterButtonsPopover.createTierBadge(tier)
@@ -96,8 +81,6 @@ function FilterButtonsPopover.filterCategory(filterGroupPrefix, category)
 	local values = Array.map(category.items, function (item)
 		return itemToPropertyValues(item) or item
 	end)
-	local checkedStates = FilterButtonsPopover.getInitialCheckedStates(category, values)
-	local checkedCount = #Array.filter(values, function (value) return checkedStates[value] end)
 	local columns = math.ceil(#values / MAX_ROWS)
 
 	local items = Array.map(category.items, function (item, index)
@@ -108,7 +91,8 @@ function FilterButtonsPopover.filterCategory(filterGroupPrefix, category)
 				['data-filter-on'] = value,
 				['data-filter-default'] = tostring(Table.includes(category.defaultItems, value)),
 				role = 'checkbox',
-				['aria-checked'] = tostring(checkedStates[value]),
+				-- The checked state, counts and labels are filled in by FilterButtons.js
+				['aria-checked'] = 'false',
 			},
 			children = {
 				Html.Span{
@@ -138,12 +122,8 @@ function FilterButtonsPopover.filterCategory(filterGroupPrefix, category)
 						children = title,
 					},
 					Html.Span{
-						classes = {
-							CLASS_NAME .. '__category-count',
-							checkedCount == 0 and (CLASS_NAME .. '__category-count--empty') or nil,
-						},
+						classes = {CLASS_NAME .. '__category-count'},
 						attributes = {['data-filter-popover-category-count'] = groupName},
-						children = checkedCount,
 					},
 					Html.Span{
 						classes = {CLASS_NAME .. '__category-action'},
@@ -154,7 +134,6 @@ function FilterButtonsPopover.filterCategory(filterGroupPrefix, category)
 							role = 'button',
 							tabindex = '0',
 						},
-						children = checkedCount > 0 and CLEAR_LABEL or SELECT_ALL_LABEL,
 					},
 				},
 			},
