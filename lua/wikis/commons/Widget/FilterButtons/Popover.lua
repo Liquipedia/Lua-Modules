@@ -39,8 +39,10 @@ local SELECT_ALL_LABEL = 'Select all'
 ---@field filterGroupPrefix string prefix of the filter groups; must not be shared with other filter buttons on the page
 ---@field label string?
 
-local defaultProps = {
-	label = 'Filter',
+local FilterButtonsPopover = {
+	defaultProps = {
+		label = 'Filter',
+	}
 }
 
 ---Mirrors the display logic in FilterButtons.js: a category with everything selected is unrestricted
@@ -48,7 +50,7 @@ local defaultProps = {
 ---@param category FilterButtonCategory
 ---@param values string[]
 ---@return table<string, boolean>
-local function getInitialCheckedStates(category, values)
+function FilterButtonsPopover.getInitialCheckedStates(category, values)
 	local states = Table.map(values, function (_, value)
 		return value, Table.includes(category.defaultItems, value)
 	end)
@@ -60,7 +62,7 @@ end
 
 ---@param tier string
 ---@return VNode?
-local function TierBadge(tier)
+function FilterButtonsPopover.createTierBadge(tier)
 	local identifier = Tier.toIdentifier(tier)
 	local tierShort = Tier.toShortName(tier)
 	if String.isEmpty(tierShort) then
@@ -80,7 +82,7 @@ end
 ---@param filterGroupPrefix string
 ---@param category FilterButtonCategory
 ---@return VNode
-local function FilterCategory(filterGroupPrefix, category)
+function FilterButtonsPopover.filterCategory(filterGroupPrefix, category)
 	assert(
 		Table.isNotEmpty(category.items),
 		category.name .. ': List of items is required, either input or filled during load'
@@ -94,7 +96,7 @@ local function FilterCategory(filterGroupPrefix, category)
 	local values = Array.map(category.items, function (item)
 		return itemToPropertyValues(item) or item
 	end)
-	local checkedStates = getInitialCheckedStates(category, values)
+	local checkedStates = FilterButtonsPopover.getInitialCheckedStates(category, values)
 	local checkedCount = #Array.filter(values, function (value) return checkedStates[value] end)
 	local columns = math.ceil(#values / MAX_ROWS)
 
@@ -117,7 +119,7 @@ local function FilterCategory(filterGroupPrefix, category)
 					classes = {CLASS_NAME .. '__item-label'},
 					children = transformValueToText(item),
 				},
-				isTierCategory and TierBadge(item) or nil,
+				isTierCategory and FilterButtonsPopover.createTierBadge(item) or nil,
 			},
 		}
 	end)
@@ -175,7 +177,7 @@ end
 ---@param variant 'ghost'|'secondary'|'primary'
 ---@param children Renderable|Renderable[]
 ---@return VNode
-local function FooterButton(action, variant, children)
+function FilterButtonsPopover.createFooterButton(action, variant, children)
 	return Button{
 		classes = {CLASS_NAME .. '__button', CLASS_NAME .. '__button--' .. action},
 		variant = variant,
@@ -189,7 +191,7 @@ end
 ---The interactivity is provided by FilterButtons.js.
 ---@param props FilterButtonsPopoverProps
 ---@return VNode
-local function FilterButtonsPopover(props)
+function FilterButtonsPopover.render(props)
 	local categories = props.categories or Lua.import('Module:FilterButtons/Config').categories
 	local filterGroupPrefix = props.filterGroupPrefix
 	assert(String.isNotEmpty(filterGroupPrefix), 'FilterButtonsPopover: filterGroupPrefix is required')
@@ -227,17 +229,17 @@ local function FilterButtonsPopover(props)
 				children = {
 					Html.Div{
 						classes = {CLASS_NAME .. '__categories'},
-						children = Array.map(categories, FnUtil.curry(FilterCategory, filterGroupPrefix)),
+						children = Array.map(categories, FnUtil.curry(FilterButtonsPopover.filterCategory, filterGroupPrefix)),
 					},
 					Html.Div{
 						classes = {CLASS_NAME .. '__footer'},
 						children = {
-							FooterButton('reset', 'ghost', 'Reset'),
+							FilterButtonsPopover.createFooterButton('reset', 'ghost', 'Reset'),
 							Html.Div{
 								classes = {CLASS_NAME .. '__footer-end'},
 								children = {
-									FooterButton('cancel', 'secondary', 'Cancel'),
-									FooterButton('apply', 'primary', 'Apply'),
+									FilterButtonsPopover.createFooterButton('cancel', 'secondary', 'Cancel'),
+									FilterButtonsPopover.createFooterButton('apply', 'primary', 'Apply'),
 								},
 							},
 						},
@@ -248,4 +250,4 @@ local function FilterButtonsPopover(props)
 	}
 end
 
-return Component.component(FilterButtonsPopover, defaultProps)
+return Component.component(FilterButtonsPopover.render, FilterButtonsPopover.defaultProps)
