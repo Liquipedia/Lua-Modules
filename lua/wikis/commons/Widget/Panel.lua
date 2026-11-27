@@ -11,6 +11,7 @@ local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
 local Component = Lua.import('Module:Widget/Component')
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Html = Lua.import('Module:Widget/Html')
 local Div = Html.Div
@@ -33,19 +34,13 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 ---@return VNode
 local function Panel(props)
 	local boxId = props.boxId
-	local attributes = props.headingAttributes or {}
 	local hasToggle = boxId ~= nil
-
-	if hasToggle then
-		attributes = Table.merge(attributes, {
-			tabindex = '0',
-			['data-component'] = 'panel-box-collapsible-button'
-		})
-	end
 
 	local heading = Div{
 		classes = { 'panel-box-heading', 'wiki-color-dark', 'wiki-backgroundcolor-light', 'wiki-bordercolor-light' },
-		attributes = attributes,
+		attributes = hasToggle
+			and Table.merge(props.headingAttributes, {['data-collapsible-click-region'] = 'true'})
+			or props.headingAttributes,
 		children = WidgetUtil.collect(
 			hasToggle and {
 				Div{
@@ -59,34 +54,39 @@ local function Panel(props)
 		)
 	}
 
-	local body = Div{
-		classes = WidgetUtil.collect(
-			hasToggle and 'panel-box-collapsible-content' or nil,
-			'panel-box-body',
-			not Logic.readBool(props.padding) and 'panel-box-body--no-padding' or nil,
-			props.bodyClass
-		),
-		css = props.bodyStyle,
-		attributes = hasToggle and {
-			['data-component'] = 'panel-box-content'
-		} or {},
-		children = props.children
-	}
+	local bodyClasses = WidgetUtil.collect(
+		'panel-box-body',
+		not Logic.readBool(props.padding) and 'panel-box-body--no-padding' or nil,
+		props.bodyClass
+	)
+	local panelClasses = WidgetUtil.collect('panel-box', 'wiki-bordercolor-light', props.classes)
+
+	if hasToggle then
+		return GeneralCollapsible{
+			classes = panelClasses,
+			attributes = Table.mergeInto(
+				{['data-collapsible-storage-key'] = 'panel-box-' .. boxId},
+				props.panelAttributes
+			),
+			titleWidget = heading,
+			collapseAreaClasses = bodyClasses,
+			collapseAreaCss = props.bodyStyle,
+			children = props.children,
+		}
+	end
 
 	return Div{
-		classes = WidgetUtil.collect('panel-box', 'wiki-bordercolor-light', props.classes),
-		attributes = Table.merge(
-			hasToggle and {
-				['data-component'] = 'panel-box',
-				['data-panel-box-id'] = boxId
-			} or {},
-			props.panelAttributes
-		),
-		children = WidgetUtil.collect(
-			heading, body
-		)
+		classes = panelClasses,
+		attributes = props.panelAttributes,
+		children = {
+			heading,
+			Div{
+				classes = bodyClasses,
+				css = props.bodyStyle,
+				children = props.children,
+			},
+		}
 	}
-
 end
 
 return Component.component(Panel)

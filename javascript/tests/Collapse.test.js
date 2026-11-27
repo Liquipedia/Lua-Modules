@@ -129,6 +129,75 @@ describe( 'Collapse module', () => {
 		} );
 	} );
 
+	describe( 'nested collapsibles', () => {
+		test( 'only wire up their own toggle buttons', () => {
+			document.body.innerHTML = `
+				<div id="mw-content-text">
+					<div class="general-collapsible outer">
+						<div class="header"></div>
+						<div class="should-collapse">
+							<div class="general-collapsible collapsed inner">
+								<span class="general-collapsible-expand-button">Show</span>
+								<span class="general-collapsible-collapse-button">Hide</span>
+								<div class="should-collapse">Content</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			`;
+			globalThis.liquipedia.collapse.supportsAnchoredPopover = () => false;
+			globalThis.liquipedia.collapse.setupGeneralCollapsibleButtons();
+
+			const outer = document.querySelector( '.outer' );
+			const inner = document.querySelector( '.inner' );
+			inner.querySelector( 'button.general-collapsible-expand-button' ).click();
+			expect( outer.classList.contains( 'collapsed' ) ).toBe( false );
+			expect( inner.classList.contains( 'collapsed' ) ).toBe( false );
+			inner.querySelector( 'button.general-collapsible-collapse-button' ).click();
+			expect( outer.classList.contains( 'collapsed' ) ).toBe( false );
+			expect( inner.classList.contains( 'collapsed' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'click region collapsibles', () => {
+		const render = () => {
+			document.body.innerHTML = `
+				<div id="mw-content-text">
+					<div class="general-collapsible">
+						<div class="header" data-collapsible-click-region="true">Title</div>
+						<div class="should-collapse">Content</div>
+					</div>
+				</div>
+			`;
+			return {
+				collapsible: document.querySelector( '.general-collapsible' ),
+				region: document.querySelector( '.header' )
+			};
+		};
+
+		test( 'toggles on click and keyboard', () => {
+			const { collapsible, region } = render();
+			globalThis.liquipedia.collapse.setupClickableRegionCollapsibles();
+
+			expect( region.getAttribute( 'tabindex' ) ).toBe( '0' );
+			expect( region.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
+			region.click();
+			expect( collapsible.classList.contains( 'collapsed' ) ).toBe( true );
+			expect( region.getAttribute( 'aria-expanded' ) ).toBe( 'false' );
+			region.dispatchEvent( new KeyboardEvent( 'keydown', { key: 'Enter' } ) );
+			expect( collapsible.classList.contains( 'collapsed' ) ).toBe( false );
+		} );
+
+		test( 'toggles once when initialized again', () => {
+			const { collapsible, region } = render();
+			globalThis.liquipedia.collapse.setupClickableRegionCollapsibles();
+			globalThis.liquipedia.collapse.setupClickableRegionCollapsibles();
+
+			region.click();
+			expect( collapsible.classList.contains( 'collapsed' ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'persistent collapsibles', () => {
 		const render = ( collapsed ) => {
 			const classes = collapsed ? 'general-collapsible collapsed' : 'general-collapsible';

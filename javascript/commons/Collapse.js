@@ -184,10 +184,18 @@ liquipedia.collapse = {
 			button?.setAttribute( 'popovertarget', area.id );
 		} );
 	},
+	// init() runs again after FilterButtons reloads content; a second listener would undo each toggle.
+	clickRegions: new WeakSet(),
+
 	setupClickableRegionCollapsibles: function() {
 		const regions = document.querySelectorAll( '[data-collapsible-click-region]' );
 
 		regions.forEach( ( region ) => {
+			if ( this.clickRegions.has( region ) ) {
+				return;
+			}
+			this.clickRegions.add( region );
+
 			// Get exclusion selector from attribute, default to interactive elements
 			// (links and buttons, which includes the general-collapsible toggles).
 			// Can pass empty string for "no exclusions" (everything toggles collapse)

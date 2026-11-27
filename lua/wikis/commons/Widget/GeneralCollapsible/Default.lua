@@ -22,7 +22,7 @@ local Div = Html.Div
 ---@field titleClasses string[]?
 ---@field titleWidget Renderable?
 ---@field collapseAreaClasses string[]?
----@field collapseAreaCss table<string, string|number>?
+---@field collapseAreaCss HtmlStyleProps?
 ---@field children Renderable|Renderable[]?
 ---@field popoverCollapseArea boolean?
 

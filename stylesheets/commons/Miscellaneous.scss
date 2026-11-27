@@ -1314,8 +1314,9 @@ Author(s): trev
 Template: General Collapsible
 Author: warnull
 *******************************************************************************/
+/* The :not() keeps an expanded outer collapsible from hiding the expand button of a collapsed nested one */
 .collapsed .general-collapsible-default-toggle > .general-collapsible-collapse-button,
-.general-collapsible:not( .collapsed ) .general-collapsible-default-toggle > .general-collapsible-expand-button {
+.general-collapsible:not( .collapsed ) .general-collapsible-default-toggle:not( .collapsed .general-collapsible-default-toggle ) > .general-collapsible-expand-button {
 	display: none;
 }
 
