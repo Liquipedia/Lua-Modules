@@ -27,6 +27,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@class TeamStatsRecord
 ---@field wins integer
 ---@field losses integer
+---@field draws integer
 
 ---@class TeamStatsMap
 ---@field total TeamStatsRecord
@@ -41,6 +42,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local TeamStats = {}
 
 local DASH = '–'
+local DRAW_WINNER = 0
 
 local PICK_TYPES = {
 	{key = 'ownPick', short = 'own', long = 'on own pick'},
@@ -65,13 +67,13 @@ end
 
 ---@return TeamStatsRecord
 local function newRecord()
-	return {wins = 0, losses = 0}
+	return {wins = 0, draws = 0, losses = 0}
 end
 
 ---@param record TeamStatsRecord
 ---@return integer
 local function gamesPlayed(record)
-	return record.wins + record.losses
+	return record.wins + record.draws + record.losses
 end
 
 ---@param entry TeamStatsOpponent
@@ -165,11 +167,11 @@ end
 function TeamStats._addGames(entry, games, opponentIndex, pickedBy)
 	Array.forEach(games, function(game)
 		local winner = tonumber(game.winner)
-		if Logic.isEmpty(game.map) or (winner ~= 1 and winner ~= 2) then
+		if Logic.isEmpty(game.map) or (winner ~= DRAW_WINNER and winner ~= 1 and winner ~= 2) then
 			return
 		end
 
-		local result = winner == opponentIndex and 'wins' or 'losses'
+		local result = winner == DRAW_WINNER and 'draws' or winner == opponentIndex and 'wins' or 'losses'
 		local picker = pickedBy[game.map]
 		local pickType = 'decider'
 		if picker then
@@ -187,6 +189,9 @@ end
 ---@param record TeamStatsRecord
 ---@return string
 local function formatRecord(record)
+	if record.draws > 0 then
+		return record.wins .. '-' .. record.draws .. '-' .. record.losses
+	end
 	return record.wins .. '-' .. record.losses
 end
 
@@ -203,6 +208,7 @@ local function totalRecord(entry)
 	for _, mapStats in pairs(entry.maps) do
 		total.wins = total.wins + mapStats.total.wins
 		total.losses = total.losses + mapStats.total.losses
+		total.draws = total.draws + mapStats.total.draws
 	end
 	return total
 end
@@ -266,7 +272,7 @@ function TeamStats._mapCell(mapStats)
 	end)
 
 	return TableWidgets.Cell{
-		classes = {rate > 0.5 and 'bg-win' or rate < 0.5 and 'bg-down' or 'bg-draw'},
+		classes = {total.wins > total.losses and 'bg-win' or total.wins < total.losses and 'bg-down' or 'bg-draw'},
 		attributes = {
 			['data-sort-value'] = rate * 1000 + gamesPlayed(total),
 			title = formatRecord(total) .. ' (' .. percentage .. '): ' .. table.concat(tooltip, ', '),
