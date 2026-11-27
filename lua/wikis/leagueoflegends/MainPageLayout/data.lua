@@ -86,18 +86,17 @@ local CONTENT = {
 		body = '{{Liquipedia:Eventbox}}',
 		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
-	filterButtons = {
+	matches = {
+		noPanel = true,
+		body = MatchTicker{filterGroupPrefix = MainPageLayoutUtil.MATCH_TICKER_FILTER_GROUP_PREFIX},
+		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
+	},
+	tournamentsFilter = {
 		noPanel = true,
 		body = Div{
-			css = { width = '100%', ['margin-bottom'] = '8px' },
-			children = { FilterButtonsWidget() }
-		}
-	},
-	matches = {
-		heading = 'Matches',
-		body = MatchTicker{},
-		padding = false,
-		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
+			css = {['margin-bottom'] = '0.5rem'},
+			children = FilterButtonsWidget()
+		},
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -209,8 +208,18 @@ return {
 	},
 	layouts = {
 		main = {
+			{ -- Top
+				size = 12,
+				children = {
+					{
+						mobileOrder = 3,
+						noPanel = true,
+						content = CONTENT.matches,
+					},
+				},
+			},
 			{ -- Left
-				sizes = {xxl = 5, xxxl = 6},
+				sizes = {xxl = 6, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
@@ -221,71 +230,48 @@ return {
 						content = CONTENT.specialEvents,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 6,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 8,
 						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 7,
+						mobileOrder = 9,
 						content = CONTENT.wantToHelp,
 					},
 					{
-						mobileOrder = 8,
+						mobileOrder = 10,
 						content = CONTENT.liquipediaApp,
 					},
 				}
 			},
 			{ -- Right
-				sizes = {xxl = 7, xxxl = 6},
+				sizes = {xxl = 6, xxxl = 6},
 				children = {
 					{
-						mobileOrder = 3,
-						children = {
-							{
-								children = {
-									{
-										noPanel = true,
-										content = CONTENT.filterButtons,
-									},
-								},
-							},
-							{
-								size = 6,
-								children = {
-									{
-										noPanel = true,
-										content = CONTENT.matches,
-									},
-								},
-							},
-							{
-								size = 6,
-								children = {
-									{
-										noPanel = true,
-										content = CONTENT.tournaments,
-									},
-								},
-							},
-						},
+						mobileOrder = 4,
+						content = CONTENT.tournamentsFilter,
+					},
+					{
+						mobileOrder = 5,
+						content = CONTENT.tournaments,
 					},
 				},
 			},
 			{
 				children = {
 					{
-						mobileOrder = 5,
+						mobileOrder = 7,
 						content = CONTENT.headlines,
 					},
 					{
-						mobileOrder = 9,
+						mobileOrder = 11,
 						content = CONTENT.usefulArticles,
 					},
 					{
-						mobileOrder = 10,
+						mobileOrder = 12,
 						content = CONTENT.references,
 					},
 				},

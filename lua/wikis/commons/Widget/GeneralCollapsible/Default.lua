@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Table = Lua.import('Module:Table')
 
 local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
 local Component = Lua.import('Module:Widget/Component')
@@ -23,16 +24,19 @@ local Div = Html.Div
 ---@field collapseAreaClasses string[]?
 ---@field collapseAreaCss table<string, string|number>?
 ---@field children Renderable|Renderable[]?
+---@field popoverCollapseArea boolean?
 
 ---@param props DefaultCollapsibleProps
 ---@return HtmlNode
 local function DefaultCollapsible(props)
 	return Div{
-		attributes = props.attributes,
+		attributes = props.popoverCollapseArea and Table.mergeInto(
+			{['data-collapsible-popover'] = 'true'}, props.attributes
+		) or props.attributes,
 		css = props.css,
 		classes = Array.extend(
 			'general-collapsible',
-			props.shouldCollapse and 'collapsed' or nil,
+			(props.popoverCollapseArea or props.shouldCollapse) and 'collapsed' or nil,
 			props.classes
 		),
 		children = {

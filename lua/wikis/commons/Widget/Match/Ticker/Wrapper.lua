@@ -10,13 +10,17 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Component = Lua.import('Module:Widget/Component')
 
+local Button = Lua.import('Module:Widget/Basic/Button')
+local CarouselContent = Lua.import('Module:Widget/Basic/Carousel/Content')
 local Html = Lua.import('Module:Widget/Html')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local MatchTickerCard = Lua.import('Module:Widget/Match/Ticker/Card')
 local HorizontalContainer = Lua.import('Module:Widget/Match/Ticker/HorizontalContainer')
 
 ---@param props {matches: {match: MatchGroupUtilMatch, gameData: MatchTickerGameData?}[],
 ---header: Renderable?, showInfoForEmptyResults: boolean, wrapperClasses: string[],
----hideTournament: boolean, displayGameIcons: boolean, onlyHighlightOnValue: string?, variant: 'vertical'|'horizontal'}
+---hideTournament: boolean, displayGameIcons: boolean, onlyHighlightOnValue: string?,
+---variant: 'vertical'|'horizontal'|'carousel', showAllLink: string?}
 ---@return Renderable?
 local function MatchTickerWrapper(props)
 	local matches = props.matches
@@ -40,7 +44,8 @@ local function MatchTickerWrapper(props)
 			hideTournament = props.hideTournament,
 			displayGameIcons = props.displayGameIcons,
 			onlyHighlightOnValue = props.onlyHighlightOnValue,
-			variant = props.variant == 'horizontal' and 'vertical' or nil,
+			-- The date is shown in the group header
+			countdownFormat = (props.variant == 'carousel' or props.variant == 'horizontal') and 'minimal' or nil,
 			gameData = match.gameData
 		}
 	end)
@@ -52,10 +57,46 @@ local function MatchTickerWrapper(props)
 		}
 	end
 
-	return Html.Div{
-		classes = props.wrapperClasses,
-		children = Array.extend({header}, HorizontalContainer{children = matchCards}),
-	}
+	-- Bare scrollable card list; the surrounding `.carousel` (and its controls) is provided by the caller.
+	-- Item widths are left to the stylesheet, so the caller can switch to a stacked list on small screens.
+	if props.variant == 'carousel' then
+		local showAllCard = props.showAllLink and Html.Div{
+			classes = {'match-ticker-show-all-card'},
+			children = {
+				Button{
+					classes = {'mobile-hide'},
+					link = props.showAllLink,
+					variant = 'ghost',
+					size = 'xs',
+					children = {
+						'Show all matches',
+						IconFa{iconName = 'next', screenReaderHidden = true},
+					},
+				},
+				Button{
+					classes = {'mobile-only'},
+					link = props.showAllLink,
+					variant = 'ghost',
+					size = 'sm',
+					children = {
+						'See more matches',
+						IconFa{iconName = 'next', screenReaderHidden = true},
+					},
+				}
+			},
+		} or nil
+		return Html.Div{
+			classes = props.wrapperClasses,
+			children = Array.extend({header}, CarouselContent{
+				classes = {'match-ticker-carousel'},
+				children = Array.extend(matchCards, showAllCard),
+				itemWidth = false,
+				gap = '0',
+			}),
+		}
+	end
+
+	return HorizontalContainer{children = matchCards}
 end
 
 return Component.component(MatchTickerWrapper)
