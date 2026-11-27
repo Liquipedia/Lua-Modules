@@ -182,7 +182,11 @@ function MatchGroupLegacy.getAlt(template, bracketType)
 			end
 		end
 
-		match2mapping[id] = {opp1 = matchKey .. 'p1', opp2 = matchKey .. 'p2', details = matchKey}
+		if bracketType == Opponent.duo then
+			match2mapping[id] = {opp1 = matchKey .. 't1', opp2 = matchKey .. 't2', details = matchKey}
+		else
+			match2mapping[id] = {opp1 = matchKey .. 'p1', opp2 = matchKey .. 'p2', details = matchKey}
+		end
 	end)
 
 	MatchGroupLegacy._handleHeaderMapping(match2mapping, lowerHeaders, lastRoundIndex)
@@ -258,15 +262,28 @@ end
 ---@param scoreKey string
 ---@return table
 function MatchGroupLegacy:getOpponent(prefix, scoreKey)
-	return {
-		['$notEmpty$'] = self.bracketType == 'team' and (prefix .. 'team') or prefix,
-		template = prefix .. 'team',
+	if self.bracketType == Opponent.solo or self.bracketType == Opponent.team then
+		return {
+			['$notEmpty$'] = self.bracketType == 'team' and (prefix .. 'team') or prefix,
+			template = prefix .. 'team',
+			score = prefix .. scoreKey,
+			name = prefix,
+			displayname = prefix .. 'display',
+			flag = prefix .. 'flag',
+			win = prefix .. 'win',
+		}
+	end
+	local base = {
+		['$notEmpty$'] = (prefix .. 'p1'),
 		score = prefix .. scoreKey,
-		name = prefix,
-		displayname = prefix .. 'display',
-		flag = prefix .. 'flag',
 		win = prefix .. 'win',
 	}
+	for i = 1, Opponent.partySize(self.bracketType) do
+		base['p' .. i] = prefix .. 'p' .. i .. 'display'
+		base['p' .. i .. 'link'] = prefix .. 'p' .. i
+		base['p' .. i .. 'flag'] = prefix .. 'p' .. i .. 'flag'
+	end
+	return base
 end
 
 ---@param mapIndex number
