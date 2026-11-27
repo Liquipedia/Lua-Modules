@@ -202,24 +202,7 @@ function FilterButtonsPopover.render(props)
 		classes = {CLASS_NAME},
 		attributes = {['data-filter-popover'] = ''},
 		children = {
-			-- Swapped for a <button> by FilterButtons.js; the `button` class opts out of the skin's <button> styling
-			Html.Div{
-				classes = {CLASS_NAME .. '__toggle', 'button'},
-				attributes = {['data-filter-popover-toggle'] = ''},
-				children = {
-					Html.Span{
-						classes = {CLASS_NAME .. '__toggle-label'},
-						children = {
-							props.label,
-							Html.Span{
-								classes = {CLASS_NAME .. '__toggle-count'},
-								attributes = {['data-filter-popover-count'] = ''},
-							},
-						},
-					},
-					IconFa{iconName = 'expand', screenReaderHidden = true},
-				},
-			},
+			FilterButtonsPopover.createToggle(props.label),
 			Html.Div{
 				classes = {CLASS_NAME .. '__panel'},
 				attributes = {
@@ -231,19 +214,47 @@ function FilterButtonsPopover.render(props)
 						classes = {CLASS_NAME .. '__categories'},
 						children = Array.map(categories, FnUtil.curry(FilterButtonsPopover.filterCategory, filterGroupPrefix)),
 					},
-					Html.Div{
-						classes = {CLASS_NAME .. '__footer'},
-						children = {
-							FilterButtonsPopover.createFooterButton('reset', 'ghost', 'Reset'),
-							Html.Div{
-								classes = {CLASS_NAME .. '__footer-end'},
-								children = {
-									FilterButtonsPopover.createFooterButton('cancel', 'secondary', 'Cancel'),
-									FilterButtonsPopover.createFooterButton('apply', 'primary', 'Apply'),
-								},
-							},
-						},
+					FilterButtonsPopover.createFooter(),
+				},
+			},
+		},
+	}
+end
+
+---@param label string?
+---@return VNode
+function FilterButtonsPopover.createToggle(label)
+	-- Swapped for a <button> by FilterButtons.js; the `button` class opts out of the skin's <button> styling
+	return Html.Div{
+		classes = {CLASS_NAME .. '__toggle', 'button'},
+		attributes = {['data-filter-popover-toggle'] = ''},
+		children = {
+			Html.Span{
+				classes = {CLASS_NAME .. '__toggle-label'},
+				children = {
+					label,
+					Html.Span{
+						classes = {CLASS_NAME .. '__toggle-count'},
+						attributes = {['data-filter-popover-count'] = ''},
 					},
+				},
+			},
+			IconFa{iconName = 'expand', screenReaderHidden = true},
+		},
+	}
+end
+
+---@return VNode
+function FilterButtonsPopover.createFooter()
+	return Html.Div{
+		classes = {CLASS_NAME .. '__footer'},
+		children = {
+			FilterButtonsPopover.createFooterButton('reset', 'ghost', 'Reset'),
+			Html.Div{
+				classes = {CLASS_NAME .. '__footer-end'},
+				children = {
+					FilterButtonsPopover.createFooterButton('cancel', 'secondary', 'Cancel'),
+					FilterButtonsPopover.createFooterButton('apply', 'primary', 'Apply'),
 				},
 			},
 		},
