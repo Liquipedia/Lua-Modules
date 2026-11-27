@@ -408,7 +408,6 @@ class FilterButtonsPopover {
 		this.element.querySelectorAll( '[data-filter-popover-count]' ).forEach( ( counter ) => {
 			counter.textContent = count > 0 ? ' (' + count + ')' : '';
 		} );
-		this.toggle.classList.toggle( 'filter-popover__toggle--active', count > 0 );
 	}
 }
 

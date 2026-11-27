@@ -208,14 +208,11 @@ function FilterButtonsPopover.createToggle(label)
 		classes = {CLASS_NAME .. '__toggle', 'button'},
 		attributes = {['data-filter-popover-toggle'] = ''},
 		children = {
+			-- Keeps the count next to the label rather than as a separate flex item
 			Html.Span{
-				classes = {CLASS_NAME .. '__toggle-label'},
 				children = {
 					label,
-					Html.Span{
-						classes = {CLASS_NAME .. '__toggle-count'},
-						attributes = {['data-filter-popover-count'] = ''},
-					},
+					Html.Span{attributes = {['data-filter-popover-count'] = ''}},
 				},
 			},
 			IconFa{iconName = 'expand', screenReaderHidden = true},
