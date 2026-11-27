@@ -41,6 +41,7 @@ local defaultProps = {
 ---@field filterGroupPrefix string? has to match the `filterGroupPrefix` of the filter buttons controlling this ticker
 ---@field showFilterButtons boolean? renders a filter popover in the header controlling this ticker;
 ---requires a `filterGroupPrefix` that is not used by other filter buttons on the page
+---@field showAllLink string? links to all matches at the end of the list
 
 ---@param props MatchTickerFilterableContainerProps
 ---@return VNode
@@ -65,6 +66,7 @@ local function MatchTickerContainer(props)
 		variant = 'carousel',
 		showInfoForEmptyResults = true,
 		filterGroupPrefix = props.filterGroupPrefix,
+		showAllLink = props.showAllLink,
 	}
 
 	local devFlag = FeatureFlag.get('dev')

@@ -154,7 +154,10 @@ class LiquipediaMatchTicker {
 				groupElements.push( cardGroupElement );
 			}
 
-			tickerCarousel.replaceChildren( ...groupElements );
+			// Items without a match, like the link to all matches, stay after the groups
+			const otherItems = Array.from( tickerCarousel.children )
+				.filter( ( item ) => !item.querySelector( '.match-ticker-card' ) );
+			tickerCarousel.replaceChildren( ...groupElements, ...otherItems );
 		} );
 	}
 
