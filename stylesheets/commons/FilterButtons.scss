@@ -344,6 +344,7 @@ Author(s): Elysienna, Nadox
 		gap: 0.5rem;
 		min-height: 1.5rem;
 		cursor: pointer;
+		-webkit-user-select: none;
 		user-select: none;
 
 		&-label {
