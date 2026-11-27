@@ -62,15 +62,27 @@ local function MatchTickerWrapper(props)
 	if props.variant == 'carousel' then
 		local showAllCard = props.showAllLink and Html.Div{
 			classes = {'match-ticker-show-all-card'},
-			children = Button{
-				link = props.showAllLink,
-				variant = 'ghost',
-				size = 'xs',
-				children = {
-					Html.Span{classes = {'mobile-hide'}, children = 'Show all matches'},
-					Html.Span{classes = {'mobile-only'}, children = 'See more matches'},
-					IconFa{iconName = 'next', screenReaderHidden = true},
+			children = {
+				Button{
+					classes = {'mobile-hide'},
+					link = props.showAllLink,
+					variant = 'ghost',
+					size = 'xs',
+					children = {
+						'Show all matches',
+						IconFa{iconName = 'next', screenReaderHidden = true},
+					},
 				},
+				Button{
+					classes = {'mobile-only'},
+					link = props.showAllLink,
+					variant = 'ghost',
+					size = 'sm',
+					children = {
+						'See more matches',
+						IconFa{iconName = 'next', screenReaderHidden = true},
+					},
+				}
 			},
 		} or nil
 		return Html.Div{
