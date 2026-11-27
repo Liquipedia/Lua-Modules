@@ -1,0 +1,240 @@
+---
+-- @Liquipedia
+-- page=Module:Widget/FilterButtons/Popover
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local FilterButtonsUtil = Lua.import('Module:FilterButtons/Util')
+local FnUtil = Lua.import('Module:FnUtil')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Utils')
+
+local Button = Lua.import('Module:Widget/Basic/Button')
+local Component = Lua.import('Module:Widget/Component')
+local Html = Lua.import('Module:Widget/Html')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Label = Lua.import('Module:Widget/Basic/Label')
+
+local CLASS_NAME = 'filter-popover'
+-- Items are laid out in columns of at most this many rows
+local MAX_ROWS = 6
+
+local DEFAULT_TITLES = {
+	game = 'Game',
+	liquipediatier = 'Tier',
+	liquipediatiertype = 'Type',
+	region = 'Region',
+}
+
+local CLEAR_LABEL = 'Clear'
+local SELECT_ALL_LABEL = 'Select all'
+
+---@class FilterButtonsPopoverProps
+---@field categories FilterButtonCategory[]?
+---@field filterGroupPrefix string prefix of the filter groups; must not be shared with other filter buttons on the page
+---@field label string?
+
+local FilterButtonsPopover = {
+	defaultProps = {
+		label = 'Filter',
+	}
+}
+
+---@param tier string
+---@return VNode?
+function FilterButtonsPopover.createTierBadge(tier)
+	local identifier = Tier.toIdentifier(tier)
+	local tierShort = Tier.toShortName(tier)
+	if String.isEmpty(tierShort) then
+		return
+	end
+	local isNumberedTier = type(identifier) == 'number' and identifier >= 1 and identifier <= 5
+	return Label{
+		labelScheme = 'tier',
+		attributes = {
+			['data-tier'] = isNumberedTier and tostring(identifier) or 'misc',
+			['aria-hidden'] = 'true',
+		},
+		children = tierShort,
+	}
+end
+
+---@param filterGroupPrefix string
+---@param category FilterButtonCategory
+---@return VNode
+function FilterButtonsPopover.filterCategory(filterGroupPrefix, category)
+	assert(
+		Table.isNotEmpty(category.items),
+		category.name .. ': List of items is required, either input or filled during load'
+	)
+	local transformValueToText = category.transform or FnUtil.identity
+	local itemToPropertyValues = category.itemToPropertyValues or FnUtil.identity
+	local groupName = filterGroupPrefix .. '-' .. category.name
+	local title = category.title or DEFAULT_TITLES[category.name] or String.upperCaseFirst(category.name)
+	local isTierCategory = category.name == 'liquipediatier'
+
+	local values = Array.map(category.items, function (item)
+		return itemToPropertyValues(item) or item
+	end)
+	local columns = math.ceil(#values / MAX_ROWS)
+
+	local items = Array.map(category.items, function (item, index)
+		local value = values[index]
+		return Html.Div{
+			classes = {CLASS_NAME .. '__item'},
+			attributes = {
+				['data-filter-on'] = value,
+				['data-filter-default'] = tostring(Table.includes(category.defaultItems, value)),
+				role = 'checkbox',
+				-- The checked state, counts and labels are filled in by FilterButtons.js
+				['aria-checked'] = 'false',
+			},
+			children = {
+				Html.Span{
+					classes = {CLASS_NAME .. '__checkbox'},
+					children = IconFa{iconName = 'correct', screenReaderHidden = true},
+				},
+				Html.Span{
+					classes = {CLASS_NAME .. '__item-label'},
+					children = transformValueToText(item),
+				},
+				isTierCategory and FilterButtonsPopover.createTierBadge(item) or nil,
+			},
+		}
+	end)
+
+	return Html.Div{
+		classes = {
+			CLASS_NAME .. '__category',
+			columns > 1 and (CLASS_NAME .. '__category--multi-column') or nil,
+		},
+		children = {
+			Html.Div{
+				classes = {CLASS_NAME .. '__category-header'},
+				children = {
+					Html.Span{
+						classes = {CLASS_NAME .. '__category-title'},
+						children = title,
+					},
+					Html.Span{
+						classes = {CLASS_NAME .. '__category-count'},
+						attributes = {['data-filter-popover-category-count'] = groupName},
+					},
+					Html.Span{
+						classes = {CLASS_NAME .. '__category-action'},
+						attributes = {
+							['data-filter-popover-toggle-all'] = groupName,
+							['data-label-clear'] = CLEAR_LABEL,
+							['data-label-select-all'] = SELECT_ALL_LABEL,
+							role = 'button',
+							tabindex = '0',
+						},
+					},
+				},
+			},
+			Html.Div{
+				classes = {CLASS_NAME .. '__items'},
+				css = columns > 1 and {['--filter-popover-columns'] = columns} or nil,
+				attributes = {
+					['data-filter'] = 'data-filter',
+					['data-filter-staged'] = '',
+					['data-filter-effect'] = 'fade',
+					['data-filter-group'] = groupName,
+				},
+				children = items,
+			},
+		},
+	}
+end
+
+---@param action 'reset'|'cancel'|'apply'
+---@param variant 'ghost'|'secondary'|'primary'
+---@param children Renderable|Renderable[]
+---@return VNode
+function FilterButtonsPopover.createFooterButton(action, variant, children)
+	return Button{
+		classes = {CLASS_NAME .. '__button', CLASS_NAME .. '__button--' .. action},
+		variant = variant,
+		size = 'sm',
+		attributes = {['data-filter-popover-action'] = action},
+		children = children,
+	}
+end
+
+---Filter buttons displayed as checkboxes in a popover. Changes are only applied once confirmed.
+---The interactivity is provided by FilterButtons.js.
+---@param props FilterButtonsPopoverProps
+---@return VNode
+function FilterButtonsPopover.render(props)
+	local categories = props.categories or Lua.import('Module:FilterButtons/Config').categories
+	local filterGroupPrefix = props.filterGroupPrefix
+	assert(String.isNotEmpty(filterGroupPrefix), 'FilterButtonsPopover: filterGroupPrefix is required')
+
+	Array.forEach(categories, FilterButtonsUtil.loadCategory)
+
+	return Html.Div{
+		classes = {CLASS_NAME},
+		attributes = {['data-filter-popover'] = ''},
+		children = {
+			FilterButtonsPopover.createToggle(props.label),
+			Html.Div{
+				classes = {CLASS_NAME .. '__panel'},
+				attributes = {
+					role = 'dialog',
+					['aria-label'] = props.label,
+				},
+				children = {
+					Html.Div{
+						classes = {CLASS_NAME .. '__categories'},
+						children = Array.map(categories, FnUtil.curry(FilterButtonsPopover.filterCategory, filterGroupPrefix)),
+					},
+					FilterButtonsPopover.createFooter(),
+				},
+			},
+		},
+	}
+end
+
+---@param label string?
+---@return VNode
+function FilterButtonsPopover.createToggle(label)
+	-- Swapped for a <button> by FilterButtons.js; the `button` class opts out of the skin's <button> styling
+	return Html.Div{
+		classes = {CLASS_NAME .. '__toggle', 'button'},
+		attributes = {['data-filter-popover-toggle'] = ''},
+		children = {
+			-- Keeps the count next to the label rather than as a separate flex item
+			Html.Span{
+				children = {
+					label,
+					Html.Span{attributes = {['data-filter-popover-count'] = ''}},
+				},
+			},
+			IconFa{iconName = 'expand', screenReaderHidden = true},
+		},
+	}
+end
+
+---@return VNode
+function FilterButtonsPopover.createFooter()
+	return Html.Div{
+		classes = {CLASS_NAME .. '__footer'},
+		children = {
+			FilterButtonsPopover.createFooterButton('reset', 'ghost', 'Reset'),
+			Html.Div{
+				classes = {CLASS_NAME .. '__footer-end'},
+				children = {
+					FilterButtonsPopover.createFooterButton('cancel', 'secondary', 'Cancel'),
+					FilterButtonsPopover.createFooterButton('apply', 'primary', 'Apply'),
+				},
+			},
+		},
+	}
+end
+
+return Component.component(FilterButtonsPopover.render, FilterButtonsPopover.defaultProps)
