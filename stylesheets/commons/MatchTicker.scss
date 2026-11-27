@@ -74,27 +74,31 @@ Template(s): MatchTicker
 .match-ticker-show-all-card {
 	display: flex;
 	flex-grow: 1;
-	align-items: center;
-	justify-content: center;
-	padding: 0.5rem;
 	background: var( --match-ticker-card-background-color );
 	border: 0 solid var( --match-ticker-card-border-color );
 	border-right-width: 1px;
 
+	// Wrappers of the button link
+	> div {
+		display: contents;
+
+		// The whole card is clickable, with the button centered in it
+		> a {
+			flex-grow: 1;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0.5rem;
+		}
+	}
+
 	// Mobile specific overrides
-	// A full-width button below the last card
+	// A row below the last card
 	@media ( max-width: 600px ) {
-		align-items: stretch;
-		padding: 0.5rem 1rem;
 		border-width: 1px 0 0;
 
-		// Wrappers of the button link
-		> div {
-			flex-grow: 1;
-
-			> a {
-				display: block;
-			}
+		> div > a {
+			padding: 0.5rem 1rem;
 		}
 	}
 }
