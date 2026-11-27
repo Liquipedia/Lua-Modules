@@ -64,7 +64,7 @@ local function Panel(props)
 	if hasToggle then
 		return GeneralCollapsible{
 			classes = panelClasses,
-			attributes = Table.merge(
+			attributes = Table.mergeInto(
 				{['data-collapsible-storage-key'] = 'panel-box-' .. boxId},
 				props.panelAttributes
 			),
