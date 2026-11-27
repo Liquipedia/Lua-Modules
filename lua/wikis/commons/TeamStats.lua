@@ -48,16 +48,6 @@ local PICK_TYPES = {
 	{key = 'decider', short = 'dec', long = 'as decider'},
 }
 
-local LEGEND = Html.I{children = {
-	'Each cell: wins-losses (win rate) on that map, then the split: ',
-	Html.B{children = 'own'},
-	' = on their own pick, ',
-	Html.B{children = 'opp'},
-	" = on the opponent's pick, ",
-	Html.B{children = 'dec'},
-	' = as decider. Hover a cell for details.',
-}}
-
 ---@param frame Frame
 ---@return Renderable
 function TeamStats.run(frame)
@@ -336,7 +326,6 @@ local function Overview(props)
 				)}
 			end)},
 		},
-		footer = LEGEND,
 	}
 end
 TeamStats.Overview = Component.component(Overview)
