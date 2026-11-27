@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:MatchGroup/Coordinates
+-- page=Module:Domain/Bracket/Coordinates
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

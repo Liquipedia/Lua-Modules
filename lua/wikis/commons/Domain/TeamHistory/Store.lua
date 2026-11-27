@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Features/Squad/Api/TransferHistory
+-- page=Module:Domain/TeamHistory/Store
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -13,7 +13,7 @@ local Json = Lua.import('Module:Json')
 local Lpdb = Lua.import('Module:Lpdb')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 
-local SquadHistory = Lua.import('Module:Features/Squad/Lib/History')
+local TeamHistory = Lua.import('Module:Domain/TeamHistory/Model')
 
 local BooleanOperator = Condition.BooleanOperator
 local Comparator = Condition.Comparator
@@ -23,15 +23,18 @@ local pageVars = PageVariableNamespace()
 local QUERY_LIMIT = 5000
 local QUERY_ORDER = 'date asc, objectname desc'
 
---- Every transfer read the squad tables do.
-local SquadTransferHistory = {}
+--[[
+Where a team's transfer history comes from. Every read of the transfer table for a team belongs
+here, so that any feature can ask for a team history instead of writing its own query.
+]]
+local TeamHistoryStore = {}
 
 ---Builds the conditions to fetch all transfers related
 ---to the given team, respecting historical templates.
 ---@private
 ---@param teams string[]
 ---@return string
-function SquadTransferHistory._buildConditions(teams)
+function TeamHistoryStore._buildConditions(teams)
 	local conditions = Condition.Tree(BooleanOperator.any)
 	Array.forEach(teams, function (templatename)
 		conditions:add{
@@ -50,7 +53,7 @@ end
 ---@param team string the team the squad table is for, used as the cache key
 ---@param teams string[] every team template that counts as that team
 ---@return table<string, TeamHistoryEntry[]>
-function SquadTransferHistory.forTeam(team, teams)
+function TeamHistoryStore.forTeam(team, teams)
 	local teamHistoryKey = team .. '_all_transfers'
 
 	---@type table<string, TeamHistoryEntry[]>?
@@ -63,7 +66,7 @@ function SquadTransferHistory.forTeam(team, teams)
 	Lpdb.executeMassQuery(
 		'transfer',
 		{
-			conditions = SquadTransferHistory._buildConditions(teams),
+			conditions = TeamHistoryStore._buildConditions(teams),
 			order = QUERY_ORDER,
 			limit = QUERY_LIMIT
 		},
@@ -72,7 +75,7 @@ function SquadTransferHistory.forTeam(team, teams)
 		end
 	)
 
-	local playersTeamHistory = SquadHistory.fromTransfers(records, teams)
+	local playersTeamHistory = TeamHistory.fromTransfers(records, teams)
 	pageVars:set(teamHistoryKey, Json.stringify(playersTeamHistory))
 
 	return playersTeamHistory
@@ -84,7 +87,7 @@ end
 ---@return string? newTeam
 ---@return string? newRole
 ---@return string? newDate
-function SquadTransferHistory.fetchNextTeam(pagename, date)
+function TeamHistoryStore.fetchNextTeam(pagename, date)
 	local conditions = Condition.Tree(BooleanOperator.all)
 		:add{
 			Condition.Util.anyOf(Condition.ColumnName('player'), {pagename, (string.gsub(pagename, ' ', '_'))}),
@@ -102,4 +105,4 @@ function SquadTransferHistory.fetchNextTeam(pagename, date)
 	return transfer.toteamtemplate, transfer.role2, transfer.date
 end
 
-return SquadTransferHistory
+return TeamHistoryStore
