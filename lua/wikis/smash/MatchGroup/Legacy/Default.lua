@@ -71,15 +71,9 @@ function MatchGroupLegacyDefault:getOpponent(prefix, scoreKey)
 		return MatchGroupLegacy.getOpponent(self, prefix, scoreKey)
 	end
 	-- match1 doubles keys use t{n} for the side, e.g. r1m1t1p2
+	-- custom mappings (config.matches) still produce p{n} prefixes, hence the gsub
 	local sidePrefix = prefix:gsub('p(%d)$', 't%1')
-	return {
-		['$notEmpty$'] = sidePrefix .. 'p1',
-		p1 = sidePrefix .. 'p1',
-		p1flag = sidePrefix .. 'p1flag',
-		p2 = sidePrefix .. 'p2',
-		p2flag = sidePrefix .. 'p2flag',
-		score = sidePrefix .. scoreKey,
-	}
+	return MatchGroupLegacy.getOpponent(self, sidePrefix, scoreKey)
 end
 
 ---@param isReset boolean
