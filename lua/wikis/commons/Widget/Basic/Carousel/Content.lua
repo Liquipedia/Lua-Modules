@@ -19,7 +19,7 @@ local Div = Html.Div
 ---@field itemWidth string|false? `false` leaves the item width to stylesheets
 ---@field gap string?
 ---@field classes string[]?
----@field css table?
+---@field css HtmlStyleProps?
 
 local defaultProps = {
 	itemWidth = '200px',
@@ -34,7 +34,7 @@ local function CarouselContent(props)
 	assert(Array.isArray(props.children), 'CarouselContent: children must be an array')
 
 	return Div{
-		classes = Array.extend({'carousel-content'}, props.classes),
+		classes = Array.extendWith({'carousel-content'}, props.classes),
 		css = Table.mergeInto({gap = props.gap}, props.css),
 		children = Array.map(props.children, function(child)
 			return Div{

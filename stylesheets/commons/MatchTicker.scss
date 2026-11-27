@@ -462,39 +462,23 @@ Template(s): MatchTicker
 	}
 
 	.match-ticker-carousel {
-		// Keep a scroll that reaches either end on the list; only the inline axis, so the page still scrolls
-		overscroll-behavior-x: contain;
-
+		// No fade overlays to snap past
 		.carousel-item:has( > .match-ticker-card ) {
-			@media ( width > 600px ) {
-				width: 15.625rem;
-				// No fade overlays here, so cards snap flush to the start edge
-				scroll-margin-left: 0;
-			}
-		}
-
-		// Adjacent cards share a single divider
-		.match-ticker-card {
-			border-width: 0 1px 0 0;
-		}
-
-		@media ( width > 600px ) {
-			&:has( > .match-ticker-card-group ) {
-				display: grid;
-				grid-template-rows: auto auto;
-				grid-auto-flow: column;
-				// Keep groups packed at the start when they do not fill the width
-				justify-content: start;
-			}
+			scroll-margin-left: 0;
 		}
 
 		// Small screens: stacked full-width cards instead of a carousel (same breakpoint as .mobile-only)
 		@media ( max-width: 600px ) {
-			flex-direction: column;
-			overflow-x: visible;
-			scroll-snap-type: none;
+			&,
+			&:has( > .match-ticker-card-group ) {
+				display: flex;
+				flex-direction: column;
+				overflow-x: visible;
+				scroll-snap-type: none;
+			}
 
-			.carousel-item {
+			.carousel-item,
+			.carousel-item:has( > .match-ticker-card ) {
 				width: auto;
 
 				&:last-child .match-ticker-card {
@@ -508,82 +492,144 @@ Template(s): MatchTicker
 		}
 	}
 
-	.match-ticker-card-group {
-		display: grid;
-		grid-row: 1 / -1;
-		grid-template-rows: subgrid;
-		grid-template-columns: repeat( var( --match-ticker-group-columns ), 15.625rem );
-
-		@media ( max-width: 600px ) {
+	@media ( max-width: 600px ) {
+		.match-ticker-card-group {
 			// Let long content shrink instead of widening the column past the panel
 			grid-template-columns: minmax( 0, 1fr );
-		}
-
-		&__header {
-			display: flex;
-			align-items: center;
-			grid-column: 1 / -1;
-			// The bottom border is drawn inside the 34px separator in the design
-			padding: 0.5rem 1rem 0.4375rem;
-			border-style: solid;
-			border-width: 0 1px 1px 0;
-			border-color: var( --match-ticker-card-divider-color );
-			background-color: var( --match-ticker-card-group-header-background-color );
-			font-size: 0.75rem;
-			font-weight: bold;
-			line-height: 1.125rem;
-			white-space: nowrap;
-			color: var( --match-ticker-card-group-header-text-color );
 
 			// Stronger background on small screens
-			@media ( max-width: 600px ) {
+			&__header {
 				background-color: var( --match-ticker-card-group-header-small-screen-background-color );
 			}
 
-			// Ongoing matches are marked with a red dot instead of a date
-			&--live > .match-ticker-card-group__title::before {
-				font-family: "Font Awesome 5 Pro";
-				font-size: 0.5rem;
-				content: "\f111"; /* Unicode for circle */
-				color: var( --match-ticker-card-group-live-indicator-color );
-				animation: match-ticker-live-blink 2s step-end infinite;
-			}
-		}
-
-		// Stays at the start of the list while the rest of its group is scrolled past
-		&__title {
-			display: flex;
-			align-items: center;
-			gap: 0.5rem;
-			min-width: 0;
-			position: sticky;
-			// Same as the header's start padding, so it does not move until it reaches the edge
-			left: 1rem;
-		}
-
-		&__label {
-			flex-shrink: 0;
-		}
-
-		&__date {
-			min-width: 0;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			font-size: 0.6875rem;
-			font-weight: normal;
-			line-height: 1rem;
-			color: var( --match-ticker-card-group-date-color );
-		}
-
-		&__body {
-			display: grid;
-			grid-column: 1 / -1;
-			grid-auto-flow: column;
-			grid-template-columns: subgrid;
-
-			@media ( max-width: 600px ) {
+			&__body {
 				display: contents;
 			}
 		}
+	}
+}
+
+// Entity pages
+.match-ticker-horizontal-container {
+	margin-bottom: 1rem;
+
+	&__heading {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem 1rem;
+
+		// Not the heading's text style
+		.switch-toggle-container {
+			font-size: 0.875rem;
+			font-weight: normal;
+			line-height: 1.3125rem;
+			color: var( --clr-on-background );
+		}
+	}
+
+	> .carousel {
+		overflow: hidden;
+		border: 1px solid var( --match-ticker-card-border-color );
+		border-radius: 0.5rem;
+		background-color: var( --match-ticker-card-background-color );
+		width: fit-content;
+		max-width: 100%;
+
+		.carousel-button--left {
+			left: 0.375rem;
+		}
+
+		.carousel-button--right {
+			right: 0.375rem;
+		}
+	}
+}
+
+// Cards grouped by date, see MatchTicker.js
+.match-ticker-carousel {
+	// Keep a scroll that reaches either end on the list; only the inline axis, so the page still scrolls
+	overscroll-behavior-x: contain;
+
+	.carousel-item:has( > .match-ticker-card ) {
+		width: 15.625rem;
+	}
+
+	// Adjacent cards share a single divider
+	.match-ticker-card {
+		border-width: 0 1px 0 0;
+	}
+
+	&:has( > .match-ticker-card-group ) {
+		display: grid;
+		grid-template-rows: auto auto;
+		grid-auto-flow: column;
+		// Keep groups packed at the start when they do not fill the width
+		justify-content: start;
+	}
+}
+
+.match-ticker-card-group {
+	display: grid;
+	grid-row: 1 / -1;
+	grid-template-rows: subgrid;
+	grid-template-columns: repeat( var( --match-ticker-group-columns ), 15.625rem );
+
+	&__header {
+		display: flex;
+		align-items: center;
+		grid-column: 1 / -1;
+		// The bottom border is drawn inside the 34px separator in the design
+		padding: 0.5rem 1rem 0.4375rem;
+		border-style: solid;
+		border-width: 0 1px 1px 0;
+		border-color: var( --match-ticker-card-divider-color );
+		background-color: var( --match-ticker-card-group-header-background-color );
+		font-size: 0.75rem;
+		font-weight: bold;
+		line-height: 1.125rem;
+		white-space: nowrap;
+		color: var( --match-ticker-card-group-header-text-color );
+
+		// Ongoing matches are marked with a red dot instead of a date
+		&--live > .match-ticker-card-group__title::before {
+			font-family: "Font Awesome 5 Pro";
+			font-size: 0.5rem;
+			content: "\f111"; /* Unicode for circle */
+			color: var( --match-ticker-card-group-live-indicator-color );
+			animation: match-ticker-live-blink 2s step-end infinite;
+		}
+	}
+
+	// Stays at the start of the list while the rest of its group is scrolled past
+	&__title {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-width: 0;
+		position: sticky;
+		// Same as the header's start padding, so it does not move until it reaches the edge
+		left: 1rem;
+	}
+
+	&__label {
+		flex-shrink: 0;
+	}
+
+	&__date {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-size: 0.6875rem;
+		font-weight: normal;
+		line-height: 1rem;
+		color: var( --match-ticker-card-group-date-color );
+	}
+
+	&__body {
+		display: grid;
+		grid-column: 1 / -1;
+		grid-auto-flow: column;
+		grid-template-columns: subgrid;
 	}
 }

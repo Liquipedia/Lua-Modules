@@ -11,6 +11,7 @@ local Component = Lua.import('Module:Widget/Component')
 local I18n = Lua.import('Module:I18n')
 
 local Carousel = Lua.import('Module:Widget/Basic/Carousel')
+local CarouselContent = Lua.import('Module:Widget/Basic/Carousel/Content')
 local Switch = Lua.import('Module:Widget/Switch')
 local Html = Lua.import('Module:Widget/Html')
 
@@ -19,32 +20,33 @@ local TABLE_OF_CONTENTS = '__TOC__'
 ---@param props {children: Renderable[]}
 ---@return Renderable
 local function HorizontalContainer(props)
-	local carousel = Carousel{
-		classes = {'match-ticker-carousel'},
-		children = props.children,
-		itemWidth = '15.625rem',
-		gap = '0.5rem',
-	}
-
 	return Html.Div{
-		css = {['margin-bottom'] = '1rem'},
+		classes = {'match-ticker-horizontal-container'},
+		attributes = {
+			['data-switch-group-container'] = 'countdown',
+			-- Groups started matches as live
+			['data-match-ticker-type'] = 'upcoming',
+		},
 		children = {
 			Html.Div{
-				classes = {'mw-heading', 'mw-heading2'},
+				classes = {'mw-heading', 'mw-heading2', 'match-ticker-horizontal-container__heading'},
 				children = {
-					Html.H2{
-						css = {border = 'unset'},
-						children = I18n.translate('matchticker-upcoming-matches'),
+					Html.H2{children = I18n.translate('matchticker-upcoming-matches')},
+					Switch{
+						label = 'Show countdown',
+						switchGroup = 'countdown',
+						storeValue = true,
+						defaultActive = true,
 					},
 				},
 			},
-			Switch{
-				label = 'Show countdown',
-				switchGroup = 'countdown',
-				storeValue = true,
-				defaultActive = true,
-				css = {margin = '0.75rem 0 1rem'},
-				content = carousel,
+			Carousel{
+				content = CarouselContent{
+					classes = {'match-ticker-carousel'},
+					children = props.children,
+					itemWidth = false,
+					gap = '0',
+				},
 			},
 			Html.Div{
 				css = {['margin-top'] = '1rem'},

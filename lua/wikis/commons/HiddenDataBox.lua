@@ -230,7 +230,6 @@ function HiddenDataBox._matchTicker(suppressMatchTicker)
 				upcoming = true,
 				ongoing = true,
 				hideTournament = true,
-				queryByParent = false,
 				entityStyle = true,
 			}
 		end,

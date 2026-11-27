@@ -19,6 +19,11 @@ window.mw = window.mw || {
 	user: {
 		isAnon: function () {
 			return false;
+		},
+		options: {
+			get: function () {
+				return null;
+			}
 		}
 	},
 	loader: {
