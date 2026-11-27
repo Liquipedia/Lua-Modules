@@ -248,7 +248,6 @@ class FilterButtonsPopover {
 		document.addEventListener( 'keydown', ( event ) => {
 			if ( this.isOpen && event.key === 'Escape' ) {
 				this.setOpen( false );
-				this.toggle.focus();
 			}
 		} );
 	}
@@ -350,6 +349,10 @@ class FilterButtonsPopover {
 				this.panel.hidePopover();
 			}
 			return;
+		}
+		// The native popover does this on its own
+		if ( !isOpen && this.panel.contains( document.activeElement ) ) {
+			this.toggle.focus();
 		}
 		this.onToggle( isOpen );
 	}

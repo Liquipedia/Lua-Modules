@@ -218,6 +218,33 @@ describe( 'FilterButtons popover', () => {
 		expect( checkedState( 'mt-tier', '3' ) ).toBe( 'false' );
 	} );
 
+	test( 'returns focus to the toggle when closed from within the panel', () => {
+		render();
+		const toggle = query( '.filter-popover__toggle' );
+		const pressKey = ( element, key ) => element.dispatchEvent(
+			new KeyboardEvent( 'keydown', { key, bubbles: true } )
+		);
+		const focusInPanel = ( selector ) => {
+			const element = query( selector );
+			element.tabIndex = 0;
+			element.focus();
+			expect( document.activeElement ).toBe( element );
+			return element;
+		};
+
+		[ 'apply', 'cancel' ].forEach( ( action ) => {
+			open();
+			pressKey( focusInPanel( `[data-filter-popover-action="${ action }"]` ), 'Enter' );
+			expect( query( '[data-filter-popover]' ).classList.contains( 'filter-popover--open' ) ).toBe( false );
+			expect( document.activeElement ).toBe( toggle );
+		} );
+
+		open();
+		pressKey( focusInPanel( '[data-filter-group="mt-tier"] > [data-filter-on="3"]' ), 'Escape' );
+		expect( query( '[data-filter-popover]' ).classList.contains( 'filter-popover--open' ) ).toBe( false );
+		expect( document.activeElement ).toBe( toggle );
+	} );
+
 	test( 'passes the applied filters to the template expansion', async () => {
 		render();
 		open();
