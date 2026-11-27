@@ -329,6 +329,10 @@ function MatchGroupLegacy:readOpponent(opponentData)
 	if self.bracketType == Opponent.solo and Logic.isNotEmpty(opponent.displayname) then
 		opponent.link = opponent.name
 		opponent.name = Table.extract(opponent, 'displayname')
+	elseif Opponent.typeIsParty(self.bracketType) then
+		for i = 1, Opponent.partySize(self.bracketType) do
+			opponent['p' .. i] = Logic.emptyOr(opponent['p' .. i], opponent['p' .. i .. 'link'])
+		end
 	end
 	return opponent
 end
