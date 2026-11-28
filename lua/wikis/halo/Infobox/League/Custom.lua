@@ -19,10 +19,11 @@ local Variables = Lua.import('Module:Variables')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = Lua.import('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/Infobox/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local NoWrap = Widgets.NoWrap
 
 ---@class HaloLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -111,27 +112,20 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_tiertype', args.liquipediatiertype)
 end
 
----@return string[]
+---@return Renderable[]
 function CustomLeague:_makeMapList()
 	local date = self.data.endDate or self.data.startDate or os.date('%Y-%m-%d') --[[@as string]]
-	local map1 = PageLink.makeInternalLink({}, self.args['map1'])
-	local map1Modes = self:_getMapModes(self.args['map1modes'], date)
 
-	local foundMaps = {
-		tostring(self:_createNoWrappingSpan(map1Modes .. map1))
-	}
-	local index = 2
+	local foundMaps = {}
+	local index = 1
 	while not String.isEmpty(self.args['map' .. index]) do
 		local currentMap = PageLink.makeInternalLink({}, self.args['map' .. index])
 		local currentModes = self:_getMapModes(self.args['map' .. index .. 'modes'], date)
 
-		table.insert(
-			foundMaps,
-			'&nbsp;• ' .. tostring(self:_createNoWrappingSpan(currentModes .. currentMap))
-		)
+		table.insert(foundMaps, NoWrap{children = currentModes .. currentMap})
 		index = index + 1
 	end
-	return foundMaps
+	return Array.interleave(foundMaps, '&nbsp;• ')
 end
 
 ---@param modesString string?
@@ -155,35 +149,6 @@ function CustomLeague:_getMapModes(modesString, date)
 		end
 	end
 	return display .. '&nbsp;'
-end
-
----@param base string
----@return string[]
-function CustomLeague:_makeBasedListFromArgs(base)
-	local firstArg = self.args[base .. '1']
-	local foundArgs = {PageLink.makeInternalLink({}, firstArg)}
-	local index = 2
-
-	while not String.isEmpty(self.args[base .. index]) do
-		local currentArg = self.args[base .. index]
-		table.insert(foundArgs, '&nbsp;• ' ..
-			tostring(self:_createNoWrappingSpan(
-				PageLink.makeInternalLink({}, currentArg)
-			))
-		)
-		index = index + 1
-	end
-
-	return foundArgs
-end
-
----@param content Html|string|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-	span:css('white-space', 'nowrap')
-		:node(content)
-	return span
 end
 
 return CustomLeague

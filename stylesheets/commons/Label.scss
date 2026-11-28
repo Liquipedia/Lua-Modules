@@ -234,6 +234,45 @@
 		}
 	}
 
+	&.label--tier {
+		box-sizing: border-box;
+		flex-shrink: 0;
+		width: calc( var( --label-scale ) * 1.25rem );
+		height: calc( var( --label-scale ) * 1.25rem );
+		padding: unset;
+		font-weight: bold;
+		color: var( --clr-secondary-100 );
+		background-color: var( --tier-label-color );
+
+		--tier-label-color: #757575;
+
+		&[ data-tier="1" ] {
+			--tier-label-color: #ef6532;
+		}
+
+		&[ data-tier="2" ] {
+			--tier-label-color: #2563eb;
+		}
+
+		&[ data-tier="3" ] {
+			--tier-label-color: #3a3a3a;
+		}
+
+		&[ data-tier="4" ] {
+			--tier-label-color: #525252;
+		}
+
+		&[ data-tier="5" ] {
+			--tier-label-color: #757575;
+		}
+
+		&[ data-tier="misc" ] {
+			color: var( --tier-label-color );
+			background-color: transparent;
+			box-shadow: 0 0 0 calc( var( --label-scale ) * 0.0625rem ) var( --tier-label-color ) inset;
+		}
+	}
+
 	&.label--standings-result {
 		display: grid;
 		grid-template-columns: 1fr auto 1fr;

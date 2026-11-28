@@ -79,6 +79,7 @@ end
 
 ---@private
 ---@param mappedChildren Renderable[]
+---@param options CellWidgetOptions
 ---@return Widget
 function Cell._buildChildrenContainer(mappedChildren, options)
 	local widgetProps = {

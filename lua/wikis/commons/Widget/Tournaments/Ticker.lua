@@ -17,6 +17,7 @@ local TickerData = Lua.import('Module:TournamentsTicker/Data')
 
 ---@class TournamentsTickerWidgetProps: TournamentsTickerDataProps
 ---@field displayGameIcons boolean?
+---@field filterGroupPrefix string? has to match the `filterGroupPrefix` of the filter buttons controlling this ticker
 
 local defaultProps = {
 	upcomingDays = 5,
@@ -28,6 +29,18 @@ local defaultProps = {
 local function TournamentsTickerWidget(props)
 	local data = TickerData.get(props)
 	local displayGameIcons = Logic.readBool(props.displayGameIcons)
+
+	---@param title string
+	---@param tournaments StandardTournament[]
+	---@return VNode
+	local function buildSublist(title, tournaments)
+		return Sublist{
+			title = title,
+			tournaments = tournaments,
+			displayGameIcons = displayGameIcons,
+			filterGroupPrefix = props.filterGroupPrefix,
+		}
+	end
 
 	local fallbackElement = Html.Div{
 		attributes = {
@@ -54,9 +67,9 @@ local function TournamentsTickerWidget(props)
 					['data-filter-effect'] = 'fade',
 				},
 				children = {
-					Sublist{title = 'Upcoming', tournaments = data.upcoming, displayGameIcons = displayGameIcons},
-					Sublist{title = 'Ongoing', tournaments = data.ongoing, displayGameIcons = displayGameIcons},
-					Sublist{title = 'Completed', tournaments = data.completed, displayGameIcons = displayGameIcons},
+					buildSublist('Upcoming', data.upcoming),
+					buildSublist('Ongoing', data.ongoing),
+					buildSublist('Completed', data.completed),
 					fallbackElement
 				}
 			}

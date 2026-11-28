@@ -8,7 +8,9 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
+local Timezone = Lua.import('Module:Timezone')
 
 local Component = Lua.import('Module:Widget/Component')
 local Html = Lua.import('Module:Widget/Html')
@@ -23,6 +25,7 @@ local MatchButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
 ---@field onlyHighlightOnValue string?
 ---@field displayGameIcons boolean?
 ---@field hideTournament boolean?
+---@field countdownFormat CountdownFormat?
 
 local MatchTickerCard = {}
 
@@ -33,8 +36,12 @@ function MatchTickerCard.render(props)
 
 	return Html.Div{
 		classes = {'match-ticker-card'},
+		attributes = {
+			['data-match-timestamp'] = match.timestamp,
+			['data-match-timezone-offset'] = MatchTickerCard.getDisplayedTimezoneOffset(match),
+		},
 		children = {
-			MatchTickerCard.buildHeader(match),
+			MatchTickerCard.buildHeader(match, props.countdownFormat),
 			MatchTickerCardOpponents{match = match},
 			TournamentInfo(props),
 			MatchButtonBar{match = match, showVods = true, buttonSize = 'xs'}
@@ -42,13 +49,25 @@ function MatchTickerCard.render(props)
 	}
 end
 
+---Offset in seconds from UTC of the timezone the server renders the match date in
 ---@param match MatchGroupUtilMatch
+---@return integer
+function MatchTickerCard.getDisplayedTimezoneOffset(match)
+	-- Dates without a time are shown as the UTC date, see DateExt.toCountdownArg
+	if not match.dateIsExact then
+		return 0
+	end
+	return Timezone.getOffset{timezone = match.timezoneId or DateExt.defaultTimezone} or 0
+end
+
+---@param match MatchGroupUtilMatch
+---@param countdownFormat CountdownFormat
 ---@return VNode
-function MatchTickerCard.buildHeader(match)
+function MatchTickerCard.buildHeader(match, countdownFormat)
 	return Html.Div{
 		classes = {'match-ticker-card__header'},
 		children = {
-			MatchCountdown{match = match, format = 'compact'},
+			MatchCountdown{match = match, format = countdownFormat},
 			MatchTickerCard.buildSectionAndBestOf(match),
 		}
 	}
@@ -80,4 +99,4 @@ function MatchTickerCard.buildSectionAndBestOf(match)
 	}
 end
 
-return Component.component(MatchTickerCard.render)
+return Component.component(MatchTickerCard.render, {countdownFormat = 'compact'})
