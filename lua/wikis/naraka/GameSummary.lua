@@ -38,12 +38,8 @@ local MARTIAL_ARTS_MAP = 'martial arts showdown'
 ---@field type string?
 ---@field extradata {heroes: table<string|integer, string>?, tiebreaker: number?}?
 
----@class NarakaSummaryGame
+---@class NarakaSummaryGame: FFAMatchGroupUtilGame
 ---@field narakaScoreRanking boolean?
----@field map string?
----@field mapDisplayName string?
----@field date string?
----@field opponents NarakaSummaryOpponent[]?
 
 ---@class NarakaHeroLayout
 ---@field slotCount integer
@@ -207,20 +203,24 @@ local function updateScoreRanks(game)
 	Array.forEach(opponents, function(opponent, index)
 		originalOrder[opponent] = index
 	end)
+
 	Array.sortInPlaceBy(opponents, FnUtil.identity, function(left, right)
 		local leftHasScore, rightHasScore = hasScore(left), hasScore(right)
 		if leftHasScore ~= rightHasScore then
 			return leftHasScore
 		end
+
 		if leftHasScore then
 			local leftScore, rightScore = scoreValue(left), scoreValue(right)
 			if leftScore ~= rightScore then
 				return leftScore > rightScore
 			end
+
 			if tiePriority(left) ~= tiePriority(right) then
 				return tiePriority(left) > tiePriority(right)
 			end
 		end
+
 		-- Preserve a stable display order without claiming another official tiebreak rule.
 		return originalOrder[left] < originalOrder[right]
 	end)
@@ -228,11 +228,13 @@ local function updateScoreRanks(game)
 	local previousScore, previousPriority, rank
 	Array.forEach(opponents, function(opponent, index)
 		opponent.narakaScoreRank = nil
+
 		if hasScore(opponent) then
 			local score, priority = scoreValue(opponent), tiePriority(opponent)
 			if score ~= previousScore or priority ~= previousPriority then
 				rank = index
 			end
+
 			opponent.narakaScoreRank = rank
 			previousScore, previousPriority = score, priority
 		end
@@ -246,9 +248,15 @@ local function renderScoreRank(opponent)
 	if not rank then
 		return '-'
 	end
+
 	return Html.Fragment{children = {
-		MatchSummaryWidgets.Trophy{place = rank, additionalClasses = {'panel-table__cell-icon'}},
-		Html.Span{children = tostring(MatchSummaryWidgets.RankRange{rankStart = rank})},
+		MatchSummaryWidgets.Trophy{
+			place = rank,
+			additionalClasses = {'panel-table__cell-icon'},
+		},
+		Html.Span{
+			children = tostring(MatchSummaryWidgets.RankRange{rankStart = rank}),
+		},
 	}}
 end
 
@@ -257,9 +265,11 @@ end
 local function scoreRankColumn(column)
 	local result = Table.copy(column)
 	result.header = {value = 'Score Rank', mobileValue = 'Rank'}
-	result.sortVal = {value = function(opponent)
-		return opponent.narakaScoreRank or 999999
-	end}
+	result.sortVal = {
+		value = function(opponent)
+			return opponent.narakaScoreRank or 999999
+		end,
+	}
 	result.row = {value = renderScoreRank}
 	return result
 end
@@ -270,16 +280,20 @@ end
 function CustomGameSummary.adjustGameStandingsColumns(defaultColumns, game)
 	local layout = getHeroLayout(game)
 	local martialArts = isMartialArts(game.map) or isMartialArts(game.mapDisplayName)
+
 	return Array.flatMap(defaultColumns, function(column)
 		if martialArts and column.id == 'kills' then
 			return {}
 		end
+
 		if game.narakaScoreRanking and column.id == 'rank' then
 			return {scoreRankColumn(column)}
 		end
+
 		if column.id ~= 'totalPoints' then
 			return {column}
 		end
+
 		local columns = {}
 		if layout then
 			table.insert(columns, {
@@ -288,6 +302,7 @@ function CustomGameSummary.adjustGameStandingsColumns(defaultColumns, game)
 				row = {value = FnUtil.curry(renderHeroes, layout)},
 			})
 		end
+
 		table.insert(columns, column)
 		return columns
 	end)
@@ -301,6 +316,7 @@ function CustomGameSummary.getGameByMatchId(props)
 
 	local game = match.games[props.gameIdx]
 	assert(game, 'Error Game ID ' .. tostring(props.gameIdx) .. ' not found')
+	---@cast game NarakaSummaryGame
 
 	game.date = game.date or match.date
 	game.stream = match.stream
