@@ -102,6 +102,12 @@ const EXPORT_IMAGE_CONFIG = {
 			typeName: 'Participants'
 		},
 		{
+			selector: '.table2.standings-group',
+			targetSelector: 'table.table2__table',
+			titleSelector: '.table2__title',
+			typeName: 'Group Standings Table'
+		},
+		{
 			selector: '.table2.standings-ffa',
 			targetSelector: 'table.table2__table',
 			titleSelector: '.table2__title',
@@ -923,7 +929,7 @@ class ExportService {
 		}
 		this.hideInfoIcons( frameDocument );
 		this.removeExportControls( frameDocument );
-		this.expandPrizepoolTables( frameDocument );
+		this.expandCollapsedTables( frameDocument );
 	}
 
 	// Every iOS browser uses WebKit; desktop Blink also reports AppleWebKit.
@@ -952,18 +958,23 @@ class ExportService {
 	}
 
 	removeExportControls( frameDocument ) {
-		const controls = frameDocument.querySelectorAll(
-			'.switch-pill-container, .prizepooltabletoggle, .prizepool-table-wrapper .table2__footer'
-		);
+		const controls = frameDocument.querySelectorAll( '.switch-pill-container, .table2__collapse-toggle' );
 
 		for ( const control of controls ) {
 			control.remove();
 		}
+
+		// A footer that only held the collapse toggle would be left as an empty bar
+		for ( const footer of frameDocument.querySelectorAll( '.table2__footer' ) ) {
+			if ( footer.childElementCount === 0 && footer.textContent.trim() === '' ) {
+				footer.remove();
+			}
+		}
 	}
 
-	// Cut placements are hidden by `.collapsed` on the wrapper; expand so they export.
-	expandPrizepoolTables( frameDocument ) {
-		const collapsedTables = frameDocument.querySelectorAll( '.prizepool-table-wrapper.collapsed' );
+	// Rows past a Table2 `collapseAfter` are hidden by `.collapsed` on the wrapper; expand so they export.
+	expandCollapsedTables( frameDocument ) {
+		const collapsedTables = frameDocument.querySelectorAll( '.table2.general-collapsible.collapsed' );
 
 		for ( const collapsedTable of collapsedTables ) {
 			collapsedTable.classList.remove( 'collapsed' );

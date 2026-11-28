@@ -16,21 +16,30 @@ local InfoboxHeader = Lua.import('Module:Widget/Infobox/Header')
 
 local CustomMatchTicker = {}
 
+local DEFAULT_FILTER_GROUP_PREFIX = 'filterbuttons'
+
 ---Entry point for display on the main page
 ---@param frame Frame|table|nil
 ---@return Renderable?
 function CustomMatchTicker.mainPage(frame)
 	local args = Arguments.getArgs(frame)
 
-	args.tiers = args['filterbuttons-liquipediatier']
+	local filterGroupPrefix = args.filterGroupPrefix or DEFAULT_FILTER_GROUP_PREFIX
+	---@param filterName string
+	---@return string?
+	local function getFilterValue(filterName)
+		return args[filterGroupPrefix .. '-' .. filterName]
+	end
+
+	args.tiers = getFilterValue('liquipediatier')
 	if args.tiers == 'curated' then
 		args.tiers = nil
 		args.featuredOnly = true
 	end
 
-	args.tiertypes = args['filterbuttons-liquipediatiertype']
-	args.regions = args['filterbuttons-region']
-	args.games = args['filterbuttons-game']
+	args.tiertypes = getFilterValue('liquipediatiertype')
+	args.regions = getFilterValue('region')
+	args.games = getFilterValue('game')
 
 	if args.type == 'upcoming' then
 		return MatchTicker.makeMatchTicker(Table.merge(args, {ongoing = true, upcoming = true}))

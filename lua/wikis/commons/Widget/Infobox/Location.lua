@@ -7,21 +7,20 @@
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
-local Widget = Lua.import('Module:Widget')
-
+local Component = Lua.import('Module:Widget/Component')
 local Cell = Lua.import('Module:Widget/Infobox/Cell')
 local Html = Lua.import('Module:Widget/Html')
 
----@class InfoboxLocationWidget: Widget
----@operator call(table):InfoboxLocationWidget
----@field props {args: table<string, string>, showTbdOnEmpty: boolean}
-local Location = Class.new(Widget)
-Location.defaultProps = {
+---@class InfoboxLocationWidgetProps
+---@field args table<string, string>
+---@field showTbdOnEmpty boolean?
+
+local Helpers = {}
+local defaultProps = {
 	args = {},
 	showTbdOnEmpty = true,
 }
@@ -32,14 +31,16 @@ Location.defaultProps = {
 --	country: the country
 --	location: the city or place
 -- }
----@return Widget?
-function Location:render()
-	return Cell{name = 'Location', children = self:_getLocations()}
+---@param props InfoboxLocationWidgetProps
+---@return Renderable?
+local function Location(props)
+	return Cell{name = 'Location', children = Helpers._getLocations(props)}
 end
 
----@return Widget[]
-function Location:_getLocations()
-	local props = self.props
+---@private
+---@param props InfoboxLocationWidgetProps
+---@return Renderable[]
+function Helpers._getLocations(props)
 	local args = props.args
 	if Logic.isEmpty(args.country) and props.showTbdOnEmpty then
 		return {Html.Abbr{title = 'To be determined (or to be decided)', children = {'TBD'}}}
@@ -67,4 +68,4 @@ function Location:_getLocations()
 	return locations
 end
 
-return Location
+return Component.component(Location, defaultProps)

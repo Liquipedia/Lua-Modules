@@ -64,6 +64,7 @@ return {
 				swiss = {'matchscore', 'gamescore'},
 				group = {'matchscore', 'gamescore'},
 			},
+			overtime = {regulationRounds = 24},
 		},
 	},
 }

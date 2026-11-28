@@ -52,12 +52,18 @@ liquipedia.brackets = {
 	attachedMatchList: {
 		init: function() {
 			document.querySelectorAll(
-				'[data-analytics-name]:has( .standings-group ) + .brkts-matchlist'
+				'[data-analytics-name]:has( .standings-group ) + .brkts-matchlist, .brkts-matchlist + .brkts-matchlist'
 			).forEach( ( matchlist ) => {
-				const standings = matchlist.previousElementSibling.querySelector( '.standings-group' );
-				new ResizeObserver( ( [ entry ] ) => {
-					matchlist.style.width = entry.borderBoxSize[ 0 ].inlineSize + 'px';
-				} ).observe( standings );
+				let currentElement = matchlist.previousElementSibling;
+				while ( currentElement && currentElement.classList.contains( 'brkts-matchlist' ) ) {
+					currentElement = currentElement.previousElementSibling;
+				}
+				const standings = currentElement && currentElement.querySelector( '.standings-group' );
+				if ( standings ) {
+					new ResizeObserver( ( [ entry ] ) => {
+						matchlist.style.width = entry.borderBoxSize[ 0 ].inlineSize + 'px';
+					} ).observe( standings );
+				}
 			} );
 		}
 	}

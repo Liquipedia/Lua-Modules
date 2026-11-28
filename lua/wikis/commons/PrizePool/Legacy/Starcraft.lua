@@ -46,7 +46,7 @@ function StarcraftLegacyPrizePool.run(frame)
 	local newArgs = {}
 
 	newArgs.prizesummary = false
-	newArgs.cutafter = header.cutafter
+	newArgs.collapseafter = header.cutafter
 	newArgs.lpdb_prefix = header.lpdb_prefix
 
 	if Currency.raw(header.localcurrency) then

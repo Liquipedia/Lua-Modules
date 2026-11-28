@@ -27,6 +27,9 @@ local Class = Lua.import('Module:Class')
 
 ---@class StandingsTiebreaker
 ---@field context 'full'|'ml'|'h2hcs'|'h2hlegacy'
+---@field fullContextOnly boolean # Not derived from the matches among the tied opponents, so only usable in full
+---@field readsGames boolean # Reads the games of the matches
+---@field matchRecordOnly boolean # Depends only on the match record and points of the opponent
 ---@field options StandingsTiebreakerOptions
 ---@field display fun(self: StandingsTiebreaker, state:TiebreakerOpponent[], opponent: TiebreakerOpponent): string
 ---@field headerTitle fun(self: StandingsTiebreaker): string
@@ -34,6 +37,10 @@ local StandingsTiebreaker = Class.new(function (self, context, options)
 	self.context = context
 	self.options = options or {}
 end)
+
+StandingsTiebreaker.fullContextOnly = false
+StandingsTiebreaker.readsGames = false
+StandingsTiebreaker.matchRecordOnly = false
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent

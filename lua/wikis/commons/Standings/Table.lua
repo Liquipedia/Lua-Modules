@@ -43,13 +43,15 @@ local TABLE_TYPES = {ffa = true, swiss = true, group = true}
 
 ---@class StandingTableOpponentData
 ---@field rounds {specialstatus: string, scoreboard: Scoreboard?,
----matches: MatchGroupUtilMatch[], matchId: string, matchOpponentIndex: integer?}[]?
+---matches: MatchGroupUtilMatch[], matchPoints: table<string, number>?, matchId: string,
+---matchOpponentIndex: integer?}[]?
 ---@field opponent standardOpponent
 ---@field matchPoints table<string, number>? # The points of each imported match, keyed by match id
 ---@field aliases standardOpponent[]? # Only for team opponents
 ---@field startingPoints number?
 ---@field disqualifiedFromRound integer? # The first round in which the opponent is disqualified
 ---@field definiteStatuses table<integer, string>? # Manually set definite statuses, keyed by the round they apply from
+---@field minStatuses table<integer, string>? # Keyed by the round they apply from
 ---@field adjustments table<integer, StandingsAdjustment>? # Keyed by the round they apply from
 
 ---@param frame Frame
@@ -70,6 +72,7 @@ function StandingsTable.fromTemplate(frame)
 	return StandingsDisplay{
 		standings = Standings.standingsFromRecord(record, entries),
 		width = StandingsParseWiki.parseWidth(args),
+		collapseAfter = StandingsParseWiki.parseCollapseAfter(args),
 	}
 end
 
@@ -98,16 +101,19 @@ function StandingsTable.parse(args, tableType)
 
 	---@type table<integer, MatchPhase[]>
 	local matchPhasesByRound = {}
+	local maxBestOf
 	if importScoreFromMatches then
 		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args, overtime)
 
 		local importedOpponents
-		importedOpponents, matchPhasesByRound = StandingsParseLpdb.importFromMatches(
+		importedOpponents, matchPhasesByRound, maxBestOf = StandingsParseLpdb.importFromMatches(
 			rounds, automaticScoreFunction, opponents, {
 				exclusive = exclusiveOpponents,
+				dqHandling = StandingsParseWiki.parseDqHandling(args, tableType),
 				importOpponents = importOpponentFromMatches,
 				overtime = overtime,
 				includeGames = StandingsParser.needsGames(tableType, tiebreakers),
+				regulationRounds = StandingsParseWiki.parseRegulationRounds(args),
 			}
 		)
 		opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
@@ -117,12 +123,17 @@ function StandingsTable.parse(args, tableType)
 		round.started, round.finished = StandingsParser.resolveRoundStatus(round, matchPhasesByRound[round.roundNumber])
 	end)
 
+	local format = StandingsParseWiki.parseFormat(args, tableType)
 	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType, tiebreakers, {
 		drawConfig = StandingsParseWiki.parseDrawConfig(args),
 		overtime = overtime,
 		walkoverGames = StandingsParseWiki.parseWalkoverGames(args),
 		walkoverRounds = StandingsParseWiki.parseWalkoverRounds(args),
 		tiebreakerReset = tiebreakerReset,
+		maxBestOf = maxBestOf,
+		format = format,
+		-- A format is never set on ffa standings
+		points = format and StandingsParseWiki.parsePoints(args.points, overtime, tableType --[[@as 'swiss'|'group']]),
 	})
 
 	if tableType == 'swiss' then

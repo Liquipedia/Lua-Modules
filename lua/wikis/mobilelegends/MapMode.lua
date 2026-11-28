@@ -4,6 +4,7 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
+
 local Lua = require('Module:Lua')
 
 local Logic = Lua.import('Module:Logic')
@@ -34,7 +35,16 @@ function MapMode.getKey(input)
 end
 
 ---@param input string?
+---@return string?
+---Only Display Name
+function MapMode.getDisplay(input)
+	local key = MapMode.getKey(input)
+	return key and Data.mode[key].display or nil
+end
+
+---@param input string?
 ---@return Renderable?
+---Display Icon and Name
 function MapMode.display(input)
 	local key = MapMode.getKey(input)
 	local data = key and Data.mode[key]

@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
@@ -22,7 +23,7 @@ local StandingsDisplayUtil = Lua.import('Module:Standings/DisplayUtil')
 
 local Helpers = {}
 
----@param props {standings?: StandingsModel, width: number?}
+---@param props {standings?: StandingsModel, width: number?, collapseAfter: integer?}
 ---@return Renderable?
 local function StandingsGroup(props)
 	local standings = props.standings
@@ -34,9 +35,13 @@ local function StandingsGroup(props)
 	local statsToShow = StandingsDisplayUtil.statsToShow(standings)
 	local boldStatTitle = StandingsDisplayUtil.boldStatTitle(standings)
 	local hasRoundHistory = shownRounds > 1
+	local collapse = StandingsDisplayUtil.collapseProps(Array.sub(standings.rounds, 1, shownRounds), props.collapseAfter)
 
 	local standingsTable = TableWidgets.Table{
 		classes = {'standings-group'},
+		collapseAfter = collapse.collapseAfter,
+		expandText = collapse.expandText,
+		collapseText = collapse.collapseText,
 		css = {width = props.width and (props.width .. 'px') or nil},
 		title = Logic.nilIfEmpty(standings.title),
 		columns = WidgetUtil.collect(
@@ -101,9 +106,11 @@ Helpers.RoundBody = Component.component(function(props)
 			},
 			children = WidgetUtil.collect(
 				StandingsCells.placement(slot),
-				StandingsDisplayUtil.showPlacementChange(standings) and TableWidgets.Cell{
-					children = PlacementChange{change = slot.positionChangeFromPreviousRound}
-				} or nil,
+				StandingsDisplayUtil.showPlacementChange(standings) and TableWidgets.Cell(
+					DisplayHelper.addOpponentHighlightToProps({
+						children = PlacementChange{change = slot.positionChangeFromPreviousRound}
+					}, slot.opponent)
+				) or nil,
 				StandingsCells.participant(slot),
 				StandingsCells.stats(slot, props.statsToShow, props.boldStatTitle)
 			),

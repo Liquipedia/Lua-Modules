@@ -395,37 +395,25 @@ liquipedia.console = {
 		}
 		return style;
 	},
-	error: function( text, heading ) {
-		if ( heading === null ) {
-			heading = 'Liquipedia Error';
-		}
+	error: function( text, heading = 'Liquipedia Error' ) {
 		const styles = liquipedia.console.getStyles( '#ff0000', '#ffcccc' );
 		const style = liquipedia.console.getParsedStyleString( styles );
 		// eslint-disable-next-line no-console
 		console.error( '%c' + heading + ':%c' + text, style + 'font-weight:bold;font-size:200%;', style + 'padding-top:0;font-size:150%;' );
 	},
-	info: function( text, heading ) {
-		if ( heading === null ) {
-			heading = 'Liquipedia Info';
-		}
+	info: function( text, heading = 'Liquipedia Info' ) {
 		const styles = liquipedia.console.getStyles( '#0000ff', '#ccccff' );
 		const style = liquipedia.console.getParsedStyleString( styles );
 		// eslint-disable-next-line no-console
 		console.info( '%c' + heading + ':%c' + text, style + 'font-weight:bold;font-size:200%;', style + 'padding-top:0;font-size:150%;' );
 	},
-	log: function( text, heading ) {
-		if ( heading === null ) {
-			heading = 'Liquipedia Log';
-		}
+	log: function( text, heading = 'Liquipedia Log' ) {
 		const styles = liquipedia.console.getStyles( '#042b4c', '#ffffff' );
 		const style = liquipedia.console.getParsedStyleString( styles );
 		// eslint-disable-next-line no-console
 		console.log( '%c' + heading + ':%c' + text, style + 'font-weight:bold;font-size:200%;', style + 'padding-top:0;font-size:150%;' );
 	},
-	warn: function( text, heading ) {
-		if ( heading === null ) {
-			heading = 'Liquipedia Warning';
-		}
+	warn: function( text, heading = 'Liquipedia Warning' ) {
 		const styles = liquipedia.console.getStyles( '#666600', '#ffffcc' );
 		const style = liquipedia.console.getParsedStyleString( styles );
 		// eslint-disable-next-line no-console
@@ -684,11 +672,12 @@ liquipedia.tracker = {
 			} );
 		}
 
-		if ( window.localStorage.getItem( 'LiquipediaTheme' ) === 'dark' ) {
+		const theme = liquipedia.storage.get( 'LiquipediaTheme' );
+		if ( theme === 'dark' ) {
 			liquipedia.tracker.track( 'Page view with dark theme enabled' );
-		} else if ( window.localStorage.getItem( 'LiquipediaTheme' ) === 'light' ) {
+		} else if ( theme === 'light' ) {
 			liquipedia.tracker.track( 'Page view with light theme enabled' );
-		} else if ( window.localStorage.getItem( 'LiquipediaTheme' ) === 'system' ) {
+		} else if ( theme === 'system' ) {
 			liquipedia.tracker.track( 'Page view with auto theme enabled' );
 		}
 	}

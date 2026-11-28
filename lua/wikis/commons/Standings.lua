@@ -61,6 +61,7 @@ local Standings = {}
 ---@field matchLosses integer
 ---@field positionStatus string?
 ---@field definitiveStatus string?
+---@field minimumStatus string? # Worst status still possible
 ---@field match MatchGroupUtilMatch?
 ---@field matchOpponentIndex integer? # Index of the opponent in `match`, needed as the match is not alias resolved
 ---@field positionChangeFromPreviousRound integer
@@ -147,6 +148,7 @@ function Standings.entryFromRecord(record)
 		position = tonumber(record.slotindex),
 		positionStatus = record.currentstatus,
 		definitiveStatus = record.definitestatus,
+		minimumStatus = record.extradata.minstatus,
 		points = record.scoreboard.points,
 		matchWins = record.scoreboard.match.w,
 		matchLosses = record.scoreboard.match.l,

@@ -33,7 +33,7 @@ function MedalStats.run(frame)
 	args.opponentTypes = Opponent.solo
 
 	--reduce due to having text above
-	args.cutafter = tonumber(args.cutafter) or 5
+	args.collapseafter = tonumber(args.collapseafter or args.cutafter) or 5
 
 	return MedalStats(args):create()
 end
@@ -56,7 +56,7 @@ function MedalStats:create()
 		end,
 		rowSort = MedalStatsBase.rowSort,
 		hideTotalRow = true,
-		cutAfter = self.config.cutAfter,
+		collapseAfter = self.config.collapseAfter,
 		footer = Html.Small{
 			children = {
 				'Medals won per Team shows the team that a player was',

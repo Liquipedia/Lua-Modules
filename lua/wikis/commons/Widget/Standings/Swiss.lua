@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -21,7 +22,7 @@ local StandingsDisplayUtil = Lua.import('Module:Standings/DisplayUtil')
 
 local Helpers = {}
 
----@param props {standings?: StandingsModel, width: number?}
+---@param props {standings?: StandingsModel, width: number?, collapseAfter: integer?}
 ---@return Renderable?
 local function StandingsSwiss(props)
 	local standings = props.standings
@@ -32,9 +33,13 @@ local function StandingsSwiss(props)
 	local lastRound = standings.rounds[#standings.rounds]
 	local statsToShow = StandingsDisplayUtil.statsToShow(standings)
 	local boldStatTitle = StandingsDisplayUtil.boldStatTitle(standings)
+	local collapse = StandingsDisplayUtil.collapseProps({lastRound}, props.collapseAfter)
 
 	return TableWidgets.Table{
 		classes = {'standings-swiss'},
+		collapseAfter = collapse.collapseAfter,
+		expandText = collapse.expandText,
+		collapseText = collapse.collapseText,
 		css = {width = props.width and (props.width .. 'px') or nil},
 		title = Logic.nilIfEmpty(standings.title),
 		columns = Helpers.buildColumnDefinitions(standings, statsToShow),
@@ -80,6 +85,23 @@ function Helpers.headerRow(standings, statsToShow)
 	}}
 end
 
+---@param props {match: MatchGroupUtilMatch, opponentIndex: integer}
+---@return standardOpponent?
+function Helpers.getOpposingOpponent(props)
+	local match = props.match
+	local opponentIndex = tonumber(props.opponentIndex)
+	if not match or not opponentIndex or #match.opponents ~= 2 then
+		return
+	end
+
+	local opponent = match.opponents[opponentIndex]
+	if not opponent then
+		return
+	end
+
+	return Array.find(match.opponents, function(matchOpponent) return matchOpponent ~= opponent end)
+end
+
 ---@private
 ---@param standings StandingsModel
 ---@param slot StandingsEntryModel
@@ -101,13 +123,20 @@ function Helpers.createRow(standings, slot, statsToShow, boldStatTitle)
 					return TableWidgets.Cell{classes = {'standings-swiss-match'}}
 				end
 
-				return TableWidgets.Cell{
-					classes = {'standings-swiss-match'},
-					children = MatchOverview{
-						match = entry.match,
-						opponentIndex = entry.matchOpponentIndex,
-					},
+				local opposingOpponent = Helpers.getOpposingOpponent{
+					match = entry.match,
+					opponentIndex = entry.matchOpponentIndex,
 				}
+
+				return TableWidgets.Cell(
+					DisplayHelper.addOpponentHighlightToProps({
+						classes = {'standings-swiss-match'},
+						children = MatchOverview{
+							match = entry.match,
+							opponentIndex = entry.matchOpponentIndex,
+						},
+					}, opposingOpponent)
+				)
 			end)
 		),
 	}

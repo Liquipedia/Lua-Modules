@@ -63,6 +63,14 @@ Author(s): FO-nTTaX
 Template(s): Countdowns
 Author(s): FO-nTTaX
 *******************************************************************************/
+.timer-object-wrapper {
+	display: contents;
+
+	> div {
+		display: contents;
+	}
+}
+
 .timer-object-countdown-live {
 	color: #008000;
 	font-weight: bold;
@@ -1339,6 +1347,20 @@ Author: warnull
 	display: none;
 }
 
+/* Set up by Collapse.js for [data-collapsible-popover] when popovers and anchor positioning are supported */
+.general-collapsible > .should-collapse[ popover ] {
+	inset: auto;
+	width: anchor-size( width );
+	margin: 0.25rem 0 0;
+	color: inherit;
+	position-area: block-end;
+	position-try-fallbacks: flip-block;
+
+	&:not( :popover-open ) {
+		display: none;
+	}
+}
+
 /*******************************************************************************
 Usage: Only display for admins
 Author: hjpalpha
@@ -1767,6 +1789,10 @@ Author(s): Scribunto developer( s )
 	&:hover,
 	&:focus {
 		text-decoration: underline;
+	}
+
+	.logged-out & {
+		display: none !important;
 	}
 }
 

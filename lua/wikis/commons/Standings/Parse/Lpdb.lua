@@ -10,7 +10,9 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Lpdb = Lua.import('Module:Lpdb')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MathUtil = Lua.import('Module:MathUtil')
 local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
@@ -23,17 +25,32 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local StandingsOvertime = Lua.import('Module:Standings/Overtime')
 local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParseLpdb = {}
 
 local MATCH_COLUMNS = {'match2id', 'match2opponents', 'bestof', 'date', 'dateexact', 'extradata', 'finished', 'winner'}
 
+-- A DQ walkover as match2 stores it, without a winner when every opponent is disqualified
+local FORFEIT_WIN = {status = MatchGroupInputUtil.STATUS.DEFAULT_WIN, placement = 1}
+local FORFEIT_LOSS = {status = MatchGroupInputUtil.STATUS.DISQUALIFIED, placement = 2}
+local NO_WINNER = -1
+
 ---@class StandingsImportOptions
 ---@field exclusive boolean? # If set, only matches where every opponent is part of the standings are imported
 ---@field importOpponents boolean? # If set, opponents not listed manually still count as part of the standings
 ---@field overtime boolean? # If set, results of overtime matches are tracked separately from regulation results
 ---@field includeGames boolean? # If set, the games of the matches are imported as well (always with overtime)
+---@field regulationRounds integer? # Overrides the regulation rounds of the wiki config for every match
+---@field dqHandling StandingsDqHandling? # How matches of disqualified opponents count from their dq round on
+
+---@alias StandingsDqHandling 'exclude'|'forfeit'
+
+---@class StandingsDisqualifications
+---@field handling StandingsDqHandling?
+---@field opponents StandingTableOpponentData[] # Those with a dq round, none without dq handling
+---@field scoreMapper fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number|nil
 
 ---@param rounds {roundNumber: integer, matches: string[]}[]
 ---@param scoreMapper fun(opponent: standardOpponent, match: MatchGroupUtilMatch): number|nil
@@ -41,6 +58,7 @@ local MATCH_COLUMNS = {'match2id', 'match2opponents', 'bestof', 'date', 'dateexa
 ---@param options StandingsImportOptions?
 ---@return StandingTableOpponentData[]
 ---@return table<integer, MatchPhase[]>
+---@return number? maxBestOf # Includes matches between tbd opponents
 function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponents, options)
 	local matchIds = Array.flatMap(rounds, function(round)
 		return round.matches
@@ -69,8 +87,10 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 
 	---@type StandingTableOpponentData[]
 	local opponents = {}
-	---@type table<string, MatchPhase>
-	local phaseByMatchId = {}
+	---@type table<string, MatchGroupUtilMatch>
+	local matchById = {}
+	---@type number?
+	local maxBestOf
 	local lookupOpponent = StandingsParseLpdb.makeOpponentLookup(manualOpponents, options and options.importOpponents)
 	local includeGames = options and (options.includeGames or options.overtime)
 	Lpdb.executeMassQuery(
@@ -85,18 +105,36 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 				return
 			end
 			record.match2games = record.match2games or {}
-			local match2 = MatchGroupUtil.matchFromRecord(record)
-			phaseByMatchId[record.match2id] = match2.phase
-			StandingsParseLpdb.parseMatch(
+			local match2 = MatchGroupUtil.matchFromRecord(record) --[[@as StandingsMatch]]
+			match2.regulationRounds = StandingsOvertime.regulationRounds(options and options.regulationRounds)
+			matchById[record.match2id] = match2
+			local mayBeRelevant = StandingsParseLpdb.parseMatch(
 				matchIdToRound[record.match2id], match2, opponents, scoreMapper, #rounds, lookupOpponent, options
 			)
+			if mayBeRelevant then
+				maxBestOf = MathUtil.nilSafeMax(maxBestOf, match2.bestof)
+			end
 		end
 	)
 
-	-- Matches that have been entered, but not created, are treated as upcoming
+	---@type StandingsDisqualifications
+	local disqualifications = {
+		handling = options and options.dqHandling,
+		opponents = options and options.dqHandling and Array.filter(manualOpponents, function(opponentData)
+			return opponentData.disqualifiedFromRound ~= nil
+		end) or {},
+		scoreMapper = scoreMapper,
+	}
+
+	-- Matches that have been entered, but not created, are upcoming; those of disqualified opponents are finished
 	local matchPhasesByRound = Table.map(rounds, function(_, round)
+		local isDisqualified = StandingsParseLpdb.makeDisqualifiedCheck(disqualifications, round.roundNumber)
 		return round.roundNumber, Array.map(round.matches, function(matchId)
-			return phaseByMatchId[matchId] or 'upcoming'
+			local match = matchById[matchId]
+			if not match then
+				return 'upcoming'
+			end
+			return Array.any(match.opponents, isDisqualified) and 'finished' or match.phase
 		end)
 	end)
 
@@ -105,24 +143,44 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 			return
 		end
 
+		local opponent = opponentData.opponent
+		local function tally(matches, matchPoints)
+			return TiebreakerScope.tally(opponent, matches, matchPoints, options and options.overtime)
+		end
+
 		local matches = {}
+		local previousMatches, previousMatchPoints = {}, opponentData.matchPoints
 
 		return {
-			opponent = opponentData.opponent,
+			opponent = opponent,
 			matchPoints = opponentData.matchPoints,
-			rounds = Array.map(opponentData.rounds, function(roundData)
+			rounds = Array.map(opponentData.rounds, function(roundData, roundNumber)
 				local roundMatches = roundData.matches or {}
 				matches = Array.extend(matches, roundMatches)
 				local lastMatch = roundMatches[#roundMatches]
 				local matchOpponentIndex = lastMatch
-					and Array.indexOf(lastMatch.opponents, FnUtil.curry(Opponent.same, opponentData.opponent))
+					and Array.indexOf(lastMatch.opponents, FnUtil.curry(Opponent.same, opponent))
 					or nil
+
+				local countedMatches, countedMatchPoints = StandingsParseLpdb.applyDisqualifications(
+					opponent, matches, opponentData.matchPoints, roundNumber, disqualifications
+				)
+				local scoreboard
+				if countedMatches == matches then
+					scoreboard = tally(roundMatches, opponentData.matchPoints)
+				else
+					-- A disqualification also changes earlier matches, so the round is the difference of the totals
+					scoreboard = StandingsParseLpdb.subtractTally(
+						tally(countedMatches, countedMatchPoints), tally(previousMatches, previousMatchPoints)
+					)
+				end
+				previousMatches, previousMatchPoints = countedMatches, countedMatchPoints
+
 				return {
-					scoreboard = TiebreakerScope.tally(
-						opponentData.opponent, roundMatches, opponentData.matchPoints, options and options.overtime
-					),
+					scoreboard = scoreboard,
 					specialstatus = roundData.specialstatus or 'nc',
-					matches = matches,
+					matches = countedMatches,
+					matchPoints = countedMatchPoints,
 					matchId = lastMatch and lastMatch.matchId or nil,
 					matchOpponentIndex = matchOpponentIndex,
 				}
@@ -130,7 +188,84 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, manualOpponen
 		}
 	end)
 
-	return importedOpponents, matchPhasesByRound
+	return importedOpponents, matchPhasesByRound, maxBestOf
+end
+
+---@param disqualifications StandingsDisqualifications
+---@param roundNumber integer
+---@return fun(opponent: standardOpponent): boolean
+function StandingsParseLpdb.makeDisqualifiedCheck(disqualifications, roundNumber)
+	return function(opponent)
+		return Array.any(disqualifications.opponents, function(opponentData)
+			return opponentData.disqualifiedFromRound <= roundNumber and Opponent.same(opponentData.opponent, opponent)
+		end)
+	end
+end
+
+---The matches of an opponent and their points as they count in a round, the given tables if none changes
+---@param opponent standardOpponent
+---@param matches MatchGroupUtilMatch[]
+---@param matchPoints table<string, number>
+---@param roundNumber integer
+---@param disqualifications StandingsDisqualifications
+---@return MatchGroupUtilMatch[] matches
+---@return table<string, number> matchPoints
+function StandingsParseLpdb.applyDisqualifications(opponent, matches, matchPoints, roundNumber, disqualifications)
+	local isDisqualified = StandingsParseLpdb.makeDisqualifiedCheck(disqualifications, roundNumber)
+	local function hasDisqualifiedOpponent(match)
+		return Array.any(match.opponents, isDisqualified)
+	end
+	if not Array.any(matches, hasDisqualifiedOpponent) then
+		return matches, matchPoints
+	end
+
+	local roundMatchPoints = Table.copy(matchPoints)
+	local roundMatches = Array.map(matches, function(match)
+		if not hasDisqualifiedOpponent(match) then
+			return match
+		elseif disqualifications.handling == 'exclude' then
+			return nil
+		end
+		local forfeitedMatch = StandingsParseLpdb.forfeitMatch(match, isDisqualified)
+		local matchOpponent = Array.find(forfeitedMatch.opponents, FnUtil.curry(Opponent.same, opponent))
+		---@cast matchOpponent -nil
+		roundMatchPoints[match.matchId] = disqualifications.scoreMapper(matchOpponent, forfeitedMatch)
+		return forfeitedMatch
+	end)
+	return roundMatches, roundMatchPoints
+end
+
+---A finished copy of the match without its games, lost by walkover by the disqualified opponents
+---@param match MatchGroupUtilMatch
+---@param isDisqualified fun(opponent: standardOpponent): boolean
+---@return MatchGroupUtilMatch
+function StandingsParseLpdb.forfeitMatch(match, isDisqualified)
+	local opponents = Array.map(match.opponents, function(opponent)
+		return Table.merge(opponent, isDisqualified(opponent) and FORFEIT_LOSS or FORFEIT_WIN)
+	end)
+	local winner = Array.indexOf(opponents, function(opponent) return opponent.status == FORFEIT_WIN.status end)
+	return Table.merge(match, {
+		opponents = opponents,
+		winner = winner > 0 and winner or NO_WINNER,
+		finished = true,
+		games = {},
+	})
+end
+
+---@param tally StandingsTally
+---@param previous StandingsTally
+---@return StandingsTally
+function StandingsParseLpdb.subtractTally(tally, previous)
+	local function subtract(record, previousRecord)
+		return record and Table.map(record, function(key, value)
+			return key, value - previousRecord[key]
+		end)
+	end
+	return {
+		points = (tally.points or previous.points) and (tally.points or 0) - (previous.points or 0),
+		match = subtract(tally.match, previous.match),
+		overtime = subtract(tally.overtime, previous.overtime),
+	}
 end
 
 ---Builds the condition for fetching the matches. LPDB gets slow on a condition with many match ids
@@ -166,6 +301,7 @@ end
 ---@class StandingsImportOpponentLookup
 ---@field alias standardOpponent? # The manual opponent the opponent is an alias of
 ---@field isPartOfStandings boolean
+---@field isTbd boolean
 ---@field opponentData StandingTableOpponentData? # Set once the opponent is part of a counted match
 
 ---Builds a cache key for an opponent, opponents with the same key are the same opponent.
@@ -201,6 +337,7 @@ function StandingsParseLpdb.makeOpponentLookup(manualOpponents, importOpponents)
 				-- An alias is a manual opponent, so it is always part of the standings
 				isPartOfStandings = alias ~= nil
 					or StandingsParseLpdb.isPartOfStandings(opponent, manualOpponents, importOpponents),
+				isTbd = Opponent.isTbd(opponent),
 			}
 		end
 
@@ -258,6 +395,7 @@ end
 ---@param maxRounds integer
 ---@param lookupOpponent fun(opponent: standardOpponent): StandingsImportOpponentLookup
 ---@param options StandingsImportOptions?
+---@return boolean mayBeRelevant # Whether the match counts, or may once its tbd opponents are known
 function StandingsParseLpdb.parseMatch(roundNumbers, match2, opponents, scoreMapper, maxRounds, lookupOpponent, options)
 	options = options or {}
 
@@ -270,7 +408,10 @@ function StandingsParseLpdb.parseMatch(roundNumbers, match2, opponents, scoreMap
 		return lookup.isPartOfStandings
 	end)
 	if not isRelevantMatch then
-		return
+		-- A tbd opponent may still turn out to be part of the standings
+		return opponentCheck(lookups, function(lookup)
+			return lookup.isPartOfStandings or lookup.isTbd
+		end)
 	end
 
 	if options.overtime then
@@ -298,6 +439,7 @@ function StandingsParseLpdb.parseMatch(roundNumbers, match2, opponents, scoreMap
 			table.insert(opponentRoundData.matches, match2)
 		end)
 	end)
+	return true
 end
 
 return StandingsParseLpdb

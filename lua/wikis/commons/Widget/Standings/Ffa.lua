@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 
@@ -29,7 +30,7 @@ local STATUS_TO_DISPLAY = {
 
 local Helpers = {}
 
----@param props {standings?: StandingsModel, width: number?}
+---@param props {standings?: StandingsModel, width: number?, collapseAfter: integer?}
 ---@return Renderable?
 local function StandingsFfa(props)
 	local standings = props.standings
@@ -42,9 +43,13 @@ local function StandingsFfa(props)
 	local boldStatTitle = StandingsDisplayUtil.boldStatTitle(standings)
 	-- Also holds the round columns switch, so needed as soon as there is more than one round
 	local hasRoundHistory = Helpers._showRoundColumns(standings)
+	local collapse = StandingsDisplayUtil.collapseProps(Array.sub(standings.rounds, 1, shownRounds), props.collapseAfter)
 
 	local standingsTable = TableWidgets.Table{
 		classes = {'standings-ffa'},
+		collapseAfter = collapse.collapseAfter,
+		expandText = collapse.expandText,
+		collapseText = collapse.collapseText,
 		css = {width = props.width and (props.width .. 'px') or nil},
 		columns = WidgetUtil.collect(
 			{align = 'center'},
@@ -134,9 +139,11 @@ Helpers._RoundBody = Component.component(function(props)
 			},
 			children = WidgetUtil.collect(
 				StandingsCells.placement(slot),
-				StandingsDisplayUtil.showPlacementChange(standings) and TableWidgets.Cell{
-					children = PlacementChange{change = slot.positionChangeFromPreviousRound}
-				} or nil,
+				StandingsDisplayUtil.showPlacementChange(standings) and TableWidgets.Cell(
+					DisplayHelper.addOpponentHighlightToProps({
+						children = PlacementChange{change = slot.positionChangeFromPreviousRound}
+					}, slot.opponent)
+				) or nil,
 				StandingsCells.participant(slot),
 				StandingsCells.stats(slot, props.statsToShow, props.boldStatTitle),
 				Helpers._showRoundColumns(standings) and Array.map(standings.rounds, function (columnRound)

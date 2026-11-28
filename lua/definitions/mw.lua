@@ -349,6 +349,8 @@ function mw.language:formatDate(format, timestamp, localTime)
 		end
 		return time
 	end
+	-- Known issue: on Windows, os.date returns nil for timestamps before 1970-01-01, so any date before that
+	-- (e.g. DateExt.defaultDate) errors here when running the tests locally on Windows. CI runs on Linux.
 	local function localTimezoneOffset(ts)
 		local utcDt = os.date("!*t", ts)
 		local localDt = os.date("*t", ts)
@@ -369,100 +371,118 @@ function mw.language:formatDate(format, timestamp, localTime)
 		return { year = year, month = month or 1, day = day or 1, hour = hour or 0, min = minute, sec = second }
 	end
 
-	if format == 'U' then
-		if not timestamp then
-			return tostring(os.time(os.date("!*t") --[[@as osdateparam]]))
-		end
-		if type(timestamp) ~= 'string' then
-			return tostring(os.time(timestamp))
-		end
-		local tzHour, tzMinutes = timestamp:match('([%-%+]%d?%d):(%d%d)$')
-		local offset = 0
-		if tzHour then
-			offset = tonumber(tzHour) * 3600 + tonumber(tzMinutes) * 60
-		end
+	local MONTH_NAMES = {'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+		'October', 'November', 'December'}
+	local DAY_NAMES = {'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'}
 
-		local year, month, day, hour, minute, second = parseDateString(timestamp)
-		if not year then
-			return ''
+	-- Parses dates led by a month name, e.g. `Jun 1, 2024 - 12:00` or `June 1 12:00` (year defaults to the current one)
+	local function parseMonthNameDateString(timeString)
+		local monthName, day, rest = timeString:match('^%s*(%a+)%.?%s+(%d%d?),?(.*)$')
+		if not monthName then
+			return
 		end
-
-		local timestampBeforeOffset = ostimeWrapper(makeOsdateParam(year, month, day, hour, minute, second))
-		local ts = timestampBeforeOffset - offset
-
-		return tostring(ts + localTimezoneOffset(ts))
-	elseif format == 'c' then
-		local outFormat = '%Y-%m-%dT%H:%M:%S'
-		if not timestamp then
-			return os.date(outFormat) --[[@as string]]
-		end
-		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
-			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
-		end
-		if type(timestamp) == 'string' then
-			local year, month, day, hour, minute, second = parseDateString(timestamp)
-			if not year then
-				return ''
+		local month
+		for index, name in ipairs(MONTH_NAMES) do
+			if name:sub(1, 3):lower() == monthName:sub(1, 3):lower() then
+				month = index
 			end
-			return os.date(outFormat, ostimeWrapper(makeOsdateParam(year, month, day, hour, minute, second))) --[[@as string]]
 		end
-		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
-	elseif format == 'Y' then
-		local outFormat = '%Y'
-		if not timestamp then
-			return os.date(outFormat) --[[@as string]]
+		if not month then
+			return
 		end
-		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
-			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
-		end
-		if type(timestamp) == 'string' then
-			local year = parseDateString(timestamp)
-			return year or ''
-		end
-		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
-	elseif format == 'n' then
-		local outFormat = '%m'
-		if not timestamp then
-			return os.date(outFormat) --[[@as string]]
-		end
-		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
-			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
-		end
-		if type(timestamp) == 'string' then
-			local _, month = parseDateString(timestamp)
-			return month or ''
-		end
-		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
-	elseif format == 'd' then
-		local outFormat = '%d'
-		if not timestamp then
-			return os.date(outFormat) --[[@as string]]
-		end
-		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
-			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
-		end
-		if type(timestamp) == 'string' then
-			local _, _, day = parseDateString(timestamp)
-			return day or ''
-		end
-		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
-	elseif format == 'Y-m-d' then
-		if not timestamp then
-			return os.date('!%Y-%m-%d') --[[@as string]]
-		end
-		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
-			local seconds = tonumber(string.sub(timestamp, 2))
-			if not seconds then return '' end
-			return os.date('!%Y-%m-%d', seconds) --[[@as string]]
-		end
-		if type(timestamp) == 'string' then
-			local year, month, day = parseDateString(timestamp)
-			if not year then return '' end
-			return year .. '-' .. month .. '-' .. day
-		end
-		return os.date('!%Y-%m-%d', ostimeWrapper(timestamp)) --[[@as string]]
+		rest = rest:gsub('[%-%+]%d?%d:%d%d%s*$', '')
+		local year = rest:match('^%s*(%d%d%d%d)') or os.date('!%Y')
+		local hour, minute = rest:match('(%d%d?):(%d%d)')
+		return year, month, day, hour, minute, nil
 	end
-	return ''
+
+	-- Converts the timestamp argument to seconds since epoch, reading dates without an offset as UTC
+	local function toUtcSeconds(input)
+		if not input then
+			return os.time()
+		elseif type(input) ~= 'string' then
+			-- os.time reads date tables as local time, shift them so they are read as UTC instead
+			local ts = ostimeWrapper(input)
+			return ts + localTimezoneOffset(ts)
+		elseif string.sub(input, 1, 1) == '@' then
+			return tonumber(string.sub(input, 2))
+		end
+		local year, month, day, hour, minute, second = parseDateString(input)
+		if not year then
+			year, month, day, hour, minute, second = parseMonthNameDateString(input)
+		end
+		if not year then
+			return
+		end
+		local offset = 0
+		local tzSign, tzHour, tzMinutes = input:match('([%-%+])(%d?%d):(%d%d)$')
+		if tzSign then
+			offset = (tzSign == '-' and -1 or 1) * (tonumber(tzHour) * 3600 + tonumber(tzMinutes) * 60)
+		end
+		local ts = ostimeWrapper(makeOsdateParam(year, month, day, hour, minute, second))
+		return ts + localTimezoneOffset(ts) - offset
+	end
+
+	-- Subset of the PHP date format characters, see https://www.php.net/manual/en/datetime.format.php
+	local FORMAT_CHARACTERS = {
+		d = function(dt) return string.format('%02d', dt.day) end,
+		j = function(dt) return tostring(dt.day) end,
+		D = function(dt) return DAY_NAMES[dt.wday]:sub(1, 3) end,
+		l = function(dt) return DAY_NAMES[dt.wday] end,
+		m = function(dt) return string.format('%02d', dt.month) end,
+		n = function(dt) return tostring(dt.month) end,
+		M = function(dt) return MONTH_NAMES[dt.month]:sub(1, 3) end,
+		F = function(dt) return MONTH_NAMES[dt.month] end,
+		Y = function(dt) return tostring(dt.year) end,
+		y = function(dt) return string.format('%02d', dt.year % 100) end,
+		H = function(dt) return string.format('%02d', dt.hour) end,
+		G = function(dt) return tostring(dt.hour) end,
+		h = function(dt) return string.format('%02d', (dt.hour - 1) % 12 + 1) end,
+		g = function(dt) return tostring((dt.hour - 1) % 12 + 1) end,
+		i = function(dt) return string.format('%02d', dt.min) end,
+		s = function(dt) return string.format('%02d', dt.sec) end,
+		a = function(dt) return dt.hour < 12 and 'am' or 'pm' end,
+		A = function(dt) return dt.hour < 12 and 'AM' or 'PM' end,
+		-- output is always in UTC
+		P = function() return '+00:00' end,
+		c = function(dt)
+			return string.format('%04d-%02d-%02dT%02d:%02d:%02d+00:00', dt.year, dt.month, dt.day, dt.hour, dt.min, dt.sec)
+		end,
+	}
+
+	local function formatUtc(formatString, seconds)
+		local dt = os.date('!*t', seconds)
+		local parts = {}
+		local index = 1
+		while index <= #formatString do
+			local char = formatString:sub(index, index)
+			if char == '\\' then
+				index = index + 1
+				table.insert(parts, formatString:sub(index, index))
+			elseif char == '"' then
+				local closing = formatString:find('"', index + 1, true) or (#formatString + 1)
+				table.insert(parts, formatString:sub(index + 1, closing - 1))
+				index = closing
+			elseif FORMAT_CHARACTERS[char] then
+				table.insert(parts, FORMAT_CHARACTERS[char](dt))
+			else
+				table.insert(parts, char)
+			end
+			index = index + 1
+		end
+		return table.concat(parts)
+	end
+
+	if format == 'U' then
+		local seconds = toUtcSeconds(timestamp)
+		return seconds and tostring(seconds) or ''
+	end
+
+	local seconds = toUtcSeconds(timestamp)
+	if not seconds then
+		return ''
+	end
+	return formatUtc(format, seconds)
 end
 
 ---Breaks a duration in seconds into more human-readable units, e.g. 12345 to 3 hours, 25 minutes and 45 seconds, returning the result as a string.

@@ -78,13 +78,17 @@ jobs:
           files: |
             lua/wikis/**/*.lua
 
+      # plain release download URL intermittently 504s
       - name: Setup LuaLS
         if: steps.lua-changed-files.outputs.any_changed == 'true'
+        shell: bash
         env:
-          LUALS_VERSION: 3.18.2
+          LUALS_VERSION: 3.19.2
+          GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p ~/.local/bin/luals
-          curl -L https://github.com/LuaLS/lua-language-server/releases/download/$LUALS_VERSION/lua-language-server-$LUALS_VERSION-linux-x64.tar.gz | tar -xzv -C ~/.local/bin/luals
+          gh release download $LUALS_VERSION --repo LuaLS/lua-language-server \
+            --pattern lua-language-server-$LUALS_VERSION-linux-x64.tar.gz --output - | tar -xzv -C ~/.local/bin/luals
 
       - name: Check
         if: steps.lua-changed-files.outputs.any_changed == 'true'
@@ -102,17 +106,19 @@ jobs:
             | .value[]
             | (.range.start.line + 1) as $line
             | (.range.start.character + 1) as $col
-            | "::error file=\($file),line=\($line),col=\($col)::\(.message | gsub("\n"; " ")) (\(.code))"
+            | (if .severity == 1 then "error" else "warning" end) as $level
+            | "::\($level) file=\($file),line=\($line),col=\($col)::\(.message | gsub("\n"; " ")) (\(.code))"
           ' luals-check.json | tee output.txt
 
           touched=$(wc -l < output.txt)
+          touched_errors=$(grep -c '^::error ' output.txt || true)
 
           problems=$(jq -r '[.[] | length] | add // 0' luals-check.json)
           files_with=$(jq -r 'length' luals-check.json)
           {
-            echo "| | Files scanned | Files with problems | Problems | In changed files |"
-            echo "|-|-------|----------|----------|----------|"
-            echo "| LuaLS check | $(find lua -name '*.lua' | wc -l) | $files_with | $problems | $touched |"
+            echo "| | Files scanned | Files with problems | Problems | In changed files | Errors in changed files |"
+            echo "|-|-------|----------|----------|----------|----------|"
+            echo "| LuaLS check | $(find lua -name '*.lua' | wc -l) | $files_with | $problems | $touched | $touched_errors |"
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
-          exit $(( touched > 0 ? 1 : 0 ))
+          exit $(( touched_errors > 0 ? 1 : 0 ))

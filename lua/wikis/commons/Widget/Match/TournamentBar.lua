@@ -57,14 +57,12 @@ local function MatchTournamentBar(props)
 			size = '50px',
 		} or nil,
 		props.displayIcon and Html.Span{
-			children = {
-				LeagueIcon.display{
-					icon = tournament.icon,
-					iconDark = tournament.iconDark,
-					series = tournament.series,
-					link = tournamentLink,
-					options = {noTemplate = true},
-				}
+			children = LeagueIcon.display{
+				icon = tournament.icon,
+				iconDark = tournament.iconDark,
+				series = tournament.series,
+				link = tournamentLink,
+				options = {noTemplate = true},
 			}
 		} or nil,
 		Html.Span{
@@ -72,22 +70,21 @@ local function MatchTournamentBar(props)
 			children = {
 				Html.Span{
 					classes = {'match-info-tournament-name'},
-					children = {
-						Link{
-							link = tournamentLink,
-							children = Html.Span{
-								children = (match.section ~= 'Results' and #match.opponents <= 2 and {
-									tournament.displayName,
-									' - ',
-									match.section
-								} or {
-									tournament.displayName
-								})
-							}
+					children = Link{
+						link = tournamentLink,
+						children = Html.Span{
+							children = (match.section ~= 'Results' and #match.opponents <= 2 and {
+								tournament.displayName,
+								' - ',
+								match.section
+							} or {
+								tournament.displayName
+							})
 						}
 					}
 				},
 				gameData and gameData.gameIds and Html.Span{
+					classes = {'match-info-tournament-game'},
 					children = WidgetUtil.collect(
 						stageName,
 						stageName and ' - ' or nil,

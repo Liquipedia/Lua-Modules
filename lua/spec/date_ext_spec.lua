@@ -43,8 +43,8 @@ describe('Date', function()
 
 	describe('toYmdInUtc', function()
 		it('verify', function()
-			DateExt.toYmdInUtc('November 08, 2021 - 13:00 <abbr data-tz="+2:00">CET</abbr>')
-			assert.stub(FormatDateSpy).was.called_with(mw.language, 'Y-m-d', '@')
+			assert.are_equal('2021-11-08', DateExt.toYmdInUtc('November 08, 2021 - 13:00 <abbr data-tz="+2:00">CET</abbr>'))
+			assert.stub(FormatDateSpy).was.called_with(mw.language, 'Y-m-d', '@' .. 1636369200)
 		end)
 	end)
 

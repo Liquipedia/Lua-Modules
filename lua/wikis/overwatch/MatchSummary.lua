@@ -52,7 +52,7 @@ function GameRowComponentProps.createGameOpponentView(props, opponentIndex)
 	local opponentCopy = Table.deepCopy(game.opponents[opponentIndex])
 	if opponentCopy.score and game.mode == 'Push' then
 		---@diagnostic disable-next-line: assign-type-mismatch
-		opponentCopy.score = opponentCopy.score .. 'm'
+		opponentCopy.score = string.format('%.2f', opponentCopy.score) .. 'm'
 	end
 
 	return DisplayHelper.MapScore(opponentCopy, game.status)

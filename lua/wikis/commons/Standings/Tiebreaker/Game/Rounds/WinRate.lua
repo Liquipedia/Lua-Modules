@@ -16,6 +16,8 @@ local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
 ---@class TiebreakerRoundWinRate : StandingsTiebreaker
 local TiebreakerRoundWinRate = Class.new(TiebreakerInterface)
 
+TiebreakerRoundWinRate.readsGames = true
+
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
 ---@return number

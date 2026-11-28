@@ -76,7 +76,7 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@field upcoming boolean
 ---@field ongoing boolean
 ---@field onlyExact boolean
----@field enteredOpponentOnLeft boolean
+---@field enteredOpponentFirst boolean
 ---@field queryByParent boolean
 ---@field showAllTbdMatches boolean
 ---@field showInfoForEmptyResults boolean
@@ -86,10 +86,11 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@field tierTypes string[]?
 ---@field regions string[]?
 ---@field games string[]?
----@field variant 'vertical' | 'horizontal'
+---@field variant 'vertical' | 'horizontal' | 'carousel'
 ---@field featuredOnly boolean?
 ---@field displayGameIcons boolean?
 ---@field header Renderable?
+---@field showAllLink string?
 
 ---@class MatchTickerGameData
 ---@field gameIds number[]
@@ -111,7 +112,8 @@ function MatchTickerController.makeMatchTicker(args)
 		hideTournament = config.hideTournament,
 		displayGameIcons = config.displayGameIcons,
 		onlyHighlightOnValue = config.onlyHighlightOnValue,
-		variant = config.variant
+		variant = config.variant,
+		showAllLink = config.showAllLink,
 	}
 end
 
@@ -134,8 +136,8 @@ function MatchTickerController.parseConfig(args)
 		recent = Logic.readBool(args.recent),
 		upcoming = Logic.readBool(args.upcoming),
 		ongoing = Logic.readBool(args.ongoing),
-		onlyExact = Logic.readBool(Logic.emptyOr(args.onlyExact, true)),
-		enteredOpponentOnLeft = hasOpponent and Logic.readBool(args.enteredOpponentOnLeft or hasOpponent),
+		onlyExact = Logic.nilOr(Logic.readBoolOrNil(args.onlyExact), true),
+		enteredOpponentFirst = hasOpponent and Logic.readBool(args.enteredOpponentFirst or hasOpponent),
 		showInfoForEmptyResults = Logic.readBool(args.showInfoForEmptyResults),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
 		regions = args.regions and Array.parseCommaSeparatedString(args.regions) or nil,
@@ -153,8 +155,11 @@ function MatchTickerController.parseConfig(args)
 				end) or nil,
 		featuredOnly = Logic.readBool(args.featuredOnly),
 		displayGameIcons = Logic.readBool(args.displayGameIcons),
-		variant = Logic.readBool(args.entityStyle) and 'horizontal' or 'vertical',
+		variant = args.variant == 'carousel' and 'carousel'
+			or Logic.readBool(args.entityStyle) and 'horizontal'
+			or 'vertical',
 		header = args.header,
+		showAllLink = Logic.nilIfEmpty(args.showAllLink),
 	}
 
 	--min 1 of them has to be set; recent can not be set while any of the others is set
@@ -493,16 +498,20 @@ function MatchTickerController.sortMatches(matches, config)
 	end)
 end
 
---- Will only switch if enteredOpponentOnLeft is enabled AND there are exactly 2 opponents
+--- Will adjust only if enteredOpponentFirst is enabled
 ---@private
 ---@param match {match: MatchGroupUtilMatch, gameData: MatchTickerGameData?}
 ---@param config MatchTickerConfig
 function MatchTickerController.adjustMatch(match, config)
-	if not config.enteredOpponentOnLeft or #match.match.opponents ~= 2 then
+	if not config.enteredOpponentFirst or #match.match.opponents < 2 then
+		return
+	elseif #match.match.opponents > 2 then
+		---@cast match {match: FFAMatchGroupUtilMatch, gameData: MatchTickerGameData?}
+		MatchTickerController.adjustFfaMatch(match, config)
 		return
 	end
 
-	local opponentNames = Array.extend({config.player}, config.teamPages)
+	local opponentNames = Array.extendWith({config.player}, config.teamPages)
 	if
 		--check for the name value
 		Table.includes(opponentNames, ((match.match.opponents[2].name or ''):gsub(' ', '_')))
@@ -527,6 +536,39 @@ function MatchTickerController.switchOpponents(match)
 		or match.match.winner
 
 	match.match.opponents[1], match.match.opponents[2] = match.match.opponents[2], match.match.opponents[1]
+end
+
+---@private
+---@param match {match: FFAMatchGroupUtilMatch, gameData: MatchTickerGameData?}
+---@param config MatchTickerConfig
+function MatchTickerController.adjustFfaMatch(match, config)
+	if Logic.isNumeric(match.match.winner) then
+		return
+	end
+
+	local opponentNames = Array.extendWith({config.player}, config.teamPages)
+
+	local opponentIndex = Array.indexOf(
+		match.match.opponents,
+		function (matchOpponent)
+			if Table.includes(opponentNames, ((matchOpponent.name or ''):gsub(' ', '_'))) then
+				return true
+			elseif String.isEmpty(config.player) then
+				return false
+			end
+			return Array.any(
+				matchOpponent.players,
+				function (playerData)
+					return (playerData.pageName or ''):gsub(' ', '_') == config.player
+				end
+			)
+		end
+	)
+	if opponentIndex <= 1 then
+		return
+	end
+	local opponent = table.remove(match.match.opponents, opponentIndex)
+	table.insert(match.match.opponents, 1, opponent)
 end
 
 --- Fetches region of a tournament

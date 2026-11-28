@@ -16,6 +16,8 @@ local TiebreakerBuchholz = Lua.import('Module:Standings/Tiebreaker/Buchholz')
 ---@class TiebreakerBuchholzCutOne : TiebreakerBuchholz
 local TiebreakerBuchholzCutOne = Class.new(TiebreakerBuchholz)
 
+TiebreakerBuchholzCutOne.fullContextOnly = true
+
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
 ---@return number

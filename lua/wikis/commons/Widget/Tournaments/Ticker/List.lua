@@ -21,6 +21,7 @@ local TickerData = Lua.import('Module:TournamentsTicker/Data')
 ---@field variant 'tabs'|'collapsible'?
 ---@field displayGameIcons boolean?
 ---@field tierColorScheme string?
+---@field filterGroupPrefix string? has to match the `filterGroupPrefix` of the filter buttons controlling this ticker
 
 local defaultProps = {
 	upcomingDays = 5,
@@ -50,6 +51,7 @@ local function TournamentsTickerList(props)
 		return Sublist{
 			tournaments = tournaments,
 			createItem = createItem,
+			filterGroupPrefix = props.filterGroupPrefix,
 			fallback = Html.Div{
 				attributes = {
 					['data-filter-hideable-group-fallback'] = '',

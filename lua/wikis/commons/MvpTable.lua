@@ -24,7 +24,7 @@ local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class mvpTableParsedArgs
----@field cutafter number
+---@field collapseAfter number
 ---@field margin number
 ---@field points boolean
 ---@field title string?
@@ -57,8 +57,9 @@ function MvpTable.run(args)
 		return
 	end
 
+	local collapseText = 'place ' .. (parsedArgs.collapseAfter + 1) .. ' to ' .. #mvpList
+
 	return TableWidgets.Table{
-		tableClasses = {'prizepooltable', 'collapsed'},
 		title = String.nilIfEmpty(args.title),
 		attributes = {id = 'MvpTable'},
 		columns = {
@@ -69,12 +70,9 @@ function MvpTable.run(args)
 		css = {
 			['margin-top'] = parsedArgs.margin .. 'px'
 		},
-		tableAttributes = {
-			['data-opentext'] = 'place ' .. (parsedArgs.cutafter + 1) .. ' to ' .. #mvpList,
-			['data-closetext'] = 'place ' .. (parsedArgs.cutafter + 1) .. ' to ' .. #mvpList,
-			['data-cutafter'] = parsedArgs.cutafter,
-			['data-definedcutafter'] = ''
-		},
+		collapseAfter = #mvpList > parsedArgs.collapseAfter and parsedArgs.collapseAfter or nil,
+		expandText = collapseText,
+		collapseText = collapseText,
 		children = WidgetUtil.collect(
 			MvpTable._header(args),
 			TableWidgets.TableBody{children = Array.map(mvpList, FnUtil.curry(MvpTable._row, parsedArgs))}
@@ -87,7 +85,7 @@ end
 ---@return mvpTableParsedArgs
 function MvpTable._parseArgs(args)
 	local parsedArgs = {
-		cutafter = tonumber(args.cutafter) or 5,
+		collapseAfter = tonumber(args.collapseafter or args.cutafter) or 5,
 		margin = Logic.nilOr(Logic.readBoolOrNil(args.margin), true) and 20 or 0,
 		points = Logic.readBool(args.points),
 		title = args.title,

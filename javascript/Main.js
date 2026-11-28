@@ -19,6 +19,11 @@ window.mw = window.mw || {
 	user: {
 		isAnon: function () {
 			return false;
+		},
+		options: {
+			get: function () {
+				return null;
+			}
 		}
 	},
 	loader: {
@@ -44,6 +49,7 @@ window.mw = window.mw || {
 const jsModules = [
 	'UseStrict',
 	'Core',
+	'Storage',
 	'Analytics',
 	'BattleRoyale',
 	'Bracket',
@@ -61,6 +67,7 @@ const jsModules = [
 	'FilterButtons',
 	'Liquipedia_links',
 	'Mainpage',
+	'MatchTicker',
 	'Miscellaneous',
 	'PanelBoxCollapsible',
 	'Prizepooltable',

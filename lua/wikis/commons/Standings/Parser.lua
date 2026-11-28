@@ -12,11 +12,16 @@ local Info = Lua.import('Module:Info', { loadData = true })
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
+local StandingsPlacementRange = Lua.import('Module:Standings/PlacementRange')
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
+local TiebreakerGameUtil = Lua.import('Module:Standings/Tiebreaker/Game/Util')
 local TiebreakerHeadToHead = Lua.import('Module:Standings/Tiebreaker/HeadToHead')
+local TiebreakerMatchUtil = Lua.import('Module:Standings/Tiebreaker/Match/Util')
 local TiebreakerScope = Lua.import('Module:Standings/Tiebreaker/Scope')
 
 local StandingsParser = {}
+
+local DISQUALIFIED_STATUS = 'dq'
 
 ---@class StandingsParserOptions
 ---@field drawConfig {match: boolean?}? Explicit draw toggles per level; when unset, draws are detected from the data
@@ -24,6 +29,9 @@ local StandingsParser = {}
 ---@field walkoverGames integer? Games a walkover counts as in the game tiebreakers, unset means not counted
 ---@field walkoverRounds integer? Rounds a walkover map counts as in the round tiebreakers, unset means not counted
 ---@field tiebreakerReset boolean? Whether groups split by a tiebreaker start over from the first tiebreaker
+---@field maxBestOf number? The highest bestof of the table's matches
+---@field format StandingsFormat? Enables the placement ranges of the opponents
+---@field points table<string, number>? The points per result, see StandingsParseWiki.parsePoints
 
 ---@param carried table
 ---@param record table?
@@ -31,6 +39,21 @@ local function addRecord(carried, record)
 	for key, value in pairs(record or {}) do
 		carried[key] = carried[key] + value
 	end
+end
+
+---Whether the game stats repeat the match stats: every match is a Bo1 (or Bo0) and the records are equal.
+---@param entries TiebreakerOpponent[]
+---@param options StandingsParserOptions
+---@return boolean
+local function gameStatsRepeatMatchStats(entries, options)
+	if (options.maxBestOf or 0) > 1 then
+		return false
+	end
+	return Array.all(entries, function(entry)
+		local games = TiebreakerGameUtil.getGames(entry, options.walkoverGames)
+		local matches = TiebreakerMatchUtil.getMatches(entry)
+		return games.w == matches.w and games.d == matches.d and games.l == matches.l
+	end)
 end
 
 ---@param rounds {roundNumber: integer, started: boolean, finished:boolean, title: string?}[]
@@ -66,7 +89,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		local adjustments = opponentData.adjustments or {}
 
 		return Array.map(rounds, function(round)
-			local pointsFromRound, statusInRound, matchId, matchOpponentIndex, playedMatches
+			local pointsFromRound, statusInRound, matchId, matchOpponentIndex, playedMatches, roundMatchPoints
 			if opponentRounds and opponentRounds[round.roundNumber] then
 				local thisRoundsData = opponentRounds[round.roundNumber]
 				if thisRoundsData.scoreboard then
@@ -80,6 +103,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 					addRecord(carryData.overtime, thisRoundsData.scoreboard.overtime)
 				end
 				playedMatches = thisRoundsData.matches
+				roundMatchPoints = thisRoundsData.matchPoints
 			end
 			local adjustment = adjustments[round.roundNumber] or {}
 			if adjustment.points then
@@ -103,13 +127,14 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 				gameAdjustment = Table.copy(carryData.gameAdjustment),
 				roundAdjustment = Table.copy(carryData.roundAdjustment),
 				matches = playedMatches or {},
-				matchPoints = opponentData.matchPoints or {},
+				matchPoints = roundMatchPoints or opponentData.matchPoints or {},
 				startingPoints = opponentData.startingPoints,
 				finished = round.finished,
-				manualDefiniteStatus = StandingsParser.resolveManualDefiniteStatus(
+				manualDefiniteStatus = StandingsParser.resolveManualStatus(
 					opponentData.definiteStatuses, round.roundNumber
 				),
 				extradata = {
+					minstatus = StandingsParser.resolveManualStatus(opponentData.minStatuses, round.roundNumber),
 					pointschange = pointsFromRound,
 					specialstatus = statusInRound,
 					tiebreakerpoints = carryData.tiebreakerPoints,
@@ -138,6 +163,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		walkoverGames = options.walkoverGames,
 		walkoverRounds = options.walkoverRounds,
 	}
+	local gameStatsUseMatchColumns = gameStatsRepeatMatchStats(entries, options)
 
 	---@param tiebreakerId string
 	---@return StandingsAdditionalStat
@@ -147,8 +173,14 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		if tiebreakerContextType ~= 'full' then
 			return {id = tiebreakerId}
 		end
+		-- Only the column changes, placements still use the game tiebreaker
+		local columnId = tiebreakerId
+		if gameStatsUseMatchColumns then
+			columnId = TiebreakerFactory.toMatchEquivalent(tiebreakerId)
+			tiebreaker = TiebreakerFactory.tiebreakerFromId(columnId, tiebreakerOptions)
+		end
 		return {
-			id = tiebreakerId,
+			id = columnId,
 			title = tiebreaker:headerTitle(),
 		}
 	end
@@ -171,8 +203,24 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 			return opponentRound.roundindex == round.roundNumber
 		end), tiebreakerIds, tiebreakerOptions, options.tiebreakerReset)
 	end)
+
+	local placementRangeCalculator = options.format and StandingsPlacementRange.calculator(options.format, opponents, {
+		tiebreakerIds = tiebreakerIds,
+		points = options.points,
+	})
+	if placementRangeCalculator then
+		Array.forEach(rounds, function(round)
+			-- The final placements of a finished table are exact
+			if isFinished and round.roundNumber == #rounds then
+				return
+			end
+			StandingsPlacementRange.setRanges(placementRangeCalculator, Array.filter(entries, function(opponentRound)
+				return opponentRound.roundindex == round.roundNumber
+			end), round.roundNumber)
+		end)
+	end
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer,
-	---points: number, placement: integer?, slotindex: integer}[]
+	---points: number, placement: integer?, slotindex: integer, placerange: StandingsPlacementRangeValue?}[]
 
 	StandingsParser.setPlacementChange(entries)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer,
@@ -180,6 +228,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 	---matches: MatchGroupUtilMatch[]?, matchPoints: table<string, number>?}[]
 
 	StandingsParser.addStatuses(entries, bgs, 'currentstatus')
+	StandingsParser.addStatusesFromPlacementRange(entries, bgs, #opponents)
 	if isFinished then
 		StandingsParser.addStatuses(Array.filter(entries, function(opponentRound)
 			return opponentRound.roundindex == #rounds
@@ -419,30 +468,74 @@ function StandingsParser.addStatuses(opponentEnties, bgs, field)
 	end)
 end
 
----Finds the manually set definite status that is in effect in a round,
+---Sets the definite status of opponents whose placement range has a single status, else the min status when the
+---range rules out a later status other than dq. A manual min status takes priority.
+---@param opponentEntries {placerange: StandingsPlacementRangeValue?, definitestatus: string?, extradata: table}[]
+---@param bgs table<integer, string>
+---@param slotCount integer
+function StandingsParser.addStatusesFromPlacementRange(opponentEntries, bgs, slotCount)
+	local function hasSingleStatus(firstSlot, lastSlot)
+		return Array.all(Array.range(firstSlot, lastSlot), function(slot)
+			return bgs[slot] == bgs[firstSlot]
+		end)
+	end
+	local function hasWorseStatusAfter(slot)
+		return Array.any(Array.range(slot + 1, slotCount), function(laterSlot)
+			return bgs[laterSlot] ~= bgs[slot] and bgs[laterSlot] ~= DISQUALIFIED_STATUS
+		end)
+	end
+
+	-- Most entries share a few ranges
+	local statusesByRange = {}
+	local function statusesOfRange(range)
+		local key = range[1] .. '-' .. range[2]
+		if statusesByRange[key] then
+			return statusesByRange[key]
+		end
+		local worstStatus = bgs[range[2]]
+		if hasSingleStatus(range[1], range[2]) then
+			statusesByRange[key] = {definite = worstStatus}
+		elseif hasWorseStatusAfter(range[2]) then
+			statusesByRange[key] = {minimum = worstStatus}
+		else
+			statusesByRange[key] = {}
+		end
+		return statusesByRange[key]
+	end
+
+	Array.forEach(opponentEntries, function(opponent)
+		if not opponent.placerange then
+			return
+		end
+		local statuses = statusesOfRange(opponent.placerange)
+		opponent.definitestatus = statuses.definite
+		opponent.extradata.minstatus = opponent.extradata.minstatus or statuses.minimum
+	end)
+end
+
+---Finds the manually set status that is in effect in a round,
 ---which is the one with the highest round number that is not after the given round.
----@param definiteStatuses table<integer, string>?
+---@param statuses table<integer, string>?
 ---@param roundNumber integer
 ---@return string?
-function StandingsParser.resolveManualDefiniteStatus(definiteStatuses, roundNumber)
-	if not definiteStatuses then
+function StandingsParser.resolveManualStatus(statuses, roundNumber)
+	if not statuses then
 		return
 	end
 	for round = roundNumber, 1, -1 do
-		if definiteStatuses[round] then
-			return definiteStatuses[round]
+		if statuses[round] then
+			return statuses[round]
 		end
 	end
 end
 
----Overrides the statuses of opponents with a manually set definite status.
----A definite status is also the current status, so both are set.
----@param opponentEntries {manualDefiniteStatus: string?, currentstatus: string?, definitestatus: string?}[]
+---Overrides the definite status of opponents with a manually set one.
+---The current status stays the bg of the slot.
+---@param opponentEntries {manualDefiniteStatus: string?, definitestatus: string?}[]
 function StandingsParser.applyManualStatuses(opponentEntries)
 	Array.forEach(opponentEntries, function(opponent)
 		local manualStatus = opponent.manualDefiniteStatus
 		if manualStatus then
-			opponent.currentstatus = manualStatus
 			opponent.definitestatus = manualStatus
 		end
 	end)
@@ -454,8 +547,8 @@ end
 function StandingsParser.applyDisqualifications(opponentEntries)
 	Array.forEach(opponentEntries, function(opponent)
 		if opponent.extradata.disqualified then
-			opponent.currentstatus = 'dq'
-			opponent.definitestatus = 'dq'
+			opponent.currentstatus = DISQUALIFIED_STATUS
+			opponent.definitestatus = DISQUALIFIED_STATUS
 		end
 	end)
 end

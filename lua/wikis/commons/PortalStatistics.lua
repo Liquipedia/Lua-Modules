@@ -241,9 +241,7 @@ function StatisticsPortal._coverageMatchTableRow(args, parameters)
 	local gameCountValue
 
 	if Info.config.match2.status == 0 then
-		---@diagnostic disable-next-line: deprecated
 		matchCountValue = Count.matches(parameters)
-		---@diagnostic disable-next-line: deprecated
 		gameCountValue = Count.games(parameters)
 	else
 		matchCountValue = Count.match2(parameters)

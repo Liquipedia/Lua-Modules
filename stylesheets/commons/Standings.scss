@@ -68,12 +68,12 @@
 			--placement-row-color: var( --position-disqualified-color );
 		}
 
-		&:has( > :first-child > .label--placement[ data-placement-type ] ) > :not( .standings-swiss-match ) {
+		&:has( > :first-child > .label--placement[ data-placement-type ]:not( [ data-label-type="placement-minimum" ] ) ) > :not( .standings-swiss-match ) {
 			background-color: var( --placement-confirmed-color );
 			box-shadow: inset 0 -1px var( --border-color );
 		}
 
-		&:has( > :first-child > .label--placement[ data-placement-type ] ):hover > :not( .standings-swiss-match ) {
+		&:has( > :first-child > .label--placement[ data-placement-type ]:not( [ data-label-type="placement-minimum" ] ) ):hover > :not( .standings-swiss-match ) {
 			background-color: hsl( from var( --placement-confirmed-color ) h s calc( l * 0.9 ) );
 
 			.theme--dark & {
@@ -126,6 +126,27 @@
 
 		> .generic-label {
 			flex-shrink: 0;
+		}
+	}
+
+	td.brkts-opponent-hover {
+		transition: 0.5s;
+		transition-property: border-color;
+
+		&-active {
+			box-shadow: -1px 0 2px var( --brackets-opponent-hover-color ) inset, 1px 0 2px var( --brackets-opponent-hover-color ) inset, 0 -1px 2px var( --brackets-opponent-hover-color ) inset, 0 1px 2px var( --brackets-opponent-hover-color ) inset;
+
+			&:not( .standings-swiss-match ) {
+				box-shadow: 0 -1px var( --brackets-opponent-hover-color ) inset, 0 1px var( --brackets-opponent-hover-color ) inset !important;
+
+				&:first-child {
+					box-shadow: 0 -1px var( --brackets-opponent-hover-color ) inset, 0 1px var( --brackets-opponent-hover-color ) inset, 1px 0 2px var( --brackets-opponent-hover-color ) inset !important;
+				}
+
+				&:nth-last-child( 1 of :not( .standings-swiss-match ) ) {
+					box-shadow: 0 -1px var( --brackets-opponent-hover-color ) inset, 0 1px var( --brackets-opponent-hover-color ) inset, -1px 0 2px var( --brackets-opponent-hover-color ) inset !important;
+				}
+			}
 		}
 	}
 }

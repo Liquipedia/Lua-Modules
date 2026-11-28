@@ -93,6 +93,10 @@ return {
 		name = 'British Summer Time',
 		offset = {1, 0},
 	},
+	BTT = {
+		name = 'Bhutan Time',
+		offset = {6, 0},
+	},
 	CAT = {
 		name = 'Central Africa Time',
 		offset = {2, 0},
@@ -104,6 +108,10 @@ return {
 	CET = {
 		name = 'Central European Time',
 		offset = {1, 0},
+	},
+	CKT = {
+		name = 'Cook Island Time',
+		offset = {-10, 0},
 	},
 	COT = {
 		name = 'Colombia Time',
@@ -290,6 +298,10 @@ return {
 	SGT = {
 		name = 'Singapore Time',
 		offset = {8, 0},
+	},
+	SST = {
+		name = 'Samoa Standard Time',
+		offset = {-11, 0},
 	},
 	THA = {
 		abbr = 'ICT',
