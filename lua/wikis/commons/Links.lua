@@ -107,6 +107,7 @@ local PREFIXES = {
 	douyin_page = {'https://v.douyin.com/'},
 	douyu = {'https://www.douyu.com/'},
 	ebattle = {match = 'https://www.ebattle.gg/turnier/match/'},
+	ecm = {'https://ecircuitmania.com/tournaments/'},
 	esea = {
 		'https://play.esea.net/events/',
 		player = 'https://play.esea.net/users/',
@@ -346,6 +347,7 @@ local PREFIXES = {
 	},
 	tlprofile = {'https://tl.net/forum/profile.php?user='},
 	tlstream = {'https://tl.net/video/streams/'},
+	['tm-events'] = {'https://trackmania.events/events/'},
 	tonamel = {'https://tonamel.com/competition/'},
 	toornament = {'https://play.toornament.com/tournaments/'},
 	['trackmania-io'] = {
