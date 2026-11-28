@@ -134,24 +134,31 @@ end
 ---@param date string?
 ---@return table<string, string>?
 function HeroPicks.readMapOpponent(map, opponentIndex, slotCount, date)
-	return Logic.nilIfEmpty(Table.map(Array.range(1, slotCount), function(_, heroIndex)
+	---@type table<string, string>
+	local picks = {}
+
+	Array.forEach(Array.range(1, slotCount), function(heroIndex)
 		local parameter = 't' .. opponentIndex .. 'h' .. heroIndex
 		local value = map[parameter]
 
+		if value == nil then
+			return
+		end
+
 		if type(value) == 'string' and String.trim(value) == '' then
-			return tostring(heroIndex), nil
-		elseif value == nil then
-			return tostring(heroIndex), nil
+			return
 		end
 
 		local hero = HeroPicks.lookup(value, date)
 		if not hero then
 			warnUnknownHero(value, parameter)
-			return tostring(heroIndex), nil
+			return
 		end
 
-		return tostring(heroIndex), hero.page
-	end))
+		picks[tostring(heroIndex)] = hero.page
+	end)
+
+	return Logic.nilIfEmpty(picks)
 end
 
 return HeroPicks
