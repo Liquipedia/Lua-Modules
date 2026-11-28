@@ -9,8 +9,11 @@ local Lua = require('Module:Lua')
 
 local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
+local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
 
+local Html = Lua.import('Module:Widget/Html')
+local Div = Html.Div
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 local CONTENT = {
@@ -29,6 +32,13 @@ local CONTENT = {
 		heading = 'Popular Esports',
 		body = '{{Liquipedia:Popular Esports}}',
 		boxid = 1529,
+	},
+	filterButtons = {
+		noPanel = true,
+		body = Div{
+			css = { width = '100%', ['margin-bottom'] = '8px' },
+			children = { FilterButtonsWidget() }
+		}
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -124,6 +134,14 @@ return {
 									{
 										noPanel = true,
 										content = CONTENT.popularEsports,
+									},
+								},
+							},
+							{
+								children = {
+									{
+										noPanel = true,
+										content = CONTENT.filterButtons,
 									},
 								},
 							},
