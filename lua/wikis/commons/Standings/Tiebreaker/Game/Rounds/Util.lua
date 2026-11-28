@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
@@ -18,6 +19,17 @@ local StandingsOvertime = Lua.import('Module:Standings/Overtime')
 local TiebreakerGameUtil = Lua.import('Module:Standings/Tiebreaker/Game/Util')
 
 local TiebreakerRoundUtil = {}
+
+---The column titles of the round tiebreakers, a wiki can rename rounds through Info.config.standings.roundName
+---(e.g. goals), the titles are then spelled out
+---@return {name: string, diff: string, winRate: string}
+function TiebreakerRoundUtil.titles()
+	local roundName = (Info.config.standings or {}).roundName
+	if not roundName then
+		return {name = 'Round', diff = 'RD', winRate = 'Rnd%'}
+	end
+	return {name = roundName, diff = roundName .. ' Diff', winRate = roundName .. '%'}
+end
 
 ---@param opponent TiebreakerOpponent
 ---@return {rounds: integer, w: integer, l: integer, regulation: {w: integer, l: integer},

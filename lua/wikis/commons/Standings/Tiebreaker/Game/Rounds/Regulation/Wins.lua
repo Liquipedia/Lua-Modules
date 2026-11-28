@@ -33,7 +33,7 @@ end
 
 ---@return string
 function TiebreakerRoundWinsRegulation:headerTitle()
-	return 'Round (R)'
+	return TiebreakerRoundUtil.titles().name .. ' (R)'
 end
 
 ---@param state TiebreakerOpponent[]

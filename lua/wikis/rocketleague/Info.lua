@@ -60,6 +60,7 @@ return {
 				swiss = {'matchscore', 'gamescore'},
 				group = {'matchscore', 'gamescore'},
 			},
+			roundName = 'Goal',
 		},
 	},
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',

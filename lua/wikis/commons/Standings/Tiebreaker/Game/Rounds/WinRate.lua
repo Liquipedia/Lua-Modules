@@ -30,7 +30,7 @@ end
 
 ---@return string
 function TiebreakerRoundWinRate:headerTitle()
-	return 'Rnd%'
+	return TiebreakerRoundUtil.titles().winRate
 end
 
 ---@param state TiebreakerOpponent[]
