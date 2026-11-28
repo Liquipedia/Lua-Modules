@@ -14,7 +14,6 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Component = Lua.import('Module:Widget/Component')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local DurationStatsVodLink = Lua.import('Module:Features/DurationStats/Components/VodLink')
 
@@ -32,15 +31,15 @@ local function DurationStatsRow(props)
 	local game = entry.game
 
 	return TableWidgets.Row{
-		children = WidgetUtil.collect(
+		children = {
 			TableWidgets.Cell{children = DateExt.toYmdInUtc(game.date)},
 			TableWidgets.Cell{children = Link{link = entry.pageName, children = entry.stageName}},
 			TableWidgets.Cell{children = entry.gameId},
 			TableWidgets.Cell{children = displayOpponent(entry.winner)},
 			TableWidgets.Cell{children = displayOpponent(entry.loser)},
 			TableWidgets.Cell{children = game.length},
-			Logic.readBool(props.showVod) and TableWidgets.Cell{children = DurationStatsVodLink.display(entry)} or nil
-		)
+			Logic.readBool(props.showVod) and TableWidgets.Cell{children = DurationStatsVodLink.display(entry)} or nil,
+		}
 	}
 end
 

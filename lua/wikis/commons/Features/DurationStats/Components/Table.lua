@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 
 local Component = Lua.import('Module:Widget/Component')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local DurationStatsRow = Lua.import('Module:Features/DurationStats/Components/Row')
 local DurationStatsVodLink = Lua.import('Module:Features/DurationStats/Components/VodLink')
@@ -26,33 +25,33 @@ local function DurationStatsTable(props)
 	return TableWidgets.Table{
 		sortable = true,
 		title = props.title,
-		columns = WidgetUtil.collect(
+		columns = {
 			{align = 'left'},
 			{align = 'left'},
 			{align = 'right'},
 			{align = 'left'},
 			{align = 'left'},
 			{align = 'right'},
-			showVod and {align = 'center'} or nil
-		),
-		children = WidgetUtil.collect(
+			showVod and {align = 'center'} or nil,
+		},
+		children = {
 			--Header
 			TableWidgets.Row{
-				children = WidgetUtil.collect(
+				children = {
 					TableWidgets.CellHeader{children = 'Date', unsortable = true},
 					TableWidgets.CellHeader{children = 'Stage', unsortable = true},
 					TableWidgets.CellHeader{children = 'Game #', unsortable = true},
 					TableWidgets.CellHeader{children = 'Winner'},
 					TableWidgets.CellHeader{children = 'Loser'},
 					TableWidgets.CellHeader{children = 'Duration', unsortable = true},
-					showVod and TableWidgets.CellHeader{children = 'VOD', unsortable = true} or nil
-				),
+					showVod and TableWidgets.CellHeader{children = 'VOD', unsortable = true} or nil,
+				},
 			},
 			--Rows
 			TableWidgets.TableBody{children = Array.map(props.entries, function(entry)
 				return DurationStatsRow{entry = entry, showVod = showVod}
-			end)}
-		)
+			end)},
+		},
 	}
 end
 

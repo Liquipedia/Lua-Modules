@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
@@ -32,7 +31,7 @@ function Conditions.build(spec, sdate, edate)
 		ConditionNode(ColumnName('winner'), Comparator.neq, ''),
 		ConditionNode(ColumnName('length'), Comparator.neq, ''),
 		ConditionNode(ColumnName('status'), Comparator.neq, 'notplayed'),
-		TournamentStructure.getPageNamesFilter('bracket', Array.flatten(spec.pageNames)),
+		TournamentStructure.getMatch2Filter(spec),
 	}
 
 	if Logic.isNotEmpty(sdate) then
