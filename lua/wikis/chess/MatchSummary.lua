@@ -16,6 +16,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 
 local Collapsible = Lua.import('Module:Widget/Match/Summary/Collapsible')
@@ -59,10 +60,22 @@ local CustomMatchSummary = {
 	GameRow = ChessMatchSummaryGameRow,
 }
 
+---@param game MatchGroupUtilGame
+---@param opponentIndex integer
+---@return number
+local function calculateGameScore(game, opponentIndex)
+	local score = game.scores and tonumber(game.scores[opponentIndex])
+	if score and score >= 0 then
+		return score
+	end
+	return game.winner == opponentIndex and 1 or game.winner == 0 and 0.5 or 0
+end
+
 ---@param args table
 ---@return VNode
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {
+		calculateGameScore = calculateGameScore,
 		width = function (match)
 			if Array.any(match.opponents, function (opponent)
 				return opponent.type == Opponent.team
@@ -79,13 +92,45 @@ function CustomMatchSummary.gameFilter(game)
 	return game.status ~= STATUS_NOT_PLAYED
 end
 
+---@param game MatchGroupUtilGame
+---@param opponentIndex integer
+---@return VNode
+local function makeGameScore(game, opponentIndex)
+	return OpponentDisplay.BlockScore{
+		isWinner = game.winner == opponentIndex or game.winner == 0,
+		scoreText = MatchSummaryWidgets.GameRow.scoreDisplay(game, opponentIndex),
+	}
+end
+
 ---@param props MatchSummaryGameRowProps
 ---@return Renderable[]
 function GameRowComponentProps.createGameOverview(props)
 	local game = props.game
-	return {
+	local title = {
 		'Game ' .. props.gameIndex,
 		tonumber(game.length) and (' - ' .. game.length .. ' moves') or '',
+	}
+
+	local score1 = MatchSummaryWidgets.GameRow.scoreDisplay(game, 1)
+	local score2 = MatchSummaryWidgets.GameRow.scoreDisplay(game, 2)
+	if Logic.isEmpty(score1) and Logic.isEmpty(score2) then
+		return title
+	end
+
+	return {
+		Html.Div{
+			children = {
+				Html.Div{children = title},
+				Html.Div{
+					classes = {'brkts-popup-spaced'},
+					children = {
+						makeGameScore(game, 1),
+						':',
+						makeGameScore(game, 2),
+					},
+				},
+			},
+		},
 	}
 end
 
