@@ -48,6 +48,19 @@ describe('Date', function()
 		end)
 	end)
 
+	describe('toEndOfDay', function()
+		it('verify', function()
+			assert.are_equal('2026-05-10 23:59:59', DateExt.toEndOfDay('2026-05-10'))
+			-- dates that already have a time of day are left alone
+			assert.are_equal('2026-05-10 12:00:00', DateExt.toEndOfDay('2026-05-10 12:00:00'))
+			assert.are_equal('2026-05-10T12:00:00', DateExt.toEndOfDay('2026-05-10T12:00:00'))
+			-- so are partial dates and empty input
+			assert.are_equal('2026-05', DateExt.toEndOfDay('2026-05'))
+			assert.are_equal('', DateExt.toEndOfDay(''))
+			assert.is_nil(DateExt.toEndOfDay(nil))
+		end)
+	end)
+
 	describe('getContextualDateOrNow', function()
 		it('verify', function()
 			assert.are_equal(os.date('%F'), DateExt.getContextualDateOrNow())
