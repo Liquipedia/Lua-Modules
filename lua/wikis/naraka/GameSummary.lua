@@ -12,6 +12,7 @@ local FnUtil = Lua.import('Module:FnUtil')
 local HeroPicks = Lua.import('Module:HeroPicks')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local SummaryHelper = Lua.import('Module:MatchSummary/Base/Ffa')
@@ -19,6 +20,7 @@ local SummaryHelper = Lua.import('Module:MatchSummary/Base/Ffa')
 local Html = Lua.import('Module:Widget/Html')
 local MatchSummaryCharacter = Lua.import('Module:Widget/Match/Summary/Character')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CustomGameSummary = {}
 
@@ -29,10 +31,15 @@ local HERO_SLOT_GAP = 2
 local MARTIAL_ARTS_MAP = 'martial arts showdown'
 
 ---@class NarakaSummaryOpponent
+---@field score number?
+---@field status string?
+---@field placement number?
+---@field narakaScoreRank integer?
 ---@field type string?
----@field extradata {heroes: table<string|integer, string>?}?
+---@field extradata {heroes: table<string|integer, string>?, tiebreaker: number?}?
 
 ---@class NarakaSummaryGame
+---@field narakaScoreRanking boolean?
 ---@field map string?
 ---@field mapDisplayName string?
 ---@field date string?
@@ -46,6 +53,12 @@ local MARTIAL_ARTS_MAP = 'martial arts showdown'
 ---@field id string
 ---@field header table?
 ---@field row table?
+---@field sortable boolean?
+---@field sortType string?
+---@field class string?
+---@field icon string?
+---@field show? fun(game: NarakaSummaryGame): boolean
+---@field sortVal table?
 
 ---@param mapName string?
 ---@return boolean
@@ -162,30 +175,121 @@ local function renderHeroHeader(layout)
 	}
 end
 
+-- Display-only ranking: never replace placement, which is used for scoring.
+---@param opponent NarakaSummaryOpponent
+---@return boolean
+local function hasScore(opponent)
+	return (not opponent.status or opponent.status == 'S') and tonumber(opponent.score) ~= nil
+end
+
+---@param opponent NarakaSummaryOpponent
+---@return number
+local function tiePriority(opponent)
+	return tonumber((opponent.extradata or {}).tiebreaker) or 0
+end
+
+---@param opponent NarakaSummaryOpponent
+---@return number
+local function scoreValue(opponent)
+	-- Ignore floating-point noise in calculated scores; leave the stored score untouched.
+	return math.floor(tonumber(opponent.score) * 1000000 + 0.5) / 1000000
+end
+
+---@param game NarakaSummaryGame
+local function updateScoreRanks(game)
+	game.narakaScoreRanking = not (isMartialArts(game.map) or isMartialArts(game.mapDisplayName))
+	if not game.narakaScoreRanking then
+		return
+	end
+
+	local opponents = game.opponents or {}
+	local originalOrder = {}
+	Array.forEach(opponents, function(opponent, index)
+		originalOrder[opponent] = index
+	end)
+	Array.sortInPlaceBy(opponents, FnUtil.identity, function(left, right)
+		local leftHasScore, rightHasScore = hasScore(left), hasScore(right)
+		if leftHasScore ~= rightHasScore then
+			return leftHasScore
+		end
+		if leftHasScore then
+			local leftScore, rightScore = scoreValue(left), scoreValue(right)
+			if leftScore ~= rightScore then
+				return leftScore > rightScore
+			end
+			if tiePriority(left) ~= tiePriority(right) then
+				return tiePriority(left) > tiePriority(right)
+			end
+		end
+		-- Preserve a stable display order without claiming another official tiebreak rule.
+		return originalOrder[left] < originalOrder[right]
+	end)
+
+	local previousScore, previousPriority, rank
+	Array.forEach(opponents, function(opponent, index)
+		opponent.narakaScoreRank = nil
+		if hasScore(opponent) then
+			local score, priority = scoreValue(opponent), tiePriority(opponent)
+			if score ~= previousScore or priority ~= previousPriority then
+				rank = index
+			end
+			opponent.narakaScoreRank = rank
+			previousScore, previousPriority = score, priority
+		end
+	end)
+end
+
+---@param opponent NarakaSummaryOpponent
+---@return VNode|string
+local function renderScoreRank(opponent)
+	local rank = opponent.narakaScoreRank
+	if not rank then
+		return '-'
+	end
+	return Html.Fragment{children = {
+		MatchSummaryWidgets.Trophy{place = rank, additionalClasses = {'panel-table__cell-icon'}},
+		Html.Span{children = tostring(MatchSummaryWidgets.RankRange{rankStart = rank})},
+	}}
+end
+
+---@param column NarakaSummaryColumn
+---@return NarakaSummaryColumn
+local function scoreRankColumn(column)
+	local result = Table.copy(column)
+	result.header = {value = 'Score Rank', mobileValue = 'Rank'}
+	result.sortVal = {value = function(opponent)
+		return opponent.narakaScoreRank or 999999
+	end}
+	result.row = {value = renderScoreRank}
+	return result
+end
+
 ---@param defaultColumns NarakaSummaryColumn[]
 ---@param game NarakaSummaryGame
 ---@return NarakaSummaryColumn[]
 function CustomGameSummary.adjustGameStandingsColumns(defaultColumns, game)
 	local layout = getHeroLayout(game)
-	if not layout then
-		return defaultColumns
-	end
-
+	local martialArts = isMartialArts(game.map) or isMartialArts(game.mapDisplayName)
 	return Array.flatMap(defaultColumns, function(column)
+		if martialArts and column.id == 'kills' then
+			return {}
+		end
+		if game.narakaScoreRanking and column.id == 'rank' then
+			return {scoreRankColumn(column)}
+		end
 		if column.id ~= 'totalPoints' then
 			return {column}
 		end
-
-		return {
-			{
+		local columns = {}
+		if layout then
+			table.insert(columns, {
 				id = 'hero',
 				header = {value = renderHeroHeader(layout)},
-				row = {
-					value = FnUtil.curry(renderHeroes, layout),
-				},
-			},
-			column,
-		}
+				row = {value = FnUtil.curry(renderHeroes, layout)},
+			})
+		end
+		table.insert(columns, column)
+		return columns
 	end)
 end
 
@@ -200,18 +304,24 @@ function CustomGameSummary.getGameByMatchId(props)
 
 	game.date = game.date or match.date
 	game.stream = match.stream
-	game.extradata.settings = match.extradata.settings
+	game.extradata = game.extradata or {}
+	game.extradata.settings = (match.extradata or {}).settings
 
 	SummaryHelper.updateGameOpponents(match, game)
+	updateScoreRanks(game)
 
 	return MatchSummaryWidgets.Tab{
 		matchId = match.matchId,
 		idx = props.gameIdx,
-		children = {
+		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameDetails{game = game},
+			(isMartialArts(game.map) or isMartialArts(game.mapDisplayName))
+				and game.extradata.placementinfo and MatchSummaryWidgets.PointsDistribution{
+				scores = SummaryHelper.createScoringData{extradata = game.extradata},
+			} or nil,
 			MatchSummaryWidgets.Mvp(game.extradata.mvp),
-			SummaryHelper.standardGame(game, CustomGameSummary),
-		},
+			SummaryHelper.standardGame(game, CustomGameSummary)
+		),
 	}
 end
 
